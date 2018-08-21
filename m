@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-0000qu-I9
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:13 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-0000r1-JY
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lS-0006xU-UY
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lS-0006xh-Uq
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:09 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49353 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:49350 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6lS-0006vK-Fs
+	id 1fs6lS-0006vA-HS
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:06 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:31:22 +0200
-Message-Id: <1534858316-12945-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:31:20 +0200
+Message-Id: <1534858316-12945-11-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 12/46] target/mips: Add emulation of nanoMIPS
- 16-bit logic instructions
+Subject: [Qemu-devel] [PULL v3 10/46] target/mips: Add emulation of nanoMIPS
+ 16-bit misc instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +30,74 @@ Cc: peter.maydell@linaro.org
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of NOT16, AND16, XOR16, OR16 instructions.
+Add emulation of misc nanoMIPS 16-bit instructions.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ target/mips/translate.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 569e58a..75f2b64 100644
+index e3fac1a..c774dc9 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16760,6 +16760,37 @@ static inline int decode_gpr_gpr4_zero(int r)
- }
- 
- 
-+/* extraction utilities */
-+
-+#define NANOMIPS_EXTRACT_RD(op) ((op >> 7) & 0x7)
-+#define NANOMIPS_EXTRACT_RS(op) ((op >> 4) & 0x7)
-+#define NANOMIPS_EXTRACT_RS2(op) uMIPS_RS(op)
-+#define NANOMIPS_EXTRACT_RS1(op) ((op >> 1) & 0x7)
-+#define NANOMIPS_EXTRACT_RD5(op) ((op >> 5) & 0x1f)
-+#define NANOMIPS_EXTRACT_RS5(op) (op & 0x1f)
-+
-+
-+static void gen_pool16c_nanomips_insn(DisasContext *ctx)
-+{
-+    int rt = decode_gpr_gpr3(NANOMIPS_EXTRACT_RD(ctx->opcode));
-+    int rs = decode_gpr_gpr3(NANOMIPS_EXTRACT_RS(ctx->opcode));
-+
-+    switch (extract32(ctx->opcode, 2, 2)) {
-+    case NM_NOT16:
-+        gen_logic(ctx, OPC_NOR, rt, rs, 0);
-+        break;
-+    case NM_AND16:
-+        gen_logic(ctx, OPC_AND, rt, rt, rs);
-+        break;
-+    case NM_XOR16:
-+        gen_logic(ctx, OPC_XOR, rt, rt, rs);
-+        break;
-+    case NM_OR16:
-+        gen_logic(ctx, OPC_OR, rt, rt, rs);
-+        break;
-+    }
-+}
-+
- static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
- {
-     uint32_t op;
-@@ -16836,6 +16867,7 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_P16C:
-         switch (ctx->opcode & 1) {
-         case NM_POOL16C_0:
-+            gen_pool16c_nanomips_insn(ctx);
-             break;
-         case NM_LWXS16:
-             gen_ldxs(ctx, rt, rs, rd);
-@@ -16910,6 +16942,12 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case NM_ANDI16:
-+        {
-+            uint32_t u = extract32(ctx->opcode, 0, 4);
-+            u = (u == 12) ? 0xff :
-+                (u == 13) ? 0xffff : u;
-+            gen_logic_imm(ctx, OPC_ANDI, rt, rs, u);
+@@ -16763,6 +16763,40 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+     op = extract32(ctx->opcode, 10, 6);
+     switch (op) {
+     case NM_P16_MV:
++        rt = NANOMIPS_EXTRACT_RD5(ctx->opcode);
++        if (rt != 0) {
++            /* MOVE */
++            rs = NANOMIPS_EXTRACT_RS5(ctx->opcode);
++            gen_arith(ctx, OPC_ADDU, rt, rs, 0);
++        } else {
++            /* P16.RI */
++            switch (extract32(ctx->opcode, 3, 2)) {
++            case NM_P16_SYSCALL:
++                if (extract32(ctx->opcode, 2, 1) == 0) {
++                    generate_exception_end(ctx, EXCP_SYSCALL);
++                } else {
++                    generate_exception_end(ctx, EXCP_RI);
++                }
++                break;
++            case NM_BREAK16:
++                generate_exception_end(ctx, EXCP_BREAK);
++                break;
++            case NM_SDBBP16:
++                if (is_uhi(extract32(ctx->opcode, 0, 3))) {
++                    gen_helper_do_semihosting(cpu_env);
++                } else {
++                    if (ctx->hflags & MIPS_HFLAG_SBRI) {
++                        generate_exception_end(ctx, EXCP_RI);
++                    } else {
++                        generate_exception_end(ctx, EXCP_DBp);
++                    }
++                }
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
 +        }
          break;
-     case NM_P16_LB:
-         offset = extract32(ctx->opcode, 0, 2);
+     case NM_P16_SHIFT:
+         {
+@@ -16842,6 +16876,13 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case NM_LI16:
++        {
++            int imm = extract32(ctx->opcode, 0, 7);
++            imm = (imm == 0x7f ? -1 : imm);
++            if (rt != 0) {
++                tcg_gen_movi_tl(cpu_gpr[rt], imm);
++            }
++        }
+         break;
+     case NM_ANDI16:
+         break;
 -- 
 2.7.4
