@@ -1,24 +1,16 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:34243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1frv74-0001Ln-C1
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 21:05:39 -0400
+	(envelope-from <famz@redhat.com>) id 1frv75-0001Ln-4J
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 21:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1frv1D-0001DQ-1B
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:59:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42750 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1frv1C-0001DC-TD
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:59:34 -0400
-Date: Tue, 21 Aug 2018 08:59:32 +0800
+	(envelope-from <famz@redhat.com>) id 1frv0m-0000zN-BY
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:59:10 -0400
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180821005931.GJ10682@lemon.usersys.redhat.com>
-References: <20180818015344.797-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180818015344.797-1-f4bug@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/4] docker: Sort packages
+Date: Tue, 21 Aug 2018 08:58:43 +0800
+Message-Id: <20180821005843.5146-4-famz@redhat.com>
+In-Reply-To: <20180821005843.5146-1-famz@redhat.com>
+References: <20180821005843.5146-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 3/3] tests: Add unit tests for image locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +19,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Fri, 08/17 22:53, Philippe Mathieu-Daud=E9 wrote:
-> Trivial cleanup patches.
->=20
-> Per the Docker recommendation, "this helps to avoid duplication of
-> packages and make the list much easier to update. This also makes PRs
-> a lot easier to read and review."
->=20
-> Regards,
->=20
-> Phil.
->=20
-> Philippe Mathieu-Daud=E9 (4):
->   docker: Sort Fedora packages
->   docker: Sort Fedora packages (i386-cross)
->   docker: Sort Ubuntu packages
->   docker: Sort CentOS packages
->=20
->  tests/docker/dockerfiles/centos7.docker       |   2 +-
->  .../dockerfiles/fedora-i386-cross.docker      |   9 +-
->  tests/docker/dockerfiles/fedora.docker        | 102 ++++++++++++++----
->  tests/docker/dockerfiles/ubuntu.docker        |  61 +++++++++--
->  4 files changed, 141 insertions(+), 33 deletions(-)
->=20
-> --=20
-> 2.18.0
->=20
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/Makefile.include     |   2 +
+ tests/test-image-locking.c | 154 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 156 insertions(+)
+ create mode 100644 tests/test-image-locking.c
 
-Queued, thanks.
-
-Fam
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 760a0f18b6..8cc0595b39 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -95,6 +95,7 @@ check-unit-y += tests/test-bdrv-drain$(EXESUF)
+ check-unit-y += tests/test-blockjob$(EXESUF)
+ check-unit-y += tests/test-blockjob-txn$(EXESUF)
+ check-unit-y += tests/test-block-backend$(EXESUF)
++check-unit-y += tests/test-image-locking$(EXESUF)
+ check-unit-y += tests/test-x86-cpuid$(EXESUF)
+ # all code tested by test-x86-cpuid is inside topology.h
+ gcov-files-test-x86-cpuid-y =
+@@ -640,6 +641,7 @@ tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(te
+ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
++tests/test-image-locking$(EXESUF): tests/test-image-locking.o $(test-block-obj-y) $(test-util-obj-y)
+ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+diff --git a/tests/test-image-locking.c b/tests/test-image-locking.c
+new file mode 100644
+index 0000000000..ac1a5fd4ca
+--- /dev/null
++++ b/tests/test-image-locking.c
+@@ -0,0 +1,154 @@
++/*
++ * Image locking tests
++ *
++ * Copyright (c) 2018 Red Hat Inc.
++ *
++ * Author: Fam Zheng <famz@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qdict.h"
++
++static BlockBackend *open_image(const char *path,
++                                uint64_t perm, uint64_t shared_perm,
++                                Error **errp)
++{
++    Error *local_err = NULL;
++    BlockBackend *blk;
++    QDict *options = qdict_new();
++
++    qdict_put_str(options, "driver", "raw");
++    blk = blk_new_open(path, NULL, options, BDRV_O_RDWR, &local_err);
++    if (blk) {
++        g_assert_null(local_err);
++        if (blk_set_perm(blk, perm, shared_perm, errp)) {
++            blk_unref(blk);
++            blk = NULL;
++        }
++    } else {
++        error_propagate(errp, local_err);
++    }
++    return blk;
++}
++
++static void check_locked_bytes(int fd, uint64_t perm_locks,
++                               uint64_t shared_perm_locks)
++{
++    int i;
++
++    if (!perm_locks && !shared_perm_locks) {
++        g_assert(!qemu_lock_fd_test(fd, 0, 0, true));
++        return;
++    }
++    for (i = 0; (1ULL << i) <= BLK_PERM_ALL; i++) {
++        uint64_t bit = (1ULL << i);
++        bool perm_expected = !!(bit & perm_locks);
++        bool shared_perm_expected = !!(bit & shared_perm_locks);
++        g_assert_cmpint(perm_expected, ==,
++                        !!qemu_lock_fd_test(fd, 100 + i, 1, true));
++        g_assert_cmpint(shared_perm_expected, ==,
++                        !!qemu_lock_fd_test(fd, 200 + i, 1, true));
++    }
++}
++
++static void test_image_locking_basic(void)
++{
++    BlockBackend *blk1, *blk2, *blk3;
++    char img_path[] = "/tmp/qtest.XXXXXX";
++    uint64_t perm, shared_perm;
++
++    int fd = mkstemp(img_path);
++    assert(fd >= 0);
++
++    perm = BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
++    shared_perm = BLK_PERM_ALL;
++    blk1 = open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk1);
++
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    /* compatible perm between blk1 and blk2 */
++    blk2 = open_image(img_path, perm | BLK_PERM_RESIZE, shared_perm, NULL);
++    g_assert(blk2);
++    check_locked_bytes(fd, perm | BLK_PERM_RESIZE, ~shared_perm);
++
++    /* incompatible perm with already open blk1 and blk2 */
++    blk3 = open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, NULL);
++    g_assert_null(blk3);
++
++    blk_unref(blk2);
++
++    /* Check that extra bytes in blk2 are correctly unlocked */
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    blk_unref(blk1);
++
++    /* Image is unused, no lock there */
++    check_locked_bytes(fd, 0, 0);
++    blk3 = open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, &error_abort);
++    g_assert(blk3);
++    blk_unref(blk3);
++    close(fd);
++}
++
++static void test_set_perm_abort(void)
++{
++    BlockBackend *blk1, *blk2;
++    char img_path[] = "/tmp/qtest.XXXXXX";
++    uint64_t perm, shared_perm;
++    int r;
++    int fd = mkstemp(img_path);
++    assert(fd >= 0);
++
++    perm = BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
++    shared_perm = BLK_PERM_ALL;
++    blk1 = open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk1);
++
++    blk2 = open_image(img_path, perm, shared_perm, &error_abort);
++    g_assert(blk2);
++
++    check_locked_bytes(fd, perm, ~shared_perm);
++
++    /* A failed blk_set_perm mustn't change perm status (locked bytes) */
++    r = blk_set_perm(blk2, perm | BLK_PERM_RESIZE, BLK_PERM_WRITE_UNCHANGED,
++                     NULL);
++    g_assert_cmpint(r, !=, 0);
++    check_locked_bytes(fd, perm, ~shared_perm);
++}
++
++int main(int argc, char **argv)
++{
++    bdrv_init();
++    qemu_init_main_loop(&error_abort);
++
++    g_test_init(&argc, &argv, NULL);
++
++    if (qemu_has_ofd_lock()) {
++        g_test_add_func("/image-locking/basic", test_image_locking_basic);
++        g_test_add_func("/image-locking/set-perm-abort", test_set_perm_abort);
++    }
++
++    return g_test_run();
++}
+-- 
+2.17.1
