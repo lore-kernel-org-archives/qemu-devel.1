@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tK-00023l-BM
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:16 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tO-000272-5T
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tI-0007Mm-7T
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:09 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34902 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tJ-0007QE-Dd
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:14 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34926 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs5tH-0007KI-95
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:07 -0400
+	id 1fs5tI-0007ME-VB
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:09 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 14:35:29 +0200
-Message-Id: <1534854951-6321-25-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 14:35:45 +0200
+Message-Id: <1534854951-6321-41-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 24/46] target/mips: Add CP0 Config3 and Config5
- fields to DisasContext structure
+Subject: [Qemu-devel] [PULL 40/46] elf: Relax MIPS' elf_check_arch() to
+ accept EM_NANOMIPS too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +28,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Dimitrije Nikolic <dnikolic@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add CP0_Config3 and CP0_Config5 to DisasContext structure. This is
-needed for implementing availability control of various instructions.
+Starting from nanoMIPS introduction, machine variant can be
+EM_MIPS or EM_NANOMIPS.
 
-Signed-off-by: "Aleksandar Markovic <amarkovic@wavecomp.com>"
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ linux-user/elfload.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index a06b5b1..dc1760b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -1449,6 +1449,8 @@ typedef struct DisasContext {
-     uint32_t opcode;
-     int insn_flags;
-     int32_t CP0_Config1;
-+    int32_t CP0_Config3;
-+    int32_t CP0_Config5;
-     /* Routine used to access memory */
-     int mem_idx;
-     TCGMemOp default_tcg_memop_mask;
-@@ -23305,6 +23307,8 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->saved_pc = -1;
-     ctx->insn_flags = env->insn_flags;
-     ctx->CP0_Config1 = env->CP0_Config1;
-+    ctx->CP0_Config3 = env->CP0_Config3;
-+    ctx->CP0_Config5 = env->CP0_Config5;
-     ctx->btarget = 0;
-     ctx->kscrexist = (env->CP0_Config4 >> CP0C4_KScrExist) & 0xff;
-     ctx->rxi = (env->CP0_Config3 >> CP0C3_RXI) & 1;
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index df07055..8638612 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -853,6 +853,8 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
+ #endif
+ #define ELF_ARCH    EM_MIPS
+ 
++#define elf_check_arch(x) ((x) == EM_MIPS || (x) == EM_NANOMIPS)
++
+ static inline void init_thread(struct target_pt_regs *regs,
+                                struct image_info *infop)
+ {
 -- 
 2.7.4
