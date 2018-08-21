@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-0000r2-Jo
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:14 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lW-0000s0-Nw
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lR-0006uR-AA
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:09 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49265 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lU-00070K-CK
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:10 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49376 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6lQ-0006r2-Gb
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:04 -0400
+	id 1fs6lT-0006xH-RF
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:08 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:31:11 +0200
-Message-Id: <1534858316-12945-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:31:25 +0200
+Message-Id: <1534858316-12945-16-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 01/46] target/mips: Add preprocessor
- constants for nanoMIPS
+Subject: [Qemu-devel] [PULL v3 15/46] target/mips: Add emulation of nanoMIPS
+ instructions MOVE.P and MOVE.PREV
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add ISA_NANOMIPS32 and CPU_NANOMIPS32 preprocessor constants.
+Add emulation of nanoMIPS instructions MOVE.P and MOVE.PREV.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/mips-defs.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/mips/translate.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index d239069..c8e9979 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -39,6 +39,7 @@
- #define   ISA_MIPS64R5  0x00001000
- #define   ISA_MIPS32R6  0x00002000
- #define   ISA_MIPS64R6  0x00004000
-+#define   ISA_NANOMIPS32  0x00008000
- 
- /* MIPS ASEs. */
- #define   ASE_MIPS16    0x00010000
-@@ -87,6 +88,9 @@
- #define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
- #define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
- 
-+/* Wave Computing: "nanoMIPS" */
-+#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
-+
- /* Strictly follow the architecture standard:
-    - Disallow "special" instruction handling for PMON/SPIM.
-    Note that we still maintain Count/Compare to match the host clock. */
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index cbe3779..8bc08f7 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -17438,8 +17438,39 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case NM_MOVEP:
+-        break;
+     case NM_MOVEPREV:
++        {
++            static const int gpr2reg1[] = {4, 5, 6, 7};
++            static const int gpr2reg2[] = {5, 6, 7, 8};
++            int re;
++            int rd2 = extract32(ctx->opcode, 3, 1) << 1 |
++                      extract32(ctx->opcode, 8, 1);
++            int r1 = gpr2reg1[rd2];
++            int r2 = gpr2reg2[rd2];
++            int r3 = extract32(ctx->opcode, 4, 1) << 3 |
++                     extract32(ctx->opcode, 0, 3);
++            int r4 = extract32(ctx->opcode, 9, 1) << 3 |
++                     extract32(ctx->opcode, 5, 3);
++            TCGv t0 = tcg_temp_new();
++            TCGv t1 = tcg_temp_new();
++            if (op == NM_MOVEP) {
++                rd = r1;
++                re = r2;
++                rs = decode_gpr_gpr4_zero(r3);
++                rt = decode_gpr_gpr4_zero(r4);
++            } else {
++                rd = decode_gpr_gpr4(r3);
++                re = decode_gpr_gpr4(r4);
++                rs = r1;
++                rt = r2;
++            }
++            gen_load_gpr(t0, rs);
++            gen_load_gpr(t1, rt);
++            tcg_gen_mov_tl(cpu_gpr[rd], t0);
++            tcg_gen_mov_tl(cpu_gpr[re], t1);
++            tcg_temp_free(t0);
++            tcg_temp_free(t1);
++        }
+         break;
+     default:
+         return decode_nanomips_32_48_opc(env, ctx);
 -- 
 2.7.4
