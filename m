@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lX-0000sa-Am
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:19 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lV-0000r2-Jo
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lU-000710-J1
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:11 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49379 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6lR-0006uR-AA
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:09 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49265 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6lU-0006yF-34
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:08 -0400
+	id 1fs6lQ-0006r2-Gb
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:32:04 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:31:31 +0200
-Message-Id: <1534858316-12945-22-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 15:31:11 +0200
+Message-Id: <1534858316-12945-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534858316-12945-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v3 21/46] target/mips: Implement emulation of
- nanoMIPS ROTX instruction
+Subject: [Qemu-devel] [PULL v3 01/46] target/mips: Add preprocessor
+ constants for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,166 +28,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Matthew Fortune <matthew.fortune@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Added a helper for ROTX based on the pseudocode from the
-architecture spec. This instraction was not present in previous
-MIPS instruction sets.
+Add ISA_NANOMIPS32 and CPU_NANOMIPS32 preprocessor constants.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/helper.h    |  2 ++
- target/mips/op_helper.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++
- target/mips/translate.c | 15 ++++++++
- 3 files changed, 111 insertions(+)
+ target/mips/mips-defs.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 5f49234..b2a780a 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -40,6 +40,8 @@ DEF_HELPER_FLAGS_1(bitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- DEF_HELPER_FLAGS_1(dbitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- #endif
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index d239069..c8e9979 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -39,6 +39,7 @@
+ #define   ISA_MIPS64R5  0x00001000
+ #define   ISA_MIPS32R6  0x00002000
+ #define   ISA_MIPS64R6  0x00004000
++#define   ISA_NANOMIPS32  0x00008000
  
-+DEF_HELPER_FLAGS_4(rotx, TCG_CALL_NO_RWG_SE, tl, tl, i32, i32, i32)
-+
- #ifndef CONFIG_USER_ONLY
- /* CP0 helpers */
- DEF_HELPER_1(mfc0_mvpcontrol, tl, env)
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 0b2663b..b3eef9f 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -249,6 +249,100 @@ target_ulong helper_bitswap(target_ulong rt)
-     return (int32_t)bitswap(rt);
- }
+ /* MIPS ASEs. */
+ #define   ASE_MIPS16    0x00010000
+@@ -87,6 +88,9 @@
+ #define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
+ #define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
  
-+target_ulong helper_rotx(target_ulong rs, uint32_t shift, uint32_t shiftx,
-+                        uint32_t stripe)
-+{
-+    int i;
-+    uint64_t tmp0 = ((uint64_t)rs) << 32 | ((uint64_t)rs & 0xffffffff);
-+    uint64_t tmp1 = tmp0;
-+    for (i = 0; i <= 46; i++) {
-+        int s;
-+        if (i & 0x8) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
++/* Wave Computing: "nanoMIPS" */
++#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
 +
-+        if (stripe != 0 && !(i & 0x4)) {
-+            s = ~s;
-+        }
-+        if (s & 0x10) {
-+            if (tmp0 & (1LL << (i + 16))) {
-+                tmp1 |= 1LL << i;
-+            } else {
-+                tmp1 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp2 = tmp1;
-+    for (i = 0; i <= 38; i++) {
-+        int s;
-+        if (i & 0x4) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+
-+        if (s & 0x8) {
-+            if (tmp1 & (1LL << (i + 8))) {
-+                tmp2 |= 1LL << i;
-+            } else {
-+                tmp2 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp3 = tmp2;
-+    for (i = 0; i <= 34; i++) {
-+        int s;
-+        if (i & 0x2) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+        if (s & 0x4) {
-+            if (tmp2 & (1LL << (i + 4))) {
-+                tmp3 |= 1LL << i;
-+            } else {
-+                tmp3 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp4 = tmp3;
-+    for (i = 0; i <= 32; i++) {
-+        int s;
-+        if (i & 0x1) {
-+            s = shift;
-+        } else {
-+            s = shiftx;
-+        }
-+        if (s & 0x2) {
-+            if (tmp3 & (1LL << (i + 2))) {
-+                tmp4 |= 1LL << i;
-+            } else {
-+                tmp4 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    uint64_t tmp5 = tmp4;
-+    for (i = 0; i <= 31; i++) {
-+        int s;
-+        s = shift;
-+        if (s & 0x1) {
-+            if (tmp4 & (1LL << (i + 1))) {
-+                tmp5 |= 1LL << i;
-+            } else {
-+                tmp5 &= ~(1LL << i);
-+            }
-+        }
-+    }
-+
-+    return (int64_t)(int32_t)(uint32_t)tmp5;
-+}
-+
- #ifndef CONFIG_USER_ONLY
- 
- static inline hwaddr do_translate_address(CPUMIPSState *env,
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index b00d28b..7b2ffb2 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -17811,6 +17811,21 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-             }
-             break;
-         case NM_P_ROTX:
-+            if (rt != 0) {
-+                TCGv t0 = tcg_temp_new();
-+                TCGv_i32 shift = tcg_const_i32(extract32(ctx->opcode, 0, 5));
-+                TCGv_i32 shiftx = tcg_const_i32(extract32(ctx->opcode, 7, 4)
-+                                                << 1);
-+                TCGv_i32 stripe = tcg_const_i32(extract32(ctx->opcode, 6, 1));
-+
-+                gen_load_gpr(t0, rs);
-+                gen_helper_rotx(cpu_gpr[rt], t0, shift, shiftx, stripe);
-+                tcg_temp_free(t0);
-+
-+                tcg_temp_free_i32(shift);
-+                tcg_temp_free_i32(shiftx);
-+                tcg_temp_free_i32(stripe);
-+            }
-             break;
-         case NM_P_INS:
-             switch (((ctx->opcode >> 10) & 2) |
+ /* Strictly follow the architecture standard:
+    - Disallow "special" instruction handling for PMON/SPIM.
+    Note that we still maintain Count/Compare to match the host clock. */
 -- 
 2.7.4
