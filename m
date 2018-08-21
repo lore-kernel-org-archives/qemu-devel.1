@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fsC8y-0003GR-Ke
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:16:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fsCHS-0006VB-Ev
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fsBxw-0005Ql-S0
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:05:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47286 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fsBxw-0005PH-M6
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:05:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7ADE98077104
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 19:05:19 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 21 Aug 2018 14:05:16 -0500
-Message-Id: <20180821190516.264411-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests/libqos: Utilize newer glib spawn check
+	(envelope-from <ehabkost@redhat.com>) id 1fsCHN-0003Xw-7K
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 15:25:30 -0400
+Date: Tue, 21 Aug 2018 16:25:19 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180821192518.GL18995@localhost.localdomain>
+References: <20180817013400.13353-1-ehabkost@redhat.com>
+	<20180817013400.13353-9-ehabkost@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180817013400.13353-9-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 8/8] i386: Disable TOPOEXT by default on
+ "-cpu host"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-stable@nongnu.org
 
-During development, I got a 'make check' failure that claimed:
+CCing qemu-stable.
 
-qemu-img returned status code 32512
-**
-ERROR:tests/libqos/libqos.c:202:mkimg: assertion failed: (!rc)
+On Thu, Aug 16, 2018 at 10:34:00PM -0300, Eduardo Habkost wrote:
+> Enabling TOPOEXT is always allowed, but it can't be enabled
+> blindly by "-cpu host" because it may make guests crash if the
+> rest of the cache topology information isn't provided or isn't
+> consistent.
+> 
+> This addresses the bug reported at:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1613277
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Message-Id: <20180809221852.15285-1-ehabkost@redhat.com>
+> Tested-by: Richard W.M. Jones <rjones@redhat.com>
+> Reviewed-by: Babu Moger <babu.moger@amd.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  target/i386/cpu.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 52a77a7d08..4e4fe8fa8b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -849,6 +849,12 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>          },
+>          .cpuid_eax = 0x80000001, .cpuid_reg = R_ECX,
+>          .tcg_features = TCG_EXT3_FEATURES,
+> +        /*
+> +         * TOPOEXT is always allowed but can't be enabled blindly by
+> +         * "-cpu host", as it requires consistent cache topology info
+> +         * to be provided so it doesn't confuse guests.
+> +         */
+> +        .no_autoenable_flags = CPUID_EXT3_TOPOEXT,
+>      },
+>      [FEAT_C000_0001_EDX] = {
+>          .feat_names = {
+> -- 
+> 2.18.0.rc1.1.g3f1ff2140
+> 
+> 
 
-But 32512 is too big for a normal exit status value, which means we
-failed to use WEXITSTATUS() to shift the bits to the desired value
-for printing.  However, instead of worrying about how to portably
-parse g_spawn()'s rc in the proper platform-dependent manner, it's
-better to just rely on the fact that we now require glib 2.40 (since
-commit e7b3af815) and can therefore use glib's portable checker
-instead, where the message under my same condition improves to:
-
-Child process exited with code 127
-**
-ERROR:tests/libqos/libqos.c:192:mkimg: assertion failed: (ret && !err)
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-
----
-This appears to be the only remaining vestige of a comment mentioning
-glib < 2.40.
----
- tests/libqos/libqos.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
-
-diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-index 013ca68581c..c5141873448 100644
---- a/tests/libqos/libqos.c
-+++ b/tests/libqos/libqos.c
-@@ -185,22 +185,12 @@ void mkimg(const char *file, const char *fmt, unsigned size_mb)
-     cli = g_strdup_printf("%s create -f %s %s %uM", qemu_img_abs_path,
-                           fmt, file, size_mb);
-     ret = g_spawn_command_line_sync(cli, &out, &out2, &rc, &err);
--    if (err) {
-+    if (err || !g_spawn_check_exit_status(rc, &err)) {
-         fprintf(stderr, "%s\n", err->message);
-         g_error_free(err);
-     }
-     g_assert(ret && !err);
-
--    /* In glib 2.34, we have g_spawn_check_exit_status. in 2.12, we don't.
--     * glib 2.43.91 implementation assumes that any non-zero is an error for
--     * windows, but uses extra precautions for Linux. However,
--     * 0 is only possible if the program exited normally, so that should be
--     * sufficient for our purposes on all platforms, here. */
--    if (rc) {
--        fprintf(stderr, "qemu-img returned status code %d\n", rc);
--    }
--    g_assert(!rc);
--
-     g_free(out);
-     g_free(out2);
-     g_free(cli);
 -- 
-2.17.1
+Eduardo
