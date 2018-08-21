@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6No-00015k-IU
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:44 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fs6R0-0004rO-5M
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:10:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs6Nk-0008Jj-7S
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:40 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35344 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs6Nj-0008I6-Ql
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:07:36 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 15:06:42 +0200
-Message-Id: <1534856848-12102-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v2 00/46] MIPS queue August 21, 2018 v2
+	(envelope-from <flukshun@gmail.com>) id 1fs6Qv-0001oD-Lk
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:10:58 -0400
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:33392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1fs6Qv-0001nn-H2
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 09:10:53 -0400
+Received: by mail-yw1-xc44.google.com with SMTP id x67-v6so3006543ywg.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 06:10:53 -0700 (PDT)
+Sender: fluxion <flukshun@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+References: <CAOrZHTTgNLY6UjvgMm_98R9A0-GvCz-1owxOYz-1dN9-kVNmhA@mail.gmail.com>
+In-Reply-To: <CAOrZHTTgNLY6UjvgMm_98R9A0-GvCz-1owxOYz-1dN9-kVNmhA@mail.gmail.com>
+Message-ID: <153485704527.13636.5674938620198385149@sif>
+Date: Tue, 21 Aug 2018 08:10:45 -0500
+Subject: Re: [Qemu-devel] [PATCH] qga: Support Unicode paths in
+ guest-file-open on win32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,122 +30,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Jonathon Reinhart <jreinhart@cc-sw.com>, qemu-devel@nongnu.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Quoting Jonathon Reinhart (2018-08-01 18:10:59)
+> Currently, the win32 port of QEMU Guest Agent does not properly handle Un=
+icode
+> paths. The JSON decoder produces a valid UTF-8 path string, but this is p=
+assed
+> directly to CreateFileA, which is expecting an ANSI string and not UTF-8.=
+ This
+> leads to mangled filenames.
+> =
 
-The following changes since commit feb84d74e4833b57eaca5cb3b5a95610380c109d:
+> This patch follows the example of qmp_guest_set_user_password() and uses
+> g_utf8_to_utf16() to convert the string to UTF-16 and calls CreateFileW()
+> explicitly.
+> =
 
-  target/mips: Fix pre-nanoMIPS MT ASE instructions availability control (2018-08-21 14:59:32 +0200)
+> Signed-off-by: Jonathon Reinhart <jreinhart@cc-sw.com>
+> ---
+>  qga/commands-win32.c | 24 +++++++++++++++++++-----
+>  1 file changed, 19 insertions(+), 5 deletions(-)
+> =
 
-are available in the git repository at:
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 98d9735389..416343b97b 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -160,13 +160,15 @@ static void handle_set_nonblocking(HANDLE fh)
+>  int64_t qmp_guest_file_open(const char *path, bool has_mode,
+>                              const char *mode, Error **errp)
+>  {
+> -    int64_t fd;
+> +    int64_t fd =3D -1;
+>      HANDLE fh;
+>      HANDLE templ_file =3D NULL;
+>      DWORD share_mode =3D FILE_SHARE_READ;
+>      DWORD flags_and_attr =3D FILE_ATTRIBUTE_NORMAL;
+>      LPSECURITY_ATTRIBUTES sa_attr =3D NULL;
+>      OpenFlags *guest_flags;
+> +    GError *gerr =3D NULL;
+> +    wchar_t *w_path =3D NULL;
+> =
 
-  https://github.com/AMarkovic/qemu mips-queue-aug-21-2018
+>      if (!has_mode) {
+>          mode =3D "r";
+> @@ -175,16 +177,21 @@ int64_t qmp_guest_file_open(const char *path,
+> bool has_mode,
 
-for you to fetch changes up to 7bfa634d0a73b74f2b84a5cd13d055e61210c356:
+It looks like your mail client might be wrapping patches at 80 char,
+which makes them not apply on my end. I've fixed this one up and
+applied it though:
 
-  target/mips: Add definition of nanoMIPS I7200 CPU (2018-08-21 14:59:32 +0200)
+  https://github.com/mdroth/qemu/commits/qga
 
-----------------------------------------------------------------
-MIPS queue August 21, 2018 v2
+>      guest_flags =3D find_open_flag(mode);
+>      if (guest_flags =3D=3D NULL) {
+>          error_setg(errp, "invalid file open mode");
+> -        return -1;
+> +        goto done;
+> +    }
+> +
+> +    w_path =3D g_utf8_to_utf16(path, -1, NULL, NULL, &gerr);
+> +    if (!w_path) {
+> +        goto done;
+>      }
+> =
 
-In v1, there were three missing "Reviewed-by" lines. Please use
-this pull request.
+> -    fh =3D CreateFile(path, guest_flags->desired_access, share_mode, sa_=
+attr,
+> +    fh =3D CreateFileW(w_path, guest_flags->desired_access, share_mode, =
+sa_attr,
+>                      guest_flags->creation_disposition, flags_and_attr,
+>                      templ_file);
+>      if (fh =3D=3D INVALID_HANDLE_VALUE) {
+>          error_setg_win32(errp, GetLastError(), "failed to open file '%s'=
+",
+>                           path);
+> -        return -1;
+> +        goto done;
+>      }
+> =
 
-----------------------------------------------------------------
+>      /* set fd non-blocking to avoid common use cases (like reading from a
+> @@ -196,10 +203,17 @@ int64_t qmp_guest_file_open(const char *path,
+> bool has_mode,
+>      if (fd < 0) {
+>          CloseHandle(fh);
+>          error_setg(errp, "failed to add handle to qmp handle table");
+> -        return -1;
+> +        goto done;
+>      }
+> =
 
-Aleksandar Markovic (5):
-  target/mips: Add preprocessor constants for nanoMIPS
-  target/mips: Add placeholder and invocation of decode_nanomips_opc()
-  target/mips: Add nanoMIPS decoding and extraction utilities
-  elf: Relax MIPS' elf_check_arch() to accept EM_NANOMIPS too
-  elf: Don't check FCR31_NAN2008 bit for nanoMIPS
+>      slog("guest-file-open, handle: % " PRId64, fd);
+> +
+> +done:
+> +    if (gerr) {
+> +        error_setg(errp, QERR_QGA_COMMAND_FAILED, gerr->message);
+> +        g_error_free(gerr);
+> +    }
+> +    g_free(w_path);
+>      return fd;
+>  }
+> =
 
-Aleksandar Rikalo (4):
-  target/mips: Implement emulation of nanoMIPS LLWP/SCWP pair
-  target/mips: Fix pre-nanoMIPS MT ASE instructions availability control
-  elf: Add EM_NANOMIPS value as a valid one for e_machine field
-  elf: On elf loading, treat both EM_MIPS and EM_NANOMIPS as legal for
-    MIPS
+> -- =
 
-Dimitrije Nikolic (2):
-  target/mips: Add CP0 Config3 and Config5 fields to DisasContext
-    structure
-  target/mips: Add availability control via bit NMS
-
-James Hogan (1):
-  target/mips: Implement emulation of nanoMIPS EXTW instruction
-
-Matthew Fortune (3):
-  target/mips: Implement emulation of nanoMIPS ROTX instruction
-  disas: Add support for nanoMIPS platform
-  mips_malta: Add basic nanoMIPS boot code for Malta board
-
-Paul Burton (1):
-  mips_malta: Add setting up GT64120 BARs to the nanoMIPS bootloader
-
-Stefan Markovic (15):
-  target/mips: Add nanoMIPS DSP ASE opcodes
-  target/mips: Prevent switching mode related to Config3 ISA bit for
-    nanoMIPS
-  target/mips: Add emulation of nanoMIPS 16-bit branch instructions
-  target/mips: Add emulation of nanoMIPS 16-bit save and restore
-    instructions
-  target/mips: Add emulation of nanoMIPS 32-bit branch instructions
-  target/mips: Implement MT ASE support for nanoMIPS
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 1
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 2
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 3
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 4
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 5
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 6
-  target/mips: Add updating BadInstr and BadInstrX for nanoMIPS
-  mips_malta: Fix semihosting argument passing for nanoMIPS bare metal
-  target/mips: Add definition of nanoMIPS I7200 CPU
-
-Yongbok Kim (15):
-  target/mips: Add nanoMIPS base instruction set opcodes
-  target/mips: Add emulation of nanoMIPS 16-bit arithmetic instructions
-  target/mips: Add emulation of nanoMIPS 16-bit shift instructions
-  target/mips: Add emulation of nanoMIPS 16-bit misc instructions
-  target/mips: Add emulation of nanoMIPS 16-bit load and store
-    instructions
-  target/mips: Add emulation of nanoMIPS 16-bit logic instructions
-  target/mips: Add emulation of some common nanoMIPS 32-bit instructions
-  target/mips: Add emulation of nanoMIPS instructions MOVE.P and
-    MOVE.PREV
-  target/mips: Add emulation of nanoMIPS 48-bit instructions
-  target/mips: Add emulation of nanoMIPS FP instructions
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32a0)
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32axf)
-  target/mips: Add emulation of misc nanoMIPS instructions (p_lsx)
-  target/mips: Add emulation of nanoMIPS 32-bit load and store
-    instructions
-  target/mips: Fix ERET/ERETNC behavior related to ADEL exception
-
- MAINTAINERS                      |     2 +
- disas/Makefile.objs              |     1 +
- disas/mips.c                     |    90 +-
- disas/nanomips.cpp               | 15812 +++++++++++++++++++++++++++++++++++++
- disas/nanomips.h                 |  1100 +++
- hw/mips/mips_malta.c             |   212 +-
- include/disas/bfd.h              |     1 +
- include/elf.h                    |     2 +
- include/hw/elf_ops.h             |     8 +
- linux-user/elfload.c             |     2 +
- linux-user/mips/cpu_loop.c       |    28 +-
- target/mips/cpu.c                |    11 +-
- target/mips/cpu.h                |     2 +
- target/mips/helper.c             |    16 +
- target/mips/helper.h             |     2 +
- target/mips/mips-defs.h          |     4 +
- target/mips/op_helper.c          |    98 +-
- target/mips/translate.c          |  4983 +++++++++++-
- target/mips/translate_init.inc.c |    39 +
- 19 files changed, 22330 insertions(+), 83 deletions(-)
- create mode 100644 disas/nanomips.cpp
- create mode 100644 disas/nanomips.h
-
--- 
-2.7.4
+> 2.11.0
+>=20
