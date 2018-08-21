@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tI-00023a-Ni
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:14 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tK-00023n-Fb
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tG-0007JP-1b
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:08 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34881 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fs5tI-0007MZ-37
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:10 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:34892 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fs5tF-0007Hh-EI
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:05 -0400
+	id 1fs5tH-0007JT-2j
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 08:36:07 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Tue, 21 Aug 2018 14:35:13 +0200
-Message-Id: <1534854951-6321-9-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 21 Aug 2018 14:35:21 +0200
+Message-Id: <1534854951-6321-17-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1534854951-6321-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 08/46] target/mips: Add emulation of nanoMIPS
- 16-bit branch instructions
+Subject: [Qemu-devel] [PULL 16/46] target/mips: Add emulation of nanoMIPS
+ 48-bit instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,201 +28,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Add emulation of nanoMIPS 16-bit branch instructions.
+Add emulation of LI48, ADDIU48, ADDIUGP48, ADDIUPC48, LWPC48, and
+SWPC48 instructions.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 158 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 158 insertions(+)
+ target/mips/translate.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 65 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 261680e..b0bbf4c 100644
+index 8bc08f7..98df88e 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -4564,6 +4564,128 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(t1);
- }
- 
-+
-+/* nanoMIPS Branches */
-+static void gen_compute_branch_nm(DisasContext *ctx, uint32_t opc,
-+                                int insn_bytes,
-+                                int rs, int rt, int32_t offset)
-+{
-+    target_ulong btgt = -1;
-+    int bcond_compute = 0;
-+    TCGv t0 = tcg_temp_new();
-+    TCGv t1 = tcg_temp_new();
-+
-+    /* Load needed operands */
-+    switch (opc) {
-+    case OPC_BEQ:
-+    case OPC_BNE:
-+        /* Compare two registers */
-+        if (rs != rt) {
-+            gen_load_gpr(t0, rs);
-+            gen_load_gpr(t1, rt);
-+            bcond_compute = 1;
-+        }
-+        btgt = ctx->base.pc_next + insn_bytes + offset;
-+        break;
-+    case OPC_BGEZAL:
-+        /* Compare to zero */
-+        if (rs != 0) {
-+            gen_load_gpr(t0, rs);
-+            bcond_compute = 1;
-+        }
-+        btgt = ctx->base.pc_next + insn_bytes + offset;
-+        break;
-+    case OPC_BPOSGE32:
-+        tcg_gen_andi_tl(t0, cpu_dspctrl, 0x3F);
-+        bcond_compute = 1;
-+        btgt = ctx->base.pc_next + insn_bytes + offset;
-+        break;
-+    case OPC_JR:
-+    case OPC_JALR:
-+        /* Jump to register */
-+        if (offset != 0 && offset != 16) {
-+            /* Hint = 0 is JR/JALR, hint 16 is JR.HB/JALR.HB, the
-+               others are reserved. */
-+            MIPS_INVAL("jump hint");
-+            generate_exception_end(ctx, EXCP_RI);
-+            goto out;
-+        }
-+        gen_load_gpr(btarget, rs);
-+        break;
-+    default:
-+        MIPS_INVAL("branch/jump");
-+        generate_exception_end(ctx, EXCP_RI);
-+        goto out;
-+    }
-+    if (bcond_compute == 0) {
-+        /* No condition to be computed */
-+        switch (opc) {
-+        case OPC_BEQ:     /* rx == rx        */
-+            /* Always take */
-+            ctx->hflags |= MIPS_HFLAG_B;
-+            break;
-+        case OPC_BGEZAL:  /* 0 >= 0          */
-+            /* Always take and link */
-+            tcg_gen_movi_tl(cpu_gpr[31],
-+                            ctx->base.pc_next + insn_bytes);
-+            ctx->hflags |= MIPS_HFLAG_B;
-+            break;
-+        case OPC_BNE:     /* rx != rx        */
-+            tcg_gen_movi_tl(cpu_gpr[31], ctx->base.pc_next + 8);
-+            /* Skip the instruction in the delay slot */
-+            ctx->base.pc_next += 4;
-+            goto out;
-+        case OPC_JR:
-+            ctx->hflags |= MIPS_HFLAG_BR;
-+            break;
-+        case OPC_JALR:
-+            if (rt > 0) {
-+                tcg_gen_movi_tl(cpu_gpr[rt],
-+                                ctx->base.pc_next + insn_bytes);
-+            }
-+            ctx->hflags |= MIPS_HFLAG_BR;
-+            break;
-+        default:
-+            MIPS_INVAL("branch/jump");
-+            generate_exception_end(ctx, EXCP_RI);
-+            goto out;
-+        }
-+    } else {
-+        switch (opc) {
-+        case OPC_BEQ:
-+            tcg_gen_setcond_tl(TCG_COND_EQ, bcond, t0, t1);
-+            goto not_likely;
-+        case OPC_BNE:
-+            tcg_gen_setcond_tl(TCG_COND_NE, bcond, t0, t1);
-+            goto not_likely;
-+        case OPC_BGEZAL:
-+            tcg_gen_setcondi_tl(TCG_COND_GE, bcond, t0, 0);
-+            tcg_gen_movi_tl(cpu_gpr[31],
-+                            ctx->base.pc_next + insn_bytes);
-+            goto not_likely;
-+        case OPC_BPOSGE32:
-+            tcg_gen_setcondi_tl(TCG_COND_GE, bcond, t0, 32);
-+        not_likely:
-+            ctx->hflags |= MIPS_HFLAG_BC;
-+            break;
-+        default:
-+            MIPS_INVAL("conditional branch/jump");
-+            generate_exception_end(ctx, EXCP_RI);
-+            goto out;
-+        }
-+    }
-+
-+    ctx->btarget = btgt;
-+
-+ out:
-+    if (insn_bytes == 2) {
-+        ctx->hflags |= MIPS_HFLAG_B16;
-+    }
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+}
-+
-+
- /* special3 bitfield operations */
- static void gen_bitops (DisasContext *ctx, uint32_t opc, int rt,
-                         int rs, int lsb, int msb)
-@@ -16729,14 +16851,50 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_SWGP16:
+@@ -16946,7 +16946,71 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
          break;
-     case NM_BC16:
-+        gen_compute_branch_nm(ctx, OPC_BEQ, 2, 0, 0,
-+                           (sextract32(ctx->opcode, 0, 1) << 10) |
-+                           (extract32(ctx->opcode, 1, 9) << 1));
-         break;
-     case NM_BALC16:
-+        gen_compute_branch_nm(ctx, OPC_BGEZAL, 2, 0, 0,
-+                           (sextract32(ctx->opcode, 0, 1) << 10) |
-+                           (extract32(ctx->opcode, 1, 9) << 1));
-         break;
-     case NM_BEQZC16:
-+        gen_compute_branch_nm(ctx, OPC_BEQ, 2, rt, 0,
-+                           (sextract32(ctx->opcode, 0, 1) << 7) |
-+                           (extract32(ctx->opcode, 1, 6) << 1));
-         break;
-     case NM_BNEZC16:
-+        gen_compute_branch_nm(ctx, OPC_BNE, 2, rt, 0,
-+                           (sextract32(ctx->opcode, 0, 1) << 7) |
-+                           (extract32(ctx->opcode, 1, 6) << 1));
-         break;
-     case NM_P16_BR:
-+        switch (ctx->opcode & 0xf) {
-+        case 0:
-+            /* P16.JRC */
-+            switch (extract32(ctx->opcode, 4, 1)) {
-+            case NM_JRC:
-+                gen_compute_branch_nm(ctx, OPC_JR, 2,
-+                                   extract32(ctx->opcode, 5, 5), 0, 0);
+     case NM_P48I:
+-        return 6;
++        {
++            insn = cpu_lduw_code(env, ctx->base.pc_next + 4);
++            target_long addr_off = extract32(ctx->opcode, 0, 16) | insn << 16;
++            switch (extract32(ctx->opcode, 16, 5)) {
++            case NM_LI48:
++                if (rt != 0) {
++                    tcg_gen_movi_tl(cpu_gpr[rt], addr_off);
++                }
 +                break;
-+            case NM_JALRC16:
-+                gen_compute_branch_nm(ctx, OPC_JALR, 2,
-+                                   extract32(ctx->opcode, 5, 5), 31, 0);
++            case NM_ADDIU48:
++                if (rt != 0) {
++                    tcg_gen_addi_tl(cpu_gpr[rt], cpu_gpr[rt], addr_off);
++                    tcg_gen_ext32s_tl(cpu_gpr[rt], cpu_gpr[rt]);
++                }
++                break;
++            case NM_ADDIUGP48:
++                if (rt != 0) {
++                    gen_op_addr_addi(ctx, cpu_gpr[rt], cpu_gpr[28], addr_off);
++                }
++                break;
++            case NM_ADDIUPC48:
++                if (rt != 0) {
++                    target_long addr = addr_add(ctx, ctx->base.pc_next + 6,
++                                                addr_off);
++
++                    tcg_gen_movi_tl(cpu_gpr[rt], addr);
++                }
++                break;
++            case NM_LWPC48:
++                if (rt != 0) {
++                    TCGv t0;
++                    t0 = tcg_temp_new();
++
++                    target_long addr = addr_add(ctx, ctx->base.pc_next + 6,
++                                                addr_off);
++
++                    tcg_gen_movi_tl(t0, addr);
++                    tcg_gen_qemu_ld_tl(cpu_gpr[rt], t0, ctx->mem_idx, MO_TESL);
++                    tcg_temp_free(t0);
++                }
++                break;
++            case NM_SWPC48:
++                {
++                    TCGv t0, t1;
++                    t0 = tcg_temp_new();
++                    t1 = tcg_temp_new();
++
++                    target_long addr = addr_add(ctx, ctx->base.pc_next + 6,
++                                                addr_off);
++
++                    tcg_gen_movi_tl(t0, addr);
++                    gen_load_gpr(t1, rt);
++
++                    tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUL);
++
++                    tcg_temp_free(t0);
++                    tcg_temp_free(t1);
++                }
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
 +                break;
 +            }
-+            break;
-+        default:
-+            {
-+                /* P16.BRI */
-+                uint32_t opc = extract32(ctx->opcode, 4, 3) <
-+                               extract32(ctx->opcode, 7, 3) ? OPC_BEQ : OPC_BNE;
-+                gen_compute_branch_nm(ctx, opc, 2, rs, rt,
-+                                   extract32(ctx->opcode, 0, 4) << 1);
-+            }
-+            break;
++            return 6;
 +        }
-         break;
-     case NM_P16_SR:
-         break;
+     case NM_P_U12:
+         switch (extract32(ctx->opcode, 12, 4)) {
+         case NM_ORI:
 -- 
 2.7.4
