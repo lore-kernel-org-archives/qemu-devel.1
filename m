@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fs0Le-0001Zw-FW
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1fs0Lj-0001e1-Rz
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fs0Lb-0000js-AR
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38828)
+	(envelope-from <bounces@canonical.com>) id 1fs0Ld-0000mC-Ol
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38940)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fs0Lb-0000jO-3o
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:40:59 -0400
+	id 1fs0Ld-0000la-IV
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 02:41:01 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fs0LZ-00031w-Th
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 06:40:58 +0000
+	id 1fs0Lc-00032Y-J8
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 06:41:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D7FEF2E8524
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 06:40:57 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8F0CB2E8523
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 06:41:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Aug 2018 06:26:18 -0000
-From: Thomas Huth <1780928@bugs.launchpad.net>
-Reply-To: Bug 1780928 <1780928@bugs.launchpad.net>
+Date: Tue, 21 Aug 2018 06:31:57 -0000
+From: Thomas Huth <1773753@bugs.launchpad.net>
+Reply-To: Bug 1773753 <1773753@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <153121318079.13203.2840846134376544024.malonedeb@gac.canonical.com>
-Message-Id: <153483277913.31294.11082510107205452127.launchpad@soybean.canonical.com>
+References: <152749874146.3829.13327505377905335957.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153483311788.30784.18180445741557309692.launchpad@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1780928] Re: v2.12.0-2321-gb34181056c: vcpu
- hotplug crashes qemu-kvm with segfault
+Subject: [Qemu-devel] [Bug 1773753] Re: virsh start,
+ after virsh managed save hangs and vm goes to paused state with
+ qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,47 +47,44 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1780928
+https://bugs.launchpad.net/bugs/1773753
 
 Title:
-  v2.12.0-2321-gb34181056c: vcpu hotplug crashes qemu-kvm with segfault
+  virsh start, after virsh managed save hangs and vm goes to paused
+  state with qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  vcpu hotplug crashes upstream qemu(v2.12.0-2321-gb34181056c), vcpu
-  hotplug works fine in v2.12.0-rc4.
+  Host Env:
+  IBM Power8 with Fedora28 base with compiled upstream kernel, qemu, libvir=
+t.
 
-  Host: Power8, kernel: 4.18.0-rc2-00037-g6f0d349d922b
-  Guest: Power8, kernel: 4.18.0-rc3-00183-gc42c12a90545 (base image: fedora=
-27 ppc64le)
+  Host Kernel: 4.17.0-rc5-00069-g3acf4e395260
 
-  /usr/share/avocado-plugins-vt/build/qemu/ppc64-softmmu/qemu-system-ppc64 =
--M pseries,accel=3Dkvm,max-cpu-compat=3Dpower8 -m 8192 -device virtio-scsi-=
-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x2 -drive file=3D/var/lib/avocado/data/a=
-vocado-vt/images/jeos-27-ppc64le.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive1=
- -device scsi-hd,drive=3Ddrive1,bus=3Dscsi0.0 -smp 1,cores=3D1,threads=3D1,=
-sockets=3D1,maxcpus=3D8 -serial /dev/pts/0 -monitor stdio -vga none -nograp=
-hic -kernel /home/kvmci/linux/vmlinux -append 'root=3D/dev/sda2 rw console=
-=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcall_debug' -nic user,=
-model=3Dvirtio-net-pci =
+  qemu-kvm(5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b):
+  v2.12.0-813-g5a5c383b13-dirty
 
-  QEMU 2.12.50 monitor - type 'help' for more information
-  (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
-  Segmentation fault (core dumped)
+  libvirt(4804a4db33a37f828d033733bc47f6eff5d262c3):
 
-  =
+  Guest Kernel: 4.17.0-rc7
 
-  Guest initial cpu:
-  # lscpu
+  Steps to recreate:
+  Define a guest attached with above setup and start.
+  # virsh start avocado-vt-vm1
+
+  guest console;...
+  # uname -r
+  4.17.0-rc7
+  [root@atest-guest ~]# lscpu
   Architecture:        ppc64le
   Byte Order:          Little Endian
-  CPU(s):              1
-  On-line CPU(s) list: 0
+  CPU(s):              3
+  On-line CPU(s) list: 0-2
   Thread(s) per core:  1
   Core(s) per socket:  1
-  Socket(s):           1
+  Socket(s):           3
   NUMA node(s):        1
   Model:               2.1 (pvr 004b 0201)
   Model name:          POWER8 (architected), altivec supported
@@ -94,7 +92,42 @@ model=3Dvirtio-net-pci =
   Virtualization type: para
   L1d cache:           64K
   L1i cache:           32K
-  NUMA node0 CPU(s):   0
+  NUMA node0 CPU(s):   0-2
+
+  =
+
+  # virsh managedsave avocado-vt-vm1 =
+
+
+  Domain avocado-vt-vm1 state saved by libvirt
+
+  # virsh list
+   Id    Name                           State
+  ----------------------------------------------------
+
+  # virsh start avocado-vt-vm1 ----Hangs forever and vm state goes to
+  paused.
+
+  =
+
+  # virsh list
+   Id    Name                           State
+  ----------------------------------------------------
+   87    avocado-vt-vm1                 paused
+
+  =
+
+  P:S:- with same above setup, just changing the qemu-kvm comes bydefault w=
+ith F28 works fine.
+
+  /usr/bin/qemu-kvm --version
+  QEMU emulator version 2.11.1(qemu-2.11.1-2.fc28)
+
+  Summary: with above other setup.
+  machine type pseries-2.12 and qemu-2.11.1-2.fc28 -Works fine.
+
+  machine type pseries-2.12/pseries-2.13 and qemu
+  5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b - Does not work.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1780928/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1773753/+subscriptions
