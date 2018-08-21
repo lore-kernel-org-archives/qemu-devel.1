@@ -1,16 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fs3FR-0003qo-1X
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fs3FR-0003qs-2c
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fs3FL-0007rF-Sj
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fs3FO-0007up-KS
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 05:46:48 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue, 21 Aug 2018 12:46:11 +0300
-Message-Id: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue, 21 Aug 2018 12:46:12 +0300
+Message-Id: <1534844779-118784-2-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 0/8] discard blockstats
+Subject: [Qemu-devel] [PATCH v4 1/8] qapi: group BlockDeviceStats fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,132 +24,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, famz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-new in v4:
-    - patch 7: discard and write-zeroes code paths had been separated in
-      34fa110e: file-posix: Fix write_zeroes with unmap on block devices.
-      This patch now only accounts discards that come explicitly
-      through .bdrv_co_pdiscard handler.
-    - qapi 'Since' clauses changed 3.0 -> 3.1
+Make the stat fields definition slightly more readable.
+Also reorder total_time_ns stats read-write-flush as done elsewhere.
+Cosmetic change only.
 
-v3: http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg03688.html
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+---
+ qapi/block-core.json | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-----
-
-qmp query-blockstats provides stats info for write/read/flush ops.
-
-Patches 1-6 implement the similar for discard (unmap) command for scsi
-and ide disks.
-Discard stat "unmap_ops / unmap_bytes" is supposed to account the ops that
-have completed without an error.
-
-However, discard operation is advisory. Specifically,
- - common block layer ignores ENOTSUP error code.
-   That might be returned if the block driver does not support discard,
-   or discard has been configured to be ignored.
- - format drivers such as qcow2 may ignore discard if they were configured
-   to ignore that, or if the corresponding area is already marked unused
-   (unallocated / zero clusters).
-
-And what is actually useful is the number of bytes actually discarded
-down on the host filesystem.
-To achieve that, driver-specific statistics has been added to blockstats
-(patch 8).
-With patch 7, file-posix driver accounts discard operations on its level too.
-
-query-blockstat result:
-
-(note the difference between blockdevice unmap and file discard stats. qcow2
-sends fewer ops down to the file as the clusters are actually unallocated
-on qcow2 level)
-
-{
-  "return": [
-    {
-      "device": "drive-scsi0-0-0-0",
-      "parent": {
->       "discard-bytes-ok": 262144,
->       "discard-nb-ok": 4,
-        "stats": {
->         "unmap_operations": 0,
->         "unmap_merged": 0,
-          "flush_total_time_ns": 0,
-          "wr_highest_offset": 8111718400,
-          "wr_total_time_ns": 0,
-          "failed_wr_operations": 0,
-          "failed_rd_operations": 0,
-          "wr_merged": 0,
-          "wr_bytes": 0,
-          "timed_stats": [
-            
-          ],
->         "failed_unmap_operations": 0,
-          "failed_flush_operations": 0,
-          "account_invalid": false,
-          "rd_total_time_ns": 0,
->         "invalid_unmap_operations": 0,
-          "flush_operations": 0,
-          "wr_operations": 0,
->         "unmap_bytes": 0,
-          "rd_merged": 0,
-          "rd_bytes": 0,
->         "unmap_total_time_ns": 0,
-          "invalid_flush_operations": 0,
-          "account_failed": false,
-          "rd_operations": 0,
-          "invalid_wr_operations": 0,
-          "invalid_rd_operations": 0
-        },
-        "node-name": "#block012",
->       "driver": "file",
->       "discard-nb-failed": 0
-      },
-      "stats": {
->       "unmap_operations": 860,
->       "unmap_merged": 0,
-        "flush_total_time_ns": 21506733,
-        "wr_highest_offset": 13411741696,
-        "wr_total_time_ns": 2212749334,
-        "failed_wr_operations": 0,
-        "failed_rd_operations": 0,
-        "wr_merged": 0,
-        "wr_bytes": 3426304,
-        "timed_stats": [
-          
-        ],
->       "failed_unmap_operations": 0,
-        "failed_flush_operations": 0,
-        "account_invalid": true,
-        "rd_total_time_ns": 3617478206,
->       "invalid_unmap_operations": 0,
-        "flush_operations": 24,
-        "wr_operations": 309,
->       "unmap_bytes": 11949633536,
-        "rd_merged": 0,
-        "rd_bytes": 141967360,
->       "unmap_total_time_ns": 14871816,
-        [..]
-
-Anton Nefedov (8):
-  qapi: group BlockDeviceStats fields
-  qapi: add unmap to BlockDeviceStats
-  ide: account UNMAP (TRIM) operations
-  scsi: store unmap offset and nb_sectors in request struct
-  scsi: move unmap error checking to the complete callback
-  scsi: account unmap operations
-  file-posix: account discard operations
-  qapi: query-blockstat: add driver specific file-posix stats
-
- qapi/block-core.json       | 82 +++++++++++++++++++++++++++++++++++++++-------
- include/block/accounting.h |  1 +
- include/block/block.h      |  1 +
- include/block/block_int.h  |  1 +
- block.c                    |  9 +++++
- block/file-posix.c         | 45 +++++++++++++++++++++++--
- block/qapi.c               | 11 +++++++
- hw/ide/core.c              | 12 +++++++
- hw/scsi/scsi-disk.c        | 29 +++++++++-------
- tests/qemu-iotests/227.out | 18 ++++++++++
- 10 files changed, 184 insertions(+), 25 deletions(-)
-
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 4c7a37a..44d992f 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -784,12 +784,12 @@
+ # @flush_operations: The number of cache flush operations performed by the
+ #                    device (since 0.15.0)
+ #
+-# @flush_total_time_ns: Total time spend on cache flushes in nano-seconds
+-#                       (since 0.15.0).
++# @rd_total_time_ns: Total time spent on reads in nanoseconds (since 0.15.0).
+ #
+-# @wr_total_time_ns: Total time spend on writes in nano-seconds (since 0.15.0).
++# @wr_total_time_ns: Total time spent on writes in nanoseconds (since 0.15.0).
+ #
+-# @rd_total_time_ns: Total_time_spend on reads in nano-seconds (since 0.15.0).
++# @flush_total_time_ns: Total time spent on cache flushes in nanoseconds
++#                       (since 0.15.0).
+ #
+ # @wr_highest_offset: The offset after the greatest byte written to the
+ #                     device.  The intended use of this information is for
+@@ -842,14 +842,18 @@
+ # Since: 0.14.0
+ ##
+ { 'struct': 'BlockDeviceStats',
+-  'data': {'rd_bytes': 'int', 'wr_bytes': 'int', 'rd_operations': 'int',
+-           'wr_operations': 'int', 'flush_operations': 'int',
+-           'flush_total_time_ns': 'int', 'wr_total_time_ns': 'int',
+-           'rd_total_time_ns': 'int', 'wr_highest_offset': 'int',
+-           'rd_merged': 'int', 'wr_merged': 'int', '*idle_time_ns': 'int',
++  'data': {'rd_bytes': 'int', 'wr_bytes': 'int',
++           'rd_operations': 'int', 'wr_operations': 'int',
++           'flush_operations': 'int',
++           'rd_total_time_ns': 'int', 'wr_total_time_ns': 'int',
++           'flush_total_time_ns': 'int',
++           'wr_highest_offset': 'int',
++           'rd_merged': 'int', 'wr_merged': 'int',
++           '*idle_time_ns': 'int',
+            'failed_rd_operations': 'int', 'failed_wr_operations': 'int',
+-           'failed_flush_operations': 'int', 'invalid_rd_operations': 'int',
+-           'invalid_wr_operations': 'int', 'invalid_flush_operations': 'int',
++           'failed_flush_operations': 'int',
++           'invalid_rd_operations': 'int', 'invalid_wr_operations': 'int',
++           'invalid_flush_operations': 'int',
+            'account_invalid': 'bool', 'account_failed': 'bool',
+            'timed_stats': ['BlockDeviceTimedStats'],
+            '*x_rd_latency_histogram': 'BlockLatencyHistogramInfo',
 -- 
 2.7.4
