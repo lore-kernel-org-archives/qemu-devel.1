@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fruLx-0004yc-3D
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:16:57 -0400
+	(envelope-from <no-reply@patchew.org>) id 1frufD-00071Q-72
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:36:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fruFz-00032d-BS
-	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:10:47 -0400
-References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-3-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <332129bf-2c69-8ad2-ca0c-c95322639f7c@redhat.com>
-Date: Mon, 20 Aug 2018 20:10:40 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fruf9-0003ir-7r
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:36:51 -0400
+Resent-Message-Id: <E1fruf9-0003ir-7r@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21127)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fruf8-0003gf-VK
+	for qemu-devel@nongnu.org; Mon, 20 Aug 2018 20:36:47 -0400
+In-Reply-To: <20180820202604.14218-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <153481175754.17712.11782121995511793904@502c9da6d61e>
 MIME-Version: 1.0
-In-Reply-To: <20180817190457.8292-3-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] jobs: canonize Error object
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 20 Aug 2018 17:35:59 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/7] Linux user for 3.1 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,17 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, crosthwaite.peter@gmail.com, riku.voipio@iki.fi, pbonzini@redhat.com, aurelien@aurel32.net, rth@twiddle.net
 
-
-
-On 08/17/2018 03:04 PM, John Snow wrote:
-> +            error_setg_errno(&job->err, -job->ret, "job failed");
-
-Kevin specifically asked for me to change this, and I lost it in the
-shuffle. I'll send a v3 now, since there are enough nits to warrant it,
-and I think I want to adjust a few things to set up the "part II"
-portion of this changeset a little more nicely.
-
---js
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwODIwMjAyNjA0LjE0MjE4LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvN10gTGludXggdXNlciBmb3IgMy4xIHBhdGNoZXMKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
+JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+NDUyNmI2ZDQyMiBsaW51eC11c2VyOiBhZGQgUUVNVV9JRkxBX0lORk9fS0lORCBuZXN0ZWQgdHlw
+ZSBmb3IgdHVuCjNlMzhjZDMxZjYgbGludXgtdXNlcjogdXBkYXRlIG5ldGxpbmsgcm91dGUgdHlw
+ZXMKZjQ5NzM2MWQ2NyBsaW51eC11c2VyOiBpbnRyb2R1Y2UgUUVNVV9SVEFfKiB0byB1c2Ugd2l0
+aCBydGF0dHJfdHlwZV90CmNjYjcxMDAxZjkgbGludXgtdXNlcjogZml4IHJlY3Ztc2coKS9yZWN2
+ZnJvbSgpIHdpdGggbmV0bGluayBhbmQgTVNHX1RSVU5DCjdmMTE3MWMxNjMgc2g0OiBmaXggdXNl
+X2ljb3VudCB3aXRoIGxpbnV4LXVzZXIKMWI3NDlhZWE5MCBsaW51eC11c2VyOiBmaXggMzJiaXQg
+ZzJoKCkvaDJnKCkKMjhmZTI2NGFhMiBxZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgeDg2XzY0IHRh
+cmdldAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiBxZW11LWJpbmZt
+dC1jb25mLnNoOiBhZGQgeDg2XzY0IHRhcmdldC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojMjk6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxNzoKK3g4Nl82
+NF9tYWdpYz0nXHg3ZkVMRlx4MDJceDAxXHgwMVx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBc
+eDAwXHgwMFx4MDJceDAwXHgzZVx4MDAnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
+IzMwOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MTg6Cit4ODZfNjRfbWFzaz0n
+XHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZlXHhmZVx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZc
+eGZmXHhmZlx4ZmVceGZmXHhmZlx4ZmYnCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDE4
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
+ZWNraW5nIFBBVENIIDIvNzogbGludXgtdXNlcjogZml4IDMyYml0IGcyaCgpL2gyZygpLi4uCkNo
+ZWNraW5nIFBBVENIIDMvNzogc2g0OiBmaXggdXNlX2ljb3VudCB3aXRoIGxpbnV4LXVzZXIuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNC83OiBsaW51eC11c2VyOiBmaXggcmVjdm1zZygpL3JlY3Zmcm9tKCkg
+d2l0aCBuZXRsaW5rIGFuZCBNU0dfVFJVTkMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS83OiBsaW51eC11
+c2VyOiBpbnRyb2R1Y2UgUUVNVV9SVEFfKiB0byB1c2Ugd2l0aCBydGF0dHJfdHlwZV90Li4uCkNo
+ZWNraW5nIFBBVENIIDYvNzogbGludXgtdXNlcjogdXBkYXRlIG5ldGxpbmsgcm91dGUgdHlwZXMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNy83OiBsaW51eC11c2VyOiBhZGQgUUVNVV9JRkxBX0lORk9fS0lO
+RCBuZXN0ZWQgdHlwZSBmb3IgdHVuLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
