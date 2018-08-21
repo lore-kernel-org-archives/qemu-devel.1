@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fryJa-0002CE-As
+	(envelope-from <bounces@canonical.com>) id 1fryJa-0002CD-AJ
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fryJY-0006c5-89
+	(envelope-from <bounces@canonical.com>) id 1fryJX-0006bH-3G
 	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:30:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35860)
+Received: from indium.canonical.com ([91.189.90.7]:35826)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fryJY-0006bX-1t
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:30:44 -0400
+	id 1fryJW-0006al-Tf
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 00:30:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fryJX-0003BS-B0
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 04:30:43 +0000
+	id 1fryJV-000375-Qg
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 04:30:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5074E2E8041
-	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 04:30:43 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C7D382E8041
+	for <qemu-devel@nongnu.org>; Tue, 21 Aug 2018 04:30:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Aug 2018 04:17:30 -0000
-From: Launchpad Bug Tracker <1471583@bugs.launchpad.net>
-Reply-To: Bug 1471583 <1471583@bugs.launchpad.net>
+Date: Tue, 21 Aug 2018 04:17:28 -0000
+From: Launchpad Bug Tracker <1472083@bugs.launchpad.net>
+Reply-To: Bug 1472083 <1472083@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150705175825.18932.46509.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153482505067.29888.4426776446336899839.malone@loganberry.canonical.com>
+References: <20150707053638.9337.88545.malonedeb@gac.canonical.com>
+Message-Id: <153482504829.29888.5182195854780072535.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1471583] Re: QCA988X Wifi Card Not PCI Passing
- Through
+Subject: [Qemu-devel] [Bug 1472083] Re: Qemu 2.1.2 hang when stop command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,121 +47,54 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1471583
+https://bugs.launchpad.net/bugs/1472083
 
 Title:
-  QCA988X Wifi Card Not PCI Passing Through
+  Qemu 2.1.2 hang when stop command
 
 Status in QEMU:
   Expired
 
 Bug description:
-  CPU:  Intel(R) Xeon(R) CPU E3-1265L v3 @ 2.50GHz
-  KVM:  qemu-kvm-1.5.3-86.el7_1.2.x86_64
-  Kernel:  4.1.1-1.el7.elrepo.x86_64, and kernel-3.10.0-229.7.2.el7.x86_64
-  Host & Guest: CentOS 7.1
-  Using virt-manager-1.1.0-12.el7.noarch to create, configure, and start gu=
-est
+  Qemu 2.1.2, Linux kernel 3.13.6, this is the stack.
 
-  I am trying to do a PCI passthrough of a QCA988X wifi card.  It's a Doodl=
-e Labs military-grade 802.11ac miniPCI card, which uses the ath10k kernel d=
-river.  This card configures nicely on the host, and seems to pass through =
-to the guest, but early in the boot of the guest it says "Unknown header ty=
-pe" at the wifi's bus address.  And sure enough, lspci -vv on the host then=
- shows:
-          !!! Unknown header type 7f
-          Kernel driver in use: vfio-pci
-
-  When the guest has booted, of course it shows as an Unclassified
-  device.  Host and guest must run at least kernel 4.0 so the wifi
-  card's current firmware will load, and so that its driver comes with
-  the kernel.  I have both host and guest set up for the wifi card.  I
-  tried running kernel 3.10 in the host and passing through the PCI
-  device, but same behavior.
-
-  I am passing through to the guest an Intel i350 ethernet card just
-  fine, in fact I'm passing through two of its SR-IOV virt interfaces to
-  the guest, so that works.
-
-  On the host, before I start the guest, the wifi card looks like this
-  (lspci -vv):
-
-  0a:00.0 Network controller: Qualcomm Atheros QCA988x 802.11ac Wireless Ne=
-twork Adapter
-          Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParEr=
-r- Stepping- SERR- FastB2B- DisINTx+
-          Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast >TAbort- =
-<TAbort- <MAbort- >SERR- <PERR- INTx-
-          Latency: 0, Cache Line Size: 64 bytes
-          Interrupt: pin A routed to IRQ 43
-          Region 0: Memory at f7000000 (64-bit, non-prefetchable) [size=3D2=
-M]
-          Expansion ROM at f7200000 [disabled] [size=3D64K]
-          Capabilities: [40] Power Management version 2
-                  Flags: PMEClk- DSI- D1+ D2+ AuxCurrent=3D375mA PME(D0+,D1=
-+,D2+,D3hot+,D3cold+)
-                  Status: D0 NoSoftRst- PME-Enable- DSel=3D0 DScale=3D0 PME-
-          Capabilities: [50] MSI: Enable+ Count=3D8/8 Maskable+ 64bit-
-                  Address: fee00618  Data: 0000
-                  Masking: 00000000  Pending: 00000000
-          Capabilities: [70] Express (v2) Endpoint, MSI 00
-                  DevCap: MaxPayload 256 bytes, PhantFunc 0, Latency L0s un=
-limited, L1 <64us
-                          ExtTag- AttnBtn- AttnInd- PwrInd- RBE+ FLReset-
-                  DevCtl: Report errors: Correctable- Non-Fatal- Fatal- Uns=
-upported-
-                          RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
-                          MaxPayload 128 bytes, MaxReadReq 512 bytes
-                  DevSta: CorrErr- UncorrErr- FatalErr- UnsuppReq- AuxPwr+ =
-TransPend-
-                  LnkCap: Port #0, Speed 2.5GT/s, Width x1, ASPM L0s L1, Ex=
-it Latency L0s <4us, L1 <64us
-                          ClockPM- Surprise- LLActRep- BwNot-
-                  LnkCtl: ASPM Disabled; RCB 64 bytes Disabled- CommClk-
-                          ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-                  LnkSta: Speed 2.5GT/s, Width x1, TrErr- Train- SlotClk+ D=
-LActive- BWMgmt- ABWMgmt-
-                  DevCap2: Completion Timeout: Not Supported, TimeoutDis+, =
-LTR-, OBFF Not Supported
-                  DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, L=
-TR-, OBFF Disabled
-                  LnkCtl2: Target Link Speed: 2.5GT/s, EnterCompliance- Spe=
-edDis-
-                           Transmit Margin: Normal Operating Range, EnterMo=
-difiedCompliance- ComplianceSOS-
-                           Compliance De-emphasis: -6dB
-                  LnkSta2: Current De-emphasis Level: -6dB, EqualizationCom=
-plete-, EqualizationPhase1-
-                           EqualizationPhase2-, EqualizationPhase3-, LinkEq=
-ualizationRequest-
-          Capabilities: [100 v1] Advanced Error Reporting
-                  UESta:  DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt=
-- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
-                  UEMsk:  DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt=
-- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
-                  UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt=
-- RxOF+ MalfTLP+ ECRC- UnsupReq- ACSViol-
-                  CESta:  RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFat=
-alErr-
-                  CEMsk:  RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFat=
-alErr+
-                  AERCap: First Error Pointer: 00, GenCap- CGenEn- ChkCap- =
-ChkEn-
-          Capabilities: [140 v1] Virtual Channel
-                  Caps:   LPEVC=3D0 RefClk=3D100ns PATEntryBits=3D1
-                  Arb:    Fixed- WRR32- WRR64- WRR128-
-                  Ctrl:   ArbSelect=3DFixed
-                  Status: InProgress-
-                  VC0:    Caps:   PATOffset=3D00 MaxTimeSlots=3D1 RejSnoopT=
-rans-
-                          Arb:    Fixed- WRR32- WRR64- WRR128- TWRR128- WRR=
-256-
-                          Ctrl:   Enable+ ID=3D0 ArbSelect=3DFixed TC/VC=3D=
-01
-                          Status: NegoPending- InProgress-
-          Capabilities: [160 v1] Device Serial Number 00-00-00-00-00-00-00-=
-00
-          Kernel driver in use: ath10k_pci
+  #0  in ppoll () from /lib/x86_64-linux-gnu/libc.so.6
+  #1  in qemu_poll_ns (fds=3D0x7fa82a8de380, nfds=3D1, timeout=3D-1) at qem=
+u-timer.c:314
+  #2  in aio_poll (ctx=3D0x7fa82a8b5000, blocking=3Dtrue) at aio-posix.c:250
+  #3  in bdrv_drain_all () at block.c:1924
+  #4  in do_vm_stop (state=3DRUN_STATE_PAUSED) at /qemu-2.1.2/cpus.c:544
+  #5  in vm_stop (state=3DRUN_STATE_PAUSED) at /qemu-2.1.2/cpus.c:1227
+  #6  in qmp_stop (errp=3D0x7ffffb6dcaf8) at qmp.c:98
+  #7  in qmp_marshal_input_stop (mon=3D0x7fa82a8e0970, qdict=3D0x7fa8302950=
+20, ret=3D0x7ffffb6dcb48) at qmp-marshal.c:2806
+  #8  in qmp_call_cmd (mon=3D0x7fa82a8e0970, cmd=3D0x7fa8290558a0, params=
+=3D0x7fa830295020)  at /qemu-2.1.2/monitor.c:5038
+  #9  in handle_qmp_command (parser=3D0x7fa82a8e0a28, tokens=3D0x7fa82a8d9b=
+50) at /qemu-2.1.2/monitor.c:5104
+  #10 in json_message_process_token (lexer=3D0x7fa82a8e0a30, token=3D0x7fa8=
+30122b60, type=3DJSON_OPERATOR, x=3D39, y=3D17865) at qobject/json-streamer=
+.c:87
+  #11 in json_lexer_feed_char (lexer=3D0x7fa82a8e0a30, ch=3D125 '}', flush=
+=3Dfalse) at qobject/json-lexer.c:303
+  #12 in json_lexer_feed (lexer=3D0x7fa82a8e0a30, buffer=3D0x7ffffb6dcdb0 "=
+}\315m\373\377\177", size=3D1) at qobject/json-lexer.c:356
+  #13 in json_message_parser_feed (parser=3D0x7fa82a8e0a28, buffer=3D0x7fff=
+fb6dcdb0 "}\315m\373\377\177", size=3D1) at qobject/json-streamer.c:111
+  #14 in monitor_control_read (opaque=3D0x7fa82a8e0970, buf=3D0x7ffffb6dcdb=
+0 "}\315m\373\377\177", size=3D1) at /qemu-2.1.2/monitor.c:5125
+  #15 in qemu_chr_be_write (s=3D0x7fa82a8c2020, buf=3D0x7ffffb6dcdb0 "}\315=
+m\373\377\177", len=3D1) at qemu-char.c:213
+  #16 in tcp_chr_read (chan=3D0x7fa82a8c4ba0, cond=3DG_IO_IN, opaque=3D0x7f=
+a82a8c2020) at qemu-char.c:2729
+  #17 in g_main_context_dispatch () from /lib/x86_64-linux-gnu/libglib-2.0.=
+so.0
+  #18 in glib_pollfds_poll () at main-loop.c:190
+  #19 in os_host_main_loop_wait (timeout=3D24000000) at main-loop.c:235
+  #20 in main_loop_wait (nonblocking=3D0) at main-loop.c:484
+  #21 in main_loop () at vl.c:2034
+  #22 in main (argc=3D55, argv=3D0x7ffffb6de338, envp=3D0x7ffffb6de4f8) at =
+vl.c:4583
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1471583/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1472083/+subscriptions
