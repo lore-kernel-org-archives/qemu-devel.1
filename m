@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fsS8a-0001VS-Ce
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:21:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fsS9P-0001uI-CK
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:22:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fsS8S-0003yj-KH
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:21:20 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fsS9O-00051I-EF
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:22:15 -0400
 References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-7-jsnow@redhat.com>
+	<20180817190457.8292-8-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ce27055e-4a00-348b-9234-05a5e0e0af13@redhat.com>
-Date: Wed, 22 Aug 2018 14:20:48 +0200
+Message-ID: <576e0cd4-9f3e-0861-1236-fbe8573516c2@redhat.com>
+Date: Wed, 22 Aug 2018 14:21:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180817190457.8292-7-jsnow@redhat.com>
+In-Reply-To: <20180817190457.8292-8-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="onrmKow6r3bl4w4fppOWZgnPjz5PE5Wsd"
-Subject: Re: [Qemu-devel] [PATCH 6/7] jobs: utilize job_exit shim
+	boundary="mk3agGBPavoqlC0xjef91KyVmnHp6xvtA"
+Subject: Re: [Qemu-devel] [PATCH 7/7] jobs: remove job_defer_to_main_loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,51 @@ To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---onrmKow6r3bl4w4fppOWZgnPjz5PE5Wsd
+--mk3agGBPavoqlC0xjef91KyVmnHp6xvtA
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
-Message-ID: <ce27055e-4a00-348b-9234-05a5e0e0af13@redhat.com>
-Subject: Re: [PATCH 6/7] jobs: utilize job_exit shim
+Message-ID: <576e0cd4-9f3e-0861-1236-fbe8573516c2@redhat.com>
+Subject: Re: [PATCH 7/7] jobs: remove job_defer_to_main_loop
 References: <20180817190457.8292-1-jsnow@redhat.com>
- <20180817190457.8292-7-jsnow@redhat.com>
-In-Reply-To: <20180817190457.8292-7-jsnow@redhat.com>
+ <20180817190457.8292-8-jsnow@redhat.com>
+In-Reply-To: <20180817190457.8292-8-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2018-08-17 21:04, John Snow wrote:
-> Utilize the job_exit shim by not calling job_defer_to_main_loop, and
-> where applicable, converting the deferred callback into the job_exit
-> callback.
->=20
-> This converts backup, stream, create, and the unit tests all at once.
-> None of these jobs undergo and order of operations changes, so it shoul=
-d
-> be a mechanical change.
+> Now that the job infrastructure is handling the job_completed call for
+> all implemented jobs, we can remove the interface that allowed jobs to
+> schedule their own completion.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  block/backup.c            | 16 ----------------
->  block/create.c            | 14 +++-----------
->  block/stream.c            | 22 +++++++---------------
->  tests/test-bdrv-drain.c   |  6 ------
->  tests/test-blockjob-txn.c | 11 ++---------
->  tests/test-blockjob.c     | 10 ++++------
->  6 files changed, 16 insertions(+), 63 deletions(-)
+>  include/qemu/job.h | 17 -----------------
+>  job.c              | 40 ++--------------------------------------
+>  2 files changed, 2 insertions(+), 55 deletions(-)
 
-[...]
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-> index 82cedee78b..ef29f35e44 100644
-> --- a/tests/test-blockjob-txn.c
-> +++ b/tests/test-blockjob-txn.c
-> @@ -24,17 +24,11 @@ typedef struct {
->      int *result;
->  } TestBlockJob;
-> =20
-> -static void test_block_job_complete(Job *job, void *opaque)
-> +static void test_block_job_exit(Job *job)
->  {
->      BlockJob *bjob =3D container_of(job, BlockJob, job);
->      BlockDriverState *bs =3D blk_bs(bjob->blk);
-> -    int rc =3D (intptr_t)opaque;
-> =20
-> -    if (job_is_cancelled(job)) {
-> -        rc =3D -ECANCELED;
-> -    }
-> -
-> -    job_completed(job, rc);
->      bdrv_unref(bs);
->  }
-
-That is a change in the order of operations, actually.  It's OK though
-because the BDS is still owned by the block job's BlockBackend.
-
-(So I'd give an R-b, but I'm still unsure about the .exit() interface.)
+In addition, you could make job_completed() static to job.c.
 
 Max
 
 
---onrmKow6r3bl4w4fppOWZgnPjz5PE5Wsd
+--mk3agGBPavoqlC0xjef91KyVmnHp6xvtA
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt9VSAACgkQ9AfbAGHV
-z0DWUQf9F7ycbApxgnJSAbXLLT8Es7OfVaGiMCTgGIqnIuesuhmQOyxltB/SpRzH
-H+ewnzk5Qy8Phk4jPM01QZmavxth4l9uGNBeUvTZo9V80d8fh/BA+MIJmwxRw44c
-U/3/6YnEfQaQ37sRYsSpesXTqzjfJhyl7Ua90Irl7W/yMVEzRW/cX4aU2LFGfJ24
-rXh46auOpRAJpaoJ26inTV/Pig3xvWW0C4uqq6D4VPmCyMZlwqeS+t7Vem3xm/pI
-1QSLQi/mD7BFXrRO6EXaRCZ86RIs5/u+rUqT9Yc5zQfVEZHWpGE2VMtTSBEGWZvd
-5YaO1WUXrNpPra+Qxcf7yzgVn/SbKw==
-=ipmW
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt9VWIACgkQ9AfbAGHV
+z0Cqfwf9H1+JYZF6wltWJ95sbd3Kwb35ti1kAGKm2UBhKhHMdCbAyh+g/VF4gcK9
+MAvGBmYaGsxCjcn0X5r/ndjDGAzaZ0rYinnfGqbPdbvZZZCl8U7VnVwEb0HzwRMT
+WKrFVl6ayuVHGY1egBdiYuK6nWAsV+fkzeicMPqDMcIk58wDJLZYgWkBJJmN1XQd
+IAFzdzoc6GybNzC4UEG8P4DdZJlNlvcbBhtZTGSYxDvaakACV93ribp6UftOMSet
+yYHR2uoJcCHbswL/TLkjVFRG42PucwYe7GQyYrOL9pXDXnh9vn5ssWVB7WuXAkbK
+4WXgVdFjMFEAUxQ7RsJBsAmWlQLAeg==
+=Eqyb
 -----END PGP SIGNATURE-----
 
---onrmKow6r3bl4w4fppOWZgnPjz5PE5Wsd--
+--mk3agGBPavoqlC0xjef91KyVmnHp6xvtA--
