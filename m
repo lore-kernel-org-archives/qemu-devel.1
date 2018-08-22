@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fsVX2-0007Ny-Bb
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:58:53 -0400
+	(envelope-from <berrange@redhat.com>) id 1fsVae-0003BI-2g
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:02:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fsVWy-0003nB-Ht
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:58:52 -0400
-Received: from mail-it0-f65.google.com ([209.85.214.65]:53157)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fsVWy-0003mD-8V
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:58:48 -0400
-Received: by mail-it0-f65.google.com with SMTP id d9-v6so3497511itf.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 08:58:47 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1fsVaa-0005u0-3Z
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:02:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35670 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fsVaY-0005sh-40
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:02:31 -0400
+Date: Wed, 22 Aug 2018 17:02:22 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180822160222.GP12750@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
+	<39b3c8b8-25eb-3a8e-3a5a-abd584a11e2c@laine.org>
+	<f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
+	<20180822120135.GN18995@localhost.localdomain>
+	<20180822122601.GI12750@redhat.com>
+	<20180822125455.GP18995@localhost.localdomain>
+	<20180822134440.GK12750@redhat.com>
+	<20180822141828.GQ18995@localhost.localdomain>
+	<20180822145720.GL12750@redhat.com>
+	<20180822154948.GR18995@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180822154611.GN12750@redhat.com>
-References: <20180822142956.6859-1-marcandre.lureau@redhat.com>
-	<20180822142956.6859-4-marcandre.lureau@redhat.com>
-	<20180822154611.GN12750@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 22 Aug 2018 17:58:46 +0200
-Message-ID: <CAMxuvawr-ooy91ZHTHx+aLYhgpH5gBoAKQz_pvF=kcHzadjLog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] seccomp: set the seccomp filter to
- all threads
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180822154948.GR18995@localhost.localdomain>
+Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
+ for guest OSes that don't support virtio-1.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,144 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paul Moore <pmoore@redhat.com>, Eduardo Otubo <otubo@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Andrea Bolognani <abologna@redhat.com>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>, Laine Stump <laine@laine.org>
 
-On Wed, Aug 22, 2018 at 5:46 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> On Wed, Aug 22, 2018 at 04:29:56PM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> When using "-seccomp on", the seccomp policy is only applied to the
->> main thread, the vcpu worker thread and other worker threads created
->> after seccomp policy is applied; the seccomp policy is not applied to
->> e.g. the RCU thread because it is created before the seccomp policy is
->> applied and SECCOMP_FILTER_FLAG_TSYNC isn't used.
->>
->> This can be verified with
->> for task in /proc/`pidof qemu`/task/*; do cat $task/status | grep Secc ;=
- done
->> Seccomp:      2
->> Seccomp:      0
->> Seccomp:      0
->> Seccomp:      2
->> Seccomp:      2
->> Seccomp:      2
->>
->> Starting with libseccomp 2.2.0 and kernel >=3D 3.17, we can use
->> seccomp_attr_set(ctx, > SCMP_FLTATR_CTL_TSYNC, 1) to update the policy
->> on all threads.
->>
->> Do it by default if possible, warn if not possible. Add an option to
->> set the tsync behaviour explicitly.
->>
->> Note: we can't bump libseccomp to 2.2.0 since it's not available in
->> Debian oldstable (2.1.0).
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  qemu-seccomp.c  | 65 +++++++++++++++++++++++++++++++++++++++++++++++--
->>  qemu-options.hx |  2 ++
->>  2 files changed, 65 insertions(+), 2 deletions(-)
->>
->> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
->> index f0c833f3ca..aa23eae970 100644
->> --- a/qemu-seccomp.c
->> +++ b/qemu-seccomp.c
->> @@ -119,6 +119,45 @@ qemu_seccomp(unsigned int operation, unsigned int f=
-lags, void *args)
->>  #endif
->>  }
->>
->> +static bool qemu_seccomp_syscall_check(void)
->> +{
->> +    int rc;
->> +
->> +    /*
->> +     * this is an invalid call because the second argument is non-zero,=
- but
->> +     * depending on the errno value of ENOSYS or EINVAL we can guess if=
- the
->> +     * seccomp() syscal is supported or not
->> +     */
->> +    rc =3D qemu_seccomp(SECCOMP_SET_MODE_STRICT, 1, NULL);
->> +    if (rc < 0 && errno =3D=3D EINVAL) {
->> +        return true;
->> +    }
->> +
->> +    return false;
->> +}
->> +
->> +static bool qemu_seccomp_get_default_tsync(void)
->> +{
->> +    bool tsync =3D true;
->> +
->> +    /* TSYNC support was added with the syscall */
->> +    if (!qemu_seccomp_syscall_check()) {
->> +        error_report("The host kernel doesn't support seccomp TSYNC!");
->> +        tsync =3D false;
->> +    }
->> +
->> +#if !(SCMP_VER_MAJOR >=3D 2 && SCMP_VER_MINOR >=3D 2)
->> +    error_report("libseccomp is too old to support TSYNC!");
->> +    tsync =3D false;
->> +#endif
->> +
->> +    if (!tsync) {
->> +        error_report("Only the main thread will be filtered by seccomp!=
-");
->
-> At this point you might as well not bother using seccomp at all. The
-> thread that is confined merely needs to scribble something into the
-> stack of the unconfined thread and now it can do whatever it wants.
+On Wed, Aug 22, 2018 at 12:49:48PM -0300, Eduardo Habkost wrote:
 
-Actually, that message is incorrect, it should rather be "not all
-threads will be filtered" (as described in commit message).
+> > The thing that has really tipped my mind this way is that even
+> > if we provide new device models, mgmt apps will be loathe to
+> > actually use them because it will prevent live migration of
+> > those guests to hosts with older libvirt.
+> 
+> This might be an issue for some apps, but is it going to happen
+> in practice?  Don't they all need mechanisms to flip a switch and
+> enable features that require newer host software, already?
 
-> IMHO we need to find a way to get the policy to apply to those other
-> threads.
+That is true, but most features that get added to virt these days
+are things which are opt-in for specific use cases. eg when we
+added mdev support if a guest gets given an mdev VGPU it obviously
+won't be migratable to older libvirt lacking mdev support. The
+mitigation is that only $TINY % of guests will be using mdev, so
+the compat problem won't widely affect things.
 
-That's what the patch is about ;)
+With the alternative virtio models we're discussing here, the idea
+is that they'd be used by default for all new guest deployments,
+so the impact will be felt on every guest.
 
-> The RCU thread is tricky as it is spawned from a __constructor__
-> function, which means it'll be active way before we setup seccomp.
->
-> I think we need to figure out a way todo synchronization between
-> the RCU thread and the seccomp setup code. Could we have a global
-> variable 'int seccomp_initialized' that we check from the RCU
-> thread loop - when that toggles to non-zero, the RCU thread can
-> then call into the seccomp_start() method to activate policy in
-> its thread. We'd need a synchronous feedback mechansim back to
-> the main thread, as it must block startup until all the threads
-> have activated the seccomp filter.
+> > So my feeling is we should do the work to enable use of Q35
+> > by default in mgmt apps, for guest OS where it is known to
+> > work correctly today. Every other OS should just stick with
+> > i440fx as we already know that works for them today and Q35
+> > doesn't offer legacy OS compelling enough benefits to switch.
+> 
+> I'd still prefer if libvirt provided a saner configuration
+> mechanism, and let libosinfo and management apps decide what
+> works best for them.
+> 
+> If it helps, I can send QEMU patches to make
+> virtio-0.9/virtio-1.0-non-transitional/virtio-1.0-transitional
+> appear as different device types.  libvirt would then be able to
+> check if the device type implements "pci-express-device" or
+> "conventional-pci-device", instead of adding device-specific
+> placement logic.
 
-That's a bit like TSYNC, except we do it ourself with RCU thread. But
-what about other threads? For examples one that could be created by
-external libraries (like mesa)
+I don't think it makes a big difference from pov of the libvirt
+impl, as its just the difference between "-device virtio-net,modern=off"
+and "-device virtio-net-0.9".  It still has the same amount of extra
+work and complexity rippling out from libvirt to mgmt apps, to address
+a problem (make old RHEL6 use Q35 instad of i440fx) that shouldn't
+really need to exist.
 
->
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index 5515dfaba5..dafacb60c6 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -3864,6 +3864,8 @@ Disable set*uid|gid system calls
->>  Disable *fork and execve
->>  @item resourcecontrol=3D@var{string}
->>  Disable process affinity and schedular priority
->> +@item tsync=3D@var{bool}
->> +Apply seccomp filter to all threads (default is auto, and will warn if =
-fail)
->
-> IMHO this should never exist, as setting "tsync" to anything other
-> than "yes", is akin to just running without any sandbox.
-
-Then we should just fail -sandbox on those systems.
-
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
