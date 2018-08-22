@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fsUrt-00029f-0B
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:16:21 -0400
+	(envelope-from <david@redhat.com>) id 1fsUug-0003F9-8o
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:19:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fsUro-0004yi-2p
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:16:20 -0400
+	(envelope-from <david@redhat.com>) id 1fsUua-00070g-Cb
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:19:14 -0400
 References: <20180822144039.5796-1-pavel.zbitskiy@gmail.com>
+	<20180822144039.5796-2-pavel.zbitskiy@gmail.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <3fdd72fa-6482-3e96-fe66-9c124b84bce8@redhat.com>
-Date: Wed, 22 Aug 2018 17:16:12 +0200
+Message-ID: <aaf7a5b1-4143-b209-9626-ce1309fb628b@redhat.com>
+Date: Wed, 22 Aug 2018 17:19:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180822144039.5796-1-pavel.zbitskiy@gmail.com>
+In-Reply-To: <20180822144039.5796-2-pavel.zbitskiy@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] Some improvements in z/Arch
- instructions support
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] target/s390x: use regular spaces in
+ translate.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +26,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, richard.henderson@linaro.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, richard.henderson@linaro.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
 On 22.08.2018 16:40, Pavel Zbitskiy wrote:
-> Changes since v3:
-> * Patches 1-6 were accepted, thanks!
-> * Use in1_la2 in op_cvb().
-> * Free a temp in op_cvb().
-> * Make ra const in helper_cvb().
-> * Use wrap_address() in helper_cvb().
-> * Add a minor formatting patch.
-> * Add LPSW(E) alignment check.
-> 
+> In a few places translate.c contains non-breaking spaces (0xc2 0xa0)
+> instead of regular ones (0x20):
+>=20
+>   7c 7c c2 a0 63 63
+>   7c 7c 20    63 63
+>   |  |        c  c
+>=20
+> This confuses some text editors.
+>=20
+> Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
+> ---
+>  target/s390x/translate.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index 40e12ca2c4..7363aabf3a 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -842,7 +842,7 @@ static void disas_jcc(DisasContext *s, DisasCompare=
+ *c, uint32_t mask)
+>              cond =3D TCG_COND_NE;
+>              c->u.s32.b =3D tcg_const_i32(1);
+>              break;
+> -        case 0x8 | 0x2: /* cc =3D=3D 0 ||=C2=A0cc =3D=3D 2 =3D> (cc & =
+1) =3D=3D 0 */
+> +        case 0x8 | 0x2: /* cc =3D=3D 0 || cc =3D=3D 2 =3D> (cc & 1) =3D=
+=3D 0 */
+>              cond =3D TCG_COND_EQ;
+>              c->g1 =3D false;
+>              c->u.s32.a =3D tcg_temp_new_i32();
+> @@ -861,7 +861,7 @@ static void disas_jcc(DisasContext *s, DisasCompare=
+ *c, uint32_t mask)
+>              cond =3D TCG_COND_NE;
+>              c->u.s32.b =3D tcg_const_i32(0);
+>              break;
+> -        case 0x4 | 0x1: /* cc =3D=3D 1 ||=C2=A0cc =3D=3D 3 =3D> (cc & =
+1) !=3D 0 */
+> +        case 0x4 | 0x1: /* cc =3D=3D 1 || cc =3D=3D 3 =3D> (cc & 1) !=3D=
+ 0 */
+>              cond =3D TCG_COND_NE;
+>              c->g1 =3D false;
+>              c->u.s32.a =3D tcg_temp_new_i32();
+>=20
 
-Keep the patches coming, happy to see some activity :)
+(can't spot a difference in my mail editor ;) )
 
-> Pavel Zbitskiy (3):
->   target/s390x: use regular spaces in translate.c
->   target/s390x: exception on non-aligned LPSW(E)
->   target/s390x: implement CVB, CVBY and CVBG
-> 
->  target/s390x/helper.h           |  2 ++
->  target/s390x/insn-data.def      |  4 +++
->  target/s390x/int_helper.c       | 52 +++++++++++++++++++++++++++++++++
->  target/s390x/mem_helper.c       | 19 +++++++-----
->  target/s390x/translate.c        | 23 +++++++++++++--
->  tests/tcg/s390x/Makefile.target |  1 +
->  tests/tcg/s390x/cvb.c           | 18 ++++++++++++
->  7 files changed, 110 insertions(+), 9 deletions(-)
->  create mode 100644 tests/tcg/s390x/cvb.c
-> 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-
--- 
+--=20
 
 Thanks,
 
