@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsbxp-0007RT-Ck
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 18:50:57 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fsc4q-0001Hn-B8
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 18:58:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsbxo-0004gV-Mv
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 18:50:57 -0400
-References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-3-jsnow@redhat.com>
-	<332129bf-2c69-8ad2-ca0c-c95322639f7c@redhat.com>
-	<c63c5a3b-9168-a502-453f-3ccabc2ff747@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <92b5c1a6-1434-3ef6-50a8-aa77cf1e6167@redhat.com>
-Date: Wed, 22 Aug 2018 18:50:49 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fsc4l-0001Oz-LE
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 18:58:12 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35795)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fsc4l-0001Mq-1H
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 18:58:07 -0400
+Received: by mail-pf1-x444.google.com with SMTP id p12-v6so1680060pfh.2
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 15:58:06 -0700 (PDT)
+References: <20180818190118.12911-1-richard.henderson@linaro.org>
+	<20180818190118.12911-11-richard.henderson@linaro.org>
+	<51f5ba46-f63a-e433-7e0b-82e72a643d79@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b19ce14e-2425-b4b8-3d52-82a65468f845@linaro.org>
+Date: Wed, 22 Aug 2018 15:58:01 -0700
 MIME-Version: 1.0
-In-Reply-To: <c63c5a3b-9168-a502-453f-3ccabc2ff747@redhat.com>
+In-Reply-To: <51f5ba46-f63a-e433-7e0b-82e72a643d79@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] jobs: canonize Error object
+Subject: Re: [Qemu-devel] [PATCH v4 10/16] linux-user: Split out some simple
+ file syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-
-
-On 08/22/2018 06:59 AM, Max Reitz wrote:
-> On 2018-08-21 02:10, John Snow wrote:
->>
->>
->> On 08/17/2018 03:04 PM, John Snow wrote:
->>> +            error_setg_errno(&job->err, -job->ret, "job failed");
->>
->> Kevin specifically asked for me to change this, and I lost it in the
->> shuffle. I'll send a v3 now, since there are enough nits to warrant it,
->> and I think I want to adjust a few things to set up the "part II"
->> portion of this changeset a little more nicely.
+On 08/21/2018 05:50 PM, Laurent Vivier wrote:
+> I don't understand why you need/want to duplicate the list of syscalls here.
 > 
-> But error_setg_errno() uses either strerror() or
-> g_win32_error_message(), depending on the host OS.  I prefer that over a
-> blind strerror(), to be honest.
+> If I modify your patch as following, it works without duplicating the list:
 > 
+> diff --git a/linux-user/syscall-file.def.c b/linux-user/syscall-file.def.c
+> new file mode 100644
+> index 0000000000..78b1bd0467
+> --- /dev/null
+> +++ b/linux-user/syscall-file.def.c
+> @@ -0,0 +1,13 @@
+> +SYSCALL_DEF(close, ARG_DEC);
+> +#ifdef TARGET_NR_open
+> +SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+> +#endif
+> +SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+> +SYSCALL_DEF(read, ARG_DEC, ARG_PTR, ARG_DEC);
+> +#ifdef TARGET_NR_readlink
+> +SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
+> +#endif
+> +#ifdef TARGET_NR_readlinkat
+> +SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
+> +#endif
+> +SYSCALL_DEF(write, ARG_DEC, ARG_PTR, ARG_DEC);
 
-uhh, does it...?
+Sort-of interesting, but I do have other definitions of
+syscall structures that do not use this macro.
 
-it looks like error_setg_errno is always error_setg_errno_internal,
-which always uses strerror... am I misreading?
+Please look through e.g. patch 15 and suggest how I might
+define mmap2 with your scheme.
 
-> In general, it might make sense to introduce a qemu_strerror() (which
-> g_strdup()s strerror() on Linux, I presume, so it's compatible with
-> Win32); or to allow passing a NULL format to error_setg_errno() so you
-> only get the error string.
-> 
-> Max
-> 
+
+r~
