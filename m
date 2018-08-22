@@ -1,30 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fsJDG-0002K0-3q
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 22:49:38 -0400
+	(envelope-from <jcody@redhat.com>) id 1fsK3O-0001fP-VT
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:43:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fsJDA-0000ni-93
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 22:49:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57308 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fsJD6-0000kq-Uw
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 22:49:29 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 388F14021CC3
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 02:49:28 +0000 (UTC)
-Date: Wed, 22 Aug 2018 10:49:20 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180822024920.GA3324@xz-x1>
-References: <153487789207.20513.6642364712339067528.stgit@gimli.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <153487789207.20513.6642364712339067528.stgit@gimli.home>
-Subject: Re: [Qemu-devel] [PATCH] vfio/pci: Fix failure to close file
- descriptor on error
+	(envelope-from <jcody@redhat.com>) id 1fsK3O-0001vI-7l
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:43:30 -0400
+From: Jeff Cody <jcody@redhat.com>
+Date: Tue, 21 Aug 2018 23:43:17 -0400
+Message-Id: <20180822034319.686504-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL 0/2] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,19 +17,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Aug 21, 2018 at 12:58:53PM -0600, Alex Williamson wrote:
-> A new error path fails to close the device file descriptor when
-> triggered by a ballooning incompatibility within the group.  Fix it.
-> 
-> Fixes: 238e91728503 ("vfio/ccw/pci: Allow devices to opt-in for ballooning")
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+The following changes since commit ee135aa0428fe5af2af7be04ff16d2b596a9330a:
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-3.1-20180821' into staging (2018-08-21 13:27:11 +0100)
 
-Regards,
+are available in the Git repository at:
+
+  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+
+for you to fetch changes up to 26bf474ba92c76e61bea51726e22da6dfd185296:
+
+  block: iotest to catch abort on forced blockjob cancel (2018-08-21 15:20:37 -0400)
+
+----------------------------------------------------------------
+Block job patches
+----------------------------------------------------------------
+
+Jeff Cody (2):
+  block: for jobs, do not clear user_paused until after the resume
+  block: iotest to catch abort on forced blockjob cancel
+
+ job.c                      |  2 +-
+ tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/229.out | 23 +++++++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 120 insertions(+), 1 deletion(-)
+ create mode 100755 tests/qemu-iotests/229
+ create mode 100644 tests/qemu-iotests/229.out
 
 -- 
-Peter Xu
+2.17.1
