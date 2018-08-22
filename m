@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fsRpZ-000718-E4
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:46 -0400
+	(envelope-from <quintela@redhat.com>) id 1fsRpX-00070M-LS
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fsRpV-0000IB-JN
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27369)
+	(envelope-from <quintela@redhat.com>) id 1fsRpV-0000IN-PT
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46218 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fsRpT-0000GJ-DE
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:40 -0400
-Date: Wed, 22 Aug 2018 09:01:35 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180822120135.GN18995@localhost.localdomain>
-References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
-	<20180817092936.GC11124@redhat.com>
-	<e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
-	<39b3c8b8-25eb-3a8e-3a5a-abd584a11e2c@laine.org>
-	<f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
- for guest OSes that don't support virtio-1.0
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsRpV-0000Hu-GL
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:41 -0400
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 22 Aug 2018 14:00:50 +0200
+Message-Id: <20180822120050.12694-21-quintela@redhat.com>
+In-Reply-To: <20180822120050.12694-1-quintela@redhat.com>
+References: <20180822120050.12694-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 20/20] migration: hold the lock only if it is
+ really needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Laine Stump <laine@laine.org>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Wed, Aug 22, 2018 at 12:36:27PM +0200, Andrea Bolognani wrote:
-> On Tue, 2018-08-21 at 14:21 -0400, Laine Stump wrote:
-> > On 08/17/2018 06:35 AM, Andrea Bolognani wrote:
-> > > If we decide we want to explicitly spell out the options instead
-> > > of relying on QEMU changing behavior based on the slot type, which
-> > > is probably a good idea anyway, I think we should have
-> > > 
-> > >   virtio-0.9 => disable-legacy=no,disable-modern=no
-> > >   virtio-1.0 => disable-legacy=yes,disable-modern=no
-> > > 
-> > > There's basically no reason to have a device legacy-only rather
-> > > than transitional, and spelling out both options instead of only
-> > > one of them just seems more robust.
-> > 
-> > I agree with both of those, but the counter-argument is that "virtio"
-> > already describes a transitional device like your proposal for
-> > virtio-0.9 (at least today), and it makes the versioned models less
-> > orthogonal. In the end, I could go either way...
-> 
-> Yeah, Dan already made that argument and convinced me that we
-> should use virtio-0.9 for legacy only, virtio-1.0 for modern only
-> and plain virtio for no enforced behavior / transitional.
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-I don't understand why we are optimizing the new system for the
-less useful use cases:
+Try to hold src_page_req_mutex only if the queue is not
+empty
 
-I don't see a use case where virtio-0.9 (legacy-only) would be
-more useful than virtio-transitional.  I don't see why anybody
-would prefer a legacy-only device instead of a transitional
-device.  Even if your guest has only legacy drivers, it might be
-upgraded and get new drivers in the future.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ include/qemu/queue.h | 1 +
+ migration/ram.c      | 4 ++++
+ 2 files changed, 5 insertions(+)
 
-I don't see a use case where virtio-1.0 (modern-only) would be
-more useful than "virtio".  If you are running i440fx, you get a
-transitional device with "virtio", and I don't see why anybody
-would prefer a modern-only device.  If you are running Q35, you
-already get a modern-only device with "virtio".
-
-The most useful feature users need is the ability to ask for a
-transitional virtio device on Q35, and this use case is
-explicitly being left out of the proposal.  Why?
-
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index 59fd1203a1..ac418efc43 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -341,6 +341,7 @@ struct {                                                                \
+ /*
+  * Simple queue access methods.
+  */
++#define QSIMPLEQ_EMPTY_ATOMIC(head) (atomic_read(&((head)->sqh_first)) == NULL)
+ #define QSIMPLEQ_EMPTY(head)        ((head)->sqh_first == NULL)
+ #define QSIMPLEQ_FIRST(head)        ((head)->sqh_first)
+ #define QSIMPLEQ_NEXT(elm, field)   ((elm)->field.sqe_next)
+diff --git a/migration/ram.c b/migration/ram.c
+index 40013e68a1..79c89425a3 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2033,6 +2033,10 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
+ {
+     RAMBlock *block = NULL;
+ 
++    if (QSIMPLEQ_EMPTY_ATOMIC(&rs->src_page_requests)) {
++        return NULL;
++    }
++
+     qemu_mutex_lock(&rs->src_page_req_mutex);
+     if (!QSIMPLEQ_EMPTY(&rs->src_page_requests)) {
+         struct RAMSrcPageRequest *entry =
 -- 
-Eduardo
+2.17.1
