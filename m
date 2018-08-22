@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fsQ3s-0003v1-O4
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:25 -0400
+	(envelope-from <quintela@redhat.com>) id 1fsQ3w-0003xr-G8
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fsQ3r-0005Ew-A6
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38946 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fsQ3s-0005Fu-4E
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40088 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fsQ3n-00055H-GQ
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:19 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4ECB24023ECB
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 10:08:11 +0000 (UTC)
-References: <20180822095421.11765-1-quintela@redhat.com>
-	<20180822095421.11765-2-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f95390a5-2b4b-e364-34b4-15ff62c2c580@redhat.com>
-Date: Wed, 22 Aug 2018 12:08:07 +0200
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsQ3r-0005DT-5O
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:23 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <1533562177-16447-9-git-send-email-lidongchen@tencent.com>
+	(Lidong Chen's message of "Mon, 6 Aug 2018 21:29:34 +0800")
+References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
+	<1533562177-16447-9-git-send-email-lidongchen@tencent.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 22 Aug 2018 12:08:13 +0200
+Message-ID: <877eki67ea.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20180822095421.11765-2-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] configure: We don't want to clean
- configuration files
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 08/11] migration: implement the shutdown
+ for RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: zhang.zhanghailiang@huawei.com, dgilbert@redhat.com, qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>
 
-On 2018-08-22 11:54, Juan Quintela wrote:
-> If you don't want to compile everything, you configure
-> config-devices.mak.  And then make clean remove it, and make will
-> create a default one without your configuration.  Fix it by not
-> removing it on clean target.  Remove it instead on distclean.
+Lidong Chen <jemmy858585@gmail.com> wrote:
+> From: Lidong Chen <jemmy858585@gmail.com>
+>
+> Because RDMA QIOChannel not implement shutdown function,
+> If the to_dst_file was set error, the return path thread
+> will wait forever. and the migration thread will wait
+> return path thread exit.
+>
+> the backtrace of return path thread is:
+>
+> (gdb) bt
+>     #0  0x00007f372a76bb0f in ppoll () from /lib64/libc.so.6
+>     #1  0x000000000071dc24 in qemu_poll_ns (fds=0x7ef7091d0580, nfds=2, timeout=100000000)
+>         at qemu-timer.c:325
+>     #2  0x00000000006b2fba in qemu_rdma_wait_comp_channel (rdma=0xd424000)
+>         at migration/rdma.c:1501
+>     #3  0x00000000006b3191 in qemu_rdma_block_for_wrid (rdma=0xd424000, wrid_requested=4000,
+>         byte_len=0x7ef7091d0640) at migration/rdma.c:1580
+>     #4  0x00000000006b3638 in qemu_rdma_exchange_get_response (rdma=0xd424000,
+>         head=0x7ef7091d0720, expecting=3, idx=0) at migration/rdma.c:1726
+>     #5  0x00000000006b3ad6 in qemu_rdma_exchange_recv (rdma=0xd424000, head=0x7ef7091d0720,
+>         expecting=3) at migration/rdma.c:1903
+>     #6  0x00000000006b5d03 in qemu_rdma_get_buffer (opaque=0x6a57dc0, buf=0x5c80030 "", pos=8,
+>         size=32768) at migration/rdma.c:2714
+>     #7  0x00000000006a9635 in qemu_fill_buffer (f=0x5c80000) at migration/qemu-file.c:232
+>     #8  0x00000000006a9ecd in qemu_peek_byte (f=0x5c80000, offset=0)
+>         at migration/qemu-file.c:502
+>     #9  0x00000000006a9f1f in qemu_get_byte (f=0x5c80000) at migration/qemu-file.c:515
+>     #10 0x00000000006aa162 in qemu_get_be16 (f=0x5c80000) at migration/qemu-file.c:591
+>     #11 0x00000000006a46d3 in source_return_path_thread (
+>         opaque=0xd826a0 <current_migration.37100>) at migration/migration.c:1331
+>     #12 0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
+>     #13 0x00007f372a77635d in clone () from /lib64/libc.so.6
+>
+> the backtrace of migration thread is:
+>
+> (gdb) bt
+>     #0  0x00007f372aa4af57 in pthread_join () from /lib64/libpthread.so.0
+>     #1  0x00000000007d5711 in qemu_thread_join (thread=0xd826f8 <current_migration.37100+88>)
+>         at util/qemu-thread-posix.c:504
+>     #2  0x00000000006a4bc5 in await_return_path_close_on_source (
+>         ms=0xd826a0 <current_migration.37100>) at migration/migration.c:1460
+>     #3  0x00000000006a53e4 in migration_completion (s=0xd826a0 <current_migration.37100>,
+>         current_active_state=4, old_vm_running=0x7ef7089cf976, start_time=0x7ef7089cf980)
+>         at migration/migration.c:1695
+>     #4  0x00000000006a5c54 in migration_thread (opaque=0xd826a0 <current_migration.37100>)
+>         at migration/migration.c:1837
+>     #5  0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
+>     #6  0x00007f372a77635d in clone () from /lib64/libc.so.6
+>
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Sounds like a good idea!
-
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> 
-> Remove it instead on distclean.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-Please remove the duplicated Sob. Then you can add:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
