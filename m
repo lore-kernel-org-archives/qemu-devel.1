@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsQ3P-0003Xl-HZ
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:07:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1fsQ3s-0003v1-O4
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsQ3M-0004lg-2T
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:07:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36990 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fsQ3r-0005Ew-A6
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38946 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsQ3L-0004kT-A6
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:07:51 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1533562177-16447-8-git-send-email-lidongchen@tencent.com>
-	(Lidong Chen's message of "Mon, 6 Aug 2018 21:29:33 +0800")
-References: <1533562177-16447-1-git-send-email-lidongchen@tencent.com>
-	<1533562177-16447-8-git-send-email-lidongchen@tencent.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 22 Aug 2018 12:07:44 +0200
-Message-ID: <87bm9u67f3.fsf@trasno.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fsQ3n-00055H-GQ
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:08:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4ECB24023ECB
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 10:08:11 +0000 (UTC)
+References: <20180822095421.11765-1-quintela@redhat.com>
+	<20180822095421.11765-2-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f95390a5-2b4b-e364-34b4-15ff62c2c580@redhat.com>
+Date: Wed, 22 Aug 2018 12:08:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 07/11] migration: poll the cm event
- while wait RDMA work request completion
+In-Reply-To: <20180822095421.11765-2-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 01/10] configure: We don't want to clean
+ configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: zhang.zhanghailiang@huawei.com, dgilbert@redhat.com, qemu-devel@nongnu.org, Lidong Chen <lidongchen@tencent.com>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Lidong Chen <jemmy858585@gmail.com> wrote:
-> From: Lidong Chen <jemmy858585@gmail.com>
->
-> If the peer qemu is crashed, the qemu_rdma_wait_comp_channel function
-> maybe loop forever. so we should also poll the cm event fd, and when
-> receive RDMA_CM_EVENT_DISCONNECTED and RDMA_CM_EVENT_DEVICE_REMOVAL,
-> we consider some error happened.
->
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> Signed-off-by: Gal Shachaf <galsha@mellanox.com>
-> Signed-off-by: Aviad Yehezkel <aviadye@mellanox.com>
+On 2018-08-22 11:54, Juan Quintela wrote:
+> If you don't want to compile everything, you configure
+> config-devices.mak.  And then make clean remove it, and make will
+> create a default one without your configuration.  Fix it by not
+> removing it on clean target.  Remove it instead on distclean.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Sounds like a good idea!
+
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> 
+> --
+> 
+> Remove it instead on distclean.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+Please remove the duplicated Sob. Then you can add:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
