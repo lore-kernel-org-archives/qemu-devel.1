@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fsNqW-00049x-Oh
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 03:46:29 -0400
+	(envelope-from <david@redhat.com>) id 1fsOAM-0001r4-4Z
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fsNqQ-000113-5B
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 03:46:28 -0400
-Date: Wed, 22 Aug 2018 09:46:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180822094608.17c070b9.cohuck@redhat.com>
-In-Reply-To: <f9634033-8cf4-b677-28f8-1eda2cb6647e@linux.ibm.com>
-References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
-	<20180815134844.55722b47.cohuck@redhat.com>
-	<f9634033-8cf4-b677-28f8-1eda2cb6647e@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 00/15] s390: vfio-ccw dasd ipl support
+	(envelope-from <david@redhat.com>) id 1fsO1l-00014j-Pl
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 03:58:09 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Wed, 22 Aug 2018 09:57:49 +0200
+Message-Id: <20180822075750.12399-8-david@redhat.com>
+In-Reply-To: <20180822075750.12399-1-david@redhat.com>
+References: <20180822075750.12399-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 7/8] s390x/tcg: fix FP register pair checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +19,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jason J. Herne" <jjherne@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On Tue, 21 Aug 2018 15:31:55 -0400
-"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+Valid register pairs are 0/2, 1/3, 4/6, 5/7, 8/10, 9/11, 12/14, 13/15.
 
-> On 08/15/2018 07:48 AM, Cornelia Huck wrote:
-> > On Thu,  5 Jul 2018 13:25:28 -0400
-> > "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
-> >   
-> >> This is to support booting from vfio-ccw dasd devices. We basically implement
-> >> the real hardware ipl procedure. This allows for booting Linux guests on
-> >> vfio-ccw devices.
-> >>
-> >> vfio-ccw's channel program prefetch algorithm complicates ipl because most ipl
-> >> channel programs dynamically modify themselves. Details on the ipl process and
-> >> how we worked around this issue can be found in docs/devel/s390-dasd-ipl.txt.  
-> > 
-> > Cleaning up my mail backlog... I think there were some comments; will
-> > there be a new version forthcoming?
-> >   
-> 
-> Yes there will. We're hitting a hang now and not sure if it is a device, 
-> configuration or coding problem. Once I get that cleared up I'll be back 
-> for round #2.
-> 
+R1/R2 always selects the lower number, so the current checks are not
+correct as e.g. 2/4 could be selected as a pair.
 
-Great, thanks for the info!
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/translate.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 1ca6ef45a1..27d2405ef4 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -1110,7 +1110,7 @@ typedef struct {
+ #define IF_HFP3     0x0004      /* r3 points at fp reg for HFP instructions */
+ #define IF_BFP      0x0008      /* binary floating point instruction */
+ #define IF_DFP      0x0010      /* decimal floating point instruction */
+-#define IF_PRIV     0x0020      /* priviledged instruction */
++#define IF_PRIV     0x0020      /* privileged instruction */
+ 
+ struct DisasInsn {
+     unsigned opc:16;
+@@ -5985,6 +5985,12 @@ static bool is_afp_reg(int reg)
+     return reg % 2 || reg > 6;
+ }
+ 
++static bool is_fp_pair(int reg)
++{
++    /* 0,1,4,5,8,9,12,13: to exclude the others, check for single bit */
++    return !(reg & 0x2);
++}
++
+ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
+ {
+     const DisasInsn *insn;
+@@ -6013,7 +6019,7 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
+ 
+     /* process flags */
+     if (insn->flags) {
+-        /* priviledged instruction */
++        /* privileged instruction */
+         if ((s->base.tb->flags & FLAG_MASK_PSTATE) && (insn->flags & IF_PRIV)) {
+             gen_program_exception(s, PGM_PRIVILEGED);
+             return DISAS_NORETURN;
+@@ -6067,17 +6073,11 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
+                 excp = PGM_SPECIFICATION;
+             }
+         }
+-        if (spec & SPEC_r1_f128) {
+-            r = get_field(&f, r1);
+-            if (r > 13) {
+-                excp = PGM_SPECIFICATION;
+-            }
++        if ((spec & SPEC_r1_f128) && !is_fp_pair(get_field(&f, r1))) {
++            excp = PGM_SPECIFICATION;
+         }
+-        if (spec & SPEC_r2_f128) {
+-            r = get_field(&f, r2);
+-            if (r > 13) {
+-                excp = PGM_SPECIFICATION;
+-            }
++        if ((spec & SPEC_r2_f128) && !is_fp_pair(get_field(&f, r2))) {
++            excp = PGM_SPECIFICATION;
+         }
+         if (excp) {
+             gen_program_exception(s, excp);
+-- 
+2.17.1
