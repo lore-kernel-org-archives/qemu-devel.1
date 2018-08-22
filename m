@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fsW2g-0007F0-AS
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:31:35 -0400
+	(envelope-from <quintela@redhat.com>) id 1fsW5Q-0008RS-An
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fsW2d-0003Fa-5D
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:31:34 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180822075750.12399-1-david@redhat.com>
-	<20180822075750.12399-2-david@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <2a286edc-3d3f-974d-03f6-296031a0b350@twiddle.net>
-Date: Wed, 22 Aug 2018 09:31:27 -0700
+	(envelope-from <quintela@redhat.com>) id 1fsW5N-0005Jf-6m
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:34:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50348 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsW5N-0005JF-1X
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:34:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74F7A804BAAC
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 16:34:20 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <9d025405-6302-6fa0-d7fe-f4d2a0db5ea7@redhat.com> (Thomas Huth's
+	message of "Wed, 22 Aug 2018 12:18:04 +0200")
+References: <20180822095421.11765-1-quintela@redhat.com>
+	<20180822095421.11765-4-quintela@redhat.com>
+	<9d025405-6302-6fa0-d7fe-f4d2a0db5ea7@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 22 Aug 2018 18:34:11 +0200
+Message-ID: <87pnyanyws.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20180822075750.12399-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/8] s390x/tcg: factor out and fix DATA
- exception injection
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 03/10] check: Only test isa-testdev when
+ it is compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +36,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 08/22/2018 12:57 AM, David Hildenbrand wrote:
-> The DXC is to be stored in the low core, and only in the FPC in case AFP
-> is enabled in CR0.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h         |  1 +
->  target/s390x/excp_helper.c | 28 ++++++++++++++++++++++++++++
->  target/s390x/fpu_helper.c  | 13 +++----------
->  target/s390x/helper.h      |  1 +
->  target/s390x/tcg_s390x.h   |  2 ++
->  target/s390x/translate.c   | 19 +++++++++----------
->  6 files changed, 44 insertions(+), 20 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 6f8861e554..5e50c3a303 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -322,6 +322,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
->  #define CR0_LOWPROT             0x0000000010000000ULL
->  #define CR0_SECONDARY           0x0000000004000000ULL
->  #define CR0_EDAT                0x0000000000800000ULL
-> +#define CR0_AFP                 0x0000000000040000ULL
->  #define CR0_EMERGENCY_SIGNAL_SC 0x0000000000004000ULL
->  #define CR0_EXTERNAL_CALL_SC    0x0000000000002000ULL
->  #define CR0_CKC_SC              0x0000000000000800ULL
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index f0ce60cff2..f5cab94ec5 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -21,11 +21,13 @@
->  #include "qemu/osdep.h"
->  #include "cpu.h"
->  #include "internal.h"
-> +#include "exec/helper-proto.h"
->  #include "qemu/timer.h"
->  #include "exec/exec-all.h"
->  #include "exec/cpu_ldst.h"
->  #include "hw/s390x/ioinst.h"
->  #include "exec/address-spaces.h"
-> +#include "tcg_s390x.h"
->  #ifndef CONFIG_USER_ONLY
->  #include "sysemu/sysemu.h"
->  #include "hw/s390x/s390_flic.h"
-> @@ -48,6 +50,32 @@
->      do { } while (0)
->  #endif
->  
-> +void QEMU_NORETURN tcg_s390_data_exception(CPUS390XState *env, uint32_t dxc,
-> +                                           uintptr_t ra)
-> +{
-> +    CPUState *cs = CPU(s390_env_get_cpu(env));
-> +
-> +    g_assert(!(dxc & ~0xff));
-> +#if !defined(CONFIG_USER_ONLY)
-> +    /* Store the DXC into the lowcore */
-> +    stw_phys(cs->as, env->psa + offsetof(LowCore, data_exc_code), dxc);
-> +#endif
-> +
-> +    /* Store the DXC into the FPC if AFP is enabled */
-> +    if (env->cregs[0] & CR0_AFP) {
-> +        env->fpc = (env->fpc & ~0xff00) | (dxc << 8);
-> +    }
-> +    s390_program_interrupt(env, PGM_DATA, ILEN_AUTO, ra);
+Thomas Huth <thuth@redhat.com> wrote:
+> On 2018-08-22 11:54, Juan Quintela wrote:
+>> Once there, untangle endianness-test and boot-serial-test.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> 
+>> --
+>> 
+>> boot-serial-test don't depend on isa-testdev.  Thanks Thomas.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>
+> Please remove the duplicated Sob.
 
-We should probably export tcg_s390_program_interrupt, so ...
+Found the problem!!!!
 
-> +
-> +    /* the following is not necessary, but allows us to use noreturn */
-> +    cpu_loop_exit_restore(cs, ra);
+As the cool man that I am, I put the signed-off line with a hook.  And I
+updated the hook to the last version in git upstream, to be, you know
+cool.
 
-... you don't have to do this.
-But even if not, g_assert_not_reached() is better here.
+And the new version don't check that the line is already there.
 
-I'll note that s390_program_interrupt is buggy for tcg, in that it logs
-env->psw.addr before cpu_loop_restore, and therefore psw.addr is essentially
-random data.
+SOB=$(git var GIT_COMMITTER_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
+git interpret-trailers --in-place --trailer "$SOB" "$COMMIT_MSG_FILE"
 
+Will try to get it right.
 
-r~
+Later, Juan.
