@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fsUJn-0005XR-14
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:41:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1fsUMD-0008B2-5S
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:43:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fsUJl-0000EU-AG
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:41:06 -0400
-From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Date: Wed, 22 Aug 2018 10:40:39 -0400
-Message-Id: <20180822144039.5796-4-pavel.zbitskiy@gmail.com>
-In-Reply-To: <20180822144039.5796-1-pavel.zbitskiy@gmail.com>
-References: <20180822144039.5796-1-pavel.zbitskiy@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 3/3] target/s390x: implement CVB,
- CVBY and CVBG
+	(envelope-from <thuth@redhat.com>) id 1fsUMA-0002dA-0P
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:43:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43596 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fsUM9-0002cf-Qd
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:43:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 700D087A6D
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 14:43:33 +0000 (UTC)
+References: <20180822095421.11765-1-quintela@redhat.com>
+	<20180822095421.11765-7-quintela@redhat.com>
+	<fdf970ce-baa2-7b87-7e72-bba34d9c1328@redhat.com>
+	<8736v6pix0.fsf@trasno.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f518638b-d435-aa2f-da44-1b013e333774@redhat.com>
+Date: Wed, 22 Aug 2018 16:43:27 +0200
+MIME-Version: 1.0
+In-Reply-To: <8736v6pix0.fsf@trasno.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 06/10] check: Only test ivshm when it is
+ compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,175 +37,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com, richard.henderson@linaro.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Convert to Binary - counterparts of the already implemented Convert
-to Decimal (CVD*) instructions.
-Example from the Principles of Operation: 25594C becomes 63FA.
+On 2018-08-22 16:36, Juan Quintela wrote:
+[...]
+> I got even more confused.  check-qtest-pci-y is only tested on x86*, go
+> figure.
 
-Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
----
- target/s390x/helper.h           |  1 +
- target/s390x/insn-data.def      |  4 +++
- target/s390x/int_helper.c       | 52 +++++++++++++++++++++++++++++++++
- target/s390x/translate.c        | 11 +++++++
- tests/tcg/s390x/Makefile.target |  1 +
- tests/tcg/s390x/cvb.c           | 18 ++++++++++++
- 6 files changed, 87 insertions(+)
- create mode 100644 tests/tcg/s390x/cvb.c
+Yes, that's ugly, indeed. We should maybe rework that so that all board
+which include pci.mak can use it...
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index b0df3267e5..2a9e9240df 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -88,6 +88,7 @@ DEF_HELPER_FLAGS_4(tcxb, TCG_CALL_NO_RWG_SE, i32, env, i64, i64, i64)
- DEF_HELPER_FLAGS_2(sqeb, TCG_CALL_NO_WG, i64, env, i64)
- DEF_HELPER_FLAGS_2(sqdb, TCG_CALL_NO_WG, i64, env, i64)
- DEF_HELPER_FLAGS_3(sqxb, TCG_CALL_NO_WG, i64, env, i64, i64)
-+DEF_HELPER_FLAGS_3(cvb, TCG_CALL_NO_WG, i64, env, i64, i32)
- DEF_HELPER_FLAGS_1(cvd, TCG_CALL_NO_RWG_SE, i64, s32)
- DEF_HELPER_FLAGS_4(pack, TCG_CALL_NO_WG, void, env, i32, i64, i64)
- DEF_HELPER_FLAGS_4(pka, TCG_CALL_NO_WG, void, env, i64, i64, i32)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 9c7b434fca..0911180ca6 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -284,6 +284,10 @@
-     D(0xec73, CLFIT,   RIE_a, GIE, r1_32u, i2_32u, 0, 0, ct, 0, 1)
-     D(0xec71, CLGIT,   RIE_a, GIE, r1_o, i2_32u, 0, 0, ct, 0, 1)
- 
-+/* CONVERT TO BINARY */
-+    C(0x4f00, CVB,     RX_a,  Z,   la2, 0, new, r1_32, cvb, 0)
-+    C(0xe306, CVBY,    RXY_a, LD,  la2, 0, new, r1_32, cvb, 0)
-+    C(0xe30e, CVBG,    RXY_a, Z,   la2, 0, r1, 0, cvb, 0)
- /* CONVERT TO DECIMAL */
-     C(0x4e00, CVD,     RX_a,  Z,   r1_o, a2, 0, 0, cvd, 0)
-     C(0xe326, CVDY,    RXY_a, LD,  r1_o, a2, 0, 0, cvd, 0)
-diff --git a/target/s390x/int_helper.c b/target/s390x/int_helper.c
-index abf77a94e6..3b12c11cee 100644
---- a/target/s390x/int_helper.c
-+++ b/target/s390x/int_helper.c
-@@ -24,6 +24,7 @@
- #include "exec/exec-all.h"
- #include "qemu/host-utils.h"
- #include "exec/helper-proto.h"
-+#include "exec/cpu_ldst.h"
- 
- /* #define DEBUG_HELPER */
- #ifdef DEBUG_HELPER
-@@ -118,6 +119,57 @@ uint64_t HELPER(divu64)(CPUS390XState *env, uint64_t ah, uint64_t al,
-     return ret;
- }
- 
-+static void general_operand_exception(CPUS390XState *env, uintptr_t ra)
-+{
-+#ifndef CONFIG_USER_ONLY
-+    LowCore *lowcore;
-+
-+    lowcore = cpu_map_lowcore(env);
-+    lowcore->data_exc_code = 0;
-+    cpu_unmap_lowcore(lowcore);
-+#endif
-+    s390_program_interrupt(env, PGM_DATA, ILEN_AUTO, ra);
-+}
-+
-+uint64_t HELPER(cvb)(CPUS390XState *env, uint64_t src, uint32_t n)
-+{
-+    int i, j;
-+    uint64_t tmpsrc;
-+    const uintptr_t ra = GETPC();
-+    int64_t dec, sign = 0, digit, val = 0, pow10 = 0;
-+
-+    for (i = 0; i < n; i++) {
-+        tmpsrc = wrap_address(env, src + (n - i - 1) * 8);
-+        dec = cpu_ldq_data_ra(env, tmpsrc, ra);
-+        for (j = 0; j < 16; j++, dec >>= 4) {
-+            if (i == 0 && j == 0) {
-+                sign = dec & 0xf;
-+                if (sign < 0xa) {
-+                    general_operand_exception(env, ra);
-+                }
-+                continue;
-+            }
-+            digit = dec & 0xf;
-+            if (digit > 0x9) {
-+                general_operand_exception(env, ra);
-+            }
-+            if (i == 0 && j == 1) {
-+                if (sign == 0xb || sign == 0xd) {
-+                    val = -digit;
-+                    pow10 = -10;
-+                } else {
-+                    val = digit;
-+                    pow10 = 10;
-+                }
-+            } else {
-+                val += digit * pow10;
-+                pow10 *= 10;
-+            }
-+        }
-+    }
-+    return val;
-+}
-+
- uint64_t HELPER(cvd)(int32_t reg)
- {
-     /* positive 0 */
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 4161bd0b1f..ff36dbe362 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2114,6 +2114,17 @@ static DisasJumpType op_csp(DisasContext *s, DisasOps *o)
- }
- #endif
- 
-+static DisasJumpType op_cvb(DisasContext *s, DisasOps *o)
-+{
-+    bool g = (s->fields->op == 0xE3) && (s->fields->op2 == 0x0E);
-+    int32_t n = g ? 2 /* CVBG */ : 1 /* CVB, CVBY */;
-+    TCGv_i32 tmp = tcg_const_i32(n);
-+
-+    gen_helper_cvb(o->out, cpu_env, o->addr1, tmp);
-+    tcg_temp_free_i32(tmp);
-+    return DISAS_NEXT;
-+}
-+
- static DisasJumpType op_cvd(DisasContext *s, DisasOps *o)
- {
-     TCGv_i64 t1 = tcg_temp_new_i64();
-diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
-index 151dc075aa..990dfb26ff 100644
---- a/tests/tcg/s390x/Makefile.target
-+++ b/tests/tcg/s390x/Makefile.target
-@@ -6,3 +6,4 @@ TESTS+=ipm
- TESTS+=exrl-trt
- TESTS+=exrl-trtr
- TESTS+=pack
-+TESTS+=cvb
-diff --git a/tests/tcg/s390x/cvb.c b/tests/tcg/s390x/cvb.c
-new file mode 100644
-index 0000000000..3a72e132aa
---- /dev/null
-+++ b/tests/tcg/s390x/cvb.c
-@@ -0,0 +1,18 @@
-+#include <stdint.h>
-+#include <unistd.h>
-+
-+int main(void)
-+{
-+    uint64_t data = 0x000000000025594cull;
-+    uint64_t result = 0;
-+
-+    asm volatile(
-+        "    cvb %[result],%[data]\n"
-+        : [result] "+r" (result)
-+        : [data] "m" (data));
-+    if (result != 0x63fa) {
-+        write(1, "bad result\n", 11);
-+        return 1;
-+    }
-+    return 0;
-+}
--- 
-2.18.0
+ Thomas
