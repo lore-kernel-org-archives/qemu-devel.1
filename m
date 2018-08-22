@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsRpX-00070L-DX
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fsRpZ-000718-E4
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsRpU-0000HN-6X
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39656 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fsRpV-0000IB-JN
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27369)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsRpR-0000Fq-JH
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:38 -0400
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 22 Aug 2018 14:00:49 +0200
-Message-Id: <20180822120050.12694-20-quintela@redhat.com>
-In-Reply-To: <20180822120050.12694-1-quintela@redhat.com>
-References: <20180822120050.12694-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 19/20] migration: move handle of zero page to
- the thread
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fsRpT-0000GJ-DE
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 08:01:40 -0400
+Date: Wed, 22 Aug 2018 09:01:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180822120135.GN18995@localhost.localdomain>
+References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
+	<20180817092936.GC11124@redhat.com>
+	<e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
+	<39b3c8b8-25eb-3a8e-3a5a-abd584a11e2c@laine.org>
+	<f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
+ for guest OSes that don't support virtio-1.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,212 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Laine Stump <laine@laine.org>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+On Wed, Aug 22, 2018 at 12:36:27PM +0200, Andrea Bolognani wrote:
+> On Tue, 2018-08-21 at 14:21 -0400, Laine Stump wrote:
+> > On 08/17/2018 06:35 AM, Andrea Bolognani wrote:
+> > > If we decide we want to explicitly spell out the options instead
+> > > of relying on QEMU changing behavior based on the slot type, which
+> > > is probably a good idea anyway, I think we should have
+> > > 
+> > >   virtio-0.9 => disable-legacy=no,disable-modern=no
+> > >   virtio-1.0 => disable-legacy=yes,disable-modern=no
+> > > 
+> > > There's basically no reason to have a device legacy-only rather
+> > > than transitional, and spelling out both options instead of only
+> > > one of them just seems more robust.
+> > 
+> > I agree with both of those, but the counter-argument is that "virtio"
+> > already describes a transitional device like your proposal for
+> > virtio-0.9 (at least today), and it makes the versioned models less
+> > orthogonal. In the end, I could go either way...
+> 
+> Yeah, Dan already made that argument and convinced me that we
+> should use virtio-0.9 for legacy only, virtio-1.0 for modern only
+> and plain virtio for no enforced behavior / transitional.
 
-Detecting zero page is not a light work, moving it to the thread to
-speed the main thread up, btw, handling ram_release_pages() for the
-zero page is moved to the thread as well
+I don't understand why we are optimizing the new system for the
+less useful use cases:
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 96 +++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 70 insertions(+), 26 deletions(-)
+I don't see a use case where virtio-0.9 (legacy-only) would be
+more useful than virtio-transitional.  I don't see why anybody
+would prefer a legacy-only device instead of a transitional
+device.  Even if your guest has only legacy drivers, it might be
+upgraded and get new drivers in the future.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 11066df881..40013e68a1 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -341,6 +341,7 @@ typedef struct PageSearchStatus PageSearchStatus;
- struct CompressParam {
-     bool done;
-     bool quit;
-+    bool zero_page;
-     QEMUFile *file;
-     QemuMutex mutex;
-     QemuCond cond;
-@@ -382,7 +383,7 @@ static QemuThread *decompress_threads;
- static QemuMutex decomp_done_lock;
- static QemuCond decomp_done_cond;
- 
--static void do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-+static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-                                  ram_addr_t offset, uint8_t *source_buf);
- 
- static void *do_data_compress(void *opaque)
-@@ -390,6 +391,7 @@ static void *do_data_compress(void *opaque)
-     CompressParam *param = opaque;
-     RAMBlock *block;
-     ram_addr_t offset;
-+    bool zero_page;
- 
-     qemu_mutex_lock(&param->mutex);
-     while (!param->quit) {
-@@ -399,11 +401,12 @@ static void *do_data_compress(void *opaque)
-             param->block = NULL;
-             qemu_mutex_unlock(&param->mutex);
- 
--            do_compress_ram_page(param->file, &param->stream, block, offset,
--                                 param->originbuf);
-+            zero_page = do_compress_ram_page(param->file, &param->stream,
-+                                             block, offset, param->originbuf);
- 
-             qemu_mutex_lock(&comp_done_lock);
-             param->done = true;
-+            param->zero_page = zero_page;
-             qemu_cond_signal(&comp_done_cond);
-             qemu_mutex_unlock(&comp_done_lock);
- 
-@@ -1849,13 +1852,19 @@ static int ram_save_multifd_page(RAMState *rs, RAMBlock *block,
-     return 1;
- }
- 
--static void do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-+static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-                                  ram_addr_t offset, uint8_t *source_buf)
- {
-     RAMState *rs = ram_state;
-     uint8_t *p = block->host + (offset & TARGET_PAGE_MASK);
-+    bool zero_page = false;
-     int ret;
- 
-+    if (save_zero_page_to_file(rs, f, block, offset)) {
-+        zero_page = true;
-+        goto exit;
-+    }
-+
-     save_page_header(rs, f, block, offset | RAM_SAVE_FLAG_COMPRESS_PAGE);
- 
-     /*
-@@ -1868,10 +1877,21 @@ static void do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
-     if (ret < 0) {
-         qemu_file_set_error(migrate_get_current()->to_dst_file, ret);
-         error_report("compressed data failed!");
--        return;
-+        return false;
-     }
- 
-+exit:
-     ram_release_pages(block->idstr, offset & TARGET_PAGE_MASK, 1);
-+    return zero_page;
-+}
-+
-+static void
-+update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
-+{
-+    if (param->zero_page) {
-+        ram_counters.duplicate++;
-+    }
-+    ram_counters.transferred += bytes_xmit;
- }
- 
- static void flush_compressed_data(RAMState *rs)
-@@ -1895,7 +1915,12 @@ static void flush_compressed_data(RAMState *rs)
-         qemu_mutex_lock(&comp_param[idx].mutex);
-         if (!comp_param[idx].quit) {
-             len = qemu_put_qemu_file(rs->f, comp_param[idx].file);
--            ram_counters.transferred += len;
-+            /*
-+             * it's safe to fetch zero_page without holding comp_done_lock
-+             * as there is no further request submitted to the thread,
-+             * i.e, the thread should be waiting for a request at this point.
-+             */
-+            update_compress_thread_counts(&comp_param[idx], len);
-         }
-         qemu_mutex_unlock(&comp_param[idx].mutex);
-     }
-@@ -1926,7 +1951,7 @@ retry:
-             qemu_cond_signal(&comp_param[idx].cond);
-             qemu_mutex_unlock(&comp_param[idx].mutex);
-             pages = 1;
--            ram_counters.transferred += bytes_xmit;
-+            update_compress_thread_counts(&comp_param[idx], bytes_xmit);
-             break;
-         }
-     }
-@@ -2200,6 +2225,39 @@ static bool save_page_use_compression(RAMState *rs)
-     return false;
- }
- 
-+/*
-+ * try to compress the page before posting it out, return true if the page
-+ * has been properly handled by compression, otherwise needs other
-+ * paths to handle it
-+ */
-+static bool save_compress_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
-+{
-+    if (!save_page_use_compression(rs)) {
-+        return false;
-+    }
-+
-+    /*
-+     * When starting the process of a new block, the first page of
-+     * the block should be sent out before other pages in the same
-+     * block, and all the pages in last block should have been sent
-+     * out, keeping this order is important, because the 'cont' flag
-+     * is used to avoid resending the block name.
-+     *
-+     * We post the fist page as normal page as compression will take
-+     * much CPU resource.
-+     */
-+    if (block != rs->last_sent_block) {
-+        flush_compressed_data(rs);
-+        return false;
-+    }
-+
-+    if (compress_page_with_multi_thread(rs, block, offset) > 0) {
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
- /**
-  * ram_save_target_page: save one target page
-  *
-@@ -2220,15 +2278,8 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-         return res;
-     }
- 
--    /*
--     * When starting the process of a new block, the first page of
--     * the block should be sent out before other pages in the same
--     * block, and all the pages in last block should have been sent
--     * out, keeping this order is important, because the 'cont' flag
--     * is used to avoid resending the block name.
--     */
--    if (block != rs->last_sent_block && save_page_use_compression(rs)) {
--            flush_compressed_data(rs);
-+    if (save_compress_page(rs, block, offset)) {
-+        return 1;
-     }
- 
-     res = save_zero_page(rs, block, offset);
-@@ -2246,17 +2297,10 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
-     }
- 
-     /*
--     * Make sure the first page is sent out before other pages.
--     *
--     * we post it as normal page as compression will take much
--     * CPU resource.
-+     * do not use multifd for compression as the first page in the new
-+     * block should be posted out before sending the compressed page
-      */
--    if (block == rs->last_sent_block && save_page_use_compression(rs)) {
--        res = compress_page_with_multi_thread(rs, block, offset);
--        if (res > 0) {
--            return res;
--        }
--    } else if (migrate_use_multifd()) {
-+    if (!save_page_use_compression(rs) && migrate_use_multifd()) {
-         return ram_save_multifd_page(rs, block, offset);
-     }
- 
+I don't see a use case where virtio-1.0 (modern-only) would be
+more useful than "virtio".  If you are running i440fx, you get a
+transitional device with "virtio", and I don't see why anybody
+would prefer a modern-only device.  If you are running Q35, you
+already get a modern-only device with "virtio".
+
+The most useful feature users need is the ability to ask for a
+transitional virtio device on Q35, and this use case is
+explicitly being left out of the proposal.  Why?
+
 -- 
-2.17.1
+Eduardo
