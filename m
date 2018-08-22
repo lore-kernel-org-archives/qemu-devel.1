@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fsHMZ-0006NN-6R
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 20:51:08 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fsHie-0004jr-7p
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fsHMV-0004Kg-S0
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 20:51:07 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:60713)
+	(envelope-from <laurent@vivier.eu>) id 1fsHbi-0004Bx-A0
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:06:49 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:52991)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fsHMT-0004Ib-1B
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 20:51:01 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fsHbi-00047p-0f
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:06:46 -0400
 References: <20180818190118.12911-1-richard.henderson@linaro.org>
-	<20180818190118.12911-11-richard.henderson@linaro.org>
+	<20180818190118.12911-9-richard.henderson@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <51f5ba46-f63a-e433-7e0b-82e72a643d79@vivier.eu>
-Date: Wed, 22 Aug 2018 02:50:56 +0200
+Message-ID: <f0aea4d7-54e7-cc8f-898f-b5a3fd8165e1@vivier.eu>
+Date: Wed, 22 Aug 2018 03:06:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180818190118.12911-11-richard.henderson@linaro.org>
+In-Reply-To: <20180818190118.12911-9-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 10/16] linux-user: Split out some simple
- file syscalls
+Subject: Re: [Qemu-devel] [PATCH v4 08/16] configure: Use
+ -Wunused-const-variable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,168 +32,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
 Le 18/08/2018 à 21:01, Richard Henderson a écrit :
-> This includes close, open, openat, read, readlink, readlinkat, write.
+> For the linux-user syscall split, we have static const structs
+> that must be matched up with a switch statement that uses them.
+> By default, gcc will not warn for such a variable, but silently
+> remove them.
+> 
+> For C++, such objects are sometimes declared for their constructor
+> side effects.  Do not propagate this flag into QEM_CXXFLAGS.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  linux-user/strace.c           |  64 -----
->  linux-user/syscall-file.inc.c | 440 ++++++++++++++++++++++++++++++++++
->  linux-user/syscall.c          | 393 ++----------------------------
->  linux-user/strace.list        |  21 --
->  4 files changed, 463 insertions(+), 455 deletions(-)
->  create mode 100644 linux-user/syscall-file.inc.c
+>  configure | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-...
-> +#include "syscall-file.inc.c"
-> +
->  static const SyscallDef *syscall_table(int num)
->  {
-> -#define S(NAME)  case TARGET_NR_##NAME: return &def_##NAME;
-> +#define S(NAME)  case TARGET_NR_##NAME: return &def_##NAME
->  
->      switch (num) {
-> +    /*
-> +     * Unconditional syscalls.
-> +     */
-> +    S(close);
-> +    S(openat);
-> +    S(read);
-> +    S(write);
-> +
-> +    /*
-> +     * Conditional syscalls.
-> +     */
-> +#ifdef TARGET_NR_open
-> +    S(open);
-> +#endif
-> +#ifdef TARGET_NR_readlink
-> +    S(readlink);
-> +#endif
-> +#ifdef TARGET_NR_readlinkat
-> +    S(readlinkat);
-> +#endif
->      }
->      return NULL;
+> diff --git a/configure b/configure
+> index db97930314..86e6e18428 100755
+> --- a/configure
+> +++ b/configure
+> @@ -105,7 +105,8 @@ update_cxxflags() {
+>      for arg in $QEMU_CFLAGS; do
+>          case $arg in
+>              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
+> -            -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls)
+> +            -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls|\
+> +            -Wunused-const-variable)
+>                  ;;
+>              *)
+>                  QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
+> @@ -1780,6 +1781,7 @@ gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
+>  gcc_flags="-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flags"
+>  gcc_flags="-Wno-string-plus-int $gcc_flags"
+>  gcc_flags="-Wno-error=address-of-packed-member $gcc_flags"
+> +gcc_flags="-Wunused-const-variable $gcc_flags"
+>  # Note that we do not add -Werror to gcc_flags here, because that would
+>  # enable it for all configure tests. If a configure test failed due
+>  # to -Werror this would just silently disable some features,
+> 
 
-I don't understand why you need/want to duplicate the list of syscalls here.
+This breaks build of hw/misc/macio/gpio.o:
 
-If I modify your patch as following, it works without duplicating the list:
+In file included from include/hw/misc/macio/macio.h:33,
+                 from hw/misc/macio/gpio.c:29:
+hw/misc/macio/pmu.h:129:21: error: 'pmu_data_len' defined but not used
+[-Werror=unused-const-variable=]
+ static const int8_t pmu_data_len[256][2] = {
+                     ^~~~~~~~~~~~
+In file included from include/hw/misc/macio/macio.h:33,
+                 from hw/misc/macio/macio.c:33:
+include/hw/misc/macio/pmu.h:129:21: error: 'pmu_data_len' defined but
+not used [-Werror=unused-const-variable=]
+ static const int8_t pmu_data_len[256][2] = {
+                     ^~~~~~~~~~~~
 
-diff --git a/linux-user/syscall-file.def.c b/linux-user/syscall-file.def.c
-new file mode 100644
-index 0000000000..78b1bd0467
---- /dev/null
-+++ b/linux-user/syscall-file.def.c
-@@ -0,0 +1,13 @@
-+SYSCALL_DEF(close, ARG_DEC);
-+#ifdef TARGET_NR_open
-+SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
-+#endif
-+SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
-+SYSCALL_DEF(read, ARG_DEC, ARG_PTR, ARG_DEC);
-+#ifdef TARGET_NR_readlink
-+SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
-+#endif
-+#ifdef TARGET_NR_readlinkat
-+SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
-+#endif
-+SYSCALL_DEF(write, ARG_DEC, ARG_PTR, ARG_DEC);
-diff --git a/linux-user/syscall-file.inc.c b/linux-user/syscall-file.inc.c
-index aecc63682f..dda04200ed 100644
---- a/linux-user/syscall-file.inc.c
-+++ b/linux-user/syscall-file.inc.c
-@@ -307,21 +307,18 @@ SYSCALL_IMPL(close)
-     fd_trans_unregister(arg1);
-     return get_errno(close(arg1));
- }
--SYSCALL_DEF(close, ARG_DEC);
+This can be fixed by moving pmu_data_len array from pmu.h to pmu.c as it
+is the only user.
 
- #ifdef TARGET_NR_open
- SYSCALL_IMPL(open)
- {
-     return do_openat(cpu_env, AT_FDCWD, arg1, arg2, arg3);
- }
--SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
- #endif
-
- SYSCALL_IMPL(openat)
- {
-     return do_openat(cpu_env, arg1, arg2, arg3, arg4);
- }
--SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
-
- SYSCALL_IMPL(read)
- {
-@@ -346,7 +343,6 @@ SYSCALL_IMPL(read)
-     unlock_user(p, arg2, ret);
-     return ret;
- }
--SYSCALL_DEF(read, ARG_DEC, ARG_PTR, ARG_DEC);
-
- static abi_long do_readlink_proc_exe(char *buf, abi_ulong bufsiz)
- {
-@@ -386,7 +382,6 @@ SYSCALL_IMPL(readlink)
-     unlock_user(p, arg1, 0);
-     return ret;
- }
--SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
- #endif
-
- #ifdef TARGET_NR_readlinkat
-@@ -411,7 +406,6 @@ SYSCALL_IMPL(readlinkat)
-     unlock_user(p, arg2, 0);
-     return ret;
- }
--SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
- #endif
-
- SYSCALL_IMPL(write)
-@@ -437,4 +431,4 @@ SYSCALL_IMPL(write)
-     unlock_user(p, arg2, 0);
-     return ret;
- }
--SYSCALL_DEF(write, ARG_DEC, ARG_PTR, ARG_DEC);
-+#include "syscall-file.def.c"
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f757ae87b0..21e7700255 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -12117,33 +12117,15 @@ static abi_long do_syscall1(void *cpu_env, int
-num, abi_long arg1,
-
- static const SyscallDef *syscall_table(int num)
- {
--#define S(NAME)  case TARGET_NR_##NAME: return &def_##NAME
-+#undef SYSCALL_DEF
-+#define SYSCALL_DEF(NAME, ...)  case TARGET_NR_##NAME: return &def_##NAME
-
-     switch (num) {
--    /*
--     * Unconditional syscalls.
--     */
--    S(close);
--    S(openat);
--    S(read);
--    S(write);
--
--    /*
--     * Conditional syscalls.
--     */
--#ifdef TARGET_NR_open
--    S(open);
--#endif
--#ifdef TARGET_NR_readlink
--    S(readlink);
--#endif
--#ifdef TARGET_NR_readlinkat
--    S(readlinkat);
--#endif
-+#include "syscall-file.def.c"
-     }
-     return NULL;
-
--#undef S
-+#undef SYSCALL_DEF
- }
-
- abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+Thanks,
+Laurent
