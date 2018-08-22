@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsOBy-0003Kz-Kg
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:08:39 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fsOJP-0004zV-2S
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsOBu-00081X-Jx
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:08:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59434 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsOBr-0007ya-B8
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:08:32 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B86CA87A82
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 08:08:29 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 22 Aug 2018 10:07:51 +0200
-Message-Id: <20180822080751.11307-20-quintela@redhat.com>
-In-Reply-To: <20180822080751.11307-1-quintela@redhat.com>
-References: <20180822080751.11307-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 19/19] check: Only test tpm devices when they
- are compiled in
+	(envelope-from <luc.michel@greensocs.com>) id 1fsOJN-0004e2-6B
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:16:19 -0400
+References: <20180821132811.17675-1-peter.maydell@linaro.org>
+	<20180821132811.17675-2-peter.maydell@linaro.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <7421acd0-4c9d-95ca-dbd2-a903ef0ee2b8@greensocs.com>
+Date: Wed, 22 Aug 2018 10:15:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180821132811.17675-2-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="E9r24IIsJoWN0pfovn6XKiYHCmb2EPysw"
+Subject: Re: [Qemu-devel] [PATCH 1/9] hw/intc/arm_gic: Document QEMU
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +25,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--E9r24IIsJoWN0pfovn6XKiYHCmb2EPysw
+From: Luc Michel <luc.michel@greensocs.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: patches@linaro.org
+Message-ID: <7421acd0-4c9d-95ca-dbd2-a903ef0ee2b8@greensocs.com>
+Subject: Re: [PATCH 1/9] hw/intc/arm_gic: Document QEMU interface
+References: <20180821132811.17675-1-peter.maydell@linaro.org>
+ <20180821132811.17675-2-peter.maydell@linaro.org>
+In-Reply-To: <20180821132811.17675-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index de296ed3e1..6dc8d06f4c 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -302,10 +302,10 @@ check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) += tests/vhost-user-test$(EX
- ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
- check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
- endif
--check-qtest-i386-$(CONFIG_TPM) += tests/tpm-crb-swtpm-test$(EXESUF)
--check-qtest-i386-$(CONFIG_TPM) += tests/tpm-crb-test$(EXESUF)
--check-qtest-i386-$(CONFIG_TPM) += tests/tpm-tis-swtpm-test$(EXESUF)
--check-qtest-i386-$(CONFIG_TPM) += tests/tpm-tis-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-swtpm-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_TPM_CRB) += tests/tpm-crb-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-swtpm-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_TPM_TIS) += tests/tpm-tis-test$(EXESUF)
- check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
- check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
- check-qtest-i386-$(CONFIG_RTL8139_PCI) += tests/test-filter-redirector$(EXESUF)
--- 
-2.17.1
+
+
+On 8/21/18 3:28 PM, Peter Maydell wrote:
+> The GICv2's QEMU interface (sysbus MMIO regions, IRQs,
+> etc) is now quite complicated with the addition of the
+> virtualization extensions. Add a comment in the header
+> file which documents it.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I needed to write this out to figure out what I was
+> connecting to what in the a15mpcore object :-)
+> ---
+>  include/hw/intc/arm_gic.h | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+>=20
+> diff --git a/include/hw/intc/arm_gic.h b/include/hw/intc/arm_gic.h
+> index 42bb535fd45..989bc837606 100644
+> --- a/include/hw/intc/arm_gic.h
+> +++ b/include/hw/intc/arm_gic.h
+> @@ -18,6 +18,41 @@
+>   * with this program; if not, see <http://www.gnu.org/licenses/>.
+>   */
+> =20
+> +/*
+> + * QEMU interface:
+> + *  + QOM property "num-cpu": number of CPUs to support
+> + *  + QOM property "num-irq": number of IRQs (including both SPIs and =
+PPIs)
+> + *  + QOM property "revision": GIC version (1 or 2), or 0 for the 11MP=
+Core GIC
+> + *  + QOM property "has-security-extensions": set true if the GIC shou=
+ld
+> + *    implement the security extensions
+> + *  + QOM property "has-virtualization-extensions": set true if the GI=
+C should
+> + *    implement the virtualization extensions
+> + *  + unnamed GPIO inputs: (where P is number of PPIs, i.e. num-irq - =
+32)
+"where P is the number of SPIs"
+> + *    [0..P-1]  SPIs
+> + *    [P..P+31] PPIs for CPU 0
+> + *    [P+32..P+63] PPIs for CPU 1
+> + *    ...
+> + *  + sysbus IRQ 0 : IRQ
+> + *  + sysbus IRQ 1 : FIQ
+> + *  + sysbus IRQ 2 : VIRQ (exists even if virt extensions not present)=
+
+> + *  + sysbus IRQ 3 : VFIQ (exists even if virt extensions not present)=
+
+> + *  + sysbus IRQ 4 : maintenance IRQ for CPU i/f 0 (only if virt extns=
+ present)
+> + *  + sysbus IRQ 5 : maintenance IRQ for CPU i/f 1 (only if virt extns=
+ present)
+I think it's more like
+
+For a GIC supporting N CPUs:
+  + sysbus IRQ 0: IRQ for CPU 0
+  + ...
+  + sysbus IRQ N-1: IRQ for CPU N-1
+
+  + sysbus IRQ N: FIQ for CPU 0
+  + ...
+  + sysbus IRQ 2*N-1: FIQ for CPU N-1
+
+  + sysbus IRQ 2*N: VIRQ for CPU 0
+  + ...
+  + sysbus IRQ 3*N-1: VIRQ for CPU N-1
+
+  + sysbus IRQ 3*N: VFIQ for CPU 0
+  + ...
+  + sysbus IRQ 4*N-1: VFIQ for CPU N-1
+
+  + sysbus IRQ 4*N: maintenance IRQ for CPU i/f 0 (only if virt extns
+present)
+  + ...
+  + sysbus IRQ 5*N-1: maintenance IRQ for CPU i/f N-1 (only if virt
+extns present)
+
+> + *    ...
+> + *  + sysbus MMIO regions: (in order; numbers will vary depending on
+> + *    whether virtualization extensions are present and on number of c=
+ores)
+> + *    - distributor registers (GICD*)
+> + *    - CPU interface for the accessing core (GICC*)
+> + *    - virtual interface control registers (GICH*) (only if virt extn=
+s present)
+> + *    - virtual CPU interface for the accessing core (GICV*) (only if =
+virt)
+> + *    - CPU 0 CPU interface registers
+> + *    - CPU 1 CPU interface registers
+> + *      ...
+> + *    - CPU 0 VCPU interface registers (only if virt extns present)
+CPU 0 virtual interface (GICH*)
+> + *    - CPU 1 VCPU interface registers (only if virt extns present)
+CPU 1 virtual interface (GICH*)
+> + *      ...> + */
+> +
+>  #ifndef HW_ARM_GIC_H
+>  #define HW_ARM_GIC_H
+> =20
+>=20
+
+
+--E9r24IIsJoWN0pfovn6XKiYHCmb2EPysw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt9G78ACgkQd8knW3Qn
+Tr777w/8D6tHmil9ayMGzOUe+nn+qMsboQKeEzs7WRrWYyp3gbsGC1LvHNGRghMI
+9jRJ3UZd7Ps3aGRpqjq2kyfkVrIGr0SiUW8QyHxFNwde+9UMCrZBRCzbh4p7gxhC
++s1PPvhNGmwG+vI1h0UEhK7jSIOeFF6VSb6cy/tjEaGe2vpPUWYa2ujYSIYEzSTP
+vDJSoVtpxbJKKWGrXjA+k1m7McVksb8DnL+FcYPyGz0h/WRek21Z0tx9XJa4k7wK
+68EBkusKfatvaXCaxOGycI5mcTVaf0i5RUFNIaczB840RTTFAwFRJJx6QxAA7oZa
+yLvrIJIHyjly84LngOwm1VBItuCMqnNwzDxsfa4B26+zFOSIOcjoEmADtV9C4dFk
++hwd7ZBpme2dynp+SAsiFxgUibBc+QV6fsFlNU1mVHaXat7maGgiVCfde3GF7pQx
+h0m6rUETAF3k0FqdzZUNS3pCLcvVafeO/yyHUig32j6yOkyBSC8W7zf7ui48T5lX
+LbHnoNyhDciwUY1MedSkxT5y41TYYOduSebc/m8edb7efFrXT4iz66R/XJ0cJ/BK
+WHUiQT6S0oD2vT9PEYyA/pZ6HoSqbFHKtNVPLJYt5tqVUR1ula1C/2cc02zvc11q
+TThCRbY4V7M0G/bSvqyc0CJkx99oo9Wp0CqL3PVe5K21WAifecs=
+=ahCz
+-----END PGP SIGNATURE-----
+
+--E9r24IIsJoWN0pfovn6XKiYHCmb2EPysw--
