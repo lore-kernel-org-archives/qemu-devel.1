@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fsOPJ-0002RW-Sp
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:22:26 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fsOPb-0002eZ-LU
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fsOPI-0007uX-JO
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:22:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37484 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fsOPA-0007mP-05
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:22:19 -0400
-References: <20180811205924.4113-1-zhangckid@gmail.com>
-	<20180811205924.4113-17-zhangckid@gmail.com>
-	<2bd91af8-f11f-ff55-8a02-9bee3361d7ff@redhat.com>
-	<CAK3tnvJtAS75zw8-6fgNv+RTqGuizRm8Mb0zAhGqE_njwy1Dpw@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <03a7e551-6473-ef4f-b149-d132efadd2f9@redhat.com>
-Date: Wed, 22 Aug 2018 16:21:56 +0800
+	(envelope-from <luc.michel@greensocs.com>) id 1fsOPT-00081a-OZ
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:22:39 -0400
+References: <20180821132811.17675-1-peter.maydell@linaro.org>
+	<20180821132811.17675-3-peter.maydell@linaro.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <766c6d21-6adc-e2a4-d299-f5ad69745081@greensocs.com>
+Date: Wed, 22 Aug 2018 10:17:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAK3tnvJtAS75zw8-6fgNv+RTqGuizRm8Mb0zAhGqE_njwy1Dpw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V11 16/20] filter: Add handle_event method
- for NetFilterClass
+In-Reply-To: <20180821132811.17675-3-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GsnHEC6NylLgPIGC3GiRk6pwMOnRT3pLs"
+Subject: Re: [Qemu-devel] [PATCH 2/9] hw/intc/arm_gic: Make per-cpu GICH
+ memory regions 0x200 bytes large
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,195 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GsnHEC6NylLgPIGC3GiRk6pwMOnRT3pLs
+From: Luc Michel <luc.michel@greensocs.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: patches@linaro.org
+Message-ID: <766c6d21-6adc-e2a4-d299-f5ad69745081@greensocs.com>
+Subject: Re: [PATCH 2/9] hw/intc/arm_gic: Make per-cpu GICH memory regions
+ 0x200 bytes large
+References: <20180821132811.17675-1-peter.maydell@linaro.org>
+ <20180821132811.17675-3-peter.maydell@linaro.org>
+In-Reply-To: <20180821132811.17675-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
 
-On 2018=E5=B9=B408=E6=9C=8821=E6=97=A5 17:25, Zhang Chen wrote:
-> On Tue, Aug 21, 2018 at 11:30 AM Jason Wang <jasowang@redhat.com> wrote=
-:
->
->>
->> On 2018=E5=B9=B408=E6=9C=8812=E6=97=A5 04:59, Zhang Chen wrote:
->>> Filter needs to process the event of checkpoint/failover or
->>> other event passed by COLO frame.
->>>
->>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->>> ---
->>>    include/net/filter.h |  5 +++++
->>>    net/filter.c         | 17 +++++++++++++++++
->>>    net/net.c            | 28 ++++++++++++++++++++++++++++
->>>    3 files changed, 50 insertions(+)
->>>
->>> diff --git a/include/net/filter.h b/include/net/filter.h
->>> index 435acd6f82..49da666ac0 100644
->>> --- a/include/net/filter.h
->>> +++ b/include/net/filter.h
->>> @@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *=
-nc,
->>>
->>>    typedef void (FilterStatusChanged) (NetFilterState *nf, Error **er=
-rp);
->>>
->>> +typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Err=
-or
->> **errp);
->>> +
->>>    typedef struct NetFilterClass {
->>>        ObjectClass parent_class;
->>>
->>> @@ -45,6 +47,7 @@ typedef struct NetFilterClass {
->>>        FilterSetup *setup;
->>>        FilterCleanup *cleanup;
->>>        FilterStatusChanged *status_changed;
->>> +    FilterHandleEvent *handle_event;
->>>        /* mandatory */
->>>        FilterReceiveIOV *receive_iov;
->>>    } NetFilterClass;
->>> @@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState
->> *sender,
->>>                                        int iovcnt,
->>>                                        void *opaque);
->>>
->>> +void colo_notify_filters_event(int event, Error **errp);
->>> +
->>>    #endif /* QEMU_NET_FILTER_H */
->>> diff --git a/net/filter.c b/net/filter.c
->>> index 2fd7d7d663..0f17eba143 100644
->>> --- a/net/filter.c
->>> +++ b/net/filter.c
->>> @@ -17,6 +17,8 @@
->>>    #include "net/vhost_net.h"
->>>    #include "qom/object_interfaces.h"
->>>    #include "qemu/iov.h"
->>> +#include "net/colo.h"
->>> +#include "migration/colo.h"
->>>
->>>    static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
->>>    {
->>> @@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
->>>        g_free(nf->netdev_id);
->>>    }
->>>
->>> +static void dummy_handle_event(NetFilterState *nf, int event, Error
->> **errp)
->>> +{
->> It's in fact not a "dummy" handler, Maybe it's better to rename it as
->> "default".
->>
-> OK, I will rename it in next version.
->
->
->>> +    switch (event) {
->>> +    case COLO_EVENT_CHECKPOINT:
->>> +        break;
->>> +    case COLO_EVENT_FAILOVER:
->>> +        object_property_set_str(OBJECT(nf), "off", "status", errp);
->> I think filter is a generic infrastructure, so it's better not have CO=
-LO
->> specific things like this. You can either add a generic name or have a
->> dedicated helper to just disable all net filters.
->>
-> Maybe we can rename it to "EVENT_CHECKPOINT" and "EVENT_FAILOVER" looks
-> better?
->
+On 8/21/18 3:28 PM, Peter Maydell wrote:
+> Reduce the size of the per-cpu GICH memory regions from 0x1000
+> to 0x200. The registers only cover 0x200 bytes, and the Cortex-A15
+> wants to map them at a spacing of 0x200 bytes apart. Having the
+> region be too large interferes with mapping them like that, so
+> reduce it.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-I think registering notifier to COLO is better. For disabling filter, we=20
-can have a generic dedicated helpers to do this.
+Reviewed-By: Luc Michel <luc.michel@greensocs.com>
 
-Btw, I remember we allow disabling filter through qmp, if it's true, we=20
-probably need some notification to management, but this can be done in=20
-the future.
+> ---
+>  hw/intc/arm_gic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+> index c1b35fc1ee2..542b4b93eab 100644
+> --- a/hw/intc/arm_gic.c
+> +++ b/hw/intc/arm_gic.c
+> @@ -2084,7 +2084,7 @@ static void arm_gic_realize(DeviceState *dev, Err=
+or **errp)
+>          for (i =3D 0; i < s->num_cpu; i++) {
+>              memory_region_init_io(&s->vifaceiomem[i + 1], OBJECT(s),
+>                                    &gic_viface_ops, &s->backref[i],
+> -                                  "gic_viface", 0x1000);
+> +                                  "gic_viface", 0x200);
+>              sysbus_init_mmio(sbd, &s->vifaceiomem[i + 1]);
+>          }
+>      }
+>=20
 
->>> +        break;
->>> +    default:
->>> +        break;
->>> +    }
->>> +}
->>> +
->>>    static void netfilter_class_init(ObjectClass *oc, void *data)
->>>    {
->>>        UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
->>> +    NetFilterClass *nfc =3D NETFILTER_CLASS(oc);
->>>
->>>        ucc->complete =3D netfilter_complete;
->>> +    nfc->handle_event =3D dummy_handle_event;
->>>    }
->>>
->>>    static const TypeInfo netfilter_info =3D {
->>> diff --git a/net/net.c b/net/net.c
->>> index a77ea88fff..b4f6a2efb2 100644
->>> --- a/net/net.c
->>> +++ b/net/net.c
->>> @@ -1331,6 +1331,34 @@ void hmp_info_network(Monitor *mon, const QDic=
-t
->> *qdict)
->>>        }
->>>    }
->>>
->>> +void colo_notify_filters_event(int event, Error **errp)
->>> +{
->>> +    NetClientState *nc, *peer;
->>> +    NetClientDriver type;
->>> +    NetFilterState *nf;
->>> +    NetFilterClass *nfc =3D NULL;
->>> +    Error *local_err =3D NULL;
->>> +
->>> +    QTAILQ_FOREACH(nc, &net_clients, next) {
->>> +        peer =3D nc->peer;
->>> +        type =3D nc->info->type;
->>> +        if (!peer || type !=3D NET_CLIENT_DRIVER_TAP) {
->>> +            continue;
->>> +        }
->> The check the TAP is redundant with previous patch.
->>
-> OK, I will remove it.
->
->
->>> +        QTAILQ_FOREACH(nf, &nc->filters, next) {
->>> +            nfc =3D  NETFILTER_GET_CLASS(OBJECT(nf));
->>> +            if (!nfc->handle_event) {
->> Looks like this won't happen.
->>
-> It will happen. like filter-mirror and filter-redirector haven't this e=
-vent.
 
-But you do:
+--GsnHEC6NylLgPIGC3GiRk6pwMOnRT3pLs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
- =C2=A0 static void netfilter_class_init(ObjectClass *oc, void *data)
- =C2=A0 {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 UserCreatableClass *ucc =3D USER_CREATABL=
-E_CLASS(oc);
-+=C2=A0=C2=A0=C2=A0 NetFilterClass *nfc =3D NETFILTER_CLASS(oc);
+-----BEGIN PGP SIGNATURE-----
 
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ucc->complete =3D netfilter_complete;
-+=C2=A0=C2=A0=C2=A0 nfc->handle_event =3D dummy_handle_event;
- =C2=A0 }
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt9HBUACgkQd8knW3Qn
+Tr7OSg/9GDBuLCyKqQnz9/7ZtAV77g2T4zBXpsSZ4dsSv+kO0knsp++xkzaoN0kE
+IMLyZdp/3P0oq9t8G8LMGrQB4HVh8xdjka9NQQgzBS5gM8FiKi32LXilX819kYvs
+/2ZiEbgBNeeGndtkv4MI1WcX50e3ZkWSOxPKnuqOjpEuyi4WE0D2acsbTmYS+3iq
+lol7hfZIyOSb2MMmUKE6TCb41M/mIQ8W7ReHraB0zqjOB2/x6/VkopR8ljTlAkeh
+NNaDz2Z537gNHXSZESLzvsye6fCW+ab0qp/Z/j5R7caZsTqQhmcaf9QopdQQkD3I
+LVeGOkakWXOQucRVFhRW6jA4CRmQd1fWWR3l/LfgmZ5u3FDF3MQvGL+eZXIj3nGY
+NctFjEXGfmnRBU/zRFECeNLCjAKtidH7YXhF45uFlG0VMQqPCIDscCZoiDf3Bl+b
+SyvHQRa5A17NYbUB3lCyVFF6Nenkn5cwrC6R593UoHn21WreDVq1rrCoXRWSIML3
+86Yt7r3dLnlv1f2D5AiK1fkEJwaoUs+CINOHgrNJ7sgItBSO+/Iu9iRjVMK4ECfN
+Kj9wDDqEKpPhr6A6b3U2tupQFrYNoeXK4dKGSBMin5h8FXAqgJBEfWlzKwITPKGa
+wzfQ6CRonM87PtuoDNiTHveXbeyUIu/h+7jqXMHAy6czaJ3zW9M=
+=bSc8
+-----END PGP SIGNATURE-----
 
-?
-
-Thanks
-
->
-> Thanks
-> Zhang Chen
->
->
->> Thanks
->>
->>> +                continue;
->>> +            }
->>> +            nfc->handle_event(nf, event, &local_err);
->>> +            if (local_err) {
->>> +                error_propagate(errp, local_err);
->>> +                return;
->>> +            }
->>> +        }
->>> +    }
->>> +}
->>> +
->>>    void qmp_set_link(const char *name, bool up, Error **errp)
->>>    {
->>>        NetClientState *ncs[MAX_QUEUE_NUM];
->>
+--GsnHEC6NylLgPIGC3GiRk6pwMOnRT3pLs--
