@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsU7N-0002eE-F0
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:28:18 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsU9B-0004u0-8N
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:30:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsU7K-0007vT-9y
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:28:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43890 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsU97-0000qR-HW
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:30:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46998 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsU7K-0007vB-3G
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:28:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fsU97-0000oD-8C
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:30:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C05D04023820
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 14:28:13 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <96821c07-7aa6-5920-8921-da967258c0d5@redhat.com> (Thomas Huth's
-	message of "Wed, 22 Aug 2018 12:13:18 +0200")
-References: <20180822095421.11765-1-quintela@redhat.com>
-	<20180822095421.11765-3-quintela@redhat.com>
-	<96821c07-7aa6-5920-8921-da967258c0d5@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 22 Aug 2018 16:28:05 +0200
-Message-ID: <87ftz6pjbe.fsf@trasno.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 31BD1807689C
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 14:30:02 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 22 Aug 2018 16:29:53 +0200
+Message-Id: <20180822142956.6859-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 02/10] check: Use land/lor when possible
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/3] seccomp fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: pmoore@redhat.com, Eduardo Otubo <otubo@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Thomas Huth <thuth@redhat.com> wrote:
-> On 2018-08-22 11:54, Juan Quintela wrote:
->> So everythig is (a bit) more consistent
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  tests/Makefile.include | 12 ++++--------
->>  1 file changed, 4 insertions(+), 8 deletions(-)
-> [...]
->> @@ -299,9 +297,7 @@ check-qtest-i386-y += tests/q35-test$(EXESUF)
->>  check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
->>  gcov-files-i386-y += hw/pci-host/q35.c
->>  check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) +=
->> tests/vhost-user-test$(EXESUF)
->> -ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
->> -check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) +=
->> tests/vhost-user-test$(EXESUF)
->> -endif
->> +check-qtest-x86_64-$(call lor, $(CONFIG_VHOST_USER_NET_TEST_i386),
->> $(CONFIG_VHOST_USER_NET_TEST_x86_64)) +=
->> tests/vhost-user-test$(EXESUF)
->
-> I think that is the wrong condition. It's rather "!i386 AND x86_64" that
-> you have to test here. Since that line will get incredibly long with the
-> $(call ...) expressions, I'd suggest to rather drop this hunk, I think
-> it's more readable the way it is.
+Hi,
 
-Dropped.
+This series fixes 2 issues with -sandbox:
 
-Anyways, the propper fix is to change how vhost is configured at all.
-The bits in configure are "interesting" to say the less.
+- The seccomp action SCMP_ACT_KILL results in immediate termination of
+  the thread that made the bad system call. However, qemu being
+  multi-threaded, it keeps running. There is no easy way for parent
+  process / management layer (libvirt) to know about that situation.
 
-Later, Juan.
+  Instead, the default SIGSYS handler when invoked with SCMP_ACT_TRAP
+  will terminate the program and core dump.
+
+  This may not be the most secure solution, but probably better than
+  just killing the offending thread. SCMP_ACT_KILL_PROCESS has been
+  added in Linux 4.14 to improve the situation, which I propose to use
+  by default if available.
+
+  Related to:
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
+
+- The seccomp filter isn't applied to all threads. We can solve the
+  issue by using SECCOMP_FILTER_FLAG_TSYNC since libseccomp 2.2.0 and
+  kernel >=3D 3.17. The issue remains on older kernels or older
+  libseccomp. I chose to report an error by default, but we may want
+  it to fail instead.
+
+v3:
+- modify qemu_seccomp() to set errno=3DENOSYS
+- add patch "seccomp: set the seccomp filter to all threads"
+
+v2:
+- fix clang unused inline warning
+- add acked-by/r-b tags
+
+Marc-Andr=C3=A9 Lureau (3):
+  seccomp: use SIGSYS signal instead of killing the thread
+  seccomp: prefer SCMP_ACT_KILL_PROCESS if available
+  seccomp: set the seccomp filter to all threads
+
+ qemu-seccomp.c  | 96 +++++++++++++++++++++++++++++++++++++++++++++++--
+ qemu-options.hx |  2 ++
+ 2 files changed, 95 insertions(+), 3 deletions(-)
+
+--=20
+2.18.0.547.g1d89318c48
