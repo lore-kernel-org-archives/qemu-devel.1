@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fsOa8-00052b-Oa
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:33:39 -0400
+	(envelope-from <david@redhat.com>) id 1fsOob-0007ll-3H
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:48:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fsOa6-0006bl-ND
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:33:36 -0400
-References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
-	<20180817180440.49687-1-vsementsov@virtuozzo.com>
-	<4d266435-855b-7900-0ad0-d677a568ebf7@redhat.com>
-	<f4f935d2-cb37-b63b-5060-f15cb43becbd@redhat.com>
-	<8ce95ada-2162-d22f-6925-a97309d8c48a@virtuozzo.com>
-	<7cd836ad-7270-fe65-d0bd-32b0423d07be@redhat.com>
-	<aa17dfe6-3ed8-6bff-cb5e-9421dd7d608a@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c45ec13e-3df0-b6c3-bf74-a726434fe115@redhat.com>
-Date: Wed, 22 Aug 2018 10:33:04 +0200
+	(envelope-from <david@redhat.com>) id 1fsOoX-0000XN-TL
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:48:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37092 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fsOoW-0000Tm-41
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:48:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 456524023ECB
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 08:48:27 +0000 (UTC)
+References: <1534845930-14451-1-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c3d31421-22ee-f826-6c16-4540c7c63d08@redhat.com>
+Date: Wed, 22 Aug 2018 10:48:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <aa17dfe6-3ed8-6bff-cb5e-9421dd7d608a@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="92BkcfODNsu2MjvXYTUVEBvqMxUb1SmaD"
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qapi: add x-query-block-graph
+In-Reply-To: <1534845930-14451-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Remove deprecated -balloon option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,308 +33,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: crosa@redhat.com, ehabkost@redhat.com, armbru@redhat.com, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---92BkcfODNsu2MjvXYTUVEBvqMxUb1SmaD
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: crosa@redhat.com, ehabkost@redhat.com, armbru@redhat.com,
- kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, den@openvz.org,
- stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <c45ec13e-3df0-b6c3-bf74-a726434fe115@redhat.com>
-Subject: Re: [PATCH v2 1/3] qapi: add x-query-block-graph
-References: <1b072083-700b-9853-e525-e2726bf17476@virtuozzo.com>
- <20180817180440.49687-1-vsementsov@virtuozzo.com>
- <4d266435-855b-7900-0ad0-d677a568ebf7@redhat.com>
- <f4f935d2-cb37-b63b-5060-f15cb43becbd@redhat.com>
- <8ce95ada-2162-d22f-6925-a97309d8c48a@virtuozzo.com>
- <7cd836ad-7270-fe65-d0bd-32b0423d07be@redhat.com>
- <aa17dfe6-3ed8-6bff-cb5e-9421dd7d608a@virtuozzo.com>
-In-Reply-To: <aa17dfe6-3ed8-6bff-cb5e-9421dd7d608a@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 21.08.2018 12:05, Thomas Huth wrote:
+> The "-balloon" option has been replaced by "-device virtio-balloon".
+> It's been marked as deprecated since two releases, and nobody
+> complained, so let's remove it now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  docs/virtio-balloon-stats.txt |  6 +++---
+>  qemu-deprecated.texi          |  5 -----
+>  qemu-options.hx               | 10 ----------
+>  vl.c                          | 36 ------------------------------------
+>  4 files changed, 3 insertions(+), 54 deletions(-)
+> 
+> diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.txt
+> index 9985e1d..1732cc8 100644
+> --- a/docs/virtio-balloon-stats.txt
+> +++ b/docs/virtio-balloon-stats.txt
+> @@ -61,9 +61,9 @@ It's also important to note the following:
+>     respond to the request the timer will never be re-armed, which has
+>     the same effect as disabling polling
+>  
+> -Here are a few examples. QEMU is started with '-balloon virtio', which
+> -generates '/machine/peripheral-anon/device[1]' as the QOM path for the
+> -balloon device.
+> +Here are a few examples. QEMU is started with '-device virtio-balloon',
+> +which generates '/machine/peripheral-anon/device[1]' as the QOM path for
+> +the balloon device.
+>  
+>  Enable polling with 2 seconds interval:
+>  
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 67b7211..0714017 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -106,11 +106,6 @@ enabled via the ``-machine usb=on'' argument.
+>  
+>  The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
+>  
+> -@subsection -balloon (since 2.12.0)
+> -
+> -The @option{--balloon virtio} argument has been superseded by
+> -@option{--device virtio-balloon}.
+> -
+>  @subsection -fsdev handle (since 2.12.0)
+>  
+>  The ``handle'' fsdev backend does not support symlinks and causes the 9p
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 4efdedf..47c6b92 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -454,16 +454,6 @@ modprobe i810_audio clocking=48000
+>  @end example
+>  ETEXI
+>  
+> -DEF("balloon", HAS_ARG, QEMU_OPTION_balloon,
+> -    "-balloon virtio[,addr=str]\n"
+> -    "                enable virtio balloon device (deprecated)\n", QEMU_ARCH_ALL)
+> -STEXI
+> -@item -balloon virtio[,addr=@var{addr}]
+> -@findex -balloon
+> -Enable virtio balloon device, optionally with PCI address @var{addr}. This
+> -option is deprecated, use @option{-device virtio-balloon} instead.
+> -ETEXI
+> -
+>  DEF("device", HAS_ARG, QEMU_OPTION_device,
+>      "-device driver[,prop[=value][,...]]\n"
+>      "                add device (based on driver)\n"
+> diff --git a/vl.c b/vl.c
+> index 16b913f..f952f01 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2127,36 +2127,6 @@ static void parse_display(const char *p)
+>      }
+>  }
+>  
+> -static int balloon_parse(const char *arg)
+> -{
+> -    QemuOpts *opts;
+> -
+> -    warn_report("This option is deprecated. "
+> -                "Use '--device virtio-balloon' to enable the balloon device.");
+> -
+> -    if (strcmp(arg, "none") == 0) {
+> -        return 0;
+> -    }
+> -
+> -    if (!strncmp(arg, "virtio", 6)) {
+> -        if (arg[6] == ',') {
+> -            /* have params -> parse them */
+> -            opts = qemu_opts_parse_noisily(qemu_find_opts("device"), arg + 7,
+> -                                           false);
+> -            if (!opts)
+> -                return  -1;
+> -        } else {
+> -            /* create empty opts */
+> -            opts = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
+> -                                    &error_abort);
+> -        }
+> -        qemu_opt_set(opts, "driver", "virtio-balloon", &error_abort);
+> -        return 0;
+> -    }
+> -
+> -    return -1;
+> -}
+> -
+>  char *qemu_find_file(int type, const char *name)
+>  {
+>      int i;
+> @@ -3659,12 +3629,6 @@ int main(int argc, char **argv, char **envp)
+>              case QEMU_OPTION_no_hpet:
+>                  no_hpet = 1;
+>                  break;
+> -            case QEMU_OPTION_balloon:
+> -                if (balloon_parse(optarg) < 0) {
+> -                    error_report("unknown -balloon argument %s", optarg);
+> -                    exit(1);
+> -                }
+> -                break;
+>              case QEMU_OPTION_no_reboot:
+>                  no_reboot = 1;
+>                  break;
+> 
 
-On 2018-08-20 20:38, Vladimir Sementsov-Ogievskiy wrote:
-> 20.08.2018 16:44, Max Reitz wrote:
->> On 2018-08-20 12:20, Vladimir Sementsov-Ogievskiy wrote:
->>> 18.08.2018 00:03, Max Reitz wrote:
->>>> On 2018-08-17 22:32, Eric Blake wrote:
->>>>> On 08/17/2018 01:04 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>>>> Add a new command, returning block nodes graph.
->>>>>>
->>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy
->>>>>> <vsementsov@virtuozzo.com>
->>>>>> ---
->>>>>> =C2=A0=C2=A0=C2=A0 qapi/block-core.json=C2=A0 | 116
->>>>>> ++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>> +##
->>>>>> +# @BlockGraphEdge:
->>>>>> +#
->>>>>> +# Block Graph edge description for x-query-block-graph.
->>>>>> +#
->>>>>> +# @parent: parent id
->>>>>> +#
->>>>>> +# @child: child id
->>>>>> +#
->>>>>> +# @name: name of the relation (examples are 'file' and 'backing')=
+Nice to see this go.
 
->>>>> Can this be made into a QAPI enum? (It would have ripple effects to=
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
->>>>> existing code, but might be a worthwhile cleanup).
->>>>>
->>>>>> +#
->>>>>> +# @perm: granted permissions for the parent operating on the chil=
-d
->>>>>> +#
->>>>>> +# @shared-perm: permissions that can still be granted to other us=
-ers
->>>>>> of the
->>>>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 child while it is still attached this parent
->>>>>> +#
->>>>>> +# Since: 3.1
->>>>>> +##
->>>>>> +{ 'struct': 'BlockGraphEdge',
->>>>>> +=C2=A0 'data': { 'parent': 'uint64', 'child': 'uint64',
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'name': 'str', 'perm': [ 'BlockPermission' ],
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'shared-perm': [ 'BlockPermission' ] } }
->>>>>> +
->>>>>> +##
->>>>>> +# @x-query-block-graph:
->>>>>> +#
->>>>>> +# Get the block graph.
->>>>>> +#
->>>>>> +# Since: 3.1
->>>>>> +##
->>>>>> +{ 'command': 'x-query-block-graph', 'returns': 'BlockGraph' }
->>>>> Why is this command given an x- prefix?=C2=A0 What would it take to=
- promote
->>>>> it from experimental to fully supported?
->>>> This is just a very bad reasons, but I'll give it anyway: We really
->>>> want
->>>> such a command but still don't have one.=C2=A0 So I doubt this is ex=
-actly
->>>> what we want. :-)
->>>>
->>>> A better reason is that we probably do not want a single command to
->>>> return the whole block graph.=C2=A0 Do we want the command to just r=
-eturn
->>>> info for a single node, including just the node names of the childre=
-n?
->>>> Do we want the command to include child info on request (but start f=
-rom
->>>> a user-specified root)?
->>>>
->>>> Also, the interface is...=C2=A0 Er, weird?=C2=A0 Honestly, I don't q=
-uite see why
->>>> we would want it like this without x-.
->>>>
->>>> Why use newly generated IDs instead of node names?=C2=A0 Why are tho=
-se RAM
->>>> addresses?=C2=A0 That is just so fishy.
->>>>
->>>> Because parents can be non-nodes?=C2=A0 Well, I suppose you better n=
-ot
->>>> include them in the graph like this, then.
->>>>
->>>> I don't see why the query command we want would include non-BDSs at
->>>> all.
->>>>
->>>> It may be useful for debugging, so, er, well, with an x-debug- prefi=
-x,
->>>> OK.=C2=A0 But the question then is whether it's useful enough to war=
-rant
->>>> having a separate query command that isn't precisely the command we
->>>> want
->>>> anyway.
->>>
->>>> The first question we probably have to ask is whether the query comm=
-and
->>>> needs to output parent information.=C2=A0 If not, querying would pro=
-bably
->>>> start at some named node and then you'd go down from there (either w=
-ith
->>>> many queries or through a single one).
->>>>
->>>> If so, well, then we can still output parent information, but I'd sa=
-y
->>>> that then is purely informational and we don't need to "generate" ne=
-w
->>>> IDs for them.=C2=A0 Just have either a node-name there or a user-rea=
-dable
->>>> description (like it was in v1; although it has to be noted that suc=
-h a
->>>> user-readable description is useless to a management layer), but the=
-se
->>>> new IDs are really not something I like.
->>>>
->>>>> Overall, the command looks quite useful; and the fact that you
->>>>> produced
->>>>> some nice .dot graphs from it for visualization seems like it is wo=
-rth
->>>>> considering this as a permanent API addition.=C2=A0 The question, t=
-hen,
->>>>> is if
->>>>> the interface is right, or if it needs any tweaks (like using an en=
-um
->>>>> instead of open-coded string for the relation between parent and
->>>>> child),
->>>>> as a reason for keeping the x- prefix.
->>>> You can use x-debug- even when you decide to keep a command.
->>>>
->>>> I see no reason why a command should hastily not get an x- prefix ju=
-st
->>>> because it may be useful enough.=C2=A0 If it really is and we really=
- see the
->>>> interface is good (which I really don't think it is), then we can
->>>> always
->>>> drop it later.
->>>>
->>>> Max
->>>>
->>>>>> +++ b/block.c
->>>>>> @@ -4003,6 +4003,86 @@ BlockDeviceInfoList
->>>>>> *bdrv_named_nodes_list(Error **errp)
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return list;
->>>>>> =C2=A0=C2=A0=C2=A0 }
->>>>>> =C2=A0=C2=A0=C2=A0 +#define QAPI_LIST_ADD(list, element) do { \
->>>>>> +=C2=A0=C2=A0=C2=A0 typeof(list) _tmp =3D g_new(typeof(*(list)), 1=
-); \
->>>>>> +=C2=A0=C2=A0=C2=A0 _tmp->value =3D (element); \
->>>>>> +=C2=A0=C2=A0=C2=A0 _tmp->next =3D (list); \
->>>>>> +=C2=A0=C2=A0=C2=A0 list =3D _tmp; \
->>>>>> +} while (0)
->>>>> Hmm - this seems like a frequently observed pattern - should it be
->>>>> something that we add independently and use throughout the tree as
->>>>> part
->>>>> of QAPI interactions in general?
->>>>>
->>>>>> +
->>>>>> +BlockGraph *bdrv_get_block_graph(Error **errp)
->>>>>> +{
->>>>>> +=C2=A0=C2=A0=C2=A0 BlockGraph *graph =3D g_new0(BlockGraph, 1);
->>>>>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *bs;
->>>>>> +=C2=A0=C2=A0=C2=A0 BdrvChild *child;
->>>>>> +=C2=A0=C2=A0=C2=A0 BlockGraphNode *node;
->>>>>> +=C2=A0=C2=A0=C2=A0 BlockGraphEdge *edge;
->>>>>> +=C2=A0=C2=A0=C2=A0 struct {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int flag;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockPermission num;
->>>>>> +=C2=A0=C2=A0=C2=A0 } permissions[] =3D {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_CONSISTENT_=
-READ,
->>>>>> BLOCK_PERMISSION_CONSISTENT_READ },
->>>>> Would it be worth directly reusing a QAPI enum for all such
->>>>> permissions
->>>>> in the existing code base, instead of having to map between an
->>>>> internal
->>>>> and a QAPI enum?
->>>>>
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_WRITE,=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_W=
-RITE },
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_WRITE_UNCHA=
-NGED,
->>>>>> BLOCK_PERMISSION_WRITE_UNCHANGED },
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_RESIZE,=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_RESIZE =
-},
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { BLK_PERM_GRAPH_MOD,=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLOCK_PERMISSION_GRAPH_MOD },
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { 0, 0 }
->>>>>> +=C2=A0=C2=A0=C2=A0 }, *p;
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 QTAILQ_FOREACH(bs, &graph_bdrv_states, node_li=
-st) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QLIST_FOREACH(child, &=
-bs->parents, next_parent) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- if (!child->role->parent_is_bds) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 BlockGraphNodeList *el;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 bool add =3D true;
->>>>> Does your command need/want to expose internal nodes? (I argue that=
- it
->>>>> probably should show internal nodes, even when normal 'query-block'=
+-- 
 
->>>>> doesn't, just because knowing about the impact of internal nodes
->>>>> can be
->>>>> important when tracking down permissions issues).
->>>> You could make it a flag, but in theory, implicit nodes should never=
- be
->>>> visible through QMP.=C2=A0 (Though if you explicitly request them, t=
-hat's
->>>> probably a different story.)
->>>>
->>>> Max
->>>>
->>> My goal is to get graphviz representation of block graph with all the=
+Thanks,
 
->>> parents for debugging. And I'm absolutely ok to do it with x-debug-.
->>> Then we shouldn't care about enum for role type now. So, it the patch=
- ok
->>> for you with x-debug- prefix?
->> Actually, no, because I'm not sure whether using points for the IDs is=
- a
->> good idea.=C2=A0 That may defeat ASLR, and that would be a problem eve=
-n with
->> x-debug-.
->=20
-> Hmm ASLR, what about trace points? Do they violate it? We can enable
-> trace-points on running vm and they'll show a lot of pointers...
-
-Good question, but at least you can disable it during configure.  If
-query-block-graph is disabled by default and needs to be enabled
-explicitly, I guess that'd be OK.
-
-Another benefit of using a hash map though would be that you don't need
-to loop through the array of existing nodes to find out which you have
-added already -- a lookup in the hash map would be enough.
-
-Max
-
->> So I'd prefer using e.g. a hash map to map pointers to freshly generat=
-ed
->> IDs (just incrementing integers).
->>
->> In any case, I'll take a further look at the patch later, but another
->> thing that I've just seen is that using the opaque pointers to identif=
-y
->> a parent is something that doesn't look like it's guaranteed to work.
->>
->> I suppose the alternative would be to start from all possible roots an=
-d
->> generate the graph from there (all possible roots being all
->> monitor-owned BDSs and all BlockBackends, I think).
->>
->> Max
->>
->=20
->=20
-
-
-
---92BkcfODNsu2MjvXYTUVEBvqMxUb1SmaD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt9H8AACgkQ9AfbAGHV
-z0BdQAgAwQUqcO53IxCmzcuDQY0BM3LJIUXww6YUqbN/OiFoIITnLjRyl0RBEPMH
-hjwgUJcizPomaGuaB989zAn1Xob5Y9GL3hKDpR1LpMxhqnUa64gUBL3/tXpW4VKe
-RjHaSr/CmBTmYx8Vv/rC4M4oIpoDRWBbD+BKe7DhXLpEa5ENVz4Jjg9bKYun04Or
-3EVF32MXmofRa8SiPoN7AhQLBIxkiKhPmWlnJyRNfucDgv/EskyjoUFfOG3bINlr
-Z16UfHdd4AhAnO78r0w/vfu4kz4w6qhM+Pp5av+FSQ8E3/v019zBaVLLoPuDMv5H
-rmCgdOBfxuUHBhYiLuzghR/d5DqKOQ==
-=Norb
------END PGP SIGNATURE-----
-
---92BkcfODNsu2MjvXYTUVEBvqMxUb1SmaD--
+David / dhildenb
