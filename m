@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWgA-0004YU-QR
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWg9-0004Ve-R0
 	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWX3-0005Ir-D0
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:03:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51172 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWXK-0005Tl-OV
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:03:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37466 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fsWX3-0005Ib-8c
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:02:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	id 1fsWXK-0005TH-Bq
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:03:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B91DB804BAAC
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 17:02:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0DC2B401EF02
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 17:03:14 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 22 Aug 2018 19:02:46 +0200
-Message-Id: <20180822170250.29573-1-marcandre.lureau@redhat.com>
+Date: Wed, 22 Aug 2018 19:02:50 +0200
+Message-Id: <20180822170250.29573-5-marcandre.lureau@redhat.com>
+In-Reply-To: <20180822170250.29573-1-marcandre.lureau@redhat.com>
+References: <20180822170250.29573-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/4] seccomp fixes
+Subject: [Qemu-devel] [PATCH v4 4/4] seccomp: set the seccomp filter to all
+ threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +37,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pmoore@redhat.com, berrange@redhat.com, eblake@redhat.com, Eduardo Otubo <otubo@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi,
+When using "-seccomp on", the seccomp policy is only applied to the
+main thread, the vcpu worker thread and other worker threads created
+after seccomp policy is applied; the seccomp policy is not applied to
+e.g. the RCU thread because it is created before the seccomp policy is
+applied and SECCOMP_FILTER_FLAG_TSYNC isn't used.
 
-This series fixes 2 issues with -sandbox:
+This can be verified with
+for task in /proc/`pidof qemu`/task/*; do cat $task/status | grep Secc ; =
+done
+Seccomp:	2
+Seccomp:	0
+Seccomp:	0
+Seccomp:	2
+Seccomp:	2
+Seccomp:	2
 
-- The seccomp action SCMP_ACT_KILL results in immediate termination of
-  the thread that made the bad system call. However, qemu being
-  multi-threaded, it keeps running. There is no easy way for parent
-  process / management layer (libvirt) to know about that situation.
+Starting with libseccomp 2.2.0 and kernel >=3D 3.17, we can use
+seccomp_attr_set(ctx, > SCMP_FLTATR_CTL_TSYNC, 1) to update the policy
+on all threads.
 
-  Instead, the default SIGSYS handler when invoked with SCMP_ACT_TRAP
-  will terminate the program and core dump.
+libseccomp requirement was bumped to 2.2.0 in previous patch.
+libseccomp should fail to set the filter if it can't honour
+SCMP_FLTATR_CTL_TSYNC (untested), and thus -sandbox will now fail on
+kernel < 3.17.
 
-  This may not be the most secure solution, but probably better than
-  just killing the offending thread. SCMP_ACT_KILL_PROCESS has been
-  added in Linux 4.14 to improve the situation, which I propose to use
-  by default if available.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qemu-seccomp.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-  Related to:
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
-
-- The seccomp filter isn't applied to all threads. We can solve the
-  issue by using SECCOMP_FILTER_FLAG_TSYNC since libseccomp 2.2.0 and
-  kernel >=3D 3.17.
-
-v3:
-- modify qemu_seccomp() to set errno=3DENOSYS
-- add patch "seccomp: set the seccomp filter to all threads"
-
-v2:
-- fix clang unused inline warning
-- add acked-by/r-b tags
-
-Marc-Andr=C3=A9 Lureau (4):
-  seccomp: use SIGSYS signal instead of killing the thread
-  seccomp: prefer SCMP_ACT_KILL_PROCESS if available
-  configure: require libseccomp 2.2.0
-  seccomp: set the seccomp filter to all threads
-
- qemu-seccomp.c | 36 +++++++++++++++++++++++++++++++++++-
- configure      |  7 ++-----
- 2 files changed, 37 insertions(+), 6 deletions(-)
-
+diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+index f0c833f3ca..4729eb107f 100644
+--- a/qemu-seccomp.c
++++ b/qemu-seccomp.c
+@@ -149,6 +149,11 @@ static int seccomp_start(uint32_t seccomp_opts)
+         goto seccomp_return;
+     }
+=20
++    rc =3D seccomp_attr_set(ctx, SCMP_FLTATR_CTL_TSYNC, 1);
++    if (rc !=3D 0) {
++        goto seccomp_return;
++    }
++
+     for (i =3D 0; i < ARRAY_SIZE(blacklist); i++) {
+         if (!(seccomp_opts & blacklist[i].set)) {
+             continue;
 --=20
 2.18.0.547.g1d89318c48
