@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fsUZO-0000cp-OY
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1fsUZe-0000i6-3T
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fsUZL-0004lm-II
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44488 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fsUZa-0004uv-QD
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46696 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fsUZL-0004kQ-Bw
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:11 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CBC304023820
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 14:57:09 +0000 (UTC)
-Date: Wed, 22 Aug 2018 22:57:07 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180822145707.GJ3878@lemon.usersys.redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fsUZa-0004uh-Iz
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:26 -0400
+Date: Wed, 22 Aug 2018 15:57:20 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180822145720.GL12750@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
+	<20180817092936.GC11124@redhat.com>
+	<e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
+	<39b3c8b8-25eb-3a8e-3a5a-abd584a11e2c@laine.org>
+	<f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
+	<20180822120135.GN18995@localhost.localdomain>
+	<20180822122601.GI12750@redhat.com>
+	<20180822125455.GP18995@localhost.localdomain>
+	<20180822134440.GK12750@redhat.com>
+	<20180822141828.GQ18995@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Subject: [Qemu-devel] virtio_stw_phys_cached crash
+In-Reply-To: <20180822141828.GQ18995@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
+ for guest OSes that don't support virtio-1.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +38,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, pbonzini@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Andrea Bolognani <abologna@redhat.com>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>, Laine Stump <laine@laine.org>
 
-On master (13b7b188501) and v3.0.0, booting the OpenBSD install63.iso with a
-virtio-net (slirp backend) device gives this assertion failure:
+On Wed, Aug 22, 2018 at 11:18:28AM -0300, Eduardo Habkost wrote:
+> On Wed, Aug 22, 2018 at 02:44:40PM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+> > On Wed, Aug 22, 2018 at 09:54:55AM -0300, Eduardo Habkost wrote:
+> > > On Wed, Aug 22, 2018 at 01:26:01PM +0100, Daniel P. Berrang=C3=A9 w=
+rote:
+> > > > On Wed, Aug 22, 2018 at 09:01:35AM -0300, Eduardo Habkost wrote:
+> > > > > On Wed, Aug 22, 2018 at 12:36:27PM +0200, Andrea Bolognani wrot=
+e:
+> > > > > > On Tue, 2018-08-21 at 14:21 -0400, Laine Stump wrote:
+> > > > > > > On 08/17/2018 06:35 AM, Andrea Bolognani wrote:
+> > > > > > > > If we decide we want to explicitly spell out the options =
+instead
+> > > > > > > > of relying on QEMU changing behavior based on the slot ty=
+pe, which
+> > > > > > > > is probably a good idea anyway, I think we should have
+> > > > > > > >=20
+> > > > > > > >   virtio-0.9 =3D> disable-legacy=3Dno,disable-modern=3Dno
+> > > > > > > >   virtio-1.0 =3D> disable-legacy=3Dyes,disable-modern=3Dn=
+o
+> > > > > > > >=20
+> > > > > > > > There's basically no reason to have a device legacy-only =
+rather
+> > > > > > > > than transitional, and spelling out both options instead =
+of only
+> > > > > > > > one of them just seems more robust.
+> > > > > > >=20
+> > > > > > > I agree with both of those, but the counter-argument is tha=
+t "virtio"
+> > > > > > > already describes a transitional device like your proposal =
+for
+> > > > > > > virtio-0.9 (at least today), and it makes the versioned mod=
+els less
+> > > > > > > orthogonal. In the end, I could go either way...
+> > > > > >=20
+> > > > > > Yeah, Dan already made that argument and convinced me that we
+> > > > > > should use virtio-0.9 for legacy only, virtio-1.0 for modern =
+only
+> > > > > > and plain virtio for no enforced behavior / transitional.
+> > > > >=20
+> > > > > I don't understand why we are optimizing the new system for the
+> > > > > less useful use cases:
+> > > > >=20
+> > > > > I don't see a use case where virtio-0.9 (legacy-only) would be
+> > > > > more useful than virtio-transitional.  I don't see why anybody
+> > > > > would prefer a legacy-only device instead of a transitional
+> > > > > device.  Even if your guest has only legacy drivers, it might b=
+e
+> > > > > upgraded and get new drivers in the future.
+> > > > >=20
+> > > > > I don't see a use case where virtio-1.0 (modern-only) would be
+> > > > > more useful than "virtio".  If you are running i440fx, you get =
+a
+> > > > > transitional device with "virtio", and I don't see why anybody
+> > > > > would prefer a modern-only device.  If you are running Q35, you
+> > > > > already get a modern-only device with "virtio".
+> > > > >=20
+> > > > > The most useful feature users need is the ability to ask for a
+> > > > > transitional virtio device on Q35, and this use case is
+> > > > > explicitly being left out of the proposal.  Why?
+> > > >=20
+> > > > You can already get a transitional device on Q35, albeit with man=
+ual
+> > > > placement. Adding flags for magic placement for the existing devi=
+ces
+> > > > is not something that is suitable for the XML. The ability to get
+> > > > legacy-only, or modern-only doesn't exist today in any way, so th=
+at
+> > > > would be a valid new feature.
+> > >=20
+> > > Transitional devices and modern-only devices are different kinds
+> > > of devices.  Making the guest see a different type of device
+> > > depending on where it's plugged is why we got into this mess, why
+> > > would we recommend applications to rely on this behavior?
+> > >=20
+> > > That's why I like your virtio-0.9/virtio-1.0 proposal.  I just
+> > > don't see why you think virtio-transitional should be out of it.
+> >=20
+> > An explicit virtio-transitional device is still two separate
+> > devices pretending to be the same thing, but magically changing
+> > their identity at runtime. We've already got that situation with
+> > existing device models, and I'm loathe to see us add 2nd device
+> > model with that same behaviour, just for sake of having a slightly
+> > different PCI bus placement strategy to support outdated guest OS.
+>=20
+> Your seem to be describing what the current "virtio" device is:
+> it becomes a non-transitional (modern-only) Virtio device on some
+> cases, and becomes a transitional Virtio device on other cases.
+> It is two devices pretending to be the same thing.  That's
+> exactly what I would like applications to get rid of.
+>=20
+> Now, the above is really not an accurate description of
+> transitional Virtio devices.  A transitional Virtio device is
+> something clearly specified in the Virtio spec, and it just means
+> a device that supports two types of drivers.  It's not different
+> from a x86_64 CPU that can run 32-bit OSes.
+>=20
+> See:
+> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.htm=
+l#x1-60001
+> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.htm=
+l#x1-3090004
 
-(gdb) bt
-#0  0x00007f6f25703feb in raise () at /lib64/libc.so.6
-#1  0x00007f6f256ee5c1 in abort () at /lib64/libc.so.6
-#2  0x00007f6f256ee491 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
-#3  0x00007f6f256fc752 in  () at /lib64/libc.so.6
-#4  0x000055d966f5b5d6 in address_space_stw_le_cached (cache=0x7f6f040fd700, addr=516, val=1, attrs=..., result=0x0)
-    at /stor/work/qemu/include/exec/memory_ldst_cached.inc.h:85
-#5  0x000055d966f5b804 in stw_le_phys_cached (cache=0x7f6f040fd700, addr=516, val=1) at /stor/work/qemu/include/exec/memory_ldst_phys.inc.h:121
-#6  0x000055d966f5c3e7 in virtio_stw_phys_cached (vdev=0x55d969aeeff0, cache=0x7f6f040fd700, pa=516, value=1) at /stor/work/qemu/include/hw/virtio/virtio-access.h:195
-#7  0x000055d966f5cef8 in vring_set_avail_event (vq=0x7f6f181df110, val=1) at /stor/work/qemu/hw/virtio/virtio.c:324
-#8  0x000055d966f5e1c8 in virtqueue_pop (vq=0x7f6f181df110, sz=48) at /stor/work/qemu/hw/virtio/virtio.c:883
-#9  0x000055d966f2d69b in virtio_net_handle_ctrl (vdev=0x55d969aeeff0, vq=0x7f6f181df110) at /stor/work/qemu/hw/net/virtio-net.c:986
-#10 0x000055d966f5ffb9 in virtio_queue_notify_vq (vq=0x7f6f181df110) at /stor/work/qemu/hw/virtio/virtio.c:1534
-#11 0x000055d966f6224d in virtio_queue_host_notifier_read (n=0x7f6f181df178) at /stor/work/qemu/hw/virtio/virtio.c:2451
-#12 0x000055d9673ef460 in aio_dispatch_handlers (ctx=0x55d96891af90) at /stor/work/qemu/util/aio-posix.c:406
-#13 0x000055d9673ef5f3 in aio_dispatch (ctx=0x55d96891af90) at /stor/work/qemu/util/aio-posix.c:437
-#14 0x000055d9673eae25 in aio_ctx_dispatch (source=0x55d96891af90, callback=0x0, user_data=0x0) at /stor/work/qemu/util/async.c:261
-#15 0x00007f6f28b578ad in g_main_context_dispatch () at /lib64/libglib-2.0.so.0
-#16 0x000055d9673ee040 in glib_pollfds_poll () at /stor/work/qemu/util/main-loop.c:215
-#17 0x000055d9673ee0ae in os_host_main_loop_wait (timeout=0) at /stor/work/qemu/util/main-loop.c:238
-#18 0x000055d9673ee167 in main_loop_wait (nonblocking=0) at /stor/work/qemu/util/main-loop.c:497
-#19 0x000055d96702efd0 in main_loop () at /stor/work/qemu/vl.c:1866
-#20 0x000055d9670368bd in main (argc=22, argv=0x7ffdef327638, envp=0x7ffdef3276f0) at /stor/work/qemu/vl.c:4644
+When I say a device pretending to be 2 different devices, I'm
+generally referring to the fact that a single QEMU device model
+can expose two different PCI device IDs depending on how it is
+configured and/or placed.
 
-No surprise, bisection points to
+> > > > Honestly though, the longer this discussion goes on, the more I t=
+hink
+> > > > the answer is just "do nothing". All this time spent on discussio=
+n,
+> > > > and future time spent on implementing new logic in apps, is merel=
+y
+> > > > to support running RHEL-6 on Q35.  I think we should just say tha=
+t
+> > > > RHEL-6 should use i440fx forever and be done with it.
+> > >=20
+> > > I'm not sure if you are saying that we (Red Hat) shouldn't spend
+> > > time implementing it, or that the libvirt upstream project should
+> > > reject the patches if somebody implements it.  I would understand
+> > > the former, but not the latter.
+> >=20
+> > Even if someone is willing to implement it in libvirt, we have to
+> > consider the cost of supporting it in both libvirt and applications
+> > using libvirt and the complexity it adds to our story about the
+> > docs / best practices for configuring guests.
+> >=20
+> > Even though I do kind of like the virtio-0.9/virtio-1.0 device model
+> > as concepts, I'm yet to be convinced that implementing them in libvir=
+t
+> > and then also in all the downstream applications (oVirt, OpenStack,
+> > virt-manager, cockpit, etc) is actually worth the cost.
+> >=20
+> > There's little compelling reason to care about running outdated OS
+> > like RHEL-6 on Q35 in general. The motivation behind it is just
+> > coming from an artifically created problem downstream, by wishing
+> > to drop the i440fx machine at some still undeteremined point in the
+> > future. By the time that future comes, RHEL-6 may well even be
+> > end of life making the entire exercise a pointless.
+>=20
+> I'm all for making a cost/benefit analysis, but I don't think you
+> are taking into account the costs of keeping the confusing
+> semantics of existing "virtio" devices.
+>=20
+> If you still want to refuse to provide a sane way to configure
+> transitional Virtio devices, I really won't care.  But I believe
+> the interface you are trying to keep is actually the one you are
+> criticizing ("two separate devices pretending to be the same
+> thing, but magically changing their identity at runtime").
 
-commit 48564041a73adbbff52834f9edbe3806fceefab7
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Sun Mar 18 18:26:36 2018 +0100
+Yeah, I guess I should make a distinction between what I would
+do if it was a clean slate, and what we should do given our existing
+practice.
 
-    exec: reintroduce MemoryRegion caching
+If we had a clean slate I would not like to see our current impl
+done.  Given that it already exists, however, we're stuck with
+that forever. So the question is whether implementing any of
+the alternative options is a net benefit for libvirt & mgmt apps
+overall. My gut feeling is that despite the downsides of the
+current impl, it is not worth trying todo something different.
 
-Fam
+The thing that has really tipped my mind this way is that even
+if we provide new device models, mgmt apps will be loathe to
+actually use them because it will prevent live migration of
+those guests to hosts with older libvirt.
+
+So my feeling is we should do the work to enable use of Q35
+by default in mgmt apps, for guest OS where it is known to
+work correctly today. Every other OS should just stick with
+i440fx as we already know that works for them today and Q35
+doesn't offer legacy OS compelling enough benefits to switch.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
