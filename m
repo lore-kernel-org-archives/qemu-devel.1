@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fsQLz-0000Ql-7C
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:27:08 -0400
+	(envelope-from <quintela@redhat.com>) id 1fsQcM-0000YD-Lp
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:44:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fsQLu-0001Ua-61
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:27:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40520 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fsQZm-0002cl-TO
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:41:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37888 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fsQLt-0001U5-WA
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:27:02 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsQZm-0002cI-OB
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:41:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 32AA7814FDCE
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 10:27:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5250E4023476
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 10:41:22 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <2385c734-9bec-e745-4d38-d6dbfa9d3ee0@redhat.com> (Thomas Huth's
+	message of "Wed, 22 Aug 2018 12:34:22 +0200")
 References: <20180822095421.11765-1-quintela@redhat.com>
-	<20180822095421.11765-7-quintela@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fdf970ce-baa2-7b87-7e72-bba34d9c1328@redhat.com>
-Date: Wed, 22 Aug 2018 12:26:56 +0200
+	<20180822095421.11765-9-quintela@redhat.com>
+	<2385c734-9bec-e745-4d38-d6dbfa9d3ee0@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 22 Aug 2018 12:41:14 +0200
+Message-ID: <87va823cqd.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20180822095421.11765-7-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/10] check: Only test ivshm when it is
- compiled in
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 08/10] check: Move VMXNET3 test to common
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +35,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 2018-08-22 11:54, Juan Quintela wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/Makefile.include | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 9a918f7655..116e93cdb6 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -243,8 +243,8 @@ gcov-files-pci-y += hw/display/virtio-gpu-pci.c
->  gcov-files-pci-$(CONFIG_VIRTIO_VGA) += hw/display/virtio-vga.c
->  check-qtest-pci-$(CONFIG_HDA) += tests/intel-hda-test$(EXESUF)
->  gcov-files-pci-$(CONFIG_HDA) += hw/audio/intel-hda.c hw/audio/hda-codec.c
-> -check-qtest-pci-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
-> -gcov-files-pci-y += hw/misc/ivshmem.c
-> +check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) += tests/ivshmem-test$(EXESUF)
-> +gcov-files-pci-$(CONFIG_IVSHMEM_DEVICE) += hw/misc/ivshmem.c
->  check-qtest-pci-y += tests/megasas-test$(EXESUF)
->  gcov-files-pci-y += hw/scsi/megasas.c
->  
-> @@ -358,7 +358,7 @@ check-qtest-ppc64-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
->  check-qtest-ppc64-$(CONFIG_RTL8139_PCI) += tests/test-filter-redirector$(EXESUF)
->  check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
->  check-qtest-ppc64-y += tests/numa-test$(EXESUF)
-> -check-qtest-ppc64-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
-> +check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) += tests/ivshmem-test$(EXESUF)
->  check-qtest-ppc64-y += tests/cpu-plug-test$(EXESUF)
+Thomas Huth <thuth@redhat.com> wrote:
+> On 2018-08-22 11:54, Juan Quintela wrote:
+>> We protect it with CONFIG_VMXNET3_PCI now, so no need to also put it
+>> on i386.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  tests/Makefile.include | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index d524e1bdeb..91ffde3103 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -247,6 +247,8 @@ check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) +=
+>> tests/ivshmem-test$(EXESUF)
+>>  gcov-files-pci-$(CONFIG_IVSHMEM_DEVICE) += hw/misc/ivshmem.c
+>>  check-qtest-pci-y += tests/megasas-test$(EXESUF)
+>>  gcov-files-pci-y += hw/scsi/megasas.c
+>> +check-qtest-$(CONFIG_VMXNET3_PCI) += tests/vmxnet3-test$(EXESUF)
+>> +gcov-files-$(CONFIG_VMXNET3_PCI) += hw/net/vmxnet3.c
+>>  
+>>  check-qtest-i386-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
+>>  check-qtest-i386-y += tests/fdc-test$(EXESUF)
+>> @@ -270,8 +272,6 @@ gcov-files-i386-$(CONFIG_WDT_IB700) +=
+>> hw/watchdog/watchdog.c hw/watchdog/wdt_ib
+>>  check-qtest-i386-y += tests/tco-test$(EXESUF)
+>>  check-qtest-i386-y += $(check-qtest-pci-y)
+>>  gcov-files-i386-y += $(gcov-files-pci-y)
+>> -check-qtest-i386-$(CONFIG_VMXNET3_PCI) += tests/vmxnet3-test$(EXESUF)
+>> -gcov-files-i386-$(CONFIG_VMXNET3_PCI) += hw/net/vmxnet3.c
+>>  gcov-files-i386-y += hw/net/net_rx_pkt.c
+>>  gcov-files-i386-y += hw/net/net_tx_pkt.c
+>>  check-qtest-i386-$(CONFIG_PVPANIC) += tests/pvpanic-test$(EXESUF)
+>
+> It shouldn't matter much ... it's a x86-only device, so we could also
+> keep it there? Or is there an urgent reason to move it?
 
-I guess we could add a line a la:
+I was trying to minimize the amount that are architecture specific.  In
+this particular case it is defined already on i386-softmmu.mak.  So, why
+should we maintain that info in two places?
 
-gcov-files-ppc64-$(CONFIG_IVSHMEM_DEVICE) += hw/misc/ivshmem.c
+Anyways, I had to stop soon this "cleanup" because there are things like
+boot-serial-test that don't work on all the boards that define
+CONFIG_SERIAL :-(
 
-here, too, but since that's a pre-existing problem:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Later, Juan.
