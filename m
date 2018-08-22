@@ -1,23 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fsWMz-0004tk-DM
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:52:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1fsWNp-0005IV-Vw
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:53:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fsWMw-0007Du-83
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:52:33 -0400
-References: <20180822075750.12399-1-david@redhat.com>
-	<20180822075750.12399-2-david@redhat.com>
-	<2a286edc-3d3f-974d-03f6-296031a0b350@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <1448959e-3e59-d183-2de8-d0f129968909@redhat.com>
-Date: Wed, 22 Aug 2018 18:52:27 +0200
+	(envelope-from <berrange@redhat.com>) id 1fsWNm-0007jJ-Ia
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:53:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55150 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fsWNm-0007ix-36
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:53:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B1C8B7A7EA
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 16:53:21 +0000 (UTC)
+Date: Wed, 22 Aug 2018 17:53:12 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180822165312.GV12750@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180822142956.6859-1-marcandre.lureau@redhat.com>
+	<20180822142956.6859-4-marcandre.lureau@redhat.com>
+	<20180822154611.GN12750@redhat.com>
+	<CAMxuvawr-ooy91ZHTHx+aLYhgpH5gBoAKQz_pvF=kcHzadjLog@mail.gmail.com>
+	<4a0122ad-52eb-d241-709b-76038e65a858@redhat.com>
+	<CAMxuvaxEM4DjCq=AKEEg3cTJzoo1PX9N5R6p1_+wvCY=TMtgqQ@mail.gmail.com>
+	<20180822164336.GS12750@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2a286edc-3d3f-974d-03f6-296031a0b350@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/8] s390x/tcg: factor out and fix DATA
- exception injection
+Content-Disposition: inline
+In-Reply-To: <20180822164336.GS12750@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] seccomp: set the seccomp filter to
+ all threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,105 +41,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Paul Moore <pmoore@redhat.com>, Eduardo Otubo <otubo@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 22.08.2018 18:31, Richard Henderson wrote:
-> On 08/22/2018 12:57 AM, David Hildenbrand wrote:
->> The DXC is to be stored in the low core, and only in the FPC in case AFP
->> is enabled in CR0.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/cpu.h         |  1 +
->>  target/s390x/excp_helper.c | 28 ++++++++++++++++++++++++++++
->>  target/s390x/fpu_helper.c  | 13 +++----------
->>  target/s390x/helper.h      |  1 +
->>  target/s390x/tcg_s390x.h   |  2 ++
->>  target/s390x/translate.c   | 19 +++++++++----------
->>  6 files changed, 44 insertions(+), 20 deletions(-)
->>
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 6f8861e554..5e50c3a303 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -322,6 +322,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
->>  #define CR0_LOWPROT             0x0000000010000000ULL
->>  #define CR0_SECONDARY           0x0000000004000000ULL
->>  #define CR0_EDAT                0x0000000000800000ULL
->> +#define CR0_AFP                 0x0000000000040000ULL
->>  #define CR0_EMERGENCY_SIGNAL_SC 0x0000000000004000ULL
->>  #define CR0_EXTERNAL_CALL_SC    0x0000000000002000ULL
->>  #define CR0_CKC_SC              0x0000000000000800ULL
->> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
->> index f0ce60cff2..f5cab94ec5 100644
->> --- a/target/s390x/excp_helper.c
->> +++ b/target/s390x/excp_helper.c
->> @@ -21,11 +21,13 @@
->>  #include "qemu/osdep.h"
->>  #include "cpu.h"
->>  #include "internal.h"
->> +#include "exec/helper-proto.h"
->>  #include "qemu/timer.h"
->>  #include "exec/exec-all.h"
->>  #include "exec/cpu_ldst.h"
->>  #include "hw/s390x/ioinst.h"
->>  #include "exec/address-spaces.h"
->> +#include "tcg_s390x.h"
->>  #ifndef CONFIG_USER_ONLY
->>  #include "sysemu/sysemu.h"
->>  #include "hw/s390x/s390_flic.h"
->> @@ -48,6 +50,32 @@
->>      do { } while (0)
->>  #endif
->>  
->> +void QEMU_NORETURN tcg_s390_data_exception(CPUS390XState *env, uint32_t dxc,
->> +                                           uintptr_t ra)
->> +{
->> +    CPUState *cs = CPU(s390_env_get_cpu(env));
->> +
->> +    g_assert(!(dxc & ~0xff));
->> +#if !defined(CONFIG_USER_ONLY)
->> +    /* Store the DXC into the lowcore */
->> +    stw_phys(cs->as, env->psa + offsetof(LowCore, data_exc_code), dxc);
->> +#endif
->> +
->> +    /* Store the DXC into the FPC if AFP is enabled */
->> +    if (env->cregs[0] & CR0_AFP) {
->> +        env->fpc = (env->fpc & ~0xff00) | (dxc << 8);
->> +    }
->> +    s390_program_interrupt(env, PGM_DATA, ILEN_AUTO, ra);
-> 
-> We should probably export tcg_s390_program_interrupt, so ...
-> 
->> +
->> +    /* the following is not necessary, but allows us to use noreturn */
->> +    cpu_loop_exit_restore(cs, ra);
-> 
-> ... you don't have to do this.
-> But even if not, g_assert_not_reached() is better here.
+On Wed, Aug 22, 2018 at 05:43:36PM +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Aug 22, 2018 at 06:19:16PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >=20
+> > On Wed, Aug 22, 2018 at 6:07 PM, Eric Blake <eblake@redhat.com> wrote=
+:
+> > > On 08/22/2018 10:58 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > >
+> > >>> At this point you might as well not bother using seccomp at all. =
+The
+> > >>> thread that is confined merely needs to scribble something into t=
+he
+> > >>> stack of the unconfined thread and now it can do whatever it want=
+s.
+> > >>
+> > >>
+> > >> Actually, that message is incorrect, it should rather be "not all
+> > >> threads will be filtered" (as described in commit message).
+> > >>
+> > >>> IMHO we need to find a way to get the policy to apply to those ot=
+her
+> > >>> threads.
+> > >>
+> > >>
+> > >> That's what the patch is about ;)
+> > >
+> > >
+> > > In other words, this patch is patching the gaping security hole tha=
+t already
+> > > exists, but...
+> > >
+> > >>>> +++ b/qemu-options.hx
+> > >>>> @@ -3864,6 +3864,8 @@ Disable set*uid|gid system calls
+> > >>>>   Disable *fork and execve
+> > >>>>   @item resourcecontrol=3D@var{string}
+> > >>>>   Disable process affinity and schedular priority
+> > >>>> +@item tsync=3D@var{bool}
+> > >>>> +Apply seccomp filter to all threads (default is auto, and will =
+warn if
+> > >>>> fail)
+> > >>>
+> > >>>
+> > >>> IMHO this should never exist, as setting "tsync" to anything othe=
+r
+> > >>> than "yes", is akin to just running without any sandbox.
+> > >>
+> > >>
+> > >> Then we should just fail -sandbox on those systems.
+> > >
+> > >
+> > > ...leaving the backdoor open.  Yes, we should instead fix things to=
+ hard
+> > > fail when -sandbox cannot fully protect the process, rather than ad=
+ding a
+> > > tsync=3Doff backdoor to permit execution in spite of the insecurity=
+.
+> >=20
+> > Ok, -sandbox will now require libseccomp 2.2.0 (not available in
+> > Debian oldstable - so it will fail at configure time) and kernel >=3D
+> > 3.17 (error during start). If that sounds ok, I'll update the series.
+>=20
+> Hmm, that will cause seccomp to be unusable for RHEL-7, prior to
+> the 7.5 kernel, which has complications wrt libvirt using -sandbox
+> by default.
 
-If that also works, fine.
+None the less, lets just do what you propose here.
 
-> 
-> I'll note that s390_program_interrupt is buggy for tcg, in that it logs
-> env->psw.addr before cpu_loop_restore, and therefore psw.addr is essentially
-> random data.
+Distros without kernel support should explicitly disable seccomp in QEMU
+at build time, then libvirt will "do the right thing".
 
-Indeed, for that it works fairly reliably.
-
-I'll send a fix with the next version.
-
-Thanks!
-
-> 
-> 
-> r~
-> 
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
