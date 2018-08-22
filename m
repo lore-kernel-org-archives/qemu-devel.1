@@ -1,29 +1,22 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:51055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fsQwW-0004ru-VQ
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:04:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fsQwb-0004ru-6N
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:04:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fsQkR-0003NA-Ou
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:52:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38138 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fsQkR-0003LA-Am
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:52:23 -0400
-Date: Wed, 22 Aug 2018 11:52:16 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180822105216.GG12750@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
-	<20180817092936.GC11124@redhat.com>
-	<e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
-	<39b3c8b8-25eb-3a8e-3a5a-abd584a11e2c@laine.org>
-	<f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fsQjX-0001oK-2t
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 06:51:27 -0400
+References: <20180817190457.8292-1-jsnow@redhat.com>
+	<20180817190457.8292-2-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <fd070439-3f9f-7c86-0466-49cd7aeab942@redhat.com>
+Date: Wed, 22 Aug 2018 12:51:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
- for guest OSes that don't support virtio-1.0
+In-Reply-To: <20180817190457.8292-2-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="USRdzgZAApObZdI4KLXjx4JKMphHujH7D"
+Subject: Re: [Qemu-devel] [PATCH 1/7] jobs: change start callback to run
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Laine Stump <laine@laine.org>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
 
-On Wed, Aug 22, 2018 at 12:36:27PM +0200, Andrea Bolognani wrote:
-> On Tue, 2018-08-21 at 14:21 -0400, Laine Stump wrote:
-> > On 08/17/2018 06:35 AM, Andrea Bolognani wrote:
-> > > If we decide we want to explicitly spell out the options instead
-> > > of relying on QEMU changing behavior based on the slot type, which
-> > > is probably a good idea anyway, I think we should have
-> > > 
-> > >   virtio-0.9 => disable-legacy=no,disable-modern=no
-> > >   virtio-1.0 => disable-legacy=yes,disable-modern=no
-> > > 
-> > > There's basically no reason to have a device legacy-only rather
-> > > than transitional, and spelling out both options instead of only
-> > > one of them just seems more robust.
-> > 
-> > I agree with both of those, but the counter-argument is that "virtio"
-> > already describes a transitional device like your proposal for
-> > virtio-0.9 (at least today), and it makes the versioned models less
-> > orthogonal. In the end, I could go either way...
-> 
-> Yeah, Dan already made that argument and convinced me that we
-> should use virtio-0.9 for legacy only, virtio-1.0 for modern only
-> and plain virtio for no enforced behavior / transitional.
-> 
-> > The problem I can see with the virtio-1.0 model name is that if
-> > management applications start putting that into their XML (even though
-> > "virtio" would yield a working guest), the guests will be unable to
-> > migrate to another machine that has the same version of qemu, but an
-> > older libvirt that doesn't understand the virtio-1.0 model number. If
-> > that's acceptable, then management apps can being always specifying the
-> > version for virtio whether it's old or new. If not, then they should
-> > continue to use plain "virtio" unless they specifically need to force
-> > virtio-0.9.
-> 
-> Well, even using virtio-0.9 could be considered problematic,
-> because at least from the QEMU point of view there's nothing
-> preventing the guest from working correctly as long as the version
-> is recent enough that disable-legacy/disable-modern are available.
-> 
-> AFAIK management applications such as oVirt and OpenStack usually
-> require specific, reasonably recent versions of QEMU and libvirt,
-> so they could make sure virtio-0.9 and virtio-1.0 are understood
-> by all nodes in the cluster that way.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--USRdzgZAApObZdI4KLXjx4JKMphHujH7D
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
+Message-ID: <fd070439-3f9f-7c86-0466-49cd7aeab942@redhat.com>
+Subject: Re: [PATCH 1/7] jobs: change start callback to run callback
+References: <20180817190457.8292-1-jsnow@redhat.com>
+ <20180817190457.8292-2-jsnow@redhat.com>
+In-Reply-To: <20180817190457.8292-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Of course this is not a new scenario - any time an app makes use of a new
-feature exposed in libvirt there's a chance that guests using that feature
-will not be migratable to older libvirt. The apps and/or administrators
-deploying them, have to decide on the cost/benefit tradeoff.
+On 2018-08-17 21:04, John Snow wrote:
+> Presently we codify the entry point for a job as the "start" callback,
+> but a more apt name would be "run" to clarify the idea that when this
+> function returns we consider the job to have "finished," except for
+> any cleanup which occurs in separate callbacks later.
+>=20
+> As part of this clarification, change the signature to include an error=
 
-I think this will have an impact on ability of apps to adopt use of the
-virtio-0.9/1.0 device model variants though. Both oVirt and OpenStack
-do care about live migration to older versions, at least at certain
-periods in time. For example, during a live upgrade scenario, 
+> object and a return code. The error ptr is not yet used, and the return=
 
-This dovetails into Laine querying about the domain capabilities not
-currently reporting info on the available device models. In the case
-that migration to older verisons is needed, the dom capabilities info
-won't be looked at anyway, as they don't wish to blindly use a feature
-that just happens to exist in the current version.
+> code while captured, will be overwritten by actions in the job_complete=
+d
+> function.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/backup.c            |  7 ++++---
+>  block/commit.c            |  7 ++++---
+>  block/create.c            |  8 +++++---
+>  block/mirror.c            | 10 ++++++----
+>  block/stream.c            |  7 ++++---
+>  include/qemu/job.h        |  2 +-
+>  job.c                     |  6 +++---
+>  tests/test-bdrv-drain.c   |  7 ++++---
+>  tests/test-blockjob-txn.c | 16 ++++++++--------
+>  tests/test-blockjob.c     |  7 ++++---
+>  10 files changed, 43 insertions(+), 34 deletions(-)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+[...]
+
+> diff --git a/job.c b/job.c
+> index fa671b431a..898260b2b3 100644
+> --- a/job.c
+> +++ b/job.c
+> @@ -544,16 +544,16 @@ static void coroutine_fn job_co_entry(void *opaqu=
+e)
+>  {
+>      Job *job =3D opaque;
+> =20
+> -    assert(job && job->driver && job->driver->start);
+> +    assert(job && job->driver && job->driver->run);
+>      job_pause_point(job);
+> -    job->driver->start(job);
+> +    job->ret =3D job->driver->run(job, NULL);
+>  }
+
+Hmmm, this breaks the iff relationship with job->error.  We might call
+job_update_rc() afterwards, but then job_completed() would need to free
+it if it overwrites it with the error description from a potential error
+object.
+
+Also, I suspect the following patches might fix the relationship anyway?
+ (But then an "XXX: This does not hold right now, but will be fixed in a
+future patch" in the documentation of Job.error might help.)
+
+Max
+
+
+--USRdzgZAApObZdI4KLXjx4JKMphHujH7D
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt9QB4ACgkQ9AfbAGHV
+z0BdRQf/b8b25ZKl86iwAWq/15fBwV8zP5Qj7iLSv5AAp2Mek0CsAFmBIELhPHiY
+H9LCJZD83FChc4Mba5PiSKROoRUND+wA5QXnth2aUkQH1+LsoLRiuFeqU1D0KNyb
+eQQBsng+1MJsxkMFlN26jt3bjkhRo/XypeycY3xY2QVcJ2ApFRqdhTwue4BMENZa
+5RMrua6etpCihGRzLGWJRNxlksMTo0wTvjwVc1IZI3rtzUJS9YVd5x+i4Zc+d3v1
+D4J1v+CbHGmAnrErtIudiG0cq17mDjfadDV4BQJChFjvWHB3YQIH1MlnkXMIVjza
+1tmi1AuXx7jXLscpY9u+xDXOAuLI6Q==
+=vgEx
+-----END PGP SIGNATURE-----
+
+--USRdzgZAApObZdI4KLXjx4JKMphHujH7D--
