@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fsHie-0004jr-7p
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:14:01 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fsHjV-0005k9-C9
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:14:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fsHbi-0004Bx-A0
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:06:49 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:52991)
+	(envelope-from <laurent@vivier.eu>) id 1fsHjP-0001eU-Br
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:14:49 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:42769)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fsHbi-00047p-0f
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:06:46 -0400
-References: <20180818190118.12911-1-richard.henderson@linaro.org>
-	<20180818190118.12911-9-richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fsHjN-0001ai-St
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:14:42 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <f0aea4d7-54e7-cc8f-898f-b5a3fd8165e1@vivier.eu>
-Date: Wed, 22 Aug 2018 03:06:41 +0200
+Date: Wed, 22 Aug 2018 03:14:12 +0200
+Message-Id: <20180822011417.11608-3-laurent@vivier.eu>
+In-Reply-To: <20180822011417.11608-1-laurent@vivier.eu>
+References: <20180822011417.11608-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20180818190118.12911-9-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 08/16] configure: Use
- -Wunused-const-variable
+Subject: [Qemu-devel] [PULL 2/7] linux-user: Split out do_syscall1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +26,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>
 
-Le 18/08/2018 à 21:01, Richard Henderson a écrit :
-> For the linux-user syscall split, we have static const structs
-> that must be matched up with a switch statement that uses them.
-> By default, gcc will not warn for such a variable, but silently
-> remove them.
-> 
-> For C++, such objects are sometimes declared for their constructor
-> side effects.  Do not propagate this flag into QEM_CXXFLAGS.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  configure | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index db97930314..86e6e18428 100755
-> --- a/configure
-> +++ b/configure
-> @@ -105,7 +105,8 @@ update_cxxflags() {
->      for arg in $QEMU_CFLAGS; do
->          case $arg in
->              -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
-> -            -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls)
-> +            -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls|\
-> +            -Wunused-const-variable)
->                  ;;
->              *)
->                  QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
-> @@ -1780,6 +1781,7 @@ gcc_flags="-Wendif-labels -Wno-shift-negative-value $gcc_flags"
->  gcc_flags="-Wno-initializer-overrides -Wexpansion-to-defined $gcc_flags"
->  gcc_flags="-Wno-string-plus-int $gcc_flags"
->  gcc_flags="-Wno-error=address-of-packed-member $gcc_flags"
-> +gcc_flags="-Wunused-const-variable $gcc_flags"
->  # Note that we do not add -Werror to gcc_flags here, because that would
->  # enable it for all configure tests. If a configure test failed due
->  # to -Werror this would just silently disable some features,
-> 
+From: Richard Henderson <richard.henderson@linaro.org>
 
-This breaks build of hw/misc/macio/gpio.o:
+There was supposed to be a single point of return for do_syscall
+so that tracing works properly.  However, there are a few bugs
+in that area.  It is significantly simpler to simply split out
+an inner function to enforce this.
 
-In file included from include/hw/misc/macio/macio.h:33,
-                 from hw/misc/macio/gpio.c:29:
-hw/misc/macio/pmu.h:129:21: error: 'pmu_data_len' defined but not used
-[-Werror=unused-const-variable=]
- static const int8_t pmu_data_len[256][2] = {
-                     ^~~~~~~~~~~~
-In file included from include/hw/misc/macio/macio.h:33,
-                 from hw/misc/macio/macio.c:33:
-include/hw/misc/macio/pmu.h:129:21: error: 'pmu_data_len' defined but
-not used [-Werror=unused-const-variable=]
- static const int8_t pmu_data_len[256][2] = {
-                     ^~~~~~~~~~~~
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180818190118.12911-3-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 77 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 48 insertions(+), 29 deletions(-)
 
-This can be fixed by moving pmu_data_len array from pmu.h to pmu.c as it
-is the only user.
-
-Thanks,
-Laurent
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 2e45f854f7..f651024357 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -8092,13 +8092,15 @@ static int host_to_target_cpu_mask(const unsigned long *host_mask,
+     return 0;
+ }
+ 
+-/* do_syscall() should always have a single exit point at the end so
+-   that actions, such as logging of syscall results, can be performed.
+-   All errnos that do_syscall() returns must be -TARGET_<errcode>. */
+-abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+-                    abi_long arg2, abi_long arg3, abi_long arg4,
+-                    abi_long arg5, abi_long arg6, abi_long arg7,
+-                    abi_long arg8)
++/* This is an internal helper for do_syscall so that it is easier
++ * to have a single return point, so that actions, such as logging
++ * of syscall results, can be performed.
++ * All errnos that do_syscall() returns must be -TARGET_<errcode>.
++ */
++static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
++                            abi_long arg2, abi_long arg3, abi_long arg4,
++                            abi_long arg5, abi_long arg6, abi_long arg7,
++                            abi_long arg8)
+ {
+     CPUState *cpu = ENV_GET_CPU(cpu_env);
+     abi_long ret;
+@@ -8113,25 +8115,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+ #endif
+     void *p;
+ 
+-#if defined(DEBUG_ERESTARTSYS)
+-    /* Debug-only code for exercising the syscall-restart code paths
+-     * in the per-architecture cpu main loops: restart every syscall
+-     * the guest makes once before letting it through.
+-     */
+-    {
+-        static int flag;
+-
+-        flag = !flag;
+-        if (flag) {
+-            return -TARGET_ERESTARTSYS;
+-        }
+-    }
+-#endif
+-
+-    trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+-    if(do_strace)
+-        print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+-
+     switch(num) {
+     case TARGET_NR_exit:
+         /* In old applications this may be used to implement _exit(2).
+@@ -12942,11 +12925,47 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         break;
+     }
+ fail:
+-    if(do_strace)
+-        print_syscall_ret(num, ret);
+-    trace_guest_user_syscall_ret(cpu, num, ret);
+     return ret;
+ efault:
+     ret = -TARGET_EFAULT;
+     goto fail;
+ }
++
++abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
++                    abi_long arg2, abi_long arg3, abi_long arg4,
++                    abi_long arg5, abi_long arg6, abi_long arg7,
++                    abi_long arg8)
++{
++    CPUState *cpu = ENV_GET_CPU(cpu_env);
++    abi_long ret;
++
++#ifdef DEBUG_ERESTARTSYS
++    /* Debug-only code for exercising the syscall-restart code paths
++     * in the per-architecture cpu main loops: restart every syscall
++     * the guest makes once before letting it through.
++     */
++    {
++        static bool flag;
++        flag = !flag;
++        if (flag) {
++            return -TARGET_ERESTARTSYS;
++        }
++    }
++#endif
++
++    trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4,
++                             arg5, arg6, arg7, arg8);
++
++    if (unlikely(do_strace)) {
++        print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
++        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
++                          arg5, arg6, arg7, arg8);
++        print_syscall_ret(num, ret);
++    } else {
++        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
++                          arg5, arg6, arg7, arg8);
++    }
++
++    trace_guest_user_syscall_ret(cpu, num, ret);
++    return ret;
++}
+-- 
+2.17.1
