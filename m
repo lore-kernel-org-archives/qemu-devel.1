@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fsZ1n-000820-CB
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 15:42:54 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fsawF-0007cm-Ep
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 17:45:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fsYrj-0003KH-FW
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 15:32:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41348 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fsYrj-0003J7-83
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 15:32:27 -0400
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Wed, 22 Aug 2018 13:32:24 -0600
-Message-ID: <153496608036.29987.17320139395542439335.stgit@gimli.home>
+	(envelope-from <jsnow@redhat.com>) id 1fsawE-0006xm-Mc
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 17:45:15 -0400
+References: <20180817190457.8292-1-jsnow@redhat.com>
+	<20180817190457.8292-4-jsnow@redhat.com>
+	<7c836fb4-c6f4-b590-11ef-6aadb8bc169a@redhat.com>
+	<bd4dc120-2fb2-fc4d-c11f-d79631eb7c16@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d6c3b676-2fa2-f4e3-439a-93785827579f@redhat.com>
+Date: Wed, 22 Aug 2018 17:45:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <bd4dc120-2fb2-fc4d-c11f-d79631eb7c16@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] postcopy: Synchronize usage of the balloon
- inhibitor
+Subject: Re: [Qemu-devel] [PATCH 3/7] jobs: add exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, dgilbert@redhat.com, borntraeger@de.ibm.com, peter.maydell@linaro.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com
 
-While the qemu_balloon_inhibit() interface appears rather general purpose,
-postcopy uses it in a last-caller-wins approach with no guarantee of balanced
-inhibits and de-inhibits.  Wrap postcopy's usage of the inhibitor to give it
-one vote overall, using the same last-caller-wins approach as previously
-implemented at the balloon level.
 
-Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Fixes: 01ccbec7bdf6 ("balloon: Allow multiple inhibit users")
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
 
-Note that checkpatch.pl doesn't appreciate the initialization of the
-static variable to false, imo it improves the readability of the code
-in this instance, so I've left it.  Shout if you disagree.
+On 08/22/2018 07:52 AM, Max Reitz wrote:
+> On 2018-08-22 13:43, Max Reitz wrote:
+> 
+> [...]
+> 
+>> I'd like .main_loop_settle().  Or .main_loop_post_run().  I think it's
+>> OK to have names that aren't as cool and tense as possible, when in
+>> return they actually tell you what they're doing.  (Sure,
+>> .main_loop_post_run() sounds really stupid, but it tells you exactly
+>> when the function is called and what it's for.)
+> 
+> Looking at the next patch, I realized that .main_loop_complete() or
+> .complete_in_main_loop() would work just as well.  (No, I don't see any
+> confusion with whether you need to call job_completed(), especially
+> since after this series you can probably make that function static to
+> job.c.)
+> 
+> Max
+> 
 
-If this gets acks I can include it with a pull request for a couple
-other fixes to the original series.  Thanks
-
- migration/postcopy-ram.c |   18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 932f18894990..c2e387ed44b4 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -509,6 +509,20 @@ int postcopy_ram_incoming_init(MigrationIncomingState *mis)
-     return 0;
- }
- 
-+/*
-+ * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
-+ * last caller wins.
-+ */
-+static void postcopy_balloon_inhibit(bool state)
-+{
-+    static bool cur_state = false;
-+
-+    if (state != cur_state) {
-+        qemu_balloon_inhibit(state);
-+        cur_state = state;
-+    }
-+}
-+
- /*
-  * At the end of a migration where postcopy_ram_incoming_init was called.
-  */
-@@ -539,7 +553,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
-         mis->have_fault_thread = false;
-     }
- 
--    qemu_balloon_inhibit(false);
-+    postcopy_balloon_inhibit(false);
- 
-     if (enable_mlock) {
-         if (os_mlock() < 0) {
-@@ -1107,7 +1121,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-      * Ballooning can mark pages as absent while we're postcopying
-      * that would cause false userfaults.
-      */
--    qemu_balloon_inhibit(true);
-+    postcopy_balloon_inhibit(true);
- 
-     trace_postcopy_ram_enable_notify();
- 
+I'm sorry to announce that after the part two of this series, the
+callback will be erased completely, so the name is maybe less... important.
