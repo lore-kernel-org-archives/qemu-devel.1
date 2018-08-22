@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fsXoZ-0000Wa-E9
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 14:25:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1fsXqB-0002dS-OR
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 14:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fsXc0-0006BE-4u
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 14:12:11 -0400
-Date: Wed, 22 Aug 2018 15:12:02 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180822181202.GD3778@localhost.localdomain>
-References: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fsXq7-0003Ib-5R
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 14:26:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58150 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fsXq6-0003Hy-RA
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 14:26:42 -0400
+References: <20180822180259.26365-1-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <82e691b4-c2fe-5b68-91d8-ab2dd90ce691@redhat.com>
+Date: Wed, 22 Aug 2018 13:26:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: revert back to 1 SRAT entry for
- hotpluggable area
+In-Reply-To: <20180822180259.26365-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] RFC: chardev: mark the calls that allow an
+ implicit mux monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,148 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, haozhong.zhang@intel.com, mst@redhat.com, qemu-stable@nongnu.org, lersek@redhat.com, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Ji, John" <john.ji@intel.com>, "Lai, Paul C" <paul.c.lai@intel.com>, "Zhang, Yu C" <yu.c.zhang@intel.com>, "Zhang, Yi Z" <yi.z.zhang@intel.com>, "Tian, Jun J" <jun.j.tian@intel.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Anthony Perard <anthony.perard@citrix.com>
 
+On 08/22/2018 01:02 PM, Marc-Andr=C3=A9 Lureau wrote:
+> This is mostly for readability of the code. Let's make it clear which
+> callers can create an implicit monitor when the chardev is muxed.
+>=20
+> This will also enforce a safer behaviour, as we don't really support
+> creating monitor anywhere/anytime at the moment.
+>=20
+> There are documented cases, such as: -serial/-parallel/-virtioconsole
+> and to less extent -debugcon.
+>=20
+> Less obvious and questionnable ones are -gdb and Xen console. Add a
 
-CCing NVDIMM maintainer, and Intel people who may be able to
-help.
+s/questionnable/questionable/
 
-Summary: SRAT changes added for NVDIMM break memory hotplug on
-Windows, and our best option right now is to revert the changes.
-
-
-On Wed, Aug 22, 2018 at 11:46:44AM +0200, Igor Mammedov wrote:
-> Commit
->   10efd7e108 "pc: acpi: fix memory hotplug regression by reducing stub SRAT entry size"
-> attemped to fix hotplug regression introduced by
->   848a1cc1e "hw/acpi-build: build SRAT memory affinity structures for DIMM devices"
-> 
-> fixed issue for Windows/3.0+ linux kernels, however it regressed 2.6 based
-> kernels (RHEL6) to the point where guest might crash at boot.
-> Reason is that 2.6 kernel discards SRAT table due too small last entry
-> which down the road leads to crashes. Hack I've tried in 10efd7e108 is also
-> not ACPI spec compliant according to which whole possible RAM should be
-> described in SRAT. Revert 10efd7e108 to fix regression for 2.6 based kernels.
-> 
-> With 10efd7e108 reverted, I've also tried splitting SRAT table statically
-> in different ways %/node and %/slot but Windows still fails to online
-> 2nd pc-dimm hot-plugged into node 0 (as described in 10efd7e108) and
-> sometimes even coldplugged pc-dimms where affected with static SRAT
-> partitioning.
-> The only known so far way where Windows stays happy is when we have 1
-> SRAT entry in the last node covering all hotplug area.
-> 
-> Revert 848a1cc1e until we come up with a way to avoid regression
-> on Windows with hotplug area split in several entries.
-> Tested this with 2.6/3.0 based kernels (RHEL6/7) and WS20[08/12/12R2/16]).
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> FIXME note for those, but keep the support for now.
+>=20
+> Other qemu_chr_new() callers either have a fixed parameter/filename
+> string, or do preliminary checks on the string (such as slirp), or do
+> not need it, such as -qtest.
+>=20
+> On a related note, the list of monitor creation places:
+>=20
+> - the chardev creators listed above: all from command line (except
+>    perhaps Xen console?)
+>=20
+> - -gdb & hmp gdbserver will create a "GDB monitor command" chardev
+>    that is wired to an HMP monitor.
+>=20
+> - -mon command line option
+>=20
+>>From this short study, I would like to think that a monitor may only
+> be created in the main thread today, though I remain skeptical :)
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
-> CC: haozhong.zhang@intel.com
-> CC: mst@redhat.com
-> CC: qemu-stable@nongnu.org
-> CC: ehabkost@redhat.com
-> CC: lersek@redhat.com
-> ---
->  hw/i386/acpi-build.c | 73 +++++++++-------------------------------------------
->  1 file changed, 12 insertions(+), 61 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index e1ee8ae..1599caa 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2251,64 +2251,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->  #define HOLE_640K_START  (640 * KiB)
->  #define HOLE_640K_END   (1 * MiB)
->  
-> -static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-> -                                           uint64_t len, int default_node)
-> -{
-> -    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
-> -    MemoryDeviceInfoList *info;
-> -    MemoryDeviceInfo *mi;
-> -    PCDIMMDeviceInfo *di;
-> -    uint64_t end = base + len, cur, size;
-> -    bool is_nvdimm;
-> -    AcpiSratMemoryAffinity *numamem;
-> -    MemoryAffinityFlags flags;
-> -
-> -    for (cur = base, info = info_list;
-> -         cur < end;
-> -         cur += size, info = info->next) {
-> -        numamem = acpi_data_push(table_data, sizeof *numamem);
-> -
-> -        if (!info) {
-> -            /*
-> -             * Entry is required for Windows to enable memory hotplug in OS
-> -             * and for Linux to enable SWIOTLB when booted with less than
-> -             * 4G of RAM. Windows works better if the entry sets proximity
-> -             * to the highest NUMA node in the machine at the end of the
-> -             * reserved space.
-> -             * Memory devices may override proximity set by this entry,
-> -             * providing _PXM method if necessary.
-> -             */
-> -            build_srat_memory(numamem, end - 1, 1, default_node,
-> -                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> -            break;
-> -        }
-> -
-> -        mi = info->value;
-> -        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-> -        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
-> -
-> -        if (cur < di->addr) {
-> -            build_srat_memory(numamem, cur, di->addr - cur, default_node,
-> -                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> -            numamem = acpi_data_push(table_data, sizeof *numamem);
-> -        }
-> -
-> -        size = di->size;
-> -
-> -        flags = MEM_AFFINITY_ENABLED;
-> -        if (di->hotpluggable) {
-> -            flags |= MEM_AFFINITY_HOTPLUGGABLE;
-> -        }
-> -        if (is_nvdimm) {
-> -            flags |= MEM_AFFINITY_NON_VOLATILE;
-> -        }
-> -
-> -        build_srat_memory(numamem, di->addr, size, di->node, flags);
-> -    }
-> -
-> -    qapi_free_MemoryDeviceInfoList(info_list);
-> -}
-> -
->  static void
->  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->  {
-> @@ -2414,10 +2356,19 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->          build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
->      }
->  
-> +    /*
-> +     * Entry is required for Windows to enable memory hotplug in OS
-> +     * and for Linux to enable SWIOTLB when booted with less than
-> +     * 4G of RAM. Windows works better if the entry sets proximity
-> +     * to the highest NUMA node in the machine.
-> +     * Memory devices may override proximity set by this entry,
-> +     * providing _PXM method if necessary.
-> +     */
->      if (hotplugabble_address_space_size) {
-> -        build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
-> -                                       hotplugabble_address_space_size,
-> -                                       pcms->numa_nodes - 1);
-> +        numamem = acpi_data_push(table_data, sizeof *numamem);
-> +        build_srat_memory(numamem, machine->device_memory->base,
-> +                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
-> +                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
->      }
->  
->      build_header(linker, table_data,
-> -- 
-> 2.7.4
-> 
+>   include/chardev/char.h | 18 +++++++++++++++++-
+>   chardev/char.c         | 21 +++++++++++++++++----
+>   gdbstub.c              |  6 +++++-
+>   hw/char/xen_console.c  |  5 ++++-
+>   vl.c                   |  8 ++++----
+>   5 files changed, 47 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/include/chardev/char.h b/include/chardev/char.h
+> index 6f0576e214..be2b9b817e 100644
+> --- a/include/chardev/char.h
+> +++ b/include/chardev/char.h
+> @@ -105,6 +105,7 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
+>    * @qemu_chr_new:
+>    *
+>    * Create a new character backend from a URI.
+> + * Do not implicitely initialize a monitor if the chardev is muxed.
 
--- 
-Eduardo
+s/implicitely/implicitly/
+
+>    *
+>    * @label the name of the backend
+>    * @filename the URI
+> @@ -113,6 +114,19 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts=
+,
+>    */
+>   Chardev *qemu_chr_new(const char *label, const char *filename);
+>  =20
+> +/**
+> + * @qemu_chr_new_mux_mon:
+> + *
+> + * Create a new character backend from a URI.
+> + * Implicitely initialize a monitor if the chardev is muxed.
+
+and again
+
+> +++ b/gdbstub.c
+> @@ -2038,7 +2038,11 @@ int gdbserver_start(const char *device)
+>               sigaction(SIGINT, &act, NULL);
+>           }
+>   #endif
+> -        chr =3D qemu_chr_new_noreplay("gdb", device);
+> +        /*
+> +         * FIXME: it's a bit weird to allow using a mux chardev here
+> +         * and setup implicitely a monitor. We may want to break this.
+
+s/setup implicitely/implicitly set up/
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
