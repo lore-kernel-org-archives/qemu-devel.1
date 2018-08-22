@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fsUZe-0000i6-3T
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1fsUe5-0002Np-G1
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:02:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fsUZa-0004uv-QD
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46696 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fsUe2-0007oL-8p
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:02:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51812 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fsUZa-0004uh-Iz
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:57:26 -0400
-Date: Wed, 22 Aug 2018 15:57:20 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fsUe1-0007nj-W9
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:02:02 -0400
+Date: Wed, 22 Aug 2018 16:01:55 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180822145720.GL12750@redhat.com>
+Message-ID: <20180822150155.GM12750@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
 	<20180817092936.GC11124@redhat.com>
@@ -22,11 +22,11 @@ References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
 	<20180822122601.GI12750@redhat.com>
 	<20180822125455.GP18995@localhost.localdomain>
 	<20180822134440.GK12750@redhat.com>
-	<20180822141828.GQ18995@localhost.localdomain>
+	<cb831d07-a3f2-9c6a-dbd4-a727c8f13e4f@laine.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180822141828.GQ18995@localhost.localdomain>
+In-Reply-To: <cb831d07-a3f2-9c6a-dbd4-a727c8f13e4f@laine.org>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
  for guest OSes that don't support virtio-1.0
@@ -38,182 +38,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Andrea Bolognani <abologna@redhat.com>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>, Laine Stump <laine@laine.org>
+To: Laine Stump <laine@laine.org>
+Cc: Libvirt <libvir-list@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Andrea Bolognani <abologna@redhat.com>, qemu list <qemu-devel@nongnu.org>
 
-On Wed, Aug 22, 2018 at 11:18:28AM -0300, Eduardo Habkost wrote:
-> On Wed, Aug 22, 2018 at 02:44:40PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Wed, Aug 22, 2018 at 09:54:55AM -0300, Eduardo Habkost wrote:
-> > > On Wed, Aug 22, 2018 at 01:26:01PM +0100, Daniel P. Berrang=C3=A9 w=
-rote:
-> > > > On Wed, Aug 22, 2018 at 09:01:35AM -0300, Eduardo Habkost wrote:
-> > > > > On Wed, Aug 22, 2018 at 12:36:27PM +0200, Andrea Bolognani wrot=
-e:
-> > > > > > On Tue, 2018-08-21 at 14:21 -0400, Laine Stump wrote:
-> > > > > > > On 08/17/2018 06:35 AM, Andrea Bolognani wrote:
-> > > > > > > > If we decide we want to explicitly spell out the options =
-instead
-> > > > > > > > of relying on QEMU changing behavior based on the slot ty=
-pe, which
-> > > > > > > > is probably a good idea anyway, I think we should have
-> > > > > > > >=20
-> > > > > > > >   virtio-0.9 =3D> disable-legacy=3Dno,disable-modern=3Dno
-> > > > > > > >   virtio-1.0 =3D> disable-legacy=3Dyes,disable-modern=3Dn=
-o
-> > > > > > > >=20
-> > > > > > > > There's basically no reason to have a device legacy-only =
-rather
-> > > > > > > > than transitional, and spelling out both options instead =
-of only
-> > > > > > > > one of them just seems more robust.
-> > > > > > >=20
-> > > > > > > I agree with both of those, but the counter-argument is tha=
-t "virtio"
-> > > > > > > already describes a transitional device like your proposal =
-for
-> > > > > > > virtio-0.9 (at least today), and it makes the versioned mod=
-els less
-> > > > > > > orthogonal. In the end, I could go either way...
-> > > > > >=20
-> > > > > > Yeah, Dan already made that argument and convinced me that we
-> > > > > > should use virtio-0.9 for legacy only, virtio-1.0 for modern =
-only
-> > > > > > and plain virtio for no enforced behavior / transitional.
-> > > > >=20
-> > > > > I don't understand why we are optimizing the new system for the
-> > > > > less useful use cases:
-> > > > >=20
-> > > > > I don't see a use case where virtio-0.9 (legacy-only) would be
-> > > > > more useful than virtio-transitional.  I don't see why anybody
-> > > > > would prefer a legacy-only device instead of a transitional
-> > > > > device.  Even if your guest has only legacy drivers, it might b=
-e
-> > > > > upgraded and get new drivers in the future.
-> > > > >=20
-> > > > > I don't see a use case where virtio-1.0 (modern-only) would be
-> > > > > more useful than "virtio".  If you are running i440fx, you get =
-a
-> > > > > transitional device with "virtio", and I don't see why anybody
-> > > > > would prefer a modern-only device.  If you are running Q35, you
-> > > > > already get a modern-only device with "virtio".
-> > > > >=20
-> > > > > The most useful feature users need is the ability to ask for a
-> > > > > transitional virtio device on Q35, and this use case is
-> > > > > explicitly being left out of the proposal.  Why?
-> > > >=20
-> > > > You can already get a transitional device on Q35, albeit with man=
-ual
-> > > > placement. Adding flags for magic placement for the existing devi=
-ces
-> > > > is not something that is suitable for the XML. The ability to get
-> > > > legacy-only, or modern-only doesn't exist today in any way, so th=
-at
-> > > > would be a valid new feature.
-> > >=20
-> > > Transitional devices and modern-only devices are different kinds
-> > > of devices.  Making the guest see a different type of device
-> > > depending on where it's plugged is why we got into this mess, why
-> > > would we recommend applications to rely on this behavior?
-> > >=20
-> > > That's why I like your virtio-0.9/virtio-1.0 proposal.  I just
-> > > don't see why you think virtio-transitional should be out of it.
-> >=20
-> > An explicit virtio-transitional device is still two separate
-> > devices pretending to be the same thing, but magically changing
-> > their identity at runtime. We've already got that situation with
-> > existing device models, and I'm loathe to see us add 2nd device
-> > model with that same behaviour, just for sake of having a slightly
-> > different PCI bus placement strategy to support outdated guest OS.
->=20
-> Your seem to be describing what the current "virtio" device is:
-> it becomes a non-transitional (modern-only) Virtio device on some
-> cases, and becomes a transitional Virtio device on other cases.
-> It is two devices pretending to be the same thing.  That's
-> exactly what I would like applications to get rid of.
->=20
-> Now, the above is really not an accurate description of
-> transitional Virtio devices.  A transitional Virtio device is
-> something clearly specified in the Virtio spec, and it just means
-> a device that supports two types of drivers.  It's not different
-> from a x86_64 CPU that can run 32-bit OSes.
->=20
-> See:
-> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.htm=
-l#x1-60001
-> http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.htm=
-l#x1-3090004
-
-When I say a device pretending to be 2 different devices, I'm
-generally referring to the fact that a single QEMU device model
-can expose two different PCI device IDs depending on how it is
-configured and/or placed.
-
-> > > > Honestly though, the longer this discussion goes on, the more I t=
-hink
-> > > > the answer is just "do nothing". All this time spent on discussio=
-n,
-> > > > and future time spent on implementing new logic in apps, is merel=
-y
-> > > > to support running RHEL-6 on Q35.  I think we should just say tha=
-t
-> > > > RHEL-6 should use i440fx forever and be done with it.
-> > >=20
-> > > I'm not sure if you are saying that we (Red Hat) shouldn't spend
-> > > time implementing it, or that the libvirt upstream project should
-> > > reject the patches if somebody implements it.  I would understand
-> > > the former, but not the latter.
-> >=20
+On Wed, Aug 22, 2018 at 10:37:12AM -0400, Laine Stump wrote:
+> On 08/22/2018 09:44 AM, Daniel P. Berrang=C3=A9 wrote:
 > > Even if someone is willing to implement it in libvirt, we have to
 > > consider the cost of supporting it in both libvirt and applications
 > > using libvirt and the complexity it adds to our story about the
 > > docs / best practices for configuring guests.
-> >=20
+> >
 > > Even though I do kind of like the virtio-0.9/virtio-1.0 device model
 > > as concepts, I'm yet to be convinced that implementing them in libvir=
 t
 > > and then also in all the downstream applications (oVirt, OpenStack,
 > > virt-manager, cockpit, etc) is actually worth the cost.
-> >=20
-> > There's little compelling reason to care about running outdated OS
-> > like RHEL-6 on Q35 in general. The motivation behind it is just
-> > coming from an artifically created problem downstream, by wishing
-> > to drop the i440fx machine at some still undeteremined point in the
-> > future. By the time that future comes, RHEL-6 may well even be
-> > end of life making the entire exercise a pointless.
 >=20
-> I'm all for making a cost/benefit analysis, but I don't think you
-> are taking into account the costs of keeping the confusing
-> semantics of existing "virtio" devices.
+> I'm starting to lean towards this opinion too - I was thinking about
+> this over the weekend, and it does seem like the code in the management
+> apps will be convoluted/complex/your favorite adjective. Going into thi=
+s
+> I had the naive impression that a simple bit of logic in the management
+> application could just take the union of supported devices from
+> libosinfo(guestOS) and domaincapabilities(qemu), then pick the top mode=
+l
+> name from the list. It's unfortunately not that simple, so we're going
+> to end up with a bunch of extra code in the management application
+> (multiplied by the number of management apps, multiplied by the number
+> of different virtio devices) and that code will need to be maintained.
 >=20
-> If you still want to refuse to provide a sane way to configure
-> transitional Virtio devices, I really won't care.  But I believe
-> the interface you are trying to keep is actually the one you are
-> criticizing ("two separate devices pretending to be the same
-> thing, but magically changing their identity at runtime").
+> In the meantime, the only advantages over just giving up and using 440f=
+x
+> for RHEL6 would be 1) consistent support for using Q35 on all
+> "supported" guest OSes, 2) the possibility of doing SecureBoot, and 2)
+> being able to someday in the future eliminate all 440fx-specific code
+> from the set of code that needs to be tested/maintained by downstream
+> maintainers. (1) is nice and clean, but the value is dubious if it's
+> achieved by "unclean" code elsewhere. (2) is a non-feature for almost
+> everyone, and (3) isn't going to happen anyway, since any existing
+> guests have already been setup using 440fx as the machinetype, and we
+> can't force people to change the machinetype of an existing guest (as
+> Dan says, over the amount of time needed to make that an acceptable
+> requirement, the guest OSes in question could likely reach EOL anyway).
 
-Yeah, I guess I should make a distinction between what I would
-do if it was a clean slate, and what we should do given our existing
-practice.
+Two notes
 
-If we had a clean slate I would not like to see our current impl
-done.  Given that it already exists, however, we're stuck with
-that forever. So the question is whether implementing any of
-the alternative options is a net benefit for libvirt & mgmt apps
-overall. My gut feeling is that despite the downsides of the
-current impl, it is not worth trying todo something different.
+ - The notion of "supported" guest OS is an invention of downstream
+   distro vendors.
 
-The thing that has really tipped my mind this way is that even
-if we provide new device models, mgmt apps will be loathe to
-actually use them because it will prevent live migration of
-those guests to hosts with older libvirt.
+ - RHEL-6 doesn't support SecureBoot at all, even on bare metal.
+   IOW the possibility of SecureBoot with KVM for RHEL-6 doesn't
+   even arise to begin with.
 
-So my feeling is we should do the work to enable use of Q35
-by default in mgmt apps, for guest OS where it is known to
-work correctly today. Every other OS should just stick with
-i440fx as we already know that works for them today and Q35
-doesn't offer legacy OS compelling enough benefits to switch.
+> (NB: of course if we want to require 440fx for RHEL6, we'll still need
+> to do the work on libosinfo to report "supported machinetype", and on
+> all the management applications to honor that information)
 
+Yes, we still have plenty of work todo across the mgmt apps just to get
+Q35 used by default in the first place.
 
 Regards,
 Daniel
