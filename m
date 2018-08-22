@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fsUMD-0008B2-5S
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:43:37 -0400
+	(envelope-from <groug@kaod.org>) id 1fsUMw-0000Fa-UA
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:44:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fsUMA-0002dA-0P
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:43:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43596 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fsUM9-0002cf-Qd
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:43:33 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 700D087A6D
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 14:43:33 +0000 (UTC)
-References: <20180822095421.11765-1-quintela@redhat.com>
-	<20180822095421.11765-7-quintela@redhat.com>
-	<fdf970ce-baa2-7b87-7e72-bba34d9c1328@redhat.com>
-	<8736v6pix0.fsf@trasno.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f518638b-d435-aa2f-da44-1b013e333774@redhat.com>
-Date: Wed, 22 Aug 2018 16:43:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <8736v6pix0.fsf@trasno.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/10] check: Only test ivshm when it is
- compiled in
+	(envelope-from <groug@kaod.org>) id 1fsUMt-0003FK-57
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:44:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34362
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fsUMs-0003DZ-7i
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:44:19 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w7MEdBC8143578
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 10:44:16 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2m18hy4220-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 10:44:16 -0400
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Wed, 22 Aug 2018 15:44:14 +0100
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 22 Aug 2018 16:43:39 +0200
+Message-Id: <20180822144340.91828-1-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 0/1] 9p patches 2018-08-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,15 +35,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-On 2018-08-22 16:36, Juan Quintela wrote:
-[...]
-> I got even more confused.  check-qtest-pci-y is only tested on x86*, go
-> figure.
+The following changes since commit 13b7b188501d419a7d63c016e00065bcc693b7d4:
 
-Yes, that's ugly, indeed. We should maybe rework that so that all board
-which include pci.mak can use it...
+  Merge remote-tracking branch 'remotes/kraxel/tags/vga-20180821-pull-request' into staging (2018-08-21 15:57:56 +0100)
 
- Thomas
+are available in the Git repository at:
+
+  https://github.com/gkurz/qemu.git tags/for-upstream
+
+for you to fetch changes up to adbffc2074754aff8d806843d9e83443590ce5e0:
+
+  fsdev: fix compilation with VIRTIO but not VIRTIO_9P (2018-08-22 12:21:13 +0200)
+
+----------------------------------------------------------------
+Just a build fix that I had queued during soft freeze.
+
+----------------------------------------------------------------
+Paolo Bonzini (1):
+      fsdev: fix compilation with VIRTIO but not VIRTIO_9P
+
+ fsdev/Makefile.objs | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+-- 
+2.14.4
