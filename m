@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fsNRI-0001gL-BS
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 03:20:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1fsNgu-0008GW-Tv
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 03:36:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fsNRH-0005nE-9k
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 03:20:24 -0400
-References: <20180820153020.21478-1-peter.maydell@linaro.org>
-From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <aec8f424-f2eb-b52b-d2ed-c1249cdf32a0@greensocs.com>
-Date: Wed, 22 Aug 2018 09:19:54 +0200
+	(envelope-from <thuth@redhat.com>) id 1fsNgq-0000bv-Rm
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 03:36:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33396 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fsNgk-0000Xw-5V
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 03:36:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5641840201C0
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 07:36:20 +0000 (UTC)
+References: <20180821190516.264411-1-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2cbe2b1d-d2e8-beec-94b0-3e8c93955588@redhat.com>
+Date: Wed, 22 Aug 2018 09:36:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180820153020.21478-1-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="N3tevn2M5jWscMpV88bE8XKIgUQ60Nvs7"
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] target/arm: Some pieces of support
- for 32-bit Hyp mode
+In-Reply-To: <20180821190516.264411-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests/libqos: Utilize newer glib spawn
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +34,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---N3tevn2M5jWscMpV88bE8XKIgUQ60Nvs7
-From: Luc Michel <luc.michel@greensocs.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <aec8f424-f2eb-b52b-d2ed-c1249cdf32a0@greensocs.com>
-Subject: Re: [PATCH v2 0/6] target/arm: Some pieces of support for 32-bit Hyp
- mode
-References: <20180820153020.21478-1-peter.maydell@linaro.org>
-In-Reply-To: <20180820153020.21478-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 2018-08-21 21:05, Eric Blake wrote:
+> During development, I got a 'make check' failure that claimed:
+> 
+> qemu-img returned status code 32512
+> **
+> ERROR:tests/libqos/libqos.c:202:mkimg: assertion failed: (!rc)
+> 
+> But 32512 is too big for a normal exit status value, which means we
+> failed to use WEXITSTATUS() to shift the bits to the desired value
+> for printing.  However, instead of worrying about how to portably
+> parse g_spawn()'s rc in the proper platform-dependent manner, it's
+> better to just rely on the fact that we now require glib 2.40 (since
+> commit e7b3af815) and can therefore use glib's portable checker
+> instead, where the message under my same condition improves to:
+> 
+> Child process exited with code 127
+> **
+> ERROR:tests/libqos/libqos.c:192:mkimg: assertion failed: (ret && !err)
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> This appears to be the only remaining vestige of a comment mentioning
+> glib < 2.40.
+> ---
+>  tests/libqos/libqos.c | 12 +-----------
+>  1 file changed, 1 insertion(+), 11 deletions(-)
+> 
+> diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+> index 013ca68581c..c5141873448 100644
+> --- a/tests/libqos/libqos.c
+> +++ b/tests/libqos/libqos.c
+> @@ -185,22 +185,12 @@ void mkimg(const char *file, const char *fmt, unsigned size_mb)
+>      cli = g_strdup_printf("%s create -f %s %s %uM", qemu_img_abs_path,
+>                            fmt, file, size_mb);
+>      ret = g_spawn_command_line_sync(cli, &out, &out2, &rc, &err);
+> -    if (err) {
+> +    if (err || !g_spawn_check_exit_status(rc, &err)) {
+>          fprintf(stderr, "%s\n", err->message);
+>          g_error_free(err);
+>      }
+>      g_assert(ret && !err);
+> 
+> -    /* In glib 2.34, we have g_spawn_check_exit_status. in 2.12, we don't.
+> -     * glib 2.43.91 implementation assumes that any non-zero is an error for
+> -     * windows, but uses extra precautions for Linux. However,
+> -     * 0 is only possible if the program exited normally, so that should be
+> -     * sufficient for our purposes on all platforms, here. */
+> -    if (rc) {
+> -        fprintf(stderr, "qemu-img returned status code %d\n", rc);
+> -    }
+> -    g_assert(!rc);
+> -
+>      g_free(out);
+>      g_free(out2);
+>      g_free(cli);
+> 
 
-On 8/20/18 5:30 PM, Peter Maydell wrote:
-> Now we have virtualization support in the GICv2 emulation,
-> I thought I'd have a look at how much we were still missing
-> for being able to enable EL2 support for AArch32.
-> This set of patches fixes some minor missing pieces:
->  * AArch32 HACTLR2
->  * AArch32 HCR, HCR2
->  * support for taking exceptions to Hyp mode
->  * boot AArch32 kernels in Hyp mode where available
-> and I threw in a trivial bugfix:
->  * Clear CPSR.IL and CPSR.J on 32-bit exception entry
-> since it would otherwise have a conflict with the refactoring
-> of exception entry.
->=20
-> Changes v1->v2:
->  * some patches are now upstream
->  * v8-only registers no longer created for v7 CPUs
->  * split the "factor out exception-entry code" into
->    its own patch
->  * new patch: clear CPSR.IL and CPSR.J
->  * new patch: boot kernels in Hyp mode if possible
->=20
-> (I still have the same "guest EL0 segv" issue as for v1
-> if I actually enable the EL2 feature on Cortex-A15.)
->=20
-
-Reviewed-By: Luc Michel <luc.michel@greensocs.com>
-
-> thanks
-> -- PMM
->=20
-> Peter Maydell (6):
->   target/arm: Implement RAZ/WI HACTLR2
->   target/arm: Implement AArch32 HCR and HCR2
->   target/arm: Factor out code for taking an AArch32 exception
->   target/arm: Implement support for taking exceptions to Hyp mode
->   target/arm: Clear CPSR.IL and CPSR.J on 32-bit exception entry
->   hw/arm/boot: AArch32 kernels should be started in Hyp mode if
->     available
->=20
->  hw/arm/boot.c       |  11 +++
->  target/arm/helper.c | 212 ++++++++++++++++++++++++++++++++++++++------=
-
->  2 files changed, 196 insertions(+), 27 deletions(-)
->=20
-
-
---N3tevn2M5jWscMpV88bE8XKIgUQ60Nvs7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt9DpoACgkQd8knW3Qn
-Tr7zkRAAgtr5gcdGbI5GShfRCuXnl4Kj7SCCWlZvGmaqLtnrWFyQZKpHqa/vL1c1
-oh25kMcow4o96mtwZlO8Mt154MEQMp3NhhKHZegz2MxrebZ89rY2ro6Yt0DOUFcA
-mXJARciOU94Zp93p0BUGGcndmrUF+rLBm1RYStrXCJv/Zz+2Fj0vvA6njzpSJiFO
-7NkHCw4v5HbLWiIhKksrIL1Gles2ZzjgiwN2duTDwc0f/+Y8Wh9PFCkii7xDlL/b
-FseNd4z0aomar5YcdfGmEpdAeB19ZyHOMWC/JygJjUgGDnn5q1T8ZYzLgykqdBo7
-uVHODVCUIbmazohsGDP9rpfS26++PnKEas4hhmx8Q1Q+bDVE4vk/XEjS0esSO08p
-BwLcm5jjcTMmgIYPO646qO/imcIuAxbq6eRWPn/kcBVhTW+SU0CUSMG3uYsf7gJX
-RlG5Q4CkiQWkeBojINRCKUDwWlWfuD/tg1yscOmtgwDnL4a+EesUDnieA6HWuQ29
-B2DGbJZGBZBcULzNl7IhWqZz5iIMmSW9v7QkVWk+P2wi1ZxVa7Qw2KwV7zhfSM+1
-K5BFomYo5mC8rbrKd59BAmMDe/Gf88ICjeQxlCjd0KDAD2dgOF1lLG1rD7z0ufaC
-ntSXqR/XQtDcjWecyXylpaFWu11CgoAtPZKJosJHeUoDHAs/MVA=
-=rJ2C
------END PGP SIGNATURE-----
-
---N3tevn2M5jWscMpV88bE8XKIgUQ60Nvs7--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
