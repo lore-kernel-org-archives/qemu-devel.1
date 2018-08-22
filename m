@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fsOU9-0007dq-MK
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:27:26 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fsOUG-0007jz-BA
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fsOU2-0002LK-3a
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:27:25 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fsOUF-0002Wl-36
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:27:31 -0400
 References: <20180821132811.17675-1-peter.maydell@linaro.org>
-	<20180821132811.17675-7-peter.maydell@linaro.org>
+	<20180821132811.17675-9-peter.maydell@linaro.org>
 From: Luc Michel <luc.michel@greensocs.com>
-Message-ID: <9088c265-475e-a10a-0e7f-ad68525d628b@greensocs.com>
-Date: Wed, 22 Aug 2018 10:26:53 +0200
+Message-ID: <ca7da7bc-2bcb-f99b-7606-32e16afd9e2a@greensocs.com>
+Date: Wed, 22 Aug 2018 10:27:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180821132811.17675-7-peter.maydell@linaro.org>
+In-Reply-To: <20180821132811.17675-9-peter.maydell@linaro.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="QoGn91AGytkeeo8pSL6cYLzF9KZOWsK9G"
-Subject: Re: [Qemu-devel] [PATCH 6/9] hw/arm/fsl-imx6ul: Connect VIRQ and
- VFIQ
+	boundary="l6Ra2MdfSdB3BqlULtqZq3Rqj6mUHruH2"
+Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/vexpress: Don't set
+ info->secure_boot if CPU doesn't have EL3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +29,81 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QoGn91AGytkeeo8pSL6cYLzF9KZOWsK9G
+--l6Ra2MdfSdB3BqlULtqZq3Rqj6mUHruH2
 From: Luc Michel <luc.michel@greensocs.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 Cc: patches@linaro.org
-Message-ID: <9088c265-475e-a10a-0e7f-ad68525d628b@greensocs.com>
-Subject: Re: [PATCH 6/9] hw/arm/fsl-imx6ul: Connect VIRQ and VFIQ
+Message-ID: <ca7da7bc-2bcb-f99b-7606-32e16afd9e2a@greensocs.com>
+Subject: Re: [PATCH 8/9] hw/arm/vexpress: Don't set info->secure_boot if CPU
+ doesn't have EL3
 References: <20180821132811.17675-1-peter.maydell@linaro.org>
- <20180821132811.17675-7-peter.maydell@linaro.org>
-In-Reply-To: <20180821132811.17675-7-peter.maydell@linaro.org>
+ <20180821132811.17675-9-peter.maydell@linaro.org>
+In-Reply-To: <20180821132811.17675-9-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 
 
 On 8/21/18 3:28 PM, Peter Maydell wrote:
-> Connect the VIRQ and VFIQ lines from the GIC to the CPU;
-> these exist always for both CPU and GIC whether the
-> virtualization extensions are enabled or not, so we
-> can just unconditionally connect them.
+> Don't request that the arm_load_kernel() code should boot in secure
+> state if the CPU doesn't have a secure state. Currently this
+> doesn't make a difference because the boot.c code only examines
+> the secure_boot flag in code guarded by an ARM_FEATURE_EL3 check,
+> but upcoming changes for supporting booting into Hyp mode will
+> change that.
 >=20
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
 > ---
->  hw/arm/fsl-imx7.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  hw/arm/vexpress.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-> index d5e26855a55..7663ad68610 100644
-> --- a/hw/arm/fsl-imx7.c
-> +++ b/hw/arm/fsl-imx7.c
-> @@ -209,6 +209,10 @@ static void fsl_imx7_realize(DeviceState *dev, Err=
-or **errp)
->          sysbus_connect_irq(sbd, i, irq);
->          irq =3D qdev_get_gpio_in(d, ARM_CPU_FIQ);
->          sysbus_connect_irq(sbd, i + smp_cpus, irq);
-> +        irq =3D qdev_get_gpio_in(d, ARM_CPU_VIRQ);
-> +        sysbus_connect_irq(sbd, i + 2 * smp_cpus, irq);
-> +        irq =3D qdev_get_gpio_in(d, ARM_CPU_VFIQ);
-> +        sysbus_connect_irq(sbd, i + 3 * smp_cpus, irq);
->      }
+> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+> index dc47ed84c20..3631f4de3a4 100644
+> --- a/hw/arm/vexpress.c
+> +++ b/hw/arm/vexpress.c
+> @@ -705,8 +705,8 @@ static void vexpress_common_init(MachineState *mach=
+ine)
+>      daughterboard->bootinfo.smp_bootreg_addr =3D map[VE_SYSREGS] + 0x3=
+0;
+>      daughterboard->bootinfo.gic_cpu_if_addr =3D daughterboard->gic_cpu=
+_if_addr;
+>      daughterboard->bootinfo.modify_dtb =3D vexpress_modify_dtb;
+> -    /* Indicate that when booting Linux we should be in secure state *=
+/
+> -    daughterboard->bootinfo.secure_boot =3D true;
+> +    /* When booting Linux we should be in secure state if the CPU has =
+one. */
+> +    daughterboard->bootinfo.secure_boot =3D vms->secure;
+>      arm_load_kernel(ARM_CPU(first_cpu), &daughterboard->bootinfo);
+>  }
 > =20
->      /*
 >=20
 
 
---QoGn91AGytkeeo8pSL6cYLzF9KZOWsK9G
+--l6Ra2MdfSdB3BqlULtqZq3Rqj6mUHruH2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt9Hk0ACgkQd8knW3Qn
-Tr6Xzw/7BJWnXiK1IAwb1HZtMkkSjOvsjffWk15GXut7FsvioLBQAQiLvQQq6swn
-Ng1gYP6mxesnOMuQiEgRXog+/+lUfg+jfd79jQ6MKIGi3KrO4RhZoLLJd7pprtYc
-UBrhD9+rdGzp48Z33BAY3bf93ygIU40MUuv1IDexS3jlVRNOgv+5Mv4awVEhOPED
-EmDvQMnucu79fvkX0tT/GACZ5n1U9swWfjtaugMUjNJreqMAIyRrGACTpmd/wAcK
-xKDwlEKyDjLPGclVzuAGUvGJLHfhKixTtISlccg4p/7S9iC+SI87PP5vxaNaXtAW
-by3dk2FWS0jElKi5p5W/i9p2AMy/rJrknPSC1aCkxybg4WJR0ZV5YaIrXvDV+dEG
-i3WBwCzSJep7FqgLdAtHSAN68/VOGdcCWo0ohAXvo/9GoIorcimmPkyPmz5gR2nA
-yesLaoTXaIOR/Cf22w8AEKYtK3S+KkjOiyBp2Jde6fXvh0pBca2sjS+xuD51U78O
-1+F15TUQln3wDP4c/OLU6DOLTUxBQAn57RcKeoZV6kXfcHTe/P06cR1SQXYhW4tf
-A5bMcHT2NspCGW6DkIWjbRndYqMKgGh2ufZTEkJDTkrG/fjtJkMnkfRMirNDo+2O
-0MXATBfnb39VrgawW7V3Uf7Jy4fLH0yvBFJqba1whNHcNzQxjZQ=
-=rtBk
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt9HloACgkQd8knW3Qn
+Tr7QYQ/8D0/+Lh1Nyz2Oku1dQ/wsgjHIxgHn/iZ+E88XDZSevqZV78NqJ15nfZWv
+Pz8AVP3XyOcqEQH4q0wkxy01we7qKDJDiThLdT9oPHseWN37dCiiqOtKa3V7GRaZ
+N0MfkUCcYohdG9ce7q5fIFyrQN2ZN/Ro93vWoJm3we5/lWb6H2aFOJguST5LO1W/
+UsIbM3f8mVQG5vsjf9Fv6sDErSMHvLezPyP10N5IF+70WZX1t6vBAzVgPRP6gToN
+jxVO/g3tKmBvZQqdUURWfwOJF+HF1t9OA5fREsxj9tuS53nWvXk0a/gqAjGnn6CD
+j1XUV0WNEnz/UfDyafILQ8ux1ni6awxOhKZ2NE6Ji/W68/AkI6aub7BUycZycHyG
+Y87dXBF8UmiH/UPYNEpWzXfxr/vQvAHkUoFpgCTgrgimodmzw044B1K7tzd7L79u
+4bdDWbESKJCPjYCHCmpDE86jaYk2HgbnvoGbRTZpAkgUQ0XhQbVhNZzsCj4rFOJI
+PDd9XK/b1Z0Xzrf6XP3NOE9TKHcOoWFtGa1KHCXqtxpNdsJukZmnjNXQf++sEcNX
+UgGl4Rsx8RYkxOiECWZeDJzXhM/3osCs9ryaRVHnQs9B/wAVMcmjcxci8pVBRzja
+pSmpTgfOLneAO1LYbaX+CqHOCh142BZLWPZKGV/iYSzHUfzp4Bs=
+=BPRe
 -----END PGP SIGNATURE-----
 
---QoGn91AGytkeeo8pSL6cYLzF9KZOWsK9G--
+--l6Ra2MdfSdB3BqlULtqZq3Rqj6mUHruH2--
