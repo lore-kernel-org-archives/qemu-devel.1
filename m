@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWgA-0004Vy-Of
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWgA-0004YU-QR
 	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWXD-0005Os-M2
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:03:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37454 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWX3-0005Ir-D0
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:03:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51172 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fsWXD-0005Od-Gu
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:03:07 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1fsWX3-0005Ib-8c
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:02:57 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 37F73401EF02
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 17:03:07 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B91DB804BAAC
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 17:02:56 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 22 Aug 2018 19:02:48 +0200
-Message-Id: <20180822170250.29573-3-marcandre.lureau@redhat.com>
-In-Reply-To: <20180822170250.29573-1-marcandre.lureau@redhat.com>
-References: <20180822170250.29573-1-marcandre.lureau@redhat.com>
+Date: Wed, 22 Aug 2018 19:02:46 +0200
+Message-Id: <20180822170250.29573-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 2/4] seccomp: prefer SCMP_ACT_KILL_PROCESS
- if available
+Subject: [Qemu-devel] [PATCH v4 0/4] seccomp fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +34,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pmoore@redhat.com, berrange@redhat.com, eblake@redhat.com, Eduardo Otubo <otubo@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The upcoming libseccomp release should have SCMP_ACT_KILL_PROCESS
-action (https://github.com/seccomp/libseccomp/issues/96).
+Hi,
 
-SCMP_ACT_KILL_PROCESS is preferable to immediately terminate the
-offending process, rather than having the SIGSYS handler running.
+This series fixes 2 issues with -sandbox:
 
-Use SECCOMP_GET_ACTION_AVAIL to check availability of kernel support,
-as libseccomp will fallback on SCMP_ACT_KILL otherwise, and we still
-prefer SCMP_ACT_TRAP.
+- The seccomp action SCMP_ACT_KILL results in immediate termination of
+  the thread that made the bad system call. However, qemu being
+  multi-threaded, it keeps running. There is no easy way for parent
+  process / management layer (libvirt) to know about that situation.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Acked-by: Eduardo Otubo <otubo@redhat.com>
----
- qemu-seccomp.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+  Instead, the default SIGSYS handler when invoked with SCMP_ACT_TRAP
+  will terminate the program and core dump.
 
-diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index b117a92559..f0c833f3ca 100644
---- a/qemu-seccomp.c
-+++ b/qemu-seccomp.c
-@@ -20,6 +20,7 @@
- #include <sys/prctl.h>
- #include <seccomp.h>
- #include "sysemu/seccomp.h"
-+#include <linux/seccomp.h>
-=20
- /* For some architectures (notably ARM) cacheflush is not supported unti=
-l
-  * libseccomp 2.2.3, but configure enforces that we are using a more rec=
-ent
-@@ -107,12 +108,40 @@ static const struct QemuSeccompSyscall blacklist[] =
-=3D {
-     { SCMP_SYS(sched_get_priority_min), QEMU_SECCOMP_SET_RESOURCECTL },
- };
-=20
-+static inline __attribute__((unused)) int
-+qemu_seccomp(unsigned int operation, unsigned int flags, void *args)
-+{
-+#ifdef __NR_seccomp
-+    return syscall(__NR_seccomp, operation, flags, args);
-+#else
-+    errno =3D ENOSYS;
-+    return -1;
-+#endif
-+}
-+
-+static uint32_t qemu_seccomp_get_kill_action(void)
-+{
-+#if defined(SECCOMP_GET_ACTION_AVAIL) && defined(SCMP_ACT_KILL_PROCESS) =
-&& \
-+    defined(SECCOMP_RET_KILL_PROCESS)
-+    {
-+        uint32_t action =3D SECCOMP_RET_KILL_PROCESS;
-+
-+        if (qemu_seccomp(SECCOMP_GET_ACTION_AVAIL, 0, &action) =3D=3D 0)=
- {
-+            return SCMP_ACT_KILL_PROCESS;
-+        }
-+    }
-+#endif
-+
-+    return SCMP_ACT_TRAP;
-+}
-+
-=20
- static int seccomp_start(uint32_t seccomp_opts)
- {
-     int rc =3D 0;
-     unsigned int i =3D 0;
-     scmp_filter_ctx ctx;
-+    uint32_t action =3D qemu_seccomp_get_kill_action();
-=20
-     ctx =3D seccomp_init(SCMP_ACT_ALLOW);
-     if (ctx =3D=3D NULL) {
-@@ -125,7 +154,7 @@ static int seccomp_start(uint32_t seccomp_opts)
-             continue;
-         }
-=20
--        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_TRAP, blacklist[i].n=
-um,
-+        rc =3D seccomp_rule_add_array(ctx, action, blacklist[i].num,
-                                     blacklist[i].narg, blacklist[i].arg_=
-cmp);
-         if (rc < 0) {
-             goto seccomp_return;
+  This may not be the most secure solution, but probably better than
+  just killing the offending thread. SCMP_ACT_KILL_PROCESS has been
+  added in Linux 4.14 to improve the situation, which I propose to use
+  by default if available.
+
+  Related to:
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
+
+- The seccomp filter isn't applied to all threads. We can solve the
+  issue by using SECCOMP_FILTER_FLAG_TSYNC since libseccomp 2.2.0 and
+  kernel >=3D 3.17.
+
+v3:
+- modify qemu_seccomp() to set errno=3DENOSYS
+- add patch "seccomp: set the seccomp filter to all threads"
+
+v2:
+- fix clang unused inline warning
+- add acked-by/r-b tags
+
+Marc-Andr=C3=A9 Lureau (4):
+  seccomp: use SIGSYS signal instead of killing the thread
+  seccomp: prefer SCMP_ACT_KILL_PROCESS if available
+  configure: require libseccomp 2.2.0
+  seccomp: set the seccomp filter to all threads
+
+ qemu-seccomp.c | 36 +++++++++++++++++++++++++++++++++++-
+ configure      |  7 ++-----
+ 2 files changed, 37 insertions(+), 6 deletions(-)
+
 --=20
 2.18.0.547.g1d89318c48
