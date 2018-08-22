@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fsWAw-00059T-Nz
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:40:12 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fsWCC-0005sV-Bv
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fsWAw-0000oO-0U
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:40:06 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:53210)
+	(envelope-from <richard.henderson@linaro.org>) id 1fsWC9-0001oo-7c
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:41:24 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34367)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fsWAv-0000nt-PP
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:40:05 -0400
-Received: by mail-wm0-x242.google.com with SMTP id y139-v6so2586165wmc.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 09:40:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fsWC8-0001oB-PB
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:41:21 -0400
+Received: by mail-pg1-x544.google.com with SMTP id y5-v6so1180045pgv.1
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 09:41:20 -0700 (PDT)
+References: <20180822075750.12399-1-david@redhat.com>
+	<20180822075750.12399-3-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d7dc3e58-14de-1d4d-2486-c688fd251e78@linaro.org>
+Date: Wed, 22 Aug 2018 09:41:17 -0700
 MIME-Version: 1.0
-References: <20180822142956.6859-1-marcandre.lureau@redhat.com>
-	<20180822142956.6859-4-marcandre.lureau@redhat.com>
-	<20180822154611.GN12750@redhat.com>
-	<CAMxuvawr-ooy91ZHTHx+aLYhgpH5gBoAKQz_pvF=kcHzadjLog@mail.gmail.com>
-	<20180822160614.GQ12750@redhat.com>
-	<CAJ+F1CK65vU4pkX9w8gbMfJdMfEXv5OZyXv6yRJbJjG1J1OYmg@mail.gmail.com>
-In-Reply-To: <CAJ+F1CK65vU4pkX9w8gbMfJdMfEXv5OZyXv6yRJbJjG1J1OYmg@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 22 Aug 2018 18:39:52 +0200
-Message-ID: <CAJ+F1CLdOsxLu+cHScTDMPUm9iq=3NO6=F4wQJi2FSssVZBVuA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] seccomp: set the seccomp filter to
- all threads
+In-Reply-To: <20180822075750.12399-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 2/8] s390x/tcg: store in the TB flags if
+ AFP is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,26 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: pmoore@redhat.com, Eduardo Otubo <otubo@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Hi
+On 08/22/2018 12:57 AM, David Hildenbrand wrote:
+> We exit the TB when changing the control registers, so just like PSW
+> bits, this should always be consistent for a TB.
+> 
+> Using the PSW bit semantic makes things a lot easier compared to
+> manually defining the sapre, shifted bits.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 
-On Wed, Aug 22, 2018 at 6:37 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
->
-> On Wed, Aug 22, 2018 at 6:08 PM Daniel P. Berrang=C3=A9 <berrange@redhat.=
-com> wrote:
-> > We would have to make libvirt probe for tsync support too, because it
-> > now unconditionally uses -sandbox for new enough QEMU.
->
-> sigh :( that's where the -sandbox tsync option could have been helpful
-> keeping the compatibility.
-
-So what can libvirt do if tsync is not available?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+r~
