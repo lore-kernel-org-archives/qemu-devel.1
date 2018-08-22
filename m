@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fsK3P-0001iZ-Ib
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:43:32 -0400
+	(envelope-from <jcody@redhat.com>) id 1fsK3Q-0001mo-CP
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fsK3O-0001va-Ru
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:43:31 -0400
+	(envelope-from <jcody@redhat.com>) id 1fsK3P-0001vu-8f
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:43:32 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 21 Aug 2018 23:43:18 -0400
-Message-Id: <20180822034319.686504-2-jcody@redhat.com>
+Date: Tue, 21 Aug 2018 23:43:19 -0400
+Message-Id: <20180822034319.686504-3-jcody@redhat.com>
 In-Reply-To: <20180822034319.686504-1-jcody@redhat.com>
 References: <20180822034319.686504-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] block: for jobs,
- do not clear user_paused until after the resume
+Subject: [Qemu-devel] [PULL 2/2] block: iotest to catch abort on forced
+ blockjob cancel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +23,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-The function job_cancel_async() will always cause an assert for blockjob
-user resume.  We set job->user_paused to false, and then call
-job->driver->user_resume().  In the case of blockjobs, this is the
-block_job_user_resume() function.
-
-In that function, we assert that job.user_paused is set to true.
-Unfortunately, right before calling this function, it has explicitly
-been set to false.
-
-The fix is pretty simple: set job->user_paused to false only after the
-job user_resume() function has been called.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
-Message-id: bb183b77d8f2dd6bd67b8da559a90ac1e74b2052.1534868459.git.jcody@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: df317f617fbe5affcf699cb8560e7b0c2e028a64.1534868459.git.jcody@redhat.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- job.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/229.out | 23 +++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 119 insertions(+)
+ create mode 100755 tests/qemu-iotests/229
+ create mode 100644 tests/qemu-iotests/229.out
 
-diff --git a/job.c b/job.c
-index fa671b431a..e36ebaafd8 100644
---- a/job.c
-+++ b/job.c
-@@ -732,10 +732,10 @@ static void job_cancel_async(Job *job, bool force)
- {
-     if (job->user_paused) {
-         /* Do not call job_enter here, the caller will handle it.  */
--        job->user_paused = false;
-         if (job->driver->user_resume) {
-             job->driver->user_resume(job);
-         }
-+        job->user_paused = false;
-         assert(job->pause_count > 0);
-         job->pause_count--;
-     }
+diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
+new file mode 100755
+index 0000000000..ff851ec431
+--- /dev/null
++++ b/tests/qemu-iotests/229
+@@ -0,0 +1,95 @@
++#!/bin/bash
++#
++# Test for force canceling a running blockjob that is paused in
++# an error state.
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=jcody@redhat.com
++
++seq="$(basename $0)"
++echo "QA output created by $seq"
++
++here="$PWD"
++status=1	# failure is the default!
++
++_cleanup()
++{
++    _cleanup_qemu
++    _cleanup_test_img
++    rm -f "$TEST_IMG" "$DEST_IMG"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++# Needs backing file and backing format support
++_supported_fmt qcow2 qed
++_supported_proto file
++_supported_os Linux
++
++
++DEST_IMG="$TEST_DIR/d.$IMGFMT"
++TEST_IMG="$TEST_DIR/b.$IMGFMT"
++
++_make_test_img 2M
++
++# destination for mirror will be too small, causing error
++TEST_IMG=$DEST_IMG _make_test_img 1M
++
++$QEMU_IO -c 'write 0 2M' "$TEST_IMG" | _filter_qemu_io
++
++_launch_qemu -drive id=testdisk,file="$TEST_IMG",format="$IMGFMT"
++
++_send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'qmp_capabilities'}" \
++    'return'
++
++echo
++echo '=== Starting drive-mirror, causing error & stop  ==='
++echo
++
++_send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'drive-mirror',
++                 'arguments': {'device': 'testdisk',
++                               'mode':   'absolute-paths',
++                               'format': '$IMGFMT',
++                               'target': '$DEST_IMG',
++                               'sync':   'full',
++                               'mode':   'existing',
++                               'on-source-error': 'stop',
++                               'on-target-error': 'stop' }}"    \
++     "JOB_STATUS_CHANGE.*pause"
++
++echo
++echo '=== Force cancel job paused in error state  ==='
++echo
++
++success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'block-job-cancel',
++                 'arguments': { 'device': 'testdisk',
++                                'force': true}}" \
++     "BLOCK_JOB_CANCELLED" "Assertion"
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
+new file mode 100644
+index 0000000000..4c4112805f
+--- /dev/null
++++ b/tests/qemu-iotests/229.out
+@@ -0,0 +1,23 @@
++QA output created by 229
++Formatting 'TEST_DIR/b.IMGFMT', fmt=IMGFMT size=2097152
++Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=1048576
++wrote 2097152/2097152 bytes at offset 0
++2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++{"return": {}}
++
++=== Starting drive-mirror, causing error & stop  ===
++
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "testdisk"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
++
++=== Force cancel job paused in error state  ===
++
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index b973dc842d..743790745b 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -225,3 +225,4 @@
+ 225 rw auto quick
+ 226 auto quick
+ 227 auto quick
++229 auto quick
 -- 
 2.17.1
