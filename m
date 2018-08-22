@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsU3V-0000UR-DK
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:24:22 -0400
+	(envelope-from <quintela@redhat.com>) id 1fsU7N-0002eE-F0
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsU3R-00053Q-Ef
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:24:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42774 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fsU7K-0007vT-9y
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:28:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43890 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsU3R-00052t-9l
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:24:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsU7K-0007vB-3G
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 10:28:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9DECD87A6D
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 14:24:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C05D04023820
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 14:28:13 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <f95390a5-2b4b-e364-34b4-15ff62c2c580@redhat.com> (Thomas Huth's
-	message of "Wed, 22 Aug 2018 12:08:07 +0200")
+In-Reply-To: <96821c07-7aa6-5920-8921-da967258c0d5@redhat.com> (Thomas Huth's
+	message of "Wed, 22 Aug 2018 12:13:18 +0200")
 References: <20180822095421.11765-1-quintela@redhat.com>
-	<20180822095421.11765-2-quintela@redhat.com>
-	<f95390a5-2b4b-e364-34b4-15ff62c2c580@redhat.com>
+	<20180822095421.11765-3-quintela@redhat.com>
+	<96821c07-7aa6-5920-8921-da967258c0d5@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Wed, 22 Aug 2018 16:24:00 +0200
-Message-ID: <87k1oipji7.fsf@trasno.org>
+Date: Wed, 22 Aug 2018 16:28:05 +0200
+Message-ID: <87ftz6pjbe.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 01/10] configure: We don't want to clean
- configuration files
+Subject: Re: [Qemu-devel] [PATCH v3 02/10] check: Use land/lor when possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,23 +40,34 @@ Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redha
 
 Thomas Huth <thuth@redhat.com> wrote:
 > On 2018-08-22 11:54, Juan Quintela wrote:
->> If you don't want to compile everything, you configure
->> config-devices.mak.  And then make clean remove it, and make will
->> create a default one without your configuration.  Fix it by not
->> removing it on clean target.  Remove it instead on distclean.
->
-> Sounds like a good idea!
->
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> 
->> --
->> 
->> Remove it instead on distclean.
+>> So everythig is (a bit) more consistent
 >> 
 >> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  tests/Makefile.include | 12 ++++--------
+>>  1 file changed, 4 insertions(+), 8 deletions(-)
+> [...]
+>> @@ -299,9 +297,7 @@ check-qtest-i386-y += tests/q35-test$(EXESUF)
+>>  check-qtest-i386-y += tests/vmgenid-test$(EXESUF)
+>>  gcov-files-i386-y += hw/pci-host/q35.c
+>>  check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) +=
+>> tests/vhost-user-test$(EXESUF)
+>> -ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
+>> -check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) +=
+>> tests/vhost-user-test$(EXESUF)
+>> -endif
+>> +check-qtest-x86_64-$(call lor, $(CONFIG_VHOST_USER_NET_TEST_i386),
+>> $(CONFIG_VHOST_USER_NET_TEST_x86_64)) +=
+>> tests/vhost-user-test$(EXESUF)
 >
-> Please remove the duplicated Sob. Then you can add:
+> I think that is the wrong condition. It's rather "!i386 AND x86_64" that
+> you have to test here. Since that line will get incredibly long with the
+> $(call ...) expressions, I'd suggest to rather drop this hunk, I think
+> it's more readable the way it is.
 
-Done, thanks.
+Dropped.
 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+Anyways, the propper fix is to change how vhost is configured at all.
+The bits in configure are "interesting" to say the less.
+
+Later, Juan.
