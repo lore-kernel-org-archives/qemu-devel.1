@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fsK3Q-0001mo-CP
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:43:33 -0400
+	(envelope-from <peterx@redhat.com>) id 1fsK6V-0006xf-KD
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fsK3P-0001vu-8f
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:43:32 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 21 Aug 2018 23:43:19 -0400
-Message-Id: <20180822034319.686504-3-jcody@redhat.com>
-In-Reply-To: <20180822034319.686504-1-jcody@redhat.com>
-References: <20180822034319.686504-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] block: iotest to catch abort on forced
- blockjob cancel
+	(envelope-from <peterx@redhat.com>) id 1fsK6Q-0003aV-KR
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:46:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52378 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fsK6Q-0003Zu-El
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 23:46:38 -0400
+Date: Wed, 22 Aug 2018 11:46:32 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180822034632.GB3324@xz-x1>
+References: <20180817135224.22971-1-marcandre.lureau@redhat.com>
+	<20180820024504.GA7953@xz-mi>
+	<CAJ+F1C+J1mUeP8YbsCg=-VU15adxKZoM2acxEJUVtEBUTJsuBQ@mail.gmail.com>
+	<20180821062951.GE19915@xz-mi>
+	<CAJ+F1C+qTV6gQa6SZJ_HLUP1YO0Nm2C-momg0nAZcV6TWPaREw@mail.gmail.com>
+	<3842a5df-b3ed-08b3-b627-a89cd3c7c1ce@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3842a5df-b3ed-08b3-b627-a89cd3c7c1ce@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/4] Fix socket chardev regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,159 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: df317f617fbe5affcf699cb8560e7b0c2e028a64.1534868459.git.jcody@redhat.com
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- tests/qemu-iotests/229     | 95 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/229.out | 23 +++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 119 insertions(+)
- create mode 100755 tests/qemu-iotests/229
- create mode 100644 tests/qemu-iotests/229.out
+On Tue, Aug 21, 2018 at 04:16:27PM +0200, Paolo Bonzini wrote:
+> On 21/08/2018 16:04, Marc-Andr=C3=A9 Lureau wrote:
+> >> If you don't like the way I proposed, another thing I am
+> >> thinking is that whether we can assign the gcontext for the chardev
+> >> backend before initialization of it (or by parsing the backend &
+> >> frontend relationships before init of backends), then we assure that
+> >> we never change the gcontext of any chardev backends.  Though that
+> > Yes, I think that's a cleaner solution. I suggested to use an iothrea=
+d
+> > argument in the cover letter.
+>=20
+> That would be nice, but isn't it already too late for the monitor chard=
+ev?
 
-diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-new file mode 100755
-index 0000000000..ff851ec431
---- /dev/null
-+++ b/tests/qemu-iotests/229
-@@ -0,0 +1,95 @@
-+#!/bin/bash
-+#
-+# Test for force canceling a running blockjob that is paused in
-+# an error state.
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=jcody@redhat.com
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+here="$PWD"
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_qemu
-+    _cleanup_test_img
-+    rm -f "$TEST_IMG" "$DEST_IMG"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+# Needs backing file and backing format support
-+_supported_fmt qcow2 qed
-+_supported_proto file
-+_supported_os Linux
-+
-+
-+DEST_IMG="$TEST_DIR/d.$IMGFMT"
-+TEST_IMG="$TEST_DIR/b.$IMGFMT"
-+
-+_make_test_img 2M
-+
-+# destination for mirror will be too small, causing error
-+TEST_IMG=$DEST_IMG _make_test_img 1M
-+
-+$QEMU_IO -c 'write 0 2M' "$TEST_IMG" | _filter_qemu_io
-+
-+_launch_qemu -drive id=testdisk,file="$TEST_IMG",format="$IMGFMT"
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'qmp_capabilities'}" \
-+    'return'
-+
-+echo
-+echo '=== Starting drive-mirror, causing error & stop  ==='
-+echo
-+
-+_send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'drive-mirror',
-+                 'arguments': {'device': 'testdisk',
-+                               'mode':   'absolute-paths',
-+                               'format': '$IMGFMT',
-+                               'target': '$DEST_IMG',
-+                               'sync':   'full',
-+                               'mode':   'existing',
-+                               'on-source-error': 'stop',
-+                               'on-target-error': 'stop' }}"    \
-+     "JOB_STATUS_CHANGE.*pause"
-+
-+echo
-+echo '=== Force cancel job paused in error state  ==='
-+echo
-+
-+success_or_failure="y" _send_qemu_cmd $QEMU_HANDLE \
-+    "{'execute': 'block-job-cancel',
-+                 'arguments': { 'device': 'testdisk',
-+                                'force': true}}" \
-+     "BLOCK_JOB_CANCELLED" "Assertion"
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-new file mode 100644
-index 0000000000..4c4112805f
---- /dev/null
-+++ b/tests/qemu-iotests/229.out
-@@ -0,0 +1,23 @@
-+QA output created by 229
-+Formatting 'TEST_DIR/b.IMGFMT', fmt=IMGFMT size=2097152
-+Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=1048576
-+wrote 2097152/2097152 bytes at offset 0
-+2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+{"return": {}}
-+
-+=== Starting drive-mirror, causing error & stop  ===
-+
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "testdisk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "testdisk"}}
-+
-+=== Force cancel job paused in error state  ===
-+
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "testdisk", "operation": "write", "action": "stop"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "testdisk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "testdisk", "len": 2097152, "offset": 1048576, "speed": 0, "type": "mirror"}}
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index b973dc842d..743790745b 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -225,3 +225,4 @@
- 225 rw auto quick
- 226 auto quick
- 227 auto quick
-+229 auto quick
--- 
-2.17.1
+I think, yes, if we want to do this automatically. Though if as
+Marc-Andr=C3=A9 suggested (which I didn't really notice first when readin=
+g
+the cover letter), then maybe that's not a problem since user need to
+manually specify the iothread for a chardev backend, then chardev
+context will not depend on monitor code any more.
+
+Marc-Andr=C3=A9, do you want to propose your iothread interface?  That
+should be the easy way AFAIU, though that'll make the command line for
+monitor out-of-band much longer (but it seems fine at least to me).
+
+Adding Markus too.
+
+>=20
+> In any case, I don't see a reason to dislike this patch, especially
+> since it comes with a testcase.
+
+AFAIU the test case didn't really test the non-NULL gcontext case, so
+it fixed A (vhost-user reconnect) however it might break B (non-NULL
+gcontext with a potential race).
+
+Regards,
+
+--=20
+Peter Xu
