@@ -1,38 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fsWNp-0005IV-Vw
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:53:26 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWgA-0004Vz-TK
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:12:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fsWNm-0007jJ-Ia
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:53:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55150 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsWX4-0005JT-Sw
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:03:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50282 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fsWNm-0007ix-36
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 12:53:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fsWX4-0005JF-Ov
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 13:02:58 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B1C8B7A7EA
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 16:53:21 +0000 (UTC)
-Date: Wed, 22 Aug 2018 17:53:12 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180822165312.GV12750@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180822142956.6859-1-marcandre.lureau@redhat.com>
-	<20180822142956.6859-4-marcandre.lureau@redhat.com>
-	<20180822154611.GN12750@redhat.com>
-	<CAMxuvawr-ooy91ZHTHx+aLYhgpH5gBoAKQz_pvF=kcHzadjLog@mail.gmail.com>
-	<4a0122ad-52eb-d241-709b-76038e65a858@redhat.com>
-	<CAMxuvaxEM4DjCq=AKEEg3cTJzoo1PX9N5R6p1_+wvCY=TMtgqQ@mail.gmail.com>
-	<20180822164336.GS12750@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 709F14023ECB
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 17:02:58 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 22 Aug 2018 19:02:47 +0200
+Message-Id: <20180822170250.29573-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180822170250.29573-1-marcandre.lureau@redhat.com>
+References: <20180822170250.29573-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180822164336.GS12750@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] seccomp: set the seccomp filter to
- all threads
+Subject: [Qemu-devel] [PATCH v4 1/4] seccomp: use SIGSYS signal instead of
+ killing the thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,85 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: Paul Moore <pmoore@redhat.com>, Eduardo Otubo <otubo@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: pmoore@redhat.com, berrange@redhat.com, eblake@redhat.com, Eduardo Otubo <otubo@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Wed, Aug 22, 2018 at 05:43:36PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Aug 22, 2018 at 06:19:16PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >=20
-> > On Wed, Aug 22, 2018 at 6:07 PM, Eric Blake <eblake@redhat.com> wrote=
-:
-> > > On 08/22/2018 10:58 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > >
-> > >>> At this point you might as well not bother using seccomp at all. =
-The
-> > >>> thread that is confined merely needs to scribble something into t=
-he
-> > >>> stack of the unconfined thread and now it can do whatever it want=
-s.
-> > >>
-> > >>
-> > >> Actually, that message is incorrect, it should rather be "not all
-> > >> threads will be filtered" (as described in commit message).
-> > >>
-> > >>> IMHO we need to find a way to get the policy to apply to those ot=
-her
-> > >>> threads.
-> > >>
-> > >>
-> > >> That's what the patch is about ;)
-> > >
-> > >
-> > > In other words, this patch is patching the gaping security hole tha=
-t already
-> > > exists, but...
-> > >
-> > >>>> +++ b/qemu-options.hx
-> > >>>> @@ -3864,6 +3864,8 @@ Disable set*uid|gid system calls
-> > >>>>   Disable *fork and execve
-> > >>>>   @item resourcecontrol=3D@var{string}
-> > >>>>   Disable process affinity and schedular priority
-> > >>>> +@item tsync=3D@var{bool}
-> > >>>> +Apply seccomp filter to all threads (default is auto, and will =
-warn if
-> > >>>> fail)
-> > >>>
-> > >>>
-> > >>> IMHO this should never exist, as setting "tsync" to anything othe=
-r
-> > >>> than "yes", is akin to just running without any sandbox.
-> > >>
-> > >>
-> > >> Then we should just fail -sandbox on those systems.
-> > >
-> > >
-> > > ...leaving the backdoor open.  Yes, we should instead fix things to=
- hard
-> > > fail when -sandbox cannot fully protect the process, rather than ad=
-ding a
-> > > tsync=3Doff backdoor to permit execution in spite of the insecurity=
-.
-> >=20
-> > Ok, -sandbox will now require libseccomp 2.2.0 (not available in
-> > Debian oldstable - so it will fail at configure time) and kernel >=3D
-> > 3.17 (error during start). If that sounds ok, I'll update the series.
->=20
-> Hmm, that will cause seccomp to be unusable for RHEL-7, prior to
-> the 7.5 kernel, which has complications wrt libvirt using -sandbox
-> by default.
+The seccomp action SCMP_ACT_KILL results in immediate termination of
+the thread that made the bad system call. However, qemu being
+multi-threaded, it keeps running. There is no easy way for parent
+process / management layer (libvirt) to know about that situation.
 
-None the less, lets just do what you propose here.
+Instead, the default SIGSYS handler when invoked with SCMP_ACT_TRAP
+will terminate the program and core dump.
 
-Distros without kernel support should explicitly disable seccomp in QEMU
-at build time, then libvirt will "do the right thing".
+This may not be the most secure solution, but probably better than
+just killing the offending thread. SCMP_ACT_KILL_PROCESS has been
+added in Linux 4.14 to improve the situation, which I propose to use
+by default if available in the next patch.
 
-Regards,
-Daniel
+Related to:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1594456
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Acked-by: Eduardo Otubo <otubo@redhat.com>
+---
+ qemu-seccomp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+index 9cd8eb9499..b117a92559 100644
+--- a/qemu-seccomp.c
++++ b/qemu-seccomp.c
+@@ -125,7 +125,7 @@ static int seccomp_start(uint32_t seccomp_opts)
+             continue;
+         }
+=20
+-        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_KILL, blacklist[i].n=
+um,
++        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_TRAP, blacklist[i].n=
+um,
+                                     blacklist[i].narg, blacklist[i].arg_=
+cmp);
+         if (rc < 0) {
+             goto seccomp_return;
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+2.18.0.547.g1d89318c48
