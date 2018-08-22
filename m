@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fsR1Q-0000fP-0k
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:09:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fsR32-0001yI-Gm
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:11:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fsR1P-0001lY-2c
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:09:55 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fsR2y-0002Z3-US
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:11:36 -0400
 References: <20180817190457.8292-1-jsnow@redhat.com>
 	<20180817190457.8292-3-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a60390d5-b104-cbe1-c3f6-79012ce1f45c@redhat.com>
-Date: Wed, 22 Aug 2018 13:09:39 +0200
+Message-ID: <904aa956-ad1f-4606-f2d5-742501d42f21@redhat.com>
+Date: Wed, 22 Aug 2018 13:11:08 +0200
 MIME-Version: 1.0
 In-Reply-To: <20180817190457.8292-3-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="2KWRn58Uy7X6Q8e2Pt4S8mA2Hf8XshfiM"
+	boundary="3xOOOiZYtiiQNYBD1SxvzWCMbI4nxbEKe"
 Subject: Re: [Qemu-devel] [PATCH 2/7] jobs: canonize Error object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,11 +28,11 @@ To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2KWRn58Uy7X6Q8e2Pt4S8mA2Hf8XshfiM
+--3xOOOiZYtiiQNYBD1SxvzWCMbI4nxbEKe
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
-Message-ID: <a60390d5-b104-cbe1-c3f6-79012ce1f45c@redhat.com>
+Message-ID: <904aa956-ad1f-4606-f2d5-742501d42f21@redhat.com>
 Subject: Re: [PATCH 2/7] jobs: canonize Error object
 References: <20180817190457.8292-1-jsnow@redhat.com>
  <20180817190457.8292-3-jsnow@redhat.com>
@@ -64,58 +64,46 @@ On 2018-08-17 21:04, John Snow wrote:
 >  tests/test-blockjob.c     |  2 +-
 >  11 files changed, 22 insertions(+), 31 deletions(-)
 
-So...  Why does this patch come before removing the @ret parameter from
-job_completed()?
+(Accidentally deleted this part from my first reply)
+
+> diff --git a/job.c b/job.c
+> index 898260b2b3..c9de1af556 100644
+> --- a/job.c
+> +++ b/job.c
 
 [...]
 
-> diff --git a/include/qemu/job.h b/include/qemu/job.h
-> index 9cf463d228..5c92c53ef0 100644
-> --- a/include/qemu/job.h
-> +++ b/include/qemu/job.h
-> @@ -124,12 +124,12 @@ typedef struct Job {
->      /** Estimated progress_current value at the completion of the job =
-*/
->      int64_t progress_total;
+> @@ -535,7 +535,6 @@ void job_drain(Job *job)
+>      }
+>  }
 > =20
-> -    /** Error string for a failed job (NULL if, and only if, job->ret =
-=3D=3D 0) */
-> -    char *error;
 > -
->      /** ret code passed to job_completed. */
->      int ret;
-> =20
-> +    /** Error object for a failed job **/
-> +    Error *err;
-> +
+>  /**
+>   * All jobs must allow a pause point before entering their job proper.=
+ This
+>   * ensures that jobs can be paused prior to being started, then resume=
+d later.
 
-Is there a reason why you remove the iff relationship?
-
-(Maybe because job_completed() still receives @ret? :-))
+If anything, you should remove one empty line after this function. ;-)
 
 Max
 
->      /** The completion function that will be called when the job compl=
-etes.  */
->      BlockCompletionFunc *cb;
-> =20
 
-
---2KWRn58Uy7X6Q8e2Pt4S8mA2Hf8XshfiM
+--3xOOOiZYtiiQNYBD1SxvzWCMbI4nxbEKe
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt9RHMACgkQ9AfbAGHV
-z0CtlwgAs5IMWuj4P4j+vVxS6muQu8DrtNX3jN4qdOV7tQ9y/6g+7FloGeMEu/Ti
-hctpf/ZF0f6IDYA1QeA1Nql96tivTcWV7lBSxMtnYHWNHVTsTzfKjEFEij1S4DSU
-p47lgc+nh/+rVgQ1DA2jMpsduORMDi2okOYgzm1aPEVIcdXDIvU5HG+E/t0L/x5M
-UJthIdbnd4a5QsTSHo64SrFftKDDzRJv9xjaU4uzI98BvyiLEQTW50QhNHuTxNKI
-JVAifTqEZdUTqmx7cr3HWnc5Ip9L3TGz1yNlQxVxykfqvRqYsk3u7m5ESV3CsC2b
-egOdCwq/uBXIFXGH5m7qUCifdHeEsA==
-=EaQi
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt9RMwACgkQ9AfbAGHV
+z0Ac3AgAmBsFRVhPETzx3yfp+lbiBYUpSk4y/WoXigIBGkFtl/u9tvrSzIOFI2fO
+2K7Xv5btKZ5o86Igd3B6ljProAlMFzuaFbm/FyJ1TujrXqGVNgu910hw2ZWZ+5IH
+M1Hvy69MM9skSmjsUSLY7DHxTVPvRncW0lPkQg3j1wkMglH5t80U/rqfUUM7Xdw4
+NUsaHVSYK5BSwNX1iR1kxGPnQxi1ZLjyzbiMVtXyPC+pmBQejOF+x10a0KpWiKWM
+z9Np7p+a7QGnrsKfMlmMNdmDon2WdgGxLCHufs/PvBPkgPX4crT3MIr//1UHXh4/
+s9IW7uEfp1VukU+uYecwYdetuGNU5Q==
+=pVvJ
 -----END PGP SIGNATURE-----
 
---2KWRn58Uy7X6Q8e2Pt4S8mA2Hf8XshfiM--
+--3xOOOiZYtiiQNYBD1SxvzWCMbI4nxbEKe--
