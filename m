@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fsVRS-0001Tc-Je
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:53:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1fsVRh-0001TX-Kn
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:53:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fsVOL-0005fI-SR
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:49:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13253)
+	(envelope-from <berrange@redhat.com>) id 1fsVKv-0002Jt-Bm
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:46:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45978 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fsVOL-0005ew-Ju
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:49:53 -0400
-Date: Wed, 22 Aug 2018 12:49:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180822154948.GR18995@localhost.localdomain>
-References: <20180817092936.GC11124@redhat.com>
-	<e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
-	<39b3c8b8-25eb-3a8e-3a5a-abd584a11e2c@laine.org>
-	<f961907dde47f1a7fa3be400bed6356f136ec704.camel@redhat.com>
-	<20180822120135.GN18995@localhost.localdomain>
-	<20180822122601.GI12750@redhat.com>
-	<20180822125455.GP18995@localhost.localdomain>
-	<20180822134440.GK12750@redhat.com>
-	<20180822141828.GQ18995@localhost.localdomain>
-	<20180822145720.GL12750@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fsVKv-0002Iz-4U
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 11:46:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA15D4023827
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 15:46:20 +0000 (UTC)
+Date: Wed, 22 Aug 2018 16:46:11 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180822154611.GN12750@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180822142956.6859-1-marcandre.lureau@redhat.com>
+	<20180822142956.6859-4-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180822145720.GL12750@redhat.com>
+In-Reply-To: <20180822142956.6859-4-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
- for guest OSes that don't support virtio-1.0
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] seccomp: set the seccomp filter to
+ all threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,133 +36,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Andrea Bolognani <abologna@redhat.com>, Libvirt <libvir-list@redhat.com>, qemu list <qemu-devel@nongnu.org>, Laine Stump <laine@laine.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, pmoore@redhat.com, Eduardo Otubo <otubo@redhat.com>
 
-On Wed, Aug 22, 2018 at 03:57:20PM +0100, Daniel P. Berrang=E9 wrote:
-> On Wed, Aug 22, 2018 at 11:18:28AM -0300, Eduardo Habkost wrote:
-> > On Wed, Aug 22, 2018 at 02:44:40PM +0100, Daniel P. Berrang=E9 wrote:
-[...]
-> > > An explicit virtio-transitional device is still two separate
-> > > devices pretending to be the same thing, but magically changing
-> > > their identity at runtime. We've already got that situation with
-> > > existing device models, and I'm loathe to see us add 2nd device
-> > > model with that same behaviour, just for sake of having a slightly
-> > > different PCI bus placement strategy to support outdated guest OS.
-> >=20
-> > Your seem to be describing what the current "virtio" device is:
-> > it becomes a non-transitional (modern-only) Virtio device on some
-> > cases, and becomes a transitional Virtio device on other cases.
-> > It is two devices pretending to be the same thing.  That's
-> > exactly what I would like applications to get rid of.
-> >=20
-> > Now, the above is really not an accurate description of
-> > transitional Virtio devices.  A transitional Virtio device is
-> > something clearly specified in the Virtio spec, and it just means
-> > a device that supports two types of drivers.  It's not different
-> > from a x86_64 CPU that can run 32-bit OSes.
-> >=20
-> > See:
-> > http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.h=
-tml#x1-60001
-> > http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.h=
-tml#x1-3090004
+On Wed, Aug 22, 2018 at 04:29:56PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> When using "-seccomp on", the seccomp policy is only applied to the
+> main thread, the vcpu worker thread and other worker threads created
+> after seccomp policy is applied; the seccomp policy is not applied to
+> e.g. the RCU thread because it is created before the seccomp policy is
+> applied and SECCOMP_FILTER_FLAG_TSYNC isn't used.
 >=20
-> When I say a device pretending to be 2 different devices, I'm
-> generally referring to the fact that a single QEMU device model
-> can expose two different PCI device IDs depending on how it is
-> configured and/or placed.
-
-Understood.  Then you are not describing transitional Virtio, you
-are just describing QEMU's disable-legacy=3Dauto behavior (which is
-the default).
-
-
+> This can be verified with
+> for task in /proc/`pidof qemu`/task/*; do cat $task/status | grep Secc =
+; done
+> Seccomp:	2
+> Seccomp:	0
+> Seccomp:	0
+> Seccomp:	2
+> Seccomp:	2
+> Seccomp:	2
 >=20
-> > > > > Honestly though, the longer this discussion goes on, the more I=
- think
-> > > > > the answer is just "do nothing". All this time spent on discuss=
-ion,
-> > > > > and future time spent on implementing new logic in apps, is mer=
-ely
-> > > > > to support running RHEL-6 on Q35.  I think we should just say t=
-hat
-> > > > > RHEL-6 should use i440fx forever and be done with it.
-> > > >=20
-> > > > I'm not sure if you are saying that we (Red Hat) shouldn't spend
-> > > > time implementing it, or that the libvirt upstream project should
-> > > > reject the patches if somebody implements it.  I would understand
-> > > > the former, but not the latter.
-> > >=20
-> > > Even if someone is willing to implement it in libvirt, we have to
-> > > consider the cost of supporting it in both libvirt and applications
-> > > using libvirt and the complexity it adds to our story about the
-> > > docs / best practices for configuring guests.
-> > >=20
-> > > Even though I do kind of like the virtio-0.9/virtio-1.0 device mode=
-l
-> > > as concepts, I'm yet to be convinced that implementing them in libv=
-irt
-> > > and then also in all the downstream applications (oVirt, OpenStack,
-> > > virt-manager, cockpit, etc) is actually worth the cost.
-> > >=20
-> > > There's little compelling reason to care about running outdated OS
-> > > like RHEL-6 on Q35 in general. The motivation behind it is just
-> > > coming from an artifically created problem downstream, by wishing
-> > > to drop the i440fx machine at some still undeteremined point in the
-> > > future. By the time that future comes, RHEL-6 may well even be
-> > > end of life making the entire exercise a pointless.
-> >=20
-> > I'm all for making a cost/benefit analysis, but I don't think you
-> > are taking into account the costs of keeping the confusing
-> > semantics of existing "virtio" devices.
-> >=20
-> > If you still want to refuse to provide a sane way to configure
-> > transitional Virtio devices, I really won't care.  But I believe
-> > the interface you are trying to keep is actually the one you are
-> > criticizing ("two separate devices pretending to be the same
-> > thing, but magically changing their identity at runtime").
+> Starting with libseccomp 2.2.0 and kernel >=3D 3.17, we can use
+> seccomp_attr_set(ctx, > SCMP_FLTATR_CTL_TSYNC, 1) to update the policy
+> on all threads.
 >=20
-> Yeah, I guess I should make a distinction between what I would
-> do if it was a clean slate, and what we should do given our existing
-> practice.
+> Do it by default if possible, warn if not possible. Add an option to
+> set the tsync behaviour explicitly.
 >=20
-> If we had a clean slate I would not like to see our current impl
-> done.  Given that it already exists, however, we're stuck with
-> that forever. So the question is whether implementing any of
-> the alternative options is a net benefit for libvirt & mgmt apps
-> overall. My gut feeling is that despite the downsides of the
-> current impl, it is not worth trying todo something different.
-
-Fair enough.
-
+> Note: we can't bump libseccomp to 2.2.0 since it's not available in
+> Debian oldstable (2.1.0).
 >=20
-> The thing that has really tipped my mind this way is that even
-> if we provide new device models, mgmt apps will be loathe to
-> actually use them because it will prevent live migration of
-> those guests to hosts with older libvirt.
-
-This might be an issue for some apps, but is it going to happen
-in practice?  Don't they all need mechanisms to flip a switch and
-enable features that require newer host software, already?
-
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qemu-seccomp.c  | 65 +++++++++++++++++++++++++++++++++++++++++++++++--
+>  qemu-options.hx |  2 ++
+>  2 files changed, 65 insertions(+), 2 deletions(-)
 >=20
-> So my feeling is we should do the work to enable use of Q35
-> by default in mgmt apps, for guest OS where it is known to
-> work correctly today. Every other OS should just stick with
-> i440fx as we already know that works for them today and Q35
-> doesn't offer legacy OS compelling enough benefits to switch.
+> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+> index f0c833f3ca..aa23eae970 100644
+> --- a/qemu-seccomp.c
+> +++ b/qemu-seccomp.c
+> @@ -119,6 +119,45 @@ qemu_seccomp(unsigned int operation, unsigned int =
+flags, void *args)
+>  #endif
+>  }
+> =20
+> +static bool qemu_seccomp_syscall_check(void)
+> +{
+> +    int rc;
+> +
+> +    /*
+> +     * this is an invalid call because the second argument is non-zero=
+, but
+> +     * depending on the errno value of ENOSYS or EINVAL we can guess i=
+f the
+> +     * seccomp() syscal is supported or not
+> +     */
+> +    rc =3D qemu_seccomp(SECCOMP_SET_MODE_STRICT, 1, NULL);
+> +    if (rc < 0 && errno =3D=3D EINVAL) {
+> +        return true;
+> +    }
+> +
+> +    return false;
+> +}
+> +
+> +static bool qemu_seccomp_get_default_tsync(void)
+> +{
+> +    bool tsync =3D true;
+> +
+> +    /* TSYNC support was added with the syscall */
+> +    if (!qemu_seccomp_syscall_check()) {
+> +        error_report("The host kernel doesn't support seccomp TSYNC!")=
+;
+> +        tsync =3D false;
+> +    }
+> +
+> +#if !(SCMP_VER_MAJOR >=3D 2 && SCMP_VER_MINOR >=3D 2)
+> +    error_report("libseccomp is too old to support TSYNC!");
+> +    tsync =3D false;
+> +#endif
+> +
+> +    if (!tsync) {
+> +        error_report("Only the main thread will be filtered by seccomp=
+!");
 
-I'd still prefer if libvirt provided a saner configuration
-mechanism, and let libosinfo and management apps decide what
-works best for them.
+At this point you might as well not bother using seccomp at all. The
+thread that is confined merely needs to scribble something into the
+stack of the unconfined thread and now it can do whatever it wants.
 
-If it helps, I can send QEMU patches to make
-virtio-0.9/virtio-1.0-non-transitional/virtio-1.0-transitional
-appear as different device types.  libvirt would then be able to
-check if the device type implements "pci-express-device" or
-"conventional-pci-device", instead of adding device-specific
-placement logic.
+IMHO we need to find a way to get the policy to apply to those other
+threads.
 
+The RCU thread is tricky as it is spawned from a __constructor__
+function, which means it'll be active way before we setup seccomp.
+
+I think we need to figure out a way todo synchronization between
+the RCU thread and the seccomp setup code. Could we have a global
+variable 'int seccomp_initialized' that we check from the RCU
+thread loop - when that toggles to non-zero, the RCU thread can
+then call into the seccomp_start() method to activate policy in
+its thread. We'd need a synchronous feedback mechansim back to
+the main thread, as it must block startup until all the threads
+have activated the seccomp filter.
+
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 5515dfaba5..dafacb60c6 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3864,6 +3864,8 @@ Disable set*uid|gid system calls
+>  Disable *fork and execve
+>  @item resourcecontrol=3D@var{string}
+>  Disable process affinity and schedular priority
+> +@item tsync=3D@var{bool}
+> +Apply seccomp filter to all threads (default is auto, and will warn if=
+ fail)
+
+IMHO this should never exist, as setting "tsync" to anything other
+than "yes", is akin to just running without any sandbox.
+
+Regards,
+Daniel
 --=20
-Eduardo
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
