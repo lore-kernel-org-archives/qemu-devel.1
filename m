@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fsRjS-0002eB-UO
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:55:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fsRka-0003Bp-Qp
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fsRjS-0002DN-1i
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:55:26 -0400
-References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-5-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <44f443a7-fd79-d2ec-e4a9-f228923e25db@redhat.com>
-Date: Wed, 22 Aug 2018 13:55:01 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fsRkZ-0002ti-V6
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:56:36 -0400
+Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:40471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fsRkV-0002s1-Rc
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 07:56:33 -0400
+Received: by mail-oi0-x236.google.com with SMTP id w126-v6so2625065oie.7
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 04:56:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180817190457.8292-5-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="E2yPqPXkMq0drdtfyPUyg9nqlkZLW1nuN"
-Subject: Re: [Qemu-devel] [PATCH 4/7] block/commit: utilize job_exit shim
+In-Reply-To: <CAGmj6qvDLzdDoW7AA4189ZnGTnM0Kr=P0nY9FugWmCWNr_+uWA@mail.gmail.com>
+References: <CAGmj6quRd4KaYJL2vqohFHuNDim+aB5OqoCAcK0HbFx7t+bfjg@mail.gmail.com>
+	<CAFEAcA-MyMUyX9NWLU5OTcqMPXPsiag_awKU9_Qh-vUf2eMoPA@mail.gmail.com>
+	<CAGmj6qvDLzdDoW7AA4189ZnGTnM0Kr=P0nY9FugWmCWNr_+uWA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 22 Aug 2018 12:56:09 +0100
+Message-ID: <CAFEAcA8-mVtidcCs8h3cRXPRsadSOkEPMB_0_PDR87HjKzWOPQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Modeling a device controlled by combination of
+ GPIO and UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
+To: Martin Schroeder <mkschreder.uk@googlemail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E2yPqPXkMq0drdtfyPUyg9nqlkZLW1nuN
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
-Message-ID: <44f443a7-fd79-d2ec-e4a9-f228923e25db@redhat.com>
-Subject: Re: [PATCH 4/7] block/commit: utilize job_exit shim
-References: <20180817190457.8292-1-jsnow@redhat.com>
- <20180817190457.8292-5-jsnow@redhat.com>
-In-Reply-To: <20180817190457.8292-5-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 22 August 2018 at 08:36, Martin Schroeder
+<mkschreder.uk@googlemail.com> wrote:
+> Thanks Peter.
+>
+> I have set it up such that master device has qemu_irq array which it
+> initializes using qdev_init_gpio_out with number of gpio lines going
+> out and slave device calls qdev_init_gpio_in with a callback that
+> should be called when irq is raised. Then I connect them together at
+> higher level using qdev_connect_gpio_out as you said. Then master
+> calls qemu_set_irq with 1 or 0 depending on whether the gpio is high
+> or low.
+>
+> This works, but not as I would expect. The handler that I supply to
+> the init_gpio_in is only being called very infrequently - perhaps once
+> every 50 toggles on the gpio pin. I need to make sure that it gets
+> called every time master device calls qemu_set_irq.
+>
+> What's the mechanism behind this behavior and how can I deliver gpio
+> change to the slave?
 
-On 2018-08-17 21:04, John Snow wrote:
-> Change the manual deferment to commit_complete into the implicit
-> callback to job_exit, renaming commit_complete to commit_exit.
->=20
-> This conversion does change the timing of when job_completed is
-> called to after the bdrv_replace_node and bdrv_unref calls, which
-> could have implications for bjob->blk which will now be put down
-> after this cleanup.
->=20
-> Kevin highlights that we did not take any permissions for that backend
-> at job creation time, so it is safe to reorder these operations.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/commit.c | 20 ++++----------------
->  1 file changed, 4 insertions(+), 16 deletions(-)
->=20
-> diff --git a/block/commit.c b/block/commit.c
-> index 4a17bb73ec..93c3b6a39e 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
+The mechanism is pretty simple -- a qemu_irq is really a
+pointer to a small struct that has a function pointer in
+it. Initializing a gpio in is just setting up the struct and
+function pointer. Connecting them is passing the qemu_irq
+pointer to the source. Calling qemu_set_irq() simply
+calls the function pointer. (You can step through in a
+debugger from the qemu_set_irq call through to the target
+function call if you like -- it's not very much code.)
 
-[...]
+This can fail in the sense that if you don't wire it up
+right then nothing happens when you call qemu_set_irq()
+(because you didn't give the source device the right
+qemu_irq or you didn't give it one at all), but it
+shouldn't be able to fail unreliably and only call
+the destination handler some of the time.
 
-> @@ -93,8 +87,8 @@ static void commit_complete(Job *job, void *opaque)
-> =20
->      if (!job_is_cancelled(job) && ret =3D=3D 0) {
->          /* success */
-> -        ret =3D bdrv_drop_intermediate(s->commit_top_bs, base,
-> -                                     s->backing_file_str);
-> +        job->ret =3D bdrv_drop_intermediate(s->commit_top_bs, base,
-> +                                          s->backing_file_str);
-
-This makes me ask myself why .exit() doesn't just return an int, like
-=2Erun().  And takes an Error **.
-
-Max
-
->      } else {
->          /* XXX Can (or should) we somehow keep 'consistent read' block=
-ed even
->           * after the failed/cancelled commit job is gone? If we alread=
-y wrote
-
-
---E2yPqPXkMq0drdtfyPUyg9nqlkZLW1nuN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlt9TxUACgkQ9AfbAGHV
-z0C+pAf9ESB6ao2xDpbmBDys3VT5Cm6RLlL+1DZBHw5sfCEd2hJmgLeF6h4BJ8Iu
-E6O5UJfxxdpGKcnoSlAutDa9hcgQ+eYlerdsM4vvXprZRrcLKMG6wqxS0wo5H1U5
-Egg2b48jXk3L+1Huz/Npm+4n0qLBjaPr8SjE1J5sdFSocIBdkbbTg+BcZTP9IGnH
-cv6T9X2lsE4XV+bADwy5G/8qa/uOlswXxHLN9d6knnL4fMXMtvUxK+E6WHxyJ04y
-6cJ2yus/DtlPGkJlvjP7q0ZWkHXHK2woFHESw/a1cYOI1j+ubWqtYmLEHb4N+YAx
-uJV6nCdnyqLMJ/gwjg+gYoErwOTskQ==
-=Ooki
------END PGP SIGNATURE-----
-
---E2yPqPXkMq0drdtfyPUyg9nqlkZLW1nuN--
+thanks
+-- PMM
