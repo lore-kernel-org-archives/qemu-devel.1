@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsOBg-00035o-T4
+	(envelope-from <quintela@redhat.com>) id 1fsOBg-00035n-Sz
 	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:08:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsOBf-0007pm-S4
+	(envelope-from <quintela@redhat.com>) id 1fsOBf-0007pe-QX
 	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:08:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39632 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59414 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsOBZ-0007hE-F4
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:08:16 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsOBX-0007fm-Va
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:08:15 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 572637A7EC
-	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 08:08:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E9CE987A7F
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 08:08:08 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 22 Aug 2018 10:07:39 +0200
-Message-Id: <20180822080751.11307-8-quintela@redhat.com>
+Date: Wed, 22 Aug 2018 10:07:38 +0200
+Message-Id: <20180822080751.11307-7-quintela@redhat.com>
 In-Reply-To: <20180822080751.11307-1-quintela@redhat.com>
 References: <20180822080751.11307-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 07/19] check: Only test ac97 when it is compiled
- in
+Subject: [Qemu-devel] [PULL 06/19] check: Only test es1370 when it is
+ compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,19 +40,19 @@ Reviewed-by: Thomas Huth <thuth@redhat.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 386e3db7d7..e90a8a251c 100644
+index bac1a7efe0..386e3db7d7 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -226,8 +226,8 @@ check-qtest-pci-$(CONFIG_NE2000_PCI) += tests/ne2000-test$(EXESUF)
- gcov-files-pci-$(CONFIG_NE2000_PCI) += hw/net/ne2000.c
- check-qtest-pci-y += tests/nvme-test$(EXESUF)
+@@ -228,8 +228,8 @@ check-qtest-pci-y += tests/nvme-test$(EXESUF)
  gcov-files-pci-y += hw/block/nvme.c
--check-qtest-pci-y += tests/ac97-test$(EXESUF)
--gcov-files-pci-y += hw/audio/ac97.c
-+check-qtest-pci-$(CONFIG_AC97) += tests/ac97-test$(EXESUF)
-+gcov-files-pci-$(CONFIG_AC97) += hw/audio/ac97.c
- check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
- gcov-files-pci-$(CONFIG_ES1370) += hw/audio/es1370.c
+ check-qtest-pci-y += tests/ac97-test$(EXESUF)
+ gcov-files-pci-y += hw/audio/ac97.c
+-check-qtest-pci-y += tests/es1370-test$(EXESUF)
+-gcov-files-pci-y += hw/audio/es1370.c
++check-qtest-pci-$(CONFIG_ES1370) += tests/es1370-test$(EXESUF)
++gcov-files-pci-$(CONFIG_ES1370) += hw/audio/es1370.c
  check-qtest-pci-y += $(check-qtest-virtio-y)
+ gcov-files-pci-y += $(gcov-files-virtio-y) hw/virtio/virtio-pci.c
+ check-qtest-pci-y += tests/tpci200-test$(EXESUF)
 -- 
 2.17.1
