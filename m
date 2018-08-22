@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fsOPw-0002v5-8C
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:23:05 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fsOTM-0006vE-4t
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fsOPr-0008HG-8K
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:23:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36618 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fsOPq-0008Fc-8q
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:22:58 -0400
-References: <20180811205924.4113-1-zhangckid@gmail.com>
-	<20180811205924.4113-16-zhangckid@gmail.com>
-	<f5b85e98-29ed-86e0-4497-7a63b61a663b@redhat.com>
-	<CAK3tnv+CPvV5F09PWx5B2bQp6xYNmyJ--x_qy4mS7XZ6K1=W_Q@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f19bc830-61e5-6136-980e-d8f64b7786af@redhat.com>
-Date: Wed, 22 Aug 2018 16:22:50 +0800
+	(envelope-from <luc.michel@greensocs.com>) id 1fsOTK-0001wv-He
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 04:26:35 -0400
+References: <20180821132811.17675-1-peter.maydell@linaro.org>
+	<20180821132811.17675-4-peter.maydell@linaro.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <e31f0f76-888c-d2ed-9e2a-b00dff2f60b7@greensocs.com>
+Date: Wed, 22 Aug 2018 10:26:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAK3tnv+CPvV5F09PWx5B2bQp6xYNmyJ--x_qy4mS7XZ6K1=W_Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V11 15/20] net/net.c: Add net client type
- check function for COLO
+In-Reply-To: <20180821132811.17675-4-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lhKe1mfNMRmvFe62sUmPpklSqHXlBieuJ"
+Subject: Re: [Qemu-devel] [PATCH 3/9] hw/arm/vexpress: Connect VIRQ and VFIQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com, Zhang Chen <chen.zhang@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lhKe1mfNMRmvFe62sUmPpklSqHXlBieuJ
+From: Luc Michel <luc.michel@greensocs.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: patches@linaro.org
+Message-ID: <e31f0f76-888c-d2ed-9e2a-b00dff2f60b7@greensocs.com>
+Subject: Re: [PATCH 3/9] hw/arm/vexpress: Connect VIRQ and VFIQ
+References: <20180821132811.17675-1-peter.maydell@linaro.org>
+ <20180821132811.17675-4-peter.maydell@linaro.org>
+In-Reply-To: <20180821132811.17675-4-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 8/21/18 3:28 PM, Peter Maydell wrote:
+> Connect the VIRQ and VFIQ lines from the GIC to the CPU;
+> these exist always for both CPU and GIC whether the
+> virtualization extensions are enabled or not, so we
+> can just unconditionally connect them.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+
+> ---
+>  hw/arm/vexpress.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+> index 5bfe2e43487..dc47ed84c20 100644
+> --- a/hw/arm/vexpress.c
+> +++ b/hw/arm/vexpress.c
+> @@ -251,6 +251,10 @@ static void init_cpus(const char *cpu_type, const =
+char *privdev,
+>          sysbus_connect_irq(busdev, n, qdev_get_gpio_in(cpudev, ARM_CPU=
+_IRQ));
+>          sysbus_connect_irq(busdev, n + smp_cpus,
+>                             qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
+> +        sysbus_connect_irq(busdev, n + 2 * smp_cpus,
+> +                           qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
+> +        sysbus_connect_irq(busdev, n + 3 * smp_cpus,
+> +                           qdev_get_gpio_in(cpudev, ARM_CPU_VFIQ));
+>      }
+>  }
+> =20
+>=20
 
 
+--lhKe1mfNMRmvFe62sUmPpklSqHXlBieuJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 2018=E5=B9=B408=E6=9C=8821=E6=97=A5 17:26, Zhang Chen wrote:
->
->
-> On Tue, Aug 21, 2018 at 11:27 AM Jason Wang <jasowang@redhat.com=20
-> <mailto:jasowang@redhat.com>> wrote:
->
->
->
->     On 2018=E5=B9=B408=E6=9C=8812=E6=97=A5 04:59, Zhang Chen wrote:
->     > From: Zhang Chen <chen.zhang@intel.com
->     <mailto:chen.zhang@intel.com>>
->     >
->     > We add is_colo_support_client_type() to check the net client
->     type for
->     > COLO-compare. Currently we just support TAP.
->     > Suggested by Jason.
->     >
->     > Signed-off-by: Zhang Chen <zhangckid@gmail.com
->     <mailto:zhangckid@gmail.com>>
->     > Signed-off-by: Zhang Chen <chen.zhang@intel.com
->     <mailto:chen.zhang@intel.com>>
->     > ---
->
->     This needs more works:
->
->     - Forbid vhost
->     - Deal with hotplug
->
->     Looks not a must for this series, so to speed up the process, you
->     may do
->     it on top.
->
->
-> Do you mean this patch we can stay this status currently?
->
-> Thanks
-> Zhang Chen
+-----BEGIN PGP SIGNATURE-----
 
-Sorry for being unclear, I mean we need a complete solution rather than=20
-partial one.
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAlt9HiwACgkQd8knW3Qn
+Tr708w//bqlKb4V4zARkgA5EYV9FR61RfwEF2N2hCjoWEDyIfZfhyRGUZWZk2NHh
+3aAVRuK6Yd2dzq2258AfOuJ0YLuLg1ZObpJF3KfYOCIctgY8IOJIpb601Q0bIJdG
+o1zE5xmzWoyYJIssuTIqTfIqPvW2nHXt6mLf0OAaU/KdIehG/vYF+Pxv/Ix46bvl
+9M5RxWOEUJ4B9w/PiOzmJm3d2Houq18THS0Lf6KjCtJgqsd9DQti7uR6ZQmaDFsJ
+rfYWZIrm0IqunuRddhef4hhtPTeQ8ccGwJuyBXfCrdiY345sznSrEy28C+lFpIxG
+ShISijkvpN4HbKv3RrBB1i+7rXEwf4PQ673LATIxZgKsnHoxstQCmnrLHtADojHM
+sf1Y2c33p1d/uYl/NXRzD2xpR47ZdVqZRMJo9jIJ3rqfWMsSW2cDmEIeIQrFiZom
+M2b7tXjzUqY6TYJhzTjZGtbzFO6xQ7XB6RL8S40IqKi5E4jk0UKpia6Kbp/uEWjj
+QaTUKSBVqwrFriPChGTJH1AuUOkKU75DAThnCdFbFINL/p0cM88S7Wq6MdjWRcn6
+AIhVGb/tbSuiJ3Zm1TK7uxwfU2T3peX/Fwxq//1xddL8Oc0kTd2AiOf5j7mswApl
+PgLmTw8pVYmB9mLdsIXyOkCPoQg2KNld7fcrYKIjUVuPrmo4JEo=
+=dLvx
+-----END PGP SIGNATURE-----
 
-Thanks
+--lhKe1mfNMRmvFe62sUmPpklSqHXlBieuJ--
