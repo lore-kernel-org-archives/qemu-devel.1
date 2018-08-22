@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fsIWl-000132-Lb
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 22:05:48 -0400
+	(envelope-from <peterx@redhat.com>) id 1fsJDG-0002K0-3q
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 22:49:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fsILP-0003e0-93
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:54:04 -0400
-Received: from mga05.intel.com ([192.55.52.43]:20953)
+	(envelope-from <peterx@redhat.com>) id 1fsJDA-0000ni-93
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 22:49:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57308 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1fsILO-0003ag-Jk
-	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 21:53:59 -0400
-References: <1534821487-14189-1-git-send-email-jing2.liu@linux.intel.com>
-	<1534821487-14189-3-git-send-email-jing2.liu@linux.intel.com>
-	<e88aac49-d0be-6ba9-9674-1785caa5af5b@gmail.com>
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <b3d4db42-0ff0-9fd6-7c4e-ee74d15093e5@linux.intel.com>
-Date: Wed, 22 Aug 2018 09:53:51 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fsJD6-0000kq-Uw
+	for qemu-devel@nongnu.org; Tue, 21 Aug 2018 22:49:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 388F14021CC3
+	for <qemu-devel@nongnu.org>; Wed, 22 Aug 2018 02:49:28 +0000 (UTC)
+Date: Wed, 22 Aug 2018 10:49:20 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180822024920.GA3324@xz-x1>
+References: <153487789207.20513.6642364712339067528.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <e88aac49-d0be-6ba9-9674-1785caa5af5b@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw/pci: add PCI resource reserve
- capability to legacy PCI bridge
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <153487789207.20513.6642364712339067528.stgit@gimli.home>
+Subject: Re: [Qemu-devel] [PATCH] vfio/pci: Fix failure to close file
+ descriptor on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +33,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: anthony.xu@intel.com, mst@redhat.com, lersek@redhat.com, pbonzini@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi Marcel,
+On Tue, Aug 21, 2018 at 12:58:53PM -0600, Alex Williamson wrote:
+> A new error path fails to close the device file descriptor when
+> triggered by a ballooning incompatibility within the group.  Fix it.
+> 
+> Fixes: 238e91728503 ("vfio/ccw/pci: Allow devices to opt-in for ballooning")
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-On 8/21/2018 5:59 PM, Marcel Apfelbaum wrote:
-> 
-> 
-> On 08/21/2018 06:18 AM, Jing Liu wrote:
->> Add hint to firmware (e.g. SeaBIOS) to reserve addtional
->> BUS/IO/MEM/PREF resource for legacy pci-pci bridge. Add the
->> resource reserve capability deleting in pci_bridge_dev_exitfn.
->>
->> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
->> ---
->>   hw/pci-bridge/pci_bridge_dev.c | 24 ++++++++++++++++++++++++
->>   1 file changed, 24 insertions(+)
->>
-[...]
-> 
-> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
-> 
-Thanks for the quick reviewing and feedback.
-So could I ask what I should do now, update a new version
-with your rb or just waiting for pushing, or else?
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Thanks,
-Jing
+Regards,
 
-> Thanks,
-> Marcel
-> 
+-- 
+Peter Xu
