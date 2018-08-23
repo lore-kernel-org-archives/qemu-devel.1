@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fskJD-0004Wn-1O
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 03:45:38 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1fskY6-0001vk-8a
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 04:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fskEM-0006mY-1Y
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 03:40:34 -0400
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-Date: Thu, 23 Aug 2018 11:44:59 -0400
-Message-ID: <1535039100-11248-1-git-send-email-gengdongjiu@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6 1/2] linux-headers: Update to kernel
- mainline commit 815f0ddb3
+	(envelope-from <peng.hao2@zte.com.cn>) id 1fskY2-0000qU-WD
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 04:00:58 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:17888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
+	id 1fskY2-0000ll-K3
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 04:00:54 -0400
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Fri, 24 Aug 2018 00:14:48 +0800
+Message-Id: <1535040889-52782-4-git-send-email-peng.hao2@zte.com.cn>
+In-Reply-To: <1535040889-52782-1-git-send-email-peng.hao2@zte.com.cn>
+References: <1535040889-52782-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [PATCH V3 3/4] target-i386: add rtc 0x70 port as
+ coalesced_pio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,114 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: gengdongjiu@huawei.com, linuxarm@huawei.com
+To: pbonzini@redhat.com, mst@redhat.com, ehabkost@redhat.com, rkrcmar@redhat.com
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn, Peng Hao <peng.hao2@zte.com.cn>
 
-Update our kernel headers to mainline commit
-815f0ddb346c196018d4d8f8f55c12b83da1de3f
-(include/linux/compiler*.h: make compiler-*.h mutually exclusive)
-
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- include/standard-headers/linux/input.h |  9 +++++----
- linux-headers/asm-arm/kvm.h            | 13 +++++++++++++
- linux-headers/asm-arm64/kvm.h          | 13 +++++++++++++
- linux-headers/linux/kvm.h              |  1 +
- 4 files changed, 32 insertions(+), 4 deletions(-)
+ hw/timer/mc146818rtc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
-index 6d6128c..c0ad9fc 100644
---- a/include/standard-headers/linux/input.h
-+++ b/include/standard-headers/linux/input.h
-@@ -267,10 +267,11 @@ struct input_mask {
- /*
-  * MT_TOOL types
-  */
--#define MT_TOOL_FINGER		0
--#define MT_TOOL_PEN		1
--#define MT_TOOL_PALM		2
--#define MT_TOOL_MAX		2
-+#define MT_TOOL_FINGER		0x00
-+#define MT_TOOL_PEN		0x01
-+#define MT_TOOL_PALM		0x02
-+#define MT_TOOL_DIAL		0x0a
-+#define MT_TOOL_MAX		0x0f
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 6f1f723..1ef5f77 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -70,6 +70,7 @@ typedef struct RTCState {
+     ISADevice parent_obj;
  
- /*
-  * Values describing the status of a force-feedback effect
-diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
-index 72aa226..e1f8b74 100644
---- a/linux-headers/asm-arm/kvm.h
-+++ b/linux-headers/asm-arm/kvm.h
-@@ -27,6 +27,7 @@
- #define __KVM_HAVE_GUEST_DEBUG
- #define __KVM_HAVE_IRQ_LINE
- #define __KVM_HAVE_READONLY_MEM
-+#define __KVM_HAVE_VCPU_EVENTS
+     MemoryRegion io;
++    MemoryRegion coalesced_io;
+     uint8_t cmos_data[128];
+     uint8_t cmos_index;
+     int32_t base_year;
+@@ -990,6 +991,13 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
+     isa_register_ioport(isadev, &s->io, base);
  
- #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
- 
-@@ -125,6 +126,18 @@ struct kvm_sync_regs {
- struct kvm_arch_memory_slot {
- };
- 
-+/* for KVM_GET/SET_VCPU_EVENTS */
-+struct kvm_vcpu_events {
-+	struct {
-+		__u8 serror_pending;
-+		__u8 serror_has_esr;
-+		/* Align it to 8 bytes */
-+		__u8 pad[6];
-+		__u64 serror_esr;
-+	} exception;
-+	__u32 reserved[12];
-+};
++    /* register rtc 0x70 port for coalesced_pio */
++    memory_region_set_flush_coalesced(&s->io);
++    memory_region_init_io(&s->coalesced_io, OBJECT(s), &cmos_ops,
++                          s, "rtc1", 1);
++    isa_register_ioport(isadev, &s->coalesced_io, base);
++    memory_region_add_coalescing(&s->coalesced_io, 0, 1);
 +
- /* If you need to interpret the index values, here is the key: */
- #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
- #define KVM_REG_ARM_COPROC_SHIFT	16
-diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
-index 99cb9ad..e6a98c1 100644
---- a/linux-headers/asm-arm64/kvm.h
-+++ b/linux-headers/asm-arm64/kvm.h
-@@ -39,6 +39,7 @@
- #define __KVM_HAVE_GUEST_DEBUG
- #define __KVM_HAVE_IRQ_LINE
- #define __KVM_HAVE_READONLY_MEM
-+#define __KVM_HAVE_VCPU_EVENTS
- 
- #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
- 
-@@ -154,6 +155,18 @@ struct kvm_sync_regs {
- struct kvm_arch_memory_slot {
- };
- 
-+/* for KVM_GET/SET_VCPU_EVENTS */
-+struct kvm_vcpu_events {
-+	struct {
-+		__u8 serror_pending;
-+		__u8 serror_has_esr;
-+		/* Align it to 8 bytes */
-+		__u8 pad[6];
-+		__u64 serror_esr;
-+	} exception;
-+	__u32 reserved[12];
-+};
-+
- /* If you need to interpret the index values, here is the key: */
- #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
- #define KVM_REG_ARM_COPROC_SHIFT	16
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 6679072..bae1c89 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -951,6 +951,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_HYPERV_TLBFLUSH 155
- #define KVM_CAP_S390_HPAGE_1M 156
- #define KVM_CAP_NESTED_STATE 157
-+#define KVM_CAP_ARM_INJECT_SERROR_ESR 158
- 
- #ifdef KVM_CAP_IRQ_ROUTING
+     qdev_set_legacy_instance_id(dev, base, 3);
+     qemu_register_reset(rtc_reset, s);
  
 -- 
-1.9.1
+1.8.3.1
