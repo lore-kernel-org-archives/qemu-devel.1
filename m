@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmJ-00056b-1U
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmJ-00057U-FT
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:36:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmA-0000F1-K8
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:58 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41931 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmA-0000FM-OR
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:59 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:41934 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fspmA-0000AL-1b
+	id 1fspmA-0000B2-5J
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:50 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 15:34:28 +0200
-Message-Id: <1535031276-22911-39-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 15:34:32 +0200
+Message-Id: <1535031276-22911-43-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v4 38/46] target/mips: Fix ERET/ERETNC behavior
- related to ADEL exception
+Subject: [Qemu-devel] [PULL v4 42/46] elf: Don't check FCR31_NAN2008 bit for
+ nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +28,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Fix ERET/ERETNC so that ADEL exception can be raised.
+nanoMIPS is always NaN2008 compliant, and rules for checking
+FCR31's NAN2008 bit are obsoleted.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/op_helper.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ linux-user/mips/cpu_loop.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index b3eef9f..c148b31 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -2427,10 +2427,12 @@ void helper_eretnc(CPUMIPSState *env)
- void helper_deret(CPUMIPSState *env)
- {
-     debug_pre_eret(env);
--    set_pc(env, env->CP0_DEPC);
- 
-     env->hflags &= ~MIPS_HFLAG_DM;
-     compute_hflags(env);
-+
-+    set_pc(env, env->CP0_DEPC);
-+
-     debug_post_eret(env);
- }
- #endif /* !CONFIG_USER_ONLY */
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index 1d3dc9e..c9c20cf 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -747,6 +747,9 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+     if (regs->cp0_epc & 1) {
+         env->hflags |= MIPS_HFLAG_M16;
+     }
++    if (env->insn_flags & ISA_NANOMIPS32) {
++        return;
++    }
+     if (((info->elf_flags & EF_MIPS_NAN2008) != 0) !=
+         ((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) != 0)) {
+         if ((env->active_fpu.fcr31_rw_bitmask &
 -- 
 2.7.4
