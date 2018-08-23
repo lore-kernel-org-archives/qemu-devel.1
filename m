@@ -1,21 +1,21 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgP-0003W0-AZ
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgO-0003W0-Bh
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsset-0003Z0-PC
+	(envelope-from <armbru@redhat.com>) id 1fssev-0003bR-0S
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58512 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59412 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003YP-HZ
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:31 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsseu-0003Zk-EU
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:44 +0200
-Message-Id: <20180823164025.12553-18-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:45 +0200
+Message-Id: <20180823164025.12553-19-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 17/58] json: Fix lexer to include the bad
- character in JSON_ERROR token
+Subject: [Qemu-devel] [PATCH v3 18/58] json: Reject unescaped control
+ characters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +27,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-json_lexer[] maps (lexer state, input character) to the new lexer
-state.  The input character is consumed unless the new state is
-terminal and the input character doesn't belong to this token,
-i.e. the state transition uses look-ahead.  When this is the case,
-input character '\0' would result in the same state transition.
-TERMINAL_NEEDED_LOOKAHEAD() exploits this.
+Fix the lexer to reject unescaped control characters in JSON strings,
+in accordance with RFC 8259 "The JavaScript Object Notation (JSON)
+Data Interchange Format".
 
-Except this is wrong for transitions to IN_ERROR.  There, the
-offending input character is in fact consumed: case IN_ERROR returns.
-It isn't added to the JSON_ERROR token, though.
+Bonus: we now recover more nicely from unclosed strings.  E.g.
 
-Fix that by making TERMINAL_NEEDED_LOOKAHEAD() return false for
-transitions to IN_ERROR.
+    {"one: 1}\n{"two": 2}
 
-There's a slight complication.  json_lexer_flush() passes input
-character '\0' to flush an incomplete token.  If this results in
-JSON_ERROR, we'd now add the '\0' to the token.  Suppress that.
+now recovers cleanly after the newline, where before the lexer
+remained confused until the next unpaired double quote or lexical
+error.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
  qobject/json-lexer.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/check-qjson.c  | 6 +-----
+ tests/qmp-test.c     | 4 ++--
+ 3 files changed, 5 insertions(+), 9 deletions(-)
 
 diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 980ba159d6..7c0875d225 100644
+index 7c0875d225..e85e9a78ff 100644
 --- a/qobject/json-lexer.c
 +++ b/qobject/json-lexer.c
-@@ -76,7 +76,7 @@ QEMU_BUILD_BUG_ON((int)JSON_MIN <= (int)IN_START);
-    from OLD_STATE required lookahead.  This happens whenever the table
-    below uses the TERMINAL macro.  */
- #define TERMINAL_NEEDED_LOOKAHEAD(old_state, terminal) \
--            (json_lexer[(old_state)][0] == (terminal))
-+    (terminal != IN_ERROR && json_lexer[(old_state)][0] == (terminal))
+@@ -115,7 +115,7 @@ static const uint8_t json_lexer[][256] =  {
+         ['u'] = IN_DQ_UCODE0,
+     },
+     [IN_DQ_STRING] = {
+-        [1 ... 0xBF] = IN_DQ_STRING,
++        [0x20 ... 0xBF] = IN_DQ_STRING,
+         [0xC2 ... 0xF4] = IN_DQ_STRING,
+         ['\\'] = IN_DQ_STRING_ESCAPE,
+         ['"'] = JSON_STRING,
+@@ -155,7 +155,7 @@ static const uint8_t json_lexer[][256] =  {
+         ['u'] = IN_SQ_UCODE0,
+     },
+     [IN_SQ_STRING] = {
+-        [1 ... 0xBF] = IN_SQ_STRING,
++        [0x20 ... 0xBF] = IN_SQ_STRING,
+         [0xC2 ... 0xF4] = IN_SQ_STRING,
+         ['\\'] = IN_SQ_STRING_ESCAPE,
+         ['\''] = JSON_STRING,
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 1688b2f5c1..f1405ad47a 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -202,11 +202,7 @@ static void utf8_string(void)
+             "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+             "\x10\x11\x12\x13\x14\x15\x16\x17"
+             "\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
+-            /* bug: not corrected (valid UTF-8, but invalid JSON) */
+-            "\x01\x02\x03\x04\x05\x06\x07"
+-            "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+-            "\x10\x11\x12\x13\x14\x15\x16\x17"
+-            "\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
++            NULL,
+             "\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007"
+             "\\b\\t\\n\\u000B\\f\\r\\u000E\\u000F"
+             "\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017"
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 5edc97f63f..7b3ba17c4a 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -86,9 +86,9 @@ static void test_malformed(QTestState *qts)
+     g_assert(recovered(qts));
  
- static const uint8_t json_lexer[][256] =  {
-     /* Relies on default initialization to IN_ERROR! */
-@@ -304,7 +304,7 @@ static int json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-         assert(lexer->state <= ARRAY_SIZE(json_lexer));
-         new_state = json_lexer[lexer->state][(uint8_t)ch];
-         char_consumed = !TERMINAL_NEEDED_LOOKAHEAD(lexer->state, new_state);
--        if (char_consumed) {
-+        if (char_consumed && !flush) {
-             g_string_append_c(lexer->token, ch);
-         }
+     /* lexical error: control character in string */
+-    qtest_qmp_send_raw(qts, "{'execute': 'nonexistent', 'id':'\n'}");
++    qtest_qmp_send_raw(qts, "{'execute': 'nonexistent', 'id':'\n");
+     resp = qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound"); /* BUG */
++    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     qobject_unref(resp);
+     g_assert(recovered(qts));
  
 -- 
 2.17.1
