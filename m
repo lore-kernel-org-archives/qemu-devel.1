@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgR-0003T9-Ds
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgS-0003Z5-Gf
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsset-0003YG-2Y
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40728 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fsses-0003Xu-S0
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55970 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsses-0003XP-Oq
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsses-0003XF-HC
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:30 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:41 +0200
-Message-Id: <20180823164025.12553-15-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:38 +0200
+Message-Id: <20180823164025.12553-12-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 14/58] check-qjson: Fix utf8_string() to
- test all invalid sequences
+Subject: [Qemu-devel] [PATCH v3 11/58] check-qjson: Consolidate partly
+ redundant string tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +27,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Some of utf8_string()'s test_cases[] contain multiple invalid
-sequences.  Testing that qobject_from_json() fails only tests we
-reject at least one invalid sequence.  That's incomplete.
-
-Additionally test each non-space sequence in isolation.
-
-This demonstrates that the JSON parser accepts invalid sequences
-starting with \xC2..\xF4.  Add a FIXME comment.
+simple_string() and single_quote_string() have become redundant with
+escaped_string(), except for embedded single and double quotes.
+Replace them by a test that covers just that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c | 33 ++++++++++++++++++++++++++++-----
- 1 file changed, 28 insertions(+), 5 deletions(-)
+ tests/check-qjson.c | 64 ++++++++++-----------------------------------
+ 1 file changed, 14 insertions(+), 50 deletions(-)
 
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 8d0fe4c8a7..40a573eb21 100644
+index 4bb4925673..c67ac72858 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -20,6 +20,7 @@
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
-+#include "qemu/unicode.h"
- #include "qemu-common.h"
+@@ -126,59 +126,24 @@ static void escaped_string(void)
+     }
+ }
  
- static QString *from_json_str(const char *jstr, bool single, Error **errp)
-@@ -410,7 +411,7 @@ static void utf8_string(void)
-             "\xC8 \xC9 \xCA \xCB \xCC \xCD \xCE \xCF "
-             "\xD0 \xD1 \xD2 \xD3 \xD4 \xD5 \xD6 \xD7 "
-             "\xD8 \xD9 \xDA \xDB \xDC \xDD \xDE \xDF ",
--            NULL,               /* bug: rejected */
-+            NULL,               /* bug: rejected (partly, see FIXME below) */
-             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
-             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
-             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
-@@ -429,7 +430,7 @@ static void utf8_string(void)
-         /* 3.2.3  All 8 first bytes of 4-byte sequences, followed by space */
-         {
-             "\xF0 \xF1 \xF2 \xF3 \xF4 \xF5 \xF6 \xF7 ",
--            NULL,               /* bug: rejected */
-+            NULL,               /* bug: rejected (partly, see FIXME below) */
-             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD ",
-         },
-         /* 3.2.4  All 4 first bytes of 5-byte sequences, followed by space */
-@@ -509,7 +510,7 @@ static void utf8_string(void)
-         {
-             "\xC0\xE0\x80\xF0\x80\x80\xF8\x80\x80\x80\xFC\x80\x80\x80\x80"
-             "\xDF\xEF\xBF\xF7\xBF\xBF\xFB\xBF\xBF\xBF\xFD\xBF\xBF\xBF\xBF",
--            NULL,               /* bug: rejected */
-+            NULL,               /* bug: rejected (partly, see FIXME below) */
-             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD"
-             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
-         },
-@@ -792,8 +793,8 @@ static void utf8_string(void)
+-static void simple_string(void)
++static void string_with_quotes(void)
+ {
+-    int i;
+-    struct {
+-        const char *encoded;
+-        const char *decoded;
+-    } test_cases[] = {
+-        { "\"hello world\"", "hello world" },
+-        { "\"the quick brown fox jumped over the fence\"",
+-          "the quick brown fox jumped over the fence" },
+-        {}
++    const char *test_cases[] = {
++        "\"the bee's knees\"",
++        "'double quote \"'",
++        NULL
      };
-     int i, j;
-     QString *str;
--    const char *json_in, *utf8_out, *utf8_in, *json_out;
--    char *jstr;
-+    const char *json_in, *utf8_out, *utf8_in, *json_out, *tail;
-+    char *end, *in, *jstr;
+-
+-    for (i = 0; test_cases[i].encoded; i++) {
+-        QObject *obj;
+-        QString *str;
+-
+-        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+-        str = qobject_to(QString, obj);
+-        g_assert(str);
+-        g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+-
+-        str = qobject_to_json(obj);
+-        g_assert(strcmp(qstring_get_str(str), test_cases[i].encoded) == 0);
+-
+-        qobject_unref(obj);
+-        
+-        qobject_unref(str);
+-    }
+-}
+-
+-static void single_quote_string(void)
+-{
+     int i;
+-    struct {
+-        const char *encoded;
+-        const char *decoded;
+-    } test_cases[] = {
+-        { "'hello world'", "hello world" },
+-        { "'the quick brown fox \\' jumped over the fence'",
+-          "the quick brown fox ' jumped over the fence" },
+-        {}
+-    };
++    QString *str;
++    char *cstr;
  
-     for (i = 0; test_cases[i].json_in; i++) {
-         for (j = 0; j < 2; j++) {
-@@ -810,6 +811,28 @@ static void utf8_string(void)
-             } else {
-                 str = from_json_str(json_in, j, NULL);
-                 g_assert(!str);
-+                /*
-+                 * Failure may be due to any sequence, but *all* sequences
-+                 * are expected to fail.  Test each one in isolation.
-+                 */
-+                for (tail = json_in; *tail; tail = end) {
-+                    mod_utf8_codepoint(tail, 6, &end);
-+                    if (*end == ' ') {
-+                        end++;
-+                    }
-+                    in = strndup(tail, end - tail);
-+                    str = from_json_str(in, j, NULL);
-+                    /*
-+                     * FIXME JSON parser accepts invalid sequence
-+                     * starting with \xC2..\xF4
-+                     */
-+                    if (*in >= '\xC2' && *in <= '\xF4') {
-+                        g_free(str);
-+                        str = NULL;
-+                    }
-+                    g_assert(!str);
-+                    g_free(in);
-+                }
-             }
+-    for (i = 0; test_cases[i].encoded; i++) {
+-        QObject *obj;
+-        QString *str;
+-
+-        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+-        str = qobject_to(QString, obj);
++    for (i = 0; test_cases[i]; i++) {
++        str = qobject_to(QString,
++                         qobject_from_json(test_cases[i], &error_abort));
+         g_assert(str);
+-        g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+-
++        cstr = g_strndup(test_cases[i] + 1, strlen(test_cases[i]) - 2);
++        g_assert_cmpstr(qstring_get_str(str), ==, cstr);
++        g_free(cstr);
+         qobject_unref(str);
+     }
+ }
+@@ -1525,10 +1490,9 @@ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
  
-             /* Unparse @utf8_in, expect @json_out */
+-    g_test_add_func("/literals/string/simple", simple_string);
+     g_test_add_func("/literals/string/escaped", escaped_string);
++    g_test_add_func("/literals/string/quotes", string_with_quotes);
+     g_test_add_func("/literals/string/utf8", utf8_string);
+-    g_test_add_func("/literals/string/single_quote", single_quote_string);
+     g_test_add_func("/literals/string/vararg", vararg_string);
+ 
+     g_test_add_func("/literals/number/simple", simple_number);
 -- 
 2.17.1
