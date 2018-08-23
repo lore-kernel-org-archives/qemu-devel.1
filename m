@@ -1,21 +1,21 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgC-0003T9-Hj
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:41:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgE-0003T9-Ho
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssew-0003ce-0m
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40776 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fsseu-0003aA-6D
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58522 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fssev-0003bg-Hq
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:33 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003Yq-S7
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:40:01 +0200
-Message-Id: <20180823164025.12553-35-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:48 +0200
+Message-Id: <20180823164025.12553-22-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 34/58] json: Redesign the callback to
- consume JSON values
+Subject: [Qemu-devel] [PATCH v3 21/58] check-qjson: Document we expect
+ invalid UTF-8 to be rejected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,388 +27,554 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-The classical way to structure parser and lexer is to have the client
-call the parser to get an abstract syntax tree, the parser call the
-lexer to get the next token, and the lexer call some function to get
-input characters.
+The JSON parser rejects some invalid sequences, but accepts others
+without correcting the problem.
 
-Another way to structure them would be to have the client feed
-characters to the lexer, the lexer feed tokens to the parser, and the
-parser feed abstract syntax trees to some callback provided by the
-client.  This way is more easily integrated into an event loop that
-dispatches input characters as they arrive.
+We should either reject all invalid sequences, or minimize overlong
+sequences and replace all other invalid sequences by a suitable
+replacement character.  A common choice for replacement is U+FFFD.
 
-Our JSON parser is kind of between the two.  The lexer feeds tokens to
-a "streamer" instead of a real parser.  The streamer accumulates
-tokens until it got the sequence of tokens that comprise a single JSON
-value (it counts curly braces and square brackets to decide).  It
-feeds those token sequences to a callback provided by the client.  The
-callback passes each token sequence to the parser, and gets back an
-abstract syntax tree.
-
-I figure it was done that way to make a straightforward recursive
-descent parser possible.  "Get next token" becomes "pop the first
-token off the token sequence".  Drawback: we need to store a complete
-token sequence.  Each token eats 13 + input characters + malloc
-overhead bytes.
-
-Observations:
-
-1. This is not the only way to use recursive descent.  If we replaced
-   "get next token" by a coroutine yield, we could do without a
-   streamer.
-
-2. The lexer reports errors by passing a JSON_ERROR token to the
-   streamer.  This communicates the offending input characters and
-   their location, but no more.
-
-3. The streamer reports errors by passing a null token sequence to the
-   callback.  The (already poor) lexical error information is thrown
-   away.
-
-4. Having the callback receive a token sequence duplicates the code to
-   convert token sequence to abstract syntax tree in every callback.
-
-5. Known bug: the streamer silently drops incomplete token sequences.
-
-This commit rectifies 4. by lifting the call of the parser from the
-callbacks into the streamer.  Later commits will address 3. and 5.
-
-The lifting removes a bug from qjson.c's parse_json(): it passed a
-pointer to a non-null Error * in certain cases, as demonstrated by
-check-qjson.c.
-
-json_parser_parse() is now unused.  It's a stupid wrapper around
-json_parser_parse_err().  Drop it, and rename json_parser_parse_err()
-to json_parser_parse().
+I'm going to implement the former.  Update the comments in
+utf8_string() to expect this.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/qapi/qmp/json-parser.h   |  3 +--
- include/qapi/qmp/json-streamer.h |  8 ++++++--
- monitor.c                        | 18 ++++++++----------
- qapi/qmp-dispatch.c              |  1 -
- qga/main.c                       | 12 +++---------
- qobject/json-parser.c            |  7 +------
- qobject/json-streamer.c          | 19 +++++++++++--------
- qobject/qjson.c                  | 14 +++++---------
- tests/check-qjson.c              |  1 -
- tests/libqtest.c                 | 10 ++++------
- 10 files changed, 39 insertions(+), 54 deletions(-)
+ tests/check-qjson.c | 151 +++++++++++++++++++++-----------------------
+ 1 file changed, 71 insertions(+), 80 deletions(-)
 
-diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parser.h
-index 102f5c0068..a34209db7a 100644
---- a/include/qapi/qmp/json-parser.h
-+++ b/include/qapi/qmp/json-parser.h
-@@ -16,7 +16,6 @@
- 
- #include "qemu-common.h"
- 
--QObject *json_parser_parse(GQueue *tokens, va_list *ap);
--QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **errp);
-+QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp);
- 
- #endif
-diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
-index 7922e185a5..e162fd01da 100644
---- a/include/qapi/qmp/json-streamer.h
-+++ b/include/qapi/qmp/json-streamer.h
-@@ -25,7 +25,9 @@ typedef struct JSONToken {
- 
- typedef struct JSONMessageParser
- {
--    void (*emit)(struct JSONMessageParser *parser, GQueue *tokens);
-+    void (*emit)(void *opaque, QObject *json, Error *err);
-+    void *opaque;
-+    va_list *ap;
-     JSONLexer lexer;
-     int brace_count;
-     int bracket_count;
-@@ -37,7 +39,9 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
-                                 JSONTokenType type, int x, int y);
- 
- void json_message_parser_init(JSONMessageParser *parser,
--                              void (*func)(JSONMessageParser *, GQueue *));
-+                              void (*emit)(void *opaque, QObject *json,
-+                                           Error *err),
-+                              void *opaque, va_list *ap);
- 
- void json_message_parser_feed(JSONMessageParser *parser,
-                              const char *buffer, size_t size);
-diff --git a/monitor.c b/monitor.c
-index a1999e396c..392659324f 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -59,7 +59,6 @@
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/json-streamer.h"
--#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qlist.h"
- #include "qom/object_interfaces.h"
- #include "trace-root.h"
-@@ -4245,18 +4244,15 @@ static void monitor_qmp_bh_dispatcher(void *data)
- 
- #define  QMP_REQ_QUEUE_LEN_MAX  (8)
- 
--static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
-+static void handle_qmp_command(void *opaque, QObject *req, Error *err)
- {
--    QObject *req, *id = NULL;
-+    Monitor *mon = opaque;
-+    QObject *id = NULL;
-     QDict *qdict;
--    MonitorQMP *mon_qmp = container_of(parser, MonitorQMP, parser);
--    Monitor *mon = container_of(mon_qmp, Monitor, qmp);
--    Error *err = NULL;
-     QMPRequest *req_obj;
- 
--    req = json_parser_parse_err(tokens, NULL, &err);
-     if (!req && !err) {
--        /* json_parser_parse_err() sucks: can fail without setting @err */
-+        /* json_parser_parse() sucks: can fail without setting @err */
-         error_setg(&err, QERR_JSON_PARSING);
-     }
- 
-@@ -4454,7 +4450,8 @@ static void monitor_qmp_event(void *opaque, int event)
-         monitor_qmp_response_flush(mon);
-         monitor_qmp_cleanup_queues(mon);
-         json_message_parser_destroy(&mon->qmp.parser);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
-+        json_message_parser_init(&mon->qmp.parser, handle_qmp_command,
-+                                 mon, NULL);
-         mon_refcount--;
-         monitor_fdsets_cleanup();
-         break;
-@@ -4672,7 +4669,8 @@ void monitor_init(Chardev *chr, int flags)
- 
-     if (monitor_is_qmp(mon)) {
-         qemu_chr_fe_set_echo(&mon->chr, true);
--        json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
-+        json_message_parser_init(&mon->qmp.parser, handle_qmp_command,
-+                                 mon, NULL);
-         if (mon->use_io_thread) {
-             /*
-              * Make sure the old iowatch is gone.  It's possible when
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 6f2d466596..d8da1a62de 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -14,7 +14,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/qmp/dispatch.h"
--#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qbool.h"
-diff --git a/qga/main.c b/qga/main.c
-index 87372d40ef..2fc49d00d8 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -19,7 +19,6 @@
- #include <sys/wait.h>
- #endif
- #include "qapi/qmp/json-streamer.h"
--#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qstring.h"
-@@ -597,18 +596,13 @@ static void process_command(GAState *s, QDict *req)
- }
- 
- /* handle requests/control events coming in over the channel */
--static void process_event(JSONMessageParser *parser, GQueue *tokens)
-+static void process_event(void *opaque, QObject *obj, Error *err)
- {
--    GAState *s = container_of(parser, GAState, parser);
--    QObject *obj;
-+    GAState *s = opaque;
-     QDict *req, *rsp;
--    Error *err = NULL;
-     int ret;
- 
--    g_assert(s && parser);
--
-     g_debug("process_event: called");
--    obj = json_parser_parse_err(tokens, NULL, &err);
-     if (err) {
-         goto err;
-     }
-@@ -1320,7 +1314,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-     s->command_state = ga_command_state_new();
-     ga_command_state_init(s, s->command_state);
-     ga_command_state_init_all(s->command_state);
--    json_message_parser_init(&s->parser, process_event);
-+    json_message_parser_init(&s->parser, process_event, s, NULL);
- 
- #ifndef _WIN32
-     if (!register_signal_handlers()) {
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 7bfa08200c..95fa348e21 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -541,12 +541,7 @@ static QObject *parse_value(JSONParserContext *ctxt, va_list *ap)
-     }
- }
- 
--QObject *json_parser_parse(GQueue *tokens, va_list *ap)
--{
--    return json_parser_parse_err(tokens, ap, NULL);
--}
--
--QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **errp)
-+QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
- {
-     JSONParserContext ctxt = { .buf = tokens };
-     QObject *result;
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 9f57ebf2bd..7fd0ff8756 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qapi/qmp/json-lexer.h"
-+#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/json-streamer.h"
- 
- #define MAX_TOKEN_SIZE (64ULL << 20)
-@@ -38,8 +39,9 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
-                                 JSONTokenType type, int x, int y)
- {
-     JSONMessageParser *parser = container_of(lexer, JSONMessageParser, lexer);
-+    Error *err = NULL;
-     JSONToken *token;
--    GQueue *tokens;
-+    QObject *json;
- 
-     switch (type) {
-     case JSON_LCURLY:
-@@ -97,19 +99,20 @@ out_emit:
-     /* send current list of tokens to parser and reset tokenizer */
-     parser->brace_count = 0;
-     parser->bracket_count = 0;
--    /* parser->emit takes ownership of parser->tokens.  Remove our own
--     * reference to parser->tokens before handing it out to parser->emit.
--     */
--    tokens = parser->tokens;
-+    json = json_parser_parse(parser->tokens, parser->ap, &err);
-     parser->tokens = g_queue_new();
--    parser->emit(parser, tokens);
-     parser->token_size = 0;
-+    parser->emit(parser->opaque, json, err);
- }
- 
- void json_message_parser_init(JSONMessageParser *parser,
--                              void (*func)(JSONMessageParser *, GQueue *))
-+                              void (*emit)(void *opaque, QObject *json,
-+                                           Error *err),
-+                              void *opaque, va_list *ap)
- {
--    parser->emit = func;
-+    parser->emit = emit;
-+    parser->opaque = opaque;
-+    parser->ap = ap;
-     parser->brace_count = 0;
-     parser->bracket_count = 0;
-     parser->tokens = g_queue_new();
-diff --git a/qobject/qjson.c b/qobject/qjson.c
-index ab4040f235..7395556069 100644
---- a/qobject/qjson.c
-+++ b/qobject/qjson.c
-@@ -13,8 +13,6 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qapi/qmp/json-lexer.h"
--#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/json-streamer.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qbool.h"
-@@ -27,16 +25,16 @@
- typedef struct JSONParsingState
- {
-     JSONMessageParser parser;
--    va_list *ap;
-     QObject *result;
-     Error *err;
- } JSONParsingState;
- 
--static void parse_json(JSONMessageParser *parser, GQueue *tokens)
-+static void consume_json(void *opaque, QObject *json, Error *err)
- {
--    JSONParsingState *s = container_of(parser, JSONParsingState, parser);
-+    JSONParsingState *s = opaque;
- 
--    s->result = json_parser_parse_err(tokens, s->ap, &s->err);
-+    s->result = json;
-+    error_propagate(&s->err, err);
- }
- 
- /*
-@@ -54,9 +52,7 @@ static QObject *qobject_from_jsonv(const char *string, va_list *ap,
- {
-     JSONParsingState state = {};
- 
--    state.ap = ap;
--
--    json_message_parser_init(&state.parser, parse_json);
-+    json_message_parser_init(&state.parser, consume_json, &state, ap);
-     json_message_parser_feed(&state.parser, string, strlen(string));
-     json_message_parser_flush(&state.parser);
-     json_message_parser_destroy(&state.parser);
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index defc21fa04..604886a1a2 100644
+index f1405ad47a..69f5a187c9 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -1438,7 +1438,6 @@ static void multiple_values(void)
-     qobject_unref(obj);
+@@ -157,13 +157,7 @@ static void utf8_string(void)
+      * They're all marked "bug:" below, and are to be replaced by
+      * correct ones as the bugs get fixed.
+      *
+-     * The JSON parser rejects some invalid sequences, but accepts
+-     * others without correcting the problem.
+-     *
+-     * We should either reject all invalid sequences, or minimize
+-     * overlong sequences and replace all other invalid sequences by a
+-     * suitable replacement character.  A common choice for
+-     * replacement is U+FFFD.
++     * The JSON parser rejects some, but not all invalid sequences.
+      *
+      * Problem: we can't easily deal with embedded U+0000.  Parsing
+      * the JSON string "this \\u0000" is fun" yields "this \0 is fun",
+@@ -185,11 +179,8 @@ static void utf8_string(void)
+     } test_cases[] = {
+         /*
+          * Bug markers used here:
+-         * - bug: not corrected
+-         *   JSON parser fails to correct invalid sequence(s)
+-         * - bug: rejected
+-         *   JSON parser rejects invalid sequence(s)
+-         *   We may choose to define this as feature
++         * - bug: not rejected
++         *   JSON parser fails to reject invalid sequence(s)
+          */
  
-     /* BUG simultaneously succeeds and fails */
--    /* BUG calls json_parser_parse() with errp pointing to non-null */
-     obj = qobject_from_json("} true", &err);
-     g_assert(qbool_get_bool(qobject_to(QBool, obj)));
-     error_free_or_abort(&err);
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index a7ad09fc86..e17fe4fbd2 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -21,9 +21,9 @@
- #include <sys/un.h>
- 
- #include "libqtest.h"
-+#include "qemu-common.h"
- #include "qemu/cutils.h"
- #include "qapi/error.h"
--#include "qapi/qmp/json-parser.h"
- #include "qapi/qmp/json-streamer.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
-@@ -446,12 +446,10 @@ typedef struct {
-     QDict *response;
- } QMPResponseParser;
- 
--static void qmp_response(JSONMessageParser *parser, GQueue *tokens)
-+static void qmp_response(void *opaque, QObject *obj, Error *err)
- {
--    QMPResponseParser *qmp = container_of(parser, QMPResponseParser, parser);
--    QObject *obj;
-+    QMPResponseParser *qmp = opaque;
- 
--    obj = json_parser_parse(tokens, NULL);
-     if (!obj) {
-         fprintf(stderr, "QMP JSON response parsing failed\n");
-         abort();
-@@ -468,7 +466,7 @@ QDict *qmp_fd_receive(int fd)
-     bool log = getenv("QTEST_LOG") != NULL;
- 
-     qmp.response = NULL;
--    json_message_parser_init(&qmp.parser, qmp_response);
-+    json_message_parser_init(&qmp.parser, qmp_response, &qmp, NULL);
-     while (!qmp.response) {
-         ssize_t len;
-         char c;
+         /* 0  Control characters */
+@@ -257,13 +248,13 @@ static void utf8_string(void)
+         /* 2.1.5  5 bytes U+200000 */
+         {
+             "\xF8\x88\x80\x80\x80",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 2.1.6  6 bytes U+4000000 */
+         {
+             "\xFC\x84\x80\x80\x80\x80",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 2.2  Last possible sequence of a certain length */
+@@ -296,19 +287,19 @@ static void utf8_string(void)
+         /* 2.2.4  4 bytes U+1FFFFF */
+         {
+             "\xF7\xBF\xBF\xBF",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 2.2.5  5 bytes U+3FFFFFF */
+         {
+             "\xFB\xBF\xBF\xBF\xBF",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 2.2.6  6 bytes U+7FFFFFFF */
+         {
+             "\xFD\xBF\xBF\xBF\xBF\xBF",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 2.3  Other boundary conditions */
+@@ -347,49 +338,49 @@ static void utf8_string(void)
+         /* 3.1.1  First continuation byte */
+         {
+             "\x80",
+-            "\x80",             /* bug: not corrected */
++            "\x80",             /* bug: not rejected */
+             "\\uFFFD",
+         },
+         /* 3.1.2  Last continuation byte */
+         {
+             "\xBF",
+-            "\xBF",             /* bug: not corrected */
++            "\xBF",             /* bug: not rejected */
+             "\\uFFFD",
+         },
+         /* 3.1.3  2 continuation bytes */
+         {
+             "\x80\xBF",
+-            "\x80\xBF",         /* bug: not corrected */
++            "\x80\xBF",         /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         /* 3.1.4  3 continuation bytes */
+         {
+             "\x80\xBF\x80",
+-            "\x80\xBF\x80",     /* bug: not corrected */
++            "\x80\xBF\x80",     /* bug: not rejected */
+             "\\uFFFD\\uFFFD\\uFFFD",
+         },
+         /* 3.1.5  4 continuation bytes */
+         {
+             "\x80\xBF\x80\xBF",
+-            "\x80\xBF\x80\xBF", /* bug: not corrected */
++            "\x80\xBF\x80\xBF", /* bug: not rejected */
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
+         },
+         /* 3.1.6  5 continuation bytes */
+         {
+             "\x80\xBF\x80\xBF\x80",
+-            "\x80\xBF\x80\xBF\x80", /* bug: not corrected */
++            "\x80\xBF\x80\xBF\x80", /* bug: not rejected */
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
+         },
+         /* 3.1.7  6 continuation bytes */
+         {
+             "\x80\xBF\x80\xBF\x80\xBF",
+-            "\x80\xBF\x80\xBF\x80\xBF", /* bug: not corrected */
++            "\x80\xBF\x80\xBF\x80\xBF", /* bug: not rejected */
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
+         },
+         /* 3.1.8  7 continuation bytes */
+         {
+             "\x80\xBF\x80\xBF\x80\xBF\x80",
+-            "\x80\xBF\x80\xBF\x80\xBF\x80", /* bug: not corrected */
++            "\x80\xBF\x80\xBF\x80\xBF\x80", /* bug: not rejected */
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
+         },
+         /* 3.1.9  Sequence of all 64 possible continuation bytes */
+@@ -402,7 +393,7 @@ static void utf8_string(void)
+             "\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF"
+             "\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7"
+             "\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF",
+-             /* bug: not corrected */
++             /* bug: not rejected */
+             "\x80\x81\x82\x83\x84\x85\x86\x87"
+             "\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F"
+             "\x90\x91\x92\x93\x94\x95\x96\x97"
+@@ -427,7 +418,7 @@ static void utf8_string(void)
+             "\xC8 \xC9 \xCA \xCB \xCC \xCD \xCE \xCF "
+             "\xD0 \xD1 \xD2 \xD3 \xD4 \xD5 \xD6 \xD7 "
+             "\xD8 \xD9 \xDA \xDB \xDC \xDD \xDE \xDF ",
+-            NULL,               /* bug: rejected (partly, see FIXME below) */
++            NULL,               /* bug: accepted partly, see FIXME below */
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
+@@ -437,7 +428,7 @@ static void utf8_string(void)
+         {
+             "\xE0 \xE1 \xE2 \xE3 \xE4 \xE5 \xE6 \xE7 "
+             "\xE8 \xE9 \xEA \xEB \xEC \xED \xEE \xEF ",
+-            /* bug: not corrected */
++            /* bug: not rejected */
+             "\xE0 \xE1 \xE2 \xE3 \xE4 \xE5 \xE6 \xE7 "
+             "\xE8 \xE9 \xEA \xEB \xEC \xED \xEE \xEF ",
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD "
+@@ -446,131 +437,131 @@ static void utf8_string(void)
+         /* 3.2.3  All 8 first bytes of 4-byte sequences, followed by space */
+         {
+             "\xF0 \xF1 \xF2 \xF3 \xF4 \xF5 \xF6 \xF7 ",
+-            NULL,               /* bug: rejected (partly, see FIXME below) */
++            NULL,               /* bug: accepted partly, see FIXME below */
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD \\uFFFD ",
+         },
+         /* 3.2.4  All 4 first bytes of 5-byte sequences, followed by space */
+         {
+             "\xF8 \xF9 \xFA \xFB ",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD \\uFFFD \\uFFFD \\uFFFD ",
+         },
+         /* 3.2.5  All 2 first bytes of 6-byte sequences, followed by space */
+         {
+             "\xFC \xFD ",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD \\uFFFD ",
+         },
+         /* 3.3  Sequences with last continuation byte missing */
+         /* 3.3.1  2-byte sequence with last byte missing (U+0000) */
+         {
+             "\xC0",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 3.3.2  3-byte sequence with last byte missing (U+0000) */
+         {
+             "\xE0\x80",
+-            "\xE0\x80",           /* bug: not corrected */
++            "\xE0\x80",         /* bug: not rejected */
+             "\\uFFFD",
+         },
+         /* 3.3.3  4-byte sequence with last byte missing (U+0000) */
+         {
+             "\xF0\x80\x80",
+-            "\xF0\x80\x80",     /* bug: not corrected */
++            "\xF0\x80\x80",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         /* 3.3.4  5-byte sequence with last byte missing (U+0000) */
+         {
+             "\xF8\x80\x80\x80",
+-            NULL,                   /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 3.3.5  6-byte sequence with last byte missing (U+0000) */
+         {
+             "\xFC\x80\x80\x80\x80",
+-            NULL,                        /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 3.3.6  2-byte sequence with last byte missing (U+07FF) */
+         {
+             "\xDF",
+-            "\xDF",             /* bug: not corrected */
++            "\xDF",             /* bug: not rejected */
+             "\\uFFFD",
+         },
+         /* 3.3.7  3-byte sequence with last byte missing (U+FFFF) */
+         {
+             "\xEF\xBF",
+-            "\xEF\xBF",           /* bug: not corrected */
++            "\xEF\xBF",         /* bug: not rejected */
+             "\\uFFFD",
+         },
+         /* 3.3.8  4-byte sequence with last byte missing (U+1FFFFF) */
+         {
+             "\xF7\xBF\xBF",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 3.3.9  5-byte sequence with last byte missing (U+3FFFFFF) */
+         {
+             "\xFB\xBF\xBF\xBF",
+-            NULL,                 /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 3.3.10  6-byte sequence with last byte missing (U+7FFFFFFF) */
+         {
+             "\xFD\xBF\xBF\xBF\xBF",
+-            NULL,                        /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 3.4  Concatenation of incomplete sequences */
+         {
+             "\xC0\xE0\x80\xF0\x80\x80\xF8\x80\x80\x80\xFC\x80\x80\x80\x80"
+             "\xDF\xEF\xBF\xF7\xBF\xBF\xFB\xBF\xBF\xBF\xFD\xBF\xBF\xBF\xBF",
+-            NULL,               /* bug: rejected (partly, see FIXME below) */
++            NULL,               /* bug: accepted partly, see FIXME below */
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD"
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
+         },
+         /* 3.5  Impossible bytes */
+         {
+             "\xFE",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         {
+             "\xFF",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         {
+             "\xFE\xFE\xFF\xFF",
+-            NULL,                 /* bug: rejected */
++            NULL,
+             "\\uFFFD\\uFFFD\\uFFFD\\uFFFD",
+         },
+         /* 4  Overlong sequences */
+         /* 4.1  Overlong '/' */
+         {
+             "\xC0\xAF",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         {
+             "\xE0\x80\xAF",
+-            "\xE0\x80\xAF",     /* bug: not corrected */
++            "\xE0\x80\xAF",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             "\xF0\x80\x80\xAF",
+-            "\xF0\x80\x80\xAF",  /* bug: not corrected */
++            "\xF0\x80\x80\xAF", /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             "\xF8\x80\x80\x80\xAF",
+-            NULL,                        /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         {
+             "\xFC\x80\x80\x80\x80\xAF",
+-            NULL,                               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /*
+@@ -582,13 +573,13 @@ static void utf8_string(void)
+         {
+             /* \U+007F */
+             "\xC1\xBF",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         {
+             /* \U+07FF */
+             "\xE0\x9F\xBF",
+-            "\xE0\x9F\xBF",     /* bug: not corrected */
++            "\xE0\x9F\xBF",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+@@ -599,50 +590,50 @@ static void utf8_string(void)
+              * also 2.2.3
+              */
+             "\xF0\x8F\xBF\xBC",
+-            "\xF0\x8F\xBF\xBC",   /* bug: not corrected */
++            "\xF0\x8F\xBF\xBC", /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+1FFFFF */
+             "\xF8\x87\xBF\xBF\xBF",
+-            NULL,                        /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         {
+             /* \U+3FFFFFF */
+             "\xFC\x83\xBF\xBF\xBF\xBF",
+-            NULL,                               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 4.3  Overlong representation of the NUL character */
+         {
+             /* \U+0000 */
+             "\xC0\x80",
+-            NULL,               /* bug: rejected */
++            NULL,
+             "\\u0000",
+         },
+         {
+             /* \U+0000 */
+             "\xE0\x80\x80",
+-            "\xE0\x80\x80",     /* bug: not corrected */
++            "\xE0\x80\x80",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+0000 */
+             "\xF0\x80\x80\x80",
+-            "\xF0\x80\x80\x80",   /* bug: not corrected */
++            "\xF0\x80\x80\x80", /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+0000 */
+             "\xF8\x80\x80\x80\x80",
+-            NULL,                        /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         {
+             /* \U+0000 */
+             "\xFC\x80\x80\x80\x80\x80",
+-            NULL,                               /* bug: rejected */
++            NULL,
+             "\\uFFFD",
+         },
+         /* 5  Illegal code positions */
+@@ -650,92 +641,92 @@ static void utf8_string(void)
+         {
+             /* \U+D800 */
+             "\xED\xA0\x80",
+-            "\xED\xA0\x80",     /* bug: not corrected */
++            "\xED\xA0\x80",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+DB7F */
+             "\xED\xAD\xBF",
+-            "\xED\xAD\xBF",     /* bug: not corrected */
++            "\xED\xAD\xBF",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+DB80 */
+             "\xED\xAE\x80",
+-            "\xED\xAE\x80",     /* bug: not corrected */
++            "\xED\xAE\x80",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+DBFF */
+             "\xED\xAF\xBF",
+-            "\xED\xAF\xBF",     /* bug: not corrected */
++            "\xED\xAF\xBF",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+DC00 */
+             "\xED\xB0\x80",
+-            "\xED\xB0\x80",     /* bug: not corrected */
++            "\xED\xB0\x80",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+DF80 */
+             "\xED\xBE\x80",
+-            "\xED\xBE\x80",     /* bug: not corrected */
++            "\xED\xBE\x80",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+DFFF */
+             "\xED\xBF\xBF",
+-            "\xED\xBF\xBF",     /* bug: not corrected */
++            "\xED\xBF\xBF",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         /* 5.2  Paired UTF-16 surrogates */
+         {
+             /* \U+D800\U+DC00 */
+             "\xED\xA0\x80\xED\xB0\x80",
+-            "\xED\xA0\x80\xED\xB0\x80", /* bug: not corrected */
++            "\xED\xA0\x80\xED\xB0\x80", /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         {
+             /* \U+D800\U+DFFF */
+             "\xED\xA0\x80\xED\xBF\xBF",
+-            "\xED\xA0\x80\xED\xBF\xBF", /* bug: not corrected */
++            "\xED\xA0\x80\xED\xBF\xBF", /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         {
+             /* \U+DB7F\U+DC00 */
+             "\xED\xAD\xBF\xED\xB0\x80",
+-            "\xED\xAD\xBF\xED\xB0\x80", /* bug: not corrected */
++            "\xED\xAD\xBF\xED\xB0\x80", /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         {
+             /* \U+DB7F\U+DFFF */
+             "\xED\xAD\xBF\xED\xBF\xBF",
+-            "\xED\xAD\xBF\xED\xBF\xBF", /* bug: not corrected */
++            "\xED\xAD\xBF\xED\xBF\xBF", /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         {
+             /* \U+DB80\U+DC00 */
+             "\xED\xAE\x80\xED\xB0\x80",
+-            "\xED\xAE\x80\xED\xB0\x80", /* bug: not corrected */
++            "\xED\xAE\x80\xED\xB0\x80", /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         {
+             /* \U+DB80\U+DFFF */
+             "\xED\xAE\x80\xED\xBF\xBF",
+-            "\xED\xAE\x80\xED\xBF\xBF", /* bug: not corrected */
++            "\xED\xAE\x80\xED\xBF\xBF", /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         {
+             /* \U+DBFF\U+DC00 */
+             "\xED\xAF\xBF\xED\xB0\x80",
+-            "\xED\xAF\xBF\xED\xB0\x80", /* bug: not corrected */
++            "\xED\xAF\xBF\xED\xB0\x80", /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         {
+             /* \U+DBFF\U+DFFF */
+             "\xED\xAF\xBF\xED\xBF\xBF",
+-            "\xED\xAF\xBF\xED\xBF\xBF", /* bug: not corrected */
++            "\xED\xAF\xBF\xED\xBF\xBF", /* bug: not rejected */
+             "\\uFFFD\\uFFFD",
+         },
+         /* 5.3  Other illegal code positions */
+@@ -743,25 +734,25 @@ static void utf8_string(void)
+         {
+             /* \U+FFFE */
+             "\xEF\xBF\xBE",
+-            "\xEF\xBF\xBE",     /* bug: not corrected */
++            "\xEF\xBF\xBE",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* \U+FFFF */
+             "\xEF\xBF\xBF",
+-            "\xEF\xBF\xBF",     /* bug: not corrected */
++            "\xEF\xBF\xBF",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* U+FDD0 */
+             "\xEF\xB7\x90",
+-            "\xEF\xB7\x90",     /* bug: not corrected */
++            "\xEF\xB7\x90",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         {
+             /* U+FDEF */
+             "\xEF\xB7\xAF",
+-            "\xEF\xB7\xAF",     /* bug: not corrected */
++            "\xEF\xB7\xAF",     /* bug: not rejected */
+             "\\uFFFD",
+         },
+         /* Plane 1 .. 16 noncharacters */
+@@ -783,7 +774,7 @@ static void utf8_string(void)
+             "\xF3\xAF\xBF\xBE\xF3\xAF\xBF\xBF"
+             "\xF3\xBF\xBF\xBE\xF3\xBF\xBF\xBF"
+             "\xF4\x8F\xBF\xBE\xF4\x8F\xBF\xBF",
+-            /* bug: not corrected */
++            /* bug: not rejected */
+             "\xF0\x9F\xBF\xBE\xF0\x9F\xBF\xBF"
+             "\xF0\xAF\xBF\xBE\xF0\xAF\xBF\xBF"
+             "\xF0\xBF\xBF\xBE\xF0\xBF\xBF\xBF"
 -- 
 2.17.1
