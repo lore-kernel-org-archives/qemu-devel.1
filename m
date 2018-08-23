@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fsm3u-0004Lx-7R
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:37:55 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fsm4F-0004Up-Kl
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:38:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fsm3t-0004Gf-2l
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:37:54 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37719)
+	(envelope-from <zhangckid@gmail.com>) id 1fsm4E-0004Uo-Ld
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:38:15 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:33327)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fsm3s-0004Fx-Qa
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:37:52 -0400
-Received: by mail-oi0-x241.google.com with SMTP id p84-v6so8190655oic.4
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 02:37:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fsm4E-0004TR-DK
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:38:14 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id i134-v6so1618607wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 02:38:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180814144436.679-1-peter.maydell@linaro.org>
-References: <20180814144436.679-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Aug 2018 10:37:31 +0100
-Message-ID: <CAFEAcA-PcXDbBFW3ZyXazp2RRz5xoo-KQesq9s_76ariyKpGBg@mail.gmail.com>
+References: <20180811205924.4113-1-zhangckid@gmail.com>
+	<20180811205924.4113-16-zhangckid@gmail.com>
+	<f5b85e98-29ed-86e0-4497-7a63b61a663b@redhat.com>
+	<CAK3tnv+CPvV5F09PWx5B2bQp6xYNmyJ--x_qy4mS7XZ6K1=W_Q@mail.gmail.com>
+	<f19bc830-61e5-6136-980e-d8f64b7786af@redhat.com>
+In-Reply-To: <f19bc830-61e5-6136-980e-d8f64b7786af@redhat.com>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Thu, 23 Aug 2018 17:37:59 +0800
+Message-ID: <CAK3tnv+4gxxpv=pmFD-wLrvTAq9oOcaHRTBYtF8BqRHY-5T6OQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/8] arm/raspi: Make fb handle
- virtual viewport
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V11 15/20] net/net.c: Add net client type
+ check function for COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: jasowang@redhat.com
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com, Zhang Chen <chen.zhang@intel.com>
 
-Ping for code review?
+On Wed, Aug 22, 2018 at 4:22 PM Jason Wang <jasowang@redhat.com> wrote:
 
-thanks
--- PMM
+>
+>
+> On 2018=E5=B9=B408=E6=9C=8821=E6=97=A5 17:26, Zhang Chen wrote:
+> >
+> >
+> > On Tue, Aug 21, 2018 at 11:27 AM Jason Wang <jasowang@redhat.com
+> > <mailto:jasowang@redhat.com>> wrote:
+> >
+> >
+> >
+> >     On 2018=E5=B9=B408=E6=9C=8812=E6=97=A5 04:59, Zhang Chen wrote:
+> >     > From: Zhang Chen <chen.zhang@intel.com
+> >     <mailto:chen.zhang@intel.com>>
+> >     >
+> >     > We add is_colo_support_client_type() to check the net client
+> >     type for
+> >     > COLO-compare. Currently we just support TAP.
+> >     > Suggested by Jason.
+> >     >
+> >     > Signed-off-by: Zhang Chen <zhangckid@gmail.com
+> >     <mailto:zhangckid@gmail.com>>
+> >     > Signed-off-by: Zhang Chen <chen.zhang@intel.com
+> >     <mailto:chen.zhang@intel.com>>
+> >     > ---
+> >
+> >     This needs more works:
+> >
+> >     - Forbid vhost
+> >     - Deal with hotplug
+> >
+> >     Looks not a must for this series, so to speed up the process, you
+> >     may do
+> >     it on top.
+> >
+> >
+> > Do you mean this patch we can stay this status currently?
+> >
+> > Thanks
+> > Zhang Chen
+>
+> Sorry for being unclear, I mean we need a complete solution rather than
+> partial one.
+>
 
-On 14 August 2018 at 15:44, Peter Maydell <peter.maydell@linaro.org> wrote:
-> The raspi framebuffer supports a virtual viewport which can
-> be set up so that the virtual framebuffer size is larger than
-> the physical screen size, and the displayed area is at some
-> offset within this virtual framebuffer area. This patchset
-> implements that support.
+OK, I will remove this patch from this series, and send a complete solution
+in the future.
+
+Thanks
+Zhang Chen
+
+
 >
-> To do that I had to do a fair amount of refactoring, because
-> getting the viewport code to work correctly and prevent the
-> guest from making it fall over by specifying silly offsets
-> or sizes requires that we properly validate and clip the
-> config that the guest sends us.
+> Thanks
 >
-> Note that the documentation in places like
-> https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
-> has various errors in it. The behaviour implemented here
-> corresponds to how a hardware raspi2 I tested seems to behave,
-> using test programs based on the code from
-> http://www.valvers.com/open-software/raspberry-pi/step05-bare-metal-programming-in-c-pt5/
 >
-> (I was a little bit hampered because I couldn't get the rpi
-> to actually *display* anything to the HDMI port, so mostly
-> I was testing the edge case behaviour of attempting to set
-> and read back various config values.)
->
-> This series fixes this bug:
-> https://bugs.launchpad.net/qemu/+bug/1777672
->
-> thanks
-> -- PMM
->
-> Peter Maydell (8):
->   hw/misc/bcm2835_fb: Move config fields to their own struct
->   hw/misc/bcm2835_property: Track fb settings using BCM2835FBConfig
->   hw/display/bcm2835_fb: Drop unused size and pitch fields
->   hw/display/bcm2835_fb: Reset resolution, etc correctly
->   hw/display/bcm2835_fb: Abstract out calculation of pitch, size
->   hw/display/bcm2835_fb: Fix handling of virtual framebuffer
->   hw/display/bcm2835_fb: Validate config settings
->   hw/display/bcm2835_fb: Validate bcm2835_fb_mbox_push() config
->
->  include/hw/display/bcm2835_fb.h |  59 +++++++--
->  hw/display/bcm2835_fb.c         | 218 +++++++++++++++++++-------------
->  hw/misc/bcm2835_property.c      | 123 +++++++++---------
->  3 files changed, 240 insertions(+), 160 deletions(-)
