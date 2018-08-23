@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fssOX-0002nU-Eg
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:23:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fssQO-0005ME-Cm
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:25:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fssOW-0002x3-L9
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:23:37 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fssOW-0002vu-8p
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:23:36 -0400
-Received: by mail-oi0-x242.google.com with SMTP id z185-v6so9837231oia.5
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 09:23:36 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1fssQK-0004CL-6k
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:25:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58012 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fssQJ-0004B7-QX
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:25:28 -0400
+References: <20180823133540.12973-1-pbonzini@redhat.com>
+	<CAFEAcA_GidqNpjz+xV0Rix7YbZToZT8t+=dQ-+UxBLo3cbbfMw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <959d62e8-6a27-c115-01e7-88b0fbe5a7aa@redhat.com>
+Date: Thu, 23 Aug 2018 18:25:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180809042206.15726-21-richard.henderson@linaro.org>
-References: <20180809042206.15726-1-richard.henderson@linaro.org>
-	<20180809042206.15726-21-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Aug 2018 17:23:15 +0100
-Message-ID: <CAFEAcA8vyDqCR1sUxfnY=v=jjjE5UD1rDmMs8gQEeH4YUievqA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 20/20] target/arm: Pass TCGMemOpIdx to sve
- memory helpers
+In-Reply-To: <CAFEAcA_GidqNpjz+xV0Rix7YbZToZT8t+=dQ-+UxBLo3cbbfMw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v3 00/69] Misc patches for 2018-08-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Desnogues <laurent.desnogues@gmail.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 9 August 2018 at 05:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> There is quite a lot of code required to compute cpu_mem_index,
-> or even put together the full TCGMemOpIdx.  This can easily be
-> done at translation time.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/internals.h     |   5 ++
->  target/arm/sve_helper.c    | 138 +++++++++++++++++++------------------
->  target/arm/translate-sve.c |  67 +++++++++++-------
->  3 files changed, 121 insertions(+), 89 deletions(-)
->
+On 23/08/2018 18:16, Peter Maydell wrote:
+> 
+> tests/libqtest.c: In function 'qtest_is_old_versioned_machine':
+> tests/libqtest.c:1019:13: warning: array subscript has type 'char'
+> [-Wchar-subscripts]
+>              if (!isdigit(*chr) && *chr != '.') {
+>              ^
+> 
+> Code should be using qemu_isdigit(). We don't enforce -Werror
+> on NetBSD, though, so we could let this through and fix it up
+> later...
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+As you prefer.  I can send a v4 too.
 
-thanks
--- PMM
+> Test failure on x86-64 Linux (debug build):
+> 
+> 
+> MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+> gtester -k --verbose -m=qui
+> ck tests/test-replication
+> TEST: tests/test-replication... (pid=6535)
+>   /replication/primary/read:                                           OK
+>   /replication/primary/write:                                          OK
+>   /replication/primary/start:                                          OK
+>   /replication/primary/stop:                                           OK
+>   /replication/primary/do_checkpoint:                                  OK
+>   /replication/primary/get_error_all:                                  OK
+>   /replication/secondary/read:                                         OK
+>   /replication/secondary/write:                                        OK
+>   /replication/secondary/start:                                        **
+> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-replication.c:120:test_blk_write:
+> assertion failed: (async_ret == 0)
+> FAIL
+> GTester: last random seed: R02Sb173bafaddab398fce3309452c295220
+> (pid=6688)
+>   /replication/secondary/stop:                                         OK
+>   /replication/secondary/do_checkpoint:                                OK
+>   /replication/secondary/get_error_all:                                OK
+> FAIL: tests/test-replication
+> 
+> I'm just checking whether that fails consistently or if it's a random/
+> intermittent.
+
+That would be strange, since I'm not touching the block layer at all
+(not my turf!)...
+
+Paolo
