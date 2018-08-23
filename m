@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSM-0005IP-Gu
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSM-0005IU-Lw
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSG-0004qD-Dt
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSI-0004sL-2e
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:26 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57108 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:57131 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fsqSF-0004ny-Lj
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:20 -0400
+	id 1fsqSH-0004po-KC
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:21 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 16:18:48 +0200
-Message-Id: <1535033941-861-34-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 16:18:52 +0200
+Message-Id: <1535033941-861-38-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535033941-861-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535033941-861-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v5 33/46] target/mips: Add emulation of DSP ASE
- for nanoMIPS - part 5
+Subject: [Qemu-devel] [PULL v5 37/46] target/mips: Add updating BadInstr and
+ BadInstrX for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,175 +30,43 @@ Cc: peter.maydell@linaro.org
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add emulation of DSP ASE instructions for nanoMIPS - part 5.
+Update BadInstr and BadInstrX registers for nanoMIPS. The same
+support for pre-nanoMIPS remains unimplemented.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 142 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 142 insertions(+)
+ target/mips/helper.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 24476a5..c83dad0 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -17774,6 +17774,144 @@ static void gen_pool32axf_2_nanomips_insn(DisasContext *ctx, uint32_t opc,
-     tcg_temp_free(v1_t);
- }
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index e215af9..f0c268b 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -682,6 +682,22 @@ static void set_hflags_for_handler (CPUMIPSState *env)
  
-+static void gen_pool32axf_4_nanomips_insn(DisasContext *ctx, uint32_t opc,
-+                                          int rt, int rs)
-+{
-+    int ret = rt;
-+    TCGv t0 = tcg_temp_new();
-+    TCGv v0_t = tcg_temp_new();
+ static inline void set_badinstr_registers(CPUMIPSState *env)
+ {
++    if (env->insn_flags & ISA_NANOMIPS32) {
++        if (env->CP0_Config3 & (1 << CP0C3_BI)) {
++            uint32_t instr = (cpu_lduw_code(env, env->active_tc.PC)) << 16;
++            if ((instr & 0x10000000) == 0) {
++                instr |= cpu_lduw_code(env, env->active_tc.PC + 2);
++            }
++            env->CP0_BadInstr = instr;
 +
-+    gen_load_gpr(v0_t, rs);
-+
-+    switch (opc) {
-+    case NM_ABSQ_S_QB:
-+        check_dspr2(ctx);
-+        gen_helper_absq_s_qb(v0_t, v0_t, cpu_env);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_ABSQ_S_PH:
-+        check_dsp(ctx);
-+        gen_helper_absq_s_ph(v0_t, v0_t, cpu_env);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_ABSQ_S_W:
-+        check_dsp(ctx);
-+        gen_helper_absq_s_w(v0_t, v0_t, cpu_env);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEQ_W_PHL:
-+        check_dsp(ctx);
-+        tcg_gen_andi_tl(v0_t, v0_t, 0xFFFF0000);
-+        tcg_gen_ext32s_tl(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEQ_W_PHR:
-+        check_dsp(ctx);
-+        tcg_gen_andi_tl(v0_t, v0_t, 0x0000FFFF);
-+        tcg_gen_shli_tl(v0_t, v0_t, 16);
-+        tcg_gen_ext32s_tl(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEQU_PH_QBL:
-+        check_dsp(ctx);
-+        gen_helper_precequ_ph_qbl(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEQU_PH_QBR:
-+        check_dsp(ctx);
-+        gen_helper_precequ_ph_qbr(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEQU_PH_QBLA:
-+        check_dsp(ctx);
-+        gen_helper_precequ_ph_qbla(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEQU_PH_QBRA:
-+        check_dsp(ctx);
-+        gen_helper_precequ_ph_qbra(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEU_PH_QBL:
-+        check_dsp(ctx);
-+        gen_helper_preceu_ph_qbl(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEU_PH_QBR:
-+        check_dsp(ctx);
-+        gen_helper_preceu_ph_qbr(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEU_PH_QBLA:
-+        check_dsp(ctx);
-+        gen_helper_preceu_ph_qbla(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_PRECEU_PH_QBRA:
-+        check_dsp(ctx);
-+        gen_helper_preceu_ph_qbra(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_REPLV_PH:
-+        check_dsp(ctx);
-+        tcg_gen_ext16u_tl(v0_t, v0_t);
-+        tcg_gen_shli_tl(t0, v0_t, 16);
-+        tcg_gen_or_tl(v0_t, v0_t, t0);
-+        tcg_gen_ext32s_tl(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_REPLV_QB:
-+        check_dsp(ctx);
-+        tcg_gen_ext8u_tl(v0_t, v0_t);
-+        tcg_gen_shli_tl(t0, v0_t, 8);
-+        tcg_gen_or_tl(v0_t, v0_t, t0);
-+        tcg_gen_shli_tl(t0, v0_t, 16);
-+        tcg_gen_or_tl(v0_t, v0_t, t0);
-+        tcg_gen_ext32s_tl(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_BITREV:
-+        check_dsp(ctx);
-+        gen_helper_bitrev(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_INSV:
-+        check_dsp(ctx);
-+        {
-+            TCGv tv0 = tcg_temp_new();
-+
-+            gen_load_gpr(tv0, rt);
-+            gen_helper_insv(v0_t, cpu_env, v0_t, tv0);
-+            gen_store_gpr(v0_t, ret);
-+            tcg_temp_free(tv0);
++            if ((instr & 0xFC000000) == 0x60000000) {
++                instr = cpu_lduw_code(env, env->active_tc.PC + 4) << 16;
++                env->CP0_BadInstrX = instr;
++            }
 +        }
-+        break;
-+    case NM_RADDU_W_QB:
-+        check_dsp(ctx);
-+        gen_helper_raddu_w_qb(v0_t, v0_t);
-+        gen_store_gpr(v0_t, ret);
-+        break;
-+    case NM_BITSWAP:
-+        gen_bitswap(ctx, OPC_BITSWAP, ret, rs);
-+        break;
-+    case NM_CLO:
-+        gen_cl(ctx, OPC_CLO, ret, rs);
-+        break;
-+    case NM_CLZ:
-+        gen_cl(ctx, OPC_CLZ, ret, rs);
-+        break;
-+    case NM_WSBH:
-+        gen_bshfl(ctx, OPC_WSBH, ret, rs);
-+        break;
-+    default:
-+        generate_exception_end(ctx, EXCP_RI);
-+        break;
++        return;
 +    }
 +
-+    tcg_temp_free(v0_t);
-+    tcg_temp_free(t0);
-+}
-+
- 
- static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
- {
-@@ -17795,6 +17933,10 @@ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
-         }
-         break;
-     case NM_POOL32AXF_4:
-+        {
-+            int32_t op1 = extract32(ctx->opcode, 9, 7);
-+            gen_pool32axf_4_nanomips_insn(ctx, op1, rt, rs);
-+        }
-         break;
-     case NM_POOL32AXF_5:
-         switch (extract32(ctx->opcode, 9, 7)) {
+     if (env->hflags & MIPS_HFLAG_M16) {
+         /* TODO: add BadInstr support for microMIPS */
+         return;
 -- 
 2.7.4
