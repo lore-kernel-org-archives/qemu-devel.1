@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fstKE-00042a-Cb
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:23:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fstM6-0005vQ-Sa
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fstKB-0005Vi-1b
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:23:14 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:41866)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fstKA-0005Uv-QM
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:23:10 -0400
-Received: by mail-pg1-x541.google.com with SMTP id s15-v6so2940440pgv.8
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 10:23:10 -0700 (PDT)
-References: <20180820141116.9118-1-peter.maydell@linaro.org>
-	<20180820141116.9118-14-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <3d7fefa3-009b-ccb5-8091-a983ce9ff3f4@linaro.org>
-Date: Thu, 23 Aug 2018 10:23:03 -0700
+	(envelope-from <ehabkost@redhat.com>) id 1fstM3-00072d-A8
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:25:10 -0400
+Date: Thu, 23 Aug 2018 14:25:01 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180823172501.GM3778@localhost.localdomain>
+References: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
+	<c88ef55d-738b-57bc-f00f-b4a4d7303bd6@redhat.com>
+	<20180822150536.6d79a1e1@redhat.com>
+	<20180822180112.GB3778@localhost.localdomain>
+	<20180823101406.06320b35@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180820141116.9118-14-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 13/22] hw/arm/iotkit: Wire up the lines for
- MSCs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180823101406.06320b35@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pc: acpi: revert back to 1 SRAT entry for
+ hotpluggable area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, patches@linaro.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: haozhong.zhang@intel.com, xiaoguangrong.eric@gmail.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org, john.ji@intel.com, Laszlo Ersek <lersek@redhat.com>
 
-On 08/20/2018 07:11 AM, Peter Maydell wrote:
-> The IoTKit doesn't have any MSCs itself but it does need
-> some wiring to connect the external signals from MSCs
-> in the outer board model up to the registers and the
-> NVIC IRQ line.
-> 
-> We also need to expose a MemoryRegion corresponding to
-> the AHB bus, so that MSCs in the outer board model can
-> use that as their downstream port. (In the FPGA this is
-> the "AHB Slave Expansion" ports shown in the block
-> diagram in the AN505 documentation.)
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  include/hw/arm/iotkit.h |  8 ++++++++
->  hw/arm/iotkit.c         | 15 +++++++++++++++
->  2 files changed, 23 insertions(+)
+On Thu, Aug 23, 2018 at 10:14:06AM +0200, Igor Mammedov wrote:
+> On Wed, 22 Aug 2018 15:01:12 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+[...]
+> > However, have you considered keeping adding separate entries for
+> > NVDIMM devices only (so we follow the spec), but add a single
+> > (numa_nodes-1, MEM_AFFINITY_HOTPLUGGABLE|MEM_AFFINITY_ENABLED)
+> > entry to the rest?
+> Indeed, I did. It doesn't work either.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+When exactly it didn't work?  Did nvdimm + memory hotplug ever
+worked together on Windows guests?
 
+For all the other cases there should be absolutely no difference:
 
-r~
+nvdimm users would still get a spec-compliant SRAT table (like on
+QEMU 3.0).
+
+Memory hotplug users w/o nvdimm would get the same ACPI table
+that they would get after applying this patch (i.e. the one we
+had before commit 848a1cc1e ("hw/acpi-build: build SRAT memory
+affinity structures for DIMM devices").
+
+-- 
+Eduardo
