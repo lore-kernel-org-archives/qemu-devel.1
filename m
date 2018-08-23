@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fstM6-0005vQ-Sa
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:25:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fstMV-0006Rh-3e
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fstM3-00072d-A8
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:25:10 -0400
-Date: Thu, 23 Aug 2018 14:25:01 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180823172501.GM3778@localhost.localdomain>
-References: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
-	<c88ef55d-738b-57bc-f00f-b4a4d7303bd6@redhat.com>
-	<20180822150536.6d79a1e1@redhat.com>
-	<20180822180112.GB3778@localhost.localdomain>
-	<20180823101406.06320b35@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fstMT-0007fM-Vp
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:25:34 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42176)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fstMT-0007dO-KY
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:25:33 -0400
+Received: by mail-oi0-x244.google.com with SMTP id q204-v6so10598199oig.9
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 10:25:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180823101406.06320b35@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: revert back to 1 SRAT entry for
- hotpluggable area
+In-Reply-To: <6a28d02d-b5b0-62c1-47b7-fd1bcb4779c4@linaro.org>
+References: <20180820141116.9118-1-peter.maydell@linaro.org>
+	<20180820141116.9118-13-peter.maydell@linaro.org>
+	<6a28d02d-b5b0-62c1-47b7-fd1bcb4779c4@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Aug 2018 18:25:12 +0100
+Message-ID: <CAFEAcA_TojNCRTCsaQFg3QMwS7vtn1zABimHJY8zXmoKkoEcyA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 12/22] hw/misc/iotkit-secctl: Wire up
+ registers for controlling MSCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: haozhong.zhang@intel.com, xiaoguangrong.eric@gmail.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org, john.ji@intel.com, Laszlo Ersek <lersek@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Thu, Aug 23, 2018 at 10:14:06AM +0200, Igor Mammedov wrote:
-> On Wed, 22 Aug 2018 15:01:12 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-[...]
-> > However, have you considered keeping adding separate entries for
-> > NVDIMM devices only (so we follow the spec), but add a single
-> > (numa_nodes-1, MEM_AFFINITY_HOTPLUGGABLE|MEM_AFFINITY_ENABLED)
-> > entry to the rest?
-> Indeed, I did. It doesn't work either.
+On 23 August 2018 at 18:21, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 08/20/2018 07:11 AM, Peter Maydell wrote:
+>> The IoTKit does not have any Master Security Contollers itself,
+>> but it does provide registers in the secure privilege control
+>> block which allow control of MSCs in the external system.
+>> Add support for these registers.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  include/hw/misc/iotkit-secctl.h | 14 +++++++
+>>  hw/misc/iotkit-secctl.c         | 73 +++++++++++++++++++++++++++++----
+>>  2 files changed, 79 insertions(+), 8 deletions(-)
+>
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+>>
+>> +static bool needed_always(void *opaque)
+>> +{
+>> +    return true;
+>> +}
+>
+> We really should either make NULL imply just this,
+> or export one copy from generic code.  Soon...
 
-When exactly it didn't work?  Did nvdimm + memory hotplug ever
-worked together on Windows guests?
+I sent a patch for doing the former, but it got some pushback
+from Juan:
+https://patchwork.ozlabs.org/patch/954507/
 
-For all the other cases there should be absolutely no difference:
-
-nvdimm users would still get a spec-compliant SRAT table (like on
-QEMU 3.0).
-
-Memory hotplug users w/o nvdimm would get the same ACPI table
-that they would get after applying this patch (i.e. the one we
-had before commit 848a1cc1e ("hw/acpi-build: build SRAT memory
-affinity structures for DIMM devices").
-
--- 
-Eduardo
+thanks
+-- PMM
