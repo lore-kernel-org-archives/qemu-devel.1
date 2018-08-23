@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40822)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fsrp9-0002jn-SX
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 11:47:04 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fsrr4-0004bD-Mt
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 11:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fsrp6-0007SU-Tf
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 11:47:03 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 23 Aug 2018 18:46:54 +0300
-Message-Id: <20180823154655.40188-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20180823154655.40188-1-vsementsov@virtuozzo.com>
-References: <20180823154655.40188-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] scripts: add render_block_graph
- function for QEMUMachine
+	(envelope-from <laurent@vivier.eu>) id 1fsrr1-0008Gu-H8
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 11:49:02 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:60130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fsrr1-0008GS-7c
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 11:48:59 -0400
+References: <20180818190118.12911-1-richard.henderson@linaro.org>
+	<20180818190118.12911-11-richard.henderson@linaro.org>
+	<51f5ba46-f63a-e433-7e0b-82e72a643d79@vivier.eu>
+	<b19ce14e-2425-b4b8-3d52-82a65468f845@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <9091dd0e-dd02-1ca5-63b9-58d30140c061@vivier.eu>
+Date: Thu, 23 Aug 2018 17:48:56 +0200
+MIME-Version: 1.0
+In-Reply-To: <b19ce14e-2425-b4b8-3d52-82a65468f845@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 10/16] linux-user: Split out some simple
+ file syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,144 +31,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: crosa@redhat.com, ehabkost@redhat.com, eblake@redhat.com, armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-Render block nodes graph with help of graphviz. This new function is
-for debugging, so there is no sense to put it into qemu.py as a method
-of QEMUMachine. Let's instead put it separately.
+Le 23/08/2018 à 00:58, Richard Henderson a écrit :
+> On 08/21/2018 05:50 PM, Laurent Vivier wrote:
+>> I don't understand why you need/want to duplicate the list of syscalls here.
+>>
+>> If I modify your patch as following, it works without duplicating the list:
+>>
+>> diff --git a/linux-user/syscall-file.def.c b/linux-user/syscall-file.def.c
+>> new file mode 100644
+>> index 0000000000..78b1bd0467
+>> --- /dev/null
+>> +++ b/linux-user/syscall-file.def.c
+>> @@ -0,0 +1,13 @@
+>> +SYSCALL_DEF(close, ARG_DEC);
+>> +#ifdef TARGET_NR_open
+>> +SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+>> +#endif
+>> +SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+>> +SYSCALL_DEF(read, ARG_DEC, ARG_PTR, ARG_DEC);
+>> +#ifdef TARGET_NR_readlink
+>> +SYSCALL_DEF(readlink, ARG_STR, ARG_PTR, ARG_DEC);
+>> +#endif
+>> +#ifdef TARGET_NR_readlinkat
+>> +SYSCALL_DEF(readlinkat, ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_DEC);
+>> +#endif
+>> +SYSCALL_DEF(write, ARG_DEC, ARG_PTR, ARG_DEC);
+> 
+> Sort-of interesting, but I do have other definitions of
+> syscall structures that do not use this macro.
+> 
+> Please look through e.g. patch 15 and suggest how I might
+> define mmap2 with your scheme.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- scripts/render_block_graph.py | 120 ++++++++++++++++++++++++++++++++++
- 1 file changed, 120 insertions(+)
- create mode 100755 scripts/render_block_graph.py
+We can add a base macro in syscall.h:
 
-diff --git a/scripts/render_block_graph.py b/scripts/render_block_graph.py
-new file mode 100755
-index 0000000000..382cc769ef
---- /dev/null
-+++ b/scripts/render_block_graph.py
-@@ -0,0 +1,120 @@
-+#!/usr/bin/env python
-+#
-+# Render Qemu Block Graph
-+#
-+# Copyright (c) 2018 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import os
-+import sys
-+import subprocess
-+import json
-+from graphviz import Digraph
-+from qemu import MonitorResponseError
-+
-+
-+def perm(arr):
-+    s = 'w' if 'write' in arr else '_'
-+    s += 'r' if 'consistent-read' in arr else '_'
-+    s += 'u' if 'write-unchanged' in arr else '_'
-+    s += 'g' if 'graph-mod' in arr else '_'
-+    s += 's' if 'resize' in arr else '_'
-+    return s
-+
-+
-+def render_block_graph(qmp, filename, format='png'):
-+    '''
-+    Render graph in text (dot) representation into "@filename" and
-+    representation in @format into "@filename.@format"
-+    '''
-+
-+    bds_nodes = qmp.command('query-named-block-nodes')
-+    bds_nodes = {n['node-name']: n for n in bds_nodes}
-+
-+    job_nodes = qmp.command('query-block-jobs')
-+    job_nodes = {n['device']: n for n in job_nodes}
-+
-+    block_graph = qmp.command('x-debug-query-block-graph')
-+
-+    graph = Digraph(comment='Block Nodes Graph')
-+    graph.format = format
-+    graph.node('permission symbols:\l'
-+               '  w - Write\l'
-+               '  r - consistent-Read\l'
-+               '  u - write - Unchanged\l'
-+               '  g - Graph-mod\l'
-+               '  s - reSize\l'
-+               'edge label scheme:\l'
-+               '  <child type>\l'
-+               '  <perm>\l'
-+               '  <shared_perm>\l', shape='none')
-+
-+    for n in block_graph['nodes']:
-+        if n['type'] == 'bds':
-+            info = bds_nodes[n['name']]
-+            label = n['name'] + ' [' + info['drv'] + ']'
-+            if info['drv'] == 'file':
-+                label += '\n' + os.path.basename(info['file'])
-+            shape = 'ellipse'
-+        elif n['type'] == 'job':
-+            info = job_nodes[n['name']]
-+            label = info['type'] + ' job (' + n['name'] + ')'
-+            shape = 'box'
-+        else:
-+            assert n['type'] == 'blk'
-+            label = n['name'] if n['name'] else 'unnamed blk'
-+            shape = 'box'
-+
-+        graph.node(str(n['id']), label, shape=shape)
-+
-+    for e in block_graph['edges']:
-+        label = '%s\l%s\l%s\l' % (e['name'], perm(e['perm']),
-+                                  perm(e['shared-perm']))
-+        graph.edge(str(e['parent']), str(e['child']), label=label)
-+
-+    graph.render(filename)
-+
-+
-+class LibvirtGuest():
-+    def __init__(self, name):
-+        self.name = name
-+
-+    def command(self, cmd):
-+        # only supports qmp commands without parameters
-+        m = {'execute': cmd}
-+        ar = ['virsh', 'qemu-monitor-command', self.name, json.dumps(m)]
-+
-+        reply = json.loads(subprocess.check_output(ar))
-+
-+        if 'error' in reply:
-+            raise MonitorResponseError(reply)
-+
-+        return reply['return']
-+
-+
-+if __name__ == '__main__':
-+    obj = sys.argv[1]
-+    out = sys.argv[2]
-+
-+    if os.path.exists(obj):
-+        # assume unix socket
-+        qmp = QEMUMonitorProtocol(obj)
-+        qmp.connect()
-+    else:
-+        # assume libvirt guest name
-+        qmp = LibvirtGuest(obj)
-+
-+    render_block_graph(qmp, out)
--- 
-2.18.0
+#define SYSCALL_DECL(NAME, ARGS, IMPL, PRINT, PRINT_RET, ...) \
+    static const SyscallDef def_##NAME = { \
+        .name = #NAME, .args = ARGS, .impl = IMPL, .print = PRINT, \
+        .print_ret = PRINT_RET, .arg_type = { __VA_ARGS__ } \
+    }
+
+and use it with the others:
+
+#define SYSCALL_DEF(NAME, ...) \
+    SYSCALL_DECL(NAME, NULL, impl_##NAME, NULL, NULL, __VA_ARGS__)
+
+#define SYSCALL_DEF_ARGS(NAME, ...) \
+    SYSCALL_DECL(NAME, args_##NAME, impl_##NAME, NULL, NULL, __VA_ARGS__)
+
+Then in syscall.c:
+
+static const SyscallDef *syscall_table(int num)
+{
+#undef SYSCALL_DECL
+#define SYSCALL_DECL(NAME, ...)  \
+    case TARGET_NR_##NAME: return &def_##NAME
+
+    switch (num) {
+#include "syscall-file.def.c"
+#include "syscall-ipc.def.c"
+#include "syscall-mem.def.c"
+#include "syscall-proc.def.c"
+    }
+    return NULL;
+
+#undef SYSCALL_DECL
+}
+
+and for mmap2 in syscall-mem.def.c:
+
+SYSCALL_DEF(mlock, ARG_PTR, ARG_DEC);
+SYSCALL_DEF(mlockall, ARG_HEX);
+#ifdef TARGET_NR_mmap
+SYSCALL_DECL(mmap, args_mmap, impl_mmap, NULL, print_syscall_ptr_ret,
+             ARG_PTR, ARG_DEC, ARG_MMAPPROT, ARG_MMAPFLAG, ARG_DEC,
+ARG_DEC);
+#endif
+#ifdef TARGET_NR_mmap2
+SYSCALL_DECL(mmap2, args_mmap2, impl_mmap, NULL, print_syscall_ptr_ret,
+             ARG_PTR, ARG_DEC, ARG_MMAPPROT, ARG_MMAPFLAG, ARG_DEC,
+ARG_DEC64);
+#endif
+...
+
+I pushed the modifications into:
+git://github.com/vivier/qemu.git lu-split-4
+
+Note that ipc_shmat can't use the macro (because the name of structure
+is def_ipc_shmat, and not def_shmat), but we don't need it because it is
+not exported to the syscall_table and only used locally by
+SYSCALL_ARGS(ipc).
+
+And doing like this, I think we don't need to add -Wunused-const-variable.
+
+Thanks,
+Laurent
