@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fstaU-0007md-Ku
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:40:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fstct-0001pO-Iv
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:42:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fstaP-0001wI-Im
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:40:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46692 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fstaP-0001uw-09
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:39:57 -0400
-References: <20180823164025.12553-1-armbru@redhat.com>
-	<20180823164025.12553-59-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <554415b1-07eb-c570-78dc-621496115860@redhat.com>
-Date: Thu, 23 Aug 2018 12:39:53 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1fstco-0003jb-Fe
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:42:31 -0400
+Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:33344)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fstco-0003jF-8Z
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:42:26 -0400
+Received: by mail-pf1-x42d.google.com with SMTP id d4-v6so3163210pfn.0
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 10:42:26 -0700 (PDT)
+References: <20180820141116.9118-1-peter.maydell@linaro.org>
+	<20180820141116.9118-23-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <786e23f7-8492-477e-632b-10dc3ebd4576@linaro.org>
+Date: Thu, 23 Aug 2018 10:42:19 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180823164025.12553-59-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180820141116.9118-23-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 58/58] json: Update references to RFC
- 7159 to RFC 8259
+Subject: Re: [Qemu-devel] [PATCH 22/22] hw/arm/mps2-tz: Fix MPS2 SCC config
+ register values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +32,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, patches@linaro.org
 
-On 08/23/2018 11:40 AM, Markus Armbruster wrote:
-> RFC 8259 (December 2017) obsoletes RFC 7159 (March 2014).
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   include/qapi/qmp/qnum.h | 2 +-
->   qapi/introspect.json    | 2 +-
->   qobject/json-parser.c   | 2 +-
->   3 files changed, 3 insertions(+), 3 deletions(-)
+On 08/20/2018 07:11 AM, Peter Maydell wrote:
+> +    mmc->scc_id = 0x41040000 | (0x505 << 4);
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Is it any less clear to say 0x41045050?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
