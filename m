@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgQ-0003W0-9C
+	(envelope-from <armbru@redhat.com>) id 1fssgQ-0003T9-EW
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsset-0003ZC-Tw
+	(envelope-from <armbru@redhat.com>) id 1fsseu-0003Zg-1s
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40730 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44738 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003YR-IO
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003YX-O7
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:31 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:42 +0200
-Message-Id: <20180823164025.12553-16-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:51 +0200
+Message-Id: <20180823164025.12553-25-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 15/58] check-qjson qmp-test: Cover control
- characters more thoroughly
+Subject: [Qemu-devel] [PATCH v3 24/58] json: Leave rejecting invalid UTF-8
+ to parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,111 +27,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange
-Format" requires control characters in strings to be escaped.
-Demonstrate the JSON parser accepts U+0001 .. U+001F unescaped.
+Both the lexer and the parser (attempt to) validate UTF-8 in JSON
+strings.
+
+The lexer rejects bytes that can't occur in valid UTF-8: \xC0..\xC1,
+\xF5..\xFF.  This rejects some, but not all invalid UTF-8.  It also
+rejects ASCII control characters \x00..\x1F, in accordance with RFC
+8259 (see recent commit "json: Reject unescaped control characters").
+
+When the lexer rejects, it ends the token right after the first bad
+byte.  Good when the bad byte is a newline.  Not so good when it's
+something like an overlong sequence in the middle of a string.  For
+instance, input
+
+    {"abc\xC0\xAFijk": 1}\n
+
+produces the tokens
+
+    JSON_LCURLY   {
+    JSON_ERROR    "abc\xC0
+    JSON_ERROR    \xAF
+    JSON_KEYWORD  ijk
+    JSON_ERROR   ": 1}\n
+
+The parser then reports four errors
+
+    Invalid JSON syntax
+    Invalid JSON syntax
+    JSON parse error, invalid keyword 'ijk'
+    Invalid JSON syntax
+
+before it recovers at the newline.
+
+The commit before previous made the parser reject invalid UTF-8
+sequences.  Since then, anything the lexer rejects, the parser would
+reject as well.  Thus, the lexer's rejecting is unnecessary for
+correctness, and harmful for error reporting.
+
+However, we want to keep rejecting ASCII control characters in the
+lexer, because that produces the behavior we want for unclosed
+strings.
+
+We also need to keep rejecting \xFF in the lexer, because we
+documented that as a way to reset the JSON parser
+(docs/interop/qmp-spec.txt section 2.6 QGA Synchronization), which
+means we can't change how we recover from this error now.  I wish we
+hadn't done that.
+
+I think we should treat \xFE the same as \xFF.
+
+Change the lexer to accept \xC0..\xC1 and \xF5..\xFD.  It now rejects
+only \x00..\x1F and \xFE..\xFF.  Error reporting for invalid UTF-8 in
+strings is much improved, except for \xFE and \xFF.  For the example
+above, the lexer now produces
+
+    JSON_LCURLY   {
+    JSON_STRING   "abc\xC0\xAFijk"
+    JSON_COLON    :
+    JSON_INTEGER  1
+    JSON_RCURLY
+
+and the parser reports just
+
+    JSON parse error, invalid UTF-8 sequence in string
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c | 36 ++++++++++++++++++++++++++++++------
- tests/qmp-test.c    | 14 ++++++++++++++
- 2 files changed, 44 insertions(+), 6 deletions(-)
+ qobject/json-lexer.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 40a573eb21..a586189d87 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -192,6 +192,26 @@ static void utf8_string(void)
-          *   We may choose to define this as feature
-          */
- 
-+        /* 0  Control characters */
-+        {
-+            /*
-+             * Note: \x00 is impossible, other representations of
-+             * U+0000 are covered under 4.3
-+             */
-+            "\x01\x02\x03\x04\x05\x06\x07"
-+            "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
-+            "\x10\x11\x12\x13\x14\x15\x16\x17"
-+            "\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
-+            /* bug: not corrected (valid UTF-8, but invalid JSON) */
-+            "\x01\x02\x03\x04\x05\x06\x07"
-+            "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
-+            "\x10\x11\x12\x13\x14\x15\x16\x17"
-+            "\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
-+            "\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007"
-+            "\\b\\t\\n\\u000B\\f\\r\\u000E\\u000F"
-+            "\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017"
-+            "\\u0018\\u0019\\u001A\\u001B\\u001C\\u001D\\u001E\\u001F",
-+        },
-         /* 1  Some correct UTF-8 text */
-         {
-             /* a bit of German */
-@@ -211,14 +231,14 @@ static void utf8_string(void)
-         /* 2  Boundary condition test cases */
-         /* 2.1  First possible sequence of a certain length */
-         /*
--         * 2.1.1  1 byte U+0001
--         * \x00 is impossible, test \x01 instead.  Other
--         * representations of U+0000 are covered under 4.3.
-+         * 2.1.1 1 byte U+0020
-+         * Control characters are already covered by their own test
-+         * case under 0.  Test the first 1 byte non-control character
-+         * here.
-          */
-         {
--            "\x01",
--            "\x01",
--            "\\u0001",
-+            " ",
-+            " ",
-         },
-         /* 2.1.2  2 bytes U+0080 */
-         {
-@@ -1333,6 +1353,10 @@ static void junk_input(void)
-     g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
- 
-+    obj = qobject_from_json("{\x01", &err);
-+    g_assert(!err);             /* BUG */
-+    g_assert(obj == NULL);
-+
-     obj = qobject_from_json("[0\xFF]", &err);
-     error_free_or_abort(&err);
-     g_assert(obj == NULL);
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 17153192fe..5edc97f63f 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -71,6 +71,13 @@ static void test_malformed(QTestState *qts)
-     qobject_unref(resp);
-     g_assert(recovered(qts));
- 
-+    /* lexical error: funny control character outside string */
-+    qtest_qmp_send_raw(qts, "{\x01");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-     /* lexical error: impossible byte in string */
-     qtest_qmp_send_raw(qts, "{'bad \xFF");
-     resp = qtest_qmp_receive(qts);
-@@ -78,6 +85,13 @@ static void test_malformed(QTestState *qts)
-     qobject_unref(resp);
-     g_assert(recovered(qts));
- 
-+    /* lexical error: control character in string */
-+    qtest_qmp_send_raw(qts, "{'execute': 'nonexistent', 'id':'\n'}");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound"); /* BUG */
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-     /* lexical error: interpolation */
-     qtest_qmp_send_raw(qts, "%%p\n");
-     resp = qtest_qmp_receive(qts);
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 902fe60846..93fa2737e6 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -177,8 +177,7 @@ static const uint8_t json_lexer[][256] =  {
+         ['u'] = IN_DQ_UCODE0,
+     },
+     [IN_DQ_STRING] = {
+-        [0x20 ... 0xBF] = IN_DQ_STRING,
+-        [0xC2 ... 0xF4] = IN_DQ_STRING,
++        [0x20 ... 0xFD] = IN_DQ_STRING,
+         ['\\'] = IN_DQ_STRING_ESCAPE,
+         ['"'] = JSON_STRING,
+     },
+@@ -217,8 +216,7 @@ static const uint8_t json_lexer[][256] =  {
+         ['u'] = IN_SQ_UCODE0,
+     },
+     [IN_SQ_STRING] = {
+-        [0x20 ... 0xBF] = IN_SQ_STRING,
+-        [0xC2 ... 0xF4] = IN_SQ_STRING,
++        [0x20 ... 0xFD] = IN_SQ_STRING,
+         ['\\'] = IN_SQ_STRING_ESCAPE,
+         ['\''] = JSON_STRING,
+     },
 -- 
 2.17.1
