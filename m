@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fsmMP-00020G-PZ
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:57:03 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fsmMR-00020g-9p
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fsmMO-0006yq-VW
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:57:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32990 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fsmMQ-00070P-Ak
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:57:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50866 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fsmMO-0006yG-O4
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:57:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fsmMP-0006z5-U3
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:57:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 28BC440216E6
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 09:57:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2015E87A78
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 09:57:01 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 23 Aug 2018 11:56:41 +0200
-Message-Id: <20180823095653.14556-1-kraxel@redhat.com>
+Date: Thu, 23 Aug 2018 11:56:52 +0200
+Message-Id: <20180823095653.14556-12-kraxel@redhat.com>
+In-Reply-To: <20180823095653.14556-1-kraxel@redhat.com>
+References: <20180823095653.14556-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/12] Ui 20180823 v3 patches
+Subject: [Qemu-devel] [PULL 11/12] dmabuf: add y0_top, pass it to spice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +33,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The following changes since commit d0092d90eb546a8bbe9e9120426c1894741237=
-97:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180820' into =
-staging (2018-08-20 17:41:18 +0100)
+Some scanouts during boot are top-down without it.
 
-are available in the git repository at:
+y0_top is set from VHOST_USER_GPU_DMABUF_SCANOUT code path in the last
+patch of this series.
 
-  git://git.kraxel.org/qemu tags/ui-20180823-v3-pull-request
+In current QEMU code base, only vfio/display uses dmabuf API. But the
+VFIO query interface doesn't provide or need that detail so far.
 
-for you to fetch changes up to 63cde1d13d0767f778a130e2c93c15ad709e1276:
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180713130916.4153-5-marcandre.lureau@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/console.h | 1 +
+ ui/spice-display.c   | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-  util: promote qemu_egl_rendernode_open() to libqemuutil (2018-08-23 11:=
-53:26 +0200)
-
-----------------------------------------------------------------
-ui: misc fixes which piled up during 3.0 release freeze
-
-----------------------------------------------------------------
-
-Daniel P. Berrang=C3=A9 (2):
-  doc: switch to modern syntax for VNC TLS setup
-  vnc: remove support for deprecated tls, x509, x509verify options
-
-Marc-Andr=C3=A9 Lureau (3):
-  ui: use enum to string helpers
-  dmabuf: add y0_top, pass it to spice
-  util: promote qemu_egl_rendernode_open() to libqemuutil
-
-Paolo Bonzini (2):
-  spice-display: access ptr_x/ptr_y under Mutex
-  spice-display: fix qemu_spice_cursor_refresh_bh locking
-
-Peter Wu (1):
-  vnc: fix memleak of the "vnc-worker-output" name
-
-Philippe Mathieu-Daud=C3=A9 (1):
-  ui/vnc: Remove useless parenthesis around DIV_ROUND_UP macro
-
-Tao Wu (1):
-  sdl2: redraw correctly when scanout_mode enabled.
-
-Thomas Huth (2):
-  ui/sdl2: Remove the obsolete SDL_INIT_NOPARACHUTE flag
-  ui/sdl2: Fix broken -full-screen CLI option
-
- include/qemu/drm.h   |  6 ++++
- include/ui/console.h |  1 +
- qemu-keymap.c        |  2 +-
- ui/console.c         |  6 ++--
- ui/egl-helpers.c     | 51 ++--------------------------
- ui/sdl2-gl.c         |  5 +++
- ui/sdl2.c            | 13 +++-----
- ui/spice-display.c   | 42 +++++++++++++++--------
- ui/vnc-enc-tight.c   |  2 +-
- ui/vnc-jobs.c        |  3 +-
- ui/vnc.c             | 94 ++--------------------------------------------=
-------
- util/drm.c           | 66 ++++++++++++++++++++++++++++++++++++
- MAINTAINERS          |  1 +
- qemu-deprecated.texi | 20 -----------
- qemu-doc.texi        | 20 ++++++++---
- qemu-options.hx      | 43 ------------------------
- util/Makefile.objs   |  1 +
- 17 files changed, 139 insertions(+), 237 deletions(-)
- create mode 100644 include/qemu/drm.h
- create mode 100644 util/drm.c
-
+diff --git a/include/ui/console.h b/include/ui/console.h
+index 981b519dde..fb969caf70 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -186,6 +186,7 @@ struct QemuDmaBuf {
+     uint32_t  stride;
+     uint32_t  fourcc;
+     uint32_t  texture;
++    bool      y0_top;
+ };
+=20
+ typedef struct DisplayChangeListenerOps {
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 7b230987dc..2f8adb6b9f 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -1056,7 +1056,8 @@ static void qemu_spice_gl_update(DisplayChangeListe=
+ner *dcl,
+             /* note: spice server will close the fd, so hand over a dup =
+*/
+             spice_qxl_gl_scanout(&ssd->qxl, dup(dmabuf->fd),
+                                  dmabuf->width, dmabuf->height,
+-                                 dmabuf->stride, dmabuf->fourcc, false);
++                                 dmabuf->stride, dmabuf->fourcc,
++                                 dmabuf->y0_top);
+         }
+         qemu_spice_gl_monitor_config(ssd, 0, 0, dmabuf->width, dmabuf->h=
+eight);
+         ssd->guest_dmabuf_refresh =3D false;
 --=20
 2.9.3
