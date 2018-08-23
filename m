@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fsqMy-0007hB-PG
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:13:53 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fsqQx-0004Ki-S7
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:18:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fsqMu-0001mg-LC
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:13:52 -0400
-Date: Thu, 23 Aug 2018 16:13:42 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180823161342.119d0638.cohuck@redhat.com>
-In-Reply-To: <1532521224-27235-9-git-send-email-thuth@redhat.com>
-References: <1532521224-27235-1-git-send-email-thuth@redhat.com>
-	<1532521224-27235-9-git-send-email-thuth@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fsqQt-0003zH-MN
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:17:59 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41293)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fsqQt-0003ys-CK
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:17:55 -0400
+Received: by mail-pf1-x441.google.com with SMTP id h79-v6so1892995pfk.8
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 07:17:55 -0700 (PDT)
+References: <20180820141116.9118-1-peter.maydell@linaro.org>
+	<20180820141116.9118-7-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <56bb43b1-765d-0fe4-2ae4-26cab7e32efd@linaro.org>
+Date: Thu, 23 Aug 2018 07:17:51 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-3.1 08/10] hw/s390x: Move
- vhost-vsock-ccw code to a separate file
+In-Reply-To: <20180820141116.9118-7-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 06/22] hw/arm/iotkit: Wire up the watchdogs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, patches@linaro.org
 
-On Wed, 25 Jul 2018 14:20:22 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> The code should only be enabled if CONFIG_VHOST_VSOCK has been set.
-> This can be done best if the code resides in a separate file.
+On 08/20/2018 07:11 AM, Peter Maydell wrote:
+> The IoTKit includes three different instances of the
+> CMSDK APB watchdog; create and wire them up.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/s390x/Makefile.objs     |  1 +
->  hw/s390x/vhost-vsock-ccw.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/arm/iotkit.h |  6 +++++
+>  hw/arm/iotkit.c         | 58 ++++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 61 insertions(+), 3 deletions(-)
 
-Small nit: The existing MAINTAINERS entry for virtio-ccw doesn't catch
-this (although the virtio-ccw machine one does). I'll squash in the
-following:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f823fdec91..6d01cd00af 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1228,6 +1228,7 @@ M: Cornelia Huck <cohuck@redhat.com>
- M: Christian Borntraeger <borntraeger@de.ibm.com>
- S: Supported
- F: hw/s390x/virtio-ccw*.[hc]
-+F: hw/s390x/vhost-vsock-ccw.c
- T: git git://github.com/cohuck/qemu.git s390-next
- T: git git://github.com/borntraeger/qemu.git s390-next
- L: qemu-s390x@nongnu.org
 
->  hw/s390x/virtio-ccw.c      | 47 ------------------------------------
->  3 files changed, 61 insertions(+), 47 deletions(-)
->  create mode 100644 hw/s390x/vhost-vsock-ccw.c
+r~
