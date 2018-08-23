@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskT-0000XE-EK
+	(envelope-from <armbru@redhat.com>) id 1fsskS-0000Vx-Ax
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskL-0006LG-Ec
+	(envelope-from <armbru@redhat.com>) id 1fsskL-0006LP-Er
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37298 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45000 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskL-0006KN-0h
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskL-0006KQ-4Y
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:09 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:40:19 +0200
-Message-Id: <20180823164025.12553-53-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:40:17 +0200
+Message-Id: <20180823164025.12553-51-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 52/58] qobject: Drop superfluous includes of
- qemu-common.h
+Subject: [Qemu-devel] [PATCH v3 50/58] json: Unbox tokens queue in
+ JSONMessageParser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +30,126 @@ Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/qapi/qmp/json-parser.h | 1 -
- qobject/json-lexer.c           | 1 -
- qobject/json-streamer.c        | 1 -
- qobject/qbool.c                | 1 -
- qobject/qlist.c                | 1 -
- qobject/qnull.c                | 1 -
- qobject/qnum.c                 | 1 -
- qobject/qobject.c              | 1 -
- qobject/qstring.c              | 1 -
- 9 files changed, 9 deletions(-)
+ include/qapi/qmp/json-streamer.h |  2 +-
+ qobject/json-parser.c            |  1 -
+ qobject/json-streamer.c          | 30 +++++++++++-------------------
+ 3 files changed, 12 insertions(+), 21 deletions(-)
 
-diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parser.h
-index 21b23d7bec..55f75954c3 100644
---- a/include/qapi/qmp/json-parser.h
-+++ b/include/qapi/qmp/json-parser.h
-@@ -14,7 +14,6 @@
- #ifndef QEMU_JSON_PARSER_H
- #define QEMU_JSON_PARSER_H
+diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
+index e162fd01da..d1d7fe2595 100644
+--- a/include/qapi/qmp/json-streamer.h
++++ b/include/qapi/qmp/json-streamer.h
+@@ -31,7 +31,7 @@ typedef struct JSONMessageParser
+     JSONLexer lexer;
+     int brace_count;
+     int bracket_count;
+-    GQueue *tokens;
++    GQueue tokens;
+     uint64_t token_size;
+ } JSONMessageParser;
  
--#include "qemu-common.h"
- #include "qapi/qmp/json-lexer.h"
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 685e9dac24..e9a9f937f3 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -552,7 +552,6 @@ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
+         parser_context_pop_token(&ctxt);
+     }
+     g_free(ctxt.current);
+-    g_queue_free(ctxt.buf);
  
- typedef struct JSONToken JSONToken;
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index a728c32faa..06ec67dc45 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -12,7 +12,6 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "qapi/qmp/json-lexer.h"
- #include "qapi/qmp/json-streamer.h"
- 
+     return result;
+ }
 diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 467bc29413..da53e770e9 100644
+index 954bf9d468..9210281a65 100644
 --- a/qobject/json-streamer.c
 +++ b/qobject/json-streamer.c
-@@ -12,7 +12,6 @@
-  */
+@@ -22,17 +22,12 @@
+ #define MAX_TOKEN_COUNT (2ULL << 20)
+ #define MAX_NESTING (1 << 10)
  
- #include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "qapi/error.h"
- #include "qapi/qmp/json-lexer.h"
- #include "qapi/qmp/json-parser.h"
-diff --git a/qobject/qbool.c b/qobject/qbool.c
-index b58249925c..06dfc43498 100644
---- a/qobject/qbool.c
-+++ b/qobject/qbool.c
-@@ -13,7 +13,6 @@
+-static void json_message_free_token(void *token, void *opaque)
+-{
+-    g_free(token);
+-}
+-
+ static void json_message_free_tokens(JSONMessageParser *parser)
+ {
+-    if (parser->tokens) {
+-        g_queue_foreach(parser->tokens, json_message_free_token, NULL);
+-        g_queue_free(parser->tokens);
+-        parser->tokens = NULL;
++    JSONToken *token;
++
++    while ((token = g_queue_pop_head(&parser->tokens))) {
++        g_free(token);
+     }
+ }
  
- #include "qemu/osdep.h"
- #include "qapi/qmp/qbool.h"
--#include "qemu-common.h"
+@@ -61,11 +56,10 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+         error_setg(&err, "JSON parse error, stray '%s'", input->str);
+         goto out_emit;
+     case JSON_END_OF_INPUT:
+-        if (g_queue_is_empty(parser->tokens)) {
++        if (g_queue_is_empty(&parser->tokens)) {
+             return;
+         }
+-        json = json_parser_parse(parser->tokens, parser->ap, &err);
+-        parser->tokens = NULL;
++        json = json_parser_parse(&parser->tokens, parser->ap, &err);
+         goto out_emit;
+     default:
+         break;
+@@ -79,7 +73,7 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+         error_setg(&err, "JSON token size limit exceeded");
+         goto out_emit;
+     }
+-    if (g_queue_get_length(parser->tokens) + 1 > MAX_TOKEN_COUNT) {
++    if (g_queue_get_length(&parser->tokens) + 1 > MAX_TOKEN_COUNT) {
+         error_setg(&err, "JSON token count limit exceeded");
+         goto out_emit;
+     }
+@@ -97,21 +91,19 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
  
- /**
-  * qbool_from_bool(): Create a new QBool from a bool
-diff --git a/qobject/qlist.c b/qobject/qlist.c
-index 37c1c167f1..b3274af88b 100644
---- a/qobject/qlist.c
-+++ b/qobject/qlist.c
-@@ -17,7 +17,6 @@
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
- #include "qemu/queue.h"
--#include "qemu-common.h"
+     parser->token_size += input->len;
  
- /**
-  * qlist_new(): Create a new QList
-diff --git a/qobject/qnull.c b/qobject/qnull.c
-index f6f55f11ea..00870a1824 100644
---- a/qobject/qnull.c
-+++ b/qobject/qnull.c
-@@ -11,7 +11,6 @@
-  */
+-    g_queue_push_tail(parser->tokens, token);
++    g_queue_push_tail(&parser->tokens, token);
  
- #include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "qapi/qmp/qnull.h"
+     if ((parser->brace_count > 0 || parser->bracket_count > 0)
+         && parser->bracket_count >= 0 && parser->bracket_count >= 0) {
+         return;
+     }
  
- QNull qnull_ = {
-diff --git a/qobject/qnum.c b/qobject/qnum.c
-index 1501c82832..7012fc57f2 100644
---- a/qobject/qnum.c
-+++ b/qobject/qnum.c
-@@ -14,7 +14,6 @@
+-    json = json_parser_parse(parser->tokens, parser->ap, &err);
+-    parser->tokens = NULL;
++    json = json_parser_parse(&parser->tokens, parser->ap, &err);
  
- #include "qemu/osdep.h"
- #include "qapi/qmp/qnum.h"
--#include "qemu-common.h"
+ out_emit:
+     parser->brace_count = 0;
+     parser->bracket_count = 0;
+     json_message_free_tokens(parser);
+-    parser->tokens = g_queue_new();
+     parser->token_size = 0;
+     parser->emit(parser->opaque, json, err);
+ }
+@@ -126,7 +118,7 @@ void json_message_parser_init(JSONMessageParser *parser,
+     parser->ap = ap;
+     parser->brace_count = 0;
+     parser->bracket_count = 0;
+-    parser->tokens = g_queue_new();
++    g_queue_init(&parser->tokens);
+     parser->token_size = 0;
  
- /**
-  * qnum_from_int(): Create a new QNum from an int64_t
-diff --git a/qobject/qobject.c b/qobject/qobject.c
-index cf4b7e229e..878dd76e79 100644
---- a/qobject/qobject.c
-+++ b/qobject/qobject.c
-@@ -8,7 +8,6 @@
-  */
+     json_lexer_init(&parser->lexer, !!ap);
+@@ -141,7 +133,7 @@ void json_message_parser_feed(JSONMessageParser *parser,
+ void json_message_parser_flush(JSONMessageParser *parser)
+ {
+     json_lexer_flush(&parser->lexer);
+-    assert(g_queue_is_empty(parser->tokens));
++    assert(g_queue_is_empty(&parser->tokens));
+ }
  
- #include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qnull.h"
- #include "qapi/qmp/qnum.h"
-diff --git a/qobject/qstring.c b/qobject/qstring.c
-index 0f1510e792..1c6897df00 100644
---- a/qobject/qstring.c
-+++ b/qobject/qstring.c
-@@ -12,7 +12,6 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/qmp/qstring.h"
--#include "qemu-common.h"
- 
- /**
-  * qstring_new(): Create a new empty QString
+ void json_message_parser_destroy(JSONMessageParser *parser)
 -- 
 2.17.1
