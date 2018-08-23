@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskU-0000Y4-EL
+	(envelope-from <armbru@redhat.com>) id 1fsskU-0000Y3-EC
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskM-0006Me-6p
+	(envelope-from <armbru@redhat.com>) id 1fsskN-0006Nl-0O
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59570 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40970 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskL-0006Lf-S6
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:09 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskM-0006MM-Ar
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:10 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:40:22 +0200
-Message-Id: <20180823164025.12553-56-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:40:07 +0200
+Message-Id: <20180823164025.12553-41-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 55/58] json: Keep interpolation state in
- JSONParserContext
+Subject: [Qemu-devel] [PATCH v3 40/58] json: Leave rejecting invalid
+ interpolation to parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,209 +27,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-The recursive descent parser passes along a pointer to
-JSONParserContext.  It additionally passes a pointer to interpolation
-state (a va_alist *) as needed to reach its consumer
-parse_interpolation().
+Both lexer and parser reject invalid interpolation specifications.
+The parser's check is useless.
 
-Stuffing the latter pointer into JSONParserContext saves us the
-trouble of passing it along, so do that.
+The lexer ends the token right after the first bad character.  This
+tends to lead to suboptimal error reporting.  For instance, input
+
+    [ %04d ]
+
+produces the tokens
+
+    JSON_LSQUARE  [
+    JSON_ERROR    %0
+    JSON_INTEGER  4
+    JSON_KEYWORD  d
+    JSON_RSQUARE  ]
+
+The parser then yields an error, an object and two more errors:
+
+    error: Invalid JSON syntax
+    object: 4
+    error: JSON parse error, invalid keyword
+    error: JSON parse error, expecting value
+
+Dumb down the lexer to accept [A-Za-z0-9]*.  The parser's check is now
+used.  Emit a proper error there.
+
+The lexer now produces
+
+    JSON_LSQUARE  [
+    JSON_INTERP   %04d
+    JSON_RSQUARE  ]
+
+and the parser reports just
+
+    JSON parse error, invalid interpolation '%04d'
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-parser.c | 59 ++++++++++++++++++++++---------------------
- 1 file changed, 30 insertions(+), 29 deletions(-)
+ qobject/json-lexer.c  | 44 ++++++-------------------------------------
+ qobject/json-parser.c |  1 +
+ tests/check-qjson.c   |  3 ++-
+ 3 files changed, 9 insertions(+), 39 deletions(-)
 
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index 7c31c2c8ff..f1a4b5a430 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -93,7 +93,8 @@
+  *   (apostrophe) instead of %x22 (quotation mark), and can't contain
+  *   unescaped apostrophe, but can contain unescaped quotation mark.
+  * - Interpolation, if enabled:
+- *   interpolation = %((l|ll|I64)[du]|[ipsf])
++ *   The lexer accepts %[A-Za-z0-9]*, and leaves rejecting invalid
++ *   ones to the parser.
+  *
+  * Note:
+  * - Input must be encoded in modified UTF-8.
+@@ -116,11 +117,6 @@ enum json_lexer_state {
+     IN_NEG_NONZERO_NUMBER,
+     IN_KEYWORD,
+     IN_INTERP,
+-    IN_INTERP_L,
+-    IN_INTERP_LL,
+-    IN_INTERP_I,
+-    IN_INTERP_I6,
+-    IN_INTERP_I64,
+     IN_WHITESPACE,
+     IN_START,
+     IN_START_INTERP,            /* must be IN_START + 1 */
+@@ -224,39 +220,11 @@ static const uint8_t json_lexer[][256] =  {
+     },
+ 
+     /* interpolation */
+-    [IN_INTERP_LL] = {
+-        ['d'] = JSON_INTERP,
+-        ['u'] = JSON_INTERP,
+-    },
+-
+-    [IN_INTERP_L] = {
+-        ['d'] = JSON_INTERP,
+-        ['l'] = IN_INTERP_LL,
+-        ['u'] = JSON_INTERP,
+-    },
+-
+-    [IN_INTERP_I64] = {
+-        ['d'] = JSON_INTERP,
+-        ['u'] = JSON_INTERP,
+-    },
+-
+-    [IN_INTERP_I6] = {
+-        ['4'] = IN_INTERP_I64,
+-    },
+-
+-    [IN_INTERP_I] = {
+-        ['6'] = IN_INTERP_I6,
+-    },
+-
+     [IN_INTERP] = {
+-        ['d'] = JSON_INTERP,
+-        ['i'] = JSON_INTERP,
+-        ['p'] = JSON_INTERP,
+-        ['s'] = JSON_INTERP,
+-        ['u'] = JSON_INTERP,
+-        ['f'] = JSON_INTERP,
+-        ['l'] = IN_INTERP_L,
+-        ['I'] = IN_INTERP_I,
++        TERMINAL(JSON_INTERP),
++        ['A' ... 'Z'] = IN_INTERP,
++        ['a' ... 'z'] = IN_INTERP,
++        ['0' ... '9'] = IN_INTERP,
+     },
+ 
+     /*
 diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 7449684f1c..273f448a52 100644
+index 2855eaaeca..e61cee9e8a 100644
 --- a/qobject/json-parser.c
 +++ b/qobject/json-parser.c
-@@ -36,6 +36,7 @@ typedef struct JSONParserContext
-     Error *err;
-     JSONToken *current;
-     GQueue *buf;
-+    va_list *ap;
- } JSONParserContext;
- 
- #define BUG_ON(cond) assert(!(cond))
-@@ -49,7 +50,7 @@ typedef struct JSONParserContext
-  * 4) deal with premature EOI
-  */
- 
--static QObject *parse_value(JSONParserContext *ctxt, va_list *ap);
-+static QObject *parse_value(JSONParserContext *ctxt);
- 
- /**
-  * Error handler
-@@ -243,7 +244,7 @@ static JSONToken *parser_context_peek_token(JSONParserContext *ctxt)
- /**
-  * Parsing rules
-  */
--static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
-+static int parse_pair(JSONParserContext *ctxt, QDict *dict)
- {
-     QObject *value;
-     QString *key = NULL;
-@@ -255,7 +256,7 @@ static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
-         goto out;
-     }
- 
--    key = qobject_to(QString, parse_value(ctxt, ap));
-+    key = qobject_to(QString, parse_value(ctxt));
-     if (!key) {
-         parse_error(ctxt, peek, "key is not a string in object");
-         goto out;
-@@ -272,7 +273,7 @@ static int parse_pair(JSONParserContext *ctxt, QDict *dict, va_list *ap)
-         goto out;
-     }
- 
--    value = parse_value(ctxt, ap);
-+    value = parse_value(ctxt);
-     if (value == NULL) {
-         parse_error(ctxt, token, "Missing value in dict");
-         goto out;
-@@ -290,7 +291,7 @@ out:
-     return -1;
- }
- 
--static QObject *parse_object(JSONParserContext *ctxt, va_list *ap)
-+static QObject *parse_object(JSONParserContext *ctxt)
- {
-     QDict *dict = NULL;
-     JSONToken *token, *peek;
-@@ -307,7 +308,7 @@ static QObject *parse_object(JSONParserContext *ctxt, va_list *ap)
-     }
- 
-     if (peek->type != JSON_RCURLY) {
--        if (parse_pair(ctxt, dict, ap) == -1) {
-+        if (parse_pair(ctxt, dict) == -1) {
-             goto out;
-         }
- 
-@@ -323,7 +324,7 @@ static QObject *parse_object(JSONParserContext *ctxt, va_list *ap)
-                 goto out;
-             }
- 
--            if (parse_pair(ctxt, dict, ap) == -1) {
-+            if (parse_pair(ctxt, dict) == -1) {
-                 goto out;
-             }
- 
-@@ -344,7 +345,7 @@ out:
-     return NULL;
- }
- 
--static QObject *parse_array(JSONParserContext *ctxt, va_list *ap)
-+static QObject *parse_array(JSONParserContext *ctxt)
- {
-     QList *list = NULL;
-     JSONToken *token, *peek;
-@@ -363,7 +364,7 @@ static QObject *parse_array(JSONParserContext *ctxt, va_list *ap)
-     if (peek->type != JSON_RSQUARE) {
-         QObject *obj;
- 
--        obj = parse_value(ctxt, ap);
-+        obj = parse_value(ctxt);
-         if (obj == NULL) {
-             parse_error(ctxt, token, "expecting value");
-             goto out;
-@@ -383,7 +384,7 @@ static QObject *parse_array(JSONParserContext *ctxt, va_list *ap)
-                 goto out;
-             }
- 
--            obj = parse_value(ctxt, ap);
-+            obj = parse_value(ctxt);
-             if (obj == NULL) {
-                 parse_error(ctxt, token, "expecting value");
-                 goto out;
-@@ -426,7 +427,7 @@ static QObject *parse_keyword(JSONParserContext *ctxt)
-     return NULL;
- }
- 
--static QObject *parse_interpolation(JSONParserContext *ctxt, va_list *ap)
-+static QObject *parse_interpolation(JSONParserContext *ctxt)
- {
-     JSONToken *token;
- 
-@@ -434,29 +435,29 @@ static QObject *parse_interpolation(JSONParserContext *ctxt, va_list *ap)
-     assert(token && token->type == JSON_INTERP);
- 
-     if (!strcmp(token->str, "%p")) {
--        return va_arg(*ap, QObject *);
-+        return va_arg(*ctxt->ap, QObject *);
-     } else if (!strcmp(token->str, "%i")) {
--        return QOBJECT(qbool_from_bool(va_arg(*ap, int)));
-+        return QOBJECT(qbool_from_bool(va_arg(*ctxt->ap, int)));
-     } else if (!strcmp(token->str, "%d")) {
--        return QOBJECT(qnum_from_int(va_arg(*ap, int)));
-+        return QOBJECT(qnum_from_int(va_arg(*ctxt->ap, int)));
-     } else if (!strcmp(token->str, "%ld")) {
--        return QOBJECT(qnum_from_int(va_arg(*ap, long)));
-+        return QOBJECT(qnum_from_int(va_arg(*ctxt->ap, long)));
-     } else if (!strcmp(token->str, "%lld")) {
--        return QOBJECT(qnum_from_int(va_arg(*ap, long long)));
-+        return QOBJECT(qnum_from_int(va_arg(*ctxt->ap, long long)));
-     } else if (!strcmp(token->str, "%" PRId64)) {
--        return QOBJECT(qnum_from_int(va_arg(*ap, int64_t)));
-+        return QOBJECT(qnum_from_int(va_arg(*ctxt->ap, int64_t)));
-     } else if (!strcmp(token->str, "%u")) {
--        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned int)));
-+        return QOBJECT(qnum_from_uint(va_arg(*ctxt->ap, unsigned int)));
-     } else if (!strcmp(token->str, "%lu")) {
--        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long)));
-+        return QOBJECT(qnum_from_uint(va_arg(*ctxt->ap, unsigned long)));
-     } else if (!strcmp(token->str, "%llu")) {
--        return QOBJECT(qnum_from_uint(va_arg(*ap, unsigned long long)));
-+        return QOBJECT(qnum_from_uint(va_arg(*ctxt->ap, unsigned long long)));
-     } else if (!strcmp(token->str, "%" PRIu64)) {
--        return QOBJECT(qnum_from_uint(va_arg(*ap, uint64_t)));
-+        return QOBJECT(qnum_from_uint(va_arg(*ctxt->ap, uint64_t)));
-     } else if (!strcmp(token->str, "%s")) {
--        return QOBJECT(qstring_from_str(va_arg(*ap, const char *)));
-+        return QOBJECT(qstring_from_str(va_arg(*ctxt->ap, const char *)));
+@@ -453,6 +453,7 @@ static QObject *parse_interpolation(JSONParserContext *ctxt, va_list *ap)
      } else if (!strcmp(token->str, "%f")) {
--        return QOBJECT(qnum_from_double(va_arg(*ap, double)));
-+        return QOBJECT(qnum_from_double(va_arg(*ctxt->ap, double)));
+         return QOBJECT(qnum_from_double(va_arg(*ap, double)));
      }
-     parse_error(ctxt, token, "invalid interpolation '%s'", token->str);
++    parse_error(ctxt, token, "invalid interpolation '%s'", token->str);
      return NULL;
-@@ -514,7 +515,7 @@ static QObject *parse_literal(JSONParserContext *ctxt)
-     }
  }
  
--static QObject *parse_value(JSONParserContext *ctxt, va_list *ap)
-+static QObject *parse_value(JSONParserContext *ctxt)
- {
-     JSONToken *token;
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index d6fda0786f..83f8a0e6e3 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1021,7 +1021,8 @@ static void interpolation_unknown(void)
+     }
+     g_test_trap_subprocess(NULL, 0, 0);
+     g_test_trap_assert_failed();
+-    g_test_trap_assert_stderr("*Unexpected error*stray '%x'*");
++    g_test_trap_assert_stderr("*Unexpected error*"
++                              "invalid interpolation '%x'*");
+ }
  
-@@ -526,11 +527,11 @@ static QObject *parse_value(JSONParserContext *ctxt, va_list *ap)
- 
-     switch (token->type) {
-     case JSON_LCURLY:
--        return parse_object(ctxt, ap);
-+        return parse_object(ctxt);
-     case JSON_LSQUARE:
--        return parse_array(ctxt, ap);
-+        return parse_array(ctxt);
-     case JSON_INTERP:
--        return parse_interpolation(ctxt, ap);
-+        return parse_interpolation(ctxt);
-     case JSON_INTEGER:
-     case JSON_FLOAT:
-     case JSON_STRING:
-@@ -557,10 +558,10 @@ JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr)
- 
- QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
- {
--    JSONParserContext ctxt = { .buf = tokens };
-+    JSONParserContext ctxt = { .buf = tokens, .ap = ap };
-     QObject *result;
- 
--    result = parse_value(&ctxt, ap);
-+    result = parse_value(&ctxt);
-     assert(ctxt.err || g_queue_is_empty(ctxt.buf));
- 
-     error_propagate(errp, ctxt.err);
+ static void interpolation_string(void)
 -- 
 2.17.1
