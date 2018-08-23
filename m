@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgO-0003T9-CZ
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgP-0003W0-AZ
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsseu-0003ZY-0Y
+	(envelope-from <armbru@redhat.com>) id 1fsset-0003Z0-PC
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37078 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58512 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003Yd-MW
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003YP-HZ
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:31 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:46 +0200
-Message-Id: <20180823164025.12553-20-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:44 +0200
+Message-Id: <20180823164025.12553-18-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 19/58] json: Revamp lexer documentation
+Subject: [Qemu-devel] [PATCH v3 17/58] json: Fix lexer to include the bad
+ character in JSON_ERROR token
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,108 +27,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+json_lexer[] maps (lexer state, input character) to the new lexer
+state.  The input character is consumed unless the new state is
+terminal and the input character doesn't belong to this token,
+i.e. the state transition uses look-ahead.  When this is the case,
+input character '\0' would result in the same state transition.
+TERMINAL_NEEDED_LOOKAHEAD() exploits this.
+
+Except this is wrong for transitions to IN_ERROR.  There, the
+offending input character is in fact consumed: case IN_ERROR returns.
+It isn't added to the JSON_ERROR token, though.
+
+Fix that by making TERMINAL_NEEDED_LOOKAHEAD() return false for
+transitions to IN_ERROR.
+
+There's a slight complication.  json_lexer_flush() passes input
+character '\0' to flush an incomplete token.  If this results in
+JSON_ERROR, we'd now add the '\0' to the token.  Suppress that.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-lexer.c | 80 +++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 71 insertions(+), 9 deletions(-)
+ qobject/json-lexer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index e85e9a78ff..902fe60846 100644
+index 980ba159d6..7c0875d225 100644
 --- a/qobject/json-lexer.c
 +++ b/qobject/json-lexer.c
-@@ -18,21 +18,83 @@
- #define MAX_TOKEN_SIZE (64ULL << 20)
+@@ -76,7 +76,7 @@ QEMU_BUILD_BUG_ON((int)JSON_MIN <= (int)IN_START);
+    from OLD_STATE required lookahead.  This happens whenever the table
+    below uses the TERMINAL macro.  */
+ #define TERMINAL_NEEDED_LOOKAHEAD(old_state, terminal) \
+-            (json_lexer[(old_state)][0] == (terminal))
++    (terminal != IN_ERROR && json_lexer[(old_state)][0] == (terminal))
  
- /*
-- * Required by JSON (RFC 7159):
-+ * From RFC 8259 "The JavaScript Object Notation (JSON) Data
-+ * Interchange Format", with [comments in brackets]:
-  *
-- * \"([^\\\"]|\\[\"'\\/bfnrt]|\\u[0-9a-fA-F]{4})*\"
-- * -?(0|[1-9][0-9]*)(.[0-9]+)?([eE][-+]?[0-9]+)?
-- * [{}\[\],:]
-- * [a-z]+   # covers null, true, false
-+ * The set of tokens includes six structural characters, strings,
-+ * numbers, and three literal names.
-  *
-- * Extension of '' strings:
-+ * These are the six structural characters:
-  *
-- * '([^\\']|\\[\"'\\/bfnrt]|\\u[0-9a-fA-F]{4})*'
-+ *    begin-array     = ws %x5B ws  ; [ left square bracket
-+ *    begin-object    = ws %x7B ws  ; { left curly bracket
-+ *    end-array       = ws %x5D ws  ; ] right square bracket
-+ *    end-object      = ws %x7D ws  ; } right curly bracket
-+ *    name-separator  = ws %x3A ws  ; : colon
-+ *    value-separator = ws %x2C ws  ; , comma
-  *
-- * Extension for vararg handling in JSON construction:
-+ * Insignificant whitespace is allowed before or after any of the six
-+ * structural characters.
-+ * [This lexer accepts it before or after any token, which is actually
-+ * the same, as the grammar always has structural characters between
-+ * other tokens.]
-  *
-- * %((l|ll|I64)?d|[ipsf])
-+ *    ws = *(
-+ *           %x20 /              ; Space
-+ *           %x09 /              ; Horizontal tab
-+ *           %x0A /              ; Line feed or New line
-+ *           %x0D )              ; Carriage return
-  *
-+ * [...] three literal names:
-+ *    false null true
-+ *  [This lexer accepts [a-z]+, and leaves rejecting unknown literal
-+ *  names to the parser.]
-+ *
-+ * [Numbers:]
-+ *
-+ *    number = [ minus ] int [ frac ] [ exp ]
-+ *    decimal-point = %x2E       ; .
-+ *    digit1-9 = %x31-39         ; 1-9
-+ *    e = %x65 / %x45            ; e E
-+ *    exp = e [ minus / plus ] 1*DIGIT
-+ *    frac = decimal-point 1*DIGIT
-+ *    int = zero / ( digit1-9 *DIGIT )
-+ *    minus = %x2D               ; -
-+ *    plus = %x2B                ; +
-+ *    zero = %x30                ; 0
-+ *
-+ * [Strings:]
-+ *    string = quotation-mark *char quotation-mark
-+ *
-+ *    char = unescaped /
-+ *        escape (
-+ *            %x22 /          ; "    quotation mark  U+0022
-+ *            %x5C /          ; \    reverse solidus U+005C
-+ *            %x2F /          ; /    solidus         U+002F
-+ *            %x62 /          ; b    backspace       U+0008
-+ *            %x66 /          ; f    form feed       U+000C
-+ *            %x6E /          ; n    line feed       U+000A
-+ *            %x72 /          ; r    carriage return U+000D
-+ *            %x74 /          ; t    tab             U+0009
-+ *            %x75 4HEXDIG )  ; uXXXX                U+XXXX
-+ *    escape = %x5C              ; \
-+ *    quotation-mark = %x22      ; "
-+ *    unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
-+ *
-+ *
-+ * Extensions over RFC 8259:
-+ * - Extra escape sequence in strings:
-+ *   0x27 (apostrophe) is recognized after escape, too
-+ * - Single-quoted strings:
-+ *   Like double-quoted strings, except they're delimited by %x27
-+ *   (apostrophe) instead of %x22 (quotation mark), and can't contain
-+ *   unescaped apostrophe, but can contain unescaped quotation mark.
-+ * - Interpolation:
-+ *   interpolation = %((l|ll|I64)[du]|[ipsf])
-+ *
-+ * Note:
-+ * - Input must be encoded in UTF-8.
-+ * - Decoding and validating is left to the parser.
-  */
+ static const uint8_t json_lexer[][256] =  {
+     /* Relies on default initialization to IN_ERROR! */
+@@ -304,7 +304,7 @@ static int json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+         assert(lexer->state <= ARRAY_SIZE(json_lexer));
+         new_state = json_lexer[lexer->state][(uint8_t)ch];
+         char_consumed = !TERMINAL_NEEDED_LOOKAHEAD(lexer->state, new_state);
+-        if (char_consumed) {
++        if (char_consumed && !flush) {
+             g_string_append_c(lexer->token, ch);
+         }
  
- enum json_lexer_state {
 -- 
 2.17.1
