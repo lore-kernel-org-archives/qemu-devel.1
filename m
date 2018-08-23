@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgL-0003T9-38
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgS-0003W0-8b
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssev-0003cL-NR
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44760 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fsseu-0003aZ-IQ
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44746 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fssev-0003b3-7c
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:33 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsseu-0003Zc-8g
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:59 +0200
-Message-Id: <20180823164025.12553-33-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:57 +0200
+Message-Id: <20180823164025.12553-31-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 32/58] json-parser: simplify and avoid
- JSONParserContext allocation
+Subject: [Qemu-devel] [PATCH v3 30/58] check-qjson: Fix and enable
+ utf8_string()'s disabled part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +27,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-parser_context_new/free() are only used from json_parser_parse(). We
-can fold the code there and avoid an allocation altogether.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180719184111.5129-9-marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-parser.c | 41 +++++++++--------------------------------
- 1 file changed, 9 insertions(+), 32 deletions(-)
+ tests/check-qjson.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 73e6ad7458..7bfa08200c 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -237,33 +237,6 @@ static JSONToken *parser_context_peek_token(JSONPars=
-erContext *ctxt)
-     return g_queue_peek_head(ctxt->buf);
- }
-=20
--static JSONParserContext *parser_context_new(GQueue *tokens)
--{
--    JSONParserContext *ctxt;
--
--    if (!tokens) {
--        return NULL;
--    }
--
--    ctxt =3D g_malloc0(sizeof(JSONParserContext));
--    ctxt->buf =3D tokens;
--
--    return ctxt;
--}
--
--/* to support error propagation, ctxt->err must be freed separately */
--static void parser_context_free(JSONParserContext *ctxt)
--{
--    if (ctxt) {
--        while (!g_queue_is_empty(ctxt->buf)) {
--            parser_context_pop_token(ctxt);
--        }
--        g_free(ctxt->current);
--        g_queue_free(ctxt->buf);
--        g_free(ctxt);
--    }
--}
--
- /**
-  * Parsing rules
-  */
-@@ -575,18 +548,22 @@ QObject *json_parser_parse(GQueue *tokens, va_list =
-*ap)
-=20
- QObject *json_parser_parse_err(GQueue *tokens, va_list *ap, Error **errp=
-)
- {
--    JSONParserContext *ctxt =3D parser_context_new(tokens);
-+    JSONParserContext ctxt =3D { .buf =3D tokens };
-     QObject *result;
-=20
--    if (!ctxt) {
-+    if (!tokens) {
-         return NULL;
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 343f8af36a..defc21fa04 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -776,15 +776,10 @@ static void utf8_string(void)
+             qobject_unref(str);
+             g_free(jstr);
+ 
+-            /*
+-             * Parse @json_out right back
+-             * Disabled, because qobject_from_json() is buggy, and I can't
+-             * be bothered to add the expected incorrect results.
+-             * FIXME Enable once these bugs have been fixed.
+-             */
+-            if (0 && json_out != json_in) {
++            /* Parse @json_out right back, unless it has replacements */
++            if (!strstr(json_out, "\\uFFFD")) {
+                 str = from_json_str(json_out, j, &error_abort);
+-                g_assert_cmpstr(qstring_get_try_str(str), ==, utf8_out);
++                g_assert_cmpstr(qstring_get_try_str(str), ==, utf8_in);
+             }
+         }
      }
-=20
--    result =3D parse_value(ctxt, ap);
-+    result =3D parse_value(&ctxt, ap);
-=20
--    error_propagate(errp, ctxt->err);
-+    error_propagate(errp, ctxt.err);
-=20
--    parser_context_free(ctxt);
-+    while (!g_queue_is_empty(ctxt.buf)) {
-+        parser_context_pop_token(&ctxt);
-+    }
-+    g_free(ctxt.current);
-+    g_queue_free(ctxt.buf);
-=20
-     return result;
- }
---=20
+-- 
 2.17.1
