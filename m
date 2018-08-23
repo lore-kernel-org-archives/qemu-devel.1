@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgS-0003Sq-HK
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgR-0003W0-DJ
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsser-0003Wq-MY
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37052 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fsseu-0003ao-Mn
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40746 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsser-0003W1-Eg
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:29 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsseu-0003Zl-CX
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:28 +0200
-Message-Id: <20180823164025.12553-2-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:47 +0200
+Message-Id: <20180823164025.12553-21-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/58] docs/interop/qmp-spec: How to force
- known good parser state
+Subject: [Qemu-devel] [PATCH v3 20/58] json: Tighten and simplify
+ qstring_from_escaped_str()'s loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +27,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Section "QGA Synchronization" specifies that sending "a raw 0xFF
-sentinel byte" makes the server "reset its state and discard all
-pending data prior to the sentinel."  What actually happens there is a
-lexical error, which will produce one or more error responses.
-Moreover, it's not specific to QGA.
-
-Create new section "Forcing the JSON parser into known-good state" to
-document the technique properly.  Rewrite section "QGA
-Synchronization" to document just the other direction, i.e. command
-guest-sync-delimited.
-
-Section "Protocol Specification" mentions "synchronization bytes
-(documented below)".  Delete that.
-
-While there, fix it not to claim '"Server" is QEMU itself', but
-'"Server" is either QEMU or the QEMU Guest Agent'.
+Simplify loop control, and assert that the string ends with the
+appropriate quote (the lexer ensures it does).
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- docs/interop/qmp-spec.txt | 42 ++++++++++++++++++++++++++-------------
- 1 file changed, 28 insertions(+), 14 deletions(-)
+ qobject/json-parser.c | 30 +++++++-----------------------
+ 1 file changed, 7 insertions(+), 23 deletions(-)
 
-diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
-index 1566b8ae5e..8f7da0245d 100644
---- a/docs/interop/qmp-spec.txt
-+++ b/docs/interop/qmp-spec.txt
-@@ -20,9 +20,9 @@ operating system.
- 2. Protocol Specification
- =========================
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index a5aa790d62..164b86769b 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -132,65 +132,49 @@ static QString *qstring_from_escaped_str(JSONParserContext *ctxt,
+ {
+     const char *ptr = token->str;
+     QString *str;
+-    int double_quote = 1;
+-
+-    if (*ptr == '"') {
+-        double_quote = 1;
+-    } else {
+-        double_quote = 0;
+-    }
+-    ptr++;
++    char quote;
  
--This section details the protocol format. For the purpose of this document
--"Client" is any application which is using QMP to communicate with QEMU and
--"Server" is QEMU itself.
-+This section details the protocol format. For the purpose of this
-+document, "Server" is either QEMU or the QEMU Guest Agent, and
-+"Client" is any application communicating with it via QMP.
- 
- JSON data structures, when mentioned in this document, are always in the
- following format:
-@@ -34,9 +34,8 @@ by the JSON standard:
- 
- http://www.ietf.org/rfc/rfc7159.txt
- 
--The protocol is always encoded in UTF-8 except for synchronization
--bytes (documented below); although thanks to json-string escape
--sequences, the server will reply using only the strict ASCII subset.
-+The server expects its input to be encoded in UTF-8, and sends its
-+output encoded in ASCII.
- 
- For convenience, json-object members mentioned in this document will
- be in a certain order. However, in real protocol usage they can be in
-@@ -215,16 +214,31 @@ Some events are rate-limited to at most one per second.  If additional
- dropped, and the last one is delayed.  "Similar" normally means same
- event type.  See qmp-events.txt for details.
- 
--2.6 QGA Synchronization
-+2.6 Forcing the JSON parser into known-good state
-+-------------------------------------------------
++    assert(*ptr == '"' || *ptr == '\'');
++    quote = *ptr++;
+     str = qstring_new();
+-    while (*ptr && 
+-           ((double_quote && *ptr != '"') || (!double_quote && *ptr != '\''))) {
 +
-+Incomplete or invalid input can leave the server's JSON parser in a
-+state where it can't parse additional commands.  To get it back into
-+known-good state, the client should provoke a lexical error.
-+
-+The cleanest way to do that is sending an ASCII control character
-+other than '\t' (horizontal tab), '\r' (carriage return), or '\n' (new
-+line).
-+
-+Sadly, older versions of QEMU can fail to flag this as an error.  If a
-+client needs to deal with them, it should send a 0xFF byte.
-+
-+2.7 QGA Synchronization
- -----------------------
++    while (*ptr != quote) {
++        assert(*ptr);
+         if (*ptr == '\\') {
+             ptr++;
+-
+-            switch (*ptr) {
++            switch (*ptr++) {
+             case '"':
+                 qstring_append(str, "\"");
+-                ptr++;
+                 break;
+             case '\'':
+                 qstring_append(str, "'");
+-                ptr++;
+                 break;
+             case '\\':
+                 qstring_append(str, "\\");
+-                ptr++;
+                 break;
+             case '/':
+                 qstring_append(str, "/");
+-                ptr++;
+                 break;
+             case 'b':
+                 qstring_append(str, "\b");
+-                ptr++;
+                 break;
+             case 'f':
+                 qstring_append(str, "\f");
+-                ptr++;
+                 break;
+             case 'n':
+                 qstring_append(str, "\n");
+-                ptr++;
+                 break;
+             case 'r':
+                 qstring_append(str, "\r");
+-                ptr++;
+                 break;
+             case 't':
+                 qstring_append(str, "\t");
+-                ptr++;
+                 break;
+             case 'u': {
+                 uint16_t unicode_char = 0;
+                 char utf8_char[4];
+                 int i = 0;
  
--When using QGA, an additional synchronization feature is built into
--the protocol.  If the Client sends a raw 0xFF sentinel byte (not valid
--JSON), then the Server will reset its state and discard all pending
--data prior to the sentinel.  Conversely, if the Client makes use of
--the 'guest-sync-delimited' command, the Server will send a raw 0xFF
--sentinel byte prior to its response, to aid the Client in discarding
--any data prior to the sentinel.
-+When a client connects to QGA over a transport lacking proper
-+connection semantics such as virtio-serial, QGA may have read partial
-+input from a previous client.  The client needs to force QGA's parser
-+into known-good state using the previous section's technique.
-+Moreover, the client may receive output a previous client didn't read.
-+To help with skipping that output, QGA provides the
-+'guest-sync-delimited' command.  Refer to its documentation for
-+details.
- 
- 
- 3. QMP Examples
+-                ptr++;
+-
+                 for (i = 0; i < 4; i++) {
+                     if (qemu_isxdigit(*ptr)) {
+                         unicode_char |= hex2decimal(*ptr) << ((3 - i) * 4);
 -- 
 2.17.1
