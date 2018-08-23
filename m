@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgL-0003W0-3L
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgP-0003Z5-EU
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssev-0003cY-Tp
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40764 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fsseu-0003Zz-5D
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58516 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fssev-0003bB-C9
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:33 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003Yo-Qz
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:40:03 +0200
-Message-Id: <20180823164025.12553-37-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:54 +0200
+Message-Id: <20180823164025.12553-28-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 36/58] json: Don't create JSON_ERROR tokens
- that won't be used
+Subject: [Qemu-devel] [PATCH v3 27/58] json: Simplify parse_string()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +29,100 @@ Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-streamer.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ qobject/json-parser.c | 42 +++++++++++++++++++-----------------------
+ 1 file changed, 19 insertions(+), 23 deletions(-)
 
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 0c33186e8e..fa595a8761 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -56,6 +56,8 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
-     case JSON_RSQUARE:
-         parser->bracket_count--;
-         break;
-+    case JSON_ERROR:
-+        goto out_emit;
-     default:
-         break;
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 7437827c24..9cb363f7e1 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -101,8 +101,7 @@ static int hex2decimal(char ch)
+     } else if (ch >= 'A' && ch <= 'F') {
+         return 10 + (ch - 'A');
      }
-@@ -71,10 +73,6 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
- 
-     g_queue_push_tail(parser->tokens, token);
- 
--    if (type == JSON_ERROR) {
--        goto out_emit;
--    }
 -
-     if (parser->brace_count < 0 ||
-         parser->bracket_count < 0 ||
-         (parser->brace_count == 0 &&
+-    return -1;
++    abort();
+ }
+ 
+ /**
+@@ -144,7 +143,7 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+     const char *ptr = token->str;
+     QString *str;
+     char quote;
+-    int cp;
++    int cp, i;
+     char *end;
+     ssize_t len;
+     char utf8_buf[5];
+@@ -159,51 +158,48 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+             ptr++;
+             switch (*ptr++) {
+             case '"':
+-                qstring_append(str, "\"");
++                qstring_append_chr(str, '"');
+                 break;
+             case '\'':
+-                qstring_append(str, "'");
++                qstring_append_chr(str, '\'');
+                 break;
+             case '\\':
+-                qstring_append(str, "\\");
++                qstring_append_chr(str, '\\');
+                 break;
+             case '/':
+-                qstring_append(str, "/");
++                qstring_append_chr(str, '/');
+                 break;
+             case 'b':
+-                qstring_append(str, "\b");
++                qstring_append_chr(str, '\b');
+                 break;
+             case 'f':
+-                qstring_append(str, "\f");
++                qstring_append_chr(str, '\f');
+                 break;
+             case 'n':
+-                qstring_append(str, "\n");
++                qstring_append_chr(str, '\n');
+                 break;
+             case 'r':
+-                qstring_append(str, "\r");
++                qstring_append_chr(str, '\r');
+                 break;
+             case 't':
+-                qstring_append(str, "\t");
++                qstring_append_chr(str, '\t');
+                 break;
+-            case 'u': {
+-                uint16_t unicode_char = 0;
+-                char utf8_char[4];
+-                int i = 0;
+-
++            case 'u':
++                cp = 0;
+                 for (i = 0; i < 4; i++) {
+-                    if (qemu_isxdigit(*ptr)) {
+-                        unicode_char |= hex2decimal(*ptr) << ((3 - i) * 4);
+-                    } else {
++                    if (!qemu_isxdigit(*ptr)) {
+                         parse_error(ctxt, token,
+                                     "invalid hex escape sequence in string");
+                         goto out;
+                     }
++                    cp <<= 4;
++                    cp |= hex2decimal(*ptr);
+                     ptr++;
+                 }
+ 
+-                wchar_to_utf8(unicode_char, utf8_char, sizeof(utf8_char));
+-                qstring_append(str, utf8_char);
+-            }   break;
++                wchar_to_utf8(cp, utf8_buf, sizeof(utf8_buf));
++                qstring_append(str, utf8_buf);
++                break;
+             default:
+                 parse_error(ctxt, token, "invalid escape sequence in string");
+                 goto out;
 -- 
 2.17.1
