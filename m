@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgO-0003Z5-CB
+	(envelope-from <armbru@redhat.com>) id 1fssgO-0003T9-CZ
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsseu-0003bD-UB
+	(envelope-from <armbru@redhat.com>) id 1fsseu-0003ZY-0Y
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37088 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37078 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsseu-0003a7-Ff
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003Yd-MW
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:31 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:55 +0200
-Message-Id: <20180823164025.12553-29-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:46 +0200
+Message-Id: <20180823164025.12553-20-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 28/58] json: Reject invalid \uXXXX,
- fix \u0000
+Subject: [Qemu-devel] [PATCH v3 19/58] json: Revamp lexer documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,132 +26,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-The JSON parser translates invalid \uXXXX to garbage instead of
-rejecting it, and swallows \u0000.
-
-Fix by using mod_utf8_encode() instead of flawed wchar_to_utf8().
-
-Valid surrogate pairs are now differently broken: they're rejected
-instead of translated to garbage.  The next commit will fix them.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-parser.c | 35 ++++++-----------------------------
- tests/check-qjson.c   | 41 +++++++++++------------------------------
- 2 files changed, 17 insertions(+), 59 deletions(-)
+ qobject/json-lexer.c | 80 +++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 71 insertions(+), 9 deletions(-)
 
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 9cb363f7e1..e49da192fe 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -64,34 +64,6 @@ static void GCC_FMT_ATTR(3, 4) parse_error(JSONParserContext *ctxt,
-     error_setg(&ctxt->err, "JSON parse error, %s", message);
- }
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index e85e9a78ff..902fe60846 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -18,21 +18,83 @@
+ #define MAX_TOKEN_SIZE (64ULL << 20)
  
--/**
-- * String helpers
-- *
-- * These helpers are used to unescape strings.
-- */
--static void wchar_to_utf8(uint16_t wchar, char *buffer, size_t buffer_length)
--{
--    if (wchar <= 0x007F) {
--        BUG_ON(buffer_length < 2);
--
--        buffer[0] = wchar & 0x7F;
--        buffer[1] = 0;
--    } else if (wchar <= 0x07FF) {
--        BUG_ON(buffer_length < 3);
--
--        buffer[0] = 0xC0 | ((wchar >> 6) & 0x1F);
--        buffer[1] = 0x80 | (wchar & 0x3F);
--        buffer[2] = 0;
--    } else {
--        BUG_ON(buffer_length < 4);
--
--        buffer[0] = 0xE0 | ((wchar >> 12) & 0x0F);
--        buffer[1] = 0x80 | ((wchar >> 6) & 0x3F);
--        buffer[2] = 0x80 | (wchar & 0x3F);
--        buffer[3] = 0;
--    }
--}
--
- static int hex2decimal(char ch)
- {
-     if (ch >= '0' && ch <= '9') {
-@@ -197,7 +169,12 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
-                     ptr++;
-                 }
+ /*
+- * Required by JSON (RFC 7159):
++ * From RFC 8259 "The JavaScript Object Notation (JSON) Data
++ * Interchange Format", with [comments in brackets]:
+  *
+- * \"([^\\\"]|\\[\"'\\/bfnrt]|\\u[0-9a-fA-F]{4})*\"
+- * -?(0|[1-9][0-9]*)(.[0-9]+)?([eE][-+]?[0-9]+)?
+- * [{}\[\],:]
+- * [a-z]+   # covers null, true, false
++ * The set of tokens includes six structural characters, strings,
++ * numbers, and three literal names.
+  *
+- * Extension of '' strings:
++ * These are the six structural characters:
+  *
+- * '([^\\']|\\[\"'\\/bfnrt]|\\u[0-9a-fA-F]{4})*'
++ *    begin-array     = ws %x5B ws  ; [ left square bracket
++ *    begin-object    = ws %x7B ws  ; { left curly bracket
++ *    end-array       = ws %x5D ws  ; ] right square bracket
++ *    end-object      = ws %x7D ws  ; } right curly bracket
++ *    name-separator  = ws %x3A ws  ; : colon
++ *    value-separator = ws %x2C ws  ; , comma
+  *
+- * Extension for vararg handling in JSON construction:
++ * Insignificant whitespace is allowed before or after any of the six
++ * structural characters.
++ * [This lexer accepts it before or after any token, which is actually
++ * the same, as the grammar always has structural characters between
++ * other tokens.]
+  *
+- * %((l|ll|I64)?d|[ipsf])
++ *    ws = *(
++ *           %x20 /              ; Space
++ *           %x09 /              ; Horizontal tab
++ *           %x0A /              ; Line feed or New line
++ *           %x0D )              ; Carriage return
+  *
++ * [...] three literal names:
++ *    false null true
++ *  [This lexer accepts [a-z]+, and leaves rejecting unknown literal
++ *  names to the parser.]
++ *
++ * [Numbers:]
++ *
++ *    number = [ minus ] int [ frac ] [ exp ]
++ *    decimal-point = %x2E       ; .
++ *    digit1-9 = %x31-39         ; 1-9
++ *    e = %x65 / %x45            ; e E
++ *    exp = e [ minus / plus ] 1*DIGIT
++ *    frac = decimal-point 1*DIGIT
++ *    int = zero / ( digit1-9 *DIGIT )
++ *    minus = %x2D               ; -
++ *    plus = %x2B                ; +
++ *    zero = %x30                ; 0
++ *
++ * [Strings:]
++ *    string = quotation-mark *char quotation-mark
++ *
++ *    char = unescaped /
++ *        escape (
++ *            %x22 /          ; "    quotation mark  U+0022
++ *            %x5C /          ; \    reverse solidus U+005C
++ *            %x2F /          ; /    solidus         U+002F
++ *            %x62 /          ; b    backspace       U+0008
++ *            %x66 /          ; f    form feed       U+000C
++ *            %x6E /          ; n    line feed       U+000A
++ *            %x72 /          ; r    carriage return U+000D
++ *            %x74 /          ; t    tab             U+0009
++ *            %x75 4HEXDIG )  ; uXXXX                U+XXXX
++ *    escape = %x5C              ; \
++ *    quotation-mark = %x22      ; "
++ *    unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
++ *
++ *
++ * Extensions over RFC 8259:
++ * - Extra escape sequence in strings:
++ *   0x27 (apostrophe) is recognized after escape, too
++ * - Single-quoted strings:
++ *   Like double-quoted strings, except they're delimited by %x27
++ *   (apostrophe) instead of %x22 (quotation mark), and can't contain
++ *   unescaped apostrophe, but can contain unescaped quotation mark.
++ * - Interpolation:
++ *   interpolation = %((l|ll|I64)[du]|[ipsf])
++ *
++ * Note:
++ * - Input must be encoded in UTF-8.
++ * - Decoding and validating is left to the parser.
+  */
  
--                wchar_to_utf8(cp, utf8_buf, sizeof(utf8_buf));
-+                if (mod_utf8_encode(utf8_buf, sizeof(utf8_buf), cp) < 0) {
-+                    parse_error(ctxt, token,
-+                                "\\u%.4s is not a valid Unicode character",
-+                                ptr - 3);
-+                    goto out;
-+                }
-                 qstring_append(str, utf8_buf);
-                 break;
-             default:
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 3abf12b4d2..4abb5847ad 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -64,7 +64,7 @@ static void escaped_string(void)
-         { "triple byte utf-8 \\u20AC", "triple byte utf-8 \xe2\x82\xac" },
-         { "quadruple byte utf-8 \\uD834\\uDD1E", /* U+1D11E */
-           /* bug: want \xF0\x9D\x84\x9E */
--          "quadruple byte utf-8 \xED\xA0\xB4\xED\xB4\x9E", .skip = 1 },
-+          NULL },
-         { "\\", NULL },
-         { "\\z", NULL },
-         { "\\ux", NULL },
-@@ -72,35 +72,16 @@ static void escaped_string(void)
-         { "\\u12x", NULL },
-         { "\\u123x", NULL },
-         { "\\u12345", "\341\210\2645" },
--        { "\\u0000x", "x", .skip = 1}, /* bug: want \xC0\x80x */
--        { "unpaired leading surrogate \\uD800",
--          /* bug: not rejected */
--          "unpaired leading surrogate \355\240\200", .skip = 1 },
--        { "unpaired leading surrogate \\uD800\\uCAFE",
--          /* bug: not rejected */
--          "unpaired leading surrogate \355\240\200\354\253\276", .skip = 1 },
--        { "unpaired leading surrogate \\uD800\\uD801\\uDC02",
--          /* bug: not rejected */
--          "unpaired leading surrogate \355\240\200\355\240\201\355\260\202",
--          .skip = 1 },
--        { "unpaired trailing surrogate \\uDC00",
--          /* bug: not rejected */
--          "unpaired trailing surrogate \355\260\200", .skip = 1},
--        { "backward surrogate pair \\uDC00\\uD800",
--          /* bug: not rejected */
--          "backward surrogate pair \355\260\200\355\240\200", .skip = 1},
--        { "noncharacter U+FDD0 \\uFDD0",
--          /* bug: not rejected */
--          "noncharacter U+FDD0 \xEF\xB7\x90", .skip = 1},
--        { "noncharacter U+FDEF \\uFDEF",
--          /* bug: not rejected */
--          "noncharacter U+FDEF \xEF\xB7\xAF", .skip = 1},
--        { "noncharacter U+1FFFE \\uD87F\\uDFFE",
--          /* bug: not rejected */
--          "noncharacter U+1FFFE \xED\xA1\xBF\xED\xBF\xBE", .skip = 1},
--        { "noncharacter U+10FFFF \\uDC3F\\uDFFF",
--          /* bug: not rejected */
--          "noncharacter U+10FFFF \xED\xB0\xBF\xED\xBF\xBF", .skip = 1},
-+        { "\\u0000x", "\xC0\x80x" },
-+        { "unpaired leading surrogate \\uD800", NULL },
-+        { "unpaired leading surrogate \\uD800\\uCAFE", NULL },
-+        { "unpaired leading surrogate \\uD800\\uD801\\uDC02", NULL },
-+        { "unpaired trailing surrogate \\uDC00", NULL },
-+        { "backward surrogate pair \\uDC00\\uD800", NULL },
-+        { "noncharacter U+FDD0 \\uFDD0", NULL },
-+        { "noncharacter U+FDEF \\uFDEF", NULL },
-+        { "noncharacter U+1FFFE \\uD87F\\uDFFE", NULL },
-+        { "noncharacter U+10FFFF \\uDC3F\\uDFFF", NULL },
-         {}
-     };
-     int i, j;
+ enum json_lexer_state {
 -- 
 2.17.1
