@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskU-0000Xz-Ae
+	(envelope-from <armbru@redhat.com>) id 1fsskU-0000Y0-CF
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskL-0006M3-KI
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37308 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fsskM-0006N6-Ey
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56214 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskL-0006Ke-99
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:09 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskM-0006MG-3T
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:10 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:40:21 +0200
-Message-Id: <20180823164025.12553-55-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:40:25 +0200
+Message-Id: <20180823164025.12553-59-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 54/58] tests/drive_del-test: Fix harmless
- JSON interpolation bug
+Subject: [Qemu-devel] [PATCH v3 58/58] json: Update references to RFC 7159
+ to RFC 8259
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +27,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-test_after_failed_device_add() does this:
-
-    response = qmp("{'execute': 'device_add',"
-                   " 'arguments': {"
-                   "   'driver': 'virtio-blk-%s',"
-                   "   'drive': 'drive0'"
-                   "}}", qvirtio_get_dev_type());
-
-Wrong.  An interpolation specification must be a JSON token, it
-doesn't work within JSON string tokens.  The code above doesn't use
-the value of qvirtio_get_dev_type(), and sends arguments
-
-    {"driver": "virtio-blk-%s", "drive": "drive0"}}
-
-The command fails because there is no driver named "virtio-blk-%".
-Harmless, since the test wants the command to fail.  Screwed up in
-commit 2f84a92ec63.
-
-Fix the obvious way.  The command now fails because the drive is
-empty, like it did before commit 2f84a92ec63.
+RFC 8259 (December 2017) obsoletes RFC 7159 (March 2014).
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/drive_del-test.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ include/qapi/qmp/qnum.h | 2 +-
+ qapi/introspect.json    | 2 +-
+ qobject/json-parser.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
-index 2d0b176b36..673c10140f 100644
---- a/tests/drive_del-test.c
-+++ b/tests/drive_del-test.c
-@@ -65,9 +65,13 @@ static void test_drive_without_dev(void)
+diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+index 45bf02a036..bbae0a5ec8 100644
+--- a/include/qapi/qmp/qnum.h
++++ b/include/qapi/qmp/qnum.h
+@@ -25,7 +25,7 @@ typedef enum {
  
- static void test_after_failed_device_add(void)
- {
-+    char driver[32];
-     QDict *response;
-     QDict *error;
- 
-+    snprintf(driver, sizeof(driver), "virtio-blk-%s",
-+             qvirtio_get_dev_type());
-+
-     qtest_start("-drive if=none,id=drive0");
- 
-     /* Make device_add fail. If this leaks the virtio-blk device then a
-@@ -75,9 +79,9 @@ static void test_after_failed_device_add(void)
-      */
-     response = qmp("{'execute': 'device_add',"
-                    " 'arguments': {"
--                   "   'driver': 'virtio-blk-%s',"
-+                   "   'driver': %s,"
-                    "   'drive': 'drive0'"
--                   "}}", qvirtio_get_dev_type());
-+                   "}}", driver);
-     g_assert(response);
-     error = qdict_get_qdict(response, "error");
-     g_assert_cmpstr(qdict_get_try_str(error, "class"), ==, "GenericError");
+ /*
+  * QNum encapsulates how our dialect of JSON fills in the blanks left
+- * by the JSON specification (RFC 7159) regarding numbers.
++ * by the JSON specification (RFC 8259) regarding numbers.
+  *
+  * Conceptually, we treat number as an abstract type with three
+  * concrete subtypes: floating-point, signed integer, unsigned
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index 137b39b992..3d22166b2b 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -120,7 +120,7 @@
+ ##
+ # @JSONType:
+ #
+-# The four primitive and two structured types according to RFC 7159
++# The four primitive and two structured types according to RFC 8259
+ # section 1, plus 'int' (split off 'number'), plus the obvious top
+ # type 'value'.
+ #
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 3318b8dad0..5a840dfd86 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -516,7 +516,7 @@ static QObject *parse_literal(JSONParserContext *ctxt)
+     }
+     case JSON_FLOAT:
+         /* FIXME dependent on locale; a pervasive issue in QEMU */
+-        /* FIXME our lexer matches RFC 7159 in forbidding Inf or NaN,
++        /* FIXME our lexer matches RFC 8259 in forbidding Inf or NaN,
+          * but those might be useful extensions beyond JSON */
+         return QOBJECT(qnum_from_double(strtod(token->str, NULL)));
+     default:
 -- 
 2.17.1
