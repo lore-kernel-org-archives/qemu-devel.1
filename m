@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskN-0000SL-43
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1fsskM-0000Rl-EF
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskL-0006L0-Bs
+	(envelope-from <armbru@redhat.com>) id 1fsskK-0006KW-RY
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59564 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56206 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskK-0006KJ-VU
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:09 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskK-0006Jo-L8
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:08 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:40:18 +0200
-Message-Id: <20180823164025.12553-52-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:40:10 +0200
+Message-Id: <20180823164025.12553-44-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 51/58] json: Make JSONToken opaque outside
- json-parser.c
+Subject: [Qemu-devel] [PATCH v3 43/58] qjson: Fix qobject_from_json() &
+ friends for multiple values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +27,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+qobject_from_json() & friends use the consume_json() callback to
+receive either a value or an error from the parser.
+
+When they are fed a string that contains more than either one JSON
+value or one JSON syntax error, consume_json() gets called multiple
+times.
+
+When the last call receives a value, qobject_from_json() returns that
+value.  Any other values are leaked.
+
+When any call receives an error, qobject_from_json() sets the first
+error received.  Any other errors are thrown away.
+
+When values follow errors, qobject_from_json() returns both a value
+and sets an error.  That's bad.  Impact:
+
+* block.c's parse_json_protocol() ignores and leaks the value.  It's
+  used to to parse pseudo-filenames starting with "json:".  The
+  pseudo-filenames can come from the user or from image meta-data such
+  as a QCOW2 image's backing file name.
+
+* vl.c's parse_display_qapi() ignores and leaks the error.  It's used
+  to parse the argument of command line option -display.
+
+* vl.c's main() case QEMU_OPTION_blockdev ignores the error and leaves
+  it in @err.  main() will then pass a pointer to a non-null Error *
+  to net_init_clients(), which is forbidden.  It can lead to assertion
+  failure or other misbehavior.
+
+* check-qjson.c's multiple_values() demonstrates the badness.
+
+* The other callers are not affected since they only pass strings with
+  exactly one JSON value or, in the case of negative tests, one
+  error.
+
+The impact on the _nofail() functions is relatively harmless.  They
+abort when any call receives an error.  Else they return the last
+value, and leak the others, if any.
+
+Fix consume_json() as follows.  On the first call, save value and
+error as before.  On subsequent calls, if any, don't save them.  If
+the first call saved a value, the next call, if any, replaces the
+value by an "Expecting at most one JSON value" error.  Take care not
+to leak values or errors that aren't saved.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/qapi/qmp/json-parser.h   |  4 ++++
- include/qapi/qmp/json-streamer.h |  7 -------
- qobject/json-parser.c            | 19 +++++++++++++++++++
- qobject/json-streamer.c          |  8 +-------
- 4 files changed, 24 insertions(+), 14 deletions(-)
+ qobject/qjson.c     | 15 ++++++++++++++-
+ tests/check-qjson.c | 10 +++-------
+ 2 files changed, 17 insertions(+), 8 deletions(-)
 
-diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parser.h
-index a34209db7a..21b23d7bec 100644
---- a/include/qapi/qmp/json-parser.h
-+++ b/include/qapi/qmp/json-parser.h
-@@ -15,7 +15,11 @@
- #define QEMU_JSON_PARSER_H
- 
- #include "qemu-common.h"
-+#include "qapi/qmp/json-lexer.h"
- 
-+typedef struct JSONToken JSONToken;
-+
-+JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr);
- QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp);
- 
- #endif
-diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
-index d1d7fe2595..29950ac37c 100644
---- a/include/qapi/qmp/json-streamer.h
-+++ b/include/qapi/qmp/json-streamer.h
-@@ -16,13 +16,6 @@
- 
- #include "qapi/qmp/json-lexer.h"
- 
--typedef struct JSONToken {
--    int type;
--    int x;
--    int y;
--    char str[];
--} JSONToken;
--
- typedef struct JSONMessageParser
+diff --git a/qobject/qjson.c b/qobject/qjson.c
+index 7395556069..7f69036487 100644
+--- a/qobject/qjson.c
++++ b/qobject/qjson.c
+@@ -33,8 +33,21 @@ static void consume_json(void *opaque, QObject *json, Error *err)
  {
-     void (*emit)(void *opaque, QObject *json, Error *err);
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index e9a9f937f3..a247875f14 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -26,6 +26,13 @@
- #include "qapi/qmp/json-lexer.h"
- #include "qapi/qmp/json-streamer.h"
+     JSONParsingState *s = opaque;
  
-+struct JSONToken {
-+    JSONTokenType type;
-+    int x;
-+    int y;
-+    char str[];
-+};
++    assert(!json != !err);
++    assert(!s->result || !s->err);
 +
- typedef struct JSONParserContext
- {
-     Error *err;
-@@ -538,6 +545,18 @@ static QObject *parse_value(JSONParserContext *ctxt, va_list *ap)
-     }
++    if (s->result) {
++        qobject_unref(s->result);
++        s->result = NULL;
++        error_setg(&s->err, "Expecting at most one JSON value");
++    }
++    if (s->err) {
++        qobject_unref(json);
++        error_free(err);
++        return;
++    }
+     s->result = json;
+-    error_propagate(&s->err, err);
++    s->err = err;
  }
  
-+JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr)
-+{
-+    JSONToken *token = g_malloc(sizeof(JSONToken) + tokstr->len + 1);
-+
-+    token->type = type;
-+    memcpy(token->str, tokstr->str, tokstr->len);
-+    token->str[tokstr->len] = 0;
-+    token->x = x;
-+    token->y = y;
-+    return token;
-+}
-+
- QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
- {
-     JSONParserContext ctxt = { .buf = tokens };
-diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
-index 9210281a65..467bc29413 100644
---- a/qobject/json-streamer.c
-+++ b/qobject/json-streamer.c
-@@ -82,13 +82,7 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
-         goto out_emit;
-     }
+ /*
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index f344ad921c..f9438370d9 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1443,17 +1443,13 @@ static void multiple_values(void)
+     Error *err = NULL;
+     QObject *obj;
  
--    token = g_malloc(sizeof(JSONToken) + input->len + 1);
--    token->type = type;
--    memcpy(token->str, input->str, input->len);
--    token->str[input->len] = 0;
--    token->x = x;
--    token->y = y;
--
-+    token = json_token(type, x, y, input);
-     parser->token_size += input->len;
+-    /* BUG this leaks the syntax tree for "false" */
+     obj = qobject_from_json("false true", &err);
+-    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
+-    g_assert(!err);
+-    qobject_unref(obj);
++    error_free_or_abort(&err);
++    g_assert(obj == NULL);
  
-     g_queue_push_tail(&parser->tokens, token);
+-    /* BUG simultaneously succeeds and fails */
+     obj = qobject_from_json("} true", &err);
+-    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
+     error_free_or_abort(&err);
+-    qobject_unref(obj);
++    g_assert(obj == NULL);
+ }
+ 
+ int main(int argc, char **argv)
 -- 
 2.17.1
