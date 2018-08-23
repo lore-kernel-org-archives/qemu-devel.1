@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsy0O-0005fb-T7
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:23:09 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsy0N-0001JZ-Bk
+	(envelope-from <jsnow@redhat.com>) id 1fsy0N-0005dH-44
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:23:04 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jsnow@redhat.com>) id 1fsy0L-0001F0-2W
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:23:02 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu, 23 Aug 2018 18:22:45 -0400
-Message-Id: <20180823222249.13518-10-jsnow@redhat.com>
+Date: Thu, 23 Aug 2018 18:22:43 -0400
+Message-Id: <20180823222249.13518-8-jsnow@redhat.com>
 In-Reply-To: <20180823222249.13518-1-jsnow@redhat.com>
 References: <20180823222249.13518-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 09/13] jobs: remove .exit callback
+Subject: [Qemu-devel] [PATCH v2 07/13] tests/blockjob: replace Blockjob with
+ Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,160 +23,214 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Max Reitz <mreitz@redhat.com>, kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>
 
-Now that all of the jobs use the component finalization callbacks,
-there's no use for the heavy-hammer .exit callback anymore.
-
-job_exit becomes a glorified type shim so that we can call
-job_completed from aio_bh_schedule_oneshot.
-
-Move these three functions down into job.c to eliminate a
-forward reference.
+These tests don't actually test blockjobs anymore, they test
+generic Job lifetimes. Change the types accordingly.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- include/qemu/job.h        | 11 -------
- job.c                     | 77 +++++++++++++++++++++--------------------------
- tests/test-blockjob-txn.c |  4 +--
- 3 files changed, 36 insertions(+), 56 deletions(-)
+ tests/test-blockjob.c | 98 ++++++++++++++++++++++++++-------------------------
+ 1 file changed, 50 insertions(+), 48 deletions(-)
 
-diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 858cc2b37a..c5409c4b2d 100644
---- a/include/qemu/job.h
-+++ b/include/qemu/job.h
-@@ -213,17 +213,6 @@ struct JobDriver {
-      */
-     void (*drain)(Job *job);
- 
--    /**
--     * If the callback is not NULL, exit will be invoked from the main thread
--     * when the job's coroutine has finished, but before transactional
--     * convergence; before @prepare or @abort.
--     *
--     * FIXME TODO: This callback is only temporary to transition remaining jobs
--     * to prepare/commit/abort/clean callbacks and will be removed before 3.1.
--     * is released.
--     */
--    void (*exit)(Job *job);
--
-     /**
-      * If the callback is not NULL, prepare will be invoked when all the jobs
-      * belonging to the same transaction complete; or upon this job's completion
-diff --git a/job.c b/job.c
-index 01dd97fee3..72f7de1f36 100644
---- a/job.c
-+++ b/job.c
-@@ -535,49 +535,6 @@ void job_drain(Job *job)
-     }
- }
- 
--static void job_completed(Job *job);
--
--static void job_exit(void *opaque)
--{
--    Job *job = (Job *)opaque;
--    AioContext *aio_context = job->aio_context;
--
--    if (job->driver->exit) {
--        aio_context_acquire(aio_context);
--        job->driver->exit(job);
--        aio_context_release(aio_context);
--    }
--    job_completed(job);
--}
--
--/**
-- * All jobs must allow a pause point before entering their job proper. This
-- * ensures that jobs can be paused prior to being started, then resumed later.
-- */
--static void coroutine_fn job_co_entry(void *opaque)
--{
--    Job *job = opaque;
--
--    assert(job && job->driver && job->driver->run);
--    job_pause_point(job);
--    job->ret = job->driver->run(job, &job->err);
--    job->deferred_to_main_loop = true;
--    aio_bh_schedule_oneshot(qemu_get_aio_context(), job_exit, job);
--}
--
--
--void job_start(Job *job)
--{
--    assert(job && !job_started(job) && job->paused &&
--           job->driver && job->driver->run);
--    job->co = qemu_coroutine_create(job_co_entry, job);
--    job->pause_count--;
--    job->busy = true;
--    job->paused = false;
--    job_state_transition(job, JOB_STATUS_RUNNING);
--    aio_co_enter(job->aio_context, job->co);
--}
--
- /* Assumes the block_job_mutex is held */
- static bool job_timer_not_pending(Job *job)
- {
-@@ -894,6 +851,40 @@ static void job_completed(Job *job)
-     }
- }
- 
-+/** Useful only as a type shim for aio_bh_schedule_oneshot. */
-+static void job_exit(void *opaque)
-+{
-+    Job *job = (Job *)opaque;
-+    job_completed(job);
-+}
-+
-+/**
-+ * All jobs must allow a pause point before entering their job proper. This
-+ * ensures that jobs can be paused prior to being started, then resumed later.
-+ */
-+static void coroutine_fn job_co_entry(void *opaque)
-+{
-+    Job *job = opaque;
-+
-+    assert(job && job->driver && job->driver->run);
-+    job_pause_point(job);
-+    job->ret = job->driver->run(job, &job->err);
-+    job->deferred_to_main_loop = true;
-+    aio_bh_schedule_oneshot(qemu_get_aio_context(), job_exit, job);
-+}
-+
-+void job_start(Job *job)
-+{
-+    assert(job && !job_started(job) && job->paused &&
-+           job->driver && job->driver->run);
-+    job->co = qemu_coroutine_create(job_co_entry, job);
-+    job->pause_count--;
-+    job->busy = true;
-+    job->paused = false;
-+    job_state_transition(job, JOB_STATUS_RUNNING);
-+    aio_co_enter(job->aio_context, job->co);
-+}
-+
- void job_cancel(Job *job, bool force)
- {
-     if (job->status == JOB_STATUS_CONCLUDED) {
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index ef29f35e44..86606f92b3 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -24,7 +24,7 @@ typedef struct {
-     int *result;
- } TestBlockJob;
- 
--static void test_block_job_exit(Job *job)
-+static void test_block_job_clean(Job *job)
- {
-     BlockJob *bjob = container_of(job, BlockJob, job);
-     BlockDriverState *bs = blk_bs(bjob->blk);
-@@ -73,7 +73,7 @@ static const BlockJobDriver test_block_job_driver = {
-         .user_resume   = block_job_user_resume,
-         .drain         = block_job_drain,
-         .run           = test_block_job_run,
--        .exit          = test_block_job_exit,
-+        .clean         = test_block_job_clean,
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index ad4a65bc78..8e8b680416 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -206,18 +206,20 @@ static const BlockJobDriver test_cancel_driver = {
      },
  };
  
+-static CancelJob *create_common(BlockJob **pjob)
++static CancelJob *create_common(Job **pjob)
+ {
+     BlockBackend *blk;
+-    BlockJob *job;
++    Job *job;
++    BlockJob *bjob;
+     CancelJob *s;
+ 
+     blk = create_blk(NULL);
+-    job = mk_job(blk, "Steve", &test_cancel_driver, true,
+-                 JOB_MANUAL_FINALIZE | JOB_MANUAL_DISMISS);
+-    job_ref(&job->job);
+-    assert(job->job.status == JOB_STATUS_CREATED);
+-    s = container_of(job, CancelJob, common);
++    bjob = mk_job(blk, "Steve", &test_cancel_driver, true,
++                  JOB_MANUAL_FINALIZE | JOB_MANUAL_DISMISS);
++    job = &bjob->job;
++    job_ref(job);
++    assert(job->status == JOB_STATUS_CREATED);
++    s = container_of(bjob, CancelJob, common);
+     s->blk = blk;
+ 
+     *pjob = job;
+@@ -242,7 +244,7 @@ static void cancel_common(CancelJob *s)
+ 
+ static void test_cancel_created(void)
+ {
+-    BlockJob *job;
++    Job *job;
+     CancelJob *s;
+ 
+     s = create_common(&job);
+@@ -251,119 +253,119 @@ static void test_cancel_created(void)
+ 
+ static void test_cancel_running(void)
+ {
+-    BlockJob *job;
++    Job *job;
+     CancelJob *s;
+ 
+     s = create_common(&job);
+ 
+-    job_start(&job->job);
+-    assert(job->job.status == JOB_STATUS_RUNNING);
++    job_start(job);
++    assert(job->status == JOB_STATUS_RUNNING);
+ 
+     cancel_common(s);
+ }
+ 
+ static void test_cancel_paused(void)
+ {
+-    BlockJob *job;
++    Job *job;
+     CancelJob *s;
+ 
+     s = create_common(&job);
+ 
+-    job_start(&job->job);
+-    assert(job->job.status == JOB_STATUS_RUNNING);
++    job_start(job);
++    assert(job->status == JOB_STATUS_RUNNING);
+ 
+-    job_user_pause(&job->job, &error_abort);
+-    job_enter(&job->job);
+-    assert(job->job.status == JOB_STATUS_PAUSED);
++    job_user_pause(job, &error_abort);
++    job_enter(job);
++    assert(job->status == JOB_STATUS_PAUSED);
+ 
+     cancel_common(s);
+ }
+ 
+ static void test_cancel_ready(void)
+ {
+-    BlockJob *job;
++    Job *job;
+     CancelJob *s;
+ 
+     s = create_common(&job);
+ 
+-    job_start(&job->job);
+-    assert(job->job.status == JOB_STATUS_RUNNING);
++    job_start(job);
++    assert(job->status == JOB_STATUS_RUNNING);
+ 
+     s->should_converge = true;
+-    job_enter(&job->job);
+-    assert(job->job.status == JOB_STATUS_READY);
++    job_enter(job);
++    assert(job->status == JOB_STATUS_READY);
+ 
+     cancel_common(s);
+ }
+ 
+ static void test_cancel_standby(void)
+ {
+-    BlockJob *job;
++    Job *job;
+     CancelJob *s;
+ 
+     s = create_common(&job);
+ 
+-    job_start(&job->job);
+-    assert(job->job.status == JOB_STATUS_RUNNING);
++    job_start(job);
++    assert(job->status == JOB_STATUS_RUNNING);
+ 
+     s->should_converge = true;
+-    job_enter(&job->job);
+-    assert(job->job.status == JOB_STATUS_READY);
++    job_enter(job);
++    assert(job->status == JOB_STATUS_READY);
+ 
+-    job_user_pause(&job->job, &error_abort);
+-    job_enter(&job->job);
+-    assert(job->job.status == JOB_STATUS_STANDBY);
++    job_user_pause(job, &error_abort);
++    job_enter(job);
++    assert(job->status == JOB_STATUS_STANDBY);
+ 
+     cancel_common(s);
+ }
+ 
+ static void test_cancel_pending(void)
+ {
+-    BlockJob *job;
++    Job *job;
+     CancelJob *s;
+ 
+     s = create_common(&job);
+ 
+-    job_start(&job->job);
+-    assert(job->job.status == JOB_STATUS_RUNNING);
++    job_start(job);
++    assert(job->status == JOB_STATUS_RUNNING);
+ 
+     s->should_converge = true;
+-    job_enter(&job->job);
+-    assert(job->job.status == JOB_STATUS_READY);
++    job_enter(job);
++    assert(job->status == JOB_STATUS_READY);
+ 
+-    job_complete(&job->job, &error_abort);
+-    job_enter(&job->job);
++    job_complete(job, &error_abort);
++    job_enter(job);
+     while (!s->completed) {
+         aio_poll(qemu_get_aio_context(), true);
+     }
+-    assert(job->job.status == JOB_STATUS_PENDING);
++    assert(job->status == JOB_STATUS_PENDING);
+ 
+     cancel_common(s);
+ }
+ 
+ static void test_cancel_concluded(void)
+ {
+-    BlockJob *job;
++    Job *job;
+     CancelJob *s;
+ 
+     s = create_common(&job);
+ 
+-    job_start(&job->job);
+-    assert(job->job.status == JOB_STATUS_RUNNING);
++    job_start(job);
++    assert(job->status == JOB_STATUS_RUNNING);
+ 
+     s->should_converge = true;
+-    job_enter(&job->job);
+-    assert(job->job.status == JOB_STATUS_READY);
++    job_enter(job);
++    assert(job->status == JOB_STATUS_READY);
+ 
+-    job_complete(&job->job, &error_abort);
+-    job_enter(&job->job);
++    job_complete(job, &error_abort);
++    job_enter(job);
+     while (!s->completed) {
+         aio_poll(qemu_get_aio_context(), true);
+     }
+-    assert(job->job.status == JOB_STATUS_PENDING);
++    assert(job->status == JOB_STATUS_PENDING);
+ 
+-    job_finalize(&job->job, &error_abort);
+-    assert(job->job.status == JOB_STATUS_CONCLUDED);
++    job_finalize(job, &error_abort);
++    assert(job->status == JOB_STATUS_CONCLUDED);
+ 
+     cancel_common(s);
+ }
 -- 
 2.14.4
