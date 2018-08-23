@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1fsqyW-0003xh-WD
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:52:41 -0400
+	(envelope-from <otubo@redhat.com>) id 1fsqyY-0003zI-Ca
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1fsqyV-0008EM-Tk
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:52:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55750 helo=mx1.redhat.com)
+	(envelope-from <otubo@redhat.com>) id 1fsqyX-0008FX-FP
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:52:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55754 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1fsqyV-0008Dt-Mw
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:52:39 -0400
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1fsqyX-0008FH-A5
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:52:41 -0400
 From: Eduardo Otubo <otubo@redhat.com>
-Date: Thu, 23 Aug 2018 16:52:28 +0200
-Message-Id: <20180823145230.13183-3-otubo@redhat.com>
+Date: Thu, 23 Aug 2018 16:52:29 +0200
+Message-Id: <20180823145230.13183-4-otubo@redhat.com>
 In-Reply-To: <20180823145230.13183-1-otubo@redhat.com>
 References: <20180823145230.13183-1-otubo@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/4] seccomp: prefer SCMP_ACT_KILL_PROCESS if
- available
+Subject: [Qemu-devel] [PULL 3/4] configure: require libseccomp 2.2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +31,47 @@ Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com, pmoore@redhat.com, be
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The upcoming libseccomp release should have SCMP_ACT_KILL_PROCESS
-action (https://github.com/seccomp/libseccomp/issues/96).
+The following patch is going to require TSYNC, which is only available
+since libseccomp 2.2.0.
 
-SCMP_ACT_KILL_PROCESS is preferable to immediately terminate the
-offending process, rather than having the SIGSYS handler running.
+libseccomp 2.2.0 was released February 12, 2015.
 
-Use SECCOMP_GET_ACTION_AVAIL to check availability of kernel support,
-as libseccomp will fallback on SCMP_ACT_KILL otherwise, and we still
-prefer SCMP_ACT_TRAP.
+According to repology, libseccomp version in different distros:
+
+  RHEL-7: 2.3.1
+  Debian (Stretch): 2.3.1
+  OpenSUSE Leap 15: 2.3.2
+  Ubuntu (Xenial):  2.3.1
+
+This will drop support for -sandbox on:
+
+  Debian (Jessie): 2.1.1 (but 2.2.3 in backports)
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Acked-by: Eduardo Otubo <otubo@redhat.com>
 ---
- qemu-seccomp.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+ configure | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index b117a92559..f0c833f3ca 100644
---- a/qemu-seccomp.c
-+++ b/qemu-seccomp.c
-@@ -20,6 +20,7 @@
- #include <sys/prctl.h>
- #include <seccomp.h>
- #include "sysemu/seccomp.h"
-+#include <linux/seccomp.h>
+diff --git a/configure b/configure
+index e7bddc04b0..5fc2915096 100755
+--- a/configure
++++ b/configure
+@@ -2228,13 +2228,10 @@ fi
+ ##########################################
+ # libseccomp check
 =20
- /* For some architectures (notably ARM) cacheflush is not supported unti=
-l
-  * libseccomp 2.2.3, but configure enforces that we are using a more rec=
-ent
-@@ -107,12 +108,40 @@ static const struct QemuSeccompSyscall blacklist[] =
-=3D {
-     { SCMP_SYS(sched_get_priority_min), QEMU_SECCOMP_SET_RESOURCECTL },
- };
-=20
-+static inline __attribute__((unused)) int
-+qemu_seccomp(unsigned int operation, unsigned int flags, void *args)
-+{
-+#ifdef __NR_seccomp
-+    return syscall(__NR_seccomp, operation, flags, args);
-+#else
-+    errno =3D ENOSYS;
-+    return -1;
-+#endif
-+}
-+
-+static uint32_t qemu_seccomp_get_kill_action(void)
-+{
-+#if defined(SECCOMP_GET_ACTION_AVAIL) && defined(SCMP_ACT_KILL_PROCESS) =
-&& \
-+    defined(SECCOMP_RET_KILL_PROCESS)
-+    {
-+        uint32_t action =3D SECCOMP_RET_KILL_PROCESS;
-+
-+        if (qemu_seccomp(SECCOMP_GET_ACTION_AVAIL, 0, &action) =3D=3D 0)=
- {
-+            return SCMP_ACT_KILL_PROCESS;
-+        }
-+    }
-+#endif
-+
-+    return SCMP_ACT_TRAP;
-+}
-+
-=20
- static int seccomp_start(uint32_t seccomp_opts)
- {
-     int rc =3D 0;
-     unsigned int i =3D 0;
-     scmp_filter_ctx ctx;
-+    uint32_t action =3D qemu_seccomp_get_kill_action();
-=20
-     ctx =3D seccomp_init(SCMP_ACT_ALLOW);
-     if (ctx =3D=3D NULL) {
-@@ -125,7 +154,7 @@ static int seccomp_start(uint32_t seccomp_opts)
-             continue;
-         }
-=20
--        rc =3D seccomp_rule_add_array(ctx, SCMP_ACT_TRAP, blacklist[i].n=
-um,
-+        rc =3D seccomp_rule_add_array(ctx, action, blacklist[i].num,
-                                     blacklist[i].narg, blacklist[i].arg_=
-cmp);
-         if (rc < 0) {
-             goto seccomp_return;
++libseccomp_minver=3D"2.2.0"
+ if test "$seccomp" !=3D "no" ; then
+     case "$cpu" in
+-    i386|x86_64)
+-        libseccomp_minver=3D"2.1.0"
+-        ;;
+-    mips)
+-        libseccomp_minver=3D"2.2.0"
++    i386|x86_64|mips)
+         ;;
+     arm|aarch64)
+         libseccomp_minver=3D"2.2.3"
 --=20
 2.17.1
