@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm9-00050M-Pc
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm9-00050F-NW
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm7-00006f-1O
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm5-0008Un-9P
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:49 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41888 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:38382 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fspm6-0008VU-Jv
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:46 -0400
+	id 1fspm5-0007un-0v
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:45 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 15:33:59 +0200
-Message-Id: <1535031276-22911-10-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 15:33:51 +0200
+Message-Id: <1535031276-22911-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v4 09/46] target/mips: Add emulation of nanoMIPS
- 16-bit shift instructions
+Subject: [Qemu-devel] [PULL v4 01/46] target/mips: Add preprocessor
+ constants for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add emulation of nanoMIPS 16-bit shift instructions.
+Add ISA_NANOMIPS32 and CPU_NANOMIPS32 preprocessor constants.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ target/mips/mips-defs.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index b0bbf4c..e3fac1a 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -16765,6 +16765,21 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-     case NM_P16_MV:
-         break;
-     case NM_P16_SHIFT:
-+        {
-+            int shift = extract32(ctx->opcode, 0, 3);
-+            uint32_t opc = 0;
-+            shift = (shift == 0) ? 8 : shift;
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index d239069..c8e9979 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -39,6 +39,7 @@
+ #define   ISA_MIPS64R5  0x00001000
+ #define   ISA_MIPS32R6  0x00002000
+ #define   ISA_MIPS64R6  0x00004000
++#define   ISA_NANOMIPS32  0x00008000
+ 
+ /* MIPS ASEs. */
+ #define   ASE_MIPS16    0x00010000
+@@ -87,6 +88,9 @@
+ #define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
+ #define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
+ 
++/* Wave Computing: "nanoMIPS" */
++#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
 +
-+            switch (extract32(ctx->opcode, 3, 1)) {
-+            case NM_SLL16:
-+                opc = OPC_SLL;
-+                break;
-+            case NM_SRL16:
-+                opc = OPC_SRL;
-+                break;
-+            }
-+            gen_shift_imm(ctx, opc, rt, rs, shift);
-+        }
-         break;
-     case NM_P16C:
-         break;
+ /* Strictly follow the architecture standard:
+    - Disallow "special" instruction handling for PMON/SPIM.
+    Note that we still maintain Count/Compare to match the host clock. */
 -- 
 2.7.4
