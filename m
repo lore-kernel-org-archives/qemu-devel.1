@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lightn1ngstr1ke@protonmail.com>) id 1fswXn-00072T-Dn
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:49:28 -0400
+	(envelope-from <bounces@canonical.com>) id 1fswYy-0000J0-Az
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lightn1ngstr1ke@protonmail.com>) id 1fswXh-0002ab-Pg
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:49:27 -0400
-Received: from mail-40136.protonmail.ch ([185.70.40.136]:52049)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lightn1ngstr1ke@protonmail.com>)
-	id 1fswXh-0002Ym-6L
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:49:21 -0400
-Date: Thu, 23 Aug 2018 20:49:05 +0000
-From: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
-Reply-To: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
-Message-ID: <Mw_FWPmP471NZBFaZ63lfYWX35taiBr777pee0e9Wx85sDo_YOJIklZy8hMMCu-9Jec2zb3Mm94Gf7q-oZOUiAonAFix7XRL6BgXRAWwIuI=@protonmail.com>
+	(envelope-from <bounces@canonical.com>) id 1fswYt-0003IH-BH
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fswYt-0003Ho-4p
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:50:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fswYs-0000ov-6o
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 20:50:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 301FA2E805D
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 20:50:34 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel]  [PATCH] input-linux: customizable toggle keys v2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Aug 2018 20:44:42 -0000
+From: Frederick Metzengerstein <1788701@bugs.launchpad.net>
+Reply-To: Bug 1788701 <1788701@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153505708215.4220.1958982030702670661.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788701] [NEW] "Zoom to fit" doesn't work with
+ -display gtk -vga virtio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,116 +36,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
 
-VGhpcyBwYXRjaCBpbnRyb2R1Y2VzIGEgbmV3IHN0cmluZyBvcHRpb24gdG8gdGhlIGlucHV0LWxp
-bnV4CmNvbW1hbmRsaW5lOgoKdG9nZ2xlX2tleXM9W251bV06W251bV06W251bV0gLi4uCgpTZXBh
-cmF0ZWQgYnkgY29tbWFzLCB0b2dnbGVfa2V5cyBhbGxvd3MgdGhlIHVzZXIgdG8gc3BlY2lmeSB0
-aGUga2V5IElEcwpvZiBhbGwgdGhlIGtleXMgZGVzaXJlZCBmb3Igc3dpdGNoaW5nIGJldHdlZW4g
-dGhlIGd1ZXN0IGFuZCBob3N0LiBUaGVzZQprZXkgSURzIGNhbiBiZSBmb3VuZCBpbjoKCmluY2x1
-ZGUvc3RhbmRhcmQtaGVhZGVycy9saW51eC9pbnB1dC1ldmVudC1jb2Rlcy5oCgphbmQgYXJlIHBy
-ZWZpeGVkIHdpdGggS0VZXy4KCklmIHRoZSBvcHRpb24gaXMgbWFsZm9ybWVkIG9yIG5vdCBzcGVj
-aWZpZWQsIGl0IHdpbGwgdXNlIHRoZSBjdXJyZW50CmRlZmF1bHQgb2YgS0VZX0xFRlRDVFJMICsg
-S0VZX1JJR0hUQ1RSTC4KClNlbmRpbmcgb25jZSBhZ2FpbiBhcyB2MiBhcyBJIGZvcmdvdCB0byBz
-aWduIG9mZiB0aGUgbGFzdCBvbmUuCgpTaWduZWQtb2ZmLWJ5OiBSeWFuIEVsIEtvY2h0YSA8bGln
-aHRuMW5nc3RyMWtlQHByb3Rvbm1haWwuY29tPgotLS0KdWkvaW5wdXQtbGludXguYyB8IDEzNiAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQoxIGZpbGUgY2hh
-bmdlZCwgMTM0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvdWkv
-aW5wdXQtbGludXguYyBiL3VpL2lucHV0LWxpbnV4LmMKaW5kZXggOTcyMDMzM2IyYy4uMzg4Nzhm
-MDgzNiAxMDA2NDQKLS0tIGEvdWkvaW5wdXQtbGludXguYworKysgYi91aS9pbnB1dC1saW51eC5j
-CkBAIC0xMiw2ICsxMiw3IEBACiNpbmNsdWRlICJzeXNlbXUvc3lzZW11LmgiCiNpbmNsdWRlICJ1
-aS9pbnB1dC5oIgojaW5jbHVkZSAicW9tL29iamVjdF9pbnRlcmZhY2VzLmgiCisjaW5jbHVkZSAi
-aW5jbHVkZS9xZW11L2N1dGlscy5oIgoKI2luY2x1ZGUgPHN5cy9pb2N0bC5oPgojaW5jbHVkZSAi
-c3RhbmRhcmQtaGVhZGVycy9saW51eC9pbnB1dC5oIgpAQCAtNjMsNiArNjQsMTAgQEAgc3RydWN0
-IElucHV0TGludXggewogICAgIHN0cnVjdCBpbnB1dF9ldmVudCBldmVudDsKICAgICBpbnQgICAg
-ICAgICByZWFkX29mZnNldDsKCisgICAgY2hhciAgICAgICAgKnRvZ2dsZV9rZXlzOworICAgIGlu
-dCAgICAgICAgIHRvZ2dsZV9rZXlzX2xlbjsKKyAgICBpbnQgICAgICAgICAqdG9nZ2xlX2tleXNf
-bGlzdDsKKwogICAgIFFUQUlMUV9FTlRSWShJbnB1dExpbnV4KSBuZXh0Owp9OwoKQEAgLTk4LDYg
-KzEwMywxNiBAQCBzdGF0aWMgdm9pZCBpbnB1dF9saW51eF90b2dnbGVfZ3JhYihJbnB1dExpbnV4
-ICppbCkKICAgICB9Cn0KCitzdGF0aWMgYm9vbCBpbnB1dF9saW51eF9jaGVja190b2dnbGVfa2V5
-cyhJbnB1dExpbnV4ICppbCkKK3sKKyAgICBmb3IgKHVuc2lnbmVkIGkgPSAwOyBpIDwgaWwtPnRv
-Z2dsZV9rZXlzX2xlbjsgaSsrKSB7CisgICAgICAgIGlmICghaWwtPmtleWRvd25baWwtPnRvZ2ds
-ZV9rZXlzX2xpc3RbaV1dKSB7CisgICAgICAgICAgICByZXR1cm4gZmFsc2U7CisgICAgICAgIH0K
-KyAgICB9CisgICAgcmV0dXJuIHRydWU7Cit9CisKc3RhdGljIHZvaWQgaW5wdXRfbGludXhfaGFu
-ZGxlX2tleWJvYXJkKElucHV0TGludXggKmlsLAogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHN0cnVjdCBpbnB1dF9ldmVudCAqZXZlbnQpCnsKQEAgLTEzNCw4ICsxNDks
-NyBAQCBzdGF0aWMgdm9pZCBpbnB1dF9saW51eF9oYW5kbGVfa2V5Ym9hcmQoSW5wdXRMaW51eCAq
-aWwsCiAgICAgICAgIH0KCiAgICAgICAgIC8qIGhvdGtleSAtPiByZWNvcmQgc3dpdGNoIHJlcXVl
-c3QgLi4uICovCi0gICAgICAgIGlmIChpbC0+a2V5ZG93bltLRVlfTEVGVENUUkxdICYmCi0gICAg
-ICAgICAgICBpbC0+a2V5ZG93bltLRVlfUklHSFRDVFJMXSkgeworICAgICAgICBpZiAoaW5wdXRf
-bGludXhfY2hlY2tfdG9nZ2xlX2tleXMoaWwpKSB7CiAgICAgICAgICAgICBpbC0+Z3JhYl9yZXF1
-ZXN0ID0gdHJ1ZTsKICAgICAgICAgfQoKQEAgLTI3NCw2ICsyODgsMTggQEAgc3RhdGljIHZvaWQg
-aW5wdXRfbGludXhfY29tcGxldGUoVXNlckNyZWF0YWJsZSAqdWMsIEVycm9yICoqZXJycCkKICAg
-ICAgICAgcmV0dXJuOwogICAgIH0KCisgICAgLyoKKyAgICAgKiBJZiB0aGUgdG9nZ2xlX2tleXMg
-Y2hhciB3YXMgbm90IHByb3ZpZGVkLCBzZXQKKyAgICAgKiB0aGUgZGVmYXVsdCBvZiBLRVlfTEVG
-VENUUkwgYW5kIEtFWV9SSUdIVENUUkwKKyAgICAgKi8KKyAgICBpZiAoIWlsLT50b2dnbGVfa2V5
-cyB8fCAhaWwtPnRvZ2dsZV9rZXlzX2xpc3QgfHwgIWlsLT50b2dnbGVfa2V5c19sZW4pIHsKKyAg
-ICAgICAgaWwtPnRvZ2dsZV9rZXlzID0gTlVMTDsKKyAgICAgICAgaWwtPnRvZ2dsZV9rZXlzX2xl
-biA9IDI7CisgICAgICAgIGlsLT50b2dnbGVfa2V5c19saXN0ID0gZ19uZXcoaW50LCAyKTsKKyAg
-ICAgICAgaWwtPnRvZ2dsZV9rZXlzX2xpc3RbMF0gPSBLRVlfTEVGVENUUkw7CisgICAgICAgIGls
-LT50b2dnbGVfa2V5c19saXN0WzFdID0gS0VZX1JJR0hUQ1RSTDsKKyAgICB9CisKICAgICBpbC0+
-ZmQgPSBvcGVuKGlsLT5ldmRldiwgT19SRFdSKTsKICAgICBpZiAoaWwtPmZkIDwgMCkgIHsKICAg
-ICAgICAgZXJyb3Jfc2V0Z19maWxlX29wZW4oZXJycCwgZXJybm8sIGlsLT5ldmRldik7CkBAIC0z
-NTksNiArMzg1LDExIEBAIHN0YXRpYyB2b2lkIGlucHV0X2xpbnV4X2luc3RhbmNlX2ZpbmFsaXpl
-KE9iamVjdCAqb2JqKQogICAgICAgICBjbG9zZShpbC0+ZmQpOwogICAgIH0KICAgICBnX2ZyZWUo
-aWwtPmV2ZGV2KTsKKworICAgIGlmIChpbC0+dG9nZ2xlX2tleXMpIHsKKyAgICAgICAgZ19mcmVl
-KGlsLT50b2dnbGVfa2V5cyk7CisgICAgfQorICAgIGdfZnJlZShpbC0+dG9nZ2xlX2tleXNfbGlz
-dCk7Cn0KCnN0YXRpYyBjaGFyICppbnB1dF9saW51eF9nZXRfZXZkZXYoT2JqZWN0ICpvYmosIEVy
-cm9yICoqZXJycCkKQEAgLTQxMCwxMSArNDQxLDExMiBAQCBzdGF0aWMgdm9pZCBpbnB1dF9saW51
-eF9zZXRfcmVwZWF0KE9iamVjdCAqb2JqLCBib29sIHZhbHVlLAogICAgIGlsLT5yZXBlYXQgPSB2
-YWx1ZTsKfQoKK3N0YXRpYyB2b2lkIGlucHV0X2xpbnV4X3BvcHVsYXRlX3RvZ2dsZV9rZXlzKElu
-cHV0TGludXggKmlsKQoreworICAgIC8qCisgICAgICogSWYgbm8gdG9nZ2xlX2tleXMgd2FzIHBy
-b3ZpZGVkLCByZXR1cm4gemVybyBrZXlzLgorICAgICAqIFRoaXMgd2lsbCBiZSBjbGVhbmVkIHVw
-IGluIHRoZSBpbnB1dF9saW51eF9jb21wbGV0ZSgpCisgICAgICogZnVuY3Rpb24gYW5kIHJlc2V0
-IHRvIGJvdGggQ3RybCBrZXlzLgorICAgICAqLworICAgIGlmICghaWwtPnRvZ2dsZV9rZXlzKSB7
-CisgICAgICAgIGlsLT50b2dnbGVfa2V5c19sZW4gPSAwOworICAgICAgICBpbC0+dG9nZ2xlX2tl
-eXNfbGlzdCA9IE5VTEw7CisgICAgICAgIHJldHVybjsKKyAgICB9CisKKyAgICAvKgorICAgICAq
-IEl0ZXJhdGUgdGhyb3VnaCBlYWNoIHRva2VuIGluIHRoZSB0b2dnbGVfa2V5cyBzdHJpbmcsCisg
-ICAgICogc2VwYXJhdGVkIGJ5IGNvbG9ucywgYW5kIGFkZCBpdCB0byB0aGUgaWwtPnRvZ2dsZV9r
-ZXlzX2xpc3QKKyAgICAgKiBhcnJheS4KKyAgICAgKgorICAgICAqIFVuZm9ydHVuYXRlbHkgdGhp
-cyBtdXN0IGJlIGRvbmUgdHdpY2UgaW4gb3JkZXIgdG8KKyAgICAgKiBkZXRlcm1pbmUgaG93IG11
-Y2ggbWVtb3J5IHdpbGwgYmUgYWxsb2NhdGVkIGxhdGVyIG9uLgorICAgICAqLworCisgICAgLyog
-Rmlyc3Qgc2NhbiAqLworICAgIGlsLT50b2dnbGVfa2V5c19sZW4gPSAwOworCisgICAgY2hhciAq
-b3JpZywgKnRva2VuLCAqc2F2ZXB0cjsKKworICAgIG9yaWcgPSBnX3N0cmR1cChpbC0+dG9nZ2xl
-X2tleXMpOworICAgIHNhdmVwdHIgPSBvcmlnOworCisgICAgd2hpbGUgKHN0cnRva19yKHNhdmVw
-dHIsICI6IiwgJnNhdmVwdHIpKSB7CisgICAgICAgIGlsLT50b2dnbGVfa2V5c19sZW4rKzsKKyAg
-ICB9CisKKyAgICAvKgorICAgICAqIElmIHRoZSBjb3VudCBmb3VuZCB6ZXJvIHRva2VucywgcmV0
-dXJuIGFuIGVtcHR5IGxpc3QuCisgICAgICogQWdhaW4sIHRoaXMgd2lsbCBiZSBjbGVhbmVkIHVw
-IGluIGlucHV0X2xpbnV4X2NvbXBsZXRlKCkuCisgICAgICovCisgICAgaWYgKCFpbC0+dG9nZ2xl
-X2tleXNfbGVuKSB7CisgICAgICAgIGlsLT50b2dnbGVfa2V5c19saXN0ID0gTlVMTDsKKyAgICAg
-ICAgZ19mcmVlKG9yaWcpOworICAgICAgICByZXR1cm47CisgICAgfQorCisgICAgLyogU2Vjb25k
-IHNjYW4gKi8KKyAgICBpbC0+dG9nZ2xlX2tleXNfbGlzdCA9IGdfbmV3KGludCwgaWwtPnRvZ2ds
-ZV9rZXlzX2xlbik7CisKKyAgICBzdHJjcHkob3JpZywgaWwtPnRvZ2dsZV9rZXlzKTsKKyAgICBz
-YXZlcHRyID0gb3JpZzsKKyAgICB1bnNpZ25lZCBjbnRyID0gMDsKKworICAgIC8qIEFkZCBlYWNo
-IHRva2VuJ3MgaW50IHJlcHJlc2VudGF0aW9uIHRvIHRoZSBsaXN0ICovCisgICAgd2hpbGUgKCh0
-b2tlbiA9IHN0cnRva19yKHNhdmVwdHIsICI6IiwgJnNhdmVwdHIpKSkgeworICAgICAgICBsb25n
-IHZhbCA9IDA7CisgICAgICAgIGludCBzdHJ0b2xfcmV0ID0gcWVtdV9zdHJ0b2wodG9rZW4sIE5V
-TEwsIDEwLCAmdmFsKTsKKworICAgICAgICAvKgorICAgICAgICAgKiBDaGVjayB0byBlbnN1cmUg
-KGEpIHFlbXVfc3RydG9sKCkgZGlkIG5vdCBmYWlsCisgICAgICAgICAqIGFuZCAoYikgdGhlIGlu
-dGVnZXIgaXQgcmV0dXJuZWQgaXMgd2l0aGluIHRoZQorICAgICAgICAgKiByYW5nZSBvZiBwb3Nz
-aWJsZSBrZXlzCisgICAgICAgICAqLworICAgICAgICBpZiAoc3RydG9sX3JldCA+IDAgfHwgISh2
-YWwgPiAwICYmIHZhbCA8IEtFWV9DTlQpKSB7CisgICAgICAgICAgICBnX2ZyZWUoaWwtPnRvZ2ds
-ZV9rZXlzX2xpc3QpOworICAgICAgICAgICAgZ19mcmVlKG9yaWcpOworICAgICAgICAgICAgaWwt
-PnRvZ2dsZV9rZXlzX2xlbiA9IDA7CisgICAgICAgICAgICBpbC0+dG9nZ2xlX2tleXNfbGlzdCA9
-IE5VTEw7CisgICAgICAgICAgICByZXR1cm47CisgICAgICAgIH0KKworICAgICAgICBpbC0+dG9n
-Z2xlX2tleXNfbGlzdFtjbnRyXSA9IHZhbDsKKyAgICAgICAgY250cisrOworICAgIH0KKworICAg
-IGdfZnJlZShvcmlnKTsKK30KKworc3RhdGljIHZvaWQgaW5wdXRfbGludXhfc2V0X3RvZ2dsZV9r
-ZXlzKE9iamVjdCAqb2JqLCBjb25zdCBjaGFyICp2YWx1ZSwKKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApCit7CisgICAgSW5wdXRMaW51eCAqaWwg
-PSBJTlBVVF9MSU5VWChvYmopOworCisgICAgaWYgKGlsLT50b2dnbGVfa2V5cykgeworICAgICAg
-ICBlcnJvcl9zZXRnKGVycnAsICJ0b2dnbGVfa2V5cyBwcm9wZXJ0eSBhbHJlYWR5IHNldCIpOwor
-ICAgICAgICByZXR1cm47CisgICAgfQorCisgICAgaWwtPnRvZ2dsZV9rZXlzID0gZ19zdHJkdXAo
-dmFsdWUpOworCisgICAgaW5wdXRfbGludXhfcG9wdWxhdGVfdG9nZ2xlX2tleXMoaWwpOworfQor
-CitzdGF0aWMgY2hhciAqaW5wdXRfbGludXhfZ2V0X3RvZ2dsZV9rZXlzKE9iamVjdCAqb2JqLCBF
-cnJvciAqKmVycnApCit7CisgICAgSW5wdXRMaW51eCAqaWwgPSBJTlBVVF9MSU5VWChvYmopOwor
-CisgICAgcmV0dXJuIGdfc3RyZHVwKGlsLT50b2dnbGVfa2V5cyk7Cit9CisKc3RhdGljIHZvaWQg
-aW5wdXRfbGludXhfaW5zdGFuY2VfaW5pdChPYmplY3QgKm9iaikKewogICAgIG9iamVjdF9wcm9w
-ZXJ0eV9hZGRfc3RyKG9iaiwgImV2ZGV2IiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBp
-bnB1dF9saW51eF9nZXRfZXZkZXYsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRf
-bGludXhfc2V0X2V2ZGV2LCBOVUxMKTsKKyAgICBvYmplY3RfcHJvcGVydHlfYWRkX3N0cihvYmos
-ICJ0b2dnbGVfa2V5cyIsCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfbGludXhf
-Z2V0X3RvZ2dsZV9rZXlzLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlucHV0X2xpbnV4
-X3NldF90b2dnbGVfa2V5cywgTlVMTCk7CiAgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9ib29sKG9i
-aiwgImdyYWJfYWxsIiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfbGludXhf
-Z2V0X2dyYWJfYWxsLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9saW51eF9z
-ZXRfZ3JhYl9hbGwsIE5VTEwpOwotLQoyLjE4LjA=
+Public bug reported:
+
+qemu version: 2.12.1
+
+When using -display gtk for all -vga options (std,qxl,vmware,cirrus) the
+option "Zoom To Fit" is unchecked and auto-resizing of the window works
+well; except for -vga virtio: here "Zoom To Fit" is checked and auto-
+resizing doesn't work.
+
+Proposal: disable "Zoom To Fit" as default for virtio as well
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788701
+
+Title:
+  "Zoom to fit" doesn't work  with -display gtk -vga virtio
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu version: 2.12.1
+
+  When using -display gtk for all -vga options (std,qxl,vmware,cirrus)
+  the option "Zoom To Fit" is unchecked and auto-resizing of the window
+  works well; except for -vga virtio: here "Zoom To Fit" is checked and
+  auto-resizing doesn't work.
+
+  Proposal: disable "Zoom To Fit" as default for virtio as well
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788701/+subscriptions
