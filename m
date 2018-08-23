@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chrisfriedt@gmail.com>) id 1fsx40-0007tJ-94
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 17:22:44 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fsxmz-0001cX-UG
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chrisfriedt@gmail.com>) id 1fsx3z-0008OY-J1
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 17:22:44 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:41854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <chrisfriedt@gmail.com>)
-	id 1fsx3z-0008OQ-CY
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 17:22:43 -0400
-Received: by mail-oi0-x244.google.com with SMTP id k12-v6so11816054oiw.8
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 14:22:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAF4BF-R8iAkeHXFPHazY2Tmr+Yh=WrG4yKx=LVm7rRLBnxKseA@mail.gmail.com>
-	<CAFEAcA_y2-N_aaG4W4rQABsTe=B++pSMp53_kKay0_MjGT4WpA@mail.gmail.com>
-	<CAF4BF-RzCr_hx6iAPR3pQ_eAChue38eTE646EOou6XE6FkNSVQ@mail.gmail.com>
-	<CAF4BF-Tb74eNHuNMXNXJZAXq4UQ=mG3BOd4Dnswe+WY89q1Miw@mail.gmail.com>
-In-Reply-To: <CAF4BF-Tb74eNHuNMXNXJZAXq4UQ=mG3BOd4Dnswe+WY89q1Miw@mail.gmail.com>
-From: Christopher Friedt <chrisfriedt@gmail.com>
-Date: Thu, 23 Aug 2018 17:22:29 -0400
-Message-ID: <CAF4BF-RcXN8OQxc8vEu=mAucNOUe8MDC95toQ6NXnYbopsqREA@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="000000000000002a5a057420dcb5"
-Subject: Re: [Qemu-devel] [PATCH] Fix ARM v7m gen_intermediate_code()
+	(envelope-from <jsnow@redhat.com>) id 1fsxmy-0001xt-Ny
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:09:13 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Thu, 23 Aug 2018 18:08:55 -0400
+Message-Id: <20180823220856.10094-9-jsnow@redhat.com>
+In-Reply-To: <20180823220856.10094-1-jsnow@redhat.com>
+References: <20180823220856.10094-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 8/9] jobs: remove ret argument to
+ job_completed; privatize it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +20,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
---000000000000002a5a057420dcb5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Jobs are now expected to return their retcode on the stack, from the
+.run callback, so we can remove that argument.
 
-On Thu, Aug 23, 2018 at 4:01 PM Christopher Friedt
-<chrisfriedt@gmail.com> wrote:
-> On Thu., Aug. 23, 2018, 3:50 p.m. Christopher Friedt, <chrisfriedt@gmail.=
-com> wrote:
->> On Thu., Aug. 23, 2018, 2:20 p.m. Peter Maydell, <peter.maydell@linaro.o=
-rg> wrote:
->>> On 23 August 2018 at 17:36, Christopher Friedt <chrisfriedt@gmail.com> =
-wrote:
->>>
->>> happen to have a copy on your lake, but the short answer
->>> is that bit 1 must be set, exactly because this is what
->>> defines whether EPSR.T is set on exception entry.
->>
->> Doh! You're right, although I checked for that in my rom vector table. A=
-s it turns out, I relocated my vtable to ram and *then* zeroed bss, which w=
-ould obviously clear the T bit.
->
-> Ok, not right. The vtable entries all do have the T bit set and I was zer=
-oing the bss first after all. All isr entries are either 0x2e9 (no-op isr),=
- 0x2ff (no-op fault handler), or 0 (for reserved), so the T bit is set ever=
-ywhere it needs to be.
->
-> It would seem there is an underlying issue with the T bit not getting set=
- upon exception invocation, and my previous patch was more of a bandaid sol=
-ution. It would be fairly straightforward to come up with a short assembly =
-fragment that verifiably demonstrates the problem in this case.
+job_cancel does not need to set -ECANCELED because job_completed will
+update the return code itself if the job was canceled.
 
-OK - assembly fragment worked fine. So yeah, it has to be something
-wrong with the way that the C library I'm linking to (musl) is doing
-syscalls.
+While we're here, make job_completed static to job.c and remove it from
+job.h; move the documentation of return code to the .run() callback and
+to the job->ret property, accordingly.
 
---000000000000002a5a057420dcb5
-Content-Type: application/octet-stream; name="foo.S"
-Content-Disposition: attachment; filename="foo.S"
-Content-Transfer-Encoding: base64
-Content-ID: <f_jl72o68y0>
-X-Attachment-Id: f_jl72o68y0
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ include/qemu/job.h | 24 +++++++++++-------------
+ job.c              | 11 ++++++-----
+ trace-events       |  2 +-
+ 3 files changed, 18 insertions(+), 19 deletions(-)
 
-ICAgICAgICAuc3ludGF4IHVuaWZpZWQKICAgICAgICAuY3B1IGNvcnRleC1tMwoKICAgICAgICAu
-c2VjdGlvbiAiLnRleHQiCgoJCS5nbG9iYWwgX3N0YXJ0CgogICAgICAgIC50eXBlIF92dGFibGUs
-ICVvYmplY3QKX3Z0YWJsZToKICAgICAgICAud29yZCAgIDB4MjAwMjAwMDAgLy8gaW5pdGlhbCBz
-cAogICAgICAgIC53b3JkICAgX3N0YXJ0ICAgICAvLyBpbml0aWFsIHBjCiAgICAgICAgLndvcmQg
-ICBfaXNyICAgICAgIC8vIG5taQogICAgICAgIC53b3JkICAgbWVtY3B5ICAgICAvLyBoYXJkZmF1
-bHQKICAgICAgICAud29yZCAgIF9pc3IgICAgICAgLy8gbWVtbWFuYWdlCiAgICAgICAgLndvcmQg
-ICBtZW1jcHkgICAgIC8vIGJ1c2ZhdWx0CiAgICAgICAgLndvcmQgICBtZW1jcHkgICAgIC8vIHVz
-YWdlZmF1bHQKICAgICAgICAud29yZCAgIDAgICAgICAgICAgLy8gcmVzZXJ2ZWQKICAgICAgICAu
-d29yZCAgIDAgICAgICAgICAgLy8gcmVzZXJ2ZWQKICAgICAgICAud29yZCAgIDAgICAgICAgICAg
-Ly8gcmVzZXJ2ZWQKICAgICAgICAud29yZCAgIDAgICAgICAgICAgLy8gcmVzZXJ2ZWQKICAgICAg
-ICAud29yZCAgIF9pc3IgICAgICAgLy8gc3ZjYWxsCiAgICAgICAgLndvcmQgICBfaXNyICAgICAg
-IC8vIGRlYnVnbW9uaXRvcgogICAgICAgIC53b3JkICAgMCAgICAgICAgICAvLyByZXNlcnZlZAog
-ICAgICAgIC53b3JkICAgX2lzciAgICAgICAvLyBwZW5kc3YKICAgICAgICAud29yZCAgIF9pc3Ig
-ICAgICAgLy8gc3lzdGljawogICAgICAgIC5zaXplIF92dGFibGUsIC4gLSBfdnRhYmxlCgoJCS50
-eXBlIF9zdGFydCwgJWZ1bmN0aW9uCl9zdGFydDoKCQkvLyBjb3B5IHZ0YWJsZSB0byBiZWdpbm5p
-bmcgb2YgcmFtCgkJbGRyIHIwLCAuTDAgICAgICAgIC8vIGRlc3RpbmF0aW9uCgkJbW92IHIxLCAj
-MCAgICAgICAgIC8vIHNvdXJjZQoJCW1vdiByMiwgIygxNio0KSAgICAvLyBzaXplIChieXRlcykK
-CQlibCBtZW1jcHkKCgkJbGRyIHIwLCAuTDAgICAgICAgIC8vIGJlZ2lubmluZyBvZiByYW0KCQls
-ZHIgcjEsIC5MMSAgICAgICAgLy8gVlRPUgoJCXN0ciByMCwgWyByMSBdCgkJc3ZjIDAKCQliIF9z
-dGFydAoJCS5zaXplIF9zdGFydCwgLiAtIF9zdGFydAoKCQkudHlwZSBfaXNyLCAlZnVuY3Rpb24K
-X2lzcjoKCQlieCBscgoJCS5zaXplIF9pc3IsIC4gLSBfaXNyCgoJCS50eXBlIG1lbWNweSwgJWZ1
-bmN0aW9uCm1lbWNweToKCQlwdXNoCXtyN30KCQlzdWIJc3AsICMyMAoJCWFkZAlyNywgc3AsICMw
-CgkJc3RyCXIwLCBbcjcsICMxMl0KCQlzdHIJcjEsIFtyNywgIzhdCgkJc3RyCXIyLCBbcjcsICM0
-XQoJCWIubgk9MmYKMToKCQlsZHIJcjMsIFtyNywgIzhdCgkJbGRyYglyMiwgW3IzLCAjMF0KCQls
-ZHIJcjMsIFtyNywgIzEyXQoJCXN0cmIJcjIsIFtyMywgIzBdCgkJbGRyCXIzLCBbcjcsICMxMl0K
-CQlhZGRzCXIzLCAjMQoJCXN0cglyMywgW3I3LCAjMTJdCgkJbGRyCXIzLCBbcjcsICM4XQoJCWFk
-ZHMJcjMsICMxCgkJc3RyCXIzLCBbcjcsICM4XQoJCWxkcglyMywgW3I3LCAjNF0KCQlzdWJzCXIz
-LCAjMQoJCXN0cglyMywgW3I3LCAjNF0KCQlsZHIJcjMsIFtyNywgIzRdCjI6CgkJY21wCXIzLCAj
-MAoJCWJuZQkxYgoJCW5vcAoJCWFkZHMJcjcsICMyMAoJCW1vdglzcCwgcjcKCQlwb3AJe3I3fQoJ
-CWJ4CWxyCgoJCS5zaXplIG1lbWNweSwgLiAtIG1lbWNweQoKLkwwOgoJCS53b3JkIDB4MjAwMDAw
-MDAKCi5MMToKCQkud29yZCAweGUwMDBlZDA4CgoJCS5lbmQKCg==
---000000000000002a5a057420dcb5--
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index c67f6a647e..2990f28edc 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -124,7 +124,7 @@ typedef struct Job {
+     /** Estimated progress_current value at the completion of the job */
+     int64_t progress_total;
+ 
+-    /** ret code passed to job_completed. */
++    /** Return code from @run callback; 0 on success and -errno on failure. */
+     int ret;
+ 
+     /** Error object for a failed job **/
+@@ -168,7 +168,16 @@ struct JobDriver {
+     /** Enum describing the operation */
+     JobType job_type;
+ 
+-    /** Mandatory: Entrypoint for the Coroutine. */
++    /**
++     * Mandatory: Entrypoint for the Coroutine.
++     *
++     * This callback will be invoked when moving from CREATED to RUNNING.
++     *
++     * If this callback returns nonzero, the job transaction it is part of is
++     * aborted. If it returns zero, the job moves into the WAITING state. If it
++     * is the last job to complete in its transaction, all jobs in the
++     * transaction move from WAITING to PENDING.
++     */
+     int coroutine_fn (*run)(Job *job, Error **errp);
+ 
+     /**
+@@ -492,17 +501,6 @@ void job_early_fail(Job *job);
+ /** Moves the @job from RUNNING to READY */
+ void job_transition_to_ready(Job *job);
+ 
+-/**
+- * @job: The job being completed.
+- * @ret: The status code.
+- *
+- * Marks @job as completed. If @ret is non-zero, the job transaction it is part
+- * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
+- * is the last job to complete in its transaction, all jobs in the transaction
+- * move from WAITING to PENDING.
+- */
+-void job_completed(Job *job, int ret);
+-
+ /** Asynchronously complete the specified @job. */
+ void job_complete(Job *job, Error **errp);
+ 
+diff --git a/job.c b/job.c
+index bc8dad4e71..213042b762 100644
+--- a/job.c
++++ b/job.c
+@@ -535,6 +535,8 @@ void job_drain(Job *job)
+     }
+ }
+ 
++static void job_completed(Job *job);
++
+ static void job_exit(void *opaque)
+ {
+     Job *job = (Job *)opaque;
+@@ -545,7 +547,7 @@ static void job_exit(void *opaque)
+         job->driver->exit(job);
+         aio_context_release(aio_context);
+     }
+-    job_completed(job, job->ret);
++    job_completed(job);
+ }
+ 
+ /**
+@@ -883,13 +885,12 @@ static void job_completed_txn_success(Job *job)
+     }
+ }
+ 
+-void job_completed(Job *job, int ret)
++static void job_completed(Job *job)
+ {
+     assert(job && job->txn && !job_is_completed(job));
+ 
+-    job->ret = ret;
+     job_update_rc(job);
+-    trace_job_completed(job, ret, job->ret);
++    trace_job_completed(job, job->ret);
+     if (job->ret) {
+         job_completed_txn_abort(job);
+     } else {
+@@ -905,7 +906,7 @@ void job_cancel(Job *job, bool force)
+     }
+     job_cancel_async(job, force);
+     if (!job_started(job)) {
+-        job_completed(job, -ECANCELED);
++        job_completed(job);
+     } else if (job->deferred_to_main_loop) {
+         job_completed_txn_abort(job);
+     } else {
+diff --git a/trace-events b/trace-events
+index c445f54773..4fd2cb4b97 100644
+--- a/trace-events
++++ b/trace-events
+@@ -107,7 +107,7 @@ gdbstub_err_checksum_incorrect(uint8_t expected, uint8_t got) "got command packe
+ # job.c
+ job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
+ job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
+-job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
++job_completed(void *job, int ret) "job %p ret %d"
+ 
+ # job-qmp.c
+ qmp_job_cancel(void *job) "job %p"
+-- 
+2.14.4
