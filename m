@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm9-00050S-Sw
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm9-00050J-On
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm5-0008V5-GQ
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm5-0008VL-Kq
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:49 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:38375 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:38397 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fspm5-0007ui-3Z
+	id 1fspm5-0007vQ-74
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:45 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 15:33:50 +0200
-Message-Id: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v4 00/46] MIPS queue August 2018 v4
+Date: Thu, 23 Aug 2018 15:33:53 +0200
+Message-Id: <1535031276-22911-4-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PULL v4 03/46] target/mips: Add nanoMIPS DSP ASE
+ opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +28,258 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-The following changes since commit 3392fbee4e435658733bbe9aab23392660558b59:
+Add nanoMIPS opcodes for DSP ASE instruction pools and instructions.
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.1-pull-request' into staging (2018-08-23 12:28:17 +0100)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 215 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 215 insertions(+)
 
-are available in the git repository at:
-
-  https://github.com/AMarkovic/qemu mips-queue-aug-2018
-
-for you to fetch changes up to 1ee6d7cab75003a0659a09d3e9df8721ecbb491d:
-
-  target/mips: Add definition of nanoMIPS I7200 CPU (2018-08-23 14:55:13 +0200)
-
-----------------------------------------------------------------
-MIPS queue August 2018 v4
-
-This patch set contains support for core functionality and system
-mode for nanoMIPS platform.
-
-v4: Fixed clang build errors for user mode configurationos.
-v3: Fixed initial ('since') commit.
-v2: Added missing 'Reviewed-by' lines
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (5):
-  target/mips: Add preprocessor constants for nanoMIPS
-  target/mips: Add placeholder and invocation of decode_nanomips_opc()
-  target/mips: Add nanoMIPS decoding and extraction utilities
-  elf: Relax MIPS' elf_check_arch() to accept EM_NANOMIPS too
-  elf: Don't check FCR31_NAN2008 bit for nanoMIPS
-
-Aleksandar Rikalo (4):
-  target/mips: Implement emulation of nanoMIPS LLWP/SCWP pair
-  target/mips: Fix pre-nanoMIPS MT ASE instructions availability control
-  elf: Add EM_NANOMIPS value as a valid one for e_machine field
-  elf: On elf loading, treat both EM_MIPS and EM_NANOMIPS as legal for
-    MIPS
-
-Dimitrije Nikolic (2):
-  target/mips: Add CP0 Config3 and Config5 fields to DisasContext
-    structure
-  target/mips: Add availability control via bit NMS
-
-James Hogan (1):
-  target/mips: Implement emulation of nanoMIPS EXTW instruction
-
-Matthew Fortune (3):
-  target/mips: Implement emulation of nanoMIPS ROTX instruction
-  disas: Add support for nanoMIPS platform
-  mips_malta: Add basic nanoMIPS boot code for Malta board
-
-Paul Burton (1):
-  mips_malta: Add setting up GT64120 BARs to the nanoMIPS bootloader
-
-Stefan Markovic (15):
-  target/mips: Add nanoMIPS DSP ASE opcodes
-  target/mips: Prevent switching mode related to Config3 ISA bit for
-    nanoMIPS
-  target/mips: Add emulation of nanoMIPS 16-bit branch instructions
-  target/mips: Add emulation of nanoMIPS 16-bit save and restore
-    instructions
-  target/mips: Add emulation of nanoMIPS 32-bit branch instructions
-  target/mips: Implement MT ASE support for nanoMIPS
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 1
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 2
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 3
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 4
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 5
-  target/mips: Add emulation of DSP ASE for nanoMIPS - part 6
-  target/mips: Add updating BadInstr and BadInstrX for nanoMIPS
-  mips_malta: Fix semihosting argument passing for nanoMIPS bare metal
-  target/mips: Add definition of nanoMIPS I7200 CPU
-
-Yongbok Kim (15):
-  target/mips: Add nanoMIPS base instruction set opcodes
-  target/mips: Add emulation of nanoMIPS 16-bit arithmetic instructions
-  target/mips: Add emulation of nanoMIPS 16-bit shift instructions
-  target/mips: Add emulation of nanoMIPS 16-bit misc instructions
-  target/mips: Add emulation of nanoMIPS 16-bit load and store
-    instructions
-  target/mips: Add emulation of nanoMIPS 16-bit logic instructions
-  target/mips: Add emulation of some common nanoMIPS 32-bit instructions
-  target/mips: Add emulation of nanoMIPS instructions MOVE.P and
-    MOVE.PREV
-  target/mips: Add emulation of nanoMIPS 48-bit instructions
-  target/mips: Add emulation of nanoMIPS FP instructions
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32a0)
-  target/mips: Add emulation of misc nanoMIPS instructions (pool32axf)
-  target/mips: Add emulation of misc nanoMIPS instructions (p_lsx)
-  target/mips: Add emulation of nanoMIPS 32-bit load and store
-    instructions
-  target/mips: Fix ERET/ERETNC behavior related to ADEL exception
-
- MAINTAINERS                      |     2 +
- disas/Makefile.objs              |     1 +
- disas/mips.c                     |    90 +-
- disas/nanomips.cpp               | 15812 +++++++++++++++++++++++++++++++++++++
- disas/nanomips.h                 |  1100 +++
- hw/mips/mips_malta.c             |   212 +-
- include/disas/bfd.h              |     1 +
- include/elf.h                    |     2 +
- include/hw/elf_ops.h             |     8 +
- linux-user/elfload.c             |     2 +
- linux-user/mips/cpu_loop.c       |    28 +-
- target/mips/cpu.c                |    11 +-
- target/mips/cpu.h                |     2 +
- target/mips/helper.c             |    16 +
- target/mips/helper.h             |     2 +
- target/mips/mips-defs.h          |     4 +
- target/mips/op_helper.c          |    98 +-
- target/mips/translate.c          |  4981 +++++++++++-
- target/mips/translate_init.inc.c |    39 +
- 19 files changed, 22330 insertions(+), 81 deletions(-)
- create mode 100644 disas/nanomips.cpp
- create mode 100644 disas/nanomips.h
-
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 0075dbc..4f95b9a 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -16010,6 +16010,79 @@ enum {
+     NM_SOV      = 0x7a,
+ };
+ 
++/* POOL32A5 instruction pool */
++enum {
++    NM_CMP_EQ_PH        = 0x00,
++    NM_CMP_LT_PH        = 0x08,
++    NM_CMP_LE_PH        = 0x10,
++    NM_CMPGU_EQ_QB      = 0x18,
++    NM_CMPGU_LT_QB      = 0x20,
++    NM_CMPGU_LE_QB      = 0x28,
++    NM_CMPGDU_EQ_QB     = 0x30,
++    NM_CMPGDU_LT_QB     = 0x38,
++    NM_CMPGDU_LE_QB     = 0x40,
++    NM_CMPU_EQ_QB       = 0x48,
++    NM_CMPU_LT_QB       = 0x50,
++    NM_CMPU_LE_QB       = 0x58,
++    NM_ADDQ_S_W         = 0x60,
++    NM_SUBQ_S_W         = 0x68,
++    NM_ADDSC            = 0x70,
++    NM_ADDWC            = 0x78,
++
++    NM_ADDQ_S_PH   = 0x01,
++    NM_ADDQH_R_PH  = 0x09,
++    NM_ADDQH_R_W   = 0x11,
++    NM_ADDU_S_QB   = 0x19,
++    NM_ADDU_S_PH   = 0x21,
++    NM_ADDUH_R_QB  = 0x29,
++    NM_SHRAV_R_PH  = 0x31,
++    NM_SHRAV_R_QB  = 0x39,
++    NM_SUBQ_S_PH   = 0x41,
++    NM_SUBQH_R_PH  = 0x49,
++    NM_SUBQH_R_W   = 0x51,
++    NM_SUBU_S_QB   = 0x59,
++    NM_SUBU_S_PH   = 0x61,
++    NM_SUBUH_R_QB  = 0x69,
++    NM_SHLLV_S_PH  = 0x71,
++    NM_PRECR_SRA_R_PH_W = 0x79,
++
++    NM_MULEU_S_PH_QBL   = 0x12,
++    NM_MULEU_S_PH_QBR   = 0x1a,
++    NM_MULQ_RS_PH       = 0x22,
++    NM_MULQ_S_PH        = 0x2a,
++    NM_MULQ_RS_W        = 0x32,
++    NM_MULQ_S_W         = 0x3a,
++    NM_APPEND           = 0x42,
++    NM_MODSUB           = 0x52,
++    NM_SHRAV_R_W        = 0x5a,
++    NM_SHRLV_PH         = 0x62,
++    NM_SHRLV_QB         = 0x6a,
++    NM_SHLLV_QB         = 0x72,
++    NM_SHLLV_S_W        = 0x7a,
++
++    NM_SHILO            = 0x03,
++
++    NM_MULEQ_S_W_PHL    = 0x04,
++    NM_MULEQ_S_W_PHR    = 0x0c,
++
++    NM_MUL_S_PH         = 0x05,
++    NM_PRECR_QB_PH      = 0x0d,
++    NM_PRECRQ_QB_PH     = 0x15,
++    NM_PRECRQ_PH_W      = 0x1d,
++    NM_PRECRQ_RS_PH_W   = 0x25,
++    NM_PRECRQU_S_QB_PH  = 0x2d,
++    NM_PACKRL_PH        = 0x35,
++    NM_PICK_QB          = 0x3d,
++    NM_PICK_PH          = 0x45,
++
++    NM_SHRA_R_W         = 0x5e,
++    NM_SHRA_R_PH        = 0x66,
++    NM_SHLL_S_PH        = 0x76,
++    NM_SHLL_S_W         = 0x7e,
++
++    NM_REPL_PH          = 0x07
++};
++
+ /* POOL32A7 instruction pool */
+ enum {
+     NM_P_LSX        = 0x00,
+@@ -16199,8 +16272,127 @@ enum {
+ 
+ /* POOL32Axf instruction pool */
+ enum {
++    NM_POOL32AXF_1 = 0x01,
++    NM_POOL32AXF_2 = 0x02,
+     NM_POOL32AXF_4 = 0x04,
+     NM_POOL32AXF_5 = 0x05,
++    NM_POOL32AXF_7 = 0x07,
++};
++
++/* POOL32Axf_1 instruction pool */
++enum {
++    NM_POOL32AXF_1_0 = 0x00,
++    NM_POOL32AXF_1_1 = 0x01,
++    NM_POOL32AXF_1_3 = 0x03,
++    NM_POOL32AXF_1_4 = 0x04,
++    NM_POOL32AXF_1_5 = 0x05,
++    NM_POOL32AXF_1_7 = 0x07,
++};
++
++/* POOL32Axf_2 instruction pool */
++enum {
++    NM_POOL32AXF_2_0_7     = 0x00,
++    NM_POOL32AXF_2_8_15    = 0x01,
++    NM_POOL32AXF_2_16_23   = 0x02,
++    NM_POOL32AXF_2_24_31   = 0x03,
++};
++
++/* POOL32Axf_7 instruction pool */
++enum {
++    NM_SHRA_R_QB    = 0x0,
++    NM_SHRL_PH      = 0x1,
++    NM_REPL_QB      = 0x2,
++};
++
++/* POOL32Axf_1_0 instruction pool */
++enum {
++    NM_MFHI = 0x0,
++    NM_MFLO = 0x1,
++    NM_MTHI = 0x2,
++    NM_MTLO = 0x3,
++};
++
++/* POOL32Axf_1_1 instruction pool */
++enum {
++    NM_MTHLIP = 0x0,
++    NM_SHILOV = 0x1,
++};
++
++/* POOL32Axf_1_3 instruction pool */
++enum {
++    NM_RDDSP    = 0x0,
++    NM_WRDSP    = 0x1,
++    NM_EXTP     = 0x2,
++    NM_EXTPDP   = 0x3,
++};
++
++/* POOL32Axf_1_4 instruction pool */
++enum {
++    NM_SHLL_QB  = 0x0,
++    NM_SHRL_QB  = 0x1,
++};
++
++/* POOL32Axf_1_5 instruction pool */
++enum {
++    NM_MAQ_S_W_PHR   = 0x0,
++    NM_MAQ_S_W_PHL   = 0x1,
++    NM_MAQ_SA_W_PHR  = 0x2,
++    NM_MAQ_SA_W_PHL  = 0x3,
++};
++
++/* POOL32Axf_1_7 instruction pool */
++enum {
++    NM_EXTR_W       = 0x0,
++    NM_EXTR_R_W     = 0x1,
++    NM_EXTR_RS_W    = 0x2,
++    NM_EXTR_S_H     = 0x3,
++};
++
++/* POOL32Axf_2_0_7 instruction pool */
++enum {
++    NM_DPA_W_PH     = 0x0,
++    NM_DPAQ_S_W_PH  = 0x1,
++    NM_DPS_W_PH     = 0x2,
++    NM_DPSQ_S_W_PH  = 0x3,
++    NM_BALIGN       = 0x4,
++    NM_MADD         = 0x5,
++    NM_MULT         = 0x6,
++    NM_EXTRV_W      = 0x7,
++};
++
++/* POOL32Axf_2_8_15 instruction pool */
++enum {
++    NM_DPAX_W_PH    = 0x0,
++    NM_DPAQ_SA_L_W  = 0x1,
++    NM_DPSX_W_PH    = 0x2,
++    NM_DPSQ_SA_L_W  = 0x3,
++    NM_MADDU        = 0x5,
++    NM_MULTU        = 0x6,
++    NM_EXTRV_R_W    = 0x7,
++};
++
++/* POOL32Axf_2_16_23 instruction pool */
++enum {
++    NM_DPAU_H_QBL       = 0x0,
++    NM_DPAQX_S_W_PH     = 0x1,
++    NM_DPSU_H_QBL       = 0x2,
++    NM_DPSQX_S_W_PH     = 0x3,
++    NM_EXTPV            = 0x4,
++    NM_MSUB             = 0x5,
++    NM_MULSA_W_PH       = 0x6,
++    NM_EXTRV_RS_W       = 0x7,
++};
++
++/* POOL32Axf_2_24_31 instruction pool */
++enum {
++    NM_DPAU_H_QBR       = 0x0,
++    NM_DPAQX_SA_W_PH    = 0x1,
++    NM_DPSU_H_QBR       = 0x2,
++    NM_DPSQX_SA_W_PH    = 0x3,
++    NM_EXTPDPV          = 0x4,
++    NM_MSUBU            = 0x5,
++    NM_MULSAQ_S_W_PH    = 0x6,
++    NM_EXTRV_S_H        = 0x7,
+ };
+ 
+ /* POOL32Axf_{4, 5} instruction pool */
+@@ -16221,6 +16413,29 @@ enum {
+     NM_WAIT     = 0x61,
+     NM_DERET    = 0x71,
+     NM_ERETX    = 0x79,
++
++    /* nanoMIPS DSP instructions */
++    NM_ABSQ_S_QB        = 0x00,
++    NM_ABSQ_S_PH        = 0x08,
++    NM_ABSQ_S_W         = 0x10,
++    NM_PRECEQ_W_PHL     = 0x28,
++    NM_PRECEQ_W_PHR     = 0x30,
++    NM_PRECEQU_PH_QBL   = 0x38,
++    NM_PRECEQU_PH_QBR   = 0x48,
++    NM_PRECEU_PH_QBL    = 0x58,
++    NM_PRECEU_PH_QBR    = 0x68,
++    NM_PRECEQU_PH_QBLA  = 0x39,
++    NM_PRECEQU_PH_QBRA  = 0x49,
++    NM_PRECEU_PH_QBLA   = 0x59,
++    NM_PRECEU_PH_QBRA   = 0x69,
++    NM_REPLV_PH         = 0x01,
++    NM_REPLV_QB         = 0x09,
++    NM_BITREV           = 0x18,
++    NM_INSV             = 0x20,
++    NM_RADDU_W_QB       = 0x78,
++
++    NM_BITSWAP          = 0x05,
++    NM_WSBH             = 0x3d,
+ };
+ 
+ /* PP.SR instruction pool */
 -- 
 2.7.4
