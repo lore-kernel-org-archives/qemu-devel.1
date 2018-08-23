@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsxn0-0001cf-Jl
+	(envelope-from <jsnow@redhat.com>) id 1fsxn0-0001ca-3M
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsxmy-0001yA-Ut
+	(envelope-from <jsnow@redhat.com>) id 1fsxmy-0001y5-Qt
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:09:14 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu, 23 Aug 2018 18:08:49 -0400
-Message-Id: <20180823220856.10094-3-jsnow@redhat.com>
-In-Reply-To: <20180823220856.10094-1-jsnow@redhat.com>
-References: <20180823220856.10094-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/9] jobs: canonize Error object
+Date: Thu, 23 Aug 2018 18:08:47 -0400
+Message-Id: <20180823220856.10094-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/9] jobs: Job Exit Refactoring Pt 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,261 +20,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-Jobs presently use both an Error object in the case of the create job,
-and char strings in the case of generic errors elsewhere.
+This is part one of a two part series that refactors the exit logic
+of jobs.
 
-Unify the two paths as just j->err, and remove the extra argument from
-job_completed. The integer error code for job_completed is kept for now,
-to be removed shortly in a separate patch.
+Part one removes job_defer_to_main_loop.
+Part two removes the job->exit() callback introduced in part one.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/backup.c            |  2 +-
- block/commit.c            |  2 +-
- block/create.c            |  5 ++---
- block/mirror.c            |  2 +-
- block/stream.c            |  2 +-
- include/qemu/job.h        | 10 ++++------
- job-qmp.c                 |  5 +++--
- job.c                     | 18 ++++++------------
- tests/test-bdrv-drain.c   |  2 +-
- tests/test-blockjob-txn.c |  2 +-
- tests/test-blockjob.c     |  2 +-
- 11 files changed, 22 insertions(+), 30 deletions(-)
+It's redundant to have each job manage deferring to the main loop
+itself. Unifying this makes sense from an API standpoint.
+Doing so also allows us to remove a tricky case where the completion
+code is called under an aio_context lock, which then calls the
+finalization code which is itself executed under a second aio_context
+lock, leading to deadlocks.
 
-diff --git a/block/backup.c b/block/backup.c
-index 5d47781840..1e965d54e5 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -388,7 +388,7 @@ static void backup_complete(Job *job, void *opaque)
- {
-     BackupCompleteData *data = opaque;
- 
--    job_completed(job, data->ret, NULL);
-+    job_completed(job, data->ret);
-     g_free(data);
- }
- 
-diff --git a/block/commit.c b/block/commit.c
-index a0ea86ff64..4a17bb73ec 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -117,7 +117,7 @@ static void commit_complete(Job *job, void *opaque)
-      * bdrv_set_backing_hd() to fail. */
-     block_job_remove_all_bdrv(bjob);
- 
--    job_completed(job, ret, NULL);
-+    job_completed(job, ret);
-     g_free(data);
- 
-     /* If bdrv_drop_intermediate() didn't already do that, remove the commit
-diff --git a/block/create.c b/block/create.c
-index 04733c3618..26a385c6c7 100644
---- a/block/create.c
-+++ b/block/create.c
-@@ -35,14 +35,13 @@ typedef struct BlockdevCreateJob {
-     BlockDriver *drv;
-     BlockdevCreateOptions *opts;
-     int ret;
--    Error *err;
- } BlockdevCreateJob;
- 
- static void blockdev_create_complete(Job *job, void *opaque)
- {
-     BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
- 
--    job_completed(job, s->ret, s->err);
-+    job_completed(job, s->ret);
- }
- 
- static int coroutine_fn blockdev_create_run(Job *job, Error **errp)
-@@ -50,7 +49,7 @@ static int coroutine_fn blockdev_create_run(Job *job, Error **errp)
-     BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
- 
-     job_progress_set_remaining(&s->common, 1);
--    s->ret = s->drv->bdrv_co_create(s->opts, &s->err);
-+    s->ret = s->drv->bdrv_co_create(s->opts, errp);
-     job_progress_update(&s->common, 1);
- 
-     qapi_free_BlockdevCreateOptions(s->opts);
-diff --git a/block/mirror.c b/block/mirror.c
-index 691763db41..be5dc6b7b0 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -710,7 +710,7 @@ static void mirror_exit(Job *job, void *opaque)
-     blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
- 
-     bs_opaque->job = NULL;
--    job_completed(job, data->ret, NULL);
-+    job_completed(job, data->ret);
- 
-     g_free(data);
-     bdrv_drained_end(src);
-diff --git a/block/stream.c b/block/stream.c
-index b4b987df7e..26a775386b 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -93,7 +93,7 @@ out:
-     }
- 
-     g_free(s->backing_file_str);
--    job_completed(job, data->ret, NULL);
-+    job_completed(job, data->ret);
-     g_free(data);
- }
- 
-diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 9cf463d228..5c92c53ef0 100644
---- a/include/qemu/job.h
-+++ b/include/qemu/job.h
-@@ -124,12 +124,12 @@ typedef struct Job {
-     /** Estimated progress_current value at the completion of the job */
-     int64_t progress_total;
- 
--    /** Error string for a failed job (NULL if, and only if, job->ret == 0) */
--    char *error;
--
-     /** ret code passed to job_completed. */
-     int ret;
- 
-+    /** Error object for a failed job **/
-+    Error *err;
-+
-     /** The completion function that will be called when the job completes.  */
-     BlockCompletionFunc *cb;
- 
-@@ -484,15 +484,13 @@ void job_transition_to_ready(Job *job);
- /**
-  * @job: The job being completed.
-  * @ret: The status code.
-- * @error: The error message for a failing job (only with @ret < 0). If @ret is
-- *         negative, but NULL is given for @error, strerror() is used.
-  *
-  * Marks @job as completed. If @ret is non-zero, the job transaction it is part
-  * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
-  * is the last job to complete in its transaction, all jobs in the transaction
-  * move from WAITING to PENDING.
-  */
--void job_completed(Job *job, int ret, Error *error);
-+void job_completed(Job *job, int ret);
- 
- /** Asynchronously complete the specified @job. */
- void job_complete(Job *job, Error **errp);
-diff --git a/job-qmp.c b/job-qmp.c
-index 410775df61..a969b2bbf0 100644
---- a/job-qmp.c
-+++ b/job-qmp.c
-@@ -146,8 +146,9 @@ static JobInfo *job_query_single(Job *job, Error **errp)
-         .status             = job->status,
-         .current_progress   = job->progress_current,
-         .total_progress     = job->progress_total,
--        .has_error          = !!job->error,
--        .error              = g_strdup(job->error),
-+        .has_error          = !!job->err,
-+        .error              = job->err ? \
-+                              g_strdup(error_get_pretty(job->err)) : NULL,
-     };
- 
-     return info;
-diff --git a/job.c b/job.c
-index 76988f6678..bc1d970df4 100644
---- a/job.c
-+++ b/job.c
-@@ -369,7 +369,7 @@ void job_unref(Job *job)
- 
-         QLIST_REMOVE(job, job_list);
- 
--        g_free(job->error);
-+        error_free(job->err);
-         g_free(job->id);
-         g_free(job);
-     }
-@@ -546,7 +546,7 @@ static void coroutine_fn job_co_entry(void *opaque)
- 
-     assert(job && job->driver && job->driver->run);
-     job_pause_point(job);
--    job->ret = job->driver->run(job, NULL);
-+    job->ret = job->driver->run(job, &job->err);
- }
- 
- 
-@@ -666,8 +666,8 @@ static void job_update_rc(Job *job)
-         job->ret = -ECANCELED;
-     }
-     if (job->ret) {
--        if (!job->error) {
--            job->error = g_strdup(strerror(-job->ret));
-+        if (!job->err) {
-+            error_setg(&job->err, "%s", g_strdup(strerror(-job->ret)));
-         }
-         job_state_transition(job, JOB_STATUS_ABORTING);
-     }
-@@ -865,17 +865,11 @@ static void job_completed_txn_success(Job *job)
-     }
- }
- 
--void job_completed(Job *job, int ret, Error *error)
-+void job_completed(Job *job, int ret)
- {
-     assert(job && job->txn && !job_is_completed(job));
- 
-     job->ret = ret;
--    if (error) {
--        assert(job->ret < 0);
--        job->error = g_strdup(error_get_pretty(error));
--        error_free(error);
--    }
--
-     job_update_rc(job);
-     trace_job_completed(job, ret, job->ret);
-     if (job->ret) {
-@@ -893,7 +887,7 @@ void job_cancel(Job *job, bool force)
-     }
-     job_cancel_async(job, force);
-     if (!job_started(job)) {
--        job_completed(job, -ECANCELED, NULL);
-+        job_completed(job, -ECANCELED);
-     } else if (job->deferred_to_main_loop) {
-         job_completed_txn_abort(job);
-     } else {
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index a7533861f6..00604dfc0c 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -754,7 +754,7 @@ typedef struct TestBlockJob {
- 
- static void test_job_completed(Job *job, void *opaque)
- {
--    job_completed(job, 0, NULL);
-+    job_completed(job, 0);
- }
- 
- static int coroutine_fn test_job_run(Job *job, Error **errp)
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index 3194924071..82cedee78b 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -34,7 +34,7 @@ static void test_block_job_complete(Job *job, void *opaque)
-         rc = -ECANCELED;
-     }
- 
--    job_completed(job, rc, NULL);
-+    job_completed(job, rc);
-     bdrv_unref(bs);
- }
- 
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index b0462bfdec..408a226939 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -167,7 +167,7 @@ static void cancel_job_completed(Job *job, void *opaque)
- {
-     CancelJob *s = opaque;
-     s->completed = true;
--    job_completed(job, 0, NULL);
-+    job_completed(job, 0);
- }
- 
- static void cancel_job_complete(Job *job, Error **errp)
+Removing this recursive lock acquisition is necessary for converting
+mirror to only modify its graph post-finalization, but it's also just
+safer and will bite us less in the future.
+
+This series introduces a job->exit callback, but after jobs are
+fully transitioned to using the .commit/.abort callbacks in Pt 2,
+this new completion callback will be removed again. It's only here
+as a crutch to let us investigate the completion refactoring in Pt 2
+more carefully.
+
+V2:
+
+001/9:[----] [--] 'jobs: change start callback to run callback'
+002/9:[0003] [FC] 'jobs: canonize Error object'
+003/9:[0005] [FC] 'jobs: add exit shim'
+004/9:[0002] [FC] 'block/commit: utilize job_exit shim'
+005/9:[----] [--] 'block/mirror: utilize job_exit shim'
+006/9:[----] [--] 'jobs: utilize job_exit shim'
+007/9:[down] 'block/backup: make function variables consistently named'
+008/9:[down] 'jobs: remove ret argument to job_completed; privatize it'
+009/9:[----] [--] 'jobs: remove job_defer_to_main_loop'
+
+002: Update commit message
+     Remove errant space (Eric, Max)
+     Update error message setting (Kevin)
+003: Add comment clarifying that .exit is temporary/transitional (Max, Eric)
+004: change reference from `ret` to `job->ret`
+     (Note: most of these references go away in Pt 2 of the series,
+            except for those in mirror_exit.) (for Max.)
+007: Added, at Eric's suggestion.
+008: Moved forward from Pt 2 of the series. (Max.)
+
+Hopefully this version makes the trajectory clearer.
+--js
+
+John Snow (9):
+  jobs: change start callback to run callback
+  jobs: canonize Error object
+  jobs: add exit shim
+  block/commit: utilize job_exit shim
+  block/mirror: utilize job_exit shim
+  jobs: utilize job_exit shim
+  block/backup: make function variables consistently named
+  jobs: remove ret argument to job_completed; privatize it
+  jobs: remove job_defer_to_main_loop
+
+ block/backup.c            | 81 +++++++++++++++++++----------------------------
+ block/commit.c            | 29 ++++++-----------
+ block/create.c            | 19 ++++-------
+ block/mirror.c            | 35 +++++++++-----------
+ block/stream.c            | 29 +++++++----------
+ include/qemu/job.h        | 62 +++++++++++++++---------------------
+ job-qmp.c                 |  5 +--
+ job.c                     | 73 +++++++++++++++---------------------------
+ tests/test-bdrv-drain.c   | 13 +++-----
+ tests/test-blockjob-txn.c | 25 ++++++---------
+ tests/test-blockjob.c     | 17 +++++-----
+ trace-events              |  2 +-
+ 12 files changed, 150 insertions(+), 240 deletions(-)
+
 -- 
 2.14.4
