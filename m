@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskM-0000Rl-EF
+	(envelope-from <armbru@redhat.com>) id 1fsskM-0000Ri-Dl
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsskK-0006KW-RY
+	(envelope-from <armbru@redhat.com>) id 1fsskK-0006KF-Jc
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56206 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40962 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskK-0006Jo-L8
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsskK-0006JO-9X
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:46:08 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:40:10 +0200
-Message-Id: <20180823164025.12553-44-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:40:15 +0200
+Message-Id: <20180823164025.12553-49-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 43/58] qjson: Fix qobject_from_json() &
- friends for multiple values
+Subject: [Qemu-devel] [PATCH v3 48/58] json: Enforce token count and size
+ limits more tightly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +27,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-qobject_from_json() & friends use the consume_json() callback to
-receive either a value or an error from the parser.
-
-When they are fed a string that contains more than either one JSON
-value or one JSON syntax error, consume_json() gets called multiple
-times.
-
-When the last call receives a value, qobject_from_json() returns that
-value.  Any other values are leaked.
-
-When any call receives an error, qobject_from_json() sets the first
-error received.  Any other errors are thrown away.
-
-When values follow errors, qobject_from_json() returns both a value
-and sets an error.  That's bad.  Impact:
-
-* block.c's parse_json_protocol() ignores and leaks the value.  It's
-  used to to parse pseudo-filenames starting with "json:".  The
-  pseudo-filenames can come from the user or from image meta-data such
-  as a QCOW2 image's backing file name.
-
-* vl.c's parse_display_qapi() ignores and leaks the error.  It's used
-  to parse the argument of command line option -display.
-
-* vl.c's main() case QEMU_OPTION_blockdev ignores the error and leaves
-  it in @err.  main() will then pass a pointer to a non-null Error *
-  to net_init_clients(), which is forbidden.  It can lead to assertion
-  failure or other misbehavior.
-
-* check-qjson.c's multiple_values() demonstrates the badness.
-
-* The other callers are not affected since they only pass strings with
-  exactly one JSON value or, in the case of negative tests, one
-  error.
-
-The impact on the _nofail() functions is relatively harmless.  They
-abort when any call receives an error.  Else they return the last
-value, and leak the others, if any.
-
-Fix consume_json() as follows.  On the first call, save value and
-error as before.  On subsequent calls, if any, don't save them.  If
-the first call saved a value, the next call, if any, replaces the
-value by an "Expecting at most one JSON value" error.  Take care not
-to leak values or errors that aren't saved.
+Token count and size limits exist to guard against excessive heap
+usage.  We check them only after we created the token on the heap.
+That's assigning a cowboy to the barn to lasso the horse after it has
+bolted.  Close the barn door instead: check before we create the
+token.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/qjson.c     | 15 ++++++++++++++-
- tests/check-qjson.c | 10 +++-------
- 2 files changed, 17 insertions(+), 8 deletions(-)
+ qobject/json-streamer.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/qobject/qjson.c b/qobject/qjson.c
-index 7395556069..7f69036487 100644
---- a/qobject/qjson.c
-+++ b/qobject/qjson.c
-@@ -33,8 +33,21 @@ static void consume_json(void *opaque, QObject *json, Error *err)
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index 674dfe6e85..810aae521f 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -20,7 +20,7 @@
+ 
+ #define MAX_TOKEN_SIZE (64ULL << 20)
+ #define MAX_TOKEN_COUNT (2ULL << 20)
+-#define MAX_NESTING (1ULL << 10)
++#define MAX_NESTING (1 << 10)
+ 
+ static void json_message_free_token(void *token, void *opaque)
  {
-     JSONParsingState *s = opaque;
+@@ -71,6 +71,23 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+         break;
+     }
  
-+    assert(!json != !err);
-+    assert(!s->result || !s->err);
++    /*
++     * Security consideration, we limit total memory allocated per object
++     * and the maximum recursion depth that a message can force.
++     */
++    if (parser->token_size + input->len + 1 > MAX_TOKEN_SIZE) {
++        error_setg(&err, "JSON token size limit exceeded");
++        goto out_emit;
++    }
++    if (g_queue_get_length(parser->tokens) + 1 > MAX_TOKEN_COUNT) {
++        error_setg(&err, "JSON token count limit exceeded");
++        goto out_emit;
++    }
++    if (parser->bracket_count + parser->brace_count > MAX_NESTING) {
++        error_setg(&err, "JSON nesting depth limit exceeded");
++        goto out_emit;
++    }
 +
-+    if (s->result) {
-+        qobject_unref(s->result);
-+        s->result = NULL;
-+        error_setg(&s->err, "Expecting at most one JSON value");
-+    }
-+    if (s->err) {
-+        qobject_unref(json);
-+        error_free(err);
-+        return;
-+    }
-     s->result = json;
--    error_propagate(&s->err, err);
-+    s->err = err;
- }
+     token = g_malloc(sizeof(JSONToken) + input->len + 1);
+     token->type = type;
+     memcpy(token->str, input->str, input->len);
+@@ -91,23 +108,6 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+         goto out_emit;
+     }
  
- /*
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index f344ad921c..f9438370d9 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -1443,17 +1443,13 @@ static void multiple_values(void)
-     Error *err = NULL;
-     QObject *obj;
+-    /*
+-     * Security consideration, we limit total memory allocated per object
+-     * and the maximum recursion depth that a message can force.
+-     */
+-    if (parser->token_size > MAX_TOKEN_SIZE) {
+-        error_setg(&err, "JSON token size limit exceeded");
+-        goto out_emit;
+-    }
+-    if (g_queue_get_length(parser->tokens) > MAX_TOKEN_COUNT) {
+-        error_setg(&err, "JSON token count limit exceeded");
+-        goto out_emit;
+-    }
+-    if (parser->bracket_count + parser->brace_count > MAX_NESTING) {
+-        error_setg(&err, "JSON nesting depth limit exceeded");
+-        goto out_emit;
+-    }
+-
+     return;
  
--    /* BUG this leaks the syntax tree for "false" */
-     obj = qobject_from_json("false true", &err);
--    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
--    g_assert(!err);
--    qobject_unref(obj);
-+    error_free_or_abort(&err);
-+    g_assert(obj == NULL);
- 
--    /* BUG simultaneously succeeds and fails */
-     obj = qobject_from_json("} true", &err);
--    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
-     error_free_or_abort(&err);
--    qobject_unref(obj);
-+    g_assert(obj == NULL);
- }
- 
- int main(int argc, char **argv)
+ out_emit:
 -- 
 2.17.1
