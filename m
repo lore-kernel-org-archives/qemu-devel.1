@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmD-00052U-F8
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmF-00053f-V3
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:36:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspm9-0000Bp-Bl
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:53 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41922 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmA-0000Eb-AX
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:55 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:41930 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fspm8-000085-KA
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:48 -0400
+	id 1fspm9-0000AH-SS
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:50 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 15:34:20 +0200
-Message-Id: <1535031276-22911-31-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 15:34:27 +0200
+Message-Id: <1535031276-22911-38-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v4 30/46] target/mips: Add emulation of DSP ASE
- for nanoMIPS - part 2
+Subject: [Qemu-devel] [PULL v4 37/46] target/mips: Add updating BadInstr and
+ BadInstrX for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +30,43 @@ Cc: peter.maydell@linaro.org
 
 From: Stefan Markovic <smarkovic@wavecomp.com>
 
-Add emulation of DSP ASE instructions for nanoMIPS - part 2.
+Update BadInstr and BadInstrX registers for nanoMIPS. The same
+support for pre-nanoMIPS remains unimplemented.
 
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ target/mips/helper.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index d3635e7..59dcd87 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -19316,6 +19316,16 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                 case NM_BC1NEZC:
-                     gen_compute_branch_cp1_nm(ctx, OPC_BC1NEZ, rt, s);
-                     break;
-+                case NM_BPOSGE32C:
-+                    check_dspr2(ctx);
-+                    {
-+                        int32_t imm = extract32(ctx->opcode, 1, 13) |
-+                                      extract32(ctx->opcode, 0, 1) << 13;
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index e215af9..f0c268b 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -682,6 +682,22 @@ static void set_hflags_for_handler (CPUMIPSState *env)
+ 
+ static inline void set_badinstr_registers(CPUMIPSState *env)
+ {
++    if (env->insn_flags & ISA_NANOMIPS32) {
++        if (env->CP0_Config3 & (1 << CP0C3_BI)) {
++            uint32_t instr = (cpu_lduw_code(env, env->active_tc.PC)) << 16;
++            if ((instr & 0x10000000) == 0) {
++                instr |= cpu_lduw_code(env, env->active_tc.PC + 2);
++            }
++            env->CP0_BadInstr = instr;
 +
-+                        gen_compute_branch_nm(ctx, OPC_BPOSGE32, 4, -1, -2,
-+                                              imm);
-+                    }
-+                    break;
-                 default:
-                     generate_exception_end(ctx, EXCP_RI);
-                     break;
++            if ((instr & 0xFC000000) == 0x60000000) {
++                instr = cpu_lduw_code(env, env->active_tc.PC + 4) << 16;
++                env->CP0_BadInstrX = instr;
++            }
++        }
++        return;
++    }
++
+     if (env->hflags & MIPS_HFLAG_M16) {
+         /* TODO: add BadInstr support for microMIPS */
+         return;
 -- 
 2.7.4
