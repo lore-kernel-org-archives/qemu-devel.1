@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmJ-00056k-5E
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:36:02 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmJ-00056b-1U
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:36:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmA-0000F8-MM
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41935 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmA-0000F1-K8
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:58 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:41931 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fspmA-0000B7-2P
+	id 1fspmA-0000AL-1b
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:50 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 15:34:31 +0200
-Message-Id: <1535031276-22911-42-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 15:34:28 +0200
+Message-Id: <1535031276-22911-39-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v4 41/46] elf: On elf loading,
- treat both EM_MIPS and EM_NANOMIPS as legal for MIPS
+Subject: [Qemu-devel] [PULL v4 38/46] target/mips: Fix ERET/ERETNC behavior
+ related to ADEL exception
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +28,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Modify load_elf32()/load_elf64() to treat EM_NANOMIPS as legal as
-EM_MIPS is.
+Fix ERET/ERETNC so that ADEL exception can be raised.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- include/hw/elf_ops.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/mips/op_helper.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index b6e19e3..81cecaf 100644
---- a/include/hw/elf_ops.h
-+++ b/include/hw/elf_ops.h
-@@ -327,6 +327,14 @@ static int glue(load_elf, SZ)(const char *name, int fd,
-                 }
-             }
-             break;
-+        case EM_MIPS:
-+        case EM_NANOMIPS:
-+            if ((ehdr.e_machine != EM_MIPS) &&
-+                (ehdr.e_machine != EM_NANOMIPS)) {
-+                ret = ELF_LOAD_WRONG_ARCH;
-+                goto fail;
-+            }
-+            break;
-         default:
-             if (elf_machine != ehdr.e_machine) {
-                 ret = ELF_LOAD_WRONG_ARCH;
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index b3eef9f..c148b31 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -2427,10 +2427,12 @@ void helper_eretnc(CPUMIPSState *env)
+ void helper_deret(CPUMIPSState *env)
+ {
+     debug_pre_eret(env);
+-    set_pc(env, env->CP0_DEPC);
+ 
+     env->hflags &= ~MIPS_HFLAG_DM;
+     compute_hflags(env);
++
++    set_pc(env, env->CP0_DEPC);
++
+     debug_post_eret(env);
+ }
+ #endif /* !CONFIG_USER_ONLY */
 -- 
 2.7.4
