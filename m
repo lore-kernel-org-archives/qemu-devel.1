@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgT-0003T9-Al
+	(envelope-from <armbru@redhat.com>) id 1fssgT-0003Z5-Dc
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsser-0003Wb-Li
+	(envelope-from <armbru@redhat.com>) id 1fsser-0003Wl-Lv
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44708 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59400 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsser-0003W0-Ef
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsser-0003W7-Ej
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:29 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:29 +0200
-Message-Id: <20180823164025.12553-3-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:30 +0200
+Message-Id: <20180823164025.12553-4-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 02/58] check-qjson: Cover multiple JSON
- objects in same string
+Subject: [Qemu-devel] [PATCH v3 03/58] check-qjson: Cover blank and
+ lexically erroneous input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +27,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-qobject_from_json() & friends misbehave when the JSON text has more
-than one JSON value.  Add test coverage to demonstrate the bugs.
+qobject_from_json() can return null without setting an error on
+lexical errors.  I call that a bug.  Add test coverage to demonstrate
+it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ tests/check-qjson.c | 40 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 37 insertions(+), 3 deletions(-)
 
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index eaf5d20663..cc952c56ea 100644
+index cc952c56ea..4daadc272b 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -1418,6 +1418,25 @@ static void limits_nesting(void)
-     g_assert(obj == NULL);
- }
+@@ -1307,8 +1307,40 @@ static void simple_varargs(void)
  
-+static void multiple_values(void)
+ static void empty_input(void)
+ {
+-    const char *empty = "";
+-    QObject *obj = qobject_from_json(empty, &error_abort);
++    QObject *obj = qobject_from_json("", &error_abort);
++    g_assert(obj == NULL);
++}
++
++static void blank_input(void)
 +{
++    QObject *obj = qobject_from_json("\n ", &error_abort);
++    g_assert(obj == NULL);
++}
++
++static void junk_input(void)
++{
++    /* Note: junk within strings is covered elsewhere */
 +    Error *err = NULL;
 +    QObject *obj;
 +
-+    /* BUG this leaks the syntax tree for "false" */
-+    obj = qobject_from_json("false true", &err);
-+    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
-+    g_assert(!err);
-+    qobject_unref(obj);
++    obj = qobject_from_json("@", &err);
++    g_assert(!err);             /* BUG */
++    g_assert(obj == NULL);
 +
-+    /* BUG simultaneously succeeds and fails */
-+    /* BUG calls json_parser_parse() with errp pointing to non-null */
-+    obj = qobject_from_json("} true", &err);
-+    g_assert(qbool_get_bool(qobject_to(QBool, obj)));
++    obj = qobject_from_json("[0\xFF]", &err);
 +    error_free_or_abort(&err);
-+    qobject_unref(obj);
-+}
++    g_assert(obj == NULL);
 +
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -1455,6 +1474,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/errors/invalid_dict_comma", invalid_dict_comma);
-     g_test_add_func("/errors/unterminated/literal", unterminated_literal);
-     g_test_add_func("/errors/limits/nesting", limits_nesting);
-+    g_test_add_func("/errors/multiple_values", multiple_values);
- 
-     return g_test_run();
++    obj = qobject_from_json("00", &err);
++    g_assert(!err);             /* BUG */
++    g_assert(obj == NULL);
++
++    obj = qobject_from_json("[1e", &err);
++    g_assert(!err);             /* BUG */
++    g_assert(obj == NULL);
++
++    obj = qobject_from_json("truer", &err);
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
  }
+ 
+@@ -1462,7 +1494,9 @@ int main(int argc, char **argv)
+ 
+     g_test_add_func("/varargs/simple_varargs", simple_varargs);
+ 
+-    g_test_add_func("/errors/empty_input", empty_input);
++    g_test_add_func("/errors/empty", empty_input);
++    g_test_add_func("/errors/blank", blank_input);
++    g_test_add_func("/errors/junk", junk_input);
+     g_test_add_func("/errors/unterminated/string", unterminated_string);
+     g_test_add_func("/errors/unterminated/escape", unterminated_escape);
+     g_test_add_func("/errors/unterminated/sq_string", unterminated_sq_string);
 -- 
 2.17.1
