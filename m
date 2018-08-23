@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsck7-0005mC-17
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 19:40:51 -0400
+	(envelope-from <lightn1ngstr1ke@protonmail.com>) id 1fseVE-0006fD-QJ
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 21:33:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsck6-0001d2-9M
-	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 19:40:50 -0400
-References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-7-jsnow@redhat.com>
-	<ce27055e-4a00-348b-9234-05a5e0e0af13@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5a08f2fa-ccdb-3219-0ff8-65e38d7c06eb@redhat.com>
-Date: Wed, 22 Aug 2018 19:40:41 -0400
+	(envelope-from <lightn1ngstr1ke@protonmail.com>) id 1fseLX-0002Fg-Gg
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 21:23:38 -0400
+Received: from mail-40136.protonmail.ch ([185.70.40.136]:56562)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lightn1ngstr1ke@protonmail.com>)
+	id 1fseLW-0002EE-VD
+	for qemu-devel@nongnu.org; Wed, 22 Aug 2018 21:23:35 -0400
+Date: Thu, 23 Aug 2018 01:23:20 +0000
+From: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
+Reply-To: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
+Message-ID: <petKSachdmuxWMgY2EXHzES3PpUCAUwQacKEaIU9PHykNXfsah1sP3OaVuDLz0VBYJM7qtJsWSrv3U9bkb_2LT_itBxDbAYKIHlEJJXtEiE=@protonmail.com>
 MIME-Version: 1.0
-In-Reply-To: <ce27055e-4a00-348b-9234-05a5e0e0af13@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/7] jobs: utilize job_exit shim
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel]  [PATCH] input-linux: toggle for lock keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
 
-
-
-On 08/22/2018 08:20 AM, Max Reitz wrote:
-> On 2018-08-17 21:04, John Snow wrote:
->> Utilize the job_exit shim by not calling job_defer_to_main_loop, and
->> where applicable, converting the deferred callback into the job_exit
->> callback.
->>
->> This converts backup, stream, create, and the unit tests all at once.
->> None of these jobs undergo and order of operations changes, so it should
->> be a mechanical change.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/backup.c            | 16 ----------------
->>  block/create.c            | 14 +++-----------
->>  block/stream.c            | 22 +++++++---------------
->>  tests/test-bdrv-drain.c   |  6 ------
->>  tests/test-blockjob-txn.c | 11 ++---------
->>  tests/test-blockjob.c     | 10 ++++------
->>  6 files changed, 16 insertions(+), 63 deletions(-)
-> 
-> [...]
-> 
->> diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
->> index 82cedee78b..ef29f35e44 100644
->> --- a/tests/test-blockjob-txn.c
->> +++ b/tests/test-blockjob-txn.c
->> @@ -24,17 +24,11 @@ typedef struct {
->>      int *result;
->>  } TestBlockJob;
->>  
->> -static void test_block_job_complete(Job *job, void *opaque)
->> +static void test_block_job_exit(Job *job)
->>  {
->>      BlockJob *bjob = container_of(job, BlockJob, job);
->>      BlockDriverState *bs = blk_bs(bjob->blk);
->> -    int rc = (intptr_t)opaque;
->>  
->> -    if (job_is_cancelled(job)) {
->> -        rc = -ECANCELED;
->> -    }
->> -
->> -    job_completed(job, rc);
->>      bdrv_unref(bs);
->>  }
-> 
-> That is a change in the order of operations, actually.  It's OK though
-> because the BDS is still owned by the block job's BlockBackend.
-> 
-> (So I'd give an R-b, but I'm still unsure about the .exit() interface.)
-> 
-> Max
-> 
-
-Good eye; it does change the order of operations here, but like the
-preceding two patches it should be safe for the same reasons.
-
-I'll just update the commit message to keep things easier.
+VGhpcyBwYXRjaCBpbnRyb2R1Y2VzIHRocmVlIG5ldyBvcHRpb25zIG9uIHRoZSBpbnB1dC1saW51
+eCBjb21tYW5kbGluZToKCihhKSBpZ25vcmVfY2Fwc19sb2NrPVtvbnxvZmZdCihiKSBpZ25vcmVf
+bnVtX2xvY2s9W29ufG9mZl0KKGMpIGlnbm9yZV9zY3JvbGxfbG9jaz1bb258b2ZmXQoKSWYgZW5h
+YmxlZCwgdGhlIGtleSB3aWxsIGJlIGRpc2FibGVkIGFuZCBub3QgZm9yd2FyZGVkIHRvIHRoZSBn
+dWVzdC4KVGhlcmUgYXJlIHR3byBtYWluIHJlYXNvbnMgZm9yIHRoaXM6CgooYSkgV2l0aG91dCBr
+ZXlib2FyZCBMRURzLCBpdCBjYW4gYmUgZGlmZmljdWx0IHRvIHRlbGwgd2hldGhlciBpdCBpcwpl
+bmFibGVkIG9yIG5vdAooYikgUHJlcGFyYXRpb24gZm9yIGFub3RoZXIgcGF0Y2ggd2hpY2ggd2ls
+bCBhbGxvdyBjaGFuZ2luZyB0aGUga2V5cwp1c2VkIHRvIHRvZ2dsZSB0aGUgaW5wdXQgZGV2aWNl
+J3MgZ3JhYi4gSWYgeW91IHNldCB0aGUga2V5IHRvCktFWV9TQ1JPTExMT0NLIGZvciBleGFtcGxl
+LCBpdCBjYW4gYmUgZnJ1c3RyYXRpbmcgZGlzYWJsaW5nIHNjcm9sbCBsb2NrCmluIHRoZSBndWVz
+dCwgYXMgaXQgd2lsbCByZXF1aXJlIHByZXNzaW5nIHRoZSBrZXkgbW9yZSB0aGFuIHR3aWNlLgoK
+SSdtIG5ldyB0byB0aGlzLCBzbyBpZiBJJ3ZlIG1hZGUgYSBtaXN0YWtlLCBsZXQgbWUga25vdyA7
+LSkKClNpZ25lZC1vZmYtYnk6IFJ5YW4gRWwgS29jaHRhIDxsaWdodG4xbmdzdHIxa2VAcHJvdG9u
+bWFpbC5jb20+Ci0tLQp1aS9pbnB1dC1saW51eC5jIHwgODAgKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKy0tCjEgZmlsZSBjaGFuZ2VkLCA3OCBpbnNlcnRpb25z
+KCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3VpL2lucHV0LWxpbnV4LmMgYi91aS9p
+bnB1dC1saW51eC5jCmluZGV4IDk3MjAzMzNiMmMuLjA1OWQwYzAyYTcgMTAwNjQ0Ci0tLSBhL3Vp
+L2lucHV0LWxpbnV4LmMKKysrIGIvdWkvaW5wdXQtbGludXguYwpAQCAtNjMsNiArNjMsMTAgQEAg
+c3RydWN0IElucHV0TGludXggewogICAgIHN0cnVjdCBpbnB1dF9ldmVudCBldmVudDsKICAgICBp
+bnQgICAgICAgICByZWFkX29mZnNldDsKCisgICAgYm9vbCAgICAgICAgaWdub3JlX2NhcHNfbG9j
+azsKKyAgICBib29sICAgICAgICBpZ25vcmVfbnVtX2xvY2s7CisgICAgYm9vbCAgICAgICAgaWdu
+b3JlX3Njcm9sbF9sb2NrOworCiAgICAgUVRBSUxRX0VOVFJZKElucHV0TGludXgpIG5leHQ7Cn07
+CgpAQCAtOTgsNiArMTAyLDIxIEBAIHN0YXRpYyB2b2lkIGlucHV0X2xpbnV4X3RvZ2dsZV9ncmFi
+KElucHV0TGludXggKmlsKQogICAgIH0KfQoKK3N0YXRpYyBib29sIGlucHV0X2xpbnV4X2lnbm9y
+ZV9ldmVudChJbnB1dExpbnV4ICppbCwKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBzdHJ1Y3QgaW5wdXRfZXZlbnQgKmV2ZW50KQoreworICAgIGlmIChpbC0+aWdub3JlX2Nh
+cHNfbG9jayAmJiBldmVudC0+Y29kZSA9PSBLRVlfQ0FQU0xPQ0spIHsKKyAgICAgICAgcmV0dXJu
+IHRydWU7CisgICAgfQorICAgIGlmIChpbC0+aWdub3JlX251bV9sb2NrICYmIGV2ZW50LT5jb2Rl
+ID09IEtFWV9OVU1MT0NLKSB7CisgICAgICAgIHJldHVybiB0cnVlOworICAgIH0KKyAgICBpZiAo
+aWwtPmlnbm9yZV9zY3JvbGxfbG9jayAmJiBldmVudC0+Y29kZSA9PSBLRVlfU0NST0xMTE9DSykg
+eworICAgICAgICByZXR1cm4gdHJ1ZTsKKyAgICB9CisgICAgcmV0dXJuIGZhbHNlOworfQorCnN0
+YXRpYyB2b2lkIGlucHV0X2xpbnV4X2hhbmRsZV9rZXlib2FyZChJbnB1dExpbnV4ICppbCwKICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3QgaW5wdXRfZXZlbnQg
+KmV2ZW50KQp7CkBAIC0xMjcsOCArMTQ2LDExIEBAIHN0YXRpYyB2b2lkIGlucHV0X2xpbnV4X2hh
+bmRsZV9rZXlib2FyZChJbnB1dExpbnV4ICppbCwKICAgICAgICAgICAgIGlsLT5rZXljb3VudC0t
+OwogICAgICAgICB9CgotICAgICAgICAvKiBzZW5kIGV2ZW50IHRvIGd1ZXN0IHdoZW4gZ3JhYiBp
+cyBhY3RpdmUgKi8KLSAgICAgICAgaWYgKGlsLT5ncmFiX2FjdGl2ZSkgeworICAgICAgICAvKgor
+ICAgICAgICAgKiBzZW5kIGV2ZW50IHRvIGd1ZXN0IHdoZW4gZ3JhYiBpcyBhY3RpdmUsCisgICAg
+ICAgICAqIGlnbm9yaW5nIGNhcHMvbnVtL3Njcm9sbCBsb2NrIHdoZW4gaWdub3JlIGJpdCBzZXQK
+KyAgICAgICAgICovCisgICAgICAgIGlmIChpbC0+Z3JhYl9hY3RpdmUgJiYgIWlucHV0X2xpbnV4
+X2lnbm9yZV9ldmVudChpbCwgZXZlbnQpKSB7CiAgICAgICAgICAgICBpbnQgcWNvZGUgPSBxZW11
+X2lucHV0X2xpbnV4X3RvX3Fjb2RlKGV2ZW50LT5jb2RlKTsKICAgICAgICAgICAgIHFlbXVfaW5w
+dXRfZXZlbnRfc2VuZF9rZXlfcWNvZGUoTlVMTCwgcWNvZGUsIGV2ZW50LT52YWx1ZSk7CiAgICAg
+ICAgIH0KQEAgLTQxMCw2ICs0MzIsNTEgQEAgc3RhdGljIHZvaWQgaW5wdXRfbGludXhfc2V0X3Jl
+cGVhdChPYmplY3QgKm9iaiwgYm9vbCB2YWx1ZSwKICAgICBpbC0+cmVwZWF0ID0gdmFsdWU7Cn0K
+CitzdGF0aWMgYm9vbCBpbnB1dF9saW51eF9nZXRfaWdub3JlX2NhcHNfbG9jayhPYmplY3QgKm9i
+aiwgRXJyb3IgKiplcnJwKQoreworICAgIElucHV0TGludXggKmlsID0gSU5QVVRfTElOVVgob2Jq
+KTsKKworICAgIHJldHVybiBpbC0+aWdub3JlX2NhcHNfbG9jazsKK30KKworc3RhdGljIHZvaWQg
+aW5wdXRfbGludXhfc2V0X2lnbm9yZV9jYXBzX2xvY2soT2JqZWN0ICpvYmosIGJvb2wgdmFsdWUs
+CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVy
+cnApCit7CisgICAgSW5wdXRMaW51eCAqaWwgPSBJTlBVVF9MSU5VWChvYmopOworCisgICAgaWwt
+Pmlnbm9yZV9jYXBzX2xvY2sgPSB2YWx1ZTsKK30KKworc3RhdGljIGJvb2wgaW5wdXRfbGludXhf
+Z2V0X2lnbm9yZV9udW1fbG9jayhPYmplY3QgKm9iaiwgRXJyb3IgKiplcnJwKQoreworICAgIElu
+cHV0TGludXggKmlsID0gSU5QVVRfTElOVVgob2JqKTsKKworICAgIHJldHVybiBpbC0+aWdub3Jl
+X251bV9sb2NrOworfQorCitzdGF0aWMgdm9pZCBpbnB1dF9saW51eF9zZXRfaWdub3JlX251bV9s
+b2NrKE9iamVjdCAqb2JqLCBib29sIHZhbHVlLAorICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApCit7CisgICAgSW5wdXRMaW51eCAqaWwgPSBJ
+TlBVVF9MSU5VWChvYmopOworCisgICAgaWwtPmlnbm9yZV9udW1fbG9jayA9IHZhbHVlOworfQor
+CitzdGF0aWMgYm9vbCBpbnB1dF9saW51eF9nZXRfaWdub3JlX3Njcm9sbF9sb2NrKE9iamVjdCAq
+b2JqLCBFcnJvciAqKmVycnApCit7CisgICAgSW5wdXRMaW51eCAqaWwgPSBJTlBVVF9MSU5VWChv
+YmopOworCisgICAgcmV0dXJuIGlsLT5pZ25vcmVfc2Nyb2xsX2xvY2s7Cit9CisKK3N0YXRpYyB2
+b2lkIGlucHV0X2xpbnV4X3NldF9pZ25vcmVfc2Nyb2xsX2xvY2soT2JqZWN0ICpvYmosIGJvb2wg
+dmFsdWUsCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVy
+cm9yICoqZXJycCkKK3sKKyAgICBJbnB1dExpbnV4ICppbCA9IElOUFVUX0xJTlVYKG9iaik7CisK
+KyAgICBpbC0+aWdub3JlX3Njcm9sbF9sb2NrID0gdmFsdWU7Cit9CisKc3RhdGljIHZvaWQgaW5w
+dXRfbGludXhfaW5zdGFuY2VfaW5pdChPYmplY3QgKm9iaikKewogICAgIG9iamVjdF9wcm9wZXJ0
+eV9hZGRfc3RyKG9iaiwgImV2ZGV2IiwKQEAgLTQyMSw2ICs0ODgsMTUgQEAgc3RhdGljIHZvaWQg
+aW5wdXRfbGludXhfaW5zdGFuY2VfaW5pdChPYmplY3QgKm9iaikKICAgICBvYmplY3RfcHJvcGVy
+dHlfYWRkX2Jvb2wob2JqLCAicmVwZWF0IiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+aW5wdXRfbGludXhfZ2V0X3JlcGVhdCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5w
+dXRfbGludXhfc2V0X3JlcGVhdCwgTlVMTCk7CisgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9ib29s
+KG9iaiwgImlnbm9yZV9jYXBzX2xvY2siLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgICBp
+bnB1dF9saW51eF9nZXRfaWdub3JlX2NhcHNfbG9jaywKKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgaW5wdXRfbGludXhfc2V0X2lnbm9yZV9jYXBzX2xvY2ssIE5VTEwpOworICAgIG9iamVj
+dF9wcm9wZXJ0eV9hZGRfYm9vbChvYmosICJpZ25vcmVfbnVtX2xvY2siLAorICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBpbnB1dF9saW51eF9nZXRfaWdub3JlX251bV9sb2NrLAorICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9saW51eF9zZXRfaWdub3JlX251bV9sb2NrLCBO
+VUxMKTsKKyAgICBvYmplY3RfcHJvcGVydHlfYWRkX2Jvb2wob2JqLCAiaWdub3JlX3Njcm9sbF9s
+b2NrIiwKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfbGludXhfZ2V0X2lnbm9y
+ZV9zY3JvbGxfbG9jaywKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfbGludXhf
+c2V0X2lnbm9yZV9zY3JvbGxfbG9jaywgTlVMTCk7Cn0KCnN0YXRpYyB2b2lkIGlucHV0X2xpbnV4
+X2NsYXNzX2luaXQoT2JqZWN0Q2xhc3MgKm9jLCB2b2lkICpkYXRhKQotLQoyLjE4LjA=
