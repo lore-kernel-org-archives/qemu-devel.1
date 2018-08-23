@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([208.118.235.92]:56815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fsj9c-0000fJ-T7
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 02:31:37 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fsjyf-0006r0-JD
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 03:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fsj9Z-0005nt-Lw
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 02:31:36 -0400
-Received: from mga04.intel.com ([192.55.52.120]:15473)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1fsj9Z-0004Cx-BY
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 02:31:33 -0400
-Message-ID: <1535005708.4104.34.camel@linux.intel.com>
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Thu, 23 Aug 2018 14:28:28 +0800
-In-Reply-To: <20180818150548.GN15372@localhost.localdomain>
-References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-	<1533909989-56115-3-git-send-email-robert.hu@linux.intel.com>
-	<20180817131810.GA15372@localhost.localdomain>
-	<1534577221.4104.20.camel@linux.intel.com>
-	<20180818150548.GN15372@localhost.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] kvm: Add support to
- KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl
+	(envelope-from <borntraeger@de.ibm.com>) id 1fsjyb-0002Ot-Ke
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 03:24:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45726
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fsjyb-0002Od-FV
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 03:24:17 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w7N7NxMx098310
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 03:24:16 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2m1r06h7u5-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 03:24:16 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 23 Aug 2018 08:24:14 +0100
+References: <153496608036.29987.17320139395542439335.stgit@gimli.home>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 23 Aug 2018 09:24:10 +0200
+MIME-Version: 1.0
+In-Reply-To: <153496608036.29987.17320139395542439335.stgit@gimli.home>
+Content-Language: en-US
+Message-Id: <c3cc7022-743c-8e3c-d32f-304450393e80@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] postcopy: Synchronize usage of the balloon
+ inhibitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,143 +43,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: robert.hu@intel.com, robert.hu@linux.intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
+To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Cc: quintela@redhat.com, dgilbert@redhat.com, peter.maydell@linaro.org
 
-On Sat, 2018-08-18 at 12:05 -0300, Eduardo Habkost wrote:
 
-> > > >  
-> > > >  int kvm_has_pit_state2(void)
-> > > >  {
-> > > > @@ -420,6 +421,41 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-> > > >      return ret;
-> > > >  }
-> > > >  
-> > > > +uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
-> > > > +{
-> > > > +    struct {
-> > > > +        struct kvm_msrs info;
-> > > > +        struct kvm_msr_entry entries[1];
-> > > > +    } msr_data;
-> > > > +    uint32_t ret;
-> > > > +
-> > > > +    /*Check if the requested feature MSR is supported*/
-> > > > +    int i;
-> > > > +    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
-> > > > +        if (index == kvm_feature_msrs->indices[i]) {
-> > > > +            break;
-> > > > +        }
-> > > > +    }
-> > > 
-> > > We are duplicating the logic that's already inside KVM (checking
-> > > the list of supported MSRs and returning an error).  Can't we
-> > > make this simpler and just remove this check?  If the MSR is not
-> > > supported, KVM_GET_MSRS would just return 0.
-> > 
-> > Yes, seems dup. but if we remove this hunk, the
-> > kvm_get_supported_feature_msrs() is unnecessary at all.
-> 
-> So maybe kvm_get_supported_feature_msrs() really is unnecessary?
 
-I'll keep it, for 1) check KVM_CAP_GET_MSR_FEATURES capabilities; 2) get
-kvm_feature_msrs, so later kvm_arch_get_supported_msr_feature() use it
-to check if MSR features are supported.
+On 08/22/2018 09:32 PM, Alex Williamson wrote:
+> While the qemu_balloon_inhibit() interface appears rather general purpose,
+> postcopy uses it in a last-caller-wins approach with no guarantee of balanced
+> inhibits and de-inhibits.  Wrap postcopy's usage of the inhibitor to give it
+> one vote overall, using the same last-caller-wins approach as previously
+> implemented at the balloon level.
 > 
-> We seem to have two alternatives:
-> * calling KVM_GET_MSRS for all MSRs only once, at
->   kvm_get_supported_feature_msrs() (as I had suggested
->   previously);
-> * calling KVM_GET_MSRS for one MSR unconditionally here, but
->   _not_ treating 0 as a fatal error.
+> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Fixes: 01ccbec7bdf6 ("balloon: Allow multiple inhibit users")
+
+This make qemu iotest 169 working again. 
+
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
 > 
-> I prefer the former, but I would be OK with both alternatives.
-> Note that we need to check for KVM capabilities in both cases.
+> Note that checkpatch.pl doesn't appreciate the initialization of the
+> static variable to false, imo it improves the readability of the code
+> in this instance, so I've left it.  Shout if you disagree.
 > 
+> If this gets acks I can include it with a pull request for a couple
+> other fixes to the original series.  Thanks
 > 
-I'll choose the latter :).
-> > > 
-> > > > +    if (i >= kvm_feature_msrs->nmsrs) {
-> > > > +        fprintf(stderr, "Requested MSR (index= %d) is not supported.\n", index);
-> > > 
-> > > This error message is meaningless for QEMU users.  Do we really
-> > > need to print it?
-> > > 
-> > > > +        return 0;
-> > > 
-> > > Returning 0 for MSRs that are not supported is probably OK, but
-> > > we need to see this function being used, to be sure (I didn't
-> > > look at all the patches in this series yet).
-> > > 
-> > > > +    }
-> > > > +
-> > > > +    msr_data.info.nmsrs = 1;
-> > > > +    msr_data.entries[0].index = index;
-> > > > +
-> > > > +    ret = kvm_ioctl(s, KVM_GET_MSRS, &msr_data);
-> > > > +
-> > > > +    if (ret != 1) {
-> > > > +        fprintf(stderr, "KVM get MSR (index=0x%x) feature failed, %s\n",
-> > > > +            index, strerror(-ret));
-> > > > +        exit(1);
-> > > 
-> > > I'm not a fan of APIs that write to stdout/stderr or exit(),
-> > > unless they are clearly just initialization functions that should
-> > > never fail in normal circumstances.
-> > > 
-> > > But if you call KVM_GET_MSRS for all MSRs at
-> > > kvm_get_supported_feature_msrs() below, this function would never
-> > > need to report an error.
-> > > 
-> > > We are already going through the trouble of allocating
-> > > kvm_feature_msrs in kvm_get_supported_feature_msrs() anyway.
-> > 
-> > I had looked into KVM KVM_GET_MSRS handling, though less likely, still
-> > have changes copy_from/to_user() fail. Therefore I added the check and
-> > warning here, in that seldom case happens.
-> > 
-> > exit() or not, I'm also not sure. Seems not necessary, while my usual
-> > programming philosophy is never let wrong goes further. For in the case
-> > of ioctl(KVM_GET_MSRS) returns failure, something goes wrong underlying,
-> > I would prefer to let user know this, rather than let it pass and goes
-> > further.
+>  migration/postcopy-ram.c |   18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
 > 
-> We probably have no option other than exiting if KVM_GET_MSRS
-> returns an unexpected error.  It's just that I find the code
-> harder to review, because we need to be sure this won't terminate
-> QEMU under normal circumstances.
-> 
-> But if you demonstrate that all errors here are truly fatal and
-> unexpected, calling exit() may be OK.  (See the
-> KVM_CAP_GET_MSR_FEATURES comment below for one example where
-> exiting is not going to be OK.)
-> 
-> Proper error reporting using Error** would be even better than
-> exiting, but considering that none of the functions at i386/cpu.c
-> return errors using Error**, I won't force you to do that.
-> 
-Thanks.
-> 
-> > > 
-> [...]
-> > > > +        struct kvm_msr_list msr_list;
-> > > > +
-> > > > +        kvm_supported_feature_msrs++;
-> > > > +
-> > > > +        msr_list.nmsrs = 0;
-> > > > +        ret = kvm_ioctl(s, KVM_GET_MSR_FEATURE_INDEX_LIST, &msr_list);
-> > > > +        if (ret < 0 && ret != -E2BIG) {
-> > > > +            return ret;
-> > > 
-> > > What if the host KVM version doesn't support
-> > > KVM_GET_MSR_FEATURE_INDEX_LIST?
-> > 
-> > Going to add kvm_check_extension(s, KVM_CAP_GET_MSR_FEATURES) before
-> > this ioctl. if not support, return -1. (Then the kvm_init will fail and
-> > exit.)
-> 
-> We don't want QEMU to refuse to run if the kernel doesn't have
-> KVM_CAP_GET_MSR_FEATURES.  We can treat missing capability as
-> equivalent to returning an empty list of MSRs.
-Yes. I'll let caller (kvm_arch_init) ignore the return value but a
-simple warning.
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 932f18894990..c2e387ed44b4 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -509,6 +509,20 @@ int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+>      return 0;
+>  }
+>  
+> +/*
+> + * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
+> + * last caller wins.
+> + */
+> +static void postcopy_balloon_inhibit(bool state)
+> +{
+> +    static bool cur_state = false;
+> +
+> +    if (state != cur_state) {
+> +        qemu_balloon_inhibit(state);
+> +        cur_state = state;
+> +    }
+> +}
+> +
+>  /*
+>   * At the end of a migration where postcopy_ram_incoming_init was called.
+>   */
+> @@ -539,7 +553,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>          mis->have_fault_thread = false;
+>      }
+>  
+> -    qemu_balloon_inhibit(false);
+> +    postcopy_balloon_inhibit(false);
+>  
+>      if (enable_mlock) {
+>          if (os_mlock() < 0) {
+> @@ -1107,7 +1121,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+>       * Ballooning can mark pages as absent while we're postcopying
+>       * that would cause false userfaults.
+>       */
+> -    qemu_balloon_inhibit(true);
+> +    postcopy_balloon_inhibit(true);
+>  
+>      trace_postcopy_ram_enable_notify();
+>  
 > 
