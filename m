@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSO-0005Id-0u
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSO-0005Jz-RE
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSI-0004sr-76
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:27 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57134 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSI-0004tU-Ci
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:28 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:57137 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fsqSH-0004qo-MQ
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:21 -0400
+	id 1fsqSH-0004r7-QA
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:22 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 16:18:55 +0200
-Message-Id: <1535033941-861-41-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 16:18:58 +0200
+Message-Id: <1535033941-861-44-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535033941-861-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535033941-861-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v5 40/46] elf: Relax MIPS' elf_check_arch() to
- accept EM_NANOMIPS too
+Subject: [Qemu-devel] [PULL v5 43/46] mips_malta: Add basic nanoMIPS boot
+ code for Malta board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +28,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Matthew Fortune <matthew.fortune@mips.com>
 
-Starting from nanoMIPS introduction, machine variant can be
-EM_MIPS or EM_NANOMIPS.
+Add basic nanoMIPS boot code for Malta.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/elfload.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/mips/mips_malta.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 60 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index df07055..8638612 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -853,6 +853,8 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
- #endif
- #define ELF_ARCH    EM_MIPS
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 3467451..2e851d9 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -599,6 +599,59 @@ static void network_init(PCIBus *pci_bus)
+     }
+ }
  
-+#define elf_check_arch(x) ((x) == EM_MIPS || (x) == EM_NANOMIPS)
++static void write_bootloader_nanomips(uint8_t *base, int64_t run_addr,
++                                      int64_t kernel_entry)
++{
++    uint16_t *p;
 +
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
++    /* Small bootloader */
++    p = (uint16_t *)base;
++
++#define NM_HI1(VAL) (((VAL) >> 16) & 0x1f)
++#define NM_HI2(VAL) \
++            (((VAL) & 0xf000) | (((VAL) >> 19) & 0xffc) | (((VAL) >> 31) & 0x1))
++#define NM_LO(VAL)  ((VAL) & 0xfff)
++
++    stw_p(p++, 0x2800); stw_p(p++, 0x001c); /* bc to_here */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++    stw_p(p++, 0x8000); stw_p(p++, 0xc000); /* nop */
++
++    /* to_here: */
++    stw_p(p++, 0x0080); stw_p(p++, 0x0002); /* li a0,2 */
++    stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
++    stw_p(p++, NM_HI2(ENVP_ADDR - 64));
++                                /* lui sp,%hi(ENVP_ADDR - 64) */
++    stw_p(p++, 0x83bd); stw_p(p++, NM_LO(ENVP_ADDR - 64));
++                                /* ori sp,sp,%lo(ENVP_ADDR - 64) */
++    stw_p(p++, 0xe0a0 | NM_HI1(ENVP_ADDR));
++    stw_p(p++, NM_HI2(ENVP_ADDR));
++                                /* lui a1,%hi(ENVP_ADDR) */
++    stw_p(p++, 0x80a5); stw_p(p++, NM_LO(ENVP_ADDR));
++                                /* ori a1,a1,%lo(ENVP_ADDR) */
++    stw_p(p++, 0xe0c0 | NM_HI1(ENVP_ADDR + 8));
++    stw_p(p++, NM_HI2(ENVP_ADDR + 8));
++                                /* lui a2,%hi(ENVP_ADDR + 8) */
++    stw_p(p++, 0x80c6); stw_p(p++, NM_LO(ENVP_ADDR + 8));
++                                /* ori a2,a2,%lo(ENVP_ADDR + 8) */
++    stw_p(p++, 0xe0e0 | NM_HI1(loaderparams.ram_low_size));
++    stw_p(p++, NM_HI2(loaderparams.ram_low_size));
++                                /* lui a3,%hi(loaderparams.ram_low_size) */
++    stw_p(p++, 0x80e7); stw_p(p++, NM_LO(loaderparams.ram_low_size));
++                                /* ori a3,a3,%lo(loaderparams.ram_low_size) */
++    stw_p(p++, 0xe320 | NM_HI1(kernel_entry));
++    stw_p(p++, NM_HI2(kernel_entry));
++                                /* lui t9,%hi(kernel_entry) */
++    stw_p(p++, 0x8339); stw_p(p++, NM_LO(kernel_entry));
++                                /* ori t9,t9,%lo(kernel_entry) */
++    stw_p(p++, 0x4bf9); stw_p(p++, 0x0000);
++                                /* jalrc   t8 */
++}
++
+ /* ROM and pseudo bootloader
+ 
+    The following code implements a very very simple bootloader. It first
+@@ -620,7 +673,6 @@ static void network_init(PCIBus *pci_bus)
+      a2 - 32-bit address of the environment variables table
+      a3 - RAM size in bytes
+ */
+-
+ static void write_bootloader(uint8_t *base, int64_t run_addr,
+                              int64_t kernel_entry)
  {
+@@ -1096,8 +1148,13 @@ void mips_malta_init(MachineState *machine)
+         loaderparams.initrd_filename = initrd_filename;
+         kernel_entry = load_kernel();
+ 
+-        write_bootloader(memory_region_get_ram_ptr(bios),
+-                         bootloader_run_addr, kernel_entry);
++        if (!cpu_supports_isa(machine->cpu_type, ISA_NANOMIPS32)) {
++            write_bootloader(memory_region_get_ram_ptr(bios),
++                             bootloader_run_addr, kernel_entry);
++        } else {
++            write_bootloader_nanomips(memory_region_get_ram_ptr(bios),
++                                      bootloader_run_addr, kernel_entry);
++        }
+         if (kvm_enabled()) {
+             /* Write the bootloader code @ the end of RAM, 1MB reserved */
+             write_bootloader(memory_region_get_ram_ptr(ram_low_preio) +
 -- 
 2.7.4
