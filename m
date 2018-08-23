@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fsqGQ-00020Z-Mc
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:07:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1fsqGq-0002LB-2N
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:07:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fsqGL-0006QK-9P
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:07:04 -0400
-Date: Thu, 23 Aug 2018 22:06:47 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180823140647.GC6960@lemon.usersys.redhat.com>
-References: <20180823122123.18278-1-pbonzini@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fsqGn-0006ek-3c
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:07:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51002 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fsqGm-0006dj-QH
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:07:28 -0400
+References: <20180823102502.28122-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <684bc04e-0e25-cd9b-b773-1b5b140586d3@redhat.com>
+Date: Thu, 23 Aug 2018 09:07:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180823122123.18278-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: update MemoryRegionCaches when
- guest negotiates features
+In-Reply-To: <20180823102502.28122-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] scripts: report on author emails that are
+ mangled by the mailing list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,19 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com, qemu-stable@nongnu.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, 08/23 14:21, Paolo Bonzini wrote:
-> Because the cache is sized to include the rings and the event indices,
-> negotiating the VIRTIO_RING_F_EVENT_IDX feature will result in the size
-> of the cache changing.  And because MemoryRegionCache accesses are
-> range-checked, if we skip this we end up with an assertion failure.
-> This happens with OpenBSD 6.3.
-> 
-> Reported-by: Fam Zheng <famz@redhat.com>
-> Fixes: 97cd965c070152bc626c7507df9fb356bbe1cd81
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 08/23/2018 05:25 AM, Daniel P. Berrang=C3=A9 wrote:
+> In some cases the Author: email address in patches submitted to the
+> list gets mangled such that it says
+>=20
+>      John Doe via Qemu-devel <qemu-devel@nongnu.org>
+>=20
+> This change is a result of workarounds for DMARC policies.
+>=20
+> Subsystem maintainers accepting patches need to catch these and fix
+> them before sending pull requests, so a checkpatch.pl test is highly
+> desirable.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>   scripts/checkpatch.pl | 4 ++++
+>   1 file changed, 4 insertions(+)
+>=20
 
-Tested-by: Fam Zheng <famz@redhat.com>
+Adding it here will let patchew flag such message; the workaround is for=20
+the submitter to resubmit with an explicit 'From: User Name=20
+<address@example.com>' line in the body of the email.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
