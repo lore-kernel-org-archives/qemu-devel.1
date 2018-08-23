@@ -1,21 +1,21 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:60967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgR-0003Sq-Ho
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgT-0003Sq-OO
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsseu-0003Zt-3k
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40740 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fsser-0003Wc-Ly
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44710 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsset-0003Yk-Q5
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:31 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsser-0003W8-Eh
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:29 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:52 +0200
-Message-Id: <20180823164025.12553-26-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:31 +0200
+Message-Id: <20180823164025.12553-5-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 25/58] json: Accept overlong \xC0\x80 as
- U+0000 ("modified UTF-8")
+Subject: [Qemu-devel] [PATCH v3 04/58] check-qjson: Cover whitespace more
+ thoroughly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +27,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-Since the JSON grammer doesn't accept U+0000 anywhere, this merely
-exchanges one kind of parse error for another.  It's purely for
-consistency with qobject_to_json(), which accepts \xC0\x80 (see commit
-e2ec3f97680).
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-lexer.c  | 2 +-
- qobject/json-parser.c | 2 +-
- tests/check-qjson.c   | 8 +-------
- 3 files changed, 3 insertions(+), 9 deletions(-)
+ tests/check-qjson.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 93fa2737e6..4c402f62d3 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -93,7 +93,7 @@
-  *   interpolation = %((l|ll|I64)[du]|[ipsf])
-  *
-  * Note:
-- * - Input must be encoded in UTF-8.
-+ * - Input must be encoded in modified UTF-8.
-  * - Decoding and validating is left to the parser.
-  */
- 
-diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index b77931614b..a9b227f56c 100644
---- a/qobject/json-parser.c
-+++ b/qobject/json-parser.c
-@@ -200,7 +200,7 @@ static QString *qstring_from_escaped_str(JSONParserContext *ctxt,
-             }
-         } else {
-             cp = mod_utf8_codepoint(ptr, 6, &end);
--            if (cp <= 0) {
-+            if (cp < 0) {
-                 parse_error(ctxt, token, "invalid UTF-8 sequence in string");
-                 goto out;
-             }
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 71c77d2f70..3abf12b4d2 100644
+index 4daadc272b..188f683317 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -152,12 +152,6 @@ static void string_with_quotes(void)
- static void utf8_string(void)
- {
-     /*
--     * Problem: we can't easily deal with embedded U+0000.  Parsing
--     * the JSON string "this \\u0000" is fun" yields "this \0 is fun",
--     * which gets misinterpreted as NUL-terminated "this ".  We should
--     * consider using overlong encoding \xC0\x80 for U+0000 ("modified
--     * UTF-8").
--     *
-      * Most test cases are scraped from Markus Kuhn's UTF-8 decoder
-      * capability and stress test at
-      * http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
-@@ -586,7 +580,7 @@ static void utf8_string(void)
-         {
-             /* \U+0000 */
-             "\xC0\x80",
--            NULL,
-+            "\xC0\x80",
-             "\\u0000",
+@@ -1236,7 +1236,7 @@ static void simple_whitespace(void)
+                     })),
          },
          {
+-            .encoded = " [ 43 , { 'h' : 'b' }, [ ], 42 ]",
++            .encoded = "\t[ 43 , { 'h' : 'b' },\r\n\t[ ], 42 ]\n",
+             .decoded = QLIT_QLIST(((QLitObject[]){
+                         QLIT_QNUM(43),
+                         QLIT_QDICT(((QLitDictEntry[]){
 -- 
 2.17.1
