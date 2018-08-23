@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fstUJ-0000kO-2r
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:33:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1fstWF-0003AB-K7
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fstUE-0005BY-0V
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:33:39 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46137)
+	(envelope-from <bounces@canonical.com>) id 1fstWA-0006PF-J8
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:35:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43854)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fstUD-0005B1-Nw
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:33:33 -0400
-Received: by mail-pg1-x542.google.com with SMTP id b129-v6so2948064pga.13
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 10:33:33 -0700 (PDT)
-References: <20180820141116.9118-1-peter.maydell@linaro.org>
-	<20180820141116.9118-20-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <25543a01-8243-1389-3650-d3bd03fa16b5@linaro.org>
-Date: Thu, 23 Aug 2018 10:33:27 -0700
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fstWA-0006Oj-BY
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:35:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fstW9-00062V-4E
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 17:35:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1EFA22E851C
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 17:35:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180820141116.9118-20-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 19/22] hw/ssi/pl022: Correct wrong value
- for PL022_INT_RT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Aug 2018 17:23:45 -0000
+From: Heiko Sieger <1788665@bugs.launchpad.net>
+Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788665] [NEW] Low 2D graphics performance with
+ Windows 10 (1803) VGA passthrough VM using "Spectre" protection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +36,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, patches@linaro.org
+To: qemu-devel@nongnu.org
 
-On 08/20/2018 07:11 AM, Peter Maydell wrote:
-> The PL022 interrupt registers have bits allocated as:
->  0: ROR (receive overrun)
->  1: RT (receive timeout)
->  2: RX (receive FIFO half full or less)
->  3: TX (transmit FIFO half full or less)
-> 
-> A cut and paste error meant we had the wrong value for
-> the PL022_INT_RT constant. This bug doesn't affect device
-> behaviour, because we don't implmenet the receive timeout
+Public bug reported:
 
-implement.
+Windows 10 (1803) VM using VGA passthrough via qemu script.
 
-> feature and so never set that interrupt bit.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/ssi/pl022.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+After upgrading Windows 10 Pro VM to version 1803, or possibly after
+applying the March/April security updates from Microsoft, the VM would
+show low 2D graphics performance (sluggishness in 2D applications and
+low Passmark results).
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Turning off Spectre vulnerability protection in Windows remedies the
+issue.
+
+Expected behavior:
+qemu/kvm hypervisor to expose firmware capabilities of host to guest OS - s=
+ee https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE-2=
+017-5715-and-hyper-v-vms
+
+Background:
+
+Starting in March or April Microsoft began to push driver updates in
+their updates / security updates. See https://support.microsoft.com/en-
+us/help/4073757/protect-your-windows-devices-against-spectre-meltdown
+
+One update concerns the Intel microcode - see
+https://support.microsoft.com/en-us/help/4100347. It is activated by
+default within Windows.
+
+Once the updates are applied within the Windows guest, 2D graphics
+performance drops significantly. Other performance benchmarks are not
+affected.
+
+A bare metal Windows installation does not display a performance loss
+after the update. See https://heiko-sieger.info/low-2d-graphics-
+benchmark-with-windows-10-1803-kvm-vm/
+
+Similar reports can be found here:
+https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_pe=
+rformance_on_windows/
+
+Hardware:
+
+6 core Intel Core i7-3930K (-MT-MCP-)
+
+Host OS:
+Linux Mint 19/Ubuntu 18.04
+Kernel: 4.15.0-32-generic x86_64
+Qemu: QEMU emulator version 2.11.1
+Intel microcode (host): 0x714
+dmesg | grep microcode
+[    0.000000] microcode: microcode updated early to revision 0x714, date =
+=3D 2018-05-08
+[    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
+[    2.813340] microcode: Microcode Update Driver: v2.2.
+
+Note: I manually updated the Intel microcode on the host from 0x713 to
+0x714. However, both microcode versions produce the same result in the
+Windows guest.
+
+Guest OS:
+Windows 10 Pro 64 bit, release 1803
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 
-r~
+** Tags: intel microcode spectre
+
+** Attachment added: "Red graph - Windows 10 bare metal; blue graph - Windo=
+ws 10 VM with Spectre protection enabled; yellow graph - Windows 10 VM with=
+ spectre protection disabled"
+   https://bugs.launchpad.net/bugs/1788665/+attachment/5179857/+files/Captu=
+re-20180817-4-spectre-disabled-0x714-2d.PNG
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788665
+
+Title:
+  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
+  using "Spectre" protection
+
+Status in QEMU:
+  New
+
+Bug description:
+  Windows 10 (1803) VM using VGA passthrough via qemu script.
+
+  After upgrading Windows 10 Pro VM to version 1803, or possibly after
+  applying the March/April security updates from Microsoft, the VM would
+  show low 2D graphics performance (sluggishness in 2D applications and
+  low Passmark results).
+
+  Turning off Spectre vulnerability protection in Windows remedies the
+  issue.
+
+  Expected behavior:
+  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
+ see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
+-2017-5715-and-hyper-v-vms
+
+  Background:
+
+  Starting in March or April Microsoft began to push driver updates in
+  their updates / security updates. See https://support.microsoft.com
+  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
+  meltdown
+
+  One update concerns the Intel microcode - see
+  https://support.microsoft.com/en-us/help/4100347. It is activated by
+  default within Windows.
+
+  Once the updates are applied within the Windows guest, 2D graphics
+  performance drops significantly. Other performance benchmarks are not
+  affected.
+
+  A bare metal Windows installation does not display a performance loss
+  after the update. See https://heiko-sieger.info/low-2d-graphics-
+  benchmark-with-windows-10-1803-kvm-vm/
+
+  Similar reports can be found here:
+  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
+performance_on_windows/
+
+  Hardware:
+
+  6 core Intel Core i7-3930K (-MT-MCP-)
+
+  Host OS:
+  Linux Mint 19/Ubuntu 18.04
+  Kernel: 4.15.0-32-generic x86_64
+  Qemu: QEMU emulator version 2.11.1
+  Intel microcode (host): 0x714
+  dmesg | grep microcode
+  [    0.000000] microcode: microcode updated early to revision 0x714, date=
+ =3D 2018-05-08
+  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
+  [    2.813340] microcode: Microcode Update Driver: v2.2.
+
+  Note: I manually updated the Intel microcode on the host from 0x713 to
+  0x714. However, both microcode versions produce the same result in the
+  Windows guest.
+
+  Guest OS:
+  Windows 10 Pro 64 bit, release 1803
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
