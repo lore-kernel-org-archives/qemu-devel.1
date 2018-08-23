@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSE-0005B5-0G
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:20 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSE-0005B9-1X
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqS7-0004j9-US
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqS7-0004iq-TU
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:17 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56891 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:56834 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fsqS6-0004hP-5K
+	id 1fsqS6-0004gn-5F
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:11 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 16:18:19 +0200
-Message-Id: <1535033941-861-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 16:18:16 +0200
+Message-Id: <1535033941-861-2-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535033941-861-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535033941-861-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v5 04/46] target/mips: Prevent switching mode
- related to Config3 ISA bit for nanoMIPS
+Subject: [Qemu-devel] [PULL v5 01/46] target/mips: Add preprocessor
+ constants for nanoMIPS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +28,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Only if Config3.ISA is 3 (microMIPS), the mode should be switched in
-cpu_state_reset(). Config3.ISA is 1 for nanoMIPS processors, and no mode
-change should happen.
+Add ISA_NANOMIPS32 and CPU_NANOMIPS32 preprocessor constants.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/mips/mips-defs.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4f95b9a..7fb322b 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -21841,8 +21841,8 @@ void cpu_state_reset(CPUMIPSState *env)
-         env->CP0_Status |= (1 << CP0St_FR);
-     }
+diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+index d239069..c8e9979 100644
+--- a/target/mips/mips-defs.h
++++ b/target/mips/mips-defs.h
+@@ -39,6 +39,7 @@
+ #define   ISA_MIPS64R5  0x00001000
+ #define   ISA_MIPS32R6  0x00002000
+ #define   ISA_MIPS64R6  0x00004000
++#define   ISA_NANOMIPS32  0x00008000
  
--    if (env->CP0_Config3 & (1 << CP0C3_ISA)) {
--        /*  microMIPS on reset when Config3.ISA == {1, 3} */
-+    if (env->CP0_Config3 & (1 << CP0C3_ISA) & (1 << (CP0C3_ISA + 1))) {
-+        /*  microMIPS on reset when Config3.ISA is 3 */
-         env->hflags |= MIPS_HFLAG_M16;
-     }
+ /* MIPS ASEs. */
+ #define   ASE_MIPS16    0x00010000
+@@ -87,6 +88,9 @@
+ #define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
+ #define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
  
++/* Wave Computing: "nanoMIPS" */
++#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
++
+ /* Strictly follow the architecture standard:
+    - Disallow "special" instruction handling for PMON/SPIM.
+    Note that we still maintain Count/Compare to match the host clock. */
 -- 
 2.7.4
