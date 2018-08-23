@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgU-0003Sq-HB
+	(envelope-from <armbru@redhat.com>) id 1fssgV-0003W0-04
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsses-0003XT-K4
+	(envelope-from <armbru@redhat.com>) id 1fsser-0003Ww-Nt
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40710 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44716 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsses-0003X6-AE
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:30 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsser-0003WH-FA
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:29 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:33 +0200
-Message-Id: <20180823164025.12553-7-armbru@redhat.com>
-In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
-References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 06/58] qmp-test: Cover syntax and lexical
- errors
+Date: Thu, 23 Aug 2018 18:39:27 +0200
+Message-Id: <20180823164025.12553-1-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 00/58] json: Fixes,
+ error reporting improvements, cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,130 +28,216 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-qmp-test neglects to cover QMP input that isn't valid JSON.  libqtest
-doesn't let us such input.  Add qtest_qmp_send_raw() for this purpose,
-and put it to use in qmp-test.
+JSON is such a simple language, so writing a parser should be easy,
+shouldn't it?  Well, the evidence is in, and it's a lot of patches.
+Summary of fixes:
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/libqtest.c | 17 +++++++++++++++++
- tests/libqtest.h | 11 +++++++++++
- tests/qmp-test.c | 41 ++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 68 insertions(+), 1 deletion(-)
+* Reject ASCII control characters in strings as RFC 7159 specifies
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 852ccff1ce..dc42347da3 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -604,6 +604,23 @@ void qtest_qmp_send(QTestState *s, const char *fmt, ...)
-     va_end(ap);
- }
- 
-+void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
-+{
-+    bool log = getenv("QTEST_LOG") != NULL;
-+    va_list ap;
-+    char *str;
-+
-+    va_start(ap, fmt);
-+    str = g_strdup_vprintf(fmt, ap);
-+    va_end(ap);
-+
-+    if (log) {
-+        fprintf(stderr, "%s", str);
-+    }
-+    socket_send(s->qmp_fd, str, strlen(str));
-+    g_free(str);
-+}
-+
- QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event)
- {
-     QDict *response;
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index def1edaafa..1e831973ff 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -96,6 +96,17 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...)
- void qtest_qmp_send(QTestState *s, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
- 
-+/**
-+ * qtest_qmp_send_raw:
-+ * @s: #QTestState instance to operate on.
-+ * @fmt...: text to send, formatted like sprintf()
-+ *
-+ * Sends text to the QMP monitor verbatim.  Need not be valid JSON;
-+ * this is useful for negative tests.
-+ */
-+void qtest_qmp_send_raw(QTestState *s, const char *fmt, ...)
-+    GCC_FMT_ATTR(2, 3);
-+
- /**
-  * qtest_qmpv:
-  * @s: #QTestState instance to operate on.
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index dbc8f6c16e..17153192fe 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -1,7 +1,7 @@
- /*
-  * QMP protocol test cases
-  *
-- * Copyright (c) 2017 Red Hat Inc.
-+ * Copyright (c) 2017-2018 Red Hat Inc.
-  *
-  * Authors:
-  *  Markus Armbruster <armbru@redhat.com>
-@@ -42,10 +42,49 @@ static void test_version(QObject *version)
-     visit_free(v);
- }
- 
-+static bool recovered(QTestState *qts)
-+{
-+    QDict *resp;
-+    bool ret;
-+
-+    resp = qtest_qmp(qts, "{ 'execute': 'no-such-cmd' }");
-+    ret = !strcmp(get_error_class(resp), "CommandNotFound");
-+    qobject_unref(resp);
-+    return ret;
-+}
-+
- static void test_malformed(QTestState *qts)
- {
-     QDict *resp;
- 
-+    /* syntax error */
-+    qtest_qmp_send_raw(qts, "{]\n");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-+    /* lexical error: impossible byte outside string */
-+    qtest_qmp_send_raw(qts, "{\xFF");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-+    /* lexical error: impossible byte in string */
-+    qtest_qmp_send_raw(qts, "{'bad \xFF");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-+    /* lexical error: interpolation */
-+    qtest_qmp_send_raw(qts, "%%p\n");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
-+
-     /* Not even a dictionary */
-     resp = qtest_qmp(qts, "null");
-     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
--- 
+* Reject all invalid UTF-8 sequences, not just some
+
+* Reject invalid \uXXXX escapes
+
+* Implement \uXXXX surrogate pairs as specified by RFC 7159
+
+* Don't ignore \u0000 silently, map it to \xC0\80 (modified UTF-8)
+
+* qobject_from_json() is ridicilously broken for input containing more
+  than one value, fix
+
+* Don't ignore trailing unterminated structures
+
+* Less cavalierly cruel error reporting
+
+Topped off with tests and cleanups.
+
+If you're into this kind of disaster relief, commit c7a3f25200c
+"qapi.py: Restructure lexer and parser" was even funnier.
+
+v3:
+* Trivially rebased
+* Old PATCH 41,51-52 punted to a future series
+* PATCH 01 was PATCH 56 [Eric]
+* PATCH 58 is new (but trivial)
+* R-bys kept
+* PATCH 01,06,11
+  - Commit message improved [Eric]
+* PATCH 08,10,12,14
+  - from_json_str()'s unusual parameter order tidied up [Eric]
+* PATCH 15,18-19,24,26,37
+  - Refer to RFC 8259 instead of obsolete RFC 7159
+* PATCH 37-39,40
+  - Abbreviate interpolation as INTERP instead of INTERPOL [Eric]
+* PATCH 39
+  - Stale comment updated
+* PATCH 45
+  - Comma after JSON_END_OF_INPUT
+v2:
+* Rebased
+* PATCH 01,11-14,16-18,20,22-23,29-36,41,43,45-50,53-55 otherwise
+  unchanged
+* PATCH 57-60 are new
+* R-bys kept unless noted otherwise
+* PATCH 02
+  - Cover unrecognized keyword [Eric]
+* PATCH 03
+  - Cover \r [Eric]
+* PATCH 04-05
+  - Comments touched up [Eric]
+* PATCH 06
+  - Use qmp_fd_send_raw() just for "\xff" [Eric]
+* PATCH 07
+  - Plug memory leak [Eric]
+* PATCH 08
+  - Delay adding coverage for \' until PATCH 09
+* PATCH 09
+  - Cover \\\0
+  - Drop duplicated test case (editing accident) [Eric]
+  - Improve surrogate coverage
+* PATCH 10
+  - Don't lose test coverage for \" and \'
+  - R-by dropped
+* PATCH 15,27,38-39
+  - Cover unkown interpolation specification
+  - Cover attempt to interpolate into JSON string
+  - R-by of PATCH 15 dropped
+* PATCH 19
+  - Tweak loop control once more
+  - R-by dropped
+* PATCH 21,26
+  - Update for tweak to PATCH 19
+  - I might still drop redundant masking [Eric]
+* PATCH 24
+  - Commit message improved
+* PATCH 25
+  - Comment improvement [Eric]
+  - Commit message tweaked
+* PATCH 28
+  - Fix error message to show both halves of an invalid surrogate pair
+    [Eric]
+  - Fix unpaired leading surrogate followed by \u escape [Paolo]
+* PATCH 36
+  - I might still rename JSON_INTERPOL & friends [Eric]
+* PATCH 37
+  - Document lexing interpolations is now optional [Eric]
+  - Move deletion of a redundant assignment from PATCH 51 [Eric]
+* PATCH 37,42,51-52
+  - De-duplicate state transitions common to IN_START and
+    IN_START_INTERPOL [Eric]
+* PATCH 38
+  - Commit message tweaked
+* PATCH 39
+  - More legible commit message [Eric]
+  - Comment fix [Eric]
+* PATCH 40
+  - Commit message typo [Eric]
+* PATCH 44
+  - Commit message tab damage [Eric]
+* PATCH 56
+  - More on QGA synchronization [Eric]
+  - I might still move this earlier in the series
+
+Marc-Andr=C3=A9 Lureau (2):
+  json: remove useless return value from lexer/parser
+  json-parser: simplify and avoid JSONParserContext allocation
+
+Markus Armbruster (56):
+  docs/interop/qmp-spec: How to force known good parser state
+  check-qjson: Cover multiple JSON objects in same string
+  check-qjson: Cover blank and lexically erroneous input
+  check-qjson: Cover whitespace more thoroughly
+  qmp-cmd-test: Split off qmp-test
+  qmp-test: Cover syntax and lexical errors
+  test-qga: Clean up how we test QGA synchronization
+  check-qjson: Cover escaped characters more thoroughly, part 1
+  check-qjson: Streamline escaped_string()'s test strings
+  check-qjson: Cover escaped characters more thoroughly, part 2
+  check-qjson: Consolidate partly redundant string tests
+  check-qjson: Cover UTF-8 in single quoted strings
+  check-qjson: Simplify utf8_string()
+  check-qjson: Fix utf8_string() to test all invalid sequences
+  check-qjson qmp-test: Cover control characters more thoroughly
+  check-qjson: Cover interpolation more thoroughly
+  json: Fix lexer to include the bad character in JSON_ERROR token
+  json: Reject unescaped control characters
+  json: Revamp lexer documentation
+  json: Tighten and simplify qstring_from_escaped_str()'s loop
+  check-qjson: Document we expect invalid UTF-8 to be rejected
+  json: Reject invalid UTF-8 sequences
+  json: Report first rather than last parse error
+  json: Leave rejecting invalid UTF-8 to parser
+  json: Accept overlong \xC0\x80 as U+0000 ("modified UTF-8")
+  json: Leave rejecting invalid escape sequences to parser
+  json: Simplify parse_string()
+  json: Reject invalid \uXXXX, fix \u0000
+  json: Fix \uXXXX for surrogate pairs
+  check-qjson: Fix and enable utf8_string()'s disabled part
+  json: Have lexer call streamer directly
+  json: Redesign the callback to consume JSON values
+  json: Don't pass null @tokens to json_parser_parse()
+  json: Don't create JSON_ERROR tokens that won't be used
+  json: Rename token JSON_ESCAPE & friends to JSON_INTERP
+  json: Treat unwanted interpolation as lexical error
+  json: Pass lexical errors and limit violations to callback
+  json: Leave rejecting invalid interpolation to parser
+  json: Replace %I64d, %I64u by %PRId64, %PRIu64
+  json: Improve names of lexer states related to numbers
+  qjson: Fix qobject_from_json() & friends for multiple values
+  json: Fix latent parser aborts at end of input
+  json: Fix streamer not to ignore trailing unterminated structures
+  json: Assert json_parser_parse() consumes all tokens on success
+  qjson: Have qobject_from_json() & friends reject empty and blank
+  json: Enforce token count and size limits more tightly
+  json: Streamline json_message_process_token()
+  json: Unbox tokens queue in JSONMessageParser
+  json: Make JSONToken opaque outside json-parser.c
+  qobject: Drop superfluous includes of qemu-common.h
+  json: Clean up headers
+  tests/drive_del-test: Fix harmless JSON interpolation bug
+  json: Keep interpolation state in JSONParserContext
+  json: Improve safety of qobject_from_jsonf_nofail() & friends
+  json: Support %% in JSON strings when interpolating
+  json: Update references to RFC 7159 to RFC 8259
+
+ MAINTAINERS                      |    1 +
+ block.c                          |    5 -
+ docs/interop/qmp-spec.txt        |   42 +-
+ include/qapi/qmp/json-lexer.h    |   56 --
+ include/qapi/qmp/json-parser.h   |   36 +-
+ include/qapi/qmp/json-streamer.h |   46 --
+ include/qapi/qmp/qerror.h        |    3 -
+ include/qapi/qmp/qnum.h          |    2 +-
+ include/qemu/unicode.h           |    1 +
+ monitor.c                        |   21 +-
+ qapi/introspect.json             |    2 +-
+ qapi/qmp-dispatch.c              |    1 -
+ qapi/qobject-input-visitor.c     |    5 -
+ qga/main.c                       |   15 +-
+ qobject/json-lexer.c             |  317 ++++-----
+ qobject/json-parser-int.h        |   54 ++
+ qobject/json-parser.c            |  379 +++++------
+ qobject/json-streamer.c          |  126 ++--
+ qobject/qbool.c                  |    1 -
+ qobject/qjson.c                  |   31 +-
+ qobject/qlist.c                  |    1 -
+ qobject/qnull.c                  |    1 -
+ qobject/qnum.c                   |    1 -
+ qobject/qobject.c                |    1 -
+ qobject/qstring.c                |    1 -
+ tests/Makefile.include           |    3 +
+ tests/check-qjson.c              | 1058 ++++++++++++++++--------------
+ tests/drive_del-test.c           |    8 +-
+ tests/libqtest.c                 |   57 +-
+ tests/libqtest.h                 |   13 +
+ tests/qmp-cmd-test.c             |  213 ++++++
+ tests/qmp-test.c                 |  252 ++-----
+ tests/test-qga.c                 |    3 +-
+ util/unicode.c                   |   69 +-
+ 34 files changed, 1484 insertions(+), 1341 deletions(-)
+ delete mode 100644 include/qapi/qmp/json-lexer.h
+ delete mode 100644 include/qapi/qmp/json-streamer.h
+ create mode 100644 qobject/json-parser-int.h
+ create mode 100644 tests/qmp-cmd-test.c
+
+--=20
 2.17.1
