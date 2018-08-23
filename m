@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fsm4F-0004Up-Kl
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:38:16 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fsmEd-00089O-VT
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fsm4E-0004Uo-Ld
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:38:15 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:33327)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fsm4E-0004TR-DK
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:38:14 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id i134-v6so1618607wmf.0
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 02:38:13 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1fsmEb-0007ov-6i
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:48:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43520 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fsmEa-0007oB-Tt
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 05:48:57 -0400
+Date: Thu, 23 Aug 2018 11:48:50 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180823094850.zycuwtjndmztgcm4@sirius.home.kraxel.org>
+References: <20180822095421.11765-1-quintela@redhat.com>
+	<20180822095421.11765-8-quintela@redhat.com>
+	<0d3a215b-4916-b0a6-5654-5d64fcf6c996@redhat.com>
+	<87y3cyo4ax.fsf@trasno.org>
+	<20180823074321.wx7wix7jwsfrcbk5@sirius.home.kraxel.org>
+	<9cb5f027-e49c-d943-7ffa-9e744537f174@redhat.com>
 MIME-Version: 1.0
-References: <20180811205924.4113-1-zhangckid@gmail.com>
-	<20180811205924.4113-16-zhangckid@gmail.com>
-	<f5b85e98-29ed-86e0-4497-7a63b61a663b@redhat.com>
-	<CAK3tnv+CPvV5F09PWx5B2bQp6xYNmyJ--x_qy4mS7XZ6K1=W_Q@mail.gmail.com>
-	<f19bc830-61e5-6136-980e-d8f64b7786af@redhat.com>
-In-Reply-To: <f19bc830-61e5-6136-980e-d8f64b7786af@redhat.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Thu, 23 Aug 2018 17:37:59 +0800
-Message-ID: <CAK3tnv+4gxxpv=pmFD-wLrvTAq9oOcaHRTBYtF8BqRHY-5T6OQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V11 15/20] net/net.c: Add net client type
- check function for COLO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9cb5f027-e49c-d943-7ffa-9e744537f174@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] check: Only test boot-serial when
+ sga is compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com, Zhang Chen <chen.zhang@intel.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On Wed, Aug 22, 2018 at 4:22 PM Jason Wang <jasowang@redhat.com> wrote:
+> > I remember we even discussed that a while back ...
+> > Oh yes: https://git.kraxel.org/cgit/qemu/commit/?h=work/no-sgabios&id=408690999429fdf44011c49b3af6efa50f369b1e
+> > Somehow never ended up being merged.
+> 
+> Sounds like a good idea! Could you repost the patch, with an update to
+> qemu-deprecated.texi, please? Maybe also print the deprecation message
+> in any case if !use_sgabios, e.g.:
+> 
+>     } else {
+>         /*
+>          * For this machine type we expect SeaBIOS to provide a
+>          * serial console for -machine graphics=off.  No need to
+>          * add the sgabios rom here.
+>          */
+>         warn_report("sgabios is deprecated and is not required anymore,"
+>                     " SeaBIOS now has the same functionality, too");
+>     }
 
->
->
-> On 2018=E5=B9=B408=E6=9C=8821=E6=97=A5 17:26, Zhang Chen wrote:
-> >
-> >
-> > On Tue, Aug 21, 2018 at 11:27 AM Jason Wang <jasowang@redhat.com
-> > <mailto:jasowang@redhat.com>> wrote:
-> >
-> >
-> >
-> >     On 2018=E5=B9=B408=E6=9C=8812=E6=97=A5 04:59, Zhang Chen wrote:
-> >     > From: Zhang Chen <chen.zhang@intel.com
-> >     <mailto:chen.zhang@intel.com>>
-> >     >
-> >     > We add is_colo_support_client_type() to check the net client
-> >     type for
-> >     > COLO-compare. Currently we just support TAP.
-> >     > Suggested by Jason.
-> >     >
-> >     > Signed-off-by: Zhang Chen <zhangckid@gmail.com
-> >     <mailto:zhangckid@gmail.com>>
-> >     > Signed-off-by: Zhang Chen <chen.zhang@intel.com
-> >     <mailto:chen.zhang@intel.com>>
-> >     > ---
-> >
-> >     This needs more works:
-> >
-> >     - Forbid vhost
-> >     - Deal with hotplug
-> >
-> >     Looks not a must for this series, so to speed up the process, you
-> >     may do
-> >     it on top.
-> >
-> >
-> > Do you mean this patch we can stay this status currently?
-> >
-> > Thanks
-> > Zhang Chen
->
-> Sorry for being unclear, I mean we need a complete solution rather than
-> partial one.
->
+Hmm, IIRC libvirt support is a bit tricky here as there is no easy way
+to probe for serial console support in seabios.  So the idea was to just
+allow both -machine graphics=off and -device sga, by turning -device sga
+into a nop in case -machine graphics=off is present.
 
-OK, I will remove this patch from this series, and send a complete solution
-in the future.
+But given we meanwhile had some releases without this I suspect that
+isn't a good idea any more.  With both -machine graphics=off -device sga
+seabios and sgabios will fight over the serial device ...
 
-Thanks
-Zhang Chen
+So, maybe take a completely different route.  Add a deprecation_reason
+field to DeviceClass.  Make it visible in qapi introspection, so libvirt
+can see it and avoid adding it to the command line.  Then we can
+deprecate -device sga (and possibly other devices too) that way.
 
+For live migration compatibility reasons it'll be quite a while until we
+can actually delete the device (much longer than the usual 2 releases
+deprecation cycle).
 
->
-> Thanks
->
->
+cheers,
+  Gerd
