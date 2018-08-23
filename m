@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmJ-00057U-FT
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmM-0005Bw-GB
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:36:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmA-0000FM-OR
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:41934 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fspmA-0000Fc-U6
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:36:02 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:41938 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fspmA-0000B2-5J
+	id 1fspmA-0000CG-Go
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:35:50 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 15:34:32 +0200
-Message-Id: <1535031276-22911-43-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 15:34:35 +0200
+Message-Id: <1535031276-22911-46-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535031276-22911-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v4 42/46] elf: Don't check FCR31_NAN2008 bit for
- nanoMIPS
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v4 45/46] mips_malta: Fix semihosting argument
+ passing for nanoMIPS bare metal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +31,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Stefan Markovic <smarkovic@wavecomp.com>
 
-nanoMIPS is always NaN2008 compliant, and rules for checking
-FCR31's NAN2008 bit are obsoleted.
+Fix passing argument for nanoMIPS bare metal related to the
+semihosting regime.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- linux-user/mips/cpu_loop.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/mips/mips_malta.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 1d3dc9e..c9c20cf 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -747,6 +747,9 @@ void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
-     if (regs->cp0_epc & 1) {
-         env->hflags |= MIPS_HFLAG_M16;
-     }
-+    if (env->insn_flags & ISA_NANOMIPS32) {
-+        return;
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index f261dd6..40041d5 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -630,8 +630,14 @@ static void write_bootloader_nanomips(uint8_t *base,=
+ int64_t run_addr,
+                                 /* nop */
+=20
+     /* to_here: */
+-    stw_p(p++, 0x0080); stw_p(p++, 0x0002);
++    if (semihosting_get_argc()) {
++        /* Preserve a0 content as arguments have been passed    */
++        stw_p(p++, 0x8000); stw_p(p++, 0xc000);
++                                /* nop                          */
++    } else {
++        stw_p(p++, 0x0080); stw_p(p++, 0x0002);
+                                 /* li a0,2                      */
 +    }
-     if (((info->elf_flags & EF_MIPS_NAN2008) != 0) !=
-         ((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) != 0)) {
-         if ((env->active_fpu.fcr31_rw_bitmask &
--- 
+=20
+     stw_p(p++, 0xe3a0 | NM_HI1(ENVP_ADDR - 64));
+=20
+--=20
 2.7.4
