@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSJ-0005Gr-R3
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSG-0005DC-II
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSG-0004pv-GB
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:23 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:57098 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fsqSD-0004mX-UX
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:20 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:57035 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fsqSF-0004nR-Nc
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:20 -0400
+	id 1fsqS9-0004jh-Qx
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:19:15 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 23 Aug 2018 16:18:39 +0200
-Message-Id: <1535033941-861-25-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 23 Aug 2018 16:18:20 +0200
+Message-Id: <1535033941-861-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1535033941-861-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1535033941-861-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL v5 24/46] target/mips: Add CP0 Config3 and
- Config5 fields to DisasContext structure
+Subject: [Qemu-devel] [PULL v5 05/46] target/mips: Add placeholder and
+ invocation of decode_nanomips_opc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Dimitrije Nikolic <dnikolic@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add CP0_Config3 and CP0_Config5 to DisasContext structure. This is
-needed for implementing availability control of various instructions.
+Add empty body and invocation of decode_nanomips_opc() if the bit
+ISA_NANOMIPS32 is set in ctx->insn_flags.
 
-Reviewed-by: "Aleksandar Markovic <amarkovic@wavecomp.com>"
-Signed-off-by: "Aleksandar Markovic <amarkovic@wavecomp.com>"
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/mips/translate.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4b1bb18..10475a6 100644
+index 7fb322b..4184d91 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1449,6 +1449,8 @@ typedef struct DisasContext {
-     uint32_t opcode;
-     int insn_flags;
-     int32_t CP0_Config1;
-+    int32_t CP0_Config3;
-+    int32_t CP0_Config5;
-     /* Routine used to access memory */
-     int mem_idx;
-     TCGMemOp default_tcg_memop_mask;
-@@ -23307,6 +23309,8 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->saved_pc = -1;
-     ctx->insn_flags = env->insn_flags;
-     ctx->CP0_Config1 = env->CP0_Config1;
-+    ctx->CP0_Config3 = env->CP0_Config3;
-+    ctx->CP0_Config5 = env->CP0_Config5;
-     ctx->btarget = 0;
-     ctx->kscrexist = (env->CP0_Config4 >> CP0C4_KScrExist) & 0xff;
-     ctx->rxi = (env->CP0_Config3 >> CP0C3_RXI) & 1;
+@@ -16586,6 +16586,19 @@ enum {
+     NM_EVP      = 0x01,
+ };
+ 
++
++/*
++ *
++ * nanoMIPS decoding engine
++ *
++ */
++
++static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
++{
++    return 2;
++}
++
++
+ /* SmartMIPS extension to MIPS32 */
+ 
+ #if defined(TARGET_MIPS64)
+@@ -21402,7 +21415,10 @@ static void mips_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     int is_slot;
+ 
+     is_slot = ctx->hflags & MIPS_HFLAG_BMASK;
+-    if (!(ctx->hflags & MIPS_HFLAG_M16)) {
++    if (ctx->insn_flags & ISA_NANOMIPS32) {
++        ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
++        insn_bytes = decode_nanomips_opc(env, ctx);
++    } else if (!(ctx->hflags & MIPS_HFLAG_M16)) {
+         ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
+         insn_bytes = 4;
+         decode_opc(env, ctx);
 -- 
 2.7.4
