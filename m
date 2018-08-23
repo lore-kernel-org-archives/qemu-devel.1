@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsnRl-0003tX-42
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 07:06:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fsnor-0001ik-RM
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 07:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fsnRh-0004jp-Lf
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 07:06:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45676 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fsnRh-0004jl-FV
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 07:06:33 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E981A40006EC
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 11:06:32 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180823095359.GH23703@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Thu, 23 Aug 2018 10:53:59 +0100")
-References: <20180822095421.11765-1-quintela@redhat.com>
-	<20180822095421.11765-8-quintela@redhat.com>
-	<0d3a215b-4916-b0a6-5654-5d64fcf6c996@redhat.com>
-	<87y3cyo4ax.fsf@trasno.org>
-	<20180823074321.wx7wix7jwsfrcbk5@sirius.home.kraxel.org>
-	<9cb5f027-e49c-d943-7ffa-9e744537f174@redhat.com>
-	<20180823094850.zycuwtjndmztgcm4@sirius.home.kraxel.org>
-	<20180823095359.GH23703@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 23 Aug 2018 13:06:19 +0200
-Message-ID: <87efepqr4k.fsf@trasno.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fsnkm-0004m6-SR
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 07:26:17 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34561)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fsnkm-0004ls-EQ
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 07:26:16 -0400
+Received: by mail-oi0-x243.google.com with SMTP id 13-v6so8659437ois.1
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 04:26:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 07/10] check: Only test boot-serial when
- sga is compiled in
+In-Reply-To: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
+References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Aug 2018 12:25:55 +0100
+Message-ID: <CAFEAcA8a6c1DK9D=fr7sRiMyBhr9OWvsAOUvJetG+p1eXBrWgA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/74] Misc patches for 2018-08-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,62 +28,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, lvivier@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> On Thu, Aug 23, 2018 at 11:48:50AM +0200, Gerd Hoffmann wrote:
->> > > I remember we even discussed that a while back ...
->> > > Oh yes:
->> > > https://git.kraxel.org/cgit/qemu/commit/?h=3Dwork/no-sgabios&id=3D40=
-8690999429fdf44011c49b3af6efa50f369b1e
->> > > Somehow never ended up being merged.
->> >=20
->> > Sounds like a good idea! Could you repost the patch, with an update to
->> > qemu-deprecated.texi, please? Maybe also print the deprecation message
->> > in any case if !use_sgabios, e.g.:
->> >=20
->> >     } else {
->> >         /*
->> >          * For this machine type we expect SeaBIOS to provide a
->> >          * serial console for -machine graphics=3Doff.  No need to
->> >          * add the sgabios rom here.
->> >          */
->> >         warn_report("sgabios is deprecated and is not required anymore=
-,"
->> >                     " SeaBIOS now has the same functionality, too");
->> >     }
->>=20
->> Hmm, IIRC libvirt support is a bit tricky here as there is no easy way
->> to probe for serial console support in seabios.  So the idea was to just
->> allow both -machine graphics=3Doff and -device sga, by turning -device s=
-ga
->> into a nop in case -machine graphics=3Doff is present.
->>=20
->> But given we meanwhile had some releases without this I suspect that
->> isn't a good idea any more.  With both -machine graphics=3Doff -device s=
-ga
->> seabios and sgabios will fight over the serial device ...
->>=20
->> So, maybe take a completely different route.  Add a deprecation_reason
->> field to DeviceClass.  Make it visible in qapi introspection, so libvirt
->> can see it and avoid adding it to the command line.  Then we can
->> deprecate -device sga (and possibly other devices too) that way.
+On 21 August 2018 at 18:01, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 659b11e7a7239529cfdb4968418268ff9aa22d88:
 >
-> That won't work IIUC. If we stop using "-device sga" based on some
-> introspected deprecation value on the device, that means the guest
-> will have a different ABI from POV of migration stream. So we would
-> be unable to migrate to a QEMU without the deprecation, despite the
-> XML config being unchanged.
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.1-pull-request' into staging (2018-08-21 11:36:15 +0100)
 >
-> The only way we can stop using "-device sga" is if we either have
-> something explicit in the XML saying whether to use it or not, or
-> alternatively have some indicator associated with the next versioned
-> machine type that we can hook off.
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 6fd9b3b03635935a3a21cecde777c238745b88da:
+>
+>   test-char: add socket reconnect test (2018-08-21 17:13:12 +0200)
+>
 
-I think this is the only sane way to go.  From machine type X.Y, device
-whatever is no longer available.  That work for all devices, make live
-migration working, and we are sure that we are not using the
-"deprecated" device on new machines.
+Hi. This fails to build for 32-bit Arm:
 
-Later, Juan.
+In file included from /home/peter.maydell/qemu/include/qemu/osdep.h:51:0,
+                 from /home/peter.maydell/qemu/tests/test-rcu-list.c:23:
+/home/peter.maydell/qemu/tests/test-rcu-list.c: In function 'reclaim_list_el':
+/home/peter.maydell/qemu/include/qemu/compiler.h:92:36: error: static
+assertion failed: "not expecting:
+ sizeof(*&n_reclaims) > ATOMIC_REG_SIZE"
+ #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+                                    ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:100:30: note: in
+expansion of macro 'QEMU_BUILD_BUG_MS
+G'
+ #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+                              ^
+/home/peter.maydell/qemu/include/qemu/atomic.h:133:5: note: in
+expansion of macro 'QEMU_BUILD_BUG_ON'
+     QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c:107:5: note: in
+expansion of macro 'atomic_set'
+     atomic_set(&n_reclaims, n_reclaims + 1);
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c: In function 'rcu_q_updater':
+/home/peter.maydell/qemu/include/qemu/compiler.h:92:36: error: static
+assertion failed: "not expecting:
+ sizeof(*&n_nodes_removed) > ATOMIC_REG_SIZE"
+ #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+                                    ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:100:30: note: in
+expansion of macro 'QEMU_BUILD_BUG_MS
+G'
+ #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+                              ^
+/home/peter.maydell/qemu/include/qemu/atomic.h:133:5: note: in
+expansion of macro 'QEMU_BUILD_BUG_ON'
+     QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c:235:5: note: in
+expansion of macro 'atomic_set'
+     atomic_set(&n_nodes_removed, n_nodes_removed + n_removed_local);
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c: In function 'rcu_qtest':
+/home/peter.maydell/qemu/include/qemu/compiler.h:92:36: error: static
+assertion failed: "not expecting: sizeof(*&n_nodes_removed) >
+ATOMIC_REG_SIZE"
+ #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+                                    ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:100:30: note: in
+expansion of macro 'QEMU_BUILD_BUG_MSG'
+ #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+                              ^
+/home/peter.maydell/qemu/include/qemu/atomic.h:125:5: note: in
+expansion of macro 'QEMU_BUILD_BUG_ON'
+     QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c:292:12: note: in
+expansion of macro 'atomic_read'
+     while (atomic_read(&n_nodes_removed) > atomic_read(&n_reclaims)) {
+            ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:92:36: error: static
+assertion failed: "not expecting: sizeof(*&n_reclaims) >
+ATOMIC_REG_SIZE"
+ #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+                                    ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:100:30: note: in
+expansion of macro 'QEMU_BUILD_BUG_MSG'
+ #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+                              ^
+/home/peter.maydell/qemu/include/qemu/atomic.h:125:5: note: in
+expansion of macro 'QEMU_BUILD_BUG_ON'
+     QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c:292:44: note: in
+expansion of macro 'atomic_read'
+     while (atomic_read(&n_nodes_removed) > atomic_read(&n_reclaims)) {
+                                            ^
+In file included from /usr/include/glib-2.0/glib.h:82:0,
+                 from /home/peter.maydell/qemu/include/glib-compat.h:32,
+                 from /home/peter.maydell/qemu/include/qemu/osdep.h:122,
+                 from /home/peter.maydell/qemu/tests/test-rcu-list.c:23:
+/home/peter.maydell/qemu/include/qemu/compiler.h:92:36: error: static
+assertion failed: "not expecting: sizeof(*&n_nodes_removed) >
+ATOMIC_REG_SIZE"
+ #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+                                    ^
+/usr/include/glib-2.0/glib/gtestutils.h:48:61: note: in definition of
+macro 'g_assert_cmpint'
+                                              gint64 __n1 = (n1), __n2 = (n2); \
+                                                             ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:100:30: note: in
+expansion of macro 'QEMU_BUILD_BUG_MSG'
+ #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+                              ^
+/home/peter.maydell/qemu/include/qemu/atomic.h:125:5: note: in
+expansion of macro 'QEMU_BUILD_BUG_ON'
+     QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c:297:25: note: in
+expansion of macro 'atomic_read'
+         g_assert_cmpint(atomic_read(&n_nodes_removed), ==,
+                         ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:92:36: error: static
+assertion failed: "not expecting: sizeof(*&n_reclaims) >
+ATOMIC_REG_SIZE"
+ #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+                                    ^
+/usr/include/glib-2.0/glib/gtestutils.h:48:74: note: in definition of
+macro 'g_assert_cmpint'
+                                              gint64 __n1 = (n1), __n2 = (n2); \
+                                                                          ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:100:30: note: in
+expansion of macro 'QEMU_BUILD_BUG_MSG'
+ #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+                              ^
+/home/peter.maydell/qemu/include/qemu/atomic.h:125:5: note: in
+expansion of macro 'QEMU_BUILD_BUG_ON'
+     QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c:298:25: note: in
+expansion of macro 'atomic_read'
+                         atomic_read(&n_reclaims));
+                         ^
+In file included from /home/peter.maydell/qemu/include/qemu/osdep.h:51:0,
+                 from /home/peter.maydell/qemu/tests/test-rcu-list.c:23:
+/home/peter.maydell/qemu/include/qemu/compiler.h:92:36: error: static
+assertion failed: "not expecting: sizeof(*&n_nodes_removed) >
+ATOMIC_REG_SIZE"
+ #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+                                    ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:100:30: note: in
+expansion of macro 'QEMU_BUILD_BUG_MSG'
+ #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+                              ^
+/home/peter.maydell/qemu/include/qemu/atomic.h:125:5: note: in
+expansion of macro 'QEMU_BUILD_BUG_ON'
+     QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c:303:16: note: in
+expansion of macro 'atomic_read'
+                atomic_read(&n_nodes_removed), atomic_read(&n_reclaims));
+                ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:92:36: error: static
+assertion failed: "not expecting: sizeof(*&n_reclaims) >
+ATOMIC_REG_SIZE"
+ #define QEMU_BUILD_BUG_MSG(x, msg) _Static_assert(!(x), msg)
+                                    ^
+/home/peter.maydell/qemu/include/qemu/compiler.h:100:30: note: in
+expansion of macro 'QEMU_BUILD_BUG_MSG'
+ #define QEMU_BUILD_BUG_ON(x) QEMU_BUILD_BUG_MSG(x, "not expecting: " #x)
+                              ^
+/home/peter.maydell/qemu/include/qemu/atomic.h:125:5: note: in
+expansion of macro 'QEMU_BUILD_BUG_ON'
+     QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
+     ^
+/home/peter.maydell/qemu/tests/test-rcu-list.c:303:47: note: in
+expansion of macro 'atomic_read'
+                atomic_read(&n_nodes_removed), atomic_read(&n_reclaims));
+                                               ^
+/home/peter.maydell/qemu/rules.mak:69: recipe for target
+'tests/test-rcu-list.o' failed
+
+thanks
+-- PMM
