@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsy0M-0005cd-Mr
+	(envelope-from <jsnow@redhat.com>) id 1fsy0N-0005dF-3E
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsy0L-0001FD-3h
+	(envelope-from <jsnow@redhat.com>) id 1fsy0L-0001GW-IK
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:23:02 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu, 23 Aug 2018 18:22:38 -0400
-Message-Id: <20180823222249.13518-3-jsnow@redhat.com>
+Date: Thu, 23 Aug 2018 18:22:46 -0400
+Message-Id: <20180823222249.13518-11-jsnow@redhat.com>
 In-Reply-To: <20180823222249.13518-1-jsnow@redhat.com>
 References: <20180823222249.13518-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 02/13] block/mirror: add block job creation
- flags
+Subject: [Qemu-devel] [PATCH v2 10/13] qapi/block-commit: expose new job
+ properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +23,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Max Reitz <mreitz@redhat.com>, kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>
 
-Add support for taking and passing forward job creaton flags.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/mirror.c            | 5 +++--
- blockdev.c                | 3 ++-
- include/block/block_int.h | 5 ++++-
- 3 files changed, 9 insertions(+), 4 deletions(-)
+ blockdev.c           |  8 ++++++++
+ qapi/block-core.json | 16 +++++++++++++++-
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 57b4ac97d8..837279e979 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1639,7 +1639,8 @@ fail:
- 
- void mirror_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *target, const char *replaces,
--                  int64_t speed, uint32_t granularity, int64_t buf_size,
-+                  int creation_flags, int64_t speed,
-+                  uint32_t granularity, int64_t buf_size,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
-@@ -1655,7 +1656,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-     }
-     is_none_mode = mode == MIRROR_SYNC_MODE_NONE;
-     base = mode == MIRROR_SYNC_MODE_TOP ? backing_bs(bs) : NULL;
--    mirror_start_job(job_id, bs, JOB_DEFAULT, target, replaces,
-+    mirror_start_job(job_id, bs, creation_flags, target, replaces,
-                      speed, granularity, buf_size, backing_mode,
-                      on_source_error, on_target_error, unmap, NULL, NULL,
-                      &mirror_job_driver, is_none_mode, base, false,
 diff --git a/blockdev.c b/blockdev.c
-index c15a1e624b..6574356708 100644
+index ec90eb1cf9..98b91e75a7 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -3590,6 +3590,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-                                    bool has_copy_mode, MirrorCopyMode copy_mode,
-                                    Error **errp)
+@@ -3204,6 +3204,8 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+                       bool has_backing_file, const char *backing_file,
+                       bool has_speed, int64_t speed,
+                       bool has_filter_node_name, const char *filter_node_name,
++                      bool has_auto_finalize, bool auto_finalize,
++                      bool has_auto_dismiss, bool auto_dismiss,
+                       Error **errp)
  {
-+    int job_flags = JOB_DEFAULT;
+     BlockDriverState *bs;
+@@ -3223,6 +3225,12 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+     if (!has_filter_node_name) {
+         filter_node_name = NULL;
+     }
++    if (has_auto_finalize && !auto_finalize) {
++        job_flags |= JOB_MANUAL_FINALIZE;
++    }
++    if (has_auto_dismiss && !auto_dismiss) {
++        job_flags |= JOB_MANUAL_DISMISS;
++    }
  
-     if (!has_speed) {
-         speed = 0;
-@@ -3642,7 +3643,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-      * and will allow to check whether the node still exist at mirror completion
-      */
-     mirror_start(job_id, bs, target,
--                 has_replaces ? replaces : NULL,
-+                 has_replaces ? replaces : NULL, job_flags,
-                  speed, granularity, buf_size, sync, backing_mode,
-                  on_source_error, on_target_error, unmap, filter_node_name,
-                  copy_mode, errp);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ffab0b4d3e..b40f0bfc9b 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1029,6 +1029,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-  * @target: Block device to write to.
-  * @replaces: Block graph node name to replace once the mirror is done. Can
-  *            only be used when full mirroring is selected.
-+ * @creation_flags: Flags that control the behavior of the Job lifetime.
-+ *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @granularity: The chosen granularity for the dirty bitmap.
-  * @buf_size: The amount of data that can be in flight at one time.
-@@ -1050,7 +1052,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-  */
- void mirror_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *target, const char *replaces,
--                  int64_t speed, uint32_t granularity, int64_t buf_size,
-+                  int creation_flags, int64_t speed,
-+                  uint32_t granularity, int64_t buf_size,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
+     /* Important Note:
+      *  libvirt relies on the DeviceNotFound error class in order to probe for
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 4c7a37afdc..d5b62e50d7 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1498,6 +1498,19 @@
+ #                    above @top. If this option is not given, a node name is
+ #                    autogenerated. (Since: 2.9)
+ #
++# @auto-finalize: When false, this job will wait in a PENDING state after it has
++#                 finished its work, waiting for @block-job-finalize before
++#                 making any block graph changes.
++#                 When true, this job will automatically
++#                 perform its abort or commit actions.
++#                 Defaults to true. (Since 3.1)
++#
++# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
++#                has completely ceased all work, and awaits @block-job-dismiss.
++#                When true, this job will automatically disappear from the query
++#                list without user intervention.
++#                Defaults to true. (Since 3.1)
++#
+ # Returns: Nothing on success
+ #          If @device does not exist, DeviceNotFound
+ #          Any other error returns a GenericError.
+@@ -1515,7 +1528,8 @@
+ { 'command': 'block-commit',
+   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str', '*top': 'str',
+             '*backing-file': 'str', '*speed': 'int',
+-            '*filter-node-name': 'str' } }
++            '*filter-node-name': 'str',
++            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+ 
+ ##
+ # @drive-backup:
 -- 
 2.14.4
