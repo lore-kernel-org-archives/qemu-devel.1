@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fstra-0001RR-6A
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:57:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fstwd-0006X6-B9
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 14:02:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fstrZ-0007zL-JF
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:57:42 -0400
-Date: Thu, 23 Aug 2018 14:57:23 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180823175723.GP3778@localhost.localdomain>
-References: <20180823154655.40188-1-vsementsov@virtuozzo.com>
-	<20180823154655.40188-3-vsementsov@virtuozzo.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fstwc-00045z-E8
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 14:02:55 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:40853)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fstwc-00045Z-6t
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 14:02:54 -0400
+Received: by mail-oi0-x241.google.com with SMTP id l202-v6so3906710oig.7
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 11:02:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180823154655.40188-3-vsementsov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] scripts: add render_block_graph
- function for QEMUMachine
+In-Reply-To: <20180822034319.686504-1-jcody@redhat.com>
+References: <20180822034319.686504-1-jcody@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Aug 2018 19:02:33 +0100
+Message-ID: <CAFEAcA8Jxdk35tS0qR=wHXTaJPvcdR-cVdwAdnkTwV95XL8r5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,17 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, famz@redhat.com, jsnow@redhat.com, armbru@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, crosa@redhat.com, den@openvz.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Aug 23, 2018 at 06:46:54PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Render block nodes graph with help of graphviz. This new function is
-> for debugging, so there is no sense to put it into qemu.py as a method
-> of QEMUMachine. Let's instead put it separately.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 22 August 2018 at 04:43, Jeff Cody <jcody@redhat.com> wrote:
+> The following changes since commit ee135aa0428fe5af2af7be04ff16d2b596a9330a:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-3.1-20180821' into staging (2018-08-21 13:27:11 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+>
+> for you to fetch changes up to 26bf474ba92c76e61bea51726e22da6dfd185296:
+>
+>   block: iotest to catch abort on forced blockjob cancel (2018-08-21 15:20:37 -0400)
+>
+> ----------------------------------------------------------------
+> Block job patches
+> ----------------------------------------------------------------
+>
+> Jeff Cody (2):
+>   block: for jobs, do not clear user_paused until after the resume
+>   block: iotest to catch abort on forced blockjob cancel
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Applied, thanks.
 
--- 
-Eduardo
+-- PMM
