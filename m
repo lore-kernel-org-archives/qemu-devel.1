@@ -1,34 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fsmyK-0000Zd-DQ
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 06:36:14 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fsn0b-0001Ik-FB
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 06:38:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fsmyH-0007w7-LR
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 06:36:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37292)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fsmyH-0007uk-Bd
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 06:36:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fsmyG-0000r8-AS
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 10:36:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4C3DB2E851D
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 10:36:08 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Aug 2018 10:23:44 -0000
-From: costinel <1775702@bugs.launchpad.net>
-Reply-To: Bug 1775702 <1775702@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152840439622.3676.18260529468873821664.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153501982483.3422.13362300413530237341.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1775702] Re: High host CPU load and slower guest
- after upgrade guest OS Windows 10 to ver 1803
+	(envelope-from <pm215@archaic.org.uk>) id 1fsn0a-0000y7-CK
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 06:38:33 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 Aug 2018 11:38:18 +0100
+Message-Id: <20180823103818.31189-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH v2] hw/intc/arm_gic: Document QEMU interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +17,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Luc Michel <luc.michel@greensocs.com>
 
-hv_synic && hv_stimer only reduces the cpu from 40-50% to 4-5%.
-still expecting under 1% like linux guests.
+The GICv2's QEMU interface (sysbus MMIO regions, IRQs,
+etc) is now quite complicated with the addition of the
+virtualization extensions. Add a comment in the header
+file which documents it.
 
--- =
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I needed to write this out to figure out what I was
+connecting to what in the a15mpcore object :-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1775702
+v1->v2 changes: fixed errors in sysbus IRQ and per-cpu GICH
+memory region docs pointed out by Luc.
 
-Title:
-  High host CPU load and slower guest after upgrade guest OS Windows 10
-  to ver 1803
+ include/hw/intc/arm_gic.h | 43 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-Status in QEMU:
-  New
-
-Bug description:
-  After upgrading Windows 10 guest to version 1803, guests VM runs
-  slower and there is high host CPU load even when guest is almost idle.
-  Did not happened with windows 10 up to version 1709.
-
-  See my 1st report here:
-  https://askubuntu.com/questions/1033985/kvm-high-host-cpu-load-after-upgr=
-ading-vm-to-windows-10-1803
-
-  Another user report is here:
-  https://lime-technology.com/forums/topic/71479-windows-10-vm-cpu-usage/
-
-  Tested on: Ubuntu 16.04 with qemu 2.5.0 and i3-3217U, Arch with qemu
-  2.12 i5-7200U, Ubuntu 18.04 qemu 2.11.1 AMD FX-4300. All three
-  platform showing the same slowdown and higher host cpu load with
-  windows 10 1803 VM compared to windows 10 1709 VM.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1775702/+subscriptions
+diff --git a/include/hw/intc/arm_gic.h b/include/hw/intc/arm_gic.h
+index 42bb535fd45..1af5051ed5d 100644
+--- a/include/hw/intc/arm_gic.h
++++ b/include/hw/intc/arm_gic.h
+@@ -18,6 +18,49 @@
+  * with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++/*
++ * QEMU interface:
++ *  + QOM property "num-cpu": number of CPUs to support
++ *  + QOM property "num-irq": number of IRQs (including both SPIs and PPIs)
++ *  + QOM property "revision": GIC version (1 or 2), or 0 for the 11MPCore GIC
++ *  + QOM property "has-security-extensions": set true if the GIC should
++ *    implement the security extensions
++ *  + QOM property "has-virtualization-extensions": set true if the GIC should
++ *    implement the virtualization extensions
++ *  + unnamed GPIO inputs: (where P is number of PPIs, i.e. num-irq - 32)
++ *    [0..P-1]  SPIs
++ *    [P..P+31] PPIs for CPU 0
++ *    [P+32..P+63] PPIs for CPU 1
++ *    ...
++ *  + sysbus IRQs: (in order; number will vary depending on number of cores)
++ *    - IRQ for CPU 0
++ *    - IRQ for CPU 1
++ *      ...
++ *    - FIQ for CPU 0
++ *    - FIQ for CPU 1
++ *      ...
++ *    - VIRQ for CPU 0 (exists even if virt extensions not present)
++ *    - VIRQ for CPU 1 (exists even if virt extensions not present)
++ *      ...
++ *    - VFIQ for CPU 0 (exists even if virt extensions not present)
++ *    - VFIQ for CPU 1 (exists even if virt extensions not present)
++ *      ...
++ *    - maintenance IRQ for CPU i/f 0 (only if virt extensions present)
++ *    - maintenance IRQ for CPU i/f 1 (only if virt extensions present)
++ *  + sysbus MMIO regions: (in order; numbers will vary depending on
++ *    whether virtualization extensions are present and on number of cores)
++ *    - distributor registers (GICD*)
++ *    - CPU interface for the accessing core (GICC*)
++ *    - virtual interface control registers (GICH*) (only if virt extns present)
++ *    - virtual CPU interface for the accessing core (GICV*) (only if virt)
++ *    - CPU 0 CPU interface registers
++ *    - CPU 1 CPU interface registers
++ *      ...
++ *    - CPU 0 virtual interface control registers (only if virt extns present)
++ *    - CPU 1 virtual interface control registers (only if virt extns present)
++ *      ...
++ */
++
+ #ifndef HW_ARM_GIC_H
+ #define HW_ARM_GIC_H
+ 
+-- 
+2.18.0
