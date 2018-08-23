@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fsqch-0007oO-Nw
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:30:13 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsqeE-000128-Rn
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fsqcd-000397-Ex
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:30:07 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:43917)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fsqcd-000384-0y
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:30:03 -0400
-Received: by mail-pf1-x443.google.com with SMTP id j26-v6so2790133pfi.10
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 07:30:02 -0700 (PDT)
-References: <20180820141116.9118-1-peter.maydell@linaro.org>
-	<20180820141116.9118-11-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4157d5bd-d0de-2059-2d29-8b1a8e3c010f@linaro.org>
-Date: Thu, 23 Aug 2018 07:29:59 -0700
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fsqeB-00045a-G0
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:31:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51586 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fsqeB-00041j-AP
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:31:39 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 12AE04023827
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 14:31:33 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu, 23 Aug 2018 16:31:20 +0200
+Message-Id: <20180823143125.16767-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180820141116.9118-11-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/22] hw/misc/iotkit: Wire up the sysctl
- and sysinfo register blocks
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/5] Fix socket chardev regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com, peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 08/20/2018 07:11 AM, Peter Maydell wrote:
-> Wire up the system control element's register banks
-> (sysctl and sysinfo).
-> 
-> This is the last of the previously completely unimplemented
-> components in the IoTKit.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/arm/iotkit.h |  6 +++++-
->  hw/arm/iotkit.c         | 26 ++++++++++++++++++--------
->  2 files changed, 23 insertions(+), 9 deletions(-)
+Hi,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+In commit 25679e5d58e "chardev: tcp: postpone async connection setup"
+(and its follow up 99f2f54174a59), Peter moved chardev socket
+connection to machine_done event. However, chardev created later will
+no longer attempt to connect, and chardev created in tests do not have
+machine_done event (breaking some of vhost-user-test).
 
+The goal was to move the "connect" source to the chardev frontend
+context (the monitor thread context in his case). chr->gcontext is set
+with qemu_chr_fe_set_handlers(). But there is no guarantee that the
+function will be called in general, so we can't delay connection until
+then: the chardev should still attempt to connect during open(), using
+the main context.
 
-r~
+An alternative would be to specify the iothread during chardev
+creation. Setting up monitor OOB would be quite different too, it
+would take the same iothread as argument.
+
+99f2f54174a595e is also a bit problematic, since it will behave
+differently before and after machine_done (the first case gives a
+chance to use a different context reliably, the second looks racy)
+
+In the end, I am not sure this is all necessary, as chardev callbacks
+are called after qemu_chr_fe_set_handlers(), at which point the
+context of sources are updated. In "char-socket: update all ioc
+handlers when changing context", I moved also the hup handler to the
+updated context. So unless the main thread is already stuck, we can
+setup a different context for the chardev at that time. Or not?
+
+v2:
+- fix a random socket chardev test failure
+
+Marc-Andr=C3=A9 Lureau (5):
+  Revert "chardev: tcp: postpone TLS work until machine done"
+  Revert "chardev: tcp: postpone async connection setup"
+  char-socket: update all ioc handlers when changing context
+  test-char: fix random socket test failure
+  test-char: add socket reconnect test
+
+ chardev/char-socket.c | 86 ++++++++++++++++++-------------------------
+ tests/test-char.c     | 25 +++++++++++--
+ 2 files changed, 57 insertions(+), 54 deletions(-)
+
+--=20
+2.18.0.547.g1d89318c48
