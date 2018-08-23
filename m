@@ -1,15 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fsq0k-0003EZ-Us
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:50:55 -0400
+	(envelope-from <famz@redhat.com>) id 1fsqGQ-00020Z-Mc
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:07:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fsq0k-0003VM-5p
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 09:50:54 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Aug 2018 14:50:47 +0100
-Message-Id: <20180823135047.16525-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] target/arm: Start AArch32 CPUs with EL2 but
- not EL3 in Hyp mode
+	(envelope-from <famz@redhat.com>) id 1fsqGL-0006QK-9P
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 10:07:04 -0400
+Date: Thu, 23 Aug 2018 22:06:47 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180823140647.GC6960@lemon.usersys.redhat.com>
+References: <20180823122123.18278-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180823122123.18278-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: update MemoryRegionCaches when
+ guest negotiates features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,44 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, jasowang@redhat.com, qemu-stable@nongnu.org
 
-The ARMv8 architecture defines that an AArch32 CPU starts
-in SVC mode, unless EL2 is the highest available EL, in
-which case it starts in Hyp mode. (In ARMv7 a CPU with EL2
-but not EL3 was not a valid configuration, but we don't
-specifically reject this if the user asks for one.)
+On Thu, 08/23 14:21, Paolo Bonzini wrote:
+> Because the cache is sized to include the rings and the event indices,
+> negotiating the VIRTIO_RING_F_EVENT_IDX feature will result in the size
+> of the cache changing.  And because MemoryRegionCache accesses are
+> range-checked, if we skip this we end up with an assertion failure.
+> This happens with OpenBSD 6.3.
+> 
+> Reported-by: Fam Zheng <famz@redhat.com>
+> Fixes: 97cd965c070152bc626c7507df9fb356bbe1cd81
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 258ba6dcaad..b5e61cc1775 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -199,8 +199,18 @@ static void arm_cpu_reset(CPUState *s)
-         env->cp15.c15_cpar = 1;
-     }
- #else
--    /* SVC mode with interrupts disabled.  */
--    env->uncached_cpsr = ARM_CPU_MODE_SVC;
-+
-+    /*
-+     * If the highest available EL is EL2, AArch32 will start in Hyp
-+     * mode; otherwise it starts in SVC. Note that if we start in
-+     * AArch64 then these values in the uncached_cpsr will be ignored.
-+     */
-+    if (arm_feature(env, ARM_FEATURE_EL2) &&
-+        !arm_feature(env, ARM_FEATURE_EL3)) {
-+        env->uncached_cpsr = ARM_CPU_MODE_HYP;
-+    } else {
-+        env->uncached_cpsr = ARM_CPU_MODE_SVC;
-+    }
-     env->daif = PSTATE_D | PSTATE_A | PSTATE_I | PSTATE_F;
- 
-     if (arm_feature(env, ARM_FEATURE_M)) {
--- 
-2.18.0
+Tested-by: Fam Zheng <famz@redhat.com>
