@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fsw9E-000292-08
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:24:04 -0400
+	(envelope-from <lightn1ngstr1ke@protonmail.com>) id 1fswVA-00066P-Gh
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fsw98-0005Jy-LY
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:24:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34270 helo=mx1.redhat.com)
+	(envelope-from <lightn1ngstr1ke@protonmail.com>) id 1fswV1-00011s-Gp
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:46:40 -0400
+Received: from mail-40136.protonmail.ch ([185.70.40.136]:43442)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fsw98-0005JY-G3
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:23:58 -0400
-References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
-	<1533909989-56115-3-git-send-email-robert.hu@linux.intel.com>
-	<20180817131810.GA15372@localhost.localdomain>
-	<1534577221.4104.20.camel@linux.intel.com>
-	<20180818150548.GN15372@localhost.localdomain>
-	<1535005708.4104.34.camel@linux.intel.com>
-	<20180823171158.GI3778@localhost.localdomain>
-	<f59a30a4-6415-3c15-a3c1-5769eee04ad6@redhat.com>
-	<20180823173632.GN3778@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <92a99591-ad6c-6b8a-b934-8da5616cf70e@redhat.com>
-Date: Thu, 23 Aug 2018 22:23:53 +0200
+	(Exim 4.71) (envelope-from <lightn1ngstr1ke@protonmail.com>)
+	id 1fswV0-0000zm-UL
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 16:46:35 -0400
+Date: Thu, 23 Aug 2018 20:46:22 +0000
+From: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
+Reply-To: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
+Message-ID: <8f7eYzw9BgwUeH_z45Rgcwu8DVy8fSamlQ-f-VsR2pj9TgnAJBMrCoZjxzT6XN5XojiHMMEbOOgy-gHU0KuLiSD7YerZJPI8TZYaBdhCCIs=@protonmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180823173632.GN3778@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] kvm: Add support to
- KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel]  [PATCH] input-linux: customizable toggle keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +26,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Robert Hoo <robert.hu@linux.intel.com>, robert.hu@intel.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com" <kraxel@redhat.com>
 
-On 23/08/2018 19:36, Eduardo Habkost wrote:
->> Right, but if KVM_CAP_GET_MSR_FEATURES is not available I guess you ca=
-n
->> assume the MSRs to be zero for everything except "-cpu host".
-> Yes, that would be simplest way to implement the above.  Then
-> QEMU would refuse to run if the feature was part of the requested
-> configuration (2), or not care at all because the feature was not
-> set in the configuration (1).
->=20
-> But I'm not sure I follow the suggestion to not consider the MSR
-> to be zero on "-cpu host".  If we don't need and KVM-side code to
-> support a given MSR feature, we can enable it on all models.
-
-The case I was thinking about, is where there is no KVM-side code to
-support the MSR feature, but you still need the host CPU to have it.
-Without KVM's feature MSR support, you cannot read the host value of the
-MSR.
-
-My idea was that feature MSRs will default to the host value returned by
-KVM_GET_MSR on the /dev/kvm file descriptor, so "-cpu host" could just
-ignore KVM_CAP_GET_MSR_FEATURES and use KVM's default value of the MSRs.
-
-However, I guess we can just use the default value for _all_ CPU models,
-because in practice the only effect would be on nested VMX MSRs, and
-nested VMX can only be migrated on kernels that have
-KVM_CAP_GET_MSR_FEATURES.  So in practice people using nested VMX are
-using "-cpu host" anyway, not "-cpu SandyBridge,+vmx".
-
-My proposalis: basically, if KVM_CAP_GET_MSR_FEATURES is unavailable:
-
-- MSR-based features would cause an error if specified on the command lin=
-e;
-
-- kvm_arch_init_vcpu would skip the KVM_SET_MSR for feature MSRs complete=
-ly.
-
-What do you think?
-
-Paolo
+VGhpcyBwYXRjaCBpbnRyb2R1Y2VzIGEgbmV3IHN0cmluZyBvcHRpb24gdG8gdGhlIGlucHV0LWxp
+bnV4CmNvbW1hbmRsaW5lOgoKdG9nZ2xlX2tleXM9W251bV06W251bV06W251bV0gLi4uCgpTZXBh
+cmF0ZWQgYnkgY29sb25zLCB0b2dnbGVfa2V5cyBhbGxvd3MgdGhlIHVzZXIgdG8gc3BlY2lmeSB0
+aGUga2V5IElEcwpvZiBhbGwgdGhlIGtleXMgZGVzaXJlZCBmb3Igc3dpdGNoaW5nIGJldHdlZW4g
+dGhlIGd1ZXN0IGFuZCBob3N0LiBUaGVzZQprZXkgSURzIGNhbiBiZSBmb3VuZCBpbjoKCmluY2x1
+ZGUvc3RhbmRhcmQtaGVhZGVycy9saW51eC9pbnB1dC1ldmVudC1jb2Rlcy5oCgphbmQgYXJlIHBy
+ZWZpeGVkIHdpdGggS0VZXy4KCklmIHRoZSBvcHRpb24gaXMgbWFsZm9ybWVkIG9yIG5vdCBzcGVj
+aWZpZWQsIGl0IHdpbGwgdXNlIHRoZSBjdXJyZW50CmRlZmF1bHQgb2YgS0VZX0xFRlRDVFJMICsg
+S0VZX1JJR0hUQ1RSTC4KLS0tCnVpL2lucHV0LWxpbnV4LmMgfCAxMzYgKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0KMSBmaWxlIGNoYW5nZWQsIDEzNCBpbnNl
+cnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3VpL2lucHV0LWxpbnV4LmMg
+Yi91aS9pbnB1dC1saW51eC5jCmluZGV4IDk3MjAzMzNiMmMuLjM4ODc4ZjA4MzYgMTAwNjQ0Ci0t
+LSBhL3VpL2lucHV0LWxpbnV4LmMKKysrIGIvdWkvaW5wdXQtbGludXguYwpAQCAtMTIsNiArMTIs
+NyBAQAojaW5jbHVkZSAic3lzZW11L3N5c2VtdS5oIgojaW5jbHVkZSAidWkvaW5wdXQuaCIKI2lu
+Y2x1ZGUgInFvbS9vYmplY3RfaW50ZXJmYWNlcy5oIgorI2luY2x1ZGUgImluY2x1ZGUvcWVtdS9j
+dXRpbHMuaCIKCiNpbmNsdWRlIDxzeXMvaW9jdGwuaD4KI2luY2x1ZGUgInN0YW5kYXJkLWhlYWRl
+cnMvbGludXgvaW5wdXQuaCIKQEAgLTYzLDYgKzY0LDEwIEBAIHN0cnVjdCBJbnB1dExpbnV4IHsK
+ICAgICBzdHJ1Y3QgaW5wdXRfZXZlbnQgZXZlbnQ7CiAgICAgaW50ICAgICAgICAgcmVhZF9vZmZz
+ZXQ7CgorICAgIGNoYXIgICAgICAgICp0b2dnbGVfa2V5czsKKyAgICBpbnQgICAgICAgICB0b2dn
+bGVfa2V5c19sZW47CisgICAgaW50ICAgICAgICAgKnRvZ2dsZV9rZXlzX2xpc3Q7CisKICAgICBR
+VEFJTFFfRU5UUlkoSW5wdXRMaW51eCkgbmV4dDsKfTsKCkBAIC05OCw2ICsxMDMsMTYgQEAgc3Rh
+dGljIHZvaWQgaW5wdXRfbGludXhfdG9nZ2xlX2dyYWIoSW5wdXRMaW51eCAqaWwpCiAgICAgfQp9
+Cgorc3RhdGljIGJvb2wgaW5wdXRfbGludXhfY2hlY2tfdG9nZ2xlX2tleXMoSW5wdXRMaW51eCAq
+aWwpCit7CisgICAgZm9yICh1bnNpZ25lZCBpID0gMDsgaSA8IGlsLT50b2dnbGVfa2V5c19sZW47
+IGkrKykgeworICAgICAgICBpZiAoIWlsLT5rZXlkb3duW2lsLT50b2dnbGVfa2V5c19saXN0W2ld
+XSkgeworICAgICAgICAgICAgcmV0dXJuIGZhbHNlOworICAgICAgICB9CisgICAgfQorICAgIHJl
+dHVybiB0cnVlOworfQorCnN0YXRpYyB2b2lkIGlucHV0X2xpbnV4X2hhbmRsZV9rZXlib2FyZChJ
+bnB1dExpbnV4ICppbCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBz
+dHJ1Y3QgaW5wdXRfZXZlbnQgKmV2ZW50KQp7CkBAIC0xMzQsOCArMTQ5LDcgQEAgc3RhdGljIHZv
+aWQgaW5wdXRfbGludXhfaGFuZGxlX2tleWJvYXJkKElucHV0TGludXggKmlsLAogICAgICAgICB9
+CgogICAgICAgICAvKiBob3RrZXkgLT4gcmVjb3JkIHN3aXRjaCByZXF1ZXN0IC4uLiAqLwotICAg
+ICAgICBpZiAoaWwtPmtleWRvd25bS0VZX0xFRlRDVFJMXSAmJgotICAgICAgICAgICAgaWwtPmtl
+eWRvd25bS0VZX1JJR0hUQ1RSTF0pIHsKKyAgICAgICAgaWYgKGlucHV0X2xpbnV4X2NoZWNrX3Rv
+Z2dsZV9rZXlzKGlsKSkgewogICAgICAgICAgICAgaWwtPmdyYWJfcmVxdWVzdCA9IHRydWU7CiAg
+ICAgICAgIH0KCkBAIC0yNzQsNiArMjg4LDE4IEBAIHN0YXRpYyB2b2lkIGlucHV0X2xpbnV4X2Nv
+bXBsZXRlKFVzZXJDcmVhdGFibGUgKnVjLCBFcnJvciAqKmVycnApCiAgICAgICAgIHJldHVybjsK
+ICAgICB9CgorICAgIC8qCisgICAgICogSWYgdGhlIHRvZ2dsZV9rZXlzIGNoYXIgd2FzIG5vdCBw
+cm92aWRlZCwgc2V0CisgICAgICogdGhlIGRlZmF1bHQgb2YgS0VZX0xFRlRDVFJMIGFuZCBLRVlf
+UklHSFRDVFJMCisgICAgICovCisgICAgaWYgKCFpbC0+dG9nZ2xlX2tleXMgfHwgIWlsLT50b2dn
+bGVfa2V5c19saXN0IHx8ICFpbC0+dG9nZ2xlX2tleXNfbGVuKSB7CisgICAgICAgIGlsLT50b2dn
+bGVfa2V5cyA9IE5VTEw7CisgICAgICAgIGlsLT50b2dnbGVfa2V5c19sZW4gPSAyOworICAgICAg
+ICBpbC0+dG9nZ2xlX2tleXNfbGlzdCA9IGdfbmV3KGludCwgMik7CisgICAgICAgIGlsLT50b2dn
+bGVfa2V5c19saXN0WzBdID0gS0VZX0xFRlRDVFJMOworICAgICAgICBpbC0+dG9nZ2xlX2tleXNf
+bGlzdFsxXSA9IEtFWV9SSUdIVENUUkw7CisgICAgfQorCiAgICAgaWwtPmZkID0gb3BlbihpbC0+
+ZXZkZXYsIE9fUkRXUik7CiAgICAgaWYgKGlsLT5mZCA8IDApICB7CiAgICAgICAgIGVycm9yX3Nl
+dGdfZmlsZV9vcGVuKGVycnAsIGVycm5vLCBpbC0+ZXZkZXYpOwpAQCAtMzU5LDYgKzM4NSwxMSBA
+QCBzdGF0aWMgdm9pZCBpbnB1dF9saW51eF9pbnN0YW5jZV9maW5hbGl6ZShPYmplY3QgKm9iaikK
+ICAgICAgICAgY2xvc2UoaWwtPmZkKTsKICAgICB9CiAgICAgZ19mcmVlKGlsLT5ldmRldik7CisK
+KyAgICBpZiAoaWwtPnRvZ2dsZV9rZXlzKSB7CisgICAgICAgIGdfZnJlZShpbC0+dG9nZ2xlX2tl
+eXMpOworICAgIH0KKyAgICBnX2ZyZWUoaWwtPnRvZ2dsZV9rZXlzX2xpc3QpOwp9CgpzdGF0aWMg
+Y2hhciAqaW5wdXRfbGludXhfZ2V0X2V2ZGV2KE9iamVjdCAqb2JqLCBFcnJvciAqKmVycnApCkBA
+IC00MTAsMTEgKzQ0MSwxMTIgQEAgc3RhdGljIHZvaWQgaW5wdXRfbGludXhfc2V0X3JlcGVhdChP
+YmplY3QgKm9iaiwgYm9vbCB2YWx1ZSwKICAgICBpbC0+cmVwZWF0ID0gdmFsdWU7Cn0KCitzdGF0
+aWMgdm9pZCBpbnB1dF9saW51eF9wb3B1bGF0ZV90b2dnbGVfa2V5cyhJbnB1dExpbnV4ICppbCkK
+K3sKKyAgICAvKgorICAgICAqIElmIG5vIHRvZ2dsZV9rZXlzIHdhcyBwcm92aWRlZCwgcmV0dXJu
+IHplcm8ga2V5cy4KKyAgICAgKiBUaGlzIHdpbGwgYmUgY2xlYW5lZCB1cCBpbiB0aGUgaW5wdXRf
+bGludXhfY29tcGxldGUoKQorICAgICAqIGZ1bmN0aW9uIGFuZCByZXNldCB0byBib3RoIEN0cmwg
+a2V5cy4KKyAgICAgKi8KKyAgICBpZiAoIWlsLT50b2dnbGVfa2V5cykgeworICAgICAgICBpbC0+
+dG9nZ2xlX2tleXNfbGVuID0gMDsKKyAgICAgICAgaWwtPnRvZ2dsZV9rZXlzX2xpc3QgPSBOVUxM
+OworICAgICAgICByZXR1cm47CisgICAgfQorCisgICAgLyoKKyAgICAgKiBJdGVyYXRlIHRocm91
+Z2ggZWFjaCB0b2tlbiBpbiB0aGUgdG9nZ2xlX2tleXMgc3RyaW5nLAorICAgICAqIHNlcGFyYXRl
+ZCBieSBjb2xvbnMsIGFuZCBhZGQgaXQgdG8gdGhlIGlsLT50b2dnbGVfa2V5c19saXN0CisgICAg
+ICogYXJyYXkuCisgICAgICoKKyAgICAgKiBVbmZvcnR1bmF0ZWx5IHRoaXMgbXVzdCBiZSBkb25l
+IHR3aWNlIGluIG9yZGVyIHRvCisgICAgICogZGV0ZXJtaW5lIGhvdyBtdWNoIG1lbW9yeSB3aWxs
+IGJlIGFsbG9jYXRlZCBsYXRlciBvbi4KKyAgICAgKi8KKworICAgIC8qIEZpcnN0IHNjYW4gKi8K
+KyAgICBpbC0+dG9nZ2xlX2tleXNfbGVuID0gMDsKKworICAgIGNoYXIgKm9yaWcsICp0b2tlbiwg
+KnNhdmVwdHI7CisKKyAgICBvcmlnID0gZ19zdHJkdXAoaWwtPnRvZ2dsZV9rZXlzKTsKKyAgICBz
+YXZlcHRyID0gb3JpZzsKKworICAgIHdoaWxlIChzdHJ0b2tfcihzYXZlcHRyLCAiOiIsICZzYXZl
+cHRyKSkgeworICAgICAgICBpbC0+dG9nZ2xlX2tleXNfbGVuKys7CisgICAgfQorCisgICAgLyoK
+KyAgICAgKiBJZiB0aGUgY291bnQgZm91bmQgemVybyB0b2tlbnMsIHJldHVybiBhbiBlbXB0eSBs
+aXN0LgorICAgICAqIEFnYWluLCB0aGlzIHdpbGwgYmUgY2xlYW5lZCB1cCBpbiBpbnB1dF9saW51
+eF9jb21wbGV0ZSgpLgorICAgICAqLworICAgIGlmICghaWwtPnRvZ2dsZV9rZXlzX2xlbikgewor
+ICAgICAgICBpbC0+dG9nZ2xlX2tleXNfbGlzdCA9IE5VTEw7CisgICAgICAgIGdfZnJlZShvcmln
+KTsKKyAgICAgICAgcmV0dXJuOworICAgIH0KKworICAgIC8qIFNlY29uZCBzY2FuICovCisgICAg
+aWwtPnRvZ2dsZV9rZXlzX2xpc3QgPSBnX25ldyhpbnQsIGlsLT50b2dnbGVfa2V5c19sZW4pOwor
+CisgICAgc3RyY3B5KG9yaWcsIGlsLT50b2dnbGVfa2V5cyk7CisgICAgc2F2ZXB0ciA9IG9yaWc7
+CisgICAgdW5zaWduZWQgY250ciA9IDA7CisKKyAgICAvKiBBZGQgZWFjaCB0b2tlbidzIGludCBy
+ZXByZXNlbnRhdGlvbiB0byB0aGUgbGlzdCAqLworICAgIHdoaWxlICgodG9rZW4gPSBzdHJ0b2tf
+cihzYXZlcHRyLCAiOiIsICZzYXZlcHRyKSkpIHsKKyAgICAgICAgbG9uZyB2YWwgPSAwOworICAg
+ICAgICBpbnQgc3RydG9sX3JldCA9IHFlbXVfc3RydG9sKHRva2VuLCBOVUxMLCAxMCwgJnZhbCk7
+CisKKyAgICAgICAgLyoKKyAgICAgICAgICogQ2hlY2sgdG8gZW5zdXJlIChhKSBxZW11X3N0cnRv
+bCgpIGRpZCBub3QgZmFpbAorICAgICAgICAgKiBhbmQgKGIpIHRoZSBpbnRlZ2VyIGl0IHJldHVy
+bmVkIGlzIHdpdGhpbiB0aGUKKyAgICAgICAgICogcmFuZ2Ugb2YgcG9zc2libGUga2V5cworICAg
+ICAgICAgKi8KKyAgICAgICAgaWYgKHN0cnRvbF9yZXQgPiAwIHx8ICEodmFsID4gMCAmJiB2YWwg
+PCBLRVlfQ05UKSkgeworICAgICAgICAgICAgZ19mcmVlKGlsLT50b2dnbGVfa2V5c19saXN0KTsK
+KyAgICAgICAgICAgIGdfZnJlZShvcmlnKTsKKyAgICAgICAgICAgIGlsLT50b2dnbGVfa2V5c19s
+ZW4gPSAwOworICAgICAgICAgICAgaWwtPnRvZ2dsZV9rZXlzX2xpc3QgPSBOVUxMOworICAgICAg
+ICAgICAgcmV0dXJuOworICAgICAgICB9CisKKyAgICAgICAgaWwtPnRvZ2dsZV9rZXlzX2xpc3Rb
+Y250cl0gPSB2YWw7CisgICAgICAgIGNudHIrKzsKKyAgICB9CisKKyAgICBnX2ZyZWUob3JpZyk7
+Cit9CisKK3N0YXRpYyB2b2lkIGlucHV0X2xpbnV4X3NldF90b2dnbGVfa2V5cyhPYmplY3QgKm9i
+aiwgY29uc3QgY2hhciAqdmFsdWUsCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgRXJyb3IgKiplcnJwKQoreworICAgIElucHV0TGludXggKmlsID0gSU5QVVRfTElOVVgo
+b2JqKTsKKworICAgIGlmIChpbC0+dG9nZ2xlX2tleXMpIHsKKyAgICAgICAgZXJyb3Jfc2V0Zyhl
+cnJwLCAidG9nZ2xlX2tleXMgcHJvcGVydHkgYWxyZWFkeSBzZXQiKTsKKyAgICAgICAgcmV0dXJu
+OworICAgIH0KKworICAgIGlsLT50b2dnbGVfa2V5cyA9IGdfc3RyZHVwKHZhbHVlKTsKKworICAg
+IGlucHV0X2xpbnV4X3BvcHVsYXRlX3RvZ2dsZV9rZXlzKGlsKTsKK30KKworc3RhdGljIGNoYXIg
+KmlucHV0X2xpbnV4X2dldF90b2dnbGVfa2V5cyhPYmplY3QgKm9iaiwgRXJyb3IgKiplcnJwKQor
+eworICAgIElucHV0TGludXggKmlsID0gSU5QVVRfTElOVVgob2JqKTsKKworICAgIHJldHVybiBn
+X3N0cmR1cChpbC0+dG9nZ2xlX2tleXMpOworfQorCnN0YXRpYyB2b2lkIGlucHV0X2xpbnV4X2lu
+c3RhbmNlX2luaXQoT2JqZWN0ICpvYmopCnsKICAgICBvYmplY3RfcHJvcGVydHlfYWRkX3N0cihv
+YmosICJldmRldiIsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfbGludXhfZ2V0
+X2V2ZGV2LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlucHV0X2xpbnV4X3NldF9ldmRl
+diwgTlVMTCk7CisgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF9zdHIob2JqLCAidG9nZ2xlX2tleXMi
+LAorICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlucHV0X2xpbnV4X2dldF90b2dnbGVfa2V5
+cywKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9saW51eF9zZXRfdG9nZ2xlX2tl
+eXMsIE5VTEwpOwogICAgIG9iamVjdF9wcm9wZXJ0eV9hZGRfYm9vbChvYmosICJncmFiX2FsbCIs
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlucHV0X2xpbnV4X2dldF9ncmFiX2FsbCwK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfbGludXhfc2V0X2dyYWJfYWxsLCBO
+VUxMKTsKLS0KMi4xOC4w
