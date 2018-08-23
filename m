@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fssgS-0003W0-8b
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1fssgU-0003T9-99
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fsseu-0003aZ-IQ
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44746 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsseu-0003Zc-8g
+	(envelope-from <armbru@redhat.com>) id 1fsses-0003Xc-OB
 	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58506 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fsses-0003X8-GM
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 12:40:30 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 23 Aug 2018 18:39:57 +0200
-Message-Id: <20180823164025.12553-31-armbru@redhat.com>
+Date: Thu, 23 Aug 2018 18:39:35 +0200
+Message-Id: <20180823164025.12553-9-armbru@redhat.com>
 In-Reply-To: <20180823164025.12553-1-armbru@redhat.com>
 References: <20180823164025.12553-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 30/58] check-qjson: Fix and enable
- utf8_string()'s disabled part
+Subject: [Qemu-devel] [PATCH v3 08/58] check-qjson: Cover escaped characters
+ more thoroughly, part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +27,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+escaped_string() first tests double quoted strings, then repeats a few
+tests with single quotes.  Repeat all of them: store the strings to
+test without quotes, and wrap them in either kind of quote for
+testing.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/check-qjson.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ tests/check-qjson.c | 96 +++++++++++++++++++++++++++------------------
+ 1 file changed, 57 insertions(+), 39 deletions(-)
 
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 343f8af36a..defc21fa04 100644
+index 188f683317..008b6e95e4 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -776,15 +776,10 @@ static void utf8_string(void)
-             qobject_unref(str);
-             g_free(jstr);
+@@ -22,55 +22,73 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qemu-common.h"
  
--            /*
--             * Parse @json_out right back
--             * Disabled, because qobject_from_json() is buggy, and I can't
--             * be bothered to add the expected incorrect results.
--             * FIXME Enable once these bugs have been fixed.
--             */
--            if (0 && json_out != json_in) {
-+            /* Parse @json_out right back, unless it has replacements */
-+            if (!strstr(json_out, "\\uFFFD")) {
-                 str = from_json_str(json_out, j, &error_abort);
--                g_assert_cmpstr(qstring_get_try_str(str), ==, utf8_out);
-+                g_assert_cmpstr(qstring_get_try_str(str), ==, utf8_in);
-             }
++static QString *from_json_str(const char *jstr, bool single, Error **errp)
++{
++    char quote = single ? '\'' : '"';
++    char *qjstr = g_strdup_printf("%c%s%c", quote, jstr, quote);
++    QString *ret = qobject_to(QString, qobject_from_json(qjstr, errp));
++
++    g_free(qjstr);
++    return ret;
++}
++
++static char *to_json_str(QString *str)
++{
++    QString *json = qobject_to_json(QOBJECT(str));
++    char *jstr;
++
++    if (!json) {
++        return NULL;
++    }
++    /* peel off double quotes */
++    jstr = g_strndup(qstring_get_str(json) + 1,
++                     qstring_get_length(json) - 2);
++    qobject_unref(json);
++    return jstr;
++}
++
+ static void escaped_string(void)
+ {
+-    int i;
+     struct {
+-        const char *encoded;
+-        const char *decoded;
++        /* Content of JSON string to parse with qobject_from_json() */
++        const char *json_in;
++        /* Expected parse output; to unparse with qobject_to_json() */
++        const char *utf8_out;
+         int skip;
+     } test_cases[] = {
+-        { "\"\\b\"", "\b" },
+-        { "\"\\f\"", "\f" },
+-        { "\"\\n\"", "\n" },
+-        { "\"\\r\"", "\r" },
+-        { "\"\\t\"", "\t" },
+-        { "\"/\"", "/" },
+-        { "\"\\/\"", "/", .skip = 1 },
+-        { "\"\\\\\"", "\\" },
+-        { "\"\\\"\"", "\"" },
+-        { "\"hello world \\\"embedded string\\\"\"",
++        { "\\b", "\b" },
++        { "\\f", "\f" },
++        { "\\n", "\n" },
++        { "\\r", "\r" },
++        { "\\t", "\t" },
++        { "/", "/" },
++        { "\\/", "/", .skip = 1 },
++        { "\\\\", "\\" },
++        { "\\\"", "\"" },
++        { "hello world \\\"embedded string\\\"",
+           "hello world \"embedded string\"" },
+-        { "\"hello world\\nwith new line\"", "hello world\nwith new line" },
+-        { "\"single byte utf-8 \\u0020\"", "single byte utf-8  ", .skip = 1 },
+-        { "\"double byte utf-8 \\u00A2\"", "double byte utf-8 \xc2\xa2" },
+-        { "\"triple byte utf-8 \\u20AC\"", "triple byte utf-8 \xe2\x82\xac" },
+-        { "'\\b'", "\b", .skip = 1 },
+-        { "'\\f'", "\f", .skip = 1 },
+-        { "'\\n'", "\n", .skip = 1 },
+-        { "'\\r'", "\r", .skip = 1 },
+-        { "'\\t'", "\t", .skip = 1 },
+-        { "'\\/'", "/", .skip = 1 },
+-        { "'\\\\'", "\\", .skip = 1 },
++        { "hello world\\nwith new line", "hello world\nwith new line" },
++        { "single byte utf-8 \\u0020", "single byte utf-8  ", .skip = 1 },
++        { "double byte utf-8 \\u00A2", "double byte utf-8 \xc2\xa2" },
++        { "triple byte utf-8 \\u20AC", "triple byte utf-8 \xe2\x82\xac" },
+         {}
+     };
++    int i, j;
++    QString *cstr;
++    char *jstr;
+ 
+-    for (i = 0; test_cases[i].encoded; i++) {
+-        QObject *obj;
+-        QString *str;
+-
+-        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+-        str = qobject_to(QString, obj);
+-        g_assert(str);
+-        g_assert_cmpstr(qstring_get_str(str), ==, test_cases[i].decoded);
+-
+-        if (test_cases[i].skip == 0) {
+-            str = qobject_to_json(obj);
+-            g_assert_cmpstr(qstring_get_str(str), ==, test_cases[i].encoded);
+-            qobject_unref(obj);
++    for (i = 0; test_cases[i].json_in; i++) {
++        for (j = 0; j < 2; j++) {
++            cstr = from_json_str(test_cases[i].json_in, j, &error_abort);
++            g_assert_cmpstr(qstring_get_try_str(cstr),
++                            ==, test_cases[i].utf8_out);
++            if (test_cases[i].skip == 0) {
++                jstr = to_json_str(cstr);
++                g_assert_cmpstr(jstr, ==, test_cases[i].json_in);
++                g_free(jstr);
++            }
++            qobject_unref(cstr);
          }
+-
+-        qobject_unref(str);
      }
+ }
+ 
 -- 
 2.17.1
