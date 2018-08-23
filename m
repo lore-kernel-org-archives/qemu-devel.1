@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fstWF-0003AB-K7
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:35:40 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fstXE-0004nb-CA
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:36:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fstWA-0006PF-J8
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:35:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fstWA-0006Oj-BY
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:35:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fstW9-00062V-4E
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 17:35:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1EFA22E851C
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 17:35:33 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1fstX9-0007PZ-5h
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:36:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fstX8-0007Oc-UB
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 13:36:35 -0400
+Date: Thu, 23 Aug 2018 14:36:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180823173632.GN3778@localhost.localdomain>
+References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
+	<1533909989-56115-3-git-send-email-robert.hu@linux.intel.com>
+	<20180817131810.GA15372@localhost.localdomain>
+	<1534577221.4104.20.camel@linux.intel.com>
+	<20180818150548.GN15372@localhost.localdomain>
+	<1535005708.4104.34.camel@linux.intel.com>
+	<20180823171158.GI3778@localhost.localdomain>
+	<f59a30a4-6415-3c15-a3c1-5769eee04ad6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Aug 2018 17:23:45 -0000
-From: Heiko Sieger <1788665@bugs.launchpad.net>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] [NEW] Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f59a30a4-6415-3c15-a3c1-5769eee04ad6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] kvm: Add support to
+ KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,155 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Robert Hoo <robert.hu@linux.intel.com>, robert.hu@intel.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
 
-Public bug reported:
+On Thu, Aug 23, 2018 at 07:28:25PM +0200, Paolo Bonzini wrote:
+> On 23/08/2018 19:11, Eduardo Habkost wrote:
+> >>> We don't want QEMU to refuse to run if the kernel doesn't have
+> >>> KVM_CAP_GET_MSR_FEATURES.  We can treat missing capability as
+> >>> equivalent to returning an empty list of MSRs.
+> >> Yes. I'll let caller (kvm_arch_init) ignore the return value but a
+> >> simple warning.
+> > Warnings tend to be ignored and are generally a sign that QEMU
+> > isn't doing the right thing.  Sometimes we have no choice, but I
+> > don't think that's the case here.
+> > 
+> > As far as I can see, we have only two possibilities here:
+> > 1) The host can run a VM that behaves exactly as requested on the
+> >    command-line (no warning required).
+> > 2) The host can't run the requested configuration (fatal error,
+> >    not a warning).
+> 
+> Right, but if KVM_CAP_GET_MSR_FEATURES is not available I guess you can
+> assume the MSRs to be zero for everything except "-cpu host".
 
-Windows 10 (1803) VM using VGA passthrough via qemu script.
+Yes, that would be simplest way to implement the above.  Then
+QEMU would refuse to run if the feature was part of the requested
+configuration (2), or not care at all because the feature was not
+set in the configuration (1).
 
-After upgrading Windows 10 Pro VM to version 1803, or possibly after
-applying the March/April security updates from Microsoft, the VM would
-show low 2D graphics performance (sluggishness in 2D applications and
-low Passmark results).
+But I'm not sure I follow the suggestion to not consider the MSR
+to be zero on "-cpu host".  If we don't need and KVM-side code to
+support a given MSR feature, we can enable it on all models.  IF
+we need KVM-side code, we can't enable it even on "-cpu host".
+This is not different from CPUID-based features.
 
-Turning off Spectre vulnerability protection in Windows remedies the
-issue.
-
-Expected behavior:
-qemu/kvm hypervisor to expose firmware capabilities of host to guest OS - s=
-ee https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE-2=
-017-5715-and-hyper-v-vms
-
-Background:
-
-Starting in March or April Microsoft began to push driver updates in
-their updates / security updates. See https://support.microsoft.com/en-
-us/help/4073757/protect-your-windows-devices-against-spectre-meltdown
-
-One update concerns the Intel microcode - see
-https://support.microsoft.com/en-us/help/4100347. It is activated by
-default within Windows.
-
-Once the updates are applied within the Windows guest, 2D graphics
-performance drops significantly. Other performance benchmarks are not
-affected.
-
-A bare metal Windows installation does not display a performance loss
-after the update. See https://heiko-sieger.info/low-2d-graphics-
-benchmark-with-windows-10-1803-kvm-vm/
-
-Similar reports can be found here:
-https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_pe=
-rformance_on_windows/
-
-Hardware:
-
-6 core Intel Core i7-3930K (-MT-MCP-)
-
-Host OS:
-Linux Mint 19/Ubuntu 18.04
-Kernel: 4.15.0-32-generic x86_64
-Qemu: QEMU emulator version 2.11.1
-Intel microcode (host): 0x714
-dmesg | grep microcode
-[    0.000000] microcode: microcode updated early to revision 0x714, date =
-=3D 2018-05-08
-[    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-[    2.813340] microcode: Microcode Update Driver: v2.2.
-
-Note: I manually updated the Intel microcode on the host from 0x713 to
-0x714. However, both microcode versions produce the same result in the
-Windows guest.
-
-Guest OS:
-Windows 10 Pro 64 bit, release 1803
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: intel microcode spectre
-
-** Attachment added: "Red graph - Windows 10 bare metal; blue graph - Windo=
-ws 10 VM with Spectre protection enabled; yellow graph - Windows 10 VM with=
- spectre protection disabled"
-   https://bugs.launchpad.net/bugs/1788665/+attachment/5179857/+files/Captu=
-re-20180817-4-spectre-disabled-0x714-2d.PNG
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
-
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
-
-Status in QEMU:
-  New
-
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+-- 
+Eduardo
