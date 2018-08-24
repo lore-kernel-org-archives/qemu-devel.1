@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ftFOv-0007NZ-0K
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:57:38 -0400
+	(envelope-from <clg@kaod.org>) id 1ftFOy-0007X0-QT
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:57:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ftFBv-0001W2-V7
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:44:11 -0400
-Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:48872)
+	(envelope-from <clg@kaod.org>) id 1ftFBn-0001Ml-LZ
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:44:02 -0400
+Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:41680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ftFBv-0001Up-ML
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:44:07 -0400
-Received: from player695.ha.ovh.net (unknown [10.109.143.183])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 6347DE8C81
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 18:44:06 +0200 (CEST)
-References: <153512460418.276612.14744411474887601809.stgit@bahia>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ftFBn-0001Ko-8n
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:43:59 -0400
+Received: from player786.ha.ovh.net (unknown [10.109.146.168])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 94F2DC1A20
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 18:43:57 +0200 (CEST)
+References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
+	<20180821043343.7514-26-david@gibson.dropbear.id.au>
+	<CAFEAcA8k7u6HoAuS3v-FUzDA37-1a9Sy=QrqXvJVEKjRtCWsAA@mail.gmail.com>
+	<7a3389a5-ffc5-58d9-659d-fbc46e88ca24@kaod.org>
+	<20180824173839.03f8c29b@bahia.lan>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <aa0cef01-b6c9-9710-a56f-bd50a580d354@kaod.org>
-Date: Fri, 24 Aug 2018 18:44:00 +0200
+Message-ID: <7e4d61cc-1da4-ecb8-8dd3-f3e51b20861a@kaod.org>
+Date: Fri, 24 Aug 2018 18:43:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <153512460418.276612.14744411474887601809.stgit@bahia>
+In-Reply-To: <20180824173839.03f8c29b@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr_pci: fix potential NULL pointer
- dereference
+Subject: Re: [Qemu-devel] [PULL 25/26] spapr_pci: factorize the use of
+ SPAPR_MACHINE_GET_CLASS()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +35,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Laurent Vivier <lvivier@redhat.com>
 
-On 08/24/2018 05:30 PM, Greg Kurz wrote:
-> Commit 2c88b098e76fd added a call to SPAPR_MACHINE_GET_CLASS(spapr) in
-> spapr_phb_realize() before we check spapr isn't NULL. This causes QEMU
-> to crash when starting a non-pseries machine with a sPAPR PHB.
+On 08/24/2018 05:38 PM, Greg Kurz wrote:
+> On Fri, 24 Aug 2018 17:30:12 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >=20
-> This could be fixed by setting the smc variable after the null check,
-> but it seems more explicit to use a ternary operator to skip the call
-> to SPAPR_MACHINE_GET_CLASS() if spapr is NULL, since spapr_phb_realize(=
-)
-> will return immediately in this case.
+>> On 08/24/2018 05:09 PM, Peter Maydell wrote:
+>>> On 21 August 2018 at 05:33, David Gibson <david@gibson.dropbear.id.au=
+> wrote: =20
+>>>> From: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>>
+>>>> It should save us some CPU cycles as these routines perform a lot of
+>>>> checks.
+>>>>
+>>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>> ---
+>>>>  hw/ppc/spapr_pci.c | 11 ++++++-----
+>>>>  1 file changed, 6 insertions(+), 5 deletions(-) =20
+>>>
+>>> Hi; Coverity points out in CID 1395183 that there's a bug in
+>>> this part of this patch:
+>>>  =20
+>>>> @@ -1558,6 +1559,7 @@ static void spapr_phb_realize(DeviceState *dev=
+, Error **errp)
+>>>>      sPAPRMachineState *spapr =3D
+>>>>          (sPAPRMachineState *) object_dynamic_cast(qdev_get_machine(=
+),
+>>>>                                                    TYPE_SPAPR_MACHIN=
+E);
+>>>> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr); =20
+>>>
+>>> This has moved the call to SPAPR_MACHINE_GET_CLASS() above
+>>> the check for "is spapr NULL", which is wrong, because it
+>>> will unconditionally dereference the pointer you pass to it. =20
+>>
 >=20
-> This was reported by Coverity (CID 1395170 and 1395183).
+> I've sent a trivial patch to fix this.
+
+yes. Looks good. But,
+
 >=20
-> Fixes: 2c88b098e76fde0c7fcc0476dd3f80ce58409505
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+>> I see. This is a simple fix but the root reason for this check is=20
+>> commit f7d6bfcdc0fe ("spapr_pci: fail gracefully with non-pseries=20
+>> machine types").=20
+>>
+>=20
+> Yeah, we also have one in spapr_cpu_core_realize() for the very
+> same reason.
+>
+>> Is there a way to specify which device type can or can not be=20
+>> plugged on a machine ?=20
+>>
+>> I suppose we cannot use :=20
+>>
+>> 	machine_class_allow_dynamic_sysbus_dev()=20
+>>
+>> for cold plugged devices. Or can we ? That would be better.
+>>
+>=20
+> Hmm... not sure this would help. The root problem is that many
+> places in spapr_pci and spapr_cpu_core assume the machine is
+> sPAPR.
 
+which is a perfectly legitimate assumption for a sPAPR only device,
+same for spapr_cpu_core. I would think. Shouldn't we enforce=20
+the restriction at the machine level instead and not at the device
+level ?=20
 
+I thought that was the purpose of commit 0bd1909da606 ("machine:=20
+Replace has_dynamic_sysbus with list of allowed devices"), to=20
+make sure machines had a predefined list of user-creatable devices.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+I might be missing something.
 
 Thanks,
 
 C.
-
-> ---
->  hw/ppc/spapr_pci.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 5cd676e4430d..6bcb4f419b6b 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1559,7 +1559,7 @@ static void spapr_phb_realize(DeviceState *dev, E=
-rror **errp)
->      sPAPRMachineState *spapr =3D
->          (sPAPRMachineState *) object_dynamic_cast(qdev_get_machine(),
->                                                    TYPE_SPAPR_MACHINE);
-> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> +    sPAPRMachineClass *smc =3D spapr ? SPAPR_MACHINE_GET_CLASS(spapr) =
-: NULL;
->      SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
->      sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(s);
->      PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
->=20
