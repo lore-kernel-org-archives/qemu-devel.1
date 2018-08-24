@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1ftIjd-0001sN-Ju
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 16:31:10 -0400
+	(envelope-from <prvs=7672175d0=jancraig@amazon.com>)
+	id 1ftI0o-0006Lg-VJ
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:44:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1ftIja-0004Wd-9L
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 16:31:09 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri, 24 Aug 2018 16:31:01 -0400
-Message-Id: <20180824203101.30125-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH] spapr: fix leak of rev array
+	(envelope-from <prvs=7672175d0=jancraig@amazon.com>)
+	id 1ftI0j-0003v0-1N
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:44:50 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:1250)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=7672175d0=jancraig@amazon.com>)
+	id 1ftI0i-0003td-OQ
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:44:44 -0400
+From: Craig Janeczek <jancraig@amazon.com>
+Date: Fri, 24 Aug 2018 15:44:01 -0400
+Message-Id: <cover.1535133088.git.jancraig@amazon.com>
+Subject: [Qemu-devel] [PATCH 0/7] Add limited MXU instruction support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,29 +25,24 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org
+Cc: amarkovic@wavecomp.com, aurelien@aurel32.net, Craig Janeczek <jancraig@amazon.com>
 
-Introduced in 04d595b300 ("spapr: do not use CPU_FOREACH_REVERSE",
-2018-08-23)
+This patch set begins to add MXU instruction support for mips
+emulation. The patches are split such that the register overhead
+is added first followed by a series of instructions.
 
-Fixes: CID1395181
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- hw/ppc/spapr.c | 1 +
- 1 file changed, 1 insertion(+)
+Craig Janeczek (7):
+  target/mips: Add MXU register support
+  target/mips: Add MXU instructions S32I2M and S32M2I
+  target/mips: Add MXU instruction S8LDD
+  target/mips: Add MXU instruction D16MUL
+  target/mips: Add MXU instruction D16MAC
+  target/mips: Add MXU instructions Q8MUL and Q8MULSU
+  target/mips: Add MXU instructions S32LDD and S32LDDR
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 4edb6c7d16..505d4c84e5 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -607,6 +607,7 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
-         spapr_populate_cpu_dt(cs, fdt, offset, spapr);
-     }
- 
-+    g_free(rev);
- }
- 
- static uint32_t spapr_pc_dimm_node(MemoryDeviceInfoList *list, ram_addr_t addr)
+ target/mips/cpu.h       |   1 +
+ target/mips/translate.c | 401 +++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 398 insertions(+), 4 deletions(-)
+
 -- 
-2.17.1
+2.18.0
