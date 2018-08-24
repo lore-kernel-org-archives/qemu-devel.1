@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8To-0007EO-GL
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:09 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8Tr-0007GF-My
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8Tn-0003hq-Kw
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:08 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44876)
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8Tq-0003sV-DN
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:11 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ft8Tn-0003ee-Bp
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:07 -0400
+	id 1ft8Tq-0003jk-3M
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:10 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8Tm-0006Sx-9U
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:06 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8Tp-0006UG-2M
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:09 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 10:33:08 +0100
-Message-Id: <20180824093343.11346-18-peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 10:33:11 +0100
+Message-Id: <20180824093343.11346-21-peter.maydell@linaro.org>
 In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
 References: <20180824093343.11346-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 17/52] target/arm: Clear CPSR.IL and CPSR.J on
- 32-bit exception entry
+Subject: [Qemu-devel] [PULL 20/52] hw/misc/mps2-fpgaio: Implement PSCNTR and
+ COUNTER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +30,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-On 32-bit exception entry, CPSR.J must always be set to 0
-(see v7A Arm ARM DDI0406C.c B1.8.5). CPSR.IL must also
-be cleared on 32-bit exception entry (see v8A Arm ARM
-DDI0487C.a G1.10).
+In the MPS2 FPGAIO, PSCNTR is a free-running downcounter with
+a reload value configured via the PRESCALE register, and
+COUNTER counts up by 1 every time PSCNTR reaches zero.
+Implement these counters.
 
-Clear these bits. (This fixes a bug which will never be noticed
-by non-buggy guests.)
+We can just increment the counters migration subsection's
+version ID because we only added it in the previous commit,
+so no released QEMU versions will be using it.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Message-id: 20180820153020.21478-6-peter.maydell@linaro.org
+Message-id: 20180820141116.9118-3-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/hw/misc/mps2-fpgaio.h |  6 +++
+ hw/misc/mps2-fpgaio.c         | 97 +++++++++++++++++++++++++++++++++--
+ 2 files changed, 99 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 10f40b01700..b0ab18af43e 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8054,6 +8054,8 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
-     if (env->cp15.sctlr_el[arm_current_el(env)] & SCTLR_EE) {
-         env->uncached_cpsr |= CPSR_E;
-     }
-+    /* J and IL must always be cleared for exception entry */
-+    env->uncached_cpsr &= ~(CPSR_IL | CPSR_J);
-     env->daif |= mask;
+diff --git a/include/hw/misc/mps2-fpgaio.h b/include/hw/misc/mps2-fpgaio.h
+index ec057d38c76..69e265cd4b2 100644
+--- a/include/hw/misc/mps2-fpgaio.h
++++ b/include/hw/misc/mps2-fpgaio.h
+@@ -37,6 +37,12 @@ typedef struct {
+     uint32_t prescale;
+     uint32_t misc;
  
-     if (new_mode == ARM_CPU_MODE_HYP) {
++    /* QEMU_CLOCK_VIRTUAL time at which counter and pscntr were last synced */
++    int64_t pscntr_sync_ticks;
++    /* Values of COUNTER and PSCNTR at time pscntr_sync_ticks */
++    uint32_t counter;
++    uint32_t pscntr;
++
+     uint32_t prescale_clk;
+ 
+     /* These hold the CLOCK_VIRTUAL ns tick when the CLK1HZ/CLK100HZ was zero */
+diff --git a/hw/misc/mps2-fpgaio.c b/hw/misc/mps2-fpgaio.c
+index bbc28f641f0..5cf10ebd66a 100644
+--- a/hw/misc/mps2-fpgaio.c
++++ b/hw/misc/mps2-fpgaio.c
+@@ -43,6 +43,77 @@ static int64_t tickoff_from_counter(int64_t now, uint32_t count, int frq)
+     return now - muldiv64(count, NANOSECONDS_PER_SECOND, frq);
+ }
+ 
++static void resync_counter(MPS2FPGAIO *s)
++{
++    /*
++     * Update s->counter and s->pscntr to their true current values
++     * by calculating how many times PSCNTR has ticked since the
++     * last time we did a resync.
++     */
++    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    int64_t elapsed = now - s->pscntr_sync_ticks;
++
++    /*
++     * Round elapsed down to a whole number of PSCNTR ticks, so we don't
++     * lose time if we do multiple resyncs in a single tick.
++     */
++    uint64_t ticks = muldiv64(elapsed, s->prescale_clk, NANOSECONDS_PER_SECOND);
++
++    /*
++     * Work out what PSCNTR and COUNTER have moved to. We assume that
++     * PSCNTR reloads from PRESCALE one tick-period after it hits zero,
++     * and that COUNTER increments at the same moment.
++     */
++    if (ticks == 0) {
++        /* We haven't ticked since the last time we were asked */
++        return;
++    } else if (ticks < s->pscntr) {
++        /* We haven't yet reached zero, just reduce the PSCNTR */
++        s->pscntr -= ticks;
++    } else {
++        if (s->prescale == 0) {
++            /*
++             * If the reload value is zero then the PSCNTR will stick
++             * at zero once it reaches it, and so we will increment
++             * COUNTER every tick after that.
++             */
++            s->counter += ticks - s->pscntr;
++            s->pscntr = 0;
++        } else {
++            /*
++             * This is the complicated bit. This ASCII art diagram gives an
++             * example with PRESCALE==5 PSCNTR==7:
++             *
++             * ticks  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
++             * PSCNTR 7  6  5  4  3  2  1  0  5  4  3  2  1  0  5
++             * cinc                           1                 2
++             * y            0  1  2  3  4  5  6  7  8  9 10 11 12
++             * x            0  1  2  3  4  5  0  1  2  3  4  5  0
++             *
++             * where x = y % (s->prescale + 1)
++             * and so PSCNTR = s->prescale - x
++             * and COUNTER is incremented by y / (s->prescale + 1)
++             *
++             * The case where PSCNTR < PRESCALE works out the same,
++             * though we must be careful to calculate y as 64-bit unsigned
++             * for all parts of the expression.
++             * y < 0 is not possible because that implies ticks < s->pscntr.
++             */
++            uint64_t y = ticks - s->pscntr + s->prescale;
++            s->pscntr = s->prescale - (y % (s->prescale + 1));
++            s->counter += y / (s->prescale + 1);
++        }
++    }
++
++    /*
++     * Only advance the sync time to the timestamp of the last PSCNTR tick,
++     * not all the way to 'now', so we don't lose time if we do multiple
++     * resyncs in a single tick.
++     */
++    s->pscntr_sync_ticks += muldiv64(ticks, NANOSECONDS_PER_SECOND,
++                                     s->prescale_clk);
++}
++
+ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
+ {
+     MPS2FPGAIO *s = MPS2_FPGAIO(opaque);
+@@ -74,9 +145,12 @@ static uint64_t mps2_fpgaio_read(void *opaque, hwaddr offset, unsigned size)
+         r = counter_from_tickoff(now, s->clk100hz_tick_offset, 100);
+         break;
+     case A_COUNTER:
++        resync_counter(s);
++        r = s->counter;
++        break;
+     case A_PSCNTR:
+-        qemu_log_mask(LOG_UNIMP, "MPS2 FPGAIO: counters unimplemented\n");
+-        r = 0;
++        resync_counter(s);
++        r = s->pscntr;
+         break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+@@ -107,6 +181,7 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
+         s->led0 = value & 0x3;
+         break;
+     case A_PRESCALE:
++        resync_counter(s);
+         s->prescale = value;
+         break;
+     case A_MISC:
+@@ -126,6 +201,14 @@ static void mps2_fpgaio_write(void *opaque, hwaddr offset, uint64_t value,
+         now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+         s->clk100hz_tick_offset = tickoff_from_counter(now, value, 100);
+         break;
++    case A_COUNTER:
++        resync_counter(s);
++        s->counter = value;
++        break;
++    case A_PSCNTR:
++        resync_counter(s);
++        s->pscntr = value;
++        break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "MPS2 FPGAIO write: bad offset 0x%x\n", (int) offset);
+@@ -150,6 +233,9 @@ static void mps2_fpgaio_reset(DeviceState *dev)
+     s->misc = 0;
+     s->clk1hz_tick_offset = tickoff_from_counter(now, 0, 1);
+     s->clk100hz_tick_offset = tickoff_from_counter(now, 0, 100);
++    s->counter = 0;
++    s->pscntr = 0;
++    s->pscntr_sync_ticks = now;
+ }
+ 
+ static void mps2_fpgaio_init(Object *obj)
+@@ -170,12 +256,15 @@ static bool mps2_fpgaio_counters_needed(void *opaque)
+ 
+ static const VMStateDescription mps2_fpgaio_counters_vmstate = {
+     .name = "mps2-fpgaio/counters",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .needed = mps2_fpgaio_counters_needed,
+     .fields = (VMStateField[]) {
+         VMSTATE_INT64(clk1hz_tick_offset, MPS2FPGAIO),
+         VMSTATE_INT64(clk100hz_tick_offset, MPS2FPGAIO),
++        VMSTATE_UINT32(counter, MPS2FPGAIO),
++        VMSTATE_UINT32(pscntr, MPS2FPGAIO),
++        VMSTATE_INT64(pscntr_sync_ticks, MPS2FPGAIO),
+         VMSTATE_END_OF_LIST()
+     }
+ };
 -- 
 2.18.0
