@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftHoi-0002HY-7d
+	(envelope-from <armbru@redhat.com>) id 1ftHoi-0002HX-5A
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:32:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftHoe-0001e3-22
+	(envelope-from <armbru@redhat.com>) id 1ftHoe-0001ds-1W
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:32:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38838 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38840 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ftHob-0001ZV-UZ
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ftHob-0001ZY-Uc
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:32:14 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 26A204023827
+	by mx1.redhat.com (Postfix) with ESMTPS id 29B9E402383E
 	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:32:10 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-97.ams2.redhat.com
 	[10.36.116.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DB7FE2026D6D
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DE7BB621BE
 	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:32:09 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 24 Aug 2018 21:31:23 +0200
-Message-Id: <20180824193206.25475-16-armbru@redhat.com>
+Date: Fri, 24 Aug 2018 21:31:24 +0200
+Message-Id: <20180824193206.25475-17-armbru@redhat.com>
 In-Reply-To: <20180824193206.25475-1-armbru@redhat.com>
 References: <20180824193206.25475-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 15/58] check-qjson qmp-test: Cover control
- characters more thoroughly
+Subject: [Qemu-devel] [PULL 16/58] check-qjson: Cover interpolation more
+ thoroughly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,112 +36,235 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-RFC 8259 "The JavaScript Object Notation (JSON) Data Interchange
-Format" requires control characters in strings to be escaped.
-Demonstrate the JSON parser accepts U+0001 .. U+001F unescaped.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180823164025.12553-16-armbru@redhat.com>
+Message-Id: <20180823164025.12553-17-armbru@redhat.com>
 ---
- tests/check-qjson.c | 36 ++++++++++++++++++++++++++++++------
- tests/qmp-test.c    | 14 ++++++++++++++
- 2 files changed, 44 insertions(+), 6 deletions(-)
+ tests/check-qjson.c | 166 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 102 insertions(+), 64 deletions(-)
 
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 40a573eb21..a586189d87 100644
+index a586189d87..1688b2f5c1 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -192,6 +192,26 @@ static void utf8_string(void)
-          *   We may choose to define this as feature
-          */
+@@ -876,30 +876,6 @@ static void utf8_string(void)
+     }
+ }
  
-+        /* 0  Control characters */
-+        {
-+            /*
-+             * Note: \x00 is impossible, other representations of
-+             * U+0000 are covered under 4.3
-+             */
-+            "\x01\x02\x03\x04\x05\x06\x07"
-+            "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
-+            "\x10\x11\x12\x13\x14\x15\x16\x17"
-+            "\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
-+            /* bug: not corrected (valid UTF-8, but invalid JSON) */
-+            "\x01\x02\x03\x04\x05\x06\x07"
-+            "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
-+            "\x10\x11\x12\x13\x14\x15\x16\x17"
-+            "\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F",
-+            "\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007"
-+            "\\b\\t\\n\\u000B\\f\\r\\u000E\\u000F"
-+            "\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017"
-+            "\\u0018\\u0019\\u001A\\u001B\\u001C\\u001D\\u001E\\u001F",
-+        },
-         /* 1  Some correct UTF-8 text */
-         {
-             /* a bit of German */
-@@ -211,14 +231,14 @@ static void utf8_string(void)
-         /* 2  Boundary condition test cases */
-         /* 2.1  First possible sequence of a certain length */
-         /*
--         * 2.1.1  1 byte U+0001
--         * \x00 is impossible, test \x01 instead.  Other
--         * representations of U+0000 are covered under 4.3.
-+         * 2.1.1 1 byte U+0020
-+         * Control characters are already covered by their own test
-+         * case under 0.  Test the first 1 byte non-control character
-+         * here.
-          */
-         {
--            "\x01",
--            "\x01",
--            "\\u0001",
-+            " ",
-+            " ",
-         },
-         /* 2.1.2  2 bytes U+0080 */
-         {
-@@ -1333,6 +1353,10 @@ static void junk_input(void)
-     g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
+-static void vararg_string(void)
+-{
+-    int i;
+-    struct {
+-        const char *decoded;
+-    } test_cases[] = {
+-        { "hello world" },
+-        { "the quick brown fox jumped over the fence" },
+-        {}
+-    };
+-
+-    for (i = 0; test_cases[i].decoded; i++) {
+-        QString *str;
+-
+-        str = qobject_to(QString,
+-                         qobject_from_jsonf_nofail("%s",
+-                                                   test_cases[i].decoded));
+-        g_assert(str);
+-        g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+-
+-        qobject_unref(str);
+-    }
+-}
+-
+ static void simple_number(void)
+ {
+     int i;
+@@ -1017,29 +993,6 @@ static void float_number(void)
+     }
+ }
  
-+    obj = qobject_from_json("{\x01", &err);
-+    g_assert(!err);             /* BUG */
-+    g_assert(obj == NULL);
+-static void vararg_number(void)
+-{
+-    QNum *qnum;
+-    int value = 0x2342;
+-    long long value_ll = 0x2342342343LL;
+-    double valuef = 2.323423423;
+-    int64_t val;
+-
+-    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%d", value));
+-    g_assert(qnum_get_try_int(qnum, &val));
+-    g_assert_cmpint(val, ==, value);
+-    qobject_unref(qnum);
+-
+-    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%lld", value_ll));
+-    g_assert(qnum_get_try_int(qnum, &val));
+-    g_assert_cmpint(val, ==, value_ll);
+-    qobject_unref(qnum);
+-
+-    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%f", valuef));
+-    g_assert(qnum_get_double(qnum) == valuef);
+-    qobject_unref(qnum);
+-}
+-
+ static void keyword_literal(void)
+ {
+     QObject *obj;
+@@ -1069,17 +1022,6 @@ static void keyword_literal(void)
+ 
+     qobject_unref(qbool);
+ 
+-    qbool = qobject_to(QBool, qobject_from_jsonf_nofail("%i", false));
+-    g_assert(qbool);
+-    g_assert(qbool_get_bool(qbool) == false);
+-    qobject_unref(qbool);
+-
+-    /* Test that non-zero values other than 1 get collapsed to true */
+-    qbool = qobject_to(QBool, qobject_from_jsonf_nofail("%i", 2));
+-    g_assert(qbool);
+-    g_assert(qbool_get_bool(qbool) == true);
+-    qobject_unref(qbool);
+-
+     obj = qobject_from_json("null", &error_abort);
+     g_assert(obj != NULL);
+     g_assert(qobject_type(obj) == QTYPE_QNULL);
+@@ -1091,6 +1033,101 @@ static void keyword_literal(void)
+     qobject_unref(null);
+ }
+ 
++static void interpolation_valid(void)
++{
++    long long value_lld = 0x123456789abcdefLL;
++    long value_ld = (long)value_lld;
++    int value_d = (int)value_lld;
++    unsigned long long value_llu = 0xfedcba9876543210ULL;
++    unsigned long value_lu = (unsigned long)value_llu;
++    unsigned value_u = (unsigned)value_llu;
++    double value_f = 2.323423423;
++    const char *value_s = "hello world";
++    QObject *value_p = QOBJECT(qnull());
++    QBool *qbool;
++    QNum *qnum;
++    QString *qstr;
++    QObject *qobj;
 +
-     obj = qobject_from_json("[0\xFF]", &err);
-     error_free_or_abort(&err);
-     g_assert(obj == NULL);
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 17153192fe..5edc97f63f 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -71,6 +71,13 @@ static void test_malformed(QTestState *qts)
-     qobject_unref(resp);
-     g_assert(recovered(qts));
- 
-+    /* lexical error: funny control character outside string */
-+    qtest_qmp_send_raw(qts, "{\x01");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
++    /* bool */
 +
-     /* lexical error: impossible byte in string */
-     qtest_qmp_send_raw(qts, "{'bad \xFF");
-     resp = qtest_qmp_receive(qts);
-@@ -78,6 +85,13 @@ static void test_malformed(QTestState *qts)
-     qobject_unref(resp);
-     g_assert(recovered(qts));
- 
-+    /* lexical error: control character in string */
-+    qtest_qmp_send_raw(qts, "{'execute': 'nonexistent', 'id':'\n'}");
-+    resp = qtest_qmp_receive(qts);
-+    g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound"); /* BUG */
-+    qobject_unref(resp);
-+    g_assert(recovered(qts));
++    qbool = qobject_to(QBool, qobject_from_jsonf_nofail("%i", false));
++    g_assert(qbool);
++    g_assert(qbool_get_bool(qbool) == false);
++    qobject_unref(qbool);
 +
-     /* lexical error: interpolation */
-     qtest_qmp_send_raw(qts, "%%p\n");
-     resp = qtest_qmp_receive(qts);
++    /* Test that non-zero values other than 1 get collapsed to true */
++    qbool = qobject_to(QBool, qobject_from_jsonf_nofail("%i", 2));
++    g_assert(qbool);
++    g_assert(qbool_get_bool(qbool) == true);
++    qobject_unref(qbool);
++
++    /* number */
++
++    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%d", value_d));
++    g_assert_cmpint(qnum_get_int(qnum), ==, value_d);
++    qobject_unref(qnum);
++
++    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%ld", value_ld));
++    g_assert_cmpint(qnum_get_int(qnum), ==, value_ld);
++    qobject_unref(qnum);
++
++    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%lld", value_lld));
++    g_assert_cmpint(qnum_get_int(qnum), ==, value_lld);
++    qobject_unref(qnum);
++
++    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%u", value_u));
++    g_assert_cmpuint(qnum_get_uint(qnum), ==, value_u);
++    qobject_unref(qnum);
++
++    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%lu", value_lu));
++    g_assert_cmpuint(qnum_get_uint(qnum), ==, value_lu);
++    qobject_unref(qnum);
++
++    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%llu", value_llu));
++    g_assert_cmpuint(qnum_get_uint(qnum), ==, value_llu);
++    qobject_unref(qnum);
++
++    qnum = qobject_to(QNum, qobject_from_jsonf_nofail("%f", value_f));
++    g_assert(qnum_get_double(qnum) == value_f);
++    qobject_unref(qnum);
++
++    /* string */
++
++    qstr = qobject_to(QString,
++                     qobject_from_jsonf_nofail("%s", value_s));
++    g_assert_cmpstr(qstring_get_try_str(qstr), ==, value_s);
++    qobject_unref(qstr);
++
++    /* object */
++
++    qobj = qobject_from_jsonf_nofail("%p", value_p);
++    g_assert(qobj == value_p);
++}
++
++static void interpolation_unknown(void)
++{
++    if (g_test_subprocess()) {
++        qobject_from_jsonf_nofail("%x", 666);
++    }
++    g_test_trap_subprocess(NULL, 0, 0);
++    g_test_trap_assert_failed();
++}
++
++static void interpolation_string(void)
++{
++    QLitObject decoded = QLIT_QLIST(((QLitObject[]){
++            QLIT_QSTR("%s"),
++            QLIT_QSTR("eins"),
++            {}}));
++    QObject *qobj;
++
++    /* Dangerous misfeature: % is silently ignored in strings */
++    qobj = qobject_from_jsonf_nofail("['%s', %s]", "eins", "zwei");
++    g_assert(qlit_equal_qobject(&decoded, qobj));
++    qobject_unref(qobj);
++}
++
+ static void simple_dict(void)
+ {
+     int i;
+@@ -1309,7 +1346,7 @@ static void simple_whitespace(void)
+     }
+ }
+ 
+-static void simple_varargs(void)
++static void simple_interpolation(void)
+ {
+     QObject *embedded_obj;
+     QObject *obj;
+@@ -1506,22 +1543,23 @@ int main(int argc, char **argv)
+     g_test_add_func("/literals/string/escaped", escaped_string);
+     g_test_add_func("/literals/string/quotes", string_with_quotes);
+     g_test_add_func("/literals/string/utf8", utf8_string);
+-    g_test_add_func("/literals/string/vararg", vararg_string);
+ 
+     g_test_add_func("/literals/number/simple", simple_number);
+     g_test_add_func("/literals/number/large", large_number);
+     g_test_add_func("/literals/number/float", float_number);
+-    g_test_add_func("/literals/number/vararg", vararg_number);
+ 
+     g_test_add_func("/literals/keyword", keyword_literal);
+ 
++    g_test_add_func("/literals/interpolation/valid", interpolation_valid);
++    g_test_add_func("/literals/interpolation/unkown", interpolation_unknown);
++    g_test_add_func("/literals/interpolation/string", interpolation_string);
++
+     g_test_add_func("/dicts/simple_dict", simple_dict);
+     g_test_add_func("/dicts/large_dict", large_dict);
+     g_test_add_func("/lists/simple_list", simple_list);
+ 
+-    g_test_add_func("/whitespace/simple_whitespace", simple_whitespace);
+-
+-    g_test_add_func("/varargs/simple_varargs", simple_varargs);
++    g_test_add_func("/mixed/simple_whitespace", simple_whitespace);
++    g_test_add_func("/mixed/interpolation", simple_interpolation);
+ 
+     g_test_add_func("/errors/empty", empty_input);
+     g_test_add_func("/errors/blank", blank_input);
 -- 
 2.17.1
