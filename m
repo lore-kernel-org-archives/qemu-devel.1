@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ft8jw-00058E-LU
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:50:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ft8zt-0007Pb-Cp
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:07:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ft8jr-0006ls-Ma
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:50:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47770)
+	(envelope-from <peter.maydell@linaro.org>) id 1ft8zs-0007ma-LR
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:07:17 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:46959)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ft8jr-0006kg-4b
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:50:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ft8jo-0004TW-7p
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 09:50:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2527D2E851B
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 09:50:39 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ft8zs-0007mB-EL
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:07:16 -0400
+Received: by mail-oi0-x244.google.com with SMTP id y207-v6so14368189oie.13
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 03:07:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180823164756.16948-1-pbonzini@redhat.com>
+References: <20180823164756.16948-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 11:06:55 +0100
+Message-ID: <CAFEAcA-C-4o4NzSi9qUiiamdOBoLwT8rk+WHbJecGg82tZv1rA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Aug 2018 09:44:32 -0000
-From: Frederick Metzengerstein <1788701@bugs.launchpad.net>
-Reply-To: Bug 1788701 <1788701@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153505708215.4220.1958982030702670661.malonedeb@gac.canonical.com>
-Message-Id: <153510387275.30588.10042979129207876298.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788701] Re: "Zoom to fit" doesn't work with
- -display gtk -vga virtio
+Subject: Re: [Qemu-devel] [PULL v4 00/69] Misc patches for 2018-08-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Well, then something isn't right here.
+On 23 August 2018 at 17:47, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 659b11e7a7239529cfdb4968418268ff9aa22d=
+88:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.1-p=
+ull-request' into staging (2018-08-21 11:36:15 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to b2e78fac6f27c36938353e477354778896adc08f:
+>
+>   KVM: cleanup unnecessary #ifdef KVM_CAP_... (2018-08-23 18:46:25 +0200)
+>
+> ----------------------------------------------------------------
+> * x86 TCG fixes for 64-bit call gates (Andrew)
+> * qumu-guest-agent freeze-hook tweak (Christian)
+> * pm_smbus improvements (Corey)
+> * Move validation to pre_plug for pc-dimm (David)
+> * Fix memory leaks (Eduardo, Marc-Andr=C3=A9)
+> * synchronization profiler (Emilio)
+> * Convert the CPU list to RCU (Emilio)
+> * LSI support for PPR Extended Message (George)
+> * vhost-scsi support for protection information (Greg)
+> * Mark mptsas as a storage device in the help (Guenter)
+> * checkpatch tweak cherry-picked from Linux (me)
+> * Typos, cleanups and dead-code removal (Julia, Marc-Andr=C3=A9)
+> * qemu-pr-helper support for old libmultipath (Murilo)
+> * Annotate fallthroughs (me)
+> * MemoryRegionOps cleanup (me, Peter)
+> * Make s390 qtests independent from libqos, which doesn't actually suppor=
+t it (me)
+> * Make cpu_get_ticks independent from BQL (me)
+> * Introspection fixes (Thomas)
+> * Support QEMU_MODULE_DIR environment variable (ryang)
 
-"Zoom to Fit" disabled: qemu starts with a small window (1:1 scale) and
-resizes the window when the xserver/window manager starts (1:1 scale).
-This is the sane and wanted behavior.
+Applied, thanks.
 
-"Zoom to Fit" enabled: qemu starts with a small window and doesn't
-resizes the window when the xserver/window manager starts. The whole
-display is squeezed into the small window. The window simply ignores
-resolution changes of the guest.
-
-So either there is sth wrong with your statement: "Therefore it is not
-needed to auto-resize the window" or with my setup (my window manager is
-dwm, the linux guest uses modesetting as video driver).
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788701
-
-Title:
-  "Zoom to fit" doesn't work  with -display gtk -vga virtio
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu version: 2.12.1, 3.0.0
-
-  When using -display gtk for all -vga options (std,qxl,vmware,cirrus)
-  the option "Zoom To Fit" is unchecked by default and thus auto-
-  resizing of the window works well; except for -vga virtio: here "Zoom
-  To Fit" is checked and auto-resizing doesn't work.
-
-  Proposal: make "Zoom To Fit" unchecked by default for virtio as well
-  Extended proposal: make GTK window options configurable via parameters
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788701/+subscriptions
+-- PMM
