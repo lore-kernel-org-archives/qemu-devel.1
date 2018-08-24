@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ft9bt-0003ms-Cj
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:46:34 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1ft9fD-0005IP-VJ
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:50:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ft9bq-0001ao-7t
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:46:33 -0400
-Date: Fri, 24 Aug 2018 07:46:22 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180824104622.GV3778@localhost.localdomain>
-References: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
-	<c88ef55d-738b-57bc-f00f-b4a4d7303bd6@redhat.com>
-	<20180822150536.6d79a1e1@redhat.com>
-	<20180822180112.GB3778@localhost.localdomain>
-	<20180823101406.06320b35@redhat.com>
-	<20180823172501.GM3778@localhost.localdomain>
-	<20180824100305.64e3ff08@redhat.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1ft9fD-00041e-6P
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:49:59 -0400
+References: <1535039100-11248-1-git-send-email-gengdongjiu@huawei.com>
+	<1535039100-11248-2-git-send-email-gengdongjiu@huawei.com>
+	<CAFEAcA9DJ_GMkq1fGUjXJDu9GUM0cd6Pjm1HsXpm5rQ5n78Zew@mail.gmail.com>
+	<26a33eec-3ed5-f05d-7c36-5b46eeba9612@huawei.com>
+	<CAFEAcA8e77FvPCEKGb0eNoWf_NnQqoyMz3P_-=hJCC-PW3+2vg@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <5028e5a5-ad82-fd9b-476c-4bf21f807772@huawei.com>
+Date: Fri, 24 Aug 2018 18:49:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180824100305.64e3ff08@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: revert back to 1 SRAT entry for
- hotpluggable area
+In-Reply-To: <CAFEAcA8e77FvPCEKGb0eNoWf_NnQqoyMz3P_-=hJCC-PW3+2vg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] target: arm: Add support for VCPU
+ event states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: haozhong.zhang@intel.com, xiaoguangrong.eric@gmail.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org, john.ji@intel.com, Laszlo Ersek <lersek@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
 
-On Fri, Aug 24, 2018 at 10:03:05AM +0200, Igor Mammedov wrote:
-> On Thu, 23 Aug 2018 14:25:01 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+
+On 2018/8/24 18:38, Peter Maydell wrote:
+> On 24 August 2018 at 11:28, gengdongjiu <gengdongjiu@huawei.com> wrote:
+>> On 2018/8/24 0:52, Peter Maydell wrote:
+>>> On 23 August 2018 at 16:45, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>>>> +static int kvm_put_vcpu_events(ARMCPU *cpu)
+>>>> +{
+>>>> +    CPUARMState *env = &cpu->env;
+>>>> +    struct kvm_vcpu_events events = {};
+>>>> +
+>>>> +    if (!kvm_has_vcpu_events()) {
+>>>> +        return 0;
+>>>> +    }
+>>>> +
+>>>> +    memset(&events, 0, sizeof(events));
+>>>> +    events.exception.serror_pending = env->serror.pending;
+>>>> +
+>>>> +    if (have_inject_serror_esr) {
+>>>> +        events.exception.serror_has_esr = env->serror.has_esr;
+>>>> +        events.exception.serror_esr = env->serror.esr;
+>>>> +    }
+>>>
+>>> I realised that the effect of this condition is that
+>>> if we migrate a VM from a machine which supports specifying the
+>>> SError ESR to one which does not, and at the point of migration
+>>> there is a pending SError with an ESR value, then we will
+>>> silently drop the specified ESR value. The other alternative
+>>> would be to fail the migration (by dropping the if() check,
+>>> and letting the host kernel fail the ioctl if that meant that
+>>> we asked it to set an SError ESR it couldn't manage.)
+>>>
+>>> I guess that's OK? It's all hypothetical currently since
+>>> we don't support migration between different host CPU types.
+>>
+>> Peter,
+>>    there are two status needed to migrate, one is serror_pending, another is SError ESR value.
+>>
+>> If A migrates to B, A can set an SError ESR, but B does not support to set.
+>> when A is pending a SError and need to migrate to B, I think it should support to migrate the serror_pending status without the ESR value(the ESR value is 0).
+>> That is to say,  if A is pending a SError, when migrate to B, B should also pend a SError.
+>>
+>> or do you think we should refused this migration?
 > 
-> > On Thu, Aug 23, 2018 at 10:14:06AM +0200, Igor Mammedov wrote:
-> > > On Wed, 22 Aug 2018 15:01:12 -0300
-> > > Eduardo Habkost <ehabkost@redhat.com> wrote:  
-> > [...]
-> > > > However, have you considered keeping adding separate entries for
-> > > > NVDIMM devices only (so we follow the spec), but add a single
-> > > > (numa_nodes-1, MEM_AFFINITY_HOTPLUGGABLE|MEM_AFFINITY_ENABLED)
-> > > > entry to the rest?  
-> > > Indeed, I did. It doesn't work either.  
-> > 
-> > When exactly it didn't work?  Did nvdimm + memory hotplug ever
-> > worked together on Windows guests?
-> before 848a1cc1e QEMU CLI with nvdimm + memory hotplug worked
-> as expected for Windows.
+> I don't know, that's why I asked. If we have a pending
+> SError with an ESR, and we end up on a destination machine
+> where we can pend the SError but not the ESR, does that
+> make sense (ie will the guest still be able to usefully
+  I agree this suggestion that can pend the SError but without the ESR in the destination machine.
 
-OK, so my suggestion would still have a regression.  Nevermind.
-
-> With approach you suggested, it would create several SRAT entries
-> X for nvdimm and Y for the rest (1 in the best case or many if
-> nvdimms/pc-dimms are interleaved) and that breaks memory hotplug.
->  
-> > For all the other cases there should be absolutely no difference:
-> > 
-> > nvdimm users would still get a spec-compliant SRAT table (like on
-> > QEMU 3.0).
-> > 
-> > Memory hotplug users w/o nvdimm would get the same ACPI table
-> > that they would get after applying this patch (i.e. the one we
-> > had before commit 848a1cc1e ("hw/acpi-build: build SRAT memory
-> > affinity structures for DIMM devices").
-> I did consider it. It still would be a regression but a minor one
-> (only Windows nvdimm enabled cases will have regressed memory
-> hotplug). I even have a patch for it, but it's still a regression,
-> that's why I've posted full 848a1cc1e revert.
+> continue), or have we thrown away information that the
+> guest requires to be able to usefully use the SError ?
+> Presumably the ESR is important, or we could just never
+> bother to set it when pending SErrors.
 > 
-> If it were a bug in the newest version of windows (assuming it's
-> proven Windows bug), I'd be inclined towards being spec compliant
-> and let MS fix Windows as it was with CPU hotplug (hijacked ACPI0010
-> container) which they eventually fixed, but in this case it affects
-> all guests versions and there is no proof that's a Windows bug.
+> thanks
+> -- PMM
 > 
-> So my hope here is that Intel has resources to figure out what
-> Windows expectations are wrt SRAT/memory layout and memory hotplug.
-
-Agreed.
-
--- 
-Eduardo
+> .
+> 
