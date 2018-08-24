@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ftBSt-0002rR-Iv
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 08:45:24 -0400
+	(envelope-from <mst@redhat.com>) id 1ftBbn-0006Dr-6o
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 08:54:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ftBSs-0008Tl-QK
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 08:45:23 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:42676)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ftBSs-0008Ru-DX
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 08:45:22 -0400
-Received: by mail-oi0-x244.google.com with SMTP id q204-v6so15045843oig.9
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 05:45:22 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1ftBbj-0007yN-7m
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 08:54:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58742 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ftBbh-0007wa-MY
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 08:54:31 -0400
+Date: Fri, 24 Aug 2018 15:54:22 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180824155408-mutt-send-email-mst@kernel.org>
+References: <1535071416-212072-1-git-send-email-longpeng2@huawei.com>
+	<5B7F5688.5080007@huawei.com>
+	<20180824142118-mutt-send-email-mst@kernel.org>
+	<33183CC9F5247A488A2544077AF19020DB0A1B5B@dggeml531-mbs.china.huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8okRmYDDAW2D_dq_VfQLowM1Uzhfm6KafeJFzLXBvt9A@mail.gmail.com>
-References: <20180823112153.15279-1-peter.maydell@linaro.org>
-	<20180823141155.GD6960@lemon.usersys.redhat.com>
-	<CAFEAcA8okRmYDDAW2D_dq_VfQLowM1Uzhfm6KafeJFzLXBvt9A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 13:45:01 +0100
-Message-ID: <CAFEAcA82wxTeHiPkMKnO9XCDGYbtP1B9_HgZxJu+d6=XKdx+iw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tests/vm: Increase timeout waiting for VM
- to boot to 5 minutes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DB0A1B5B@dggeml531-mbs.china.huawei.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v25 0/2] virtio-crypto:
+ virtio crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "agraf@suse.de" <agraf@suse.de>, "jasowang@redhat.com" <jasowang@redhat.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>
 
-On 24 August 2018 at 13:02, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 23 August 2018 at 15:11, Fam Zheng <famz@redhat.com> wrote:
->> On Thu, 08/23 12:21, Peter Maydell wrote:
->>> The VM tests currently have a timeout of 2 minutes for trying
->>> to connect to ssh. Since the guest VM has to boot from cold
->>> to the point of accepting inbound ssh during this time, if the
->>> host machine is heavily loaded it can spuriously time out.
->>> Increase the timeout from 2 to 5 minutes.
->>>
->>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>
->> Acked-by: Fam Zheng <famz@redhat.com>
->>
->> Again, please apply this yourself. :)
->
-> Applied, thanks.
+On Fri, Aug 24, 2018 at 12:07:44PM +0000, Gonglei (Arei) wrote:
+> Hi Michael,
+> 
+> > -----Original Message-----
+> > From: virtio-dev@lists.oasis-open.org [mailto:virtio-dev@lists.oasis-open.org]
+> > On Behalf Of Michael S. Tsirkin
+> > Sent: Friday, August 24, 2018 7:23 PM
+> > To: longpeng <longpeng2@huawei.com>
+> > Cc: xin.zeng@intel.com; Gonglei (Arei) <arei.gonglei@huawei.com>;
+> > pasic@linux.vnet.ibm.com; qemu-devel@nongnu.org;
+> > virtio-dev@lists.oasis-open.org; cohuck@redhat.com; stefanha@redhat.com;
+> > denglingli@chinamobile.com; Jani Kokkonen <Jani.Kokkonen@huawei.com>;
+> > Ola.Liljedahl@arm.com; Varun.Sethi@freescale.com;
+> > brian.a.keating@intel.com; liang.j.ma@intel.com; john.griffin@intel.com;
+> > agraf@suse.de; jasowang@redhat.com; vincent.jardin@6wind.com;
+> > Huangweidong (C) <weidong.huang@huawei.com>; wangxin (U)
+> > <wangxinxin.wang@huawei.com>; Zhoujian (jay) <jianjay.zhou@huawei.com>
+> > Subject: [virtio-dev] Re: [PATCH v25 0/2] virtio-crypto: virtio crypto device
+> > specification
+> > 
+> > Is there a github issue? If not pls create one.
+> > 
+> 
+> I just created one issue:
+> 
+> https://github.com/oasis-tcs/virtio-spec/issues/19
 
-I'm still seeing the ssh login for a netbsd VM sometimes
-sit there apparently indefinitely. Is there some way to
-debug what the guest VM is actually doing when the
-log just sits there doing
-DEBUG:root:ssh_cmd: ssh -q -o StrictHostKeyChecking=no -o
-UserKnownHostsFile=/dev/null -o ConnectTimeout=1 -p 36947 -i
-/home/peter.maydell/qemu-netbsd/build/vm-test-g0SkVX.tmp/id_rsa
-qemu@127.0.0.1 exit 0
-DEBUG:root:ssh_cmd: ssh -q -o StrictHostKeyChecking=no -o
-UserKnownHostsFile=/dev/null -o ConnectTimeout=1 -p 36947 -i
-/home/peter.maydell/qemu-netbsd/build/vm-test-g0SkVX.tmp/id_rsa
-qemu@127.0.0.1 exit 0
+All set to start voting whenever you request it.
 
-(eg a capture of its terminal output) ?
-
-thanks
--- PMM
+> 
+> Thanks,
+> -Gonglei
