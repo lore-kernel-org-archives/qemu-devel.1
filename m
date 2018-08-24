@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ft8gX-0001ix-UF
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:47:20 -0400
+	(envelope-from <quintela@redhat.com>) id 1ft8iS-0003be-EN
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ft8gT-0004Va-2S
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:47:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54366 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ft8gS-0004V7-SP
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:47:12 -0400
-Date: Fri, 24 Aug 2018 17:47:09 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180824094709.GG31581@lemon.usersys.redhat.com>
-References: <20180824012126.22721-1-famz@redhat.com>
-	<20180824082237.GA3430@redhat.com>
-	<20180824085220.GF31581@lemon.usersys.redhat.com>
-	<CAFEAcA-Qqsnwo3CwtbTMoPvNqkVc6f+4Uj15a2=a2BQdvqmLkA@mail.gmail.com>
+	(envelope-from <quintela@redhat.com>) id 1ft8iN-0005oS-F0
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:49:16 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180823165410.5ff77164.cohuck@redhat.com> (Cornelia Huck's
+	message of "Thu, 23 Aug 2018 16:54:10 +0200")
+References: <1535027120-26187-1-git-send-email-thuth@redhat.com>
+	<20180823165410.5ff77164.cohuck@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Fri, 24 Aug 2018 11:49:01 +0200
+Message-ID: <87a7pcqelu.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-Qqsnwo3CwtbTMoPvNqkVc6f+4Uj15a2=a2BQdvqmLkA@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: vm: auto_install OpenBSD
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] tests/migration: Enable the migration test
+ on s390x, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Brad Smith <brad@comstyle.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 
-On Fri, 08/24 10:06, Peter Maydell wrote:
-> On 24 August 2018 at 09:52, Fam Zheng <famz@redhat.com> wrote:
-> > On Fri, 08/24 09:22, Daniel P. Berrang=E9 wrote:
-> >> On Fri, Aug 24, 2018 at 09:21:26AM +0800, Fam Zheng wrote:
-> >> > Upgrade OpenBSD to 6.3 using auto_install. Especially, drop SDL1,
-> >> > include SDL2.
-> >> >
-> >> > One limitation of this patch is that we need a temporary HTTP serv=
-er on
-> >> > host 80 port for auto_install, because slirp cannot do guest forwa=
-rd on
-> >> > "host addr".
-> >>
-> >> That's a pretty big limitation, as port 80 requires root privileges,
-> >> and that's a pretty strict no for automated testing IMHO.
-> >>
-> >> Why does it have to be port 80 in particular - is it not possible
-> >> to use 8080 or even better, detect a random free port ?
-> >
-> > OpenBSD autoinstall[1] is hardcoded to fetch from port 80. Maybe we c=
-an instead
-> > persuade it into fetching from a different http server than 10.0.2.2.=
- To do that
-> > we'd need to implement a new slirp option for either "option tftp-ser=
-ver-name"
-> > or "next-server" according to the manpage. I'll have to experiment wi=
-th it to
-> > see if it will work.
->=20
-> Can you use the usermode networking "guestfwd" option to make guest
-> tcp connections to wherever:80 go to host:8080 or something instead?
-> (watch out for https://bugs.launchpad.net/qemu/+bug/1628971 if it
-> is still relevant, I guess).
+Cornelia Huck <cohuck@redhat.com> wrote:
+> On Thu, 23 Aug 2018 14:25:20 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+>
+>> We can re-use the s390-ccw bios code to implement a small firmware
+>> for a s390x guest which prints out the "A" and "B" characters and
+>> modifies the memory, as required for the migration test.
+>> 
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/Makefile.include               |   1 +
+>>  tests/migration-test.c               |  23 ++
+>>  tests/migration/s390x-a-b-rebuild.sh |  42 ++++
+>>  tests/migration/s390x-a-b.c          |  35 +++
+>>  tests/migration/s390x-a-b.h          | 427 +++++++++++++++++++++++++++++++++++
+>>  5 files changed, 528 insertions(+)
+>>  create mode 100755 tests/migration/s390x-a-b-rebuild.sh
+>>  create mode 100644 tests/migration/s390x-a-b.c
+>>  create mode 100644 tests/migration/s390x-a-b.h
+>
+> Hm, I wanted to comment that those new files should be added to the
+> MAINTAINERS file pattern (here as well :), but tests/migration does not
+> seem to have an entry in MAINTAINERS yet...
+>
+>
+>> diff --git a/tests/migration/s390x-a-b.h b/tests/migration/s390x-a-b.h
+>> new file mode 100644
+>> index 0000000..eb1bab4
+>> --- /dev/null
+>> +++ b/tests/migration/s390x-a-b.h
+>> @@ -0,0 +1,427 @@
+>> +/*
+>> + * This file is automatically generated from tests/migration/s390x-a-b.c, edit
+>> + * that and then run tests/migration/s390x-a-b-rebuild.sh to update, and then
+>> + * remember to send both in your patch submission.
+>> + */
+>
+> And here I assumed that this file would be lovingly hand-crafted :)
+>
+> Looks sane to me:
+>
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+>
+> Juan, from your previous mails I gather that you'll take this through
+> your tree, right?
 
-Yes, that is what I mean above. Will post v2.
-
-Fam
+Yeap.  Thanks.
