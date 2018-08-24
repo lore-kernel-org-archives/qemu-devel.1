@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Simon.Hausmann@qt.io>) id 1ft8dA-0007Om-UH
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:43:49 -0400
+	(envelope-from <quintela@redhat.com>) id 1ftBht-0003aE-MG
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Simon.Hausmann@qt.io>) id 1ft8d7-0002SE-N8
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:43:48 -0400
-Received: from mail-db5eur01on0100.outbound.protection.outlook.com
-	([104.47.2.100]:54966
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Simon.Hausmann@qt.io>)
-	id 1ft8d7-0002RD-CG
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:43:45 -0400
-From: Simon Hausmann <simon.hausmann@qt.io>
-Date: Fri, 24 Aug 2018 11:43:30 +0200
-Message-Id: <20180824094330.8908-1-simon.hausmann@qt.io>
+	(envelope-from <quintela@redhat.com>) id 1ftBhq-0004Uu-CX
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:00:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44750 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ftBhq-0004UO-7B
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:00:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F10140216E8
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 13:00:49 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <51139c7c-9592-d5ac-8541-b9d54febfd2a@redhat.com> (Thomas Huth's
+	message of "Thu, 9 Aug 2018 08:10:00 +0200")
+References: <20180808114830.7169-1-quintela@redhat.com>
+	<20180808114830.7169-12-quintela@redhat.com>
+	<51139c7c-9592-d5ac-8541-b9d54febfd2a@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Fri, 24 Aug 2018 15:00:38 +0200
+Message-ID: <875zzzrkax.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] linux-user: add support for MADV_DONTNEED
+Subject: Re: [Qemu-devel] [PATCH v2 11/22] virtio: split host bits from
+ virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +36,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Sami Nurmenniemi <sami.nurmenniemi@qt.io>, Simon Hausmann <simon.hausmann@qt.io>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Most flags to madvise() are just hints, so typically ignoring the
-syscall and returning okay is fine. However applications exist that do
-rely on MADV_DONTNEED behavior to guarantee that upon subsequent access
-the mapping is refreshed from the backing file or zero for anonymous
-mappings.
+Thomas Huth <thuth@redhat.com> wrote:
+> On 08/08/2018 01:48 PM, Juan Quintela wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  default-configs/virtio.mak        |  3 +++
+>>  hw/virtio/Makefile.objs           |  1 +
+>>  hw/virtio/virtio-input-host-pci.c | 42 +++++++++++++++++++++++++++++++
+>>  hw/virtio/virtio-pci.c            | 20 ---------------
+>>  4 files changed, 46 insertions(+), 20 deletions(-)
+>>  create mode 100644 hw/virtio/virtio-input-host-pci.c
+>> 
+>> diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+>> index 1304849018..6309dbf938 100644
+>> --- a/default-configs/virtio.mak
+>> +++ b/default-configs/virtio.mak
+>> @@ -12,3 +12,6 @@ CONFIG_VIRTIO_RNG=y
+>>  CONFIG_SCSI=y
+>>  CONFIG_VIRTIO_SCSI=y
+>>  CONFIG_VIRTIO_SERIAL=y
+>> +CONFIG_VIRTIO_VSOCK=y
+>> +CONFIG_VIRTIO_INPUT_HOST=$(CONFIG_LINUX)
+>
+> What's the VIRTIO_VSOCK good for? You don't seem to use it in this patch?
 
-Signed-off-by: Simon Hausmann <simon.hausmann@qt.io>
----
- linux-user/mmap.c    | 21 +++++++++++++++++++++
- linux-user/qemu.h    |  1 +
- linux-user/syscall.c |  6 +-----
- 3 files changed, 23 insertions(+), 5 deletions(-)
-
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 41e0983ce8..6b308d4e13 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -762,3 +762,24 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-     mmap_unlock();
-     return new_addr;
- }
-+
-+int target_madvise(abi_ulong start, abi_ulong len, int flags)
-+{
-+    len = HOST_PAGE_ALIGN(len);
-+    start &= qemu_host_page_mask;
-+
-+    if (!guest_range_valid(start, len)) {
-+        errno = TARGET_EINVAL;
-+        return -1;
-+    }
-+
-+    /* A straight passthrough may not be safe because qemu sometimes
-+       turns private file-backed mappings into anonymous mappings.
-+       Most flags are hints, except for MADV_DONTNEED that applications
-+       may rely on to zero out pages, so we pass that through.
-+       Otherwise returning success is ok. */
-+    if (flags & MADV_DONTNEED) {
-+        return madvise(g2h(start), len, MADV_DONTNEED);
-+    }
-+    return 0;
-+}
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index b4959e41c6..4b68019904 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -437,6 +437,7 @@ int target_munmap(abi_ulong start, abi_ulong len);
- abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-                        abi_ulong new_size, unsigned long flags,
-                        abi_ulong new_addr);
-+int target_madvise(abi_ulong start, abi_ulong len, int flags);
- extern unsigned long last_brk;
- extern abi_ulong mmap_next_start;
- abi_ulong mmap_find_vma(abi_ulong, abi_ulong);
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 202aa777ad..023874ac8c 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -11874,11 +11874,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
- 
- #ifdef TARGET_NR_madvise
-     case TARGET_NR_madvise:
--        /* A straight passthrough may not be safe because qemu sometimes
--           turns private file-backed mappings into anonymous mappings.
--           This will break MADV_DONTNEED.
--           This is a hint, so ignoring and returning success is ok.  */
--        ret = get_errno(0);
-+        ret = get_errno(target_madvise(arg1, arg2, arg3));
-         break;
- #endif
- #if TARGET_ABI_BITS == 32
--- 
-2.17.1
+Trash from previous rebases.  Removed.  Thanks.
