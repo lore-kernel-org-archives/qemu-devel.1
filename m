@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ft85O-0008Il-HF
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:08:57 -0400
+	(envelope-from <peterx@redhat.com>) id 1ft897-0003u6-D4
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:12:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ft85N-000655-K9
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:08:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37118 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1ft894-0008TN-3h
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:12:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38382 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ft85N-00064x-EN
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:08:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 21C0287A74
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 09:08:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ft893-0008T4-UK
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:12:42 -0400
+Date: Fri, 24 Aug 2018 17:12:36 +0800
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 24 Aug 2018 17:08:26 +0800
-Message-Id: <20180824090826.21370-4-peterx@redhat.com>
-In-Reply-To: <20180824090826.21370-1-peterx@redhat.com>
-References: <20180824090826.21370-1-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC 3/3] monitor: switch to use chardev's iothread
+Message-ID: <20180824091236.GB3020@xz-x1>
+References: <20180823143125.16767-1-marcandre.lureau@redhat.com>
+	<20180824034517.GF24044@xz-x1>
+	<CAMxuvayHnOM1_iGPqg5MBxhYa_Mz=S-jC5z_Tp_UmwvLo0Zu-Q@mail.gmail.com>
+	<20180824084454.GA3020@xz-x1>
+	<CAJ+F1CLBGcc0B+BQTZh8KLhqPr7PAf4mDLb81nQSVmiZxK7Anw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CLBGcc0B+BQTZh8KLhqPr7PAf4mDLb81nQSVmiZxK7Anw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] Fix socket chardev regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,129 +31,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Now after we have chardev maintained iothread, we switch to that one by
-adding a parsing phase for monitors even before chardevs start to
-initialize.  Then chardevs will use a constant gcontext since the
-creation of the object and it should never change.
+On Fri, Aug 24, 2018 at 10:51:18AM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Fri, Aug 24, 2018 at 10:45 AM Peter Xu <peterx@redhat.com> wrote:
+> >
+> > On Fri, Aug 24, 2018 at 10:32:58AM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > Hi
+> > >
+> > > On Fri, Aug 24, 2018 at 5:45 AM, Peter Xu <peterx@redhat.com> wrote=
+:
+> > > > On Thu, Aug 23, 2018 at 04:31:20PM +0200, Marc-Andr=C3=A9 Lureau =
+wrote:
+> > > >> Hi,
+> > > >>
+> > > >> In commit 25679e5d58e "chardev: tcp: postpone async connection s=
+etup"
+> > > >> (and its follow up 99f2f54174a59), Peter moved chardev socket
+> > > >> connection to machine_done event. However, chardev created later=
+ will
+> > > >> no longer attempt to connect, and chardev created in tests do no=
+t have
+> > > >> machine_done event (breaking some of vhost-user-test).
+> > > >>
+> > > >> The goal was to move the "connect" source to the chardev fronten=
+d
+> > > >> context (the monitor thread context in his case). chr->gcontext =
+is set
+> > > >> with qemu_chr_fe_set_handlers(). But there is no guarantee that =
+the
+> > > >> function will be called in general, so we can't delay connection=
+ until
+> > > >> then: the chardev should still attempt to connect during open(),=
+ using
+> > > >> the main context.
+> > > >>
+> > > >> An alternative would be to specify the iothread during chardev
+> > > >> creation. Setting up monitor OOB would be quite different too, i=
+t
+> > > >> would take the same iothread as argument.
+> > > >>
+> > > >> 99f2f54174a595e is also a bit problematic, since it will behave
+> > > >> differently before and after machine_done (the first case gives =
+a
+> > > >> chance to use a different context reliably, the second looks rac=
+y)
+> > > >>
+> > > >> In the end, I am not sure this is all necessary, as chardev call=
+backs
+> > > >> are called after qemu_chr_fe_set_handlers(), at which point the
+> > > >> context of sources are updated. In "char-socket: update all ioc
+> > > >> handlers when changing context", I moved also the hup handler to=
+ the
+> > > >> updated context. So unless the main thread is already stuck, we =
+can
+> > > >> setup a different context for the chardev at that time. Or not?
+> > > >>
+> > > >> v2:
+> > > >> - fix a random socket chardev test failure
+> > > >
+> > > > I have no problem on patch 3-5, but aren't patch 1-2 still breaki=
+ng
+> > > > the context switch of chardev?  Or did I misunderstood?
+> > >
+> > > Switching context is broken/racy regardless. My current plan is to
+> > > suspend the context to switch to, and update all sources before
+> > > thawing the target context.
+> > >
+> > > If you prefer we can delay the revert, but I would rather have them
+> > > because the regression seems much worse to me.
+> >
+> > Have you started working on above?  I started to code up some RFC
+> > patch to let the chardev maintain the iothreads (now it'll only have =
+a
+> > monitor iothread) then we don't need to switch context for chardev an=
+y
+> > more.  I plan to post it today for a quick look.  With that, this
+> > series will not break anything then.
+>=20
+> No, I haven't really started the code, but spent some time thinking...
+>=20
+> Ok, if you manage to put together that proposal, that sounds interestin=
+g.
 
-Remove the context setup in qemu_chr_be_update_read_handlers(), instead
-assert it in qemu_chr_fe_set_handlers() properly to make sure the
-context to be setup is always the one provided when chardev creates.
+Not really your iothread proposal; I tried to keep the interface
+unchanged, but move the iothread ownership from the monitor code to
+chardev code.  Please have a look at:
 
-Note that now we kept all the context parameters in misc functions,
-however it should be always setting the same context, otherwise a
-programming bug.  In the future we may remove all these parameters.
+  [RFC 0/3] chardev: introduce chardev contexts
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- chardev/char-fe.c |  6 ++++++
- chardev/char.c    |  1 -
- monitor.c         |  4 ++--
- vl.c              | 31 +++++++++++++++++++++++++++++++
- 4 files changed, 39 insertions(+), 3 deletions(-)
+>=20
+> Nevertheless, I can work on improving/fixing the race when switching
+> contexts (already used by colo)
 
-diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-index b1f228e8b5..fcb232c9b6 100644
---- a/chardev/char-fe.c
-+++ b/chardev/char-fe.c
-@@ -267,6 +267,12 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-         remove_fd_in_watch(s);
-     } else {
-         fe_open = 1;
-+        /*
-+         * Currently we don't allow to change context after chardev is
-+         * created.  TODO: either remove these context parameters, or
-+         * re-activate dynamic context switch for chardevs.
-+         */
-+        assert(context == s->gcontext);
-     }
-     b->chr_can_read = fd_can_read;
-     b->chr_read = fd_read;
-diff --git a/chardev/char.c b/chardev/char.c
-index c98d245ef7..da8ca9082b 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -200,7 +200,6 @@ void qemu_chr_be_update_read_handlers(Chardev *s,
- {
-     ChardevClass *cc = CHARDEV_GET_CLASS(s);
- 
--    s->gcontext = context;
-     if (cc->chr_update_read_handler) {
-         cc->chr_update_read_handler(s);
-     }
-diff --git a/monitor.c b/monitor.c
-index a1999e396c..1e45f3466e 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4543,7 +4543,7 @@ static AioContext *monitor_get_aio_context(void)
- 
- static void monitor_iothread_init(void)
- {
--    mon_iothread = iothread_create("mon_iothread", &error_abort);
-+    mon_iothread = qemu_chr_iothread_get(CHR_CONTEXT_MONITOR);
- 
-     /*
-      * The dispatcher BH must run in the main loop thread, since we
-@@ -4735,7 +4735,7 @@ void monitor_cleanup(void)
-     qemu_bh_delete(qmp_respond_bh);
-     qmp_respond_bh = NULL;
- 
--    iothread_destroy(mon_iothread);
-+    /* It'll be cleaned up by chardev */
-     mon_iothread = NULL;
- }
- 
-diff --git a/vl.c b/vl.c
-index 25e156c020..5bc0946987 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2349,6 +2349,32 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
-     return 0;
- }
- 
-+/*
-+ * This setup the backends properly, it really has nothing to do with
-+ * monitor itself yet.
-+ */
-+static int mon_setup_func(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    const char *chardev;
-+    int flags;
-+    QemuOpts *chr_opts;
-+
-+    flags = mon_parse_flags(opts);
-+    chardev = qemu_opt_get(opts, "chardev");
-+
-+    /*
-+     * If out-of-band is enabled on the monitor, choose the correct
-+     * context for the backend before it initializes.
-+     */
-+    if (flags & MONITOR_USE_OOB) {
-+        chr_opts = qemu_opts_find(qemu_find_opts("chardev"), chardev);
-+        qemu_opt_set_number(chr_opts, "context", CHR_CONTEXT_MONITOR,
-+                            &error_abort);
-+    }
-+
-+    return 0;
-+}
-+
- static void monitor_parse(const char *optarg, const char *mode, bool pretty)
- {
-     static int monitor_device_index = 0;
-@@ -4278,6 +4304,11 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
- 
-+    if (qemu_opts_foreach(qemu_find_opts("mon"),
-+                          mon_setup_func, NULL, NULL)) {
-+        exit(1);
-+    }
-+
-     if (qemu_opts_foreach(qemu_find_opts("chardev"),
-                           chardev_init_func, NULL, NULL)) {
-         exit(1);
--- 
-2.17.1
+Ouch, is colo changing context too?  I hope that series won't break it.
+
+(Ok if so I believe it'll very possible to break it...)
+
+Regards,
+
+--=20
+Peter Xu
