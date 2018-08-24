@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ft7iO-00009J-CB
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:45:09 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ft7iS-00009H-BM
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ft7iK-0004KN-N3
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:45:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50520 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ft7iI-0004Hi-Nh
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:45:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E01A9402315B
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 08:45:01 +0000 (UTC)
-Date: Fri, 24 Aug 2018 16:44:54 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180824084454.GA3020@xz-x1>
-References: <20180823143125.16767-1-marcandre.lureau@redhat.com>
-	<20180824034517.GF24044@xz-x1>
-	<CAMxuvayHnOM1_iGPqg5MBxhYa_Mz=S-jC5z_Tp_UmwvLo0Zu-Q@mail.gmail.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1ft7hH-0003WL-5V
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:44:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMxuvayHnOM1_iGPqg5MBxhYa_Mz=S-jC5z_Tp_UmwvLo0Zu-Q@mail.gmail.com>
+References: <20180817171932.31976-1-marcandre.lureau@redhat.com>
+	<20180817171932.31976-3-marcandre.lureau@redhat.com>
+	<87d0u8b2u8.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d0u8b2u8.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 24 Aug 2018 10:43:44 +0200
+Message-ID: <CAJ+F1CLVBmcqa0Rz_=KJY9VphbwxhFWrqWtGnc4kTu61BJOjDg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Fix socket chardev regression
+Subject: Re: [Qemu-devel] [PATCH 2/2] qobject: modify qobject_ref() to
+ assert on NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +25,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "P. Berrange, Daniel" <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Fri, Aug 24, 2018 at 10:32:58AM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Fri, Aug 24, 2018 at 5:45 AM, Peter Xu <peterx@redhat.com> wrote:
-> > On Thu, Aug 23, 2018 at 04:31:20PM +0200, Marc-Andr=C3=A9 Lureau wrot=
+Hi
+On Fri, Aug 24, 2018 at 10:12 AM Markus Armbruster <armbru@redhat.com> wrot=
 e:
-> >> Hi,
-> >>
-> >> In commit 25679e5d58e "chardev: tcp: postpone async connection setup=
-"
-> >> (and its follow up 99f2f54174a59), Peter moved chardev socket
-> >> connection to machine_done event. However, chardev created later wil=
-l
-> >> no longer attempt to connect, and chardev created in tests do not ha=
-ve
-> >> machine_done event (breaking some of vhost-user-test).
-> >>
-> >> The goal was to move the "connect" source to the chardev frontend
-> >> context (the monitor thread context in his case). chr->gcontext is s=
-et
-> >> with qemu_chr_fe_set_handlers(). But there is no guarantee that the
-> >> function will be called in general, so we can't delay connection unt=
-il
-> >> then: the chardev should still attempt to connect during open(), usi=
-ng
-> >> the main context.
-> >>
-> >> An alternative would be to specify the iothread during chardev
-> >> creation. Setting up monitor OOB would be quite different too, it
-> >> would take the same iothread as argument.
-> >>
-> >> 99f2f54174a595e is also a bit problematic, since it will behave
-> >> differently before and after machine_done (the first case gives a
-> >> chance to use a different context reliably, the second looks racy)
-> >>
-> >> In the end, I am not sure this is all necessary, as chardev callback=
-s
-> >> are called after qemu_chr_fe_set_handlers(), at which point the
-> >> context of sources are updated. In "char-socket: update all ioc
-> >> handlers when changing context", I moved also the hup handler to the
-> >> updated context. So unless the main thread is already stuck, we can
-> >> setup a different context for the chardev at that time. Or not?
-> >>
-> >> v2:
-> >> - fix a random socket chardev test failure
-> >
-> > I have no problem on patch 3-5, but aren't patch 1-2 still breaking
-> > the context switch of chardev?  Or did I misunderstood?
->=20
-> Switching context is broken/racy regardless. My current plan is to
-> suspend the context to switch to, and update all sources before
-> thawing the target context.
->=20
-> If you prefer we can delay the revert, but I would rather have them
-> because the regression seems much worse to me.
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > While it may be convenient to accept NULL value in
+> > qobject_unref() (for similar reasons as free() accepts NULL), it is
+> > not such a good idea for qobject_ref(): now assert() on NULL.
+>
+> Why is it not such a good idea?
+>
+> Is it unsafe?  Unclean?  Ugly?
+>
+> If unsafe, can you point to actual problems, present or past?
+>
+> If you consider it unclean or ugly, can you point to established
+> convention?
 
-Have you started working on above?  I started to code up some RFC
-patch to let the chardev maintain the iothreads (now it'll only have a
-monitor iothread) then we don't need to switch context for chardev any
-more.  I plan to post it today for a quick look.  With that, this
-series will not break anything then.
+In general, a function/method shouldn't accept NULL as argument, as it
+is usually a programmer mistake.
 
->=20
-> >
-> > Regards,
-> >
-> > --
-> > Peter Xu
+free() / unref() are exceptions, for convenience.
 
-Regards,
+fwiw, g_object_ref/unref() do not accept NULL. However,
+g_clear_object() was introduced later to simply clearing an object
+reference (unref and set to NULL, checks NULL).
+
+>
+> > Some code relied on that behaviour, but it's best to be explicit that
+> > NULL is accepted.  We have to rely on testing, and manual inspection
+> > of qobject_ref() usage:
+> >
+> > * block.c:
+> >  - bdrv_refresh_filename(): guarded
+> >  - append_open_options(): it depends if qdict values could be NULL,
+> >    handled for extra safety, might be unnecessary
+> >
+> > * block/blkdebug.c:
+> >  - blkdebug_refresh_filename(): depends if qdict values could be NULL,
+> >    full_open_options could be NULL apparently, handled
+> >
+> > * block/blkverify.c: guarded
+> >
+> > * block/{null,nvme}.c: guarded, previous qdict_del() (actually
+> >   qdict_find()) guarantee non-NULL)
+> >
+> > * block/quorum.c: full_open_options could be NULL, handled for extra
+> >   safety, might be unnecessary
+> >
+> > * monitor: events have associated qdict, but may not have 'data' dict
+> >   entry. Command 'id' is already guarded. A queued response is
+> >   non-NULL.
+> >
+> > * qapi/qmp-dispatch.c: if "arguments" exists, it can't be NULL during
+> >   json parsing
+> >
+> > * qapi/qobject-input-visitor.c: guarded by assert in visit_type_any()
+> >
+> > * qapi/qobject-output-visitor.c: guarded by assert() in visit_type_any(=
+)
+> >   qobject_output_complete(): guarded by pre-condition assert()
+> >
+> > * qmp.c: guarded, error out before if NULL
+> >
+> > * qobject/q{list,dict}.c: can accept NULL values apparently, what's
+> >   the reason? how are you supposed to handle that? no test?
+> >
+> >   Some code, such as qdict_flatten_qdict(), assume the value is always
+> >   non-NULL for example.
+> >
+> > - tests/*: considered to be covered by make check, not critical
+> >
+> > - util/keyval.c: guarded, if (!elt[i]) before
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> That's a lot of analysis to support a change...
+>
+> > ---
+> >  include/qapi/qmp/qobject.h | 7 ++++---
+> >  block.c                    | 6 ++++--
+> >  block/blkdebug.c           | 3 ++-
+> >  block/quorum.c             | 3 ++-
+> >  monitor.c                  | 2 +-
+> >  5 files changed, 13 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/include/qapi/qmp/qobject.h b/include/qapi/qmp/qobject.h
+> > index fcfd549220..2fe5b42579 100644
+> > --- a/include/qapi/qmp/qobject.h
+> > +++ b/include/qapi/qmp/qobject.h
+> > @@ -74,9 +74,8 @@ static inline void qobject_init(QObject *obj, QType t=
+ype)
+> >
+> >  static inline void qobject_ref_impl(QObject *obj)
+> >  {
+> > -    if (obj) {
+> > -        obj->base.refcnt++;
+> > -    }
+> > +    assert(obj);
+> > +    obj->base.refcnt++;
+> >  }
+> >
+> >  /**
+> > @@ -103,6 +102,7 @@ static inline void qobject_unref_impl(QObject *obj)
+> >
+> >  /**
+> >   * qobject_ref(): Increment QObject's reference count
+> > + * @obj: a #QObject or child type instance (must not be NULL)
+> >   *
+> >   * Returns: the same @obj. The type of @obj will be propagated to the
+> >   * return type.
+> > @@ -116,6 +116,7 @@ static inline void qobject_unref_impl(QObject *obj)
+> >  /**
+> >   * qobject_unref(): Decrement QObject's reference count, deallocate
+> >   * when it reaches zero
+> > + * @obj: a #QObject or child type instance (can be NULL)
+> >   */
+> >  #define qobject_unref(obj) qobject_unref_impl(QOBJECT(obj))
+> >
+> > diff --git a/block.c b/block.c
+> > index 6161dbe3eb..f1e35c3c1e 100644
+> > --- a/block.c
+> > +++ b/block.c
+> > @@ -5154,6 +5154,8 @@ static bool append_open_options(QDict *d, BlockDr=
+iverState *bs)
+> >      for (entry =3D qdict_first(bs->options); entry;
+> >           entry =3D qdict_next(bs->options, entry))
+> >      {
+> > +        QObject *val;
+> > +
+> >          /* Exclude node-name references to children */
+> >          QLIST_FOREACH(child, &bs->children, next) {
+> >              if (!strcmp(entry->key, child->name)) {
+> > @@ -5174,8 +5176,8 @@ static bool append_open_options(QDict *d, BlockDr=
+iverState *bs)
+> >              continue;
+> >          }
+> >
+> > -        qdict_put_obj(d, qdict_entry_key(entry),
+> > -                      qobject_ref(qdict_entry_value(entry)));
+> > +        val =3D qdict_entry_value(entry);
+> > +        qdict_put_obj(d, qdict_entry_key(entry), val ? qobject_ref(val=
+) : NULL);
+> >          found_any =3D true;
+> >      }
+> >
+> > diff --git a/block/blkdebug.c b/block/blkdebug.c
+> > index 0759452925..062263f7e1 100644
+> > --- a/block/blkdebug.c
+> > +++ b/block/blkdebug.c
+> > @@ -846,7 +846,8 @@ static void blkdebug_refresh_filename(BlockDriverSt=
+ate *bs, QDict *options)
+> >      opts =3D qdict_new();
+> >      qdict_put_str(opts, "driver", "blkdebug");
+> >
+> > -    qdict_put(opts, "image", qobject_ref(bs->file->bs->full_open_optio=
+ns));
+> > +    qdict_put(opts, "image", bs->file->bs->full_open_options ?
+> > +              qobject_ref(bs->file->bs->full_open_options) : NULL);
+> >
+> >      for (e =3D qdict_first(options); e; e =3D qdict_next(options, e)) =
+{
+> >          if (strcmp(qdict_entry_key(e), "x-image")) {
+> > diff --git a/block/quorum.c b/block/quorum.c
+> > index 9152da8c58..96cd094ede 100644
+> > --- a/block/quorum.c
+> > +++ b/block/quorum.c
+> > @@ -1089,7 +1089,8 @@ static void quorum_refresh_filename(BlockDriverSt=
+ate *bs, QDict *options)
+> >      children =3D qlist_new();
+> >      for (i =3D 0; i < s->num_children; i++) {
+> >          qlist_append(children,
+> > -                     qobject_ref(s->children[i]->bs->full_open_options=
+));
+> > +                     s->children[i]->bs->full_open_options ?
+> > +                     qobject_ref(s->children[i]->bs->full_open_options=
+) : NULL);
+> >      }
+> >
+> >      opts =3D qdict_new();
+> > diff --git a/monitor.c b/monitor.c
+> > index eab2dc7b7b..be4bcd82a0 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -675,7 +675,7 @@ monitor_qapi_event_queue_no_reenter(QAPIEvent event=
+, QDict *qdict)
+> >
+> >              evstate =3D g_new(MonitorQAPIEventState, 1);
+> >              evstate->event =3D event;
+> > -            evstate->data =3D qobject_ref(data);
+> > +            evstate->data =3D data ? qobject_ref(data) : NULL;
+> >              evstate->qdict =3D NULL;
+> >              evstate->timer =3D timer_new_ns(monitor_get_event_clock(),
+> >                                            monitor_qapi_event_handler,
+>
+> ... that only complicates code.  By not much, granted.  My problem with
+> it is that the commit message doesn't convince me it's an improvement.
+>
+
 
 --=20
-Peter Xu
+Marc-Andr=C3=A9 Lureau
