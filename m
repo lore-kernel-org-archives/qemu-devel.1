@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ftFsv-0000Pu-9B
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:28:38 -0400
+	(envelope-from <prvs=76755a058=roger.pau@citrix.com>)
+	id 1ftFtW-0000VF-K6
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:29:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ftFlG-0007Qq-EG
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:20:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48726)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ftFlG-0007PZ-6W
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:20:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ftFlE-00055e-06
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 17:20:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F28902E8076
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 17:20:35 +0000 (UTC)
+	(envelope-from <prvs=76755a058=roger.pau@citrix.com>)
+	id 1ftFj8-0005Le-H2
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:18:31 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:46733)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=76755a058=roger.pau@citrix.com>)
+	id 1ftFj4-0005Cw-3J
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:18:23 -0400
+Date: Fri, 24 Aug 2018 19:18:10 +0200
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+Message-ID: <20180824171810.pqz5eblyvz7fhhbc@mac.bytemobile.com>
+References: <20180824155804.azxqj5kvhbswyy5n@mac.bytemobile.com>
+	<1efbdd93-03c4-26d6-7ea0-8d1c85654d5b@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Aug 2018 17:11:12 -0000
-From: Daniel Berrange <1788665@bugs.launchpad.net>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153513067304.12274.16891085269120620268.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1efbdd93-03c4-26d6-7ea0-8d1c85654d5b@gmail.com>
+Subject: Re: [Qemu-devel] usage of mremap in pvrdma break FreeBSD build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,106 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
 
-You're mis-understanding how microcode works a little. Microcode is
-loaded into physical CPUs in the host. This affects everything that runs
-on these CPUs thereafter. A KVM guest is merely a process running on the
-host CPUs, so it is affected by the updated microcode. There is no
-notion of the virtual CPUs having a different microcode.
+On Fri, Aug 24, 2018 at 07:49:01PM +0300, Marcel Apfelbaum wrote:
+> Hi Roger,
+> 
+> 
+> On 08/24/2018 06:58 PM, Roger Pau Monné wrote:
+> > Hello,
+> > 
+> > The usage of mremap in the pvrdma code breaks the build on FreeBSD:
+> > 
+> > /root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning: implicit declaration of
+> >        function 'mremap' is invalid in C99 [-Wimplicit-function-declaration]
+> >      host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
+> >                  ^
+> > /root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning: this function
+> >        declaration is not a prototype [-Wstrict-prototypes]
+> > /root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:60:46: error: use of undeclared
+> >        identifier 'MREMAP_MAYMOVE'
+> >      host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
+> >                                               ^
+> > /root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:97:48: error: use of undeclared
+> >        identifier 'MREMAP_MAYMOVE'
+> >          mremap(curr_page, 0, TARGET_PAGE_SIZE, MREMAP_MAYMOVE | MREMAP_FIXED,
+> >                                                 ^
+> > /root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:97:65: error: use of undeclared
+> >        identifier 'MREMAP_FIXED'
+> >          mremap(curr_page, 0, TARGET_PAGE_SIZE, MREMAP_MAYMOVE | MREMAP_FIXED,
+> >                                                                  ^
+> > 
+> > FreeBSD has librdma in base so by default QEMU configure script will
+> > enable the build of the rdma bits in QEMU. Sadly this code uses mremap
+> > which is Linux-specific.
+> > 
+> > AFAICT either the build of pvrdma is limited to Linux in the configure
+> > script, or the calls to mremap are replaced with a portable
+> > equivalent.
+> > 
+> > Thanks, Roger.
+> 
+> A fix has been submitted and merged:
+> 
+> https://patchew.org/QEMU/20180819202300.10590-1-marcel.apfelbaum@gmail.com/20180819202300.10590-16-marcel.apfelbaum@gmail.com/
 
-The doc you pointed to above
+Thanks! And sorry for the noise.
 
-https://docs.microsoft.com/en-us/virtualization/hyper-v-on-
-windows/CVE-2017-5715-and-hyper-v-vms
-
-indicates that you must install the microcode in the host, which enables
-new CPUs features. These features should then be exposed to the guest.
-
-You say you've installed the microcode which is good, but did you also
-update the kernel ?
-
-Host kernel updates were required in order for KVM to be able to expose
-the new features from the microcode, to the guest. Essentially if your
-guest kernel shows  "pti ssbd ibrs ibpb stibp"  features as present,
-then thanks to your "-cpu host" usage, the guest should see them too.
-
-
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2017-5715
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
-
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
-
-Status in QEMU:
-  New
-
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+Roger.
