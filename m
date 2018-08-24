@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UQ-0007kv-5v
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:47 -0400
+	(envelope-from <famz@redhat.com>) id 1ft8gX-0001ix-UF
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:47:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UO-0004s1-QZ
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:46 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ft8UO-0004rQ-GA
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:44 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UN-0006hu-Jx
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:43 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 10:33:41 +0100
-Message-Id: <20180824093343.11346-51-peter.maydell@linaro.org>
-In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
-References: <20180824093343.11346-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 50/52] hw/display/bcm2835_fb: Validate config
- settings
+	(envelope-from <famz@redhat.com>) id 1ft8gT-0004Va-2S
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:47:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54366 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ft8gS-0004V7-SP
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:47:12 -0400
+Date: Fri, 24 Aug 2018 17:47:09 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180824094709.GG31581@lemon.usersys.redhat.com>
+References: <20180824012126.22721-1-famz@redhat.com>
+	<20180824082237.GA3430@redhat.com>
+	<20180824085220.GF31581@lemon.usersys.redhat.com>
+	<CAFEAcA-Qqsnwo3CwtbTMoPvNqkVc6f+4Uj15a2=a2BQdvqmLkA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-Qqsnwo3CwtbTMoPvNqkVc6f+4Uj15a2=a2BQdvqmLkA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: vm: auto_install OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,243 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Brad Smith <brad@comstyle.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-Validate the config settings that the guest tries to set.
+On Fri, 08/24 10:06, Peter Maydell wrote:
+> On 24 August 2018 at 09:52, Fam Zheng <famz@redhat.com> wrote:
+> > On Fri, 08/24 09:22, Daniel P. Berrang=E9 wrote:
+> >> On Fri, Aug 24, 2018 at 09:21:26AM +0800, Fam Zheng wrote:
+> >> > Upgrade OpenBSD to 6.3 using auto_install. Especially, drop SDL1,
+> >> > include SDL2.
+> >> >
+> >> > One limitation of this patch is that we need a temporary HTTP serv=
+er on
+> >> > host 80 port for auto_install, because slirp cannot do guest forwa=
+rd on
+> >> > "host addr".
+> >>
+> >> That's a pretty big limitation, as port 80 requires root privileges,
+> >> and that's a pretty strict no for automated testing IMHO.
+> >>
+> >> Why does it have to be port 80 in particular - is it not possible
+> >> to use 8080 or even better, detect a random free port ?
+> >
+> > OpenBSD autoinstall[1] is hardcoded to fetch from port 80. Maybe we c=
+an instead
+> > persuade it into fetching from a different http server than 10.0.2.2.=
+ To do that
+> > we'd need to implement a new slirp option for either "option tftp-ser=
+ver-name"
+> > or "next-server" according to the manpage. I'll have to experiment wi=
+th it to
+> > see if it will work.
+>=20
+> Can you use the usermode networking "guestfwd" option to make guest
+> tcp connections to wherever:80 go to host:8080 or something instead?
+> (watch out for https://bugs.launchpad.net/qemu/+bug/1628971 if it
+> is still relevant, I guess).
 
-The wiki page documentation is not really accurate here:
-generally rather than failing requests to set bad parameters,
-the hardware will just clip them to something sensible.
+Yes, that is what I mean above. Will post v2.
 
-Validate the most important parameters: sizes and
-the viewport offsets. This prevents the framebuffer
-code from trying to read out-of-range memory.
-
-In the property handling code, we validate the new parameters every
-time we encounter a tag that sets them. This means we validate the
-config multiple times if the request includes multiple config-setting
-tags, but the code would require significant restructuring to do a
-validation only once but still return the clipped settings for
-get-parameter tags and the buffer allocation tag.
-
-Validation of settings made via the older bcm2835_fb_mbox_push()
-function will be done in the next commit.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180814144436.679-8-peter.maydell@linaro.org
----
- include/hw/display/bcm2835_fb.h |  8 +++++
- hw/display/bcm2835_fb.c         | 48 +++++++++++++++++++++++++++--
- hw/misc/bcm2835_property.c      | 54 ++++++++++++++++-----------------
- 3 files changed, 81 insertions(+), 29 deletions(-)
-
-diff --git a/include/hw/display/bcm2835_fb.h b/include/hw/display/bcm2835_fb.h
-index d992c60c120..228988ba056 100644
---- a/include/hw/display/bcm2835_fb.h
-+++ b/include/hw/display/bcm2835_fb.h
-@@ -76,4 +76,12 @@ static inline uint32_t bcm2835_fb_get_size(BCM2835FBConfig *config)
-     return yres * bcm2835_fb_get_pitch(config);
- }
- 
-+/**
-+ * bcm2835_fb_validate_config: check provided config
-+ *
-+ * Validates the configuration information provided by the guest and
-+ * adjusts it if necessary.
-+ */
-+void bcm2835_fb_validate_config(BCM2835FBConfig *config);
-+
- #endif
-diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
-index 76a10072b46..3edb8b5cfcb 100644
---- a/hw/display/bcm2835_fb.c
-+++ b/hw/display/bcm2835_fb.c
-@@ -34,6 +34,13 @@
- #define DEFAULT_VCRAM_SIZE 0x4000000
- #define BCM2835_FB_OFFSET  0x00100000
- 
-+/* Maximum permitted framebuffer size; experimentally determined on an rpi2 */
-+#define XRES_MAX 3840
-+#define YRES_MAX 2560
-+/* Framebuffer size used if guest requests zero size */
-+#define XRES_SMALL 592
-+#define YRES_SMALL 488
-+
- static void fb_invalidate_display(void *opaque)
- {
-     BCM2835FBState *s = BCM2835_FB(opaque);
-@@ -202,6 +209,45 @@ static void fb_update_display(void *opaque)
-     s->invalidate = false;
- }
- 
-+void bcm2835_fb_validate_config(BCM2835FBConfig *config)
-+{
-+    /*
-+     * Validate the config, and clip any bogus values into range,
-+     * as the hardware does. Note that fb_update_display() relies on
-+     * this happening to prevent it from performing out-of-range
-+     * accesses on redraw.
-+     */
-+    config->xres = MIN(config->xres, XRES_MAX);
-+    config->xres_virtual = MIN(config->xres_virtual, XRES_MAX);
-+    config->yres = MIN(config->yres, YRES_MAX);
-+    config->yres_virtual = MIN(config->yres_virtual, YRES_MAX);
-+
-+    /*
-+     * These are not minima: a 40x40 framebuffer will be accepted.
-+     * They're only used as defaults if the guest asks for zero size.
-+     */
-+    if (config->xres == 0) {
-+        config->xres = XRES_SMALL;
-+    }
-+    if (config->yres == 0) {
-+        config->yres = YRES_SMALL;
-+    }
-+    if (config->xres_virtual == 0) {
-+        config->xres_virtual = config->xres;
-+    }
-+    if (config->yres_virtual == 0) {
-+        config->yres_virtual = config->yres;
-+    }
-+
-+    if (fb_use_offsets(config)) {
-+        /* Clip the offsets so the viewport is within the physical screen */
-+        config->xoffset = MIN(config->xoffset,
-+                              config->xres_virtual - config->xres);
-+        config->yoffset = MIN(config->yoffset,
-+                              config->yres_virtual - config->yres);
-+    }
-+}
-+
- static void bcm2835_fb_mbox_push(BCM2835FBState *s, uint32_t value)
- {
-     uint32_t pitch;
-@@ -238,8 +284,6 @@ void bcm2835_fb_reconfigure(BCM2835FBState *s, BCM2835FBConfig *newconfig)
- {
-     s->lock = true;
- 
--    /* TODO: input validation! */
--
-     s->config = *newconfig;
- 
-     s->invalidate = true;
-diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-index e3ab677891b..145427ae0f8 100644
---- a/hw/misc/bcm2835_property.c
-+++ b/hw/misc/bcm2835_property.c
-@@ -155,16 +155,6 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
-         case 0x00040002: /* Blank screen */
-             resplen = 4;
-             break;
--        case 0x00040003: /* Get physical display width/height */
--            stl_le_phys(&s->dma_as, value + 12, fbconfig.xres);
--            stl_le_phys(&s->dma_as, value + 16, fbconfig.yres);
--            resplen = 8;
--            break;
--        case 0x00040004: /* Get virtual display width/height */
--            stl_le_phys(&s->dma_as, value + 12, fbconfig.xres_virtual);
--            stl_le_phys(&s->dma_as, value + 16, fbconfig.yres_virtual);
--            resplen = 8;
--            break;
-         case 0x00044003: /* Test physical display width/height */
-         case 0x00044004: /* Test virtual display width/height */
-             resplen = 8;
-@@ -172,29 +162,35 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
-         case 0x00048003: /* Set physical display width/height */
-             fbconfig.xres = ldl_le_phys(&s->dma_as, value + 12);
-             fbconfig.yres = ldl_le_phys(&s->dma_as, value + 16);
-+            bcm2835_fb_validate_config(&fbconfig);
-             fbconfig_updated = true;
-+            /* fall through */
-+        case 0x00040003: /* Get physical display width/height */
-+            stl_le_phys(&s->dma_as, value + 12, fbconfig.xres);
-+            stl_le_phys(&s->dma_as, value + 16, fbconfig.yres);
-             resplen = 8;
-             break;
-         case 0x00048004: /* Set virtual display width/height */
-             fbconfig.xres_virtual = ldl_le_phys(&s->dma_as, value + 12);
-             fbconfig.yres_virtual = ldl_le_phys(&s->dma_as, value + 16);
-+            bcm2835_fb_validate_config(&fbconfig);
-             fbconfig_updated = true;
-+            /* fall through */
-+        case 0x00040004: /* Get virtual display width/height */
-+            stl_le_phys(&s->dma_as, value + 12, fbconfig.xres_virtual);
-+            stl_le_phys(&s->dma_as, value + 16, fbconfig.yres_virtual);
-             resplen = 8;
-             break;
--        case 0x00040005: /* Get depth */
--            stl_le_phys(&s->dma_as, value + 12, fbconfig.bpp);
--            resplen = 4;
--            break;
-         case 0x00044005: /* Test depth */
-             resplen = 4;
-             break;
-         case 0x00048005: /* Set depth */
-             fbconfig.bpp = ldl_le_phys(&s->dma_as, value + 12);
-+            bcm2835_fb_validate_config(&fbconfig);
-             fbconfig_updated = true;
--            resplen = 4;
--            break;
--        case 0x00040006: /* Get pixel order */
--            stl_le_phys(&s->dma_as, value + 12, fbconfig.pixo);
-+            /* fall through */
-+        case 0x00040005: /* Get depth */
-+            stl_le_phys(&s->dma_as, value + 12, fbconfig.bpp);
-             resplen = 4;
-             break;
-         case 0x00044006: /* Test pixel order */
-@@ -202,11 +198,11 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
-             break;
-         case 0x00048006: /* Set pixel order */
-             fbconfig.pixo = ldl_le_phys(&s->dma_as, value + 12);
-+            bcm2835_fb_validate_config(&fbconfig);
-             fbconfig_updated = true;
--            resplen = 4;
--            break;
--        case 0x00040007: /* Get alpha */
--            stl_le_phys(&s->dma_as, value + 12, fbconfig.alpha);
-+            /* fall through */
-+        case 0x00040006: /* Get pixel order */
-+            stl_le_phys(&s->dma_as, value + 12, fbconfig.pixo);
-             resplen = 4;
-             break;
-         case 0x00044007: /* Test pixel alpha */
-@@ -214,7 +210,11 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
-             break;
-         case 0x00048007: /* Set alpha */
-             fbconfig.alpha = ldl_le_phys(&s->dma_as, value + 12);
-+            bcm2835_fb_validate_config(&fbconfig);
-             fbconfig_updated = true;
-+            /* fall through */
-+        case 0x00040007: /* Get alpha */
-+            stl_le_phys(&s->dma_as, value + 12, fbconfig.alpha);
-             resplen = 4;
-             break;
-         case 0x00040008: /* Get pitch */
-@@ -222,18 +222,18 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
-                         bcm2835_fb_get_pitch(&fbconfig));
-             resplen = 4;
-             break;
--        case 0x00040009: /* Get virtual offset */
--            stl_le_phys(&s->dma_as, value + 12, fbconfig.xoffset);
--            stl_le_phys(&s->dma_as, value + 16, fbconfig.yoffset);
--            resplen = 8;
--            break;
-         case 0x00044009: /* Test virtual offset */
-             resplen = 8;
-             break;
-         case 0x00048009: /* Set virtual offset */
-             fbconfig.xoffset = ldl_le_phys(&s->dma_as, value + 12);
-             fbconfig.yoffset = ldl_le_phys(&s->dma_as, value + 16);
-+            bcm2835_fb_validate_config(&fbconfig);
-             fbconfig_updated = true;
-+            /* fall through */
-+        case 0x00040009: /* Get virtual offset */
-+            stl_le_phys(&s->dma_as, value + 12, fbconfig.xoffset);
-+            stl_le_phys(&s->dma_as, value + 16, fbconfig.yoffset);
-             resplen = 8;
-             break;
-         case 0x0004000a: /* Get/Test/Set overscan */
--- 
-2.18.0
+Fam
