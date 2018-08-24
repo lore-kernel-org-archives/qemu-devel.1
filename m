@@ -1,18 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ftCWi-0001XK-1x
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:53:24 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ftCWw-0001d6-2b
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ftCWg-0000bY-W5
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:53:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33414 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1ftCWs-0000iU-To
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:53:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52508)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1ftCWg-0000bJ-QQ
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:53:22 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri, 24 Aug 2018 21:53:12 +0800
-Message-Id: <20180824135312.1606-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] slirp: Implement RFC2132 TFTP server name
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ftCWs-0000i6-Mz
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 09:53:34 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EF689C05B008
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 13:53:33 +0000 (UTC)
+Date: Fri, 24 Aug 2018 10:53:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180824135332.GY3778@localhost.localdomain>
+References: <1535035877-219196-1-git-send-email-imammedo@redhat.com>
+	<fb74bf2d-6973-9c2d-d799-8d16561c0265@redhat.com>
+	<20180824111350.04d10250@redhat.com>
+	<20180824111148.GX3778@localhost.localdomain>
+	<20180824132654.63fb9047@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180824132654.63fb9047@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] vl.c: make sure maxcpus matches topology
+ to prevent migration failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,160 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, berrange@redhat.com, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, brad@comstyle.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, libvir-list@redhat.com
 
-This new usernet option can be used to add data for option 66 (tftp
-server name) in the BOOTP reply, which is useful in PXE based automatic
-OS install such as OpenBSD.
+On Fri, Aug 24, 2018 at 01:26:54PM +0200, Igor Mammedov wrote:
+> On Fri, 24 Aug 2018 08:11:48 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Fri, Aug 24, 2018 at 11:13:50AM +0200, Igor Mammedov wrote:
+> > > On Thu, 23 Aug 2018 18:32:41 +0200
+> > > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > >   
+> > > > On 23/08/2018 16:51, Igor Mammedov wrote:  
+> > > > > Topology (threads*cores*sockets) must match maxcpus to be valid,
+> > > > > otherwise we could start QEMU with invalid topology that throws
+> > > > > a error on migration destination side, that should not be reachable:
+> > > > > Source:
+> > > > >   -smp 8,maxcpus=64,cores=1,threads=8,sockets=1
+> > > > > // hotplug cpus upto maxcpus
+> > > > > Destination:
+> > > > >   -smp 64,maxcpus=64,cores=1,threads=8,sockets=1
+> > > > >   qemu: cpu topology: sockets (1) * cores (1) * threads (8) < smp_cpus (64)  
+> > > This destination CLI aren't exactly correct as well since
+> > > it should've been exactly the same -smp as on source + a bunch of -device cpufoo...
+> > > so we can always say go fix your CLI so it won't trigger error.
+> > >     
+> > > > The destination should have sockets=8, shouldn't it?  
+> > > either that or cores=8 or cores=4,sockets=2 ...
+> > >    
+> > > > It seems to me that, at startup, you should have cpus = s*t*c and cpus
+> > > > <= maxcpus.  Currently we check cpus <= s*t*c <= maxcpus, which doesn't
+> > > > make much sense.  
+> > > I think that s*t*c should describe topology of whole machine
+> > > including not yet plugged vcpus. "cpus = s*t*c" probably won't work
+> > > for partially filled package case:
+> > >        -smp 1,cores=1,threads=8,sockets=1
+> > > cores/threads should reflect full package configuration
+> > > for guest to see an expected topology.  
+> > 
+> > Oh, now I remember: that's the reason we don't enforce
+> > s*t*c == smp_cpus nor s*t*c == max_cpus.
+> > 
+> > Both "-smp 4,maxcpus=8,cores=2,threads=2,sockets=1" and
+> >      "-smp 4,maxcpus=8,cores=2,threads=2,sockets=2"
+> > worked since maxcpus was introduced, making the semantics of
+> > "sockets" unclear and hard to change without breaking existing
+> > configs.
+> Should we go with deprication thingy then,
+> so we could make it clear in the future?
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- net/slirp.c      | 7 +++++--
- qapi/net.json    | 5 ++++-
- slirp/bootp.c    | 8 ++++++++
- slirp/bootp.h    | 1 +
- slirp/libslirp.h | 3 ++-
- slirp/slirp.c    | 6 +++++-
- slirp/slirp.h    | 2 ++
- 7 files changed, 27 insertions(+), 5 deletions(-)
+Yes, but I'm not sure which option we should adopt
+(s*t*c == smp_cpus or s*t*c == max_cpus).
 
-diff --git a/net/slirp.c b/net/slirp.c
-index 1e14318b4d..b0c68a3665 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -158,6 +158,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-                           const char *vnameserver, const char *vnameserver6,
-                           const char *smb_export, const char *vsmbserver,
-                           const char **dnssearch, const char *vdomainname,
-+                          const char *tftp_server_name,
-                           Error **errp)
- {
-     /* default settings according to historic slirp */
-@@ -377,7 +378,8 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-     s->slirp = slirp_init(restricted, ipv4, net, mask, host,
-                           ipv6, ip6_prefix, vprefix6_len, ip6_host,
-                           vhostname, tftp_export, bootfile, dhcp,
--                          dns, ip6_dns, dnssearch, vdomainname, s);
-+                          dns, ip6_dns, dnssearch, vdomainname,
-+                          tftp_server_name, s);
-     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
- 
-     for (config = slirp_configs; config; config = config->next) {
-@@ -966,7 +968,8 @@ int net_init_slirp(const Netdev *netdev, const char *name,
-                          user->ipv6_host, user->hostname, user->tftp,
-                          user->bootfile, user->dhcpstart,
-                          user->dns, user->ipv6_dns, user->smb,
--                         user->smbserver, dnssearch, user->domainname, errp);
-+                         user->smbserver, dnssearch, user->domainname,
-+                         user->tftp_server_name, errp);
- 
-     while (slirp_configs) {
-         config = slirp_configs;
-diff --git a/qapi/net.json b/qapi/net.json
-index c86f351161..b3cd42f610 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -174,6 +174,8 @@
- #
- # @guestfwd: forward guest TCP connections
- #
-+# @tftp-server-name: (optional) RFC2132 "TFTP server name" string (Since 3.1)
-+#
- # Since: 1.2
- ##
- { 'struct': 'NetdevUserOptions',
-@@ -198,7 +200,8 @@
-     '*smb':       'str',
-     '*smbserver': 'str',
-     '*hostfwd':   ['String'],
--    '*guestfwd':  ['String'] } }
-+    '*guestfwd':  ['String'],
-+    '*tftp-server-name': 'str' } }
- 
- ##
- # @NetdevTapOptions:
-diff --git a/slirp/bootp.c b/slirp/bootp.c
-index 9e7b53ba94..ed2cf3b96e 100644
---- a/slirp/bootp.c
-+++ b/slirp/bootp.c
-@@ -306,6 +306,14 @@ static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
-             q += val;
-         }
- 
-+        if (slirp->tftp_server_name) {
-+            val = strlen(slirp->tftp_server_name);
-+            *q++ = RFC2132_TFTP_SERVER_NAME;
-+            *q++ = val;
-+            memcpy(q, slirp->tftp_server_name, val);
-+            q += val;
-+        }
-+
-         if (slirp->vdnssearch) {
-             size_t spaceleft = sizeof(rbp->bp_vend) - (q - rbp->bp_vend);
-             val = slirp->vdnssearch_len;
-diff --git a/slirp/bootp.h b/slirp/bootp.h
-index 394525733e..4043489835 100644
---- a/slirp/bootp.h
-+++ b/slirp/bootp.h
-@@ -70,6 +70,7 @@
- #define RFC2132_MAX_SIZE	57
- #define RFC2132_RENEWAL_TIME    58
- #define RFC2132_REBIND_TIME     59
-+#define RFC2132_TFTP_SERVER_NAME 66
- 
- #define DHCPDISCOVER		1
- #define DHCPOFFER		2
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 740408a96e..8bd2ad044b 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -16,7 +16,8 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque);
-+                  const char *vdomainname, const char *tftp_server_name,
-+                  void *opaque);
- void slirp_cleanup(Slirp *slirp);
- 
- void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 5c3bd6163f..f62189c650 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -286,7 +286,8 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque)
-+                  const char *vdomainname, const char *tftp_server_name,
-+                  void *opaque)
- {
-     Slirp *slirp = g_malloc0(sizeof(Slirp));
- 
-@@ -321,6 +322,9 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-     slirp->vdhcp_startaddr = vdhcp_start;
-     slirp->vnameserver_addr = vnameserver;
-     slirp->vnameserver_addr6 = vnameserver6;
-+    if (tftp_server_name) {
-+        slirp->tftp_server_name = g_strdup(tftp_server_name);
-+    }
- 
-     if (vdnssearch) {
-         translate_dnssearch(slirp, vdnssearch);
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 10b410898a..5ad982ee25 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -219,6 +219,8 @@ struct Slirp {
-     GRand *grand;
-     QEMUTimer *ra_timer;
- 
-+    char *tftp_server_name;
-+
-     void *opaque;
- };
- 
+Does anybody know what's the semantics expected by libvirt today?
+
 -- 
-2.17.1
+Eduardo
