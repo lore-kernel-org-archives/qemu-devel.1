@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ft9Ua-0007U2-UL
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:39:01 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ft9YP-0001eK-3g
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ft9Ua-0003DJ-1j
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:39:00 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:38189)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ft9UZ-0003Cp-Qy
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:38:59 -0400
-Received: by mail-oi0-x241.google.com with SMTP id z185-v6so14088722oia.5
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 03:38:59 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1ft9YL-00078b-V2
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:42:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ft9YL-00077h-Nj
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 06:42:53 -0400
+Date: Fri, 24 Aug 2018 07:42:46 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180824104246.GU3778@localhost.localdomain>
+References: <201808241718451351057@zte.com.cn>
 MIME-Version: 1.0
-In-Reply-To: <26a33eec-3ed5-f05d-7c36-5b46eeba9612@huawei.com>
-References: <1535039100-11248-1-git-send-email-gengdongjiu@huawei.com>
-	<1535039100-11248-2-git-send-email-gengdongjiu@huawei.com>
-	<CAFEAcA9DJ_GMkq1fGUjXJDu9GUM0cd6Pjm1HsXpm5rQ5n78Zew@mail.gmail.com>
-	<26a33eec-3ed5-f05d-7c36-5b46eeba9612@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 11:38:38 +0100
-Message-ID: <CAFEAcA8e77FvPCEKGb0eNoWf_NnQqoyMz3P_-=hJCC-PW3+2vg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] target: arm: Add support for VCPU
- event states
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201808241718451351057@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V3 2/4] target-i386:add coalesced_pio API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
+To: peng.hao2@zte.com.cn
+Cc: pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-On 24 August 2018 at 11:28, gengdongjiu <gengdongjiu@huawei.com> wrote:
-> On 2018/8/24 0:52, Peter Maydell wrote:
->> On 23 August 2018 at 16:45, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->>> +static int kvm_put_vcpu_events(ARMCPU *cpu)
->>> +{
->>> +    CPUARMState *env = &cpu->env;
->>> +    struct kvm_vcpu_events events = {};
->>> +
->>> +    if (!kvm_has_vcpu_events()) {
->>> +        return 0;
->>> +    }
->>> +
->>> +    memset(&events, 0, sizeof(events));
->>> +    events.exception.serror_pending = env->serror.pending;
->>> +
->>> +    if (have_inject_serror_esr) {
->>> +        events.exception.serror_has_esr = env->serror.has_esr;
->>> +        events.exception.serror_esr = env->serror.esr;
->>> +    }
->>
->> I realised that the effect of this condition is that
->> if we migrate a VM from a machine which supports specifying the
->> SError ESR to one which does not, and at the point of migration
->> there is a pending SError with an ESR value, then we will
->> silently drop the specified ESR value. The other alternative
->> would be to fail the migration (by dropping the if() check,
->> and letting the host kernel fail the ioctl if that meant that
->> we asked it to set an SError ESR it couldn't manage.)
->>
->> I guess that's OK? It's all hypothetical currently since
->> we don't support migration between different host CPU types.
->
-> Peter,
->    there are two status needed to migrate, one is serror_pending, another is SError ESR value.
->
-> If A migrates to B, A can set an SError ESR, but B does not support to set.
-> when A is pending a SError and need to migrate to B, I think it should support to migrate the serror_pending status without the ESR value(the ESR value is 0).
-> That is to say,  if A is pending a SError, when migrate to B, B should also pend a SError.
->
-> or do you think we should refused this migration?
+On Fri, Aug 24, 2018 at 05:18:45PM +0800, peng.hao2@zte.com.cn wrote:
+[...]
+> > > -            cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
+> > > +            if (ent->pio == 1) {
+> > > +                address_space_rw(&address_space_io, ent->phys_addr,
+> > > +                                 MEMTXATTRS_NONE, ent->data, ent->len, true);
+> 
+> > Why exactly MEMTXATTRS_NONE is the right attrs argument here?
+> > Why MEMTXATTRS_UNSPECIFIED wouldn't work?
+> 
+> I didn't notice MEMTXATTRS_NONE is the same as MEMTXATTRS_UNSPECIFIED.
+> MEMTXATTRS_NONE is redundant.
 
-I don't know, that's why I asked. If we have a pending
-SError with an ESR, and we end up on a destination machine
-where we can pend the SError but not the ESR, does that
-make sense (ie will the guest still be able to usefully
-continue), or have we thrown away information that the
-guest requires to be able to usefully use the SError ?
-Presumably the ESR is important, or we could just never
-bother to set it when pending SErrors.
+They are not exactly the same (see below), but in either case I'm
+not sure it would make any difference for PIO.
 
-thanks
--- PMM
+
+> >> +            } else {
+> >> +                cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
+> >> +            }
+> >>              smp_wmb();
+> >>              ring->first = (ring->first + 1) % KVM_COALESCED_MMIO_MAX;
+> >>          }
+> >> diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+> >> index d4a1642..12fd64f 100644
+> >> --- a/include/exec/memattrs.h
+> >> +++ b/include/exec/memattrs.h
+> >> @@ -45,7 +45,7 @@ typedef struct MemTxAttrs {
+> >>   * from "didn't specify" if necessary).
+> >>   */
+> >>  #define MEMTXATTRS_UNSPECIFIED ((MemTxAttrs) { .unspecified = 1 })
+> >> -
+> >> +#define MEMTXATTRS_NONE ((MemTxAttrs) { 0 })
+
+
+-- 
+Eduardo
