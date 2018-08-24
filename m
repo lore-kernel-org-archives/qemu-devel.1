@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ftFsq-0000Os-8n
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:28:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1ftFsv-0000Pu-9B
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ftFfX-00020C-W5
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:14:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35576 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ftFfW-0001vP-SK
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:14:43 -0400
-Date: Fri, 24 Aug 2018 20:14:37 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180824201116-mutt-send-email-mst@kernel.org>
-References: <20180820104045.133968-1-mst@redhat.com>
-	<20180820104045.133968-5-mst@redhat.com>
-	<CAFEAcA9eOFMuvkN2gBetU4SSpV0Jp2hSVsjMG53_Cp8TrkObFg@mail.gmail.com>
-	<20180824195231-mutt-send-email-mst@kernel.org>
-	<CAFEAcA8d0TMqkmkVY9mANj+Dv9fZj18ov=nvaDNtKqss5Nmc+w@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1ftFlG-0007Qq-EG
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:20:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ftFlG-0007PZ-6W
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 13:20:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ftFlE-00055e-06
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 17:20:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F28902E8076
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 17:20:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8d0TMqkmkVY9mANj+Dv9fZj18ov=nvaDNtKqss5Nmc+w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 4/7] hostmem-file: add the 'pmem' option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 24 Aug 2018 17:11:12 -0000
+From: Daniel Berrange <1788665@bugs.launchpad.net>
+Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
+Message-Id: <153513067304.12274.16891085269120620268.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
+ Windows 10 (1803) VGA passthrough VM using "Spectre" protection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +37,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Junyan He <junyan.he@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Fri, Aug 24, 2018 at 05:57:06PM +0100, Peter Maydell wrote:
-> On 24 August 2018 at 17:53, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > On Fri, Aug 24, 2018 at 04:13:18PM +0100, Peter Maydell wrote:
-> >> object_get_canonical_path_component() returns a string which
-> >> must be freed using g_free().
-> 
-> > Like the following? Junyan, could you pls try this one and confirm?
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >
-> > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> > index 2476dcb435..d88125b86e 100644
-> > --- a/backends/hostmem-file.c
-> > +++ b/backends/hostmem-file.c
-> > @@ -154,11 +154,14 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
-> >  #ifndef CONFIG_LIBPMEM
-> >      if (value) {
-> >          Error *local_err = NULL;
-> > +        char *path = object_get_canonical_path_component(o);
-> > +
-> >          error_setg(&local_err,
-> >                     "Lack of libpmem support while setting the 'pmem=on'"
-> >                     " of %s '%s'. We can't ensure data persistence.",
-> >                     object_get_typename(o),
-> > -                   object_get_canonical_path_component(o));
-> > +                   );
-> > +        g_free(path);
-> >          error_propagate(errp, local_err);
-> >          return;
-> 
-> Yep, like that (though I would put the closing ");" on
-> the line with object_get_typename() and delete the trailing comma).
-> 
-> thanks
-> -- PMM
+You're mis-understanding how microcode works a little. Microcode is
+loaded into physical CPUs in the host. This affects everything that runs
+on these CPUs thereafter. A KVM guest is merely a process running on the
+host CPUs, so it is affected by the updated microcode. There is no
+notion of the virtual CPUs having a different microcode.
 
-oh i forgot to add in "path".
-I didn't build with libpmem installed
-Should have been (still untested):
+The doc you pointed to above
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+https://docs.microsoft.com/en-us/virtualization/hyper-v-on-
+windows/CVE-2017-5715-and-hyper-v-vms
+
+indicates that you must install the microcode in the host, which enables
+new CPUs features. These features should then be exposed to the guest.
+
+You say you've installed the microcode which is good, but did you also
+update the kernel ?
+
+Host kernel updates were required in order for KVM to be able to expose
+the new features from the microcode, to the guest. Essentially if your
+guest kernel shows  "pti ssbd ibrs ibpb stibp"  features as present,
+then thanks to your "-cpu host" usage, the guest should see them too.
 
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 2476dcb435..72e7055ee7 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -154,11 +154,14 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
- #ifndef CONFIG_LIBPMEM
-     if (value) {
-         Error *local_err = NULL;
-+        char *path = object_get_canonical_path_component(o);
-+
-         error_setg(&local_err,
-                    "Lack of libpmem support while setting the 'pmem=on'"
-                    " of %s '%s'. We can't ensure data persistence.",
-                    object_get_typename(o),
--                   object_get_canonical_path_component(o));
-+                   path);
-+        g_free(path);
-         error_propagate(errp, local_err);
-         return;
-     }
+** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2017-5715
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788665
+
+Title:
+  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
+  using "Spectre" protection
+
+Status in QEMU:
+  New
+
+Bug description:
+  Windows 10 (1803) VM using VGA passthrough via qemu script.
+
+  After upgrading Windows 10 Pro VM to version 1803, or possibly after
+  applying the March/April security updates from Microsoft, the VM would
+  show low 2D graphics performance (sluggishness in 2D applications and
+  low Passmark results).
+
+  Turning off Spectre vulnerability protection in Windows remedies the
+  issue.
+
+  Expected behavior:
+  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
+ see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
+-2017-5715-and-hyper-v-vms
+
+  Background:
+
+  Starting in March or April Microsoft began to push driver updates in
+  their updates / security updates. See https://support.microsoft.com
+  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
+  meltdown
+
+  One update concerns the Intel microcode - see
+  https://support.microsoft.com/en-us/help/4100347. It is activated by
+  default within Windows.
+
+  Once the updates are applied within the Windows guest, 2D graphics
+  performance drops significantly. Other performance benchmarks are not
+  affected.
+
+  A bare metal Windows installation does not display a performance loss
+  after the update. See https://heiko-sieger.info/low-2d-graphics-
+  benchmark-with-windows-10-1803-kvm-vm/
+
+  Similar reports can be found here:
+  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
+performance_on_windows/
+
+  Hardware:
+
+  6 core Intel Core i7-3930K (-MT-MCP-)
+
+  Host OS:
+  Linux Mint 19/Ubuntu 18.04
+  Kernel: 4.15.0-32-generic x86_64
+  Qemu: QEMU emulator version 2.11.1
+  Intel microcode (host): 0x714
+  dmesg | grep microcode
+  [    0.000000] microcode: microcode updated early to revision 0x714, date=
+ =3D 2018-05-08
+  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
+  [    2.813340] microcode: Microcode Update Driver: v2.2.
+
+  Note: I manually updated the Intel microcode on the host from 0x713 to
+  0x714. However, both microcode versions produce the same result in the
+  Windows guest.
+
+  Guest OS:
+  Windows 10 Pro 64 bit, release 1803
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
