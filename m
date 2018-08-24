@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsy0O-0005fe-U5
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:23:09 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1ft0Cs-0002L3-0b
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 20:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fsy0N-0001Jq-FU
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 18:23:04 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Thu, 23 Aug 2018 18:22:47 -0400
-Message-Id: <20180823222249.13518-12-jsnow@redhat.com>
-In-Reply-To: <20180823222249.13518-1-jsnow@redhat.com>
-References: <20180823222249.13518-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/13] qapi/block-mirror: expose new job
- properties
+	(envelope-from <longpeng2@huawei.com>) id 1ft0Cn-0000Tr-5s
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 20:44:05 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:43424 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <longpeng2@huawei.com>)
+	id 1ft0Cm-0000RI-On
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 20:44:01 -0400
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Fri, 24 Aug 2018 08:43:36 +0800
+Message-ID: <1535071416-212072-3-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1535071416-212072-1-git-send-email-longpeng2@huawei.com>
+References: <1535071416-212072-1-git-send-email-longpeng2@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v25 2/2] virtio-crypto: Add conformance clauses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,129 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: mst@redhat.com, cohuck@redhat.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, pasic@linux.vnet.ibm.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com, "Longpeng(Mike)" <nimisolo@gmail.com>, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
+From: "Longpeng(Mike)" <nimisolo@gmail.com>
+
+Add the conformance targets and clauses for
+virtio-crypto device.
+
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Zhoujian <jianjay.zhou@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- blockdev.c           | 14 ++++++++++++++
- qapi/block-core.json | 30 ++++++++++++++++++++++++++++--
- 2 files changed, 42 insertions(+), 2 deletions(-)
+ conformance.tex | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index 98b91e75a7..429cdf9901 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3597,6 +3597,8 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-                                    bool has_filter_node_name,
-                                    const char *filter_node_name,
-                                    bool has_copy_mode, MirrorCopyMode copy_mode,
-+                                   bool has_auto_finalize, bool auto_finalize,
-+                                   bool has_auto_dismiss, bool auto_dismiss,
-                                    Error **errp)
- {
-     int job_flags = JOB_DEFAULT;
-@@ -3625,6 +3627,12 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-     if (!has_copy_mode) {
-         copy_mode = MIRROR_COPY_MODE_BACKGROUND;
-     }
-+    if (has_auto_finalize && !auto_finalize) {
-+        job_flags |= JOB_MANUAL_FINALIZE;
-+    }
-+    if (has_auto_dismiss && !auto_dismiss) {
-+        job_flags |= JOB_MANUAL_DISMISS;
-+    }
+diff --git a/conformance.tex b/conformance.tex
+index e4efe33..5638eae 100644
+--- a/conformance.tex
++++ b/conformance.tex
+@@ -147,6 +147,21 @@ An SCSI host driver MUST conform to the following normative statements:
+ \item \ref{drivernormative:Device Types / SCSI Host Device / Device Operation / Device Operation: eventq}
+ \end{itemize}
  
-     if (granularity != 0 && (granularity < 512 || granularity > 1048576 * 64)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "granularity",
-@@ -3802,6 +3810,8 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-                            arg->has_unmap, arg->unmap,
-                            false, NULL,
-                            arg->has_copy_mode, arg->copy_mode,
-+                           arg->has_auto_finalize, arg->auto_finalize,
-+                           arg->has_auto_dismiss, arg->auto_dismiss,
-                            &local_err);
-     bdrv_unref(target_bs);
-     error_propagate(errp, local_err);
-@@ -3823,6 +3833,8 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                          bool has_filter_node_name,
-                          const char *filter_node_name,
-                          bool has_copy_mode, MirrorCopyMode copy_mode,
-+                         bool has_auto_finalize, bool auto_finalize,
-+                         bool has_auto_dismiss, bool auto_dismiss,
-                          Error **errp)
- {
-     BlockDriverState *bs;
-@@ -3856,6 +3868,8 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                            true, true,
-                            has_filter_node_name, filter_node_name,
-                            has_copy_mode, copy_mode,
-+                           has_auto_finalize, auto_finalize,
-+                           has_auto_dismiss, auto_dismiss,
-                            &local_err);
-     error_propagate(errp, local_err);
++\subsection{Crypto Driver Conformance}\label{sec:Conformance / Driver Conformance / Crypto Driver Conformance}
++
++A Crypto driver MUST conform to the following normative statements:
++
++\begin{itemize}
++\item \ref{drivernormative:Device Types / Crypto Device / Device configuration layout}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Initialization}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: create session}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: destroy session}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / HASH Service operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / MAC Service operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / Symmetric algorithms Operation}
++\item \ref{drivernormative:Device Types / Crypto Device / Device Operation / AEAD Service operation}
++\end{itemize}
++
+ \section{Device Conformance}\label{sec:Conformance / Device Conformance}
  
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d5b62e50d7..e785c2e9fe 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1729,6 +1729,18 @@
- # @copy-mode: when to copy data to the destination; defaults to 'background'
- #             (Since: 3.0)
- #
-+# @auto-finalize: When false, this job will wait in a PENDING state after it has
-+#                 finished its work, waiting for @block-job-finalize before
-+#                 making any block graph changes.
-+#                 When true, this job will automatically
-+#                 perform its abort or commit actions.
-+#                 Defaults to true. (Since 3.1)
-+#
-+# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
-+#                has completely ceased all work, and awaits @block-job-dismiss.
-+#                When true, this job will automatically disappear from the query
-+#                list without user intervention.
-+#                Defaults to true. (Since 3.1)
- # Since: 1.3
- ##
- { 'struct': 'DriveMirror',
-@@ -1738,7 +1750,8 @@
-             '*speed': 'int', '*granularity': 'uint32',
-             '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
-             '*on-target-error': 'BlockdevOnError',
--            '*unmap': 'bool', '*copy-mode': 'MirrorCopyMode' } }
-+            '*unmap': 'bool', '*copy-mode': 'MirrorCopyMode',
-+            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+ A device MUST conform to the following normative statements:
+@@ -268,6 +283,20 @@ An SCSI host device MUST conform to the following normative statements:
+ \item \ref{devicenormative:Device Types / SCSI Host Device / Device Operation / Device Operation: eventq}
+ \end{itemize}
  
- ##
- # @BlockDirtyBitmap:
-@@ -2004,6 +2017,18 @@
- # @copy-mode: when to copy data to the destination; defaults to 'background'
- #             (Since: 3.0)
- #
-+# @auto-finalize: When false, this job will wait in a PENDING state after it has
-+#                 finished its work, waiting for @block-job-finalize before
-+#                 making any block graph changes.
-+#                 When true, this job will automatically
-+#                 perform its abort or commit actions.
-+#                 Defaults to true. (Since 3.1)
-+#
-+# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
-+#                has completely ceased all work, and awaits @block-job-dismiss.
-+#                When true, this job will automatically disappear from the query
-+#                list without user intervention.
-+#                Defaults to true. (Since 3.1)
- # Returns: nothing on success.
- #
- # Since: 2.6
-@@ -2025,7 +2050,8 @@
-             '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
-             '*on-target-error': 'BlockdevOnError',
-             '*filter-node-name': 'str',
--            '*copy-mode': 'MirrorCopyMode' } }
-+            '*copy-mode': 'MirrorCopyMode',
-+            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
- # @block_set_io_throttle:
++\subsection{Crypto Device Conformance}\label{sec:Conformance / Device Conformance / Crypto Device Conformance}
++
++A Crypto device MUST conform to the following normative statements:
++
++\begin{itemize}
++\item \ref{devicenormative:Device Types / Crypto Device / Device configuration layout}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: create session}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: destroy session}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / HASH Service operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / MAC Service operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / Symmetric algorithms Operation}
++\item \ref{devicenormative:Device Types / Crypto Device / Device Operation / AEAD Service operation}
++\end{itemize}
++
+ \section{Legacy Interface: Transitional Device and
+ Transitional Driver Conformance}\label{sec:Conformance / Legacy
+ Interface: Transitional Device and 
 -- 
-2.14.4
+1.8.3.1
