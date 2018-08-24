@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UE-0007aQ-Ku
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:35 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UG-0007cT-F6
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UD-0004k2-0H
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:34 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44896)
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UE-0004kq-LF
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:36 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ft8UB-0004eK-1e
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:31 -0400
+	id 1ft8UC-0004PP-Vm
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:33 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8U9-0006c6-Hh
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:29 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UA-0006cN-HK
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:30 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 10:33:29 +0100
-Message-Id: <20180824093343.11346-39-peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 10:33:30 +0100
+Message-Id: <20180824093343.11346-40-peter.maydell@linaro.org>
 In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
 References: <20180824093343.11346-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 38/52] hw/ssi/pl022: Correct wrong DMACR and ICR
- handling
+Subject: [Qemu-devel] [PULL 39/52] hw/arm/mps2-tz: Instantiate SPI
+ controllers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +30,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In the PL022, register offset 0x20 is the ICR, a write-only
-interrupt-clear register.  Register offset 0x24 is DMACR, the DMA
-control register.  We were incorrectly implementing (a stub version
-of) DMACR at 0x20, and not implementing anything at 0x24.  Fix this
-bug.
+The SPI controllers in the MPS2 AN505 board are PL022s.
+We have a model of the PL022, so create these devices.
+
+We don't currently model the LCD controller that sits behind
+one of the PL022s; the others are intended to control devices
+that sit on the FPGA's general purpose SPI connector or
+"shield" expansion connectors.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20180820141116.9118-21-peter.maydell@linaro.org
+Message-id: 20180820141116.9118-22-peter.maydell@linaro.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/ssi/pl022.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ hw/arm/mps2-tz.c | 38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
 
-diff --git a/hw/ssi/pl022.c b/hw/ssi/pl022.c
-index d310671d18e..e58247554cc 100644
---- a/hw/ssi/pl022.c
-+++ b/hw/ssi/pl022.c
-@@ -146,7 +146,7 @@ static uint64_t pl022_read(void *opaque, hwaddr offset,
-         return s->is;
-     case 0x1c: /* MIS */
-         return s->im & s->is;
--    case 0x20: /* DMACR */
-+    case 0x24: /* DMACR */
-         /* Not implemented.  */
-         return 0;
-     default:
-@@ -192,7 +192,15 @@ static void pl022_write(void *opaque, hwaddr offset,
-         s->im = value;
-         pl022_update(s);
-         break;
--    case 0x20: /* DMACR */
-+    case 0x20: /* ICR */
-+        /*
-+         * write-1-to-clear: bit 0 clears ROR, bit 1 clears RT;
-+         * RX and TX interrupts cannot be cleared this way.
-+         */
-+        value &= PL022_INT_ROR | PL022_INT_RT;
-+        s->is &= ~value;
-+        break;
-+    case 0x24: /* DMACR */
-         if (value) {
-             qemu_log_mask(LOG_UNIMP, "pl022: DMA not implemented\n");
-         }
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index d810e51a1b4..cedf605e20e 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -48,6 +48,7 @@
+ #include "hw/misc/tz-msc.h"
+ #include "hw/arm/iotkit.h"
+ #include "hw/dma/pl080.h"
++#include "hw/ssi/pl022.h"
+ #include "hw/devices.h"
+ #include "net/net.h"
+ #include "hw/core/split-irq.h"
+@@ -73,7 +74,7 @@ typedef struct {
+     MPS2FPGAIO fpgaio;
+     TZPPC ppc[5];
+     TZMPC ssram_mpc[3];
+-    UnimplementedDeviceState spi[5];
++    PL022State spi[5];
+     UnimplementedDeviceState i2c[4];
+     UnimplementedDeviceState i2s_audio;
+     UnimplementedDeviceState gpio[4];
+@@ -324,6 +325,31 @@ static MemoryRegion *make_dma(MPS2TZMachineState *mms, void *opaque,
+     return sysbus_mmio_get_region(s, 0);
+ }
+ 
++static MemoryRegion *make_spi(MPS2TZMachineState *mms, void *opaque,
++                              const char *name, hwaddr size)
++{
++    /*
++     * The AN505 has five PL022 SPI controllers.
++     * One of these should have the LCD controller behind it; the others
++     * are connected only to the FPGA's "general purpose SPI connector"
++     * or "shield" expansion connectors.
++     * Note that if we do implement devices behind SPI, the chip select
++     * lines are set via the "MISC" register in the MPS2 FPGAIO device.
++     */
++    PL022State *spi = opaque;
++    int i = spi - &mms->spi[0];
++    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
++    SysBusDevice *s;
++
++    sysbus_init_child_obj(OBJECT(mms), name, spi, sizeof(mms->spi[0]),
++                          TYPE_PL022);
++    object_property_set_bool(OBJECT(spi), true, "realized", &error_fatal);
++    s = SYS_BUS_DEVICE(spi);
++    sysbus_connect_irq(s, 0,
++                       qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 51 + i));
++    return sysbus_mmio_get_region(s, 0);
++}
++
+ static void mps2tz_common_init(MachineState *machine)
+ {
+     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
+@@ -422,11 +448,11 @@ static void mps2tz_common_init(MachineState *machine)
+         }, {
+             .name = "apb_ppcexp1",
+             .ports = {
+-                { "spi0", make_unimp_dev, &mms->spi[0], 0x40205000, 0x1000 },
+-                { "spi1", make_unimp_dev, &mms->spi[1], 0x40206000, 0x1000 },
+-                { "spi2", make_unimp_dev, &mms->spi[2], 0x40209000, 0x1000 },
+-                { "spi3", make_unimp_dev, &mms->spi[3], 0x4020a000, 0x1000 },
+-                { "spi4", make_unimp_dev, &mms->spi[4], 0x4020b000, 0x1000 },
++                { "spi0", make_spi, &mms->spi[0], 0x40205000, 0x1000 },
++                { "spi1", make_spi, &mms->spi[1], 0x40206000, 0x1000 },
++                { "spi2", make_spi, &mms->spi[2], 0x40209000, 0x1000 },
++                { "spi3", make_spi, &mms->spi[3], 0x4020a000, 0x1000 },
++                { "spi4", make_spi, &mms->spi[4], 0x4020b000, 0x1000 },
+                 { "uart0", make_uart, &mms->uart[0], 0x40200000, 0x1000 },
+                 { "uart1", make_uart, &mms->uart[1], 0x40201000, 0x1000 },
+                 { "uart2", make_uart, &mms->uart[2], 0x40202000, 0x1000 },
 -- 
 2.18.0
