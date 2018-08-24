@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Manish.Jaggi@cavium.com>) id 1ft8K9-00025W-Qm
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:24:11 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8Ta-000731-LQ
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Manish.Jaggi@cavium.com>) id 1ft8K6-0000CX-Lo
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:24:09 -0400
-Received: from mail-eopbgr680054.outbound.protection.outlook.com
-	([40.107.68.54]:26624
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8TZ-0002kh-Gq
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:33:54 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Manish.Jaggi@cavium.com>)
-	id 1ft8K6-0000BF-DK
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:24:06 -0400
-From: "Jaggi, Manish" <Manish.Jaggi@cavium.com>
-Date: Fri, 24 Aug 2018 09:24:02 +0000
-Message-ID: <3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
-References: <CABgNM92-PHWg3X41tCVfErmV9-Hnu5GYpz_pa9-iXfbScFUCZg@mail.gmail.com>
-	<CD29DCF7-6537-406F-A127-6A2FFDDAAD79@caviumnetworks.com>
-	<87k1ohxik4.fsf@trasno.org>
-In-Reply-To: <87k1ohxik4.fsf@trasno.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <08907A54512D82438DEFC0010CA28316@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
- different processor ids
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1ft8TZ-0002fG-4S
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:33:53 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8TY-0006Mr-5L
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:33:52 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 10:32:55 +0100
+Message-Id: <20180824093343.11346-5-peter.maydell@linaro.org>
+In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
+References: <20180824093343.11346-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 04/52] target/arm: Use the float-to-int-scale
+ softfloat routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +28,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, Anthony Liguori <aliguori@us.ibm.com>
+To: qemu-devel@nongnu.org
 
-DQoNCj4gT24gMjMtQXVnLTIwMTgsIGF0IDc6NTkgUE0sIEp1YW4gUXVpbnRlbGEgPHF1aW50ZWxh
-QHJlZGhhdC5jb20+IHdyb3RlOg0KPiANCj4gRXh0ZXJuYWwgRW1haWwNCj4gDQo+ICJKYWdnaSwg
-TWFuaXNoIiA8TWFuaXNoLkphZ2dpQGNhdml1bS5jb20+IHdyb3RlOg0KPj4gSGksDQo+IA0KPiBI
-aQ0KPiANCj4gW05vdGUgdGhhdCBJIHdhcyBjb25mdXNlZCBhYm91dCB3aGF0IGRvIHlvdSBtZWFu
-IHdpdGggcHJvYmxlbXMgd2l0aA0KPiBwcm9jZXNzb3JJRC4gIFRoZXJlIGlzIG5vIHByb2Nlc3Nv
-cklEIG9uIHRoZSBtaWdyYXRpb24gc3RyZWFtLCBzbyBJDQo+IGRpZG4ndCB1bmRlcnN0b29kIHdo
-YXQgeW91IHdlcmUgdGFsa2luZyBhYm91dC4gIFVudGlsIEkgcmVhbGl6ZWQgdGhhdA0KPiB5b3Ug
-d2VyZSB0cnlpbmcgdG8gbWlncmF0ZSBmcm9tIGRpZmZlcmVudCBjcHUgdHlwZXNdDQo+IA0KPj4g
-UG9zdGluZyBhZ2FpbiB3aXRoIG15IGNhdml1bSBJRCBhbmQgQ0NpbmcgcmVsZXZhbnQgZm9sa3MN
-Cj4gDQo+IEl0IHdpbGwgYmUgZ29vZCB0byBnaXZlIFdoYXQgYXJjaGl0ZWN0dXJlIGFyZSB3ZSB0
-YWxraW5nIGFib3V0PyAgTUlQUywNCj4gQVJNLCBhbnl0aGluZyBlbHNlPw0KPiANCmFybTY0DQoN
-Cj4gV2h5PyAgQmVjYXVzZSB3ZSBkbyB0aGlzIGNvbnRpbm91c2x5IG9uIHg4Nl82NCB3b3JsZC4g
-IEhvdyBkbyB3ZSBkbw0KPiB0aGlzPyAgV2UgZW11bGF0ZSB0aGUgX3Byb2Nlc3Nvcl8gY2FwYWJp
-bGl0aWVzLCBzbyAiaW4gZ2VuZXJhbCIgeW91IGNhbg0KPiBhbHdheXMgbWlncmF0ZSBmcm9tIGEg
-cHJvY2Vzc29yIHRvIGFub3RoZXIgd2l0aCBhIHN1cGVyc2V0IG9mIHRoZQ0KPiBmZWF0dXJlcy4g
-IElmIHlvdSBsb29rIGF0IHRoZSBvdXB1dCBvZjoNCj4gDQo+ICAgIHFlbXUtc3lzdGVtLXg4Nl82
-NCAtY3B1ID8NCj4gDQo+IFlvdSBjYW4gc2VlIHRoYXQgd2UgaGF2ZSBsb3RzIG9mIGNwdSB0eXBl
-cyB0aGF0IHdlIGVtdWxhdGUgYW5kIGNwdWlkDQo+IChmZWF0dXJlcyByZWFsbHkpLiAgTWlncmF0
-aW9uIGludGVsPC0+YW1kIGlzIHRyaWNreS4gIEJ1dCBmcm9tICJpbnRlbA0KPiB3aXRoIGxlc3Mg
-ZmVhdHVyZXMiIHRvICJpbnRlbCB3aXRoIG1vcmUgZmVhdHVyZXMiIChvciB0aGUgc2FtZSB3aXRo
-IEFNRCkNCj4gaXQgaXMgYSBjb21tb24gdGhpbmcgdG8gZG8uICBPbmNlIHRvbGQgdGhhdCwgaXQg
-aXMgYSBsb3Qgb2Ygd29yaywgc2ltcGxlDQo+IHRoaW5ncyBsaWtlIHRoYXQgcHJvY2Vzc29ycyBy
-dW4gYXQgZGlmZmVyZW50IGNsb2NrIHNwZWVkcyBpbXBseSB0aGF0IHlvdQ0KPiBuZWVkIHRvIGJl
-IGNhcmVmdWwgZHVyaW5nIG1pZ3JhdGlvbiB3aXRoIHRpbWVycyBhbmQgYW55dGhpbmcgdGhhdA0K
-PiBkZXBlbmRzIG9uIGZyZXF1ZW5jaWVzLg0KPiANCj4gSSBkb24ndCBrbm93IGVub3VnaCBhYm91
-dCBvdGhlciBhcmNoaXRlY3R1cmVzIHRvIGtub3cgaG93IHRvIGRvIGl0LCBvcg0KPiBob3cgZmVh
-c2libGUgaXMuDQoNCkZvciBhcm02NCBxZW11L2t2bSB0aHJvd3MgYW4gZXJyb3Igd2hlbiBwcm9j
-ZXNzb3JJRCBkb2VzIG5vdCBtYXRjaC4gDQo+IA0KPj4gTGl2ZSBNaWdyYXRpb24gYmV0d2VlbiBt
-YWNoaW5lcyB3aXRoIGRpZmZlcmVudCBwcm9jZXNzb3JJZHMNCj4+IA0KPj4gVk0gTWlncmF0aW9u
-IGJldHdlZW4gbWFjaGluZXMgd2l0aCBkaWZmZXJlbnQgcHJvY2Vzc29ySWQgdmFsdWVzIHRocm93
-cw0KPj4gZXJyb3IgaW4gcWVtdS9rdm0uIFRob3VnaCB0aGlzIGNoZWNrIGlzIGFwcHJvcHJpYXRl
-IGJ1dCBpcyBvdmVya2lsbCB3aGVyZQ0KPj4gdHdvIG1hY2hpbmVzIGFyZSBvZiBzYW1lIFNvQy9h
-cmNoIGZhbWlseSBhbmQgaGF2ZSBzYW1lIGNvcmUvZ2ljIGJ1dA0KPj4gZGVsdGEgY291bGQgYmUg
-aW4gb3RoZXIgcGFydHMgb2YgU29jIHdoaWNoIGhhdmUgbm8gZWZmZWN0IG9uIFZNDQo+PiBvcGVy
-YXRpb24uDQo+IA0KPiBUaGVuIHlvdSBuZWVkIHRvIGRvIHRoZSB3aG9sZSBwcm9jZXNzIG9mOg0K
-PiANCj4gTGV0cyBjYWxsIGJvdGggcHJvY2Vzc29ycyBBMSBhbmQgQTIuICBZb3UgbmVlZCB0byBk
-byB0aGUgd2hvbGUgcHJvY2Vzcw0KPiBvZjoNCj4gDQo+IGEtIGRlZmluaW5nIGNwdSBBMQ0KPiBi
-LSBtYWtlIHN1cmUgdGhhdCB3aGVuIHlvdSBydW4gcWVtdS9rdm0gb24gcHJvY2Vzc29yIEEyLCB0
-aGUNCj4gIGZlYXR1cmVzL2JlaGF2aW91cnMgdGhhdCB0aGUgZ3Vlc3Qgc2Vlcy4gIFRoaXMgaXMg
-bm90IHRyaXZpYWwgYXQNCj4gIGFsbC4NCj4gYy0gd2hlbiBtaWdyYXRpb24gY29tZXMsIHlvdSBj
-YW4gc2VlIHRoYXQgeW91IG5lZWQgdG8gYWRqdXN0IHRvIHdoYXRldmVyDQo+ICBpcyB0aGUgYXJj
-aGl0ZWN0dXJlIG9mIHRoZSBkZXN0aW5hdGlvbi4NCj4gDQo+PiBUaGVyZSBjb3VsZCBiZSB0d28g
-d2F5cyB0byBhZGRyZXNzIHRoaXMgaXNzdWUgYnkgaWdub3JpbmcgdGhlDQo+PiBjb21wYXJpc29u
-IG9mIHByb2Nlc3NvcklEcyBhbmQgc28gbmVlZCBmZWVkYmFjayBmcm9tIHRoZQ0KPj4gY29tbXVu
-aXR5IG9uIHRoaXMuDQo+PiANCj4+IGEpIE1haW50YWluIGEgd2hpdGVsaXN0IGluIHFlbXU6DQo+
-PiANCj4+IFRoaXMgd2lsbCBiZSBhIHNldCBvZiBhbGwgcHJvY2Vzc29ySWRzIHdoaWNoIGFyZSBj
-b21wYXRpYmxlIGFuZCBtaWdyYXRpb24gY2FuDQo+PiBoYXBwZW4gYmV0d2VlbiBhbnkgb2YgdGhl
-IG1hY2hpbmVzIHdpdGggdGhlIElkcyBmcm9tIHRoaXMgc2V0LiBUaGlzIHNldCBjYW4NCj4+IGJl
-IHN0YXRpY2FsbHkgYnVpbHQgd2l0aGluIHFlbXUgYmluYXJ5Lg0KPiANCj4gSW4gZ2VuZXJhbCwg
-SSBwcmVmZmVyIHdoaXRlbGlzdHMgb3ZlciBibGFja2xpc3RzLg0KPiANCj4+IGIpIFByb3ZpZGUg
-YW4gZXh0cmEgb3B0aW9uIHdpdGggbWlncmF0ZSBjb21tYW5kDQo+PiANCj4+ICBtaWdyYXRlIHRj
-cDo8aXA+Ojxwb3J0Pjo8ZGVzdF9wcm9jZXNzb3JfaWQ+DQo+PiANCj4+IFRoaXMgaXMgdG8gZmFr
-ZSB0aGUgc3JjX3Byb2Nlc3Nvcl9pZCBhcyBkZXN0X3Byb2Nlc3Nvcl9pZCwgc28gdGhlIHFlbXUg
-cnVubmluZw0KPj4gb24gZGVzdGluYXRpb24gbWFjaGluZSB3aWxsIG5vdCBjb21wbGFpbi4gVGhl
-IG92ZXJoZWFkIHdpdGggdGhpcyBhcHByb2FjaCBpcw0KPj4gdGhhdCB0aGUgZGVzdGluYXRpb24g
-bWFjaGluZXMgSWQgbmVlZCB0byBiZSBrbm93biBiZWZvcmVoYW5kLg0KPiANCj4gUGxlYXNlLCBk
-b24ndCBldmVuIHRoaW5rIGFib3V0IHRoaXM6DQo+IGEtIG1pZ3JhdGlvbiBjb21tYW5kcyBhcmUg
-YXJjaGl0ZWN0dXJlIGFnbm9zdGljDQo+IGItIGluIGdlbmVyYWwgaXQgaXMgX211Y2hfLCBfbXVj
-aF8gZWFzaWVyIHRvIGZpeCB0aGluZ3Mgb24gZGVzdGluYXRpb24NCj4gIHRoYXQgb24gc291cmNl
-Lg0KPiANCj4+IElmIHRoZXJlIGlzIHNvbWUgYmV0dGVyIHdheeKApiBwbGVhc2Ugc3VnZ2VzdC4N
-Cj4gDQo+IExvb2sgYXQgaG93IGl0IGlzIGRvbmUgb24geDg2XzY0LiAgQnV0IGJlIGF3YXJlIHRo
-YXQgImRvaW5nIGl0IHJpZ2h0Ig0KPiB0YWtlcyBhIGxvdCBvZiB3b3JrLiAgVG8gZ2l2ZSB5b3Ug
-b25lIGlkZWE6DQo+IC0gdXBzdHJlYW0sIGkuZS4gcWVtdSwgIndhcmFudGVlIiB0aGF0IG1pZ3Jh
-dGlvbiBvZjoNCj4gcWVtdS1YIC1NIG1hY2hpbmUtdHlwZS1YIC0+IHFlbXUtWSAtTSBtYWNoaW5l
-LXR5cGUtWA0KPiB3b3JrcyB3aGVuIFggPCBZLg0KPiANCj4gLSBkb3duc3RyZWFtIChpLmUuIHJl
-ZGhhdCBvbiBteSBjYXNlLCBidXQgSSBhbSBzdXJlIHRoYXQgb3RoZXJzIGFsc28NCj4gInN1ZmZl
-ciIgdGhpcykgIGFsbG93IGFsc286DQo+IA0KPiBxZW11LVkgLU0gbWFjaGluZS10eXBlLVggLT4g
-cWVtdS1YIC1NIG1hY2hpbmUtdHlwZS1YIChZID4gWCkNCj4gDQo+IGluIGdlbmVyYWwgaXQgaXMg
-YSB2ZXJ5IGNvbXBsaWNhdGVkIHByb2JsZW0sIHNvIHdlIGxpbWl0IF93aGF0XyB5b3UNCj4gY2Fu
-IGRvLiAgQmFzaWNhbGx5IHdlIG9ubHkgc3VwcG9ydCBvdXIgbWFjaGluZS10eXBlcywgZG8gYSBs
-b3Qgb2YNCj4gdGVzdGluZywgYW5kIGFyZSB2ZXJ5IGNhcmVmdWwgd2hlbiB3ZSBhZGQgbmV3IGZl
-YXR1cmVzLiAgSS5lLiBiZQ0KPiBwcmVwYXJyZWQgdG8gZG8gYSBsb3Qgb2YgdGVzdGluZyBhbmQg
-YSBsb3Qgb2YgZml4aW5nLg0KDQpBdCB0aGlzIHBvaW50IEkgYW0gdGFyZ2V0aW5nIGEgc2ltcGxl
-ciBjYXNlIHdoZXJlIE1hY2hpbmUgQTEgYW5kIEEyIGhhcyBhIGNvcmUgZnJvbSB0aGUgc2FtZSBT
-b0MgZmFtaWx5Lg0KRm9yIGV4YW1wbGUgQ2F2aXVtIFRodW5kZXJYMiBDb3JlIGluY3JlbWVudGFs
-IHZlcnNpb25zIHdoaWNoIGhhcyBpZGVudGljYWwgY29yZSBhbmQgR0lDIGFuZCBtYXkgaGF2ZSBz
-b21lIGVycmF0YSBmaXhlcy4NCkluIHRoYXQgY2FzZSBZPVggc2luY2UgbWlncmF0aW9uIG9ubHkg
-dGFrZXMgY2FyZSBvZiBQViBkZXZpY2VzLg0KDQpJbiB0aGF0IGNhc2UgYSB3aGl0ZWxpc3QgY291
-bGQgYmUgYW4gZWFzaWVyIG9wdGlvbj8NCg0KSG93IHRvIHByb3ZpZGUgdGhlIHdoaXRlbGlzdCB0
-byBxZW11IGluIGEgcGxhdGZvcm0gYWdub3N0aWMgd2F5Pw0KLSBJIHdpbGwgbG9vayBpbnRvIGlu
-dGVsIG1vZGVsIGFzIHlvdSBoYXZlIHN1Z2dlc3RlZCwgZG9lcyBpbnRlbCBrZWVwcyBhIHdoaXRl
-bGlzdCBvciBtYXNrcyBvZmYgc29tZSBiaXRzIG9mIHByb2Nlc3NvcklEDQpIb3cgZG9lcyBpbnRl
-bCBkb2VzIGl0DQoNCi0gaXMgcHJvdmlkaW5nIGEgLW1pcmF0ZS1jb21wYXQtd2hpdGVsaXN0IDxm
-aWxlPiBvcHRpb24gZm9yIGFybSBvbmx5IGxvb2tzIGdvb2Q/DQp0aGlzIG9wdGlvbiBjYW4gYmUg
-YWRkZWQgaW4gQTEvQTIgcWVtdSBjb21tYW5kLCBzbyBpdCB3b3VsZCBiZSB1cHN0cmVhbSAvIGRv
-d25zdHJlYW0gYWdub3N0aWMuDQo+IA0KPiBJIGFtIHNvcnJ5IHRvIG5vdCBiZSBhYmxlIHRvIHRl
-bGwgeW91IHRoYXQgdGhpcyBpcyBhbiBlYXN5IHByb2JsZW0uDQo+IA0KPiBMYXRlciwgSnVhbi4N
-Cg0K
+From: Richard Henderson <richard.henderson@linaro.org>
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180814002653.12828-5-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper.c | 101 ++++++++++++++++++++++----------------------
+ 1 file changed, 51 insertions(+), 50 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 456bb9cc113..8eb611542dc 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11566,38 +11566,28 @@ float##fsz HELPER(vfp_##name##to##p)(uint##isz##_t  x, uint32_t shift, \
+                                      void *fpstp) \
+ { return itype##_to_##float##fsz##_scalbn(x, -shift, fpstp); }
+ 
+-/* Notice that we want only input-denormal exception flags from the
+- * scalbn operation: the other possible flags (overflow+inexact if
+- * we overflow to infinity, output-denormal) aren't correct for the
+- * complete scale-and-convert operation.
+- */
+-#define VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, isz, itype, round) \
+-uint##isz##_t HELPER(vfp_to##name##p##round)(float##fsz x, \
+-                                             uint32_t shift, \
+-                                             void *fpstp) \
+-{ \
+-    float_status *fpst = fpstp; \
+-    int old_exc_flags = get_float_exception_flags(fpst); \
+-    float##fsz tmp; \
+-    if (float##fsz##_is_any_nan(x)) { \
+-        float_raise(float_flag_invalid, fpst); \
+-        return 0; \
+-    } \
+-    tmp = float##fsz##_scalbn(x, shift, fpst); \
+-    old_exc_flags |= get_float_exception_flags(fpst) \
+-        & float_flag_input_denormal; \
+-    set_float_exception_flags(old_exc_flags, fpst); \
+-    return float##fsz##_to_##itype##round(tmp, fpst); \
++#define VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, isz, itype, ROUND, suff)   \
++uint##isz##_t HELPER(vfp_to##name##p##suff)(float##fsz x, uint32_t shift, \
++                                            void *fpst)                   \
++{                                                                         \
++    if (unlikely(float##fsz##_is_any_nan(x))) {                           \
++        float_raise(float_flag_invalid, fpst);                            \
++        return 0;                                                         \
++    }                                                                     \
++    return float##fsz##_to_##itype##_scalbn(x, ROUND, shift, fpst);       \
+ }
+ 
+ #define VFP_CONV_FIX(name, p, fsz, isz, itype)                   \
+ VFP_CONV_FIX_FLOAT(name, p, fsz, isz, itype)                     \
+-VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, isz, itype, _round_to_zero) \
+-VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, isz, itype, )
++VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, isz, itype,               \
++                         float_round_to_zero, _round_to_zero)    \
++VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, isz, itype,               \
++                         get_float_rounding_mode(fpst), )
+ 
+ #define VFP_CONV_FIX_A64(name, p, fsz, isz, itype)               \
+ VFP_CONV_FIX_FLOAT(name, p, fsz, isz, itype)                     \
+-VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, isz, itype, )
++VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, isz, itype,               \
++                         get_float_rounding_mode(fpst), )
+ 
+ VFP_CONV_FIX(sh, d, 64, 64, int16)
+ VFP_CONV_FIX(sl, d, 64, 64, int32)
+@@ -11637,53 +11627,64 @@ uint32_t HELPER(vfp_uqtoh)(uint64_t x, uint32_t shift, void *fpst)
+     return uint64_to_float16_scalbn(x, -shift, fpst);
+ }
+ 
+-static float64 do_prescale_fp16(float16 f, int shift, float_status *fpst)
+-{
+-    if (unlikely(float16_is_any_nan(f))) {
+-        float_raise(float_flag_invalid, fpst);
+-        return 0;
+-    } else {
+-        int old_exc_flags = get_float_exception_flags(fpst);
+-        float64 ret;
+-
+-        ret = float16_to_float64(f, true, fpst);
+-        ret = float64_scalbn(ret, shift, fpst);
+-        old_exc_flags |= get_float_exception_flags(fpst)
+-            & float_flag_input_denormal;
+-        set_float_exception_flags(old_exc_flags, fpst);
+-
+-        return ret;
+-    }
+-}
+-
+ uint32_t HELPER(vfp_toshh)(uint32_t x, uint32_t shift, void *fpst)
+ {
+-    return float64_to_int16(do_prescale_fp16(x, shift, fpst), fpst);
++    if (unlikely(float16_is_any_nan(x))) {
++        float_raise(float_flag_invalid, fpst);
++        return 0;
++    }
++    return float16_to_int16_scalbn(x, get_float_rounding_mode(fpst),
++                                   shift, fpst);
+ }
+ 
+ uint32_t HELPER(vfp_touhh)(uint32_t x, uint32_t shift, void *fpst)
+ {
+-    return float64_to_uint16(do_prescale_fp16(x, shift, fpst), fpst);
++    if (unlikely(float16_is_any_nan(x))) {
++        float_raise(float_flag_invalid, fpst);
++        return 0;
++    }
++    return float16_to_uint16_scalbn(x, get_float_rounding_mode(fpst),
++                                    shift, fpst);
+ }
+ 
+ uint32_t HELPER(vfp_toslh)(uint32_t x, uint32_t shift, void *fpst)
+ {
+-    return float64_to_int32(do_prescale_fp16(x, shift, fpst), fpst);
++    if (unlikely(float16_is_any_nan(x))) {
++        float_raise(float_flag_invalid, fpst);
++        return 0;
++    }
++    return float16_to_int32_scalbn(x, get_float_rounding_mode(fpst),
++                                   shift, fpst);
+ }
+ 
+ uint32_t HELPER(vfp_toulh)(uint32_t x, uint32_t shift, void *fpst)
+ {
+-    return float64_to_uint32(do_prescale_fp16(x, shift, fpst), fpst);
++    if (unlikely(float16_is_any_nan(x))) {
++        float_raise(float_flag_invalid, fpst);
++        return 0;
++    }
++    return float16_to_uint32_scalbn(x, get_float_rounding_mode(fpst),
++                                    shift, fpst);
+ }
+ 
+ uint64_t HELPER(vfp_tosqh)(uint32_t x, uint32_t shift, void *fpst)
+ {
+-    return float64_to_int64(do_prescale_fp16(x, shift, fpst), fpst);
++    if (unlikely(float16_is_any_nan(x))) {
++        float_raise(float_flag_invalid, fpst);
++        return 0;
++    }
++    return float16_to_int64_scalbn(x, get_float_rounding_mode(fpst),
++                                   shift, fpst);
+ }
+ 
+ uint64_t HELPER(vfp_touqh)(uint32_t x, uint32_t shift, void *fpst)
+ {
+-    return float64_to_uint64(do_prescale_fp16(x, shift, fpst), fpst);
++    if (unlikely(float16_is_any_nan(x))) {
++        float_raise(float_flag_invalid, fpst);
++        return 0;
++    }
++    return float16_to_uint64_scalbn(x, get_float_rounding_mode(fpst),
++                                    shift, fpst);
+ }
+ 
+ /* Set the current fp rounding mode and return the old one.
+-- 
+2.18.0
