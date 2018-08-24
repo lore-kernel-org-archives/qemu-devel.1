@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftHxR-0003Mi-8G
+	(envelope-from <armbru@redhat.com>) id 1ftHxR-0003Mz-AM
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftHxL-00019Z-TT
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41886 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1ftHxN-0001Cs-SE
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55284 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ftHxL-000195-K8
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:15 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ftHxN-0001By-LA
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:17 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1B4E1804B9F4
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:41:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4E8D040216EC
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:41:17 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-97.ams2.redhat.com
 	[10.36.116.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EBFB22026D6D
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:41:14 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EE6E2156889
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:41:17 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 24 Aug 2018 21:31:50 +0200
-Message-Id: <20180824193206.25475-43-armbru@redhat.com>
+Date: Fri, 24 Aug 2018 21:32:05 +0200
+Message-Id: <20180824193206.25475-58-armbru@redhat.com>
 In-Reply-To: <20180824193206.25475-1-armbru@redhat.com>
 References: <20180824193206.25475-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 42/58] json: Improve names of lexer states
- related to numbers
+Subject: [Qemu-devel] [PULL 57/58] json: Support %% in JSON strings when
+ interpolating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,94 +36,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+The previous commit makes JSON strings containing '%' awkward to
+express in templates: you'd have to mask the '%' with an Unicode
+escape \u0025.  No template currently contains such JSON strings.
+Support the printf conversion specification %% in JSON strings as a
+convenience anyway, because it's trivially easy to do.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180823164025.12553-43-armbru@redhat.com>
+Message-Id: <20180823164025.12553-58-armbru@redhat.com>
 ---
- qobject/json-lexer.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+ qobject/json-parser.c | 3 ++-
+ tests/check-qjson.c   | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index f1a4b5a430..01417dca9d 100644
---- a/qobject/json-lexer.c
-+++ b/qobject/json-lexer.c
-@@ -108,13 +108,13 @@ enum json_lexer_state {
-     IN_SQ_STRING_ESCAPE,
-     IN_SQ_STRING,
-     IN_ZERO,
--    IN_DIGITS,
--    IN_DIGIT,
-+    IN_EXP_DIGITS,
-+    IN_EXP_SIGN,
-     IN_EXP_E,
-     IN_MANTISSA,
-     IN_MANTISSA_DIGITS,
--    IN_NONZERO_NUMBER,
--    IN_NEG_NONZERO_NUMBER,
-+    IN_DIGITS,
-+    IN_SIGN,
-     IN_KEYWORD,
-     IN_INTERP,
-     IN_WHITESPACE,
-@@ -164,19 +164,19 @@ static const uint8_t json_lexer[][256] =  {
-     },
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index 63e9229f1c..3318b8dad0 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -208,10 +208,11 @@ static QString *parse_string(JSONParserContext *ctxt, JSONToken *token)
+             }
+             break;
+         case '%':
+-            if (ctxt->ap) {
++            if (ctxt->ap && ptr[1] != '%') {
+                 parse_error(ctxt, token, "can't interpolate into string");
+                 goto out;
+             }
++            ptr++;
+             /* fall through */
+         default:
+             cp = mod_utf8_codepoint(ptr, 6, &end);
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index a1854573de..cc13f3d41e 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1270,7 +1270,7 @@ static void simple_interpolation(void)
+     QObject *obj;
+     QLitObject decoded = QLIT_QLIST(((QLitObject[]){
+             QLIT_QNUM(1),
+-            QLIT_QNUM(2),
++            QLIT_QSTR("100%"),
+             QLIT_QLIST(((QLitObject[]){
+                         QLIT_QNUM(32),
+                         QLIT_QNUM(42),
+@@ -1280,7 +1280,7 @@ static void simple_interpolation(void)
+     embedded_obj = qobject_from_json("[32, 42]", &error_abort);
+     g_assert(embedded_obj != NULL);
  
-     /* Float */
--    [IN_DIGITS] = {
-+    [IN_EXP_DIGITS] = {
-         TERMINAL(JSON_FLOAT),
--        ['0' ... '9'] = IN_DIGITS,
-+        ['0' ... '9'] = IN_EXP_DIGITS,
-     },
+-    obj = qobject_from_jsonf_nofail("[%d, 2, %p]", 1, embedded_obj);
++    obj = qobject_from_jsonf_nofail("[%d, '100%%', %p]", 1, embedded_obj);
+     g_assert(qlit_equal_qobject(&decoded, obj));
  
--    [IN_DIGIT] = {
--        ['0' ... '9'] = IN_DIGITS,
-+    [IN_EXP_SIGN] = {
-+        ['0' ... '9'] = IN_EXP_DIGITS,
-     },
- 
-     [IN_EXP_E] = {
--        ['-'] = IN_DIGIT,
--        ['+'] = IN_DIGIT,
--        ['0' ... '9'] = IN_DIGITS,
-+        ['-'] = IN_EXP_SIGN,
-+        ['+'] = IN_EXP_SIGN,
-+        ['0' ... '9'] = IN_EXP_DIGITS,
-     },
- 
-     [IN_MANTISSA_DIGITS] = {
-@@ -191,17 +191,17 @@ static const uint8_t json_lexer[][256] =  {
-     },
- 
-     /* Number */
--    [IN_NONZERO_NUMBER] = {
-+    [IN_DIGITS] = {
-         TERMINAL(JSON_INTEGER),
--        ['0' ... '9'] = IN_NONZERO_NUMBER,
-+        ['0' ... '9'] = IN_DIGITS,
-         ['e'] = IN_EXP_E,
-         ['E'] = IN_EXP_E,
-         ['.'] = IN_MANTISSA,
-     },
- 
--    [IN_NEG_NONZERO_NUMBER] = {
-+    [IN_SIGN] = {
-         ['0'] = IN_ZERO,
--        ['1' ... '9'] = IN_NONZERO_NUMBER,
-+        ['1' ... '9'] = IN_DIGITS,
-     },
- 
-     /* keywords */
-@@ -236,8 +236,8 @@ static const uint8_t json_lexer[][256] =  {
-         ['"'] = IN_DQ_STRING,
-         ['\''] = IN_SQ_STRING,
-         ['0'] = IN_ZERO,
--        ['1' ... '9'] = IN_NONZERO_NUMBER,
--        ['-'] = IN_NEG_NONZERO_NUMBER,
-+        ['1' ... '9'] = IN_DIGITS,
-+        ['-'] = IN_SIGN,
-         ['{'] = JSON_LCURLY,
-         ['}'] = JSON_RCURLY,
-         ['['] = JSON_LSQUARE,
+     qobject_unref(obj);
 -- 
 2.17.1
