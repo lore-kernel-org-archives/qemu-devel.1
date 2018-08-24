@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ft3lM-00074v-1x
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:31:56 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ft3pn-0001E1-2i
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:36:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ft3lG-0004oZ-WB
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:31:55 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35158)
+	(envelope-from <richard.henderson@linaro.org>) id 1ft3pi-0008OR-41
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:36:31 -0400
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:39393)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ft3lG-0004o3-Hp
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:31:50 -0400
-Received: by mail-pl1-x643.google.com with SMTP id d9-v6so540723plr.2
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 21:31:50 -0700 (PDT)
+	id 1ft3ph-0008Nz-Ug
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:36:26 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id j8-v6so3918877pff.6
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 21:36:25 -0700 (PDT)
 References: <20180814144436.679-1-peter.maydell@linaro.org>
-	<20180814144436.679-2-peter.maydell@linaro.org>
+	<20180814144436.679-3-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b73437f7-bbf7-7175-69b3-65a2d1635447@linaro.org>
-Date: Thu, 23 Aug 2018 21:31:46 -0700
+Message-ID: <315f0ccb-2da2-3df9-4eec-5c591f29a708@linaro.org>
+Date: Thu, 23 Aug 2018 21:36:22 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180814144436.679-2-peter.maydell@linaro.org>
+In-Reply-To: <20180814144436.679-3-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/8] hw/misc/bcm2835_fb: Move config fields
- to their own struct
+Subject: Re: [Qemu-devel] [PATCH 2/8] hw/misc/bcm2835_property: Track fb
+ settings using BCM2835FBConfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,25 +36,20 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 08/14/2018 07:44 AM, Peter Maydell wrote:
-> The handling of framebuffer properties in the bcm2835_property code
-> is a bit clumsy, because for each of the many fb related properties
-> we try to track the value we're about to set and whether we're going
-> to be setting a value, and then we hand all the new values off
-> to the framebuffer via a function which takes them all as separate
-> arguments. It would be simpler if the property code could easily
-> copy all the framebuffer's current settings, update them with
-> the new specified values and then ask the framebuffer to switch
-> to the new set.
-> 
-> As the first part of this refactoring, pull all the fb config
-> settings fields in BCM2835FBState out into their own struct.
+> Refactor the fb property setting code so that rather than
+> using a set of pointers to local variables to track
+> whether a config value has been updated in the current
+> mbox and if so what its new value is, we just copy
+> all the current settings of the fb at the start, and
+> then update that copy as we go along, before asking
+> the fb to switch to it at the end.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  include/hw/display/bcm2835_fb.h |  26 ++++++--
->  hw/display/bcm2835_fb.c         | 114 +++++++++++++++++---------------
->  hw/misc/bcm2835_property.c      |  28 ++++----
->  3 files changed, 94 insertions(+), 74 deletions(-)
+>  include/hw/display/bcm2835_fb.h |  4 +-
+>  hw/display/bcm2835_fb.c         | 27 ++---------
+>  hw/misc/bcm2835_property.c      | 80 ++++++++++++++-------------------
+>  3 files changed, 37 insertions(+), 74 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
