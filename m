@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ftDj8-0004Ym-5i
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:10:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ftDmO-0005kA-LT
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:13:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ftDj7-0001vq-Al
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:10:18 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:39400)
+	(envelope-from <peter.maydell@linaro.org>) id 1ftDmN-0004p5-U8
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:13:40 -0400
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:36706)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ftDj6-0001u9-Nn
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:10:17 -0400
-Received: by mail-oi0-x234.google.com with SMTP id c190-v6so15873258oig.6
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 08:10:16 -0700 (PDT)
+	id 1ftDmN-0004oj-LV
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:13:39 -0400
+Received: by mail-oi0-x235.google.com with SMTP id r69-v6so15286621oie.3
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 08:13:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180821043343.7514-26-david@gibson.dropbear.id.au>
-References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
-	<20180821043343.7514-26-david@gibson.dropbear.id.au>
+In-Reply-To: <20180820104045.133968-5-mst@redhat.com>
+References: <20180820104045.133968-1-mst@redhat.com>
+	<20180820104045.133968-5-mst@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 16:09:55 +0100
-Message-ID: <CAFEAcA8k7u6HoAuS3v-FUzDA37-1a9Sy=QrqXvJVEKjRtCWsAA@mail.gmail.com>
+Date: Fri, 24 Aug 2018 16:13:18 +0100
+Message-ID: <CAFEAcA9eOFMuvkN2gBetU4SSpV0Jp2hSVsjMG53_Cp8TrkObFg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 25/26] spapr_pci: factorize the use of
- SPAPR_MACHINE_GET_CLASS()
+Subject: Re: [Qemu-devel] [PULL 4/7] hostmem-file: add the 'pmem' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Laurent Vivier <lvivier@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Junyan He <junyan.he@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On 21 August 2018 at 05:33, David Gibson <david@gibson.dropbear.id.au> wrot=
-e:
-> From: C=C3=A9dric Le Goater <clg@kaod.org>
+On 20 August 2018 at 21:24, Michael S. Tsirkin <mst@redhat.com> wrote:
+> From: Junyan He <junyan.he@intel.com>
 >
-> It should save us some CPU cycles as these routines perform a lot of
-> checks.
+> When QEMU emulates vNVDIMM labels and migrates vNVDIMM devices, it
+> needs to know whether the backend storage is a real persistent memory,
+> in order to decide whether special operations should be performed to
+> ensure the data persistence.
 >
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_pci.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+> This boolean option 'pmem' allows users to specify whether the backend
+> storage of memory-backend-file is a real persistent memory. If
+> 'pmem=on', QEMU will set the flag RAM_PMEM in the RAM block of the
+> corresponding memory region. If 'pmem' is set while lack of libpmem
+> support, a error is generated.
 
-Hi; Coverity points out in CID 1395183 that there's a bug in
-this part of this patch:
+Hi; Coverity reports (CID 1395184) that there is a resource leak
+in an error-exit path in this function:
 
-> @@ -1558,6 +1559,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
->      sPAPRMachineState *spapr =3D
->          (sPAPRMachineState *) object_dynamic_cast(qdev_get_machine(),
->                                                    TYPE_SPAPR_MACHINE);
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
+> +{
+> +    HostMemoryBackend *backend = MEMORY_BACKEND(o);
+> +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+> +
+> +    if (host_memory_backend_mr_inited(backend)) {
+> +        error_setg(errp, "cannot change property 'pmem' of %s '%s'",
+> +                   object_get_typename(o),
+> +                   object_get_canonical_path_component(o));
+> +        return;
+> +    }
+> +
+> +#ifndef CONFIG_LIBPMEM
+> +    if (value) {
+> +        Error *local_err = NULL;
+> +        error_setg(&local_err,
+> +                   "Lack of libpmem support while setting the 'pmem=on'"
+> +                   " of %s '%s'. We can't ensure data persistence.",
+> +                   object_get_typename(o),
+> +                   object_get_canonical_path_component(o));
 
-This has moved the call to SPAPR_MACHINE_GET_CLASS() above
-the check for "is spapr NULL", which is wrong, because it
-will unconditionally dereference the pointer you pass to it.
+object_get_canonical_path_component() returns a string which
+must be freed using g_free().
+
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +#endif
+> +
+> +    fb->is_pmem = value;
+> +}
 
 thanks
 -- PMM
