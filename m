@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ft4At-0003v8-3N
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:58:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1ft4Hj-0000Ut-O7
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 01:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ft4Ap-0005n2-3e
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:58:19 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ft4Ao-0005mW-Tg
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:58:15 -0400
-Received: by mail-pl1-x642.google.com with SMTP id c6-v6so566849pls.4
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 21:58:14 -0700 (PDT)
-References: <20180823222215.13781-1-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7862ca2e-d802-be4c-8d72-b049ded4669a@linaro.org>
-Date: Thu, 23 Aug 2018 21:58:11 -0700
+	(envelope-from <thuth@redhat.com>) id 1ft4Hg-0000b5-Gl
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 01:05:23 -0400
+References: <1528867465-26696-1-git-send-email-thuth@redhat.com>
+	<5f7eaa02-8dc6-9d61-0a30-62d632f6cda3@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5ead6e54-cbe5-7b4a-473d-2d3c49df0e89@redhat.com>
+Date: Fri, 24 Aug 2018 07:05:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180823222215.13781-1-laurent@vivier.eu>
+In-Reply-To: <5f7eaa02-8dc6-9d61-0a30-62d632f6cda3@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: move TargetFdTrans functions
- to their own file
+Subject: Re: [Qemu-devel] [PATCH] trivial: Make bios files and source files
+ non-executable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 
-On 08/23/2018 03:22 PM, Laurent Vivier wrote:
-> This will ease to move out syscall functions from syscall.c
+On 2018-06-13 12:34, David Hildenbrand wrote:
+> On 13.06.2018 07:24, Thomas Huth wrote:
+>> These files can not be executed on the host, so they should not be
+>> marked as executable.
 > 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/Makefile.objs |    2 +-
->  linux-user/fd-trans.c    | 1408 ++++++++++++++++++++++++++++++++++++
->  linux-user/fd-trans.h    |   97 +++
->  linux-user/syscall.c     | 1448 +-------------------------------------
->  4 files changed, 1507 insertions(+), 1448 deletions(-)
->  create mode 100644 linux-user/fd-trans.c
->  create mode 100644 linux-user/fd-trans.h
+> Or can not be executed at all :)
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> 
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  block/blkreplay.c                  |   0
+>>  pc-bios/hppa-firmware.img          | Bin
+>>  pc-bios/palcode-clipper            | Bin
+>>  pc-bios/u-boot-sam460-20100605.bin | Bin
+>>  pc-bios/u-boot.e500                | Bin
+>>  replay/replay-char.c               |   0
+>>  6 files changed, 0 insertions(+), 0 deletions(-)
+>>  mode change 100755 => 100644 block/blkreplay.c
+>>  mode change 100755 => 100644 pc-bios/hppa-firmware.img
+>>  mode change 100755 => 100644 pc-bios/palcode-clipper
+>>  mode change 100755 => 100644 pc-bios/u-boot-sam460-20100605.bin
+>>  mode change 100755 => 100644 pc-bios/u-boot.e500
+>>  mode change 100755 => 100644 replay/replay-char.c
+>>
+>> diff --git a/block/blkreplay.c b/block/blkreplay.c
+>> old mode 100755
+>> new mode 100644
+>> diff --git a/pc-bios/hppa-firmware.img b/pc-bios/hppa-firmware.img
+>> old mode 100755
+>> new mode 100644
+>> diff --git a/pc-bios/palcode-clipper b/pc-bios/palcode-clipper
+>> old mode 100755
+>> new mode 100644
+>> diff --git a/pc-bios/u-boot-sam460-20100605.bin b/pc-bios/u-boot-sam460-20100605.bin
+>> old mode 100755
+>> new mode 100644
+>> diff --git a/pc-bios/u-boot.e500 b/pc-bios/u-boot.e500
+>> old mode 100755
+>> new mode 100644
+>> diff --git a/replay/replay-char.c b/replay/replay-char.c
+>> old mode 100755
+>> new mode 100644
 
-Thanks for this.
+Ping?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+ Thomas
