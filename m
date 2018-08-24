@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UO-0007iQ-D6
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:45 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UK-0007gj-Sv
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UN-0004qn-4D
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:44 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44902)
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UI-0004nK-Sc
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:40 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44896)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ft8UM-0004q5-QP
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:43 -0400
+	id 1ft8UH-0004eK-5m
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:37 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UL-0006gu-Sc
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:41 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UF-0006eQ-GQ
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:35 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 10:33:40 +0100
-Message-Id: <20180824093343.11346-50-peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 10:33:35 +0100
+Message-Id: <20180824093343.11346-45-peter.maydell@linaro.org>
 In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
 References: <20180824093343.11346-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 49/52] hw/display/bcm2835_fb: Fix handling of
- virtual framebuffer
+Subject: [Qemu-devel] [PULL 44/52] hw/misc/bcm2835_fb: Move config fields to
+ their own struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,187 +30,374 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The raspi framebuffir in bcm2835_fb supports the definition
-of a virtual "viewport", which is smaller than the full
-physical framebuffer size and at an adjustable offset within
-it. Only the viewport area is sent to the screen. This allows
-the guest to do things like double buffering, or scrolling
-by adjusting the viewport origin. Currently QEMU doesn't
-implement this at all.
+The handling of framebuffer properties in the bcm2835_property code
+is a bit clumsy, because for each of the many fb related properties
+we try to track the value we're about to set and whether we're going
+to be setting a value, and then we hand all the new values off
+to the framebuffer via a function which takes them all as separate
+arguments. It would be simpler if the property code could easily
+copy all the framebuffer's current settings, update them with
+the new specified values and then ask the framebuffer to switch
+to the new set.
 
-Add support for this feature:
- * the property mailbox code needs to distinguish the
-   virtual width/height from the physical width/height
- * the framebuffer code needs to do something with the
-   virtual width/height/origin information
-
-Note that the wiki documentation on the semantics of the
-virtual and physical height and width has it the wrong way
-around -- the virtual size is the size of the allocated
-buffer, and the physical size is the size of the display,
-so the virtual size is always the same as or larger than
-the physical.
-
-If the viewport size is set smaller than the physical
-screen size, we ignore the viewport settings completely
-and just display the physical screen area.
+As the first part of this refactoring, pull all the fb config
+settings fields in BCM2835FBState out into their own struct.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180814144436.679-7-peter.maydell@linaro.org
+Message-id: 20180814144436.679-2-peter.maydell@linaro.org
 ---
- include/hw/display/bcm2835_fb.h |  6 ++++--
- hw/display/bcm2835_fb.c         | 28 ++++++++++++++++++++++------
- hw/misc/bcm2835_property.c      | 21 +++++++++++++++------
- 3 files changed, 41 insertions(+), 14 deletions(-)
+ include/hw/display/bcm2835_fb.h |  26 ++++++--
+ hw/display/bcm2835_fb.c         | 114 +++++++++++++++++---------------
+ hw/misc/bcm2835_property.c      |  28 ++++----
+ 3 files changed, 94 insertions(+), 74 deletions(-)
 
 diff --git a/include/hw/display/bcm2835_fb.h b/include/hw/display/bcm2835_fb.h
-index 95bcec7fe33..d992c60c120 100644
+index ae0a3807f2c..8485825ba5f 100644
 --- a/include/hw/display/bcm2835_fb.h
 +++ b/include/hw/display/bcm2835_fb.h
-@@ -62,7 +62,8 @@ void bcm2835_fb_reconfigure(BCM2835FBState *s, BCM2835FBConfig *newconfig);
-  */
- static inline uint32_t bcm2835_fb_get_pitch(BCM2835FBConfig *config)
- {
--    return config->xres * (config->bpp >> 3);
-+    uint32_t xres = MAX(config->xres, config->xres_virtual);
-+    return xres * (config->bpp >> 3);
- }
+@@ -17,6 +17,20 @@
+ #define TYPE_BCM2835_FB "bcm2835-fb"
+ #define BCM2835_FB(obj) OBJECT_CHECK(BCM2835FBState, (obj), TYPE_BCM2835_FB)
  
- /**
-@@ -71,7 +72,8 @@ static inline uint32_t bcm2835_fb_get_pitch(BCM2835FBConfig *config)
-  */
- static inline uint32_t bcm2835_fb_get_size(BCM2835FBConfig *config)
- {
--    return config->yres * bcm2835_fb_get_pitch(config);
-+    uint32_t yres = MAX(config->yres, config->yres_virtual);
-+    return yres * bcm2835_fb_get_pitch(config);
- }
++/*
++ * Configuration information about the fb which the guest can program
++ * via the mailbox property interface.
++ */
++typedef struct {
++    uint32_t xres, yres;
++    uint32_t xres_virtual, yres_virtual;
++    uint32_t xoffset, yoffset;
++    uint32_t bpp;
++    uint32_t base;
++    uint32_t pixo;
++    uint32_t alpha;
++} BCM2835FBConfig;
++
+ typedef struct {
+     /*< private >*/
+     SysBusDevice busdev;
+@@ -31,12 +45,12 @@ typedef struct {
+     qemu_irq mbox_irq;
  
- #endif
+     bool lock, invalidate, pending;
+-    uint32_t xres, yres;
+-    uint32_t xres_virtual, yres_virtual;
+-    uint32_t xoffset, yoffset;
+-    uint32_t bpp;
+-    uint32_t base, pitch, size;
+-    uint32_t pixo, alpha;
++
++    BCM2835FBConfig config;
++
++    /* These are just cached values calculated from the config settings */
++    uint32_t size;
++    uint32_t pitch;
+ } BCM2835FBState;
+ 
+ void bcm2835_fb_reconfigure(BCM2835FBState *s, uint32_t *xres, uint32_t *yres,
 diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
-index a6c0a0cc942..76a10072b46 100644
+index 3355f4c131b..0ffad49ab8f 100644
 --- a/hw/display/bcm2835_fb.c
 +++ b/hw/display/bcm2835_fb.c
-@@ -126,6 +126,18 @@ static void draw_line_src16(void *opaque, uint8_t *dst, const uint8_t *src,
-     }
- }
+@@ -52,7 +52,7 @@ static void draw_line_src16(void *opaque, uint8_t *dst, const uint8_t *src,
+     int bpp = surface_bits_per_pixel(surface);
  
-+static bool fb_use_offsets(BCM2835FBConfig *config)
-+{
-+    /*
-+     * Return true if we should use the viewport offsets.
-+     * Experimentally, the hardware seems to do this only if the
-+     * viewport size is larger than the physical screen. (It doesn't
-+     * prevent the guest setting this silly viewport setting, though...)
-+     */
-+    return config->xres_virtual > config->xres &&
-+        config->yres_virtual > config->yres;
-+}
-+
- static void fb_update_display(void *opaque)
- {
-     BCM2835FBState *s = opaque;
-@@ -134,12 +146,18 @@ static void fb_update_display(void *opaque)
-     int last = 0;
+     while (width--) {
+-        switch (s->bpp) {
++        switch (s->config.bpp) {
+         case 8:
+             /* lookup palette starting at video ram base
+              * TODO: cache translation, rather than doing this each time!
+@@ -91,7 +91,7 @@ static void draw_line_src16(void *opaque, uint8_t *dst, const uint8_t *src,
+             break;
+         }
+ 
+-        if (s->pixo == 0) {
++        if (s->config.pixo == 0) {
+             /* swap to BGR pixel format */
+             uint8_t tmp = r;
+             r = b;
+@@ -135,12 +135,12 @@ static void fb_update_display(void *opaque)
      int src_width = 0;
      int dest_width = 0;
-+    uint32_t xoff = 0, yoff = 0;
  
-     if (s->lock || !s->config.xres) {
+-    if (s->lock || !s->xres) {
++    if (s->lock || !s->config.xres) {
          return;
      }
  
-     src_width = bcm2835_fb_get_pitch(&s->config);
-+    if (fb_use_offsets(&s->config)) {
-+        xoff = s->config.xoffset;
-+        yoff = s->config.yoffset;
-+    }
-+
-     dest_width = s->config.xres;
+-    src_width = s->xres * (s->bpp >> 3);
+-    dest_width = s->xres;
++    src_width = s->config.xres * (s->config.bpp >> 3);
++    dest_width = s->config.xres;
  
      switch (surface_bits_per_pixel(surface)) {
-@@ -165,8 +183,9 @@ static void fb_update_display(void *opaque)
+     case 0:
+@@ -165,16 +165,18 @@ static void fb_update_display(void *opaque)
      }
  
      if (s->invalidate) {
-+        hwaddr base = s->config.base + xoff + yoff * src_width;
-         framebuffer_update_memory_section(&s->fbsection, s->dma_mr,
--                                          s->config.base,
-+                                          base,
-                                           s->config.yres, src_width);
+-        framebuffer_update_memory_section(&s->fbsection, s->dma_mr, s->base,
+-                                          s->yres, src_width);
++        framebuffer_update_memory_section(&s->fbsection, s->dma_mr,
++                                          s->config.base,
++                                          s->config.yres, src_width);
      }
  
-@@ -176,7 +195,8 @@ static void fb_update_display(void *opaque)
+-    framebuffer_update_display(surface, &s->fbsection, s->xres, s->yres,
++    framebuffer_update_display(surface, &s->fbsection,
++                               s->config.xres, s->config.yres,
+                                src_width, dest_width, 0, s->invalidate,
                                 draw_line_src16, s, &first, &last);
  
      if (first >= 0) {
--        dpy_gfx_update(s->con, 0, first, s->config.xres, last - first + 1);
-+        dpy_gfx_update(s->con, 0, first, s->config.xres,
-+                       last - first + 1);
+-        dpy_gfx_update(s->con, 0, first, s->xres, last - first + 1);
++        dpy_gfx_update(s->con, 0, first, s->config.xres, last - first + 1);
      }
  
      s->invalidate = false;
-@@ -202,8 +222,6 @@ static void bcm2835_fb_mbox_push(BCM2835FBState *s, uint32_t value)
-     s->config.base = s->vcram_base | (value & 0xc0000000);
-     s->config.base += BCM2835_FB_OFFSET;
+@@ -186,28 +188,28 @@ static void bcm2835_fb_mbox_push(BCM2835FBState *s, uint32_t value)
  
--    /* TODO - Manage properly virtual resolution */
--
-     pitch = bcm2835_fb_get_pitch(&s->config);
-     size = bcm2835_fb_get_size(&s->config);
+     s->lock = true;
  
-@@ -224,8 +242,6 @@ void bcm2835_fb_reconfigure(BCM2835FBState *s, BCM2835FBConfig *newconfig)
+-    s->xres = ldl_le_phys(&s->dma_as, value);
+-    s->yres = ldl_le_phys(&s->dma_as, value + 4);
+-    s->xres_virtual = ldl_le_phys(&s->dma_as, value + 8);
+-    s->yres_virtual = ldl_le_phys(&s->dma_as, value + 12);
+-    s->bpp = ldl_le_phys(&s->dma_as, value + 20);
+-    s->xoffset = ldl_le_phys(&s->dma_as, value + 24);
+-    s->yoffset = ldl_le_phys(&s->dma_as, value + 28);
++    s->config.xres = ldl_le_phys(&s->dma_as, value);
++    s->config.yres = ldl_le_phys(&s->dma_as, value + 4);
++    s->config.xres_virtual = ldl_le_phys(&s->dma_as, value + 8);
++    s->config.yres_virtual = ldl_le_phys(&s->dma_as, value + 12);
++    s->config.bpp = ldl_le_phys(&s->dma_as, value + 20);
++    s->config.xoffset = ldl_le_phys(&s->dma_as, value + 24);
++    s->config.yoffset = ldl_le_phys(&s->dma_as, value + 28);
  
-     s->config = *newconfig;
+-    s->base = s->vcram_base | (value & 0xc0000000);
+-    s->base += BCM2835_FB_OFFSET;
++    s->config.base = s->vcram_base | (value & 0xc0000000);
++    s->config.base += BCM2835_FB_OFFSET;
  
--    /* TODO - Manage properly virtual resolution */
--
+     /* TODO - Manage properly virtual resolution */
+ 
+-    s->pitch = s->xres * (s->bpp >> 3);
+-    s->size = s->yres * s->pitch;
++    s->pitch = s->config.xres * (s->config.bpp >> 3);
++    s->size = s->config.yres * s->pitch;
+ 
+     stl_le_phys(&s->dma_as, value + 16, s->pitch);
+-    stl_le_phys(&s->dma_as, value + 32, s->base);
++    stl_le_phys(&s->dma_as, value + 32, s->config.base);
+     stl_le_phys(&s->dma_as, value + 36, s->size);
+ 
      s->invalidate = true;
-     qemu_console_resize(s->con, s->config.xres, s->config.yres);
+-    qemu_console_resize(s->con, s->xres, s->yres);
++    qemu_console_resize(s->con, s->config.xres, s->config.yres);
      s->lock = false;
+ }
+ 
+@@ -219,34 +221,34 @@ void bcm2835_fb_reconfigure(BCM2835FBState *s, uint32_t *xres, uint32_t *yres,
+ 
+     /* TODO: input validation! */
+     if (xres) {
+-        s->xres = *xres;
++        s->config.xres = *xres;
+     }
+     if (yres) {
+-        s->yres = *yres;
++        s->config.yres = *yres;
+     }
+     if (xoffset) {
+-        s->xoffset = *xoffset;
++        s->config.xoffset = *xoffset;
+     }
+     if (yoffset) {
+-        s->yoffset = *yoffset;
++        s->config.yoffset = *yoffset;
+     }
+     if (bpp) {
+-        s->bpp = *bpp;
++        s->config.bpp = *bpp;
+     }
+     if (pixo) {
+-        s->pixo = *pixo;
++        s->config.pixo = *pixo;
+     }
+     if (alpha) {
+-        s->alpha = *alpha;
++        s->config.alpha = *alpha;
+     }
+ 
+     /* TODO - Manage properly virtual resolution */
+ 
+-    s->pitch = s->xres * (s->bpp >> 3);
+-    s->size = s->yres * s->pitch;
++    s->pitch = s->config.xres * (s->config.bpp >> 3);
++    s->size = s->config.yres * s->pitch;
+ 
+     s->invalidate = true;
+-    qemu_console_resize(s->con, s->xres, s->yres);
++    qemu_console_resize(s->con, s->config.xres, s->config.yres);
+     s->lock = false;
+ }
+ 
+@@ -312,18 +314,18 @@ static const VMStateDescription vmstate_bcm2835_fb = {
+         VMSTATE_BOOL(lock, BCM2835FBState),
+         VMSTATE_BOOL(invalidate, BCM2835FBState),
+         VMSTATE_BOOL(pending, BCM2835FBState),
+-        VMSTATE_UINT32(xres, BCM2835FBState),
+-        VMSTATE_UINT32(yres, BCM2835FBState),
+-        VMSTATE_UINT32(xres_virtual, BCM2835FBState),
+-        VMSTATE_UINT32(yres_virtual, BCM2835FBState),
+-        VMSTATE_UINT32(xoffset, BCM2835FBState),
+-        VMSTATE_UINT32(yoffset, BCM2835FBState),
+-        VMSTATE_UINT32(bpp, BCM2835FBState),
+-        VMSTATE_UINT32(base, BCM2835FBState),
++        VMSTATE_UINT32(config.xres, BCM2835FBState),
++        VMSTATE_UINT32(config.yres, BCM2835FBState),
++        VMSTATE_UINT32(config.xres_virtual, BCM2835FBState),
++        VMSTATE_UINT32(config.yres_virtual, BCM2835FBState),
++        VMSTATE_UINT32(config.xoffset, BCM2835FBState),
++        VMSTATE_UINT32(config.yoffset, BCM2835FBState),
++        VMSTATE_UINT32(config.bpp, BCM2835FBState),
++        VMSTATE_UINT32(config.base, BCM2835FBState),
+         VMSTATE_UINT32(pitch, BCM2835FBState),
+         VMSTATE_UINT32(size, BCM2835FBState),
+-        VMSTATE_UINT32(pixo, BCM2835FBState),
+-        VMSTATE_UINT32(alpha, BCM2835FBState),
++        VMSTATE_UINT32(config.pixo, BCM2835FBState),
++        VMSTATE_UINT32(config.alpha, BCM2835FBState),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -349,13 +351,13 @@ static void bcm2835_fb_reset(DeviceState *dev)
+ 
+     s->pending = false;
+ 
+-    s->xres_virtual = s->xres;
+-    s->yres_virtual = s->yres;
+-    s->xoffset = 0;
+-    s->yoffset = 0;
+-    s->base = s->vcram_base + BCM2835_FB_OFFSET;
+-    s->pitch = s->xres * (s->bpp >> 3);
+-    s->size = s->yres * s->pitch;
++    s->config.xres_virtual = s->config.xres;
++    s->config.yres_virtual = s->config.yres;
++    s->config.xoffset = 0;
++    s->config.yoffset = 0;
++    s->config.base = s->vcram_base + BCM2835_FB_OFFSET;
++    s->pitch = s->config.xres * (s->config.bpp >> 3);
++    s->size = s->config.yres * s->pitch;
+ 
+     s->invalidate = true;
+     s->lock = false;
+@@ -385,18 +387,20 @@ static void bcm2835_fb_realize(DeviceState *dev, Error **errp)
+     bcm2835_fb_reset(dev);
+ 
+     s->con = graphic_console_init(dev, 0, &vgafb_ops, s);
+-    qemu_console_resize(s->con, s->xres, s->yres);
++    qemu_console_resize(s->con, s->config.xres, s->config.yres);
+ }
+ 
+ static Property bcm2835_fb_props[] = {
+     DEFINE_PROP_UINT32("vcram-base", BCM2835FBState, vcram_base, 0),/*required*/
+     DEFINE_PROP_UINT32("vcram-size", BCM2835FBState, vcram_size,
+                        DEFAULT_VCRAM_SIZE),
+-    DEFINE_PROP_UINT32("xres", BCM2835FBState, xres, 640),
+-    DEFINE_PROP_UINT32("yres", BCM2835FBState, yres, 480),
+-    DEFINE_PROP_UINT32("bpp", BCM2835FBState, bpp, 16),
+-    DEFINE_PROP_UINT32("pixo", BCM2835FBState, pixo, 1), /* 1=RGB, 0=BGR */
+-    DEFINE_PROP_UINT32("alpha", BCM2835FBState, alpha, 2), /* alpha ignored */
++    DEFINE_PROP_UINT32("xres", BCM2835FBState, config.xres, 640),
++    DEFINE_PROP_UINT32("yres", BCM2835FBState, config.yres, 480),
++    DEFINE_PROP_UINT32("bpp", BCM2835FBState, config.bpp, 16),
++    DEFINE_PROP_UINT32("pixo",
++                       BCM2835FBState, config.pixo, 1), /* 1=RGB, 0=BGR */
++    DEFINE_PROP_UINT32("alpha",
++                       BCM2835FBState, config.alpha, 2), /* alpha ignored */
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
 diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-index c8c4979bd26..e3ab677891b 100644
+index 70eaafd325f..c79f358702d 100644
 --- a/hw/misc/bcm2835_property.c
 +++ b/hw/misc/bcm2835_property.c
-@@ -155,23 +155,32 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
-         case 0x00040002: /* Blank screen */
-             resplen = 4;
+@@ -141,10 +141,10 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
+         /* Frame buffer */
+ 
+         case 0x00040001: /* Allocate buffer */
+-            stl_le_phys(&s->dma_as, value + 12, s->fbdev->base);
+-            tmp_xres = newxres != NULL ? *newxres : s->fbdev->xres;
+-            tmp_yres = newyres != NULL ? *newyres : s->fbdev->yres;
+-            tmp_bpp = newbpp != NULL ? *newbpp : s->fbdev->bpp;
++            stl_le_phys(&s->dma_as, value + 12, s->fbdev->config.base);
++            tmp_xres = newxres != NULL ? *newxres : s->fbdev->config.xres;
++            tmp_yres = newyres != NULL ? *newyres : s->fbdev->config.yres;
++            tmp_bpp = newbpp != NULL ? *newbpp : s->fbdev->config.bpp;
+             stl_le_phys(&s->dma_as, value + 16,
+                         tmp_xres * tmp_yres * tmp_bpp / 8);
+             resplen = 8;
+@@ -157,8 +157,8 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
              break;
--        case 0x00040003: /* Get display width/height */
--        case 0x00040004:
-+        case 0x00040003: /* Get physical display width/height */
-             stl_le_phys(&s->dma_as, value + 12, fbconfig.xres);
-             stl_le_phys(&s->dma_as, value + 16, fbconfig.yres);
+         case 0x00040003: /* Get display width/height */
+         case 0x00040004:
+-            tmp_xres = newxres != NULL ? *newxres : s->fbdev->xres;
+-            tmp_yres = newyres != NULL ? *newyres : s->fbdev->yres;
++            tmp_xres = newxres != NULL ? *newxres : s->fbdev->config.xres;
++            tmp_yres = newyres != NULL ? *newyres : s->fbdev->config.yres;
+             stl_le_phys(&s->dma_as, value + 12, tmp_xres);
+             stl_le_phys(&s->dma_as, value + 16, tmp_yres);
+             resplen = 8;
+@@ -176,7 +176,7 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
              resplen = 8;
              break;
--        case 0x00044003: /* Test display width/height */
--        case 0x00044004:
-+        case 0x00040004: /* Get virtual display width/height */
-+            stl_le_phys(&s->dma_as, value + 12, fbconfig.xres_virtual);
-+            stl_le_phys(&s->dma_as, value + 16, fbconfig.yres_virtual);
-             resplen = 8;
-             break;
--        case 0x00048003: /* Set display width/height */
--        case 0x00048004:
-+        case 0x00044003: /* Test physical display width/height */
-+        case 0x00044004: /* Test virtual display width/height */
-+            resplen = 8;
-+            break;
-+        case 0x00048003: /* Set physical display width/height */
-             fbconfig.xres = ldl_le_phys(&s->dma_as, value + 12);
-             fbconfig.yres = ldl_le_phys(&s->dma_as, value + 16);
-             fbconfig_updated = true;
-             resplen = 8;
-             break;
-+        case 0x00048004: /* Set virtual display width/height */
-+            fbconfig.xres_virtual = ldl_le_phys(&s->dma_as, value + 12);
-+            fbconfig.yres_virtual = ldl_le_phys(&s->dma_as, value + 16);
-+            fbconfig_updated = true;
-+            resplen = 8;
-+            break;
          case 0x00040005: /* Get depth */
-             stl_le_phys(&s->dma_as, value + 12, fbconfig.bpp);
+-            tmp_bpp = newbpp != NULL ? *newbpp : s->fbdev->bpp;
++            tmp_bpp = newbpp != NULL ? *newbpp : s->fbdev->config.bpp;
+             stl_le_phys(&s->dma_as, value + 12, tmp_bpp);
              resplen = 4;
+             break;
+@@ -189,7 +189,7 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
+             resplen = 4;
+             break;
+         case 0x00040006: /* Get pixel order */
+-            tmp_pixo = newpixo != NULL ? *newpixo : s->fbdev->pixo;
++            tmp_pixo = newpixo != NULL ? *newpixo : s->fbdev->config.pixo;
+             stl_le_phys(&s->dma_as, value + 12, tmp_pixo);
+             resplen = 4;
+             break;
+@@ -202,7 +202,7 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
+             resplen = 4;
+             break;
+         case 0x00040007: /* Get alpha */
+-            tmp_alpha = newalpha != NULL ? *newalpha : s->fbdev->alpha;
++            tmp_alpha = newalpha != NULL ? *newalpha : s->fbdev->config.alpha;
+             stl_le_phys(&s->dma_as, value + 12, tmp_alpha);
+             resplen = 4;
+             break;
+@@ -215,14 +215,16 @@ static void bcm2835_property_mbox_push(BCM2835PropertyState *s, uint32_t value)
+             resplen = 4;
+             break;
+         case 0x00040008: /* Get pitch */
+-            tmp_xres = newxres != NULL ? *newxres : s->fbdev->xres;
+-            tmp_bpp = newbpp != NULL ? *newbpp : s->fbdev->bpp;
++            tmp_xres = newxres != NULL ? *newxres : s->fbdev->config.xres;
++            tmp_bpp = newbpp != NULL ? *newbpp : s->fbdev->config.bpp;
+             stl_le_phys(&s->dma_as, value + 12, tmp_xres * tmp_bpp / 8);
+             resplen = 4;
+             break;
+         case 0x00040009: /* Get virtual offset */
+-            tmp_xoffset = newxoffset != NULL ? *newxoffset : s->fbdev->xoffset;
+-            tmp_yoffset = newyoffset != NULL ? *newyoffset : s->fbdev->yoffset;
++            tmp_xoffset = newxoffset != NULL ?
++                *newxoffset : s->fbdev->config.xoffset;
++            tmp_yoffset = newyoffset != NULL ?
++                *newyoffset : s->fbdev->config.yoffset;
+             stl_le_phys(&s->dma_as, value + 12, tmp_xoffset);
+             stl_le_phys(&s->dma_as, value + 16, tmp_yoffset);
+             resplen = 8;
 -- 
 2.18.0
