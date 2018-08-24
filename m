@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftHoi-0002HZ-Ab
+	(envelope-from <armbru@redhat.com>) id 1ftHoi-0002Hm-DE
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:32:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftHoe-0001ft-Hz
+	(envelope-from <armbru@redhat.com>) id 1ftHoe-0001fD-Dv
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:32:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55054 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41642 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ftHoc-0001Yg-4f
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ftHoc-0001Zi-4q
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:32:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1AD0440216F4
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:32:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4220A804B9F4
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:32:10 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-97.ams2.redhat.com
 	[10.36.116.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CE9B31010417
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:32:08 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DAA8A9F0C
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:32:10 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 24 Aug 2018 21:31:18 +0200
-Message-Id: <20180824193206.25475-11-armbru@redhat.com>
+Date: Fri, 24 Aug 2018 21:31:38 +0200
+Message-Id: <20180824193206.25475-31-armbru@redhat.com>
 In-Reply-To: <20180824193206.25475-1-armbru@redhat.com>
 References: <20180824193206.25475-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 10/58] check-qjson: Cover escaped characters
- more thoroughly, part 2
+Subject: [Qemu-devel] [PULL 30/58] check-qjson: Fix and enable
+ utf8_string()'s disabled part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,101 +36,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Cover escaped single quote, surrogates, invalid escapes, and
-noncharacters.  This demonstrates that valid surrogate pairs are
-misinterpreted, and invalid surrogates and noncharacters aren't
-rejected.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180823164025.12553-11-armbru@redhat.com>
+Message-Id: <20180823164025.12553-31-armbru@redhat.com>
 ---
- tests/check-qjson.c | 62 ++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 53 insertions(+), 9 deletions(-)
+ tests/check-qjson.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
 diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 880453a93b..4bb4925673 100644
+index 343f8af36a..defc21fa04 100644
 --- a/tests/check-qjson.c
 +++ b/tests/check-qjson.c
-@@ -57,10 +57,49 @@ static void escaped_string(void)
-         int skip;
-     } test_cases[] = {
-         { "\\b\\f\\n\\r\\t\\\\\\\"", "\b\f\n\r\t\\\"" },
--        { "\\/", "/", .skip = 1 },
-+        { "\\/\\'", "/'", .skip = 1 },
-         { "single byte utf-8 \\u0020", "single byte utf-8  ", .skip = 1 },
-         { "double byte utf-8 \\u00A2", "double byte utf-8 \xc2\xa2" },
-         { "triple byte utf-8 \\u20AC", "triple byte utf-8 \xe2\x82\xac" },
-+        { "quadruple byte utf-8 \\uD834\\uDD1E", /* U+1D11E */
-+          /* bug: want \xF0\x9D\x84\x9E */
-+          "quadruple byte utf-8 \xED\xA0\xB4\xED\xB4\x9E", .skip = 1 },
-+        { "\\", NULL },
-+        { "\\z", NULL },
-+        { "\\ux", NULL },
-+        { "\\u1x", NULL },
-+        { "\\u12x", NULL },
-+        { "\\u123x", NULL },
-+        { "\\u12345", "\341\210\2645" },
-+        { "\\u0000x", "x", .skip = 1}, /* bug: want \xC0\x80x */
-+        { "unpaired leading surrogate \\uD800",
-+          /* bug: not rejected */
-+          "unpaired leading surrogate \355\240\200", .skip = 1 },
-+        { "unpaired leading surrogate \\uD800\\uCAFE",
-+          /* bug: not rejected */
-+          "unpaired leading surrogate \355\240\200\354\253\276", .skip = 1 },
-+        { "unpaired leading surrogate \\uD800\\uD801\\uDC02",
-+          /* bug: not rejected */
-+          "unpaired leading surrogate \355\240\200\355\240\201\355\260\202",
-+          .skip = 1 },
-+        { "unpaired trailing surrogate \\uDC00",
-+          /* bug: not rejected */
-+          "unpaired trailing surrogate \355\260\200", .skip = 1},
-+        { "backward surrogate pair \\uDC00\\uD800",
-+          /* bug: not rejected */
-+          "backward surrogate pair \355\260\200\355\240\200", .skip = 1},
-+        { "noncharacter U+FDD0 \\uFDD0",
-+          /* bug: not rejected */
-+          "noncharacter U+FDD0 \xEF\xB7\x90", .skip = 1},
-+        { "noncharacter U+FDEF \\uFDEF",
-+          /* bug: not rejected */
-+          "noncharacter U+FDEF \xEF\xB7\xAF", .skip = 1},
-+        { "noncharacter U+1FFFE \\uD87F\\uDFFE",
-+          /* bug: not rejected */
-+          "noncharacter U+1FFFE \xED\xA1\xBF\xED\xBF\xBE", .skip = 1},
-+        { "noncharacter U+10FFFF \\uDC3F\\uDFFF",
-+          /* bug: not rejected */
-+          "noncharacter U+10FFFF \xED\xB0\xBF\xED\xBF\xBF", .skip = 1},
-         {}
-     };
-     int i, j;
-@@ -69,15 +108,20 @@ static void escaped_string(void)
+@@ -776,15 +776,10 @@ static void utf8_string(void)
+             qobject_unref(str);
+             g_free(jstr);
  
-     for (i = 0; test_cases[i].json_in; i++) {
-         for (j = 0; j < 2; j++) {
--            cstr = from_json_str(test_cases[i].json_in, j, &error_abort);
--            g_assert_cmpstr(qstring_get_try_str(cstr),
--                            ==, test_cases[i].utf8_out);
--            if (test_cases[i].skip == 0) {
--                jstr = to_json_str(cstr);
--                g_assert_cmpstr(jstr, ==, test_cases[i].json_in);
--                g_free(jstr);
-+            if (test_cases[i].utf8_out) {
-+                cstr = from_json_str(test_cases[i].json_in, j, &error_abort);
-+                g_assert_cmpstr(qstring_get_try_str(cstr),
-+                                ==, test_cases[i].utf8_out);
-+                if (!test_cases[i].skip) {
-+                    jstr = to_json_str(cstr);
-+                    g_assert_cmpstr(jstr, ==, test_cases[i].json_in);
-+                    g_free(jstr);
-+                }
-+                qobject_unref(cstr);
-+            } else {
-+                cstr = from_json_str(test_cases[i].json_in, j, NULL);
-+                g_assert(!cstr);
+-            /*
+-             * Parse @json_out right back
+-             * Disabled, because qobject_from_json() is buggy, and I can't
+-             * be bothered to add the expected incorrect results.
+-             * FIXME Enable once these bugs have been fixed.
+-             */
+-            if (0 && json_out != json_in) {
++            /* Parse @json_out right back, unless it has replacements */
++            if (!strstr(json_out, "\\uFFFD")) {
+                 str = from_json_str(json_out, j, &error_abort);
+-                g_assert_cmpstr(qstring_get_try_str(str), ==, utf8_out);
++                g_assert_cmpstr(qstring_get_try_str(str), ==, utf8_in);
              }
--            qobject_unref(cstr);
          }
      }
- }
 -- 
 2.17.1
