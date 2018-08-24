@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ft6aj-0006qH-Rw
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 03:33:12 -0400
+	(envelope-from <kraxel@redhat.com>) id 1ft6al-0006qY-Ho
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 03:33:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ft6ah-0000eo-FS
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 03:33:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48988 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1ft6ah-0000eu-FS
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 03:33:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34344 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ft6af-0000YS-Fy
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ft6af-0000Yk-M5
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 03:33:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8EFFF4023475
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 07:33:02 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 101CC87A74
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 07:33:03 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 24 Aug 2018 09:32:54 +0200
-Message-Id: <20180824073256.19626-2-kraxel@redhat.com>
+Date: Fri, 24 Aug 2018 09:32:56 +0200
+Message-Id: <20180824073256.19626-4-kraxel@redhat.com>
 In-Reply-To: <20180824073256.19626-1-kraxel@redhat.com>
 References: <20180824073256.19626-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/3] ui: remove support for GTK2 in favour of
- GTK3
+Subject: [Qemu-devel] [PULL 3/3] ui: remove support for SDL1.2 in favour of
+ SDL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,663 +38,1683 @@ Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=
 
 From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-GTK2 was deprecated in the 2.12.0 release with:
+SDL1.2 was deprecated in the 2.12.0 release with:
 
-  commit b7715af2b31f47060cc5b4be930d16c13be93fa9
+  commit e52c6ba34149b4f39c3fd60e59ee32b809db2bfa
   Author: Daniel P. Berrange <berrange@redhat.com>
-  Date:   Tue Dec 12 11:34:40 2017 +0000
+  Date:   Mon Jan 15 14:25:33 2018 +0000
 
-    ui: deprecate use of GTK 2.x in favour of 3.x series
+    ui: deprecate use of SDL 1.2 in favour of 2.0 series
 
-    The GTK 3.0 release was made in Feb, 2011:
+    The SDL 2.0 release was made in Aug, 2013:
 
-      https://blog.gtk.org/2011/02/10/gtk-3-0-released/
+      https://www.libsdl.org/release/
 
-    That will soon be 7 years ago, which is enough time to consider
-    the 3.x series widely supported.
+    That will soon be 4 + 1/2 years ago, which is enough time to consider
+    the 2.0 series widely supported.
 
-    Thus we deprecate the GTK 2.x support, which will allow us to
-    delete it in the last release of 2018. By this time, GTK 3.x
-    will be almost 8 years old.
+    Thus we deprecate the SDL 1.2 support, which will allow us to delete =
+it
+    in the last release of 2018. By this time, SDL 2.0 will be more than =
+5
+    years old.
 
     Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-    Message-id: 20171212113440.16483-1-berrange@redhat.com
+    Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+    Message-id: 20180115142533.24585-1-berrange@redhat.com
     Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
 It is thus able to be removed in the 3.1.0 release.
 
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-id: 20180822131554.3398-2-berrange@redhat.com
+Message-id: 20180822131554.3398-4-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure            |  51 +++-----------
- include/ui/gtk.h     |   9 ---
- ui/gtk-egl.c         |  10 ++-
- ui/gtk.c             | 192 ++++-----------------------------------------=
+ configure              |   60 +--
+ ui/sdl_zoom.h          |   25 --
+ ui/sdl_zoom_template.h |  219 -----------
+ ui/sdl.c               | 1027 ------------------------------------------=
 ------
- qemu-deprecated.texi |   7 --
- 5 files changed, 26 insertions(+), 243 deletions(-)
+ ui/sdl_zoom.c          |   93 -----
+ qemu-deprecated.texi   |    9 -
+ ui/Makefile.objs       |    5 -
+ 7 files changed, 7 insertions(+), 1431 deletions(-)
+ delete mode 100644 ui/sdl_zoom.h
+ delete mode 100644 ui/sdl_zoom_template.h
+ delete mode 100644 ui/sdl.c
+ delete mode 100644 ui/sdl_zoom.c
 
 diff --git a/configure b/configure
-index e7bddc04b0..f982d8bd61 100755
+index eca30885d6..c7728e9355 100755
 --- a/configure
 +++ b/configure
-@@ -453,7 +453,6 @@ glusterfs_discard=3D"no"
- glusterfs_fallocate=3D"no"
- glusterfs_zerofill=3D"no"
- gtk=3D""
--gtkabi=3D""
- gtk_gl=3D"no"
- tls_priority=3D"NORMAL"
- gnutls=3D""
-@@ -1369,8 +1368,6 @@ for opt do
+@@ -344,7 +344,6 @@ docs=3D""
+ fdt=3D""
+ netmap=3D"no"
+ sdl=3D""
+-sdlabi=3D""
+ virtfs=3D""
+ mpath=3D""
+ vnc=3D"yes"
+@@ -565,7 +564,6 @@ query_pkg_config() {
+     "${pkg_config_exe}" ${QEMU_PKG_CONFIG_FLAGS} "$@"
+ }
+ pkg_config=3Dquery_pkg_config
+-sdl_config=3D"${SDL_CONFIG-${cross_prefix}sdl-config}"
+ sdl2_config=3D"${SDL2_CONFIG-${cross_prefix}sdl2-config}"
+=20
+ # If the user hasn't specified ARFLAGS, default to 'rv', just as make do=
+es.
+@@ -1028,8 +1026,6 @@ for opt do
    ;;
-   --disable-pvrdma) pvrdma=3D"no"
+   --enable-sdl) sdl=3D"yes"
    ;;
--  --with-gtkabi=3D*) gtkabi=3D"$optarg"
+-  --with-sdlabi=3D*) sdlabi=3D"$optarg"
 -  ;;
-   --disable-vte) vte=3D"no"
+   --disable-qom-cast-debug) qom_cast_debug=3D"no"
    ;;
-   --enable-vte) vte=3D"yes"
-@@ -1658,7 +1655,6 @@ disabled with --disable-FEATURE, default is enabled=
+   --enable-qom-cast-debug) qom_cast_debug=3D"yes"
+@@ -1653,7 +1649,6 @@ disabled with --disable-FEATURE, default is enabled=
  if available:
+   nettle          nettle cryptography support
+   gcrypt          libgcrypt cryptography support
    sdl             SDL UI
-   --with-sdlabi     select preferred SDL ABI 1.2 or 2.0
+-  --with-sdlabi     select preferred SDL ABI 1.2 or 2.0
    gtk             gtk UI
--  --with-gtkabi     select preferred GTK ABI 2.0 or 3.0
    vte             vte support for the gtk UI
    curses          curses UI
-   vnc             VNC UI support
-@@ -2648,24 +2644,9 @@ fi
- # GTK probe
+@@ -2916,37 +2911,11 @@ fi
 =20
- if test "$gtk" !=3D "no"; then
--    if test "$gtkabi" =3D ""; then
--        # The GTK ABI was not specified explicitly, so try whether 3.0 i=
-s available.
--        # Use 2.0 as a fallback if that is available.
--        if $pkg_config --exists "gtk+-3.0 >=3D 3.0.0"; then
--            gtkabi=3D3.0
--        elif $pkg_config --exists "gtk+-2.0 >=3D 2.18.0"; then
--            gtkabi=3D2.0
--        else
--            gtkabi=3D3.0
--        fi
--    fi
--    gtkpackage=3D"gtk+-$gtkabi"
--    gtkx11package=3D"gtk+-x11-$gtkabi"
--    if test "$gtkabi" =3D "3.0" ; then
--      gtkversion=3D"3.0.0"
--    else
--      gtkversion=3D"2.18.0"
--    fi
-+    gtkpackage=3D"gtk+-3.0"
-+    gtkx11package=3D"gtk+-x11-3.0"
-+    gtkversion=3D"3.0.0"
-     if $pkg_config --exists "$gtkpackage >=3D $gtkversion"; then
-         gtk_cflags=3D$($pkg_config --cflags $gtkpackage)
-         gtk_libs=3D$($pkg_config --libs $gtkpackage)
-@@ -2909,16 +2890,11 @@ fi
- # VTE probe
-=20
- if test "$vte" !=3D "no"; then
--    if test "$gtkabi" =3D "3.0"; then
--      vteminversion=3D"0.32.0"
--      if $pkg_config --exists "vte-2.91"; then
--        vtepackage=3D"vte-2.91"
+ sdl_probe ()
+ {
+-  sdl_too_old=3Dno
+-  if test "$sdlabi" =3D ""; then
+-      if $pkg_config --exists "sdl2"; then
+-          sdlabi=3D2.0
+-      elif $pkg_config --exists "sdl"; then
+-          sdlabi=3D1.2
 -      else
--        vtepackage=3D"vte-2.90"
+-          sdlabi=3D2.0
 -      fi
-+    vteminversion=3D"0.32.0"
-+    if $pkg_config --exists "vte-2.91"; then
-+      vtepackage=3D"vte-2.91"
+-  fi
+-
+-  if test $sdlabi =3D "2.0"; then
+-      sdl_config=3D$sdl2_config
+-      sdlname=3Dsdl2
+-      sdlconfigname=3Dsdl2_config
+-  elif test $sdlabi =3D "1.2"; then
+-      sdlname=3Dsdl
+-      sdlconfigname=3Dsdl_config
+-  else
+-      error_exit "Unknown sdlabi $sdlabi, must be 1.2 or 2.0"
+-  fi
+-
+-  if test "$(basename $sdl_config)" !=3D $sdlconfigname && ! has ${sdl_c=
+onfig}; then
+-    sdl_config=3D$sdlconfigname
+-  fi
+-
+-  if $pkg_config $sdlname --exists; then
+-    sdlconfig=3D"$pkg_config $sdlname"
++  if $pkg_config sdl2 --exists; then
++    sdlconfig=3D"$pkg_config sdl2"
+     sdlversion=3D$($sdlconfig --modversion 2>/dev/null)
+   elif has ${sdl_config}; then
+-    sdlconfig=3D"$sdl_config"
++    sdlconfig=3D"$sdl2_config"
+     sdlversion=3D$($sdlconfig --version)
+   else
+     if test "$sdl" =3D "yes" ; then
+@@ -2968,8 +2937,8 @@ EOF
+   sdl_cflags=3D$($sdlconfig --cflags 2>/dev/null)
+   sdl_cflags=3D"$sdl_cflags -Wno-undef"  # workaround 2.0.8 bug
+   if test "$static" =3D "yes" ; then
+-    if $pkg_config $sdlname --exists; then
+-      sdl_libs=3D$($pkg_config $sdlname --static --libs 2>/dev/null)
++    if $pkg_config sdl2 --exists; then
++      sdl_libs=3D$($pkg_config sdl2 --static --libs 2>/dev/null)
      else
--      vtepackage=3D"vte"
--      vteminversion=3D"0.24.0"
-+      vtepackage=3D"vte-2.90"
+       sdl_libs=3D$($sdlconfig --static-libs 2>/dev/null)
      fi
-     if $pkg_config --exists "$vtepackage >=3D $vteminversion"; then
-         vte_cflags=3D$($pkg_config --cflags $vtepackage)
-@@ -2926,11 +2902,7 @@ if test "$vte" !=3D "no"; then
-         vteversion=3D$($pkg_config --modversion $vtepackage)
-         vte=3D"yes"
-     elif test "$vte" =3D "yes"; then
--        if test "$gtkabi" =3D "3.0"; then
--            feature_not_found "vte" "Install libvte-2.90/2.91 devel"
--        else
--            feature_not_found "vte" "Install libvte devel"
--        fi
-+        feature_not_found "vte" "Install libvte-2.90/2.91 devel"
-     else
-         vte=3D"no"
-     fi
-@@ -6089,12 +6061,6 @@ if test "$sdl_too_old" =3D "yes"; then
- echo "-> Your SDL version is too old - please upgrade to have SDL suppor=
-t"
- fi
+@@ -2977,11 +2946,7 @@ EOF
+     sdl_libs=3D$($sdlconfig --libs 2>/dev/null)
+   fi
+   if compile_prog "$sdl_cflags" "$sdl_libs" ; then
+-    if test $(echo $sdlversion | sed 's/[^0-9]//g') -lt 121 ; then
+-      sdl_too_old=3Dyes
+-    else
+-      sdl=3Dyes
+-    fi
++    sdl=3Dyes
 =20
--if test "$gtkabi" =3D "2.0"; then
--    echo
--    echo "WARNING: Use of GTK 2.0 is deprecated and will be removed in"
--    echo "WARNING: future releases. Please switch to using GTK 3.0"
+     # static link with sdl ? (note: sdl.pc's --static --libs is broken)
+     if test "$sdl" =3D "yes" -a "$static" =3D "yes" ; then
+@@ -2997,7 +2962,7 @@ EOF
+     fi # static link
+   else # sdl not found
+     if test "$sdl" =3D "yes" ; then
+-      feature_not_found "sdl" "Install SDL devel"
++      feature_not_found "sdl" "Install SDL2 devel"
+     fi
+     sdl=3Dno
+   fi # sdl compile test
+@@ -6057,16 +6022,6 @@ echo "capstone          $capstone"
+ echo "docker            $docker"
+ echo "libpmem support   $libpmem"
+=20
+-if test "$sdl_too_old" =3D "yes"; then
+-echo "-> Your SDL version is too old - please upgrade to have SDL suppor=
+t"
 -fi
 -
- if test "$sdlabi" =3D "1.2"; then
+-if test "$sdlabi" =3D "1.2"; then
+-    echo
+-    echo "WARNING: Use of SDL 1.2 is deprecated and will be removed in"
+-    echo "WARNING: future releases. Please switch to using SDL 2.0"
+-fi
+-
+ if test "$supported_cpu" =3D "no"; then
      echo
-     echo "WARNING: Use of SDL 1.2 is deprecated and will be removed in"
-@@ -6414,7 +6380,6 @@ if test "$glib_subprocess" =3D "yes" ; then
+     echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELE=
+ASES!"
+@@ -6269,7 +6224,6 @@ if test "$have_x11" =3D "yes" -a "$need_x11" =3D "y=
+es"; then
  fi
- if test "$gtk" =3D "yes" ; then
-   echo "CONFIG_GTK=3Dm" >> $config_host_mak
--  echo "CONFIG_GTKABI=3D$gtkabi" >> $config_host_mak
-   echo "GTK_CFLAGS=3D$gtk_cflags" >> $config_host_mak
-   echo "GTK_LIBS=3D$gtk_libs" >> $config_host_mak
-   if test "$gtk_gl" =3D "yes" ; then
-diff --git a/include/ui/gtk.h b/include/ui/gtk.h
-index a79780afc7..99edd3c085 100644
---- a/include/ui/gtk.h
-+++ b/include/ui/gtk.h
-@@ -27,15 +27,6 @@
- #include "ui/egl-context.h"
- #endif
-=20
--/* Compatibility define to let us build on both Gtk2 and Gtk3 */
--#if GTK_CHECK_VERSION(3, 0, 0)
--static inline void gdk_drawable_get_size(GdkWindow *w, gint *ww, gint *w=
-h)
--{
--    *ww =3D gdk_window_get_width(w);
--    *wh =3D gdk_window_get_height(w);
--}
--#endif
--
- typedef struct GtkDisplayState GtkDisplayState;
-=20
- typedef struct VirtualGfxConsole {
-diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
-index fb00ad12ec..a77c25b490 100644
---- a/ui/gtk-egl.c
-+++ b/ui/gtk-egl.c
-@@ -48,11 +48,7 @@ void gd_egl_init(VirtualConsole *vc)
-         return;
-     }
-=20
--#if GTK_CHECK_VERSION(3, 0, 0)
-     Window x11_window =3D gdk_x11_window_get_xid(gdk_window);
--#else
--    Window x11_window =3D gdk_x11_drawable_get_xid(gdk_window);
--#endif
-     if (!x11_window) {
-         return;
-     }
-@@ -82,7 +78,8 @@ void gd_egl_draw(VirtualConsole *vc)
-                        vc->gfx.esurface, vc->gfx.ectx);
-=20
-         window =3D gtk_widget_get_window(vc->gfx.drawing_area);
--        gdk_drawable_get_size(window, &ww, &wh);
-+        ww =3D gdk_window_get_width(window);
-+        wh =3D gdk_window_get_height(window);
-         surface_gl_setup_viewport(vc->gfx.gls, vc->gfx.ds, ww, wh);
-         surface_gl_render_texture(vc->gfx.gls, vc->gfx.ds);
-=20
-@@ -265,7 +262,8 @@ void gd_egl_scanout_flush(DisplayChangeListener *dcl,
-                    vc->gfx.esurface, vc->gfx.ectx);
-=20
-     window =3D gtk_widget_get_window(vc->gfx.drawing_area);
--    gdk_drawable_get_size(window, &ww, &wh);
-+    ww =3D gdk_window_get_width(window);
-+    wh =3D gdk_window_get_height(window);
-     egl_fb_setup_default(&vc->gfx.win_fb, ww, wh);
-     if (vc->gfx.cursor_fb.texture) {
-         egl_texture_blit(vc->gfx.gls, &vc->gfx.win_fb, &vc->gfx.guest_fb=
-,
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 5cce6ed42d..9d09bc9e57 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -111,49 +111,6 @@
- # define VTE_CHECK_VERSION(a, b, c) 0
- #endif
-=20
--#if defined(CONFIG_VTE) && !GTK_CHECK_VERSION(3, 0, 0)
+ if test "$sdl" =3D "yes" ; then
+   echo "CONFIG_SDL=3Dm" >> $config_host_mak
+-  echo "CONFIG_SDLABI=3D$sdlabi" >> $config_host_mak
+   echo "SDL_CFLAGS=3D$sdl_cflags" >> $config_host_mak
+   echo "SDL_LIBS=3D$sdl_libs" >> $config_host_mak
+ fi
+diff --git a/ui/sdl_zoom.h b/ui/sdl_zoom.h
+deleted file mode 100644
+index 39696ddb08..0000000000
+--- a/ui/sdl_zoom.h
++++ /dev/null
+@@ -1,25 +0,0 @@
 -/*
-- * The gtk2 vte terminal widget seriously messes up the window resize
-- * for some reason.  You basically can't make the qemu window smaller
-- * any more because the toplevel window geoemtry hints are overridden.
+- * SDL_zoom - surface scaling
+- *=20
+- * Copyright (c) 2009 Citrix Systems, Inc.
 - *
-- * Workaround that by hiding all vte widgets, except the one in the
-- * current tab.
+- * Derived from: SDL_rotozoom,  LGPL (c) A. Schiffler from the SDL_gfx l=
+ibrary.
+- * Modifications by Stefano Stabellini.
 - *
-- * Luckily everything works smooth in gtk3.
+- * This work is licensed under the terms of the GNU GPL version 2.
+- * See the COPYING file in the top-level directory.
+- *
 - */
--# define VTE_RESIZE_HACK 1
--#endif
 -
--#if !GTK_CHECK_VERSION(2, 20, 0)
--#define gtk_widget_get_realized(widget) GTK_WIDGET_REALIZED(widget)
--#endif
+-#ifndef SDL_ZOOM_H
+-#define SDL_ZOOM_H
 -
--#ifndef GDK_IS_X11_DISPLAY
--#define GDK_IS_X11_DISPLAY(dpy) (dpy =3D=3D dpy)
--#endif
--#ifndef GDK_IS_WAYLAND_DISPLAY
--#define GDK_IS_WAYLAND_DISPLAY(dpy) (dpy =3D=3D dpy)
--#endif
--#ifndef GDK_IS_WIN32_DISPLAY
--#define GDK_IS_WIN32_DISPLAY(dpy) (dpy =3D=3D dpy)
--#endif
+-#include <SDL.h>
 -
--#if !GTK_CHECK_VERSION(2, 22, 0)
--#define GDK_KEY_0 GDK_0
--#define GDK_KEY_1 GDK_1
--#define GDK_KEY_2 GDK_2
--#define GDK_KEY_f GDK_f
--#define GDK_KEY_g GDK_g
--#define GDK_KEY_m GDK_m
--#define GDK_KEY_q GDK_q
--#define GDK_KEY_plus GDK_plus
--#define GDK_KEY_equal GDK_equal
--#define GDK_KEY_minus GDK_minus
--#define GDK_KEY_Pause GDK_Pause
--#define GDK_KEY_Delete GDK_Delete
--#endif
+-#define SMOOTHING_OFF		0
+-#define SMOOTHING_ON		1
 -
- /* Some older mingw versions lack this constant or have
-  * it conditionally defined */
- #ifdef _WIN32
-@@ -455,7 +412,8 @@ static void gd_update_full_redraw(VirtualConsole *vc)
- {
-     GtkWidget *area =3D vc->gfx.drawing_area;
-     int ww, wh;
--    gdk_drawable_get_size(gtk_widget_get_window(area), &ww, &wh);
-+    ww =3D gdk_window_get_width(gtk_widget_get_window(area));
-+    wh =3D gdk_window_get_height(gtk_widget_get_window(area));
- #if defined(CONFIG_GTK_GL)
-     if (vc->gfx.gls && gtk_use_gl_area) {
-         gtk_gl_area_queue_render(GTK_GL_AREA(vc->gfx.drawing_area));
-@@ -530,7 +488,8 @@ static void gd_update(DisplayChangeListener *dcl,
-     if (!win) {
-         return;
-     }
--    gdk_drawable_get_size(win, &ww, &wh);
-+    ww =3D gdk_window_get_width(win);
-+    wh =3D gdk_window_get_height(win);
-=20
-     mx =3D my =3D 0;
-     if (ww > fbw) {
-@@ -549,7 +508,6 @@ static void gd_refresh(DisplayChangeListener *dcl)
-     graphic_hw_update(dcl->con);
- }
-=20
--#if GTK_CHECK_VERSION(3, 0, 0)
- static GdkDevice *gd_get_pointer(GdkDisplay *dpy)
- {
- #if GTK_CHECK_VERSION(3, 20, 0)
-@@ -580,24 +538,6 @@ static void gd_mouse_set(DisplayChangeListener *dcl,
-     vc->s->last_x =3D x;
-     vc->s->last_y =3D y;
- }
+-int sdl_zoom_blit(SDL_Surface *src_sfc, SDL_Surface *dst_sfc,
+-                  int smooth, SDL_Rect *src_rect);
+-
+-#endif /* SDL_ZOOM_H */
+diff --git a/ui/sdl_zoom_template.h b/ui/sdl_zoom_template.h
+deleted file mode 100644
+index 6a424adfb4..0000000000
+--- a/ui/sdl_zoom_template.h
++++ /dev/null
+@@ -1,219 +0,0 @@
+-/*
+- * SDL_zoom_template - surface scaling
+- *=20
+- * Copyright (c) 2009 Citrix Systems, Inc.
+- *
+- * Derived from: SDL_rotozoom,  LGPL (c) A. Schiffler from the SDL_gfx l=
+ibrary.
+- * Modifications by Stefano Stabellini.
+- *
+- * This work is licensed under the terms of the GNU GPL version 2.
+- * See the COPYING file in the top-level directory.
+- *
+- */
+-
+-#if BPP =3D=3D 16
+-#define SDL_TYPE Uint16
+-#elif BPP =3D=3D 32
+-#define SDL_TYPE Uint32
 -#else
--static void gd_mouse_set(DisplayChangeListener *dcl,
--                         int x, int y, int visible)
--{
--    VirtualConsole *vc =3D container_of(dcl, VirtualConsole, gfx.dcl);
--    gint x_root, y_root;
+-#error unsupport depth
+-#endif
 -
--    if (qemu_input_is_absolute()) {
+-/* =20
+- *  Simple helper functions to make the code looks nicer
+- *
+- *  Assume spf =3D source SDL_PixelFormat
+- *         dpf =3D dest SDL_PixelFormat
+- *
+- */
+-#define getRed(color)   (((color) & spf->Rmask) >> spf->Rshift)
+-#define getGreen(color) (((color) & spf->Gmask) >> spf->Gshift)
+-#define getBlue(color)  (((color) & spf->Bmask) >> spf->Bshift)
+-#define getAlpha(color) (((color) & spf->Amask) >> spf->Ashift)
+-
+-#define setRed(r, pcolor) do { \
+-    *pcolor =3D ((*pcolor) & (~(dpf->Rmask))) + \
+-              (((r) & (dpf->Rmask >> dpf->Rshift)) << dpf->Rshift); \
+-} while (0)
+-
+-#define setGreen(g, pcolor) do { \
+-    *pcolor =3D ((*pcolor) & (~(dpf->Gmask))) + \
+-              (((g) & (dpf->Gmask >> dpf->Gshift)) << dpf->Gshift); \
+-} while (0)
+-
+-#define setBlue(b, pcolor) do { \
+-    *pcolor =3D ((*pcolor) & (~(dpf->Bmask))) + \
+-              (((b) & (dpf->Bmask >> dpf->Bshift)) << dpf->Bshift); \
+-} while (0)
+-
+-#define setAlpha(a, pcolor) do { \
+-    *pcolor =3D ((*pcolor) & (~(dpf->Amask))) + \
+-              (((a) & (dpf->Amask >> dpf->Ashift)) << dpf->Ashift); \
+-} while (0)
+-
+-static void glue(sdl_zoom_rgb, BPP)(SDL_Surface *src, SDL_Surface *dst, =
+int smooth,
+-                                   SDL_Rect *dst_rect)
+-{
+-    int x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy, ex, ey, t1, t2=
+, sstep, sstep_jump;
+-    SDL_TYPE *c00, *c01, *c10, *c11, *sp, *csp, *dp;
+-    int d_gap;
+-    SDL_PixelFormat *spf =3D src->format;
+-    SDL_PixelFormat *dpf =3D dst->format;
+-
+-    if (smooth) {=20
+-        /* For interpolation: assume source dimension is one pixel.
+-         * Smaller here to avoid overflow on right and bottom edge.
+-         */
+-        sx =3D (int) (65536.0 * (float) (src->w - 1) / (float) dst->w);
+-        sy =3D (int) (65536.0 * (float) (src->h - 1) / (float) dst->h);
+-    } else {
+-        sx =3D (int) (65536.0 * (float) src->w / (float) dst->w);
+-        sy =3D (int) (65536.0 * (float) src->h / (float) dst->h);
+-    }
+-
+-    sax =3D g_new(int, dst->w + 1);
+-    say =3D g_new(int, dst->h + 1);
+-
+-    sp =3D csp =3D (SDL_TYPE *) src->pixels;
+-    dp =3D (SDL_TYPE *) (dst->pixels + dst_rect->y * dst->pitch +
+-                       dst_rect->x * dst->format->BytesPerPixel);
+-
+-    csx =3D 0;
+-    csax =3D sax;
+-    for (x =3D 0; x <=3D dst->w; x++) {
+-        *csax =3D csx;
+-        csax++;
+-        csx &=3D 0xffff;
+-        csx +=3D sx;
+-    }
+-    csy =3D 0;
+-    csay =3D say;
+-    for (y =3D 0; y <=3D dst->h; y++) {
+-        *csay =3D csy;
+-        csay++;
+-        csy &=3D 0xffff;
+-        csy +=3D sy;
+-    }
+-
+-    d_gap =3D dst->pitch - dst_rect->w * dst->format->BytesPerPixel;
+-
+-    if (smooth) {
+-        csay =3D say;
+-        for (y =3D 0; y < dst_rect->y; y++) {
+-            csay++;
+-            sstep =3D (*csay >> 16) * src->pitch;
+-            csp =3D (SDL_TYPE *) ((Uint8 *) csp + sstep);
+-        }
+-
+-        /* Calculate sstep_jump */
+-        csax =3D sax;=20
+-        sstep_jump =3D 0;
+-        for (x =3D 0; x < dst_rect->x; x++) {
+-            csax++;=20
+-            sstep =3D (*csax >> 16);
+-            sstep_jump +=3D sstep;
+-        }
+-
+-        for (y =3D 0; y < dst_rect->h ; y++) {
+-            /* Setup colour source pointers */
+-            c00 =3D csp + sstep_jump;
+-            c01 =3D c00 + 1;
+-            c10 =3D (SDL_TYPE *) ((Uint8 *) csp + src->pitch) + sstep_ju=
+mp;
+-            c11 =3D c10 + 1;
+-            csax =3D sax + dst_rect->x;=20
+-
+-            for (x =3D 0; x < dst_rect->w; x++) {
+-
+-                /* Interpolate colours */
+-                ex =3D (*csax & 0xffff);
+-                ey =3D (*csay & 0xffff);
+-                t1 =3D ((((getRed(*c01) - getRed(*c00)) * ex) >> 16) +
+-                     getRed(*c00)) & (dpf->Rmask >> dpf->Rshift);
+-                t2 =3D ((((getRed(*c11) - getRed(*c10)) * ex) >> 16) +
+-                     getRed(*c10)) & (dpf->Rmask >> dpf->Rshift);
+-                setRed((((t2 - t1) * ey) >> 16) + t1, dp);
+-                t1 =3D ((((getGreen(*c01) - getGreen(*c00)) * ex) >> 16)=
+ +
+-                     getGreen(*c00)) & (dpf->Gmask >> dpf->Gshift);
+-                t2 =3D ((((getGreen(*c11) - getGreen(*c10)) * ex) >> 16)=
+ +
+-                     getGreen(*c10)) & (dpf->Gmask >> dpf->Gshift);
+-                setGreen((((t2 - t1) * ey) >> 16) + t1, dp);
+-                t1 =3D ((((getBlue(*c01) - getBlue(*c00)) * ex) >> 16) +
+-                     getBlue(*c00)) & (dpf->Bmask >> dpf->Bshift);
+-                t2 =3D ((((getBlue(*c11) - getBlue(*c10)) * ex) >> 16) +
+-                     getBlue(*c10)) & (dpf->Bmask >> dpf->Bshift);
+-                setBlue((((t2 - t1) * ey) >> 16) + t1, dp);
+-                t1 =3D ((((getAlpha(*c01) - getAlpha(*c00)) * ex) >> 16)=
+ +
+-                     getAlpha(*c00)) & (dpf->Amask >> dpf->Ashift);
+-                t2 =3D ((((getAlpha(*c11) - getAlpha(*c10)) * ex) >> 16)=
+ +
+-                     getAlpha(*c10)) & (dpf->Amask >> dpf->Ashift);
+-                setAlpha((((t2 - t1) * ey) >> 16) + t1, dp);=20
+-
+-                /* Advance source pointers */
+-                csax++;=20
+-                sstep =3D (*csax >> 16);
+-                c00 +=3D sstep;
+-                c01 +=3D sstep;
+-                c10 +=3D sstep;
+-                c11 +=3D sstep;
+-                /* Advance destination pointer */
+-                dp++;
+-            }
+-            /* Advance source pointer */
+-            csay++;
+-            csp =3D (SDL_TYPE *) ((Uint8 *) csp + (*csay >> 16) * src->p=
+itch);
+-            /* Advance destination pointers */
+-            dp =3D (SDL_TYPE *) ((Uint8 *) dp + d_gap);
+-        }
+-
+-
+-    } else {
+-        csay =3D say;
+-
+-        for (y =3D 0; y < dst_rect->y; y++) {
+-            csay++;
+-            sstep =3D (*csay >> 16) * src->pitch;
+-            csp =3D (SDL_TYPE *) ((Uint8 *) csp + sstep);
+-        }
+-
+-        /* Calculate sstep_jump */
+-        csax =3D sax;=20
+-        sstep_jump =3D 0;
+-        for (x =3D 0; x < dst_rect->x; x++) {
+-            csax++;=20
+-            sstep =3D (*csax >> 16);
+-            sstep_jump +=3D sstep;
+-        }
+-
+-        for (y =3D 0 ; y < dst_rect->h ; y++) {
+-            sp =3D csp + sstep_jump;
+-            csax =3D sax + dst_rect->x;
+-
+-            for (x =3D 0; x < dst_rect->w; x++) {
+-
+-                /* Draw */
+-                *dp =3D *sp;
+-
+-                /* Advance source pointers */
+-                csax++;
+-                sstep =3D (*csax >> 16);
+-                sp +=3D sstep;
+-
+-                /* Advance destination pointer */
+-                dp++;
+-            }
+-            /* Advance source pointers */
+-            csay++;
+-            sstep =3D (*csay >> 16) * src->pitch;
+-            csp =3D (SDL_TYPE *) ((Uint8 *) csp + sstep);
+-
+-            /* Advance destination pointer */
+-            dp =3D (SDL_TYPE *) ((Uint8 *) dp + d_gap);
+-        }
+-    }
+-
+-    g_free(sax);
+-    g_free(say);
+-}
+-
+-#undef SDL_TYPE
+-
+diff --git a/ui/sdl.c b/ui/sdl.c
+deleted file mode 100644
+index a5fd503c25..0000000000
+--- a/ui/sdl.c
++++ /dev/null
+@@ -1,1027 +0,0 @@
+-/*
+- * QEMU SDL display driver
+- *
+- * Copyright (c) 2003 Fabrice Bellard
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+- * of this software and associated documentation files (the "Software"),=
+ to deal
+- * in the Software without restriction, including without limitation the=
+ rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be includ=
+ed in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+- * THE SOFTWARE.
+- */
+-
+-/* Avoid compiler warning because macro is redefined in SDL_syswm.h. */
+-#undef WIN32_LEAN_AND_MEAN
+-
+-#include "qemu/osdep.h"
+-#include <SDL.h>
+-#include <SDL_syswm.h>
+-
+-#include "qemu-common.h"
+-#include "qemu/cutils.h"
+-#include "ui/console.h"
+-#include "ui/input.h"
+-#include "sysemu/sysemu.h"
+-#ifndef WIN32
+-#include "x_keymap.h"
+-#endif
+-#include "sdl_zoom.h"
+-
+-static DisplayChangeListener *dcl;
+-static DisplaySurface *surface;
+-static DisplayOptions *opts;
+-static SDL_Surface *real_screen;
+-static SDL_Surface *guest_screen =3D NULL;
+-static int gui_grab; /* if true, all keyboard/mouse events are grabbed *=
+/
+-static int last_vm_running;
+-static bool gui_saved_scaling;
+-static int gui_saved_width;
+-static int gui_saved_height;
+-static int gui_saved_grab;
+-static int gui_fullscreen;
+-static int gui_key_modifier_pressed;
+-static int gui_keysym;
+-static int gui_grab_code =3D KMOD_LALT | KMOD_LCTRL;
+-static uint8_t modifiers_state[256];
+-static SDL_Cursor *sdl_cursor_normal;
+-static SDL_Cursor *sdl_cursor_hidden;
+-static int absolute_enabled =3D 0;
+-static int guest_cursor =3D 0;
+-static int guest_x, guest_y;
+-static SDL_Cursor *guest_sprite =3D NULL;
+-static SDL_PixelFormat host_format;
+-static int scaling_active =3D 0;
+-static Notifier mouse_mode_notifier;
+-static int idle_counter;
+-static const guint16 *keycode_map;
+-static size_t keycode_maplen;
+-
+-#define SDL_REFRESH_INTERVAL_BUSY 10
+-#define SDL_MAX_IDLE_COUNT (2 * GUI_REFRESH_INTERVAL_DEFAULT \
+-                            / SDL_REFRESH_INTERVAL_BUSY + 1)
+-
+-#if 0
+-#define DEBUG_SDL
+-#endif
+-
+-static void sdl_update(DisplayChangeListener *dcl,
+-                       int x, int y, int w, int h)
+-{
+-    SDL_Rect rec;
+-    rec.x =3D x;
+-    rec.y =3D y;
+-    rec.w =3D w;
+-    rec.h =3D h;
+-
+-#ifdef DEBUG_SDL
+-    printf("SDL: Updating x=3D%d y=3D%d w=3D%d h=3D%d (scaling: %d)\n",
+-           x, y, w, h, scaling_active);
+-#endif
+-
+-    if (guest_screen) {
+-        if (!scaling_active) {
+-            SDL_BlitSurface(guest_screen, &rec, real_screen, &rec);
+-        } else {
+-            if (sdl_zoom_blit(guest_screen, real_screen, SMOOTHING_ON, &=
+rec) < 0) {
+-                fprintf(stderr, "Zoom blit failed\n");
+-                exit(1);
+-            }
+-        }
+-    }=20
+-    SDL_UpdateRect(real_screen, rec.x, rec.y, rec.w, rec.h);
+-}
+-
+-static void do_sdl_resize(int width, int height, int bpp)
+-{
+-    int flags;
+-    SDL_Surface *tmp_screen;
+-
+-#ifdef DEBUG_SDL
+-    printf("SDL: Resizing to %dx%d bpp %d\n", width, height, bpp);
+-#endif
+-
+-    flags =3D SDL_HWSURFACE | SDL_ASYNCBLIT | SDL_HWACCEL;
+-    if (gui_fullscreen) {
+-        flags |=3D SDL_FULLSCREEN;
+-    } else {
+-        flags |=3D SDL_RESIZABLE;
+-    }
+-    if (no_frame) {
+-        flags |=3D SDL_NOFRAME;
+-    }
+-
+-    tmp_screen =3D SDL_SetVideoMode(width, height, bpp, flags);
+-    if (!real_screen) {
+-        if (!tmp_screen) {
+-            fprintf(stderr, "Could not open SDL display (%dx%dx%d): %s\n=
+",
+-                    width, height, bpp, SDL_GetError());
+-            exit(1);
+-        }
+-    } else {
+-        /*
+-         * Revert to the previous video mode if the change of resizing o=
+r
+-         * resolution failed.
+-         */
+-        if (!tmp_screen) {
+-            fprintf(stderr, "Failed to set SDL display (%dx%dx%d): %s\n"=
+,
+-                    width, height, bpp, SDL_GetError());
+-            return;
+-        }
+-    }
+-
+-    real_screen =3D tmp_screen;
+-}
+-
+-static void sdl_switch(DisplayChangeListener *dcl,
+-                       DisplaySurface *new_surface)
+-{
+-    PixelFormat pf;
+-
+-    /* temporary hack: allows to call sdl_switch to handle scaling chang=
+es */
+-    if (new_surface) {
+-        surface =3D new_surface;
+-    }
+-    pf =3D qemu_pixelformat_from_pixman(surface->format);
+-
+-    if (!scaling_active) {
+-        do_sdl_resize(surface_width(surface), surface_height(surface), 0=
+);
+-    } else if (real_screen->format->BitsPerPixel !=3D
+-               surface_bits_per_pixel(surface)) {
+-        do_sdl_resize(real_screen->w, real_screen->h,
+-                      surface_bits_per_pixel(surface));
+-    }
+-
+-    if (guest_screen !=3D NULL) {
+-        SDL_FreeSurface(guest_screen);
+-    }
+-
+-#ifdef DEBUG_SDL
+-    printf("SDL: Creating surface with masks: %08x %08x %08x %08x\n",
+-           pf.rmask, pf.gmask, pf.bmask, pf.amask);
+-#endif
+-
+-    guest_screen =3D SDL_CreateRGBSurfaceFrom
+-        (surface_data(surface),
+-         surface_width(surface), surface_height(surface),
+-         surface_bits_per_pixel(surface), surface_stride(surface),
+-         pf.rmask, pf.gmask,
+-         pf.bmask, pf.amask);
+-}
+-
+-static bool sdl_check_format(DisplayChangeListener *dcl,
+-                             pixman_format_code_t format)
+-{
+-    /*
+-     * We let SDL convert for us a few more formats than,
+-     * the native ones. Thes are the ones I have tested.
+-     */
+-    return (format =3D=3D PIXMAN_x8r8g8b8 ||
+-            format =3D=3D PIXMAN_b8g8r8x8 ||
+-            format =3D=3D PIXMAN_x1r5g5b5 ||
+-            format =3D=3D PIXMAN_r5g6b5);
+-}
+-
+-/* generic keyboard conversion */
+-
+-#include "sdl_keysym.h"
+-
+-static kbd_layout_t *kbd_layout =3D NULL;
+-
+-static uint8_t sdl_keyevent_to_keycode_generic(const SDL_KeyboardEvent *=
+ev)
+-{
+-    bool shift =3D modifiers_state[0x2a] || modifiers_state[0x36];
+-    bool altgr =3D modifiers_state[0xb8];
+-    bool ctrl  =3D modifiers_state[0x1d] || modifiers_state[0x9d];
+-    int keysym;
+-    /* workaround for X11+SDL bug with AltGR */
+-    keysym =3D ev->keysym.sym;
+-    if (keysym =3D=3D 0 && ev->keysym.scancode =3D=3D 113)
+-        keysym =3D SDLK_MODE;
+-    /* For Japanese key '\' and '|' */
+-    if (keysym =3D=3D 92 && ev->keysym.scancode =3D=3D 133) {
+-        keysym =3D 0xa5;
+-    }
+-    return keysym2scancode(kbd_layout, keysym,
+-                           shift, altgr, ctrl) & SCANCODE_KEYMASK;
+-}
+-
+-
+-static const guint16 *sdl_get_keymap(size_t *maplen)
+-{
+-#if defined(WIN32)
+-    *maplen =3D qemu_input_map_atset1_to_qcode_len;
+-    return qemu_input_map_atset1_to_qcode;
+-#else
+-#if defined(SDL_VIDEO_DRIVER_X11)
+-    SDL_SysWMinfo info;
+-
+-    SDL_VERSION(&info.version);
+-    if (SDL_GetWMInfo(&info) > 0) {
+-        return qemu_xkeymap_mapping_table(
+-            info.info.x11.display, maplen);
+-    }
+-#endif
+-    g_warning("Unsupported SDL video driver / platform.\n"
+-              "Assuming Linux KBD scancodes, but probably wrong.\n"
+-              "Please report to qemu-devel@nongnu.org\n"
+-              "including the following information:\n"
+-              "\n"
+-              "  - Operating system\n"
+-              "  - SDL video driver\n");
+-    *maplen =3D qemu_input_map_xorgkbd_to_qcode_len;
+-    return qemu_input_map_xorgkbd_to_qcode;
+-#endif
+-}
+-
+-static uint8_t sdl_keyevent_to_keycode(const SDL_KeyboardEvent *ev)
+-{
+-    int qcode;
+-    if (!keycode_map) {
+-        return 0;
+-    }
+-    if (ev->keysym.scancode > keycode_maplen) {
+-        return 0;
+-    }
+-
+-    qcode =3D keycode_map[ev->keysym.scancode];
+-
+-    if (qcode > qemu_input_map_qcode_to_qnum_len) {
+-        return 0;
+-    }
+-
+-    return qemu_input_map_qcode_to_qnum[qcode];
+-}
+-
+-static void reset_keys(void)
+-{
+-    int i;
+-    for(i =3D 0; i < 256; i++) {
+-        if (modifiers_state[i]) {
+-            qemu_input_event_send_key_number(dcl->con, i, false);
+-            modifiers_state[i] =3D 0;
+-        }
+-    }
+-}
+-
+-static void sdl_process_key(SDL_KeyboardEvent *ev)
+-{
+-    int keycode;
+-
+-    if (ev->keysym.sym =3D=3D SDLK_PAUSE) {
+-        /* specific case */
+-        qemu_input_event_send_key_qcode(dcl->con, Q_KEY_CODE_PAUSE,
+-                                        ev->type =3D=3D SDL_KEYDOWN);
 -        return;
 -    }
 -
--    gdk_window_get_root_coords(gtk_widget_get_window(vc->gfx.drawing_are=
-a),
--                               x, y, &x_root, &y_root);
--    gdk_display_warp_pointer(gtk_widget_get_display(vc->gfx.drawing_area=
-),
--                             gtk_widget_get_screen(vc->gfx.drawing_area)=
-,
--                             x_root, y_root);
+-    if (kbd_layout) {
+-        keycode =3D sdl_keyevent_to_keycode_generic(ev);
+-    } else {
+-        keycode =3D sdl_keyevent_to_keycode(ev);
+-    }
+-
+-    switch(keycode) {
+-    case 0x00:
+-        /* sent when leaving window: reset the modifiers state */
+-        reset_keys();
+-        return;
+-    case 0x2a:                          /* Left Shift */
+-    case 0x36:                          /* Right Shift */
+-    case 0x1d:                          /* Left CTRL */
+-    case 0x9d:                          /* Right CTRL */
+-    case 0x38:                          /* Left ALT */
+-    case 0xb8:                         /* Right ALT */
+-        if (ev->type =3D=3D SDL_KEYUP)
+-            modifiers_state[keycode] =3D 0;
+-        else
+-            modifiers_state[keycode] =3D 1;
+-        break;
+-#define QEMU_SDL_VERSION ((SDL_MAJOR_VERSION << 8) + SDL_MINOR_VERSION)
+-#if QEMU_SDL_VERSION < 0x102 || QEMU_SDL_VERSION =3D=3D 0x102 && SDL_PAT=
+CHLEVEL < 14
+-        /* SDL versions before 1.2.14 don't support key up for caps/num =
+lock. */
+-    case 0x45: /* num lock */
+-    case 0x3a: /* caps lock */
+-        /* SDL does not send the key up event, so we generate it */
+-        qemu_input_event_send_key_number(dcl->con, keycode, true);
+-        qemu_input_event_send_key_number(dcl->con, keycode, false);
+-        return;
+-#endif
+-    }
+-
+-    /* now send the key code */
+-    qemu_input_event_send_key_number(dcl->con, keycode,
+-                                     ev->type =3D=3D SDL_KEYDOWN);
 -}
--#endif
-=20
- static void gd_cursor_define(DisplayChangeListener *dcl,
-                              QEMUCursor *c)
-@@ -619,11 +559,7 @@ static void gd_cursor_define(DisplayChangeListener *=
-dcl,
-          pixbuf, c->hot_x, c->hot_y);
-     gdk_window_set_cursor(gtk_widget_get_window(vc->gfx.drawing_area), c=
-ursor);
-     g_object_unref(pixbuf);
--#if !GTK_CHECK_VERSION(3, 0, 0)
--    gdk_cursor_unref(cursor);
--#else
-     g_object_unref(cursor);
--#endif
- }
-=20
- static void gd_switch(DisplayChangeListener *dcl,
-@@ -863,7 +799,8 @@ static gboolean gd_draw_event(GtkWidget *widget, cair=
-o_t *cr, void *opaque)
-     fbw =3D surface_width(vc->gfx.ds);
-     fbh =3D surface_height(vc->gfx.ds);
-=20
--    gdk_drawable_get_size(gtk_widget_get_window(widget), &ww, &wh);
-+    ww =3D gdk_window_get_width(gtk_widget_get_window(widget));
-+    wh =3D gdk_window_get_height(gtk_widget_get_window(widget));
-=20
-     if (s->full_screen) {
-         vc->gfx.scale_x =3D (double)ww / fbw;
-@@ -907,29 +844,6 @@ static gboolean gd_draw_event(GtkWidget *widget, cai=
-ro_t *cr, void *opaque)
-     return TRUE;
- }
-=20
--#if !GTK_CHECK_VERSION(3, 0, 0)
--static gboolean gd_expose_event(GtkWidget *widget, GdkEventExpose *expos=
-e,
--                                void *opaque)
+-
+-static void sdl_update_caption(void)
 -{
--    cairo_t *cr;
--    gboolean ret;
+-    char win_title[1024];
+-    char icon_title[1024];
+-    const char *status =3D "";
 -
--    cr =3D gdk_cairo_create(gtk_widget_get_window(widget));
--    cairo_rectangle(cr,
--                    expose->area.x,
--                    expose->area.y,
--                    expose->area.width,
--                    expose->area.height);
--    cairo_clip(cr);
+-    if (!runstate_is_running())
+-        status =3D " [Stopped]";
+-    else if (gui_grab) {
+-        if (alt_grab)
+-            status =3D " - Press Ctrl-Alt-Shift-G to exit mouse grab";
+-        else if (ctrl_grab)
+-            status =3D " - Press Right-Ctrl-G to exit mouse grab";
+-        else
+-            status =3D " - Press Ctrl-Alt-G to exit mouse grab";
+-    }
 -
--    ret =3D gd_draw_event(widget, cr, opaque);
+-    if (qemu_name) {
+-        snprintf(win_title, sizeof(win_title), "QEMU (%s)%s", qemu_name,=
+ status);
+-        snprintf(icon_title, sizeof(icon_title), "QEMU (%s)", qemu_name)=
+;
+-    } else {
+-        snprintf(win_title, sizeof(win_title), "QEMU%s", status);
+-        snprintf(icon_title, sizeof(icon_title), "QEMU");
+-    }
 -
--    cairo_destroy(cr);
--
--    return ret;
+-    SDL_WM_SetCaption(win_title, icon_title);
 -}
--#endif
 -
- static gboolean gd_motion_event(GtkWidget *widget, GdkEventMotion *motio=
-n,
-                                 void *opaque)
- {
-@@ -947,8 +861,8 @@ static gboolean gd_motion_event(GtkWidget *widget, Gd=
-kEventMotion *motion,
-     fbw =3D surface_width(vc->gfx.ds) * vc->gfx.scale_x;
-     fbh =3D surface_height(vc->gfx.ds) * vc->gfx.scale_y;
-=20
--    gdk_drawable_get_size(gtk_widget_get_window(vc->gfx.drawing_area),
--                          &ww, &wh);
-+    ww =3D gdk_window_get_width(gtk_widget_get_window(vc->gfx.drawing_ar=
-ea));
-+    wh =3D gdk_window_get_height(gtk_widget_get_window(vc->gfx.drawing_a=
-rea));
-=20
-     mx =3D my =3D 0;
-     if (ww > fbw) {
-@@ -1026,13 +940,8 @@ static gboolean gd_motion_event(GtkWidget *widget, =
-GdkEventMotion *motion,
-         }
-=20
-         if (x !=3D (int)motion->x_root || y !=3D (int)motion->y_root) {
--#if GTK_CHECK_VERSION(3, 0, 0)
-             GdkDevice *dev =3D gdk_event_get_device((GdkEvent *)motion);
-             gdk_device_warp(dev, screen, x, y);
--#else
--            GdkDisplay *display =3D gtk_widget_get_display(widget);
--            gdk_display_warp_pointer(display, screen, x, y);
--#endif
-             s->last_set =3D FALSE;
-             return FALSE;
-         }
-@@ -1309,10 +1218,6 @@ static void gd_accel_switch_vc(void *opaque)
-     VirtualConsole *vc =3D opaque;
-=20
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(vc->menu_item), T=
-RUE);
--#if !GTK_CHECK_VERSION(3, 0, 0)
--    /* GTK2 sends the accel key to the target console - ignore this unti=
-l */
--    vc->s->ignore_keys =3D true;
--#endif
- }
-=20
- static void gd_menu_show_tabs(GtkMenuItem *item, void *opaque)
-@@ -1539,7 +1444,7 @@ static void gd_grab_update(VirtualConsole *vc, bool=
- kbd, bool ptr)
-         gdk_seat_ungrab(seat);
-     }
- }
--#elif GTK_CHECK_VERSION(3, 0, 0)
-+#else
- static void gd_grab_devices(VirtualConsole *vc, bool grab,
-                             GdkInputSource source, GdkEventMask mask,
-                             GdkCursor *cursor)
-@@ -1578,14 +1483,10 @@ static void gd_grab_keyboard(VirtualConsole *vc, =
-const char *reason)
-=20
- #if GTK_CHECK_VERSION(3, 20, 0)
-     gd_grab_update(vc, true, vc->s->ptr_owner =3D=3D vc);
--#elif GTK_CHECK_VERSION(3, 0, 0)
-+#else
-     gd_grab_devices(vc, true, GDK_SOURCE_KEYBOARD,
-                    GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK,
-                    NULL);
--#else
--    gdk_keyboard_grab(gtk_widget_get_window(vc->gfx.drawing_area),
--                      FALSE,
--                      GDK_CURRENT_TIME);
- #endif
-     vc->s->kbd_owner =3D vc;
-     gd_update_caption(vc->s);
-@@ -1603,10 +1504,8 @@ static void gd_ungrab_keyboard(GtkDisplayState *s)
-=20
- #if GTK_CHECK_VERSION(3, 20, 0)
-     gd_grab_update(vc, false, vc->s->ptr_owner =3D=3D vc);
--#elif GTK_CHECK_VERSION(3, 0, 0)
-+#else
-     gd_grab_devices(vc, false, GDK_SOURCE_KEYBOARD, 0, NULL);
--#else
--    gdk_keyboard_ungrab(GDK_CURRENT_TIME);
- #endif
-     gd_update_caption(s);
-     trace_gd_ungrab(vc->label, "kbd");
-@@ -1628,7 +1527,7 @@ static void gd_grab_pointer(VirtualConsole *vc, con=
-st char *reason)
-     gd_grab_update(vc, vc->s->kbd_owner =3D=3D vc, true);
-     gdk_device_get_position(gd_get_pointer(display),
-                             NULL, &vc->s->grab_x_root, &vc->s->grab_y_ro=
-ot);
--#elif GTK_CHECK_VERSION(3, 0, 0)
-+#else
-     gd_grab_devices(vc, true, GDK_SOURCE_MOUSE,
-                     GDK_POINTER_MOTION_MASK |
-                     GDK_BUTTON_PRESS_MASK |
-@@ -1638,19 +1537,6 @@ static void gd_grab_pointer(VirtualConsole *vc, co=
-nst char *reason)
-                     vc->s->null_cursor);
-     gdk_device_get_position(gd_get_pointer(display),
-                             NULL, &vc->s->grab_x_root, &vc->s->grab_y_ro=
-ot);
--#else
--    gdk_pointer_grab(gtk_widget_get_window(vc->gfx.drawing_area),
--                     FALSE, /* All events to come to our window directly=
- */
--                     GDK_POINTER_MOTION_MASK |
--                     GDK_BUTTON_PRESS_MASK |
--                     GDK_BUTTON_RELEASE_MASK |
--                     GDK_BUTTON_MOTION_MASK |
--                     GDK_SCROLL_MASK,
--                     NULL, /* Allow cursor to move over entire desktop *=
-/
--                     vc->s->null_cursor,
--                     GDK_CURRENT_TIME);
--    gdk_display_get_pointer(display, NULL,
--                            &vc->s->grab_x_root, &vc->s->grab_y_root, NU=
-LL);
- #endif
-     vc->s->ptr_owner =3D vc;
-     gd_update_caption(vc->s);
-@@ -1673,16 +1559,11 @@ static void gd_ungrab_pointer(GtkDisplayState *s)
-     gdk_device_warp(gd_get_pointer(display),
-                     gtk_widget_get_screen(vc->gfx.drawing_area),
-                     vc->s->grab_x_root, vc->s->grab_y_root);
--#elif GTK_CHECK_VERSION(3, 0, 0)
-+#else
-     gd_grab_devices(vc, false, GDK_SOURCE_MOUSE, 0, NULL);
-     gdk_device_warp(gd_get_pointer(display),
-                     gtk_widget_get_screen(vc->gfx.drawing_area),
-                     vc->s->grab_x_root, vc->s->grab_y_root);
--#else
--    gdk_pointer_ungrab(GDK_CURRENT_TIME);
--    gdk_display_warp_pointer(display,
--                             gtk_widget_get_screen(vc->gfx.drawing_area)=
-,
--                             vc->s->grab_x_root, vc->s->grab_y_root);
- #endif
-     gd_update_caption(s);
-     trace_gd_ungrab(vc->label, "ptr");
-@@ -1715,21 +1596,10 @@ static void gd_change_page(GtkNotebook *nb, gpoin=
-ter arg1, guint arg2,
-         return;
-     }
-=20
--#ifdef VTE_RESIZE_HACK
--    vc =3D gd_vc_find_current(s);
--    if (vc && vc->type =3D=3D GD_VC_VTE) {
--        gtk_widget_hide(vc->vte.terminal);
+-static void sdl_hide_cursor(void)
+-{
+-    if (!cursor_hide)
+-        return;
+-
+-    if (qemu_input_is_absolute()) {
+-        SDL_ShowCursor(1);
+-        SDL_SetCursor(sdl_cursor_hidden);
+-    } else {
+-        SDL_ShowCursor(0);
 -    }
--#endif
-     vc =3D gd_vc_find_by_page(s, arg2);
-     if (!vc) {
-         return;
-     }
--#ifdef VTE_RESIZE_HACK
--    if (vc->type =3D=3D GD_VC_VTE) {
--        gtk_widget_show(vc->vte.terminal);
+-}
+-
+-static void sdl_show_cursor(void)
+-{
+-    if (!cursor_hide)
+-        return;
+-
+-    if (!qemu_input_is_absolute() || !qemu_console_is_graphic(NULL)) {
+-        SDL_ShowCursor(1);
+-        if (guest_cursor &&
+-                (gui_grab || qemu_input_is_absolute() || absolute_enable=
+d))
+-            SDL_SetCursor(guest_sprite);
+-        else
+-            SDL_SetCursor(sdl_cursor_normal);
 -    }
--#endif
-     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(vc->menu_item),
-                                    TRUE);
-     on_vga =3D (vc->type =3D=3D GD_VC_GFX &&
-@@ -1963,20 +1833,15 @@ static GSList *gd_vc_vte_init(GtkDisplayState *s,=
- VirtualConsole *vc,
-     vte_terminal_set_size(VTE_TERMINAL(vc->vte.terminal),
-                           VC_TERM_X_MIN, VC_TERM_Y_MIN);
-=20
--#if VTE_CHECK_VERSION(0, 28, 0) && GTK_CHECK_VERSION(3, 0, 0)
-+#if VTE_CHECK_VERSION(0, 28, 0)
-     vadjustment =3D gtk_scrollable_get_vadjustment
-         (GTK_SCROLLABLE(vc->vte.terminal));
- #else
-     vadjustment =3D vte_terminal_get_adjustment(VTE_TERMINAL(vc->vte.ter=
-minal));
- #endif
-=20
--#if GTK_CHECK_VERSION(3, 0, 0)
-     box =3D gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-     scrollbar =3D gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, vadjustmen=
-t);
--#else
--    box =3D gtk_hbox_new(false, 2);
--    scrollbar =3D gtk_vscrollbar_new(vadjustment);
--#endif
-=20
-     gtk_box_pack_end(GTK_BOX(box), scrollbar, FALSE, FALSE, 0);
-     gtk_box_pack_end(GTK_BOX(box), vc->vte.terminal, TRUE, TRUE, 0);
-@@ -2015,7 +1880,6 @@ static void gd_vcs_init(GtkDisplayState *s, GSList =
-*group,
-=20
- static void gd_connect_vc_gfx_signals(VirtualConsole *vc)
- {
--#if GTK_CHECK_VERSION(3, 0, 0)
-     g_signal_connect(vc->gfx.drawing_area, "draw",
-                      G_CALLBACK(gd_draw_event), vc);
- #if defined(CONFIG_GTK_GL)
-@@ -2027,10 +1891,6 @@ static void gd_connect_vc_gfx_signals(VirtualConso=
-le *vc)
-                          G_CALLBACK(gd_resize_event), vc);
-     }
- #endif
--#else
--    g_signal_connect(vc->gfx.drawing_area, "expose-event",
--                     G_CALLBACK(gd_expose_event), vc);
--#endif
-     if (qemu_console_is_graphic(vc->gfx.dcl.con)) {
-         g_signal_connect(vc->gfx.drawing_area, "event",
-                          G_CALLBACK(gd_event), vc);
-@@ -2226,11 +2086,9 @@ static GtkWidget *gd_create_menu_view(GtkDisplaySt=
-ate *s)
-=20
-     gtk_accel_group_connect(s->accel_group, GDK_KEY_f, HOTKEY_MODIFIERS,=
- 0,
-             g_cclosure_new_swap(G_CALLBACK(gd_accel_full_screen), s, NUL=
-L));
--#if GTK_CHECK_VERSION(3, 8, 0)
-     gtk_accel_label_set_accel(
-             GTK_ACCEL_LABEL(gtk_bin_get_child(GTK_BIN(s->full_screen_ite=
-m))),
-             GDK_KEY_f, HOTKEY_MODIFIERS);
--#endif
-     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), s->full_screen_item=
-);
-=20
-     separator =3D gtk_separator_menu_item_new();
-@@ -2362,11 +2220,6 @@ static void gtk_display_init(DisplayState *ds, Dis=
-playOptions *opts)
-     assert(opts->type =3D=3D DISPLAY_TYPE_GTK);
-     s->opts =3D opts;
-=20
--#if !GTK_CHECK_VERSION(3, 0, 0)
--    g_printerr("Running QEMU with GTK 2.x is deprecated, and will be rem=
-oved\n"
--               "in a future release. Please switch to GTK 3.x instead\n"=
-);
--#endif
+-}
 -
-     s->window =3D gtk_window_new(GTK_WINDOW_TOPLEVEL);
- #if GTK_CHECK_VERSION(3, 2, 0)
-     s->vbox =3D gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-@@ -2423,23 +2276,6 @@ static void gtk_display_init(DisplayState *ds, Dis=
-playOptions *opts)
-=20
-     gtk_widget_show_all(s->window);
-=20
--#ifdef VTE_RESIZE_HACK
--    {
--        VirtualConsole *cur =3D gd_vc_find_current(s);
--        if (cur) {
--            int i;
+-static void sdl_grab_start(void)
+-{
+-    /*
+-     * If the application is not active, do not try to enter grab state.=
+ This
+-     * prevents 'SDL_WM_GrabInput(SDL_GRAB_ON)' from blocking all the
+-     * application (SDL bug).
+-     */
+-    if (!(SDL_GetAppState() & SDL_APPINPUTFOCUS)) {
+-        return;
+-    }
+-    if (guest_cursor) {
+-        SDL_SetCursor(guest_sprite);
+-        if (!qemu_input_is_absolute() && !absolute_enabled) {
+-            SDL_WarpMouse(guest_x, guest_y);
+-        }
+-    } else
+-        sdl_hide_cursor();
+-    SDL_WM_GrabInput(SDL_GRAB_ON);
+-    gui_grab =3D 1;
+-    sdl_update_caption();
+-}
 -
--            for (i =3D 0; i < s->nb_vcs; i++) {
--                VirtualConsole *vc =3D &s->vc[i];
--                if (vc && vc->type =3D=3D GD_VC_VTE && vc !=3D cur) {
--                    gtk_widget_hide(vc->vte.terminal);
--                }
+-static void sdl_grab_end(void)
+-{
+-    SDL_WM_GrabInput(SDL_GRAB_OFF);
+-    gui_grab =3D 0;
+-    sdl_show_cursor();
+-    sdl_update_caption();
+-}
+-
+-static void absolute_mouse_grab(void)
+-{
+-    int mouse_x, mouse_y;
+-
+-    SDL_GetMouseState(&mouse_x, &mouse_y);
+-    if (mouse_x > 0 && mouse_x < real_screen->w - 1 &&
+-        mouse_y > 0 && mouse_y < real_screen->h - 1) {
+-        sdl_grab_start();
+-    }
+-}
+-
+-static void sdl_mouse_mode_change(Notifier *notify, void *data)
+-{
+-    if (qemu_input_is_absolute()) {
+-        if (!absolute_enabled) {
+-            absolute_enabled =3D 1;
+-            if (qemu_console_is_graphic(NULL)) {
+-                absolute_mouse_grab();
 -            }
--            gd_update_windowsize(cur);
+-        }
+-    } else if (absolute_enabled) {
+-        if (!gui_fullscreen) {
+-            sdl_grab_end();
+-        }
+-        absolute_enabled =3D 0;
+-    }
+-}
+-
+-static void sdl_send_mouse_event(int dx, int dy, int x, int y, int state=
+)
+-{
+-    static uint32_t bmap[INPUT_BUTTON__MAX] =3D {
+-        [INPUT_BUTTON_LEFT]       =3D SDL_BUTTON(SDL_BUTTON_LEFT),
+-        [INPUT_BUTTON_MIDDLE]     =3D SDL_BUTTON(SDL_BUTTON_MIDDLE),
+-        [INPUT_BUTTON_RIGHT]      =3D SDL_BUTTON(SDL_BUTTON_RIGHT),
+-        [INPUT_BUTTON_WHEEL_UP]   =3D SDL_BUTTON(SDL_BUTTON_WHEELUP),
+-        [INPUT_BUTTON_WHEEL_DOWN] =3D SDL_BUTTON(SDL_BUTTON_WHEELDOWN),
+-    };
+-    static uint32_t prev_state;
+-
+-    if (prev_state !=3D state) {
+-        qemu_input_update_buttons(dcl->con, bmap, prev_state, state);
+-        prev_state =3D state;
+-    }
+-
+-    if (qemu_input_is_absolute()) {
+-        qemu_input_queue_abs(dcl->con, INPUT_AXIS_X, x,
+-                             0, real_screen->w);
+-        qemu_input_queue_abs(dcl->con, INPUT_AXIS_Y, y,
+-                             0, real_screen->h);
+-    } else {
+-        if (guest_cursor) {
+-            x -=3D guest_x;
+-            y -=3D guest_y;
+-            guest_x +=3D x;
+-            guest_y +=3D y;
+-            dx =3D x;
+-            dy =3D y;
+-        }
+-        qemu_input_queue_rel(dcl->con, INPUT_AXIS_X, dx);
+-        qemu_input_queue_rel(dcl->con, INPUT_AXIS_Y, dy);
+-    }
+-    qemu_input_event_sync();
+-}
+-
+-static void sdl_scale(int width, int height)
+-{
+-    int bpp =3D real_screen->format->BitsPerPixel;
+-
+-#ifdef DEBUG_SDL
+-    printf("SDL: Scaling to %dx%d bpp %d\n", width, height, bpp);
+-#endif
+-
+-    if (bpp !=3D 16 && bpp !=3D 32) {
+-        bpp =3D 32;
+-    }
+-    do_sdl_resize(width, height, bpp);
+-    scaling_active =3D 1;
+-}
+-
+-static void toggle_full_screen(void)
+-{
+-    int width =3D surface_width(surface);
+-    int height =3D surface_height(surface);
+-    int bpp =3D surface_bits_per_pixel(surface);
+-
+-    gui_fullscreen =3D !gui_fullscreen;
+-    if (gui_fullscreen) {
+-        gui_saved_width =3D real_screen->w;
+-        gui_saved_height =3D real_screen->h;
+-        gui_saved_scaling =3D scaling_active;
+-
+-        do_sdl_resize(width, height, bpp);
+-        scaling_active =3D 0;
+-
+-        gui_saved_grab =3D gui_grab;
+-        sdl_grab_start();
+-    } else {
+-        if (gui_saved_scaling) {
+-            sdl_scale(gui_saved_width, gui_saved_height);
+-        } else {
+-            do_sdl_resize(width, height, 0);
+-        }
+-        if (!gui_saved_grab || !qemu_console_is_graphic(NULL)) {
+-            sdl_grab_end();
 -        }
 -    }
+-    graphic_hw_invalidate(NULL);
+-    graphic_hw_update(NULL);
+-}
+-
+-static void handle_keydown(SDL_Event *ev)
+-{
+-    int mod_state;
+-    int keycode;
+-
+-    if (alt_grab) {
+-        mod_state =3D (SDL_GetModState() & (gui_grab_code | KMOD_LSHIFT)=
+) =3D=3D
+-                    (gui_grab_code | KMOD_LSHIFT);
+-    } else if (ctrl_grab) {
+-        mod_state =3D (SDL_GetModState() & KMOD_RCTRL) =3D=3D KMOD_RCTRL=
+;
+-    } else {
+-        mod_state =3D (SDL_GetModState() & gui_grab_code) =3D=3D gui_gra=
+b_code;
+-    }
+-    gui_key_modifier_pressed =3D mod_state;
+-
+-    if (gui_key_modifier_pressed) {
+-        keycode =3D sdl_keyevent_to_keycode(&ev->key);
+-        switch (keycode) {
+-        case 0x21: /* 'f' key on US keyboard */
+-            toggle_full_screen();
+-            gui_keysym =3D 1;
+-            break;
+-        case 0x22: /* 'g' key */
+-            if (!gui_grab) {
+-                if (qemu_console_is_graphic(NULL)) {
+-                    sdl_grab_start();
+-                }
+-            } else if (!gui_fullscreen) {
+-                sdl_grab_end();
+-            }
+-            gui_keysym =3D 1;
+-            break;
+-        case 0x16: /* 'u' key on US keyboard */
+-            if (scaling_active) {
+-                scaling_active =3D 0;
+-                sdl_switch(dcl, NULL);
+-                graphic_hw_invalidate(NULL);
+-                graphic_hw_update(NULL);
+-            }
+-            gui_keysym =3D 1;
+-            break;
+-        case 0x02 ... 0x0a: /* '1' to '9' keys */
+-            /* Reset the modifiers sent to the current console */
+-            reset_keys();
+-            console_select(keycode - 0x02);
+-            gui_keysym =3D 1;
+-            if (gui_fullscreen) {
+-                break;
+-            }
+-            if (!qemu_console_is_graphic(NULL)) {
+-                /* release grab if going to a text console */
+-                if (gui_grab) {
+-                    sdl_grab_end();
+-                } else if (absolute_enabled) {
+-                    sdl_show_cursor();
+-                }
+-            } else if (absolute_enabled) {
+-                sdl_hide_cursor();
+-                absolute_mouse_grab();
+-            }
+-            break;
+-        case 0x1b: /* '+' */
+-        case 0x35: /* '-' */
+-            if (!gui_fullscreen) {
+-                int width =3D MAX(real_screen->w + (keycode =3D=3D 0x1b =
+? 50 : -50),
+-                                160);
+-                int height =3D (surface_height(surface) * width) /
+-                    surface_width(surface);
+-
+-                sdl_scale(width, height);
+-                graphic_hw_invalidate(NULL);
+-                graphic_hw_update(NULL);
+-                gui_keysym =3D 1;
+-            }
+-        default:
+-            break;
+-        }
+-    } else if (!qemu_console_is_graphic(NULL)) {
+-        int keysym =3D 0;
+-
+-        if (ev->key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL)) {
+-            switch (ev->key.keysym.sym) {
+-            case SDLK_UP:
+-                keysym =3D QEMU_KEY_CTRL_UP;
+-                break;
+-            case SDLK_DOWN:
+-                keysym =3D QEMU_KEY_CTRL_DOWN;
+-                break;
+-            case SDLK_LEFT:
+-                keysym =3D QEMU_KEY_CTRL_LEFT;
+-                break;
+-            case SDLK_RIGHT:
+-                keysym =3D QEMU_KEY_CTRL_RIGHT;
+-                break;
+-            case SDLK_HOME:
+-                keysym =3D QEMU_KEY_CTRL_HOME;
+-                break;
+-            case SDLK_END:
+-                keysym =3D QEMU_KEY_CTRL_END;
+-                break;
+-            case SDLK_PAGEUP:
+-                keysym =3D QEMU_KEY_CTRL_PAGEUP;
+-                break;
+-            case SDLK_PAGEDOWN:
+-                keysym =3D QEMU_KEY_CTRL_PAGEDOWN;
+-                break;
+-            default:
+-                break;
+-            }
+-        } else {
+-            switch (ev->key.keysym.sym) {
+-            case SDLK_UP:
+-                keysym =3D QEMU_KEY_UP;
+-                break;
+-            case SDLK_DOWN:
+-                keysym =3D QEMU_KEY_DOWN;
+-                break;
+-            case SDLK_LEFT:
+-                keysym =3D QEMU_KEY_LEFT;
+-                break;
+-            case SDLK_RIGHT:
+-                keysym =3D QEMU_KEY_RIGHT;
+-                break;
+-            case SDLK_HOME:
+-                keysym =3D QEMU_KEY_HOME;
+-                break;
+-            case SDLK_END:
+-                keysym =3D QEMU_KEY_END;
+-                break;
+-            case SDLK_PAGEUP:
+-                keysym =3D QEMU_KEY_PAGEUP;
+-                break;
+-            case SDLK_PAGEDOWN:
+-                keysym =3D QEMU_KEY_PAGEDOWN;
+-                break;
+-            case SDLK_BACKSPACE:
+-                keysym =3D QEMU_KEY_BACKSPACE;
+-                break;
+-            case SDLK_DELETE:
+-                keysym =3D QEMU_KEY_DELETE;
+-                break;
+-            default:
+-                break;
+-            }
+-        }
+-        if (keysym) {
+-            kbd_put_keysym(keysym);
+-        } else if (ev->key.keysym.unicode !=3D 0) {
+-            kbd_put_keysym(ev->key.keysym.unicode);
+-        }
+-    }
+-    if (qemu_console_is_graphic(NULL) && !gui_keysym) {
+-        sdl_process_key(&ev->key);
+-    }
+-}
+-
+-static void handle_keyup(SDL_Event *ev)
+-{
+-    int mod_state;
+-
+-    if (!alt_grab) {
+-        mod_state =3D (ev->key.keysym.mod & gui_grab_code);
+-    } else {
+-        mod_state =3D (ev->key.keysym.mod & (gui_grab_code | KMOD_LSHIFT=
+));
+-    }
+-    if (!mod_state && gui_key_modifier_pressed) {
+-        gui_key_modifier_pressed =3D 0;
+-        gui_keysym =3D 0;
+-    }
+-    if (qemu_console_is_graphic(NULL) && !gui_keysym) {
+-        sdl_process_key(&ev->key);
+-    }
+-}
+-
+-static void handle_mousemotion(SDL_Event *ev)
+-{
+-    int max_x, max_y;
+-
+-    if (qemu_console_is_graphic(NULL) &&
+-        (qemu_input_is_absolute() || absolute_enabled)) {
+-        max_x =3D real_screen->w - 1;
+-        max_y =3D real_screen->h - 1;
+-        if (gui_grab && (ev->motion.x =3D=3D 0 || ev->motion.y =3D=3D 0 =
+||
+-            ev->motion.x =3D=3D max_x || ev->motion.y =3D=3D max_y)) {
+-            sdl_grab_end();
+-        }
+-        if (!gui_grab &&
+-            (ev->motion.x > 0 && ev->motion.x < max_x &&
+-            ev->motion.y > 0 && ev->motion.y < max_y)) {
+-            sdl_grab_start();
+-        }
+-    }
+-    if (gui_grab || qemu_input_is_absolute() || absolute_enabled) {
+-        sdl_send_mouse_event(ev->motion.xrel, ev->motion.yrel,
+-                             ev->motion.x, ev->motion.y, ev->motion.stat=
+e);
+-    }
+-}
+-
+-static void handle_mousebutton(SDL_Event *ev)
+-{
+-    int buttonstate =3D SDL_GetMouseState(NULL, NULL);
+-    SDL_MouseButtonEvent *bev;
+-
+-    if (!qemu_console_is_graphic(NULL)) {
+-        return;
+-    }
+-
+-    bev =3D &ev->button;
+-    if (!gui_grab && !qemu_input_is_absolute()) {
+-        if (ev->type =3D=3D SDL_MOUSEBUTTONUP && bev->button =3D=3D SDL_=
+BUTTON_LEFT) {
+-            /* start grabbing all events */
+-            sdl_grab_start();
+-        }
+-    } else {
+-        if (ev->type =3D=3D SDL_MOUSEBUTTONDOWN) {
+-            buttonstate |=3D SDL_BUTTON(bev->button);
+-        } else {
+-            buttonstate &=3D ~SDL_BUTTON(bev->button);
+-        }
+-        sdl_send_mouse_event(0, 0, bev->x, bev->y, buttonstate);
+-    }
+-}
+-
+-static void handle_activation(SDL_Event *ev)
+-{
+-#ifdef _WIN32
+-    /* Disable grab if the window no longer has the focus
+-     * (Windows-only workaround) */
+-    if (gui_grab && ev->active.state =3D=3D SDL_APPINPUTFOCUS &&
+-        !ev->active.gain && !gui_fullscreen) {
+-        sdl_grab_end();
+-    }
+-#endif
+-    if (!gui_grab && ev->active.gain && qemu_console_is_graphic(NULL) &&
+-        (qemu_input_is_absolute() || absolute_enabled)) {
+-        absolute_mouse_grab();
+-    }
+-    if (ev->active.state & SDL_APPACTIVE) {
+-        if (ev->active.gain) {
+-            /* Back to default interval */
+-            update_displaychangelistener(dcl, GUI_REFRESH_INTERVAL_DEFAU=
+LT);
+-        } else {
+-            /* Sleeping interval.  Not using the long default here as
+-             * sdl_refresh does not only update the guest screen, but
+-             * also checks for gui events. */
+-            update_displaychangelistener(dcl, 500);
+-        }
+-    }
+-}
+-
+-static void sdl_refresh(DisplayChangeListener *dcl)
+-{
+-    SDL_Event ev1, *ev =3D &ev1;
+-    bool allow_close =3D true;
+-    int idle =3D 1;
+-
+-    if (last_vm_running !=3D runstate_is_running()) {
+-        last_vm_running =3D runstate_is_running();
+-        sdl_update_caption();
+-    }
+-
+-    graphic_hw_update(NULL);
+-    SDL_EnableUNICODE(!qemu_console_is_graphic(NULL));
+-
+-    while (SDL_PollEvent(ev)) {
+-        switch (ev->type) {
+-        case SDL_VIDEOEXPOSE:
+-            sdl_update(dcl, 0, 0, real_screen->w, real_screen->h);
+-            break;
+-        case SDL_KEYDOWN:
+-            idle =3D 0;
+-            handle_keydown(ev);
+-            break;
+-        case SDL_KEYUP:
+-            idle =3D 0;
+-            handle_keyup(ev);
+-            break;
+-        case SDL_QUIT:
+-            if (opts->has_window_close && !opts->window_close) {
+-                allow_close =3D false;
+-            }
+-            if (allow_close) {
+-                no_shutdown =3D 0;
+-                qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
+-            }
+-            break;
+-        case SDL_MOUSEMOTION:
+-            idle =3D 0;
+-            handle_mousemotion(ev);
+-            break;
+-        case SDL_MOUSEBUTTONDOWN:
+-        case SDL_MOUSEBUTTONUP:
+-            idle =3D 0;
+-            handle_mousebutton(ev);
+-            break;
+-        case SDL_ACTIVEEVENT:
+-            handle_activation(ev);
+-            break;
+-        case SDL_VIDEORESIZE:
+-            sdl_scale(ev->resize.w, ev->resize.h);
+-            graphic_hw_invalidate(NULL);
+-            graphic_hw_update(NULL);
+-            break;
+-        default:
+-            break;
+-        }
+-    }
+-
+-    if (idle) {
+-        if (idle_counter < SDL_MAX_IDLE_COUNT) {
+-            idle_counter++;
+-            if (idle_counter >=3D SDL_MAX_IDLE_COUNT) {
+-                dcl->update_interval =3D GUI_REFRESH_INTERVAL_DEFAULT;
+-            }
+-        }
+-    } else {
+-        idle_counter =3D 0;
+-        dcl->update_interval =3D SDL_REFRESH_INTERVAL_BUSY;
+-    }
+-}
+-
+-static void sdl_mouse_warp(DisplayChangeListener *dcl,
+-                           int x, int y, int on)
+-{
+-    if (on) {
+-        if (!guest_cursor)
+-            sdl_show_cursor();
+-        if (gui_grab || qemu_input_is_absolute() || absolute_enabled) {
+-            SDL_SetCursor(guest_sprite);
+-            if (!qemu_input_is_absolute() && !absolute_enabled) {
+-                SDL_WarpMouse(x, y);
+-            }
+-        }
+-    } else if (gui_grab)
+-        sdl_hide_cursor();
+-    guest_cursor =3D on;
+-    guest_x =3D x, guest_y =3D y;
+-}
+-
+-static void sdl_mouse_define(DisplayChangeListener *dcl,
+-                             QEMUCursor *c)
+-{
+-    uint8_t *image, *mask;
+-    int bpl;
+-
+-    if (guest_sprite)
+-        SDL_FreeCursor(guest_sprite);
+-
+-    bpl =3D cursor_get_mono_bpl(c);
+-    image =3D g_malloc0(bpl * c->height);
+-    mask  =3D g_malloc0(bpl * c->height);
+-    cursor_get_mono_image(c, 0x000000, image);
+-    cursor_get_mono_mask(c, 0, mask);
+-    guest_sprite =3D SDL_CreateCursor(image, mask, c->width, c->height,
+-                                    c->hot_x, c->hot_y);
+-    g_free(image);
+-    g_free(mask);
+-
+-    if (guest_cursor &&
+-            (gui_grab || qemu_input_is_absolute() || absolute_enabled))
+-        SDL_SetCursor(guest_sprite);
+-}
+-
+-static void sdl_cleanup(void)
+-{
+-    if (guest_sprite)
+-        SDL_FreeCursor(guest_sprite);
+-    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+-}
+-
+-static const DisplayChangeListenerOps dcl_ops =3D {
+-    .dpy_name             =3D "sdl",
+-    .dpy_gfx_update       =3D sdl_update,
+-    .dpy_gfx_switch       =3D sdl_switch,
+-    .dpy_gfx_check_format =3D sdl_check_format,
+-    .dpy_refresh          =3D sdl_refresh,
+-    .dpy_mouse_set        =3D sdl_mouse_warp,
+-    .dpy_cursor_define    =3D sdl_mouse_define,
+-};
+-
+-static void sdl1_display_init(DisplayState *ds, DisplayOptions *o)
+-{
+-    int flags;
+-    uint8_t data =3D 0;
+-    const SDL_VideoInfo *vi;
+-    SDL_SysWMinfo info;
+-    char *filename;
+-
+-    assert(o->type =3D=3D DISPLAY_TYPE_SDL);
+-    opts =3D o;
+-#if defined(__APPLE__)
+-    /* always use generic keymaps */
+-    if (!keyboard_layout)
+-        keyboard_layout =3D "en-us";
+-#endif
+-    if(keyboard_layout) {
+-        kbd_layout =3D init_keyboard_layout(name2keysym, keyboard_layout=
+);
+-        if (!kbd_layout)
+-            exit(1);
+-    }
+-
+-    g_printerr("Running QEMU with SDL 1.2 is deprecated, and will be rem=
+oved\n"
+-               "in a future release. Please switch to SDL 2.0 instead\n"=
+);
+-
+-    if (opts->has_full_screen && opts->full_screen) {
+-        setenv("SDL_VIDEO_ALLOW_SCREENSAVER", "1", 0);
+-    }
+-#ifdef __linux__
+-    /* on Linux, SDL may use fbcon|directfb|svgalib when run without
+-     * accessible $DISPLAY to open X11 window.  This is often the case
+-     * when qemu is run using sudo.  But in this case, and when actually
+-     * run in X11 environment, SDL fights with X11 for the video card,
+-     * making current display unavailable, often until reboot.
+-     * So make x11 the default SDL video driver if this variable is unse=
+t.
+-     * This is a bit hackish but saves us from bigger problem.
+-     * Maybe it's a good idea to fix this in SDL instead.
+-     */
+-    setenv("SDL_VIDEODRIVER", "x11", 0);
 -#endif
 -
-     vc =3D gd_vc_find_current(s);
-     gtk_widget_set_sensitive(s->view_menu, vc !=3D NULL);
- #ifdef CONFIG_VTE
+-    /* Enable normal up/down events for Caps-Lock and Num-Lock keys.
+-     * This requires SDL >=3D 1.2.14. */
+-    setenv("SDL_DISABLE_LOCK_KEYS", "1", 1);
+-
+-    flags =3D SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
+-    if (SDL_Init (flags)) {
+-        fprintf(stderr, "Could not initialize SDL(%s) - exiting\n",
+-                SDL_GetError());
+-        exit(1);
+-    }
+-    vi =3D SDL_GetVideoInfo();
+-    host_format =3D *(vi->vfmt);
+-
+-    keycode_map =3D sdl_get_keymap(&keycode_maplen);
+-
+-    /* Load a 32x32x4 image. White pixels are transparent. */
+-    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, "qemu-icon.bmp");
+-    if (filename) {
+-        SDL_Surface *image =3D SDL_LoadBMP(filename);
+-        if (image) {
+-            uint32_t colorkey =3D SDL_MapRGB(image->format, 255, 255, 25=
+5);
+-            SDL_SetColorKey(image, SDL_SRCCOLORKEY, colorkey);
+-            SDL_WM_SetIcon(image, NULL);
+-        }
+-        g_free(filename);
+-    }
+-
+-    if (opts->has_full_screen && opts->full_screen) {
+-        gui_fullscreen =3D 1;
+-        sdl_grab_start();
+-    }
+-
+-    dcl =3D g_new0(DisplayChangeListener, 1);
+-    dcl->ops =3D &dcl_ops;
+-    register_displaychangelistener(dcl);
+-
+-    mouse_mode_notifier.notify =3D sdl_mouse_mode_change;
+-    qemu_add_mouse_mode_change_notifier(&mouse_mode_notifier);
+-
+-    sdl_update_caption();
+-    SDL_EnableKeyRepeat(250, 50);
+-    gui_grab =3D 0;
+-
+-    sdl_cursor_hidden =3D SDL_CreateCursor(&data, &data, 8, 1, 0, 0);
+-    sdl_cursor_normal =3D SDL_GetCursor();
+-
+-    memset(&info, 0, sizeof(info));
+-    SDL_VERSION(&info.version);
+-    if (SDL_GetWMInfo(&info)) {
+-        int i;
+-        for (i =3D 0; ; i++) {
+-            /* All consoles share the same window */
+-            QemuConsole *con =3D qemu_console_lookup_by_index(i);
+-            if (con) {
+-#if defined(SDL_VIDEO_DRIVER_X11)
+-                qemu_console_set_window_id(con, info.info.x11.wmwindow);
+-#elif defined(SDL_VIDEO_DRIVER_NANOX) || \
+-      defined(SDL_VIDEO_DRIVER_WINDIB) || defined(SDL_VIDEO_DRIVER_DDRAW=
+) || \
+-      defined(SDL_VIDEO_DRIVER_GAPI) || \
+-      defined(SDL_VIDEO_DRIVER_RISCOS)
+-                qemu_console_set_window_id(con, (int) (uintptr_t) info.w=
+indow);
+-#else
+-                qemu_console_set_window_id(con, info.data);
+-#endif
+-            } else {
+-                break;
+-            }
+-        }
+-    }
+-
+-    atexit(sdl_cleanup);
+-}
+-
+-static QemuDisplay qemu_display_sdl1 =3D {
+-    .type       =3D DISPLAY_TYPE_SDL,
+-    .init       =3D sdl1_display_init,
+-};
+-
+-static void register_sdl1(void)
+-{
+-    qemu_display_register(&qemu_display_sdl1);
+-}
+-
+-type_init(register_sdl1);
+diff --git a/ui/sdl_zoom.c b/ui/sdl_zoom.c
+deleted file mode 100644
+index b96196bac5..0000000000
+--- a/ui/sdl_zoom.c
++++ /dev/null
+@@ -1,93 +0,0 @@
+-/*
+- * SDL_zoom - surface scaling
+- *=20
+- * Copyright (c) 2009 Citrix Systems, Inc.
+- *
+- * Derived from: SDL_rotozoom,  LGPL (c) A. Schiffler from the SDL_gfx l=
+ibrary.
+- * Modifications by Stefano Stabellini.
+- *
+- * This work is licensed under the terms of the GNU GPL version 2.
+- * See the COPYING file in the top-level directory.
+- *
+- */
+-
+-#include "qemu/osdep.h"
+-#include "sdl_zoom.h"
+-
+-static void sdl_zoom_rgb16(SDL_Surface *src, SDL_Surface *dst, int smoot=
+h,
+-                           SDL_Rect *dst_rect);
+-static void sdl_zoom_rgb32(SDL_Surface *src, SDL_Surface *dst, int smoot=
+h,
+-                           SDL_Rect *dst_rect);
+-
+-#define BPP 32
+-#include  "sdl_zoom_template.h"
+-#undef BPP
+-#define BPP 16
+-#include  "sdl_zoom_template.h"
+-#undef BPP
+-
+-int sdl_zoom_blit(SDL_Surface *src_sfc, SDL_Surface *dst_sfc, int smooth=
+,
+-                  SDL_Rect *in_rect)
+-{
+-    SDL_Rect zoom, src_rect;
+-    int extra;
+-
+-    /* Grow the size of the modified rectangle to avoid edge artefacts *=
+/
+-    src_rect.x =3D (in_rect->x > 0) ? (in_rect->x - 1) : 0;
+-    src_rect.y =3D (in_rect->y > 0) ? (in_rect->y - 1) : 0;
+-
+-    src_rect.w =3D in_rect->w + 1;
+-    if (src_rect.x + src_rect.w > src_sfc->w)
+-        src_rect.w =3D src_sfc->w - src_rect.x;
+-
+-    src_rect.h =3D in_rect->h + 1;
+-    if (src_rect.y + src_rect.h > src_sfc->h)
+-        src_rect.h =3D src_sfc->h - src_rect.y;
+-
+-    /* (x,y) : round down */
+-    zoom.x =3D (int)(((float)(src_rect.x * dst_sfc->w)) / (float)(src_sf=
+c->w));
+-    zoom.y =3D (int)(((float)(src_rect.y * dst_sfc->h)) / (float)(src_sf=
+c->h));
+-
+-    /* (w,h) : round up */
+-    zoom.w =3D (int)( ((double)((src_rect.w * dst_sfc->w) + (src_sfc->w =
+- 1))) /
+-                     (double)(src_sfc->w));
+-
+-    zoom.h =3D (int)( ((double)((src_rect.h * dst_sfc->h) + (src_sfc->h =
+- 1))) /
+-                     (double)(src_sfc->h));
+-
+-    /* Account for any (x,y) rounding by adding one-source-pixel's worth
+-     * of destination pixels and then edge checking.
+-     */
+-
+-    extra =3D ((dst_sfc->w-1) / src_sfc->w) + 1;
+-
+-    if ((zoom.x + zoom.w) < (dst_sfc->w - extra))
+-        zoom.w +=3D extra;
+-    else
+-        zoom.w =3D dst_sfc->w - zoom.x;
+-
+-    extra =3D ((dst_sfc->h-1) / src_sfc->h) + 1;
+-
+-    if ((zoom.y + zoom.h) < (dst_sfc->h - extra))
+-        zoom.h +=3D extra;
+-    else
+-        zoom.h =3D dst_sfc->h - zoom.y;
+-
+-    /* The rectangle (zoom.x, zoom.y, zoom.w, zoom.h) is the area on the
+-     * destination surface that needs to be updated.
+-     */
+-    if (src_sfc->format->BitsPerPixel =3D=3D 32)
+-        sdl_zoom_rgb32(src_sfc, dst_sfc, smooth, &zoom);
+-    else if (src_sfc->format->BitsPerPixel =3D=3D 16)
+-        sdl_zoom_rgb16(src_sfc, dst_sfc, smooth, &zoom);
+-    else {
+-        fprintf(stderr, "pixel format not supported\n");
+-        return -1;
+-    }
+-
+-    /* Return the rectangle of the update to the caller */
+-    *in_rect =3D zoom;
+-
+-    return 0;
+-}
+-
 diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 87212b62f2..a6a7228a06 100644
+index a6a7228a06..ab7571d734 100644
 --- a/qemu-deprecated.texi
 +++ b/qemu-deprecated.texi
-@@ -19,13 +19,6 @@ deprecated.
+@@ -17,15 +17,6 @@ they were first deprecated in the 2.10.0 release.
+ What follows is a list of all features currently marked as
+ deprecated.
 =20
- @section Build options
-=20
--@subsection GTK 2.x
+-@section Build options
 -
--Previously QEMU has supported building against both GTK 2.x
--and 3.x series APIs. Support for the GTK 2.x builds will be
--discontinued, so maintainers should switch to using GTK 3.x,
+-@subsection SDL 1.2
+-
+-Previously QEMU has supported building against both SDL 1.2
+-and 2.0 series APIs. Support for the SDL 1.2 builds will be
+-discontinued, so maintainers should switch to using SDL 2.0,
 -which is the default.
 -
- @subsection SDL 1.2
+ @section System emulator command line arguments
 =20
- Previously QEMU has supported building against both SDL 1.2
+ @subsection -no-kvm (since 1.3.0)
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+index 00f6976c30..9b6f0c6b67 100644
+--- a/ui/Makefile.objs
++++ b/ui/Makefile.objs
+@@ -17,15 +17,10 @@ common-obj-$(call lnot,$(CONFIG_VNC)) +=3D vnc-stubs.=
+o
+=20
+ # ui-sdl module
+ common-obj-$(CONFIG_SDL) +=3D sdl.mo
+-ifeq ($(CONFIG_SDLABI),1.2)
+-sdl.mo-objs :=3D sdl.o sdl_zoom.o
+-endif
+-ifeq ($(CONFIG_SDLABI),2.0)
+ sdl.mo-objs :=3D sdl2.o sdl2-input.o sdl2-2d.o
+ ifeq ($(CONFIG_OPENGL),y)
+ sdl.mo-objs +=3D sdl2-gl.o
+ endif
+-endif
+ sdl.mo-cflags :=3D $(SDL_CFLAGS)
+ sdl.mo-libs :=3D $(SDL_LIBS)
+=20
 --=20
 2.9.3
