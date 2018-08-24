@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8U1-0007QT-5F
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:23 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8U0-0007Pr-HE
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8Tz-0004D6-Pi
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8Ty-0004Bs-Vo
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:20 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44888)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44886)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ft8Tz-0004Bj-GO
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:19 -0400
+	id 1ft8Ty-00047W-J8
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:18 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8Ty-0006Xo-G8
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:18 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8Tx-0006XL-GI
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:17 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 10:33:19 +0100
-Message-Id: <20180824093343.11346-29-peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 10:33:18 +0100
+Message-Id: <20180824093343.11346-28-peter.maydell@linaro.org>
 In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
 References: <20180824093343.11346-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 28/52] hw/misc/iotkit: Wire up the sysctl and
- sysinfo register blocks
+Subject: [Qemu-devel] [PULL 27/52] hw/misc/iotkit-sysinfo: Implement IoTKit
+ system information block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +33,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Wire up the system control element's register banks
-(sysctl and sysinfo).
-
-This is the last of the previously completely unimplemented
-components in the IoTKit.
+Implement the IoTKit system control element's system information
+block; this is just a pair of read-only version/config registers,
+plus the usual PID/CID ID registers.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180820141116.9118-11-peter.maydell@linaro.org
+Message-id: 20180820141116.9118-10-peter.maydell@linaro.org
 ---
- include/hw/arm/iotkit.h |  6 +++++-
- hw/arm/iotkit.c         | 26 ++++++++++++++++++--------
- 2 files changed, 23 insertions(+), 9 deletions(-)
+ hw/misc/Makefile.objs            |   1 +
+ include/hw/misc/iotkit-sysinfo.h |  37 +++++++++
+ hw/misc/iotkit-sysinfo.c         | 128 +++++++++++++++++++++++++++++++
+ MAINTAINERS                      |   2 +
+ default-configs/arm-softmmu.mak  |   1 +
+ 5 files changed, 169 insertions(+)
+ create mode 100644 include/hw/misc/iotkit-sysinfo.h
+ create mode 100644 hw/misc/iotkit-sysinfo.c
 
-diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
-index 0f5c5101708..426dc326a0d 100644
---- a/include/hw/arm/iotkit.h
-+++ b/include/hw/arm/iotkit.h
-@@ -58,7 +58,8 @@
- #include "hw/timer/cmsdk-apb-timer.h"
- #include "hw/timer/cmsdk-apb-dualtimer.h"
- #include "hw/watchdog/cmsdk-apb-watchdog.h"
--#include "hw/misc/unimp.h"
-+#include "hw/misc/iotkit-sysctl.h"
-+#include "hw/misc/iotkit-sysinfo.h"
- #include "hw/or-irq.h"
- #include "hw/core/split-irq.h"
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index ac1f3bc030c..af2b503824e 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -67,6 +67,7 @@ obj-$(CONFIG_TZ_MPC) += tz-mpc.o
+ obj-$(CONFIG_TZ_PPC) += tz-ppc.o
+ obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
+ obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
++obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
  
-@@ -97,6 +98,9 @@ typedef struct IoTKit {
-     CMSDKAPBWatchdog nswatchdog;
-     CMSDKAPBWatchdog swatchdog;
- 
-+    IoTKitSysCtl sysctl;
-+    IoTKitSysCtl sysinfo;
+ obj-$(CONFIG_PVPANIC) += pvpanic.o
+ obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+diff --git a/include/hw/misc/iotkit-sysinfo.h b/include/hw/misc/iotkit-sysinfo.h
+new file mode 100644
+index 00000000000..7b2e1a5e48b
+--- /dev/null
++++ b/include/hw/misc/iotkit-sysinfo.h
+@@ -0,0 +1,37 @@
++/*
++ * ARM IoTKit system information block
++ *
++ * Copyright (c) 2018 Linaro Limited
++ * Written by Peter Maydell
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 or
++ *  (at your option) any later version.
++ */
 +
-     MemoryRegion container;
-     MemoryRegion alias1;
-     MemoryRegion alias2;
-diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
-index cb0ec456f39..f8276b5425c 100644
---- a/hw/arm/iotkit.c
-+++ b/hw/arm/iotkit.c
-@@ -16,7 +16,6 @@
- #include "hw/sysbus.h"
- #include "hw/registerfields.h"
- #include "hw/arm/iotkit.h"
--#include "hw/misc/unimp.h"
- #include "hw/arm/arm.h"
- 
- /* Clock frequency in HZ of the 32KHz "slow clock" */
-@@ -151,6 +150,10 @@ static void iotkit_init(Object *obj)
-                           sizeof(s->nswatchdog), TYPE_CMSDK_APB_WATCHDOG);
-     sysbus_init_child_obj(obj, "swatchdog", &s->swatchdog,
-                           sizeof(s->swatchdog), TYPE_CMSDK_APB_WATCHDOG);
-+    sysbus_init_child_obj(obj, "iotkit-sysctl", &s->sysctl,
-+                          sizeof(s->sysctl), TYPE_IOTKIT_SYSCTL);
-+    sysbus_init_child_obj(obj, "iotkit-sysinfo", &s->sysinfo,
-+                          sizeof(s->sysinfo), TYPE_IOTKIT_SYSINFO);
-     object_initialize_child(obj, "nmi-orgate", &s->nmi_orgate,
-                             sizeof(s->nmi_orgate), TYPE_OR_IRQ,
-                             &error_abort, NULL);
-@@ -516,13 +519,20 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
-                           qdev_get_gpio_in_named(dev_apb_ppc1,
-                                                  "cfg_sec_resp", 0));
- 
--    /* Using create_unimplemented_device() maps the stub into the
--     * system address space rather than into our container, but the
--     * overall effect to the guest is the same.
--     */
--    create_unimplemented_device("SYSINFO", 0x40020000, 0x1000);
--
--    create_unimplemented_device("SYSCONTROL", 0x50021000, 0x1000);
-+    object_property_set_bool(OBJECT(&s->sysinfo), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
++/*
++ * This is a model of the "system information block" which is part of the
++ * Arm IoTKit and documented in
++ * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
++ * QEMU interface:
++ *  + sysbus MMIO region 0: the system information register bank
++ */
++
++#ifndef HW_MISC_IOTKIT_SYSINFO_H
++#define HW_MISC_IOTKIT_SYSINFO_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_IOTKIT_SYSINFO "iotkit-sysinfo"
++#define IOTKIT_SYSINFO(obj) OBJECT_CHECK(IoTKitSysInfo, (obj), \
++                                        TYPE_IOTKIT_SYSINFO)
++
++typedef struct IoTKitSysInfo {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++    MemoryRegion iomem;
++} IoTKitSysInfo;
++
++#endif
+diff --git a/hw/misc/iotkit-sysinfo.c b/hw/misc/iotkit-sysinfo.c
+new file mode 100644
+index 00000000000..78955bc45f5
+--- /dev/null
++++ b/hw/misc/iotkit-sysinfo.c
+@@ -0,0 +1,128 @@
++/*
++ * ARM IoTKit system information block
++ *
++ * Copyright (c) 2018 Linaro Limited
++ * Written by Peter Maydell
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 or
++ *  (at your option) any later version.
++ */
++
++/*
++ * This is a model of the "system information block" which is part of the
++ * Arm IoTKit and documented in
++ * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
++ * It consists of 2 read-only version/config registers, plus the
++ * usual ID registers.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "trace.h"
++#include "qapi/error.h"
++#include "sysemu/sysemu.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/misc/iotkit-sysinfo.h"
++
++REG32(SYS_VERSION, 0x0)
++REG32(SYS_CONFIG, 0x4)
++REG32(PID4, 0xfd0)
++REG32(PID5, 0xfd4)
++REG32(PID6, 0xfd8)
++REG32(PID7, 0xfdc)
++REG32(PID0, 0xfe0)
++REG32(PID1, 0xfe4)
++REG32(PID2, 0xfe8)
++REG32(PID3, 0xfec)
++REG32(CID0, 0xff0)
++REG32(CID1, 0xff4)
++REG32(CID2, 0xff8)
++REG32(CID3, 0xffc)
++
++/* PID/CID values */
++static const int sysinfo_id[] = {
++    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
++    0x58, 0xb8, 0x0b, 0x00, /* PID0..PID3 */
++    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
++};
++
++static uint64_t iotkit_sysinfo_read(void *opaque, hwaddr offset,
++                                    unsigned size)
++{
++    uint64_t r;
++
++    switch (offset) {
++    case A_SYS_VERSION:
++        r = 0x41743;
++        break;
++
++    case A_SYS_CONFIG:
++        r = 0x31;
++        break;
++    case A_PID4 ... A_CID3:
++        r = sysinfo_id[(offset - A_PID4) / 4];
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "IoTKit SysInfo read: bad offset %x\n", (int)offset);
++        r = 0;
++        break;
 +    }
-+    /* System information registers */
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysinfo), 0, 0x40020000);
-+    /* System control registers */
-+    object_property_set_bool(OBJECT(&s->sysctl), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctl), 0, 0x50021000);
++    trace_iotkit_sysinfo_read(offset, r, size);
++    return r;
++}
++
++static void iotkit_sysinfo_write(void *opaque, hwaddr offset,
++                                 uint64_t value, unsigned size)
++{
++    trace_iotkit_sysinfo_write(offset, value, size);
++
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "IoTKit SysInfo: write to RO offset 0x%x\n", (int)offset);
++}
++
++static const MemoryRegionOps iotkit_sysinfo_ops = {
++    .read = iotkit_sysinfo_read,
++    .write = iotkit_sysinfo_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    /* byte/halfword accesses are just zero-padded on reads and writes */
++    .impl.min_access_size = 4,
++    .impl.max_access_size = 4,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
++};
++
++static void iotkit_sysinfo_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    IoTKitSysInfo *s = IOTKIT_SYSINFO(obj);
++
++    memory_region_init_io(&s->iomem, obj, &iotkit_sysinfo_ops,
++                          s, "iotkit-sysinfo", 0x1000);
++    sysbus_init_mmio(sbd, &s->iomem);
++}
++
++static void iotkit_sysinfo_class_init(ObjectClass *klass, void *data)
++{
++    /*
++     * This device has no guest-modifiable state and so it
++     * does not need a reset function or VMState.
++     */
++}
++
++static const TypeInfo iotkit_sysinfo_info = {
++    .name = TYPE_IOTKIT_SYSINFO,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(IoTKitSysInfo),
++    .instance_init = iotkit_sysinfo_init,
++    .class_init = iotkit_sysinfo_class_init,
++};
++
++static void iotkit_sysinfo_register_types(void)
++{
++    type_register_static(&iotkit_sysinfo_info);
++}
++
++type_init(iotkit_sysinfo_register_types);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index ea35aa2cca5..cb780f463cb 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -541,6 +541,8 @@ F: hw/arm/iotkit.c
+ F: include/hw/arm/iotkit.h
+ F: hw/misc/iotkit-sysctl.c
+ F: include/hw/misc/iotkit-sysctl.h
++F: hw/misc/iotkit-sysinfo.c
++F: include/hw/misc/iotkit-sysinfo.h
  
-     /* This OR gate wires together outputs from the secure watchdogs to NMI */
-     object_property_set_int(OBJECT(&s->nmi_orgate), 2, "num-lines", &err);
+ Musicpal
+ M: Jan Kiszka <jan.kiszka@web.de>
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 79aac7702a9..ebbdcb29f38 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -115,6 +115,7 @@ CONFIG_TZ_PPC=y
+ CONFIG_IOTKIT=y
+ CONFIG_IOTKIT_SECCTL=y
+ CONFIG_IOTKIT_SYSCTL=y
++CONFIG_IOTKIT_SYSINFO=y
+ 
+ CONFIG_VERSATILE=y
+ CONFIG_VERSATILE_PCI=y
 -- 
 2.18.0
