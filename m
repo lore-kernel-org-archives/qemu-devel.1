@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ft8Bu-0006QK-QI
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:15:39 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1ft8FH-0007hk-0I
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ft8Bt-0002cT-EX
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:15:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38448 helo=mx1.redhat.com)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1ft8FB-00058e-PV
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:19:05 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:32928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ft8Bt-0002c8-9M
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:15:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F09B87DAC9
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 09:15:36 +0000 (UTC)
-Date: Fri, 24 Aug 2018 11:15:34 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180824111534.7e833a0b@redhat.com>
-In-Reply-To: <20180823180307.GQ3778@localhost.localdomain>
-References: <1535035877-219196-1-git-send-email-imammedo@redhat.com>
-	<fb74bf2d-6973-9c2d-d799-8d16561c0265@redhat.com>
-	<20180823180307.GQ3778@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vl.c: make sure maxcpus matches topology
- to prevent migration failure
+	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
+	id 1ft8FB-00054X-Cq
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:19:01 -0400
+Date: Fri, 24 Aug 2018 17:18:45 +0800 (CST)
+Message-ID: <201808241718451351057@zte.com.cn>
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V3_2/4=5D_target-i386=3Aadd_coal?=
+ =?utf-8?q?esced=5Fpio_API?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: ehabkost@redhat.com
+Cc: pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-On Thu, 23 Aug 2018 15:03:07 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Thu, Aug 23, 2018 at 06:32:41PM +0200, Paolo Bonzini wrote:
-> > On 23/08/2018 16:51, Igor Mammedov wrote:  
-> > > Topology (threads*cores*sockets) must match maxcpus to be valid,
-> > > otherwise we could start QEMU with invalid topology that throws
-> > > a error on migration destination side, that should not be reachable:
-> > > Source:
-> > >   -smp 8,maxcpus=64,cores=1,threads=8,sockets=1
-> > > // hotplug cpus upto maxcpus
-> > > Destination:
-> > >   -smp 64,maxcpus=64,cores=1,threads=8,sockets=1
-> > >   qemu: cpu topology: sockets (1) * cores (1) * threads (8) < smp_cpus (64)  
-> > 
-> > The destination should have sockets=8, shouldn't it?
-> > 
-> > It seems to me that, at startup, you should have cpus = s*t*c and cpus
-> > <= maxcpus.  Currently we check cpus <= s*t*c <= maxcpus, which doesn't
-> > make much sense.  
-> 
-> Most of the incompleteness of input validation at smp_parse() can
-> be explained by our fear of breaking existing configurations and
-> making existing running VMs not runnable.
-> 
-> But now we have a deprecation policy.  If we're still afraid of
-> breaking peoples' existing configurations, we should at least
-> deprecate those configurations as soon as possible (and make QEMU
-> at least emit a warning).
-Sure, I can send a deprecation patch first.
+PiBPbiBGcmksIEF1ZyAyNCwgMjAxOCBhdCAxMjoxNDo0N0FNICswODAwLCBQZW5nIEhhbyB3cm90
+ZToKPiA+IFNpZ25lZC1vZmYtYnk6IFBlbmcgSGFvIDxwZW5nLmhhbzJAenRlLmNvbS5jbj4KPiA+
+IC0tLQo+ID4gIGFjY2VsL2t2bS9rdm0tYWxsLmMgICAgIHwgNTggKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLQo+ID4gIGluY2x1ZGUvZXhlYy9tZW1hdHRy
+cy5oIHwgIDIgKy0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDUzIGluc2VydGlvbnMoKyksIDcgZGVs
+ZXRpb25zKC0pCj4gPiAKCj4+IEBAIC01MzYsNyArNTM3LDcgQEAgc3RhdGljIHZvaWQga3ZtX2Nv
+YWxlc2NlX21taW9fcmVnaW9uKE1lbW9yeUxpc3RlbmVyICpsaXN0ZW5lciwKPiA+ICAKPiA+ICAg
+ICAgICAgIHpvbmUuYWRkciA9IHN0YXJ0Owo+ID4gICAgICAgICAgem9uZS5zaXplID0gc2l6ZTsK
+PiA+IC0gICAgICAgIHpvbmUucGFkID0gMDsKPiA+ICsgICAgICAgIHpvbmUucGlvID0gMDsKPiA+
+ICAKPiA+ICAgICAgICAgICh2b2lkKWt2bV92bV9pb2N0bChzLCBLVk1fUkVHSVNURVJfQ09BTEVT
+Q0VEX01NSU8sICZ6b25lKTsKPiA+ICAgICAgfQo+ID4gQEAgLTU1MywxMiArNTU0LDUxIEBAIHN0
+YXRpYyB2b2lkIGt2bV91bmNvYWxlc2NlX21taW9fcmVnaW9uKE1lbW9yeUxpc3RlbmVyICpsaXN0
+ZW5lciwKPiA+ICAKPiA+ICAgICAgICAgIHpvbmUuYWRkciA9IHN0YXJ0Owo+ID4gICAgICAgICAg
+em9uZS5zaXplID0gc2l6ZTsKPiA+IC0gICAgICAgIHpvbmUucGFkID0gMDsKPiA+ICsgICAgICAg
+IHpvbmUucGlvID0gMDsKPiA+ICAKPiA+ICAgICAgICAgICh2b2lkKWt2bV92bV9pb2N0bChzLCBL
+Vk1fVU5SRUdJU1RFUl9DT0FMRVNDRURfTU1JTywgJnpvbmUpOwo+ID4gICAgICB9Cj4gPiAgfQo+
+IAo+IFRoZSAyIGh1bmtzIGFib3ZlIG5lZWQgdG8gZ28gdG8gcGF0Y2ggMS80IHRvIGF2b2lkIGJy
+ZWFraW5nIHRoZQo+IGJ1aWxkIGFmdGVyIGFwcGx5aW5nIDEvNC4KPiAKPiBIb3dldmVyLCBwYXRj
+aCAxLzQgaXMganVzdCBhIGhlYWRlciB1cGRhdGUgYW5kIEkgZG9uJ3QgdGhpbmsKPiBydW5uaW5n
+IHVwZGF0ZS1saW51eC1oZWFkZXJzLnNoIHdhcyBzdXBwb3NlZCB0byBicmVhayB0aGUgYnVpbGQu
+Cj4gCj4gUmFkaW0gYXNrZWQgYWJvdXQgdGhpcyBhdDoKPiAgRGF0ZTogV2VkLCAxOCBKdWwgMjAx
+OCAxNjo0MzoxMSArMDIwMAogPiBTdWJqZWN0OiBSZTogW1BBVENIIHYyXSBLVk06IEFkZCBjb2Fs
+ZXNjZWQgUElPIHN1cHBvcnQKID4gTWVzc2FnZS1JRDogPDIwMTgwNzE4MTQ0MzExLkdCNjM0OEBm
+bGFzaz4KPiBQYW9sbywgZG8geW91IGhhdmUgYSBzdWdnZXN0aW9uIG9uIGhvdyB0byB1cGRhdGUg
+dGhlIHN0cnVjdAo+IHdpdGhvdXQgbWFraW5nIGEgaGVhZGVyIHVwZGF0ZSBicmVhayB0aGUgYnVp
+bGQ/Cj4gCgo+ID4gK3N0YXRpYyBNZW1vcnlMaXN0ZW5lciBrdm1fY29hbGVzY2VkX2lvX2xpc3Rl
+bmVyID0gewo+ID4gKyAgICAuY29hbGVzY2VkX21taW9fYWRkID0ga3ZtX2NvYWxlc2NlX2lvX2Fk
+ZCwKPiA+ICsgICAgLmNvYWxlc2NlZF9tbWlvX2RlbCA9IGt2bV9jb2FsZXNjZV9pb19kZWwsCgo+
+IE5pdDogSSB3b3VsZCByZW5hbWUgdGhlIGZpZWxkcyB0byAiY29hbGVzY2VkX21taW9fe2FkZCxk
+ZWx9IiB0bwo+IGNvYWxlc2NlZF9pb18qLCBiZWNhdXNlIHRoZXkgYXJlIG5vdCBzcGVjaWZpYyB0
+byBNTUlPIGFueW1vcmUuCgo+IEkgd291bGQgYWxzbyBuYW1lIHRoZSBmdW5jdGlvbnMga3ZtX2Nv
+YWxlc2NlX3Bpb197YWRkLGRlbH0KPiBiZWNhdXNlIHRoZSBhcmUgc3BlY2lmaWMgdG8gcGlvLgoK
+ICBJIHdpbGwgbW9kaWZ5IGluIG5leHQgcGF0Y2guIAoKPiA+ICt9Owo+ID4gKwo+ID4gIGludCBr
+dm1fY2hlY2tfZXh0ZW5zaW9uKEtWTVN0YXRlICpzLCB1bnNpZ25lZCBpbnQgZXh0ZW5zaW9uKQo+
+ID4gIHsKPiA+ICAgICAgaW50IHJldDsKPiA+IEBAIC0xNjE1LDcgKzE2NTUsOCBAQCBzdGF0aWMg
+aW50IGt2bV9pbml0KE1hY2hpbmVTdGF0ZSAqbXMpCgo+ID4gIAo+ID4gICAgICAgICAgICAgIGVu
+dCA9ICZyaW5nLT5jb2FsZXNjZWRfbW1pb1tyaW5nLT5maXJzdF07Cj4gPiAtCj4gPiAtICAgICAg
+ICAgICAgY3B1X3BoeXNpY2FsX21lbW9yeV93cml0ZShlbnQtPnBoeXNfYWRkciwgZW50LT5kYXRh
+LCBlbnQtPmxlbik7Cj4gPiArICAgICAgICAgICAgaWYgKGVudC0+cGlvID09IDEpIHsKPiA+ICsg
+ICAgICAgICAgICAgICAgYWRkcmVzc19zcGFjZV9ydygmYWRkcmVzc19zcGFjZV9pbywgZW50LT5w
+aHlzX2FkZHIsCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTUVNVFhBVFRS
+U19OT05FLCBlbnQtPmRhdGEsIGVudC0+bGVuLCB0cnVlKTsKCj4gV2h5IGV4YWN0bHkgTUVNVFhB
+VFRSU19OT05FIGlzIHRoZSByaWdodCBhdHRycyBhcmd1bWVudCBoZXJlPwo+IFdoeSBNRU1UWEFU
+VFJTX1VOU1BFQ0lGSUVEIHdvdWxkbid0IHdvcms/CgpJIGRpZG4ndCBub3RpY2UgTUVNVFhBVFRS
+U19OT05FIGlzIHRoZSBzYW1lIGFzIE1FTVRYQVRUUlNfVU5TUEVDSUZJRUQuCk1FTVRYQVRUUlNf
+Tk9ORSBpcyByZWR1bmRhbnQuCj4+ICsgICAgICAgICAgICB9IGVsc2Ugewo+PiArICAgICAgICAg
+ICAgICAgIGNwdV9waHlzaWNhbF9tZW1vcnlfd3JpdGUoZW50LT5waHlzX2FkZHIsIGVudC0+ZGF0
+YSwgZW50LT5sZW4pOwo+PiArICAgICAgICAgICAgfQo+PiAgICAgICAgICAgICAgc21wX3dtYigp
+Owo+PiAgICAgICAgICAgICAgcmluZy0+Zmlyc3QgPSAocmluZy0+Zmlyc3QgKyAxKSAlIEtWTV9D
+T0FMRVNDRURfTU1JT19NQVg7Cj4+ICAgICAgICAgIH0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUv
+ZXhlYy9tZW1hdHRycy5oIGIvaW5jbHVkZS9leGVjL21lbWF0dHJzLmgKPj4gaW5kZXggZDRhMTY0
+Mi4uMTJmZDY0ZiAxMDA2NDQKPj4gLS0tIGEvaW5jbHVkZS9leGVjL21lbWF0dHJzLmgKPj4gKysr
+IGIvaW5jbHVkZS9leGVjL21lbWF0dHJzLmgKPj4gQEAgLTQ1LDcgKzQ1LDcgQEAgdHlwZWRlZiBz
+dHJ1Y3QgTWVtVHhBdHRycyB7Cj4+ICAgKiBmcm9tICJkaWRuJ3Qgc3BlY2lmeSIgaWYgbmVjZXNz
+YXJ5KS4KPj4gICAqLwo+PiAgI2RlZmluZSBNRU1UWEFUVFJTX1VOU1BFQ0lGSUVEICgoTWVtVHhB
+dHRycykgeyAudW5zcGVjaWZpZWQgPSAxIH0pCj4+IC0KPj4gKyNkZWZpbmUgTUVNVFhBVFRSU19O
+T05FICgoTWVtVHhBdHRycykgeyAwIH0p
