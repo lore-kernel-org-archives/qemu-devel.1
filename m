@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ft3A8-0006P0-DO
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:53:33 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1ft3FZ-0000wG-Cw
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ft32M-0004jU-CI
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:45:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46528 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1ft3FU-0004FH-UK
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:59:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60732)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ft32M-0004io-7R
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:45:26 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6510140241E7
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 03:45:24 +0000 (UTC)
-Date: Fri, 24 Aug 2018 11:45:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180824034517.GF24044@xz-x1>
-References: <20180823143125.16767-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ft3FU-0004Es-KV
+	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:59:00 -0400
+Date: Fri, 24 Aug 2018 00:58:55 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180824035855.GT3778@localhost.localdomain>
+References: <1535040889-52782-1-git-send-email-peng.hao2@zte.com.cn>
+	<1535040889-52782-3-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180823143125.16767-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Fix socket chardev regression
+In-Reply-To: <1535040889-52782-3-git-send-email-peng.hao2@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V3 2/4] target-i386:add coalesced_pio API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +27,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-On Thu, Aug 23, 2018 at 04:31:20PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Hi,
->=20
-> In commit 25679e5d58e "chardev: tcp: postpone async connection setup"
-> (and its follow up 99f2f54174a59), Peter moved chardev socket
-> connection to machine_done event. However, chardev created later will
-> no longer attempt to connect, and chardev created in tests do not have
-> machine_done event (breaking some of vhost-user-test).
->=20
-> The goal was to move the "connect" source to the chardev frontend
-> context (the monitor thread context in his case). chr->gcontext is set
-> with qemu_chr_fe_set_handlers(). But there is no guarantee that the
-> function will be called in general, so we can't delay connection until
-> then: the chardev should still attempt to connect during open(), using
-> the main context.
->=20
-> An alternative would be to specify the iothread during chardev
-> creation. Setting up monitor OOB would be quite different too, it
-> would take the same iothread as argument.
->=20
-> 99f2f54174a595e is also a bit problematic, since it will behave
-> differently before and after machine_done (the first case gives a
-> chance to use a different context reliably, the second looks racy)
->=20
-> In the end, I am not sure this is all necessary, as chardev callbacks
-> are called after qemu_chr_fe_set_handlers(), at which point the
-> context of sources are updated. In "char-socket: update all ioc
-> handlers when changing context", I moved also the hup handler to the
-> updated context. So unless the main thread is already stuck, we can
-> setup a different context for the chardev at that time. Or not?
->=20
-> v2:
-> - fix a random socket chardev test failure
+On Fri, Aug 24, 2018 at 12:14:47AM +0800, Peng Hao wrote:
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> ---
+>  accel/kvm/kvm-all.c     | 58 ++++++++++++++++++++++++++++++++++++++++++++-----
+>  include/exec/memattrs.h |  2 +-
+>  2 files changed, 53 insertions(+), 7 deletions(-)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index eb7db92..830745e 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -78,6 +78,7 @@ struct KVMState
+>      int fd;
+>      int vmfd;
+>      int coalesced_mmio;
+> +    int coalesced_pio;
+>      struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
+>      bool coalesced_flush_in_progress;
+>      int vcpu_events;
+> @@ -536,7 +537,7 @@ static void kvm_coalesce_mmio_region(MemoryListener *listener,
+>  
+>          zone.addr = start;
+>          zone.size = size;
+> -        zone.pad = 0;
+> +        zone.pio = 0;
+>  
+>          (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
+>      }
+> @@ -553,12 +554,51 @@ static void kvm_uncoalesce_mmio_region(MemoryListener *listener,
+>  
+>          zone.addr = start;
+>          zone.size = size;
+> -        zone.pad = 0;
+> +        zone.pio = 0;
+>  
+>          (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
+>      }
+>  }
 
-I have no problem on patch 3-5, but aren't patch 1-2 still breaking
-the context switch of chardev?  Or did I misunderstood?
+The 2 hunks above need to go to patch 1/4 to avoid breaking the
+build after applying 1/4.
 
-Regards,
+However, patch 1/4 is just a header update and I don't think
+running update-linux-headers.sh was supposed to break the build.
 
---=20
-Peter Xu
+Radim asked about this at:
+
+ Date: Wed, 18 Jul 2018 16:43:11 +0200
+ Subject: Re: [PATCH v2] KVM: Add coalesced PIO support
+ Message-ID: <20180718144311.GB6348@flask>
+
+Paolo, do you have a suggestion on how to update the struct
+without making a header update break the build?
+
+
+>  
+> +static void kvm_coalesce_io_add(MemoryListener *listener,
+> +                                MemoryRegionSection *section,
+> +                                hwaddr start, hwaddr size)
+> +{
+> +    KVMState *s = kvm_state;
+> +
+> +    if (s->coalesced_pio) {
+> +        struct kvm_coalesced_mmio_zone zone;
+> +
+> +        zone.addr = start;
+> +        zone.size = size;
+> +        zone.pio = 1;
+> +
+> +        (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
+> +    }
+> +}
+> +
+> +static void kvm_coalesce_io_del(MemoryListener *listener,
+> +                                MemoryRegionSection *section,
+> +                                hwaddr start, hwaddr size)
+> +{
+> +    KVMState *s = kvm_state;
+> +
+> +    if (s->coalesced_pio) {
+> +        struct kvm_coalesced_mmio_zone zone;
+> +
+> +        zone.addr = start;
+> +        zone.size = size;
+> +        zone.pio = 1;
+> +
+> +        (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
+> +     }
+> +}
+> +
+> +static MemoryListener kvm_coalesced_io_listener = {
+> +    .coalesced_mmio_add = kvm_coalesce_io_add,
+> +    .coalesced_mmio_del = kvm_coalesce_io_del,
+
+Nit: I would rename the fields to "coalesced_mmio_{add,del}" to
+coalesced_io_*, because they are not specific to MMIO anymore.
+
+I would also name the functions kvm_coalesce_pio_{add,del}
+because the are specific to pio.
+
+
+> +};
+> +
+>  int kvm_check_extension(KVMState *s, unsigned int extension)
+>  {
+>      int ret;
+> @@ -1615,7 +1655,8 @@ static int kvm_init(MachineState *ms)
+>      }
+>  
+>      s->coalesced_mmio = kvm_check_extension(s, KVM_CAP_COALESCED_MMIO);
+> -
+> +    s->coalesced_pio = s->coalesced_mmio &&
+> +                       kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
+
+Nit: I would keep the blank line here.
+
+>  #ifdef KVM_CAP_VCPU_EVENTS
+>      s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
+>  #endif
+> @@ -1694,7 +1735,8 @@ static int kvm_init(MachineState *ms)
+>                                   &address_space_memory, 0);
+>      memory_listener_register(&kvm_io_listener,
+>                               &address_space_io);
+> -
+> +    memory_listener_register(&kvm_coalesced_io_listener,
+> +                             &address_space_io);
+
+Nit: I would keep the blank line here.
+
+>      s->many_ioeventfds = kvm_check_many_ioeventfds();
+>  
+>      s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
+> @@ -1775,8 +1817,12 @@ void kvm_flush_coalesced_mmio_buffer(void)
+>              struct kvm_coalesced_mmio *ent;
+>  
+>              ent = &ring->coalesced_mmio[ring->first];
+> -
+> -            cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
+> +            if (ent->pio == 1) {
+> +                address_space_rw(&address_space_io, ent->phys_addr,
+> +                                 MEMTXATTRS_NONE, ent->data, ent->len, true);
+
+Why exactly MEMTXATTRS_NONE is the right attrs argument here?
+Why MEMTXATTRS_UNSPECIFIED wouldn't work?
+
+
+> +            } else {
+> +                cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
+> +            }
+>              smp_wmb();
+>              ring->first = (ring->first + 1) % KVM_COALESCED_MMIO_MAX;
+>          }
+> diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+> index d4a1642..12fd64f 100644
+> --- a/include/exec/memattrs.h
+> +++ b/include/exec/memattrs.h
+> @@ -45,7 +45,7 @@ typedef struct MemTxAttrs {
+>   * from "didn't specify" if necessary).
+>   */
+>  #define MEMTXATTRS_UNSPECIFIED ((MemTxAttrs) { .unspecified = 1 })
+> -
+> +#define MEMTXATTRS_NONE ((MemTxAttrs) { 0 })
+
+Nit: I would keep the blank line here.
+
+>  /* New-style MMIO accessors can indicate that the transaction failed.
+>   * A zero (MEMTX_OK) response means success; anything else is a failure
+>   * of some kind. The memory subsystem will bitwise-OR together results
+> -- 
+> 1.8.3.1
+> 
+
+-- 
+Eduardo
