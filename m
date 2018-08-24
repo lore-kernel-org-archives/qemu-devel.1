@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftAO4-0007Vb-TM
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 07:36:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ftAPo-000886-9H
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 07:38:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftAO1-0004Mh-MJ
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 07:36:20 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180817171932.31976-1-marcandre.lureau@redhat.com>
-	<20180817171932.31976-2-marcandre.lureau@redhat.com>
-	<87in40b3fc.fsf@dusky.pond.sub.org>
-	<CAJ+F1CLdS0V0wGjHS0eUe=VV0ExsTp+Bk09TTJn9Rm5A_DRjCg@mail.gmail.com>
-Date: Fri, 24 Aug 2018 13:30:51 +0200
-In-Reply-To: <CAJ+F1CLdS0V0wGjHS0eUe=VV0ExsTp+Bk09TTJn9Rm5A_DRjCg@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 24 Aug 2018
-	10:45:44 +0200")
-Message-ID: <87wosg80ic.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1ftAPl-0005uQ-2E
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 07:38:08 -0400
+Date: Fri, 24 Aug 2018 13:37:57 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180824133757.1cbdba75.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] qdict: add qdict_steal()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [RFD] [s390x] Tweaking the s390x maintainership setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,116 +20,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, QEMU <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Hi all,
 
-> Hi
->
-> On Fri, Aug 24, 2018 at 10:05 AM Markus Armbruster <armbru@redhat.com> wr=
-ote:
->>
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->> > Add a new function qdict_steal(), that deletes a key from a dict, and
->> > returns the associated value, if any. Simplify related code.
->> >
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> > ---
->> >  include/qapi/qmp/qdict.h |  1 +
->> >  monitor.c                |  3 +--
->> >  qobject/block-qdict.c    |  7 ++-----
->> >  qobject/qdict.c          | 22 ++++++++++++++++++++++
->> >  4 files changed, 26 insertions(+), 7 deletions(-)
->>
->> Missing: tests/check-qdict.c update.
->
-> ok
->
->>
->> > diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
->> > index 7f3ec10a10..84644bfba6 100644
->> > --- a/include/qapi/qmp/qdict.h
->> > +++ b/include/qapi/qmp/qdict.h
->> > @@ -37,6 +37,7 @@ QObject *qdict_entry_value(const QDictEntry *entry);
->> >  size_t qdict_size(const QDict *qdict);
->> >  void qdict_put_obj(QDict *qdict, const char *key, QObject *value);
->> >  void qdict_del(QDict *qdict, const char *key);
->> > +QObject *qdict_steal(QDict *qdict, const char *key);
->> >  int qdict_haskey(const QDict *qdict, const char *key);
->> >  QObject *qdict_get(const QDict *qdict, const char *key);
->> >  bool qdict_is_equal(const QObject *x, const QObject *y);
->> > diff --git a/monitor.c b/monitor.c
->> > index a1999e396c..eab2dc7b7b 100644
->> > --- a/monitor.c
->> > +++ b/monitor.c
->> > @@ -4262,8 +4262,7 @@ static void handle_qmp_command(JSONMessageParser=
- *parser, GQueue *tokens)
->> >
->> >      qdict =3D qobject_to(QDict, req);
->> >      if (qdict) {
->> > -        id =3D qobject_ref(qdict_get(qdict, "id"));
->> > -        qdict_del(qdict, "id");
->> > +        id =3D qdict_steal(qdict, "id");
->> >      } /* else will fail qmp_dispatch() */
->> >
->> >      if (req && trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAN=
-D)) {
->> > diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
->> > index 42054cc274..a07664ee6a 100644
->> > --- a/qobject/block-qdict.c
->> > +++ b/qobject/block-qdict.c
->> > @@ -692,8 +692,6 @@ void qdict_join(QDict *dest, QDict *src, bool over=
-write)
->> >   */
->> >  bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Err=
-or **errp)
->> >  {
->> > -    QObject *qobj;
->> > -
->> >      while (renames->from) {
->> >          if (qdict_haskey(qdict, renames->from)) {
->> >              if (qdict_haskey(qdict, renames->to)) {
->> > @@ -702,9 +700,8 @@ bool qdict_rename_keys(QDict *qdict, const QDictRe=
-names *renames, Error **errp)
->> >                  return false;
->> >              }
->> >
->> > -            qobj =3D qdict_get(qdict, renames->from);
->> > -            qdict_put_obj(qdict, renames->to, qobject_ref(qobj));
->> > -            qdict_del(qdict, renames->from);
->> > +            qdict_put_obj(qdict, renames->to,
->> > +                          qdict_steal(qdict, renames->from));
->> >          }
->> >
->> >          renames++;
->>
->> How did you find possible uses for qdict_steal()?
->
-> manual review
+while I think the current s390x maintainership setup is working quite
+well, there's probably still room for improvement. In particular, I'd
+like to spread out the work a bit more and make it easy to test things
+pre-integration in an automated way.
 
-Okay.  I expected a few more than two.
+As a recap, how it works today:
 
->> > diff --git a/qobject/qdict.c b/qobject/qdict.c
->> > index 3d8c2f7bbc..322f23f094 100644
->> > --- a/qobject/qdict.c
->> > +++ b/qobject/qdict.c
->> > @@ -406,6 +406,28 @@ void qdict_del(QDict *qdict, const char *key)
->> >      }
->> >  }
->> >
->> > +/**
->> > + * qdict_steal(): Steal a 'key:value' pair from the dictionary
->>
->> "Steal" is cute, but perhaps qdict_get_and_del() would be clearer.
->
-> "steal" is common in glib. I don't mind renaming.
+- We have designated maintainers for some major areas:
+  * tcg
+  * KVM
+  * s390 virtio-ccw machine
+  * s390 bios
+  * vfio-ccw
+  * virtio-ccw
 
-Hmm.  I found g_hash_table_steal(), but it's a bit different: it
-"Removes a key and its associated value from a GHashTable without
-calling the key and value destroy functions" (that part seems close
-enough), but returns a bool rather than the value.  Feels like sub-par
-design to me.  Is this the precedence you have in mind?
+- I'm acting as overall s390x maintainer, queuing patches onto my
+  s390-next branch (s390-fixes for fixes during freeze) and sometimes
+  pulling s390 bios updates (if I don't apply them myself). I'm
+  generally the only person that sends pull requests for master.
 
-[...]
+Some problems I've noted:
+
+* The bus factor -- or, put in a less dramatic way, what happens when
+  I'm sick or on vacation? For fixes during freeze, there's no problem
+  if the other maintainers submit them directly, but I really don't want
+  to be the single point of failure (plus, I'm the only person listed
+  as vfio-ccw maintainer).
+* The IBM folks can't do tcg.
+* Conversely, the non-IBM folks cannot review things that don't have
+  public documentation (yet), other than in a very general way.
+* I don't want to pick everything myself :) Especially when I basically
+  rely on other people noticing problems in the first place (like with
+  the non-public things or code areas I'm not so familiar with).
+* Testing seems to be a bit ad hoc. It would be nice to have a branch
+  that (semi) automated tests can be run on before things hit upstream,
+  and that is also created on top of current master. (I usually only
+  rebase the pushed-out s390-next branch when I apply new patches, and
+  sometimes not even then.) Oh, and other people testing things,
+  especially on different hardware.
+
+So, here are some ideas I had on how to improve things:
+
+* Split up maintainership a bit more. For example, split out areas like
+  pci for which no public documentation is available; these need to
+  have at least one IBM maintainer. Another candidate would maybe be
+  the cpu model.
+* On a related note, more maintainers from IBM would be nice :) For
+  example, for vfio-ccw, where I'm the only maintainer... Some R:
+  entries would not hurt, either.
+* More trees to pull from. Of course, not every area needs a dedicated
+  tree (that would become silly pretty quickly), but for example a tcg
+  tree would be nice. I can still pick individual patches if a pull
+  request would be overkill.
+* I'd also like to have a designated backup for the overall
+  maintainership, especially for when I'm on vacation (like the first
+  two weeks of September, just to let you know :) or otherwise
+  unavailable, but also for sanity. Likely needs to be a non-IBMer due
+  to the tcg problem.
+* A more predictable s390-next would be nice. Maybe have it
+  (semi-)automatically created out of the different trees, on top of
+  current master? I would start to apply patches on a new branch that
+  feeds into s390-next rather than on s390-next directly, then.
+* Do something about (semi-)consolidated, (semi-)automatic testing.
+  Like hooking into Travis (or something similar), sharing test setups,
+  and enabling tests to be run on a range of platforms (including very
+  recent ones). Testing is probably a large topic on its own, though.
+
+Thoughts?
