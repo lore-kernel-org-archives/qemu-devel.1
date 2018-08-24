@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Simon.Hausmann@qt.io>) id 1ft7Mv-0007AF-RV
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:22:58 -0400
+	(envelope-from <Simon.Hausmann@qt.io>) id 1ft8dA-0007Om-UH
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:43:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Simon.Hausmann@qt.io>) id 1ft7Mr-00041t-AC
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:22:57 -0400
-Received: from mail-eopbgr80117.outbound.protection.outlook.com
-	([40.107.8.117]:13248
-	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+	(envelope-from <Simon.Hausmann@qt.io>) id 1ft8d7-0002SE-N8
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:43:48 -0400
+Received: from mail-db5eur01on0100.outbound.protection.outlook.com
+	([104.47.2.100]:54966
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Simon.Hausmann@qt.io>)
-	id 1ft7Mp-0003y6-D5
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:22:53 -0400
+	id 1ft8d7-0002RD-CG
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:43:45 -0400
 From: Simon Hausmann <simon.hausmann@qt.io>
-Date: Fri, 24 Aug 2018 10:22:33 +0200
-Message-Id: <20180824082233.5008-1-simon.hausmann@qt.io>
+Date: Fri, 24 Aug 2018 11:43:30 +0200
+Message-Id: <20180824094330.8908-1-simon.hausmann@qt.io>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] linux-user: add support for MADV_DONTNEED
+Subject: [Qemu-devel] [PATCH v2] linux-user: add support for MADV_DONTNEED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,22 +37,25 @@ mappings.
 
 Signed-off-by: Simon Hausmann <simon.hausmann@qt.io>
 ---
- linux-user/mmap.c    | 18 ++++++++++++++++++
+ linux-user/mmap.c    | 21 +++++++++++++++++++++
  linux-user/qemu.h    |  1 +
  linux-user/syscall.c |  6 +-----
- 3 files changed, 20 insertions(+), 5 deletions(-)
+ 3 files changed, 23 insertions(+), 5 deletions(-)
 
 diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 41e0983ce8..3adb7a0f0a 100644
+index 41e0983ce8..6b308d4e13 100644
 --- a/linux-user/mmap.c
 +++ b/linux-user/mmap.c
-@@ -762,3 +762,21 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+@@ -762,3 +762,24 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
      mmap_unlock();
      return new_addr;
  }
 +
 +int target_madvise(abi_ulong start, abi_ulong len, int flags)
 +{
++    len = HOST_PAGE_ALIGN(len);
++    start &= qemu_host_page_mask;
++
 +    if (!guest_range_valid(start, len)) {
 +        errno = TARGET_EINVAL;
 +        return -1;
