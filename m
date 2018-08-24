@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftHxR-0003Mu-95
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1ftHxR-0003Mm-8F
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ftHxM-0001Ap-Rl
+	(envelope-from <armbru@redhat.com>) id 1ftHxL-00019T-S8
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56904 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56124 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ftHxM-0001A4-Iz
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ftHxL-000196-JH
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 15:41:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F1468780F
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:41:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 204357DAC2
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:41:15 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-97.ams2.redhat.com
 	[10.36.116.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AD8C621BE
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:41:16 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC10A2156889
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 19:41:14 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 24 Aug 2018 21:31:52 +0200
-Message-Id: <20180824193206.25475-45-armbru@redhat.com>
+Date: Fri, 24 Aug 2018 21:31:59 +0200
+Message-Id: <20180824193206.25475-52-armbru@redhat.com>
 In-Reply-To: <20180824193206.25475-1-armbru@redhat.com>
 References: <20180824193206.25475-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 44/58] json: Fix latent parser aborts at end of
- input
+Subject: [Qemu-devel] [PULL 51/58] json: Make JSONToken opaque outside
+ json-parser.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,47 +36,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-json-parser.c carefully reports end of input like this:
-
-    token = parser_context_pop_token(ctxt);
-    if (token == NULL) {
-        parse_error(ctxt, NULL, "premature EOI");
-        goto out;
-    }
-
-Except parser_context_pop_token() can't return null, it fails its
-assertion instead.  Same for parser_context_peek_token().  Broken in
-commit 65c0f1e9558, and faithfully preserved in commit 95385fe9ace.
-Only a latent bug, because the streamer throws away any input that
-could trigger it.
-
-Drop the assertions, so we can fix the streamer in the next commit.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20180823164025.12553-45-armbru@redhat.com>
+Message-Id: <20180823164025.12553-52-armbru@redhat.com>
 ---
- qobject/json-parser.c | 2 --
- 1 file changed, 2 deletions(-)
+ include/qapi/qmp/json-parser.h   |  4 ++++
+ include/qapi/qmp/json-streamer.h |  7 -------
+ qobject/json-parser.c            | 19 +++++++++++++++++++
+ qobject/json-streamer.c          |  8 +-------
+ 4 files changed, 24 insertions(+), 14 deletions(-)
 
+diff --git a/include/qapi/qmp/json-parser.h b/include/qapi/qmp/json-parser.h
+index a34209db7a..21b23d7bec 100644
+--- a/include/qapi/qmp/json-parser.h
++++ b/include/qapi/qmp/json-parser.h
+@@ -15,7 +15,11 @@
+ #define QEMU_JSON_PARSER_H
+ 
+ #include "qemu-common.h"
++#include "qapi/qmp/json-lexer.h"
+ 
++typedef struct JSONToken JSONToken;
++
++JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr);
+ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp);
+ 
+ #endif
+diff --git a/include/qapi/qmp/json-streamer.h b/include/qapi/qmp/json-streamer.h
+index d1d7fe2595..29950ac37c 100644
+--- a/include/qapi/qmp/json-streamer.h
++++ b/include/qapi/qmp/json-streamer.h
+@@ -16,13 +16,6 @@
+ 
+ #include "qapi/qmp/json-lexer.h"
+ 
+-typedef struct JSONToken {
+-    int type;
+-    int x;
+-    int y;
+-    char str[];
+-} JSONToken;
+-
+ typedef struct JSONMessageParser
+ {
+     void (*emit)(void *opaque, QObject *json, Error *err);
 diff --git a/qobject/json-parser.c b/qobject/json-parser.c
-index 27e873ad3b..e3ee2a273a 100644
+index e9a9f937f3..a247875f14 100644
 --- a/qobject/json-parser.c
 +++ b/qobject/json-parser.c
-@@ -226,14 +226,12 @@ out:
- static JSONToken *parser_context_pop_token(JSONParserContext *ctxt)
+@@ -26,6 +26,13 @@
+ #include "qapi/qmp/json-lexer.h"
+ #include "qapi/qmp/json-streamer.h"
+ 
++struct JSONToken {
++    JSONTokenType type;
++    int x;
++    int y;
++    char str[];
++};
++
+ typedef struct JSONParserContext
  {
-     g_free(ctxt->current);
--    assert(!g_queue_is_empty(ctxt->buf));
-     ctxt->current = g_queue_pop_head(ctxt->buf);
-     return ctxt->current;
+     Error *err;
+@@ -538,6 +545,18 @@ static QObject *parse_value(JSONParserContext *ctxt, va_list *ap)
+     }
  }
  
- static JSONToken *parser_context_peek_token(JSONParserContext *ctxt)
++JSONToken *json_token(JSONTokenType type, int x, int y, GString *tokstr)
++{
++    JSONToken *token = g_malloc(sizeof(JSONToken) + tokstr->len + 1);
++
++    token->type = type;
++    memcpy(token->str, tokstr->str, tokstr->len);
++    token->str[tokstr->len] = 0;
++    token->x = x;
++    token->y = y;
++    return token;
++}
++
+ QObject *json_parser_parse(GQueue *tokens, va_list *ap, Error **errp)
  {
--    assert(!g_queue_is_empty(ctxt->buf));
-     return g_queue_peek_head(ctxt->buf);
- }
+     JSONParserContext ctxt = { .buf = tokens };
+diff --git a/qobject/json-streamer.c b/qobject/json-streamer.c
+index 9210281a65..467bc29413 100644
+--- a/qobject/json-streamer.c
++++ b/qobject/json-streamer.c
+@@ -82,13 +82,7 @@ void json_message_process_token(JSONLexer *lexer, GString *input,
+         goto out_emit;
+     }
  
+-    token = g_malloc(sizeof(JSONToken) + input->len + 1);
+-    token->type = type;
+-    memcpy(token->str, input->str, input->len);
+-    token->str[input->len] = 0;
+-    token->x = x;
+-    token->y = y;
+-
++    token = json_token(type, x, y, input);
+     parser->token_size += input->len;
+ 
+     g_queue_push_tail(&parser->tokens, token);
 -- 
 2.17.1
