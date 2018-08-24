@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ftECP-0004yv-8I
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:40:33 -0400
+	(envelope-from <prvs=76755a058=roger.pau@citrix.com>)
+	id 1ftETY-00047T-Qk
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ftECO-00061Y-Fc
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:40:33 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39671)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ftECO-00060s-2e
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:40:32 -0400
-Received: by mail-oi0-x244.google.com with SMTP id c190-v6so16043811oig.6
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 08:40:31 -0700 (PDT)
+	(envelope-from <prvs=76755a058=roger.pau@citrix.com>)
+	id 1ftETV-0000tv-Ke
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:58:16 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:50474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=76755a058=roger.pau@citrix.com>)
+	id 1ftETV-0000q7-9I
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:58:13 -0400
+Date: Fri, 24 Aug 2018 17:58:04 +0200
+From: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+Message-ID: <20180824155804.azxqj5kvhbswyy5n@mac.bytemobile.com>
 MIME-Version: 1.0
-In-Reply-To: <20180824153648.GX3430@redhat.com>
-References: <20180824073256.19626-1-kraxel@redhat.com>
-	<CAFEAcA-ZtP8CUSJAE5quaE9Sr=EY9BJcoGqQRH_3EgMXi7y6ww@mail.gmail.com>
-	<20180824153648.GX3430@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 16:40:10 +0100
-Message-ID: <CAFEAcA9HfDMTeUyC2FOwVk=9wz9uJYy2_iR_8dt_eOjCxsOrEQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/3] Ui2 20180824 patches
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Subject: [Qemu-devel] usage of mremap in pvrdma break FreeBSD build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Libvirt <libvir-list@redhat.com>
+To: Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 24 August 2018 at 16:36, Daniel P. Berrang=C3=A9 <berrange@redhat.com> w=
-rote:
-> On Fri, Aug 24, 2018 at 04:32:54PM +0100, Peter Maydell wrote:
->> On 24 August 2018 at 08:32, Gerd Hoffmann <kraxel@redhat.com> wrote:
->> > The following changes since commit 5ccac548faf041ff5229a8e8342e3be14a3=
-4c8af:
->> >
->> >   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' =
-into staging (2018-08-23 17:35:48 +0100)
->> >
->> > are available in the git repository at:
->> >
->> >   git://git.kraxel.org/qemu tags/ui2-20180824-pull-request
->> >
->> > for you to fetch changes up to eb01505ea6c8330273d189acc053cc60d00bfa1=
-a:
->> >
->> >   ui: remove support for SDL1.2 in favour of SDL2 (2018-08-24 09:31:39=
- +0200)
->> >
->> > ----------------------------------------------------------------
->> > ui: remove deprecated UI frontends
->> >
->> > ----------------------------------------------------------------
->> >
->> > Daniel P. Berrang=C3=A9 (3):
->> >   ui: remove support for GTK2 in favour of GTK3
->> >   ui: increase min required GTK3 version to 3.14.0
->> >   ui: remove support for SDL1.2 in favour of SDL2
->>
->> Doesn't the last one of these depend on our fixing the
->> OpenBSD VM first ?
->
-> Yep, i mentioned that in my posting of the patch series.
+Hello,
 
-Thought so; dropped from my queue of pullreqs to process. Please
-resubmit it when the OpenBSD VM has been fixed. (That is one of my
-buildtest setups so this would just fail the pullreq buildtest
-otherwise.)
+The usage of mremap in the pvrdma code breaks the build on FreeBSD:
 
-thanks
--- PMM
+/root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning: implicit declaration of
+      function 'mremap' is invalid in C99 [-Wimplicit-function-declaration]
+    host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
+                ^
+/root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:60:17: warning: this function
+      declaration is not a prototype [-Wstrict-prototypes]
+/root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:60:46: error: use of undeclared
+      identifier 'MREMAP_MAYMOVE'
+    host_virt = mremap(curr_page, 0, length, MREMAP_MAYMOVE);
+                                             ^
+/root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:97:48: error: use of undeclared
+      identifier 'MREMAP_MAYMOVE'
+        mremap(curr_page, 0, TARGET_PAGE_SIZE, MREMAP_MAYMOVE | MREMAP_FIXED,
+                                               ^
+/root/src/xen/tools/qemu-xen-dir/hw/rdma/vmw/pvrdma_cmd.c:97:65: error: use of undeclared
+      identifier 'MREMAP_FIXED'
+        mremap(curr_page, 0, TARGET_PAGE_SIZE, MREMAP_MAYMOVE | MREMAP_FIXED,
+                                                                ^
+
+FreeBSD has librdma in base so by default QEMU configure script will
+enable the build of the rdma bits in QEMU. Sadly this code uses mremap
+which is Linux-specific.
+
+AFAICT either the build of pvrdma is limited to Linux in the configure
+script, or the calls to mremap are replaced with a portable
+equivalent.
+
+Thanks, Roger.
