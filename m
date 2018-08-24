@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8U0-0007Pr-HE
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:22 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8U4-0007T1-23
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8Ty-0004Bs-Vo
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:20 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44886)
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8U3-0004L6-2D
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:23 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44890)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ft8Ty-00047W-J8
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:18 -0400
+	id 1ft8U2-0004FY-Mb
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:22 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8Tx-0006XL-GI
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:17 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8U1-0006Z7-D6
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:21 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 10:33:18 +0100
-Message-Id: <20180824093343.11346-28-peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 10:33:22 +0100
+Message-Id: <20180824093343.11346-32-peter.maydell@linaro.org>
 In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
 References: <20180824093343.11346-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 27/52] hw/misc/iotkit-sysinfo: Implement IoTKit
- system information block
+Subject: [Qemu-devel] [PULL 31/52] hw/arm/iotkit: Wire up the lines for MSCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,237 +32,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Implement the IoTKit system control element's system information
-block; this is just a pair of read-only version/config registers,
-plus the usual PID/CID ID registers.
+The IoTKit doesn't have any MSCs itself but it does need
+some wiring to connect the external signals from MSCs
+in the outer board model up to the registers and the
+NVIC IRQ line.
+
+We also need to expose a MemoryRegion corresponding to
+the AHB bus, so that MSCs in the outer board model can
+use that as their downstream port. (In the FPGA this is
+the "AHB Slave Expansion" ports shown in the block
+diagram in the AN505 documentation.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20180820141116.9118-14-peter.maydell@linaro.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180820141116.9118-10-peter.maydell@linaro.org
 ---
- hw/misc/Makefile.objs            |   1 +
- include/hw/misc/iotkit-sysinfo.h |  37 +++++++++
- hw/misc/iotkit-sysinfo.c         | 128 +++++++++++++++++++++++++++++++
- MAINTAINERS                      |   2 +
- default-configs/arm-softmmu.mak  |   1 +
- 5 files changed, 169 insertions(+)
- create mode 100644 include/hw/misc/iotkit-sysinfo.h
- create mode 100644 hw/misc/iotkit-sysinfo.c
+ include/hw/arm/iotkit.h |  8 ++++++++
+ hw/arm/iotkit.c         | 15 +++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index ac1f3bc030c..af2b503824e 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -67,6 +67,7 @@ obj-$(CONFIG_TZ_MPC) += tz-mpc.o
- obj-$(CONFIG_TZ_PPC) += tz-ppc.o
- obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
- obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
-+obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+index 426dc326a0d..3a8ee639085 100644
+--- a/include/hw/arm/iotkit.h
++++ b/include/hw/arm/iotkit.h
+@@ -28,6 +28,9 @@
+  *  + QOM property "EXP_NUMIRQ" sets the number of expansion interrupts
+  *  + Named GPIO inputs "EXP_IRQ" 0..n are the expansion interrupts, which
+  *    are wired to the NVIC lines 32 .. n+32
++ *  + sysbus MMIO region 0 is the "AHB Slave Expansion" which allows
++ *    bus master devices in the board model to make transactions into
++ *    all the devices and memory areas in the IoTKit
+  * Controlling up to 4 AHB expansion PPBs which a system using the IoTKit
+  * might provide:
+  *  + named GPIO outputs apb_ppcexp{0,1,2,3}_nonsec[0..15]
+@@ -45,6 +48,11 @@
+  * Controlling each of the 16 expansion MPCs which a system using the IoTKit
+  * might provide:
+  *  + named GPIO inputs mpcexp_status[0..15]
++ * Controlling each of the 16 expansion MSCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO inputs mscexp_status[0..15]
++ *  + named GPIO outputs mscexp_clear[0..15]
++ *  + named GPIO outputs mscexp_ns[0..15]
+  */
  
- obj-$(CONFIG_PVPANIC) += pvpanic.o
- obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
-diff --git a/include/hw/misc/iotkit-sysinfo.h b/include/hw/misc/iotkit-sysinfo.h
-new file mode 100644
-index 00000000000..7b2e1a5e48b
---- /dev/null
-+++ b/include/hw/misc/iotkit-sysinfo.h
-@@ -0,0 +1,37 @@
-+/*
-+ * ARM IoTKit system information block
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
+ #ifndef IOTKIT_H
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+index f8276b5425c..8742200fb42 100644
+--- a/hw/arm/iotkit.c
++++ b/hw/arm/iotkit.c
+@@ -667,6 +667,21 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+ 
+     iotkit_forward_sec_resp_cfg(s);
+ 
++    /* Forward the MSC related signals */
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_status");
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_clear");
++    qdev_pass_gpios(dev_secctl, dev, "mscexp_ns");
++    qdev_connect_gpio_out_named(dev_secctl, "msc_irq", 0,
++                                qdev_get_gpio_in(DEVICE(&s->armv7m), 11));
 +
-+/*
-+ * This is a model of the "system information block" which is part of the
-+ * Arm IoTKit and documented in
-+ * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
-+ * QEMU interface:
-+ *  + sysbus MMIO region 0: the system information register bank
-+ */
-+
-+#ifndef HW_MISC_IOTKIT_SYSINFO_H
-+#define HW_MISC_IOTKIT_SYSINFO_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_IOTKIT_SYSINFO "iotkit-sysinfo"
-+#define IOTKIT_SYSINFO(obj) OBJECT_CHECK(IoTKitSysInfo, (obj), \
-+                                        TYPE_IOTKIT_SYSINFO)
-+
-+typedef struct IoTKitSysInfo {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    MemoryRegion iomem;
-+} IoTKitSysInfo;
-+
-+#endif
-diff --git a/hw/misc/iotkit-sysinfo.c b/hw/misc/iotkit-sysinfo.c
-new file mode 100644
-index 00000000000..78955bc45f5
---- /dev/null
-+++ b/hw/misc/iotkit-sysinfo.c
-@@ -0,0 +1,128 @@
-+/*
-+ * ARM IoTKit system information block
-+ *
-+ * Copyright (c) 2018 Linaro Limited
-+ * Written by Peter Maydell
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License version 2 or
-+ *  (at your option) any later version.
-+ */
-+
-+/*
-+ * This is a model of the "system information block" which is part of the
-+ * Arm IoTKit and documented in
-+ * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ecm0601256/index.html
-+ * It consists of 2 read-only version/config registers, plus the
-+ * usual ID registers.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/misc/iotkit-sysinfo.h"
-+
-+REG32(SYS_VERSION, 0x0)
-+REG32(SYS_CONFIG, 0x4)
-+REG32(PID4, 0xfd0)
-+REG32(PID5, 0xfd4)
-+REG32(PID6, 0xfd8)
-+REG32(PID7, 0xfdc)
-+REG32(PID0, 0xfe0)
-+REG32(PID1, 0xfe4)
-+REG32(PID2, 0xfe8)
-+REG32(PID3, 0xfec)
-+REG32(CID0, 0xff0)
-+REG32(CID1, 0xff4)
-+REG32(CID2, 0xff8)
-+REG32(CID3, 0xffc)
-+
-+/* PID/CID values */
-+static const int sysinfo_id[] = {
-+    0x04, 0x00, 0x00, 0x00, /* PID4..PID7 */
-+    0x58, 0xb8, 0x0b, 0x00, /* PID0..PID3 */
-+    0x0d, 0xf0, 0x05, 0xb1, /* CID0..CID3 */
-+};
-+
-+static uint64_t iotkit_sysinfo_read(void *opaque, hwaddr offset,
-+                                    unsigned size)
-+{
-+    uint64_t r;
-+
-+    switch (offset) {
-+    case A_SYS_VERSION:
-+        r = 0x41743;
-+        break;
-+
-+    case A_SYS_CONFIG:
-+        r = 0x31;
-+        break;
-+    case A_PID4 ... A_CID3:
-+        r = sysinfo_id[(offset - A_PID4) / 4];
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "IoTKit SysInfo read: bad offset %x\n", (int)offset);
-+        r = 0;
-+        break;
-+    }
-+    trace_iotkit_sysinfo_read(offset, r, size);
-+    return r;
-+}
-+
-+static void iotkit_sysinfo_write(void *opaque, hwaddr offset,
-+                                 uint64_t value, unsigned size)
-+{
-+    trace_iotkit_sysinfo_write(offset, value, size);
-+
-+    qemu_log_mask(LOG_GUEST_ERROR,
-+                  "IoTKit SysInfo: write to RO offset 0x%x\n", (int)offset);
-+}
-+
-+static const MemoryRegionOps iotkit_sysinfo_ops = {
-+    .read = iotkit_sysinfo_read,
-+    .write = iotkit_sysinfo_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    /* byte/halfword accesses are just zero-padded on reads and writes */
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-+};
-+
-+static void iotkit_sysinfo_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    IoTKitSysInfo *s = IOTKIT_SYSINFO(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &iotkit_sysinfo_ops,
-+                          s, "iotkit-sysinfo", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static void iotkit_sysinfo_class_init(ObjectClass *klass, void *data)
-+{
 +    /*
-+     * This device has no guest-modifiable state and so it
-+     * does not need a reset function or VMState.
++     * Expose our container region to the board model; this corresponds
++     * to the AHB Slave Expansion ports which allow bus master devices
++     * (eg DMA controllers) in the board model to make transactions into
++     * devices in the IoTKit.
 +     */
-+}
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->container);
 +
-+static const TypeInfo iotkit_sysinfo_info = {
-+    .name = TYPE_IOTKIT_SYSINFO,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(IoTKitSysInfo),
-+    .instance_init = iotkit_sysinfo_init,
-+    .class_init = iotkit_sysinfo_class_init,
-+};
-+
-+static void iotkit_sysinfo_register_types(void)
-+{
-+    type_register_static(&iotkit_sysinfo_info);
-+}
-+
-+type_init(iotkit_sysinfo_register_types);
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ea35aa2cca5..cb780f463cb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -541,6 +541,8 @@ F: hw/arm/iotkit.c
- F: include/hw/arm/iotkit.h
- F: hw/misc/iotkit-sysctl.c
- F: include/hw/misc/iotkit-sysctl.h
-+F: hw/misc/iotkit-sysinfo.c
-+F: include/hw/misc/iotkit-sysinfo.h
+     system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
+ }
  
- Musicpal
- M: Jan Kiszka <jan.kiszka@web.de>
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 79aac7702a9..ebbdcb29f38 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -115,6 +115,7 @@ CONFIG_TZ_PPC=y
- CONFIG_IOTKIT=y
- CONFIG_IOTKIT_SECCTL=y
- CONFIG_IOTKIT_SYSCTL=y
-+CONFIG_IOTKIT_SYSINFO=y
- 
- CONFIG_VERSATILE=y
- CONFIG_VERSATILE_PCI=y
 -- 
 2.18.0
