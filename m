@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UG-0007cT-F6
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:37 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UI-0007eq-Tc
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UE-0004kq-LF
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:36 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UG-0004mA-S6
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:38 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ft8UC-0004PP-Vm
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:33 -0400
+	id 1ft8UG-0004PP-C7
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:36 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8UA-0006cN-HK
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:30 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8UE-0006dx-AQ
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:34 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 10:33:30 +0100
-Message-Id: <20180824093343.11346-40-peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 10:33:34 +0100
+Message-Id: <20180824093343.11346-44-peter.maydell@linaro.org>
 In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
 References: <20180824093343.11346-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 39/52] hw/arm/mps2-tz: Instantiate SPI
- controllers
+Subject: [Qemu-devel] [PULL 43/52] target/arm: Remove a handful of stray tabs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +29,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The SPI controllers in the MPS2 AN505 board are PL022s.
-We have a model of the PL022, so create these devices.
-
-We don't currently model the LCD controller that sits behind
-one of the PL022s; the others are intended to control devices
-that sit on the FPGA's general purpose SPI connector or
-"shield" expansion connectors.
+Following the bulk conversion of the iwMMXt code, there are
+just a handful of hard coded tabs in target/arm; fix them.
+This is a whitespace-only patch.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20180820141116.9118-22-peter.maydell@linaro.org
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180821165215.29069-4-peter.maydell@linaro.org
 ---
- hw/arm/mps2-tz.c | 38 ++++++++++++++++++++++++++++++++------
- 1 file changed, 32 insertions(+), 6 deletions(-)
+ target/arm/cpu.h      | 16 ++++++++--------
+ target/arm/arm-semi.c |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index d810e51a1b4..cedf605e20e 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -48,6 +48,7 @@
- #include "hw/misc/tz-msc.h"
- #include "hw/arm/iotkit.h"
- #include "hw/dma/pl080.h"
-+#include "hw/ssi/pl022.h"
- #include "hw/devices.h"
- #include "net/net.h"
- #include "hw/core/split-irq.h"
-@@ -73,7 +74,7 @@ typedef struct {
-     MPS2FPGAIO fpgaio;
-     TZPPC ppc[5];
-     TZMPC ssram_mpc[3];
--    UnimplementedDeviceState spi[5];
-+    PL022State spi[5];
-     UnimplementedDeviceState i2c[4];
-     UnimplementedDeviceState i2s_audio;
-     UnimplementedDeviceState gpio[4];
-@@ -324,6 +325,31 @@ static MemoryRegion *make_dma(MPS2TZMachineState *mms, void *opaque,
-     return sysbus_mmio_get_region(s, 0);
- }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 62c36b41507..65c0fa0a659 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1320,14 +1320,14 @@ enum arm_cpu_mode {
+ #define ARM_VFP_FPINST2 10
  
-+static MemoryRegion *make_spi(MPS2TZMachineState *mms, void *opaque,
-+                              const char *name, hwaddr size)
-+{
-+    /*
-+     * The AN505 has five PL022 SPI controllers.
-+     * One of these should have the LCD controller behind it; the others
-+     * are connected only to the FPGA's "general purpose SPI connector"
-+     * or "shield" expansion connectors.
-+     * Note that if we do implement devices behind SPI, the chip select
-+     * lines are set via the "MISC" register in the MPS2 FPGAIO device.
-+     */
-+    PL022State *spi = opaque;
-+    int i = spi - &mms->spi[0];
-+    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-+    SysBusDevice *s;
-+
-+    sysbus_init_child_obj(OBJECT(mms), name, spi, sizeof(mms->spi[0]),
-+                          TYPE_PL022);
-+    object_property_set_bool(OBJECT(spi), true, "realized", &error_fatal);
-+    s = SYS_BUS_DEVICE(spi);
-+    sysbus_connect_irq(s, 0,
-+                       qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 51 + i));
-+    return sysbus_mmio_get_region(s, 0);
-+}
-+
- static void mps2tz_common_init(MachineState *machine)
- {
-     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
-@@ -422,11 +448,11 @@ static void mps2tz_common_init(MachineState *machine)
-         }, {
-             .name = "apb_ppcexp1",
-             .ports = {
--                { "spi0", make_unimp_dev, &mms->spi[0], 0x40205000, 0x1000 },
--                { "spi1", make_unimp_dev, &mms->spi[1], 0x40206000, 0x1000 },
--                { "spi2", make_unimp_dev, &mms->spi[2], 0x40209000, 0x1000 },
--                { "spi3", make_unimp_dev, &mms->spi[3], 0x4020a000, 0x1000 },
--                { "spi4", make_unimp_dev, &mms->spi[4], 0x4020b000, 0x1000 },
-+                { "spi0", make_spi, &mms->spi[0], 0x40205000, 0x1000 },
-+                { "spi1", make_spi, &mms->spi[1], 0x40206000, 0x1000 },
-+                { "spi2", make_spi, &mms->spi[2], 0x40209000, 0x1000 },
-+                { "spi3", make_spi, &mms->spi[3], 0x4020a000, 0x1000 },
-+                { "spi4", make_spi, &mms->spi[4], 0x4020b000, 0x1000 },
-                 { "uart0", make_uart, &mms->uart[0], 0x40200000, 0x1000 },
-                 { "uart1", make_uart, &mms->uart[1], 0x40201000, 0x1000 },
-                 { "uart2", make_uart, &mms->uart[2], 0x40202000, 0x1000 },
+ /* iwMMXt coprocessor control registers.  */
+-#define ARM_IWMMXT_wCID		0
+-#define ARM_IWMMXT_wCon		1
+-#define ARM_IWMMXT_wCSSF	2
+-#define ARM_IWMMXT_wCASF	3
+-#define ARM_IWMMXT_wCGR0	8
+-#define ARM_IWMMXT_wCGR1	9
+-#define ARM_IWMMXT_wCGR2	10
+-#define ARM_IWMMXT_wCGR3	11
++#define ARM_IWMMXT_wCID  0
++#define ARM_IWMMXT_wCon  1
++#define ARM_IWMMXT_wCSSF 2
++#define ARM_IWMMXT_wCASF 3
++#define ARM_IWMMXT_wCGR0 8
++#define ARM_IWMMXT_wCGR1 9
++#define ARM_IWMMXT_wCGR2 10
++#define ARM_IWMMXT_wCGR3 11
+ 
+ /* V7M CCR bits */
+ FIELD(V7M_CCR, NONBASETHRDENA, 0, 1)
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index 7cac8734c70..b2b22d231e3 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -136,7 +136,7 @@ static void arm_semi_cb(CPUState *cs, target_ulong ret, target_ulong err)
+ #ifdef CONFIG_USER_ONLY
+         ts->swi_errno = err;
+ #else
+-	syscall_err = err;
++        syscall_err = err;
+ #endif
+         reg0 = ret;
+     } else {
 -- 
 2.18.0
