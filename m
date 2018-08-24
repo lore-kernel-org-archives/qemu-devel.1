@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ft3FZ-0000wG-Cw
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:59:06 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ft3aO-0002M1-RY
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ft3FU-0004FH-UK
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:59:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60732)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ft3FU-0004Es-KV
-	for qemu-devel@nongnu.org; Thu, 23 Aug 2018 23:59:00 -0400
-Date: Fri, 24 Aug 2018 00:58:55 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180824035855.GT3778@localhost.localdomain>
-References: <1535040889-52782-1-git-send-email-peng.hao2@zte.com.cn>
-	<1535040889-52782-3-git-send-email-peng.hao2@zte.com.cn>
+	(envelope-from <richard.henderson@linaro.org>) id 1ft3aI-00075G-6z
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:20:34 -0400
+Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:42409)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ft3aH-00074W-Cf
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:20:29 -0400
+Received: by mail-pl1-x633.google.com with SMTP id g23-v6so529425plq.9
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 21:20:28 -0700 (PDT)
+References: <20180823175225.22612-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1a00a128-08ca-a214-5f69-971a867cdde7@linaro.org>
+Date: Thu, 23 Aug 2018 21:20:25 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1535040889-52782-3-git-send-email-peng.hao2@zte.com.cn>
-Subject: Re: [Qemu-devel] [PATCH V3 2/4] target-i386:add coalesced_pio API
+In-Reply-To: <20180823175225.22612-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/mps2: Fix ID register errors on
+ AN511 and AN385
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,180 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peng Hao <peng.hao2@zte.com.cn>
-Cc: pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Fri, Aug 24, 2018 at 12:14:47AM +0800, Peng Hao wrote:
-> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+On 08/23/2018 10:52 AM, Peter Maydell wrote:
+> Fix MPS2 SCC config register values for the mps2-an511
+> and mps2-an385 boards:
+>  * the SCC_AID bits [23:20] specify the FPGA build target board revision,
+>    and the SCC_CFG4 register specifies the actual board revision, so
+>    these should have matching values. Claim to be board revision C,
+>    consistently -- we had the revision in the wrong part of SCC_AID.
+>  * SCC_ID bits [15:4] should be the board number in hex, not decimal
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  accel/kvm/kvm-all.c     | 58 ++++++++++++++++++++++++++++++++++++++++++++-----
->  include/exec/memattrs.h |  2 +-
->  2 files changed, 53 insertions(+), 7 deletions(-)
+> This fixes a bug that I noticed for the AN505 model and fixed there,
+> but forgot to also fix on our other MPS image models.
 > 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index eb7db92..830745e 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -78,6 +78,7 @@ struct KVMState
->      int fd;
->      int vmfd;
->      int coalesced_mmio;
-> +    int coalesced_pio;
->      struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
->      bool coalesced_flush_in_progress;
->      int vcpu_events;
-> @@ -536,7 +537,7 @@ static void kvm_coalesce_mmio_region(MemoryListener *listener,
->  
->          zone.addr = start;
->          zone.size = size;
-> -        zone.pad = 0;
-> +        zone.pio = 0;
->  
->          (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
->      }
-> @@ -553,12 +554,51 @@ static void kvm_uncoalesce_mmio_region(MemoryListener *listener,
->  
->          zone.addr = start;
->          zone.size = size;
-> -        zone.pad = 0;
-> +        zone.pio = 0;
->  
->          (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
->      }
->  }
+>  hw/arm/mps2.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-The 2 hunks above need to go to patch 1/4 to avoid breaking the
-build after applying 1/4.
-
-However, patch 1/4 is just a header update and I don't think
-running update-linux-headers.sh was supposed to break the build.
-
-Radim asked about this at:
-
- Date: Wed, 18 Jul 2018 16:43:11 +0200
- Subject: Re: [PATCH v2] KVM: Add coalesced PIO support
- Message-ID: <20180718144311.GB6348@flask>
-
-Paolo, do you have a suggestion on how to update the struct
-without making a header update break the build?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
->  
-> +static void kvm_coalesce_io_add(MemoryListener *listener,
-> +                                MemoryRegionSection *section,
-> +                                hwaddr start, hwaddr size)
-> +{
-> +    KVMState *s = kvm_state;
-> +
-> +    if (s->coalesced_pio) {
-> +        struct kvm_coalesced_mmio_zone zone;
-> +
-> +        zone.addr = start;
-> +        zone.size = size;
-> +        zone.pio = 1;
-> +
-> +        (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
-> +    }
-> +}
-> +
-> +static void kvm_coalesce_io_del(MemoryListener *listener,
-> +                                MemoryRegionSection *section,
-> +                                hwaddr start, hwaddr size)
-> +{
-> +    KVMState *s = kvm_state;
-> +
-> +    if (s->coalesced_pio) {
-> +        struct kvm_coalesced_mmio_zone zone;
-> +
-> +        zone.addr = start;
-> +        zone.size = size;
-> +        zone.pio = 1;
-> +
-> +        (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
-> +     }
-> +}
-> +
-> +static MemoryListener kvm_coalesced_io_listener = {
-> +    .coalesced_mmio_add = kvm_coalesce_io_add,
-> +    .coalesced_mmio_del = kvm_coalesce_io_del,
-
-Nit: I would rename the fields to "coalesced_mmio_{add,del}" to
-coalesced_io_*, because they are not specific to MMIO anymore.
-
-I would also name the functions kvm_coalesce_pio_{add,del}
-because the are specific to pio.
-
-
-> +};
-> +
->  int kvm_check_extension(KVMState *s, unsigned int extension)
->  {
->      int ret;
-> @@ -1615,7 +1655,8 @@ static int kvm_init(MachineState *ms)
->      }
->  
->      s->coalesced_mmio = kvm_check_extension(s, KVM_CAP_COALESCED_MMIO);
-> -
-> +    s->coalesced_pio = s->coalesced_mmio &&
-> +                       kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
-
-Nit: I would keep the blank line here.
-
->  #ifdef KVM_CAP_VCPU_EVENTS
->      s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
->  #endif
-> @@ -1694,7 +1735,8 @@ static int kvm_init(MachineState *ms)
->                                   &address_space_memory, 0);
->      memory_listener_register(&kvm_io_listener,
->                               &address_space_io);
-> -
-> +    memory_listener_register(&kvm_coalesced_io_listener,
-> +                             &address_space_io);
-
-Nit: I would keep the blank line here.
-
->      s->many_ioeventfds = kvm_check_many_ioeventfds();
->  
->      s->sync_mmu = !!kvm_vm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
-> @@ -1775,8 +1817,12 @@ void kvm_flush_coalesced_mmio_buffer(void)
->              struct kvm_coalesced_mmio *ent;
->  
->              ent = &ring->coalesced_mmio[ring->first];
-> -
-> -            cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
-> +            if (ent->pio == 1) {
-> +                address_space_rw(&address_space_io, ent->phys_addr,
-> +                                 MEMTXATTRS_NONE, ent->data, ent->len, true);
-
-Why exactly MEMTXATTRS_NONE is the right attrs argument here?
-Why MEMTXATTRS_UNSPECIFIED wouldn't work?
-
-
-> +            } else {
-> +                cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
-> +            }
->              smp_wmb();
->              ring->first = (ring->first + 1) % KVM_COALESCED_MMIO_MAX;
->          }
-> diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
-> index d4a1642..12fd64f 100644
-> --- a/include/exec/memattrs.h
-> +++ b/include/exec/memattrs.h
-> @@ -45,7 +45,7 @@ typedef struct MemTxAttrs {
->   * from "didn't specify" if necessary).
->   */
->  #define MEMTXATTRS_UNSPECIFIED ((MemTxAttrs) { .unspecified = 1 })
-> -
-> +#define MEMTXATTRS_NONE ((MemTxAttrs) { 0 })
-
-Nit: I would keep the blank line here.
-
->  /* New-style MMIO accessors can indicate that the transaction failed.
->   * A zero (MEMTX_OK) response means success; anything else is a failure
->   * of some kind. The memory subsystem will bitwise-OR together results
-> -- 
-> 1.8.3.1
-> 
-
--- 
-Eduardo
+r~
