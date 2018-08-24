@@ -1,34 +1,25 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:45619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ftFOQ-00076f-MN
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:57:07 -0400
+	(envelope-from <mst@redhat.com>) id 1ftFOa-00076f-NO
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:57:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ftFNH-000504-9J
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:55:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36210)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ftFNG-0004wr-V0
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:55:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ftFNE-00080K-7b
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 16:55:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8DA622E818A
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 16:55:46 +0000 (UTC)
+	(envelope-from <mst@redhat.com>) id 1ftFKk-0002Lz-AW
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:53:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51392 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ftFKk-0002K7-2r
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 12:53:14 -0400
+Date: Fri, 24 Aug 2018 19:53:09 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180824195231-mutt-send-email-mst@kernel.org>
+References: <20180820104045.133968-1-mst@redhat.com>
+	<20180820104045.133968-5-mst@redhat.com>
+	<CAFEAcA9eOFMuvkN2gBetU4SSpV0Jp2hSVsjMG53_Cp8TrkObFg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Aug 2018 16:47:54 -0000
-From: Heiko Sieger <1788665@bugs.launchpad.net>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153512927459.6126.8381964895607113445.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9eOFMuvkN2gBetU4SSpV0Jp2hSVsjMG53_Cp8TrkObFg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 4/7] hostmem-file: add the 'pmem' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,126 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Junyan He <junyan.he@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Thanks for the reply. I understand that the CPU features are exposed.
-However, is the host-side Intel microcode exposed to the guest?
+On Fri, Aug 24, 2018 at 04:13:18PM +0100, Peter Maydell wrote:
+> On 20 August 2018 at 21:24, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > From: Junyan He <junyan.he@intel.com>
+> >
+> > When QEMU emulates vNVDIMM labels and migrates vNVDIMM devices, it
+> > needs to know whether the backend storage is a real persistent memory,
+> > in order to decide whether special operations should be performed to
+> > ensure the data persistence.
+> >
+> > This boolean option 'pmem' allows users to specify whether the backend
+> > storage of memory-backend-file is a real persistent memory. If
+> > 'pmem=on', QEMU will set the flag RAM_PMEM in the RAM block of the
+> > corresponding memory region. If 'pmem' is set while lack of libpmem
+> > support, a error is generated.
+> 
+> Hi; Coverity reports (CID 1395184) that there is a resource leak
+> in an error-exit path in this function:
+> 
+> > +static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
+> > +{
+> > +    HostMemoryBackend *backend = MEMORY_BACKEND(o);
+> > +    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
+> > +
+> > +    if (host_memory_backend_mr_inited(backend)) {
+> > +        error_setg(errp, "cannot change property 'pmem' of %s '%s'",
+> > +                   object_get_typename(o),
+> > +                   object_get_canonical_path_component(o));
+> > +        return;
+> > +    }
+> > +
+> > +#ifndef CONFIG_LIBPMEM
+> > +    if (value) {
+> > +        Error *local_err = NULL;
+> > +        error_setg(&local_err,
+> > +                   "Lack of libpmem support while setting the 'pmem=on'"
+> > +                   " of %s '%s'. We can't ensure data persistence.",
+> > +                   object_get_typename(o),
+> > +                   object_get_canonical_path_component(o));
+> 
+> object_get_canonical_path_component() returns a string which
+> must be freed using g_free().
+> 
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +#endif
+> > +
+> > +    fb->is_pmem = value;
+> > +}
+> 
+> thanks
+> -- PMM
 
-Here is my qemu command:
 
-qemu-system-x86_64 \
-  -runas user \
-  -monitor stdio \
-  -serial none \
-  -parallel none \
-  -nodefaults \
-  -nodefconfig \
-  -name $vmname,process=3D$vmname \
-  -machine q35,accel=3Dkvm,kernel_irqchip=3Don \
--cpu host,kvm=3Doff,hv_vendor_id=3D1234567890ab,hv_vapic,hv_time,hv_relaxed=
-,hv_spinlocks=3D0x1fff \
-  -smp 12,sockets=3D1,cores=3D6,threads=3D2 \
-  -m 16G \
-  -mem-path /dev/hugepages \
-  -mem-prealloc \
-  -balloon none \
-  -rtc base=3Dlocaltime,clock=3Dhost \
-  -vga none \
-  -nographic \
-  -soundhw hda \
-  -device vfio-pci,host=3D02:00.0,multifunction=3Don \
-  -device vfio-pci,host=3D02:00.1 \
-  -device vfio-pci,host=3D00:1a.0 \
-  -device vfio-pci,host=3D08:00.0 \
-  -drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/OVMF/OVMF_CODE=
-.fd \
-  -drive if=3Dpflash,format=3Draw,file=3D/tmp/my_vars.fd \
-  -boot order=3Dc \
-  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,aio=3Dnative,disc=
-ard=3Dunmap,detect-zeroes=3Dunmap,file=3D/dev/mapper/lm13-win10 \
-  -drive id=3Ddisk1,if=3Dvirtio,cache=3Dnone,format=3Draw,aio=3Dnative,file=
-=3D/dev/mapper/photos-photo_stripe \
-  -drive id=3Ddisk2,if=3Dvirtio,cache=3Dnone,format=3Draw,aio=3Dnative,file=
-=3D/dev/mapper/media-photo_raw \
-  -netdev type=3Dtap,id=3Dnet0,ifname=3Dvmtap0,vhost=3Don \
-  -device virtio-net-pci,netdev=3Dnet0,mac=3D00:16:3e:00:01:01
+Like the following? Junyan, could you pls try this one and confirm?
 
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-By the way, the same 2D performance drop happens when I run the VM as root.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
-
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
-
-Status in QEMU:
-  New
-
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 2476dcb435..d88125b86e 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -154,11 +154,14 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
+ #ifndef CONFIG_LIBPMEM
+     if (value) {
+         Error *local_err = NULL;
++        char *path = object_get_canonical_path_component(o);
++
+         error_setg(&local_err,
+                    "Lack of libpmem support while setting the 'pmem=on'"
+                    " of %s '%s'. We can't ensure data persistence.",
+                    object_get_typename(o),
+-                   object_get_canonical_path_component(o));
++                   );
++        g_free(path);
+         error_propagate(errp, local_err);
+         return;
+     }
