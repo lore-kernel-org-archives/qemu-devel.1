@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ft73s-0005d2-AB
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:03:17 -0400
+	(envelope-from <armbru@redhat.com>) id 1ft75J-0006P2-G7
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:04:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1ft73n-0002jE-BG
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:03:16 -0400
-Date: Fri, 24 Aug 2018 10:03:05 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180824100305.64e3ff08@redhat.com>
-In-Reply-To: <20180823172501.GM3778@localhost.localdomain>
-References: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
-	<c88ef55d-738b-57bc-f00f-b4a4d7303bd6@redhat.com>
-	<20180822150536.6d79a1e1@redhat.com>
-	<20180822180112.GB3778@localhost.localdomain>
-	<20180823101406.06320b35@redhat.com>
-	<20180823172501.GM3778@localhost.localdomain>
+	(envelope-from <armbru@redhat.com>) id 1ft75I-0004bx-FI
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:04:45 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180817171932.31976-1-marcandre.lureau@redhat.com>
+	<20180817171932.31976-2-marcandre.lureau@redhat.com>
+Date: Fri, 24 Aug 2018 09:59:35 +0200
+In-Reply-To: <20180817171932.31976-2-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 17 Aug 2018 19:19:31 +0200")
+Message-ID: <87in40b3fc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: revert back to 1 SRAT entry for
- hotpluggable area
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] qdict: add qdict_steal()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +25,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: haozhong.zhang@intel.com, xiaoguangrong.eric@gmail.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org, john.ji@intel.com, Laszlo Ersek <lersek@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, 23 Aug 2018 14:25:01 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> On Thu, Aug 23, 2018 at 10:14:06AM +0200, Igor Mammedov wrote:
-> > On Wed, 22 Aug 2018 15:01:12 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:  
-> [...]
-> > > However, have you considered keeping adding separate entries for
-> > > NVDIMM devices only (so we follow the spec), but add a single
-> > > (numa_nodes-1, MEM_AFFINITY_HOTPLUGGABLE|MEM_AFFINITY_ENABLED)
-> > > entry to the rest?  
-> > Indeed, I did. It doesn't work either.  
-> 
-> When exactly it didn't work?  Did nvdimm + memory hotplug ever
-> worked together on Windows guests?
-before 848a1cc1e QEMU CLI with nvdimm + memory hotplug worked
-as expected for Windows.
-With approach you suggested, it would create several SRAT entries
-X for nvdimm and Y for the rest (1 in the best case or many if
-nvdimms/pc-dimms are interleaved) and that breaks memory hotplug.
- 
-> For all the other cases there should be absolutely no difference:
-> 
-> nvdimm users would still get a spec-compliant SRAT table (like on
-> QEMU 3.0).
-> 
-> Memory hotplug users w/o nvdimm would get the same ACPI table
-> that they would get after applying this patch (i.e. the one we
-> had before commit 848a1cc1e ("hw/acpi-build: build SRAT memory
-> affinity structures for DIMM devices").
-I did consider it. It still would be a regression but a minor one
-(only Windows nvdimm enabled cases will have regressed memory
-hotplug). I even have a patch for it, but it's still a regression,
-that's why I've posted full 848a1cc1e revert.
+> Add a new function qdict_steal(), that deletes a key from a dict, and
+> returns the associated value, if any. Simplify related code.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/qapi/qmp/qdict.h |  1 +
+>  monitor.c                |  3 +--
+>  qobject/block-qdict.c    |  7 ++-----
+>  qobject/qdict.c          | 22 ++++++++++++++++++++++
+>  4 files changed, 26 insertions(+), 7 deletions(-)
 
-If it were a bug in the newest version of windows (assuming it's
-proven Windows bug), I'd be inclined towards being spec compliant
-and let MS fix Windows as it was with CPU hotplug (hijacked ACPI0010
-container) which they eventually fixed, but in this case it affects
-all guests versions and there is no proof that's a Windows bug.
+Missing: tests/check-qdict.c update.
 
-So my hope here is that Intel has resources to figure out what
-Windows expectations are wrt SRAT/memory layout and memory hotplug.
+> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+> index 7f3ec10a10..84644bfba6 100644
+> --- a/include/qapi/qmp/qdict.h
+> +++ b/include/qapi/qmp/qdict.h
+> @@ -37,6 +37,7 @@ QObject *qdict_entry_value(const QDictEntry *entry);
+>  size_t qdict_size(const QDict *qdict);
+>  void qdict_put_obj(QDict *qdict, const char *key, QObject *value);
+>  void qdict_del(QDict *qdict, const char *key);
+> +QObject *qdict_steal(QDict *qdict, const char *key);
+>  int qdict_haskey(const QDict *qdict, const char *key);
+>  QObject *qdict_get(const QDict *qdict, const char *key);
+>  bool qdict_is_equal(const QObject *x, const QObject *y);
+> diff --git a/monitor.c b/monitor.c
+> index a1999e396c..eab2dc7b7b 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4262,8 +4262,7 @@ static void handle_qmp_command(JSONMessageParser *p=
+arser, GQueue *tokens)
+>=20=20
+>      qdict =3D qobject_to(QDict, req);
+>      if (qdict) {
+> -        id =3D qobject_ref(qdict_get(qdict, "id"));
+> -        qdict_del(qdict, "id");
+> +        id =3D qdict_steal(qdict, "id");
+>      } /* else will fail qmp_dispatch() */
+>=20=20
+>      if (req && trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND))=
+ {
+> diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+> index 42054cc274..a07664ee6a 100644
+> --- a/qobject/block-qdict.c
+> +++ b/qobject/block-qdict.c
+> @@ -692,8 +692,6 @@ void qdict_join(QDict *dest, QDict *src, bool overwri=
+te)
+>   */
+>  bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error =
+**errp)
+>  {
+> -    QObject *qobj;
+> -
+>      while (renames->from) {
+>          if (qdict_haskey(qdict, renames->from)) {
+>              if (qdict_haskey(qdict, renames->to)) {
+> @@ -702,9 +700,8 @@ bool qdict_rename_keys(QDict *qdict, const QDictRenam=
+es *renames, Error **errp)
+>                  return false;
+>              }
+>=20=20
+> -            qobj =3D qdict_get(qdict, renames->from);
+> -            qdict_put_obj(qdict, renames->to, qobject_ref(qobj));
+> -            qdict_del(qdict, renames->from);
+> +            qdict_put_obj(qdict, renames->to,
+> +                          qdict_steal(qdict, renames->from));
+>          }
+>=20=20
+>          renames++;
+
+How did you find possible uses for qdict_steal()?
+
+> diff --git a/qobject/qdict.c b/qobject/qdict.c
+> index 3d8c2f7bbc..322f23f094 100644
+> --- a/qobject/qdict.c
+> +++ b/qobject/qdict.c
+> @@ -406,6 +406,28 @@ void qdict_del(QDict *qdict, const char *key)
+>      }
+>  }
+>=20=20
+> +/**
+> + * qdict_steal(): Steal a 'key:value' pair from the dictionary
+
+"Steal" is cute, but perhaps qdict_get_and_del() would be clearer.
+
+> + *
+> + * Return the associated entry value and remove it, or NULL.
+
+Suggest
+
+    * If @qdict has @key, return its value, and delete it from @qdict.
+    * Else, return NULL.
+
+> + */
+> +QObject *qdict_steal(QDict *qdict, const char *key)
+> +{
+> +    QDictEntry *entry;
+> +    QObject *val =3D NULL;
+> +
+> +    entry =3D qdict_find(qdict, key, tdb_hash(key) % QDICT_BUCKET_MAX);
+> +    if (entry) {
+> +        QLIST_REMOVE(entry, next);
+> +        val =3D qobject_ref(entry->value);
+> +        qentry_destroy(entry);
+> +        qdict->size--;
+> +    }
+> +
+> +    return val;
+> +}
+
+This is a slightly extended qdict_del().
+
+   void qdict_del(QDict *qdict, const char *key)
+   {
+       QDictEntry *entry;
+
+       entry =3D qdict_find(qdict, key, tdb_hash(key) % QDICT_BUCKET_MAX);
+       if (entry) {
+           QLIST_REMOVE(entry, next);
+           qentry_destroy(entry);
+           qdict->size--;
+       }
+   }
+
+Heavy-handed de-duplication:
+
+   QObject *qdict_get_and_del(QDict *qdict, const char *key)
+   {
+       QDictEntry *entry;
+       QObject *val;
+
+       entry =3D qdict_find(qdict, key, tdb_hash(key) % QDICT_BUCKET_MAX);
+       if (!entry) {
+           return NULL;
+       }
+
+       QLIST_REMOVE(entry, next);
+       val =3D qobject_ref(entry->value);
+       qentry_destroy(entry);
+       qdict->size--;
+       return val;
+   }
+
+   void qdict_del(QDict *qdict, const char *key)
+   {
+       qobject_unref(qdict_get_and_del(qdict, key));
+   }
+
+Makes qdict_del() execute an additional qobject_ref() / qobject_unref(),
+but that shouldn't matter.
+
+> +
+> +
+
+Just one blank line, please.
+
+>  /**
+>   * qdict_is_equal(): Test whether the two QDicts are equal
+>   *
