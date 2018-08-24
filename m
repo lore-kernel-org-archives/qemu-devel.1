@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8U9-0007Up-9l
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:30 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8U3-0004Mk-JH
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8U3-0007SF-5W
 	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:26 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44892)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8U1-0004IW-Tb
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:23 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:44890)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ft8U3-0004KG-7K
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:23 -0400
+	id 1ft8U1-0004FY-GY
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 05:34:21 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1ft8U2-0006ZZ-9p
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:22 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1ft8U0-0006Yh-D3
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:34:20 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 10:33:23 +0100
-Message-Id: <20180824093343.11346-33-peter.maydell@linaro.org>
+Date: Fri, 24 Aug 2018 10:33:21 +0100
+Message-Id: <20180824093343.11346-31-peter.maydell@linaro.org>
 In-Reply-To: <20180824093343.11346-1-peter.maydell@linaro.org>
 References: <20180824093343.11346-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 32/52] hw/arm/mps2-tz: Create PL081s and MSCs
+Subject: [Qemu-devel] [PULL 30/52] hw/misc/iotkit-secctl: Wire up registers
+ for controlling MSCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,185 +33,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The AN505 FPGA image includes four PL081 DMA controllers, each
-of which is gated by a Master Security Controller that allows
-the guest to prevent a non-secure DMA controller from accessing
-memory that is used by secure guest code. Create and wire
-up these devices.
+The IoTKit does not have any Master Security Contollers itself,
+but it does provide registers in the secure privilege control
+block which allow control of MSCs in the external system.
+Add support for these registers.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20180820141116.9118-15-peter.maydell@linaro.org
+Message-id: 20180820141116.9118-13-peter.maydell@linaro.org
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/arm/mps2-tz.c | 100 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 93 insertions(+), 7 deletions(-)
+ include/hw/misc/iotkit-secctl.h | 14 +++++++
+ hw/misc/iotkit-secctl.c         | 73 +++++++++++++++++++++++++++++----
+ 2 files changed, 79 insertions(+), 8 deletions(-)
 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index dc0f34abe53..d810e51a1b4 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -45,7 +45,9 @@
- #include "hw/misc/mps2-scc.h"
- #include "hw/misc/mps2-fpgaio.h"
- #include "hw/misc/tz-mpc.h"
-+#include "hw/misc/tz-msc.h"
- #include "hw/arm/iotkit.h"
-+#include "hw/dma/pl080.h"
- #include "hw/devices.h"
- #include "net/net.h"
- #include "hw/core/split-irq.h"
-@@ -75,8 +77,9 @@ typedef struct {
-     UnimplementedDeviceState i2c[4];
-     UnimplementedDeviceState i2s_audio;
-     UnimplementedDeviceState gpio[4];
--    UnimplementedDeviceState dma[4];
-     UnimplementedDeviceState gfx;
-+    PL080State dma[4];
-+    TZMSC msc[4];
-     CMSDKAPBUART uart[5];
-     SplitIRQ sec_resp_splitter;
-     qemu_or_irq uart_irq_orgate;
-@@ -263,6 +266,64 @@ static MemoryRegion *make_mpc(MPS2TZMachineState *mms, void *opaque,
-     return sysbus_mmio_get_region(SYS_BUS_DEVICE(mpc), 0);
+diff --git a/include/hw/misc/iotkit-secctl.h b/include/hw/misc/iotkit-secctl.h
+index 082c14c925e..1a193b306f1 100644
+--- a/include/hw/misc/iotkit-secctl.h
++++ b/include/hw/misc/iotkit-secctl.h
+@@ -19,6 +19,7 @@
+  *  + named GPIO output "sec_resp_cfg" indicating whether blocked accesses
+  *    should RAZ/WI or bus error
+  *  + named GPIO output "nsc_cfg" whose value tracks the NSCCFG register value
++ *  + named GPIO output "msc_irq" for the combined IRQ line from the MSCs
+  * Controlling the 2 APB PPCs in the IoTKit:
+  *  + named GPIO outputs apb_ppc0_nonsec[0..2] and apb_ppc1_nonsec
+  *  + named GPIO outputs apb_ppc0_ap[0..2] and apb_ppc1_ap
+@@ -44,6 +45,11 @@
+  * Controlling each of the 16 expansion MPCs which a system using the IoTKit
+  * might provide:
+  *  + named GPIO inputs mpcexp_status[0..15]
++ * Controlling each of the 16 expansion MSCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO inputs mscexp_status[0..15]
++ *  + named GPIO outputs mscexp_clear[0..15]
++ *  + named GPIO outputs mscexp_ns[0..15]
+  */
+ 
+ #ifndef IOTKIT_SECCTL_H
+@@ -62,6 +68,7 @@
+ #define IOTS_NUM_AHB_EXP_PPC 4
+ #define IOTS_NUM_EXP_MPC 16
+ #define IOTS_NUM_MPC 1
++#define IOTS_NUM_EXP_MSC 16
+ 
+ typedef struct IoTKitSecCtl IoTKitSecCtl;
+ 
+@@ -103,6 +110,13 @@ struct IoTKitSecCtl {
+     uint32_t brginten;
+     uint32_t mpcintstatus;
+ 
++    uint32_t secmscintstat;
++    uint32_t secmscinten;
++    uint32_t nsmscexp;
++    qemu_irq mscexp_clear[IOTS_NUM_EXP_MSC];
++    qemu_irq mscexp_ns[IOTS_NUM_EXP_MSC];
++    qemu_irq msc_irq;
++
+     IoTKitSecCtlPPC apb[IOTS_NUM_APB_PPC];
+     IoTKitSecCtlPPC apbexp[IOTS_NUM_APB_EXP_PPC];
+     IoTKitSecCtlPPC ahbexp[IOTS_NUM_APB_EXP_PPC];
+diff --git a/hw/misc/iotkit-secctl.c b/hw/misc/iotkit-secctl.c
+index de4fd8e36d2..2222b3e147d 100644
+--- a/hw/misc/iotkit-secctl.c
++++ b/hw/misc/iotkit-secctl.c
+@@ -190,12 +190,13 @@ static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
+         r = s->apbexp[offset_to_ppc_idx(offset)].sp;
+         break;
+     case A_SECMSCINTSTAT:
++        r = s->secmscintstat;
++        break;
+     case A_SECMSCINTEN:
++        r = s->secmscinten;
++        break;
+     case A_NSMSCEXP:
+-        qemu_log_mask(LOG_UNIMP,
+-                      "IoTKit SecCtl S block read: "
+-                      "unimplemented offset 0x%x\n", offset);
+-        r = 0;
++        r = s->nsmscexp;
+         break;
+     case A_PID4:
+     case A_PID5:
+@@ -291,6 +292,23 @@ static void iotkit_secctl_ppc_update_irq_enable(IoTKitSecCtlPPC *ppc)
+     qemu_set_irq(ppc->irq_enable, extract32(value, ppc->irq_bit_offset, 1));
  }
  
-+static MemoryRegion *make_dma(MPS2TZMachineState *mms, void *opaque,
-+                              const char *name, hwaddr size)
++static void iotkit_secctl_update_mscexp_irqs(qemu_irq *msc_irqs, uint32_t value)
 +{
-+    PL080State *dma = opaque;
-+    int i = dma - &mms->dma[0];
-+    SysBusDevice *s;
-+    char *mscname = g_strdup_printf("%s-msc", name);
-+    TZMSC *msc = &mms->msc[i];
-+    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-+    MemoryRegion *msc_upstream;
-+    MemoryRegion *msc_downstream;
++    int i;
 +
-+    /*
-+     * Each DMA device is a PL081 whose transaction master interface
-+     * is guarded by a Master Security Controller. The downstream end of
-+     * the MSC connects to the IoTKit AHB Slave Expansion port, so the
-+     * DMA devices can see all devices and memory that the CPU does.
-+     */
-+    sysbus_init_child_obj(OBJECT(mms), mscname, msc, sizeof(*msc), TYPE_TZ_MSC);
-+    msc_downstream = sysbus_mmio_get_region(SYS_BUS_DEVICE(&mms->iotkit), 0);
-+    object_property_set_link(OBJECT(msc), OBJECT(msc_downstream),
-+                             "downstream", &error_fatal);
-+    object_property_set_link(OBJECT(msc), OBJECT(mms),
-+                             "idau", &error_fatal);
-+    object_property_set_bool(OBJECT(msc), true, "realized", &error_fatal);
-+
-+    qdev_connect_gpio_out_named(DEVICE(msc), "irq", 0,
-+                                qdev_get_gpio_in_named(iotkitdev,
-+                                                       "mscexp_status", i));
-+    qdev_connect_gpio_out_named(iotkitdev, "mscexp_clear", i,
-+                                qdev_get_gpio_in_named(DEVICE(msc),
-+                                                       "irq_clear", 0));
-+    qdev_connect_gpio_out_named(iotkitdev, "mscexp_ns", i,
-+                                qdev_get_gpio_in_named(DEVICE(msc),
-+                                                       "cfg_nonsec", 0));
-+    qdev_connect_gpio_out(DEVICE(&mms->sec_resp_splitter),
-+                          ARRAY_SIZE(mms->ppc) + i,
-+                          qdev_get_gpio_in_named(DEVICE(msc),
-+                                                 "cfg_sec_resp", 0));
-+    msc_upstream = sysbus_mmio_get_region(SYS_BUS_DEVICE(msc), 0);
-+
-+    sysbus_init_child_obj(OBJECT(mms), name, dma, sizeof(*dma), TYPE_PL081);
-+    object_property_set_link(OBJECT(dma), OBJECT(msc_upstream),
-+                             "downstream", &error_fatal);
-+    object_property_set_bool(OBJECT(dma), true, "realized", &error_fatal);
-+
-+    s = SYS_BUS_DEVICE(dma);
-+    /* Wire up DMACINTR, DMACINTERR, DMACINTTC */
-+    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev,
-+                                                    "EXP_IRQ", 58 + i * 3));
-+    sysbus_connect_irq(s, 1, qdev_get_gpio_in_named(iotkitdev,
-+                                                    "EXP_IRQ", 56 + i * 3));
-+    sysbus_connect_irq(s, 2, qdev_get_gpio_in_named(iotkitdev,
-+                                                    "EXP_IRQ", 57 + i * 3));
-+
-+    return sysbus_mmio_get_region(s, 0);
++    for (i = 0; i < IOTS_NUM_EXP_MSC; i++) {
++        qemu_set_irq(msc_irqs[i], extract32(value, i + 16, 1));
++    }
 +}
 +
- static void mps2tz_common_init(MachineState *machine)
- {
-     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
-@@ -289,13 +350,14 @@ static void mps2tz_common_init(MachineState *machine)
-                              &error_fatal);
- 
-     /* The sec_resp_cfg output from the IoTKit must be split into multiple
--     * lines, one for each of the PPCs we create here.
-+     * lines, one for each of the PPCs we create here, plus one per MSC.
-      */
-     object_initialize(&mms->sec_resp_splitter, sizeof(mms->sec_resp_splitter),
-                       TYPE_SPLIT_IRQ);
-     object_property_add_child(OBJECT(machine), "sec-resp-splitter",
-                               OBJECT(&mms->sec_resp_splitter), &error_abort);
--    object_property_set_int(OBJECT(&mms->sec_resp_splitter), 5,
-+    object_property_set_int(OBJECT(&mms->sec_resp_splitter),
-+                            ARRAY_SIZE(mms->ppc) + ARRAY_SIZE(mms->msc),
-                             "num-lines", &error_fatal);
-     object_property_set_bool(OBJECT(&mms->sec_resp_splitter), true,
-                              "realized", &error_fatal);
-@@ -396,10 +458,10 @@ static void mps2tz_common_init(MachineState *machine)
-         }, {
-             .name = "ahb_ppcexp1",
-             .ports = {
--                { "dma0", make_unimp_dev, &mms->dma[0], 0x40110000, 0x1000 },
--                { "dma1", make_unimp_dev, &mms->dma[1], 0x40111000, 0x1000 },
--                { "dma2", make_unimp_dev, &mms->dma[2], 0x40112000, 0x1000 },
--                { "dma3", make_unimp_dev, &mms->dma[3], 0x40113000, 0x1000 },
-+                { "dma0", make_dma, &mms->dma[0], 0x40110000, 0x1000 },
-+                { "dma1", make_dma, &mms->dma[1], 0x40111000, 0x1000 },
-+                { "dma2", make_dma, &mms->dma[2], 0x40112000, 0x1000 },
-+                { "dma3", make_dma, &mms->dma[3], 0x40113000, 0x1000 },
-             },
-         },
-     };
-@@ -480,12 +542,32 @@ static void mps2tz_common_init(MachineState *machine)
-     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
- }
- 
-+static void mps2_tz_idau_check(IDAUInterface *ii, uint32_t address,
-+                               int *iregion, bool *exempt, bool *ns, bool *nsc)
++static void iotkit_secctl_update_msc_irq(IoTKitSecCtl *s)
 +{
-+    /*
-+     * The MPS2 TZ FPGA images have IDAUs in them which are connected to
-+     * the Master Security Controllers. Thes have the same logic as
-+     * is used by the IoTKit for the IDAU connected to the CPU, except
-+     * that MSCs don't care about the NSC attribute.
-+     */
-+    int region = extract32(address, 28, 4);
++    /* Update the combined MSC IRQ, based on S_MSCEXP_STATUS and S_MSCEXP_EN */
++    bool level = s->secmscintstat & s->secmscinten;
 +
-+    *ns = !(region & 1);
-+    *nsc = false;
-+    /* 0xe0000000..0xe00fffff and 0xf0000000..0xf00fffff are exempt */
-+    *exempt = (address & 0xeff00000) == 0xe0000000;
-+    *iregion = region;
++    qemu_set_irq(s->msc_irq, level);
 +}
 +
- static void mps2tz_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-+    IDAUInterfaceClass *iic = IDAU_INTERFACE_CLASS(oc);
- 
-     mc->init = mps2tz_common_init;
-     mc->max_cpus = 1;
-+    iic->check = mps2_tz_idau_check;
+ static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
+                                          uint64_t value,
+                                          unsigned size, MemTxAttrs attrs)
+@@ -370,10 +388,15 @@ static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
+         iotkit_secctl_ppc_sp_write(ppc, value);
+         break;
+     case A_SECMSCINTCLR:
++        iotkit_secctl_update_mscexp_irqs(s->mscexp_clear, value);
++        break;
+     case A_SECMSCINTEN:
+-        qemu_log_mask(LOG_UNIMP,
+-                      "IoTKit SecCtl S block write: "
+-                      "unimplemented offset 0x%x\n", offset);
++        s->secmscinten = value;
++        iotkit_secctl_update_msc_irq(s);
++        break;
++    case A_NSMSCEXP:
++        s->nsmscexp = value;
++        iotkit_secctl_update_mscexp_irqs(s->mscexp_ns, value);
+         break;
+     case A_SECMPCINTSTATUS:
+     case A_SECPPCINTSTAT:
+@@ -381,7 +404,6 @@ static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
+     case A_BRGINTSTAT:
+     case A_AHBNSPPC0:
+     case A_AHBSPPPC0:
+-    case A_NSMSCEXP:
+     case A_PID4:
+     case A_PID5:
+     case A_PID6:
+@@ -588,6 +610,14 @@ static void iotkit_secctl_mpcexp_status(void *opaque, int n, int level)
+     s->mpcintstatus = deposit32(s->mpcintstatus, n + 16, 1, !!level);
  }
  
- static void mps2tz_an505_class_init(ObjectClass *oc, void *data)
-@@ -506,6 +588,10 @@ static const TypeInfo mps2tz_info = {
-     .instance_size = sizeof(MPS2TZMachineState),
-     .class_size = sizeof(MPS2TZMachineClass),
-     .class_init = mps2tz_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_IDAU_INTERFACE },
-+        { }
-+    },
++static void iotkit_secctl_mscexp_status(void *opaque, int n, int level)
++{
++    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
++
++    s->secmscintstat = deposit32(s->secmscintstat, n + 16, 1, !!level);
++    iotkit_secctl_update_msc_irq(s);
++}
++
+ static void iotkit_secctl_ppc_irqstatus(void *opaque, int n, int level)
+ {
+     IoTKitSecCtlPPC *ppc = opaque;
+@@ -660,6 +690,14 @@ static void iotkit_secctl_init(Object *obj)
+     qdev_init_gpio_in_named(dev, iotkit_secctl_mpcexp_status,
+                             "mpcexp_status", IOTS_NUM_EXP_MPC);
+ 
++    qdev_init_gpio_in_named(dev, iotkit_secctl_mscexp_status,
++                            "mscexp_status", IOTS_NUM_EXP_MSC);
++    qdev_init_gpio_out_named(dev, s->mscexp_clear, "mscexp_clear",
++                             IOTS_NUM_EXP_MSC);
++    qdev_init_gpio_out_named(dev, s->mscexp_ns, "mscexp_ns",
++                             IOTS_NUM_EXP_MSC);
++    qdev_init_gpio_out_named(dev, &s->msc_irq, "msc_irq", 1);
++
+     memory_region_init_io(&s->s_regs, obj, &iotkit_secctl_s_ops,
+                           s, "iotkit-secctl-s-regs", 0x1000);
+     memory_region_init_io(&s->ns_regs, obj, &iotkit_secctl_ns_ops,
+@@ -690,6 +728,24 @@ static const VMStateDescription iotkit_secctl_mpcintstatus_vmstate = {
+     }
  };
  
- static const TypeInfo mps2tz_an505_info = {
++static bool needed_always(void *opaque)
++{
++    return true;
++}
++
++static const VMStateDescription iotkit_secctl_msc_vmstate = {
++    .name = "iotkit-secctl/msc",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = needed_always,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(secmscintstat, IoTKitSecCtl),
++        VMSTATE_UINT32(secmscinten, IoTKitSecCtl),
++        VMSTATE_UINT32(nsmscexp, IoTKitSecCtl),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription iotkit_secctl_vmstate = {
+     .name = "iotkit-secctl",
+     .version_id = 1,
+@@ -710,6 +766,7 @@ static const VMStateDescription iotkit_secctl_vmstate = {
+     },
+     .subsections = (const VMStateDescription*[]) {
+         &iotkit_secctl_mpcintstatus_vmstate,
++        &iotkit_secctl_msc_vmstate,
+         NULL
+     },
+ };
 -- 
 2.18.0
