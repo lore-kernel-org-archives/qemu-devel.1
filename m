@@ -1,21 +1,26 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:50153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ft7jD-0000iw-0R
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:46:00 -0400
+	(envelope-from <mlureau@redhat.com>) id 1ft7jR-0000iw-Po
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:46:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1ft7jB-000505-V7
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:45:58 -0400
+	(envelope-from <mlureau@redhat.com>) id 1ft7Wg-0002Hz-4b
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:33:05 -0400
+Received: from mail-it0-f68.google.com ([209.85.214.68]:51018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ft7Wf-0002FC-D1
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 04:33:01 -0400
+Received: by mail-it0-f68.google.com with SMTP id j81-v6so1140653ite.0
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 01:32:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20180817171932.31976-1-marcandre.lureau@redhat.com>
-	<20180817171932.31976-2-marcandre.lureau@redhat.com>
-	<87in40b3fc.fsf@dusky.pond.sub.org>
-In-Reply-To: <87in40b3fc.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 24 Aug 2018 10:45:44 +0200
-Message-ID: <CAJ+F1CLdS0V0wGjHS0eUe=VV0ExsTp+Bk09TTJn9Rm5A_DRjCg@mail.gmail.com>
+In-Reply-To: <20180824034517.GF24044@xz-x1>
+References: <20180823143125.16767-1-marcandre.lureau@redhat.com>
+	<20180824034517.GF24044@xz-x1>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 24 Aug 2018 10:32:58 +0200
+Message-ID: <CAMxuvayHnOM1_iGPqg5MBxhYa_Mz=S-jC5z_Tp_UmwvLo0Zu-Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] qdict: add qdict_steal()
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] Fix socket chardev regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,196 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "P. Berrange, Daniel" <berrange@redhat.com>
 
 Hi
 
-On Fri, Aug 24, 2018 at 10:05 AM Markus Armbruster <armbru@redhat.com> wrot=
-e:
+On Fri, Aug 24, 2018 at 5:45 AM, Peter Xu <peterx@redhat.com> wrote:
+> On Thu, Aug 23, 2018 at 04:31:20PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi,
+>>
+>> In commit 25679e5d58e "chardev: tcp: postpone async connection setup"
+>> (and its follow up 99f2f54174a59), Peter moved chardev socket
+>> connection to machine_done event. However, chardev created later will
+>> no longer attempt to connect, and chardev created in tests do not have
+>> machine_done event (breaking some of vhost-user-test).
+>>
+>> The goal was to move the "connect" source to the chardev frontend
+>> context (the monitor thread context in his case). chr->gcontext is set
+>> with qemu_chr_fe_set_handlers(). But there is no guarantee that the
+>> function will be called in general, so we can't delay connection until
+>> then: the chardev should still attempt to connect during open(), using
+>> the main context.
+>>
+>> An alternative would be to specify the iothread during chardev
+>> creation. Setting up monitor OOB would be quite different too, it
+>> would take the same iothread as argument.
+>>
+>> 99f2f54174a595e is also a bit problematic, since it will behave
+>> differently before and after machine_done (the first case gives a
+>> chance to use a different context reliably, the second looks racy)
+>>
+>> In the end, I am not sure this is all necessary, as chardev callbacks
+>> are called after qemu_chr_fe_set_handlers(), at which point the
+>> context of sources are updated. In "char-socket: update all ioc
+>> handlers when changing context", I moved also the hup handler to the
+>> updated context. So unless the main thread is already stuck, we can
+>> setup a different context for the chardev at that time. Or not?
+>>
+>> v2:
+>> - fix a random socket chardev test failure
 >
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
-> > Add a new function qdict_steal(), that deletes a key from a dict, and
-> > returns the associated value, if any. Simplify related code.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  include/qapi/qmp/qdict.h |  1 +
-> >  monitor.c                |  3 +--
-> >  qobject/block-qdict.c    |  7 ++-----
-> >  qobject/qdict.c          | 22 ++++++++++++++++++++++
-> >  4 files changed, 26 insertions(+), 7 deletions(-)
->
-> Missing: tests/check-qdict.c update.
+> I have no problem on patch 3-5, but aren't patch 1-2 still breaking
+> the context switch of chardev?  Or did I misunderstood?
 
-ok
+Switching context is broken/racy regardless. My current plan is to
+suspend the context to switch to, and update all sources before
+thawing the target context.
 
->
-> > diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-> > index 7f3ec10a10..84644bfba6 100644
-> > --- a/include/qapi/qmp/qdict.h
-> > +++ b/include/qapi/qmp/qdict.h
-> > @@ -37,6 +37,7 @@ QObject *qdict_entry_value(const QDictEntry *entry);
-> >  size_t qdict_size(const QDict *qdict);
-> >  void qdict_put_obj(QDict *qdict, const char *key, QObject *value);
-> >  void qdict_del(QDict *qdict, const char *key);
-> > +QObject *qdict_steal(QDict *qdict, const char *key);
-> >  int qdict_haskey(const QDict *qdict, const char *key);
-> >  QObject *qdict_get(const QDict *qdict, const char *key);
-> >  bool qdict_is_equal(const QObject *x, const QObject *y);
-> > diff --git a/monitor.c b/monitor.c
-> > index a1999e396c..eab2dc7b7b 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -4262,8 +4262,7 @@ static void handle_qmp_command(JSONMessageParser =
-*parser, GQueue *tokens)
-> >
-> >      qdict =3D qobject_to(QDict, req);
-> >      if (qdict) {
-> > -        id =3D qobject_ref(qdict_get(qdict, "id"));
-> > -        qdict_del(qdict, "id");
-> > +        id =3D qdict_steal(qdict, "id");
-> >      } /* else will fail qmp_dispatch() */
-> >
-> >      if (req && trace_event_get_state_backends(TRACE_HANDLE_QMP_COMMAND=
-)) {
-> > diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-> > index 42054cc274..a07664ee6a 100644
-> > --- a/qobject/block-qdict.c
-> > +++ b/qobject/block-qdict.c
-> > @@ -692,8 +692,6 @@ void qdict_join(QDict *dest, QDict *src, bool overw=
-rite)
-> >   */
-> >  bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Erro=
-r **errp)
-> >  {
-> > -    QObject *qobj;
-> > -
-> >      while (renames->from) {
-> >          if (qdict_haskey(qdict, renames->from)) {
-> >              if (qdict_haskey(qdict, renames->to)) {
-> > @@ -702,9 +700,8 @@ bool qdict_rename_keys(QDict *qdict, const QDictRen=
-ames *renames, Error **errp)
-> >                  return false;
-> >              }
-> >
-> > -            qobj =3D qdict_get(qdict, renames->from);
-> > -            qdict_put_obj(qdict, renames->to, qobject_ref(qobj));
-> > -            qdict_del(qdict, renames->from);
-> > +            qdict_put_obj(qdict, renames->to,
-> > +                          qdict_steal(qdict, renames->from));
-> >          }
-> >
-> >          renames++;
->
-> How did you find possible uses for qdict_steal()?
-
-manual review
+If you prefer we can delay the revert, but I would rather have them
+because the regression seems much worse to me.
 
 >
-> > diff --git a/qobject/qdict.c b/qobject/qdict.c
-> > index 3d8c2f7bbc..322f23f094 100644
-> > --- a/qobject/qdict.c
-> > +++ b/qobject/qdict.c
-> > @@ -406,6 +406,28 @@ void qdict_del(QDict *qdict, const char *key)
-> >      }
-> >  }
-> >
-> > +/**
-> > + * qdict_steal(): Steal a 'key:value' pair from the dictionary
+> Regards,
 >
-> "Steal" is cute, but perhaps qdict_get_and_del() would be clearer.
-
-"steal" is common in glib. I don't mind renaming.
-
->
-> > + *
-> > + * Return the associated entry value and remove it, or NULL.
->
-> Suggest
->
->     * If @qdict has @key, return its value, and delete it from @qdict.
->     * Else, return NULL.
->
-> > + */
-> > +QObject *qdict_steal(QDict *qdict, const char *key)
-> > +{
-> > +    QDictEntry *entry;
-> > +    QObject *val =3D NULL;
-> > +
-> > +    entry =3D qdict_find(qdict, key, tdb_hash(key) % QDICT_BUCKET_MAX)=
-;
-> > +    if (entry) {
-> > +        QLIST_REMOVE(entry, next);
-> > +        val =3D qobject_ref(entry->value);
-> > +        qentry_destroy(entry);
-> > +        qdict->size--;
-> > +    }
-> > +
-> > +    return val;
-> > +}
->
-> This is a slightly extended qdict_del().
->
->    void qdict_del(QDict *qdict, const char *key)
->    {
->        QDictEntry *entry;
->
->        entry =3D qdict_find(qdict, key, tdb_hash(key) % QDICT_BUCKET_MAX)=
-;
->        if (entry) {
->            QLIST_REMOVE(entry, next);
->            qentry_destroy(entry);
->            qdict->size--;
->        }
->    }
->
-> Heavy-handed de-duplication:
->
->    QObject *qdict_get_and_del(QDict *qdict, const char *key)
->    {
->        QDictEntry *entry;
->        QObject *val;
->
->        entry =3D qdict_find(qdict, key, tdb_hash(key) % QDICT_BUCKET_MAX)=
-;
->        if (!entry) {
->            return NULL;
->        }
->
->        QLIST_REMOVE(entry, next);
->        val =3D qobject_ref(entry->value);
->        qentry_destroy(entry);
->        qdict->size--;
->        return val;
->    }
->
->    void qdict_del(QDict *qdict, const char *key)
->    {
->        qobject_unref(qdict_get_and_del(qdict, key));
->    }
->
-> Makes qdict_del() execute an additional qobject_ref() / qobject_unref(),
-> but that shouldn't matter.
-
-ok
-
->
-> > +
-> > +
->
-> Just one blank line, please.
-
-ok
-
->
-> >  /**
-> >   * qdict_is_equal(): Test whether the two QDicts are equal
-> >   *
->
-
-thanks
-
---=20
-Marc-Andr=C3=A9 Lureau
+> --
+> Peter Xu
