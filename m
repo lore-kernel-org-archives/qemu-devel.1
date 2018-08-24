@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ft3xI-0005cZ-2e
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:44:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ft46c-0001Wr-Jd
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1ft3xD-0005mL-1B
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:44:15 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45534)
+	(envelope-from <richard.henderson@linaro.org>) id 1ft46Y-0002vH-Ic
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:53:54 -0400
+Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:39442)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1ft3xC-0005lh-OH
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:44:10 -0400
-Received: by mail-pg1-x542.google.com with SMTP id m4-v6so3192957pgv.12
-	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 21:44:10 -0700 (PDT)
+	id 1ft46Y-0002sS-Bx
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 00:53:50 -0400
+Received: by mail-pf1-x433.google.com with SMTP id j8-v6so3937655pff.6
+	for <qemu-devel@nongnu.org>; Thu, 23 Aug 2018 21:53:50 -0700 (PDT)
 References: <20180814144436.679-1-peter.maydell@linaro.org>
-	<20180814144436.679-7-peter.maydell@linaro.org>
+	<20180814144436.679-8-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <369b363b-0b90-fd78-d2f8-49f23510cb3e@linaro.org>
-Date: Thu, 23 Aug 2018 21:44:07 -0700
+Message-ID: <b6bbd929-5008-f72b-1a6c-67d5ea16d982@linaro.org>
+Date: Thu, 23 Aug 2018 21:53:46 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180814144436.679-7-peter.maydell@linaro.org>
+In-Reply-To: <20180814144436.679-8-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/8] hw/display/bcm2835_fb: Fix handling of
- virtual framebuffer
+Subject: Re: [Qemu-devel] [PATCH 7/8] hw/display/bcm2835_fb: Validate config
+ settings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +36,32 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 08/14/2018 07:44 AM, Peter Maydell wrote:
-> The raspi framebuffir in bcm2835_fb supports the definition
-
-framebuffer.
-
-> of a virtual "viewport", which is smaller than the full
-> physical framebuffer size and at an adjustable offset within
-> it. Only the viewport area is sent to the screen. This allows
-> the guest to do things like double buffering, or scrolling
-> by adjusting the viewport origin. Currently QEMU doesn't
-> implement this at all.
+> Validate the config settings that the guest tries to set.
 > 
-> Add support for this feature:
->  * the property mailbox code needs to distinguish the
->    virtual width/height from the physical width/height
->  * the framebuffer code needs to do something with the
->    virtual width/height/origin information
+> The wiki page documentation is not really accurate here:
+> generally rather than failing requests to set bad parameters,
+> the hardware will just clip them to something sensible.
 > 
-> Note that the wiki documentation on the semantics of the
-> virtual and physical height and width has it the wrong way
-> around -- the virtual size is the size of the allocated
-> buffer, and the physical size is the size of the display,
-> so the virtual size is always the same as or larger than
-> the physical.
+> Validate the most important parameters: sizes and
+> the viewport offsets. This prevents the framebuffer
+> code from trying to read out-of-range memory.
 > 
-> If the viewport size is set smaller than the physical
-> screen size, we ignore the viewport settings completely
-> and just display the physical screen area.
+> In the property handling code, we validate the new parameters every
+> time we encounter a tag that sets them. This means we validate the
+> config multiple times if the request includes multiple config-setting
+> tags, but the code would require significant restructuring to do a
+> validation only once but still return the clipped settings for
+> get-parameter tags and the buffer allocation tag.
+> 
+> Validation of settings made via the older bcm2835_fb_mbox_push()
+> function will be done in the next commit.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  include/hw/display/bcm2835_fb.h |  6 ++++--
->  hw/display/bcm2835_fb.c         | 28 ++++++++++++++++++++++------
->  hw/misc/bcm2835_property.c      | 21 +++++++++++++++------
->  3 files changed, 41 insertions(+), 14 deletions(-)
+>  include/hw/display/bcm2835_fb.h |  8 +++++
+>  hw/display/bcm2835_fb.c         | 48 +++++++++++++++++++++++++++--
+>  hw/misc/bcm2835_property.c      | 54 ++++++++++++++++-----------------
+>  3 files changed, 81 insertions(+), 29 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
