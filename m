@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ftDTN-0003wf-Ru
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:54:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ftDdU-0000dB-UT
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:04:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ftDTN-0001Pp-7w
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:54:01 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33458)
+	(envelope-from <peter.maydell@linaro.org>) id 1ftDdR-0003CV-8x
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:04:27 -0400
+Received: from mail-oi0-x22a.google.com ([2607:f8b0:4003:c06::22a]:35119)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ftDTM-0001P8-RF
-	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 10:54:01 -0400
-Received: by mail-oi0-x241.google.com with SMTP id 8-v6so15821157oip.0
-	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 07:54:00 -0700 (PDT)
+	id 1ftDdQ-0003Bu-Rf
+	for qemu-devel@nongnu.org; Fri, 24 Aug 2018 11:04:25 -0400
+Received: by mail-oi0-x22a.google.com with SMTP id m11-v6so15857503oic.2
+	for <qemu-devel@nongnu.org>; Fri, 24 Aug 2018 08:04:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180824144840.GV3430@redhat.com>
-References: <20180824012126.22721-1-famz@redhat.com>
-	<8d039be4-486e-e017-88ca-5cb6ebd89519@comstyle.com>
-	<20180824144341.GU3430@redhat.com>
-	<CAFEAcA-r4CrL91gk0JhD4_iEZEOR=02Aa+noo3H3sed==P+6WQ@mail.gmail.com>
-	<20180824144840.GV3430@redhat.com>
+In-Reply-To: <1534870966-9287-4-git-send-email-pbonzini@redhat.com>
+References: <1534870966-9287-1-git-send-email-pbonzini@redhat.com>
+	<1534870966-9287-4-git-send-email-pbonzini@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 24 Aug 2018 15:53:39 +0100
-Message-ID: <CAFEAcA8+Axs2xGCJkuFr6SG2Xz9zYf_FZxFK_bP0xk=C32CxTw@mail.gmail.com>
+Date: Fri, 24 Aug 2018 16:04:03 +0100
+Message-ID: <CAFEAcA-nN4AD1m1w8Uv=wfvAYbVVrdPAxFKN75maVJe9wi=yDw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: vm: auto_install OpenBSD
+Subject: Re: [Qemu-devel] [PULL 03/74] es1370: simplify MemoryRegionOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Brad Smith <brad@comstyle.com>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 24 August 2018 at 15:48, Daniel P. Berrang=C3=A9 <berrange@redhat.com> w=
-rote:
-> On Fri, Aug 24, 2018 at 03:46:31PM +0100, Peter Maydell wrote:
->> Is emulated TLS a sufficiently complete/performant TLS
->> implementation for our purposes?
->>
->> (I think it would be better if OpenBSD just implemented real TLS
->> like every other host OS we support.)
+On 21 August 2018 at 18:01, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> Use the automatic subregister extraction from the memory API, and avoid
+> that Coverity complains about missing fallthrough comments.
+
+Hi -- Coverity (CID 1395167) points out that these changes are wrong:
+
+> @@ -572,21 +497,19 @@ static void es1370_writel(void *opaque, uint32_t addr, uint32_t val)
+>          print_sctl (val);
+>          break;
 >
-> My reading of the situation is that OpenBSD *does* support real TLS,
-> but our configure script failed to detect that it supported it,
-> due to missing "-pthread" arg.
+> -    case ES1370_REG_ADC_SCOUNT:
+> -        d++;
+> -    case ES1370_REG_DAC2_SCOUNT:
+> -        d++;
+>      case ES1370_REG_DAC1_SCOUNT:
+> +    case ES1370_REG_DAC2_SCOUNT:
+> +    case ES1370_REG_ADC_SCOUNT:
+> +        d += (addr - ES1370_REG_DAC1_SCOUNT) >> 2;
+>          d->scount = (val & 0xffff) | (d->scount & ~0xffff);
+>          ldebug ("chan %td CURR_SAMP_CT %d, SAMP_CT %d\n",
+>                  d - &s->chan[0], val >> 16, (val & 0xffff));
+>          break;
+>
+> -    case ES1370_REG_ADC_FRAMEADR:
+> -        d++;
+> -    case ES1370_REG_DAC2_FRAMEADR:
+> -        d++;
+>      case ES1370_REG_DAC1_FRAMEADR:
+> +    case ES1370_REG_DAC2_FRAMEADR:
+> +    case ES1370_REG_ADC_FRAMEADR:
+> +        d += (addr - ES1370_REG_DAC1_FRAMEADR) >> 3;
 
-Real TLS doesn't require that you have to call out to
-pthread_* functions or link against a library to get it.
-It's directly implemented by the C compiler/linker/runtime.
+because these values aren't contiguous:
+
+#define ES1370_REG_DAC1_FRAMEADR    0xc30
+#define ES1370_REG_DAC2_FRAMEADR    0xc38
+#define ES1370_REG_ADC_FRAMEADR     0xd30
+
+so you can't calculate the value of 'd' from the addr
+this way.
+
+(Similarly for the SCOUNT registers.)
 
 thanks
 -- PMM
