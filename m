@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpi-00016o-K3
+	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpi-00016n-Jz
 	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpf-0007nh-AJ
+	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpf-0007nm-AJ
 	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:54 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:38192 helo=mxct.zte.com.cn)
+Received: from mxhk.zte.com.cn ([63.217.80.70]:37216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
-	id 1ftPpe-0007l5-T1
+	id 1ftPpe-0007l3-T3
 	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:51 -0400
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Sat, 25 Aug 2018 20:19:47 +0800
-Message-Id: <1535199590-68475-2-git-send-email-peng.hao2@zte.com.cn>
+Date: Sat, 25 Aug 2018 20:19:48 +0800
+Message-Id: <1535199590-68475-3-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1535199590-68475-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1535199590-68475-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V4 1/4] target-i386: introduce coalesced_pio
- kvm header update
+Subject: [Qemu-devel] [PATCH V4 2/4]  target-i386:add coalesced_pio API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +27,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: pbonzini@redhat.com, mst@redhat.com, ehabkost@redhat.com, rkrcmar@redhat.com
 Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn, Peng Hao <peng.hao2@zte.com.cn>
 
-add coalesced_pio's struct and KVM_CAP_COALESCED_PIO header.
-
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- accel/kvm/kvm-all.c       | 4 ++--
- linux-headers/linux/kvm.h | 5 +++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ accel/kvm/kvm-all.c   | 57 +++++++++++++++++++++++++++++++++++++++++++++++----
+ include/exec/memory.h |  4 ++--
+ memory.c              |  4 ++--
+ 3 files changed, 57 insertions(+), 8 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index eb7db92..4a3909d 100644
+index 4a3909d..11d8d78 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -536,7 +536,7 @@ static void kvm_coalesce_mmio_region(MemoryListener *listener,
- 
-         zone.addr = start;
-         zone.size = size;
--        zone.pad = 0;
-+        zone.pio = 0;
- 
-         (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
+@@ -78,6 +78,7 @@ struct KVMState
+     int fd;
+     int vmfd;
+     int coalesced_mmio;
++    int coalesced_pio;
+     struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
+     bool coalesced_flush_in_progress;
+     int vcpu_events;
+@@ -559,6 +560,45 @@ static void kvm_uncoalesce_mmio_region(MemoryListener *listener,
      }
-@@ -553,7 +553,7 @@ static void kvm_uncoalesce_mmio_region(MemoryListener *listener,
+ }
  
-         zone.addr = start;
-         zone.size = size;
--        zone.pad = 0;
-+        zone.pio = 0;
- 
-         (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
++static void kvm_coalesce_pio_add(MemoryListener *listener,
++                                MemoryRegionSection *section,
++                                hwaddr start, hwaddr size)
++{
++    KVMState *s = kvm_state;
++
++    if (s->coalesced_pio) {
++        struct kvm_coalesced_mmio_zone zone;
++
++        zone.addr = start;
++        zone.size = size;
++        zone.pio = 1;
++
++        (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
++    }
++}
++
++static void kvm_coalesce_pio_del(MemoryListener *listener,
++                                MemoryRegionSection *section,
++                                hwaddr start, hwaddr size)
++{
++    KVMState *s = kvm_state;
++
++    if (s->coalesced_pio) {
++        struct kvm_coalesced_mmio_zone zone;
++
++        zone.addr = start;
++        zone.size = size;
++        zone.pio = 1;
++
++        (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
++     }
++}
++
++static MemoryListener kvm_coalesced_pio_listener = {
++    .coalesced_io_add = kvm_coalesce_pio_add,
++    .coalesced_io_del = kvm_coalesce_pio_del,
++};
++
+ int kvm_check_extension(KVMState *s, unsigned int extension)
+ {
+     int ret;
+@@ -1615,6 +1655,8 @@ static int kvm_init(MachineState *ms)
      }
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 98f389a..747b473 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -420,13 +420,13 @@ struct kvm_run {
- struct kvm_coalesced_mmio_zone {
- 	__u64 addr;
- 	__u32 size;
--	__u32 pad;
-+	__u32 pio;
- };
  
- struct kvm_coalesced_mmio {
- 	__u64 phys_addr;
- 	__u32 len;
--	__u32 pad;
-+	__u32 pio;
- 	__u8  data[8];
- };
+     s->coalesced_mmio = kvm_check_extension(s, KVM_CAP_COALESCED_MMIO);
++    s->coalesced_pio = s->coalesced_mmio &&
++                       kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
  
-@@ -949,6 +949,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_GET_MSR_FEATURES 153
- #define KVM_CAP_HYPERV_EVENTFD 154
- #define KVM_CAP_HYPERV_TLBFLUSH 155
-+#define KVM_CAP_COALESCED_PIO 156
+ #ifdef KVM_CAP_VCPU_EVENTS
+     s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
+@@ -1687,13 +1729,15 @@ static int kvm_init(MachineState *ms)
+         s->memory_listener.listener.eventfd_add = kvm_mem_ioeventfd_add;
+         s->memory_listener.listener.eventfd_del = kvm_mem_ioeventfd_del;
+     }
+-    s->memory_listener.listener.coalesced_mmio_add = kvm_coalesce_mmio_region;
+-    s->memory_listener.listener.coalesced_mmio_del = kvm_uncoalesce_mmio_region;
++    s->memory_listener.listener.coalesced_io_add = kvm_coalesce_mmio_region;
++    s->memory_listener.listener.coalesced_io_del = kvm_uncoalesce_mmio_region;
  
- #ifdef KVM_CAP_IRQ_ROUTING
+     kvm_memory_listener_register(s, &s->memory_listener,
+                                  &address_space_memory, 0);
+     memory_listener_register(&kvm_io_listener,
+                              &address_space_io);
++    memory_listener_register(&kvm_coalesced_pio_listener,
++                             &address_space_io);
  
+     s->many_ioeventfds = kvm_check_many_ioeventfds();
+ 
+@@ -1775,8 +1819,13 @@ void kvm_flush_coalesced_mmio_buffer(void)
+             struct kvm_coalesced_mmio *ent;
+ 
+             ent = &ring->coalesced_mmio[ring->first];
+-
+-            cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
++            if (ent->pio == 1) {
++                address_space_rw(&address_space_io, ent->phys_addr,
++                                 MEMTXATTRS_UNSPECIFIED, ent->data,
++                                 ent->len, true);
++            } else {
++                cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
++            }
+             smp_wmb();
+             ring->first = (ring->first + 1) % KVM_COALESCED_MMIO_MAX;
+         }
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 448d41a..4600fa3 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -410,9 +410,9 @@ struct MemoryListener {
+                         bool match_data, uint64_t data, EventNotifier *e);
+     void (*eventfd_del)(MemoryListener *listener, MemoryRegionSection *section,
+                         bool match_data, uint64_t data, EventNotifier *e);
+-    void (*coalesced_mmio_add)(MemoryListener *listener, MemoryRegionSection *section,
++    void (*coalesced_io_add)(MemoryListener *listener, MemoryRegionSection *section,
+                                hwaddr addr, hwaddr len);
+-    void (*coalesced_mmio_del)(MemoryListener *listener, MemoryRegionSection *section,
++    void (*coalesced_io_del)(MemoryListener *listener, MemoryRegionSection *section,
+                                hwaddr addr, hwaddr len);
+     /* Lower = earlier (during add), later (during del) */
+     unsigned priority;
+diff --git a/memory.c b/memory.c
+index e9cd446..8b0311e 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2126,7 +2126,7 @@ static void memory_region_update_coalesced_range_as(MemoryRegion *mr, AddressSpa
+                 .size = fr->addr.size,
+             };
+ 
+-            MEMORY_LISTENER_CALL(as, coalesced_mmio_del, Reverse, &section,
++            MEMORY_LISTENER_CALL(as, coalesced_io_del, Reverse, &section,
+                                  int128_get64(fr->addr.start),
+                                  int128_get64(fr->addr.size));
+             QTAILQ_FOREACH(cmr, &mr->coalesced, link) {
+@@ -2137,7 +2137,7 @@ static void memory_region_update_coalesced_range_as(MemoryRegion *mr, AddressSpa
+                     continue;
+                 }
+                 tmp = addrrange_intersection(tmp, fr->addr);
+-                MEMORY_LISTENER_CALL(as, coalesced_mmio_add, Forward, &section,
++                MEMORY_LISTENER_CALL(as, coalesced_io_add, Forward, &section,
+                                      int128_get64(tmp.start),
+                                      int128_get64(tmp.size));
+             }
 -- 
 1.8.3.1
