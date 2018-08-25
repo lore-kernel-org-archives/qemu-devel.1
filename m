@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpi-00016m-JX
+	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpi-00016p-KD
 	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpf-0007nr-CX
+	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpf-0007nc-A1
 	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:54 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:38190 helo=mxct.zte.com.cn)
+Received: from mxhk.zte.com.cn ([63.217.80.70]:51054)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
-	id 1ftPpe-0007l4-T4
+	id 1ftPpe-0007l2-T0
 	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:51 -0400
 From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Sat, 25 Aug 2018 20:19:49 +0800
-Message-Id: <1535199590-68475-4-git-send-email-peng.hao2@zte.com.cn>
+Date: Sat, 25 Aug 2018 20:19:50 +0800
+Message-Id: <1535199590-68475-5-git-send-email-peng.hao2@zte.com.cn>
 In-Reply-To: <1535199590-68475-1-git-send-email-peng.hao2@zte.com.cn>
 References: <1535199590-68475-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V4 3/4] target-i386: add rtc 0x70 port as
+Subject: [Qemu-devel] [PATCH V4 4/4] target-i386: add i440fx 0xcf8 port as
  coalesced_pio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,34 +30,23 @@ Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn, Peng H
 
 Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 ---
- hw/timer/mc146818rtc.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/pci-host/piix.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index 6f1f723..b19ef51 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -70,6 +70,7 @@ typedef struct RTCState {
-     ISADevice parent_obj;
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index 0e60834..da73743 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -327,6 +327,10 @@ static void i440fx_pcihost_realize(DeviceState *dev, Error **errp)
  
-     MemoryRegion io;
-+    MemoryRegion coalesced_io;
-     uint8_t cmos_data[128];
-     uint8_t cmos_index;
-     int32_t base_year;
-@@ -990,6 +991,13 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
-     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
-     isa_register_ioport(isadev, &s->io, base);
- 
-+    /* register rtc 0x70 port for coalesced_pio */
-+    memory_region_set_flush_coalesced(&s->io);
-+    memory_region_init_io(&s->coalesced_io, OBJECT(s), &cmos_ops,
-+                          s, "rtc1", 1);
-+    isa_register_ioport(isadev, &s->coalesced_io, base);
-+    memory_region_add_coalescing(&s->coalesced_io, 0, 1);
+     sysbus_add_io(sbd, 0xcfc, &s->data_mem);
+     sysbus_init_ioports(sbd, 0xcfc, 4);
 +
-     qdev_set_legacy_instance_id(dev, base, 3);
-     qemu_register_reset(rtc_reset, s);
++    /* register i440fx 0xcf8 port as coalesced pio */
++    memory_region_set_flush_coalesced(&s->data_mem);
++    memory_region_add_coalescing(&s->conf_mem, 0, 4);
+ }
  
+ static void i440fx_realize(PCIDevice *dev, Error **errp)
 -- 
 1.8.3.1
