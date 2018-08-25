@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ftaZp-0002tk-Nm
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:34:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1ftab9-0004eE-MY
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:35:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ftaRT-0005Cx-U3
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:25:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60534)
+	(envelope-from <bounces@canonical.com>) id 1ftab5-0004z2-He
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:35:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33542)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ftaRT-0005C1-Ny
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:25:35 -0400
+	id 1ftab5-0004vh-BA
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:35:31 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1ftaRS-0003Oi-1t
-	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 15:25:34 +0000
+	id 1ftab3-00048P-Ig
+	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 15:35:29 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0C5802E807B
-	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 15:25:34 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 8C0DC2E807C
+	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 15:35:29 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 25 Aug 2018 15:20:05 -0000
+Date: Sat, 25 Aug 2018 15:27:22 -0000
 From: Heiko Sieger <1788665@bugs.launchpad.net>
 Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153521040578.5976.10466147244592526074.malone@gac.canonical.com>
+Message-Id: <153521084253.6334.10142890807089111446.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
  Windows 10 (1803) VGA passthrough VM using "Spectre" protection
@@ -39,46 +39,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Daniel Berrange: ...Essentially if your guest kernel shows "pti ssbd
-ibrs ibpb stibp" features as present, then thanks to your "-cpu host"
-usage, the guest should see them too.
+For comparison, here the Linux/host cat /proc/cpuinfo (partial):
 
-1. I changed my qemu start script and added +vmx:
--cpu host,kvm=3Doff,hv_vendor_id=3D1234567890ab,hv_vapic,hv_time,hv_relaxed=
-,hv_spinlocks=3D0x1fff,+vmx \
-
-2. I installed cygwin on the Windows guest and ran cat /proc/cpuinfo.
-Here the output:
-
-processor       : 11
-vendor_id       : GenuineIntel
-cpu family      : 6
-model           : 45
-model name      : Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz
-stepping        : 7
-cpu MHz         : 3200.000
-cache size      : 4096 KB
-physical id     : 0
-siblings        : 12
-core id         : 5
-cpu cores       : 6
-apicid          : 11
-initial apicid  : 11
-fpu             : yes
-fpu_exception   : yes
-cpuid level     : 13
-wp              : yes
-flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
-cmov pat pse36 clflush mmx fxsr sse sse2 ss ht pni vmx ssse3 cx16 sse4_1 ss=
-e4_2 x2apic popcnt aes xsave osxsave avx hypervisor lahf_lm arat xsaveopt t=
-sc_adjust
-clflush size    : 64
-cache_alignment : 64
-address sizes   : 40 bits physical, 48 bits virtual
+processor	: 11
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 45
+model name	: Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz
+stepping	: 7
+microcode	: 0x714
+cpu MHz		: 4200.015
+cache size	: 12288 KB
+physical id	: 0
+siblings	: 12
+core id		: 5
+cpu cores	: 6
+apicid		: 11
+initial apicid	: 11
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
+pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rd=
+tscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_=
+tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 =
+cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes =
+xsave avx lahf_lm epb pti ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority=
+ ept vpid xsaveopt dtherm ida arat pln pts flush_l1d
+bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf
+bogomips	: 6399.97
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 46 bits physical, 48 bits virtual
 power management:
-
-The flags  "pti ssbd ibrs ibpb stibp" are not listed! How do I pass
-these flags/features to the Windows guest?
 
 -- =
 
