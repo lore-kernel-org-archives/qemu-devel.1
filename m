@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpi-00016p-KD
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1ftQCj-0002Db-Gj
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:29:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1ftPpf-0007nc-A1
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:54 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:51054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
-	id 1ftPpe-0007l2-T0
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:05:51 -0400
-From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Sat, 25 Aug 2018 20:19:50 +0800
-Message-Id: <1535199590-68475-5-git-send-email-peng.hao2@zte.com.cn>
-In-Reply-To: <1535199590-68475-1-git-send-email-peng.hao2@zte.com.cn>
-References: <1535199590-68475-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V4 4/4] target-i386: add i440fx 0xcf8 port as
- coalesced_pio
+	(envelope-from <bounces@canonical.com>) id 1ftQCe-0000jZ-Iw
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:29:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ftQCe-0000jA-Ck
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 00:29:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ftQCd-0005Gd-2K
+	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 04:29:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 041D12E8083
+	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 04:29:35 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 25 Aug 2018 04:17:27 -0000
+From: Launchpad Bug Tracker <1331859@bugs.launchpad.net>
+Reply-To: Bug 1331859 <1331859@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140618233942.6989.4044.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153517064773.26541.12718173375363543243.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1331859] Re: QEMU kernel panic on Windows with
+ arithmetic syntax error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, ehabkost@redhat.com, rkrcmar@redhat.com
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn, Peng Hao <peng.hao2@zte.com.cn>
+To: qemu-devel@nongnu.org
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
----
- hw/pci-host/piix.c | 4 ++++
- 1 file changed, 4 insertions(+)
+[Expired for QEMU because there has been no activity for 60 days.]
 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 0e60834..da73743 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -327,6 +327,10 @@ static void i440fx_pcihost_realize(DeviceState *dev, Error **errp)
- 
-     sysbus_add_io(sbd, 0xcfc, &s->data_mem);
-     sysbus_init_ioports(sbd, 0xcfc, 4);
-+
-+    /* register i440fx 0xcf8 port as coalesced pio */
-+    memory_region_set_flush_coalesced(&s->data_mem);
-+    memory_region_add_coalescing(&s->conf_mem, 0, 4);
- }
- 
- static void i440fx_realize(PCIDevice *dev, Error **errp)
--- 
-1.8.3.1
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1331859
+
+Title:
+  QEMU kernel panic on Windows with arithmetic syntax error
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  During attempts to bring-up QEMU 64-bit ARM support I discovered a
+  kernel panics that only occur on Windows but work properly on Linux.
+
+  The issue can be reproduced by running the following command line:
+
+  $ ./arm-softmmu/qemu-system-arm -M versatilepb -kernel
+  $IMAGES/vmlinuz-3.2.0-4-versatile -initrd
+  $IMAGES/initrd.img-3.2.0-4-versatile -hda
+  $IMAGES/debian_wheezy_armel_standard.qcow2 -append "root=3D/dev/sda1"
+
+  where $IMAGES is the location where the images are downloaded from
+  http://people.debian.org/~aurel32/qemu/armel/.
+
+  This was reproduced with both a custom built QEMU as well as the QEMU
+  image installed by
+  http://qemu.weilnetz.de/w32/qemu_w32-setup-20140617.exe.
+
+  The same command line runs properly on Linux using a custom built
+  QEMU.
+
+  The Windows versions of QEMU do appear to work properly using the arm-
+  test images available on qemu.org.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1331859/+subscriptions
