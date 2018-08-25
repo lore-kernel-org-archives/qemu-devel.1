@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ftaGq-0003eh-SV
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:14:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1ftaZp-0002tk-Nm
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:34:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ftaGp-0002Zh-Sp
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:14:36 -0400
-From: Max Reitz <mreitz@redhat.com>
-References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-6-jsnow@redhat.com>
-	<553da197-ebd0-1eda-909c-aa0740332737@redhat.com>
-	<0b63f8aa-16eb-b719-b903-dff693753e8b@redhat.com>
-	<70d6a96e-ac23-101c-bf10-d9855fe2ec9e@redhat.com>
-Message-ID: <f182768d-e133-6041-d43d-979a8d7f4562@redhat.com>
-Date: Sat, 25 Aug 2018 17:14:16 +0200
+	(envelope-from <bounces@canonical.com>) id 1ftaRT-0005Cx-U3
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:25:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ftaRT-0005C1-Ny
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 11:25:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1ftaRS-0003Oi-1t
+	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 15:25:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0C5802E807B
+	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 15:25:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <70d6a96e-ac23-101c-bf10-d9855fe2ec9e@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="f3KRHQKk2olZg1M0H6aS8uKXHIABwAART"
-Subject: Re: [Qemu-devel] [PATCH 5/7] block/mirror: utilize job_exit shim
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 25 Aug 2018 15:20:05 -0000
+From: Heiko Sieger <1788665@bugs.launchpad.net>
+Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
+Message-Id: <153521040578.5976.10466147244592526074.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
+ Windows 10 (1803) VGA passthrough VM using "Spectre" protection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,139 +37,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f3KRHQKk2olZg1M0H6aS8uKXHIABwAART
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
-Message-ID: <f182768d-e133-6041-d43d-979a8d7f4562@redhat.com>
-Subject: Re: [PATCH 5/7] block/mirror: utilize job_exit shim
-References: <20180817190457.8292-1-jsnow@redhat.com>
- <20180817190457.8292-6-jsnow@redhat.com>
- <553da197-ebd0-1eda-909c-aa0740332737@redhat.com>
- <0b63f8aa-16eb-b719-b903-dff693753e8b@redhat.com>
- <70d6a96e-ac23-101c-bf10-d9855fe2ec9e@redhat.com>
-In-Reply-To: <70d6a96e-ac23-101c-bf10-d9855fe2ec9e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Daniel Berrange: ...Essentially if your guest kernel shows "pti ssbd
+ibrs ibpb stibp" features as present, then thanks to your "-cpu host"
+usage, the guest should see them too.
 
-On 2018-08-25 17:02, Max Reitz wrote:
-> On 2018-08-23 00:05, John Snow wrote:
->>
->>
->> On 08/22/2018 08:15 AM, Max Reitz wrote:
->>> On 2018-08-17 21:04, John Snow wrote:
->>>> Change the manual deferment to mirror_exit into the implicit
->>>> callback to job_exit and the mirror_exit callback.
->>>>
->>>> This does change the order of some bdrv_unref calls and job_complete=
-d,
->>>> but thanks to the new context in which we call .job_exit, this is sa=
-fe
->>>> to defer the possible flushing of any nodes to the job_finalize_sing=
-le
->>>> cleanup stage.
->>>
->>> Ah, right, I forgot this.  Hm, what exactly do you mean?  This functi=
-on
->>> is executed in the main loop, so it can make 'src' go away.  I don't =
-see
->>> any difference to before.
->>>
->>
->> This changes the order in which we unreference these objects; if you
->> look at this patch the job_completed call I delete is in the middle of=
+1. I changed my qemu start script and added +vmx:
+-cpu host,kvm=3Doff,hv_vendor_id=3D1234567890ab,hv_vapic,hv_time,hv_relaxed=
+,hv_spinlocks=3D0x1fff,+vmx \
 
->> what becomes the .exit() callback, which means there is a subtle chang=
-e
->> in the ordering of how references are put down.
->>
->> Take a look at the weird ordering of mirror_exit as it exists right no=
-w;
->> we call job_completed first and *then* put down the last references. I=
-f
->> you re-order this upstream right now, you'll deadlock QEMU because thi=
-s
->> means job_completed is responsible for putting down the last reference=
+2. I installed cygwin on the Windows guest and ran cat /proc/cpuinfo.
+Here the output:
 
->> to some of these block/bds objects.
->>
->> However, job_completed takes an additional AIO context lock and calls
->> job_finalize_single under *two* locks, which will hang QEMU if we
->> attempt to flush any of these nodes when we put down the last referenc=
-e.
->=20
-> If you say so...  I have to admit I don't really understand.  The
-> comment doesn't explain why it's so important to keep src around until
-> job_completed(), so I don't know.  I thought AioContexts are recursive
-> so it doesn't matter whether you take them recursively or not.
->=20
-> Anyway.  So the difference now is that job_defer_to_main_loop() took th=
-e
-> lock around the whole exit function, whereas the new exit shim only
-> takes it around the .exit() method, but calls job_complete() without a
-> lock -- and then job_finalize_single() gets its lock again, so the job
-> methods are again called with locks.  That sounds OK to me.
->=20
->> Performing the reordering here is *safe* because by removing the call =
-to
->> job_completed and utilizing the exit shim, the .exit() callback execut=
-es
->> only under one lock, and when the finalize code runs later it is also
->> executed under only one lock, making this re-ordering safe.
->>
->> Clear as mud?
->=20
-> Well, I trust you that the drain issue was the reason that src had to
-> stay around until after job_completed().  It seems a bit
-> counter-intuitive, because the comment explaining that src needs to sta=
-y
-> around until job_completed() doesn't say much -- but it does imply that=
+processor       : 11
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 45
+model name      : Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz
+stepping        : 7
+cpu MHz         : 3200.000
+cache size      : 4096 KB
+physical id     : 0
+siblings        : 12
+core id         : 5
+cpu cores       : 6
+apicid          : 11
+initial apicid  : 11
+fpu             : yes
+fpu_exception   : yes
+cpuid level     : 13
+wp              : yes
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca =
+cmov pat pse36 clflush mmx fxsr sse sse2 ss ht pni vmx ssse3 cx16 sse4_1 ss=
+e4_2 x2apic popcnt aes xsave osxsave avx hypervisor lahf_lm arat xsaveopt t=
+sc_adjust
+clflush size    : 64
+cache_alignment : 64
+address sizes   : 40 bits physical, 48 bits virtual
+power management:
 
-> without that bdrv_ref(), the BDS might be destroyed before
-> job_completed().  Which is different from simply having only one
-> reference left and then being deleted in job_completed().
->=20
-> Looking at 3f09bfbc7be, I'm inclined to believe the original reason may=
+The flags  "pti ssbd ibrs ibpb stibp" are not listed! How do I pass
+these flags/features to the Windows guest?
 
-> be that src->job points to the job and that we shouldn't delete it as
-> long as it does (bdrv_delete() asserts that bs->job is NULL).  Oh no, a=
+-- =
 
-> tangent appears.
->=20
-> ...I would assume that when bdrv_replace_node() is called, BlockJob.blk=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788665
 
-> is updated to point to the new BDS.  But nobody seems to update the
-> BDS.job field.  Investigation is in order.
+Title:
+  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
+  using "Spectre" protection
 
-Aha!  Mirror is run from the mirror filter (of course).  So the node
-where BDS.job is set is actually not replaced.
+Status in QEMU:
+  New
 
-Well, it is, but then we specifically switch the job BB back to point to
-the mirror filter.  As long as it does not go away until then, all is
-safe.  (And that bdrv_ref() guard doesn't change with this patch.)
+Bug description:
+  Windows 10 (1803) VM using VGA passthrough via qemu script.
 
-Max
+  After upgrading Windows 10 Pro VM to version 1803, or possibly after
+  applying the March/April security updates from Microsoft, the VM would
+  show low 2D graphics performance (sluggishness in 2D applications and
+  low Passmark results).
 
+  Turning off Spectre vulnerability protection in Windows remedies the
+  issue.
 
---f3KRHQKk2olZg1M0H6aS8uKXHIABwAART
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  Expected behavior:
+  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
+ see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
+-2017-5715-and-hyper-v-vms
 
------BEGIN PGP SIGNATURE-----
+  Background:
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluBckgACgkQ9AfbAGHV
-z0BVwgf/aMsn3eQ2YGqQT6m8NfRG0c8YgLhvGrMtl5CVUOMl0sNVy0OmSonhc8kP
-6N76Y+vYJfpqO/Avq2TabEd4xuIJwgF5XTx2YRm7/xSIM10Qaoc+55O4N9pD/Syr
-gxKfHkfEwXXaqpGT/BXzzQ5KzkfjSi0evIDl+qEcuFiIhzxFCo5gK7xzctszOIb9
-kdpju6VR4jp87zsOJEZHXejjd3iPnNGDIB2wWf8FjrabJc+7dHC8geU3qB3Pc/hp
-tQmN7QVlWb5KsnjjVsPgnb/YrebJie5XvwQOmnwnOXp+es+5OSOq+yKSnljA0j5c
-xUoqbVbBliNGtDkXpdRPuAjQUH/DcA==
-=cU9o
------END PGP SIGNATURE-----
+  Starting in March or April Microsoft began to push driver updates in
+  their updates / security updates. See https://support.microsoft.com
+  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
+  meltdown
 
---f3KRHQKk2olZg1M0H6aS8uKXHIABwAART--
+  One update concerns the Intel microcode - see
+  https://support.microsoft.com/en-us/help/4100347. It is activated by
+  default within Windows.
+
+  Once the updates are applied within the Windows guest, 2D graphics
+  performance drops significantly. Other performance benchmarks are not
+  affected.
+
+  A bare metal Windows installation does not display a performance loss
+  after the update. See https://heiko-sieger.info/low-2d-graphics-
+  benchmark-with-windows-10-1803-kvm-vm/
+
+  Similar reports can be found here:
+  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
+performance_on_windows/
+
+  Hardware:
+
+  6 core Intel Core i7-3930K (-MT-MCP-)
+
+  Host OS:
+  Linux Mint 19/Ubuntu 18.04
+  Kernel: 4.15.0-32-generic x86_64
+  Qemu: QEMU emulator version 2.11.1
+  Intel microcode (host): 0x714
+  dmesg | grep microcode
+  [    0.000000] microcode: microcode updated early to revision 0x714, date=
+ =3D 2018-05-08
+  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
+  [    2.813340] microcode: Microcode Update Driver: v2.2.
+
+  Note: I manually updated the Intel microcode on the host from 0x713 to
+  0x714. However, both microcode versions produce the same result in the
+  Windows guest.
+
+  Guest OS:
+  Windows 10 Pro 64 bit, release 1803
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
