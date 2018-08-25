@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ftYDn-0001P7-88
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 09:03:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ftYDv-0001PQ-NS
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 09:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ftY5L-0004vU-TT
-	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 08:54:36 -0400
-References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-4-jsnow@redhat.com>
-	<7c836fb4-c6f4-b590-11ef-6aadb8bc169a@redhat.com>
-	<bd4dc120-2fb2-fc4d-c11f-d79631eb7c16@redhat.com>
-	<d6c3b676-2fa2-f4e3-439a-93785827579f@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b6ece610-27f2-433d-3eea-4702b9381af6@redhat.com>
-Date: Sat, 25 Aug 2018 14:54:18 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1ftY22-0002Rj-PK
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 08:51:11 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39316)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ftY22-0002QX-Bb
+	for qemu-devel@nongnu.org; Sat, 25 Aug 2018 08:51:10 -0400
+Received: by mail-oi0-x242.google.com with SMTP id c190-v6so19864413oig.6
+	for <qemu-devel@nongnu.org>; Sat, 25 Aug 2018 05:51:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d6c3b676-2fa2-f4e3-439a-93785827579f@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HweOPp0QFPPlbFHSORwlnIk1NCBHinUiO"
-Subject: Re: [Qemu-devel] [PATCH 3/7] jobs: add exit shim
+In-Reply-To: <20180823145230.13183-1-otubo@redhat.com>
+References: <20180823145230.13183-1-otubo@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Aug 2018 13:50:49 +0100
+Message-ID: <CAFEAcA9dfmD9f0yQvVQ5xV=srG5W7BtPdvunj1jDpES9DUjFqQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/4] seccomp branch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com
+To: Eduardo Otubo <otubo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paul Moore <pmoore@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HweOPp0QFPPlbFHSORwlnIk1NCBHinUiO
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com
-Message-ID: <b6ece610-27f2-433d-3eea-4702b9381af6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/7] jobs: add exit shim
-References: <20180817190457.8292-1-jsnow@redhat.com>
- <20180817190457.8292-4-jsnow@redhat.com>
- <7c836fb4-c6f4-b590-11ef-6aadb8bc169a@redhat.com>
- <bd4dc120-2fb2-fc4d-c11f-d79631eb7c16@redhat.com>
- <d6c3b676-2fa2-f4e3-439a-93785827579f@redhat.com>
-In-Reply-To: <d6c3b676-2fa2-f4e3-439a-93785827579f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-08-22 23:45, John Snow wrote:
->=20
->=20
-> On 08/22/2018 07:52 AM, Max Reitz wrote:
->> On 2018-08-22 13:43, Max Reitz wrote:
->>
->> [...]
->>
->>> I'd like .main_loop_settle().  Or .main_loop_post_run().  I think it'=
-s
->>> OK to have names that aren't as cool and tense as possible, when in
->>> return they actually tell you what they're doing.  (Sure,
->>> .main_loop_post_run() sounds really stupid, but it tells you exactly
->>> when the function is called and what it's for.)
->>
->> Looking at the next patch, I realized that .main_loop_complete() or
->> .complete_in_main_loop() would work just as well.  (No, I don't see an=
-y
->> confusion with whether you need to call job_completed(), especially
->> since after this series you can probably make that function static to
->> job.c.)
->>
->> Max
->>
->=20
-> I'm sorry to announce that after the part two of this series, the
-> callback will be erased completely, so the name is maybe less... import=
-ant.
-
-That's what I get for not reading the cover letter.
-
-Max
+On 23 August 2018 at 15:52, Eduardo Otubo <otubo@redhat.com> wrote:
+> The following changes since commit 3392fbee4e435658733bbe9aab23392660558b=
+59:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.1-p=
+ull-request' into staging (2018-08-23 12:28:17 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/otubo/qemu.git tags/pull-seccomp-20180823
+>
+> for you to fetch changes up to 70dfabeaa79ba4d7a3b699abe1a047c8012db114:
+>
+>   seccomp: set the seccomp filter to all threads (2018-08-23 16:45:44 +02=
+00)
+>
+> ----------------------------------------------------------------
+> pull-seccomp-20180823
+>
+> ----------------------------------------------------------------
+> Marc-Andr=C3=A9 Lureau (4):
+>       seccomp: use SIGSYS signal instead of killing the thread
+>       seccomp: prefer SCMP_ACT_KILL_PROCESS if available
+>       configure: require libseccomp 2.2.0
+>       seccomp: set the seccomp filter to all threads
+>
+>  configure      |  7 ++-----
+>  qemu-seccomp.c | 36 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 37 insertions(+), 6 deletions(-)
 
 
---HweOPp0QFPPlbFHSORwlnIk1NCBHinUiO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Applied, thanks.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluBUXoACgkQ9AfbAGHV
-z0BO2AgAvsonHor0TNw+kGfN7mQyrr0Rt8sLjdtit+3C0q9LNArd+/YYmOWzOlU1
-1Pjk+NaYZUGzemQzqiV/QoQ5NUPc2QF5+zYTGUYZ20l4UrgAkR8vVmrl75VY7RH7
-8/qvQVijuO4EdwhYq+4KRz65Y8xw1kYrqGOXixHMroWOS3EeTkp3lUw7NzhyGQiD
-4HT4k1O+6vPcDHBKtiJnaGYHbjxPfvP1Z6BtdfBsnpuQDp+ZIXKNSLcz605bsKoL
-n6awQB1MrTrs+6K8h+58sp7LxcWtMUTxLVLE2aaBbDjxHk8f7K9HRlMX3SEtXCp1
-57N3TXmOYGqser020nqMMR49PiESPg==
-=Lfvw
------END PGP SIGNATURE-----
-
---HweOPp0QFPPlbFHSORwlnIk1NCBHinUiO--
+-- PMM
