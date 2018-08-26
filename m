@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ftvl9-00082n-H1
+	(envelope-from <berto@igalia.com>) id 1ftvl9-00082q-Hj
 	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 10:11:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ftvl6-0006z7-CL
+	(envelope-from <berto@igalia.com>) id 1ftvl6-0006yk-9d
 	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 10:11:19 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Sun, 26 Aug 2018 17:09:39 +0300
-Message-Id: <2827c309182950530885b95f0582677b8d99d347.1535291602.git.berto@igalia.com>
+Date: Sun, 26 Aug 2018 17:09:34 +0300
+Message-Id: <054195c8f83f524ee1f4d117407ac507dd18b0d8.1535291602.git.berto@igalia.com>
 In-Reply-To: <cover.1535291602.git.berto@igalia.com>
 References: <cover.1535291602.git.berto@igalia.com>
 In-Reply-To: <cover.1535291602.git.berto@igalia.com>
 References: <cover.1535291602.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 8/9] block: Allow changing 'detect-zeroes' on
- reopen
+Subject: [Qemu-devel] [PATCH 3/9] block: Remove child references from
+ bs->{options, explicit_options}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,141 +25,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-'detect-zeroes' is one of the basic BlockdevOptions available for all
-drivers, but it's silently ignored by bdrv_reopen_prepare/commit(), so
-the user cannot change it and doesn't get an error explaining that it
-can't be changed.
+Block drivers allow opening their children using a reference to an
+existing BlockDriverState. These references remain stored in the
+'options' and 'explicit_options' QDicts, but we don't need to keep
+them once everything is open.
 
-This should update the detect-zeroes setting, but does nothing:
+What is more important, these values can become wrong if the children
+change:
 
-   (qemu) qemu-io virtio0 "reopen -o detect-zeroes=on"
+    $ qemu-img create -f qcow2 hd0.qcow2 10M
+    $ qemu-img create -f qcow2 hd1.qcow2 10M
+    $ qemu-img create -f qcow2 hd2.qcow2 10M
+    $ $QEMU -drive if=none,file=hd0.qcow2,node-name=hd0 \
+            -drive if=none,file=hd1.qcow2,node-name=hd1,backing=hd0 \
+            -drive file=hd2.qcow2,node-name=hd2,backing=hd1
 
-This should return an error but also does nothing:
+After this hd2 has hd1 as its backing file. Now let's remove it using
+block_stream:
 
-   (qemu) qemu-io virtio0 "reopen -o discard=off,detect-zeroes=unmap"
+    (qemu) block_stream hd2 0 hd0.qcow2
 
-Since there's no reason why we shouldn't allow changing it and the
-implementation is simple let's just do it.
+Now hd0 is the backing file of hd2, but hd2's options QDicts still
+contain backing=hd1.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c               | 63 +++++++++++++++++++++++++++++++--------------------
- include/block/block.h |  1 +
- 2 files changed, 40 insertions(+), 24 deletions(-)
+ block.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/block.c b/block.c
-index 21f1eb9cd1..9aed5c19f4 100644
+index 0dbb1fcc7b..2f2484965d 100644
 --- a/block.c
 +++ b/block.c
-@@ -764,6 +764,30 @@ static void bdrv_join_options(BlockDriverState *bs, QDict *options,
+@@ -2763,12 +2763,15 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+         }
      }
- }
  
-+static BlockdevDetectZeroesOptions bdrv_parse_detect_zeroes(QemuOpts *opts,
-+                                                            int open_flags,
-+                                                            Error **errp)
-+{
-+    Error *local_err = NULL;
-+    const char *value = qemu_opt_get(opts, "detect-zeroes");
-+    BlockdevDetectZeroesOptions detect_zeroes =
-+        qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup, value,
-+                        BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return detect_zeroes;
-+    }
-+
-+    if (detect_zeroes == BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP &&
-+        !(open_flags & BDRV_O_UNMAP))
-+    {
-+        error_setg(errp, "setting detect-zeroes to unmap is not allowed "
-+                   "without setting discard operation to unmap");
-+    }
-+
-+    return detect_zeroes;
-+}
-+
- /**
-  * Set open flags for a given discard mode
-  *
-@@ -1328,7 +1352,6 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
-     const char *driver_name = NULL;
-     const char *node_name = NULL;
-     const char *discard;
--    const char *detect_zeroes;
-     QemuOpts *opts;
+-    /* Remove all children options from bs->options and bs->explicit_options */
++    /* Remove all children options and references
++     * from bs->options and bs->explicit_options */
+     QLIST_FOREACH(child, &bs->children, next) {
+         char *child_key_dot;
+         child_key_dot = g_strdup_printf("%s.", child->name);
+         qdict_extract_subqdict(bs->explicit_options, NULL, child_key_dot);
+         qdict_extract_subqdict(bs->options, NULL, child_key_dot);
++        qdict_del(bs->explicit_options, child->name);
++        qdict_del(bs->options, child->name);
+         g_free(child_key_dot);
+     }
+ 
+@@ -3289,6 +3292,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+ {
      BlockDriver *drv;
-     Error *local_err = NULL;
-@@ -1417,29 +1440,12 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
-         }
-     }
+     BlockDriverState *bs;
++    BdrvChild *child;
+     bool old_can_write, new_can_write;
  
--    detect_zeroes = qemu_opt_get(opts, "detect-zeroes");
--    if (detect_zeroes) {
--        BlockdevDetectZeroesOptions value =
--            qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup,
--                            detect_zeroes,
--                            BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF,
--                            &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            ret = -EINVAL;
--            goto fail_opts;
--        }
--
--        if (value == BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP &&
--            !(bs->open_flags & BDRV_O_UNMAP))
--        {
--            error_setg(errp, "setting detect-zeroes to unmap is not allowed "
--                             "without setting discard operation to unmap");
--            ret = -EINVAL;
--            goto fail_opts;
--        }
--
--        bs->detect_zeroes = value;
-+    bs->detect_zeroes =
-+        bdrv_parse_detect_zeroes(opts, bs->open_flags, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto fail_opts;
-     }
- 
-     if (filename != NULL) {
-@@ -3187,6 +3193,14 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-         }
-     }
- 
-+    reopen_state->detect_zeroes =
-+        bdrv_parse_detect_zeroes(opts, reopen_state->flags, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto error;
-+    }
-+
-     /* node-name and driver must be unchanged. Put them back into the QDict, so
-      * that they are checked at the end of this function. */
-     value = qemu_opt_get(opts, "node-name");
-@@ -3344,6 +3358,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
-     bs->options            = reopen_state->options;
+     assert(reopen_state != NULL);
+@@ -3313,6 +3317,12 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
      bs->open_flags         = reopen_state->flags;
      bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
-+    bs->detect_zeroes      = reopen_state->detect_zeroes;
  
-     /* Remove child references from bs->options and bs->explicit_options */
-     QLIST_FOREACH(child, &bs->children, next) {
-diff --git a/include/block/block.h b/include/block/block.h
-index 4e0871aaf9..f71fa5a1c4 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -184,6 +184,7 @@ typedef QSIMPLEQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReopenQueue;
- typedef struct BDRVReopenState {
-     BlockDriverState *bs;
-     int flags;
-+    BlockdevDetectZeroesOptions detect_zeroes;
-     uint64_t perm, shared_perm;
-     QDict *options;
-     QDict *explicit_options;
++    /* Remove child references from bs->options and bs->explicit_options */
++    QLIST_FOREACH(child, &bs->children, next) {
++        qdict_del(bs->explicit_options, child->name);
++        qdict_del(bs->options, child->name);
++    }
++
+     bdrv_refresh_limits(bs, NULL);
+ 
+     bdrv_set_perm(reopen_state->bs, reopen_state->perm,
 -- 
 2.11.0
