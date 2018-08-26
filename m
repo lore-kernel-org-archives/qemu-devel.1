@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ftvl9-00082j-FA
+	(envelope-from <berto@igalia.com>) id 1ftvl9-00082m-Gp
 	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 10:11:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1ftvl6-0006zJ-Ef
+	(envelope-from <berto@igalia.com>) id 1ftvl6-0006zb-Ew
 	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 10:11:19 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Sun, 26 Aug 2018 17:09:32 +0300
-Message-Id: <c96c83fefeaf6d586f0c521ddd36b076cd60eaed.1535291602.git.berto@igalia.com>
+Date: Sun, 26 Aug 2018 17:09:35 +0300
+Message-Id: <cbbe82e012ffd2dde05fec3012ab1ebc7cd3d045.1535291602.git.berto@igalia.com>
 In-Reply-To: <cover.1535291602.git.berto@igalia.com>
 References: <cover.1535291602.git.berto@igalia.com>
 In-Reply-To: <cover.1535291602.git.berto@igalia.com>
 References: <cover.1535291602.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH 1/9] qemu-io: Fix writethrough check in reopen
+Subject: [Qemu-devel] [PATCH 4/9] block: Don't look for child references in
+ append_open_options()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +25,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-"qemu-io reopen" doesn't allow changing the writethrough setting of
-the cache, but the check is wrong, causing an error even on a simple
-reopen with the default parameters:
-
-   $ qemu-img create -f qcow2 hd.qcow2 1M
-   $ qemu-system-x86_64 -monitor stdio -drive if=virtio,file=hd.qcow2
-   (qemu) qemu-io virtio0 reopen
-   Cannot change cache.writeback: Device attached
+In the previous patch we removed child references from bs->options, so
+there's no need to look for them here anymore.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- qemu-io-cmds.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 5bf5f28178..db0b3ee5ef 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2025,7 +2025,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
-     }
+diff --git a/block.c b/block.c
+index 2f2484965d..92afb3dcce 100644
+--- a/block.c
++++ b/block.c
+@@ -5153,23 +5153,12 @@ static bool append_open_options(QDict *d, BlockDriverState *bs)
+ {
+     const QDictEntry *entry;
+     QemuOptDesc *desc;
+-    BdrvChild *child;
+     bool found_any = false;
  
--    if (writethrough != blk_enable_write_cache(blk) &&
-+    if (!writethrough != blk_enable_write_cache(blk) &&
-         blk_get_attached_dev(blk))
+     for (entry = qdict_first(bs->options); entry;
+          entry = qdict_next(bs->options, entry))
      {
-         error_report("Cannot change cache.writeback: Device attached");
+-        /* Exclude node-name references to children */
+-        QLIST_FOREACH(child, &bs->children, next) {
+-            if (!strcmp(entry->key, child->name)) {
+-                break;
+-            }
+-        }
+-        if (child) {
+-            continue;
+-        }
+-
+-        /* And exclude all non-driver-specific options */
++        /* Exclude all non-driver-specific options */
+         for (desc = bdrv_runtime_opts.desc; desc->name; desc++) {
+             if (!strcmp(qdict_entry_key(entry), desc->name)) {
+                 break;
 -- 
 2.11.0
