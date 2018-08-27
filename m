@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fu9UW-0001Eg-Hz
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:51:05 -0400
+	(envelope-from <peterx@redhat.com>) id 1fu9ZZ-0003hV-9E
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fu9UR-0003s0-J7
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:51:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47174 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fu9ZU-0000hn-9n
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:56:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47278 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fu9UR-0003ri-Dl
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:50:59 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CD39B7A7E5
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 04:50:58 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180824084658.4285-1-kraxel@redhat.com>
-Date: Mon, 27 Aug 2018 06:50:55 +0200
-In-Reply-To: <20180824084658.4285-1-kraxel@redhat.com> (Gerd Hoffmann's
-	message of "Fri, 24 Aug 2018 10:46:58 +0200")
-Message-ID: <87o9doxvio.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fu9ZU-0000hV-4q
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:56:12 -0400
+Date: Mon, 27 Aug 2018 12:56:02 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180827045602.GF3020@xz-x1>
+References: <20180825135724.8981-1-marcandre.lureau@redhat.com>
+	<20180825135724.8981-5-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] gtk: add zoom-to-fit to gtk options.
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180825135724.8981-5-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] monitor: no need to save need_resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Gerd Hoffmann <kraxel@redhat.com> writes:
+On Sat, Aug 25, 2018 at 03:57:19PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> There is no need for per-command need_resume granularity, it should
+> resume after running an non-oob command on oob-disabled monitor.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-> This allows to set the option on the command line, i.e. "-display
-> gtk,zoom-to-fit={on,off}", overriding the default choosen by qemu.
+Note that this series/patch still conflict with the "enable
+out-of-band by default" series.
 
-chosen
+  [PATCH v6 00/13] monitor: enable OOB by default
 
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  ui/gtk.c     | 8 ++++++++
->  qapi/ui.json | 6 +++++-
->  2 files changed, 13 insertions(+), 1 deletion(-)
->
-> diff --git a/ui/gtk.c b/ui/gtk.c
-> index 5cce6ed42d..3ddb5fe162 100644
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -2136,6 +2136,8 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
->                                QemuConsole *con, int idx,
->                                GSList *group, GtkWidget *view_menu)
->  {
-> +    bool zoom_to_fit;
-> +
->      vc->label = qemu_console_get_label(con);
->      vc->s = s;
->      vc->gfx.scale_x = 1.0;
-> @@ -2199,6 +2201,12 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
->      group = gd_vc_menu_init(s, vc, idx, group, view_menu);
->  
->      if (dpy_ui_info_supported(vc->gfx.dcl.con)) {
-> +        zoom_to_fit = true;
-> +    }
-> +    if (s->opts->u.gtk.has_zoom_to_fit) {
-> +        zoom_to_fit = s->opts->u.gtk.zoom_to_fit;
-> +    }
-> +    if (zoom_to_fit) {
->          gtk_menu_item_activate(GTK_MENU_ITEM(s->zoom_fit_item));
->          s->free_scale = true;
->      }
-> diff --git a/qapi/ui.json b/qapi/ui.json
-> index 4ca91bb45a..4d2387ce7b 100644
-> --- a/qapi/ui.json
-> +++ b/qapi/ui.json
-> @@ -1022,12 +1022,16 @@
->  # GTK display options.
->  #
->  # @grab-on-hover: Grab keyboard input on mouse hover.
-> +# @zoom-to-fit: Zoom guest display to fit into the host window.  When
-> +#               turned off the host window will be resized instead
-> +#               (since 3.1).
+I'm not against this patch to be merged since it has its r-b, but I
+feel like we'd better judge on whether we still like the response
+queue first, in case one day we'll need to add these things back.
 
-What's the default?
+When there could be functional changes around the code path I would
+think we'd better keep the cleanup patches postponed a bit until those
+functional changes are settled.  For now the functional part is decide
+how to fix up the rest of out-of-band issues (my proposal is in the
+series above which should solve everything that is related to
+out-of-band to be fixed; if there is more, I'll continue to work on
+it), whether we should enable it by default for 3.1 (my answer
+is... yes...), and what to do with it.
 
-The cover letter says its chosen by QEMU.  Matches my reading of the
-patch.  Please document it.
+If we found that it's too hard to enable it by default, I'm thinking
+whether we can make it a persistent flag for monitor (maybe turning
+the "x-oob" into a real "oob" and keep it, then we don't turn it on by
+default), then we can let libvirt start working with out-of-band with
+the flag.  After all it's actually working mostly (the pending issues
+are only things like flow control for malicious/buggy clients, but
+libvirt never had such an issue with it).
 
->  #
->  # Since: 2.12
->  #
->  ##
->  { 'struct'  : 'DisplayGTK',
-> -  'data'    : { '*grab-on-hover' : 'bool' } }
-> +  'data'    : { '*grab-on-hover' : 'bool',
-> +                '*zoom-to-fit'   : 'bool'  } }
->  
->   ##
->   # @DisplayGLMode:
+Regards,
 
-
-With a suitable doc fix
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+--=20
+Peter Xu
