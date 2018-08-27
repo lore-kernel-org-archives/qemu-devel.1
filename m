@@ -1,22 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuI7s-0004Uw-F2
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:04:17 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fuIDg-0002xY-Or
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:10:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuI7o-00048R-LQ
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:04:14 -0400
-References: <20180823222249.13518-1-jsnow@redhat.com>
-	<20180823222249.13518-14-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <5e231134-be0a-fb6d-b61d-59bf42635ce9@redhat.com>
-Date: Mon, 27 Aug 2018 16:03:53 +0200
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fuIDd-0002yD-Ck
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:10:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59604
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fuIDd-0002vr-4l
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:10:13 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w7RE9ea4013333
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 10:10:10 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2m4h7tme9c-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 10:10:10 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 27 Aug 2018 08:10:09 -0600
+References: <20180810153223.28409-1-marcandre.lureau@redhat.com>
+	<20180810153223.28409-7-marcandre.lureau@redhat.com>
+	<20180813110744.3d0ee400@redhat.com>
+	<CAJ+F1C+sCoJzOVGxmjKdTjPyk6EH7_vXZT7vdRPCiFrHQmtr7Q@mail.gmail.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Mon, 27 Aug 2018 10:10:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180823222249.13518-14-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="i5CUkCp9v276gbZan47xNLf5gvURJoHnF"
-Subject: Re: [Qemu-devel] [PATCH v2 13/13] block/backup: qapi documentation
- fixup
+In-Reply-To: <CAJ+F1C+sCoJzOVGxmjKdTjPyk6EH7_vXZT7vdRPCiFrHQmtr7Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <62c55924-3750-b274-7ff3-b677fd7b3ad7@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 6/6] tpm: add ACPI memory clear interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +45,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i5CUkCp9v276gbZan47xNLf5gvURJoHnF
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com,
- Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <5e231134-be0a-fb6d-b61d-59bf42635ce9@redhat.com>
-Subject: Re: [PATCH v2 13/13] block/backup: qapi documentation fixup
-References: <20180823222249.13518-1-jsnow@redhat.com>
- <20180823222249.13518-14-jsnow@redhat.com>
-In-Reply-To: <20180823222249.13518-14-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 08/14/2018 06:02 AM, Marc-Andr=C3=A9 Lureau wrote:
+>
+>>> --- a/docs/specs/tpm.txt
+>>> +++ b/docs/specs/tpm.txt
+>>> @@ -121,6 +121,8 @@ layout:
+>>>    +----------+--------+--------+------------------------------------=
+-------+
+>>>    | next_step|   0x1  |  0x159 | Operation to execute after reboot b=
+y      |
+>>>    |          |        |        | firmware. Used by firmware.        =
+       |
+>>> + +----------+--------+--------+-------------------------------------=
+------+
+>>> + | movv     |   0x1  |  0x200 | Memory overwrite variable           =
+      |
+>>>    +----------+--------+--------+------------------------------------=
+-------+
+>> why 0x200 and not 0x15a ?
+>>
+> I thought it would be better to leave some room for PPI, but that
+> probably doesn't help much. Let's move it to 0x15a.
+>
+>> Btw why TPM_PPI_ADDR_SIZE is 0x400 and excess bytes aren't documented =
+anywhere?
+> I guess for the same reason, Stefan wanted to have some room for
+> future changes. Is that a problem?
+>
+> Stefan, can you confirm?
+Yes, this was the primary reason.
 
-On 2018-08-24 00:22, John Snow wrote:
-> Fix documentation to match the other jobs amended for 3.1.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  qapi/block-core.json | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---i5CUkCp9v276gbZan47xNLf5gvURJoHnF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluEBMoACgkQ9AfbAGHV
-z0CioggAjqLO9Uzbq7IkM1PWZLb1y6IoVPmAvLnzxWf1B1sz23rLdWXJWWF1rOUt
-mdKgtQepqw5uJkE0XTSkfdm3sBJwYRICK40tg4iGkHbWsduevQZn/ikowRoVXayb
-HGfsyzYa0toUKvxB5ZbbI6iqLGXKd6+5DrqaTcnRe2CPBOaA7omtlp/pYK76kC++
-FJd6Wbuc2Tcu75o9+KzNfQ4BAP0shQGJ1zuqJogm5MpqkulMhwiN/ZwR/758urno
-1dBBWVJ0ArHEyPHvraa8KCd/JU6pVgTi94oLxprxY+fG37ZEYSQehpMP5RrROWAO
-DNw45EUK2SsvJh2dxaQWwg20FBbfBA==
-=Vdd/
------END PGP SIGNATURE-----
-
---i5CUkCp9v276gbZan47xNLf5gvURJoHnF--
+ =C2=A0=C2=A0 Stefan
