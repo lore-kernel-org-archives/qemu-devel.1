@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fuCJq-0005zV-CC
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:52:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1fuChv-0001Is-MG
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fuC5E-0001mj-0Y
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:37:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51366 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fuCfj-0007Rs-8Z
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:14:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54948 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fuC5D-0001mb-Re
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:37:07 -0400
-References: <20180825135724.8981-1-marcandre.lureau@redhat.com>
-	<20180825135724.8981-3-marcandre.lureau@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e5ab0f3d-358e-ef4d-0bf3-c700e050b1f6@redhat.com>
-Date: Mon, 27 Aug 2018 09:37:03 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuCfj-0007RO-4Z
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:14:51 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6FE4F4023461
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:14:49 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180817173752.19136-1-marcandre.lureau@redhat.com>
+Date: Mon, 27 Aug 2018 10:14:41 +0200
+In-Reply-To: <20180817173752.19136-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Fri, 17 Aug 2018 19:37:52 +0200")
+Message-ID: <87va7wusy6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180825135724.8981-3-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/9] qmp: constify qmp_is_oob()
+Subject: Re: [Qemu-devel] [PATCH v2] monitor: accept input on resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, armbru@redhat.com, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 2018-08-25 15:57, Marc-Andr=C3=A9 Lureau wrote:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> A chardev may stop trying to write if the associated can_read()
+> callback returned 0. This happens when the monitor is suspended.
+> The frontend is supposed to call qemu_chr_fe_accept_input() when it is
+> ready to accept data again.
+>
+> An issue was observed with a spice port: pending commands may be
+> delayed, as the chardev is not flushed. Most chardev don't use the
+> accept_input() callback, and instead check regularly if they can
+> write. The ones that do use it are braille, mux, msmouse,
+> spice (abstract), spicevmc, spiceport, wctablet.
+>
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Acked-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  include/qapi/qmp/dispatch.h | 2 +-
->  qapi/qmp-dispatch.c         | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-> index 4e2e749faf..68a528a9aa 100644
-> --- a/include/qapi/qmp/dispatch.h
-> +++ b/include/qapi/qmp/dispatch.h
-> @@ -50,7 +50,7 @@ bool qmp_has_success_response(const QmpCommand *cmd);
->  QDict *qmp_error_response(Error *err);
->  QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
->                      bool allow_oob);
-> -bool qmp_is_oob(QDict *dict);
-> +bool qmp_is_oob(const QDict *dict);
-> =20
->  typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
-> =20
-> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-> index d8da1a62de..1d922e04f7 100644
-> --- a/qapi/qmp-dispatch.c
-> +++ b/qapi/qmp-dispatch.c
-> @@ -155,7 +155,7 @@ QDict *qmp_error_response(Error *err)
->  /*
->   * Does @qdict look like a command to be run out-of-band?
->   */
-> -bool qmp_is_oob(QDict *dict)
-> +bool qmp_is_oob(const QDict *dict)
->  {
->      return qdict_haskey(dict, "exec-oob")
->          && !qdict_haskey(dict, "execute");
->=20
+>  monitor.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/monitor.c b/monitor.c
+> index a1999e396c..33823b035a 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4407,6 +4407,7 @@ void monitor_resume(Monitor *mon)
+>              assert(mon->rs);
+>              readline_show_prompt(mon->rs);
+>          }
+> +        qemu_chr_fe_accept_input(&mon->chr);
+>      }
+>      trace_monitor_suspend(mon, -1);
+>  }
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Queued.  Thanks!
