@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:58747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fuJhd-0000Uh-SH
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:45:18 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fuJt9-0005mD-TF
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fuJgd-0002c7-QC
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:44:17 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fuJgd-0002bf-AO
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:44:15 -0400
-Received: by mail-oi0-x243.google.com with SMTP id p84-v6so28093081oic.4
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:44:15 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fuJrP-0002Dr-CT
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:55:24 -0400
+References: <20180817190457.8292-1-jsnow@redhat.com>
+	<20180817190457.8292-4-jsnow@redhat.com>
+	<7c836fb4-c6f4-b590-11ef-6aadb8bc169a@redhat.com>
+	<b576a1a9-ac22-599f-665f-8559e8a9faf1@redhat.com>
+	<c76b3fc9-e6a9-4e0b-7607-f0bbcef30234@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <2535fb2a-7079-f6cc-88d6-e25780691b7f@redhat.com>
+Date: Mon, 27 Aug 2018 11:54:52 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180827100431.7915-1-quintela@redhat.com>
-References: <20180827100431.7915-1-quintela@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Aug 2018 16:43:54 +0100
-Message-ID: <CAFEAcA_DHVuER-v_3=kOi5yCMTsvAj6qe7qJxLbZfvmLGo6tLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/9] Disable tests when device is not
- compiled in
+In-Reply-To: <c76b3fc9-e6a9-4e0b-7607-f0bbcef30234@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/7] jobs: add exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +27,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com
 
-On 27 August 2018 at 11:04, Juan Quintela <quintela@redhat.com> wrote:
-> The following changes since commit 235c82acca0491465e94be3cae2583b42d37c859:
->
->   Merge remote-tracking branch 'remotes/otubo/tags/pull-seccomp-20180823' into staging (2018-08-25 13:08:57 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/juanquintela/qemu.git tags/check/20180827
->
-> for you to fetch changes up to ee1f6c812b3240420dff07a3860060b7d4abfe09:
->
->   check: Move wdt_ib700 test to common (2018-08-27 11:27:07 +0200)
->
-> ----------------------------------------------------------------
-> check/next for 20180827
->
-> Hi
->
-> This are the patches that are reviewed to disable tests when devices
-> are not compiled in.  I will stop now until the changes to qtest are
-> finished.
->
-> Later, Juan.
->
-Applied, thanks.
 
--- PMM
+
+On 08/25/2018 09:05 AM, Max Reitz wrote:
+> On 2018-08-22 23:52, John Snow wrote:
+>>
+>>
+>> On 08/22/2018 07:43 AM, Max Reitz wrote:
+>>> On 2018-08-17 21:04, John Snow wrote:
+>>>> All jobs do the same thing when they leave their running loop:
+>>>> - Store the return code in a structure
+>>>> - wait to receive this structure in the main thread
+>>>> - signal job completion via job_completed
+>>>>
+>>>> Few jobs do anything beyond exactly this. Consolidate this exit
+>>>> logic for a net reduction in SLOC.
+>>>>
+>>>> More seriously, when we utilize job_defer_to_main_loop_bh to call
+>>>> a function that calls job_completed, job_finalize_single will run
+>>>> in a context where it has recursively taken the aio_context lock,
+>>>> which can cause hangs if it puts down a reference that causes a flush.
+>>>>
+>>>> You can observe this in practice by looking at mirror_exit's careful
+>>>> placement of job_completed and bdrv_unref calls.
+>>>>
+>>>> If we centralize job exiting, we can signal job completion from outside
+>>>> of the aio_context, which should allow for job cleanup code to run with
+>>>> only one lock, which makes cleanup callbacks less tricky to write.
+>>>>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>  include/qemu/job.h |  7 +++++++
+>>>>  job.c              | 19 +++++++++++++++++++
+>>>>  2 files changed, 26 insertions(+)
+>>>
+>>> Currently all jobs do this, the question of course is why.  The answer
+>>> is because they are block jobs that need to do some graph manipulation
+>>> in the main thread, right?
+>>>
+>>
+>> Yep.
+>>
+>>> OK, that's reasonable enough, that sounds like even non-block jobs may
+>>> need this (i.e. modify some global qemu state that you can only do in
+>>> the main loop).  Interestingly, the create job only calls
+>>> job_completed() of which it says nowhere that it needs to be executed in
+>>> the main loop.
+>>>
+>>
+>> Yeah, not all jobs will have anything meaningful to do in the main loop
+>> context. This is one of them.
+>>
+>>> ...on second thought, do we really want to execute job_complete() in the
+>>> main loop?  First of all, all of the transactional functions will run in
+>>> the main loop.  Which makes sense, but it isn't noted anywhere.
+>>> Secondly, we may end up calling JobDriver.user_resume(), which is
+>>> probably not something we want to call in the main loop.
+>>>
+>>
+>> I think we need to execute job_complete in the main loop, or otherwise
+>> restructure the code that can run between job_completed and
+>> job_finalize_single so that .prepare/.commit/.abort/.clean run in the
+>> main thread, which is something we want to preserve.
+> 
+> Sure.
+> 
+>> It's simpler just to say that complete will run from the main thread,
+>> like it does presently.
+> 
+> Yes, but we don't say that.
+> 
+>> Why would we not want to call user_resume from the main loop? That's
+>> directly where it's called from, since it gets invoked directly from the
+>> qmp thread.
+> 
+> Hmm!  True indeed.
+> 
+> The reason why we might not want to do it is because the job may not run
+> in the main loop, so modifying the job (especially invoking a job
+> method) may be dangerous without taking precautions.
+> 
+>>> OTOH, job_finish_sync() is something that has to be run in the main loop
+>>> because it polls the main loop (and as far as my FUSE experiments have
+>>> told me, polling a foreign AioContext doesn't work).
+>>>
+>>> So...  I suppose it would be nice if we had a real distinction which
+>>> functions are run in which AioContext.  It seems like we indeed want to
+>>> run job_completed() in the main loop, but what to do about the
+>>> user_resume() call in job_cancel_async()?
+>>>
+>>
+>> I don't think we need to do anything -- at least, these functions
+>> *already* run from the main loop.
+> 
+> Yeah, but we don't mark that anywhere.  I really don't like that.  Jobs
+> need to know which of their functions are run in which AioContext.
+> 
+>> mirror_exit et al get scheduled from job_defer_to_main_loop and call
+>> job_completed there, so it's already always done from the main loop; I'm
+>> just cutting out the part where the jobs have to manually schedule this.
+> 
+> I'm not saying what you're doing is wrong, I'm just saying tracking
+> which things are running in which context is not easy because there are
+> no comments on how it's supposed to be run.  (Apart from your new
+> .exit() method which does say that it's run in the main loop.)
+> 
+> No, I don't find it obvious which functions are run in which context
+> when first I have to think about in which context those functions are
+> used (e.g. user_resume is usually the result of a QMP command, so it's
+> run in the main loop; the transactional methods are part of completion,
+> which is done in the main loop, so they are also called in the main
+> loop; and so on).
+> 
+> But that's not part of this series.  It just occurred to me when
+> tracking down which function belongs to which context when reviewing
+> this patch.
+> 
+> Max
+> 
+
+Oh, I see. I can mark up the functions I/we expect to run in the main
+thread with comments above the function implementation, would that help?
+
+Probably also a top level document would also help... We're overdue for
+one after all the changes recently.
