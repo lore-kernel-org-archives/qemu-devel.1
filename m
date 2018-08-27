@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuIeo-0001eI-Hf
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fuIeq-0001eQ-E3
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuISn-0000F1-Ru
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:25:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fuISn-0000Dl-IT
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:25:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fuISl-0006QE-4N
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 14:25:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AF1EF2E80CE
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 14:25:49 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1fuISF-0007pk-To
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:25:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35838 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fuISF-0007oW-Lq
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:25:19 -0400
+Date: Mon, 27 Aug 2018 16:25:12 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180827162512.14fff54b@redhat.com>
+In-Reply-To: <20180827160239.54cc993a@bahia.lan>
+References: <1535368030-214556-1-git-send-email-imammedo@redhat.com>
+	<20180827160239.54cc993a@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Aug 2018 14:18:23 -0000
-From: Thomas Huth <1780812@bugs.launchpad.net>
-Reply-To: Bug 1780812 <1780812@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153115106911.12886.11036147672468872471.malonedeb@gac.canonical.com>
-Message-Id: <153537950388.6556.7464573606452918007.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1780812] Re: Full-Screen Switch Does Nothing When
- Using SDL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc: make sure that guest isn't able to
+ unplug the first cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +28,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au, david@redhat.com, cohuck@redhat.com
 
-Fix has been merged:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D6fb34ffcaae0823
+On Mon, 27 Aug 2018 16:02:39 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+> On Mon, 27 Aug 2018 13:07:10 +0200
+> Igor Mammedov <imammedo@redhat.com> wrote:
+> 
+> > The first cpu unplug wasn't ever supported and corresponding
+> > monitor/qmp commands refuse to unplug it. However guest is able
+> > to issue eject request either using following command:
+> >   # echo 1 >/sys/devices/system/cpu/cpu0/firmware_node/eject  
+> 
+> I can't reproduce the issue with a pc guest and current master...
+> 
+> All I seem to get is an error in dmesg:
+> 
+> [   97.435446] processor cpu0: Offline failed.
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Thomas Huth (th-huth)
+To be able to unplug CPU0 one need to set CONFIG_BOOTPARAM_HOTPLUG_CPU0=y
+(I've tested it with a RHLE7 kernel)
+ 
+> > or directly writing to cpu hotplug registers, which makes
+> > qemu crash with SIGSEGV following back trace:
+> > 
+> >    kvm_flush_coalesced_mmio_buffer ()
+> >        while (ring->first != ring->last)
+> >    ...
+> >    qemu_flush_coalesced_mmio_buffer
+> >    prepare_mmio_access
+> >    flatview_read_continue
+> >    flatview_read
+> >    address_space_read_full
+> >    address_space_rw
+> >    kvm_cpu_exec(cpu!0)
+> >    qemu_kvm_cpu_thread_fn
+> > 
+> > the reason for which is that ring == KVMState::coalesced_mmio_ring
+> > happens to be a part of 1st CPU that was uplugged by guest.
+> > 
+> > Fix it by forbidding 1st cpu unplug from guest side and in addition
+> > remove CPU0._EJ0 ACPI method to make clear that unplug of the first
+> > CPU is not supported.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > CCing spapr and s390x folks in case targets need to prevent 1st CPU unplug as well
+> >   
+> 
+> A spapr guest can _release_ the first cpu by doing something like:
+> 
+> # echo -n "/cpus/PowerPC,POWER8@0" > /sys/devices/system/cpu/release
+> 
+> But AFAIK, this doesn't unplug the cpu from a QEMU standpoint.
+Good,
+so only x86 fix should be fixed.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1780812
-
-Title:
-  Full-Screen Switch Does Nothing When Using SDL
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  When using SDL switches, e.g.
-
-  -sdl -full-screen -display sdl
-
-  ... you'd expect the display to start full-screen, as per the switch
-  description, but it just starts in a window. Pressing the full-screen
-  key combination (Ctrl+Alt+F) enters fullscreen mode as expected.
-
-  Tested on QEmu 2.12.0 using qemu-system-x86_64. OS is Arch Linux.
-  Guest is Windows 98 in this test, but happens universally so the guest
-  shouldn't be relevant in this instance.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1780812/+subscriptions
+> > CC: mst@redhat.com
+> > CC: pbonzini@redhat.com
+> > CC: david@gibson.dropbear.id.au
+> > CC: groug@kaod.org
+> > CC: david@redhat.com
+> > CC: cohuck@redhat.com
+> > ---
+> >  hw/acpi/cpu.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> > index 5ae595e..4bb8371 100644
+> > --- a/hw/acpi/cpu.c
+> > +++ b/hw/acpi/cpu.c
+> > @@ -117,7 +117,7 @@ static void cpu_hotplug_wr(void *opaque, hwaddr addr, uint64_t data,
+> >              DeviceState *dev = NULL;
+> >              HotplugHandler *hotplug_ctrl = NULL;
+> >  
+> > -            if (!cdev->cpu) {
+> > +            if (!cdev->cpu || cdev->cpu == first_cpu) {
+> >                  trace_cpuhp_acpi_ejecting_invalid_cpu(cpu_st->selector);
+> >                  break;
+> >              }
+> > @@ -541,9 +541,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+> >                  aml_buffer(madt_buf->len, (uint8_t *)madt_buf->data)));
+> >              g_array_free(madt_buf, true);
+> >  
+> > -            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+> > -            aml_append(method, aml_call1(CPU_EJECT_METHOD, uid));
+> > -            aml_append(dev, method);
+> > +            if (CPU(arch_ids->cpus[i].cpu) != first_cpu) {
+> > +                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+> > +                aml_append(method, aml_call1(CPU_EJECT_METHOD, uid));
+> > +                aml_append(dev, method);
+> > +            }
+> >  
+> >              method = aml_method("_OST", 3, AML_SERIALIZED);
+> >              aml_append(method,  
+> 
