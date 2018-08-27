@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuBVv-0005tl-5c
+	(envelope-from <armbru@redhat.com>) id 1fuBVv-0005tn-Ti
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuBVr-00067W-Tq
+	(envelope-from <armbru@redhat.com>) id 1fuBVr-00067I-RW
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:00:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53036 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55140 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuBVr-00066t-LT
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuBVr-00066u-Kv
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:00:35 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 27 Aug 2018 09:00:17 +0200
-Message-Id: <20180827070021.11931-3-armbru@redhat.com>
+Date: Mon, 27 Aug 2018 09:00:18 +0200
+Message-Id: <20180827070021.11931-4-armbru@redhat.com>
 In-Reply-To: <20180827070021.11931-1-armbru@redhat.com>
 References: <20180827070021.11931-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/6] json: Clean up how lexer consumes "end of
- input"
+Subject: [Qemu-devel] [PATCH 3/6] json: Make lexer's "character consumed"
+ logic less confusing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +27,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-When the lexer isn't in its start state at the end of input, it's
-working on a token.  To flush it out, it needs to transit to its start
-state on "end of input" lookahead.
+The lexer uses macro TERMINAL_NEEDED_LOOKAHEAD() to decide whether a
+state transition consumes the input character.  It returns true when
+the state transition is defined with the TERMINAL() macro.  To detect
+that, it checks whether input '\0' would have resulted in the same
+state transition, and the new state is not IN_ERROR.
 
-There are two ways to the start state, depending on the current state:
+Why does that even work?  For all states, the new state on input '\0'
+is either IN_ERROR or defined with TERMINAL().  If the state
+transition equals the one we'd get for input '\0', it goes to IN_ERROR
+or to the argument of TERMINAL().  We never use TERMINAL(IN_ERROR),
+because it makes no sense.  Thus, if it doesn't go to IN_ERROR, it
+must be defined with TERMINAL().
 
-* If the lexer is in a TERMINAL(JSON_FOO) state, it can emit a
-  JSON_FOO token.
+Since this isn't quite confusing enough, we negate the result to get
+@char_consumed, and ignore it when @flush is true.
 
-* Else, it can go to IN_ERROR state, and emit a JSON_ERROR token.
-
-There are complications, however:
-
-* The transition to IN_ERROR state consumes the input character and
-  adds it to the JSON_ERROR token.  The latter is inappropriate for
-  the "end of input" character, so we suppress that.  See also recent
-  commit "json: Fix lexer to include the bad character in JSON_ERROR
-  token".
-
-* The transition to a TERMINAL(JSON_FOO) state doesn't consume the
-  input character.  In that case, the lexer normally loops until it is
-  consumed.  We have to suppress that for the "end of input" input
-  character.  If we didn't, the lexer would consume it by entering
-  IN_ERROR state, emitting a bogus JSON_ERROR token.  We fixed that in
-  commit bd3924a33a6.
-
-However, simply breaking the loop this way assumes that the lexer
-needs exactly one state transition to reach its start state.  That
-assumption is correct now, but it's unclean, and I'll soon break it.
-Clean up: instead of breaking the loop after one iteration, break it
-after it reached the start state.
+Instead of deriving the lookahead bit from the state transition, make
+it explicit.  This is easier to understand, and a bit more flexible,
+too.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/json-lexer.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ qobject/json-lexer.c      | 27 ++++++++++++++++-----------
+ qobject/json-parser-int.h |  1 +
+ 2 files changed, 17 insertions(+), 11 deletions(-)
 
 diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 4867839f66..ec3aec726f 100644
+index ec3aec726f..28582e17d9 100644
 --- a/qobject/json-lexer.c
 +++ b/qobject/json-lexer.c
-@@ -261,7 +261,8 @@ void json_lexer_init(JSONLexer *lexer, bool enable_interpolation)
+@@ -121,15 +121,11 @@ enum json_lexer_state {
+ };
  
- static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+ QEMU_BUILD_BUG_ON((int)JSON_MIN <= (int)IN_START_INTERP);
++QEMU_BUILD_BUG_ON(JSON_MAX >= 0x80);
+ QEMU_BUILD_BUG_ON(IN_START_INTERP != IN_START + 1);
+ 
+-#define TERMINAL(state) [0 ... 0xFF] = (state)
+-
+-/* Return whether TERMINAL is a terminal state and the transition to it
+-   from OLD_STATE required lookahead.  This happens whenever the table
+-   below uses the TERMINAL macro.  */
+-#define TERMINAL_NEEDED_LOOKAHEAD(old_state, terminal) \
+-    (terminal != IN_ERROR && json_lexer[(old_state)][0] == (terminal))
++#define LOOKAHEAD 0x80
++#define TERMINAL(state) [0 ... 0xFF] = ((state) | LOOKAHEAD)
+ 
+ static const uint8_t json_lexer[][256] =  {
+     /* Relies on default initialization to IN_ERROR! */
+@@ -251,6 +247,17 @@ static const uint8_t json_lexer[][256] =  {
+     [IN_START_INTERP]['%'] = IN_INTERP,
+ };
+ 
++static inline uint8_t next_state(JSONLexer *lexer, char ch, bool flush,
++                                 bool *char_consumed)
++{
++    uint8_t next;
++
++    assert(lexer->state <= ARRAY_SIZE(json_lexer));
++    next = json_lexer[lexer->state][(uint8_t)ch];
++    *char_consumed = !flush && !(next & LOOKAHEAD);
++    return next & ~LOOKAHEAD;
++}
++
+ void json_lexer_init(JSONLexer *lexer, bool enable_interpolation)
  {
--    int char_consumed, new_state;
-+    int new_state;
-+    bool char_consumed = false;
- 
-     lexer->x++;
-     if (ch == '\n') {
-@@ -269,11 +270,12 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-         lexer->y++;
+     lexer->start_state = lexer->state = enable_interpolation
+@@ -271,11 +278,9 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
      }
  
--    do {
-+    while (flush ? lexer->state != lexer->start_state : !char_consumed) {
-         assert(lexer->state <= ARRAY_SIZE(json_lexer));
-         new_state = json_lexer[lexer->state][(uint8_t)ch];
--        char_consumed = !TERMINAL_NEEDED_LOOKAHEAD(lexer->state, new_state);
--        if (char_consumed && !flush) {
-+        char_consumed = !flush
-+            && !TERMINAL_NEEDED_LOOKAHEAD(lexer->state, new_state);
-+        if (char_consumed) {
+     while (flush ? lexer->state != lexer->start_state : !char_consumed) {
+-        assert(lexer->state <= ARRAY_SIZE(json_lexer));
+-        new_state = json_lexer[lexer->state][(uint8_t)ch];
+-        char_consumed = !flush
+-            && !TERMINAL_NEEDED_LOOKAHEAD(lexer->state, new_state);
++        new_state = next_state(lexer, ch, flush, &char_consumed);
+         if (char_consumed) {
++            assert(!flush);
              g_string_append_c(lexer->token, ch);
          }
  
-@@ -318,7 +320,7 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-             break;
-         }
-         lexer->state = new_state;
--    } while (!char_consumed && !flush);
-+    }
+diff --git a/qobject/json-parser-int.h b/qobject/json-parser-int.h
+index ceaa890ec6..abeec63af5 100644
+--- a/qobject/json-parser-int.h
++++ b/qobject/json-parser-int.h
+@@ -33,6 +33,7 @@ typedef enum json_token_type {
+     JSON_SKIP,
+     JSON_ERROR,
+     JSON_END_OF_INPUT,
++    JSON_MAX = JSON_END_OF_INPUT
+ } JSONTokenType;
  
-     /* Do not let a single token grow to an arbitrarily large size,
-      * this is a security consideration.
-@@ -342,9 +344,8 @@ void json_lexer_feed(JSONLexer *lexer, const char *buffer, size_t size)
- 
- void json_lexer_flush(JSONLexer *lexer)
- {
--    if (lexer->state != lexer->start_state) {
--        json_lexer_feed_char(lexer, 0, true);
--    }
-+    json_lexer_feed_char(lexer, 0, true);
-+    assert(lexer->state == lexer->start_state);
-     json_message_process_token(lexer, lexer->token, JSON_END_OF_INPUT,
-                                lexer->x, lexer->y);
- }
+ typedef struct JSONToken JSONToken;
 -- 
 2.17.1
