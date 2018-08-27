@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fuG85-0005x5-9a
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:56:22 -0400
+	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
+	id 1fuGRC-0005np-Bk
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:16:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fuG7z-0006F2-HJ
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:56:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34488 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fuG7z-0006Ec-Ah
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:56:15 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C4009801145A
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 11:56:14 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 27 Aug 2018 13:56:08 +0200
-Message-Id: <1535370968-217716-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH] vl.c deprecate incorrect CPUs topology
+	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
+	id 1fuGPx-0002k0-MX
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:14:52 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:4686)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
+	id 1fuGPx-0002gs-HM
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:14:49 -0400
+From: "Janeczek, Craig" <jancraig@amazon.com>
+Date: Mon, 27 Aug 2018 12:14:42 +0000
+Message-ID: <0ba3173789a84b53be491b580eb30d77@EX13D12UEA003.ant.amazon.com>
+References: <cover.1535133088.git.jancraig@amazon.com>
+	<f1e92127959ffb3df713a06452328a71170bda93.1535133089.git.jancraig@amazon.com>
+	<231c38e4-8ad4-0f73-69ab-7a66d20716d3@linaro.org>
+In-Reply-To: <231c38e4-8ad4-0f73-69ab-7a66d20716d3@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 2/7] target/mips: Add MXU instructions
+ S32I2M and S32M2I
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, libvir-list@redhat.com, ehabkost@redhat.com, berrange@redhat.com, drjones@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>
 
--smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-so that total number of logical CPUs [sockets * cores * threads]
-would be equal to [maxcpus], however historically we didn't have
-such check in QEMU and it is possible to start VM with an invalid
-topology.
-Deprecate invalid options combination so we can make sure that
-the topology VM started with is always correct in the future.
-Users with an invalid sockets/cores/threads/maxcpus values should
-fix their CLI to make sure that
-   [sockets * cores * threads] == [maxcpus]
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- qemu-deprecated.texi | 11 +++++++++++
- vl.c                 |  6 ++++++
- 2 files changed, 17 insertions(+)
-
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 87212b6..d5d9ce6 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -159,6 +159,17 @@ The 'file' driver for drives is no longer appropriate for character or host
- devices and will only accept regular files (S_IFREG). The correct driver
- for these file types is 'host_cdrom' or 'host_device' as appropriate.
- 
-+@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
-+
-+CPU topology properties should describe whole machine topology including
-+possible CPUs. but historically it was possible to start QEMU with
-+an incorrect topology where
-+  socket * core * thread >= X && < maxcpus
-+which could lead to incorrect topology enumeration by the guest.
-+Support for invalid topology will be removed, end user must ensure
-+that topology described with -smp includes all possible cpus, i.e.:
-+  socket * core * thread == maxcpus
-+
- @section QEMU Machine Protocol (QMP) commands
- 
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-diff --git a/vl.c b/vl.c
-index 5ba06ad..bc53828 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1238,6 +1238,12 @@ static void smp_parse(QemuOpts *opts)
-             exit(1);
-         }
- 
-+        if (sockets * cores * threads != max_cpus) {
-+            warn_report("Invalid CPUs topology deprecated. "
-+                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "!= maxcpus (%u)",
-+                        sockets, cores, threads, max_cpus);
-+        }
-         if (sockets * cores * threads > max_cpus) {
-             error_report("cpu topology: "
-                          "sockets (%u) * cores (%u) * threads (%u) > "
--- 
-2.7.4
+aHR0cHM6Ly93d3cucm9ja2JveC5vcmcvd2lraS9wdWIvTWFpbi9JbmdlbmljSno0NzYwQi9qei1z
+aW1kLWRvY3MucGRmDQoNCkkgcHVsbGVkIHRoZW0gZnJvbSBoZXJlLiBJIGFsc28gd3JvdGUgYSBz
+ZXJpZXMgb2YgdGVzdHMgd2hpY2ggSSBjcm9zcyBjb21waWxlZCB0aGVuIHJhbiBvbiBib3RoIEhX
+IGFuZCB0aHJvdWdoIFFFTVUuIEFsdGhvdWdoIEkgZGlkIG5vdCBzdWJtaXQgdGhvc2UgdGVzdHMg
+YXMgcGFydCBvZiB0aGlzIHBhdGNoc2V0IGFzIEkgYW0gdW5zdXJlIG9mIGhvdyB0byBhZGQgdGhl
+bSBpbnRvIHRoZSBRRU1VIHRlc3QgaW5mcmFzdHJ1Y3R1cmUuDQoNCi0tLS0tT3JpZ2luYWwgTWVz
+c2FnZS0tLS0tDQpGcm9tOiBSaWNoYXJkIEhlbmRlcnNvbiA8cmljaGFyZC5oZW5kZXJzb25AbGlu
+YXJvLm9yZz4gDQpTZW50OiBTYXR1cmRheSwgQXVndXN0IDI1LCAyMDE4IDE6MDcgUE0NClRvOiBK
+YW5lY3playwgQ3JhaWcgPGphbmNyYWlnQGFtYXpvbi5jb20+OyBxZW11LWRldmVsQG5vbmdudS5v
+cmcNCkNjOiBhdXJlbGllbkBhdXJlbDMyLm5ldDsgYW1hcmtvdmljQHdhdmVjb21wLmNvbQ0KU3Vi
+amVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggMi83XSB0YXJnZXQvbWlwczogQWRkIE1YVSBp
+bnN0cnVjdGlvbnMgUzMySTJNIGFuZCBTMzJNMkkNCg0KT24gMDgvMjQvMjAxOCAxMjo0NCBQTSwg
+Q3JhaWcgSmFuZWN6ZWsgdmlhIFFlbXUtZGV2ZWwgd3JvdGU6DQo+IEFkZHMgc3VwcG9ydCBmb3Ig
+ZW11bGF0aW5nIHRoZSBTMzJJMk0gYW5kIFMzMk0ySSBNWFUgaW5zdHJ1Y3Rpb25zLg0KPiANCj4g
+U2lnbmVkLW9mZi1ieTogQ3JhaWcgSmFuZWN6ZWsgPGphbmNyYWlnQGFtYXpvbi5jb20+DQo+IC0t
+LQ0KPiAgdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMgfCA1NSANCj4gKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysNCj4gIDEgZmlsZSBjaGFuZ2VkLCA1NSBpbnNlcnRpb25z
+KCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMgYi90YXJnZXQv
+bWlwcy90cmFuc2xhdGUuYyBpbmRleCANCj4gNTBmMGNiNTU4Zi4uMzgxZGZhZDM2ZSAxMDA2NDQN
+Cj4gLS0tIGEvdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmMNCj4gKysrIGIvdGFyZ2V0L21pcHMvdHJh
+bnNsYXRlLmMNCj4gQEAgLTM2NCw2ICszNjQsOSBAQCBlbnVtIHsNCj4gICAgICBPUENfQ0xPICAg
+ICAgPSAweDIxIHwgT1BDX1NQRUNJQUwyLA0KPiAgICAgIE9QQ19EQ0xaICAgICA9IDB4MjQgfCBP
+UENfU1BFQ0lBTDIsDQo+ICAgICAgT1BDX0RDTE8gICAgID0gMHgyNSB8IE9QQ19TUEVDSUFMMiwN
+Cj4gKyAgICAvKiBNWFUgKi8NCj4gKyAgICBPUENfTVhVX1MzMkkyTSA9IDB4MkYgfCBPUENfU1BF
+Q0lBTDIsDQo+ICsgICAgT1BDX01YVV9TMzJNMkkgPSAweDJFIHwgT1BDX1NQRUNJQUwyLA0KDQpJ
+IGhhdmVuJ3QgYmVlbiBhYmxlIHRvIGZpbmQgYW55IGRvY3VtZW50YXRpb24gb2YgdGhlIGJpdCBs
+YXlvdXQgb2YgdGhlc2UgaW5zdHJ1Y3Rpb25zLiAgQW55IHBvaW50ZXJzPw0KDQo+ICt0eXBlZGVm
+IHVuaW9uIHsNCj4gKyAgICBzdHJ1Y3Qgew0KPiArICAgICAgICB1aW50MzJfdCBvcDo2Ow0KPiAr
+ICAgICAgICB1aW50MzJfdCB4cmE6NTsNCj4gKyAgICAgICAgdWludDMyX3Q6NTsNCj4gKyAgICAg
+ICAgdWludDMyX3QgcmI6NTsNCj4gKyAgICAgICAgdWludDMyX3Q6NTsNCj4gKyAgICAgICAgdWlu
+dDMyX3Qgc3BlY2lhbDI6NjsNCj4gKyAgICB9IFMzMkkyTTsNCj4gKw0KPiArICAgIHN0cnVjdCB7
+DQo+ICsgICAgICAgIHVpbnQzMl90IG9wOjY7DQo+ICsgICAgICAgIHVpbnQzMl90IHhyYTo1Ow0K
+PiArICAgICAgICB1aW50MzJfdDo1Ow0KPiArICAgICAgICB1aW50MzJfdCByYjo1Ow0KPiArICAg
+ICAgICB1aW50MzJfdDo1Ow0KPiArICAgICAgICB1aW50MzJfdCBzcGVjaWFsMjo2Ow0KPiArICAg
+IH0gUzMyTTJJOw0KPiArfSBNWFVfT1BDT0RFOw0KDQpEbyBub3QgdXNlIGJpdGZpZWxkcy4gIFRo
+ZSBsYXlvdXQgZGlmZmVycyBieSBob3N0IGNvbXBpbGVyLg0KVXNlIGV4dHJhY3QzMihpbnB1dCwg
+cG9zLCBsZW4pLg0KDQoNCj4gKw0KPiArLyogTVhVIEluc3RydWN0aW9ucyAqLw0KPiArc3RhdGlj
+IHZvaWQgZ2VuX214dShEaXNhc0NvbnRleHQgKmN0eCwgdWludDMyX3Qgb3BjKSB7ICNpZm5kZWYg
+DQo+ICtUQVJHRVRfTUlQUzY0IC8qIE9ubHkgd29ya3MgaW4gMzIgYml0IG1vZGUgKi8NCj4gKyAg
+ICBUQ0d2IHQwOw0KPiArICAgIHQwID0gdGNnX3RlbXBfbmV3KCk7DQo+ICsgICAgTVhVX09QQ09E
+RSAqb3Bjb2RlID0gKE1YVV9PUENPREUgKikmY3R4LT5vcGNvZGU7DQo+ICsNCj4gKyAgICBzd2l0
+Y2ggKG9wYykgew0KPiArICAgIGNhc2UgT1BDX01YVV9TMzJJMk06DQo+ICsgICAgICAgIGdlbl9s
+b2FkX2dwcih0MCwgb3Bjb2RlLT5TMzJJMk0ucmIpOw0KPiArICAgICAgICBnZW5fc3RvcmVfbXh1
+X2dwcih0MCwgb3Bjb2RlLT5TMzJJMk0ueHJhKTsNCj4gKyAgICAgICAgYnJlYWs7DQo+ICsNCj4g
+KyAgICBjYXNlIE9QQ19NWFVfUzMyTTJJOg0KPiArICAgICAgICBnZW5fbG9hZF9teHVfZ3ByKHQw
+LCBvcGNvZGUtPlMzMk0ySS54cmEpOw0KPiArICAgICAgICBnZW5fc3RvcmVfZ3ByKHQwLCBvcGNv
+ZGUtPlMzMk0ySS5yYik7DQo+ICsgICAgICAgIGJyZWFrOw0KPiArICAgIH0NCj4gKw0KPiArICAg
+IHRjZ190ZW1wX2ZyZWUodDApOw0KPiArI2Vsc2UNCj4gKyAgICBnZW5lcmF0ZV9leGNlcHRpb25f
+ZW5kKGN0eCwgRVhDUF9SSSk7ICNlbmRpZiB9DQoNClRoZXJlJ3Mgbm90aGluZyBoZXJlICh5ZXQs
+IEkgc3VwcG9zZSkgdGhhdCB3b24ndCBjb21waWxlIGZvciBNSVBTNjQuDQpJJ2Qgc3VnZ2VzdCBh
+dm9pZGluZyBpZmRlZnMgYXMgbXVjaCBhcyBwb3NzaWJsZS4NCg0KDQpyfg0KDQo=
