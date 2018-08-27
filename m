@@ -1,21 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuFNS-00011D-Mf
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:08:14 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fuFNa-0001Ch-SH
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuFCm-0007ce-Ib
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:57:09 -0400
-References: <20180823220856.10094-1-jsnow@redhat.com>
-	<20180823220856.10094-10-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <29fed4d6-de2c-8ef3-c003-6407d8129735@redhat.com>
-Date: Mon, 27 Aug 2018 12:56:51 +0200
+	(envelope-from <kraxel@redhat.com>) id 1fuF9C-00067D-NU
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:53:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45898 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuF9C-000678-Ij
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:53:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3831240216E9
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 10:53:26 +0000 (UTC)
+Date: Mon, 27 Aug 2018 12:53:21 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180827105321.5qeclqhsopqtutjv@sirius.home.kraxel.org>
+References: <20180822095421.11765-1-quintela@redhat.com>
+	<20180822095421.11765-8-quintela@redhat.com>
+	<0d3a215b-4916-b0a6-5654-5d64fcf6c996@redhat.com>
+	<87y3cyo4ax.fsf@trasno.org>
+	<20180823074321.wx7wix7jwsfrcbk5@sirius.home.kraxel.org>
+	<9cb5f027-e49c-d943-7ffa-9e744537f174@redhat.com>
+	<20180823094850.zycuwtjndmztgcm4@sirius.home.kraxel.org>
+	<20180823095359.GH23703@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180823220856.10094-10-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lkcnwuUgm1aMFKr8jDXg6QLf3u3P2x3wT"
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] jobs: remove job_defer_to_main_loop
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180823095359.GH23703@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] check: Only test boot-serial when
+ sga is compiled in
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +40,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, lvivier@redhat.com, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lkcnwuUgm1aMFKr8jDXg6QLf3u3P2x3wT
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com,
- Jeff Cody <jcody@redhat.com>
-Message-ID: <29fed4d6-de2c-8ef3-c003-6407d8129735@redhat.com>
-Subject: Re: [PATCH v2 9/9] jobs: remove job_defer_to_main_loop
-References: <20180823220856.10094-1-jsnow@redhat.com>
- <20180823220856.10094-10-jsnow@redhat.com>
-In-Reply-To: <20180823220856.10094-10-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+  Hi,
 
-On 2018-08-24 00:08, John Snow wrote:
-> Now that the job infrastructure is handling the job_completed call for
-> all implemented jobs, we can remove the interface that allowed jobs to
-> schedule their own completion.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  include/qemu/job.h | 17 -----------------
->  job.c              | 40 ++--------------------------------------
->  2 files changed, 2 insertions(+), 55 deletions(-)
+> The only way we can stop using "-device sga" is if we either have
+> something explicit in the XML saying whether to use it or not, or
+> alternatively have some indicator associated with the next versioned
+> machine type that we can hook off.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+How does libvirt query the machine type properties?
 
-
---lkcnwuUgm1aMFKr8jDXg6QLf3u3P2x3wT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluD2PMACgkQ9AfbAGHV
-z0AHvwgAlj7PL5IK3qfRVr4wIlztSiKnsL06YnDZH1/Wrcci1fjCVvswB5q1+mUD
-fRg+u+FtMYzp+PUJpRgMXYdK4RYpjqnod0RtN+WNO6db59fnnwy8QD2GJaTq+yQ7
-VvQ6z+vOxamdUNEVIAHjKgmOI25m2vPPF7z07h4sangaFP63y7Q/2kaLPsGb72/6
-ruo3xtAFR56VwXfEIn0AtfTvn4NsN86dz4FKwSz1DLF0RUnLj0OVJrQCeJMzjDR5
-ZOHEeyNONnTw3QgnBLeBrNbS/8DJruw2rWYvGLZMWR6xvPLWLbArHQAiu9znwAMj
-b+ftSErfn9p1twWBWy/dBZTHpOrj/g==
-=SDhx
------END PGP SIGNATURE-----
-
---lkcnwuUgm1aMFKr8jDXg6QLf3u3P2x3wT--
+thanks,
+  Gerd
