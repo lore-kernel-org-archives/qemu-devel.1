@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fuEG1-0004eo-8Y
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 05:56:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuEK2-0006EK-Og
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:00:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fuEG0-0005Pv-BY
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 05:56:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44538 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuEG0-0005Nu-5S
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 05:56:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51C6540216EB
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 09:56:23 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 27 Aug 2018 11:56:20 +0200
-Message-Id: <20180827095620.26774-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] gtk: add zoom-to-fit to gtk options.
+	(envelope-from <mreitz@redhat.com>) id 1fuEK1-0001eL-UB
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:00:34 -0400
+References: <20180823220856.10094-1-jsnow@redhat.com>
+	<20180823220856.10094-4-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <e2e1bfe0-d353-54b2-8945-d1ce10ead9cf@redhat.com>
+Date: Mon, 27 Aug 2018 12:00:17 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180823220856.10094-4-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Zqic2ZCrjHyMFaobeRvn9FQ3EdLGnNjd9"
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] jobs: add exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +24,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>
 
-This allows to set the option on the command line, i.e. "-display
-gtk,zoom-to-fit={on,off}", overriding the default chosen by qemu.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Zqic2ZCrjHyMFaobeRvn9FQ3EdLGnNjd9
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com,
+ Jeff Cody <jcody@redhat.com>
+Message-ID: <e2e1bfe0-d353-54b2-8945-d1ce10ead9cf@redhat.com>
+Subject: Re: [PATCH v2 3/9] jobs: add exit shim
+References: <20180823220856.10094-1-jsnow@redhat.com>
+ <20180823220856.10094-4-jsnow@redhat.com>
+In-Reply-To: <20180823220856.10094-4-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- ui/gtk.c     |  8 ++++++++
- qapi/ui.json | 10 +++++++++-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+On 2018-08-24 00:08, John Snow wrote:
+> All jobs do the same thing when they leave their running loop:
+> - Store the return code in a structure
+> - wait to receive this structure in the main thread
+> - signal job completion via job_completed
+>=20
+> Few jobs do anything beyond exactly this. Consolidate this exit
+> logic for a net reduction in SLOC.
+>=20
+> More seriously, when we utilize job_defer_to_main_loop_bh to call
+> a function that calls job_completed, job_finalize_single will run
+> in a context where it has recursively taken the aio_context lock,
+> which can cause hangs if it puts down a reference that causes a flush.
+>=20
+> You can observe this in practice by looking at mirror_exit's careful
+> placement of job_completed and bdrv_unref calls.
+>=20
+> If we centralize job exiting, we can signal job completion from outside=
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 5cce6ed42d..3ddb5fe162 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -2136,6 +2136,8 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
-                               QemuConsole *con, int idx,
-                               GSList *group, GtkWidget *view_menu)
- {
-+    bool zoom_to_fit;
-+
-     vc->label = qemu_console_get_label(con);
-     vc->s = s;
-     vc->gfx.scale_x = 1.0;
-@@ -2199,6 +2201,12 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
-     group = gd_vc_menu_init(s, vc, idx, group, view_menu);
- 
-     if (dpy_ui_info_supported(vc->gfx.dcl.con)) {
-+        zoom_to_fit = true;
-+    }
-+    if (s->opts->u.gtk.has_zoom_to_fit) {
-+        zoom_to_fit = s->opts->u.gtk.zoom_to_fit;
-+    }
-+    if (zoom_to_fit) {
-         gtk_menu_item_activate(GTK_MENU_ITEM(s->zoom_fit_item));
-         s->free_scale = true;
-     }
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 4ca91bb45a..bf9e157d5a 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1022,12 +1022,20 @@
- # GTK display options.
- #
- # @grab-on-hover: Grab keyboard input on mouse hover.
-+# @zoom-to-fit: Zoom guest display to fit into the host window.  When
-+#               turned off the host window will be resized instead.
-+#               In case the display device can notify the guest on
-+#               window resizes (virtio-gpu) this will default to "on",
-+#               assuming the guest will resize the display to match
-+#               the window size then.  Otherwise it defaults to "off".
-+#               Since 3.1
- #
- # Since: 2.12
- #
- ##
- { 'struct'  : 'DisplayGTK',
--  'data'    : { '*grab-on-hover' : 'bool' } }
-+  'data'    : { '*grab-on-hover' : 'bool',
-+                '*zoom-to-fit'   : 'bool'  } }
- 
-  ##
-  # @DisplayGLMode:
--- 
-2.9.3
+> of the aio_context, which should allow for job cleanup code to run with=
+
+> only one lock, which makes cleanup callbacks less tricky to write.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  include/qemu/job.h | 11 +++++++++++
+>  job.c              | 18 ++++++++++++++++++
+>  2 files changed, 29 insertions(+)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--Zqic2ZCrjHyMFaobeRvn9FQ3EdLGnNjd9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluDy7EACgkQ9AfbAGHV
+z0B1EAf+NiJ3aDOuLUxfUu6vzTUML+BatsjSKoxg6lOT8hJ4Il8pRupwOuOybWQg
+bBEczCWyGqmMlZirgg0F7wloE8lKMwqwWAiScMU4h7ptF850LnbBQbnC45kUckQX
+0lVtDHvb//DPpojJOyUXWi1cH3/wTdk2EOn0SECDtpQNRFLK6DvUMhPNcOpqVI3g
+83986CWORsNbjCCrInGVunogzWRqd7vOvEHVNaSumyDscw1yt2U2edgCT5tsqk7k
+66bdF82Ax+FBYMNUQEwuSru/Zok2jTXqKZnPU/+2AgzaTajlEXGBBVH1yHKwzsTz
+dqwZUUq6uvlKduNKcdpeKMiJr2XkxQ==
+=loJK
+-----END PGP SIGNATURE-----
+
+--Zqic2ZCrjHyMFaobeRvn9FQ3EdLGnNjd9--
