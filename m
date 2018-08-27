@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fuGkZ-0001vr-Sh
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:08 -0400
+	(envelope-from <mst@redhat.com>) id 1fuGl1-00028J-4A
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fuGkW-0003jX-Lj
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:07 -0400
-Received: from mail-by2nam01on0134.outbound.protection.outlook.com
-	([104.47.34.134]:44448
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fuGkW-0003hN-5r
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:04 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 27 Aug 2018 12:35:53 +0000
-Message-ID: <BN7PR08MB48687DC8D5F23786CCD97A9DC60B0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <cover.1535133088.git.jancraig@amazon.com>,
-	<261dd8062c85c2a5eefb4d6effa2a44d5fc953f7.1535133089.git.jancraig@amazon.com>
-In-Reply-To: <261dd8062c85c2a5eefb4d6effa2a44d5fc953f7.1535133089.git.jancraig@amazon.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mst@redhat.com>) id 1fuGkx-0004CB-UW
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33362 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fuGkx-00048v-PU
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:31 -0400
+Date: Mon, 27 Aug 2018 15:36:29 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180827153604-mutt-send-email-mst@kernel.org>
+References: <201808271625000266021@zte.com.cn>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/7] target/mips: Add MXU register support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201808271625000266021@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V4 4/4] target-i386: add i440fx 0xcf8 port
+ ascoalesced_pio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
+To: peng.hao2@zte.com.cn
+Cc: liran.alon@oracle.com, pbonzini@redhat.com, ehabkost@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-> From: Craig Janeczek <jancraig@amazon.com>
-> Sent: Friday, August 24, 2018 9:44 PM
->
-> Subject: [PATCH 1/7] target/mips: Add MXU register support
->=20
-> This commit makes the MXU registers and the helper functions for
-> reading/writing to them. This is required for full MXU instruction
-> support.
+On Mon, Aug 27, 2018 at 04:25:00PM +0800, peng.hao2@zte.com.cn wrote:
+> >> On 25 Aug 2018, at 15:19, Peng Hao <peng.hao2@zte.com.cn> wrote:
+> >> 
+> >> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> >> index 0e60834..da73743 100644
+> >> --- a/hw/pci-host/piix.c
+> >> +++ b/hw/pci-host/piix.c
+> >> @@ -327,6 +327,10 @@ static void i440fx_pcihost_realize(DeviceState *dev, Error **errp)
+> >> 
+> >>     sysbus_add_io(sbd, 0xcfc, &s->data_mem);
+> >>     sysbus_init_ioports(sbd, 0xcfc, 4);
+> >> +
+> >> +    /* register i440fx 0xcf8 port as coalesced pio */
+> >> +    memory_region_set_flush_coalesced(&s->data_mem);
+> >> +    memory_region_add_coalescing(&s->conf_mem, 0, 4);
+> >> }
+> >> 
+> 
+> >Is there a reason to not register this port as coalesced PIO also for Q35?
+> >In q35_host_realize()?
+> >If not, I would do that as an extra patch as part of this series.
+> Just as I mentioned in patch [0/4] , you can add pci-host config port as coalesecd pio. I think  it works for q35 port 0xcf8.
+> >-Liran
 
-Hi, Craig,
+What's the performance improvement for q35?
 
-The term "helper function" is good in general terminology sense, however, i=
-n QEMU terminology, it is used for something else (see op_helper.c for exam=
-ples), and not for the case similar to the functions in this patch. Your fu=
-nctions generate "inline" code, in QEMU terminology, which is opposite to "=
-helper" functions. Just don't use the word "helper" in the commit message. =
-Use "wrapper", "utility", or similar word.
-
-Thanks,
-Aleksandar
+-- 
+MST
