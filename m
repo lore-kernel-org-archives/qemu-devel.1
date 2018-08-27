@@ -1,40 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fuGSA-0006Ko-Rv
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:17:10 -0400
+	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
+	id 1fuGb2-0004Bv-IR
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fuGEY-0005om-SZ
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:03:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47592
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fuGEY-0005o0-La
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:03:02 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w7RBxYA3086391
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:03:01 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2m4gqnrmd9-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:03:01 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 27 Aug 2018 13:02:54 +0100
-References: <20180824133757.1cbdba75.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 27 Aug 2018 14:02:49 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180824133757.1cbdba75.cohuck@redhat.com>
+	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
+	id 1fuGay-0004zD-Rd
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:26:16 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:2627)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
+	id 1fuGay-0004yE-IA
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:26:12 -0400
+From: "Janeczek, Craig" <jancraig@amazon.com>
+Date: Mon, 27 Aug 2018 12:22:18 +0000
+Message-ID: <fed7b415b77c45d286e3b7cb4bc7b84f@EX13D12UEA003.ant.amazon.com>
+References: <cover.1535133088.git.jancraig@amazon.com>
+	<f1e92127959ffb3df713a06452328a71170bda93.1535133089.git.jancraig@amazon.com>
+	<231c38e4-8ad4-0f73-69ab-7a66d20716d3@linaro.org>
 Content-Language: en-US
-Message-Id: <de80a3a0-7fd7-783c-3d3b-b8c4a481a893@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFD] [s390x] Tweaking the s390x maintainership
- setup
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 2/7] target/mips: Add MXU instructions
+ S32I2M and S32M2I
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,88 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>
 
-
-
-On 08/24/2018 01:37 PM, Cornelia Huck wrote:
-> Hi all,
-> 
-> while I think the current s390x maintainership setup is working quite
-> well, there's probably still room for improvement. In particular, I'd
-> like to spread out the work a bit more and make it easy to test things
-> pre-integration in an automated way.
-> 
-> As a recap, how it works today:
-> 
-> - We have designated maintainers for some major areas:
->   * tcg
->   * KVM
->   * s390 virtio-ccw machine
->   * s390 bios
->   * vfio-ccw
->   * virtio-ccw
-> 
-> - I'm acting as overall s390x maintainer, queuing patches onto my
->   s390-next branch (s390-fixes for fixes during freeze) and sometimes
->   pulling s390 bios updates (if I don't apply them myself). I'm
->   generally the only person that sends pull requests for master.
-> 
-> Some problems I've noted:
-> 
-> * The bus factor -- or, put in a less dramatic way, what happens when
->   I'm sick or on vacation? For fixes during freeze, there's no problem
->   if the other maintainers submit them directly, but I really don't want
->   to be the single point of failure (plus, I'm the only person listed
->   as vfio-ccw maintainer).
-> * The IBM folks can't do tcg.
-> * Conversely, the non-IBM folks cannot review things that don't have
->   public documentation (yet), other than in a very general way.
-> * I don't want to pick everything myself :) Especially when I basically
->   rely on other people noticing problems in the first place (like with
->   the non-public things or code areas I'm not so familiar with).
-> * Testing seems to be a bit ad hoc. It would be nice to have a branch
->   that (semi) automated tests can be run on before things hit upstream,
->   and that is also created on top of current master. (I usually only
->   rebase the pushed-out s390-next branch when I apply new patches, and
->   sometimes not even then.) Oh, and other people testing things,
->   especially on different hardware.
-> 
-> So, here are some ideas I had on how to improve things:
-> 
-> * Split up maintainership a bit more. For example, split out areas like
->   pci for which no public documentation is available; these need to
->   have at least one IBM maintainer. Another candidate would maybe be
->   the cpu model.
-> * On a related note, more maintainers from IBM would be nice :) For
->   example, for vfio-ccw, where I'm the only maintainer... Some R:
->   entries would not hurt, either.
-
-Yes, we (IBM) should take care of vfio-ccw (and probably also pci and ap)
-Give me some more days to sort things out a bit. 
-
-> * More trees to pull from. Of course, not every area needs a dedicated
->   tree (that would become silly pretty quickly), but for example a tcg
->   tree would be nice. I can still pick individual patches if a pull
->   request would be overkill.
-> * I'd also like to have a designated backup for the overall
->   maintainership, especially for when I'm on vacation (like the first
->   two weeks of September, just to let you know :) or otherwise
->   unavailable, but also for sanity. Likely needs to be a non-IBMer due
->   to the tcg problem.
-
-Is the current setup with Richard (TCG) and myself (KVM) not good enough?
-
-
-> * A more predictable s390-next would be nice. Maybe have it
->   (semi-)automatically created out of the different trees, on top of
->   current master? I would start to apply patches on a new branch that
->   feeds into s390-next rather than on s390-next directly, then.
-> * Do something about (semi-)consolidated, (semi-)automatic testing.
->   Like hooking into Travis (or something similar), sharing test setups,
->   and enabling tests to be run on a range of platforms (including very
->   recent ones). Testing is probably a large topic on its own, though.
-> 
-> Thoughts?
-> 
+aHR0cHM6Ly9naXRodWIuY29tL01JUFMvQ0kyMF9tcGxheWVyL2Jsb2IvY2kyMF9tcGxheWVyL214
+dV9hcw0KDQpTb3JyeSBJIG1pcy1yZWFkIG91ciBjb21tZW50LiBUaGUgYml0IGxheW91dHMgd2Vy
+ZSBwdWxsZWQgZnJvbSB0aGlzIHNjcmlwdCBhbmQgdmFsaWRhdGVkIGJ5IHZpc3VhbGx5IGV4YW1p
+bmluZyBjb21waWxlZCBjb2RlLg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTog
+SmFuZWN6ZWssIENyYWlnIA0KU2VudDogTW9uZGF5LCBBdWd1c3QgMjcsIDIwMTggODoxNSBBTQ0K
+VG86ICdSaWNoYXJkIEhlbmRlcnNvbicgPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc+OyBx
+ZW11LWRldmVsQG5vbmdudS5vcmcNCkNjOiBhdXJlbGllbkBhdXJlbDMyLm5ldDsgYW1hcmtvdmlj
+QHdhdmVjb21wLmNvbQ0KU3ViamVjdDogUkU6IFtRZW11LWRldmVsXSBbUEFUQ0ggMi83XSB0YXJn
+ZXQvbWlwczogQWRkIE1YVSBpbnN0cnVjdGlvbnMgUzMySTJNIGFuZCBTMzJNMkkNCg0KaHR0cHM6
+Ly93d3cucm9ja2JveC5vcmcvd2lraS9wdWIvTWFpbi9JbmdlbmljSno0NzYwQi9qei1zaW1kLWRv
+Y3MucGRmDQoNCkkgcHVsbGVkIHRoZW0gZnJvbSBoZXJlLiBJIGFsc28gd3JvdGUgYSBzZXJpZXMg
+b2YgdGVzdHMgd2hpY2ggSSBjcm9zcyBjb21waWxlZCB0aGVuIHJhbiBvbiBib3RoIEhXIGFuZCB0
+aHJvdWdoIFFFTVUuIEFsdGhvdWdoIEkgZGlkIG5vdCBzdWJtaXQgdGhvc2UgdGVzdHMgYXMgcGFy
+dCBvZiB0aGlzIHBhdGNoc2V0IGFzIEkgYW0gdW5zdXJlIG9mIGhvdyB0byBhZGQgdGhlbSBpbnRv
+IHRoZSBRRU1VIHRlc3QgaW5mcmFzdHJ1Y3R1cmUuDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
+LS0tDQpGcm9tOiBSaWNoYXJkIEhlbmRlcnNvbiA8cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9y
+Zz4NClNlbnQ6IFNhdHVyZGF5LCBBdWd1c3QgMjUsIDIwMTggMTowNyBQTQ0KVG86IEphbmVjemVr
+LCBDcmFpZyA8amFuY3JhaWdAYW1hem9uLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KQ2M6
+IGF1cmVsaWVuQGF1cmVsMzIubmV0OyBhbWFya292aWNAd2F2ZWNvbXAuY29tDQpTdWJqZWN0OiBS
+ZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCAyLzddIHRhcmdldC9taXBzOiBBZGQgTVhVIGluc3RydWN0
+aW9ucyBTMzJJMk0gYW5kIFMzMk0ySQ0KDQpPbiAwOC8yNC8yMDE4IDEyOjQ0IFBNLCBDcmFpZyBK
+YW5lY3playB2aWEgUWVtdS1kZXZlbCB3cm90ZToNCj4gQWRkcyBzdXBwb3J0IGZvciBlbXVsYXRp
+bmcgdGhlIFMzMkkyTSBhbmQgUzMyTTJJIE1YVSBpbnN0cnVjdGlvbnMuDQo+IA0KPiBTaWduZWQt
+b2ZmLWJ5OiBDcmFpZyBKYW5lY3playA8amFuY3JhaWdAYW1hem9uLmNvbT4NCj4gLS0tDQo+ICB0
+YXJnZXQvbWlwcy90cmFuc2xhdGUuYyB8IDU1DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwgNTUgaW5zZXJ0aW9ucygrKQ0KPiAN
+Cj4gZGlmZiAtLWdpdCBhL3RhcmdldC9taXBzL3RyYW5zbGF0ZS5jIGIvdGFyZ2V0L21pcHMvdHJh
+bnNsYXRlLmMgaW5kZXggDQo+IDUwZjBjYjU1OGYuLjM4MWRmYWQzNmUgMTAwNjQ0DQo+IC0tLSBh
+L3RhcmdldC9taXBzL3RyYW5zbGF0ZS5jDQo+ICsrKyBiL3RhcmdldC9taXBzL3RyYW5zbGF0ZS5j
+DQo+IEBAIC0zNjQsNiArMzY0LDkgQEAgZW51bSB7DQo+ICAgICAgT1BDX0NMTyAgICAgID0gMHgy
+MSB8IE9QQ19TUEVDSUFMMiwNCj4gICAgICBPUENfRENMWiAgICAgPSAweDI0IHwgT1BDX1NQRUNJ
+QUwyLA0KPiAgICAgIE9QQ19EQ0xPICAgICA9IDB4MjUgfCBPUENfU1BFQ0lBTDIsDQo+ICsgICAg
+LyogTVhVICovDQo+ICsgICAgT1BDX01YVV9TMzJJMk0gPSAweDJGIHwgT1BDX1NQRUNJQUwyLA0K
+PiArICAgIE9QQ19NWFVfUzMyTTJJID0gMHgyRSB8IE9QQ19TUEVDSUFMMiwNCg0KSSBoYXZlbid0
+IGJlZW4gYWJsZSB0byBmaW5kIGFueSBkb2N1bWVudGF0aW9uIG9mIHRoZSBiaXQgbGF5b3V0IG9m
+IHRoZXNlIGluc3RydWN0aW9ucy4gIEFueSBwb2ludGVycz8NCg0KPiArdHlwZWRlZiB1bmlvbiB7
+DQo+ICsgICAgc3RydWN0IHsNCj4gKyAgICAgICAgdWludDMyX3Qgb3A6NjsNCj4gKyAgICAgICAg
+dWludDMyX3QgeHJhOjU7DQo+ICsgICAgICAgIHVpbnQzMl90OjU7DQo+ICsgICAgICAgIHVpbnQz
+Ml90IHJiOjU7DQo+ICsgICAgICAgIHVpbnQzMl90OjU7DQo+ICsgICAgICAgIHVpbnQzMl90IHNw
+ZWNpYWwyOjY7DQo+ICsgICAgfSBTMzJJMk07DQo+ICsNCj4gKyAgICBzdHJ1Y3Qgew0KPiArICAg
+ICAgICB1aW50MzJfdCBvcDo2Ow0KPiArICAgICAgICB1aW50MzJfdCB4cmE6NTsNCj4gKyAgICAg
+ICAgdWludDMyX3Q6NTsNCj4gKyAgICAgICAgdWludDMyX3QgcmI6NTsNCj4gKyAgICAgICAgdWlu
+dDMyX3Q6NTsNCj4gKyAgICAgICAgdWludDMyX3Qgc3BlY2lhbDI6NjsNCj4gKyAgICB9IFMzMk0y
+STsNCj4gK30gTVhVX09QQ09ERTsNCg0KRG8gbm90IHVzZSBiaXRmaWVsZHMuICBUaGUgbGF5b3V0
+IGRpZmZlcnMgYnkgaG9zdCBjb21waWxlci4NClVzZSBleHRyYWN0MzIoaW5wdXQsIHBvcywgbGVu
+KS4NCg0KDQo+ICsNCj4gKy8qIE1YVSBJbnN0cnVjdGlvbnMgKi8NCj4gK3N0YXRpYyB2b2lkIGdl
+bl9teHUoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQzMl90IG9wYykgeyAjaWZuZGVmDQo+ICtUQVJH
+RVRfTUlQUzY0IC8qIE9ubHkgd29ya3MgaW4gMzIgYml0IG1vZGUgKi8NCj4gKyAgICBUQ0d2IHQw
+Ow0KPiArICAgIHQwID0gdGNnX3RlbXBfbmV3KCk7DQo+ICsgICAgTVhVX09QQ09ERSAqb3Bjb2Rl
+ID0gKE1YVV9PUENPREUgKikmY3R4LT5vcGNvZGU7DQo+ICsNCj4gKyAgICBzd2l0Y2ggKG9wYykg
+ew0KPiArICAgIGNhc2UgT1BDX01YVV9TMzJJMk06DQo+ICsgICAgICAgIGdlbl9sb2FkX2dwcih0
+MCwgb3Bjb2RlLT5TMzJJMk0ucmIpOw0KPiArICAgICAgICBnZW5fc3RvcmVfbXh1X2dwcih0MCwg
+b3Bjb2RlLT5TMzJJMk0ueHJhKTsNCj4gKyAgICAgICAgYnJlYWs7DQo+ICsNCj4gKyAgICBjYXNl
+IE9QQ19NWFVfUzMyTTJJOg0KPiArICAgICAgICBnZW5fbG9hZF9teHVfZ3ByKHQwLCBvcGNvZGUt
+PlMzMk0ySS54cmEpOw0KPiArICAgICAgICBnZW5fc3RvcmVfZ3ByKHQwLCBvcGNvZGUtPlMzMk0y
+SS5yYik7DQo+ICsgICAgICAgIGJyZWFrOw0KPiArICAgIH0NCj4gKw0KPiArICAgIHRjZ190ZW1w
+X2ZyZWUodDApOw0KPiArI2Vsc2UNCj4gKyAgICBnZW5lcmF0ZV9leGNlcHRpb25fZW5kKGN0eCwg
+RVhDUF9SSSk7ICNlbmRpZiB9DQoNClRoZXJlJ3Mgbm90aGluZyBoZXJlICh5ZXQsIEkgc3VwcG9z
+ZSkgdGhhdCB3b24ndCBjb21waWxlIGZvciBNSVBTNjQuDQpJJ2Qgc3VnZ2VzdCBhdm9pZGluZyBp
+ZmRlZnMgYXMgbXVjaCBhcyBwb3NzaWJsZS4NCg0KDQpyfg0KDQo=
