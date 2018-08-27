@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuExI-000597-CS
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:41:09 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuExN-0005B0-MB
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuExF-0005m0-4Y
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:41:08 -0400
-Date: Mon, 27 Aug 2018 12:40:58 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180827124058.36aa13ee.cohuck@redhat.com>
-In-Reply-To: <a29f4cdd-8012-d46e-8984-b4e223f1957f@redhat.com>
-References: <20180824133757.1cbdba75.cohuck@redhat.com>
-	<a29f4cdd-8012-d46e-8984-b4e223f1957f@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fuExM-0005qh-SM
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:41:13 -0400
+References: <20180823220856.10094-1-jsnow@redhat.com>
+	<20180823220856.10094-8-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9b5e9012-e1b3-0198-7372-9172bc1d414c@redhat.com>
+Date: Mon, 27 Aug 2018 12:41:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFD] [s390x] Tweaking the s390x maintainership
- setup
+In-Reply-To: <20180823220856.10094-8-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5SvYq0GmUcYQ7vBGBy2Sn3gHMwxxqVizt"
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] block/backup: make function
+ variables consistently named
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>
 
-On Mon, 27 Aug 2018 11:26:21 +0200
-David Hildenbrand <david@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5SvYq0GmUcYQ7vBGBy2Sn3gHMwxxqVizt
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com,
+ Jeff Cody <jcody@redhat.com>
+Message-ID: <9b5e9012-e1b3-0198-7372-9172bc1d414c@redhat.com>
+Subject: Re: [PATCH v2 7/9] block/backup: make function variables consistently
+ named
+References: <20180823220856.10094-1-jsnow@redhat.com>
+ <20180823220856.10094-8-jsnow@redhat.com>
+In-Reply-To: <20180823220856.10094-8-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 24.08.2018 13:37, Cornelia Huck wrote:
-> > So, here are some ideas I had on how to improve things:
-> > 
-> > * Split up maintainership a bit more. For example, split out areas like
-> >   pci for which no public documentation is available; these need to
-> >   have at least one IBM maintainer. Another candidate would maybe be
-> >   the cpu model.  
-> 
-> I could take care of the latter. But it usually goes hand in hand with
-> KVM changes (or core s390x changes for migration), so I am not sure if
-> splitting the cpu model out makes that much sense after all. To me, it
-> somehow feels "s390x core".
+On 2018-08-24 00:08, John Snow wrote:
+> Rename opaque_job to job to be consistent with other job implementation=
+s.
+> Rename 'job', the BackupBlockJob object, to 's' to also be consistent.
+>=20
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/backup.c | 62 +++++++++++++++++++++++++++++---------------------=
+--------
+>  1 file changed, 31 insertions(+), 31 deletions(-)
 
-I'll defer to your judgment here :)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> 
-> > * On a related note, more maintainers from IBM would be nice :) For
-> >   example, for vfio-ccw, where I'm the only maintainer... Some R:
-> >   entries would not hurt, either.
-> > * More trees to pull from. Of course, not every area needs a dedicated
-> >   tree (that would become silly pretty quickly), but for example a tcg
-> >   tree would be nice. I can still pick individual patches if a pull
-> >   request would be overkill.  
-> 
-> I can take care of that for TCG (including picking + sending pull requests).
 
-Cool, thank you. I'll do a pull request before my vacation with the
-current model, so we could switch after that.
+--5SvYq0GmUcYQ7vBGBy2Sn3gHMwxxqVizt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> 
-> > * I'd also like to have a designated backup for the overall
-> >   maintainership, especially for when I'm on vacation (like the first
-> >   two weeks of September, just to let you know :) or otherwise
-> >   unavailable, but also for sanity. Likely needs to be a non-IBMer due
-> >   to the tcg problem.  
-> 
-> Either Thomas or I could do that. I will be on vacation the first two
-> weeks of September, too ;) Thomas, interested?
+-----BEGIN PGP SIGNATURE-----
 
-Maybe both of you? I doubt we'll be on vacation during the same time
-period every time ;)
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluD1T0ACgkQ9AfbAGHV
+z0DSAwgAkE2O+3DXg27s4Tc0Qu3vX6JK+keL6nHiMo0Wz42S7UtkzsPk2OvSX5dH
+E+6mgpZVkbmMUFAD8HYP0efh++CGVpXITD/AFCWOKpY+6Y8S3wivJ/p4+xpDNC2q
+Xb1jpXgrnG0qWqBjegCFoscUcew89/zNcIxwDUxhQzdMfEFJc2lTGjHLQ4y1v/FB
+58wIHarAXlWQDgjBKHTzi2EP7mZXogwvUg5c5OUTFqaZMfG5WTgt8il4bDax2pni
+N1eerGRDjV9C+gMI2FyfLuUe0PwmUlgZlxYNow0CWVGZqpckhykXI9BpL7YNMGWg
+EM2kUsU//2az580915dMW1RCTRdM7A==
+=3gcD
+-----END PGP SIGNATURE-----
 
-> 
-> > * A more predictable s390-next would be nice. Maybe have it
-> >   (semi-)automatically created out of the different trees, on top of
-> >   current master? I would start to apply patches on a new branch that
-> >   feeds into s390-next rather than on s390-next directly, then.  
-> 
-> Is there any fancy mechanism out there with which we can easily build
-> something like that (automatic merging like e.g. linux-next does)?
-
-I can dig around whether there are some published scripts for that.
-What we probably need is:
-
-- a list of branches to merge
-- a script that tries to merge them one by one and then pushes the
-  result out
-
-We'll probably be able to semi-automate this, but I doubt that it is
-possible to do that fully automatically (conflict resolution etc.)
-AFAIK, linux-next is also done semi-automatically (but also on a way
-different scale :)
-
-> 
-> > * Do something about (semi-)consolidated, (semi-)automatic testing.
-> >   Like hooking into Travis (or something similar), sharing test setups,
-> >   and enabling tests to be run on a range of platforms (including very
-> >   recent ones). Testing is probably a large topic on its own, though.  
-> 
-> Sounds interesting to me. Especially building all different kinds of
-> combinations + e.g. running kvm-unit-tests / booting a simple distro.
-
-Yes, something like that. Especially on different hardware.
+--5SvYq0GmUcYQ7vBGBy2Sn3gHMwxxqVizt--
