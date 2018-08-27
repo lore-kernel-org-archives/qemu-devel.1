@@ -1,34 +1,34 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:44271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuIeX-0001gL-9J
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:07 -0400
+	(envelope-from <groug@kaod.org>) id 1fuIeh-0001gL-ON
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuIcS-0006jV-3g
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:35:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46882)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fuIcR-0006jJ-Ru
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:35:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fuIcQ-0000BQ-6i
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 14:35:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 27D3E2E80C8
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 14:35:50 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1fuIVh-0001qY-VE
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:28:58 -0400
+Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:35885)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fuIVh-0001nk-Mp
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:28:53 -0400
+Received: from player794.ha.ovh.net (unknown [10.109.160.39])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 1E4511DE538
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 16:28:52 +0200 (CEST)
+Date: Mon, 27 Aug 2018 16:28:40 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180827162840.4dc4c064@bahia.lan>
+In-Reply-To: <20180827110339.175df032@bahia.lan>
+References: <20180821043343.7514-1-david@gibson.dropbear.id.au>
+	<20180821043343.7514-26-david@gibson.dropbear.id.au>
+	<CAFEAcA8k7u6HoAuS3v-FUzDA37-1a9Sy=QrqXvJVEKjRtCWsAA@mail.gmail.com>
+	<7a3389a5-ffc5-58d9-659d-fbc46e88ca24@kaod.org>
+	<20180824173839.03f8c29b@bahia.lan>
+	<7e4d61cc-1da4-ecb8-8dd3-f3e51b20861a@kaod.org>
+	<e47d2b72-cc32-cbee-3662-0aedea03024f@redhat.com>
+	<20180827110339.175df032@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Aug 2018 14:29:22 -0000
-From: =?utf-8?q?=C5=81ukasz_Zemczak?= <1755912@bugs.launchpad.net>
-Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153538016230.11448.8360742488932224384.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
- SIGABRT when using option -vga qxl
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 25/26] spapr_pci: factorize the
+ use of SPAPR_MACHINE_GET_CLASS()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,201 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Hello Leonardo, or anyone else affected,
+On Mon, 27 Aug 2018 11:03:39 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-Accepted qemu into bionic-proposed. The package will build now and be
-available at https://launchpad.net/ubuntu/+source/qemu/1:2.11+dfsg-
-1ubuntu7.5 in a few hours, and then in the -proposed repository.
+> On Mon, 27 Aug 2018 08:21:48 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+>=20
+> > On 2018-08-24 18:43, C=C3=A9dric Le Goater wrote: =20
+> > > On 08/24/2018 05:38 PM, Greg Kurz wrote:   =20
+> > >> On Fri, 24 Aug 2018 17:30:12 +0200
+> > >> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> > >>   =20
+> > >>> On 08/24/2018 05:09 PM, Peter Maydell wrote:   =20
+> > >>>> On 21 August 2018 at 05:33, David Gibson <david@gibson.dropbear.id=
+.au> wrote:     =20
+> > >>>>> From: C=C3=A9dric Le Goater <clg@kaod.org>   =20
+> > [...] =20
+> > >>> Is there a way to specify which device type can or can not be=20
+> > >>> plugged on a machine ?=20
+> > >>>
+> > >>> I suppose we cannot use :=20
+> > >>>
+> > >>> 	machine_class_allow_dynamic_sysbus_dev()=20
+> > >>>
+> > >>> for cold plugged devices. Or can we ? That would be better.
+> > >>>   =20
+> > >>
+> > >> Hmm... not sure this would help. The root problem is that many
+> > >> places in spapr_pci and spapr_cpu_core assume the machine is
+> > >> sPAPR.   =20
+> > >=20
+> > > which is a perfectly legitimate assumption for a sPAPR only device,
+> > > same for spapr_cpu_core. I would think. Shouldn't we enforce=20
+> > > the restriction at the machine level instead and not at the device
+> > > level ?=20
+> > >=20
+> > > I thought that was the purpose of commit 0bd1909da606 ("machine:=20
+> > > Replace has_dynamic_sysbus with list of allowed devices"), to=20
+> > > make sure machines had a predefined list of user-creatable devices.  =
+ =20
+> >=20
+> > The "spapr-pci-host-bridge" is explicitly marked with
+> > "dc->user_creatable =3D true" - so it is creatable everywhere. You could
+> > try whether it is possible to make it only creatable via the white list
+> > instead =20
+>=20
+> Hmm... how would you do that ?
+>=20
 
-Please help us by testing this new package.  See
-https://wiki.ubuntu.com/Testing/EnableProposed for documentation on how
-to enable and use -proposed.Your feedback will aid us getting this
-update out to other Ubuntu users.
+The white list is checked in machine_init_notify() which gets called way af=
+ter
+spapr_phb_realize()... we can't rely on this to check the machine and the P=
+HB
+are compatible. Maybe add a dedicated bus for the PHBs in the spapr machine=
+ ?
 
-If this package fixes the bug for you, please add a comment to this bug,
-mentioning the version of the package you tested and change the tag from
-verification-needed-bionic to verification-done-bionic. If it does not
-fix the bug for you, please add a comment stating that, and change the
-tag to verification-failed-bionic. In either case, without details of
-your testing we will not be able to proceed.
-
-Further information regarding the verification process can be found at
-https://wiki.ubuntu.com/QATeam/PerformingSRUVerification .  Thank you in
-advance!
-
-** Changed in: qemu (Ubuntu Bionic)
-       Status: Triaged =3D> Fix Committed
-
-** Tags added: verification-needed verification-needed-bionic
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1755912
-
-Title:
-  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Bionic:
-  Fix Committed
-
-Bug description:
-  [Impact]
-
-   * There are conditions where the vga/qxl driver can crash the qemu =
-
-     process.
-
-   * It is like a very complex case of a non initialized var - without the =
-
-     fix it might try to ask for updates without having a valid primary =
-
-     surface.
-
-   * Backport from upstream
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D5bd5c27c7d284d01477c5cc=
-022ce22438c46bf9f
-  to avoid the crash
-
-  =
-
-  [Test Case]
-
-   * Sometimes booting xubuntu was reported to be enough, at other times
-  it was needed to change resolution a few times to trigger.
-
-    # get xubuntu iso (actually other UI Isos should do as well)
-    $ qemu-system-x86_64 -vga qxl -enable-kvm -cpu host -smp cores=3D2,thre=
-ads=3D2 -m 2048 -cdrom xubuntu-18.04-desktop-amd64.iso
-    # If it boots successfully, change resolution until it crashes.
-    $ while true ; do xrandr --output Virtual-0 --mode 640x480 ; sleep 1 ; =
-xrandr --output Virtual-0 --mode 1280x720 ; sleep 1 ; xrandr --output Virtu=
-al-0 --mode 1920x1080 ; sleep 1 ; done
-
-   * Without the fix that will trigger the qemu crash
-
-  [Regression Potential]
-
-   * The change "just" adds QXL_MODE_UNDEFINED as one more trigger to leave =
-
-     the rendering update. That sounds rather safe. But thinking hard on =
-
-     potential updates I could think of theoretical setups that were  in =
-
-     undefined mode all the time (unlikely or impossible I think) that now =
-
-     would get no updates anymore. Well I really don't think this is an =
-
-     issue, but since this section should be open thinking on "potential" =
-
-     regressions that is what comes to my mind.
-
-  [Other Info]
-   =
-
-   * Thanks to Leonardo for most of the bisecting and discussion work!
-
-  =
-
-  ---
-
-  =
-
-  When using qemu-system-x86_64 with the option -vga qxl, it crashes. The e=
-asiest way to crash it is by trying to change the guest's resolution. Howev=
-er, the system may randomly crash too, not happening only when changing res=
-olution. Here is the terminal output of one of these random crashes:
-
-  --------
-
-  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
- -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
-tdev=3Dhostnet0
-  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
-d raw.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Automatically detec=
-ting the format is dangerous for raw images, write operations on block 0 wi=
-ll be restricted.
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Specify the 'raw' f=
-ormat explicitly to remove the restrictions.
-
-  (process:21313): Spice-WARNING **: 16:01:45.759: display-
-  channel.c:2431:display_channel_validate_surface: canvas address is
-  0x7f8eb948ab18 for 0 (and is NULL)
-
-  (process:21313): Spice-WARNING **: 16:01:45.759: display-
-  channel.c:2432:display_channel_validate_surface: failed on 0
-
-  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
-display_channel_update: condition `display_channel_validate_surface(display=
-, surface_id)' failed
-  Abortado (imagem do n=C3=BAcleo gravada)
-
-  --------
-
-  I was running QEMU as a normal user which is on the groups kvm and
-  disk. Initially I supposed the problem was because I was running QEMU
-  as root, but as a normal user this happens too.
-
-  I have tested with guests with different Ubuntu version: 18.04, 17.10
-  and 16.04. It is happening with them all.
-
-  ProblemType: Crash
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
-  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
-  Uname: Linux 4.15.0-10-generic x86_64
-  ApportVersion: 2.20.8-0ubuntu10
-  Architecture: amd64
-  CurrentDesktop: XFCE
-  Date: Wed Mar 14 17:13:52 2018
-  ExecutablePath: /usr/bin/qemu-system-x86_64
-  InstallationDate: Installed on 2017-06-13 (273 days ago)
-  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: LENOVO 80UG
-  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
-e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
-tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
-  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
-d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
-  Signal: 6
-  SourcePackage: qemu
-  StacktraceTop:
-  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
-  Title: qemu-system-x86_64 crashed with SIGABRT
-  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
-  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
-ev plugdev sambashare sudo
-  dmi.bios.date: 07/10/2017
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 0XCN43WW
-  dmi.board.asset.tag: NO Asset Tag
-  dmi.board.name: Toronto 4A2
-  dmi.board.vendor: LENOVO
-  dmi.board.version: SDK0J40679 WIN
-  dmi.chassis.asset.tag: NO Asset Tag
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Lenovo ideapad 310-14ISK
-  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
-Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
-10:cvrLenovoideapad310-14ISK:
-  dmi.product.family: IDEAPAD
-  dmi.product.name: 80UG
-  dmi.product.version: Lenovo ideapad 310-14ISK
-  dmi.sys.vendor: LENOVO
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
+> > ... not sure whether that works though, since there is a class
+> > hierarchy (TYPE_PCI_HOST_BRIDGE) in between?
+> >  =20
+>=20
+> Also, as said above, we have the very same problem with spapr_cpu_core,
+> which is definitely not a sysbus device...
+>=20
+> Cheers,
+>=20
+> --
+> Greg
+>=20
+> >  Thomas =20
+>=20
+>=20
