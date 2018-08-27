@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fu9Hk-0002nl-9w
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:37:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1fu9Hn-0002oH-A3
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:37:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fu9EK-0008Q3-6M
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:34:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55294)
+	(envelope-from <bounces@canonical.com>) id 1fu9Dv-0008JW-1w
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:33:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54624)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fu9EK-0008Ph-0B
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:34:20 -0400
+	id 1fu9Du-0008Ih-RD
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 00:33:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fu9EH-0002Lu-Mo
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 04:34:17 +0000
+	id 1fu9Dr-0005nC-Ds
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 04:33:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 070002E817B
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 04:34:17 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D12B02E8442
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 04:33:26 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Aug 2018 04:17:57 -0000
-From: Launchpad Bug Tracker <474968@bugs.launchpad.net>
-Reply-To: Bug 474968 <474968@bugs.launchpad.net>
+Date: Mon, 27 Aug 2018 04:17:54 -0000
+From: Launchpad Bug Tracker <1129571@bugs.launchpad.net>
+Reply-To: Bug 1129571 <1129571@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20091105012553.4800.9352.malonedeb@gangotri.canonical.com>
-Message-Id: <153534347818.22848.4139412864973475949.malone@loganberry.canonical.com>
+References: <20130218230633.21029.10708.malonedeb@wampee.canonical.com>
+Message-Id: <153534347499.22848.16602564378591538711.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 474968] Re: kvm smb server hogs cpu guest freeze
+Subject: [Qemu-devel] [Bug 1129571] Re: libreoffice armhf FTBFS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,69 +38,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for qemu-kvm (Ubuntu) because there has been no activity for 60
+[Expired for qemu (Ubuntu) because there has been no activity for 60
 days.]
 
-** Changed in: qemu-kvm (Ubuntu)
+** Changed in: qemu (Ubuntu)
        Status: Incomplete =3D> Expired
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/474968
+https://bugs.launchpad.net/bugs/1129571
 
 Title:
-  kvm smb server hogs cpu guest freeze
+  libreoffice armhf FTBFS
 
 Status in QEMU:
   Won't Fix
-Status in qemu-kvm package in Ubuntu:
+Status in qemu package in Ubuntu:
   Expired
 
 Bug description:
-  Binary package hint: qemu-kvm
+  We have been experiencing FTBFS of LibreOffice 3.5.7, 12.04, armhf in
+  the launchpad buildds. We believe this is likely due to an error in
+  qemu.
 
-  kvm hogs the CPU reproducibly. I installed an Ubuntu using KVM. I run
-  the machine with -net nic,model=3Drtl8139,macaddr=3Df0:00:BA:12:34:56 -net
-  user,hostfwd=3Dtcp::2223-:22,smb=3D/tmp/share, sshed into the machine and
-  typed "telnet 10.0.2.4 139" to try whether the SMB server works. KVM
-  then hogs the CPU.
+  While we do not have a small test case yet, we do have a build log
+  (attaching here).
 
-  ProblemType: Bug
-  Architecture: amd64
-  Date: Thu Nov  5 01:23:09 2009
-  DistroRelease: Ubuntu 9.10
-  KvmCmdLine: Error: command ['ps', '-C', 'kvm', '-F'] failed with exit cod=
-e 1: UID        PID  PPID  C    SZ   RSS PSR STIME TTY          TIME CMD
-  MachineType: LENOVO 766636G
-  Package: kvm 1:84+dfsg-0ubuntu16+0.11.0+0ubuntu6.3
-  PccardctlIdent:
-   Socket 0:
-     no product info available
-  PccardctlStatus:
-   Socket 0:
-     no card
-  ProcCmdLine: root=3D/dev/mapper/cryptroot source=3DUUID=3D9c3d5596-27c6-4=
-fd5-bfcd-fa8eef6f1230 ro quiet splash  crashkernel=3D384M-2G:64M,2G-:128M
-  SourcePackage: qemu-kvm
-  Uname: Linux 2.6.32-999-generic x86_64
-  dmi.bios.date: 07/01/2008
-  dmi.bios.vendor: LENOVO
-  dmi.bios.version: 7NETB6WW (2.16 )
-  dmi.board.name: 766636G
-  dmi.board.vendor: LENOVO
-  dmi.board.version: Not Available
-  dmi.chassis.asset.tag: No Asset Information
-  dmi.chassis.type: 10
-  dmi.chassis.vendor: LENOVO
-  dmi.chassis.version: Not Available
-  dmi.modalias: dmi:bvnLENOVO:bvr7NETB6WW(2.16):bd07/01/2008:svnLENOVO:pn76=
-6636G:pvrThinkPadX61s:rvnLENOVO:rn766636G:rvrNotAvailable:cvnLENOVO:ct10:cv=
-rNotAvailable:
-  dmi.product.name: 766636G
-  dmi.product.version: ThinkPad X61s
-  dmi.sys.vendor: LENOVO
+  The relevant snippet from the build log is:
+
+  3.5.7/solver/unxlngr.pro/bin/jaxp.jar:/build/buildd/libreoffice-3.5.7/sol=
+ver/unxlngr.pro/bin/juh.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.=
+pro/bin/parser.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/x=
+t.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/unoil.jar:/bui=
+ld/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/ridl.jar:/build/buildd/l=
+ibreoffice-3.5.7/solver/unxlngr.pro/bin/jurt.jar:/build/buildd/libreoffice-=
+3.5.7/solver/unxlngr.pro/bin/xmlsearch.jar:/build/buildd/libreoffice-3.5.7/=
+solver/unxlngr.pro/bin/LuceneHelpWrapper.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/HelpIndexerTool.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/lucene-core-2.3.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/lucene-analyzers-2.3.jar" com.sun.star.help.HelpIn=
+dexerTool -lang cs -mod swriter -zipdir ../../unxlngr.pro/misc/ziptmpswrite=
+r_cs -o ../../unxlngr.pro/bin/swriter_cs.zip.unxlngr.pro
+  dmake:  Error code 132, while making '../../unxlngr.pro/bin/swriter_cs.zi=
+p'
+
+  We believe this is from bash error code 128 + 4, where 4 is illegal
+  instruction, thus leading us to suspect qemu.
+
+  Any help in tracking this down would be appreciated.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/474968/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1129571/+subscriptions
