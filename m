@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46896)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuIiN-0006CA-0v
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:42:00 -0400
+	id 1fuIis-0006YU-Do
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:42:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuIiI-00026e-Tl
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:41:58 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:30130)
+	id 1fuIio-0002rM-4T
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:42:30 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:30192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuIiI-000260-H2
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:41:54 -0400
+	id 1fuIin-0002q8-Gw
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:42:25 -0400
 From: Craig Janeczek <jancraig@amazon.com>
-Date: Mon, 27 Aug 2018 10:38:01 -0400
-Message-Id: <20180827143806.25048-2-jancraig@amazon.com>
+Date: Mon, 27 Aug 2018 10:38:04 -0400
+Message-Id: <20180827143806.25048-5-jancraig@amazon.com>
 In-Reply-To: <20180827143806.25048-1-jancraig@amazon.com>
 References: <20180827143806.25048-1-jancraig@amazon.com>
-Subject: [Qemu-devel] [PATCH v2 1/6] target/mips: Add MXU instructions
- S32I2M and S32M2I
+Subject: [Qemu-devel] [PATCH v2 4/6] target/mips: Add MXU instruction D16MAC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,161 +29,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: amarkovic@wavecomp.com, aurelien@aurel32.net, Craig Janeczek <jancraig@amazon.com>
 
-This commit makes the MXU registers and the utility functions for
-reading/writing to them. This is required for full MXU instruction
-support.
-
-Adds support for emulating the S32I2M and S32M2I MXU instructions.
+Adds support for emulating the D16MAC instruction.
 
 Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 ---
  v1
     - initial patch
  v2
-    - Fix checkpatch.pl errors
-    - remove mips64 ifdef
     - changed bitfield usage to extract32
-    - squashed register addition patch into this one
+    - used sextract_tl instructions instead of shift and ext
 
- target/mips/cpu.h       |  1 +
- target/mips/translate.c | 71 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 72 insertions(+)
+ target/mips/translate.c | 62 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 009202cf64..4b2948a2c8 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -170,6 +170,7 @@ struct TCState {
-         MSACSR_FS_MASK)
- 
-     float_status msa_fp_status;
-+    target_ulong mxu_gpr[16];
- };
- 
- typedef struct CPUMIPSState CPUMIPSState;
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index bdd880bb77..ef819d67e0 100644
+index 8a6b4f2899..7d37567652 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -364,6 +364,9 @@ enum {
-     OPC_CLO      = 0x21 | OPC_SPECIAL2,
-     OPC_DCLZ     = 0x24 | OPC_SPECIAL2,
+@@ -366,6 +366,7 @@ enum {
      OPC_DCLO     = 0x25 | OPC_SPECIAL2,
-+    /* MXU */
-+    OPC_MXU_S32I2M = 0x2F | OPC_SPECIAL2,
-+    OPC_MXU_S32M2I = 0x2E | OPC_SPECIAL2,
-     /* Special */
-     OPC_SDBBP    = 0x3F | OPC_SPECIAL2,
- };
-@@ -1398,6 +1401,9 @@ static TCGv_i32 fpu_fcr0, fpu_fcr31;
- static TCGv_i64 fpu_f64[32];
- static TCGv_i64 msa_wr_d[64];
- 
-+/* MXU registers */
-+static TCGv mxu_gpr[16];
-+
- #include "exec/gen-icount.h"
- 
- #define gen_helper_0e0i(name, arg) do {                           \
-@@ -1517,6 +1523,13 @@ static const char * const msaregnames[] = {
-     "w30.d0", "w30.d1", "w31.d0", "w31.d1",
- };
- 
-+static const char * const mxuregnames[] = {
-+    "XR1",  "XR2",  "XR3",  "XR4",  "XR5",
-+    "XR6",  "XR7",  "XR8",  "XR9",  "XR10",
-+    "XR11", "XR12", "XR13", "XR14", "XR15",
-+    "XR16",
-+};
-+
- #define LOG_DISAS(...)                                                        \
-     do {                                                                      \
-         if (MIPS_DEBUG_DISAS) {                                               \
-@@ -1550,6 +1563,23 @@ static inline void gen_store_gpr (TCGv t, int reg)
-         tcg_gen_mov_tl(cpu_gpr[reg], t);
- }
- 
-+/* MXU General purpose registers moves. */
-+static inline void gen_load_mxu_gpr(TCGv t, int reg)
-+{
-+    if (reg == 0) {
-+        tcg_gen_movi_tl(t, 0);
-+    } else {
-+        tcg_gen_mov_tl(t, mxu_gpr[reg - 1]);
-+    }
-+}
-+
-+static inline void gen_store_mxu_gpr(TCGv t, int reg)
-+{
-+    if (reg != 0) {
-+        tcg_gen_mov_tl(mxu_gpr[reg - 1], t);
-+    }
-+}
-+
- /* Moves to/from shadow registers. */
- static inline void gen_load_srsgpr (int from, int to)
+     /* MXU */
+     OPC_MXU_D16MUL = 0x08 | OPC_SPECIAL2,
++    OPC_MXU_D16MAC = 0x0A | OPC_SPECIAL2,
+     OPC_MXU_S8LDD  = 0x22 | OPC_SPECIAL2,
+     OPC_MXU_S32I2M = 0x2F | OPC_SPECIAL2,
+     OPC_MXU_S32M2I = 0x2E | OPC_SPECIAL2,
+@@ -3774,7 +3775,7 @@ static void gen_cl (DisasContext *ctx, uint32_t opc,
+ static void gen_mxu(DisasContext *ctx, uint32_t opc)
  {
-@@ -3738,6 +3768,35 @@ static void gen_cl (DisasContext *ctx, uint32_t opc,
-     }
- }
+     TCGv t0, t1, t2, t3;
+-    uint32_t rb, xra, xrb, xrc, xrd, s8, sel, optn2, optn3;
++    uint32_t rb, xra, xrb, xrc, xrd, s8, sel, optn2, optn3, aptn2;
  
-+/* MXU Instructions */
-+static void gen_mxu(DisasContext *ctx, uint32_t opc)
-+{
-+    TCGv t0;
-+    uint32_t xra, rb;
-+
-+    t0 = tcg_temp_new();
-+
-+    switch (opc) {
-+    case OPC_MXU_S32I2M:
-+        xra = extract32(ctx->opcode, 6, 5);
-+        rb = extract32(ctx->opcode, 16, 5);
-+
-+        gen_load_gpr(t0, rb);
-+        gen_store_mxu_gpr(t0, xra);
-+        break;
-+
-+    case OPC_MXU_S32M2I:
-+        xra = extract32(ctx->opcode, 6, 5);
-+        rb = extract32(ctx->opcode, 16, 5);
-+
-+        gen_load_mxu_gpr(t0, xra);
-+        gen_store_gpr(t0, rb);
-+        break;
-+    }
-+
-+    tcg_temp_free(t0);
-+}
-+
- /* Godson integer instructions */
- static void gen_loongson_integer(DisasContext *ctx, uint32_t opc,
-                                  int rd, int rs, int rt)
-@@ -17818,6 +17877,12 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
-         check_insn(ctx, INSN_LOONGSON2F);
-         gen_loongson_integer(ctx, op1, rd, rs, rt);
+     t0 = tcg_temp_new();
+     t1 = tcg_temp_new();
+@@ -3892,6 +3893,64 @@ static void gen_mxu(DisasContext *ctx, uint32_t opc)
+         gen_store_mxu_gpr(t3, xra);
+         gen_store_mxu_gpr(t2, xrd);
          break;
 +
-+    case OPC_MXU_S32I2M:
-+    case OPC_MXU_S32M2I:
-+        gen_mxu(ctx, op1);
++    case OPC_MXU_D16MAC:
++        xra = extract32(ctx->opcode, 6, 4);
++        xrb = extract32(ctx->opcode, 10, 4);
++        xrc = extract32(ctx->opcode, 14, 4);
++        xrd = extract32(ctx->opcode, 18, 4);
++        optn2 = extract32(ctx->opcode, 22, 2);
++        aptn2 = extract32(ctx->opcode, 24, 2);
++
++        gen_load_mxu_gpr(t1, xrb);
++        tcg_gen_sextract_tl(t0, t1, 0, 16);
++        tcg_gen_sextract_tl(t1, t1, 16, 16);
++        gen_load_mxu_gpr(t3, xrc);
++        tcg_gen_sextract_tl(t2, t3, 0, 16);
++        tcg_gen_sextract_tl(t3, t3, 16, 16);
++
++        switch (optn2) {
++        case 0: /* XRB.H*XRC.H == lop, XRB.L*XRC.L == rop */
++            tcg_gen_mul_tl(t3, t1, t3);
++            tcg_gen_mul_tl(t2, t0, t2);
++            break;
++        case 1: /* XRB.L*XRC.H == lop, XRB.L*XRC.L == rop */
++            tcg_gen_mul_tl(t3, t0, t3);
++            tcg_gen_mul_tl(t2, t0, t2);
++            break;
++        case 2: /* XRB.H*XRC.H == lop, XRB.H*XRC.L == rop */
++            tcg_gen_mul_tl(t3, t1, t3);
++            tcg_gen_mul_tl(t2, t1, t2);
++            break;
++        case 3: /* XRB.L*XRC.H == lop, XRB.H*XRC.L == rop */
++            tcg_gen_mul_tl(t3, t0, t3);
++            tcg_gen_mul_tl(t2, t1, t2);
++            break;
++        }
++        gen_load_mxu_gpr(t0, xra);
++        gen_load_mxu_gpr(t1, xrd);
++
++        switch (aptn2) {
++        case 0:
++            tcg_gen_add_tl(t3, t0, t3);
++            tcg_gen_add_tl(t2, t1, t2);
++            break;
++        case 1:
++            tcg_gen_add_tl(t3, t0, t3);
++            tcg_gen_sub_tl(t2, t1, t2);
++            break;
++        case 2:
++            tcg_gen_sub_tl(t3, t0, t3);
++            tcg_gen_add_tl(t2, t1, t2);
++            break;
++        case 3:
++            tcg_gen_sub_tl(t3, t0, t3);
++            tcg_gen_sub_tl(t2, t1, t2);
++            break;
++        }
++        gen_store_mxu_gpr(t3, xra);
++        gen_store_mxu_gpr(t2, xrd);
 +        break;
-+
-     case OPC_CLO:
-     case OPC_CLZ:
-         check_insn(ctx, ISA_MIPS32);
-@@ -20742,6 +20807,12 @@ void mips_tcg_init(void)
-     fpu_fcr31 = tcg_global_mem_new_i32(cpu_env,
-                                        offsetof(CPUMIPSState, active_fpu.fcr31),
-                                        "fcr31");
-+
-+    for (i = 0; i < 16; i++)
-+        mxu_gpr[i] = tcg_global_mem_new(cpu_env,
-+                                        offsetof(CPUMIPSState,
-+                                                 active_tc.mxu_gpr[i]),
-+                                        mxuregnames[i]);
- }
+     }
  
- #include "translate_init.inc.c"
+     tcg_temp_free(t0);
+@@ -17985,6 +18044,7 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MXU_S32M2I:
+     case OPC_MXU_S8LDD:
+     case OPC_MXU_D16MUL:
++    case OPC_MXU_D16MAC:
+         gen_mxu(ctx, op1);
+         break;
+ 
 -- 
 2.18.0
