@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([208.118.235.92]:60008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fuFxv-0001Ka-II
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:45:52 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fuG85-0005x5-9a
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fuFxr-0003cy-6j
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:45:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33410 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fuG7z-0006F2-HJ
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:56:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34488 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fuFxq-0003bf-Od
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:45:47 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180827111533.100ee062.cohuck@redhat.com> (Cornelia Huck's
-	message of "Mon, 27 Aug 2018 11:15:33 +0200")
-References: <20180822120050.12694-1-quintela@redhat.com>
-	<CAFEAcA9xowHzaeN=N-EsUdP8rqMtGsJR2dNerQ_59Q+32ySWsw@mail.gmail.com>
-	<20180827111533.100ee062.cohuck@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 27 Aug 2018 13:45:37 +0200
-Message-ID: <87zhx8xcbi.fsf@trasno.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 00/20] Migration pull requset
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fuG7z-0006Ec-Ah
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:56:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C4009801145A
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 11:56:14 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Mon, 27 Aug 2018 13:56:08 +0200
+Message-Id: <1535370968-217716-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH] vl.c deprecate incorrect CPUs topology
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, libvir-list@redhat.com, ehabkost@redhat.com, berrange@redhat.com, drjones@redhat.com
 
-Cornelia Huck <cohuck@redhat.com> wrote:
-> On Fri, 24 Aug 2018 18:05:03 +0100
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->
->> On 22 August 2018 at 13:00, Juan Quintela <quintela@redhat.com> wrote:
->> > The following changes since commit 13b7b188501d419a7d63c016e00065bcc693b7d4:
->> >
->> >   Merge remote-tracking branch
->> > 'remotes/kraxel/tags/vga-20180821-pull-request' into staging
->> > (2018-08-21 15:57:56 +0100)
->> >
->> > are available in the Git repository at:
->> >
->> >   git://github.com/juanquintela/qemu.git tags/migration/20180822-1
->> >
->> > for you to fetch changes up to ae526e32bd36cfb84045c8d2fd34e0b9e39a52f8:
->> >
->> >   migration: hold the lock only if it is really needed (2018-08-22
->> > 12:36:18 +0200)
->> >
->> > ----------------------------------------------------------------
->> > migration/next for 20180822
->> >
->> > All pending patches that are reviewed:
->> > - doc for pr_load (dave)
->> > - postcopy + rdma is nearer (lidong chen)
->> > - compression fixes (xiao)
->> > - silent warning for pcc tests (Thomas)
->> > - fix subsection without .needed function (pmaydell)
->> >
->> > Please apply, Juan.
->> >
->> > ----------------------------------------------------------------  
->> 
->> Applied, thanks.
->> 
->> -- PMM
->> 
->
-> The rdma migration code in there seems to upset my clang (5.0.2, Fedora
-> 27); gcc (7.3.1) does not complain.
->
-> /home/cohuck/git/qemu/migration/rdma.c:4035:9: error: variable
->       'rdma_return_path' is used uninitialized whenever 'if' condition is true
->       [-Werror,-Wsometimes-uninitialized]
->     if (ret) {
->         ^~~
-> /home/cohuck/git/qemu/migration/rdma.c:4059:12: note: uninitialized use occurs
->       here
->     g_free(rdma_return_path);
->            ^~~~~~~~~~~~~~~~
-> /home/cohuck/git/qemu/migration/rdma.c:4035:5: note: remove the 'if' if its
->       condition is always false
->     if (ret) {
->     ^~~~~~~~~~
-> /home/cohuck/git/qemu/migration/rdma.c:4027:9: error: variable
->       'rdma_return_path' is used uninitialized whenever 'if' condition is true
->       [-Werror,-Wsometimes-uninitialized]
->     if (ret) {
->         ^~~
-> /home/cohuck/git/qemu/migration/rdma.c:4059:12: note: uninitialized use occurs
->       here
->     g_free(rdma_return_path);
->            ^~~~~~~~~~~~~~~~
-> /home/cohuck/git/qemu/migration/rdma.c:4027:5: note: remove the 'if' if its
->       condition is always false
->     if (ret) {
->     ^~~~~~~~~~
-> /home/cohuck/git/qemu/migration/rdma.c:4021:9: error: variable
->       'rdma_return_path' is used uninitialized whenever 'if' condition is true
->       [-Werror,-Wsometimes-uninitialized]
->     if (rdma == NULL) {
->         ^~~~~~~~~~~~
-> /home/cohuck/git/qemu/migration/rdma.c:4059:12: note: uninitialized use occurs
->       here
->     g_free(rdma_return_path);
->            ^~~~~~~~~~~~~~~~
-> /home/cohuck/git/qemu/migration/rdma.c:4021:5: note: remove the 'if' if its
->       condition is always false
->     if (rdma == NULL) {
->     ^~~~~~~~~~~~~~~~~~~
-> /home/cohuck/git/qemu/migration/rdma.c:4015:41: note: initialize the variable
->       'rdma_return_path' to silence this warning
->     RDMAContext *rdma, *rdma_return_path;
->                                         ^
->                                          = NULL
+-smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
+so that total number of logical CPUs [sockets * cores * threads]
+would be equal to [maxcpus], however historically we didn't have
+such check in QEMU and it is possible to start VM with an invalid
+topology.
+Deprecate invalid options combination so we can make sure that
+the topology VM started with is always correct in the future.
+Users with an invalid sockets/cores/threads/maxcpus values should
+fix their CLI to make sure that
+   [sockets * cores * threads] == [maxcpus]
 
-Thanks, instaling clang and seing what is going on here.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ qemu-deprecated.texi | 11 +++++++++++
+ vl.c                 |  6 ++++++
+ 2 files changed, 17 insertions(+)
 
-Later, Juan.
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 87212b6..d5d9ce6 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -159,6 +159,17 @@ The 'file' driver for drives is no longer appropriate for character or host
+ devices and will only accept regular files (S_IFREG). The correct driver
+ for these file types is 'host_cdrom' or 'host_device' as appropriate.
+ 
++@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
++
++CPU topology properties should describe whole machine topology including
++possible CPUs. but historically it was possible to start QEMU with
++an incorrect topology where
++  socket * core * thread >= X && < maxcpus
++which could lead to incorrect topology enumeration by the guest.
++Support for invalid topology will be removed, end user must ensure
++that topology described with -smp includes all possible cpus, i.e.:
++  socket * core * thread == maxcpus
++
+ @section QEMU Machine Protocol (QMP) commands
+ 
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+diff --git a/vl.c b/vl.c
+index 5ba06ad..bc53828 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1238,6 +1238,12 @@ static void smp_parse(QemuOpts *opts)
+             exit(1);
+         }
+ 
++        if (sockets * cores * threads != max_cpus) {
++            warn_report("Invalid CPUs topology deprecated. "
++                        "sockets (%u) * cores (%u) * threads (%u) "
++                        "!= maxcpus (%u)",
++                        sockets, cores, threads, max_cpus);
++        }
+         if (sockets * cores * threads > max_cpus) {
+             error_report("cpu topology: "
+                          "sockets (%u) * cores (%u) * threads (%u) > "
+-- 
+2.7.4
