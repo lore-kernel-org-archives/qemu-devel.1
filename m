@@ -1,37 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fuGlr-0002XI-76
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:37:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuGm4-0002gu-KU
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:37:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fuGlo-0005BF-13
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:37:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37604
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
-	id 1fuGln-00059I-Ql
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:37:23 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w7RCXisC017564
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:37:22 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2m4e09g9fj-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:37:21 -0400
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
-	Mon, 27 Aug 2018 13:37:19 +0100
-From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
-Date: Mon, 27 Aug 2018 07:37:14 -0500
+	(envelope-from <cohuck@redhat.com>) id 1fuGm1-0005Jl-FV
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:37:40 -0400
+Date: Mon, 27 Aug 2018 14:37:31 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180827143731.26a5c0f6.cohuck@redhat.com>
+In-Reply-To: <de80a3a0-7fd7-783c-3d3b-b8c4a481a893@de.ibm.com>
+References: <20180824133757.1cbdba75.cohuck@redhat.com>
+	<de80a3a0-7fd7-783c-3d3b-b8c4a481a893@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <153537327445.92657.5884855110375406189.stgit@lep8c.aus.stglabs.ibm.com>
-Subject: [Qemu-devel] [PATCH] linux-user: elf: mmap all the target-pages of
- hostpage for data segment
+Subject: Re: [Qemu-devel] [RFD] [s390x] Tweaking the s390x maintainership
+ setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,80 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: riku.voipio@iki.fi, laurent@vivier.eu
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-If the hostpage size is greater than the TARGET_PAGESIZE, the
-target-pages of size TARGET_PAGESIZE are marked valid only till the
-length requested during the elfload. The glibc attempts to consume unused
-space in the last page of data segment(__libc_memalign() in
-elf/dl-minimal.c). The GLRO(dl_pagesize) is actually the host pagesize as
-set in the auxillary vectors. So, there is no explicit mmap request for
-the remaining target-pages on the last hostpage. The glibc assumes that
-particular space as available and subsequent attempts to use
-those addresses lead to crash as the target_mmap has not marked them valid
-for those target-pages.
+On Mon, 27 Aug 2018 14:02:49 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-The issue is seen when trying to chroot to 16.04-x86_64 ubuntu on a PPC64
-host where the fork fails to access the thread_id as it is allocated on a
-page not marked valid. The recent glibc doesnt have checks for thread-id in
-fork, but the issue can manifest somewhere else, none the less.
+> On 08/24/2018 01:37 PM, Cornelia Huck wrote:
 
-The fix here is to map all the target-pages of the hostpage during the
-ELF load for data segment to allow the glibc for proper consumption.
+> > So, here are some ideas I had on how to improve things:
+> > 
+> > * Split up maintainership a bit more. For example, split out areas like
+> >   pci for which no public documentation is available; these need to
+> >   have at least one IBM maintainer. Another candidate would maybe be
+> >   the cpu model.
+> > * On a related note, more maintainers from IBM would be nice :) For
+> >   example, for vfio-ccw, where I'm the only maintainer... Some R:
+> >   entries would not hurt, either.  
+> 
+> Yes, we (IBM) should take care of vfio-ccw (and probably also pci and ap)
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
----
- linux-user/elfload.c |   24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+Just to note: I'm happy to continue taking care of vfio-ccw (especially
+as I also have some code changes for it under development), but it
+would be great if someone would join me. The others (pci and the
+upcoming ap) should be handled by IBM, agreed.
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 8638612aec..1d86034c8d 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -1438,9 +1438,17 @@ struct exec
- 
- /* Necessary parameters */
- #define TARGET_ELF_EXEC_PAGESIZE TARGET_PAGE_SIZE
--#define TARGET_ELF_PAGESTART(_v) ((_v) & \
--                                 ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
--#define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
-+#define TARGET_ELF_PAGESTART(_v, _s) \
-+        ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-+         (_v) & ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE - 1) : \
-+         (_v) & ~(abi_ulong)(_s - 1));
-+#define TARGET_ELF_PAGEOFFSET(_v, _s) \
-+        ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-+         (_v) & (TARGET_ELF_EXEC_PAGESIZE - 1) : \
-+         (_v) & (_s - 1));
-+#define TARGET_ELF_PAGELENGTH(_v, _s) \
-+        ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-+         TARGET_PAGE_ALIGN(_v) : HOST_PAGE_ALIGN(_v));
- 
- #define DLINFO_ITEMS 15
- 
-@@ -2279,7 +2287,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-     for (i = 0; i < ehdr->e_phnum; i++) {
-         struct elf_phdr *eppnt = phdr + i;
-         if (eppnt->p_type == PT_LOAD) {
--            abi_ulong vaddr, vaddr_po, vaddr_ps, vaddr_ef, vaddr_em;
-+            abi_ulong vaddr, vaddr_po, vaddr_ps, vaddr_ef, vaddr_em, vaddr_len;
-             int elf_prot = 0;
- 
-             if (eppnt->p_flags & PF_R) elf_prot =  PROT_READ;
-@@ -2287,10 +2295,12 @@ static void load_elf_image(const char *image_name, int image_fd,
-             if (eppnt->p_flags & PF_X) elf_prot |= PROT_EXEC;
- 
-             vaddr = load_bias + eppnt->p_vaddr;
--            vaddr_po = TARGET_ELF_PAGEOFFSET(vaddr);
--            vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
-+            vaddr_po = TARGET_ELF_PAGEOFFSET(vaddr, qemu_host_page_size);
-+            vaddr_ps = TARGET_ELF_PAGESTART(vaddr, qemu_host_page_size);
-+            vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po,
-+                                              qemu_host_page_size);
- 
--            error = target_mmap(vaddr_ps, eppnt->p_filesz + vaddr_po,
-+            error = target_mmap(vaddr_ps, vaddr_len,
-                                 elf_prot, MAP_PRIVATE | MAP_FIXED,
-                                 image_fd, eppnt->p_offset - vaddr_po);
-             if (error == -1) {
+> Give me some more days to sort things out a bit. 
+
+Thanks for looking into this. No hurry, I'm out on vacation soon
+anyway :)
+
+> 
+> > * More trees to pull from. Of course, not every area needs a dedicated
+> >   tree (that would become silly pretty quickly), but for example a tcg
+> >   tree would be nice. I can still pick individual patches if a pull
+> >   request would be overkill.
+> > * I'd also like to have a designated backup for the overall
+> >   maintainership, especially for when I'm on vacation (like the first
+> >   two weeks of September, just to let you know :) or otherwise
+> >   unavailable, but also for sanity. Likely needs to be a non-IBMer due
+> >   to the tcg problem.  
+> 
+> Is the current setup with Richard (TCG) and myself (KVM) not good enough?
+
+It's mostly "I'm uncomfortable that it's only me". Having the tcg
+maintainers resp. you handle things is absolutely fine for the usual
+run of things. The only time where there might be problems is if e.g.
+tcg and kvm changes interact in a non-trivial way, but I expect these
+to be very rare.
+
+> 
+> 
+> > * A more predictable s390-next would be nice. Maybe have it
+> >   (semi-)automatically created out of the different trees, on top of
+> >   current master? I would start to apply patches on a new branch that
+> >   feeds into s390-next rather than on s390-next directly, then.
+> > * Do something about (semi-)consolidated, (semi-)automatic testing.
+> >   Like hooking into Travis (or something similar), sharing test setups,
+> >   and enabling tests to be run on a range of platforms (including very
+> >   recent ones). Testing is probably a large topic on its own, though.
+> > 
+> > Thoughts?
+> >   
+> 
