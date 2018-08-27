@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fuHWR-0000fM-T7
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:25:36 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fuHc0-0003UK-T2
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fuHWO-000231-K3
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:25:35 -0400
-Received: from mail-by2nam03on0102.outbound.protection.outlook.com
-	([104.47.42.102]:60585
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fuHWO-00022B-9F
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:25:32 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Mon, 27 Aug 2018 13:25:27 +0000
-Message-ID: <BN7PR08MB4868711B3B45495757BC5962C60B0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <cover.1535133088.git.jancraig@amazon.com>
-	<f1e92127959ffb3df713a06452328a71170bda93.1535133089.git.jancraig@amazon.com>
-	<231c38e4-8ad4-0f73-69ab-7a66d20716d3@linaro.org>
-	,<fed7b415b77c45d286e3b7cb4bc7b84f@EX13D12UEA003.ant.amazon.com>
-In-Reply-To: <fed7b415b77c45d286e3b7cb4bc7b84f@EX13D12UEA003.ant.amazon.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <laurent@vivier.eu>) id 1fuHbx-0004zG-28
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:31:20 -0400
+References: <153537327445.92657.5884855110375406189.stgit@lep8c.aus.stglabs.ibm.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <9ab7a80d-9289-2d65-9d87-238cfa69f456@vivier.eu>
+Date: Mon, 27 Aug 2018 15:25:47 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/7] target/mips: Add MXU instructions
- S32I2M and S32M2I
+In-Reply-To: <153537327445.92657.5884855110375406189.stgit@lep8c.aus.stglabs.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: elf: mmap all the target-pages
+ of hostpage for data segment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,23 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Janeczek, Craig" <jancraig@amazon.com>, Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, riku.voipio@iki.fi
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-> From: Janeczek, Craig <jancraig@amazon.com>
-> Sent: Monday, August 27, 2018 2:22 PM
->=20
-> Subject: RE: [Qemu-devel] [PATCH 2/7] target/mips: Add MXU instructions S=
-32I2M and S32M2I
->=20
-> https://github.com/MIPS/CI20_mplayer/blob/ci20_mplayer/mxu_as
->=20
-> Sorry I mis-read our comment. The bit layouts were pulled from
-> this script and validated by visually examining compiled code.
+Le 27/08/2018 à 14:37, Shivaprasad G Bhat a écrit :
+> If the hostpage size is greater than the TARGET_PAGESIZE, the
+> target-pages of size TARGET_PAGESIZE are marked valid only till the
+> length requested during the elfload. The glibc attempts to consume unused
+> space in the last page of data segment(__libc_memalign() in
+> elf/dl-minimal.c). The GLRO(dl_pagesize) is actually the host pagesize as
+> set in the auxillary vectors. So, there is no explicit mmap request for
+> the remaining target-pages on the last hostpage. The glibc assumes that
+> particular space as available and subsequent attempts to use
+> those addresses lead to crash as the target_mmap has not marked them valid
+> for those target-pages.
+> 
+> The issue is seen when trying to chroot to 16.04-x86_64 ubuntu on a PPC64
+> host where the fork fails to access the thread_id as it is allocated on a
+> page not marked valid. The recent glibc doesnt have checks for thread-id in
+> fork, but the issue can manifest somewhere else, none the less.
+> 
+> The fix here is to map all the target-pages of the hostpage during the
+> ELF load for data segment to allow the glibc for proper consumption.
+> 
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+> ---
+>  linux-user/elfload.c |   24 +++++++++++++++++-------
+>  1 file changed, 17 insertions(+), 7 deletions(-)
+> 
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index 8638612aec..1d86034c8d 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -1438,9 +1438,17 @@ struct exec
+>  
+>  /* Necessary parameters */
+>  #define TARGET_ELF_EXEC_PAGESIZE TARGET_PAGE_SIZE
+> -#define TARGET_ELF_PAGESTART(_v) ((_v) & \
+> -                                 ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
+> -#define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
+> +#define TARGET_ELF_PAGESTART(_v, _s) \
+> +        ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
+> +         (_v) & ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE - 1) : \
+> +         (_v) & ~(abi_ulong)(_s - 1));
+> +#define TARGET_ELF_PAGEOFFSET(_v, _s) \
+> +        ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
+> +         (_v) & (TARGET_ELF_EXEC_PAGESIZE - 1) : \
+> +         (_v) & (_s - 1));
+> +#define TARGET_ELF_PAGELENGTH(_v, _s) \
+> +        ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
+> +         TARGET_PAGE_ALIGN(_v) : HOST_PAGE_ALIGN(_v));
 
-I think Richard brings to your attention that the structure definitions usi=
-ng bit fields may yield different results on little and big endian hosts, w=
-hich is certainly the situation you want to avooid, and recommends using ex=
-tract32(), or similar QEMU feature, instead.
+I think it's only possible if the PT_LOAD p_align value is greater or
+equal to qemu_host_page_size.
 
-Aleksandar
+See 33143c446e ("linux-user: fix ELF load alignment error").
+
+You could check this with qemu-s390x or qemu-arm on ppc64 host.
+
+Thanks,
+Laurent
