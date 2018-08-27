@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuI6U-0002Yl-Bd
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:02:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1fuI6V-0003JK-Fi
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuHss-0007ul-0K
+	(envelope-from <armbru@redhat.com>) id 1fuHsr-0007uf-W2
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:48:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37888 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37890 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuHsr-0007uI-On
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuHsr-0007uK-PE
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:48:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 739508010FDF
+	by mx1.redhat.com (Postfix) with ESMTPS id 750148011059
 	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 13:48:45 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 27 Aug 2018 15:48:41 +0200
-Message-Id: <20180827134842.12238-3-armbru@redhat.com>
+Date: Mon, 27 Aug 2018 15:48:40 +0200
+Message-Id: <20180827134842.12238-2-armbru@redhat.com>
 In-Reply-To: <20180827134842.12238-1-armbru@redhat.com>
 References: <20180827134842.12238-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 2/3] intel-iommu: start to use
- error_report_once
+Subject: [Qemu-devel] [PULL v2 1/3] qemu-error: introduce
+ {error|warn}_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,248 +31,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Eric Blake <eblake@redhat.com>
 
 From: Peter Xu <peterx@redhat.com>
 
-Replace existing trace_vtd_err() with error_report_once() then stderr
-will capture something if any of the error happens, meanwhile we don't
-suffer from any DDOS.  Then remove the trace point.  Since at it,
-provide more information where proper (now we can pass parameters into
-the report function).
+There are many error_report()s that can be used in frequently called
+functions, especially on IO paths.  That can be unideal in that
+malicious guest can try to trigger the error tons of time which might
+use up the log space on the host (e.g., libvirt can capture the stderr
+of QEMU and put it persistently onto disk).  In VT-d emulation code, we
+have trace_vtd_error() tracer.  AFAIU all those places can be replaced
+by something like error_report() but trace points are mostly used to
+avoid the DDOS attack that mentioned above.  However using trace points
+mean that errors are not dumped if trace not enabled.
 
+It's not a big deal in most modern server managements since we have
+things like logrotate to maintain the logs and make sure the quota is
+expected.  However it'll still be nice that we just provide another way
+to restrict message generations.  In most cases, this kind of
+error_report()s will only provide valid information on the first message
+sent, and all the rest of similar messages will be mostly talking about
+the same thing.  This patch introduces *_report_once() helpers to allow
+a message to be dumped only once during one QEMU process's life cycle.
+It will make sure: (1) it's on by deffault, so we can even get something
+without turning the trace on and reproducing, and (2) it won't be
+affected by DDOS attack.
+
+To implement it, I stole the printk_once() macro from Linux.
+
+CC: Eric Blake <eblake@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180815095328.32414-3-peterx@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-[Two format strings fixed, whitespace tidied up]
+Message-Id: <20180815095328.32414-2-peterx@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+[Whitespace adjusted, comments improved]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/i386/intel_iommu.c | 65 ++++++++++++++++++++++++-------------------
- hw/i386/trace-events  |  1 -
- 2 files changed, 37 insertions(+), 29 deletions(-)
+ include/qemu/error-report.h | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 0a8cd4e9cc..9c0f525408 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -311,14 +311,14 @@ static void vtd_generate_fault_event(IntelIOMMUStat=
-e *s, uint32_t pre_fsts)
- {
-     if (pre_fsts & VTD_FSTS_PPF || pre_fsts & VTD_FSTS_PFO ||
-         pre_fsts & VTD_FSTS_IQE) {
--        trace_vtd_err("There are previous interrupt conditions "
--                      "to be serviced by software, fault event "
--                      "is not generated.");
-+        error_report_once("There are previous interrupt conditions "
-+                          "to be serviced by software, fault event "
-+                          "is not generated");
-         return;
-     }
-     vtd_set_clear_mask_long(s, DMAR_FECTL_REG, 0, VTD_FECTL_IP);
-     if (vtd_get_long_raw(s, DMAR_FECTL_REG) & VTD_FECTL_IM) {
--        trace_vtd_err("Interrupt Mask set, irq is not generated.");
-+        error_report_once("Interrupt Mask set, irq is not generated");
-     } else {
-         vtd_generate_interrupt(s, DMAR_FEADDR_REG, DMAR_FEDATA_REG);
-         vtd_set_clear_mask_long(s, DMAR_FECTL_REG, VTD_FECTL_IP, 0);
-@@ -426,20 +426,20 @@ static void vtd_report_dmar_fault(IntelIOMMUState *=
-s, uint16_t source_id,
-     trace_vtd_dmar_fault(source_id, fault, addr, is_write);
-=20
-     if (fsts_reg & VTD_FSTS_PFO) {
--        trace_vtd_err("New fault is not recorded due to "
--                      "Primary Fault Overflow.");
-+        error_report_once("New fault is not recorded due to "
-+                          "Primary Fault Overflow");
-         return;
-     }
-=20
-     if (vtd_try_collapse_fault(s, source_id)) {
--        trace_vtd_err("New fault is not recorded due to "
--                      "compression of faults.");
-+        error_report_once("New fault is not recorded due to "
-+                          "compression of faults");
-         return;
-     }
-=20
-     if (vtd_is_frcd_set(s, s->next_frcd_reg)) {
--        trace_vtd_err("Next Fault Recording Reg is used, "
--                      "new fault is not recorded, set PFO field.");
-+        error_report_once("Next Fault Recording Reg is used, "
-+                          "new fault is not recorded, set PFO field");
-         vtd_set_clear_mask_long(s, DMAR_FSTS_REG, 0, VTD_FSTS_PFO);
-         return;
-     }
-@@ -447,8 +447,8 @@ static void vtd_report_dmar_fault(IntelIOMMUState *s,=
- uint16_t source_id,
-     vtd_record_frcd(s, s->next_frcd_reg, source_id, addr, fault, is_writ=
-e);
-=20
-     if (fsts_reg & VTD_FSTS_PPF) {
--        trace_vtd_err("There are pending faults already, "
--                      "fault event is not generated.");
-+        error_report_once("There are pending faults already, "
-+                          "fault event is not generated");
-         vtd_set_frcd_and_update_ppf(s, s->next_frcd_reg);
-         s->next_frcd_reg++;
-         if (s->next_frcd_reg =3D=3D DMAR_FRCD_REG_NR) {
-@@ -1056,8 +1056,10 @@ static int vtd_sync_shadow_page_table_range(VTDAdd=
-ressSpace *vtd_as,
-              * we just skip the sync for this time.  After all we even
-              * don't have the root table pointer!
-              */
--            trace_vtd_err("Detected invalid context entry when "
--                          "trying to sync shadow page table");
-+            error_report_once("%s: invalid context entry for bus 0x%x"
-+                              " devfn 0x%x",
-+                              __func__, pci_bus_num(vtd_as->bus),
-+                              vtd_as->devfn);
-             return 0;
-         }
-     }
-@@ -1514,7 +1516,8 @@ static uint64_t vtd_context_cache_invalidate(IntelI=
-OMMUState *s, uint64_t val)
-         break;
-=20
-     default:
--        trace_vtd_err("Context cache invalidate type error.");
-+        error_report_once("%s: invalid context: 0x%" PRIx64,
-+                          __func__, val);
-         caig =3D 0;
-     }
-     return caig;
-@@ -1634,7 +1637,8 @@ static uint64_t vtd_iotlb_flush(IntelIOMMUState *s,=
- uint64_t val)
-         am =3D VTD_IVA_AM(addr);
-         addr =3D VTD_IVA_ADDR(addr);
-         if (am > VTD_MAMV) {
--            trace_vtd_err("IOTLB PSI flush: address mask overflow.");
-+            error_report_once("%s: address mask overflow: 0x%" PRIx64,
-+                              __func__, vtd_get_quad_raw(s, DMAR_IVA_REG=
-));
-             iaig =3D 0;
-             break;
-         }
-@@ -1643,7 +1647,8 @@ static uint64_t vtd_iotlb_flush(IntelIOMMUState *s,=
- uint64_t val)
-         break;
-=20
-     default:
--        trace_vtd_err("IOTLB flush: invalid granularity.");
-+        error_report_once("%s: invalid granularity: 0x%" PRIx64,
-+                          __func__, val);
-         iaig =3D 0;
-     }
-     return iaig;
-@@ -1793,8 +1798,8 @@ static void vtd_handle_ccmd_write(IntelIOMMUState *=
-s)
-     /* Context-cache invalidation request */
-     if (val & VTD_CCMD_ICC) {
-         if (s->qi_enabled) {
--            trace_vtd_err("Queued Invalidation enabled, "
--                          "should not use register-based invalidation");
-+            error_report_once("Queued Invalidation enabled, "
-+                              "should not use register-based invalidatio=
-n");
-             return;
-         }
-         ret =3D vtd_context_cache_invalidate(s, val);
-@@ -1814,8 +1819,8 @@ static void vtd_handle_iotlb_write(IntelIOMMUState =
-*s)
-     /* IOTLB invalidation request */
-     if (val & VTD_TLB_IVT) {
-         if (s->qi_enabled) {
--            trace_vtd_err("Queued Invalidation enabled, "
--                          "should not use register-based invalidation.")=
-;
-+            error_report_once("Queued Invalidation enabled, "
-+                              "should not use register-based invalidatio=
-n");
-             return;
-         }
-         ret =3D vtd_iotlb_flush(s, val);
-@@ -1833,7 +1838,7 @@ static bool vtd_get_inv_desc(dma_addr_t base_addr, =
-uint32_t offset,
-     dma_addr_t addr =3D base_addr + offset * sizeof(*inv_desc);
-     if (dma_memory_read(&address_space_memory, addr, inv_desc,
-         sizeof(*inv_desc))) {
--        trace_vtd_err("Read INV DESC failed.");
-+        error_report_once("Read INV DESC failed");
-         inv_desc->lo =3D 0;
-         inv_desc->hi =3D 0;
-         return false;
-@@ -2188,7 +2193,8 @@ static uint64_t vtd_mem_read(void *opaque, hwaddr a=
-ddr, unsigned size)
-     trace_vtd_reg_read(addr, size);
-=20
-     if (addr + size > DMAR_REG_SIZE) {
--        trace_vtd_err("Read MMIO over range.");
-+        error_report_once("%s: MMIO over range: addr=3D0x%" PRIx64
-+                          " size=3D0x%u", __func__, addr, size);
-         return (uint64_t)-1;
-     }
-=20
-@@ -2239,7 +2245,8 @@ static void vtd_mem_write(void *opaque, hwaddr addr=
-,
-     trace_vtd_reg_write(addr, size, val);
-=20
-     if (addr + size > DMAR_REG_SIZE) {
--        trace_vtd_err("Write MMIO over range.");
-+        error_report_once("%s: MMIO over range: addr=3D0x%" PRIx64
-+                          " size=3D0x%u", __func__, addr, size);
-         return;
-     }
-=20
-@@ -2610,7 +2617,8 @@ static int vtd_irte_get(IntelIOMMUState *iommu, uin=
-t16_t index,
-     addr =3D iommu->intr_root + index * sizeof(*entry);
-     if (dma_memory_read(&address_space_memory, addr, entry,
-                         sizeof(*entry))) {
--        trace_vtd_err("Memory read failed for IRTE.");
-+        error_report_once("%s: read failed: ind=3D0x%x addr=3D0x%" PRIx6=
-4,
-+                          __func__, index, addr);
-         return -VTD_FR_IR_ROOT_INVAL;
-     }
-=20
-@@ -2742,14 +2750,15 @@ static int vtd_interrupt_remap_msi(IntelIOMMUStat=
-e *iommu,
-     }
-=20
-     if (origin->address & VTD_MSI_ADDR_HI_MASK) {
--        trace_vtd_err("MSI address high 32 bits non-zero when "
--                      "Interrupt Remapping enabled.");
-+        error_report_once("%s: MSI address high 32 bits non-zero detecte=
-d: "
-+                          "address=3D0x%" PRIx64, __func__, origin->addr=
-ess);
-         return -VTD_FR_IR_REQ_RSVD;
-     }
-=20
-     addr.data =3D origin->address & VTD_MSI_ADDR_LO_MASK;
-     if (addr.addr.__head !=3D 0xfee) {
--        trace_vtd_err("MSI addr low 32 bit invalid.");
-+        error_report_once("%s: MSI address low 32 bit invalid: 0x%" PRIx=
-32,
-+                          __func__, addr.data);
-         return -VTD_FR_IR_REQ_RSVD;
-     }
-=20
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index e14d06ec83..922431b1bb 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -69,7 +69,6 @@ vtd_ir_remap_msi_req(uint64_t addr, uint64_t data) "add=
-r 0x%"PRIx64" data 0x%"PR
- vtd_fsts_ppf(bool set) "FSTS PPF bit set to %d"
- vtd_fsts_clear_ip(void) ""
- vtd_frr_new(int index, uint64_t hi, uint64_t lo) "index %d high 0x%"PRIx=
-64" low 0x%"PRIx64
--vtd_err(const char *str) "%s"
- vtd_err_dmar_iova_overflow(uint64_t iova) "iova 0x%"PRIx64
- vtd_err_dmar_slpte_read_error(uint64_t iova, int level) "iova 0x%"PRIx64=
-" level %d"
- vtd_err_dmar_slpte_perm_error(uint64_t iova, int level, uint64_t slpte, =
-bool is_write) "iova 0x%"PRIx64" level %d slpte 0x%"PRIx64" write %d"
---=20
+diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+index e1c8ae1a52..72fab2b031 100644
+--- a/include/qemu/error-report.h
++++ b/include/qemu/error-report.h
+@@ -44,6 +44,38 @@ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ 
++/*
++ * Similar to error_report(), except it prints the message just once.
++ * Return true when it prints, false otherwise.
++ */
++#define error_report_once(fmt, ...)             \
++    ({                                          \
++        static bool print_once_;                \
++        bool ret_print_once_ = !print_once_;    \
++                                                \
++        if (!print_once_) {                     \
++            print_once_ = true;                 \
++            error_report(fmt, ##__VA_ARGS__);   \
++        }                                       \
++        unlikely(ret_print_once_);              \
++    })
++
++/*
++ * Similar to warn_report(), except it prints the message just once.
++ * Return true when it prints, false otherwise.
++ */
++#define warn_report_once(fmt, ...)              \
++    ({                                          \
++        static bool print_once_;                \
++        bool ret_print_once_ = !print_once_;    \
++                                                \
++        if (!print_once_) {                     \
++            print_once_ = true;                 \
++            warn_report(fmt, ##__VA_ARGS__);    \
++        }                                       \
++        unlikely(ret_print_once_);              \
++    })
++
+ const char *error_get_progname(void);
+ extern bool enable_timestamp_msg;
+ 
+-- 
 2.17.1
