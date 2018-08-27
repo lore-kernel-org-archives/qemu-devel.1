@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuI72-0003sE-Nh
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:03:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuI7s-0004Uw-F2
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuI71-0003AS-MG
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:03:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuI7o-00048R-LQ
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:04:14 -0400
 References: <20180823222249.13518-1-jsnow@redhat.com>
-	<20180823222249.13518-13-jsnow@redhat.com>
+	<20180823222249.13518-14-jsnow@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c8fe6817-6f09-f476-32d3-25d0ca3abb59@redhat.com>
-Date: Mon, 27 Aug 2018 16:03:10 +0200
+Message-ID: <5e231134-be0a-fb6d-b61d-59bf42635ce9@redhat.com>
+Date: Mon, 27 Aug 2018 16:03:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180823222249.13518-13-jsnow@redhat.com>
+In-Reply-To: <20180823222249.13518-14-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ikD9YaHzKRCcO53ezosQcTnsyngmfFbGz"
-Subject: Re: [Qemu-devel] [PATCH v2 12/13] qapi/block-stream: expose new job
- properties
+	boundary="i5CUkCp9v276gbZan47xNLf5gvURJoHnF"
+Subject: Re: [Qemu-devel] [PATCH v2 13/13] block/backup: qapi documentation
+ fixup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +29,46 @@ To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ikD9YaHzKRCcO53ezosQcTnsyngmfFbGz
+--i5CUkCp9v276gbZan47xNLf5gvURJoHnF
 From: Max Reitz <mreitz@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com,
  Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <c8fe6817-6f09-f476-32d3-25d0ca3abb59@redhat.com>
-Subject: Re: [PATCH v2 12/13] qapi/block-stream: expose new job properties
+Message-ID: <5e231134-be0a-fb6d-b61d-59bf42635ce9@redhat.com>
+Subject: Re: [PATCH v2 13/13] block/backup: qapi documentation fixup
 References: <20180823222249.13518-1-jsnow@redhat.com>
- <20180823222249.13518-13-jsnow@redhat.com>
-In-Reply-To: <20180823222249.13518-13-jsnow@redhat.com>
+ <20180823222249.13518-14-jsnow@redhat.com>
+In-Reply-To: <20180823222249.13518-14-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2018-08-24 00:22, John Snow wrote:
+> Fix documentation to match the other jobs amended for 3.1.
+>=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  blockdev.c           |  9 +++++++++
->  hmp.c                |  5 +++--
->  qapi/block-core.json | 16 +++++++++++++++-
->  3 files changed, 27 insertions(+), 3 deletions(-)
-
-[...]
-
-> diff --git a/hmp.c b/hmp.c
-> index 2aafb50e8e..e3c3ecd76f 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1865,8 +1865,9 @@ void hmp_block_stream(Monitor *mon, const QDict *=
-qdict)
->      int64_t speed =3D qdict_get_try_int(qdict, "speed", 0);
-> =20
->      qmp_block_stream(true, device, device, base !=3D NULL, base, false=
-, NULL,
-> -                     false, NULL, qdict_haskey(qdict, "speed"), speed,=
-
-> -                     true, BLOCKDEV_ON_ERROR_REPORT, &error);
-> +                     false, NULL, qdict_haskey(qdict, "speed"), speed,=
- true,
-> +                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, fa=
-lse,
-
-Does this remind me more of Dilbert's RNG or of Wheatley brute-forcing
-passwords in Portal 2?
+>  qapi/block-core.json | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> +                     &error);
-> =20
->      hmp_handle_error(mon, &error);
->  }
 
-
---ikD9YaHzKRCcO53ezosQcTnsyngmfFbGz
+--i5CUkCp9v276gbZan47xNLf5gvURJoHnF
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluEBJ4ACgkQ9AfbAGHV
-z0A3cQgAnNB6tLCxFrIgPz68IP7Q/Clx6x9S0yQKl2dMVoN045O+HSph69yRTpQ1
-pQ6vldK+xKWT7EKQGKvlGNYIxtqF0KuV9aTvhHp7gkIJpZcSSBYsySRtwU64k7hz
-3hNOnsR+6XtxI4iOqiN7aMTUYep0HAcd898rcJm+GUtbVajYr799XeaAtP/xVVS1
-gjyA3rBuBEkEuheLujv98qNPq1hhqDZ5itpaJADORQw/uL82iiE7gTC94pZetCQ2
-j/ZkdHcVYNvNfStyj7wIn+Id6P5bRu2HwBwdaCEMxkILkUywklUPj74VQv4N2wM9
-WEvT53zEmK8hskhwTQ7mt19fvShlhg==
-=m3GG
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluEBMoACgkQ9AfbAGHV
+z0CioggAjqLO9Uzbq7IkM1PWZLb1y6IoVPmAvLnzxWf1B1sz23rLdWXJWWF1rOUt
+mdKgtQepqw5uJkE0XTSkfdm3sBJwYRICK40tg4iGkHbWsduevQZn/ikowRoVXayb
+HGfsyzYa0toUKvxB5ZbbI6iqLGXKd6+5DrqaTcnRe2CPBOaA7omtlp/pYK76kC++
+FJd6Wbuc2Tcu75o9+KzNfQ4BAP0shQGJ1zuqJogm5MpqkulMhwiN/ZwR/758urno
+1dBBWVJ0ArHEyPHvraa8KCd/JU6pVgTi94oLxprxY+fG37ZEYSQehpMP5RrROWAO
+DNw45EUK2SsvJh2dxaQWwg20FBbfBA==
+=Vdd/
 -----END PGP SIGNATURE-----
 
---ikD9YaHzKRCcO53ezosQcTnsyngmfFbGz--
+--i5CUkCp9v276gbZan47xNLf5gvURJoHnF--
