@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fuDHA-0005XA-3d
+	(envelope-from <kraxel@redhat.com>) id 1fuDHA-0005XB-3o
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fuDH8-0004mB-DZ
+	(envelope-from <kraxel@redhat.com>) id 1fuDH6-0004kz-5s
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56032 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56018 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuDH8-0004lu-6L
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:30 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuDH5-0004kI-Pp
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D6E0C40200A0
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:53:29 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6358740201DB
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:53:27 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 27 Aug 2018 10:53:13 +0200
-Message-Id: <20180827085320.9732-6-kraxel@redhat.com>
+Date: Mon, 27 Aug 2018 10:53:11 +0200
+Message-Id: <20180827085320.9732-4-kraxel@redhat.com>
 In-Reply-To: <20180827085320.9732-1-kraxel@redhat.com>
 References: <20180827085320.9732-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/12] doc: switch to modern syntax for VNC TLS
- setup
+Subject: [Qemu-devel] [PULL 03/12] ui: use enum to string helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,88 +33,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The use of 'tls', 'x509' and 'x509verify' properties is the deprecated
-backcompat syntax, replaced by use of TLS creds objects.
+Minor code simplification.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Message-id: 20180725092751.21767-2-berrange@redhat.com
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-id: 20180801092508.4927-1-marcandre.lureau@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- qemu-doc.texi | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ qemu-keymap.c | 2 +-
+ ui/console.c  | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index f74542a0e9..7bd449f398 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -1103,7 +1103,9 @@ support provides a secure session, but no authentic=
-ation. This allows any
- client to connect, and provides an encrypted session.
+diff --git a/qemu-keymap.c b/qemu-keymap.c
+index 6216371aa1..4d00468747 100644
+--- a/qemu-keymap.c
++++ b/qemu-keymap.c
+@@ -84,7 +84,7 @@ static void walk_map(struct xkb_keymap *map, xkb_keycod=
+e_t code, void *data)
+     }
+     fprintf(outfile, "# evdev %d (0x%x), QKeyCode \"%s\", number 0x%x\n"=
+,
+             evdev, evdev,
+-            QKeyCode_lookup.array[qcode],
++            QKeyCode_str(qcode),
+             qcode_to_number(qcode));
 =20
- @example
--qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509=3D/etc/pki/qemu -monit=
-or stdio
-+qemu-system-i386 [...OPTIONS...] \
-+  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
-,verify-peer=3Dno \
-+  -vnc :1,tls-creds=3Dtls0 -monitor stdio
- @end example
+     /*
+diff --git a/ui/console.c b/ui/console.c
+index bc58458ee8..3a285bae00 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -2319,7 +2319,7 @@ bool qemu_display_find_default(DisplayOptions *opts=
+)
 =20
- In the above example @code{/etc/pki/qemu} should contain at least three =
-files,
-@@ -1118,10 +1120,14 @@ only be readable by the user owning it.
- Certificates can also provide a means to authenticate the client connect=
-ing.
- The server will request that the client provide a certificate, which it =
-will
- then validate against the CA certificate. This is a good choice if deplo=
-ying
--in an environment with a private internal certificate authority.
-+in an environment with a private internal certificate authority. It uses=
- the
-+same syntax as previously, but with @code{verify-peer} set to @code{yes}
-+instead.
-=20
- @example
--qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509verify=3D/etc/pki/qemu =
--monitor stdio
-+qemu-system-i386 [...OPTIONS...] \
-+  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
-,verify-peer=3Dyes \
-+  -vnc :1,tls-creds=3Dtls0 -monitor stdio
- @end example
-=20
-=20
-@@ -1132,7 +1138,9 @@ Finally, the previous method can be combined with V=
-NC password authentication
- to provide two layers of authentication for clients.
-=20
- @example
--qemu-system-i386 [...OPTIONS...] -vnc :1,password,tls,x509verify=3D/etc/=
-pki/qemu -monitor stdio
-+qemu-system-i386 [...OPTIONS...] \
-+  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
-,verify-peer=3Dyes \
-+  -vnc :1,tls-creds=3Dtls0,password -monitor stdio
- (qemu) change vnc password
- Password: ********
- (qemu)
-@@ -1169,7 +1177,9 @@ credentials. This can be enabled, by combining the =
-'sasl' option
- with the aforementioned TLS + x509 options:
-=20
- @example
--qemu-system-i386 [...OPTIONS...] -vnc :1,tls,x509,sasl -monitor stdio
-+qemu-system-i386 [...OPTIONS...] \
-+  -object tls-creds-x509,id=3Dtls0,dir=3D/etc/pki/qemu,endpoint=3Dserver=
-,verify-peer=3Dyes \
-+  -vnc :1,tls-creds=3Dtls0,sasl -monitor stdio
- @end example
-=20
- @node vnc_setup_sasl
+     for (i =3D 0; i < ARRAY_SIZE(prio); i++) {
+         if (dpys[prio[i]] =3D=3D NULL) {
+-            ui_module_load_one(DisplayType_lookup.array[prio[i]]);
++            ui_module_load_one(DisplayType_str(prio[i]));
+         }
+         if (dpys[prio[i]] =3D=3D NULL) {
+             continue;
+@@ -2337,11 +2337,11 @@ void qemu_display_early_init(DisplayOptions *opts=
+)
+         return;
+     }
+     if (dpys[opts->type] =3D=3D NULL) {
+-        ui_module_load_one(DisplayType_lookup.array[opts->type]);
++        ui_module_load_one(DisplayType_str(opts->type));
+     }
+     if (dpys[opts->type] =3D=3D NULL) {
+         error_report("Display '%s' is not available.",
+-                     DisplayType_lookup.array[opts->type]);
++                     DisplayType_str(opts->type));
+         exit(1);
+     }
+     if (dpys[opts->type]->early_init) {
 --=20
 2.9.3
