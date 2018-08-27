@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fuPv5-0003fF-Me
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:36 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fuPv6-0003gX-Te
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fuPv4-0005jR-Mb
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34112 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fuPv6-0005lW-5V
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49314 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fuPv4-0005ij-GZ
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	id 1fuPv5-0005l5-Ut
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3211087A82
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 22:23:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F812400738B
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 22:23:35 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 28 Aug 2018 00:23:16 +0200
-Message-Id: <20180827222322.26009-4-marcandre.lureau@redhat.com>
+Date: Tue, 28 Aug 2018 00:23:17 +0200
+Message-Id: <20180827222322.26009-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20180827222322.26009-1-marcandre.lureau@redhat.com>
 References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/9] chardev: use a child source for qio input
- source
+Subject: [Qemu-devel] [PATCH 4/9] char: update the mux hanlders in class
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,113 +37,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, berrange@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-GLib child source were added with version 2.28. We can use them now
-that we bumped our requirement to 2.40.
+Instead of handling mux chardev in a special way in
+qemu_chr_fe_set_handlers(), we may use the chr_update_read_handler
+class callback instead.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-io.c | 48 +++++------------------------------------------
- 1 file changed, 5 insertions(+), 43 deletions(-)
+ include/chardev/char-mux.h | 1 -
+ chardev/char-fe.c          | 4 ----
+ chardev/char-mux.c         | 5 +++--
+ 3 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/chardev/char-io.c b/chardev/char-io.c
-index f81052481a..8ced184160 100644
---- a/chardev/char-io.c
-+++ b/chardev/char-io.c
-@@ -33,7 +33,6 @@ typedef struct IOWatchPoll {
-     IOCanReadHandler *fd_can_read;
-     GSourceFunc fd_read;
-     void *opaque;
--    GMainContext *context;
- } IOWatchPoll;
+diff --git a/include/chardev/char-mux.h b/include/chardev/char-mux.h
+index 1e13187767..572cefd517 100644
+--- a/include/chardev/char-mux.h
++++ b/include/chardev/char-mux.h
+@@ -55,7 +55,6 @@ typedef struct MuxChardev {
+ #define CHARDEV_IS_MUX(chr)                             \
+     object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_MUX)
 =20
- static IOWatchPoll *io_watch_poll_from_source(GSource *source)
-@@ -55,47 +54,24 @@ static gboolean io_watch_poll_prepare(GSource *source=
-,
-         iwp->src =3D qio_channel_create_watch(
-             iwp->ioc, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL);
-         g_source_set_callback(iwp->src, iwp->fd_read, iwp->opaque, NULL)=
-;
--        g_source_attach(iwp->src, iwp->context);
--    } else {
--        g_source_destroy(iwp->src);
-+        g_source_add_child_source(source, iwp->src);
-         g_source_unref(iwp->src);
-+    } else {
-+        g_source_remove_child_source(source, iwp->src);
-         iwp->src =3D NULL;
+-void mux_chr_set_handlers(Chardev *chr, GMainContext *context);
+ void mux_set_focus(Chardev *chr, int focus);
+ void mux_chr_send_all_event(Chardev *chr, int event);
+=20
+diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+index b1f228e8b5..6ed8bff46a 100644
+--- a/chardev/char-fe.c
++++ b/chardev/char-fe.c
+@@ -288,10 +288,6 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+             qemu_chr_be_event(s, CHR_EVENT_OPENED);
+         }
      }
-     return FALSE;
- }
-=20
--static gboolean io_watch_poll_check(GSource *source)
--{
--    return FALSE;
--}
 -
- static gboolean io_watch_poll_dispatch(GSource *source, GSourceFunc call=
-back,
-                                        gpointer user_data)
- {
--    abort();
--}
--
--static void io_watch_poll_finalize(GSource *source)
--{
--    /* Due to a glib bug, removing the last reference to a source
--     * inside a finalize callback causes recursive locking (and a
--     * deadlock).  This is not a problem inside other callbacks,
--     * including dispatch callbacks, so we call io_remove_watch_poll
--     * to remove this source.  At this point, iwp->src must
--     * be NULL, or we would leak it.
--     *
--     * This would be solved much more elegantly by child sources,
--     * but we support older glib versions that do not have them.
--     */
--    IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
--    assert(iwp->src =3D=3D NULL);
-+    return G_SOURCE_CONTINUE;
- }
-=20
- static GSourceFuncs io_watch_poll_funcs =3D {
-     .prepare =3D io_watch_poll_prepare,
--    .check =3D io_watch_poll_check,
-     .dispatch =3D io_watch_poll_dispatch,
--    .finalize =3D io_watch_poll_finalize,
- };
-=20
- GSource *io_add_watch_poll(Chardev *chr,
-@@ -115,7 +91,6 @@ GSource *io_add_watch_poll(Chardev *chr,
-     iwp->ioc =3D ioc;
-     iwp->fd_read =3D (GSourceFunc) fd_read;
-     iwp->src =3D NULL;
--    iwp->context =3D context;
-=20
-     name =3D g_strdup_printf("chardev-iowatch-%s", chr->label);
-     g_source_set_name((GSource *)iwp, name);
-@@ -126,23 +101,10 @@ GSource *io_add_watch_poll(Chardev *chr,
-     return (GSource *)iwp;
- }
-=20
--static void io_remove_watch_poll(GSource *source)
--{
--    IOWatchPoll *iwp;
--
--    iwp =3D io_watch_poll_from_source(source);
--    if (iwp->src) {
--        g_source_destroy(iwp->src);
--        g_source_unref(iwp->src);
--        iwp->src =3D NULL;
+-    if (CHARDEV_IS_MUX(s)) {
+-        mux_chr_set_handlers(s, context);
 -    }
--    g_source_destroy(&iwp->parent);
--}
--
- void remove_fd_in_watch(Chardev *chr)
- {
-     if (chr->gsource) {
--        io_remove_watch_poll(chr->gsource);
-+        g_source_destroy(chr->gsource);
-         chr->gsource =3D NULL;
-     }
  }
+=20
+ void qemu_chr_fe_take_focus(CharBackend *b)
+diff --git a/chardev/char-mux.c b/chardev/char-mux.c
+index 6055e76293..9406eaf08d 100644
+--- a/chardev/char-mux.c
++++ b/chardev/char-mux.c
+@@ -278,7 +278,7 @@ static void char_mux_finalize(Object *obj)
+     qemu_chr_fe_deinit(&d->chr, false);
+ }
+=20
+-void mux_chr_set_handlers(Chardev *chr, GMainContext *context)
++static void mux_chr_update_read_handlers(Chardev *chr)
+ {
+     MuxChardev *d =3D MUX_CHARDEV(chr);
+=20
+@@ -289,7 +289,7 @@ void mux_chr_set_handlers(Chardev *chr, GMainContext =
+*context)
+                              mux_chr_event,
+                              NULL,
+                              chr,
+-                             context, true);
++                             chr->gcontext, true);
+ }
+=20
+ void mux_set_focus(Chardev *chr, int focus)
+@@ -383,6 +383,7 @@ static void char_mux_class_init(ObjectClass *oc, void=
+ *data)
+     cc->chr_add_watch =3D mux_chr_add_watch;
+     cc->chr_be_event =3D mux_chr_be_event;
+     cc->chr_machine_done =3D open_muxes;
++    cc->chr_update_read_handler =3D mux_chr_update_read_handlers;
+ }
+=20
+ static const TypeInfo char_mux_type_info =3D {
 --=20
 2.18.0.547.g1d89318c48
