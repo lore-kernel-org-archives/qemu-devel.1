@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fuIuO-0007zP-N8
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:54:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1fuIuP-000811-O8
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fuIuM-0001p6-Hd
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:54:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36864 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fuIuO-0001q6-Mw
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:54:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36870 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fuIuM-0001ok-Bs
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:54:22 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fuIuO-0001pw-GJ
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:54:24 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Mon, 27 Aug 2018 16:54:09 +0200
-Message-Id: <1535381652-19870-2-git-send-email-thuth@redhat.com>
+Date: Mon, 27 Aug 2018 16:54:10 +0200
+Message-Id: <1535381652-19870-3-git-send-email-thuth@redhat.com>
 In-Reply-To: <1535381652-19870-1-git-send-email-thuth@redhat.com>
 References: <1535381652-19870-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/4] Remove the deprecated -balloon option
+Subject: [Qemu-devel] [PATCH 2/4] Remove the deprecated -nodefconfig option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,136 +26,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, libvir-list@redhat.com, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-The "-balloon" option has been replaced by "-device virtio-balloon".
-It's been marked as deprecated since two releases, and nobody
-complained, so let's remove it now.
+It's the same as -no-user-config and marked as deprecated since three
+releases already. Time to remove it now.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- docs/virtio-balloon-stats.txt |  6 +++---
- qemu-deprecated.texi          |  5 -----
- qemu-options.hx               | 10 ----------
- vl.c                          | 36 ------------------------------------
- 4 files changed, 3 insertions(+), 54 deletions(-)
+ docs/interop/live-block-operations.rst | 4 ++--
+ qemu-deprecated.texi                   | 4 ----
+ qemu-options.hx                        | 4 ++--
+ vl.c                                   | 2 --
+ 4 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/docs/virtio-balloon-stats.txt b/docs/virtio-balloon-stats.tx=
-t
-index 9985e1d..1732cc8 100644
---- a/docs/virtio-balloon-stats.txt
-+++ b/docs/virtio-balloon-stats.txt
-@@ -61,9 +61,9 @@ It's also important to note the following:
-    respond to the request the timer will never be re-armed, which has
-    the same effect as disabling polling
-=20
--Here are a few examples. QEMU is started with '-balloon virtio', which
--generates '/machine/peripheral-anon/device[1]' as the QOM path for the
--balloon device.
-+Here are a few examples. QEMU is started with '-device virtio-balloon',
-+which generates '/machine/peripheral-anon/device[1]' as the QOM path for
-+the balloon device.
-=20
- Enable polling with 2 seconds interval:
-=20
+diff --git a/docs/interop/live-block-operations.rst b/docs/interop/live-block-operations.rst
+index 734252b..48afdc7 100644
+--- a/docs/interop/live-block-operations.rst
++++ b/docs/interop/live-block-operations.rst
+@@ -129,7 +129,7 @@ To show some example invocations of command-line, we will use the
+ following invocation of QEMU, with a QMP server running over UNIX
+ socket::
+ 
+-    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -nodefconfig \
++    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -no-user-config \
+         -M q35 -nodefaults -m 512 \
+         -blockdev node-name=node-A,driver=qcow2,file.driver=file,file.node-name=file,file.filename=./a.qcow2 \
+         -device virtio-blk,drive=node-A,id=virtio0 \
+@@ -694,7 +694,7 @@ instance, with the following invocation.  (As noted earlier, for
+ simplicity's sake, the destination QEMU is started on the same host, but
+ it could be located elsewhere)::
+ 
+-    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -nodefconfig \
++    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -no-user-config \
+         -M q35 -nodefaults -m 512 \
+         -blockdev node-name=node-TargetDisk,driver=qcow2,file.driver=file,file.node-name=file,file.filename=./target-disk.qcow2 \
+         -device virtio-blk,drive=node-TargetDisk,id=virtio0 \
 diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 1b9c007..98f5062 100644
+index 98f5062..19c8ae2 100644
 --- a/qemu-deprecated.texi
 +++ b/qemu-deprecated.texi
-@@ -86,11 +86,6 @@ enabled via the ``-machine usb=3Don'' argument.
-=20
- The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
-=20
--@subsection -balloon (since 2.12.0)
+@@ -82,10 +82,6 @@ would automatically enable USB support on the machine type.
+ If using the new syntax, USB support must be explicitly
+ enabled via the ``-machine usb=on'' argument.
+ 
+-@subsection -nodefconfig (since 2.11.0)
 -
--The @option{--balloon virtio} argument has been superseded by
--@option{--device virtio-balloon}.
+-The ``-nodefconfig`` argument is a synonym for ``-no-user-config``.
 -
  @subsection -fsdev handle (since 2.12.0)
-=20
+ 
  The ``handle'' fsdev backend does not support symlinks and causes the 9p
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 654ef48..ccf7155 100644
+index ccf7155..d9be20b 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -454,16 +454,6 @@ modprobe i810_audio clocking=3D48000
- @end example
+@@ -3833,8 +3833,7 @@ Write device configuration to @var{file}. The @var{file} can be either filename
+ command line and device configuration into file or dash @code{-}) character to print the
+ output to stdout. This can be later used as input file for @code{-readconfig} option.
  ETEXI
-=20
--DEF("balloon", HAS_ARG, QEMU_OPTION_balloon,
--    "-balloon virtio[,addr=3Dstr]\n"
--    "                enable virtio balloon device (deprecated)\n", QEMU_=
-ARCH_ALL)
--STEXI
--@item -balloon virtio[,addr=3D@var{addr}]
--@findex -balloon
--Enable virtio balloon device, optionally with PCI address @var{addr}. Th=
-is
--option is deprecated, use @option{-device virtio-balloon} instead.
--ETEXI
--
- DEF("device", HAS_ARG, QEMU_OPTION_device,
-     "-device driver[,prop[=3Dvalue][,...]]\n"
-     "                add device (based on driver)\n"
+-HXCOMM Deprecated, same as -no-user-config
+-DEF("nodefconfig", 0, QEMU_OPTION_nodefconfig, "", QEMU_ARCH_ALL)
++
+ DEF("no-user-config", 0, QEMU_OPTION_nouserconfig,
+     "-no-user-config\n"
+     "                do not load default user-provided config files at startup\n",
+@@ -3845,6 +3844,7 @@ STEXI
+ The @code{-no-user-config} option makes QEMU not load any of the user-provided
+ config files on @var{sysconfdir}.
+ ETEXI
++
+ DEF("trace", HAS_ARG, QEMU_OPTION_trace,
+     "-trace [[enable=]<pattern>][,events=<file>][,file=<file>]\n"
+     "                specify tracing options\n",
 diff --git a/vl.c b/vl.c
-index 5ba06ad..674c42f 100644
+index 674c42f..386c71d 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2127,36 +2127,6 @@ static void parse_display(const char *p)
-     }
- }
-=20
--static int balloon_parse(const char *arg)
--{
--    QemuOpts *opts;
--
--    warn_report("This option is deprecated. "
--                "Use '--device virtio-balloon' to enable the balloon dev=
-ice.");
--
--    if (strcmp(arg, "none") =3D=3D 0) {
--        return 0;
--    }
--
--    if (!strncmp(arg, "virtio", 6)) {
--        if (arg[6] =3D=3D ',') {
--            /* have params -> parse them */
--            opts =3D qemu_opts_parse_noisily(qemu_find_opts("device"), a=
-rg + 7,
--                                           false);
--            if (!opts)
--                return  -1;
--        } else {
--            /* create empty opts */
--            opts =3D qemu_opts_create(qemu_find_opts("device"), NULL, 0,
--                                    &error_abort);
--        }
--        qemu_opt_set(opts, "driver", "virtio-balloon", &error_abort);
--        return 0;
--    }
--
--    return -1;
--}
--
- char *qemu_find_file(int type, const char *name)
- {
-     int i;
-@@ -3660,12 +3630,6 @@ int main(int argc, char **argv, char **envp)
-             case QEMU_OPTION_no_hpet:
-                 no_hpet =3D 1;
+@@ -2999,7 +2999,6 @@ int main(int argc, char **argv, char **envp)
+ 
+             popt = lookup_opt(argc, argv, &optarg, &optind);
+             switch (popt->index) {
+-            case QEMU_OPTION_nodefconfig:
+             case QEMU_OPTION_nouserconfig:
+                 userconfig = false;
                  break;
--            case QEMU_OPTION_balloon:
--                if (balloon_parse(optarg) < 0) {
--                    error_report("unknown -balloon argument %s", optarg)=
-;
--                    exit(1);
--                }
--                break;
-             case QEMU_OPTION_no_reboot:
-                 no_reboot =3D 1;
+@@ -3927,7 +3926,6 @@ int main(int argc, char **argv, char **envp)
+             case QEMU_OPTION_enable_sync_profile:
+                 qsp_enable();
                  break;
---=20
+-            case QEMU_OPTION_nodefconfig:
+             case QEMU_OPTION_nouserconfig:
+                 /* Nothing to be parsed here. Especially, do not error out below. */
+                 break;
+-- 
 1.8.3.1
