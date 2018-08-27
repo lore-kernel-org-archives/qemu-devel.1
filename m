@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1fuDC0-0001gh-C3
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:48:13 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fuDHA-0005X8-3h
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1fuDBu-00021A-5b
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:48:12 -0400
-Received: from thoth.sbs.de ([192.35.17.2]:40249)
+	(envelope-from <kraxel@redhat.com>) id 1fuDH8-0004ml-Fq
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56034 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
-	id 1fuDBm-0001xh-L5
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:48:01 -0400
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <48ae78d8-58ec-8813-8680-6f407ea46041@siemens.com>
-Date: Mon, 27 Aug 2018 10:47:51 +0200
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuDH8-0004lw-94
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:30 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E589940200B3
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:53:29 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 27 Aug 2018 10:53:16 +0200
+Message-Id: <20180827085320.9732-9-kraxel@redhat.com>
+In-Reply-To: <20180827085320.9732-1-kraxel@redhat.com>
+References: <20180827085320.9732-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] kvm: x86: Fix kvm_arch_fixup_msi_route for
- remap-less case
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 08/12] spice-display: fix
+ qemu_spice_cursor_refresh_bh locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>, Christopher Goldsworthy <christopher.goldsworthy@outlook.com>
+To: qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-The AMD IOMMU does not (yet) support interrupt remapping. But
-kvm_arch_fixup_msi_route assumes that all implementations do and crashes
-when the AMD IOMMU is used in KVM mode.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Fixes: 8b5ed7dffa1f ("intel_iommu: add support for split irqchip")
-Reported-by: Christopher Goldsworthy <christopher.goldsworthy@outlook.com>
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+spice-display should not call the ui/console.c functions dpy_cursor_defin=
+e
+and dpy_moues_set with the SimpleSpiceDisplay lock taken.  That will caus=
+e
+a deadlock, because the DisplayChangeListener callbacks will take the loc=
+k
+again.  It is also in general a bad idea to invoke generic callbacks with=
+ a
+lock taken, because it can cause AB-BA deadlocks in the long run.  The on=
+ly
+thing that requires care is that the cursor may disappear as soon as the
+mutex is released, so you need an extra cursor_get/cursor_put pair.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20180720063109.4631-3-pbonzini@redhat.com
+
+[ kraxel: fix dpy_cursor_define() call ]
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ ui/spice-display.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 9313602d3d..1fe3a73a10 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -3677,6 +3677,10 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-         MSIMessage src, dst;
-         X86IOMMUClass *class = X86_IOMMU_GET_CLASS(iommu);
- 
-+        if (!class->int_remap) {
-+            return 0;
-+        }
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 46df673cd7..7b230987dc 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -450,29 +450,35 @@ void qemu_spice_display_switch(SimpleSpiceDisplay *=
+ssd,
+     qemu_mutex_unlock(&ssd->lock);
+ }
+=20
+-static void qemu_spice_cursor_refresh_unlocked(SimpleSpiceDisplay *ssd)
++void qemu_spice_cursor_refresh_bh(void *opaque)
+ {
++    SimpleSpiceDisplay *ssd =3D opaque;
 +
-         src.address = route->u.msi.address_hi;
-         src.address <<= VTD_MSI_ADDR_HI_SHIFT;
-         src.address |= route->u.msi.address_lo;
--- 
-2.16.4
++    qemu_mutex_lock(&ssd->lock);
+     if (ssd->cursor) {
++        QEMUCursor *c =3D ssd->cursor;
+         assert(ssd->dcl.con);
+-        dpy_cursor_define(ssd->dcl.con, ssd->cursor);
++        cursor_get(c);
++        qemu_mutex_unlock(&ssd->lock);
++        dpy_cursor_define(ssd->dcl.con, c);
++        qemu_mutex_lock(&ssd->lock);
++        cursor_put(c);
+     }
++
+     if (ssd->mouse_x !=3D -1 && ssd->mouse_y !=3D -1) {
++        int x, y;
+         assert(ssd->dcl.con);
+-        dpy_mouse_set(ssd->dcl.con, ssd->mouse_x, ssd->mouse_y, 1);
++        x =3D ssd->mouse_x;
++        y =3D ssd->mouse_y;
+         ssd->mouse_x =3D -1;
+         ssd->mouse_y =3D -1;
++        qemu_mutex_unlock(&ssd->lock);
++        dpy_mouse_set(ssd->dcl.con, x, y, 1);
++    } else {
++        qemu_mutex_unlock(&ssd->lock);
+     }
+ }
+=20
+-void qemu_spice_cursor_refresh_bh(void *opaque)
+-{
+-    SimpleSpiceDisplay *ssd =3D opaque;
+-
+-    qemu_mutex_lock(&ssd->lock);
+-    qemu_spice_cursor_refresh_unlocked(ssd);
+-    qemu_mutex_unlock(&ssd->lock);
+-}
+-
+ void qemu_spice_display_refresh(SimpleSpiceDisplay *ssd)
+ {
+     graphic_hw_update(ssd->dcl.con);
+--=20
+2.9.3
