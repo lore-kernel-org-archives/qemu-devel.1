@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuBVx-0005uS-O6
+	(envelope-from <armbru@redhat.com>) id 1fuBVx-0005uc-Os
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuBVw-0006CU-PF
+	(envelope-from <armbru@redhat.com>) id 1fuBVw-0006Cd-QJ
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:00:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55150 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50374 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuBVw-0006BK-FR
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuBVw-0006BJ-FC
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:00:40 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 27 Aug 2018 09:00:20 +0200
-Message-Id: <20180827070021.11931-6-armbru@redhat.com>
+Date: Mon, 27 Aug 2018 09:00:21 +0200
+Message-Id: <20180827070021.11931-7-armbru@redhat.com>
 In-Reply-To: <20180827070021.11931-1-armbru@redhat.com>
 References: <20180827070021.11931-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/6] json: Eliminate lexer state IN_ERROR
+Subject: [Qemu-devel] [PATCH 6/6] json: Eliminate lexer state IN_WHITESPACE,
+ pseudo-token JSON_SKIP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +27,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
+The lexer ignores whitespace like this:
+
+         on whitespace      on non-ws   spontaneously
+    IN_START --> IN_WHITESPACE --> JSON_SKIP --> IN_START
+                    ^    |
+                     \__/  on whitespace
+
+This accumulates a whitespace token in state IN_WHITESPACE, only to
+throw it away on the transition via JSON_SKIP to the start state.
+Wasteful.  Go from IN_START to IN_START on whitspace directly,
+dropping the whitespace character.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/json-lexer.c      | 9 +++++----
- qobject/json-parser-int.h | 8 ++++----
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ qobject/json-lexer.c      | 22 +++++-----------------
+ qobject/json-parser-int.h |  1 -
+ 2 files changed, 5 insertions(+), 18 deletions(-)
 
 diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 39c7ce7adc..2a5561c917 100644
+index 2a5561c917..a7df2093aa 100644
 --- a/qobject/json-lexer.c
 +++ b/qobject/json-lexer.c
-@@ -100,8 +100,7 @@
-  */
- 
- enum json_lexer_state {
--    IN_ERROR = 0,               /* must really be 0, see json_lexer[] */
--    IN_RECOVERY,
-+    IN_RECOVERY = 1,
-     IN_DQ_STRING_ESCAPE,
-     IN_DQ_STRING,
-     IN_SQ_STRING_ESCAPE,
-@@ -121,6 +120,8 @@ enum json_lexer_state {
+@@ -115,7 +115,6 @@ enum json_lexer_state {
+     IN_SIGN,
+     IN_KEYWORD,
+     IN_INTERP,
+-    IN_WHITESPACE,
+     IN_START,
      IN_START_INTERP,            /* must be IN_START + 1 */
  };
- 
-+QEMU_BUILD_BUG_ON(JSON_ERROR != 0);
-+QEMU_BUILD_BUG_ON(IN_RECOVERY != JSON_ERROR + 1);
- QEMU_BUILD_BUG_ON((int)JSON_MIN <= (int)IN_START_INTERP);
- QEMU_BUILD_BUG_ON(JSON_MAX >= 0x80);
- QEMU_BUILD_BUG_ON(IN_START_INTERP != IN_START + 1);
-@@ -176,7 +177,7 @@ static const uint8_t json_lexer[][256] =  {
-     /* Zero */
-     [IN_ZERO] = {
-         TERMINAL(JSON_INTEGER),
--        ['0' ... '9'] = IN_ERROR,
-+        ['0' ... '9'] = JSON_ERROR,
-         ['.'] = IN_MANTISSA,
+@@ -228,15 +227,6 @@ static const uint8_t json_lexer[][256] =  {
+         ['a' ... 'z'] = IN_KEYWORD,
      },
  
-@@ -328,7 +329,7 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+-    /* whitespace */
+-    [IN_WHITESPACE] = {
+-        TERMINAL(JSON_SKIP),
+-        [' '] = IN_WHITESPACE,
+-        ['\t'] = IN_WHITESPACE,
+-        ['\r'] = IN_WHITESPACE,
+-        ['\n'] = IN_WHITESPACE,
+-    },
+-
+     /* interpolation */
+     [IN_INTERP] = {
+         TERMINAL(JSON_INTERP),
+@@ -263,10 +253,10 @@ static const uint8_t json_lexer[][256] =  {
+         [','] = JSON_COMMA,
+         [':'] = JSON_COLON,
+         ['a' ... 'z'] = IN_KEYWORD,
+-        [' '] = IN_WHITESPACE,
+-        ['\t'] = IN_WHITESPACE,
+-        ['\r'] = IN_WHITESPACE,
+-        ['\n'] = IN_WHITESPACE,
++        [' '] = IN_START,
++        ['\t'] = IN_START,
++        ['\r'] = IN_START,
++        ['\n'] = IN_START,
+     },
+     [IN_START_INTERP]['%'] = IN_INTERP,
+ };
+@@ -323,10 +313,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+             json_message_process_token(lexer, lexer->token, new_state,
+                                        lexer->x, lexer->y);
+             /* fall through */
+-        case JSON_SKIP:
+-            g_string_truncate(lexer->token, 0);
+-            /* fall through */
          case IN_START:
++            g_string_truncate(lexer->token, 0);
              new_state = lexer->start_state;
              break;
--        case IN_ERROR:
-+        case JSON_ERROR:
-             json_message_process_token(lexer, lexer->token, JSON_ERROR,
-                                        lexer->x, lexer->y);
-             new_state = IN_RECOVERY;
+         case JSON_ERROR:
 diff --git a/qobject/json-parser-int.h b/qobject/json-parser-int.h
-index abeec63af5..57cb8e79d3 100644
+index 57cb8e79d3..16a25d00bb 100644
 --- a/qobject/json-parser-int.h
 +++ b/qobject/json-parser-int.h
-@@ -16,10 +16,11 @@
- 
- #include "qapi/qmp/json-parser.h"
- 
--
- typedef enum json_token_type {
--    JSON_MIN = 100,
--    JSON_LCURLY = JSON_MIN,
-+    JSON_ERROR = 0,             /* must be zero, see json_lexer[] */
-+    /* Gap for lexer states */
-+    JSON_LCURLY = 100,
-+    JSON_MIN = JSON_LCURLY,
-     JSON_RCURLY,
-     JSON_LSQUARE,
-     JSON_RSQUARE,
-@@ -31,7 +32,6 @@ typedef enum json_token_type {
+@@ -31,7 +31,6 @@ typedef enum json_token_type {
+     JSON_KEYWORD,
      JSON_STRING,
      JSON_INTERP,
-     JSON_SKIP,
--    JSON_ERROR,
+-    JSON_SKIP,
      JSON_END_OF_INPUT,
      JSON_MAX = JSON_END_OF_INPUT
  } JSONTokenType;
