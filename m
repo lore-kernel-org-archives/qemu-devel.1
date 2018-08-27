@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuDtM-0007jv-Eu
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 05:33:05 -0400
+	(envelope-from <david@redhat.com>) id 1fuDtb-0007jz-AR
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 05:33:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuDqi-0003JM-6o
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 05:30:16 -0400
-References: <20180823220856.10094-1-jsnow@redhat.com>
-	<20180823220856.10094-2-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <86874359-e26c-4974-c2ec-bbc4e8ade264@redhat.com>
-Date: Mon, 27 Aug 2018 11:30:00 +0200
+	(envelope-from <david@redhat.com>) id 1fuDn0-0007KY-3s
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 05:26:29 -0400
+References: <20180824133757.1cbdba75.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a29f4cdd-8012-d46e-8984-b4e223f1957f@redhat.com>
+Date: Mon, 27 Aug 2018 11:26:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180823220856.10094-2-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JNNGtBsmvprbAUTtajiAaZNlDYQauo6Rt"
-Subject: Re: [Qemu-devel] [PATCH v2 1/9] jobs: change start callback to run
- callback
+In-Reply-To: <20180824133757.1cbdba75.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFD] [s390x] Tweaking the s390x maintainership
+ setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JNNGtBsmvprbAUTtajiAaZNlDYQauo6Rt
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com,
- Jeff Cody <jcody@redhat.com>
-Message-ID: <86874359-e26c-4974-c2ec-bbc4e8ade264@redhat.com>
-Subject: Re: [PATCH v2 1/9] jobs: change start callback to run callback
-References: <20180823220856.10094-1-jsnow@redhat.com>
- <20180823220856.10094-2-jsnow@redhat.com>
-In-Reply-To: <20180823220856.10094-2-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-08-24 00:08, John Snow wrote:
-> Presently we codify the entry point for a job as the "start" callback,
-> but a more apt name would be "run" to clarify the idea that when this
-> function returns we consider the job to have "finished," except for
-> any cleanup which occurs in separate callbacks later.
+On 24.08.2018 13:37, Cornelia Huck wrote:
+> Hi all,
 >=20
-> As part of this clarification, change the signature to include an error=
-
-> object and a return code. The error ptr is not yet used, and the return=
-
-> code while captured, will be overwritten by actions in the job_complete=
-d
-> function.
+> while I think the current s390x maintainership setup is working quite
+> well, there's probably still room for improvement. In particular, I'd
+> like to spread out the work a bit more and make it easy to test things
+> pre-integration in an automated way.
 >=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/backup.c            |  7 ++++---
->  block/commit.c            |  7 ++++---
->  block/create.c            |  8 +++++---
->  block/mirror.c            | 10 ++++++----
->  block/stream.c            |  7 ++++---
->  include/qemu/job.h        |  2 +-
->  job.c                     |  6 +++---
->  tests/test-bdrv-drain.c   |  7 ++++---
->  tests/test-blockjob-txn.c | 16 ++++++++--------
->  tests/test-blockjob.c     |  7 ++++---
->  10 files changed, 43 insertions(+), 34 deletions(-)
+> As a recap, how it works today:
+>=20
+> - We have designated maintainers for some major areas:
+>   * tcg
+>   * KVM
+>   * s390 virtio-ccw machine
+>   * s390 bios
+>   * vfio-ccw
+>   * virtio-ccw
+>=20
+> - I'm acting as overall s390x maintainer, queuing patches onto my
+>   s390-next branch (s390-fixes for fixes during freeze) and sometimes
+>   pulling s390 bios updates (if I don't apply them myself). I'm
+>   generally the only person that sends pull requests for master.
+>=20
+> Some problems I've noted:
+>=20
+> * The bus factor -- or, put in a less dramatic way, what happens when
+>   I'm sick or on vacation? For fixes during freeze, there's no problem
+>   if the other maintainers submit them directly, but I really don't wan=
+t
+>   to be the single point of failure (plus, I'm the only person listed
+>   as vfio-ccw maintainer).
+> * The IBM folks can't do tcg.
+> * Conversely, the non-IBM folks cannot review things that don't have
+>   public documentation (yet), other than in a very general way.
+> * I don't want to pick everything myself :) Especially when I basically
+>   rely on other people noticing problems in the first place (like with
+>   the non-public things or code areas I'm not so familiar with).
+> * Testing seems to be a bit ad hoc. It would be nice to have a branch
+>   that (semi) automated tests can be run on before things hit upstream,
+>   and that is also created on top of current master. (I usually only
+>   rebase the pushed-out s390-next branch when I apply new patches, and
+>   sometimes not even then.) Oh, and other people testing things,
+>   especially on different hardware.
+>=20
+> So, here are some ideas I had on how to improve things:
+>=20
+> * Split up maintainership a bit more. For example, split out areas like
+>   pci for which no public documentation is available; these need to
+>   have at least one IBM maintainer. Another candidate would maybe be
+>   the cpu model.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+I could take care of the latter. But it usually goes hand in hand with
+KVM changes (or core s390x changes for migration), so I am not sure if
+splitting the cpu model out makes that much sense after all. To me, it
+somehow feels "s390x core".
 
-But I see a discrepancy in the upcoming s->ret <=3D> s->err relationship
-now.  And that is if .run() doesn't return an Error *...
+> * On a related note, more maintainers from IBM would be nice :) For
+>   example, for vfio-ccw, where I'm the only maintainer... Some R:
+>   entries would not hurt, either.
+> * More trees to pull from. Of course, not every area needs a dedicated
+>   tree (that would become silly pretty quickly), but for example a tcg
+>   tree would be nice. I can still pick individual patches if a pull
+>   request would be overkill.
 
-That could be remedied immediately in job_co_entry(), though, either by
-calling job_update_rc(), or by inlining its "if (!job->err)" part.
+I can take care of that for TCG (including picking + sending pull request=
+s).
 
-Max
+> * I'd also like to have a designated backup for the overall
+>   maintainership, especially for when I'm on vacation (like the first
+>   two weeks of September, just to let you know :) or otherwise
+>   unavailable, but also for sanity. Likely needs to be a non-IBMer due
+>   to the tcg problem.
+
+Either Thomas or I could do that. I will be on vacation the first two
+weeks of September, too ;) Thomas, interested?
+
+> * A more predictable s390-next would be nice. Maybe have it
+>   (semi-)automatically created out of the different trees, on top of
+>   current master? I would start to apply patches on a new branch that
+>   feeds into s390-next rather than on s390-next directly, then.
+
+Is there any fancy mechanism out there with which we can easily build
+something like that (automatic merging like e.g. linux-next does)?
+
+> * Do something about (semi-)consolidated, (semi-)automatic testing.
+>   Like hooking into Travis (or something similar), sharing test setups,
+>   and enabling tests to be run on a range of platforms (including very
+>   recent ones). Testing is probably a large topic on its own, though.
+
+Sounds interesting to me. Especially building all different kinds of
+combinations + e.g. running kvm-unit-tests / booting a simple distro.
+
+>=20
+> Thoughts?
+>=20
 
 
---JNNGtBsmvprbAUTtajiAaZNlDYQauo6Rt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+--=20
 
------BEGIN PGP SIGNATURE-----
+Thanks,
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluDxJgACgkQ9AfbAGHV
-z0C6RggAsP9BcZ/wtts4CWt645L5T7qR1Oh+ekur3hCbTETVK535HR5M9RubnYtR
-QoVdEh9z6lfcH6Y/owK9aeXw7IMI6Jwpa8jXYMNqzK9UDmMosdvlF1CgFh/04BYb
-JnBcaOSJriRWkJjgU+juCOUAdgiNxlxUr2aNnHyyCHwGtmkxY/8QE/pIOgq4YUwe
-XfKAY9pMdYZ3A0y/ZUiPkAosiW+z5VviVo30GBXVCcCcBLF+n0TuE+DNeCGsUTB4
-TXvZ9Mx9Kcze3Tf1bNy7sOGUGD6xdpmmJaIAK3eqR8Wso5n3jZJ27WYRL6YNfxkF
-Uwqqo6h4HtTuIch7EZUE2cyxZhoLNQ==
-=Ru1E
------END PGP SIGNATURE-----
-
---JNNGtBsmvprbAUTtajiAaZNlDYQauo6Rt--
+David / dhildenb
