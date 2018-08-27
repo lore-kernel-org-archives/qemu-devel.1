@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fuDHA-0005XC-3o
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:33 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fuDHT-0005n6-Sy
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fuDH4-0004jh-TY
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36212 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fuDHP-0004se-2X
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42884 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuDH4-0004ii-Mn
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:26 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuDHO-0004rz-Tw
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:46 -0400
+Date: Mon, 27 Aug 2018 10:53:42 +0200
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 27 Aug 2018 10:53:12 +0200
-Message-Id: <20180827085320.9732-5-kraxel@redhat.com>
-In-Reply-To: <20180827085320.9732-1-kraxel@redhat.com>
-References: <20180827085320.9732-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 04/12] sdl2: redraw correctly when scanout_mode
- enabled.
+Message-ID: <20180827085342.q3vnnyssxag5qio5@sirius.home.kraxel.org>
+References: <20180823095653.14556-1-kraxel@redhat.com>
+	<CAFEAcA-QhN14Sbo8r9OO-8G_pV6+2mACih+ECFM+TOwgky+Htw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-QhN14Sbo8r9OO-8G_pV6+2mACih+ECFM+TOwgky+Htw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/12] Ui 20180823 v3 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Tao Wu <lepton@google.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Libvirt <libvir-list@redhat.com>
 
-From: Tao Wu <lepton@google.com>
+On Fri, Aug 24, 2018 at 11:09:50PM +0100, Peter Maydell wrote:
+> On 23 August 2018 at 10:56, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > The following changes since commit d0092d90eb546a8bbe9e9120426c189474123797:
+> >
+> >   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180820' into staging (2018-08-20 17:41:18 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   git://git.kraxel.org/qemu tags/ui-20180823-v3-pull-request
+> >
+> > for you to fetch changes up to 63cde1d13d0767f778a130e2c93c15ad709e1276:
+> >
+> >   util: promote qemu_egl_rendernode_open() to libqemuutil (2018-08-23 11:53:26 +0200)
+> >
+> > ----------------------------------------------------------------
+> > ui: misc fixes which piled up during 3.0 release freeze
+> >
+> > ----------------------------------------------------------------
+> 
+> Hi; this failed to build on openbsd (the VM setup in tests/vm).
+> Linking of all the qemu-system-foo binaries failed with:
+> 
+> ../ui/egl-helpers.o: In function `egl_rendernode_init':
+> ui/egl-helpers.c:153: undefined reference to `qemu_drm_rendernode_open'
 
-When scanout_mode enabled, surface is out of sync with actual screen.
-In such case, we just call sdl2_gl_scanout_flush to do redraw. This
-fixes bug reported in
-https://lists.freedesktop.org/archives/virglrenderer-devel/2018-July/001330.html
+Fixed, v4 sent.
 
-Signed-off-by: Tao Wu <lepton@google.com>
-Message-id: 20180726225900.180698-1-lepton@google.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/sdl2-gl.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
-index 83b71853d1..1bf4542d8d 100644
---- a/ui/sdl2-gl.c
-+++ b/ui/sdl2-gl.c
-@@ -124,6 +124,11 @@ void sdl2_gl_redraw(struct sdl2_console *scon)
- {
-     assert(scon->opengl);
- 
-+    if (scon->scanout_mode) {
-+        /* sdl2_gl_scanout_flush actually only care about
-+         * the first argument. */
-+        return sdl2_gl_scanout_flush(&scon->dcl, 0, 0, 0, 0);
-+    }
-     if (scon->surface) {
-         sdl2_gl_render_surface(scon);
-     }
--- 
-2.9.3
+> 
+> 
+> thanks
+> -- PMM
