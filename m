@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fuDHA-0005X9-3b
+	(envelope-from <kraxel@redhat.com>) id 1fuDHA-0005XG-4m
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fuDH5-0004kQ-KF
+	(envelope-from <kraxel@redhat.com>) id 1fuDH5-0004km-TI
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56012 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56016 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuDH5-0004k5-E6
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fuDH5-0004kG-Jn
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:53:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1B31540201BE
+	by mx1.redhat.com (Postfix) with ESMTPS id 3E8C540201CB
 	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:53:27 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 27 Aug 2018 10:53:17 +0200
-Message-Id: <20180827085320.9732-10-kraxel@redhat.com>
-In-Reply-To: <20180827085320.9732-1-kraxel@redhat.com>
-References: <20180827085320.9732-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 09/12] ui/sdl2: Fix broken -full-screen CLI
- option
+Date: Mon, 27 Aug 2018 10:53:08 +0200
+Message-Id: <20180827085320.9732-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/12] Ui 20180827 v4 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +31,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+The following changes since commit 5ccac548faf041ff5229a8e8342e3be14a34c8=
+af:
 
-We've got to set the gui_fullscreen variable before creating the
-SDL2 window, otherwise the initial window will not be created in
-fullscreen mode.
+  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' int=
+o staging (2018-08-23 17:35:48 +0100)
 
-Buglink: https://bugs.launchpad.net/bugs/1780812
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-id: 1531161850-6860-1-git-send-email-thuth@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/sdl2.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+are available in the git repository at:
 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 755a7134ff..0a9a18a964 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -790,6 +790,8 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
-     memset(&info, 0, sizeof(info));
-     SDL_VERSION(&info.version);
- 
-+    gui_fullscreen = o->has_full_screen && o->full_screen;
-+
-     for (i = 0;; i++) {
-         QemuConsole *con = qemu_console_lookup_by_index(i);
-         if (!con) {
-@@ -842,17 +844,14 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
-         g_free(filename);
-     }
- 
--    if (sdl2_console->opts->has_full_screen &&
--        sdl2_console->opts->full_screen) {
--        gui_fullscreen = 1;
-+    gui_grab = 0;
-+    if (gui_fullscreen) {
-         sdl_grab_start(0);
-     }
- 
-     mouse_mode_notifier.notify = sdl_mouse_mode_change;
-     qemu_add_mouse_mode_change_notifier(&mouse_mode_notifier);
- 
--    gui_grab = 0;
--
-     sdl_cursor_hidden = SDL_CreateCursor(&data, &data, 8, 1, 0, 0);
-     sdl_cursor_normal = SDL_GetCursor();
- 
--- 
+  git://git.kraxel.org/qemu tags/ui-20180827-v4-pull-request
+
+for you to fetch changes up to b1d380372f31672da9318431e84e79bccd8ef3bf:
+
+  util: promote qemu_egl_rendernode_open() to libqemuutil (2018-08-27 10:=
+51:44 +0200)
+
+----------------------------------------------------------------
+ui: misc fixes which piled up during 3.0 release freeze
+
+----------------------------------------------------------------
+
+Daniel P. Berrang=C3=A9 (2):
+  doc: switch to modern syntax for VNC TLS setup
+  vnc: remove support for deprecated tls, x509, x509verify options
+
+Marc-Andr=C3=A9 Lureau (3):
+  ui: use enum to string helpers
+  dmabuf: add y0_top, pass it to spice
+  util: promote qemu_egl_rendernode_open() to libqemuutil
+
+Paolo Bonzini (2):
+  spice-display: access ptr_x/ptr_y under Mutex
+  spice-display: fix qemu_spice_cursor_refresh_bh locking
+
+Peter Wu (1):
+  vnc: fix memleak of the "vnc-worker-output" name
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  ui/vnc: Remove useless parenthesis around DIV_ROUND_UP macro
+
+Tao Wu (1):
+  sdl2: redraw correctly when scanout_mode enabled.
+
+Thomas Huth (2):
+  ui/sdl2: Remove the obsolete SDL_INIT_NOPARACHUTE flag
+  ui/sdl2: Fix broken -full-screen CLI option
+
+ include/qemu/drm.h   |  6 ++++
+ include/ui/console.h |  1 +
+ qemu-keymap.c        |  2 +-
+ ui/console.c         |  6 ++--
+ ui/egl-helpers.c     | 51 ++--------------------------
+ ui/sdl2-gl.c         |  5 +++
+ ui/sdl2.c            | 13 +++-----
+ ui/spice-display.c   | 42 +++++++++++++++--------
+ ui/vnc-enc-tight.c   |  2 +-
+ ui/vnc-jobs.c        |  3 +-
+ ui/vnc.c             | 94 ++--------------------------------------------=
+------
+ util/drm.c           | 66 ++++++++++++++++++++++++++++++++++++
+ MAINTAINERS          |  1 +
+ qemu-deprecated.texi | 20 -----------
+ qemu-doc.texi        | 20 ++++++++---
+ qemu-options.hx      | 43 ------------------------
+ util/Makefile.objs   |  1 +
+ 17 files changed, 139 insertions(+), 237 deletions(-)
+ create mode 100644 include/qemu/drm.h
+ create mode 100644 util/drm.c
+
+--=20
 2.9.3
