@@ -1,29 +1,22 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:56462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fuGRO-0005np-Fq
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:16:19 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuGRz-0005np-31
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:16:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fuGOz-0001Hq-Ho
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:13:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59468 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fuGOz-0001HP-9Q
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:13:49 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C4B1F85746
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 12:13:48 +0000 (UTC)
-Date: Mon, 27 Aug 2018 14:13:43 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180827121343.gvmngrmf3da63o2w@kamzik.brq.redhat.com>
-References: <1535370968-217716-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fuGIu-0003ZH-Og
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:07:33 -0400
+References: <20180823222249.13518-1-jsnow@redhat.com>
+	<20180823222249.13518-5-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9b363ad7-4a3f-e0d7-fa0c-a3fa006f7f00@redhat.com>
+Date: Mon, 27 Aug 2018 14:07:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1535370968-217716-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vl.c deprecate incorrect CPUs topology
+In-Reply-To: <20180823222249.13518-5-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="aM0gpOiEa6nry0VU5UXiHZdsJUavqR7nt"
+Subject: Re: [Qemu-devel] [PATCH v2 04/13] block/commit: refactor commit to
+ use job callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +25,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, libvir-list@redhat.com, ehabkost@redhat.com, berrange@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Mon, Aug 27, 2018 at 01:56:08PM +0200, Igor Mammedov wrote:
-> -smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-> so that total number of logical CPUs [sockets * cores * threads]
-> would be equal to [maxcpus], however historically we didn't have
-> such check in QEMU and it is possible to start VM with an invalid
-> topology.
-> Deprecate invalid options combination so we can make sure that
-> the topology VM started with is always correct in the future.
-> Users with an invalid sockets/cores/threads/maxcpus values should
-> fix their CLI to make sure that
->    [sockets * cores * threads] == [maxcpus]
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--aM0gpOiEa6nry0VU5UXiHZdsJUavqR7nt
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com,
+ Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <9b363ad7-4a3f-e0d7-fa0c-a3fa006f7f00@redhat.com>
+Subject: Re: [PATCH v2 04/13] block/commit: refactor commit to use job
+ callbacks
+References: <20180823222249.13518-1-jsnow@redhat.com>
+ <20180823222249.13518-5-jsnow@redhat.com>
+In-Reply-To: <20180823222249.13518-5-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-08-24 00:22, John Snow wrote:
+> Use the component callbacks; prepare, abort, and clean.
+>=20
+> NB: prepare is only called when the job has not yet failed;
+> and abort can be called after prepare.
+>=20
+> complete -> prepare -> abort -> clean
+> complete -> abort -> clean
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  qemu-deprecated.texi | 11 +++++++++++
->  vl.c                 |  6 ++++++
->  2 files changed, 17 insertions(+)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 87212b6..d5d9ce6 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -159,6 +159,17 @@ The 'file' driver for drives is no longer appropriate for character or host
->  devices and will only accept regular files (S_IFREG). The correct driver
->  for these file types is 'host_cdrom' or 'host_device' as appropriate.
->  
-> +@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
+>  block/commit.c | 90 ++++++++++++++++++++++++++++++++------------------=
+--------
+>  1 file changed, 49 insertions(+), 41 deletions(-)
+>=20
+> diff --git a/block/commit.c b/block/commit.c
+> index b6e8969877..9bf50385cf 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
 
-sockets, cores, threads
+[...]
 
+> @@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBacken=
+d *bs, BlockBackend *base,
+
+[...]
+
+> +static void commit_abort(Job *job)
+> +{
+> +    CommitBlockJob *s =3D container_of(job, CommitBlockJob, common.job=
+);
+> +    BlockDriverState *top_bs =3D blk_bs(s->top);
 > +
-> +CPU topology properties should describe whole machine topology including
-> +possible CPUs. but historically it was possible to start QEMU with
-
-/./,/
-
-> +an incorrect topology where
-> +  socket * core * thread >= X && < maxcpus
-
-sockets * cores * threads
-
-&& X < maxcpus
-
-> +which could lead to incorrect topology enumeration by the guest.
-> +Support for invalid topology will be removed, end user must ensure
-topologies
-/end user/the user/
-
-> +that topology described with -smp includes all possible cpus, i.e.:
-/that/the
-
-> +  socket * core * thread == maxcpus
-
-sockets * cores * threads
-
+> +    /* Make sure commit_top_bs and top stay around until bdrv_replace_=
+node() */
+> +    bdrv_ref(top_bs);
+> +    bdrv_ref(s->commit_top_bs);
 > +
->  @section QEMU Machine Protocol (QMP) commands
->  
->  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-> diff --git a/vl.c b/vl.c
-> index 5ba06ad..bc53828 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1238,6 +1238,12 @@ static void smp_parse(QemuOpts *opts)
->              exit(1);
->          }
->  
-> +        if (sockets * cores * threads != max_cpus) {
-> +            warn_report("Invalid CPUs topology deprecated. "
+> +    if (s->base) {
+> +        blk_unref(s->base);
+>      }
+> =20
+> +    /* free the blockers on the intermediate nodes so that bdrv_replac=
+e_nodes
+> +     * can succeed */
+> +    block_job_remove_all_bdrv(&s->common);
+> +
+> +    /* If bdrv_drop_intermediate() didn't already do that, remove the =
+commit
+> +     * filter driver from the backing chain. Do this as the final step=
+ so that
+> +     * the 'consistent read' permission can be granted.
 
-/CPUs/CPU/
+I'd suggest rewording this to "If bdrv_drop_intermediate() failed (or
+was not invoked at all), remove the commit filter driver from the
+backing chain now."
 
-Not sure we want a period after deprecated. Would ':' be more appropriate?
+Right now it sounds like maybe bdrv_drop_intermediate() removes the
+filter, and maybe it doesn't.  But actually it is supposed to always
+remove it -- but it may fail, and then we have to force-remove the filter=
+=2E
 
-> +                        "sockets (%u) * cores (%u) * threads (%u) "
-> +                        "!= maxcpus (%u)",
-> +                        sockets, cores, threads, max_cpus);
-> +        }
->          if (sockets * cores * threads > max_cpus) {
->              error_report("cpu topology: "
->                           "sockets (%u) * cores (%u) * threads (%u) > "
-> -- 
-> 2.7.4
->
+Apart from that:
 
-Thanks,
-drew 
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> +     *
+> +     * XXX Can (or should) we somehow keep 'consistent read' blocked e=
+ven
+> +     * after the failed/cancelled commit job is gone? If we already wr=
+ote
+> +     * something to base, the intermediate images aren't valid any mor=
+e. */
+> +    bdrv_child_try_set_perm(s->commit_top_bs->backing, 0, BLK_PERM_ALL=
+,
+> +                            &error_abort);
+> +    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
+> +                      &error_abort);
+> +
+> +    bdrv_unref(s->commit_top_bs);
+> +    bdrv_unref(top_bs);
+> +}
+
+
+
+--aM0gpOiEa6nry0VU5UXiHZdsJUavqR7nt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluD6XkACgkQ9AfbAGHV
+z0A3JwgAphRKthfjkg2mpA7efGJ6jyEEzG8hAXbHAdq06VgjU7DL24lQPrdOvR46
+PRRgeicovYW10CdLB9/6+rdNZKFPw4vr8tQMS4Gh+77HPxxhR8s7DP3VuBaK6HBy
+dbT9VefhZ/vZUwx3RFdpVwWMHL/O3Je7w3AU9QP0ERqzs6JUexWoLX1fkgKsQnO2
+MnrcefM8T4k5zwX2AXcssmHxmjSOt2hWvVMKJ9ZWcZMGPttiYMTKL2ivLY1XvKn1
+InVw/7+/iGsk4ohce3IE7ebiXnMkbPlx+cr+yIzFJmYfFqe/ikp0GE01gkUAz+63
+cdujvRCWGyE3UhBHeEeh+BoPw9z89g==
+=eQ/4
+-----END PGP SIGNATURE-----
+
+--aM0gpOiEa6nry0VU5UXiHZdsJUavqR7nt--
