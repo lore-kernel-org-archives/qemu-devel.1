@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fuNWs-0003Be-RN
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 15:50:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1fuPEi-0007PI-Bm
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 17:39:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fuNDP-0005FD-An
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 15:30:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45034 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fuPEg-0008JN-Ip
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 17:39:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49578 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fuNDP-0005Ew-5V
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 15:30:19 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E70AE26360
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 19:30:17 +0000 (UTC)
-References: <20180815133747.25032-1-peterx@redhat.com>
-	<20180815133747.25032-7-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fuPEg-0008Ip-Bm
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 17:39:46 -0400
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <6b125dfa-2097-8dda-0de0-e72136391947@redhat.com>
-Date: Mon, 27 Aug 2018 14:30:12 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180815133747.25032-7-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 06/13] qapi: remove COMMAND_DROPPED event
+Date: Mon, 27 Aug 2018 16:39:42 -0500
+Message-Id: <20180827213943.33524-2-eblake@redhat.com>
+In-Reply-To: <20180827213943.33524-1-eblake@redhat.com>
+References: <20180827213943.33524-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/2] qapi: Minor introspect.py cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,24 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 08/15/2018 08:37 AM, Peter Xu wrote:
-> Now it was not used any more.  Drop it, especially if we can do that
-> before we release QEMU 3.0.
+Commit 7d0f982b changed generated introspection output to no longer
+produce long lines in the generated .c file, but failed to adjust
+comments to match.  Add some clarity that the shorter length that
+matters most is the overall QMP response on the wire.
 
-Stale commit message, now that 3.0 has been released. But still doable, 
-since the event could not be emitted without use of the experimental 
-x-oob option.
+Commit 25b1ef31 triggers a pep8 formatting nit.
 
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->   docs/interop/qmp-spec.txt |  5 +++--
->   qapi/misc.json            | 40 ---------------------------------------
->   2 files changed, 3 insertions(+), 42 deletions(-)
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ scripts/qapi/introspect.py | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 189a4edabab..43e81a06938 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -89,7 +89,6 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaMonolithicCVisitor):
+         for typ in self._used_types:
+             typ.visit(self)
+         # generate C
+-        # TODO can generate awfully long lines
+         name = c_name(self._prefix, protect=False) + 'qmp_schema_qlit'
+         self._genh.add(mcgen('''
+ #include "qapi/qmp/qlit.h"
+@@ -129,8 +128,8 @@ const QLitObject %(c_name)s = %(c_string)s;
+         if typ not in self._used_types:
+             self._used_types.append(typ)
+         # Clients should examine commands and events, not types.  Hide
+-        # type names to reduce the temptation.  Also saves a few
+-        # characters.
++        # type names as integers to reduce the temptation.  Also, it
++        # saves a few characters on the wire.
+         if isinstance(typ, QAPISchemaBuiltinType):
+             return typ.name
+         if isinstance(typ, QAPISchemaArrayType):
+@@ -185,7 +184,7 @@ const QLitObject %(c_name)s = %(c_string)s;
+         arg_type = arg_type or self._schema.the_empty_object_type
+         ret_type = ret_type or self._schema.the_empty_object_type
+         obj = {'arg-type': self._use_type(arg_type),
+-               'ret-type': self._use_type(ret_type) }
++               'ret-type': self._use_type(ret_type)}
+         if allow_oob:
+             obj['allow-oob'] = allow_oob
+         self._gen_qlit(name, 'command', obj, ifcond)
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.1
