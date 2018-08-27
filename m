@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fuI66-00033O-FU
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:02:27 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fuI6B-0002Yl-N6
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fuHzv-0006ny-Iu
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:56:04 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:43399)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fuHzu-0006iB-Dt
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:56:02 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id b15-v6so27360411oib.10
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 06:56:01 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180827085320.9732-1-kraxel@redhat.com>
-References: <20180827085320.9732-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Aug 2018 14:55:40 +0100
-Message-ID: <CAFEAcA9Ny-GtsET+57YDj00Efi0VoVqCyEF7GYfSfg8Th0xf-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/12] Ui 20180827 v4 patches
+	(envelope-from <imammedo@redhat.com>) id 1fuHxS-0004Hb-KU
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:53:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35806 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fuHxS-0004Gy-FX
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 09:53:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1D7AB4023461
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 13:53:30 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Mon, 27 Aug 2018 15:53:26 +0200
+Message-Id: <1535378006-223604-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] vl.c deprecate incorrect CPUs topology
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Libvirt <libvir-list@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, libvir-list@redhat.com, ehabkost@redhat.com, berrange@redhat.com, drjones@redhat.com
 
-On 27 August 2018 at 09:53, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit 5ccac548faf041ff5229a8e8342e3be14a34c8af:
->
->   Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-08-23 17:35:48 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20180827-v4-pull-request
->
-> for you to fetch changes up to b1d380372f31672da9318431e84e79bccd8ef3bf:
->
->   util: promote qemu_egl_rendernode_open() to libqemuutil (2018-08-27 10:51:44 +0200)
->
-> ----------------------------------------------------------------
-> ui: misc fixes which piled up during 3.0 release freeze
->
-> ----------------------------------------------------------------
-Applied, thanks.
+-smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
+so that total number of logical CPUs [sockets * cores * threads]
+would be equal to [maxcpus], however historically we didn't have
+such check in QEMU and it is possible to start VM with an invalid
+topology.
+Deprecate invalid options combination so we can make sure that
+the topology VM started with is always correct in the future.
+Users with an invalid sockets/cores/threads/maxcpus values should
+fix their CLI to make sure that
+   [sockets * cores * threads] == [maxcpus]
 
--- PMM
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  - spelling&&co fixes (Andrew Jones <drjones@redhat.com>)
+---
+ qemu-deprecated.texi | 11 +++++++++++
+ vl.c                 |  6 ++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 87212b6..b649b2e 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -159,6 +159,17 @@ The 'file' driver for drives is no longer appropriate for character or host
+ devices and will only accept regular files (S_IFREG). The correct driver
+ for these file types is 'host_cdrom' or 'host_device' as appropriate.
+ 
++@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
++
++CPU topology properties should describe whole machine topology including
++possible CPUs. but historically it was possible to start QEMU with
++an incorrect topology where
++  sockets * cores * threads >= X && X < maxcpus
++which could lead to incorrect topology enumeration by the guest.
++Support for invalid topology will be removed, the user must ensure
++topologies described with -smp includes all possible cpus, i.e.:
++  sockets * cores * threads == maxcpus
++
+ @section QEMU Machine Protocol (QMP) commands
+ 
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+diff --git a/vl.c b/vl.c
+index 5ba06ad..238f856 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1238,6 +1238,12 @@ static void smp_parse(QemuOpts *opts)
+             exit(1);
+         }
+ 
++        if (sockets * cores * threads != max_cpus) {
++            warn_report("Invalid CPU topology deprecated: "
++                        "sockets (%u) * cores (%u) * threads (%u) "
++                        "!= maxcpus (%u)",
++                        sockets, cores, threads, max_cpus);
++        }
+         if (sockets * cores * threads > max_cpus) {
+             error_report("cpu topology: "
+                          "sockets (%u) * cores (%u) * threads (%u) > "
+-- 
+2.7.4
