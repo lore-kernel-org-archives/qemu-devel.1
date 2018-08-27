@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuGb2-0004Bv-IR
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:26:17 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fuGkZ-0001vr-Sh
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuGay-0004zD-Rd
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:26:16 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:2627)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuGay-0004yE-IA
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:26:12 -0400
-From: "Janeczek, Craig" <jancraig@amazon.com>
-Date: Mon, 27 Aug 2018 12:22:18 +0000
-Message-ID: <fed7b415b77c45d286e3b7cb4bc7b84f@EX13D12UEA003.ant.amazon.com>
-References: <cover.1535133088.git.jancraig@amazon.com>
-	<f1e92127959ffb3df713a06452328a71170bda93.1535133089.git.jancraig@amazon.com>
-	<231c38e4-8ad4-0f73-69ab-7a66d20716d3@linaro.org>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fuGkW-0003jX-Lj
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:07 -0400
+Received: from mail-by2nam01on0134.outbound.protection.outlook.com
+	([104.47.34.134]:44448
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fuGkW-0003hN-5r
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:36:04 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 27 Aug 2018 12:35:53 +0000
+Message-ID: <BN7PR08MB48687DC8D5F23786CCD97A9DC60B0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <cover.1535133088.git.jancraig@amazon.com>,
+	<261dd8062c85c2a5eefb4d6effa2a44d5fc953f7.1535133089.git.jancraig@amazon.com>
+In-Reply-To: <261dd8062c85c2a5eefb4d6effa2a44d5fc953f7.1535133089.git.jancraig@amazon.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/7] target/mips: Add MXU instructions
- S32I2M and S32M2I
+Subject: Re: [Qemu-devel] [PATCH 1/7] target/mips: Add MXU register support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>
+To: Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
 
-aHR0cHM6Ly9naXRodWIuY29tL01JUFMvQ0kyMF9tcGxheWVyL2Jsb2IvY2kyMF9tcGxheWVyL214
-dV9hcw0KDQpTb3JyeSBJIG1pcy1yZWFkIG91ciBjb21tZW50LiBUaGUgYml0IGxheW91dHMgd2Vy
-ZSBwdWxsZWQgZnJvbSB0aGlzIHNjcmlwdCBhbmQgdmFsaWRhdGVkIGJ5IHZpc3VhbGx5IGV4YW1p
-bmluZyBjb21waWxlZCBjb2RlLg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTog
-SmFuZWN6ZWssIENyYWlnIA0KU2VudDogTW9uZGF5LCBBdWd1c3QgMjcsIDIwMTggODoxNSBBTQ0K
-VG86ICdSaWNoYXJkIEhlbmRlcnNvbicgPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc+OyBx
-ZW11LWRldmVsQG5vbmdudS5vcmcNCkNjOiBhdXJlbGllbkBhdXJlbDMyLm5ldDsgYW1hcmtvdmlj
-QHdhdmVjb21wLmNvbQ0KU3ViamVjdDogUkU6IFtRZW11LWRldmVsXSBbUEFUQ0ggMi83XSB0YXJn
-ZXQvbWlwczogQWRkIE1YVSBpbnN0cnVjdGlvbnMgUzMySTJNIGFuZCBTMzJNMkkNCg0KaHR0cHM6
-Ly93d3cucm9ja2JveC5vcmcvd2lraS9wdWIvTWFpbi9JbmdlbmljSno0NzYwQi9qei1zaW1kLWRv
-Y3MucGRmDQoNCkkgcHVsbGVkIHRoZW0gZnJvbSBoZXJlLiBJIGFsc28gd3JvdGUgYSBzZXJpZXMg
-b2YgdGVzdHMgd2hpY2ggSSBjcm9zcyBjb21waWxlZCB0aGVuIHJhbiBvbiBib3RoIEhXIGFuZCB0
-aHJvdWdoIFFFTVUuIEFsdGhvdWdoIEkgZGlkIG5vdCBzdWJtaXQgdGhvc2UgdGVzdHMgYXMgcGFy
-dCBvZiB0aGlzIHBhdGNoc2V0IGFzIEkgYW0gdW5zdXJlIG9mIGhvdyB0byBhZGQgdGhlbSBpbnRv
-IHRoZSBRRU1VIHRlc3QgaW5mcmFzdHJ1Y3R1cmUuDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQpGcm9tOiBSaWNoYXJkIEhlbmRlcnNvbiA8cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9y
-Zz4NClNlbnQ6IFNhdHVyZGF5LCBBdWd1c3QgMjUsIDIwMTggMTowNyBQTQ0KVG86IEphbmVjemVr
-LCBDcmFpZyA8amFuY3JhaWdAYW1hem9uLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KQ2M6
-IGF1cmVsaWVuQGF1cmVsMzIubmV0OyBhbWFya292aWNAd2F2ZWNvbXAuY29tDQpTdWJqZWN0OiBS
-ZTogW1FlbXUtZGV2ZWxdIFtQQVRDSCAyLzddIHRhcmdldC9taXBzOiBBZGQgTVhVIGluc3RydWN0
-aW9ucyBTMzJJMk0gYW5kIFMzMk0ySQ0KDQpPbiAwOC8yNC8yMDE4IDEyOjQ0IFBNLCBDcmFpZyBK
-YW5lY3playB2aWEgUWVtdS1kZXZlbCB3cm90ZToNCj4gQWRkcyBzdXBwb3J0IGZvciBlbXVsYXRp
-bmcgdGhlIFMzMkkyTSBhbmQgUzMyTTJJIE1YVSBpbnN0cnVjdGlvbnMuDQo+IA0KPiBTaWduZWQt
-b2ZmLWJ5OiBDcmFpZyBKYW5lY3playA8amFuY3JhaWdAYW1hem9uLmNvbT4NCj4gLS0tDQo+ICB0
-YXJnZXQvbWlwcy90cmFuc2xhdGUuYyB8IDU1DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwgNTUgaW5zZXJ0aW9ucygrKQ0KPiAN
-Cj4gZGlmZiAtLWdpdCBhL3RhcmdldC9taXBzL3RyYW5zbGF0ZS5jIGIvdGFyZ2V0L21pcHMvdHJh
-bnNsYXRlLmMgaW5kZXggDQo+IDUwZjBjYjU1OGYuLjM4MWRmYWQzNmUgMTAwNjQ0DQo+IC0tLSBh
-L3RhcmdldC9taXBzL3RyYW5zbGF0ZS5jDQo+ICsrKyBiL3RhcmdldC9taXBzL3RyYW5zbGF0ZS5j
-DQo+IEBAIC0zNjQsNiArMzY0LDkgQEAgZW51bSB7DQo+ICAgICAgT1BDX0NMTyAgICAgID0gMHgy
-MSB8IE9QQ19TUEVDSUFMMiwNCj4gICAgICBPUENfRENMWiAgICAgPSAweDI0IHwgT1BDX1NQRUNJ
-QUwyLA0KPiAgICAgIE9QQ19EQ0xPICAgICA9IDB4MjUgfCBPUENfU1BFQ0lBTDIsDQo+ICsgICAg
-LyogTVhVICovDQo+ICsgICAgT1BDX01YVV9TMzJJMk0gPSAweDJGIHwgT1BDX1NQRUNJQUwyLA0K
-PiArICAgIE9QQ19NWFVfUzMyTTJJID0gMHgyRSB8IE9QQ19TUEVDSUFMMiwNCg0KSSBoYXZlbid0
-IGJlZW4gYWJsZSB0byBmaW5kIGFueSBkb2N1bWVudGF0aW9uIG9mIHRoZSBiaXQgbGF5b3V0IG9m
-IHRoZXNlIGluc3RydWN0aW9ucy4gIEFueSBwb2ludGVycz8NCg0KPiArdHlwZWRlZiB1bmlvbiB7
-DQo+ICsgICAgc3RydWN0IHsNCj4gKyAgICAgICAgdWludDMyX3Qgb3A6NjsNCj4gKyAgICAgICAg
-dWludDMyX3QgeHJhOjU7DQo+ICsgICAgICAgIHVpbnQzMl90OjU7DQo+ICsgICAgICAgIHVpbnQz
-Ml90IHJiOjU7DQo+ICsgICAgICAgIHVpbnQzMl90OjU7DQo+ICsgICAgICAgIHVpbnQzMl90IHNw
-ZWNpYWwyOjY7DQo+ICsgICAgfSBTMzJJMk07DQo+ICsNCj4gKyAgICBzdHJ1Y3Qgew0KPiArICAg
-ICAgICB1aW50MzJfdCBvcDo2Ow0KPiArICAgICAgICB1aW50MzJfdCB4cmE6NTsNCj4gKyAgICAg
-ICAgdWludDMyX3Q6NTsNCj4gKyAgICAgICAgdWludDMyX3QgcmI6NTsNCj4gKyAgICAgICAgdWlu
-dDMyX3Q6NTsNCj4gKyAgICAgICAgdWludDMyX3Qgc3BlY2lhbDI6NjsNCj4gKyAgICB9IFMzMk0y
-STsNCj4gK30gTVhVX09QQ09ERTsNCg0KRG8gbm90IHVzZSBiaXRmaWVsZHMuICBUaGUgbGF5b3V0
-IGRpZmZlcnMgYnkgaG9zdCBjb21waWxlci4NClVzZSBleHRyYWN0MzIoaW5wdXQsIHBvcywgbGVu
-KS4NCg0KDQo+ICsNCj4gKy8qIE1YVSBJbnN0cnVjdGlvbnMgKi8NCj4gK3N0YXRpYyB2b2lkIGdl
-bl9teHUoRGlzYXNDb250ZXh0ICpjdHgsIHVpbnQzMl90IG9wYykgeyAjaWZuZGVmDQo+ICtUQVJH
-RVRfTUlQUzY0IC8qIE9ubHkgd29ya3MgaW4gMzIgYml0IG1vZGUgKi8NCj4gKyAgICBUQ0d2IHQw
-Ow0KPiArICAgIHQwID0gdGNnX3RlbXBfbmV3KCk7DQo+ICsgICAgTVhVX09QQ09ERSAqb3Bjb2Rl
-ID0gKE1YVV9PUENPREUgKikmY3R4LT5vcGNvZGU7DQo+ICsNCj4gKyAgICBzd2l0Y2ggKG9wYykg
-ew0KPiArICAgIGNhc2UgT1BDX01YVV9TMzJJMk06DQo+ICsgICAgICAgIGdlbl9sb2FkX2dwcih0
-MCwgb3Bjb2RlLT5TMzJJMk0ucmIpOw0KPiArICAgICAgICBnZW5fc3RvcmVfbXh1X2dwcih0MCwg
-b3Bjb2RlLT5TMzJJMk0ueHJhKTsNCj4gKyAgICAgICAgYnJlYWs7DQo+ICsNCj4gKyAgICBjYXNl
-IE9QQ19NWFVfUzMyTTJJOg0KPiArICAgICAgICBnZW5fbG9hZF9teHVfZ3ByKHQwLCBvcGNvZGUt
-PlMzMk0ySS54cmEpOw0KPiArICAgICAgICBnZW5fc3RvcmVfZ3ByKHQwLCBvcGNvZGUtPlMzMk0y
-SS5yYik7DQo+ICsgICAgICAgIGJyZWFrOw0KPiArICAgIH0NCj4gKw0KPiArICAgIHRjZ190ZW1w
-X2ZyZWUodDApOw0KPiArI2Vsc2UNCj4gKyAgICBnZW5lcmF0ZV9leGNlcHRpb25fZW5kKGN0eCwg
-RVhDUF9SSSk7ICNlbmRpZiB9DQoNClRoZXJlJ3Mgbm90aGluZyBoZXJlICh5ZXQsIEkgc3VwcG9z
-ZSkgdGhhdCB3b24ndCBjb21waWxlIGZvciBNSVBTNjQuDQpJJ2Qgc3VnZ2VzdCBhdm9pZGluZyBp
-ZmRlZnMgYXMgbXVjaCBhcyBwb3NzaWJsZS4NCg0KDQpyfg0KDQo=
+> From: Craig Janeczek <jancraig@amazon.com>
+> Sent: Friday, August 24, 2018 9:44 PM
+>
+> Subject: [PATCH 1/7] target/mips: Add MXU register support
+>=20
+> This commit makes the MXU registers and the helper functions for
+> reading/writing to them. This is required for full MXU instruction
+> support.
+
+Hi, Craig,
+
+The term "helper function" is good in general terminology sense, however, i=
+n QEMU terminology, it is used for something else (see op_helper.c for exam=
+ples), and not for the case similar to the functions in this patch. Your fu=
+nctions generate "inline" code, in QEMU terminology, which is opposite to "=
+helper" functions. Just don't use the word "helper" in the commit message. =
+Use "wrapper", "utility", or similar word.
+
+Thanks,
+Aleksandar
