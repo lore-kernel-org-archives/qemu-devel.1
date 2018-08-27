@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fuD1F-0005zv-Mu
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:37:07 -0400
+	(envelope-from <Simon.Hausmann@qt.io>) id 1fuD5Z-0008Mx-Vh
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:41:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fuD1C-00080y-G0
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:37:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55352 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fuD1C-00080g-Ac
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:37:02 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 27 Aug 2018 16:36:45 +0800
-Message-Id: <20180827083645.12548-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] slirp: Implement RFC2132 TFTP server name
+	(envelope-from <Simon.Hausmann@qt.io>) id 1fuD5W-0003fi-GM
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:41:33 -0400
+Received: from mail-db5eur03on0716.outbound.protection.outlook.com
+	([2a01:111:f400:fe0a::716]:52208
+	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Simon.Hausmann@qt.io>)
+	id 1fuD5W-0003dJ-0B
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 04:41:30 -0400
+From: Simon Hausmann <simon.hausmann@qt.io>
+Date: Mon, 27 Aug 2018 10:40:37 +0200
+Message-Id: <20180827084037.25316-1-simon.hausmann@qt.io>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3] linux-user: add support for MADV_DONTNEED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,195 +27,289 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com, berrange@redhat.com, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, brad@comstyle.com
+Cc: Simon Hausmann <simon.hausmann@qt.io>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Sami Nurmenniemi <sami.nurmenniemi@qt.io>
 
-This new usernet option can be used to add data for option 66 (tftp
-server name) in the BOOTP reply, which is useful in PXE based automatic
-OS install such as OpenBSD.
+Most flags to madvise() are just hints, so typically ignoring the
+syscall and returning okay is fine. However applications exist that do
+rely on MADV_DONTNEED behavior to guarantee that upon subsequent access
+the mapping is refreshed from the backing file or zero for anonymous
+mappings. The file backed mappings this is tricky - hence the original
+comment - but for anonymous mappings it is safe to forward. We just need
+to remember which those mappings are, which is now stored in the flags.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Sami Nurmenniemi <sami.nurmenniemi@qt.io>
+Signed-off-by: Simon Hausmann <simon.hausmann@qt.io>
+
+--
+v2:
+  - align start and len on host page size
+v3:
+  - align start and len to target page size as it may be bigger than
+    host
+  - use immediate return in do_syscall
+  - forward MADV_DONTNEED advice only for anonymously mapped pages
+  - remember which mappings are anonymous in the page flags and preserve
+    those bits across mprotect calls.
 ---
+ accel/tcg/translate-all.c |  8 +++++--
+ bsd-user/mmap.c           |  8 +++----
+ include/exec/cpu-all.h    | 11 ++++++++-
+ linux-user/elfload.c      |  3 ++-
+ linux-user/mmap.c         | 49 +++++++++++++++++++++++++++++++++++----
+ linux-user/qemu.h         |  1 +
+ linux-user/syscall.c      | 12 ++++------
+ 7 files changed, 72 insertions(+), 20 deletions(-)
 
-v3: Add doc to qemu-options.hx. [Thomas]
-
-v2: - Adjust parameter order and field placement to be closer to other
-tftp options. [Samuel]
-    - Drop 'optional'. [Eric]
----
- net/slirp.c      | 5 ++++-
- qapi/net.json    | 5 ++++-
- qemu-options.hx  | 7 ++++++-
- slirp/bootp.c    | 8 ++++++++
- slirp/bootp.h    | 1 +
- slirp/libslirp.h | 4 +++-
- slirp/slirp.c    | 5 ++++-
- slirp/slirp.h    | 1 +
- 8 files changed, 31 insertions(+), 5 deletions(-)
-
-diff --git a/net/slirp.c b/net/slirp.c
-index 1e14318b4d..90ef09b40a 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -158,6 +158,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-                           const char *vnameserver, const char *vnameserver6,
-                           const char *smb_export, const char *vsmbserver,
-                           const char **dnssearch, const char *vdomainname,
-+                          const char *tftp_server_name,
-                           Error **errp)
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 898c3bb3d1..467fbd9aeb 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2481,7 +2481,8 @@ int page_get_flags(target_ulong address)
+ /* Modify the flags of a page and invalidate the code if necessary.
+    The flag PAGE_WRITE_ORG is positioned automatically depending
+    on PAGE_WRITE.  The mmap_lock should already be held.  */
+-void page_set_flags(target_ulong start, target_ulong end, int flags)
++void page_set_flags(target_ulong start, target_ulong end, int flags,
++                    enum page_set_flags_mode mode)
  {
-     /* default settings according to historic slirp */
-@@ -376,6 +377,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
+     target_ulong addr, len;
  
-     s->slirp = slirp_init(restricted, ipv4, net, mask, host,
-                           ipv6, ip6_prefix, vprefix6_len, ip6_host,
-+                          tftp_server_name,
-                           vhostname, tftp_export, bootfile, dhcp,
-                           dns, ip6_dns, dnssearch, vdomainname, s);
-     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
-@@ -966,7 +968,8 @@ int net_init_slirp(const Netdev *netdev, const char *name,
-                          user->ipv6_host, user->hostname, user->tftp,
-                          user->bootfile, user->dhcpstart,
-                          user->dns, user->ipv6_dns, user->smb,
--                         user->smbserver, dnssearch, user->domainname, errp);
-+                         user->smbserver, dnssearch, user->domainname,
-+                         user->tftp_server_name, errp);
- 
-     while (slirp_configs) {
-         config = slirp_configs;
-diff --git a/qapi/net.json b/qapi/net.json
-index c86f351161..8f99fd911d 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -174,6 +174,8 @@
- #
- # @guestfwd: forward guest TCP connections
- #
-+# @tftp-server-name: RFC2132 "TFTP server name" string (Since 3.1)
-+#
- # Since: 1.2
- ##
- { 'struct': 'NetdevUserOptions',
-@@ -198,7 +200,8 @@
-     '*smb':       'str',
-     '*smbserver': 'str',
-     '*hostfwd':   ['String'],
--    '*guestfwd':  ['String'] } }
-+    '*guestfwd':  ['String'],
-+    '*tftp-server-name': 'str' } }
- 
- ##
- # @NetdevTapOptions:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5515dfaba5..6ddabd9b81 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1885,7 +1885,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-     "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-host=addr]\n"
-     "         [,restrict=on|off][,hostname=host][,dhcpstart=addr]\n"
-     "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,domainname=domain]\n"
--    "         [,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
-+    "         [,tftp=dir][,tftp-server-name][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
- #ifndef _WIN32
-                                              "[,smb=dir[,smbserver=addr]]\n"
- #endif
-@@ -2122,6 +2122,11 @@ server. The files in @var{dir} will be exposed as the root of a TFTP server.
- The TFTP client on the guest must be configured in binary mode (use the command
- @code{bin} of the Unix TFTP client).
- 
-+@item tftp-server-name=@var{name}
-+In BOOTP reply, broadcast @var{name} as the "TFTP server name" (RFC2132 option
-+66). This can be used to advise the guest to load boot files or configurations
-+from a different server than the host address.
-+
- @item bootfile=@var{file}
- When using the user mode network stack, broadcast @var{file} as the BOOTP
- filename. In conjunction with @option{tftp}, this can be used to network boot
-diff --git a/slirp/bootp.c b/slirp/bootp.c
-index 9e7b53ba94..ed2cf3b96e 100644
---- a/slirp/bootp.c
-+++ b/slirp/bootp.c
-@@ -306,6 +306,14 @@ static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
-             q += val;
+@@ -2513,7 +2514,10 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
+             p->first_tb) {
+             tb_invalidate_phys_page(addr, 0);
          }
+-        p->flags = flags;
++        if (mode == PAGE_SET_ALL_FLAGS)
++            p->flags = flags;
++        else /* PAGE_SET_PROTECTION */
++            p->flags |= (p->flags & ~(PAGE_BITS - 1)) | (flags & PAGE_BITS);
+     }
+ }
  
-+        if (slirp->tftp_server_name) {
-+            val = strlen(slirp->tftp_server_name);
-+            *q++ = RFC2132_TFTP_SERVER_NAME;
-+            *q++ = val;
-+            memcpy(q, slirp->tftp_server_name, val);
-+            q += val;
-+        }
+diff --git a/bsd-user/mmap.c b/bsd-user/mmap.c
+index 17f4cd80aa..4bfac81af4 100644
+--- a/bsd-user/mmap.c
++++ b/bsd-user/mmap.c
+@@ -125,7 +125,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
+         if (ret != 0)
+             goto error;
+     }
+-    page_set_flags(start, start + len, prot | PAGE_VALID);
++    page_set_flags(start, start + len, prot, PAGE_SET_PROTECTION);
+     mmap_unlock();
+     return 0;
+ error:
+@@ -214,7 +214,7 @@ static abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
+            to mmap.  */
+         page_set_flags(last_brk & TARGET_PAGE_MASK,
+                        TARGET_PAGE_ALIGN(new_brk),
+-                       PAGE_RESERVED);
++                       PAGE_RESERVED, PAGE_SET_ALL_FLAGS);
+     }
+     last_brk = new_brk;
+ 
+@@ -397,7 +397,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+         }
+     }
+  the_end1:
+-    page_set_flags(start, start + len, prot | PAGE_VALID);
++    page_set_flags(start, start + len, prot | PAGE_VALID, PAGE_SET_ALL_FLAGS);
+  the_end:
+ #ifdef DEBUG_MMAP
+     printf("ret=0x" TARGET_FMT_lx "\n", start);
+@@ -460,7 +460,7 @@ int target_munmap(abi_ulong start, abi_ulong len)
+     }
+ 
+     if (ret == 0)
+-        page_set_flags(start, start + len, 0);
++        page_set_flags(start, start + len, 0, PAGE_SET_ALL_FLAGS);
+     mmap_unlock();
+     return ret;
+ }
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 117d2fbbca..100388dcd4 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -249,6 +249,9 @@ extern intptr_t qemu_host_page_mask;
+ /* FIXME: Code that sets/uses this is broken and needs to go away.  */
+ #define PAGE_RESERVED  0x0020
+ #endif
++#if defined(CONFIG_LINUX) && defined(CONFIG_USER_ONLY)
++#define PAGE_MAP_ANONYMOUS 0x0080
++#endif
+ 
+ #if defined(CONFIG_USER_ONLY)
+ void page_dump(FILE *f);
+@@ -257,8 +260,14 @@ typedef int (*walk_memory_regions_fn)(void *, target_ulong,
+                                       target_ulong, unsigned long);
+ int walk_memory_regions(void *, walk_memory_regions_fn);
+ 
++enum page_set_flags_mode {
++    PAGE_SET_ALL_FLAGS,
++    PAGE_SET_PROTECTION
++};
 +
-         if (slirp->vdnssearch) {
-             size_t spaceleft = sizeof(rbp->bp_vend) - (q - rbp->bp_vend);
-             val = slirp->vdnssearch_len;
-diff --git a/slirp/bootp.h b/slirp/bootp.h
-index 394525733e..4043489835 100644
---- a/slirp/bootp.h
-+++ b/slirp/bootp.h
-@@ -70,6 +70,7 @@
- #define RFC2132_MAX_SIZE	57
- #define RFC2132_RENEWAL_TIME    58
- #define RFC2132_REBIND_TIME     59
-+#define RFC2132_TFTP_SERVER_NAME 66
+ int page_get_flags(target_ulong address);
+-void page_set_flags(target_ulong start, target_ulong end, int flags);
++void page_set_flags(target_ulong start, target_ulong end, int flags,
++                    enum page_set_flags_mode);
+ int page_check_range(target_ulong start, target_ulong len, int flags);
+ #endif
  
- #define DHCPDISCOVER		1
- #define DHCPOFFER		2
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 740408a96e..0e84ab9b52 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -13,10 +13,12 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   bool in6_enabled,
-                   struct in6_addr vprefix_addr6, uint8_t vprefix_len,
-                   struct in6_addr vhost6, const char *vhostname,
-+                  const char *tftp_server_name,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque);
-+                  const char *vdomainname,
-+                  void *opaque);
- void slirp_cleanup(Slirp *slirp);
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 8638612aec..c59cf4359c 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1702,7 +1702,8 @@ static void zero_bss(abi_ulong elf_bss, abi_ulong last_bss, int prot)
  
- void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 5c3bd6163f..4073b0174f 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -283,10 +283,12 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   bool in6_enabled,
-                   struct in6_addr vprefix_addr6, uint8_t vprefix_len,
-                   struct in6_addr vhost6, const char *vhostname,
-+                  const char *tftp_server_name,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque)
-+                  const char *vdomainname,
-+                  void *opaque)
+     /* Ensure that the bss page(s) are valid */
+     if ((page_get_flags(last_bss-1) & prot) != prot) {
+-        page_set_flags(elf_bss & TARGET_PAGE_MASK, last_bss, prot | PAGE_VALID);
++        page_set_flags(elf_bss & TARGET_PAGE_MASK, last_bss, prot,
++                       PAGE_SET_PROTECTION);
+     }
+ 
+     if (host_start < host_map_start) {
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 41e0983ce8..fff29ee04b 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -124,7 +124,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
+         if (ret != 0)
+             goto error;
+     }
+-    page_set_flags(start, start + len, prot | PAGE_VALID);
++    page_set_flags(start, start + len, prot, PAGE_SET_PROTECTION);
+     mmap_unlock();
+     return 0;
+ error:
+@@ -362,6 +362,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+                      int flags, int fd, abi_ulong offset)
  {
-     Slirp *slirp = g_malloc0(sizeof(Slirp));
+     abi_ulong ret, end, real_start, real_end, retaddr, host_offset, host_len;
++    int page_flags;
  
-@@ -321,6 +323,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-     slirp->vdhcp_startaddr = vdhcp_start;
-     slirp->vnameserver_addr = vnameserver;
-     slirp->vnameserver_addr6 = vnameserver6;
-+    slirp->tftp_server_name = g_strdup(tftp_server_name);
+     mmap_lock();
+ #ifdef DEBUG_MMAP
+@@ -562,7 +563,11 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+         }
+     }
+  the_end1:
+-    page_set_flags(start, start + len, prot | PAGE_VALID);
++    page_flags = prot | PAGE_VALID;
++    if (flags & MAP_ANONYMOUS) {
++        page_flags |= PAGE_MAP_ANONYMOUS;
++    }
++    page_set_flags(start, start + len, page_flags, PAGE_SET_ALL_FLAGS);
+  the_end:
+ #ifdef DEBUG_MMAP
+     printf("ret=0x" TARGET_ABI_FMT_lx "\n", start);
+@@ -675,7 +680,7 @@ int target_munmap(abi_ulong start, abi_ulong len)
+     }
  
-     if (vdnssearch) {
-         translate_dnssearch(slirp, vdnssearch);
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 10b410898a..b80725a0d6 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -212,6 +212,7 @@ struct Slirp {
-     /* tftp states */
-     char *tftp_prefix;
-     struct tftp_session tftp_sessions[TFTP_SESSIONS_MAX];
-+    char *tftp_server_name;
+     if (ret == 0) {
+-        page_set_flags(start, start + len, 0);
++        page_set_flags(start, start + len, 0, PAGE_SET_ALL_FLAGS);
+         tb_invalidate_phys_range(start, start + len);
+     }
+     mmap_unlock();
+@@ -755,10 +760,44 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+     } else {
+         new_addr = h2g(host_addr);
+         prot = page_get_flags(old_addr);
+-        page_set_flags(old_addr, old_addr + old_size, 0);
+-        page_set_flags(new_addr, new_addr + new_size, prot | PAGE_VALID);
++        page_set_flags(old_addr, old_addr + old_size, 0,
++                       PAGE_SET_ALL_FLAGS);
++        page_set_flags(new_addr, new_addr + new_size, prot | PAGE_VALID,
++                       PAGE_SET_ALL_FLAGS);
+     }
+     tb_invalidate_phys_range(new_addr, new_addr + new_size);
+     mmap_unlock();
+     return new_addr;
+ }
++
++int target_madvise(abi_ulong start, abi_ulong len, int advice)
++{
++    abi_ulong end, addr;
++    int ret;
++
++    len = TARGET_PAGE_ALIGN(len);
++    start &= TARGET_PAGE_MASK;
++
++    if (!guest_range_valid(start, len)) {
++        errno = EINVAL;
++        return -1;
++    }
++
++    /* A straight passthrough may not be safe because qemu sometimes
++       turns private file-backed mappings into anonymous mappings.
++       Most flags are hints so we ignore them.
++       One exception is made for MADV_DONTNEED on anonymous mappings,
++       that applications may rely on to zero out pages. */
++    if (advice & MADV_DONTNEED) {
++        end = start + len;
++        for (addr = start; addr < end; addr += TARGET_PAGE_SIZE) {
++            if (page_get_flags(addr) & PAGE_MAP_ANONYMOUS) {
++                ret = madvise(g2h(addr), TARGET_PAGE_SIZE, MADV_DONTNEED);
++                if (ret != 0) {
++                    return ret;
++                }
++            }
++        }
++    }
++    return 0;
++}
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index b4959e41c6..e5ac5e9c6a 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -437,6 +437,7 @@ int target_munmap(abi_ulong start, abi_ulong len);
+ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+                        abi_ulong new_size, unsigned long flags,
+                        abi_ulong new_addr);
++int target_madvise(abi_ulong start, abi_ulong len, int advice);
+ extern unsigned long last_brk;
+ extern abi_ulong mmap_next_start;
+ abi_ulong mmap_find_vma(abi_ulong, abi_ulong);
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 850b72a0c7..4478de5fc8 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -5124,7 +5124,8 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
  
-     ArpTable arp_table;
-     NdpTable ndp_table;
+     page_set_flags(raddr, raddr + shm_info.shm_segsz,
+                    PAGE_VALID | PAGE_READ |
+-                   ((shmflg & SHM_RDONLY)? 0 : PAGE_WRITE));
++                   ((shmflg & SHM_RDONLY) ? 0 : PAGE_WRITE),
++                   PAGE_SET_ALL_FLAGS);
+ 
+     for (i = 0; i < N_SHM_REGIONS; i++) {
+         if (!shm_regions[i].in_use) {
+@@ -5150,7 +5151,8 @@ static inline abi_long do_shmdt(abi_ulong shmaddr)
+     for (i = 0; i < N_SHM_REGIONS; ++i) {
+         if (shm_regions[i].in_use && shm_regions[i].start == shmaddr) {
+             shm_regions[i].in_use = false;
+-            page_set_flags(shmaddr, shmaddr + shm_regions[i].size, 0);
++            page_set_flags(shmaddr, shmaddr + shm_regions[i].size, 0,
++                           PAGE_SET_ALL_FLAGS);
+             break;
+         }
+     }
+@@ -11559,11 +11561,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+ 
+ #ifdef TARGET_NR_madvise
+     case TARGET_NR_madvise:
+-        /* A straight passthrough may not be safe because qemu sometimes
+-           turns private file-backed mappings into anonymous mappings.
+-           This will break MADV_DONTNEED.
+-           This is a hint, so ignoring and returning success is ok.  */
+-        return 0;
++        return get_errno(target_madvise(arg1, arg2, arg3));
+ #endif
+ #if TARGET_ABI_BITS == 32
+     case TARGET_NR_fcntl64:
 -- 
 2.17.1
