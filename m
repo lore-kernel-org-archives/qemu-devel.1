@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fu7BL-00015F-IA
-	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:23:08 -0400
+	(envelope-from <peterx@redhat.com>) id 1fu7In-0005Zt-1g
+	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fu7BI-0002SX-BJ
-	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:23:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46886 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fu7Ij-0000rg-SR
+	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:30:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53686 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fu7BG-0002S0-MU
-	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:23:04 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 27 Aug 2018 10:22:53 +0800
-Message-Id: <20180827022253.28140-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] slirp: Implement RFC2132 TFTP server name
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fu7Ij-0000qT-L6
+	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:30:45 -0400
+Date: Mon, 27 Aug 2018 10:30:35 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180827023035.GE3020@xz-x1>
+References: <20180824090826.21370-1-peterx@redhat.com>
+	<CAJ+F1C+4rshvZ6wNLq0Lo95tPXm_iUxorgRYeNYqgyQCYvxBNQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1C+4rshvZ6wNLq0Lo95tPXm_iUxorgRYeNYqgyQCYvxBNQ@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/3] chardev: introduce chardev contexts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,168 +28,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, berrange@redhat.com, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, brad@comstyle.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This new usernet option can be used to add data for option 66 (tftp
-server name) in the BOOTP reply, which is useful in PXE based automatic
-OS install such as OpenBSD.
+On Fri, Aug 24, 2018 at 03:46:03PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Hi,
+>=20
+> On Fri, Aug 24, 2018 at 11:10 AM Peter Xu <peterx@redhat.com> wrote:
+> >
+> > This is a RFC series.  It majorly did these things:
+> >
+> > (1) move the monitor iothread management from monitor code to chardev
+> >     code somehow,
+> >
+> > (2) decide which context/iothread to use for the chardev before
+> >     chardev creates, by parsing monitor options earlier (not init, bu=
+t
+> >     only parsing) since monitor is the only exception now,
+> >
+> > (2) disallow chardev context to change for the whole lifecycle.
+> >
+> > Basically this work moves the only chardev iothread (the monitor
+> > iothread) into chardev's management, then it's easy to setup the
+> > iothread even before the chardev creates, hence no context switch for
+> > chardev is needed any more.  In the future if we want to let any
+> > chardev to run on some other threads, we just define a new
+> > ChardevContext, then do qemu_opt_set_number(...) for the chardev.  Fo=
+r
+> > now, there is only a monitor context.
+> >
+> > It does not mean that this will let chardev depend on monitor code,
+> > instead it'll totally remove the reverse dependency - before this
+> > work, the chardev backend strangely depends on the frontend to setup
+> > the context (which brought us many trouble).  Now this should be gone=
+.
+> >
+> > This series should solve the potential issue raised here:
+> >
+> >   https://patchwork.kernel.org/patch/10122713/#22187395
+> >
+> > And also should let Marc-Andr=C3=A9's vhost-user reconnect series wor=
+k
+> > without breaking context switch of chardev (since it never switches
+> > now hence no way to break):
+> >
+> >   http://patchwork.ozlabs.org/cover/961442/
+> >
+> > Only smoke test carried out with out-of-band, and make check.
+> >
+> > Please have a look on whether this is a workable solution,
+>=20
+> Clever hack!
+>=20
+> The code could be simplified somewhat:
+> - it probably doesn't need ChardevContextMap
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
+Is it because we only have monitor to use it?  If so, I suspect we
+might still want it since I'm just thinking maybe we can add a second
+one for COLO...
 
-v2: - Adjust parameter order and field placement to be closer to other
-tftp options. [Samuel]
-    - Drop 'optional'. [Eric]
----
- net/slirp.c      | 5 ++++-
- qapi/net.json    | 5 ++++-
- slirp/bootp.c    | 8 ++++++++
- slirp/bootp.h    | 1 +
- slirp/libslirp.h | 4 +++-
- slirp/slirp.c    | 5 ++++-
- slirp/slirp.h    | 1 +
- 7 files changed, 25 insertions(+), 4 deletions(-)
+[2]
 
-diff --git a/net/slirp.c b/net/slirp.c
-index 1e14318b4d..90ef09b40a 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -158,6 +158,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-                           const char *vnameserver, const char *vnameserver6,
-                           const char *smb_export, const char *vsmbserver,
-                           const char **dnssearch, const char *vdomainname,
-+                          const char *tftp_server_name,
-                           Error **errp)
- {
-     /* default settings according to historic slirp */
-@@ -376,6 +377,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
- 
-     s->slirp = slirp_init(restricted, ipv4, net, mask, host,
-                           ipv6, ip6_prefix, vprefix6_len, ip6_host,
-+                          tftp_server_name,
-                           vhostname, tftp_export, bootfile, dhcp,
-                           dns, ip6_dns, dnssearch, vdomainname, s);
-     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
-@@ -966,7 +968,8 @@ int net_init_slirp(const Netdev *netdev, const char *name,
-                          user->ipv6_host, user->hostname, user->tftp,
-                          user->bootfile, user->dhcpstart,
-                          user->dns, user->ipv6_dns, user->smb,
--                         user->smbserver, dnssearch, user->domainname, errp);
-+                         user->smbserver, dnssearch, user->domainname,
-+                         user->tftp_server_name, errp);
- 
-     while (slirp_configs) {
-         config = slirp_configs;
-diff --git a/qapi/net.json b/qapi/net.json
-index c86f351161..8f99fd911d 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -174,6 +174,8 @@
- #
- # @guestfwd: forward guest TCP connections
- #
-+# @tftp-server-name: RFC2132 "TFTP server name" string (Since 3.1)
-+#
- # Since: 1.2
- ##
- { 'struct': 'NetdevUserOptions',
-@@ -198,7 +200,8 @@
-     '*smb':       'str',
-     '*smbserver': 'str',
-     '*hostfwd':   ['String'],
--    '*guestfwd':  ['String'] } }
-+    '*guestfwd':  ['String'],
-+    '*tftp-server-name': 'str' } }
- 
- ##
- # @NetdevTapOptions:
-diff --git a/slirp/bootp.c b/slirp/bootp.c
-index 9e7b53ba94..ed2cf3b96e 100644
---- a/slirp/bootp.c
-+++ b/slirp/bootp.c
-@@ -306,6 +306,14 @@ static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
-             q += val;
-         }
- 
-+        if (slirp->tftp_server_name) {
-+            val = strlen(slirp->tftp_server_name);
-+            *q++ = RFC2132_TFTP_SERVER_NAME;
-+            *q++ = val;
-+            memcpy(q, slirp->tftp_server_name, val);
-+            q += val;
-+        }
-+
-         if (slirp->vdnssearch) {
-             size_t spaceleft = sizeof(rbp->bp_vend) - (q - rbp->bp_vend);
-             val = slirp->vdnssearch_len;
-diff --git a/slirp/bootp.h b/slirp/bootp.h
-index 394525733e..4043489835 100644
---- a/slirp/bootp.h
-+++ b/slirp/bootp.h
-@@ -70,6 +70,7 @@
- #define RFC2132_MAX_SIZE	57
- #define RFC2132_RENEWAL_TIME    58
- #define RFC2132_REBIND_TIME     59
-+#define RFC2132_TFTP_SERVER_NAME 66
- 
- #define DHCPDISCOVER		1
- #define DHCPOFFER		2
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 740408a96e..0e84ab9b52 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -13,10 +13,12 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   bool in6_enabled,
-                   struct in6_addr vprefix_addr6, uint8_t vprefix_len,
-                   struct in6_addr vhost6, const char *vhostname,
-+                  const char *tftp_server_name,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque);
-+                  const char *vdomainname,
-+                  void *opaque);
- void slirp_cleanup(Slirp *slirp);
- 
- void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout);
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 5c3bd6163f..4073b0174f 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -283,10 +283,12 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   bool in6_enabled,
-                   struct in6_addr vprefix_addr6, uint8_t vprefix_len,
-                   struct in6_addr vhost6, const char *vhostname,
-+                  const char *tftp_server_name,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
--                  const char *vdomainname, void *opaque)
-+                  const char *vdomainname,
-+                  void *opaque)
- {
-     Slirp *slirp = g_malloc0(sizeof(Slirp));
- 
-@@ -321,6 +323,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-     slirp->vdhcp_startaddr = vdhcp_start;
-     slirp->vnameserver_addr = vnameserver;
-     slirp->vnameserver_addr6 = vnameserver6;
-+    slirp->tftp_server_name = g_strdup(tftp_server_name);
- 
-     if (vdnssearch) {
-         translate_dnssearch(slirp, vdnssearch);
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 10b410898a..b80725a0d6 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -212,6 +212,7 @@ struct Slirp {
-     /* tftp states */
-     char *tftp_prefix;
-     struct tftp_session tftp_sessions[TFTP_SESSIONS_MAX];
-+    char *tftp_server_name;
- 
-     ArpTable arp_table;
-     NdpTable ndp_table;
--- 
-2.17.1
+> - I would not typedef ChardevContext (took me a while to realize it was=
+ an enum)
+
+Maybe, ChardevContextType?
+
+> - we should avoid the "context" option, perhaps during chardev
+> parsing, check -mon usage.
+
+[2]
+
+> - more :)
+>=20
+> Other issues:
+> - blend monitor code in chardev
+
+As I mentioned in the cover letter, my intention is not to blend
+monitor code into chardev.  For example, we can define the name as
+CHR_CONTEXT_1 rather than CHR_CONTEXT_MONITOR and comment with
+
+  /* CONTEXT_1 should only be used by monitor */
+
+but it's just not that direct.  I'd say it's not "blending monitor
+codes in chardev", but a pure naming.  Instead, actually I see [1]
+tries to blend monitor code in chardev, which I would prefer not.
+That's why I used the QemuOpts to pass and decide what context to use.
+
+> - chardev cleanup is done after monitor cleanup, this may race iothread=
+s
+
+Will it?  My plan is that we only let frontend (monitor) depends on
+the frontend (chardev), then cleaning monitor then chardev seems the
+correct order for me without race, no?
+
+> - breaks chardev context switching (colo)
+
+I just had a glance at COLO, I'm not sure but... I think it's not
+really using the "dynamic context switching".  IMHO it only needs a
+separate context.  If so, it should be able to live with this series,
+we might just need to define one more for COLO at [1].
+
+> - not a very dynamic solution (doesn't help to create oob monitor dynam=
+ically)
+
+I never created monitors dynamically, but if we want that we might
+need to expose this "context" property to user, then we can
+dynamically create out-of-band monitors (as long as when we create the
+chardev for the out-of-band monitor we pass in correct context
+property).
+
+>=20
+> I'd continue to look for options, we might come back to this one eventu=
+ally :)
+>=20
+> thanks!
+
+Thanks for the very positive feedback! :) Yes, let's see whether we
+have better alternatives.
+
+Regards,
+
+--=20
+Peter Xu
