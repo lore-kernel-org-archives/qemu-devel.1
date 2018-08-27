@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuFfn-0007YS-Tj
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:27:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1fuFiG-0008KH-GD
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:29:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuFfn-0007NU-AE
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:27:07 -0400
-References: <20180823222249.13518-1-jsnow@redhat.com>
-	<20180823222249.13518-4-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <50fb1b99-3586-19ab-df2a-a489c0740064@redhat.com>
-Date: Mon, 27 Aug 2018 13:26:52 +0200
+	(envelope-from <armbru@redhat.com>) id 1fuFiD-0003EQ-4F
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:29:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32842 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuFiC-0003E7-Vf
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:29:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A509E4023ECB
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 11:29:36 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180815133747.25032-1-peterx@redhat.com>
+	<20180815133747.25032-2-peterx@redhat.com>
+Date: Mon, 27 Aug 2018 13:29:29 +0200
+In-Reply-To: <20180815133747.25032-2-peterx@redhat.com> (Peter Xu's message of
+	"Wed, 15 Aug 2018 21:37:35 +0800")
+Message-ID: <87ftz0ujxi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180823222249.13518-4-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="J834ogyofIYjZ0ekrH2aaPGup2F7zkCck"
-Subject: Re: [Qemu-devel] [PATCH v2 03/13] block/stream: add block job
- creation flags
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 01/13] monitor: simplify
+ monitor_qmp_setup_handlers_bh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---J834ogyofIYjZ0ekrH2aaPGup2F7zkCck
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com,
- Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <50fb1b99-3586-19ab-df2a-a489c0740064@redhat.com>
-Subject: Re: [PATCH v2 03/13] block/stream: add block job creation flags
-References: <20180823222249.13518-1-jsnow@redhat.com>
- <20180823222249.13518-4-jsnow@redhat.com>
-In-Reply-To: <20180823222249.13518-4-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Peter Xu <peterx@redhat.com> writes:
 
-On 2018-08-24 00:22, John Snow wrote:
-> Add support for taking and passing forward job creaton flags.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> When we reach monitor_qmp_setup_handlers_bh() we must be using the
+> IOThread then, so no need to check against it any more.  Instead, we
+> assert.
+>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  block/stream.c            | 5 +++--
->  blockdev.c                | 3 ++-
->  include/block/block_int.h | 5 ++++-
->  3 files changed, 9 insertions(+), 4 deletions(-)
+>  monitor.c | 13 ++++---------
+>  1 file changed, 4 insertions(+), 9 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 77861e96af..5cd9398824 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4624,15 +4624,10 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
+>      Monitor *mon = opaque;
+>      GMainContext *context;
+>  
+> -    if (mon->use_io_thread) {
+> -        /* Use @mon_iothread context */
+> -        context = monitor_get_io_context();
+> -        assert(context);
+> -    } else {
+> -        /* Use default main loop context */
+> -        context = NULL;
+> -    }
+> -
+> +    assert(mon->use_io_thread);
+> +    /* Use @mon_iothread context */
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Mind if I drop this comment?
 
+> +    context = monitor_get_io_context();
+> +    assert(context);
+>      qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
+>                               monitor_qmp_event, NULL, mon, context, true);
+>      monitor_list_append(mon);
 
---J834ogyofIYjZ0ekrH2aaPGup2F7zkCck
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluD3/wACgkQ9AfbAGHV
-z0Aw7QgAslStGbY7heXbqSczjKstzE32Z6BPedyRwYGLxlshRCfVw1K5ukIMFssV
-gnfh2KKktNHkN2yvYYFKWyt7i9GB1LsvdlHfJeNpPuH1ZTprnU0WxiB2Mu2+8dSV
-hIx3+II/PgeaYz/UXWm1ALhWxwVRp8GqkQi4sg2L91dqZ9mrKP6XS2VzLhLYlCeU
-8moX5MlowoDdae5RhhMAH0pUu0rr1oplbQejOpyoSRoGfL5JeGHJeL8rioWwRyNE
-NGmmuyOrZa4Jx04JeSH+g0RmWO+bH+XpoLZDQsDkwejxLtyBynWTBfcygeNqBpNn
-5JCmY9KpQ0FGy0DC1xBoSv5IZ0YCVQ==
-=ym1O
------END PGP SIGNATURE-----
-
---J834ogyofIYjZ0ekrH2aaPGup2F7zkCck--
+R-by stands, of course.
