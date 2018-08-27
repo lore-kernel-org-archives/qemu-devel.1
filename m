@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45360)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuIf0-0001zv-1f
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:30 -0400
+	id 1fuIf5-00022m-72
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuIew-00007O-6a
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:29 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:44692)
+	id 1fuIf0-0000Au-Te
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:35 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:62974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=770980de4=jancraig@amazon.com>)
-	id 1fuIev-00006I-SJ
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:25 -0400
+	id 1fuIf0-0000Ak-Lk
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 10:38:30 -0400
 From: Craig Janeczek <jancraig@amazon.com>
-Date: Mon, 27 Aug 2018 10:38:06 -0400
-Message-Id: <20180827143806.25048-7-jancraig@amazon.com>
+Date: Mon, 27 Aug 2018 10:38:05 -0400
+Message-Id: <20180827143806.25048-6-jancraig@amazon.com>
 In-Reply-To: <20180827143806.25048-1-jancraig@amazon.com>
 References: <20180827143806.25048-1-jancraig@amazon.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] target/mips: Add MXU instructions
- S32LDD and S32LDDR
+Subject: [Qemu-devel] [PATCH v2 5/6] target/mips: Add MXU instructions Q8MUL
+ and Q8MULSU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,7 +30,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: amarkovic@wavecomp.com, aurelien@aurel32.net, Craig Janeczek <jancraig@amazon.com>
 
-Adds support for emulating the S32LDD and S32LDDR MXU instructions.
+Adds support for emulating the Q8MUL and Q8MULSU instructions.
 
 Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 ---
@@ -39,104 +39,122 @@ Signed-off-by: Craig Janeczek <jancraig@amazon.com>
  v2
     - changed bitfield usage to extract32
 
- target/mips/translate.c | 43 ++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 38 insertions(+), 5 deletions(-)
+ target/mips/translate.c | 70 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 69 insertions(+), 1 deletion(-)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e2def36b03..2eb7c02741 100644
+index 7d37567652..e2def36b03 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -347,7 +347,8 @@ enum {
-     OPC_MSUB     = 0x04 | OPC_SPECIAL2,
-     OPC_MSUBU    = 0x05 | OPC_SPECIAL2,
-     /* Loongson 2F */
--    OPC_MULT_G_2F   = 0x10 | OPC_SPECIAL2,
-+    /* opcode 0x10 overlaps loongson and MXU command */
-+    OPC_MULT_G_2F_MXU_S32LDD   = 0x10 | OPC_SPECIAL2,
-     OPC_DMULT_G_2F  = 0x11 | OPC_SPECIAL2,
-     OPC_MULTU_G_2F  = 0x12 | OPC_SPECIAL2,
-     OPC_DMULTU_G_2F = 0x13 | OPC_SPECIAL2,
-@@ -3776,7 +3777,7 @@ static void gen_cl (DisasContext *ctx, uint32_t opc,
+@@ -370,6 +370,7 @@ enum {
+     OPC_MXU_S8LDD  = 0x22 | OPC_SPECIAL2,
+     OPC_MXU_S32I2M = 0x2F | OPC_SPECIAL2,
+     OPC_MXU_S32M2I = 0x2E | OPC_SPECIAL2,
++    OPC_MXU_Q8MUL  = 0x38 | OPC_SPECIAL2,
+     /* Special */
+     OPC_SDBBP    = 0x3F | OPC_SPECIAL2,
+ };
+@@ -3774,13 +3775,17 @@ static void gen_cl (DisasContext *ctx, uint32_t opc,
+ /* MXU Instructions */
  static void gen_mxu(DisasContext *ctx, uint32_t opc)
  {
-     TCGv t0, t1, t2, t3, t4, t5, t6, t7;
--    uint32_t rb, xra, xrb, xrc, xrd, s8, sel, optn2, optn3, aptn2;
-+    uint32_t rb, xra, xrb, xrc, xrd, s8, s12, sel, optn2, optn3, aptn2;
+-    TCGv t0, t1, t2, t3;
++    TCGv t0, t1, t2, t3, t4, t5, t6, t7;
+     uint32_t rb, xra, xrb, xrc, xrd, s8, sel, optn2, optn3, aptn2;
  
      t0 = tcg_temp_new();
      t1 = tcg_temp_new();
-@@ -3858,6 +3859,29 @@ static void gen_mxu(DisasContext *ctx, uint32_t opc)
-         gen_store_mxu_gpr(t0, xra);
-         break;
+     t2 = tcg_temp_new();
+     t3 = tcg_temp_new();
++    t4 = tcg_temp_new();
++    t5 = tcg_temp_new();
++    t6 = tcg_temp_new();
++    t7 = tcg_temp_new();
  
-+    case OPC_MULT_G_2F_MXU_S32LDD:
+     switch (opc) {
+     case OPC_MXU_S32I2M:
+@@ -3951,12 +3956,74 @@ static void gen_mxu(DisasContext *ctx, uint32_t opc)
+         gen_store_mxu_gpr(t3, xra);
+         gen_store_mxu_gpr(t2, xrd);
+         break;
++
++    case OPC_MXU_Q8MUL:
 +        xra = extract32(ctx->opcode, 6, 4);
-+        s12 = extract32(ctx->opcode, 10, 10);
-+        sel = extract32(ctx->opcode, 20, 1);
-+        rb = extract32(ctx->opcode, 21, 5);
++        xrb = extract32(ctx->opcode, 10, 4);
++        xrc = extract32(ctx->opcode, 14, 4);
++        xrd = extract32(ctx->opcode, 18, 4);
++        sel = extract32(ctx->opcode, 22, 4);
 +
-+        gen_load_gpr(t0, rb);
++        gen_load_mxu_gpr(t3, xrb);
++        gen_load_mxu_gpr(t7, xrc);
 +
-+        tcg_gen_movi_tl(t1, s12);
-+        tcg_gen_shli_tl(t1, t1, 2);
-+        if (s12 & 0x200) {
-+            tcg_gen_ori_tl(t1, t1, 0xFFFFF000);
++        if (sel == 0x2) {
++            /* Q8MULSU */
++            tcg_gen_ext8s_tl(t0, t3);
++            tcg_gen_shri_tl(t3, t3, 8);
++            tcg_gen_ext8s_tl(t1, t3);
++            tcg_gen_shri_tl(t3, t3, 8);
++            tcg_gen_ext8s_tl(t2, t3);
++            tcg_gen_shri_tl(t3, t3, 8);
++            tcg_gen_ext8s_tl(t3, t3);
++        } else {
++            /* Q8MUL */
++            tcg_gen_ext8u_tl(t0, t3);
++            tcg_gen_shri_tl(t3, t3, 8);
++            tcg_gen_ext8u_tl(t1, t3);
++            tcg_gen_shri_tl(t3, t3, 8);
++            tcg_gen_ext8u_tl(t2, t3);
++            tcg_gen_shri_tl(t3, t3, 8);
++            tcg_gen_ext8u_tl(t3, t3);
 +        }
-+        tcg_gen_add_tl(t1, t0, t1);
-+        tcg_gen_qemu_ld_tl(t1, t1, ctx->mem_idx, MO_SL);
 +
-+        if (sel == 1) {
-+            /* S32LDDR */
-+            tcg_gen_bswap32_tl(t1, t1);
-+        }
++        tcg_gen_ext8u_tl(t4, t7);
++        tcg_gen_shri_tl(t7, t7, 8);
++        tcg_gen_ext8u_tl(t5, t7);
++        tcg_gen_shri_tl(t7, t7, 8);
++        tcg_gen_ext8u_tl(t6, t7);
++        tcg_gen_shri_tl(t7, t7, 8);
++        tcg_gen_ext8u_tl(t7, t7);
++
++        tcg_gen_mul_tl(t0, t0, t4);
++        tcg_gen_mul_tl(t1, t1, t5);
++        tcg_gen_mul_tl(t2, t2, t6);
++        tcg_gen_mul_tl(t3, t3, t7);
++
++        tcg_gen_andi_tl(t0, t0, 0xFFFF);
++        tcg_gen_andi_tl(t1, t1, 0xFFFF);
++        tcg_gen_andi_tl(t2, t2, 0xFFFF);
++        tcg_gen_andi_tl(t3, t3, 0xFFFF);
++
++        tcg_gen_shli_tl(t1, t1, 16);
++        tcg_gen_shli_tl(t3, t3, 16);
++
++        tcg_gen_or_tl(t0, t0, t1);
++        tcg_gen_or_tl(t1, t2, t3);
++
++        gen_store_mxu_gpr(t0, xrd);
 +        gen_store_mxu_gpr(t1, xra);
 +        break;
-+
+     }
+ 
+     tcg_temp_free(t0);
+     tcg_temp_free(t1);
+     tcg_temp_free(t2);
+     tcg_temp_free(t3);
++    tcg_temp_free(t4);
++    tcg_temp_free(t5);
++    tcg_temp_free(t6);
++    tcg_temp_free(t7);
+ }
+ 
+ /* Godson integer instructions */
+@@ -18045,6 +18112,7 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MXU_S8LDD:
      case OPC_MXU_D16MUL:
-         xra = extract32(ctx->opcode, 6, 4);
-         xrb = extract32(ctx->opcode, 10, 4);
-@@ -4039,7 +4063,7 @@ static void gen_loongson_integer(DisasContext *ctx, uint32_t opc,
- 
-     switch (opc) {
-     case OPC_MULT_G_2E:
--    case OPC_MULT_G_2F:
-+    case OPC_MULT_G_2F_MXU_S32LDD:
-     case OPC_MULTU_G_2E:
-     case OPC_MULTU_G_2F:
- #if defined(TARGET_MIPS64)
-@@ -4062,7 +4086,7 @@ static void gen_loongson_integer(DisasContext *ctx, uint32_t opc,
- 
-     switch (opc) {
-     case OPC_MULT_G_2E:
--    case OPC_MULT_G_2F:
-+    case OPC_MULT_G_2F_MXU_S32LDD:
-         tcg_gen_mul_tl(cpu_gpr[rd], t0, t1);
-         tcg_gen_ext32s_tl(cpu_gpr[rd], cpu_gpr[rd]);
-         break;
-@@ -18099,7 +18123,6 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
-         break;
-     case OPC_DIV_G_2F:
-     case OPC_DIVU_G_2F:
--    case OPC_MULT_G_2F:
-     case OPC_MULTU_G_2F:
-     case OPC_MOD_G_2F:
-     case OPC_MODU_G_2F:
-@@ -18116,6 +18139,16 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MXU_D16MAC:
++    case OPC_MXU_Q8MUL:
          gen_mxu(ctx, op1);
          break;
  
-+    case OPC_MULT_G_2F_MXU_S32LDD:
-+        /* There is an overlap of opcodes between Loongson2F and MXU */
-+        if (ctx->insn_flags & INSN_LOONGSON2F) {
-+            check_insn(ctx, INSN_LOONGSON2F);
-+            gen_loongson_integer(ctx, op1, rd, rs, rt);
-+        } else {
-+            gen_mxu(ctx, op1);
-+        }
-+        break;
-+
-     case OPC_CLO:
-     case OPC_CLZ:
-         check_insn(ctx, ISA_MIPS32);
 -- 
 2.18.0
