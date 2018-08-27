@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fuMSR-000153-Ld
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 14:41:57 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fuMUc-00050E-9m
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 14:44:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fuMSE-0007dl-Ls
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 14:41:45 -0400
-Received: from smtp58.i.mail.ru ([217.69.128.38]:45136)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fuMSE-0007aN-7x
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 14:41:34 -0400
-From: Julia Suvorova <jusual@mail.ru>
-Date: Mon, 27 Aug 2018 21:41:03 +0300
-Message-Id: <20180827184103.32190-3-jusual@mail.ru>
-In-Reply-To: <20180827184103.32190-1-jusual@mail.ru>
-References: <20180827184103.32190-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH v2 2/2] tests/test-char: Check websocket
- chardev functionality
+	(envelope-from <jsnow@redhat.com>) id 1fuMUa-0001Bg-Qr
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 14:44:02 -0400
+References: <20180823220856.10094-1-jsnow@redhat.com>
+	<20180823220856.10094-9-jsnow@redhat.com>
+	<e6fc7a59-748e-858b-0359-89749025105e@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <2434a4b3-b481-7645-89ac-81ec518cec1d@redhat.com>
+Date: Mon, 27 Aug 2018 14:43:45 -0400
+MIME-Version: 1.0
+In-Reply-To: <e6fc7a59-748e-858b-0359-89749025105e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 8/9] jobs: remove ret argument to
+ job_completed; privatize it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,167 +26,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>
 
-Test order:
-    Creating server websocket chardev
-    Creating usual tcp chardev client
-    Sending handshake message from client
-    Receiving handshake reply
-    Sending ping frame with "hello" payload
-    Receiving pong reply
-    Sending binary data "world"
-    Checking the received data on server side
-    Checking of closing handshake
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
- tests/test-char.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 125 insertions(+)
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 5905d31441..deba699b25 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -406,6 +406,130 @@ static void char_socket_fdpass_test(void)
- }
- 
- 
-+static void websock_server_read(void *opaque, const uint8_t *buf, int size)
-+{
-+    g_assert(size == 5);
-+    g_assert(strncmp((char *) buf, "world", size) == 0);
-+    quit = true;
-+}
-+
-+
-+static int websock_server_can_read(void *opaque)
-+{
-+    return 10;
-+}
-+
-+
-+static bool websock_check_http_headers(char *buf, int size)
-+{
-+    int i;
-+    const char *ans[] = { "HTTP/1.1 101 Switching Protocols\r\n",
-+                          "Server: QEMU VNC\r\n",
-+                          "Upgrade: websocket\r\n",
-+                          "Connection: Upgrade\r\n",
-+                          "Sec-WebSocket-Accept:",
-+                          "Sec-WebSocket-Protocol: binary\r\n" };
-+
-+    for (i = 0; i < 6; i++) {
-+        if (g_strstr_len(buf, size, ans[i]) == NULL) {
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+}
-+
-+
-+static void websock_client_read(void *opaque, const uint8_t *buf, int size)
-+{
-+    const uint8_t ping[] = { 0x89, 0x85,                  /* Ping header */
-+                             0x07, 0x77, 0x9e, 0xf9,      /* Masking key */
-+                             0x6f, 0x12, 0xf2, 0x95, 0x68 /* "hello" */ };
-+
-+    const uint8_t binary[] = { 0x82, 0x85,                  /* Binary header */
-+                               0x74, 0x90, 0xb9, 0xdf,      /* Masking key */
-+                               0x03, 0xff, 0xcb, 0xb3, 0x10 /* "world" */ };
-+    Chardev *chr_client = opaque;
-+
-+    if (websock_check_http_headers((char *) buf, size)) {
-+        qemu_chr_fe_write(chr_client->be, ping, sizeof(ping));
-+    } else if (buf[0] == 0x8a && buf[1] == 0x05) {
-+        g_assert(strncmp((char *) buf + 2, "hello", 5) == 0);
-+        qemu_chr_fe_write(chr_client->be, binary, sizeof(binary));
-+    } else {
-+        g_assert(buf[0] == 0x88 && buf[1] == 0x16);
-+        g_assert(strncmp((char *) buf + 4, "peer requested close", 10) == 0);
-+        quit = true;
-+    }
-+}
-+
-+
-+static int websock_client_can_read(void *opaque)
-+{
-+    return 4096;
-+}
-+
-+
-+static void char_websock_test(void)
-+{
-+    QObject *addr;
-+    QDict *qdict;
-+    const char *port;
-+    char *tmp;
-+    char *handshake_port;
-+    CharBackend be;
-+    CharBackend client_be;
-+    Chardev *chr_client;
-+    Chardev *chr = qemu_chr_new("server",
-+                                "websock:127.0.0.1:0,server,nowait");
-+    const char handshake[] = "GET / HTTP/1.1\r\n"
-+                             "Upgrade: websocket\r\n"
-+                             "Connection: Upgrade\r\n"
-+                             "Host: localhost:%s\r\n"
-+                             "Origin: http://localhost:%s\r\n"
-+                             "Sec-WebSocket-Key: o9JHNiS3/0/0zYE1wa3yIw==\r\n"
-+                             "Sec-WebSocket-Version: 13\r\n"
-+                             "Sec-WebSocket-Protocol: binary\r\n\r\n";
-+    const uint8_t close[] = { 0x88, 0x82,             /* Close header */
-+                              0xef, 0xaa, 0xc5, 0x97, /* Masking key */
-+                              0xec, 0x42              /* Status code */ };
-+
-+    addr = object_property_get_qobject(OBJECT(chr), "addr", &error_abort);
-+    qdict = qobject_to(QDict, addr);
-+    port = qdict_get_str(qdict, "port");
-+    tmp = g_strdup_printf("tcp:127.0.0.1:%s", port);
-+    handshake_port = g_strdup_printf(handshake, port, port);
-+    qobject_unref(qdict);
-+
-+    qemu_chr_fe_init(&be, chr, &error_abort);
-+    qemu_chr_fe_set_handlers(&be, websock_server_can_read, websock_server_read,
-+                             NULL, NULL, chr, NULL, true);
-+
-+    chr_client = qemu_chr_new("client", tmp);
-+    qemu_chr_fe_init(&client_be, chr_client, &error_abort);
-+    qemu_chr_fe_set_handlers(&client_be, websock_client_can_read,
-+                             websock_client_read,
-+                             NULL, NULL, chr_client, NULL, true);
-+    g_free(tmp);
-+
-+    qemu_chr_write_all(chr_client,
-+                       (uint8_t *) handshake_port,
-+                       strlen(handshake_port));
-+    g_free(handshake_port);
-+    main_loop();
-+
-+    g_assert(object_property_get_bool(OBJECT(chr), "connected", &error_abort));
-+    g_assert(object_property_get_bool(OBJECT(chr_client),
-+                                      "connected", &error_abort));
-+
-+    qemu_chr_write_all(chr_client, close, sizeof(close));
-+    main_loop();
-+
-+    object_unparent(OBJECT(chr_client));
-+    object_unparent(OBJECT(chr));
-+}
-+
-+
- #ifndef _WIN32
- static void char_pipe_test(void)
- {
-@@ -829,6 +953,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/char/serial", char_serial_test);
- #endif
-     g_test_add_func("/char/hotswap", char_hotswap_test);
-+    g_test_add_func("/char/websocket", char_websock_test);
- 
-     return g_test_run();
- }
--- 
-2.17.1
+On 08/27/2018 06:52 AM, Max Reitz wrote:
+> On 2018-08-24 00:08, John Snow wrote:
+>> Jobs are now expected to return their retcode on the stack, from the
+>> .run callback, so we can remove that argument.
+>>
+>> job_cancel does not need to set -ECANCELED because job_completed will
+>> update the return code itself if the job was canceled.
+>>
+>> While we're here, make job_completed static to job.c and remove it from
+>> job.h; move the documentation of return code to the .run() callback and
+>> to the job->ret property, accordingly.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  include/qemu/job.h | 24 +++++++++++-------------
+>>  job.c              | 11 ++++++-----
+>>  trace-events       |  2 +-
+>>  3 files changed, 18 insertions(+), 19 deletions(-)
+> 
+> Er, yeah.  Sorry for not being able to read.  Again.
+> 
+>> diff --git a/include/qemu/job.h b/include/qemu/job.h
+>> index c67f6a647e..2990f28edc 100644
+>> --- a/include/qemu/job.h
+>> +++ b/include/qemu/job.h
+>> @@ -124,7 +124,7 @@ typedef struct Job {
+>>      /** Estimated progress_current value at the completion of the job */
+>>      int64_t progress_total;
+>>  
+>> -    /** ret code passed to job_completed. */
+>> +    /** Return code from @run callback; 0 on success and -errno on failure. */
+> 
+> Hm.  Not really, it's the general status of the whole job, isn't it?
+> Besides being the return value from .run(), it's also set by .exit() (so
+> it's presumably going to be the return value from .prepare() after part
+> 2) and by job_update_rc() when the job has been cancelled.
+> 
+
+You're right. I was trying to emphasize where it gets set in the
+normative case. I'll rephrase.
+
+What I want to say is effectively: "This is the return code for the job,
+which is what gets returned by the .run and/or .prepare callbacks, or
+gets set to -ECANCELED if the job is canceled and the job itself
+neglects to set a nonzero code."
+
+>>      int ret;
+>>  
+>>      /** Error object for a failed job **/
+>> @@ -168,7 +168,16 @@ struct JobDriver {
+>>      /** Enum describing the operation */
+>>      JobType job_type;
+>>  
+>> -    /** Mandatory: Entrypoint for the Coroutine. */
+>> +    /**
+>> +     * Mandatory: Entrypoint for the Coroutine.
+>> +     *
+>> +     * This callback will be invoked when moving from CREATED to RUNNING.
+>> +     *
+>> +     * If this callback returns nonzero, the job transaction it is part of is
+>> +     * aborted. If it returns zero, the job moves into the WAITING state. If it
+>> +     * is the last job to complete in its transaction, all jobs in the
+>> +     * transaction move from WAITING to PENDING.
+>> +     */
+> 
+> Moving this description from job_completed() seems to imply we do want
+> to call job_update_rc() right after invoking .run().
+> 
+
+Sure, I'll take a look at that.
+
+>>      int coroutine_fn (*run)(Job *job, Error **errp);
+>>  
+>>      /**
+>> @@ -492,17 +501,6 @@ void job_early_fail(Job *job);
+>>  /** Moves the @job from RUNNING to READY */
+>>  void job_transition_to_ready(Job *job);
+>>  
+>> -/**
+>> - * @job: The job being completed.
+>> - * @ret: The status code.
+>> - *
+>> - * Marks @job as completed. If @ret is non-zero, the job transaction it is part
+>> - * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
+>> - * is the last job to complete in its transaction, all jobs in the transaction
+>> - * move from WAITING to PENDING.
+>> - */
+>> -void job_completed(Job *job, int ret);
+>> -
+>>  /** Asynchronously complete the specified @job. */
+>>  void job_complete(Job *job, Error **errp);
+>>  
+>> diff --git a/job.c b/job.c
+>> index bc8dad4e71..213042b762 100644
+>> --- a/job.c
+>> +++ b/job.c
+>> @@ -535,6 +535,8 @@ void job_drain(Job *job)
+>>      }
+>>  }
+>>  
+>> +static void job_completed(Job *job);
+>> +
+>>  static void job_exit(void *opaque)
+>>  {
+>>      Job *job = (Job *)opaque;
+>> @@ -545,7 +547,7 @@ static void job_exit(void *opaque)
+>>          job->driver->exit(job);
+>>          aio_context_release(aio_context);
+>>      }
+>> -    job_completed(job, job->ret);
+>> +    job_completed(job);
+>>  }
+>>  
+>>  /**
+>> @@ -883,13 +885,12 @@ static void job_completed_txn_success(Job *job)
+>>      }
+>>  }
+>>  
+>> -void job_completed(Job *job, int ret)
+>> +static void job_completed(Job *job)
+>>  {
+>>      assert(job && job->txn && !job_is_completed(job));
+>>  
+>> -    job->ret = ret;
+>>      job_update_rc(job);
+> 
+> I think we want to remove the job_update_rc() from here.  It should be
+> called after job->ret is updated, i.e. immediately after .run() and
+> .exit() have been invoked.  (Or presumably .prepare() in part 2.)
+> Oh, and in job_cancel() before it invokes job_completed()?
+> 
+> But then again, maybe it would be easiest to keep it here...  It just
+> doesn't feel quite right to me.
+> 
+> Max
+> 
+
+It does feel slightly strange now. I'll see if I can find something that
+feels better.
+
+>> -    trace_job_completed(job, ret, job->ret);
+>> +    trace_job_completed(job, job->ret);
+>>      if (job->ret) {
+>>          job_completed_txn_abort(job);
+>>      } else {
+>> @@ -905,7 +906,7 @@ void job_cancel(Job *job, bool force)
+>>      }
+>>      job_cancel_async(job, force);
+>>      if (!job_started(job)) {
+>> -        job_completed(job, -ECANCELED);
+>> +        job_completed(job);
+>>      } else if (job->deferred_to_main_loop) {
+>>          job_completed_txn_abort(job);
+>>      } else {
+>> diff --git a/trace-events b/trace-events
+>> index c445f54773..4fd2cb4b97 100644
+>> --- a/trace-events
+>> +++ b/trace-events
+>> @@ -107,7 +107,7 @@ gdbstub_err_checksum_incorrect(uint8_t expected, uint8_t got) "got command packe
+>>  # job.c
+>>  job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
+>>  job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
+>> -job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
+>> +job_completed(void *job, int ret) "job %p ret %d"
+>>  
+>>  # job-qmp.c
+>>  qmp_job_cancel(void *job) "job %p"
+>>
+> 
+> 
