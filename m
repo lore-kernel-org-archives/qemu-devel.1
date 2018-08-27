@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fuPv2-0003eG-Tf
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fuPv2-0003eF-SD
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fuPv1-0005c5-GX
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fuPv0-0005bi-0A
 	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36020 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51152 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fuPv1-0005bx-9q
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:31 -0400
+	id 1fuPuz-0005b3-QW
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 18:23:29 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 03E81401EF2F
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 22:23:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7BB9E8011309
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 22:23:29 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 28 Aug 2018 00:23:15 +0200
-Message-Id: <20180827222322.26009-3-marcandre.lureau@redhat.com>
+Date: Tue, 28 Aug 2018 00:23:14 +0200
+Message-Id: <20180827222322.26009-2-marcandre.lureau@redhat.com>
 In-Reply-To: <20180827222322.26009-1-marcandre.lureau@redhat.com>
 References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/9] chardev: mark the calls that allow an
- implicit mux monitor
+Subject: [Qemu-devel] [PATCH 1/9] char.h: fix gtk-doc comment style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,313 +36,438 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, berrange@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This is mostly for readability of the code. Let's make it clear which
-callers can create an implicit monitor when the chardev is muxed.
-
-This will also enforce a safer behaviour, as we don't really support
-creating monitor anywhere/anytime at the moment. Add an assert() to
-make sure the programmer explicitely wanted that behaviour.
-
-There are documented cases, such as: -serial/-parallel/-virtioconsole
-and to less extent -debugcon.
-
-Less obvious and questionable ones are -gdb, SLIRP -guestfwd and Xen
-console. Add a FIXME note for those, but keep the support for now.
-
-Other qemu_chr_new() callers either have a fixed parameter/filename
-string or do not need it, such as -qtest:
-
-* qtest.c: qtest_init()
-  Afaik, only used by tests/libqtest.c, without mux. I don't think we
-  support it outside of qemu testing: drop support for implicit mux
-  monitor (qemu_chr_new() call: no implicit mux now).
-
-* hw/
-  All with literal @filename argument that doesn't enable mux monitor.
-
-* tests/
-  All with @filename argument that doesn't enable mux monitor.
-
-On a related note, the list of monitor creation places:
-
-- the chardev creators listed above: all from command line (except
-  perhaps Xen console?)
-
-- -gdb & hmp gdbserver will create a "GDB monitor command" chardev
-  that is wired to an HMP monitor.
-
-- -mon command line option
-
->From this short study, I would like to think that a monitor may only
-be created in the main thread today, though I remain skeptical :)
+Use the gtk-doc function comment style, as documented in:
+https://developer.gnome.org/gtk-doc-manual/stable/documenting_symbols.htm=
+l.en
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/chardev/char.h | 24 ++++++++++++++++++++----
- chardev/char.c         | 32 +++++++++++++++++++++++++-------
- gdbstub.c              |  6 +++++-
- hw/char/xen_console.c  |  5 ++++-
- net/slirp.c            |  5 ++++-
- vl.c                   | 10 +++++-----
- 6 files changed, 63 insertions(+), 19 deletions(-)
+ include/chardev/char-fe.h | 81 ++++++++++++++++++---------------------
+ include/chardev/char.h    | 61 +++++++++++++----------------
+ 2 files changed, 63 insertions(+), 79 deletions(-)
 
+diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
+index c67271f1ba..21071f1fb1 100644
+--- a/include/chardev/char-fe.h
++++ b/include/chardev/char-fe.h
+@@ -20,7 +20,7 @@ struct CharBackend {
+ };
+=20
+ /**
+- * @qemu_chr_fe_init:
++ * qemu_chr_fe_init:
+  *
+  * Initializes a front end for the given CharBackend and
+  * Chardev. Call qemu_chr_fe_deinit() to remove the association and
+@@ -31,7 +31,7 @@ struct CharBackend {
+ bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp);
+=20
+ /**
+- * @qemu_chr_fe_deinit:
++ * qemu_chr_fe_deinit:
+  * @b: a CharBackend
+  * @del: if true, delete the chardev backend
+ *
+@@ -42,9 +42,9 @@ bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error=
+ **errp);
+ void qemu_chr_fe_deinit(CharBackend *b, bool del);
+=20
+ /**
+- * @qemu_chr_fe_get_driver:
++ * qemu_chr_fe_get_driver:
+  *
+- * Returns the driver associated with a CharBackend or NULL if no
++ * Returns: the driver associated with a CharBackend or NULL if no
+  * associated Chardev.
+  * Note: avoid this function as the driver should never be accessed dire=
+ctly,
+  *       especially by the frontends that support chardevice hotswap.
+@@ -53,21 +53,21 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del);
+ Chardev *qemu_chr_fe_get_driver(CharBackend *be);
+=20
+ /**
+- * @qemu_chr_fe_backend_connected:
++ * qemu_chr_fe_backend_connected:
+  *
+- * Returns true if there is a chardevice associated with @be.
++ * Returns: true if there is a chardevice associated with @be.
+  */
+ bool qemu_chr_fe_backend_connected(CharBackend *be);
+=20
+ /**
+- * @qemu_chr_fe_backend_open:
++ * qemu_chr_fe_backend_open:
+  *
+- * Returns true if chardevice associated with @be is open.
++ * Returns: true if chardevice associated with @be is open.
+  */
+ bool qemu_chr_fe_backend_open(CharBackend *be);
+=20
+ /**
+- * @qemu_chr_fe_set_handlers:
++ * qemu_chr_fe_set_handlers:
+  * @b: a CharBackend
+  * @fd_can_read: callback to get the amount of data the frontend may
+  *               receive
+@@ -95,7 +95,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+                               bool set_open);
+=20
+ /**
+- * @qemu_chr_fe_take_focus:
++ * qemu_chr_fe_take_focus:
+  *
+  * Take the focus (if the front end is muxed).
+  *
+@@ -104,14 +104,14 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
+ void qemu_chr_fe_take_focus(CharBackend *b);
+=20
+ /**
+- * @qemu_chr_fe_accept_input:
++ * qemu_chr_fe_accept_input:
+  *
+  * Notify that the frontend is ready to receive data
+  */
+ void qemu_chr_fe_accept_input(CharBackend *be);
+=20
+ /**
+- * @qemu_chr_fe_disconnect:
++ * qemu_chr_fe_disconnect:
+  *
+  * Close a fd accepted by character backend.
+  * Without associated Chardev, do nothing.
+@@ -119,7 +119,7 @@ void qemu_chr_fe_accept_input(CharBackend *be);
+ void qemu_chr_fe_disconnect(CharBackend *be);
+=20
+ /**
+- * @qemu_chr_fe_wait_connected:
++ * qemu_chr_fe_wait_connected:
+  *
+  * Wait for characted backend to be connected, return < 0 on error or
+  * if no associated Chardev.
+@@ -127,19 +127,18 @@ void qemu_chr_fe_disconnect(CharBackend *be);
+ int qemu_chr_fe_wait_connected(CharBackend *be, Error **errp);
+=20
+ /**
+- * @qemu_chr_fe_set_echo:
++ * qemu_chr_fe_set_echo:
++ * @echo true to enable echo, false to disable echo
+  *
+  * Ask the backend to override its normal echo setting.  This only reall=
+y
+  * applies to the stdio backend and is used by the QMP server such that =
+you
+  * can see what you type if you try to type QMP commands.
+  * Without associated Chardev, do nothing.
+- *
+- * @echo true to enable echo, false to disable echo
+  */
+ void qemu_chr_fe_set_echo(CharBackend *be, bool echo);
+=20
+ /**
+- * @qemu_chr_fe_set_open:
++ * qemu_chr_fe_set_open:
+  *
+  * Set character frontend open status.  This is an indication that the
+  * front end is ready (or not) to begin doing I/O.
+@@ -148,83 +147,77 @@ void qemu_chr_fe_set_echo(CharBackend *be, bool ech=
+o);
+ void qemu_chr_fe_set_open(CharBackend *be, int fe_open);
+=20
+ /**
+- * @qemu_chr_fe_printf:
++ * qemu_chr_fe_printf:
++ * @fmt see #printf
+  *
+  * Write to a character backend using a printf style interface.  This
+  * function is thread-safe. It does nothing without associated
+  * Chardev.
+- *
+- * @fmt see #printf
+  */
+ void qemu_chr_fe_printf(CharBackend *be, const char *fmt, ...)
+     GCC_FMT_ATTR(2, 3);
+=20
+ /**
+- * @qemu_chr_fe_add_watch:
++ * qemu_chr_fe_add_watch:
++ * @cond the condition to poll for
++ * @func the function to call when the condition happens
++ * @user_data the opaque pointer to pass to @func
+  *
+  * If the backend is connected, create and add a #GSource that fires
+  * when the given condition (typically G_IO_OUT|G_IO_HUP or G_IO_HUP)
+  * is active; return the #GSource's tag.  If it is disconnected,
+  * or without associated Chardev, return 0.
+  *
+- * @cond the condition to poll for
+- * @func the function to call when the condition happens
+- * @user_data the opaque pointer to pass to @func
+- *
+  * Returns: the source tag
+  */
+ guint qemu_chr_fe_add_watch(CharBackend *be, GIOCondition cond,
+                             GIOFunc func, void *user_data);
+=20
+ /**
+- * @qemu_chr_fe_write:
++ * qemu_chr_fe_write:
++ * @buf the data
++ * @len the number of bytes to send
+  *
+  * Write data to a character backend from the front end.  This function
+  * will send data from the front end to the back end.  This function
+  * is thread-safe.
+  *
+- * @buf the data
+- * @len the number of bytes to send
+- *
+  * Returns: the number of bytes consumed (0 if no associated Chardev)
+  */
+ int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len);
+=20
+ /**
+- * @qemu_chr_fe_write_all:
++ * qemu_chr_fe_write_all:
++ * @buf the data
++ * @len the number of bytes to send
+  *
+  * Write data to a character backend from the front end.  This function =
+will
+  * send data from the front end to the back end.  Unlike @qemu_chr_fe_wr=
+ite,
+  * this function will block if the back end cannot consume all of the da=
+ta
+  * attempted to be written.  This function is thread-safe.
+  *
+- * @buf the data
+- * @len the number of bytes to send
+- *
+  * Returns: the number of bytes consumed (0 if no associated Chardev)
+  */
+ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len);
+=20
+ /**
+- * @qemu_chr_fe_read_all:
+- *
+- * Read data to a buffer from the back end.
+- *
++ * qemu_chr_fe_read_all:
+  * @buf the data buffer
+  * @len the number of bytes to read
+  *
++ * Read data to a buffer from the back end.
++ *
+  * Returns: the number of bytes read (0 if no associated Chardev)
+  */
+ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len);
+=20
+ /**
+- * @qemu_chr_fe_ioctl:
+- *
+- * Issue a device specific ioctl to a backend.  This function is thread-=
+safe.
+- *
++ * qemu_chr_fe_ioctl:
+  * @cmd see CHR_IOCTL_*
+  * @arg the data associated with @cmd
+  *
++ * Issue a device specific ioctl to a backend.  This function is thread-=
+safe.
++ *
+  * Returns: if @cmd is not supported by the backend or there is no
+  *          associated Chardev, -ENOTSUP, otherwise the return
+  *          value depends on the semantics of @cmd
+@@ -232,7 +225,7 @@ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *bu=
+f, int len);
+ int qemu_chr_fe_ioctl(CharBackend *be, int cmd, void *arg);
+=20
+ /**
+- * @qemu_chr_fe_get_msgfd:
++ * qemu_chr_fe_get_msgfd:
+  *
+  * For backends capable of fd passing, return the latest file descriptor=
+ passed
+  * by a client.
+@@ -245,7 +238,7 @@ int qemu_chr_fe_ioctl(CharBackend *be, int cmd, void =
+*arg);
+ int qemu_chr_fe_get_msgfd(CharBackend *be);
+=20
+ /**
+- * @qemu_chr_fe_get_msgfds:
++ * qemu_chr_fe_get_msgfds:
+  *
+  * For backends capable of fd passing, return the number of file receive=
+d
+  * descriptors and fills the fds array up to num elements
+@@ -258,7 +251,7 @@ int qemu_chr_fe_get_msgfd(CharBackend *be);
+ int qemu_chr_fe_get_msgfds(CharBackend *be, int *fds, int num);
+=20
+ /**
+- * @qemu_chr_fe_set_msgfds:
++ * qemu_chr_fe_set_msgfds:
+  *
+  * For backends capable of fd passing, set an array of fds to be passed =
+with
+  * the next send operation.
 diff --git a/include/chardev/char.h b/include/chardev/char.h
-index 3e4fe6dad0..268daaa90b 100644
+index 6f0576e214..3e4fe6dad0 100644
 --- a/include/chardev/char.h
 +++ b/include/chardev/char.h
-@@ -105,14 +105,27 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
-  * @filename: the URI
+@@ -68,12 +68,11 @@ struct Chardev {
+ };
+=20
+ /**
+- * @qemu_chr_new_from_opts:
++ * qemu_chr_new_from_opts:
++ * @opts: see qemu-config.c for a list of valid options
+  *
+  * Create a new character backend from a QemuOpts list.
+  *
+- * @opts see qemu-config.c for a list of valid options
+- *
+  * Returns: on success: a new character backend
+  *          otherwise:  NULL; @errp specifies the error
+  *                            or left untouched in case of help option
+@@ -82,17 +81,16 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+                                 Error **errp);
+=20
+ /**
+- * @qemu_chr_parse_common:
++ * qemu_chr_parse_common:
++ * @opts: the options that still need parsing
++ * @backend: a new backend
+  *
+  * Parse the common options available to all character backends.
+- *
+- * @opts the options that still need parsing
+- * @backend a new backend
+  */
+ void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend);
+=20
+ /**
+- * @qemu_chr_parse_opts:
++ * qemu_chr_parse_opts:
+  *
+  * Parse the options to the ChardevBackend struct.
+  *
+@@ -102,49 +100,46 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts,
+                                     Error **errp);
+=20
+ /**
+- * @qemu_chr_new:
++ * qemu_chr_new:
++ * @label: the name of the backend
++ * @filename: the URI
   *
   * Create a new character backend from a URI.
-+ * Do not implicitly initialize a monitor if the chardev is muxed.
   *
+- * @label the name of the backend
+- * @filename the URI
+- *
   * Returns: a new character backend
   */
  Chardev *qemu_chr_new(const char *label, const char *filename);
 =20
  /**
-- * qemu_chr_change:
-- * @opts: the new backend options
-+ * qemu_chr_new_mux_mon:
-+ * @label: the name of the backend
-+ * @filename: the URI
-+ *
-+ * Create a new character backend from a URI.
-+ * Implicitly initialize a monitor if the chardev is muxed.
-+ *
-+ * Returns: a new character backend
-+ */
-+Chardev *qemu_chr_new_mux_mon(const char *label, const char *filename);
-+
-+/**
-+* qemu_chr_change:
-+* @opts: the new backend options
+- * @qemu_chr_change:
++ * qemu_chr_change:
++ * @opts: the new backend options
   *
   * Change an existing character backend
+- *
+- * @opts the new backend options
   */
-@@ -129,6 +142,7 @@ void qemu_chr_cleanup(void);
-  * qemu_chr_new_noreplay:
-  * @label: the name of the backend
-  * @filename: the URI
-+ * @with_mux_mon: if chardev is muxed, initialize a monitor
+ void qemu_chr_change(QemuOpts *opts, Error **errp);
+=20
+ /**
+- * @qemu_chr_cleanup:
++ * qemu_chr_cleanup:
+  *
+  * Delete all chardevs (when leaving qemu)
+  */
+ void qemu_chr_cleanup(void);
+=20
+ /**
+- * @qemu_chr_new_noreplay:
++ * qemu_chr_new_noreplay:
++ * @label: the name of the backend
++ * @filename: the URI
   *
   * Create a new character backend from a URI.
   * Character device communications are not written
-@@ -136,7 +150,8 @@ void qemu_chr_cleanup(void);
+  * into the replay log.
   *
+- * @label the name of the backend
+- * @filename the URI
+- *
   * Returns: a new character backend
   */
--Chardev *qemu_chr_new_noreplay(const char *label, const char *filename);
-+Chardev *qemu_chr_new_noreplay(const char *label, const char *filename,
-+                               bool with_mux_mon);
+ Chardev *qemu_chr_new_noreplay(const char *label, const char *filename);
 =20
  /**
-  * qemu_chr_be_can_write:
-@@ -194,7 +209,8 @@ bool qemu_chr_has_feature(Chardev *chr,
-                           ChardevFeature feature);
- void qemu_chr_set_feature(Chardev *chr,
-                           ChardevFeature feature);
--QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename)=
-;
-+QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
-+                                bool with_mux_mon);
- int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_a=
-ll);
- #define qemu_chr_write_all(s, buf, len) qemu_chr_write(s, buf, len, true=
-)
- int qemu_chr_wait_connected(Chardev *chr, Error **errp);
-diff --git a/chardev/char.c b/chardev/char.c
-index 76d866e6fe..c1b89b6638 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -329,7 +329,8 @@ int qemu_chr_wait_connected(Chardev *chr, Error **err=
-p)
-     return 0;
- }
+- * @qemu_chr_be_can_write:
++ * qemu_chr_be_can_write:
+  *
+  * Determine how much data the front end can currently accept.  This fun=
+ction
+  * returns the number of bytes the front end can accept.  If it returns =
+0, the
+@@ -156,43 +151,39 @@ Chardev *qemu_chr_new_noreplay(const char *label, c=
+onst char *filename);
+ int qemu_chr_be_can_write(Chardev *s);
 =20
--QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename)
-+QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
-+                                bool with_mux_mon)
- {
-     char host[65], port[33], width[8], height[8];
-     int pos;
-@@ -344,6 +345,10 @@ QemuOpts *qemu_chr_parse_compat(const char *label, c=
-onst char *filename)
-     }
+ /**
+- * @qemu_chr_be_write:
++ * qemu_chr_be_write:
++ * @buf: a buffer to receive data from the front end
++ * @len: the number of bytes to receive from the front end
+  *
+  * Write data from the back end to the front end.  Before issuing this c=
+all,
+  * the caller should call @qemu_chr_be_can_write to determine how much d=
+ata
+  * the front end can currently accept.
+- *
+- * @buf a buffer to receive data from the front end
+- * @len the number of bytes to receive from the front end
+  */
+ void qemu_chr_be_write(Chardev *s, uint8_t *buf, int len);
 =20
-     if (strstart(filename, "mon:", &p)) {
-+        if (!with_mux_mon) {
-+            error_report("mon: isn't supported in this context");
-+            return NULL;
-+        }
-         filename =3D p;
-         qemu_opt_set(opts, "mux", "on", &error_abort);
-         if (strcmp(filename, "stdio") =3D=3D 0) {
-@@ -683,7 +688,8 @@ out:
-     return chr;
- }
+ /**
+- * @qemu_chr_be_write_impl:
++ * qemu_chr_be_write_impl:
++ * @buf: a buffer to receive data from the front end
++ * @len: the number of bytes to receive from the front end
+  *
+  * Implementation of back end writing. Used by replay module.
+- *
+- * @buf a buffer to receive data from the front end
+- * @len the number of bytes to receive from the front end
+  */
+ void qemu_chr_be_write_impl(Chardev *s, uint8_t *buf, int len);
 =20
--Chardev *qemu_chr_new_noreplay(const char *label, const char *filename)
-+Chardev *qemu_chr_new_noreplay(const char *label, const char *filename,
-+                               bool with_mux_mon)
- {
-     const char *p;
-     Chardev *chr;
-@@ -694,25 +700,27 @@ Chardev *qemu_chr_new_noreplay(const char *label, c=
-onst char *filename)
-         return qemu_chr_find(p);
-     }
+ /**
+- * @qemu_chr_be_update_read_handlers:
++ * qemu_chr_be_update_read_handlers:
++ * @context: the gcontext that will be used to attach the watch sources
+  *
+  * Invoked when frontend read handlers are setup
+- *
+- * @context the gcontext that will be used to attach the watch sources
+  */
+ void qemu_chr_be_update_read_handlers(Chardev *s,
+                                       GMainContext *context);
 =20
--    opts =3D qemu_chr_parse_compat(label, filename);
-+    opts =3D qemu_chr_parse_compat(label, filename, with_mux_mon);
-     if (!opts)
-         return NULL;
+ /**
+- * @qemu_chr_be_event:
++ * qemu_chr_be_event:
++ * @event: the event to send
+  *
+  * Send an event from the back end to the front end.
+- *
+- * @event the event to send
+  */
+ void qemu_chr_be_event(Chardev *s, int event);
 =20
-     chr =3D qemu_chr_new_from_opts(opts, &err);
-     if (err) {
-         error_report_err(err);
--    }
--    if (chr && qemu_opt_get_bool(opts, "mux", 0)) {
-+    } else if (qemu_opt_get_bool(opts, "mux", 0)) {
-+        assert(with_mux_mon);
-         monitor_init(chr, MONITOR_USE_READLINE);
-     }
-     qemu_opts_del(opts);
-     return chr;
- }
-=20
--Chardev *qemu_chr_new(const char *label, const char *filename)
-+static Chardev *qemu_chr_new_with_mux_mon(const char *label,
-+                                          const char *filename,
-+                                          bool with_mux_mon)
- {
-     Chardev *chr;
--    chr =3D qemu_chr_new_noreplay(label, filename);
-+    chr =3D qemu_chr_new_noreplay(label, filename, with_mux_mon);
-     if (chr) {
-         if (replay_mode !=3D REPLAY_MODE_NONE) {
-             qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
-@@ -726,6 +734,16 @@ Chardev *qemu_chr_new(const char *label, const char =
-*filename)
-     return chr;
- }
-=20
-+Chardev *qemu_chr_new(const char *label, const char *filename)
-+{
-+    return qemu_chr_new_with_mux_mon(label, filename, false);
-+}
-+
-+Chardev *qemu_chr_new_mux_mon(const char *label, const char *filename)
-+{
-+    return qemu_chr_new_with_mux_mon(label, filename, true);
-+}
-+
- static int qmp_query_chardev_foreach(Object *obj, void *data)
- {
-     Chardev *chr =3D CHARDEV(obj);
-diff --git a/gdbstub.c b/gdbstub.c
-index d6ab95006c..c8478de8f5 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2038,7 +2038,11 @@ int gdbserver_start(const char *device)
-             sigaction(SIGINT, &act, NULL);
-         }
- #endif
--        chr =3D qemu_chr_new_noreplay("gdb", device);
-+        /*
-+         * FIXME: it's a bit weird to allow using a mux chardev here
-+         * and implicitly setup a monitor. We may want to break this.
-+         */
-+        chr =3D qemu_chr_new_noreplay("gdb", device, true);
-         if (!chr)
-             return -1;
-     }
-diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
-index 8b4b4bf523..6a231d487b 100644
---- a/hw/char/xen_console.c
-+++ b/hw/char/xen_console.c
-@@ -207,7 +207,10 @@ static int con_init(struct XenDevice *xendev)
-     } else {
-         snprintf(label, sizeof(label), "xencons%d", con->xendev.dev);
-         qemu_chr_fe_init(&con->chr,
--                         qemu_chr_new(label, output), &error_abort);
-+                         /*
-+                          * FIXME: should it support implicit muxed moni=
-tors?
-+                          */
-+                         qemu_chr_new_mux_mon(label, output), &error_abo=
-rt);
-     }
-=20
-     xenstore_store_pv_console_info(con->xendev.dev,
-diff --git a/net/slirp.c b/net/slirp.c
-index 1e14318b4d..677dc36fe4 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -836,7 +836,10 @@ static int slirp_guestfwd(SlirpState *s, const char =
-*config_str,
-         }
-     } else {
-         Error *err =3D NULL;
--        Chardev *chr =3D qemu_chr_new(buf, p);
-+        /*
-+         * FIXME: should it support implicit muxed monitors?
-+         */
-+        Chardev *chr =3D qemu_chr_new_mux_mon(buf, p);
-=20
-         if (!chr) {
-             error_setg(errp, "Could not open guest forwarding device '%s=
-'",
-diff --git a/vl.c b/vl.c
-index 5ba06adf78..b38e49ca43 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2353,7 +2353,7 @@ static void monitor_parse(const char *optarg, const=
- char *mode, bool pretty)
-     } else {
-         snprintf(label, sizeof(label), "compat_monitor%d",
-                  monitor_device_index);
--        opts =3D qemu_chr_parse_compat(label, optarg);
-+        opts =3D qemu_chr_parse_compat(label, optarg, true);
-         if (!opts) {
-             error_report("parse error: %s", optarg);
-             exit(1);
-@@ -2425,7 +2425,7 @@ static int serial_parse(const char *devname)
-     snprintf(label, sizeof(label), "serial%d", index);
-     serial_hds =3D g_renew(Chardev *, serial_hds, index + 1);
-=20
--    serial_hds[index] =3D qemu_chr_new(label, devname);
-+    serial_hds[index] =3D qemu_chr_new_mux_mon(label, devname);
-     if (!serial_hds[index]) {
-         error_report("could not connect serial device"
-                      " to character backend '%s'", devname);
-@@ -2461,7 +2461,7 @@ static int parallel_parse(const char *devname)
-         exit(1);
-     }
-     snprintf(label, sizeof(label), "parallel%d", index);
--    parallel_hds[index] =3D qemu_chr_new(label, devname);
-+    parallel_hds[index] =3D qemu_chr_new_mux_mon(label, devname);
-     if (!parallel_hds[index]) {
-         error_report("could not connect parallel device"
-                      " to character backend '%s'", devname);
-@@ -2492,7 +2492,7 @@ static int virtcon_parse(const char *devname)
-     qemu_opt_set(dev_opts, "driver", "virtconsole", &error_abort);
-=20
-     snprintf(label, sizeof(label), "virtcon%d", index);
--    virtcon_hds[index] =3D qemu_chr_new(label, devname);
-+    virtcon_hds[index] =3D qemu_chr_new_mux_mon(label, devname);
-     if (!virtcon_hds[index]) {
-         error_report("could not connect virtio console"
-                      " to character backend '%s'", devname);
-@@ -2508,7 +2508,7 @@ static int debugcon_parse(const char *devname)
- {
-     QemuOpts *opts;
-=20
--    if (!qemu_chr_new("debugcon", devname)) {
-+    if (!qemu_chr_new_mux_mon("debugcon", devname)) {
-         exit(1);
-     }
-     opts =3D qemu_opts_create(qemu_find_opts("device"), "debugcon", 1, N=
-ULL);
 --=20
 2.18.0.547.g1d89318c48
