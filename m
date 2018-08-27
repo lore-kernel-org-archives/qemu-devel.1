@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fuBbV-0001FP-GM
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:06:26 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fuBlr-0000L0-E1
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:17:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fuBbQ-0001VV-HQ
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:06:25 -0400
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
-	<4eca96cf-5520-fb82-2e23-afff3ba35077@virtuozzo.com>
-	<c6f924f2-b70d-a460-f96c-7d40b9d06e22@redhat.com>
-	<7da20590-58d7-4ef0-92b9-fcb955f28c9b@virtuozzo.com>
-	<20180813163048.GO4323@localhost.localdomain>
-	<ae864bb4-257e-240c-eeab-3c9c13462c0d@virtuozzo.com>
-Message-ID: <4dcf31f4-b2e0-e3cf-47ac-a9e745a9e2d8@virtuozzo.com>
-Date: Mon, 27 Aug 2018 10:05:54 +0300
+	(envelope-from <luc.michel@greensocs.com>) id 1fuBlq-0007RK-Hy
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 03:17:07 -0400
+References: <20180823103818.31189-1-peter.maydell@linaro.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <0d9483b2-eab3-3361-8d10-bd31bb11e169@greensocs.com>
+Date: Mon, 27 Aug 2018 09:16:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <ae864bb4-257e-240c-eeab-3c9c13462c0d@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v0 0/2] Postponed actions
+In-Reply-To: <20180823103818.31189-1-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hdW4xaa2HNUcyl3Yo8L6EbvSp3oqdDfmk"
+Subject: Re: [Qemu-devel] [PATCH v2] hw/intc/arm_gic: Document QEMU interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,147 +23,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org, stefanha@redhat.com, mreitz@redhat.com, John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-PING! PING!
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hdW4xaa2HNUcyl3Yo8L6EbvSp3oqdDfmk
+From: Luc Michel <luc.michel@greensocs.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: patches@linaro.org
+Message-ID: <0d9483b2-eab3-3361-8d10-bd31bb11e169@greensocs.com>
+Subject: Re: [PATCH v2] hw/intc/arm_gic: Document QEMU interface
+References: <20180823103818.31189-1-peter.maydell@linaro.org>
+In-Reply-To: <20180823103818.31189-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 14.08.2018 10:08, Denis Plotnikov wrote:
+
+
+On 8/23/18 12:38 PM, Peter Maydell wrote:
+> The GICv2's QEMU interface (sysbus MMIO regions, IRQs,
+> etc) is now quite complicated with the addition of the
+> virtualization extensions. Add a comment in the header
+> file which documents it.
 >=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I needed to write this out to figure out what I was
+> connecting to what in the a15mpcore object :-)
 >=20
-> On 13.08.2018 19:30, Kevin Wolf wrote:
->> Am 13.08.2018 um 10:32 hat Denis Plotnikov geschrieben:
->>> Ping ping!
->>>
->>> On 16.07.2018 21:59, John Snow wrote:
->>>>
->>>>
->>>> On 07/16/2018 11:01 AM, Denis Plotnikov wrote:
->>>>> Ping!
->>>>>
->>>>
->>>> I never saw a reply to Stefan's question on July 2nd, did you reply
->>>> off-list?
->>>>
->>>> --js
->>> Yes, I did. I talked to Stefan why the patch set appeared.
->>
->> The rest of us still don't know the answer. I had the same question.
->>
->> Kevin
-> Yes, that's my fault. I should have post it earlier.
+> v1->v2 changes: fixed errors in sysbus IRQ and per-cpu GICH
+> memory region docs pointed out by Luc.
 >=20
-> I reviewed the problem once again and come up with the following=20
-> explanation.
-> Indeed, if the global lock has been taken by the main thread the vCPU=20
-> threads won't be able to execute mmio ide.
-> But, if the main thread will release the lock then nothing will prevent
-> vCPU threads form execution what they want, e.g writing to the block=20
-> device.
+>  include/hw/intc/arm_gic.h | 43 +++++++++++++++++++++++++++++++++++++++=
+
+>  1 file changed, 43 insertions(+)
 >=20
-> In case of running the mirroring it is possible. Let's take a look
-> at the following snippet of mirror_run. This is a part the mirroring=20
-> completion part.
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_=
-drained_begin(bs);
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cnt =
-=3D bdrv_get_dirty_count(s->dirty_bitmap);
->  >>>>>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (cnt > 0 || mirror_flush(s) < 0)=
- {
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 bdrv_drained_end(bs);
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 continue;
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> (X) >>>>=C2=A0=C2=A0=C2=A0 assert(QLIST_EMPTY(&bs->tracked_requests));
->=20
-> mirror_flush here can yield the current coroutine so nothing more can be=
-=20
-> executed.
-> We could end up with the situation when the main loop have to revolve to=
-=20
-> poll for another timer/bh to process. While revolving it releases the=20
-> global lock. If the global lock is waited for by a vCPU (any other)=20
-> thread, the waiting thread will get the lock and make what it intends.
->=20
-> This is something that I can observe:
->=20
-> mirror_flush yields coroutine, the main thread revolves and locks=20
-> because a vCPU was waiting for the lock. Now the vCPU thread owns the=20
-> lock and the main thread waits for the lock releasing.
-> The vCPU thread does cmd_write_dma and releases the lock. Then, the main
-> thread gets the lock and continues to run eventually proceeding with the=
-=20
-> coroutine yeiled.
-> If the vCPU requests aren't completed by the moment we will assert at=20
-> (X). If the vCPU requests are completed we won't even notice that we had=
-=20
-> some writes while in the drained section.
->=20
-> Denis
->>
->>>>> On 29.06.2018 15:40, Denis Plotnikov wrote:
->>>>>> There are cases when a request to a block driver state shouldn't hav=
-e
->>>>>> appeared producing dangerous race conditions.
->>>>>> This misbehaviour is usually happens with storage devices emulated
->>>>>> without eventfd for guest to host notifications like IDE.
->>>>>>
->>>>>> The issue arises when the context is in the "drained" section
->>>>>> and doesn't expect the request to come, but request comes from the
->>>>>> device not using iothread and which context is processed by the main
->>>>>> loop.
->>>>>>
->>>>>> The main loop apart of the iothread event loop isn't blocked by the
->>>>>> "drained" section.
->>>>>> The request coming and processing while in "drained" section can=20
->>>>>> spoil
->>>>>> the
->>>>>> block driver state consistency.
->>>>>>
->>>>>> This behavior can be observed in the following KVM-based case:
->>>>>>
->>>>>> 1. Setup a VM with an IDE disk.
->>>>>> 2. Inside a VM start a disk writing load for the IDE device
->>>>>> =C2=A0 =C2=A0=C2=A0 e.g: dd if=3D<file> of=3D<file> bs=3DX count=3DY=
- oflag=3Ddirect
->>>>>> 3. On the host create a mirroring block job for the IDE device
->>>>>> =C2=A0 =C2=A0=C2=A0 e.g: drive_mirror <your_IDE> <your_path>
->>>>>> 4. On the host finish the block job
->>>>>> =C2=A0 =C2=A0=C2=A0 e.g: block_job_complete <your_IDE>
->>>>>> =C2=A0 =C2=A0 Having done the 4th action, you could get an assert:
->>>>>> assert(QLIST_EMPTY(&bs->tracked_requests)) from mirror_run.
->>>>>> On my setup, the assert is 1/3 reproducible.
->>>>>>
->>>>>> The patch series introduces the mechanism to postpone the requests
->>>>>> until the BDS leaves "drained" section for the devices not using
->>>>>> iothreads.
->>>>>> Also, it modifies the asynchronous block backend infrastructure to=20
->>>>>> use
->>>>>> that mechanism to release the assert bug for IDE devices.
->>>>>>
->>>>>> Denis Plotnikov (2):
->>>>>> =C2=A0 =C2=A0=C2=A0 async: add infrastructure for postponed actions
->>>>>> =C2=A0 =C2=A0=C2=A0 block: postpone the coroutine executing if the B=
-DS's is drained
->>>>>>
->>>>>> =C2=A0 =C2=A0 block/block-backend.c | 58=20
->>>>>> ++++++++++++++++++++++++++++++---------
->>>>>> =C2=A0 =C2=A0 include/block/aio.h=C2=A0=C2=A0 | 63=20
->>>>>> +++++++++++++++++++++++++++++++++++++++++++
->>>>>> =C2=A0 =C2=A0 util/async.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 33 +++++++++++++++++++++++
->>>>>> =C2=A0 =C2=A0 3 files changed, 142 insertions(+), 12 deletions(-)
->>>>>>
->>>>>
->>>
->>> --=20
->>> Best,
->>> Denis
->=20
+> diff --git a/include/hw/intc/arm_gic.h b/include/hw/intc/arm_gic.h
+> index 42bb535fd45..1af5051ed5d 100644
+> --- a/include/hw/intc/arm_gic.h
+> +++ b/include/hw/intc/arm_gic.h
+> @@ -18,6 +18,49 @@
+>   * with this program; if not, see <http://www.gnu.org/licenses/>.
+>   */
+> =20
+> +/*
+> + * QEMU interface:
+> + *  + QOM property "num-cpu": number of CPUs to support
+> + *  + QOM property "num-irq": number of IRQs (including both SPIs and =
+PPIs)
+> + *  + QOM property "revision": GIC version (1 or 2), or 0 for the 11MP=
+Core GIC
+> + *  + QOM property "has-security-extensions": set true if the GIC shou=
+ld
+> + *    implement the security extensions
+> + *  + QOM property "has-virtualization-extensions": set true if the GI=
+C should
+> + *    implement the virtualization extensions
+> + *  + unnamed GPIO inputs: (where P is number of PPIs, i.e. num-irq - =
+32)
+I think here it's "where P is the number of SPIs".
+
+Apart from that:
+
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
 --=20
-Best,
-Denis
+Luc
+
+> + *    [0..P-1]  SPIs
+> + *    [P..P+31] PPIs for CPU 0
+> + *    [P+32..P+63] PPIs for CPU 1
+> + *    ...
+> + *  + sysbus IRQs: (in order; number will vary depending on number of =
+cores)
+> + *    - IRQ for CPU 0
+> + *    - IRQ for CPU 1
+> + *      ...
+> + *    - FIQ for CPU 0
+> + *    - FIQ for CPU 1
+> + *      ...
+> + *    - VIRQ for CPU 0 (exists even if virt extensions not present)
+> + *    - VIRQ for CPU 1 (exists even if virt extensions not present)
+> + *      ...
+> + *    - VFIQ for CPU 0 (exists even if virt extensions not present)
+> + *    - VFIQ for CPU 1 (exists even if virt extensions not present)
+> + *      ...
+> + *    - maintenance IRQ for CPU i/f 0 (only if virt extensions present=
+)
+> + *    - maintenance IRQ for CPU i/f 1 (only if virt extensions present=
+)
+> + *  + sysbus MMIO regions: (in order; numbers will vary depending on
+> + *    whether virtualization extensions are present and on number of c=
+ores)
+> + *    - distributor registers (GICD*)
+> + *    - CPU interface for the accessing core (GICC*)
+> + *    - virtual interface control registers (GICH*) (only if virt extn=
+s present)
+> + *    - virtual CPU interface for the accessing core (GICV*) (only if =
+virt)
+> + *    - CPU 0 CPU interface registers
+> + *    - CPU 1 CPU interface registers
+> + *      ...
+> + *    - CPU 0 virtual interface control registers (only if virt extns =
+present)
+> + *    - CPU 1 virtual interface control registers (only if virt extns =
+present)
+> + *      ...
+> + */
+> +
+>  #ifndef HW_ARM_GIC_H
+>  #define HW_ARM_GIC_H
+> =20
+>=20
+
+
+--hdW4xaa2HNUcyl3Yo8L6EbvSp3oqdDfmk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUvSC0Bi15mxw2PT5d8knW3QnTr4FAluDpV0ACgkQd8knW3Qn
+Tr5abg/8DvqdBhWgDNK9EOIWiBMnypgdwr0gONeXjjnWbXmVkV5gXdZVdDJajsLX
+X4W8Y+gEZ/bKVaFL1Hfw7HlFI8VtB2D7xXJjikIz65N6CExScxVc/E9QslrmmP19
+/4jHdzugFIAc+whVdmwO5ijpfyUWa0TviNyJBOPaiZEb0wjnYovpj4B0+If+ULIw
+yGJaQcSsuDPcuemo+RjmGRT6fYZ4OlbwbEwXMm0anSYlGHPmjeugZ4bsxPYa0/Ko
+XIR7mIWKdEwrO8qvBfoIf4sND5uYwwexcVJmS735zchCnl6VgzKFIXR+O19cuIDB
+QZA4Hy6DzlKVpcdeEtjb45V4E2W+w94dzrE87eNtYOdRnisz+31elSWmCcXz/BRJ
+RSt9GP2vKgbtTUZLB+1OrVg2cQ83LkR0dE/nmoqw/x1b2YHZkx2X7Z8059gh6ve1
+FBTbD3w5cxJwDXM4IGJ5Bh1S/OSk/kR/F2+m0HoVkUOC37WjwASqA7Q8kGj8gYd/
+rk0A5NE29qRKX5dHl/9R/ZzD/iP/hv90CuPdKsVf4yN1thXn6WlXlmscQrjNz484
+yfu5NX4D/PfURY470BdwY3KmfkE5UfmM/yVoFkpqCVPTSYPGR9ajNNtcu/8rXdS7
+94eO4LbWL8fHXqYNZ1GGsPx+JMX8g4H2g5blO6Ibmg+5Je0n81s=
+=kzpr
+-----END PGP SIGNATURE-----
+
+--hdW4xaa2HNUcyl3Yo8L6EbvSp3oqdDfmk--
