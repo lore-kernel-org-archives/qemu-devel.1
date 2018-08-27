@@ -1,22 +1,23 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:39772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuH67-0003EV-M5
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:58:26 -0400
+	(envelope-from <david@redhat.com>) id 1fuH6V-0003EV-D9
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:58:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuH16-0007Pf-Jc
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:53:14 -0400
-References: <20180823222249.13518-1-jsnow@redhat.com>
-	<20180823222249.13518-7-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c1e934f1-82d4-5668-a7ac-8cdc05372ced@redhat.com>
-Date: Mon, 27 Aug 2018 14:52:57 +0200
+	(envelope-from <david@redhat.com>) id 1fuGva-00012r-F8
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:47:36 -0400
+References: <20180824133757.1cbdba75.cohuck@redhat.com>
+	<de80a3a0-7fd7-783c-3d3b-b8c4a481a893@de.ibm.com>
+	<20180827143731.26a5c0f6.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <212cc356-d1ce-3576-4616-01ec1eec1da2@redhat.com>
+Date: Mon, 27 Aug 2018 14:47:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180823222249.13518-7-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JmsOaNykJqT10DZqUPERQUGKwDj2RK0rH"
-Subject: Re: [Qemu-devel] [PATCH v2 06/13] block/commit: refactor stream to
- use job callbacks
+In-Reply-To: <20180827143731.26a5c0f6.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFD] [s390x] Tweaking the s390x maintainership
+ setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +26,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JmsOaNykJqT10DZqUPERQUGKwDj2RK0rH
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com,
- Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <c1e934f1-82d4-5668-a7ac-8cdc05372ced@redhat.com>
-Subject: Re: [PATCH v2 06/13] block/commit: refactor stream to use job
- callbacks
-References: <20180823222249.13518-1-jsnow@redhat.com>
- <20180823222249.13518-7-jsnow@redhat.com>
-In-Reply-To: <20180823222249.13518-7-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+>>
+>>> * More trees to pull from. Of course, not every area needs a dedicated
+>>>   tree (that would become silly pretty quickly), but for example a tcg
+>>>   tree would be nice. I can still pick individual patches if a pull
+>>>   request would be overkill.
+>>> * I'd also like to have a designated backup for the overall
+>>>   maintainership, especially for when I'm on vacation (like the first
+>>>   two weeks of September, just to let you know :) or otherwise
+>>>   unavailable, but also for sanity. Likely needs to be a non-IBMer due
+>>>   to the tcg problem.  
+>>
+>> Is the current setup with Richard (TCG) and myself (KVM) not good enough?
+> 
+> It's mostly "I'm uncomfortable that it's only me". Having the tcg
+> maintainers resp. you handle things is absolutely fine for the usual
+> run of things. The only time where there might be problems is if e.g.
+> tcg and kvm changes interact in a non-trivial way, but I expect these
+> to be very rare.
 
-@subject: s/commit/stream/
+I wonder what kind of persons do things like that ;)
 
-On 2018-08-24 00:22, John Snow wrote:
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/stream.c | 23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
+But yes, it should be rare and usually can wait in case you are on vacation.
 
-This is a nice patch.
+-- 
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Thanks,
 
-
---JmsOaNykJqT10DZqUPERQUGKwDj2RK0rH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluD9CkACgkQ9AfbAGHV
-z0CU1ggAgCMwzI4yFJL6rtysQYkTbqPz8vSeXAw+U1hCekpeA9vgpXpodSVn9jfH
-yqNpxYDevIk9eeB2u6UYlXfSYB7vLz/yzglhfK0GDB2RX/fsCQlj4yk3JaxDlUVH
-jwjKy+UxX2cSS0ZOM5kQ2ApACXANPebrlVHkjNskV+dZi1vGmxCYlh35i4+O2/dr
-sQJvco5+8PmQUIOmKXY4AIaMYdVSLiLfd19VaZ4Ln6L1yU9xU7uoBYR/nVtcL0mo
-qvZjRR4ORr8i5Mo4mf3VqmsP3Cu66MU/rAqr0WrU9T1yupVk8O9tvtZLGBzCynjD
-mWmV5Yr0JDY2Th950hUZbGiXf3WwLw==
-=6Huh
------END PGP SIGNATURE-----
-
---JmsOaNykJqT10DZqUPERQUGKwDj2RK0rH--
+David / dhildenb
