@@ -1,19 +1,21 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:37183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fuFMh-00011D-QA
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:07:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuFNS-00011D-Mf
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:08:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fuFMc-0006ge-Vf
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:07:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59226 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fuFMc-0006fM-Qb
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:07:18 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon, 27 Aug 2018 13:07:10 +0200
-Message-Id: <1535368030-214556-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH] pc: make sure that guest isn't able to unplug
- the first cpu
+	(envelope-from <mreitz@redhat.com>) id 1fuFCm-0007ce-Ib
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 06:57:09 -0400
+References: <20180823220856.10094-1-jsnow@redhat.com>
+	<20180823220856.10094-10-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <29fed4d6-de2c-8ef3-c003-6407d8129735@redhat.com>
+Date: Mon, 27 Aug 2018 12:56:51 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180823220856.10094-10-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lkcnwuUgm1aMFKr8jDXg6QLf3u3P2x3wT"
+Subject: Re: [Qemu-devel] [PATCH v2 9/9] jobs: remove job_defer_to_main_loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,76 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, david@gibson.dropbear.id.au, groug@kaod.org, david@redhat.com, cohuck@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>
 
-The first cpu unplug wasn't ever supported and corresponding
-monitor/qmp commands refuse to unplug it. However guest is able
-to issue eject request either using following command:
-  # echo 1 >/sys/devices/system/cpu/cpu0/firmware_node/eject
-or directly writing to cpu hotplug registers, which makes
-qemu crash with SIGSEGV following back trace:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lkcnwuUgm1aMFKr8jDXg6QLf3u3P2x3wT
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com,
+ Jeff Cody <jcody@redhat.com>
+Message-ID: <29fed4d6-de2c-8ef3-c003-6407d8129735@redhat.com>
+Subject: Re: [PATCH v2 9/9] jobs: remove job_defer_to_main_loop
+References: <20180823220856.10094-1-jsnow@redhat.com>
+ <20180823220856.10094-10-jsnow@redhat.com>
+In-Reply-To: <20180823220856.10094-10-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-   kvm_flush_coalesced_mmio_buffer ()
-       while (ring->first != ring->last)
-   ...
-   qemu_flush_coalesced_mmio_buffer
-   prepare_mmio_access
-   flatview_read_continue
-   flatview_read
-   address_space_read_full
-   address_space_rw
-   kvm_cpu_exec(cpu!0)
-   qemu_kvm_cpu_thread_fn
+On 2018-08-24 00:08, John Snow wrote:
+> Now that the job infrastructure is handling the job_completed call for
+> all implemented jobs, we can remove the interface that allowed jobs to
+> schedule their own completion.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  include/qemu/job.h | 17 -----------------
+>  job.c              | 40 ++--------------------------------------
+>  2 files changed, 2 insertions(+), 55 deletions(-)
 
-the reason for which is that ring == KVMState::coalesced_mmio_ring
-happens to be a part of 1st CPU that was uplugged by guest.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Fix it by forbidding 1st cpu unplug from guest side and in addition
-remove CPU0._EJ0 ACPI method to make clear that unplug of the first
-CPU is not supported.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-CCing spapr and s390x folks in case targets need to prevent 1st CPU unplug as well
+--lkcnwuUgm1aMFKr8jDXg6QLf3u3P2x3wT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-CC: mst@redhat.com
-CC: pbonzini@redhat.com
-CC: david@gibson.dropbear.id.au
-CC: groug@kaod.org
-CC: david@redhat.com
-CC: cohuck@redhat.com
----
- hw/acpi/cpu.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-index 5ae595e..4bb8371 100644
---- a/hw/acpi/cpu.c
-+++ b/hw/acpi/cpu.c
-@@ -117,7 +117,7 @@ static void cpu_hotplug_wr(void *opaque, hwaddr addr, uint64_t data,
-             DeviceState *dev = NULL;
-             HotplugHandler *hotplug_ctrl = NULL;
- 
--            if (!cdev->cpu) {
-+            if (!cdev->cpu || cdev->cpu == first_cpu) {
-                 trace_cpuhp_acpi_ejecting_invalid_cpu(cpu_st->selector);
-                 break;
-             }
-@@ -541,9 +541,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
-                 aml_buffer(madt_buf->len, (uint8_t *)madt_buf->data)));
-             g_array_free(madt_buf, true);
- 
--            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
--            aml_append(method, aml_call1(CPU_EJECT_METHOD, uid));
--            aml_append(dev, method);
-+            if (CPU(arch_ids->cpus[i].cpu) != first_cpu) {
-+                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
-+                aml_append(method, aml_call1(CPU_EJECT_METHOD, uid));
-+                aml_append(dev, method);
-+            }
- 
-             method = aml_method("_OST", 3, AML_SERIALIZED);
-             aml_append(method,
--- 
-2.7.4
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluD2PMACgkQ9AfbAGHV
+z0AHvwgAlj7PL5IK3qfRVr4wIlztSiKnsL06YnDZH1/Wrcci1fjCVvswB5q1+mUD
+fRg+u+FtMYzp+PUJpRgMXYdK4RYpjqnod0RtN+WNO6db59fnnwy8QD2GJaTq+yQ7
+VvQ6z+vOxamdUNEVIAHjKgmOI25m2vPPF7z07h4sangaFP63y7Q/2kaLPsGb72/6
+ruo3xtAFR56VwXfEIn0AtfTvn4NsN86dz4FKwSz1DLF0RUnLj0OVJrQCeJMzjDR5
+ZOHEeyNONnTw3QgnBLeBrNbS/8DJruw2rWYvGLZMWR6xvPLWLbArHQAiu9znwAMj
+b+ftSErfn9p1twWBWy/dBZTHpOrj/g==
+=SDhx
+-----END PGP SIGNATURE-----
+
+--lkcnwuUgm1aMFKr8jDXg6QLf3u3P2x3wT--
