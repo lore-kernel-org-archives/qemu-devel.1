@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuGRz-0005np-31
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:16:58 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fuGSA-0006Ko-Rv
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:17:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuGIu-0003ZH-Og
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:07:33 -0400
-References: <20180823222249.13518-1-jsnow@redhat.com>
-	<20180823222249.13518-5-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9b363ad7-4a3f-e0d7-fa0c-a3fa006f7f00@redhat.com>
-Date: Mon, 27 Aug 2018 14:07:21 +0200
+	(envelope-from <borntraeger@de.ibm.com>) id 1fuGEY-0005om-SZ
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:03:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47592
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fuGEY-0005o0-La
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 08:03:02 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w7RBxYA3086391
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:03:01 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2m4gqnrmd9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 08:03:01 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 27 Aug 2018 13:02:54 +0100
+References: <20180824133757.1cbdba75.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 27 Aug 2018 14:02:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180823222249.13518-5-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aM0gpOiEa6nry0VU5UXiHZdsJUavqR7nt"
-Subject: Re: [Qemu-devel] [PATCH v2 04/13] block/commit: refactor commit to
- use job callbacks
+In-Reply-To: <20180824133757.1cbdba75.cohuck@redhat.com>
+Content-Language: en-US
+Message-Id: <de80a3a0-7fd7-783c-3d3b-b8c4a481a893@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFD] [s390x] Tweaking the s390x maintainership
+ setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +43,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aM0gpOiEa6nry0VU5UXiHZdsJUavqR7nt
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com,
- Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <9b363ad7-4a3f-e0d7-fa0c-a3fa006f7f00@redhat.com>
-Subject: Re: [PATCH v2 04/13] block/commit: refactor commit to use job
- callbacks
-References: <20180823222249.13518-1-jsnow@redhat.com>
- <20180823222249.13518-5-jsnow@redhat.com>
-In-Reply-To: <20180823222249.13518-5-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-08-24 00:22, John Snow wrote:
-> Use the component callbacks; prepare, abort, and clean.
->=20
-> NB: prepare is only called when the job has not yet failed;
-> and abort can be called after prepare.
->=20
-> complete -> prepare -> abort -> clean
-> complete -> abort -> clean
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/commit.c | 90 ++++++++++++++++++++++++++++++++------------------=
---------
->  1 file changed, 49 insertions(+), 41 deletions(-)
->=20
-> diff --git a/block/commit.c b/block/commit.c
-> index b6e8969877..9bf50385cf 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-
-[...]
-
-> @@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBacken=
-d *bs, BlockBackend *base,
-
-[...]
-
-> +static void commit_abort(Job *job)
-> +{
-> +    CommitBlockJob *s =3D container_of(job, CommitBlockJob, common.job=
-);
-> +    BlockDriverState *top_bs =3D blk_bs(s->top);
-> +
-> +    /* Make sure commit_top_bs and top stay around until bdrv_replace_=
-node() */
-> +    bdrv_ref(top_bs);
-> +    bdrv_ref(s->commit_top_bs);
-> +
-> +    if (s->base) {
-> +        blk_unref(s->base);
->      }
-> =20
-> +    /* free the blockers on the intermediate nodes so that bdrv_replac=
-e_nodes
-> +     * can succeed */
-> +    block_job_remove_all_bdrv(&s->common);
-> +
-> +    /* If bdrv_drop_intermediate() didn't already do that, remove the =
-commit
-> +     * filter driver from the backing chain. Do this as the final step=
- so that
-> +     * the 'consistent read' permission can be granted.
-
-I'd suggest rewording this to "If bdrv_drop_intermediate() failed (or
-was not invoked at all), remove the commit filter driver from the
-backing chain now."
-
-Right now it sounds like maybe bdrv_drop_intermediate() removes the
-filter, and maybe it doesn't.  But actually it is supposed to always
-remove it -- but it may fail, and then we have to force-remove the filter=
-=2E
-
-Apart from that:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +     *
-> +     * XXX Can (or should) we somehow keep 'consistent read' blocked e=
-ven
-> +     * after the failed/cancelled commit job is gone? If we already wr=
-ote
-> +     * something to base, the intermediate images aren't valid any mor=
-e. */
-> +    bdrv_child_try_set_perm(s->commit_top_bs->backing, 0, BLK_PERM_ALL=
-,
-> +                            &error_abort);
-> +    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
-> +                      &error_abort);
-> +
-> +    bdrv_unref(s->commit_top_bs);
-> +    bdrv_unref(top_bs);
-> +}
+To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
 
 
---aM0gpOiEa6nry0VU5UXiHZdsJUavqR7nt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+On 08/24/2018 01:37 PM, Cornelia Huck wrote:
+> Hi all,
+> 
+> while I think the current s390x maintainership setup is working quite
+> well, there's probably still room for improvement. In particular, I'd
+> like to spread out the work a bit more and make it easy to test things
+> pre-integration in an automated way.
+> 
+> As a recap, how it works today:
+> 
+> - We have designated maintainers for some major areas:
+>   * tcg
+>   * KVM
+>   * s390 virtio-ccw machine
+>   * s390 bios
+>   * vfio-ccw
+>   * virtio-ccw
+> 
+> - I'm acting as overall s390x maintainer, queuing patches onto my
+>   s390-next branch (s390-fixes for fixes during freeze) and sometimes
+>   pulling s390 bios updates (if I don't apply them myself). I'm
+>   generally the only person that sends pull requests for master.
+> 
+> Some problems I've noted:
+> 
+> * The bus factor -- or, put in a less dramatic way, what happens when
+>   I'm sick or on vacation? For fixes during freeze, there's no problem
+>   if the other maintainers submit them directly, but I really don't want
+>   to be the single point of failure (plus, I'm the only person listed
+>   as vfio-ccw maintainer).
+> * The IBM folks can't do tcg.
+> * Conversely, the non-IBM folks cannot review things that don't have
+>   public documentation (yet), other than in a very general way.
+> * I don't want to pick everything myself :) Especially when I basically
+>   rely on other people noticing problems in the first place (like with
+>   the non-public things or code areas I'm not so familiar with).
+> * Testing seems to be a bit ad hoc. It would be nice to have a branch
+>   that (semi) automated tests can be run on before things hit upstream,
+>   and that is also created on top of current master. (I usually only
+>   rebase the pushed-out s390-next branch when I apply new patches, and
+>   sometimes not even then.) Oh, and other people testing things,
+>   especially on different hardware.
+> 
+> So, here are some ideas I had on how to improve things:
+> 
+> * Split up maintainership a bit more. For example, split out areas like
+>   pci for which no public documentation is available; these need to
+>   have at least one IBM maintainer. Another candidate would maybe be
+>   the cpu model.
+> * On a related note, more maintainers from IBM would be nice :) For
+>   example, for vfio-ccw, where I'm the only maintainer... Some R:
+>   entries would not hurt, either.
 
------BEGIN PGP SIGNATURE-----
+Yes, we (IBM) should take care of vfio-ccw (and probably also pci and ap)
+Give me some more days to sort things out a bit. 
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluD6XkACgkQ9AfbAGHV
-z0A3JwgAphRKthfjkg2mpA7efGJ6jyEEzG8hAXbHAdq06VgjU7DL24lQPrdOvR46
-PRRgeicovYW10CdLB9/6+rdNZKFPw4vr8tQMS4Gh+77HPxxhR8s7DP3VuBaK6HBy
-dbT9VefhZ/vZUwx3RFdpVwWMHL/O3Je7w3AU9QP0ERqzs6JUexWoLX1fkgKsQnO2
-MnrcefM8T4k5zwX2AXcssmHxmjSOt2hWvVMKJ9ZWcZMGPttiYMTKL2ivLY1XvKn1
-InVw/7+/iGsk4ohce3IE7ebiXnMkbPlx+cr+yIzFJmYfFqe/ikp0GE01gkUAz+63
-cdujvRCWGyE3UhBHeEeh+BoPw9z89g==
-=eQ/4
------END PGP SIGNATURE-----
+> * More trees to pull from. Of course, not every area needs a dedicated
+>   tree (that would become silly pretty quickly), but for example a tcg
+>   tree would be nice. I can still pick individual patches if a pull
+>   request would be overkill.
+> * I'd also like to have a designated backup for the overall
+>   maintainership, especially for when I'm on vacation (like the first
+>   two weeks of September, just to let you know :) or otherwise
+>   unavailable, but also for sanity. Likely needs to be a non-IBMer due
+>   to the tcg problem.
 
---aM0gpOiEa6nry0VU5UXiHZdsJUavqR7nt--
+Is the current setup with Richard (TCG) and myself (KVM) not good enough?
+
+
+> * A more predictable s390-next would be nice. Maybe have it
+>   (semi-)automatically created out of the different trees, on top of
+>   current master? I would start to apply patches on a new branch that
+>   feeds into s390-next rather than on s390-next directly, then.
+> * Do something about (semi-)consolidated, (semi-)automatic testing.
+>   Like hooking into Travis (or something similar), sharing test setups,
+>   and enabling tests to be run on a range of platforms (including very
+>   recent ones). Testing is probably a large topic on its own, though.
+> 
+> Thoughts?
+> 
