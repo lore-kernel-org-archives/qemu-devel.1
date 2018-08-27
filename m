@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fuLDe-00029Q-Dx
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 13:22:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1fuLGN-00066e-LV
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 13:25:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fuL4N-0007YF-TT
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 13:12:57 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:62355)
+	(envelope-from <eblake@redhat.com>) id 1fuLGJ-0001jE-RA
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 13:25:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53324 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1fuL4N-0007WS-BA
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 13:12:51 -0400
-Date: Mon, 27 Aug 2018 19:12:29 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180827110544.12256-1-mark.cave-ayland@ilande.co.uk>
-Message-ID: <alpine.BSF.2.21.1808271903170.61025@zero.eik.bme.hu>
-References: <20180827110544.12256-1-mark.cave-ayland@ilande.co.uk>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fuLGG-0001SL-2w
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 13:25:11 -0400
+References: <20180827070021.11931-1-armbru@redhat.com>
+	<20180827070021.11931-7-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9f11e72b-42c5-da48-3f70-7370d680d59d@redhat.com>
+Date: Mon, 27 Aug 2018 12:25:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] 40p: fix PCI interrupt routing
+In-Reply-To: <20180827070021.11931-7-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 6/6] json: Eliminate lexer state
+ IN_WHITESPACE, pseudo-token JSON_SKIP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: hpoussin@reactos.org, david@gibson.dropbear.id.au, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On Mon, 27 Aug 2018, Mark Cave-Ayland wrote:
-> According to the PReP specification section 6.1.6 "System Interrupt
-> Assignments", all PCI interrupts are routed via IRQ 15.
->
-> With this patch applied it is now possible to boot the sandalfoot
-> zImage all the way through to a working userspace when using
-> OpenBIOS.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+On 08/27/2018 02:00 AM, Markus Armbruster wrote:
+> The lexer ignores whitespace like this:
+> 
+>           on whitespace      on non-ws   spontaneously
+>      IN_START --> IN_WHITESPACE --> JSON_SKIP --> IN_START
+>                      ^    |
+>                       \__/  on whitespace
+> 
+> This accumulates a whitespace token in state IN_WHITESPACE, only to
+> throw it away on the transition via JSON_SKIP to the start state.
+> Wasteful.  Go from IN_START to IN_START on whitspace directly,
+
+s/whitspace/whitespace/
+
+> dropping the whitespace character.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
-> hw/ppc/prep.c | 9 +++++----
-> 1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 162b27a3b8..e82c1355d9 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -668,10 +668,11 @@ static void ibm_40p_init(MachineState *machine)
->     dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"));
->     qdev_connect_gpio_out(dev, 0,
->                           cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
-> -    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
-> -    sysbus_connect_irq(pcihost, 1, qdev_get_gpio_in(dev, 13));
-> -    sysbus_connect_irq(pcihost, 2, qdev_get_gpio_in(dev, 15));
-> -    sysbus_connect_irq(pcihost, 3, qdev_get_gpio_in(dev, 13));
-> +    /* According to PReP specification section 6.1.6 "System Interrupt
-> +     * Assignments", all PCI interrupts are routed via IRQ 15 */
-> +    for (i = 0; i < PCI_NUM_PINS; i++) {
-> +        sysbus_connect_irq(pcihost, i, qdev_get_gpio_in(dev, 15));
-> +    }
+>   qobject/json-lexer.c      | 22 +++++-----------------
+>   qobject/json-parser-int.h |  1 -
+>   2 files changed, 5 insertions(+), 18 deletions(-)
+> 
+> @@ -263,10 +253,10 @@ static const uint8_t json_lexer[][256] =  {
+>           [','] = JSON_COMMA,
+>           [':'] = JSON_COLON,
+>           ['a' ... 'z'] = IN_KEYWORD,
+> -        [' '] = IN_WHITESPACE,
+> -        ['\t'] = IN_WHITESPACE,
+> -        ['\r'] = IN_WHITESPACE,
+> -        ['\n'] = IN_WHITESPACE,
+> +        [' '] = IN_START,
+> +        ['\t'] = IN_START,
+> +        ['\r'] = IN_START,
+> +        ['\n'] = IN_START,
+>       },
+>       [IN_START_INTERP]['%'] = IN_INTERP,
 
-I'm not sure but this looks similar to what we had with sam460ex:
+Don't you need to set [IN_START_INTERP][' '] to IN_START_INTERP, rather 
+than IN_START?  Otherwise, the presence of skipped whitespace would 
+change whether interpolation happens.  (At least, that's what you had in 
+an earlier version of this patch).
 
-http://lists.nongnu.org/archive/html/qemu-ppc/2018-07/msg00359.html
+>   };
+> @@ -323,10 +313,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
+>               json_message_process_token(lexer, lexer->token, new_state,
+>                                          lexer->x, lexer->y);
+>               /* fall through */
+> -        case JSON_SKIP:
+> -            g_string_truncate(lexer->token, 0);
+> -            /* fall through */
+>           case IN_START:
+> +            g_string_truncate(lexer->token, 0);
+>               new_state = lexer->start_state;
 
-I think you may not connect multiple interrupts to the same host irq line 
-this way but you either need an OR gate or handle it within the mapping in 
-the PCI host model (which is what we ended up with for the sam460ex). 
-Peter's suggestion was to do whichever matches real hardware the most if 
-you can find out that (as noted here also with more explanation that could 
-be useful):
+Oh, I see. We are magically reverting to the correct start state if the 
+requested transition reports IN_START, rather than blindly using IN_START.
 
-http://lists.nongnu.org/archive/html/qemu-ppc/2018-07/msg00360.html
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-But I could be mistaken in this case, haven't checked it in detail.
-
-Regards,
-BALATON Zoltan
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
