@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fuFaq-00033K-4j
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:22:00 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuFav-00035F-J1
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:22:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fuFam-00081x-W5
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:22:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60894 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fuFam-0007zz-Qv
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:21:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 809984023ECB
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 11:21:55 +0000 (UTC)
-Date: Mon, 27 Aug 2018 13:21:52 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180827112152.bxpq3xj6uzqwloqk@kamzik.brq.redhat.com>
-References: <1535035877-219196-1-git-send-email-imammedo@redhat.com>
-	<fb74bf2d-6973-9c2d-d799-8d16561c0265@redhat.com>
-	<20180823180307.GQ3778@localhost.localdomain>
+	(envelope-from <mreitz@redhat.com>) id 1fuFau-00089t-Pn
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 07:22:05 -0400
+References: <20180823222249.13518-1-jsnow@redhat.com>
+	<20180823222249.13518-2-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <89e4371c-15cf-0ac0-eec9-c3b8e3dc8934@redhat.com>
+Date: Mon, 27 Aug 2018 13:21:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180823180307.GQ3778@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH] vl.c: make sure maxcpus matches topology
- to prevent migration failure
+In-Reply-To: <20180823222249.13518-2-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="zqintyr7vlBw17laTa6UnlnOt1K4dwx2N"
+Subject: Re: [Qemu-devel] [PATCH v2 01/13] block/commit: add block job
+ creation flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Aug 23, 2018 at 03:03:07PM -0300, Eduardo Habkost wrote:
-> On Thu, Aug 23, 2018 at 06:32:41PM +0200, Paolo Bonzini wrote:
-> > On 23/08/2018 16:51, Igor Mammedov wrote:
-> > > Topology (threads*cores*sockets) must match maxcpus to be valid,
-> > > otherwise we could start QEMU with invalid topology that throws
-> > > a error on migration destination side, that should not be reachable:
-> > > Source:
-> > >   -smp 8,maxcpus=64,cores=1,threads=8,sockets=1
-> > > // hotplug cpus upto maxcpus
-> > > Destination:
-> > >   -smp 64,maxcpus=64,cores=1,threads=8,sockets=1
-> > >   qemu: cpu topology: sockets (1) * cores (1) * threads (8) < smp_cpus (64)
-> > 
-> > The destination should have sockets=8, shouldn't it?
-> > 
-> > It seems to me that, at startup, you should have cpus = s*t*c and cpus
-> > <= maxcpus.  Currently we check cpus <= s*t*c <= maxcpus, which doesn't
-> > make much sense.
-> 
-> Most of the incompleteness of input validation at smp_parse() can
-> be explained by our fear of breaking existing configurations and
-> making existing running VMs not runnable.
-> 
-> But now we have a deprecation policy.  If we're still afraid of
-> breaking peoples' existing configurations, we should at least
-> deprecate those configurations as soon as possible (and make QEMU
-> at least emit a warning).
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zqintyr7vlBw17laTa6UnlnOt1K4dwx2N
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>, jtc@redhat.com,
+ Jeff Cody <jcody@redhat.com>, Eric Blake <eblake@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <89e4371c-15cf-0ac0-eec9-c3b8e3dc8934@redhat.com>
+Subject: Re: [PATCH v2 01/13] block/commit: add block job creation flags
+References: <20180823222249.13518-1-jsnow@redhat.com>
+ <20180823222249.13518-2-jsnow@redhat.com>
+In-Reply-To: <20180823222249.13518-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-A million years ago (well > 2 anyway) when I was thinking about doing some
-'-smp' improvements I tried to address this without breaking existing
-configs. Here's how I approached it
+On 2018-08-24 00:22, John Snow wrote:
+> Add support for taking and passing forward job creation flags.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/commit.c            | 5 +++--
+>  blockdev.c                | 7 ++++---
+>  include/block/block_int.h | 5 ++++-
+>  3 files changed, 11 insertions(+), 6 deletions(-)
 
- https://lists.gnu.org/archive/html/qemu-ppc/2016-06/msg00317.html
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Also, there's another similar fix needed in smbios generation. See
 
- https://lists.gnu.org/archive/html/qemu-ppc/2016-06/msg00322.html
+--zqintyr7vlBw17laTa6UnlnOt1K4dwx2N
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
-drew 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluD3soACgkQ9AfbAGHV
+z0DGggf/RGbnRhcrOMyldJ6OXE5aFY7DLZH/3Tt+vvMPblDe7F6ClM5ykwZntYDy
+39hBnLhSRSv/t00CIpomyHYLbIRwM3UcX7B0GwO0f7l176tA2eSSi1RfLVB4It4I
+MyovxGMjZaH9kJKE7d0KVDMDUj2ci+r6J2aMlBqzFihvI9rSQ0nciVq7J7YLjN3/
+/o+0fcCpZge9pCKkoZfxkJgNb/dhdSFcu+EoDMjVHM3JG/OPjZeicjaqyWFut5/X
+RCivF1ABuHeqTDqvJjVfnIw7vcOn0Ky7pmEHf1ifcX9giVMzXNy7TLEAcxd7e1b8
+x+b6wyg3fu9UyUL03p2/sWzuI96KIQ==
+=72dg
+-----END PGP SIGNATURE-----
+
+--zqintyr7vlBw17laTa6UnlnOt1K4dwx2N--
