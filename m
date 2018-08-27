@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fuJDe-0001p2-K1
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:14:21 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1fuJHH-00085Y-SE
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fuJ8Q-0006wr-Uy
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:08:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49210 helo=mx1.redhat.com)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1fuJHD-0008Bb-Lv
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:18:03 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:19284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1fuJ8Q-0006wM-OY
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:08:54 -0400
-Date: Mon, 27 Aug 2018 17:08:45 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20180827150845.GK122225@angien.pipo.sk>
-References: <1535381652-19870-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DozTQjXnjm3C9Xhk"
-Content-Disposition: inline
-In-Reply-To: <1535381652-19870-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 0/4] Remove more deprecated
- options
+	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
+	id 1fuJHD-00089r-9K
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:17:59 -0400
+Date: Mon, 27 Aug 2018 23:17:49 +0800 (CST)
+Message-ID: <201808272317499067164@zte.com.cn>
+Mime-Version: 1.0
+From: <peng.hao2@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH_V4_4/4=5D_target-i386=3A_add_i44?=
+ =?utf-8?q?0fx_0xcf8_portascoalesced=5Fpio?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: mst@redhat.com
+Cc: liran.alon@oracle.com, pbonzini@redhat.com, ehabkost@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-
---DozTQjXnjm3C9Xhk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Aug 27, 2018 at 16:54:08 +0200, Thomas Huth wrote:
-> These options are deprecated since at least two releases, and nobody
-> complained. Time to remove them now.
->=20
-> (I'm sending these patches as a series since Paolo asked me to send a PULL
-> request on my own for them ... but if one of the subsystems maintainers
-> prefers to take the patches through their own tree instead, just let me
-> know)
->=20
-> Thomas Huth (4):
->   Remove the deprecated -balloon option
->   Remove the deprecated -nodefconfig option
->   Remove the deprecated options -startdate, -localtime and -rtc-td-hack
->   net: Remove the deprecated -tftp, -bootp, -redir and -smb options
-
-Libvirt does not use any of the options above thankfully so a weak-ACK
-=66rom the libvirt side.
-
---DozTQjXnjm3C9Xhk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAluEE/sACgkQHGwCByjY
-1GqGoA/+K6y4dGElfnJGWq2s/1YOC3x07HiW2E3Attt2/qm8uRDK0K2SrbWZTBeQ
-DELIqzPMb633y6tiCJdEFxxX5c3awgbze4iRNqnTYXmAlp0r0OUqnQkqu3wvanTE
-ADaLN13+syyQ9RA7R9haokQDFNd+nTkhEYDFMYm2ZtG8Qk9/vOSqzVkPRnBonCHP
-Q1dJwFBN3jzHY2bF80hJfPoW5sOblDNMpSKzOSrUYZyu+AG/ngLqTy3pu7mmGks0
-FBgm4EnZ+4O/38wisBzu3hcD+YO267xU6zrb/zqQasA2tcnWhx1g0CCLAL4F+tee
-L4Y2uoCaqDkcGrcvcA1dZ4pN0Nl6oaEGgJrBKFsJ+IekIMHCQZiDBtUHpjcqDQFQ
-7adc9MYnGLz0CY9fUgDvj5cq4izL67Pysey2NEyT1sRbgDRVF5VYEh25IMU9XvjA
-hrtPEJfNTLdWQlhftBf6WbzgQ28FwjEkRi9gohTpQc49J/qlIjEvEHoQ9ifZknwa
-JqwiLV1J8nB03p/wiC3D/wWpIMFN7E5GEp0zcAEgneiaXHP+wQ5j72wdwcKniPBk
-X4pyGNVF2Hp0z1OwzrryEZGUs6iTZ3/QbyYtGbD2n5MCORz0yPBCSphSq6KHC0nO
-u0/8/ttcp/kQVdqX2drsxc2me/M4rZ1g8uGQfBHZ5fbXEr4yeyA=
-=VXVx
------END PGP SIGNATURE-----
-
---DozTQjXnjm3C9Xhk--
+Pk9uIE1vbiwgQXVnIDI3LCAyMDE4IGF0IDA0OjI1OjAwUE0gKzA4MDAsIHBlbmcuaGFvMkB6dGUu
+Y29tLmNuIHdyb3RlOgo+PiA+PiBPbiAyNSBBdWcgMjAxOCwgYXQgMTU6MTksIFBlbmcgSGFvIDxw
+ZW5nLmhhbzJAenRlLmNvbS5jbj4gd3JvdGU6Cj4+ID4+IAo+PiA+PiBkaWZmIC0tZ2l0IGEvaHcv
+cGNpLWhvc3QvcGlpeC5jIGIvaHcvcGNpLWhvc3QvcGlpeC5jCj4+ID4+IGluZGV4IDBlNjA4MzQu
+LmRhNzM3NDMgMTAwNjQ0Cj4+ID4+IC0tLSBhL2h3L3BjaS1ob3N0L3BpaXguYwo+PiA+PiArKysg
+Yi9ody9wY2ktaG9zdC9waWl4LmMKPj4gPj4gQEAgLTMyNyw2ICszMjcsMTAgQEAgc3RhdGljIHZv
+aWQgaTQ0MGZ4X3BjaWhvc3RfcmVhbGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvciAqKmVycnAp
+Cj4+ID4+IAo+PiA+PiAgICAgc3lzYnVzX2FkZF9pbyhzYmQsIDB4Y2ZjLCAmcy0+ZGF0YV9tZW0p
+Owo+PiA+PiAgICAgc3lzYnVzX2luaXRfaW9wb3J0cyhzYmQsIDB4Y2ZjLCA0KTsKPj4gPj4gKwo+
+PiA+PiArICAgIC8qIHJlZ2lzdGVyIGk0NDBmeCAweGNmOCBwb3J0IGFzIGNvYWxlc2NlZCBwaW8g
+Ki8KPj4gPj4gKyAgICBtZW1vcnlfcmVnaW9uX3NldF9mbHVzaF9jb2FsZXNjZWQoJnMtPmRhdGFf
+bWVtKTsKPj4gPj4gKyAgICBtZW1vcnlfcmVnaW9uX2FkZF9jb2FsZXNjaW5nKCZzLT5jb25mX21l
+bSwgMCwgNCk7Cj4+ID4+IH0KPj4gPj4gCj4+ID5JcyB0aGVyZSBhIHJlYXNvbiB0byBub3QgcmVn
+aXN0ZXIgdGhpcyBwb3J0IGFzIGNvYWxlc2NlZCBQSU8gYWxzbyBmb3IgUTM1Pwo+PiA+SW4gcTM1
+X2hvc3RfcmVhbGl6ZSgpPwo+PiA+SWYgbm90LCBJIHdvdWxkIGRvIHRoYXQgYXMgYW4gZXh0cmEg
+cGF0Y2ggYXMgcGFydCBvZiB0aGlzIHNlcmllcy4KPj4gSnVzdCBhcyBJIG1lbnRpb25lZCBpbiBw
+YXRjaCBbMC80XSAsIHlvdSBjYW4gYWRkIHBjaS0+Pmhvc3QgY29uZmlnIHBvcnQgYXMgY29hbGVz
+ZWNkIHBpby4gSSB0aGluayAgaXQgd29ya3MgZm9yIHEzNSBwb3J0IDB4Y2Y4Lgo+PiA+LUxpcmFu
+Cj4KPldoYXQncyB0aGUgcGVyZm9ybWFuY2UgaW1wcm92ZW1lbnQgZm9yIHEzNT8KcTM1IGFsc28g
+aGFzICB0aGUgc2FtZSBwY2ktaG9zdCBjb25maWcgcG9ydCAweGNmOCAgYXMgIHBpaXguIEkgdGVz
+dCB0aGUgY29hbGVzY2VkIHBpbyBmb3IgCnEzNSBwY2ktaG9zdCBjb25maWcgcG9ydCAweGNmOC4g
+SXQgc3BlbnQgbGVzcyBWTS1leGl0IGF2ZyB0aW1lIGZyb20gM3VzIHRvIDAuNnVzLgoKPi0tIAo+
+TVNU
