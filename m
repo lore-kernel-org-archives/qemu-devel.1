@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fuJt9-0005mD-TF
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:57:16 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fuJxJ-0001g4-Lj
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 12:01:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fuJrP-0002Dr-CT
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 11:55:24 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fuJxE-0006n8-Ja
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 12:01:29 -0400
 References: <20180817190457.8292-1-jsnow@redhat.com>
-	<20180817190457.8292-4-jsnow@redhat.com>
-	<7c836fb4-c6f4-b590-11ef-6aadb8bc169a@redhat.com>
-	<b576a1a9-ac22-599f-665f-8559e8a9faf1@redhat.com>
-	<c76b3fc9-e6a9-4e0b-7607-f0bbcef30234@redhat.com>
+	<20180817190457.8292-2-jsnow@redhat.com>
+	<fd070439-3f9f-7c86-0466-49cd7aeab942@redhat.com>
+	<e97c1bf4-9cbf-eb5a-7237-c83c534eb3b6@redhat.com>
+	<208168ca-5e05-83b1-9531-a6ac77c80bae@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <2535fb2a-7079-f6cc-88d6-e25780691b7f@redhat.com>
-Date: Mon, 27 Aug 2018 11:54:52 -0400
+Message-ID: <d5f3eda3-5eab-2e27-d55e-cda74d879fe7@redhat.com>
+Date: Mon, 27 Aug 2018 12:01:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <c76b3fc9-e6a9-4e0b-7607-f0bbcef30234@redhat.com>
+In-Reply-To: <208168ca-5e05-83b1-9531-a6ac77c80bae@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/7] jobs: add exit shim
+Subject: Re: [Qemu-devel] [PATCH 1/7] jobs: change start callback to run
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,129 +29,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com
+Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
 
 
 
-On 08/25/2018 09:05 AM, Max Reitz wrote:
-> On 2018-08-22 23:52, John Snow wrote:
+On 08/25/2018 09:33 AM, Max Reitz wrote:
+> On 2018-08-23 01:01, John Snow wrote:
 >>
 >>
->> On 08/22/2018 07:43 AM, Max Reitz wrote:
+>> On 08/22/2018 06:51 AM, Max Reitz wrote:
 >>> On 2018-08-17 21:04, John Snow wrote:
->>>> All jobs do the same thing when they leave their running loop:
->>>> - Store the return code in a structure
->>>> - wait to receive this structure in the main thread
->>>> - signal job completion via job_completed
+>>>> Presently we codify the entry point for a job as the "start" callback,
+>>>> but a more apt name would be "run" to clarify the idea that when this
+>>>> function returns we consider the job to have "finished," except for
+>>>> any cleanup which occurs in separate callbacks later.
 >>>>
->>>> Few jobs do anything beyond exactly this. Consolidate this exit
->>>> logic for a net reduction in SLOC.
->>>>
->>>> More seriously, when we utilize job_defer_to_main_loop_bh to call
->>>> a function that calls job_completed, job_finalize_single will run
->>>> in a context where it has recursively taken the aio_context lock,
->>>> which can cause hangs if it puts down a reference that causes a flush.
->>>>
->>>> You can observe this in practice by looking at mirror_exit's careful
->>>> placement of job_completed and bdrv_unref calls.
->>>>
->>>> If we centralize job exiting, we can signal job completion from outside
->>>> of the aio_context, which should allow for job cleanup code to run with
->>>> only one lock, which makes cleanup callbacks less tricky to write.
+>>>> As part of this clarification, change the signature to include an error
+>>>> object and a return code. The error ptr is not yet used, and the return
+>>>> code while captured, will be overwritten by actions in the job_completed
+>>>> function.
 >>>>
 >>>> Signed-off-by: John Snow <jsnow@redhat.com>
 >>>> ---
->>>>  include/qemu/job.h |  7 +++++++
->>>>  job.c              | 19 +++++++++++++++++++
->>>>  2 files changed, 26 insertions(+)
+>>>>  block/backup.c            |  7 ++++---
+>>>>  block/commit.c            |  7 ++++---
+>>>>  block/create.c            |  8 +++++---
+>>>>  block/mirror.c            | 10 ++++++----
+>>>>  block/stream.c            |  7 ++++---
+>>>>  include/qemu/job.h        |  2 +-
+>>>>  job.c                     |  6 +++---
+>>>>  tests/test-bdrv-drain.c   |  7 ++++---
+>>>>  tests/test-blockjob-txn.c | 16 ++++++++--------
+>>>>  tests/test-blockjob.c     |  7 ++++---
+>>>>  10 files changed, 43 insertions(+), 34 deletions(-)
 >>>
->>> Currently all jobs do this, the question of course is why.  The answer
->>> is because they are block jobs that need to do some graph manipulation
->>> in the main thread, right?
+>>> [...]
 >>>
->>
->> Yep.
->>
->>> OK, that's reasonable enough, that sounds like even non-block jobs may
->>> need this (i.e. modify some global qemu state that you can only do in
->>> the main loop).  Interestingly, the create job only calls
->>> job_completed() of which it says nowhere that it needs to be executed in
->>> the main loop.
+>>>> diff --git a/job.c b/job.c
+>>>> index fa671b431a..898260b2b3 100644
+>>>> --- a/job.c
+>>>> +++ b/job.c
+>>>> @@ -544,16 +544,16 @@ static void coroutine_fn job_co_entry(void *opaque)
+>>>>  {
+>>>>      Job *job = opaque;
+>>>>  
+>>>> -    assert(job && job->driver && job->driver->start);
+>>>> +    assert(job && job->driver && job->driver->run);
+>>>>      job_pause_point(job);
+>>>> -    job->driver->start(job);
+>>>> +    job->ret = job->driver->run(job, NULL);
+>>>>  }
 >>>
->>
->> Yeah, not all jobs will have anything meaningful to do in the main loop
->> context. This is one of them.
->>
->>> ...on second thought, do we really want to execute job_complete() in the
->>> main loop?  First of all, all of the transactional functions will run in
->>> the main loop.  Which makes sense, but it isn't noted anywhere.
->>> Secondly, we may end up calling JobDriver.user_resume(), which is
->>> probably not something we want to call in the main loop.
+>>> Hmmm, this breaks the iff relationship with job->error.  We might call
+>>> job_update_rc() afterwards, but then job_completed() would need to free
+>>> it if it overwrites it with the error description from a potential error
+>>> object.
 >>>
->>
->> I think we need to execute job_complete in the main loop, or otherwise
->> restructure the code that can run between job_completed and
->> job_finalize_single so that .prepare/.commit/.abort/.clean run in the
->> main thread, which is something we want to preserve.
-> 
-> Sure.
-> 
->> It's simpler just to say that complete will run from the main thread,
->> like it does presently.
-> 
-> Yes, but we don't say that.
-> 
->> Why would we not want to call user_resume from the main loop? That's
->> directly where it's called from, since it gets invoked directly from the
->> qmp thread.
-> 
-> Hmm!  True indeed.
-> 
-> The reason why we might not want to do it is because the job may not run
-> in the main loop, so modifying the job (especially invoking a job
-> method) may be dangerous without taking precautions.
-> 
->>> OTOH, job_finish_sync() is something that has to be run in the main loop
->>> because it polls the main loop (and as far as my FUSE experiments have
->>> told me, polling a foreign AioContext doesn't work).
+>>> Also, I suspect the following patches might fix the relationship anyway?
+>>>  (But then an "XXX: This does not hold right now, but will be fixed in a
+>>> future patch" in the documentation of Job.error might help.)
 >>>
->>> So...  I suppose it would be nice if we had a real distinction which
->>> functions are run in which AioContext.  It seems like we indeed want to
->>> run job_completed() in the main loop, but what to do about the
->>> user_resume() call in job_cancel_async()?
+>>> Max
 >>>
 >>
->> I don't think we need to do anything -- at least, these functions
->> *already* run from the main loop.
+>> Hmm... does it? ... I guess you mean that we are setting job->ret
+>> earlier than we used to, which gives us a window where you can have ret
+>> set, but error unset.
+>>
+>> This will get settled out by the end of the series anyway:
 > 
-> Yeah, but we don't mark that anywhere.  I really don't like that.  Jobs
-> need to know which of their functions are run in which AioContext.
+> Oh no, it appears I accidentally removed yet another chunk from my reply
+> to patch 2...
 > 
->> mirror_exit et al get scheduled from job_defer_to_main_loop and call
->> job_completed there, so it's already always done from the main loop; I'm
->> just cutting out the part where the jobs have to manually schedule this.
+>> - char *error gets replaced with Error *err,
 > 
-> I'm not saying what you're doing is wrong, I'm just saying tracking
-> which things are running in which context is not easy because there are
-> no comments on how it's supposed to be run.  (Apart from your new
-> .exit() method which does say that it's run in the main loop.)
+> Which is basically the same.  I noted in the deleted chunk that patch 2
+> just removes the iff relationship from the describing comment, but, well...
 > 
-> No, I don't find it obvious which functions are run in which context
-> when first I have to think about in which context those functions are
-> used (e.g. user_resume is usually the result of a QMP command, so it's
-> run in the main loop; the transactional methods are part of completion,
-> which is done in the main loop, so they are also called in the main
-> loop; and so on).
+>> - I remove the error object from job_completed
+>> - v2 will remove the ret argument, too.
 > 
-> But that's not part of this series.  It just occurred to me when
-> tracking down which function belongs to which context when reviewing
-> this patch.
+> The most important bit of the chunk I removed was that I was complaining
+> about Job.ret still being there.  I don't really see the point of this
+> patch here at this point.
+> 
+> Unfortunately I can't quite recall...
+> 
+> Having a central Error object doesn't really make sense.  Whenever the
+> block job wants to return an error, it should probably do so as "return"
+> values of methods (like .run()).  Same for ret, of course.
+> 
+> I understand that this is probably really only possible after v2 when
+> you've made more use of abort/commit.  But still, I don't think this
+> patch improves anything, so I would leave this clean-up until later when
+> you can really do something.
+> 
+> I suppose the idea here is that you want to drop the errp parameter from
+> job_completed(), because it is not going to be called by .exit().  But
+> the obvious way around this would be to pass an errp to .exit() and then
+> pass the result on to job_completed().
 > 
 > Max
 > 
 
-Oh, I see. I can mark up the functions I/we expect to run in the main
-thread with comments above the function implementation, would that help?
+That might be a good idea, but I need to look at the pathway for
+actually showing that error to the user, since we need to pass it down a
+few times anyway. It's certainly simpler to just stash it in the object.
 
-Probably also a top level document would also help... We're overdue for
-one after all the changes recently.
+I'll take a look.
