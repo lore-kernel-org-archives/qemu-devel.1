@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fu78a-0007KY-7Q
-	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:20:17 -0400
+	(envelope-from <famz@redhat.com>) id 1fu78v-0007gG-Gt
+	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fu78W-0008TS-S0
-	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:20:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53452 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fu78s-0000RH-5K
+	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:20:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34360 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fu78W-0008Sr-L6
-	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:20:12 -0400
-Date: Mon, 27 Aug 2018 10:20:08 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fu78s-0000QS-13
+	for qemu-devel@nongnu.org; Sun, 26 Aug 2018 22:20:34 -0400
+Date: Mon, 27 Aug 2018 10:20:31 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180827022008.GA19413@lemon.usersys.redhat.com>
+Message-ID: <20180827022031.GB19413@lemon.usersys.redhat.com>
 References: <20180824135312.1606-1-famz@redhat.com>
-	<20180825165306.tyoc5jrcgmkmbzyy@var.youpi.perso.aquilenet.fr>
+	<1f5e48b3-4fa1-1ff4-0775-1d36604cad3f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180825165306.tyoc5jrcgmkmbzyy@var.youpi.perso.aquilenet.fr>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1f5e48b3-4fa1-1ff4-0775-1d36604cad3f@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] slirp: Implement RFC2132 TFTP server name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,36 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, berrange@redhat.com, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, brad@comstyle.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, berrange@redhat.com, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, brad@comstyle.com
 
-On Sat, 08/25 18:53, Samuel Thibault wrote:
-> Hello,
->=20
-> Fam Zheng, le ven. 24 ao=FBt 2018 21:53:12 +0800, a ecrit:
-> >                            const char *vnameserver, const char *vname=
-server6,
-> >                            const char *smb_export, const char *vsmbse=
-rver,
-> >                            const char **dnssearch, const char *vdomai=
-nname,
-> > +                          const char *tftp_server_name,
->=20
-> I'd say rather put it between the vhostname and tftp_export parameters.
->=20
-> > @@ -321,6 +322,9 @@ Slirp *slirp_init(int restricted, bool in_enabled=
-, struct in_addr vnetwork,
-> >      slirp->vdhcp_startaddr =3D vdhcp_start;
-> >      slirp->vnameserver_addr =3D vnameserver;
-> >      slirp->vnameserver_addr6 =3D vnameserver6;
-> > +    if (tftp_server_name) {
-> > +        slirp->tftp_server_name =3D g_strdup(tftp_server_name);
-> > +    }
->=20
-> I'd say do not bother testing for tftp_server_name !=3D NULL, just alwa=
-ys
-> use g_strdup, as is done for other values.
+On Fri, 08/24 11:21, Eric Blake wrote:
+> On 08/24/2018 08:53 AM, Fam Zheng wrote:
+> > This new usernet option can be used to add data for option 66 (tftp
+> > server name) in the BOOTP reply, which is useful in PXE based automatic
+> > OS install such as OpenBSD.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> 
+> > +++ b/qapi/net.json
+> > @@ -174,6 +174,8 @@
+> >   #
+> >   # @guestfwd: forward guest TCP connections
+> >   #
+> > +# @tftp-server-name: (optional) RFC2132 "TFTP server name" string (Since 3.1)
+> 
+> The doc generator automatically marks up optional members these days, so you
+> can drop '(optional)' from this line.
 
-Both sound good. I'll send v2.
+OK, will drop in v2. Thanks!
 
 Fam
