@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fuelk-0005a6-6t
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:14:57 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fueu2-00026w-PX
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fuelg-0003nv-6I
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:14:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34522 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fuelf-0003mt-U0
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:14:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5FD5C7721B
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 14:14:51 +0000 (UTC)
-Date: Tue, 28 Aug 2018 16:14:46 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180828141446.l4fxq42saxss234h@kamzik.brq.redhat.com>
-References: <1535464093-3648-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fuetz-0004uv-GC
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:23:30 -0400
+Received: from mail-co1nam05on072b.outbound.protection.outlook.com
+	([2a01:111:f400:fe50::72b]:55912
+	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fuety-0004r5-VE
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:23:27 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 28 Aug 2018 14:23:04 +0000
+Message-ID: <BN7PR08MB4868B0E06C13DE35AA4327DBC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <20180828130041.26445-1-jancraig@amazon.com>,
+	<20180828130041.26445-5-jancraig@amazon.com>
+In-Reply-To: <20180828130041.26445-5-jancraig@amazon.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1535464093-3648-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] vl.c deprecate incorrect CPUs topology
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] target/mips: Add MXU instruction
+ S8LDD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +32,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, ehabkost@redhat.com
+To: Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
 
-On Tue, Aug 28, 2018 at 03:48:13PM +0200, Igor Mammedov wrote:
-> -smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-> so that total number of logical CPUs [sockets * cores * threads]
-> would be equal to [maxcpus], however historically we didn't have
-> such check in QEMU and it is possible to start VM with an invalid
-> topology.
-> Deprecate invalid options combination so we can make sure that
-> the topology VM started with is always correct in the future.
-> Users with an invalid sockets/cores/threads/maxcpus values should
-> fix their CLI to make sure that
->    [sockets * cores * threads] == [maxcpus]
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> From: Craig Janeczek <jancraig@amazon.com>
+> Sent: Tuesday, August 28, 2018 3:00 PM
+> To: qemu-devel@nongnu.org
+> Cc: Aleksandar Markovic; aurelien@aurel32.net; Craig Janeczek
+> Subject: [PATCH v3 4/8] target/mips: Add MXU instruction S8LDD
+>=20
+> Adds support for emulating the S8LDD MXU instruction.
+>=20
+> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 > ---
-> v4:
->   - missed dot comment, fix it with s/./,/ (Andrew Jones <drjones@redhat.com>)
-> v3:
->   - more spelling fixes (Andrew Jones <drjones@redhat.com>)
->   - place deprecation check after (sockets * cores * threads > max_cpus) check
->     (Eduardo Habkost <ehabkost@redhat.com>)
-> v2:
->   - spelling&&co fixes (Andrew Jones <drjones@redhat.com>)
-> ---
->  qemu-deprecated.texi | 11 +++++++++++
->  vl.c                 |  7 +++++++
->  2 files changed, 18 insertions(+)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 87212b6..094b4ca 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -159,6 +159,17 @@ The 'file' driver for drives is no longer appropriate for character or host
->  devices and will only accept regular files (S_IFREG). The correct driver
->  for these file types is 'host_cdrom' or 'host_device' as appropriate.
->  
-> +@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
+>  v1
+>     - initial patch
+>  v2
+>     - changed bitfield usage to extract32
+>     - used deposit_tl instructions instead of shift and bitmask
+>  v3
+>     - Split gen_mxu function into command specific gen_mxu_<ins> function=
+s
+>=20
+>  target/mips/translate.c | 69 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 69 insertions(+)
+>=20
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index f6991aa8ef..024e48baf6 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -3851,6 +3851,71 @@ static void gen_mxu_s32m2i(DisasContext *ctx, uint=
+32_t opc)
+>      tcg_temp_free(t0);
+>  }
+>=20
+> +/* S8LDD XRa, rb, S8, OPTN3 - Load a byte from memory to XRF */
+> +static void gen_mxu_s8ldd(DisasContext *ctx, uint32_t opc)
+> +{
+> +    TCGv t0, t1;
+> +    uint32_t xra, s8, optn3, rb;
 > +
-> +CPU topology properties should describe whole machine topology including
-> +possible CPUs, but historically it was possible to start QEMU with
-> +an incorrect topology where
-> +  sockets * cores * threads >= X && X < maxcpus
-> +which could lead to an incorrect topology enumeration by the guest.
-> +Support for invalid topologies will be removed, the user must ensure
-> +topologies described with -smp include all possible cpus, i.e.
-> +  sockets * cores * threads == maxcpus
+> +    t0 =3D tcg_temp_new();
+> +    t1 =3D tcg_temp_new();
 > +
->  @section QEMU Machine Protocol (QMP) commands
->  
->  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-> diff --git a/vl.c b/vl.c
-> index 5ba06ad..7fd700e 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1246,6 +1246,13 @@ static void smp_parse(QemuOpts *opts)
->              exit(1);
->          }
->  
-> +        if (sockets * cores * threads != max_cpus) {
-> +            warn_report("Invalid CPU topology deprecated: "
-> +                        "sockets (%u) * cores (%u) * threads (%u) "
-> +                        "!= maxcpus (%u)",
-> +                        sockets, cores, threads, max_cpus);
-> +        }
+> +    xra =3D extract32(ctx->opcode, 6, 4);
+> +    s8 =3D extract32(ctx->opcode, 10, 8);
+> +    optn3 =3D extract32(ctx->opcode, 18, 3);
+> +    rb =3D extract32(ctx->opcode, 21, 5);
 > +
->          smp_cpus = cpus;
->          smp_cores = cores;
->          smp_threads = threads;
-> -- 
-> 2.7.4
-> 
->
+> +    gen_load_gpr(t0, rb);
+> +    tcg_gen_addi_tl(t0, t0, (int8_t)s8);
+> +    switch (optn3) {
+> +    case 0: /*XRa[7:0] =3D tmp8 */
+> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
+> +        gen_load_mxu_gpr(t0, xra);
+> +        tcg_gen_deposit_tl(t0, t0, t1, 0, 8);
+> +        break;
+> +    case 1: /* XRa[15:8] =3D tmp8 */
+> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
+> +        gen_load_mxu_gpr(t0, xra);
+> +        tcg_gen_deposit_tl(t0, t0, t1, 8, 8);
+> +        break;
+> +    case 2: /* XRa[23:16] =3D tmp8 */
+> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
+> +        gen_load_mxu_gpr(t0, xra);
+> +        tcg_gen_deposit_tl(t0, t0, t1, 16, 8);
+> +        break;
+> +    case 3: /* XRa[31:24] =3D tmp8 */
+> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
+> +        gen_load_mxu_gpr(t0, xra);
+> +        tcg_gen_deposit_tl(t0, t0, t1, 24, 8);
+> +        break;
+> +    case 4: /* XRa =3D {8'b0, tmp8, 8'b0, tmp8} */
+> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
+> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
+> +        break;
+> +    case 5: /* XRa =3D {tmp8, 8'b0, tmp8, 8'b0} */
+> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
+> +        tcg_gen_shli_tl(t1, t1, 8);
+> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
+> +        break;
+> +    case 6: /* XRa =3D {{8{sign of tmp8}}, tmp8, {8{sign of tmp8}}, tmp8=
+} */
+> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_SB);
+> +        tcg_gen_mov_tl(t0, t1);
+> +        tcg_gen_andi_tl(t0, t0, 0xFF00FFFF);
+> +        tcg_gen_shli_tl(t1, t1, 16);
+> +        tcg_gen_or_tl(t0, t0, t1);
+> +        break;
+> +    case 7: /* XRa =3D {tmp8, tmp8, tmp8, tmp8} */
+> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
+> +        tcg_gen_deposit_tl(t1, t1, t1, 8, 8);
+> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
+> +        break;
+> +    }
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Similar to the situation in patch 6, the following is missing:
+
+/* MXU operand getting patterns OPTN3 */
+#define MXU_OPTN3_PTN0  0
+#define MXU_OPTN3_PTN1  1
+#define MXU_OPTN3_PTN2  2
+#define MXU_OPTN3_PTN3  3
+#define MXU_OPTN3_PTN4  4
+#define MXU_OPTN3_PTN5  5
+#define MXU_OPTN3_PTN6  6
+#define MXU_OPTN3_PTN7  7
+
+> +    gen_store_mxu_gpr(t0, xra);
+> +
+> +    tcg_temp_free(t0);
+> +    tcg_temp_free(t1);
+> +}
+> +
+>  /* Godson integer instructions */
+>  static void gen_loongson_integer(DisasContext *ctx, uint32_t opc,
+>                                   int rd, int rs, int rt)
+> @@ -17956,6 +18021,10 @@ static void decode_opc_special2_legacy(CPUMIPSSt=
+ate *env, DisasContext *ctx)
+>          gen_mxu_s32m2i(ctx, op1);
+>          break;
+>=20
+> +    case OPC_MXU_S8LDD:
+> +        gen_mxu_s8ldd(ctx, op1);
+> +        break;
+> +
+>      case OPC_CLO:
+>      case OPC_CLZ:
+>          check_insn(ctx, ISA_MIPS32);
+> --
+> 2.18.0
+>=20
+
+Thanks,
+Aleksandar=
