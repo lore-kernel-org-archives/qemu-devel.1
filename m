@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuaB2-00070x-0N
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1fuaB2-00070y-Iz
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuaAx-00076n-TL
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46698)
+	(envelope-from <bounces@canonical.com>) id 1fuaB1-00077X-3x
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46892)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fuaAx-00076J-M8
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:39 -0400
+	id 1fuaB0-00077T-Si
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fuaAw-0003X1-2o
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:38 +0000
+	id 1fuaAy-0003X3-AT
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 141B42E80CB
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4D2002E80C7
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Aug 2018 09:08:21 -0000
+Date: Tue, 28 Aug 2018 09:10:39 -0000
 From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
 	<1755912@bugs.launchpad.net>
 Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153544730183.6050.15493232555552482224.malone@gac.canonical.com>
+Message-Id: <153544743938.6088.14720329196483565958.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
  SIGABRT when using option -vga qxl
@@ -40,58 +40,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Running the Bionic ISO like:
-$ qemu-system-x86_64 -cpu host -smp cores=3D4,threads=3D2 -boot d -m 2048 -=
-enable-kvm -vga qxl -vnc :21 -cdrom ubuntu-18.04-desktop-amd64.iso
-
-Attaching like:
-$ vncviewer FullColor=3D1 AutoSelect=3D0 10.245.168.42:5921
-(alternatives on tigervnc)
-Well for me it had "-k de" as well :-)
-
-Then boot into the "try Ubuntu" live CD mode.
-There opened a terminal to loop on xrandr.
-
-Running the loop of above in that guest to crash it after a while.
-
-
-Upgrade to proposed:
-$ sudo apt install qemu-system-x86=3D1:2.11+dfsg-1ubuntu7.5
-Reading package lists... Done
-Building dependency tree       =
-
-Reading state information... Done
-Suggested packages:
-  samba vde2 qemu-block-extra sgabios ovmf
-The following packages will be upgraded:
-  qemu-system-x86
-1 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
-Need to get 5.168 kB of archives.
-After this operation, 0 B of additional disk space will be used.
-Get:1 http://archive.ubuntu.com/ubuntu bionic-proposed/main amd64 qemu-syst=
-em-x86 amd64 1:2.11+dfsg-1ubuntu7.5 [5.168 kB]
-Fetched 5.168 kB in 1s (7.666 kB/s)          =
-
-(Reading database ... 127990 files and directories currently installed.)
-Preparing to unpack .../qemu-system-x86_1%3a2.11+dfsg-1ubuntu7.5_amd64.deb =
-...
-Unpacking qemu-system-x86 (1:2.11+dfsg-1ubuntu7.5) over (1:2.11+dfsg-1ubunt=
-u7.4) ...
-Setting up qemu-system-x86 (1:2.11+dfsg-1ubuntu7.5) ...
-Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
-
-
-Running the loop again with the same setup  - no crash in 15 minutes - assu=
-me that means good now.
-I'd be glad about someone else checking the result as well, best someone fo=
-rmerly affected by it.
-(and having a tick in the eye for seeing my right screen change sizes and f=
-licker all the time)
-
-Setting verified
-
-** Tags removed: verification-needed
-** Tags added: verification-done
+Thanks Leonardo for your check as well!
+I agree that this particular issue here is fixed as we hoped.
+The other one with the freeze did not occur for me, you might open another =
+bug if you have any pointers how we could go on on this.
 
 -- =
 
