@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58227)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fuXsg-00041d-8F
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 02:53:39 -0400
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1fuY30-0001KE-Qc
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 03:04:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fuXsY-0002YR-Ez
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 02:53:37 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37841)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fuXsW-0002Wr-Ed
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 02:53:30 -0400
-Received: by mail-wm0-x234.google.com with SMTP id n11-v6so721960wmc.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 23:53:28 -0700 (PDT)
-References: <1533793434-7614-1-git-send-email-whois.zihan.yang@gmail.com>
-	<ece2a3ff-678d-00b6-3fd6-660972c5beca@gmail.com>
-	<20180827070406.t525gr43qpu7wpsj@sirius.home.kraxel.org>
-	<CAKwiv-gyGoqEpmpicxo_a3cQBsb0-XoT9cqkJu5WOtkUtAx0eQ@mail.gmail.com>
-	<5f5dc082-7053-d6b9-b01f-fffba1847ba5@gmail.com>
-	<20180828060752.mmsd7x7uobqm2gsr@sirius.home.kraxel.org>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <8b232ca6-4643-24c7-d93d-589a452d0785@gmail.com>
-Date: Tue, 28 Aug 2018 09:53:24 +0300
+	(envelope-from <yi.z.zhang@linux.intel.com>) id 1fuY2w-0002no-NO
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 03:04:18 -0400
+Received: from mga14.intel.com ([192.55.52.115]:30414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.z.zhang@linux.intel.com>)
+	id 1fuY2w-0002li-DW
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 03:04:14 -0400
+Date: Tue, 28 Aug 2018 23:42:57 +0800
+From: Yi Zhang <yi.z.zhang@linux.intel.com>
+Message-ID: <20180828154256.GH13028@tiger-server>
+References: <20180820104045.133968-1-mst@redhat.com>
+	<20180820104045.133968-5-mst@redhat.com>
+	<CAFEAcA9eOFMuvkN2gBetU4SSpV0Jp2hSVsjMG53_Cp8TrkObFg@mail.gmail.com>
+	<20180824195231-mutt-send-email-mst@kernel.org>
+	<CAFEAcA8d0TMqkmkVY9mANj+Dv9fZj18ov=nvaDNtKqss5Nmc+w@mail.gmail.com>
+	<20180824201116-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180828060752.mmsd7x7uobqm2gsr@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [SeaBIOS] [RFC v2 0/3] Support multiple pci
- domains in pci_device
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180824201116-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PULL 4/7] hostmem-file: add the 'pmem' option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, seabios@seabios.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Junyan He <junyan.he@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Gerd,
+On 2018-08-24 at 20:14:37 +0300, Michael S. Tsirkin wrote:
+> On Fri, Aug 24, 2018 at 05:57:06PM +0100, Peter Maydell wrote:
+> > On 24 August 2018 at 17:53, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > On Fri, Aug 24, 2018 at 04:13:18PM +0100, Peter Maydell wrote:
+> > >> object_get_canonical_path_component() returns a string which
+> > >> must be freed using g_free().
+> > 
+> > > Like the following? Junyan, could you pls try this one and confirm?
+> > >
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > >
+> > > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> > > index 2476dcb435..d88125b86e 100644
+> > > --- a/backends/hostmem-file.c
+> > > +++ b/backends/hostmem-file.c
+> > > @@ -154,11 +154,14 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
+> > >  #ifndef CONFIG_LIBPMEM
+> > >      if (value) {
+> > >          Error *local_err = NULL;
+> > > +        char *path = object_get_canonical_path_component(o);
+> > > +
+> > >          error_setg(&local_err,
+> > >                     "Lack of libpmem support while setting the 'pmem=on'"
+> > >                     " of %s '%s'. We can't ensure data persistence.",
+> > >                     object_get_typename(o),
+> > > -                   object_get_canonical_path_component(o));
+> > > +                   );
+> > > +        g_free(path);
+> > >          error_propagate(errp, local_err);
+> > >          return;
+> > 
+> > Yep, like that (though I would put the closing ");" on
+> > the line with object_get_typename() and delete the trailing comma).
+> > 
+> > thanks
+> > -- PMM
+>a
 
-On 08/28/2018 09:07 AM, Gerd Hoffmann wrote:
->    Hi,
->
->> Since we will not use all 256 buses of an extra PCI domain,
->> I think this space will allow us to support more PCI domains.
-> Depends on the use case I guess.  If you just need many pcie devices
-> this probably doesn't help.  If you want them for numa support then yes,
-> more domains with less devices each can be useful then.
+Ah.. Thanks Michael/Peter to identify/prepare this fix.
 
-We already support multiple NUMA nodes. We want more devices.
-Still, having 4x number of devices we previously supported is
-a good step forward.
+> oh i forgot to add in "path".
+> I didn't build with libpmem installed
 
->
->> How will the flow look like ?
->>
->> 1. QEMU passes to SeaBIOS information of how many extra
->>     PCI domains needs, and how many buses per domain.
->>     How it will pass this info? A vendor specific capability,
->>     some PCI registers or modifying extra-pci-roots fw_cfg file?
-> Where is the pxb-pcie device?  0000:$somewhere?  Or $domain:00:00.0?
+Maybe you already have libpmem installed yet, 
+it is *ifndef* CONFIG_LIBPMEM ^_^
 
-  0000:$somewhere (On PCI domain 0)
+> Should have been (still untested):
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> 
+> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> index 2476dcb435..72e7055ee7 100644
+> --- a/backends/hostmem-file.c
+> +++ b/backends/hostmem-file.c
+> @@ -154,11 +154,14 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
+>  #ifndef CONFIG_LIBPMEM
+>      if (value) {
+>          Error *local_err = NULL;
+> +        char *path = object_get_canonical_path_component(o);
+> +
+>          error_setg(&local_err,
+>                     "Lack of libpmem support while setting the 'pmem=on'"
+>                     " of %s '%s'. We can't ensure data persistence.",
+>                     object_get_typename(o),
+> -                   object_get_canonical_path_component(o));
+> +                   path);
+> +        g_free(path);
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+> 
+Ah.. I saw another place still have the seem leak, on the previous few lines in
+file_memory_backend_set_pmem, I will prepare another patch to fix the
+leaks in these two place.
 
-
-
->> 2. SeaBIOS assigns the address for each PCI Domain
-
->>   and
->>      returns the information to QEMU.
->>      How it will do that? Some pxb-pcie registers? Or do we model
->>      the MMCFG like a PCI BAR?
-> If we can access pxb-pcie registers before configuring MMCFG then yes,
-> we should use pxb-pcie registers for that.
-
-Yes, we can.
-
-Thanks Gerd!
-Marcel
-
->
-> cheers,
->    Gerd
->
+Regards
+Yi.
