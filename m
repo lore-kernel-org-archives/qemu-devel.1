@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fucrZ-0001Dk-Iw
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 08:12:51 -0400
+	(envelope-from <david@redhat.com>) id 1fucsN-0001jd-4h
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 08:13:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fucrW-0003b5-1h
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 08:12:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42748 helo=mx1.redhat.com)
+	(envelope-from <david@redhat.com>) id 1fucsK-0004bu-19
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 08:13:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58256 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fucrV-0003aN-R9
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 08:12:45 -0400
-Date: Tue, 28 Aug 2018 08:12:40 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180828080646-mutt-send-email-mst@kernel.org>
-References: <1535071416-212072-1-git-send-email-longpeng2@huawei.com>
-	<5B7F5688.5080007@huawei.com>
-	<20180824142118-mutt-send-email-mst@kernel.org>
-	<33183CC9F5247A488A2544077AF19020DB0A1B5B@dggeml531-mbs.china.huawei.com>
-	<20180824155408-mutt-send-email-mst@kernel.org>
-	<33183CC9F5247A488A2544077AF19020DB0B44A6@dggeml511-mbx.china.huawei.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fucsJ-0004bY-Qs
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 08:13:35 -0400
+References: <20180713075232.9575-1-pagupta@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <1328e543-0276-8f33-1744-8baa053023c4@redhat.com>
+Date: Tue, 28 Aug 2018 14:13:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DB0B44A6@dggeml511-mbx.china.huawei.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v25 0/2] virtio-crypto:
- virtio crypto device specification
+In-Reply-To: <20180713075232.9575-1-pagupta@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 0/2] kvm "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,59 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: longpeng <longpeng2@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "cohuck@redhat.com" <cohuck@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "agraf@suse.de" <agraf@suse.de>, "jasowang@redhat.com" <jasowang@redhat.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: Pankaj Gupta <pagupta@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-nvdimm@ml01.01.org
+Cc: jack@suse.cz, stefanha@redhat.com, dan.j.williams@intel.com, riel@surriel.com, haozhong.zhang@intel.com, nilal@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, ross.zwisler@intel.com, xiaoguangrong.eric@gmail.com, hch@infradead.org, mst@redhat.com, niteshnarayanlal@hotmail.com, lcapitulino@redhat.com, imammedo@redhat.com, eblake@redhat.com
 
-On Tue, Aug 28, 2018 at 03:31:02AM +0000, Gonglei (Arei) wrote:
+On 13.07.2018 09:52, Pankaj Gupta wrote:
+> This is RFC V3 for 'fake DAX' flushing interface sharing
+> for review. This patchset has two parts:
 > 
-> > -----Original Message-----
-> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > Sent: Friday, August 24, 2018 8:54 PM
-> > 
-> > On Fri, Aug 24, 2018 at 12:07:44PM +0000, Gonglei (Arei) wrote:
-> > > Hi Michael,
-> > >
-> > > > -----Original Message-----
-> > > > From: virtio-dev@lists.oasis-open.org
-> > [mailto:virtio-dev@lists.oasis-open.org]
-> > > > On Behalf Of Michael S. Tsirkin
-> > > > Sent: Friday, August 24, 2018 7:23 PM
-> > > > To: longpeng <longpeng2@huawei.com>
-> > > > Cc: xin.zeng@intel.com; Gonglei (Arei) <arei.gonglei@huawei.com>;
-> > > > pasic@linux.vnet.ibm.com; qemu-devel@nongnu.org;
-> > > > virtio-dev@lists.oasis-open.org; cohuck@redhat.com;
-> > stefanha@redhat.com;
-> > > > denglingli@chinamobile.com; Jani Kokkonen
-> > <Jani.Kokkonen@huawei.com>;
-> > > > Ola.Liljedahl@arm.com; Varun.Sethi@freescale.com;
-> > > > brian.a.keating@intel.com; liang.j.ma@intel.com; john.griffin@intel.com;
-> > > > agraf@suse.de; jasowang@redhat.com; vincent.jardin@6wind.com;
-> > > > Huangweidong (C) <weidong.huang@huawei.com>; wangxin (U)
-> > > > <wangxinxin.wang@huawei.com>; Zhoujian (jay)
-> > <jianjay.zhou@huawei.com>
-> > > > Subject: [virtio-dev] Re: [PATCH v25 0/2] virtio-crypto: virtio crypto device
-> > > > specification
-> > > >
-> > > > Is there a github issue? If not pls create one.
-> > > >
-> > >
-> > > I just created one issue:
-> > >
-> > > https://github.com/oasis-tcs/virtio-spec/issues/19
-> > 
-> > All set to start voting whenever you request it.
-> > 
+> - Guest virtio-pmem driver
+>   Guest driver reads persistent memory range from paravirt device 
+>   and registers with 'nvdimm_bus'. 'nvdimm/pmem' driver uses this 
+>   information to allocate persistent memory range. Also, we have 
+>   implemented guest side of VIRTIO flushing interface.
 > 
-> Hi Michael,
+> - Qemu virtio-pmem device
+>   It exposes a persistent memory range to KVM guest which at host 
+>   side is file backed memory and works as persistent memory device. 
+>   In addition to this it provides virtio device handling of flushing 
+>   interface. KVM guest performs Qemu side asynchronous sync using 
+>   this interface.
 > 
-> Since no comments currently, pls help to start a ballot for virtio crypto spec if you can. :)
+> Changes from RFC v2:
+> - Add flush function in the nd_region in place of switching
+>   on a flag - Dan & Stefan
+> - Add flush completion function with proper locking and wait
+>   for host side flush completion - Stefan & Dan
+> - Keep userspace API in uapi header file - Stefan, MST
+> - Use LE fields & New device id - MST
+> - Indentation & spacing suggestions - MST & Eric
+> - Remove extra header files & add licensing - Stefan
 > 
+> Changes from RFC v1:
+> - Reuse existing 'pmem' code for registering persistent 
+>   memory and other operations instead of creating an entirely 
+>   new block driver.
+> - Use VIRTIO driver to register memory information with 
+>   nvdimm_bus and create region_type accordingly. 
+> - Call VIRTIO flush from existing pmem driver.
 > 
-> Thanks,
-> -Gonglei
+> Details of project idea for 'fake DAX' flushing interface is 
+> shared [2] & [3].
+> 
+> Pankaj Gupta (2):
+>    Add virtio-pmem guest driver
+>    pmem: device flush over VIRTIO
+> 
+> [1] https://marc.info/?l=linux-mm&m=150782346802290&w=2
+> [2] https://www.spinics.net/lists/kvm/msg149761.html
+> [3] https://www.spinics.net/lists/kvm/msg153095.html  
+> 
+>  drivers/nvdimm/nd.h              |    1 
+>  drivers/nvdimm/pmem.c            |    4 
+>  drivers/nvdimm/region_devs.c     |   24 +++-
+>  drivers/virtio/Kconfig           |    9 +
+>  drivers/virtio/Makefile          |    1 
+>  drivers/virtio/virtio_pmem.c     |  190 +++++++++++++++++++++++++++++++++++++++
+>  include/linux/libnvdimm.h        |    5 -
+>  include/linux/virtio_pmem.h      |   44 +++++++++
+>  include/uapi/linux/virtio_ids.h  |    1 
+>  include/uapi/linux/virtio_pmem.h |   40 ++++++++
+>  10 files changed, 310 insertions(+), 9 deletions(-)
+> 
 
-Done. In the future please add a link to mailing list archives.
+Hi Pankaj,
 
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+do you have a branch for the QEMU part somewhere available? I want to
+see how this works with MemoryDevice changes.
+
+-- 
+
+Thanks,
+
+David / dhildenb
