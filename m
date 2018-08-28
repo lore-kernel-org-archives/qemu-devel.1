@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fugkE-0004Du-QN
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:21:31 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fuhB5-0005NM-FR
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:49:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fugk5-0000z3-6Q
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:21:28 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36526)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fugjv-0000x4-G5
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:21:13 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fugjr-00052j-SB
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 16:21:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8C1272E80D2
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 16:21:07 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1fuh5O-0007tK-M5
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:43:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35938 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fuh5K-0007r5-6Z
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:43:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 307E2401EF04
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 16:43:16 +0000 (UTC)
+Date: Tue, 28 Aug 2018 18:43:12 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180828184312.6e0e417d@redhat.com>
+In-Reply-To: <20180828153840.22519-1-marcandre.lureau@redhat.com>
+References: <20180828153840.22519-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Aug 2018 16:07:18 -0000
-From: Daniel Berrange <1788665@bugs.launchpad.net>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153547243831.21204.1820885054588100649.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+Subject: Re: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,85 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-I'm not convinced we can trust the output from cygwin wrt CPU flags.  A
-better test would be to install a modern Linux guest which has the
-mitigations, and see if that reports the flags.
+On Tue, 28 Aug 2018 17:38:40 +0200
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
--- =
+> The share=3Don/off property is used to modified mmap() MAP_SHARED
+> setting. Make it on by default for convenience and compatibility
+> reasons.
+it would be nice to state reasons here.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
+also flipping default to on is behavioral change when
+used with bind policy which could make backend initialization fail
+so CLI that used to work (if there are any users of this without shared=3Do=
+n)
+won't work anymore.
 
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
-
-Status in QEMU:
-  New
-
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  backends/hostmem-memfd.c | 4 +++-
+>  qemu-options.hx          | 4 +++-
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+> index 1e20fe0ba8..abd52364db 100644
+> --- a/backends/hostmem-memfd.c
+> +++ b/backends/hostmem-memfd.c
+> @@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
+Error **errp)
+> =20
+>      name =3D object_get_canonical_path(OBJECT(backend));
+>      memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
+> -                                   name, backend->size, true, fd, errp);
+> +                                   name, backend->size,
+> +                                   backend->share, fd, errp);
+>      g_free(name);
+>  }
+> =20
+> @@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
+> =20
+>      /* default to sealed file */
+>      m->seal =3D true;
+> +    MEMORY_BACKEND(m)->share =3D true;
+>  }
+> =20
+>  static void
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index f14e423b7c..25c02d72b8 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4029,7 +4029,7 @@ Memory backend objects offer more control than the =
+@option{-m} option that is
+>  traditionally used to define guest RAM. Please refer to
+>  @option{memory-backend-file} for a description of the options.
+> =20
+> -@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
+mp=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},host-nodes=3D@v=
+ar{host-nodes},policy=3D@var{default|preferred|bind|interleave},seal=3D@var=
+{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
+> +@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
+mp=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{=
+size},host-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bind|in=
+terleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{siz=
+e}
+> =20
+>  Creates an anonymous memory file backend object, which allows QEMU to
+>  share the memory with an external process (e.g. when using
+> @@ -4051,6 +4051,8 @@ with the @option{seal} option (requires at least Li=
+nux 4.16).
+>  Please refer to @option{memory-backend-file} for a description of the
+>  other options.
+> =20
+> +The @option{share} boolean option is @var{on} by default with memfd.
+> +
+>  @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
+> =20
+>  Creates a random number generator backend which obtains entropy from
