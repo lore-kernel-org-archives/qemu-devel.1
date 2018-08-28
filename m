@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fubA8-00045g-8q
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:23:53 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fubT6-0001vj-Cp
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:43:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1fubA7-0005aa-4C
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:23:52 -0400
-References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
-	<4eca96cf-5520-fb82-2e23-afff3ba35077@virtuozzo.com>
-	<c6f924f2-b70d-a460-f96c-7d40b9d06e22@redhat.com>
-	<7da20590-58d7-4ef0-92b9-fcb955f28c9b@virtuozzo.com>
-	<20180813163048.GO4323@localhost.localdomain>
-	<ae864bb4-257e-240c-eeab-3c9c13462c0d@virtuozzo.com>
-	<4dcf31f4-b2e0-e3cf-47ac-a9e745a9e2d8@virtuozzo.com>
-	<eac4f402-4d67-acd3-8489-0253d93a62f3@redhat.com>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <4dc5c71b-6bd9-f248-dcd1-c56feb0e7254@virtuozzo.com>
-Date: Tue, 28 Aug 2018 13:23:36 +0300
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fubQG-0006Xu-Q5
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:40:33 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36344)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fubQG-0006TZ-Gf
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:40:32 -0400
+Received: by mail-wr1-x441.google.com with SMTP id m27-v6so1109439wrf.3
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 03:40:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <eac4f402-4d67-acd3-8489-0253d93a62f3@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
+	<20180827222322.26009-7-marcandre.lureau@redhat.com>
+	<20180828035232.GD4446@xz-x1>
+	<CAJ+F1C+fe4QGZmvtw76SQH=pqu6Nwure+CVPXBT_deHKgE5n0Q@mail.gmail.com>
+	<20180828102051.GF4446@xz-x1>
+In-Reply-To: <20180828102051.GF4446@xz-x1>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 28 Aug 2018 12:40:19 +0200
+Message-ID: <CAJ+F1CLnBd_dfhdARaD-qzC5qhb-tw-ZMgBur9=2u9Bx_M31SQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v0 0/2] Postponed actions
+Subject: Re: [Qemu-devel] [PATCH 6/9] terminal3270: do not use backend timer
+ sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,169 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org, stefanha@redhat.com, mreitz@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+
+Hi
+
+On Tue, Aug 28, 2018 at 12:20 PM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Aug 28, 2018 at 11:09:28AM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Tue, Aug 28, 2018 at 5:52 AM Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > On Tue, Aug 28, 2018 at 12:23:19AM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > > terminal3270 is uses the front-end side of the chardev. It shouldn'=
+t
+> > > > create sources from backend side context. Fwiw, send_timing_mark_cb
+> > > > calls qemu_chr_fe_write_all() which should be thread safe.
+> > > >
+> > > > This partially reverts changes from commit
+> > > > 2c716ba1506769c9be2caa02f0f6d6e7c00f4304.
+> > >
+> > > I don't fully understand too on why "It shouldn't create sources from
+> > > backend side context".  Could you explain a bit?
+> >
+> > A frontend shouldn't use a backend function, and doesn't have to use
+> > the backend gmaincontext.
+> >
+> > >
+> > > If you don't want the backend gcontext to be exposed to the frontend,
+> > > IMHO the simplest thing is just to use the NULL gcontext in
+> > > qemu_chr_timeout_add_ms() which is a one-liner change. I don't see
+> > > much point on re-using the GSource tags since IMHO GSource pointer is
+> > > always superior to the old tag system.
+> >
+> > Using the tag or the GSource * doesn't change much afaik.
+>
+> I did some convertions in the past year to convert tag -> GSource and
+> that shows some differences when we want non-default gcontexts...
+> Otherwise I won't bother. :)
+
+It doesn't need a specific context here, does it?
+
+>
+> > Not only
+> > this is not a hot path, but glib gmain code does create the tag on
+> > attach anyway. You may be marginally faster on remove/detach by
+> > avoiding one lookup.
+> >
+> > (btw, I think both tag and GSource* are as old)
+>
+> I am not strong on this, but my rule is that if I don't have explicit
+> reason to change a code I keep it there.  Here I don't see an obvious
+> reason to switch back to the tag things (not to mention that I still
+> think GSource is better, always).
+
+As I explained, you shouldn't use backend fonctions in the frontend,
+and there is no reason to use the backend context. I try to keep all
+the sources created around chardev under control, and this one is
+incorrect imho.
+
+Using g_timeout_add() is convenient, since it does all the work you do
+manually by creating a source, setting callback, attaching, unref etc.
+And it uses the default context, which is in general the right thing.
+
+I can do all the manual work and keep the GSource* around, but I don't
+think that helps in any way here.
 
 
+>
+> Thanks,
+>
+> --
+> Peter Xu
 
-On 27.08.2018 19:05, John Snow wrote:
->=20
->=20
-> On 08/27/2018 03:05 AM, Denis Plotnikov wrote:
->> PING! PING!
->>
->=20
-> Sorry, Kevin and Stefan are both on PTO right now, I think. I can't
-> promise I have the time to look soon, but you at least deserve an answer
-> for the radio silence the last week.
->=20
-> --js
-Thanks for the response!
-I'll be waiting for some comments!
 
-Denis
->=20
->> On 14.08.2018 10:08, Denis Plotnikov wrote:
->>>
->>>
->>> On 13.08.2018 19:30, Kevin Wolf wrote:
->>>> Am 13.08.2018 um 10:32 hat Denis Plotnikov geschrieben:
->>>>> Ping ping!
->>>>>
->>>>> On 16.07.2018 21:59, John Snow wrote:
->>>>>>
->>>>>>
->>>>>> On 07/16/2018 11:01 AM, Denis Plotnikov wrote:
->>>>>>> Ping!
->>>>>>>
->>>>>>
->>>>>> I never saw a reply to Stefan's question on July 2nd, did you reply
->>>>>> off-list?
->>>>>>
->>>>>> --js
->>>>> Yes, I did. I talked to Stefan why the patch set appeared.
->>>>
->>>> The rest of us still don't know the answer. I had the same question.
->>>>
->>>> Kevin
->>> Yes, that's my fault. I should have post it earlier.
->>>
->>> I reviewed the problem once again and come up with the following
->>> explanation.
->>> Indeed, if the global lock has been taken by the main thread the vCPU
->>> threads won't be able to execute mmio ide.
->>> But, if the main thread will release the lock then nothing will prevent
->>> vCPU threads form execution what they want, e.g writing to the block
->>> device.
->>>
->>> In case of running the mirroring it is possible. Let's take a look
->>> at the following snippet of mirror_run. This is a part the mirroring
->>> completion part.
->>>
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 bdrv_drained_begin(bs);
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 cnt =3D bdrv_get_dirty_count(s->dirty_bitmap);
->>>  =C2=A0>>>>>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (cnt > 0 || mirror_flush=
-(s) < 0) {
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_drained_end(bs);
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 continue;
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 }
->>>
->>> (X) >>>>=C2=A0=C2=A0=C2=A0 assert(QLIST_EMPTY(&bs->tracked_requests));
->>>
->>> mirror_flush here can yield the current coroutine so nothing more can
->>> be executed.
->>> We could end up with the situation when the main loop have to revolve
->>> to poll for another timer/bh to process. While revolving it releases
->>> the global lock. If the global lock is waited for by a vCPU (any
->>> other) thread, the waiting thread will get the lock and make what it
->>> intends.
->>>
->>> This is something that I can observe:
->>>
->>> mirror_flush yields coroutine, the main thread revolves and locks
->>> because a vCPU was waiting for the lock. Now the vCPU thread owns the
->>> lock and the main thread waits for the lock releasing.
->>> The vCPU thread does cmd_write_dma and releases the lock. Then, the mai=
-n
->>> thread gets the lock and continues to run eventually proceeding with
->>> the coroutine yeiled.
->>> If the vCPU requests aren't completed by the moment we will assert at
->>> (X). If the vCPU requests are completed we won't even notice that we
->>> had some writes while in the drained section.
->>>
->>> Denis
->>>>
->>>>>>> On 29.06.2018 15:40, Denis Plotnikov wrote:
->>>>>>>> There are cases when a request to a block driver state shouldn't
->>>>>>>> have
->>>>>>>> appeared producing dangerous race conditions.
->>>>>>>> This misbehaviour is usually happens with storage devices emulated
->>>>>>>> without eventfd for guest to host notifications like IDE.
->>>>>>>>
->>>>>>>> The issue arises when the context is in the "drained" section
->>>>>>>> and doesn't expect the request to come, but request comes from the
->>>>>>>> device not using iothread and which context is processed by the ma=
-in
->>>>>>>> loop.
->>>>>>>>
->>>>>>>> The main loop apart of the iothread event loop isn't blocked by th=
-e
->>>>>>>> "drained" section.
->>>>>>>> The request coming and processing while in "drained" section can
->>>>>>>> spoil
->>>>>>>> the
->>>>>>>> block driver state consistency.
->>>>>>>>
->>>>>>>> This behavior can be observed in the following KVM-based case:
->>>>>>>>
->>>>>>>> 1. Setup a VM with an IDE disk.
->>>>>>>> 2. Inside a VM start a disk writing load for the IDE device
->>>>>>>>  =C2=A0 =C2=A0=C2=A0 e.g: dd if=3D<file> of=3D<file> bs=3DX count=
-=3DY oflag=3Ddirect
->>>>>>>> 3. On the host create a mirroring block job for the IDE device
->>>>>>>>  =C2=A0 =C2=A0=C2=A0 e.g: drive_mirror <your_IDE> <your_path>
->>>>>>>> 4. On the host finish the block job
->>>>>>>>  =C2=A0 =C2=A0=C2=A0 e.g: block_job_complete <your_IDE>
->>>>>>>>  =C2=A0 =C2=A0 Having done the 4th action, you could get an assert=
-:
->>>>>>>> assert(QLIST_EMPTY(&bs->tracked_requests)) from mirror_run.
->>>>>>>> On my setup, the assert is 1/3 reproducible.
->>>>>>>>
->>>>>>>> The patch series introduces the mechanism to postpone the requests
->>>>>>>> until the BDS leaves "drained" section for the devices not using
->>>>>>>> iothreads.
->>>>>>>> Also, it modifies the asynchronous block backend infrastructure
->>>>>>>> to use
->>>>>>>> that mechanism to release the assert bug for IDE devices.
->>>>>>>>
->>>>>>>> Denis Plotnikov (2):
->>>>>>>>  =C2=A0 =C2=A0=C2=A0 async: add infrastructure for postponed actio=
-ns
->>>>>>>>  =C2=A0 =C2=A0=C2=A0 block: postpone the coroutine executing if th=
-e BDS's is drained
->>>>>>>>
->>>>>>>>  =C2=A0 =C2=A0 block/block-backend.c | 58
->>>>>>>> ++++++++++++++++++++++++++++++---------
->>>>>>>>  =C2=A0 =C2=A0 include/block/aio.h=C2=A0=C2=A0 | 63
->>>>>>>> +++++++++++++++++++++++++++++++++++++++++++
->>>>>>>>  =C2=A0 =C2=A0 util/async.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 | 33 +++++++++++++++++++++++
->>>>>>>>  =C2=A0 =C2=A0 3 files changed, 142 insertions(+), 12 deletions(-)
->>>>>>>>
->>>>>>>
->>>>>
->>>>> --=20
->>>>> Best,
->>>>> Denis
->>>
->>
->=20
 
 --=20
-Best,
-Denis
+Marc-Andr=C3=A9 Lureau
