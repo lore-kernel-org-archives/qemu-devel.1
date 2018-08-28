@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fui28-00052v-09
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:44:06 -0400
+	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
+	id 1fui28-00052w-5I
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:44:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuhpj-0005iy-KU
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:31:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44188)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fuhpj-0005hi-BY
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:31:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fuhph-0004AF-4s
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 17:31:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 547BC2E80E2
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 17:31:12 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
+	id 1fuhoD-0003JC-5g
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:29:44 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:18542)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
+	id 1fuhoB-0003IH-4G
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:29:39 -0400
+From: "Janeczek, Craig" <jancraig@amazon.com>
+Date: Tue, 28 Aug 2018 17:29:33 +0000
+Message-ID: <c271c73f79a84547ba9c53150122b049@EX13D12UEA003.ant.amazon.com>
+References: <20180828130041.26445-1-jancraig@amazon.com>,
+	<20180828130041.26445-4-jancraig@amazon.com>
+	<BN7PR08MB4868C15DDF3A45B9E4719EEAC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<7e66fdf9299b4908a52ef778a856c41c@EX13D12UEA003.ant.amazon.com>
+	<BN7PR08MB48681AB62D0FF0D95B8994A2C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
+In-Reply-To: <BN7PR08MB48681AB62D0FF0D95B8994A2C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Aug 2018 17:20:56 -0000
-From: Heiko Sieger <1788665@bugs.launchpad.net>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153547685700.30557.18115985105402392135.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 3/8] target/mips: Add MXU instructions
+ S32I2M and S32M2I
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +35,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-Thanks, I will do that tomorrow and report back.
+The only commands that have the 5th bit required to address XR16 are S32M2I=
+/S32I2M.
 
--- =
+I can split it out into a separate utility function and put a conditional i=
+nto the S32M2I/S32I2M functions if you are more comfortable with that.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
+-----Original Message-----
+From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
+Sent: Tuesday, August 28, 2018 12:53 PM
+To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net
+Subject: Re: [PATCH v3 3/8] target/mips: Add MXU instructions S32I2M and S3=
+2M2I
 
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
+> > This does not handle the case xra =3D=3D XR16.
 
-Status in QEMU:
-  New
+> I do not see where the case is un-handled. XR16 maps to index 15 in the m=
+xu_gpr array.
 
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+But, XR16 has its own rules for read/write, and you are treating it just as=
+ a regular register.=20
