@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fug4u-00041m-Nf
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:38:49 -0400
+	(envelope-from <ybettan@redhat.com>) id 1fug70-0005UD-QF
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fug4q-0000xr-Lo
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:38:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34020 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fug4q-0000vs-G1
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:38:44 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A7325401EF0F
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 15:38:43 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 28 Aug 2018 17:38:40 +0200
-Message-Id: <20180828153840.22519-1-marcandre.lureau@redhat.com>
+	(envelope-from <ybettan@redhat.com>) id 1fug6w-0004UQ-HY
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:40:58 -0400
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:38644)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1fug6w-0004RH-2v
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:40:54 -0400
+Received: by mail-wm0-f68.google.com with SMTP id t25-v6so2500147wmi.3
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 08:40:53 -0700 (PDT)
+References: <20180828072426.45103-1-ybettan@redhat.com>
+From: Yoni Bettan <ybettan@redhat.com>
+Message-ID: <bb0876ba-26c3-9f01-2b2a-b27ce5f848b2@redhat.com>
+Date: Tue, 28 Aug 2018 18:40:50 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
+In-Reply-To: <20180828072426.45103-1-ybettan@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC V1] hw/pci/pci_example.c : Added a new pci
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +31,376 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-The share=3Don/off property is used to modified mmap() MAP_SHARED
-setting. Make it on by default for convenience and compatibility
-reasons.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- backends/hostmem-memfd.c | 4 +++-
- qemu-options.hx          | 4 +++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+On 8/28/18 10:24 AM, Yoni Bettan wrote:
+>      - this is a simple example of how to write a pci device that supports
+>        portio, mmio, irq and dma
 
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index 1e20fe0ba8..abd52364db 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
-Error **errp)
-=20
-     name =3D object_get_canonical_path(OBJECT(backend));
-     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
--                                   name, backend->size, true, fd, errp);
-+                                   name, backend->size,
-+                                   backend->share, fd, errp);
-     g_free(name);
- }
-=20
-@@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
-=20
-     /* default to sealed file */
-     m->seal =3D true;
-+    MEMORY_BACKEND(m)->share =3D true;
- }
-=20
- static void
-diff --git a/qemu-options.hx b/qemu-options.hx
-index f14e423b7c..25c02d72b8 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4029,7 +4029,7 @@ Memory backend objects offer more control than the =
-@option{-m} option that is
- traditionally used to define guest RAM. Please refer to
- @option{memory-backend-file} for a description of the options.
-=20
--@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
-mp=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},host-nodes=3D=
-@var{host-nodes},policy=3D@var{default|preferred|bind|interleave},seal=3D=
-@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
-+@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
-mp=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},size=3D@va=
-r{size},host-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bin=
-d|interleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@v=
-ar{size}
-=20
- Creates an anonymous memory file backend object, which allows QEMU to
- share the memory with an external process (e.g. when using
-@@ -4051,6 +4051,8 @@ with the @option{seal} option (requires at least Li=
-nux 4.16).
- Please refer to @option{memory-backend-file} for a description of the
- other options.
-=20
-+The @option{share} boolean option is @var{on} by default with memfd.
-+
- @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
-=20
- Creates a random number generator backend which obtains entropy from
---=20
-2.19.0.rc0.48.gb9dfa238d5
+As the commit message miss a little bit of information I will add it 
+here and update
+the commit message in the next Version.
+
+The main goal is to add 2 example devices to be used as a template or a 
+guideline for
+contributors when they wish to create a new device.
+Those devices may be compiled by default with qemu, to ensure they won't 
+break, but not have to
+be linked, so performance won't decrease.
+Another reason for such devices is to document "the right way" to write 
+a new device in qemu.
+
+  * PCI device:
+      o its driver is located at
+        https://github.com/ybettan/QemuDeviceDrivers.git
+  * virtIO device:
+      o its driver isn't written yet but will be added to the same
+        Github repository written above.
+      o when this device will be done the next step is to insert it into
+        the virtio specification.
+
+
+Both devices can be found at https://github.com/ybettan/qemu.git under 
+'pci' and 'virtio' branches.
+
+In addition I am writing a blog to give a logical overview of the virtio 
+protocol and a step-by-step
+guide to write a new virtio device.
+This blog can be found at https://howtovms.wordpress.com. 
+<https://howtovms.wordpress.com>
+>
+> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+> ---
+>   hw/pci/Makefile.objs |   1 +
+>   hw/pci/pci_example.c | 309 +++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 310 insertions(+)
+>   create mode 100644 hw/pci/pci_example.c
+>
+> diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
+> index 9f905e6344..e684b72f90 100644
+> --- a/hw/pci/Makefile.objs
+> +++ b/hw/pci/Makefile.objs
+> @@ -4,6 +4,7 @@ common-obj-$(CONFIG_PCI) += shpc.o
+>   common-obj-$(CONFIG_PCI) += slotid_cap.o
+>   common-obj-$(CONFIG_PCI) += pci_host.o pcie_host.o
+>   common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o pcie_port.o
+> +common-obj-$(CONFIG_PCI) += pci_example.o
+>   
+>   common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
+>   common-obj-$(CONFIG_ALL) += pci-stub.o
+> diff --git a/hw/pci/pci_example.c b/hw/pci/pci_example.c
+> new file mode 100644
+> index 0000000000..326c9b7fa1
+> --- /dev/null
+> +++ b/hw/pci/pci_example.c
+> @@ -0,0 +1,309 @@
+> +#include "qemu/osdep.h"
+> +#include "hw/pci/pci.h"
+> +
+> +#define TYPE_PCI_EXAMPLE "pci-example"
+> +
+> +#define PCI_EXAMPLE(obj)  \
+> +    OBJECT_CHECK(PCIExampleDevState, (obj), TYPE_PCI_EXAMPLE)
+> +
+> +
+> +#define ERROR -1
+> +#define BLOCK_SIZE 64
+> +#define EXAMPLE_MMIO_SIZE BLOCK_SIZE
+> +#define EXAMPLE_PIO_SIZE BLOCK_SIZE
+> +#define DMA_BUFF_SIZE 4096
+> +
+> +/*---------------------------------------------------------------------------*/
+> +/*                                 PCI Struct                                */
+> +/*---------------------------------------------------------------------------*/
+> +
+> +typedef struct PCIExampleDevState {
+> +    /*< private >*/
+> +    PCIDevice parent_obj;
+> +    /*< public >*/
+> +
+> +    /* memory region */
+> +    MemoryRegion portio;
+> +    MemoryRegion mmio;
+> +    MemoryRegion irqio;
+> +    MemoryRegion dmaio;
+> +
+> +    /* data registers */
+> +    uint64_t memData, ioData, dmaPhisicalBase;
+> +
+> +    qemu_irq irq;
+> +    /* for the driver to determine if this device caused the interrupt */
+> +    uint64_t threwIrq;
+> +
+> +} PCIExampleDevState;
+> +
+> +
+> +/*---------------------------------------------------------------------------*/
+> +/*                         Read/Write functions                              */
+> +/*---------------------------------------------------------------------------*/
+> +
+> +/* do nothing because the mmio read is done from DMA buffer */
+> +static uint64_t pci_example_mmio_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    return ERROR;
+> +}
+> +
+> +static void
+> +pci_example_mmio_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+> +{
+> +    PCIExampleDevState *pms = (PCIExampleDevState *)opaque;
+> +    PCIDevice *pciDev = (PCIDevice *)opaque;
+> +
+> +    if (size != 1) {
+> +        return;
+> +    }
+> +
+> +    /* compute the result */
+> +    pms->memData = val * 2;
+> +
+> +    /* write the result directly to phisical memory */
+> +    cpu_physical_memory_write(pms->dmaPhisicalBase, &pms->memData,
+> +            DMA_BUFF_SIZE);
+> +
+> +    /* raise an IRQ to notify DMA has finished  */
+> +    pms->threwIrq = 1;
+> +    pci_irq_assert(pciDev);
+> +}
+> +
+> +static uint64_t pci_example_pio_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    PCIExampleDevState *pms = (PCIExampleDevState *)opaque;
+> +
+> +    if (size != 1) {
+> +        return ERROR;
+> +    }
+> +
+> +    return pms->ioData;
+> +}
+> +
+> +static void
+> +pci_example_pio_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+> +{
+> +    PCIExampleDevState *pms = (PCIExampleDevState *)opaque;
+> +    PCIDevice *pciDev = (PCIDevice *)opaque;
+> +
+> +    if (size != 1) {
+> +        return;
+> +    }
+> +
+> +    pms->ioData = val * 2;
+> +    pms->threwIrq = 1;
+> +    pci_irq_assert(pciDev);
+> +}
+> +
+> +static uint64_t pci_example_irqio_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    PCIExampleDevState *pms = (PCIExampleDevState *)opaque;
+> +
+> +    if (size != 1) {
+> +        return ERROR;
+> +    }
+> +
+> +    return pms->threwIrq;
+> +}
+> +
+> +static void
+> +pci_example_irqio_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+> +{
+> +    PCIExampleDevState *pms = (PCIExampleDevState *)opaque;
+> +    PCIDevice *pciDev = (PCIDevice *)opaque;
+> +
+> +    if (size != 1) {
+> +        return;
+> +    }
+> +
+> +    /* give the ability to assert IRQ , we will use it only to deassert IRQ */
+> +    if (val) {
+> +        pci_irq_assert(pciDev);
+> +        pms->threwIrq = 1;
+> +    } else {
+> +        pms->threwIrq = 0;
+> +        pci_irq_deassert(pciDev);
+> +    }
+> +}
+> +
+> +/* do nothing because physical DMA buffer addres is onlyt set and don't need to
+> + * be red */
+> +static uint64_t
+> +pci_example_dma_base_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    return ERROR;
+> +}
+> +
+> +static void
+> +pci_example_dma_base_write(void *opaque, hwaddr addr, uint64_t val,
+> +        unsigned size)
+> +{
+> +    PCIExampleDevState *pms = (PCIExampleDevState *)opaque;
+> +
+> +    if (size != 4) {
+> +        return;
+> +    }
+> +
+> +    /* notify the device about the physical address of the DMA buffer that the
+> +     * driver has allocated */
+> +    switch (addr) {
+> +        /* lower bytes */
+> +        case(0):
+> +            pms->dmaPhisicalBase &= 0xffffffff00000000;
+> +            break;
+> +
+> +        /* upper bytes */
+> +        case(4):
+> +            val <<= 32;
+> +            pms->dmaPhisicalBase &= 0x00000000ffffffff;
+> +            break;
+> +    }
+> +
+> +    pms->dmaPhisicalBase |= val;
+> +}
+> +
+> +/*---------------------------------------------------------------------------*/
+> +/*                             PCI region ops                                */
+> +/*---------------------------------------------------------------------------*/
+> +
+> +/* callback called when memory region representing the MMIO space is accessed */
+> +static const MemoryRegionOps pci_example_mmio_ops = {
+> +    .read = pci_example_mmio_read,
+> +    .write = pci_example_mmio_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 1,
+> +    },
+> +};
+> +
+> +/* callback called when memory region representing the PIO space is accessed */
+> +static const MemoryRegionOps pci_example_pio_ops = {
+> +    .read = pci_example_pio_read,
+> +    .write = pci_example_pio_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 1,
+> +    },
+> +};
+> +
+> +/* callback called when memory region representing the IRQ space is accessed */
+> +static const MemoryRegionOps pci_example_irqio_ops = {
+> +    .read = pci_example_irqio_read,
+> +    .write = pci_example_irqio_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 1,
+> +    },
+> +};
+> +
+> +/* callback called when memory region representing the DMA space is accessed */
+> +static const MemoryRegionOps pci_example_dma_ops = {
+> +    .read = pci_example_dma_base_read,
+> +    .write = pci_example_dma_base_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 4,
+> +    },
+> +};
+> +
+> +/*---------------------------------------------------------------------------*/
+> +/*                             PCI functions                                 */
+> +/*---------------------------------------------------------------------------*/
+> +
+> +/* this is called when lunching the vm with "-device <device name>" */
+> +static void pci_example_realize(PCIDevice *pciDev, Error **errp)
+> +{
+> +   PCIExampleDevState *d = PCI_EXAMPLE(pciDev);
+> +   uint8_t *pciCond = pciDev->config;
+> +
+> +   d->threwIrq = 0;
+> +
+> +   /* initiallise the memory region of the CPU to the device */
+> +   memory_region_init_io(&d->mmio, OBJECT(d), &pci_example_mmio_ops, d,
+> +           "pci-example-mmio", EXAMPLE_MMIO_SIZE);
+> +
+> +   memory_region_init_io(&d->portio, OBJECT(d), &pci_example_pio_ops, d,
+> +           "pci-example-portio", EXAMPLE_PIO_SIZE);
+> +
+> +   memory_region_init_io(&d->irqio, OBJECT(d), &pci_example_irqio_ops, d,
+> +           "pci-example-irqio", EXAMPLE_PIO_SIZE);
+> +
+> +   memory_region_init_io(&d->dmaio, OBJECT(d), &pci_example_dma_ops, d,
+> +           "pci-example-dma-base", EXAMPLE_MMIO_SIZE);
+> +
+> +   /* alocate BARs */
+> +   pci_register_bar(pciDev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
+> +   pci_register_bar(pciDev, 1, PCI_BASE_ADDRESS_SPACE_IO, &d->portio);
+> +   pci_register_bar(pciDev, 2, PCI_BASE_ADDRESS_SPACE_IO, &d->irqio);
+> +   pci_register_bar(pciDev, 3, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->dmaio);
+> +
+> +   /* give interrupt support.
+> +    * a pci device has 4 pin for interrupt, here we use pin A */
+> +   pci_config_set_interrupt_pin(pciCond, 1);
+> +}
+> +
+> +
+> +/* the destructor of pci_example_realize() */
+> +static void pci_example_uninit(PCIDevice *dev)
+> +{
+> +    /* unregister BARs and other stuff */
+> +}
+> +
+> +
+> +/* class constructor */
+> +static void pci_example_class_init(ObjectClass *klass, void *data)
+> +{
+> +   /* sort of dynamic cast */
+> +   DeviceClass *dc = DEVICE_CLASS(klass);
+> +   PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> +
+> +   k->realize = pci_example_realize;
+> +   k->exit = pci_example_uninit;
+> +
+> +   /* some regular IDs in HEXA */
+> +   k->vendor_id = PCI_VENDOR_ID_REDHAT;
+> +   k->device_id = PCI_DEVICE_ID_REDHAT_TEST;
+> +   k->class_id = PCI_CLASS_OTHERS;
+> +
+> +   /* set the device bitmap category */
+> +   set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +
+> +   k->revision = 0x00;
+> +   dc->desc = "PCI Example Device";
+> +}
+> +
+> +/*---------------------------------------------------------------------------*/
+> +/*                            QEMU overhead                                  */
+> +/*---------------------------------------------------------------------------*/
+> +
+> +
+> +/* Contains all the informations of the device we are creating.
+> + * class_init will be called when we are defining our device. */
+> +static const TypeInfo pci_example_info = {
+> +    .name           = TYPE_PCI_EXAMPLE,
+> +    .parent         = TYPE_PCI_DEVICE,
+> +    .instance_size  = sizeof(PCIExampleDevState),
+> +    .class_init     = pci_example_class_init,
+> +    .interfaces     = (InterfaceInfo[]) {
+> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> +        { },
+> +    },
+> +};
+> +
+> +
+> +/* function called before the qemu main it will define our device */
+> +static void pci_example_register_types(void)
+> +{
+> +    type_register_static(&pci_example_info);
+> +}
+> +
+> +/* make qemu register our device at qemu-booting */
+> +type_init(pci_example_register_types)
+> +
+> +
+> +
