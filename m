@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuVcN-00046F-Ud
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:28:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1fuVcq-0004Jv-9M
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:29:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuVcJ-0001yl-0j
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:28:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44308 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fuVcl-0002QY-B2
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:29:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44320 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuVcI-0001w0-Ra
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:28:34 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuVcl-0002QM-4s
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:29:03 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180827070021.11931-1-armbru@redhat.com>
-	<20180827070021.11931-2-armbru@redhat.com>
-	<0a033e63-a980-b8e6-2f60-cd743cc6c94c@redhat.com>
-Date: Tue, 28 Aug 2018 06:28:30 +0200
-In-Reply-To: <0a033e63-a980-b8e6-2f60-cd743cc6c94c@redhat.com> (Eric Blake's
-	message of "Mon, 27 Aug 2018 11:50:08 -0500")
-Message-ID: <87pny3qfm9.fsf@dusky.pond.sub.org>
+	<20180827070021.11931-3-armbru@redhat.com>
+	<ef8a1994-4e57-ee0c-6dc3-793f94e15321@redhat.com>
+Date: Tue, 28 Aug 2018 06:28:59 +0200
+In-Reply-To: <ef8a1994-4e57-ee0c-6dc3-793f94e15321@redhat.com> (Eric Blake's
+	message of "Mon, 27 Aug 2018 11:58:28 -0500")
+Message-ID: <87lg8rqflg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/6] json: Fix lexer for lookahead
- character beyond '\x7F'
+Subject: Re: [Qemu-devel] [PATCH 2/6] json: Clean up how lexer consumes "end
+ of input"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +30,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
 Eric Blake <eblake@redhat.com> writes:
 
 > On 08/27/2018 02:00 AM, Markus Armbruster wrote:
->> The lexer fails to end a valid token when the lookahead character is
->> beyond '\x7F'.  For instance, input
+>> When the lexer isn't in its start state at the end of input, it's
+>> working on a token.  To flush it out, it needs to transit to its start
+>> state on "end of input" lookahead.
 >>
->>      true\xC2\xA2
+>> There are two ways to the start state, depending on the current state:
 >>
->> produces the tokens
+>> * If the lexer is in a TERMINAL(JSON_FOO) state, it can emit a
+>>    JSON_FOO token.
 >>
->>      JSON_ERROR     true\xC2
->>      JSON_ERROR     \xA2
+>> * Else, it can go to IN_ERROR state, and emit a JSON_ERROR token.
 >>
->> The first token should be
+>> There are complications, however:
 >>
->>      JSON_KEYWORD   true
->>
->> instead.
+>> * The transition to IN_ERROR state consumes the input character and
+>>    adds it to the JSON_ERROR token.  The latter is inappropriate for
+>>    the "end of input" character, so we suppress that.  See also recent
+>>    commit "json: Fix lexer to include the bad character in JSON_ERROR
+>>    token".
 >
-> As long as we still get a JSON_ERROR in the end.
+> Now commit a2ec6be7
 
-We do: one for \xC2, and one for \xA2.  PATCH 4 will lose the second one.
+I'll update the commit message.
 
->> The culprit is
 >>
->>      #define TERMINAL(state) [0 ... 0x7F] = (state)
+>> * The transition to a TERMINAL(JSON_FOO) state doesn't consume the
+>>    input character.  In that case, the lexer normally loops until it is
+>>    consumed.  We have to suppress that for the "end of input" input
+>>    character.  If we didn't, the lexer would consume it by entering
+>>    IN_ERROR state, emitting a bogus JSON_ERROR token.  We fixed that in
+>>    commit bd3924a33a6.
 >>
->> It leaves [0x80..0xFF] zero, i.e. IN_ERROR.  Has always been broken.
->
-> I wonder if that was done because it was assuming that valid input is
-> only ASCII, and that any byte larger than 0x7f is invalid except
-> within the context of a string.
-
-Plausible thinko.
-
->                                  But whatever the reason for the
-> original bug, your fix makes sense.
->
->> Fix it to initialize the complete array.
->
-> Worth testsuite coverage?
-
-Since lookahead bytes > 0x7F are always a parse error, all the bug can
-do is swallow a TERMINAL() token right before a parse error.  The
-TERMINAL() tokens are JSON_INTEGER, JSON_FLOAT, JSON_KEYWORD, JSON_SKIP,
-JSON_INTERP.  Fairly harmless.  In particular, JSON objects get through
-even when followed by a byte > 0x7F.
-
-Of course, test coverage wouldn't hurt regardless.
-
+>> However, simply breaking the loop this way assumes that the lexer
+>> needs exactly one state transition to reach its start state.  That
+>> assumption is correct now, but it's unclean, and I'll soon break it.
+>> Clean up: instead of breaking the loop after one iteration, break it
+>> after it reached the start state.
+>>
 >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
->>   qobject/json-lexer.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>   qobject/json-lexer.c | 17 +++++++++--------
+>>   1 file changed, 9 insertions(+), 8 deletions(-)
 >>
+>> diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+>> index 4867839f66..ec3aec726f 100644
+>> --- a/qobject/json-lexer.c
+>> +++ b/qobject/json-lexer.c
+>> @@ -261,7 +261,8 @@ void json_lexer_init(JSONLexer *lexer, bool enable_interpolation)
+>>     static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool
+>> flush)
+>>   {
+>> -    int char_consumed, new_state;
+>> +    int new_state;
+>> +    bool char_consumed = false;
+>
+> Yay for the switch to bool.
 >
 > Reviewed-by: Eric Blake <eblake@redhat.com>
 
