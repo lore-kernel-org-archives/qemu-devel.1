@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fubhJ-0002c3-Su
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:10 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fubhm-0002oB-KG
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fubhJ-0008JB-5Z
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:09 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38661)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fubhl-00004u-RG
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:38 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33327)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fubhI-0008Ir-U2
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:09 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w11-v6so1149932wrc.5
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 03:58:08 -0700 (PDT)
+	id 1fubhl-0008WF-K5
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:37 -0400
+Received: by mail-wr1-x444.google.com with SMTP id v90-v6so1166315wrc.0
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 03:58:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20180817173104.14691-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20180817173104.14691-1-marcandre.lureau@redhat.com>
+References: <20180821100716.13803-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20180821100716.13803-1-marcandre.lureau@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 28 Aug 2018 12:57:56 +0200
-Message-ID: <CAJ+F1C+o2UPHZFMgEPUh8-DBVMCGc7zYhSfmn=wOYM5KT0RAgQ@mail.gmail.com>
+Date: Tue, 28 Aug 2018 12:58:24 +0200
+Message-ID: <CAJ+F1CK9-pJyY+sWqUYiYvDAxWO9F_1ETgzNZ=zi1cUBuM5LSw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vnc: call sasl_server_init() only when
- required
+Subject: Re: [Qemu-devel] [PATCH] iothread: fix crash with invalid properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +30,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: QEMU <qemu-devel@nongnu.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 ping
-On Fri, Aug 17, 2018 at 7:32 PM Marc-Andr=C3=A9 Lureau
+On Tue, Aug 21, 2018 at 12:07 PM Marc-Andr=C3=A9 Lureau
 <marcandre.lureau@redhat.com> wrote:
 >
-> VNC server is calling sasl_server_init() during startup of QEMU, even
-> if SASL auth has not been enabled.
+> -object iothread,id=3Dfoo,? will crash qemu:
 >
-> This may create undesirable warnings like "Could not find keytab file:
-> /etc/qemu/krb5.tab" when the user didn't configure SASL on host and
-> started VNC server.
+> qemu-system-x86_64:qemu-thread-posix.c:128: qemu_cond_destroy: Assertion =
+`cond->initialized' failed.
 >
-> Instead, only initialize SASL when needed. Note that HMP/QMP "change
-> vnc" calls vnc_display_open() again, which will initialize SASL if
-> needed.
->
-> Related to:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1609327
+> Use thread_id !=3D -1 to check if iothread_complete() finished
+> successfully and the mutex/cond have been initialized.
 >
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  ui/vnc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  iothread.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 >
-> diff --git a/ui/vnc.c b/ui/vnc.c
-> index 359693238b..fc507d7f36 100644
-> --- a/ui/vnc.c
-> +++ b/ui/vnc.c
-> @@ -4054,7 +4054,7 @@ void vnc_display_open(const char *id, Error **errp)
->      trace_vnc_auth_init(vd, 1, vd->ws_auth, vd->ws_subauth);
+> diff --git a/iothread.c b/iothread.c
+> index aff1281257..2fb1cdf55d 100644
+> --- a/iothread.c
+> +++ b/iothread.c
+> @@ -110,6 +110,7 @@ static void iothread_instance_init(Object *obj)
+>      IOThread *iothread =3D IOTHREAD(obj);
 >
->  #ifdef CONFIG_VNC_SASL
-> -    if ((saslErr =3D sasl_server_init(NULL, "qemu")) !=3D SASL_OK) {
-> +    if (sasl && ((saslErr =3D sasl_server_init(NULL, "qemu")) !=3D SASL_=
-OK)) {
->          error_setg(errp, "Failed to initialize SASL auth: %s",
->                     sasl_errstring(saslErr, NULL, NULL));
->          goto fail;
+>      iothread->poll_max_ns =3D IOTHREAD_POLL_MAX_NS_DEFAULT;
+> +    iothread->thread_id =3D -1;
+>  }
+>
+>  static void iothread_instance_finalize(Object *obj)
+> @@ -117,6 +118,11 @@ static void iothread_instance_finalize(Object *obj)
+>      IOThread *iothread =3D IOTHREAD(obj);
+>
+>      iothread_stop(iothread);
+> +
+> +    if (iothread->thread_id !=3D -1) {
+> +        qemu_cond_destroy(&iothread->init_done_cond);
+> +        qemu_mutex_destroy(&iothread->init_done_lock);
+> +    }
+>      /*
+>       * Before glib2 2.33.10, there is a glib2 bug that GSource context
+>       * pointer may not be cleared even if the context has already been
+> @@ -135,8 +141,6 @@ static void iothread_instance_finalize(Object *obj)
+>          g_main_context_unref(iothread->worker_context);
+>          iothread->worker_context =3D NULL;
+>      }
+> -    qemu_cond_destroy(&iothread->init_done_cond);
+> -    qemu_mutex_destroy(&iothread->init_done_lock);
+>  }
+>
+>  static void iothread_complete(UserCreatable *obj, Error **errp)
+> @@ -147,7 +151,6 @@ static void iothread_complete(UserCreatable *obj, Err=
+or **errp)
+>
+>      iothread->stopping =3D false;
+>      iothread->running =3D true;
+> -    iothread->thread_id =3D -1;
+>      iothread->ctx =3D aio_context_new(&local_error);
+>      if (!iothread->ctx) {
+>          error_propagate(errp, local_error);
 > --
 > 2.18.0.547.g1d89318c48
 >
