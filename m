@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ful86-0004km-5K
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 17:02:28 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fuluB-0004D9-AZ
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 17:52:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ful82-0007gT-85
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 17:02:25 -0400
-References: <153546966871.75539.10980006517656536139.stgit@lep8c.aus.stglabs.ibm.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ed3c0388-a9fe-2fdf-c54e-27d690eb5def@vivier.eu>
-Date: Tue, 28 Aug 2018 23:01:45 +0200
+	(envelope-from <jsnow@redhat.com>) id 1fulu9-0004kL-Ec
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 17:52:06 -0400
+References: <20180817190457.8292-1-jsnow@redhat.com>
+	<20180817190457.8292-6-jsnow@redhat.com>
+	<553da197-ebd0-1eda-909c-aa0740332737@redhat.com>
+	<0b63f8aa-16eb-b719-b903-dff693753e8b@redhat.com>
+	<70d6a96e-ac23-101c-bf10-d9855fe2ec9e@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4f4742dd-4f3d-f865-0af5-cf50c78736dc@redhat.com>
+Date: Tue, 28 Aug 2018 17:51:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <153546966871.75539.10980006517656536139.stgit@lep8c.aus.stglabs.ibm.com>
+In-Reply-To: <70d6a96e-ac23-101c-bf10-d9855fe2ec9e@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: elf: mmap all the
- target-pages of hostpage for data segment
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/7] block/mirror: utilize job_exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>, riku.voipio@iki.fi
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com
 
-Le 28/08/2018 à 17:22, Shivaprasad G Bhat a écrit :
-> If the hostpage size is greater than the TARGET_PAGESIZE, the
-> target-pages of size TARGET_PAGESIZE are marked valid only till the
-> length requested during the elfload. The glibc attempts to consume unused
-> space in the last page of data segment(__libc_memalign() in
-> elf/dl-minimal.c). If PT_LOAD p_align is greater than or
-> equal to hostpage size, the GLRO(dl_pagesize) is actually the host pagesize
-> as set in the auxillary vectors. So, there is no explicit mmap request for
-> the remaining target-pages on the last hostpage. The glibc assumes that
-> particular space as available and subsequent attempts to use
-> those addresses lead to crash as the target_mmap has not marked them valid
-> for target-pages as valid.
-> 
-> The issue is seen when trying to chroot to 16.04-x86_64 ubuntu on a PPC64
-> host where the fork fails to access the thread_id as it is allocated on a
-> page not marked valid. The recent glibc doesnt have checks for thread-id in
-> fork, but the issue can manifest somewhere else, none the less.
-> 
-> The fix here is to map all the target-pages of the hostpage during the
-> elfload if the p_align is greater than or equal to hostpage size, for
-> data segment to allow the glibc for proper consumption.
-> 
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
-> ---
-> v1: https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg05730.html
-> Changes from v1:
->    - Made the conditionals consistent with the commit "33143c446e" and
->      changed the commit message accordingly.
-> 
->  linux-user/elfload.c |   37 +++++++++++++++++++++++++++++--------
->  1 file changed, 29 insertions(+), 8 deletions(-)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 8638612aec..cced43f45c 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -1438,9 +1438,23 @@ struct exec
->  
->  /* Necessary parameters */
->  #define TARGET_ELF_EXEC_PAGESIZE TARGET_PAGE_SIZE
-> -#define TARGET_ELF_PAGESTART(_v) ((_v) & \
-> -                                 ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
-> -#define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
-> +#define TARGET_ELF_PAGESTART(_v, _a, _s, _m) \
-> +        (((_a & ~_m) != 0) ? \
-> +         (_v) & ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE - 1) : \
-> +         ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-> +          (_v) & ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE - 1) : \
-> +          (_v) & ~(abi_ulong)(_s - 1)));
-> +#define TARGET_ELF_PAGEOFFSET(_v, _a, _s, _m) \
-> +        (((_a & ~_m) != 0) ? \
-> +         (_v) & (TARGET_ELF_EXEC_PAGESIZE - 1) : \
-> +         ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-> +          (_v) & (TARGET_ELF_EXEC_PAGESIZE - 1) : \
-> +          (_v) & (_s - 1)));
-> +#define TARGET_ELF_PAGELENGTH(_v, _a, _s, _m) \
-> +        (((_a & ~_m) != 0) ? \
-> +         TARGET_PAGE_ALIGN(_v) : \
-> +         ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-> +          TARGET_PAGE_ALIGN(_v) : HOST_PAGE_ALIGN(_v)));
 
-I think you should use eppnt->p_align instead of info->alignment and 
-simplify this to:
 
-#define TARGET_ELF_EXEC_PAGESIZE \
-        (((eppnt->p_align & ~qemu_host_page_mask) != 0) ? \
-         TARGET_PAGE_SIZE : MAX(qemu_host_page_size, TARGET_PAGE_SIZE))
-#define TARGET_ELF_PAGELENGTH(_v) ROUND_UP((_v), TARGET_ELF_EXEC_PAGESIZE)
+On 08/25/2018 11:02 AM, Max Reitz wrote:
+> On 2018-08-23 00:05, John Snow wrote:
+>>
+>>
+>> On 08/22/2018 08:15 AM, Max Reitz wrote:
+>>> On 2018-08-17 21:04, John Snow wrote:
+>>>> Change the manual deferment to mirror_exit into the implicit
+>>>> callback to job_exit and the mirror_exit callback.
+>>>>
+>>>> This does change the order of some bdrv_unref calls and job_completed,
+>>>> but thanks to the new context in which we call .job_exit, this is safe
+>>>> to defer the possible flushing of any nodes to the job_finalize_single
+>>>> cleanup stage.
+>>>
+>>> Ah, right, I forgot this.  Hm, what exactly do you mean?  This function
+>>> is executed in the main loop, so it can make 'src' go away.  I don't see
+>>> any difference to before.
+>>>
+>>
+>> This changes the order in which we unreference these objects; if you
+>> look at this patch the job_completed call I delete is in the middle of
+>> what becomes the .exit() callback, which means there is a subtle change
+>> in the ordering of how references are put down.
+>>
+>> Take a look at the weird ordering of mirror_exit as it exists right now;
+>> we call job_completed first and *then* put down the last references. If
+>> you re-order this upstream right now, you'll deadlock QEMU because this
+>> means job_completed is responsible for putting down the last reference
+>> to some of these block/bds objects.
+>>
+>> However, job_completed takes an additional AIO context lock and calls
+>> job_finalize_single under *two* locks, which will hang QEMU if we
+>> attempt to flush any of these nodes when we put down the last reference.
+> 
+> If you say so...  I have to admit I don't really understand.  The
+> comment doesn't explain why it's so important to keep src around until
+> job_completed(), so I don't know.  I thought AioContexts are recursive
+> so it doesn't matter whether you take them recursively or not.
+> 
+> Anyway.  So the difference now is that job_defer_to_main_loop() took the
+> lock around the whole exit function, whereas the new exit shim only
+> takes it around the .exit() method, but calls job_complete() without a
+> lock -- and then job_finalize_single() gets its lock again, so the job
+> methods are again called with locks.  That sounds OK to me.
+> 
+>> Performing the reordering here is *safe* because by removing the call to
+>> job_completed and utilizing the exit shim, the .exit() callback executes
+>> only under one lock, and when the finalize code runs later it is also
+>> executed under only one lock, making this re-ordering safe.
+>>
+>> Clear as mud?
+> 
+> Well, I trust you that the drain issue was the reason that src had to
+> stay around until after job_completed().  It seems a bit
+> counter-intuitive, because the comment explaining that src needs to stay
+> around until job_completed() doesn't say much -- but it does imply that
+> without that bdrv_ref(), the BDS might be destroyed before
+> job_completed().  Which is different from simply having only one
+> reference left and then being deleted in job_completed().
+> 
+> Looking at 3f09bfbc7be, I'm inclined to believe the original reason may
+> be that src->job points to the job and that we shouldn't delete it as
+> long as it does (bdrv_delete() asserts that bs->job is NULL).  Oh no, a
+> tangent appears.
+> 
+> ...I would assume that when bdrv_replace_node() is called, BlockJob.blk
+> is updated to point to the new BDS.  But nobody seems to update the
+> BDS.job field.  Investigation is in order.
+> 
+> Max
+> 
 
-Thanks,
-Laurent
+The real reason, presently, appears to just be that we want to call
+bdrv_drained_end on src, but we may have put down the last reference
+during bdrv_replace_node.
+
+I'll update the comment accordingly. Anything beyond that is beyond the
+scope of this series.
+
+--js
