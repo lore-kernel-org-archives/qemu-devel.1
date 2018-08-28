@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50664)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fudcY-0002kZ-Bw
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:01:27 -0400
+	id 1fudcY-0002jR-Tp
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:01:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fudc5-0000aR-E4
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:00:59 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:46415)
+	id 1fudc5-0000aE-CZ
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:00:58 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:32767)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fudc5-0000YH-93
+	id 1fudc5-0000ZR-4U
 	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:00:53 -0400
 From: Craig Janeczek <jancraig@amazon.com>
-Date: Tue, 28 Aug 2018 09:00:36 -0400
-Message-Id: <20180828130041.26445-4-jancraig@amazon.com>
+Date: Tue, 28 Aug 2018 09:00:39 -0400
+Message-Id: <20180828130041.26445-7-jancraig@amazon.com>
 In-Reply-To: <20180828130041.26445-1-jancraig@amazon.com>
 References: <20180828130041.26445-1-jancraig@amazon.com>
-Subject: [Qemu-devel] [PATCH v3 3/8] target/mips: Add MXU instructions
- S32I2M and S32M2I
+Subject: [Qemu-devel] [PATCH v3 6/8] target/mips: Add MXU instruction D16MAC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +29,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: amarkovic@wavecomp.com, aurelien@aurel32.net, Craig Janeczek <jancraig@amazon.com>
 
-This commit makes the MXU registers and the utility functions for
-reading/writing to them. This is required for full MXU instruction
-support.
-
-Adds support for emulating the S32I2M and S32M2I MXU instructions.
+Adds support for emulating the D16MAC instruction.
 
 Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 ---
  v1
     - initial patch
  v2
-    - Fix checkpatch.pl errors
-    - remove mips64 ifdef
     - changed bitfield usage to extract32
-    - squashed register addition patch into this one
+    - used sextract_tl instructions instead of shift and ext
  v3
-    - Split register addition and opcode enum definition into seperate patches
     - Split gen_mxu function into command specific gen_mxu_<ins> functions
 
- target/mips/translate.c | 62 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ target/mips/translate.c | 78 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ae6b16ecd7..f6991aa8ef 100644
+index f693e45203..7c17867d30 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1610,6 +1610,23 @@ static inline void gen_store_gpr (TCGv t, int reg)
-         tcg_gen_mov_tl(cpu_gpr[reg], t);
+@@ -3967,6 +3967,80 @@ static void gen_mxu_d16mul(DisasContext *ctx, uint32_t opc)
+     tcg_temp_free(t3);
  }
  
-+/* MXU General purpose registers moves. */
-+static inline void gen_load_mxu_gpr(TCGv t, int reg)
++/* D16MAC XRa, XRb, XRc, XRd, APTN2, OPTN2
++ * Signed 16 bit pattern multiply and accumulate */
++static void gen_mxu_d16mac(DisasContext *ctx, uint32_t opc)
 +{
-+    if (reg == 0) {
-+        tcg_gen_movi_tl(t, 0);
-+    } else {
-+        tcg_gen_mov_tl(t, mxu_gpr[reg - 1]);
-+    }
-+}
-+
-+static inline void gen_store_mxu_gpr(TCGv t, int reg)
-+{
-+    if (reg != 0) {
-+        tcg_gen_mov_tl(mxu_gpr[reg - 1], t);
-+    }
-+}
-+
- /* Moves to/from shadow registers. */
- static inline void gen_load_srsgpr (int from, int to)
- {
-@@ -3798,6 +3815,42 @@ static void gen_cl (DisasContext *ctx, uint32_t opc,
-     }
- }
- 
-+/* MXU Instructions */
-+
-+/* S32I2M XRa, rb - Register move from GRF to XRF */
-+static void gen_mxu_s32i2m(DisasContext *ctx, uint32_t opc)
-+{
-+    TCGv t0;
-+    uint32_t xra, rb;
++    TCGv t0, t1, t2, t3;
++    uint32_t xra, xrb, xrc, xrd, optn2, aptn2;
 +
 +    t0 = tcg_temp_new();
++    t1 = tcg_temp_new();
++    t2 = tcg_temp_new();
++    t3 = tcg_temp_new();
 +
-+    xra = extract32(ctx->opcode, 6, 5);
-+    rb = extract32(ctx->opcode, 16, 5);
++    xra = extract32(ctx->opcode, 6, 4);
++    xrb = extract32(ctx->opcode, 10, 4);
++    xrc = extract32(ctx->opcode, 14, 4);
++    xrd = extract32(ctx->opcode, 18, 4);
++    optn2 = extract32(ctx->opcode, 22, 2);
++    aptn2 = extract32(ctx->opcode, 24, 2);
 +
-+    gen_load_gpr(t0, rb);
-+    gen_store_mxu_gpr(t0, xra);
++    gen_load_mxu_gpr(t1, xrb);
++    tcg_gen_sextract_tl(t0, t1, 0, 16);
++    tcg_gen_sextract_tl(t1, t1, 16, 16);
++    gen_load_mxu_gpr(t3, xrc);
++    tcg_gen_sextract_tl(t2, t3, 0, 16);
++    tcg_gen_sextract_tl(t3, t3, 16, 16);
 +
-+    tcg_temp_free(t0);
-+}
-+
-+/* S32M2I XRa, rb - Register move from XRF to GRF */
-+static void gen_mxu_s32m2i(DisasContext *ctx, uint32_t opc)
-+{
-+    TCGv t0;
-+    uint32_t xra, rb;
-+
-+    t0 = tcg_temp_new();
-+
-+    xra = extract32(ctx->opcode, 6, 5);
-+    rb = extract32(ctx->opcode, 16, 5);
-+
++    switch (optn2) {
++    case 0: /* XRB.H*XRC.H == lop, XRB.L*XRC.L == rop */
++        tcg_gen_mul_tl(t3, t1, t3);
++        tcg_gen_mul_tl(t2, t0, t2);
++        break;
++    case 1: /* XRB.L*XRC.H == lop, XRB.L*XRC.L == rop */
++        tcg_gen_mul_tl(t3, t0, t3);
++        tcg_gen_mul_tl(t2, t0, t2);
++        break;
++    case 2: /* XRB.H*XRC.H == lop, XRB.H*XRC.L == rop */
++        tcg_gen_mul_tl(t3, t1, t3);
++        tcg_gen_mul_tl(t2, t1, t2);
++        break;
++    case 3: /* XRB.L*XRC.H == lop, XRB.H*XRC.L == rop */
++        tcg_gen_mul_tl(t3, t0, t3);
++        tcg_gen_mul_tl(t2, t1, t2);
++        break;
++    }
 +    gen_load_mxu_gpr(t0, xra);
-+    gen_store_gpr(t0, rb);
++    gen_load_mxu_gpr(t1, xrd);
++
++    switch (aptn2) {
++    case 0:
++        tcg_gen_add_tl(t3, t0, t3);
++        tcg_gen_add_tl(t2, t1, t2);
++        break;
++    case 1:
++        tcg_gen_add_tl(t3, t0, t3);
++        tcg_gen_sub_tl(t2, t1, t2);
++        break;
++    case 2:
++        tcg_gen_sub_tl(t3, t0, t3);
++        tcg_gen_add_tl(t2, t1, t2);
++        break;
++    case 3:
++        tcg_gen_sub_tl(t3, t0, t3);
++        tcg_gen_sub_tl(t2, t1, t2);
++        break;
++    }
++    gen_store_mxu_gpr(t3, xra);
++    gen_store_mxu_gpr(t2, xrd);
 +
 +    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++    tcg_temp_free(t2);
++    tcg_temp_free(t3);
 +}
 +
  /* Godson integer instructions */
  static void gen_loongson_integer(DisasContext *ctx, uint32_t opc,
                                   int rd, int rs, int rt)
-@@ -17894,6 +17947,15 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
-         check_insn(ctx, INSN_LOONGSON2F);
-         gen_loongson_integer(ctx, op1, rd, rs, rt);
+@@ -18080,6 +18154,10 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
+         gen_mxu_d16mul(ctx, op1);
          break;
-+
-+    case OPC_MXU_S32I2M:
-+        gen_mxu_s32i2m(ctx, op1);
-+        break;
-+
-+    case OPC_MXU_S32M2I:
-+        gen_mxu_s32m2i(ctx, op1);
+ 
++    case OPC_MXU_D16MAC:
++        gen_mxu_d16mac(ctx, op1);
 +        break;
 +
      case OPC_CLO:
