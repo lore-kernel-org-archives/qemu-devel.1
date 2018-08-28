@@ -1,31 +1,30 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:39290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fubT6-0001vj-Cp
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:43:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1fubT7-0001vj-DP
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fubQG-0006Xu-Q5
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:40:33 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fubQG-0006TZ-Gf
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:40:32 -0400
-Received: by mail-wr1-x441.google.com with SMTP id m27-v6so1109439wrf.3
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 03:40:32 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1fubNv-0000Tv-TJ
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:38:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39722 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fubNv-0000Ta-LK
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:38:07 -0400
+Date: Tue, 28 Aug 2018 11:37:57 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180828103757.GI25114@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180827184103.32190-1-jusual@mail.ru>
+	<20180827184103.32190-2-jusual@mail.ru>
+	<20180828090249.GB25114@redhat.com>
+	<c5fbae21-21cb-db73-dd2e-029f0e2d5126@mail.ru>
+	<20180828100914.GE25114@redhat.com>
+	<abb29dce-396d-63bb-a1a3-48328e9e2dee@mail.ru>
 MIME-Version: 1.0
-References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
-	<20180827222322.26009-7-marcandre.lureau@redhat.com>
-	<20180828035232.GD4446@xz-x1>
-	<CAJ+F1C+fe4QGZmvtw76SQH=pqu6Nwure+CVPXBT_deHKgE5n0Q@mail.gmail.com>
-	<20180828102051.GF4446@xz-x1>
-In-Reply-To: <20180828102051.GF4446@xz-x1>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 28 Aug 2018 12:40:19 +0200
-Message-ID: <CAJ+F1CLnBd_dfhdARaD-qzC5qhb-tw-ZMgBur9=2u9Bx_M31SQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <abb29dce-396d-63bb-a1a3-48328e9e2dee@mail.ru>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/9] terminal3270: do not use backend timer
- sources
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] chardev: Add websocket support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +33,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Steffen =?utf-8?B?R8O2cnR6?= <mail@steffen-goertz.de>
 
-Hi
+On Tue, Aug 28, 2018 at 01:18:19PM +0300, Julia Suvorova wrote:
+> On 28.08.2018 13:09, Daniel P. Berrang=C3=A9 wrote:
+> > On Tue, Aug 28, 2018 at 01:04:41PM +0300, Julia Suvorova wrote:
+> > > On 28.08.2018 12:02, Daniel P. Berrang=C3=A9 wrote:
+> > > > On Mon, Aug 27, 2018 at 09:41:02PM +0300, Julia Suvorova wrote:
+> > > > > New option "websock" added to allow using websocket protocol fo=
+r
+> > > > > chardev socket backend.
+> > > > > Example:
+> > > > >       -chardev socket,websock,id=3D...
+> > > > >=20
+> > > > > Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> > > > > ---
+> > > > >    chardev/char-socket.c | 124 +++++++++++++++++++++++++++++++-=
+----------
+> > > > >    chardev/char.c        |   8 ++-
+> > > > >    qapi/char.json        |   3 +
+> > > > >    3 files changed, 103 insertions(+), 32 deletions(-)
+> > > >=20
+> > > > Also needs changes to qemu-options.hx to document the new
+> > > > websock option.  This doc ends up included in the main
+> > > > qemu-doc.html published on the website, and also forms the
+> > > > man page for qemu.
+> > > >=20
+> > > > > diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+> > > > > index efbad6ee7c..1d3c14d85d 100644
+> > > > > --- a/chardev/char-socket.c
+> > > > > +++ b/chardev/char-socket.c
+> > > > > @@ -26,6 +26,7 @@
+> > > > >    #include "chardev/char.h"
+> > > > >    #include "io/channel-socket.h"
+> > > > >    #include "io/channel-tls.h"
+> > > > > +#include "io/channel-websock.h"
+> > > > >    #include "io/net-listener.h"
+> > > > >    #include "qemu/error-report.h"
+> > > > >    #include "qemu/option.h"
+> > > > > @@ -69,6 +70,8 @@ typedef struct {
+> > > > >        GSource *telnet_source;
+> > > > >        TCPChardevTelnetInit *telnet_init;
+> > > > > +    bool is_websock;
+> > > > > +
+> > > > >        GSource *reconnect_timer;
+> > > > >        int64_t reconnect_time;
+> > > > >        bool connect_err_reported;
+> > > > > @@ -385,30 +388,37 @@ static void tcp_chr_free_connection(Chard=
+ev *chr)
+> > > > >        s->connected =3D 0;
+> > > > >    }
+> > > > > -static char *SocketAddress_to_str(const char *prefix, SocketAd=
+dress *addr,
+> > > > > -                                  bool is_listen, bool is_teln=
+et)
+> > > > > +static const char *qemu_chr_socket_protocol(SocketChardev *s)
+> > > > > +{
+> > > > > +    if (s->is_telnet) {
+> > > > > +        return "telnet";
+> > > > > +    }
+> > > > > +    return s->is_websock ? "websock" : "tcp";
+> > > > > +}
+> > > > > +
+> > > > > +static char *qemu_chr_socket_address(SocketChardev *s, const c=
+har *prefix)
+> > > > >    {
+> > > > > -    switch (addr->type) {
+> > > > > +    switch (s->addr->type) {
+> > > > >        case SOCKET_ADDRESS_TYPE_INET:
+> > > > >            return g_strdup_printf("%s%s:%s:%s%s", prefix,
+> > > > > -                               is_telnet ? "telnet" : "tcp",
+> > > > > -                               addr->u.inet.host,
+> > > > > -                               addr->u.inet.port,
+> > > > > -                               is_listen ? ",server" : "");
+> > > > > +                               qemu_chr_socket_protocol(s),
+> > > > > +                               s->addr->u.inet.host,
+> > > > > +                               s->addr->u.inet.port,
+> > > > > +                               s->is_listen ? ",server" : "");
+> > > > >            break;
+> > > > >        case SOCKET_ADDRESS_TYPE_UNIX:
+> > > > >            return g_strdup_printf("%sunix:%s%s", prefix,
+> > > > > -                               addr->u.q_unix.path,
+> > > > > -                               is_listen ? ",server" : "");
+> > > > > +                               s->addr->u.q_unix.path,
+> > > > > +                               s->is_listen ? ",server" : "");
+> > > > >            break;
+> > > > >        case SOCKET_ADDRESS_TYPE_FD:
+> > > > > -        return g_strdup_printf("%sfd:%s%s", prefix, addr->u.fd=
+.str,
+> > > > > -                               is_listen ? ",server" : "");
+> > > > > +        return g_strdup_printf("%sfd:%s%s", prefix, s->addr->u=
+.fd.str,
+> > > > > +                               s->is_listen ? ",server" : "");
+> > > > >            break;
+> > > > >        case SOCKET_ADDRESS_TYPE_VSOCK:
+> > > > >            return g_strdup_printf("%svsock:%s:%s", prefix,
+> > > > > -                               addr->u.vsock.cid,
+> > > > > -                               addr->u.vsock.port);
+> > > > > +                               s->addr->u.vsock.cid,
+> > > > > +                               s->addr->u.vsock.port);
+> > > > >        default:
+> > > > >            abort();
+> > > > >        }
+> > > > > @@ -419,8 +429,7 @@ static void update_disconnected_filename(So=
+cketChardev *s)
+> > > > >        Chardev *chr =3D CHARDEV(s);
+> > > > >        g_free(chr->filename);
+> > > > > -    chr->filename =3D SocketAddress_to_str("disconnected:", s-=
+>addr,
+> > > > > -                                         s->is_listen, s->is_t=
+elnet);
+> > > > > +    chr->filename =3D qemu_chr_socket_address(s, "disconnected=
+:");
+> > > > >    }
+> > > > >    /* NB may be called even if tcp_chr_connect has not been
+> > > > > @@ -506,10 +515,12 @@ static int tcp_chr_sync_read(Chardev *chr=
+, const uint8_t *buf, int len)
+> > > > >        return size;
+> > > > >    }
+> > > > > -static char *sockaddr_to_str(struct sockaddr_storage *ss, sock=
+len_t ss_len,
+> > > > > -                             struct sockaddr_storage *ps, sock=
+len_t ps_len,
+> > > > > -                             bool is_listen, bool is_telnet)
+> > > > > +static char *qemu_chr_compute_filename(SocketChardev *s)
+> > > > >    {
+> > > > > +    struct sockaddr_storage *ss =3D &s->sioc->localAddr;
+> > > > > +    struct sockaddr_storage *ps =3D &s->sioc->remoteAddr;
+> > > > > +    socklen_t ss_len =3D s->sioc->localAddrLen;
+> > > > > +    socklen_t ps_len =3D s->sioc->remoteAddrLen;
+> > > > >        char shost[NI_MAXHOST], sserv[NI_MAXSERV];
+> > > > >        char phost[NI_MAXHOST], pserv[NI_MAXSERV];
+> > > > >        const char *left =3D "", *right =3D "";
+> > > > > @@ -519,7 +530,7 @@ static char *sockaddr_to_str(struct sockadd=
+r_storage *ss, socklen_t ss_len,
+> > > > >        case AF_UNIX:
+> > > > >            return g_strdup_printf("unix:%s%s",
+> > > > >                                   ((struct sockaddr_un *)(ss))-=
+>sun_path,
+> > > > > -                               is_listen ? ",server" : "");
+> > > > > +                               s->is_listen ? ",server" : "");
+> > > > >    #endif
+> > > > >        case AF_INET6:
+> > > > >            left  =3D "[";
+> > > > > @@ -531,9 +542,9 @@ static char *sockaddr_to_str(struct sockadd=
+r_storage *ss, socklen_t ss_len,
+> > > > >            getnameinfo((struct sockaddr *) ps, ps_len, phost, s=
+izeof(phost),
+> > > > >                        pserv, sizeof(pserv), NI_NUMERICHOST | N=
+I_NUMERICSERV);
+> > > > >            return g_strdup_printf("%s:%s%s%s:%s%s <-> %s%s%s:%s=
+",
+> > > > > -                               is_telnet ? "telnet" : "tcp",
+> > > > > +                               qemu_chr_socket_protocol(s),
+> > > > >                                   left, shost, right, sserv,
+> > > > > -                               is_listen ? ",server" : "",
+> > > > > +                               s->is_listen ? ",server" : "",
+> > > > >                                   left, phost, right, pserv);
+> > > > >        default:
+> > > > > @@ -547,10 +558,7 @@ static void tcp_chr_connect(void *opaque)
+> > > > >        SocketChardev *s =3D SOCKET_CHARDEV(opaque);
+> > > > >        g_free(chr->filename);
+> > > > > -    chr->filename =3D sockaddr_to_str(
+> > > > > -        &s->sioc->localAddr, s->sioc->localAddrLen,
+> > > > > -        &s->sioc->remoteAddr, s->sioc->remoteAddrLen,
+> > > > > -        s->is_listen, s->is_telnet);
+> > > > > +    chr->filename =3D qemu_chr_compute_filename(s);
+> > > > >        s->connected =3D 1;
+> > > > >        chr->gsource =3D io_add_watch_poll(chr, s->ioc,
+> > > >=20
+> > > > Everything above this point is refactoring of existing code, mixe=
+d in with
+> > > > a few websock additions.
+> > > >=20
+> > > > Everything below this is implementing the websocket feature.
+> > > >=20
+> > > > These two distinct tasks should be separated, so that refactoring=
+ is in
+> > > > the first patch, and websocks impl is in a second patch.
+> > >=20
+> > > Thus, I will have second patch based on the first patch, and the
+> > > first will contain code that will never be used. If it's okay, I wi=
+ll
+> > > divide the patch.
+> >=20
+> > Don't really know why you're saying the first patch code won't be use=
+d.
+> > The code you're refactoring here is already used today, and you are j=
+ust
+> > renaming methods & changing what parameters are passed to it.
+>=20
+> I meant that some code will be replaced with a second patch.
+> For instance, in the first patch I will add this line:
+> +    return "tcp";
+> And in the second it will be replaced by:
+> +    return s->is_websock ? "websock" : "tcp";
+> So this is extra unnecessary code.
 
-On Tue, Aug 28, 2018 at 12:20 PM Peter Xu <peterx@redhat.com> wrote:
->
-> On Tue, Aug 28, 2018 at 11:09:28AM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Tue, Aug 28, 2018 at 5:52 AM Peter Xu <peterx@redhat.com> wrote:
-> > >
-> > > On Tue, Aug 28, 2018 at 12:23:19AM +0200, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> > > > terminal3270 is uses the front-end side of the chardev. It shouldn'=
-t
-> > > > create sources from backend side context. Fwiw, send_timing_mark_cb
-> > > > calls qemu_chr_fe_write_all() which should be thread safe.
-> > > >
-> > > > This partially reverts changes from commit
-> > > > 2c716ba1506769c9be2caa02f0f6d6e7c00f4304.
-> > >
-> > > I don't fully understand too on why "It shouldn't create sources from
-> > > backend side context".  Could you explain a bit?
-> >
-> > A frontend shouldn't use a backend function, and doesn't have to use
-> > the backend gmaincontext.
-> >
-> > >
-> > > If you don't want the backend gcontext to be exposed to the frontend,
-> > > IMHO the simplest thing is just to use the NULL gcontext in
-> > > qemu_chr_timeout_add_ms() which is a one-liner change. I don't see
-> > > much point on re-using the GSource tags since IMHO GSource pointer is
-> > > always superior to the old tag system.
-> >
-> > Using the tag or the GSource * doesn't change much afaik.
->
-> I did some convertions in the past year to convert tag -> GSource and
-> that shows some differences when we want non-default gcontexts...
-> Otherwise I won't bother. :)
+That is to be expected and isn't really considered unnecessary code.
+It is best practice when separating work into a series of commits to
+ensure each commit only covers one distinct task.
 
-It doesn't need a specific context here, does it?
-
->
-> > Not only
-> > this is not a hot path, but glib gmain code does create the tag on
-> > attach anyway. You may be marginally faster on remove/detach by
-> > avoiding one lookup.
-> >
-> > (btw, I think both tag and GSource* are as old)
->
-> I am not strong on this, but my rule is that if I don't have explicit
-> reason to change a code I keep it there.  Here I don't see an obvious
-> reason to switch back to the tag things (not to mention that I still
-> think GSource is better, always).
-
-As I explained, you shouldn't use backend fonctions in the frontend,
-and there is no reason to use the backend context. I try to keep all
-the sources created around chardev under control, and this one is
-incorrect imho.
-
-Using g_timeout_add() is convenient, since it does all the work you do
-manually by creating a source, setting callback, attaching, unref etc.
-And it uses the default context, which is in general the right thing.
-
-I can do all the manual work and keep the GSource* around, but I don't
-think that helps in any way here.
-
-
->
-> Thanks,
->
-> --
-> Peter Xu
-
-
-
+Regards,
+Daniel
 --=20
-Marc-Andr=C3=A9 Lureau
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
