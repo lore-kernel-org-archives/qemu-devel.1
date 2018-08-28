@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fujlj-0002cO-4J
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:35:16 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1fukEi-0004bY-LW
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 16:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fujlb-0001wn-KX
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:35:11 -0400
-Received: from mail-by2nam03on0134.outbound.protection.outlook.com
-	([104.47.42.134]:6316
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fujlZ-0001sE-UK
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:35:07 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 28 Aug 2018 19:35:00 +0000
-Message-ID: <BN7PR08MB4868B3C34EB2307D4EAE9722C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <20180828130041.26445-1-jancraig@amazon.com>,
-	<20180828130041.26445-3-jancraig@amazon.com>
-	<BN7PR08MB48680621D40A0A8800E9AEF6C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
-	<b9eab9396a6e4270b9e536a4fe84a54d@EX13D12UEA003.ant.amazon.com>
-	<BN7PR08MB4868B217B1104A75673CE58EC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
-	<a89f839cb02647ae865382f060bc29f0@EX13D12UEA003.ant.amazon.com>
-In-Reply-To: <a89f839cb02647ae865382f060bc29f0@EX13D12UEA003.ant.amazon.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <danielhb413@gmail.com>) id 1fuk4z-0004dn-JQ
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:55:12 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:43738)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1fuk4z-0004cT-Ad
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:55:09 -0400
+Received: by mail-qt0-x242.google.com with SMTP id g53-v6so3161198qtg.10
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 12:55:09 -0700 (PDT)
+References: <20180705200813.2033-1-danielhb413@gmail.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <4b2460c7-962b-83be-0b1e-4ed9ccc29708@gmail.com>
+Date: Tue, 28 Aug 2018 16:55:04 -0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/8] target/mips: Add all MXU opcodes
+In-Reply-To: <20180705200813.2033-1-danielhb413@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v8 0/3] wakeup-from-suspend and
+ system_wakeup changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Janeczek, Craig" <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com
 
-> From: Janeczek, Craig <jancraig@amazon.com>
-> Sent: Tuesday, August 28, 2018 8:54 PM
+Ping
+
+On 07/05/2018 05:08 PM, Daniel Henrique Barboza wrote:
+> changes in v8:
+> - created 'query-current-machine' API to hold the wakeup-suspend-support
+>    flag
+> - wake-up flag now considers the --no-acpi config option for PC archs
+> - fixes in patch 3 proposed by Markus.
+> Previous series link:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04234.html
 >
-> Subject: RE: [PATCH v3 2/8] target/mips: Add all MXU opcodes
+> Daniel Henrique Barboza (3):
+>    qmp: query-current-machine with wakeup-suspend-support
+>    qga: update guest-suspend-ram and guest-suspend-hybrid descriptions
+>    qmp hmp: Make system_wakeup check wake-up support and run state
 >
-> I will re-work each of the mxu_gen_<ins> functions to check for MXUEN and=
- jump over the implementation of the instruction if not enabled.
->=20
-> I would like to clarify the structure of the switch statement before impl=
-ementing it.
+>   hmp.c                   |  5 ++++-
+>   include/sysemu/sysemu.h |  1 +
+>   qapi/misc.json          | 29 ++++++++++++++++++++++++++++-
+>   qga/qapi-schema.json    | 12 ++++++------
+>   qmp.c                   | 11 ++++++++++-
+>   vl.c                    | 30 ++++++++++++++++++++++++++++++
+>   6 files changed, 79 insertions(+), 9 deletions(-)
 >
-> I was originally planning on checking if there was a MXU hit and MXUEN wa=
-s set, in that case use the MXU instruction, else use the original switch. =
-This will not work as MXUEN is in a TCGv and cant be used in an if statemen=
-t at that level. That is why I plan on putting the MXUEN check in each of t=
-he mxu_gen_<ins> functions.
->=20
-> What should the re-worked switch statement look like which runs the mxu_g=
-en_<ins> functions?
-
-I didn't study these code segments in depth, but at this moment it seems to=
- me that the cleanest organization would be to leave current decode_opc_spe=
-cial2_legacy(env, ctx); as is, and, however, to change the part with its in=
-vocation:
-
-    case OPC_SPECIAL2:
-        decode_opc_special2_legacy(env, ctx);
-        break;
-to
-
-    case OPC_SPECIAL2:
-        if (<MXU is present>) {
-                decode_opc_special2_mxu(env, ctx);
-        } else if (<LOONGSON_2F>) {
-                decode_opc_special2_legacy(env, ctx);
-        }
-        break;
-
-where decode_opc_special2_mxu(env, ctx); is the function that you will writ=
-e.
-
-Or something along these lines...
-
-But I may be mistaken regrding details...
-
-Again, overall, this series is very good. We are arguing about some technic=
-al details, out of which many are, frankly, unimportant. I just want to tel=
-l you that don't misunderstand my and Richard's critiques - we want this co=
-de in QEMU, just want it to be nice, clean, and correct, and we definitely =
-appreciate your work very much!=
