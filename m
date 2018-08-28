@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fuSlr-0006t7-B5
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 21:26:18 -0400
+	(envelope-from <prvs=771160022=marcolso@amazon.com>)
+	id 1fuT6S-0007Dl-GM
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 21:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fuSlo-0003Zp-61
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 21:26:15 -0400
-Received: from ozlabs.org ([203.11.71.1]:44151)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fuSln-0003OA-4I
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 21:26:12 -0400
-Date: Tue, 28 Aug 2018 10:52:37 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180828005237.GC2222@umbus.fritz.box>
-References: <1535368030-214556-1-git-send-email-imammedo@redhat.com>
-	<20180827160239.54cc993a@bahia.lan>
+	(envelope-from <prvs=771160022=marcolso@amazon.com>)
+	id 1fuSyh-0008Km-GP
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 21:39:36 -0400
+References: <1535087186-9643-1-git-send-email-marcolso@amazon.com>
+	<837facae-ff38-e995-ca2e-9c16efb7c209@redhat.com>
+From: Marc Olson <marcolso@amazon.com>
+Message-ID: <0956d551-b21a-7e01-f541-b96ef3be03d8@amazon.com>
+Date: Mon, 27 Aug 2018 18:34:49 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/Uq4LBwYP4y1W6pO"
-Content-Disposition: inline
-In-Reply-To: <20180827160239.54cc993a@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] pc: make sure that guest isn't able to
- unplug the first cpu
+In-Reply-To: <837facae-ff38-e995-ca2e-9c16efb7c209@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] blkdebug: Add support for latency rules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +26,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, david@redhat.com, cohuck@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 
---/Uq4LBwYP4y1W6pO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 08/24/2018 09:11 AM, Eric Blake wrote:
+> On 08/24/2018 12:06 AM, Marc Olson via Qemu-devel wrote:
+>> Allow rules to be created to inject latency into I/O operations.
+>>
+>> Signed-off-by: Marc Olson <marcolso@amazon.com>
+>> ---
+>>   block/blkdebug.c        | 101 
+>> ++++++++++++++++++++++++++++++++++++++----------
+>>   docs/devel/blkdebug.txt |  30 ++++++++++----
+>>   2 files changed, 103 insertions(+), 28 deletions(-)
+>
+> The commit message could usefully summarize some of the doc additions 
+> (so you can learn more about it without having to read the patch 
+> itself) - but the doc additions are appreciated.
+I can be more verbose in the commit.
+>
+> Missing: you should enhance an existing (or add a new) iotests usage 
+> of blkdebug to specify a latency operation. One possible test would be 
+> forcing a read to take longer than a write - then issue an aio read, a 
+> write immediately after, and verify that the write completes first and 
+> then the read (whether the read sees the old or the new data just 
+> written would then depend on whether the delay is acted on before or 
+> after blkdebug forwards the read on to the real block layer).
+>
+I'll add at least a simple test to the repo.
 
-On Mon, Aug 27, 2018 at 04:02:39PM +0200, Greg Kurz wrote:
-> On Mon, 27 Aug 2018 13:07:10 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
->=20
-> > The first cpu unplug wasn't ever supported and corresponding
-> > monitor/qmp commands refuse to unplug it. However guest is able
-> > to issue eject request either using following command:
-> >   # echo 1 >/sys/devices/system/cpu/cpu0/firmware_node/eject
->=20
-> I can't reproduce the issue with a pc guest and current master...
->=20
-> All I seem to get is an error in dmesg:
->=20
-> [   97.435446] processor cpu0: Offline failed.
->=20
-> > or directly writing to cpu hotplug registers, which makes
-> > qemu crash with SIGSEGV following back trace:
-> >=20
-> >    kvm_flush_coalesced_mmio_buffer ()
-> >        while (ring->first !=3D ring->last)
-> >    ...
-> >    qemu_flush_coalesced_mmio_buffer
-> >    prepare_mmio_access
-> >    flatview_read_continue
-> >    flatview_read
-> >    address_space_read_full
-> >    address_space_rw
-> >    kvm_cpu_exec(cpu!0)
-> >    qemu_kvm_cpu_thread_fn
-> >=20
-> > the reason for which is that ring =3D=3D KVMState::coalesced_mmio_ring
-> > happens to be a part of 1st CPU that was uplugged by guest.
-> >=20
-> > Fix it by forbidding 1st cpu unplug from guest side and in addition
-> > remove CPU0._EJ0 ACPI method to make clear that unplug of the first
-> > CPU is not supported.
-> >=20
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > CCing spapr and s390x folks in case targets need to prevent 1st CPU unp=
-lug as well
-> >=20
->=20
-> A spapr guest can _release_ the first cpu by doing something like:
->=20
-> # echo -n "/cpus/PowerPC,POWER8@0" > /sys/devices/system/cpu/release
->=20
-> But AFAIK, this doesn't unplug the cpu from a QEMU standpoint.
+>>
+>> diff --git a/block/blkdebug.c b/block/blkdebug.c
+>> index e216699..762e438 100644
+>> --- a/block/blkdebug.c
+>> +++ b/block/blkdebug.c
+>> @@ -65,6 +65,7 @@ typedef struct BlkdebugSuspendedReq {
+>>     enum {
+>>       ACTION_INJECT_ERROR,
+>> +    ACTION_DELAY,
+>>       ACTION_SET_STATE,
+>>       ACTION_SUSPEND,
+>>   };
+>
+> Does any of this need to be accessible via QMP?  (If QMP can't already 
+> fine-tune what blkdebug can do, I'm not proposing that you have to 
+> make it do so - but if QMP can specify error injections, it should 
+> also be able to specify delays).  Even if it doesn't need to be in 
+> QMP, should we specify this enum and related types in our qapi/*.json 
+> files?
+It does appear that blkdebug is in the qapi/*.json files. I've added the 
+appropriate types, but I'm less familiar with the QMP incantations, and 
+seem to have misconfigured my tests as they result in an uninitialized 
+mutex when trying to do aio*. Using the existing tests as a guide, 
+there's no global BlockBackend created, and so hmp_qemu_io() creates a 
+local backend that is cleaned up before the aio completes. Removing the 
+blk_unref() clears it up, but of course leaks memory. I don't see an API 
+that creates the appropriate QMP BlockBackend for file backed devices.
 
-Unplugging CPU 0 with device_del should be ok too.
+>
+>> @@ -123,6 +127,33 @@ static QemuOptsList inject_error_opts = {
+>>       },
+>>   };
+>>   +static QemuOptsList delay_opts = {
+>
+> One reason for suggesting that this be done with QAPI types is that 
+> QemuOpts is already proving to be painfully hard to extend, where in 
+> general we are trying to move towards using QAPI types rather than yet 
+> more QemuOpts munging.
+>
+>> @@ -182,16 +214,21 @@ static int add_rule(void *opaque, QemuOpts 
+>> *opts, Error **errp)
+>>           .state  = qemu_opt_get_number(opts, "state", 0),
+>>       };
+>>   +    rule->once  = qemu_opt_get_bool(opts, "once", 0);
+>> +    sector = qemu_opt_get_number(opts, "sector", -1);
+>> +    rule->offset = sector == -1 ? -1 : sector * BDRV_SECTOR_SIZE;
+>
+> I really wish we could spend time moving blkdebug to be byte-based 
+> instead of sector-based.
+I'm not certain I see the benefit of moving to byte based. Storage 
+devices are sector based. The biggest pain point with blkdebug is not 
+that it's sector based, but that offsets are based on the backing file, 
+and not as viewed by the guest. In order to properly use blkdebug with 
+qcow2, for example, you have to do some gymnastics.
+>
+>> +++ b/docs/devel/blkdebug.txt
+>> @@ -24,7 +24,7 @@ This way, all error paths can be tested to make 
+>> sure they are correct.
+>>   Rules
+>>   -----
+>>   The blkdebug block driver takes a list of "rules" that tell the 
+>> error injection
+>> -engine when to fail an I/O request.
+>> +engine when to fail (inject-error) or add latency to (delay) an I/O 
+>> request.
+>>     Each I/O request is evaluated against the rules.  If a rule 
+>> matches the request
+>>   then its "action" is executed.
+>> @@ -33,17 +33,25 @@ Rules can be placed in a configuration file; the 
+>> configuration file
+>>   follows the same .ini-like format used by QEMU's -readconfig 
+>> option, and
+>>   each section of the file represents a rule.
+>>   -The following configuration file defines a single rule:
+>> +The following configuration file defines multiple rules:
+>>       $ cat blkdebug.conf
+>>     [inject-error]
+>>     event = "read_aio"
+>>     errno = "28"
+>>   -This rule fails all aio read requests with ENOSPC (28).  Note that 
+>> the errno
+>> -value depends on the host.  On Linux, see
+>> +  [delay]
+>> +  event = "read_aio"
+>> +  sector = "2048"
+>> +  latency = "500000"
+>> +
+>> +The error rule fails all aio read requests with ENOSPC (28). Note 
+>> that the
+>> +errno value depends on the host.  On Linux, see
+>>   /usr/include/asm-generic/errno-base.h for errno values.
+>>   +The delay rule adds 500 ms of latency to a read I/O request 
+>> containing sector
+>> +2048.
+>
+> So in this example, you get a failure no matter what, but that one 
+> sector takes even longer to fail?
+No, in the case of injection that overlaps, it takes the first rule. 
+This is similar to the existing behavior--if two errors match, you don't 
+know which you're getting. I like the suggestion, and I've reworked it a 
+bit to delay first and then take any errors, but still take the first of 
+each. I could see a follow on that looks for the most specific rule in 
+either case (or the greatest delay in the latency case).
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---/Uq4LBwYP4y1W6pO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluEnNMACgkQbDjKyiDZ
-s5KbRg//WXmNNMgisxOqxnQelVDR3+NtaOv17M6fpA1moMYvBo/YIOU1fwdBzjhn
-Y/SMvygTeGrjB9g6vCGNKfIVsMkBqQkb3m5Vcp6LM4hfywWwKyilwE1IiH6PvTHx
-DTNaDk6pJa2mF4oyb4K9dSfbrrm+DcI9Q5oqS/plLDLuebw1ZORhlCSXbJpzF7wV
-fpFlvpamKp/Fzvb9EbKyIAUbsYIa2A3sDiAnzIl0eI56j7LTQumL/I5YEBwrMFWh
-zcBZeNHWuP0vX3My8qYtqx1UGo6b2J61NVAWmxFMWV91PZrmJoPRwkQJvFtBtXxz
-dmOVR3guXgQkTU5niwx3haruSG1iB6rVNwEJ5DjJkA1RXr52DTymvOWBzY0GXzAl
-AdOoTMI7xpS5uam1t3OClh1rFs2QEO6Zj7abPVnMVRW4X2Q2QU2s7Q49dvdBII3D
-XLAHigNOykFafqZ79Iw2bDey9iWXZMBa7SQ/baSMS0cZlVPgUqquU74YgCJ42G5n
-oDTxQOBNREhtiC675GaNXoXZ/8ZabWEhrlvwT+ivquPkFFesGI6NUqhhMJ60RTT0
-ZxlKvjOdqP8rl5VTgDFRKM2kdLtSaTENaLUY+YUVgcAg7aTXUPTp+1Kz0cKL8bXH
-u2xDhwCCVuPdaUU6AkIPii1BE01il5wuC2wwWYRzchPhBViE70Q=
-=hmui
------END PGP SIGNATURE-----
-
---/Uq4LBwYP4y1W6pO--
+>
+> Overall, I like the idea.
+>
