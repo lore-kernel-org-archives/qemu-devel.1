@@ -1,14 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1fuUWS-0002Lg-Gv
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 23:18:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1fuUe2-0003v0-C5
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 23:26:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1fuUWR-0005lz-B2
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 23:18:28 -0400
-From: yuchenlin@synology.com
-Date: Tue, 28 Aug 2018 11:17:51 +0800
-Message-Id: <20180828031751.29507-1-yuchenlin@synology.com>
-Subject: [Qemu-devel] [PATCH] vmdk: align end of file to a sector boundary
+	(envelope-from <peterx@redhat.com>) id 1fuUdx-0002IN-E9
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 23:26:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57092 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fuUdx-0002Gn-9L
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 23:26:13 -0400
+Date: Tue, 28 Aug 2018 11:26:01 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180828032601.GA2768@xz-x1>
+References: <20180815095328.32414-1-peterx@redhat.com>
+	<20180815095328.32414-4-peterx@redhat.com>
+	<8736v0t0cm.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8736v0t0cm.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v5 3/3] intel-iommu: replace more vtd_err_*
+ traces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,48 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, yuchenlin <yuchenlin@synology.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Halil Pasic <pasic@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>
 
-From: yuchenlin <yuchenlin@synology.com>
+On Mon, Aug 27, 2018 at 03:17:45PM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > Replace all the trace_vtd_err_*() hooks with the new error_report_once()
+> > since they are similar to trace_vtd_err() - dumping the first error
+> > would be mostly enough, then we have them on by default too.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> [...]
+> 
+> Let's use "%x" instead of "%" PRIx16 for simplicity, and add spaces
+> around PRIx64 & friends.
+> 
+> Squashing in:
 
-There is a rare case which the size of last compressed cluster
-is larger than the cluster size, which will cause the file is
-not aligned at the sector boundary.
+Thanks for touching up the places around in both patches.
 
-Signed-off-by: yuchenlin <yuchenlin@synology.com>
----
- block/vmdk.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/block/vmdk.c b/block/vmdk.c
-index a9d0084e36..a8ae7c65d2 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1698,6 +1698,24 @@ static int coroutine_fn
- vmdk_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-                            uint64_t bytes, QEMUIOVector *qiov)
- {
-+    if (bytes == 0) {
-+        /* align end of file to a sector boundary. */
-+        BDRVVmdkState *s = bs->opaque;
-+        int i, ret;
-+        int64_t length;
-+
-+        for (i = 0; i < s->num_extents; i++) {
-+            length = bdrv_getlength(s->extents[i].file->bs);
-+            if (length < 0) {
-+                return length;
-+            }
-+            ret = bdrv_truncate(s->extents[i].file, length, PREALLOC_MODE_OFF, NULL);
-+            if (ret < 0) {
-+                return ret;
-+            }
-+        }
-+        return 0;
-+    }
-     return vmdk_co_pwritev(bs, offset, bytes, qiov, 0);
- }
- 
 -- 
-2.17.0
+Peter Xu
