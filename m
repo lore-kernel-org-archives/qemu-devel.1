@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fugP2-0007EG-QM
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:59:37 -0400
+	(envelope-from <rjones@redhat.com>) id 1fugPd-0007eX-V3
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:00:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fugOz-0005jR-J1
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:59:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50100 helo=mx1.redhat.com)
+	(envelope-from <rjones@redhat.com>) id 1fugPa-0006CT-NO
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:00:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fugOz-0005j5-DJ
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:59:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E00D0807A13F
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 15:59:32 +0000 (UTC)
-Date: Tue, 28 Aug 2018 16:59:25 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180828155925.GG31005@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
-	<20180713130916.4153-22-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1fugPa-00068Y-Bz
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:00:10 -0400
+Date: Tue, 28 Aug 2018 16:59:59 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180828155959.GA16050@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180713130916.4153-22-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 21/29] util: use fcntl() for
- qemu_write_pidfile() locking
+Subject: [Qemu-devel] ANNOUNCE: nbdkit 1.6 - an NBD server toolkit with
+ stable plugin API and permissive license
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,60 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, airlied@redhat.com, kraxel@redhat.com
+To: libguestfs@redhat.com, virt-tools-list@redhat.com, nbd@other.debian.org, qemu-devel@nongnu.org
 
-On Fri, Jul 13, 2018 at 03:09:08PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> According to Daniel Berrange, fcntl() locks have better portable
-> semantics than lockf().
+NBD =E2=80=94 Network Block Device =E2=80=94 is a protocol for accessing =
+Block Devices
+(hard disks and disk-like things) over a Network.  nbdkit is a toolkit
+for creating NBD servers.
 
-Specifically I was referring to this from 'man lockf':
+The key features are:
 
-   On Linux, lockf() is just an interface  on  top  of  fcntl(2)  locking=
-.
-   Many other systems implement lockf() in this way, but note that POSIX.=
-1
-   leaves the relationship between lockf() and fcntl(2) locks unspecified=
-.
-   A  portable  application  should  probably  avoid mixing calls to thes=
-e
-   interfaces.
+ * Multithreaded NBD server written in C with good performance.
+ * Minimal dependencies for the basic server.
+ * Liberal license (BSD) allows nbdkit to be linked to proprietary
+   libraries or included in proprietary code.
+ * Well-documented, simple plugin API with a stable ABI guarantee.
+   Lets you export =E2=80=9Cunconventional=E2=80=9D block devices easily.
+ * You can write plugins in C, [new!] Lua, Perl, Python, OCaml, Ruby or T=
+cl.
+ * Filters can be stacked in front of plugins to transform the output.
 
-IOW, if its just a shim around fcntl() on many systems, it is clearer
-if we just use fcntl() directly, as we then know how fcntl() locks will
-behave if they're on a network filesystem like NFS.
+https://github.com/libguestfs/nbdkit
+http://download.libguestfs.org/nbdkit/1.6-stable/
+(other downloads: http://download.libguestfs.org/nbdkit/ )
 
-> Use an exclusive lock on the first byte with fcntl().
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  util/oslib-posix.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index da1d4a3201..26b11490b9 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -92,6 +92,11 @@ bool qemu_write_pidfile(const char *pidfile, Error *=
-*errp)
->  {
->      int pidfd;
->      char pidstr[32];
-> +    struct flock lock =3D {
-> +        .l_type =3D F_WRLCK,
-> +        .l_whence =3D SEEK_SET,
-> +        .l_len =3D 1,
-> +    };
+New in the 1.6 release:
 
-For the same semantics as lockf we should use  len =3D=3D 0 (ie infinity)
+ * You can now write plugins in the Lua scripting language.
 
+ * nbdkit and common plugins are now "63 bit clean": the maximum disk
+   size supported is 2^63-1 bytes, and the core server and plugins now
+   have additional tests to check this works, even on 32 bit machines.
 
-Regards,
-Daniel
+ * Multiple improvements to the =E2=80=98file=E2=80=99 plugin to make zer=
+oing and
+   trimming perform better, work correctly with block devices, and
+   work on older Linux kernels [Nir Soffer, Eric Blake].
+
+ * New =E2=80=98pattern=E2=80=99 plugin generates a simple, fixed test pa=
+ttern for
+   testing nbdkit filters and NBD clients.
+
+ * New =E2=80=98truncate=E2=80=99 filter can: truncate or extend the size=
+ of plugins,
+   or round up or down the size to next multiple of a power of 2.
+   Useful for NBD clients like qemu which can only handle NBD sizes
+   which are a multiple of 512 bytes.
+
+ * New =E2=80=98error=E2=80=99 filter which can be used to inject errors =
+into the
+   protocol for testing how clients can handle and recover from
+   errors.
+
+ * New =E2=80=98data=E2=80=99 plugin allows you to specify (small) disk i=
+mages
+   directly on the command line.
+
+ * Enhanced error reporting in the Python plugin so full tracebacks
+   from errors are now displayed instead of being lost as before.
+
+ * NBD_OPT_GO now supported, so we can return errors when negotiating
+   the export name.
+
+ * Support for logging error messages to syslog.
+
+ * nbdkit can now be compiled with Clang (as well as GCC).
+
+ * nbdkit can now be compiled on FreeBSD.
+
+ * The VDDK plugin is compiled unconditionally.  You no longer need to
+   install the proprietary VDDK to compile it.
+
+ * Debug messages now include the name of the filter when invoked from
+   a filter context.
+
+ * Debug flags (-D option) provides lightweight debugging for plugin
+   authors.
+
+Thanks to all who contributed, especially Nir Soffer and Eric Blake.
+
+Rich.
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
