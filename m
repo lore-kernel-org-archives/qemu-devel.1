@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuaB2-00070y-Iz
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1fuaB5-000719-5L
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fuaB1-00077X-3x
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46892)
+	(envelope-from <bounces@canonical.com>) id 1fuaB3-00078e-N8
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47058)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fuaB0-00077T-Si
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:43 -0400
+	id 1fuaB3-00078A-Fo
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fuaAy-0003X3-AT
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:40 +0000
+	id 1fuaB0-0003gz-Sk
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4D2002E80C7
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 6407A2E80E5
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Aug 2018 09:10:39 -0000
+Date: Tue, 28 Aug 2018 09:11:47 -0000
 From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
 	<1755912@bugs.launchpad.net>
 Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153544743938.6088.14720329196483565958.malone@gac.canonical.com>
+Message-Id: <153544750801.25740.15888220014785827687.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
  SIGABRT when using option -vga qxl
@@ -40,10 +40,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Thanks Leonardo for your check as well!
-I agree that this particular issue here is fixed as we hoped.
-The other one with the freeze did not occur for me, you might open another =
-bug if you have any pointers how we could go on on this.
+Arr reading is hard today, you had the other bug open already ... grml
+:-)
+
+Never the less - This bug here is fixed in the proposed version and for
+now that is the important part.
 
 -- =
 
