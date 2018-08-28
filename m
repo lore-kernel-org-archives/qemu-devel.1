@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fuhHX-000695-A6
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:55:56 -0400
+	(envelope-from <kevin@koconnor.net>) id 1fuhNm-000384-0r
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fuhHS-0002M6-Db
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:55:53 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:53431)
+	(envelope-from <kevin@koconnor.net>) id 1fuhNY-0007AJ-GN
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:02:14 -0400
+Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:43727)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fuhHR-0002Kd-0W
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:55:49 -0400
-Received: by mail-wm0-x241.google.com with SMTP id b19-v6so2628473wme.3
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:55:48 -0700 (PDT)
+	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1fuhNX-00078Q-FO
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:02:07 -0400
+Received: by mail-qt0-x233.google.com with SMTP id g53-v6so2500087qtg.10
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 10:02:06 -0700 (PDT)
+Date: Tue, 28 Aug 2018 13:02:04 -0400
+From: Kevin O'Connor <kevin@koconnor.net>
+Message-ID: <20180828170203.GA1018@morn.lan>
+References: <1533793434-7614-1-git-send-email-whois.zihan.yang@gmail.com>
+	<ece2a3ff-678d-00b6-3fd6-660972c5beca@gmail.com>
+	<20180827070406.t525gr43qpu7wpsj@sirius.home.kraxel.org>
+	<CAKwiv-gyGoqEpmpicxo_a3cQBsb0-XoT9cqkJu5WOtkUtAx0eQ@mail.gmail.com>
+	<5f5dc082-7053-d6b9-b01f-fffba1847ba5@gmail.com>
+	<20180828060752.mmsd7x7uobqm2gsr@sirius.home.kraxel.org>
+	<8b232ca6-4643-24c7-d93d-589a452d0785@gmail.com>
+	<20180828101458.pnsldezdzp6tdulp@sirius.home.kraxel.org>
 MIME-Version: 1.0
-References: <20180828153840.22519-1-marcandre.lureau@redhat.com>
-	<20180828184312.6e0e417d@redhat.com>
-	<CAJ+F1CLvye1F9xKskpPiogeTU+54+=Lurg3qX4cYpq1=r5sNaQ@mail.gmail.com>
-In-Reply-To: <CAJ+F1CLvye1F9xKskpPiogeTU+54+=Lurg3qX4cYpq1=r5sNaQ@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 28 Aug 2018 18:55:35 +0200
-Message-ID: <CAJ+F1C+7zis5wmV_V9MuL5bMvPp9CnCuUrg_yQgQuYM3p_3xxA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180828101458.pnsldezdzp6tdulp@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [SeaBIOS] [RFC v2 0/3] Support multiple pci
+ domains in pci_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,113 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, seabios@seabios.org, qemu-devel@nongnu.org, Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Tue, Aug 28, 2018 at 6:54 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
->
-> On Tue, Aug 28, 2018 at 6:49 PM Igor Mammedov <imammedo@redhat.com> wrote=
-:
-> >
-> > On Tue, 28 Aug 2018 17:38:40 +0200
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> >
-> > > The share=3Don/off property is used to modified mmap() MAP_SHARED
-> > > setting. Make it on by default for convenience and compatibility
-> > > reasons.
-> > it would be nice to state reasons here.
-> >
-> > also flipping default to on is behavioral change when
-> > used with bind policy which could make backend initialization fail
-> > so CLI that used to work (if there are any users of this without shared=
-=3Don)
-> > won't work anymore.
->
-> memfd backend is passing shared=3Dtrue to memory_region_init_ram_from_fd(=
-).
->
-> The patch allows to tweak that (instead of ignoring the property),
-> while keeping the value to shared=3Dtrue.
+On Tue, Aug 28, 2018 at 12:14:58PM +0200, Gerd Hoffmann wrote:
+>   Hi,
+> 
+> > > Where is the pxb-pcie device?  0000:$somewhere?  Or $domain:00:00.0?
+> > 
+> >  0000:$somewhere (On PCI domain 0)
+> 
+> Cool, so we don't have an chicken-and-egg issue.
+> 
+> > > If we can access pxb-pcie registers before configuring MMCFG then yes,
+> > > we should use pxb-pcie registers for that.
+> > 
+> > Yes, we can.
+> 
+> Ok, so we can configure mmcfg as hidden pci bar, simliar to the q35
+> mmcfg.  Any configuration hints can be passed as pci vendor capability
+> (simliar to the bridge window size hints), if needed.
 
-keeping the default value to shared=3Dtrrue.
+Just so I understand, the proposal is to have SeaBIOS search for
+pxb-pcie devices on the main PCI bus and allocate address space for
+each.  (These devices would not be considered pci buses in the
+traditional sense.)  Then SeaBIOS will traverse that address space
+(MMCFG) and allocate BARs (both address space and io space) for the
+PCI devices found in that address space.  Finally, QEMU will take all
+those allocations and use it when generating the ACPI tables.
 
->
-> >
-> > >
-> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  backends/hostmem-memfd.c | 4 +++-
-> > >  qemu-options.hx          | 4 +++-
-> > >  2 files changed, 6 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> > > index 1e20fe0ba8..abd52364db 100644
-> > > --- a/backends/hostmem-memfd.c
-> > > +++ b/backends/hostmem-memfd.c
-> > > @@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBackend *backe=
-nd, Error **errp)
-> > >
-> > >      name =3D object_get_canonical_path(OBJECT(backend));
-> > >      memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
-> > > -                                   name, backend->size, true, fd, er=
-rp);
-> > > +                                   name, backend->size,
-> > > +                                   backend->share, fd, errp);
-> > >      g_free(name);
-> > >  }
-> > >
-> > > @@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
-> > >
-> > >      /* default to sealed file */
-> > >      m->seal =3D true;
-> > > +    MEMORY_BACKEND(m)->share =3D true;
-> > >  }
-> > >
-> > >  static void
-> > > diff --git a/qemu-options.hx b/qemu-options.hx
-> > > index f14e423b7c..25c02d72b8 100644
-> > > --- a/qemu-options.hx
-> > > +++ b/qemu-options.hx
-> > > @@ -4029,7 +4029,7 @@ Memory backend objects offer more control than =
-the @option{-m} option that is
-> > >  traditionally used to define guest RAM. Please refer to
-> > >  @option{memory-backend-file} for a description of the options.
-> > >
-> > > -@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off=
-},dump=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},host-nodes=
-=3D@var{host-nodes},policy=3D@var{default|preferred|bind|interleave},seal=
-=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
-> > > +@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off=
-},dump=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},size=3D@=
-var{size},host-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bin=
-d|interleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var=
-{size}
-> > >
-> > >  Creates an anonymous memory file backend object, which allows QEMU t=
-o
-> > >  share the memory with an external process (e.g. when using
-> > > @@ -4051,6 +4051,8 @@ with the @option{seal} option (requires at leas=
-t Linux 4.16).
-> > >  Please refer to @option{memory-backend-file} for a description of th=
-e
-> > >  other options.
-> > >
-> > > +The @option{share} boolean option is @var{on} by default with memfd.
-> > > +
-> > >  @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
-> > >
-> > >  Creates a random number generator backend which obtains entropy from
-> >
-> >
->
->
-> --
-> Marc-Andr=C3=A9 Lureau
+Did I get that right?
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+-Kevin
