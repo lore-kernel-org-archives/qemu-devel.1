@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fuhcQ-0002Tw-Ti
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:17:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1fui28-00052v-09
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fuhcK-0004EQ-5y
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:17:28 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:40709)
+	(envelope-from <bounces@canonical.com>) id 1fuhpj-0005iy-KU
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:31:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fuhcJ-0004Cg-L7
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:17:23 -0400
-Received: by mail-wm0-x243.google.com with SMTP id 207-v6so2768481wme.5
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 10:17:23 -0700 (PDT)
-References: <1533793434-7614-1-git-send-email-whois.zihan.yang@gmail.com>
-	<ece2a3ff-678d-00b6-3fd6-660972c5beca@gmail.com>
-	<20180827070406.t525gr43qpu7wpsj@sirius.home.kraxel.org>
-	<CAKwiv-gyGoqEpmpicxo_a3cQBsb0-XoT9cqkJu5WOtkUtAx0eQ@mail.gmail.com>
-	<5f5dc082-7053-d6b9-b01f-fffba1847ba5@gmail.com>
-	<20180828060752.mmsd7x7uobqm2gsr@sirius.home.kraxel.org>
-	<8b232ca6-4643-24c7-d93d-589a452d0785@gmail.com>
-	<20180828101458.pnsldezdzp6tdulp@sirius.home.kraxel.org>
-	<20180828170203.GA1018@morn.lan>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <ab62fe25-77f4-23d7-74d9-accda67e7a30@gmail.com>
-Date: Tue, 28 Aug 2018 20:17:19 +0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fuhpj-0005hi-BY
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:31:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fuhph-0004AF-4s
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 17:31:13 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 547BC2E80E2
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 17:31:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180828170203.GA1018@morn.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [SeaBIOS] [RFC v2 0/3] Support multiple pci
- domains in pci_device
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Aug 2018 17:20:56 -0000
+From: Heiko Sieger <1788665@bugs.launchpad.net>
+Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
+Message-Id: <153547685700.30557.18115985105402392135.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
+ Windows 10 (1803) VGA passthrough VM using "Spectre" protection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,43 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin O'Connor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: seabios@seabios.org, qemu-devel@nongnu.org, Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi Kevin,
+Thanks, I will do that tomorrow and report back.
 
-On 08/28/2018 08:02 PM, Kevin O'Connor wrote:
-> On Tue, Aug 28, 2018 at 12:14:58PM +0200, Gerd Hoffmann wrote:
->>    Hi,
->>
->>>> Where is the pxb-pcie device?  0000:$somewhere?  Or $domain:00:00.0?
->>>   0000:$somewhere (On PCI domain 0)
->> Cool, so we don't have an chicken-and-egg issue.
->>
->>>> If we can access pxb-pcie registers before configuring MMCFG then yes,
->>>> we should use pxb-pcie registers for that.
->>> Yes, we can.
->> Ok, so we can configure mmcfg as hidden pci bar, simliar to the q35
->> mmcfg.  Any configuration hints can be passed as pci vendor capability
->> (simliar to the bridge window size hints), if needed.
-> Just so I understand, the proposal is to have SeaBIOS search for
-> pxb-pcie devices on the main PCI bus and allocate address space for
-> each.  (These devices would not be considered pci buses in the
-> traditional sense.)  Then SeaBIOS will traverse that address space
-> (MMCFG) and allocate BARs (both address space and io space) for the
-> PCI devices found in that address space.  Finally, QEMU will take all
-> those allocations and use it when generating the ACPI tables.
->
-> Did I get that right?
+-- =
 
-Yes, the pxb-pcie exposes a new PCI root bus, but we want it
-in a different PCI domain. This is done in order to remove the
-256 PCI Express devices limitation on a PCI Express machine.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788665
 
-Does the plan sounds sane?
+Title:
+  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
+  using "Spectre" protection
 
-Thanks,
-Marcel
+Status in QEMU:
+  New
 
->
-> -Kevin
+Bug description:
+  Windows 10 (1803) VM using VGA passthrough via qemu script.
+
+  After upgrading Windows 10 Pro VM to version 1803, or possibly after
+  applying the March/April security updates from Microsoft, the VM would
+  show low 2D graphics performance (sluggishness in 2D applications and
+  low Passmark results).
+
+  Turning off Spectre vulnerability protection in Windows remedies the
+  issue.
+
+  Expected behavior:
+  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
+ see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
+-2017-5715-and-hyper-v-vms
+
+  Background:
+
+  Starting in March or April Microsoft began to push driver updates in
+  their updates / security updates. See https://support.microsoft.com
+  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
+  meltdown
+
+  One update concerns the Intel microcode - see
+  https://support.microsoft.com/en-us/help/4100347. It is activated by
+  default within Windows.
+
+  Once the updates are applied within the Windows guest, 2D graphics
+  performance drops significantly. Other performance benchmarks are not
+  affected.
+
+  A bare metal Windows installation does not display a performance loss
+  after the update. See https://heiko-sieger.info/low-2d-graphics-
+  benchmark-with-windows-10-1803-kvm-vm/
+
+  Similar reports can be found here:
+  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
+performance_on_windows/
+
+  Hardware:
+
+  6 core Intel Core i7-3930K (-MT-MCP-)
+
+  Host OS:
+  Linux Mint 19/Ubuntu 18.04
+  Kernel: 4.15.0-32-generic x86_64
+  Qemu: QEMU emulator version 2.11.1
+  Intel microcode (host): 0x714
+  dmesg | grep microcode
+  [    0.000000] microcode: microcode updated early to revision 0x714, date=
+ =3D 2018-05-08
+  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
+  [    2.813340] microcode: Microcode Update Driver: v2.2.
+
+  Note: I manually updated the Intel microcode on the host from 0x713 to
+  0x714. However, both microcode versions produce the same result in the
+  Windows guest.
+
+  Guest OS:
+  Windows 10 Pro 64 bit, release 1803
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
