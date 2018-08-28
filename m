@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fug12-0007Kl-IV
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:34:53 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fug4u-00041m-Nf
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:38:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbhat@linux.vnet.ibm.com>) id 1fufou-0002fC-HI
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:22:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36084)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbhat@linux.vnet.ibm.com>)
-	id 1fufou-0002eb-87
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:22:16 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w7SFKfq8070952
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 11:22:14 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2m585daftc-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 11:22:14 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sbhat@linux.vnet.ibm.com>;
-	Tue, 28 Aug 2018 16:22:12 +0100
-From: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
-Date: Tue, 28 Aug 2018 10:22:07 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fug4q-0000xr-Lo
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:38:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34020 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fug4q-0000vs-G1
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:38:44 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A7325401EF0F
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 15:38:43 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 28 Aug 2018 17:38:40 +0200
+Message-Id: <20180828153840.22519-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <153546966871.75539.10980006517656536139.stgit@lep8c.aus.stglabs.ibm.com>
-Subject: [Qemu-devel] [PATCH v2] linux-user: elf: mmap all the target-pages
- of hostpage for data segment
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,99 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: riku.voipio@iki.fi, laurent@vivier.eu
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-If the hostpage size is greater than the TARGET_PAGESIZE, the
-target-pages of size TARGET_PAGESIZE are marked valid only till the
-length requested during the elfload. The glibc attempts to consume unused
-space in the last page of data segment(__libc_memalign() in
-elf/dl-minimal.c). If PT_LOAD p_align is greater than or
-equal to hostpage size, the GLRO(dl_pagesize) is actually the host pagesize
-as set in the auxillary vectors. So, there is no explicit mmap request for
-the remaining target-pages on the last hostpage. The glibc assumes that
-particular space as available and subsequent attempts to use
-those addresses lead to crash as the target_mmap has not marked them valid
-for target-pages as valid.
+The share=3Don/off property is used to modified mmap() MAP_SHARED
+setting. Make it on by default for convenience and compatibility
+reasons.
 
-The issue is seen when trying to chroot to 16.04-x86_64 ubuntu on a PPC64
-host where the fork fails to access the thread_id as it is allocated on a
-page not marked valid. The recent glibc doesnt have checks for thread-id in
-fork, but the issue can manifest somewhere else, none the less.
-
-The fix here is to map all the target-pages of the hostpage during the
-elfload if the p_align is greater than or equal to hostpage size, for
-data segment to allow the glibc for proper consumption.
-
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.vnet.ibm.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
-v1: https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg05730.html
-Changes from v1:
-   - Made the conditionals consistent with the commit "33143c446e" and
-     changed the commit message accordingly.
+ backends/hostmem-memfd.c | 4 +++-
+ qemu-options.hx          | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
- linux-user/elfload.c |   37 +++++++++++++++++++++++++++++--------
- 1 file changed, 29 insertions(+), 8 deletions(-)
-
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 8638612aec..cced43f45c 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -1438,9 +1438,23 @@ struct exec
- 
- /* Necessary parameters */
- #define TARGET_ELF_EXEC_PAGESIZE TARGET_PAGE_SIZE
--#define TARGET_ELF_PAGESTART(_v) ((_v) & \
--                                 ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
--#define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
-+#define TARGET_ELF_PAGESTART(_v, _a, _s, _m) \
-+        (((_a & ~_m) != 0) ? \
-+         (_v) & ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE - 1) : \
-+         ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-+          (_v) & ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE - 1) : \
-+          (_v) & ~(abi_ulong)(_s - 1)));
-+#define TARGET_ELF_PAGEOFFSET(_v, _a, _s, _m) \
-+        (((_a & ~_m) != 0) ? \
-+         (_v) & (TARGET_ELF_EXEC_PAGESIZE - 1) : \
-+         ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-+          (_v) & (TARGET_ELF_EXEC_PAGESIZE - 1) : \
-+          (_v) & (_s - 1)));
-+#define TARGET_ELF_PAGELENGTH(_v, _a, _s, _m) \
-+        (((_a & ~_m) != 0) ? \
-+         TARGET_PAGE_ALIGN(_v) : \
-+         ((TARGET_ELF_EXEC_PAGESIZE > _s) ? \
-+          TARGET_PAGE_ALIGN(_v) : HOST_PAGE_ALIGN(_v)));
- 
- #define DLINFO_ITEMS 15
- 
-@@ -2279,7 +2293,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-     for (i = 0; i < ehdr->e_phnum; i++) {
-         struct elf_phdr *eppnt = phdr + i;
-         if (eppnt->p_type == PT_LOAD) {
--            abi_ulong vaddr, vaddr_po, vaddr_ps, vaddr_ef, vaddr_em;
-+            abi_ulong vaddr, vaddr_po, vaddr_ps, vaddr_ef, vaddr_em, vaddr_len;
-             int elf_prot = 0;
- 
-             if (eppnt->p_flags & PF_R) elf_prot =  PROT_READ;
-@@ -2287,10 +2301,17 @@ static void load_elf_image(const char *image_name, int image_fd,
-             if (eppnt->p_flags & PF_X) elf_prot |= PROT_EXEC;
- 
-             vaddr = load_bias + eppnt->p_vaddr;
--            vaddr_po = TARGET_ELF_PAGEOFFSET(vaddr);
--            vaddr_ps = TARGET_ELF_PAGESTART(vaddr);
--
--            error = target_mmap(vaddr_ps, eppnt->p_filesz + vaddr_po,
-+            vaddr_po = TARGET_ELF_PAGEOFFSET(vaddr, info->alignment,
-+                                             qemu_host_page_size,
-+                                             qemu_host_page_mask);
-+            vaddr_ps = TARGET_ELF_PAGESTART(vaddr, info->alignment,
-+                                            qemu_host_page_size,
-+                                            qemu_host_page_mask);
-+            vaddr_len = TARGET_ELF_PAGELENGTH(eppnt->p_filesz + vaddr_po,
-+                                              info->alignment,
-+                                              qemu_host_page_size,
-+                                              qemu_host_page_mask);
-+            error = target_mmap(vaddr_ps, vaddr_len,
-                                 elf_prot, MAP_PRIVATE | MAP_FIXED,
-                                 image_fd, eppnt->p_offset - vaddr_po);
-             if (error == -1) {
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index 1e20fe0ba8..abd52364db 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
+Error **errp)
+=20
+     name =3D object_get_canonical_path(OBJECT(backend));
+     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
+-                                   name, backend->size, true, fd, errp);
++                                   name, backend->size,
++                                   backend->share, fd, errp);
+     g_free(name);
+ }
+=20
+@@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
+=20
+     /* default to sealed file */
+     m->seal =3D true;
++    MEMORY_BACKEND(m)->share =3D true;
+ }
+=20
+ static void
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f14e423b7c..25c02d72b8 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4029,7 +4029,7 @@ Memory backend objects offer more control than the =
+@option{-m} option that is
+ traditionally used to define guest RAM. Please refer to
+ @option{memory-backend-file} for a description of the options.
+=20
+-@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
+mp=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},host-nodes=3D=
+@var{host-nodes},policy=3D@var{default|preferred|bind|interleave},seal=3D=
+@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
++@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
+mp=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},size=3D@va=
+r{size},host-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bin=
+d|interleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@v=
+ar{size}
+=20
+ Creates an anonymous memory file backend object, which allows QEMU to
+ share the memory with an external process (e.g. when using
+@@ -4051,6 +4051,8 @@ with the @option{seal} option (requires at least Li=
+nux 4.16).
+ Please refer to @option{memory-backend-file} for a description of the
+ other options.
+=20
++The @option{share} boolean option is @var{on} by default with memfd.
++
+ @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
+=20
+ Creates a random number generator backend which obtains entropy from
+--=20
+2.19.0.rc0.48.gb9dfa238d5
