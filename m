@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fudfg-0006gP-4p
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:04:37 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fudtd-0001EL-5k
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:19:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fudfZ-0006Yi-Oo
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:04:35 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:59075)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fudfY-0006Ry-7Y
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:04:29 -0400
-From: Craig Janeczek <jancraig@amazon.com>
-Date: Tue, 28 Aug 2018 09:00:41 -0400
-Message-Id: <20180828130041.26445-9-jancraig@amazon.com>
-In-Reply-To: <20180828130041.26445-1-jancraig@amazon.com>
-References: <20180828130041.26445-1-jancraig@amazon.com>
-Subject: [Qemu-devel] [PATCH v3 8/8] target/mips: Add MXU instructions
- S32LDD and S32LDDR
+	(envelope-from <imammedo@redhat.com>) id 1fudtZ-0000ar-5d
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:19:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45432 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fudtZ-0000aO-08
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:18:57 -0400
+Date: Tue, 28 Aug 2018 15:18:48 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180828151848.3d09ca06@redhat.com>
+In-Reply-To: <20180828005237.GC2222@umbus.fritz.box>
+References: <1535368030-214556-1-git-send-email-imammedo@redhat.com>
+	<20180827160239.54cc993a@bahia.lan>
+	<20180828005237.GC2222@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc: make sure that guest isn't able to
+ unplug the first cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: amarkovic@wavecomp.com, aurelien@aurel32.net, Craig Janeczek <jancraig@amazon.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, david@redhat.com, cohuck@redhat.com
 
-Adds support for emulating the S32LDD and S32LDDR MXU instructions.
+On Tue, 28 Aug 2018 10:52:37 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Signed-off-by: Craig Janeczek <jancraig@amazon.com>
----
- v1
-    - initial patch
- v2
-    - changed bitfield usage to extract32
- v3
-    - Split gen_mxu function into command specific gen_mxu_<ins> functions
-
- target/mips/translate.c | 47 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 46 insertions(+), 1 deletion(-)
-
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index a28ea124c2..1ddc9f04e8 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -4123,6 +4123,42 @@ static void gen_mxu_q8mul(DisasContext *ctx, uint32_t opc)
-     tcg_temp_free(t7);
- }
- 
-+/* S32LDD XRa, rb, S12 - Load a word from memory to XRF
-+ * S32LDDR XRa, rb, S12 - Load a word from memory to XRF,
-+ *                        reversed byte sequence */
-+static void gen_mxu_s32ldd(DisasContext *ctx, uint32_t opc)
-+{
-+    TCGv t0, t1;
-+    uint32_t xra, s12, sel, rb;
-+
-+    t0 = tcg_temp_new();
-+    t1 = tcg_temp_new();
-+
-+    xra = extract32(ctx->opcode, 6, 4);
-+    s12 = extract32(ctx->opcode, 10, 10);
-+    sel = extract32(ctx->opcode, 20, 1);
-+    rb = extract32(ctx->opcode, 21, 5);
-+
-+    gen_load_gpr(t0, rb);
-+
-+    tcg_gen_movi_tl(t1, s12);
-+    tcg_gen_shli_tl(t1, t1, 2);
-+    if (s12 & 0x200) {
-+        tcg_gen_ori_tl(t1, t1, 0xFFFFF000);
-+    }
-+    tcg_gen_add_tl(t1, t0, t1);
-+    tcg_gen_qemu_ld_tl(t1, t1, ctx->mem_idx, MO_SL);
-+
-+    if (sel == 1) {
-+        /* S32LDDR */
-+        tcg_gen_bswap32_tl(t1, t1);
-+    }
-+    gen_store_mxu_gpr(t1, xra);
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+}
-+
- /* Godson integer instructions */
- static void gen_loongson_integer(DisasContext *ctx, uint32_t opc,
-                                  int rd, int rs, int rt)
-@@ -18212,7 +18248,6 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
-         break;
-     case OPC_DIV_G_2F_MXU_S32LDI:
-     case OPC_DIVU_G_2F_MXU_S32LDIV:
--    case OPC_MULT_G_2F_MXU_S32LDD:
-     case OPC_MULTU_G_2F_MXU_S32LDDV:
-     case OPC_MOD_G_2F_MXU_Q8ADDE:
-     case OPC_MODU_G_2F:
-@@ -18244,6 +18279,16 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
-         gen_mxu_q8mul(ctx, op1);
-         break;
- 
-+    case OPC_MULT_G_2F_MXU_S32LDD:
-+        /* There is an overlap of opcodes between Loongson2F and MXU */
-+        if (ctx->insn_flags & INSN_LOONGSON2F) {
-+            check_insn(ctx, INSN_LOONGSON2F);
-+            gen_loongson_integer(ctx, op1, rd, rs, rt);
-+        } else {
-+            gen_mxu_s32ldd(ctx, op1);
-+        }
-+        break;
-+
-     case OPC_CLO:
-     case OPC_CLZ:
-         check_insn(ctx, ISA_MIPS32);
--- 
-2.18.0
+> On Mon, Aug 27, 2018 at 04:02:39PM +0200, Greg Kurz wrote:
+> > On Mon, 27 Aug 2018 13:07:10 +0200
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >   
+> > > The first cpu unplug wasn't ever supported and corresponding
+> > > monitor/qmp commands refuse to unplug it. However guest is able
+> > > to issue eject request either using following command:
+> > >   # echo 1 >/sys/devices/system/cpu/cpu0/firmware_node/eject  
+> > 
+> > I can't reproduce the issue with a pc guest and current master...
+> > 
+> > All I seem to get is an error in dmesg:
+> > 
+> > [   97.435446] processor cpu0: Offline failed.
+> >   
+> > > or directly writing to cpu hotplug registers, which makes
+> > > qemu crash with SIGSEGV following back trace:
+> > > 
+> > >    kvm_flush_coalesced_mmio_buffer ()
+> > >        while (ring->first != ring->last)
+> > >    ...
+> > >    qemu_flush_coalesced_mmio_buffer
+> > >    prepare_mmio_access
+> > >    flatview_read_continue
+> > >    flatview_read
+> > >    address_space_read_full
+> > >    address_space_rw
+> > >    kvm_cpu_exec(cpu!0)
+> > >    qemu_kvm_cpu_thread_fn
+> > > 
+> > > the reason for which is that ring == KVMState::coalesced_mmio_ring
+> > > happens to be a part of 1st CPU that was uplugged by guest.
+> > > 
+> > > Fix it by forbidding 1st cpu unplug from guest side and in addition
+> > > remove CPU0._EJ0 ACPI method to make clear that unplug of the first
+> > > CPU is not supported.
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > > CCing spapr and s390x folks in case targets need to prevent 1st CPU unplug as well
+> > >   
+> > 
+> > A spapr guest can _release_ the first cpu by doing something like:
+> > 
+> > # echo -n "/cpus/PowerPC,POWER8@0" > /sys/devices/system/cpu/release
+> > 
+> > But AFAIK, this doesn't unplug the cpu from a QEMU standpoint.  
+> 
+> Unplugging CPU 0 with device_del should be ok too.
+Do you mean real unplugging (cpu0 object freed) or just remove request?
