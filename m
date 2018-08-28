@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fueM1-0000ES-7j
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:48:22 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fueOm-00010E-34
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fueLy-0002m6-0c
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:48:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58470 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fueLx-0002jk-QN
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:48:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6986C40122C3
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 13:48:17 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 28 Aug 2018 15:48:13 +0200
-Message-Id: <1535464093-3648-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v4] vl.c deprecate incorrect CPUs topology
+	(envelope-from <gengdongjiu@huawei.com>) id 1fueOl-0007g2-4L
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:51:11 -0400
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Tue, 28 Aug 2018 21:49:14 +0800
+Message-ID: <20180828134915.8744-2-gengdongjiu@huawei.com>
+In-Reply-To: <20180828134915.8744-1-gengdongjiu@huawei.com>
+References: <20180828134915.8744-1-gengdongjiu@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 1/2] linux-headers: Update to kernel
+ mainline commit 815f0ddb3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +22,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, ehabkost@redhat.com, berrange@redhat.com, drjones@redhat.com
+To: peter.maydell@linaro.org, pbonzini@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, gengdongjiu@huawei.com
 
--smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-so that total number of logical CPUs [sockets * cores * threads]
-would be equal to [maxcpus], however historically we didn't have
-such check in QEMU and it is possible to start VM with an invalid
-topology.
-Deprecate invalid options combination so we can make sure that
-the topology VM started with is always correct in the future.
-Users with an invalid sockets/cores/threads/maxcpus values should
-fix their CLI to make sure that
-   [sockets * cores * threads] == [maxcpus]
+Update our kernel headers to mainline commit
+815f0ddb346c196018d4d8f8f55c12b83da1de3f
+(include/linux/compiler*.h: make compiler-*.h mutually exclusive)
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
-v4:
-  - missed dot comment, fix it with s/./,/ (Andrew Jones <drjones@redhat.com>)
-v3:
-  - more spelling fixes (Andrew Jones <drjones@redhat.com>)
-  - place deprecation check after (sockets * cores * threads > max_cpus) check
-    (Eduardo Habkost <ehabkost@redhat.com>)
-v2:
-  - spelling&&co fixes (Andrew Jones <drjones@redhat.com>)
----
- qemu-deprecated.texi | 11 +++++++++++
- vl.c                 |  7 +++++++
- 2 files changed, 18 insertions(+)
+ include/standard-headers/linux/input.h |  9 +++++----
+ linux-headers/asm-arm/kvm.h            | 13 +++++++++++++
+ linux-headers/asm-arm64/kvm.h          | 13 +++++++++++++
+ linux-headers/linux/kvm.h              |  1 +
+ 4 files changed, 32 insertions(+), 4 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 87212b6..094b4ca 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -159,6 +159,17 @@ The 'file' driver for drives is no longer appropriate for character or host
- devices and will only accept regular files (S_IFREG). The correct driver
- for these file types is 'host_cdrom' or 'host_device' as appropriate.
+diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
+index 6d6128c..c0ad9fc 100644
+--- a/include/standard-headers/linux/input.h
++++ b/include/standard-headers/linux/input.h
+@@ -267,10 +267,11 @@ struct input_mask {
+ /*
+  * MT_TOOL types
+  */
+-#define MT_TOOL_FINGER		0
+-#define MT_TOOL_PEN		1
+-#define MT_TOOL_PALM		2
+-#define MT_TOOL_MAX		2
++#define MT_TOOL_FINGER		0x00
++#define MT_TOOL_PEN		0x01
++#define MT_TOOL_PALM		0x02
++#define MT_TOOL_DIAL		0x0a
++#define MT_TOOL_MAX		0x0f
  
-+@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
-+
-+CPU topology properties should describe whole machine topology including
-+possible CPUs, but historically it was possible to start QEMU with
-+an incorrect topology where
-+  sockets * cores * threads >= X && X < maxcpus
-+which could lead to an incorrect topology enumeration by the guest.
-+Support for invalid topologies will be removed, the user must ensure
-+topologies described with -smp include all possible cpus, i.e.
-+  sockets * cores * threads == maxcpus
-+
- @section QEMU Machine Protocol (QMP) commands
+ /*
+  * Values describing the status of a force-feedback effect
+diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
+index 72aa226..e1f8b74 100644
+--- a/linux-headers/asm-arm/kvm.h
++++ b/linux-headers/asm-arm/kvm.h
+@@ -27,6 +27,7 @@
+ #define __KVM_HAVE_GUEST_DEBUG
+ #define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
++#define __KVM_HAVE_VCPU_EVENTS
  
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-diff --git a/vl.c b/vl.c
-index 5ba06ad..7fd700e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1246,6 +1246,13 @@ static void smp_parse(QemuOpts *opts)
-             exit(1);
-         }
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
  
-+        if (sockets * cores * threads != max_cpus) {
-+            warn_report("Invalid CPU topology deprecated: "
-+                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "!= maxcpus (%u)",
-+                        sockets, cores, threads, max_cpus);
-+        }
+@@ -125,6 +126,18 @@ struct kvm_sync_regs {
+ struct kvm_arch_memory_slot {
+ };
+ 
++/* for KVM_GET/SET_VCPU_EVENTS */
++struct kvm_vcpu_events {
++	struct {
++		__u8 serror_pending;
++		__u8 serror_has_esr;
++		/* Align it to 8 bytes */
++		__u8 pad[6];
++		__u64 serror_esr;
++	} exception;
++	__u32 reserved[12];
++};
 +
-         smp_cpus = cpus;
-         smp_cores = cores;
-         smp_threads = threads;
+ /* If you need to interpret the index values, here is the key: */
+ #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
+ #define KVM_REG_ARM_COPROC_SHIFT	16
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index 99cb9ad..e6a98c1 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -39,6 +39,7 @@
+ #define __KVM_HAVE_GUEST_DEBUG
+ #define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
++#define __KVM_HAVE_VCPU_EVENTS
+ 
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ 
+@@ -154,6 +155,18 @@ struct kvm_sync_regs {
+ struct kvm_arch_memory_slot {
+ };
+ 
++/* for KVM_GET/SET_VCPU_EVENTS */
++struct kvm_vcpu_events {
++	struct {
++		__u8 serror_pending;
++		__u8 serror_has_esr;
++		/* Align it to 8 bytes */
++		__u8 pad[6];
++		__u64 serror_esr;
++	} exception;
++	__u32 reserved[12];
++};
++
+ /* If you need to interpret the index values, here is the key: */
+ #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
+ #define KVM_REG_ARM_COPROC_SHIFT	16
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 6679072..bae1c89 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -951,6 +951,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_HYPERV_TLBFLUSH 155
+ #define KVM_CAP_S390_HPAGE_1M 156
+ #define KVM_CAP_NESTED_STATE 157
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 158
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
-2.7.4
+1.9.1
