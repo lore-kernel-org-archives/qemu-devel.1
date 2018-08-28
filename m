@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fuex8-0002vM-Tj
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:26:46 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fufDG-0003Tx-2P
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1fuex3-0007Ka-0y
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:26:42 -0400
-Date: Tue, 28 Aug 2018 16:26:26 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20180828142626.GM122225@angien.pipo.sk>
-References: <20180810162658.6562-1-kwolf@redhat.com>
-	<20180810162658.6562-2-kwolf@redhat.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fufDA-0006wW-Ky
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:43:21 -0400
+Received: from mail-eopbgr730106.outbound.protection.outlook.com
+	([40.107.73.106]:24112
+	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fufDA-0006vE-5u
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:43:16 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 28 Aug 2018 14:43:12 +0000
+Message-ID: <BN7PR08MB4868C15DDF3A45B9E4719EEAC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <20180828130041.26445-1-jancraig@amazon.com>,
+	<20180828130041.26445-4-jancraig@amazon.com>
+In-Reply-To: <20180828130041.26445-4-jancraig@amazon.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eWmFpGZayiNrn4FL"
-Content-Disposition: inline
-In-Reply-To: <20180810162658.6562-2-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] commit: Add top-node/base-node options
+Subject: Re: [Qemu-devel] [PATCH v3 3/8] target/mips: Add MXU instructions
+ S32I2M and S32M2I
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,110 +32,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-
---eWmFpGZayiNrn4FL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Aug 10, 2018 at 18:26:57 +0200, Kevin Wolf wrote:
-> The block-commit QMP command required specifying the top and base nodes
-> of the commit jobs using the file name of that node. While this works
-> in simple cases (local files with absolute paths), the file names
-> generated for more complicated setups can be hard to predict.
+> From: Craig Janeczek <jancraig@amazon.com>
+> Sent: Tuesday, August 28, 2018 3:00 PM
+> To: qemu-devel@nongnu.org
+> Cc: Aleksandar Markovic; aurelien@aurel32.net; Craig Janeczek
+> Subject: [PATCH v3 3/8] target/mips: Add MXU instructions S32I2M and S32M=
+2I
 >=20
-> This adds two new options top-node and base-node to the command, which
-> allow specifying node names instead. They are mutually exclusive with
-> the old options.
+> This commit makes the MXU registers and the utility functions for
+> reading/writing to them. This is required for full MXU instruction
+> support.
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Adds support for emulating the S32I2M and S32M2I MXU instructions.
+>=20
+> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 > ---
->  qapi/block-core.json | 24 ++++++++++++++++++------
->  blockdev.c           | 32 ++++++++++++++++++++++++++++++--
->  2 files changed, 48 insertions(+), 8 deletions(-)
+>  v1
+>     - initial patch
+>  v2
+>     - Fix checkpatch.pl errors
+>     - remove mips64 ifdef
+>     - changed bitfield usage to extract32
+>     - squashed register addition patch into this one
+>  v3
+>     - Split register addition and opcode enum definition into seperate pa=
+tches
+>     - Split gen_mxu function into command specific gen_mxu_<ins> function=
+s
+>=20
+>  target/mips/translate.c | 62 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 62 insertions(+)
+>=20
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index ae6b16ecd7..f6991aa8ef 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -1610,6 +1610,23 @@ static inline void gen_store_gpr (TCGv t, int reg)
+>          tcg_gen_mov_tl(cpu_gpr[reg], t);
+>  }
+>=20
+> +/* MXU General purpose registers moves. */
+> +static inline void gen_load_mxu_gpr(TCGv t, int reg)
+> +{
+> +    if (reg =3D=3D 0) {
+> +        tcg_gen_movi_tl(t, 0);
+> +    } else {
+> +        tcg_gen_mov_tl(t, mxu_gpr[reg - 1]);
+> +    }
+> +}
 
-While the below is not strictly relevant to this patch usage
-block-commit is not possible when using -blockdev. Thus the new
-arguments are not very useful otherwise.
+What happens if reg > 16? Also, the argument reg should be unsigned.
 
-With the new options I'm getting:
+> +
+> +static inline void gen_store_mxu_gpr(TCGv t, int reg)
+> +{
+> +    if (reg !=3D 0) {
+> +        tcg_gen_mov_tl(mxu_gpr[reg - 1], t);
+> +    }
+> +}
+> +
 
-{"execute":"block-commit",
- "arguments": { "device":"libvirt-3-format",
-                "job-id":"libvirt-3-format",
-                "top-node":"libvirt-8-format",
-                "base-node":"libvirt-9-format",
-                "auto-finalize":true,
-                "auto-dismiss":false},
- "id":"libvirt-16"}
+What happens if reg > 16? Also, the argument reg should be unsigned.
 
-{"id":"libvirt-16",
- "error":{"class":"GenericError",
-          "desc":"Block node is read-only"}}
+>  /* Moves to/from shadow registers. */
+>  static inline void gen_load_srsgpr (int from, int to)
+>  {
+> @@ -3798,6 +3815,42 @@ static void gen_cl (DisasContext *ctx, uint32_t op=
+c,
+>      }
+>  }
+>=20
+> +/* MXU Instructions */
+> +
+> +/* S32I2M XRa, rb - Register move from GRF to XRF */
+> +static void gen_mxu_s32i2m(DisasContext *ctx, uint32_t opc)
+> +{
+> +    TCGv t0;
+> +    uint32_t xra, rb;
+> +
+> +    t0 =3D tcg_temp_new();
+> +
+> +    xra =3D extract32(ctx->opcode, 6, 5);
+> +    rb =3D extract32(ctx->opcode, 16, 5);
+> +
+> +    gen_load_gpr(t0, rb);
+> +    gen_store_mxu_gpr(t0, xra);
+> +
+> +    tcg_temp_free(t0);
+> +}
 
-I'm pointing into the backing chain so the files are declared as read-only.
+This does not handle the case xra =3D=3D XR16. From the doc:
 
-It works just-fine if I open them as read-write with
--blockdev/blockdev-add but that obviously is not correct as you can't
-then share parts of the backing chain with other VMs due to image
-locking.
+"In MXU, a dedicated register file named XRF comprises sixteen 32-bit gener=
+al purpose registers =96 XR0~XR15. XR0 is a special one, which always is re=
+ad as zero. Moreover, XR16 is an alias of MXU_CR described below and it can=
+ only be accessed by S32I2M/S32M2I instructions."
 
-libvirt-3-format is read-write and all other node names are readonly in
-the above example.
-
-The same also happens when using filenames:
-
-{"execute":"block-commit",
- "arguments" : {"device":"libvirt-3-format",
-                "job-id":"libvirt-3-format",
-                "top":"/var/lib/libvirt/images/rhel7.3.1483615252",
-                "base":"/var/lib/libvirt/images/rhel7.3.1483605924",
-                "auto-finalize":true,
-                "auto-dismiss":false},
- "id":"libvirt-13"}
-
-{"id":"libvirt-13","error":{"class":"GenericError","desc":"Block node is re=
-ad-only"}}
-
-
-When I use the drive alias rather than the node-name for the 'device'
-argument it works as expected.
-
-{"execute":"block-commit",
- "arguments": { "device":"drive-virtio-disk0",
-                "job-id":"drive-virtio-disk0",
-                "top":"/var/lib/libvirt/images/rhel7.3.1483536402",
-                "base":"/var/lib/libvirt/images/rhel7.3.1483545313"},
- "id":"libvirt-18"}
-
-
-I was not able to find anything which would allow to reopen the file R/W
-in case of the block-commit operation, but I suspect it should be done
-automatically as previously it was done that way prior to -blockdev.
-
-Peter
-
---eWmFpGZayiNrn4FL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAluFW48ACgkQHGwCByjY
-1GougQ/6A4jFDsp60GLDGVHihjot8tB2z4MrnqGbIA3ebQ6XnRFqdX8DR72Tli8v
-iUAwEg2PiPNX1P4ToeBxXwB5cTTWnmwzU+J+8oDF2qJy6E7SwLA/U6Z9LsD/32ds
-yudMrYM/RJYICeBkEObFcblH+RaghJLsTWdjReyAAurepF1bk1Xhyc9OyM0YL5/7
-Z/zMPwhhWBpI5Yoq59viTIIXTKtoZGW8VaKy7PrY9nNXZZcif12ZmvEkR4W0t84m
-hq+0hR5w9oQInDULPoRwVVxXRVAnE/PdLy90QPOClDuzHUpvnwGWWi3LRdpkAkQS
-nFeB1OzkDQ2Zh7Ylc0txapJ9w+rAORECc6yvHC4/ZTOqIIuJn2NEGJy3iPAJ7Rqw
-7CSxaPKJBX8IYL2C+pJGWS/fVfTk4mcPW8uTmJ16J4KHQpT13k6IUdXoSGVLjf6k
-hsDQ7CpjVeERjakPRWB/PtgDYxEVSss3XmvlWQ5oARmgUzrMpE7Awqb6/Yy+GacA
-wxM1nPj/RWiljJDbfkArZWDeFzhvXjqZJJaPRczWh3YESmCNj509i5iexFJ/c9jh
-Ln1+JHyrGyvz+55yVhuQTEfjyhRK2MYuOnMjsErZl+yqQVPniaotDg8o4KHl7rP0
-sYQ3/ll8/eZMxBiHCMdqxZkFIKQUWFH3DmRDGD15bk7yI2IVd8E=
-=Q/vN
------END PGP SIGNATURE-----
-
---eWmFpGZayiNrn4FL--
+> +
+> +/* S32M2I XRa, rb - Register move from XRF to GRF */
+> +static void gen_mxu_s32m2i(DisasContext *ctx, uint32_t opc)
+> +{
+> +    TCGv t0;
+> +    uint32_t xra, rb;
+> +
+> +    t0 =3D tcg_temp_new();
+> +
+> +    xra =3D extract32(ctx->opcode, 6, 5);
+> +    rb =3D extract32(ctx->opcode, 16, 5);
+> +
+> +    gen_load_mxu_gpr(t0, xra);
+> +    gen_store_gpr(t0, rb);
+> +
+> +    tcg_temp_free(t0);
+> +}
+> +
+>  /* Godson integer instructions */
+>  static void gen_loongson_integer(DisasContext *ctx, uint32_t opc,
+>                                   int rd, int rs, int rt)
+> @@ -17894,6 +17947,15 @@ static void decode_opc_special2_legacy(CPUMIPSSt=
+ate *env, DisasContext *ctx)
+>          check_insn(ctx, INSN_LOONGSON2F);
+>          gen_loongson_integer(ctx, op1, rd, rs, rt);
+>          break;
+> +
+> +    case OPC_MXU_S32I2M:
+> +        gen_mxu_s32i2m(ctx, op1);
+> +        break;
+> +
+> +    case OPC_MXU_S32M2I:
+> +        gen_mxu_s32m2i(ctx, op1);
+> +        break;
+> +
+>      case OPC_CLO:
+>      case OPC_CLZ:
+>          check_insn(ctx, ISA_MIPS32);
