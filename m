@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fufg4-0002p2-Jh
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:13:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1fug0T-0006xC-2X
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:34:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fufg1-0005fY-GL
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:13:08 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:53275)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fufg1-0005fH-Bv
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:13:05 -0400
-From: "Janeczek, Craig" <jancraig@amazon.com>
-Date: Tue, 28 Aug 2018 15:13:01 +0000
-Message-ID: <b9eab9396a6e4270b9e536a4fe84a54d@EX13D12UEA003.ant.amazon.com>
-References: <20180828130041.26445-1-jancraig@amazon.com>,
-	<20180828130041.26445-3-jancraig@amazon.com>
-	<BN7PR08MB48680621D40A0A8800E9AEF6C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
-In-Reply-To: <BN7PR08MB48680621D40A0A8800E9AEF6C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1fufxD-0007xw-7P
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:30:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33740 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fufxD-0007xe-1w
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:30:51 -0400
+References: <20180827213943.33524-1-eblake@redhat.com>
+	<20180827213943.33524-3-eblake@redhat.com>
+	<87k1oaoew1.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fef4c95f-8a40-7349-6885-4346d53c6968@redhat.com>
+Date: Tue, 28 Aug 2018 10:30:49 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/8] target/mips: Add all MXU opcodes
+In-Reply-To: <87k1oaoew1.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] qapi: Add comments to aid debugging
+ generated introspection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-I see that I can check the loongson instructions by checking for INSN_LOONG=
-SON2F. Using MXU if that is not set
+On 08/28/2018 07:27 AM, Markus Armbruster wrote:
 
-What should I check for the mult or misc instructions that were there first=
-?
+>> ---
+>> v2: rebase on conditional code additions, drop patch to remove -u,
+>> update documentation to match
 
------Original Message-----
-From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
-Sent: Tuesday, August 28, 2018 11:07 AM
-To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net
-Subject: Re: [PATCH v3 2/8] target/mips: Add all MXU opcodes
+My update wasn't very accurate, as you discovered :)
 
-> From: Craig Janeczek <jancraig@amazon.com>
-> Sent: Tuesday, August 28, 2018 3:00 PM
-> To: qemu-devel@nongnu.org
-> Cc: Aleksandar Markovic; aurelien@aurel32.net; Craig Janeczek
-> Subject: [PATCH v3 2/8] target/mips: Add all MXU opcodes
->=20
-> Adds all MXU opcodes to the opcode enum. The MXU opcodes overlap with=20
-> existing misc and Loongson 2F copcodes. The enums were updated to=20
-> reflect the multiple possible meanings where applicable.
->=20
-> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
+> 
+> Let's rebase onto my "[PATCH 0/2] qapi: A whitespace touch-up, and a doc
+> update".  The appended fixup needs to be squashed in then.  Happy to do
+> that in my tree.
 
-It is good that all codes are covered, but this situation with overlap is u=
-nnatural.
+Yes, that makes the most sense.  Go ahead!
 
-Try creating a separate enum for MXU opcodes, and rearranging switch statem=
-ent, taking into account what instructions set is supported by the CPU in q=
-uestion.
+> 
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
+> 
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index a4091a7d78..f9990808de 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -1430,7 +1430,7 @@ Example:
+>               { "name", QLIT_QSTR("MY_EVENT"), },
+>               {}
+>           })),
+> -        /* "0" = q_empty */
+> +        /* "0" = q_obj_my-command-arg */
+>           QLIT_QDICT(((QLitDictEntry[]) {
+>               { "members", QLIT_QLIST(((QLitObject[]) {
+>                   QLIT_QDICT(((QLitDictEntry[]) {
+> @@ -1444,6 +1444,7 @@ Example:
+>               { "name", QLIT_QSTR("0"), },
+>               {}
+>           })),
+> +        /* "1" = UserDefOne */
+>           QLIT_QDICT(((QLitDictEntry[]) {
+>               { "members", QLIT_QLIST(((QLitObject[]) {
+>                   QLIT_QDICT(((QLitDictEntry[]) {
+> @@ -1463,6 +1464,7 @@ Example:
+>               { "name", QLIT_QSTR("1"), },
+>               {}
+>           })),
+> +        /* "2" = q_empty */
+>           QLIT_QDICT(((QLitDictEntry[]) {
+>               { "members", QLIT_QLIST(((QLitObject[]) {
+>                   {}
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
