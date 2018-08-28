@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fua0N-0000se-8e
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:09:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1fuaB2-00070x-0N
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fua0M-0001PF-3H
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:09:43 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35746)
+	(envelope-from <bounces@canonical.com>) id 1fuaAx-00076n-TL
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46698)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fua0L-0001Ol-PZ
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:09:42 -0400
-Received: by mail-wm0-x242.google.com with SMTP id o18-v6so1192131wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 02:09:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fuaAx-00076J-M8
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 05:20:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fuaAw-0003X1-2o
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 141B42E80CB
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:20:38 +0000 (UTC)
 MIME-Version: 1.0
-References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
-	<20180827222322.26009-7-marcandre.lureau@redhat.com>
-	<20180828035232.GD4446@xz-x1>
-In-Reply-To: <20180828035232.GD4446@xz-x1>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 28 Aug 2018 11:09:28 +0200
-Message-ID: <CAJ+F1C+fe4QGZmvtw76SQH=pqu6Nwure+CVPXBT_deHKgE5n0Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/9] terminal3270: do not use backend timer
- sources
+Date: Tue, 28 Aug 2018 09:08:21 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1755912@bugs.launchpad.net>
+Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153544730183.6050.15493232555552482224.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
+ SIGABRT when using option -vga qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,112 +38,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi
+Running the Bionic ISO like:
+$ qemu-system-x86_64 -cpu host -smp cores=3D4,threads=3D2 -boot d -m 2048 -=
+enable-kvm -vga qxl -vnc :21 -cdrom ubuntu-18.04-desktop-amd64.iso
 
-On Tue, Aug 28, 2018 at 5:52 AM Peter Xu <peterx@redhat.com> wrote:
->
-> On Tue, Aug 28, 2018 at 12:23:19AM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > terminal3270 is uses the front-end side of the chardev. It shouldn't
-> > create sources from backend side context. Fwiw, send_timing_mark_cb
-> > calls qemu_chr_fe_write_all() which should be thread safe.
-> >
-> > This partially reverts changes from commit
-> > 2c716ba1506769c9be2caa02f0f6d6e7c00f4304.
->
-> I don't fully understand too on why "It shouldn't create sources from
-> backend side context".  Could you explain a bit?
+Attaching like:
+$ vncviewer FullColor=3D1 AutoSelect=3D0 10.245.168.42:5921
+(alternatives on tigervnc)
+Well for me it had "-k de" as well :-)
 
-A frontend shouldn't use a backend function, and doesn't have to use
-the backend gmaincontext.
+Then boot into the "try Ubuntu" live CD mode.
+There opened a terminal to loop on xrandr.
 
->
-> If you don't want the backend gcontext to be exposed to the frontend,
-> IMHO the simplest thing is just to use the NULL gcontext in
-> qemu_chr_timeout_add_ms() which is a one-liner change. I don't see
-> much point on re-using the GSource tags since IMHO GSource pointer is
-> always superior to the old tag system.
-
-Using the tag or the GSource * doesn't change much afaik. Not only
-this is not a hot path, but glib gmain code does create the tag on
-attach anyway. You may be marginally faster on remove/detach by
-avoiding one lookup.
-
-(btw, I think both tag and GSource* are as old)
-
->
-> >
-> > CC: Peter Xu <peterx@redhat.com>
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  hw/char/terminal3270.c | 15 ++++++---------
-> >  1 file changed, 6 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
-> > index e9c45e55b1..35b079d5c4 100644
-> > --- a/hw/char/terminal3270.c
-> > +++ b/hw/char/terminal3270.c
-> > @@ -31,7 +31,7 @@ typedef struct Terminal3270 {
-> >      uint8_t outv[OUTPUT_BUFFER_SIZE];
-> >      int in_len;
-> >      bool handshake_done;
-> > -    GSource *timer_src;
-> > +    guint timer_tag;
-> >  } Terminal3270;
-> >
-> >  #define TYPE_TERMINAL_3270 "x-terminal3270"
-> > @@ -47,10 +47,9 @@ static int terminal_can_read(void *opaque)
-> >
-> >  static void terminal_timer_cancel(Terminal3270 *t)
-> >  {
-> > -    if (t->timer_src) {
-> > -        g_source_destroy(t->timer_src);
-> > -        g_source_unref(t->timer_src);
-> > -        t->timer_src =3D NULL;
-> > +    if (t->timer_tag) {
-> > +        g_source_remove(t->timer_tag);
-> > +        t->timer_tag =3D 0;
-> >      }
-> >  }
-> >
-> > @@ -100,8 +99,7 @@ static void terminal_read(void *opaque, const uint8_=
-t *buf, int size)
-> >      assert(size <=3D (INPUT_BUFFER_SIZE - t->in_len));
-> >
-> >      terminal_timer_cancel(t);
-> > -    t->timer_src =3D qemu_chr_timeout_add_ms(t->chr.chr, 600 * 1000,
-> > -                                           send_timing_mark_cb, t);
-> > +    t->timer_tag =3D g_timeout_add_seconds(600, send_timing_mark_cb, t=
-);
-> >      memcpy(&t->inv[t->in_len], buf, size);
-> >      t->in_len +=3D size;
-> >      if (t->in_len < 2) {
-> > @@ -160,8 +158,7 @@ static void chr_event(void *opaque, int event)
-> >           * char-socket.c. Once qemu receives the terminal-type of the
-> >           * client, mark handshake done and trigger everything rolling =
-again.
-> >           */
-> > -        t->timer_src =3D qemu_chr_timeout_add_ms(t->chr.chr, 600 * 100=
-0,
-> > -                                               send_timing_mark_cb, t)=
-;
-> > +        t->timer_tag =3D g_timeout_add_seconds(600, send_timing_mark_c=
-b, t);
-> >          break;
-> >      case CHR_EVENT_CLOSED:
-> >          sch->curr_status.scsw.dstat =3D SCSW_DSTAT_DEVICE_END;
-> > --
-> > 2.18.0.547.g1d89318c48
-> >
->
-> Regards,
->
-> --
-> Peter Xu
->
+Running the loop of above in that guest to crash it after a while.
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+Upgrade to proposed:
+$ sudo apt install qemu-system-x86=3D1:2.11+dfsg-1ubuntu7.5
+Reading package lists... Done
+Building dependency tree       =
+
+Reading state information... Done
+Suggested packages:
+  samba vde2 qemu-block-extra sgabios ovmf
+The following packages will be upgraded:
+  qemu-system-x86
+1 upgraded, 0 newly installed, 0 to remove and 16 not upgraded.
+Need to get 5.168 kB of archives.
+After this operation, 0 B of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu bionic-proposed/main amd64 qemu-syst=
+em-x86 amd64 1:2.11+dfsg-1ubuntu7.5 [5.168 kB]
+Fetched 5.168 kB in 1s (7.666 kB/s)          =
+
+(Reading database ... 127990 files and directories currently installed.)
+Preparing to unpack .../qemu-system-x86_1%3a2.11+dfsg-1ubuntu7.5_amd64.deb =
+...
+Unpacking qemu-system-x86 (1:2.11+dfsg-1ubuntu7.5) over (1:2.11+dfsg-1ubunt=
+u7.4) ...
+Setting up qemu-system-x86 (1:2.11+dfsg-1ubuntu7.5) ...
+Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
+
+
+Running the loop again with the same setup  - no crash in 15 minutes - assu=
+me that means good now.
+I'd be glad about someone else checking the result as well, best someone fo=
+rmerly affected by it.
+(and having a tick in the eye for seeing my right screen change sizes and f=
+licker all the time)
+
+Setting verified
+
+** Tags removed: verification-needed
+** Tags added: verification-done
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755912
+
+Title:
+  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Bionic:
+  Fix Committed
+
+Bug description:
+  [Impact]
+
+   * There are conditions where the vga/qxl driver can crash the qemu =
+
+     process.
+
+   * It is like a very complex case of a non initialized var - without the =
+
+     fix it might try to ask for updates without having a valid primary =
+
+     surface.
+
+   * Backport from upstream
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D5bd5c27c7d284d01477c5cc=
+022ce22438c46bf9f
+  to avoid the crash
+
+  =
+
+  [Test Case]
+
+   * Sometimes booting xubuntu was reported to be enough, at other times
+  it was needed to change resolution a few times to trigger.
+
+    # get xubuntu iso (actually other UI Isos should do as well)
+    $ qemu-system-x86_64 -vga qxl -enable-kvm -cpu host -smp cores=3D2,thre=
+ads=3D2 -m 2048 -cdrom xubuntu-18.04-desktop-amd64.iso
+    # If it boots successfully, change resolution until it crashes.
+    $ while true ; do xrandr --output Virtual-0 --mode 640x480 ; sleep 1 ; =
+xrandr --output Virtual-0 --mode 1280x720 ; sleep 1 ; xrandr --output Virtu=
+al-0 --mode 1920x1080 ; sleep 1 ; done
+
+   * Without the fix that will trigger the qemu crash
+
+  [Regression Potential]
+
+   * The change "just" adds QXL_MODE_UNDEFINED as one more trigger to leave =
+
+     the rendering update. That sounds rather safe. But thinking hard on =
+
+     potential updates I could think of theoretical setups that were  in =
+
+     undefined mode all the time (unlikely or impossible I think) that now =
+
+     would get no updates anymore. Well I really don't think this is an =
+
+     issue, but since this section should be open thinking on "potential" =
+
+     regressions that is what comes to my mind.
+
+  [Other Info]
+   =
+
+   * Thanks to Leonardo for most of the bisecting and discussion work!
+
+  =
+
+  ---
+
+  =
+
+  When using qemu-system-x86_64 with the option -vga qxl, it crashes. The e=
+asiest way to crash it is by trying to change the guest's resolution. Howev=
+er, the system may randomly crash too, not happening only when changing res=
+olution. Here is the terminal output of one of these random crashes:
+
+  --------
+
+  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
+ -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
+tdev=3Dhostnet0
+  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
+d raw.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Automatically detec=
+ting the format is dangerous for raw images, write operations on block 0 wi=
+ll be restricted.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Specify the 'raw' f=
+ormat explicitly to remove the restrictions.
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2431:display_channel_validate_surface: canvas address is
+  0x7f8eb948ab18 for 0 (and is NULL)
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2432:display_channel_validate_surface: failed on 0
+
+  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
+display_channel_update: condition `display_channel_validate_surface(display=
+, surface_id)' failed
+  Abortado (imagem do n=C3=BAcleo gravada)
+
+  --------
+
+  I was running QEMU as a normal user which is on the groups kvm and
+  disk. Initially I supposed the problem was because I was running QEMU
+  as root, but as a normal user this happens too.
+
+  I have tested with guests with different Ubuntu version: 18.04, 17.10
+  and 16.04. It is happening with them all.
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
+  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
+  Uname: Linux 4.15.0-10-generic x86_64
+  ApportVersion: 2.20.8-0ubuntu10
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Wed Mar 14 17:13:52 2018
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  InstallationDate: Installed on 2017-06-13 (273 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: LENOVO 80UG
+  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
+e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
+tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
+d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
+  Signal: 6
+  SourcePackage: qemu
+  StacktraceTop:
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  Title: qemu-system-x86_64 crashed with SIGABRT
+  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
+  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
+ev plugdev sambashare sudo
+  dmi.bios.date: 07/10/2017
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN43WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
