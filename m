@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fubhm-0002oB-KG
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:39 -0400
+	(envelope-from <berrange@redhat.com>) id 1fublY-0005eS-Vf
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 07:02:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fubhl-00004u-RG
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:38 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33327)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fubhl-0008WF-K5
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:58:37 -0400
-Received: by mail-wr1-x444.google.com with SMTP id v90-v6so1166315wrc.0
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 03:58:37 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1fublV-0002TX-Nb
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 07:02:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40478 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fublT-0002Pp-I9
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 07:02:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3DFCB88846
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 11:02:26 +0000 (UTC)
+Date: Tue, 28 Aug 2018 12:02:18 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180828110218.GJ25114@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180817173104.14691-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20180821100716.13803-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20180821100716.13803-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 28 Aug 2018 12:58:24 +0200
-Message-ID: <CAJ+F1CK9-pJyY+sWqUYiYvDAxWO9F_1ETgzNZ=zi1cUBuM5LSw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180817173104.14691-1-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] iothread: fix crash with invalid properties
+Subject: Re: [Qemu-devel] [PATCH] vnc: call sasl_server_init() only when
+ required
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +35,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-ping
-On Tue, Aug 21, 2018 at 12:07 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> -object iothread,id=3Dfoo,? will crash qemu:
->
-> qemu-system-x86_64:qemu-thread-posix.c:128: qemu_cond_destroy: Assertion =
-`cond->initialized' failed.
->
-> Use thread_id !=3D -1 to check if iothread_complete() finished
-> successfully and the mutex/cond have been initialized.
->
+On Fri, Aug 17, 2018 at 07:31:03PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> VNC server is calling sasl_server_init() during startup of QEMU, even
+> if SASL auth has not been enabled.
+>=20
+> This may create undesirable warnings like "Could not find keytab file:
+> /etc/qemu/krb5.tab" when the user didn't configure SASL on host and
+> started VNC server.
+>=20
+> Instead, only initialize SASL when needed. Note that HMP/QMP "change
+> vnc" calls vnc_display_open() again, which will initialize SASL if
+> needed.
+
+I could have sworn we had a way to change the VNC auth method on the
+fly without restarting the whole server, but I can't find it now, so
+must have been imagining it :-)
+
+>=20
+> Related to:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1609327
+>=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  iothread.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/iothread.c b/iothread.c
-> index aff1281257..2fb1cdf55d 100644
-> --- a/iothread.c
-> +++ b/iothread.c
-> @@ -110,6 +110,7 @@ static void iothread_instance_init(Object *obj)
->      IOThread *iothread =3D IOTHREAD(obj);
->
->      iothread->poll_max_ns =3D IOTHREAD_POLL_MAX_NS_DEFAULT;
-> +    iothread->thread_id =3D -1;
->  }
->
->  static void iothread_instance_finalize(Object *obj)
-> @@ -117,6 +118,11 @@ static void iothread_instance_finalize(Object *obj)
->      IOThread *iothread =3D IOTHREAD(obj);
->
->      iothread_stop(iothread);
-> +
-> +    if (iothread->thread_id !=3D -1) {
-> +        qemu_cond_destroy(&iothread->init_done_cond);
-> +        qemu_mutex_destroy(&iothread->init_done_lock);
-> +    }
->      /*
->       * Before glib2 2.33.10, there is a glib2 bug that GSource context
->       * pointer may not be cleared even if the context has already been
-> @@ -135,8 +141,6 @@ static void iothread_instance_finalize(Object *obj)
->          g_main_context_unref(iothread->worker_context);
->          iothread->worker_context =3D NULL;
->      }
-> -    qemu_cond_destroy(&iothread->init_done_cond);
-> -    qemu_mutex_destroy(&iothread->init_done_lock);
->  }
->
->  static void iothread_complete(UserCreatable *obj, Error **errp)
-> @@ -147,7 +151,6 @@ static void iothread_complete(UserCreatable *obj, Err=
-or **errp)
->
->      iothread->stopping =3D false;
->      iothread->running =3D true;
-> -    iothread->thread_id =3D -1;
->      iothread->ctx =3D aio_context_new(&local_error);
->      if (!iothread->ctx) {
->          error_propagate(errp, local_error);
-> --
-> 2.18.0.547.g1d89318c48
->
->
+>  ui/vnc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index 359693238b..fc507d7f36 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -4054,7 +4054,7 @@ void vnc_display_open(const char *id, Error **err=
+p)
+>      trace_vnc_auth_init(vd, 1, vd->ws_auth, vd->ws_subauth);
+> =20
+>  #ifdef CONFIG_VNC_SASL
+> -    if ((saslErr =3D sasl_server_init(NULL, "qemu")) !=3D SASL_OK) {
+> +    if (sasl && ((saslErr =3D sasl_server_init(NULL, "qemu")) !=3D SAS=
+L_OK)) {
+>          error_setg(errp, "Failed to initialize SASL auth: %s",
+>                     sasl_errstring(saslErr, NULL, NULL));
+>          goto fail;
 
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
+Regards,
+Daniel
 --=20
-Marc-Andr=C3=A9 Lureau
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
