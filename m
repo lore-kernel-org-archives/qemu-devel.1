@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fuggL-0001Ni-Bp
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:17:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1fugkE-0004Du-QN
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fugTa-0001NV-8P
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:04:19 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45430)
+	(envelope-from <bounces@canonical.com>) id 1fugk5-0000z3-6Q
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:21:28 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36526)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fugTZ-0001NG-UY
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:04:18 -0400
-Received: by mail-wr1-x443.google.com with SMTP id 20-v6so2075956wrb.12
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 09:04:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fugjv-0000x4-G5
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:21:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fugjr-00052j-SB
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 16:21:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8C1272E80D2
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 16:21:07 +0000 (UTC)
 MIME-Version: 1.0
-References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
-	<20180713130916.4153-21-marcandre.lureau@redhat.com>
-	<20180828155250.GF31005@redhat.com>
-In-Reply-To: <20180828155250.GF31005@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 28 Aug 2018 18:04:04 +0200
-Message-ID: <CAJ+F1CLsCkehAOs3=63cT1UFL8frccFVJhjoXEmKxW+nsDW5JA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 20/29] util: add qemu_write_pidfile()
+Date: Tue, 28 Aug 2018 16:07:18 -0000
+From: Daniel Berrange <1788665@bugs.launchpad.net>
+Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
+Message-Id: <153547243831.21204.1820885054588100649.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
+ Windows 10 (1803) VGA passthrough VM using "Spectre" protection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +37,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: David Airlie <airlied@redhat.com>, QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi
-On Tue, Aug 28, 2018 at 5:53 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
->
-> On Fri, Jul 13, 2018 at 03:09:07PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > There are variants of qemu_create_pidfile() in qemu-pr-helper and
-> > qemu-ga. Let's have a common implementation in libqemuutil.
-> >
-> > The code is based from pr-helper write_pidfile(), but allows the
-> > caller to deal with error reporting and behaviour.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  include/qemu/osdep.h  |  3 ++-
-> >  os-posix.c            | 24 -------------------
-> >  os-win32.c            | 25 --------------------
-> >  qga/main.c            | 54 ++++++++-----------------------------------
-> >  scsi/qemu-pr-helper.c | 40 ++++----------------------------
-> >  util/oslib-posix.c    | 33 ++++++++++++++++++++++++++
-> >  util/oslib-win32.c    | 27 ++++++++++++++++++++++
-> >  vl.c                  |  4 ++--
-> >  8 files changed, 79 insertions(+), 131 deletions(-)
->
->
->
-> > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> > index 13b6f8d776..da1d4a3201 100644
-> > --- a/util/oslib-posix.c
-> > +++ b/util/oslib-posix.c
-> > @@ -88,6 +88,39 @@ int qemu_daemon(int nochdir, int noclose)
-> >      return daemon(nochdir, noclose);
-> >  }
-> >
-> > +bool qemu_write_pidfile(const char *pidfile, Error **errp)
-> > +{
-> > +    int pidfd;
-> > +    char pidstr[32];
-> > +
-> > +    pidfd =3D qemu_open(pidfile, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR=
-);
-> > +    if (pidfd =3D=3D -1) {
-> > +        error_setg_errno(errp, errno, "Cannot open pid file");
-> > +        return false;
-> > +    }
-> > +
-> > +    if (lockf(pidfd, F_TLOCK, 0)) {
-> > +        error_setg_errno(errp, errno, "Cannot lock pid file");
-> > +        goto fail;
-> > +    }
-> > +    if (ftruncate(pidfd, 0)) {
-> > +        error_setg_errno(errp, errno, "Failed to truncate pid file");
-> > +        goto fail;
-> > +    }
-> > +
-> > +    snprintf(pidstr, sizeof(pidstr), "%d\n", getpid());
-> > +    if (write(pidfd, pidstr, strlen(pidstr)) !=3D strlen(pidstr)) {
-> > +        error_setg(errp, "Failed to write pid file");
-> > +        goto fail;
-> > +    }
-> > +    return true;
-> > +
-> > +fail:
-> > +    unlink(pidfile);
->
-> Danger,  Will Robinson !
->
-> We can get to this fail: label if we were unable to lockf() the
-> pidfile. ie someone else owns the pidfile, and we've now unlinked
-> the pidfile they own.
+I'm not convinced we can trust the output from cygwin wrt CPU flags.  A
+better test would be to install a modern Linux guest which has the
+mitigations, and see if that reports the flags.
 
-The code was based on qemu-pr-helper, so the problem exists there.
+-- =
 
-So we better follow ga_open_pidfile() version here, and close the fd,
-return an error. ok
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788665
 
->
->
-> > +    close(pidfd);
-> > +    return false;
-> > +}
-> > +
-> >  void *qemu_oom_check(void *ptr)
-> >  {
-> >      if (ptr =3D=3D NULL) {
->
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
->
+Title:
+  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
+  using "Spectre" protection
 
+Status in QEMU:
+  New
 
---=20
-Marc-Andr=C3=A9 Lureau
+Bug description:
+  Windows 10 (1803) VM using VGA passthrough via qemu script.
+
+  After upgrading Windows 10 Pro VM to version 1803, or possibly after
+  applying the March/April security updates from Microsoft, the VM would
+  show low 2D graphics performance (sluggishness in 2D applications and
+  low Passmark results).
+
+  Turning off Spectre vulnerability protection in Windows remedies the
+  issue.
+
+  Expected behavior:
+  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
+ see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
+-2017-5715-and-hyper-v-vms
+
+  Background:
+
+  Starting in March or April Microsoft began to push driver updates in
+  their updates / security updates. See https://support.microsoft.com
+  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
+  meltdown
+
+  One update concerns the Intel microcode - see
+  https://support.microsoft.com/en-us/help/4100347. It is activated by
+  default within Windows.
+
+  Once the updates are applied within the Windows guest, 2D graphics
+  performance drops significantly. Other performance benchmarks are not
+  affected.
+
+  A bare metal Windows installation does not display a performance loss
+  after the update. See https://heiko-sieger.info/low-2d-graphics-
+  benchmark-with-windows-10-1803-kvm-vm/
+
+  Similar reports can be found here:
+  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
+performance_on_windows/
+
+  Hardware:
+
+  6 core Intel Core i7-3930K (-MT-MCP-)
+
+  Host OS:
+  Linux Mint 19/Ubuntu 18.04
+  Kernel: 4.15.0-32-generic x86_64
+  Qemu: QEMU emulator version 2.11.1
+  Intel microcode (host): 0x714
+  dmesg | grep microcode
+  [    0.000000] microcode: microcode updated early to revision 0x714, date=
+ =3D 2018-05-08
+  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
+  [    2.813340] microcode: Microcode Update Driver: v2.2.
+
+  Note: I manually updated the Intel microcode on the host from 0x713 to
+  0x714. However, both microcode versions produce the same result in the
+  Windows guest.
+
+  Guest OS:
+  Windows 10 Pro 64 bit, release 1803
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
