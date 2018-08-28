@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fuhB5-0005NM-FR
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:49:18 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fuhDD-0008KG-Ls
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:51:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fuh5O-0007tK-M5
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:43:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35938 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fuh5K-0007r5-6Z
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:43:19 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 307E2401EF04
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 16:43:16 +0000 (UTC)
-Date: Tue, 28 Aug 2018 18:43:12 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180828184312.6e0e417d@redhat.com>
-In-Reply-To: <20180828153840.22519-1-marcandre.lureau@redhat.com>
-References: <20180828153840.22519-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1fuhD7-0006dm-Ei
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:51:26 -0400
+Received: from mail-cys01nam02on0722.outbound.protection.outlook.com
+	([2a01:111:f400:fe45::722]:12864
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fuhD1-0006b0-LB
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 12:51:16 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 28 Aug 2018 16:51:12 +0000
+Message-ID: <BN7PR08MB4868B217B1104A75673CE58EC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <20180828130041.26445-1-jancraig@amazon.com>,
+	<20180828130041.26445-3-jancraig@amazon.com>
+	<BN7PR08MB48680621D40A0A8800E9AEF6C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<b9eab9396a6e4270b9e536a4fe84a54d@EX13D12UEA003.ant.amazon.com>
+In-Reply-To: <b9eab9396a6e4270b9e536a4fe84a54d@EX13D12UEA003.ant.amazon.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] target/mips: Add all MXU opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +33,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: "Janeczek, Craig" <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-On Tue, 28 Aug 2018 17:38:40 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> I see that I can check the loongson instructions by checking for INSN_LOO=
+NGSON2F. Using MXU if that is not set
 
-> The share=3Don/off property is used to modified mmap() MAP_SHARED
-> setting. Make it on by default for convenience and compatibility
-> reasons.
-it would be nice to state reasons here.
+One more thing to check is MXUEN bit of MXU control register. This should b=
+e done before handling any MXU instructions, except S32M2I/S32I2M.
 
-also flipping default to on is behavioral change when
-used with bind policy which could make backend initialization fail
-so CLI that used to work (if there are any users of this without shared=3Do=
-n)
-won't work anymore.
+> What should I check for the mult or misc instructions that were there fir=
+st?
 
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  backends/hostmem-memfd.c | 4 +++-
->  qemu-options.hx          | 4 +++-
->  2 files changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> index 1e20fe0ba8..abd52364db 100644
-> --- a/backends/hostmem-memfd.c
-> +++ b/backends/hostmem-memfd.c
-> @@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
-Error **errp)
-> =20
->      name =3D object_get_canonical_path(OBJECT(backend));
->      memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
-> -                                   name, backend->size, true, fd, errp);
-> +                                   name, backend->size,
-> +                                   backend->share, fd, errp);
->      g_free(name);
->  }
-> =20
-> @@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
-> =20
->      /* default to sealed file */
->      m->seal =3D true;
-> +    MEMORY_BACKEND(m)->share =3D true;
->  }
-> =20
->  static void
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index f14e423b7c..25c02d72b8 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4029,7 +4029,7 @@ Memory backend objects offer more control than the =
-@option{-m} option that is
->  traditionally used to define guest RAM. Please refer to
->  @option{memory-backend-file} for a description of the options.
-> =20
-> -@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
-mp=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},host-nodes=3D@v=
-ar{host-nodes},policy=3D@var{default|preferred|bind|interleave},seal=3D@var=
-{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
-> +@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
-mp=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{=
-size},host-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bind|in=
-terleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{siz=
-e}
-> =20
->  Creates an anonymous memory file backend object, which allows QEMU to
->  share the memory with an external process (e.g. when using
-> @@ -4051,6 +4051,8 @@ with the @option{seal} option (requires at least Li=
-nux 4.16).
->  Please refer to @option{memory-backend-file} for a description of the
->  other options.
-> =20
-> +The @option{share} boolean option is @var{on} by default with memfd.
-> +
->  @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
-> =20
->  Creates a random number generator backend which obtains entropy from
+It should be is somewhere in LOONGSON docs.
