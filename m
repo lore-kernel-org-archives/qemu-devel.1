@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fukhq-0006TI-Mt
+	(envelope-from <jsnow@redhat.com>) id 1fukhs-0006Xy-Dd
 	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 16:35:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fukYx-0002hG-Gf
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 16:26:10 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:34286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=771b48d5d=jancraig@amazon.com>)
-	id 1fukYx-0002gS-4f
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 16:26:07 -0400
-From: "Janeczek, Craig" <jancraig@amazon.com>
-Date: Tue, 28 Aug 2018 20:22:28 +0000
-Message-ID: <a8a8a9fd52124f56ac3be7e991b3b39a@EX13D12UEA003.ant.amazon.com>
-References: <20180828130041.26445-1-jancraig@amazon.com>,
-	<20180828130041.26445-3-jancraig@amazon.com>
-	<BN7PR08MB48680621D40A0A8800E9AEF6C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
-	<b9eab9396a6e4270b9e536a4fe84a54d@EX13D12UEA003.ant.amazon.com>
-	<BN7PR08MB4868B217B1104A75673CE58EC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
-	<a89f839cb02647ae865382f060bc29f0@EX13D12UEA003.ant.amazon.com>
-	<BN7PR08MB4868B3C34EB2307D4EAE9722C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
-In-Reply-To: <BN7PR08MB4868B3C34EB2307D4EAE9722C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <jsnow@redhat.com>) id 1fukYf-0002U8-Da
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 16:25:50 -0400
+References: <20180817190457.8292-1-jsnow@redhat.com>
+	<20180817190457.8292-6-jsnow@redhat.com>
+	<553da197-ebd0-1eda-909c-aa0740332737@redhat.com>
+	<0b63f8aa-16eb-b719-b903-dff693753e8b@redhat.com>
+	<70d6a96e-ac23-101c-bf10-d9855fe2ec9e@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <1920b33f-6773-b224-23b6-74874641f639@redhat.com>
+Date: Tue, 28 Aug 2018 16:25:40 -0400
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 2/8] target/mips: Add all MXU opcodes
+In-Reply-To: <70d6a96e-ac23-101c-bf10-d9855fe2ec9e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/7] block/mirror: utilize job_exit shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Jeff Cody <jcody@redhat.com>, kwolf@redhat.com, jtc@redhat.com, Fam Zheng <famz@redhat.com>
 
-To clarify, if MXU is present (a cpu defined to have MXU instructions is se=
-lected) we will never run any of the other special2 commands? That would ac=
-tually simplify the implementation.
 
-Also I understand the want for clean code, I appreciate the comments.
 
------Original Message-----
-From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
-Sent: Tuesday, August 28, 2018 3:35 PM
-To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net
-Subject: Re: [PATCH v3 2/8] target/mips: Add all MXU opcodes
+On 08/25/2018 11:02 AM, Max Reitz wrote:
+> If you say so...  I have to admit I don't really understand.  The
+> comment doesn't explain why it's so important to keep src around until
+> job_completed(), so I don't know.  I thought AioContexts are recursive
+> so it doesn't matter whether you take them recursively or not.
 
-> From: Janeczek, Craig <jancraig@amazon.com>
-> Sent: Tuesday, August 28, 2018 8:54 PM
->
-> Subject: RE: [PATCH v3 2/8] target/mips: Add all MXU opcodes
->
-> I will re-work each of the mxu_gen_<ins> functions to check for MXUEN and=
- jump over the implementation of the instruction if not enabled.
->=20
-> I would like to clarify the structure of the switch statement before impl=
-ementing it.
->
-> I was originally planning on checking if there was a MXU hit and MXUEN wa=
-s set, in that case use the MXU instruction, else use the original switch. =
-This will not work as MXUEN is in a TCGv and cant be used in an if statemen=
-t at that level. That is why I plan on putting the MXUEN check in each of t=
-he mxu_gen_<ins> functions.
->=20
-> What should the re-worked switch statement look like which runs the mxu_g=
-en_<ins> functions?
+bdrv_flush has troubles under a recursive lock if it is invoked from a
+different thread. It tries to poll for flush completion but the
+coroutine which gets scheduled (instead of entered) can't actually run
+if we hold the lock twice from, say, the main thread -- which is where
+we're doing the graph manipulation from.
 
-I didn't study these code segments in depth, but at this moment it seems to=
- me that the cleanest organization would be to leave current decode_opc_spe=
-cial2_legacy(env, ctx); as is, and, however, to change the part with its in=
-vocation:
+>        co = qemu_coroutine_create(bdrv_flush_co_entry, &flush_co);
+>        bdrv_coroutine_enter(bs, co);
+>        BDRV_POLL_WHILE(bs, flush_co.ret == NOT_DONE);
 
-    case OPC_SPECIAL2:
-        decode_opc_special2_legacy(env, ctx);
-        break;
-to
+BDRV_POLL_WHILE there causes us the grief via AIO_WAIT_WHILE, which only
+puts down one reference, so we deadlock in bdrv_flush in a recursive
+context.
 
-    case OPC_SPECIAL2:
-        if (<MXU is present>) {
-                decode_opc_special2_mxu(env, ctx);
-        } else if (<LOONGSON_2F>) {
-                decode_opc_special2_legacy(env, ctx);
-        }
-        break;
+Kevin helped me figure it out; I CC'd him off-list on a mail that you
+were also CC'd on ("hang in mirror_exit") that's probably pretty helpful:
 
-where decode_opc_special2_mxu(env, ctx); is the function that you will writ=
-e.
+> Took a little more than five minutes, but I think I've got it now. The
+> important thing is that the test case is for dataplane, i.e. the job
+> runs in an I/O thread AioContext. Job completion, however, happens in
+> the main loop thread.
+> 
+> Therefore, when bdrv_delete() wants to flush the node first, it needs to
+> run bdrv_co_flush() in a foreign AioContext, so the coroutine is
+> scheduled. The I/O thread backtrace shows that it's waiting for the
+> AioContext lock before it can actually enter the bdrv_co_flush()
+> coroutine, so we must have deadlocked:
 
-Or something along these lines...
-
-But I may be mistaken regrding details...
-
-Again, overall, this series is very good. We are arguing about some technic=
-al details, out of which many are, frankly, unimportant. I just want to tel=
-l you that don't misunderstand my and Richard's critiques - we want this co=
-de in QEMU, just want it to be nice, clean, and correct, and we definitely =
-appreciate your work very much!
+--js
