@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuVuC-0001xg-4E
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:47:08 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fuWi2-0002Wy-Fn
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 01:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuVin-0001N6-Bl
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:35:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44348 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuVin-0001LX-4u
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:35:17 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180827070021.11931-1-armbru@redhat.com>
-	<20180827070021.11931-5-armbru@redhat.com>
-	<4550a64e-1218-2a58-bed1-f0a9f0efa30b@redhat.com>
-Date: Tue, 28 Aug 2018 06:35:12 +0200
-In-Reply-To: <4550a64e-1218-2a58-bed1-f0a9f0efa30b@redhat.com> (Eric Blake's
-	message of "Mon, 27 Aug 2018 12:18:42 -0500")
-Message-ID: <87h8jfqfb3.fsf@dusky.pond.sub.org>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fuWhE-0007IW-NT
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 01:37:47 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fuWhE-0007Ff-Fk
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 01:37:44 -0400
+Received: by mail-wr1-x442.google.com with SMTP id j26-v6so325638wre.2
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 22:37:44 -0700 (PDT)
+References: <1533793434-7614-1-git-send-email-whois.zihan.yang@gmail.com>
+	<ece2a3ff-678d-00b6-3fd6-660972c5beca@gmail.com>
+	<20180827070406.t525gr43qpu7wpsj@sirius.home.kraxel.org>
+	<CAKwiv-gyGoqEpmpicxo_a3cQBsb0-XoT9cqkJu5WOtkUtAx0eQ@mail.gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <5f5dc082-7053-d6b9-b01f-fffba1847ba5@gmail.com>
+Date: Tue, 28 Aug 2018 08:37:39 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/6] json: Nicer recovery from lexical
- errors
+In-Reply-To: <CAKwiv-gyGoqEpmpicxo_a3cQBsb0-XoT9cqkJu5WOtkUtAx0eQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [SeaBIOS] [RFC v2 0/3] Support multiple pci
+ domains in pci_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +34,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Zihan Yang <whois.zihan.yang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, seabios@seabios.org
 
-Eric Blake <eblake@redhat.com> writes:
+Hi Gerd
 
-> On 08/27/2018 02:00 AM, Markus Armbruster wrote:
->> When the lexer chokes on an input character, it consumes the
->> character, emits a JSON error token, and enters its start state.  This
->> can lead to suboptimal error recovery.  For instance, input
+On 08/28/2018 07:12 AM, Zihan Yang wrote:
+> Gerd Hoffmann <kraxel@redhat.com> 于2018年8月27日周一 上午7:04写道：
+>>    Hi,
 >>
->>      0123 ,
+>>>>    However, QEMU only binds port 0xcf8 and 0xcfc to
+>>>> bus pcie.0. To avoid bus confliction, we should use other port pairs for
+>>>> busses under new domains.
+>>> I would skip support for IO based configuration and use only MMCONFIG
+>>> for extra root buses.
+>>>
+>>> The question remains: how do we assign MMCONFIG space for
+>>> each PCI domain.
+
+Thanks for your comments!
+
+>> Allocation-wise it would be easiest to place them above 4G.  Right after
+>> memory, or after etc/reserved-memory-end (if that fw_cfg file is
+>> present), where the 64bit pci bars would have been placed.  Move the pci
+>> bars up in address space to make room.
 >>
->> produces the tokens
+>> Only problem is that seabios wouldn't be able to access mmconfig then.
 >>
->>      JSON_ERROR    01
->>      JSON_INTEGER  23
->>      JSON_COMMA    ,
+>> Placing them below 4G would work at least for a few pci domains.  q35
+>> mmconfig bar is placed at 0xb0000000 -> 0xbfffffff, basically for
+>> historical reasons.  Old qemu versions had 2.75G low memory on q35 (up
+>> to 0xafffffff), and I think old machine types still have that for live
+>> migration compatibility reasons.  Modern qemu uses 2G only, to make
+>> gigabyte alignment work.
 >>
->> Make the lexer skip characters after a lexical error until a
->> structural character ('[', ']', '{', '}', ':', ','), an ASCII control
->> character, or '\xFE', or '\xFF'.
+>> 32bit pci bars are placed above 0xc0000000.  The address space from 2G
+>> to 2.75G (0x8000000 -> 0xafffffff) is unused on new machine types.
+>> Enough room for three additional mmconfig bars (full size), so four
+>> pci domains total if you add the q35 one.
+> Maybe we can support 4 domains first before we come up
+> with a better solution. But I'm not sure if four domains are
+> enough for those who want too many devices?
+
+(Adding Michael)
+
+Since we will not use all 256 buses of an extra PCI domain,
+I think this space will allow us to support more PCI domains.
+
+How will the flow look like ?
+
+1. QEMU passes to SeaBIOS information of how many extra
+    PCI domains needs, and how many buses per domain.
+    How it will pass this info? A vendor specific capability,
+    some PCI registers or modifying extra-pci-roots fw_cfg file?
+
+2. SeaBIOS assigns the address for each PCI Domain and
+     returns the information to QEMU.
+     How it will do that? Some pxb-pcie registers? Or do we model
+     the MMCFG like a PCI BAR?
+
+3. Once QEMU gets the MMCFG addresses, it can answer to
+     mmio configuration cycles.
+
+4. SeaBIOS queries all PCI domains devices, computes
+    and assigns IO/MEM resources (for PCI domains > 0 it will
+    use MMCFG to configure the PCI devices)
+
+5. QEMU uses the IO/MEM information to create the CRS for each
+     extra PCI host bridge.
+
+6. SeaBIOS gets the ACPI tables from QEMU and passes them to the
+    guest OS.
+
+Thanks,
+Marcel
+
+
+
+
+
+>> cheers,
+>>    Gerd
 >>
->> Note that we must not skip ASCII control characters, '\xFE', '\xFF',
->> because those are documented to force the JSON parser into known-good
->> state, by docs/interop/qmp-spec.txt.
->>
->> The lexer now produces
->>
->>      JSON_ERROR    01
->>      JSON_COMMA    ,
->
-> So the lexer has now completely skipped the intermediate input, but
-> the resulting error message need only point at the start of where
-> input went wrong, and skipping to a sane point results in fewer error
-> tokens to be reported.  Makes sense.
-
-Exactly.
-
-We could emit a recovery token to let json_message_process_token()
-report what we skipped, but I don't think it's worth the trouble.
-
->> Update qmp-test for the nicer error recovery: QMP now report just one
->
-> s/report/reports/
-
-Will fix.
-
->> error for input %p instead of two.  Also drop the newline after %p; it
->> was needed to tease out the second error.
->
-> That's because pre-patch, 'p' is one of the input characters that
-> requires lookahead to determine if it forms a complete token (and the
-> newline provides the transition needed to consume it); now post-patch,
-> the 'p' is consumed as part of the junk after the error is first
-> detected at the '%'.
-
-Exactly.
-
-> And to my earlier complaint about 0x1a resulting in JSON_ERROR then
-> JSON_INTEGER then JSON_KEYWORD, that sequence is likewise now
-> identified as a single JSON_ERROR at the 'x', with the rest of the
-> attempted hex number (invalid in JSON) silently skipped.  Nice.
-
-Correct.
-
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   qobject/json-lexer.c | 43 +++++++++++++++++++++++++++++--------------
->>   tests/qmp-test.c     |  6 +-----
->>   2 files changed, 30 insertions(+), 19 deletions(-)
->>
->> diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
->> index 28582e17d9..39c7ce7adc 100644
->> --- a/qobject/json-lexer.c
->> +++ b/qobject/json-lexer.c
->> @@ -101,6 +101,7 @@
->>     enum json_lexer_state {
->>       IN_ERROR = 0,               /* must really be 0, see json_lexer[] */
->> +    IN_RECOVERY,
->>       IN_DQ_STRING_ESCAPE,
->>       IN_DQ_STRING,
->>       IN_SQ_STRING_ESCAPE,
->> @@ -130,6 +131,28 @@ QEMU_BUILD_BUG_ON(IN_START_INTERP != IN_START + 1);
->>   static const uint8_t json_lexer[][256] =  {
->>       /* Relies on default initialization to IN_ERROR! */
->>   +    /* error recovery */
->> +    [IN_RECOVERY] = {
->> +        /*
->> +         * Skip characters until a structural character, an ASCII
->> +         * control character other than '\t', or impossible UTF-8
->> +         * bytes '\xFE', '\xFF'.  Structural characters and line
->> +         * endings are promising resynchronization points.  Clients
->> +         * may use the others to force the JSON parser into known-good
->> +         * state; see docs/interop/qmp-spec.txt.
->> +         */
->> +        [0 ... 0x1F] = IN_START | LOOKAHEAD,
->
-> And here's where the LOOKAHEAD bit has to be separate, because you are
-> now assigning semantics to the transition on '\0' that are distinct
-> from either of the two roles previously enumerated as possible.
-
-I could do
-
-            TERMINAL(IN_START)
-            [0x20 ... 0xFD] = IN_RECOVERY,
-            ['\t'] = IN_RECOVERY,
-
-but it would be awful :)
-
->> +        [0x20 ... 0xFD] = IN_RECOVERY,
->> +        [0xFE ... 0xFF] = IN_START | LOOKAHEAD,
->> +        ['\t'] = IN_RECOVERY,
->> +        ['['] = IN_START | LOOKAHEAD,
->> +        [']'] = IN_START | LOOKAHEAD,
->> +        ['{'] = IN_START | LOOKAHEAD,
->> +        ['}'] = IN_START | LOOKAHEAD,
->> +        [':'] = IN_START | LOOKAHEAD,
->> +        [','] = IN_START | LOOKAHEAD,
->> +    },
->
-> It took me a couple of reads before I was satisfied that everything is
-> initialized as desired (range assignments followed by more-specific
-> re-assignment works, but isn't common), but this looks right.
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
