@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1fui3Q-0006Jf-En
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:45:25 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fuiYN-0004j2-5D
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 14:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin@koconnor.net>) id 1fui3N-0005yS-IE
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:45:24 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:37249)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1fui3K-0005Xc-Es
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 13:45:19 -0400
-Received: by mail-qt0-x241.google.com with SMTP id n6-v6so2684230qtl.4
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 10:45:09 -0700 (PDT)
-Date: Tue, 28 Aug 2018 13:45:07 -0400
-From: Kevin O'Connor <kevin@koconnor.net>
-Message-ID: <20180828174506.GB8674@morn.lan>
-References: <1533793434-7614-1-git-send-email-whois.zihan.yang@gmail.com>
-	<ece2a3ff-678d-00b6-3fd6-660972c5beca@gmail.com>
-	<20180827070406.t525gr43qpu7wpsj@sirius.home.kraxel.org>
-	<CAKwiv-gyGoqEpmpicxo_a3cQBsb0-XoT9cqkJu5WOtkUtAx0eQ@mail.gmail.com>
-	<5f5dc082-7053-d6b9-b01f-fffba1847ba5@gmail.com>
-	<20180828060752.mmsd7x7uobqm2gsr@sirius.home.kraxel.org>
-	<8b232ca6-4643-24c7-d93d-589a452d0785@gmail.com>
-	<20180828101458.pnsldezdzp6tdulp@sirius.home.kraxel.org>
-	<20180828170203.GA1018@morn.lan>
-	<ab62fe25-77f4-23d7-74d9-accda67e7a30@gmail.com>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fuiYF-0004H1-K6
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 14:17:21 -0400
+Received: from mail-cys01nam02on0108.outbound.protection.outlook.com
+	([104.47.37.108]:55568
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fuiY7-00048a-6E
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 14:17:10 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 28 Aug 2018 18:17:02 +0000
+Message-ID: <BN7PR08MB4868E1AEDD2FD07E8501445FC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <20180828130041.26445-1-jancraig@amazon.com>,
+	<20180828130041.26445-4-jancraig@amazon.com>
+	<BN7PR08MB4868C15DDF3A45B9E4719EEAC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<7e66fdf9299b4908a52ef778a856c41c@EX13D12UEA003.ant.amazon.com>
+	<BN7PR08MB48681AB62D0FF0D95B8994A2C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<c271c73f79a84547ba9c53150122b049@EX13D12UEA003.ant.amazon.com>
+In-Reply-To: <c271c73f79a84547ba9c53150122b049@EX13D12UEA003.ant.amazon.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ab62fe25-77f4-23d7-74d9-accda67e7a30@gmail.com>
-Subject: Re: [Qemu-devel] [SeaBIOS] [RFC v2 0/3] Support multiple pci
- domains in pci_device
+Subject: Re: [Qemu-devel] [PATCH v3 3/8] target/mips: Add MXU instructions
+ S32I2M and S32M2I
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,41 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org, qemu-devel@nongnu.org, Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Janeczek, Craig" <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-On Tue, Aug 28, 2018 at 08:17:19PM +0300, Marcel Apfelbaum wrote:
-> On 08/28/2018 08:02 PM, Kevin O'Connor wrote:
-> > On Tue, Aug 28, 2018 at 12:14:58PM +0200, Gerd Hoffmann wrote:
-> > > > > Where is the pxb-pcie device?  0000:$somewhere?  Or $domain:00:00.0?
-> > > >   0000:$somewhere (On PCI domain 0)
-> > > Cool, so we don't have an chicken-and-egg issue.
-> > > 
-> > > > > If we can access pxb-pcie registers before configuring MMCFG then yes,
-> > > > > we should use pxb-pcie registers for that.
-> > > > Yes, we can.
-> > > Ok, so we can configure mmcfg as hidden pci bar, simliar to the q35
-> > > mmcfg.  Any configuration hints can be passed as pci vendor capability
-> > > (simliar to the bridge window size hints), if needed.
-> > Just so I understand, the proposal is to have SeaBIOS search for
-> > pxb-pcie devices on the main PCI bus and allocate address space for
-> > each.  (These devices would not be considered pci buses in the
-> > traditional sense.)  Then SeaBIOS will traverse that address space
-> > (MMCFG) and allocate BARs (both address space and io space) for the
-> > PCI devices found in that address space.  Finally, QEMU will take all
-> > those allocations and use it when generating the ACPI tables.
-> > 
-> > Did I get that right?
-> 
-> Yes, the pxb-pcie exposes a new PCI root bus, but we want it
-> in a different PCI domain. This is done in order to remove the
-> 256 PCI Express devices limitation on a PCI Express machine.
-> 
-> Does the plan sounds sane?
+> The only commands that have the 5th bit required to address XR16 are S32M=
+2I/S32I2M.
+>=20
+> I can split it out into a separate utility function and put a conditional=
+ into the S32M2I/S32I2M functions if you are more comfortable with that.
 
-It sounds okay to me.
+It is not a bad idea. (preventing all instructions other than S32M2I/S32I2M=
+ from accessing XR16)
 
-Separately, we could "dust off" the SeaBIOS PAE patches if we want to
-place the address space allocations above 4GB.
+-----Original Message-----
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Sent: Tuesday, August 28, 2018 12:53 PM
+To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net
+Subject: Re: [PATCH v3 3/8] target/mips: Add MXU instructions S32I2M and S3=
+2M2I
 
--Kevin
+> > This does not handle the case xra =3D=3D XR16.
+
+> I do not see where the case is un-handled. XR16 maps to index 15 in the m=
+xu_gpr array.
+
+But, XR16 has its own rules for read/write, and you are treating it just as=
+ a regular register.
