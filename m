@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fugIf-0005Bv-NH
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:53:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1fugIu-0005Hb-MO
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fugIc-0002Lz-ED
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:53:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48652 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fugIr-0002ir-Dn
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:53:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50910 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fugIc-0002L9-6J
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:52:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B9C2A4023ECC
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 15:52:57 +0000 (UTC)
-Date: Tue, 28 Aug 2018 16:52:50 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180828155250.GF31005@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
-	<20180713130916.4153-21-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fugIr-0002h2-7C
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:53:13 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180825135724.8981-1-marcandre.lureau@redhat.com>
+	<20180825135724.8981-5-marcandre.lureau@redhat.com>
+	<20180827045602.GF3020@xz-x1>
+Date: Tue, 28 Aug 2018 17:46:29 +0200
+In-Reply-To: <20180827045602.GF3020@xz-x1> (Peter Xu's message of "Mon, 27 Aug
+	2018 12:56:02 +0800")
+Message-ID: <87a7p6mr3e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180713130916.4153-21-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 20/29] util: add qemu_write_pidfile()
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] monitor: no need to save need_resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,91 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, airlied@redhat.com, kraxel@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Fri, Jul 13, 2018 at 03:09:07PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> There are variants of qemu_create_pidfile() in qemu-pr-helper and
-> qemu-ga. Let's have a common implementation in libqemuutil.
->=20
-> The code is based from pr-helper write_pidfile(), but allows the
-> caller to deal with error reporting and behaviour.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/qemu/osdep.h  |  3 ++-
->  os-posix.c            | 24 -------------------
->  os-win32.c            | 25 --------------------
->  qga/main.c            | 54 ++++++++-----------------------------------
->  scsi/qemu-pr-helper.c | 40 ++++----------------------------
->  util/oslib-posix.c    | 33 ++++++++++++++++++++++++++
->  util/oslib-win32.c    | 27 ++++++++++++++++++++++
->  vl.c                  |  4 ++--
->  8 files changed, 79 insertions(+), 131 deletions(-)
+Peter Xu <peterx@redhat.com> writes:
 
+> On Sat, Aug 25, 2018 at 03:57:19PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> There is no need for per-command need_resume granularity, it should
+>> resume after running an non-oob command on oob-disabled monitor.
+>>=20
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>
+> Note that this series/patch still conflict with the "enable
+> out-of-band by default" series.
+>
+>   [PATCH v6 00/13] monitor: enable OOB by default
 
+Yes.
 
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 13b6f8d776..da1d4a3201 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -88,6 +88,39 @@ int qemu_daemon(int nochdir, int noclose)
->      return daemon(nochdir, noclose);
->  }
-> =20
-> +bool qemu_write_pidfile(const char *pidfile, Error **errp)
-> +{
-> +    int pidfd;
-> +    char pidstr[32];
-> +
-> +    pidfd =3D qemu_open(pidfile, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR=
-);
-> +    if (pidfd =3D=3D -1) {
-> +        error_setg_errno(errp, errno, "Cannot open pid file");
-> +        return false;
-> +    }
-> +
-> +    if (lockf(pidfd, F_TLOCK, 0)) {
-> +        error_setg_errno(errp, errno, "Cannot lock pid file");
-> +        goto fail;
-> +    }
-> +    if (ftruncate(pidfd, 0)) {
-> +        error_setg_errno(errp, errno, "Failed to truncate pid file");
-> +        goto fail;
-> +    }
-> +
-> +    snprintf(pidstr, sizeof(pidstr), "%d\n", getpid());
-> +    if (write(pidfd, pidstr, strlen(pidstr)) !=3D strlen(pidstr)) {
-> +        error_setg(errp, "Failed to write pid file");
-> +        goto fail;
-> +    }
-> +    return true;
-> +
-> +fail:
-> +    unlink(pidfile);
+> I'm not against this patch to be merged since it has its r-b, but I
+> feel like we'd better judge on whether we still like the response
+> queue first, in case one day we'll need to add these things back.
 
-Danger,  Will Robinson !
+Let's not worry about things that may or may not happen at some
+indeterminate time in the future.
 
-We can get to this fail: label if we were unable to lockf() the
-pidfile. ie someone else owns the pidfile, and we've now unlinked
-the pidfile they own.
+However:
 
+> When there could be functional changes around the code path I would
+> think we'd better keep the cleanup patches postponed a bit until those
+> functional changes are settled.  For now the functional part is decide
+> how to fix up the rest of out-of-band issues (my proposal is in the
+> series above which should solve everything that is related to
+> out-of-band to be fixed; if there is more, I'll continue to work on
+> it), whether we should enable it by default for 3.1 (my answer
+> is... yes...), and what to do with it.
 
-> +    close(pidfd);
-> +    return false;
-> +}
-> +
->  void *qemu_oom_check(void *ptr)
->  {
->      if (ptr =3D=3D NULL) {
+I agree the important job is to finish OOB.
 
+Sometimes, it's better to clean up first.  Sometimes, it's not.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Right now, the response queue is a useless complication, and
+Marc-Andr=C3=A9's PATCH 3+4 get rid of it.  Lovely.  I understand this
+conflicts with your OOB work.  The question is whether your work
+fundamentally needs the response queue or not.
+
+If your OOB work happens to be coded for the response queue, but the
+problem could also be solved without the response queue, then the OOB
+job doesn't fundamentally need the response queue.
+
+Unless that's the case, getting rid of the response queue is unnecessary
+churn.
+
+If it is the case, we still need to consider effort.  Which order is
+less total work?  Which order gets us to the goal faster?
+
+Can you guys agree on answers to these questions, or do you need me to
+answer them?
+
+Restating the questions:
+
+1. Can you think of a way to do what Peter's OOB series does, but
+without the response queue?
+
+2. If you can, what's easier / cheaper / faster:
+
+   a. Merge Marc-Andr=C3=A9's patches to get rid of response queue, rewrite
+      OOB series without response queue on top.
+
+   b. Merge Peter's OOB series with response queue, rewrite patches to
+      get rid of response queue on top.
+
+> If we found that it's too hard to enable it by default, I'm thinking
+> whether we can make it a persistent flag for monitor (maybe turning
+> the "x-oob" into a real "oob" and keep it, then we don't turn it on by
+> default), then we can let libvirt start working with out-of-band with
+> the flag.  After all it's actually working mostly (the pending issues
+> are only things like flow control for malicious/buggy clients, but
+> libvirt never had such an issue with it).
+
+The OOB job isn't complete without working flow control.  Nevertheless,
+I'm willing to consider enabling OOB without working flow control.
