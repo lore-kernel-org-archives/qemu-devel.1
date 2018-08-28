@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fufbc-0007ZH-A8
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:08:33 -0400
+	(envelope-from <berrange@redhat.com>) id 1fufbY-0007Zy-Jv
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:08:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fufY1-0000el-Dx
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:04:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47102 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fufZY-0001XF-Ax
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:06:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47028 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fufY1-0000ee-9K
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:04:49 -0400
-References: <20180827070021.11931-1-armbru@redhat.com>
-	<20180827070021.11931-6-armbru@redhat.com>
-	<2f5517a3-bb02-c7e7-cebc-315fbf8bd89b@redhat.com>
-	<87d0u3qf30.fsf@dusky.pond.sub.org>
-	<4556c609-2b90-43be-7456-4239eb116a55@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8b1add80-0ff2-50c0-0a64-c2d67dd4fad7@redhat.com>
-Date: Tue, 28 Aug 2018 10:04:45 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fufZY-0001X5-6F
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:06:24 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CF8F840006EC
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 15:06:23 +0000 (UTC)
+Date: Tue, 28 Aug 2018 16:06:16 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180828150616.GB31005@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
+	<20180713130916.4153-4-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4556c609-2b90-43be-7456-4239eb116a55@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180713130916.4153-4-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] json: Eliminate lexer state IN_ERROR
+Subject: Re: [Qemu-devel] [PATCH v4 03/29] chardev: unref if underlying
+ chardev has no parent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +36,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, airlied@redhat.com, kraxel@redhat.com
 
-On 08/28/2018 10:01 AM, Eric Blake wrote:
-> The question remains, then, if a fixed-size gap (by making JSON_MIN be=20
-> exactly 100) is any smarter than a contiguous layout (by making JSON_MI=
-N=20
-> be IN_START_INTERP + 1).=C2=A0 I can't see any strong reason for prefer=
-ring=20
-> one form over the other, so keeping the gap doesn't hurt.
+On Fri, Jul 13, 2018 at 03:08:50PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> It's possible to write code creating a chardev backend that is not
+> registered. When it is not user-created, it makes sense to keep it
+> hidden. Let the associated frontend destroy it also in this case.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  chardev/char-fe.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 
-And having said that, this patch series also introduced a second gap for=20
-LOOKAHEAD defined at 0x80, along with assertions that it doesn't collide=20
-with either IN_* or JSON_*. It may be just as easy to make JSON_MIN=20
-start at LOOKAHEAD+1 than to assert that all of JSON_* fits in the space=20
-between 100 and 0x80 - 1.  Although in the long run, I seriously doubt=20
-we'll be adding many new enum values to either the lexer or the parser.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
+
+Regards,
+Daniel
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
