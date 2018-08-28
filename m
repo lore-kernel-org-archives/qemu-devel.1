@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59470)
+Received: from eggs.gnu.org ([208.118.235.92]:43160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fuU7a-0006p6-BV
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 22:52:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1fuUCd-0000y6-8F
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 22:58:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fuU7X-0000li-4o
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 22:52:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fuU7W-0000f2-Px
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 22:52:43 -0400
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
-	[10.5.11.24])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 68C8383F51
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 02:52:40 +0000 (UTC)
-Date: Mon, 27 Aug 2018 23:52:36 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180828025236.GF5675@localhost.localdomain>
-References: <1535378006-223604-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fuUAf-0006j8-HO
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 22:56:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59682)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fuUAf-0006ig-AP
+	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 22:55:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fuUAc-0004WN-Cu
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 02:55:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 976322E818B
+	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 02:55:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1535378006-223604-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] vl.c deprecate incorrect CPUs topology
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Aug 2018 02:46:22 -0000
+From: =?utf-8?q?Leonardo_M=C3=BCller?= <leozinho29_eu@hotmail.com>
+Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153542438214.12559.8054094877014708693.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
+ SIGABRT when using option -vga qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +37,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, libvir-list@redhat.com, berrange@redhat.com, drjones@redhat.com
+To: qemu-devel@nongnu.org
 
-On Mon, Aug 27, 2018 at 03:53:26PM +0200, Igor Mammedov wrote:
-> -smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-> so that total number of logical CPUs [sockets * cores * threads]
-> would be equal to [maxcpus], however historically we didn't have
-> such check in QEMU and it is possible to start VM with an invalid
-> topology.
-> Deprecate invalid options combination so we can make sure that
-> the topology VM started with is always correct in the future.
-> Users with an invalid sockets/cores/threads/maxcpus values should
-> fix their CLI to make sure that
->    [sockets * cores * threads] == [maxcpus]
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> v2:
->   - spelling&&co fixes (Andrew Jones <drjones@redhat.com>)
-> ---
->  qemu-deprecated.texi | 11 +++++++++++
->  vl.c                 |  6 ++++++
->  2 files changed, 17 insertions(+)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 87212b6..b649b2e 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -159,6 +159,17 @@ The 'file' driver for drives is no longer appropriate for character or host
->  devices and will only accept regular files (S_IFREG). The correct driver
->  for these file types is 'host_cdrom' or 'host_device' as appropriate.
->  
-> +@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
-> +
-> +CPU topology properties should describe whole machine topology including
-> +possible CPUs. but historically it was possible to start QEMU with
-> +an incorrect topology where
-> +  sockets * cores * threads >= X && X < maxcpus
-> +which could lead to incorrect topology enumeration by the guest.
-> +Support for invalid topology will be removed, the user must ensure
-> +topologies described with -smp includes all possible cpus, i.e.:
-> +  sockets * cores * threads == maxcpus
-> +
->  @section QEMU Machine Protocol (QMP) commands
->  
->  @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-> diff --git a/vl.c b/vl.c
-> index 5ba06ad..238f856 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1238,6 +1238,12 @@ static void smp_parse(QemuOpts *opts)
->              exit(1);
->          }
->  
-> +        if (sockets * cores * threads != max_cpus) {
-> +            warn_report("Invalid CPU topology deprecated: "
-> +                        "sockets (%u) * cores (%u) * threads (%u) "
-> +                        "!= maxcpus (%u)",
-> +                        sockets, cores, threads, max_cpus);
-> +        }
+Thank you for the effort to backport this bug fix, I have tested the
+proposed version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.5) and the crash
+when changing resolution is no longer happening. Unfortunately, after
+some time (about 10 minutes, much longer than without this fix), the
+guest freezes.
 
-We don't need to print the warning if
-  sockets * cores * threads > max_cpus,
-because it already triggers error_report()/exit() below.  I
-suggest reordering the checks:
+I reported that in https://bugs.launchpad.net/qemu/+bug/1787070
 
-    if (sockets * cores * threads > max_cpus) {
-        error_report(...);
-        exit(1);
-    }
-    if (sockets * cores * threads != max_cpus) {
-        warn_report(...)
-    }
+I'll change the tag to verification-done-bionic, as this particular
+issue was corrected. The other issue still exists in QEMU upstream.
 
+** Tags removed: verification-needed-bionic
+** Tags added: verification-done-bionic
 
->          if (sockets * cores * threads > max_cpus) {
->              error_report("cpu topology: "
->                           "sockets (%u) * cores (%u) * threads (%u) > "
-> -- 
-> 2.7.4
-> 
+-- =
 
--- 
-Eduardo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755912
+
+Title:
+  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Bionic:
+  Fix Committed
+
+Bug description:
+  [Impact]
+
+   * There are conditions where the vga/qxl driver can crash the qemu =
+
+     process.
+
+   * It is like a very complex case of a non initialized var - without the =
+
+     fix it might try to ask for updates without having a valid primary =
+
+     surface.
+
+   * Backport from upstream
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D5bd5c27c7d284d01477c5cc=
+022ce22438c46bf9f
+  to avoid the crash
+
+  =
+
+  [Test Case]
+
+   * Sometimes booting xubuntu was reported to be enough, at other times
+  it was needed to change resolution a few times to trigger.
+
+    # get xubuntu iso (actually other UI Isos should do as well)
+    $ qemu-system-x86_64 -vga qxl -enable-kvm -cpu host -smp cores=3D2,thre=
+ads=3D2 -m 2048 -cdrom xubuntu-18.04-desktop-amd64.iso
+    # If it boots successfully, change resolution until it crashes.
+    $ while true ; do xrandr --output Virtual-0 --mode 640x480 ; sleep 1 ; =
+xrandr --output Virtual-0 --mode 1280x720 ; sleep 1 ; xrandr --output Virtu=
+al-0 --mode 1920x1080 ; sleep 1 ; done
+
+   * Without the fix that will trigger the qemu crash
+
+  [Regression Potential]
+
+   * The change "just" adds QXL_MODE_UNDEFINED as one more trigger to leave =
+
+     the rendering update. That sounds rather safe. But thinking hard on =
+
+     potential updates I could think of theoretical setups that were  in =
+
+     undefined mode all the time (unlikely or impossible I think) that now =
+
+     would get no updates anymore. Well I really don't think this is an =
+
+     issue, but since this section should be open thinking on "potential" =
+
+     regressions that is what comes to my mind.
+
+  [Other Info]
+   =
+
+   * Thanks to Leonardo for most of the bisecting and discussion work!
+
+  =
+
+  ---
+
+  =
+
+  When using qemu-system-x86_64 with the option -vga qxl, it crashes. The e=
+asiest way to crash it is by trying to change the guest's resolution. Howev=
+er, the system may randomly crash too, not happening only when changing res=
+olution. Here is the terminal output of one of these random crashes:
+
+  --------
+
+  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
+ -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
+tdev=3Dhostnet0
+  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
+d raw.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Automatically detec=
+ting the format is dangerous for raw images, write operations on block 0 wi=
+ll be restricted.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Specify the 'raw' f=
+ormat explicitly to remove the restrictions.
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2431:display_channel_validate_surface: canvas address is
+  0x7f8eb948ab18 for 0 (and is NULL)
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2432:display_channel_validate_surface: failed on 0
+
+  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
+display_channel_update: condition `display_channel_validate_surface(display=
+, surface_id)' failed
+  Abortado (imagem do n=C3=BAcleo gravada)
+
+  --------
+
+  I was running QEMU as a normal user which is on the groups kvm and
+  disk. Initially I supposed the problem was because I was running QEMU
+  as root, but as a normal user this happens too.
+
+  I have tested with guests with different Ubuntu version: 18.04, 17.10
+  and 16.04. It is happening with them all.
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
+  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
+  Uname: Linux 4.15.0-10-generic x86_64
+  ApportVersion: 2.20.8-0ubuntu10
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Wed Mar 14 17:13:52 2018
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  InstallationDate: Installed on 2017-06-13 (273 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: LENOVO 80UG
+  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
+e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
+tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
+d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
+  Signal: 6
+  SourcePackage: qemu
+  StacktraceTop:
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  Title: qemu-system-x86_64 crashed with SIGABRT
+  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
+  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
+ev plugdev sambashare sudo
+  dmi.bios.date: 07/10/2017
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN43WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
