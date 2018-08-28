@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fuV3b-0005As-US
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 23:52:45 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fuVPg-0005o0-Am
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:15:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fuV3Y-0006My-E5
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 23:52:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57784 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fuV3Y-0006Mi-7s
-	for qemu-devel@nongnu.org; Mon, 27 Aug 2018 23:52:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8B81940241EE
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 03:52:39 +0000 (UTC)
-Date: Tue, 28 Aug 2018 11:52:32 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180828035232.GD4446@xz-x1>
-References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
-	<20180827222322.26009-7-marcandre.lureau@redhat.com>
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fuVMl-0006dO-1M
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:12:31 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:42936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
+	id 1fuVMk-0006dA-Pl
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 00:12:30 -0400
+Received: by mail-lf1-x142.google.com with SMTP id z11-v6so182225lff.9
+	for <qemu-devel@nongnu.org>; Mon, 27 Aug 2018 21:12:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180827222322.26009-7-marcandre.lureau@redhat.com>
+References: <1533793434-7614-1-git-send-email-whois.zihan.yang@gmail.com>
+	<ece2a3ff-678d-00b6-3fd6-660972c5beca@gmail.com>
+	<20180827070406.t525gr43qpu7wpsj@sirius.home.kraxel.org>
+In-Reply-To: <20180827070406.t525gr43qpu7wpsj@sirius.home.kraxel.org>
+From: Zihan Yang <whois.zihan.yang@gmail.com>
+Date: Tue, 28 Aug 2018 04:12:17 +0000
+Message-ID: <CAKwiv-gyGoqEpmpicxo_a3cQBsb0-XoT9cqkJu5WOtkUtAx0eQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/9] terminal3270: do not use backend timer
- sources
+Subject: Re: [Qemu-devel] [SeaBIOS] [RFC v2 0/3] Support multiple pci
+ domains in pci_device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,91 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, berrange@redhat.com, armbru@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On Tue, Aug 28, 2018 at 12:23:19AM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> terminal3270 is uses the front-end side of the chardev. It shouldn't
-> create sources from backend side context. Fwiw, send_timing_mark_cb
-> calls qemu_chr_fe_write_all() which should be thread safe.
->=20
-> This partially reverts changes from commit
-> 2c716ba1506769c9be2caa02f0f6d6e7c00f4304.
+Gerd Hoffmann <kraxel@redhat.com> =E4=BA=8E2018=E5=B9=B48=E6=9C=8827=E6=97=
+=A5=E5=91=A8=E4=B8=80 =E4=B8=8A=E5=8D=887:04=E5=86=99=E9=81=93=EF=BC=9A
+>
+>   Hi,
+>
+> > >   However, QEMU only binds port 0xcf8 and 0xcfc to
+> > > bus pcie.0. To avoid bus confliction, we should use other port pairs =
+for
+> > > busses under new domains.
+> >
+> > I would skip support for IO based configuration and use only MMCONFIG
+> > for extra root buses.
+> >
+> > The question remains: how do we assign MMCONFIG space for
+> > each PCI domain.
+>
+> Allocation-wise it would be easiest to place them above 4G.  Right after
+> memory, or after etc/reserved-memory-end (if that fw_cfg file is
+> present), where the 64bit pci bars would have been placed.  Move the pci
+> bars up in address space to make room.
+>
+> Only problem is that seabios wouldn't be able to access mmconfig then.
+>
+> Placing them below 4G would work at least for a few pci domains.  q35
+> mmconfig bar is placed at 0xb0000000 -> 0xbfffffff, basically for
+> historical reasons.  Old qemu versions had 2.75G low memory on q35 (up
+> to 0xafffffff), and I think old machine types still have that for live
+> migration compatibility reasons.  Modern qemu uses 2G only, to make
+> gigabyte alignment work.
+>
+> 32bit pci bars are placed above 0xc0000000.  The address space from 2G
+> to 2.75G (0x8000000 -> 0xafffffff) is unused on new machine types.
+> Enough room for three additional mmconfig bars (full size), so four
+> pci domains total if you add the q35 one.
 
-I don't fully understand too on why "It shouldn't create sources from
-backend side context".  Could you explain a bit?
+Maybe we can support 4 domains first before we come up
+with a better solution. But I'm not sure if four domains are
+enough for those who want too many devices?
 
-If you don't want the backend gcontext to be exposed to the frontend,
-IMHO the simplest thing is just to use the NULL gcontext in
-qemu_chr_timeout_add_ms() which is a one-liner change. I don't see
-much point on re-using the GSource tags since IMHO GSource pointer is
-always superior to the old tag system.
-
->=20
-> CC: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/char/terminal3270.c | 15 ++++++---------
->  1 file changed, 6 insertions(+), 9 deletions(-)
->=20
-> diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
-> index e9c45e55b1..35b079d5c4 100644
-> --- a/hw/char/terminal3270.c
-> +++ b/hw/char/terminal3270.c
-> @@ -31,7 +31,7 @@ typedef struct Terminal3270 {
->      uint8_t outv[OUTPUT_BUFFER_SIZE];
->      int in_len;
->      bool handshake_done;
-> -    GSource *timer_src;
-> +    guint timer_tag;
->  } Terminal3270;
-> =20
->  #define TYPE_TERMINAL_3270 "x-terminal3270"
-> @@ -47,10 +47,9 @@ static int terminal_can_read(void *opaque)
-> =20
->  static void terminal_timer_cancel(Terminal3270 *t)
->  {
-> -    if (t->timer_src) {
-> -        g_source_destroy(t->timer_src);
-> -        g_source_unref(t->timer_src);
-> -        t->timer_src =3D NULL;
-> +    if (t->timer_tag) {
-> +        g_source_remove(t->timer_tag);
-> +        t->timer_tag =3D 0;
->      }
->  }
-> =20
-> @@ -100,8 +99,7 @@ static void terminal_read(void *opaque, const uint8_=
-t *buf, int size)
->      assert(size <=3D (INPUT_BUFFER_SIZE - t->in_len));
-> =20
->      terminal_timer_cancel(t);
-> -    t->timer_src =3D qemu_chr_timeout_add_ms(t->chr.chr, 600 * 1000,
-> -                                           send_timing_mark_cb, t);
-> +    t->timer_tag =3D g_timeout_add_seconds(600, send_timing_mark_cb, t=
-);
->      memcpy(&t->inv[t->in_len], buf, size);
->      t->in_len +=3D size;
->      if (t->in_len < 2) {
-> @@ -160,8 +158,7 @@ static void chr_event(void *opaque, int event)
->           * char-socket.c. Once qemu receives the terminal-type of the
->           * client, mark handshake done and trigger everything rolling =
-again.
->           */
-> -        t->timer_src =3D qemu_chr_timeout_add_ms(t->chr.chr, 600 * 100=
-0,
-> -                                               send_timing_mark_cb, t)=
-;
-> +        t->timer_tag =3D g_timeout_add_seconds(600, send_timing_mark_c=
-b, t);
->          break;
->      case CHR_EVENT_CLOSED:
->          sch->curr_status.scsw.dstat =3D SCSW_DSTAT_DEVICE_END;
-> --=20
-> 2.18.0.547.g1d89318c48
->=20
-
-Regards,
-
---=20
-Peter Xu
+> cheers,
+>   Gerd
+>
