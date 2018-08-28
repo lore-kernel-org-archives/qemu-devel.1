@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fueu2-00026w-PX
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:23:31 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1fuex8-0002vM-Tj
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fuetz-0004uv-GC
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:23:30 -0400
-Received: from mail-co1nam05on072b.outbound.protection.outlook.com
-	([2a01:111:f400:fe50::72b]:55912
-	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fuety-0004r5-VE
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:23:27 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Tue, 28 Aug 2018 14:23:04 +0000
-Message-ID: <BN7PR08MB4868B0E06C13DE35AA4327DBC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <20180828130041.26445-1-jancraig@amazon.com>,
-	<20180828130041.26445-5-jancraig@amazon.com>
-In-Reply-To: <20180828130041.26445-5-jancraig@amazon.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <pkrempa@redhat.com>) id 1fuex3-0007Ka-0y
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 10:26:42 -0400
+Date: Tue, 28 Aug 2018 16:26:26 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20180828142626.GM122225@angien.pipo.sk>
+References: <20180810162658.6562-1-kwolf@redhat.com>
+	<20180810162658.6562-2-kwolf@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] target/mips: Add MXU instruction
- S8LDD
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eWmFpGZayiNrn4FL"
+Content-Disposition: inline
+In-Reply-To: <20180810162658.6562-2-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] commit: Add top-node/base-node options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,137 +24,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-> From: Craig Janeczek <jancraig@amazon.com>
-> Sent: Tuesday, August 28, 2018 3:00 PM
-> To: qemu-devel@nongnu.org
-> Cc: Aleksandar Markovic; aurelien@aurel32.net; Craig Janeczek
-> Subject: [PATCH v3 4/8] target/mips: Add MXU instruction S8LDD
+
+--eWmFpGZayiNrn4FL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Aug 10, 2018 at 18:26:57 +0200, Kevin Wolf wrote:
+> The block-commit QMP command required specifying the top and base nodes
+> of the commit jobs using the file name of that node. While this works
+> in simple cases (local files with absolute paths), the file names
+> generated for more complicated setups can be hard to predict.
 >=20
-> Adds support for emulating the S8LDD MXU instruction.
+> This adds two new options top-node and base-node to the command, which
+> allow specifying node names instead. They are mutually exclusive with
+> the old options.
 >=20
-> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  v1
->     - initial patch
->  v2
->     - changed bitfield usage to extract32
->     - used deposit_tl instructions instead of shift and bitmask
->  v3
->     - Split gen_mxu function into command specific gen_mxu_<ins> function=
-s
->=20
->  target/mips/translate.c | 69 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 69 insertions(+)
->=20
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index f6991aa8ef..024e48baf6 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -3851,6 +3851,71 @@ static void gen_mxu_s32m2i(DisasContext *ctx, uint=
-32_t opc)
->      tcg_temp_free(t0);
->  }
->=20
-> +/* S8LDD XRa, rb, S8, OPTN3 - Load a byte from memory to XRF */
-> +static void gen_mxu_s8ldd(DisasContext *ctx, uint32_t opc)
-> +{
-> +    TCGv t0, t1;
-> +    uint32_t xra, s8, optn3, rb;
-> +
-> +    t0 =3D tcg_temp_new();
-> +    t1 =3D tcg_temp_new();
-> +
-> +    xra =3D extract32(ctx->opcode, 6, 4);
-> +    s8 =3D extract32(ctx->opcode, 10, 8);
-> +    optn3 =3D extract32(ctx->opcode, 18, 3);
-> +    rb =3D extract32(ctx->opcode, 21, 5);
-> +
-> +    gen_load_gpr(t0, rb);
-> +    tcg_gen_addi_tl(t0, t0, (int8_t)s8);
-> +    switch (optn3) {
-> +    case 0: /*XRa[7:0] =3D tmp8 */
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        gen_load_mxu_gpr(t0, xra);
-> +        tcg_gen_deposit_tl(t0, t0, t1, 0, 8);
-> +        break;
-> +    case 1: /* XRa[15:8] =3D tmp8 */
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        gen_load_mxu_gpr(t0, xra);
-> +        tcg_gen_deposit_tl(t0, t0, t1, 8, 8);
-> +        break;
-> +    case 2: /* XRa[23:16] =3D tmp8 */
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        gen_load_mxu_gpr(t0, xra);
-> +        tcg_gen_deposit_tl(t0, t0, t1, 16, 8);
-> +        break;
-> +    case 3: /* XRa[31:24] =3D tmp8 */
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        gen_load_mxu_gpr(t0, xra);
-> +        tcg_gen_deposit_tl(t0, t0, t1, 24, 8);
-> +        break;
-> +    case 4: /* XRa =3D {8'b0, tmp8, 8'b0, tmp8} */
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-> +        break;
-> +    case 5: /* XRa =3D {tmp8, 8'b0, tmp8, 8'b0} */
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        tcg_gen_shli_tl(t1, t1, 8);
-> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-> +        break;
-> +    case 6: /* XRa =3D {{8{sign of tmp8}}, tmp8, {8{sign of tmp8}}, tmp8=
-} */
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_SB);
-> +        tcg_gen_mov_tl(t0, t1);
-> +        tcg_gen_andi_tl(t0, t0, 0xFF00FFFF);
-> +        tcg_gen_shli_tl(t1, t1, 16);
-> +        tcg_gen_or_tl(t0, t0, t1);
-> +        break;
-> +    case 7: /* XRa =3D {tmp8, tmp8, tmp8, tmp8} */
-> +        tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
-> +        tcg_gen_deposit_tl(t1, t1, t1, 8, 8);
-> +        tcg_gen_deposit_tl(t0, t1, t1, 16, 16);
-> +        break;
-> +    }
+>  qapi/block-core.json | 24 ++++++++++++++++++------
+>  blockdev.c           | 32 ++++++++++++++++++++++++++++++--
+>  2 files changed, 48 insertions(+), 8 deletions(-)
 
-Similar to the situation in patch 6, the following is missing:
+While the below is not strictly relevant to this patch usage
+block-commit is not possible when using -blockdev. Thus the new
+arguments are not very useful otherwise.
 
-/* MXU operand getting patterns OPTN3 */
-#define MXU_OPTN3_PTN0  0
-#define MXU_OPTN3_PTN1  1
-#define MXU_OPTN3_PTN2  2
-#define MXU_OPTN3_PTN3  3
-#define MXU_OPTN3_PTN4  4
-#define MXU_OPTN3_PTN5  5
-#define MXU_OPTN3_PTN6  6
-#define MXU_OPTN3_PTN7  7
+With the new options I'm getting:
 
-> +    gen_store_mxu_gpr(t0, xra);
-> +
-> +    tcg_temp_free(t0);
-> +    tcg_temp_free(t1);
-> +}
-> +
->  /* Godson integer instructions */
->  static void gen_loongson_integer(DisasContext *ctx, uint32_t opc,
->                                   int rd, int rs, int rt)
-> @@ -17956,6 +18021,10 @@ static void decode_opc_special2_legacy(CPUMIPSSt=
-ate *env, DisasContext *ctx)
->          gen_mxu_s32m2i(ctx, op1);
->          break;
->=20
-> +    case OPC_MXU_S8LDD:
-> +        gen_mxu_s8ldd(ctx, op1);
-> +        break;
-> +
->      case OPC_CLO:
->      case OPC_CLZ:
->          check_insn(ctx, ISA_MIPS32);
-> --
-> 2.18.0
->=20
+{"execute":"block-commit",
+ "arguments": { "device":"libvirt-3-format",
+                "job-id":"libvirt-3-format",
+                "top-node":"libvirt-8-format",
+                "base-node":"libvirt-9-format",
+                "auto-finalize":true,
+                "auto-dismiss":false},
+ "id":"libvirt-16"}
 
-Thanks,
-Aleksandar=
+{"id":"libvirt-16",
+ "error":{"class":"GenericError",
+          "desc":"Block node is read-only"}}
+
+I'm pointing into the backing chain so the files are declared as read-only.
+
+It works just-fine if I open them as read-write with
+-blockdev/blockdev-add but that obviously is not correct as you can't
+then share parts of the backing chain with other VMs due to image
+locking.
+
+libvirt-3-format is read-write and all other node names are readonly in
+the above example.
+
+The same also happens when using filenames:
+
+{"execute":"block-commit",
+ "arguments" : {"device":"libvirt-3-format",
+                "job-id":"libvirt-3-format",
+                "top":"/var/lib/libvirt/images/rhel7.3.1483615252",
+                "base":"/var/lib/libvirt/images/rhel7.3.1483605924",
+                "auto-finalize":true,
+                "auto-dismiss":false},
+ "id":"libvirt-13"}
+
+{"id":"libvirt-13","error":{"class":"GenericError","desc":"Block node is re=
+ad-only"}}
+
+
+When I use the drive alias rather than the node-name for the 'device'
+argument it works as expected.
+
+{"execute":"block-commit",
+ "arguments": { "device":"drive-virtio-disk0",
+                "job-id":"drive-virtio-disk0",
+                "top":"/var/lib/libvirt/images/rhel7.3.1483536402",
+                "base":"/var/lib/libvirt/images/rhel7.3.1483545313"},
+ "id":"libvirt-18"}
+
+
+I was not able to find anything which would allow to reopen the file R/W
+in case of the block-commit operation, but I suspect it should be done
+automatically as previously it was done that way prior to -blockdev.
+
+Peter
+
+--eWmFpGZayiNrn4FL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAluFW48ACgkQHGwCByjY
+1GougQ/6A4jFDsp60GLDGVHihjot8tB2z4MrnqGbIA3ebQ6XnRFqdX8DR72Tli8v
+iUAwEg2PiPNX1P4ToeBxXwB5cTTWnmwzU+J+8oDF2qJy6E7SwLA/U6Z9LsD/32ds
+yudMrYM/RJYICeBkEObFcblH+RaghJLsTWdjReyAAurepF1bk1Xhyc9OyM0YL5/7
+Z/zMPwhhWBpI5Yoq59viTIIXTKtoZGW8VaKy7PrY9nNXZZcif12ZmvEkR4W0t84m
+hq+0hR5w9oQInDULPoRwVVxXRVAnE/PdLy90QPOClDuzHUpvnwGWWi3LRdpkAkQS
+nFeB1OzkDQ2Zh7Ylc0txapJ9w+rAORECc6yvHC4/ZTOqIIuJn2NEGJy3iPAJ7Rqw
+7CSxaPKJBX8IYL2C+pJGWS/fVfTk4mcPW8uTmJ16J4KHQpT13k6IUdXoSGVLjf6k
+hsDQ7CpjVeERjakPRWB/PtgDYxEVSss3XmvlWQ5oARmgUzrMpE7Awqb6/Yy+GacA
+wxM1nPj/RWiljJDbfkArZWDeFzhvXjqZJJaPRczWh3YESmCNj509i5iexFJ/c9jh
+Ln1+JHyrGyvz+55yVhuQTEfjyhRK2MYuOnMjsErZl+yqQVPniaotDg8o4KHl7rP0
+sYQ3/ll8/eZMxBiHCMdqxZkFIKQUWFH3DmRDGD15bk7yI2IVd8E=
+=Q/vN
+-----END PGP SIGNATURE-----
+
+--eWmFpGZayiNrn4FL--
