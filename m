@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1fue6m-0008JS-Rz
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:32:37 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fufbU-0007ZH-KE
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgfbeta@me.com>) id 1fue6j-0003FV-LJ
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 09:32:36 -0400
-From: Chen Zhang <tgfbeta@me.com>
-Content-type: text/plain; charset=us-ascii
-Content-transfer-encoding: quoted-printable
-MIME-version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Message-id: <23DA939E-B500-4ABE-A484-1FE1CB43B48A@me.com>
-Date: Tue, 28 Aug 2018 21:32:18 +0800
-Subject: [Qemu-devel] [PATCH] Add support for TCP path/QMP_PATH in
- scripts/qmp/qmp
+	(envelope-from <amarkovic@wavecomp.com>) id 1fufaW-0001x5-Vd
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:07:30 -0400
+Received: from mail-by2nam05on071c.outbound.protection.outlook.com
+	([2a01:111:f400:fe52::71c]:7995
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fufaW-0001v0-GQ
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 11:07:24 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 28 Aug 2018 15:07:05 +0000
+Message-ID: <BN7PR08MB48680621D40A0A8800E9AEF6C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <20180828130041.26445-1-jancraig@amazon.com>,
+	<20180828130041.26445-3-jancraig@amazon.com>
+In-Reply-To: <20180828130041.26445-3-jancraig@amazon.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] target/mips: Add all MXU opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,55 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, ehabkost@redhat.com
+To: Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-=46rom a1f93198020b8c043edab5292db39b52ac77f78b Mon Sep 17 00:00:00 2001
+> From: Craig Janeczek <jancraig@amazon.com>
+> Sent: Tuesday, August 28, 2018 3:00 PM
+> To: qemu-devel@nongnu.org
+> Cc: Aleksandar Markovic; aurelien@aurel32.net; Craig Janeczek
+> Subject: [PATCH v3 2/8] target/mips: Add all MXU opcodes
+>=20
+> Adds all MXU opcodes to the opcode enum. The MXU opcodes overlap with
+> existing misc and Loongson 2F copcodes. The enums were updated to
+> reflect the multiple possible meanings where applicable.
+>=20
+> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 
-Signed-off-by: Zhang Chen <tgfbeta@me.com>
----
- scripts/qmp/qmp | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+It is good that all codes are covered, but this situation with overlap is u=
+nnatural.
 
-diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
-index 6cb46fd..0e8ed19 100755
---- a/scripts/qmp/qmp
-+++ b/scripts/qmp/qmp
-@@ -63,6 +63,16 @@ def main(args):
-     if not path:
-         print("QMP path isn't set, use --path=3Dqmp-monitor-address or =
-set QMP_PATH")
-         return 1
-+    tcp_addr =3D path.split(':')
-+    if len(tcp_addr) =3D=3D 2:
-+        try:
-+            port =3D int(tcp_addr[1])
-+        except ValueError:
-+            print("QMP path contains a non-numeric TCP port")
-+            return 1
-+        addr =3D ( tcp_addr[0], port )
-+    else:
-+        addr =3D path
-=20
-     if len(args):
-         command, args =3D args[0], args[1:]
-@@ -74,7 +84,7 @@ def main(args):
-     if command in ['help']:
-         os.execlp('man', 'man', 'qmp')
-=20
--    srv =3D QEMUMonitorProtocol(path)
-+    srv =3D QEMUMonitorProtocol(addr)
-     srv.connect()
-=20
-     def do_command(srv, cmd, **kwds):
-@@ -99,7 +109,7 @@ def main(args):
-             raise
-         return 0
-=20
--    srv =3D QEMUMonitorProtocol(path)
-+    srv =3D QEMUMonitorProtocol(addr)
-     srv.connect()
-=20
-     arguments =3D {}
---=20
-2.7.4
+Try creating a separate enum for MXU opcodes, and rearranging switch statem=
+ent, taking into account what instructions set is supported by the CPU in q=
+uestion.=
