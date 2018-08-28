@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fujXu-0006uO-Ke
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:21:01 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fujlj-0002cO-4J
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fujIq-0001hc-5X
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:05:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55436 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fujIn-0001bh-Hn
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:05:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A338807A13D
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 19:05:20 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180815133747.25032-1-peterx@redhat.com>
-Date: Tue, 28 Aug 2018 21:05:15 +0200
-In-Reply-To: <20180815133747.25032-1-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 15 Aug 2018 21:37:34 +0800")
-Message-ID: <87a7p6l3bo.fsf@dusky.pond.sub.org>
+	(envelope-from <amarkovic@wavecomp.com>) id 1fujlb-0001wn-KX
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:35:11 -0400
+Received: from mail-by2nam03on0134.outbound.protection.outlook.com
+	([104.47.42.134]:6316
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fujlZ-0001sE-UK
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 15:35:07 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 28 Aug 2018 19:35:00 +0000
+Message-ID: <BN7PR08MB4868B3C34EB2307D4EAE9722C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <20180828130041.26445-1-jancraig@amazon.com>,
+	<20180828130041.26445-3-jancraig@amazon.com>
+	<BN7PR08MB48680621D40A0A8800E9AEF6C60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<b9eab9396a6e4270b9e536a4fe84a54d@EX13D12UEA003.ant.amazon.com>
+	<BN7PR08MB4868B217B1104A75673CE58EC60A0@BN7PR08MB4868.namprd08.prod.outlook.com>,
+	<a89f839cb02647ae865382f060bc29f0@EX13D12UEA003.ant.amazon.com>
+In-Reply-To: <a89f839cb02647ae865382f060bc29f0@EX13D12UEA003.ant.amazon.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 00/13] monitor: enable OOB by default
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] target/mips: Add all MXU opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "Janeczek, Craig" <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-Peter Xu <peterx@redhat.com> writes:
+> From: Janeczek, Craig <jancraig@amazon.com>
+> Sent: Tuesday, August 28, 2018 8:54 PM
+>
+> Subject: RE: [PATCH v3 2/8] target/mips: Add all MXU opcodes
+>
+> I will re-work each of the mxu_gen_<ins> functions to check for MXUEN and=
+ jump over the implementation of the instruction if not enabled.
+>=20
+> I would like to clarify the structure of the switch statement before impl=
+ementing it.
+>
+> I was originally planning on checking if there was a MXU hit and MXUEN wa=
+s set, in that case use the MXU instruction, else use the original switch. =
+This will not work as MXUEN is in a TCGv and cant be used in an if statemen=
+t at that level. That is why I plan on putting the MXUEN check in each of t=
+he mxu_gen_<ins> functions.
+>=20
+> What should the re-worked switch statement look like which runs the mxu_g=
+en_<ins> functions?
 
-> Hi, Markus, Marc-Andre,
->
-> I didn't follow up the latest discussions on the response queue or
-> monitor changes.  For now this series still makes sense to me, so I'm
-> just rebasing the series to master and repost (with some additional
-> changes/patches to address Markus's concerns). Please let me know if
-> you have made any conclusion that I'm not aware of, or if this work
-> needs any further rebasing.
->
-> v6 (previous version of the series might be incorrect; from this
-> version, I continued to use the old version counts):
-> - collect r-bs
-> - use Markus's version of build_params() [Markus]
-> - use \' instead of \" in Python codes [Markus]
-> - in qapi_event_send_*() still pass in &error_abort instead of NULL
->   [Markus]
-> - remove COMMAND_DROPPED from document too
-> - add missing pieces for test-qmp-cmds [Markus]
-> - add one patch to remove as much different code path for oob as
->   possible [Markus]
->
-> TODO:
-> - flow control test is still missing; I still didn't consider it much,
->   also we possibly need to touch up monitor_puts() to use limited
->   sized buffer to complete the flow control of QMP channel
->
-> Please review.  Thanks,
+I didn't study these code segments in depth, but at this moment it seems to=
+ me that the cleanest organization would be to leave current decode_opc_spe=
+cial2_legacy(env, ctx); as is, and, however, to change the part with its in=
+vocation:
 
-PATCH 01-03 queued.  Thanks!
+    case OPC_SPECIAL2:
+        decode_opc_special2_legacy(env, ctx);
+        break;
+to
+
+    case OPC_SPECIAL2:
+        if (<MXU is present>) {
+                decode_opc_special2_mxu(env, ctx);
+        } else if (<LOONGSON_2F>) {
+                decode_opc_special2_legacy(env, ctx);
+        }
+        break;
+
+where decode_opc_special2_mxu(env, ctx); is the function that you will writ=
+e.
+
+Or something along these lines...
+
+But I may be mistaken regrding details...
+
+Again, overall, this series is very good. We are arguing about some technic=
+al details, out of which many are, frankly, unimportant. I just want to tel=
+l you that don't misunderstand my and Richard's critiques - we want this co=
+de in QEMU, just want it to be nice, clean, and correct, and we definitely =
+appreciate your work very much!=
