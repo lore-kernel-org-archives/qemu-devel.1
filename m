@@ -1,40 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fub6b-0000rE-VH
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:20:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1fub7L-0001KG-Lb
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fub6W-0001KK-FB
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:20:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38478 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fub7I-0002Mu-EL
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:20:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38002 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fub6W-0001K7-AU
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:20:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D700C40241EA
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 10:20:07 +0000 (UTC)
-Date: Tue, 28 Aug 2018 12:20:02 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180828102002.wri67kcvzkta7et3@sirius.home.kraxel.org>
-References: <20180822095421.11765-1-quintela@redhat.com>
-	<20180822095421.11765-8-quintela@redhat.com>
-	<0d3a215b-4916-b0a6-5654-5d64fcf6c996@redhat.com>
-	<87y3cyo4ax.fsf@trasno.org>
-	<20180823074321.wx7wix7jwsfrcbk5@sirius.home.kraxel.org>
-	<9cb5f027-e49c-d943-7ffa-9e744537f174@redhat.com>
-	<20180823094850.zycuwtjndmztgcm4@sirius.home.kraxel.org>
-	<20180823095359.GH23703@redhat.com>
-	<20180827105321.5qeclqhsopqtutjv@sirius.home.kraxel.org>
-	<20180828081920.GA25114@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fub7I-0002MJ-8G
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 06:20:56 -0400
+Date: Tue, 28 Aug 2018 18:20:51 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180828102051.GF4446@xz-x1>
+References: <20180827222322.26009-1-marcandre.lureau@redhat.com>
+	<20180827222322.26009-7-marcandre.lureau@redhat.com>
+	<20180828035232.GD4446@xz-x1>
+	<CAJ+F1C+fe4QGZmvtw76SQH=pqu6Nwure+CVPXBT_deHKgE5n0Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180828081920.GA25114@redhat.com>
+In-Reply-To: <CAJ+F1C+fe4QGZmvtw76SQH=pqu6Nwure+CVPXBT_deHKgE5n0Q@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 07/10] check: Only test boot-serial when
- sga is compiled in
+Subject: Re: [Qemu-devel] [PATCH 6/9] terminal3270: do not use backend timer
+ sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,40 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, lvivier@redhat.com, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Aug 28, 2018 at 09:19:20AM +0100, Daniel P. Berrang=E9 wrote:
-> On Mon, Aug 27, 2018 at 12:53:21PM +0200, Gerd Hoffmann wrote:
-> >   Hi,
-> >=20
-> > > The only way we can stop using "-device sga" is if we either have
-> > > something explicit in the XML saying whether to use it or not, or
-> > > alternatively have some indicator associated with the next versione=
-d
-> > > machine type that we can hook off.
-> >=20
-> > How does libvirt query the machine type properties?
+On Tue, Aug 28, 2018 at 11:09:28AM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
 >=20
-> libvirt is able to query properties against i440FX-pcihost and
-> q35-pcihost devices - currently we only look for one prop:
+> On Tue, Aug 28, 2018 at 5:52 AM Peter Xu <peterx@redhat.com> wrote:
+> >
+> > On Tue, Aug 28, 2018 at 12:23:19AM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > terminal3270 is uses the front-end side of the chardev. It shouldn'=
+t
+> > > create sources from backend side context. Fwiw, send_timing_mark_cb
+> > > calls qemu_chr_fe_write_all() which should be thread safe.
+> > >
+> > > This partially reverts changes from commit
+> > > 2c716ba1506769c9be2caa02f0f6d6e7c00f4304.
+> >
+> > I don't fully understand too on why "It shouldn't create sources from
+> > backend side context".  Could you explain a bit?
 >=20
-> static struct virQEMUCapsStringFlags virQEMUCapsDevicePropsI440FXPCIHos=
-t[] =3D {
->     { "pci-hole64-size", QEMU_CAPS_I440FX_PCI_HOLE64_SIZE },
-> };
+> A frontend shouldn't use a backend function, and doesn't have to use
+> the backend gmaincontext.
 >=20
-> static struct virQEMUCapsStringFlags virQEMUCapsDevicePropsQ35PCIHost[]=
- =3D {
->     { "pci-hole64-size", QEMU_CAPS_Q35_PCI_HOLE64_SIZE },
-> };
+> >
+> > If you don't want the backend gcontext to be exposed to the frontend,
+> > IMHO the simplest thing is just to use the NULL gcontext in
+> > qemu_chr_timeout_add_ms() which is a one-liner change. I don't see
+> > much point on re-using the GSource tags since IMHO GSource pointer is
+> > always superior to the old tag system.
 >=20
-> Not sure if that's the kind of thing you're looking for ?
+> Using the tag or the GSource * doesn't change much afaik.
 
-Looking for way for libvirt to figure whenever a specific machine type
-has sga deprecated or not.  So, if libvirt can query device properties,
-can we just add a "deprecated" property to sga and flip that to true for
-3.1+ machine types?
+I did some convertions in the past year to convert tag -> GSource and
+that shows some differences when we want non-default gcontexts...
+Otherwise I won't bother. :)
 
-cheers,
-  Gerd
+> Not only
+> this is not a hot path, but glib gmain code does create the tag on
+> attach anyway. You may be marginally faster on remove/detach by
+> avoiding one lookup.
+>=20
+> (btw, I think both tag and GSource* are as old)
+
+I am not strong on this, but my rule is that if I don't have explicit
+reason to change a code I keep it there.  Here I don't see an obvious
+reason to switch back to the tag things (not to mention that I still
+think GSource is better, always).
+
+Thanks,
+
+--=20
+Peter Xu
