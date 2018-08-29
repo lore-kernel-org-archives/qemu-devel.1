@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fv3Xt-0006jt-5v
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 12:42:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fv3Yj-0008Q1-TX
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 12:43:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amarkovic@wavecomp.com>) id 1fv3Xp-00008P-6U
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 12:42:17 -0400
-Received: from mail-dm3nam03on0118.outbound.protection.outlook.com
-	([104.47.41.118]:45133
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
-	id 1fv3Xo-0008SV-Sj
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 12:42:13 -0400
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-Date: Wed, 29 Aug 2018 16:42:08 +0000
-Message-ID: <BN7PR08MB48687A4E92C78D63F13E05A9C6090@BN7PR08MB4868.namprd08.prod.outlook.com>
-References: <20180828130041.26445-1-jancraig@amazon.com>
-In-Reply-To: <20180828130041.26445-1-jancraig@amazon.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <ehabkost@redhat.com>) id 1fv3Yf-00016u-Vm
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 12:43:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50062)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fv3Yf-00016P-O7
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 12:43:05 -0400
+Date: Wed, 29 Aug 2018 13:43:00 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180829164300.GL5675@localhost.localdomain>
+References: <1535199590-68475-1-git-send-email-peng.hao2@zte.com.cn>
+	<1535199590-68475-3-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] Add limited MXU instruction support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1535199590-68475-3-git-send-email-peng.hao2@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V4 2/4]  target-i386:add coalesced_pio API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,21 +27,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Dinu Radian <dradian@wavecomp.com>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-> From: Craig Janeczek <jancraig@amazon.com>
-> Sent: Tuesday, August 28, 2018 3:00 PM
->
-> Subject: [PATCH v3 0/8] Add limited MXU instruction support
->
-> This patch set begins to add MXU instruction support for mips emulation.
+On Sat, Aug 25, 2018 at 08:19:48PM +0800, Peng Hao wrote:
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
 
-Craig,
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-May I ask you what is the exact platform (CPU/board) that you are targeting=
- with this series? Do we need perhaps to add/modify something in translate_=
-init.inc.c? I am very curious.
-
-Thanks,
-Aleksandar=
+-- 
+Eduardo
