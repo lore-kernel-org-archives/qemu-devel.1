@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fv1pZ-0005Fq-Ca
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:52:26 -0400
+	(envelope-from <berto@igalia.com>) id 1fv1tT-0000CK-79
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:56:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fv1pW-0003oj-6v
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:52:25 -0400
+	(envelope-from <berto@igalia.com>) id 1fv1tO-0006zn-Aa
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:56:27 -0400
 From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <26c1da0d-5076-0fd3-e761-4c0d61e4856e@redhat.com>
+In-Reply-To: <c147ca8a-da5e-bb8d-86ab-b9c34acddcf3@redhat.com>
 References: <cover.1535291602.git.berto@igalia.com>
-	<054195c8f83f524ee1f4d117407ac507dd18b0d8.1535291602.git.berto@igalia.com>
-	<af713c19-bc70-c581-aa9c-58aa08ab5e55@redhat.com>
-	<w51tvnd2xt6.fsf@maestria.local.igalia.com>
-	<26c1da0d-5076-0fd3-e761-4c0d61e4856e@redhat.com>
-Date: Wed, 29 Aug 2018 16:52:18 +0200
-Message-ID: <w51lg8p2pjx.fsf@maestria.local.igalia.com>
+	<d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
+	<c9cb16fe-8e23-50c4-67c0-3c5952163099@redhat.com>
+	<w51r2ih2w5m.fsf@maestria.local.igalia.com>
+	<c147ca8a-da5e-bb8d-86ab-b9c34acddcf3@redhat.com>
+Date: Wed, 29 Aug 2018 16:56:20 +0200
+Message-ID: <w51in3t2pd7.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/9] block: Remove child references from
- bs->{options, explicit_options}
+Subject: Re: [Qemu-devel] [PATCH 5/9] block: Allow child references on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +28,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Wed 29 Aug 2018 02:18:45 PM CEST, Max Reitz wrote:
->>>> @@ -3313,6 +3317,12 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>>>      bs->open_flags         = reopen_state->flags;
->>>>      bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
->>>>  
->>>> +    /* Remove child references from bs->options and bs->explicit_options */
->>>> +    QLIST_FOREACH(child, &bs->children, next) {
->>>> +        qdict_del(bs->explicit_options, child->name);
->>>> +        qdict_del(bs->options, child->name);
->>>> +    }
->>>> +
->>>
->>> Why don't you remove the child options as well?
+On Wed 29 Aug 2018 02:59:01 PM CEST, Max Reitz wrote:
+>>> Specifically, that means when you don't specify @backing, the default
+>>> chain will be opened and may replace the current one.
 >> 
->> Because there's no child options here at this point. They are removed
->> from the parent QDict in bdrv_reopen_queue_child():
+>> At the moment "backing" is the only child option that can be omitted,
+>> all others must be specified. So if you leave "backing" out on reopen()
+>> we have the following possibilities:
 >> 
->>   QLIST_FOREACH(child, &bs->children, next) {
->>       /* ... */
->>       child_key_dot = g_strdup_printf("%s.", child->name);
->>       qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
->>       qdict_extract_subqdict(options, &new_child_options, child_key_dot);
->>       g_free(child_key_dot);
->> 
->>       bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options, 0,
->>                               child->role, options, flags);
->>   }
+>>   a) We open the default backing file from disk. I don't think we want
+>>      to open a new image on reopen(). Plus, what happens if the current
+>>      backing image is the default one? Do we need to detect that? And
+>>      what if it's the default image but has non-default options? The
+>>      whole thing looks like a can of worms.
 >
-> Hm.  It's a bit weird to split child options and child references into
-> two parts, but I suppose it makes sense.
+> True.
+>
+>>   b) We leave the current backing file untouched.
+>
+> Hm.  That doesn't make sense for blockdev-add, so you could argue that
+> this behavior works as a default for reopen (because it cannot be
+> "confused" with the blockdev-add default).
+>
+>>   c) We forbid it, and the user has to pass an explicit child, or NULL.
+>
+> That sounds good.
+>
+>> I chose (b) in this series. I suppose (c) could also be an option. But
+>> (a) doesn't looke like a good idea.
+>
+> I agree with the last sentiment, but I'd prefer making it an error
+> instead of choosing (b).  Yes, you could argue that choosing (b) as a
+> default makes sense in a way, but in another, it just doesn't make
+> sense.  (Because while (b) makes no sense for blockdev-add, (a) would
+> make sense for both blockdev-add and reopen.  Sure, it's horrible to
+> support, but from a user's POV, it makes sense.  So it's just
+> confusing not to make that the default for reopen as well).
+>
+> But the most important point is that it's trivial for the user to keep
+> the current backing file.  They just need to give the current
+> backing's node-name.
 
-The child references have to remain in the parent until at least
-bdrv_reopen_prepare() because we need them if we want to allow replacing
-a child.
+Or NULL if there's no backing file, right?
 
-The child options are removed in bdrv_reopen_queue_child() because we
-need to pass them to the children. We could also make a copy and remove
-them later in bdrv_reopen_commit() if that makes things more clear, but
-I don't know...
-
-> What do you think of adding a note to make it more clear?
-> (e.g. "(The inline child options have been handled in
-> bdrv_reopen_queue_child() already)")
-
-Sure, why not.
-
-> [1] On second thought, we do probably want to check the references
-> there, at least.  If you attach a new child, there is no need to reopen
-> the current child, so we should skip the bdrv_reopen_queue_child()
-
-Yes, that's done in a subsequent patch (not part of this series yet).
+The problem I see with this is that it would make the options quite
+verbose. "backing" is an attribute of all BDSs, also protocol ones. I
+suppose we can make "backing" optional in those, or is there any case
+where it makes sense?
 
 Berto
