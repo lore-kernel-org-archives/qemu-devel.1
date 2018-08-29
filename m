@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fv0in-00084y-N9
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:22 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fv0io-00085Q-8e
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fv0ik-0000R4-GG
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52136 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fv0in-0000SP-C0
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53492 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fv0ik-0000QX-8u
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1fv0in-0000Rx-2S
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:21 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 91B40738F1
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 13:41:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D42A40201C3
+	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 13:41:20 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 29 Aug 2018 15:40:40 +0200
-Message-Id: <20180829134043.31706-8-marcandre.lureau@redhat.com>
+Date: Wed, 29 Aug 2018 15:40:42 +0200
+Message-Id: <20180829134043.31706-10-marcandre.lureau@redhat.com>
 In-Reply-To: <20180829134043.31706-1-marcandre.lureau@redhat.com>
 References: <20180829134043.31706-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 07/10] tests: add qmp/qom-set-without-value
- test
+Subject: [Qemu-devel] [PATCH v4 09/10] qga: process_event() simplification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +36,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-test_qom_set_without_value() is about a bug in infrastructure used by
-the QMP core, fixed in commit c489780203.  We covered the bug in
-infrastructure unit tests (commit bce3035a44).  I wrote that test
-earlier, to cover QMP level as well, the test could go into qmp-test.
+Simplify the code around qmp_dispatch():
+- rely on qmp_dispatch/check_obj() for message checking
+- have a single send_response() point
+- constify send_response() argument
+
+It changes a couple of error messages:
+
+* When @req isn't a dictionary, from
+    Invalid JSON syntax
+  to
+    QMP input must be a JSON object
+
+* When @req lacks member "execute", from
+    this feature or command is not currently supported
+  to
+    QMP input lacks member 'execute'
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qmp-test.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ qga/main.c | 57 ++++++++++++++----------------------------------------
+ 1 file changed, 15 insertions(+), 42 deletions(-)
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 4ae2245484..fdfe73b6d2 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -348,6 +348,23 @@ static void test_qmp_preconfig(void)
-     qtest_quit(qs);
+diff --git a/qga/main.c b/qga/main.c
+index 6d70242d05..6596408cbb 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -544,15 +544,15 @@ fail:
+ #endif
  }
 =20
-+static void test_qom_set_without_value(void)
-+{
-+    QTestState *qts;
-+    QDict *ret;
-+
-+    qts =3D qtest_init(common_args);
-+
-+    ret =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
-+                    " { 'path': '/machine', 'property': 'rtc-time' } }")=
-;
-+    g_assert_nonnull(ret);
-+
-+    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
-+
-+    qobject_unref(ret);
-+    qtest_quit(qts);
-+}
-+
- int main(int argc, char *argv[])
+-static int send_response(GAState *s, QDict *payload)
++static int send_response(GAState *s, const QDict *rsp)
  {
-     g_test_init(&argc, &argv, NULL);
-@@ -355,6 +372,7 @@ int main(int argc, char *argv[])
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-     qtest_add_func("qmp/oob", test_qmp_oob);
-     qtest_add_func("qmp/preconfig", test_qmp_preconfig);
-+    qtest_add_func("qmp/qom-set-without-value", test_qom_set_without_val=
-ue);
+     const char *buf;
+     QString *payload_qstr, *response_qstr;
+     GIOStatus status;
 =20
-     return g_test_run();
+-    g_assert(payload && s->channel);
++    g_assert(rsp && s->channel);
+=20
+-    payload_qstr =3D qobject_to_json(QOBJECT(payload));
++    payload_qstr =3D qobject_to_json(QOBJECT(rsp));
+     if (!payload_qstr) {
+         return -EINVAL;
+     }
+@@ -578,58 +578,31 @@ static int send_response(GAState *s, QDict *payload=
+)
+     return 0;
  }
+=20
+-static void process_command(GAState *s, QDict *req)
+-{
+-    QDict *rsp;
+-    int ret;
+-
+-    g_assert(req);
+-    g_debug("processing command");
+-    rsp =3D qmp_dispatch(&ga_commands, QOBJECT(req), false);
+-    if (rsp) {
+-        ret =3D send_response(s, rsp);
+-        if (ret < 0) {
+-            g_warning("error sending response: %s", strerror(-ret));
+-        }
+-        qobject_unref(rsp);
+-    }
+-}
+-
+ /* handle requests/control events coming in over the channel */
+ static void process_event(void *opaque, QObject *obj, Error *err)
+ {
+     GAState *s =3D opaque;
+-    QDict *req, *rsp;
++    QDict *rsp;
+     int ret;
+=20
+     g_debug("process_event: called");
+     assert(!obj !=3D !err);
+     if (err) {
+-        goto err;
+-    }
+-    req =3D qobject_to(QDict, obj);
+-    if (!req) {
+-        error_setg(&err, "Input must be a JSON object");
+-        goto err;
+-    }
+-    if (!qdict_haskey(req, "execute")) {
+-        g_warning("unrecognized payload format");
+-        error_setg(&err, QERR_UNSUPPORTED);
+-        goto err;
++        rsp =3D qmp_error_response(err);
++        goto end;
+     }
+=20
+-    process_command(s, req);
+-    qobject_unref(obj);
+-    return;
++    g_debug("processing command");
++    rsp =3D qmp_dispatch(&ga_commands, obj, false);
+=20
+-err:
+-    g_warning("failed to parse event: %s", error_get_pretty(err));
+-    rsp =3D qmp_error_response(err);
+-    ret =3D send_response(s, rsp);
+-    if (ret < 0) {
+-        g_warning("error sending error response: %s", strerror(-ret));
++end:
++    if (rsp) {
++        ret =3D send_response(s, rsp);
++        if (ret < 0) {
++            g_warning("error sending error response: %s", strerror(-ret)=
+);
++        }
++        qobject_unref(rsp);
+     }
+-    qobject_unref(rsp);
+     qobject_unref(obj);
+ }
+=20
 --=20
 2.19.0.rc0.48.gb9dfa238d5
