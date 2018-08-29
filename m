@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuxBj-0005pZ-4c
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:55:02 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuxBe-0005f2-Q6
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:54:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuwz5-0002Zu-QA
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:41:56 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuwzA-0002b6-Lu
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:42:02 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 29 Aug 2018 11:41:26 +0200
-Message-Id: <20180829094143.2102-3-cohuck@redhat.com>
+Date: Wed, 29 Aug 2018 11:41:28 +0200
+Message-Id: <20180829094143.2102-5-cohuck@redhat.com>
 In-Reply-To: <20180829094143.2102-1-cohuck@redhat.com>
 References: <20180829094143.2102-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 02/19] target/s390x: add BAL and BALR
- instructions
+Subject: [Qemu-devel] [PULL 04/19] target/s390x: fix IPM polluting
+ irrelevant bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +25,91 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.d
 
 From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 
-These instructions are provided for compatibility purposes and are
-used only by old software, in the new code BAS and BASR are preferred.
-The difference between the old and new instruction exists only in the
-24-bit mode.
-
-In addition, fix BAS polluting high 32 bits of the first operand in
-24- and 31-bit addressing modes.
+Suppose psw.mask=0x0000000080000000, cc=2, r1=0 and we do "ipm 1".
+This command must touch only bits 32-39, so the expected output
+is r1=0x20000000. However, currently qemu yields r1=0x20008000,
+because irrelevant parts of PSW leak into r1 during program mask
+transfer.
 
 Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Message-Id: <20180821025104.19604-3-pavel.zbitskiy@gmail.com>
+Message-Id: <20180821025104.19604-5-pavel.zbitskiy@gmail.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/insn-data.def |  3 +++
- target/s390x/translate.c   | 54 ++++++++++++++++++++++++++++++++++++++++------
- 2 files changed, 50 insertions(+), 7 deletions(-)
+ target/s390x/translate.c        | 17 +++++++----------
+ tests/tcg/s390x/Makefile.target |  1 +
+ tests/tcg/s390x/ipm.c           | 22 ++++++++++++++++++++++
+ 3 files changed, 30 insertions(+), 10 deletions(-)
+ create mode 100644 tests/tcg/s390x/ipm.c
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 5c6f33ed9c..9c7b434fca 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -102,6 +102,9 @@
-     D(0x9400, NI,      SI,    Z,   la1, i2_8u, new, 0, ni, nz64, MO_UB)
-     D(0xeb54, NIY,     SIY,   LD,  la1, i2_8u, new, 0, ni, nz64, MO_UB)
- 
-+/* BRANCH AND LINK */
-+    C(0x0500, BALR,    RR_a,  Z,   0, r2_nz, r1, 0, bal, 0)
-+    C(0x4500, BAL,     RX_a,  Z,   0, a2, r1, 0, bal, 0)
- /* BRANCH AND SAVE */
-     C(0x0d00, BASR,    RR_a,  Z,   0, r2_nz, r1, 0, bas, 0)
-     C(0x4d00, BAS,     RX_a,  Z,   0, a2, r1, 0, bas, 0)
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 57c03cbf58..9caae5af84 100644
+index 4f62a38c97..40e12ca2c4 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -84,14 +84,21 @@ static uint64_t inline_branch_hit[CC_OP_MAX];
- static uint64_t inline_branch_miss[CC_OP_MAX];
- #endif
+@@ -2444,20 +2444,17 @@ static DisasJumpType op_insi(DisasContext *s, DisasOps *o)
  
--static uint64_t pc_to_link_info(DisasContext *s, uint64_t pc)
-+static void pc_to_link_info(TCGv_i64 out, DisasContext *s, uint64_t pc)
+ static DisasJumpType op_ipm(DisasContext *s, DisasOps *o)
  {
--    if (!(s->base.tb->flags & FLAG_MASK_64)) {
--        if (s->base.tb->flags & FLAG_MASK_32) {
--            return pc | 0x80000000;
-+    TCGv_i64 tmp;
-+
-+    if (s->base.tb->flags & FLAG_MASK_32) {
-+        if (s->base.tb->flags & FLAG_MASK_64) {
-+            tcg_gen_movi_i64(out, pc);
-+            return;
-         }
-+        pc |= 0x80000000;
-     }
--    return pc;
-+    assert(!(s->base.tb->flags & FLAG_MASK_64));
-+    tmp = tcg_const_i64(pc);
-+    tcg_gen_deposit_i64(out, out, tmp, 0, 32);
-+    tcg_temp_free_i64(tmp);
+-    TCGv_i64 t1;
++    TCGv_i64 t1, t2;
+ 
+     gen_op_calc_cc(s);
+-    tcg_gen_andi_i64(o->out, o->out, ~0xff000000ull);
+-
+     t1 = tcg_temp_new_i64();
+-    tcg_gen_shli_i64(t1, psw_mask, 20);
+-    tcg_gen_shri_i64(t1, t1, 36);
+-    tcg_gen_or_i64(o->out, o->out, t1);
+-
+-    tcg_gen_extu_i32_i64(t1, cc_op);
+-    tcg_gen_shli_i64(t1, t1, 28);
+-    tcg_gen_or_i64(o->out, o->out, t1);
++    tcg_gen_extract_i64(t1, psw_mask, 40, 4);
++    t2 = tcg_temp_new_i64();
++    tcg_gen_extu_i32_i64(t2, cc_op);
++    tcg_gen_deposit_i64(t1, t1, t2, 4, 60);
++    tcg_gen_deposit_i64(o->out, o->out, t1, 24, 8);
+     tcg_temp_free_i64(t1);
++    tcg_temp_free_i64(t2);
+     return DISAS_NEXT;
  }
  
- static TCGv_i64 psw_addr;
-@@ -1453,7 +1460,40 @@ static DisasJumpType op_ni(DisasContext *s, DisasOps *o)
- 
- static DisasJumpType op_bas(DisasContext *s, DisasOps *o)
- {
--    tcg_gen_movi_i64(o->out, pc_to_link_info(s, s->pc_tmp));
-+    pc_to_link_info(o->out, s, s->pc_tmp);
-+    if (o->in2) {
-+        tcg_gen_mov_i64(psw_addr, o->in2);
-+        per_branch(s, false);
-+        return DISAS_PC_UPDATED;
-+    } else {
-+        return DISAS_NEXT;
-+    }
-+}
+diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
+index f62f950d8e..c800a582e5 100644
+--- a/tests/tcg/s390x/Makefile.target
++++ b/tests/tcg/s390x/Makefile.target
+@@ -2,3 +2,4 @@ VPATH+=$(SRC_PATH)/tests/tcg/s390x
+ CFLAGS+=-march=zEC12 -m64
+ TESTS+=hello-s390x
+ TESTS+=csst
++TESTS+=ipm
+diff --git a/tests/tcg/s390x/ipm.c b/tests/tcg/s390x/ipm.c
+new file mode 100644
+index 0000000000..742f3a18c5
+--- /dev/null
++++ b/tests/tcg/s390x/ipm.c
+@@ -0,0 +1,22 @@
++#include <stdint.h>
++#include <unistd.h>
 +
-+static void save_link_info(DisasContext *s, DisasOps *o)
++int main(void)
 +{
-+    TCGv_i64 t;
++    uint32_t op1 = 0x55555555;
++    uint32_t op2 = 0x44444444;
++    uint64_t cc = 0xffffffffffffffffull;
 +
-+    if (s->base.tb->flags & (FLAG_MASK_32 | FLAG_MASK_64)) {
-+        pc_to_link_info(o->out, s, s->pc_tmp);
-+        return;
++    asm volatile(
++        "    clc 0(4,%[op1]),0(%[op2])\n"
++        "    ipm %[cc]\n"
++        : [cc] "+r" (cc)
++        : [op1] "r" (&op1),
++          [op2] "r" (&op2)
++        : "cc");
++    if (cc != 0xffffffff20ffffffull) {
++        write(1, "bad cc\n", 7);
++        return 1;
 +    }
-+    gen_op_calc_cc(s);
-+    tcg_gen_andi_i64(o->out, o->out, 0xffffffff00000000ull);
-+    tcg_gen_ori_i64(o->out, o->out, ((s->ilen / 2) << 30) | s->pc_tmp);
-+    t = tcg_temp_new_i64();
-+    tcg_gen_shri_i64(t, psw_mask, 16);
-+    tcg_gen_andi_i64(t, t, 0x0f000000);
-+    tcg_gen_or_i64(o->out, o->out, t);
-+    tcg_gen_extu_i32_i64(t, cc_op);
-+    tcg_gen_shli_i64(t, t, 28);
-+    tcg_gen_or_i64(o->out, o->out, t);
-+    tcg_temp_free_i64(t);
++    return 0;
 +}
-+
-+static DisasJumpType op_bal(DisasContext *s, DisasOps *o)
-+{
-+    save_link_info(s, o);
-     if (o->in2) {
-         tcg_gen_mov_i64(psw_addr, o->in2);
-         per_branch(s, false);
-@@ -1465,7 +1505,7 @@ static DisasJumpType op_bas(DisasContext *s, DisasOps *o)
- 
- static DisasJumpType op_basi(DisasContext *s, DisasOps *o)
- {
--    tcg_gen_movi_i64(o->out, pc_to_link_info(s, s->pc_tmp));
-+    pc_to_link_info(o->out, s, s->pc_tmp);
-     return help_goto_direct(s, s->base.pc_next + 2 * get_field(s->fields, i2));
- }
- 
 -- 
 2.14.4
