@@ -1,37 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuyrW-0001kp-7Z
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:42:19 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fuytj-0005U9-2f
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fuybl-0000iQ-AU
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:26:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47090 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fuytc-00017t-Bk
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:44:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51788 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fuybl-0000iG-5B
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:25:57 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A6B20B5CA
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 11:25:56 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <68a98c1b-e6dd-f2df-1499-17c2b8b583be@redhat.com>
-	<20180817092936.GC11124@redhat.com>
-	<e8a14a22915569b492adb414e5ccc98dcf64a24d.camel@redhat.com>
-	<20180817104351.GG11124@redhat.com>
-	<878t5516h9.fsf@dusky.pond.sub.org>
-	<20180817132415.GQ11124@redhat.com>
-Date: Wed, 29 Aug 2018 13:25:51 +0200
-In-Reply-To: <20180817132415.GQ11124@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Fri, 17 Aug 2018 14:24:15 +0100")
-Message-ID: <875zzte7nk.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fuytc-00017p-76
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:44:24 -0400
+Date: Wed, 29 Aug 2018 12:44:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180829114418.GB2412@work-vm>
+References: <1534796770-10295-1-git-send-email-minyard@acm.org>
+	<1534796770-10295-11-git-send-email-minyard@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] clean/simple Q35 support in libvirt+QEMU
- for guest OSes that don't support virtio-1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1534796770-10295-11-git-send-email-minyard@acm.org>
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] i2c: Add vmstate handling to the
+ smbus eeprom
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,68 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Libvirt <libvir-list@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Laine Stump <laine@redhat.com>, qemu list <qemu-devel@nongnu.org>
+To: minyard@acm.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+* minyard@acm.org (minyard@acm.org) wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+> 
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Michael S . Tsirkin" <mst@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/i2c/smbus_eeprom.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+> index f18aa3d..d4430b0 100644
+> --- a/hw/i2c/smbus_eeprom.c
+> +++ b/hw/i2c/smbus_eeprom.c
+> @@ -29,6 +29,8 @@
+>  
+>  //#define DEBUG
+>  
+> +#define TYPE_SMBUS_EEPROM_DEVICE "smbus-eeprom"
+> +
+>  typedef struct SMBusEEPROMDevice {
+>      SMBusDevice smbusdev;
+>      void *data;
+> @@ -97,6 +99,17 @@ static uint8_t eeprom_read_data(SMBusDevice *dev, uint8_t cmd, int n)
+>      return eeprom_receive_byte(dev);
+>  }
+>  
+> +static const VMStateDescription vmstate_smbus_eeprom = {
+> +    .name = TYPE_SMBUS_EEPROM_DEVICE,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
 
-> On Fri, Aug 17, 2018 at 03:13:22PM +0200, Markus Armbruster wrote:
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->>=20
->> > On Fri, Aug 17, 2018 at 12:35:11PM +0200, Andrea Bolognani wrote:
->> >> On Fri, 2018-08-17 at 10:29 +0100, Daniel P. Berrang=C3=A9 wrote:
->> >> > On Thu, Aug 16, 2018 at 06:20:29PM -0400, Laine Stump wrote:
->> >> > > 5) Some guest OSes that we still want to support (and which would
->> >> > > otherwise work okay on a Q35 virtual machine) have virtio drivers=
- too
->> >> > > old to support virtio-1.0 (CentOS6 and RHEL6 are examples of such=
- OSes),
->> >> > > but due to the chain of reasons listed above, the "standard" conf=
-ig for
->> >> > > a Q35 guest generated by libvirt doesn't support virtio-0.9, hence
->> >> > > doesn't support these guest OSes.
->> >> >=20
->> >> > Note when talking about "support" you're really saying it from the
->> >> > downstream vendor, specifically RHEL, POV. From upstream or Fedora =
-POV
->> >> > essentially all x86 OS ever made are in scope for running under QEMU
->> >> > if suitable virtual hardware models have been provided. QEMU doesn't
->> >> > maintain any whitelist of "supported" OS that differs from what is
->> >> > technically capable of being run, in the way downstream vendors do.
->> >>=20
->> >> Well, at least in the case of RHEL 6, "not supported" means that it
->> >> will not boot at all on q35 with the default guest topology created
->> >> by libvirt, so that's not really a downstream-only problem :)
->> >
->> > I mean from an upstream POV we still support RHEL-6 fine in i440fx,
->> > so there's no reason to particularly care about RHEL-6 with q35
->> > upstream.
->>=20
->> Only true if Q35 provides nothing of value over i440FX for RHEL-6
->> guests.  Does it?
->
-> Q35 has little technical benefit over i440fx for the majority of guest
-> deployments, regardless of guest OS.
+Can you add a .needed and wire it up to a property that we can then wire
+to machine types; that way we don't break migration compatibility.
 
-Alright, I can look it up myself.  This list is from Marcel's slide deck
-"Q35 - QEMU" <https://wiki.qemu.org/images/4/4e/Q35.pdf>, August 2016,
-page 13:
+> +    .fields      = (VMStateField[]) {
+> +        VMSTATE_SMBUS_DEVICE(smbusdev, SMBusEEPROMDevice),
+> +        VMSTATE_UINT8(offset, SMBusEEPROMDevice),
 
-    Q35-only features
-    =E2=97=8F PCIe =E2=80=9Cgoodies=E2=80=9D
-    =E2=80=93 Extended configuration space (MMCFG)
-    =E2=80=93 PCIe native hotplug
-    =E2=80=93 Advanced Error Reporting (AER)
-    =E2=80=93 Alternative Routing-ID Interpretation (ARI)
-    =E2=80=93 Native Power Management
-    =E2=80=93 Function Level Reset (FLR)
-    =E2=80=93 Address Translation Services (ATS)
-    =E2=97=8F AHCI storage controller
-    =E2=97=8F vIOMMU emulation
-    =E2=97=8F =E2=80=9CSecure=E2=80=9D Secure Boot
+What about the data?
 
-We can debate the actual value of these items.  Perhaps this will then
-result in a "little technical benefit over i440fx for the majority of
-guest deployments, regardless of guest OS" verdict.  That's okay.  What
-doesn't work for me is making such sweeping claims without presenting
-the evidence.
+Dave
+
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+>  {
+>      SMBusEEPROMDevice *eeprom = (SMBusEEPROMDevice *)dev;
+> @@ -121,12 +134,13 @@ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+>      sc->write_data = eeprom_write_data;
+>      sc->read_data = eeprom_read_data;
+>      dc->props = smbus_eeprom_properties;
+> +    dc->vmsd = &vmstate_smbus_eeprom;
+>      /* Reason: pointer property "data" */
+>      dc->user_creatable = false;
+>  }
+>  
+>  static const TypeInfo smbus_eeprom_info = {
+> -    .name          = "smbus-eeprom",
+> +    .name          = TYPE_SMBUS_EEPROM_DEVICE,
+>      .parent        = TYPE_SMBUS_DEVICE,
+>      .instance_size = sizeof(SMBusEEPROMDevice),
+>      .class_init    = smbus_eeprom_class_initfn,
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
