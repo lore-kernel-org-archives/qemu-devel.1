@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fv0Y1-0003Hc-AH
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:30:16 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fv0hv-0007dK-DV
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fv0Xy-00078W-Vu
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:30:12 -0400
-References: <20180809223117.7846-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6f7811d6-8317-e1ce-b00d-20068a48038e@redhat.com>
-Date: Wed, 29 Aug 2018 15:29:59 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fv0ht-0008OO-Kg
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:40:27 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fv0ht-0008NX-Cs
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:40:25 -0400
+Received: by mail-wm0-x242.google.com with SMTP id j192-v6so5609309wmj.1
+	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 06:40:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180809223117.7846-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="yepbMcWGAfvwWewclv9uvQCr8wxqRHPWI"
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] block: Deal with filters
+References: <20180825135724.8981-1-marcandre.lureau@redhat.com>
+	<20180825135724.8981-5-marcandre.lureau@redhat.com>
+	<20180827045602.GF3020@xz-x1>
+	<87a7p6mr3e.fsf@dusky.pond.sub.org> <20180829004237.GG4446@xz-x1>
+	<87r2ihh7qg.fsf@dusky.pond.sub.org> <20180829102102.GA9942@xz-x1>
+	<87ftyx9whk.fsf@dusky.pond.sub.org>
+In-Reply-To: <87ftyx9whk.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 29 Aug 2018 15:40:12 +0200
+Message-ID: <CAJ+F1C+YfCH90tF_nAU9XmyL5cQC=6MSQrxEG-orvsx-hQ8rdg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] monitor: no need to save need_resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yepbMcWGAfvwWewclv9uvQCr8wxqRHPWI
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <6f7811d6-8317-e1ce-b00d-20068a48038e@redhat.com>
-Subject: Re: [PATCH v2 00/11] block: Deal with filters
-References: <20180809223117.7846-1-mreitz@redhat.com>
-In-Reply-To: <20180809223117.7846-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-Eric inadvertently pointed me to the fact that qemu-img needs some
-additional work.  Its get_block_status() should completely skip R/W
-filters (just adding a "bs =3D bdrv_skip_rw_filters()" at the top of the
-loop is enough -- in turn, I can probably drop the
-bdrv_skip_implicit_filters() at the bottom), and I suspect the
-bdrv_block_status() call in convert_iteration_sectors() should really be
+On Wed, Aug 29, 2018 at 2:51 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> > So I think now I agree with you that the response queue is not
+> > required if we think the first solution is okay for us.
+>
+> Cool.  Can you explore that and post patches?
+>
 
-  BlockDriverState *src_bs =3D blk_bs(s->src[src_cur]);
-  bdrv_block_status_above(src_bs, bdrv_backing_chain_next(src_bs), ...);
+As we agree to drop the response queue, I am sending rebased v4, with
+qga fixes and r-b from Michael, and tests splitted.
 
-Max
+thanks
 
-
---yepbMcWGAfvwWewclv9uvQCr8wxqRHPWI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGn9cACgkQ9AfbAGHV
-z0DY+wf/bu8PenMzVHsOg86uEjelkVtT0TZS7+BMneX8Eb9Rn0wPp82h/xhWLU9M
-9sUgpFjU16PqZg9xNsyT+4M70qLZ+MTg95XC7VTWajZL+/CHub1vJk3WI7iKyG8z
-Uil77vR9zUita1eYQwpld2iuQziuqBla+TZxhgdXiGZAZ/KCHWai39rAGxp6/ZS6
-s8ygDTScyVL9uKdhT261w/Vy4MCTzXmWB/fUrO4wRDOpVJ7w1WBPjuS47706ACAa
-dM6qOWRpKT5KWxJkNdWzuNbHLdTCtrIzgexeHWG1gqUyUh1SU7cya5KnC11dkWMz
-tCQZ0itSEj56tVn//QE6WQiXXEM25Q==
-=+JWE
------END PGP SIGNATURE-----
-
---yepbMcWGAfvwWewclv9uvQCr8wxqRHPWI--
+--=20
+Marc-Andr=C3=A9 Lureau
