@@ -1,30 +1,21 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:60643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fuzpb-0006f9-2E
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:44:20 -0400
+	(envelope-from <berto@igalia.com>) id 1fuzpm-0006f9-5n
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:44:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fuzhl-0008O1-KH
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:36:14 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35061)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fuzhl-0008NY-CY
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:36:13 -0400
-Received: by mail-wm0-x243.google.com with SMTP id o18-v6so5389660wmc.0
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 05:36:13 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1fuzen-00076M-Ic
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:33:14 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <8530786e-50b2-3dc2-2f1c-834ccd163b3a@redhat.com>
+References: <cover.1535291602.git.berto@igalia.com>
+	<599f98e81407a82d8b05764eeac7dbcf5f52142d.1535291602.git.berto@igalia.com>
+	<8530786e-50b2-3dc2-2f1c-834ccd163b3a@redhat.com>
+Date: Wed, 29 Aug 2018 14:33:08 +0200
+Message-ID: <w51o9dl2vzv.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-References: <20180828153840.22519-1-marcandre.lureau@redhat.com>
-	<20180828184312.6e0e417d@redhat.com>
-	<CAJ+F1CLvye1F9xKskpPiogeTU+54+=Lurg3qX4cYpq1=r5sNaQ@mail.gmail.com>
-	<CAJ+F1C+7zis5wmV_V9MuL5bMvPp9CnCuUrg_yQgQuYM3p_3xxA@mail.gmail.com>
-	<20180829105009.07e5255f@redhat.com>
-In-Reply-To: <20180829105009.07e5255f@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 29 Aug 2018 14:36:00 +0200
-Message-ID: <CAJ+F1CLniMjFc1PCYqeBSkSJJ-sCk+PKvjupdurXKez9wedA4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 6/9] file-posix: Forbid trying to change
+ unsupported options during reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,139 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Hi
-
-On Wed, Aug 29, 2018 at 10:50 AM Igor Mammedov <imammedo@redhat.com> wrote:
+On Wed 29 Aug 2018 01:33:13 PM CEST, Max Reitz wrote:
+> On 2018-08-26 16:09, Alberto Garcia wrote:
+>> The file-posix code is used for the "file", "host_device" and
+>> "host_cdrom" drivers, and it allows reopening images. However the only
+>> option that is actually processed is "x-check-cache-dropped", and
+>> changes in all other options (e.g. "filename") are silently ignored:
+>> 
+>>    (qemu) qemu-io virtio0 "reopen -o file.filename=no-such-file"
+>> 
+>> While we could allow changing some of the other options, let's keep
+>> things as they are for now but return an error if the user tries to
+>> change any of them.
+>> 
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  block/file-posix.c | 9 +++++++--
+>>  1 file changed, 7 insertions(+), 2 deletions(-)
 >
-> On Tue, 28 Aug 2018 18:55:35 +0200
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
->
-> > On Tue, Aug 28, 2018 at 6:54 PM Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@gmail.com> wrote:
-> > >
-> > > Hi
-> > >
-> > > On Tue, Aug 28, 2018 at 6:49 PM Igor Mammedov <imammedo@redhat.com> w=
-rote:
-> > > >
-> > > > On Tue, 28 Aug 2018 17:38:40 +0200
-> > > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > > >
-> > > > > The share=3Don/off property is used to modified mmap() MAP_SHARED
-> > > > > setting. Make it on by default for convenience and compatibility
-> > > > > reasons.
-> > > > it would be nice to state reasons here.
-> > > >
-> > > > also flipping default to on is behavioral change when
-> > > > used with bind policy which could make backend initialization fail
-> > > > so CLI that used to work (if there are any users of this without sh=
-ared=3Don)
-> > > > won't work anymore.
-> > >
-> > > memfd backend is passing shared=3Dtrue to memory_region_init_ram_from=
-_fd().
-> > >
-> > > The patch allows to tweak that (instead of ignoring the property),
-> > > while keeping the value to shared=3Dtrue.
-> >
-> > keeping the default value to shared=3Dtrrue.
-> ok,
-> another question:
->  does it make sense to allow "shared=3Dfalse" at all?
->  should we bail out if user asks for it?
+> Looks OK, but the same question from the last patch arises.  If
+> unspecified options mean using the default, shouldn't the user have to
+> re-specify all mandatory options, so at least @filename in this case?
 
-You may want to use memfd for convenience (no need to specify hugetlb
-mem-path for ex), without the share memory aspects.
+This is the old (existing) reopen command, which takes the current
+options and applies the user-specified changes on top. In this one we
+can leave options out because the old values are kept.
 
-(but the patch was mostly for completeness)
+It's in the new QMP blockdev-reopen command (not in this series yet)
+that you need to specify all options (among other things because it
+takes a BlockdevOptions struct, so there's no choice not to specify the
+mandatory ones).
 
->
-> >
-> > >
-> > > >
-> > > > >
-> > > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-> > > > > ---
-> > > > >  backends/hostmem-memfd.c | 4 +++-
-> > > > >  qemu-options.hx          | 4 +++-
-> > > > >  2 files changed, 6 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> > > > > index 1e20fe0ba8..abd52364db 100644
-> > > > > --- a/backends/hostmem-memfd.c
-> > > > > +++ b/backends/hostmem-memfd.c
-> > > > > @@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBackend *b=
-ackend, Error **errp)
-> > > > >
-> > > > >      name =3D object_get_canonical_path(OBJECT(backend));
-> > > > >      memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend)=
-,
-> > > > > -                                   name, backend->size, true, fd=
-, errp);
-> > > > > +                                   name, backend->size,
-> > > > > +                                   backend->share, fd, errp);
-> > > > >      g_free(name);
-> > > > >  }
-> > > > >
-> > > > > @@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
-> > > > >
-> > > > >      /* default to sealed file */
-> > > > >      m->seal =3D true;
-> > > > > +    MEMORY_BACKEND(m)->share =3D true;
-> > > > >  }
-> > > > >
-> > > > >  static void
-> > > > > diff --git a/qemu-options.hx b/qemu-options.hx
-> > > > > index f14e423b7c..25c02d72b8 100644
-> > > > > --- a/qemu-options.hx
-> > > > > +++ b/qemu-options.hx
-> > > > > @@ -4029,7 +4029,7 @@ Memory backend objects offer more control t=
-han the @option{-m} option that is
-> > > > >  traditionally used to define guest RAM. Please refer to
-> > > > >  @option{memory-backend-file} for a description of the options.
-> > > > >
-> > > > > -@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on=
-|off},dump=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},host-no=
-des=3D@var{host-nodes},policy=3D@var{default|preferred|bind|interleave},sea=
-l=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
-> > > > > +@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on=
-|off},dump=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},size=
-=3D@var{size},host-nodes=3D@var{host-nodes},policy=3D@var{default|preferred=
-|bind|interleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D=
-@var{size}
-> > > > >
-> > > > >  Creates an anonymous memory file backend object, which allows QE=
-MU to
-> > > > >  share the memory with an external process (e.g. when using
-> > > > > @@ -4051,6 +4051,8 @@ with the @option{seal} option (requires at =
-least Linux 4.16).
-> > > > >  Please refer to @option{memory-backend-file} for a description o=
-f the
-> > > > >  other options.
-> > > > >
-> > > > > +The @option{share} boolean option is @var{on} by default with me=
-mfd.
-> > > > > +
-> > > > >  @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/rand=
-om}
-> > > > >
-> > > > >  Creates a random number generator backend which obtains entropy =
-from
-> > > >
-> > > >
-> > >
-> > >
-> > > --
-> > > Marc-Andr=C3=A9 Lureau
-> >
-> >
-> >
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Berto
