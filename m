@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fuy89-0007sM-Fr
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:55:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuyqO-0001VR-V7
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fuy86-0007qF-AK
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:55:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45976 helo=mx1.redhat.com)
+	(envelope-from <cohuck@redhat.com>) id 1fuypw-00005L-Ce
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:40:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47676 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fuy86-0007ph-2y
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:55:18 -0400
-Date: Wed, 29 Aug 2018 11:55:11 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180829105510.GB2660@work-vm>
-References: <BC29A004BA570342A4CC0044A384557201784EDDA1@H3CMLB14-EX.srv.huawei-3com.com>
-	<BC29A004BA570342A4CC0044A384557201784EDDD6@H3CMLB14-EX.srv.huawei-3com.com>
-	<BC29A004BA570342A4CC0044A384557201784EDE3E@H3CMLB14-EX.srv.huawei-3com.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fuypw-00005E-76
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:40:36 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DD7A1FBE68
+	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 11:40:35 +0000 (UTC)
+Date: Wed, 29 Aug 2018 13:40:30 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180829134030.5a631d61.cohuck@redhat.com>
+In-Reply-To: <20180828072426.45103-1-ybettan@redhat.com>
+References: <20180828072426.45103-1-ybettan@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BC29A004BA570342A4CC0044A384557201784EDE3E@H3CMLB14-EX.srv.huawei-3com.com>
-Subject: Re: [Qemu-devel] qemu 2.12.0 crash during install windows 10 with
- vga.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC V1] hw/pci/pci_example.c : Added a new pci
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +33,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changlimin <changlimin@h3c.com>
-Cc: "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+To: Yoni Bettan <ybettan@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 
-* Changlimin (changlimin@h3c.com) wrote:
-> Hi,
-> I have the same issue as https://www.qubes-os.org/doc/windows-vm/ , it's not easy to reproduce.
-> cpu_physical_memory_snapshot_get_dirty: Assertion `start + length <= snap->end' failed
-> 
-> Qemu version is 2.12.0. 
-> (gdb) bt
-> #0  0x00007f504ed6fc37 in raise () from /lib/x86_64-linux-gnu/libc.so.6
-> #1  0x00007f504ed73028 in abort () from /lib/x86_64-linux-gnu/libc.so.6
-> #2  0x00007f504ed68bf6 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
-> #3  0x00007f504ed68ca2 in __assert_fail () from /lib/x86_64-linux-gnu/libc.so.6
-> #4  0x00005585bbdc9641 in cpu_physical_memory_snapshot_get_dirty (snap=snap@entry=0x5585bfdc2ff0, start=<optimized out>, length=<optimized out>)
->     at /qemu-2.12/exec.c:1264
-> #5  0x00005585bbe2b4de in memory_region_snapshot_get_dirty (mr=mr@entry=0x5585c06e3d10, snap=snap@entry=0x5585bfdc2ff0, addr=<optimized out>,
->     size=<optimized out>) at /qemu-2.12/memory.c:1997
-> #6  0x00005585bbe552a4 in vga_draw_graphic (full_update=0, s=0x5585c06e3d00) at /qemu-2.12/hw/display/vga.c:1671
-> #7  vga_update_display (opaque=0x5585c06e3d00) at /qemu-2.12/hw/display/vga.c:1767
-> #8  0x00005585bc0d9a8f in qemu_spice_display_refresh (ssd=0x5585c06e3930) at /qemu-2.12/ui/spice-display.c:478
-> #9  0x00005585bc0ced72 in dpy_refresh (s=0x5585c081b2a0) at /qemu-2.12/ui/console.c:1629
-> #10 gui_update (opaque=0x5585c081b2a0) at /qemu-2.12/ui/console.c:203
-> #11 0x00005585bc1d333c in timerlist_run_timers (timer_list=0x5585bee1f950) at /qemu-2.12/util/qemu-timer.c:536
-> #12 0x00005585bc1d35a3 in qemu_clock_run_timers (type=QEMU_CLOCK_REALTIME) at /qemu-2.12/util/qemu-timer.c:547
-> #13 qemu_clock_run_all_timers () at /qemu-2.12/util/qemu-timer.c:674
-> #14 0x00005585bc1d3aa4 in main_loop_wait (nonblocking=<optimized out>) at /qemu-2.12/util/main-loop.c:528
-> #15 0x00005585bbdc2f8a in main_loop () at /qemu-2.12/vl.c:1973
-> #16 main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /qemu-2.12/vl.c:4804 
-> 
-> (gdb) frame 5
-> (gdb) p/x *snap
-> $1 = {start = 0x1000c0000, end = 0x1000c0000, dirty = 0x5585bfdc3000}
-> 
-> Here the snap->start is identical to snap->end , I think something is wrong. 
-> In function vga_draw_graphic, the snap is allocated from region_start/region_end.
->         snap = memory_region_snapshot_and_clear_dirty(&s->vram, region_start,
->                                                       region_end - region_start,
->                                                       DIRTY_MEMORY_VGA);
-> 
-> Is that possible for region_start== region_end ? 
+On Tue, 28 Aug 2018 10:24:26 +0300
+Yoni Bettan <ybettan@redhat.com> wrote:
 
-Could this be the same bug as
-https://bugs.launchpad.net/qemu/+bug/1784900/ ?
+>     - this is a simple example of how to write a pci device that supports
+>       portio, mmio, irq and dma
 
-I'm not sure if the bug existed in 2.12.0 though.
+Do you also plan to add example code for MSI(-X)?
 
-Dave
+[Not just asking because s390 only supports MSI-X. Honestly :)]
 
-> BR,
-> Chang Limin
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+> ---
+>  hw/pci/Makefile.objs |   1 +
+>  hw/pci/pci_example.c | 309 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 310 insertions(+)
+>  create mode 100644 hw/pci/pci_example.c
+> 
+
+(...)
+
+> diff --git a/hw/pci/pci_example.c b/hw/pci/pci_example.c
+> new file mode 100644
+> index 0000000000..326c9b7fa1
+> --- /dev/null
+> +++ b/hw/pci/pci_example.c
+> @@ -0,0 +1,309 @@
+> +#include "qemu/osdep.h"
+> +#include "hw/pci/pci.h"
+> +
+> +#define TYPE_PCI_EXAMPLE "pci-example"
+> +
+> +#define PCI_EXAMPLE(obj)  \
+> +    OBJECT_CHECK(PCIExampleDevState, (obj), TYPE_PCI_EXAMPLE)
+> +
+> +
+> +#define ERROR -1
+
+It's probably not a good idea to obfuscate the return code. Either
+return -1, or a proper error code.
+
+> +#define BLOCK_SIZE 64
+> +#define EXAMPLE_MMIO_SIZE BLOCK_SIZE
+> +#define EXAMPLE_PIO_SIZE BLOCK_SIZE
+> +#define DMA_BUFF_SIZE 4096
+> +
+> +/*---------------------------------------------------------------------------*/
+> +/*                                 PCI Struct                                */
+> +/*---------------------------------------------------------------------------*/
+> +
+> +typedef struct PCIExampleDevState {
+> +    /*< private >*/
+> +    PCIDevice parent_obj;
+> +    /*< public >*/
+> +
+> +    /* memory region */
+> +    MemoryRegion portio;
+> +    MemoryRegion mmio;
+> +    MemoryRegion irqio;
+> +    MemoryRegion dmaio;
+> +
+> +    /* data registers */
+> +    uint64_t memData, ioData, dmaPhisicalBase;
+
+I think we want this to be mem_data, io_data, and dma_physical_base
+instead.
+
+> +
+> +    qemu_irq irq;
+> +    /* for the driver to determine if this device caused the interrupt */
+> +    uint64_t threwIrq;
+
+Same here (threw_irq).
+
+> +
+> +} PCIExampleDevState;
+> +
+> +
+> +/*---------------------------------------------------------------------------*/
+> +/*                         Read/Write functions                              */
+> +/*---------------------------------------------------------------------------*/
+> +
+> +/* do nothing because the mmio read is done from DMA buffer */
+> +static uint64_t pci_example_mmio_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    return ERROR;
+> +}
+> +
+> +static void
+> +pci_example_mmio_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+
+I think our preferred style is to keep return value and function name
+on the same line and add line breaks in the parameter list, if needed.
+(Some more occurrences further down.)
+
+> +{
+> +    PCIExampleDevState *pms = (PCIExampleDevState *)opaque;
+
+peds? ped_state? (I'm not sure pms <-> PCIExampleDevState is obvious;
+I'm not sure either whether my suggestions are better :)
+
+> +    PCIDevice *pciDev = (PCIDevice *)opaque;
+
+pci_dev is better, I think. Also, I'd probably refer to pms->parent_obj
+(maybe call that one pci_device instead?) instead of casting.
+
+> +
+> +    if (size != 1) {
+> +        return;
+> +    }
+> +
+> +    /* compute the result */
+> +    pms->memData = val * 2;
+> +
+> +    /* write the result directly to phisical memory */
+> +    cpu_physical_memory_write(pms->dmaPhisicalBase, &pms->memData,
+> +            DMA_BUFF_SIZE);
+
+Indentation seems off.
+
+> +
+> +    /* raise an IRQ to notify DMA has finished  */
+> +    pms->threwIrq = 1;
+> +    pci_irq_assert(pciDev);
+> +}
+
+(...)
+
+> +/* do nothing because physical DMA buffer addres is onlyt set and don't need to
+> + * be red */
+
+s/addres/address/
+s/onlyt/only/
+s/don't/doesn't/
+s/red/read/
+
+Also, we prefer the
+
+/*
+ * comment style
+ */
+
+if it can't fit on one line.
+
+(...)
+
+> +/*---------------------------------------------------------------------------*/
+> +/*                             PCI functions                                 */
+> +/*---------------------------------------------------------------------------*/
+> +
+> +/* this is called when lunching the vm with "-device <device name>" */
+
+s/lunching/launching/
+
+Although that's simply the normal realization process, which could also
+be triggered by hotplug.
+
+> +static void pci_example_realize(PCIDevice *pciDev, Error **errp)
+> +{
+> +   PCIExampleDevState *d = PCI_EXAMPLE(pciDev);
+
+Here you use "d" as a variable name, which arguably might be better
+than any of the suggestions above :)
+
+> +   uint8_t *pciCond = pciDev->config;
+> +
+> +   d->threwIrq = 0;
+> +
+> +   /* initiallise the memory region of the CPU to the device */
+
+s/initiallise/initialize/
+
+> +   memory_region_init_io(&d->mmio, OBJECT(d), &pci_example_mmio_ops, d,
+> +           "pci-example-mmio", EXAMPLE_MMIO_SIZE);
+> +
+> +   memory_region_init_io(&d->portio, OBJECT(d), &pci_example_pio_ops, d,
+> +           "pci-example-portio", EXAMPLE_PIO_SIZE);
+> +
+> +   memory_region_init_io(&d->irqio, OBJECT(d), &pci_example_irqio_ops, d,
+> +           "pci-example-irqio", EXAMPLE_PIO_SIZE);
+> +
+> +   memory_region_init_io(&d->dmaio, OBJECT(d), &pci_example_dma_ops, d,
+> +           "pci-example-dma-base", EXAMPLE_MMIO_SIZE);
+> +
+> +   /* alocate BARs */
+
+s/alocate/allocate/
+
+> +   pci_register_bar(pciDev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
+> +   pci_register_bar(pciDev, 1, PCI_BASE_ADDRESS_SPACE_IO, &d->portio);
+> +   pci_register_bar(pciDev, 2, PCI_BASE_ADDRESS_SPACE_IO, &d->irqio);
+> +   pci_register_bar(pciDev, 3, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->dmaio);
+> +
+> +   /* give interrupt support.
+> +    * a pci device has 4 pin for interrupt, here we use pin A */
+> +   pci_config_set_interrupt_pin(pciCond, 1);
+> +}
+> +
+> +
+> +/* the destructor of pci_example_realize() */
+> +static void pci_example_uninit(PCIDevice *dev)
+> +{
+> +    /* unregister BARs and other stuff */
+
+Shouldn't the function actually do it, then? :)
+
+> +}
+> +
+> +
+> +/* class constructor */
+> +static void pci_example_class_init(ObjectClass *klass, void *data)
+> +{
+> +   /* sort of dynamic cast */
+> +   DeviceClass *dc = DEVICE_CLASS(klass);
+> +   PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> +
+> +   k->realize = pci_example_realize;
+> +   k->exit = pci_example_uninit;
+> +
+> +   /* some regular IDs in HEXA */
+> +   k->vendor_id = PCI_VENDOR_ID_REDHAT;
+> +   k->device_id = PCI_DEVICE_ID_REDHAT_TEST;
+> +   k->class_id = PCI_CLASS_OTHERS;
+> +
+> +   /* set the device bitmap category */
+> +   set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +
+> +   k->revision = 0x00;
+> +   dc->desc = "PCI Example Device";
+> +}
+> +
+> +/*---------------------------------------------------------------------------*/
+> +/*                            QEMU overhead                                  */
+
+Lol :)
+
+> +/*---------------------------------------------------------------------------*/
+> +
+> +
+> +/* Contains all the informations of the device we are creating.
+> + * class_init will be called when we are defining our device. */
+> +static const TypeInfo pci_example_info = {
+> +    .name           = TYPE_PCI_EXAMPLE,
+> +    .parent         = TYPE_PCI_DEVICE,
+> +    .instance_size  = sizeof(PCIExampleDevState),
+> +    .class_init     = pci_example_class_init,
+> +    .interfaces     = (InterfaceInfo[]) {
+> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> +        { },
+> +    },
+> +};
+> +
+> +
+> +/* function called before the qemu main it will define our device */
+
+"Define our device type; this is done during startup of QEMU"
+
+?
+
+> +static void pci_example_register_types(void)
+> +{
+> +    type_register_static(&pci_example_info);
+> +}
+> +
+> +/* make qemu register our device at qemu-booting */
+
+I don't think you need this comment here as well (the type_init and the
+function kind of form one logical unit.)
+
+> +type_init(pci_example_register_types)
+> +
+> +
+> +
+
+I think the basic structure looks sound; I've focused on style
+questions as this is supposed to be an example for others to copy from.
+I'll leave the pci details to people more versed in pci :)
