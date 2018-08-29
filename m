@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuyrO-00027v-Bz
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:42:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuyrP-00028Q-CX
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuyiz-0004Wv-Ed
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:33:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuycf-0001B5-Mp
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:26:54 -0400
 References: <cover.1535291602.git.berto@igalia.com>
-	<599f98e81407a82d8b05764eeac7dbcf5f52142d.1535291602.git.berto@igalia.com>
+	<d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8530786e-50b2-3dc2-2f1c-834ccd163b3a@redhat.com>
-Date: Wed, 29 Aug 2018 13:33:13 +0200
+Message-ID: <c9cb16fe-8e23-50c4-67c0-3c5952163099@redhat.com>
+Date: Wed, 29 Aug 2018 13:26:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <599f98e81407a82d8b05764eeac7dbcf5f52142d.1535291602.git.berto@igalia.com>
+In-Reply-To: <d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ku80OT2eS7IEH847tduSYAmXWiM1CBJPV"
-Subject: Re: [Qemu-devel] [PATCH 6/9] file-posix: Forbid trying to change
- unsupported options during reopen
+	boundary="5gMDOBD76EatADTyVctlkGhyMeIvl24iH"
+Subject: Re: [Qemu-devel] [PATCH 5/9] block: Allow child references on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +28,112 @@ To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ku80OT2eS7IEH847tduSYAmXWiM1CBJPV
+--5gMDOBD76EatADTyVctlkGhyMeIvl24iH
 From: Max Reitz <mreitz@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <8530786e-50b2-3dc2-2f1c-834ccd163b3a@redhat.com>
-Subject: Re: [PATCH 6/9] file-posix: Forbid trying to change unsupported
- options during reopen
+Message-ID: <c9cb16fe-8e23-50c4-67c0-3c5952163099@redhat.com>
+Subject: Re: [PATCH 5/9] block: Allow child references on reopen
 References: <cover.1535291602.git.berto@igalia.com>
- <599f98e81407a82d8b05764eeac7dbcf5f52142d.1535291602.git.berto@igalia.com>
-In-Reply-To: <599f98e81407a82d8b05764eeac7dbcf5f52142d.1535291602.git.berto@igalia.com>
+ <d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
+In-Reply-To: <d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2018-08-26 16:09, Alberto Garcia wrote:
-> The file-posix code is used for the "file", "host_device" and
-> "host_cdrom" drivers, and it allows reopening images. However the only
-> option that is actually processed is "x-check-cache-dropped", and
-> changes in all other options (e.g. "filename") are silently ignored:
+> In the previous patches we removed all child references from
+> bs->{options,explicit_options} because keeping them is useless and
+> wrong.
 >=20
->    (qemu) qemu-io virtio0 "reopen -o file.filename=3Dno-such-file"
+> Because of this, any attempt to reopen a BlockDriverState using a
+> child reference as one of its options would result in a failure,
+> because bdrv_reopen_prepare() would detect that there's a new option
+> (the child reference) that wasn't present in bs->options.
 >=20
-> While we could allow changing some of the other options, let's keep
-> things as they are for now but return an error if the user tries to
-> change any of them.
+> But passing child references on reopen can be useful. It's a way to
+> specify a BDS's child without having to pass recursively all of the
+> child's options, and if the reference points to a different BDS then
+> this can allow us to replace the child.
+>=20
+> However, replacing the child is something that needs to be implemented
+> case by case and only when it makes sense. For now, this patch allows
+> passing a child reference as long as it points to the current child of
+> the BlockDriverState.
+
+"For now"?  If you intend it to be case-by-case, won't it be handled by
+the driver's bdrv_reopen_prepare() implementation?
+
+> It's also important to remember that, as a consequence of the
+> previous patches, this child reference will be removed from
+> bs->{options,explicit_options} after the reopening has been completed.
 >=20
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  block/file-posix.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+>  block.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>=20
+> diff --git a/block.c b/block.c
+> index 92afb3dcce..804d557608 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -3241,6 +3241,25 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_=
+state, BlockReopenQueue *queue,
+>              QObject *new =3D entry->value;
+>              QObject *old =3D qdict_get(reopen_state->bs->options, entr=
+y->key);
+> =20
+> +            /* We allow child references 'child_name'=3D'value'
+> +             * if 'child_name' is an existing child of the BDS
+> +             * and 'value' is the child's node name (a string). */
+> +            if (qobject_type(new) =3D=3D QTYPE_QSTRING) {
+> +                BdrvChild *child;
+> +                QLIST_FOREACH(child, &reopen_state->bs->children, next=
+) {
+> +                    if (!strcmp(child->name, entry->key)) {
+> +                        break;
+> +                    }
+> +                }
+> +
+> +                if (child) {
+> +                    const char *str =3D qobject_get_try_str(new);
+> +                    if (!strcmp(child->bs->node_name, str)) {
+> +                        continue; /* Found child with this name, skip =
+option */
+> +                    }
+> +                }
+> +            }
+> +
 
-Looks OK, but the same question from the last patch arises.  If
-unspecified options mean using the default, shouldn't the user have to
-re-specify all mandatory options, so at least @filename in this case?
+Looks good, but I think the comment looks a bit convoluted.  Maybe add a
+note like "(so the child has to stay the same)"?
+
+Third...  Hm.  This is just a general question.  So as far as I
+understand we decided that when you don't specify an option for reopen,
+it means that the default is used, and that we don't want to retain the
+old value.  Specifically, that means when you don't specify @backing,
+the default chain will be opened and may replace the current one.  So
+for other children, not specifying them should mean detaching them.
+
+So why isn't it mandatory to re-specify all children for now?
 
 Max
 
 
---ku80OT2eS7IEH847tduSYAmXWiM1CBJPV
+--5gMDOBD76EatADTyVctlkGhyMeIvl24iH
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGhHkACgkQ9AfbAGHV
-z0ASSQf/c806QvCH7TrT5XXD15lhn0YTQykKkrDD9prRyJjsnq9IKpda+YBw538u
-qNLS6xWkxpce7EfkJLH5PZAB1YILj9MatDn9iE6wXQaLYSrkv62wCPRNb6l4EkTY
-gwE9CubFTLVzWXieGzGbeBPoSN+BTTf5x+aAaBwydSNr2CpejBqnGf7c2OvmOtqp
-JStxwoXL5dipgMoqeU8uJ31tFwkfDhGJmpbdSuzQwN2GcGOu+iTSVzItkF34A7zM
-BYNrAfCeEnoWn9eYiFh4h/+rZtCQ3GAgnh3G23jQ28umJmX+K/FnUcv/60MyPq+O
-F1wMpc4ImfUUJJgWXts1NPeifubMtg==
-=t1sS
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGgvYACgkQ9AfbAGHV
+z0DK6wf/eympZECxNjpvPCccVsINTWNyQHHNL63QxL+rMiV28k0djiWiC/TpMQ0O
+KGyacMFmXjDemWeGUB39V5OM8uOCdr2U2OXxC9Y+RHL7dXSTL+UV5RqpJdWsLK4L
+Gl3Hkf3XR6rYjI5EwfMHHyU05997vr1VbQnedIm227sObGp0wFzobwVkCfrFZGVc
+3TNrJczrTVpFjL65JndZuo5GU3yEDNgA9oCNt4iXueVA4msr6OyUeajeLIuR5Lxe
+rmeYyZEOl8iX9StZHQTk24ckXeM2u3e2EWpBfWF4G1JuknoJCI4HzkYv28ybpQBR
+ItNMQMWB2yyPs5KVoFueDOUkVUWMlg==
+=aFau
 -----END PGP SIGNATURE-----
 
---ku80OT2eS7IEH847tduSYAmXWiM1CBJPV--
+--5gMDOBD76EatADTyVctlkGhyMeIvl24iH--
