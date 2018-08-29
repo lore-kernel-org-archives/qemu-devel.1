@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fv1Vv-0004nN-Cp
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:32:08 -0400
+	(envelope-from <berto@igalia.com>) id 1fv1pZ-0005Fq-Ca
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fv1Vq-00071U-DV
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:32:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34378 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fv1Vq-000714-8r
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:32:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8F6397A7E6
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 14:32:01 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 29 Aug 2018 16:32:01 +0200
-Message-Id: <1535553121-80352-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1535464093-3648-1-git-send-email-imammedo@redhat.com>
-References: <1535464093-3648-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH] vl:c: make sure that sockets are calculated
- correctly in '-smp X' case
+	(envelope-from <berto@igalia.com>) id 1fv1pW-0003oj-6v
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 10:52:25 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <26c1da0d-5076-0fd3-e761-4c0d61e4856e@redhat.com>
+References: <cover.1535291602.git.berto@igalia.com>
+	<054195c8f83f524ee1f4d117407ac507dd18b0d8.1535291602.git.berto@igalia.com>
+	<af713c19-bc70-c581-aa9c-58aa08ab5e55@redhat.com>
+	<w51tvnd2xt6.fsf@maestria.local.igalia.com>
+	<26c1da0d-5076-0fd3-e761-4c0d61e4856e@redhat.com>
+Date: Wed, 29 Aug 2018 16:52:18 +0200
+Message-ID: <w51lg8p2pjx.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/9] block: Remove child references from
+ bs->{options, explicit_options}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: drjones@redhat.com, ehabkost@redhat.com
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-commit
-  (5cdc9b76e3 vl.c: Remove dead assignment)
-removed sockets calculation when 'sockets' weren't provided on CLI
-since there wasn't any users for it back then. Exiting checks
-are neither reachable
-   } else if (sockets * cores * threads < cpus) {
-or nor triggable
-   if (sockets * cores * threads > max_cpus)
-so we weren't noticing wrong topology since then, since users
-recalculate sockets adhoc on their own.
+On Wed 29 Aug 2018 02:18:45 PM CEST, Max Reitz wrote:
+>>>> @@ -3313,6 +3317,12 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+>>>>      bs->open_flags         = reopen_state->flags;
+>>>>      bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
+>>>>  
+>>>> +    /* Remove child references from bs->options and bs->explicit_options */
+>>>> +    QLIST_FOREACH(child, &bs->children, next) {
+>>>> +        qdict_del(bs->explicit_options, child->name);
+>>>> +        qdict_del(bs->options, child->name);
+>>>> +    }
+>>>> +
+>>>
+>>> Why don't you remove the child options as well?
+>> 
+>> Because there's no child options here at this point. They are removed
+>> from the parent QDict in bdrv_reopen_queue_child():
+>> 
+>>   QLIST_FOREACH(child, &bs->children, next) {
+>>       /* ... */
+>>       child_key_dot = g_strdup_printf("%s.", child->name);
+>>       qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
+>>       qdict_extract_subqdict(options, &new_child_options, child_key_dot);
+>>       g_free(child_key_dot);
+>> 
+>>       bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options, 0,
+>>                               child->role, options, flags);
+>>   }
+>
+> Hm.  It's a bit weird to split child options and child references into
+> two parts, but I suppose it makes sense.
 
-However with deprecation check it becomes noticable, for example
-  -smp 2
-will start printing warning:
-  "warning: Invalid CPU topology deprecated: sockets (1) * cores (1) * threads (1) != maxcpus (2)"
-calculating sockets if they weren't specified.
+The child references have to remain in the parent until at least
+bdrv_reopen_prepare() because we need them if we want to allow replacing
+a child.
 
-Fix it by returning back sockets calculation if it's omited on CLI.
+The child options are removed in bdrv_reopen_queue_child() because we
+need to pass them to the children. We could also make a copy and remove
+them later in bdrv_reopen_commit() if that makes things more clear, but
+I don't know...
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- vl.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> What do you think of adding a note to make it more clear?
+> (e.g. "(The inline child options have been handled in
+> bdrv_reopen_queue_child() already)")
 
-diff --git a/vl.c b/vl.c
-index 7fd700e..333d638 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1210,11 +1210,14 @@ static void smp_parse(QemuOpts *opts)
- 
-         /* compute missing values, prefer sockets over cores over threads */
-         if (cpus == 0 || sockets == 0) {
--            sockets = sockets > 0 ? sockets : 1;
-             cores = cores > 0 ? cores : 1;
-             threads = threads > 0 ? threads : 1;
-             if (cpus == 0) {
-+                sockets = sockets > 0 ? sockets : 1;
-                 cpus = cores * threads * sockets;
-+            } else {
-+                max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
-+                sockets = !sockets ? max_cpus / (cores * threads) : sockets;
-             }
-         } else if (cores == 0) {
-             threads = threads > 0 ? threads : 1;
--- 
-2.7.4
+Sure, why not.
+
+> [1] On second thought, we do probably want to check the references
+> there, at least.  If you attach a new child, there is no need to reopen
+> the current child, so we should skip the bdrv_reopen_queue_child()
+
+Yes, that's done in a subsequent patch (not part of this series yet).
+
+Berto
