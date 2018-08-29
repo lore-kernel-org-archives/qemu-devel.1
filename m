@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fv3wh-0005L7-CA
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 13:07:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fv3zB-0007U7-0p
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 13:10:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fv3oW-0004Jp-Bg
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 12:59:31 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Wed, 29 Aug 2018 17:59:09 +0100
-Message-Id: <20180829165911.30106-6-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180829165911.30106-1-mark.cave-ayland@ilande.co.uk>
-References: <20180829165911.30106-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 5/7] mac_oldworld: implement custom
- FWPathProvider
+	(envelope-from <ehabkost@redhat.com>) id 1fv3z6-0001Rj-Qd
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 13:10:28 -0400
+Date: Wed, 29 Aug 2018 14:10:21 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180829171021.GA17213@habkost.net>
+References: <23DA939E-B500-4ABE-A484-1FE1CB43B48A@me.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <23DA939E-B500-4ABE-A484-1FE1CB43B48A@me.com>
+Subject: Re: [Qemu-devel] [PATCH] Add support for TCP path/QMP_PATH in
+ scripts/qmp/qmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,113 +23,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: Chen Zhang <tgfbeta@me.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This enables the correct generation of bootdevice fw paths for in-built IDE
-and virtio-pci-blk devices suitable for OpenBIOS.
+On Tue, Aug 28, 2018 at 09:32:18PM +0800, Chen Zhang wrote:
+> From a1f93198020b8c043edab5292db39b52ac77f78b Mon Sep 17 00:00:00 2001
+> 
+> Signed-off-by: Zhang Chen <tgfbeta@me.com>
+> ---
+>  scripts/qmp/qmp | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
+> index 6cb46fd..0e8ed19 100755
+> --- a/scripts/qmp/qmp
+> +++ b/scripts/qmp/qmp
+> @@ -63,6 +63,16 @@ def main(args):
+>      if not path:
+>          print("QMP path isn't set, use --path=qmp-monitor-address or set QMP_PATH")
+>          return 1
+> +    tcp_addr = path.split(':')
+> +    if len(tcp_addr) == 2:
+> +        try:
+> +            port = int(tcp_addr[1])
+> +        except ValueError:
+> +            print("QMP path contains a non-numeric TCP port")
+> +            return 1
+> +        addr = ( tcp_addr[0], port )
+> +    else:
+> +        addr = path
 
-Note we also set the MachineClass ignore_boot_device_suffixes property to true
-since an additional disk node should not be added except for virtio devices.
+I don't think this qualifies as trivial patch.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/ppc/mac_oldworld.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 57 insertions(+), 1 deletion(-)
+I'm not against extending scripts/qmp/qmp this way, but this
+deserves some coordination to allow usage of QMP addresses that
+are not unix sockets in other scripts too.  Supporting libvirt's
+qemu-monitor-command would be another use case for this.  See:
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index c7b73e274f..9891c325a9 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -42,6 +42,7 @@
- #include "hw/misc/macio/macio.h"
- #include "hw/ide.h"
- #include "hw/loader.h"
-+#include "hw/fw-path-provider.h"
- #include "elf.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-@@ -373,6 +374,54 @@ static void ppc_heathrow_init(MachineState *machine)
-     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
- }
- 
-+/*
-+ * Implementation of an interface to adjust firmware path
-+ * for the bootindex property handling.
-+ */
-+static char *heathrow_fw_dev_path(FWPathProvider *p, BusState *bus,
-+                                  DeviceState *dev)
-+{
-+    PCIDevice *pci;
-+    IDEBus *ide_bus;
-+    IDEState *ide_s;
-+    MACIOIDEState *macio_ide;
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "macio-oldworld")) {
-+        pci = PCI_DEVICE(dev);
-+        return g_strdup_printf("mac-io@%x", PCI_SLOT(pci->devfn));
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "macio-ide")) {
-+        macio_ide = MACIO_IDE(dev);
-+        return g_strdup_printf("ata-3@%x", macio_ide->addr);
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-drive")) {
-+        ide_bus = IDE_BUS(qdev_get_parent_bus(dev));
-+        ide_s = idebus_active_if(ide_bus);
-+
-+        if (ide_s->drive_kind == IDE_CD) {
-+            return g_strdup("cdrom");
-+        }
-+
-+        return g_strdup("hd");
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-hd")) {
-+        return g_strdup("hd");
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-cd")) {
-+        return g_strdup("cdrom");
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "virtio-blk-device")) {
-+        return g_strdup("disk");
-+    }
-+
-+    return NULL;
-+}
-+
- static int heathrow_kvm_type(const char *arg)
- {
-     /* Always force PR KVM */
-@@ -382,6 +431,7 @@ static int heathrow_kvm_type(const char *arg)
- static void heathrow_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-+    FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(oc);
- 
-     mc->desc = "Heathrow based PowerMAC";
-     mc->init = ppc_heathrow_init;
-@@ -395,12 +445,18 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
-     mc->kvm_type = heathrow_kvm_type;
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("750_v3.1");
-     mc->default_display = "std";
-+    mc->ignore_boot_device_suffixes = true;
-+    fwc->get_dev_path = heathrow_fw_dev_path;
- }
- 
- static const TypeInfo ppc_heathrow_machine_info = {
-     .name          = MACHINE_TYPE_NAME("g3beige"),
-     .parent        = TYPE_MACHINE,
--    .class_init    = heathrow_class_init
-+    .class_init    = heathrow_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_FW_PATH_PROVIDER },
-+        { }
-+    },
- };
- 
- static void ppc_heathrow_register_types(void)
+https://www.mail-archive.com/qemu-block@nongnu.org/msg41351.html
+
+I suggest adding a new option name (e.g. --tcp) to explicitly
+tell the script you have a hostname:port pair, for simplicity.
+It doesn't make sense to overload an option named "path" for
+something that is not a path.
+
+
+>  
+>      if len(args):
+>          command, args = args[0], args[1:]
+> @@ -74,7 +84,7 @@ def main(args):
+>      if command in ['help']:
+>          os.execlp('man', 'man', 'qmp')
+>  
+> -    srv = QEMUMonitorProtocol(path)
+> +    srv = QEMUMonitorProtocol(addr)
+>      srv.connect()
+>  
+>      def do_command(srv, cmd, **kwds):
+> @@ -99,7 +109,7 @@ def main(args):
+>              raise
+>          return 0
+>  
+> -    srv = QEMUMonitorProtocol(path)
+> +    srv = QEMUMonitorProtocol(addr)
+>      srv.connect()
+>  
+>      arguments = {}
+> -- 
+> 2.7.4
+> 
+
 -- 
-2.11.0
+Eduardo
