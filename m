@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fv7Jc-0000JP-G0
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 16:43:49 -0400
+	(envelope-from <bounces@canonical.com>) id 1fv8uO-0006Fn-6B
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 18:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fv7JX-0003cq-LW
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 16:43:48 -0400
-Date: Mon, 27 Aug 2018 14:19:31 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180827131931.GA20843@stefanha-x1.localdomain>
-References: <20180816141303.20518-1-joel@jms.id.au>
-	<20180816141303.20518-3-joel@jms.id.au>
+	(envelope-from <bounces@canonical.com>) id 1fv8uK-0003IB-Sn
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 18:25:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56876)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fv8uK-0003GS-JQ
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 18:25:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fv8uH-0006wS-Va
+	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 22:25:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 611152E80D6
+	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 22:25:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8t9RHnE3ZwKMSgU+"
-Content-Disposition: inline
-In-Reply-To: <20180816141303.20518-3-joel@jms.id.au>
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] arm: Add Nordic Semiconductor nRF51
- SoC
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Aug 2018 22:12:53 -0000
+From: Jim White <1789751@bugs.launchpad.net>
+Reply-To: Bug 1789751 <1789751@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153558077352.6448.1092429650643921786.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1789751] [NEW] Using -overcommit flag leads to
+ qemu crashing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +36,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: qemu-devel@nongnu.org
+
+Public bug reported:
+
+Running the following leads to a qemu crash on startup:
+
+jwhite@laptop:~/os$ qemu-system-i386 -overcommit cpu-pm=3Don
+qemu-system-i386: -overcommit cpu-pm=3Don: There is no option group 'overco=
+mmit'
+Segmentation fault (core dumped)
+jwhite@laptop:~/os$ =
 
 
---8t9RHnE3ZwKMSgU+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 16, 2018 at 11:43:02PM +0930, Joel Stanley wrote:
-> The nRF51 is a Cortex-M0 microcontroller with an on-board radio module,
-> plus other common ARM SoC peripherals.
->=20
->  http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf
->=20
-> This defines a basic model of the CPU and memory, with no peripherals
-> implemented at this stage.
->=20
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> ---
-> v2:
->   put memory as struct fileds in state structure
->   pass OBJECT(s) as owner, not NULL
->   Add missing addresses for ficr
->   Fix flash and sram sizes for microbit
->   Embed cpu object in state object an initalise it without use of armv7m_=
-init
->   Link to datasheet
-> v3:
->   rebase nrf51 on m0 changes
->   remove unused kernel_filename
->   clarify flash and sram size
->   make flash and sram size properties of the soc state
-> v4:
->   set the number of interrupts to 32
-> v5:
->  move back to armv7m calls, as v4 of Stefan's patch removed the
->  m_profile changes
-> ---
->  default-configs/arm-softmmu.mak |   1 +
->  hw/arm/Makefile.objs            |   1 +
->  hw/arm/nrf51_soc.c              | 119 ++++++++++++++++++++++++++++++++
->  include/hw/arm/nrf51_soc.h      |  42 +++++++++++
->  4 files changed, 163 insertions(+)
->  create mode 100644 hw/arm/nrf51_soc.c
->  create mode 100644 include/hw/arm/nrf51_soc.h
+This fixes the issue:
 
-Besides what has already been discussed:
+--- ../tmp/qemu-3.0.0/vl.c	2018-08-14 12:10:35.000000000 -0700
++++ vl.c	2018-08-29 14:59:30.151554120 -0700
+@@ -2987,6 +2987,7 @@
+     qemu_add_opts(&qemu_object_opts);
+     qemu_add_opts(&qemu_tpmdev_opts);
+     qemu_add_opts(&qemu_realtime_opts);
++    qemu_add_opts(&qemu_overcommit_opts);
+     qemu_add_opts(&qemu_msg_opts);
+     qemu_add_opts(&qemu_name_opts);
+     qemu_add_opts(&qemu_numa_opts);
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
---8t9RHnE3ZwKMSgU+
-Content-Type: application/pgp-signature; name="signature.asc"
+-- =
 
------BEGIN PGP SIGNATURE-----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1789751
 
-iQEcBAEBAgAGBQJbg/pjAAoJEJykq7OBq3PIYfAIAKU5HKGzSlW3FNQI9LBIYfiU
-xaQtcQpNZCPdPOMcWfhYsJpiu+3Y2TyepbEt8gX8LREhc3BXoRZv16D7ENKt9DbT
-lqBanTi/r4PdgxaAPAy+wsfiSgZ4xWFy/eeTi+jBcraSzVP9xZGTlF+oegZ0HB8w
-sUtBsLtDNlIGAnpQyMbimaffyPrsQ+ImbEzyCuGGerkXWnbbxvsPSozTWXi9Kj+Z
-am5fTiszM7c9XAb/FjWYdGjqJLu7j83o0ns1zC/qqRLwDGn1BPFGplvDV5zO94Y/
-5n1j08nRmEMNESwXMfrnOSTkSgl+tJivdR9ZlliPtD5pnmEF8UlGZxtYASySyIM=
-=ObAi
------END PGP SIGNATURE-----
+Title:
+  Using -overcommit flag leads to qemu crashing
 
---8t9RHnE3ZwKMSgU+--
+Status in QEMU:
+  New
+
+Bug description:
+  Running the following leads to a qemu crash on startup:
+
+  jwhite@laptop:~/os$ qemu-system-i386 -overcommit cpu-pm=3Don
+  qemu-system-i386: -overcommit cpu-pm=3Don: There is no option group 'over=
+commit'
+  Segmentation fault (core dumped)
+  jwhite@laptop:~/os$ =
+
+
+  =
+
+  This fixes the issue:
+
+  --- ../tmp/qemu-3.0.0/vl.c	2018-08-14 12:10:35.000000000 -0700
+  +++ vl.c	2018-08-29 14:59:30.151554120 -0700
+  @@ -2987,6 +2987,7 @@
+       qemu_add_opts(&qemu_object_opts);
+       qemu_add_opts(&qemu_tpmdev_opts);
+       qemu_add_opts(&qemu_realtime_opts);
+  +    qemu_add_opts(&qemu_overcommit_opts);
+       qemu_add_opts(&qemu_msg_opts);
+       qemu_add_opts(&qemu_name_opts);
+       qemu_add_opts(&qemu_numa_opts);
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1789751/+subscriptions
