@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fuxr4-0005g4-Md
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:37:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuxwX-0001pb-B7
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fuxr1-0004m4-9S
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:37:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49530 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fuxr1-0004lH-17
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:37:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 593F7804B4B9
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 10:37:38 +0000 (UTC)
-Date: Wed, 29 Aug 2018 11:37:30 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180829103730.GG4199@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
-	<20180829095035.GI31005@redhat.com> <20180829102201.GA2660@work-vm>
+	(envelope-from <mreitz@redhat.com>) id 1fuxwV-0000ce-CX
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:43:21 -0400
+References: <cover.1535291602.git.berto@igalia.com>
+	<054195c8f83f524ee1f4d117407ac507dd18b0d8.1535291602.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <af713c19-bc70-c581-aa9c-58aa08ab5e55@redhat.com>
+Date: Wed, 29 Aug 2018 12:43:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180829102201.GA2660@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/29] vhost-user for input & GPU
+In-Reply-To: <054195c8f83f524ee1f4d117407ac507dd18b0d8.1535291602.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DyEo4rOO2MVH1jXtw0vZoZflhnFBfcKBN"
+Subject: Re: [Qemu-devel] [PATCH 3/9] block: Remove child references from
+ bs->{options, explicit_options}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,144 +25,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, airlied@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Wed, Aug 29, 2018 at 11:22:01AM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Fri, Jul 13, 2018 at 03:08:47PM +0200, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> > > Hi,
-> > >=20
-> > > vhost-user allows to drive a virtio device in a seperate
-> > > process. After vhost-user-net, we have seen
-> > > vhost-user-{scsi,blk,crypto} added more recently.
-> > >=20
-> > > This series, initially proposed 2 years ago
-> > > (https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.htm=
-l)
-> > > contributes with vhost-user-input and vhost-user-gpu.
-> > >=20
-> > > Additionally, to factor out common code and ease the usage, a
-> > > vhost-user-backend is introduced as an intermediary object between =
-the
-> > > backend and the qemu device.
-> > >=20
-> > > You may start a vhost-user-gpu with virgl rendering in a separate
-> > > process like this:
-> > >=20
-> > > $ ./vhost-user-gpu --virgl -s vgpu.sock &
-> > > $ qemu...
-> > >   -chardev socket,id=3Dchr,path=3Dvgpu.sock
-> > >   -object vhost-user-backend,id=3Dvug,chardev=3Dchr
-> > >   -device vhost-user-vga,vhost-user=3Dvug
-> > >=20
-> > > You may also specify the backend command and the arguments as part =
-of
-> > > vhost-user-backend qemu arguments. For example, to start a
-> > > vhost-user-input backend on input device /dev/input/event19:
-> > >=20
-> > > -object vhost-user-backend,id=3Dvuid,cmd=3D"vhost-user-input /dev/i=
-nput/event19"
-> > > -device virtio-input-host-pci,vhost-user=3Dvuid
-> > >=20
-> > > The vhost-user-gpu backend requires virgl from git.
-> > >=20
-> > > The libvirt support is on-going work:
-> > > https://github.com/elmarco/libvirt/commits/vhost-user-gpu
-> > >=20
-> > > The GPU benchmarks are encouraging, giving up to x5 performance on
-> > > Unigine Heaven 4.0.
-> >=20
-> > What is the main driving motivation behind this featureset ? Is it ai=
-med
-> > at providing performance, or security, or allowing arbitrary out of t=
-ree
-> > backends, or all three ?
-> >=20
-> > Although we've got a number of vhost-user backends I'm pretty concern=
-ed
-> > about the direction this is taking QEMU overall.
-> >=20
-> > Managing QEMU is non-trivial for a number of reasons. We've done a lo=
-t of
-> > work to provide standardized modelling of CLI args, guest ABI stabili=
-ty
-> > via association with machine types, migration data stream stability,
-> > QEMU feature capabilities detection and so on.
-> >=20
-> > The move to outsource backends to external binaries is discarding som=
-e
-> > or all of these items, rewinding alot of progress we've made in the
-> > managability of QEMU. Each external binary has to now reinvent the
-> > things that are already solved in QEMU, and you can be sure each impl
-> > will reinvent the concepts differently.
-> >=20
-> > I can't help feeling that we are shooting ourselves in the foot here
-> > long term.
-> >=20
-> > We've always rejected the idea of having loadable modules in QEMU, bu=
-t
-> > as a result we've end up with outsourcing the backend entirely via th=
-e
-> > vhost-user framework, so the end result is even more opaque than if w=
-e
-> > had loadable modules, and is unable to take advantage of our standard=
-ized
-> > modelling frameworks & capabilities :-(
-> >=20
-> > If we just look at performance & security, and ignore 3rd party impls
-> > for a minute, I really don't like that to gain perf + security  we ha=
-ve
-> > to change from:
-> >=20
-> >  $ qemu...
-> >    -device virtio-vga
-> > =20
-> > To
-> >=20
-> >  $ ./vhost-user-gpu --virgl -s vgpu.sock &
-> >  $ qemu...
-> >    -chardev socket,id=3Dchr,path=3Dvgpu.sock
-> >    -object vhost-user-backend,id=3Dvug,chardev=3Dchr
-> >    -device vhost-user-vga,vhost-user=3Dvug
-> >=20
-> > Once we have the ability to run the backend via an external process,
-> > to gain performance & security benefits, assuming feature parity is
-> > achieved, I question why anyone would want to continue with the old
-> > in-process approach ? IOW the goal should be that the original args=20
-> >=20
-> >  $ qemu...
-> >    -device virtio-vga
-> >=20
-> > should "do the right thing" to launch the external process when you
-> > have upgraded to a new enough QEMU, so that everyone immediately
-> > benefits from the more secure & performant architecture.=20
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DyEo4rOO2MVH1jXtw0vZoZflhnFBfcKBN
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <af713c19-bc70-c581-aa9c-58aa08ab5e55@redhat.com>
+Subject: Re: [PATCH 3/9] block: Remove child references from
+ bs->{options,explicit_options}
+References: <cover.1535291602.git.berto@igalia.com>
+ <054195c8f83f524ee1f4d117407ac507dd18b0d8.1535291602.git.berto@igalia.com>
+In-Reply-To: <054195c8f83f524ee1f4d117407ac507dd18b0d8.1535291602.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-08-26 16:09, Alberto Garcia wrote:
+> Block drivers allow opening their children using a reference to an
+> existing BlockDriverState. These references remain stored in the
+> 'options' and 'explicit_options' QDicts, but we don't need to keep
+> them once everything is open.
 >=20
-> But which external process should it run, under what privilieges
-> and with sockets placed where?
-> While it's true it would be good to have a nice simple way, often
-> the qemu process might not have the privs to run that external process
-> or know where to put the sockets; that's exactly the type of thing
-> we're happy to leave to libvirt to wire up.
+> What is more important, these values can become wrong if the children
+> change:
+>=20
+>     $ qemu-img create -f qcow2 hd0.qcow2 10M
+>     $ qemu-img create -f qcow2 hd1.qcow2 10M
+>     $ qemu-img create -f qcow2 hd2.qcow2 10M
+>     $ $QEMU -drive if=3Dnone,file=3Dhd0.qcow2,node-name=3Dhd0 \
+>             -drive if=3Dnone,file=3Dhd1.qcow2,node-name=3Dhd1,backing=3D=
+hd0 \
+>             -drive file=3Dhd2.qcow2,node-name=3Dhd2,backing=3Dhd1
+>=20
+> After this hd2 has hd1 as its backing file. Now let's remove it using
+> block_stream:
+>=20
+>     (qemu) block_stream hd2 0 hd0.qcow2
+>=20
+> Now hd0 is the backing file of hd2, but hd2's options QDicts still
+> contain backing=3Dhd1.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 
-We can still do both - the simple case where QEMU just spawns a process,
+Also, the question is, why would we discard the child options, but keep
+the references (which we do not add, so we only have the ones specified
+by the user).
 
-  $ qemu...
-    -device virtio-vga
+> diff --git a/block.c b/block.c
+> index 0dbb1fcc7b..2f2484965d 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2763,12 +2763,15 @@ static BlockDriverState *bdrv_open_inherit(cons=
+t char *filename,
+>          }
+>      }
+> =20
+> -    /* Remove all children options from bs->options and bs->explicit_o=
+ptions */
+> +    /* Remove all children options and references
+> +     * from bs->options and bs->explicit_options */
+>      QLIST_FOREACH(child, &bs->children, next) {
+>          char *child_key_dot;
+>          child_key_dot =3D g_strdup_printf("%s.", child->name);
+>          qdict_extract_subqdict(bs->explicit_options, NULL, child_key_d=
+ot);
+>          qdict_extract_subqdict(bs->options, NULL, child_key_dot);
+> +        qdict_del(bs->explicit_options, child->name);
+> +        qdict_del(bs->options, child->name);
+>          g_free(child_key_dot);
+>      }
+> =20
+> @@ -3289,6 +3292,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_s=
+tate)
+>  {
+>      BlockDriver *drv;
+>      BlockDriverState *bs;
+> +    BdrvChild *child;
+>      bool old_can_write, new_can_write;
+> =20
+>      assert(reopen_state !=3D NULL);
+> @@ -3313,6 +3317,12 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_=
+state)
+>      bs->open_flags         =3D reopen_state->flags;
+>      bs->read_only =3D !(reopen_state->flags & BDRV_O_RDWR);
+> =20
+> +    /* Remove child references from bs->options and bs->explicit_optio=
+ns */
+> +    QLIST_FOREACH(child, &bs->children, next) {
+> +        qdict_del(bs->explicit_options, child->name);
+> +        qdict_del(bs->options, child->name);
+> +    }
+> +
 
-while also allowing connections to a pre-spawned process to have extra
-privs via:
+Why don't you remove the child options as well?
 
-  $ qemu...
-    -device virtio-vga,vhost=3DchardevID
+Max
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>      bdrv_refresh_limits(bs, NULL);
+> =20
+>      bdrv_set_perm(reopen_state->bs, reopen_state->perm,
+>=20
+
+
+
+--DyEo4rOO2MVH1jXtw0vZoZflhnFBfcKBN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGeLoACgkQ9AfbAGHV
+z0ABOwgAvFnhaNsp5HqDtBsq6zBuFYOB/xoSzlgaC3flA1+/822YnOh2AoqbM3D2
+kgLdO6m4G9L59FTVer7w3TVsxULTGClIdRpIi7vfgmgPX1gC0xSD0AWrh7T/5L67
+a/6QknE9nsKPo/vAzWSwKmoO8FxKGuZa8Cj5aZ0sKQkBnEEJKbdH16XiVTo+Xb0O
++zVub0Ovwxd8qKzoQbIT3jdOZRu7JSMAZIYfgVE3QItcgoZULubiM9znJpbsXgig
+uUuzbYr/BT9EFvzBGqrfVhSGrfrqxhXA1tnaxFUhncinsYI3rkMTk6Rz6q7R+RIe
+oofrLHyu9gpnTnysnYWWKGeMdVuByw==
+=Ku3Z
+-----END PGP SIGNATURE-----
+
+--DyEo4rOO2MVH1jXtw0vZoZflhnFBfcKBN--
