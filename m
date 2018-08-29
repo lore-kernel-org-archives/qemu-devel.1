@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fuyqt-0001kp-Bj
+	(envelope-from <quintela@redhat.com>) id 1fuyqr-0001cf-1w
 	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:41:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fuynJ-0007N5-NO
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:37:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51490 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fuynL-0007NZ-88
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:37:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56600 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fuynJ-0007Mx-HO
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:37:53 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fuynL-0007NN-2G
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:37:55 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 381A68077102
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 11:37:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BB5398574D
+	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 11:37:54 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 29 Aug 2018 13:37:19 +0200
-Message-Id: <20180829113730.14992-6-quintela@redhat.com>
+Date: Wed, 29 Aug 2018 13:37:20 +0200
+Message-Id: <20180829113730.14992-7-quintela@redhat.com>
 In-Reply-To: <20180829113730.14992-1-quintela@redhat.com>
 References: <20180829113730.14992-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/16] virtio: split virtio balloon bits from
+Subject: [Qemu-devel] [PATCH 06/16] virtio: split virtio 9p bits from
  virtio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,44 +34,42 @@ To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, mst@redhat.com
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/virtio/Makefile.objs        |  1 +
- hw/virtio/virtio-balloon-pci.c | 94 ++++++++++++++++++++++++++++++++++
- hw/virtio/virtio-pci.c         | 58 ---------------------
- hw/virtio/virtio-pci.h         | 14 -----
- tests/Makefile.include         |  4 +-
- 5 files changed, 97 insertions(+), 74 deletions(-)
- create mode 100644 hw/virtio/virtio-balloon-pci.c
+ hw/virtio/Makefile.objs   |  1 +
+ hw/virtio/virtio-9p-pci.c | 86 +++++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c    | 52 -----------------------
+ hw/virtio/virtio-pci.h    | 20 ---------
+ 4 files changed, 87 insertions(+), 72 deletions(-)
+ create mode 100644 hw/virtio/virtio-9p-pci.c
 
 diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 2efa544a2d..0f0b846a45 100644
+index 0f0b846a45..bc802db4e8 100644
 --- a/hw/virtio/Makefile.objs
 +++ b/hw/virtio/Makefile.objs
-@@ -14,6 +14,7 @@ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o vhost-vsock-pci.o
- obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+@@ -15,6 +15,7 @@ obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
-+obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
+ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
++obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
  endif
  
  common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) += vhost-stub.o
-diff --git a/hw/virtio/virtio-balloon-pci.c b/hw/virtio/virtio-balloon-pci.c
+diff --git a/hw/virtio/virtio-9p-pci.c b/hw/virtio/virtio-9p-pci.c
 new file mode 100644
-index 0000000000..2e9d92990b
+index 0000000000..74c6ca2ddb
 --- /dev/null
-+++ b/hw/virtio/virtio-balloon-pci.c
-@@ -0,0 +1,94 @@
++++ b/hw/virtio/virtio-9p-pci.c
+@@ -0,0 +1,86 @@
 +/*
-+ * Virtio balloon PCI Bindings
++ * Virtio 9p PCI Bindings
 + *
-+ * Copyright IBM, Corp. 2007
-+ * Copyright (c) 2009 CodeSourcery
++ * Copyright IBM, Corp. 2010
 + *
 + * Authors:
 + *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *  Paul Brook        <paul@codesourcery.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
 + *
 + * Contributions after 2012-01-13 are licensed under the terms of the
 + * GNU GPL, version 2 or (at your option) any later version.
@@ -80,219 +78,181 @@ index 0000000000..2e9d92990b
 +#include "qemu/osdep.h"
 +
 +#include "virtio-pci.h"
-+#include "hw/virtio/virtio-balloon.h"
-+#include "qapi/error.h"
-+
-+typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
++#include "hw/9pfs/virtio-9p.h"
 +
 +/*
-+ * virtio-balloon-pci: This extends VirtioPCIProxy.
++ * virtio-9p-pci: This extends VirtioPCIProxy.
 + */
-+#define TYPE_VIRTIO_BALLOON_PCI "virtio-balloon-pci"
-+#define VIRTIO_BALLOON_PCI(obj) \
-+        OBJECT_CHECK(VirtIOBalloonPCI, (obj), TYPE_VIRTIO_BALLOON_PCI)
 +
-+struct VirtIOBalloonPCI {
++#define TYPE_VIRTIO_9P_PCI "virtio-9p-pci"
++#define VIRTIO_9P_PCI(obj) \
++        OBJECT_CHECK(V9fsPCIState, (obj), TYPE_VIRTIO_9P_PCI)
++
++typedef struct V9fsPCIState {
 +    VirtIOPCIProxy parent_obj;
-+    VirtIOBalloon vdev;
-+};
++    V9fsVirtioState vdev;
++} V9fsPCIState;
 +
-+static Property virtio_balloon_pci_properties[] = {
-+    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_balloon_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++static void virtio_9p_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 +{
-+    VirtIOBalloonPCI *dev = VIRTIO_BALLOON_PCI(vpci_dev);
++    V9fsPCIState *dev = VIRTIO_9P_PCI(vpci_dev);
 +    DeviceState *vdev = DEVICE(&dev->vdev);
-+
-+    if (vpci_dev->class_code != PCI_CLASS_OTHERS &&
-+        vpci_dev->class_code != PCI_CLASS_MEMORY_RAM) { /* qemu < 1.1 */
-+        vpci_dev->class_code = PCI_CLASS_OTHERS;
-+    }
 +
 +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
 +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +}
 +
-+static void virtio_balloon_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-+    k->realize = virtio_balloon_pci_realize;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->props = virtio_balloon_pci_properties;
-+    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-+    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BALLOON;
-+    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
-+    pcidev_k->class_id = PCI_CLASS_OTHERS;
-+}
-+
-+static void virtio_balloon_pci_instance_init(Object *obj)
-+{
-+    VirtIOBalloonPCI *dev = VIRTIO_BALLOON_PCI(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_BALLOON);
-+    object_property_add_alias(obj, "guest-stats", OBJECT(&dev->vdev),
-+                                  "guest-stats", &error_abort);
-+    object_property_add_alias(obj, "guest-stats-polling-interval",
-+                              OBJECT(&dev->vdev),
-+                              "guest-stats-polling-interval", &error_abort);
-+}
-+
-+static const TypeInfo virtio_balloon_pci_info = {
-+    .name          = TYPE_VIRTIO_BALLOON_PCI,
-+    .parent        = TYPE_VIRTIO_PCI,
-+    .instance_size = sizeof(VirtIOBalloonPCI),
-+    .instance_init = virtio_balloon_pci_instance_init,
-+    .class_init    = virtio_balloon_pci_class_init,
++static Property virtio_9p_pci_properties[] = {
++    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
++                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
++    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void virtio_balloon_pci_register(void)
++static void virtio_9p_pci_class_init(ObjectClass *klass, void *data)
 +{
-+    type_register_static(&virtio_balloon_pci_info);
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++
++    k->realize = virtio_9p_pci_realize;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_9P;
++    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id = 0x2;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = virtio_9p_pci_properties;
 +}
 +
-+type_init(virtio_balloon_pci_register)
++static void virtio_9p_pci_instance_init(Object *obj)
++{
++    V9fsPCIState *dev = VIRTIO_9P_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_9P);
++}
++
++static const TypeInfo virtio_9p_pci_info = {
++    .name          = TYPE_VIRTIO_9P_PCI,
++    .parent        = TYPE_VIRTIO_PCI,
++    .instance_size = sizeof(V9fsPCIState),
++    .instance_init = virtio_9p_pci_instance_init,
++    .class_init    = virtio_9p_pci_class_init,
++};
++
++static void virtio_9p_pci_register(void)
++{
++    type_register_static(&virtio_9p_pci_info);
++}
++
++type_init(virtio_9p_pci_register)
 diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 63700f5548..4bb2a5aab2 100644
+index 4bb2a5aab2..ab2f5c93cf 100644
 --- a/hw/virtio/virtio-pci.c
 +++ b/hw/virtio/virtio-pci.c
-@@ -23,7 +23,6 @@
- #include "hw/virtio/virtio-net.h"
- #include "hw/virtio/virtio-serial.h"
- #include "hw/virtio/virtio-scsi.h"
--#include "hw/virtio/virtio-balloon.h"
- #include "hw/pci/pci.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-@@ -2237,62 +2236,6 @@ static const TypeInfo vhost_user_scsi_pci_info = {
- };
- #endif
+@@ -1077,55 +1077,6 @@ static void virtio_pci_vmstate_change(DeviceState *d, bool running)
+     }
+ }
  
--/* virtio-balloon-pci */
--
--static Property virtio_balloon_pci_properties[] = {
--    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void virtio_balloon_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+-#ifdef CONFIG_VIRTFS
+-static void virtio_9p_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
 -{
--    VirtIOBalloonPCI *dev = VIRTIO_BALLOON_PCI(vpci_dev);
+-    V9fsPCIState *dev = VIRTIO_9P_PCI(vpci_dev);
 -    DeviceState *vdev = DEVICE(&dev->vdev);
--
--    if (vpci_dev->class_code != PCI_CLASS_OTHERS &&
--        vpci_dev->class_code != PCI_CLASS_MEMORY_RAM) { /* qemu < 1.1 */
--        vpci_dev->class_code = PCI_CLASS_OTHERS;
--    }
 -
 -    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
 -    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 -}
 -
--static void virtio_balloon_pci_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
--    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
--    k->realize = virtio_balloon_pci_realize;
--    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
--    dc->props = virtio_balloon_pci_properties;
--    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
--    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_BALLOON;
--    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
--    pcidev_k->class_id = PCI_CLASS_OTHERS;
--}
--
--static void virtio_balloon_pci_instance_init(Object *obj)
--{
--    VirtIOBalloonPCI *dev = VIRTIO_BALLOON_PCI(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_BALLOON);
--    object_property_add_alias(obj, "guest-stats", OBJECT(&dev->vdev),
--                                  "guest-stats", &error_abort);
--    object_property_add_alias(obj, "guest-stats-polling-interval",
--                              OBJECT(&dev->vdev),
--                              "guest-stats-polling-interval", &error_abort);
--}
--
--static const TypeInfo virtio_balloon_pci_info = {
--    .name          = TYPE_VIRTIO_BALLOON_PCI,
--    .parent        = TYPE_VIRTIO_PCI,
--    .instance_size = sizeof(VirtIOBalloonPCI),
--    .instance_init = virtio_balloon_pci_instance_init,
--    .class_init    = virtio_balloon_pci_class_init,
+-static Property virtio_9p_pci_properties[] = {
+-    DEFINE_PROP_BIT("ioeventfd", VirtIOPCIProxy, flags,
+-                    VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT, true),
+-    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors, 2),
+-    DEFINE_PROP_END_OF_LIST(),
 -};
 -
- /* virtio-serial-pci */
- 
- static void virtio_serial_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-@@ -2478,7 +2421,6 @@ static void virtio_pci_register_types(void)
+-static void virtio_9p_pci_class_init(ObjectClass *klass, void *data)
+-{
+-    DeviceClass *dc = DEVICE_CLASS(klass);
+-    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
+-    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
+-
+-    k->realize = virtio_9p_pci_realize;
+-    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
+-    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_9P;
+-    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
+-    pcidev_k->class_id = 0x2;
+-    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+-    dc->props = virtio_9p_pci_properties;
+-}
+-
+-static void virtio_9p_pci_instance_init(Object *obj)
+-{
+-    V9fsPCIState *dev = VIRTIO_9P_PCI(obj);
+-
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VIRTIO_9P);
+-}
+-
+-static const TypeInfo virtio_9p_pci_info = {
+-    .name          = TYPE_VIRTIO_9P_PCI,
+-    .parent        = TYPE_VIRTIO_PCI,
+-    .instance_size = sizeof(V9fsPCIState),
+-    .instance_init = virtio_9p_pci_instance_init,
+-    .class_init    = virtio_9p_pci_class_init,
+-};
+-#endif /* CONFIG_VIRTFS */
+-
+ /*
+  * virtio-pci: This is the PCIDevice which has a virtio-pci-bus.
+  */
+@@ -2413,9 +2364,6 @@ static void virtio_pci_register_types(void)
+ {
+     type_register_static(&virtio_pci_bus_info);
+     type_register_static(&virtio_pci_info);
+-#ifdef CONFIG_VIRTFS
+-    type_register_static(&virtio_9p_pci_info);
+-#endif
+     type_register_static(&virtio_blk_pci_info);
+ #if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
      type_register_static(&vhost_user_blk_pci_info);
- #endif
-     type_register_static(&virtio_scsi_pci_info);
--    type_register_static(&virtio_balloon_pci_info);
-     type_register_static(&virtio_serial_pci_info);
-     type_register_static(&virtio_net_pci_info);
- #ifdef CONFIG_VHOST_SCSI
 diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 2415eb6a4d..093fde7f4f 100644
+index 093fde7f4f..200950de0a 100644
 --- a/hw/virtio/virtio-pci.h
 +++ b/hw/virtio/virtio-pci.h
-@@ -20,7 +20,6 @@
- #include "hw/virtio/virtio-net.h"
- #include "hw/virtio/virtio-serial.h"
- #include "hw/virtio/virtio-scsi.h"
--#include "hw/virtio/virtio-balloon.h"
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-crypto.h"
-@@ -39,7 +38,6 @@
- typedef struct VirtIOPCIProxy VirtIOPCIProxy;
- typedef struct VirtIOBlkPCI VirtIOBlkPCI;
- typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
--typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
- typedef struct VirtIOSerialPCI VirtIOSerialPCI;
- typedef struct VirtIONetPCI VirtIONetPCI;
- typedef struct VHostSCSIPCI VHostSCSIPCI;
-@@ -264,18 +262,6 @@ struct VirtIOBlkPCI {
-     VirtIOBlock vdev;
+@@ -28,9 +28,6 @@
+ #include "hw/virtio/vhost-user-blk.h"
+ #endif
+ 
+-#ifdef CONFIG_VIRTFS
+-#include "hw/9pfs/virtio-9p.h"
+-#endif
+ #ifdef CONFIG_VHOST_SCSI
+ #include "hw/virtio/vhost-scsi.h"
+ #endif
+@@ -286,23 +283,6 @@ struct VirtIONetPCI {
+     VirtIONet vdev;
  };
  
 -/*
-- * virtio-balloon-pci: This extends VirtioPCIProxy.
+- * virtio-9p-pci: This extends VirtioPCIProxy.
 - */
--#define TYPE_VIRTIO_BALLOON_PCI "virtio-balloon-pci"
--#define VIRTIO_BALLOON_PCI(obj) \
--        OBJECT_CHECK(VirtIOBalloonPCI, (obj), TYPE_VIRTIO_BALLOON_PCI)
 -
--struct VirtIOBalloonPCI {
+-#ifdef CONFIG_VIRTFS
+-
+-#define TYPE_VIRTIO_9P_PCI "virtio-9p-pci"
+-#define VIRTIO_9P_PCI(obj) \
+-        OBJECT_CHECK(V9fsPCIState, (obj), TYPE_VIRTIO_9P_PCI)
+-
+-typedef struct V9fsPCIState {
 -    VirtIOPCIProxy parent_obj;
--    VirtIOBalloon vdev;
--};
+-    V9fsVirtioState vdev;
+-} V9fsPCIState;
+-
+-#endif
 -
  /*
-  * virtio-serial-pci: This extends VirtioPCIProxy.
+  * virtio-input-pci: This extends VirtioPCIProxy.
   */
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 739124b540..8c23270d4c 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -199,8 +199,8 @@ gcov-files-virtioserial-y += hw/char/virtio-console.c
- gcov-files-virtio-y += i386-softmmu/hw/virtio/virtio.c
- check-qtest-virtio-y += tests/virtio-net-test$(EXESUF)
- gcov-files-virtio-y += i386-softmmu/hw/net/virtio-net.c
--check-qtest-virtio-y += tests/virtio-balloon-test$(EXESUF)
--gcov-files-virtio-y += i386-softmmu/hw/virtio/virtio-balloon.c
-+check-qtest-virtio-$(CONFIG_VIRTIO_BALLOON) += tests/virtio-balloon-test$(EXESUF)
-+gcov-files-virtio-$(CONFIG_VIRTIO_BALLOON) += i386-softmmu/hw/virtio/virtio-balloon.c
- check-qtest-virtio-y += tests/virtio-blk-test$(EXESUF)
- gcov-files-virtio-y += i386-softmmu/hw/block/virtio-blk.c
- check-qtest-virtio-$(CONFIG_VIRTIO_RNG) += tests/virtio-rng-test$(EXESUF)
 -- 
 2.17.1
