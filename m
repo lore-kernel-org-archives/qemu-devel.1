@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuxBa-0005TA-5P
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:54:51 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuxBd-0005TP-Tk
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:54:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuwzj-0002xb-LR
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:42:40 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuwzD-0002dO-Np
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:42:04 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 29 Aug 2018 11:41:39 +0200
-Message-Id: <20180829094143.2102-16-cohuck@redhat.com>
+Date: Wed, 29 Aug 2018 11:41:30 +0200
+Message-Id: <20180829094143.2102-7-cohuck@redhat.com>
 In-Reply-To: <20180829094143.2102-1-cohuck@redhat.com>
 References: <20180829094143.2102-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 15/19] hw/s390x: Move virtio-ccw-gpu code to a
- separate file
+Subject: [Qemu-devel] [PULL 06/19] target/s390x: fix PACK reading 1 byte
+ less and writing 1 byte more
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,179 +21,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
 
-The code should only be enabled if CONFIG_VIRTIO_GPU has been set. This
-can be done best if the code resides in a separate file.
+PACK fails on the test from the Principles of Operation: F1F2F3F4
+becomes 0000234C instead of 0001234C due to an off-by-one error.
+Furthermore, it overwrites one extra byte to the left of F1.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1532521224-27235-10-git-send-email-thuth@redhat.com>
+If len_dest is 0, then we only want to flip the 1st byte and never loop
+over the rest. Therefore, the loop condition should be > and not >=.
+
+If len_src is 1, then we should flip the 1st byte and pack the 2nd.
+Since len_src is already decremented before the loop, the first
+condition should be >=, and not >.
+
+Likewise for len_src == 2 and the second condition.
+
+Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
+Message-Id: <20180821025104.19604-7-pavel.zbitskiy@gmail.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/Makefile.objs    |  1 +
- hw/s390x/virtio-ccw-gpu.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/virtio-ccw.c     | 47 ---------------------------------
- 3 files changed, 68 insertions(+), 47 deletions(-)
- create mode 100644 hw/s390x/virtio-ccw-gpu.c
+ target/s390x/mem_helper.c       |  6 +++---
+ tests/tcg/s390x/Makefile.target |  1 +
+ tests/tcg/s390x/pack.c          | 21 +++++++++++++++++++++
+ 3 files changed, 25 insertions(+), 3 deletions(-)
+ create mode 100644 tests/tcg/s390x/pack.c
 
-diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index f1c058e6f2..9c858c1dde 100644
---- a/hw/s390x/Makefile.objs
-+++ b/hw/s390x/Makefile.objs
-@@ -13,6 +13,7 @@ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-ccw-balloon.o
- obj-$(CONFIG_VIRTIO_SCSI) += virtio-ccw-scsi.o
- obj-$(CONFIG_VIRTIO_RNG) += virtio-ccw-rng.o
- obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-ccw-crypto.o
-+obj-$(CONFIG_VIRTIO_GPU) += virtio-ccw-gpu.o
- obj-$(call land,$(CONFIG_VIRTIO_9P),$(CONFIG_VIRTFS)) += virtio-ccw-9p.o
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-ccw.o
- obj-y += css-bridge.o
-diff --git a/hw/s390x/virtio-ccw-gpu.c b/hw/s390x/virtio-ccw-gpu.c
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 704d0193b5..bacae4f503 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1019,15 +1019,15 @@ void HELPER(pack)(CPUS390XState *env, uint32_t len, uint64_t dest, uint64_t src)
+     len_src--;
+ 
+     /* now pack every value */
+-    while (len_dest >= 0) {
++    while (len_dest > 0) {
+         b = 0;
+ 
+-        if (len_src > 0) {
++        if (len_src >= 0) {
+             b = cpu_ldub_data_ra(env, src, ra) & 0x0f;
+             src--;
+             len_src--;
+         }
+-        if (len_src > 0) {
++        if (len_src >= 0) {
+             b |= cpu_ldub_data_ra(env, src, ra) << 4;
+             src--;
+             len_src--;
+diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
+index 7de4376f52..151dc075aa 100644
+--- a/tests/tcg/s390x/Makefile.target
++++ b/tests/tcg/s390x/Makefile.target
+@@ -5,3 +5,4 @@ TESTS+=csst
+ TESTS+=ipm
+ TESTS+=exrl-trt
+ TESTS+=exrl-trtr
++TESTS+=pack
+diff --git a/tests/tcg/s390x/pack.c b/tests/tcg/s390x/pack.c
 new file mode 100644
-index 0000000000..71869b7fbd
+index 0000000000..4be36f29a7
 --- /dev/null
-+++ b/hw/s390x/virtio-ccw-gpu.c
-@@ -0,0 +1,67 @@
-+/*
-+ * virtio ccw gpu implementation
-+ *
-+ * Copyright 2012, 2015 IBM Corp.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
++++ b/tests/tcg/s390x/pack.c
+@@ -0,0 +1,21 @@
++#include <unistd.h>
 +
-+#include "qemu/osdep.h"
-+#include "hw/virtio/virtio.h"
-+#include "qapi/error.h"
-+#include "virtio-ccw.h"
-+
-+static void virtio_ccw_gpu_realize(VirtioCcwDevice *ccw_dev, Error **errp)
++int main(void)
 +{
-+    VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(ccw_dev);
-+    DeviceState *vdev = DEVICE(&dev->vdev);
++    char data[] = {0xaa, 0xaa, 0xf1, 0xf2, 0xf3, 0xc4, 0xaa, 0xaa};
++    char exp[] = {0xaa, 0xaa, 0x00, 0x01, 0x23, 0x4c, 0xaa, 0xaa};
++    int i;
 +
-+    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++    asm volatile(
++        "    pack 2(4,%[data]),2(4,%[data])\n"
++        :
++        : [data] "r" (&data[0])
++        : "memory");
++    for (i = 0; i < 8; i++) {
++        if (data[i] != exp[i]) {
++            write(1, "bad data\n", 9);
++            return 1;
++        }
++    }
++    return 0;
 +}
-+
-+static void virtio_ccw_gpu_instance_init(Object *obj)
-+{
-+    VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(obj);
-+    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
-+
-+    ccw_dev->force_revision_1 = true;
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_GPU);
-+}
-+
-+static Property virtio_ccw_gpu_properties[] = {
-+    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
-+                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
-+    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
-+                       VIRTIO_CCW_MAX_REV),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_ccw_gpu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
-+
-+    k->realize = virtio_ccw_gpu_realize;
-+    dc->props = virtio_ccw_gpu_properties;
-+    dc->hotpluggable = false;
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+}
-+
-+static const TypeInfo virtio_ccw_gpu = {
-+    .name          = TYPE_VIRTIO_GPU_CCW,
-+    .parent        = TYPE_VIRTIO_CCW_DEVICE,
-+    .instance_size = sizeof(VirtIOGPUCcw),
-+    .instance_init = virtio_ccw_gpu_instance_init,
-+    .class_init    = virtio_ccw_gpu_class_init,
-+};
-+
-+static void virtio_ccw_gpu_register(void)
-+{
-+    type_register_static(&virtio_ccw_gpu);
-+}
-+
-+type_init(virtio_ccw_gpu_register)
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 1f68e04bac..8746b9ce92 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -808,15 +808,6 @@ static void virtio_ccw_blk_instance_init(Object *obj)
-                               "bootindex", &error_abort);
- }
- 
--static void virtio_ccw_gpu_realize(VirtioCcwDevice *ccw_dev, Error **errp)
--{
--    VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(ccw_dev);
--    DeviceState *vdev = DEVICE(&dev->vdev);
--
--    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
--    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
--}
--
- static void virtio_ccw_input_realize(VirtioCcwDevice *ccw_dev, Error **errp)
- {
-     VirtIOInputCcw *dev = VIRTIO_INPUT_CCW(ccw_dev);
-@@ -1252,43 +1243,6 @@ static const TypeInfo virtio_ccw_blk = {
-     .class_init    = virtio_ccw_blk_class_init,
- };
- 
--static Property virtio_ccw_gpu_properties[] = {
--    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
--                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
--    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
--                       VIRTIO_CCW_MAX_REV),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void virtio_ccw_gpu_instance_init(Object *obj)
--{
--    VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(obj);
--    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
--
--    ccw_dev->force_revision_1 = true;
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_GPU);
--}
--
--static void virtio_ccw_gpu_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
--
--    k->realize = virtio_ccw_gpu_realize;
--    dc->props = virtio_ccw_gpu_properties;
--    dc->hotpluggable = false;
--    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
--}
--
--static const TypeInfo virtio_ccw_gpu = {
--    .name          = TYPE_VIRTIO_GPU_CCW,
--    .parent        = TYPE_VIRTIO_CCW_DEVICE,
--    .instance_size = sizeof(VirtIOGPUCcw),
--    .instance_init = virtio_ccw_gpu_instance_init,
--    .class_init    = virtio_ccw_gpu_class_init,
--};
--
- static Property virtio_ccw_input_properties[] = {
-     DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
-                     VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
-@@ -1464,7 +1418,6 @@ static void virtio_ccw_register(void)
-     type_register_static(&virtio_ccw_device_info);
-     type_register_static(&virtio_ccw_blk);
-     type_register_static(&virtio_ccw_net);
--    type_register_static(&virtio_ccw_gpu);
-     type_register_static(&virtio_ccw_input);
-     type_register_static(&virtio_ccw_input_hid);
-     type_register_static(&virtio_ccw_keyboard);
 -- 
 2.14.4
