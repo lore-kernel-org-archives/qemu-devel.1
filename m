@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55688)
+Received: from eggs.gnu.org ([208.118.235.92]:46352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fuoPI-0006Zn-LA
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 20:32:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1fuoce-0003Fu-J6
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 20:46:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fuoOy-0007Iz-Kq
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 20:32:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1fuoOy-0007Fb-7l
-	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 20:32:04 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w7T0T9LA001893
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 20:32:02 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2m5bp2jy4h-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Aug 2018 20:32:02 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 28 Aug 2018 18:32:00 -0600
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <CAJ+F1CL+w0f8Esow9RS3XEo0bYmg28uqPhQyvi+7fJEARACkTA@mail.gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1fuoZU-0000B0-Rm
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 20:43:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33430 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fuoZN-0008Vr-3m
+	for qemu-devel@nongnu.org; Tue, 28 Aug 2018 20:42:51 -0400
+Date: Wed, 29 Aug 2018 08:42:37 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180829004237.GG4446@xz-x1>
 References: <20180825135724.8981-1-marcandre.lureau@redhat.com>
-	<20180825135724.8981-9-marcandre.lureau@redhat.com>
-	<153541472616.13636.8864065629716803544@sif>
-	<CAJ+F1CL+w0f8Esow9RS3XEo0bYmg28uqPhQyvi+7fJEARACkTA@mail.gmail.com>
-Date: Tue, 28 Aug 2018 18:52:48 -0500
-Message-Id: <153550036836.13636.2315178729210330934@sif>
-Subject: Re: [Qemu-devel] [PATCH v3 8/9] qga: process_event() simplification
+	<20180825135724.8981-5-marcandre.lureau@redhat.com>
+	<20180827045602.GF3020@xz-x1> <87a7p6mr3e.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87a7p6mr3e.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 4/9] monitor: no need to save need_resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,160 +29,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Quoting Marc-Andr=C3=A9 Lureau (2018-08-28 06:56:51)
-> Hi
-> On Tue, Aug 28, 2018 at 2:05 AM Michael Roth <mdroth@linux.vnet.ibm.com> =
-wrote:
-> >
-> > Quoting Marc-Andr=C3=A9 Lureau (2018-08-25 08:57:23)
-> > > Simplify the code around qmp_dispatch():
-> > > - rely on qmp_dispatch/check_obj() for message checking
-> > > - have a single send_response() point
-> > > - constify send_response() argument
-> > >
-> > > It changes a couple of error messages:
-> > >
-> > > * When @req isn't a dictionary, from
-> > >     Invalid JSON syntax
-> > >   to
-> > >     QMP input must be a JSON object
-> > >
-> > > * When @req lacks member "execute", from
-> > >     this feature or command is not currently supported
-> > >   to
-> > >     QMP input lacks member 'execute'
-> > >
-> > > CC: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  qga/main.c | 47 +++++++++--------------------------------------
-> > >  1 file changed, 9 insertions(+), 38 deletions(-)
-> > >
-> > > diff --git a/qga/main.c b/qga/main.c
-> > > index 6d70242d05..f0ec035996 100644
-> > > --- a/qga/main.c
-> > > +++ b/qga/main.c
-> > > @@ -544,15 +544,15 @@ fail:
-> > >  #endif
-> > >  }
-> > >
-> > > -static int send_response(GAState *s, QDict *payload)
-> > > +static int send_response(GAState *s, const QDict *rsp)
-> > >  {
-> > >      const char *buf;
-> > >      QString *payload_qstr, *response_qstr;
-> > >      GIOStatus status;
-> > >
-> > > -    g_assert(payload && s->channel);
-> > > +    g_assert(rsp && s->channel);
-> > >
-> > > -    payload_qstr =3D qobject_to_json(QOBJECT(payload));
-> > > +    payload_qstr =3D qobject_to_json(QOBJECT(rsp));
-> > >      if (!payload_qstr) {
-> > >          return -EINVAL;
-> > >      }
-> > > @@ -578,53 +578,24 @@ static int send_response(GAState *s, QDict *pay=
-load)
-> > >      return 0;
-> > >  }
-> > >
-> > > -static void process_command(GAState *s, QDict *req)
-> > > -{
-> > > -    QDict *rsp;
-> > > -    int ret;
-> > > -
-> > > -    g_assert(req);
-> > > -    g_debug("processing command");
-> > > -    rsp =3D qmp_dispatch(&ga_commands, QOBJECT(req), false);
-> > > -    if (rsp) {
-> > > -        ret =3D send_response(s, rsp);
-> > > -        if (ret < 0) {
-> > > -            g_warning("error sending response: %s", strerror(-ret));
-> > > -        }
-> > > -        qobject_unref(rsp);
-> > > -    }
-> >
-> > We used to check here for the success-response=3Dfalse scenario (e.g.
-> > guest-shutdown qga command). Now we pass the result of qmp_dispatch()
-> > directly to send_response(), which looks like that might cause an
-> > assertion now. Do we need to add handling for this?
-> =
-
-> Good catch! fixing it:
-> =
-
-> end:
->     if (rsp) {
->         ret =3D send_response(s, rsp);
->         if (ret < 0) {
->             g_warning("error sending error response: %s", strerror(-ret));
->         }
->         qobject_unref(rsp);
->     }
-> =
-
-> ack, with that?
-
-Looks good! With that:
-
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-> =
-
-> > > -}
-> > > -
-> > >  /* handle requests/control events coming in over the channel */
-> > >  static void process_event(void *opaque, QObject *obj, Error *err)
-> > >  {
-> > >      GAState *s =3D opaque;
-> > > -    QDict *req, *rsp;
-> > > +    QDict *rsp;
-> > >      int ret;
-> > >
-> > >      g_debug("process_event: called");
-> > >      assert(!obj !=3D !err);
-> > >      if (err) {
-> > > -        goto err;
-> > > -    }
-> > > -    req =3D qobject_to(QDict, obj);
-> > > -    if (!req) {
-> > > -        error_setg(&err, "Input must be a JSON object");
-> > > -        goto err;
-> > > -    }
-> > > -    if (!qdict_haskey(req, "execute")) {
-> > > -        g_warning("unrecognized payload format");
-> > > -        error_setg(&err, QERR_UNSUPPORTED);
-> > > -        goto err;
-> > > +        rsp =3D qmp_error_response(err);
-> > > +        goto end;
-> > >      }
-> > >
-> > > -    process_command(s, req);
-> > > -    qobject_unref(obj);
-> > > -    return;
-> > > +    g_debug("processing command");
-> > > +    rsp =3D qmp_dispatch(&ga_commands, obj, false);
-> > >
-> > > -err:
-> > > -    g_warning("failed to parse event: %s", error_get_pretty(err));
-> > > -    rsp =3D qmp_error_response(err);
-> > > +end:
-> > >      ret =3D send_response(s, rsp);
-> > >      if (ret < 0) {
-> > >          g_warning("error sending error response: %s", strerror(-ret)=
-);
-> > > --
-> > > 2.18.0.547.g1d89318c48
-> > >
-> >
-> =
-
-> =
-
-> -- =
-
-> Marc-Andr=C3=A9 Lureau
+On Tue, Aug 28, 2018 at 05:46:29PM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
 >=20
+> > On Sat, Aug 25, 2018 at 03:57:19PM +0200, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> >> There is no need for per-command need_resume granularity, it should
+> >> resume after running an non-oob command on oob-disabled monitor.
+> >>=20
+> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> >
+> > Note that this series/patch still conflict with the "enable
+> > out-of-band by default" series.
+> >
+> >   [PATCH v6 00/13] monitor: enable OOB by default
+>=20
+> Yes.
+>=20
+> > I'm not against this patch to be merged since it has its r-b, but I
+> > feel like we'd better judge on whether we still like the response
+> > queue first, in case one day we'll need to add these things back.
+>=20
+> Let's not worry about things that may or may not happen at some
+> indeterminate time in the future.
+
+It might not be that "far future"...  Please see below.
+
+>=20
+> However:
+>=20
+> > When there could be functional changes around the code path I would
+> > think we'd better keep the cleanup patches postponed a bit until thos=
+e
+> > functional changes are settled.  For now the functional part is decid=
+e
+> > how to fix up the rest of out-of-band issues (my proposal is in the
+> > series above which should solve everything that is related to
+> > out-of-band to be fixed; if there is more, I'll continue to work on
+> > it), whether we should enable it by default for 3.1 (my answer
+> > is... yes...), and what to do with it.
+>=20
+> I agree the important job is to finish OOB.
+>=20
+> Sometimes, it's better to clean up first.  Sometimes, it's not.
+>=20
+> Right now, the response queue is a useless complication, and
+> Marc-Andr=C3=A9's PATCH 3+4 get rid of it.  Lovely.  I understand this
+> conflicts with your OOB work.  The question is whether your work
+> fundamentally needs the response queue or not.
+
+Just to clarify a bit... I prefer to keep the response queue not
+because it's conflicting my existing work but because I think we might
+get use of it even in the near future.  I stated it here on the
+possibility that we might use the response queue to solve the
+unlimited monitor out_buf issue here:
+
+https://patchwork.kernel.org/patch/10511471/#22110771
+
+Quotes:
+
+        ...
+        Yeah actually this reminded me about the fact that we are
+        still using unlimited buffer size for the out_buf.  IMHO we
+        should make it a limited size after 3.0, then AFAICT if
+        without current qmp response queue we'll need to introduce
+        some similar thing to cache responses then when the out_buf is
+        full.
+
+        IMHO the response queue looks more like the correct place that
+        we should do the flow control, and the out_buf could be
+        majorly used to do the JSON->string convertion (so basically
+        IMHO the out_buf limitation should be the size of the maximum
+        JSON object that we'll have).
+        ...
+
+Let's imagine what we need if we want to limit the out_buf: (1) To
+limit the out_buf, we need somewhere to cache the responses that we
+want to put into out_buf but we can't when the out_buf is full -
+that's mostly the response queue now.  (2) Since we will need to queue
+these items onto out_buf when out_buf is not full, we'll possibly need
+something like a bottom half to kickoff when out_buf is able to handle
+more data - that's mostly the bottom half of the response queue.
+
+AFAIU the rest to do is very possible only that we set a limit to the
+out_buf but only if response queue is there...
+
+I didn't really work on the out_buf since I didn't want to further
+expand the out-of-band work (since it's already going far away before
+it settles down first...), and after all the out_buf issue is nothing
+related to the out-of-band work and it's there for a long time.
+However that's the major reason that I might prefer to keep the queue
+now.
+
+[1]
+
+>=20
+> If your OOB work happens to be coded for the response queue, but the
+> problem could also be solved without the response queue, then the OOB
+> job doesn't fundamentally need the response queue.
+
+Yes, I think the OOB work itself does not need the response queue now.
+
+>=20
+> Unless that's the case, getting rid of the response queue is unnecessar=
+y
+> churn.
+>=20
+> If it is the case, we still need to consider effort.  Which order is
+> less total work?  Which order gets us to the goal faster?
+>=20
+> Can you guys agree on answers to these questions, or do you need me to
+> answer them?
+>=20
+> Restating the questions:
+>=20
+> 1. Can you think of a way to do what Peter's OOB series does, but
+> without the response queue?
+>=20
+> 2. If you can, what's easier / cheaper / faster:
+>=20
+>    a. Merge Marc-Andr=C3=A9's patches to get rid of response queue, rew=
+rite
+>       OOB series without response queue on top.
+>=20
+>    b. Merge Peter's OOB series with response queue, rewrite patches to
+>       get rid of response queue on top.
+
+Let's have a quick look at above [1], if it's not a good reason (or
+even it's still unclear) then let's drop the queue.  It'll be
+perfectly fine I rebase my work upon Marc-Andr=C3=A9's.  After all the on=
+ly
+reason to keep the response queue for me is to save time (for anyone
+who will be working with monitors).  If we spend too much time on
+judging whether we should keep the queue (we've already spent some)
+then it's already a waste of time...  It does not worth it IMO.
+
+>=20
+> > If we found that it's too hard to enable it by default, I'm thinking
+> > whether we can make it a persistent flag for monitor (maybe turning
+> > the "x-oob" into a real "oob" and keep it, then we don't turn it on b=
+y
+> > default), then we can let libvirt start working with out-of-band with
+> > the flag.  After all it's actually working mostly (the pending issues
+> > are only things like flow control for malicious/buggy clients, but
+> > libvirt never had such an issue with it).
+>=20
+> The OOB job isn't complete without working flow control.  Nevertheless,
+> I'm willing to consider enabling OOB without working flow control.
+
+That'll be great.  Thanks!
+
+(Though I think the current OOB series should have addressed all but
+ the out_buf flow control issue, right?)
+
+Regards,
+
+--=20
+Peter Xu
