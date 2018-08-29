@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fuzL6-0003bd-Mk
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:12:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuzLQ-0003bi-1g
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fuzDo-0008M2-L7
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:05:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48666 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fuzDo-0008Km-Au
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:05:16 -0400
-Date: Wed, 29 Aug 2018 13:05:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180829120509.GD2412@work-vm>
-References: <1534796770-10295-1-git-send-email-minyard@acm.org>
-	<1534796770-10295-6-git-send-email-minyard@acm.org>
-	<1aac39bc-5cd6-350f-9c8e-b5374f25510e@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fuzAB-0006ri-Qu
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:01:37 -0400
+References: <cover.1535291602.git.berto@igalia.com>
+	<c3e00bed732f1a08edff79aee79669f3572352b8.1535291602.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <92551863-bd02-8dab-ea8f-be02b0277146@redhat.com>
+Date: Wed, 29 Aug 2018 14:01:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1aac39bc-5cd6-350f-9c8e-b5374f25510e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] i2c:pm_smbus: Fix state transfer
+In-Reply-To: <c3e00bed732f1a08edff79aee79669f3572352b8.1535291602.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ezJy5SpZIUFWz7tt09qeGZx3uZtppAYvB"
+Subject: Re: [Qemu-devel] [PATCH 9/9] block: Allow changing 'force-share' on
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: minyard@acm.org, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 20/08/2018 22:26, minyard@acm.org wrote:
-> > From: Corey Minyard <cminyard@mvista.com>
-> > 
-> > Transfer the state information for the SMBus registers and
-> > internal data so it will work on a VM transfer.
-> 
-> Since the device is mostly unused, I would rather have this in a
-> subsection.  This way the format remains backwards-compatible as long as
-> the registers have the default values.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ezJy5SpZIUFWz7tt09qeGZx3uZtppAYvB
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <92551863-bd02-8dab-ea8f-be02b0277146@redhat.com>
+Subject: Re: [PATCH 9/9] block: Allow changing 'force-share' on reopen
+References: <cover.1535291602.git.berto@igalia.com>
+ <c3e00bed732f1a08edff79aee79669f3572352b8.1535291602.git.berto@igalia.com>
+In-Reply-To: <c3e00bed732f1a08edff79aee79669f3572352b8.1535291602.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Or simpler just wire it to a property and machine type.
+On 2018-08-26 16:09, Alberto Garcia wrote:
+> 'force-share' is one of the basic BlockdevOptions available for all
+> drivers, but it's silently ignored by bdrv_reopen_prepare/commit(), so
+> the user cannot change it and doesn't get an error explaining that it
+> can't be changed.
+>=20
+> One example of how this option is being ignored is that on a
+> read-write image this should produce an error:
+>=20
+>    (qemu) qemu-io virtio0 "reopen -o force-share=3Don"
+>    force-share=3Don can only be used with read-only images
+>=20
+> Since there's no reason why we shouldn't allow changing it and the
+> implementation is simple let's just do it.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block.c               | 30 ++++++++++++++++++++++++------
+>  include/block/block.h |  1 +
+>  2 files changed, 25 insertions(+), 6 deletions(-)
 
-Dave
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> Also, in case you are interested, a few years ago I was thinking of
-> implementing clock stretching; the plan was that clock stretching would
-> let you pass host I2C devices down to the guest.  Basically, the I2C
-> recv function was changed to accept a callback+opaque, and said callback
-> would be invoked later if recv returned -EAGAIN (or something like
-> that).  Unfortunately I didn't finish adding support to all the I2C
-> controllers when my laptop was stolen, so the patches are lost. :/
-> 
-> Paolo
-> 
-> > Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/acpi/piix4.c           |  3 ++-
-> >  hw/i2c/pm_smbus.c         | 20 ++++++++++++++++++++
-> >  hw/i2c/smbus_ich9.c       |  5 +++--
-> >  include/hw/i2c/pm_smbus.h |  2 ++
-> >  4 files changed, 27 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> > index 6404af5..f8d8d2e 100644
-> > --- a/hw/acpi/piix4.c
-> > +++ b/hw/acpi/piix4.c
-> > @@ -309,7 +309,7 @@ static const VMStateDescription vmstate_cpuhp_state = {
-> >   */
-> >  static const VMStateDescription vmstate_acpi = {
-> >      .name = "piix4_pm",
-> > -    .version_id = 3,
-> > +    .version_id = 4,
-> >      .minimum_version_id = 3,
-> >      .minimum_version_id_old = 1,
-> >      .load_state_old = acpi_load_old,
-> > @@ -320,6 +320,7 @@ static const VMStateDescription vmstate_acpi = {
-> >          VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
-> >          VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
-> >          VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
-> > +        VMSTATE_STRUCT(smb, PIIX4PMState, 4, pmsmb_vmstate, PMSMBus),
-> >          VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
-> >          VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
-> >          VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
-> > diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-> > index 32132be..9e11d47 100644
-> > --- a/hw/i2c/pm_smbus.c
-> > +++ b/hw/i2c/pm_smbus.c
-> > @@ -383,6 +383,26 @@ static const MemoryRegionOps pm_smbus_ops = {
-> >      .endianness = DEVICE_LITTLE_ENDIAN,
-> >  };
-> >  
-> > +const VMStateDescription pmsmb_vmstate = {
-> > +    .name = "pmsmb",
-> > +    .version_id = 1,
-> > +    .minimum_version_id = 1,
-> > +    .fields = (VMStateField[]) {
-> > +        VMSTATE_UINT8(smb_stat, PMSMBus),
-> > +        VMSTATE_UINT8(smb_ctl, PMSMBus),
-> > +        VMSTATE_UINT8(smb_cmd, PMSMBus),
-> > +        VMSTATE_UINT8(smb_addr, PMSMBus),
-> > +        VMSTATE_UINT8(smb_data0, PMSMBus),
-> > +        VMSTATE_UINT8(smb_data1, PMSMBus),
-> > +        VMSTATE_UINT32(smb_index, PMSMBus),
-> > +        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
-> > +        VMSTATE_UINT8(smb_auxctl, PMSMBus),
-> > +        VMSTATE_BOOL(i2c_enable, PMSMBus),
-> > +        VMSTATE_BOOL(op_done, PMSMBus),
-> > +        VMSTATE_END_OF_LIST()
-> > +    }
-> > +};
-> > +
-> >  void pm_smbus_init(DeviceState *parent, PMSMBus *smb)
-> >  {
-> >      smb->op_done = true;
-> > diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
-> > index a66a114..c8b8413 100644
-> > --- a/hw/i2c/smbus_ich9.c
-> > +++ b/hw/i2c/smbus_ich9.c
-> > @@ -45,10 +45,11 @@ typedef struct ICH9SMBState {
-> >  
-> >  static const VMStateDescription vmstate_ich9_smbus = {
-> >      .name = "ich9_smb",
-> > -    .version_id = 1,
-> > +    .version_id = 2,
-> >      .minimum_version_id = 1,
-> >      .fields = (VMStateField[]) {
-> > -        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
-> > +        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
-> > +        VMSTATE_STRUCT(smb, ICH9SMBState, 2, pmsmb_vmstate, PMSMBus),
-> >          VMSTATE_END_OF_LIST()
-> >      }
-> >  };
-> > diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
-> > index 99d5489..b1e1970 100644
-> > --- a/include/hw/i2c/pm_smbus.h
-> > +++ b/include/hw/i2c/pm_smbus.h
-> > @@ -33,4 +33,6 @@ typedef struct PMSMBus {
-> >  
-> >  void pm_smbus_init(DeviceState *parent, PMSMBus *smb);
-> >  
-> > +extern const VMStateDescription pmsmb_vmstate;
-> > +
-> >  #endif /* PM_SMBUS_H */
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--ezJy5SpZIUFWz7tt09qeGZx3uZtppAYvB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGixcACgkQ9AfbAGHV
+z0DZgQf/Y8KcwgHsNmCJZ4jJ37AN/7RjZmINZ1XN4mYCfyNW1jD9XHvDRGUhJvkB
+7HiOVbpgcJqrBIY7AHLU+qbWzTVEKLjg25PmNoDIhcyj8j0KtY8HL6/lzxTcGpFN
+tmeWEKwlxJfa5qbzClqiPykxfg0TDJqVlTRZIPk/5e9tVKckxoomgZPoLZ2ydhXd
+F/Kox20nDGb9G+2pZGN8TSnOcsJg6lLw6MNUudwsG6t7e8JxHaOZHMsTkEFrLytE
+RFDgpwQu2Xy2f88vmzdVYWr3DW2GoZeVELBH6ag5A3J9WErptHvSJRgALyjSaNKL
+stwsabsQi3WrX9RgnC4sHN/AejnScA==
+=wy/Q
+-----END PGP SIGNATURE-----
+
+--ezJy5SpZIUFWz7tt09qeGZx3uZtppAYvB--
