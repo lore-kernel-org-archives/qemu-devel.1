@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuxBY-0005TP-Mn
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:54:49 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuxBa-0005Yy-3q
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:54:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuwzt-00032S-UC
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:42:47 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuwzj-0002xZ-LE
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:42:40 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 29 Aug 2018 11:41:42 +0200
-Message-Id: <20180829094143.2102-19-cohuck@redhat.com>
+Date: Wed, 29 Aug 2018 11:41:37 +0200
+Message-Id: <20180829094143.2102-14-cohuck@redhat.com>
 In-Reply-To: <20180829094143.2102-1-cohuck@redhat.com>
 References: <20180829094143.2102-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 18/19] hw/s390x: Move virtio-ccw-blk code to a
- separate file
+Subject: [Qemu-devel] [PULL 13/19] hw/s390x: Move virtio-ccw-crypto code to
+ a separate file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +25,41 @@ Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.d
 
 From: Thomas Huth <thuth@redhat.com>
 
-The code should only be enabled if CONFIG_VIRTIO_BLK has been set.
+The code should only be enabled if CONFIG_VIRTIO_CRYPTO has been set.
 This can be done best if the code resides in a separate file.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1532542110-9017-1-git-send-email-thuth@redhat.com>
+Message-Id: <1532521224-27235-8-git-send-email-thuth@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/Makefile.objs    |  1 +
- hw/s390x/virtio-ccw-blk.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/virtio-ccw.c     | 46 --------------------------------
- 3 files changed, 68 insertions(+), 46 deletions(-)
- create mode 100644 hw/s390x/virtio-ccw-blk.c
+ hw/s390x/Makefile.objs       |  1 +
+ hw/s390x/virtio-ccw-crypto.c | 75 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/virtio-ccw.c        | 55 --------------------------------
+ 3 files changed, 76 insertions(+), 55 deletions(-)
+ create mode 100644 hw/s390x/virtio-ccw-crypto.c
 
 diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index 172ba55455..5dbc00ce9b 100644
+index 08a8c107d4..1073cfaef2 100644
 --- a/hw/s390x/Makefile.objs
 +++ b/hw/s390x/Makefile.objs
-@@ -16,6 +16,7 @@ obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-ccw-crypto.o
- obj-$(CONFIG_VIRTIO_GPU) += virtio-ccw-gpu.o
- obj-$(CONFIG_VIRTIO_INPUT) += virtio-ccw-input.o
- obj-$(CONFIG_VIRTIO_NET) += virtio-ccw-net.o
-+obj-$(CONFIG_VIRTIO_BLK) += virtio-ccw-blk.o
+@@ -12,6 +12,7 @@ obj-$(CONFIG_VIRTIO_SERIAL) += virtio-ccw-serial.o
+ obj-$(CONFIG_VIRTIO_BALLOON) += virtio-ccw-balloon.o
+ obj-$(CONFIG_VIRTIO_SCSI) += virtio-ccw-scsi.o
+ obj-$(CONFIG_VIRTIO_RNG) += virtio-ccw-rng.o
++obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-ccw-crypto.o
  obj-$(call land,$(CONFIG_VIRTIO_9P),$(CONFIG_VIRTFS)) += virtio-ccw-9p.o
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-ccw.o
  obj-y += css-bridge.o
-diff --git a/hw/s390x/virtio-ccw-blk.c b/hw/s390x/virtio-ccw-blk.c
+ obj-y += ccw-device.o
+diff --git a/hw/s390x/virtio-ccw-crypto.c b/hw/s390x/virtio-ccw-crypto.c
 new file mode 100644
-index 0000000000..1f3d09a75a
+index 0000000000..aab6a958f2
 --- /dev/null
-+++ b/hw/s390x/virtio-ccw-blk.c
-@@ -0,0 +1,67 @@
++++ b/hw/s390x/virtio-ccw-crypto.c
+@@ -0,0 +1,75 @@
 +/*
-+ * virtio ccw block implementation
++ * virtio ccw crypto implementation
 + *
 + * Copyright 2012, 2015 IBM Corp.
-+ * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or (at
 + * your option) any later version. See the COPYING file in the top-level
@@ -72,26 +71,35 @@ index 0000000000..1f3d09a75a
 +#include "qapi/error.h"
 +#include "virtio-ccw.h"
 +
-+static void virtio_ccw_blk_realize(VirtioCcwDevice *ccw_dev, Error **errp)
++static void virtio_ccw_crypto_realize(VirtioCcwDevice *ccw_dev, Error **errp)
 +{
-+    VirtIOBlkCcw *dev = VIRTIO_BLK_CCW(ccw_dev);
++    VirtIOCryptoCcw *dev = VIRTIO_CRYPTO_CCW(ccw_dev);
 +    DeviceState *vdev = DEVICE(&dev->vdev);
++    Error *err = NULL;
 +
 +    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    object_property_set_link(OBJECT(vdev),
++                             OBJECT(dev->vdev.conf.cryptodev), "cryptodev",
++                             NULL);
 +}
 +
-+static void virtio_ccw_blk_instance_init(Object *obj)
++static void virtio_ccw_crypto_instance_init(Object *obj)
 +{
-+    VirtIOBlkCcw *dev = VIRTIO_BLK_CCW(obj);
++    VirtIOCryptoCcw *dev = VIRTIO_CRYPTO_CCW(obj);
++    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
 +
++    ccw_dev->force_revision_1 = true;
 +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_BLK);
-+    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
-+                              "bootindex", &error_abort);
++                                TYPE_VIRTIO_CRYPTO);
 +}
 +
-+static Property virtio_ccw_blk_properties[] = {
++static Property virtio_ccw_crypto_properties[] = {
 +    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
 +                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
 +    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
@@ -99,65 +107,64 @@ index 0000000000..1f3d09a75a
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void virtio_ccw_blk_class_init(ObjectClass *klass, void *data)
++static void virtio_ccw_crypto_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
 +
-+    k->realize = virtio_ccw_blk_realize;
-+    dc->props = virtio_ccw_blk_properties;
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    k->realize = virtio_ccw_crypto_realize;
++    dc->props = virtio_ccw_crypto_properties;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
 +}
 +
-+static const TypeInfo virtio_ccw_blk = {
-+    .name          = TYPE_VIRTIO_BLK_CCW,
++static const TypeInfo virtio_ccw_crypto = {
++    .name          = TYPE_VIRTIO_CRYPTO_CCW,
 +    .parent        = TYPE_VIRTIO_CCW_DEVICE,
-+    .instance_size = sizeof(VirtIOBlkCcw),
-+    .instance_init = virtio_ccw_blk_instance_init,
-+    .class_init    = virtio_ccw_blk_class_init,
++    .instance_size = sizeof(VirtIOCryptoCcw),
++    .instance_init = virtio_ccw_crypto_instance_init,
++    .class_init    = virtio_ccw_crypto_class_init,
 +};
 +
-+static void virtio_ccw_blk_register(void)
++static void virtio_ccw_crypto_register(void)
 +{
-+    type_register_static(&virtio_ccw_blk);
++    type_register_static(&virtio_ccw_crypto);
 +}
 +
-+type_init(virtio_ccw_blk_register)
++type_init(virtio_ccw_crypto_register)
 diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index be6939bdec..212b3d3dea 100644
+index 4ec4d3dba3..5a7896f76d 100644
 --- a/hw/s390x/virtio-ccw.c
 +++ b/hw/s390x/virtio-ccw.c
-@@ -767,25 +767,6 @@ static void virtio_ccw_device_unrealize(VirtioCcwDevice *dev, Error **errp)
-     }
+@@ -808,24 +808,6 @@ static void virtio_ccw_blk_instance_init(Object *obj)
+                               "bootindex", &error_abort);
  }
  
--static void virtio_ccw_blk_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+-static void virtio_ccw_crypto_realize(VirtioCcwDevice *ccw_dev, Error **errp)
 -{
--    VirtIOBlkCcw *dev = VIRTIO_BLK_CCW(ccw_dev);
+-    VirtIOCryptoCcw *dev = VIRTIO_CRYPTO_CCW(ccw_dev);
 -    DeviceState *vdev = DEVICE(&dev->vdev);
+-    Error *err = NULL;
 -
 -    qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
--    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+-    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-
+-    object_property_set_link(OBJECT(vdev),
+-                             OBJECT(dev->vdev.conf.cryptodev), "cryptodev",
+-                             NULL);
 -}
 -
--static void virtio_ccw_blk_instance_init(Object *obj)
--{
--    VirtIOBlkCcw *dev = VIRTIO_BLK_CCW(obj);
--
--    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
--                                TYPE_VIRTIO_BLK);
--    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
--                              "bootindex", &error_abort);
--}
--
- /* DeviceState to VirtioCcwDevice. Note: used on datapath,
-  * be careful and test performance if you change this.
-  */
-@@ -1160,32 +1141,6 @@ static void virtio_ccw_device_unplugged(DeviceState *d)
- }
- /**************** Virtio-ccw Bus Device Descriptions *******************/
+ static void virtio_ccw_gpu_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+ {
+     VirtIOGPUCcw *dev = VIRTIO_GPU_CCW(ccw_dev);
+@@ -1270,42 +1252,6 @@ static const TypeInfo virtio_ccw_blk = {
+     .class_init    = virtio_ccw_blk_class_init,
+ };
  
--static Property virtio_ccw_blk_properties[] = {
+-static Property virtio_ccw_crypto_properties[] = {
 -    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
 -                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
 -    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
@@ -165,34 +172,44 @@ index be6939bdec..212b3d3dea 100644
 -    DEFINE_PROP_END_OF_LIST(),
 -};
 -
--static void virtio_ccw_blk_class_init(ObjectClass *klass, void *data)
+-static void virtio_ccw_crypto_instance_init(Object *obj)
+-{
+-    VirtIOCryptoCcw *dev = VIRTIO_CRYPTO_CCW(obj);
+-    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
+-
+-    ccw_dev->force_revision_1 = true;
+-    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+-                                TYPE_VIRTIO_CRYPTO);
+-}
+-
+-static void virtio_ccw_crypto_class_init(ObjectClass *klass, void *data)
 -{
 -    DeviceClass *dc = DEVICE_CLASS(klass);
 -    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
 -
--    k->realize = virtio_ccw_blk_realize;
--    dc->props = virtio_ccw_blk_properties;
--    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+-    k->realize = virtio_ccw_crypto_realize;
+-    dc->props = virtio_ccw_crypto_properties;
+-    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
 -}
 -
--static const TypeInfo virtio_ccw_blk = {
--    .name          = TYPE_VIRTIO_BLK_CCW,
+-static const TypeInfo virtio_ccw_crypto = {
+-    .name          = TYPE_VIRTIO_CRYPTO_CCW,
 -    .parent        = TYPE_VIRTIO_CCW_DEVICE,
--    .instance_size = sizeof(VirtIOBlkCcw),
--    .instance_init = virtio_ccw_blk_instance_init,
--    .class_init    = virtio_ccw_blk_class_init,
+-    .instance_size = sizeof(VirtIOCryptoCcw),
+-    .instance_init = virtio_ccw_crypto_instance_init,
+-    .class_init    = virtio_ccw_crypto_class_init,
 -};
 -
- static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
- {
-     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
-@@ -1275,7 +1230,6 @@ static void virtio_ccw_register(void)
- {
-     type_register_static(&virtio_ccw_bus_info);
-     type_register_static(&virtio_ccw_device_info);
--    type_register_static(&virtio_ccw_blk);
- }
- 
- type_init(virtio_ccw_register)
+ static Property virtio_ccw_gpu_properties[] = {
+     DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
+                     VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
+@@ -1565,7 +1511,6 @@ static void virtio_ccw_register(void)
+ #ifdef CONFIG_VHOST_VSOCK
+     type_register_static(&vhost_vsock_ccw_info);
+ #endif
+-    type_register_static(&virtio_ccw_crypto);
+     type_register_static(&virtio_ccw_gpu);
+     type_register_static(&virtio_ccw_input);
+     type_register_static(&virtio_ccw_input_hid);
 -- 
 2.14.4
