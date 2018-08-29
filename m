@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuxBB-0005TA-Lk
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:54:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuxBH-0005Yy-AU
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:54:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fux31-0006Sz-D1
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:46:00 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fux23-00061T-Co
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:45:00 -0400
 References: <20180809213528.14738-1-mreitz@redhat.com>
-	<20180809213528.14738-8-mreitz@redhat.com>
-	<w51d0u2sllv.fsf@maestria.local.igalia.com>
+	<20180809213528.14738-6-mreitz@redhat.com>
+	<w517ekasjtr.fsf@maestria.local.igalia.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <926d8985-2709-b6b4-fb4b-1dd6b5fd309b@redhat.com>
-Date: Wed, 29 Aug 2018 11:45:52 +0200
+Message-ID: <ca1fb933-8a5b-3055-0460-ab1d3859ebdf@redhat.com>
+Date: Wed, 29 Aug 2018 11:44:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <w51d0u2sllv.fsf@maestria.local.igalia.com>
+In-Reply-To: <w517ekasjtr.fsf@maestria.local.igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="EHc3glLQDZlCzS3Uv7ICd10L6iIWS3l3P"
-Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 07/31] iotests.py: Add
- node_info()
+	boundary="4TxbCocw9mXlXYaEzp9a8tUDGQoPvokUJ"
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 05/31] block: Respect backing
+ bs in bdrv_refresh_filename
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +30,56 @@ To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EHc3glLQDZlCzS3Uv7ICd10L6iIWS3l3P
+--4TxbCocw9mXlXYaEzp9a8tUDGQoPvokUJ
 From: Max Reitz <mreitz@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  Eric Blake <eblake@redhat.com>
-Message-ID: <926d8985-2709-b6b4-fb4b-1dd6b5fd309b@redhat.com>
-Subject: Re: [PATCH for-3.1 v10 07/31] iotests.py: Add node_info()
+Message-ID: <ca1fb933-8a5b-3055-0460-ab1d3859ebdf@redhat.com>
+Subject: Re: [PATCH for-3.1 v10 05/31] block: Respect backing bs in
+ bdrv_refresh_filename
 References: <20180809213528.14738-1-mreitz@redhat.com>
- <20180809213528.14738-8-mreitz@redhat.com>
- <w51d0u2sllv.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51d0u2sllv.fsf@maestria.local.igalia.com>
+ <20180809213528.14738-6-mreitz@redhat.com>
+ <w517ekasjtr.fsf@maestria.local.igalia.com>
+In-Reply-To: <w517ekasjtr.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-08-28 14:48, Alberto Garcia wrote:
-> On Thu 09 Aug 2018 11:35:04 PM CEST, Max Reitz wrote:
->> This function queries a node; since we cannot do that right now, it
->> executes query-named-block-nodes and returns the matching node's objec=
-t.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/iotests.py | 10 ++++++++++
->>  1 file changed, 10 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
-s.py
->> index 5c45788dac..6583001ac8 100644
->> --- a/tests/qemu-iotests/iotests.py
->> +++ b/tests/qemu-iotests/iotests.py
->> @@ -465,6 +465,16 @@ class VM(qtest.QEMUQtestMachine):
->>                  else:
->>                      iotests.log(ev)
->> =20
->> +    def node_info(self, node_name, require_existence=3DTrue):
->> +        nodes =3D self.qmp('query-named-block-nodes')
->> +        for x in nodes['return']:
->> +            if x['node-name'] =3D=3D node_name:
->> +                return x
->> +        if require_existence:
->> +            assert False
->> +        else:
->> +            return None
+On 2018-08-28 15:26, Alberto Garcia wrote:
+> On Thu 09 Aug 2018 11:35:02 PM CEST, Max Reitz wrote:
+>> +    backing_overridden =3D bdrv_backing_overridden(bs);
 >> +
+>> +    if (bs->open_flags & BDRV_O_NO_IO) {
+>> +        /* Without I/O, the backing file does not change anything.
+>> +         * Therefore, in such a case (primarily qemu-img), we can
+>> +         * pretend the backing file has not been overridden even if
+>> +         * it technically has been. */
+>> +        backing_overridden =3D false;
+>> +    }
 >=20
-> I don't think you need the require_existence parameter here... if you
-> simply return None you'll get an error as soon as you try to use the
-> return value.
+> What is this for?
 
-Hm!  True.  I'm not sure I like the non-verbosity of "Did not find key X
-in None" (or whatever error Python's going to throw), but then again,
-"assert False" is not really any better.  So, yep, will change.
-
-Thanks for reviewing,
+qemu-img info opens files with BDRV_O_NO_BACKING.  Without this check,
+you'd get a json:{} filename with "backing": null.
 
 Max
 
 
---EHc3glLQDZlCzS3Uv7ICd10L6iIWS3l3P
+--4TxbCocw9mXlXYaEzp9a8tUDGQoPvokUJ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGa1AACgkQ9AfbAGHV
-z0Aa1ggAl9TQlX4NHfbpnA85n2BDZ4XSXaj0pn/jX6wAuZI/deYfdVpVwXTtl9+a
-yNmMDZ6slaiP7l6F+etUYd1T9viXfjUncxMQdN25bS0Nv1GSWGFUmjRZtnkNRUwZ
-yjOzio465QulM8q883IYJepKpp/AveVdWgDdWypcT1yfTbanJcUe6mBAcXCiXPvb
-SffYtHzXZKUjZb2gyQsVPr7NEtxqtypdBMipUTHanWx3YUnE2hmgkwr0YnNhWlZo
-g6kiQxGe3aaAUbd0a/Fiti/JNGP8Mgpo5bkB+sHd78CGUtdemMBch/7rHXsRmY/t
-RYBQW+cw/olgu9P4O1ArVitnnrTgVQ==
-=Q94p
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGaxQACgkQ9AfbAGHV
+z0BMJAgAvLBk5/5sYJemcen3Q7QfiPjkm3h9TTB3A5qm0Ga3YM4+Nq7VHG7EBu/Q
+GwKag/7cC+RDXrMRAC+EGefKoaRa9w8TDDytC4jnmckOjIru//DRsOFFERwgvPOw
+4EpqABe6pncvdnR305rUCg8/agofTT+a7N5ekguhBs93sdOwxhBE7MkvMxili+k2
+7P9aqUIwwkjPARZyqy1kf0qVrTzJNLoF+TDRpJOYeHhiqwOTjcJYSdJSYzedo3IX
+sNLuu0YqM2kAMG0J+Jxi8W642hTLuUeeQ2nI1+1WOl1GAAcL3ROmdtxM0NizQHbw
+ZeClWnvCMlf/4HustE3yyH2ayhmO/g==
+=JqJL
 -----END PGP SIGNATURE-----
 
---EHc3glLQDZlCzS3Uv7ICd10L6iIWS3l3P--
+--4TxbCocw9mXlXYaEzp9a8tUDGQoPvokUJ--
