@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quan.xu0@gmail.com>) id 1fv0iV-0007tR-VQ
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:07 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quan.xu0@gmail.com>) id 1fv0iR-0000E1-RI
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fv0iU-0007rD-3K
 	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:03 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39889)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <quan.xu0@gmail.com>) id 1fv0iR-0000BD-3q
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:40:59 -0400
-Received: by mail-oi0-x242.google.com with SMTP id c190-v6so9158511oig.6
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 06:40:57 -0700 (PDT)
-From: Quan Xu <quan.xu0@gmail.com>
-Message-ID: <5ab76c3e-9310-0e08-2f1b-4ff52bf229f8@gmail.com>
-Date: Wed, 29 Aug 2018 21:40:50 +0800
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fv0iP-0000Bm-ST
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:41:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60978 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fv0iM-00009J-M5
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:40:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 637935A74E
+	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 13:40:53 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 29 Aug 2018 15:40:34 +0200
+Message-Id: <20180829134043.31706-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180829134043.31706-1-marcandre.lureau@redhat.com>
+References: <20180829134043.31706-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH RFC] migration: make sure to run iterate
- precopy during the bulk stage
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 01/10] monitor: consitify
+ qmp_send_response() QDict argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +35,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, dgilbert@redhat.com, kvm <kvm@vger.kernel.org>
+Cc: armbru@redhat.com, peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
- From 8dbf7370e7ea1caab0b769d0d4dcdd072d14d421 Mon Sep 17 00:00:00 2001
-From: Quan Xu <quan.xu0@gmail.com>
-Date: Wed, 29 Aug 2018 21:33:14 +0800
-Subject: [PATCH RFC] migration: make sure to run iterate precopy during the
-  bulk stage
-
-Since the bulk stage assumes in (migration_bitmap_find_dirty) that every
-page is dirty, return a rough total ram as pending size to make sure that
-migration thread continues to run iterate precopy during the bulk stage.
-
-Otherwise the downtime grows unpredictably, as migration thread needs to
-send both the rest of pages and dirty pages during complete precopy.
-
-Signed-off-by: Quan Xu <quan.xu0@gmail.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
-  migration/ram.c | 3 ++-
-  1 file changed, 2 insertions(+), 1 deletion(-)
+ monitor.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 79c8942..cfa304c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3308,7 +3308,8 @@ static void ram_save_pending(QEMUFile *f, void 
-*opaque, uint64_t max_size,
-          /* We can do postcopy, and all the data is postcopiable */
-          *res_compatible += remaining_size;
-      } else {
--        *res_precopy_only += remaining_size;
-+        *res_precopy_only += (rs->ram_bulk_stage ?
-+                              ram_bytes_total() : remaining_size);
-      }
-  }
-
---
-1.8.3.1
+diff --git a/monitor.c b/monitor.c
+index 021c11b1bf..a1db4db487 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -503,9 +503,9 @@ int monitor_fprintf(FILE *stream, const char *fmt, ..=
+.)
+     return 0;
+ }
+=20
+-static void qmp_send_response(Monitor *mon, QDict *rsp)
++static void qmp_send_response(Monitor *mon, const QDict *rsp)
+ {
+-    QObject *data =3D QOBJECT(rsp);
++    const QObject *data =3D QOBJECT(rsp);
+     QString *json;
+=20
+     json =3D mon->flags & MONITOR_USE_PRETTY ? qobject_to_json_pretty(da=
+ta) :
+--=20
+2.19.0.rc0.48.gb9dfa238d5
