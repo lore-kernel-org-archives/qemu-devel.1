@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fv0LL-0003Az-Jv
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:17:14 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fv0SG-0000PU-52
+	for Qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fv0LI-0006sR-8s
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:17:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51242 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fv0LI-0006sB-1o
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:17:04 -0400
-Date: Wed, 29 Aug 2018 15:16:53 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180829131653.gk4yhjdi2pk5bdcd@kamzik.brq.redhat.com>
-References: <CABgNM92-PHWg3X41tCVfErmV9-Hnu5GYpz_pa9-iXfbScFUCZg@mail.gmail.com>
-	<CD29DCF7-6537-406F-A127-6A2FFDDAAD79@caviumnetworks.com>
-	<87k1ohxik4.fsf@trasno.org>
-	<3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
-	<20180828172739.GA10175@work-vm>
-	<19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
+	(envelope-from <mreitz@redhat.com>) id 1fv0SC-0003ZP-V2
+	for Qemu-devel@nongnu.org; Wed, 29 Aug 2018 09:24:16 -0400
+References: <c8301133-5f39-3fa5-af3e-9bc60ce44172@redhat.com>
+	<8c51bdec-2862-211d-3818-ee69b51ef17c@redhat.com>
+	<045562f3-6c25-244d-7ba5-1ae8650ab405@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f36df962-ade5-6e79-957c-d2e541fa752c@redhat.com>
+Date: Wed, 29 Aug 2018 15:24:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
- different processor ids
+In-Reply-To: <045562f3-6c25-244d-7ba5-1ae8650ab405@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Ovr6aeyNrWa9L4ZFKMLmMMn8okt8e6yJx"
+Subject: Re: [Qemu-devel] blkdebug get_status bug [was: [Qemu-block] NBD
+ structured reads vs. block size]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,277 +26,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jaggi, Manish" <Manish.Jaggi@cavium.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Auger Eric <eric.auger@redhat.com>, "peter.maydell@linaro.org qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Liguori <aliguori@us.ibm.com>
+To: Eric Blake <eblake@redhat.com>, qemu block <qemu-block@nongnu.org>, Kevin O'Connor <kevin@koconnor.net>, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>
 
-On Wed, Aug 29, 2018 at 12:40:08PM +0000, Jaggi, Manish wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ovr6aeyNrWa9L4ZFKMLmMMn8okt8e6yJx
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu block <qemu-block@nongnu.org>,
+ Kevin O'Connor <kevin@koconnor.net>,
+ "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>
+Message-ID: <f36df962-ade5-6e79-957c-d2e541fa752c@redhat.com>
+Subject: Re: [Qemu-devel] blkdebug get_status bug [was: [Qemu-block] NBD
+ structured reads vs. block size]
+References: <c8301133-5f39-3fa5-af3e-9bc60ce44172@redhat.com>
+ <8c51bdec-2862-211d-3818-ee69b51ef17c@redhat.com>
+ <045562f3-6c25-244d-7ba5-1ae8650ab405@redhat.com>
+In-Reply-To: <045562f3-6c25-244d-7ba5-1ae8650ab405@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-08-28 23:59, Eric Blake wrote:
+> [following up to a different set of emails]
 >=20
+> On 08/28/2018 03:41 PM, Eric Blake wrote:
+>> Revisiting this:
+>>
+>> On 08/01/2018 09:41 AM, Eric Blake wrote:
+>>> Rich Jones pointed me to questionable behavior in qemu's NBD server
+>>> implementation today: qemu advertises a minimum block size of 512 to
+>>> any client that promises to honor block sizes, but when serving up a
+>>> raw file that is not aligned to a sector boundary, attempting to read=
+
+>>> that final portion of the file results in a structured read with two
+>>> chunks, the first for the data up to the end of the actual file, and
+>>> the second reporting a hole for the rest of the sector. If a client
+>>> is promising to obey block sizes on its requests, it seems odd that
+>>> the server is allowed to send a result that is not also aligned to
+>>> block sizes.
+>>>
+>>> Right now, the NBD spec says that when structured replies are in use,=
+
+>>> then for a structured read:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 The server MAY split the reply into any numb=
+er of content chunks;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 each chunk MUST describe at least one byte, =
+although to minimize
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 overhead, the server SHOULD use chunks with =
+lengths and offsets as
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 an integer multiple of 512 bytes, where poss=
+ible (the first and
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 last chunk of an unaligned read being the mo=
+st obvious places for
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 an exception).
+>>>
+>>> I'm wondering if we should tighten that to require that the server
+>>> partition the reply chunks to be aligned to the advertised minimum
+>>> block size (at which point, qemu should either advertise 1 instead of=
+
+>>> 512 as the minimum size when serving up an unaligned file, or else
+>>> qemu should just send the final partial sector as a single data chunk=
+
+>>> rather than trying to report the last few bytes as a hole).
+>>>
+>>> For comparison, on block status, we require:
+>>>
+>>> =C2=A0=C2=A0=C2=A0 The server SHOULD use descriptor
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 lengths that are an integer multiple of 512 =
+bytes where possible
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 (the first and last descriptor of an unalign=
+ed query being the
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 most obvious places for an exception), and M=
+UST use descriptor
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 lengths that are an integer multiple of any =
+advertised minimum
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 block size.
+>>>
+>>> And qemu as a client currently hangs up on any server that violates
+>>> that requirement on block status (that is, when qemu as the server
+>>> tries to send a block status that was not aligned to the advertised
+>>> block size, qemu as the client flags it as an invalid server - which
+>>> means qemu as server is currently broken).=C2=A0 So I'm thinking we s=
+hould
+>>> copy that requirement onto servers for reads as well.
+>>
+>> Vladimir pointed out that the problem is not necessarily just limited
+>> to the implicit hole at the end of a file that was rounded up to
+>> sector size.=C2=A0 Another case where sub-region changes occur in qemu=
+ is
+>> where you have a backing file with 512-byte hole granularity (qemu-img=
+
+>> create -f qcow2 -o cluster_size=3D512 backing.qcow2 100M) and an overl=
+ay
+>> with larger granularity (qemu-img create -f qcow2 -b backing.qcow2 -F
+>> qcow2 -o cluster_size=3D4k active.qcow2). On a cluster where the top
+>> layer defers to the underlying layer, it is possible to alternate
+>> between holes and data at sector boundaries but at subsets of the
+>> cluster boundary of the top layer.=C2=A0 As long as qemu advertises a
+>> minimum block size of 512 rather than the cluster size, then this
+>> isn't a problem, but if qemu were to change to report the qcow2
+>> cluster size as its minimum I/O (rather than merely its preferred I/O,=
+
+>> because it can do read-modify-write on data smaller than a cluster),
+>> this would be another case where unaligned replies might confuse a
+>> client.
 >=20
-> > On 28-Aug-2018, at 10:57 PM, Dr. David Alan Gilbert <dgilbert@redhat.=
-com> wrote:
-> >=20
-> > External Email
-> >=20
-> > (Cc'ing in Eric, Drew, and Peter for ARM stuff)
-> >=20
-> Thanks,
-> > * Jaggi, Manish (Manish.Jaggi@cavium.com) wrote:
-> >>=20
-> >>=20
-> >>> On 23-Aug-2018, at 7:59 PM, Juan Quintela <quintela@redhat.com> wro=
-te:
-> >>>=20
-> >>> External Email
-> >>>=20
-> >>> "Jaggi, Manish" <Manish.Jaggi@cavium.com> wrote:
-> >>>> Hi,
-> >>>=20
-> >>> Hi
-> >>>=20
-> >>> [Note that I was confused about what do you mean with problems with
-> >>> processorID.  There is no processorID on the migration stream, so I
-> >>> didn't understood what you were talking about.  Until I realized th=
-at
-> >>> you were trying to migrate from different cpu types]
-> >>>=20
-> >>>> Posting again with my cavium ID and CCing relevant folks
-> >>>=20
-> >>> It will be good to give What architecture are we talking about?  MI=
-PS,
-> >>> ARM, anything else?
-> >>>=20
-> >> arm64
-> >>=20
-> >>> Why?  Because we do this continously on x86_64 world.  How do we do
-> >>> this?  We emulate the _processor_ capabilities, so "in general" you=
- can
-> >>> always migrate from a processor to another with a superset of the
-> >>> features.  If you look at the ouput of:
-> >>>=20
-> >>>   qemu-system-x86_64 -cpu ?
-> >>>=20
-> >>> You can see that we have lots of cpu types that we emulate and cpui=
-d
-> >>> (features really).  Migration intel<->amd is tricky.  But from "int=
-el
-> >>> with less features" to "intel with more features" (or the same with=
- AMD)
-> >>> it is a common thing to do.  Once told that, it is a lot of work, s=
-imple
-> >>> things like that processors run at different clock speeds imply tha=
-t you
-> >>> need to be careful during migration with timers and anything that
-> >>> depends on frequencies.
-> >>>=20
-> >>> I don't know enough about other architectures to know how to do it,=
- or
-> >>> how feasible is.
-> >>=20
-> >> For arm64 qemu/kvm throws an error when processorID does not match.
-> >>>=20
-> >>>> Live Migration between machines with different processorIds
-> >>>>=20
-> >>>> VM Migration between machines with different processorId values th=
-rows
-> >>>> error in qemu/kvm. Though this check is appropriate but is overkil=
-l where
-> >>>> two machines are of same SoC/arch family and have same core/gic bu=
+> So, I tried to actually create this scenario, to see what actually
+> happens, and we have a worse bug that needs to be resolved first.=C2=A0=
+ That
+> is, bdrv_block_status_above() chokes when there is a blkdebug node in
+> the works:
+>=20
+> $ qemu-img create -f qcow2 -o cluster_size=3D512 back.qcow2 100M
+> $ qemu-io -c 'w P1 0 512' -c 'w -P1 1k 512' -f qcow2 back.qcow2
+
+s/ P1/ -P1/
+
+> $ qemu-img create -f qcow2 -F qcow2 -b back.qcow2 \
+> =C2=A0=C2=A0=C2=A0 -o cluster_size=3D1M top.qcow2
+> $ qemu-img map --output=3Djson -f qcow2 top.qcow2
+> [{ "start": 0, "length": 512, "depth": 1, "zero": false, "data": true,
+> "offset": 27648},
+> { "start": 512, "length": 512, "depth": 1, "zero": true, "data": false}=
+,
+> { "start": 1024, "length": 512, "depth": 1, "zero": false, "data": true=
+,
+> "offset": 28160},
+> { "start": 1536, "length": 104856064, "depth": 1, "zero": true, "data":=
+
+> false}]
+> $ qemu-img map --output=3Djson --image-opts \
+> =C2=A0=C2=A0 driver=3Dblkdebug,image.driver=3Dqcow2,image.file.driver=3D=
+file,\
+> image.file.filename=3Dtop.qcow2,align=3D4k
+> [{ "start": 0, "length": 104857600, "depth": 0, "zero": false, "data":
+> false}]
+>=20
+> Yikes! Adding blkdebug says there is no data in the file at all! Action=
+s
+> like 'qemu-img convert' for copying between images would thus behave
+> differently on a blkdebug image than they would on the real image, whic=
+h
+> somewhat defeats the purpose of blkdebug being a filter node.
+>=20
+> $ ./qemu-io --image-opts \
+> =C2=A0=C2=A0 driver=3Dblkdebug,image.driver=3Dqcow2,image.file.driver=3D=
+file,\
+> image.file.filename=3Dtop.qcow2,align=3D4k
+> qemu-io> r -P1 0 512
+> read 512/512 bytes at offset 0
+> 512 bytes, 1 ops; 0.0002 sec (1.782 MiB/sec and 3649.6350 ops/sec)
+> qemu-io> r -P0 512 512
+> read 512/512 bytes at offset 512
+> 512 bytes, 1 ops; 0.0002 sec (2.114 MiB/sec and 4329.0043 ops/sec)
+> qemu-io>
+>=20
+> Meanwhile, the data from the backing file is clearly visible when read.=
+
+> So the bug must lie somewhere in the get_status operation.=C2=A0 Lookin=
+g
+> closer, I see this in bdrv_co_block_status_above():
+>=20
+> 2242=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (p =3D bs; p !=3D ba=
+se; p =3D backing_bs(p)) {
+>=20
+> When qcow2 is directly opened, this iterates to back.qcow2 and sees tha=
 t
-> >>>> delta could be in other parts of Soc which have no effect on VM
-> >>>> operation.
-> >>>=20
-> >>> Then you need to do the whole process of:
-> >>>=20
-> >>> Lets call both processors A1 and A2.  You need to do the whole proc=
-ess
-> >>> of:
-> >>>=20
-> >>> a- defining cpu A1
-> >>> b- make sure that when you run qemu/kvm on processor A2, the
-> >>> features/behaviours that the guest sees.  This is not trivial at
-> >>> all.
-> >>> c- when migration comes, you can see that you need to adjust to wha=
-tever
-> >>> is the architecture of the destination.
-> >>>=20
-> >>>> There could be two ways to address this issue by ignoring the
-> >>>> comparison of processorIDs and so need feedback from the
-> >>>> community on this.
-> >>>>=20
-> >>>> a) Maintain a whitelist in qemu:
-> >>>>=20
-> >>>> This will be a set of all processorIds which are compatible and mi=
-gration can
-> >>>> happen between any of the machines with the Ids from this set. Thi=
-s set can
-> >>>> be statically built within qemu binary.
-> >>>=20
-> >>> In general, I preffer whitelists over blacklists.
-> >>>=20
-> >>>> b) Provide an extra option with migrate command
-> >>>>=20
-> >>>> migrate tcp:<ip>:<port>:<dest_processor_id>
-> >>>>=20
-> >>>> This is to fake the src_processor_id as dest_processor_id, so the =
-qemu running
-> >>>> on destination machine will not complain. The overhead with this a=
-pproach is
-> >>>> that the destination machines Id need to be known beforehand.
-> >>>=20
-> >>> Please, don't even think about this:
-> >>> a- migration commands are architecture agnostic
-> >>> b- in general it is _much_, _much_ easier to fix things on destinat=
-ion
-> >>> that on source.
-> >>>=20
-> >>>> If there is some better way=E2=80=A6 please suggest.
-> >>>=20
-> >>> Look at how it is done on x86_64.  But be aware that "doing it righ=
-t"
-> >>> takes a lot of work.  To give you one idea:
-> >>> - upstream, i.e. qemu, "warantee" that migration of:
-> >>> qemu-X -M machine-type-X -> qemu-Y -M machine-type-X
-> >>> works when X < Y.
-> >>>=20
-> >>> - downstream (i.e. redhat on my case, but I am sure that others als=
-o
-> >>> "suffer" this)  allow also:
-> >>>=20
-> >>> qemu-Y -M machine-type-X -> qemu-X -M machine-type-X (Y > X)
-> >>>=20
-> >>> in general it is a very complicated problem, so we limit _what_ you
-> >>> can do.  Basically we only support our machine-types, do a lot of
-> >>> testing, and are very careful when we add new features.  I.e. be
-> >>> preparred to do a lot of testing and a lot of fixing.
-> >>=20
-> >> At this point I am targeting a simpler case where Machine A1 and A2 =
-has a core from the same SoC family.
-> >> For example Cavium ThunderX2 Core incremental versions which has ide=
-ntical core and GIC and may have some errata fixes.
-
-That may or may not be a simple case. What happens when the minor
-revision that contains an erratum fix not only stops requiring a
-guest kernel workaround to be used, but actually causes the guest
-kernel to break when that workaround is attempted?
-
-> >> In that case Y=3DX since migration only takes care of PV devices.
-> >>=20
-> >> In that case a whitelist could be an easier option?
-> >>=20
-> >> How to provide the whitelist to qemu in a platform agnostic way?
-> >> - I will look into intel model as you have suggested, does intel kee=
-ps a whitelist or masks off some bits of processorID
-> >> How does intel does it
-> >=20
-> > Purely based on features rather than IDs.
-
-x86 processors have a stable core, i.e. it's pretty rare to have an
-erratum in a new processor that can't easily be dealt with by turning
-off its corresponding feature, i.e. masking off some CPUID feature bits.
-AArch64 processors have ID registers (similar to CPUID feature leaves),
-so if there was an erratum in one of the features advertised by its ID
-registers, then that erratum could be dealt with the same way. However,
-AArch64 processors also have plenty of errata in their core. The only
-way to detect when those errata require workarounds is by MIDR.
-
-> >=20
-> > If it's an Intel processor and it's got that set of CPU features
-> > migration to it will normally work.
-> > (There are some gotcha's that we hit from time to time, but
-> > the basic idea holds)
-> >=20
->=20
-> Just to add what happens in ARM64 case, qemu running on Machine A sends=
- cpu state information to Machine B.
-> This state contains MIDR value, and so Processor ID value is compared i=
-n KVM and not in qemu (correcting myself).
->=20
-> IIRC, Peter/Eric please point if there is something incorrect in the be=
-low flow...
->=20
-> (Machine B)
-> target/arm/machine.c: cpu_post_load()
-> 		- updates cpu->cpreg_values[i] : which includes MIDR (processor ID re=
-gister)
->=20
-> 		- calls write_list_to_kvmstate(cpu, KVM_PUT_FULL_STATE)
->=20
-> 				target/arm/kvm.c: write_list_to_kvmstate
-> 				- calls =3D> kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &r);
->=20
-> 					=3D> and it eventually lands up IIRC in Linux code in=20
->=20
-> 							=3D> arch/arm64/kvm/sys_regs.c : set_invariant_sys_reg(u64 id, v=
-oid __user *uaddr)
-> 							 	/* This is what we mean by invariant: you can't change it. */
-> 								if (r->val !=3D val)
-> 									return -EINVAL;
-> 								Note: MIDR_EL1 is invariant register.
-> result: Migration fails on Machine B.
->=20
-> A few points:
-> - qemu on arm64 is invoked with -machine virt and -cpu as host. So we d=
-on't explicitly define which cpu.=20
->=20
-> - In case Machine A and Machine B have almost same Core and the delta m=
-ay-not have any effect on qemu operation, migration should work by just l=
-ooking into whitelist.
-> whitelist can be given as a parameter for qemu on machine B.
->=20
-> qemu-system-aarch64 -whitelist <ids separated by commas>
->=20
-> (This is my proposal)
->=20
-> - So in cpu_post_load (Machine B) qemu can lookup whitelist and replace=
- the MIDR with the one at Machine B.=20
-> Sounds good?
-
-It shouldn't be necessary. With '-cpu host' QEMU should probably just rea=
+> there is data in the first cluster, changing the overall status reporte=
 d
-all the ID registers from the host first, updating the guest's copy to
-match the destination host's registers (we're using '-cpu host', the
-registers should match the host - including MIDR.) If a user chooses to
-migrate a guest that is using '-cpu host', then they need to know what
-they are doing. If a whitelist of close-enough processors is possible to
-create, then that whitelist should be managed and used at a higher layer
-in the virt stack, not down in QEMU. For example, openstack can determine
-destination candidates using whatever policy it wants, including a close-
-enough processor whitelist.
+> to the caller.=C2=A0 But when the qcow2 is hidden by blkdebug, backing_=
+bs()
+> states that blkdebug has no backing image, and terminates the loop earl=
+y
+> with JUST the status of the (empty) top file, rather than properly
+> merging in the status from the backing file.
+>=20
+> I don't know if the bug lies in backing_bs(), or in the blkdebug driver=
+,
+> or in the combination of the two.=C2=A0 Maybe it is as simple as fixing=
 
-So, I propose blindly updating all invariant registers when migrating
-a '-cpu host' guest and leaving it to the user to do these migrations
-at their own risk (when migrating to a truly identical host, the blind
-update will not change anything. So it would be no worse than what we
-do today.) One side note is that we're starting to give QEMU control
-over what optional processor features are available to the guest, e.g.
-SVE. So before blindly updating all ID registers we'd want to inform
-KVM of the guest configuration in order for KVM to return appropriate
-ID register values.
+> backing_bs() such that on a filter node bs, it defers to
+> backing_bs(bs->file->bs), to make filter nodes behave as if they have
+> the same backing file semantics as what they are wrapping.
 
-Thanks,
-drew
+You mean my "block: Deal with filters" series?
 
->=20
-> - Juan raised a point about clock speed, I am not sure it will have any=
- effect on arm since qemu is run with -cpu host param.
-> I could be wrong here, Peter/Eric can you please correct me...
->=20
-> -Thanks
-> Manish
->=20
->=20
->=20
-> > Dave
-> >> - is providing a -mirate-compat-whitelist <file> option for arm only=
- looks good?
-> >> this option can be added in A1/A2 qemu command, so it would be upstr=
-eam / downstream agnostic.
-> >=20
-> >>>=20
-> >>> I am sorry to not be able to tell you that this is an easy problem.
-> >>>=20
-> >>> Later, Juan.
-> >>=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
+(Which replaces the backing_bs(p) with bdrv_filtered_bs(p) -- "filtered"
+means both "normal" R/W filter nodes, and "backing" COW filtering.)
+
+qemu-img map doesn't work even with that series, though, because
+bdrv_block_status() only gets the status of the topmost node.  And if
+that's a blkdebug node, well, you only get your blkdebug info.  That is
+pretty much working as intended.
+
+The real issue is in qemu-img map, which should just disregard filters.
+Add a "bs =3D bdrv_skip_rw_filters(bs)" right at the top of the loop in
+qemu-img.c:get_block_status(), and it works.
+
+Max
+
+
+--Ovr6aeyNrWa9L4ZFKMLmMMn8okt8e6yJx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGnnkACgkQ9AfbAGHV
+z0DPmQf/VVJPCgy98hKoqiJFxdVOYQ0T4wQgcdOucjMOXBfa4LpG437QCfCrDBa2
+Jss+TAIzyVi295xKTmB4vqo2Nhk/zQYnlO/tqDrXmmr2QPRk7x9jjHhJNOJ56PkX
+bYDoinF0+e776wXoeBv9H4MVPaOt1C03DHix6yu/owKjHd6qxV+Ndl4HYWswbDdR
+86Ylz6Vq1+ogiTOtiY5t0PQ/9dBBB8VLqelNe3r9xvf69MxtfDeZL9icHf24nKLY
+86Y0bSqcD1EPf/eWi1htF79kFXhbiMKkf2O4IaWHkgS485uy+zE5FjW7lDWwwh7v
+O1WEwR435wnJp5ScQRGiv+2ZCOGWcQ==
+=wksp
+-----END PGP SIGNATURE-----
+
+--Ovr6aeyNrWa9L4ZFKMLmMMn8okt8e6yJx--
