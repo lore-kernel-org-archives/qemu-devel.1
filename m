@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuyrP-00028Q-CX
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:42:08 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fuyrN-00027w-HB
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fuycf-0001B5-Mp
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:26:54 -0400
-References: <cover.1535291602.git.berto@igalia.com>
-	<d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c9cb16fe-8e23-50c4-67c0-3c5952163099@redhat.com>
-Date: Wed, 29 Aug 2018 13:26:46 +0200
+	(envelope-from <mlureau@redhat.com>) id 1fuykD-00058J-VY
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:34:45 -0400
+Received: from mail-it0-f68.google.com ([209.85.214.68]:50508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fuykD-00055O-Qc
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:34:41 -0400
+Received: by mail-it0-f68.google.com with SMTP id j81-v6so7171446ite.0
+	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 04:34:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5gMDOBD76EatADTyVctlkGhyMeIvl24iH"
-Subject: Re: [Qemu-devel] [PATCH 5/9] block: Allow child references on reopen
+In-Reply-To: <20180829095035.GI31005@redhat.com>
+References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
+	<20180829095035.GI31005@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 29 Aug 2018 13:34:40 +0200
+Message-ID: <CAMxuvayUDC+dZegONEwto36qTqaJFUEF9UrvNiY+1HJ_6nrzYg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 00/29] vhost-user for input & GPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,116 +29,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, David Airlie <airlied@redhat.com>, "Hoffmann, Gerd" <kraxel@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5gMDOBD76EatADTyVctlkGhyMeIvl24iH
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <c9cb16fe-8e23-50c4-67c0-3c5952163099@redhat.com>
-Subject: Re: [PATCH 5/9] block: Allow child references on reopen
-References: <cover.1535291602.git.berto@igalia.com>
- <d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
-In-Reply-To: <d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On 2018-08-26 16:09, Alberto Garcia wrote:
-> In the previous patches we removed all child references from
-> bs->{options,explicit_options} because keeping them is useless and
-> wrong.
->=20
-> Because of this, any attempt to reopen a BlockDriverState using a
-> child reference as one of its options would result in a failure,
-> because bdrv_reopen_prepare() would detect that there's a new option
-> (the child reference) that wasn't present in bs->options.
->=20
-> But passing child references on reopen can be useful. It's a way to
-> specify a BDS's child without having to pass recursively all of the
-> child's options, and if the reference points to a different BDS then
-> this can allow us to replace the child.
->=20
-> However, replacing the child is something that needs to be implemented
-> case by case and only when it makes sense. For now, this patch allows
-> passing a child reference as long as it points to the current child of
-> the BlockDriverState.
+On Wed, Aug 29, 2018 at 11:50 AM, Daniel P. Berrang=C3=A9
+<berrange@redhat.com> wrote:
+> On Fri, Jul 13, 2018 at 03:08:47PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> Hi,
+>>
+>> vhost-user allows to drive a virtio device in a seperate
+>> process. After vhost-user-net, we have seen
+>> vhost-user-{scsi,blk,crypto} added more recently.
+>>
+>> This series, initially proposed 2 years ago
+>> (https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.html)
+>> contributes with vhost-user-input and vhost-user-gpu.
+>>
+>> Additionally, to factor out common code and ease the usage, a
+>> vhost-user-backend is introduced as an intermediary object between the
+>> backend and the qemu device.
+>>
+>> You may start a vhost-user-gpu with virgl rendering in a separate
+>> process like this:
+>>
+>> $ ./vhost-user-gpu --virgl -s vgpu.sock &
+>> $ qemu...
+>>   -chardev socket,id=3Dchr,path=3Dvgpu.sock
+>>   -object vhost-user-backend,id=3Dvug,chardev=3Dchr
+>>   -device vhost-user-vga,vhost-user=3Dvug
+>>
+>> You may also specify the backend command and the arguments as part of
+>> vhost-user-backend qemu arguments. For example, to start a
+>> vhost-user-input backend on input device /dev/input/event19:
+>>
+>> -object vhost-user-backend,id=3Dvuid,cmd=3D"vhost-user-input /dev/input/=
+event19"
+>> -device virtio-input-host-pci,vhost-user=3Dvuid
+>>
+>> The vhost-user-gpu backend requires virgl from git.
+>>
+>> The libvirt support is on-going work:
+>> https://github.com/elmarco/libvirt/commits/vhost-user-gpu
+>>
+>> The GPU benchmarks are encouraging, giving up to x5 performance on
+>> Unigine Heaven 4.0.
+>
+> What is the main driving motivation behind this featureset ? Is it aimed
+> at providing performance, or security, or allowing arbitrary out of tree
+> backends, or all three ?
 
-"For now"?  If you intend it to be case-by-case, won't it be handled by
-the driver's bdrv_reopen_prepare() implementation?
+Mainly security/stability & performance. Allowing arbitrary out of
+tree backends is a bonus for me, I don't care much if we don't allow
+it.
 
-> It's also important to remember that, as a consequence of the
-> previous patches, this child reference will be removed from
-> bs->{options,explicit_options} after the reopening has been completed.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->=20
-> diff --git a/block.c b/block.c
-> index 92afb3dcce..804d557608 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3241,6 +3241,25 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_=
-state, BlockReopenQueue *queue,
->              QObject *new =3D entry->value;
->              QObject *old =3D qdict_get(reopen_state->bs->options, entr=
-y->key);
-> =20
-> +            /* We allow child references 'child_name'=3D'value'
-> +             * if 'child_name' is an existing child of the BDS
-> +             * and 'value' is the child's node name (a string). */
-> +            if (qobject_type(new) =3D=3D QTYPE_QSTRING) {
-> +                BdrvChild *child;
-> +                QLIST_FOREACH(child, &reopen_state->bs->children, next=
-) {
-> +                    if (!strcmp(child->name, entry->key)) {
-> +                        break;
-> +                    }
-> +                }
-> +
-> +                if (child) {
-> +                    const char *str =3D qobject_get_try_str(new);
-> +                    if (!strcmp(child->bs->node_name, str)) {
-> +                        continue; /* Found child with this name, skip =
-option */
-> +                    }
-> +                }
-> +            }
-> +
+> Although we've got a number of vhost-user backends I'm pretty concerned
+> about the direction this is taking QEMU overall.
+>
+> Managing QEMU is non-trivial for a number of reasons. We've done a lot of
+> work to provide standardized modelling of CLI args, guest ABI stability
+> via association with machine types, migration data stream stability,
+> QEMU feature capabilities detection and so on.
+>
+> The move to outsource backends to external binaries is discarding some
+> or all of these items, rewinding alot of progress we've made in the
+> managability of QEMU. Each external binary has to now reinvent the
+> things that are already solved in QEMU, and you can be sure each impl
+> will reinvent the concepts differently.
+>
+> I can't help feeling that we are shooting ourselves in the foot here
+> long term.
 
-Looks good, but I think the comment looks a bit convoluted.  Maybe add a
-note like "(so the child has to stay the same)"?
+I have a bit of the same feeling. For ex, I was a bit reluctant having
+the TPM emulator as an external process (new protocol, external
+binaries, with various management work, "opaque" migration). But in
+the end, the integration with libvirt makes thing quite easy for the
+user. So I changed a bit my mind, and I think this is one task that
+libvirt can be really good at.
 
-Third...  Hm.  This is just a general question.  So as far as I
-understand we decided that when you don't specify an option for reopen,
-it means that the default is used, and that we don't want to retain the
-old value.  Specifically, that means when you don't specify @backing,
-the default chain will be opened and may replace the current one.  So
-for other children, not specifying them should mean detaching them.
+>
+> We've always rejected the idea of having loadable modules in QEMU, but
+> as a result we've end up with outsourcing the backend entirely via the
+> vhost-user framework, so the end result is even more opaque than if we
+> had loadable modules, and is unable to take advantage of our standardized
+> modelling frameworks & capabilities :-(
 
-So why isn't it mandatory to re-specify all children for now?
+I agree, that's one of the reason I put together libvhostuser in the
+first place. If qemu ships its own backend, there is no reason we
+don't share modelling & code etc.
 
-Max
+For ex, I hope more vhost-users will use the -object
+vhost-user-backend to do basic connection and virtio setup. (in the
+series, -gpu and -input, I didn't really investigate -crypto, -net,
+-blk etc)
+
+> If we just look at performance & security, and ignore 3rd party impls
+> for a minute, I really don't like that to gain perf + security  we have
+> to change from:
+>
+>  $ qemu...
+>    -device virtio-vga
+>
+> To
+>
+>  $ ./vhost-user-gpu --virgl -s vgpu.sock &
+>  $ qemu...
+>    -chardev socket,id=3Dchr,path=3Dvgpu.sock
+>    -object vhost-user-backend,id=3Dvug,chardev=3Dchr
+>    -device vhost-user-vga,vhost-user=3Dvug
+>
+
+That's a bit incovenient for qemu command line users. But who runs
+qemu this way but some developers? (others have higher-level scripts /
+tools or libvirt)
+
+> Once we have the ability to run the backend via an external process,
+> to gain performance & security benefits, assuming feature parity is
+> achieved, I question why anyone would want to continue with the old
+> in-process approach ? IOW the goal should be that the original args
+>
+>  $ qemu...
+>    -device virtio-vga
+>
+> should "do the right thing" to launch the external process when you
+> have upgraded to a new enough QEMU, so that everyone immediately
+> benefits from the more secure & performant architecture.
 
 
---5gMDOBD76EatADTyVctlkGhyMeIvl24iH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+That's not incompatible with having the lengthy version. But this
+comes with some downside atm, since migration is not implemented for
+ex (for 2d, virgl doesn't have migration).
 
------BEGIN PGP SIGNATURE-----
+And seccomp spawn rule disable forking.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGgvYACgkQ9AfbAGHV
-z0DK6wf/eympZECxNjpvPCccVsINTWNyQHHNL63QxL+rMiV28k0djiWiC/TpMQ0O
-KGyacMFmXjDemWeGUB39V5OM8uOCdr2U2OXxC9Y+RHL7dXSTL+UV5RqpJdWsLK4L
-Gl3Hkf3XR6rYjI5EwfMHHyU05997vr1VbQnedIm227sObGp0wFzobwVkCfrFZGVc
-3TNrJczrTVpFjL65JndZuo5GU3yEDNgA9oCNt4iXueVA4msr6OyUeajeLIuR5Lxe
-rmeYyZEOl8iX9StZHQTk24ckXeM2u3e2EWpBfWF4G1JuknoJCI4HzkYv28ybpQBR
-ItNMQMWB2yyPs5KVoFueDOUkVUWMlg==
-=aFau
------END PGP SIGNATURE-----
+And libvirt will probably want to manage the external process for
+security/resource/tweaking reasons.
 
---5gMDOBD76EatADTyVctlkGhyMeIvl24iH--
+thanks for the feedback!
