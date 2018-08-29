@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fuxks-0000Hc-8f
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:31:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuxkv-0008Tc-M6
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:31:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fuxc2-00089F-9b
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:22:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44812 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fuxc1-00087Y-UI
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:22:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 870487788D
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 10:22:08 +0000 (UTC)
-Date: Wed, 29 Aug 2018 11:22:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180829102201.GA2660@work-vm>
-References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
-	<20180829095035.GI31005@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fuxao-0006rc-Tk
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:20:55 -0400
+References: <cover.1535291602.git.berto@igalia.com>
+	<c96c83fefeaf6d586f0c521ddd36b076cd60eaed.1535291602.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <675abc39-6731-ca56-55e4-859fe0923232@redhat.com>
+Date: Wed, 29 Aug 2018 12:20:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180829095035.GI31005@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/29] vhost-user for input & GPU
+In-Reply-To: <c96c83fefeaf6d586f0c521ddd36b076cd60eaed.1535291602.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9qr1PFj0JTQW8ftncytMhX8h6iiRezE21"
+Subject: Re: [Qemu-devel] [PATCH 1/9] qemu-io: Fix writethrough check in
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,127 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, airlied@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Fri, Jul 13, 2018 at 03:08:47PM +0200, Marc-Andr=E9 Lureau wrote:
-> > Hi,
-> >=20
-> > vhost-user allows to drive a virtio device in a seperate
-> > process. After vhost-user-net, we have seen
-> > vhost-user-{scsi,blk,crypto} added more recently.
-> >=20
-> > This series, initially proposed 2 years ago
-> > (https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.html)
-> > contributes with vhost-user-input and vhost-user-gpu.
-> >=20
-> > Additionally, to factor out common code and ease the usage, a
-> > vhost-user-backend is introduced as an intermediary object between th=
-e
-> > backend and the qemu device.
-> >=20
-> > You may start a vhost-user-gpu with virgl rendering in a separate
-> > process like this:
-> >=20
-> > $ ./vhost-user-gpu --virgl -s vgpu.sock &
-> > $ qemu...
-> >   -chardev socket,id=3Dchr,path=3Dvgpu.sock
-> >   -object vhost-user-backend,id=3Dvug,chardev=3Dchr
-> >   -device vhost-user-vga,vhost-user=3Dvug
-> >=20
-> > You may also specify the backend command and the arguments as part of
-> > vhost-user-backend qemu arguments. For example, to start a
-> > vhost-user-input backend on input device /dev/input/event19:
-> >=20
-> > -object vhost-user-backend,id=3Dvuid,cmd=3D"vhost-user-input /dev/inp=
-ut/event19"
-> > -device virtio-input-host-pci,vhost-user=3Dvuid
-> >=20
-> > The vhost-user-gpu backend requires virgl from git.
-> >=20
-> > The libvirt support is on-going work:
-> > https://github.com/elmarco/libvirt/commits/vhost-user-gpu
-> >=20
-> > The GPU benchmarks are encouraging, giving up to x5 performance on
-> > Unigine Heaven 4.0.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9qr1PFj0JTQW8ftncytMhX8h6iiRezE21
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <675abc39-6731-ca56-55e4-859fe0923232@redhat.com>
+Subject: Re: [PATCH 1/9] qemu-io: Fix writethrough check in reopen
+References: <cover.1535291602.git.berto@igalia.com>
+ <c96c83fefeaf6d586f0c521ddd36b076cd60eaed.1535291602.git.berto@igalia.com>
+In-Reply-To: <c96c83fefeaf6d586f0c521ddd36b076cd60eaed.1535291602.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-08-26 16:09, Alberto Garcia wrote:
+> "qemu-io reopen" doesn't allow changing the writethrough setting of
+> the cache, but the check is wrong, causing an error even on a simple
+> reopen with the default parameters:
 >=20
-> What is the main driving motivation behind this featureset ? Is it aime=
-d
-> at providing performance, or security, or allowing arbitrary out of tre=
-e
-> backends, or all three ?
+>    $ qemu-img create -f qcow2 hd.qcow2 1M
+>    $ qemu-system-x86_64 -monitor stdio -drive if=3Dvirtio,file=3Dhd.qco=
+w2
+>    (qemu) qemu-io virtio0 reopen
+>    Cannot change cache.writeback: Device attached
 >=20
-> Although we've got a number of vhost-user backends I'm pretty concerned
-> about the direction this is taking QEMU overall.
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  qemu-io-cmds.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> Managing QEMU is non-trivial for a number of reasons. We've done a lot =
-of
-> work to provide standardized modelling of CLI args, guest ABI stability
-> via association with machine types, migration data stream stability,
-> QEMU feature capabilities detection and so on.
->=20
-> The move to outsource backends to external binaries is discarding some
-> or all of these items, rewinding alot of progress we've made in the
-> managability of QEMU. Each external binary has to now reinvent the
-> things that are already solved in QEMU, and you can be sure each impl
-> will reinvent the concepts differently.
->=20
-> I can't help feeling that we are shooting ourselves in the foot here
-> long term.
->=20
-> We've always rejected the idea of having loadable modules in QEMU, but
-> as a result we've end up with outsourcing the backend entirely via the
-> vhost-user framework, so the end result is even more opaque than if we
-> had loadable modules, and is unable to take advantage of our standardiz=
-ed
-> modelling frameworks & capabilities :-(
->=20
-> If we just look at performance & security, and ignore 3rd party impls
-> for a minute, I really don't like that to gain perf + security  we have
-> to change from:
->=20
->  $ qemu...
->    -device virtio-vga
+> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+> index 5bf5f28178..db0b3ee5ef 100644
+> --- a/qemu-io-cmds.c
+> +++ b/qemu-io-cmds.c
+> @@ -2025,7 +2025,7 @@ static int reopen_f(BlockBackend *blk, int argc, =
+char **argv)
+>          return -EINVAL;
+>      }
 > =20
-> To
->=20
->  $ ./vhost-user-gpu --virgl -s vgpu.sock &
->  $ qemu...
->    -chardev socket,id=3Dchr,path=3Dvgpu.sock
->    -object vhost-user-backend,id=3Dvug,chardev=3Dchr
->    -device vhost-user-vga,vhost-user=3Dvug
->=20
-> Once we have the ability to run the backend via an external process,
-> to gain performance & security benefits, assuming feature parity is
-> achieved, I question why anyone would want to continue with the old
-> in-process approach ? IOW the goal should be that the original args=20
->=20
->  $ qemu...
->    -device virtio-vga
->=20
-> should "do the right thing" to launch the external process when you
-> have upgraded to a new enough QEMU, so that everyone immediately
-> benefits from the more secure & performant architecture.=20
+> -    if (writethrough !=3D blk_enable_write_cache(blk) &&
+> +    if (!writethrough !=3D blk_enable_write_cache(blk) &&
 
-But which external process should it run, under what privilieges
-and with sockets placed where?
-While it's true it would be good to have a nice simple way, often
-the qemu process might not have the privs to run that external process
-or know where to put the sockets; that's exactly the type of thing
-we're happy to leave to libvirt to wire up.
+I'd prefer the ! before the blk_enable_write_cache(), because that's how
+the initial assignment of writethrough looks, but nobody really cares, so=
+:
 
-Dave
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+>          blk_get_attached_dev(blk))
+>      {
+>          error_report("Cannot change cache.writeback: Device attached")=
+;
 >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+
+
+--9qr1PFj0JTQW8ftncytMhX8h6iiRezE21
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGc34ACgkQ9AfbAGHV
+z0CXJwgAs8DFZTdWZTo4H90y367aytlyyPThTSZot5ZyJil+/UYLdyu/3AzhepCN
+uu7qYSwO9THUGvjWnIuiEYDyEBoRfAQZW1vkdexIpl9AMBsDXokAiSlm8TPmlBfU
+IphxdlqVdUe9lkpJcYCk4ikX02v5rRdYOP+ngSB11SKWNwud2MSa+NhwWQ5XuQgQ
+BprT7p1K2WvpwklcL2X7Ns6wQVhKJRr7Bt5IoW9kJxxFSDZns6VIETC0MH8NEgiO
+5HhIKrUU16o1ZQZAndDxl+nOrAHL31OHkEyP78bbM5R3ZmQV4jbsykHDssEhhxV8
+fygdyTztjpUfLUAHE5d6oi2PqbBMyw==
+=GYAG
+-----END PGP SIGNATURE-----
+
+--9qr1PFj0JTQW8ftncytMhX8h6iiRezE21--
