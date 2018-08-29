@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fuz30-0007QC-24
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:54:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fuzL6-0003bd-Mk
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fuz2v-0003gk-Bz
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:54:05 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <af713c19-bc70-c581-aa9c-58aa08ab5e55@redhat.com>
-References: <cover.1535291602.git.berto@igalia.com>
-	<054195c8f83f524ee1f4d117407ac507dd18b0d8.1535291602.git.berto@igalia.com>
-	<af713c19-bc70-c581-aa9c-58aa08ab5e55@redhat.com>
-Date: Wed, 29 Aug 2018 13:53:57 +0200
-Message-ID: <w51tvnd2xt6.fsf@maestria.local.igalia.com>
+	(envelope-from <dgilbert@redhat.com>) id 1fuzDo-0008M2-L7
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:05:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48666 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fuzDo-0008Km-Au
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:05:16 -0400
+Date: Wed, 29 Aug 2018 13:05:10 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180829120509.GD2412@work-vm>
+References: <1534796770-10295-1-git-send-email-minyard@acm.org>
+	<1534796770-10295-6-git-send-email-minyard@acm.org>
+	<1aac39bc-5cd6-350f-9c8e-b5374f25510e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 3/9] block: Remove child references from
- bs->{options, explicit_options}
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1aac39bc-5cd6-350f-9c8e-b5374f25510e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] i2c:pm_smbus: Fix state transfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +28,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: minyard@acm.org, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Corey Minyard <cminyard@mvista.com>
 
-On Wed 29 Aug 2018 12:43:06 PM CEST, Max Reitz wrote:
-> On 2018-08-26 16:09, Alberto Garcia wrote:
->> Block drivers allow opening their children using a reference to an
->> existing BlockDriverState. These references remain stored in the
->> 'options' and 'explicit_options' QDicts, but we don't need to keep
->> them once everything is open.
->> 
->> What is more important, these values can become wrong if the children
->> change:
->> 
->>     $ qemu-img create -f qcow2 hd0.qcow2 10M
->>     $ qemu-img create -f qcow2 hd1.qcow2 10M
->>     $ qemu-img create -f qcow2 hd2.qcow2 10M
->>     $ $QEMU -drive if=none,file=hd0.qcow2,node-name=hd0 \
->>             -drive if=none,file=hd1.qcow2,node-name=hd1,backing=hd0 \
->>             -drive file=hd2.qcow2,node-name=hd2,backing=hd1
->> 
->> After this hd2 has hd1 as its backing file. Now let's remove it using
->> block_stream:
->> 
->>     (qemu) block_stream hd2 0 hd0.qcow2
->> 
->> Now hd0 is the backing file of hd2, but hd2's options QDicts still
->> contain backing=hd1.
->> 
->> Signed-off-by: Alberto Garcia <berto@igalia.com>
->> ---
->>  block.c | 12 +++++++++++-
->>  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> Also, the question is, why would we discard the child options, but
-> keep the references (which we do not add, so we only have the ones
-> specified by the user).
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 20/08/2018 22:26, minyard@acm.org wrote:
+> > From: Corey Minyard <cminyard@mvista.com>
+> > 
+> > Transfer the state information for the SMBus registers and
+> > internal data so it will work on a VM transfer.
+> 
+> Since the device is mostly unused, I would rather have this in a
+> subsection.  This way the format remains backwards-compatible as long as
+> the registers have the default values.
 
-We discussed this a couple of weeks ago: 
+Or simpler just wire it to a property and machine type.
 
-https://lists.gnu.org/archive/html/qemu-block/2018-08/msg00478.html
+Dave
 
-In the end I got convinced that we didn't need to keep the child
-references.
-
->> @@ -3313,6 +3317,12 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
->>      bs->open_flags         = reopen_state->flags;
->>      bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
->>  
->> +    /* Remove child references from bs->options and bs->explicit_options */
->> +    QLIST_FOREACH(child, &bs->children, next) {
->> +        qdict_del(bs->explicit_options, child->name);
->> +        qdict_del(bs->options, child->name);
->> +    }
->> +
->
-> Why don't you remove the child options as well?
-
-Because there's no child options here at this point. They are removed
-from the parent QDict in bdrv_reopen_queue_child():
-
-  QLIST_FOREACH(child, &bs->children, next) {
-      /* ... */
-      child_key_dot = g_strdup_printf("%s.", child->name);
-      qdict_extract_subqdict(explicit_options, NULL, child_key_dot);
-      qdict_extract_subqdict(options, &new_child_options, child_key_dot);
-      g_free(child_key_dot);
-
-      bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options, 0,
-                              child->role, options, flags);
-  }
-
-Berto
+> Also, in case you are interested, a few years ago I was thinking of
+> implementing clock stretching; the plan was that clock stretching would
+> let you pass host I2C devices down to the guest.  Basically, the I2C
+> recv function was changed to accept a callback+opaque, and said callback
+> would be invoked later if recv returned -EAGAIN (or something like
+> that).  Unfortunately I didn't finish adding support to all the I2C
+> controllers when my laptop was stolen, so the patches are lost. :/
+> 
+> Paolo
+> 
+> > Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  hw/acpi/piix4.c           |  3 ++-
+> >  hw/i2c/pm_smbus.c         | 20 ++++++++++++++++++++
+> >  hw/i2c/smbus_ich9.c       |  5 +++--
+> >  include/hw/i2c/pm_smbus.h |  2 ++
+> >  4 files changed, 27 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> > index 6404af5..f8d8d2e 100644
+> > --- a/hw/acpi/piix4.c
+> > +++ b/hw/acpi/piix4.c
+> > @@ -309,7 +309,7 @@ static const VMStateDescription vmstate_cpuhp_state = {
+> >   */
+> >  static const VMStateDescription vmstate_acpi = {
+> >      .name = "piix4_pm",
+> > -    .version_id = 3,
+> > +    .version_id = 4,
+> >      .minimum_version_id = 3,
+> >      .minimum_version_id_old = 1,
+> >      .load_state_old = acpi_load_old,
+> > @@ -320,6 +320,7 @@ static const VMStateDescription vmstate_acpi = {
+> >          VMSTATE_UINT16(ar.pm1.evt.en, PIIX4PMState),
+> >          VMSTATE_UINT16(ar.pm1.cnt.cnt, PIIX4PMState),
+> >          VMSTATE_STRUCT(apm, PIIX4PMState, 0, vmstate_apm, APMState),
+> > +        VMSTATE_STRUCT(smb, PIIX4PMState, 4, pmsmb_vmstate, PMSMBus),
+> >          VMSTATE_TIMER_PTR(ar.tmr.timer, PIIX4PMState),
+> >          VMSTATE_INT64(ar.tmr.overflow_time, PIIX4PMState),
+> >          VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
+> > diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+> > index 32132be..9e11d47 100644
+> > --- a/hw/i2c/pm_smbus.c
+> > +++ b/hw/i2c/pm_smbus.c
+> > @@ -383,6 +383,26 @@ static const MemoryRegionOps pm_smbus_ops = {
+> >      .endianness = DEVICE_LITTLE_ENDIAN,
+> >  };
+> >  
+> > +const VMStateDescription pmsmb_vmstate = {
+> > +    .name = "pmsmb",
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_UINT8(smb_stat, PMSMBus),
+> > +        VMSTATE_UINT8(smb_ctl, PMSMBus),
+> > +        VMSTATE_UINT8(smb_cmd, PMSMBus),
+> > +        VMSTATE_UINT8(smb_addr, PMSMBus),
+> > +        VMSTATE_UINT8(smb_data0, PMSMBus),
+> > +        VMSTATE_UINT8(smb_data1, PMSMBus),
+> > +        VMSTATE_UINT32(smb_index, PMSMBus),
+> > +        VMSTATE_UINT8_ARRAY(smb_data, PMSMBus, PM_SMBUS_MAX_MSG_SIZE),
+> > +        VMSTATE_UINT8(smb_auxctl, PMSMBus),
+> > +        VMSTATE_BOOL(i2c_enable, PMSMBus),
+> > +        VMSTATE_BOOL(op_done, PMSMBus),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> >  void pm_smbus_init(DeviceState *parent, PMSMBus *smb)
+> >  {
+> >      smb->op_done = true;
+> > diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+> > index a66a114..c8b8413 100644
+> > --- a/hw/i2c/smbus_ich9.c
+> > +++ b/hw/i2c/smbus_ich9.c
+> > @@ -45,10 +45,11 @@ typedef struct ICH9SMBState {
+> >  
+> >  static const VMStateDescription vmstate_ich9_smbus = {
+> >      .name = "ich9_smb",
+> > -    .version_id = 1,
+> > +    .version_id = 2,
+> >      .minimum_version_id = 1,
+> >      .fields = (VMStateField[]) {
+> > -        VMSTATE_PCI_DEVICE(dev, struct ICH9SMBState),
+> > +        VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
+> > +        VMSTATE_STRUCT(smb, ICH9SMBState, 2, pmsmb_vmstate, PMSMBus),
+> >          VMSTATE_END_OF_LIST()
+> >      }
+> >  };
+> > diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+> > index 99d5489..b1e1970 100644
+> > --- a/include/hw/i2c/pm_smbus.h
+> > +++ b/include/hw/i2c/pm_smbus.h
+> > @@ -33,4 +33,6 @@ typedef struct PMSMBus {
+> >  
+> >  void pm_smbus_init(DeviceState *parent, PMSMBus *smb);
+> >  
+> > +extern const VMStateDescription pmsmb_vmstate;
+> > +
+> >  #endif /* PM_SMBUS_H */
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
