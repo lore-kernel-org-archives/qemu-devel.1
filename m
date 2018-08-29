@@ -1,30 +1,22 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:42693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuyqO-0001VR-V7
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:41:09 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuyqU-0001VR-1T
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:41:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuypw-00005L-Ce
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:40:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47676 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fuypw-00005E-76
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:40:36 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD7A1FBE68
-	for <qemu-devel@nongnu.org>; Wed, 29 Aug 2018 11:40:35 +0000 (UTC)
-Date: Wed, 29 Aug 2018 13:40:30 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180829134030.5a631d61.cohuck@redhat.com>
-In-Reply-To: <20180828072426.45103-1-ybettan@redhat.com>
-References: <20180828072426.45103-1-ybettan@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fuyoj-0008CW-D2
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 07:39:22 -0400
+References: <cover.1535291602.git.berto@igalia.com>
+	<e4b359c3971bb95e1e3cc55e0f69e68404f33f17.1535291602.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d3ea4f66-e8f3-35a2-1c3b-dcedb989827a@redhat.com>
+Date: Wed, 29 Aug 2018 13:39:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC V1] hw/pci/pci_example.c : Added a new pci
- device
+In-Reply-To: <e4b359c3971bb95e1e3cc55e0f69e68404f33f17.1535291602.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QgJIjrGnFjEDPksfjD0YNEHq2dHS3hgy8"
+Subject: Re: [Qemu-devel] [PATCH 7/9] block: Allow changing 'discard' on
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,283 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoni Bettan <ybettan@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Tue, 28 Aug 2018 10:24:26 +0300
-Yoni Bettan <ybettan@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QgJIjrGnFjEDPksfjD0YNEHq2dHS3hgy8
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <d3ea4f66-e8f3-35a2-1c3b-dcedb989827a@redhat.com>
+Subject: Re: [PATCH 7/9] block: Allow changing 'discard' on reopen
+References: <cover.1535291602.git.berto@igalia.com>
+ <e4b359c3971bb95e1e3cc55e0f69e68404f33f17.1535291602.git.berto@igalia.com>
+In-Reply-To: <e4b359c3971bb95e1e3cc55e0f69e68404f33f17.1535291602.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
->     - this is a simple example of how to write a pci device that supports
->       portio, mmio, irq and dma
-
-Do you also plan to add example code for MSI(-X)?
-
-[Not just asking because s390 only supports MSI-X. Honestly :)]
-
-> 
-> Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+On 2018-08-26 16:09, Alberto Garcia wrote:
+> 'discard' is one of the basic BlockdevOptions available for all
+> drivers, but it's silently ignored by bdrv_reopen_prepare/commit(), so
+> the user cannot change it and doesn't get an error explaining that it
+> can't be changed.
+>=20
+> This should update the discard setting, but does nothing:
+>=20
+>    (qemu) qemu-io virtio0 "reopen -o discard=3Don"
+>=20
+> Since there's no reason why we shouldn't allow changing it and the
+> implementation is simple let's just do it.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  hw/pci/Makefile.objs |   1 +
->  hw/pci/pci_example.c | 309 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 310 insertions(+)
->  create mode 100644 hw/pci/pci_example.c
-> 
-
-(...)
-
-> diff --git a/hw/pci/pci_example.c b/hw/pci/pci_example.c
-> new file mode 100644
-> index 0000000000..326c9b7fa1
-> --- /dev/null
-> +++ b/hw/pci/pci_example.c
-> @@ -0,0 +1,309 @@
-> +#include "qemu/osdep.h"
-> +#include "hw/pci/pci.h"
-> +
-> +#define TYPE_PCI_EXAMPLE "pci-example"
-> +
-> +#define PCI_EXAMPLE(obj)  \
-> +    OBJECT_CHECK(PCIExampleDevState, (obj), TYPE_PCI_EXAMPLE)
-> +
-> +
-> +#define ERROR -1
-
-It's probably not a good idea to obfuscate the return code. Either
-return -1, or a proper error code.
-
-> +#define BLOCK_SIZE 64
-> +#define EXAMPLE_MMIO_SIZE BLOCK_SIZE
-> +#define EXAMPLE_PIO_SIZE BLOCK_SIZE
-> +#define DMA_BUFF_SIZE 4096
-> +
-> +/*---------------------------------------------------------------------------*/
-> +/*                                 PCI Struct                                */
-> +/*---------------------------------------------------------------------------*/
-> +
-> +typedef struct PCIExampleDevState {
-> +    /*< private >*/
-> +    PCIDevice parent_obj;
-> +    /*< public >*/
-> +
-> +    /* memory region */
-> +    MemoryRegion portio;
-> +    MemoryRegion mmio;
-> +    MemoryRegion irqio;
-> +    MemoryRegion dmaio;
-> +
-> +    /* data registers */
-> +    uint64_t memData, ioData, dmaPhisicalBase;
-
-I think we want this to be mem_data, io_data, and dma_physical_base
-instead.
-
-> +
-> +    qemu_irq irq;
-> +    /* for the driver to determine if this device caused the interrupt */
-> +    uint64_t threwIrq;
-
-Same here (threw_irq).
-
-> +
-> +} PCIExampleDevState;
-> +
-> +
-> +/*---------------------------------------------------------------------------*/
-> +/*                         Read/Write functions                              */
-> +/*---------------------------------------------------------------------------*/
-> +
-> +/* do nothing because the mmio read is done from DMA buffer */
-> +static uint64_t pci_example_mmio_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    return ERROR;
-> +}
-> +
-> +static void
-> +pci_example_mmio_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-
-I think our preferred style is to keep return value and function name
-on the same line and add line breaks in the parameter list, if needed.
-(Some more occurrences further down.)
-
-> +{
-> +    PCIExampleDevState *pms = (PCIExampleDevState *)opaque;
-
-peds? ped_state? (I'm not sure pms <-> PCIExampleDevState is obvious;
-I'm not sure either whether my suggestions are better :)
-
-> +    PCIDevice *pciDev = (PCIDevice *)opaque;
-
-pci_dev is better, I think. Also, I'd probably refer to pms->parent_obj
-(maybe call that one pci_device instead?) instead of casting.
-
-> +
-> +    if (size != 1) {
-> +        return;
+>  block.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/block.c b/block.c
+> index 804d557608..21f1eb9cd1 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -3178,6 +3178,15 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_=
+state, BlockReopenQueue *queue,
+> =20
+>      update_flags_from_options(&reopen_state->flags, opts);
+> =20
+> +    value =3D qemu_opt_get(opts, "discard");
+> +    if (value !=3D NULL) {
+> +        if (bdrv_parse_discard_flags(value, &reopen_state->flags) !=3D=
+ 0) {
+> +            error_setg(errp, "Invalid discard option");
+> +            ret =3D -EINVAL;
+> +            goto error;
+> +        }
 > +    }
 > +
-> +    /* compute the result */
-> +    pms->memData = val * 2;
-> +
-> +    /* write the result directly to phisical memory */
-> +    cpu_physical_memory_write(pms->dmaPhisicalBase, &pms->memData,
-> +            DMA_BUFF_SIZE);
+>      /* node-name and driver must be unchanged. Put them back into the =
+QDict, so
+>       * that they are checked at the end of this function. */
+>      value =3D qemu_opt_get(opts, "node-name");
 
-Indentation seems off.
+Hm.  Why not just use the same "trick" here as in your last patch, i.e.
+use qemu_opt_get_del() above and then qemu_opts_to_qdict() to return all
+unhandled options to the QDict?
 
-> +
-> +    /* raise an IRQ to notify DMA has finished  */
-> +    pms->threwIrq = 1;
-> +    pci_irq_assert(pciDev);
-> +}
+(We'd have to use *_del() in update_flags_from_options() as well, but
+that would be OK for all callers, I believe.)
 
-(...)
+Max
 
-> +/* do nothing because physical DMA buffer addres is onlyt set and don't need to
-> + * be red */
 
-s/addres/address/
-s/onlyt/only/
-s/don't/doesn't/
-s/red/read/
+--QgJIjrGnFjEDPksfjD0YNEHq2dHS3hgy8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Also, we prefer the
+-----BEGIN PGP SIGNATURE-----
 
-/*
- * comment style
- */
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGhd8ACgkQ9AfbAGHV
+z0D/yAf9FMgDZ053E7yXuDZeqohULrRoQr3BuEFPygldXFfUzKhXzkRvQuFGfMt9
+HtKoheef3F0ENBgWYyYSwqkC/e8j9tAar3JW3+VNcnrl+W9YP+OgWwr9LEzuGzCn
+v9LVRulXHovOiIo3YMDNnl4Gp73YYEdGtNjQTIaDsz5oNCw5RC6XrX9ZrpiMoe7D
+foDTHT8+X7fp24OVUtfnc9GBYIaCumGjzaGdRHfNz2EV9BfTOgZDDDMhPtaOTAz0
+JuubvuvSLbU7CxBbRSL2lJ7uuJzCw3UPDFvlW/MzjK+oWg2cF8oGC7tY936Ujf2H
+J67I8jhzG/9DPpyZOdM0qC3ABJ/MyQ==
+=32Yg
+-----END PGP SIGNATURE-----
 
-if it can't fit on one line.
-
-(...)
-
-> +/*---------------------------------------------------------------------------*/
-> +/*                             PCI functions                                 */
-> +/*---------------------------------------------------------------------------*/
-> +
-> +/* this is called when lunching the vm with "-device <device name>" */
-
-s/lunching/launching/
-
-Although that's simply the normal realization process, which could also
-be triggered by hotplug.
-
-> +static void pci_example_realize(PCIDevice *pciDev, Error **errp)
-> +{
-> +   PCIExampleDevState *d = PCI_EXAMPLE(pciDev);
-
-Here you use "d" as a variable name, which arguably might be better
-than any of the suggestions above :)
-
-> +   uint8_t *pciCond = pciDev->config;
-> +
-> +   d->threwIrq = 0;
-> +
-> +   /* initiallise the memory region of the CPU to the device */
-
-s/initiallise/initialize/
-
-> +   memory_region_init_io(&d->mmio, OBJECT(d), &pci_example_mmio_ops, d,
-> +           "pci-example-mmio", EXAMPLE_MMIO_SIZE);
-> +
-> +   memory_region_init_io(&d->portio, OBJECT(d), &pci_example_pio_ops, d,
-> +           "pci-example-portio", EXAMPLE_PIO_SIZE);
-> +
-> +   memory_region_init_io(&d->irqio, OBJECT(d), &pci_example_irqio_ops, d,
-> +           "pci-example-irqio", EXAMPLE_PIO_SIZE);
-> +
-> +   memory_region_init_io(&d->dmaio, OBJECT(d), &pci_example_dma_ops, d,
-> +           "pci-example-dma-base", EXAMPLE_MMIO_SIZE);
-> +
-> +   /* alocate BARs */
-
-s/alocate/allocate/
-
-> +   pci_register_bar(pciDev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-> +   pci_register_bar(pciDev, 1, PCI_BASE_ADDRESS_SPACE_IO, &d->portio);
-> +   pci_register_bar(pciDev, 2, PCI_BASE_ADDRESS_SPACE_IO, &d->irqio);
-> +   pci_register_bar(pciDev, 3, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->dmaio);
-> +
-> +   /* give interrupt support.
-> +    * a pci device has 4 pin for interrupt, here we use pin A */
-> +   pci_config_set_interrupt_pin(pciCond, 1);
-> +}
-> +
-> +
-> +/* the destructor of pci_example_realize() */
-> +static void pci_example_uninit(PCIDevice *dev)
-> +{
-> +    /* unregister BARs and other stuff */
-
-Shouldn't the function actually do it, then? :)
-
-> +}
-> +
-> +
-> +/* class constructor */
-> +static void pci_example_class_init(ObjectClass *klass, void *data)
-> +{
-> +   /* sort of dynamic cast */
-> +   DeviceClass *dc = DEVICE_CLASS(klass);
-> +   PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-> +
-> +   k->realize = pci_example_realize;
-> +   k->exit = pci_example_uninit;
-> +
-> +   /* some regular IDs in HEXA */
-> +   k->vendor_id = PCI_VENDOR_ID_REDHAT;
-> +   k->device_id = PCI_DEVICE_ID_REDHAT_TEST;
-> +   k->class_id = PCI_CLASS_OTHERS;
-> +
-> +   /* set the device bitmap category */
-> +   set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +
-> +   k->revision = 0x00;
-> +   dc->desc = "PCI Example Device";
-> +}
-> +
-> +/*---------------------------------------------------------------------------*/
-> +/*                            QEMU overhead                                  */
-
-Lol :)
-
-> +/*---------------------------------------------------------------------------*/
-> +
-> +
-> +/* Contains all the informations of the device we are creating.
-> + * class_init will be called when we are defining our device. */
-> +static const TypeInfo pci_example_info = {
-> +    .name           = TYPE_PCI_EXAMPLE,
-> +    .parent         = TYPE_PCI_DEVICE,
-> +    .instance_size  = sizeof(PCIExampleDevState),
-> +    .class_init     = pci_example_class_init,
-> +    .interfaces     = (InterfaceInfo[]) {
-> +        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-> +        { },
-> +    },
-> +};
-> +
-> +
-> +/* function called before the qemu main it will define our device */
-
-"Define our device type; this is done during startup of QEMU"
-
-?
-
-> +static void pci_example_register_types(void)
-> +{
-> +    type_register_static(&pci_example_info);
-> +}
-> +
-> +/* make qemu register our device at qemu-booting */
-
-I don't think you need this comment here as well (the type_init and the
-function kind of form one logical unit.)
-
-> +type_init(pci_example_register_types)
-> +
-> +
-> +
-
-I think the basic structure looks sound; I've focused on style
-questions as this is supposed to be an example for others to copy from.
-I'll leave the pci details to people more versed in pci :)
+--QgJIjrGnFjEDPksfjD0YNEHq2dHS3hgy8--
