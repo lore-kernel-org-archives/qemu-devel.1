@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuxBe-0005TA-L2
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:54:58 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuxBn-0005f2-25
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:55:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuwzC-0002bN-6T
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:42:03 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fuwyz-0002VM-Bu
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:41:52 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 29 Aug 2018 11:41:29 +0200
-Message-Id: <20180829094143.2102-6-cohuck@redhat.com>
-In-Reply-To: <20180829094143.2102-1-cohuck@redhat.com>
-References: <20180829094143.2102-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 05/19] target/s390x: add EX support for TRT and
- TRTR
+Date: Wed, 29 Aug 2018 11:41:24 +0200
+Message-Id: <20180829094143.2102-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 00/19] next batch of s390x changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,189 +18,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
+The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd241557452:
 
-Improves "b213c9f5: target/s390x: Implement TRTR" by introducing the
-intermediate functions, which are compatible with dx_helper type.
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27-v2' into staging (2018-08-27 16:44:20 +0100)
 
-Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Message-Id: <20180821025104.19604-6-pavel.zbitskiy@gmail.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/mem_helper.c       | 16 ++++++++++++++
- tests/tcg/s390x/Makefile.target |  2 ++
- tests/tcg/s390x/exrl-trt.c      | 48 +++++++++++++++++++++++++++++++++++++++++
- tests/tcg/s390x/exrl-trtr.c     | 48 +++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 114 insertions(+)
+are available in the Git repository at:
+
+  git://github.com/cohuck/qemu tags/s390x-20180829
+
+for you to fetch changes up to ef17064acc752d47377b1b263ef328e1281ab48e:
+
+  target/s390x: use regular spaces in translate.c (2018-08-28 17:37:01 +0200)
+
+----------------------------------------------------------------
+- various fixes and improvements in the tcg code
+- split off the individual virtio-ccw devices into separate files
+
+----------------------------------------------------------------
+
+Pavel Zbitskiy (7):
+  tests/tcg: add a simple s390x test
+  target/s390x: add BAL and BALR instructions
+  target/s390x: fix CSST decoding and runtime alignment check
+  target/s390x: fix IPM polluting irrelevant bits
+  target/s390x: add EX support for TRT and TRTR
+  target/s390x: fix PACK reading 1 byte less and writing 1 byte more
+  target/s390x: use regular spaces in translate.c
+
+Thomas Huth (12):
+  hw/s390x/virtio-ccw: Consolidate calls to virtio_ccw_unrealize()
+  hw/s390x: Move virtio-ccw-serial code to a separate file
+  hw/s390x: Move virtio-ccw-balloon code to a separate file
+  hw/s390x: Move virtio-ccw-scsi code to a separate file
+  hw/s390x: Move virtio-ccw-rng code to a separate file
+  hw/s390x: Move virtio-ccw-9p code to a separate file
+  hw/s390x: Move virtio-ccw-crypto code to a separate file
+  hw/s390x: Move vhost-vsock-ccw code to a separate file
+  hw/s390x: Move virtio-ccw-gpu code to a separate file
+  hw/s390x: Move virtio-ccw-input code to a separate file
+  hw/s390x: Move virtio-ccw-net code to a separate file
+  hw/s390x: Move virtio-ccw-blk code to a separate file
+
+ MAINTAINERS                     |   4 +-
+ hw/s390x/Makefile.objs          |  11 +
+ hw/s390x/vhost-vsock-ccw.c      |  60 ++++
+ hw/s390x/virtio-ccw-9p.c        |  65 ++++
+ hw/s390x/virtio-ccw-balloon.c   |  70 +++++
+ hw/s390x/virtio-ccw-blk.c       |  67 ++++
+ hw/s390x/virtio-ccw-crypto.c    |  75 +++++
+ hw/s390x/virtio-ccw-gpu.c       |  67 ++++
+ hw/s390x/virtio-ccw-input.c     | 118 +++++++
+ hw/s390x/virtio-ccw-net.c       |  70 +++++
+ hw/s390x/virtio-ccw-rng.c       |  74 +++++
+ hw/s390x/virtio-ccw-scsi.c      | 125 ++++++++
+ hw/s390x/virtio-ccw-serial.c    |  78 +++++
+ hw/s390x/virtio-ccw.c           | 676 +---------------------------------------
+ target/s390x/insn-data.def      |   3 +
+ target/s390x/mem_helper.c       |  24 +-
+ target/s390x/translate.c        |  79 +++--
+ tests/tcg/s390x/Makefile.target |   8 +
+ tests/tcg/s390x/csst.c          |  43 +++
+ tests/tcg/s390x/exrl-trt.c      |  48 +++
+ tests/tcg/s390x/exrl-trtr.c     |  48 +++
+ tests/tcg/s390x/hello-s390x.c   |   7 +
+ tests/tcg/s390x/ipm.c           |  22 ++
+ tests/tcg/s390x/pack.c          |  21 ++
+ 24 files changed, 1168 insertions(+), 695 deletions(-)
+ create mode 100644 hw/s390x/vhost-vsock-ccw.c
+ create mode 100644 hw/s390x/virtio-ccw-9p.c
+ create mode 100644 hw/s390x/virtio-ccw-balloon.c
+ create mode 100644 hw/s390x/virtio-ccw-blk.c
+ create mode 100644 hw/s390x/virtio-ccw-crypto.c
+ create mode 100644 hw/s390x/virtio-ccw-gpu.c
+ create mode 100644 hw/s390x/virtio-ccw-input.c
+ create mode 100644 hw/s390x/virtio-ccw-net.c
+ create mode 100644 hw/s390x/virtio-ccw-rng.c
+ create mode 100644 hw/s390x/virtio-ccw-scsi.c
+ create mode 100644 hw/s390x/virtio-ccw-serial.c
+ create mode 100644 tests/tcg/s390x/Makefile.target
+ create mode 100644 tests/tcg/s390x/csst.c
  create mode 100644 tests/tcg/s390x/exrl-trt.c
  create mode 100644 tests/tcg/s390x/exrl-trtr.c
+ create mode 100644 tests/tcg/s390x/hello-s390x.c
+ create mode 100644 tests/tcg/s390x/ipm.c
+ create mode 100644 tests/tcg/s390x/pack.c
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index c94dbf3fcb..704d0193b5 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1299,12 +1299,26 @@ static inline uint32_t do_helper_trt(CPUS390XState *env, int len,
-     return 0;
- }
- 
-+static uint32_t do_helper_trt_fwd(CPUS390XState *env, uint32_t len,
-+                                  uint64_t array, uint64_t trans,
-+                                  uintptr_t ra)
-+{
-+    return do_helper_trt(env, len, array, trans, 1, ra);
-+}
-+
- uint32_t HELPER(trt)(CPUS390XState *env, uint32_t len, uint64_t array,
-                      uint64_t trans)
- {
-     return do_helper_trt(env, len, array, trans, 1, GETPC());
- }
- 
-+static uint32_t do_helper_trt_bkwd(CPUS390XState *env, uint32_t len,
-+                                   uint64_t array, uint64_t trans,
-+                                   uintptr_t ra)
-+{
-+    return do_helper_trt(env, len, array, trans, -1, ra);
-+}
-+
- uint32_t HELPER(trtr)(CPUS390XState *env, uint32_t len, uint64_t array,
-                       uint64_t trans)
- {
-@@ -2193,12 +2207,14 @@ void HELPER(ex)(CPUS390XState *env, uint32_t ilen, uint64_t r1, uint64_t addr)
-         typedef uint32_t (*dx_helper)(CPUS390XState *, uint32_t, uint64_t,
-                                       uint64_t, uintptr_t);
-         static const dx_helper dx[16] = {
-+            [0x0] = do_helper_trt_bkwd,
-             [0x2] = do_helper_mvc,
-             [0x4] = do_helper_nc,
-             [0x5] = do_helper_clc,
-             [0x6] = do_helper_oc,
-             [0x7] = do_helper_xc,
-             [0xc] = do_helper_tr,
-+            [0xd] = do_helper_trt_fwd,
-         };
-         dx_helper helper = dx[opc & 0xf];
- 
-diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
-index c800a582e5..7de4376f52 100644
---- a/tests/tcg/s390x/Makefile.target
-+++ b/tests/tcg/s390x/Makefile.target
-@@ -3,3 +3,5 @@ CFLAGS+=-march=zEC12 -m64
- TESTS+=hello-s390x
- TESTS+=csst
- TESTS+=ipm
-+TESTS+=exrl-trt
-+TESTS+=exrl-trtr
-diff --git a/tests/tcg/s390x/exrl-trt.c b/tests/tcg/s390x/exrl-trt.c
-new file mode 100644
-index 0000000000..3c5323aecb
---- /dev/null
-+++ b/tests/tcg/s390x/exrl-trt.c
-@@ -0,0 +1,48 @@
-+#include <stdint.h>
-+#include <unistd.h>
-+
-+int main(void)
-+{
-+    char op1[] = "hello";
-+    char op2[256];
-+    uint64_t r1 = 0xffffffffffffffffull;
-+    uint64_t r2 = 0xffffffffffffffffull;
-+    uint64_t cc;
-+    int i;
-+
-+    for (i = 0; i < 256; i++) {
-+        if (i == 0) {
-+            op2[i] = 0xaa;
-+        } else {
-+            op2[i] = 0;
-+        }
-+    }
-+    asm volatile(
-+        "    j 2f\n"
-+        "1:  trt 0(1,%[op1]),0(%[op2])\n"
-+        "2:  exrl %[op1_len],1b\n"
-+        "    lgr %[r1],%%r1\n"
-+        "    lgr %[r2],%%r2\n"
-+        "    ipm %[cc]\n"
-+        : [r1] "+r" (r1),
-+          [r2] "+r" (r2),
-+          [cc] "=r" (cc)
-+        : [op1] "r" (&op1),
-+          [op1_len] "r" (5),
-+          [op2] "r" (&op2)
-+        : "r1", "r2", "cc");
-+    cc = (cc >> 28) & 3;
-+    if (cc != 2) {
-+        write(1, "bad cc\n", 7);
-+        return 1;
-+    }
-+    if ((char *)r1 != &op1[5]) {
-+        write(1, "bad r1\n", 7);
-+        return 1;
-+    }
-+    if (r2 != 0xffffffffffffffaaull) {
-+        write(1, "bad r2\n", 7);
-+        return 1;
-+    }
-+    return 0;
-+}
-diff --git a/tests/tcg/s390x/exrl-trtr.c b/tests/tcg/s390x/exrl-trtr.c
-new file mode 100644
-index 0000000000..c33153ad7e
---- /dev/null
-+++ b/tests/tcg/s390x/exrl-trtr.c
-@@ -0,0 +1,48 @@
-+#include <stdint.h>
-+#include <unistd.h>
-+
-+int main(void)
-+{
-+    char op1[] = {0, 1, 2, 3};
-+    char op2[256];
-+    uint64_t r1 = 0xffffffffffffffffull;
-+    uint64_t r2 = 0xffffffffffffffffull;
-+    uint64_t cc;
-+    int i;
-+
-+    for (i = 0; i < 256; i++) {
-+        if (i == 1) {
-+            op2[i] = 0xbb;
-+        } else {
-+            op2[i] = 0;
-+        }
-+    }
-+    asm volatile(
-+        "    j 2f\n"
-+        "1:  trtr 3(1,%[op1]),0(%[op2])\n"
-+        "2:  exrl %[op1_len],1b\n"
-+        "    lgr %[r1],%%r1\n"
-+        "    lgr %[r2],%%r2\n"
-+        "    ipm %[cc]\n"
-+        : [r1] "+r" (r1),
-+          [r2] "+r" (r2),
-+          [cc] "=r" (cc)
-+        : [op1] "r" (&op1),
-+          [op1_len] "r" (3),
-+          [op2] "r" (&op2)
-+        : "r1", "r2", "cc");
-+    cc = (cc >> 28) & 3;
-+    if (cc != 1) {
-+        write(1, "bad cc\n", 7);
-+        return 1;
-+    }
-+    if ((char *)r1 != &op1[1]) {
-+        write(1, "bad r1\n", 7);
-+        return 1;
-+    }
-+    if (r2 != 0xffffffffffffffbbull) {
-+        write(1, "bad r2\n", 7);
-+        return 1;
-+    }
-+    return 0;
-+}
 -- 
 2.14.4
