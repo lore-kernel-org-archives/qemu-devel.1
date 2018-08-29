@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:42924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <viktor.prutyanov@virtuozzo.com>) id 1fuzpA-00069q-UT
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:43:57 -0400
+	(envelope-from <Manish.Jaggi@cavium.com>) id 1fuzpU-0006fB-EQ
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:44:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <viktor.prutyanov@virtuozzo.com>) id 1fuznk-000315-SB
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:42:28 -0400
-Received: from mail-eopbgr40138.outbound.protection.outlook.com
-	([40.107.4.138]:19424
-	helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+	(envelope-from <Manish.Jaggi@cavium.com>) id 1fuzlc-0001p1-OI
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:40:16 -0400
+Received: from mail-sn1nam01on0050.outbound.protection.outlook.com
+	([104.47.32.50]:6118
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <viktor.prutyanov@virtuozzo.com>)
-	id 1fuznk-0002zG-Fq
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:42:24 -0400
-From: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
-Date: Wed, 29 Aug 2018 15:41:24 +0300
-Message-Id: <1535546488-30208-2-git-send-email-viktor.prutyanov@virtuozzo.com>
-In-Reply-To: <1535546488-30208-1-git-send-email-viktor.prutyanov@virtuozzo.com>
-References: <1535546488-30208-1-git-send-email-viktor.prutyanov@virtuozzo.com>
+	(Exim 4.71) (envelope-from <Manish.Jaggi@cavium.com>)
+	id 1fuzlb-0001n0-J4
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 08:40:11 -0400
+From: "Jaggi, Manish" <Manish.Jaggi@cavium.com>
+Date: Wed, 29 Aug 2018 12:40:08 +0000
+Message-ID: <19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
+References: <CABgNM92-PHWg3X41tCVfErmV9-Hnu5GYpz_pa9-iXfbScFUCZg@mail.gmail.com>
+	<CD29DCF7-6537-406F-A127-6A2FFDDAAD79@caviumnetworks.com>
+	<87k1ohxik4.fsf@trasno.org>
+	<3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
+	<20180828172739.GA10175@work-vm>
+In-Reply-To: <20180828172739.GA10175@work-vm>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <58F281508DF5D740B6D94027C36CF501@namprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/5] dump: move Windows dump structures
- definitions
+Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
+ different processor ids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,381 +36,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, pbonzini@redhat.com, armbru@redhat.com, dgilbert@redhat.com, rkagan@virtuozzo.com, viktor.prutyanov@phystech.edu, Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, Juan Quintela <quintela@redhat.com>, Auger Eric <eric.auger@redhat.com>, "drjones@redhat.com" <drjones@redhat.com>, "peter.maydell@linaro.org
+	qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Liguori <aliguori@us.ibm.com>
 
-This patch moves definitions of Windows dump structures to
-include/qemu/win_dump_defs.h to keep create_win_dump() prototype separate.
-
-Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
----
- include/qemu/win_dump_defs.h | 179 +++++++++++++++++++++++++++++++++++++++++++
- win_dump.h                   | 166 +--------------------------------------
- 2 files changed, 183 insertions(+), 162 deletions(-)
- create mode 100644 include/qemu/win_dump_defs.h
-
-diff --git a/include/qemu/win_dump_defs.h b/include/qemu/win_dump_defs.h
-new file mode 100644
-index 0000000..145096e
---- /dev/null
-+++ b/include/qemu/win_dump_defs.h
-@@ -0,0 +1,179 @@
-+/*
-+ * Windows crashdump definitions
-+ *
-+ * Copyright (c) 2018 Virtuozzo International GmbH
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_WIN_DUMP_DEFS_H
-+#define QEMU_WIN_DUMP_DEFS_H
-+
-+typedef struct WinDumpPhyMemRun64 {
-+    uint64_t BasePage;
-+    uint64_t PageCount;
-+} QEMU_PACKED WinDumpPhyMemRun64;
-+
-+typedef struct WinDumpPhyMemDesc64 {
-+    uint32_t NumberOfRuns;
-+    uint32_t unused;
-+    uint64_t NumberOfPages;
-+    WinDumpPhyMemRun64 Run[43];
-+} QEMU_PACKED WinDumpPhyMemDesc64;
-+
-+typedef struct WinDumpExceptionRecord {
-+    uint32_t ExceptionCode;
-+    uint32_t ExceptionFlags;
-+    uint64_t ExceptionRecord;
-+    uint64_t ExceptionAddress;
-+    uint32_t NumberParameters;
-+    uint32_t unused;
-+    uint64_t ExceptionInformation[15];
-+} QEMU_PACKED WinDumpExceptionRecord;
-+
-+typedef struct WinDumpHeader64 {
-+    char Signature[4];
-+    char ValidDump[4];
-+    uint32_t MajorVersion;
-+    uint32_t MinorVersion;
-+    uint64_t DirectoryTableBase;
-+    uint64_t PfnDatabase;
-+    uint64_t PsLoadedModuleList;
-+    uint64_t PsActiveProcessHead;
-+    uint32_t MachineImageType;
-+    uint32_t NumberProcessors;
-+    union {
-+        struct {
-+            uint32_t BugcheckCode;
-+            uint32_t unused0;
-+            uint64_t BugcheckParameter1;
-+            uint64_t BugcheckParameter2;
-+            uint64_t BugcheckParameter3;
-+            uint64_t BugcheckParameter4;
-+        };
-+        uint8_t BugcheckData[40];
-+    };
-+    uint8_t VersionUser[32];
-+    uint64_t KdDebuggerDataBlock;
-+    union {
-+        WinDumpPhyMemDesc64 PhysicalMemoryBlock;
-+        uint8_t PhysicalMemoryBlockBuffer[704];
-+    };
-+    union {
-+        uint8_t ContextBuffer[3000];
-+    };
-+    WinDumpExceptionRecord Exception;
-+    uint32_t DumpType;
-+    uint32_t unused1;
-+    uint64_t RequiredDumpSpace;
-+    uint64_t SystemTime;
-+    char Comment[128];
-+    uint64_t SystemUpTime;
-+    uint32_t MiniDumpFields;
-+    uint32_t SecondaryDataState;
-+    uint32_t ProductType;
-+    uint32_t SuiteMask;
-+    uint32_t WriterStatus;
-+    uint8_t unused2;
-+    uint8_t KdSecondaryVersion;
-+    uint8_t reserved[4018];
-+} QEMU_PACKED WinDumpHeader64;
-+
-+#define KDBG_OWNER_TAG_OFFSET64             0x10
-+#define KDBG_MM_PFN_DATABASE_OFFSET64       0xC0
-+#define KDBG_KI_BUGCHECK_DATA_OFFSET64      0x88
-+#define KDBG_KI_PROCESSOR_BLOCK_OFFSET64    0x218
-+#define KDBG_OFFSET_PRCB_CONTEXT_OFFSET64   0x338
-+
-+#define VMCOREINFO_ELF_NOTE_HDR_SIZE    24
-+
-+#define WIN_CTX_X64 0x00100000L
-+
-+#define WIN_CTX_CTL 0x00000001L
-+#define WIN_CTX_INT 0x00000002L
-+#define WIN_CTX_SEG 0x00000004L
-+#define WIN_CTX_FP  0x00000008L
-+#define WIN_CTX_DBG 0x00000010L
-+
-+#define WIN_CTX_FULL    (WIN_CTX_X64 | WIN_CTX_CTL | WIN_CTX_INT | WIN_CTX_FP)
-+#define WIN_CTX_ALL     (WIN_CTX_FULL | WIN_CTX_SEG | WIN_CTX_DBG)
-+
-+#define LIVE_SYSTEM_DUMP    0x00000161
-+
-+typedef struct WinM128A {
-+    uint64_t low;
-+    int64_t high;
-+} QEMU_ALIGNED(16) WinM128A;
-+
-+typedef struct WinContext {
-+    uint64_t PHome[6];
-+
-+    uint32_t ContextFlags;
-+    uint32_t MxCsr;
-+
-+    uint16_t SegCs;
-+    uint16_t SegDs;
-+    uint16_t SegEs;
-+    uint16_t SegFs;
-+    uint16_t SegGs;
-+    uint16_t SegSs;
-+    uint32_t EFlags;
-+
-+    uint64_t Dr0;
-+    uint64_t Dr1;
-+    uint64_t Dr2;
-+    uint64_t Dr3;
-+    uint64_t Dr6;
-+    uint64_t Dr7;
-+
-+    uint64_t Rax;
-+    uint64_t Rcx;
-+    uint64_t Rdx;
-+    uint64_t Rbx;
-+    uint64_t Rsp;
-+    uint64_t Rbp;
-+    uint64_t Rsi;
-+    uint64_t Rdi;
-+    uint64_t R8;
-+    uint64_t R9;
-+    uint64_t R10;
-+    uint64_t R11;
-+    uint64_t R12;
-+    uint64_t R13;
-+    uint64_t R14;
-+    uint64_t R15;
-+
-+    uint64_t Rip;
-+
-+    struct {
-+        uint16_t ControlWord;
-+        uint16_t StatusWord;
-+        uint8_t TagWord;
-+        uint8_t Reserved1;
-+        uint16_t ErrorOpcode;
-+        uint32_t ErrorOffset;
-+        uint16_t ErrorSelector;
-+        uint16_t Reserved2;
-+        uint32_t DataOffset;
-+        uint16_t DataSelector;
-+        uint16_t Reserved3;
-+        uint32_t MxCsr;
-+        uint32_t MxCsr_Mask;
-+        WinM128A FloatRegisters[8];
-+        WinM128A XmmRegisters[16];
-+        uint8_t Reserved4[96];
-+    } FltSave;
-+
-+    WinM128A VectorRegister[26];
-+    uint64_t VectorControl;
-+
-+    uint64_t DebugControl;
-+    uint64_t LastBranchToRip;
-+    uint64_t LastBranchFromRip;
-+    uint64_t LastExceptionToRip;
-+    uint64_t LastExceptionFromRip;
-+} QEMU_ALIGNED(16) WinContext;
-+
-+#endif /* QEMU_WIN_DUMP_DEFS_H */
-diff --git a/win_dump.h b/win_dump.h
-index f9e1faf..b8c2534 100644
---- a/win_dump.h
-+++ b/win_dump.h
-@@ -8,169 +8,11 @@
-  *
-  */
- 
--typedef struct WinDumpPhyMemRun64 {
--    uint64_t BasePage;
--    uint64_t PageCount;
--} QEMU_PACKED WinDumpPhyMemRun64;
-+#ifndef WIN_DUMP_H
-+#define WIN_DUMP_H
- 
--typedef struct WinDumpPhyMemDesc64 {
--    uint32_t NumberOfRuns;
--    uint32_t unused;
--    uint64_t NumberOfPages;
--    WinDumpPhyMemRun64 Run[43];
--} QEMU_PACKED WinDumpPhyMemDesc64;
--
--typedef struct WinDumpExceptionRecord {
--    uint32_t ExceptionCode;
--    uint32_t ExceptionFlags;
--    uint64_t ExceptionRecord;
--    uint64_t ExceptionAddress;
--    uint32_t NumberParameters;
--    uint32_t unused;
--    uint64_t ExceptionInformation[15];
--} QEMU_PACKED WinDumpExceptionRecord;
--
--typedef struct WinDumpHeader64 {
--    char Signature[4];
--    char ValidDump[4];
--    uint32_t MajorVersion;
--    uint32_t MinorVersion;
--    uint64_t DirectoryTableBase;
--    uint64_t PfnDatabase;
--    uint64_t PsLoadedModuleList;
--    uint64_t PsActiveProcessHead;
--    uint32_t MachineImageType;
--    uint32_t NumberProcessors;
--    union {
--        struct {
--            uint32_t BugcheckCode;
--            uint32_t unused0;
--            uint64_t BugcheckParameter1;
--            uint64_t BugcheckParameter2;
--            uint64_t BugcheckParameter3;
--            uint64_t BugcheckParameter4;
--        };
--        uint8_t BugcheckData[40];
--    };
--    uint8_t VersionUser[32];
--    uint64_t KdDebuggerDataBlock;
--    union {
--        WinDumpPhyMemDesc64 PhysicalMemoryBlock;
--        uint8_t PhysicalMemoryBlockBuffer[704];
--    };
--    union {
--        uint8_t ContextBuffer[3000];
--    };
--    WinDumpExceptionRecord Exception;
--    uint32_t DumpType;
--    uint32_t unused1;
--    uint64_t RequiredDumpSpace;
--    uint64_t SystemTime;
--    char Comment[128];
--    uint64_t SystemUpTime;
--    uint32_t MiniDumpFields;
--    uint32_t SecondaryDataState;
--    uint32_t ProductType;
--    uint32_t SuiteMask;
--    uint32_t WriterStatus;
--    uint8_t unused2;
--    uint8_t KdSecondaryVersion;
--    uint8_t reserved[4018];
--} QEMU_PACKED WinDumpHeader64;
-+#include "qemu/win_dump_defs.h"
- 
- void create_win_dump(DumpState *s, Error **errp);
- 
--#define KDBG_OWNER_TAG_OFFSET64             0x10
--#define KDBG_MM_PFN_DATABASE_OFFSET64       0xC0
--#define KDBG_KI_BUGCHECK_DATA_OFFSET64      0x88
--#define KDBG_KI_PROCESSOR_BLOCK_OFFSET64    0x218
--#define KDBG_OFFSET_PRCB_CONTEXT_OFFSET64   0x338
--
--#define VMCOREINFO_ELF_NOTE_HDR_SIZE    24
--
--#define WIN_CTX_X64 0x00100000L
--
--#define WIN_CTX_CTL 0x00000001L
--#define WIN_CTX_INT 0x00000002L
--#define WIN_CTX_SEG 0x00000004L
--#define WIN_CTX_FP  0x00000008L
--#define WIN_CTX_DBG 0x00000010L
--
--#define WIN_CTX_FULL    (WIN_CTX_X64 | WIN_CTX_CTL | WIN_CTX_INT | WIN_CTX_FP)
--#define WIN_CTX_ALL     (WIN_CTX_FULL | WIN_CTX_SEG | WIN_CTX_DBG)
--
--#define LIVE_SYSTEM_DUMP    0x00000161
--
--typedef struct WinM128A {
--    uint64_t low;
--    int64_t high;
--} QEMU_ALIGNED(16) WinM128A;
--
--typedef struct WinContext {
--    uint64_t PHome[6];
--
--    uint32_t ContextFlags;
--    uint32_t MxCsr;
--
--    uint16_t SegCs;
--    uint16_t SegDs;
--    uint16_t SegEs;
--    uint16_t SegFs;
--    uint16_t SegGs;
--    uint16_t SegSs;
--    uint32_t EFlags;
--
--    uint64_t Dr0;
--    uint64_t Dr1;
--    uint64_t Dr2;
--    uint64_t Dr3;
--    uint64_t Dr6;
--    uint64_t Dr7;
--
--    uint64_t Rax;
--    uint64_t Rcx;
--    uint64_t Rdx;
--    uint64_t Rbx;
--    uint64_t Rsp;
--    uint64_t Rbp;
--    uint64_t Rsi;
--    uint64_t Rdi;
--    uint64_t R8;
--    uint64_t R9;
--    uint64_t R10;
--    uint64_t R11;
--    uint64_t R12;
--    uint64_t R13;
--    uint64_t R14;
--    uint64_t R15;
--
--    uint64_t Rip;
--
--    struct {
--        uint16_t ControlWord;
--        uint16_t StatusWord;
--        uint8_t TagWord;
--        uint8_t Reserved1;
--        uint16_t ErrorOpcode;
--        uint32_t ErrorOffset;
--        uint16_t ErrorSelector;
--        uint16_t Reserved2;
--        uint32_t DataOffset;
--        uint16_t DataSelector;
--        uint16_t Reserved3;
--        uint32_t MxCsr;
--        uint32_t MxCsr_Mask;
--        WinM128A FloatRegisters[8];
--        WinM128A XmmRegisters[16];
--        uint8_t Reserved4[96];
--    } FltSave;
--
--    WinM128A VectorRegister[26];
--    uint64_t VectorControl;
--
--    uint64_t DebugControl;
--    uint64_t LastBranchToRip;
--    uint64_t LastBranchFromRip;
--    uint64_t LastExceptionToRip;
--    uint64_t LastExceptionFromRip;
--} QEMU_ALIGNED(16) WinContext;
-+#endif /* WIN_DUMP_H */
--- 
-2.7.4
+DQoNCj4gT24gMjgtQXVnLTIwMTgsIGF0IDEwOjU3IFBNLCBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0
+IDxkZ2lsYmVydEByZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IEV4dGVybmFsIEVtYWlsDQo+IA0K
+PiAoQ2MnaW5nIGluIEVyaWMsIERyZXcsIGFuZCBQZXRlciBmb3IgQVJNIHN0dWZmKQ0KPiANClRo
+YW5rcywNCj4gKiBKYWdnaSwgTWFuaXNoIChNYW5pc2guSmFnZ2lAY2F2aXVtLmNvbSkgd3JvdGU6
+DQo+PiANCj4+IA0KPj4+IE9uIDIzLUF1Zy0yMDE4LCBhdCA3OjU5IFBNLCBKdWFuIFF1aW50ZWxh
+IDxxdWludGVsYUByZWRoYXQuY29tPiB3cm90ZToNCj4+PiANCj4+PiBFeHRlcm5hbCBFbWFpbA0K
+Pj4+IA0KPj4+ICJKYWdnaSwgTWFuaXNoIiA8TWFuaXNoLkphZ2dpQGNhdml1bS5jb20+IHdyb3Rl
+Og0KPj4+PiBIaSwNCj4+PiANCj4+PiBIaQ0KPj4+IA0KPj4+IFtOb3RlIHRoYXQgSSB3YXMgY29u
+ZnVzZWQgYWJvdXQgd2hhdCBkbyB5b3UgbWVhbiB3aXRoIHByb2JsZW1zIHdpdGgNCj4+PiBwcm9j
+ZXNzb3JJRC4gIFRoZXJlIGlzIG5vIHByb2Nlc3NvcklEIG9uIHRoZSBtaWdyYXRpb24gc3RyZWFt
+LCBzbyBJDQo+Pj4gZGlkbid0IHVuZGVyc3Rvb2Qgd2hhdCB5b3Ugd2VyZSB0YWxraW5nIGFib3V0
+LiAgVW50aWwgSSByZWFsaXplZCB0aGF0DQo+Pj4geW91IHdlcmUgdHJ5aW5nIHRvIG1pZ3JhdGUg
+ZnJvbSBkaWZmZXJlbnQgY3B1IHR5cGVzXQ0KPj4+IA0KPj4+PiBQb3N0aW5nIGFnYWluIHdpdGgg
+bXkgY2F2aXVtIElEIGFuZCBDQ2luZyByZWxldmFudCBmb2xrcw0KPj4+IA0KPj4+IEl0IHdpbGwg
+YmUgZ29vZCB0byBnaXZlIFdoYXQgYXJjaGl0ZWN0dXJlIGFyZSB3ZSB0YWxraW5nIGFib3V0PyAg
+TUlQUywNCj4+PiBBUk0sIGFueXRoaW5nIGVsc2U/DQo+Pj4gDQo+PiBhcm02NA0KPj4gDQo+Pj4g
+V2h5PyAgQmVjYXVzZSB3ZSBkbyB0aGlzIGNvbnRpbm91c2x5IG9uIHg4Nl82NCB3b3JsZC4gIEhv
+dyBkbyB3ZSBkbw0KPj4+IHRoaXM/ICBXZSBlbXVsYXRlIHRoZSBfcHJvY2Vzc29yXyBjYXBhYmls
+aXRpZXMsIHNvICJpbiBnZW5lcmFsIiB5b3UgY2FuDQo+Pj4gYWx3YXlzIG1pZ3JhdGUgZnJvbSBh
+IHByb2Nlc3NvciB0byBhbm90aGVyIHdpdGggYSBzdXBlcnNldCBvZiB0aGUNCj4+PiBmZWF0dXJl
+cy4gIElmIHlvdSBsb29rIGF0IHRoZSBvdXB1dCBvZjoNCj4+PiANCj4+PiAgIHFlbXUtc3lzdGVt
+LXg4Nl82NCAtY3B1ID8NCj4+PiANCj4+PiBZb3UgY2FuIHNlZSB0aGF0IHdlIGhhdmUgbG90cyBv
+ZiBjcHUgdHlwZXMgdGhhdCB3ZSBlbXVsYXRlIGFuZCBjcHVpZA0KPj4+IChmZWF0dXJlcyByZWFs
+bHkpLiAgTWlncmF0aW9uIGludGVsPC0+YW1kIGlzIHRyaWNreS4gIEJ1dCBmcm9tICJpbnRlbA0K
+Pj4+IHdpdGggbGVzcyBmZWF0dXJlcyIgdG8gImludGVsIHdpdGggbW9yZSBmZWF0dXJlcyIgKG9y
+IHRoZSBzYW1lIHdpdGggQU1EKQ0KPj4+IGl0IGlzIGEgY29tbW9uIHRoaW5nIHRvIGRvLiAgT25j
+ZSB0b2xkIHRoYXQsIGl0IGlzIGEgbG90IG9mIHdvcmssIHNpbXBsZQ0KPj4+IHRoaW5ncyBsaWtl
+IHRoYXQgcHJvY2Vzc29ycyBydW4gYXQgZGlmZmVyZW50IGNsb2NrIHNwZWVkcyBpbXBseSB0aGF0
+IHlvdQ0KPj4+IG5lZWQgdG8gYmUgY2FyZWZ1bCBkdXJpbmcgbWlncmF0aW9uIHdpdGggdGltZXJz
+IGFuZCBhbnl0aGluZyB0aGF0DQo+Pj4gZGVwZW5kcyBvbiBmcmVxdWVuY2llcy4NCj4+PiANCj4+
+PiBJIGRvbid0IGtub3cgZW5vdWdoIGFib3V0IG90aGVyIGFyY2hpdGVjdHVyZXMgdG8ga25vdyBo
+b3cgdG8gZG8gaXQsIG9yDQo+Pj4gaG93IGZlYXNpYmxlIGlzLg0KPj4gDQo+PiBGb3IgYXJtNjQg
+cWVtdS9rdm0gdGhyb3dzIGFuIGVycm9yIHdoZW4gcHJvY2Vzc29ySUQgZG9lcyBub3QgbWF0Y2gu
+DQo+Pj4gDQo+Pj4+IExpdmUgTWlncmF0aW9uIGJldHdlZW4gbWFjaGluZXMgd2l0aCBkaWZmZXJl
+bnQgcHJvY2Vzc29ySWRzDQo+Pj4+IA0KPj4+PiBWTSBNaWdyYXRpb24gYmV0d2VlbiBtYWNoaW5l
+cyB3aXRoIGRpZmZlcmVudCBwcm9jZXNzb3JJZCB2YWx1ZXMgdGhyb3dzDQo+Pj4+IGVycm9yIGlu
+IHFlbXUva3ZtLiBUaG91Z2ggdGhpcyBjaGVjayBpcyBhcHByb3ByaWF0ZSBidXQgaXMgb3Zlcmtp
+bGwgd2hlcmUNCj4+Pj4gdHdvIG1hY2hpbmVzIGFyZSBvZiBzYW1lIFNvQy9hcmNoIGZhbWlseSBh
+bmQgaGF2ZSBzYW1lIGNvcmUvZ2ljIGJ1dA0KPj4+PiBkZWx0YSBjb3VsZCBiZSBpbiBvdGhlciBw
+YXJ0cyBvZiBTb2Mgd2hpY2ggaGF2ZSBubyBlZmZlY3Qgb24gVk0NCj4+Pj4gb3BlcmF0aW9uLg0K
+Pj4+IA0KPj4+IFRoZW4geW91IG5lZWQgdG8gZG8gdGhlIHdob2xlIHByb2Nlc3Mgb2Y6DQo+Pj4g
+DQo+Pj4gTGV0cyBjYWxsIGJvdGggcHJvY2Vzc29ycyBBMSBhbmQgQTIuICBZb3UgbmVlZCB0byBk
+byB0aGUgd2hvbGUgcHJvY2Vzcw0KPj4+IG9mOg0KPj4+IA0KPj4+IGEtIGRlZmluaW5nIGNwdSBB
+MQ0KPj4+IGItIG1ha2Ugc3VyZSB0aGF0IHdoZW4geW91IHJ1biBxZW11L2t2bSBvbiBwcm9jZXNz
+b3IgQTIsIHRoZQ0KPj4+IGZlYXR1cmVzL2JlaGF2aW91cnMgdGhhdCB0aGUgZ3Vlc3Qgc2Vlcy4g
+IFRoaXMgaXMgbm90IHRyaXZpYWwgYXQNCj4+PiBhbGwuDQo+Pj4gYy0gd2hlbiBtaWdyYXRpb24g
+Y29tZXMsIHlvdSBjYW4gc2VlIHRoYXQgeW91IG5lZWQgdG8gYWRqdXN0IHRvIHdoYXRldmVyDQo+
+Pj4gaXMgdGhlIGFyY2hpdGVjdHVyZSBvZiB0aGUgZGVzdGluYXRpb24uDQo+Pj4gDQo+Pj4+IFRo
+ZXJlIGNvdWxkIGJlIHR3byB3YXlzIHRvIGFkZHJlc3MgdGhpcyBpc3N1ZSBieSBpZ25vcmluZyB0
+aGUNCj4+Pj4gY29tcGFyaXNvbiBvZiBwcm9jZXNzb3JJRHMgYW5kIHNvIG5lZWQgZmVlZGJhY2sg
+ZnJvbSB0aGUNCj4+Pj4gY29tbXVuaXR5IG9uIHRoaXMuDQo+Pj4+IA0KPj4+PiBhKSBNYWludGFp
+biBhIHdoaXRlbGlzdCBpbiBxZW11Og0KPj4+PiANCj4+Pj4gVGhpcyB3aWxsIGJlIGEgc2V0IG9m
+IGFsbCBwcm9jZXNzb3JJZHMgd2hpY2ggYXJlIGNvbXBhdGlibGUgYW5kIG1pZ3JhdGlvbiBjYW4N
+Cj4+Pj4gaGFwcGVuIGJldHdlZW4gYW55IG9mIHRoZSBtYWNoaW5lcyB3aXRoIHRoZSBJZHMgZnJv
+bSB0aGlzIHNldC4gVGhpcyBzZXQgY2FuDQo+Pj4+IGJlIHN0YXRpY2FsbHkgYnVpbHQgd2l0aGlu
+IHFlbXUgYmluYXJ5Lg0KPj4+IA0KPj4+IEluIGdlbmVyYWwsIEkgcHJlZmZlciB3aGl0ZWxpc3Rz
+IG92ZXIgYmxhY2tsaXN0cy4NCj4+PiANCj4+Pj4gYikgUHJvdmlkZSBhbiBleHRyYSBvcHRpb24g
+d2l0aCBtaWdyYXRlIGNvbW1hbmQNCj4+Pj4gDQo+Pj4+IG1pZ3JhdGUgdGNwOjxpcD46PHBvcnQ+
+OjxkZXN0X3Byb2Nlc3Nvcl9pZD4NCj4+Pj4gDQo+Pj4+IFRoaXMgaXMgdG8gZmFrZSB0aGUgc3Jj
+X3Byb2Nlc3Nvcl9pZCBhcyBkZXN0X3Byb2Nlc3Nvcl9pZCwgc28gdGhlIHFlbXUgcnVubmluZw0K
+Pj4+PiBvbiBkZXN0aW5hdGlvbiBtYWNoaW5lIHdpbGwgbm90IGNvbXBsYWluLiBUaGUgb3Zlcmhl
+YWQgd2l0aCB0aGlzIGFwcHJvYWNoIGlzDQo+Pj4+IHRoYXQgdGhlIGRlc3RpbmF0aW9uIG1hY2hp
+bmVzIElkIG5lZWQgdG8gYmUga25vd24gYmVmb3JlaGFuZC4NCj4+PiANCj4+PiBQbGVhc2UsIGRv
+bid0IGV2ZW4gdGhpbmsgYWJvdXQgdGhpczoNCj4+PiBhLSBtaWdyYXRpb24gY29tbWFuZHMgYXJl
+IGFyY2hpdGVjdHVyZSBhZ25vc3RpYw0KPj4+IGItIGluIGdlbmVyYWwgaXQgaXMgX211Y2hfLCBf
+bXVjaF8gZWFzaWVyIHRvIGZpeCB0aGluZ3Mgb24gZGVzdGluYXRpb24NCj4+PiB0aGF0IG9uIHNv
+dXJjZS4NCj4+PiANCj4+Pj4gSWYgdGhlcmUgaXMgc29tZSBiZXR0ZXIgd2F54oCmIHBsZWFzZSBz
+dWdnZXN0Lg0KPj4+IA0KPj4+IExvb2sgYXQgaG93IGl0IGlzIGRvbmUgb24geDg2XzY0LiAgQnV0
+IGJlIGF3YXJlIHRoYXQgImRvaW5nIGl0IHJpZ2h0Ig0KPj4+IHRha2VzIGEgbG90IG9mIHdvcmsu
+ICBUbyBnaXZlIHlvdSBvbmUgaWRlYToNCj4+PiAtIHVwc3RyZWFtLCBpLmUuIHFlbXUsICJ3YXJh
+bnRlZSIgdGhhdCBtaWdyYXRpb24gb2Y6DQo+Pj4gcWVtdS1YIC1NIG1hY2hpbmUtdHlwZS1YIC0+
+IHFlbXUtWSAtTSBtYWNoaW5lLXR5cGUtWA0KPj4+IHdvcmtzIHdoZW4gWCA8IFkuDQo+Pj4gDQo+
+Pj4gLSBkb3duc3RyZWFtIChpLmUuIHJlZGhhdCBvbiBteSBjYXNlLCBidXQgSSBhbSBzdXJlIHRo
+YXQgb3RoZXJzIGFsc28NCj4+PiAic3VmZmVyIiB0aGlzKSAgYWxsb3cgYWxzbzoNCj4+PiANCj4+
+PiBxZW11LVkgLU0gbWFjaGluZS10eXBlLVggLT4gcWVtdS1YIC1NIG1hY2hpbmUtdHlwZS1YIChZ
+ID4gWCkNCj4+PiANCj4+PiBpbiBnZW5lcmFsIGl0IGlzIGEgdmVyeSBjb21wbGljYXRlZCBwcm9i
+bGVtLCBzbyB3ZSBsaW1pdCBfd2hhdF8geW91DQo+Pj4gY2FuIGRvLiAgQmFzaWNhbGx5IHdlIG9u
+bHkgc3VwcG9ydCBvdXIgbWFjaGluZS10eXBlcywgZG8gYSBsb3Qgb2YNCj4+PiB0ZXN0aW5nLCBh
+bmQgYXJlIHZlcnkgY2FyZWZ1bCB3aGVuIHdlIGFkZCBuZXcgZmVhdHVyZXMuICBJLmUuIGJlDQo+
+Pj4gcHJlcGFycmVkIHRvIGRvIGEgbG90IG9mIHRlc3RpbmcgYW5kIGEgbG90IG9mIGZpeGluZy4N
+Cj4+IA0KPj4gQXQgdGhpcyBwb2ludCBJIGFtIHRhcmdldGluZyBhIHNpbXBsZXIgY2FzZSB3aGVy
+ZSBNYWNoaW5lIEExIGFuZCBBMiBoYXMgYSBjb3JlIGZyb20gdGhlIHNhbWUgU29DIGZhbWlseS4N
+Cj4+IEZvciBleGFtcGxlIENhdml1bSBUaHVuZGVyWDIgQ29yZSBpbmNyZW1lbnRhbCB2ZXJzaW9u
+cyB3aGljaCBoYXMgaWRlbnRpY2FsIGNvcmUgYW5kIEdJQyBhbmQgbWF5IGhhdmUgc29tZSBlcnJh
+dGEgZml4ZXMuDQo+PiBJbiB0aGF0IGNhc2UgWT1YIHNpbmNlIG1pZ3JhdGlvbiBvbmx5IHRha2Vz
+IGNhcmUgb2YgUFYgZGV2aWNlcy4NCj4+IA0KPj4gSW4gdGhhdCBjYXNlIGEgd2hpdGVsaXN0IGNv
+dWxkIGJlIGFuIGVhc2llciBvcHRpb24/DQo+PiANCj4+IEhvdyB0byBwcm92aWRlIHRoZSB3aGl0
+ZWxpc3QgdG8gcWVtdSBpbiBhIHBsYXRmb3JtIGFnbm9zdGljIHdheT8NCj4+IC0gSSB3aWxsIGxv
+b2sgaW50byBpbnRlbCBtb2RlbCBhcyB5b3UgaGF2ZSBzdWdnZXN0ZWQsIGRvZXMgaW50ZWwga2Vl
+cHMgYSB3aGl0ZWxpc3Qgb3IgbWFza3Mgb2ZmIHNvbWUgYml0cyBvZiBwcm9jZXNzb3JJRA0KPj4g
+SG93IGRvZXMgaW50ZWwgZG9lcyBpdA0KPiANCj4gUHVyZWx5IGJhc2VkIG9uIGZlYXR1cmVzIHJh
+dGhlciB0aGFuIElEcy4NCj4gDQo+IElmIGl0J3MgYW4gSW50ZWwgcHJvY2Vzc29yIGFuZCBpdCdz
+IGdvdCB0aGF0IHNldCBvZiBDUFUgZmVhdHVyZXMNCj4gbWlncmF0aW9uIHRvIGl0IHdpbGwgbm9y
+bWFsbHkgd29yay4NCj4gKFRoZXJlIGFyZSBzb21lIGdvdGNoYSdzIHRoYXQgd2UgaGl0IGZyb20g
+dGltZSB0byB0aW1lLCBidXQNCj4gdGhlIGJhc2ljIGlkZWEgaG9sZHMpDQo+IA0KDQpKdXN0IHRv
+IGFkZCB3aGF0IGhhcHBlbnMgaW4gQVJNNjQgY2FzZSwgcWVtdSBydW5uaW5nIG9uIE1hY2hpbmUg
+QSBzZW5kcyBjcHUgc3RhdGUgaW5mb3JtYXRpb24gdG8gTWFjaGluZSBCLg0KVGhpcyBzdGF0ZSBj
+b250YWlucyBNSURSIHZhbHVlLCBhbmQgc28gUHJvY2Vzc29yIElEIHZhbHVlIGlzIGNvbXBhcmVk
+IGluIEtWTSBhbmQgbm90IGluIHFlbXUgKGNvcnJlY3RpbmcgbXlzZWxmKS4NCg0KSUlSQywgUGV0
+ZXIvRXJpYyBwbGVhc2UgcG9pbnQgaWYgdGhlcmUgaXMgc29tZXRoaW5nIGluY29ycmVjdCBpbiB0
+aGUgYmVsb3cgZmxvdy4uLg0KDQooTWFjaGluZSBCKQ0KdGFyZ2V0L2FybS9tYWNoaW5lLmM6IGNw
+dV9wb3N0X2xvYWQoKQ0KCQktIHVwZGF0ZXMgY3B1LT5jcHJlZ192YWx1ZXNbaV0gOiB3aGljaCBp
+bmNsdWRlcyBNSURSIChwcm9jZXNzb3IgSUQgcmVnaXN0ZXIpDQoNCgkJLSBjYWxscyB3cml0ZV9s
+aXN0X3RvX2t2bXN0YXRlKGNwdSwgS1ZNX1BVVF9GVUxMX1NUQVRFKQ0KDQoJCQkJdGFyZ2V0L2Fy
+bS9rdm0uYzogd3JpdGVfbGlzdF90b19rdm1zdGF0ZQ0KCQkJCS0gY2FsbHMgPT4ga3ZtX3ZjcHVf
+aW9jdGwoY3MsIEtWTV9TRVRfT05FX1JFRywgJnIpOw0KDQoJCQkJCT0+IGFuZCBpdCBldmVudHVh
+bGx5IGxhbmRzIHVwIElJUkMgaW4gTGludXggY29kZSBpbiANCg0KCQkJCQkJCT0+IGFyY2gvYXJt
+NjQva3ZtL3N5c19yZWdzLmMgOiBzZXRfaW52YXJpYW50X3N5c19yZWcodTY0IGlkLCB2b2lkIF9f
+dXNlciAqdWFkZHIpDQoJCQkJCQkJIAkvKiBUaGlzIGlzIHdoYXQgd2UgbWVhbiBieSBpbnZhcmlh
+bnQ6IHlvdSBjYW4ndCBjaGFuZ2UgaXQuICovDQoJCQkJCQkJCWlmIChyLT52YWwgIT0gdmFsKQ0K
+CQkJCQkJCQkJcmV0dXJuIC1FSU5WQUw7DQoJCQkJCQkJCU5vdGU6IE1JRFJfRUwxIGlzIGludmFy
+aWFudCByZWdpc3Rlci4NCnJlc3VsdDogTWlncmF0aW9uIGZhaWxzIG9uIE1hY2hpbmUgQi4NCg0K
+QSBmZXcgcG9pbnRzOg0KLSBxZW11IG9uIGFybTY0IGlzIGludm9rZWQgd2l0aCAtbWFjaGluZSB2
+aXJ0IGFuZCAtY3B1IGFzIGhvc3QuIFNvIHdlIGRvbid0IGV4cGxpY2l0bHkgZGVmaW5lIHdoaWNo
+IGNwdS4gDQoNCi0gSW4gY2FzZSBNYWNoaW5lIEEgYW5kIE1hY2hpbmUgQiBoYXZlIGFsbW9zdCBz
+YW1lIENvcmUgYW5kIHRoZSBkZWx0YSBtYXktbm90IGhhdmUgYW55IGVmZmVjdCBvbiBxZW11IG9w
+ZXJhdGlvbiwgbWlncmF0aW9uIHNob3VsZCB3b3JrIGJ5IGp1c3QgbG9va2luZyBpbnRvIHdoaXRl
+bGlzdC4NCndoaXRlbGlzdCBjYW4gYmUgZ2l2ZW4gYXMgYSBwYXJhbWV0ZXIgZm9yIHFlbXUgb24g
+bWFjaGluZSBCLg0KDQpxZW11LXN5c3RlbS1hYXJjaDY0IC13aGl0ZWxpc3QgPGlkcyBzZXBhcmF0
+ZWQgYnkgY29tbWFzPg0KDQooVGhpcyBpcyBteSBwcm9wb3NhbCkNCg0KLSBTbyBpbiBjcHVfcG9z
+dF9sb2FkIChNYWNoaW5lIEIpIHFlbXUgY2FuIGxvb2t1cCB3aGl0ZWxpc3QgYW5kIHJlcGxhY2Ug
+dGhlIE1JRFIgd2l0aCB0aGUgb25lIGF0IE1hY2hpbmUgQi4gDQpTb3VuZHMgZ29vZD8NCg0KLSBK
+dWFuIHJhaXNlZCBhIHBvaW50IGFib3V0IGNsb2NrIHNwZWVkLCBJIGFtIG5vdCBzdXJlIGl0IHdp
+bGwgaGF2ZSBhbnkgZWZmZWN0IG9uIGFybSBzaW5jZSBxZW11IGlzIHJ1biB3aXRoIC1jcHUgaG9z
+dCBwYXJhbS4NCkkgY291bGQgYmUgd3JvbmcgaGVyZSwgUGV0ZXIvRXJpYyBjYW4geW91IHBsZWFz
+ZSBjb3JyZWN0IG1lLi4uDQoNCi1UaGFua3MNCk1hbmlzaA0KDQoNCg0KPiBEYXZlDQo+PiAtIGlz
+IHByb3ZpZGluZyBhIC1taXJhdGUtY29tcGF0LXdoaXRlbGlzdCA8ZmlsZT4gb3B0aW9uIGZvciBh
+cm0gb25seSBsb29rcyBnb29kPw0KPj4gdGhpcyBvcHRpb24gY2FuIGJlIGFkZGVkIGluIEExL0Ey
+IHFlbXUgY29tbWFuZCwgc28gaXQgd291bGQgYmUgdXBzdHJlYW0gLyBkb3duc3RyZWFtIGFnbm9z
+dGljLg0KPiANCj4+PiANCj4+PiBJIGFtIHNvcnJ5IHRvIG5vdCBiZSBhYmxlIHRvIHRlbGwgeW91
+IHRoYXQgdGhpcyBpcyBhbiBlYXN5IHByb2JsZW0uDQo+Pj4gDQo+Pj4gTGF0ZXIsIEp1YW4uDQo+
+PiANCj4gLS0NCj4gRHIuIERhdmlkIEFsYW4gR2lsYmVydCAvIGRnaWxiZXJ0QHJlZGhhdC5jb20g
+LyBNYW5jaGVzdGVyLCBVSw0KDQo=
