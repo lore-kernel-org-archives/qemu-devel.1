@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fv2WS-0004Q6-Aq
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:36:45 -0400
+	(envelope-from <david@redhat.com>) id 1fv2WT-0004Qb-9S
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fv2WR-0001xf-FG
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:36:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43954 helo=mx1.redhat.com)
+	(envelope-from <david@redhat.com>) id 1fv2WS-0001y2-CY
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:36:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43960 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fv2WQ-0001xI-7r
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:36:42 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fv2WS-0001xn-5c
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:36:44 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 29 Aug 2018 17:36:07 +0200
-Message-Id: <20180829153624.12299-4-david@redhat.com>
+Date: Wed, 29 Aug 2018 17:36:08 +0200
+Message-Id: <20180829153624.12299-5-david@redhat.com>
 In-Reply-To: <20180829153624.12299-1-david@redhat.com>
 References: <20180829153624.12299-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/20] memory-device: introduce separate
- config option
+Subject: [Qemu-devel] [PATCH v2 04/20] memory-device:
+ get_region_size()/get_plugged_size() might fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +27,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Some architectures might support memory devices, while they don't
-support DIMM/NVDIMM. So let's
-- Rename CONFIG_MEM_HOTPLUG to CONFIG_MEM_DEVICE
-- Introduce CONFIG_DIMM and use it similarly to CONFIG NVDIMM
+Let's properly forward the error, so errors from get_region_size() /
+get_plugged_size(), can be handled.
 
-CONFIG_DIMM and CONFIG_NVDIMM require CONFIG_MEM_DEVICE.
+Users right now call both functions after the device has been realized,
+which is guaranteed to no fail (we'll document this behavior in a
+follow-up patch).
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- default-configs/i386-softmmu.mak  | 3 ++-
- default-configs/ppc64-softmmu.mak | 3 ++-
- hw/Makefile.objs                  | 2 +-
- hw/mem/Makefile.objs              | 4 ++--
- qapi/misc.json                    | 2 +-
- 5 files changed, 8 insertions(+), 6 deletions(-)
+ hw/mem/memory-device.c         | 6 +++---
+ hw/mem/pc-dimm.c               | 5 +++--
+ include/hw/mem/memory-device.h | 4 ++--
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 8c7d4a0fa0..4c1637338b 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -50,7 +50,8 @@ CONFIG_PCI_Q35=y
- CONFIG_APIC=y
- CONFIG_IOAPIC=y
- CONFIG_PVPANIC=y
--CONFIG_MEM_HOTPLUG=y
-+CONFIG_MEM_DEVICE=y
-+CONFIG_DIMM=y
- CONFIG_NVDIMM=y
- CONFIG_ACPI_NVDIMM=y
- CONFIG_PCIE_PORT=y
-diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-index b94af6c7c6..f550573782 100644
---- a/default-configs/ppc64-softmmu.mak
-+++ b/default-configs/ppc64-softmmu.mak
-@@ -16,4 +16,5 @@ CONFIG_VIRTIO_VGA=y
- CONFIG_XICS=$(CONFIG_PSERIES)
- CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
- CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
--CONFIG_MEM_HOTPLUG=y
-+CONFIG_MEM_DEVICE=y
-+CONFIG_DIMM=y
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index a19c1417ed..58872e27e0 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += vfio/
- devices-dirs-$(CONFIG_SOFTMMU) += virtio/
- devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
- devices-dirs-$(CONFIG_SOFTMMU) += xen/
--devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
-+devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
- devices-dirs-$(CONFIG_SOFTMMU) += smbios/
- devices-dirs-y += core/
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-index 10be4df2a2..3e2f7c5ca2 100644
---- a/hw/mem/Makefile.objs
-+++ b/hw/mem/Makefile.objs
-@@ -1,3 +1,3 @@
--common-obj-$(CONFIG_MEM_HOTPLUG) += pc-dimm.o
--common-obj-$(CONFIG_MEM_HOTPLUG) += memory-device.o
-+common-obj-$(CONFIG_DIMM) += pc-dimm.o
-+common-obj-$(CONFIG_MEM_DEVICE) += memory-device.o
- common-obj-$(CONFIG_NVDIMM) += nvdimm.o
-diff --git a/qapi/misc.json b/qapi/misc.json
-index d450cfef21..7c36de0464 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2061,7 +2061,7 @@
- #
- # @plugged-memory: size of memory that can be hot-unplugged. This field
- #                  is omitted if target doesn't support memory hotplug
--#                  (i.e. CONFIG_MEM_HOTPLUG not defined on build time).
-+#                  (i.e. CONFIG_MEM_DEVICE not defined at build time).
- #
- # Since: 2.11.0
- ##
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index 0d9892b715..d87599c280 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -60,7 +60,7 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
+         const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+ 
+         if (dev->realized) {
+-            *size += mdc->get_region_size(md);
++            *size += mdc->get_region_size(md, &error_abort);
+         }
+     }
+ 
+@@ -167,7 +167,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+         uint64_t md_size, md_addr;
+ 
+         md_addr = mdc->get_addr(md);
+-        md_size = mdc->get_region_size(md);
++        md_size = mdc->get_region_size(md, &error_abort);
+         if (*errp) {
+             goto out;
+         }
+@@ -233,7 +233,7 @@ static int memory_device_plugged_size(Object *obj, void *opaque)
+         const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+ 
+         if (dev->realized) {
+-            *size += mdc->get_plugged_size(md);
++            *size += mdc->get_plugged_size(md, &error_abort);
+         }
+     }
+ 
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index fb6bcaedc4..4bf1a0acc9 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -236,14 +236,15 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+     return dimm->addr;
+ }
+ 
+-static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
++static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
++                                           Error **errp)
+ {
+     /* dropping const here is fine as we don't touch the memory region */
+     PCDIMMDevice *dimm = PC_DIMM(md);
+     const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
+     MemoryRegion *mr;
+ 
+-    mr = ddc->get_memory_region(dimm, &error_abort);
++    mr = ddc->get_memory_region(dimm, errp);
+     if (!mr) {
+         return 0;
+     }
+diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+index 2853b084b5..f02b229837 100644
+--- a/include/hw/mem/memory-device.h
++++ b/include/hw/mem/memory-device.h
+@@ -33,8 +33,8 @@ typedef struct MemoryDeviceClass {
+     InterfaceClass parent_class;
+ 
+     uint64_t (*get_addr)(const MemoryDeviceState *md);
+-    uint64_t (*get_plugged_size)(const MemoryDeviceState *md);
+-    uint64_t (*get_region_size)(const MemoryDeviceState *md);
++    uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
++    uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
+     void (*fill_device_info)(const MemoryDeviceState *md,
+                              MemoryDeviceInfo *info);
+ } MemoryDeviceClass;
 -- 
 2.17.1
