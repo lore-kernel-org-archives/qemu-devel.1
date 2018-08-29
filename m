@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuxBj-0005f2-7s
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:55:00 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fuxkT-0008Tc-FZ
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:30:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fuwz2-0002Wr-Mb
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 05:41:53 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 29 Aug 2018 11:41:25 +0200
-Message-Id: <20180829094143.2102-2-cohuck@redhat.com>
-In-Reply-To: <20180829094143.2102-1-cohuck@redhat.com>
-References: <20180829094143.2102-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 01/19] tests/tcg: add a simple s390x test
+	(envelope-from <mreitz@redhat.com>) id 1fuxgz-0004O1-Ls
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 06:27:18 -0400
+References: <cover.1535291602.git.berto@igalia.com>
+	<32606f818dfcc21e2e503852b63f248cafb92871.1535291602.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <118efdba-a5f2-faaa-dbfb-8b400252b02d@redhat.com>
+Date: Wed, 29 Aug 2018 12:27:10 +0200
+MIME-Version: 1.0
+In-Reply-To: <32606f818dfcc21e2e503852b63f248cafb92871.1535291602.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9Pp7epSbkVkQ9IDpVtaEpU8JHZsvHx64T"
+Subject: Re: [Qemu-devel] [PATCH 2/9] file-posix: x-check-cache-dropped
+ should default to false on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,59 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, Cornelia Huck <cohuck@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9Pp7epSbkVkQ9IDpVtaEpU8JHZsvHx64T
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <118efdba-a5f2-faaa-dbfb-8b400252b02d@redhat.com>
+Subject: Re: [PATCH 2/9] file-posix: x-check-cache-dropped should default to
+ false on reopen
+References: <cover.1535291602.git.berto@igalia.com>
+ <32606f818dfcc21e2e503852b63f248cafb92871.1535291602.git.berto@igalia.com>
+In-Reply-To: <32606f818dfcc21e2e503852b63f248cafb92871.1535291602.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Copied from alpha.
+On 2018-08-26 16:09, Alberto Garcia wrote:
+> The default value of x-check-cache-dropped is false. There's no reason
+> to use the previous value as a default in raw_reopen_prepare() because
+> bdrv_reopen_queue_child() already takes care of putting the old
+> options in the BDRVReopenState.options QDict.
 
-Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Message-Id: <20180821025104.19604-2-pavel.zbitskiy@gmail.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- MAINTAINERS                     | 1 +
- tests/tcg/s390x/Makefile.target | 3 +++
- tests/tcg/s390x/hello-s390x.c   | 7 +++++++
- 3 files changed, 11 insertions(+)
- create mode 100644 tests/tcg/s390x/Makefile.target
- create mode 100644 tests/tcg/s390x/hello-s390x.c
+Well, the reason would be because one might want to retain unspecified
+values as they were set before.  But we decided we don't want to do that.=
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d12518c08f..fd1bce176f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -253,6 +253,7 @@ S: Maintained
- F: target/s390x/
- F: hw/s390x/
- F: disas/s390.c
-+F: tests/tcg/s390x/
- L: qemu-s390x@nongnu.org
- 
- SH4
-diff --git a/tests/tcg/s390x/Makefile.target b/tests/tcg/s390x/Makefile.target
-new file mode 100644
-index 0000000000..9f4076901f
---- /dev/null
-+++ b/tests/tcg/s390x/Makefile.target
-@@ -0,0 +1,3 @@
-+VPATH+=$(SRC_PATH)/tests/tcg/s390x
-+CFLAGS+=-march=zEC12 -m64
-+TESTS+=hello-s390x
-diff --git a/tests/tcg/s390x/hello-s390x.c b/tests/tcg/s390x/hello-s390x.c
-new file mode 100644
-index 0000000000..3dc0a05f2b
---- /dev/null
-+++ b/tests/tcg/s390x/hello-s390x.c
-@@ -0,0 +1,7 @@
-+#include <unistd.h>
-+
-+int main(void)
-+{
-+    write(1, "hello\n", 6);
-+    return 0;
-+}
--- 
-2.14.4
+
+> If x-check-cache-dropped was previously set but is now missing from
+> the reopen QDict then it should be reset to false.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/file-posix.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+So:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--9Pp7epSbkVkQ9IDpVtaEpU8JHZsvHx64T
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGdP8ACgkQ9AfbAGHV
+z0B51gf/cIGyODRSj90iJuob6cuh5t5iHGs9LMhVuzW0Yo6j8EzVXcwhx3VX2V+n
+3fbqLQPbW0NmODjD2Wdl1cX1igwkgaLQ3yhKKkuLkzZRT8yU+gdoalhofcb/bs2l
+7ymKFH+Cr8aQWJqTcwQ3zlMkxbsVPWcqEfGLEwRDTPRw3JCHphvMmiaURxQEBqj5
+F5qPkMQq5bIKjD+lbTDBTERz1m7p4xltCu+mrOMCS0K4z4zGhwZNr2Sepln7TZEE
+wfDhNrqBH0BkwqVxYf/XyxN4kFkZcRmAGLUXD+vD99cYdWch1c4yyf28ng8pvTYQ
+DolwIjg0hdGxDZq5GqQuwA3fZm4Kmw==
+=N2RH
+-----END PGP SIGNATURE-----
+
+--9Pp7epSbkVkQ9IDpVtaEpU8JHZsvHx64T--
