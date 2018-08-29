@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fv20e-0005BG-Hm
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:03:54 -0400
+	(envelope-from <aclindsa@gmail.com>) id 1fv2FD-0003vR-Av
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:18:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fv20W-0002uW-Tm
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:03:50 -0400
-References: <cover.1535291602.git.berto@igalia.com>
-	<d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
-	<c9cb16fe-8e23-50c4-67c0-3c5952163099@redhat.com>
-	<w51r2ih2w5m.fsf@maestria.local.igalia.com>
-	<c147ca8a-da5e-bb8d-86ab-b9c34acddcf3@redhat.com>
-	<w51in3t2pd7.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <737260aa-010e-16e6-b639-46333ed08da6@redhat.com>
-Date: Wed, 29 Aug 2018 17:03:26 +0200
+	(envelope-from <aclindsa@gmail.com>) id 1fv2FC-0000be-04
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 11:18:55 -0400
+Date: Wed, 29 Aug 2018 11:18:49 -0400
+From: Aaron Lindsay <aclindsa@gmail.com>
+Message-ID: <20180829151848.GD3671@okra.localdomain>
+References: <1529699547-17044-1-git-send-email-alindsay@codeaurora.org>
+	<1529699547-17044-8-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA-ZVvytysV4M4oM-czE5zhxu-VJsd_mfgkp47QAVEtYXA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <w51in3t2pd7.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KbWI88ojkKQZvtSGVG74iNQqmbiSZTmfr"
-Subject: Re: [Qemu-devel] [PATCH 5/9] block: Allow child references on reopen
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-ZVvytysV4M4oM-czE5zhxu-VJsd_mfgkp47QAVEtYXA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 07/13] target/arm: Add array for
+ supported PMU events, generate PMCEID[01]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +25,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Aaron Lindsay <alindsay@amperecomputing.com>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KbWI88ojkKQZvtSGVG74iNQqmbiSZTmfr
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <737260aa-010e-16e6-b639-46333ed08da6@redhat.com>
-Subject: Re: [PATCH 5/9] block: Allow child references on reopen
-References: <cover.1535291602.git.berto@igalia.com>
- <d470d52cfc97265fec584e6b7d4b5a89c37a1739.1535291602.git.berto@igalia.com>
- <c9cb16fe-8e23-50c4-67c0-3c5952163099@redhat.com>
- <w51r2ih2w5m.fsf@maestria.local.igalia.com>
- <c147ca8a-da5e-bb8d-86ab-b9c34acddcf3@redhat.com>
- <w51in3t2pd7.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51in3t2pd7.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Jul 17 17:06, Peter Maydell wrote:
+> On 22 June 2018 at 21:32, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > This commit doesn't add any supported events, but provides the framework
+> > for adding them. We store the pm_event structs in a simple array, and
+> > provide the mapping from the event numbers to array indexes in the
+> > supported_event_map array. Because the value of PMCEID[01] depends upon
+> > which events are supported at runtime, generate it dynamically.
+> >
+> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+> > ---
+> >  target/arm/cpu.c    | 20 +++++++++++++-------
+> >  target/arm/cpu.h    | 10 ++++++++++
+> >  target/arm/cpu64.c  |  2 --
+> >  target/arm/helper.c | 37 +++++++++++++++++++++++++++++++++++++
+> >  4 files changed, 60 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> > index 98790b1..2f5b16a 100644
+> > --- a/target/arm/cpu.c
+> > +++ b/target/arm/cpu.c
+> > @@ -927,9 +927,19 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+> >      if (!cpu->has_pmu) {
+> >          unset_feature(env, ARM_FEATURE_PMU);
+> >          cpu->id_aa64dfr0 &= ~0xf00;
+> > -    } else if (!kvm_enabled()) {
+> > -        arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
+> > -        arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
+> > +    }
+> > +    if (arm_feature(env, ARM_FEATURE_PMU)) {
+> > +        uint64_t pmceid = get_pmceid(&cpu->env);
+> > +        cpu->pmceid0 = pmceid & 0xffffffff;
+> > +        cpu->pmceid1 = (pmceid >> 32) & 0xffffffff;
+> > +
+> > +        if (!kvm_enabled()) {
+> > +            arm_register_pre_el_change_hook(cpu, &pmu_pre_el_change, 0);
+> > +            arm_register_el_change_hook(cpu, &pmu_post_el_change, 0);
+> > +        }
+> > +    } else {
+> > +        cpu->pmceid0 = 0x00000000;
+> > +        cpu->pmceid1 = 0x00000000;
+> 
+> This is ok for now, but we really need to sort out what we're
+> doing for the interplay between feature bits and ID register
+> values more generally (notably for '-cpu max'), so depending on
+> when we do that work this might end up needing to change a bit
+> to fit in.
 
-On 2018-08-29 16:56, Alberto Garcia wrote:
-> On Wed 29 Aug 2018 02:59:01 PM CEST, Max Reitz wrote:
->>>> Specifically, that means when you don't specify @backing, the defaul=
-t
->>>> chain will be opened and may replace the current one.
->>>
->>> At the moment "backing" is the only child option that can be omitted,=
+Okay, I'll try to be on the lookout for this work.
 
->>> all others must be specified. So if you leave "backing" out on reopen=
-()
->>> we have the following possibilities:
->>>
->>>   a) We open the default backing file from disk. I don't think we wan=
-t
->>>      to open a new image on reopen(). Plus, what happens if the curre=
-nt
->>>      backing image is the default one? Do we need to detect that? And=
+> >      }
+> >
+> >      if (!arm_feature(env, ARM_FEATURE_EL2)) {
+> > @@ -1538,8 +1548,6 @@ static void cortex_a7_initfn(Object *obj)
+> >      cpu->id_pfr0 = 0x00001131;
+> >      cpu->id_pfr1 = 0x00011011;
+> >      cpu->id_dfr0 = 0x02010555;
+> > -    cpu->pmceid0 = 0x00000000;
+> > -    cpu->pmceid1 = 0x00000000;
+> >      cpu->id_afr0 = 0x00000000;
+> >      cpu->id_mmfr0 = 0x10101105;
+> >      cpu->id_mmfr1 = 0x40000000;
+> > @@ -1581,8 +1589,6 @@ static void cortex_a15_initfn(Object *obj)
+> >      cpu->id_pfr0 = 0x00001131;
+> >      cpu->id_pfr1 = 0x00011011;
+> >      cpu->id_dfr0 = 0x02010555;
+> > -    cpu->pmceid0 = 0x0000000;
+> > -    cpu->pmceid1 = 0x00000000;
+> >      cpu->id_afr0 = 0x00000000;
+> >      cpu->id_mmfr0 = 0x10201105;
+> >      cpu->id_mmfr1 = 0x20000000;
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index 852743b..430b8d5 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -964,6 +964,16 @@ void pmu_op_finish(CPUARMState *env);
+> >  void pmu_pre_el_change(ARMCPU *cpu, void *ignored);
+> >  void pmu_post_el_change(ARMCPU *cpu, void *ignored);
+> >
+> > +/*
+> > + * get_pmceid
+> > + * @env: CPUARMState
+> > + *
+> > + * Return the PMCEID[01] register values corresponding to the counters which
+> > + * are supported given the current configuration (0 is low 32, 1 is high 32
+> > + * bits)
+> > + */
+> > +uint64_t get_pmceid(CPUARMState *env);
+> > +
+> >  /* SCTLR bit meanings. Several bits have been reused in newer
+> >   * versions of the architecture; in that case we define constants
+> >   * for both old and new bit meanings. Code which tests against those
+> > diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> > index c50dcd4..28482a0 100644
+> > --- a/target/arm/cpu64.c
+> > +++ b/target/arm/cpu64.c
+> > @@ -141,8 +141,6 @@ static void aarch64_a57_initfn(Object *obj)
+> >      cpu->id_isar5 = 0x00011121;
+> >      cpu->id_aa64pfr0 = 0x00002222;
+> >      cpu->id_aa64dfr0 = 0x10305106;
+> > -    cpu->pmceid0 = 0x00000000;
+> > -    cpu->pmceid1 = 0x00000000;
+> >      cpu->id_aa64isar0 = 0x00011120;
+> >      cpu->id_aa64mmfr0 = 0x00001124;
+> >      cpu->dbgdidr = 0x3516d000;
+> > diff --git a/target/arm/helper.c b/target/arm/helper.c
+> > index 5d83446..9f81747 100644
+> > --- a/target/arm/helper.c
+> > +++ b/target/arm/helper.c
+> > @@ -964,6 +964,43 @@ static inline uint64_t pmu_counter_mask(CPUARMState *env)
+> >    return (1 << 31) | ((1 << pmu_num_counters(env)) - 1);
+> >  }
+> >
+> > +typedef struct pm_event {
+> > +    uint16_t number; /* PMEVTYPER.evtCount is 10 bits wide */
+> > +    /* If the event is supported on this CPU (used to generate PMCEID[01]) */
+> > +    bool (*supported)(CPUARMState *);
+> > +    /* Retrieve the current count of the underlying event. The programmed
+> > +     * counters hold a difference from the return value from this function */
+> 
+> Don't leave the */ dangling on the RHS of a multiline comment.
+> (CODING_STYLE now recommends Linux-kernel style.)
+> 
+> > +    uint64_t (*get_count)(CPUARMState *);
+> > +} pm_event;
+> > +
+> > +#define SUPPORTED_EVENT_SENTINEL UINT16_MAX
+> > +static const pm_event pm_events[] = {
+> > +    { .number = SUPPORTED_EVENT_SENTINEL }
+> > +};
+> > +static uint16_t supported_event_map[0x3f];
+> 
+> What is this hardcoded 0x3f ?
 
->>>      what if it's the default image but has non-default options? The
->>>      whole thing looks like a can of worms.
->>
->> True.
->>
->>>   b) We leave the current backing file untouched.
->>
->> Hm.  That doesn't make sense for blockdev-add, so you could argue that=
+This was the maximum common event ID (i.e. bits in PMCEID[01]) as of
+ARMv8.0. Obviously it should be a macro instead of a magic constant. I'm
+also debating whether this should be the maximum supported by the
+architecture or just the maximum supported by QEMU (particularly because
+later ARM versions raise this number significantly).
 
->> this behavior works as a default for reopen (because it cannot be
->> "confused" with the blockdev-add default).
->>
->>>   c) We forbid it, and the user has to pass an explicit child, or NUL=
-L.
->>
->> That sounds good.
->>
->>> I chose (b) in this series. I suppose (c) could also be an option. Bu=
-t
->>> (a) doesn't looke like a good idea.
->>
->> I agree with the last sentiment, but I'd prefer making it an error
->> instead of choosing (b).  Yes, you could argue that choosing (b) as a
->> default makes sense in a way, but in another, it just doesn't make
->> sense.  (Because while (b) makes no sense for blockdev-add, (a) would
->> make sense for both blockdev-add and reopen.  Sure, it's horrible to
->> support, but from a user's POV, it makes sense.  So it's just
->> confusing not to make that the default for reopen as well).
->>
->> But the most important point is that it's trivial for the user to keep=
+> > +
+> > +/*
+> > + * Called upon initialization to build PMCEID0 (low 32 bits) and PMCEID1 (high
+> > + * 32). We also use it to build a map of ARM event numbers to indices in
+> > + * our pm_events array.
+> > + */
+> > +uint64_t get_pmceid(CPUARMState *env)
+> > +{
+> > +    uint64_t pmceid = 0;
+> > +    unsigned int i = 0;
+> > +    while (pm_events[i].number != SUPPORTED_EVENT_SENTINEL) {
+> 
+> Are we ever going to run through some other array than the
+> constant pm_events[] ? We could just use ARRAY_SIZE rather
+> than requiring a sentinel member.
 
->> the current backing file.  They just need to give the current
->> backing's node-name.
->=20
-> Or NULL if there's no backing file, right?
+No, I don't think so.
 
-Ah, right, that case...  Yes.  Or we could make an exception (if
-@backing wasn't specified, and there is no default backing file, then we
-can suppress the error and handle it like backing=3Dnull).
+> 
+> > +        const pm_event *cnt = &pm_events[i];
+> > +        if (cnt->number < 0x3f && cnt->supported(env)) {
+> 
+> ...another 0x3f. Are we ever really going to see an
+> out-of-range .number field, or should we just assert()
+> that it's in range ?
 
-Right now, I'm not sure whether making an exception is a great idea, but
-it's stupid always having to pass backing=3Dnull for all qcow2 nodes that=
+In some places this can be set by user code via PMEVTYPER.evtCount, but
+I think in this code an assert is the right way to handle it.
 
-do not have a backing file...
+> 
+> > +            pmceid |= (1 << cnt->number);
+> > +            supported_event_map[cnt->number] = i;
+> > +        } else {
+> > +            supported_event_map[cnt->number] = SUPPORTED_EVENT_SENTINEL;
+> 
+> This will leave us with supported_event_map[] entries in
+> one of three states:
+>  * SUPPORTED_EVENT_SENTINEL if they have a specific pm_events[]
+>    entry marked as not supported
+>  * an index if they are supported
+>  * zero if there is no pm_events[] entry
+> 
+> Don't the ones in the last category get confused with the
+> real index 0?
+> 
+> Maybe this should initialize the whole array first to the
+> sentinel value and then just fill in the supported ones with
+> their index values?
 
-> The problem I see with this is that it would make the options quite
-> verbose. "backing" is an attribute of all BDSs, also protocol ones. I
-> suppose we can make "backing" optional in those, or is there any case
-> where it makes sense?
+I've re-written this code based on your feedback for v6, eliminating the
+sentinel and initializing the entirety of supported_event_map.
 
-Right.  Making it optional when there is no default backing file maybe
-is less bad than always requiring it.
-
-Max
-
-
---KbWI88ojkKQZvtSGVG74iNQqmbiSZTmfr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluGtb4ACgkQ9AfbAGHV
-z0Acfgf9HacrD0n8dx+gtmjRbr3rz/DudvB0a+EhSkmzkaygXi8caQLStU6eRbWm
-yl/QycELQHnZsD2TyGkmAuZEKD0rh4/vfBtaUuGdPlwRIjntsw8KsvVaBzNhSfr4
-/ArfHfcKRZgxbCqzn1rISV4RrHkkIH5vqMWGeDFoJQT47XiD/GbMlbvbdEw+mcGn
-yTznXlsKNMVAhbj247JuaFE5c3YPdSeKPMJJTIvFaqfkleebYSs3T4Rz96eKSX4d
-cZreaom1kTc+Fk7dtVkVORuxy8gmKzSGh0ewR/YxH3EJNIJodkxyZmiP2Rcviunk
-IFcvD16zl4jVqofRyLhnbMRXwaV+/A==
-=Heu1
------END PGP SIGNATURE-----
-
---KbWI88ojkKQZvtSGVG74iNQqmbiSZTmfr--
+-Aaron
