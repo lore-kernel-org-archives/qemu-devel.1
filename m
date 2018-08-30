@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55234)
+Received: from eggs.gnu.org ([208.118.235.92]:41436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fvQa6-0003F1-Cm
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:18:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fvQnC-0000m4-Ch
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fvQSy-00047c-Bp
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:10:45 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fvQSy-00045w-5a
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:10:44 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j26-v6so8758365wre.2
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 10:10:44 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fvQiA-0005R1-R8
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:26:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57960 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fvQiA-0005Qm-M4
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:26:26 -0400
+Date: Thu, 30 Aug 2018 18:26:21 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180830172620.GH2380@work-vm>
+References: <20180822120050.12694-1-quintela@redhat.com>
+	<CAFEAcA9xowHzaeN=N-EsUdP8rqMtGsJR2dNerQ_59Q+32ySWsw@mail.gmail.com>
+	<20180827111533.100ee062.cohuck@redhat.com>
 MIME-Version: 1.0
-References: <20180828153840.22519-1-marcandre.lureau@redhat.com>
-	<20180828184312.6e0e417d@redhat.com>
-	<CAJ+F1CLvye1F9xKskpPiogeTU+54+=Lurg3qX4cYpq1=r5sNaQ@mail.gmail.com>
-	<CAJ+F1C+7zis5wmV_V9MuL5bMvPp9CnCuUrg_yQgQuYM3p_3xxA@mail.gmail.com>
-	<20180829105009.07e5255f@redhat.com>
-	<CAJ+F1CLniMjFc1PCYqeBSkSJJ-sCk+PKvjupdurXKez9wedA4w@mail.gmail.com>
-	<20180830102006.5aaf9054@redhat.com>
-In-Reply-To: <20180830102006.5aaf9054@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 30 Aug 2018 19:10:31 +0200
-Message-ID: <CAJ+F1C+uk+acJhxJtc0E79cVTQxY=x+u8GKWLqGZ6mP7F=NfCg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180827111533.100ee062.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 00/20] Migration pull requset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,179 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
-Hi
-
-On Thu, Aug 30, 2018 at 10:20 AM Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Wed, 29 Aug 2018 14:36:00 +0200
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
->
-> > Hi
-> >
-> > On Wed, Aug 29, 2018 at 10:50 AM Igor Mammedov <imammedo@redhat.com> wr=
-ote:
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Fri, 24 Aug 2018 18:05:03 +0100
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> 
+> > On 22 August 2018 at 13:00, Juan Quintela <quintela@redhat.com> wrote:
+> > > The following changes since commit 13b7b188501d419a7d63c016e00065bcc693b7d4:
 > > >
-> > > On Tue, 28 Aug 2018 18:55:35 +0200
-> > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+> > >   Merge remote-tracking branch 'remotes/kraxel/tags/vga-20180821-pull-request' into staging (2018-08-21 15:57:56 +0100)
 > > >
-> > > > On Tue, Aug 28, 2018 at 6:54 PM Marc-Andr=C3=A9 Lureau
-> > > > <marcandre.lureau@gmail.com> wrote:
-> > > > >
-> > > > > Hi
-> > > > >
-> > > > > On Tue, Aug 28, 2018 at 6:49 PM Igor Mammedov <imammedo@redhat.co=
-m> wrote:
-> > > > > >
-> > > > > > On Tue, 28 Aug 2018 17:38:40 +0200
-> > > > > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > > > > >
-> > > > > > > The share=3Don/off property is used to modified mmap() MAP_SH=
-ARED
-> > > > > > > setting. Make it on by default for convenience and compatibil=
-ity
-> > > > > > > reasons.
-> > > > > > it would be nice to state reasons here.
-> > > > > >
-> > > > > > also flipping default to on is behavioral change when
-> > > > > > used with bind policy which could make backend initialization f=
-ail
-> > > > > > so CLI that used to work (if there are any users of this withou=
-t shared=3Don)
-> > > > > > won't work anymore.
-> > > > >
-> > > > > memfd backend is passing shared=3Dtrue to memory_region_init_ram_=
-from_fd().
-> > > > >
-> > > > > The patch allows to tweak that (instead of ignoring the property)=
-,
-> > > > > while keeping the value to shared=3Dtrue.
-> > > >
-> > > > keeping the default value to shared=3Dtrrue.
-> > > ok,
-> > > another question:
-> > >  does it make sense to allow "shared=3Dfalse" at all?
-> > >  should we bail out if user asks for it?
-> >
-> > You may want to use memfd for convenience (no need to specify hugetlb
-> > mem-path for ex), without the share memory aspects.
-> ok, acked.
->
-> btw:
-> looking at memfd_backend_memory_alloc/file_backend_memory_alloc
-> both needlessly are are calling host_memory_backend_mr_inited()
-> which creates an illusion that alloc could be called multiple times
-> but it isn't, could you clean that up?
-
-ok
-
->
-> In addition a following error path needs fixing
-> memfd_backend_memory_alloc()
->      if (fd =3D=3D -1) {
->         return;
->     }
-> it must set errp
-
-The error is already set by qemu_memfd_create()
-
->
-> >
-> > (but the patch was mostly for completeness)
-> >
+> > > are available in the Git repository at:
 > > >
-> > > >
-> > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redha=
-t.com>
-> > > > > > > ---
-> > > > > > >  backends/hostmem-memfd.c | 4 +++-
-> > > > > > >  qemu-options.hx          | 4 +++-
-> > > > > > >  2 files changed, 6 insertions(+), 2 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memf=
-d.c
-> > > > > > > index 1e20fe0ba8..abd52364db 100644
-> > > > > > > --- a/backends/hostmem-memfd.c
-> > > > > > > +++ b/backends/hostmem-memfd.c
-> > > > > > > @@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBacken=
-d *backend, Error **errp)
-> > > > > > >
-> > > > > > >      name =3D object_get_canonical_path(OBJECT(backend));
-> > > > > > >      memory_region_init_ram_from_fd(&backend->mr, OBJECT(back=
-end),
-> > > > > > > -                                   name, backend->size, true=
-, fd, errp);
-> > > > > > > +                                   name, backend->size,
-> > > > > > > +                                   backend->share, fd, errp)=
-;
-> > > > > > >      g_free(name);
-> > > > > > >  }
-> > > > > > >
-> > > > > > > @@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
-> > > > > > >
-> > > > > > >      /* default to sealed file */
-> > > > > > >      m->seal =3D true;
-> > > > > > > +    MEMORY_BACKEND(m)->share =3D true;
-> > > > > > >  }
-> > > > > > >
-> > > > > > >  static void
-> > > > > > > diff --git a/qemu-options.hx b/qemu-options.hx
-> > > > > > > index f14e423b7c..25c02d72b8 100644
-> > > > > > > --- a/qemu-options.hx
-> > > > > > > +++ b/qemu-options.hx
-> > > > > > > @@ -4029,7 +4029,7 @@ Memory backend objects offer more contr=
-ol than the @option{-m} option that is
-> > > > > > >  traditionally used to define guest RAM. Please refer to
-> > > > > > >  @option{memory-backend-file} for a description of the option=
-s.
-> > > > > > >
-> > > > > > > -@item -object memory-backend-memfd,id=3D@var{id},merge=3D@va=
-r{on|off},dump=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},hos=
-t-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bind|interleave}=
-,seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
-> > > > > > > +@item -object memory-backend-memfd,id=3D@var{id},merge=3D@va=
-r{on|off},dump=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},=
-size=3D@var{size},host-nodes=3D@var{host-nodes},policy=3D@var{default|prefe=
-rred|bind|interleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsiz=
-e=3D@var{size}
-> > > > > > >
-> > > > > > >  Creates an anonymous memory file backend object, which allow=
-s QEMU to
-> > > > > > >  share the memory with an external process (e.g. when using
-> > > > > > > @@ -4051,6 +4051,8 @@ with the @option{seal} option (requires=
- at least Linux 4.16).
-> > > > > > >  Please refer to @option{memory-backend-file} for a descripti=
-on of the
-> > > > > > >  other options.
-> > > > > > >
-> > > > > > > +The @option{share} boolean option is @var{on} by default wit=
-h memfd.
-> > > > > > > +
-> > > > > > >  @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/=
-random}
-> > > > > > >
-> > > > > > >  Creates a random number generator backend which obtains entr=
-opy from
-> > > > > >
-> > > > > >
-> > > > >
-> > > > >
-> > > > > --
-> > > > > Marc-Andr=C3=A9 Lureau
-> > > >
-> > > >
-> > > >
+> > >   git://github.com/juanquintela/qemu.git tags/migration/20180822-1
 > > >
-> >
-> >
->
+> > > for you to fetch changes up to ae526e32bd36cfb84045c8d2fd34e0b9e39a52f8:
+> > >
+> > >   migration: hold the lock only if it is really needed (2018-08-22 12:36:18 +0200)
+> > >
+> > > ----------------------------------------------------------------
+> > > migration/next for 20180822
+> > >
+> > > All pending patches that are reviewed:
+> > > - doc for pr_load (dave)
+> > > - postcopy + rdma is nearer (lidong chen)
+> > > - compression fixes (xiao)
+> > > - silent warning for pcc tests (Thomas)
+> > > - fix subsection without .needed function (pmaydell)
+> > >
+> > > Please apply, Juan.
+> > >
+> > > ----------------------------------------------------------------  
+> > 
+> > Applied, thanks.
+> > 
+> > -- PMM
+> > 
+> 
+> The rdma migration code in there seems to upset my clang (5.0.2, Fedora
+> 27); gcc (7.3.1) does not complain.
+> 
+> /home/cohuck/git/qemu/migration/rdma.c:4035:9: error: variable
+>       'rdma_return_path' is used uninitialized whenever 'if' condition is true
+>       [-Werror,-Wsometimes-uninitialized]
+>     if (ret) {
+>         ^~~
+> /home/cohuck/git/qemu/migration/rdma.c:4059:12: note: uninitialized use occurs
+>       here
+>     g_free(rdma_return_path);
+>            ^~~~~~~~~~~~~~~~
 
-thanks
+Yes, it's got a point.
+While the 'rdma' and 'rdma_return_path' are now more symmetry after 55cc1b5937a
+the rdma_return_path needs NULL initialisation because the rdma variable
+is set very early, where as the return path isn't set until much later.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Dave
+
+> /home/cohuck/git/qemu/migration/rdma.c:4035:5: note: remove the 'if' if its
+>       condition is always false
+>     if (ret) {
+>     ^~~~~~~~~~
+> /home/cohuck/git/qemu/migration/rdma.c:4027:9: error: variable
+>       'rdma_return_path' is used uninitialized whenever 'if' condition is true
+>       [-Werror,-Wsometimes-uninitialized]
+>     if (ret) {
+>         ^~~
+> /home/cohuck/git/qemu/migration/rdma.c:4059:12: note: uninitialized use occurs
+>       here
+>     g_free(rdma_return_path);
+>            ^~~~~~~~~~~~~~~~
+> /home/cohuck/git/qemu/migration/rdma.c:4027:5: note: remove the 'if' if its
+>       condition is always false
+>     if (ret) {
+>     ^~~~~~~~~~
+> /home/cohuck/git/qemu/migration/rdma.c:4021:9: error: variable
+>       'rdma_return_path' is used uninitialized whenever 'if' condition is true
+>       [-Werror,-Wsometimes-uninitialized]
+>     if (rdma == NULL) {
+>         ^~~~~~~~~~~~
+> /home/cohuck/git/qemu/migration/rdma.c:4059:12: note: uninitialized use occurs
+>       here
+>     g_free(rdma_return_path);
+>            ^~~~~~~~~~~~~~~~
+> /home/cohuck/git/qemu/migration/rdma.c:4021:5: note: remove the 'if' if its
+>       condition is always false
+>     if (rdma == NULL) {
+>     ^~~~~~~~~~~~~~~~~~~
+> /home/cohuck/git/qemu/migration/rdma.c:4015:41: note: initialize the variable
+>       'rdma_return_path' to silence this warning
+>     RDMAContext *rdma, *rdma_return_path;
+>                                         ^
+>                                          = NULL
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
