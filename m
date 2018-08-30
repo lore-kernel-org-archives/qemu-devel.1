@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fvK8H-0002Ve-4f
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:25:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1fvK94-0003Qv-QJ
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fvJuL-00075H-EX
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:10:40 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <d3ea4f66-e8f3-35a2-1c3b-dcedb989827a@redhat.com>
-References: <cover.1535291602.git.berto@igalia.com>
-	<e4b359c3971bb95e1e3cc55e0f69e68404f33f17.1535291602.git.berto@igalia.com>
-	<d3ea4f66-e8f3-35a2-1c3b-dcedb989827a@redhat.com>
-Date: Thu, 30 Aug 2018 12:10:12 +0200
-Message-ID: <w517ek8magr.fsf@maestria.local.igalia.com>
+	(envelope-from <bounces@canonical.com>) id 1fvK8t-0005Te-3m
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:25:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50962)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fvK8s-0005OR-Qr
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:25:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fvK8l-0006Ny-Nx
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 10:25:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B18B12E80C7
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 10:25:27 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 7/9] block: Allow changing 'discard' on
- reopen
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 30 Aug 2018 10:11:43 -0000
+From: Gerd Hoffmann <1586611@bugs.launchpad.net>
+Reply-To: Bug 1586611 <1586611@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160528092814.26607.20933.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153562390331.30984.15767221874949589177.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1586611] Re: usb-hub can not be detached when
+ detach usb device from VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed 29 Aug 2018 01:39:10 PM CEST, Max Reitz wrote:
-> On 2018-08-26 16:09, Alberto Garcia wrote:
->> 'discard' is one of the basic BlockdevOptions available for all
->> drivers, but it's silently ignored by bdrv_reopen_prepare/commit(), so
->> the user cannot change it and doesn't get an error explaining that it
->> can't be changed.
->> 
->> This should update the discard setting, but does nothing:
->> 
->>    (qemu) qemu-io virtio0 "reopen -o discard=on"
->> 
->> Since there's no reason why we shouldn't allow changing it and the
->> implementation is simple let's just do it.
->> 
->> Signed-off-by: Alberto Garcia <berto@igalia.com>
->> ---
->>  block.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->> 
->> diff --git a/block.c b/block.c
->> index 804d557608..21f1eb9cd1 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -3178,6 +3178,15 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
->>  
->>      update_flags_from_options(&reopen_state->flags, opts);
->>  
->> +    value = qemu_opt_get(opts, "discard");
->> +    if (value != NULL) {
->> +        if (bdrv_parse_discard_flags(value, &reopen_state->flags) != 0) {
->> +            error_setg(errp, "Invalid discard option");
->> +            ret = -EINVAL;
->> +            goto error;
->> +        }
->> +    }
->> +
->>      /* node-name and driver must be unchanged. Put them back into the QDict, so
->>       * that they are checked at the end of this function. */
->>      value = qemu_opt_get(opts, "node-name");
->
-> Hm.  Why not just use the same "trick" here as in your last patch,
-> i.e.  use qemu_opt_get_del() above and then qemu_opts_to_qdict() to
-> return all unhandled options to the QDict?
+Use a newer libvirt version which manages usb addressing and assigns usb
+devices to usb ports.  This is required to make sure the physical device
+tree is the same after vmsave/vmload or live migration.
 
-Hm, I think I misunderstood you earlier. You propose that I use
-qemu_opts_to_qdict() to catch all other bdrv_runtime_opts options not
-processed in this function.
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-Yes, that sounds like a good idea.
+-- =
 
-Berto
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1586611
+
+Title:
+  usb-hub can not be detached when detach usb  device from VM
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  I give a host usb device to guest in the way of using "virsh attach-devic=
+e" cmd. In guest os,use "lsusb" cmd I can see two devices have been added,o=
+ne is usb device and the other is usb-hub=EF=BC=880409:55aa NEC Corp. Hub=
+=EF=BC=89.
+  when I use "virsh detach-device" detach the usb device,in guest os the us=
+b-hub was still exists.
+  It can create a bad impression when operating the VM,for example,suspend =
+and resume the VM,qemu would report that:
+
+  2016-05-24T12:03:54.434369Z qemu-kvm: Unknown savevm section or
+  instance '0000:00:01.2/2/usb-hub' 0
+
+  2016-05-24T12:03:54.434742Z qemu-kvm: load of migration failed:
+  Invalid argument
+
+  From qemu's code,it can be sure that the usb-hub is generated by
+  qemu,but could not be seen in xml file of libvirt. So when executing
+  the migration of VM or resuming VM after suspended,it report error
+  like "Unknown savevm section or instance '0000:00:01.2/2/usb-hub' 0"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1586611/+subscriptions
