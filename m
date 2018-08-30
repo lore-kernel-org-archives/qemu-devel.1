@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fvJoP-0003RH-JT
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:04:30 -0400
+	(envelope-from <berto@igalia.com>) id 1fvK8H-0002Ve-4f
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:25:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fvJo9-0008Na-NH
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:04:16 -0400
+	(envelope-from <berto@igalia.com>) id 1fvJuL-00075H-EX
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:10:40 -0400
 From: Alberto Garcia <berto@igalia.com>
 In-Reply-To: <d3ea4f66-e8f3-35a2-1c3b-dcedb989827a@redhat.com>
 References: <cover.1535291602.git.berto@igalia.com>
 	<e4b359c3971bb95e1e3cc55e0f69e68404f33f17.1535291602.git.berto@igalia.com>
 	<d3ea4f66-e8f3-35a2-1c3b-dcedb989827a@redhat.com>
-Date: Thu, 30 Aug 2018 12:04:01 +0200
-Message-ID: <w51bm9kmar2.fsf@maestria.local.igalia.com>
+Date: Thu, 30 Aug 2018 12:10:12 +0200
+Message-ID: <w517ek8magr.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH 7/9] block: Allow changing 'discard' on
@@ -71,8 +71,10 @@ On Wed 29 Aug 2018 01:39:10 PM CEST, Max Reitz wrote:
 > i.e.  use qemu_opt_get_del() above and then qemu_opts_to_qdict() to
 > return all unhandled options to the QDict?
 
-Sure, I could do that and therefore forbid changing all of these
-options. But as I said in the commit message, there's no reason why we
-should not allow changing them.
+Hm, I think I misunderstood you earlier. You propose that I use
+qemu_opts_to_qdict() to catch all other bdrv_runtime_opts options not
+processed in this function.
+
+Yes, that sounds like a good idea.
 
 Berto
