@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fvLAH-0002BX-Al
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 07:31:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fvLdS-0001LY-4i
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 08:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fvL0U-0006u6-Lm
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 07:21:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42906)
+	(envelope-from <bounces@canonical.com>) id 1fvLdN-0002cA-8g
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 08:01:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49936)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fvL0U-0006sm-G8
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 07:20:58 -0400
+	id 1fvLdN-0002bg-3E
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 08:01:09 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fvL0S-000706-Ft
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 11:20:56 +0000
+	id 1fvLdL-00036F-U9
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 12:01:07 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6BD352E8137
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 11:20:55 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E19BF2E802D
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 12:01:07 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Aug 2018 11:08:41 -0000
-From: Heiko Sieger <1788665@bugs.launchpad.net>
+Date: Thu, 30 Aug 2018 11:53:39 -0000
+From: Daniel Berrange <1788665@bugs.launchpad.net>
 Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153562732107.21537.18103342443445007447.malone@chaenomeles.canonical.com>
+Message-Id: <153563001927.31944.14104163906888378115.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
  Windows 10 (1803) VGA passthrough VM using "Spectre" protection
@@ -39,155 +39,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Downloaded and ran the spectre-meltdown-checker.sh
+> Whew, after some hurdles I managed to install a Linux Mint 19 guest (Ubun=
+tu 18.04). After all updates, here the output:
+>
+> $ dmesg | grep microcode
+> [ 0.036780] core: PEBS disabled due to CPU errata, please upgrade microco=
+de
+>
+> So the microcode in the guest is not loaded! But see below:
 
-$ spectre-meltdown-checker.sh =
+As mentioned earlier there is no concept of loading microcode in the
+guest. Once it is loaded in the host it applies to everything running on
+that host.
 
-Spectre and Meltdown mitigation detection tool v0.39+
+This message appears to be caused by fact that we do not expose the
+current microcode version to the guest, so the guest always sees 0x1 as
+the microcode version, causing this PEBS check to fail. I don't think
+this is related to the meltdown/spectre fixes - you'd likely get that
+error message even on older systems before meltdown/spectre
 
-Checking for vulnerabilities on current system
-Kernel is Linux 4.15.0-33-generic #36-Ubuntu SMP Wed Aug 15 16:00:05 UTC 20=
-18 x86_64
-CPU is Intel(R) Core(TM) i7-3930K CPU @ 3.20GHz
+> $ cat /proc/cpuinfo | grep flags
+> flags : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat=
+ pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constan=
+t_tsc arch_perfmon rep_good nopl xtopology cpuid pni pclmulqdq vmx ssse3 cx=
+16 pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx hyperv=
+isor lahf_lm cpuid_fault pti ssbd ibrs ibpb tpr_shadow vnmi flexpriority ep=
+t vpid tsc_adjust xsaveopt arat
 
-Hardware check
-* Hardware support (CPU microcode) for mitigation techniques
-  * Indirect Branch Restricted Speculation (IBRS)
-    * SPEC_CTRL MSR is available:  YES =
+This looks correct - the guest has seen the ssbd, ibrs, ibpb features as
+required.
 
-    * CPU indicates IBRS capability:  YES  (SPEC_CTRL feature bit)
-  * Indirect Branch Prediction Barrier (IBPB)
-    * PRED_CMD MSR is available:  YES =
+> The microcode is NOT loaded in the Linux VM. However, the following
+feature flags are listed: "pti > ssbd ibrs ibpb". The "stibp" flag is
+missing.
 
-    * CPU indicates IBPB capability:  YES  (SPEC_CTRL feature bit)
-  * Single Thread Indirect Branch Predictors (STIBP)
-    * SPEC_CTRL MSR is available:  YES =
+The "stipb" flag is not relevant to guests, it is only needed by the
+hypervisor, so it is to be expected that the guest doesn't see it.
 
-    * CPU indicates STIBP capability:  NO =
+Everything seen from this Linux guest says that QEMU / KVM is doing the
+right thing and the guest has the features needed to mitigate
+Spectre/Meltdown.
 
-  * Speculative Store Bypass Disable (SSBD)
-    * CPU indicates SSBD capability:  YES  (Intel SSBD)
-  * L1 data cache invalidation
-    * FLUSH_CMD MSR is available:  YES =
-
-  * Enhanced IBRS (IBRS_ALL)
-    * CPU indicates ARCH_CAPABILITIES MSR availability:  NO =
-
-    * ARCH_CAPABILITIES MSR advertises IBRS_ALL capability:  NO =
-
-  * CPU explicitly indicates not being vulnerable to Meltdown (RDCL_NO):  N=
-O =
-
-  * CPU explicitly indicates not being vulnerable to Variant 4 (SSB_NO):  N=
-O =
-
-  * Hypervisor indicates host CPU might be vulnerable to RSB underflow (RSB=
-A):  NO =
-
-  * CPU microcode is known to cause stability problems:  NO  (model 0x2d fa=
-mily 0x6 stepping 0x7 ucode 0x1 cpuid 0x206d7)
-  * CPU microcode is the latest known available version:  NO  (latest known=
- version is 0x714 according to Intel Microcode Guidance, August 8 2018)
-* CPU vulnerability to the speculative execution attack variants
-  * Vulnerable to Variant 1:  YES =
-
-  * Vulnerable to Variant 2:  YES =
-
-  * Vulnerable to Variant 3:  YES =
-
-  * Vulnerable to Variant 3a:  YES =
-
-  * Vulnerable to Variant 4:  YES =
-
-  * Vulnerable to Variant l1tf:  YES =
-
-
-CVE-2017-5753 [bounds check bypass] aka 'Spectre Variant 1'
-* Mitigated according to the /sys interface:  YES  (Mitigation: __user poin=
-ter sanitization)
-* Kernel has array_index_mask_nospec:  YES  (1 occurrence(s) found of x86 6=
-4 bits array_index_mask_nospec())
-* Kernel has the Red Hat/Ubuntu patch:  NO =
-
-* Kernel has mask_nospec64 (arm64):  NO =
-
-> STATUS:  NOT VULNERABLE  (Mitigation: __user pointer sanitization)
-
-CVE-2017-5715 [branch target injection] aka 'Spectre Variant 2'
-* Mitigated according to the /sys interface:  YES  (Mitigation: Full generi=
-c retpoline, IBPB, IBRS_FW)
-* Mitigation 1
-  * Kernel is compiled with IBRS support:  YES =
-
-    * IBRS enabled and active:  YES  (for kernel and firmware code)
-  * Kernel is compiled with IBPB support:  YES =
-
-    * IBPB enabled and active:  YES =
-
-* Mitigation 2
-  * Kernel has branch predictor hardening (arm):  NO =
-
-  * Kernel compiled with retpoline option:  YES =
-
-    * Kernel compiled with a retpoline-aware compiler:  YES  (kernel report=
-s full retpoline compilation)
-> STATUS:  NOT VULNERABLE  (Full retpoline + IBPB are mitigating the vulner=
-ability)
-
-CVE-2017-5754 [rogue data cache load] aka 'Meltdown' aka 'Variant 3'
-* Mitigated according to the /sys interface:  YES  (Mitigation: PTI)
-* Kernel supports Page Table Isolation (PTI):  YES =
-
-  * PTI enabled and active:  YES =
-
-  * Reduced performance impact of PTI:  YES  (CPU supports PCID, performanc=
-e impact of PTI will be reduced)
-* Running as a Xen PV DomU:  NO =
-
-> STATUS:  NOT VULNERABLE  (Mitigation: PTI)
-
-CVE-2018-3640 [rogue system register read] aka 'Variant 3a'
-* CPU microcode mitigates the vulnerability:  YES =
-
-> STATUS:  NOT VULNERABLE  (your CPU microcode mitigates the vulnerability)
-
-CVE-2018-3639 [speculative store bypass] aka 'Variant 4'
-* Mitigated according to the /sys interface:  YES  (Mitigation: Speculative=
- Store Bypass disabled via prctl and seccomp)
-* Kernel supports speculation store bypass:  YES  (found in /proc/self/stat=
-us)
-> STATUS:  NOT VULNERABLE  (Mitigation: Speculative Store Bypass disabled v=
-ia prctl and seccomp)
-
-CVE-2018-3615/3620/3646 [L1 terminal fault] aka 'Foreshadow & Foreshadow-NG'
-* Mitigated according to the /sys interface:  YES  (Mitigation: PTE Inversi=
-on; VMX: conditional cache flushes, SMT vulnerable)
-> STATUS:  NOT VULNERABLE  (Mitigation: PTE Inversion; VMX: conditional cac=
-he flushes, SMT vulnerable)
-
-
-It shows that the microcode is not updated, and reports vulnerability.
-
-If I understand correctly, the Linux VM should not install the
-microcode, but report the microcode features of the host.
-
-     * CPU indicates STIBP capability:  NO
-
-Obviously stibp is not passed to the guest.
-
-Is there any other/better way to pass the host cpu capabilities to the
-VM?
-
-
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2017-5753
-
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2017-5754
-
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2018-3615
-
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2018-3639
-
-** CVE added: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3D2018-3640
+The possibilities left are that either your Windows guest is lacking
+software updates that could perhaps improve its performance, or that 2D
+graphics really is that awful in combination with spectre/meltdown
+fixes.
 
 -- =
 
