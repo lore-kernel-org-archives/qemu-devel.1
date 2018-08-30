@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvCDa-00011G-9H
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:57:55 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fvCDc-00013U-94
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvCDX-0006kc-0Q
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:57:54 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fvCDb-0006mg-3p
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:57:56 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Wed, 29 Aug 2018 21:57:32 -0400
-Message-Id: <20180830015734.19765-8-jsnow@redhat.com>
+Date: Wed, 29 Aug 2018 21:57:33 -0400
+Message-Id: <20180830015734.19765-9-jsnow@redhat.com>
 In-Reply-To: <20180830015734.19765-1-jsnow@redhat.com>
 References: <20180830015734.19765-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 7/9] block/backup: make function variables
- consistently named
+Subject: [Qemu-devel] [PATCH v3 8/9] jobs: remove ret argument to
+ job_completed; privatize it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,148 +23,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, John Snow <jsnow@redhat.com>
 
-Rename opaque_job to job to be consistent with other job implementations.
-Rename 'job', the BackupBlockJob object, to 's' to also be consistent.
+Jobs are now expected to return their retcode on the stack, from the
+.run callback, so we can remove that argument.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
+job_cancel does not need to set -ECANCELED because job_completed will
+update the return code itself if the job was canceled.
+
+While we're here, make job_completed static to job.c and remove it from
+job.h; move the documentation of return code to the .run() callback and
+to the job->ret property, accordingly.
+
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c | 62 +++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 31 insertions(+), 31 deletions(-)
+ include/qemu/job.h | 28 +++++++++++++++-------------
+ job.c              | 11 ++++++-----
+ trace-events       |  2 +-
+ 3 files changed, 22 insertions(+), 19 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index a67b7fa96b..4d084f6ca6 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -468,59 +468,59 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-     bdrv_dirty_iter_free(dbi);
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index 1144d671a1..23395c17fa 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -124,7 +124,11 @@ typedef struct Job {
+     /** Estimated progress_current value at the completion of the job */
+     int64_t progress_total;
+ 
+-    /** ret code passed to job_completed. */
++    /**
++     * Return code from @run and/or @prepare callback(s).
++     * Not final until the job has reached the CONCLUDED status.
++     * 0 on success, -errno on failure.
++     */
+     int ret;
+ 
+     /**
+@@ -172,7 +176,16 @@ struct JobDriver {
+     /** Enum describing the operation */
+     JobType job_type;
+ 
+-    /** Mandatory: Entrypoint for the Coroutine. */
++    /**
++     * Mandatory: Entrypoint for the Coroutine.
++     *
++     * This callback will be invoked when moving from CREATED to RUNNING.
++     *
++     * If this callback returns nonzero, the job transaction it is part of is
++     * aborted. If it returns zero, the job moves into the WAITING state. If it
++     * is the last job to complete in its transaction, all jobs in the
++     * transaction move from WAITING to PENDING.
++     */
+     int coroutine_fn (*run)(Job *job, Error **errp);
+ 
+     /**
+@@ -496,17 +509,6 @@ void job_early_fail(Job *job);
+ /** Moves the @job from RUNNING to READY */
+ void job_transition_to_ready(Job *job);
+ 
+-/**
+- * @job: The job being completed.
+- * @ret: The status code.
+- *
+- * Marks @job as completed. If @ret is non-zero, the job transaction it is part
+- * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
+- * is the last job to complete in its transaction, all jobs in the transaction
+- * move from WAITING to PENDING.
+- */
+-void job_completed(Job *job, int ret);
+-
+ /** Asynchronously complete the specified @job. */
+ void job_complete(Job *job, Error **errp);
+ 
+diff --git a/job.c b/job.c
+index bc8dad4e71..213042b762 100644
+--- a/job.c
++++ b/job.c
+@@ -535,6 +535,8 @@ void job_drain(Job *job)
+     }
  }
  
--static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
-+static int coroutine_fn backup_run(Job *job, Error **errp)
++static void job_completed(Job *job);
++
+ static void job_exit(void *opaque)
  {
--    BackupBlockJob *job = container_of(opaque_job, BackupBlockJob, common.job);
--    BlockDriverState *bs = blk_bs(job->common.blk);
-+    BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
-+    BlockDriverState *bs = blk_bs(s->common.blk);
-     int64_t offset, nb_clusters;
-     int ret = 0;
- 
--    QLIST_INIT(&job->inflight_reqs);
--    qemu_co_rwlock_init(&job->flush_rwlock);
-+    QLIST_INIT(&s->inflight_reqs);
-+    qemu_co_rwlock_init(&s->flush_rwlock);
- 
--    nb_clusters = DIV_ROUND_UP(job->len, job->cluster_size);
--    job_progress_set_remaining(&job->common.job, job->len);
-+    nb_clusters = DIV_ROUND_UP(s->len, s->cluster_size);
-+    job_progress_set_remaining(job, s->len);
- 
--    job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
--    if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
--        backup_incremental_init_copy_bitmap(job);
-+    s->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
-+    if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-+        backup_incremental_init_copy_bitmap(s);
-     } else {
--        hbitmap_set(job->copy_bitmap, 0, nb_clusters);
-+        hbitmap_set(s->copy_bitmap, 0, nb_clusters);
+     Job *job = (Job *)opaque;
+@@ -545,7 +547,7 @@ static void job_exit(void *opaque)
+         job->driver->exit(job);
+         aio_context_release(aio_context);
      }
- 
- 
--    job->before_write.notify = backup_before_write_notify;
--    bdrv_add_before_write_notifier(bs, &job->before_write);
-+    s->before_write.notify = backup_before_write_notify;
-+    bdrv_add_before_write_notifier(bs, &s->before_write);
- 
--    if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
-+    if (s->sync_mode == MIRROR_SYNC_MODE_NONE) {
-         /* All bits are set in copy_bitmap to allow any cluster to be copied.
-          * This does not actually require them to be copied. */
--        while (!job_is_cancelled(&job->common.job)) {
-+        while (!job_is_cancelled(job)) {
-             /* Yield until the job is cancelled.  We just let our before_write
-              * notify callback service CoW requests. */
--            job_yield(&job->common.job);
-+            job_yield(job);
-         }
--    } else if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
--        ret = backup_run_incremental(job);
-+    } else if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-+        ret = backup_run_incremental(s);
-     } else {
-         /* Both FULL and TOP SYNC_MODE's require copying.. */
--        for (offset = 0; offset < job->len;
--             offset += job->cluster_size) {
-+        for (offset = 0; offset < s->len;
-+             offset += s->cluster_size) {
-             bool error_is_read;
-             int alloced = 0;
- 
--            if (yield_and_check(job)) {
-+            if (yield_and_check(s)) {
-                 break;
-             }
- 
--            if (job->sync_mode == MIRROR_SYNC_MODE_TOP) {
-+            if (s->sync_mode == MIRROR_SYNC_MODE_TOP) {
-                 int i;
-                 int64_t n;
- 
-                 /* Check to see if these blocks are already in the
-                  * backing file. */
- 
--                for (i = 0; i < job->cluster_size;) {
-+                for (i = 0; i < s->cluster_size;) {
-                     /* bdrv_is_allocated() only returns true/false based
-                      * on the first set of sectors it comes across that
-                      * are are all in the same state.
-@@ -529,7 +529,7 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
-                      * needed but at some point that is always the case. */
-                     alloced =
-                         bdrv_is_allocated(bs, offset + i,
--                                          job->cluster_size - i, &n);
-+                                          s->cluster_size - i, &n);
-                     i += n;
- 
-                     if (alloced || n == 0) {
-@@ -547,29 +547,29 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
-             if (alloced < 0) {
-                 ret = alloced;
-             } else {
--                ret = backup_do_cow(job, offset, job->cluster_size,
-+                ret = backup_do_cow(s, offset, s->cluster_size,
-                                     &error_is_read, false);
-             }
-             if (ret < 0) {
-                 /* Depending on error action, fail now or retry cluster */
-                 BlockErrorAction action =
--                    backup_error_action(job, error_is_read, -ret);
-+                    backup_error_action(s, error_is_read, -ret);
-                 if (action == BLOCK_ERROR_ACTION_REPORT) {
-                     break;
-                 } else {
--                    offset -= job->cluster_size;
-+                    offset -= s->cluster_size;
-                     continue;
-                 }
-             }
-         }
-     }
- 
--    notifier_with_return_remove(&job->before_write);
-+    notifier_with_return_remove(&s->before_write);
- 
-     /* wait until pending backup_do_cow() calls have completed */
--    qemu_co_rwlock_wrlock(&job->flush_rwlock);
--    qemu_co_rwlock_unlock(&job->flush_rwlock);
--    hbitmap_free(job->copy_bitmap);
-+    qemu_co_rwlock_wrlock(&s->flush_rwlock);
-+    qemu_co_rwlock_unlock(&s->flush_rwlock);
-+    hbitmap_free(s->copy_bitmap);
- 
-     return ret;
+-    job_completed(job, job->ret);
++    job_completed(job);
  }
+ 
+ /**
+@@ -883,13 +885,12 @@ static void job_completed_txn_success(Job *job)
+     }
+ }
+ 
+-void job_completed(Job *job, int ret)
++static void job_completed(Job *job)
+ {
+     assert(job && job->txn && !job_is_completed(job));
+ 
+-    job->ret = ret;
+     job_update_rc(job);
+-    trace_job_completed(job, ret, job->ret);
++    trace_job_completed(job, job->ret);
+     if (job->ret) {
+         job_completed_txn_abort(job);
+     } else {
+@@ -905,7 +906,7 @@ void job_cancel(Job *job, bool force)
+     }
+     job_cancel_async(job, force);
+     if (!job_started(job)) {
+-        job_completed(job, -ECANCELED);
++        job_completed(job);
+     } else if (job->deferred_to_main_loop) {
+         job_completed_txn_abort(job);
+     } else {
+diff --git a/trace-events b/trace-events
+index c445f54773..4fd2cb4b97 100644
+--- a/trace-events
++++ b/trace-events
+@@ -107,7 +107,7 @@ gdbstub_err_checksum_incorrect(uint8_t expected, uint8_t got) "got command packe
+ # job.c
+ job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
+ job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
+-job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
++job_completed(void *job, int ret) "job %p ret %d"
+ 
+ # job-qmp.c
+ qmp_job_cancel(void *job) "job %p"
 -- 
 2.14.4
