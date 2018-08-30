@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1fvHV8-0005xO-79
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 03:36:23 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fvHr0-0001Y9-H8
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 03:58:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peng.hao2@zte.com.cn>) id 1fvHV4-0007ZF-PY
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 03:36:22 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:45982 helo=mxct.zte.com.cn)
+	(envelope-from <imammedo@redhat.com>) id 1fvHqw-00075d-Ej
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 03:58:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40234 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peng.hao2@zte.com.cn>)
-	id 1fvHV4-0007VU-BL
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 03:36:18 -0400
-From: Peng Hao <peng.hao2@zte.com.cn>
-Date: Thu, 30 Aug 2018 23:50:14 +0800
-Message-Id: <1535644216-111422-3-git-send-email-peng.hao2@zte.com.cn>
-In-Reply-To: <1535644216-111422-1-git-send-email-peng.hao2@zte.com.cn>
-References: <1535644216-111422-1-git-send-email-peng.hao2@zte.com.cn>
-Subject: [Qemu-devel] [PATCH V5 2/4]  target-i386:add coalesced_pio API
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fvHqw-000757-7I
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 03:58:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A5DCC40216E6
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 07:58:53 +0000 (UTC)
+Date: Thu, 30 Aug 2018 09:58:51 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180830095851.4e3e6a2b@redhat.com>
+In-Reply-To: <20180829173301.GC17213@habkost.net>
+References: <1535464093-3648-1-git-send-email-imammedo@redhat.com>
+	<1535553121-80352-1-git-send-email-imammedo@redhat.com>
+	<20180829173301.GC17213@habkost.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vl:c: make sure that sockets are
+ calculated correctly in '-smp X' case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,155 +35,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rkrcmar@redhat.com, mst@redhat.com, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, zhong.weidong@zte.com.cn, Peng Hao <peng.hao2@zte.com.cn>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, drjones@redhat.com
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
----
- accel/kvm/kvm-all.c   | 57 +++++++++++++++++++++++++++++++++++++++++++++++----
- include/exec/memory.h |  4 ++--
- memory.c              |  4 ++--
- 3 files changed, 57 insertions(+), 8 deletions(-)
+On Wed, 29 Aug 2018 14:33:01 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 4a3909d..11d8d78 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -78,6 +78,7 @@ struct KVMState
-     int fd;
-     int vmfd;
-     int coalesced_mmio;
-+    int coalesced_pio;
-     struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
-     bool coalesced_flush_in_progress;
-     int vcpu_events;
-@@ -559,6 +560,45 @@ static void kvm_uncoalesce_mmio_region(MemoryListener *listener,
-     }
- }
+> On Wed, Aug 29, 2018 at 04:32:01PM +0200, Igor Mammedov wrote:
+> > commit
+> >   (5cdc9b76e3 vl.c: Remove dead assignment)
+> > removed sockets calculation when 'sockets' weren't provided on CLI
+> > since there wasn't any users for it back then. Exiting checks
+> > are neither reachable
+> >    } else if (sockets * cores * threads < cpus) {
+> > or nor triggable
+> >    if (sockets * cores * threads > max_cpus)
+> > so we weren't noticing wrong topology since then, since users
+> > recalculate sockets adhoc on their own.
+> > 
+> > However with deprecation check it becomes noticable, for example
+> >   -smp 2
+> > will start printing warning:
+> >   "warning: Invalid CPU topology deprecated: sockets (1) * cores (1) * threads (1) != maxcpus (2)"
+> > calculating sockets if they weren't specified.
+> > 
+> > Fix it by returning back sockets calculation if it's omited on CLI.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  vl.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/vl.c b/vl.c
+> > index 7fd700e..333d638 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -1210,11 +1210,14 @@ static void smp_parse(QemuOpts *opts)
+> >  
+> >          /* compute missing values, prefer sockets over cores over threads */
+> >          if (cpus == 0 || sockets == 0) {
+> > -            sockets = sockets > 0 ? sockets : 1;
+> >              cores = cores > 0 ? cores : 1;
+> >              threads = threads > 0 ? threads : 1;
+> >              if (cpus == 0) {
+> > +                sockets = sockets > 0 ? sockets : 1;
+> >                  cpus = cores * threads * sockets;
+> > +            } else {
+> > +                max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);  
+> 
+> We already have a "max_cpus = qemu_opt_get_number(...)" line in
+> this function[1]:
+> 
+>         /* compute missing values, prefer sockets over cores over threads */
+>         if (cpus == 0 || sockets == 0) {
+>             sockets = sockets > 0 ? sockets : 1;
+>             cores = cores > 0 ? cores : 1;
+>             threads = threads > 0 ? threads : 1;
+>             if (cpus == 0) {
+>                 cpus = cores * threads * sockets;
+>             }
+>         } else if (cores == 0) {
+>             [...]
+>         } else if (threads == 0) {
+>             [...]
+>         } else if (sockets * cores * threads < cpus) {
+>             [...]
+>         }
+> 
+>         max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus); /* [1] */
+> 
+>         /* [2] */
+> 
+>         if (max_cpus < cpus) {
+>             error_report("maxcpus must be equal to or greater than smp");
+>             exit(1);
+>         }
+> 
+> Why not move the sockets == 0 check to [2]?
+it won't work, since the rest 'else if' depends on sockets being non 0
+which is ensured by (cpus == 0 || sockets == 0) branch, I can split this in 2
+equivalent conditions. It's more code but it might be easier to read
+
+diff --git a/vl.c b/vl.c
+index 7fd700e..6320bdc 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1208,14 +1208,18 @@ static void smp_parse(QemuOpts *opts)
+         unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
+         unsigned threads = qemu_opt_get_number(opts, "threads", 0);
  
-+static void kvm_coalesce_pio_add(MemoryListener *listener,
-+                                MemoryRegionSection *section,
-+                                hwaddr start, hwaddr size)
-+{
-+    KVMState *s = kvm_state;
-+
-+    if (s->coalesced_pio) {
-+        struct kvm_coalesced_mmio_zone zone;
-+
-+        zone.addr = start;
-+        zone.size = size;
-+        zone.pio = 1;
-+
-+        (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
-+    }
-+}
-+
-+static void kvm_coalesce_pio_del(MemoryListener *listener,
-+                                MemoryRegionSection *section,
-+                                hwaddr start, hwaddr size)
-+{
-+    KVMState *s = kvm_state;
-+
-+    if (s->coalesced_pio) {
-+        struct kvm_coalesced_mmio_zone zone;
-+
-+        zone.addr = start;
-+        zone.size = size;
-+        zone.pio = 1;
-+
-+        (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
-+     }
-+}
-+
-+static MemoryListener kvm_coalesced_pio_listener = {
-+    .coalesced_io_add = kvm_coalesce_pio_add,
-+    .coalesced_io_del = kvm_coalesce_pio_del,
-+};
-+
- int kvm_check_extension(KVMState *s, unsigned int extension)
- {
-     int ret;
-@@ -1615,6 +1655,8 @@ static int kvm_init(MachineState *ms)
-     }
- 
-     s->coalesced_mmio = kvm_check_extension(s, KVM_CAP_COALESCED_MMIO);
-+    s->coalesced_pio = s->coalesced_mmio &&
-+                       kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
- 
- #ifdef KVM_CAP_VCPU_EVENTS
-     s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
-@@ -1687,13 +1729,15 @@ static int kvm_init(MachineState *ms)
-         s->memory_listener.listener.eventfd_add = kvm_mem_ioeventfd_add;
-         s->memory_listener.listener.eventfd_del = kvm_mem_ioeventfd_del;
-     }
--    s->memory_listener.listener.coalesced_mmio_add = kvm_coalesce_mmio_region;
--    s->memory_listener.listener.coalesced_mmio_del = kvm_uncoalesce_mmio_region;
-+    s->memory_listener.listener.coalesced_io_add = kvm_coalesce_mmio_region;
-+    s->memory_listener.listener.coalesced_io_del = kvm_uncoalesce_mmio_region;
- 
-     kvm_memory_listener_register(s, &s->memory_listener,
-                                  &address_space_memory, 0);
-     memory_listener_register(&kvm_io_listener,
-                              &address_space_io);
-+    memory_listener_register(&kvm_coalesced_pio_listener,
-+                             &address_space_io);
- 
-     s->many_ioeventfds = kvm_check_many_ioeventfds();
- 
-@@ -1775,8 +1819,13 @@ void kvm_flush_coalesced_mmio_buffer(void)
-             struct kvm_coalesced_mmio *ent;
- 
-             ent = &ring->coalesced_mmio[ring->first];
--
--            cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
-+            if (ent->pio == 1) {
-+                address_space_rw(&address_space_io, ent->phys_addr,
-+                                 MEMTXATTRS_UNSPECIFIED, ent->data,
-+                                 ent->len, true);
-+            } else {
-+                cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
-+            }
-             smp_wmb();
-             ring->first = (ring->first + 1) % KVM_COALESCED_MMIO_MAX;
++        max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
+         /* compute missing values, prefer sockets over cores over threads */
+-        if (cpus == 0 || sockets == 0) {
++        if (cpus == 0) {
+             sockets = sockets > 0 ? sockets : 1;
+             cores = cores > 0 ? cores : 1;
+             threads = threads > 0 ? threads : 1;
+-            if (cpus == 0) {
+-                cpus = cores * threads * sockets;
+-            }
++            cpus = cores * threads * sockets;
++            max_cpus = max_cpus > 0 ? max_cpus : cpus;
++        } else if (sockets == 0) {
++            cores = cores > 0 ? cores : 1;
++            threads = threads > 0 ? threads : 1;
++            sockets = max_cpus / (cores * threads);
+         } else if (cores == 0) {
+             threads = threads > 0 ? threads : 1;
+             cores = cpus / (sockets * threads);
+@@ -1231,8 +1235,6 @@ static void smp_parse(QemuOpts *opts)
+             exit(1);
          }
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 448d41a..4600fa3 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -410,9 +410,9 @@ struct MemoryListener {
-                         bool match_data, uint64_t data, EventNotifier *e);
-     void (*eventfd_del)(MemoryListener *listener, MemoryRegionSection *section,
-                         bool match_data, uint64_t data, EventNotifier *e);
--    void (*coalesced_mmio_add)(MemoryListener *listener, MemoryRegionSection *section,
-+    void (*coalesced_io_add)(MemoryListener *listener, MemoryRegionSection *section,
-                                hwaddr addr, hwaddr len);
--    void (*coalesced_mmio_del)(MemoryListener *listener, MemoryRegionSection *section,
-+    void (*coalesced_io_del)(MemoryListener *listener, MemoryRegionSection *section,
-                                hwaddr addr, hwaddr len);
-     /* Lower = earlier (during add), later (during del) */
-     unsigned priority;
-diff --git a/memory.c b/memory.c
-index e9cd446..8b0311e 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2126,7 +2126,7 @@ static void memory_region_update_coalesced_range_as(MemoryRegion *mr, AddressSpa
-                 .size = fr->addr.size,
-             };
  
--            MEMORY_LISTENER_CALL(as, coalesced_mmio_del, Reverse, &section,
-+            MEMORY_LISTENER_CALL(as, coalesced_io_del, Reverse, &section,
-                                  int128_get64(fr->addr.start),
-                                  int128_get64(fr->addr.size));
-             QTAILQ_FOREACH(cmr, &mr->coalesced, link) {
-@@ -2137,7 +2137,7 @@ static void memory_region_update_coalesced_range_as(MemoryRegion *mr, AddressSpa
-                     continue;
-                 }
-                 tmp = addrrange_intersection(tmp, fr->addr);
--                MEMORY_LISTENER_CALL(as, coalesced_mmio_add, Forward, &section,
-+                MEMORY_LISTENER_CALL(as, coalesced_io_add, Forward, &section,
-                                      int128_get64(tmp.start),
-                                      int128_get64(tmp.size));
-             }
--- 
-1.8.3.1
+-        max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
+-
+         if (max_cpus < cpus) {
+             error_report("maxcpus must be equal to or greater than smp");
+             exit(1);
+
+
+> 
+> 
+> > +                sockets = !sockets ? max_cpus / (cores * threads) : sockets;  
+> 
+> The two patches in this thread make QEMU print a warning on a
+> case that was never documented as invalid/deprecated: maxcpus now
+> needs to be a multiple of cores*threads.
+> 
+> However, the error message doesn't make it obvious:
+> 
+>   $ ./x86_64-softmmu/qemu-system-x86_64 -smp 7,cores=3
+>   qemu-system-x86_64: warning: Invalid CPU topology deprecated: sockets (2) * cores (3) * threads (1) != maxcpus (7)
+to me it look pretty obvious, fix one side of equation to make sure that VM
+starts in the future.
+
+> I think this would make more sense:
+> 
+>   $ ./x86_64-softmmu/qemu-system-x86_64 -smp 7,cores=3
+>   qemu-system-x86_64: warning: Invalid CPU topology deprecated: maxcpus (7) is not a multiple of cores (3) * threads (1)
+I think it will add not necessary warning/code, but if you really
+think we need it, I can add it to 'vl.c deprecate incorrect CPUs
+topology' on respin.
+
+> 
+> 
+> >              }
+> >          } else if (cores == 0) {
+> >              threads = threads > 0 ? threads : 1;
+> > -- 
+> > 2.7.4
+> >   
+> 
