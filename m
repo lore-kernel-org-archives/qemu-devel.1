@@ -1,37 +1,29 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:53877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Liam.Merwick@oracle.com>) id 1fvPCN-0006Y2-UB
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:49:35 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fvPCS-0006Y2-Kb
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:49:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Liam.Merwick@oracle.com>) id 1fvP8Y-0005Qr-2G
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:45:37 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:44508)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Liam.Merwick@oracle.com>)
-	id 1fvP8X-0005Q7-QX
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:45:33 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-	by aserp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
-	w7UFdF8O030685
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 15:45:30 GMT
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-	by aserp2120.oracle.com with ESMTP id 2m2y2pwhhj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 15:45:30 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-	by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id w7UFjTha024023
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK) for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 15:45:29 GMT
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id w7UFjTDk014933
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 15:45:29 GMT
-From: Liam Merwick <Liam.Merwick@oracle.com>
-Date: Thu, 30 Aug 2018 16:47:04 +0100
-Message-Id: <1535644031-848-2-git-send-email-Liam.Merwick@oracle.com>
-In-Reply-To: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
-References: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
-Subject: [Qemu-devel] [PATCH 1/8] configure: Provide option to explicitly
- disable AVX2
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fvP5W-0002l8-2X
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:42:26 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33089)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fvP5V-0002km-Ra
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:42:26 -0400
+Received: by mail-wm0-x241.google.com with SMTP id i134-v6so2151314wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 08:42:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20180829134043.31706-1-marcandre.lureau@redhat.com>
+	<20180829134043.31706-8-marcandre.lureau@redhat.com>
+	<878t4o3szg.fsf@dusky.pond.sub.org>
+In-Reply-To: <878t4o3szg.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 30 Aug 2018 17:42:13 +0200
+Message-ID: <CAJ+F1CL=WEDZUCbNnrm_mm6sX3sLOcnJ3CHNj9Ec8gHmUYCYbg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] tests: add
+ qmp/qom-set-without-value test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,72 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
-The configure script detects if the compiler has AVX2 support and
-automatically sets avx2_opt="yes" which in turn defines CONFIG_AVX2_OPT.
-There is no way of explicitly overriding this setting so this commit adds
-two command-line options: --enable-avx2 and --disable-avx2.
+Hi
 
-The default behaviour, when no option is specified, is to maintain the
-current behaviour and enable AVX2 if the compiler supports it.
+On Thu, Aug 30, 2018 at 3:05 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > test_qom_set_without_value() is about a bug in infrastructure used by
+> > the QMP core, fixed in commit c489780203.  We covered the bug in
+> > infrastructure unit tests (commit bce3035a44).  I wrote that test
+> > earlier, to cover QMP level as well, the test could go into qmp-test.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  tests/qmp-test.c | 18 ++++++++++++++++++
+> >  1 file changed, 18 insertions(+)
+> >
+> > diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+> > index 4ae2245484..fdfe73b6d2 100644
+> > --- a/tests/qmp-test.c
+> > +++ b/tests/qmp-test.c
+> > @@ -348,6 +348,23 @@ static void test_qmp_preconfig(void)
+> >      qtest_quit(qs);
+> >  }
+> >
+> > +static void test_qom_set_without_value(void)
+> > +{
+> > +    QTestState *qts;
+> > +    QDict *ret;
+> > +
+> > +    qts =3D qtest_init(common_args);
+> > +
+> > +    ret =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
+> > +                    " { 'path': '/machine', 'property': 'rtc-time' } }=
+");
+> > +    g_assert_nonnull(ret);
+> > +
+> > +    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
+> > +
+> > +    qobject_unref(ret);
+> > +    qtest_quit(qts);
+> > +}
+> > +
+> >  int main(int argc, char *argv[])
+> >  {
+> >      g_test_init(&argc, &argv, NULL);
+> > @@ -355,6 +372,7 @@ int main(int argc, char *argv[])
+> >      qtest_add_func("qmp/protocol", test_qmp_protocol);
+> >      qtest_add_func("qmp/oob", test_qmp_oob);
+> >      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
+> > +    qtest_add_func("qmp/qom-set-without-value", test_qom_set_without_v=
+alue);
+> >
+> >      return g_test_run();
+> >  }
+>
+> What we're testing here is a missing 'any' parameter.  The test should
+> be named accordingly.  Perhaps:
+>
+>        qtest_add_func("qmp/missing-any", test_missing_any);
 
-Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
-Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
-Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
----
- configure | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Eh, the inner visitor fix was about an 'any' parameter missing.
 
-diff --git a/configure b/configure
-index 58862d2ae88a..8904a91715b3 100755
---- a/configure
-+++ b/configure
-@@ -427,7 +427,7 @@ usb_redir=""
- opengl=""
- opengl_dmabuf="no"
- cpuid_h="no"
--avx2_opt="no"
-+avx2_opt=""
- zlib="yes"
- capstone=""
- lzo=""
-@@ -1332,6 +1332,10 @@ for opt do
-   ;;
-   --disable-glusterfs) glusterfs="no"
-   ;;
-+  --disable-avx2) avx2_opt="no"
-+  ;;
-+  --enable-avx2) avx2_opt="yes"
-+  ;;
-   --enable-glusterfs) glusterfs="yes"
-   ;;
-   --disable-virtio-blk-data-plane|--enable-virtio-blk-data-plane)
-@@ -1709,6 +1713,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   libxml2         for Parallels image format
-   tcmalloc        tcmalloc support
-   jemalloc        jemalloc support
-+  avx2            AVX2 optimization support
-   replication     replication support
-   vhost-vsock     virtio sockets device support
-   opengl          opengl support
-@@ -5127,7 +5132,7 @@ fi
- # There is no point enabling this if cpuid.h is not usable,
- # since we won't be able to select the new routines.
- 
--if test $cpuid_h = yes; then
-+if test "$cpuid_h" = "yes" -a "$avx2_opt" != "no"; then
-   cat > $TMPC << EOF
- #pragma GCC push_options
- #pragma GCC target("avx2")
-@@ -5141,6 +5146,8 @@ int main(int argc, char *argv[]) { return bar(argv[0]); }
- EOF
-   if compile_object "" ; then
-     avx2_opt="yes"
-+  else
-+    avx2_opt="no"
-   fi
- fi
- 
--- 
-1.8.3.1
+But the test is more about about checking the behaviour of qom-set
+without 'value' argument. I would not rename it based on the internal
+bug that was fixed.
+
+--=20
+Marc-Andr=C3=A9 Lureau
