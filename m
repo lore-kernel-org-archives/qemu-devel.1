@@ -1,41 +1,36 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:41364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fvNQb-0002pF-Ur
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:56:09 -0400
+	(envelope-from <leif.lindholm@linaro.org>) id 1fvNQh-0002pF-PT
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:56:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fvNOu-0001F7-PU
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:54:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52960)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fvNOu-0001EO-GT
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:54:20 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w7UDsGAd072417
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 09:54:18 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2m6gjakvcg-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 09:54:17 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 30 Aug 2018 07:54:10 -0600
-References: <20180810153223.28409-1-marcandre.lureau@redhat.com>
-	<20180810153223.28409-2-marcandre.lureau@redhat.com>
-	<CAJ+F1CJFOer5vAy63eQ_YKx2jnq=TC7X9ChkC-=qA=QHZv9kXA@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 30 Aug 2018 09:54:05 -0400
+	(envelope-from <leif.lindholm@linaro.org>) id 1fvNNf-0000pQ-In
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:53:04 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38097)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <leif.lindholm@linaro.org>)
+	id 1fvNNf-0000ow-2r
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:53:03 -0400
+Received: by mail-wr1-x441.google.com with SMTP id w11-v6so8148047wrc.5
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 06:53:02 -0700 (PDT)
+Date: Thu, 30 Aug 2018 14:52:58 +0100
+From: Leif Lindholm <leif.lindholm@linaro.org>
+Message-ID: <20180830135258.olr7yt6univbjqx7@bivouac.eciton.net>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA9hivJzqksiSZbco4+EysYj=_y0t3k_L7TobxNPS8T2dQ@mail.gmail.com>
+	<CAHmQWvC4Kp1CAeCe8ZTGtSeG7fnT=Xen4GFKfnhTBWUCJdQV+g@mail.gmail.com>
+	<20180829134219.cmyqipnvukk6k2rp@kamzik.brq.redhat.com>
+	<CAHmQWvA5t7zbbDDM0UvuKSL_Z8ey+x+vOGZumYjwsq0FC5AHGA@mail.gmail.com>
+	<20180830083117.iekobw7l3arkt24m@bivouac.eciton.net>
+	<CAFEAcA_s+9-4PYHyx_aAnxwt4e=VH77uBG7rC4JA++nOyjAaPw@mail.gmail.com>
+	<20180830100233.nr6fm3npy57zl4xx@bivouac.eciton.net>
+	<CAKv+Gu9r+1OBOSUBW_KpDEEoKyc=iwW4zVEe04-_JUnJtSGupQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CJFOer5vAy63eQ_YKx2jnq=TC7X9ChkC-=qA=QHZv9kXA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <bddfd186-b4ab-5007-4936-a31bc701d1c4@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 1/6] hw/i386: add pc-i440fx-3.1 &
- pc-q35-3.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9r+1OBOSUBW_KpDEEoKyc=iwW4zVEe04-_JUnJtSGupQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,119 +39,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Hongbo Zhang <hongbo.zhang@linaro.org>, Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On 08/28/2018 10:05 AM, Marc-Andr=C3=A9 Lureau wrote:
-> ping
-> On Fri, Aug 10, 2018 at 5:34 PM Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
->> The following patch is going to add compatiblity parameters.
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>   include/hw/compat.h  |  4 +++-
->>   include/hw/i386/pc.h |  5 ++++-
->>   hw/i386/pc_piix.c    | 13 ++++++++++++-
->>   hw/i386/pc_q35.c     | 12 +++++++++++-
->>   4 files changed, 30 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/hw/compat.h b/include/hw/compat.h
->> index c08f4040bb..f8e596969a 100644
->> --- a/include/hw/compat.h
->> +++ b/include/hw/compat.h
->> @@ -1,7 +1,9 @@
->>   #ifndef HW_COMPAT_H
->>   #define HW_COMPAT_H
->>
->> -#define HW_COMPAT_2_12 \
->> +#define HW_COMPAT_3_0
-Should probably be 3_1 now?
->> +
->> +#define HW_COMPAT_2_12                          \
->>       {\
->>           .driver   =3D "migration",\
->>           .property =3D "decompress-error-check",\
->> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->> index 6894f37df1..09b0365a8e 100644
->> --- a/include/hw/i386/pc.h
->> +++ b/include/hw/i386/pc.h
->> @@ -294,7 +294,10 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
->>   int e820_get_num_entries(void);
->>   bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->>
->> -#define PC_COMPAT_2_12 \
->> +#define PC_COMPAT_3_0 \
-Same here?
->> +    HW_COMPAT_3_0
->> +
->> +#define PC_COMPAT_2_12                          \
->>       HW_COMPAT_2_12 \
->>       {\
->>           .driver   =3D TYPE_X86_CPU,\
->> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->> index dc09466b3e..7db1fa88ef 100644
->> --- a/hw/i386/pc_piix.c
->> +++ b/hw/i386/pc_piix.c
->> @@ -428,13 +428,24 @@ static void pc_i440fx_machine_options(MachineCla=
-ss *m)
->>       machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
->>   }
->>
->> -static void pc_i440fx_3_0_machine_options(MachineClass *m)
->> +static void pc_i440fx_3_1_machine_options(MachineClass *m)
->>   {
->>       pc_i440fx_machine_options(m);
->>       m->alias =3D "pc";
->>       m->is_default =3D 1;
->>   }
->>
->> +DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
->> +                      pc_i440fx_3_1_machine_options);
->> +
->> +static void pc_i440fx_3_0_machine_options(MachineClass *m)
-should this be the 3_1=C2=A0 rather than the one above?
->> +{
->> +    pc_i440fx_machine_options(m);
->> +    m->is_default =3D 0;
->> +    m->alias =3D NULL;
->> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
->> +}
->> +
->>   DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
->>                         pc_i440fx_3_0_machine_options);
->>
->> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
->> index 532241e3f8..cb1980a088 100644
->> --- a/hw/i386/pc_q35.c
->> +++ b/hw/i386/pc_q35.c
->> @@ -311,12 +311,22 @@ static void pc_q35_machine_options(MachineClass =
-*m)
->>       m->max_cpus =3D 288;
->>   }
->>
->> -static void pc_q35_3_0_machine_options(MachineClass *m)
->> +static void pc_q35_3_1_machine_options(MachineClass *m)
->>   {
->>       pc_q35_machine_options(m);
->>       m->alias =3D "q35";
->>   }
->>
->> +DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
->> +                   pc_q35_3_1_machine_options);
->> +
->> +static void pc_q35_3_0_machine_options(MachineClass *m)
->> +{
->> +    pc_q35_machine_options(m);
->> +    m->alias =3D NULL;
->> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
->> +}
->> +
->>   DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
->>                       pc_q35_3_0_machine_options);
->>
->> --
->> 2.18.0.547.g1d89318c48
->>
->>
->
+On Thu, Aug 30, 2018 at 03:29:02PM +0200, Ard Biesheuvel wrote:
+> On 30 August 2018 at 12:02, Leif Lindholm <leif.lindholm@linaro.org> wrote:
+> > On Thu, Aug 30, 2018 at 09:39:33AM +0100, Peter Maydell wrote:
+> >> On 30 August 2018 at 09:31, Leif Lindholm <leif.lindholm@linaro.org> wrote:
+> >> > On Thu, Aug 30, 2018 at 03:07:29PM +0800, Hongbo Zhang wrote:
+> >> >> @Ard, @Leif, is there any possibility to remove all the DT nodes?
+> >> >> On real hardware, how does UEFI find the memory size and CPU number?
+> >> >
+> >> > Usually by asking some form of SCP/PMU.
+> >> > So until we have rock-solid multi-cpu-instance (making terms up here,
+> >> > there may be a proper name already?) support upstream, we need to take
+> >> > shortcuts.
+> >>
+> >> I would expect that you'd want a "faked-on-the-QEMU end" SCP
+> >> communications endpoint to start with anyway. We have one of
+> >> those for vexpress, for instance.
+> >
+> > Ah, I wasn't aware we did!
+> >
+> > In that case - sure, that is probably the more sensible solution.
+> > Does it emulate SCMI?
+> 
+> The purpose of the SBSA/SBBR qemu machine is prototyping the
+> interactions between rich firmware and the OS for things like RAS,
+> secure variable storage for UEFI or capsule update.
+
+I think it would be useful to at some point have also an open-source
+SCP implementation and tie it into this platform (if feasible). I do
+not however think it is important, and certainly nothing we need to
+worry about for now.
+
+> How exactly the firmware figures out how many CPUs and how much memory
+> we are running with is out of scope for this, and so I don't think
+> there is a need to build something from scratch here: DT will do just
+> fine, given that both EDK2 and ARM-TF have working DT code for these
+> things.
+
+Agreed.
+
+> fw_cfg, on the other hand, is unsuitable for us. Generating ACPI
+> tables in a different way from actual bare metal is not a good idea,
+> given that things like RAS interact with ACPI as well, and fw_cfg is
+> also exposed to the OS in the default mach-virt configuration. So we
+> could tweak fw_cfg to be more suitable, but I think that does not
+> improve the usefulness of our prototype at all.
+
+Indeed.
+
+> At some point, it would be nice if we could get UEFI to receive its
+> platform description from ARM-TF in a generic manner, and it would be
+> good for EDK2 and ARM-TF to align on this. So even if we decide that
+> SCMI is more suitable way to convey this information from QEMU to the
+> guest firmware, I would object to implementing the client side of that
+> in UEFI, given that it should be ARM-TF that provides this
+> information.
+
+Yes, but the modeled SCP is relevant for the ARM-TF port for this
+platform. A "faked-on-the-QEMU end" SCP that communicates via SCMI (or
+if that's been superseded, I may have lost track) allows for sharing
+generic arm-tf code for retrieving this information with most hardware
+platforms.
+
+And that _would_ be nicer than having the lowest layers of the EDK2
+port looking more like hardware than mach-virt.
+
+This is of course also something that could be addressed at a later
+date - I'm not sure how generic arm-tf is in this regard today.
+
+/
+    Leif
