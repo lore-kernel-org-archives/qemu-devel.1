@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eager@eagerm.com>) id 1fvB8B-0003RU-RG
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 20:48:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fvBcW-0000X3-64
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:19:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eager@eagerm.com>) id 1fvB88-0008Pi-F8
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 20:48:15 -0400
-Received: from resqmta-po-09v.sys.comcast.net
-	([2001:558:fe16:19:96:114:154:168]:59170)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eager@eagerm.com>) id 1fvB88-0008PZ-95
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 20:48:12 -0400
-From: Michael Eager <eager@eagerm.com>
-References: <f38111ad-3fbb-210e-e7ec-49ae675ea65e@eagerm.com>
-Message-ID: <a57fdd27-7a86-3f31-341c-e98101d17b9a@eagerm.com>
-Date: Wed, 29 Aug 2018 17:48:07 -0700
+	(envelope-from <dgibson@ozlabs.org>) id 1fvBcV-0004gr-6d
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:19:36 -0400
+Date: Thu, 30 Aug 2018 10:46:48 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180830004648.GF2222@umbus.fritz.box>
+References: <20180829165911.30106-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <f38111ad-3fbb-210e-e7ec-49ae675ea65e@eagerm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] RISC-V - Dynamic parameterization of
- RISC-V memory map
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="R6sEYoIZpp9JErk7"
+Content-Disposition: inline
+In-Reply-To: <20180829165911.30106-1-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 0/7] mac: generate correct fw paths for
+ macio IDE and virtio-blk-pci devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Michael Eager <eager@eagercon.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Whoops.  I just noticed that this patch is against the riscv-qemu
-repo on github, not the qemu.org repo.  I will rework it for the 
-qemu.org repo.  Meanwhile, I welcome any comments.
 
-On 08/29/2018 05:21 PM, Michael Eager wrote:
-> Memory parameters for RISC-V boards can be read from a configuration
-> file using the -readconfig command line option.  The configuration file
-> should have a section for the board and memory.  The configuration for
-> the VirtIO board has the following configuration variables:
-> [riscv-virt-mem]
->    debug-base   = "0x0"
->    debug-size   = "0x100"
->    mrom-base    = "0x1000"
->    mrom-size    = "0x11000"
->    test-base    = "0x100000"
->    test-size    = "0x1000"
->    clint-base   = "0x2000000"
->    clint-size   = "0x10000"
->    plic-base    = "0xc000000"
->    plic-size    = "0x4000000"
->    uart0-base   = "0x10000000"
->    uart0-size   = "0x100"
->    virtio-base  = "0x10001000"
->    virtio-size  = "0x1000"
->    dram-base    = "0x80000000"
->    dram-size    = "0x0"
-> 
-> Values must be enclosed within quotes.
-> 
-> Signed-off-by: Michael Eager <eager@eagercon.com>
-> 
+--R6sEYoIZpp9JErk7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Michael Eager    eager@eagerm.com
-1960 Park Blvd., Palo Alto, CA 94306
+On Wed, Aug 29, 2018 at 05:59:04PM +0100, Mark Cave-Ayland wrote:
+1;5202;0c> This patchset is the QEMU counterpart to the patches posted on t=
+he OpenBIOS
+> list at https://mail.coreboot.org/pipermail/openbios/2018-August/010422.h=
+tml
+> which generate correct fw paths for the Mac Old World and New World machi=
+nes.
+>=20
+> With these patches applied QEMU generates the correct fw paths for both t=
+he
+> in-built macio IDE and virtio-blk-pci devices enabling support for bootin=
+dex
+> and most importantly with an updated OpenBIOS, allowing boot from
+> virtio-pci-blk devices.
+>=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+Applied to ppc-for-3.1, thanks.
+
+
+>=20
+>=20
+> Mark Cave-Ayland (7):
+>   macio: move MACIOIDEState type declarations to macio.h
+>   macio: add macio bus to help with fw path generation
+>   macio: add addr property to macio IDE object
+>   grackle: set device fw_name and address for correct fw path generation
+>   mac_oldworld: implement custom FWPathProvider
+>   uninorth: add ofw-addr property to allow correct fw path generation
+>   mac_newworld: implement custom FWPathProvider
+>=20
+>  hw/ide/macio.c                 |  2 ++
+>  hw/misc/macio/macio.c          | 42 ++++++++++++++++++++++--------
+>  hw/pci-host/grackle.c          | 17 ++++++++++++
+>  hw/pci-host/uninorth.c         | 16 ++++++++++++
+>  hw/ppc/mac.h                   | 26 -------------------
+>  hw/ppc/mac_newworld.c          | 59 ++++++++++++++++++++++++++++++++++++=
++++++-
+>  hw/ppc/mac_oldworld.c          | 59 ++++++++++++++++++++++++++++++++++++=
++++++-
+>  include/hw/misc/macio/macio.h  | 37 ++++++++++++++++++++++++++
+>  include/hw/pci-host/uninorth.h |  1 +
+>  9 files changed, 220 insertions(+), 39 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--R6sEYoIZpp9JErk7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluHPnMACgkQbDjKyiDZ
+s5JjyxAAmTTuBCY8Zk7A0n7t47I5jTQK1Sv/tf5yXh0797rJBdTaiIC+pBt3Lo4K
+6/AzJ2JVTPOZv/HU7CM3idsHYGfw+hxHXLX0/Bl9YCFBsx7DfNUPpZz7d/JaKwPP
+KlV7SXq+ppBdyUARZwx6ZTkbkmjOR4enRGMmwiK09HD4FPOVNi2HkINIifymlBYH
+mPyuLpvmfltaJm/g0V4EnfqCZCsxzUUkaiMbNAdHmAPOCoP6z/2sRvmteFt6PB6i
+hPGECSRgKQztE8jajXO7VJFFz5LZ0ITgFj10fUyC2WztNnGo/YySSB4K/nSKl1Xn
+1EIeNJrDL9W0+zQj99TPmTkl20iAcHWlMIr1qrSG5ntJMn5WqcY2QIIDDdRHgOTO
+Oi+/n4awfhaDq1B2yvXOx33ilFnqsuXE0tSuMu7nsgkSytR+whi+mnC2cbSOKIgD
+rQTzpumN53NLfSouIIjV9009CZpGf+Fvrid7YznIL9XoxjHk1kFxWKvF/+sWYzCD
+wuKVfFj0a1BwnZlkXVK1hkkVKmzHAvExghS5uF66Pv2xIvZppdaZod53+CJw7BDO
+vKfIQ0hu6G6XOPYHMyUFizZErcoYqCc0uC8zlsbEc1d2DdyW787Wy8hOaSeN766v
+t4Oh4+Lh9r+Ky8BPFpseqwcmAJ0ta94VqkXjSBPy7D9LZUdu5NE=
+=3lJ1
+-----END PGP SIGNATURE-----
+
+--R6sEYoIZpp9JErk7--
