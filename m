@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leif.lindholm@linaro.org>) id 1fvJmp-0002eQ-L2
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:02:48 -0400
+	(envelope-from <berto@igalia.com>) id 1fvJoP-0003RH-JT
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leif.lindholm@linaro.org>) id 1fvJmk-0007mU-Nc
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:02:47 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38767)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <leif.lindholm@linaro.org>)
-	id 1fvJmk-0007hR-7U
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:02:42 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w11-v6so7484753wrc.5
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 03:02:37 -0700 (PDT)
-Date: Thu, 30 Aug 2018 11:02:33 +0100
-From: Leif Lindholm <leif.lindholm@linaro.org>
-Message-ID: <20180830100233.nr6fm3npy57zl4xx@bivouac.eciton.net>
-References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
-	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA9hivJzqksiSZbco4+EysYj=_y0t3k_L7TobxNPS8T2dQ@mail.gmail.com>
-	<CAHmQWvC4Kp1CAeCe8ZTGtSeG7fnT=Xen4GFKfnhTBWUCJdQV+g@mail.gmail.com>
-	<20180829134219.cmyqipnvukk6k2rp@kamzik.brq.redhat.com>
-	<CAHmQWvA5t7zbbDDM0UvuKSL_Z8ey+x+vOGZumYjwsq0FC5AHGA@mail.gmail.com>
-	<20180830083117.iekobw7l3arkt24m@bivouac.eciton.net>
-	<CAFEAcA_s+9-4PYHyx_aAnxwt4e=VH77uBG7rC4JA++nOyjAaPw@mail.gmail.com>
+	(envelope-from <berto@igalia.com>) id 1fvJo9-0008Na-NH
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 06:04:16 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <d3ea4f66-e8f3-35a2-1c3b-dcedb989827a@redhat.com>
+References: <cover.1535291602.git.berto@igalia.com>
+	<e4b359c3971bb95e1e3cc55e0f69e68404f33f17.1535291602.git.berto@igalia.com>
+	<d3ea4f66-e8f3-35a2-1c3b-dcedb989827a@redhat.com>
+Date: Thu, 30 Aug 2018 12:04:01 +0200
+Message-ID: <w51bm9kmar2.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_s+9-4PYHyx_aAnxwt4e=VH77uBG7rC4JA++nOyjAaPw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 7/9] block: Allow changing 'discard' on
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,28 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Hongbo Zhang <hongbo.zhang@linaro.org>, Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Thu, Aug 30, 2018 at 09:39:33AM +0100, Peter Maydell wrote:
-> On 30 August 2018 at 09:31, Leif Lindholm <leif.lindholm@linaro.org> wrote:
-> > On Thu, Aug 30, 2018 at 03:07:29PM +0800, Hongbo Zhang wrote:
-> >> @Ard, @Leif, is there any possibility to remove all the DT nodes?
-> >> On real hardware, how does UEFI find the memory size and CPU number?
-> >
-> > Usually by asking some form of SCP/PMU.
-> > So until we have rock-solid multi-cpu-instance (making terms up here,
-> > there may be a proper name already?) support upstream, we need to take
-> > shortcuts.
-> 
-> I would expect that you'd want a "faked-on-the-QEMU end" SCP
-> communications endpoint to start with anyway. We have one of
-> those for vexpress, for instance.
+On Wed 29 Aug 2018 01:39:10 PM CEST, Max Reitz wrote:
+> On 2018-08-26 16:09, Alberto Garcia wrote:
+>> 'discard' is one of the basic BlockdevOptions available for all
+>> drivers, but it's silently ignored by bdrv_reopen_prepare/commit(), so
+>> the user cannot change it and doesn't get an error explaining that it
+>> can't be changed.
+>> 
+>> This should update the discard setting, but does nothing:
+>> 
+>>    (qemu) qemu-io virtio0 "reopen -o discard=on"
+>> 
+>> Since there's no reason why we shouldn't allow changing it and the
+>> implementation is simple let's just do it.
+>> 
+>> Signed-off-by: Alberto Garcia <berto@igalia.com>
+>> ---
+>>  block.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>> 
+>> diff --git a/block.c b/block.c
+>> index 804d557608..21f1eb9cd1 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -3178,6 +3178,15 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+>>  
+>>      update_flags_from_options(&reopen_state->flags, opts);
+>>  
+>> +    value = qemu_opt_get(opts, "discard");
+>> +    if (value != NULL) {
+>> +        if (bdrv_parse_discard_flags(value, &reopen_state->flags) != 0) {
+>> +            error_setg(errp, "Invalid discard option");
+>> +            ret = -EINVAL;
+>> +            goto error;
+>> +        }
+>> +    }
+>> +
+>>      /* node-name and driver must be unchanged. Put them back into the QDict, so
+>>       * that they are checked at the end of this function. */
+>>      value = qemu_opt_get(opts, "node-name");
+>
+> Hm.  Why not just use the same "trick" here as in your last patch,
+> i.e.  use qemu_opt_get_del() above and then qemu_opts_to_qdict() to
+> return all unhandled options to the QDict?
 
-Ah, I wasn't aware we did!
+Sure, I could do that and therefore forbid changing all of these
+options. But as I said in the commit message, there's no reason why we
+should not allow changing them.
 
-In that case - sure, that is probably the more sensible solution.
-Does it emulate SCMI?
-
-/
-    Leif
+Berto
