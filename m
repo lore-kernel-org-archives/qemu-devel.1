@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fvR5Y-0004au-Pr
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:50:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fvRg8-0005i6-IK
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fvR5V-0007FH-JZ
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:50:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56914 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fvRg4-0004uz-Iq
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:28:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45592)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fvR5V-0007F0-DQ
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:50:33 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B9B527A7E6
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 17:50:32 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 30 Aug 2018 19:50:19 +0200
-Message-Id: <20180830175019.16939-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fvRg4-0004ug-Cm
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:28:20 -0400
+Date: Thu, 30 Aug 2018 15:28:17 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180830182817.GL8359@habkost.net>
+References: <1533909989-56115-1-git-send-email-robert.hu@linux.intel.com>
+	<1533909989-56115-3-git-send-email-robert.hu@linux.intel.com>
+	<20180817131810.GA15372@localhost.localdomain>
+	<1534577221.4104.20.camel@linux.intel.com>
+	<20180818150548.GN15372@localhost.localdomain>
+	<1535005708.4104.34.camel@linux.intel.com>
+	<20180823171158.GI3778@localhost.localdomain>
+	<1535602930.4104.41.camel@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] hostmem: no need to check for
- host_memory_backend_mr_inited() in alloc()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1535602930.4104.41.camel@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] kvm: Add support to
+ KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +34,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Robert Hoo <robert.hu@linux.intel.com>
+Cc: robert.hu@intel.com, pbonzini@redhat.com, rth@twiddle.net, thomas.lendacky@amd.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
 
-memfd_backend_memory_alloc/file_backend_memory_alloc both needlessly
-are are calling host_memory_backend_mr_inited() which creates an
-illusion that alloc could be called multiple times but it isn't, it's
-called once from UserCreatable complete().
+On Thu, Aug 30, 2018 at 12:22:10PM +0800, Robert Hoo wrote:
+> On Thu, 2018-08-23 at 14:11 -0300, Eduardo Habkost wrote:
+> > On Thu, Aug 23, 2018 at 02:28:28PM +0800, Robert Hoo wrote:
+> > > On Sat, 2018-08-18 at 12:05 -0300, Eduardo Habkost wrote:
+> > [...]
+> > > > We don't want QEMU to refuse to run if the kernel doesn't have
+> > > > KVM_CAP_GET_MSR_FEATURES.  We can treat missing capability as
+> > > > equivalent to returning an empty list of MSRs.
+> > > Yes. I'll let caller (kvm_arch_init) ignore the return value but a
+> > > simple warning.
+> > 
+> > Warnings tend to be ignored and are generally a sign that QEMU
+> > isn't doing the right thing.  Sometimes we have no choice, but I
+> > don't think that's the case here.
+> > 
+> > As far as I can see, we have only two possibilities here:
+> > 1) The host can run a VM that behaves exactly as requested on the
+> >    command-line (no warning required).
+> > 2) The host can't run the requested configuration (fatal error,
+> >    not a warning).
+> > 
+> I mean the kvm_arch_init() --> kvm_get_supported_feature_msrs(), when
+> kvm_get_supported_feature_msrs() returns error, can we ignore it?
+> The cases of kvm_get_supported_feature_msrs() returning error:
+> 1) underlying KVM doesn't support GET_MSR_FEATURES capability.
+> 2) error in KVM_GET_MSR_FEATURE_INDEX_LIST.
+> 
+> given the principle you guided before, I think we can ignore above error
+> cases, and later kvm_arch_get_supported_msr_feature() would always
+> return 0 (of course, except those special cases like
+> IA32_ARCH_CAPABILITIES.RSBA)
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- backends/hostmem-file.c  | 2 +-
- backends/hostmem-memfd.c | 4 ----
- 2 files changed, 1 insertion(+), 5 deletions(-)
+Making kvm_arch_get_supported_msr_feature() return 0 if the
+capability isn't available (except for RSBA) seems to be enough
+to ensure we do the right thing on both cases (1 and 2 above).
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index 2476dcb435..5cd5fa75a7 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -54,7 +54,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, E=
-rror **errp)
- #ifndef CONFIG_LINUX
-     error_setg(errp, "-mem-path not supported on this host");
- #else
--    if (!host_memory_backend_mr_inited(backend)) {
-+    {
-         gchar *path;
-         backend->force_prealloc =3D mem_prealloc;
-         path =3D object_get_canonical_path(OBJECT(backend));
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index abd52364db..7184918112 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -44,10 +44,6 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend,=
- Error **errp)
-         return;
-     }
-=20
--    if (host_memory_backend_mr_inited(backend)) {
--        return;
--    }
--
-     backend->force_prealloc =3D mem_prealloc;
-     fd =3D qemu_memfd_create(TYPE_MEMORY_BACKEND_MEMFD, backend->size,
-                            m->hugetlb, m->hugetlbsize, m->seal ?
---=20
-2.19.0.rc0.48.gb9dfa238d5
+Now, if KVM_GET_MSR_FEATURE_INDEX_LIST returns an unexpected
+error, it sounds like an exceptional situation that can justify a
+fatal error (or at least a warning).
+
+-- 
+Eduardo
