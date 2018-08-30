@@ -1,21 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <daniel@drv.nu>) id 1fvPCP-0006qH-Ba
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:49:36 -0400
+	(envelope-from <Liam.Merwick@oracle.com>) id 1fvPCN-0006Y2-UB
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:49:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <daniel@drv.nu>) id 1fvP8M-0005Gd-LP
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:45:23 -0400
-MIME-Version: 1.0
-References: <20180622112237.2131-1-gersner@gmail.com>
-	<CAGFXeQL4FPVeFrEiQpRjGnBMBs5oCjxjXFJ_NGWsGmOjvk75pg@mail.gmail.com>
-	<CALKrh6mPkirNjwkCMLWU4d+eQnnkYDmjPVAWccP4K4tQDxxLaA@mail.gmail.com>
-In-Reply-To: <CALKrh6mPkirNjwkCMLWU4d+eQnnkYDmjPVAWccP4K4tQDxxLaA@mail.gmail.com>
-From: Daniel Verkamp <daniel@drv.nu>
-Date: Thu, 30 Aug 2018 08:45:05 -0700
-Message-ID: <CAGFXeQKjnCvY7hRw_1MxZOROhHbsdHM9YPL-QzzWeJZcu0A8Jg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/5] nvme: PCI/e configuration from
- specification
+	(envelope-from <Liam.Merwick@oracle.com>) id 1fvP8Y-0005Qr-2G
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:45:37 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:44508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Liam.Merwick@oracle.com>)
+	id 1fvP8X-0005Q7-QX
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 11:45:33 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+	by aserp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
+	w7UFdF8O030685
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 15:45:30 GMT
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+	by aserp2120.oracle.com with ESMTP id 2m2y2pwhhj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 15:45:30 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id w7UFjTha024023
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK) for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 15:45:29 GMT
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id w7UFjTDk014933
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 15:45:29 GMT
+From: Liam Merwick <Liam.Merwick@oracle.com>
+Date: Thu, 30 Aug 2018 16:47:04 +0100
+Message-Id: <1535644031-848-2-git-send-email-Liam.Merwick@oracle.com>
+In-Reply-To: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
+References: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
+Subject: [Qemu-devel] [PATCH 1/8] configure: Provide option to explicitly
+ disable AVX2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +40,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shimi Gersner <gersner@gmail.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, David Sariel <davidsa@openu.ac.il>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi Shimi,
+The configure script detects if the compiler has AVX2 support and
+automatically sets avx2_opt="yes" which in turn defines CONFIG_AVX2_OPT.
+There is no way of explicitly overriding this setting so this commit adds
+two command-line options: --enable-avx2 and --disable-avx2.
 
-On Sun, Aug 26, 2018 at 2:50 PM Gersner <gersner@gmail.com> wrote:
->
-> Hi Daniel,
-> Thanks for taking a look. Comments are inline.
->
-> Gersner.
->
-> On Sun, Jul 15, 2018 at 9:21 AM Daniel Verkamp <daniel@drv.nu> wrote:
->>
->> On Fri, Jun 22, 2018 at 4:22 AM, Shimi Gersner <gersner@gmail.com> wrote:
->> > PCI/e configuration currently does not meets specifications.
->> >
->> > Patch includes various configuration changes to support specifications
->> > - BAR2 to return zero when read and CMD.IOSE is not set.
->> > - Expose NVME configuration through IO space (Optional).
->> > - PCI Power Management v1.2.
->> > - PCIe Function Level Reset.
->> > - Disable QEMUs default use of PCIe Link Status (DLLLA).
->> > - PCIe missing AOC compliance flag.
->> > - Mask PCIe End-to-End TLP as RO (Unspecified by specification).
->> [...]
->> >      n->num_namespaces = 1;
->> >      n->num_queues = 64;
->> > -    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
->> > +    n->reg_size = pow2ceil(0x2000 + 2 * (n->num_queues + 1) * 4);
->>
->> The existing math looks OK to me (maybe already 4 bytes larger than
->> necessary?). The controller registers should be 0x1000 bytes for the
->> fixed register set, then 2 * 4 bytes for each doorbell pair (+ 1 is
->> for the admin queue, and CAP.DSTRD is set to 0, so there is no extra
->> padding between queues). The result is also rounded up to a power of
->> two, so the result will typically be 8 KB.  What is the rationale for
->> this change?
->
-> You are correct, this change shouldn't be here. It was made during tests against the
-> nvme compliance which failed here.
+The default behaviour, when no option is specified, is to maintain the
+current behaviour and enable AVX2 if the compiler supports it.
 
-If the NVMe compliance test requires it, that is probably sufficient
-reason to change it - although it would be interesting to hear their
-rationale.
+Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
+Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
+---
+ configure | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-> The specification states that bits 0 to 13 are RO, which implicitly suggests
-> that the minimal size of this BAR should be at least 16K as this is a standard
-> way to determine the BAR size on PCI (AFAIK). On the contrary it doesn't
-> fit very well with the memory mapped laid out on 3.1 Register Definition
-> of the 1.3b nvme spec. Any idea?
-
-You're right, the MLBAR section of the NVMe spec does seem to indicate
-that up to bit 13 should be reserved/RO.  This is also probably a good
-enough reason to make the change, as long as this reason is provided.
-
->
-> Additionally it does look like it has an extra 4 bytes.
->
->>
->>
->> >      n->ns_size = bs_size / (uint64_t)n->num_namespaces;
->> >
->> >      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
->> > @@ -1245,6 +1295,10 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->> >      pci_register_bar(&n->parent_obj, 0,
->> >          PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
->> >          &n->iomem);
->> > +
->> > +    // Expose the NVME memory through Address Space IO (Optional by spec)
->> > +    pci_register_bar(&n->parent_obj, 2, PCI_BASE_ADDRESS_SPACE_IO, &n->iomem);
->>
->> This looks like it will register the whole 4KB+ NVMe register set
->> (n->iomem) as an I/O space BAR, but this doesn't match the spec (see
->> NVMe 1.3c section 3.2, "Index/Data Pair registers"). The I/O BAR (if
->> implemented) should just contain two 4-byte registers, Index and Data,
->> that can be used to indirectly access the NVMe register set.  (Just
->> for curiosity, do you know of any software that uses this feature? It
->> could be useful for testing the implementation.)
->
-> Very nice catch. We indeed totally miss-interpreted the specification here.
->
-> We use the compliance suit for sanity, but it doesn't actually use this feature,
-> just verifies the configuration of the registers.
->
-> We will go with rolling back this feature as this is optional.
-
-This is probably the right move; I don't know of any real hardware
-devices that implement it (and therefore I doubt any software will
-require it).  However, it should not be too difficult to add an
-implementation of this feature; if you are interested, take a look at
-the ahci_idp_read/ahci_idp_write functions - the NVMe index/data pair
-should be very similar.
-
-> Question - I'm having hard time to determine from the specification - As
-> this is optional, how device drivers determine if it is available? Does it
-> simply the CMD.IOSE flag from the PCI? And if so, what is
-> the standard way in QEMU to disable the flag completely?
-
-Based on the wording in NVMe 1.3 section 3.2, it seems like the only
-indication of support for Index/Data Pair is whether BAR2 is filled
-out.  I believe PCI defines unused BARs to be all 0s, so software
-should be able to use this to determine whether the feature is
-provided by a particular NVMe PCIe device, and removing the
-pci_register_bar() call should be enough to accomplish this from the
-QEMU side.
-
-Thanks,
--- Daniel
+diff --git a/configure b/configure
+index 58862d2ae88a..8904a91715b3 100755
+--- a/configure
++++ b/configure
+@@ -427,7 +427,7 @@ usb_redir=""
+ opengl=""
+ opengl_dmabuf="no"
+ cpuid_h="no"
+-avx2_opt="no"
++avx2_opt=""
+ zlib="yes"
+ capstone=""
+ lzo=""
+@@ -1332,6 +1332,10 @@ for opt do
+   ;;
+   --disable-glusterfs) glusterfs="no"
+   ;;
++  --disable-avx2) avx2_opt="no"
++  ;;
++  --enable-avx2) avx2_opt="yes"
++  ;;
+   --enable-glusterfs) glusterfs="yes"
+   ;;
+   --disable-virtio-blk-data-plane|--enable-virtio-blk-data-plane)
+@@ -1709,6 +1713,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   libxml2         for Parallels image format
+   tcmalloc        tcmalloc support
+   jemalloc        jemalloc support
++  avx2            AVX2 optimization support
+   replication     replication support
+   vhost-vsock     virtio sockets device support
+   opengl          opengl support
+@@ -5127,7 +5132,7 @@ fi
+ # There is no point enabling this if cpuid.h is not usable,
+ # since we won't be able to select the new routines.
+ 
+-if test $cpuid_h = yes; then
++if test "$cpuid_h" = "yes" -a "$avx2_opt" != "no"; then
+   cat > $TMPC << EOF
+ #pragma GCC push_options
+ #pragma GCC target("avx2")
+@@ -5141,6 +5146,8 @@ int main(int argc, char *argv[]) { return bar(argv[0]); }
+ EOF
+   if compile_object "" ; then
+     avx2_opt="yes"
++  else
++    avx2_opt="no"
+   fi
+ fi
+ 
+-- 
+1.8.3.1
