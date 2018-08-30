@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fvMmg-0007Fc-SF
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:14:52 -0400
+	(envelope-from <prvs=7732fbd28=jancraig@amazon.com>)
+	id 1fvN6x-0007ty-15
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fvMmd-00050g-QT
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:14:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34094 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fvMmd-00050W-MV
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:14:47 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DBE37402315B
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 13:14:46 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180829134043.31706-1-marcandre.lureau@redhat.com>
-	<20180829134043.31706-9-marcandre.lureau@redhat.com>
-Date: Thu, 30 Aug 2018 15:14:41 +0200
-In-Reply-To: <20180829134043.31706-9-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 29 Aug 2018 15:40:41 +0200")
-Message-ID: <8736uw3sji.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <prvs=7732fbd28=jancraig@amazon.com>)
+	id 1fvN3h-0004Of-Tc
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:32:29 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:34411)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=7732fbd28=jancraig@amazon.com>)
+	id 1fvN3h-0004O9-Jd
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:32:25 -0400
+From: "Janeczek, Craig" <jancraig@amazon.com>
+Date: Thu, 30 Aug 2018 13:27:22 +0000
+Message-ID: <85c2f315a87b473097798ed0a41c9e44@EX13D12UEA003.ant.amazon.com>
+References: <20180828130041.26445-1-jancraig@amazon.com>
+	<BN7PR08MB48689B528AF7931D4D0CAB63C6080@BN7PR08MB4868.namprd08.prod.outlook.com>
+In-Reply-To: <BN7PR08MB48689B528AF7931D4D0CAB63C6080@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 08/10] tests: add a qmp success-response
- test
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] Add limited MXU instruction support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,18 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+That seems like a good plan to separate these tasks. I will implement this =
+in the next patchset. Thank you
 
-> Verify the usage of this schema feature and the API behaviour.  This
-> should be the only case where qmp_dispatch() returns NULL without
-> error.
+-----Original Message-----
+From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
+Sent: Thursday, August 30, 2018 8:40 AM
+To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net; Petar Jovanovic <pjovanovic@wavecomp.com>; Richar=
+d Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v3 0/8] Add limited MXU instruction support
 
-Scratch "without error".
+Hi, Craig,
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> From: Craig Janeczek <jancraig@amazon.com>
+> Sent: Tuesday, August 28, 2018 3:00 PM
+>=20
+> Subject: [PATCH v3 0/8] Add limited MXU instruction support
+>=20
+> This patch set begins to add MXU instruction support for mips emulation.
 
-With the commit message corrected:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Based on the info I have, I think a reasonable approach to integration of t=
+his series would be:
+
+- Add this line in mips-defs.h
+
+#define   ASE_MXU       0x02000000
+
+- In main switch, use this segment
+
+        if (ctx->insn_flags & ASE_MXU) {
+                decode_opc_special2_mxu(env, ctx);
+        } else {
+                decode_opc_special2_legacy(env, ctx);
+        }
+
+That way, you would be able to add MXU code without specifying CPU that sup=
+ports it. This will enable you to focus on MXU, which is a serieoous task a=
+nyway. Hopefully, a CPU will be added at some later date.
+
+Thanks,
+Aleksandar
