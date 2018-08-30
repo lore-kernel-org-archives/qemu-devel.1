@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fvIC3-0002i6-1Y
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 04:20:46 -0400
+	(envelope-from <leif.lindholm@linaro.org>) id 1fvIMO-0008C4-Jy
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 04:31:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fvI6Y-00087w-8w
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 04:15:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40886 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fvI6Y-00084q-2b
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 04:15:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 938DA40216E7
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 08:15:01 +0000 (UTC)
-Date: Thu, 30 Aug 2018 10:14:57 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180830101457.0071b98e@redhat.com>
-In-Reply-To: <20180828153840.22519-1-marcandre.lureau@redhat.com>
-References: <20180828153840.22519-1-marcandre.lureau@redhat.com>
+	(envelope-from <leif.lindholm@linaro.org>) id 1fvIMN-00011M-OK
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 04:31:24 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:39716)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <leif.lindholm@linaro.org>)
+	id 1fvIMM-0000xz-Rm
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 04:31:23 -0400
+Received: by mail-wm0-x244.google.com with SMTP id q8-v6so1082150wmq.4
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 01:31:21 -0700 (PDT)
+Date: Thu, 30 Aug 2018 09:31:18 +0100
+From: Leif Lindholm <leif.lindholm@linaro.org>
+Message-ID: <20180830083117.iekobw7l3arkt24m@bivouac.eciton.net>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA9hivJzqksiSZbco4+EysYj=_y0t3k_L7TobxNPS8T2dQ@mail.gmail.com>
+	<CAHmQWvC4Kp1CAeCe8ZTGtSeG7fnT=Xen4GFKfnhTBWUCJdQV+g@mail.gmail.com>
+	<20180829134219.cmyqipnvukk6k2rp@kamzik.brq.redhat.com>
+	<CAHmQWvA5t7zbbDDM0UvuKSL_Z8ey+x+vOGZumYjwsq0FC5AHGA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmQWvA5t7zbbDDM0UvuKSL_Z8ey+x+vOGZumYjwsq0FC5AHGA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +35,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Hongbo Zhang <hongbo.zhang@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On Tue, 28 Aug 2018 17:38:40 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+On Thu, Aug 30, 2018 at 03:07:29PM +0800, Hongbo Zhang wrote:
+> >> Yes, I am working on the v3, with main changes:
+> >>  - machine name "sbsa-ref" (good name?)
+> >>  - a separate file sbsa-ref.c
+> >>  - don't touch the acpi c file, acpi will be supplied by uefi
+> >
+> > I agree with the above three bullets.
+> >
+> >>  - only necessary dt node, no other peripheral dt nodes
+> >
+> > I'm not sure what DT nodes are necessary. After discussing the
+> > ACPI tables, and that firmware would supply them, I thought we
+> > also agreed firmware would supply the DTB.
+>
+> Yes, firmware supply ACPI to load OS.
+> But for DT, It is said that UEFI still needs some DT nodes, at least
+> for memory size. I am trying to figure out which DT nodes are
+> mandatory too, it is better we don't have any DT nodes left.
+> 
+> @Ard, @Leif, is there any possibility to remove all the DT nodes?
+> On real hardware, how does UEFI find the memory size and CPU number?
 
-> The share=3Don/off property is used to modified mmap() MAP_SHARED
-> setting. Make it on by default for convenience and compatibility
-> reasons.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  backends/hostmem-memfd.c | 4 +++-
->  qemu-options.hx          | 4 +++-
->  2 files changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> index 1e20fe0ba8..abd52364db 100644
-> --- a/backends/hostmem-memfd.c
-> +++ b/backends/hostmem-memfd.c
-> @@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, =
-Error **errp)
-> =20
->      name =3D object_get_canonical_path(OBJECT(backend));
->      memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
-> -                                   name, backend->size, true, fd, errp);
-> +                                   name, backend->size,
-> +                                   backend->share, fd, errp);
->      g_free(name);
->  }
-> =20
-> @@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
-> =20
->      /* default to sealed file */
->      m->seal =3D true;
-> +    MEMORY_BACKEND(m)->share =3D true;
->  }
-> =20
->  static void
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index f14e423b7c..25c02d72b8 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4029,7 +4029,7 @@ Memory backend objects offer more control than the =
-@option{-m} option that is
->  traditionally used to define guest RAM. Please refer to
->  @option{memory-backend-file} for a description of the options.
-> =20
-> -@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
-mp=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},host-nodes=3D@v=
-ar{host-nodes},policy=3D@var{default|preferred|bind|interleave},seal=3D@var=
-{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
-> +@item -object memory-backend-memfd,id=3D@var{id},merge=3D@var{on|off},du=
-mp=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{=
-size},host-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bind|in=
-terleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{siz=
-e}
-> =20
->  Creates an anonymous memory file backend object, which allows QEMU to
->  share the memory with an external process (e.g. when using
-> @@ -4051,6 +4051,8 @@ with the @option{seal} option (requires at least Li=
-nux 4.16).
->  Please refer to @option{memory-backend-file} for a description of the
->  other options.
-> =20
-> +The @option{share} boolean option is @var{on} by default with memfd.
-> +
->  @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/random}
-> =20
->  Creates a random number generator backend which obtains entropy from
+Usually by asking some form of SCP/PMU.
+So until we have rock-solid multi-cpu-instance (making terms up here,
+there may be a proper name already?) support upstream, we need to take
+shortcuts.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Using DT in the same way as we do for mach-virt when booting the OS
+with ACPI seems the most logical choice to me.
+
+The best alternative I can think of would be extending fw_cfg, but
+that would then be lost effort once (if) we get to the abovementioned
+situation, whereas the DT route comes for free.
+
+/
+    Leif
