@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fvG8H-0000Ay-BO
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 02:08:42 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fvGBE-0000wh-38
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 02:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fvG8G-0001ng-AX
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 02:08:41 -0400
-Date: Thu, 30 Aug 2018 16:07:37 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180830060737.GK2222@umbus.fritz.box>
-References: <d14d97226c3b432fa70513dcd7bacf59c6881cbd.1535608432.git.sbobroff@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IJAclU0AInkryoed"
-Content-Disposition: inline
-In-Reply-To: <d14d97226c3b432fa70513dcd7bacf59c6881cbd.1535608432.git.sbobroff@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] spapr: Correct reference count on
- spapr-cpu-core
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fvGBC-0002qx-Ep
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 02:11:44 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:40029
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fvGBC-0002qg-88
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 02:11:42 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Thu, 30 Aug 2018 07:11:29 +0100
+Message-Id: <20180830061129.4157-3-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180830061129.4157-1-mark.cave-ayland@ilande.co.uk>
+References: <20180830061129.4157-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 2/2] sun4u: implement custom FWPathProvider
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,77 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sbobroff@linux.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com
 
+This enables the correct generation of bootdevice fw paths for in-built IDE
+and virtio-pci-blk devices suitable for OpenBIOS.
 
---IJAclU0AInkryoed
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Note we also set the MachineClass ignore_boot_device_suffixes property to true
+to allow the correct customisation of the disk node names as required.
 
-On Thu, Aug 30, 2018 at 03:54:40PM +1000, Sam Bobroff wrote:
-11;rgb:ffff/ffff/ffff> spapr_init_cpus() currently creates spapr-cpu-core o=
-bjects via
-> object_new() and setting their realized property to true. This leaves
-> their reference count at two, because object_new() adds an initial
-> reference and the realization attaches them to a default parent object
-> which also increments the reference count.
->=20
-> This causes a problem if one of these cores is hot unplugged: no
-> delete event is generated for it because it's reference count doesn't
-> reach zero when it is detached from it's parent.
->=20
-> Correct this by adding a call to object_unref() in spapr_init_cpus().
->=20
-> Signed-off-by: Sam Bobroff <sbobroff@linux.ibm.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/sparc64/sun4u.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-Applied to ppc-for-3.1.
-
-> ---
->  hw/ppc/spapr.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0d032a1ad0..fbb00f0c56 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2502,6 +2502,8 @@ static void spapr_init_cpus(sPAPRMachineState *spap=
-r)
->              object_property_set_int(core, core_id, CPU_CORE_PROP_CORE_ID,
->                                      &error_fatal);
->              object_property_set_bool(core, true, "realized", &error_fata=
-l);
-> +
-> +            object_unref(core);
->          }
->      }
->  }
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---IJAclU0AInkryoed
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluHiZ0ACgkQbDjKyiDZ
-s5IdLg//cm3KOMvhJAf1b3y1EG/K9SNNm+bJbToF8AzFfwQ8CH+Xn3Ec0hmViHdD
-b9lFrBv9L4/78fmoDAT1wnnMkPNoZ5+FNor2/BfMtfLeG+31dH3B6NZn5XGa0/QW
-oOIU71wgoCUYKbS0y+OMl/98EvqtJ+o0TLZcAgvBy6U9zh1Nj3TLhy0VGS4Kc3LY
-QGAXWGUWzL9OkPAHp6cEa2pi7cN0oBWtIDJ4oHf7rtQgJXMNvXiXcxUwfEZxC9ii
-APs8JNmS2mArsMVmfkncVKnc3w6fXP0AIGvAIr0yoQXTtT1sOS8t0czP6Uj20vEy
-NaCdv+/eGmGwvOxVl9dwEmedyclZ3lLf0hUz/rbO8pzTazzMIdBqjzRo5zT5sVDs
-7taElbhnVMhEdoTNT/APdJme/aGAqPInBda3n+bqRTdoRXsjrySvgcGiLdO5n2ue
-7vdqPL5M3T1YRZn5z6ekeOcjQhpZDJGVpSmdWY6tZr7DQn2q865+I4w0/AV1bACC
-kRy4mbuoXjsRKxKkdoAd8xAVeDGzwcukQTNv33ZolpveWQsIc9gGxAr8enEcz4iZ
-U1/sg9i9NYwBbYCRa1U1a5QzTYWog+bfmu38vRlZishHs1wfNvpkHbc6joSVDteE
-bjmpebzrQ/6fqmhUyyPrk5rYx5IYPdfHIhZg+umyYQJMGnaBjaA=
-=ga1x
------END PGP SIGNATURE-----
-
---IJAclU0AInkryoed--
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index d16843b30e..f76b19e4e9 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -51,6 +51,7 @@
+ #include "hw/ide.h"
+ #include "hw/ide/pci.h"
+ #include "hw/loader.h"
++#include "hw/fw-path-provider.h"
+ #include "elf.h"
+ #include "trace.h"
+ 
+@@ -693,6 +694,56 @@ enum {
+     sun4v_id = 64,
+ };
+ 
++/*
++ * Implementation of an interface to adjust firmware path
++ * for the bootindex property handling.
++ */
++static char *sun4u_fw_dev_path(FWPathProvider *p, BusState *bus,
++                               DeviceState *dev)
++{
++    PCIDevice *pci;
++    IDEBus *ide_bus;
++    IDEState *ide_s;
++    int bus_id;
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "pbm-bridge")) {
++        pci = PCI_DEVICE(dev);
++
++        if (PCI_FUNC(pci->devfn)) {
++            return g_strdup_printf("pci@%x,%x", PCI_SLOT(pci->devfn),
++                                   PCI_FUNC(pci->devfn));
++        } else {
++            return g_strdup_printf("pci@%x", PCI_SLOT(pci->devfn));
++        }
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-drive")) {
++         ide_bus = IDE_BUS(qdev_get_parent_bus(dev));
++         ide_s = idebus_active_if(ide_bus);
++         bus_id = ide_bus->bus_id;
++
++         if (ide_s->drive_kind == IDE_CD) {
++             return g_strdup_printf("ide@%x/cdrom", bus_id);
++         }
++
++         return g_strdup_printf("ide@%x/disk", bus_id);
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-hd")) {
++        return g_strdup("disk");
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-cd")) {
++        return g_strdup("cdrom");
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "virtio-blk-device")) {
++        return g_strdup("disk");
++    }
++
++    return NULL;
++}
++
+ static const struct hwdef hwdefs[] = {
+     /* Sun4u generic PC-like machine */
+     {
+@@ -723,6 +774,7 @@ static void sun4v_init(MachineState *machine)
+ static void sun4u_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
++    FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(oc);
+ 
+     mc->desc = "Sun4u platform";
+     mc->init = sun4u_init;
+@@ -731,12 +783,18 @@ static void sun4u_class_init(ObjectClass *oc, void *data)
+     mc->is_default = 1;
+     mc->default_boot_order = "c";
+     mc->default_cpu_type = SPARC_CPU_TYPE_NAME("TI-UltraSparc-IIi");
++    mc->ignore_boot_device_suffixes = true;
++    fwc->get_dev_path = sun4u_fw_dev_path;
+ }
+ 
+ static const TypeInfo sun4u_type = {
+     .name = MACHINE_TYPE_NAME("sun4u"),
+     .parent = TYPE_MACHINE,
+     .class_init = sun4u_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_FW_PATH_PROVIDER },
++        { }
++    },
+ };
+ 
+ static void sun4v_class_init(ObjectClass *oc, void *data)
+-- 
+2.11.0
