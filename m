@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvCDW-000102-Hj
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:57:54 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fvCDa-00011G-9H
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvCDU-0006hD-QS
-	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:57:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fvCDX-0006kc-0Q
+	for qemu-devel@nongnu.org; Wed, 29 Aug 2018 21:57:54 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Wed, 29 Aug 2018 21:57:30 -0400
-Message-Id: <20180830015734.19765-6-jsnow@redhat.com>
+Date: Wed, 29 Aug 2018 21:57:32 -0400
+Message-Id: <20180830015734.19765-8-jsnow@redhat.com>
 In-Reply-To: <20180830015734.19765-1-jsnow@redhat.com>
 References: <20180830015734.19765-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/9] block/mirror: utilize job_exit shim
+Subject: [Qemu-devel] [PATCH v3 7/9] block/backup: make function variables
+ consistently named
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,134 +23,148 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, John Snow <jsnow@redhat.com>
 
-Change the manual deferment to mirror_exit into the implicit
-callback to job_exit and the mirror_exit callback.
+Rename opaque_job to job to be consistent with other job implementations.
+Rename 'job', the BackupBlockJob object, to 's' to also be consistent.
 
-This does change the order of some bdrv_unref calls and job_completed,
-but thanks to the new context in which we call .exit, this is safe to
-defer the possible flushing of any nodes to the job_finalize_single
-cleanup stage.
-
+Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/mirror.c | 29 +++++++++++------------------
- 1 file changed, 11 insertions(+), 18 deletions(-)
+ block/backup.c | 62 +++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 31 insertions(+), 31 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index be5dc6b7b0..b8941db6c1 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -607,26 +607,22 @@ static void mirror_wait_for_all_io(MirrorBlockJob *s)
-     }
+diff --git a/block/backup.c b/block/backup.c
+index a67b7fa96b..4d084f6ca6 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -468,59 +468,59 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+     bdrv_dirty_iter_free(dbi);
  }
  
--typedef struct {
--    int ret;
--} MirrorExitData;
--
--static void mirror_exit(Job *job, void *opaque)
-+static void mirror_exit(Job *job)
+-static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
++static int coroutine_fn backup_run(Job *job, Error **errp)
  {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
-     BlockJob *bjob = &s->common;
--    MirrorExitData *data = opaque;
-     MirrorBDSOpaque *bs_opaque = s->mirror_top_bs->opaque;
-     AioContext *replace_aio_context = NULL;
-     BlockDriverState *src = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     BlockDriverState *mirror_top_bs = s->mirror_top_bs;
-     Error *local_err = NULL;
-+    int ret = job->ret;
+-    BackupBlockJob *job = container_of(opaque_job, BackupBlockJob, common.job);
+-    BlockDriverState *bs = blk_bs(job->common.blk);
++    BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
++    BlockDriverState *bs = blk_bs(s->common.blk);
+     int64_t offset, nb_clusters;
+     int ret = 0;
  
-     bdrv_release_dirty_bitmap(src, s->dirty_bitmap);
+-    QLIST_INIT(&job->inflight_reqs);
+-    qemu_co_rwlock_init(&job->flush_rwlock);
++    QLIST_INIT(&s->inflight_reqs);
++    qemu_co_rwlock_init(&s->flush_rwlock);
  
--    /* Make sure that the source BDS doesn't go away before we called
--     * job_completed(). */
-+    /* Make sure that the source BDS doesn't go away during bdrv_replace_node,
-+     * before we can call bdrv_drained_end */
-     bdrv_ref(src);
-     bdrv_ref(mirror_top_bs);
-     bdrv_ref(target_bs);
-@@ -652,7 +648,7 @@ static void mirror_exit(Job *job, void *opaque)
-             bdrv_set_backing_hd(target_bs, backing, &local_err);
-             if (local_err) {
-                 error_report_err(local_err);
--                data->ret = -EPERM;
-+                ret = -EPERM;
+-    nb_clusters = DIV_ROUND_UP(job->len, job->cluster_size);
+-    job_progress_set_remaining(&job->common.job, job->len);
++    nb_clusters = DIV_ROUND_UP(s->len, s->cluster_size);
++    job_progress_set_remaining(job, s->len);
+ 
+-    job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
+-    if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+-        backup_incremental_init_copy_bitmap(job);
++    s->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
++    if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
++        backup_incremental_init_copy_bitmap(s);
+     } else {
+-        hbitmap_set(job->copy_bitmap, 0, nb_clusters);
++        hbitmap_set(s->copy_bitmap, 0, nb_clusters);
+     }
+ 
+ 
+-    job->before_write.notify = backup_before_write_notify;
+-    bdrv_add_before_write_notifier(bs, &job->before_write);
++    s->before_write.notify = backup_before_write_notify;
++    bdrv_add_before_write_notifier(bs, &s->before_write);
+ 
+-    if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
++    if (s->sync_mode == MIRROR_SYNC_MODE_NONE) {
+         /* All bits are set in copy_bitmap to allow any cluster to be copied.
+          * This does not actually require them to be copied. */
+-        while (!job_is_cancelled(&job->common.job)) {
++        while (!job_is_cancelled(job)) {
+             /* Yield until the job is cancelled.  We just let our before_write
+              * notify callback service CoW requests. */
+-            job_yield(&job->common.job);
++            job_yield(job);
+         }
+-    } else if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+-        ret = backup_run_incremental(job);
++    } else if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
++        ret = backup_run_incremental(s);
+     } else {
+         /* Both FULL and TOP SYNC_MODE's require copying.. */
+-        for (offset = 0; offset < job->len;
+-             offset += job->cluster_size) {
++        for (offset = 0; offset < s->len;
++             offset += s->cluster_size) {
+             bool error_is_read;
+             int alloced = 0;
+ 
+-            if (yield_and_check(job)) {
++            if (yield_and_check(s)) {
+                 break;
+             }
+ 
+-            if (job->sync_mode == MIRROR_SYNC_MODE_TOP) {
++            if (s->sync_mode == MIRROR_SYNC_MODE_TOP) {
+                 int i;
+                 int64_t n;
+ 
+                 /* Check to see if these blocks are already in the
+                  * backing file. */
+ 
+-                for (i = 0; i < job->cluster_size;) {
++                for (i = 0; i < s->cluster_size;) {
+                     /* bdrv_is_allocated() only returns true/false based
+                      * on the first set of sectors it comes across that
+                      * are are all in the same state.
+@@ -529,7 +529,7 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
+                      * needed but at some point that is always the case. */
+                     alloced =
+                         bdrv_is_allocated(bs, offset + i,
+-                                          job->cluster_size - i, &n);
++                                          s->cluster_size - i, &n);
+                     i += n;
+ 
+                     if (alloced || n == 0) {
+@@ -547,29 +547,29 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
+             if (alloced < 0) {
+                 ret = alloced;
+             } else {
+-                ret = backup_do_cow(job, offset, job->cluster_size,
++                ret = backup_do_cow(s, offset, s->cluster_size,
+                                     &error_is_read, false);
+             }
+             if (ret < 0) {
+                 /* Depending on error action, fail now or retry cluster */
+                 BlockErrorAction action =
+-                    backup_error_action(job, error_is_read, -ret);
++                    backup_error_action(s, error_is_read, -ret);
+                 if (action == BLOCK_ERROR_ACTION_REPORT) {
+                     break;
+                 } else {
+-                    offset -= job->cluster_size;
++                    offset -= s->cluster_size;
+                     continue;
+                 }
              }
          }
      }
-@@ -662,7 +658,7 @@ static void mirror_exit(Job *job, void *opaque)
-         aio_context_acquire(replace_aio_context);
-     }
  
--    if (s->should_complete && data->ret == 0) {
-+    if (s->should_complete && ret == 0) {
-         BlockDriverState *to_replace = src;
-         if (s->to_replace) {
-             to_replace = s->to_replace;
-@@ -679,7 +675,7 @@ static void mirror_exit(Job *job, void *opaque)
-         bdrv_drained_end(target_bs);
-         if (local_err) {
-             error_report_err(local_err);
--            data->ret = -EPERM;
-+            ret = -EPERM;
-         }
-     }
-     if (s->to_replace) {
-@@ -710,12 +706,12 @@ static void mirror_exit(Job *job, void *opaque)
-     blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
+-    notifier_with_return_remove(&job->before_write);
++    notifier_with_return_remove(&s->before_write);
  
-     bs_opaque->job = NULL;
--    job_completed(job, data->ret);
+     /* wait until pending backup_do_cow() calls have completed */
+-    qemu_co_rwlock_wrlock(&job->flush_rwlock);
+-    qemu_co_rwlock_unlock(&job->flush_rwlock);
+-    hbitmap_free(job->copy_bitmap);
++    qemu_co_rwlock_wrlock(&s->flush_rwlock);
++    qemu_co_rwlock_unlock(&s->flush_rwlock);
++    hbitmap_free(s->copy_bitmap);
  
--    g_free(data);
-     bdrv_drained_end(src);
-     bdrv_unref(mirror_top_bs);
-     bdrv_unref(src);
-+
-+    job->ret = ret;
- }
- 
- static void mirror_throttle(MirrorBlockJob *s)
-@@ -815,7 +811,6 @@ static int mirror_flush(MirrorBlockJob *s)
- static int coroutine_fn mirror_run(Job *job, Error **errp)
- {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
--    MirrorExitData *data;
-     BlockDriverState *bs = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     bool need_drain = true;
-@@ -1035,14 +1030,10 @@ immediate_exit:
-     g_free(s->in_flight_bitmap);
-     bdrv_dirty_iter_free(s->dbi);
- 
--    data = g_malloc(sizeof(*data));
--    data->ret = ret;
--
-     if (need_drain) {
-         bdrv_drained_begin(bs);
-     }
- 
--    job_defer_to_main_loop(&s->common.job, mirror_exit, data);
      return ret;
  }
- 
-@@ -1141,6 +1132,7 @@ static const BlockJobDriver mirror_job_driver = {
-         .user_resume            = block_job_user_resume,
-         .drain                  = block_job_drain,
-         .run                    = mirror_run,
-+        .exit                   = mirror_exit,
-         .pause                  = mirror_pause,
-         .complete               = mirror_complete,
-     },
-@@ -1157,6 +1149,7 @@ static const BlockJobDriver commit_active_job_driver = {
-         .user_resume            = block_job_user_resume,
-         .drain                  = block_job_drain,
-         .run                    = mirror_run,
-+        .exit                   = mirror_exit,
-         .pause                  = mirror_pause,
-         .complete               = mirror_complete,
-     },
 -- 
 2.14.4
