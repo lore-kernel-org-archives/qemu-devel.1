@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lightn1ngstr1ke@protonmail.com>) id 1fvQ5j-0001u4-Vm
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:46:49 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fvQa6-0003F1-Cm
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lightn1ngstr1ke@protonmail.com>) id 1fvPuq-0002AW-9t
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:35:31 -0400
-Received: from mail-40133.protonmail.ch ([185.70.40.133]:29499)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lightn1ngstr1ke@protonmail.com>)
-	id 1fvPup-00027H-67
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:35:28 -0400
-Date: Thu, 30 Aug 2018 16:35:18 +0000
-From: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
-Reply-To: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
-Message-ID: <VfOZq_8WA8_tWfpd_mx7RajgNVmE8Qm0NSeInrS-66gCH0OTsrgsXV3kVPOQkk0TpC_7xBuegwMuM27aS7yK78nonRd1GjNgv4tZQian1Qs=@protonmail.com>
-In-Reply-To: <20180830105102.mk3p4rnpge7f2n4h@sirius.home.kraxel.org>
-References: <petKSachdmuxWMgY2EXHzES3PpUCAUwQacKEaIU9PHykNXfsah1sP3OaVuDLz0VBYJM7qtJsWSrv3U9bkb_2LT_itBxDbAYKIHlEJJXtEiE=@protonmail.com>
-	<20180827101609.p2blhd7ka7gkqqtq@sirius.home.kraxel.org>
-	<CSjEdwPfIMyBPsRNM1KZG7ugmTMLh2leLbHEBEQ2o0UjHftEBoh98TcX-xoHTgjDAW7Vn1psMATSN_4IS68-sdTWKkd32SL-HGN5A5-pqz0=@protonmail.com>
-	<20180830105102.mk3p4rnpge7f2n4h@sirius.home.kraxel.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fvQSy-00047c-Bp
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:10:45 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35803)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fvQSy-00045w-5a
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 13:10:44 -0400
+Received: by mail-wr1-x442.google.com with SMTP id j26-v6so8758365wre.2
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 10:10:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20180828153840.22519-1-marcandre.lureau@redhat.com>
+	<20180828184312.6e0e417d@redhat.com>
+	<CAJ+F1CLvye1F9xKskpPiogeTU+54+=Lurg3qX4cYpq1=r5sNaQ@mail.gmail.com>
+	<CAJ+F1C+7zis5wmV_V9MuL5bMvPp9CnCuUrg_yQgQuYM3p_3xxA@mail.gmail.com>
+	<20180829105009.07e5255f@redhat.com>
+	<CAJ+F1CLniMjFc1PCYqeBSkSJJ-sCk+PKvjupdurXKez9wedA4w@mail.gmail.com>
+	<20180830102006.5aaf9054@redhat.com>
+In-Reply-To: <20180830102006.5aaf9054@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 30 Aug 2018 19:10:31 +0200
+Message-ID: <CAJ+F1C+uk+acJhxJtc0E79cVTQxY=x+u8GKWLqGZ6mP7F=NfCg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] input-linux: toggle for lock keys
+Subject: Re: [Qemu-devel] [PATCH] hostmem-memfd: honour share=on/off property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +35,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On August 30, 2018 6:51 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+Hi
 
-> On Mon, Aug 27, 2018 at 01:49:22PM +0000, Ryan El Kochta wrote:
+On Thu, Aug 30, 2018 at 10:20 AM Igor Mammedov <imammedo@redhat.com> wrote:
 >
-> > I personally use the Scroll Lock key. On Linux, Scroll Lock (along
-> > with all the other lock keys) is easy to disable with an xmodmap
-> > command. On Windows (or, I'd assume, other guests), it requires third
-> > party software, which is why it's likely easier to just filter them
-> > out from QEMU.
+> On Wed, 29 Aug 2018 14:36:00 +0200
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 >
-> Ok, disable with xmodmap is a reasonable approach for that key.
-> I think it would be a good idea to document that.
+> > Hi
+> >
+> > On Wed, Aug 29, 2018 at 10:50 AM Igor Mammedov <imammedo@redhat.com> wr=
+ote:
+> > >
+> > > On Tue, 28 Aug 2018 18:55:35 +0200
+> > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+> > >
+> > > > On Tue, Aug 28, 2018 at 6:54 PM Marc-Andr=C3=A9 Lureau
+> > > > <marcandre.lureau@gmail.com> wrote:
+> > > > >
+> > > > > Hi
+> > > > >
+> > > > > On Tue, Aug 28, 2018 at 6:49 PM Igor Mammedov <imammedo@redhat.co=
+m> wrote:
+> > > > > >
+> > > > > > On Tue, 28 Aug 2018 17:38:40 +0200
+> > > > > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> > > > > >
+> > > > > > > The share=3Don/off property is used to modified mmap() MAP_SH=
+ARED
+> > > > > > > setting. Make it on by default for convenience and compatibil=
+ity
+> > > > > > > reasons.
+> > > > > > it would be nice to state reasons here.
+> > > > > >
+> > > > > > also flipping default to on is behavioral change when
+> > > > > > used with bind policy which could make backend initialization f=
+ail
+> > > > > > so CLI that used to work (if there are any users of this withou=
+t shared=3Don)
+> > > > > > won't work anymore.
+> > > > >
+> > > > > memfd backend is passing shared=3Dtrue to memory_region_init_ram_=
+from_fd().
+> > > > >
+> > > > > The patch allows to tweak that (instead of ignoring the property)=
+,
+> > > > > while keeping the value to shared=3Dtrue.
+> > > >
+> > > > keeping the default value to shared=3Dtrrue.
+> > > ok,
+> > > another question:
+> > >  does it make sense to allow "shared=3Dfalse" at all?
+> > >  should we bail out if user asks for it?
+> >
+> > You may want to use memfd for convenience (no need to specify hugetlb
+> > mem-path for ex), without the share memory aspects.
+> ok, acked.
 >
-> I'd suggest to add a single option, to configure alternative toggle
-> key(s), with just a few hard-coded variants which actually make sense.
-> Something like grab-toggle=3D{two-shift,scroll-lock}. Not sure whenever
-> we need the other lock keys. scroll lock is probably the
-> least-frequently used key and therefore the best choice for the
-> purpose.
->
-> In case scroll-lock is selected we can automatically ignore it, without
-> ignore_scroll_lock=3Doff option.
->
-> cheers,
-> Gerd
+> btw:
+> looking at memfd_backend_memory_alloc/file_backend_memory_alloc
+> both needlessly are are calling host_memory_backend_mr_inited()
+> which creates an illusion that alloc could be called multiple times
+> but it isn't, could you clean that up?
 
-That's a wonderful idea. Would you be comfortable with
-grab_toggle=3Dcustom:x:x as well?
+ok
 
-Thanks,
+>
+> In addition a following error path needs fixing
+> memfd_backend_memory_alloc()
+>      if (fd =3D=3D -1) {
+>         return;
+>     }
+> it must set errp
 
-Ryan El Kochta
+The error is already set by qemu_memfd_create()
+
+>
+> >
+> > (but the patch was mostly for completeness)
+> >
+> > >
+> > > >
+> > > > >
+> > > > > >
+> > > > > > >
+> > > > > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redha=
+t.com>
+> > > > > > > ---
+> > > > > > >  backends/hostmem-memfd.c | 4 +++-
+> > > > > > >  qemu-options.hx          | 4 +++-
+> > > > > > >  2 files changed, 6 insertions(+), 2 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memf=
+d.c
+> > > > > > > index 1e20fe0ba8..abd52364db 100644
+> > > > > > > --- a/backends/hostmem-memfd.c
+> > > > > > > +++ b/backends/hostmem-memfd.c
+> > > > > > > @@ -59,7 +59,8 @@ memfd_backend_memory_alloc(HostMemoryBacken=
+d *backend, Error **errp)
+> > > > > > >
+> > > > > > >      name =3D object_get_canonical_path(OBJECT(backend));
+> > > > > > >      memory_region_init_ram_from_fd(&backend->mr, OBJECT(back=
+end),
+> > > > > > > -                                   name, backend->size, true=
+, fd, errp);
+> > > > > > > +                                   name, backend->size,
+> > > > > > > +                                   backend->share, fd, errp)=
+;
+> > > > > > >      g_free(name);
+> > > > > > >  }
+> > > > > > >
+> > > > > > > @@ -131,6 +132,7 @@ memfd_backend_instance_init(Object *obj)
+> > > > > > >
+> > > > > > >      /* default to sealed file */
+> > > > > > >      m->seal =3D true;
+> > > > > > > +    MEMORY_BACKEND(m)->share =3D true;
+> > > > > > >  }
+> > > > > > >
+> > > > > > >  static void
+> > > > > > > diff --git a/qemu-options.hx b/qemu-options.hx
+> > > > > > > index f14e423b7c..25c02d72b8 100644
+> > > > > > > --- a/qemu-options.hx
+> > > > > > > +++ b/qemu-options.hx
+> > > > > > > @@ -4029,7 +4029,7 @@ Memory backend objects offer more contr=
+ol than the @option{-m} option that is
+> > > > > > >  traditionally used to define guest RAM. Please refer to
+> > > > > > >  @option{memory-backend-file} for a description of the option=
+s.
+> > > > > > >
+> > > > > > > -@item -object memory-backend-memfd,id=3D@var{id},merge=3D@va=
+r{on|off},dump=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},hos=
+t-nodes=3D@var{host-nodes},policy=3D@var{default|preferred|bind|interleave}=
+,seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsize=3D@var{size}
+> > > > > > > +@item -object memory-backend-memfd,id=3D@var{id},merge=3D@va=
+r{on|off},dump=3D@var{on|off},share=3D@var{on|off},prealloc=3D@var{on|off},=
+size=3D@var{size},host-nodes=3D@var{host-nodes},policy=3D@var{default|prefe=
+rred|bind|interleave},seal=3D@var{on|off},hugetlb=3D@var{on|off},hugetlbsiz=
+e=3D@var{size}
+> > > > > > >
+> > > > > > >  Creates an anonymous memory file backend object, which allow=
+s QEMU to
+> > > > > > >  share the memory with an external process (e.g. when using
+> > > > > > > @@ -4051,6 +4051,8 @@ with the @option{seal} option (requires=
+ at least Linux 4.16).
+> > > > > > >  Please refer to @option{memory-backend-file} for a descripti=
+on of the
+> > > > > > >  other options.
+> > > > > > >
+> > > > > > > +The @option{share} boolean option is @var{on} by default wit=
+h memfd.
+> > > > > > > +
+> > > > > > >  @item -object rng-random,id=3D@var{id},filename=3D@var{/dev/=
+random}
+> > > > > > >
+> > > > > > >  Creates a random number generator backend which obtains entr=
+opy from
+> > > > > >
+> > > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Marc-Andr=C3=A9 Lureau
+> > > >
+> > > >
+> > > >
+> > >
+> >
+> >
+>
+
+thanks
+
+--=20
+Marc-Andr=C3=A9 Lureau
