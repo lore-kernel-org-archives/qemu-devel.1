@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fvT4O-0006HF-3K
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 15:57:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1fvT54-0007Ra-Sv
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 15:58:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fvT4N-0001Te-Dz
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 15:57:32 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180830122756.13991-1-david@redhat.com>
-	<20180830122756.13991-10-david@redhat.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <ced75c42-3e34-9b32-a93a-311fd358c432@twiddle.net>
-Date: Thu, 30 Aug 2018 12:57:24 -0700
+	(envelope-from <eblake@redhat.com>) id 1fvT54-0001bY-13
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 15:58:14 -0400
+References: <20180830015734.19765-1-jsnow@redhat.com>
+	<20180830015734.19765-3-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6ed2e7ac-8de1-bd7b-0787-fdd33c6b306e@redhat.com>
+Date: Thu, 30 Aug 2018 14:58:00 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180830122756.13991-10-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180830015734.19765-3-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 9/9] s390x/tcg: refactor specification
- checking
+Subject: Re: [Qemu-devel] [PATCH v3 2/9] jobs: canonize Error object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,18 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 08/30/2018 05:27 AM, David Hildenbrand wrote:
-> We can fit this nicely into less LOC, without harming readability.
+On 08/29/2018 08:57 PM, John Snow wrote:
+> Jobs presently use both an Error object in the case of the create job,
+> and char strings in the case of generic errors elsewhere.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Unify the two paths as just j->err, and remove the extra argument from
+> job_completed. The integer error code for job_completed is kept for now,
+> to be removed shortly in a separate patch.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  target/s390x/translate.c | 34 ++++++----------------------------
->  1 file changed, 6 insertions(+), 28 deletions(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> +++ b/job.c
 
+> @@ -666,8 +666,8 @@ static void job_update_rc(Job *job)
+>           job->ret = -ECANCELED;
+>       }
+>       if (job->ret) {
+> -        if (!job->error) {
+> -            job->error = g_strdup(strerror(-job->ret));
+> +        if (!job->err) {
+> +            error_setg(&job->err, "%s", g_strdup(strerror(-job->ret)));
 
-r~
+Memleak. Drop the g_strdup(), and just directly pass strerror() results 
+to error_setg().  (I guess we can't quite use error_setg_errno() unless 
+we add additional text beyond the strerror() results).
+
+With that fixed,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
