@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fvNTF-0006YP-Cy
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:58:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1fvNZu-0003sE-Vz
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 10:05:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fvNTE-0003AW-22
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:58:49 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:53859)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fvNTD-00039J-Nn
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 09:58:47 -0400
-Received: by mail-wm0-x242.google.com with SMTP id b19-v6so2108145wme.3
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 06:58:47 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fvNZo-0006hf-RH
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 10:05:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48552 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fvNZm-0006e6-TF
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 10:05:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DC0EE7A7E5
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 14:05:30 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180815133747.25032-1-peterx@redhat.com>
+	<20180815133747.25032-4-peterx@redhat.com>
+	<87tvngt3a6.fsf@dusky.pond.sub.org>
+Date: Thu, 30 Aug 2018 16:05:25 +0200
+In-Reply-To: <87tvngt3a6.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Mon, 27 Aug 2018 14:14:25 +0200")
+Message-ID: <871sag2bmi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20180810153223.28409-1-marcandre.lureau@redhat.com>
-	<20180810153223.28409-2-marcandre.lureau@redhat.com>
-	<CAJ+F1CJFOer5vAy63eQ_YKx2jnq=TC7X9ChkC-=qA=QHZv9kXA@mail.gmail.com>
-	<bddfd186-b4ab-5007-4936-a31bc701d1c4@linux.vnet.ibm.com>
-In-Reply-To: <bddfd186-b4ab-5007-4936-a31bc701d1c4@linux.vnet.ibm.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 30 Aug 2018 15:58:33 +0200
-Message-ID: <CAJ+F1CLp-tD8=MfC5TWpqE9_oF0f3DXPeNYTdyQs1J=6CP8Luw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 1/6] hw/i386: add pc-i440fx-3.1 &
- pc-q35-3.1
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 03/13] qapi: remove error checks for
+ event emission
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,131 +35,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan
+	Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Hi
-On Thu, Aug 30, 2018 at 3:54 PM Stefan Berger
-<stefanb@linux.vnet.ibm.com> wrote:
+Markus Armbruster <armbru@redhat.com> writes:
+
+> Peter Xu <peterx@redhat.com> writes:
 >
-> On 08/28/2018 10:05 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > ping
-> > On Fri, Aug 10, 2018 at 5:34 PM Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@redhat.com> wrote:
-> >> The following patch is going to add compatiblity parameters.
-> >>
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >> ---
-> >>   include/hw/compat.h  |  4 +++-
-> >>   include/hw/i386/pc.h |  5 ++++-
-> >>   hw/i386/pc_piix.c    | 13 ++++++++++++-
-> >>   hw/i386/pc_q35.c     | 12 +++++++++++-
-> >>   4 files changed, 30 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> >> index c08f4040bb..f8e596969a 100644
-> >> --- a/include/hw/compat.h
-> >> +++ b/include/hw/compat.h
-> >> @@ -1,7 +1,9 @@
-> >>   #ifndef HW_COMPAT_H
-> >>   #define HW_COMPAT_H
-> >>
-> >> -#define HW_COMPAT_2_12 \
-> >> +#define HW_COMPAT_3_0
-> Should probably be 3_1 now?
-> >> +
-> >> +#define HW_COMPAT_2_12                          \
-> >>       {\
-> >>           .driver   =3D "migration",\
-> >>           .property =3D "decompress-error-check",\
-> >> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> >> index 6894f37df1..09b0365a8e 100644
-> >> --- a/include/hw/i386/pc.h
-> >> +++ b/include/hw/i386/pc.h
-> >> @@ -294,7 +294,10 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> >>   int e820_get_num_entries(void);
-> >>   bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> >>
-> >> -#define PC_COMPAT_2_12 \
-> >> +#define PC_COMPAT_3_0 \
-> Same here?
-> >> +    HW_COMPAT_3_0
-> >> +
-> >> +#define PC_COMPAT_2_12                          \
-> >>       HW_COMPAT_2_12 \
-> >>       {\
-> >>           .driver   =3D TYPE_X86_CPU,\
-> >> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> >> index dc09466b3e..7db1fa88ef 100644
-> >> --- a/hw/i386/pc_piix.c
-> >> +++ b/hw/i386/pc_piix.c
-> >> @@ -428,13 +428,24 @@ static void pc_i440fx_machine_options(MachineCla=
-ss *m)
-> >>       machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
-> >>   }
-> >>
-> >> -static void pc_i440fx_3_0_machine_options(MachineClass *m)
-> >> +static void pc_i440fx_3_1_machine_options(MachineClass *m)
-> >>   {
-> >>       pc_i440fx_machine_options(m);
-> >>       m->alias =3D "pc";
-> >>       m->is_default =3D 1;
-> >>   }
-> >>
-> >> +DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-> >> +                      pc_i440fx_3_1_machine_options);
-> >> +
-> >> +static void pc_i440fx_3_0_machine_options(MachineClass *m)
-> should this be the 3_1  rather than the one above?
-
-3_1 is just above :)
-
-> >> +{
-> >> +    pc_i440fx_machine_options(m);
-> >> +    m->is_default =3D 0;
-> >> +    m->alias =3D NULL;
-> >> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> >> +}
-> >> +
-> >>   DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-> >>                         pc_i440fx_3_0_machine_options);
-> >>
-> >> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> >> index 532241e3f8..cb1980a088 100644
-> >> --- a/hw/i386/pc_q35.c
-> >> +++ b/hw/i386/pc_q35.c
-> >> @@ -311,12 +311,22 @@ static void pc_q35_machine_options(MachineClass =
-*m)
-> >>       m->max_cpus =3D 288;
-> >>   }
-> >>
-> >> -static void pc_q35_3_0_machine_options(MachineClass *m)
-> >> +static void pc_q35_3_1_machine_options(MachineClass *m)
-> >>   {
-> >>       pc_q35_machine_options(m);
-> >>       m->alias =3D "q35";
-> >>   }
-> >>
-> >> +DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-> >> +                   pc_q35_3_1_machine_options);
-> >> +
-> >> +static void pc_q35_3_0_machine_options(MachineClass *m)
-> >> +{
-> >> +    pc_q35_machine_options(m);
-> >> +    m->alias =3D NULL;
-> >> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> >> +}
-> >> +
-> >>   DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
-> >>                       pc_q35_3_0_machine_options);
-> >>
-> >> --
-> >> 2.18.0.547.g1d89318c48
-> >>
-> >>
-> >
+>> In the whole QAPI event emission code we're passing in an Error* object
+>> along the whole stack.  That's never useful since it never fails after
+>> all.  Remove that.
 >
+> This is the interesting part.  We'll see below why it can't fail.
+>
+>> Then, remove that parameter from all the callers to send an event.
+>
+> This is the mechanical part.  The callers pass &error_abort, except for
+> one that passes NULL.
+>
+> The patch moves the &error_abort argument from the qapi_event_send_FOO()
+> calls to the places where the argument is used.  No effect except for
+> the caller that passes NULL.  That one now asserts "no error".
+>
+>> Suggested-by: Eric Blake <eblake@redhat.com>
+>> Suggested-by: Markus Armbruster <armbru@redhat.com>
+>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>> ---
+>
+> Patch quoted except for the parts that drop &error_abort from
+> qapi_event_send_FOO() calls:
+>
+> [...]
+>> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+>> index c2e11465f0..6d3cffd548 100644
+>> --- a/docs/devel/qapi-code-gen.txt
+>> +++ b/docs/devel/qapi-code-gen.txt
+
+Missing:
+
+   @@ -1340,7 +1340,7 @@ Example:
+        #include "example-qapi-types.h"
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+   -    void qapi_event_send_my_event(Error **errp);
+   +    void qapi_event_send_my_event(void);
+
+        typedef enum example_QAPIEvent {
+            EXAMPLE_QAPI_EVENT_MY_EVENT = 0,
+
+>> @@ -1356,10 +1356,9 @@ Example:
+>>      $ cat qapi-generated/example-qapi-events.c
+>>  [Uninteresting stuff omitted...]
+>>  
+>> -    void qapi_event_send_my_event(Error **errp)
+>> +    void qapi_event_send_my_event(void)
+>>      {
+>>          QDict *qmp;
+>> -        Error *err = NULL;
+>>          QMPEventFuncEmit emit;
+>>  
+>>          emit = qmp_event_get_func_emit();
+>> @@ -1369,9 +1368,8 @@ Example:
+>>  
+>>          qmp = qmp_event_build_dict("MY_EVENT");
+>>  
+>> -        emit(EXAMPLE_QAPI_EVENT_MY_EVENT, qmp, &err);
+>> +        emit(EXAMPLE_QAPI_EVENT_MY_EVENT, qmp);
+>>  
+>> -        error_propagate(errp, err);
+>>          qobject_unref(qmp);
+>>      }
+>>  
+[...]
