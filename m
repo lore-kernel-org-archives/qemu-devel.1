@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fvPll-0001TU-OS
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:26:06 -0400
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1fvQ5T-0001kP-M6
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fvPlh-0004sa-OL
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:26:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52330)
+	(envelope-from <ard.biesheuvel@linaro.org>) id 1fvQ2d-0007An-42
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:43:31 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:43409)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fvPlg-0004o0-WB
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:26:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fvPlb-0007KP-Kp
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 16:25:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9C7982E819B
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 16:25:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+	id 1fvQ2c-0007AQ-Tz
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 12:43:31 -0400
+Received: by mail-io0-x243.google.com with SMTP id y10-v6so8085749ioa.10
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 09:43:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Aug 2018 16:11:13 -0000
-From: Daniel Berrange <1788665@bugs.launchpad.net>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153564547388.21269.11744802226255170183.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+In-Reply-To: <CAFEAcA-83-mQAbAvsypXBjFRD9h_St5Sjy+ntAc-jyZ7uDssAg@mail.gmail.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA9hivJzqksiSZbco4+EysYj=_y0t3k_L7TobxNPS8T2dQ@mail.gmail.com>
+	<CAHmQWvC4Kp1CAeCe8ZTGtSeG7fnT=Xen4GFKfnhTBWUCJdQV+g@mail.gmail.com>
+	<20180829134219.cmyqipnvukk6k2rp@kamzik.brq.redhat.com>
+	<CAHmQWvA5t7zbbDDM0UvuKSL_Z8ey+x+vOGZumYjwsq0FC5AHGA@mail.gmail.com>
+	<20180830083117.iekobw7l3arkt24m@bivouac.eciton.net>
+	<CAFEAcA_s+9-4PYHyx_aAnxwt4e=VH77uBG7rC4JA++nOyjAaPw@mail.gmail.com>
+	<20180830100233.nr6fm3npy57zl4xx@bivouac.eciton.net>
+	<CAKv+Gu9r+1OBOSUBW_KpDEEoKyc=iwW4zVEe04-_JUnJtSGupQ@mail.gmail.com>
+	<CAFEAcA-83-mQAbAvsypXBjFRD9h_St5Sjy+ntAc-jyZ7uDssAg@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Thu, 30 Aug 2018 18:43:29 +0200
+Message-ID: <CAKv+Gu9SLMLrG1fQhF_qFpLWqa4dDn4DrXNqVvNbhi_UnSJTZQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,102 +39,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Leif Lindholm <leif.lindholm@linaro.org>, Hongbo Zhang <hongbo.zhang@linaro.org>, Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-There is always a performance differential between bare metal & VMs. The
-actual amount varies depending on alot of different factors and
-meltdown/spectre have had an effect here - the actual perf hit depends
-on the CPU models & virtual hardware and more besides - ranging anywhere
-from 0% to 40% perf hit
+On 30 August 2018 at 18:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 30 August 2018 at 14:29, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>> How exactly the firmware figures out how many CPUs and how much memory
+>> we are running with is out of scope for this, and so I don't think
+>> there is a need to build something from scratch here: DT will do just
+>> fine, given that both EDK2 and ARM-TF have working DT code for these
+>> things.
+>>
+>> fw_cfg, on the other hand, is unsuitable for us. Generating ACPI
+>> tables in a different way from actual bare metal is not a good idea,
+>> given that things like RAS interact with ACPI as well, and fw_cfg is
+>> also exposed to the OS in the default mach-virt configuration. So we
+>> could tweak fw_cfg to be more suitable, but I think that does not
+>> improve the usefulness of our prototype at all.
+>
+> fw_cfg is an entirely generic transport for passing named
+> data blobs from QEMU to the other end. You don't have to
+> pass ACPI table fragments over it the way we do for
+> virt and the x86 PC platforms if you don't want that.
 
-The guest VM *does* know about the Spectre mitigation because it is
-being given the "ibrs" feature which is sufficient for guest OS to
-mitigate the problem.  STIBP is only needed by the host.  Exposing
-microcode version to the guest is not required as OS should only need to
-look at the features provided to determine if it can mitigate the flaws.
-The complaints about microcode version from spectre-meltdown-checker.sh
-are a bug in that script. The important parts are the "STATUS: NOT
-VULNERABLE" lines
+Sure. But the point is that fw_cfg does not really describe anything
+that is useful to us. The information that we need in ARM-TF, and
+-directly or indirectly- in UEFI is currently provided via the DT that
+is passed in memory, and at the moment, I don't see a reason to change
+that since it doesn't conflict with the goals we have for this
+prototype. Relying on an emulated device which should never exist on
+actual hardware does.
 
-If you disable Spectre protection in the Windows VM, then it is not
-protected from Spectre. The hypervisor protects itself, and exposes the
-CPU feature(s) that enable the guest to activate its own protection. The
-hypervisor won't protect the guest directly - it just gives it the tools
-needed to protect itself.
+> It's true that it's visible to the OS in the sense that it's
+> a physical device in the system, but so is a hardware connection
+> to an SCP.
+>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
-
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
-
-Status in QEMU:
-  New
-
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+Such a connection would not be exposed to the OS on a arm64 server system.
