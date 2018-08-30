@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvRzA-0008HN-D8
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:48:08 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fvRzJ-0000CM-03
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvRmD-0000hU-Ge
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:34:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60000 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fvRzD-0008MJ-QT
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:48:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43774)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fvRmD-0000h2-Bh
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:34:41 -0400
-References: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
-	<1535644031-848-3-git-send-email-Liam.Merwick@oracle.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <83875cdc-3238-fafa-7c96-21d1df89b37a@redhat.com>
-Date: Thu, 30 Aug 2018 13:34:39 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fvRzD-0008M5-KE
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:48:07 -0400
+Date: Thu, 30 Aug 2018 15:47:58 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180830184758.GM8359@habkost.net>
+References: <20180830105757.10577-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1535644031-848-3-git-send-email-Liam.Merwick@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/8] job: Fix off-by-one accesses to JobSTT
- and JobVerbTable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180830105757.10577-1-berrange@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] i386: clarify that the Q35 machine type
+ implements a P35 chipset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <Liam.Merwick@oracle.com>, qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Cole Robinson <crobinso@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laine Stump <laine@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 08/30/2018 10:47 AM, Liam Merwick wrote:
-> In the array dereference of JobVerbTable[verb] in job_apply_verb()
-> the check of the index, verb, allows an overrun because an index
-> equal to the array size is permitted.
-> 
-> Similarly, in the array dereference of JobSTT[s0][s1] with index s1
-> in job_state_transition(), an off-by-one overrun is possible.
+On Thu, Aug 30, 2018 at 11:57:57AM +0100, Daniel P. Berrang=E9 wrote:
+[...]
+> diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
+> index 63acc722a9..eeb33018ad 100644
+> --- a/include/hw/pci/pci_ids.h
+> +++ b/include/hw/pci/pci_ids.h
+> @@ -255,7 +255,7 @@
+>  #define PCI_DEVICE_ID_INTEL_82801I_EHCI2 0x293c
+>  #define PCI_DEVICE_ID_INTEL_82599_SFP_VF 0x10ed
+> =20
+> -#define PCI_DEVICE_ID_INTEL_Q35_MCH      0x29c0
+> +#define PCI_DEVICE_ID_INTEL_P35_MCH      0x29c0
 
-Fortunately, these are just assertions that are too weak; we don't have 
-any actual callers passing the __MAX entry to cause an actual overrun.
+I took a while to notice that this patch isn't actually changing
+the PCI ID, but just renaming the constant.
 
-> 
-> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
-> Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
-> Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
-> ---
->   job.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> =20
+>  #define PCI_VENDOR_ID_XEN                0x5853
+>  #define PCI_DEVICE_ID_XEN_PLATFORM       0x0001
+> --=20
+> 2.17.1
+>=20
 
-> 
-> diff --git a/job.c b/job.c
-> index e36ebaafd81c..40320566f43b 100644
-> --- a/job.c
-> +++ b/job.c
-> @@ -166,7 +166,7 @@ bool job_is_internal(Job *job)
->   static void job_state_transition(Job *job, JobStatus s1)
->   {
->       JobStatus s0 = job->status;
-> -    assert(s1 >= 0 && s1 <= JOB_STATUS__MAX);
-> +    assert(s1 >= 0 && s1 < JOB_STATUS__MAX);
->       trace_job_state_transition(job, job->ret,
->                                  JobSTT[s0][s1] ? "allowed" : "disallowed",
->                                  JobStatus_str(s0), JobStatus_str(s1));
-> @@ -181,7 +181,7 @@ static void job_state_transition(Job *job, JobStatus s1)
->   int job_apply_verb(Job *job, JobVerb verb, Error **errp)
->   {
->       JobStatus s0 = job->status;
-> -    assert(verb >= 0 && verb <= JOB_VERB__MAX);
-> +    assert(verb >= 0 && verb < JOB_VERB__MAX);
->       trace_job_apply_verb(job, JobStatus_str(s0), JobVerb_str(verb),
->                            JobVerbTable[verb][s0] ? "allowed" : "prohibited");
->       if (JobVerbTable[verb][s0]) {
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--=20
+Eduardo
