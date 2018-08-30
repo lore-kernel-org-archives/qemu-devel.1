@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fvS4V-0005R6-ML
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:53:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fvSF7-0003SV-0m
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 15:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fvS4Q-0003Zp-Iy
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:53:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42474)
+	(envelope-from <ehabkost@redhat.com>) id 1fvSF3-0000xF-Ry
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 15:04:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41496)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fvS4Q-0003ZX-AM
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 14:53:30 -0400
-Date: Thu, 30 Aug 2018 15:53:23 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fvSF3-0000w4-Hm
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 15:04:29 -0400
+Date: Thu, 30 Aug 2018 16:04:24 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180830185323.GO8359@habkost.net>
-References: <20180810153223.28409-1-marcandre.lureau@redhat.com>
-	<20180810153223.28409-2-marcandre.lureau@redhat.com>
+Message-ID: <20180830190424.GQ8359@habkost.net>
+References: <1535644216-111422-1-git-send-email-peng.hao2@zte.com.cn>
+	<1535644216-111422-2-git-send-email-peng.hao2@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180810153223.28409-2-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 1/6] hw/i386: add pc-i440fx-3.1 &
- pc-q35-3.1
+In-Reply-To: <1535644216-111422-2-git-send-email-peng.hao2@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V5 1/4] target-i386: introduce
+ coalesced_pio kvm header update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,124 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, stefanb@linux.vnet.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peng Hao <peng.hao2@zte.com.cn>
+Cc: pbonzini@redhat.com, rkrcmar@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, zhong.weidong@zte.com.cn
 
-On Fri, Aug 10, 2018 at 05:32:18PM +0200, Marc-Andr=E9 Lureau wrote:
-> The following patch is going to add compatiblity parameters.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/hw/compat.h  |  4 +++-
->  include/hw/i386/pc.h |  5 ++++-
->  hw/i386/pc_piix.c    | 13 ++++++++++++-
->  hw/i386/pc_q35.c     | 12 +++++++++++-
->  4 files changed, 30 insertions(+), 4 deletions(-)
->=20
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index c08f4040bb..f8e596969a 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -1,7 +1,9 @@
->  #ifndef HW_COMPAT_H
->  #define HW_COMPAT_H
-> =20
-> -#define HW_COMPAT_2_12 \
-> +#define HW_COMPAT_3_0
-> +
-> +#define HW_COMPAT_2_12                          \
->      {\
->          .driver   =3D "migration",\
->          .property =3D "decompress-error-check",\
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 6894f37df1..09b0365a8e 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -294,7 +294,10 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
->  int e820_get_num_entries(void);
->  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> =20
-> -#define PC_COMPAT_2_12 \
-> +#define PC_COMPAT_3_0 \
-> +    HW_COMPAT_3_0
-> +
-> +#define PC_COMPAT_2_12                          \
->      HW_COMPAT_2_12 \
->      {\
->          .driver   =3D TYPE_X86_CPU,\
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index dc09466b3e..7db1fa88ef 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -428,13 +428,24 @@ static void pc_i440fx_machine_options(MachineClas=
-s *m)
->      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
->  }
-> =20
-> -static void pc_i440fx_3_0_machine_options(MachineClass *m)
-> +static void pc_i440fx_3_1_machine_options(MachineClass *m)
->  {
->      pc_i440fx_machine_options(m);
->      m->alias =3D "pc";
->      m->is_default =3D 1;
->  }
-> =20
-> +DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-> +                      pc_i440fx_3_1_machine_options);
-> +
-> +static void pc_i440fx_3_0_machine_options(MachineClass *m)
-> +{
-> +    pc_i440fx_machine_options(m);
+On Thu, Aug 30, 2018 at 11:50:13PM +0800, Peng Hao wrote:
+> add coalesced_pio's struct and KVM_CAP_COALESCED_PIO header.
+> 
+> Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-This should be pc_i440fx_3_1_machine_options().
+I think there was a misunderstanding. I never sent a Reviewed-by
+line for this patch, because we need to get the KVM patch
+accepted before including this.
 
-
-> +    m->is_default =3D 0;
-> +    m->alias =3D NULL;
-> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> +}
-> +
->  DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
->                        pc_i440fx_3_0_machine_options);
-> =20
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 532241e3f8..cb1980a088 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -311,12 +311,22 @@ static void pc_q35_machine_options(MachineClass *=
-m)
->      m->max_cpus =3D 288;
->  }
-> =20
-> -static void pc_q35_3_0_machine_options(MachineClass *m)
-> +static void pc_q35_3_1_machine_options(MachineClass *m)
->  {
->      pc_q35_machine_options(m);
->      m->alias =3D "q35";
->  }
-> =20
-> +DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-> +                   pc_q35_3_1_machine_options);
-> +
-> +static void pc_q35_3_0_machine_options(MachineClass *m)
-> +{
-> +    pc_q35_machine_options(m);
-
-This should be pc_q35_3_1_machine_options().
-
-The rest of the patch looks good to me.
-
-> +    m->alias =3D NULL;
-> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
-> +}
-> +
->  DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
->                      pc_q35_3_0_machine_options);
-> =20
-> --=20
-> 2.18.0.547.g1d89318c48
->=20
->=20
-
---=20
+-- 
 Eduardo
