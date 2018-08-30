@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fvOAP-0005zO-8U
+	(envelope-from <sameeh@daynix.com>) id 1fvOAP-0004cp-EB
 	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 10:43:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fvNut-0003eS-8Q
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 10:27:24 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37706)
+	(envelope-from <sameeh@daynix.com>) id 1fvNum-0003ap-Vv
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 10:27:21 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:54504)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fvNus-0003d4-Ts
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 10:27:23 -0400
-Received: by mail-wm0-x242.google.com with SMTP id n11-v6so2227062wmc.2
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 07:27:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fvNum-0003Z1-Mf
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 10:27:16 -0400
+Received: by mail-wm0-x241.google.com with SMTP id c14-v6so2210868wmb.4
+	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 07:27:16 -0700 (PDT)
 From: Sameeh Jubran <sameeh@daynix.com>
-Date: Thu, 30 Aug 2018 17:27:07 +0300
-Message-Id: <20180830142708.14311-6-sameeh@daynix.com>
+Date: Thu, 30 Aug 2018 17:27:03 +0300
+Message-Id: <20180830142708.14311-2-sameeh@daynix.com>
 In-Reply-To: <20180830142708.14311-1-sameeh@daynix.com>
 References: <20180830142708.14311-1-sameeh@daynix.com>
-Subject: [Qemu-devel] [RFC 5/6] virtio-net: steering mode: Implement rss
- support
+Subject: [Qemu-devel] [RFC 1/6] Add bpf support to qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,161 +30,160 @@ Cc: Yan Vugenfirer <yan@daynix.com>
 
 From: Sameeh Jubran <sjubran@redhat.com>
 
+This commit adds the bpf header provided by Linux to Qemu.
+
 Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
 ---
- hw/net/virtio-net.c | 122 ++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 105 insertions(+), 17 deletions(-)
+ MAINTAINERS                     |  5 +++++
+ configure                       | 44 +++++++++++++++++++++++++++++++++++++++++
+ scripts/update-linux-headers.sh |  8 ++++++--
+ 3 files changed, 55 insertions(+), 2 deletions(-)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index e7c4ce6f66..4a52a6a1d0 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -972,41 +972,129 @@ static int virtio_net_handle_mq(VirtIONet *n, uint8_t cmd,
-     return VIRTIO_NET_OK;
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0fb5f38f9f..bf2619239c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2126,6 +2126,11 @@ F: hw/rdma/*
+ F: hw/rdma/vmw/*
+ F: docs/pvrdma.txt
  
--static int virtio_net_ctrl_steering_mode(VirtIONet *n, uint8_t cmd,
++BPF
++M: Sameeh Jubran <sameeh@daynix.com>
++S: Maintained
++F: linux-headers/linux/bpf.h
 +
-+static int virtio_net_ctrl_sm_rss(VirtIONet *n, uint32_t cmd,
-                                 struct iovec *iov, unsigned int iov_cnt,
-                                 struct iovec *iov_in, unsigned int iov_cnt_in,
--        size_t *size_in)
-+                                size_t *size_in)
-+{
-+    size_t s;
-+    uint32_t supported_hash_function = 0;
-+
-+    switch (cmd) {
-+    case VIRTIO_NET_SM_CTRL_RSS_GET_SUPPORTED_FUNCTIONS:
-+        supported_hash_function |= RSS_HASH_FUNCTION_TOEPLITZ;
-+        if (!size_in) {
-+            return VIRTIO_NET_ERR;
-+        }
-+        s = iov_from_buf(iov_in, iov_cnt_in, 0,
-+        &supported_hash_function,
-+        supported_hash_function);
-+        if (s != sizeof(n->supported_modes) ||
-+        !size_in) {
-+            return VIRTIO_NET_ERR;
-+        }
-+        *size_in = s;
-+        break;
-+    case VIRTIO_NET_SM_CTRL_RSS_SET:
-+        if (!n->rss_conf) {
-+            n->rss_conf = g_malloc0(
-+                    sizeof(struct virtio_net_rss_conf));
-+        } else if (iov == NULL || iov_cnt == 0) {
-+            g_free(n->rss_conf->ptrs.hash_key);
-+            g_free(n->rss_conf->ptrs.indirection_table);
-+            g_free(n->rss_conf);
-+            return VIRTIO_NET_OK;
-+        }
-+        s = iov_to_buf(iov, iov_cnt, 0, n->rss_conf,
-+                sizeof(struct virtio_net_rss_conf) -
-+                sizeof(struct virtio_net_rss_conf_ptrs));
-+
-+        if (s != sizeof(struct virtio_net_rss_conf) -
-+                sizeof(struct virtio_net_rss_conf_ptrs)) {
-+            return VIRTIO_NET_ERR;
-+        }
-+        n->rss_conf->ptrs.hash_key = g_malloc0(sizeof(uint8_t) *
-+                n->rss_conf->hash_key_length);
-+        s = iov_to_buf(iov, iov_cnt, 0, n->rss_conf->ptrs.hash_key,
-+                sizeof(uint8_t) * n->rss_conf->hash_key_length);
-+        if (s != sizeof(uint8_t) * n->rss_conf->hash_key_length) {
-+            g_free(n->rss_conf->ptrs.hash_key);
-+            return VIRTIO_NET_ERR;
-+        }
-+        n->rss_conf->ptrs.indirection_table
-+            = g_malloc0(sizeof(uint32_t) *
-+                    n->rss_conf->indirection_table_length);
-+        s = iov_to_buf(iov, iov_cnt, 0,
-+                n->rss_conf->ptrs.indirection_table, sizeof(uint32_t) *
-+                n->rss_conf->indirection_table_length);
-+        if (s != sizeof(uint32_t) *
-+                n->rss_conf->indirection_table_length) {
-+            g_free(n->rss_conf->ptrs.hash_key);
-+            g_free(n->rss_conf->ptrs.indirection_table);
-+            return VIRTIO_NET_ERR;
-+        }
-+        /* do bpf magic */
-+        break;
-+    default:
-+        return VIRTIO_NET_ERR;
+ Build and test automation
+ -------------------------
+ Build and test automation
+diff --git a/configure b/configure
+index a8c4094c87..21edaf59aa 100755
+--- a/configure
++++ b/configure
+@@ -348,6 +348,7 @@ libattr=""
+ xfs=""
+ tcg="yes"
+ membarrier=""
++bpf="no"
+ vhost_net="no"
+ vhost_crypto="no"
+ vhost_scsi="no"
+@@ -1173,6 +1174,10 @@ for opt do
+   ;;
+   --enable-membarrier) membarrier="yes"
+   ;;
++  --disable-bpf) bpf="no"
++  ;;
++  --enable-bpf) bpf="yes"
++  ;;
+   --disable-blobs) blobs="no"
+   ;;
+   --with-pkgversion=*) pkgversion="$optarg"
+@@ -1593,6 +1598,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   brlapi          BrlAPI (Braile)
+   curl            curl connectivity
+   membarrier      membarrier system call (for Linux 4.14+ or Windows)
++  bpf             bpf system calls (for Linux 3.18+)
+   fdt             fdt device tree
+   bluez           bluez stack connectivity
+   kvm             KVM acceleration support
+@@ -5232,6 +5238,38 @@ else
+ fi
+ 
+ ##########################################
++# check for usable bpf system call
++if test "$bpf" = "yes"; then
++    have_bpf=no
++    if test "$linux" = "yes" ; then
++        cat > $TMPC << EOF
++    #include <sys/syscall.h>
++    #include "linux/bpf.h"
++    #include <unistd.h>
++    #include <stdlib.h>
++    #include <string.h>
++    int main(void) {
++        union bpf_attr * attr = NULL;
++        syscall(__NR_bpf, BPF_PROG_LOAD, attr, sizeof(attr));
++        exit(0);
 +    }
++EOF
++        bpf_include="-Iinclude/standard-headers/linux"
++        bpf_cflags=""
++        bpf_libs=""
++        if compile_prog "$bpf_include" "$bpf_libs" ; then
++            have_bpf=yes
++        fi
++    fi
++    if test "$have_bpf" = "no"; then
++      feature_not_found "bpf" "libelf libs are not available or else \
++the bpf system call is not available"
++    fi
++else
++    bpf=no
++fi
 +
-+    return VIRTIO_NET_OK;
-+}
-+
-+static int virtio_net_ctrl_steering_mode(VirtIONet *n, uint8_t cmd,
-+                                struct iovec *iov, unsigned int iov_cnt,
-+                                struct iovec *iov_in, unsigned int iov_in_cnt,
-+                                size_t *size_in)
- {
-     size_t s;
-     struct virtio_net_steering_mode sm;
-+    int status = 0;
-+    size_t size_in_cmd = 0;
++##########################################
+ # check if rtnetlink.h exists and is useful
+ have_rtnetlink=no
+ cat > $TMPC << EOF
+@@ -5871,6 +5909,7 @@ echo "malloc trim support $malloc_trim"
+ echo "RDMA support      $rdma"
+ echo "fdt support       $fdt"
+ echo "membarrier        $membarrier"
++echo "bpf               $bpf"
+ echo "preadv support    $preadv"
+ echo "fdatasync         $fdatasync"
+ echo "madvise           $madvise"
+@@ -6365,6 +6404,11 @@ fi
+ if test "$membarrier" = "yes" ; then
+   echo "CONFIG_MEMBARRIER=y" >> $config_host_mak
+ fi
++if test "$bpf" = "yes" ; then
++  echo "CONFIG_BPF=y" >> $config_host_mak
++  echo "LIBS_BPF=$bpf_libs" >> $config_host_mak
++  echo "CFLAGS_BPF=$bpf_cflags" >> $config_host_mak
++fi
+ if test "$signalfd" = "yes" ; then
+   echo "CONFIG_SIGNALFD=y" >> $config_host_mak
+ fi
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index feb75390aa..57df8228af 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -35,6 +35,8 @@ cp_portable() {
+         grep '#include' "$f" | grep -v -e 'linux/virtio' \
+                                      -e 'linux/types' \
+                                      -e 'stdint' \
++                                     -e 'stdio' \
++                                     -e 'stdbool' \
+                                      -e 'linux/if_ether' \
+                                      -e 'input-event-codes' \
+                                      -e 'sys/' \
+@@ -44,6 +46,7 @@ cp_portable() {
+                                      -e 'linux/kernel' \
+                                      -e 'linux/sysinfo' \
+                                      -e 'asm-generic/kvm_para' \
++                                     -e 'linux/bpf' \
+                                      > /dev/null
+     then
+         echo "Unexpected #include in input file $f".
+@@ -58,7 +61,7 @@ cp_portable() {
+         -e 's/__le\([0-9][0-9]*\)/uint\1_t/g' \
+         -e 's/__be\([0-9][0-9]*\)/uint\1_t/g' \
+         -e 's/"\(input-event-codes\.h\)"/"standard-headers\/linux\/\1"/' \
+-        -e 's/<linux\/\([^>]*\)>/"standard-headers\/linux\/\1"/' \
++        -e 's/<linux\/\([^>]*(?!bpf)\)>/"standard-headers\/linux\/\1"/' \
+         -e 's/__bitwise//' \
+         -e 's/__attribute__((packed))/QEMU_PACKED/' \
+         -e 's/__inline__/inline/' \
+@@ -126,7 +129,8 @@ done
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+ for header in kvm.h vfio.h vfio_ccw.h vhost.h \
+-              psci.h psp-sev.h userfaultfd.h; do
++              psci.h psp-sev.h userfaultfd.h  \
++              bpf.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
  
-     switch (cmd) {
-     case VIRTIO_NET_CTRL_SM_GET_SUPPORTED_MODES:
-         if (!size_in) {
-             return VIRTIO_NET_ERR;
-         }
--                  s = iov_from_buf(iov_in, iov_cnt_in, 0,
--          &n->supported_modes, sizeof(n->supported_modes));
-+        n->supported_modes.steering_modes |= STEERING_MODE_RSS |
-+            STEERING_MODE_AUTO;
-+        s = iov_from_buf(iov_in, iov_in_cnt, 0,
-+        &n->supported_modes,
-+        sizeof(n->supported_modes));
-         if (s != sizeof(n->supported_modes) ||
--          !size_in) {
-+        !size_in) {
-             return VIRTIO_NET_ERR;
-         }
--                  *size_in = s;
--      break;
-+        *size_in = s;
-+         break;
-     case VIRTIO_NET_CTRL_SM_CONTROL:
--        s = iov_to_buf(iov, iov_cnt, 0, &sm, sizeof(sm) -
--                sizeof(union command_data));
--        if (s != sizeof(sm) - sizeof(union command_data)) {
-+        s = iov_to_buf(iov, iov_cnt, 0, &sm, sizeof(sm));
-+        if (s != sizeof(sm)) {
-+            return VIRTIO_NET_ERR;
-+        }
-+        iov_discard_front(&iov, &iov_cnt, sizeof(sm));
-+        /* TODO handle the case where we change mode, call the old */
-+        /* mode function with null ptrs  should do the trick of */
-+        /* freeing any resources */
-+        switch (sm.steering_mode) {
-+        case STEERING_MODE_AUTO:
-+                    break;
-+        case STEERING_MODE_RSS:
-+            status = virtio_net_ctrl_sm_rss(n, sm.command,
-+                   iov, iov_cnt, iov_in, iov_in_cnt,
-+                   &size_in_cmd);
-+            if (status == VIRTIO_NET_OK && size_in_cmd > 0) {
-+                *size_in += size_in_cmd;
-+            }
-+            break;
-+        default:
-             return VIRTIO_NET_ERR;
-         }
--        /* switch (cmd)
--             {
--                dafault:
--                return VIRTIO_NET_ERR;
--         } */
--      break;
-+        break;
-     default:
--                return VIRTIO_NET_ERR;
-+        return VIRTIO_NET_ERR;
-     }
- 
-     return VIRTIO_NET_OK;
 -- 
 2.13.6
