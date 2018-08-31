@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvk9w-0001Xm-QK
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:12:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkQ2-00014U-0F
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvk9w-0004Be-1t
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:12:24 -0400
-References: <20180830015734.19765-1-jsnow@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fvkOs-0002W7-6M
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:27:50 -0400
+References: <20180831142446.22264-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0e2d7fea-fb6f-641e-22d9-aeb8e353bce7@redhat.com>
-Date: Fri, 31 Aug 2018 16:12:05 +0200
+Message-ID: <c6d83ea0-295b-3874-936c-5f4681eb87bd@redhat.com>
+Date: Fri, 31 Aug 2018 16:27:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180830015734.19765-1-jsnow@redhat.com>
+In-Reply-To: <20180831142446.22264-1-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="oWo6no7QwNe4R7Uif63bAhSAXT4TvLpCz"
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] jobs: Job Exit Refactoring Pt 1
+	boundary="3HVCdIeP5ytBxTnmk1ahDoCs4BWx0hUpL"
+Subject: Re: [Qemu-devel] [PULL 00/11] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oWo6no7QwNe4R7Uif63bAhSAXT4TvLpCz
+--3HVCdIeP5ytBxTnmk1ahDoCs4BWx0hUpL
 From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com
-Message-ID: <0e2d7fea-fb6f-641e-22d9-aeb8e353bce7@redhat.com>
-Subject: Re: [PATCH v3 0/9] jobs: Job Exit Refactoring Pt 1
-References: <20180830015734.19765-1-jsnow@redhat.com>
-In-Reply-To: <20180830015734.19765-1-jsnow@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <c6d83ea0-295b-3874-936c-5f4681eb87bd@redhat.com>
+Subject: Re: [PULL 00/11] Block patches
+References: <20180831142446.22264-1-mreitz@redhat.com>
+In-Reply-To: <20180831142446.22264-1-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-08-30 03:57, John Snow wrote:
-> This is part one of a two part series that refactors the exit logic
-> of jobs.
+On 2018-08-31 16:24, Max Reitz wrote:
+> The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd24155=
+7452:
 >=20
-> Part one removes job_defer_to_main_loop.
-> Part two removes the job->exit() callback introduced in part one.
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-=
+27-v2' into staging (2018-08-27 16:44:20 +0100)
 >=20
-> It's redundant to have each job manage deferring to the main loop
-> itself. Unifying this makes sense from an API standpoint.
-> Doing so also allows us to remove a tricky case where the completion
-> code is called under an aio_context lock, which then calls the
-> finalization code which is itself executed under a second aio_context
-> lock, leading to deadlocks.
+> are available in the Git repository at:
 >=20
-> Removing this recursive lock acquisition is necessary for converting
-> mirror to only modify its graph post-finalization, but it's also just
-> safer and will bite us less in the future.
+>   https://git.xanclic.moe/XanClic/qemu.git tags/pull-block-2018-08-31
 >=20
-> This series introduces a job->exit callback, but after jobs are
-> fully transitioned to using the .commit/.abort callbacks in Pt 2,
-> this new completion callback will be removed again. It's only here
-> as a crutch to let us investigate the completion refactoring in Pt 2
-> more carefully.
+> for you to fetch changes up to 40954cc7831c4f95f9ce6402ae3d6761f44f31ff=
+:
+>=20
+>   jobs: remove job_defer_to_main_loop (2018-08-31 16:11:27 +0200)
+>=20
+> ----------------------------------------------------------------
+> Block patches:
+> - (Block) job exit refactoring, part 1
+>   (removing job_defer_to_main_loop())
+> - Locking fix for the file-posix block driver
+> - test-bdrv-drain leak fix
+>=20
+> ----------------------------------------------------------------
 
-Thanks, dropped the superfluous g_strdup() in patch 2 and applied to my
-block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+Self-NACK.  Sorry, I don't quite know how the locking fix slipped in
+there, but it shouldn't be here.
 
 Max
 
 
---oWo6no7QwNe4R7Uif63bAhSAXT4TvLpCz
+--3HVCdIeP5ytBxTnmk1ahDoCs4BWx0hUpL
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluJTLUACgkQ9AfbAGHV
-z0D9uQgAoC9lKUOeCp7Jb+q6RcJzb62qTTQSq7z3kgAzPmJMQYq5UrIT5pJLXZnR
-y/pxPos1QEXhsVfdwiSwpwetLg4gl8xvpMtzQC+Iyv8FrbX4lQTwfnGty7qaG+PF
-e/sZ7nPhDxLh9SqKvNieNElv8WlAb55xFkVu0ArHakFsOGY5xs4pyqTgI1nsVYV6
-eIRlDVeyrfjn8W5Ioos9It938vKg8Yx19KDGeEQ7Tx+T2ZlWaBOju1MW83nJ6awo
-XxEhRqyj4fwJOS1MGxMs0r81VlbDxyrG6waCa/boSxKiOfj+KIXy9vhoWANm3VWv
-0DxqXFk8byQkHsgbl2KAm0YHBs61vg==
-=p3cI
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluJUF0ACgkQ9AfbAGHV
+z0BAAwgAkZvOBiM35BYdxV/xkpw3KLcm3HQOY6pw1AGjwwF0kOg80n+3nbR1e1dU
+Tml8eNX35lGNzpDAwoDFeRjE/vRGPjwPdQjw7ydNQLdfDE8FdGNYf/ujm6gZYuah
+wwjoIh0affq4ZZRs7wFv30F2tyAwLs5XnqtfFTR3+agyy5w8X0gKnpqk930n+qeD
+IY53qC/L9VH91c9rpPW1kxw2vDxZrbrXj2wUbB6MZKZ/y6LaAZT236shA4zQS006
+sLmkHvb6OAH11Sl2P7NFVdm8mR5MWvCSmrLzBPTuc935DHflIg4NeWSNkq68gBKq
+XH/L2R+Ky8im2IL+Mxq54NLFf9wYhg==
+=s5JT
 -----END PGP SIGNATURE-----
 
---oWo6no7QwNe4R7Uif63bAhSAXT4TvLpCz--
+--3HVCdIeP5ytBxTnmk1ahDoCs4BWx0hUpL--
