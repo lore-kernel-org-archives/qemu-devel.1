@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkQ2-00014U-0F
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:29:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkQN-0001AA-7L
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkOs-0002W7-6M
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:27:50 -0400
-References: <20180831142446.22264-1-mreitz@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fvkMN-0000s1-Cg
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:25:16 -0400
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c6d83ea0-295b-3874-936c-5f4681eb87bd@redhat.com>
-Date: Fri, 31 Aug 2018 16:27:41 +0200
-MIME-Version: 1.0
+Date: Fri, 31 Aug 2018 16:24:44 +0200
+Message-Id: <20180831142446.22264-10-mreitz@redhat.com>
 In-Reply-To: <20180831142446.22264-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3HVCdIeP5ytBxTnmk1ahDoCs4BWx0hUpL"
-Subject: Re: [Qemu-devel] [PULL 00/11] Block patches
+References: <20180831142446.22264-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PULL 09/11] block/backup: make function variables
+ consistently named
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,67 +21,154 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3HVCdIeP5ytBxTnmk1ahDoCs4BWx0hUpL
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <c6d83ea0-295b-3874-936c-5f4681eb87bd@redhat.com>
-Subject: Re: [PULL 00/11] Block patches
-References: <20180831142446.22264-1-mreitz@redhat.com>
-In-Reply-To: <20180831142446.22264-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: John Snow <jsnow@redhat.com>
 
-On 2018-08-31 16:24, Max Reitz wrote:
-> The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd24155=
-7452:
->=20
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-=
-27-v2' into staging (2018-08-27 16:44:20 +0100)
->=20
-> are available in the Git repository at:
->=20
->   https://git.xanclic.moe/XanClic/qemu.git tags/pull-block-2018-08-31
->=20
-> for you to fetch changes up to 40954cc7831c4f95f9ce6402ae3d6761f44f31ff=
-:
->=20
->   jobs: remove job_defer_to_main_loop (2018-08-31 16:11:27 +0200)
->=20
-> ----------------------------------------------------------------
-> Block patches:
-> - (Block) job exit refactoring, part 1
->   (removing job_defer_to_main_loop())
-> - Locking fix for the file-posix block driver
-> - test-bdrv-drain leak fix
->=20
-> ----------------------------------------------------------------
+Rename opaque_job to job to be consistent with other job implementations.
+Rename 'job', the BackupBlockJob object, to 's' to also be consistent.
 
-Self-NACK.  Sorry, I don't quite know how the locking fix slipped in
-there, but it shouldn't be here.
+Suggested-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180830015734.19765-8-jsnow@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/backup.c | 62 +++++++++++++++++++++++++-------------------------
+ 1 file changed, 31 insertions(+), 31 deletions(-)
 
-Max
-
-
---3HVCdIeP5ytBxTnmk1ahDoCs4BWx0hUpL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluJUF0ACgkQ9AfbAGHV
-z0BAAwgAkZvOBiM35BYdxV/xkpw3KLcm3HQOY6pw1AGjwwF0kOg80n+3nbR1e1dU
-Tml8eNX35lGNzpDAwoDFeRjE/vRGPjwPdQjw7ydNQLdfDE8FdGNYf/ujm6gZYuah
-wwjoIh0affq4ZZRs7wFv30F2tyAwLs5XnqtfFTR3+agyy5w8X0gKnpqk930n+qeD
-IY53qC/L9VH91c9rpPW1kxw2vDxZrbrXj2wUbB6MZKZ/y6LaAZT236shA4zQS006
-sLmkHvb6OAH11Sl2P7NFVdm8mR5MWvCSmrLzBPTuc935DHflIg4NeWSNkq68gBKq
-XH/L2R+Ky8im2IL+Mxq54NLFf9wYhg==
-=s5JT
------END PGP SIGNATURE-----
-
---3HVCdIeP5ytBxTnmk1ahDoCs4BWx0hUpL--
+diff --git a/block/backup.c b/block/backup.c
+index a67b7fa96b..4d084f6ca6 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -468,59 +468,59 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+     bdrv_dirty_iter_free(dbi);
+ }
+ 
+-static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
++static int coroutine_fn backup_run(Job *job, Error **errp)
+ {
+-    BackupBlockJob *job = container_of(opaque_job, BackupBlockJob, common.job);
+-    BlockDriverState *bs = blk_bs(job->common.blk);
++    BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
++    BlockDriverState *bs = blk_bs(s->common.blk);
+     int64_t offset, nb_clusters;
+     int ret = 0;
+ 
+-    QLIST_INIT(&job->inflight_reqs);
+-    qemu_co_rwlock_init(&job->flush_rwlock);
++    QLIST_INIT(&s->inflight_reqs);
++    qemu_co_rwlock_init(&s->flush_rwlock);
+ 
+-    nb_clusters = DIV_ROUND_UP(job->len, job->cluster_size);
+-    job_progress_set_remaining(&job->common.job, job->len);
++    nb_clusters = DIV_ROUND_UP(s->len, s->cluster_size);
++    job_progress_set_remaining(job, s->len);
+ 
+-    job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
+-    if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+-        backup_incremental_init_copy_bitmap(job);
++    s->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
++    if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
++        backup_incremental_init_copy_bitmap(s);
+     } else {
+-        hbitmap_set(job->copy_bitmap, 0, nb_clusters);
++        hbitmap_set(s->copy_bitmap, 0, nb_clusters);
+     }
+ 
+ 
+-    job->before_write.notify = backup_before_write_notify;
+-    bdrv_add_before_write_notifier(bs, &job->before_write);
++    s->before_write.notify = backup_before_write_notify;
++    bdrv_add_before_write_notifier(bs, &s->before_write);
+ 
+-    if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
++    if (s->sync_mode == MIRROR_SYNC_MODE_NONE) {
+         /* All bits are set in copy_bitmap to allow any cluster to be copied.
+          * This does not actually require them to be copied. */
+-        while (!job_is_cancelled(&job->common.job)) {
++        while (!job_is_cancelled(job)) {
+             /* Yield until the job is cancelled.  We just let our before_write
+              * notify callback service CoW requests. */
+-            job_yield(&job->common.job);
++            job_yield(job);
+         }
+-    } else if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
+-        ret = backup_run_incremental(job);
++    } else if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
++        ret = backup_run_incremental(s);
+     } else {
+         /* Both FULL and TOP SYNC_MODE's require copying.. */
+-        for (offset = 0; offset < job->len;
+-             offset += job->cluster_size) {
++        for (offset = 0; offset < s->len;
++             offset += s->cluster_size) {
+             bool error_is_read;
+             int alloced = 0;
+ 
+-            if (yield_and_check(job)) {
++            if (yield_and_check(s)) {
+                 break;
+             }
+ 
+-            if (job->sync_mode == MIRROR_SYNC_MODE_TOP) {
++            if (s->sync_mode == MIRROR_SYNC_MODE_TOP) {
+                 int i;
+                 int64_t n;
+ 
+                 /* Check to see if these blocks are already in the
+                  * backing file. */
+ 
+-                for (i = 0; i < job->cluster_size;) {
++                for (i = 0; i < s->cluster_size;) {
+                     /* bdrv_is_allocated() only returns true/false based
+                      * on the first set of sectors it comes across that
+                      * are are all in the same state.
+@@ -529,7 +529,7 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
+                      * needed but at some point that is always the case. */
+                     alloced =
+                         bdrv_is_allocated(bs, offset + i,
+-                                          job->cluster_size - i, &n);
++                                          s->cluster_size - i, &n);
+                     i += n;
+ 
+                     if (alloced || n == 0) {
+@@ -547,29 +547,29 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
+             if (alloced < 0) {
+                 ret = alloced;
+             } else {
+-                ret = backup_do_cow(job, offset, job->cluster_size,
++                ret = backup_do_cow(s, offset, s->cluster_size,
+                                     &error_is_read, false);
+             }
+             if (ret < 0) {
+                 /* Depending on error action, fail now or retry cluster */
+                 BlockErrorAction action =
+-                    backup_error_action(job, error_is_read, -ret);
++                    backup_error_action(s, error_is_read, -ret);
+                 if (action == BLOCK_ERROR_ACTION_REPORT) {
+                     break;
+                 } else {
+-                    offset -= job->cluster_size;
++                    offset -= s->cluster_size;
+                     continue;
+                 }
+             }
+         }
+     }
+ 
+-    notifier_with_return_remove(&job->before_write);
++    notifier_with_return_remove(&s->before_write);
+ 
+     /* wait until pending backup_do_cow() calls have completed */
+-    qemu_co_rwlock_wrlock(&job->flush_rwlock);
+-    qemu_co_rwlock_unlock(&job->flush_rwlock);
+-    hbitmap_free(job->copy_bitmap);
++    qemu_co_rwlock_wrlock(&s->flush_rwlock);
++    qemu_co_rwlock_unlock(&s->flush_rwlock);
++    hbitmap_free(s->copy_bitmap);
+ 
+     return ret;
+ }
+-- 
+2.17.1
