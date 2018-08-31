@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fvjJk-0005zk-6F
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:18:29 -0400
+	(envelope-from <liam.merwick@oracle.com>) id 1fvjLd-0006yb-U4
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:20:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fvjJf-0001N4-OY
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:18:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34062 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fvjJf-0001Mw-J5
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:18:23 -0400
-References: <1535704738-8986-1-git-send-email-thuth@redhat.com>
-	<1535704738-8986-9-git-send-email-thuth@redhat.com>
-	<87efeerbcu.fsf@dusky.pond.sub.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <593af39a-cc9b-d4e8-7e6c-efdbbe169096@redhat.com>
-Date: Fri, 31 Aug 2018 15:18:18 +0200
+	(envelope-from <liam.merwick@oracle.com>) id 1fvjLZ-0002Ad-Iz
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:20:25 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:38776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1fvjLZ-00026Z-8E
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:20:21 -0400
+References: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
+	<1535644031-848-3-git-send-email-Liam.Merwick@oracle.com>
+	<83875cdc-3238-fafa-7c96-21d1df89b37a@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <dfbc9e95-70c5-fda3-a763-3aa276e1f5f3@oracle.com>
+Date: Fri, 31 Aug 2018 14:22:04 +0100
 MIME-Version: 1.0
-In-Reply-To: <87efeerbcu.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <83875cdc-3238-fafa-7c96-21d1df89b37a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 8/9] tests: add qmp/qom-set-without-value
- test
+Subject: Re: [Qemu-devel] [PATCH 2/8] job: Fix off-by-one accesses to JobSTT
+ and JobVerbTable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On 2018-08-31 14:04, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
+
+On 30/08/18 19:34, Eric Blake wrote:
+> On 08/30/2018 10:47 AM, Liam Merwick wrote:
+>> In the array dereference of JobVerbTable[verb] in job_apply_verb()
+>> the check of the index, verb, allows an overrun because an index
+>> equal to the array size is permitted.
+>>
+>> Similarly, in the array dereference of JobSTT[s0][s1] with index s1
+>> in job_state_transition(), an off-by-one overrun is possible.
 >=20
->> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Fortunately, these are just assertions that are too weak; we don't have=
+=20
+> any actual callers passing the __MAX entry to cause an actual overrun.
+>=20
+
+True. In v2 I'll clarify that in the commit message
+
 >>
->> test_qom_set_without_value() is about a bug in infrastructure used by
->> the QMP core, fixed in commit c489780203.  We covered the bug in
->> infrastructure unit tests (commit bce3035a44).  I wrote that test
->> earlier, to cover QMP level as well, the test could go into qmp-test.
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+>> Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
+>> Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
 >> ---
->>  tests/qmp-test.c | 14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
->>
->> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
->> index b347228..2b923f0 100644
->> --- a/tests/qmp-test.c
->> +++ b/tests/qmp-test.c
->> @@ -321,6 +321,19 @@ static void test_qmp_preconfig(void)
->>      qtest_quit(qs);
->>  }
->> =20
->> +static void test_qom_set_without_value(void)
->> +{
->> +    QTestState *qts;
->> +    QDict *resp;
->> +
->> +    qts =3D qtest_init(common_args);
->> +    resp =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
->> +                     " { 'path': '/machine', 'property': 'rtc-time' }=
- }");
->> +    g_assert_nonnull(resp);
->> +    qmp_assert_error_class(resp, "GenericError");
->> +    qtest_quit(qts);
->> +}
->> +
->>  int main(int argc, char *argv[])
->>  {
->>      g_test_init(&argc, &argv, NULL);
->> @@ -328,6 +341,7 @@ int main(int argc, char *argv[])
->>      qtest_add_func("qmp/protocol", test_qmp_protocol);
->>      qtest_add_func("qmp/oob", test_qmp_oob);
->>      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
->> +    qtest_add_func("qmp/qom-set-without-value", test_qom_set_without_=
-value);
->> =20
->>      return g_test_run();
->>  }
+>> =C2=A0 job.c | 4 ++--
+>> =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
-> I'm afraid you missed my objection to naming:
-> Message-ID: <8736uvujxx.fsf@dusky.pond.sub.org>
-> https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg06368.html
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
-Sorry about that, I was not on CC: for that series. I used the patches
-from v5 where Marc-Andr=C3=A9 put me on CC:.
+Thanks,
+Liam
 
-> If you could work that into PULL v2, I'd be obliged.  If not, I'll have
-> to address it in a follow-up patch.
 
-IMHO the naming is not that bad ... OTOH, I think Peter might already be
-away? ... so we've got plenty of time to sort this out anyway.
-Marc-Andr=C3=A9, could you send a new version of the patch?
-
- Thomas
+>>
+>> diff --git a/job.c b/job.c
+>> index e36ebaafd81c..40320566f43b 100644
+>> --- a/job.c
+>> +++ b/job.c
+>> @@ -166,7 +166,7 @@ bool job_is_internal(Job *job)
+>> =C2=A0 static void job_state_transition(Job *job, JobStatus s1)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 JobStatus s0 =3D job->status;
+>> -=C2=A0=C2=A0=C2=A0 assert(s1 >=3D 0 && s1 <=3D JOB_STATUS__MAX);
+>> +=C2=A0=C2=A0=C2=A0 assert(s1 >=3D 0 && s1 < JOB_STATUS__MAX);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_job_state_transition(job, job->re=
+t,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 JobSTT[s0][s1] ? "allowed" =
+:=20
+>> "disallowed",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 JobStatus_str(s0), JobStatu=
+s_str(s1));
+>> @@ -181,7 +181,7 @@ static void job_state_transition(Job *job,=20
+>> JobStatus s1)
+>> =C2=A0 int job_apply_verb(Job *job, JobVerb verb, Error **errp)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 JobStatus s0 =3D job->status;
+>> -=C2=A0=C2=A0=C2=A0 assert(verb >=3D 0 && verb <=3D JOB_VERB__MAX);
+>> +=C2=A0=C2=A0=C2=A0 assert(verb >=3D 0 && verb < JOB_VERB__MAX);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_job_apply_verb(job, JobStatus_str=
+(s0), JobVerb_str(verb),
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 JobVerbTable[verb][s0] ? "allowed" :=20
+>> "prohibited");
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (JobVerbTable[verb][s0]) {
+>>
+>=20
