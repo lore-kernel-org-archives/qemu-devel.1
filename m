@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fvgFD-0007GB-Jp
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:01:36 -0400
+	(envelope-from <lersek@redhat.com>) id 1fvgbl-0001Qc-Pu
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fvgFA-0002UA-Dj
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:01:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49496)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fvgF9-0002TN-E6
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:01:32 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fvgF7-0004oX-9N
-	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 10:01:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 446712E80C7
-	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 10:01:29 +0000 (UTC)
+	(envelope-from <lersek@redhat.com>) id 1fvgWL-00025S-CY
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:19:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41296 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fvgWL-00025L-6x
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:19:17 -0400
+References: <1535630903-146863-1-git-send-email-imammedo@redhat.com>
+	<38b3347b-8923-26e9-82a4-f69002262767@redhat.com>
+	<20180831100046.3467d1fd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <cf8ce5d5-c336-9b45-4960-a36a2e72eaa3@redhat.com>
+Date: Fri, 31 Aug 2018 12:19:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Aug 2018 09:45:38 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153570873838.20411.14352230995251509216.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+In-Reply-To: <20180831100046.3467d1fd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qga: ignore non present cpus when handling
+ qmp_guest_get_vcpus()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Drew Jones <drjones@redhat.com>, libvir-list@redhat.com
 
-I find it interesting this is a slow down with PCI passthrough - that's
-pretty much the case you'd expect there to be least change; it shouldn't
-be generating lots of vm exit's for example which you'd expect could
-have been made slower by the recent security changes.
+On 08/31/18 10:00, Igor Mammedov wrote:
+> On Thu, 30 Aug 2018 17:51:13 +0200
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> +Drew
+>>
+>> On 08/30/18 14:08, Igor Mammedov wrote:
+>>> If VM has VCPUs plugged sparselly (for example a VM started with
+>>> 3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
+>>> only cpu0 and cpu2 are present), QGA will rise a error
+>>>   error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
+>>>   open("/sys/devices/system/cpu/cpu1/"): No such file or directory
+>>> when
+>>>   virsh vcpucount FOO --guest
+>>> is executed.
+>>> Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
+>>>
+>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>> ---
+>>>  qga/commands-posix.c | 4 +++-
+>>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+>>> index 37e8a2d..2929872 100644
+>>> --- a/qga/commands-posix.c
+>>> +++ b/qga/commands-posix.c
+>>> @@ -2044,7 +2044,9 @@ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
+>>>                                vcpu->logical_id);
+>>>      dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
+>>>      if (dirfd == -1) {
+>>> -        error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
+>>> +        if (!(sys2vcpu && errno == ENOENT)) {
+>>> +            error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
+>>> +        }
+>>>      } else {
+>>>          static const char fn[] = "online";
+>>>          int fd;
+>>>   
+>>
+>> Originally these guest agent commands (both getting and setting) were
+>> meant to be used in the absence of real VCPU hot[un]plug, as a fallback
+>> / place-holder.
+>>
+>> If the latter (= real VCPU hot(un)plug) works, then these guest agent
+>> commands shouldn't be used at all.
+> Technically there isn't reasons for "get" not to work in sparse  usecase
+> hence the patch.
+> 
+>> Drew, do I remember correctly? ... The related RHBZ is
+>> <https://bugzilla.redhat.com/show_bug.cgi?id=924684>. (It's a private
+>> one, and I'm not at liberty to open it up, so my apologies to non-RH folks.)
+>>
+>> Anyway, given that "set" should be a subset of the "get" return value
+>> (as documented in the command schema), if we fix up "get" to work with
+>> sparse topologies, then "set" should work at once.
+>>
+>> However... as far as I understand, this change will allow
+>> qmp_guest_get_vcpus() to produce a GuestLogicalProcessor object for the
+>> missing (hot-unplugged) VCPU, with the following contents:
+>> - @logical-id: populated by the loop,
+>> - @online: false (from g_malloc0()),
+>> - @can-offline: present (from the loop), and false (from g_malloc0()).
+>>
+>> The smaller problem with this might be that "online==false &&
+>> can-offline==false" is nonsensical and has never been returned before. I
+>> don't know how higher level apps will react.
+>>
+>> The larger problem might be that a higher level app could simply copy
+>> this output structure into the next "set" call unchanged, and then that
+>> "set" call will fail.
+> Libvirt it seems that survives such outrageous output
+> 
+>> I wonder if, instead of this patch, we should rework
+>> qmp_guest_get_vcpus(), to silently skip processors for which this
+>> dirpath ENOENT condition arises (i.e., return a shorter list of
+>> GuestLogicalProcessor objects).
+> 
+>> But, again, I wouldn't mix this guest agent command with real VCPU
+>> hot(un)plug in the first place. The latter is much-much better, so if
+>> it's available, use that exclusively?
+> Agreed,
+> 
+> Maybe we can block invalid usecase on libvirt side with a more clear
+> error message as libvirt sort of knows that sparse cpus are supported.
 
-I suppose one thing you could try is profiling on the host to see if
-more time is spent in the host kernel or qemu when running the 2d tests
-with the new vs older windows;  if it points to some particular hot spot
-there then perhaps it might be possible to understand why.
+OK -- I see libvir-list is CC'd, so let's hear what they prefer :)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
-
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
-
-Status in QEMU:
-  New
-
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+Thanks
+Laszlo
