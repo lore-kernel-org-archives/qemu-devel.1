@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1fvjau-0005lR-Ph
+	(envelope-from <jcody@redhat.com>) id 1fvjas-0005fz-Kq
 	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liam.merwick@oracle.com>) id 1fvjQp-0004DS-KV
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:25:52 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:44902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
-	id 1fvjQp-0004DK-CJ
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:25:47 -0400
-References: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
-	<1535644031-848-7-git-send-email-Liam.Merwick@oracle.com>
-	<13bca354-a3d1-fa51-3581-322bd1351059@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <7854c6fc-9259-31b0-f5b8-dee31d68df78@oracle.com>
-Date: Fri, 31 Aug 2018 14:27:36 +0100
+	(envelope-from <jcody@redhat.com>) id 1fvjSb-0004Xk-S0
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:27:39 -0400
+Date: Fri, 31 Aug 2018 09:27:09 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180831132709.GD415265@localhost.localdomain>
+References: <20180830015734.19765-1-jsnow@redhat.com>
+	<20180830015734.19765-2-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <13bca354-a3d1-fa51-3581-322bd1351059@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/8] block: dump_qlist() may dereference a
- Null pointer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180830015734.19765-2-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/9] jobs: change start callback to run
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +24,362 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
+On Wed, Aug 29, 2018 at 09:57:26PM -0400, John Snow wrote:
+> Presently we codify the entry point for a job as the "start" callback,
+> but a more apt name would be "run" to clarify the idea that when this
+> function returns we consider the job to have "finished," except for
+> any cleanup which occurs in separate callbacks later.
+> 
+> As part of this clarification, change the signature to include an error
+> object and a return code. The error ptr is not yet used, and the return
+> code while captured, will be overwritten by actions in the job_completed
+> function.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-On 30/08/18 19:41, Eric Blake wrote:
-> On 08/30/2018 10:47 AM, Liam Merwick wrote:
->> A NULL 'list' passed into function dump_qlist() isn't correctly
->> validated and can be passed to qlist_first() where it is dereferenced.
->=20
-> But dump_qlist() is static, and it is easy to prove that it will never=20
-> be called with a NULL 'list' parameter (it's lone caller did switch=20
-> (qobject_type(obj)), and calls dump_qlist() only for QTYPE_QLIST, which=
-=20
-> implies that the qobject_to(QList, obj) will succeed and never be NULL).
->=20
->>
->> This could be resolved by checking if the list is NULL in dump_qlist()
->> and returning immediately. However, the general case can be handled by
->> adding a NULL arg check to to qlist_first() and qlist_next() and all
->> the callers to those functions handle that cleanly.
->=20
-> NACK.=C2=A0 If anything, I'd be happier with:
->=20
-> assert(list);
->=20
-
-Thank works for me too.
-
-Regards,
-Liam
-
-> in dump_qlist() to shut up the lint checker, as we do not want to slow=20
-> down the common case of qlist_first() for something that does not=20
-> happen.=C2=A0 That is, the null dereference in qlist_first() is a featu=
-re for=20
-> detecting buggy code, and not something we need to change.
->=20
->>
->> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
->> Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
->> Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
->>
->> ---
->> =C2=A0 include/qapi/qmp/qlist.h | 6 ++++++
->> =C2=A0 1 file changed, 6 insertions(+)
->>
->> diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
->> index 8d2c32ca2863..1ec716e2eb9e 100644
->> --- a/include/qapi/qmp/qlist.h
->> +++ b/include/qapi/qmp/qlist.h
->> @@ -58,11 +58,17 @@ void qlist_destroy_obj(QObject *obj);
->> =C2=A0 static inline const QListEntry *qlist_first(const QList *qlist)
->> =C2=A0 {
->> +=C2=A0=C2=A0=C2=A0 if (!qlist) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> +=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return QTAILQ_FIRST(&qlist->head);
->> =C2=A0 }
->> =C2=A0 static inline const QListEntry *qlist_next(const QListEntry *en=
-try)
->> =C2=A0 {
->> +=C2=A0=C2=A0=C2=A0 if (!entry) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> +=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return QTAILQ_NEXT(entry, next);
->> =C2=A0 }
->>
->=20
+> ---
+>  block/backup.c            |  7 ++++---
+>  block/commit.c            |  7 ++++---
+>  block/create.c            |  8 +++++---
+>  block/mirror.c            | 10 ++++++----
+>  block/stream.c            |  7 ++++---
+>  include/qemu/job.h        |  2 +-
+>  job.c                     |  6 +++---
+>  tests/test-bdrv-drain.c   |  7 ++++---
+>  tests/test-blockjob-txn.c | 16 ++++++++--------
+>  tests/test-blockjob.c     |  7 ++++---
+>  10 files changed, 43 insertions(+), 34 deletions(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index 8630d32926..5d47781840 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -480,9 +480,9 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+>      bdrv_dirty_iter_free(dbi);
+>  }
+>  
+> -static void coroutine_fn backup_run(void *opaque)
+> +static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
+>  {
+> -    BackupBlockJob *job = opaque;
+> +    BackupBlockJob *job = container_of(opaque_job, BackupBlockJob, common.job);
+>      BackupCompleteData *data;
+>      BlockDriverState *bs = blk_bs(job->common.blk);
+>      int64_t offset, nb_clusters;
+> @@ -587,6 +587,7 @@ static void coroutine_fn backup_run(void *opaque)
+>      data = g_malloc(sizeof(*data));
+>      data->ret = ret;
+>      job_defer_to_main_loop(&job->common.job, backup_complete, data);
+> +    return ret;
+>  }
+>  
+>  static const BlockJobDriver backup_job_driver = {
+> @@ -596,7 +597,7 @@ static const BlockJobDriver backup_job_driver = {
+>          .free                   = block_job_free,
+>          .user_resume            = block_job_user_resume,
+>          .drain                  = block_job_drain,
+> -        .start                  = backup_run,
+> +        .run                    = backup_run,
+>          .commit                 = backup_commit,
+>          .abort                  = backup_abort,
+>          .clean                  = backup_clean,
+> diff --git a/block/commit.c b/block/commit.c
+> index eb414579bd..a0ea86ff64 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -134,9 +134,9 @@ static void commit_complete(Job *job, void *opaque)
+>      bdrv_unref(top);
+>  }
+>  
+> -static void coroutine_fn commit_run(void *opaque)
+> +static int coroutine_fn commit_run(Job *job, Error **errp)
+>  {
+> -    CommitBlockJob *s = opaque;
+> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
+>      CommitCompleteData *data;
+>      int64_t offset;
+>      uint64_t delay_ns = 0;
+> @@ -213,6 +213,7 @@ out:
+>      data = g_malloc(sizeof(*data));
+>      data->ret = ret;
+>      job_defer_to_main_loop(&s->common.job, commit_complete, data);
+> +    return ret;
+>  }
+>  
+>  static const BlockJobDriver commit_job_driver = {
+> @@ -222,7 +223,7 @@ static const BlockJobDriver commit_job_driver = {
+>          .free          = block_job_free,
+>          .user_resume   = block_job_user_resume,
+>          .drain         = block_job_drain,
+> -        .start         = commit_run,
+> +        .run           = commit_run,
+>      },
+>  };
+>  
+> diff --git a/block/create.c b/block/create.c
+> index 915cd41bcc..04733c3618 100644
+> --- a/block/create.c
+> +++ b/block/create.c
+> @@ -45,9 +45,9 @@ static void blockdev_create_complete(Job *job, void *opaque)
+>      job_completed(job, s->ret, s->err);
+>  }
+>  
+> -static void coroutine_fn blockdev_create_run(void *opaque)
+> +static int coroutine_fn blockdev_create_run(Job *job, Error **errp)
+>  {
+> -    BlockdevCreateJob *s = opaque;
+> +    BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
+>  
+>      job_progress_set_remaining(&s->common, 1);
+>      s->ret = s->drv->bdrv_co_create(s->opts, &s->err);
+> @@ -55,12 +55,14 @@ static void coroutine_fn blockdev_create_run(void *opaque)
+>  
+>      qapi_free_BlockdevCreateOptions(s->opts);
+>      job_defer_to_main_loop(&s->common, blockdev_create_complete, NULL);
+> +
+> +    return s->ret;
+>  }
+>  
+>  static const JobDriver blockdev_create_job_driver = {
+>      .instance_size = sizeof(BlockdevCreateJob),
+>      .job_type      = JOB_TYPE_CREATE,
+> -    .start         = blockdev_create_run,
+> +    .run           = blockdev_create_run,
+>  };
+>  
+>  void qmp_blockdev_create(const char *job_id, BlockdevCreateOptions *options,
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 6cc10df5c9..691763db41 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -812,9 +812,9 @@ static int mirror_flush(MirrorBlockJob *s)
+>      return ret;
+>  }
+>  
+> -static void coroutine_fn mirror_run(void *opaque)
+> +static int coroutine_fn mirror_run(Job *job, Error **errp)
+>  {
+> -    MirrorBlockJob *s = opaque;
+> +    MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
+>      MirrorExitData *data;
+>      BlockDriverState *bs = s->mirror_top_bs->backing->bs;
+>      BlockDriverState *target_bs = blk_bs(s->target);
+> @@ -1041,7 +1041,9 @@ immediate_exit:
+>      if (need_drain) {
+>          bdrv_drained_begin(bs);
+>      }
+> +
+>      job_defer_to_main_loop(&s->common.job, mirror_exit, data);
+> +    return ret;
+>  }
+>  
+>  static void mirror_complete(Job *job, Error **errp)
+> @@ -1138,7 +1140,7 @@ static const BlockJobDriver mirror_job_driver = {
+>          .free                   = block_job_free,
+>          .user_resume            = block_job_user_resume,
+>          .drain                  = block_job_drain,
+> -        .start                  = mirror_run,
+> +        .run                    = mirror_run,
+>          .pause                  = mirror_pause,
+>          .complete               = mirror_complete,
+>      },
+> @@ -1154,7 +1156,7 @@ static const BlockJobDriver commit_active_job_driver = {
+>          .free                   = block_job_free,
+>          .user_resume            = block_job_user_resume,
+>          .drain                  = block_job_drain,
+> -        .start                  = mirror_run,
+> +        .run                    = mirror_run,
+>          .pause                  = mirror_pause,
+>          .complete               = mirror_complete,
+>      },
+> diff --git a/block/stream.c b/block/stream.c
+> index 9264b68a1e..b4b987df7e 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -97,9 +97,9 @@ out:
+>      g_free(data);
+>  }
+>  
+> -static void coroutine_fn stream_run(void *opaque)
+> +static int coroutine_fn stream_run(Job *job, Error **errp)
+>  {
+> -    StreamBlockJob *s = opaque;
+> +    StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
+>      StreamCompleteData *data;
+>      BlockBackend *blk = s->common.blk;
+>      BlockDriverState *bs = blk_bs(blk);
+> @@ -206,6 +206,7 @@ out:
+>      data = g_malloc(sizeof(*data));
+>      data->ret = ret;
+>      job_defer_to_main_loop(&s->common.job, stream_complete, data);
+> +    return ret;
+>  }
+>  
+>  static const BlockJobDriver stream_job_driver = {
+> @@ -213,7 +214,7 @@ static const BlockJobDriver stream_job_driver = {
+>          .instance_size = sizeof(StreamBlockJob),
+>          .job_type      = JOB_TYPE_STREAM,
+>          .free          = block_job_free,
+> -        .start         = stream_run,
+> +        .run           = stream_run,
+>          .user_resume   = block_job_user_resume,
+>          .drain         = block_job_drain,
+>      },
+> diff --git a/include/qemu/job.h b/include/qemu/job.h
+> index 18c9223e31..9cf463d228 100644
+> --- a/include/qemu/job.h
+> +++ b/include/qemu/job.h
+> @@ -169,7 +169,7 @@ struct JobDriver {
+>      JobType job_type;
+>  
+>      /** Mandatory: Entrypoint for the Coroutine. */
+> -    CoroutineEntry *start;
+> +    int coroutine_fn (*run)(Job *job, Error **errp);
+>  
+>      /**
+>       * If the callback is not NULL, it will be invoked when the job transitions
+> diff --git a/job.c b/job.c
+> index e36ebaafd8..76988f6678 100644
+> --- a/job.c
+> +++ b/job.c
+> @@ -544,16 +544,16 @@ static void coroutine_fn job_co_entry(void *opaque)
+>  {
+>      Job *job = opaque;
+>  
+> -    assert(job && job->driver && job->driver->start);
+> +    assert(job && job->driver && job->driver->run);
+>      job_pause_point(job);
+> -    job->driver->start(job);
+> +    job->ret = job->driver->run(job, NULL);
+>  }
+>  
+>  
+>  void job_start(Job *job)
+>  {
+>      assert(job && !job_started(job) && job->paused &&
+> -           job->driver && job->driver->start);
+> +           job->driver && job->driver->run);
+>      job->co = qemu_coroutine_create(job_co_entry, job);
+>      job->pause_count--;
+>      job->busy = true;
+> diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+> index 17bb8508ae..a7533861f6 100644
+> --- a/tests/test-bdrv-drain.c
+> +++ b/tests/test-bdrv-drain.c
+> @@ -757,9 +757,9 @@ static void test_job_completed(Job *job, void *opaque)
+>      job_completed(job, 0, NULL);
+>  }
+>  
+> -static void coroutine_fn test_job_start(void *opaque)
+> +static int coroutine_fn test_job_run(Job *job, Error **errp)
+>  {
+> -    TestBlockJob *s = opaque;
+> +    TestBlockJob *s = container_of(job, TestBlockJob, common.job);
+>  
+>      job_transition_to_ready(&s->common.job);
+>      while (!s->should_complete) {
+> @@ -771,6 +771,7 @@ static void coroutine_fn test_job_start(void *opaque)
+>      }
+>  
+>      job_defer_to_main_loop(&s->common.job, test_job_completed, NULL);
+> +    return 0;
+>  }
+>  
+>  static void test_job_complete(Job *job, Error **errp)
+> @@ -785,7 +786,7 @@ BlockJobDriver test_job_driver = {
+>          .free           = block_job_free,
+>          .user_resume    = block_job_user_resume,
+>          .drain          = block_job_drain,
+> -        .start          = test_job_start,
+> +        .run            = test_job_run,
+>          .complete       = test_job_complete,
+>      },
+>  };
+> diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+> index 58d9b87fb2..3194924071 100644
+> --- a/tests/test-blockjob-txn.c
+> +++ b/tests/test-blockjob-txn.c
+> @@ -38,25 +38,25 @@ static void test_block_job_complete(Job *job, void *opaque)
+>      bdrv_unref(bs);
+>  }
+>  
+> -static void coroutine_fn test_block_job_run(void *opaque)
+> +static int coroutine_fn test_block_job_run(Job *job, Error **errp)
+>  {
+> -    TestBlockJob *s = opaque;
+> -    BlockJob *job = &s->common;
+> +    TestBlockJob *s = container_of(job, TestBlockJob, common.job);
+>  
+>      while (s->iterations--) {
+>          if (s->use_timer) {
+> -            job_sleep_ns(&job->job, 0);
+> +            job_sleep_ns(job, 0);
+>          } else {
+> -            job_yield(&job->job);
+> +            job_yield(job);
+>          }
+>  
+> -        if (job_is_cancelled(&job->job)) {
+> +        if (job_is_cancelled(job)) {
+>              break;
+>          }
+>      }
+>  
+> -    job_defer_to_main_loop(&job->job, test_block_job_complete,
+> +    job_defer_to_main_loop(job, test_block_job_complete,
+>                             (void *)(intptr_t)s->rc);
+> +    return s->rc;
+>  }
+>  
+>  typedef struct {
+> @@ -80,7 +80,7 @@ static const BlockJobDriver test_block_job_driver = {
+>          .free          = block_job_free,
+>          .user_resume   = block_job_user_resume,
+>          .drain         = block_job_drain,
+> -        .start         = test_block_job_run,
+> +        .run           = test_block_job_run,
+>      },
+>  };
+>  
+> diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+> index cb42f06e61..b0462bfdec 100644
+> --- a/tests/test-blockjob.c
+> +++ b/tests/test-blockjob.c
+> @@ -176,9 +176,9 @@ static void cancel_job_complete(Job *job, Error **errp)
+>      s->should_complete = true;
+>  }
+>  
+> -static void coroutine_fn cancel_job_start(void *opaque)
+> +static int coroutine_fn cancel_job_run(Job *job, Error **errp)
+>  {
+> -    CancelJob *s = opaque;
+> +    CancelJob *s = container_of(job, CancelJob, common.job);
+>  
+>      while (!s->should_complete) {
+>          if (job_is_cancelled(&s->common.job)) {
+> @@ -194,6 +194,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
+>  
+>   defer:
+>      job_defer_to_main_loop(&s->common.job, cancel_job_completed, s);
+> +    return 0;
+>  }
+>  
+>  static const BlockJobDriver test_cancel_driver = {
+> @@ -202,7 +203,7 @@ static const BlockJobDriver test_cancel_driver = {
+>          .free          = block_job_free,
+>          .user_resume   = block_job_user_resume,
+>          .drain         = block_job_drain,
+> -        .start         = cancel_job_start,
+> +        .run           = cancel_job_run,
+>          .complete      = cancel_job_complete,
+>      },
+>  };
+> -- 
+> 2.14.4
+> 
