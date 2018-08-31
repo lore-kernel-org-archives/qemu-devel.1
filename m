@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fvXN7-000561-62
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 20:33:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fvXuf-0003KQ-0D
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 21:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fvX7p-0006zs-1j
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 20:17:26 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38106)
+	(envelope-from <bounces@canonical.com>) id 1fvXin-0005tG-N0
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 20:55:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49652)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fvX7o-0006zL-NO
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 20:17:20 -0400
-Received: by mail-wr1-x442.google.com with SMTP id w11-v6so9582322wrc.5
-	for <qemu-devel@nongnu.org>; Thu, 30 Aug 2018 17:17:20 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180830173657.22939-1-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f5585867-f669-c58a-5f76-4b01ce9fb1e9@amsat.org>
-Date: Thu, 30 Aug 2018 21:17:17 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fvXin-0005t6-Gs
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 20:55:33 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fvXim-0007PZ-LO
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 00:55:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 94D262E80C9
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 00:55:32 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180830173657.22939-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] migration/rdma: Fix uninitialised
- rdma_return_path
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 Aug 2018 00:47:22 -0000
+From: Michele Denber <1787505@bugs.launchpad.net>
+Reply-To: Bug 1787505 <1787505@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153446472677.27869.256879611828000197.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153567644287.1705.5166937795587958652.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1787505] Re: Solaris host: no network connection,
+ mouse pointer mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, cohuck@redhat.com, jemmy858585@gmail.com
+To: qemu-devel@nongnu.org
 
-On 8/30/18 2:36 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Clang correctly errors out moaning that rdma_return_path
-> is used uninitialised in the earlier error paths.
-> Make it NULL so that the error path ignores it.
-> 
-> Fixes: 55cc1b5937a8e709e4c102e74b206281073aab82
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reprorted by: Cornelia Huck <cohuck@redhat.com>
+Anyone?  I'm still trying to get my networking working.  On this page:
+https://en.wikibooks.org/wiki/QEMU/Networking#User_mode_networking, it
+says
 
-"Reported-by"
+"The guest OS will see an E1000 NIC with a virtual DHCP server on
+10.0.2.2 and will be allocated an address starting from 10.0.2.15. A
+virtual DNS server will be accessible on 10.0.2.3, and a virtual SAMBA
+file server (if present) will be accessible on 10.0.2.4 allowing you to
+access files on the host via SAMBA file shares."
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+That's fine, but my LAN is on 192.186.0.x not, 10.2.0.x.  The following
+starts qemu but
 
-> ---
->  migration/rdma.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index ae07515e83..9b2e7e10aa 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -4012,7 +4012,7 @@ static void rdma_accept_incoming_migration(void *opaque)
->  void rdma_start_incoming_migration(const char *host_port, Error **errp)
->  {
->      int ret;
-> -    RDMAContext *rdma, *rdma_return_path;
-> +    RDMAContext *rdma, *rdma_return_path = NULL;
->      Error *local_err = NULL;
->  
->      trace_rdma_start_incoming_migration();
-> 
+./qemu-system-x86_64 -m 2047 -boot d  -usb -device usb-tablet  -smp 3
+-netdev user,id=3Dn0,net=3D192.168.0.0/24 -device rtl8139,netdev=3Dn0 -hda
+/bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.iso &
+
+shows an Ethernet device in XP but is unable to connect to anything via
+IE.
+
+
+But it also says
+
+"To use this network setup with the Linux kernel, you must set the
+configuration option CONFIG_E1000=3Dy when compiling."
+
+Does this (to the extent that Linux applies to Solaris) also apply if
+I'm using an rtl8139 card?
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1787505
+
+Title:
+  Solaris host: no network connection, mouse pointer mismatch
+
+Status in QEMU:
+  New
+
+Bug description:
+  This is probably a bit far afield but on a Solaris 10 SPARC host (Sun
+  M3000) running a Windows XP guest like this:
+
+  ./qemu-system-x86_64 -m 1024 -boot d  -smp 3 -net nic -net user -hda
+  /bkpool/qemuimages/XP.img -cdrom /bkpool/qemuimages/xp.iso &
+
+  the vnc server starts up and Windows boots normally.  However, there
+  is no network connectivity.  There are no network devices visible in
+  XP's Networking tab of Control Panel and a ping of the local router
+  reports "unreachable".
+
+  Also, the keyboard works fine but the guest mouse pointer is offset
+  from the host mouse position by an amount that varies by screen
+  position.  This makes it impossible to point to locations near the
+  edge of the qemu window.  This seems to be a previously reported
+  problem, but the suggested fix, " -device usb-tablet", prevents qemu
+  from even starting:
+
+  qemu-system-x86_64: -device usb-tablet: No 'usb-bus' bus found for
+  device 'usb-tablet'
+
+  The physical mouse is connected to the USB port of a Sun Ray 2fs
+  controlling the M3000 via Sun Ray server.  I apologize if this is a
+  configuration issue and not a bug but I don't know where else to
+  report it and have been unable to find a solution in the
+  documentation.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1787505/+subscriptions
