@@ -1,17 +1,17 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:57918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvs0J-0001d2-Gd
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:35:00 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fvs0G-0001d2-VF
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:34:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvrus-00079P-DF
+	(envelope-from <jsnow@redhat.com>) id 1fvrus-00079u-L8
 	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:29:23 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 31 Aug 2018 18:29:05 -0400
-Message-Id: <20180831222907.16257-14-jsnow@redhat.com>
+Date: Fri, 31 Aug 2018 18:28:57 -0400
+Message-Id: <20180831222907.16257-6-jsnow@redhat.com>
 In-Reply-To: <20180831222907.16257-1-jsnow@redhat.com>
 References: <20180831222907.16257-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 13/15] qapi/block-mirror: expose new job
- properties
+Subject: [Qemu-devel] [PATCH v3 05/15] block/mirror: don't install backing
+ chain on abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,127 +23,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: jtc@redhat.com, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- blockdev.c           | 14 ++++++++++++++
- qapi/block-core.json | 30 ++++++++++++++++++++++++++++--
- 2 files changed, 42 insertions(+), 2 deletions(-)
+In cases where we abort the block/mirror job, there's no point in
+installing the new backing chain before we finish aborting.
 
-diff --git a/blockdev.c b/blockdev.c
-index 98b91e75a7..429cdf9901 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3597,6 +3597,8 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-                                    bool has_filter_node_name,
-                                    const char *filter_node_name,
-                                    bool has_copy_mode, MirrorCopyMode copy_mode,
-+                                   bool has_auto_finalize, bool auto_finalize,
-+                                   bool has_auto_dismiss, bool auto_dismiss,
-                                    Error **errp)
- {
-     int job_flags = JOB_DEFAULT;
-@@ -3625,6 +3627,12 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-     if (!has_copy_mode) {
-         copy_mode = MIRROR_COPY_MODE_BACKGROUND;
+Move this to the "success" portion of mirror_exit.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/mirror.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
+
+diff --git a/block/mirror.c b/block/mirror.c
+index cba555b4ef..c164fee883 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -642,16 +642,6 @@ static void mirror_exit(Job *job)
+      * required before it could become a backing file of target_bs. */
+     bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+                             &error_abort);
+-    if (s->backing_mode == MIRROR_SOURCE_BACKING_CHAIN) {
+-        BlockDriverState *backing = s->is_none_mode ? src : s->base;
+-        if (backing_bs(target_bs) != backing) {
+-            bdrv_set_backing_hd(target_bs, backing, &local_err);
+-            if (local_err) {
+-                error_report_err(local_err);
+-                ret = -EPERM;
+-            }
+-        }
+-    }
+ 
+     if (s->to_replace) {
+         replace_aio_context = bdrv_get_aio_context(s->to_replace);
+@@ -659,9 +649,18 @@ static void mirror_exit(Job *job)
      }
-+    if (has_auto_finalize && !auto_finalize) {
-+        job_flags |= JOB_MANUAL_FINALIZE;
-+    }
-+    if (has_auto_dismiss && !auto_dismiss) {
-+        job_flags |= JOB_MANUAL_DISMISS;
-+    }
  
-     if (granularity != 0 && (granularity < 512 || granularity > 1048576 * 64)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "granularity",
-@@ -3802,6 +3810,8 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-                            arg->has_unmap, arg->unmap,
-                            false, NULL,
-                            arg->has_copy_mode, arg->copy_mode,
-+                           arg->has_auto_finalize, arg->auto_finalize,
-+                           arg->has_auto_dismiss, arg->auto_dismiss,
-                            &local_err);
-     bdrv_unref(target_bs);
-     error_propagate(errp, local_err);
-@@ -3823,6 +3833,8 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                          bool has_filter_node_name,
-                          const char *filter_node_name,
-                          bool has_copy_mode, MirrorCopyMode copy_mode,
-+                         bool has_auto_finalize, bool auto_finalize,
-+                         bool has_auto_dismiss, bool auto_dismiss,
-                          Error **errp)
- {
-     BlockDriverState *bs;
-@@ -3856,6 +3868,8 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                            true, true,
-                            has_filter_node_name, filter_node_name,
-                            has_copy_mode, copy_mode,
-+                           has_auto_finalize, auto_finalize,
-+                           has_auto_dismiss, auto_dismiss,
-                            &local_err);
-     error_propagate(errp, local_err);
+     if (s->should_complete && ret == 0) {
+-        BlockDriverState *to_replace = src;
+-        if (s->to_replace) {
+-            to_replace = s->to_replace;
++        BlockDriverState *to_replace = s->to_replace ? s->to_replace : src;
++
++        if (s->backing_mode == MIRROR_SOURCE_BACKING_CHAIN) {
++            BlockDriverState *backing = s->is_none_mode ? src : s->base;
++            if (backing_bs(target_bs) != backing) {
++                bdrv_set_backing_hd(target_bs, backing, &local_err);
++                if (local_err) {
++                    error_report_err(local_err);
++                    ret = -EPERM;
++                    goto clean;
++                }
++            }
+         }
  
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d5b62e50d7..e785c2e9fe 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1729,6 +1729,18 @@
- # @copy-mode: when to copy data to the destination; defaults to 'background'
- #             (Since: 3.0)
- #
-+# @auto-finalize: When false, this job will wait in a PENDING state after it has
-+#                 finished its work, waiting for @block-job-finalize before
-+#                 making any block graph changes.
-+#                 When true, this job will automatically
-+#                 perform its abort or commit actions.
-+#                 Defaults to true. (Since 3.1)
-+#
-+# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
-+#                has completely ceased all work, and awaits @block-job-dismiss.
-+#                When true, this job will automatically disappear from the query
-+#                list without user intervention.
-+#                Defaults to true. (Since 3.1)
- # Since: 1.3
- ##
- { 'struct': 'DriveMirror',
-@@ -1738,7 +1750,8 @@
-             '*speed': 'int', '*granularity': 'uint32',
-             '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
-             '*on-target-error': 'BlockdevOnError',
--            '*unmap': 'bool', '*copy-mode': 'MirrorCopyMode' } }
-+            '*unmap': 'bool', '*copy-mode': 'MirrorCopyMode',
-+            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
- # @BlockDirtyBitmap:
-@@ -2004,6 +2017,18 @@
- # @copy-mode: when to copy data to the destination; defaults to 'background'
- #             (Since: 3.0)
- #
-+# @auto-finalize: When false, this job will wait in a PENDING state after it has
-+#                 finished its work, waiting for @block-job-finalize before
-+#                 making any block graph changes.
-+#                 When true, this job will automatically
-+#                 perform its abort or commit actions.
-+#                 Defaults to true. (Since 3.1)
-+#
-+# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
-+#                has completely ceased all work, and awaits @block-job-dismiss.
-+#                When true, this job will automatically disappear from the query
-+#                list without user intervention.
-+#                Defaults to true. (Since 3.1)
- # Returns: nothing on success.
- #
- # Since: 2.6
-@@ -2025,7 +2050,8 @@
-             '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
-             '*on-target-error': 'BlockdevOnError',
-             '*filter-node-name': 'str',
--            '*copy-mode': 'MirrorCopyMode' } }
-+            '*copy-mode': 'MirrorCopyMode',
-+            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
- # @block_set_io_throttle:
+         if (bdrv_get_flags(target_bs) != bdrv_get_flags(to_replace)) {
+@@ -678,6 +677,8 @@ static void mirror_exit(Job *job)
+             ret = -EPERM;
+         }
+     }
++
++ clean:
+     if (s->to_replace) {
+         bdrv_op_unblock_all(s->to_replace, s->replace_blocker);
+         error_free(s->replace_blocker);
 -- 
 2.14.4
