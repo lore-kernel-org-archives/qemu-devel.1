@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fvgpX-0002wv-1o
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:07 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fvgpY-0002xx-7H
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fvgpT-0001v0-OR
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:06 -0400
-Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:55139)
+	(envelope-from <dgilbert@redhat.com>) id 1fvgpU-0001vk-Sh
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57404 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fvgpT-0001uA-Dr
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:03 -0400
-Received: from player168.ha.ovh.net (unknown [10.109.159.68])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 34B8CC400F
-	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 12:39:02 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 31 Aug 2018 12:38:11 +0200
-Message-Id: <20180831103816.13479-5-clg@kaod.org>
-In-Reply-To: <20180831103816.13479-1-clg@kaod.org>
-References: <20180831103816.13479-1-clg@kaod.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fvgpU-0001vN-Lt
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:04 -0400
+Date: Fri, 31 Aug 2018 11:38:56 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180831103855.GC2376@work-vm>
+References: <20180829153624.12299-1-david@redhat.com>
+	<20180829153624.12299-15-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 04/11] hw/arm/aspeed: add a 'mmio-exec'
- property to boot from the FMC flash module
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180829153624.12299-15-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 14/20] memory-device: ids of virtio
+ based devices are special
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>
 
-Now that MMIO execution is supported, introduce a 'mmio-exec' property
-to boot directly from CE0 of the FMC controller using a memory region
-alias.
+Actually on second thoughts, a question:
 
-The overhead for the current firmware images using a custom U-Boot is
-around 2 seconds, which is fine, but with a U-Boot from mainline, it
-takes an extra 50 seconds or so to reach Linux. This might be related
-to the fact that a device tree is used.
+* David Hildenbrand (david@redhat.com) wrote:
+> When reporting the id of virtio-based memory devices, we always have to
+> take the one of the proxy device (parent).
+> 
+> Expose the function, so especially virtio-based memory devices can
+> reuse the function when filling out the id in MemoryDeviceInfo.
+> 
+> Details:
+> 
+> When the user creates a virtio device (e.g.  virtio-balloon-pci), two
+> devices are actually created.
+> 
+> 1. Virtio proxy device (e.g. TYPE_VIRTIO_BALLOON_PCI)
+> 2. The "real" virtio device (e.g. TYPE_VIRTIO_BALLOON).
+> 
+> 1. aliases all properties of 2, so 2. can be properly configured using 1.
+> 1. gets the device ID set specified by the user. 2. gets no ID set.
+> 
+> If we want to make 2. a MemoryDevice but report errors/information to the
+> user, we always have to report the id of 1. (because that's the device the
+> user instantiated and configured).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/mem/memory-device.c         | 21 +++++++++++++++++++--
+>  include/hw/mem/memory-device.h |  1 +
+>  2 files changed, 20 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index a31ba73ea7..89a0c584be 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -19,6 +19,22 @@
+>  #include "sysemu/kvm.h"
+>  #include "trace.h"
+>  
+> +const char *memory_device_id(const MemoryDeviceState *md)
+> +{
+> +    Object *obj = OBJECT(md);
+> +
+> +    /* always use the ID of the proxy device for virtio devices */
+> +    if (object_dynamic_cast(obj, TYPE_VIRTIO_DEVICE)) {
+> +        if (obj->parent && object_dynamic_cast(obj->parent, TYPE_DEVICE)) {
+> +            const DeviceState *parent_dev = DEVICE(obj->parent);
+> +
+> +            return parent_dev->id;
+> +        }
+> +        return NULL;
+> +    }
+> +    return DEVICE(md)->id;
+> +}
+> +
+>  static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
+>  {
+>      const MemoryDeviceState *md_a = MEMORY_DEVICE(a);
+> @@ -168,6 +184,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>      for (item = list; item; item = g_slist_next(item)) {
+>          MemoryDeviceState *md = item->data;
+>          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
+> +        const char *id = memory_device_id(md);
+>          uint64_t md_size, md_addr;
+>  
+>          md_addr = mdc->get_addr(md);
+> @@ -178,8 +195,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>  
+>          if (ranges_overlap(md_addr, md_size, new_addr, size)) {
+>              if (hint) {
+> -                const DeviceState *d = DEVICE(md);
+> -                error_setg(errp, "address range conflicts with '%s'", d->id);
+> +                error_setg(errp, "address range conflicts with '%s'",
+> +                           id ? id : 0);
 
-MMIO execution is not activated by default because until boot time is
-improved.
+What's that 'id ? id : 0' trick for?
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/arm/aspeed.h |  2 ++
- hw/arm/aspeed.c         | 43 ++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 40 insertions(+), 5 deletions(-)
+Dave
 
-diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
-index 2b77f8d2b3c8..d079f4d6e5db 100644
---- a/include/hw/arm/aspeed.h
-+++ b/include/hw/arm/aspeed.h
-@@ -30,6 +30,8 @@ typedef struct AspeedBoardConfig {
-=20
- typedef struct AspeedMachine {
-     MachineState parent_obj;
-+
-+    bool mmio_exec;
- } AspeedMachine;
-=20
- #define ASPEED_MACHINE_CLASS(klass) \
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 6b33ecd5aa43..3a66c2dedc3e 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -216,11 +216,18 @@ static void aspeed_board_init(MachineState *machine=
-,
-          * SoC and 128MB for the AST2500 SoC, which is twice as big as
-          * needed by the flash modules of the Aspeed machines.
-          */
--        memory_region_init_rom(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
--                               fl->size, &error_abort);
--        memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
--                                    boot_rom);
--        write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort);
-+        if (ASPEED_MACHINE(machine)->mmio_exec) {
-+            memory_region_init_alias(boot_rom, OBJECT(bmc), "aspeed.boot=
-_rom",
-+                                     &fl->mmio, 0, fl->size);
-+            memory_region_add_subregion(get_system_memory(), FIRMWARE_AD=
-DR,
-+                                        boot_rom);
-+        } else {
-+            memory_region_init_rom(boot_rom, OBJECT(bmc), "aspeed.boot_r=
-om",
-+                                   fl->size, &error_abort);
-+            memory_region_add_subregion(get_system_memory(), FIRMWARE_AD=
-DR,
-+                                        boot_rom);
-+            write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort=
-);
-+        }
-     }
-=20
-     aspeed_board_binfo.kernel_filename =3D machine->kernel_filename;
-@@ -313,6 +320,29 @@ static void aspeed_machine_init(MachineState *machin=
-e)
-     aspeed_board_init(machine, amc->board);
- }
-=20
-+static bool aspeed_get_mmio_exec(Object *obj, Error **errp)
-+{
-+    return ASPEED_MACHINE(obj)->mmio_exec;
-+}
-+
-+static void aspeed_set_mmio_exec(Object *obj, bool value, Error **errp)
-+{
-+    ASPEED_MACHINE(obj)->mmio_exec =3D value;
-+}
-+
-+static void aspeed_machine_instance_init(Object *obj)
-+{
-+    ASPEED_MACHINE(obj)->mmio_exec =3D false;
-+}
-+
-+static void aspeed_machine_class_props_init(ObjectClass *oc)
-+{
-+    object_class_property_add_bool(oc, "mmio-exec", aspeed_get_mmio_exec=
-,
-+                                   aspeed_set_mmio_exec, &error_abort);
-+    object_class_property_set_description(oc, "mmio-exec",
-+                              "boot using MMIO execution", &error_abort)=
-;
-+}
-+
- static void aspeed_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-@@ -327,6 +357,8 @@ static void aspeed_machine_class_init(ObjectClass *oc=
-, void *data)
-     mc->no_cdrom =3D 1;
-     mc->no_parallel =3D 1;
-     amc->board =3D board;
-+
-+    aspeed_machine_class_props_init(oc);
- }
-=20
- static const TypeInfo aspeed_machine_type =3D {
-@@ -334,6 +366,7 @@ static const TypeInfo aspeed_machine_type =3D {
-     .parent =3D TYPE_MACHINE,
-     .instance_size =3D sizeof(AspeedMachine),
-     .class_size =3D sizeof(AspeedMachineClass),
-+    .instance_init =3D aspeed_machine_instance_init,
-     .abstract =3D true,
- };
-=20
---=20
-2.17.1
+>                  goto out;
+>              }
+>              new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
+> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+> index 05cb9437b7..324cc45b6f 100644
+> --- a/include/hw/mem/memory-device.h
+> +++ b/include/hw/mem/memory-device.h
+> @@ -54,6 +54,7 @@ typedef struct MemoryDeviceClass {
+>                               MemoryDeviceInfo *info);
+>  } MemoryDeviceClass;
+>  
+> +const char *memory_device_id(const MemoryDeviceState *md);
+>  MemoryDeviceInfoList *qmp_memory_device_list(void);
+>  uint64_t get_plugged_memory_size(void);
+>  void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
