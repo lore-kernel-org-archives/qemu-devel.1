@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvl5J-0005ig-0z
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:11:44 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fvlGa-0003VL-OW
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:23:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvkvi-0000vI-7w
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:01:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50296 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fvkvi-0000ux-2y
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:01:46 -0400
-References: <20180829153624.12299-1-david@redhat.com>
-	<20180829153624.12299-15-david@redhat.com>
-	<20180831103855.GC2376@work-vm>
-	<6aabaa18-33f1-dea3-0824-74f78fcb2d0c@redhat.com>
-	<20180831104302.GD2376@work-vm>
-	<8d71de77-9fa8-4100-41be-8e1d689ba98b@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e728135e-1996-207b-e7bb-df760cc7abff@redhat.com>
-Date: Fri, 31 Aug 2018 10:01:15 -0500
+	(envelope-from <jsnow@redhat.com>) id 1fvlGZ-000162-SE
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:23:20 -0400
+References: <20180830015734.19765-1-jsnow@redhat.com>
+	<20180830015734.19765-3-jsnow@redhat.com>
+	<6ed2e7ac-8de1-bd7b-0787-fdd33c6b306e@redhat.com>
+	<87mut3ukyi.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <126a3e52-7706-d6dc-fb7a-bda8e11d9791@redhat.com>
+Date: Fri, 31 Aug 2018 11:23:03 -0400
 MIME-Version: 1.0
-In-Reply-To: <8d71de77-9fa8-4100-41be-8e1d689ba98b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <87mut3ukyi.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 14/20] memory-device: ids of virtio
- based devices are special
+Subject: Re: [Qemu-devel] [PATCH v3 2/9] jobs: canonize Error object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,32 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 08/31/2018 06:18 AM, David Hildenbrand wrote:
 
->>>>> -                error_setg(errp, "address range conflicts with '%s'", d->id);
->>>>> +                error_setg(errp, "address range conflicts with '%s'",
->>>>> +                           id ? id : 0);
->>>>
->>>> What's that 'id ? id : 0' trick for?
->>>
->>> 0 -> "", then it actually makes sense :)
->>>
 
+On 08/31/2018 02:08 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
 > 
-> qemu-system-x86_64: -device pc-dimm,memdev=mem1,addr=0x140000000:
-> address range conflicts with '(null)'
+>> On 08/29/2018 08:57 PM, John Snow wrote:
+>>> Jobs presently use both an Error object in the case of the create job,
+>>> and char strings in the case of generic errors elsewhere.
+>>>
+>>> Unify the two paths as just j->err, and remove the extra argument from
+>>> job_completed. The integer error code for job_completed is kept for now,
+>>> to be removed shortly in a separate patch.
+>>>
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>
+>>> +++ b/job.c
+>>
+>>> @@ -666,8 +666,8 @@ static void job_update_rc(Job *job)
+>>>           job->ret = -ECANCELED;
+>>>       }
+>>>       if (job->ret) {
+>>> -        if (!job->error) {
+>>> -            job->error = g_strdup(strerror(-job->ret));
+>>> +        if (!job->err) {
+>>> +            error_setg(&job->err, "%s", g_strdup(strerror(-job->ret)));
+>>
+>> Memleak. Drop the g_strdup(), and just directly pass strerror()
+>> results to error_setg().  (I guess we can't quite use
+>> error_setg_errno() unless we add additional text beyond the strerror()
+>> results).
 > 
-> (I thought providing NULL would lead to a crash, but it is actually
-> handled properly)
+> Adding such text might well be an improvement.  I'm not telling you to
+> do so (not having looked at the context myself), just to think about it.
+> 
 
-Well, glibc handles it. But POSIX says it is undefined, and there are 
-other libc where it indeed crashes.  It's better to pass an explicit 
-non-null placeholder than to rely on glibc turning NULL into "(null)".
+In this case, and I agree with Kevin who suggested it; we ought to be
+moving away from the retcode in general and using first-class error
+objects for all of our jobs anyway.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+In this case, the job has failed with a retcode and we wish to give the
+user some hope of understanding why, but at this point in the code all
+we know is what the strerror can tell us, so a generic prefix like "The
+job failed" is not helpful because it will already be clear by events
+and other things that the job failed.
+
+The only text I can think of that would be useful is: "The job failed
+and didn't give a more specific error message. Please email
+qemu-devel@nongnu.org and harass the authors until they fix it. Anyway,
+nice chatting to you, the generic error message is: %s"
+
+--js
+
+>> With that fixed,
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
