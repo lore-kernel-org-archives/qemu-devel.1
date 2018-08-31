@@ -1,22 +1,20 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:58595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvs0q-0002Nt-20
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:35:32 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fvs0r-0002Nt-0Q
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:35:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvs0m-00029d-SA
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:35:31 -0400
-References: <20180831222907.16257-1-jsnow@redhat.com>
-	<20180831222907.16257-4-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <75a7f793-3b44-7fab-42ef-1ee7706a02f8@redhat.com>
-Date: Fri, 31 Aug 2018 17:34:40 -0500
+	(envelope-from <joel.stan@gmail.com>) id 1fvrid-0002C4-QU
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:16:44 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180831222907.16257-4-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 03/15] block/stream: add block job
- creation flags
+References: <20180831103816.13479-1-clg@kaod.org>
+In-Reply-To: <20180831103816.13479-1-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Fri, 31 Aug 2018 15:16:31 -0700
+Message-ID: <CACPK8Xdgq4ToH7yOh-v=bqLb6uhqTKeEt9DXOrXx8SaA6UV57A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/11] aspeed: misc fixes and enhancements
+ (SMC)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,25 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jtc@redhat.com, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>, alistair@alistair23.me, crosthwaite.peter@gmail.com
 
-On 08/31/2018 05:28 PM, John Snow wrote:
-> Add support for taking and passing forward job creaton flags.
+On Fri, 31 Aug 2018 at 03:38, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> Hello,
+>
+> This series adds a couple of cleanups and two main features to the
+> Aspeed machines :
+>
+>  - a 'mmio-exec' property to boot directly from a memory region alias
+>    of the FMC flash module using MMIO execution. This is not activated
+>    by default because boot time needs to be improved on recent
+>    firmwares.
+>
+>  - support for DMA to access the flash modules. Our primary need is
+>    the checksum calculation which is used to evaluate the best clock
+>    settings for reads.
 
-s/creaton/creation/ (here and in 2/15 as well)
+I gave this series a number of tests and it looked good.
 
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
->   block/stream.c            | 5 +++--
->   blockdev.c                | 3 ++-
->   include/block/block_int.h | 5 ++++-
->   3 files changed, 9 insertions(+), 4 deletions(-)
-> 
+ Tested-by: Joel Stanley <joel@jms.id.au>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Cheers,
+
+Joel
