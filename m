@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fvfsG-0003aL-Vo
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 05:37:53 -0400
+	(envelope-from <quintela@redhat.com>) id 1fvfvi-0004kA-Cu
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 05:41:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fvfsC-000696-0y
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 05:37:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57036 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fvfvc-0008Cd-P7
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 05:41:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39106 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fvfsB-00068O-SP
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 05:37:47 -0400
-Date: Fri, 31 Aug 2018 10:37:43 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180831093742.GA2376@work-vm>
-References: <20180830173657.22939-1-dgilbert@redhat.com>
-	<f5585867-f669-c58a-5f76-4b01ce9fb1e9@amsat.org>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fvfva-00089o-O2
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 05:41:19 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180829135814.GE2412@work-vm> (David Alan Gilbert's message of
+	"Wed, 29 Aug 2018 14:58:15 +0100")
+References: <CABgNM92-PHWg3X41tCVfErmV9-Hnu5GYpz_pa9-iXfbScFUCZg@mail.gmail.com>
+	<CD29DCF7-6537-406F-A127-6A2FFDDAAD79@caviumnetworks.com>
+	<87k1ohxik4.fsf@trasno.org>
+	<3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
+	<20180828172739.GA10175@work-vm>
+	<19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
+	<20180829135814.GE2412@work-vm>
+Reply-To: quintela@redhat.com
+Date: Fri, 31 Aug 2018 11:41:03 +0200
+Message-ID: <87d0tyoouo.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <f5585867-f669-c58a-5f76-4b01ce9fb1e9@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration/rdma: Fix uninitialised
- rdma_return_path
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
+ different processor ids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +34,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, cohuck@redhat.com, jemmy858585@gmail.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, Auger Eric <eric.auger@redhat.com>, "drjones@redhat.com" <drjones@redhat.com>, "peter.maydell@linaro.org qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Liguori <aliguori@us.ibm.com>
 
-* Philippe Mathieu-Daud=E9 (f4bug@amsat.org) wrote:
-> On 8/30/18 2:36 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >=20
-> > Clang correctly errors out moaning that rdma_return_path
-> > is used uninitialised in the earlier error paths.
-> > Make it NULL so that the error path ignores it.
-> >=20
-> > Fixes: 55cc1b5937a8e709e4c102e74b206281073aab82
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Reprorted by: Cornelia Huck <cohuck@redhat.com>
->=20
-> "Reported-by"
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Jaggi, Manish (Manish.Jaggi@cavium.com) wrote:
+>
+>> Just to add what happens in ARM64 case, qemu running on Machine A sends cpu state information to Machine B.
+>> This state contains MIDR value, and so Processor ID value is compared in KVM and not in qemu (correcting myself).
+>> 
+>> IIRC, Peter/Eric please point if there is something incorrect in the below flow...
+>> 
+>> (Machine B)
+>> target/arm/machine.c: cpu_post_load()
+>> 		- updates cpu->cpreg_values[i] : which includes MIDR (processor ID register)
+>> 
+>> 		- calls write_list_to_kvmstate(cpu, KVM_PUT_FULL_STATE)
+>> 
+>> 				target/arm/kvm.c: write_list_to_kvmstate
+>> 				- calls => kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &r);
+>> 
+>> 					=> and it eventually lands up IIRC in Linux code in 
+>> 
+>> 							=> arch/arm64/kvm/sys_regs.c : set_invariant_sys_reg(u64 id, void __user *uaddr)
+>> 							 	/* This is what we mean by invariant: you can't change it. */
+>> 								if (r->val != val)
+>> 									return -EINVAL;
+>> 								Note: MIDR_EL1 is invariant register.
+>> result: Migration fails on Machine B.
+>> 
+>> A few points:
+>> - qemu on arm64 is invoked with -machine virt and -cpu as host. So we don't explicitly define which cpu. 
+>
+> Note that even on x86 we don't guarantee as much about '-cpu host', what
+> we expect to work for migration is that if you pick a   '-cpu amodel'
+> and both hosts support the feature flags required by 'amodel' then it
+> should work.
 
-Oops
+I really think that the right approach here is not using -cpu host.  You
+do the full work, create a model as David says, and be sure that you car
+run that model on both cpus.  It is a lot of work, but it is the only
+way to make sure that this is going to work long term.
 
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>> - In case Machine A and Machine B have almost same Core and the
+>> delta may-not have any effect on qemu operation, migration should
+>> work by just looking into whitelist.
+>> whitelist can be given as a parameter for qemu on machine B.
+>> 
+>> qemu-system-aarch64 -whitelist <ids separated by commas>
+>> 
+>> (This is my proposal)
+>> 
+>> - So in cpu_post_load (Machine B) qemu can lookup whitelist and
+>> replace the MIDR with the one at Machine B.
+>> Sounds good?
+>> 
+>> - Juan raised a point about clock speed, I am not sure it will have
+>> any effect on arm since qemu is run with -cpu host param.
+>> I could be wrong here, Peter/Eric can you please correct me...
+>
+> Clock speed is only really a problem for things like timestamp counters;
+> some cores let you scale them; for those that don't then yes it's a bit
+> odd.
 
-Thanks,
+This was just one example that I thought on top of my head.  Other thing
+that I remember was that at some point, if you migrated to a cpu with
+hyperthreading, you lost half of your performance counters.  I still
+think that you need to create a proper model, and work from there.
 
-Dave
-
->=20
-> > ---
-> >  migration/rdma.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/migration/rdma.c b/migration/rdma.c
-> > index ae07515e83..9b2e7e10aa 100644
-> > --- a/migration/rdma.c
-> > +++ b/migration/rdma.c
-> > @@ -4012,7 +4012,7 @@ static void rdma_accept_incoming_migration(void=
- *opaque)
-> >  void rdma_start_incoming_migration(const char *host_port, Error **er=
-rp)
-> >  {
-> >      int ret;
-> > -    RDMAContext *rdma, *rdma_return_path;
-> > +    RDMAContext *rdma, *rdma_return_path =3D NULL;
-> >      Error *local_err =3D NULL;
-> > =20
-> >      trace_rdma_start_incoming_migration();
-> >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Later, Juan.
