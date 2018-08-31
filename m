@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkTo-0004gn-CP
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:32:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkTp-0004o5-KU
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:32:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkTn-0004GV-HT
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:32:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkTo-0004HL-Qd
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:32:57 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 31 Aug 2018 16:32:31 +0200
-Message-Id: <20180831143241.31787-1-mreitz@redhat.com>
+Date: Fri, 31 Aug 2018 16:32:32 +0200
+Message-Id: <20180831143241.31787-2-mreitz@redhat.com>
+In-Reply-To: <20180831143241.31787-1-mreitz@redhat.com>
+References: <20180831143241.31787-1-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/10] Block patches
+Subject: [Qemu-devel] [PULL v2 01/10] tests: fix bdrv-drain leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +25,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
-The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd2415574=
-52:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27=
--v2' into staging (2018-08-27 16:44:20 +0100)
+Spotted by ASAN:
 
-are available in the Git repository at:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=3D=3D5378=3D=3DERROR: LeakSanitizer: detected memory leaks
 
-  https://git.xanclic.moe/XanClic/qemu.git tags/pull-block-2018-08-31-v2
+Direct leak of 65536 byte(s) in 1 object(s) allocated from:
+    #0 0x7f788f83bc48 in malloc (/lib64/libasan.so.5+0xeec48)
+    #1 0x7f788c9923c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
+    #2 0x5622a1fe37bc in coroutine_trampoline /home/elmarco/src/qq/util/c=
+oroutine-ucontext.c:116
+    #3 0x7f788a15d75f in __correctly_grouped_prefixwc (/lib64/libc.so.6+0=
+x4c75f)
 
-for you to fetch changes up to e21a1c9831fc80ae3f3c1affdfa43350035d8588:
+(Broken in commit 4c8158e359d.)
 
-  jobs: remove job_defer_to_main_loop (2018-08-31 16:28:33 +0200)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20180809114417.28718-3-marcandre.lureau@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/test-bdrv-drain.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-----------------------------------------------------------------
-Block patches:
-- (Block) job exit refactoring, part 1
-  (removing job_defer_to_main_loop())
-- test-bdrv-drain leak fix
-
-----------------------------------------------------------------
-John Snow (9):
-  jobs: change start callback to run callback
-  jobs: canonize Error object
-  jobs: add exit shim
-  block/commit: utilize job_exit shim
-  block/mirror: utilize job_exit shim
-  jobs: utilize job_exit shim
-  block/backup: make function variables consistently named
-  jobs: remove ret argument to job_completed; privatize it
-  jobs: remove job_defer_to_main_loop
-
-Marc-Andr=C3=A9 Lureau (1):
-  tests: fix bdrv-drain leak
-
- include/qemu/job.h        | 70 ++++++++++++++++-----------------
- block/backup.c            | 81 ++++++++++++++++-----------------------
- block/commit.c            | 29 +++++---------
- block/create.c            | 19 +++------
- block/mirror.c            | 39 ++++++++-----------
- block/stream.c            | 29 ++++++--------
- job-qmp.c                 |  5 ++-
- job.c                     | 73 ++++++++++++-----------------------
- tests/test-bdrv-drain.c   | 14 +++----
- tests/test-blockjob-txn.c | 25 +++++-------
- tests/test-blockjob.c     | 17 ++++----
- trace-events              |  2 +-
- 12 files changed, 161 insertions(+), 242 deletions(-)
-
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 17bb8508ae..abc8bbe6f0 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -948,6 +948,7 @@ static void coroutine_fn test_co_delete_by_drain(void=
+ *opaque)
+     }
+=20
+     dbdd->done =3D true;
++    g_free(buffer);
+ }
+=20
+ /**
 --=20
 2.17.1
