@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fvcV8-0006FS-UV
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:01:48 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fvcag-0000vO-2Q
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:07:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fvcV5-0005QG-Kn
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:01:46 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180830145902.27376-1-cohuck@redhat.com>
-	<20180830145902.27376-3-cohuck@redhat.com>
-Date: Fri, 31 Aug 2018 08:01:39 +0200
-In-Reply-To: <20180830145902.27376-3-cohuck@redhat.com> (Cornelia Huck's
-	message of "Thu, 30 Aug 2018 16:59:02 +0200")
-Message-ID: <87tvnbvzuk.fsf@dusky.pond.sub.org>
+	(envelope-from <kraxel@redhat.com>) id 1fvcac-00005K-5b
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:07:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49744 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fvcaa-0007qg-Qu
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:07:24 -0400
+Date: Fri, 31 Aug 2018 08:07:15 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180831060715.mmiwtsdienomd37b@sirius.home.kraxel.org>
+References: <petKSachdmuxWMgY2EXHzES3PpUCAUwQacKEaIU9PHykNXfsah1sP3OaVuDLz0VBYJM7qtJsWSrv3U9bkb_2LT_itBxDbAYKIHlEJJXtEiE=@protonmail.com>
+	<20180827101609.p2blhd7ka7gkqqtq@sirius.home.kraxel.org>
+	<CSjEdwPfIMyBPsRNM1KZG7ugmTMLh2leLbHEBEQ2o0UjHftEBoh98TcX-xoHTgjDAW7Vn1psMATSN_4IS68-sdTWKkd32SL-HGN5A5-pqz0=@protonmail.com>
+	<20180830105102.mk3p4rnpge7f2n4h@sirius.home.kraxel.org>
+	<VfOZq_8WA8_tWfpd_mx7RajgNVmE8Qm0NSeInrS-66gCH0OTsrgsXV3kVPOQkk0TpC_7xBuegwMuM27aS7yK78nonRd1GjNgv4tZQian1Qs=@protonmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] qemu-error: make use of {error,
- warn}_report_once_cond
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <VfOZq_8WA8_tWfpd_mx7RajgNVmE8Qm0NSeInrS-66gCH0OTsrgsXV3kVPOQkk0TpC_7xBuegwMuM27aS7yK78nonRd1GjNgv4tZQian1Qs=@protonmail.com>
+Subject: Re: [Qemu-devel] [PATCH] input-linux: toggle for lock keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +30,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+To: Ryan El Kochta <lightn1ngstr1ke@protonmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Cornelia Huck <cohuck@redhat.com> writes:
+  Hi,
 
-> {error,warn}_report_once() are a special case of the new functions
-> and can simply switch to them.
->
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  include/qemu/error-report.h | 34 ++++++++++++++--------------------
->  1 file changed, 14 insertions(+), 20 deletions(-)
->
-> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-> index e415128ac4..918cb936d8 100644
-> --- a/include/qemu/error-report.h
-> +++ b/include/qemu/error-report.h
-> @@ -53,32 +53,26 @@ bool warn_report_once_cond(bool *printed, const char *fmt, ...)
->   * Similar to error_report(), except it prints the message just once.
->   * Return true when it prints, false otherwise.
->   */
-> -#define error_report_once(fmt, ...)             \
-> -    ({                                          \
-> -        static bool print_once_;                \
-> -        bool ret_print_once_ = !print_once_;    \
-> -                                                \
-> -        if (!print_once_) {                     \
-> -            print_once_ = true;                 \
-> -            error_report(fmt, ##__VA_ARGS__);   \
-> -        }                                       \
-> -        unlikely(ret_print_once_);              \
-> +#define error_report_once(fmt, ...)                     \
-> +    ({                                                  \
-> +        static bool print_once_;                        \
-> +        bool ret_print_once_ =                          \
-> +            error_report_once_cond(&print_once_,        \
-> +                                   fmt, ##__VA_ARGS__); \
-> +        unlikely(ret_print_once_);                      \
->      })
+> That's a wonderful idea. Would you be comfortable with
+> grab_toggle=custom:x:x as well?
 
-Do we still need @ret_print_once_?
+What this is supposed to do?
 
-   #define error_report_once(fmt, ...)                     \
-       ({                                                  \
-           static bool print_once_;                        \
-           unlikely(error_report_once_cond(&print_once_,   \
-                                   fmt, ##__VA_ARGS__));   \
-       })
-
-Or dispense with the unlikely:
-
-   #define error_report_once(fmt, ...)                     \
-       ({                                                  \
-           static bool print_once_;                        \
-           error_report_once_cond(&print_once_,            \
-                                  fmt, ##__VA_ARGS__);     \
-       })
-
-Got a preference?
-
->  
->  /*
->   * Similar to warn_report(), except it prints the message just once.
->   * Return true when it prints, false otherwise.
->   */
-> -#define warn_report_once(fmt, ...)              \
-> -    ({                                          \
-> -        static bool print_once_;                \
-> -        bool ret_print_once_ = !print_once_;    \
-> -                                                \
-> -        if (!print_once_) {                     \
-> -            print_once_ = true;                 \
-> -            warn_report(fmt, ##__VA_ARGS__);    \
-> -        }                                       \
-> -        unlikely(ret_print_once_);              \
-> +#define warn_report_once(fmt, ...)                      \
-> +    ({                                                  \
-> +        static bool print_once_;                        \
-> +        bool ret_print_once_ =                          \
-> +            warn_report_once_cond(&print_once_,         \
-> +                                  fmt, ##__VA_ARGS__);  \
-> +        unlikely(ret_print_once_);                      \
->      })
->  
->  const char *error_get_progname(void);
+cheers,
+  Gerd
