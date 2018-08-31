@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fvd65-0000DY-P7
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:40:01 -0400
+	(envelope-from <chen_han_xiao@126.com>) id 1fvd6k-0000DX-M9
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fvcx4-0001QX-W9
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:30:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36086 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fvcx4-0001NX-Ou
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:30:38 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180829134043.31706-1-marcandre.lureau@redhat.com>
-	<20180829134043.31706-8-marcandre.lureau@redhat.com>
-	<878t4o3szg.fsf@dusky.pond.sub.org>
-	<CAJ+F1CL=WEDZUCbNnrm_mm6sX3sLOcnJ3CHNj9Ec8gHmUYCYbg@mail.gmail.com>
-Date: Fri, 31 Aug 2018 08:30:34 +0200
-In-Reply-To: <CAJ+F1CL=WEDZUCbNnrm_mm6sX3sLOcnJ3CHNj9Ec8gHmUYCYbg@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 30 Aug 2018
-	17:42:13 +0200")
-Message-ID: <8736uvujxx.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 07/10] tests: add
- qmp/qom-set-without-value test
+	(envelope-from <chen_han_xiao@126.com>) id 1fvcrW-0005t6-JE
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:24:57 -0400
+Received: from m15-114.126.com ([220.181.15.114]:51146)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1fvcrV-0005sJ-BM
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:24:54 -0400
+From: Chen Hanxiao <chen_han_xiao@126.com>
+Date: Fri, 31 Aug 2018 14:22:50 +0800
+Message-Id: <20180831062250.12425-1-chen_han_xiao@126.com>
+Subject: [Qemu-devel] [PATCH v2] qga-win: add support for
+ qmp_guest_fsfreeze_freeze_list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,96 +22,309 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, Chen Hanxiao <chen_han_xiao@126.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+From: Chen Hanxiao <chenhanxiao@gmail.com>
 
-> Hi
->
-> On Thu, Aug 30, 2018 at 3:05 PM Markus Armbruster <armbru@redhat.com> wro=
-te:
->>
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->> > test_qom_set_without_value() is about a bug in infrastructure used by
->> > the QMP core, fixed in commit c489780203.  We covered the bug in
->> > infrastructure unit tests (commit bce3035a44).  I wrote that test
->> > earlier, to cover QMP level as well, the test could go into qmp-test.
->> >
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> > ---
->> >  tests/qmp-test.c | 18 ++++++++++++++++++
->> >  1 file changed, 18 insertions(+)
->> >
->> > diff --git a/tests/qmp-test.c b/tests/qmp-test.c
->> > index 4ae2245484..fdfe73b6d2 100644
->> > --- a/tests/qmp-test.c
->> > +++ b/tests/qmp-test.c
->> > @@ -348,6 +348,23 @@ static void test_qmp_preconfig(void)
->> >      qtest_quit(qs);
->> >  }
->> >
->> > +static void test_qom_set_without_value(void)
->> > +{
->> > +    QTestState *qts;
->> > +    QDict *ret;
->> > +
->> > +    qts =3D qtest_init(common_args);
->> > +
->> > +    ret =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
->> > +                    " { 'path': '/machine', 'property': 'rtc-time' } =
-}");
->> > +    g_assert_nonnull(ret);
->> > +
->> > +    g_assert_cmpstr(get_error_class(ret), =3D=3D, "GenericError");
->> > +
->> > +    qobject_unref(ret);
->> > +    qtest_quit(qts);
->> > +}
->> > +
->> >  int main(int argc, char *argv[])
->> >  {
->> >      g_test_init(&argc, &argv, NULL);
->> > @@ -355,6 +372,7 @@ int main(int argc, char *argv[])
->> >      qtest_add_func("qmp/protocol", test_qmp_protocol);
->> >      qtest_add_func("qmp/oob", test_qmp_oob);
->> >      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
->> > +    qtest_add_func("qmp/qom-set-without-value", test_qom_set_without_=
-value);
->> >
->> >      return g_test_run();
->> >  }
->>
->> What we're testing here is a missing 'any' parameter.  The test should
->> be named accordingly.  Perhaps:
->>
->>        qtest_add_func("qmp/missing-any", test_missing_any);
->
-> Eh, the inner visitor fix was about an 'any' parameter missing.
->
-> But the test is more about about checking the behaviour of qom-set
-> without 'value' argument. I would not rename it based on the internal
-> bug that was fixed.
+This patch add support for freeze specified fs.
 
-Missing arguments are caught by the QObject input visitor on behalf of
-the generated command marshalling code.  The command handler isn't
-called then.  Thus, qom-set doesn't get to behave!  All the test really
-tests is that
+The valid mountpoints list member are [1]:
 
-* the visitor behaves (redundant with test-qobject-input-visitor.c's
-  test_visitor_in_fail_struct_missing()),
+  The path of a mounted folder, for example, Y:\MountX\
+  A drive letter, for example, D:\
+  A volume GUID path of the form \\?\Volume{GUID}\,
+      where GUID identifies the volume
+  A UNC path that specifies a remote file share,
+      for example, \\Clusterx\Share1\
 
-* the generated marshalling code handles visitor failure (I guess that's
-  worth covering here),
+[1] https://docs.microsoft.com/en-us/windows/desktop/api/vsbackup/nf-vsbackup-ivssbackupcomponents-addtosnapshotset
 
-* and the QMP core handles command failure (redundant with numerous
-  other tests, but covering it here once more won't hurt).
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+---
+v2:
+  optimize internal logic blocks
 
-The test could just as well any other command with a mandatory argument
-of type 'any', such as qom-set or object-add.
+ qga/commands-win32.c        | 21 ++++-----
+ qga/main.c                  |  2 +-
+ qga/vss-win32.c             |  5 +-
+ qga/vss-win32.h             |  3 +-
+ qga/vss-win32/requester.cpp | 92 ++++++++++++++++++++++++++-----------
+ qga/vss-win32/requester.h   | 13 ++++--
+ 6 files changed, 91 insertions(+), 45 deletions(-)
 
-Same for arguments of inadmissible JSON type.
-
-Having written all this, I now think the test should be named
-"qmp/invalid-arg".
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 98d9735389..1d627f73c1 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -776,6 +776,13 @@ GuestFsfreezeStatus qmp_guest_fsfreeze_status(Error **errp)
+  * The frozen state is limited for up to 10 seconds by VSS.
+  */
+ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
++{
++    return qmp_guest_fsfreeze_freeze_list(false, NULL, errp);
++}
++
++int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
++                                       strList *mountpoints,
++                                       Error **errp)
+ {
+     int i;
+     Error *local_err = NULL;
+@@ -790,7 +797,7 @@ int64_t qmp_guest_fsfreeze_freeze(Error **errp)
+     /* cannot risk guest agent blocking itself on a write in this state */
+     ga_set_frozen(ga_state);
+ 
+-    qga_vss_fsfreeze(&i, true, &local_err);
++    qga_vss_fsfreeze(&i, true, mountpoints, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto error;
+@@ -808,15 +815,6 @@ error:
+     return 0;
+ }
+ 
+-int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
+-                                       strList *mountpoints,
+-                                       Error **errp)
+-{
+-    error_setg(errp, QERR_UNSUPPORTED);
+-
+-    return 0;
+-}
+-
+ /*
+  * Thaw local file systems using Volume Shadow-copy Service.
+  */
+@@ -829,7 +827,7 @@ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
+         return 0;
+     }
+ 
+-    qga_vss_fsfreeze(&i, false, errp);
++    qga_vss_fsfreeze(&i, false, NULL, errp);
+ 
+     ga_unset_frozen(ga_state);
+     return i;
+@@ -1646,7 +1644,6 @@ GList *ga_command_blacklist_init(GList *blacklist)
+         "guest-set-vcpus",
+         "guest-get-memory-blocks", "guest-set-memory-blocks",
+         "guest-get-memory-block-size",
+-        "guest-fsfreeze-freeze-list",
+         NULL};
+     char **p = (char **)list_unsupported;
+ 
+diff --git a/qga/main.c b/qga/main.c
+index 6d70242d05..13bfff5f0a 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -151,7 +151,7 @@ static void quit_handler(int sig)
+             WaitForSingleObject(hEventTimeout, 0);
+             CloseHandle(hEventTimeout);
+         }
+-        qga_vss_fsfreeze(&i, false, &err);
++        qga_vss_fsfreeze(&i, false, NULL, &err);
+         if (err) {
+             g_debug("Error unfreezing filesystems prior to exiting: %s",
+                 error_get_pretty(err));
+diff --git a/qga/vss-win32.c b/qga/vss-win32.c
+index a541f3ae01..f444a25a70 100644
+--- a/qga/vss-win32.c
++++ b/qga/vss-win32.c
+@@ -147,7 +147,8 @@ void ga_uninstall_vss_provider(void)
+ }
+ 
+ /* Call VSS requester and freeze/thaw filesystems and applications */
+-void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
++void qga_vss_fsfreeze(int *nr_volume, bool freeze,
++                      strList *mountpoints, Error **errp)
+ {
+     const char *func_name = freeze ? "requester_freeze" : "requester_thaw";
+     QGAVSSRequesterFunc func;
+@@ -164,5 +165,5 @@ void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp)
+         return;
+     }
+ 
+-    func(nr_volume, &errset);
++    func(nr_volume, mountpoints, &errset);
+ }
+diff --git a/qga/vss-win32.h b/qga/vss-win32.h
+index 4f8e39aa5c..ce2abe5a72 100644
+--- a/qga/vss-win32.h
++++ b/qga/vss-win32.h
+@@ -22,6 +22,7 @@ bool vss_initialized(void);
+ int ga_install_vss_provider(void);
+ void ga_uninstall_vss_provider(void);
+ 
+-void qga_vss_fsfreeze(int *nr_volume, bool freeze, Error **errp);
++void qga_vss_fsfreeze(int *nr_volume, bool freeze,
++                      strList *mountpints, Error **errp);
+ 
+ #endif
+diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+index 3d9c9716c0..5378c55d23 100644
+--- a/qga/vss-win32/requester.cpp
++++ b/qga/vss-win32/requester.cpp
+@@ -234,7 +234,7 @@ out:
+     }
+ }
+ 
+-void requester_freeze(int *num_vols, ErrorSet *errset)
++void requester_freeze(int *num_vols, void *mountpoints, ErrorSet *errset)
+ {
+     COMPointer<IVssAsync> pAsync;
+     HANDLE volume;
+@@ -246,6 +246,7 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
+     WCHAR short_volume_name[64], *display_name = short_volume_name;
+     DWORD wait_status;
+     int num_fixed_drives = 0, i;
++    int num_mount_points = 0;
+ 
+     if (vss_ctx.pVssbc) { /* already frozen */
+         *num_vols = 0;
+@@ -337,39 +338,73 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
+         goto out;
+     }
+ 
+-    volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
+-    if (volume == INVALID_HANDLE_VALUE) {
+-        err_set(errset, hr, "failed to find first volume");
+-        goto out;
+-    }
+-    for (;;) {
+-        if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
++    if (mountpoints) {
++        PWCHAR volume_name_wchar;
++        for (volList *list = (volList *)mountpoints; list; list = list->next) {
++            size_t len = strlen(list->value) + 1;
++            size_t converted = 0;
+             VSS_ID pid;
+-            hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
++
++            volume_name_wchar = new wchar_t[len];
++            mbstowcs_s(&converted, volume_name_wchar, len,
++                       list->value, _TRUNCATE);
++
++            hr = vss_ctx.pVssbc->AddToSnapshotSet(volume_name_wchar,
+                                                   g_gProviderId, &pid);
+             if (FAILED(hr)) {
+-                WCHAR volume_path_name[PATH_MAX];
+-                if (GetVolumePathNamesForVolumeNameW(
+-                        short_volume_name, volume_path_name,
+-                        sizeof(volume_path_name), NULL) && *volume_path_name) {
+-                    display_name = volume_path_name;
+-                }
+                 err_set(errset, hr, "failed to add %S to snapshot set",
+-                                 display_name);
+-                FindVolumeClose(volume);
++                        volume_name_wchar);
++                delete volume_name_wchar;
+                 goto out;
+             }
+-            num_fixed_drives++;
++            num_mount_points++;
++
++            delete volume_name_wchar;
+         }
+-        if (!FindNextVolumeW(volume, short_volume_name,
+-                             sizeof(short_volume_name))) {
+-            FindVolumeClose(volume);
+-            break;
++
++        if (num_mount_points == 0) {
++            /* If there is no valid mount points, just exit. */
++            goto out;
+         }
+     }
+ 
+-    if (num_fixed_drives == 0) {
+-        goto out; /* If there is no fixed drive, just exit. */
++    if (!mountpoints) {
++        volume = FindFirstVolumeW(short_volume_name, sizeof(short_volume_name));
++        if (volume == INVALID_HANDLE_VALUE) {
++            err_set(errset, hr, "failed to find first volume");
++            goto out;
++        }
++
++        for (;;) {
++            if (GetDriveTypeW(short_volume_name) == DRIVE_FIXED) {
++                VSS_ID pid;
++                hr = vss_ctx.pVssbc->AddToSnapshotSet(short_volume_name,
++                                                      g_gProviderId, &pid);
++                if (FAILED(hr)) {
++                    WCHAR volume_path_name[PATH_MAX];
++                    if (GetVolumePathNamesForVolumeNameW(
++                            short_volume_name, volume_path_name,
++                            sizeof(volume_path_name), NULL) &&
++                            *volume_path_name) {
++                        display_name = volume_path_name;
++                    }
++                    err_set(errset, hr, "failed to add %S to snapshot set",
++                            display_name);
++                    FindVolumeClose(volume);
++                    goto out;
++                }
++                num_fixed_drives++;
++            }
++            if (!FindNextVolumeW(volume, short_volume_name,
++                                 sizeof(short_volume_name))) {
++                FindVolumeClose(volume);
++                break;
++            }
++        }
++
++        if (num_fixed_drives == 0) {
++            goto out; /* If there is no fixed drive, just exit. */
++        }
+     }
+ 
+     hr = vss_ctx.pVssbc->PrepareForBackup(pAsync.replace());
+@@ -435,7 +470,12 @@ void requester_freeze(int *num_vols, ErrorSet *errset)
+         goto out;
+     }
+ 
+-    *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
++    if (mountpoints) {
++        *num_vols = vss_ctx.cFrozenVols = num_mount_points;
++    } else {
++        *num_vols = vss_ctx.cFrozenVols = num_fixed_drives;
++    }
++
+     return;
+ 
+ out:
+@@ -449,7 +489,7 @@ out1:
+ }
+ 
+ 
+-void requester_thaw(int *num_vols, ErrorSet *errset)
++void requester_thaw(int *num_vols, void *mountpints, ErrorSet *errset)
+ {
+     COMPointer<IVssAsync> pAsync;
+ 
+diff --git a/qga/vss-win32/requester.h b/qga/vss-win32/requester.h
+index 2a39d734a2..5a8e8faf0c 100644
+--- a/qga/vss-win32/requester.h
++++ b/qga/vss-win32/requester.h
+@@ -34,9 +34,16 @@ typedef struct ErrorSet {
+ STDAPI requester_init(void);
+ STDAPI requester_deinit(void);
+ 
+-typedef void (*QGAVSSRequesterFunc)(int *, ErrorSet *);
+-void requester_freeze(int *num_vols, ErrorSet *errset);
+-void requester_thaw(int *num_vols, ErrorSet *errset);
++typedef struct volList volList;
++
++struct volList {
++    volList *next;
++    char *value;
++};
++
++typedef void (*QGAVSSRequesterFunc)(int *, void *, ErrorSet *);
++void requester_freeze(int *num_vols, void *volList, ErrorSet *errset);
++void requester_thaw(int *num_vols, void *volList, ErrorSet *errset);
+ 
+ #ifdef __cplusplus
+ }
+-- 
+2.17.1
