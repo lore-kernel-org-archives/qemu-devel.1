@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fvdXX-0008VA-GV
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:08:20 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fvdji-0005Wx-LD
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fvdXU-0001Gv-CZ
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:08:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35428 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fvdXU-0001Gp-7g
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:08:16 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180827070021.11931-1-armbru@redhat.com>
-	<20180827070021.11931-6-armbru@redhat.com>
-	<2f5517a3-bb02-c7e7-cebc-315fbf8bd89b@redhat.com>
-	<87d0u3qf30.fsf@dusky.pond.sub.org>
-	<4556c609-2b90-43be-7456-4239eb116a55@redhat.com>
-	<8b1add80-0ff2-50c0-0a64-c2d67dd4fad7@redhat.com>
-Date: Fri, 31 Aug 2018 09:08:12 +0200
-In-Reply-To: <8b1add80-0ff2-50c0-0a64-c2d67dd4fad7@redhat.com> (Eric Blake's
-	message of "Tue, 28 Aug 2018 10:04:45 -0500")
-Message-ID: <87bm9jt3mr.fsf@dusky.pond.sub.org>
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fvdjg-0005Wu-ML
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:20:54 -0400
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:33098)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1fvdje-0005SD-QQ
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:20:51 -0400
+Received: by mail-yw1-xc43.google.com with SMTP id x67-v6so4732209ywg.0
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 00:20:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] json: Eliminate lexer state IN_ERROR
+In-Reply-To: <CAKv+Gu9r+1OBOSUBW_KpDEEoKyc=iwW4zVEe04-_JUnJtSGupQ@mail.gmail.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA9hivJzqksiSZbco4+EysYj=_y0t3k_L7TobxNPS8T2dQ@mail.gmail.com>
+	<CAHmQWvC4Kp1CAeCe8ZTGtSeG7fnT=Xen4GFKfnhTBWUCJdQV+g@mail.gmail.com>
+	<20180829134219.cmyqipnvukk6k2rp@kamzik.brq.redhat.com>
+	<CAHmQWvA5t7zbbDDM0UvuKSL_Z8ey+x+vOGZumYjwsq0FC5AHGA@mail.gmail.com>
+	<20180830083117.iekobw7l3arkt24m@bivouac.eciton.net>
+	<CAFEAcA_s+9-4PYHyx_aAnxwt4e=VH77uBG7rC4JA++nOyjAaPw@mail.gmail.com>
+	<20180830100233.nr6fm3npy57zl4xx@bivouac.eciton.net>
+	<CAKv+Gu9r+1OBOSUBW_KpDEEoKyc=iwW4zVEe04-_JUnJtSGupQ@mail.gmail.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Fri, 31 Aug 2018 15:20:45 +0800
+Message-ID: <CAHmQWvAx8+_0vAOd_Pq0NVr5n0spYj8o5vsj1xjn+a1M81w=Lg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +38,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Leif Lindholm <leif.lindholm@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 08/28/2018 10:01 AM, Eric Blake wrote:
->> The question remains, then, if a fixed-size gap (by making JSON_MIN
->> be exactly 100) is any smarter than a contiguous layout (by making
->> JSON_MIN be IN_START_INTERP + 1).=C2=A0 I can't see any strong reason for
->> preferring one form over the other, so keeping the gap doesn't hurt.
+On 30 August 2018 at 21:29, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 30 August 2018 at 12:02, Leif Lindholm <leif.lindholm@linaro.org> wrote:
+>> On Thu, Aug 30, 2018 at 09:39:33AM +0100, Peter Maydell wrote:
+>>> On 30 August 2018 at 09:31, Leif Lindholm <leif.lindholm@linaro.org> wrote:
+>>> > On Thu, Aug 30, 2018 at 03:07:29PM +0800, Hongbo Zhang wrote:
+>>> >> @Ard, @Leif, is there any possibility to remove all the DT nodes?
+>>> >> On real hardware, how does UEFI find the memory size and CPU number?
+>>> >
+>>> > Usually by asking some form of SCP/PMU.
+>>> > So until we have rock-solid multi-cpu-instance (making terms up here,
+>>> > there may be a proper name already?) support upstream, we need to take
+>>> > shortcuts.
+>>>
+>>> I would expect that you'd want a "faked-on-the-QEMU end" SCP
+>>> communications endpoint to start with anyway. We have one of
+>>> those for vexpress, for instance.
+>>
+>> Ah, I wasn't aware we did!
+>>
+>> In that case - sure, that is probably the more sensible solution.
+>> Does it emulate SCMI?
+>>
 >
-> And having said that, this patch series also introduced a second gap
-> for LOOKAHEAD defined at 0x80, along with assertions that it doesn't
-> collide with either IN_* or JSON_*. It may be just as easy to make
-> JSON_MIN start at LOOKAHEAD+1 than to assert that all of JSON_* fits
-> in the space between 100 and 0x80 - 1.  Although in the long run, I
-> seriously doubt we'll be adding many new enum values to either the
-> lexer or the parser.
+> The purpose of the SBSA/SBBR qemu machine is prototyping the
+> interactions between rich firmware and the OS for things like RAS,
+> secure variable storage for UEFI or capsule update.
+>
+> How exactly the firmware figures out how many CPUs and how much memory
+> we are running with is out of scope for this, and so I don't think
+> there is a need to build something from scratch here: DT will do just
+> fine, given that both EDK2 and ARM-TF have working DT code for these
+> things.
 
-LOOKAHEAD is semantically independent from the lexer state.  Evidence:
-we use both IN_START and IN_START | LOOKAHEAD in json_lexer[].
+For firmware prototype development, CPU number and memory size may not
+key points.
+But from QEMU platform implementation point of view, they can not be
+out of scope, they should be passed by command parameters instead,
+because we don't know which numbers suit for users (although there are
+default values).
+
+>From the previous discussion, SBSA machine doesn't supply ACPI, as to
+DT, implicit conclusion was same as ACPI: supplied by firmware.
+That is why I had the question,  if QEMU doesn't supply DT, if memory
+size and CPU number are passed by parameters dynamically, then how can
+they be passed to guest firmware and OS, so I considered to keep as
+least necessary DT nodes such as memory size, and also learned how
+firmware does it on real hardware, to see if we can completely remove
+all DT nodes.
+
+You support to keep DT as virt, it is really fine with me, but this
+triggers how my patch look like:
+If no DT in SBSA machine, then the code had much more difference with
+virt, so there is possibility to make it a simple separate file;
+If keep same DT as virt, then there are more overlap with virt codes,
+so I am not sure how the patch should like finally, I still prefer
+separate file to keep virt untouched, but not sure if others would
+suggest to extract common codes to a third file, it is up to the
+maintainer and reviewers.
+
+So, keeping DT same as virt is final choice, right?
+And how the patch look like? or I send a v3 with separate file to see
+for discuss?
+(understand sometime people cannot / don't like to give comments
+without seeing the patch)
+
+>
+> fw_cfg, on the other hand, is unsuitable for us. Generating ACPI
+> tables in a different way from actual bare metal is not a good idea,
+> given that things like RAS interact with ACPI as well, and fw_cfg is
+> also exposed to the OS in the default mach-virt configuration. So we
+> could tweak fw_cfg to be more suitable, but I think that does not
+> improve the usefulness of our prototype at all.
+>
+> At some point, it would be nice if we could get UEFI to receive its
+> platform description from ARM-TF in a generic manner, and it would be
+> good for EDK2 and ARM-TF to align on this. So even if we decide that
+> SCMI is more suitable way to convey this information from QEMU to the
+> guest firmware, I would object to implementing the client side of that
+> in UEFI, given that it should be ARM-TF that provides this
+> information.
