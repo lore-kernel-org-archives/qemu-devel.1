@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fvko7-0002iQ-Eo
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:53:56 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fvl4R-0005cu-TH
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fvko6-0005ZM-NG
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:53:55 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri, 31 Aug 2018 16:53:14 +0200
-Message-Id: <20180831145314.14736-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20180831145314.14736-1-marcandre.lureau@redhat.com>
-References: <20180831145314.14736-1-marcandre.lureau@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1fvl18-0005PT-IN
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:07:26 -0400
+Received: from mail-it0-f68.google.com ([209.85.214.68]:35577)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fvl17-0005P2-V9
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:07:22 -0400
+Received: by mail-it0-f68.google.com with SMTP id 139-v6so7581659itf.0
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 08:07:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180830185323.GO8359@habkost.net>
+References: <20180810153223.28409-1-marcandre.lureau@redhat.com>
+	<20180810153223.28409-2-marcandre.lureau@redhat.com>
+	<20180830185323.GO8359@habkost.net>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 31 Aug 2018 17:07:18 +0200
+Message-ID: <CAMxuvaxmU-9rOwW-3eWa0upwDbb5_ETFORPWYdvV12XhOXBmNw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] RFC: delete PID file on exit
+Subject: Re: [Qemu-devel] [PATCH v9 1/6] hw/i386: add pc-i440fx-3.1 &
+ pc-q35-3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +31,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Register an exit handler to remove the PID file. By the time atexit()
-is called, qemu_write_pidfile() guarantees QEMU owns the PID file,
-thus we could safely remove it when exiting.
+Hi
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- vl.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+On Thu, Aug 30, 2018 at 8:53 PM, Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
+> On Fri, Aug 10, 2018 at 05:32:18PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> The following patch is going to add compatiblity parameters.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  include/hw/compat.h  |  4 +++-
+>>  include/hw/i386/pc.h |  5 ++++-
+>>  hw/i386/pc_piix.c    | 13 ++++++++++++-
+>>  hw/i386/pc_q35.c     | 12 +++++++++++-
+>>  4 files changed, 30 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/hw/compat.h b/include/hw/compat.h
+>> index c08f4040bb..f8e596969a 100644
+>> --- a/include/hw/compat.h
+>> +++ b/include/hw/compat.h
+>> @@ -1,7 +1,9 @@
+>>  #ifndef HW_COMPAT_H
+>>  #define HW_COMPAT_H
+>>
+>> -#define HW_COMPAT_2_12 \
+>> +#define HW_COMPAT_3_0
+>> +
+>> +#define HW_COMPAT_2_12                          \
+>>      {\
+>>          .driver   =3D "migration",\
+>>          .property =3D "decompress-error-check",\
+>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>> index 6894f37df1..09b0365a8e 100644
+>> --- a/include/hw/i386/pc.h
+>> +++ b/include/hw/i386/pc.h
+>> @@ -294,7 +294,10 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+>>  int e820_get_num_entries(void);
+>>  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>>
+>> -#define PC_COMPAT_2_12 \
+>> +#define PC_COMPAT_3_0 \
+>> +    HW_COMPAT_3_0
+>> +
+>> +#define PC_COMPAT_2_12                          \
+>>      HW_COMPAT_2_12 \
+>>      {\
+>>          .driver   =3D TYPE_X86_CPU,\
+>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>> index dc09466b3e..7db1fa88ef 100644
+>> --- a/hw/i386/pc_piix.c
+>> +++ b/hw/i386/pc_piix.c
+>> @@ -428,13 +428,24 @@ static void pc_i440fx_machine_options(MachineClass=
+ *m)
+>>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+>>  }
+>>
+>> -static void pc_i440fx_3_0_machine_options(MachineClass *m)
+>> +static void pc_i440fx_3_1_machine_options(MachineClass *m)
+>>  {
+>>      pc_i440fx_machine_options(m);
+>>      m->alias =3D "pc";
+>>      m->is_default =3D 1;
+>>  }
+>>
+>> +DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
+>> +                      pc_i440fx_3_1_machine_options);
+>> +
+>> +static void pc_i440fx_3_0_machine_options(MachineClass *m)
+>> +{
+>> +    pc_i440fx_machine_options(m);
+>
+> This should be pc_i440fx_3_1_machine_options().
 
-diff --git a/vl.c b/vl.c
-index 0eaf948d32..743679ddb7 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2603,6 +2603,15 @@ static void qemu_run_exit_notifiers(void)
-     notifier_list_notify(&exit_notifiers, NULL);
- }
-=20
-+static const char *pid_file;
-+
-+static void qemu_unlink_pidfile(void)
-+{
-+    if (pid_file) {
-+        unlink(pid_file);
-+    }
-+}
-+
- bool machine_init_done;
-=20
- void qemu_add_machine_init_done_notifier(Notifier *notify)
-@@ -2927,7 +2936,6 @@ int main(int argc, char **argv, char **envp)
-     const char *vga_model =3D NULL;
-     const char *qtest_chrdev =3D NULL;
-     const char *qtest_log =3D NULL;
--    const char *pid_file =3D NULL;
-     const char *incoming =3D NULL;
-     bool userconfig =3D true;
-     bool nographic =3D false;
-@@ -4000,6 +4008,7 @@ int main(int argc, char **argv, char **envp)
-         error_reportf_err(err, "cannot create PID file: ");
-         exit(1);
-     }
-+    atexit(qemu_unlink_pidfile);
-=20
-     if (qemu_init_main_loop(&main_loop_err)) {
-         error_report_err(main_loop_err);
---=20
-2.19.0.rc1
+fixed
+
+>
+>
+>> +    m->is_default =3D 0;
+>> +    m->alias =3D NULL;
+>> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+>> +}
+>> +
+>>  DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
+>>                        pc_i440fx_3_0_machine_options);
+>>
+>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+>> index 532241e3f8..cb1980a088 100644
+>> --- a/hw/i386/pc_q35.c
+>> +++ b/hw/i386/pc_q35.c
+>> @@ -311,12 +311,22 @@ static void pc_q35_machine_options(MachineClass *m=
+)
+>>      m->max_cpus =3D 288;
+>>  }
+>>
+>> -static void pc_q35_3_0_machine_options(MachineClass *m)
+>> +static void pc_q35_3_1_machine_options(MachineClass *m)
+>>  {
+>>      pc_q35_machine_options(m);
+>>      m->alias =3D "q35";
+>>  }
+>>
+>> +DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
+>> +                   pc_q35_3_1_machine_options);
+>> +
+>> +static void pc_q35_3_0_machine_options(MachineClass *m)
+>> +{
+>> +    pc_q35_machine_options(m);
+>
+> This should be pc_q35_3_1_machine_options().
+
+fixed
+
+> The rest of the patch looks good to me.
+
+thanks!
+
+>
+>> +    m->alias =3D NULL;
+>> +    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
+>> +}
+>> +
+>>  DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+>>                      pc_q35_3_0_machine_options);
+>>
+>> --
+>> 2.18.0.547.g1d89318c48
+>>
+>>
+>
+> --
+> Eduardo
