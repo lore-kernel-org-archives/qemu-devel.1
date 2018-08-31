@@ -1,21 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1fvmJB-0004Aa-7x
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:30:05 -0400
+	(envelope-from <Liam.Merwick@oracle.com>) id 1fvmOO-0000zb-Kk
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:35:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1fvmJA-0007ji-EU
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:30:05 -0400
-References: <20180831145314.14736-1-marcandre.lureau@redhat.com>
-	<20180831145314.14736-4-marcandre.lureau@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <721c3a96-60a3-0d74-80d6-586d5bb7a2e1@weilnetz.de>
-Date: Fri, 31 Aug 2018 18:29:51 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180831145314.14736-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] RFC: delete PID file on exit
+	(envelope-from <Liam.Merwick@oracle.com>) id 1fvmOI-00059n-H1
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:35:27 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:55746)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Liam.Merwick@oracle.com>)
+	id 1fvmOG-000524-5k
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:35:21 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+	by aserp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id
+	w7VGYCqY185263
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 16:35:13 GMT
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+	by aserp2120.oracle.com with ESMTP id 2m2y2q4ewk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 16:35:13 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id w7VGZCpL020268
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK) for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 16:35:12 GMT
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id w7VGZCj1016221
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 16:35:12 GMT
+From: Liam Merwick <Liam.Merwick@oracle.com>
+Date: Fri, 31 Aug 2018 17:36:49 +0100
+Message-Id: <1535733414-6812-4-git-send-email-Liam.Merwick@oracle.com>
+In-Reply-To: <1535733414-6812-1-git-send-email-Liam.Merwick@oracle.com>
+References: <1535733414-6812-1-git-send-email-Liam.Merwick@oracle.com>
+Subject: [Qemu-devel] [PATCH v2 3/8] block: Null pointer dereference in
+ blk_root_get_parent_desc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +40,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-Am 31.08.2018 um 16:53 schrieb Marc-Andr=C3=A9 Lureau:
-[...]
-> +static const char *pid_file;
-> +
-> +static void qemu_unlink_pidfile(void)
-> +{
-> +    if (pid_file) {
-> +        unlink(pid_file);
-> +    }
-> +}
-> +
->  bool machine_init_done;
-> =20
->  void qemu_add_machine_init_done_notifier(Notifier *notify)
-> @@ -2927,7 +2936,6 @@ int main(int argc, char **argv, char **envp)
->      const char *vga_model =3D NULL;
->      const char *qtest_chrdev =3D NULL;
->      const char *qtest_log =3D NULL;
-> -    const char *pid_file =3D NULL;
->      const char *incoming =3D NULL;
->      bool userconfig =3D true;
->      bool nographic =3D false;
-> @@ -4000,6 +4008,7 @@ int main(int argc, char **argv, char **envp)
->          error_reportf_err(err, "cannot create PID file: ");
->          exit(1);
->      }
-> +    atexit(qemu_unlink_pidfile);
+The dev_id returned by the call to blk_get_attached_dev_id() in
+blk_root_get_parent_desc() can be NULL (an internal call to
+object_get_canonical_path may have returned NULL) so it should
+be checked before dereferencing.
 
+Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
+Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
+---
+ block/block-backend.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Could qemu_unlink_pidfile be combined with qemu_run_exit_notifiers to
-avoid an additional call of atexit from the same function (main)?
-
-Even if there is support for 32 or more atexit calls, it might be good
-to be a little bit more restrictive.
-
-Regards
-Stefan
+diff --git a/block/block-backend.c b/block/block-backend.c
+index fa120630be83..210eee75006a 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -136,7 +136,7 @@ static char *blk_root_get_parent_desc(BdrvChild *child)
+     }
+ 
+     dev_id = blk_get_attached_dev_id(blk);
+-    if (*dev_id) {
++    if (dev_id && *dev_id) {
+         return dev_id;
+     } else {
+         /* TODO Callback into the BB owner for something more detailed */
+-- 
+1.8.3.1
