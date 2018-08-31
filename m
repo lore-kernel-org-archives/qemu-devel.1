@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fvra2-0003su-OR
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:07:51 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fvrbh-0004Z9-Oc
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fvrZy-0003wj-Kq
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:07:50 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:59813)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fvrZy-0003wZ-Eh
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:07:46 -0400
-Date: Fri, 31 Aug 2018 18:07:44 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180831220744.GB18048@flamenco>
-References: <20180820150903.1224-1-pbonzini@redhat.com>
-	<20180820150903.1224-4-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180820150903.1224-4-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] cpus: protect TimerState writes with a
- spinlock
+	(envelope-from <joel.stan@gmail.com>) id 1fvrbd-0004fo-9o
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:09:33 -0400
+Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Fri, 31 Aug 2018 15:09:17 -0700
+Message-Id: <20180831220920.27113-1-joel@jms.id.au>
+Subject: [Qemu-devel] [PATCH v6 0/3] arm: Add nRF51 SoC and micro:bit machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +18,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Jim Mussared <jim.mussared@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <contrib@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-On Mon, Aug 20, 2018 at 17:09:02 +0200, Paolo Bonzini wrote:
-> In the next patch, we will need to write cpu_ticks_offset from any
-> thread, even outside the BQL.  Currently, it is protected by the BQL
-> just because cpu_enable_ticks and cpu_disable_ticks happen to hold it,
-> but the critical sections are well delimited and it's easy to remove
-> the BQL dependency.
-> 
-> Add a spinlock that matches vm_clock_seqlock, and hold it when writing
-> to the TimerState.  This also lets us fix cpu_update_icount when 64-bit
-> atomics are not available.
-> 
-> Fields of TiemrState are reordered to avoid padding.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  cpus.c | 72 ++++++++++++++++++++++++++++++++++++++--------------------
->  1 file changed, 47 insertions(+), 25 deletions(-)
-> 
-> diff --git a/cpus.c b/cpus.c
-> index 680706aefa..63ddd4fd21 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-(snip)
-> @@ -244,11 +250,15 @@ void cpu_update_icount(CPUState *cpu)
->      int64_t executed = cpu_get_icount_executed(cpu);
->      cpu->icount_budget -= executed;
->  
-> -#ifdef CONFIG_ATOMIC64
-> +#ifndef CONFIG_ATOMIC64
-> +    seqlock_write_lock(&timers_state.vm_clock_seqlock,
-> +                       &timers_state.vm_clock_lock);
-> +#endif
->      atomic_set__nocheck(&timers_state.qemu_icount,
->                          timers_state.qemu_icount + executed);
-> -#else /* FIXME: we need 64bit atomics to do this safely */
-> -    timers_state.qemu_icount += executed;
-> +#ifndef CONFIG_ATOMIC64
-> +    seqlock_write_unlock(&timers_state.vm_clock_seqlock,
-> +                         &timers_state.vm_clock_lock);
->  #endif
+v6: Rework based on Peter's review
+v5: Change back to ARMv7M from ARMMProfile
+v4: Fix number of IRQs
+v3: Rebase on Stefan's cortex-m0 series
+v2: Addresses review from Peter and Stefan
 
+This short series implements a minimal definition of the Nordic
+Semiconductor nRF51, a Cortex-M0 ARM SoC, and the BBC micro:bit, a
+machine that will use this SoC.
 
-I'm puzzled by this hunk. Why are we only adding the seqlock_write
-if !CONFIG_ATOMIC64, if we always read .qemu_icount with seqlock_read?
+Joel Stanley (3):
+  MAINTAINERS: Add NRF51 entry
+  arm: Add Nordic Semiconductor nRF51 SoC
+  arm: Add BBC micro:bit machine
 
-Thanks,
+ MAINTAINERS                     |   8 ++
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   1 +
+ hw/arm/microbit.c               |  67 ++++++++++++++++
+ hw/arm/nrf51_soc.c              | 130 ++++++++++++++++++++++++++++++++
+ include/hw/arm/nrf51_soc.h      |  41 ++++++++++
+ 6 files changed, 248 insertions(+)
+ create mode 100644 hw/arm/microbit.c
+ create mode 100644 hw/arm/nrf51_soc.c
+ create mode 100644 include/hw/arm/nrf51_soc.h
 
-		Emilio
+-- 
+2.17.1
