@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvs0S-0001le-KG
+	(envelope-from <jsnow@redhat.com>) id 1fvs0S-0001eQ-IW
 	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:35:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvrup-00076G-SI
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:29:20 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fvruq-00076f-9X
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 18:29:21 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 31 Aug 2018 18:28:53 -0400
-Message-Id: <20180831222907.16257-2-jsnow@redhat.com>
+Date: Fri, 31 Aug 2018 18:28:54 -0400
+Message-Id: <20180831222907.16257-3-jsnow@redhat.com>
 In-Reply-To: <20180831222907.16257-1-jsnow@redhat.com>
 References: <20180831222907.16257-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/15] block/commit: add block job creation
+Subject: [Qemu-devel] [PATCH v3 02/15] block/mirror: add block job creation
  flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,92 +23,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: jtc@redhat.com, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, John Snow <jsnow@redhat.com>
 
-Add support for taking and passing forward job creation flags.
+Add support for taking and passing forward job creaton flags.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/commit.c            | 5 +++--
- blockdev.c                | 7 ++++---
+ block/mirror.c            | 5 +++--
+ blockdev.c                | 3 ++-
  include/block/block_int.h | 5 ++++-
- 3 files changed, 11 insertions(+), 6 deletions(-)
+ 3 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index da69165de3..b6e8969877 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -249,7 +249,8 @@ static BlockDriver bdrv_commit_top = {
- };
+diff --git a/block/mirror.c b/block/mirror.c
+index b8941db6c1..cba555b4ef 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1639,7 +1639,8 @@ fail:
  
- void commit_start(const char *job_id, BlockDriverState *bs,
--                  BlockDriverState *base, BlockDriverState *top, int64_t speed,
-+                  BlockDriverState *base, BlockDriverState *top,
+ void mirror_start(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *target, const char *replaces,
+-                  int64_t speed, uint32_t granularity, int64_t buf_size,
 +                  int creation_flags, int64_t speed,
-                   BlockdevOnError on_error, const char *backing_file_str,
-                   const char *filter_node_name, Error **errp)
- {
-@@ -267,7 +268,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
++                  uint32_t granularity, int64_t buf_size,
+                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
+                   BlockdevOnError on_source_error,
+                   BlockdevOnError on_target_error,
+@@ -1655,7 +1656,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
      }
- 
-     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
--                         speed, JOB_DEFAULT, NULL, NULL, errp);
-+                         speed, creation_flags, NULL, NULL, errp);
-     if (!s) {
-         return;
-     }
+     is_none_mode = mode == MIRROR_SYNC_MODE_NONE;
+     base = mode == MIRROR_SYNC_MODE_TOP ? backing_bs(bs) : NULL;
+-    mirror_start_job(job_id, bs, JOB_DEFAULT, target, replaces,
++    mirror_start_job(job_id, bs, creation_flags, target, replaces,
+                      speed, granularity, buf_size, backing_mode,
+                      on_source_error, on_target_error, unmap, NULL, NULL,
+                      &mirror_job_driver, is_none_mode, base, false,
 diff --git a/blockdev.c b/blockdev.c
-index 72f5347df5..c15a1e624b 100644
+index c15a1e624b..6574356708 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -3214,6 +3214,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-      * BlockdevOnError change for blkmirror makes it in
-      */
-     BlockdevOnError on_error = BLOCKDEV_ON_ERROR_REPORT;
+@@ -3590,6 +3590,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
+                                    bool has_copy_mode, MirrorCopyMode copy_mode,
+                                    Error **errp)
+ {
 +    int job_flags = JOB_DEFAULT;
  
      if (!has_speed) {
          speed = 0;
-@@ -3295,15 +3296,15 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-             goto out;
-         }
-         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
--                            JOB_DEFAULT, speed, on_error,
-+                            job_flags, speed, on_error,
-                             filter_node_name, NULL, NULL, false, &local_err);
-     } else {
-         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
-         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
-             goto out;
-         }
--        commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, speed,
--                     on_error, has_backing_file ? backing_file : NULL,
-+        commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, job_flags,
-+                     speed, on_error, has_backing_file ? backing_file : NULL,
-                      filter_node_name, &local_err);
-     }
-     if (local_err != NULL) {
+@@ -3642,7 +3643,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
+      * and will allow to check whether the node still exist at mirror completion
+      */
+     mirror_start(job_id, bs, target,
+-                 has_replaces ? replaces : NULL,
++                 has_replaces ? replaces : NULL, job_flags,
+                  speed, granularity, buf_size, sync, backing_mode,
+                  on_source_error, on_target_error, unmap, filter_node_name,
+                  copy_mode, errp);
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 903b9c1034..ffab0b4d3e 100644
+index ffab0b4d3e..b40f0bfc9b 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -980,6 +980,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-  * @bs: Active block device.
-  * @top: Top block device to be committed.
-  * @base: Block device that will be written into, and become the new top.
+@@ -1029,6 +1029,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
+  * @target: Block device to write to.
+  * @replaces: Block graph node name to replace once the mirror is done. Can
+  *            only be used when full mirroring is selected.
 + * @creation_flags: Flags that control the behavior of the Job lifetime.
 + *                  See @BlockJobCreateFlags
   * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @on_error: The action to take upon error.
-  * @backing_file_str: String to use as the backing file in @top's overlay
-@@ -990,7 +992,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-  *
+  * @granularity: The chosen granularity for the dirty bitmap.
+  * @buf_size: The amount of data that can be in flight at one time.
+@@ -1050,7 +1052,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
   */
- void commit_start(const char *job_id, BlockDriverState *bs,
--                  BlockDriverState *base, BlockDriverState *top, int64_t speed,
-+                  BlockDriverState *base, BlockDriverState *top,
+ void mirror_start(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *target, const char *replaces,
+-                  int64_t speed, uint32_t granularity, int64_t buf_size,
 +                  int creation_flags, int64_t speed,
-                   BlockdevOnError on_error, const char *backing_file_str,
-                   const char *filter_node_name, Error **errp);
- /**
++                  uint32_t granularity, int64_t buf_size,
+                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
+                   BlockdevOnError on_source_error,
+                   BlockdevOnError on_target_error,
 -- 
 2.14.4
