@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fvmOm-0001Gt-29
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:35:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fvmXw-0003Ix-Bf
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fvmOh-0005hu-3R
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:35:52 -0400
-Received: from mail-io0-f196.google.com ([209.85.223.196]:34630)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fvmOg-0005ha-Uc
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:35:47 -0400
-Received: by mail-io0-f196.google.com with SMTP id c22-v6so10931721iob.1
-	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 09:35:46 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fvmXr-0001Xy-IZ
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:45:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55300 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fvmXp-0001Wt-It
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:45:13 -0400
+References: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
+	<1535644031-848-8-git-send-email-Liam.Merwick@oracle.com>
+	<ba464589-10b3-d449-3077-74a5eee9ec61@redhat.com>
+	<1e99f751-2cc6-7d66-dd57-cbc857a18a4a@oracle.com>
+	<1ac8f2ee-6166-020f-38c6-b22f57e76d5b@redhat.com>
+	<d0b3dc77-eed4-013c-deb6-6dd020815370@oracle.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <63e64181-a596-f440-3f46-5c09014627ee@redhat.com>
+Date: Fri, 31 Aug 2018 11:45:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <721c3a96-60a3-0d74-80d6-586d5bb7a2e1@weilnetz.de>
-References: <20180831145314.14736-1-marcandre.lureau@redhat.com>
-	<20180831145314.14736-4-marcandre.lureau@redhat.com>
-	<721c3a96-60a3-0d74-80d6-586d5bb7a2e1@weilnetz.de>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Fri, 31 Aug 2018 18:35:45 +0200
-Message-ID: <CAMxuvawK3NP0ANN=JWUWXRN2F3Fq-Va2VegGxrLE7OVCA4+eZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <d0b3dc77-eed4-013c-deb6-6dd020815370@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] RFC: delete PID file on exit
+Subject: Re: [Qemu-devel] [PATCH 7/8] io: file descriptor not initialized in
+ qio_channel_command_new_spawn()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +33,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "P. Berrange, Daniel" <berrange@redhat.com>, qemu-block <qemu-block@nongnu.org>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org
 
-Hi
+On 08/31/2018 11:19 AM, Liam Merwick wrote:
 
-On Fri, Aug 31, 2018 at 6:29 PM, Stefan Weil <sw@weilnetz.de> wrote:
-> Am 31.08.2018 um 16:53 schrieb Marc-Andr=C3=A9 Lureau:
-> [...]
->> +static const char *pid_file;
->> +
->> +static void qemu_unlink_pidfile(void)
->> +{
->> +    if (pid_file) {
->> +        unlink(pid_file);
->> +    }
->> +}
->> +
->>  bool machine_init_done;
+>>> Looking at it again, the very minor optimisation of converting the=20
+>>> 2nd 'if' to an 'else if' has the useful side-effect of appeasing the=20
+>>> static analysis tool.
 >>
->>  void qemu_add_machine_init_done_notifier(Notifier *notify)
->> @@ -2927,7 +2936,6 @@ int main(int argc, char **argv, char **envp)
->>      const char *vga_model =3D NULL;
->>      const char *qtest_chrdev =3D NULL;
->>      const char *qtest_log =3D NULL;
->> -    const char *pid_file =3D NULL;
->>      const char *incoming =3D NULL;
->>      bool userconfig =3D true;
->>      bool nographic =3D false;
->> @@ -4000,6 +4008,7 @@ int main(int argc, char **argv, char **envp)
->>          error_reportf_err(err, "cannot create PID file: ");
->>          exit(1);
->>      }
->> +    atexit(qemu_unlink_pidfile);
->
->
-> Could qemu_unlink_pidfile be combined with qemu_run_exit_notifiers to
-> avoid an additional call of atexit from the same function (main)?
->
-> Even if there is support for 32 or more atexit calls, it might be good
-> to be a little bit more restrictive.
+>> I never figured out what the tool precisely thought was wrong in the=20
+>> first place. Can you paste the output of the tool to see exactly what=20
+>> it analyzed as the potential flaw?
 
-Sure, that would require an additional Notifier, but that's not much anyway=
-.
-I'll update the patch.
+Thanks.
+
+>>=C2=A0 Perhaps the analyzer was trying to=20
+>> see what would happen if a caller submitting the fourth value (3 on=20
+>> systems where O_RDONLY is 0, 0 on systems where O_RDONLY is 1) and the=
+=20
+>> code not behaving in that setup, even though we know that all callers=20
+>> only submit the three valid values and never the fourth invalid=20
+>> value?=C2=A0 Or maybe it's a weakness where we have made dependent=20
+>> assumptions but in independent branches, in such a way that we know it=
+=20
+>> will never fail but the analyzer doesn't?
+>>
+>=20
+> The specific error it reported was
+>=20
+> Error: File Invalid
+>  =C2=A0=C2=A0 File Descriptor not Initialized [file-desc-not-init]:
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 The value <unknown> is not initialized =
+as a file descriptor.
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 at line 91 of io/channel-co=
+mmand.c in function=20
+> 'qio_channel_command_new_spawn'.
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 resource=C2=A0 =
+not initialized when flags !=3D 0 at line 62
+
+flags is not O_RDONLY,
+
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 and flags !=3D 1 at line 65
+
+flags is not O_WRONLY,
+
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 and stdinnull is false at line 69
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 and stdoutnull is false at line 69.
+
+so yes, both stdinnull and stdoutnull will be false at this point.=20
+Based on our earlier masking, that means flags is either O_RDWR (2) or=20
+bogus (3).  The analyzer is then complaining about:
+
+         dup2(stdinnull ? devnull : stdinfd[0], STDIN_FILENO);
+
+So either it is complaining about devnull being uninitialized (which it=20
+is when flags is O_RDWR - but in that situation, we know stdinnull is=20
+false which also implies that the left half of ?: is unreachable and=20
+therefore shouldn't matter) or it is complaining about stdinfd[0] being=20
+uninitialized (but we can't reach here without having gone through the=20
+earlier (!stdinnull && pipe(stdinfd)), and again, given that stdinnull=20
+is false, that is initialized).  The fact that it lists '<unknown>'=20
+rather than the actual (sub-)expression that it claims is uninitialized=20
+doesn't help.  So yeah, I'm seriously confused as to why this false=20
+positive is being reported, or why the change from 'if/if' to 'if/else=20
+if' shuts it up.
+
+>=20
+>=20
+> I've been staring at the code and can see no reason why it isn't a fals=
+e=20
+> positive (and I'll let the tool authors know)
+
+Thanks for the followup.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
