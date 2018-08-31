@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkUN-0005sl-6z
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:33:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkUQ-00062U-VC
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:33:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkUH-0004VY-DL
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:33:31 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkUP-0004aL-T6
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:33:34 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 31 Aug 2018 16:32:37 +0200
-Message-Id: <20180831143241.31787-7-mreitz@redhat.com>
+Date: Fri, 31 Aug 2018 16:32:40 +0200
+Message-Id: <20180831143241.31787-10-mreitz@redhat.com>
 In-Reply-To: <20180831143241.31787-1-mreitz@redhat.com>
 References: <20180831143241.31787-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL v2 06/10] block/mirror: utilize job_exit shim
+Subject: [Qemu-devel] [PULL v2 09/10] jobs: remove ret argument to
+ job_completed; privatize it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,138 +25,138 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.m
 
 From: John Snow <jsnow@redhat.com>
 
-Change the manual deferment to mirror_exit into the implicit
-callback to job_exit and the mirror_exit callback.
+Jobs are now expected to return their retcode on the stack, from the
+.run callback, so we can remove that argument.
 
-This does change the order of some bdrv_unref calls and job_completed,
-but thanks to the new context in which we call .exit, this is safe to
-defer the possible flushing of any nodes to the job_finalize_single
-cleanup stage.
+job_cancel does not need to set -ECANCELED because job_completed will
+update the return code itself if the job was canceled.
+
+While we're here, make job_completed static to job.c and remove it from
+job.h; move the documentation of return code to the .run() callback and
+to the job->ret property, accordingly.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Message-id: 20180830015734.19765-6-jsnow@redhat.com
+Message-id: 20180830015734.19765-9-jsnow@redhat.com
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/mirror.c | 29 +++++++++++------------------
- 1 file changed, 11 insertions(+), 18 deletions(-)
+ include/qemu/job.h | 28 +++++++++++++++-------------
+ job.c              | 11 ++++++-----
+ trace-events       |  2 +-
+ 3 files changed, 22 insertions(+), 19 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index be5dc6b7b0..b8941db6c1 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -607,26 +607,22 @@ static void mirror_wait_for_all_io(MirrorBlockJob *s)
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index 1144d671a1..23395c17fa 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -124,7 +124,11 @@ typedef struct Job {
+     /** Estimated progress_current value at the completion of the job */
+     int64_t progress_total;
+ 
+-    /** ret code passed to job_completed. */
++    /**
++     * Return code from @run and/or @prepare callback(s).
++     * Not final until the job has reached the CONCLUDED status.
++     * 0 on success, -errno on failure.
++     */
+     int ret;
+ 
+     /**
+@@ -172,7 +176,16 @@ struct JobDriver {
+     /** Enum describing the operation */
+     JobType job_type;
+ 
+-    /** Mandatory: Entrypoint for the Coroutine. */
++    /**
++     * Mandatory: Entrypoint for the Coroutine.
++     *
++     * This callback will be invoked when moving from CREATED to RUNNING.
++     *
++     * If this callback returns nonzero, the job transaction it is part of is
++     * aborted. If it returns zero, the job moves into the WAITING state. If it
++     * is the last job to complete in its transaction, all jobs in the
++     * transaction move from WAITING to PENDING.
++     */
+     int coroutine_fn (*run)(Job *job, Error **errp);
+ 
+     /**
+@@ -496,17 +509,6 @@ void job_early_fail(Job *job);
+ /** Moves the @job from RUNNING to READY */
+ void job_transition_to_ready(Job *job);
+ 
+-/**
+- * @job: The job being completed.
+- * @ret: The status code.
+- *
+- * Marks @job as completed. If @ret is non-zero, the job transaction it is part
+- * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
+- * is the last job to complete in its transaction, all jobs in the transaction
+- * move from WAITING to PENDING.
+- */
+-void job_completed(Job *job, int ret);
+-
+ /** Asynchronously complete the specified @job. */
+ void job_complete(Job *job, Error **errp);
+ 
+diff --git a/job.c b/job.c
+index 5df7791ad8..37d828f964 100644
+--- a/job.c
++++ b/job.c
+@@ -535,6 +535,8 @@ void job_drain(Job *job)
      }
  }
  
--typedef struct {
--    int ret;
--} MirrorExitData;
--
--static void mirror_exit(Job *job, void *opaque)
-+static void mirror_exit(Job *job)
- {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
-     BlockJob *bjob = &s->common;
--    MirrorExitData *data = opaque;
-     MirrorBDSOpaque *bs_opaque = s->mirror_top_bs->opaque;
-     AioContext *replace_aio_context = NULL;
-     BlockDriverState *src = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     BlockDriverState *mirror_top_bs = s->mirror_top_bs;
-     Error *local_err = NULL;
-+    int ret = job->ret;
- 
-     bdrv_release_dirty_bitmap(src, s->dirty_bitmap);
- 
--    /* Make sure that the source BDS doesn't go away before we called
--     * job_completed(). */
-+    /* Make sure that the source BDS doesn't go away during bdrv_replace_node,
-+     * before we can call bdrv_drained_end */
-     bdrv_ref(src);
-     bdrv_ref(mirror_top_bs);
-     bdrv_ref(target_bs);
-@@ -652,7 +648,7 @@ static void mirror_exit(Job *job, void *opaque)
-             bdrv_set_backing_hd(target_bs, backing, &local_err);
-             if (local_err) {
-                 error_report_err(local_err);
--                data->ret = -EPERM;
-+                ret = -EPERM;
-             }
-         }
-     }
-@@ -662,7 +658,7 @@ static void mirror_exit(Job *job, void *opaque)
-         aio_context_acquire(replace_aio_context);
-     }
- 
--    if (s->should_complete && data->ret == 0) {
-+    if (s->should_complete && ret == 0) {
-         BlockDriverState *to_replace = src;
-         if (s->to_replace) {
-             to_replace = s->to_replace;
-@@ -679,7 +675,7 @@ static void mirror_exit(Job *job, void *opaque)
-         bdrv_drained_end(target_bs);
-         if (local_err) {
-             error_report_err(local_err);
--            data->ret = -EPERM;
-+            ret = -EPERM;
-         }
-     }
-     if (s->to_replace) {
-@@ -710,12 +706,12 @@ static void mirror_exit(Job *job, void *opaque)
-     blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
- 
-     bs_opaque->job = NULL;
--    job_completed(job, data->ret);
- 
--    g_free(data);
-     bdrv_drained_end(src);
-     bdrv_unref(mirror_top_bs);
-     bdrv_unref(src);
++static void job_completed(Job *job);
 +
-+    job->ret = ret;
- }
- 
- static void mirror_throttle(MirrorBlockJob *s)
-@@ -815,7 +811,6 @@ static int mirror_flush(MirrorBlockJob *s)
- static int coroutine_fn mirror_run(Job *job, Error **errp)
+ static void job_exit(void *opaque)
  {
-     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
--    MirrorExitData *data;
-     BlockDriverState *bs = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     bool need_drain = true;
-@@ -1035,14 +1030,10 @@ immediate_exit:
-     g_free(s->in_flight_bitmap);
-     bdrv_dirty_iter_free(s->dbi);
- 
--    data = g_malloc(sizeof(*data));
--    data->ret = ret;
--
-     if (need_drain) {
-         bdrv_drained_begin(bs);
+     Job *job = (Job *)opaque;
+@@ -545,7 +547,7 @@ static void job_exit(void *opaque)
+         job->driver->exit(job);
+         aio_context_release(aio_context);
      }
- 
--    job_defer_to_main_loop(&s->common.job, mirror_exit, data);
-     return ret;
+-    job_completed(job, job->ret);
++    job_completed(job);
  }
  
-@@ -1141,6 +1132,7 @@ static const BlockJobDriver mirror_job_driver = {
-         .user_resume            = block_job_user_resume,
-         .drain                  = block_job_drain,
-         .run                    = mirror_run,
-+        .exit                   = mirror_exit,
-         .pause                  = mirror_pause,
-         .complete               = mirror_complete,
-     },
-@@ -1157,6 +1149,7 @@ static const BlockJobDriver commit_active_job_driver = {
-         .user_resume            = block_job_user_resume,
-         .drain                  = block_job_drain,
-         .run                    = mirror_run,
-+        .exit                   = mirror_exit,
-         .pause                  = mirror_pause,
-         .complete               = mirror_complete,
-     },
+ /**
+@@ -883,13 +885,12 @@ static void job_completed_txn_success(Job *job)
+     }
+ }
+ 
+-void job_completed(Job *job, int ret)
++static void job_completed(Job *job)
+ {
+     assert(job && job->txn && !job_is_completed(job));
+ 
+-    job->ret = ret;
+     job_update_rc(job);
+-    trace_job_completed(job, ret, job->ret);
++    trace_job_completed(job, job->ret);
+     if (job->ret) {
+         job_completed_txn_abort(job);
+     } else {
+@@ -905,7 +906,7 @@ void job_cancel(Job *job, bool force)
+     }
+     job_cancel_async(job, force);
+     if (!job_started(job)) {
+-        job_completed(job, -ECANCELED);
++        job_completed(job);
+     } else if (job->deferred_to_main_loop) {
+         job_completed_txn_abort(job);
+     } else {
+diff --git a/trace-events b/trace-events
+index c445f54773..4fd2cb4b97 100644
+--- a/trace-events
++++ b/trace-events
+@@ -107,7 +107,7 @@ gdbstub_err_checksum_incorrect(uint8_t expected, uint8_t got) "got command packe
+ # job.c
+ job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
+ job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
+-job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
++job_completed(void *job, int ret) "job %p ret %d"
+ 
+ # job-qmp.c
+ qmp_job_cancel(void *job) "job %p"
 -- 
 2.17.1
