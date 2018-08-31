@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fvgpY-0002xx-7H
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:11 -0400
+	(envelope-from <clg@kaod.org>) id 1fvgpo-00038I-Vf
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fvgpU-0001vk-Sh
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57404 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fvgpf-00023v-Gu
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:21 -0400
+Received: from 9.mo69.mail-out.ovh.net ([46.105.56.78]:37485)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fvgpU-0001vN-Lt
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:04 -0400
-Date: Fri, 31 Aug 2018 11:38:56 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180831103855.GC2376@work-vm>
-References: <20180829153624.12299-1-david@redhat.com>
-	<20180829153624.12299-15-david@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fvgpc-00020a-Gw
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:39:12 -0400
+Received: from player168.ha.ovh.net (unknown [10.109.146.137])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id C73CE268C2
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 12:39:10 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Fri, 31 Aug 2018 12:38:12 +0200
+Message-Id: <20180831103816.13479-6-clg@kaod.org>
+In-Reply-To: <20180831103816.13479-1-clg@kaod.org>
+References: <20180831103816.13479-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180829153624.12299-15-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 14/20] memory-device: ids of virtio
- based devices are special
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 05/11] aspeed/smc: fix some alignment issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Actually on second thoughts, a question:
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ssi/aspeed_smc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-* David Hildenbrand (david@redhat.com) wrote:
-> When reporting the id of virtio-based memory devices, we always have to
-> take the one of the proxy device (parent).
-> 
-> Expose the function, so especially virtio-based memory devices can
-> reuse the function when filling out the id in MemoryDeviceInfo.
-> 
-> Details:
-> 
-> When the user creates a virtio device (e.g.  virtio-balloon-pci), two
-> devices are actually created.
-> 
-> 1. Virtio proxy device (e.g. TYPE_VIRTIO_BALLOON_PCI)
-> 2. The "real" virtio device (e.g. TYPE_VIRTIO_BALLOON).
-> 
-> 1. aliases all properties of 2, so 2. can be properly configured using 1.
-> 1. gets the device ID set specified by the user. 2. gets no ID set.
-> 
-> If we want to make 2. a MemoryDevice but report errors/information to the
-> user, we always have to report the id of 1. (because that's the device the
-> user instantiated and configured).
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/mem/memory-device.c         | 21 +++++++++++++++++++--
->  include/hw/mem/memory-device.h |  1 +
->  2 files changed, 20 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index a31ba73ea7..89a0c584be 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -19,6 +19,22 @@
->  #include "sysemu/kvm.h"
->  #include "trace.h"
->  
-> +const char *memory_device_id(const MemoryDeviceState *md)
-> +{
-> +    Object *obj = OBJECT(md);
-> +
-> +    /* always use the ID of the proxy device for virtio devices */
-> +    if (object_dynamic_cast(obj, TYPE_VIRTIO_DEVICE)) {
-> +        if (obj->parent && object_dynamic_cast(obj->parent, TYPE_DEVICE)) {
-> +            const DeviceState *parent_dev = DEVICE(obj->parent);
-> +
-> +            return parent_dev->id;
-> +        }
-> +        return NULL;
-> +    }
-> +    return DEVICE(md)->id;
-> +}
-> +
->  static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
->  {
->      const MemoryDeviceState *md_a = MEMORY_DEVICE(a);
-> @@ -168,6 +184,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->      for (item = list; item; item = g_slist_next(item)) {
->          MemoryDeviceState *md = item->data;
->          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
-> +        const char *id = memory_device_id(md);
->          uint64_t md_size, md_addr;
->  
->          md_addr = mdc->get_addr(md);
-> @@ -178,8 +195,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->  
->          if (ranges_overlap(md_addr, md_size, new_addr, size)) {
->              if (hint) {
-> -                const DeviceState *d = DEVICE(md);
-> -                error_setg(errp, "address range conflicts with '%s'", d->id);
-> +                error_setg(errp, "address range conflicts with '%s'",
-> +                           id ? id : 0);
-
-What's that 'id ? id : 0' trick for?
-
-Dave
-
->                  goto out;
->              }
->              new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
-> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-> index 05cb9437b7..324cc45b6f 100644
-> --- a/include/hw/mem/memory-device.h
-> +++ b/include/hw/mem/memory-device.h
-> @@ -54,6 +54,7 @@ typedef struct MemoryDeviceClass {
->                               MemoryDeviceInfo *info);
->  } MemoryDeviceClass;
->  
-> +const char *memory_device_id(const MemoryDeviceState *md);
->  MemoryDeviceInfoList *qmp_memory_device_list(void);
->  uint64_t get_plugged_memory_size(void);
->  void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index b29bfd3124a9..1270842dcf0c 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -388,8 +388,8 @@ static uint64_t aspeed_smc_flash_default_read(void *o=
+paque, hwaddr addr,
+ static void aspeed_smc_flash_default_write(void *opaque, hwaddr addr,
+                                            uint64_t data, unsigned size)
+ {
+-   qemu_log_mask(LOG_GUEST_ERROR, "%s: To 0x%" HWADDR_PRIx " of size %u:=
+ 0x%"
+-                 PRIx64 "\n", __func__, addr, size, data);
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: To 0x%" HWADDR_PRIx " of size %u=
+: 0x%"
++                  PRIx64 "\n", __func__, addr, size, data);
+ }
+=20
+ static const MemoryRegionOps aspeed_smc_flash_default_ops =3D {
+@@ -529,7 +529,7 @@ static void aspeed_smc_flash_setup(AspeedSMCFlash *fl=
+, uint32_t addr)
+      */
+     if (aspeed_smc_flash_mode(fl) =3D=3D CTRL_FREADMODE) {
+         for (i =3D 0; i < aspeed_smc_flash_dummies(fl); i++) {
+-                ssi_transfer(fl->controller->spi, 0xFF);
++            ssi_transfer(fl->controller->spi, 0xFF);
+         }
+     }
+ }
+@@ -567,7 +567,7 @@ static uint64_t aspeed_smc_flash_read(void *opaque, h=
+waddr addr, unsigned size)
+ }
+=20
+ static void aspeed_smc_flash_write(void *opaque, hwaddr addr, uint64_t d=
+ata,
+-                           unsigned size)
++                                   unsigned size)
+ {
+     AspeedSMCFlash *fl =3D opaque;
+     AspeedSMCState *s =3D fl->controller;
+--=20
+2.17.1
