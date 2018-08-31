@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fvgmm-0007eB-Lc
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:36:17 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fvgmw-0007iZ-4b
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fvgmj-0000jy-9J
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:36:16 -0400
-References: <CGME20180831102306eucas1p1ffbf82383f23675fecb5faf8a2fa54d7@eucas1p1.samsung.com>
-	<9310418.Wg32kryeWE@amdc3058>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2fa9fc91-5d5d-20ad-78e9-dd9caa922138@redhat.com>
-Date: Fri, 31 Aug 2018 12:31:00 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fvgms-0000nV-U2
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:36:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58930 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fvgms-0000nH-OL
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 06:36:22 -0400
+Date: Fri, 31 Aug 2018 11:36:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180831103613.GB2376@work-vm>
+References: <20180829153624.12299-1-david@redhat.com>
+	<20180829153624.12299-15-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9310418.Wg32kryeWE@amdc3058>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/exynos4210: fix Exynos4210 UART
- support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180829153624.12299-15-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 14/20] memory-device: ids of virtio
+ based devices are special
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,24 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>
 
-On 2018-08-31 12:23, Bartlomiej Zolnierkiewicz wrote:
-> commit 97274d0c05d4 ("hw/char/exynos4210_uart.c: Remove unneeded
-> handling of NULL chardev") broke Exynos4210 support as it removed
-> NULL 'Chardev *chr' handling from exynos4210_uart_create() and
-> currently exynos4210_init() always passes NULL as 'Chardev *chr'
-> argument to exynos4210_uart_create() calls. Fix it by adding
-> missing serial_hd() calls to exynos4210_init().
+* David Hildenbrand (david@redhat.com) wrote:
+> When reporting the id of virtio-based memory devices, we always have to
+> take the one of the proxy device (parent).
 > 
-> Signed-off-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+> Expose the function, so especially virtio-based memory devices can
+> reuse the function when filling out the id in MemoryDeviceInfo.
+> 
+> Details:
+> 
+> When the user creates a virtio device (e.g.  virtio-balloon-pci), two
+> devices are actually created.
+> 
+> 1. Virtio proxy device (e.g. TYPE_VIRTIO_BALLOON_PCI)
+> 2. The "real" virtio device (e.g. TYPE_VIRTIO_BALLOON).
+> 
+> 1. aliases all properties of 2, so 2. can be properly configured using 1.
+> 1. gets the device ID set specified by the user. 2. gets no ID set.
+> 
+> If we want to make 2. a MemoryDevice but report errors/information to the
+> user, we always have to report the id of 1. (because that's the device the
+> user instantiated and configured).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  hw/arm/exynos4210.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-PS: If you've got some spare time, maybe you could consider to also
-write a regression test (e.g. for tests/boot-serial-test.c) to avoid
-that this happens again?
+>  hw/mem/memory-device.c         | 21 +++++++++++++++++++--
+>  include/hw/mem/memory-device.h |  1 +
+>  2 files changed, 20 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index a31ba73ea7..89a0c584be 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -19,6 +19,22 @@
+>  #include "sysemu/kvm.h"
+>  #include "trace.h"
+>  
+> +const char *memory_device_id(const MemoryDeviceState *md)
+> +{
+> +    Object *obj = OBJECT(md);
+> +
+> +    /* always use the ID of the proxy device for virtio devices */
+> +    if (object_dynamic_cast(obj, TYPE_VIRTIO_DEVICE)) {
+> +        if (obj->parent && object_dynamic_cast(obj->parent, TYPE_DEVICE)) {
+> +            const DeviceState *parent_dev = DEVICE(obj->parent);
+> +
+> +            return parent_dev->id;
+> +        }
+> +        return NULL;
+> +    }
+> +    return DEVICE(md)->id;
+> +}
+> +
+>  static gint memory_device_addr_sort(gconstpointer a, gconstpointer b)
+>  {
+>      const MemoryDeviceState *md_a = MEMORY_DEVICE(a);
+> @@ -168,6 +184,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>      for (item = list; item; item = g_slist_next(item)) {
+>          MemoryDeviceState *md = item->data;
+>          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
+> +        const char *id = memory_device_id(md);
+>          uint64_t md_size, md_addr;
+>  
+>          md_addr = mdc->get_addr(md);
+> @@ -178,8 +195,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>  
+>          if (ranges_overlap(md_addr, md_size, new_addr, size)) {
+>              if (hint) {
+> -                const DeviceState *d = DEVICE(md);
+> -                error_setg(errp, "address range conflicts with '%s'", d->id);
+> +                error_setg(errp, "address range conflicts with '%s'",
+> +                           id ? id : 0);
+>                  goto out;
+>              }
+>              new_addr = QEMU_ALIGN_UP(md_addr + md_size, align);
+> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+> index 05cb9437b7..324cc45b6f 100644
+> --- a/include/hw/mem/memory-device.h
+> +++ b/include/hw/mem/memory-device.h
+> @@ -54,6 +54,7 @@ typedef struct MemoryDeviceClass {
+>                               MemoryDeviceInfo *info);
+>  } MemoryDeviceClass;
+>  
+> +const char *memory_device_id(const MemoryDeviceState *md);
+>  MemoryDeviceInfoList *qmp_memory_device_list(void);
+>  uint64_t get_plugged_memory_size(void);
+>  void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
