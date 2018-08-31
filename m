@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkQN-00014U-6H
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:29:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkQL-0001A5-Al
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkMN-0000sE-FU
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:25:16 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkMO-0000si-Hb
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:25:17 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 31 Aug 2018 16:24:45 +0200
-Message-Id: <20180831142446.22264-11-mreitz@redhat.com>
+Date: Fri, 31 Aug 2018 16:24:46 +0200
+Message-Id: <20180831142446.22264-12-mreitz@redhat.com>
 In-Reply-To: <20180831142446.22264-1-mreitz@redhat.com>
 References: <20180831142446.22264-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 10/11] jobs: remove ret argument to
- job_completed; privatize it
+Subject: [Qemu-devel] [PULL 11/11] jobs: remove job_defer_to_main_loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +24,104 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.m
 
 From: John Snow <jsnow@redhat.com>
 
-Jobs are now expected to return their retcode on the stack, from the
-.run callback, so we can remove that argument.
-
-job_cancel does not need to set -ECANCELED because job_completed will
-update the return code itself if the job was canceled.
-
-While we're here, make job_completed static to job.c and remove it from
-job.h; move the documentation of return code to the .run() callback and
-to the job->ret property, accordingly.
+Now that the job infrastructure is handling the job_completed call for
+all implemented jobs, we can remove the interface that allowed jobs to
+schedule their own completion.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Message-id: 20180830015734.19765-9-jsnow@redhat.com
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180830015734.19765-10-jsnow@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/qemu/job.h | 28 +++++++++++++++-------------
- job.c              | 11 ++++++-----
- trace-events       |  2 +-
- 3 files changed, 22 insertions(+), 19 deletions(-)
+ include/qemu/job.h | 17 -----------------
+ job.c              | 40 ++--------------------------------------
+ 2 files changed, 2 insertions(+), 55 deletions(-)
 
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 1144d671a1..23395c17fa 100644
+index 23395c17fa..e0cff702b7 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -124,7 +124,11 @@ typedef struct Job {
-     /** Estimated progress_current value at the completion of the job */
-     int64_t progress_total;
+@@ -568,23 +568,6 @@ void job_finalize(Job *job, Error **errp);
+  */
+ void job_dismiss(Job **job, Error **errp);
  
--    /** ret code passed to job_completed. */
-+    /**
-+     * Return code from @run and/or @prepare callback(s).
-+     * Not final until the job has reached the CONCLUDED status.
-+     * 0 on success, -errno on failure.
-+     */
-     int ret;
- 
-     /**
-@@ -172,7 +176,16 @@ struct JobDriver {
-     /** Enum describing the operation */
-     JobType job_type;
- 
--    /** Mandatory: Entrypoint for the Coroutine. */
-+    /**
-+     * Mandatory: Entrypoint for the Coroutine.
-+     *
-+     * This callback will be invoked when moving from CREATED to RUNNING.
-+     *
-+     * If this callback returns nonzero, the job transaction it is part of is
-+     * aborted. If it returns zero, the job moves into the WAITING state. If it
-+     * is the last job to complete in its transaction, all jobs in the
-+     * transaction move from WAITING to PENDING.
-+     */
-     int coroutine_fn (*run)(Job *job, Error **errp);
- 
-     /**
-@@ -496,17 +509,6 @@ void job_early_fail(Job *job);
- /** Moves the @job from RUNNING to READY */
- void job_transition_to_ready(Job *job);
- 
--/**
-- * @job: The job being completed.
-- * @ret: The status code.
-- *
-- * Marks @job as completed. If @ret is non-zero, the job transaction it is part
-- * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
-- * is the last job to complete in its transaction, all jobs in the transaction
-- * move from WAITING to PENDING.
-- */
--void job_completed(Job *job, int ret);
+-typedef void JobDeferToMainLoopFn(Job *job, void *opaque);
 -
- /** Asynchronously complete the specified @job. */
- void job_complete(Job *job, Error **errp);
- 
+-/**
+- * @job: The job
+- * @fn: The function to run in the main loop
+- * @opaque: The opaque value that is passed to @fn
+- *
+- * This function must be called by the main job coroutine just before it
+- * returns.  @fn is executed in the main loop with the job AioContext acquired.
+- *
+- * Block jobs must call bdrv_unref(), bdrv_close(), and anything that uses
+- * bdrv_drain_all() in the main loop.
+- *
+- * The @job AioContext is held while @fn executes.
+- */
+-void job_defer_to_main_loop(Job *job, JobDeferToMainLoopFn *fn, void *opaque);
+-
+ /**
+  * Synchronously finishes the given @job. If @finish is given, it is called to
+  * trigger completion or cancellation of the job.
 diff --git a/job.c b/job.c
-index 5df7791ad8..37d828f964 100644
+index 37d828f964..b960e72710 100644
 --- a/job.c
 +++ b/job.c
-@@ -535,6 +535,8 @@ void job_drain(Job *job)
-     }
+@@ -561,12 +561,8 @@ static void coroutine_fn job_co_entry(void *opaque)
+     assert(job && job->driver && job->driver->run);
+     job_pause_point(job);
+     job->ret = job->driver->run(job, &job->err);
+-    if (!job->deferred_to_main_loop) {
+-        job->deferred_to_main_loop = true;
+-        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+-                                job_exit,
+-                                job);
+-    }
++    job->deferred_to_main_loop = true;
++    aio_bh_schedule_oneshot(qemu_get_aio_context(), job_exit, job);
  }
  
-+static void job_completed(Job *job);
-+
- static void job_exit(void *opaque)
+ 
+@@ -969,38 +965,6 @@ void job_complete(Job *job, Error **errp)
+     job->driver->complete(job, errp);
+ }
+ 
+-
+-typedef struct {
+-    Job *job;
+-    JobDeferToMainLoopFn *fn;
+-    void *opaque;
+-} JobDeferToMainLoopData;
+-
+-static void job_defer_to_main_loop_bh(void *opaque)
+-{
+-    JobDeferToMainLoopData *data = opaque;
+-    Job *job = data->job;
+-    AioContext *aio_context = job->aio_context;
+-
+-    aio_context_acquire(aio_context);
+-    data->fn(data->job, data->opaque);
+-    aio_context_release(aio_context);
+-
+-    g_free(data);
+-}
+-
+-void job_defer_to_main_loop(Job *job, JobDeferToMainLoopFn *fn, void *opaque)
+-{
+-    JobDeferToMainLoopData *data = g_malloc(sizeof(*data));
+-    data->job = job;
+-    data->fn = fn;
+-    data->opaque = opaque;
+-    job->deferred_to_main_loop = true;
+-
+-    aio_bh_schedule_oneshot(qemu_get_aio_context(),
+-                            job_defer_to_main_loop_bh, data);
+-}
+-
+ int job_finish_sync(Job *job, void (*finish)(Job *, Error **errp), Error **errp)
  {
-     Job *job = (Job *)opaque;
-@@ -545,7 +547,7 @@ static void job_exit(void *opaque)
-         job->driver->exit(job);
-         aio_context_release(aio_context);
-     }
--    job_completed(job, job->ret);
-+    job_completed(job);
- }
- 
- /**
-@@ -883,13 +885,12 @@ static void job_completed_txn_success(Job *job)
-     }
- }
- 
--void job_completed(Job *job, int ret)
-+static void job_completed(Job *job)
- {
-     assert(job && job->txn && !job_is_completed(job));
- 
--    job->ret = ret;
-     job_update_rc(job);
--    trace_job_completed(job, ret, job->ret);
-+    trace_job_completed(job, job->ret);
-     if (job->ret) {
-         job_completed_txn_abort(job);
-     } else {
-@@ -905,7 +906,7 @@ void job_cancel(Job *job, bool force)
-     }
-     job_cancel_async(job, force);
-     if (!job_started(job)) {
--        job_completed(job, -ECANCELED);
-+        job_completed(job);
-     } else if (job->deferred_to_main_loop) {
-         job_completed_txn_abort(job);
-     } else {
-diff --git a/trace-events b/trace-events
-index c445f54773..4fd2cb4b97 100644
---- a/trace-events
-+++ b/trace-events
-@@ -107,7 +107,7 @@ gdbstub_err_checksum_incorrect(uint8_t expected, uint8_t got) "got command packe
- # job.c
- job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
- job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
--job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
-+job_completed(void *job, int ret) "job %p ret %d"
- 
- # job-qmp.c
- qmp_job_cancel(void *job) "job %p"
+     Error *local_err = NULL;
 -- 
 2.17.1
