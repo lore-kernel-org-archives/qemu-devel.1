@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fvfD6-0002wK-6T
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:55:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvfOb-0001Ih-JM
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 05:07:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fvfD3-0000P0-0I
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:55:20 -0400
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:37661)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fvfD2-0000Gc-Od
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:55:16 -0400
-Received: from player693.ha.ovh.net (unknown [10.109.143.249])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 1FFD1D39D2
-	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 10:55:09 +0200 (CEST)
-References: <20180622075700.5923-1-clg@kaod.org>
-	<20180622075700.5923-4-clg@kaod.org>
-	<fb6480f3-2c25-bcd1-9586-3ce45b82d6e1@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <4348fb77-74ec-dd52-609d-fca0c9883ad1@kaod.org>
-Date: Fri, 31 Aug 2018 10:55:00 +0200
+	(envelope-from <mreitz@redhat.com>) id 1fvfOa-0001Ca-Cr
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 05:07:13 -0400
+References: <20180823220856.10094-1-jsnow@redhat.com>
+	<20180823220856.10094-2-jsnow@redhat.com>
+	<86874359-e26c-4974-c2ec-bbc4e8ade264@redhat.com>
+	<d9592097-39f1-86f3-7a34-cb82b3025147@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a11d4660-af0a-26dc-abf2-65bd4e050ae7@redhat.com>
+Date: Fri, 31 Aug 2018 11:06:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <fb6480f3-2c25-bcd1-9586-3ce45b82d6e1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] aspeed/timer: use the APB frequency
- from the SCU
+In-Reply-To: <d9592097-39f1-86f3-7a34-cb82b3025147@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="fyzBxhN9mjpJtb3PpjzIInAnnIaslGX2c"
+Subject: Re: [Qemu-devel] [PATCH v2 1/9] jobs: change start callback to run
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +27,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>, Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com, Jeff Cody <jcody@redhat.com>
 
-On 08/31/2018 10:34 AM, Thomas Huth wrote:
-> On 2018-06-22 09:57, C=C3=A9dric Le Goater wrote:
->> The timer controller can be driven by either an external 1MHz clock or
->> by the APB clock. Today, the model makes the assumption that the APB
->> frequency is always set to 24MHz but this is incorrect.
->>
->> The AST2400 SoC on the palmetto machines uses a 48MHz input clock
->> source and the APB can be set to 48MHz. The consequence is a general
->> system slowdown. The QEMU machines using the AST2500 SoC do not seem
->> impacted today because the APB frequency is still set to 24MHz.
->>
->> We fix the timer frequency for all SoCs by linking the Timer model to
->> the SCU model. The APB frequency driving the timers is now the one
->> configured for the SoC.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> Reviewed-by: Joel Stanley <joel@jms.id.au>
->> ---
->>  include/hw/timer/aspeed_timer.h |  4 ++++
->>  hw/arm/aspeed_soc.c             |  2 ++
->>  hw/timer/aspeed_timer.c         | 19 +++++++++++++++----
->>  3 files changed, 21 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed=
-_timer.h
->> index bd6c1a7f9609..040a08873432 100644
->> --- a/include/hw/timer/aspeed_timer.h
->> +++ b/include/hw/timer/aspeed_timer.h
->> @@ -24,6 +24,8 @@
->> =20
->>  #include "qemu/timer.h"
->> =20
->> +typedef struct AspeedSCUState AspeedSCUState;
->> +
->>  #define ASPEED_TIMER(obj) \
->>      OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER);
->>  #define TYPE_ASPEED_TIMER "aspeed.timer"
->> @@ -55,6 +57,8 @@ typedef struct AspeedTimerCtrlState {
->>      uint32_t ctrl;
->>      uint32_t ctrl2;
->>      AspeedTimer timers[ASPEED_TIMER_NR_TIMERS];
->> +
->> +    AspeedSCUState *scu;
->>  } AspeedTimerCtrlState;
->=20
-> This patch breaks compiling with clang 3.4.2 for me:
->=20
-> In file included from /home/thuth/devel/qemu/hw/timer/aspeed_timer.c:16=
-:
-> /home/thuth/devel/qemu/include/hw/misc/aspeed_scu.h:37:3: error:
-> redefinition of typedef 'AspeedSCUState' is a C11 feature
->       [-Werror,-Wtypedef-redefinition]
-> } AspeedSCUState;
->   ^
-> /home/thuth/devel/qemu/include/hw/timer/aspeed_timer.h:27:31: note:
-> previous definition is here
-> typedef struct AspeedSCUState AspeedSCUState;
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fyzBxhN9mjpJtb3PpjzIInAnnIaslGX2c
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com,
+ Jeff Cody <jcody@redhat.com>
+Message-ID: <a11d4660-af0a-26dc-abf2-65bd4e050ae7@redhat.com>
+Subject: Re: [PATCH v2 1/9] jobs: change start callback to run callback
+References: <20180823220856.10094-1-jsnow@redhat.com>
+ <20180823220856.10094-2-jsnow@redhat.com>
+ <86874359-e26c-4974-c2ec-bbc4e8ade264@redhat.com>
+ <d9592097-39f1-86f3-7a34-cb82b3025147@redhat.com>
+In-Reply-To: <d9592097-39f1-86f3-7a34-cb82b3025147@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ah. Bummer. I will just include the file then.
-                             =20
+On 2018-08-30 02:06, John Snow wrote:
 >=20
-> I think you should not re-typedef here. Either include the right header=
+>=20
+> On 08/27/2018 05:30 AM, Max Reitz wrote:
+>> On 2018-08-24 00:08, John Snow wrote:
+>>> Presently we codify the entry point for a job as the "start" callback=
 ,
-> or use include/qemu/typedefs.h.
+>>> but a more apt name would be "run" to clarify the idea that when this=
 
-I didn't know this file existed. I am not sure to like this method.
-
->  Thomas
+>>> function returns we consider the job to have "finished," except for
+>>> any cleanup which occurs in separate callbacks later.
+>>>
+>>> As part of this clarification, change the signature to include an err=
+or
+>>> object and a return code. The error ptr is not yet used, and the retu=
+rn
+>>> code while captured, will be overwritten by actions in the job_comple=
+ted
+>>> function.
+>>>
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>>  block/backup.c            |  7 ++++---
+>>>  block/commit.c            |  7 ++++---
+>>>  block/create.c            |  8 +++++---
+>>>  block/mirror.c            | 10 ++++++----
+>>>  block/stream.c            |  7 ++++---
+>>>  include/qemu/job.h        |  2 +-
+>>>  job.c                     |  6 +++---
+>>>  tests/test-bdrv-drain.c   |  7 ++++---
+>>>  tests/test-blockjob-txn.c | 16 ++++++++--------
+>>>  tests/test-blockjob.c     |  7 ++++---
+>>>  10 files changed, 43 insertions(+), 34 deletions(-)
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>> But I see a discrepancy in the upcoming s->ret <=3D> s->err relationsh=
+ip
+>> now.  And that is if .run() doesn't return an Error *...
+>>
+>> That could be remedied immediately in job_co_entry(), though, either b=
+y
+>> calling job_update_rc(), or by inlining its "if (!job->err)" part.
+>>
+>> Max
+>>
 >=20
+> Jobs currently exist in ... five-ish phases.
 >=20
-> PS: Did I already mention that I really dislike the typedeffing in QEMU=
-?
+> Phase 0: Not started. (Always UNDEFINED or CREATED.)
+> Phase 1: In the coroutine. (RUNNING, READY, STANDBY, PAUSED.)
+> Phase 2: Deferred to main, but job_completed not yet called. [Not
+> dignified with a formal status, but job->deferred_to_main_loop set.]
+> Phase 3: job_completed has been called. (ABORTING, WAITING, PENDING)
+> Phase 4: job_finalize_single has been called. (CONCLUDED, NULL)
 >=20
+> Broadly, though, we separate these out into two main clusters:
+>=20
+> (A): job_is_completed =3D=3D FALSE; Phases 0, 1 and 2 above.
+> (B): job_is_completed =3D=3D TRUE; Phases 3 and 4 above.
+>=20
+> The ABORTING status as it exists now is a phase 3 status. It never gets=
 
-It's a bit painful I agree.
+> set before this call, so it is a reliable indicator of being in phase 3=
+=2E
+>=20
+> If I adjust the usage of job_update_rc like you asked in several
+> reviews, it changes it to being a status that can exist in either Phase=
 
-Thanks,
+> 2 *or* 3, which complicates the code a bit as it requires an audit of
+> every caller to job_is_completed and replacing it with something more
+> appropriate. Worse, we have no way to identify phase 2 anymore without
+> adding a new status or a new boolean.
+>=20
+> I think this is a change worth making, but I must beg to defer this
+> change for a later patchset for the time-being, and leave the
+> job_update_rc calls alone for the present patchset so I can focus on
+> more pressing matters.
+>=20
+> It might be simplest to say that at CONCLUDED time, the "err iff ret"
+> relationship will be true but potentially not before then. I think this=
 
-C.=20
+> is reasonable as the error code cannot be held to be final until, well,=
+
+> the job has finished.
+
+It's OK making the change at a later point.
+
+Maybe it would make more sense to pull out the
+"set @err if @ret && !@err" part from job_update_rc() into an own
+function, and then call that every time @ret has been updated.  (And
+call the rest of the function, which does a possible state transition,
+only where that makes sense.)
+
+Max
+
+
+--fyzBxhN9mjpJtb3PpjzIInAnnIaslGX2c
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluJBS0ACgkQ9AfbAGHV
+z0CSpAgAoHk7zJT55MMOm7EX5LdgFSHZJUt6mXHfcwXZCfHkruP/WzKNu+fcFML5
+U8mjn3wSEFaAfAoK3uBXdSDbLFWoCuWlkAmG+2YHRkKAE5z6VKQVdscyQQOeNJk6
+u/fwUBQlZBrwJSLWnBYvnMjBAedDoROhOIURJTlHcmzyWXs2ETXg3O3qcuDzxzhY
+kc4HUxQU2oHSjyRrSebt6FmNtLgT3rgmCsXU3gQXZ1K2cCfOKheVNuiwa/EU5xhR
+FBWIjX5mTfyZWDG1Vv0FXpaPFUrMQEDN38WT7DBqp+rie4KvJdWwFOjWvY3ZbvbK
+JgBMXcEcmKwNvL/nuTCweA4upOEFGA==
+=tayG
+-----END PGP SIGNATURE-----
+
+--fyzBxhN9mjpJtb3PpjzIInAnnIaslGX2c--
