@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fvcUO-0005tD-J9
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:01:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1fvcV8-0006FS-UV
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:01:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fvcUK-00050K-He
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:01:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34950 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fvcUK-0004x7-B4
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:00:56 -0400
-References: <20180830155810.17629-1-marcandre.lureau@redhat.com>
-	<20180830155810.17629-4-marcandre.lureau@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b5db24e8-a4c5-6fe5-ceda-ed126a476370@redhat.com>
-Date: Fri, 31 Aug 2018 08:00:45 +0200
+	(envelope-from <armbru@redhat.com>) id 1fvcV5-0005QG-Kn
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 02:01:46 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180830145902.27376-1-cohuck@redhat.com>
+	<20180830145902.27376-3-cohuck@redhat.com>
+Date: Fri, 31 Aug 2018 08:01:39 +0200
+In-Reply-To: <20180830145902.27376-3-cohuck@redhat.com> (Cornelia Huck's
+	message of "Thu, 30 Aug 2018 16:59:02 +0200")
+Message-ID: <87tvnbvzuk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180830155810.17629-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] tests: add
- qmp/qom-set-without-value test
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] qemu-error: make use of {error,
+ warn}_report_once_cond
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
 
-On 2018-08-30 17:58, Marc-Andr=C3=A9 Lureau wrote:
-> test_qom_set_without_value() is about a bug in infrastructure used by
-> the QMP core, fixed in commit c489780203.  We covered the bug in
-> infrastructure unit tests (commit bce3035a44).  I wrote that test
-> earlier, to cover QMP level as well, the test could go into qmp-test.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Cornelia Huck <cohuck@redhat.com> writes:
+
+> {error,warn}_report_once() are a special case of the new functions
+> and can simply switch to them.
+>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  tests/qmp-test.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+>  include/qemu/error-report.h | 34 ++++++++++++++--------------------
+>  1 file changed, 14 insertions(+), 20 deletions(-)
+>
+> diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+> index e415128ac4..918cb936d8 100644
+> --- a/include/qemu/error-report.h
+> +++ b/include/qemu/error-report.h
+> @@ -53,32 +53,26 @@ bool warn_report_once_cond(bool *printed, const char *fmt, ...)
+>   * Similar to error_report(), except it prints the message just once.
+>   * Return true when it prints, false otherwise.
+>   */
+> -#define error_report_once(fmt, ...)             \
+> -    ({                                          \
+> -        static bool print_once_;                \
+> -        bool ret_print_once_ = !print_once_;    \
+> -                                                \
+> -        if (!print_once_) {                     \
+> -            print_once_ = true;                 \
+> -            error_report(fmt, ##__VA_ARGS__);   \
+> -        }                                       \
+> -        unlikely(ret_print_once_);              \
+> +#define error_report_once(fmt, ...)                     \
+> +    ({                                                  \
+> +        static bool print_once_;                        \
+> +        bool ret_print_once_ =                          \
+> +            error_report_once_cond(&print_once_,        \
+> +                                   fmt, ##__VA_ARGS__); \
+> +        unlikely(ret_print_once_);                      \
+>      })
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Do we still need @ret_print_once_?
+
+   #define error_report_once(fmt, ...)                     \
+       ({                                                  \
+           static bool print_once_;                        \
+           unlikely(error_report_once_cond(&print_once_,   \
+                                   fmt, ##__VA_ARGS__));   \
+       })
+
+Or dispense with the unlikely:
+
+   #define error_report_once(fmt, ...)                     \
+       ({                                                  \
+           static bool print_once_;                        \
+           error_report_once_cond(&print_once_,            \
+                                  fmt, ##__VA_ARGS__);     \
+       })
+
+Got a preference?
+
+>  
+>  /*
+>   * Similar to warn_report(), except it prints the message just once.
+>   * Return true when it prints, false otherwise.
+>   */
+> -#define warn_report_once(fmt, ...)              \
+> -    ({                                          \
+> -        static bool print_once_;                \
+> -        bool ret_print_once_ = !print_once_;    \
+> -                                                \
+> -        if (!print_once_) {                     \
+> -            print_once_ = true;                 \
+> -            warn_report(fmt, ##__VA_ARGS__);    \
+> -        }                                       \
+> -        unlikely(ret_print_once_);              \
+> +#define warn_report_once(fmt, ...)                      \
+> +    ({                                                  \
+> +        static bool print_once_;                        \
+> +        bool ret_print_once_ =                          \
+> +            warn_report_once_cond(&print_once_,         \
+> +                                  fmt, ##__VA_ARGS__);  \
+> +        unlikely(ret_print_once_);                      \
+>      })
+>  
+>  const char *error_get_progname(void);
