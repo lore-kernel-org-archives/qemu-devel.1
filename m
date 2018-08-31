@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fvaVy-0005sc-Kk
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 23:54:34 -0400
+	(envelope-from <mst@redhat.com>) id 1fvaVz-0005sW-9T
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 23:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fvaI9-0007aB-8y
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 23:40:18 -0400
-Received: from m15-8.126.com ([220.181.15.8]:64045)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fvaI8-0007Yx-Fq
-	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 23:40:13 -0400
-Date: Fri, 31 Aug 2018 11:08:35 +0800 (CST)
-From: "Chen Hanxiao" <chen_han_xiao@126.com>
-In-Reply-To: <153505572849.24497.6708545614556650264@sif>
-References: <20180810011348.8952-1-chen_han_xiao@126.com>
-	<153505572849.24497.6708545614556650264@sif>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	(envelope-from <mst@redhat.com>) id 1fvaHj-0007Lx-Gb
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 23:39:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42060 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fvaHi-0007J4-96
+	for qemu-devel@nongnu.org; Thu, 30 Aug 2018 23:39:46 -0400
+Date: Thu, 30 Aug 2018 23:39:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180830233835-mutt-send-email-mst@kernel.org>
+References: <201808272317499067164@zte.com.cn>
 MIME-Version: 1.0
-Message-ID: <5ec1537e.3697.1658df43182.Coremail.chen_han_xiao@126.com>
-Subject: Re: [Qemu-devel] [resend][PATCH] qga-win: add support for
- qmp_guest_fsfreeze_freeze_list
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201808272317499067164@zte.com.cn>
+Subject: Re: [Qemu-devel] [PATCH V4 4/4] target-i386: add i440fx 0xcf8
+ portascoalesced_pio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
+To: peng.hao2@zte.com.cn
+Cc: liran.alon@oracle.com, pbonzini@redhat.com, ehabkost@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org, zhong.weidong@zte.com.cn
 
-CgoKQXQgMjAxOC0wOC0yNCAwNDoyMjowOCwgIk1pY2hhZWwgUm90aCIgPG1kcm90aEBsaW51eC52
-bmV0LmlibS5jb20+IHdyb3RlOgo+UXVvdGluZyBDaGVuIEhhbnhpYW8gKDIwMTgtMDgtMDkgMjA6
-MTM6NDgpCj4+IEZyb206IENoZW4gSGFueGlhbyA8Y2hlbmhhbnhpYW9AZ21haWwuY29tPgo+PiAK
-Pj4gVGhpcyBwYXRjaCBhZGQgc3VwcG9ydCBmb3IgZnJlZXplIHNwZWNpZmllZCBmcy4KPj4gCj4+
-IFRoZSB2YWxpZCBtb3VudHBvaW50cyBsaXN0IG1lbWJlciBhcmUgWzFdOgo+PiAKPj4gICBUaGUg
-cGF0aCBvZiBhIG1vdW50ZWQgZm9sZGVyLCBmb3IgZXhhbXBsZSwgWTpcTW91bnRYXAo+PiAgIEEg
-ZHJpdmUgbGV0dGVyLCBmb3IgZXhhbXBsZSwgRDpcCj4+ICAgQSB2b2x1bWUgR1VJRCBwYXRoIG9m
-IHRoZSBmb3JtIFxcP1xWb2x1bWV7R1VJRH1cLAo+PiAgICAgICB3aGVyZSBHVUlEIGlkZW50aWZp
-ZXMgdGhlIHZvbHVtZQo+PiAgIEEgVU5DIHBhdGggdGhhdCBzcGVjaWZpZXMgYSByZW1vdGUgZmls
-ZSBzaGFyZSwKPj4gICAgICAgZm9yIGV4YW1wbGUsIFxcQ2x1c3RlcnhcU2hhcmUxXAo+PiAKPj4g
-WzFdIGh0dHBzOi8vZG9jcy5taWNyb3NvZnQuY29tL2VuLXVzL3dpbmRvd3MvZGVza3RvcC9hcGkv
-dnNiYWNrdXAvbmYtdnNiYWNrdXAtaXZzc2JhY2t1cGNvbXBvbmVudHMtYWRkdG9zbmFwc2hvdHNl
-dAo+PiAKPj4gQ2M6IE1pY2hhZWwgUm90aCA8bWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNvbT4KPj4g
-U2lnbmVkLW9mZi1ieTogQ2hlbiBIYW54aWFvIDxjaGVuaGFueGlhb0BnbWFpbC5jb20+Cj4KPlNv
-bWUgc21hbGwgbml0cyBiZWxvdywgYnV0IGxvb2tzIGdvb2Qgb3RoZXJ3aXNlLgo+Cj4+IC0tLQo+
-PiAgcWdhL2NvbW1hbmRzLXdpbjMyLmMgICAgICAgIHwgMjEgKysrKysrLS0tLS0tLS0KPj4gIHFn
-YS9tYWluLmMgICAgICAgICAgICAgICAgICB8ICAyICstClsuLi5dCj4+IGRpZmYgLS1naXQgYS9x
-Z2EvdnNzLXdpbjMyL3JlcXVlc3Rlci5jcHAgYi9xZ2EvdnNzLXdpbjMyL3JlcXVlc3Rlci5jcHAK
-Pj4gaW5kZXggM2Q5Yzk3MTZjMC4uMGJkMTcwZWRkYyAxMDA2NDQKPj4gLS0tIGEvcWdhL3Zzcy13
-aW4zMi9yZXF1ZXN0ZXIuY3BwCj4+ICsrKyBiL3FnYS92c3Mtd2luMzIvcmVxdWVzdGVyLmNwcAo+
-PiBAQCAtMjM0LDcgKzIzNCw3IEBAIG91dDoKPj4gICAgICB9Cj4+ICB9Cj4+IAo+PiAtdm9pZCBy
-ZXF1ZXN0ZXJfZnJlZXplKGludCAqbnVtX3ZvbHMsIEVycm9yU2V0ICplcnJzZXQpCj4+ICt2b2lk
-IHJlcXVlc3Rlcl9mcmVlemUoaW50ICpudW1fdm9scywgdm9pZCAqbW91bnRwb2ludHMsIEVycm9y
-U2V0ICplcnJzZXQpCj4KPkRvZXMgdGhpcyBuZWVkIHRvIGJlIGRlY2xhcmVkIGFzIHZvaWQgKiwg
-b3IgY2FuIHdlIHVzZSB0aGUgZGlyZWN0IFZvbExpc3QqCj50eXBlPyBNYXliZSBldmVuIGNvbnN0
-IFZvbExpc3QgKiBjb25zdCwgc2luY2UgaXQgaXMgcmVhZC1vbmx5PwoKVGhhdCBtYXkgY2hhbmdl
-IHRoZSBjdXJyZW50IHN0cnVjdHVyZSBhIGxvdC4KVGhlIGNhbGxlciBxZ2FfdnNzX2ZzZnJlZXpl
-IGFsc28gc2VydmUgcmVxdWVzdGVyX3RoYXcuCldlJ2QgYmV0dGVyIGtlZXAgaXRzIGRlY2xhcmF0
-aW9uIGFzIGl0IHVzZWQgdG8gYmUuCgo+Cj4+ICB7Cj4+ICAgICAgQ09NUG9pbnRlcjxJVnNzQXN5
-bmM+IHBBc3luYzsKPj4gICAgICBIQU5ETEUgdm9sdW1lOwo+PiBAQCAtMjQ1LDcgKzI0NSw5IEBA
-IHZvaWQgcmVxdWVzdGVyX2ZyZWV6ZShpbnQgKm51bV92b2xzLCBFcnJvclNldCAqZXJyc2V0KQo+
-PiAgICAgIFNFQ1VSSVRZX0FUVFJJQlVURVMgc2E7Cj4+ICAgICAgV0NIQVIgc2hvcnRfdm9sdW1l
-X25hbWVbNjRdLCAqZGlzcGxheV9uYW1lID0gc2hvcnRfdm9sdW1lX25hbWU7Cj4+ICAgICAgRFdP
-UkQgd2FpdF9zdGF0dXM7Cj4+ICsgICAgUFdDSEFSIFdTdHIgPSBOVUxMOwo+PiAgICAgIGludCBu
-dW1fZml4ZWRfZHJpdmVzID0gMCwgaTsKPj4gKyAgICBpbnQgbnVtX21vdW50X3BvaW50cyA9IDA7
-Cj4+IAo+PiAgICAgIGlmICh2c3NfY3R4LnBWc3NiYykgeyAvKiBhbHJlYWR5IGZyb3plbiAqLwo+
-PiAgICAgICAgICAqbnVtX3ZvbHMgPSAwOwo+PiBAQCAtMzM3LDEyICszMzksNDIgQEAgdm9pZCBy
-ZXF1ZXN0ZXJfZnJlZXplKGludCAqbnVtX3ZvbHMsIEVycm9yU2V0ICplcnJzZXQpCj4+ICAgICAg
-ICAgIGdvdG8gb3V0Owo+PiAgICAgIH0KPj4gCj4+IC0gICAgdm9sdW1lID0gRmluZEZpcnN0Vm9s
-dW1lVyhzaG9ydF92b2x1bWVfbmFtZSwgc2l6ZW9mKHNob3J0X3ZvbHVtZV9uYW1lKSk7Cj4+IC0g
-ICAgaWYgKHZvbHVtZSA9PSBJTlZBTElEX0hBTkRMRV9WQUxVRSkgewo+PiAtICAgICAgICBlcnJf
-c2V0KGVycnNldCwgaHIsICJmYWlsZWQgdG8gZmluZCBmaXJzdCB2b2x1bWUiKTsKPj4gKyAgICBp
-ZiAobW91bnRwb2ludHMpIHsKPj4gKyAgICAgICAgZm9yICh2b2xMaXN0ICpsaXN0ID0gKHZvbExp
-c3QgKiltb3VudHBvaW50czsgbGlzdDsgbGlzdCA9IGxpc3QtPm5leHQpIHsKPj4gKyAgICAgICAg
-ICAgIHNpemVfdCBsZW4gPSBzdHJsZW4obGlzdC0+dmFsdWUpICsgMTsKPj4gKyAgICAgICAgICAg
-IHNpemVfdCBjb252ZXJ0ZWQgPSAwOwo+PiArICAgICAgICAgICAgVlNTX0lEIHBpZDsKPj4gKwo+
-PiArICAgICAgICAgICAgV1N0ciA9IG5ldyB3Y2hhcl90W2xlbl07Cj4+ICsgICAgICAgICAgICBt
-YnN0b3djc19zKCZjb252ZXJ0ZWQsIFdTdHIsIGxlbiwgbGlzdC0+dmFsdWUsIF9UUlVOQ0FURSk7
-Cj4+ICsKPj4gKyAgICAgICAgICAgIGhyID0gdnNzX2N0eC5wVnNzYmMtPkFkZFRvU25hcHNob3RT
-ZXQoV1N0ciwKPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgZ19nUHJvdmlkZXJJZCwgJnBpZCk7Cj4+ICsgICAgICAgICAgICBpZiAoRkFJTEVEKGhy
-KSkgewo+PiArICAgICAgICAgICAgICAgIGVycl9zZXQoZXJyc2V0LCBociwgImZhaWxlZCB0byBh
-ZGQgJVMgdG8gc25hcHNob3Qgc2V0IiwgV1N0cik7Cj4+ICsgICAgICAgICAgICAgICAgZ290byBv
-dXQ7Cj4KPldTdHIgaXMgb25seSBuZWVkZWQgd2l0aGluIHRoaXMgYmxvY2ssIHNvIEknZCBwcmVm
-ZXIgZGVjbGFyaW5nIGl0IGhlcmUKPmFuZCB0aGVuIGp1c3QgYWRkaW5nIGFuIGFkZGl0aW9uYWwg
-ImRlbGV0ZSBXU3RyOyIgYmVmb3JlIHRoZSAiZ290byBvdXQ7Ii4KPgo+QWxzbyBJIGtub3cgdGhl
-IEFQSXMgZm9yY2UgdXMgdG8gZGlmZmVyIGZyb20gdGhlIFFFTVUgY29kaW5nIGd1aWRlbGluZXMK
-PndpdGggcmVnYXJkIHRvIENhbWVsQ2FzZSBhbmQgd2hhdG5vdCwgYnV0IEknZCBzdGlsbCBwcmVm
-ZXIgd2Ugc3RpY2sgdG8KPml0IHdoZW4gcG9zc2libGUuIFdTdHIgYWxzbyBpc24ndCB2ZXJ5IGRl
-c2NyaXB0aXZlLCBtYXliZQo+dm9sdW1lX25hbWVfd2NoYXI/CgpTdXJlLCB3aWxsIGJlIGZpeGVk
-IGluIHYyLgoKPgo+PiArICAgICAgICAgICAgfQo+PiArICAgICAgICAgICAgbnVtX21vdW50X3Bv
-aW50cysrOwo+PiArCj4+ICsgICAgICAgICAgICBkZWxldGUgV1N0cjsKPj4gKyAgICAgICAgfQo+
-PiArICAgIH0KPj4gKwo+PiArICAgIGlmIChtb3VudHBvaW50cyAmJiBudW1fbW91bnRfcG9pbnRz
-ID09IDApIHsKPj4gKyAgICAgICAgLyogSWYgdGhlcmUgaXMgbm8gdmFsaWQgbW91bnQgcG9pbnRz
-LCBqdXN0IGV4aXQuICovCj4+ICAgICAgICAgIGdvdG8gb3V0Owo+PiAgICAgIH0KPgo+TG9naWMg
-bWlnaHQgYmUgYSBsaXR0bGUgY2xlYW5lciBpZiB5b3UgbW92ZSB0aGlzIGJsb2NrIGFmdGVyIHRo
-ZSBmb3IKPmxvb3AgYWJvdmUuCgpEb25lLgoKPgo+PiAtICAgIGZvciAoOzspIHsKPj4gKwo+PiAr
-Cj4+ICsgICAgaWYgKCFtb3VudHBvaW50cykgewo+PiArICAgICAgICB2b2x1bWUgPSBGaW5kRmly
-c3RWb2x1bWVXKHNob3J0X3ZvbHVtZV9uYW1lLCBzaXplb2Yoc2hvcnRfdm9sdW1lX25hbWUpKTsK
-Pj4gKyAgICAgICAgaWYgKHZvbHVtZSA9PSBJTlZBTElEX0hBTkRMRV9WQUxVRSkgewo+PiArICAg
-ICAgICAgICAgZXJyX3NldChlcnJzZXQsIGhyLCAiZmFpbGVkIHRvIGZpbmQgZmlyc3Qgdm9sdW1l
-Iik7Cj4+ICsgICAgICAgICAgICBnb3RvIG91dDsKPj4gKyAgICAgICAgfQo+PiArICAgIH0KPj4g
-Kwo+PiArICAgIHdoaWxlICghbW91bnRwb2ludHMpIHsKPgo+bW91bnRwb2ludHMgaXMgcmVhZC1v
-bmx5IGluIHRoaXMgZnVuY3Rpb24sIHNvIHRoaXMgaXMgYmFzaWNhbGx5IGFuCj51bmNvbmRpdGlv
-bmFsIGxvb3AuIEknZCByYXRoZXIgd2UgZG8gZm9yKDs7KSBsaWtlIGl0IHdhcyBwcmV2aW91c2x5
-Cj5hbmQgbmVzdCB0aGF0IGluIHRoZSAiaWYgKCFtb3VudHBvaW50cykiIGFib3ZlIHRvIGtlZXAg
-dGhlIGxvZ2ljCj5tb3JlIGNvbnRhaW5lZC4KCk1vcmUgY2xlYXIuCgo+Cj4+ICAgICAgICAgIGlm
-IChHZXREcml2ZVR5cGVXKHNob3J0X3ZvbHVtZV9uYW1lKSA9PSBEUklWRV9GSVhFRCkgewo+PiAg
-ICAgICAgICAgICAgVlNTX0lEIHBpZDsKPj4gICAgICAgICAgICAgIGhyID0gdnNzX2N0eC5wVnNz
-YmMtPkFkZFRvU25hcHNob3RTZXQoc2hvcnRfdm9sdW1lX25hbWUsCj4+IEBAIC0zNTUsNyArMzg3
-LDcgQEAgdm9pZCByZXF1ZXN0ZXJfZnJlZXplKGludCAqbnVtX3ZvbHMsIEVycm9yU2V0ICplcnJz
-ZXQpCj4+ICAgICAgICAgICAgICAgICAgICAgIGRpc3BsYXlfbmFtZSA9IHZvbHVtZV9wYXRoX25h
-bWU7Cj4+ICAgICAgICAgICAgICAgICAgfQo+PiAgICAgICAgICAgICAgICAgIGVycl9zZXQoZXJy
-c2V0LCBociwgImZhaWxlZCB0byBhZGQgJVMgdG8gc25hcHNob3Qgc2V0IiwKPj4gLSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIGRpc3BsYXlfbmFtZSk7Cj4+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICBkaXNwbGF5X25hbWUpOwo+PiAgICAgICAgICAgICAgICAgIEZpbmRWb2x1bWVD
-bG9zZSh2b2x1bWUpOwo+PiAgICAgICAgICAgICAgICAgIGdvdG8gb3V0Owo+PiAgICAgICAgICAg
-ICAgfQo+PiBAQCAtMzY4LDcgKzQwMCw3IEBAIHZvaWQgcmVxdWVzdGVyX2ZyZWV6ZShpbnQgKm51
-bV92b2xzLCBFcnJvclNldCAqZXJyc2V0KQo+PiAgICAgICAgICB9Cj4+ICAgICAgfQo+PiAKPj4g
-LSAgICBpZiAobnVtX2ZpeGVkX2RyaXZlcyA9PSAwKSB7Cj4+ICsgICAgaWYgKCFtb3VudHBvaW50
-cyAmJiBudW1fZml4ZWRfZHJpdmVzID09IDApIHsKPj4gICAgICAgICAgZ290byBvdXQ7IC8qIElm
-IHRoZXJlIGlzIG5vIGZpeGVkIGRyaXZlLCBqdXN0IGV4aXQuICovCj4+ICAgICAgfQo+Cj5hbmQg
-YWxzbyBuZXN0IHRoaXMgdGhlIHNhbWUgImlmICghbW91bnRwb2ludHMpIiBibG9jayBhYm92ZS4K
-PgoKU3VyZSwgSSdsbCBwb3N0IHYyIHNvb24uCgpSZWdhcmRzLAotIENoZW4=
+On Mon, Aug 27, 2018 at 11:17:49PM +0800, peng.hao2@zte.com.cn wrote:
+> >On Mon, Aug 27, 2018 at 04:25:00PM +0800, peng.hao2@zte.com.cn wrote:
+> >> >> On 25 Aug 2018, at 15:19, Peng Hao <peng.hao2@zte.com.cn> wrote:
+> >> >> 
+> >> >> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> >> >> index 0e60834..da73743 100644
+> >> >> --- a/hw/pci-host/piix.c
+> >> >> +++ b/hw/pci-host/piix.c
+> >> >> @@ -327,6 +327,10 @@ static void i440fx_pcihost_realize(DeviceState *dev, Error **errp)
+> >> >> 
+> >> >>     sysbus_add_io(sbd, 0xcfc, &s->data_mem);
+> >> >>     sysbus_init_ioports(sbd, 0xcfc, 4);
+> >> >> +
+> >> >> +    /* register i440fx 0xcf8 port as coalesced pio */
+> >> >> +    memory_region_set_flush_coalesced(&s->data_mem);
+> >> >> +    memory_region_add_coalescing(&s->conf_mem, 0, 4);
+> >> >> }
+> >> >> 
+> >> >Is there a reason to not register this port as coalesced PIO also for Q35?
+> >> >In q35_host_realize()?
+> >> >If not, I would do that as an extra patch as part of this series.
+> >> Just as I mentioned in patch [0/4] , you can add pci->>host config port as coalesecd pio. I think  it works for q35 port 0xcf8.
+> >> >-Liran
+> >
+> >What's the performance improvement for q35?
+> q35 also has  the same pci-host config port 0xcf8  as  piix. I test the coalesced pio for 
+> q35 pci-host config port 0xcf8. It spent less VM-exit avg time from 3us to 0.6us.
+
+so pls include that patch too. piix is mostly feature frozen, piix only
+features aren't likely to be merged.
+
+> >-- 
+> >MST
