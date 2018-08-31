@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvmaN-00048Y-9C
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:47:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fvmbO-0005Jw-K4
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:48:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvmaJ-0002rG-4P
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:47:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42662 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fvmbN-0003Gf-SO
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:48:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52732 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fvmaI-0002r4-Vz
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:47:47 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fvmbN-0003GX-Na
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 12:48:53 -0400
 References: <1535733414-6812-1-git-send-email-Liam.Merwick@oracle.com>
-	<1535733414-6812-7-git-send-email-Liam.Merwick@oracle.com>
+	<1535733414-6812-8-git-send-email-Liam.Merwick@oracle.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0874d29e-26fc-c1fa-4299-bc8d133dcfa8@redhat.com>
-Date: Fri, 31 Aug 2018 11:47:45 -0500
+Message-ID: <c48ad92d-57df-5476-541c-7ea88501514a@redhat.com>
+Date: Fri, 31 Aug 2018 11:48:52 -0500
 MIME-Version: 1.0
-In-Reply-To: <1535733414-6812-7-git-send-email-Liam.Merwick@oracle.com>
+In-Reply-To: <1535733414-6812-8-git-send-email-Liam.Merwick@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 6/8] block: dump_qlist() may dereference
- a Null pointer
+Subject: Re: [Qemu-devel] [PATCH v2 7/8] io: potential unnecessary check in
+ qio_channel_command_new_spawn()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +32,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Liam Merwick <Liam.Merwick@oracle.com>, qemu-devel@nongnu.org
 
 On 08/31/2018 11:36 AM, Liam Merwick wrote:
-> A NULL 'list' passed into function dump_qlist() isn't correctly
-> validated and can be passed to qlist_first() where it is dereferenced.
+> In qio_channel_command_new_spawn() the 'flags' variable is checked
+> to see if /dev/null should be used for stdin or stdout; first with
+> O_RDONLY and then O_WRONLY.  However the second check for O_WRONLY
+> is only needed if flags != O_RDONLY and therefore should be an
+> else if statement.
 > 
-> Given that  dump_qlist() is static, and callers already do the right
-
-Double space looks odd.
-
-> thing, just add an assert to catch future potential bugs.
+> This minor optimization has the added benefit of suppressing a warning
+> from a static analysis tool (Parfait) which incorrectly reported an
+> incorrect checking of flags in qio_channel_command_new_spawn() could
+> result in an uninitialized file descriptor being used. Removing this
+> noise will help us better find real issues.
 > 
 > Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
 > ---
->   block/qapi.c | 2 ++
->   1 file changed, 2 insertions(+)
+>   io/channel-command.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 > 
-> diff --git a/block/qapi.c b/block/qapi.c
-> index c66f949db839..e81be604217c 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -740,6 +740,8 @@ static void dump_qlist(fprintf_function func_fprintf, void *f, int indentation,
->       const QListEntry *entry;
->       int i = 0;
+> diff --git a/io/channel-command.c b/io/channel-command.c
+> index 3e7eb17eff54..82acd3234915 100644
+> --- a/io/channel-command.c
+> +++ b/io/channel-command.c
+> @@ -61,8 +61,7 @@ qio_channel_command_new_spawn(const char *const argv[],
 >   
-> +    assert(list);
-> +
->       for (entry = qlist_first(list); entry; entry = qlist_next(entry), i++) {
->           QType type = qobject_type(entry->value);
->           bool composite = (type == QTYPE_QDICT || type == QTYPE_QLIST);
+>       if (flags == O_RDONLY) {
+>           stdinnull = true;
+> -    }
+> -    if (flags == O_WRONLY) {
+> +    } else if (flags == O_WRONLY) {
+>           stdoutnull = true;
+>       }
+>   
 > 
 
 -- 
