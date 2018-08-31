@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvlGa-0003VL-OW
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:23:21 -0400
+	(envelope-from <liam.merwick@oracle.com>) id 1fvlcT-00067J-J2
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fvlGZ-000162-SE
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:23:20 -0400
-References: <20180830015734.19765-1-jsnow@redhat.com>
-	<20180830015734.19765-3-jsnow@redhat.com>
-	<6ed2e7ac-8de1-bd7b-0787-fdd33c6b306e@redhat.com>
-	<87mut3ukyi.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <126a3e52-7706-d6dc-fb7a-bda8e11d9791@redhat.com>
-Date: Fri, 31 Aug 2018 11:23:03 -0400
+	(envelope-from <liam.merwick@oracle.com>) id 1fvlRL-0006j3-5G
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:34:31 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:50626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+	id 1fvlRK-0006in-SF
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:34:27 -0400
+From: Liam Merwick <liam.merwick@oracle.com>
+References: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
+	<1535644031-848-8-git-send-email-Liam.Merwick@oracle.com>
+	<ba464589-10b3-d449-3077-74a5eee9ec61@redhat.com>
+Message-ID: <1e99f751-2cc6-7d66-dd57-cbc857a18a4a@oracle.com>
+Date: Fri, 31 Aug 2018 16:36:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <87mut3ukyi.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/9] jobs: canonize Error object
+In-Reply-To: <ba464589-10b3-d449-3077-74a5eee9ec61@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 7/8] io: file descriptor not initialized in
+ qio_channel_command_new_spawn()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, jtc@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-
-
-On 08/31/2018 02:08 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
-> 
->> On 08/29/2018 08:57 PM, John Snow wrote:
->>> Jobs presently use both an Error object in the case of the create job,
->>> and char strings in the case of generic errors elsewhere.
->>>
->>> Unify the two paths as just j->err, and remove the extra argument from
->>> job_completed. The integer error code for job_completed is kept for now,
->>> to be removed shortly in a separate patch.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
+On 30/08/2018 17:18, Eric Blake wrote:
+> On 08/30/2018 10:47 AM, Liam Merwick wrote:
+>> Incorrect checking of flags could result in uninitialized
+>> file descriptor being used.
 >>
->>> +++ b/job.c
+>> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+>> Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
+>> Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
+>> ---
+>> =C2=A0 io/channel-command.c | 4 ++--
+>> =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
 >>
->>> @@ -666,8 +666,8 @@ static void job_update_rc(Job *job)
->>>           job->ret = -ECANCELED;
->>>       }
->>>       if (job->ret) {
->>> -        if (!job->error) {
->>> -            job->error = g_strdup(strerror(-job->ret));
->>> +        if (!job->err) {
->>> +            error_setg(&job->err, "%s", g_strdup(strerror(-job->ret)));
->>
->> Memleak. Drop the g_strdup(), and just directly pass strerror()
->> results to error_setg().  (I guess we can't quite use
->> error_setg_errno() unless we add additional text beyond the strerror()
->> results).
-> 
-> Adding such text might well be an improvement.  I'm not telling you to
-> do so (not having looked at the context myself), just to think about it.
-> 
+>> diff --git a/io/channel-command.c b/io/channel-command.c
+>> index 3e7eb17eff54..38deb687da21 100644
+>> --- a/io/channel-command.c
+>> +++ b/io/channel-command.c
+>> @@ -59,10 +59,10 @@ qio_channel_command_new_spawn(const char *const=20
+>> argv[],
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 flags =3D flags & O_ACCMODE;
+>> -=C2=A0=C2=A0=C2=A0 if (flags =3D=3D O_RDONLY) {
+>> +=C2=A0=C2=A0=C2=A0 if ((flags & O_RDONLY) =3D=3D O_RDONLY) {
+>=20
+> NACK.=C2=A0 O_RDONLY and O_WRONLY are subsets of O_ACCMODE, which we al=
+ready=20
+> masked out above.
+>=20
+> On some systems, we have:
+> O_RDONLY =3D=3D 0
+> O_WRONLY =3D=3D 1
+> O_RDWR =3D=3D 2
+>=20
+> On other systems, we have:
+> O_RDONLY =3D=3D 1
+> O_WRONLY =3D=3D 2
+> O_RDWR =3D=3D 3
+>=20
+> Either way, if the user passed in O_RDWR, (flags & O_RDONLY) =3D=3D O_R=
+DONLY=20
+> returns true, which is wrong.
+>=20
+> O_ACCMODE was historically 0x3, although now that POSIX has O_EXEC and=20
+> O_SEARCH (which can be the same bit pattern), some systems now make=20
+> O_ACCMODE occupy 3 bits instead of 2.
+>=20
 
-In this case, and I agree with Kevin who suggested it; we ought to be
-moving away from the retcode in general and using first-class error
-objects for all of our jobs anyway.
+Thanks for catching that and for the explanation.
 
-In this case, the job has failed with a retcode and we wish to give the
-user some hope of understanding why, but at this point in the code all
-we know is what the strerror can tell us, so a generic prefix like "The
-job failed" is not helpful because it will already be clear by events
-and other things that the job failed.
+Looking at it again, the very minor optimisation of converting the 2nd=20
+'if' to an 'else if' has the useful side-effect of appeasing the static=20
+analysis tool.
 
-The only text I can think of that would be useful is: "The job failed
-and didn't give a more specific error message. Please email
-qemu-devel@nongnu.org and harass the authors until they fix it. Anyway,
-nice chatting to you, the generic error message is: %s"
+--- a/io/channel-command.c
++++ b/io/channel-command.c
+@@ -61,8 +61,7 @@ qio_channel_command_new_spawn(const char *const argv[],
 
---js
+      if (flags =3D=3D O_RDONLY) {
+          stdinnull =3D true;
+-    }
+-    if (flags =3D=3D O_WRONLY) {
++    } else if (flags =3D=3D O_WRONLY) {
+          stdoutnull =3D true;
+      }
 
->> With that fixed,
->> Reviewed-by: Eric Blake <eblake@redhat.com>
+Regards,
+Liam
