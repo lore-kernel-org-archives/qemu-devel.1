@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvjb6-00065y-Al
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:36:25 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fvjed-000216-U5
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:40:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvjOx-0003TU-2m
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:23:51 -0400
-References: <20180830015734.19765-1-jsnow@redhat.com>
-	<20180830015734.19765-6-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9fec287c-0ce0-b2d2-2e31-1f2820bac051@redhat.com>
-Date: Fri, 31 Aug 2018 15:23:36 +0200
+	(envelope-from <amarkovic@wavecomp.com>) id 1fvjea-0002p1-OW
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:40:03 -0400
+Received: from mail-co1nam05on0702.outbound.protection.outlook.com
+	([2a01:111:f400:fe50::702]:45792
+	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fvjea-0002oN-3M
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 09:40:00 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 31 Aug 2018 13:39:35 +0000
+Message-ID: <BN7PR08MB48683D162B911B8944759A86C60F0@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <20180830193019.20104-1-jancraig@amazon.com>,
+	<20180830193019.20104-6-jancraig@amazon.com>
+In-Reply-To: <20180830193019.20104-6-jancraig@amazon.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20180830015734.19765-6-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aEWYX501bXrZvhlarElbpgP62KmE7y0FO"
-Subject: Re: [Qemu-devel] [PATCH v3 5/9] block/mirror: utilize job_exit shim
+Subject: Re: [Qemu-devel] [PATCH v4 5/9] target/mips: Add MXU instruction
+ S8LDD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com
+To: Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Richard Henderson <richard.henderson@linaro.org>, Petar Jovanovic <pjovanovic@wavecomp.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aEWYX501bXrZvhlarElbpgP62KmE7y0FO
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, jtc@redhat.com
-Message-ID: <9fec287c-0ce0-b2d2-2e31-1f2820bac051@redhat.com>
-Subject: Re: [PATCH v3 5/9] block/mirror: utilize job_exit shim
-References: <20180830015734.19765-1-jsnow@redhat.com>
- <20180830015734.19765-6-jsnow@redhat.com>
-In-Reply-To: <20180830015734.19765-6-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi, Craig,
 
-On 2018-08-30 03:57, John Snow wrote:
-> Change the manual deferment to mirror_exit into the implicit
-> callback to job_exit and the mirror_exit callback.
+> From: Craig Janeczek <jancraig@amazon.com>
+> Sent: Thursday, August 30, 2018 9:30 PM
 >=20
-> This does change the order of some bdrv_unref calls and job_completed,
-> but thanks to the new context in which we call .exit, this is safe to
-> defer the possible flushing of any nodes to the job_finalize_single
-> cleanup stage.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> Subject: [PATCH v4 5/9] target/mips: Add MXU instruction S8LDD
+
+> Adds support for emulating the S8LDD MXU instruction.
+
+> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
 > ---
->  block/mirror.c | 29 +++++++++++------------------
->  1 file changed, 11 insertions(+), 18 deletions(-)
+>  v1
+>     - initial patch
+>  v2
+>     - changed bitfield usage to extract32
+>     - used deposit_tl instructions instead of shift and bitmask
+>  v3
+>     - Split gen_mxu function into command specific gen_mxu_<ins> function=
+s
+>  v4
+>     -Add and use MXU_OPTN3_PTN #defines
+>     -Add check for MXUEN
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+>  target/mips/translate.c | 98 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 98 insertions(+)
 
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
 
---aEWYX501bXrZvhlarElbpgP62KmE7y0FO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> +    TCGv t0, t1;
+> +    TCGLabel *l0;
+> +    uint32_t xra, s8, optn3, rb;
+> +
+> +    t0 =3D tcg_temp_new();
+> +    t1 =3D tcg_temp_new();
+> +
+> +    l0 =3D gen_new_label();
+> +
+> +    xra =3D extract32(ctx->opcode, 6, 4);
+> +    s8 =3D extract32(ctx->opcode, 10, 8);
+> +    optn3 =3D extract32(ctx->opcode, 18, 3);
+> +    rb =3D extract32(ctx->opcode, 21, 5);
+> +
+> +    gen_load_mxu_cr(t0);
+> +    tcg_gen_andi_tl(t0, t0, MXUEN);
+> +    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXUEN, l0);
+> +
+> +    gen_load_gpr(t0, rb);
+> +    tcg_gen_addi_tl(t0, t0, (int8_t)s8);
 
------BEGIN PGP SIGNATURE-----
+I am not sure if this works as desired, with respect to branching. In order=
+ to survive branching, tcg variables must be initialized with tcg_temp_loca=
+l_new(), rather than with tcg_tem_new(). Please retest, and amend if needed=
+.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluJQVgACgkQ9AfbAGHV
-z0AT5wf+PTSatD4w5gXDn9z946QTn7pyeT1/hxF1HauVepDmLaEsNXbk7djvdqa9
-PFoBZzL2NbypO2fZAxtSEdPfX3uRCLpKdcVrMEUAuhmIkuRfs+GIWoRpACXdBCvA
-N9dxrdygRfE9FU7ceSLZFVmzSgeFAVja3sqzZtp9WGljqq/MKLLy0fFzksvwA+3F
-Zf/e1uQ//T9Y5AvS3hlz6HU3Fz8C1HXl4XN7+niWGPplwWCBTUUtehlW7DCostUo
-VJ+C8Ur+XKZjlqzSfw67n6bMfVEb1bIdoiLTKa1JqNvmJZhXdWId8iV+gFPdTS5w
-powxhwtjbUzmgnDG9HEPFneVV2e35Q==
-=K/jR
------END PGP SIGNATURE-----
-
---aEWYX501bXrZvhlarElbpgP62KmE7y0FO--
+Thanks,
+Aleksandar=
