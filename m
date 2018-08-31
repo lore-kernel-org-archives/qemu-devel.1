@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkUQ-00062T-Ub
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:33:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkZ9-0002nY-Bz
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:38:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkUP-0004aS-Tm
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:33:34 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkZ4-0006wv-DA
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:38:27 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 31 Aug 2018 16:32:39 +0200
-Message-Id: <20180831143241.31787-9-mreitz@redhat.com>
+Date: Fri, 31 Aug 2018 16:38:14 +0200
+Message-Id: <20180831143814.3993-1-mreitz@redhat.com>
 In-Reply-To: <20180831143241.31787-1-mreitz@redhat.com>
 References: <20180831143241.31787-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL v2 08/10] block/backup: make function variables
- consistently named
+Subject: [Qemu-devel] [PULL v2 10/10] jobs: remove job_defer_to_main_loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,150 +24,104 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.m
 
 From: John Snow <jsnow@redhat.com>
 
-Rename opaque_job to job to be consistent with other job implementations.
-Rename 'job', the BackupBlockJob object, to 's' to also be consistent.
+Now that the job infrastructure is handling the job_completed call for
+all implemented jobs, we can remove the interface that allowed jobs to
+schedule their own completion.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180830015734.19765-8-jsnow@redhat.com
+Message-id: 20180830015734.19765-10-jsnow@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c | 62 +++++++++++++++++++++++++-------------------------
- 1 file changed, 31 insertions(+), 31 deletions(-)
+ include/qemu/job.h | 17 -----------------
+ job.c              | 40 ++--------------------------------------
+ 2 files changed, 2 insertions(+), 55 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index a67b7fa96b..4d084f6ca6 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -468,59 +468,59 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-     bdrv_dirty_iter_free(dbi);
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index 23395c17fa..e0cff702b7 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -568,23 +568,6 @@ void job_finalize(Job *job, Error **errp);
+  */
+ void job_dismiss(Job **job, Error **errp);
+ 
+-typedef void JobDeferToMainLoopFn(Job *job, void *opaque);
+-
+-/**
+- * @job: The job
+- * @fn: The function to run in the main loop
+- * @opaque: The opaque value that is passed to @fn
+- *
+- * This function must be called by the main job coroutine just before it
+- * returns.  @fn is executed in the main loop with the job AioContext acquired.
+- *
+- * Block jobs must call bdrv_unref(), bdrv_close(), and anything that uses
+- * bdrv_drain_all() in the main loop.
+- *
+- * The @job AioContext is held while @fn executes.
+- */
+-void job_defer_to_main_loop(Job *job, JobDeferToMainLoopFn *fn, void *opaque);
+-
+ /**
+  * Synchronously finishes the given @job. If @finish is given, it is called to
+  * trigger completion or cancellation of the job.
+diff --git a/job.c b/job.c
+index 37d828f964..b960e72710 100644
+--- a/job.c
++++ b/job.c
+@@ -561,12 +561,8 @@ static void coroutine_fn job_co_entry(void *opaque)
+     assert(job && job->driver && job->driver->run);
+     job_pause_point(job);
+     job->ret = job->driver->run(job, &job->err);
+-    if (!job->deferred_to_main_loop) {
+-        job->deferred_to_main_loop = true;
+-        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+-                                job_exit,
+-                                job);
+-    }
++    job->deferred_to_main_loop = true;
++    aio_bh_schedule_oneshot(qemu_get_aio_context(), job_exit, job);
  }
  
--static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
-+static int coroutine_fn backup_run(Job *job, Error **errp)
+ 
+@@ -969,38 +965,6 @@ void job_complete(Job *job, Error **errp)
+     job->driver->complete(job, errp);
+ }
+ 
+-
+-typedef struct {
+-    Job *job;
+-    JobDeferToMainLoopFn *fn;
+-    void *opaque;
+-} JobDeferToMainLoopData;
+-
+-static void job_defer_to_main_loop_bh(void *opaque)
+-{
+-    JobDeferToMainLoopData *data = opaque;
+-    Job *job = data->job;
+-    AioContext *aio_context = job->aio_context;
+-
+-    aio_context_acquire(aio_context);
+-    data->fn(data->job, data->opaque);
+-    aio_context_release(aio_context);
+-
+-    g_free(data);
+-}
+-
+-void job_defer_to_main_loop(Job *job, JobDeferToMainLoopFn *fn, void *opaque)
+-{
+-    JobDeferToMainLoopData *data = g_malloc(sizeof(*data));
+-    data->job = job;
+-    data->fn = fn;
+-    data->opaque = opaque;
+-    job->deferred_to_main_loop = true;
+-
+-    aio_bh_schedule_oneshot(qemu_get_aio_context(),
+-                            job_defer_to_main_loop_bh, data);
+-}
+-
+ int job_finish_sync(Job *job, void (*finish)(Job *, Error **errp), Error **errp)
  {
--    BackupBlockJob *job = container_of(opaque_job, BackupBlockJob, common.job);
--    BlockDriverState *bs = blk_bs(job->common.blk);
-+    BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
-+    BlockDriverState *bs = blk_bs(s->common.blk);
-     int64_t offset, nb_clusters;
-     int ret = 0;
- 
--    QLIST_INIT(&job->inflight_reqs);
--    qemu_co_rwlock_init(&job->flush_rwlock);
-+    QLIST_INIT(&s->inflight_reqs);
-+    qemu_co_rwlock_init(&s->flush_rwlock);
- 
--    nb_clusters = DIV_ROUND_UP(job->len, job->cluster_size);
--    job_progress_set_remaining(&job->common.job, job->len);
-+    nb_clusters = DIV_ROUND_UP(s->len, s->cluster_size);
-+    job_progress_set_remaining(job, s->len);
- 
--    job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
--    if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
--        backup_incremental_init_copy_bitmap(job);
-+    s->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
-+    if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-+        backup_incremental_init_copy_bitmap(s);
-     } else {
--        hbitmap_set(job->copy_bitmap, 0, nb_clusters);
-+        hbitmap_set(s->copy_bitmap, 0, nb_clusters);
-     }
- 
- 
--    job->before_write.notify = backup_before_write_notify;
--    bdrv_add_before_write_notifier(bs, &job->before_write);
-+    s->before_write.notify = backup_before_write_notify;
-+    bdrv_add_before_write_notifier(bs, &s->before_write);
- 
--    if (job->sync_mode == MIRROR_SYNC_MODE_NONE) {
-+    if (s->sync_mode == MIRROR_SYNC_MODE_NONE) {
-         /* All bits are set in copy_bitmap to allow any cluster to be copied.
-          * This does not actually require them to be copied. */
--        while (!job_is_cancelled(&job->common.job)) {
-+        while (!job_is_cancelled(job)) {
-             /* Yield until the job is cancelled.  We just let our before_write
-              * notify callback service CoW requests. */
--            job_yield(&job->common.job);
-+            job_yield(job);
-         }
--    } else if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
--        ret = backup_run_incremental(job);
-+    } else if (s->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-+        ret = backup_run_incremental(s);
-     } else {
-         /* Both FULL and TOP SYNC_MODE's require copying.. */
--        for (offset = 0; offset < job->len;
--             offset += job->cluster_size) {
-+        for (offset = 0; offset < s->len;
-+             offset += s->cluster_size) {
-             bool error_is_read;
-             int alloced = 0;
- 
--            if (yield_and_check(job)) {
-+            if (yield_and_check(s)) {
-                 break;
-             }
- 
--            if (job->sync_mode == MIRROR_SYNC_MODE_TOP) {
-+            if (s->sync_mode == MIRROR_SYNC_MODE_TOP) {
-                 int i;
-                 int64_t n;
- 
-                 /* Check to see if these blocks are already in the
-                  * backing file. */
- 
--                for (i = 0; i < job->cluster_size;) {
-+                for (i = 0; i < s->cluster_size;) {
-                     /* bdrv_is_allocated() only returns true/false based
-                      * on the first set of sectors it comes across that
-                      * are are all in the same state.
-@@ -529,7 +529,7 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
-                      * needed but at some point that is always the case. */
-                     alloced =
-                         bdrv_is_allocated(bs, offset + i,
--                                          job->cluster_size - i, &n);
-+                                          s->cluster_size - i, &n);
-                     i += n;
- 
-                     if (alloced || n == 0) {
-@@ -547,29 +547,29 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
-             if (alloced < 0) {
-                 ret = alloced;
-             } else {
--                ret = backup_do_cow(job, offset, job->cluster_size,
-+                ret = backup_do_cow(s, offset, s->cluster_size,
-                                     &error_is_read, false);
-             }
-             if (ret < 0) {
-                 /* Depending on error action, fail now or retry cluster */
-                 BlockErrorAction action =
--                    backup_error_action(job, error_is_read, -ret);
-+                    backup_error_action(s, error_is_read, -ret);
-                 if (action == BLOCK_ERROR_ACTION_REPORT) {
-                     break;
-                 } else {
--                    offset -= job->cluster_size;
-+                    offset -= s->cluster_size;
-                     continue;
-                 }
-             }
-         }
-     }
- 
--    notifier_with_return_remove(&job->before_write);
-+    notifier_with_return_remove(&s->before_write);
- 
-     /* wait until pending backup_do_cow() calls have completed */
--    qemu_co_rwlock_wrlock(&job->flush_rwlock);
--    qemu_co_rwlock_unlock(&job->flush_rwlock);
--    hbitmap_free(job->copy_bitmap);
-+    qemu_co_rwlock_wrlock(&s->flush_rwlock);
-+    qemu_co_rwlock_unlock(&s->flush_rwlock);
-+    hbitmap_free(s->copy_bitmap);
- 
-     return ret;
- }
+     Error *local_err = NULL;
 -- 
 2.17.1
