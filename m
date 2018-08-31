@@ -1,28 +1,30 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:37894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvl4x-0005ig-Fu
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:11:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1fvl5J-0005ig-0z
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fvkzF-0003sr-An
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:05:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50370 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fvkvi-0000vI-7w
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:01:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50296 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fvkzC-0003py-KJ
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:05:23 -0400
-References: <1535644031-848-1-git-send-email-Liam.Merwick@oracle.com>
-	<1535644031-848-9-git-send-email-Liam.Merwick@oracle.com>
-	<f8b68066-8427-ba2f-9205-a9b316a926b5@redhat.com>
-	<ac300921-251a-7b9b-c097-150196fce7fe@oracle.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fvkvi-0000ux-2y
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 11:01:46 -0400
+References: <20180829153624.12299-1-david@redhat.com>
+	<20180829153624.12299-15-david@redhat.com>
+	<20180831103855.GC2376@work-vm>
+	<6aabaa18-33f1-dea3-0824-74f78fcb2d0c@redhat.com>
+	<20180831104302.GD2376@work-vm>
+	<8d71de77-9fa8-4100-41be-8e1d689ba98b@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <f19e373e-a6e5-62f8-f489-52605e5545d0@redhat.com>
-Date: Fri, 31 Aug 2018 10:05:19 -0500
+Message-ID: <e728135e-1996-207b-e7bb-df760cc7abff@redhat.com>
+Date: Fri, 31 Aug 2018 10:01:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <ac300921-251a-7b9b-c097-150196fce7fe@oracle.com>
+In-Reply-To: <8d71de77-9fa8-4100-41be-8e1d689ba98b@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 8/8] qcow2: Read outside array bounds in
- qcow2_pre_write_overlap_check()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 14/20] memory-device: ids of virtio
+ based devices are special
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +33,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <liam.merwick@oracle.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>
 
-On 08/31/2018 08:32 AM, Liam Merwick wrote:
+On 08/31/2018 06:18 AM, David Hildenbrand wrote:
 
->>
->> The fix looks correct, but to prevent the problem from happening=20
->> again, I'd suggest you also add a compile-time BUG_ON that fails if=20
->> the array size gets out of sync again due to another addition of=20
->> another overlap detection bit.
->>
->=20
-> Good idea. There is no generic BUG_ON in QEMU (just a few private=20
-> copies) or BUILD_BUG_ON. I can add a commit that introduces a copy of=20
-> include/linux/build_bug.h from the Linux kernel and use BUILD_BUG_ON in=
-=20
-> this commit.=C2=A0 Is there any reason not to do that?
+>>>>> -                error_setg(errp, "address range conflicts with '%s'", d->id);
+>>>>> +                error_setg(errp, "address range conflicts with '%s'",
+>>>>> +                           id ? id : 0);
+>>>>
+>>>> What's that 'id ? id : 0' trick for?
+>>>
+>>> 0 -> "", then it actually makes sense :)
+>>>
 
-We already have the generic QEMU_BUILD_BUG_ON() used throughout the=20
-tree; that's the one to use here, rather than adding yet another macro=20
-with a similar functionality.
+> 
+> qemu-system-x86_64: -device pc-dimm,memdev=mem1,addr=0x140000000:
+> address range conflicts with '(null)'
+> 
+> (I thought providing NULL would lead to a crash, but it is actually
+> handled properly)
 
---=20
+Well, glibc handles it. But POSIX says it is undefined, and there are 
+other libc where it indeed crashes.  It's better to pass an explicit 
+non-null placeholder than to rely on glibc turning NULL into "(null)".
+
+-- 
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
