@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkQT-00014U-3D
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:29:30 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkQV-0001AA-3w
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:29:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fvkML-0000r6-N9
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:25:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fvkMG-0000md-3v
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 10:25:10 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Fri, 31 Aug 2018 16:24:43 +0200
-Message-Id: <20180831142446.22264-9-mreitz@redhat.com>
+Date: Fri, 31 Aug 2018 16:24:39 +0200
+Message-Id: <20180831142446.22264-5-mreitz@redhat.com>
 In-Reply-To: <20180831142446.22264-1-mreitz@redhat.com>
 References: <20180831142446.22264-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 08/11] jobs: utilize job_exit shim
+Subject: [Qemu-devel] [PULL 04/11] jobs: canonize Error object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,292 +24,269 @@ Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.m
 
 From: John Snow <jsnow@redhat.com>
 
-Utilize the job_exit shim by not calling job_defer_to_main_loop, and
-where applicable, converting the deferred callback into the job_exit
-callback.
+Jobs presently use both an Error object in the case of the create job,
+and char strings in the case of generic errors elsewhere.
 
-This converts backup, stream, create, and the unit tests all at once.
-Most of these jobs do not see any changes to the order in which they
-clean up their resources, except the test-blockjob-txn test, which
-now puts down its bs before job_completed is called.
-
-This is safe for the same reason the reordering in the mirror job is
-safe, because job_completed no longer runs under two locks, making
-the unref safe even if it causes a flush.
+Unify the two paths as just j->err, and remove the extra argument from
+job_completed. The integer error code for job_completed is kept for now,
+to be removed shortly in a separate patch.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180830015734.19765-7-jsnow@redhat.com
+Message-id: 20180830015734.19765-3-jsnow@redhat.com
+[mreitz: Dropped a superfluous g_strdup()]
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c            | 16 ----------------
- block/create.c            | 14 +++-----------
- block/stream.c            | 22 +++++++---------------
- tests/test-bdrv-drain.c   |  6 ------
- tests/test-blockjob-txn.c | 11 ++---------
- tests/test-blockjob.c     | 10 ++++------
- 6 files changed, 16 insertions(+), 63 deletions(-)
+ include/qemu/job.h        | 14 ++++++++------
+ block/backup.c            |  2 +-
+ block/commit.c            |  2 +-
+ block/create.c            |  5 ++---
+ block/mirror.c            |  2 +-
+ block/stream.c            |  2 +-
+ job-qmp.c                 |  5 +++--
+ job.c                     | 18 ++++++------------
+ tests/test-bdrv-drain.c   |  2 +-
+ tests/test-blockjob-txn.c |  2 +-
+ tests/test-blockjob.c     |  2 +-
+ 11 files changed, 26 insertions(+), 30 deletions(-)
 
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index 9cf463d228..e0e99870a1 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -124,12 +124,16 @@ typedef struct Job {
+     /** Estimated progress_current value at the completion of the job */
+     int64_t progress_total;
+ 
+-    /** Error string for a failed job (NULL if, and only if, job->ret == 0) */
+-    char *error;
+-
+     /** ret code passed to job_completed. */
+     int ret;
+ 
++    /**
++     * Error object for a failed job.
++     * If job->ret is nonzero and an error object was not set, it will be set
++     * to strerror(-job->ret) during job_completed.
++     */
++    Error *err;
++
+     /** The completion function that will be called when the job completes.  */
+     BlockCompletionFunc *cb;
+ 
+@@ -484,15 +488,13 @@ void job_transition_to_ready(Job *job);
+ /**
+  * @job: The job being completed.
+  * @ret: The status code.
+- * @error: The error message for a failing job (only with @ret < 0). If @ret is
+- *         negative, but NULL is given for @error, strerror() is used.
+  *
+  * Marks @job as completed. If @ret is non-zero, the job transaction it is part
+  * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
+  * is the last job to complete in its transaction, all jobs in the transaction
+  * move from WAITING to PENDING.
+  */
+-void job_completed(Job *job, int ret, Error *error);
++void job_completed(Job *job, int ret);
+ 
+ /** Asynchronously complete the specified @job. */
+ void job_complete(Job *job, Error **errp);
 diff --git a/block/backup.c b/block/backup.c
-index 1e965d54e5..a67b7fa96b 100644
+index 5d47781840..1e965d54e5 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -380,18 +380,6 @@ static BlockErrorAction backup_error_action(BackupBlockJob *job,
-     }
+@@ -388,7 +388,7 @@ static void backup_complete(Job *job, void *opaque)
+ {
+     BackupCompleteData *data = opaque;
+ 
+-    job_completed(job, data->ret, NULL);
++    job_completed(job, data->ret);
+     g_free(data);
  }
  
--typedef struct {
--    int ret;
--} BackupCompleteData;
--
--static void backup_complete(Job *job, void *opaque)
--{
--    BackupCompleteData *data = opaque;
--
--    job_completed(job, data->ret);
--    g_free(data);
--}
--
- static bool coroutine_fn yield_and_check(BackupBlockJob *job)
- {
-     uint64_t delay_ns;
-@@ -483,7 +471,6 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
- static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
- {
-     BackupBlockJob *job = container_of(opaque_job, BackupBlockJob, common.job);
--    BackupCompleteData *data;
-     BlockDriverState *bs = blk_bs(job->common.blk);
-     int64_t offset, nb_clusters;
-     int ret = 0;
-@@ -584,9 +571,6 @@ static int coroutine_fn backup_run(Job *opaque_job, Error **errp)
-     qemu_co_rwlock_unlock(&job->flush_rwlock);
-     hbitmap_free(job->copy_bitmap);
+diff --git a/block/commit.c b/block/commit.c
+index a0ea86ff64..4a17bb73ec 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -117,7 +117,7 @@ static void commit_complete(Job *job, void *opaque)
+      * bdrv_set_backing_hd() to fail. */
+     block_job_remove_all_bdrv(bjob);
  
--    data = g_malloc(sizeof(*data));
--    data->ret = ret;
--    job_defer_to_main_loop(&job->common.job, backup_complete, data);
-     return ret;
- }
+-    job_completed(job, ret, NULL);
++    job_completed(job, ret);
+     g_free(data);
  
+     /* If bdrv_drop_intermediate() didn't already do that, remove the commit
 diff --git a/block/create.c b/block/create.c
-index 26a385c6c7..95341219ef 100644
+index 04733c3618..26a385c6c7 100644
 --- a/block/create.c
 +++ b/block/create.c
-@@ -34,28 +34,20 @@ typedef struct BlockdevCreateJob {
-     Job common;
+@@ -35,14 +35,13 @@ typedef struct BlockdevCreateJob {
      BlockDriver *drv;
      BlockdevCreateOptions *opts;
--    int ret;
+     int ret;
+-    Error *err;
  } BlockdevCreateJob;
  
--static void blockdev_create_complete(Job *job, void *opaque)
--{
--    BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
--
--    job_completed(job, s->ret);
--}
--
- static int coroutine_fn blockdev_create_run(Job *job, Error **errp)
+ static void blockdev_create_complete(Job *job, void *opaque)
  {
      BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
-+    int ret;
+ 
+-    job_completed(job, s->ret, s->err);
++    job_completed(job, s->ret);
+ }
+ 
+ static int coroutine_fn blockdev_create_run(Job *job, Error **errp)
+@@ -50,7 +49,7 @@ static int coroutine_fn blockdev_create_run(Job *job, Error **errp)
+     BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
  
      job_progress_set_remaining(&s->common, 1);
--    s->ret = s->drv->bdrv_co_create(s->opts, errp);
-+    ret = s->drv->bdrv_co_create(s->opts, errp);
+-    s->ret = s->drv->bdrv_co_create(s->opts, &s->err);
++    s->ret = s->drv->bdrv_co_create(s->opts, errp);
      job_progress_update(&s->common, 1);
  
      qapi_free_BlockdevCreateOptions(s->opts);
--    job_defer_to_main_loop(&s->common, blockdev_create_complete, NULL);
+diff --git a/block/mirror.c b/block/mirror.c
+index 691763db41..be5dc6b7b0 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -710,7 +710,7 @@ static void mirror_exit(Job *job, void *opaque)
+     blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
  
--    return s->ret;
-+    return ret;
- }
+     bs_opaque->job = NULL;
+-    job_completed(job, data->ret, NULL);
++    job_completed(job, data->ret);
  
- static const JobDriver blockdev_create_job_driver = {
+     g_free(data);
+     bdrv_drained_end(src);
 diff --git a/block/stream.c b/block/stream.c
-index 26a775386b..67e1e72e23 100644
+index b4b987df7e..26a775386b 100644
 --- a/block/stream.c
 +++ b/block/stream.c
-@@ -54,20 +54,16 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
-     return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
- }
- 
--typedef struct {
--    int ret;
--} StreamCompleteData;
--
--static void stream_complete(Job *job, void *opaque)
-+static void stream_exit(Job *job)
- {
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
-     BlockJob *bjob = &s->common;
--    StreamCompleteData *data = opaque;
-     BlockDriverState *bs = blk_bs(bjob->blk);
-     BlockDriverState *base = s->base;
-     Error *local_err = NULL;
-+    int ret = job->ret;
- 
--    if (!job_is_cancelled(job) && bs->backing && data->ret == 0) {
-+    if (!job_is_cancelled(job) && bs->backing && ret == 0) {
-         const char *base_id = NULL, *base_fmt = NULL;
-         if (base) {
-             base_id = s->backing_file_str;
-@@ -75,11 +71,11 @@ static void stream_complete(Job *job, void *opaque)
-                 base_fmt = base->drv->format_name;
-             }
-         }
--        data->ret = bdrv_change_backing_file(bs, base_id, base_fmt);
-+        ret = bdrv_change_backing_file(bs, base_id, base_fmt);
-         bdrv_set_backing_hd(bs, base, &local_err);
-         if (local_err) {
-             error_report_err(local_err);
--            data->ret = -EPERM;
-+            ret = -EPERM;
-             goto out;
-         }
-     }
-@@ -93,14 +89,12 @@ out:
+@@ -93,7 +93,7 @@ out:
      }
  
      g_free(s->backing_file_str);
--    job_completed(job, data->ret);
--    g_free(data);
-+    job->ret = ret;
+-    job_completed(job, data->ret, NULL);
++    job_completed(job, data->ret);
+     g_free(data);
  }
  
- static int coroutine_fn stream_run(Job *job, Error **errp)
- {
-     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
--    StreamCompleteData *data;
-     BlockBackend *blk = s->common.blk;
-     BlockDriverState *bs = blk_bs(blk);
-     BlockDriverState *base = s->base;
-@@ -203,9 +197,6 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
+diff --git a/job-qmp.c b/job-qmp.c
+index 410775df61..a969b2bbf0 100644
+--- a/job-qmp.c
++++ b/job-qmp.c
+@@ -146,8 +146,9 @@ static JobInfo *job_query_single(Job *job, Error **errp)
+         .status             = job->status,
+         .current_progress   = job->progress_current,
+         .total_progress     = job->progress_total,
+-        .has_error          = !!job->error,
+-        .error              = g_strdup(job->error),
++        .has_error          = !!job->err,
++        .error              = job->err ? \
++                              g_strdup(error_get_pretty(job->err)) : NULL,
+     };
  
- out:
-     /* Modify backing chain and close BDSes in main loop */
--    data = g_malloc(sizeof(*data));
--    data->ret = ret;
--    job_defer_to_main_loop(&s->common.job, stream_complete, data);
-     return ret;
- }
+     return info;
+diff --git a/job.c b/job.c
+index 76988f6678..7b3721d2c7 100644
+--- a/job.c
++++ b/job.c
+@@ -369,7 +369,7 @@ void job_unref(Job *job)
  
-@@ -215,6 +206,7 @@ static const BlockJobDriver stream_job_driver = {
-         .job_type      = JOB_TYPE_STREAM,
-         .free          = block_job_free,
-         .run           = stream_run,
-+        .exit          = stream_exit,
-         .user_resume   = block_job_user_resume,
-         .drain         = block_job_drain,
-     },
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 6bda4451c1..89ac15e88a 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -752,11 +752,6 @@ typedef struct TestBlockJob {
-     bool should_complete;
- } TestBlockJob;
+         QLIST_REMOVE(job, job_list);
  
--static void test_job_completed(Job *job, void *opaque)
--{
--    job_completed(job, 0);
--}
--
- static int coroutine_fn test_job_run(Job *job, Error **errp)
- {
-     TestBlockJob *s = container_of(job, TestBlockJob, common.job);
-@@ -770,7 +765,6 @@ static int coroutine_fn test_job_run(Job *job, Error **errp)
-         job_pause_point(&s->common.job);
+-        g_free(job->error);
++        error_free(job->err);
+         g_free(job->id);
+         g_free(job);
      }
+@@ -546,7 +546,7 @@ static void coroutine_fn job_co_entry(void *opaque)
  
--    job_defer_to_main_loop(&s->common.job, test_job_completed, NULL);
-     return 0;
+     assert(job && job->driver && job->driver->run);
+     job_pause_point(job);
+-    job->ret = job->driver->run(job, NULL);
++    job->ret = job->driver->run(job, &job->err);
  }
  
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index 82cedee78b..ef29f35e44 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -24,17 +24,11 @@ typedef struct {
-     int *result;
- } TestBlockJob;
  
--static void test_block_job_complete(Job *job, void *opaque)
-+static void test_block_job_exit(Job *job)
+@@ -666,8 +666,8 @@ static void job_update_rc(Job *job)
+         job->ret = -ECANCELED;
+     }
+     if (job->ret) {
+-        if (!job->error) {
+-            job->error = g_strdup(strerror(-job->ret));
++        if (!job->err) {
++            error_setg(&job->err, "%s", strerror(-job->ret));
+         }
+         job_state_transition(job, JOB_STATUS_ABORTING);
+     }
+@@ -865,17 +865,11 @@ static void job_completed_txn_success(Job *job)
+     }
+ }
+ 
+-void job_completed(Job *job, int ret, Error *error)
++void job_completed(Job *job, int ret)
  {
-     BlockJob *bjob = container_of(job, BlockJob, job);
-     BlockDriverState *bs = blk_bs(bjob->blk);
--    int rc = (intptr_t)opaque;
+     assert(job && job->txn && !job_is_completed(job));
  
--    if (job_is_cancelled(job)) {
--        rc = -ECANCELED;
+     job->ret = ret;
+-    if (error) {
+-        assert(job->ret < 0);
+-        job->error = g_strdup(error_get_pretty(error));
+-        error_free(error);
 -    }
 -
--    job_completed(job, rc);
+     job_update_rc(job);
+     trace_job_completed(job, ret, job->ret);
+     if (job->ret) {
+@@ -893,7 +887,7 @@ void job_cancel(Job *job, bool force)
+     }
+     job_cancel_async(job, force);
+     if (!job_started(job)) {
+-        job_completed(job, -ECANCELED, NULL);
++        job_completed(job, -ECANCELED);
+     } else if (job->deferred_to_main_loop) {
+         job_completed_txn_abort(job);
+     } else {
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 39ee723c8e..6bda4451c1 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -754,7 +754,7 @@ typedef struct TestBlockJob {
+ 
+ static void test_job_completed(Job *job, void *opaque)
+ {
+-    job_completed(job, 0, NULL);
++    job_completed(job, 0);
+ }
+ 
+ static int coroutine_fn test_job_run(Job *job, Error **errp)
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 3194924071..82cedee78b 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -34,7 +34,7 @@ static void test_block_job_complete(Job *job, void *opaque)
+         rc = -ECANCELED;
+     }
+ 
+-    job_completed(job, rc, NULL);
++    job_completed(job, rc);
      bdrv_unref(bs);
  }
  
-@@ -54,8 +48,6 @@ static int coroutine_fn test_block_job_run(Job *job, Error **errp)
-         }
-     }
- 
--    job_defer_to_main_loop(job, test_block_job_complete,
--                           (void *)(intptr_t)s->rc);
-     return s->rc;
- }
- 
-@@ -81,6 +73,7 @@ static const BlockJobDriver test_block_job_driver = {
-         .user_resume   = block_job_user_resume,
-         .drain         = block_job_drain,
-         .run           = test_block_job_run,
-+        .exit          = test_block_job_exit,
-     },
- };
- 
 diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 408a226939..ad4a65bc78 100644
+index b0462bfdec..408a226939 100644
 --- a/tests/test-blockjob.c
 +++ b/tests/test-blockjob.c
-@@ -163,11 +163,10 @@ typedef struct CancelJob {
-     bool completed;
- } CancelJob;
- 
--static void cancel_job_completed(Job *job, void *opaque)
-+static void cancel_job_exit(Job *job)
+@@ -167,7 +167,7 @@ static void cancel_job_completed(Job *job, void *opaque)
  {
--    CancelJob *s = opaque;
-+    CancelJob *s = container_of(job, CancelJob, common.job);
+     CancelJob *s = opaque;
      s->completed = true;
--    job_completed(job, 0);
+-    job_completed(job, 0, NULL);
++    job_completed(job, 0);
  }
  
  static void cancel_job_complete(Job *job, Error **errp)
-@@ -182,7 +181,7 @@ static int coroutine_fn cancel_job_run(Job *job, Error **errp)
- 
-     while (!s->should_complete) {
-         if (job_is_cancelled(&s->common.job)) {
--            goto defer;
-+            return 0;
-         }
- 
-         if (!job_is_ready(&s->common.job) && s->should_converge) {
-@@ -192,8 +191,6 @@ static int coroutine_fn cancel_job_run(Job *job, Error **errp)
-         job_sleep_ns(&s->common.job, 100000);
-     }
- 
-- defer:
--    job_defer_to_main_loop(&s->common.job, cancel_job_completed, s);
-     return 0;
- }
- 
-@@ -204,6 +201,7 @@ static const BlockJobDriver test_cancel_driver = {
-         .user_resume   = block_job_user_resume,
-         .drain         = block_job_drain,
-         .run           = cancel_job_run,
-+        .exit          = cancel_job_exit,
-         .complete      = cancel_job_complete,
-     },
- };
 -- 
 2.17.1
