@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([208.118.235.92]:48053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fviHO-0001M2-VS
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 08:12:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1fviU7-0000Gt-PA
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 08:25:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fviAA-00075C-7W
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 08:04:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44414 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fviAA-000750-2H
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 08:04:30 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1535704738-8986-1-git-send-email-thuth@redhat.com>
-	<1535704738-8986-9-git-send-email-thuth@redhat.com>
-Date: Fri, 31 Aug 2018 14:04:17 +0200
-In-Reply-To: <1535704738-8986-9-git-send-email-thuth@redhat.com> (Thomas
-	Huth's message of "Fri, 31 Aug 2018 10:38:57 +0200")
-Message-ID: <87efeerbcu.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1fviU1-0001X0-Og
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 08:25:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58406)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fviTz-0001VW-SD
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 08:25:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fviTx-00087R-Pq
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 12:24:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B37CB2E80CC
+	for <qemu-devel@nongnu.org>; Fri, 31 Aug 2018 12:24:57 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 8/9] tests: add qmp/qom-set-without-value
- test
+Date: Fri, 31 Aug 2018 12:07:06 -0000
+From: Stephan Henningsen <1392468@bugs.launchpad.net>
+Reply-To: Bug 1392468 <1392468@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141113201019.18949.57499.malonedeb@gac.canonical.com>
+Message-Id: <153571722643.31697.16042310345961042948.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1392468] Re: qemu uses a bitmap icon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +36,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
 
-Thomas Huth <thuth@redhat.com> writes:
+On Ubuntu 18.04 and this is still an issue.
 
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> test_qom_set_without_value() is about a bug in infrastructure used by
-> the QMP core, fixed in commit c489780203.  We covered the bug in
-> infrastructure unit tests (commit bce3035a44).  I wrote that test
-> earlier, to cover QMP level as well, the test could go into qmp-test.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/qmp-test.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-> index b347228..2b923f0 100644
-> --- a/tests/qmp-test.c
-> +++ b/tests/qmp-test.c
-> @@ -321,6 +321,19 @@ static void test_qmp_preconfig(void)
->      qtest_quit(qs);
->  }
->=20=20
-> +static void test_qom_set_without_value(void)
-> +{
-> +    QTestState *qts;
-> +    QDict *resp;
-> +
-> +    qts =3D qtest_init(common_args);
-> +    resp =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
-> +                     " { 'path': '/machine', 'property': 'rtc-time' } }"=
-);
-> +    g_assert_nonnull(resp);
-> +    qmp_assert_error_class(resp, "GenericError");
-> +    qtest_quit(qts);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->      g_test_init(&argc, &argv, NULL);
-> @@ -328,6 +341,7 @@ int main(int argc, char *argv[])
->      qtest_add_func("qmp/protocol", test_qmp_protocol);
->      qtest_add_func("qmp/oob", test_qmp_oob);
->      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
-> +    qtest_add_func("qmp/qom-set-without-value", test_qom_set_without_val=
-ue);
->=20=20
->      return g_test_run();
->  }
+Please don't make QEMU look like a crappy piece of software. It deserves
+a crisp icon.
 
-I'm afraid you missed my objection to naming:
-Message-ID: <8736uvujxx.fsf@dusky.pond.sub.org>
-https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg06368.html
+-- =
 
-If you could work that into PULL v2, I'd be obliged.  If not, I'll have
-to address it in a follow-up patch.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1392468
+
+Title:
+  qemu uses a bitmap icon
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu currently uses the icon in pc-bios/qemu-icon.bmp, which,
+  obviously, is a bitmap file. It is loaded such that white pixels will
+  be transparent. This can cause nasty artifacts in the display.
+
+  Unless there is a specific reason to use bitmaps, I'd suggest moving
+  to, e.g., a PNG file with a proper alpha channel.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1392468/+subscriptions
