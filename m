@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fvf3h-0000r7-EH
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:45:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1fvf3i-0001A2-5n
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fvexh-0007Vf-46
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:39:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39798 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fvexb-0007PK-Po
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:39:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39792 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fvexg-0007VZ-Vx
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:39:25 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fvexb-0007P1-JL
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 04:39:19 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 31 Aug 2018 10:38:57 +0200
-Message-Id: <1535704738-8986-9-git-send-email-thuth@redhat.com>
+Date: Fri, 31 Aug 2018 10:38:55 +0200
+Message-Id: <1535704738-8986-7-git-send-email-thuth@redhat.com>
 In-Reply-To: <1535704738-8986-1-git-send-email-thuth@redhat.com>
 References: <1535704738-8986-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 8/9] tests: add qmp/qom-set-without-value test
+Subject: [Qemu-devel] [PULL 6/9] tests: add qmp_assert_error_class()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +31,270 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Er
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-test_qom_set_without_value() is about a bug in infrastructure used by
-the QMP core, fixed in commit c489780203.  We covered the bug in
-infrastructure unit tests (commit bce3035a44).  I wrote that test
-earlier, to cover QMP level as well, the test could go into qmp-test.
+This helper will simplify a bunch of code checking for QMP errors and
+can be shared by various tests.  Note that test-qga does check for
+error description as well, so don't replace the code there for now.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qmp-test.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ tests/drive_del-test.c |  5 +---
+ tests/libqtest.c       | 11 ++++++++
+ tests/libqtest.h       |  9 +++++++
+ tests/qmp-test.c       | 73 ++++++++++++++++----------------------------=
+------
+ tests/test-qga.c       |  9 ++-----
+ 5 files changed, 46 insertions(+), 61 deletions(-)
 
+diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
+index 673c101..4a1a088 100644
+--- a/tests/drive_del-test.c
++++ b/tests/drive_del-test.c
+@@ -67,7 +67,6 @@ static void test_after_failed_device_add(void)
+ {
+     char driver[32];
+     QDict *response;
+-    QDict *error;
+=20
+     snprintf(driver, sizeof(driver), "virtio-blk-%s",
+              qvirtio_get_dev_type());
+@@ -83,9 +82,7 @@ static void test_after_failed_device_add(void)
+                    "   'drive': 'drive0'"
+                    "}}", driver);
+     g_assert(response);
+-    error =3D qdict_get_qdict(response, "error");
+-    g_assert_cmpstr(qdict_get_try_str(error, "class"), =3D=3D, "GenericE=
+rror");
+-    qobject_unref(response);
++    qmp_assert_error_class(response, "GenericError");
+=20
+     /* Delete the drive */
+     drive_del();
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index d635c5b..2cd5736 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -1194,3 +1194,14 @@ bool qmp_rsp_is_err(QDict *rsp)
+     qobject_unref(rsp);
+     return !!error;
+ }
++
++void qmp_assert_error_class(QDict *rsp, const char *class)
++{
++    QDict *error =3D qdict_get_qdict(rsp, "error");
++
++    g_assert_cmpstr(qdict_get_try_str(error, "class"), =3D=3D, class);
++    g_assert_nonnull(qdict_get_try_str(error, "desc"));
++    g_assert(!qdict_haskey(rsp, "return"));
++
++    qobject_unref(rsp);
++}
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 36d5cae..ed88ff9 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -1004,4 +1004,13 @@ void qtest_qmp_device_del(const char *id);
+  */
+ bool qmp_rsp_is_err(QDict *rsp);
+=20
++/**
++ * qmp_assert_error_class:
++ * @rsp: QMP response to check for error
++ * @class: an error class
++ *
++ * Assert the response has the given error class and discard @rsp.
++ */
++void qmp_assert_error_class(QDict *rsp, const char *class);
++
+ #endif
 diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index b347228..2b923f0 100644
+index 4ae2245..b347228 100644
 --- a/tests/qmp-test.c
 +++ b/tests/qmp-test.c
-@@ -321,6 +321,19 @@ static void test_qmp_preconfig(void)
-     qtest_quit(qs);
- }
+@@ -21,15 +21,6 @@
 =20
-+static void test_qom_set_without_value(void)
-+{
-+    QTestState *qts;
-+    QDict *resp;
-+
-+    qts =3D qtest_init(common_args);
-+    resp =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
-+                     " { 'path': '/machine', 'property': 'rtc-time' } }"=
-);
-+    g_assert_nonnull(resp);
-+    qmp_assert_error_class(resp, "GenericError");
-+    qtest_quit(qts);
-+}
-+
- int main(int argc, char *argv[])
+ const char common_args[] =3D "-nodefaults -machine none";
+=20
+-static const char *get_error_class(QDict *resp)
+-{
+-    QDict *error =3D qdict_get_qdict(resp, "error");
+-    const char *desc =3D qdict_get_try_str(error, "desc");
+-
+-    g_assert(desc);
+-    return error ? qdict_get_try_str(error, "class") : NULL;
+-}
+-
+ static void test_version(QObject *version)
  {
-     g_test_init(&argc, &argv, NULL);
-@@ -328,6 +341,7 @@ int main(int argc, char *argv[])
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-     qtest_add_func("qmp/oob", test_qmp_oob);
-     qtest_add_func("qmp/preconfig", test_qmp_preconfig);
-+    qtest_add_func("qmp/qom-set-without-value", test_qom_set_without_val=
-ue);
-=20
-     return g_test_run();
+     Visitor *v;
+@@ -42,15 +33,12 @@ static void test_version(QObject *version)
+     visit_free(v);
  }
+=20
+-static bool recovered(QTestState *qts)
++static void assert_recovered(QTestState *qts)
+ {
+     QDict *resp;
+-    bool ret;
+=20
+     resp =3D qtest_qmp(qts, "{ 'execute': 'no-such-cmd' }");
+-    ret =3D !strcmp(get_error_class(resp), "CommandNotFound");
+-    qobject_unref(resp);
+-    return ret;
++    qmp_assert_error_class(resp, "CommandNotFound");
+ }
+=20
+ static void test_malformed(QTestState *qts)
+@@ -60,73 +48,61 @@ static void test_malformed(QTestState *qts)
+     /* syntax error */
+     qtest_qmp_send_raw(qts, "{]\n");
+     resp =3D qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
+-    g_assert(recovered(qts));
++    qmp_assert_error_class(resp, "GenericError");
++    assert_recovered(qts);
+=20
+     /* lexical error: impossible byte outside string */
+     qtest_qmp_send_raw(qts, "{\xFF");
+     resp =3D qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
+-    g_assert(recovered(qts));
++    qmp_assert_error_class(resp, "GenericError");
++    assert_recovered(qts);
+=20
+     /* lexical error: funny control character outside string */
+     qtest_qmp_send_raw(qts, "{\x01");
+     resp =3D qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
+-    g_assert(recovered(qts));
++    qmp_assert_error_class(resp, "GenericError");
++    assert_recovered(qts);
+=20
+     /* lexical error: impossible byte in string */
+     qtest_qmp_send_raw(qts, "{'bad \xFF");
+     resp =3D qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
+-    g_assert(recovered(qts));
++    qmp_assert_error_class(resp, "GenericError");
++    assert_recovered(qts);
+=20
+     /* lexical error: control character in string */
+     qtest_qmp_send_raw(qts, "{'execute': 'nonexistent', 'id':'\n");
+     resp =3D qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
+-    g_assert(recovered(qts));
++    qmp_assert_error_class(resp, "GenericError");
++    assert_recovered(qts);
+=20
+     /* lexical error: interpolation */
+     qtest_qmp_send_raw(qts, "%%p\n");
+     /* two errors, one for "%", one for "p" */
+     resp =3D qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "GenericError");
+     resp =3D qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
+-    g_assert(recovered(qts));
++    qmp_assert_error_class(resp, "GenericError");
++    assert_recovered(qts);
+=20
+     /* Not even a dictionary */
+     resp =3D qtest_qmp(qts, "null");
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "GenericError");
+=20
+     /* No "execute" key */
+     resp =3D qtest_qmp(qts, "{}");
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "GenericError");
+=20
+     /* "execute" isn't a string */
+     resp =3D qtest_qmp(qts, "{ 'execute': true }");
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "GenericError");
+=20
+     /* "arguments" isn't a dictionary */
+     resp =3D qtest_qmp(qts, "{ 'execute': 'no-such-cmd', 'arguments': []=
+ }");
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "GenericError");
+=20
+     /* extra key */
+     resp =3D qtest_qmp(qts, "{ 'execute': 'no-such-cmd', 'extra': true }=
+");
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "GenericError");
+ }
+=20
+ static void test_qmp_protocol(void)
+@@ -148,8 +124,7 @@ static void test_qmp_protocol(void)
+=20
+     /* Test valid command before handshake */
+     resp =3D qtest_qmp(qts, "{ 'execute': 'query-version' }");
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "CommandNotFound");
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "CommandNotFound");
+=20
+     /* Test malformed commands before handshake */
+     test_malformed(qts);
+@@ -162,8 +137,7 @@ static void test_qmp_protocol(void)
+=20
+     /* Test repeated handshake */
+     resp =3D qtest_qmp(qts, "{ 'execute': 'qmp_capabilities' }");
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "CommandNotFound");
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "CommandNotFound");
+=20
+     /* Test valid command */
+     resp =3D qtest_qmp(qts, "{ 'execute': 'query-version' }");
+@@ -182,9 +156,8 @@ static void test_qmp_protocol(void)
+=20
+     /* Test command failure with 'id' */
+     resp =3D qtest_qmp(qts, "{ 'execute': 'human-monitor-command', 'id':=
+ 2 }");
+-    g_assert_cmpstr(get_error_class(resp), =3D=3D, "GenericError");
+     g_assert_cmpint(qdict_get_int(resp, "id"), =3D=3D, 2);
+-    qobject_unref(resp);
++    qmp_assert_error_class(resp, "GenericError");
+=20
+     qtest_quit(qts);
+ }
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index f69cdf6..3d63774 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -244,17 +244,12 @@ static void test_qga_invalid_id(gconstpointer fix)
+ static void test_qga_invalid_oob(gconstpointer fix)
+ {
+     const TestFixture *fixture =3D fix;
+-    QDict *ret, *error;
+-    const char *class;
++    QDict *ret;
+=20
+     ret =3D qmp_fd(fixture->fd, "{'exec-oob': 'guest-ping'}");
+     g_assert_nonnull(ret);
+=20
+-    error =3D qdict_get_qdict(ret, "error");
+-    class =3D qdict_get_try_str(error, "class");
+-    g_assert_cmpstr(class, =3D=3D, "GenericError");
+-
+-    qobject_unref(ret);
++    qmp_assert_error_class(ret, "GenericError");
+ }
+=20
+ static void test_qga_invalid_args(gconstpointer fix)
 --=20
 1.8.3.1
