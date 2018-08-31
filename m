@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fveKP-0001B1-MF
+	(envelope-from <armbru@redhat.com>) id 1fveKP-0001Ay-KV
 	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:58:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fveKN-0006cc-3J
+	(envelope-from <armbru@redhat.com>) id 1fveKM-0006c1-5I
 	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:58:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36854 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52166 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fveKM-0006cN-RA
-	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:58:46 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fveKL-0006bP-Sc
+	for qemu-devel@nongnu.org; Fri, 31 Aug 2018 03:58:45 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 31 Aug 2018 09:58:41 +0200
-Message-Id: <20180831075841.13363-7-armbru@redhat.com>
+Date: Fri, 31 Aug 2018 09:58:39 +0200
+Message-Id: <20180831075841.13363-5-armbru@redhat.com>
 In-Reply-To: <20180831075841.13363-1-armbru@redhat.com>
 References: <20180831075841.13363-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/6] json: Eliminate lexer state
- IN_WHITESPACE, pseudo-token JSON_SKIP
+Subject: [Qemu-devel] [PATCH v2 4/6] json: Nicer recovery from lexical errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +26,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com
 
-The lexer ignores whitespace like this:
+When the lexer chokes on an input character, it consumes the
+character, emits a JSON error token, and enters its start state.  This
+can lead to suboptimal error recovery.  For instance, input
 
-         on whitespace      on non-ws   spontaneously
-    IN_START --> IN_WHITESPACE --> JSON_SKIP --> IN_START
-                    ^    |
-                     \__/  on whitespace
+    0123 ,
 
-This accumulates a whitespace token in state IN_WHITESPACE, only to
-throw it away on the transition via JSON_SKIP to the start state.
-Wasteful.  Go from IN_START to IN_START on whitespace directly,
-dropping the whitespace character.
+produces the tokens
+
+    JSON_ERROR    01
+    JSON_INTEGER  23
+    JSON_COMMA    ,
+
+Make the lexer skip characters after a lexical error until a
+structural character ('[', ']', '{', '}', ':', ','), an ASCII control
+character, or '\xFE', or '\xFF'.
+
+Note that we must not skip ASCII control characters, '\xFE', '\xFF',
+because those are documented to force the JSON parser into known-good
+state, by docs/interop/qmp-spec.txt.
+
+The lexer now produces
+
+    JSON_ERROR    01
+    JSON_COMMA    ,
+
+Update qmp-test for the nicer error recovery: QMP now reports just one
+error for input %p instead of two.  Also drop the newline after %p; it
+was needed to tease out the second error.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qobject/json-lexer.c      | 22 +++++-----------------
- qobject/json-parser-int.h |  1 -
- 2 files changed, 5 insertions(+), 18 deletions(-)
+ qobject/json-lexer.c | 43 +++++++++++++++++++++++++++++--------------
+ tests/qmp-test.c     |  6 +-----
+ 2 files changed, 30 insertions(+), 19 deletions(-)
 
 diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
-index 2a5561c917..a7df2093aa 100644
+index 28582e17d9..39c7ce7adc 100644
 --- a/qobject/json-lexer.c
 +++ b/qobject/json-lexer.c
-@@ -115,7 +115,6 @@ enum json_lexer_state {
-     IN_SIGN,
-     IN_KEYWORD,
-     IN_INTERP,
--    IN_WHITESPACE,
-     IN_START,
-     IN_START_INTERP,            /* must be IN_START + 1 */
- };
-@@ -228,15 +227,6 @@ static const uint8_t json_lexer[][256] =  {
-         ['a' ... 'z'] = IN_KEYWORD,
-     },
+@@ -101,6 +101,7 @@
  
--    /* whitespace */
--    [IN_WHITESPACE] = {
--        TERMINAL(JSON_SKIP),
--        [' '] = IN_WHITESPACE,
--        ['\t'] = IN_WHITESPACE,
--        ['\r'] = IN_WHITESPACE,
--        ['\n'] = IN_WHITESPACE,
--    },
--
-     /* interpolation */
-     [IN_INTERP] = {
-         TERMINAL(JSON_INTERP),
-@@ -263,10 +253,10 @@ static const uint8_t json_lexer[][256] =  {
-         [','] = JSON_COMMA,
-         [':'] = JSON_COLON,
-         ['a' ... 'z'] = IN_KEYWORD,
--        [' '] = IN_WHITESPACE,
--        ['\t'] = IN_WHITESPACE,
--        ['\r'] = IN_WHITESPACE,
--        ['\n'] = IN_WHITESPACE,
-+        [' '] = IN_START,
-+        ['\t'] = IN_START,
-+        ['\r'] = IN_START,
-+        ['\n'] = IN_START,
-     },
-     [IN_START_INTERP]['%'] = IN_INTERP,
- };
-@@ -323,10 +313,8 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
-             json_message_process_token(lexer, lexer->token, new_state,
-                                        lexer->x, lexer->y);
+ enum json_lexer_state {
+     IN_ERROR = 0,               /* must really be 0, see json_lexer[] */
++    IN_RECOVERY,
+     IN_DQ_STRING_ESCAPE,
+     IN_DQ_STRING,
+     IN_SQ_STRING_ESCAPE,
+@@ -130,6 +131,28 @@ QEMU_BUILD_BUG_ON(IN_START_INTERP != IN_START + 1);
+ static const uint8_t json_lexer[][256] =  {
+     /* Relies on default initialization to IN_ERROR! */
+ 
++    /* error recovery */
++    [IN_RECOVERY] = {
++        /*
++         * Skip characters until a structural character, an ASCII
++         * control character other than '\t', or impossible UTF-8
++         * bytes '\xFE', '\xFF'.  Structural characters and line
++         * endings are promising resynchronization points.  Clients
++         * may use the others to force the JSON parser into known-good
++         * state; see docs/interop/qmp-spec.txt.
++         */
++        [0 ... 0x1F] = IN_START | LOOKAHEAD,
++        [0x20 ... 0xFD] = IN_RECOVERY,
++        [0xFE ... 0xFF] = IN_START | LOOKAHEAD,
++        ['\t'] = IN_RECOVERY,
++        ['['] = IN_START | LOOKAHEAD,
++        [']'] = IN_START | LOOKAHEAD,
++        ['{'] = IN_START | LOOKAHEAD,
++        ['}'] = IN_START | LOOKAHEAD,
++        [':'] = IN_START | LOOKAHEAD,
++        [','] = IN_START | LOOKAHEAD,
++    },
++
+     /* double quote string */
+     [IN_DQ_STRING_ESCAPE] = {
+         [0x20 ... 0xFD] = IN_DQ_STRING,
+@@ -301,26 +324,18 @@ static void json_lexer_feed_char(JSONLexer *lexer, char ch, bool flush)
              /* fall through */
--        case JSON_SKIP:
--            g_string_truncate(lexer->token, 0);
--            /* fall through */
-         case IN_START:
-+            g_string_truncate(lexer->token, 0);
+         case JSON_SKIP:
+             g_string_truncate(lexer->token, 0);
++            /* fall through */
++        case IN_START:
              new_state = lexer->start_state;
              break;
-         case JSON_ERROR:
-diff --git a/qobject/json-parser-int.h b/qobject/json-parser-int.h
-index 57cb8e79d3..16a25d00bb 100644
---- a/qobject/json-parser-int.h
-+++ b/qobject/json-parser-int.h
-@@ -31,7 +31,6 @@ typedef enum json_token_type {
-     JSON_KEYWORD,
-     JSON_STRING,
-     JSON_INTERP,
--    JSON_SKIP,
-     JSON_END_OF_INPUT,
-     JSON_MAX = JSON_END_OF_INPUT
- } JSONTokenType;
+         case IN_ERROR:
+-            /* XXX: To avoid having previous bad input leaving the parser in an
+-             * unresponsive state where we consume unpredictable amounts of
+-             * subsequent "good" input, percolate this error state up to the
+-             * parser by emitting a JSON_ERROR token, then reset lexer state.
+-             *
+-             * Also note that this handling is required for reliable channel
+-             * negotiation between QMP and the guest agent, since chr(0xFF)
+-             * is placed at the beginning of certain events to ensure proper
+-             * delivery when the channel is in an unknown state. chr(0xFF) is
+-             * never a valid ASCII/UTF-8 sequence, so this should reliably
+-             * induce an error/flush state.
+-             */
+             json_message_process_token(lexer, lexer->token, JSON_ERROR,
+                                        lexer->x, lexer->y);
++            new_state = IN_RECOVERY;
++            /* fall through */
++        case IN_RECOVERY:
+             g_string_truncate(lexer->token, 0);
+-            lexer->state = lexer->start_state;
+-            return;
++            break;
+         default:
+             break;
+         }
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 4ae2245484..04ad7648d2 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -93,11 +93,7 @@ static void test_malformed(QTestState *qts)
+     g_assert(recovered(qts));
+ 
+     /* lexical error: interpolation */
+-    qtest_qmp_send_raw(qts, "%%p\n");
+-    /* two errors, one for "%", one for "p" */
+-    resp = qtest_qmp_receive(qts);
+-    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+-    qobject_unref(resp);
++    qtest_qmp_send_raw(qts, "%%p");
+     resp = qtest_qmp_receive(qts);
+     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     qobject_unref(resp);
 -- 
 2.17.1
