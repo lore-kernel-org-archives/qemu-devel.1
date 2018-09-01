@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fw5JZ-00068M-5u
+	(envelope-from <luc.michel@greensocs.com>) id 1fw5JZ-00068K-5B
 	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 08:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fw5JY-0007y9-6i
+	(envelope-from <luc.michel@greensocs.com>) id 1fw5JY-0007yN-73
 	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 08:47:45 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat,  1 Sep 2018 14:46:33 +0200
-Message-Id: <20180901124639.19735-10-luc.michel@greensocs.com>
+Date: Sat,  1 Sep 2018 14:46:39 +0200
+Message-Id: <20180901124639.19735-16-luc.michel@greensocs.com>
 In-Reply-To: <20180901124639.19735-1-luc.michel@greensocs.com>
 References: <20180901124639.19735-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH 09/15] gdbstub: add multiprocess support to 'D'
- packets
+Subject: [Qemu-devel] [PATCH 15/15] arm/xlnx-zynqmp: put APUs and RPUs in
+ separate GDB groups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,104 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, mark.burton@greensocs.com
 
-'D' packets are used by GDB to detach from a process. In multiprocess
-mode, the PID to detach from is sent in the request.
+Create two separate QOM containers for APUs and RPUs to indicate to the
+GDB stub that those CPUs should be put in different processes.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 ---
- gdbstub.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 48 insertions(+), 7 deletions(-)
+ hw/arm/xlnx-zynqmp.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 4ccd1153ce..af8864e251 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1025,24 +1025,39 @@ static int gdb_breakpoint_remove(target_ulong addr, target_ulong len, int type)
-     default:
-         return -ENOSYS;
-     }
- }
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index c195040350..5e92adbc71 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -22,10 +22,11 @@
+ #include "hw/arm/xlnx-zynqmp.h"
+ #include "hw/intc/arm_gic_common.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/kvm.h"
+ #include "kvm_arm.h"
++#include "exec/gdbstub.h"
  
-+static inline void gdb_cpu_breakpoint_remove_all(CPUState *cpu)
-+{
-+    cpu_breakpoint_remove_all(cpu, BP_GDB);
-+#ifndef CONFIG_USER_ONLY
-+    cpu_watchpoint_remove_all(cpu, BP_GDB);
-+#endif
-+}
-+
-+static void gdb_process_breakpoint_remove_all(const GDBState *s, GDBProcess *p)
-+{
-+    CPUState *cpu = get_first_cpu_in_process(s, p);
-+
-+    while (cpu) {
-+        gdb_cpu_breakpoint_remove_all(cpu);
-+        cpu = gdb_next_cpu_in_process(s, cpu);
-+    }
-+}
-+
- static void gdb_breakpoint_remove_all(void)
+ #define GIC_NUM_SPI_INTR 160
+ 
+ #define ARM_PHYS_TIMER_PPI  30
+ #define ARM_VIRT_TIMER_PPI  27
+@@ -175,17 +176,18 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+                                    Error **errp)
  {
-     CPUState *cpu;
+     Error *err = NULL;
+     int i;
+     int num_rpus = MIN(smp_cpus - XLNX_ZYNQMP_NUM_APU_CPUS, XLNX_ZYNQMP_NUM_RPU_CPUS);
++    Object *rpu_group = gdb_cpu_group_container_get(OBJECT(s));
  
-     if (kvm_enabled()) {
-         kvm_remove_all_breakpoints(gdbserver_state->c_cpu);
-         return;
-     }
+     for (i = 0; i < num_rpus; i++) {
+         char *name;
  
-     CPU_FOREACH(cpu) {
--        cpu_breakpoint_remove_all(cpu, BP_GDB);
--#ifndef CONFIG_USER_ONLY
--        cpu_watchpoint_remove_all(cpu, BP_GDB);
--#endif
-+        gdb_cpu_breakpoint_remove_all(cpu);
-     }
- }
+         object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+                           "cortex-r5f-" TYPE_ARM_CPU);
+-        object_property_add_child(OBJECT(s), "rpu-cpu[*]",
++        object_property_add_child(rpu_group, "rpu-cpu[*]",
+                                   OBJECT(&s->rpu_cpu[i]), &error_abort);
  
- static void gdb_set_cpu_pc(GDBState *s, target_ulong pc)
+         name = object_get_canonical_path_component(OBJECT(&s->rpu_cpu[i]));
+         if (strcmp(name, boot_cpu)) {
+             /* Secondary CPUs start in PSCI powered-down state */
+@@ -210,13 +212,14 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+ static void xlnx_zynqmp_init(Object *obj)
  {
-@@ -1318,13 +1333,39 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         /* Kill the target */
-         error_report("QEMU: Terminated via GDBstub");
-         exit(0);
-     case 'D':
-         /* Detach packet */
--        gdb_breakpoint_remove_all();
--        gdb_syscall_mode = GDB_SYS_DISABLED;
--        gdb_continue(s);
-+        pid = 1;
-+
-+        if (s->multiprocess) {
-+            unsigned long lpid;
-+            if (*p != ';') {
-+                put_packet(s, "E22");
-+                break;
-+            }
-+            qemu_strtoul(p + 1, &p, 16, &lpid);
-+            pid = lpid;
-+        }
-+
-+        process = gdb_get_process(s, pid);
-+        gdb_process_breakpoint_remove_all(s, process);
-+        process->attached = false;
-+
-+        if (pid == gdb_get_cpu_pid(s, s->c_cpu)) {
-+            s->c_cpu = gdb_first_cpu(s);
-+        }
-+
-+        if (pid == gdb_get_cpu_pid(s, s->g_cpu)) {
-+            s->g_cpu = gdb_first_cpu(s);
-+        }
-+
-+        if (s->c_cpu == NULL) {
-+            /* No more process attached */
-+            gdb_syscall_mode = GDB_SYS_DISABLED;
-+            gdb_continue(s);
-+        }
-         put_packet(s, "OK");
-         break;
-     case 's':
-         if (*p != '\0') {
-             addr = strtoull(p, (char **)&p, 16);
+     XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
+     int i;
+     int num_apus = MIN(smp_cpus, XLNX_ZYNQMP_NUM_APU_CPUS);
++    Object *apu_group = gdb_cpu_group_container_get(obj);
+ 
+     for (i = 0; i < num_apus; i++) {
+-        object_initialize_child(obj, "apu-cpu[*]", &s->apu_cpu[i],
++        object_initialize_child(apu_group, "apu-cpu[*]", &s->apu_cpu[i],
+                                 sizeof(s->apu_cpu[i]),
+                                 "cortex-a53-" TYPE_ARM_CPU, &error_abort, NULL);
+     }
+ 
+     sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
 -- 
 2.18.0
