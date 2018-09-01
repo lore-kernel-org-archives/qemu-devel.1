@@ -1,21 +1,21 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:52649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1fvyNa-00083H-KO
-	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 01:23:27 -0400
+	(envelope-from <wei@redhat.com>) id 1fvyNb-00083H-Mp
+	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 01:23:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1fvyBt-0001FO-Jq
+	(envelope-from <wei@redhat.com>) id 1fvyBt-0001FI-K0
 	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 01:11:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37016 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37020 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1fvyBt-0001AQ-Bp
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1fvyBt-0001BM-BP
 	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 01:11:21 -0400
 From: Wei Huang <wei@redhat.com>
-Date: Sat,  1 Sep 2018 01:11:13 -0400
-Message-Id: <1535778675-32170-3-git-send-email-wei@redhat.com>
+Date: Sat,  1 Sep 2018 01:11:14 -0400
+Message-Id: <1535778675-32170-4-git-send-email-wei@redhat.com>
 In-Reply-To: <1535778675-32170-1-git-send-email-wei@redhat.com>
 References: <1535778675-32170-1-git-send-email-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V8 2/4] tests/migration: Support cross
- compilation in generating boot header file
+Subject: [Qemu-devel] [PATCH V8 3/4] tests/migration: Add migration-test
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,150 +27,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, lvivier@redhat.com, drjones@redhat.com, dgilbert@redhat.com, quintela@redhat.com, wei@redhat.com
 
-Recently a new configure option, CROSS_CC_GUEST, was added to
-$(TARGET)-softmmu/config-target.mak to support TCG-related tests. This
-patch tries to leverage this option to support cross compilation when the
-migration boot block file is being re-generated:
-
- * The x86_64 related files are moved to a new sub-dir (named ./x86_64).
- * A new top-layer Makefile is created in tests/migration/ directory.
-   This Makefile searches and parses CROSS_CC_GUEST to generate CROSS_PREFIX.
-   The CROSS_PREFIX, if available, is then passed to migration/$ARCH/Makefile.
+This patch moves the settings related migration-test from the
+migration-test.c file to a new header file.
 
 Signed-off-by: Wei Huang <wei@redhat.com>
 ---
- tests/migration-test.c                           |  2 +-
- tests/migration/Makefile                         | 43 +++++++++++++-----------
- tests/migration/x86_64/Makefile                  | 22 ++++++++++++
- tests/migration/{ => x86_64}/x86-a-b-bootblock.S |  0
- tests/migration/{ => x86_64}/x86-a-b-bootblock.h |  8 ++---
- 5 files changed, 50 insertions(+), 25 deletions(-)
- create mode 100644 tests/migration/x86_64/Makefile
- rename tests/migration/{ => x86_64}/x86-a-b-bootblock.S (100%)
- rename tests/migration/{ => x86_64}/x86-a-b-bootblock.h (93%)
+ tests/migration-test.c           | 28 ++++++++++++++++++----------
+ tests/migration/migration-test.h | 21 +++++++++++++++++++++
+ 2 files changed, 39 insertions(+), 10 deletions(-)
+ create mode 100644 tests/migration/migration-test.h
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 0e687b7..c4d79e9 100644
+index c4d79e9..bf60fa0 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -83,7 +83,7 @@ static const char *tmpfs;
- /* A simple PC boot sector that modifies memory (1-100MB) quickly
-  * outputting a 'B' every so often if it's still running.
-  */
--#include "tests/migration/x86-a-b-bootblock.h"
-+#include "tests/migration/x86_64/x86-a-b-bootblock.h"
+@@ -21,11 +21,13 @@
+ #include "chardev/char.h"
+ #include "sysemu/sysemu.h"
  
- static void init_bootfile_x86(const char *bootpath)
++#include "migration/migration-test.h"
++
+ /* TODO actually test the results and get rid of this */
+ #define qtest_qmp_discard_response(...) qobject_unref(qtest_qmp(__VA_ARGS__))
+ 
+-const unsigned start_address = 1024 * 1024;
+-const unsigned end_address = 100 * 1024 * 1024;
++unsigned start_address;
++unsigned end_address;
+ bool got_stop;
+ static bool uffd_feature_thread_id;
+ 
+@@ -80,8 +82,8 @@ static bool ufd_version_check(void)
+ 
+ static const char *tmpfs;
+ 
+-/* A simple PC boot sector that modifies memory (1-100MB) quickly
+- * outputting a 'B' every so often if it's still running.
++/* The boot file modifies memory area in [start_address, end_address)
++ * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
+  */
+ #include "tests/migration/x86_64/x86-a-b-bootblock.h"
+ 
+@@ -270,11 +272,11 @@ static void wait_for_migration_pass(QTestState *who)
+ static void check_guests_ram(QTestState *who)
  {
-diff --git a/tests/migration/Makefile b/tests/migration/Makefile
-index 5d5fa07..1de480e 100644
---- a/tests/migration/Makefile
-+++ b/tests/migration/Makefile
-@@ -1,31 +1,34 @@
--# To specify cross compiler prefix, use CROSS_PREFIX=
--#   > make CROSS_PREFIX=x86_64-linux-gnu-
-+#
-+# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
-+#
+     /* Our ASM test will have been incrementing one byte from each page from
+-     * 1MB to <100MB in order.
+-     * This gives us a constraint that any page's byte should be equal or less
+-     * than the previous pages byte (mod 256); and they should all be equal
+-     * except for one transition at the point where we meet the incrementer.
+-     * (We're running this with the guest stopped).
++     * start_address to < end_address in order. This gives us a constraint
++     * that any page's byte should be equal or less than the previous pages
++     * byte (mod 256); and they should all be equal except for one transition
++     * at the point where we meet the incrementer. (We're running this with
++     * the guest stopped).
+      */
+     unsigned address;
+     uint8_t first_byte;
+@@ -285,7 +287,8 @@ static void check_guests_ram(QTestState *who)
+     qtest_memread(who, start_address, &first_byte, 1);
+     last_byte = first_byte;
+ 
+-    for (address = start_address + 4096; address < end_address; address += 4096)
++    for (address = start_address + TEST_MEM_PAGE_SIZE; address < end_address;
++         address += TEST_MEM_PAGE_SIZE)
+     {
+         uint8_t b;
+         qtest_memread(who, address, &b, 1);
+@@ -437,6 +440,8 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+                                   " -drive file=%s,format=raw"
+                                   " -incoming %s",
+                                   accel, tmpfs, bootpath, uri);
++        start_address = X86_TEST_MEM_START;
++        end_address = X86_TEST_MEM_END;
+     } else if (strcmp(arch, "ppc64") == 0) {
+         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
+                                   " -name source,debug-threads=on"
+@@ -451,6 +456,9 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+                                   " -serial file:%s/dest_serial"
+                                   " -incoming %s",
+                                   accel, tmpfs, uri);
 +
-+TARGET_LIST = x86_64
-+
-+SRC_PATH = ../..
- 
- override define __note
--/* This file is automatically generated from
-- * tests/migration/x86-a-b-bootblock.s, edit that and then run
-- * tests/migration/rebuild-x86-bootblock.sh to update,
-- * and then remember to send both in your patch submission.
-+/* This file is automatically generated from the assembly file in
-+ * tests/migration/$@, edit that and then run "make all"
-+ * inside tests/migration to update, and then remember to send both
-+ * in your patch submission.
-  */
- endef
- export __note
- 
--.PHONY: all clean
--all: x86-a-b-bootblock.h
--
--x86-a-b-bootblock.h: x86.bootsect
--	echo "$$__note" > header.tmp
--	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
--	mv header.tmp $@
-+parse-cross-prefix = $(subst gcc,,$(patsubst cc,gcc,$(patsubst CROSS_CC_GUEST="%",%,$(shell grep "CROSS_CC_GUEST=" $(SRC_PATH)/$(1)-softmmu/config-target.mak))))
-+gen-cross-prefix = $(patsubst %-,CROSS_PREFIX=%-,$(call parse-cross-prefix,$(1)))
- 
--x86.bootsect: x86.boot
--	dd if=$< of=$@ bs=256 count=2 skip=124
-+.PHONY: all $(TARGET_LIST)
- 
--x86.boot: x86.o
--	$(CROSS_PREFIX)objcopy -O binary $< $@
-+all: $(TARGET_LIST)
- 
--x86.o: x86-a-b-bootblock.S
--	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
-+$(TARGET_LIST):
-+	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
- 
- clean:
--	@rm -rf *.boot *.o *.bootsect
-+	for target in $(TARGET_LIST); do \
-+		$(MAKE) -C $$target clean; \
-+	done
-diff --git a/tests/migration/x86_64/Makefile b/tests/migration/x86_64/Makefile
++        start_address = PPC_TEST_MEM_START;
++        end_address = PPC_TEST_MEM_END;
+     } else {
+         g_assert_not_reached();
+     }
+diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
 new file mode 100644
-index 0000000..6dc849f
+index 0000000..c4c0c52
 --- /dev/null
-+++ b/tests/migration/x86_64/Makefile
-@@ -0,0 +1,22 @@
-+# To specify cross compiler prefix, use CROSS_PREFIX=
-+#   > make CROSS_PREFIX=x86_64-linux-gnu-
++++ b/tests/migration/migration-test.h
+@@ -0,0 +1,21 @@
++/*
++ * Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#ifndef _TEST_MIGRATION_H_
++#define _TEST_MIGRATION_H_
 +
-+.PHONY: all clean
-+all: x86-a-b-bootblock.h
++/* Common */
++#define TEST_MEM_PAGE_SIZE 4096
 +
-+x86-a-b-bootblock.h: x86.bootsect
-+	echo "$$__note" > header.tmp
-+	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
-+	mv header.tmp $@
++/* x86 */
++#define X86_TEST_MEM_START (1 * 1024 * 1024)
++#define X86_TEST_MEM_END   (100 * 1024 * 1024)
 +
-+x86.bootsect: x86.boot
-+	dd if=$< of=$@ bs=256 count=2 skip=124
++/* PPC */
++#define PPC_TEST_MEM_START (1 * 1024 * 1024)
++#define PPC_TEST_MEM_END   (100 * 1024 * 1024)
 +
-+x86.boot: x86.o
-+	$(CROSS_PREFIX)objcopy -O binary $< $@
-+
-+x86.o: x86-a-b-bootblock.S
-+	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
-+
-+clean:
-+	@rm -rf *.boot *.o *.bootsect
-diff --git a/tests/migration/x86-a-b-bootblock.S b/tests/migration/x86_64/x86-a-b-bootblock.S
-similarity index 100%
-rename from tests/migration/x86-a-b-bootblock.S
-rename to tests/migration/x86_64/x86-a-b-bootblock.S
-diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/x86_64/x86-a-b-bootblock.h
-similarity index 93%
-rename from tests/migration/x86-a-b-bootblock.h
-rename to tests/migration/x86_64/x86-a-b-bootblock.h
-index 78a151f..73670ef 100644
---- a/tests/migration/x86-a-b-bootblock.h
-+++ b/tests/migration/x86_64/x86-a-b-bootblock.h
-@@ -1,7 +1,7 @@
--/* This file is automatically generated from
-- * tests/migration/x86-a-b-bootblock.s, edit that and then run
-- * tests/migration/rebuild-x86-bootblock.sh to update,
-- * and then remember to send both in your patch submission.
-+/* This file is automatically generated from the assembly file in
-+ * tests/migration/x86_64, edit that and then run "make all"
-+ * inside tests/migration to update, and then remember to send both
-+ * in your patch submission.
-  */
- unsigned char x86_bootsect[] = {
-   0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
++#endif /* _TEST_MIGRATION_H_ */
 -- 
 1.8.3.1
