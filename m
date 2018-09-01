@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fw3u7-0003Sl-El
+	(envelope-from <armbru@redhat.com>) id 1fw3u7-0003Sr-FO
 	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 07:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fw3u4-0000ix-9O
+	(envelope-from <armbru@redhat.com>) id 1fw3u6-0000jv-9u
 	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 07:17:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53050 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48030 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fw3u4-0000if-4m
-	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 07:17:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fw3u6-0000jc-5B
+	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 07:17:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 399668076895
-	for <qemu-devel@nongnu.org>; Sat,  1 Sep 2018 11:17:19 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-191.ams2.redhat.com
-	[10.36.116.191])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 116882166B41
-	for <qemu-devel@nongnu.org>; Sat,  1 Sep 2018 11:17:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CDAA487A7C
+	for <qemu-devel@nongnu.org>; Sat,  1 Sep 2018 11:17:21 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sat,  1 Sep 2018 13:17:10 +0200
-Message-Id: <20180901111716.1675-1-armbru@redhat.com>
+Date: Sat,  1 Sep 2018 13:17:13 +0200
+Message-Id: <20180901111716.1675-4-armbru@redhat.com>
+In-Reply-To: <20180901111716.1675-1-armbru@redhat.com>
+References: <20180901111716.1675-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/6] Monitor patches for 2018-09-01
+Subject: [Qemu-devel] [PULL 3/6] monitor: consitify qmp_send_response()
+ QDict argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,40 +34,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd2415574=
-52:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27=
--v2' into staging (2018-08-27 16:44:20 +0100)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20180829134043.31706-2-marcandre.lureau@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ monitor.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-are available in the Git repository at:
-
-  git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2018-09-01
-
-for you to fetch changes up to 176160ce78b58f29d765ddace885e88a732df34a:
-
-  monitor: no need to save need_resume (2018-08-30 16:08:54 +0200)
-
-----------------------------------------------------------------
-Monitor patches for 2018-09-01
-
-----------------------------------------------------------------
-Marc-Andr=C3=A9 Lureau (5):
-      monitor: accept input on resume
-      monitor: consitify qmp_send_response() QDict argument
-      qmp: constify qmp_is_oob()
-      Revert "qmp: isolate responses into io thread"
-      monitor: no need to save need_resume
-
-Peter Xu (1):
-      monitor: simplify monitor_qmp_setup_handlers_bh
-
- include/qapi/qmp/dispatch.h |   2 +-
- monitor.c                   | 150 ++++----------------------------------=
-------
- qapi/qmp-dispatch.c         |   2 +-
- 3 files changed, 15 insertions(+), 139 deletions(-)
-
+diff --git a/monitor.c b/monitor.c
+index c1add2ce09..bd0810df4d 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -503,9 +503,9 @@ int monitor_fprintf(FILE *stream, const char *fmt, ..=
+.)
+     return 0;
+ }
+=20
+-static void qmp_send_response(Monitor *mon, QDict *rsp)
++static void qmp_send_response(Monitor *mon, const QDict *rsp)
+ {
+-    QObject *data =3D QOBJECT(rsp);
++    const QObject *data =3D QOBJECT(rsp);
+     QString *json;
+=20
+     json =3D mon->flags & MONITOR_USE_PRETTY ? qobject_to_json_pretty(da=
+ta) :
 --=20
 2.17.1
