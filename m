@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fw5JE-0004tP-Ab
-	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 08:47:25 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fw5JF-0004xS-3w
+	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 08:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fw5JC-0007oo-VW
-	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 08:47:24 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fw5JD-0007pV-RN
+	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 08:47:25 -0400
 From: Luc Michel <luc.michel@greensocs.com>
-Date: Sat,  1 Sep 2018 14:46:31 +0200
-Message-Id: <20180901124639.19735-8-luc.michel@greensocs.com>
+Date: Sat,  1 Sep 2018 14:46:26 +0200
+Message-Id: <20180901124639.19735-3-luc.michel@greensocs.com>
 In-Reply-To: <20180901124639.19735-1-luc.michel@greensocs.com>
 References: <20180901124639.19735-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH 07/15] gdbstub: add multiprocess support to
- Xfer:features:read:
+Subject: [Qemu-devel] [PATCH 02/15] gdbstub: add multiprocess support to '?'
+ packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,135 +23,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Luc Michel <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, alistair@alistair23.me, mark.burton@greensocs.com
 
-Change the Xfer:features:read: packet handling to support the
-multiprocess extension. This packet is used to request the XML
-description of the CPU. In multiprocess mode, different descriptions can
-be sent for different processes.
+The gdb_get_cpu_pid() function does the PID lookup for the given CPU. It
+checks if the CPU is in a QOM container named after the
+GDB_CPU_GROUP_NAME macro. If found, it returns the correponding PID,
+which is the group ID plus one (group IDs start at 0, GDB PIDs at 1).
+When the CPU is not a child of such a container, PID 1 is returned.
 
-This function now takes the process to send the description for as a
-parameter, and use a buffer in the process structure to store the
-generated description.
+The get_thread_id() function generates the string to be used to identify
+a given thread, in a response packet for the peer. This function
+supports generating thread IDs when multiprocess mode is enabled (in the
+form `p<pid>.<tid>').
 
-It takes the first CPU of the process to generate the description.
+Use it in the reply to a '?' request.
 
 Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 ---
- gdbstub.c | 44 ++++++++++++++++++++++++--------------------
- 1 file changed, 24 insertions(+), 20 deletions(-)
+ gdbstub.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 43015f7792..761cb051c8 100644
+index 5c86218f49..ec3105dbc1 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -792,55 +792,57 @@ static CPUState *gdb_first_cpu(const GDBState *s)
+@@ -640,10 +640,37 @@ static int memtox(char *buf, const char *mem, int len)
+         }
      }
- 
-     return cpu;
+     return p - buf;
  }
  
--static const char *get_feature_xml(const char *p, const char **newp,
--                                   CPUClass *cc)
-+static const char *get_feature_xml(const GDBState *s, const char *p,
-+                                   const char **newp, GDBProcess *process)
++static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
++{
++    gchar *path;
++    gchar *cont;
++    const char *left;
++    unsigned long pid;
++
++    if (!s->multiprocess || (s->process_num == 1)) {
++        return 1;
++    }
++
++    path = object_get_canonical_path(OBJECT(cpu));
++    cont = g_strrstr(path, "/" GDB_CPU_GROUP_NAME "[");
++
++    if (cont == NULL) {
++        return 1;
++    }
++
++    cont += strlen("/" GDB_CPU_GROUP_NAME "[");
++
++    if (qemu_strtoul(cont, &left, 10, &pid)) {
++        return 1;
++    }
++
++    return pid + 1;
++}
++
+ static const char *get_feature_xml(const char *p, const char **newp,
+                                    CPUClass *cc)
  {
      size_t len;
      int i;
-     const char *name;
--    static char target_xml[1024];
-+    CPUState *cpu = get_first_cpu_in_process(s, process);
-+    CPUClass *cc = CPU_GET_CLASS(cpu);
- 
-     len = 0;
-     while (p[len] && p[len] != ':')
-         len++;
-     *newp = p + len;
- 
-     name = NULL;
-     if (strncmp(p, "target.xml", len) == 0) {
-+        char *buf = process->target_xml;
-+        const size_t buf_sz = sizeof(process->target_xml);
-+
-         /* Generate the XML description for this CPU.  */
--        if (!target_xml[0]) {
-+        if (!buf[0]) {
-             GDBRegisterState *r;
--            CPUState *cpu = first_cpu;
- 
--            pstrcat(target_xml, sizeof(target_xml),
-+            pstrcat(buf, buf_sz,
-                     "<?xml version=\"1.0\"?>"
-                     "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">"
-                     "<target>");
-             if (cc->gdb_arch_name) {
-                 gchar *arch = cc->gdb_arch_name(cpu);
--                pstrcat(target_xml, sizeof(target_xml), "<architecture>");
--                pstrcat(target_xml, sizeof(target_xml), arch);
--                pstrcat(target_xml, sizeof(target_xml), "</architecture>");
-+                pstrcat(buf, buf_sz, "<architecture>");
-+                pstrcat(buf, buf_sz, arch);
-+                pstrcat(buf, buf_sz, "</architecture>");
-                 g_free(arch);
-             }
--            pstrcat(target_xml, sizeof(target_xml), "<xi:include href=\"");
--            pstrcat(target_xml, sizeof(target_xml), cc->gdb_core_xml_file);
--            pstrcat(target_xml, sizeof(target_xml), "\"/>");
-+            pstrcat(buf, buf_sz, "<xi:include href=\"");
-+            pstrcat(buf, buf_sz, cc->gdb_core_xml_file);
-+            pstrcat(buf, buf_sz, "\"/>");
-             for (r = cpu->gdb_regs; r; r = r->next) {
--                pstrcat(target_xml, sizeof(target_xml), "<xi:include href=\"");
--                pstrcat(target_xml, sizeof(target_xml), r->xml);
--                pstrcat(target_xml, sizeof(target_xml), "\"/>");
-+                pstrcat(buf, buf_sz, "<xi:include href=\"");
-+                pstrcat(buf, buf_sz, r->xml);
-+                pstrcat(buf, buf_sz, "\"/>");
-             }
--            pstrcat(target_xml, sizeof(target_xml), "</target>");
-+            pstrcat(buf, buf_sz, "</target>");
-         }
--        return target_xml;
-+        return buf;
+@@ -909,10 +936,24 @@ static CPUState *find_cpu(uint32_t thread_id)
      }
-     if (cc->gdb_get_dynamic_xml) {
--        CPUState *cpu = first_cpu;
-         char *xmlname = g_strndup(p, len);
-         const char *xml = cc->gdb_get_dynamic_xml(cpu, xmlname);
  
-         g_free(xmlname);
-         if (xml) {
-@@ -1247,10 +1249,11 @@ out:
+     return NULL;
  }
  
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
++static char *get_thread_id(const GDBState *s, CPUState *cpu,
++                           char *buf, size_t buf_size)
++{
++    if (s->multiprocess) {
++        snprintf(buf, buf_size, "p%02x.%02x",
++                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
++    } else {
++        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
++
++    }
++
++    return buf;
++}
++
+ static int is_query_packet(const char *p, const char *query, char separator)
  {
-     CPUState *cpu;
-+    GDBProcess *process;
-     CPUClass *cc;
+     unsigned int query_len = strlen(query);
+ 
+     return strncmp(p, query, query_len) == 0 &&
+@@ -1020,22 +1061,23 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
      const char *p;
-     uint32_t pid, tid;
+     uint32_t thread;
      int ch, reg_size, type, res;
      uint8_t mem_buf[MAX_PACKET_LENGTH];
-@@ -1621,18 +1624,19 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         if (strncmp(p, "Xfer:features:read:", 19) == 0) {
-             const char *xml;
-             target_ulong total_len;
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
++    char thread_id[16];
+     uint8_t *registers;
+     target_ulong addr, len;
  
--            cc = CPU_GET_CLASS(first_cpu);
-+            process = gdb_get_cpu_process(s, s->g_cpu);
-+            cc = CPU_GET_CLASS(s->g_cpu);
-             if (cc->gdb_core_xml_file == NULL) {
-                 goto unknown_command;
-             }
+     trace_gdbstub_io_command(line_buf);
  
-             gdb_has_xml = true;
-             p += 19;
--            xml = get_feature_xml(p, &p, cc);
-+            xml = get_feature_xml(s, p, &p, process);
-             if (!xml) {
-                 snprintf(buf, sizeof(buf), "E00");
-                 put_packet(s, buf);
-                 break;
-             }
+     p = line_buf;
+     ch = *p++;
+     switch(ch) {
+     case '?':
+         /* TODO: Make this return the correct value for user-mode.  */
+-        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TRAP,
+-                 cpu_gdb_index(s->c_cpu));
++        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
++                 get_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
+         put_packet(s, buf);
+         /* Remove all the breakpoints when this query is issued,
+          * because gdb is doing and initial connect and the state
+          * should be cleaned up.
+          */
 -- 
 2.18.0
