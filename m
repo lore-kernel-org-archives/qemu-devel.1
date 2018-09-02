@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1fwWez-0003HK-PU
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 13:59:42 -0400
+	(envelope-from <ybettan@redhat.com>) id 1fwWfe-0003o7-85
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 14:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1fwWew-0005dK-J5
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 13:59:41 -0400
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:34932)
+	(envelope-from <ybettan@redhat.com>) id 1fwWfb-0006AO-1o
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 14:00:22 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:40733)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1fwWew-0005cc-BE
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 13:59:38 -0400
-Received: by mail-wm0-f65.google.com with SMTP id o18-v6so9640317wmc.0
-	for <qemu-devel@nongnu.org>; Sun, 02 Sep 2018 10:59:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1fwWfa-00069u-Pk
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 14:00:18 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n2-v6so15619063wrw.7
+	for <qemu-devel@nongnu.org>; Sun, 02 Sep 2018 11:00:18 -0700 (PDT)
 References: <20180902123608.124586-1-ybettan@redhat.com>
-	<CAFEAcA9mSb-RQMkEr8p-BEUH65Y7Y4TDbMZJkJjWoo_z-iT9sg@mail.gmail.com>
 From: Yoni Bettan <ybettan@redhat.com>
-Message-ID: <2dc88142-38b0-4bc7-0dd1-f5b46533f84a@redhat.com>
-Date: Sun, 2 Sep 2018 20:59:33 +0300
+Message-ID: <8ec8993a-f4c6-eba3-a23a-68d798a83907@redhat.com>
+Date: Sun, 2 Sep 2018 21:00:16 +0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9mSb-RQMkEr8p-BEUH65Y7Y4TDbMZJkJjWoo_z-iT9sg@mail.gmail.com>
+In-Reply-To: <20180902123608.124586-1-ybettan@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -31,30 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com
 
+Please ignore this message as a V2 was already sent.
 
-
-On 9/2/18 8:13 PM, Peter Maydell wrote:
-> On 2 September 2018 at 13:36, Yoni Bettan <ybettan@redhat.com> wrote:
->> This patch make INFO files (e.g. README, CODING_STYLE etc) much more
->> readable when watched from GitHub GUI.
->>
->> ./VERSION and ./MAINTAINERS were leave untouched otherwise
->> ./scripts/get_maintainer.pl breaks.
->>
->> ./COPYING and ./COPYING.LIB were leave untouched because it look likes
->> they come from GNU and not QEMU.
-> Thanks for this patch, but we don't use Markdown format.
-> We use RST for docs files, but README, CODING_STYLE, etc
-> are just plain text and fine as they are I think.
-
-Thanks for your reply.
-I sent a V2 patch before I have noticed your response so if you could 
-please copy your response to the V2 mail I will appreciate it.
 
 Thanks,
-Yoni
+
+Yoni.
+
+
+On 9/2/18 3:36 PM, Yoni Bettan wrote:
+> This patch make INFO files (e.g. README, CODING_STYLE etc) much more
+> readable when watched from GitHub GUI.
 >
-> -- PMM
+> ./VERSION and ./MAINTAINERS were leave untouched otherwise
+> ./scripts/get_maintainer.pl breaks.
+>
+> ./COPYING and ./COPYING.LIB were leave untouched because it look likes
+> they come from GNU and not QEMU.
+>
+> Visualization of the change can be found at
+> https://github.com/ybettan/qemu/tree/md.
+> NOTE:
+> This last part of the message should be removed from the commit message
+> since I will remove the 'md' brance from my fork if the patch is
+> accepted.
+>
+> Yoni Bettan (4):
+>    README.md : Reformatted to fit the Markdown (.md) format.
+>    CODING_STYLE.md : Reformatted to fit the Markdown (.md) format.
+>    HACKING.md : Reformatted to fit the Markdown (.md) format.
+>    LICENSE.md : Reformatted to fit the Markdown (.md) format.
+>
+>   CODING_STYLE => CODING_STYLE.md | 151 ++++++++++++++------------
+>   HACKING => HACKING.md           | 186 +++++++++++++++++---------------
+>   LICENSE => LICENSE.md           |   4 +-
+>   README => README.md             |  87 +++++++--------
+>   4 files changed, 224 insertions(+), 204 deletions(-)
+>   rename CODING_STYLE => CODING_STYLE.md (50%)
+>   rename HACKING => HACKING.md (53%)
+>   rename LICENSE => LICENSE.md (90%)
+>   rename README => README.md (68%)
+>
