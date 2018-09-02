@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fwGL6-0001SL-5H
-	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 20:34:04 -0400
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fwGL8-0001aO-J5
+	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 20:34:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fwGL2-0003Nn-Vd
-	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 20:34:04 -0400
+	(envelope-from <pavel.zbitskiy@gmail.com>) id 1fwGL7-0003Te-Uy
+	for qemu-devel@nongnu.org; Sat, 01 Sep 2018 20:34:06 -0400
 From: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Date: Sat,  1 Sep 2018 20:33:20 -0400
-Message-Id: <20180902003322.3428-2-pavel.zbitskiy@gmail.com>
+Date: Sat,  1 Sep 2018 20:33:21 -0400
+Message-Id: <20180902003322.3428-3-pavel.zbitskiy@gmail.com>
 In-Reply-To: <20180902003322.3428-1-pavel.zbitskiy@gmail.com>
 References: <20180902003322.3428-1-pavel.zbitskiy@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 1/3] target/s390x: use regular spaces in
- translate.c
+Subject: [Qemu-devel] [PATCH v5 2/3] target/s390x: exception on non-aligned
+ LPSW(E)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +23,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com, richard.henderson@linaro.org, Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-In a few places translate.c contains non-breaking spaces (0xc2 0xa0)
-instead of regular ones (0x20):
-
-  7c 7c c2 a0 63 63
-  7c 7c 20    63 63
-  |  |        c  c
-
-This confuses some text editors.
+Both LPSW and LPSWE should raise a specification exception when their
+operand is not doubleword aligned.
 
 Signed-off-by: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/s390x/translate.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 40e12ca2c4..7363aabf3a 100644
+index 7363aabf3a..59b1e5893c 100644
 --- a/target/s390x/translate.c
 +++ b/target/s390x/translate.c
-@@ -842,7 +842,7 @@ static void disas_jcc(DisasContext *s, DisasCompare *c, uint32_t mask)
-             cond = TCG_COND_NE;
-             c->u.s32.b = tcg_const_i32(1);
-             break;
--        case 0x8 | 0x2: /* cc == 0 || cc == 2 => (cc & 1) == 0 */
-+        case 0x8 | 0x2: /* cc == 0 || cc == 2 => (cc & 1) == 0 */
-             cond = TCG_COND_EQ;
-             c->g1 = false;
-             c->u.s32.a = tcg_temp_new_i32();
-@@ -861,7 +861,7 @@ static void disas_jcc(DisasContext *s, DisasCompare *c, uint32_t mask)
-             cond = TCG_COND_NE;
-             c->u.s32.b = tcg_const_i32(0);
-             break;
--        case 0x4 | 0x1: /* cc == 1 || cc == 3 => (cc & 1) != 0 */
-+        case 0x4 | 0x1: /* cc == 1 || cc == 3 => (cc & 1) != 0 */
-             cond = TCG_COND_NE;
-             c->g1 = false;
-             c->u.s32.a = tcg_temp_new_i32();
+@@ -2835,7 +2835,8 @@ static DisasJumpType op_lpsw(DisasContext *s, DisasOps *o)
+ 
+     t1 = tcg_temp_new_i64();
+     t2 = tcg_temp_new_i64();
+-    tcg_gen_qemu_ld32u(t1, o->in2, get_mem_index(s));
++    tcg_gen_qemu_ld_i64(t1, o->in2, get_mem_index(s),
++                        MO_TEUL | MO_ALIGN_8);
+     tcg_gen_addi_i64(o->in2, o->in2, 4);
+     tcg_gen_qemu_ld32u(t2, o->in2, get_mem_index(s));
+     /* Convert the 32-bit PSW_MASK into the 64-bit PSW_MASK.  */
+@@ -2855,7 +2856,8 @@ static DisasJumpType op_lpswe(DisasContext *s, DisasOps *o)
+ 
+     t1 = tcg_temp_new_i64();
+     t2 = tcg_temp_new_i64();
+-    tcg_gen_qemu_ld64(t1, o->in2, get_mem_index(s));
++    tcg_gen_qemu_ld_i64(t1, o->in2, get_mem_index(s),
++                        MO_TEQ | MO_ALIGN_8);
+     tcg_gen_addi_i64(o->in2, o->in2, 8);
+     tcg_gen_qemu_ld64(t2, o->in2, get_mem_index(s));
+     gen_helper_load_psw(cpu_env, t1, t2);
 -- 
 2.18.0
