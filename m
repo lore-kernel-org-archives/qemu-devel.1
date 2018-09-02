@@ -1,22 +1,27 @@
-Received: from [2001:4830:134:3::10] (port=56117 helo=eggs.gnu.org)
+Received: from [208.118.235.92] (port=42999 helo=eggs.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fwS9X-0007gL-19
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 09:11:30 -0400
+	(envelope-from <ybettan@redhat.com>) id 1fwSjp-0005F3-FV
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 09:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fwRsa-0007ms-3B
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 08:54:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:47333)
+	(envelope-from <ybettan@redhat.com>) id 1fwSU3-0005G8-DO
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 09:32:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43207 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1fwRow-0006qp-Qc
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 08:53:24 -0400
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Sun,  2 Sep 2018 19:46:05 +0800
-Message-Id: <1535888767-154680-2-git-send-email-robert.hu@linux.intel.com>
-In-Reply-To: <1535888767-154680-1-git-send-email-robert.hu@linux.intel.com>
-References: <1535888767-154680-1-git-send-email-robert.hu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH v4 1/3] x86: Data structure changes to support
- MSR based features
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1fwSU2-0005EK-T6
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 09:32:07 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EE6BF4021704
+	for <qemu-devel@nongnu.org>; Sun,  2 Sep 2018 12:36:21 +0000 (UTC)
+From: Yoni Bettan <ybettan@redhat.com>
+Date: Sun,  2 Sep 2018 15:36:05 +0300
+Message-Id: <20180902123608.124586-2-ybettan@redhat.com>
+In-Reply-To: <20180902123608.124586-1-ybettan@redhat.com>
+References: <20180902123608.124586-1-ybettan@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/4] README.md : Reformatted to fit the
+ Markdown (.md) format.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,453 +30,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
-Cc: qemu-devel@nongnu.org, robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, Yoni Bettan <ybettan@redhat.com>
 
-Add FeatureWordType indicator in struct FeatureWordInfo.
-Change feature_word_info[] accordingly.
-Change existing functions that refer to feature_word_info[] accordingly.
-
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+Signed-off-by: Yoni Bettan <ybettan@redhat.com>
 ---
- target/i386/cpu.c | 172 +++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 120 insertions(+), 52 deletions(-)
+ README => README.md | 87 +++++++++++++++++++++++----------------------
+ 1 file changed, 44 insertions(+), 43 deletions(-)
+ rename README => README.md (68%)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f24295e..a252c26 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -770,17 +770,36 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
-           /* missing:
-           CPUID_XSAVE_XSAVEC, CPUID_XSAVE_XSAVES */
+diff --git a/README b/README.md
+similarity index 68%
+rename from README
+rename to README.md
+index 49a9fd09cd..ac0e0528fb 100644
+--- a/README
++++ b/README.md
+@@ -1,5 +1,4 @@
+-         QEMU README
+-         ===========
++# Qemu
  
-+typedef enum FeatureWordType {
-+   CPUID_FEATURE_WORD,
-+   MSR_FEATURE_WORD,
-+} FeatureWordType;
-+
- typedef struct FeatureWordInfo {
--    /* feature flags names are taken from "Intel Processor Identification and
-+    FeatureWordType type;
-+   /* feature flags names are taken from "Intel Processor Identification and
-      * the CPUID Instruction" and AMD's "CPUID Specification".
-      * In cases of disagreement between feature naming conventions,
-      * aliases may be added.
-      */
-     const char *feat_names[32];
--    uint32_t cpuid_eax;   /* Input EAX for CPUID */
--    bool cpuid_needs_ecx; /* CPUID instruction uses ECX as input */
--    uint32_t cpuid_ecx;   /* Input ECX value for CPUID */
--    int cpuid_reg;        /* output register (R_* constant) */
-+    union {
-+        /* If type==CPUID_FEATURE_WORD */
-+        struct {
-+            uint32_t eax;   /* Input EAX for CPUID */
-+            bool needs_ecx; /* CPUID instruction uses ECX as input */
-+            uint32_t ecx;   /* Input ECX value for CPUID */
-+            int reg;        /* output register (R_* constant) */
-+        } cpuid;
-+        /* If type==MSR_FEATURE_WORD */
-+        struct {
-+            uint32_t index;
-+            struct {   /*CPUID that enumerate this MSR*/
-+                FeatureWord cpuid_class;
-+                uint32_t    cpuid_flag;
-+            } cpuid_dep;
-+        } msr;
-+    };
-     uint32_t tcg_features; /* Feature flags supported by TCG */
-     uint32_t unmigratable_flags; /* Feature flags known to be unmigratable */
-     uint32_t migratable_flags; /* Feature flags known to be migratable */
-@@ -790,6 +809,7 @@ typedef struct FeatureWordInfo {
+ QEMU is a generic and open source machine & userspace emulator and
+ virtualizer.
+@@ -30,86 +29,90 @@ QEMU as a whole is released under the GNU General Public License,
+ version 2. For full licensing details, consult the LICENSE file.
  
- static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-     [FEAT_1_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "fpu", "vme", "de", "pse",
-             "tsc", "msr", "pae", "mce",
-@@ -800,10 +820,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "fxsr", "sse", "sse2", "ss",
-             "ht" /* Intel htt */, "tm", "ia64", "pbe",
-         },
--        .cpuid_eax = 1, .cpuid_reg = R_EDX,
-+        .cpuid = {.eax = 1, .reg = R_EDX, },
-         .tcg_features = TCG_FEATURES,
-     },
-     [FEAT_1_ECX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "pni" /* Intel,AMD sse3 */, "pclmulqdq", "dtes64", "monitor",
-             "ds-cpl", "vmx", "smx", "est",
-@@ -814,7 +835,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "tsc-deadline", "aes", "xsave", NULL /* osxsave */,
-             "avx", "f16c", "rdrand", "hypervisor",
-         },
--        .cpuid_eax = 1, .cpuid_reg = R_ECX,
-+        .cpuid = { .eax = 1, .reg = R_ECX, },
-         .tcg_features = TCG_EXT_FEATURES,
-     },
-     /* Feature names that are already defined on feature_name[] but
-@@ -823,6 +844,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-      * to features[FEAT_8000_0001_EDX] if and only if CPU vendor is AMD.
-      */
-     [FEAT_8000_0001_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL /* fpu */, NULL /* vme */, NULL /* de */, NULL /* pse */,
-             NULL /* tsc */, NULL /* msr */, NULL /* pae */, NULL /* mce */,
-@@ -833,10 +855,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL /* fxsr */, "fxsr-opt", "pdpe1gb", "rdtscp",
-             NULL, "lm", "3dnowext", "3dnow",
-         },
--        .cpuid_eax = 0x80000001, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0x80000001, .reg = R_EDX, },
-         .tcg_features = TCG_EXT2_FEATURES,
-     },
-     [FEAT_8000_0001_ECX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "lahf-lm", "cmp-legacy", "svm", "extapic",
-             "cr8legacy", "abm", "sse4a", "misalignsse",
-@@ -847,7 +870,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "perfctr-nb", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x80000001, .cpuid_reg = R_ECX,
-+        .cpuid = { .eax = 0x80000001, .reg = R_ECX, },
-         .tcg_features = TCG_EXT3_FEATURES,
-         /*
-          * TOPOEXT is always allowed but can't be enabled blindly by
-@@ -857,6 +880,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .no_autoenable_flags = CPUID_EXT3_TOPOEXT,
-     },
-     [FEAT_C000_0001_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, "xstore", "xstore-en",
-             NULL, NULL, "xcrypt", "xcrypt-en",
-@@ -867,10 +891,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0xC0000001, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0xC0000001, .reg = R_EDX, },
-         .tcg_features = TCG_EXT4_FEATURES,
-     },
-     [FEAT_KVM] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
-             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
-@@ -881,10 +906,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "kvmclock-stable-bit", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EAX,
-+        .cpuid = { .eax = KVM_CPUID_FEATURES, .reg = R_EAX, },
-         .tcg_features = TCG_KVM_FEATURES,
-     },
-     [FEAT_KVM_HINTS] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "kvm-hint-dedicated", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-@@ -895,7 +921,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = KVM_CPUID_FEATURES, .reg = R_EDX, },
-         .tcg_features = TCG_KVM_FEATURES,
-         /*
-          * KVM hints aren't auto-enabled by -cpu host, they need to be
-@@ -904,6 +930,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .no_autoenable_flags = ~0U,
-     },
-     [FEAT_HYPERV_EAX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL /* hv_msr_vp_runtime_access */, NULL /* hv_msr_time_refcount_access */,
-             NULL /* hv_msr_synic_access */, NULL /* hv_msr_stimer_access */,
-@@ -918,9 +945,10 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x40000003, .cpuid_reg = R_EAX,
-+        .cpuid = { .eax = 0x40000003, .reg = R_EAX, },
-     },
-     [FEAT_HYPERV_EBX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL /* hv_create_partitions */, NULL /* hv_access_partition_id */,
-             NULL /* hv_access_memory_pool */, NULL /* hv_adjust_message_buffers */,
-@@ -934,9 +962,10 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x40000003, .cpuid_reg = R_EBX,
-+        .cpuid = { .eax = 0x40000003, .reg = R_EBX, },
-     },
-     [FEAT_HYPERV_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL /* hv_mwait */, NULL /* hv_guest_debugging */,
-             NULL /* hv_perf_monitor */, NULL /* hv_cpu_dynamic_part */,
-@@ -949,9 +978,10 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x40000003, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0x40000003, .reg = R_EDX, },
-     },
-     [FEAT_SVM] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "npt", "lbrv", "svm-lock", "nrip-save",
-             "tsc-scale", "vmcb-clean",  "flushbyasid", "decodeassists",
-@@ -962,10 +992,11 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x8000000A, .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0x8000000A, .reg = R_EDX, },
-         .tcg_features = TCG_SVM_FEATURES,
-     },
-     [FEAT_7_0_EBX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "fsgsbase", "tsc-adjust", NULL, "bmi1",
-             "hle", "avx2", NULL, "smep",
-@@ -976,12 +1007,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "clwb", "intel-pt", "avx512pf", "avx512er",
-             "avx512cd", "sha-ni", "avx512bw", "avx512vl",
-         },
--        .cpuid_eax = 7,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_EBX,
-+        .cpuid = { .eax = 7,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_EBX, },
-         .tcg_features = TCG_7_0_EBX_FEATURES,
-     },
-     [FEAT_7_0_ECX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, "avx512vbmi", "umip", "pku",
-             NULL /* ospke */, NULL, "avx512vbmi2", NULL,
-@@ -992,12 +1024,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, "cldemote", NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 7,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_ECX,
-+        .cpuid = { .eax = 7,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_ECX, },
-         .tcg_features = TCG_7_0_ECX_FEATURES,
-     },
-     [FEAT_7_0_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, "avx512-4vnniw", "avx512-4fmaps",
-             NULL, NULL, NULL, NULL,
-@@ -1008,13 +1041,14 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, "spec-ctrl", NULL,
-             NULL, "arch-capabilities", NULL, "ssbd",
-         },
--        .cpuid_eax = 7,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 7,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_EDX, },
-         .tcg_features = TCG_7_0_EDX_FEATURES,
-         .unmigratable_flags = CPUID_7_0_EDX_ARCH_CAPABILITIES,
-     },
-     [FEAT_8000_0007_EDX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-@@ -1025,12 +1059,12 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x80000007,
--        .cpuid_reg = R_EDX,
-+        .cpuid = { .eax = 0x80000007, .reg = R_EDX, },
-         .tcg_features = TCG_APM_FEATURES,
-         .unmigratable_flags = CPUID_APM_INVTSC,
-     },
-     [FEAT_8000_0008_EBX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-@@ -1041,12 +1075,12 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "amd-ssbd", "virt-ssbd", "amd-no-ssb", NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0x80000008,
--        .cpuid_reg = R_EBX,
-+        .cpuid = { .eax = 0x80000008, .reg = R_EBX, },
-         .tcg_features = 0,
-         .unmigratable_flags = 0,
-     },
-     [FEAT_XSAVE] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             "xsaveopt", "xsavec", "xgetbv1", "xsaves",
-             NULL, NULL, NULL, NULL,
-@@ -1057,12 +1091,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 0xd,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 1,
--        .cpuid_reg = R_EAX,
-+        .cpuid = { .eax = 0xd,
-+            .needs_ecx = true, .ecx = 1,
-+            .reg = R_EAX, },
-         .tcg_features = TCG_XSAVE_FEATURES,
-     },
-     [FEAT_6_EAX] = {
-+        .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, NULL, "arat", NULL,
-             NULL, NULL, NULL, NULL,
-@@ -1073,13 +1108,14 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--        .cpuid_eax = 6, .cpuid_reg = R_EAX,
-+        .cpuid = { .eax = 6, .reg = R_EAX, },
-         .tcg_features = TCG_6_EAX_FEATURES,
-     },
-     [FEAT_XSAVE_COMP_LO] = {
--        .cpuid_eax = 0xD,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_EAX,
-+        .type = CPUID_FEATURE_WORD,
-+        .cpuid = { .eax = 0xD,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_EAX, },
-         .tcg_features = ~0U,
-         .migratable_flags = XSTATE_FP_MASK | XSTATE_SSE_MASK |
-             XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | XSTATE_BNDCSR_MASK |
-@@ -1087,9 +1123,10 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             XSTATE_PKRU_MASK,
-     },
-     [FEAT_XSAVE_COMP_HI] = {
--        .cpuid_eax = 0xD,
--        .cpuid_needs_ecx = true, .cpuid_ecx = 0,
--        .cpuid_reg = R_EDX,
-+        .type = CPUID_FEATURE_WORD,
-+        .cpuid = { .eax = 0xD,
-+            .needs_ecx = true, .ecx = 0,
-+            .reg = R_EDX, },
-         .tcg_features = ~0U,
-     },
- };
-@@ -2975,21 +3012,41 @@ static const TypeInfo host_x86_cpu_type_info = {
  
- #endif
+-Building
+-========
++## Building
  
-+static char *feature_word_description(FeatureWordInfo *f, uint32_t bit)
-+{
-+    assert(f->type == CPUID_FEATURE_WORD ||
-+        f->type == MSR_FEATURE_WORD);
-+    switch (f->type) {
-+    case CPUID_FEATURE_WORD:
-+        {
-+            const char *reg = get_register_name_32(f->cpuid.reg);
-+            assert(reg);
-+            return g_strdup_printf("CPUID.%02XH:%s",
-+                f->cpuid.eax, reg);
-+        }
-+    case MSR_FEATURE_WORD:
-+        return g_strdup_printf("MSR(%02XH)",
-+            f->msr.index);
-+    }
-+
-+    return NULL;
-+}
-+
- static void report_unavailable_features(FeatureWord w, uint32_t mask)
- {
-     FeatureWordInfo *f = &feature_word_info[w];
-     int i;
-+    char *feat_word_str;
+ QEMU is multi-platform software intended to be buildable on all modern
+ Linux platforms, OS-X, Win32 (via the Mingw64 toolchain) and a variety
+ of other UNIX targets. The simple steps to build QEMU are:
  
-     for (i = 0; i < 32; ++i) {
-         if ((1UL << i) & mask) {
--            const char *reg = get_register_name_32(f->cpuid_reg);
--            assert(reg);
--            warn_report("%s doesn't support requested feature: "
--                        "CPUID.%02XH:%s%s%s [bit %d]",
-+            feat_word_str = feature_word_description(f, i);
-+            warn_report("%s doesn't support requested feature: %s%s%s [bit %d]",
-                         accel_uses_host_cpuid() ? "host" : "TCG",
--                        f->cpuid_eax, reg,
-+                        feat_word_str,
-                         f->feat_names[i] ? "." : "",
-                         f->feat_names[i] ? f->feat_names[i] : "", i);
-+            g_free(feat_word_str);
-         }
-     }
- }
-@@ -3233,11 +3290,14 @@ static void x86_cpu_get_feature_words(Object *obj, Visitor *v,
+-  mkdir build
+-  cd build
+-  ../configure
+-  make
++```
++mkdir build
++cd build
++../configure
++make
++```
  
-     for (w = 0; w < FEATURE_WORDS; w++) {
-         FeatureWordInfo *wi = &feature_word_info[w];
-+        if (wi->type != CPUID_FEATURE_WORD) {
-+            continue;
-+        }
-         X86CPUFeatureWordInfo *qwi = &word_infos[w];
--        qwi->cpuid_input_eax = wi->cpuid_eax;
--        qwi->has_cpuid_input_ecx = wi->cpuid_needs_ecx;
--        qwi->cpuid_input_ecx = wi->cpuid_ecx;
--        qwi->cpuid_register = x86_reg_info_32[wi->cpuid_reg].qapi_enum;
-+        qwi->cpuid_input_eax = wi->cpuid.eax;
-+        qwi->has_cpuid_input_ecx = wi->cpuid.needs_ecx;
-+        qwi->cpuid_input_ecx = wi->cpuid.ecx;
-+        qwi->cpuid_register = x86_reg_info_32[wi->cpuid.reg].qapi_enum;
-         qwi->features = array[w];
+ Additional information can also be found online via the QEMU website:
  
-         /* List will be in reverse order, but order shouldn't matter */
-@@ -3613,9 +3673,16 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-     uint32_t r;
+-  https://qemu.org/Hosts/Linux
+-  https://qemu.org/Hosts/Mac
+-  https://qemu.org/Hosts/W32
++* https://qemu.org/Hosts/Linux
++* https://qemu.org/Hosts/Mac
++* https://qemu.org/Hosts/W32
  
-     if (kvm_enabled()) {
--        r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid_eax,
--                                                    wi->cpuid_ecx,
--                                                    wi->cpuid_reg);
-+        switch (wi->type) {
-+        case CPUID_FEATURE_WORD:
-+            r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid.eax,
-+                                                wi->cpuid.ecx,
-+                                                wi->cpuid.reg);
-+            break;
-+        default:
-+            r = 0;
-+            break;
-+        }
-     } else if (hvf_enabled()) {
-         r = hvf_get_supported_cpuid(wi->cpuid_eax,
-                                     wi->cpuid_ecx,
-@@ -4680,9 +4747,10 @@ static void x86_cpu_adjust_feat_level(X86CPU *cpu, FeatureWord w)
- {
-     CPUX86State *env = &cpu->env;
-     FeatureWordInfo *fi = &feature_word_info[w];
--    uint32_t eax = fi->cpuid_eax;
-+    uint32_t eax = fi->cpuid.eax;
-     uint32_t region = eax & 0xF0000000;
  
-+    assert(feature_word_info[w].type == CPUID_FEATURE_WORD);
-     if (!env->features[w]) {
-         return;
-     }
+-Submitting patches
+-==================
++## Submitting patches
+ 
+ The QEMU source code is maintained under the GIT version control system.
+ 
+-   git clone git://git.qemu.org/qemu.git
++`git clone git://git.qemu.org/qemu.git`
+ 
+-When submitting patches, one common approach is to use 'git
+-format-patch' and/or 'git send-email' to format & send the mail to the
+-qemu-devel@nongnu.org mailing list. All patches submitted must contain
+-a 'Signed-off-by' line from the author. Patches should follow the
+-guidelines set out in the HACKING and CODING_STYLE files.
++When submitting patches, one common approach is to use `git format-patch`
++and/or `git send-email` to format & send the mail to the
++[qemu-devel@nongnu.org](https://lists.nongnu.org/mailman/listinfo/qemu-devel)
++mailing list. All patches submitted must contain a 'Signed-off-by' line from
++the author. Patches should follow the guidelines set out in the
++[HACKING.md](HACKING.md) and [CODING_STYLE.md](CODING_STYLE.md) files.
+ 
+ Additional information on submitting patches can be found online via
+ the QEMU website
+ 
+-  https://qemu.org/Contribute/SubmitAPatch
+-  https://qemu.org/Contribute/TrivialPatches
++* https://qemu.org/Contribute/SubmitAPatch
++* https://qemu.org/Contribute/TrivialPatches
+ 
+ The QEMU website is also maintained under source control.
+ 
+-  git clone git://git.qemu.org/qemu-web.git
+-  https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/
++`git clone git://git.qemu.org/qemu-web.git`
++* https://www.qemu.org/2017/02/04/the-new-qemu-website-is-up/
+ 
+-A 'git-publish' utility was created to make above process less
++A `git-publish` utility was created to make above process less
+ cumbersome, and is highly recommended for making regular contributions,
+ or even just for sending consecutive patch series revisions. It also
+-requires a working 'git send-email' setup, and by default doesn't
++requires a working `git send-email` setup, and by default doesn't
+ automate everything, so you may want to go through the above steps
+ manually for once.
+ 
+ For installation instructions, please go to
+ 
+-  https://github.com/stefanha/git-publish
++* https://github.com/stefanha/git-publish
+ 
+ The workflow with 'git-publish' is:
+ 
+-  $ git checkout master -b my-feature
+-  $ # work on new commits, add your 'Signed-off-by' lines to each
+-  $ git publish
++```
++git checkout master -b my-feature
++# work on new commits, add your 'Signed-off-by' lines to each
++git publish
++```
+ 
+ Your patch series will be sent and tagged as my-feature-v1 if you need to refer
+ back to it in the future.
+ 
+ Sending v2:
+ 
+-  $ git checkout my-feature # same topic branch
+-  $ # making changes to the commits (using 'git rebase', for example)
+-  $ git publish
++```
++git checkout my-feature # same topic branch
++# making changes to the commits (using 'git rebase', for example)
++git publish
++```
+ 
+ Your patch series will be sent with 'v2' tag in the subject and the git tip
+ will be tagged as my-feature-v2.
+ 
+-Bug reporting
+-=============
++## Bug reporting
+ 
+ The QEMU project uses Launchpad as its primary upstream bug tracker. Bugs
+ found when running code built from QEMU git or upstream released sources
+ should be reported via:
+ 
+-  https://bugs.launchpad.net/qemu/
++* https://bugs.launchpad.net/qemu/
+ 
+ If using QEMU via an operating system vendor pre-built binary package, it
+ is preferable to report bugs to the vendor's own bug tracker first. If
+@@ -118,22 +121,20 @@ reported via launchpad.
+ 
+ For additional information on bug reporting consult:
+ 
+-  https://qemu.org/Contribute/ReportABug
++* https://qemu.org/Contribute/ReportABug
+ 
+ 
+-Contact
+-=======
++## Contact
+ 
+ The QEMU community can be contacted in a number of ways, with the two
+ main methods being email and IRC
+ 
+- - qemu-devel@nongnu.org
+-   https://lists.nongnu.org/mailman/listinfo/qemu-devel
+- - #qemu on irc.oftc.net
++* [qemu-devel@nongnu.org](https://lists.nongnu.org/mailman/listinfo/qemu-devel)
++* #qemu on irc.oftc.net
+ 
+ Information on additional methods of contacting the community can be
+ found online via the QEMU website:
+ 
+-  https://qemu.org/Contribute/StartHere
++* https://qemu.org/Contribute/StartHere
+ 
+--- End
++## End
 -- 
-1.8.3.1
+2.17.1
