@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1fwSoN-0006iC-3a
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 09:53:18 -0400
+	(envelope-from <david@redhat.com>) id 1fwTYF-00087D-9J
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 10:40:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ybettan@redhat.com>) id 1fwSU4-0005GL-Fv
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 09:32:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43206 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1fwSU3-0005EL-8h
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 09:32:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 93EA74021702
-	for <qemu-devel@nongnu.org>; Sun,  2 Sep 2018 12:36:20 +0000 (UTC)
-From: Yoni Bettan <ybettan@redhat.com>
-Date: Sun,  2 Sep 2018 15:36:04 +0300
-Message-Id: <20180902123608.124586-1-ybettan@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/4] Reformatted INFO files to fit the Markdown
- (.md) format.
+	(envelope-from <david@redhat.com>) id 1fwTU2-0004BX-2k
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 10:36:14 -0400
+References: <20180902003322.3428-1-pavel.zbitskiy@gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <ed79ac89-4b05-c235-8a24-8eb403045ade@redhat.com>
+Date: Sun, 2 Sep 2018 16:36:04 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180902003322.3428-1-pavel.zbitskiy@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 0/3] Some improvements in z/Arch
+ instructions support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, Yoni Bettan <ybettan@redhat.com>
+To: Pavel Zbitskiy <pavel.zbitskiy@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, richard.henderson@linaro.org
 
-This patch make INFO files (e.g. README, CODING_STYLE etc) much more
-readable when watched from GitHub GUI.
+On 02.09.2018 02:33, Pavel Zbitskiy wrote:
+> Changes since v4:
+> 
+> * Simplified alignment checks by using tcg_gen_qemu_ld_i64 and
+>   MO_ALIGN*.
+> 
+> Pavel Zbitskiy (3):
+>   target/s390x: use regular spaces in translate.c
+>   target/s390x: exception on non-aligned LPSW(E)
+>   target/s390x: implement CVB, CVBY and CVBG
+> 
+>  target/s390x/helper.h           |  1 +
+>  target/s390x/insn-data.def      |  4 +++
+>  target/s390x/int_helper.c       | 52 +++++++++++++++++++++++++++++++++
+>  target/s390x/translate.c        | 21 ++++++++++---
+>  tests/tcg/s390x/Makefile.target |  1 +
+>  tests/tcg/s390x/cvb.c           | 18 ++++++++++++
+>  6 files changed, 93 insertions(+), 4 deletions(-)
+>  create mode 100644 tests/tcg/s390x/cvb.c
+> 
 
-./VERSION and ./MAINTAINERS were leave untouched otherwise
-./scripts/get_maintainer.pl breaks.
+Hi Pavel,
 
-./COPYING and ./COPYING.LIB were leave untouched because it look likes
-they come from GNU and not QEMU. 
+I'm leaving for vacation tomorrow and will have a look in two weeks when
+I'm back. Also, Conny is on vacation, so expect ~2 weeks until this gets
+reviewed / picked up.
 
-Visualization of the change can be found at
-https://github.com/ybettan/qemu/tree/md.
-NOTE:
-This last part of the message should be removed from the commit message
-since I will remove the 'md' brance from my fork if the patch is
-accepted.
-
-Yoni Bettan (4):
-  README.md : Reformatted to fit the Markdown (.md) format.
-  CODING_STYLE.md : Reformatted to fit the Markdown (.md) format.
-  HACKING.md : Reformatted to fit the Markdown (.md) format.
-  LICENSE.md : Reformatted to fit the Markdown (.md) format.
-
- CODING_STYLE => CODING_STYLE.md | 151 ++++++++++++++------------
- HACKING => HACKING.md           | 186 +++++++++++++++++---------------
- LICENSE => LICENSE.md           |   4 +-
- README => README.md             |  87 +++++++--------
- 4 files changed, 224 insertions(+), 204 deletions(-)
- rename CODING_STYLE => CODING_STYLE.md (50%)
- rename HACKING => HACKING.md (53%)
- rename LICENSE => LICENSE.md (90%)
- rename README => README.md (68%)
+Thanks!
 
 -- 
-2.17.1
+
+Thanks,
+
+David / dhildenb
