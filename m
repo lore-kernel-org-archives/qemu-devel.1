@@ -1,22 +1,22 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:47316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fwV5V-000080-B9
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 12:19:00 -0400
+	(envelope-from <groug@kaod.org>) id 1fwV5c-000080-Ir
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 12:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fwUzA-0003qc-CZ
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 12:12:27 -0400
-Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:35318)
+	(envelope-from <groug@kaod.org>) id 1fwUy9-000383-HS
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 12:11:24 -0400
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:50520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fwUzA-0003pq-79
-	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 12:12:24 -0400
-Received: from player773.ha.ovh.net (unknown [10.109.143.24])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id D3F691CB450
-	for <qemu-devel@nongnu.org>; Sun,  2 Sep 2018 18:12:22 +0200 (CEST)
-Date: Sun, 2 Sep 2018 18:12:14 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fwUy9-00033A-B2
+	for qemu-devel@nongnu.org; Sun, 02 Sep 2018 12:11:21 -0400
+Received: from player762.ha.ovh.net (unknown [10.109.146.5])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 2ED2A26823
+	for <qemu-devel@nongnu.org>; Sun,  2 Sep 2018 18:11:12 +0200 (CEST)
+Date: Sun, 2 Sep 2018 18:11:05 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180902181214.42f0b31d@bahia.lan>
-In-Reply-To: <20180902141904.14479-1-joserz@linux.ibm.com>
-References: <20180902141904.14479-1-joserz@linux.ibm.com>
+Message-ID: <20180902181105.3770d2c0@bahia.lan>
+In-Reply-To: <20180902050112.28066-1-joserz@linux.vnet.ibm.com>
+References: <20180902050112.28066-1-joserz@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -30,12 +30,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.ibm.com>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 Cc: qemu-ppc@nongnu.org, bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-On Sun,  2 Sep 2018 11:19:04 -0300
-Jose Ricardo Ziviani <joserz@linux.ibm.com> wrote:
+On Sun,  2 Sep 2018 02:01:12 -0300
+Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com> wrote:
 
+> From: Jose Ricardo Ziviani <joserz@linux.ibm.com>
+> 
 > We need to set cs->halted to 1 before calling ppc_set_compat. The reason
 > is that ppc_set_compat kicks up the new thread created to manage the
 > hotplugged KVM virtual CPU and the code drives directly to KVM_RUN
@@ -108,9 +110,6 @@ Jose Ricardo Ziviani <joserz@linux.ibm.com> wrote:
 > 
 > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.ibm.com>
 > ---
-
-I don't seen any obvious difference with your previous post but anyway
-it still looks good so:
 
 Reviewed-by: Greg Kurz <groug@kaod.org>
 
