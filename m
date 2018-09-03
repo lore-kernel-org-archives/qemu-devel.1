@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fwpwh-0004G4-SR
+	(envelope-from <berto@igalia.com>) id 1fwpwh-0004G6-TA
 	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fwpwc-0000YX-Ke
+	(envelope-from <berto@igalia.com>) id 1fwpwc-0000YV-Kl
 	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:35:15 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  3 Sep 2018 17:34:07 +0300
-Message-Id: <ccd55f9905b13f61515299977187c0b430b492bb.1535983918.git.berto@igalia.com>
+Date: Mon,  3 Sep 2018 17:34:06 +0300
+Message-Id: <b4bf05291f304b35658af1a12c97cdcf8d390fa2.1535983918.git.berto@igalia.com>
 In-Reply-To: <cover.1535983918.git.berto@igalia.com>
 References: <cover.1535983918.git.berto@igalia.com>
 In-Reply-To: <cover.1535983918.git.berto@igalia.com>
 References: <cover.1535983918.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 09/10] block: Allow changing 'detect-zeroes'
- on reopen
+Subject: [Qemu-devel] [PATCH v2 08/10] block: Allow changing 'discard' on
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,12 +25,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-'detect-zeroes' is one of the basic BlockdevOptions available for all
-drivers, but it's not handled by bdrv_reopen_prepare(), so any attempt
+'discard' is one of the basic BlockdevOptions available for all
+drivers, but it's not handled by bdrv_reopen_prepare() so any attempt
 to change it results in an error:
 
-   (qemu) qemu-io virtio0 "reopen -o detect-zeroes=on"
-   Cannot change the option 'detect-zeroes'
+   (qemu) qemu-io virtio0 "reopen -o discard=on"
+   Cannot change the option 'discard'
 
 Since there's no reason why we shouldn't allow changing it and the
 implementation is simple let's just do it.
@@ -38,123 +38,36 @@ implementation is simple let's just do it.
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Cc: Max Reitz <mreitz@redhat.com>
 ---
- block.c               | 63 +++++++++++++++++++++++++++++++--------------------
- include/block/block.h |  1 +
- 2 files changed, 40 insertions(+), 24 deletions(-)
+ block.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/block.c b/block.c
-index 3f4b7640fa..3865ef8517 100644
+index 1c0f72454a..3f4b7640fa 100644
 --- a/block.c
 +++ b/block.c
-@@ -764,6 +764,30 @@ static void bdrv_join_options(BlockDriverState *bs, QDict *options,
-     }
- }
- 
-+static BlockdevDetectZeroesOptions bdrv_parse_detect_zeroes(QemuOpts *opts,
-+                                                            int open_flags,
-+                                                            Error **errp)
-+{
-+    Error *local_err = NULL;
-+    const char *value = qemu_opt_get_del(opts, "detect-zeroes");
-+    BlockdevDetectZeroesOptions detect_zeroes =
-+        qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup, value,
-+                        BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return detect_zeroes;
-+    }
-+
-+    if (detect_zeroes == BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP &&
-+        !(open_flags & BDRV_O_UNMAP))
-+    {
-+        error_setg(errp, "setting detect-zeroes to unmap is not allowed "
-+                   "without setting discard operation to unmap");
-+    }
-+
-+    return detect_zeroes;
-+}
-+
- /**
-  * Set open flags for a given discard mode
-  *
-@@ -1328,7 +1352,6 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
-     const char *driver_name = NULL;
-     const char *node_name = NULL;
-     const char *discard;
--    const char *detect_zeroes;
-     QemuOpts *opts;
+@@ -3155,6 +3155,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
      BlockDriver *drv;
-     Error *local_err = NULL;
-@@ -1417,29 +1440,12 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
-         }
-     }
+     QemuOpts *opts;
+     QDict *orig_reopen_opts;
++    const char *value;
+     bool read_only;
  
--    detect_zeroes = qemu_opt_get(opts, "detect-zeroes");
--    if (detect_zeroes) {
--        BlockdevDetectZeroesOptions value =
--            qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup,
--                            detect_zeroes,
--                            BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF,
--                            &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            ret = -EINVAL;
--            goto fail_opts;
--        }
--
--        if (value == BLOCKDEV_DETECT_ZEROES_OPTIONS_UNMAP &&
--            !(bs->open_flags & BDRV_O_UNMAP))
--        {
--            error_setg(errp, "setting detect-zeroes to unmap is not allowed "
--                             "without setting discard operation to unmap");
--            ret = -EINVAL;
--            goto fail_opts;
--        }
--
--        bs->detect_zeroes = value;
-+    bs->detect_zeroes =
-+        bdrv_parse_detect_zeroes(opts, bs->open_flags, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto fail_opts;
-     }
+     assert(reopen_state != NULL);
+@@ -3177,6 +3178,15 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
  
-     if (filename != NULL) {
-@@ -3187,6 +3193,14 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-         }
-     }
+     update_flags_from_options(&reopen_state->flags, opts);
  
-+    reopen_state->detect_zeroes =
-+        bdrv_parse_detect_zeroes(opts, reopen_state->flags, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto error;
++    value = qemu_opt_get_del(opts, "discard");
++    if (value != NULL) {
++        if (bdrv_parse_discard_flags(value, &reopen_state->flags) != 0) {
++            error_setg(errp, "Invalid discard option");
++            ret = -EINVAL;
++            goto error;
++        }
 +    }
 +
      /* All other options (including node-name and driver) must be unchanged.
       * Put them back into the QDict, so that they are checked at the end
       * of this function. */
-@@ -3336,6 +3350,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
-     bs->options            = reopen_state->options;
-     bs->open_flags         = reopen_state->flags;
-     bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
-+    bs->detect_zeroes      = reopen_state->detect_zeroes;
- 
-     /* Remove child references from bs->options and bs->explicit_options.
-      * Child options were already removed in bdrv_reopen_queue_child() */
-diff --git a/include/block/block.h b/include/block/block.h
-index 4e0871aaf9..f71fa5a1c4 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -184,6 +184,7 @@ typedef QSIMPLEQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReopenQueue;
- typedef struct BDRVReopenState {
-     BlockDriverState *bs;
-     int flags;
-+    BlockdevDetectZeroesOptions detect_zeroes;
-     uint64_t perm, shared_perm;
-     QDict *options;
-     QDict *explicit_options;
 -- 
 2.11.0
