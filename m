@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fwnId-0001tY-Rp
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:45:44 -0400
+	(envelope-from <drjones@redhat.com>) id 1fwnJE-0002E7-U6
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fwnIY-0005D5-Ma
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:45:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58204 helo=mx1.redhat.com)
+	(envelope-from <drjones@redhat.com>) id 1fwnJ9-0005Qj-SV
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:46:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60902 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fwnIY-0005CW-Ez
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:45:38 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180903110813.hbamu4zuda6qpwuw@kamzik.brq.redhat.com> (Andrew
-	Jones's message of "Mon, 3 Sep 2018 13:08:13 +0200")
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fwnJ9-0005Py-Lq
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:46:15 -0400
+Date: Mon, 3 Sep 2018 13:46:09 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180903114609.57ekganetm7sltn7@kamzik.brq.redhat.com>
 References: <1535778675-32170-1-git-send-email-wei@redhat.com>
-	<1535778675-32170-2-git-send-email-wei@redhat.com>
-	<20180903110813.hbamu4zuda6qpwuw@kamzik.brq.redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 03 Sep 2018 13:45:33 +0200
-Message-ID: <87k1o23iua.fsf@trasno.org>
+	<1535778675-32170-5-git-send-email-wei@redhat.com>
+	<CAFEAcA_ycC8=YnUBF+zUHcTnsCHTCzXG5M77mu2yAgunuEpapg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH V8 1/4] tests/migration: Convert x86 boot
- block compilation script into Makefile
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_ycC8=YnUBF+zUHcTnsCHTCzXG5M77mu2yAgunuEpapg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V8 4/4] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Wei Huang <wei@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Wei Huang <wei@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Andrew Jones <drjones@redhat.com> wrote:
-> On Sat, Sep 01, 2018 at 01:11:12AM -0400, Wei Huang wrote:
->> The x86 boot block header currently is generated with a shell script.
->> To better support other CPUs (e.g. aarch64), we convert the script
->> into Makefile. This allows us to 1) support cross-compilation easily,
->> and 2) avoid creating a script file for every architecture.
->> 
->> Note that, in the new design, the cross compiler prefix can be specified by
->> setting the CROSS_PREFIX in "make" command. Also to allow gcc pre-processor
->> to include the C-style file correctly, it also renames the
->> x86-a-b-bootblock.s file extension from .s to .S.
->> + * tests/migration/rebuild-x86-bootblock.sh to update,
->> + * and then remember to send both in your patch submission.
->> + */
->> +endef
->> +export __note
->> +
->> +.PHONY: all clean
->> +all: x86-a-b-bootblock.h
->> +
->> +x86-a-b-bootblock.h: x86.bootsect
->> +	echo "$$__note" > header.tmp
->> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
->> +	mv header.tmp $@
->
-> The shell script this Makefile is replacing used mktemp
-> for a randomly named tmp dir. Shouldn't we continue to
-> use random names?
+On Sat, Sep 01, 2018 at 11:07:26AM +0100, Peter Maydell wrote:
+> On 1 September 2018 at 06:11, Wei Huang <wei@redhat.com> wrote:
+> > This patch adds migration test support for aarch64. The test code, which
+> > implements the same functionality as x86, is booted as a kernel in qemu.
+> > Here are the design choices we make for aarch64:
+> >
+> >  * We choose this -kernel approach because aarch64 QEMU doesn't provide a
+> >    built-in fw like x86 does. So instead of relying on a boot loader, we
+> >    use -kernel approach for aarch64.
+> >  * The serial output is sent to PL011 directly.
+> >  * The physical memory base for mach-virt machine is 0x40000000. We change
+> >    the start_address and end_address for aarch64.
+> >
+> > In addition to providing the binary, this patch also includes the source
+> > code and the build script in tests/migration/aarch64. So users can change
+> > the source and/or re-compile the binary as they wish.
+> > +    } else if (strcmp(arch, "aarch64") == 0) {
+> > +        struct utsname utsname;
+> > +
+> 
+> The comment says:
+> 
+> > +        /* kvm and tcg need different cpu and gic-version configs */
+> 
+> ...but the code below it doesn't change the cpu or gic-version
+> based on 'accel'.
+> 
+> > +        if (access("/dev/kvm", F_OK) == 0 && uname(&utsname) == 0 &&
+> > +            strcmp(utsname.machine, "aarch64") == 0) {
+> > +            accel = "kvm";
+> > +        } else {
+> > +            accel = "tcg";
+> > +        }
+> 
+> Maybe we could just use -accel=kvm,tcg rather than guessing
+> whether kvm is going to work ? If this is how the x86 code
+> works then probably best to do the same as that, though.
 
-We shouldn't be trying to create the file twice in parallel, no?
+Yeah, using '-accel=kvm:tcg' is what I suggested in the v7 review when
+suggesting to switch to -cpu max and gic-version=max. That allows the
+uname() use and the new utsname.h include to go away.
 
->
->> +
->> +x86.bootsect: x86.boot
->> +	dd if=$< of=$@ bs=256 count=2 skip=124
->> +
->> +x86.boot: x86.o
->> +	$(CROSS_PREFIX)objcopy -O binary $< $@
->> +
->> +x86.o: x86-a-b-bootblock.S
->> +	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
->> +
->> +clean:
->> +	@rm -rf *.boot *.o *.bootsect
->
-> We don't want to remove the generated header file when cleaning?
+Thanks,
+drew
 
-No, because we only generated the header file when running native, have
-the right crosscompilers, etc.  In general we only recompile it when we
-change the test file, otherwise we store the generated ones.
-
-Idea is:
-We have a c file that does what we want.
-We compile it (when we have a propper compiler) and store it on the
-tree.
-We compile it for each test.
-
-This is more "like firmware" than normal "qemu" source code.
-
-Later, Juan.
+> 
+> > +
+> > +        init_bootfile(bootpath, aarch64_kernel);
+> > +        cmd_src = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
+> > +                                  "-name vmsource,debug-threads=on -cpu max "
+> > +                                  "-m 150M -serial file:%s/src_serial "
+> > +                                  "-kernel %s ",
+> > +                                  accel, tmpfs, bootpath);
+> > +        cmd_dst = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
+> > +                                  "-name vmdest,debug-threads=on -cpu max "
+> > +                                  "-m 150M -serial file:%s/dest_serial "
+> > +                                  "-kernel %s "
+> > +                                  "-incoming %s ",
+> > +                                  accel, tmpfs, bootpath, uri);
+> > +
+> > +        start_address = ARM_TEST_MEM_START;
+> > +        end_address = ARM_TEST_MEM_END;
+> > +
+> > +        g_assert(sizeof(aarch64_kernel) <= ARM_TEST_MAX_KERNEL_SIZE);
+> 
+> thanks
+> -- PMM
+> 
