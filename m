@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fwjTU-0002oU-Mz
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 03:40:41 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1fwjYV-00079z-TF
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 03:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fwjTR-0002u8-CL
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 03:40:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50598 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fwjTR-0002tk-4k
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 03:40:37 -0400
-References: <20180830173657.22939-1-dgilbert@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <90c91534-ea52-42a8-0a01-5c8e5898b6d0@redhat.com>
-Date: Mon, 3 Sep 2018 09:40:34 +0200
+	(envelope-from <bobby.prani@gmail.com>) id 1fwjYV-0005P5-2D
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 03:45:51 -0400
+Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:54300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1fwjYU-0005OP-TR
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 03:45:50 -0400
+Received: by mail-it0-x230.google.com with SMTP id f14-v6so78430ita.4
+	for <qemu-devel@nongnu.org>; Mon, 03 Sep 2018 00:45:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180830173657.22939-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration/rdma: Fix uninitialised
- rdma_return_path
+From: Pranith Kumar <bobby.prani@gmail.com>
+Date: Mon, 3 Sep 2018 00:45:23 -0700
+Message-ID: <CAJhHMCDR3FVHxO7hfUNbYTM2zsx6Q1CeKfeMjkW0b-En-1Z0Xw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] qemu-riscv64 seg fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +26,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com, cohuck@redhat.com, jemmy858585@gmail.com
+To: mjc@sifive.com
+Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On 2018-08-30 19:36, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Clang correctly errors out moaning that rdma_return_path
-> is used uninitialised in the earlier error paths.
-> Make it NULL so that the error path ignores it.
-> 
-> Fixes: 55cc1b5937a8e709e4c102e74b206281073aab82
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reprorted by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  migration/rdma.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index ae07515e83..9b2e7e10aa 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -4012,7 +4012,7 @@ static void rdma_accept_incoming_migration(void *opaque)
->  void rdma_start_incoming_migration(const char *host_port, Error **errp)
->  {
->      int ret;
-> -    RDMAContext *rdma, *rdma_return_path;
-> +    RDMAContext *rdma, *rdma_return_path = NULL;
->      Error *local_err = NULL;
->  
->      trace_rdma_start_incoming_migration();
+Hi Michael,
 
-This will silence the error from clang for sure, so:
+qemu-riscv64 seg faults for me on a static binary. You can build the
+binary from here: https://github.com/pranith/quickht
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+$ STATIC=1 RISCV=1 make
 
-But actually, the g_free(rdma_return_path); at the end of the function
-is dead code, since it will always be called with rdma_return_path ==
-NULL. Maybe we should rather remove that g_free() instead?
+$ qemu-riscv64 ./bench -t 1 -u 1
+<seg fault>
 
- Thomas
+Thanks,
+-- 
+Pranith
