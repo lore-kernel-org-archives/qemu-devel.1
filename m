@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fwqOD-0003ld-HW
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:03:42 -0400
+	(envelope-from <thuth@redhat.com>) id 1fwqTL-0007G8-7e
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:09:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fwqOB-0007rS-FR
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:03:41 -0400
-Date: Mon, 3 Sep 2018 17:03:11 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180903150311.GC14463@dhcp-200-186.str.redhat.com>
-References: <20180810162658.6562-1-kwolf@redhat.com>
-	<20180810162658.6562-2-kwolf@redhat.com>
-	<20180828142626.GM122225@angien.pipo.sk>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="VbJkn9YxBvnuCH5J"
-Content-Disposition: inline
-In-Reply-To: <20180828142626.GM122225@angien.pipo.sk>
-Subject: Re: [Qemu-devel] [PATCH 1/2] commit: Add top-node/base-node options
+	(envelope-from <thuth@redhat.com>) id 1fwqTH-0001No-A4
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:08:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49988 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fwqTH-0001Mw-3T
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:08:55 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  3 Sep 2018 17:08:46 +0200
+Message-Id: <1535987326-16222-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] Add a gitlab-ci file for Continuous
+ Integration testing on Gitlab
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,128 +22,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Krempa <pkrempa@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, berto@igalia.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
+This is very convenient for people who store their QEMU git trees on
+gitlab.com: Automatic CI pipelines are now run for each branch that is
+pushed to the server. Since the runtime of the jobs is limited to 1h
+we distribute the targets into multiple pipelines - this way the jobs
+finish within 30 minutes.
 
---VbJkn9YxBvnuCH5J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ In case somebody is interested, the result looks e.g. like this on gitlab:
+ https://gitlab.com/huth/qemu/pipelines/29255979
 
-Am 28.08.2018 um 16:26 hat Peter Krempa geschrieben:
-> On Fri, Aug 10, 2018 at 18:26:57 +0200, Kevin Wolf wrote:
-> > The block-commit QMP command required specifying the top and base nodes
-> > of the commit jobs using the file name of that node. While this works
-> > in simple cases (local files with absolute paths), the file names
-> > generated for more complicated setups can be hard to predict.
-> >=20
-> > This adds two new options top-node and base-node to the command, which
-> > allow specifying node names instead. They are mutually exclusive with
-> > the old options.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qapi/block-core.json | 24 ++++++++++++++++++------
-> >  blockdev.c           | 32 ++++++++++++++++++++++++++++++--
-> >  2 files changed, 48 insertions(+), 8 deletions(-)
->=20
-> While the below is not strictly relevant to this patch usage
-> block-commit is not possible when using -blockdev. Thus the new
-> arguments are not very useful otherwise.
->=20
-> With the new options I'm getting:
->=20
-> {"execute":"block-commit",
->  "arguments": { "device":"libvirt-3-format",
->                 "job-id":"libvirt-3-format",
->                 "top-node":"libvirt-8-format",
->                 "base-node":"libvirt-9-format",
->                 "auto-finalize":true,
->                 "auto-dismiss":false},
->  "id":"libvirt-16"}
->=20
-> {"id":"libvirt-16",
->  "error":{"class":"GenericError",
->           "desc":"Block node is read-only"}}
->=20
-> I'm pointing into the backing chain so the files are declared as read-onl=
-y.
->=20
-> It works just-fine if I open them as read-write with
-> -blockdev/blockdev-add but that obviously is not correct as you can't
-> then share parts of the backing chain with other VMs due to image
-> locking.
->=20
-> libvirt-3-format is read-write and all other node names are readonly in
-> the above example.
->=20
-> The same also happens when using filenames:
->=20
-> {"execute":"block-commit",
->  "arguments" : {"device":"libvirt-3-format",
->                 "job-id":"libvirt-3-format",
->                 "top":"/var/lib/libvirt/images/rhel7.3.1483615252",
->                 "base":"/var/lib/libvirt/images/rhel7.3.1483605924",
->                 "auto-finalize":true,
->                 "auto-dismiss":false},
->  "id":"libvirt-13"}
->=20
-> {"id":"libvirt-13","error":{"class":"GenericError","desc":"Block node is =
-read-only"}}
+ .gitlab-ci.yml | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+ create mode 100644 .gitlab-ci.yml
 
-I see what's happening here. So we have a graph like this:
-
-     guest device
-          |
-          v
-    overlay-format -------> backing-format
-    [read-only=3Doff]         [read-only=3Don]
-          |                        |
-          v                        v
-    overlay-proto           backing-proto
-    [read-only=3Doff]         [read-only=3Don]
-
-The difference between your -blockdev use and -drive is that you
-explicitly specify the read-only option for backing-proto (and you use a
-separate -blockdev option anyway), so it doesn't just inherit it from
-backing-format.
-
-Now, when the commit job tries to reopen backing-format, your explicit
-read-only=3Don for backing-proto still takes precedence and the node stays
-read-only. If you hadn't used a separate -blockdev for backing-proto,
-but included it in the definition for backing-format and left out the
-read-only option, it would have inherited the option and reopen would
-adjust both nodes. This is what happens with -drive.
-
-So essentially, I guess, all places that want to switch between
-read-only and read-write need to learn which other nodes (apart from the
-top-level node they are interested in) must be reopened as well.
-
-This looks a bit messy. :-/
-
-Any good ideas anyone?
-
-Kevin
-
---VbJkn9YxBvnuCH5J
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJbjU0vAAoJEH8JsnLIjy/WFY8P/RdKQeuxi1UAGKG2COWPNV6e
-WBjvrPEnFXCR6YWt8OlBN5TYPRqIBw6IcOJK2MbTJwKemqQS4g0a4/Qc4lwkXjdn
-3QRcW/I0dz7F3TRNGEKTVpuN4gyEbk1ELd8aHqgW7Z2ex2eRV+A4jAHMLwDQsFOI
-yIMg8FD61fgQBc9jSxHWFpmmZu1k4nmIYF8n9b5kCwFxC0VRCYQ0+HlYxd2WsiTs
-VrLvDiQdTzolJw0r17/gjl/aCVmccamX3F+1jCY0/cI0sbmwC9agIL67r8XrrGGR
-PwTWJ6eHAocFSjxFMe9w7uEFSqJdzbvQI5t5ER8Mz/vLy3m5eAWjCorNXQAEicS9
-3hsegp9nql1377tb5OljPIW1Ei5bHGVdYLOaLXltNSrGvP9P+AD2Zyb9jPAuUwMy
-D43YN7amk5dstiSP6bhvJkTUbGQthrKZAny05EC79jK/cP8PfbsgMlRAwMrG/I69
-3kHdM8NpTH3fHdfghsPbo+5CiTwmoWQyIKgpB+DLehp2FHSQx9SDPJBa0ccFF3VG
-coqS+C8szMJGGHdAR/W5w1uHXFOcWogIMt9Yz8P0JBJfcpwDNGZhGYkP/9uBa1B1
-a3hZTRuFEIS3da28XG7cwuxLds+oeNIAnTvnv34pS7IpVi4nJVmWHvie9q8M3TJX
-6a6tnV5TE1F22f5RSEtD
-=LKjW
------END PGP SIGNATURE-----
-
---VbJkn9YxBvnuCH5J--
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+new file mode 100644
+index 0000000..18a77bc
+--- /dev/null
++++ b/.gitlab-ci.yml
+@@ -0,0 +1,48 @@
++before_script:
++ - apt-get update -qq
++ - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev
++
++build-system1:
++ script:
++ - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard-dev
++      libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev
++ - ./configure --enable-werror --target-list="aarch64-softmmu alpha-softmmu
++      cris-softmmu hppa-softmmu lm32-softmmu moxie-softmmu microblazeel-softmmu
++      microblaze-softmmu mips-softmmu mips64el-softmmu m68k-softmmu ppc-softmmu"
++ - make -j2
++ - make -j2 check
++
++build-system2:
++ script:
++ - apt-get install -y -qq libsdl2-dev libgcrypt-dev libbrlapi-dev libaio-dev
++      libfdt-dev liblzo2-dev librdmacm-dev libibverbs-dev libibumad-dev
++ - ./configure --enable-werror --target-list="tricore-softmmu unicore32-softmmu
++      riscv32-softmmu riscv64-softmmu s390x-softmmu sh4-softmmu sparc-softmmu
++      sparc64-softmmu x86_64-softmmu xtensa-softmmu nios2-softmmu or1k-softmmu"
++ - make -j2
++ - make -j2 check
++
++build-clang:
++ script:
++ - apt-get install -y -qq clang libgtk-3-dev libsdl2-dev libbluetooth-dev
++      xfslibs-dev libiscsi-dev libnfs-dev libseccomp-dev gnutls-dev librbd-dev
++ - CC="clang" ./configure --enable-werror --target-list="tilegx-linux-user
++      arm-softmmu i386-softmmu ppc64-softmmu s390x-softmmu sparc-softmmu"
++ - make -j2
++ - make -j2 check
++
++build-disabled:
++ script:
++ - ./configure --enable-werror --disable-tcg --disable-slirp --disable-libxml2
++      --disable-capstone --disable-live-block-migration --disable-glusterfs
++      --disable-replication --disable-coroutine-pool --disable-smartcard
++      --disable-guest-agent --disable-curses --disable-curl --disable-tpm
++      --disable-qom-cast-debug --disable-spice --disable-vhost-vsock
++      --disable-vhost-net --disable-vhost-crypto --disable-vhost-user
++ - make -j2
++
++build-user:
++ script:
++ - ./configure --enable-werror --disable-system --disable-guest-agent
++ - make -j2
++ - make -j2 check
+-- 
+1.8.3.1
