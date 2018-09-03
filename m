@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fwmUG-0006FE-7d
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 06:53:41 -0400
+	(envelope-from <drjones@redhat.com>) id 1fwmiV-0005Ra-He
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:08:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fwmUD-0000cj-3p
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 06:53:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56764 helo=mx1.redhat.com)
+	(envelope-from <drjones@redhat.com>) id 1fwmiT-0000Bu-D9
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:08:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43066 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fwmUC-0000bx-V0
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 06:53:37 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 68D378010FDF
-	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 10:53:35 +0000 (UTC)
-Date: Mon, 3 Sep 2018 11:53:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180903105330.GB2414@work-vm>
-References: <20180901134652.25884-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fwmiT-000073-1J
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 07:08:21 -0400
+Date: Mon, 3 Sep 2018 13:08:13 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180903110813.hbamu4zuda6qpwuw@kamzik.brq.redhat.com>
+References: <1535778675-32170-1-git-send-email-wei@redhat.com>
+	<1535778675-32170-2-git-send-email-wei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180901134652.25884-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hmp: fix migrate status timer leak
+In-Reply-To: <1535778675-32170-2-git-send-email-wei@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] tests/migration: Convert x86 boot
+ block compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +28,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, dgilbert@redhat.com
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Spotted by ASAN doing some manual testing:
->=20
-> Direct leak of 48 byte(s) in 1 object(s) allocated from:
->     #0 0x7f5fcdc75e50 in calloc (/lib64/libasan.so.5+0xeee50)
->     #1 0x7f5fcd47241d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5241d)
->     #2 0x55f989be92ce in timer_new /home/elmarco/src/qq/include/qemu/ti=
-mer.h:561
->     #3 0x55f989be92ff in timer_new_ms /home/elmarco/src/qq/include/qemu=
-/timer.h:630
->     #4 0x55f989c0219d in hmp_migrate /home/elmarco/src/qq/hmp.c:2038
->     #5 0x55f98955927b in handle_hmp_command /home/elmarco/src/qq/monito=
-r.c:3498
->     #6 0x55f98955fb8c in monitor_command_cb /home/elmarco/src/qq/monito=
-r.c:4371
->     #7 0x55f98ad40f11 in readline_handle_byte /home/elmarco/src/qq/util=
-/readline.c:393
->     #8 0x55f98955fa4f in monitor_read /home/elmarco/src/qq/monitor.c:43=
-54
->     #9 0x55f98aae30d7 in qemu_chr_be_write_impl /home/elmarco/src/qq/ch=
-ardev/char.c:175
->     #10 0x55f98aae317a in qemu_chr_be_write /home/elmarco/src/qq/charde=
-v/char.c:187
->     #11 0x55f98aae940c in fd_chr_read /home/elmarco/src/qq/chardev/char=
--fd.c:66
->     #12 0x55f98ab63018 in qio_channel_fd_source_dispatch /home/elmarco/=
-src/qq/io/channel-watch.c:84
->     #13 0x7f5fcd46c8ac in g_main_dispatch gmain.c:3177
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-
-Thanks, I'll add that to my HMP list.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+On Sat, Sep 01, 2018 at 01:11:12AM -0400, Wei Huang wrote:
+> The x86 boot block header currently is generated with a shell script.
+> To better support other CPUs (e.g. aarch64), we convert the script
+> into Makefile. This allows us to 1) support cross-compilation easily,
+> and 2) avoid creating a script file for every architecture.
+> 
+> Note that, in the new design, the cross compiler prefix can be specified by
+> setting the CROSS_PREFIX in "make" command. Also to allow gcc pre-processor
+> to include the C-style file correctly, it also renames the
+> x86-a-b-bootblock.s file extension from .s to .S.
+> 
+> Signed-off-by: Wei Huang <wei@redhat.com>
 > ---
->  hmp.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hmp.c b/hmp.c
-> index 4975fa56b0..52a4279e51 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2001,6 +2001,7 @@ static void hmp_migrate_status_cb(void *opaque)
->          }
->          monitor_resume(status->mon);
->          timer_del(status->timer);
-> +        timer_free(status->timer);
->          g_free(status);
->      }
-> =20
-> --=20
-> 2.19.0.rc1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  tests/migration/Makefile                           | 31 ++++++++++++++++++++
+>  tests/migration/rebuild-x86-bootblock.sh           | 33 ----------------------
+>  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   |  0
+>  3 files changed, 31 insertions(+), 33 deletions(-)
+>  create mode 100644 tests/migration/Makefile
+>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+>  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (100%)
+> 
+> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> new file mode 100644
+> index 0000000..5d5fa07
+> --- /dev/null
+> +++ b/tests/migration/Makefile
+> @@ -0,0 +1,31 @@
+> +# To specify cross compiler prefix, use CROSS_PREFIX=
+> +#   > make CROSS_PREFIX=x86_64-linux-gnu-
+       ^ nit: this prompt symbol is weird (at least to me, what shell uses
+              this?) To me it looks like a sh/bash redirect symbol. Can
+              we change it to '$' or use nothing at all?
+> +
+> +override define __note
+> +/* This file is automatically generated from
+> + * tests/migration/x86-a-b-bootblock.s, edit that and then run
+                                        ^ should be 'S'
+
+> + * tests/migration/rebuild-x86-bootblock.sh to update,
+> + * and then remember to send both in your patch submission.
+> + */
+> +endef
+> +export __note
+> +
+> +.PHONY: all clean
+> +all: x86-a-b-bootblock.h
+> +
+> +x86-a-b-bootblock.h: x86.bootsect
+> +	echo "$$__note" > header.tmp
+> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
+> +	mv header.tmp $@
+
+The shell script this Makefile is replacing used mktemp
+for a randomly named tmp dir. Shouldn't we continue to
+use random names?
+
+> +
+> +x86.bootsect: x86.boot
+> +	dd if=$< of=$@ bs=256 count=2 skip=124
+> +
+> +x86.boot: x86.o
+> +	$(CROSS_PREFIX)objcopy -O binary $< $@
+> +
+> +x86.o: x86-a-b-bootblock.S
+> +	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
+> +
+> +clean:
+> +	@rm -rf *.boot *.o *.bootsect
+
+We don't want to remove the generated header file when cleaning?
+
+> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+> deleted file mode 100755
+> index 86cec5d..0000000
+> --- a/tests/migration/rebuild-x86-bootblock.sh
+> +++ /dev/null
+> @@ -1,33 +0,0 @@
+> -#!/bin/sh
+> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> -# See the COPYING file in the top-level directory.
+> -#
+> -# Author: dgilbert@redhat.com
+> -
+> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
+> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
+> -
+> -if [ ! -e "$ASMFILE" ]
+> -then
+> -  echo "Couldn't find $ASMFILE" >&2
+> -  exit 1
+> -fi
+> -
+> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
+> -cd "$ASM_WORK_DIR" &&
+> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
+> -objcopy -O binary x86.o x86.boot &&
+> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
+> -xxd -i x86.bootsect |
+> -sed -e 's/.*int.*//' > x86.hex &&
+> -cat - x86.hex <<HERE > "$HEADER"
+> -/* This file is automatically generated from
+> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> - * and then remember to send both in your patch submission.
+> - */
+> -HERE
+> -
+> -rm x86.hex x86.bootsect x86.boot x86.o
+> -cd .. && rmdir "$ASM_WORK_DIR"
+> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
+> similarity index 100%
+> rename from tests/migration/x86-a-b-bootblock.s
+> rename to tests/migration/x86-a-b-bootblock.S
+> -- 
+> 1.8.3.1
+> 
+>
+
+Thanks,
+drew 
