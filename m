@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fwqa9-0003Fr-SC
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:16:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1fwqt1-0005ZA-Fh
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:35:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fwqa6-0001S6-KB
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:16:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34756 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fwqa6-0001QT-Dm
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:15:58 -0400
-Date: Mon, 3 Sep 2018 16:15:53 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180903151553.GJ14377@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1535987326-16222-1-git-send-email-thuth@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fwqsw-0003gr-Ib
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:35:31 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44080)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fwqsw-0003g7-Bg
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 11:35:26 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fwqsv-0002ao-7u
+	for <qemu-devel@nongnu.org>; Mon, 03 Sep 2018 15:35:25 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 238532E80CC
+	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 15:35:25 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1535987326-16222-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Add a gitlab-ci file for Continuous
- Integration testing on Gitlab
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Sep 2018 15:20:25 -0000
+From: Thomas Huth <588693@bugs.launchpad.net>
+Reply-To: Bug 588693 <588693@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100602125159.13777.33649.malonedeb@gandwana.canonical.com>
+Message-Id: <153598802601.31864.17864561380317686954.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 588693] Re: CD-ROM devices always return a one
+ session, one track TOC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +37,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On Mon, Sep 03, 2018 at 05:08:46PM +0200, Thomas Huth wrote:
-> This is very convenient for people who store their QEMU git trees on
-> gitlab.com: Automatic CI pipelines are now run for each branch that is
-> pushed to the server. Since the runtime of the jobs is limited to 1h
-> we distribute the targets into multiple pipelines - this way the jobs
-> finish within 30 minutes.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  In case somebody is interested, the result looks e.g. like this on gitlab:
->  https://gitlab.com/huth/qemu/pipelines/29255979
-> 
->  .gitlab-ci.yml | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 48 insertions(+)
->  create mode 100644 .gitlab-ci.yml
-> 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> new file mode 100644
-> index 0000000..18a77bc
-> --- /dev/null
-> +++ b/.gitlab-ci.yml
-> @@ -0,0 +1,48 @@
-> +before_script:
-> + - apt-get update -qq
-> + - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev
-> +
-> +build-system1:
-> + script:
-> + - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard-dev
-> +      libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev
-> + - ./configure --enable-werror --target-list="aarch64-softmmu alpha-softmmu
-> +      cris-softmmu hppa-softmmu lm32-softmmu moxie-softmmu microblazeel-softmmu
-> +      microblaze-softmmu mips-softmmu mips64el-softmmu m68k-softmmu ppc-softmmu"
-> + - make -j2
-> + - make -j2 check
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
 
-Hmm, we already have a problem with the travis CI bulds that we're stuck
-on outdated Ubuntu.
 
-We also already have a set of dockerfiles in tests/docker/ for various
-build configs maintaniers are expected to use.
+** Changed in: qemu
+       Status: In Progress =3D> Incomplete
 
-Both Travis and GitLab CI are capable of using docker images.
+** Changed in: qemu
+     Assignee: Natalia Portillo (claunia) =3D> (unassigned)
 
-What's blocking us in both Travis & GitLab cases is that we're not
-publishing the docker images for QEMU yet. If we can get that working,
-then all the CI can use pre-build docker images, saving the time
-for downloading the same DPKG files each time, as the docker images
-would be cached by the CI system IIUC.
+-- =
 
-The other reason I think it would be desirable is to get more consistency
-between the various build systems used in QEMU.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/588693
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Title:
+  CD-ROM devices always return a one session, one track TOC
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  CD-ROM devices always return a one session, one track TOC, no matter
+  if it is using ioctl's with the host or DMG images (both able of
+  having multi track, multi session discs).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/588693/+subscriptions
