@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fwhXJ-0006mJ-JM
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:36:30 -0400
+	(envelope-from <armbru@redhat.com>) id 1fwhcf-0001nn-1M
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fwhXF-0003iD-3w
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:36:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59348 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fwhca-0006jW-TU
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:42:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49042 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fwhXE-0003fy-UA
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:36:25 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fwhca-0006jI-Nh
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:41:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0ECC987A6F
-	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 05:36:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 448638011309
+	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 05:41:56 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-References: <20180903043149.4076-1-peterx@redhat.com>
-Date: Mon, 03 Sep 2018 07:36:18 +0200
-In-Reply-To: <20180903043149.4076-1-peterx@redhat.com> (Peter Xu's message of
-	"Mon, 3 Sep 2018 12:31:42 +0800")
-Message-ID: <87tvn7dtwt.fsf@dusky.pond.sub.org>
+References: <20180901211917.10372-1-marcandre.lureau@redhat.com>
+Date: Mon, 03 Sep 2018 07:41:52 +0200
+In-Reply-To: <20180901211917.10372-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Sat, 1 Sep 2018 23:19:17 +0200")
+Message-ID: <87h8j7dtnj.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 0/7] monitor: enable OOB by default
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests/check-qjson: fix a leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,99 +34,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Peter Xu <peterx@redhat.com> writes:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> (this series is based on Markus's monitor-next tree so if patchew
->  spits something out with "apply failure" then it's expected)
-
-Easy to avoid with suitable Based: tags in the cover letter:
-
-Based-on: <20180828191048.29806-1-armbru@redhat.com>
-Based-on: <20180901111716.1675-1-armbru@redhat.com>
-
-The first one gets you "[PULL 0/6] QAPI patches for 2018-08-28", which
-includes your PATCH 1+2.  The second one gets you "[PULL 0/6] Monitor
-patches for 2018-09-01", which is monitor-next.
-
-I pushed the result for reviewers' convenience:
-http://repo.or.cz/qemu/armbru.git/shortlog/refs/heads/peterx-oob
-
+> Spotted by ASAN:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D11893=3D=3DERROR: LeakSanitizer: detected memory leaks
 >
-> v7:
-> - use Markus's commit message for patch "qapi: Drop
->   qapi_event_send_FOO()'s Error ** argument" [Markus]
-> - update commit message for "qapi: remove COMMAND_DROPPED event" since
->   QEMU 3.0 is released [Eric/Dave]
-> - rebase to Markus's monitor-next tree:
->   http://repo.or.cz/qemu/armbru.git/shortlog/refs/heads/monitor-next
->   the patch "monitor: suspend monitor instead of send CMD_DROP"
->   re-written since people prefer to drop need_resume flag so now I
->   hand-made it.  Dropped a few patches since not appliable any more.
+> Direct leak of 1120 byte(s) in 28 object(s) allocated from:
+>     #0 0x7fd0515b0c48 in malloc (/lib64/libasan.so.5+0xeec48)
+>     #1 0x7fd050ffa3c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
+>     #2 0x559e708b56a4 in qstring_from_str /home/elmarco/src/qq/qobject/qs=
+tring.c:66
+>     #3 0x559e708b4fe0 in qstring_new /home/elmarco/src/qq/qobject/qstring=
+.c:23
+>     #4 0x559e708bda7d in parse_string /home/elmarco/src/qq/qobject/json-p=
+arser.c:143
+>     #5 0x559e708c1009 in parse_literal /home/elmarco/src/qq/qobject/json-=
+parser.c:484
+>     #6 0x559e708c1627 in parse_value /home/elmarco/src/qq/qobject/json-pa=
+rser.c:547
+>     #7 0x559e708c1c67 in json_parser_parse /home/elmarco/src/qq/qobject/j=
+son-parser.c:573
+>     #8 0x559e708bc0ff in json_message_process_token /home/elmarco/src/qq/=
+qobject/json-streamer.c:92
+>     #9 0x559e708d1655 in json_lexer_feed_char /home/elmarco/src/qq/qobjec=
+t/json-lexer.c:292
+>     #10 0x559e708d1fe1 in json_lexer_feed /home/elmarco/src/qq/qobject/js=
+on-lexer.c:339
+>     #11 0x559e708bc856 in json_message_parser_feed /home/elmarco/src/qq/q=
+object/json-streamer.c:121
+>     #12 0x559e708b8b4b in qobject_from_jsonv /home/elmarco/src/qq/qobject=
+/qjson.c:69
+>     #13 0x559e708b8d02 in qobject_from_json /home/elmarco/src/qq/qobject/=
+qjson.c:83
+>     #14 0x559e708a74ae in from_json_str /home/elmarco/src/qq/tests/check-=
+qjson.c:30
+>     #15 0x559e708a9f83 in utf8_string /home/elmarco/src/qq/tests/check-qj=
+son.c:781
+>     #16 0x7fd05101bc49 in test_case_run gtestutils.c:2255
+>     #17 0x7fd05101bc49 in g_test_run_suite_internal gtestutils.c:2339
 >
-> Please review.  Thanks,
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/check-qjson.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> Markus Armbruster (1):
->   qapi: Fix build_params() for empty parameter list
->
-> Peter Xu (6):
->   qapi: Drop qapi_event_send_FOO()'s Error ** argument
->   monitor: suspend monitor instead of send CMD_DROP
->   qapi: remove COMMAND_DROPPED event
->   monitor: remove "x-oob", turn oob on by default
->   Revert "tests: Add parameter to qtest_init_without_qmp_handshake"
->   tests: add oob functional test for test-qmp-cmds
->
->  block/block-backend.c        |  8 ++---
->  block/qcow2.c                |  2 +-
->  block/quorum.c               |  4 +--
->  block/write-threshold.c      |  3 +-
->  blockjob.c                   | 13 ++++----
->  cpus.c                       |  8 ++---
->  docs/devel/qapi-code-gen.txt |  6 ++--
->  docs/interop/qmp-spec.txt    |  5 ++--
->  dump.c                       |  3 +-
->  hw/acpi/core.c               |  2 +-
->  hw/acpi/cpu.c                |  2 +-
->  hw/acpi/memory_hotplug.c     |  5 ++--
->  hw/char/virtio-console.c     |  3 +-
->  hw/core/qdev.c               |  3 +-
->  hw/net/virtio-net.c          |  2 +-
->  hw/ppc/spapr_rtc.c           |  2 +-
->  hw/timer/mc146818rtc.c       |  2 +-
->  hw/virtio/virtio-balloon.c   |  3 +-
->  hw/watchdog/watchdog.c       | 15 +++++-----
->  include/monitor/monitor.h    |  1 -
->  include/qapi/qmp-event.h     |  3 +-
->  job.c                        |  2 +-
->  migration/migration.c        |  4 +--
->  migration/ram.c              |  2 +-
->  monitor.c                    | 58 ++++++++++++++----------------------
->  qapi/misc.json               | 40 -------------------------
->  scripts/qapi/common.py       | 10 +++----
->  scripts/qapi/events.py       | 23 ++++----------
->  scsi/pr-manager-helper.c     |  3 +-
->  tests/libqtest.c             | 10 +++----
->  tests/libqtest.h             |  4 +--
->  tests/qmp-test.c             |  6 ++--
->  tests/test-qmp-cmds.c        | 16 ++++++++++
->  tests/test-qmp-event.c       | 11 ++++---
->  ui/spice-core.c              | 10 +++----
->  ui/vnc.c                     |  7 ++---
->  vl.c                         | 21 +++++--------
->  37 files changed, 120 insertions(+), 202 deletions(-)
+> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+> index cc13f3d41e..d876a7a96e 100644
+> --- a/tests/check-qjson.c
+> +++ b/tests/check-qjson.c
+> @@ -780,6 +780,7 @@ static void utf8_string(void)
+>              if (!strstr(json_out, "\\uFFFD")) {
+>                  str =3D from_json_str(json_out, j, &error_abort);
+>                  g_assert_cmpstr(qstring_get_try_str(str), =3D=3D, utf8_i=
+n);
+> +                qobject_unref(str);
+>              }
+>          }
+>      }
 
-Diffstat looks friendlier without PATCH 1+2:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
- docs/interop/qmp-spec.txt |  5 +++--
- include/monitor/monitor.h |  1 -
- monitor.c                 | 55 ++++++++++++++++++-----------------------------
- qapi/misc.json            | 40 ----------------------------------
- tests/libqtest.c          | 10 ++++-----
- tests/libqtest.h          |  4 +---
- tests/qmp-test.c          |  6 +++---
- tests/test-qmp-cmds.c     | 16 ++++++++++++++
- vl.c                      |  5 -----
- 9 files changed, 48 insertions(+), 94 deletions(-)
+Queued, thanks!
