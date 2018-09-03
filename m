@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fwq2j-0002hT-VV
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:41:30 -0400
+	(envelope-from <peter@lekensteyn.nl>) id 1fwqFg-0004Od-1Y
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:54:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fwq2f-0002kf-Da
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:41:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59918 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fwq2e-0002kQ-Ol
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:41:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 85ADD402243B
-	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 14:41:23 +0000 (UTC)
-Date: Mon, 3 Sep 2018 15:41:16 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180903144116.GH14377@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180903043149.4076-1-peterx@redhat.com>
-	<20180903043149.4076-5-peterx@redhat.com>
-	<87a7oz9g1y.fsf@dusky.pond.sub.org> <20180903101606.GB14774@xz-x1>
-	<87k1o2671t.fsf@dusky.pond.sub.org>
-	<55829207-b0f7-0869-6ec7-90bc2fb67e3a@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <55829207-b0f7-0869-6ec7-90bc2fb67e3a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 4/7] qapi: remove COMMAND_DROPPED event
+	(envelope-from <peter@lekensteyn.nl>) id 1fwqFe-0002ZS-Op
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:54:51 -0400
+Received: from mail.lekensteyn.nl ([2a02:2308::360:1:25]:56663)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter@lekensteyn.nl>) id 1fwqFe-0002W4-Dr
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:54:50 -0400
+From: Peter Wu <peter@lekensteyn.nl>
+Date: Mon,  3 Sep 2018 16:54:47 +0200
+Message-Id: <20180903145447.17142-1-peter@lekensteyn.nl>
+Subject: [Qemu-devel] [PATCH] qxl: support mono cursors with inverted colors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +21,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, Sep 03, 2018 at 09:30:52AM -0500, Eric Blake wrote:
-> On 09/03/2018 08:31 AM, Markus Armbruster wrote:
-> 
-> > Example:
-> > 
-> >      client sends in-band command #1
-> >      QEMU reads and queues
-> >      QEMU dequeues in-band command #1
-> >      in-band command #1 starts executing, but it's slooow
-> >      client sends in-band command #2
-> >      QEMU reads and queues
-> >      ...
-> >      client sends in-band command #8
-> >      QEMU reads, queues and suspends the monitor
-> >      client sends out-of-band command
-> > --> time passes...
-> >      in-band command #1 completes, QEMU sends reply
-> >      QEMU dequeues in-band command #2, resumes the monitor
-> >      in-band command #2 starts executing
-> >      QEMU reads and executes out-of-band command
-> >      out-of-band command completes, QEMU sends reply
-> >      in-band command #2 completes, QEMU sends reply
-> >      ... same for remaining in-band commands ...
-> > 
-> > The out-of-band command gets stuck behind the in-band commands.
-> > 
-> > The client can avoid this by managing the flow of in-band commands: have
-> > no more than 7 in flight, so the monitor never gets suspended.
-> > 
-> > This is a potentially useful thing to do for clients, isn't it?
-> > 
-> > Eric, Daniel, is it something libvirt would do?
-> 
-> Right now, libvirt serializes commands - it never sends a QMP command until
-> the previous command's response has been processed. But that may not help
-> much, since libvirt does not send OOB commands.
+Monochrome cursors are still used by Windows guests with the
+QXL-WDDM-DOD driver. Such cursor types have one odd feature, inversion
+of colors. GDK does not seem to support it, so implement an alternative
+solution: fill the inverted pixels and add an outline to make the cursor
+more visible. Tested with the text cursor in Notepad and Windows 10.
 
-Note that is not merely due to the QMP monitor restriction either.
+cursor_set_mono is also used by the vmware GPU, so add a special check
+to avoid breaking its 32bpp format (tested with Kubuntu 14.04.4). I was
+unable to find a guest which supports the 1bpp format with a vmware GPU.
 
-Libvirt serializes all its public APIs that can change state of a running
-domain.  It usually aims to allow read-only APIs to be run in parallel with
-APIs that change state.
+The old implementation was buggy and removed in v2.10.0-108-g79c5a10cdd
+("qxl: drop mono cursor support"), this version improves upon that by
+adding bounds validation, clarifying the semantics of the two masks and
+adds a workaround for inverted colors support.
 
-The exception to the rule right now are some of the migration APIs which
-we allow to be invoked to manage the migration process. 
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1611984
+Signed-off-by: Peter Wu <peter@lekensteyn.nl>
+---
+ hw/display/qxl-render.c | 16 ++++++++++++++++
+ ui/cursor.c             | 42 +++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 56 insertions(+), 2 deletions(-)
 
-> I guess when we are designing what libvirt should do, and deciding WHEN it
-> should send OOB commands, we have the luxury of designing libvirt to enforce
-> how many in-flight in-band commands it will ever have pending at once
-> (whether the current 'at most 1', or even if we make it more parallel to 'at
-> most 7'), so that we can still be ensured that the OOB command will be
-> processed without being stuck in the queue of suspended in-band commands.
-> If we never send more than one in-band at a time, then it's not a concern
-> how deep the qemu queue is; but if we do want libvirt to start parallel
-> in-band commands, then you are right that having a way to learn the qemu
-> queue depth is programmatically more precise than just guessing the maximum
-> depth.  But it's also hard to argue we need that complexity if we don't have
-> an immediate use envisioned for it.
-
-In terms of what libvirt would want to parallelize, I think it is reasonable
-to consider any of the query-XXXX commands desirable. Other stuff is likely
-to remain serialized from libvirt's side.
-
-Regards,
-Daniel
+diff --git a/hw/display/qxl-render.c b/hw/display/qxl-render.c
+index c62b9a5e75..b82501ea9a 100644
+--- a/hw/display/qxl-render.c
++++ b/hw/display/qxl-render.c
+@@ -234,12 +234,28 @@ static QEMUCursor *qxl_cursor(PCIQXLDevice *qxl, QXLCursor *cursor,
+                               uint32_t group_id)
+ {
+     QEMUCursor *c;
++    uint8_t *and_mask, *xor_mask;
+     size_t size;
+ 
+     c = cursor_alloc(cursor->header.width, cursor->header.height);
+     c->hot_x = cursor->header.hot_spot_x;
+     c->hot_y = cursor->header.hot_spot_y;
+     switch (cursor->header.type) {
++    case SPICE_CURSOR_TYPE_MONO:
++        /* Assume that the full cursor is available in a single chunk. */
++        size = 2 * cursor_get_mono_bpl(c) * c->height;
++        if (size != cursor->data_size) {
++            fprintf(stderr, "%s: bad monochrome cursor %ux%u with size %u\n",
++                    __func__, c->width, c->height, cursor->data_size);
++            goto fail;
++        }
++        and_mask = cursor->chunk.data;
++        xor_mask = and_mask + cursor_get_mono_bpl(c) * c->height;
++        cursor_set_mono(c, 0xffffff, 0x000000, xor_mask, 1, and_mask);
++        if (qxl->debug > 2) {
++            cursor_print_ascii_art(c, "qxl/mono");
++        }
++        break;
+     case SPICE_CURSOR_TYPE_ALPHA:
+         size = sizeof(uint32_t) * cursor->header.width * cursor->header.height;
+         qxl_unpack_chunks(c->data, size, qxl, &cursor->chunk, group_id);
+diff --git a/ui/cursor.c b/ui/cursor.c
+index f3da0cee79..836bfb847f 100644
+--- a/ui/cursor.c
++++ b/ui/cursor.c
+@@ -128,13 +128,25 @@ void cursor_set_mono(QEMUCursor *c,
+     uint32_t *data = c->data;
+     uint8_t bit;
+     int x,y,bpl;
+-
++    bool expand_bitmap_only = image == mask;
++    bool has_inverted_colors = false;
++    const uint32_t inverted = 0x80000000;
++
++    /*
++     * Converts a monochrome bitmap with XOR mask 'image' and AND mask 'mask':
++     * https://docs.microsoft.com/en-us/windows-hardware/drivers/display/drawing-monochrome-pointers
++     */
+     bpl = cursor_get_mono_bpl(c);
+     for (y = 0; y < c->height; y++) {
+         bit = 0x80;
+         for (x = 0; x < c->width; x++, data++) {
+             if (transparent && mask[x/8] & bit) {
+-                *data = 0x00000000;
++                if (!expand_bitmap_only && image[x/8] & bit) {
++                    *data = inverted;
++                    has_inverted_colors = true;
++                } else {
++                    *data = 0x00000000;
++                }
+             } else if (!transparent && !(mask[x/8] & bit)) {
+                 *data = 0x00000000;
+             } else if (image[x/8] & bit) {
+@@ -150,6 +162,32 @@ void cursor_set_mono(QEMUCursor *c,
+         mask  += bpl;
+         image += bpl;
+     }
++
++    /*
++     * If there are any pixels with inverted colors, create an outline (fill
++     * transparent neighbors with the background color) and use the foreground
++     * color as "inverted" color.
++     */
++    if (has_inverted_colors) {
++        data = c->data;
++        for (y = 0; y < c->height; y++) {
++            for (x = 0; x < c->width; x++, data++) {
++                if (*data == 0 /* transparent */ &&
++                        ((x > 0 && data[-1] == inverted) ||
++                         (x + 1 < c->width && data[1] == inverted) ||
++                         (y > 0 && data[-c->width] == inverted) ||
++                         (y + 1 < c->height && data[c->width] == inverted))) {
++                    *data = 0xff000000 | background;
++                }
++            }
++        }
++        data = c->data;
++        for (x = 0; x < c->width * c->height; x++, data++) {
++            if (*data == inverted) {
++                *data = 0xff000000 | foreground;
++            }
++        }
++    }
+ }
+ 
+ void cursor_get_mono_image(QEMUCursor *c, int foreground, uint8_t *image)
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.18.0
