@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fwkjH-0000cA-Sq
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:01:09 -0400
+	(envelope-from <peterx@redhat.com>) id 1fwkp0-0003Zl-RF
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fwkjB-0000ZM-Ps
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:01:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fwkjB-0000YQ-Bk
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:00:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fwkj9-00083v-MX
-	for <qemu-devel@nongnu.org>; Mon, 03 Sep 2018 09:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4F7D42E80D3
-	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 09:00:55 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1fwkox-0004Nt-Ll
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:06:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56068 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fwkox-0004NX-F2
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:06:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C8916DFDD
+	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 09:06:54 +0000 (UTC)
+Date: Mon, 3 Sep 2018 17:06:47 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180903090647.GA16551@xz-x1>
+References: <20180903043149.4076-1-peterx@redhat.com>
+	<20180903043149.4076-4-peterx@redhat.com>
+	<87pnxv9gkn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Sep 2018 08:46:11 -0000
-From: Artem Pisarenko <1790460@bugs.launchpad.net>
-Reply-To: Bug 1790460 <1790460@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153596437135.32162.9985112313849579617.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1790460] [NEW] -icount,
- sleep=off mode is broken (target slows down or hangs)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87pnxv9gkn.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v7 3/7] monitor: suspend monitor instead of
+ send CMD_DROP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,101 +35,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Public bug reported:
+On Mon, Sep 03, 2018 at 09:38:00AM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > When we received too many qmp commands, previously we'll send
+> > COMMAND_DROPPED events to monitors, then we'll drop the requests.  Now
+> > instead of dropping the command we stop reading from input when we
+> > notice the queue is getting full.  Note that here since we removed the
+> > need_resume flag we need to be _very_ careful on the suspend/resume
+> > paring on the conditions since unmatched condition checks will hang
+> > death the monitor.  Meanwhile, now we will need to read the queue length
+> > to decide whether we'll need to resume the monitor so we need to take
+> > the queue lock again even after popping from it.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> The subject's "send CMD_DROP" fails to highlight the important part:
+> we're no longer dropping commands.  Moreover, the commit message could
+> do a better job explaining the tradeoffs.  Here's my try:
+> 
+>     monitor: Suspend monitor instead dropping commands
+> 
+>     When a QMP client sends in-band commands more quickly that we can
+>     process them, we can either queue them without limit (QUEUE), drop
+>     commands when the queue is full (DROP), or suspend receiving commands
+>     when the queue is full (SUSPEND).  None of them is ideal:
+> 
+>     * QUEUE lets a misbehaving client make QEMU eat memory without bounds.
+>       Not such a hot idea.
+> 
+>     * With DROP, the client has to cope with dropped in-band commands.  To
+>       inform the client, we send a COMMAND_DROPPED event then.  The event is
+>       flawed by design in two ways: it's ambiguous (see commit d621cfe0a17),
+>       and it brings back the "eat memory without bounds" problem.
+> 
+>     * With SUSPEND, the client has to manage the flow of in-band commands to
+>       keep the monitor available for out-of-band commands.
+> 
+>     We currently DROP.  Switch to SUSPEND.
+> 
+>     Managing the flow of in-band commands to keep the monitor available for
+>     out-of-band commands isn't really hard: just count the number of
+>     "outstanding" in-band commands (commands sent minus replies received),
+>     and if it exceeds the limit, hold back additional ones until it drops
+>     below the limit again.
 
-QEMU running with options "-icount,sleep=3Doff -rtc clock=3Dvm" doesn't exe=
-cute emulation at maximum possible speed.
-Target virtual clock may run faster or slower than realtime clock by N time=
-s, where N value depends on various unrelated conditions (i.e. random from =
-the user point of view). The worst case is when target hangs (hopefully, ea=
-rly in booting stage).
-Example scenarios I've described here: http://lists.nongnu.org/archive/html=
-/qemu-discuss/2018-08/msg00102.html
+(Will the simplest QMP client just block at the write() system call
+ without notice?  Anyway, the SUSPEND is ideal enough to me... :)
 
-QEMU process just sleeps most of the time (polling, waiting some
-condition, etc.). I've tried to debug issue and came to 99% conclusion
-that there are racing somewhere in qemu internals.
+> 
+>     Note that we need to be careful pairing the suspend with a resume, or
+>     else the monitor will hang, possibly forever.
 
-The feature is broken since v2.6.0 release.
-Bad commit is 281b2201e4e18d5b9a26e1e8d81b62b5581a13be by Pavel Dovgalyuk, =
-03/10/2016 05:56 PM:
+Will take your version, thanks.
 
-  icount: remove obsolete warp call
-  =
+> 
+> 
+> > ---
+> >  monitor.c | 33 +++++++++++++++------------------
+> >  1 file changed, 15 insertions(+), 18 deletions(-)
+> >
+> > diff --git a/monitor.c b/monitor.c
+> > index 3b90c9eb5f..9e6cad2af6 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -89,6 +89,8 @@
+> >  #include "hw/s390x/storage-attributes.h"
+> >  #endif
+> >  
+> > +#define  QMP_REQ_QUEUE_LEN_MAX  (8)
+> > +
+> 
+> Let's drop the parenthesis.
 
-  qemu_clock_warp call in qemu_tcg_wait_io_event function is not needed
-  anymore, because it is called in every iteration of main_loop_wait.
-  =
+Ok.
 
-  Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> >  /*
+> >   * Supported types:
+> >   *
+> > @@ -4124,29 +4126,33 @@ static QMPRequest *monitor_qmp_requests_pop_any(void)
+> >  static void monitor_qmp_bh_dispatcher(void *data)
+> >  {
+> >      QMPRequest *req_obj = monitor_qmp_requests_pop_any();
+> > +    Monitor *mon;
+> >      QDict *rsp;
+> >      bool need_resume;
+> >  
+> >      if (!req_obj) {
+> >          return;
+> >      }
+> > -
+> 
+> Let's keep the blank line.
 
-  Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-  Message-Id: <20160310115603.4812.67559.stgit@PASHA-ISP>
-  Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Ok.
 
-I've reverted commit to all major releases and latest git master branch.
-Issue was fixed for all of them. My adaptation is trivial: just
-restoring removed function call before "qemu_cond_wait(...)" line.
+> 
+> > +    mon = req_obj->mon;
+> >      /*  qmp_oob_enabled() might change after "qmp_capabilities" */
+> > -    need_resume = !qmp_oob_enabled(req_obj->mon);
+> > +    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+> > +    need_resume = !qmp_oob_enabled(req_obj->mon) ||
+> > +        mon->qmp.qmp_requests->length == QMP_REQ_QUEUE_LEN_MAX - 1;
+> 
+> Note for later: this is the condition guarding monitor_resume().
+> 
+> Is this race-free?  We have two criticial sections, one in
+> monitor_qmp_requests_pop_any(), and one here.  What if two threads
+> interleave like this
+> 
+>     thread 1                            thread 2
+>     ------------------------------------------------------------------
+>     monitor_qmp_requests_pop_any()
+>         lock
+>         dequeue
+>         unlock
+>                                         monitor_qmp_requests_pop_any()
+>                                             lock
+>                                             dequeue
+>                                             unlock
+>                                         lock
+>                                         check queue length
+>                                         unlock
+>                                         if queue length demands it
+>                                              monitor_resume() 
+>     lock
+>     check queue length
+>     unlock
+>     if queue length demands it
+>         monitor_resume()
+> 
+> Looks racy to me: if we start with the queue full (and the monitor
+> suspended), both threads' check queue length see length
+> QMP_REQ_QUEUE_LEN_MAX - 2, and neither thread resumes the monitor.
+> Oops.
+> 
+> Simplest fix is probably moving the resume into
+> monitor_qmp_requests_pop_any()'s critical section.
 
-I'm sure following bugs are just particular cases of the issue:
-#1774677, #1653063 .
+But we only have one QMP dispatcher, right?  So IMHO we can't have two
+threads doing monitor_qmp_requests_pop_any() at the same time.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+But I fully agree that it'll be nicer to keep them together (e.g. in
+case we allow to dispatch two commands some day), but then if you see
+it'll be something like the old req_obj->need_resume flag, but we set
+it in monitor_qmp_requests_pop_any() instead.  If so, I really prefer
+we just keep that need_resume flag for per-monitor by dropping
+176160ce78 and keep my patch to move that flag into monitor struct
+(which I dropped after the rebase of this version).
 
--- =
+> 
+> > +    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+> >      if (req_obj->req) {
+> >          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?: "");
+> > -        monitor_qmp_dispatch(req_obj->mon, req_obj->req, req_obj->id);
+> > +        monitor_qmp_dispatch(mon, req_obj->req, req_obj->id);
+> >      } else {
+> >          assert(req_obj->err);
+> >          rsp = qmp_error_response(req_obj->err);
+> >          req_obj->err = NULL;
+> > -        monitor_qmp_respond(req_obj->mon, rsp, NULL);
+> > +        monitor_qmp_respond(mon, rsp, NULL);
+> >          qobject_unref(rsp);
+> >      }
+> >  
+> >      if (need_resume) {
+> >          /* Pairs with the monitor_suspend() in handle_qmp_command() */
+> > -        monitor_resume(req_obj->mon);
+> > +        monitor_resume(mon);
+> >      }
+> >      qmp_request_free(req_obj);
+> 
+> The replacement of req_obj->mon by mon makes this change less clear than
+> it could be.  Let's figure out the possible race, and then we'll see
+> whether we'll still want this replacement.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1790460
+Sure.
 
-Title:
-  -icount,sleep=3Doff mode is broken (target slows down or hangs)
+> 
+> >  
+> > @@ -4154,8 +4160,6 @@ static void monitor_qmp_bh_dispatcher(void *data)
+> >      qemu_bh_schedule(qmp_dispatcher_bh);
+> >  }
+> >  
+> > -#define  QMP_REQ_QUEUE_LEN_MAX  (8)
+> > -
+> >  static void handle_qmp_command(void *opaque, QObject *req, Error *err)
+> >  {
+> >      Monitor *mon = opaque;
+> > @@ -4205,19 +4209,12 @@ static void handle_qmp_command(void *opaque, QObject *req, Error *err)
+>        /*
+>         * If OOB is not enabled on the current monitor, we'll emulate the
+>         * old behavior that we won't process the current monitor any more
+>         * until it has responded.  This helps make sure that as long as
+>         * OOB is not enabled, the server will never drop any command.
+>         */
+> 
+> This comment is now stale, we don't drop commands anymore.
 
-Status in QEMU:
-  New
+AFAIU it's describing [1] below but nothing related to COMMAND_DROP?
 
-Bug description:
-  QEMU running with options "-icount,sleep=3Doff -rtc clock=3Dvm" doesn't e=
-xecute emulation at maximum possible speed.
-  Target virtual clock may run faster or slower than realtime clock by N ti=
-mes, where N value depends on various unrelated conditions (i.e. random fro=
-m the user point of view). The worst case is when target hangs (hopefully, =
-early in booting stage).
-  Example scenarios I've described here: http://lists.nongnu.org/archive/ht=
-ml/qemu-discuss/2018-08/msg00102.html
+> 
+> >      if (!qmp_oob_enabled(mon)) {
+> >          monitor_suspend(mon);
 
-  QEMU process just sleeps most of the time (polling, waiting some
-  condition, etc.). I've tried to debug issue and came to 99% conclusion
-  that there are racing somewhere in qemu internals.
+[1]
 
-  The feature is broken since v2.6.0 release.
-  Bad commit is 281b2201e4e18d5b9a26e1e8d81b62b5581a13be by Pavel Dovgalyuk=
-, 03/10/2016 05:56 PM:
+> >      } else {
+> > -        /* Drop the request if queue is full. */
+> > -        if (mon->qmp.qmp_requests->length >= QMP_REQ_QUEUE_LEN_MAX) {
+> > -            qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+> > +        if (mon->qmp.qmp_requests->length == QMP_REQ_QUEUE_LEN_MAX - 1) {
+> >              /*
+> > -             * FIXME @id's scope is just @mon, and broadcasting it is
+> > -             * wrong.  If another monitor's client has a command with
+> > -             * the same ID in flight, the event will incorrectly claim
+> > -             * that command was dropped.
+> > +             * If this is _exactly_ the last request that we can
+> > +             * queue, we suspend the monitor right now.
+> >               */
+> > -            qapi_event_send_command_dropped(id,
+> > -                                            COMMAND_DROP_REASON_QUEUE_FULL);
+> > -            qmp_request_free(req_obj);
+> > -            return;
+> > +            monitor_suspend(mon);
+> >          }
+> >      }
+> 
+> The conditional and its comments look unbalanced.  Moreover, the
+> condition is visually dissimilar to the one guarding the matching
+> monitor_resume().  What about:
+> 
+>        /*
+>         * Suspend the monitor when we can't queue more requests after
+>         * this one.  Dequeuing in monitor_qmp_bh_dispatcher() will resume
+>         * it.
+>         * Note that when OOB is disabled, we queue at most one command,
+>         * for backward compatibility.
+>         */
+>        if (!qmp_oob_enabled(mon) ||
+>            mon->qmp.qmp_requests->length == QMP_REQ_QUEUE_LEN_MAX - 1) {
+>            monitor_suspend(mon);
+>        }
+> 
+> You'll have to update the comment if you move the resume to
+> monitor_qmp_requests_pop_any().
+> 
+> Next:
+> 
+>        /*
+>         * Put the request to the end of queue so that requests will be
+>         * handled in time order.  Ownership for req_obj, req, id,
+>         * etc. will be delivered to the handler side.
+>         */
+> 
+> Suggest asserting mon->qmp.qmp_requests->length < QMP_REQ_QUEUE_LEN_MAX
+> here.
 
-    icount: remove obsolete warp call
-    =
+Sure I can do this.
 
-    qemu_clock_warp call in qemu_tcg_wait_io_event function is not needed
-    anymore, because it is called in every iteration of main_loop_wait.
-    =
+> 
+>        g_queue_push_tail(mon->qmp.qmp_requests, req_obj);
+>        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
 
-    Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Thanks,
 
-    Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-    Message-Id: <20160310115603.4812.67559.stgit@PASHA-ISP>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  I've reverted commit to all major releases and latest git master
-  branch. Issue was fixed for all of them. My adaptation is trivial:
-  just restoring removed function call before "qemu_cond_wait(...)"
-  line.
-
-  I'm sure following bugs are just particular cases of the issue:
-  #1774677, #1653063 .
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1790460/+subscriptions
+-- 
+Peter Xu
