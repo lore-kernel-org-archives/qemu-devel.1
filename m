@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fwgHY-0004wU-Fd
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:16:09 -0400
+	(envelope-from <peterx@redhat.com>) id 1fwgX4-00069h-3d
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:32:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fwgHT-0002pp-MR
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:16:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43654 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fwgX0-0000Bz-Qx
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:32:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57422 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fwgHT-0002pf-GC
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:16:03 -0400
-References: <20180830142708.14311-1-sameeh@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <521030a0-a6cd-2fc7-5264-62b493a010dd@redhat.com>
-Date: Mon, 3 Sep 2018 12:15:58 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180830142708.14311-1-sameeh@daynix.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/6] Virtio-net: Support RSS
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fwgX0-0000BL-Fc
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:32:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8784687A6F
+	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 04:32:03 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon,  3 Sep 2018 12:31:42 +0800
+Message-Id: <20180903043149.4076-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 0/7] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
+(this series is based on Markus's monitor-next tree so if patchew
+ spits something out with "apply failure" then it's expected)
 
+v7:
+- use Markus's commit message for patch "qapi: Drop
+  qapi_event_send_FOO()'s Error ** argument" [Markus]
+- update commit message for "qapi: remove COMMAND_DROPPED event" since
+  QEMU 3.0 is released [Eric/Dave]
+- rebase to Markus's monitor-next tree:
+  http://repo.or.cz/qemu/armbru.git/shortlog/refs/heads/monitor-next
+  the patch "monitor: suspend monitor instead of send CMD_DROP"
+  re-written since people prefer to drop need_resume flag so now I
+  hand-made it.  Dropped a few patches since not appliable any more.
 
-On 2018=E5=B9=B408=E6=9C=8830=E6=97=A5 22:27, Sameeh Jubran wrote:
-> From: Sameeh Jubran <sjubran@redhat.com>
->
-> This series implements the Steering Mode feature which was introduced o=
-n the
-> virtio-dev list a while ago, which can be found here:
-> * https://lists.oasis-open.org/archives/virtio-dev/201805/msg00024.html
->
-> The first three patches add some infrastructure support that is used in
-> the following three patches.
->
-> The ebpf filter doesn't fully work yet as I'm having an issue with the
-> verifier which needs to be fixed.
+Please review.  Thanks,
 
-What issues did you meet? You can attach a trace buffer and get verbose=20
-debug information from that. Btw, dpdk use cls bpf and we use socket filt=
-er.
+Markus Armbruster (1):
+  qapi: Fix build_params() for empty parameter list
 
->
-> The patches still need some love as not all of the cases have been hand=
-led
-> yet most of the functionality has been implemented.
+Peter Xu (6):
+  qapi: Drop qapi_event_send_FOO()'s Error ** argument
+  monitor: suspend monitor instead of send CMD_DROP
+  qapi: remove COMMAND_DROPPED event
+  monitor: remove "x-oob", turn oob on by default
+  Revert "tests: Add parameter to qtest_init_without_qmp_handshake"
+  tests: add oob functional test for test-qmp-cmds
 
-One question is how indirection table is implemented, I thought it=20
-should be a map but looks not. Please see comment on patch 6.
+ block/block-backend.c        |  8 ++---
+ block/qcow2.c                |  2 +-
+ block/quorum.c               |  4 +--
+ block/write-threshold.c      |  3 +-
+ blockjob.c                   | 13 ++++----
+ cpus.c                       |  8 ++---
+ docs/devel/qapi-code-gen.txt |  6 ++--
+ docs/interop/qmp-spec.txt    |  5 ++--
+ dump.c                       |  3 +-
+ hw/acpi/core.c               |  2 +-
+ hw/acpi/cpu.c                |  2 +-
+ hw/acpi/memory_hotplug.c     |  5 ++--
+ hw/char/virtio-console.c     |  3 +-
+ hw/core/qdev.c               |  3 +-
+ hw/net/virtio-net.c          |  2 +-
+ hw/ppc/spapr_rtc.c           |  2 +-
+ hw/timer/mc146818rtc.c       |  2 +-
+ hw/virtio/virtio-balloon.c   |  3 +-
+ hw/watchdog/watchdog.c       | 15 +++++-----
+ include/monitor/monitor.h    |  1 -
+ include/qapi/qmp-event.h     |  3 +-
+ job.c                        |  2 +-
+ migration/migration.c        |  4 +--
+ migration/ram.c              |  2 +-
+ monitor.c                    | 58 ++++++++++++++----------------------
+ qapi/misc.json               | 40 -------------------------
+ scripts/qapi/common.py       | 10 +++----
+ scripts/qapi/events.py       | 23 ++++----------
+ scsi/pr-manager-helper.c     |  3 +-
+ tests/libqtest.c             | 10 +++----
+ tests/libqtest.h             |  4 +--
+ tests/qmp-test.c             |  6 ++--
+ tests/test-qmp-cmds.c        | 16 ++++++++++
+ tests/test-qmp-event.c       | 11 ++++---
+ ui/spice-core.c              | 10 +++----
+ ui/vnc.c                     |  7 ++---
+ vl.c                         | 21 +++++--------
+ 37 files changed, 120 insertions(+), 202 deletions(-)
 
-Thanks
-
->
-> Please share your thoughts and comments so I'll move forward with
-> sending v1 along with a fully functioning ebpf code.
->
-> Sameeh Jubran (6):
->    Add bpf support to qemu
->    tap: Add support for bpf ioctls
->    vhost-net: Expose vhost_net_get_fd
->    virtio-net: implement steering mode feature
->    virtio-net: steering mode: Implement rss support
->    virtio-net: rss: Add bpf filter
->
->   MAINTAINERS                                 |    5 +
->   configure                                   |   44 +
->   hw/net/rss_bpf_insns.h                      | 3992 ++++++++++++++++++=
-+++++++++
->   hw/net/rss_tap_bpf.h                        |   37 +
->   hw/net/rss_tap_bpf_program.c                |  172 ++
->   hw/net/vhost_net.c                          |    2 +-
->   hw/net/virtio-net.c                         |  250 +-
->   include/hw/virtio/virtio-net.h              |    5 +
->   include/net/net.h                           |    3 +-
->   include/standard-headers/linux/virtio_net.h |   55 +
->   net/tap-bsd.c                               |    5 +
->   net/tap-linux.c                             |   29 +-
->   net/tap-linux.h                             |    3 +-
->   net/tap-solaris.c                           |    5 +
->   net/tap-stub.c                              |    5 +
->   net/tap.c                                   |    8 +
->   net/tap_int.h                               |    1 +
->   qapi/net.json                               |   11 +
->   scripts/update-linux-headers.sh             |    8 +-
->   19 files changed, 4627 insertions(+), 13 deletions(-)
->   create mode 100644 hw/net/rss_bpf_insns.h
->   create mode 100644 hw/net/rss_tap_bpf.h
->   create mode 100644 hw/net/rss_tap_bpf_program.c
->
+-- 
+2.17.1
