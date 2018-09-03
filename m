@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fwoxb-0007bn-LF
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 09:32:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fwp5Q-00054G-Fg
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 09:40:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fwoxY-0004dL-Gc
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 09:32:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33236 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fwp5N-0007qK-AN
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 09:40:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60570 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fwoxY-0004cy-AA
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 09:32:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EB1808010FDF
-	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 13:32:03 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180903043149.4076-1-peterx@redhat.com>
-	<20180903043149.4076-5-peterx@redhat.com>
-	<87a7oz9g1y.fsf@dusky.pond.sub.org> <20180903101606.GB14774@xz-x1>
-Date: Mon, 03 Sep 2018 15:31:58 +0200
-In-Reply-To: <20180903101606.GB14774@xz-x1> (Peter Xu's message of "Mon, 3 Sep
-	2018 18:16:06 +0800")
-Message-ID: <87k1o2671t.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fwp5N-0007q6-4l
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 09:40:09 -0400
+Date: Mon, 3 Sep 2018 15:40:00 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180903154000.5efe1e57@redhat.com>
+In-Reply-To: <20180829153624.12299-5-david@redhat.com>
+References: <20180829153624.12299-1-david@redhat.com>
+	<20180829153624.12299-5-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 4/7] qapi: remove COMMAND_DROPPED event
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 04/20] memory-device:
+ get_region_size()/get_plugged_size() might fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,102 +28,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>
 
-Cc: Eric & Daniel for the libvirt point of view.
+On Wed, 29 Aug 2018 17:36:08 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Peter Xu <peterx@redhat.com> writes:
+> Let's properly forward the error, so errors from get_region_size() /
+> get_plugged_size(), can be handled.
+> 
+> Users right now call both functions after the device has been realized,
+> which is guaranteed to no fail (we'll document this behavior in a
+> follow-up patch).
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/mem/memory-device.c         | 6 +++---
+>  hw/mem/pc-dimm.c               | 5 +++--
+>  include/hw/mem/memory-device.h | 4 ++--
+>  3 files changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index 0d9892b715..d87599c280 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -60,7 +60,7 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
+>          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+>  
+>          if (dev->realized) {
+> -            *size += mdc->get_region_size(md);
+> +            *size += mdc->get_region_size(md, &error_abort);
+>          }
+>      }
+>  
+> @@ -167,7 +167,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+>          uint64_t md_size, md_addr;
+>  
+>          md_addr = mdc->get_addr(md);
+> -        md_size = mdc->get_region_size(md);
+> +        md_size = mdc->get_region_size(md, &error_abort);
+s/error_abort/errp/, so it won't crash on hotplug?
 
-> On Mon, Sep 03, 2018 at 09:49:13AM +0200, Markus Armbruster wrote:
->> Peter Xu <peterx@redhat.com> writes:
->> 
->> > Now it was not used any more, drop it.  We can still do that since
->> > out-of-band is still experimental, and this event is only used when
->> > out-of-band is enabled.
->> >
->> > Signed-off-by: Peter Xu <peterx@redhat.com>
->> > ---
->> >  docs/interop/qmp-spec.txt |  5 +++--
->> >  qapi/misc.json            | 40 ---------------------------------------
->> >  2 files changed, 3 insertions(+), 42 deletions(-)
->> >
->> > diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
->> > index 8f7da0245d..67e44a8120 100644
->> > --- a/docs/interop/qmp-spec.txt
->> > +++ b/docs/interop/qmp-spec.txt
->> > @@ -130,8 +130,9 @@ to pass "id" with out-of-band commands.  Passing it with all commands
->> >  is recommended for clients that accept capability "oob".
->> >  
->> >  If the client sends in-band commands faster than the server can
->> > -execute them, the server will eventually drop commands to limit the
->> > -queue length.  The sever sends event COMMAND_DROPPED then.
->> > +execute them, the server will stop reading the requests from the QMP
->> > +channel until the request queue length is reduced to an acceptable
->> > +range.
->> 
->> The change described by this documentation update is in the previous
->> commit.  This commit merely cleans up unused code.  Instead of moving
->> the doc update to the previous commit, we can simply squash the two
->> commits.
->
-> Sure, I'll squash.
->
->> 
->> Let's add a hint on managing flow of in-band commands to keep the
->> monitor available for out-of-band commands.  Here's my try:
->> 
->>     If the client sends in-band commands faster than the server can
->>     execute them, the server will stop reading the requests from the QMP
->>     channel until its request queue length falls below the limit.  To
->>     keep the monitor available for out-of-band commands, the client has
->>     to manage the flow of in-band commands.
->> 
->> Of course, anyone trying to put this hint to use will need to know the
->> actual request queue limit.  Options:
->> 
->> * Make it ABI by documenting it here
->> 
->> * Let the client configure it with a suitable command
->> 
->> * Let the introspect it with a suitable command
->
-> I'm not sure whether we should expose this information to the client,
-> considering that the client can after all detect that "full" by
-> monitoring the status of its output buffer used (e.g., poll with
-> POLLOUT) and assuming that should be enough for a client.  Or did I
-> miss anything that you were trying to emphasize but I didn't notice
-> (since after all you mentioned this too in the other thread)?
+>          if (*errp) {
+>              goto out;
+is this ever reachable?
 
-By the time the client gets "write would block", OOB has already become
-unavailable, and will remain so until the logjam clears sufficiently.
-
-Example:
-
-    client sends in-band command #1
-    QEMU reads and queues
-    QEMU dequeues in-band command #1
-    in-band command #1 starts executing, but it's slooow
-    client sends in-band command #2
-    QEMU reads and queues
-    ...
-    client sends in-band command #8
-    QEMU reads, queues and suspends the monitor
-    client sends out-of-band command
---> time passes...
-    in-band command #1 completes, QEMU sends reply
-    QEMU dequeues in-band command #2, resumes the monitor
-    in-band command #2 starts executing
-    QEMU reads and executes out-of-band command
-    out-of-band command completes, QEMU sends reply
-    in-band command #2 completes, QEMU sends reply
-    ... same for remaining in-band commands ...
-
-The out-of-band command gets stuck behind the in-band commands.
-
-The client can avoid this by managing the flow of in-band commands: have
-no more than 7 in flight, so the monitor never gets suspended.
-
-This is a potentially useful thing to do for clients, isn't it?
-
-Eric, Daniel, is it something libvirt would do?
+>          }
+> @@ -233,7 +233,7 @@ static int memory_device_plugged_size(Object *obj, void *opaque)
+>          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+>  
+>          if (dev->realized) {
+> -            *size += mdc->get_plugged_size(md);
+> +            *size += mdc->get_plugged_size(md, &error_abort);
+>          }
+>      }
+>  
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index fb6bcaedc4..4bf1a0acc9 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -236,14 +236,15 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+>      return dimm->addr;
+>  }
+>  
+> -static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
+> +static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
+> +                                           Error **errp)
+>  {
+>      /* dropping const here is fine as we don't touch the memory region */
+>      PCDIMMDevice *dimm = PC_DIMM(md);
+>      const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
+>      MemoryRegion *mr;
+>  
+> -    mr = ddc->get_memory_region(dimm, &error_abort);
+> +    mr = ddc->get_memory_region(dimm, errp);
+>      if (!mr) {
+>          return 0;
+>      }
+> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+> index 2853b084b5..f02b229837 100644
+> --- a/include/hw/mem/memory-device.h
+> +++ b/include/hw/mem/memory-device.h
+> @@ -33,8 +33,8 @@ typedef struct MemoryDeviceClass {
+>      InterfaceClass parent_class;
+>  
+>      uint64_t (*get_addr)(const MemoryDeviceState *md);
+> -    uint64_t (*get_plugged_size)(const MemoryDeviceState *md);
+> -    uint64_t (*get_region_size)(const MemoryDeviceState *md);
+> +    uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
+> +    uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
+>      void (*fill_device_info)(const MemoryDeviceState *md,
+>                               MemoryDeviceInfo *info);
+>  } MemoryDeviceClass;
