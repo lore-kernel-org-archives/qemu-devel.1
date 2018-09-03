@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fwpwh-0004G7-T8
+	(envelope-from <berto@igalia.com>) id 1fwpwh-0004Fz-RO
 	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fwpwc-0000Yk-Lb
+	(envelope-from <berto@igalia.com>) id 1fwpwc-0000YQ-Lp
 	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:35:15 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Mon,  3 Sep 2018 17:33:59 +0300
-Message-Id: <05aaab351ddfc7b75545bc7eaa1fc0f5e83f5673.1535983918.git.berto@igalia.com>
+Date: Mon,  3 Sep 2018 17:34:08 +0300
+Message-Id: <a63ee5b8ab13edb6e339c245a5963a63a044f4ae.1535983918.git.berto@igalia.com>
 In-Reply-To: <cover.1535983918.git.berto@igalia.com>
 References: <cover.1535983918.git.berto@igalia.com>
 In-Reply-To: <cover.1535983918.git.berto@igalia.com>
 References: <cover.1535983918.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 01/10] qemu-io: Fix writethrough check in
- reopen
+Subject: [Qemu-devel] [PATCH v2 10/10] block: Allow changing 'force-share'
+ on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +25,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-"qemu-io reopen" doesn't allow changing the writethrough setting of
-the cache, but the check is wrong, causing an error even on a simple
-reopen with the default parameters:
+'force-share' is one of the basic BlockdevOptions available for all
+drivers, but it's not handled by bdrv_reopen_prepare() so any attempt
+to change it results in a "Cannot change the option" error:
 
-   $ qemu-img create -f qcow2 hd.qcow2 1M
-   $ qemu-system-x86_64 -monitor stdio -drive if=virtio,file=hd.qcow2
-   (qemu) qemu-io virtio0 reopen
-   Cannot change cache.writeback: Device attached
+   (qemu) qemu-io virtio0 "reopen -o force-share=on"
+   Cannot change the option 'force-share'
+
+Since there's no reason why we shouldn't allow changing it and the
+implementation is simple let's just do it.
+
+It's worth noting that after this patch the above reopen call will
+still return an error -although a different one- if the image is not
+read-only:
+
+   (qemu) qemu-io virtio0 "reopen -o force-share=on"
+   force-share=on can only be used with read-only images
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
 ---
- qemu-io-cmds.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block.c               | 30 ++++++++++++++++++++++++------
+ include/block/block.h |  1 +
+ 2 files changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 5bf5f28178..db0b3ee5ef 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2025,7 +2025,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
+diff --git a/block.c b/block.c
+index 3865ef8517..7ee29ec9eb 100644
+--- a/block.c
++++ b/block.c
+@@ -788,6 +788,18 @@ static BlockdevDetectZeroesOptions bdrv_parse_detect_zeroes(QemuOpts *opts,
+     return detect_zeroes;
+ }
+ 
++static bool bdrv_parse_force_share(QemuOpts *opts, int flags, Error **errp)
++{
++    bool value = qemu_opt_get_bool_del(opts, BDRV_OPT_FORCE_SHARE, false);
++
++    if (value && (flags & BDRV_O_RDWR)) {
++        error_setg(errp, BDRV_OPT_FORCE_SHARE
++                   "=on can only be used with read-only images");
++    }
++
++    return value;
++}
++
+ /**
+  * Set open flags for a given discard mode
+  *
+@@ -1373,12 +1385,9 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     drv = bdrv_find_format(driver_name);
+     assert(drv != NULL);
+ 
+-    bs->force_share = qemu_opt_get_bool(opts, BDRV_OPT_FORCE_SHARE, false);
+-
+-    if (bs->force_share && (bs->open_flags & BDRV_O_RDWR)) {
+-        error_setg(errp,
+-                   BDRV_OPT_FORCE_SHARE
+-                   "=on can only be used with read-only images");
++    bs->force_share = bdrv_parse_force_share(opts, bs->open_flags, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
+         ret = -EINVAL;
+         goto fail_opts;
+     }
+@@ -3201,6 +3210,14 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+         goto error;
      }
  
--    if (writethrough != blk_enable_write_cache(blk) &&
-+    if (!writethrough != blk_enable_write_cache(blk) &&
-         blk_get_attached_dev(blk))
-     {
-         error_report("Cannot change cache.writeback: Device attached");
++    reopen_state->force_share =
++        bdrv_parse_force_share(opts, reopen_state->flags, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto error;
++    }
++
+     /* All other options (including node-name and driver) must be unchanged.
+      * Put them back into the QDict, so that they are checked at the end
+      * of this function. */
+@@ -3351,6 +3368,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+     bs->open_flags         = reopen_state->flags;
+     bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
+     bs->detect_zeroes      = reopen_state->detect_zeroes;
++    bs->force_share        = reopen_state->force_share;
+ 
+     /* Remove child references from bs->options and bs->explicit_options.
+      * Child options were already removed in bdrv_reopen_queue_child() */
+diff --git a/include/block/block.h b/include/block/block.h
+index f71fa5a1c4..a49a027c54 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -185,6 +185,7 @@ typedef struct BDRVReopenState {
+     BlockDriverState *bs;
+     int flags;
+     BlockdevDetectZeroesOptions detect_zeroes;
++    bool force_share;
+     uint64_t perm, shared_perm;
+     QDict *options;
+     QDict *explicit_options;
 -- 
 2.11.0
