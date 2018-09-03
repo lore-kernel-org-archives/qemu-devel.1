@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fwnhL-00038J-C4
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:11:16 -0400
+	(envelope-from <drjones@redhat.com>) id 1fwnkC-00065n-Go
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:14:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fwnhH-0000HZ-CW
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:11:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43788 helo=mx1.redhat.com)
+	(envelope-from <drjones@redhat.com>) id 1fwnk7-0001xw-FS
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:14:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45166 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fwnhH-0000HF-7I
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:11:11 -0400
-Date: Mon, 3 Sep 2018 13:11:07 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180903121107.GC14377@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180830142708.14311-1-sameeh@daynix.com>
-	<20180830142708.14311-7-sameeh@daynix.com>
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fwnk7-0001xW-1c
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:14:07 -0400
+Date: Mon, 3 Sep 2018 14:14:01 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180903121401.ncz2n7rlahh6xtat@kamzik.brq.redhat.com>
+References: <1535778675-32170-1-git-send-email-wei@redhat.com>
+	<1535778675-32170-2-git-send-email-wei@redhat.com>
+	<20180903110813.hbamu4zuda6qpwuw@kamzik.brq.redhat.com>
+	<87k1o23iua.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180830142708.14311-7-sameeh@daynix.com>
-Subject: Re: [Qemu-devel] [RFC 6/6] virtio-net: rss: Add bpf filter
+In-Reply-To: <87k1o23iua.fsf@trasno.org>
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] tests/migration: Convert x86 boot
+ block compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Wei Huang <wei@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, peter.maydell@linaro.org
 
-On Thu, Aug 30, 2018 at 05:27:08PM +0300, Sameeh Jubran wrote:
-> From: Sameeh Jubran <sjubran@redhat.com>
+On Mon, Sep 03, 2018 at 01:45:33PM +0200, Juan Quintela wrote:
+> Andrew Jones <drjones@redhat.com> wrote:
+> > On Sat, Sep 01, 2018 at 01:11:12AM -0400, Wei Huang wrote:
+> >> The x86 boot block header currently is generated with a shell script.
+> >> To better support other CPUs (e.g. aarch64), we convert the script
+> >> into Makefile. This allows us to 1) support cross-compilation easily,
+> >> and 2) avoid creating a script file for every architecture.
+> >> 
+> >> Note that, in the new design, the cross compiler prefix can be specified by
+> >> setting the CROSS_PREFIX in "make" command. Also to allow gcc pre-processor
+> >> to include the C-style file correctly, it also renames the
+> >> x86-a-b-bootblock.s file extension from .s to .S.
+> >> + * tests/migration/rebuild-x86-bootblock.sh to update,
+> >> + * and then remember to send both in your patch submission.
+> >> + */
+> >> +endef
+> >> +export __note
+> >> +
+> >> +.PHONY: all clean
+> >> +all: x86-a-b-bootblock.h
+> >> +
+> >> +x86-a-b-bootblock.h: x86.bootsect
+> >> +	echo "$$__note" > header.tmp
+> >> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
+> >> +	mv header.tmp $@
+> >
+> > The shell script this Makefile is replacing used mktemp
+> > for a randomly named tmp dir. Shouldn't we continue to
+> > use random names?
 > 
-> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-> ---
->  hw/net/rss_bpf_insns.h       | 3992 ++++++++++++++++++++++++++++++++++++++++++
->  hw/net/rss_tap_bpf.h         |   40 +
->  hw/net/rss_tap_bpf_program.c |  175 ++
->  hw/net/virtio-net.c          |   99 +-
->  4 files changed, 4305 insertions(+), 1 deletion(-)
->  create mode 100644 hw/net/rss_bpf_insns.h
->  create mode 100644 hw/net/rss_tap_bpf.h
->  create mode 100644 hw/net/rss_tap_bpf_program.c
+> We shouldn't be trying to create the file twice in parallel, no?
+
+Yeah, you're right. This should be safe.
+
 > 
+> >
+> >> +
+> >> +x86.bootsect: x86.boot
+> >> +	dd if=$< of=$@ bs=256 count=2 skip=124
+> >> +
+> >> +x86.boot: x86.o
+> >> +	$(CROSS_PREFIX)objcopy -O binary $< $@
+> >> +
+> >> +x86.o: x86-a-b-bootblock.S
+> >> +	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
+> >> +
+> >> +clean:
+> >> +	@rm -rf *.boot *.o *.bootsect
+> >
+> > We don't want to remove the generated header file when cleaning?
+> 
+> No, because we only generated the header file when running native, have
+> the right crosscompilers, etc.  In general we only recompile it when we
+> change the test file, otherwise we store the generated ones.
+> 
+> Idea is:
+> We have a c file that does what we want.
+> We compile it (when we have a propper compiler) and store it on the
+> tree.
+> We compile it for each test.
+> 
+> This is more "like firmware" than normal "qemu" source code.
+>
 
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 4a52a6a1d0..66b2140cc7 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -27,6 +27,10 @@
->  #include "hw/virtio/virtio-access.h"
->  #include "migration/misc.h"
->  #include "standard-headers/linux/ethtool.h"
-> +#include <sys/syscall.h>
-> +#include <linux/bpf.h>
+Right. I momentarily forget that when replying to this patch.
 
-This breaks the build on platforms without bpf.h - you checked for
-this in configure, but then never made use of the CONFIG_BPF conditional
-in the code.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks,
+drew
