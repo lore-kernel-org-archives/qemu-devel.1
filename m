@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fwpZn-00068Z-4t
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:11:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1fwpsb-0007zy-Lr
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fwpZm-0006gm-60
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:11:35 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180830015734.19765-1-jsnow@redhat.com>
-	<20180830015734.19765-3-jsnow@redhat.com>
-	<6ed2e7ac-8de1-bd7b-0787-fdd33c6b306e@redhat.com>
-	<87mut3ukyi.fsf@dusky.pond.sub.org>
-	<126a3e52-7706-d6dc-fb7a-bda8e11d9791@redhat.com>
-	<87sh2tirfk.fsf@dusky.pond.sub.org>
-	<20180903122232.GA14463@dhcp-200-186.str.redhat.com>
-Date: Mon, 03 Sep 2018 16:11:21 +0200
-In-Reply-To: <20180903122232.GA14463@dhcp-200-186.str.redhat.com> (Kevin
-	Wolf's message of "Mon, 3 Sep 2018 14:22:33 +0200")
-Message-ID: <87sh2q4qnq.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1fwpsY-0007Lz-E1
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:31:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59680 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fwpsY-0007Ix-7Y
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 10:30:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 58359402243B
+	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 14:30:57 +0000 (UTC)
+References: <20180903043149.4076-1-peterx@redhat.com>
+	<20180903043149.4076-5-peterx@redhat.com>
+	<87a7oz9g1y.fsf@dusky.pond.sub.org>
+	<20180903101606.GB14774@xz-x1> <87k1o2671t.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <55829207-b0f7-0869-6ec7-90bc2fb67e3a@redhat.com>
+Date: Mon, 3 Sep 2018 09:30:52 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/9] jobs: canonize Error object
+In-Reply-To: <87k1o2671t.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 4/7] qapi: remove COMMAND_DROPPED event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On 09/03/2018 08:31 AM, Markus Armbruster wrote:
 
-> Am 01.09.2018 um 09:54 hat Markus Armbruster geschrieben:
->> John Snow <jsnow@redhat.com> writes:
->> 
->> > On 08/31/2018 02:08 AM, Markus Armbruster wrote:
->> >> Eric Blake <eblake@redhat.com> writes:
->> >> 
->> >>> On 08/29/2018 08:57 PM, John Snow wrote:
->> >>>> Jobs presently use both an Error object in the case of the create job,
->> >>>> and char strings in the case of generic errors elsewhere.
->> >>>>
->> >>>> Unify the two paths as just j->err, and remove the extra argument from
->> >>>> job_completed. The integer error code for job_completed is kept for now,
->> >>>> to be removed shortly in a separate patch.
->> >>>>
->> >>>> Signed-off-by: John Snow <jsnow@redhat.com>
->> >>>> ---
->> >>>
->> >>>> +++ b/job.c
->> >>>
->> >>>> @@ -666,8 +666,8 @@ static void job_update_rc(Job *job)
->> >>>>           job->ret = -ECANCELED;
->> >>>>       }
->> >>>>       if (job->ret) {
->> >>>> -        if (!job->error) {
->> >>>> -            job->error = g_strdup(strerror(-job->ret));
->> >>>> +        if (!job->err) {
->> >>>> +            error_setg(&job->err, "%s", g_strdup(strerror(-job->ret)));
->> >>>
->> >>> Memleak. Drop the g_strdup(), and just directly pass strerror()
->> >>> results to error_setg().  (I guess we can't quite use
->> >>> error_setg_errno() unless we add additional text beyond the strerror()
->> >>> results).
->> >> 
->> >> Adding such text might well be an improvement.  I'm not telling you to
->> >> do so (not having looked at the context myself), just to think about it.
->> >> 
->> >
->> > In this case, and I agree with Kevin who suggested it; we ought to be
->> > moving away from the retcode in general and using first-class error
->> > objects for all of our jobs anyway.
->> >
->> > In this case, the job has failed with a retcode and we wish to give the
->> > user some hope of understanding why, but at this point in the code all
->> > we know is what the strerror can tell us, so a generic prefix like "The
->> > job failed" is not helpful because it will already be clear by events
->> > and other things that the job failed.
->> >
->> > The only text I can think of that would be useful is: "The job failed
->> > and didn't give a more specific error message. Please email
->> > qemu-devel@nongnu.org and harass the authors until they fix it. Anyway,
->> > nice chatting to you, the generic error message is: %s"
->> 
->> That might well be an improvement ;)
->> 
->> Since I don't have a realistic example ready, I'm making up a contrieved
->> one:
->> 
->> --> {"execute": "job-frobnicate"}
->> <-- {"error": {"class": "GenericError", "desc": "Device or resource busy"}}
->> 
->> Would a reply
->> 
->> <-- {"error": {"class": "GenericError", "desc": "Job failed: Device or resource busy"}}
->> 
->> be better, worse, or a wash?
->> 
->> If it's a wash, maintainability breaks the tie.  So let's have a look at
->> the code.  It's either
->> 
->>             error_setg(&job->err, "%s", strerror(-job->ret));
->> 
->> or
->> 
->>             error_setg_errno(&job->err, -job->ret, "Job failed");
->> 
->> I'd prefer the latter, because it's the common way to put an errno code
->> into an Error object, and it lets me grep for the message more easily.
->
-> Basically, if I call "job-frobnicate", I don't want an error message to
-> tell me "job-frobnicate failed: foo". I already know that I called
-> "job-frobnicate", so the actually useful message is only "foo".
->
-> A prefix like "job-frobnicate failed" should be added when it's one of
-> multiple possible error sources. For example, if a higher level monitor
-> command internally involves job-frobnicate, but also three other
-> operations, this is the place where the prefix should be added to any
-> error message returned by job-frobnicate so that we can distinguish
-> which part of the operation failed.
+> Example:
+> 
+>      client sends in-band command #1
+>      QEMU reads and queues
+>      QEMU dequeues in-band command #1
+>      in-band command #1 starts executing, but it's slooow
+>      client sends in-band command #2
+>      QEMU reads and queues
+>      ...
+>      client sends in-band command #8
+>      QEMU reads, queues and suspends the monitor
+>      client sends out-of-band command
+> --> time passes...
+>      in-band command #1 completes, QEMU sends reply
+>      QEMU dequeues in-band command #2, resumes the monitor
+>      in-band command #2 starts executing
+>      QEMU reads and executes out-of-band command
+>      out-of-band command completes, QEMU sends reply
+>      in-band command #2 completes, QEMU sends reply
+>      ... same for remaining in-band commands ...
+> 
+> The out-of-band command gets stuck behind the in-band commands.
+> 
+> The client can avoid this by managing the flow of in-band commands: have
+> no more than 7 in flight, so the monitor never gets suspended.
+> 
+> This is a potentially useful thing to do for clients, isn't it?
+> 
+> Eric, Daniel, is it something libvirt would do?
 
-John's point is that the error message is bad no matter what.
+Right now, libvirt serializes commands - it never sends a QMP command 
+until the previous command's response has been processed. But that may 
+not help much, since libvirt does not send OOB commands.
 
-My point is that if it's bad no matter what, we can just as well emit it
-the usual way, with error_setg_errno(), rather than playing games with
-strerror().
+I guess when we are designing what libvirt should do, and deciding WHEN 
+it should send OOB commands, we have the luxury of designing libvirt to 
+enforce how many in-flight in-band commands it will ever have pending at 
+once (whether the current 'at most 1', or even if we make it more 
+parallel to 'at most 7'), so that we can still be ensured that the OOB 
+command will be processed without being stuck in the queue of suspended 
+in-band commands.  If we never send more than one in-band at a time, 
+then it's not a concern how deep the qemu queue is; but if we do want 
+libvirt to start parallel in-band commands, then you are right that 
+having a way to learn the qemu queue depth is programmatically more 
+precise than just guessing the maximum depth.  But it's also hard to 
+argue we need that complexity if we don't have an immediate use 
+envisioned for it.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
