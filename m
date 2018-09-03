@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fwlWu-0004Jv-Fo
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:52:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1fwla9-0006yf-MQ
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fwlWr-0006HQ-6T
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:52:20 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:34484)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fwlWq-0006HA-UA
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:52:17 -0400
-Received: by mail-ed1-x543.google.com with SMTP id u1-v6so341631eds.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Sep 2018 02:52:16 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1fwla8-0007ac-MX
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 05:55:41 -0400
+Date: Mon, 3 Sep 2018 10:55:28 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180903095528.GC3467@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180831145314.14736-1-marcandre.lureau@redhat.com>
+	<20180831145314.14736-2-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <521030a0-a6cd-2fc7-5264-62b493a010dd@redhat.com>
-References: <20180830142708.14311-1-sameeh@daynix.com>
-	<521030a0-a6cd-2fc7-5264-62b493a010dd@redhat.com>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Mon, 3 Sep 2018 12:52:15 +0300
-Message-ID: <CAKPgXcGxOPvDc8Cb5Rf+1sODUe_Dxmm1DrAxj1HZ64ocp_5new@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180831145314.14736-2-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/6] Virtio-net: Support RSS
+Subject: Re: [Qemu-devel] [PATCH 1/3] util: add qemu_write_pidfile()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Mon, Sep 3, 2018 at 7:15 AM, Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2018=E5=B9=B408=E6=9C=8830=E6=97=A5 22:27, Sameeh Jubran wrote:
->>
->> From: Sameeh Jubran <sjubran@redhat.com>
->>
->> This series implements the Steering Mode feature which was introduced on
->> the
->> virtio-dev list a while ago, which can be found here:
->> * https://lists.oasis-open.org/archives/virtio-dev/201805/msg00024.html
->>
->> The first three patches add some infrastructure support that is used in
->> the following three patches.
->>
->> The ebpf filter doesn't fully work yet as I'm having an issue with the
->> verifier which needs to be fixed.
->
->
-> What issues did you meet? You can attach a trace buffer and get verbose
-> debug information from that. Btw, dpdk use cls bpf and we use socket filt=
-er.
-I am using the buffer for debugging actually, I keep getting back edge
-from two consecutive instructions
-in the instruction array which I have no idea how to troubleshoot! The
-instructions are generated from the
-compiled code which compiles okay.
-This didn't happen to me earlier and I have actually succeeded in
-inserting the bpf instructions with no issues.
->
->>
->> The patches still need some love as not all of the cases have been handl=
-ed
->> yet most of the functionality has been implemented.
->
->
-> One question is how indirection table is implemented, I thought it should=
- be
-> a map but looks not. Please see comment on patch 6.
-No it is a hash table.
->
-> Thanks
->
->
->>
->> Please share your thoughts and comments so I'll move forward with
->> sending v1 along with a fully functioning ebpf code.
->>
->> Sameeh Jubran (6):
->>    Add bpf support to qemu
->>    tap: Add support for bpf ioctls
->>    vhost-net: Expose vhost_net_get_fd
->>    virtio-net: implement steering mode feature
->>    virtio-net: steering mode: Implement rss support
->>    virtio-net: rss: Add bpf filter
->>
->>   MAINTAINERS                                 |    5 +
->>   configure                                   |   44 +
->>   hw/net/rss_bpf_insns.h                      | 3992
->> +++++++++++++++++++++++++++
->>   hw/net/rss_tap_bpf.h                        |   37 +
->>   hw/net/rss_tap_bpf_program.c                |  172 ++
->>   hw/net/vhost_net.c                          |    2 +-
->>   hw/net/virtio-net.c                         |  250 +-
->>   include/hw/virtio/virtio-net.h              |    5 +
->>   include/net/net.h                           |    3 +-
->>   include/standard-headers/linux/virtio_net.h |   55 +
->>   net/tap-bsd.c                               |    5 +
->>   net/tap-linux.c                             |   29 +-
->>   net/tap-linux.h                             |    3 +-
->>   net/tap-solaris.c                           |    5 +
->>   net/tap-stub.c                              |    5 +
->>   net/tap.c                                   |    8 +
->>   net/tap_int.h                               |    1 +
->>   qapi/net.json                               |   11 +
->>   scripts/update-linux-headers.sh             |    8 +-
->>   19 files changed, 4627 insertions(+), 13 deletions(-)
->>   create mode 100644 hw/net/rss_bpf_insns.h
->>   create mode 100644 hw/net/rss_tap_bpf.h
->>   create mode 100644 hw/net/rss_tap_bpf_program.c
->>
->
+On Fri, Aug 31, 2018 at 04:53:12PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> There are variants of qemu_create_pidfile() in qemu-pr-helper and
+> qemu-ga. Let's have a common implementation in libqemuutil.
+>=20
+> The code is initially based from pr-helper write_pidfile(), with
+> various improvements and suggestions from Daniel Berrang=C3=A9:
+>=20
+>   QEMU will leave the pidfile existing on disk when it exits which
+>   initially made me think it avoids the deletion race. The app
+>   managing QEMU, however, may well delete the pidfile after it has
+>   seen QEMU exit, and even if the app locks the pidfile before
+>   deleting it, there is still a race.
+>=20
+>   eg consider the following sequence
+>=20
+>         QEMU 1        libvirtd        QEMU 2
+>=20
+>   1.    lock(pidfile)
+>=20
+>   2.    exit()
+>=20
+>   3.                 open(pidfile)
+>=20
+>   4.                 lock(pidfile)
+>=20
+>   5.                                  open(pidfile)
+>=20
+>   6.                 unlink(pidfile)
+>=20
+>   7.                 close(pidfile)
+>=20
+>   8.                                  lock(pidfile)
+>=20
+>   IOW, at step 8 the new QEMU has successfully acquired the lock, but
+>   the pidfile no longer exists on disk because it was deleted after
+>   the original QEMU exited.
+>=20
+>   While we could just say no external app should ever delete the
+>   pidfile, I don't think that is satisfactory as people don't read
+>   docs, and admins don't like stale pidfiles being left around on
+>   disk.
+>=20
+>   To make this robust, I think we might want to copy libvirt's
+>   approach to pidfile acquisition which runs in a loop and checks that
+>   the file on disk /after/ acquiring the lock matches the file that
+>   was locked. Then we could in fact safely let QEMU delete its own
+>   pidfiles on clean exit..
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/qemu/osdep.h  |  3 +-
+>  os-posix.c            | 24 ---------------
+>  os-win32.c            | 25 ----------------
+>  qga/main.c            | 54 +++++++---------------------------
+>  scsi/qemu-pr-helper.c | 40 ++++---------------------
+>  util/oslib-posix.c    | 68 +++++++++++++++++++++++++++++++++++++++++++
+>  util/oslib-win32.c    | 27 +++++++++++++++++
+>  vl.c                  |  4 +--
+>  8 files changed, 114 insertions(+), 131 deletions(-)
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
 
-
+Regards,
+Daniel
 --=20
-Respectfully,
-Sameeh Jubran
-Linkedin
-Software Engineer @ Daynix.
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
