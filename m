@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fwgan-0002cx-Qt
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:36:02 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fwgeC-0006VP-1w
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fwgak-0001uF-KV
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:36:01 -0400
-References: <20180815175704.105902-1-prasad.singamsetty@oracle.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b298b247-42f4-f096-e60a-cccfcfc9d1cd@redhat.com>
-Date: Mon, 3 Sep 2018 06:35:53 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180815175704.105902-1-prasad.singamsetty@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] kvm: add call to qemu_add_opts() for
- -overcommit option
+	(envelope-from <zhangckid@gmail.com>) id 1fwge8-00046D-Pw
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:39:32 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fwge8-00043h-0C
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:39:28 -0400
+Received: by mail-pl1-x641.google.com with SMTP id f1-v6so1286522plt.4
+	for <qemu-devel@nongnu.org>; Sun, 02 Sep 2018 21:39:25 -0700 (PDT)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Mon,  3 Sep 2018 12:38:41 +0800
+Message-Id: <20180903043900.28592-1-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V12 00/19] COLO: integrate colo frame with
+ block replication and COLO proxy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +24,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: prasad.singamsetty@oracle.com, qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-stable@nongnu.org
-Cc: konrad.wilk@oracle.com
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On 2018-08-15 19:57, prasad.singamsetty@oracle.com wrote:
-> From: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> 
-> qemu command fails to process -overcommit option. Add the missing
-> call to qemu_add_opts() in vl.c.
-> 
-> Signed-off-by: Prasad Singamsetty <prasad.singamsetty@oracle.com>
-> ---
->  vl.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/vl.c b/vl.c
-> index 16b913f9d5..12d27fa028 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2987,6 +2987,7 @@ int main(int argc, char **argv, char **envp)
->      qemu_add_opts(&qemu_object_opts);
->      qemu_add_opts(&qemu_tpmdev_opts);
->      qemu_add_opts(&qemu_realtime_opts);
-> +    qemu_add_opts(&qemu_overcommit_opts);
->      qemu_add_opts(&qemu_msg_opts);
->      qemu_add_opts(&qemu_name_opts);
->      qemu_add_opts(&qemu_numa_opts);
-> 
+Hi~ All~
 
-I think this should go into the stable release as well.
+COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
+filter-redirector,filter-rewriter) have been exist in qemu
+for long time, it's time to integrate these three parts to make COLO really works.
 
- Thomas
+In this series, we have some optimizations for COLO frame, including separating the
+process of saving ram and device state, using an COLO_EXIT event to notify users that
+VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
+but since this series have just rebased on upstream which had merged a new series of migration,
+parts of pathes in this series deserve review again.
+
+We use notifier/callback method for COLO compare to notify COLO frame about
+net packets inconsistent event, and add a handle_event method for NetFilterClass to
+help COLO frame to notify filters and colo-compare about checkpoint/failover event,
+it is flexible.
+
+For the neweset version, please refer to:
+https://github.com/zhangckid/qemu/tree/qemu-colo-18sep1
+
+Please review, thanks.
+
+V12:
+ - Rebased on upstream.
+ - Removed the patch 15/20 for feature work as Jason's comments.
+ - Fixed failover bugs in patch 16/19.
+ - Renamed the dummy_handle_event to default_handle_event in patch 15/19.
+ - Cleaned needless check job.
+
+V11:
+ - Rebased on upstream.
+ - Used "RAMBLOCK_FOREACH_MIGRATABLE()" to replace "QLIST_FOREACH_RCU()" in patch 08/20.
+ - Fixed COLO related qapi command's since version in patch 10/20.
+
+V10:
+ - Rebased on upstream.
+ - Removed the "active" in COLOState.
+ - Fixed some comments.
+
+V9:
+ - Rebased on upstream codes.
+ - Addressed Jason's comments add TCP state machine track in
+   filter-rewriter.
+ - Fix some bug in colo-compare.
+ - Fix typo.
+ - Add filter-rewriter failover handle.
+ - Add net client type check in colo-compare.
+ - Add COLO state diagram.
+ - Addressed Markus and Daive's comments.
+
+V8:
+ - Rebased on upstream codes.
+ - Addressed Markus's comments in patch 10/17.
+ - Addressed Markus's comments in patch 11/17.
+ - Removed some comments in patch 4/17.
+ - Moved the "migration_bitmap_clear_dirty()" to suitable position in
+   patch 9/17.
+ - Rewrote the patch 07/17 to address Davie's comments.
+ - Moved the "qemu_savevm_live_state" out of the
+   qemu_mutex_lock_iothread.
+ - Fixed the bug that in some status COLO vm crash with segmentation fault.
+
+V7:
+ - Addressed Markus's comments in 11/17.
+ - Rebased on upstream.
+
+V6:
+ - Addressed Eric Blake's comments, use the enum to feedback in patch 11/17.
+ - Fixed QAPI command separator problem in patch 11/17.
+
+
+Zhang Chen (15):
+  filter-rewriter: Add TCP state machine and fix memory leak in
+    connection_track_table
+  colo-compare: implement the process of checkpoint
+  colo-compare: use notifier to notify packets comparing result
+  COLO: integrate colo compare with colo frame
+  COLO: Add block replication into colo process
+  COLO: Remove colo_state migration struct
+  COLO: Load dirty pages into SVM's RAM cache firstly
+  ram/COLO: Record the dirty pages that SVM received
+  COLO: Flush memory data from ram cache
+  qapi/migration.json: Rename COLO unknown mode to none mode.
+  qapi: Add new command to query colo status
+  savevm: split the process of different stages for loadvm/savevm
+  filter: Add handle_event method for NetFilterClass
+  filter-rewriter: handle checkpoint and failover event
+  docs: Add COLO status diagram to COLO-FT.txt
+
+zhanghailiang (4):
+  qmp event: Add COLO_EXIT event to notify users while exited COLO
+  COLO: flush host dirty ram from cache
+  COLO: notify net filters about checkpoint/failover event
+  COLO: quick failover process by kick COLO thread
+
+ docs/COLO-FT.txt          |  34 ++++++
+ include/exec/ram_addr.h   |   1 +
+ include/migration/colo.h  |  11 +-
+ include/net/filter.h      |   5 +
+ migration/Makefile.objs   |   2 +-
+ migration/colo-comm.c     |  76 --------------
+ migration/colo-failover.c |   2 +-
+ migration/colo.c          | 212 ++++++++++++++++++++++++++++++++++++--
+ migration/migration.c     |  46 ++++++++-
+ migration/ram.c           | 166 ++++++++++++++++++++++++++++-
+ migration/ram.h           |   4 +
+ migration/savevm.c        |  53 ++++++++--
+ migration/savevm.h        |   5 +
+ migration/trace-events    |   3 +
+ net/colo-compare.c        | 115 +++++++++++++++++++--
+ net/colo-compare.h        |  24 +++++
+ net/colo.c                |  10 +-
+ net/colo.h                |  11 +-
+ net/filter-rewriter.c     | 162 +++++++++++++++++++++++++++--
+ net/filter.c              |  17 +++
+ net/net.c                 |  19 ++++
+ qapi/migration.json       |  80 +++++++++++++-
+ vl.c                      |   2 -
+ 23 files changed, 921 insertions(+), 139 deletions(-)
+ delete mode 100644 migration/colo-comm.c
+ create mode 100644 net/colo-compare.h
+
+-- 
+2.17.GIT
