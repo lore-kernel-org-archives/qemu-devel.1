@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fwjmQ-0008GM-HA
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 04:00:15 -0400
+	(envelope-from <mjc@sifive.com>) id 1fwjtW-0003Ui-T7
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 04:07:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fwjmL-0004A6-K1
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 04:00:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35452 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fwjmL-00049s-E4
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 04:00:09 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED6C283221
-	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 08:00:08 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180901211917.10372-1-marcandre.lureau@redhat.com>
-	<3e6bdc56-3534-10eb-017d-12a815c51b2e@redhat.com>
-	<87r2ibb03c.fsf@dusky.pond.sub.org>
-	<000c9289-430a-5b98-09a4-060aaa9ba4fb@redhat.com>
-Date: Mon, 03 Sep 2018 10:00:05 +0200
-In-Reply-To: <000c9289-430a-5b98-09a4-060aaa9ba4fb@redhat.com> (Thomas Huth's
-	message of "Mon, 3 Sep 2018 07:54:01 +0200")
-Message-ID: <87o9df80ze.fsf@dusky.pond.sub.org>
+	(envelope-from <mjc@sifive.com>) id 1fwjtV-00088g-Vf
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 04:07:34 -0400
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:38091)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fwjtV-00088S-Jt
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 04:07:33 -0400
+Received: by mail-oi0-x230.google.com with SMTP id x197-v6so32177554oix.5
+	for <qemu-devel@nongnu.org>; Mon, 03 Sep 2018 01:07:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests/check-qjson: fix a leak
+In-Reply-To: <CAJhHMCCUzMvQbbcfa8GboH1wpCogFSr1vgf==1EjAz8L+yxo6w@mail.gmail.com>
+References: <CAJhHMCDR3FVHxO7hfUNbYTM2zsx6Q1CeKfeMjkW0b-En-1Z0Xw@mail.gmail.com>
+	<CAJhHMCCUzMvQbbcfa8GboH1wpCogFSr1vgf==1EjAz8L+yxo6w@mail.gmail.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Mon, 3 Sep 2018 20:07:32 +1200
+Message-ID: <CAHNT7NvuwMw71jn4aQP2DWiekMEe0veSNrnL0tao3pPR+uGROg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] qemu-riscv64 seg fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,82 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-Thomas Huth <thuth@redhat.com> writes:
+Thanks. I was just about to log an issue in the riscv-qemu issue tracker on
+GitHub.
 
-> On 2018-09-03 07:51, Markus Armbruster wrote:
->> Thomas Huth <thuth@redhat.com> writes:
->>=20
->>> On 2018-09-01 23:19, Marc-Andr=C3=A9 Lureau wrote:
->>>> Spotted by ASAN:
->>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>>> =3D=3D11893=3D=3DERROR: LeakSanitizer: detected memory leaks
->>>>
->>>> Direct leak of 1120 byte(s) in 28 object(s) allocated from:
->>>>     #0 0x7fd0515b0c48 in malloc (/lib64/libasan.so.5+0xeec48)
->>>>     #1 0x7fd050ffa3c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
->>>>     #2 0x559e708b56a4 in qstring_from_str /home/elmarco/src/qq/qobject=
-/qstring.c:66
->>>>     #3 0x559e708b4fe0 in qstring_new /home/elmarco/src/qq/qobject/qstr=
-ing.c:23
->>>>     #4 0x559e708bda7d in parse_string /home/elmarco/src/qq/qobject/jso=
-n-parser.c:143
->>>>     #5 0x559e708c1009 in parse_literal /home/elmarco/src/qq/qobject/js=
-on-parser.c:484
->>>>     #6 0x559e708c1627 in parse_value /home/elmarco/src/qq/qobject/json=
--parser.c:547
->>>>     #7 0x559e708c1c67 in json_parser_parse /home/elmarco/src/qq/qobjec=
-t/json-parser.c:573
->>>>     #8 0x559e708bc0ff in json_message_process_token /home/elmarco/src/=
-qq/qobject/json-streamer.c:92
->>>>     #9 0x559e708d1655 in json_lexer_feed_char /home/elmarco/src/qq/qob=
-ject/json-lexer.c:292
->>>>     #10 0x559e708d1fe1 in json_lexer_feed /home/elmarco/src/qq/qobject=
-/json-lexer.c:339
->>>>     #11 0x559e708bc856 in json_message_parser_feed /home/elmarco/src/q=
-q/qobject/json-streamer.c:121
->>>>     #12 0x559e708b8b4b in qobject_from_jsonv /home/elmarco/src/qq/qobj=
-ect/qjson.c:69
->>>>     #13 0x559e708b8d02 in qobject_from_json /home/elmarco/src/qq/qobje=
-ct/qjson.c:83
->>>>     #14 0x559e708a74ae in from_json_str /home/elmarco/src/qq/tests/che=
-ck-qjson.c:30
->>>>     #15 0x559e708a9f83 in utf8_string /home/elmarco/src/qq/tests/check=
--qjson.c:781
->>>>     #16 0x7fd05101bc49 in test_case_run gtestutils.c:2255
->>>>     #17 0x7fd05101bc49 in g_test_run_suite_internal gtestutils.c:2339
->>>>
->>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>>> ---
->>>>  tests/check-qjson.c | 1 +
->>>>  1 file changed, 1 insertion(+)
->>>>
->>>> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
->>>> index cc13f3d41e..d876a7a96e 100644
->>>> --- a/tests/check-qjson.c
->>>> +++ b/tests/check-qjson.c
->>>> @@ -780,6 +780,7 @@ static void utf8_string(void)
->>>>              if (!strstr(json_out, "\\uFFFD")) {
->>>>                  str =3D from_json_str(json_out, j, &error_abort);
->>>>                  g_assert_cmpstr(qstring_get_try_str(str), =3D=3D, utf=
-8_in);
->>>> +                qobject_unref(str);
->>>>              }
->>>>          }
->>>>      }
->>>>
->>>
->>> There are other occurances of from_json_str() which are not followed by
->>> an object_unref() ... do they need to be fixed as well?
->>> (e.g. at the end of escaped_string(), or earlier in utf8_string())
->>=20
->> These are all asserted to be null, aren't they?
+I reproduced it on my side. The fact that it is causes QEMU user to crash
+in translate.c is interesting.
+
+I ran your program with -d in_asm and it appears to crash in thread::join
+
+On Mon, Sep 3, 2018 at 7:58 PM, Pranith Kumar <bobby.prani@gmail.com> wrote:
+
+> On second looks, running the benchmark on a RISCV processor is also
+> giving a seg fault. So may be there is something wrong with the
+> benchmark... OTOH, x86 version runs fine... hmm
 >
-> Ah, right, sorry, it's still too early in the morning here, I guess ;-)
-
-I was about to write "I should've waited for the coffee to kick in" when
-I remembered what g_assert(!str) means :)
+> Please ignore this report, I will try to investigate further.
+>
+> Thanks,
+> On Mon, Sep 3, 2018 at 12:45 AM Pranith Kumar <bobby.prani@gmail.com>
+> wrote:
+> >
+> > Hi Michael,
+> >
+> > qemu-riscv64 seg faults for me on a static binary. You can build the
+> > binary from here: https://github.com/pranith/quickht
+> >
+> > $ STATIC=1 RISCV=1 make
+> >
+> > $ qemu-riscv64 ./bench -t 1 -u 1
+> > <seg fault>
+> >
+> > Thanks,
+> > --
+> > Pranith
+>
+>
+>
+> --
+> Pranith
+>
