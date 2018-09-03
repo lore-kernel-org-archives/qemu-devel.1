@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fwnsW-0008Od-SW
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:22:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fwnuJ-0000vD-K1
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:24:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fwnsV-0006wV-TG
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:22:48 -0400
-Date: Mon, 3 Sep 2018 14:22:33 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180903122232.GA14463@dhcp-200-186.str.redhat.com>
-References: <20180830015734.19765-1-jsnow@redhat.com>
-	<20180830015734.19765-3-jsnow@redhat.com>
-	<6ed2e7ac-8de1-bd7b-0787-fdd33c6b306e@redhat.com>
-	<87mut3ukyi.fsf@dusky.pond.sub.org>
-	<126a3e52-7706-d6dc-fb7a-bda8e11d9791@redhat.com>
-	<87sh2tirfk.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fwnuI-0007nP-Q4
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:24:39 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:43854)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fwnuH-0007lW-DE
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 08:24:37 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id b15-v6so616833oib.10
+	for <qemu-devel@nongnu.org>; Mon, 03 Sep 2018 05:24:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sh2tirfk.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 2/9] jobs: canonize Error object
+In-Reply-To: <20180903115926.GB14377@redhat.com>
+References: <20180830142708.14311-1-sameeh@daynix.com>
+	<20180830142708.14311-2-sameeh@daynix.com>
+	<20180903115926.GB14377@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Sep 2018 13:24:16 +0100
+Message-ID: <CAFEAcA8HATZQqawAX3=OPmas6uzp0UAciK7QXo=uuRbCfvUjaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 1/6] Add bpf support to qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Sameeh Jubran <sameeh@daynix.com>, Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 01.09.2018 um 09:54 hat Markus Armbruster geschrieben:
-> John Snow <jsnow@redhat.com> writes:
-> 
-> > On 08/31/2018 02:08 AM, Markus Armbruster wrote:
-> >> Eric Blake <eblake@redhat.com> writes:
-> >> 
-> >>> On 08/29/2018 08:57 PM, John Snow wrote:
-> >>>> Jobs presently use both an Error object in the case of the create job,
-> >>>> and char strings in the case of generic errors elsewhere.
-> >>>>
-> >>>> Unify the two paths as just j->err, and remove the extra argument from
-> >>>> job_completed. The integer error code for job_completed is kept for now,
-> >>>> to be removed shortly in a separate patch.
-> >>>>
-> >>>> Signed-off-by: John Snow <jsnow@redhat.com>
-> >>>> ---
-> >>>
-> >>>> +++ b/job.c
-> >>>
-> >>>> @@ -666,8 +666,8 @@ static void job_update_rc(Job *job)
-> >>>>           job->ret = -ECANCELED;
-> >>>>       }
-> >>>>       if (job->ret) {
-> >>>> -        if (!job->error) {
-> >>>> -            job->error = g_strdup(strerror(-job->ret));
-> >>>> +        if (!job->err) {
-> >>>> +            error_setg(&job->err, "%s", g_strdup(strerror(-job->ret)));
-> >>>
-> >>> Memleak. Drop the g_strdup(), and just directly pass strerror()
-> >>> results to error_setg().  (I guess we can't quite use
-> >>> error_setg_errno() unless we add additional text beyond the strerror()
-> >>> results).
-> >> 
-> >> Adding such text might well be an improvement.  I'm not telling you to
-> >> do so (not having looked at the context myself), just to think about it.
-> >> 
-> >
-> > In this case, and I agree with Kevin who suggested it; we ought to be
-> > moving away from the retcode in general and using first-class error
-> > objects for all of our jobs anyway.
-> >
-> > In this case, the job has failed with a retcode and we wish to give the
-> > user some hope of understanding why, but at this point in the code all
-> > we know is what the strerror can tell us, so a generic prefix like "The
-> > job failed" is not helpful because it will already be clear by events
-> > and other things that the job failed.
-> >
-> > The only text I can think of that would be useful is: "The job failed
-> > and didn't give a more specific error message. Please email
-> > qemu-devel@nongnu.org and harass the authors until they fix it. Anyway,
-> > nice chatting to you, the generic error message is: %s"
-> 
-> That might well be an improvement ;)
-> 
-> Since I don't have a realistic example ready, I'm making up a contrieved
-> one:
-> 
-> --> {"execute": "job-frobnicate"}
-> <-- {"error": {"class": "GenericError", "desc": "Device or resource busy"}}
-> 
-> Would a reply
-> 
-> <-- {"error": {"class": "GenericError", "desc": "Job failed: Device or resource busy"}}
-> 
-> be better, worse, or a wash?
-> 
-> If it's a wash, maintainability breaks the tie.  So let's have a look at
-> the code.  It's either
-> 
->             error_setg(&job->err, "%s", strerror(-job->ret));
-> 
-> or
-> 
->             error_setg_errno(&job->err, -job->ret, "Job failed");
-> 
-> I'd prefer the latter, because it's the common way to put an errno code
-> into an Error object, and it lets me grep for the message more easily.
+On 3 September 2018 at 12:59, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
 
-Basically, if I call "job-frobnicate", I don't want an error message to
-tell me "job-frobnicate failed: foo". I already know that I called
-"job-frobnicate", so the actually useful message is only "foo".
+>>  ##########################################
+>> +# check for usable bpf system call
+>> +if test "$bpf" =3D "yes"; then
+>
+> if test "x$bpf" !=3D "xno"; then
 
-A prefix like "job-frobnicate failed" should be added when it's one of
-multiple possible error sources. For example, if a higher level monitor
-command internally involves job-frobnicate, but also three other
-operations, this is the place where the prefix should be added to any
-error message returned by job-frobnicate so that we can distinguish
-which part of the operation failed.
+We don't use the leading-x thingy elsewhere in configure,
+why is this condition special?
+(We can assume we don't have a broken shell, and we
+know that $bpf won't be a string starting with a hyphen.)
 
-Kevin
+thanks
+-- PMM
