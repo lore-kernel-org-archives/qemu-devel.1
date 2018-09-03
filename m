@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fwgkX-0006FG-IU
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:46:06 -0400
+	(envelope-from <thuth@redhat.com>) id 1fwh6r-0000nU-GA
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:09:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fwgkU-0008Qx-9q
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:46:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33592 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fwh6n-0007Qj-Ko
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:09:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49426 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fwgkU-0008QP-3O
-	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 00:46:02 -0400
-References: <1535704738-8986-1-git-send-email-thuth@redhat.com>
-	<1535704738-8986-9-git-send-email-thuth@redhat.com>
-	<87efeerbcu.fsf@dusky.pond.sub.org>
-	<593af39a-cc9b-d4e8-7e6c-efdbbe169096@redhat.com>
-	<CAJ+F1CLX15g+QOCyjaBHJN1n0oLtQCH390RivRQkTcyptWf+cw@mail.gmail.com>
-	<5b4cef8c-084c-5a2b-1fb6-210388054d38@redhat.com>
-	<87va7qli3f.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fwh6n-0007QW-BS
+	for qemu-devel@nongnu.org; Mon, 03 Sep 2018 01:09:05 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DCFB42BCAD
+	for <qemu-devel@nongnu.org>; Mon,  3 Sep 2018 05:09:04 +0000 (UTC)
+References: <20180901211917.10372-1-marcandre.lureau@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8b3a0b15-d7dd-c95d-bccd-062c9e073658@redhat.com>
-Date: Mon, 3 Sep 2018 06:45:59 +0200
+Message-ID: <3e6bdc56-3534-10eb-017d-12a815c51b2e@redhat.com>
+Date: Mon, 3 Sep 2018 07:09:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <87va7qli3f.fsf@dusky.pond.sub.org>
+In-Reply-To: <20180901211917.10372-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 8/9] tests: add qmp/qom-set-without-value
- test
+Subject: Re: [Qemu-devel] [PATCH] tests/check-qjson: fix a leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,119 +33,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
-On 2018-08-31 16:35, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
+On 2018-09-01 23:19, Marc-Andr=C3=A9 Lureau wrote:
+> Spotted by ASAN:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D11893=3D=3DERROR: LeakSanitizer: detected memory leaks
 >=20
->> On 2018-08-31 15:24, Marc-Andr=C3=A9 Lureau wrote:
->>> Hi
->>> On Fri, Aug 31, 2018 at 3:18 PM Thomas Huth <thuth@redhat.com> wrote:
->>>>
->>>> On 2018-08-31 14:04, Markus Armbruster wrote:
->>>>> Thomas Huth <thuth@redhat.com> writes:
->>>>>
->>>>>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>>>>>
->>>>>> test_qom_set_without_value() is about a bug in infrastructure used=
- by
->>>>>> the QMP core, fixed in commit c489780203.  We covered the bug in
->>>>>> infrastructure unit tests (commit bce3035a44).  I wrote that test
->>>>>> earlier, to cover QMP level as well, the test could go into qmp-te=
-st.
->>>>>>
->>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com=
->
->>>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>>> ---
->>>>>>  tests/qmp-test.c | 14 ++++++++++++++
->>>>>>  1 file changed, 14 insertions(+)
->>>>>>
->>>>>> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
->>>>>> index b347228..2b923f0 100644
->>>>>> --- a/tests/qmp-test.c
->>>>>> +++ b/tests/qmp-test.c
->>>>>> @@ -321,6 +321,19 @@ static void test_qmp_preconfig(void)
->>>>>>      qtest_quit(qs);
->>>>>>  }
->>>>>>
->>>>>> +static void test_qom_set_without_value(void)
->>>>>> +{
->>>>>> +    QTestState *qts;
->>>>>> +    QDict *resp;
->>>>>> +
->>>>>> +    qts =3D qtest_init(common_args);
->>>>>> +    resp =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
->>>>>> +                     " { 'path': '/machine', 'property': 'rtc-tim=
-e' } }");
->>>>>> +    g_assert_nonnull(resp);
->>>>>> +    qmp_assert_error_class(resp, "GenericError");
->>>>>> +    qtest_quit(qts);
->>>>>> +}
->>>>>> +
->>>>>>  int main(int argc, char *argv[])
->>>>>>  {
->>>>>>      g_test_init(&argc, &argv, NULL);
->>>>>> @@ -328,6 +341,7 @@ int main(int argc, char *argv[])
->>>>>>      qtest_add_func("qmp/protocol", test_qmp_protocol);
->>>>>>      qtest_add_func("qmp/oob", test_qmp_oob);
->>>>>>      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
->>>>>> +    qtest_add_func("qmp/qom-set-without-value", test_qom_set_with=
-out_value);
->>>>>>
->>>>>>      return g_test_run();
->>>>>>  }
->>>>>
->>>>> I'm afraid you missed my objection to naming:
->>>>> Message-ID: <8736uvujxx.fsf@dusky.pond.sub.org>
->>>>> https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg06368.h=
-tml
->>>>
->>>> Sorry about that, I was not on CC: for that series. I used the patch=
-es
->>>> from v5 where Marc-Andr=C3=A9 put me on CC:.
->>>>
->>>>> If you could work that into PULL v2, I'd be obliged.  If not, I'll =
-have
->>>>> to address it in a follow-up patch.
->>>>
->>>> IMHO the naming is not that bad ... OTOH, I think Peter might alread=
-y be
->>>> away? ... so we've got plenty of time to sort this out anyway.
->>>> Marc-Andr=C3=A9, could you send a new version of the patch?
->>>
->>> Tbh, I don't care so much about the naming of the test, but (for once=
-)
->>> I respectfully don't think Markus suggestion is better.
->>>
->>> The function checks "qom-set" without 'value' argument:
->>> "qom-set-without-value", no brainer..
+> Direct leak of 1120 byte(s) in 28 object(s) allocated from:
+>     #0 0x7fd0515b0c48 in malloc (/lib64/libasan.so.5+0xeec48)
+>     #1 0x7fd050ffa3c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
+>     #2 0x559e708b56a4 in qstring_from_str /home/elmarco/src/qq/qobject/=
+qstring.c:66
+>     #3 0x559e708b4fe0 in qstring_new /home/elmarco/src/qq/qobject/qstri=
+ng.c:23
+>     #4 0x559e708bda7d in parse_string /home/elmarco/src/qq/qobject/json=
+-parser.c:143
+>     #5 0x559e708c1009 in parse_literal /home/elmarco/src/qq/qobject/jso=
+n-parser.c:484
+>     #6 0x559e708c1627 in parse_value /home/elmarco/src/qq/qobject/json-=
+parser.c:547
+>     #7 0x559e708c1c67 in json_parser_parse /home/elmarco/src/qq/qobject=
+/json-parser.c:573
+>     #8 0x559e708bc0ff in json_message_process_token /home/elmarco/src/q=
+q/qobject/json-streamer.c:92
+>     #9 0x559e708d1655 in json_lexer_feed_char /home/elmarco/src/qq/qobj=
+ect/json-lexer.c:292
+>     #10 0x559e708d1fe1 in json_lexer_feed /home/elmarco/src/qq/qobject/=
+json-lexer.c:339
+>     #11 0x559e708bc856 in json_message_parser_feed /home/elmarco/src/qq=
+/qobject/json-streamer.c:121
+>     #12 0x559e708b8b4b in qobject_from_jsonv /home/elmarco/src/qq/qobje=
+ct/qjson.c:69
+>     #13 0x559e708b8d02 in qobject_from_json /home/elmarco/src/qq/qobjec=
+t/qjson.c:83
+>     #14 0x559e708a74ae in from_json_str /home/elmarco/src/qq/tests/chec=
+k-qjson.c:30
+>     #15 0x559e708a9f83 in utf8_string /home/elmarco/src/qq/tests/check-=
+qjson.c:781
+>     #16 0x7fd05101bc49 in test_case_run gtestutils.c:2255
+>     #17 0x7fd05101bc49 in g_test_run_suite_internal gtestutils.c:2339
 >=20
-> Nope, that's not what it tests.  It tests the visitor, the marshalling
-> code generator, and the QMP core handle a certain kind of invalid
-> arguments correctly.  It does not test qom-set.  I explained all that
-> already.
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/check-qjson.c | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
->>> Naming it "invalid-arg" is so generic that I wouldn't be able what it=
- does.
+> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+> index cc13f3d41e..d876a7a96e 100644
+> --- a/tests/check-qjson.c
+> +++ b/tests/check-qjson.c
+> @@ -780,6 +780,7 @@ static void utf8_string(void)
+>              if (!strstr(json_out, "\\uFFFD")) {
+>                  str =3D from_json_str(json_out, j, &error_abort);
+>                  g_assert_cmpstr(qstring_get_try_str(str), =3D=3D, utf8=
+_in);
+> +                qobject_unref(str);
+>              }
+>          }
+>      }
 >=20
-> I can accept "missing-any" or "missing-any-arg".  I object to any name
-> involving qom-set, because the test is not about qom-set at all.
->=20
-> If it was, then putting it in qmp-test.c would be wrong.
->=20
->> Ok, then let's keep it this way. As I said, IMHO the current naming is
->> not really bad, and I also don't have any suggestions for a perfect na=
-me
->> right now.
->=20
-> We don't need a perfect name.  We need one that's not actively
-> misleading.
 
-Ok, then let's cancel this PULL request. I'll send a new one after the
-"vacation freeze" (i.e. in three weeks), that should be enough time for
-both of you to come to an agreement about the best naming here.
+There are other occurances of from_json_str() which are not followed by
+an object_unref() ... do they need to be fixed as well?
+(e.g. at the end of escaped_string(), or earlier in utf8_string())
 
  Thomas
