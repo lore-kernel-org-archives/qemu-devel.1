@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1fxHKF-00025N-JC
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:49:24 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fxHfM-0007xg-J3
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1fxHKC-0007yJ-DC
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:49:23 -0400
-From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Tue,  4 Sep 2018 21:49:03 +0200
-Message-Id: <20180904194903.20712-1-hpoussin@reactos.org>
+	(envelope-from <jsnow@redhat.com>) id 1fxHfI-0005yp-R0
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:11:12 -0400
+References: <20180831222907.16257-1-jsnow@redhat.com>
+	<20180831222907.16257-6-jsnow@redhat.com>
+	<b79cdffa-a0d4-824c-b9fd-b5aba38e61bd@redhat.com>
+	<00da6ab1-d2ca-8d66-7e22-8fc848b9d861@redhat.com>
+	<ab14bcff-ae29-f1ce-a694-8aa2a4b63ac9@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a4182c7a-b84d-5b03-6635-dc9ff8966a31@redhat.com>
+Date: Tue, 4 Sep 2018 16:10:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] hw/ppc: on 40p machine,
- change default firmware to OpenBIOS
+In-Reply-To: <ab14bcff-ae29-f1ce-a694-8aa2a4b63ac9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 05/15] block/mirror: don't install
+ backing chain on abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,50 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: jtc@redhat.com, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
-Use it, instead of relying on an unmaintained and very limited firmware.
 
-Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
----
- hw/ppc/prep.c            | 2 +-
- tests/boot-serial-test.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 3401570d98..1558855247 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -736,7 +736,7 @@ static void ibm_40p_init(MachineState *machine)
-     /* PCI host */
-     dev = qdev_create(NULL, "raven-pcihost");
-     if (!bios_name) {
--        bios_name = BIOS_FILENAME;
-+        bios_name = "openbios-ppc";
-     }
-     qdev_prop_set_string(dev, "bios-name", bios_name);
-     qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index 952a2e7ead..276ca14c97 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -76,13 +76,13 @@ static testdef_t tests[] = {
-     { "alpha", "clipper", "", "PCI:" },
-     { "ppc", "ppce500", "", "U-Boot" },
-     { "ppc", "prep", "-m 96", "Memory size: 96 MB" },
--    { "ppc", "40p", "-boot d", "Booting from device d" },
-+    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
-     { "ppc", "g3beige", "", "PowerPC,750" },
-     { "ppc", "mac99", "", "PowerPC,G4" },
-     { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
-     { "ppc64", "ppce500", "", "U-Boot" },
-     { "ppc64", "prep", "-boot e", "Booting from device e" },
--    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
-+    { "ppc64", "40p", "-m 192", "Memory: 192M" },
-     { "ppc64", "mac99", "", "PowerPC,970FX" },
-     { "ppc64", "pseries", "", "Open Firmware" },
-     { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
--- 
-2.11.0
+On 09/04/2018 03:30 PM, Eric Blake wrote:
+> On 09/04/2018 02:15 PM, John Snow wrote:
+>=20
+>>
+>> post-script: I really, really hate the "fake cancel" we've implemented
+>> for mirror. It makes the job logic so much worse.
+>=20
+> Mirror really does have a tri-state way to end the job (and accessible
+> only after the job has moved into the sync state):
+>=20
+> cancel (gracefully end the job by detaching the mirror, so that the
+> original volume remains active - your "fake cancel")
+> complete (gracefully end the job by pivoting to the mirror, so that the
+> original volume is now the backup)
+> cancel --force (end the job now, even though it means you did not
+> actually create a mirrored copy) - only useful since commit b76e4458 (2=
+.12)
+>=20
+> The first two are conceptually similar - the job succeeds, and one of
+> the two files used in the mirroring is now the state of the other at th=
+e
+> time the job concluded.
+>=20
+
+Sure, but I dislike how we implemented it as cancel, which mucks up the
+job mechanisms. I recognize there are two fully valid ways in which we
+want to successfully complete a mirror job.
+
+> Back-compat says we can't really change the block-job terminology
+> without an adequate deprecation cycle (and I don't know if libvirt has
+> even been taught about cancel --force yet); but for the newer 'job'
+> functionality (which we tried to shoehorn existing block jobs into), it
+> does seem like it would be nicer to have 'cancel' mean what blockjob
+> cancel --force implies, and instead focus on teaching 'complete' to hav=
+e
+> a way to select which of the two completion modes are desired (complete
+> by return to original, or complete by pivot to mirror).=C2=A0 It might =
+even
+> be nice to have a way to specify which completion mode to default to at
+> job creation time, and/or to change that default as the job is running
+> (which also implies being able to query which completion mode is
+> currently tied to the job, if you can complete without requesting eithe=
+r
+> of the two modes explicitly).
+>=20
+
+Yup, that's my preference!
