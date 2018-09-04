@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fxIw0-00041S-JY
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:32:29 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fxJPI-0005lv-Gf
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 18:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fxIvx-0004Gu-C3
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:32:28 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:36247)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fxIvw-0004FR-SG
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:32:25 -0400
-Date: Tue, 4 Sep 2018 17:32:20 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180904213220.GA1850@flamenco>
-References: <20180903171831.15446-1-cota@braap.org>
-	<20180903171831.15446-3-cota@braap.org>
-	<20180904173734.GA18515@kermit-br-ibm-com>
-	<20180904193538.GA30725@flamenco>
-	<20180904205631.GB18515@kermit-br-ibm-com>
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fxJPH-0004U8-Lk
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 18:02:44 -0400
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:39127)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fxJPH-0004Tx-GG
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 18:02:43 -0400
+Received: by mail-yw1-xc43.google.com with SMTP id m62-v6so1877536ywd.6
+	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 15:02:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180904205631.GB18515@kermit-br-ibm-com>
-Subject: Re: [Qemu-devel] [PATCH 2/6] test-rcu-list: avoid torn accesses to
- n_reclaims and n_nodes_removed
+In-Reply-To: <CAFEAcA-AyrFVYWkM+_aBQ8eXH-03UZfgiHrB37v=-iM+A=70DA@mail.gmail.com>
+References: <20180904210036.7317-1-jcmvbkbc@gmail.com>
+	<CAFEAcA-AyrFVYWkM+_aBQ8eXH-03UZfgiHrB37v=-iM+A=70DA@mail.gmail.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 4 Sep 2018 15:02:42 -0700
+Message-ID: <CAMo8Bf+3gws2Sa24xMfVsAQ_PaZVqKPbpqpySAAHrdkvnF-erw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] linux-user: do setrlimit selectively
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-On Tue, Sep 04, 2018 at 17:56:31 -0300, Murilo Opsfelder Araujo wrote:
-> The explanations you provided made a lot of difference on understanding the why
-> of your patch.  Thank you!
+On Tue, Sep 4, 2018 at 2:13 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 4 September 2018 at 22:00, Max Filippov <jcmvbkbc@gmail.com> wrote:
+>> When running 32-bit guest on 64-bit host setrlimit guest calls that
+>> affect memory resources (RLIMIT_{AS,DATA,STACK}) don't always make sense
+>> as is. They may result in QEMU lockup because mprotect call in
+>> page_unprotect would fail with ENOMEM error code, causing infinite loop
+>> of SIGSEGV. E.g. it happens when running libstdc++ testsuite for xtensa
+>> target on x86_64 host.
+>>
+>> Don't call host setrlimit for memory-related resources when running
+>> 32-bit guest on 64-bit host.
+>
+> I think the issue here is not related to 32-on-64 but to the fact
+> that we just pass through the memory rlimits. What we should ideally
+> be doing is tracking the actual guest memory allocations sufficiently
+> that we can then apply the rlimits at the QEMU level, so that guest
+> allocations that breach limits can be failed, without ever causing
+> QEMU's own alloactions to fail.
 
-Glad that helped!
+In a sense we do it by limiting 32-bit guest to 32 or less bits of the address
+space, that's why it should be rather safe to just ignore setrlimit calls in
+32-on-64 case.
 
-> Is it possible to enhance commit message and add the explanations?
-
-If I end up submitting a v2 of this series due to code-related
-changes, then I'll expand this patch's commit message.
-
-Thanks,
-
-		E.
+-- 
+Thanks.
+-- Max
