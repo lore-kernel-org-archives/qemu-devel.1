@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fxDPQ-0004G9-BV
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:38:29 -0400
+	(envelope-from <wei@redhat.com>) id 1fxDbk-0003s1-80
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:51:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fxDPN-0008Js-K0
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:38:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60668 helo=mx1.redhat.com)
+	(envelope-from <wei@redhat.com>) id 1fxDbf-00013L-RB
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:51:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47460 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fxDPN-0008JY-DM
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:38:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 12D8D40216EB
-	for <qemu-devel@nongnu.org>; Tue,  4 Sep 2018 15:38:25 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue,  4 Sep 2018 17:30:22 +0200
-Message-Id: <1536075022-46186-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1536067356-44609-2-git-send-email-imammedo@redhat.com>
-References: <1536067356-44609-2-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 1/2] vl.c deprecate incorrect CPUs topology
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1fxDbf-00012m-KT
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:51:07 -0400
+References: <1535778675-32170-1-git-send-email-wei@redhat.com>
+	<1535778675-32170-2-git-send-email-wei@redhat.com>
+	<20180903110813.hbamu4zuda6qpwuw@kamzik.brq.redhat.com>
+From: Wei Huang <wei@redhat.com>
+Message-ID: <853542b8-d5e1-8fb9-d1a7-b8c0660b0a41@redhat.com>
+Date: Tue, 4 Sep 2018 10:51:01 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180903110813.hbamu4zuda6qpwuw@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V8 1/4] tests/migration: Convert x86 boot
+ block compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +30,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, drjones@redhat.com, ehabkost@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 
--smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-so that total number of logical CPUs [sockets * cores * threads]
-would be equal to [maxcpus], however historically we didn't have
-such check in QEMU and it is possible to start VM with an invalid
-topology.
-Deprecate invalid options combination so we can make sure that
-the topology VM started with is always correct in the future.
-Users with an invalid sockets/cores/threads/maxcpus values should
-fix their CLI to make sure that
-   [sockets * cores * threads] == [maxcpus]
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
-v6:
-  - s/socket/sockets/, the same for core, thread in subsection
-    (Andrew Jones <drjones@redhat.com>)
-v5:
-  - extend deprecation doc, adding that maxcpus should be multiple of
-    present on CLI [sockets/cores/threads] options
-    (Eduardo Habkost <ehabkost@redhat.com>)
-v4:
-  - missed dot comment, fix it with s/./,/ (Andrew Jones <drjones@redhat.com>)
-v3:
-  - more spelling fixes (Andrew Jones <drjones@redhat.com>)
-  - place deprecation check after (sockets * cores * threads > max_cpus) check
-    (Eduardo Habkost <ehabkost@redhat.com>)
-v2:
-  - spelling&&co fixes (Andrew Jones <drjones@redhat.com>)
----
- qemu-deprecated.texi | 19 +++++++++++++++++++
- vl.c                 |  7 +++++++
- 2 files changed, 26 insertions(+)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 87212b6..1fac52f 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -159,6 +159,25 @@ The 'file' driver for drives is no longer appropriate for character or host
- devices and will only accept regular files (S_IFREG). The correct driver
- for these file types is 'host_cdrom' or 'host_device' as appropriate.
- 
-+@subsection -smp X,[sockets=a,cores=b,threads=c],maxcpus=Y (since 3.1)
-+
-+CPU topology properties should describe whole machine topology including
-+possible CPUs, but historically it was possible to start QEMU with
-+an incorrect topology where
-+  sockets * cores * threads >= X && X < maxcpus
-+which could lead to an incorrect topology enumeration by the guest.
-+Support for invalid topologies will be removed, the user must ensure
-+topologies described with -smp include all possible cpus, i.e.
-+  sockets * cores * threads == maxcpus
-+Note: it's assumed that maxcpus value must be multiple of the topology
-+options present on command line to avoid creating an invalid topology.
-+If maxcpus isn't be multiple of present topology options then the condition
-+(sockets * cores * threads == maxcpus) can't be satisfied and it will
-+trigger deprecation warning which later will be converted to a error.
-+If you get deprecation warning it's recommended to explicitly specify
-+a correct topology to make warning go away and ensure that it will
-+continue working in the future.
-+
- @section QEMU Machine Protocol (QMP) commands
- 
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-diff --git a/vl.c b/vl.c
-index 5ba06ad..7fd700e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1246,6 +1246,13 @@ static void smp_parse(QemuOpts *opts)
-             exit(1);
-         }
- 
-+        if (sockets * cores * threads != max_cpus) {
-+            warn_report("Invalid CPU topology deprecated: "
-+                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "!= maxcpus (%u)",
-+                        sockets, cores, threads, max_cpus);
-+        }
-+
-         smp_cpus = cpus;
-         smp_cores = cores;
-         smp_threads = threads;
--- 
-2.7.4
+On 09/03/2018 06:08 AM, Andrew Jones wrote:
+> On Sat, Sep 01, 2018 at 01:11:12AM -0400, Wei Huang wrote:
+>> The x86 boot block header currently is generated with a shell script.
+>> To better support other CPUs (e.g. aarch64), we convert the script
+>> into Makefile. This allows us to 1) support cross-compilation easily,
+>> and 2) avoid creating a script file for every architecture.
+>>
+>> Note that, in the new design, the cross compiler prefix can be specified by
+>> setting the CROSS_PREFIX in "make" command. Also to allow gcc pre-processor
+>> to include the C-style file correctly, it also renames the
+>> x86-a-b-bootblock.s file extension from .s to .S.
+>>
+>> Signed-off-by: Wei Huang <wei@redhat.com>
+>> ---
+>>  tests/migration/Makefile                           | 31 ++++++++++++++++++++
+>>  tests/migration/rebuild-x86-bootblock.sh           | 33 ----------------------
+>>  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   |  0
+>>  3 files changed, 31 insertions(+), 33 deletions(-)
+>>  create mode 100644 tests/migration/Makefile
+>>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+>>  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (100%)
+>>
+>> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+>> new file mode 100644
+>> index 0000000..5d5fa07
+>> --- /dev/null
+>> +++ b/tests/migration/Makefile
+>> @@ -0,0 +1,31 @@
+>> +# To specify cross compiler prefix, use CROSS_PREFIX=
+>> +#   > make CROSS_PREFIX=x86_64-linux-gnu-
+>        ^ nit: this prompt symbol is weird (at least to me, what shell uses
+>               this?) To me it looks like a sh/bash redirect symbol. Can
+>               we change it to '$' or use nothing at all?
+
+I will replace '>' with '$', which is indeed the commonly-used one.
+
+>> +
+>> +override define __note
+>> +/* This file is automatically generated from
+>> + * tests/migration/x86-a-b-bootblock.s, edit that and then run
+>                                         ^ should be 'S'
+
+OK, will do.
+
+> 
+>> + * tests/migration/rebuild-x86-bootblock.sh to update,
+>> + * and then remember to send both in your patch submission.
+>> + */
+>> +endef
+>> +export __note
+>> +
+>> +.PHONY: all clean
+>> +all: x86-a-b-bootblock.h
+>> +
+>> +x86-a-b-bootblock.h: x86.bootsect
+>> +	echo "$$__note" > header.tmp
+>> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
+>> +	mv header.tmp $@
+> 
+> The shell script this Makefile is replacing used mktemp
+> for a randomly named tmp dir. Shouldn't we continue to
+> use random names?>
+>> +
+>> +x86.bootsect: x86.boot
+>> +	dd if=$< of=$@ bs=256 count=2 skip=124
+>> +
+>> +x86.boot: x86.o
+>> +	$(CROSS_PREFIX)objcopy -O binary $< $@
+>> +
+>> +x86.o: x86-a-b-bootblock.S
+>> +	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
+>> +
+>> +clean:
+>> +	@rm -rf *.boot *.o *.bootsect
+> 
+> We don't want to remove the generated header file when cleaning?
+> 
+>> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+>> deleted file mode 100755
+>> index 86cec5d..0000000
+>> --- a/tests/migration/rebuild-x86-bootblock.sh
+>> +++ /dev/null
+>> @@ -1,33 +0,0 @@
+>> -#!/bin/sh
+>> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+>> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> -# See the COPYING file in the top-level directory.
+>> -#
+>> -# Author: dgilbert@redhat.com
+>> -
+>> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
+>> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
+>> -
+>> -if [ ! -e "$ASMFILE" ]
+>> -then
+>> -  echo "Couldn't find $ASMFILE" >&2
+>> -  exit 1
+>> -fi
+>> -
+>> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
+>> -cd "$ASM_WORK_DIR" &&
+>> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
+>> -objcopy -O binary x86.o x86.boot &&
+>> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
+>> -xxd -i x86.bootsect |
+>> -sed -e 's/.*int.*//' > x86.hex &&
+>> -cat - x86.hex <<HERE > "$HEADER"
+>> -/* This file is automatically generated from
+>> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+>> - * tests/migration/rebuild-x86-bootblock.sh to update,
+>> - * and then remember to send both in your patch submission.
+>> - */
+>> -HERE
+>> -
+>> -rm x86.hex x86.bootsect x86.boot x86.o
+>> -cd .. && rmdir "$ASM_WORK_DIR"
+>> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
+>> similarity index 100%
+>> rename from tests/migration/x86-a-b-bootblock.s
+>> rename to tests/migration/x86-a-b-bootblock.S
+>> -- 
+>> 1.8.3.1
+>>
+>>
+> 
+> Thanks,
+> drew 
+> 
