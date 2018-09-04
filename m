@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.ibm.com>) id 1fx7ZY-0006O0-Po
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:24:33 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fxAwm-0008Gw-40
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 09:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.ibm.com>) id 1fx7ZV-00069D-Hb
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:24:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54920
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1fxAwh-0006hM-4J
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 09:00:43 -0400
+Received: from mail-eopbgr50136.outbound.protection.outlook.com
+	([40.107.5.136]:40890
+	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.ibm.com>)
-	id 1fx7ZV-00068d-BU
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:24:29 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w849JGjk088458
-	for <qemu-devel@nongnu.org>; Tue, 4 Sep 2018 05:24:28 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2m9nxjm0ba-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 05:24:28 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.ibm.com>;
-	Tue, 4 Sep 2018 10:24:26 +0100
-From: Nikunj A Dadhania <nikunj@linux.ibm.com>
-Date: Tue,  4 Sep 2018 14:54:18 +0530
-Message-Id: <20180904092418.2380-1-nikunj@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v3] target/ppc/kvm: set vcpu as online/offline
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1fxAwg-0006fO-Cc
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 09:00:39 -0400
+References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
+	<20180720092717.GB16910@xz-mi>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <4c3e07f4-ba82-9b88-6d32-4407b10a9926@virtuozzo.com>
+Date: Tue, 4 Sep 2018 16:00:31 +0300
+MIME-Version: 1.0
+In-Reply-To: <20180720092717.GB16910@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 00/17] Background snapshots
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,97 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, Nikunj A Dadhania <nikunj@linux.ibm.com>, paulus@samba.org
+To: Peter Xu <peterx@redhat.com>
+Cc: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-Set the newly added register(KVM_REG_PPC_ONLINE) to indicate if the vcpu is
-online(1) or offline(0)
+Hi Peter
 
-KVM will use this information to set the RWMR register, which controls the PURR
-and SPURR accumulation.
+I moved the code to the repository 
+https://github.com/denis-plotnikov/qemu/tree/background-snapshot-kvm.
+the current version includes fixes with respect to your comments for 
+version 1.
+I moved KVM related patches to the end of the branch (formerly patch 
+series).
+Since, the KVM patches and the other parts to modify (vhost an others) 
+are needless in favor of upcoming userfaltfd,
+I would ask you to review the general framework which is able to work 
+with tcg.
 
-CC: paulus@samba.org
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.ibm.com>
----
- hw/ppc/spapr_cpu_core.c | 1 +
- hw/ppc/spapr_rtas.c     | 2 ++
- target/ppc/kvm.c        | 9 +++++++++
- target/ppc/kvm_ppc.h    | 7 +++++++
- 4 files changed, 19 insertions(+)
+Thanks in advance!
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 876f0b3d9d..9863221756 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -90,6 +90,7 @@ void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r
- 
-     env->nip = nip;
-     env->gpr[3] = r3;
-+    kvmppc_set_reg_ppc_online(cpu, 1);
-     CPU(cpu)->halted = 0;
-     /* Enable Power-saving mode Exit Cause exceptions */
-     ppc_store_lpcr(cpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 4ac96bc94b..d6a0952154 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -33,6 +33,7 @@
- #include "sysemu/device_tree.h"
- #include "sysemu/cpus.h"
- #include "sysemu/hw_accel.h"
-+#include "kvm_ppc.h"
- 
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_vio.h"
-@@ -207,6 +208,7 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-      * guest */
-     ppc_store_lpcr(cpu, env->spr[SPR_LPCR] & ~pcc->lpcr_pm);
-     cs->halted = 1;
-+    kvmppc_set_reg_ppc_online(cpu, 0);
-     qemu_cpu_kick(cs);
- }
- 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 9211ee2ee1..7be8081968 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2785,3 +2785,12 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
- 
-     return !kvmppc_is_pr(cs->kvm_state);
- }
-+
-+void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online)
-+{
-+    CPUState *cs = CPU(cpu);
-+
-+    if (kvm_enabled()) {
-+        kvm_set_one_reg(cs, KVM_REG_PPC_ONLINE, &online);
-+    }
-+}
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 657582bb32..f696c6e498 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -72,6 +72,7 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
- 
- bool kvmppc_hpt_needs_host_contiguous_pages(void);
- void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
-+void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
- 
- #else
- 
-@@ -187,6 +188,12 @@ static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
-     return 0;
- }
- 
-+static inline void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu,
-+                                             unsigned int online)
-+{
-+    return;
-+}
-+
- #ifndef CONFIG_USER_ONLY
- static inline bool kvmppc_spapr_use_multitce(void)
- {
+Denis
+
+On 20.07.2018 12:27, Peter Xu wrote:
+> On Wed, Jul 18, 2018 at 06:41:43PM +0300, Denis Plotnikov wrote:
+>> The workflow to make a snapshot is the following:
+>> 1. Pause the vm
+>> 2. Make a snapshot of block devices using the scheme of your choice
+>> 3. Turn on background-snapshot migration capability
+>> 4. Start the migration using the destination (migration stream) of your choice.
+>>     The migration will resume the vm execution by itself
+>>     when it has the devices' states saved  and is ready to start ram writing
+>>     to the migration stream.
+>> 5. Listen to the migration finish event
+>>
+>> The bakground snapshot works with support of KVM patch:
+>> "x86: mmu: report failed memory access to the userspace"
+>> (not applied to the mainstream, it's in the kvm mailing list)
+> 
+> Hello, Denis,
+> 
+> Do you mind to push your tree to an online repository in case to make
+> review easier?
+> 
+> Thanks,
+> 
+
 -- 
-2.14.4
+Best,
+Denis
