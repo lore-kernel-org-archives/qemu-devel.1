@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fx9TY-0007iH-DE
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:26:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1fx9nC-0001z6-J6
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:46:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fx9TU-0001xI-Hb
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:26:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52126 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fx9n9-0008MJ-D3
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:46:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52628 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fx9TU-0001wn-BO
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:26:24 -0400
-Date: Tue, 4 Sep 2018 12:26:20 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180904112620.GG22349@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180904110822.12863-1-fli@suse.com>
-	<20180904110822.12863-2-fli@suse.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fx9n9-0008Kh-7G
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:46:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5CBC440216EA
+	for <qemu-devel@nongnu.org>; Tue,  4 Sep 2018 11:46:42 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180903043149.4076-1-peterx@redhat.com>
+	<20180903043149.4076-5-peterx@redhat.com>
+	<87a7oz9g1y.fsf@dusky.pond.sub.org> <20180903101606.GB14774@xz-x1>
+	<87k1o2671t.fsf@dusky.pond.sub.org>
+	<55829207-b0f7-0869-6ec7-90bc2fb67e3a@redhat.com>
+	<20180903144116.GH14377@redhat.com>
+	<87y3chydeo.fsf@dusky.pond.sub.org>
+	<20180904082301.GB22349@redhat.com>
+Date: Tue, 04 Sep 2018 13:46:37 +0200
+In-Reply-To: <20180904082301.GB22349@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
+	=?utf-8?Q?rang=C3=A9=22's?=
+	message of "Tue, 4 Sep 2018 09:23:01 +0100")
+Message-ID: <87k1o1v61u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180904110822.12863-2-fli@suse.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] Fix segmentation fault when
- qemu_signal_init fails
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 4/7] qapi: remove COMMAND_DROPPED event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,170 +41,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr .
+	David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Sep 04, 2018 at 07:08:18PM +0800, Fei Li wrote:
-> Currently, when qemu_signal_init() fails it only returns a non-zero
-> value but without propagating any Error. But its callers need a
-> non-null err when runs error_report_err(err), or else 0->msg occurs.
-> 
-> To avoid such segmentation fault, add a new Error parameter to make
-> the call trace to propagate the err to the final caller.
-> 
-> Signed-off-by: Fei Li <fli@suse.com>
-> ---
->  include/qemu/osdep.h |  2 +-
->  util/compatfd.c      | 17 ++++++++++++-----
->  util/main-loop.c     | 11 +++++++----
->  3 files changed, 20 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index a91068df0e..09ed85fcb8 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
->                               additional fields in the future) */
->  };
->  
-> -int qemu_signalfd(const sigset_t *mask);
-> +int qemu_signalfd(const sigset_t *mask, Error **errp);
->  void sigaction_invoke(struct sigaction *action,
->                        struct qemu_signalfd_siginfo *info);
->  #endif
-> diff --git a/util/compatfd.c b/util/compatfd.c
-> index 980bd33e52..65501de622 100644
-> --- a/util/compatfd.c
-> +++ b/util/compatfd.c
-> @@ -16,6 +16,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
->  #include "qemu/thread.h"
-> +#include "qapi/error.h"
->  
->  #include <sys/syscall.h>
->  
-> @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
->      }
->  }
->  
-> -static int qemu_signalfd_compat(const sigset_t *mask)
-> +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
->  {
->      struct sigfd_compat_info *info;
->      QemuThread thread;
-> @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *mask)
->  
->      info = malloc(sizeof(*info));
->      if (info == NULL) {
-> +        error_setg(errp, "Failed to malloc in %s", __func__);
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-I'd avoid using __func__ in error messages. Instead
+> On Tue, Sep 04, 2018 at 08:39:27AM +0200, Markus Armbruster wrote:
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>>=20
+>> > On Mon, Sep 03, 2018 at 09:30:52AM -0500, Eric Blake wrote:
+>> >> On 09/03/2018 08:31 AM, Markus Armbruster wrote:
+>> >>=20
+>> >> > Example:
+>> >> >=20
+>> >> >      client sends in-band command #1
+>> >> >      QEMU reads and queues
+>> >> >      QEMU dequeues in-band command #1
+>> >> >      in-band command #1 starts executing, but it's slooow
+>> >> >      client sends in-band command #2
+>> >> >      QEMU reads and queues
+>> >> >      ...
+>> >> >      client sends in-band command #8
+>> >> >      QEMU reads, queues and suspends the monitor
+>> >> >      client sends out-of-band command
+>> >> > --> time passes...
+>> >> >      in-band command #1 completes, QEMU sends reply
+>> >> >      QEMU dequeues in-band command #2, resumes the monitor
+>> >> >      in-band command #2 starts executing
+>> >> >      QEMU reads and executes out-of-band command
+>> >> >      out-of-band command completes, QEMU sends reply
+>> >> >      in-band command #2 completes, QEMU sends reply
+>> >> >      ... same for remaining in-band commands ...
+>> >> >=20
+>> >> > The out-of-band command gets stuck behind the in-band commands.
+>> >> >=20
+>> >> > The client can avoid this by managing the flow of in-band commands:=
+ have
+>> >> > no more than 7 in flight, so the monitor never gets suspended.
+>> >> >=20
+>> >> > This is a potentially useful thing to do for clients, isn't it?
+>> >> >=20
+>> >> > Eric, Daniel, is it something libvirt would do?
+>> >>=20
+>> >> Right now, libvirt serializes commands - it never sends a QMP command=
+ until
+>> >> the previous command's response has been processed. But that may not =
+help
+>> >> much, since libvirt does not send OOB commands.
+>> >
+>> > Note that is not merely due to the QMP monitor restriction either.
+>> >
+>> > Libvirt serializes all its public APIs that can change state of a runn=
+ing
+>> > domain.  It usually aims to allow read-only APIs to be run in parallel=
+ with
+>> > APIs that change state.
+>>=20
+>> Makes sense.  State changes are complex enough without concurrency.
+>> Even permitting just concurrent queries can add non-trivial complexity.
+>>=20
+>> However, pipelineing !=3D concurrency.  "Serializing" as I understand it
+>> implies no concurrency, it doesn't imply no pipelining.
+>>=20
+>> Mind, I'm not telling you to pipeline, I'm just trying to understand the
+>> constraints.
+>
+> I can only think of one place where libvirt would be likely to use
+> pipelining. We have an API that is used for collecting bulk stats
+> of many types, across al VMs. We do a couple of QMP queries per-VM,
+> so we could pipeline those queries. Even then, I'm not sure we would
+> go to the bother, as the bigger burden for performance is that we
+> round-robin across every VM. A bigger bang for our buck would be
+> to parallelize across VMs, but still serialize within VMs, as that
+> would have less complexity.
+>
+>> > The exception to the rule right now are some of the migration APIs whi=
+ch
+>> > we allow to be invoked to manage the migration process.=20
+>>=20
+>> Can you give an example?
+>
+> We have a job that triggers the migration and sits in a thread
+> monitoring its progress.
+>
+> While this is happening we allow a few other API calls such as
+> "pause", and of course things like switching to post-copy mode,
+> changin max downtime, etc. None of this gets in to parallel
+> or pipelined monitor execution though.
 
-   "Failed to allocate signalfd memory"
+At the QMP command level, these are all in-band commands issued
+synchronously, except for out-of-band migrate-recover and migrate-pause.
 
->          errno = ENOMEM;
->          return -1;
->      }
->  
->      if (pipe(fds) == -1) {
-> +        error_setg(errp, "Failed to create a pipe in %s", __func__);
+>> >> I guess when we are designing what libvirt should do, and deciding WH=
+EN it
+>> >> should send OOB commands, we have the luxury of designing libvirt to =
+enforce
+>> >> how many in-flight in-band commands it will ever have pending at once
+>> >> (whether the current 'at most 1', or even if we make it more parallel=
+ to 'at
+>> >> most 7'), so that we can still be ensured that the OOB command will be
+>> >> processed without being stuck in the queue of suspended in-band comma=
+nds.
+>> >> If we never send more than one in-band at a time, then it's not a con=
+cern
+>> >> how deep the qemu queue is; but if we do want libvirt to start parall=
+el
+>> >> in-band commands, then you are right that having a way to learn the q=
+emu
+>> >> queue depth is programmatically more precise than just guessing the m=
+aximum
+>> >> depth.  But it's also hard to argue we need that complexity if we don=
+'t have
+>> >> an immediate use envisioned for it.
+>>=20
+>> True.
+>>=20
+>> Options for the initial interface:
+>>=20
+>> (1) Provide means for the client to determine the queue length limit
+>>     (introspection or configuration).  Clients that need the monitory to
+>>     remain available for out-of-band commands can keep limit - 1 in-band
+>>     commands in flight.
+>>=20
+>> (2) Make the queue length limit part of the documented interface.
+>>     Clients that need the monitory to remain available for out-of-band
+>>     commands can keep limit - 1 in-band commands in flight.  We can
+>>     increase the limit later, but not decrease it.  We can also switch
+>>     to (1) as needed.
+>>=20
+>> (3) Treat the queue length limit as implementation detail (but tacitly
+>>     assume its at least 2, since less makes no sense[*]).  Clients that
+>>     need the monitory to remain available for out-of-band commands
+>>     cannot safely keep more than one in-band command in flight.  We can
+>>     switch to (2) or (1) as needed.
+>>=20
+>> Opinions?
+>
+> If you did (3), effectively apps will be behaving as if you had done
+> (2) with a documented queue limit of 2, so why not just do (2) right
+> away.
 
-    "Failed to create signalfd pipe"
+Yup, that's what I thought, too.
 
->          free(info);
->          return -1;
->      }
-> @@ -94,17 +97,21 @@ static int qemu_signalfd_compat(const sigset_t *mask)
->      return fds[0];
->  }
->  
-> -int qemu_signalfd(const sigset_t *mask)
-> +int qemu_signalfd(const sigset_t *mask, Error **errp)
->  {
-> -#if defined(CONFIG_SIGNALFD)
->      int ret;
-> +    Error *local_err = NULL;
->  
-> +#if defined(CONFIG_SIGNALFD)
->      ret = syscall(SYS_signalfd, -1, mask, _NSIG / 8);
->      if (ret != -1) {
->          qemu_set_cloexec(ret);
->          return ret;
->      }
->  #endif
-> -
-> -    return qemu_signalfd_compat(mask);
-> +    ret = qemu_signalfd_compat(mask, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +    }
-
-Using a local_err is not required - you can just pass errp stright
-to qemu_signalfd_compat() and then check
-
-   if (ret < 0)
-
-> +    return ret;
->  }
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index affe0403c5..20f6ad3849 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -71,10 +71,11 @@ static void sigfd_handler(void *opaque)
->      }
->  }
->  
-> -static int qemu_signal_init(void)
-> +static int qemu_signal_init(Error **errp)
->  {
->      int sigfd;
->      sigset_t set;
-> +    Error *local_err = NULL;
->  
->      /*
->       * SIG_IPI must be blocked in the main thread and must not be caught
-> @@ -94,9 +95,10 @@ static int qemu_signal_init(void)
->      pthread_sigmask(SIG_BLOCK, &set, NULL);
->  
->      sigdelset(&set, SIG_IPI);
-> -    sigfd = qemu_signalfd(&set);
-> +    sigfd = qemu_signalfd(&set, &local_err);
->      if (sigfd == -1) {
->          fprintf(stderr, "failed to create signalfd\n");
-> +        error_propagate(errp, local_err);
->          return -errno;
->      }
-
-Again, no need for local_err - just pass errp stright in
-
->  
-> @@ -109,7 +111,7 @@ static int qemu_signal_init(void)
->  
->  #else /* _WIN32 */
->  
-> -static int qemu_signal_init(void)
-> +static int qemu_signal_init(Error **errp)
->  {
->      return 0;
->  }
-> @@ -148,8 +150,9 @@ int qemu_init_main_loop(Error **errp)
->  
->      init_clocks(qemu_timer_notify_cb);
->  
-> -    ret = qemu_signal_init();
-> +    ret = qemu_signal_init(&local_error);
->      if (ret) {
-> +        error_propagate(errp, local_error);
->          return ret;
->      }
-
-Again, no need for local_error.
+I append a proposed replacement for the patch to qmp-spec.txt.  It
+assumes the current queue size 8.  That value is of course open to
+debate.
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
+index 67e44a8120..1fc6a507e2 100644
+--- a/docs/interop/qmp-spec.txt
++++ b/docs/interop/qmp-spec.txt
+@@ -130,9 +130,11 @@ to pass "id" with out-of-band commands.  Passing it wi=
+th all commands
+ is recommended for clients that accept capability "oob".
+=20
+ If the client sends in-band commands faster than the server can
+-execute them, the server will stop reading the requests from the QMP
+-channel until the request queue length is reduced to an acceptable
+-range.
++execute them, the server's queue will fill up, and the server will
++stop reading commands from the QMP channel until the queue has space
++again.  Clients that need the server to remain responsive to
++out-of-band commands should avoid filling up the queue by limiting the
++number of in-band commands in flight to seven.
+=20
+ Only a few commands support out-of-band execution.  The ones that do
+ have "allow-oob": true in output of query-qmp-schema.
