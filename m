@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxKEU-0003Ml-Mv
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 18:55:40 -0400
+	(envelope-from <prvs=778d471cf=Alistair.Francis@wdc.com>)
+	id 1fxKXZ-0008Vo-3C
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxKET-00053J-3e
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 18:55:38 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42009)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fxKES-00051M-IE
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 18:55:36 -0400
-Received: by mail-oi0-x242.google.com with SMTP id k81-v6so9992072oib.9
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 15:55:36 -0700 (PDT)
+	(envelope-from <prvs=778d471cf=Alistair.Francis@wdc.com>)
+	id 1fxKXU-0001qa-Lq
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:15:20 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:45216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=778d471cf=Alistair.Francis@wdc.com>)
+	id 1fxKXT-0001hj-Rq
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:15:16 -0400
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Tue,  4 Sep 2018 16:14:34 -0700
+Message-Id: <20180904231442.18932-2-alistair.francis@wdc.com>
+In-Reply-To: <20180904231442.18932-1-alistair.francis@wdc.com>
+References: <20180904231442.18932-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMo8Bf+bV9wAX_ctyy2pftLnyb+_7ukiVkD5sEENX94=nQmMfw@mail.gmail.com>
-References: <20180904210036.7317-1-jcmvbkbc@gmail.com>
-	<CAFEAcA-AyrFVYWkM+_aBQ8eXH-03UZfgiHrB37v=-iM+A=70DA@mail.gmail.com>
-	<CAMo8Bf+3gws2Sa24xMfVsAQ_PaZVqKPbpqpySAAHrdkvnF-erw@mail.gmail.com>
-	<CAFEAcA8M9+sZQehFQSUrrZYZ4e=CH6aDc890FfRwbMdQfUmEKA@mail.gmail.com>
-	<CAMo8Bf+bV9wAX_ctyy2pftLnyb+_7ukiVkD5sEENX94=nQmMfw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Sep 2018 23:55:15 +0100
-Message-ID: <CAFEAcA9LtXdP7MYEf4X3SkJjnpQaSDRNaFh3rYVcWeaUgKBoew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: do setrlimit selectively
+Content-Type: text/plain
+Subject: [Qemu-devel] [PULL 1/9] RISC-V: Update address bits to support sv39
+ and sv48
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>
 
-On 4 September 2018 at 23:26, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> On Tue, Sep 4, 2018 at 3:10 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 4 September 2018 at 23:02, Max Filippov <jcmvbkbc@gmail.com> wrote:
+From: Michael Clark <mjc@sifive.com>
 
->> You could make a case for always ignoring setrlimit calls: if we
->> ever hit the limit it's as likely to be by failing a QEMU internal
->> allocation as a guest one, so not to imposing the limit at all
->> would avoid QEMU failing then. But that would apply in both the
->> 32-on-64 and also 32-on-32 and 64-on-64 cases too.
->
-> That's what I did initially, but it feels somewhat unsafe in 64-on-64 case.
-> My expectation is that limits set by 64-bit guest should be somewhat
-> suitable for the 64-bit host, is it wrong?
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/cpu.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-It doesn't matter what the limit the guest sets is -- the
-problem is that if we hit it then chances are good it'll cause
-a QEMU allocation to fail and then we'll deadlock. The limit
-might be entirely reasonable for the guest program (which
-presumably has a plan for handling the failure) but QEMU
-itself can't cope with hitting the limit.
-
-https://bugs.launchpad.net/qemu/+bug/1163034 is the bug I
-mentioned in my earlier email, by the way.
-
-thanks
--- PMM
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 34abc383e3..e0608e6d5f 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -24,12 +24,12 @@
+ #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
+ #if defined(TARGET_RISCV64)
+ #define TARGET_LONG_BITS 64
+-#define TARGET_PHYS_ADDR_SPACE_BITS 50
+-#define TARGET_VIRT_ADDR_SPACE_BITS 39
++#define TARGET_PHYS_ADDR_SPACE_BITS 56 /* 44-bit PPN */
++#define TARGET_VIRT_ADDR_SPACE_BITS 48 /* sv48 */
+ #elif defined(TARGET_RISCV32)
+ #define TARGET_LONG_BITS 32
+-#define TARGET_PHYS_ADDR_SPACE_BITS 34
+-#define TARGET_VIRT_ADDR_SPACE_BITS 32
++#define TARGET_PHYS_ADDR_SPACE_BITS 34 /* 22-bit PPN */
++#define TARGET_VIRT_ADDR_SPACE_BITS 32 /* sv32 */
+ #endif
+ 
+ #define TCG_GUEST_DEFAULT_MO 0
+-- 
+2.17.1
