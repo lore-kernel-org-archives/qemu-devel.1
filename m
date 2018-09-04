@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fxFhV-0000AU-Qr
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 14:05:18 -0400
+	(envelope-from <thuth@redhat.com>) id 1fxGCU-0000NW-QH
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 14:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fxFhS-0000X6-KM
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 14:05:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50864 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fxGCP-0002ze-8H
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 14:37:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48854 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fxFhS-0000WG-BT
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 14:05:14 -0400
-Date: Tue, 4 Sep 2018 20:05:10 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180904180510.gigbzwjfiu2fs2ne@kamzik.brq.redhat.com>
-References: <1535778675-32170-1-git-send-email-wei@redhat.com>
-	<1535778675-32170-3-git-send-email-wei@redhat.com>
-	<20180903112639.hnuprihktvifieuz@kamzik.brq.redhat.com>
-	<2128164405.32860913.1536080671057.JavaMail.zimbra@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fxGCO-0002vl-Fb
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 14:37:13 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A42AE7788F
+	for <qemu-devel@nongnu.org>; Tue,  4 Sep 2018 18:37:06 +0000 (UTC)
+References: <20180904123603.10016-1-berrange@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6dce6639-c945-8851-8a4c-364944e4b043@redhat.com>
+Date: Tue, 4 Sep 2018 20:37:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2128164405.32860913.1536080671057.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V8 2/4] tests/migration: Support cross
- compilation in generating boot header file
+In-Reply-To: <20180904123603.10016-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] configure: preserve various environment
+ variables in config.status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wehuang@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peter maydell <peter.maydell@linaro.org>, quintela@redhat.com, dgilbert@redhat.com
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, Sep 04, 2018 at 01:04:31PM -0400, Wei Huang wrote:
-> > > +parse-cross-prefix = $(subst gcc,,$(patsubst cc,gcc,$(patsubst
-> > > CROSS_CC_GUEST="%",%,$(shell grep "CROSS_CC_GUEST="
-> > > $(SRC_PATH)/$(1)-softmmu/config-target.mak))))
-> > > +gen-cross-prefix = $(patsubst %-,CROSS_PREFIX=%-,$(call
-> > > parse-cross-prefix,$(1)))
-> > >  
-> > > -x86.bootsect: x86.boot
-> > > -	dd if=$< of=$@ bs=256 count=2 skip=124
-> > > +.PHONY: all $(TARGET_LIST)
-> > >  
-> > > -x86.boot: x86.o
-> > > -	$(CROSS_PREFIX)objcopy -O binary $< $@
-> > > +all: $(TARGET_LIST)
-> > >  
-> > > -x86.o: x86-a-b-bootblock.S
-> > > -	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
-> > > +$(TARGET_LIST):
-> > > +	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
-> > >  
-> > >  clean:
-> > > -	@rm -rf *.boot *.o *.bootsect
-> > > +	for target in $(TARGET_LIST); do \
-> > > +		$(MAKE) -C $$target clean; \
-> > > +	done
-> > 
-> > The above seems overly complicated. Does the following work?
-> > 
-> > $(TARGET_LIST): CROSS_PREFIX=$(CROSS_CC_GUEST)
-> > $(TARGET_LIST):
-> > 	$(MAKE) -C $@
-> 
-> No, it doen't work for different reasons.
-> 
-> First, to have CROSS_CC_GUEST defined, we normally would use "-include" to include config-target.mak file. But the end result is, the CROSS_CC_GUEST only has the same definition for both architectures (due to make command's multi-iteration processing and include is processed first). Secondly, CROSS_CC_GUEST needs to be polished because it can be: i) not defined; ii) "cc" without prefix; or iii) used-define value. We can't use it directly.
->
+On 2018-09-04 14:36, Daniel P. Berrang=C3=A9 wrote:
+> The config.status script is auto-generated by configure upon
+> completion. The intention is that config.status can be later invoked by
+> the developer directly, or by make indirectly, to re-detect the same
+> environment that configure originally used.
+>=20
+> The current config.status script, however, only contains a record of th=
+e
+> command line arguments to configure. Various environment variables have
+> an effect on what configure will find. In particular PKG_CONFIG_LIBDIR =
+&
+> PKG_CONFIG_PATH vars will affect what libraries pkg-config finds. The
+> PATH var will affect what toolchain binaries and XXXX-config scripts ar=
+e
+> found. The LD_LIBRARY_PATH var will affect what libraries are
+> found. Most commands have env variables that will override the name/pat=
+h
+> of the default version configure finds.
+>=20
+> All these key env variables should be recorded in the config.status scr=
+ipt.
+>=20
+> Autoconf would also preserve CFLAGS, LDFLAGS, LIBS, CPPFLAGS, but QEMU
+> deals with those differently, expecting extra flags to be set using
+> configure args, rather than env variables. At the end of the script we
+> also don't have the original values of those env vars, as we modify the=
+m
+> during configure.
 
-OK. Since I don't have any better suggestions. Then this is good
-enough for me.
+It's a little bit inconsequent to ignore CFLAGS etc., but to save the CC
+and CXX variable, since we've got a configure option for setting $CC and
+$CXX, too ("--cc" and "--cxx"). Maybe we should clean that up one day,
+but that's for another patch...
 
-Thanks,
-drew
+For this one here:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
