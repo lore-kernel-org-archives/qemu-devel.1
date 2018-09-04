@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fx4zw-0005Wn-UX
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 02:39:37 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fx57D-0001cz-9V
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 02:47:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fx4zt-0006vQ-Q8
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 02:39:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57762 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fx576-00045Y-Vo
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 02:47:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50162 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fx4zt-0006uz-Ir
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 02:39:33 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BECC940241C5
-	for <qemu-devel@nongnu.org>; Tue,  4 Sep 2018 06:39:32 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180903043149.4076-1-peterx@redhat.com>
-	<20180903043149.4076-5-peterx@redhat.com>
-	<87a7oz9g1y.fsf@dusky.pond.sub.org> <20180903101606.GB14774@xz-x1>
-	<87k1o2671t.fsf@dusky.pond.sub.org>
-	<55829207-b0f7-0869-6ec7-90bc2fb67e3a@redhat.com>
-	<20180903144116.GH14377@redhat.com>
-Date: Tue, 04 Sep 2018 08:39:27 +0200
-In-Reply-To: <20180903144116.GH14377@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Mon, 3 Sep 2018 15:41:16 +0100")
-Message-ID: <87y3chydeo.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fx576-0003z9-FM
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 02:47:00 -0400
+Date: Tue, 4 Sep 2018 08:46:48 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180904084648.680c564b@redhat.com>
+In-Reply-To: <20180831172424.12029-7-marcandre.lureau@redhat.com>
+References: <20180831172424.12029-1-marcandre.lureau@redhat.com>
+	<20180831172424.12029-7-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 4/7] qapi: remove COMMAND_DROPPED event
+Subject: Re: [Qemu-devel] [PATCH v10 6/6] tpm: add ACPI memory clear
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,123 +28,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, stefanb@linux.vnet.ibm.com, "Michael S.
+	Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On Fri, 31 Aug 2018 19:24:24 +0200
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> On Mon, Sep 03, 2018 at 09:30:52AM -0500, Eric Blake wrote:
->> On 09/03/2018 08:31 AM, Markus Armbruster wrote:
->>=20
->> > Example:
->> >=20
->> >      client sends in-band command #1
->> >      QEMU reads and queues
->> >      QEMU dequeues in-band command #1
->> >      in-band command #1 starts executing, but it's slooow
->> >      client sends in-band command #2
->> >      QEMU reads and queues
->> >      ...
->> >      client sends in-band command #8
->> >      QEMU reads, queues and suspends the monitor
->> >      client sends out-of-band command
->> > --> time passes...
->> >      in-band command #1 completes, QEMU sends reply
->> >      QEMU dequeues in-band command #2, resumes the monitor
->> >      in-band command #2 starts executing
->> >      QEMU reads and executes out-of-band command
->> >      out-of-band command completes, QEMU sends reply
->> >      in-band command #2 completes, QEMU sends reply
->> >      ... same for remaining in-band commands ...
->> >=20
->> > The out-of-band command gets stuck behind the in-band commands.
->> >=20
->> > The client can avoid this by managing the flow of in-band commands: ha=
-ve
->> > no more than 7 in flight, so the monitor never gets suspended.
->> >=20
->> > This is a potentially useful thing to do for clients, isn't it?
->> >=20
->> > Eric, Daniel, is it something libvirt would do?
->>=20
->> Right now, libvirt serializes commands - it never sends a QMP command un=
-til
->> the previous command's response has been processed. But that may not help
->> much, since libvirt does not send OOB commands.
->
-> Note that is not merely due to the QMP monitor restriction either.
->
-> Libvirt serializes all its public APIs that can change state of a running
-> domain.  It usually aims to allow read-only APIs to be run in parallel wi=
-th
-> APIs that change state.
+> This allows to pass the last failing test from the Windows HLK TPM 2.0
+> TCG PPI 1.3 tests.
+>=20
+> The interface is described in the "TCG Platform Reset Attack
+> Mitigation Specification", chapter 6 "ACPI _DSM Function". According
+> to Laszlo, it's not so easy to implement in OVMF, he suggested to do
+> it in qemu instead.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/tpm/tpm_ppi.h     |  2 ++
+>  hw/i386/acpi-build.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
+>  hw/tpm/tpm_crb.c     |  1 +
+>  hw/tpm/tpm_ppi.c     | 23 ++++++++++++++++++++++
+>  hw/tpm/tpm_tis.c     |  1 +
+>  docs/specs/tpm.txt   |  2 ++
+>  hw/tpm/trace-events  |  3 +++
+>  7 files changed, 78 insertions(+)
+>=20
+> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+> index f6458bf87e..3239751e9f 100644
+> --- a/hw/tpm/tpm_ppi.h
+> +++ b/hw/tpm/tpm_ppi.h
+> @@ -23,4 +23,6 @@ typedef struct TPMPPI {
+>  bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+>                    hwaddr addr, Object *obj, Error **errp);
+> =20
+> +void tpm_ppi_reset(TPMPPI *tpmppi);
+> +
+>  #endif /* TPM_TPM_PPI_H */
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index c5e9a6e11d..2ab3e8fae7 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -1824,6 +1824,13 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
+>      pprq =3D aml_name("PPRQ");
+>      pprm =3D aml_name("PPRM");
+> =20
+> +    aml_append(dev,
+> +               aml_operation_region("TPP3", AML_SYSTEM_MEMORY,
+> +                                    aml_int(TPM_PPI_ADDR_BASE + 0x15a),
+> +                                    0x1));
+> +    field =3D aml_field("TPP3", AML_BYTE_ACC, AML_NOLOCK, AML_PRESERVE);
+> +    aml_append(field, aml_named_field("MOVV", 8));
+> +    aml_append(dev, field);
+>      /*
+>       * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynamic
+>       * operation region inside of a method for getting FUNC[op].
+> @@ -2166,7 +2173,46 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
+>              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+>          }
+>          aml_append(method, ifctx);
+> +
+> +        ifctx =3D aml_if(
+> +            aml_equal(uuid,
+> +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D")=
+));
+> +        {
+> +            /* standard DSM query function */
+> +            ifctx2 =3D aml_if(aml_equal(function, zero));
+> +            {
+> +                uint8_t byte_list[1] =3D { 0x03 };
+> +                aml_append(ifctx2, aml_return(aml_buffer(1, byte_list)));
+> +            }
+> +            aml_append(ifctx, ifctx2);
+> +
+> +            /*
+> +             * TCG Platform Reset Attack Mitigation Specification 1.0 Ch=
+.6
+> +             *
+> +             * Arg 2 (Integer): Function Index =3D 1
+> +             * Arg 3 (Package): Arguments =3D Package: Type: Integer
+> +             *                  Operation Value of the Request
+> +             * Returns: Type: Integer
+> +             *          0: Success
+> +             *          1: General Failure
+> +             */
+> +            ifctx2 =3D aml_if(aml_equal(function, one));
+> +            {
+> +                aml_append(ifctx2,
+> +                           aml_store(aml_derefof(aml_index(arguments, ze=
+ro)),
+> +                                     op));
+> +                {
+> +                    aml_append(ifctx2, aml_store(op, aml_name("MOVV")));
+> +
+> +                    /* 0: success */
+> +                    aml_append(ifctx2, aml_return(zero));
+> +                }
+> +            }
+> +            aml_append(ifctx, ifctx2);
+> +        }
+> +        aml_append(method, ifctx);
+>      }
+> +
+>      aml_append(dev, method);
+>  }
+> =20
+> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+> index b243222fd6..48f6a716ad 100644
+> --- a/hw/tpm/tpm_crb.c
+> +++ b/hw/tpm/tpm_crb.c
+> @@ -233,6 +233,7 @@ static void tpm_crb_reset(void *dev)
+>  {
+>      CRBState *s =3D CRB(dev);
+> =20
+> +    tpm_ppi_reset(&s->ppi);
+>      tpm_backend_reset(s->tpmbe);
+> =20
+>      memset(s->regs, 0, sizeof(s->regs));
+> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+> index 8b46b9dd4b..ce43bc5729 100644
+> --- a/hw/tpm/tpm_ppi.c
+> +++ b/hw/tpm/tpm_ppi.c
+> @@ -16,8 +16,30 @@
+>  #include "qapi/error.h"
+>  #include "cpu.h"
+>  #include "sysemu/memory_mapping.h"
+> +#include "sysemu/reset.h"
+>  #include "migration/vmstate.h"
+>  #include "tpm_ppi.h"
+> +#include "trace.h"
+> +
+> +void tpm_ppi_reset(TPMPPI *tpmppi)
+> +{
 
-Makes sense.  State changes are complex enough without concurrency.
-Even permitting just concurrent queries can add non-trivial complexity.
 
-However, pipelineing !=3D concurrency.  "Serializing" as I understand it
-implies no concurrency, it doesn't imply no pipelining.
+> +    char *ptr =3D memory_region_get_ram_ptr(&tpmppi->ram);
+nvdimm seems to use cpu_physical_memory_read() to access guest
+accessible memory, so question is what's difference?
 
-Mind, I'm not telling you to pipeline, I'm just trying to understand the
-constraints.
-
-> The exception to the rule right now are some of the migration APIs which
-> we allow to be invoked to manage the migration process.=20
-
-Can you give an example?
-
->> I guess when we are designing what libvirt should do, and deciding WHEN =
-it
->> should send OOB commands, we have the luxury of designing libvirt to enf=
-orce
->> how many in-flight in-band commands it will ever have pending at once
->> (whether the current 'at most 1', or even if we make it more parallel to=
- 'at
->> most 7'), so that we can still be ensured that the OOB command will be
->> processed without being stuck in the queue of suspended in-band commands.
->> If we never send more than one in-band at a time, then it's not a concern
->> how deep the qemu queue is; but if we do want libvirt to start parallel
->> in-band commands, then you are right that having a way to learn the qemu
->> queue depth is programmatically more precise than just guessing the maxi=
-mum
->> depth.  But it's also hard to argue we need that complexity if we don't =
-have
->> an immediate use envisioned for it.
-
-True.
-
-Options for the initial interface:
-
-(1) Provide means for the client to determine the queue length limit
-    (introspection or configuration).  Clients that need the monitory to
-    remain available for out-of-band commands can keep limit - 1 in-band
-    commands in flight.
-
-(2) Make the queue length limit part of the documented interface.
-    Clients that need the monitory to remain available for out-of-band
-    commands can keep limit - 1 in-band commands in flight.  We can
-    increase the limit later, but not decrease it.  We can also switch
-    to (1) as needed.
-
-(3) Treat the queue length limit as implementation detail (but tacitly
-    assume its at least 2, since less makes no sense[*]).  Clients that
-    need the monitory to remain available for out-of-band commands
-    cannot safely keep more than one in-band command in flight.  We can
-    switch to (2) or (1) as needed.
-
-Opinions?
-
-> In terms of what libvirt would want to parallelize, I think it is reasona=
-ble
-> to consider any of the query-XXXX commands desirable. Other stuff is like=
-ly
-> to remain serialized from libvirt's side.
-
-QEMU doesn't care whether it queues in-band query commands or other
-in-band commands.
-
-
-[*] With a queue length of 1, the monitor suspends on receipt of an
-in-band command, and resumes after it completes.  This renders
-out-of-band commands useless: there is no way an out-of-band command can
-overtake an in-band command.
+> +
+> +    if (ptr[0x15a] & 0x1) {
+> +        GuestPhysBlockList guest_phys_blocks;
+> +        GuestPhysBlock *block;
+> +
+> +        guest_phys_blocks_init(&guest_phys_blocks);
+> +        guest_phys_blocks_append(&guest_phys_blocks);
+> +        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
+> +            trace_tpm_ppi_memset(block->host_addr,
+> +                             block->target_end - block->target_start);
+> +            memset(block->host_addr, 0,
+> +                   block->target_end - block->target_start);
+> +        }
+> +        guest_phys_blocks_free(&guest_phys_blocks);
+> +    }
+> +}
+> =20
+>  bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+>                    hwaddr addr, Object *obj, Error **errp)
+> @@ -27,5 +49,6 @@ bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *=
+m,
+>      vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
+> =20
+>      memory_region_add_subregion(m, addr, &tpmppi->ram);
+> +
+>      return true;
+>  }
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 70432ffe8b..d9bfa956cc 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -868,6 +868,7 @@ static void tpm_tis_reset(DeviceState *dev)
+>      s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->be_driver),
+>                              TPM_TIS_BUFFER_MAX);
+> =20
+> +    tpm_ppi_reset(&s->ppi);
+>      tpm_backend_reset(s->be_driver);
+> =20
+>      s->active_locty =3D TPM_TIS_NO_LOCALITY;
+> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> index 332c2ae597..ce9bda3c89 100644
+> --- a/docs/specs/tpm.txt
+> +++ b/docs/specs/tpm.txt
+> @@ -121,6 +121,8 @@ layout:
+>   +----------+--------+--------+-----------------------------------------=
+--+
+>   | next_step|   0x1  |  0x159 | Operation to execute after reboot by    =
+  |
+>   |          |        |        | firmware. Used by firmware.             =
+  |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> + | movv     |   0x1  |  0x15a | Memory overwrite variable               =
+  |
+>   +----------+--------+--------+-----------------------------------------=
+--+
+> =20
+>     The following values are supported for the 'func' field. They corresp=
+ond
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> index 25bee0cecf..920d32ad55 100644
+> --- a/hw/tpm/trace-events
+> +++ b/hw/tpm/trace-events
+> @@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
+>  tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
+>  tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
+d to TPM: 0x%08x (size=3D%d)"
+>  tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
+t =3D %u"
+> +
+> +# hw/tpm/tpm_ppi.c
+> +tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
