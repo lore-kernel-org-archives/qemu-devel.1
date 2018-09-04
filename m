@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fxGLW-0005gb-WA
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 14:46:40 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fxGo5-0004id-G2
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:16:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fxGLV-0004UE-N9
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 14:46:38 -0400
-Date: Tue, 4 Sep 2018 14:46:20 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180904184620.GI415265@localhost.localdomain>
-References: <20180904170930.28619-1-jsnow@redhat.com>
-	<20180904170930.28619-5-jsnow@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1fxGo4-00019E-JJ
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:16:09 -0400
+References: <20180831222907.16257-1-jsnow@redhat.com>
+	<20180831222907.16257-6-jsnow@redhat.com>
+	<b79cdffa-a0d4-824c-b9fd-b5aba38e61bd@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <00da6ab1-d2ca-8d66-7e22-8fc848b9d861@redhat.com>
+Date: Tue, 4 Sep 2018 15:15:42 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180904170930.28619-5-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 04/15] block/commit: refactor commit to
- use job callbacks
+In-Reply-To: <b79cdffa-a0d4-824c-b9fd-b5aba38e61bd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 05/15] block/mirror: don't install
+ backing chain on abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,201 +26,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: jtc@redhat.com, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-On Tue, Sep 04, 2018 at 01:09:19PM -0400, John Snow wrote:
-> Use the component callbacks; prepare, abort, and clean.
+
+
+On 09/03/2018 05:24 AM, Max Reitz wrote:
+> On 2018-09-01 00:28, John Snow wrote:
+>> In cases where we abort the block/mirror job, there's no point in
+>> installing the new backing chain before we finish aborting.
+>>
+>> Move this to the "success" portion of mirror_exit.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  block/mirror.c | 27 ++++++++++++++-------------
+>>  1 file changed, 14 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/block/mirror.c b/block/mirror.c
+>> index cba555b4ef..c164fee883 100644
+>> --- a/block/mirror.c
+>> +++ b/block/mirror.c
+>> @@ -642,16 +642,6 @@ static void mirror_exit(Job *job)
+>>       * required before it could become a backing file of target_bs. */
+>>      bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+>>                              &error_abort);
+>> -    if (s->backing_mode == MIRROR_SOURCE_BACKING_CHAIN) {
+>> -        BlockDriverState *backing = s->is_none_mode ? src : s->base;
+>> -        if (backing_bs(target_bs) != backing) {
+>> -            bdrv_set_backing_hd(target_bs, backing, &local_err);
+>> -            if (local_err) {
+>> -                error_report_err(local_err);
+>> -                ret = -EPERM;
+>> -            }
+>> -        }
+>> -    }
+>>  
+>>      if (s->to_replace) {
+>>          replace_aio_context = bdrv_get_aio_context(s->to_replace);
+>> @@ -659,9 +649,18 @@ static void mirror_exit(Job *job)
+>>      }
+>>  
+>>      if (s->should_complete && ret == 0) {
+>> -        BlockDriverState *to_replace = src;
+>> -        if (s->to_replace) {
+>> -            to_replace = s->to_replace;
+>> +        BlockDriverState *to_replace = s->to_replace ? s->to_replace : src;
+>> +
+>> +        if (s->backing_mode == MIRROR_SOURCE_BACKING_CHAIN) {
+>> +            BlockDriverState *backing = s->is_none_mode ? src : s->base;
+>> +            if (backing_bs(target_bs) != backing) {
+>> +                bdrv_set_backing_hd(target_bs, backing, &local_err);
+>> +                if (local_err) {
+>> +                    error_report_err(local_err);
+>> +                    ret = -EPERM;
+>> +                    goto clean;
+>> +                }
+>> +            }
+>>          }
+>>  
+>>          if (bdrv_get_flags(target_bs) != bdrv_get_flags(to_replace)) {
 > 
-> NB: prepare is only called when the job has not yet failed;
-> and abort can be called after prepare.
+> Testing shows that on post-READY cancel, s->should_complete is 0 (which
+> makes sense, because all the rest in this path is about replacing
+> to_replace by target_bs, which we don't want to do on cancel), so this
+> would not be executed.
 > 
-> complete -> prepare -> abort -> clean
-> complete -> abort -> clean
+> However, I think we do want to give the target the correct backing chain
+> when the job is canceled this way (as I suppose there are ways to keep
+> the target around even with drive-mirror).
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/commit.c | 90 ++++++++++++++++++++++++++++++++--------------------------
->  1 file changed, 49 insertions(+), 41 deletions(-)
+> So we should attach the backing chain whenever ret == 0, not just when
+> s->should_complete is true.
 > 
-> diff --git a/block/commit.c b/block/commit.c
-> index b6e8969877..eb3941e545 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
->      BlockDriverState *commit_top_bs;
->      BlockBackend *top;
->      BlockBackend *base;
-> +    BlockDriverState *base_bs;
->      BlockdevOnError on_error;
->      int base_flags;
->      char *backing_file_str;
-> @@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
->      return 0;
->  }
->  
-> -static void commit_exit(Job *job)
-> +static int commit_prepare(Job *job)
->  {
->      CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-> -    BlockJob *bjob = &s->common;
-> -    BlockDriverState *top = blk_bs(s->top);
-> -    BlockDriverState *base = blk_bs(s->base);
-> -    BlockDriverState *commit_top_bs = s->commit_top_bs;
-> -    bool remove_commit_top_bs = false;
-> -
-> -    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-> -    bdrv_ref(top);
-> -    bdrv_ref(commit_top_bs);
->  
->      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
->       * the normal backing chain can be restored. */
->      blk_unref(s->base);
-> +    s->base = NULL;
->  
-> -    if (!job_is_cancelled(job) && job->ret == 0) {
-> -        /* success */
-> -        job->ret = bdrv_drop_intermediate(s->commit_top_bs, base,
-> -                                          s->backing_file_str);
-> -    } else {
-> -        /* XXX Can (or should) we somehow keep 'consistent read' blocked even
-> -         * after the failed/cancelled commit job is gone? If we already wrote
-> -         * something to base, the intermediate images aren't valid any more. */
-> -        remove_commit_top_bs = true;
-> +    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
-> +                                  s->backing_file_str);
-> +}
+> Max
+> 
 
-If we can go from prepare->abort->clean, then that means to me that every
-failure case of .prepare() can be resolved without permanent changes / data
-loss.  Is this necessarily the case?
+Ah, thank you for saving me from myself. I got too excited to have
+everything under that one conditional.
 
->From bdrv_drop_intermediate():
+post-script: I really, really hate the "fake cancel" we've implemented
+for mirror. It makes the job logic so much worse.
 
-    QLIST_FOREACH_SAFE(c, &top->parents, next_parent, next) {
-        /* Check whether we are allowed to switch c from top to base */
-        GSList *ignore_children = g_slist_prepend(NULL, c);
-        bdrv_check_update_perm(base, NULL, c->perm, c->shared_perm,
-                               ignore_children, &local_err);
-        g_slist_free(ignore_children);
-        if (local_err) {
-            ret = -EPERM;
-            error_report_err(local_err);
-            goto exit;
-        }
+--js
 
-        /* If so, update the backing file path in the image file */
-        if (c->role->update_filename) {
-            ret = c->role->update_filename(c, base, backing_file_str,
-                                           &local_err);
-            if (ret < 0) {
-                bdrv_abort_perm_update(base);
-                error_report_err(local_err);
-                goto exit;
-            }
-        }
-
-        [...]
-     }
-
-We could fail this but still have modified an image file backing filenames,
-right?
-
-Or am I incorrect about the intention here, that abort() can always be clean?
-
--Jeff
-
-> +
-> +static void commit_abort(Job *job)
-> +{
-> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-> +    BlockDriverState *top_bs = blk_bs(s->top);
-> +
-> +    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-> +    bdrv_ref(top_bs);
-> +    bdrv_ref(s->commit_top_bs);
-> +
-> +    if (s->base) {
-> +        blk_unref(s->base);
->      }
->  
-> +    /* free the blockers on the intermediate nodes so that bdrv_replace_nodes
-> +     * can succeed */
-> +    block_job_remove_all_bdrv(&s->common);
-> +
-> +    /* If bdrv_drop_intermediate() failed (or was not invoked), remove the
-> +     * commit filter driver from the backing chain now. Do this as the final
-> +     * step so that the 'consistent read' permission can be granted.
-> +     *
-> +     * XXX Can (or should) we somehow keep 'consistent read' blocked even
-> +     * after the failed/cancelled commit job is gone? If we already wrote
-> +     * something to base, the intermediate images aren't valid any more. */
-> +    bdrv_child_try_set_perm(s->commit_top_bs->backing, 0, BLK_PERM_ALL,
-> +                            &error_abort);
-> +    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
-> +                      &error_abort);
-> +
-> +    bdrv_unref(s->commit_top_bs);
-> +    bdrv_unref(top_bs);
-> +}
-> +
-> +static void commit_clean(Job *job)
-> +{
-> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-> +
->      /* restore base open flags here if appropriate (e.g., change the base back
->       * to r/o). These reopens do not need to be atomic, since we won't abort
->       * even on failure here */
-> -    if (s->base_flags != bdrv_get_flags(base)) {
-> -        bdrv_reopen(base, s->base_flags, NULL);
-> +    if (s->base_flags != bdrv_get_flags(s->base_bs)) {
-> +        bdrv_reopen(s->base_bs, s->base_flags, NULL);
->      }
-> +
->      g_free(s->backing_file_str);
->      blk_unref(s->top);
-> -
-> -    /* If there is more than one reference to the job (e.g. if called from
-> -     * job_finish_sync()), job_completed() won't free it and therefore the
-> -     * blockers on the intermediate nodes remain. This would cause
-> -     * bdrv_set_backing_hd() to fail. */
-> -    block_job_remove_all_bdrv(bjob);
-> -
-> -    /* If bdrv_drop_intermediate() didn't already do that, remove the commit
-> -     * filter driver from the backing chain. Do this as the final step so that
-> -     * the 'consistent read' permission can be granted.  */
-> -    if (remove_commit_top_bs) {
-> -        bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
-> -                                &error_abort);
-> -        bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
-> -                          &error_abort);
-> -    }
-> -
-> -    bdrv_unref(commit_top_bs);
-> -    bdrv_unref(top);
->  }
->  
->  static int coroutine_fn commit_run(Job *job, Error **errp)
-> @@ -211,7 +216,9 @@ static const BlockJobDriver commit_job_driver = {
->          .user_resume   = block_job_user_resume,
->          .drain         = block_job_drain,
->          .run           = commit_run,
-> -        .exit          = commit_exit,
-> +        .prepare       = commit_prepare,
-> +        .abort         = commit_abort,
-> +        .clean         = commit_clean
->      },
->  };
->  
-> @@ -345,6 +352,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
->      if (ret < 0) {
->          goto fail;
->      }
-> +    s->base_bs = base;
->  
->      /* Required permissions are already taken with block_job_add_bdrv() */
->      s->top = blk_new(0, BLK_PERM_ALL);
-> -- 
-> 2.14.4
+>> @@ -678,6 +677,8 @@ static void mirror_exit(Job *job)
+>>              ret = -EPERM;
+>>          }
+>>      }
+>> +
+>> + clean:
+>>      if (s->to_replace) {
+>>          bdrv_op_unblock_all(s->to_replace, s->replace_blocker);
+>>          error_free(s->replace_blocker);
+>>
+> 
 > 
