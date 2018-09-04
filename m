@@ -1,38 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fx9nC-0001z6-J6
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:46:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fxAC2-0000Gc-0n
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 08:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fx9n9-0008MJ-D3
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:46:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52628 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fx9n9-0008Kh-7G
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:46:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5CBC440216EA
-	for <qemu-devel@nongnu.org>; Tue,  4 Sep 2018 11:46:42 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180903043149.4076-1-peterx@redhat.com>
-	<20180903043149.4076-5-peterx@redhat.com>
-	<87a7oz9g1y.fsf@dusky.pond.sub.org> <20180903101606.GB14774@xz-x1>
-	<87k1o2671t.fsf@dusky.pond.sub.org>
-	<55829207-b0f7-0869-6ec7-90bc2fb67e3a@redhat.com>
-	<20180903144116.GH14377@redhat.com>
-	<87y3chydeo.fsf@dusky.pond.sub.org>
-	<20180904082301.GB22349@redhat.com>
-Date: Tue, 04 Sep 2018 13:46:37 +0200
-In-Reply-To: <20180904082301.GB22349@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Tue, 4 Sep 2018 09:23:01 +0100")
-Message-ID: <87k1o1v61u.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fxAC1-0001XU-3s
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 08:12:25 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:46013)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fxAC0-0001WM-SO
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 08:12:24 -0400
+Received: by mail-oi0-x242.google.com with SMTP id t68-v6so6143599oie.12
+	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 05:12:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 4/7] qapi: remove COMMAND_DROPPED event
+In-Reply-To: <ed01225b-b948-9429-a2d7-f9a5095499de@redhat.com>
+References: <1536044538-22507-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA8uVksn0w5Z6WBS8jXc8KtZjMgNuTk+TOPtsVgnXK4C0A@mail.gmail.com>
+	<ed01225b-b948-9429-a2d7-f9a5095499de@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 4 Sep 2018 13:12:02 +0100
+Message-ID: <CAFEAcA9xt9+pnt4MSuuvzhCWv3-bpata6BG0RiD86Joo3zH4dA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] configure: Save PKG_CONFIG_LIBDIR and
+ WINDRES in config.status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,171 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr .
-	David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On 4 September 2018 at 11:53, Thomas Huth <thuth@redhat.com> wrote:
+> But still, I think at least the PKG_CONFIG_LIBDIR part could be useful,
+> since the same problem e.g. also occurs when trying do a 32-bit build on
+> a 64-bit host, i.e. when running configure with "--extra-cflags=-m32".
+> Or is there also another configure switch that can help to get
+> PKG_CONFIG_LIBDIR right here?
 
-> On Tue, Sep 04, 2018 at 08:39:27AM +0200, Markus Armbruster wrote:
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->>=20
->> > On Mon, Sep 03, 2018 at 09:30:52AM -0500, Eric Blake wrote:
->> >> On 09/03/2018 08:31 AM, Markus Armbruster wrote:
->> >>=20
->> >> > Example:
->> >> >=20
->> >> >      client sends in-band command #1
->> >> >      QEMU reads and queues
->> >> >      QEMU dequeues in-band command #1
->> >> >      in-band command #1 starts executing, but it's slooow
->> >> >      client sends in-band command #2
->> >> >      QEMU reads and queues
->> >> >      ...
->> >> >      client sends in-band command #8
->> >> >      QEMU reads, queues and suspends the monitor
->> >> >      client sends out-of-band command
->> >> > --> time passes...
->> >> >      in-band command #1 completes, QEMU sends reply
->> >> >      QEMU dequeues in-band command #2, resumes the monitor
->> >> >      in-band command #2 starts executing
->> >> >      QEMU reads and executes out-of-band command
->> >> >      out-of-band command completes, QEMU sends reply
->> >> >      in-band command #2 completes, QEMU sends reply
->> >> >      ... same for remaining in-band commands ...
->> >> >=20
->> >> > The out-of-band command gets stuck behind the in-band commands.
->> >> >=20
->> >> > The client can avoid this by managing the flow of in-band commands:=
- have
->> >> > no more than 7 in flight, so the monitor never gets suspended.
->> >> >=20
->> >> > This is a potentially useful thing to do for clients, isn't it?
->> >> >=20
->> >> > Eric, Daniel, is it something libvirt would do?
->> >>=20
->> >> Right now, libvirt serializes commands - it never sends a QMP command=
- until
->> >> the previous command's response has been processed. But that may not =
-help
->> >> much, since libvirt does not send OOB commands.
->> >
->> > Note that is not merely due to the QMP monitor restriction either.
->> >
->> > Libvirt serializes all its public APIs that can change state of a runn=
-ing
->> > domain.  It usually aims to allow read-only APIs to be run in parallel=
- with
->> > APIs that change state.
->>=20
->> Makes sense.  State changes are complex enough without concurrency.
->> Even permitting just concurrent queries can add non-trivial complexity.
->>=20
->> However, pipelineing !=3D concurrency.  "Serializing" as I understand it
->> implies no concurrency, it doesn't imply no pipelining.
->>=20
->> Mind, I'm not telling you to pipeline, I'm just trying to understand the
->> constraints.
->
-> I can only think of one place where libvirt would be likely to use
-> pipelining. We have an API that is used for collecting bulk stats
-> of many types, across al VMs. We do a couple of QMP queries per-VM,
-> so we could pipeline those queries. Even then, I'm not sure we would
-> go to the bother, as the bigger burden for performance is that we
-> round-robin across every VM. A bigger bang for our buck would be
-> to parallelize across VMs, but still serialize within VMs, as that
-> would have less complexity.
->
->> > The exception to the rule right now are some of the migration APIs whi=
-ch
->> > we allow to be invoked to manage the migration process.=20
->>=20
->> Can you give an example?
->
-> We have a job that triggers the migration and sits in a thread
-> monitoring its progress.
->
-> While this is happening we allow a few other API calls such as
-> "pause", and of course things like switching to post-copy mode,
-> changin max downtime, etc. None of this gets in to parallel
-> or pipelined monitor execution though.
+Personally I think the neatest way to handle 32-bit-build-on-64-bit-host
+is to treat it like any other non-native build, ie have the distro
+ship compiler, pkg-config, etc so that --cross-prefix=i686-linux-gnu-
+works :-)
 
-At the QMP command level, these are all in-band commands issued
-synchronously, except for out-of-band migrate-recover and migrate-pause.
-
->> >> I guess when we are designing what libvirt should do, and deciding WH=
-EN it
->> >> should send OOB commands, we have the luxury of designing libvirt to =
-enforce
->> >> how many in-flight in-band commands it will ever have pending at once
->> >> (whether the current 'at most 1', or even if we make it more parallel=
- to 'at
->> >> most 7'), so that we can still be ensured that the OOB command will be
->> >> processed without being stuck in the queue of suspended in-band comma=
-nds.
->> >> If we never send more than one in-band at a time, then it's not a con=
-cern
->> >> how deep the qemu queue is; but if we do want libvirt to start parall=
-el
->> >> in-band commands, then you are right that having a way to learn the q=
-emu
->> >> queue depth is programmatically more precise than just guessing the m=
-aximum
->> >> depth.  But it's also hard to argue we need that complexity if we don=
-'t have
->> >> an immediate use envisioned for it.
->>=20
->> True.
->>=20
->> Options for the initial interface:
->>=20
->> (1) Provide means for the client to determine the queue length limit
->>     (introspection or configuration).  Clients that need the monitory to
->>     remain available for out-of-band commands can keep limit - 1 in-band
->>     commands in flight.
->>=20
->> (2) Make the queue length limit part of the documented interface.
->>     Clients that need the monitory to remain available for out-of-band
->>     commands can keep limit - 1 in-band commands in flight.  We can
->>     increase the limit later, but not decrease it.  We can also switch
->>     to (1) as needed.
->>=20
->> (3) Treat the queue length limit as implementation detail (but tacitly
->>     assume its at least 2, since less makes no sense[*]).  Clients that
->>     need the monitory to remain available for out-of-band commands
->>     cannot safely keep more than one in-band command in flight.  We can
->>     switch to (2) or (1) as needed.
->>=20
->> Opinions?
->
-> If you did (3), effectively apps will be behaving as if you had done
-> (2) with a documented queue limit of 2, so why not just do (2) right
-> away.
-
-Yup, that's what I thought, too.
-
-I append a proposed replacement for the patch to qmp-spec.txt.  It
-assumes the current queue size 8.  That value is of course open to
-debate.
-
-
-diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
-index 67e44a8120..1fc6a507e2 100644
---- a/docs/interop/qmp-spec.txt
-+++ b/docs/interop/qmp-spec.txt
-@@ -130,9 +130,11 @@ to pass "id" with out-of-band commands.  Passing it wi=
-th all commands
- is recommended for clients that accept capability "oob".
-=20
- If the client sends in-band commands faster than the server can
--execute them, the server will stop reading the requests from the QMP
--channel until the request queue length is reduced to an acceptable
--range.
-+execute them, the server's queue will fill up, and the server will
-+stop reading commands from the QMP channel until the queue has space
-+again.  Clients that need the server to remain responsive to
-+out-of-band commands should avoid filling up the queue by limiting the
-+number of in-band commands in flight to seven.
-=20
- Only a few commands support out-of-band execution.  The ones that do
- have "allow-oob": true in output of query-qmp-schema.
+thanks
+-- PMM
