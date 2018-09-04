@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fxHFR-00004s-LU
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:44:26 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1fxHKF-00025N-JC
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fxHFO-0005J0-Gl
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:44:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51260 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fxHFO-0005Ih-Bn
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:44:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7555587A84
-	for <qemu-devel@nongnu.org>; Tue,  4 Sep 2018 19:44:21 +0000 (UTC)
-References: <20180902175401.8195-1-ybettan@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b735a977-9591-e6c3-3e82-91db5da00188@redhat.com>
-Date: Tue, 4 Sep 2018 14:44:17 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1fxHKC-0007yJ-DC
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:49:23 -0400
+From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Date: Tue,  4 Sep 2018 21:49:03 +0200
+Message-Id: <20180904194903.20712-1-hpoussin@reactos.org>
 MIME-Version: 1.0
-In-Reply-To: <20180902175401.8195-1-ybettan@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 0/3] Formatted INFO files to fit
- Markdown (.md) format.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] hw/ppc: on 40p machine,
+ change default firmware to OpenBIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +21,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yoni Bettan <ybettan@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-On 09/02/2018 12:53 PM, Yoni Bettan wrote:
-> This patch make INFO files (e.g. README, CODING_STYLE and HACKING) much more
-> readable when watched from GitHub GUI.
-> 
-> ./VERSION, ./MAINTAINERS were leave untouched otherwise
-> ./scripts/get_maintainer.pl breaks.
-> 
-> ./COPYING, ./LICENSE ./COPYING.LIB were leave untouched because it look likes
-> they come from GNU and not QEMU.
-> 
-> Visualization of the change can be found at
-> https://github.com/ybettan/qemu/tree/md.
-> NOTE:
-> This last part of the message should be removed from the commit message
-> since I will remove the 'md' branch from my fork if the patch is
-> accepted.
+OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
+Use it, instead of relying on an unmaintained and very limited firmware.
 
-I'm a bit late to the thread, but wanted to point out this tangent:
+Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+---
+ hw/ppc/prep.c            | 2 +-
+ tests/boot-serial-test.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Note that the cover letter is not committed into git, so a disclaimer 
-about removing the last paragraph of the cover letter is pointless.
-
-Had this been an actual commit message, it's best to stick such 
-disclaimers (which are useful to reviewers, but not to long-term git 
-log) after the --- that separates the actual commit message from the 
-patch (as 'git am' will automatically strip such disclaimers when a 
-maintainer takes in your patch for merging through their tree).
-
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 3401570d98..1558855247 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -736,7 +736,7 @@ static void ibm_40p_init(MachineState *machine)
+     /* PCI host */
+     dev = qdev_create(NULL, "raven-pcihost");
+     if (!bios_name) {
+-        bios_name = BIOS_FILENAME;
++        bios_name = "openbios-ppc";
+     }
+     qdev_prop_set_string(dev, "bios-name", bios_name);
+     qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index 952a2e7ead..276ca14c97 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -76,13 +76,13 @@ static testdef_t tests[] = {
+     { "alpha", "clipper", "", "PCI:" },
+     { "ppc", "ppce500", "", "U-Boot" },
+     { "ppc", "prep", "-m 96", "Memory size: 96 MB" },
+-    { "ppc", "40p", "-boot d", "Booting from device d" },
++    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+     { "ppc", "g3beige", "", "PowerPC,750" },
+     { "ppc", "mac99", "", "PowerPC,G4" },
+     { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
+     { "ppc64", "ppce500", "", "U-Boot" },
+     { "ppc64", "prep", "-boot e", "Booting from device e" },
+-    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
++    { "ppc64", "40p", "-m 192", "Memory: 192M" },
+     { "ppc64", "mac99", "", "PowerPC,970FX" },
+     { "ppc64", "pseries", "", "Open Firmware" },
+     { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.11.0
