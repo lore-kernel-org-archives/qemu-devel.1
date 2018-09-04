@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fx8dD-0001sb-Nh
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 06:32:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fx8gX-0004h3-CD
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 06:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fx8dA-0006X0-UG
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 06:32:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44196 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fx8dA-0006Wc-OX
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 06:32:20 -0400
-Date: Tue, 4 Sep 2018 11:32:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180904103213.GB2529@work-vm>
-References: <CD29DCF7-6537-406F-A127-6A2FFDDAAD79@caviumnetworks.com>
-	<87k1ohxik4.fsf@trasno.org>
-	<3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
-	<20180828172739.GA10175@work-vm>
-	<19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
-	<20180829131653.gk4yhjdi2pk5bdcd@kamzik.brq.redhat.com>
-	<DC466FE6-98B4-485B-BE4D-C4E228B36107@caviumnetworks.com>
-	<20180831111121.n7zafn6peiwe6ojn@kamzik.brq.redhat.com>
-	<1604D594-E6D4-48BB-A270-F7CF1092978B@caviumnetworks.com>
-	<20180904095402.izdnqag3xak3mgsb@kamzik.brq.redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fx8gW-0008MZ-IS
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 06:35:49 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35854)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fx8gW-0008Ly-3H
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 06:35:48 -0400
+Received: by mail-oi0-x242.google.com with SMTP id r69-v6so5765921oie.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 03:35:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180904095402.izdnqag3xak3mgsb@kamzik.brq.redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
- different processor ids
+In-Reply-To: <1536044538-22507-1-git-send-email-thuth@redhat.com>
+References: <1536044538-22507-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 4 Sep 2018 11:35:26 +0100
+Message-ID: <CAFEAcA8uVksn0w5Z6WBS8jXc8KtZjMgNuTk+TOPtsVgnXK4C0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] configure: Save PKG_CONFIG_LIBDIR and
+ WINDRES in config.status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,114 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, Juan Quintela <quintela@redhat.com>, Auger Eric <eric.auger@redhat.com>, "peter.maydell@linaro.org qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Weil <sw@weilnetz.de>
 
-* Andrew Jones (drjones@redhat.com) wrote:
-> On Tue, Sep 04, 2018 at 09:16:58AM +0000, Jaggi, Manish wrote:
-> > > On 31-Aug-2018, at 4:41 PM, Andrew Jones <drjones@redhat.com> wrote=
-:
-> > > I think the sequence should look something like this:
-> > >=20
-> > >  1) Guest running on Host A with processor a
-> > >  2) Stop guest and save its state for migration
-> > >  3) Migrate guest to Host B with processor b (b is "close enough" t=
-o a)
-> > >  4) Restore guest state after migration
-> > >     If guest is running with '-cpu host'
-> > >       4.a) Inform KVM of any configuration that impacts invariant r=
-egisters
-> > >       4.b) Update the guest's view of all invariant registers to ma=
-tch the
-> > >            host
-> > >     EndIf
-> > >  5) Run guest
-> > >=20
-> > > 4.a and 4.b require new code both in QEMU and KVM. 4.a may require =
-a new
-> > > KVM API, unless the existing API can be leveraged.
-> > >=20
-> > > The definition of "close enough" is left to the users and/or higher=
- layers
-> > > of the Virt stack.
-> > >=20
-> >=20
-> > Thanks for detailing the sequence.=20
-> > I got another comment from Juan and David which is not to use -cpu ho=
-st, see below
-> >=20
-> > "I really think that the right approach here is not using -cpu host. =
- You
-> > do the full work, create a model as David says, and be sure that you =
-car
-> > run that model on both cpus.  It is a lot of work, but it is the only
-> > way to make sure that this is going to work long term.=E2=80=9D
-> >=20
-> > Not using -cpu host is orthogonal to the sequence we have been discus=
-sing in this thread.
-> > Use something like -cpu cortex-a57 (this however does not work so far=
-)
-> > This would avoid close-enough definition, but would need substantial =
-work.
-> >=20
-> > So which approach should be taken here, whats your take...
-> >=20
->=20
-> Inventing a base-AArch64 cpu model that can then be extended with optio=
-nal
-> features is a nice way to extend the migratability of a guest, however
-> it's hard to do because of errata. Since errata workarounds are enabled
-> per MIDR, then we'd need to invent our own MIDR and also some way to
-> communicate which errata we want to enable, possibly through some parav=
-irt
-> mechanism or through some implementation defined system registers that
-> KVM would need to reserve and define.
->=20
-> That's not just a ton of work for the entire virt stack (not just KVM a=
-nd
-> QEMU, but also all the layers above), but it's possible that it won't b=
-e
-> useful in the end anyway. There's risk that enabling just one erratum
-> workaround would restrict the guest to hosts of the exact same type
-> anyway. For each erratum that needs to be enabled, the probability of
-> enabling an incompatible one goes up, so it may not be likely to do muc=
-h
-> better than '-cpu host' in the end. I'm afraid that until errata are
-> primarily showing up in optional CPU features that can simply be disabl=
-ed
-> for the workaround, that we're stuck with '-cpu host'. I'd be happy to
-> discuss it more though.
->=20
-> In short, I'd go with the proposal above, for now, with possibly one
-> change. libvirt folk (Andrea Bolognani and Pino Toscano) suggest that
-> the guest invariant register updating on the destination host only be
-> done if the user opts-in to it. This is because right now if a user
-> tries to migrate to a host that is not 100% identical the migration
-> will fail, which makes the "mistake" clear. If we silently change the
-> behavior to allow it, then what could have been a mistake, because
-> the hosts aren't actually "close enough", may go unnoticed. I'm not
-> 100% sure we need another user opt-in flag to be set, though, as I
-> think the '-cpu host' indicates the user expects the VCPU to look
-> like the host CPU, and even after migration that expectation should be
-> met. Simply, users that migrate '-cpu host' VMs need to know what they'=
-re
-> doing.
+On 4 September 2018 at 08:02, Thomas Huth <thuth@redhat.com> wrote:
+> When cross-compiling QEMU for a target that significantly differs from
+> the host, the current information in config.status is not enough to
+> properly re-create the configuration. For example when I try to test
+> my build with the mingw32 cross-compiler, I regularly get this error
+> after the build system tried to re-create the configuration with the
+> config.status file:
+>
+> ERROR: sizeof(size_t) doesn't match GLIB_SIZEOF_SIZE_T.
+>        You probably need to set PKG_CONFIG_LIBDIR
+>        to point to the right pkg-config files for your
+>        build target
+>RAND
+> A similar problem exists for the "windres" tool, where you have to
+> set the WINDRES variable in case it has a different name.
+> So let's fix these issues by storing the configuration for theseq
+> variables in the config.status file, too.
 
-The problem here is that in the x86 world we've said:
-  'don't use -cpu host
-   if you're using it be careful and you need to know what you're doing'
+This is also true if the user set CC or RANLIB or any of a bunch
+of other environment variables that configure uses. If we're going
+to store those settings in config.status we should consistently
+do it for all environment variables we care about, I think.
 
-on ARM it's looking like the default; that means lots more people will
-use it who don't know what they're doing.
+What does autoconf do for the equivalent situation?
 
-At the very least you need to log cases like this (to stderr) when you
-detect them on the destination, so that when we get the innevitable
-'guest crashed after migration' reports we can see the problem in the
-log.
-
-Dave
-
-> Thanks,
-> drew
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
