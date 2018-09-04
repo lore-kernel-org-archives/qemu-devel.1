@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1fxHou-0005zF-KW
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:21:05 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fxHzv-0005vn-6X
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1fxHoq-0003K4-J9
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:21:04 -0400
-References: <20180810053712.6587-1-hpoussin@reactos.org>
-	<20180810064154.GE4079@umbus> <20180820031620.GA3348@umbus.fritz.box>
-	<d9a25f9f-e578-5097-a7fc-0fe065275b16@ilande.co.uk>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <6987dd49-757a-dd84-c73c-0a16a669ccb6@reactos.org>
-Date: Tue, 4 Sep 2018 22:20:56 +0200
+	(envelope-from <jsnow@redhat.com>) id 1fxHzt-0005K1-Go
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:32:26 -0400
+References: <20180904170930.28619-1-jsnow@redhat.com>
+	<20180904170930.28619-5-jsnow@redhat.com>
+	<20180904184620.GI415265@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <63e2cd53-a4cb-3ed7-ae70-f49b4e11fad5@redhat.com>
+Date: Tue, 4 Sep 2018 16:32:17 -0400
 MIME-Version: 1.0
-In-Reply-To: <d9a25f9f-e578-5097-a7fc-0fe065275b16@ilande.co.uk>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20180904184620.GI415265@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc: on 40p machine,
- change default firmware to OpenBIOS
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/15] block/commit: refactor commit to
+ use job callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +26,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Le 31/08/2018 à 16:16, Mark Cave-Ayland a écrit :
-> On 20/08/18 04:16, David Gibson wrote:
-> 
->> On Fri, Aug 10, 2018 at 04:41:54PM +1000, David Gibson wrote:
->>> On Fri, Aug 10, 2018 at 07:37:12AM +0200, Hervé Poussineau wrote:
->>>> OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
->>>> Use it, instead of relying on an unmaintained and very limited firmware.
->>>>
->>>> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
->>>
->>> Applied to ppc-for-3.1, thanks.
->>
->> But I'm afraid I've had to pull it out.  This breaks boot-serial-test,
->> because the new firmware prints different messages than the old one
->> did and the testcase isn't looking for them.
->>
->> I tried fixing it, but ran into complications I didn't have time to
->> debug.  So I'm afraid this will miss my coming-soon pull request.
->>
->> You should be able to reproduce the problem with "make check
->> SPEED=slow", can you fix this up and resubmit.
->>
->>>
->>>> ---
->>>>   hw/ppc/prep.c | 2 +-
->>>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
->>>> index 3401570d98..1558855247 100644
->>>> --- a/hw/ppc/prep.c
->>>> +++ b/hw/ppc/prep.c
->>>> @@ -736,7 +736,7 @@ static void ibm_40p_init(MachineState *machine)
->>>>       /* PCI host */
->>>>       dev = qdev_create(NULL, "raven-pcihost");
->>>>       if (!bios_name) {
->>>> -        bios_name = BIOS_FILENAME;
->>>> +        bios_name = "openbios-ppc";
->>>>       }
->>>>       qdev_prop_set_string(dev, "bios-name", bios_name);
->>>>       qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
-> 
-> Thanks to Thomas on IRC, I was able come up with the diff below which
-> fixes boot-serial-test when this patch is applied:
-> 
-> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> index f123b15e3e..f865822e32 100644
-> --- a/tests/boot-serial-test.c
-> +++ b/tests/boot-serial-test.c
-> @@ -75,12 +75,12 @@ typedef struct testdef {
->   static testdef_t tests[] = {
->       { "alpha", "clipper", "", "PCI:" },
->       { "ppc", "ppce500", "", "U-Boot" },
-> -    { "ppc", "40p", "-boot d", "Booting from device d" },
-> +    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
->       { "ppc", "g3beige", "", "PowerPC,750" },
->       { "ppc", "mac99", "", "PowerPC,G4" },
->       { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
->       { "ppc64", "ppce500", "", "U-Boot" },
-> -    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
-> +    { "ppc64", "40p", "-m 192", "Memory: 192M" },
->       { "ppc64", "mac99", "", "PowerPC,970FX" },
->       { "ppc64", "pseries", "", "Open Firmware" },
->       { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
-> 
-> Hervé, can you confirm that this fixes "make check" for you? If so it
-> should just be a simple case of squashing into the above patch and then
-> resubmitting a v2.
 
-Yes, this also fixes "make check" for me.
-v2 sent at http://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00362.html
 
-Thanks for the help.
+On 09/04/2018 02:46 PM, Jeff Cody wrote:
+> On Tue, Sep 04, 2018 at 01:09:19PM -0400, John Snow wrote:
+>> Use the component callbacks; prepare, abort, and clean.
+>>
+>> NB: prepare is only called when the job has not yet failed;
+>> and abort can be called after prepare.
+>>
+>> complete -> prepare -> abort -> clean
+>> complete -> abort -> clean
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block/commit.c | 90 ++++++++++++++++++++++++++++++++--------------------------
+>>  1 file changed, 49 insertions(+), 41 deletions(-)
+>>
+>> diff --git a/block/commit.c b/block/commit.c
+>> index b6e8969877..eb3941e545 100644
+>> --- a/block/commit.c
+>> +++ b/block/commit.c
+>> @@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
+>>      BlockDriverState *commit_top_bs;
+>>      BlockBackend *top;
+>>      BlockBackend *base;
+>> +    BlockDriverState *base_bs;
+>>      BlockdevOnError on_error;
+>>      int base_flags;
+>>      char *backing_file_str;
+>> @@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
+>>      return 0;
+>>  }
+>>  
+>> -static void commit_exit(Job *job)
+>> +static int commit_prepare(Job *job)
+>>  {
+>>      CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
+>> -    BlockJob *bjob = &s->common;
+>> -    BlockDriverState *top = blk_bs(s->top);
+>> -    BlockDriverState *base = blk_bs(s->base);
+>> -    BlockDriverState *commit_top_bs = s->commit_top_bs;
+>> -    bool remove_commit_top_bs = false;
+>> -
+>> -    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
+>> -    bdrv_ref(top);
+>> -    bdrv_ref(commit_top_bs);
+>>  
+>>      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
+>>       * the normal backing chain can be restored. */
+>>      blk_unref(s->base);
+>> +    s->base = NULL;
+>>  
+>> -    if (!job_is_cancelled(job) && job->ret == 0) {
+>> -        /* success */
+>> -        job->ret = bdrv_drop_intermediate(s->commit_top_bs, base,
+>> -                                          s->backing_file_str);
+>> -    } else {
+>> -        /* XXX Can (or should) we somehow keep 'consistent read' blocked even
+>> -         * after the failed/cancelled commit job is gone? If we already wrote
+>> -         * something to base, the intermediate images aren't valid any more. */
+>> -        remove_commit_top_bs = true;
+>> +    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
+>> +                                  s->backing_file_str);
+>> +}
+> 
+> If we can go from prepare->abort->clean, then that means to me that every
+> failure case of .prepare() can be resolved without permanent changes / data
+> loss.  Is this necessarily the case?
+> 
 
-Hervé
+That'd be a requisite to make the job a transaction, but commit, mirror
+and stream are not currently transactionable.
+
+The way commit already works, for example, can leave the base and
+intermediate images as unusable as standalone images. This refactoring
+will not change that alone.
+
+So it's not necessarily a problem, but it's something that would need to
+be fixed if we ever wanted transaction support.
+
+However, in talking on IRC we did realize that this patch does change
+behavior...
+
+Before:
+
+If bdrv_drop_intermediate fails, we store the retcode but continue
+cleaning up as if it didn't fail. i.e., we don't remove the commit job's
+installed top_bs node.
+
+After:
+
+if bdrv_drop_intermediate fails, we return the failure retcode and
+.abort gets called as a result, i.e. we will remove the commit job's
+installed top_bs node in favor of the original top_bs node.
+
+I think this behavior is an improvement, however it raises a question
+about the nature of failures in bdrv_drop_intermediate.
+
+If this function fails without making any changes, the new commit
+behavior is good. If it succeeds, we're also good. The problem is with
+intermediate or partial successes.
+
+If top has multiple parents (I think under normal circumstances it
+won't, but I'm not absolutely sure) and it fails to update their backing
+file references, it might partially succeed.
+
+I think commit's usage here is correct, but I think we might need to
+update bdrv_drop_intermediate to make it roll back changes if it
+experiences a partial failure to give all-or-nothing semantics.
+
+Thoughts?
+
+> From bdrv_drop_intermediate():
+> 
+>     QLIST_FOREACH_SAFE(c, &top->parents, next_parent, next) {
+>         /* Check whether we are allowed to switch c from top to base */
+>         GSList *ignore_children = g_slist_prepend(NULL, c);
+>         bdrv_check_update_perm(base, NULL, c->perm, c->shared_perm,
+>                                ignore_children, &local_err);
+>         g_slist_free(ignore_children);
+>         if (local_err) {
+>             ret = -EPERM;
+>             error_report_err(local_err);
+>             goto exit;
+>         }
+> 
+>         /* If so, update the backing file path in the image file */
+>         if (c->role->update_filename) {
+>             ret = c->role->update_filename(c, base, backing_file_str,
+>                                            &local_err);
+>             if (ret < 0) {
+>                 bdrv_abort_perm_update(base);
+>                 error_report_err(local_err);
+>                 goto exit;
+>             }
+>         }
+> 
+>         [...]
+>      }
+> 
+> We could fail this but still have modified an image file backing filenames,
+> right?
+> 
+> Or am I incorrect about the intention here, that abort() can always be clean?
+> 
+> -Jeff
+> 
+>> +
+>> +static void commit_abort(Job *job)
+>> +{
+>> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
+>> +    BlockDriverState *top_bs = blk_bs(s->top);
+>> +
+>> +    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
+>> +    bdrv_ref(top_bs);
+>> +    bdrv_ref(s->commit_top_bs);
+>> +
+>> +    if (s->base) {
+>> +        blk_unref(s->base);
+>>      }
+>>  
+>> +    /* free the blockers on the intermediate nodes so that bdrv_replace_nodes
+>> +     * can succeed */
+>> +    block_job_remove_all_bdrv(&s->common);
+>> +
+>> +    /* If bdrv_drop_intermediate() failed (or was not invoked), remove the
+>> +     * commit filter driver from the backing chain now. Do this as the final
+>> +     * step so that the 'consistent read' permission can be granted.
+>> +     *
+>> +     * XXX Can (or should) we somehow keep 'consistent read' blocked even
+>> +     * after the failed/cancelled commit job is gone? If we already wrote
+>> +     * something to base, the intermediate images aren't valid any more. */
+>> +    bdrv_child_try_set_perm(s->commit_top_bs->backing, 0, BLK_PERM_ALL,
+>> +                            &error_abort);
+>> +    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
+>> +                      &error_abort);
+>> +
+>> +    bdrv_unref(s->commit_top_bs);
+>> +    bdrv_unref(top_bs);
+>> +}
+>> +
+>> +static void commit_clean(Job *job)
+>> +{
+>> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
+>> +
+>>      /* restore base open flags here if appropriate (e.g., change the base back
+>>       * to r/o). These reopens do not need to be atomic, since we won't abort
+>>       * even on failure here */
+>> -    if (s->base_flags != bdrv_get_flags(base)) {
+>> -        bdrv_reopen(base, s->base_flags, NULL);
+>> +    if (s->base_flags != bdrv_get_flags(s->base_bs)) {
+>> +        bdrv_reopen(s->base_bs, s->base_flags, NULL);
+>>      }
+>> +
+>>      g_free(s->backing_file_str);
+>>      blk_unref(s->top);
+>> -
+>> -    /* If there is more than one reference to the job (e.g. if called from
+>> -     * job_finish_sync()), job_completed() won't free it and therefore the
+>> -     * blockers on the intermediate nodes remain. This would cause
+>> -     * bdrv_set_backing_hd() to fail. */
+>> -    block_job_remove_all_bdrv(bjob);
+>> -
+>> -    /* If bdrv_drop_intermediate() didn't already do that, remove the commit
+>> -     * filter driver from the backing chain. Do this as the final step so that
+>> -     * the 'consistent read' permission can be granted.  */
+>> -    if (remove_commit_top_bs) {
+>> -        bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
+>> -                                &error_abort);
+>> -        bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
+>> -                          &error_abort);
+>> -    }
+>> -
+>> -    bdrv_unref(commit_top_bs);
+>> -    bdrv_unref(top);
+>>  }
+>>  
+>>  static int coroutine_fn commit_run(Job *job, Error **errp)
+>> @@ -211,7 +216,9 @@ static const BlockJobDriver commit_job_driver = {
+>>          .user_resume   = block_job_user_resume,
+>>          .drain         = block_job_drain,
+>>          .run           = commit_run,
+>> -        .exit          = commit_exit,
+>> +        .prepare       = commit_prepare,
+>> +        .abort         = commit_abort,
+>> +        .clean         = commit_clean
+>>      },
+>>  };
+>>  
+>> @@ -345,6 +352,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+>>      if (ret < 0) {
+>>          goto fail;
+>>      }
+>> +    s->base_bs = base;
+>>  
+>>      /* Required permissions are already taken with block_job_add_bdrv() */
+>>      s->top = blk_new(0, BLK_PERM_ALL);
+>> -- 
+>> 2.14.4
+>>
