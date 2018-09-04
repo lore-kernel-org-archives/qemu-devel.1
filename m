@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxEpl-0004gq-BS
+	(envelope-from <jsnow@redhat.com>) id 1fxEpl-0004gd-6P
 	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:09:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxEpk-0001dJ-0E
+	(envelope-from <jsnow@redhat.com>) id 1fxEpj-0001d0-Tg
 	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:09:45 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  4 Sep 2018 13:09:19 -0400
-Message-Id: <20180904170930.28619-5-jsnow@redhat.com>
+Date: Tue,  4 Sep 2018 13:09:16 -0400
+Message-Id: <20180904170930.28619-2-jsnow@redhat.com>
 In-Reply-To: <20180904170930.28619-1-jsnow@redhat.com>
 References: <20180904170930.28619-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 04/15] block/commit: refactor commit to use
- job callbacks
+Subject: [Qemu-devel] [PATCH v4 01/15] block/commit: add block job creation
+ flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,156 +23,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
-Use the component callbacks; prepare, abort, and clean.
-
-NB: prepare is only called when the job has not yet failed;
-and abort can be called after prepare.
-
-complete -> prepare -> abort -> clean
-complete -> abort -> clean
+Add support for taking and passing forward job creation flags.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- block/commit.c | 90 ++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 49 insertions(+), 41 deletions(-)
+ block/commit.c            | 5 +++--
+ blockdev.c                | 7 ++++---
+ include/block/block_int.h | 5 ++++-
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/block/commit.c b/block/commit.c
-index b6e8969877..eb3941e545 100644
+index da69165de3..b6e8969877 100644
 --- a/block/commit.c
 +++ b/block/commit.c
-@@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
-     BlockDriverState *commit_top_bs;
-     BlockBackend *top;
-     BlockBackend *base;
-+    BlockDriverState *base_bs;
-     BlockdevOnError on_error;
-     int base_flags;
-     char *backing_file_str;
-@@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
-     return 0;
- }
- 
--static void commit_exit(Job *job)
-+static int commit_prepare(Job *job)
- {
-     CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
--    BlockJob *bjob = &s->common;
--    BlockDriverState *top = blk_bs(s->top);
--    BlockDriverState *base = blk_bs(s->base);
--    BlockDriverState *commit_top_bs = s->commit_top_bs;
--    bool remove_commit_top_bs = false;
--
--    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
--    bdrv_ref(top);
--    bdrv_ref(commit_top_bs);
- 
-     /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
-      * the normal backing chain can be restored. */
-     blk_unref(s->base);
-+    s->base = NULL;
- 
--    if (!job_is_cancelled(job) && job->ret == 0) {
--        /* success */
--        job->ret = bdrv_drop_intermediate(s->commit_top_bs, base,
--                                          s->backing_file_str);
--    } else {
--        /* XXX Can (or should) we somehow keep 'consistent read' blocked even
--         * after the failed/cancelled commit job is gone? If we already wrote
--         * something to base, the intermediate images aren't valid any more. */
--        remove_commit_top_bs = true;
-+    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
-+                                  s->backing_file_str);
-+}
-+
-+static void commit_abort(Job *job)
-+{
-+    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-+    BlockDriverState *top_bs = blk_bs(s->top);
-+
-+    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-+    bdrv_ref(top_bs);
-+    bdrv_ref(s->commit_top_bs);
-+
-+    if (s->base) {
-+        blk_unref(s->base);
-     }
- 
-+    /* free the blockers on the intermediate nodes so that bdrv_replace_nodes
-+     * can succeed */
-+    block_job_remove_all_bdrv(&s->common);
-+
-+    /* If bdrv_drop_intermediate() failed (or was not invoked), remove the
-+     * commit filter driver from the backing chain now. Do this as the final
-+     * step so that the 'consistent read' permission can be granted.
-+     *
-+     * XXX Can (or should) we somehow keep 'consistent read' blocked even
-+     * after the failed/cancelled commit job is gone? If we already wrote
-+     * something to base, the intermediate images aren't valid any more. */
-+    bdrv_child_try_set_perm(s->commit_top_bs->backing, 0, BLK_PERM_ALL,
-+                            &error_abort);
-+    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
-+                      &error_abort);
-+
-+    bdrv_unref(s->commit_top_bs);
-+    bdrv_unref(top_bs);
-+}
-+
-+static void commit_clean(Job *job)
-+{
-+    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-+
-     /* restore base open flags here if appropriate (e.g., change the base back
-      * to r/o). These reopens do not need to be atomic, since we won't abort
-      * even on failure here */
--    if (s->base_flags != bdrv_get_flags(base)) {
--        bdrv_reopen(base, s->base_flags, NULL);
-+    if (s->base_flags != bdrv_get_flags(s->base_bs)) {
-+        bdrv_reopen(s->base_bs, s->base_flags, NULL);
-     }
-+
-     g_free(s->backing_file_str);
-     blk_unref(s->top);
--
--    /* If there is more than one reference to the job (e.g. if called from
--     * job_finish_sync()), job_completed() won't free it and therefore the
--     * blockers on the intermediate nodes remain. This would cause
--     * bdrv_set_backing_hd() to fail. */
--    block_job_remove_all_bdrv(bjob);
--
--    /* If bdrv_drop_intermediate() didn't already do that, remove the commit
--     * filter driver from the backing chain. Do this as the final step so that
--     * the 'consistent read' permission can be granted.  */
--    if (remove_commit_top_bs) {
--        bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
--                                &error_abort);
--        bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
--                          &error_abort);
--    }
--
--    bdrv_unref(commit_top_bs);
--    bdrv_unref(top);
- }
- 
- static int coroutine_fn commit_run(Job *job, Error **errp)
-@@ -211,7 +216,9 @@ static const BlockJobDriver commit_job_driver = {
-         .user_resume   = block_job_user_resume,
-         .drain         = block_job_drain,
-         .run           = commit_run,
--        .exit          = commit_exit,
-+        .prepare       = commit_prepare,
-+        .abort         = commit_abort,
-+        .clean         = commit_clean
-     },
+@@ -249,7 +249,8 @@ static BlockDriver bdrv_commit_top = {
  };
  
-@@ -345,6 +352,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     if (ret < 0) {
-         goto fail;
+ void commit_start(const char *job_id, BlockDriverState *bs,
+-                  BlockDriverState *base, BlockDriverState *top, int64_t speed,
++                  BlockDriverState *base, BlockDriverState *top,
++                  int creation_flags, int64_t speed,
+                   BlockdevOnError on_error, const char *backing_file_str,
+                   const char *filter_node_name, Error **errp)
+ {
+@@ -267,7 +268,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
      }
-+    s->base_bs = base;
  
-     /* Required permissions are already taken with block_job_add_bdrv() */
-     s->top = blk_new(0, BLK_PERM_ALL);
+     s = block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK_PERM_ALL,
+-                         speed, JOB_DEFAULT, NULL, NULL, errp);
++                         speed, creation_flags, NULL, NULL, errp);
+     if (!s) {
+         return;
+     }
+diff --git a/blockdev.c b/blockdev.c
+index 72f5347df5..c15a1e624b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3214,6 +3214,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+      * BlockdevOnError change for blkmirror makes it in
+      */
+     BlockdevOnError on_error = BLOCKDEV_ON_ERROR_REPORT;
++    int job_flags = JOB_DEFAULT;
+ 
+     if (!has_speed) {
+         speed = 0;
+@@ -3295,15 +3296,15 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+             goto out;
+         }
+         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
+-                            JOB_DEFAULT, speed, on_error,
++                            job_flags, speed, on_error,
+                             filter_node_name, NULL, NULL, false, &local_err);
+     } else {
+         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
+         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
+             goto out;
+         }
+-        commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, speed,
+-                     on_error, has_backing_file ? backing_file : NULL,
++        commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, job_flags,
++                     speed, on_error, has_backing_file ? backing_file : NULL,
+                      filter_node_name, &local_err);
+     }
+     if (local_err != NULL) {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 903b9c1034..ffab0b4d3e 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -980,6 +980,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+  * @bs: Active block device.
+  * @top: Top block device to be committed.
+  * @base: Block device that will be written into, and become the new top.
++ * @creation_flags: Flags that control the behavior of the Job lifetime.
++ *                  See @BlockJobCreateFlags
+  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
+  * @on_error: The action to take upon error.
+  * @backing_file_str: String to use as the backing file in @top's overlay
+@@ -990,7 +992,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+  *
+  */
+ void commit_start(const char *job_id, BlockDriverState *bs,
+-                  BlockDriverState *base, BlockDriverState *top, int64_t speed,
++                  BlockDriverState *base, BlockDriverState *top,
++                  int creation_flags, int64_t speed,
+                   BlockdevOnError on_error, const char *backing_file_str,
+                   const char *filter_node_name, Error **errp);
+ /**
 -- 
 2.14.4
