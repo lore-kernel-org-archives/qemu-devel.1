@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxEpl-0004gp-B8
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:09:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fxEpl-0004gm-9w
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxEpk-0001dV-7S
+	(envelope-from <jsnow@redhat.com>) id 1fxEpj-0001d9-VY
 	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:09:45 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  4 Sep 2018 13:09:17 -0400
-Message-Id: <20180904170930.28619-3-jsnow@redhat.com>
-In-Reply-To: <20180904170930.28619-1-jsnow@redhat.com>
-References: <20180904170930.28619-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 02/15] block/mirror: add block job creation
- flags
+Date: Tue,  4 Sep 2018 13:09:15 -0400
+Message-Id: <20180904170930.28619-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/15] jobs: Job Exit Refactoring Pt 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +20,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, jtc@redhat.com, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
 
-Add support for taking and passing forward job creation flags.
+This is part two of a two part series that refactors the exit logic
+of jobs.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
----
- block/mirror.c            | 5 +++--
- blockdev.c                | 3 ++-
- include/block/block_int.h | 5 ++++-
- 3 files changed, 9 insertions(+), 4 deletions(-)
+This series forces all jobs to use the "finalize" semantics that were
+introduced previously, but only exposed via the backup jobs.
 
-diff --git a/block/mirror.c b/block/mirror.c
-index b8941db6c1..cba555b4ef 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1639,7 +1639,8 @@ fail:
- 
- void mirror_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *target, const char *replaces,
--                  int64_t speed, uint32_t granularity, int64_t buf_size,
-+                  int creation_flags, int64_t speed,
-+                  uint32_t granularity, int64_t buf_size,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
-@@ -1655,7 +1656,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-     }
-     is_none_mode = mode == MIRROR_SYNC_MODE_NONE;
-     base = mode == MIRROR_SYNC_MODE_TOP ? backing_bs(bs) : NULL;
--    mirror_start_job(job_id, bs, JOB_DEFAULT, target, replaces,
-+    mirror_start_job(job_id, bs, creation_flags, target, replaces,
-                      speed, granularity, buf_size, backing_mode,
-                      on_source_error, on_target_error, unmap, NULL, NULL,
-                      &mirror_job_driver, is_none_mode, base, false,
-diff --git a/blockdev.c b/blockdev.c
-index c15a1e624b..6574356708 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3590,6 +3590,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-                                    bool has_copy_mode, MirrorCopyMode copy_mode,
-                                    Error **errp)
- {
-+    int job_flags = JOB_DEFAULT;
- 
-     if (!has_speed) {
-         speed = 0;
-@@ -3642,7 +3643,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-      * and will allow to check whether the node still exist at mirror completion
-      */
-     mirror_start(job_id, bs, target,
--                 has_replaces ? replaces : NULL,
-+                 has_replaces ? replaces : NULL, job_flags,
-                  speed, granularity, buf_size, sync, backing_mode,
-                  on_source_error, on_target_error, unmap, filter_node_name,
-                  copy_mode, errp);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ffab0b4d3e..b40f0bfc9b 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1029,6 +1029,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-  * @target: Block device to write to.
-  * @replaces: Block graph node name to replace once the mirror is done. Can
-  *            only be used when full mirroring is selected.
-+ * @creation_flags: Flags that control the behavior of the Job lifetime.
-+ *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @granularity: The chosen granularity for the dirty bitmap.
-  * @buf_size: The amount of data that can be in flight at one time.
-@@ -1050,7 +1052,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-  */
- void mirror_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *target, const char *replaces,
--                  int64_t speed, uint32_t granularity, int64_t buf_size,
-+                  int creation_flags, int64_t speed,
-+                  uint32_t granularity, int64_t buf_size,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
+Patches 1-3 add plumbing for the auto-dismiss and auto-finalize flags
+but do not expose these via QAPI/QMP.
+
+Patches 4-7 refactor the .exit() callbacks into the component pieces
+of .prepare(), .commit(), .abort() and .clean(). Except mirror, which
+I cheat with.
+
+Patches 8-10 remove the last usages of .exit in a test.
+Patche 11 removes the .exit callback and the machinery to invoke it.
+
+Patches 12-14 expose the new QMP options to all of the jobs.
+Patch 15 is a doc fixup.
+
+====
+"V4"
+====
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/15:[----] [--] 'block/commit: add block job creation flags'
+002/15:[----] [--] 'block/mirror: add block job creation flags'
+003/15:[----] [--] 'block/stream: add block job creation flags'
+004/15:[----] [--] 'block/commit: refactor commit to use job callbacks'
+005/15:[0024] [FC] 'block/mirror: don't install backing chain on abort'
+006/15:[0007] [FC] 'block/mirror: conservative mirror_exit refactor'
+007/15:[down] 'block/stream: refactor stream to use job callbacks'
+008/15:[----] [--] 'tests/blockjob: replace Blockjob with Job'
+009/15:[----] [--] 'tests/test-blockjob: remove exit callback'
+010/15:[----] [--] 'tests/test-blockjob-txn: move .exit to .clean'
+011/15:[----] [--] 'jobs: remove .exit callback'
+012/15:[----] [--] 'qapi/block-commit: expose new job properties'
+013/15:[----] [--] 'qapi/block-mirror: expose new job properties'
+014/15:[----] [--] 'qapi/block-stream: expose new job properties'
+015/15:[----] [--] 'block/backup: qapi documentation fixup'
+
+002, 003: Fix typo (Eric)
+005: Don't not install the backing chain if
+     we cancel a successful job (Max)
+006: Fallout from 005
+007: Fixed commit title. (Max)
+
+====
+"V3"
+====
+
+000: Fixed my cover letter subject. Phew!
+004: Adjusted comment, added R-B
+005: New; based on discussions from what is now 006 (was 005)
+006: mirror_exit_common returns ret == 0 if we are aborting
+     and it aborts successfully (Max)
+     Added assertion that we aborted successfully (Max)
+010: New, minor cleanup before we can actually remove .exit.
+011: Removed what's now patch 10, added R-B per Max's comment.
+
+=====
+"V2":
+=====
+ - Split off the first part of the series to Pt.1
+ - More aggressively refactored .commit()
+ - Went all the way to deleting .exit() callback (Kevin)
+
+John Snow (15):
+  block/commit: add block job creation flags
+  block/mirror: add block job creation flags
+  block/stream: add block job creation flags
+  block/commit: refactor commit to use job callbacks
+  block/mirror: don't install backing chain on abort
+  block/mirror: conservative mirror_exit refactor
+  block/stream: refactor stream to use job callbacks
+  tests/blockjob: replace Blockjob with Job
+  tests/test-blockjob: remove exit callback
+  tests/test-blockjob-txn: move .exit to .clean
+  jobs: remove .exit callback
+  qapi/block-commit: expose new job properties
+  qapi/block-mirror: expose new job properties
+  qapi/block-stream: expose new job properties
+  block/backup: qapi documentation fixup
+
+ block/commit.c            |  95 +++++++++++++++++++++-----------------
+ block/mirror.c            |  44 ++++++++++++------
+ block/stream.c            |  28 ++++++++----
+ blockdev.c                |  44 ++++++++++++++++--
+ hmp.c                     |   5 +-
+ include/block/block_int.h |  15 ++++--
+ include/qemu/job.h        |  11 -----
+ job.c                     |  77 ++++++++++++++-----------------
+ qapi/block-core.json      |  80 +++++++++++++++++++++++++++-----
+ tests/test-blockjob-txn.c |   4 +-
+ tests/test-blockjob.c     | 114 +++++++++++++++++++++++-----------------------
+ 11 files changed, 315 insertions(+), 202 deletions(-)
+
 -- 
 2.14.4
