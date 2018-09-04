@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fxCes-00048y-82
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 10:50:25 -0400
+	(envelope-from <prvs=778a5ce15=jancraig@amazon.com>)
+	id 1fxCis-0000D6-NS
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 10:54:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fxCen-0007Rb-Gi
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 10:50:22 -0400
-Date: Tue, 4 Sep 2018 16:50:08 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180904145008.GB4371@localhost.localdomain>
-References: <20180817170246.14641-1-kwolf@redhat.com>
-	<20180817170246.14641-5-kwolf@redhat.com>
-	<20180824072456.GE31581@lemon.usersys.redhat.com>
+	(envelope-from <prvs=778a5ce15=jancraig@amazon.com>)
+	id 1fxCip-0002MX-Uc
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 10:54:30 -0400
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:17523)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=778a5ce15=jancraig@amazon.com>)
+	id 1fxCip-0002La-GQ
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 10:54:27 -0400
+From: "Janeczek, Craig" <jancraig@amazon.com>
+Date: Tue, 4 Sep 2018 14:47:30 +0000
+Message-ID: <3cfa8fab33d94aedae647daf4a8ca1cd@EX13D12UEA003.ant.amazon.com>
+References: <20180830193019.20104-1-jancraig@amazon.com>,
+	<20180830193019.20104-3-jancraig@amazon.com>
+	<BN7PR08MB486827A1560B19B9708D2E3CC60F0@BN7PR08MB4868.namprd08.prod.outlook.com>
+In-Reply-To: <BN7PR08MB486827A1560B19B9708D2E3CC60F0@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180824072456.GE31581@lemon.usersys.redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 4/5] block: Drop AioContext lock in
- bdrv_drain_poll_top_level()
+Subject: Re: [Qemu-devel] [PATCH v4 2/9] target/mips: Add all MXU opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,72 +32,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
 
-Am 24.08.2018 um 09:24 hat Fam Zheng geschrieben:
-> On Fri, 08/17 19:02, Kevin Wolf wrote:
-> > Simimlar to AIO_WAIT_WHILE(), bdrv_drain_poll_top_level() needs to
-> > release the AioContext lock of the node to be drained before calling
-> > aio_poll(). Otherwise, callbacks called by aio_poll() would possibly
-> > take the lock a second time and run into a deadlock with a nested
-> > AIO_WAIT_WHILE() call.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  block/io.c | 25 ++++++++++++++++++++++++-
-> >  1 file changed, 24 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/io.c b/block/io.c
-> > index 7100344c7b..832d2536bf 100644
-> > --- a/block/io.c
-> > +++ b/block/io.c
-> > @@ -268,9 +268,32 @@ bool bdrv_drain_poll(BlockDriverState *bs, bool recursive,
-> >  static bool bdrv_drain_poll_top_level(BlockDriverState *bs, bool recursive,
-> >                                        BdrvChild *ignore_parent)
-> >  {
-> > +    AioContext *ctx = bdrv_get_aio_context(bs);
-> > +
-> > +    /*
-> > +     * We cannot easily release the lock unconditionally here because many
-> > +     * callers of drain function (like qemu initialisation, tools, etc.) don't
-> > +     * even hold the main context lock.
-> > +     *
-> > +     * This means that we fix potential deadlocks for the case where we are in
-> > +     * the main context and polling a BDS in a different AioContext, but
-> > +     * draining a BDS in the main context from a different I/O thread would
-> > +     * still have this problem. Fortunately, this isn't supposed to happen
-> > +     * anyway.
-> > +     */
-> > +    if (ctx != qemu_get_aio_context()) {
-> > +        aio_context_release(ctx);
-> > +    } else {
-> > +        assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-> > +    }
-> > +
-> >      /* Execute pending BHs first and check everything else only after the BHs
-> >       * have executed. */
-> > -    while (aio_poll(bs->aio_context, false));
-> > +    while (aio_poll(ctx, false));
-> > +
-> > +    if (ctx != qemu_get_aio_context()) {
-> > +        aio_context_acquire(ctx);
-> > +    }
-> >  
-> >      return bdrv_drain_poll(bs, recursive, ignore_parent, false);
-> >  }
-> 
-> The same question as patch 3: why not just use AIO_WAIT_WHILE() here? It takes
-> care to not release any lock if both running and polling in the main context
-> (taking the in_aio_context_home_thread() branch).
+It is possible but due to the non-uniform nature of the bit fields which in=
+dicate the instructions the mask used might end up being instruction specif=
+ic. This would lead to a tiered approach where the current enum would be th=
+e top level, then each group under there might have its own enum, mask and =
+switch statement.
 
-I don't think AIO_WAIT_WHILE() can be non-blocking, though?
+-----Original Message-----
+From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
+Sent: Friday, August 31, 2018 2:59 PM
+To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net; Petar Jovanovic <pjovanovic@wavecomp.com>; Richar=
+d Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v4 2/9] target/mips: Add all MXU opcodes
 
-There is also no real condition here to check. It's just polling as long
-as there is activity to get the pending BH callbacks run. I'm not sure
-how I could possibly write this as a AIO_WAIT_WHILE() condition.
+>=20
+> ________________________________________
+> From: Craig Janeczek <jancraig@amazon.com>
+> Sent: Thursday, August 30, 2018 9:30 PM
+> To: qemu-devel@nongnu.org
+> Cc: Aleksandar Markovic; aurelien@aurel32.net; Craig Janeczek
+> Subject: [PATCH v4 2/9] target/mips: Add all MXU opcodes
+>=20
+> Adds all MXU opcodes to the opcode enum.
+>=20
+> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
+> ---
+>  v1
+>     - NA
+>  v2
+>     - NA
+>  v3
+>     - Initial patch, split out from prior first patch
+>  v4
+>     - separate MXU opcodes into their own enum
+>=20
+>  target/mips/translate.c | 60=20
+> +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 60 insertions(+)
+>=20
 
-After all, this one just doesn't feel like the right use case for
-AIO_WAIT_WHILE().
 
-Kevin
+
+
+> diff --git a/target/mips/translate.c b/target/mips/translate.c index=20
+> 19b90c8735..a598f45558 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+
+Hi, Craig,
+
+There are 56 opcodes defined here. However, there are 114 MXU instructions =
+in the MXU doc. Some other bits are used for coding missing instructions. E=
+ven in your patches, it seems, you handle some instructions that are not li=
+sted here. Is there any way to have here the complete list of opcodes, even=
+ if this involves some more complex extraction operations?
+
+Thanks,
+Aleksandar
+
+
+> @@ -368,6 +368,66 @@ enum {
+>      OPC_SDBBP    =3D 0x3F | OPC_SPECIAL2,
+>  };
+> +enum {
+> +    /* MXU */
+> +    OPC_MXU_S32MADD  =3D 0x00 | OPC_SPECIAL2,
+> +    OPC_MXU_S32MADDU =3D 0x01 | OPC_SPECIAL2,
+> +    OPC_MXU_D16MAX   =3D 0x03 | OPC_SPECIAL2,
+> +    OPC_MXU_S32MSUB  =3D 0x04 | OPC_SPECIAL2,
+> +    OPC_MXU_S32MSUBU =3D 0x05 | OPC_SPECIAL2,
+> +    OPC_MXU_D16AVG   =3D 0x06 | OPC_SPECIAL2,
+> +    OPC_MXU_D16CPS   =3D 0x07 | OPC_SPECIAL2,
+> +    OPC_MXU_D16MUL   =3D 0x08 | OPC_SPECIAL2,
+> +    OPC_MXU_D16MULF  =3D 0x09 | OPC_SPECIAL2,
+> +    OPC_MXU_D16MAC   =3D 0x0A | OPC_SPECIAL2,
+> +    OPC_MXU_D16MACF  =3D 0x0B | OPC_SPECIAL2,
+> +    OPC_MXU_D16MADL  =3D 0x0C | OPC_SPECIAL2,
+> +    OPC_MXU_S16MAD   =3D 0x0D | OPC_SPECIAL2,
+> +    OPC_MXU_Q16ADD   =3D 0x0E | OPC_SPECIAL2,
+> +    OPC_MXU_D16MACE  =3D 0x0F | OPC_SPECIAL2,
+> +    OPC_MXU_S32LDD   =3D 0x10 | OPC_SPECIAL2,
+> +    OPC_MXU_S32STD   =3D 0x11 | OPC_SPECIAL2,
+> +    OPC_MXU_S32LDDV  =3D 0x12 | OPC_SPECIAL2,
+> +    OPC_MXU_S32STDV  =3D 0x13 | OPC_SPECIAL2,
+> +    OPC_MXU_S32LDI   =3D 0x14 | OPC_SPECIAL2,
+> +    OPC_MXU_S32SDI   =3D 0x15 | OPC_SPECIAL2,
+> +    OPC_MXU_S32LDIV  =3D 0x16 | OPC_SPECIAL2,
+> +    OPC_MXU_S32SDIV  =3D 0x17 | OPC_SPECIAL2,
+> +    OPC_MXU_D32ADD   =3D 0x18 | OPC_SPECIAL2,
+> +    OPC_MXU_D32ACC   =3D 0x19 | OPC_SPECIAL2,
+> +    OPC_MXU_Q16ACC   =3D 0x1B | OPC_SPECIAL2,
+> +    OPC_MXU_Q8ADDE   =3D 0x1C | OPC_SPECIAL2,
+> +    OPC_MXU_Q8ACCE   =3D 0x1D | OPC_SPECIAL2,
+> +    OPC_MXU_S8LDD    =3D 0x22 | OPC_SPECIAL2,
+> +    OPC_MXU_S8STD    =3D 0x23 | OPC_SPECIAL2,
+> +    OPC_MXU_S8LDI    =3D 0x24 | OPC_SPECIAL2,
+> +    OPC_MXU_S8SDI    =3D 0x25 | OPC_SPECIAL2,
+> +    OPC_MXU_S32EXTR  =3D 0x26 | OPC_SPECIAL2,
+> +    OPC_MXU_D32SARW  =3D 0x27 | OPC_SPECIAL2,
+> +    OPC_MXU_LXB      =3D 0x28 | OPC_SPECIAL2,
+> +    OPC_MXU_S16LDD   =3D 0x2A | OPC_SPECIAL2,
+> +    OPC_MXU_S16STD   =3D 0x2B | OPC_SPECIAL2,
+> +    OPC_MXU_S16LDI   =3D 0x2C | OPC_SPECIAL2,
+> +    OPC_MXU_S16SDI   =3D 0x2D | OPC_SPECIAL2,
+> +    OPC_MXU_S32M2I   =3D 0x2E | OPC_SPECIAL2,
+> +    OPC_MXU_S32I2M   =3D 0x2F | OPC_SPECIAL2,
+> +    OPC_MXU_D32SLL   =3D 0x30 | OPC_SPECIAL2,
+> +    OPC_MXU_D32SLR   =3D 0x31 | OPC_SPECIAL2,
+> +    OPC_MXU_D32SARL  =3D 0x32 | OPC_SPECIAL2,
+> +    OPC_MXU_D32SAR   =3D 0x33 | OPC_SPECIAL2,
+> +    OPC_MXU_Q16SLL   =3D 0x34 | OPC_SPECIAL2,
+> +    OPC_MXU_Q16SLR   =3D 0x35 | OPC_SPECIAL2,
+> +    OPC_MXU_D32SLLV  =3D 0x36 | OPC_SPECIAL2,
+> +    OPC_MXU_Q16SAR   =3D 0x37 | OPC_SPECIAL2,
+> +    OPC_MXU_Q8MUL    =3D 0x38 | OPC_SPECIAL2,
+> +    OPC_MXU_Q8MOVZ   =3D 0x39 | OPC_SPECIAL2,
+> +    OPC_MXU_Q8MAC    =3D 0x3A | OPC_SPECIAL2,
+> +    OPC_MXU_Q16SCOP  =3D 0x3B | OPC_SPECIAL2,
+> +    OPC_MXU_Q8MADL   =3D 0x3C | OPC_SPECIAL2,
+> +    OPC_MXU_S32SFL   =3D 0x3D | OPC_SPECIAL2,
+> +    OPC_MXU_Q8SAD    =3D 0x3E | OPC_SPECIAL2,
+> +};
+> +
+>  /* Special3 opcodes */
+>  #define MASK_SPECIAL3(op)  MASK_OP_MAJOR(op) | (op & 0x3F)
