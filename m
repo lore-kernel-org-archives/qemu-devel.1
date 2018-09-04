@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fx9O9-00036p-DX
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:20:54 -0400
+	(envelope-from <berrange@redhat.com>) id 1fx9OD-00038k-8f
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fx9O4-00063f-E6
+	(envelope-from <berrange@redhat.com>) id 1fx9O9-00067Z-8o
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:20:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59284 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fx9O9-00066p-1V
 	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:20:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fx9O4-00062f-6K
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:20:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fx9O3-0005xL-48
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 11:20:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 16D712E80C8
-	for <qemu-devel@nongnu.org>; Tue,  4 Sep 2018 11:20:47 +0000 (UTC)
+Date: Tue, 4 Sep 2018 12:20:49 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180904112049.GE22349@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180904110822.12863-1-fli@suse.com>
+	<20180904110822.12863-6-fli@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Sep 2018 11:10:44 -0000
-From: Ricky Tigg <1790617@bugs.launchpad.net>
-Reply-To: Bug 1790617 <1790617@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153605729836.31419.16934091552250503095.malonedeb@soybean.canonical.com>
-Message-Id: <153605944425.28670.3548694707396374554.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1790617] Re: Version of disk image format not
- exhibited using the 'qemu-img info' command
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180904110822.12863-6-fli@suse.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] Propagate qemu_thread_create's error
+ to all callers to handle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org
 
-So many useful information that would be worth to be part of the
-documentation associated to the above mentioned link.
+On Tue, Sep 04, 2018 at 07:08:22PM +0800, Fei Li wrote:
+> Let's propagate qemu_thread_create's error to make all callers check
+> it. For those critical callers, just pass the &error_abort.
+> 
+> Signed-off-by: Fei Li <fli@suse.com>
+> ---
+>  cpus.c                      | 48 ++++++++++++++++++++++++++++++++++++++-------
+>  dump.c                      |  6 +++++-
+>  hw/misc/edu.c               |  8 +++++++-
+>  hw/ppc/spapr_hcall.c        |  9 ++++++++-
+>  hw/rdma/rdma_backend.c      |  3 ++-
+>  hw/usb/ccid-card-emulated.c | 13 ++++++++++--
+>  io/task.c                   |  3 ++-
+>  iothread.c                  | 15 +++++++++-----
+>  migration/migration.c       | 47 ++++++++++++++++++++++++++++++++------------
+>  migration/postcopy-ram.c    | 11 ++++++++++-
+>  migration/ram.c             | 32 ++++++++++++++++++++++++++----
+>  migration/savevm.c          |  8 +++++++-
+>  tests/atomic_add-bench.c    |  3 ++-
+>  tests/iothread.c            |  2 +-
+>  tests/qht-bench.c           |  3 ++-
+>  tests/rcutorture.c          |  3 ++-
+>  tests/test-aio.c            |  2 +-
+>  tests/test-rcu-list.c       |  3 ++-
+>  ui/vnc-jobs.c               | 11 +++++++++--
+>  util/compatfd.c             |  8 +++++++-
+>  util/oslib-posix.c          | 10 +++++++++-
+>  util/rcu.c                  |  3 ++-
+>  util/thread-pool.c          |  4 +++-
+>  23 files changed, 206 insertions(+), 49 deletions(-)
+> 
+> diff --git a/cpus.c b/cpus.c
+> index 41efddc218..24159af1e6 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1904,6 +1904,7 @@ static void qemu_tcg_init_vcpu(CPUState *cpu, Error **errp)
+>      static QemuCond *single_tcg_halt_cond;
+>      static QemuThread *single_tcg_cpu_thread;
+>      static int tcg_region_inited;
+> +    Error *local_err = NULL;
+>  
+>      assert(tcg_enabled());
+>      /*
+> @@ -1929,14 +1930,22 @@ static void qemu_tcg_init_vcpu(CPUState *cpu, Error **errp)
+>                   cpu->cpu_index);
+>  
+>              qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
+> -                               cpu, QEMU_THREAD_JOINABLE);
+> +                               cpu, QEMU_THREAD_JOINABLE, &local_err);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                return;
+> +            }
 
--- =
+Having to use a local error object & error_propagate calls is making this
+patch larger than it needs.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1790617
+I'd suggest changing qemu_thread_create() so that it returns a boolean,
+so it can then do
 
-Title:
-  Version of disk image format not exhibited using the 'qemu-img info'
-  command
+  if (!qemu_thread_create(cpu->thread, thread_name, qemu_tcg_cpu_thread_fn,
+                         cpu, QEMU_THREAD_JOINABLE, errp) {
+      return;
+  }
 
-Status in QEMU:
-  Invalid
+avoiding the local error object & shortening the code.
 
-Bug description:
-  OS: Fedora (64 bits) =E2=80=93 Linux =E2=80=93. Last available component:=
- qemu-
-  img.x86_64 2:2.11.2-2.fc28
-
-  Description: version of disk image format not exhibited using the
-  'qemu-img info' command.
-
-  Command 'qemu-img info qcow2 [image-file-name.img]' produces this stderr =
-message:
-  qemu-img: Expecting one image file name
-  Try 'qemu-img --help' for more information
-
-  How to reproduce in terminal:
-  1. Create a VM using Raw disk image format =
-
-  2. Run either commands 'qemu-img info -f raw [image-file-name.img]', 'qem=
-u-img info [image-file-name.img]'.
-  3. Run either commands 'qemu-img info -f qcow2 [image-file-name.qcow2]', =
-'qemu-img info [image-file-name.qcow2]'.
-
-  Actual result: output model resulting from step .2 exhibits following inf=
-ormations:
-  image: image-file-name.img
-  file format: raw
-  virtual size: _G (_ bytes)
-  disk size: _G
-
-  Output model resulting from step .3 exhibits following informations:
-  image: image-file-name.qcow2
-  file format: qcow2
-  virtual size: _G (_ bytes)
-  disk size: _G
-  cluster_size: _
-  Snapshot list:
-  ID        TAG                 VM SIZE                DATE       VM CLOCK
-  1         snapshot1          _G 2018-07-31 18:27:49   00:03:45.890
-
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: true
-      refcount bits: 16
-      corrupt: false
-
-  Actual result: raw and qcow2 formats respective versions =E2=80=93which a=
-re
-  likely to be mentioned as "version"=E2=80=93 to be exhibited.
-
-  Additional information: in documentation lastly updated 2018-08-23 at
-  https://access.redhat.com/documentation/en-
-  us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administ=
-ration_guide/index
-  it is stated in chapters:
-
-  14.10 =E2=80=93 'images in raw format can be resized in both directions, =
-whereas qcow2 version 2 or qcow2 version 3 images can be grown';
-  14.12 =E2=80=93 'the qcow2 version supplied with Red Hat Enterprise Linux=
- 7 is 1.1', 'To know which version you are using, run qemu-img info qcow2 [=
-imagefilename.img] command.'.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1790617/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
