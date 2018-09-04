@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1fxDbk-0003s1-80
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:51:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fxDtT-00005g-MW
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 12:09:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1fxDbf-00013L-RB
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:51:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47460 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1fxDbf-00012m-KT
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:51:07 -0400
-References: <1535778675-32170-1-git-send-email-wei@redhat.com>
-	<1535778675-32170-2-git-send-email-wei@redhat.com>
-	<20180903110813.hbamu4zuda6qpwuw@kamzik.brq.redhat.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <853542b8-d5e1-8fb9-d1a7-b8c0660b0a41@redhat.com>
-Date: Tue, 4 Sep 2018 10:51:01 -0500
+	(envelope-from <jsnow@redhat.com>) id 1fxDtS-0001z1-Kw
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 12:09:31 -0400
+References: <20180830015734.19765-1-jsnow@redhat.com>
+	<20180830015734.19765-3-jsnow@redhat.com>
+	<6ed2e7ac-8de1-bd7b-0787-fdd33c6b306e@redhat.com>
+	<87mut3ukyi.fsf@dusky.pond.sub.org>
+	<126a3e52-7706-d6dc-fb7a-bda8e11d9791@redhat.com>
+	<87sh2tirfk.fsf@dusky.pond.sub.org>
+	<20180903122232.GA14463@dhcp-200-186.str.redhat.com>
+	<87sh2q4qnq.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <00f1f443-8425-56fa-543e-753868e8b697@redhat.com>
+Date: Tue, 4 Sep 2018 12:09:20 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180903110813.hbamu4zuda6qpwuw@kamzik.brq.redhat.com>
+In-Reply-To: <87sh2q4qnq.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V8 1/4] tests/migration: Convert x86 boot
- block compilation script into Makefile
+Subject: Re: [Qemu-devel] [PATCH v3 2/9] jobs: canonize Error object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +30,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, jtc@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
 
 
-On 09/03/2018 06:08 AM, Andrew Jones wrote:
-> On Sat, Sep 01, 2018 at 01:11:12AM -0400, Wei Huang wrote:
->> The x86 boot block header currently is generated with a shell script.
->> To better support other CPUs (e.g. aarch64), we convert the script
->> into Makefile. This allows us to 1) support cross-compilation easily,
->> and 2) avoid creating a script file for every architecture.
+On 09/03/2018 10:11 AM, Markus Armbruster wrote:
+> Kevin Wolf <kwolf@redhat.com> writes:
+> 
+>> Am 01.09.2018 um 09:54 hat Markus Armbruster geschrieben:
+>>> John Snow <jsnow@redhat.com> writes:
+>>>
+>>>> On 08/31/2018 02:08 AM, Markus Armbruster wrote:
+>>>>> Eric Blake <eblake@redhat.com> writes:
+>>>>>
+>>>>>> On 08/29/2018 08:57 PM, John Snow wrote:
+>>>>>>> Jobs presently use both an Error object in the case of the create job,
+>>>>>>> and char strings in the case of generic errors elsewhere.
+>>>>>>>
+>>>>>>> Unify the two paths as just j->err, and remove the extra argument from
+>>>>>>> job_completed. The integer error code for job_completed is kept for now,
+>>>>>>> to be removed shortly in a separate patch.
+>>>>>>>
+>>>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>>>>> ---
+>>>>>>
+>>>>>>> +++ b/job.c
+>>>>>>
+>>>>>>> @@ -666,8 +666,8 @@ static void job_update_rc(Job *job)
+>>>>>>>           job->ret = -ECANCELED;
+>>>>>>>       }
+>>>>>>>       if (job->ret) {
+>>>>>>> -        if (!job->error) {
+>>>>>>> -            job->error = g_strdup(strerror(-job->ret));
+>>>>>>> +        if (!job->err) {
+>>>>>>> +            error_setg(&job->err, "%s", g_strdup(strerror(-job->ret)));
+>>>>>>
+>>>>>> Memleak. Drop the g_strdup(), and just directly pass strerror()
+>>>>>> results to error_setg().  (I guess we can't quite use
+>>>>>> error_setg_errno() unless we add additional text beyond the strerror()
+>>>>>> results).
+>>>>>
+>>>>> Adding such text might well be an improvement.  I'm not telling you to
+>>>>> do so (not having looked at the context myself), just to think about it.
+>>>>>
+>>>>
+>>>> In this case, and I agree with Kevin who suggested it; we ought to be
+>>>> moving away from the retcode in general and using first-class error
+>>>> objects for all of our jobs anyway.
+>>>>
+>>>> In this case, the job has failed with a retcode and we wish to give the
+>>>> user some hope of understanding why, but at this point in the code all
+>>>> we know is what the strerror can tell us, so a generic prefix like "The
+>>>> job failed" is not helpful because it will already be clear by events
+>>>> and other things that the job failed.
+>>>>
+>>>> The only text I can think of that would be useful is: "The job failed
+>>>> and didn't give a more specific error message. Please email
+>>>> qemu-devel@nongnu.org and harass the authors until they fix it. Anyway,
+>>>> nice chatting to you, the generic error message is: %s"
+>>>
+>>> That might well be an improvement ;)
+>>>
+>>> Since I don't have a realistic example ready, I'm making up a contrieved
+>>> one:
+>>>
+>>> --> {"execute": "job-frobnicate"}
+>>> <-- {"error": {"class": "GenericError", "desc": "Device or resource busy"}}
+>>>
+>>> Would a reply
+>>>
+>>> <-- {"error": {"class": "GenericError", "desc": "Job failed: Device or resource busy"}}
+>>>
+>>> be better, worse, or a wash?
+>>>
+>>> If it's a wash, maintainability breaks the tie.  So let's have a look at
+>>> the code.  It's either
+>>>
+>>>             error_setg(&job->err, "%s", strerror(-job->ret));
+>>>
+>>> or
+>>>
+>>>             error_setg_errno(&job->err, -job->ret, "Job failed");
+>>>
+>>> I'd prefer the latter, because it's the common way to put an errno code
+>>> into an Error object, and it lets me grep for the message more easily.
 >>
->> Note that, in the new design, the cross compiler prefix can be specified by
->> setting the CROSS_PREFIX in "make" command. Also to allow gcc pre-processor
->> to include the C-style file correctly, it also renames the
->> x86-a-b-bootblock.s file extension from .s to .S.
+>> Basically, if I call "job-frobnicate", I don't want an error message to
+>> tell me "job-frobnicate failed: foo". I already know that I called
+>> "job-frobnicate", so the actually useful message is only "foo".
 >>
->> Signed-off-by: Wei Huang <wei@redhat.com>
->> ---
->>  tests/migration/Makefile                           | 31 ++++++++++++++++++++
->>  tests/migration/rebuild-x86-bootblock.sh           | 33 ----------------------
->>  .../{x86-a-b-bootblock.s => x86-a-b-bootblock.S}   |  0
->>  3 files changed, 31 insertions(+), 33 deletions(-)
->>  create mode 100644 tests/migration/Makefile
->>  delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
->>  rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (100%)
->>
->> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
->> new file mode 100644
->> index 0000000..5d5fa07
->> --- /dev/null
->> +++ b/tests/migration/Makefile
->> @@ -0,0 +1,31 @@
->> +# To specify cross compiler prefix, use CROSS_PREFIX=
->> +#   > make CROSS_PREFIX=x86_64-linux-gnu-
->        ^ nit: this prompt symbol is weird (at least to me, what shell uses
->               this?) To me it looks like a sh/bash redirect symbol. Can
->               we change it to '$' or use nothing at all?
+>> A prefix like "job-frobnicate failed" should be added when it's one of
+>> multiple possible error sources. For example, if a higher level monitor
+>> command internally involves job-frobnicate, but also three other
+>> operations, this is the place where the prefix should be added to any
+>> error message returned by job-frobnicate so that we can distinguish
+>> which part of the operation failed.
+> 
+> John's point is that the error message is bad no matter what.
+> 
+> My point is that if it's bad no matter what, we can just as well emit it
+> the usual way, with error_setg_errno(), rather than playing games with
+> strerror().
+> 
 
-I will replace '>' with '$', which is indeed the commonly-used one.
+Not worth it, in my opinion. This way keeps visible behavior consistent
+until we fully eradicate the retcode.
 
->> +
->> +override define __note
->> +/* This file is automatically generated from
->> + * tests/migration/x86-a-b-bootblock.s, edit that and then run
->                                         ^ should be 'S'
-
-OK, will do.
-
-> 
->> + * tests/migration/rebuild-x86-bootblock.sh to update,
->> + * and then remember to send both in your patch submission.
->> + */
->> +endef
->> +export __note
->> +
->> +.PHONY: all clean
->> +all: x86-a-b-bootblock.h
->> +
->> +x86-a-b-bootblock.h: x86.bootsect
->> +	echo "$$__note" > header.tmp
->> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
->> +	mv header.tmp $@
-> 
-> The shell script this Makefile is replacing used mktemp
-> for a randomly named tmp dir. Shouldn't we continue to
-> use random names?>
->> +
->> +x86.bootsect: x86.boot
->> +	dd if=$< of=$@ bs=256 count=2 skip=124
->> +
->> +x86.boot: x86.o
->> +	$(CROSS_PREFIX)objcopy -O binary $< $@
->> +
->> +x86.o: x86-a-b-bootblock.S
->> +	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
->> +
->> +clean:
->> +	@rm -rf *.boot *.o *.bootsect
-> 
-> We don't want to remove the generated header file when cleaning?
-> 
->> diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
->> deleted file mode 100755
->> index 86cec5d..0000000
->> --- a/tests/migration/rebuild-x86-bootblock.sh
->> +++ /dev/null
->> @@ -1,33 +0,0 @@
->> -#!/bin/sh
->> -# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
->> -# This work is licensed under the terms of the GNU GPL, version 2 or later.
->> -# See the COPYING file in the top-level directory.
->> -#
->> -# Author: dgilbert@redhat.com
->> -
->> -ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
->> -HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
->> -
->> -if [ ! -e "$ASMFILE" ]
->> -then
->> -  echo "Couldn't find $ASMFILE" >&2
->> -  exit 1
->> -fi
->> -
->> -ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
->> -cd "$ASM_WORK_DIR" &&
->> -as --32 -march=i486 "$ASMFILE" -o x86.o &&
->> -objcopy -O binary x86.o x86.boot &&
->> -dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
->> -xxd -i x86.bootsect |
->> -sed -e 's/.*int.*//' > x86.hex &&
->> -cat - x86.hex <<HERE > "$HEADER"
->> -/* This file is automatically generated from
->> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
->> - * tests/migration/rebuild-x86-bootblock.sh to update,
->> - * and then remember to send both in your patch submission.
->> - */
->> -HERE
->> -
->> -rm x86.hex x86.bootsect x86.boot x86.o
->> -cd .. && rmdir "$ASM_WORK_DIR"
->> diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
->> similarity index 100%
->> rename from tests/migration/x86-a-b-bootblock.s
->> rename to tests/migration/x86-a-b-bootblock.S
->> -- 
->> 1.8.3.1
->>
->>
-> 
-> Thanks,
-> drew 
-> 
+--js
