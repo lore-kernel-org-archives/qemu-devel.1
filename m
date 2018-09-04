@@ -1,33 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fx7RN-0006S0-Ty
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:16:08 -0400
+	(envelope-from <Manish.Jaggi@cavium.com>) id 1fx7Sd-0007cb-Hz
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fx7RJ-0001el-TV
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:16:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46784
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <Manish.Jaggi@cavium.com>) id 1fx7SY-0002CZ-9P
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:17:23 -0400
+Received: from mail-by2nam05on0614.outbound.protection.outlook.com
+	([2a01:111:f400:fe52::614]:55456
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.ibm.com>)
-	id 1fx7RJ-0001eD-N1
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:16:01 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w849ERON096791
-	for <qemu-devel@nongnu.org>; Tue, 4 Sep 2018 05:16:00 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2m9mfhfddm-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 05:15:59 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.ibm.com>;
-	Tue, 4 Sep 2018 03:15:58 -0600
-From: Yi Min Zhao <zyimin@linux.ibm.com>
-Date: Tue,  4 Sep 2018 17:15:49 +0800
-Message-Id: <20180904091549.6361-1-zyimin@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH] s390x/pci: add common fmb
+	(Exim 4.71) (envelope-from <Manish.Jaggi@cavium.com>)
+	id 1fx7SX-00029x-Rx
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 05:17:18 -0400
+From: "Jaggi, Manish" <Manish.Jaggi@cavium.com>
+Date: Tue, 4 Sep 2018 09:16:58 +0000
+Message-ID: <1604D594-E6D4-48BB-A270-F7CF1092978B@caviumnetworks.com>
+References: <CABgNM92-PHWg3X41tCVfErmV9-Hnu5GYpz_pa9-iXfbScFUCZg@mail.gmail.com>
+	<CD29DCF7-6537-406F-A127-6A2FFDDAAD79@caviumnetworks.com>
+	<87k1ohxik4.fsf@trasno.org>
+	<3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
+	<20180828172739.GA10175@work-vm>
+	<19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
+	<20180829131653.gk4yhjdi2pk5bdcd@kamzik.brq.redhat.com>
+	<DC466FE6-98B4-485B-BE4D-C4E228B36107@caviumnetworks.com>
+	<20180831111121.n7zafn6peiwe6ojn@kamzik.brq.redhat.com>
+In-Reply-To: <20180831111121.n7zafn6peiwe6ojn@kamzik.brq.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E8A2BC93DEA0CB4787C84D24ABA6F269@namprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
+ different processor ids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,268 +40,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: cohuck@redhat.com, thuth@redhat.com, borntraeger@de.ibm.com, pmorel@linux.ibm.com, zyimin@linux.ibm.com
+To: Andrew Jones <drjones@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, Anthony Liguori <aliguori@us.ibm.com>, "peter.maydell@linaro.org qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Auger Eric <eric.auger@redhat.com>
 
-Common function measurement block is used to report counters of
-successfully issued pcilg/stg/stb and rpcit instructions. This patch
-introduces a new struct ZpciFmb and schedules a timer callback to
-copy fmb to the guest memory at a interval time which is set to
-4s by default. While attemping to update fmb failed, an event error
-would be generated. After pcilg/stg/stb and rpcit interception
-handlers issue successfully, increase the related counter. The guest
-could pass null address to switch off FMB and stop corresponding
-timer.
-
-Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
-Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
----
- hw/s390x/s390-pci-bus.c  |   3 +-
- hw/s390x/s390-pci-bus.h  |  24 +++++++++++
- hw/s390x/s390-pci-inst.c | 105 +++++++++++++++++++++++++++++++++++++++++++++--
- hw/s390x/s390-pci-inst.h |   1 +
- 4 files changed, 129 insertions(+), 4 deletions(-)
-
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index e3e0ebb7f6..7bd0b9d1e5 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -967,6 +967,7 @@ static void s390_pcihost_hot_unplug(HotplugHandler *hotplug_dev,
-     bus = pci_get_bus(pci_dev);
-     devfn = pci_dev->devfn;
-     object_unparent(OBJECT(pci_dev));
-+    fmb_timer_free(pbdev);
-     s390_pci_msix_free(pbdev);
-     s390_pci_iommu_free(s, bus, devfn);
-     pbdev->pdev = NULL;
-@@ -1139,7 +1140,7 @@ static void s390_pci_device_reset(DeviceState *dev)
-         pci_dereg_ioat(pbdev->iommu);
-     }
- 
--    pbdev->fmb_addr = 0;
-+    fmb_timer_free(pbdev);
- }
- 
- static void s390_pci_get_fid(Object *obj, Visitor *v, const char *name,
-diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-index 1f7f9b5814..fdf13a19c0 100644
---- a/hw/s390x/s390-pci-bus.h
-+++ b/hw/s390x/s390-pci-bus.h
-@@ -286,6 +286,28 @@ typedef struct S390PCIIOMMUTable {
-     S390PCIIOMMU *iommu[PCI_SLOT_MAX];
- } S390PCIIOMMUTable;
- 
-+/* Function Measurement Block */
-+#define DEFAULT_MUI 4000
-+#define UPDATE_U_BIT 0x1ULL
-+#define FMBK_MASK 0xfULL
-+
-+typedef struct ZpciFmbFmt0 {
-+    uint64_t dma_rbytes;
-+    uint64_t dma_wbytes;
-+} ZpciFmbFmt0;
-+
-+typedef struct ZpciFmb {
-+    uint8_t format;
-+    uint8_t fmt_ind[3];
-+    uint32_t sample;
-+    uint64_t last_update;
-+    uint64_t ld_ops;
-+    uint64_t st_ops;
-+    uint64_t stb_ops;
-+    uint64_t rpcit_ops;
-+    ZpciFmbFmt0 fmt0;
-+} QEMU_PACKED __attribute((__aligned__(8))) ZpciFmb;
-+
- struct S390PCIBusDevice {
-     DeviceState qdev;
-     PCIDevice *pdev;
-@@ -297,6 +319,8 @@ struct S390PCIBusDevice {
-     uint32_t fid;
-     bool fid_defined;
-     uint64_t fmb_addr;
-+    ZpciFmb fmb;
-+    QEMUTimer *fmb_timer;
-     uint8_t isc;
-     uint16_t noi;
-     uint16_t maxstbl;
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 7b61367ee3..1ed5cb91d0 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -19,6 +19,7 @@
- #include "exec/memory-internal.h"
- #include "qemu/error-report.h"
- #include "sysemu/hw_accel.h"
-+#include "hw/s390x/tod.h"
- 
- #ifndef DEBUG_S390PCI_INST
- #define DEBUG_S390PCI_INST  0
-@@ -293,7 +294,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
-         resgrp->fr = 1;
-         stq_p(&resgrp->dasm, 0);
-         stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
--        stw_p(&resgrp->mui, 0);
-+        stw_p(&resgrp->mui, DEFAULT_MUI);
-         stw_p(&resgrp->i, 128);
-         stw_p(&resgrp->maxstbl, 128);
-         resgrp->version = 0;
-@@ -456,6 +457,10 @@ int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
-         return 0;
-     }
- 
-+    if (pbdev->fmb_addr) {
-+        pbdev->fmb.ld_ops++;
-+    }
-+
-     env->regs[r1] = data;
-     setcc(cpu, ZPCI_PCI_LS_OK);
-     return 0;
-@@ -561,6 +566,10 @@ int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
-         return 0;
-     }
- 
-+    if (pbdev->fmb_addr) {
-+        pbdev->fmb.st_ops++;
-+    }
-+
-     setcc(cpu, ZPCI_PCI_LS_OK);
-     return 0;
- }
-@@ -681,6 +690,9 @@ err:
-         s390_set_status_code(env, r1, ZPCI_PCI_ST_FUNC_IN_ERR);
-         s390_pci_generate_error_event(error, pbdev->fh, pbdev->fid, start, 0);
-     } else {
-+        if (pbdev->fmb_addr) {
-+            pbdev->fmb.rpcit_ops++;
-+        }
-         setcc(cpu, ZPCI_PCI_LS_OK);
-     }
-     return 0;
-@@ -783,6 +795,10 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
-         }
-     }
- 
-+    if (pbdev->fmb_addr) {
-+        pbdev->fmb.stb_ops++;
-+    }
-+
-     setcc(cpu, ZPCI_PCI_LS_OK);
-     return 0;
- 
-@@ -889,6 +905,63 @@ void pci_dereg_ioat(S390PCIIOMMU *iommu)
-     iommu->g_iota = 0;
- }
- 
-+void fmb_timer_free(S390PCIBusDevice *pbdev)
-+{
-+    if (pbdev->fmb_timer) {
-+        timer_del(pbdev->fmb_timer);
-+        timer_free(pbdev->fmb_timer);
-+        pbdev->fmb_timer = NULL;
-+    }
-+    pbdev->fmb_addr = 0;
-+    memset(&pbdev->fmb, 0, sizeof(ZpciFmb));
-+}
-+
-+static int fmb_do_update(S390PCIBusDevice *pbdev, uint8_t offset, int len)
-+{
-+    MemTxResult ret;
-+
-+    ret = address_space_write(&address_space_memory,
-+                              pbdev->fmb_addr + (uint64_t)offset,
-+                              MEMTXATTRS_UNSPECIFIED,
-+                              (uint8_t *)&pbdev->fmb + offset,
-+                              len);
-+    if (ret) {
-+        s390_pci_generate_error_event(ERR_EVENT_FMBA, pbdev->fh, pbdev->fid,
-+                                      pbdev->fmb_addr, 0);
-+        fmb_timer_free(pbdev);
-+    }
-+
-+    return ret;
-+}
-+
-+static void fmb_update(void *opaque)
-+{
-+    S390PCIBusDevice *pbdev = opaque;
-+    int64_t t = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+    uint8_t offset = offsetof(ZpciFmb, last_update);
-+
-+    /* Update U bit */
-+    pbdev->fmb.last_update |= UPDATE_U_BIT;
-+    if (fmb_do_update(pbdev, offset, sizeof(uint64_t))) {
-+        return;
-+    }
-+
-+    /* Update FMB counters */
-+    pbdev->fmb.sample++;
-+    if (fmb_do_update(pbdev, 0, sizeof(ZpciFmb))) {
-+        return;
-+    }
-+
-+    /* Clear U bit and update the time */
-+    pbdev->fmb.last_update = time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+    pbdev->fmb.last_update &= ~UPDATE_U_BIT;
-+    if (fmb_do_update(pbdev, offset, sizeof(uint64_t))) {
-+        return;
-+    }
-+
-+    timer_mod(pbdev->fmb_timer, t + DEFAULT_MUI);
-+}
-+
- int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
-                         uintptr_t ra)
- {
-@@ -1018,9 +1091,35 @@ int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
-             s390_set_status_code(env, r1, ZPCI_MOD_ST_SEQUENCE);
-         }
-         break;
--    case ZPCI_MOD_FC_SET_MEASURE:
--        pbdev->fmb_addr = ldq_p(&fib.fmb_addr);
-+    case ZPCI_MOD_FC_SET_MEASURE: {
-+        uint64_t fmb_addr = ldq_p(&fib.fmb_addr);
-+
-+        if (fmb_addr & FMBK_MASK) {
-+            cc = ZPCI_PCI_LS_ERR;
-+            s390_pci_generate_error_event(ERR_EVENT_FMBPRO, pbdev->fh,
-+                                          pbdev->fid, fmb_addr, 0);
-+            fmb_timer_free(pbdev);
-+            break;
-+        }
-+
-+        if (!fmb_addr) {
-+            /* Stop updating FMB. */
-+            fmb_timer_free(pbdev);
-+            break;
-+        }
-+
-+        pbdev->fmb_addr = fmb_addr;
-+        if (!pbdev->fmb_timer) {
-+            pbdev->fmb_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
-+                                            fmb_update, pbdev);
-+        } else if (timer_pending(pbdev->fmb_timer)) {
-+            /* Remove pending timer to update FMB address. */
-+            timer_del(pbdev->fmb_timer);
-+        }
-+        timer_mod(pbdev->fmb_timer,
-+                  qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + DEFAULT_MUI);
-         break;
-+    }
-     default:
-         s390_program_interrupt(&cpu->env, PGM_OPERAND, 6, ra);
-         cc = ZPCI_PCI_LS_ERR;
-diff --git a/hw/s390x/s390-pci-inst.h b/hw/s390x/s390-pci-inst.h
-index 91c3d61f2a..fa3bf8b5aa 100644
---- a/hw/s390x/s390-pci-inst.h
-+++ b/hw/s390x/s390-pci-inst.h
-@@ -303,6 +303,7 @@ int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
-                         uintptr_t ra);
- int stpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
-                          uintptr_t ra);
-+void fmb_timer_free(S390PCIBusDevice *pbdev);
- 
- #define ZPCI_IO_BAR_MIN 0
- #define ZPCI_IO_BAR_MAX 5
--- 
-Yi Min
+DQoNCj4gT24gMzEtQXVnLTIwMTgsIGF0IDQ6NDEgUE0sIEFuZHJldyBKb25lcyA8ZHJqb25lc0By
+ZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IEV4dGVybmFsIEVtYWlsDQo+IA0KPiBNYW5pc2gsDQo+
+IA0KPiBZb3VyIG1haWwgcmVhZGVyIGRvZXNuJ3QgYXBwZWFyIHRvIGJlIHByb3ZpZGluZyBhbnkg
+cXVvdGluZywgc28gSSdtIG5vdA0KPiBzdXJlIEkgZm91bmQgYWxsIHlvdXIgcmVwbGllcy4gSSd2
+ZSB0cmllZCB0byBmaXggdXAgdGhlIHF1b3RpbmcgaW4gb3JkZXINCj4gdG8gcmVwbHkgaGVyZSwg
+YnV0IHlvdSBzaG91bGQgbG9vayBpbnRvIGZpeGluZyB5b3VyIHJlYWRlci4NCj4gDQpPaC4gSSBh
+bSB1c2luZyBNYWlsIG9uIE1hY09TeCwgbm90IHN1cmUgd2hhdCBpcyB3cm9uZyBoZXJlLi4uDQoN
+Cj4gT24gRnJpLCBBdWcgMzEsIDIwMTggYXQgMDk6NTI6MTJBTSArMDAwMCwgSmFnZ2ksIE1hbmlz
+aCB3cm90ZToNCj4+IE9uIGJsZWgtYmxlaCwgQW5kcmV3IEpvbmVzIHdyb3RlOg0KPj4+IE9uIGJs
+ZWgtYmxlaCwgSmFnZ2ksIE1hbmlzaCB3cm90ZToNCj4+Pj4gLSBTbyBpbiBjcHVfcG9zdF9sb2Fk
+IChNYWNoaW5lIEIpIHFlbXUgY2FuIGxvb2t1cCB3aGl0ZWxpc3QgYW5kIHJlcGxhY2UgdGhlIE1J
+RFIgd2l0aCB0aGUgb25lIGF0IE1hY2hpbmUgQi4NCj4+Pj4gU291bmRzIGdvb2Q/DQo+Pj4+IA0K
+Pj4+IEl0IHNob3VsZG4ndCBiZSBuZWNlc3NhcnkuIFdpdGggJy1jcHUgaG9zdCcgUUVNVSBzaG91
+bGQgcHJvYmFibHkganVzdCByZWFkDQo+Pj4gYWxsIHRoZSBJRCByZWdpc3RlcnMgZnJvbSB0aGUg
+aG9zdCBmaXJzdCwgdXBkYXRpbmcgdGhlIGd1ZXN0J3MgY29weSB0bw0KPj4+IG1hdGNoIHRoZSBk
+ZXN0aW5hdGlvbiBob3N0J3MgcmVnaXN0ZXJzICh3ZSdyZSB1c2luZyAnLWNwdSBob3N0JywgdGhl
+DQo+Pj4gcmVnaXN0ZXJzIHNob3VsZCBtYXRjaCB0aGUgaG9zdCAtIGluY2x1ZGluZyBNSURSLikg
+SWYgYSB1c2VyIGNob29zZXMgdG8NCj4+PiBtaWdyYXRlIGEgZ3Vlc3QgdGhhdCBpcyB1c2luZyAn
+LWNwdSBob3N0JywgdGhlbiB0aGV5IG5lZWQgdG8ga25vdyB3aGF0DQo+Pj4gdGhleSBhcmUgZG9p
+bmcuIElmIGEgd2hpdGVsaXN0IG9mIGNsb3NlLWVub3VnaCBwcm9jZXNzb3JzIGlzIHBvc3NpYmxl
+IHRvDQo+Pj4gY3JlYXRlLCB0aGVuIHRoYXQgd2hpdGVsaXN0IHNob3VsZCBiZSBtYW5hZ2VkIGFu
+ZCB1c2VkIGF0IGEgaGlnaGVyIGxheWVyDQo+Pj4gaW4gdGhlIHZpcnQgc3RhY2ssIG5vdCBkb3du
+IGluIFFFTVUuDQo+PiANCj4+IEhvdyB3b3VsZCBxZW11IGtub3cgdG8gdGhhdCBpdCBoYXMgdG8g
+cGF0Y2g/IENvdWxkIG5vdCB1bmRlcnN0YW5kIHlvdXIgcG9pbnQgaGVyZS4NCj4+IElJVUMgcWVt
+dSBuZWVkcyBzb21lIHBhcmFtZXRlciBmb3IgdGhpcw0KPiANCj4gUUVNVSB3b3VsZCB1bmNvbmRp
+dGlvbmFsbHkgdXBkYXRlIHRoZSBndWVzdCdzIHZpZXcgb2YgdGhlIGludmFyaWFudA0KPiByZWdp
+c3RlcnMgYWZ0ZXIgbWlncmF0aW9uLCB3aGVuICctY3B1IGhvc3QnIGlzIHVzZWQuIFRoZXJlJ3Mg
+bm8gbmVlZA0KPiBmb3IgYSBwYXJhbWV0ZXIsIGFzIHRoZSB1cGRhdGUgaXMgdW5jb25kaXRpb25h
+bC4NCj4gDQo+PiANCj4+PiBGb3IgZXhhbXBsZSwgb3BlbnN0YWNrIGNhbiBkZXRlcm1pbmUNCj4+
+PiBkZXN0aW5hdGlvbiBjYW5kaWRhdGVzIHVzaW5nIHdoYXRldmVyIHBvbGljeSBpdCB3YW50cywg
+aW5jbHVkaW5nIGEgY2xvc2UtDQo+Pj4gZW5vdWdoIHByb2Nlc3NvciB3aGl0ZWxpc3QuDQo+Pj4g
+DQo+Pj4gU28sIEkgcHJvcG9zZSBibGluZGx5IHVwZGF0aW5nIGFsbCBpbnZhcmlhbnQgcmVnaXN0
+ZXJzIHdoZW4gbWlncmF0aW5nDQo+Pj4gYSAnLWNwdSBob3N0JyBndWVzdCBhbmQgbGVhdmluZyBp
+dCB0byB0aGUgdXNlciB0byBkbyB0aGVzZSBtaWdyYXRpb25zDQo+Pj4gYXQgdGhlaXIgb3duIHJp
+c2sNCj4+PiANCj4+IHllcyBnb29kIHBvaW50IHVwZGF0aW5nIGFsbCBpbnZhcmlhbnQgaXMgYmV0
+dGVyLCBmb3IgdGhlIGNhc2Ugd2hlcmUgdXNlciBpcyBhd2FyZSB0aGF0IGhvc3QgYW5kIGRlc3Rp
+bmF0aW9uIGhhdmUgc2FtZSBjcHUgYXJjaC4NCj4+IEkgY2FuIHByZXBhcmUgYSBSRkMgcGF0Y2gg
+YnV0IGNwdV9wb3N0X2xvYWQgd2lsbCBuZWVkIHNvbWUgZmxhZyB0byByZXBsYWNlIHRoZXNlIHZh
+bHVlcy4sDQo+IA0KPiBJJ20gbm90IHN1cmUgd2hhdCB5b3UgbWVhbiBieSBhIGZsYWcsIGJ1dCBJ
+J2xsIHJldmlldyB0aGUgUkZDIHdoZW4geW91DQo+IHBvc3QgaXQuDQo+IA0KPj4+IA0KPj4+ICh3
+aGVuIG1pZ3JhdGluZyB0byBhIHRydWx5IGlkZW50aWNhbCBob3N0LCB0aGUgYmxpbmQNCj4+PiB1
+cGRhdGUgd2lsbCBub3QgY2hhbmdlIGFueXRoaW5nLiBTbyBpdCB3b3VsZCBiZSBubyB3b3JzZSB0
+aGFuIHdoYXQgd2UNCj4+PiBkbyB0b2RheS4pIE9uZSBzaWRlIG5vdGUgaXMgdGhhdCB3ZSdyZSBz
+dGFydGluZyB0byBnaXZlIFFFTVUgY29udHJvbA0KPj4+IG92ZXIgd2hhdCBvcHRpb25hbCBwcm9j
+ZXNzb3IgZmVhdHVyZXMgYXJlIGF2YWlsYWJsZSB0byB0aGUgZ3Vlc3QsIGUuZy4NCj4+PiBTVkUu
+IFNvIGJlZm9yZSBibGluZGx5IHVwZGF0aW5nIGFsbCBJRCByZWdpc3RlcnMgd2UnZCB3YW50IHRv
+IGluZm9ybQ0KPj4+IEtWTSBvZiB0aGUgZ3Vlc3QgY29uZmlndXJhdGlvbiBpbiBvcmRlciBmb3Ig
+S1ZNIHRvIHJldHVybiBhcHByb3ByaWF0ZQ0KPj4+IElEIHJlZ2lzdGVyIHZhbHVlcy4NCj4+PiAN
+Cj4+IE5vdCBzdXJlIGhvdyB0byBoYW5kbGUgdGhpcy4NCj4gDQo+IEkgdGhpbmsgdGhlIHNlcXVl
+bmNlIHNob3VsZCBsb29rIHNvbWV0aGluZyBsaWtlIHRoaXM6DQo+IA0KPiAgMSkgR3Vlc3QgcnVu
+bmluZyBvbiBIb3N0IEEgd2l0aCBwcm9jZXNzb3IgYQ0KPiAgMikgU3RvcCBndWVzdCBhbmQgc2F2
+ZSBpdHMgc3RhdGUgZm9yIG1pZ3JhdGlvbg0KPiAgMykgTWlncmF0ZSBndWVzdCB0byBIb3N0IEIg
+d2l0aCBwcm9jZXNzb3IgYiAoYiBpcyAiY2xvc2UgZW5vdWdoIiB0byBhKQ0KPiAgNCkgUmVzdG9y
+ZSBndWVzdCBzdGF0ZSBhZnRlciBtaWdyYXRpb24NCj4gICAgIElmIGd1ZXN0IGlzIHJ1bm5pbmcg
+d2l0aCAnLWNwdSBob3N0Jw0KPiAgICAgICA0LmEpIEluZm9ybSBLVk0gb2YgYW55IGNvbmZpZ3Vy
+YXRpb24gdGhhdCBpbXBhY3RzIGludmFyaWFudCByZWdpc3RlcnMNCj4gICAgICAgNC5iKSBVcGRh
+dGUgdGhlIGd1ZXN0J3MgdmlldyBvZiBhbGwgaW52YXJpYW50IHJlZ2lzdGVycyB0byBtYXRjaCB0
+aGUNCj4gICAgICAgICAgICBob3N0DQo+ICAgICBFbmRJZg0KPiAgNSkgUnVuIGd1ZXN0DQo+IA0K
+PiA0LmEgYW5kIDQuYiByZXF1aXJlIG5ldyBjb2RlIGJvdGggaW4gUUVNVSBhbmQgS1ZNLiA0LmEg
+bWF5IHJlcXVpcmUgYSBuZXcNCj4gS1ZNIEFQSSwgdW5sZXNzIHRoZSBleGlzdGluZyBBUEkgY2Fu
+IGJlIGxldmVyYWdlZC4NCj4gDQo+IFRoZSBkZWZpbml0aW9uIG9mICJjbG9zZSBlbm91Z2giIGlz
+IGxlZnQgdG8gdGhlIHVzZXJzIGFuZC9vciBoaWdoZXIgbGF5ZXJzDQo+IG9mIHRoZSBWaXJ0IHN0
+YWNrLg0KPiANCg0KVGhhbmtzIGZvciBkZXRhaWxpbmcgdGhlIHNlcXVlbmNlLiANCkkgZ290IGFu
+b3RoZXIgY29tbWVudCBmcm9tIEp1YW4gYW5kIERhdmlkIHdoaWNoIGlzIG5vdCB0byB1c2UgLWNw
+dSBob3N0LCBzZWUgYmVsb3cNCg0KIkkgcmVhbGx5IHRoaW5rIHRoYXQgdGhlIHJpZ2h0IGFwcHJv
+YWNoIGhlcmUgaXMgbm90IHVzaW5nIC1jcHUgaG9zdC4gIFlvdQ0KZG8gdGhlIGZ1bGwgd29yaywg
+Y3JlYXRlIGEgbW9kZWwgYXMgRGF2aWQgc2F5cywgYW5kIGJlIHN1cmUgdGhhdCB5b3UgY2FyDQpy
+dW4gdGhhdCBtb2RlbCBvbiBib3RoIGNwdXMuICBJdCBpcyBhIGxvdCBvZiB3b3JrLCBidXQgaXQg
+aXMgdGhlIG9ubHkNCndheSB0byBtYWtlIHN1cmUgdGhhdCB0aGlzIGlzIGdvaW5nIHRvIHdvcmsg
+bG9uZyB0ZXJtLuKAnQ0KDQpOb3QgdXNpbmcgLWNwdSBob3N0IGlzIG9ydGhvZ29uYWwgdG8gdGhl
+IHNlcXVlbmNlIHdlIGhhdmUgYmVlbiBkaXNjdXNzaW5nIGluIHRoaXMgdGhyZWFkLg0KVXNlIHNv
+bWV0aGluZyBsaWtlIC1jcHUgY29ydGV4LWE1NyAodGhpcyBob3dldmVyIGRvZXMgbm90IHdvcmsg
+c28gZmFyKQ0KVGhpcyB3b3VsZCBhdm9pZCBjbG9zZS1lbm91Z2ggZGVmaW5pdGlvbiwgYnV0IHdv
+dWxkIG5lZWQgc3Vic3RhbnRpYWwgd29yay4NCg0KU28gd2hpY2ggYXBwcm9hY2ggc2hvdWxkIGJl
+IHRha2VuIGhlcmUsIHdoYXRzIHlvdXIgdGFrZS4uLg0KDQo+IFRoYW5rcywNCj4gZHJldw0KDQo=
