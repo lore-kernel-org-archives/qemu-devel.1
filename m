@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57759)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=778d471cf=Alistair.Francis@wdc.com>)
-	id 1fxKXZ-0008Vo-3C
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:15:22 -0400
+	id 1fxKXY-0008Vn-Pv
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=778d471cf=Alistair.Francis@wdc.com>)
-	id 1fxKXU-0001qa-Lq
+	id 1fxKXT-0001pS-Om
 	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:15:20 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:45216)
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:27807)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=778d471cf=Alistair.Francis@wdc.com>)
-	id 1fxKXT-0001hj-Rq
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:15:16 -0400
+	id 1fxKXR-0001cF-Qh
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:15:15 -0400
 From: Alistair Francis <alistair.francis@wdc.com>
-Date: Tue,  4 Sep 2018 16:14:34 -0700
-Message-Id: <20180904231442.18932-2-alistair.francis@wdc.com>
-In-Reply-To: <20180904231442.18932-1-alistair.francis@wdc.com>
-References: <20180904231442.18932-1-alistair.francis@wdc.com>
+Date: Tue,  4 Sep 2018 16:14:33 -0700
+Message-Id: <20180904231442.18932-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PULL 1/9] RISC-V: Update address bits to support sv39
- and sv48
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 0/9] riscv-pullreq queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +28,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair.francis@wdc.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>
 
-From: Michael Clark <mjc@sifive.com>
+The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd241557452:
 
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27-v2' into staging (2018-08-27 16:44:20 +0100)
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 34abc383e3..e0608e6d5f 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -24,12 +24,12 @@
- #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
- #if defined(TARGET_RISCV64)
- #define TARGET_LONG_BITS 64
--#define TARGET_PHYS_ADDR_SPACE_BITS 50
--#define TARGET_VIRT_ADDR_SPACE_BITS 39
-+#define TARGET_PHYS_ADDR_SPACE_BITS 56 /* 44-bit PPN */
-+#define TARGET_VIRT_ADDR_SPACE_BITS 48 /* sv48 */
- #elif defined(TARGET_RISCV32)
- #define TARGET_LONG_BITS 32
--#define TARGET_PHYS_ADDR_SPACE_BITS 34
--#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+#define TARGET_PHYS_ADDR_SPACE_BITS 34 /* 22-bit PPN */
-+#define TARGET_VIRT_ADDR_SPACE_BITS 32 /* sv32 */
- #endif
- 
- #define TCG_GUEST_DEFAULT_MO 0
--- 
-2.17.1
+are available in the Git repository at:
+
+  git@github.com:alistair23/qemu.git tags/pull-riscv-pullreq-20180904
+
+for you to fetch changes up to 3b18c3fa870f11b8a1841bb7537e5bc11100160c:
+
+  riscv: remove define cpu_init() (2018-09-04 13:24:39 -0700)
+
+----------------------------------------------------------------
+A misc collection of RISC-V related patches for 3.1.
+
+----------------------------------------------------------------
+Alistair Francis (2):
+      hw/riscv/virtio: Set the soc device tree node as a simple-bus
+      hw/riscv/spike: Set the soc device tree node as a simple-bus
+
+Emilio G. Cota (2):
+      target/riscv: optimize indirect branches
+      target/riscv: call gen_goto_tb on DISAS_TOO_MANY
+
+Igor Mammedov (1):
+      riscv: remove define cpu_init()
+
+Michael Clark (4):
+      RISC-V: Update address bits to support sv39 and sv48
+      RISC-V: Improve page table walker spec compliance
+      RISC-V: Use atomic_cmpxchg to update PLIC bitmaps
+      RISC-V: Simplify riscv_cpu_local_irqs_pending
+
+ hw/riscv/sifive_plic.c         | 49 ++++++++++-----------
+ hw/riscv/spike.c               |  2 +-
+ hw/riscv/virt.c                |  2 +-
+ include/hw/riscv/sifive_plic.h |  1 -
+ target/riscv/cpu.h             |  9 ++--
+ target/riscv/cpu_bits.h        |  2 -
+ target/riscv/helper.c          | 98 ++++++++++++++++++++++++------------------
+ target/riscv/translate.c       |  9 +---
+ 8 files changed, 87 insertions(+), 85 deletions(-)
