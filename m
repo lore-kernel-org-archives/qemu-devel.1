@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fxHmw-00050a-6W
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:19:02 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1fxHou-0005zF-KW
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fxHmv-00027D-2n
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:19:02 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:40195)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fxHmu-00025R-PU
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:19:01 -0400
-Received: by mail-lj1-x243.google.com with SMTP id j19-v6so4268417ljc.7
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 13:19:00 -0700 (PDT)
+	(envelope-from <hpoussin@reactos.org>) id 1fxHoq-0003K4-J9
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:21:04 -0400
+References: <20180810053712.6587-1-hpoussin@reactos.org>
+	<20180810064154.GE4079@umbus> <20180820031620.GA3348@umbus.fritz.box>
+	<d9a25f9f-e578-5097-a7fc-0fe065275b16@ilande.co.uk>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <6987dd49-757a-dd84-c73c-0a16a669ccb6@reactos.org>
+Date: Tue, 4 Sep 2018 22:20:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180831222249.GA28489@flamenco>
-References: <20180810173941.5301-1-cota@braap.org>
-	<20180831222249.GA28489@flamenco>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 4 Sep 2018 13:18:28 -0700
-Message-ID: <CAKmqyKO2jK0YnJepSazMeCtMtFLpEMaY6UOeyHbGWKED0Z=CJw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/riscv: use
- tcg_lookup_and_goto_ptr
+In-Reply-To: <d9a25f9f-e578-5097-a7fc-0fe065275b16@ilande.co.uk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc: on 40p machine,
+ change default firmware to OpenBIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
 
-On Fri, Aug 31, 2018 at 3:22 PM, Emilio G. Cota <cota@braap.org> wrote:
-> On Fri, Aug 10, 2018 at 13:39:38 -0400, Emilio G. Cota wrote:
->> Changes wrt v1: changed patch 3 as suggested by Richard. Also
->> added his R-b's.
+Le 31/08/2018 à 16:16, Mark Cave-Ayland a écrit :
+> On 20/08/18 04:16, David Gibson wrote:
+> 
+>> On Fri, Aug 10, 2018 at 04:41:54PM +1000, David Gibson wrote:
+>>> On Fri, Aug 10, 2018 at 07:37:12AM +0200, Hervé Poussineau wrote:
+>>>> OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
+>>>> Use it, instead of relying on an unmaintained and very limited firmware.
+>>>>
+>>>> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+>>>
+>>> Applied to ppc-for-3.1, thanks.
 >>
->> You can fetch this series from:
->>   https://github.com/cota/qemu/tree/riscv-lookup_ptr-v2
->
-> RISC-V maintainers: any plans of picking this up for 3.1?
+>> But I'm afraid I've had to pull it out.  This breaks boot-serial-test,
+>> because the new firmware prints different messages than the old one
+>> did and the testcase isn't looking for them.
+>>
+>> I tried fixing it, but ran into complications I didn't have time to
+>> debug.  So I'm afraid this will miss my coming-soon pull request.
+>>
+>> You should be able to reproduce the problem with "make check
+>> SPEED=slow", can you fix this up and resubmit.
+>>
+>>>
+>>>> ---
+>>>>   hw/ppc/prep.c | 2 +-
+>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+>>>> index 3401570d98..1558855247 100644
+>>>> --- a/hw/ppc/prep.c
+>>>> +++ b/hw/ppc/prep.c
+>>>> @@ -736,7 +736,7 @@ static void ibm_40p_init(MachineState *machine)
+>>>>       /* PCI host */
+>>>>       dev = qdev_create(NULL, "raven-pcihost");
+>>>>       if (!bios_name) {
+>>>> -        bios_name = BIOS_FILENAME;
+>>>> +        bios_name = "openbios-ppc";
+>>>>       }
+>>>>       qdev_prop_set_string(dev, "bios-name", bios_name);
+>>>>       qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+> 
+> Thanks to Thomas on IRC, I was able come up with the diff below which
+> fixes boot-serial-test when this patch is applied:
+> 
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index f123b15e3e..f865822e32 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -75,12 +75,12 @@ typedef struct testdef {
+>   static testdef_t tests[] = {
+>       { "alpha", "clipper", "", "PCI:" },
+>       { "ppc", "ppce500", "", "U-Boot" },
+> -    { "ppc", "40p", "-boot d", "Booting from device d" },
+> +    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+>       { "ppc", "g3beige", "", "PowerPC,750" },
+>       { "ppc", "mac99", "", "PowerPC,G4" },
+>       { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
+>       { "ppc64", "ppce500", "", "U-Boot" },
+> -    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
+> +    { "ppc64", "40p", "-m 192", "Memory: 192M" },
+>       { "ppc64", "mac99", "", "PowerPC,970FX" },
+>       { "ppc64", "pseries", "", "Open Firmware" },
+>       { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
+> 
+> Hervé, can you confirm that this fixes "make check" for you? If so it
+> should just be a simple case of squashing into the above patch and then
+> resubmitting a v2.
 
-Thanks for CCing me.
+Yes, this also fixes "make check" for me.
+v2 sent at http://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00362.html
 
-I think Michael must be really busy, I haven't seen any activity for
-awhile. I'm going to send a PR with everything that has been reviewed
-and applies cleanly.
+Thanks for the help.
 
-Alistair
-
->
-> (Cc'ing Alistair since he recently submitted some riscv-related
-> pull requests; BTW Alistair, should you be listed as a RISC-V
-> maintainer?)
->
-> Thanks,
->
->                 Emilio
->
+Hervé
