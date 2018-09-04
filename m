@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wehuang@redhat.com>) id 1fxEks-0003Md-VD
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:04:44 -0400
+	(envelope-from <wehuang@redhat.com>) id 1fxEo4-0004Ym-MG
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wehuang@redhat.com>) id 1fxEko-0004mV-AC
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:04:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44920)
+	(envelope-from <wehuang@redhat.com>) id 1fxEo1-0007bD-HB
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:08:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37318)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wehuang@redhat.com>) id 1fxEkm-0004jl-3Z
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:04:36 -0400
-Date: Tue, 4 Sep 2018 13:04:31 -0400 (EDT)
+	(Exim 4.71) (envelope-from <wehuang@redhat.com>) id 1fxEo1-0007av-9c
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 13:07:57 -0400
+Date: Tue, 4 Sep 2018 13:07:56 -0400 (EDT)
 From: Wei Huang <wehuang@redhat.com>
-Message-ID: <2128164405.32860913.1536080671057.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20180903112639.hnuprihktvifieuz@kamzik.brq.redhat.com>
+Message-ID: <1199030251.32861977.1536080876430.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180903115335.i763ae67bykvjijl@kamzik.brq.redhat.com>
 References: <1535778675-32170-1-git-send-email-wei@redhat.com>
-	<1535778675-32170-3-git-send-email-wei@redhat.com>
-	<20180903112639.hnuprihktvifieuz@kamzik.brq.redhat.com>
+	<1535778675-32170-5-git-send-email-wei@redhat.com>
+	<20180903115335.i763ae67bykvjijl@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V8 2/4] tests/migration: Support cross
- compilation in generating boot header file
+Subject: Re: [Qemu-devel] [PATCH V8 4/4] tests: Add migration test for
+ aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,198 +39,39 @@ Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peter maydell <peter.maydell@lina
 > To: "Wei Huang" <wei@redhat.com>
 > Cc: qemu-devel@nongnu.org, lvivier@redhat.com, "peter maydell" <peter.maydell@linaro.org>, quintela@redhat.com,
 > dgilbert@redhat.com
-> Sent: Monday, September 3, 2018 6:26:39 AM
-> Subject: Re: [Qemu-devel] [PATCH V8 2/4] tests/migration: Support cross compilation in generating boot header file
+> Sent: Monday, September 3, 2018 6:53:35 AM
+> Subject: Re: [Qemu-devel] [PATCH V8 4/4] tests: Add migration test for aarch64
 > 
-> On Sat, Sep 01, 2018 at 01:11:13AM -0400, Wei Huang wrote:
-> > Recently a new configure option, CROSS_CC_GUEST, was added to
-> > $(TARGET)-softmmu/config-target.mak to support TCG-related tests. This
-> > patch tries to leverage this option to support cross compilation when the
-> > migration boot block file is being re-generated:
-> > 
-> >  * The x86_64 related files are moved to a new sub-dir (named ./x86_64).
-> >  * A new top-layer Makefile is created in tests/migration/ directory.
-> >    This Makefile searches and parses CROSS_CC_GUEST to generate
-> >    CROSS_PREFIX.
-> >    The CROSS_PREFIX, if available, is then passed to
-> >    migration/$ARCH/Makefile.
-> > 
-> > Signed-off-by: Wei Huang <wei@redhat.com>
-> > ---
-> >  tests/migration-test.c                           |  2 +-
-> >  tests/migration/Makefile                         | 43
-> >  +++++++++++++-----------
-> >  tests/migration/x86_64/Makefile                  | 22 ++++++++++++
-> >  tests/migration/{ => x86_64}/x86-a-b-bootblock.S |  0
-> >  tests/migration/{ => x86_64}/x86-a-b-bootblock.h |  8 ++---
-> >  5 files changed, 50 insertions(+), 25 deletions(-)
-> >  create mode 100644 tests/migration/x86_64/Makefile
-> >  rename tests/migration/{ => x86_64}/x86-a-b-bootblock.S (100%)
-> >  rename tests/migration/{ => x86_64}/x86-a-b-bootblock.h (93%)
-> > 
-> > diff --git a/tests/migration-test.c b/tests/migration-test.c
-> > index 0e687b7..c4d79e9 100644
-> > --- a/tests/migration-test.c
-> > +++ b/tests/migration-test.c
-> > @@ -83,7 +83,7 @@ static const char *tmpfs;
-> >  /* A simple PC boot sector that modifies memory (1-100MB) quickly
-> >   * outputting a 'B' every so often if it's still running.
-> >   */
-> > -#include "tests/migration/x86-a-b-bootblock.h"
-> > +#include "tests/migration/x86_64/x86-a-b-bootblock.h"
+> On Sat, Sep 01, 2018 at 01:11:15AM -0400, Wei Huang wrote:
+> > +.section .text
+> > +
+> > +        .globl  _start
+> > +
+> > +_start:
+> > +        /* disable MMU to use phys mem address */
+> > +        mrs     x0, sctlr_el1
+> > +        bic     x0, x0, #(1<<0)
+> > +        msr     sctlr_el1, x0
+> > +        isb
+> > +
+> > +        /* traverse test memory region */
+> > +        mov     x0, #ARM_TEST_MEM_START
+> > +        mov     x1, #ARM_TEST_MEM_END
 > 
-> Is x86-a-b-bootblock.h specific to x86_64, or both i386 and x86_64?
-> I think we want the dir name to be i386 if it's the later. Also,
-> we could drop the 'x86-' prefix from the filename, now that the
-> directory identifies the arch.
+> I don't think there's any reason to require the start and
+> end addresses to be hard coded. We should be able to get
+> the start address with
 
-Well, I can try it. But this will make the Makefile more complicated as we have to detect x86_64 compiler for i386 binary (most distros only ship x86_64 cross compiler).
+Are you saying that we should make the .S file as independent as possible? These variables need to be defined for migration-test.c anyway. Why can't we just use them here?
 
 > 
-> >  
-> >  static void init_bootfile_x86(const char *bootpath)
-> >  {
-> > diff --git a/tests/migration/Makefile b/tests/migration/Makefile
-> > index 5d5fa07..1de480e 100644
-> > --- a/tests/migration/Makefile
-> > +++ b/tests/migration/Makefile
-> > @@ -1,31 +1,34 @@
-> > -# To specify cross compiler prefix, use CROSS_PREFIX=
-> > -#   > make CROSS_PREFIX=x86_64-linux-gnu-
-> > +#
-> > +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-> > +#
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or
-> > later.
-> > +# See the COPYING file in the top-level directory.
-> > +#
-> > +
-> > +TARGET_LIST = x86_64
-> > +
-> > +SRC_PATH = ../..
-> >  
-> >  override define __note
-> > -/* This file is automatically generated from
-> > - * tests/migration/x86-a-b-bootblock.s, edit that and then run
-> > - * tests/migration/rebuild-x86-bootblock.sh to update,
-> > - * and then remember to send both in your patch submission.
-> > +/* This file is automatically generated from the assembly file in
-> > + * tests/migration/$@, edit that and then run "make all"
+> #define KERNEL_OFFSET 0x80000
+>            adr     x0, _start
+>            add     x0, x0, #(1024 * 1024 - KERNEL_OFFSET)
 > 
-> nit: /, edit that/. Edit that file/
+> and the end address with
 > 
-> > + * inside tests/migration to update, and then remember to send both
-> > + * in your patch submission.
-> nit: ^ the header and the assembler differences
-> 
-> >   */
-> >  endef
-> >  export __note
-> >  
-> > -.PHONY: all clean
-> > -all: x86-a-b-bootblock.h
-> > -
-> > -x86-a-b-bootblock.h: x86.bootsect
-> > -	echo "$$__note" > header.tmp
-> > -	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
-> > -	mv header.tmp $@
-> > +parse-cross-prefix = $(subst gcc,,$(patsubst cc,gcc,$(patsubst
-> > CROSS_CC_GUEST="%",%,$(shell grep "CROSS_CC_GUEST="
-> > $(SRC_PATH)/$(1)-softmmu/config-target.mak))))
-> > +gen-cross-prefix = $(patsubst %-,CROSS_PREFIX=%-,$(call
-> > parse-cross-prefix,$(1)))
-> >  
-> > -x86.bootsect: x86.boot
-> > -	dd if=$< of=$@ bs=256 count=2 skip=124
-> > +.PHONY: all $(TARGET_LIST)
-> >  
-> > -x86.boot: x86.o
-> > -	$(CROSS_PREFIX)objcopy -O binary $< $@
-> > +all: $(TARGET_LIST)
-> >  
-> > -x86.o: x86-a-b-bootblock.S
-> > -	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
-> > +$(TARGET_LIST):
-> > +	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
-> >  
-> >  clean:
-> > -	@rm -rf *.boot *.o *.bootsect
-> > +	for target in $(TARGET_LIST); do \
-> > +		$(MAKE) -C $$target clean; \
-> > +	done
-> 
-> The above seems overly complicated. Does the following work?
-> 
-> $(TARGET_LIST): CROSS_PREFIX=$(CROSS_CC_GUEST)
-> $(TARGET_LIST):
-> 	$(MAKE) -C $@
-
-No, it doen't work for different reasons.
-
-First, to have CROSS_CC_GUEST defined, we normally would use "-include" to include config-target.mak file. But the end result is, the CROSS_CC_GUEST only has the same definition for both architectures (due to make command's multi-iteration processing and include is processed first). Secondly, CROSS_CC_GUEST needs to be polished because it can be: i) not defined; ii) "cc" without prefix; or iii) used-define value. We can't use it directly.
-
-
-
-> 
-> 
-> > diff --git a/tests/migration/x86_64/Makefile
-> > b/tests/migration/x86_64/Makefile
-> > new file mode 100644
-> > index 0000000..6dc849f
-> > --- /dev/null
-> > +++ b/tests/migration/x86_64/Makefile
-> > @@ -0,0 +1,22 @@
-> > +# To specify cross compiler prefix, use CROSS_PREFIX=
-> > +#   > make CROSS_PREFIX=x86_64-linux-gnu-
-> > +
-> > +.PHONY: all clean
-> > +all: x86-a-b-bootblock.h
-> > +
-> > +x86-a-b-bootblock.h: x86.bootsect
-> > +	echo "$$__note" > header.tmp
-> > +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
-> > +	mv header.tmp $@
-> > +
-> > +x86.bootsect: x86.boot
-> > +	dd if=$< of=$@ bs=256 count=2 skip=124
-> > +
-> > +x86.boot: x86.o
-> > +	$(CROSS_PREFIX)objcopy -O binary $< $@
-> > +
-> > +x86.o: x86-a-b-bootblock.S
-> > +	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
-> > +
-> > +clean:
-> > +	@rm -rf *.boot *.o *.bootsect
-> > diff --git a/tests/migration/x86-a-b-bootblock.S
-> > b/tests/migration/x86_64/x86-a-b-bootblock.S
-> > similarity index 100%
-> > rename from tests/migration/x86-a-b-bootblock.S
-> > rename to tests/migration/x86_64/x86-a-b-bootblock.S
-> > diff --git a/tests/migration/x86-a-b-bootblock.h
-> > b/tests/migration/x86_64/x86-a-b-bootblock.h
-> > similarity index 93%
-> > rename from tests/migration/x86-a-b-bootblock.h
-> > rename to tests/migration/x86_64/x86-a-b-bootblock.h
-> > index 78a151f..73670ef 100644
-> > --- a/tests/migration/x86-a-b-bootblock.h
-> > +++ b/tests/migration/x86_64/x86-a-b-bootblock.h
-> > @@ -1,7 +1,7 @@
-> > -/* This file is automatically generated from
-> > - * tests/migration/x86-a-b-bootblock.s, edit that and then run
-> > - * tests/migration/rebuild-x86-bootblock.sh to update,
-> > - * and then remember to send both in your patch submission.
-> > +/* This file is automatically generated from the assembly file in
-> > + * tests/migration/x86_64, edit that and then run "make all"
-> > + * inside tests/migration to update, and then remember to send both
-> > + * in your patch submission.
-> >   */
-> >  unsigned char x86_bootsect[] = {
-> >    0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
-> > --
-> > 1.8.3.1
-> > 
-> >
+>            add     x1, x0, #(99 * 1024 * 1024)
 > 
 > Thanks,
 > drew
