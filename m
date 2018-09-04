@@ -1,23 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxHzv-0005vn-6X
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:32:28 -0400
+	(envelope-from <muriloo@linux.ibm.com>) id 1fxINP-00041l-VP
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxHzt-0005K1-Go
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:32:26 -0400
-References: <20180904170930.28619-1-jsnow@redhat.com>
-	<20180904170930.28619-5-jsnow@redhat.com>
-	<20180904184620.GI415265@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <63e2cd53-a4cb-3ed7-ae70-f49b4e11fad5@redhat.com>
-Date: Tue, 4 Sep 2018 16:32:17 -0400
+	(envelope-from <muriloo@linux.ibm.com>) id 1fxINM-0006DQ-KU
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:56:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48778
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1fxINM-0006CV-AR
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:56:40 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w84KuTvK138417
+	for <qemu-devel@nongnu.org>; Tue, 4 Sep 2018 16:56:39 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ma0gcu3em-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 16:56:38 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Tue, 4 Sep 2018 16:56:35 -0400
+Date: Tue, 4 Sep 2018 17:56:31 -0300
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+References: <20180903171831.15446-1-cota@braap.org>
+	<20180903171831.15446-3-cota@braap.org>
+	<20180904173734.GA18515@kermit-br-ibm-com>
+	<20180904193538.GA30725@flamenco>
 MIME-Version: 1.0
-In-Reply-To: <20180904184620.GI415265@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/15] block/commit: refactor commit to
- use job callbacks
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180904193538.GA30725@flamenco>
+Message-Id: <20180904205631.GB18515@kermit-br-ibm-com>
+Subject: Re: [Qemu-devel] [PATCH 2/6] test-rcu-list: avoid torn accesses to
+ n_reclaims and n_nodes_removed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,247 +45,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
+Hi, Emilio.
 
-
-On 09/04/2018 02:46 PM, Jeff Cody wrote:
-> On Tue, Sep 04, 2018 at 01:09:19PM -0400, John Snow wrote:
->> Use the component callbacks; prepare, abort, and clean.
->>
->> NB: prepare is only called when the job has not yet failed;
->> and abort can be called after prepare.
->>
->> complete -> prepare -> abort -> clean
->> complete -> abort -> clean
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/commit.c | 90 ++++++++++++++++++++++++++++++++--------------------------
->>  1 file changed, 49 insertions(+), 41 deletions(-)
->>
->> diff --git a/block/commit.c b/block/commit.c
->> index b6e8969877..eb3941e545 100644
->> --- a/block/commit.c
->> +++ b/block/commit.c
->> @@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
->>      BlockDriverState *commit_top_bs;
->>      BlockBackend *top;
->>      BlockBackend *base;
->> +    BlockDriverState *base_bs;
->>      BlockdevOnError on_error;
->>      int base_flags;
->>      char *backing_file_str;
->> @@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
->>      return 0;
->>  }
->>  
->> -static void commit_exit(Job *job)
->> +static int commit_prepare(Job *job)
->>  {
->>      CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
->> -    BlockJob *bjob = &s->common;
->> -    BlockDriverState *top = blk_bs(s->top);
->> -    BlockDriverState *base = blk_bs(s->base);
->> -    BlockDriverState *commit_top_bs = s->commit_top_bs;
->> -    bool remove_commit_top_bs = false;
->> -
->> -    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
->> -    bdrv_ref(top);
->> -    bdrv_ref(commit_top_bs);
->>  
->>      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
->>       * the normal backing chain can be restored. */
->>      blk_unref(s->base);
->> +    s->base = NULL;
->>  
->> -    if (!job_is_cancelled(job) && job->ret == 0) {
->> -        /* success */
->> -        job->ret = bdrv_drop_intermediate(s->commit_top_bs, base,
->> -                                          s->backing_file_str);
->> -    } else {
->> -        /* XXX Can (or should) we somehow keep 'consistent read' blocked even
->> -         * after the failed/cancelled commit job is gone? If we already wrote
->> -         * something to base, the intermediate images aren't valid any more. */
->> -        remove_commit_top_bs = true;
->> +    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
->> +                                  s->backing_file_str);
->> +}
+On Tue, Sep 04, 2018 at 03:35:38PM -0400, Emilio G. Cota wrote:
+> On Tue, Sep 04, 2018 at 14:37:34 -0300, Murilo Opsfelder Araujo wrote:
+> > Hi, Emilio.
+> > 
+> > On Mon, Sep 03, 2018 at 01:18:27PM -0400, Emilio G. Cota wrote:
+> > > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> > > ---
+> > >  tests/test-rcu-list.c | 67 +++++++++++++++++++++++++++++++++++++------
+> > >  1 file changed, 59 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
+> > > index 192bfbf02e..2606b7c19d 100644
+> > > --- a/tests/test-rcu-list.c
+> > > +++ b/tests/test-rcu-list.c
+> > > @@ -25,6 +25,23 @@
+> > >  #include "qemu/rcu.h"
+> > >  #include "qemu/thread.h"
+> > >  #include "qemu/rcu_queue.h"
+> > > +#include "qemu/seqlock.h"
+> > > +
+> > > +/*
+> > > + * Abstraction to avoid torn accesses when there is a single thread updating
+> > > + * the count.
+> > > + *
+> > > + * If CONFIG_ATOMIC64 is defined, we simply use atomic accesses. Otherwise, we
+> > > + * use a seqlock without a lock, since only one thread can update the count.
+> > > + */
+> > > +struct Count {
+> > > +    long long val;
+> > > +#ifndef CONFIG_ATOMIC64
+> > > +    QemuSeqLock sequence;
+> > > +#endif
+> > > +};
+> > > +
+> > > +typedef struct Count Count;
+> > >
+> > >  /*
+> > >   * Test variables.
+> > > @@ -33,8 +50,8 @@
+> > >  static QemuMutex counts_mutex;
+> > >  static long long n_reads = 0LL;
+> > >  static long long n_updates = 0LL;
+> > > -static long long n_reclaims = 0LL;
+> > > -static long long n_nodes_removed = 0LL;
+> > > +static Count n_reclaims;
+> > > +static Count n_nodes_removed;
+> > 
+> > Don't we need to init the seqlocks?
+> > 
+> >   seqlock_init(&n_reclaims.sequence);
+> >   seqlock_init(&n_nodes_removed.sequence);
+> > 
+> > Don't we need to init ->val with 0LL as well?
 > 
-> If we can go from prepare->abort->clean, then that means to me that every
-> failure case of .prepare() can be resolved without permanent changes / data
-> loss.  Is this necessarily the case?
+> These are all zeroed out due to being static.
+> 
+> We could add seqlock_init calls just to be more clear, but seqlock_init
+> would not have any actual effect (it just sets the sequence to 0).
+> 
+> > >  static long long n_nodes = 0LL;
+> > >  static int g_test_in_charge = 0;
+> > >
+> > > @@ -60,6 +77,38 @@ static int select_random_el(int max)
+> > >      return (rand() % max);
+> > >  }
+> > >
+> > > +static inline long long count_read(Count *c)
+> > > +{
+> > > +#ifdef CONFIG_ATOMIC64
+> > > +    /* use __nocheck because sizeof(void *) might be < sizeof(long long) */
+> > > +    return atomic_read__nocheck(&c->val);
+> > > +#else
+> > > +    unsigned int version;
+> > > +    long long val;
+> > > +
+> > > +    do {
+> > > +        version = seqlock_read_begin(&c->sequence);
+> > > +        val = c->val;
+> > > +    } while (seqlock_read_retry(&c->sequence, version));
+> > > +    return val;
+> > > +#endif
+> > > +}
+> > > +
+> > > +static inline void count_add(Count *c, long long val)
+> > > +{
+> > > +#ifdef CONFIG_ATOMIC64
+> > > +    atomic_set__nocheck(&c->val, c->val + val);
+> > > +#else
+> > > +    seqlock_write_begin(&c->sequence);
+> > > +    c->val += val;
+> > > +    seqlock_write_end(&c->sequence);
+> > > +#endif
+> > > +}
+> > > +
+> > > +static inline void count_inc(Count *c)
+> > > +{
+> > > +    count_add(c, 1);
+> > > +}
+> > 
+> > Are these `#ifdef CONFIG_ATOMIC64` required?
+> > 
+> > The bodies of
+> > 
+> >   seqlock_read_begin()
+> >   seqlock_read_retry()
+> >   seqlock_write_begin()
+> >   seqlock_write_end()
+> > 
+> > in include/qemu/seqlock.h make me think that they already use atomic operations.
+> > What am I missing?
+> 
+> atomic_read/set(*foo), as defined in qemu/atomic.h, are as wide as
+> foo. The sequence number in a seqlock is an "unsigned", so those
+> atomics won't be larger than 32 bits.
+> 
+> The counts we're dealing with here are 64-bits, so with
+> #ifdef CONFIG_ATOMIC64 we ensure that the host can actually
+> perform those 64-bit atomic accesses.
+> 
+> > >
+> > >  static void create_thread(void *(*func)(void *))
+> > >  {
+> > > @@ -104,7 +153,7 @@ static void reclaim_list_el(struct rcu_head *prcu)
+> > >      struct list_element *el = container_of(prcu, struct list_element, rcu);
+> > >      g_free(el);
+> > >      /* Accessed only from call_rcu thread.  */
+> > > -    n_reclaims++;
+> > > +    count_inc(&n_reclaims);
+> > >  }
+> > >
+> > >  #if TEST_LIST_TYPE == 1
+> > > @@ -232,7 +281,7 @@ static void *rcu_q_updater(void *arg)
+> > >      qemu_mutex_lock(&counts_mutex);
+> > >      n_nodes += n_nodes_local;
+> > >      n_updates += n_updates_local;
+> > > -    n_nodes_removed += n_removed_local;
+> > > +    count_add(&n_nodes_removed, n_removed_local);
+> > 
+> > I'm just curious why n_nodes and n_updates don't need seqlocks.  Are
+> > n_nodes_removed and n_reclaims some kind of special that seqlocks are required?
+> 
+> n_nodes and n_updates are serialized by counts_mutex.
+> 
+> n_nodes_removed and n_reclaims don't really need the lock (even though
+> some accesses to it are protected by it; more on this below), since
+> they're updated by a single thread at a time. This is why just using
+> atomic_set is enough for these, and why we use seqlocks if the host
+> cannot do 64-bit atomic accesses.
+> 
+> Note that these "atomics" are not "read-modify-write"; they are
+> atomic in the sense that they prevent torn accesses, but
+> otherwise imply no memory fences or synchronization.
+> 
+> > >      qemu_mutex_unlock(&counts_mutex);
+> > >      return NULL;
+> > >  }
+> > > @@ -286,19 +335,21 @@ static void rcu_qtest(const char *test, int duration, int nreaders)
+> > >          n_removed_local++;
+> > >      }
+> > >      qemu_mutex_lock(&counts_mutex);
+> > > -    n_nodes_removed += n_removed_local;
+> > > +    count_add(&n_nodes_removed, n_removed_local);
+> > >      qemu_mutex_unlock(&counts_mutex);
+> > 
+> > Does this count_add() need to be guarded by a mutex?
+> 
+> No. In fact, accesses to n_nodes_removed don't need the mutex
+> at all, because only one thread writes to it at a time (first
+> the updater thread, then the main thread joins the updater
+> thread, and then the main thread updates it).
+> 
+> Performance-wise, this change wouldn't change much though, which
+> is why I decided not to include it. The main purpose of this
+> patch is to avoid undefined behaviour when different threads
+> access the same variable with regular accesses without always
+> holding the same lock, as is the case with the two variables
+> converted to Count.
+> 
+> Cheers,
+> 
+> 		Emilio
 > 
 
-That'd be a requisite to make the job a transaction, but commit, mirror
-and stream are not currently transactionable.
+The explanations you provided made a lot of difference on understanding the why
+of your patch.  Thank you!
 
-The way commit already works, for example, can leave the base and
-intermediate images as unusable as standalone images. This refactoring
-will not change that alone.
+Is it possible to enhance commit message and add the explanations?
 
-So it's not necessarily a problem, but it's something that would need to
-be fixed if we ever wanted transaction support.
-
-However, in talking on IRC we did realize that this patch does change
-behavior...
-
-Before:
-
-If bdrv_drop_intermediate fails, we store the retcode but continue
-cleaning up as if it didn't fail. i.e., we don't remove the commit job's
-installed top_bs node.
-
-After:
-
-if bdrv_drop_intermediate fails, we return the failure retcode and
-.abort gets called as a result, i.e. we will remove the commit job's
-installed top_bs node in favor of the original top_bs node.
-
-I think this behavior is an improvement, however it raises a question
-about the nature of failures in bdrv_drop_intermediate.
-
-If this function fails without making any changes, the new commit
-behavior is good. If it succeeds, we're also good. The problem is with
-intermediate or partial successes.
-
-If top has multiple parents (I think under normal circumstances it
-won't, but I'm not absolutely sure) and it fails to update their backing
-file references, it might partially succeed.
-
-I think commit's usage here is correct, but I think we might need to
-update bdrv_drop_intermediate to make it roll back changes if it
-experiences a partial failure to give all-or-nothing semantics.
-
-Thoughts?
-
-> From bdrv_drop_intermediate():
-> 
->     QLIST_FOREACH_SAFE(c, &top->parents, next_parent, next) {
->         /* Check whether we are allowed to switch c from top to base */
->         GSList *ignore_children = g_slist_prepend(NULL, c);
->         bdrv_check_update_perm(base, NULL, c->perm, c->shared_perm,
->                                ignore_children, &local_err);
->         g_slist_free(ignore_children);
->         if (local_err) {
->             ret = -EPERM;
->             error_report_err(local_err);
->             goto exit;
->         }
-> 
->         /* If so, update the backing file path in the image file */
->         if (c->role->update_filename) {
->             ret = c->role->update_filename(c, base, backing_file_str,
->                                            &local_err);
->             if (ret < 0) {
->                 bdrv_abort_perm_update(base);
->                 error_report_err(local_err);
->                 goto exit;
->             }
->         }
-> 
->         [...]
->      }
-> 
-> We could fail this but still have modified an image file backing filenames,
-> right?
-> 
-> Or am I incorrect about the intention here, that abort() can always be clean?
-> 
-> -Jeff
-> 
->> +
->> +static void commit_abort(Job *job)
->> +{
->> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
->> +    BlockDriverState *top_bs = blk_bs(s->top);
->> +
->> +    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
->> +    bdrv_ref(top_bs);
->> +    bdrv_ref(s->commit_top_bs);
->> +
->> +    if (s->base) {
->> +        blk_unref(s->base);
->>      }
->>  
->> +    /* free the blockers on the intermediate nodes so that bdrv_replace_nodes
->> +     * can succeed */
->> +    block_job_remove_all_bdrv(&s->common);
->> +
->> +    /* If bdrv_drop_intermediate() failed (or was not invoked), remove the
->> +     * commit filter driver from the backing chain now. Do this as the final
->> +     * step so that the 'consistent read' permission can be granted.
->> +     *
->> +     * XXX Can (or should) we somehow keep 'consistent read' blocked even
->> +     * after the failed/cancelled commit job is gone? If we already wrote
->> +     * something to base, the intermediate images aren't valid any more. */
->> +    bdrv_child_try_set_perm(s->commit_top_bs->backing, 0, BLK_PERM_ALL,
->> +                            &error_abort);
->> +    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
->> +                      &error_abort);
->> +
->> +    bdrv_unref(s->commit_top_bs);
->> +    bdrv_unref(top_bs);
->> +}
->> +
->> +static void commit_clean(Job *job)
->> +{
->> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
->> +
->>      /* restore base open flags here if appropriate (e.g., change the base back
->>       * to r/o). These reopens do not need to be atomic, since we won't abort
->>       * even on failure here */
->> -    if (s->base_flags != bdrv_get_flags(base)) {
->> -        bdrv_reopen(base, s->base_flags, NULL);
->> +    if (s->base_flags != bdrv_get_flags(s->base_bs)) {
->> +        bdrv_reopen(s->base_bs, s->base_flags, NULL);
->>      }
->> +
->>      g_free(s->backing_file_str);
->>      blk_unref(s->top);
->> -
->> -    /* If there is more than one reference to the job (e.g. if called from
->> -     * job_finish_sync()), job_completed() won't free it and therefore the
->> -     * blockers on the intermediate nodes remain. This would cause
->> -     * bdrv_set_backing_hd() to fail. */
->> -    block_job_remove_all_bdrv(bjob);
->> -
->> -    /* If bdrv_drop_intermediate() didn't already do that, remove the commit
->> -     * filter driver from the backing chain. Do this as the final step so that
->> -     * the 'consistent read' permission can be granted.  */
->> -    if (remove_commit_top_bs) {
->> -        bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
->> -                                &error_abort);
->> -        bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
->> -                          &error_abort);
->> -    }
->> -
->> -    bdrv_unref(commit_top_bs);
->> -    bdrv_unref(top);
->>  }
->>  
->>  static int coroutine_fn commit_run(Job *job, Error **errp)
->> @@ -211,7 +216,9 @@ static const BlockJobDriver commit_job_driver = {
->>          .user_resume   = block_job_user_resume,
->>          .drain         = block_job_drain,
->>          .run           = commit_run,
->> -        .exit          = commit_exit,
->> +        .prepare       = commit_prepare,
->> +        .abort         = commit_abort,
->> +        .clean         = commit_clean
->>      },
->>  };
->>  
->> @@ -345,6 +352,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
->>      if (ret < 0) {
->>          goto fail;
->>      }
->> +    s->base_bs = base;
->>  
->>      /* Required permissions are already taken with block_job_add_bdrv() */
->>      s->top = blk_new(0, BLK_PERM_ALL);
->> -- 
->> 2.14.4
->>
+-- 
+Murilo
