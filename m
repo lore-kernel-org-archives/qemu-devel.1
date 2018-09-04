@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fx9Q2-0005Dl-Vt
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:22:51 -0400
+	(envelope-from <berrange@redhat.com>) id 1fx9TY-0007iH-DE
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:26:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fx9Q1-0007Ni-Uh
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:22:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52024 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fx9TU-0001xI-Hb
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:26:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52126 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fx9Q1-0007NP-OJ
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:22:49 -0400
-Date: Tue, 4 Sep 2018 12:22:46 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fx9TU-0001wn-BO
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 07:26:24 -0400
+Date: Tue, 4 Sep 2018 12:26:20 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180904112246.GF22349@redhat.com>
+Message-ID: <20180904112620.GG22349@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180904110822.12863-1-fli@suse.com>
-	<20180904110822.12863-4-fli@suse.com>
+	<20180904110822.12863-2-fli@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180904110822.12863-4-fli@suse.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] qemu_init_vcpu: add a new Error
- paramater to propagate
+In-Reply-To: <20180904110822.12863-2-fli@suse.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] Fix segmentation fault when
+ qemu_signal_init fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,163 +32,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Fei Li <fli@suse.com>
 Cc: qemu-devel@nongnu.org
 
-On Tue, Sep 04, 2018 at 07:08:20PM +0800, Fei Li wrote:
-> The caller of qemu_init_vcpu() already passed the **errp to handle
-> errors. In view of this, add a new Error parameter to the following
-> call trace to propagate the error and let the final caller check it.
+On Tue, Sep 04, 2018 at 07:08:18PM +0800, Fei Li wrote:
+> Currently, when qemu_signal_init() fails it only returns a non-zero
+> value but without propagating any Error. But its callers need a
+> non-null err when runs error_report_err(err), or else 0->msg occurs.
+> 
+> To avoid such segmentation fault, add a new Error parameter to make
+> the call trace to propagate the err to the final caller.
 > 
 > Signed-off-by: Fei Li <fli@suse.com>
 > ---
->  cpus.c                          | 32 +++++++++++++++++++-------------
->  include/qom/cpu.h               |  2 +-
->  target/alpha/cpu.c              |  6 +++++-
->  target/arm/cpu.c                |  6 +++++-
->  target/cris/cpu.c               |  6 +++++-
->  target/hppa/cpu.c               |  6 +++++-
->  target/i386/cpu.c               |  6 +++++-
->  target/lm32/cpu.c               |  6 +++++-
->  target/m68k/cpu.c               |  6 +++++-
->  target/microblaze/cpu.c         |  6 +++++-
->  target/mips/cpu.c               |  6 +++++-
->  target/moxie/cpu.c              |  6 +++++-
->  target/nios2/cpu.c              |  6 +++++-
->  target/openrisc/cpu.c           |  6 +++++-
->  target/ppc/translate_init.inc.c |  6 +++++-
->  target/riscv/cpu.c              |  6 +++++-
->  target/s390x/cpu.c              |  5 ++++-
->  target/sh4/cpu.c                |  6 +++++-
->  target/sparc/cpu.c              |  6 +++++-
->  target/tilegx/cpu.c             |  6 +++++-
->  target/tricore/cpu.c            |  6 +++++-
->  target/unicore32/cpu.c          |  6 +++++-
->  target/xtensa/cpu.c             |  6 +++++-
->  23 files changed, 124 insertions(+), 35 deletions(-)
+>  include/qemu/osdep.h |  2 +-
+>  util/compatfd.c      | 17 ++++++++++++-----
+>  util/main-loop.c     | 11 +++++++----
+>  3 files changed, 20 insertions(+), 10 deletions(-)
 > 
-> diff --git a/cpus.c b/cpus.c
-> index 8ee6e5db93..41efddc218 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1898,7 +1898,7 @@ void cpu_remove_sync(CPUState *cpu)
->  /* For temporary buffers for forming a name */
->  #define VCPU_THREAD_NAME_SIZE 16
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index a91068df0e..09ed85fcb8 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
+>                               additional fields in the future) */
+>  };
 >  
-> -static void qemu_tcg_init_vcpu(CPUState *cpu)
-> +static void qemu_tcg_init_vcpu(CPUState *cpu, Error **errp)
->  {
->      char thread_name[VCPU_THREAD_NAME_SIZE];
->      static QemuCond *single_tcg_halt_cond;
-> @@ -1954,7 +1954,7 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+> -int qemu_signalfd(const sigset_t *mask);
+> +int qemu_signalfd(const sigset_t *mask, Error **errp);
+>  void sigaction_invoke(struct sigaction *action,
+>                        struct qemu_signalfd_siginfo *info);
+>  #endif
+> diff --git a/util/compatfd.c b/util/compatfd.c
+> index 980bd33e52..65501de622 100644
+> --- a/util/compatfd.c
+> +++ b/util/compatfd.c
+> @@ -16,6 +16,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "qemu/thread.h"
+> +#include "qapi/error.h"
+>  
+>  #include <sys/syscall.h>
+>  
+> @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
 >      }
 >  }
 >  
-> -static void qemu_hax_start_vcpu(CPUState *cpu)
-> +static void qemu_hax_start_vcpu(CPUState *cpu, Error **errp)
+> -static int qemu_signalfd_compat(const sigset_t *mask)
+> +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
 >  {
->      char thread_name[VCPU_THREAD_NAME_SIZE];
+>      struct sigfd_compat_info *info;
+>      QemuThread thread;
+> @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *mask)
 >  
-> @@ -1971,7 +1971,7 @@ static void qemu_hax_start_vcpu(CPUState *cpu)
->  #endif
+>      info = malloc(sizeof(*info));
+>      if (info == NULL) {
+> +        error_setg(errp, "Failed to malloc in %s", __func__);
+
+I'd avoid using __func__ in error messages. Instead
+
+   "Failed to allocate signalfd memory"
+
+>          errno = ENOMEM;
+>          return -1;
+>      }
+>  
+>      if (pipe(fds) == -1) {
+> +        error_setg(errp, "Failed to create a pipe in %s", __func__);
+
+    "Failed to create signalfd pipe"
+
+>          free(info);
+>          return -1;
+>      }
+> @@ -94,17 +97,21 @@ static int qemu_signalfd_compat(const sigset_t *mask)
+>      return fds[0];
 >  }
 >  
-> -static void qemu_kvm_start_vcpu(CPUState *cpu)
-> +static void qemu_kvm_start_vcpu(CPUState *cpu, Error **errp)
+> -int qemu_signalfd(const sigset_t *mask)
+> +int qemu_signalfd(const sigset_t *mask, Error **errp)
 >  {
->      char thread_name[VCPU_THREAD_NAME_SIZE];
->  
-> @@ -1984,7 +1984,7 @@ static void qemu_kvm_start_vcpu(CPUState *cpu)
->                         cpu, QEMU_THREAD_JOINABLE);
->  }
->  
-> -static void qemu_hvf_start_vcpu(CPUState *cpu)
-> +static void qemu_hvf_start_vcpu(CPUState *cpu, Error **errp)
->  {
->      char thread_name[VCPU_THREAD_NAME_SIZE];
->  
-> @@ -2002,7 +2002,7 @@ static void qemu_hvf_start_vcpu(CPUState *cpu)
->                         cpu, QEMU_THREAD_JOINABLE);
->  }
->  
-> -static void qemu_whpx_start_vcpu(CPUState *cpu)
-> +static void qemu_whpx_start_vcpu(CPUState *cpu, Error **errp)
->  {
->      char thread_name[VCPU_THREAD_NAME_SIZE];
->  
-> @@ -2018,7 +2018,7 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
->  #endif
->  }
->  
-> -static void qemu_dummy_start_vcpu(CPUState *cpu)
-> +static void qemu_dummy_start_vcpu(CPUState *cpu, Error **errp)
->  {
->      char thread_name[VCPU_THREAD_NAME_SIZE];
->  
-> @@ -2031,11 +2031,12 @@ static void qemu_dummy_start_vcpu(CPUState *cpu)
->                         QEMU_THREAD_JOINABLE);
->  }
->  
-> -void qemu_init_vcpu(CPUState *cpu)
-> +void qemu_init_vcpu(CPUState *cpu, Error **errp)
->  {
->      cpu->nr_cores = smp_cores;
->      cpu->nr_threads = smp_threads;
->      cpu->stopped = true;
+> -#if defined(CONFIG_SIGNALFD)
+>      int ret;
 > +    Error *local_err = NULL;
 >  
->      if (!cpu->as) {
->          /* If the target cpu hasn't set up any address spaces itself,
-> @@ -2046,17 +2047,22 @@ void qemu_init_vcpu(CPUState *cpu)
+> +#if defined(CONFIG_SIGNALFD)
+>      ret = syscall(SYS_signalfd, -1, mask, _NSIG / 8);
+>      if (ret != -1) {
+>          qemu_set_cloexec(ret);
+>          return ret;
 >      }
->  
->      if (kvm_enabled()) {
-> -        qemu_kvm_start_vcpu(cpu);
-> +        qemu_kvm_start_vcpu(cpu, &local_err);
->      } else if (hax_enabled()) {
-> -        qemu_hax_start_vcpu(cpu);
-> +        qemu_hax_start_vcpu(cpu, &local_err);
->      } else if (hvf_enabled()) {
-> -        qemu_hvf_start_vcpu(cpu);
-> +        qemu_hvf_start_vcpu(cpu, &local_err);
->      } else if (tcg_enabled()) {
-> -        qemu_tcg_init_vcpu(cpu);
-> +        qemu_tcg_init_vcpu(cpu, &local_err);
->      } else if (whpx_enabled()) {
-> -        qemu_whpx_start_vcpu(cpu);
-> +        qemu_whpx_start_vcpu(cpu, &local_err);
->      } else {
-> -        qemu_dummy_start_vcpu(cpu);
-> +        qemu_dummy_start_vcpu(cpu, &local_err);
-> +    }
-> +
+>  #endif
+> -
+> -    return qemu_signalfd_compat(mask);
+> +    ret = qemu_signalfd_compat(mask, &local_err);
 > +    if (local_err) {
 > +        error_propagate(errp, local_err);
-> +        return;
->      }
-
-I'd be inclined to make this method return a boolean, so....
-
-
-> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-> index b08078e7fc..5b0b4892f2 100644
-> --- a/target/alpha/cpu.c
-> +++ b/target/alpha/cpu.c
-> @@ -66,7 +66,11 @@ static void alpha_cpu_realizefn(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> -    qemu_init_vcpu(cs);
-> +    qemu_init_vcpu(cs, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
 > +    }
 
-...this can be simplified to get rid of the local error object
+Using a local_err is not required - you can just pass errp stright
+to qemu_signalfd_compat() and then check
 
-  if (!qemu_init_vcpu(cs, errp)) {
-      return;
-  }
+   if (ret < 0)
 
-likewise for the rest of the patch below...
+> +    return ret;
+>  }
+> diff --git a/util/main-loop.c b/util/main-loop.c
+> index affe0403c5..20f6ad3849 100644
+> --- a/util/main-loop.c
+> +++ b/util/main-loop.c
+> @@ -71,10 +71,11 @@ static void sigfd_handler(void *opaque)
+>      }
+>  }
+>  
+> -static int qemu_signal_init(void)
+> +static int qemu_signal_init(Error **errp)
+>  {
+>      int sigfd;
+>      sigset_t set;
+> +    Error *local_err = NULL;
+>  
+>      /*
+>       * SIG_IPI must be blocked in the main thread and must not be caught
+> @@ -94,9 +95,10 @@ static int qemu_signal_init(void)
+>      pthread_sigmask(SIG_BLOCK, &set, NULL);
+>  
+>      sigdelset(&set, SIG_IPI);
+> -    sigfd = qemu_signalfd(&set);
+> +    sigfd = qemu_signalfd(&set, &local_err);
+>      if (sigfd == -1) {
+>          fprintf(stderr, "failed to create signalfd\n");
+> +        error_propagate(errp, local_err);
+>          return -errno;
+>      }
+
+Again, no need for local_err - just pass errp stright in
+
+>  
+> @@ -109,7 +111,7 @@ static int qemu_signal_init(void)
+>  
+>  #else /* _WIN32 */
+>  
+> -static int qemu_signal_init(void)
+> +static int qemu_signal_init(Error **errp)
+>  {
+>      return 0;
+>  }
+> @@ -148,8 +150,9 @@ int qemu_init_main_loop(Error **errp)
+>  
+>      init_clocks(qemu_timer_notify_cb);
+>  
+> -    ret = qemu_signal_init();
+> +    ret = qemu_signal_init(&local_error);
+>      if (ret) {
+> +        error_propagate(errp, local_error);
+>          return ret;
+>      }
+
+Again, no need for local_error.
 
 
 Regards,
