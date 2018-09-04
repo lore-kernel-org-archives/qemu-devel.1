@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxIgq-0000KZ-V8
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:16:49 -0400
+	(envelope-from <cota@braap.org>) id 1fxIw0-00041S-JY
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:32:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxIgq-00079E-0r
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:16:48 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:39003)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fxIgp-00077i-By
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:16:47 -0400
-Received: by mail-oi0-x242.google.com with SMTP id c190-v6so9576134oig.6
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 14:16:47 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1fxIvx-0004Gu-C3
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:32:28 -0400
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:36247)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fxIvw-0004FR-SG
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 17:32:25 -0400
+Date: Tue, 4 Sep 2018 17:32:20 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180904213220.GA1850@flamenco>
+References: <20180903171831.15446-1-cota@braap.org>
+	<20180903171831.15446-3-cota@braap.org>
+	<20180904173734.GA18515@kermit-br-ibm-com>
+	<20180904193538.GA30725@flamenco>
+	<20180904205631.GB18515@kermit-br-ibm-com>
 MIME-Version: 1.0
-In-Reply-To: <907dd14c-0707-3153-bd35-da0ee5ed3bdf@redhat.com>
-References: <20180904123603.10016-1-berrange@redhat.com>
-	<907dd14c-0707-3153-bd35-da0ee5ed3bdf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Sep 2018 22:16:26 +0100
-Message-ID: <CAFEAcA_n_Ah87Z7E5xBuSXr8-==ZD8hF4A8kUMqNDmqB_zZRjg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3] configure: preserve various environment
- variables in config.status
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180904205631.GB18515@kermit-br-ibm-com>
+Subject: Re: [Qemu-devel] [PATCH 2/6] test-rcu-list: avoid torn accesses to
+ n_reclaims and n_nodes_removed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +31,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 4 September 2018 at 17:21, Eric Blake <eblake@redhat.com> wrote:
-> I still find it odd
-> that we aren't precisely mirroring the (nice!) semantics that autoconf users
-> have come to rely on
+On Tue, Sep 04, 2018 at 17:56:31 -0300, Murilo Opsfelder Araujo wrote:
+> The explanations you provided made a lot of difference on understanding the why
+> of your patch.  Thank you!
 
-I think that's more the result of (a) most people don't know the
-details of the autoconf semantics and (b) configure works well-enough
-that nobody spends more time messing with it than they need to. I think
-as an aspiration "behave like an autoconf configure script" is
-probably a sensible goal.
+Glad that helped!
 
-thanks
--- PMM
+> Is it possible to enhance commit message and add the explanations?
+
+If I end up submitting a v2 of this series due to code-related
+changes, then I'll expand this patch's commit message.
+
+Thanks,
+
+		E.
