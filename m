@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=778a5ce15=jancraig@amazon.com>)
-	id 1fxCis-0000D6-NS
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 10:54:31 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1fxCpC-0004H6-Mu
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=778a5ce15=jancraig@amazon.com>)
-	id 1fxCip-0002MX-Uc
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 10:54:30 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:17523)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=778a5ce15=jancraig@amazon.com>)
-	id 1fxCip-0002La-GQ
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 10:54:27 -0400
-From: "Janeczek, Craig" <jancraig@amazon.com>
-Date: Tue, 4 Sep 2018 14:47:30 +0000
-Message-ID: <3cfa8fab33d94aedae647daf4a8ca1cd@EX13D12UEA003.ant.amazon.com>
-References: <20180830193019.20104-1-jancraig@amazon.com>,
-	<20180830193019.20104-3-jancraig@amazon.com>
-	<BN7PR08MB486827A1560B19B9708D2E3CC60F0@BN7PR08MB4868.namprd08.prod.outlook.com>
-In-Reply-To: <BN7PR08MB486827A1560B19B9708D2E3CC60F0@BN7PR08MB4868.namprd08.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <pkrempa@redhat.com>) id 1fxCp9-0006qj-UF
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 11:01:02 -0400
+Date: Tue, 4 Sep 2018 17:00:42 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20180904150042.GE3803@andariel.pipo.sk>
+References: <20180810162658.6562-1-kwolf@redhat.com>
+	<20180810162658.6562-2-kwolf@redhat.com>
+	<20180828142626.GM122225@angien.pipo.sk>
+	<20180903150311.GC14463@dhcp-200-186.str.redhat.com>
+	<w51bm9dl81j.fsf@maestria.local.igalia.com>
+	<20180904141730.GC3803@andariel.pipo.sk>
+	<w515zzll3xy.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 2/9] target/mips: Add all MXU opcodes
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/2994txjAzEdQwm5"
+Content-Disposition: inline
+In-Reply-To: <w515zzll3xy.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] commit: Add top-node/base-node options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,131 +29,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-It is possible but due to the non-uniform nature of the bit fields which in=
-dicate the instructions the mask used might end up being instruction specif=
-ic. This would lead to a tiered approach where the current enum would be th=
-e top level, then each group under there might have its own enum, mask and =
-switch statement.
 
------Original Message-----
-From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
-Sent: Friday, August 31, 2018 2:59 PM
-To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net; Petar Jovanovic <pjovanovic@wavecomp.com>; Richar=
-d Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v4 2/9] target/mips: Add all MXU opcodes
+--/2994txjAzEdQwm5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Sep 04, 2018 at 16:42:17 +0200, Alberto Garcia wrote:
+> On Tue 04 Sep 2018 04:17:30 PM CEST, Peter Krempa wrote:
+> >> >> libvirt-3-format is read-write and all other node names are
+> >> >> readonly in the above example.
+> >> >>=20
+> >> >> The same also happens when using filenames:
+> >> >>=20
+> >> >> {"execute":"block-commit",
+> >> >>  "arguments" : {"device":"libvirt-3-format",
+> >> >>                 "job-id":"libvirt-3-format",
+> >> >>                 "top":"/var/lib/libvirt/images/rhel7.3.1483615252",
+> >> >>                 "base":"/var/lib/libvirt/images/rhel7.3.1483605924",
+> >> >>                 "auto-finalize":true,
+> >> >>                 "auto-dismiss":false},
+> >> >>  "id":"libvirt-13"}
+> >> >>=20
+> >> >> {"id":"libvirt-13","error":{"class":"GenericError","desc":"Block no=
+de is read-only"}}
+> >> >
+> >> > I see what's happening here. So we have a graph like this:
+> >> >
+> >> >      guest device
+> >> >           |
+> >> >           v
+> >> >     overlay-format -------> backing-format
+> >> >     [read-only=3Doff]         [read-only=3Don]
+> >> >           |                        |
+> >> >           v                        v
+> >> >     overlay-proto           backing-proto
+> >> >     [read-only=3Doff]         [read-only=3Don]
+> >> >
+> >> > The difference between your -blockdev use and -drive is that you
+> >> > explicitly specify the read-only option for backing-proto (and you u=
+se
+> >> > a separate -blockdev option anyway), so it doesn't just inherit it
+> >> > from backing-format.
+> >>=20
+> >> Are these format and protocol block devices opened with four separate
+> >> -blockdev parameters? Is that how libvirt does it?
+> >
+> > Yes. This goes along with the fact that for 'blockdev-create' you need
+> > to blockdev-add the file which you want to format, but the formatted
+> > file is not automatically added.
+> >
+> > If we'd use the approach where the protocol layer is opened as part of
+> > the format layer it would complicate the snapshot code where we need
+> > to add a file and then format it to qcow2. It would mean that we'd
+> > have to blockdev-add a file, format it via blockdev-create, then
+> > blockdev-del it and open it together with the format layer. Otherwise
+> > the disk hot-unplug code would be plain crazy.
 >=20
-> ________________________________________
-> From: Craig Janeczek <jancraig@amazon.com>
-> Sent: Thursday, August 30, 2018 9:30 PM
-> To: qemu-devel@nongnu.org
-> Cc: Aleksandar Markovic; aurelien@aurel32.net; Craig Janeczek
-> Subject: [PATCH v4 2/9] target/mips: Add all MXU opcodes
+> Do you need to add the protocol layer in order to format it, though? :-?
 >=20
-> Adds all MXU opcodes to the opcode enum.
+> (I'm just trying to understand how this works, I'm not too familiar with
+> blockdev-create)
 >=20
-> Signed-off-by: Craig Janeczek <jancraig@amazon.com>
-> ---
->  v1
->     - NA
->  v2
->     - NA
->  v3
->     - Initial patch, split out from prior first patch
->  v4
->     - separate MXU opcodes into their own enum
+> {'execute': 'blockdev-create',
+>  'arguments': {'job-id': 'job0',
+>                'options': {'driver': 'file',
+>                            'filename': 'test.qcow2',
+>                            'size': 0}}}
+> {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
 >=20
->  target/mips/translate.c | 60=20
-> +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 60 insertions(+)
->=20
+> {'execute': 'blockdev-create',
+>  'arguments': {'job-id': 'job1',
+>                'options': { 'driver': 'qcow2',
+>                             'size': 1048576,
+>                             'file': {'driver': 'file',
+>                                      'filename': 'test.qcow2'}}}}
+> {'execute': 'job-dismiss', 'arguments': {'id': 'job1'}}
 
+Honestly I've reused the existing approach and did not try without
+actually adding the protocol layer.
 
+I remember being told some time ago to specify both layers explicitly.
+Since it's not yet enabled in libvirt we theoretically could change to
+one -blockdev for format+protocol but in that case we need some kind
+of guarantee that every (even new) feature will work with it.
 
+Switching between those approaches once we enable it upstream will not
+be possible without adding a lot of compatibility code.
 
-> diff --git a/target/mips/translate.c b/target/mips/translate.c index=20
-> 19b90c8735..a598f45558 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
+--/2994txjAzEdQwm5
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Hi, Craig,
+-----BEGIN PGP SIGNATURE-----
 
-There are 56 opcodes defined here. However, there are 114 MXU instructions =
-in the MXU doc. Some other bits are used for coding missing instructions. E=
-ven in your patches, it seems, you handle some instructions that are not li=
-sted here. Is there any way to have here the complete list of opcodes, even=
- if this involves some more complex extraction operations?
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAluOnhcACgkQHGwCByjY
+1GqUdw//Rli4VQLoxe95tCi7Qag1LUEjUVxJEJsQ1pjjOf/POWD2gSWmC1sY5HHU
+s1XAGyAX4d11d4PCC/7Iea69QX15oTmbE+IZ424fb+3oY4fLSBoLlBBpwHVqKEdF
+Sqx+WtVWPkfH5yTdDdlVKk1MZMg1cclBXqoIduico2jv5ejQDSXsodT5UspeLiwM
+mrj2mKhZOZ4flW5yA+VifcXwmuTxqSmau278FN4zuMt/4IdHHvo4QWP0cq0lffpo
+Pl2nbyQSxLDj1jxAs5t4XZJa7ersO/6tn73bUqFrSwWfLWdhIdQzdUQVc+4e8p6S
+F6WB4rQAG1nTBCJkWsNAIgaXm+t5lA/F2vMhzmJNnXBq7K5OZeNfXiE38uN9utUZ
+lk197t9h9Nyaz/S2jCwDk2mDUrk0OFR90dC8TxY6weLHrX+NOS/52mYo8bIiqg4P
+rWBW2GVzRc4RiDQeCscRHko+OJoqiW5VQWM3BUccWZvtqv3W/UvgjRnPa1ACzw6Y
+UQyU9Q5aGULHpt7l0mFB5IiFuo1ewcLEb4q5vtR8s0llU/e5cUqq2M7LlE7GEJdT
+DhGQLVcpm1wXqrNytEfGZlcYCQsvRAXrcU0h1PIzEgrqJ8AlIUaD/qWO67c8FmrS
+75ysNh4LLQaFX3w0FllsJDM/c4NPMirl5JcAG0vZVxDuTi8zRaQ=
+=h2gc
+-----END PGP SIGNATURE-----
 
-Thanks,
-Aleksandar
-
-
-> @@ -368,6 +368,66 @@ enum {
->      OPC_SDBBP    =3D 0x3F | OPC_SPECIAL2,
->  };
-> +enum {
-> +    /* MXU */
-> +    OPC_MXU_S32MADD  =3D 0x00 | OPC_SPECIAL2,
-> +    OPC_MXU_S32MADDU =3D 0x01 | OPC_SPECIAL2,
-> +    OPC_MXU_D16MAX   =3D 0x03 | OPC_SPECIAL2,
-> +    OPC_MXU_S32MSUB  =3D 0x04 | OPC_SPECIAL2,
-> +    OPC_MXU_S32MSUBU =3D 0x05 | OPC_SPECIAL2,
-> +    OPC_MXU_D16AVG   =3D 0x06 | OPC_SPECIAL2,
-> +    OPC_MXU_D16CPS   =3D 0x07 | OPC_SPECIAL2,
-> +    OPC_MXU_D16MUL   =3D 0x08 | OPC_SPECIAL2,
-> +    OPC_MXU_D16MULF  =3D 0x09 | OPC_SPECIAL2,
-> +    OPC_MXU_D16MAC   =3D 0x0A | OPC_SPECIAL2,
-> +    OPC_MXU_D16MACF  =3D 0x0B | OPC_SPECIAL2,
-> +    OPC_MXU_D16MADL  =3D 0x0C | OPC_SPECIAL2,
-> +    OPC_MXU_S16MAD   =3D 0x0D | OPC_SPECIAL2,
-> +    OPC_MXU_Q16ADD   =3D 0x0E | OPC_SPECIAL2,
-> +    OPC_MXU_D16MACE  =3D 0x0F | OPC_SPECIAL2,
-> +    OPC_MXU_S32LDD   =3D 0x10 | OPC_SPECIAL2,
-> +    OPC_MXU_S32STD   =3D 0x11 | OPC_SPECIAL2,
-> +    OPC_MXU_S32LDDV  =3D 0x12 | OPC_SPECIAL2,
-> +    OPC_MXU_S32STDV  =3D 0x13 | OPC_SPECIAL2,
-> +    OPC_MXU_S32LDI   =3D 0x14 | OPC_SPECIAL2,
-> +    OPC_MXU_S32SDI   =3D 0x15 | OPC_SPECIAL2,
-> +    OPC_MXU_S32LDIV  =3D 0x16 | OPC_SPECIAL2,
-> +    OPC_MXU_S32SDIV  =3D 0x17 | OPC_SPECIAL2,
-> +    OPC_MXU_D32ADD   =3D 0x18 | OPC_SPECIAL2,
-> +    OPC_MXU_D32ACC   =3D 0x19 | OPC_SPECIAL2,
-> +    OPC_MXU_Q16ACC   =3D 0x1B | OPC_SPECIAL2,
-> +    OPC_MXU_Q8ADDE   =3D 0x1C | OPC_SPECIAL2,
-> +    OPC_MXU_Q8ACCE   =3D 0x1D | OPC_SPECIAL2,
-> +    OPC_MXU_S8LDD    =3D 0x22 | OPC_SPECIAL2,
-> +    OPC_MXU_S8STD    =3D 0x23 | OPC_SPECIAL2,
-> +    OPC_MXU_S8LDI    =3D 0x24 | OPC_SPECIAL2,
-> +    OPC_MXU_S8SDI    =3D 0x25 | OPC_SPECIAL2,
-> +    OPC_MXU_S32EXTR  =3D 0x26 | OPC_SPECIAL2,
-> +    OPC_MXU_D32SARW  =3D 0x27 | OPC_SPECIAL2,
-> +    OPC_MXU_LXB      =3D 0x28 | OPC_SPECIAL2,
-> +    OPC_MXU_S16LDD   =3D 0x2A | OPC_SPECIAL2,
-> +    OPC_MXU_S16STD   =3D 0x2B | OPC_SPECIAL2,
-> +    OPC_MXU_S16LDI   =3D 0x2C | OPC_SPECIAL2,
-> +    OPC_MXU_S16SDI   =3D 0x2D | OPC_SPECIAL2,
-> +    OPC_MXU_S32M2I   =3D 0x2E | OPC_SPECIAL2,
-> +    OPC_MXU_S32I2M   =3D 0x2F | OPC_SPECIAL2,
-> +    OPC_MXU_D32SLL   =3D 0x30 | OPC_SPECIAL2,
-> +    OPC_MXU_D32SLR   =3D 0x31 | OPC_SPECIAL2,
-> +    OPC_MXU_D32SARL  =3D 0x32 | OPC_SPECIAL2,
-> +    OPC_MXU_D32SAR   =3D 0x33 | OPC_SPECIAL2,
-> +    OPC_MXU_Q16SLL   =3D 0x34 | OPC_SPECIAL2,
-> +    OPC_MXU_Q16SLR   =3D 0x35 | OPC_SPECIAL2,
-> +    OPC_MXU_D32SLLV  =3D 0x36 | OPC_SPECIAL2,
-> +    OPC_MXU_Q16SAR   =3D 0x37 | OPC_SPECIAL2,
-> +    OPC_MXU_Q8MUL    =3D 0x38 | OPC_SPECIAL2,
-> +    OPC_MXU_Q8MOVZ   =3D 0x39 | OPC_SPECIAL2,
-> +    OPC_MXU_Q8MAC    =3D 0x3A | OPC_SPECIAL2,
-> +    OPC_MXU_Q16SCOP  =3D 0x3B | OPC_SPECIAL2,
-> +    OPC_MXU_Q8MADL   =3D 0x3C | OPC_SPECIAL2,
-> +    OPC_MXU_S32SFL   =3D 0x3D | OPC_SPECIAL2,
-> +    OPC_MXU_Q8SAD    =3D 0x3E | OPC_SPECIAL2,
-> +};
-> +
->  /* Special3 opcodes */
->  #define MASK_SPECIAL3(op)  MASK_OP_MAJOR(op) | (op & 0x3F)
+--/2994txjAzEdQwm5--
