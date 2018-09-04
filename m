@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fxH75-0002U7-1Y
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:35:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1fxHFR-00004s-LU
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:44:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fxH71-0006f2-Mr
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:35:46 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:57397)
+	(envelope-from <eblake@redhat.com>) id 1fxHFO-0005J0-Gl
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:44:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51260 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fxH71-0006dI-8m
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:35:43 -0400
-Date: Tue, 4 Sep 2018 15:35:38 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180904193538.GA30725@flamenco>
-References: <20180903171831.15446-1-cota@braap.org>
-	<20180903171831.15446-3-cota@braap.org>
-	<20180904173734.GA18515@kermit-br-ibm-com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fxHFO-0005Ih-Bn
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 15:44:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7555587A84
+	for <qemu-devel@nongnu.org>; Tue,  4 Sep 2018 19:44:21 +0000 (UTC)
+References: <20180902175401.8195-1-ybettan@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b735a977-9591-e6c3-3e82-91db5da00188@redhat.com>
+Date: Tue, 4 Sep 2018 14:44:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180904173734.GA18515@kermit-br-ibm-com>
-Subject: Re: [Qemu-devel] [PATCH 2/6] test-rcu-list: avoid torn accesses to
- n_reclaims and n_nodes_removed
+In-Reply-To: <20180902175401.8195-1-ybettan@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2 0/3] Formatted INFO files to fit
+ Markdown (.md) format.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,186 +34,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Yoni Bettan <ybettan@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, stefanha@redhat.com
 
-On Tue, Sep 04, 2018 at 14:37:34 -0300, Murilo Opsfelder Araujo wrote:
-> Hi, Emilio.
+On 09/02/2018 12:53 PM, Yoni Bettan wrote:
+> This patch make INFO files (e.g. README, CODING_STYLE and HACKING) much more
+> readable when watched from GitHub GUI.
 > 
-> On Mon, Sep 03, 2018 at 01:18:27PM -0400, Emilio G. Cota wrote:
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> > ---
-> >  tests/test-rcu-list.c | 67 +++++++++++++++++++++++++++++++++++++------
-> >  1 file changed, 59 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
-> > index 192bfbf02e..2606b7c19d 100644
-> > --- a/tests/test-rcu-list.c
-> > +++ b/tests/test-rcu-list.c
-> > @@ -25,6 +25,23 @@
-> >  #include "qemu/rcu.h"
-> >  #include "qemu/thread.h"
-> >  #include "qemu/rcu_queue.h"
-> > +#include "qemu/seqlock.h"
-> > +
-> > +/*
-> > + * Abstraction to avoid torn accesses when there is a single thread updating
-> > + * the count.
-> > + *
-> > + * If CONFIG_ATOMIC64 is defined, we simply use atomic accesses. Otherwise, we
-> > + * use a seqlock without a lock, since only one thread can update the count.
-> > + */
-> > +struct Count {
-> > +    long long val;
-> > +#ifndef CONFIG_ATOMIC64
-> > +    QemuSeqLock sequence;
-> > +#endif
-> > +};
-> > +
-> > +typedef struct Count Count;
-> >
-> >  /*
-> >   * Test variables.
-> > @@ -33,8 +50,8 @@
-> >  static QemuMutex counts_mutex;
-> >  static long long n_reads = 0LL;
-> >  static long long n_updates = 0LL;
-> > -static long long n_reclaims = 0LL;
-> > -static long long n_nodes_removed = 0LL;
-> > +static Count n_reclaims;
-> > +static Count n_nodes_removed;
+> ./VERSION, ./MAINTAINERS were leave untouched otherwise
+> ./scripts/get_maintainer.pl breaks.
 > 
-> Don't we need to init the seqlocks?
+> ./COPYING, ./LICENSE ./COPYING.LIB were leave untouched because it look likes
+> they come from GNU and not QEMU.
 > 
->   seqlock_init(&n_reclaims.sequence);
->   seqlock_init(&n_nodes_removed.sequence);
-> 
-> Don't we need to init ->val with 0LL as well?
+> Visualization of the change can be found at
+> https://github.com/ybettan/qemu/tree/md.
+> NOTE:
+> This last part of the message should be removed from the commit message
+> since I will remove the 'md' branch from my fork if the patch is
+> accepted.
 
-These are all zeroed out due to being static.
+I'm a bit late to the thread, but wanted to point out this tangent:
 
-We could add seqlock_init calls just to be more clear, but seqlock_init
-would not have any actual effect (it just sets the sequence to 0).
+Note that the cover letter is not committed into git, so a disclaimer 
+about removing the last paragraph of the cover letter is pointless.
 
-> >  static long long n_nodes = 0LL;
-> >  static int g_test_in_charge = 0;
-> >
-> > @@ -60,6 +77,38 @@ static int select_random_el(int max)
-> >      return (rand() % max);
-> >  }
-> >
-> > +static inline long long count_read(Count *c)
-> > +{
-> > +#ifdef CONFIG_ATOMIC64
-> > +    /* use __nocheck because sizeof(void *) might be < sizeof(long long) */
-> > +    return atomic_read__nocheck(&c->val);
-> > +#else
-> > +    unsigned int version;
-> > +    long long val;
-> > +
-> > +    do {
-> > +        version = seqlock_read_begin(&c->sequence);
-> > +        val = c->val;
-> > +    } while (seqlock_read_retry(&c->sequence, version));
-> > +    return val;
-> > +#endif
-> > +}
-> > +
-> > +static inline void count_add(Count *c, long long val)
-> > +{
-> > +#ifdef CONFIG_ATOMIC64
-> > +    atomic_set__nocheck(&c->val, c->val + val);
-> > +#else
-> > +    seqlock_write_begin(&c->sequence);
-> > +    c->val += val;
-> > +    seqlock_write_end(&c->sequence);
-> > +#endif
-> > +}
-> > +
-> > +static inline void count_inc(Count *c)
-> > +{
-> > +    count_add(c, 1);
-> > +}
-> 
-> Are these `#ifdef CONFIG_ATOMIC64` required?
-> 
-> The bodies of
-> 
->   seqlock_read_begin()
->   seqlock_read_retry()
->   seqlock_write_begin()
->   seqlock_write_end()
-> 
-> in include/qemu/seqlock.h make me think that they already use atomic operations.
-> What am I missing?
+Had this been an actual commit message, it's best to stick such 
+disclaimers (which are useful to reviewers, but not to long-term git 
+log) after the --- that separates the actual commit message from the 
+patch (as 'git am' will automatically strip such disclaimers when a 
+maintainer takes in your patch for merging through their tree).
 
-atomic_read/set(*foo), as defined in qemu/atomic.h, are as wide as
-foo. The sequence number in a seqlock is an "unsigned", so those
-atomics won't be larger than 32 bits.
-
-The counts we're dealing with here are 64-bits, so with
-#ifdef CONFIG_ATOMIC64 we ensure that the host can actually
-perform those 64-bit atomic accesses.
-
-> >
-> >  static void create_thread(void *(*func)(void *))
-> >  {
-> > @@ -104,7 +153,7 @@ static void reclaim_list_el(struct rcu_head *prcu)
-> >      struct list_element *el = container_of(prcu, struct list_element, rcu);
-> >      g_free(el);
-> >      /* Accessed only from call_rcu thread.  */
-> > -    n_reclaims++;
-> > +    count_inc(&n_reclaims);
-> >  }
-> >
-> >  #if TEST_LIST_TYPE == 1
-> > @@ -232,7 +281,7 @@ static void *rcu_q_updater(void *arg)
-> >      qemu_mutex_lock(&counts_mutex);
-> >      n_nodes += n_nodes_local;
-> >      n_updates += n_updates_local;
-> > -    n_nodes_removed += n_removed_local;
-> > +    count_add(&n_nodes_removed, n_removed_local);
-> 
-> I'm just curious why n_nodes and n_updates don't need seqlocks.  Are
-> n_nodes_removed and n_reclaims some kind of special that seqlocks are required?
-
-n_nodes and n_updates are serialized by counts_mutex.
-
-n_nodes_removed and n_reclaims don't really need the lock (even though
-some accesses to it are protected by it; more on this below), since
-they're updated by a single thread at a time. This is why just using
-atomic_set is enough for these, and why we use seqlocks if the host
-cannot do 64-bit atomic accesses.
-
-Note that these "atomics" are not "read-modify-write"; they are
-atomic in the sense that they prevent torn accesses, but
-otherwise imply no memory fences or synchronization.
-
-> >      qemu_mutex_unlock(&counts_mutex);
-> >      return NULL;
-> >  }
-> > @@ -286,19 +335,21 @@ static void rcu_qtest(const char *test, int duration, int nreaders)
-> >          n_removed_local++;
-> >      }
-> >      qemu_mutex_lock(&counts_mutex);
-> > -    n_nodes_removed += n_removed_local;
-> > +    count_add(&n_nodes_removed, n_removed_local);
-> >      qemu_mutex_unlock(&counts_mutex);
-> 
-> Does this count_add() need to be guarded by a mutex?
-
-No. In fact, accesses to n_nodes_removed don't need the mutex
-at all, because only one thread writes to it at a time (first
-the updater thread, then the main thread joins the updater
-thread, and then the main thread updates it).
-
-Performance-wise, this change wouldn't change much though, which
-is why I decided not to include it. The main purpose of this
-patch is to avoid undefined behaviour when different threads
-access the same variable with regular accesses without always
-holding the same lock, as is the case with the two variables
-converted to Count.
-
-Cheers,
-
-		Emilio
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
