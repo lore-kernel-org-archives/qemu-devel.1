@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxHfM-0007xg-J3
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:11:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1fxHgC-0008Ms-O8
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:12:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxHfI-0005yp-R0
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:11:12 -0400
-References: <20180831222907.16257-1-jsnow@redhat.com>
-	<20180831222907.16257-6-jsnow@redhat.com>
-	<b79cdffa-a0d4-824c-b9fd-b5aba38e61bd@redhat.com>
-	<00da6ab1-d2ca-8d66-7e22-8fc848b9d861@redhat.com>
-	<ab14bcff-ae29-f1ce-a694-8aa2a4b63ac9@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a4182c7a-b84d-5b03-6635-dc9ff8966a31@redhat.com>
-Date: Tue, 4 Sep 2018 16:10:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1fxHg4-0006J9-Te
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:12:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54764 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fxHg3-0006I3-1C
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 16:11:56 -0400
+References: <20180830142708.14311-1-sameeh@daynix.com>
+	<20180830142708.14311-7-sameeh@daynix.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dfcdf727-a1cf-0ad5-c052-25d3b657a433@redhat.com>
+Date: Tue, 4 Sep 2018 15:11:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <ab14bcff-ae29-f1ce-a694-8aa2a4b63ac9@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180830142708.14311-7-sameeh@daynix.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 05/15] block/mirror: don't install
- backing chain on abort
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 6/6] virtio-net: rss: Add bpf filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +28,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jtc@redhat.com, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
 
+On 08/30/2018 09:27 AM, Sameeh Jubran wrote:
+> From: Sameeh Jubran <sjubran@redhat.com>
+> 
+> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+> ---
+>   hw/net/rss_bpf_insns.h       | 3992 ++++++++++++++++++++++++++++++++++++++++++
+>   hw/net/rss_tap_bpf.h         |   40 +
+>   hw/net/rss_tap_bpf_program.c |  175 ++
+>   hw/net/virtio-net.c          |   99 +-
+>   4 files changed, 4305 insertions(+), 1 deletion(-)
+>   create mode 100644 hw/net/rss_bpf_insns.h
+>   create mode 100644 hw/net/rss_tap_bpf.h
+>   create mode 100644 hw/net/rss_tap_bpf_program.c
+> 
+> diff --git a/hw/net/rss_bpf_insns.h b/hw/net/rss_bpf_insns.h
+> new file mode 100644
+> index 0000000000..1a92110b8d
+> --- /dev/null
+> +++ b/hw/net/rss_bpf_insns.h
+> @@ -0,0 +1,3992 @@
+> +/*
+> + * RSS ebpf instructions for virtio-net
+> + *
+> + * Copyright (c) 2018 RedHat.
 
+Please spell it "Red Hat", as that is the proper name in use in all 
+other places in the repository.
 
-On 09/04/2018 03:30 PM, Eric Blake wrote:
-> On 09/04/2018 02:15 PM, John Snow wrote:
->=20
->>
->> post-script: I really, really hate the "fake cancel" we've implemented
->> for mirror. It makes the job logic so much worse.
->=20
-> Mirror really does have a tri-state way to end the job (and accessible
-> only after the job has moved into the sync state):
->=20
-> cancel (gracefully end the job by detaching the mirror, so that the
-> original volume remains active - your "fake cancel")
-> complete (gracefully end the job by pivoting to the mirror, so that the
-> original volume is now the backup)
-> cancel --force (end the job now, even though it means you did not
-> actually create a mirrored copy) - only useful since commit b76e4458 (2=
-.12)
->=20
-> The first two are conceptually similar - the job succeeds, and one of
-> the two files used in the mirroring is now the state of the other at th=
-e
-> time the job concluded.
->=20
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include <linux/bpf.h>
+> +
+> +#ifndef BPF_RSS_INSNS
+> +#define BPF_RSS_INSNS
+> +
+> +/* bpf_insn array matching l3_l4 section. see tap_bpf_program.c file */
+> +struct bpf_insn l3_l4_hash_insns[] = {
+> +{0xbf , 0x6 , 0x1 , 0x0000 , 0x00000000},
+> +{0x28 , 0x0 , 0x0 , 0x0000 , 0x0000000c},
 
-Sure, but I dislike how we implemented it as cancel, which mucks up the
-job mechanisms. I recognize there are two fully valid ways in which we
-want to successfully complete a mirror job.
+Is this file generated?  If not, this long array of magic numbers can't 
+be the preferred form for source editing (which would be in violation of 
+GPL requirements); if so, why are we checking in a generated file into 
+qemu.git?  It can indeed be valid to check in a generated file if the 
+program for generating it is not commonly available to developers, but 
+the comments should make it clear that such is the case; and you would 
+be wise to point to more than just 'tap_bpf_program.c', but also include 
+comments stating how to reproduce this generated file.
 
-> Back-compat says we can't really change the block-job terminology
-> without an adequate deprecation cycle (and I don't know if libvirt has
-> even been taught about cancel --force yet); but for the newer 'job'
-> functionality (which we tried to shoehorn existing block jobs into), it
-> does seem like it would be nicer to have 'cancel' mean what blockjob
-> cancel --force implies, and instead focus on teaching 'complete' to hav=
-e
-> a way to select which of the two completion modes are desired (complete
-> by return to original, or complete by pivot to mirror).=C2=A0 It might =
-even
-> be nice to have a way to specify which completion mode to default to at
-> job creation time, and/or to change that default as the job is running
-> (which also implies being able to query which completion mode is
-> currently tied to the job, if you can complete without requesting eithe=
-r
-> of the two modes explicitly).
->=20
+Your commit then adds a file by a similar name, but not matching the one 
+you called out here:
 
-Yup, that's my preference!
+> --- /dev/null
+> +++ b/hw/net/rss_tap_bpf_program.c
+> @@ -0,0 +1,175 @@
+> +/*
+> + * RSS ebpf code for virtio-net
+> + *
+> + * Copyright (c) 2018 RedHat.
+
+Again, wrong spelling.
+
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + *
+> + * This code is heavily based on the following bpf code from dpdk
+> + * https://git.dpdk.org/dpdk/tree/drivers/net/tap/tap_bpf_program.c
+
+Your choice of license might be incompatible.  That file states:
+
+/* SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0
+
+but GPLv2-only is not the same as your choice of GPLv2+.
+
+Perhaps you can get away with GPLv2+ being compatible with BSD-3-Clause, 
+but it might be safer to state that this file is GPLv2-only (as an 
+explicit choice of one of your two options from the source you were 
+copying).
+
+> +
+> +RSS(l3_l4)
+> +
+> +BPF_LICENSE("Dual BSD/GPL");
+
+And this is different from what you wrote above. So which license is 
+this file?
+
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 4a52a6a1d0..66b2140cc7 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -27,6 +27,10 @@
+>   #include "hw/virtio/virtio-access.h"
+>   #include "migration/misc.h"
+>   #include "standard-headers/linux/ethtool.h"
+> +#include <sys/syscall.h>
+> +#include <linux/bpf.h>
+
+Is this going to cause compilation failure on non-Linux machines?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
