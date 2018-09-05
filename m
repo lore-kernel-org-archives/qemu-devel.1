@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxMo5-00020d-E0
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:40:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fxMoV-0002Ai-I2
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:41:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxMo4-0001Z2-85
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:40:33 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:46151)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fxMo3-0001Xc-SP
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:40:32 -0400
-Received: by mail-oi0-x244.google.com with SMTP id y207-v6so10536796oie.13
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 18:40:31 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1fxMoR-0001xI-Ka
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:40:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fxMoR-0001wL-E6
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:40:55 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 09DBA3084216
+	for <qemu-devel@nongnu.org>; Wed,  5 Sep 2018 01:40:54 +0000 (UTC)
+Date: Tue, 4 Sep 2018 22:40:49 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180905014049.GJ12698@habkost.net>
+References: <1536067356-44609-1-git-send-email-imammedo@redhat.com>
+	<1536067356-44609-3-git-send-email-imammedo@redhat.com>
+	<20180904151848.ualq7qvcikdsomi3@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMo8BfL3J-oFqHds3=0nya-Cke1FstXWpkZosvBJsvZmHJc4bw@mail.gmail.com>
-References: <20180904210036.7317-1-jcmvbkbc@gmail.com>
-	<CAFEAcA-AyrFVYWkM+_aBQ8eXH-03UZfgiHrB37v=-iM+A=70DA@mail.gmail.com>
-	<CAMo8Bf+3gws2Sa24xMfVsAQ_PaZVqKPbpqpySAAHrdkvnF-erw@mail.gmail.com>
-	<CAFEAcA8M9+sZQehFQSUrrZYZ4e=CH6aDc890FfRwbMdQfUmEKA@mail.gmail.com>
-	<CAMo8Bf+bV9wAX_ctyy2pftLnyb+_7ukiVkD5sEENX94=nQmMfw@mail.gmail.com>
-	<CAFEAcA9LtXdP7MYEf4X3SkJjnpQaSDRNaFh3rYVcWeaUgKBoew@mail.gmail.com>
-	<CAMo8BfL3J-oFqHds3=0nya-Cke1FstXWpkZosvBJsvZmHJc4bw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 5 Sep 2018 02:40:10 +0100
-Message-ID: <CAFEAcA_M2L8y0pc+LsudV0Ec-EzD5S-_E-jZE7QuXof+af3KTQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: do setrlimit selectively
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180904151848.ualq7qvcikdsomi3@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] vl:c: make sure that sockets are
+ calculated correctly in '-smp X' case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,44 +35,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: Andrew Jones <drjones@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
 
-On 5 September 2018 at 01:08, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> Ok, the deadlock (and other weird behavior) is a separate problem:
-> QEMU doesn't check results of resource allocation functions and
-> then gets surprised. Errors must be handled and QEMU must be
-> terminated properly.
->
-> As to hitting the limit, I don't see anything wrong with it as long as
-> the limits are relevant.
+On Tue, Sep 04, 2018 at 05:18:48PM +0200, Andrew Jones wrote:
+> On Tue, Sep 04, 2018 at 03:22:36PM +0200, Igor Mammedov wrote:
+> > commit
+> >   (5cdc9b76e3 vl.c: Remove dead assignment)
+> > removed sockets calculation when 'sockets' weren't provided on CLI
+> > since there wasn't any users for it back then. Exiting checks
+> > are neither reachable
+> >    } else if (sockets * cores * threads < cpus) {
+> > or nor triggable
+> >    if (sockets * cores * threads > max_cpus)
+> > so we weren't noticing wrong topology since then, since users
+> > recalculate sockets adhoc on their own.
+> > 
+> > However with deprecation check it becomes noticable, for example
+> >   -smp 2
+> > will start printing warning:
+> >   "warning: Invalid CPU topology deprecated: sockets (1) * cores (1) * threads (1) != maxcpus (2)"
+> > calculating sockets if they weren't specified.
+> > 
+> > Fix it by returning back sockets calculation if it's omited on CLI.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >  vl.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/vl.c b/vl.c
+> > index 7fd700e..333d638 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -1210,11 +1210,14 @@ static void smp_parse(QemuOpts *opts)
+> >  
+> >          /* compute missing values, prefer sockets over cores over threads */
+> >          if (cpus == 0 || sockets == 0) {
+> > -            sockets = sockets > 0 ? sockets : 1;
+> >              cores = cores > 0 ? cores : 1;
+> >              threads = threads > 0 ? threads : 1;
+> >              if (cpus == 0) {
+> > +                sockets = sockets > 0 ? sockets : 1;
+> >                  cpus = cores * threads * sockets;
+> > +            } else {
+> > +                max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
+> > +                sockets = !sockets ? max_cpus / (cores * threads) : sockets;
 
-The limit is relevant *to the guest process*. It's not relevant
-to QEMU's own allocations. If you're running directly under
-the host kernel and you set a memory rlimit, it doesn't mean
-that the kernel suddenly starts failing its own internal
-allocations.
+Why the !sockets check here?  If we have reached this statement
+we know that (cpus == 0 || sockets == 0) is true and
+(cpus == 0) is false, so sockets is guaranteed to be 0.
 
-It would obviously be better if we fixed the problems of
-allocations failing causing non-obvious problems (if nothing
-else it would make debugging of things which triggered QEMU
-asserts easier). But the guest should not be able to cause
-QEMU's internal allocations to fail by setting the rlimit.
+Sorry for not spotting this earlier.
 
-> What I've seen so far is application calling
-> setrlimit to catch its own bugs and limit bug impact on the rest of
-> the system. 64-on-64 would probably set up a relevant limit,
-> 32-on-64 -- unlikely.
+> >              }
+> >          } else if (cores == 0) {
+> >              threads = threads > 0 ? threads : 1;
+> > -- 
+> > 2.7.4
+> > 
+> >
+>  
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
->> https://bugs.launchpad.net/qemu/+bug/1163034 is the bug I
->> mentioned in my earlier email, by the way.
->
-> It looks like the proposed patch would fix the issue if it were
-> 32-on-64 case without making it worse for the 64-on-64 case?
-
-I still think 32-on-64 is a red herring here. If ignoring
-client attempts to set the memory rlimits makes sense on
-32-on-64 it makes sense for all configurations.
-
-thanks
--- PMM
+-- 
+Eduardo
