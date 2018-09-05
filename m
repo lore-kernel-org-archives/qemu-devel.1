@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fxW7k-0003ym-79
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:37:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fxW8Q-00051y-HZ
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:38:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fxW7h-0000k4-2d
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:37:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49080 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fxW7g-0000hq-RP
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:37:24 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180905082919.6986-1-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 5 Sep 2018 12:29:19 +0400")
-References: <20180905082919.6986-1-marcandre.lureau@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 05 Sep 2018 13:37:11 +0200
-Message-ID: <87va7k9nvc.fsf@trasno.org>
+	(envelope-from <mreitz@redhat.com>) id 1fxW8N-0001nn-Bf
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:38:10 -0400
+References: <20180904170930.28619-1-jsnow@redhat.com>
+	<20180904170930.28619-5-jsnow@redhat.com>
+	<20180904184620.GI415265@localhost.localdomain>
+	<63e2cd53-a4cb-3ed7-ae70-f49b4e11fad5@redhat.com>
+	<57dc1c6c-29bd-f134-646f-15139df7f4f4@redhat.com>
+	<20180905104941.GB4489@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <78038681-9981-ce9f-e0ba-82c43c31e98d@redhat.com>
+Date: Wed, 5 Sep 2018 13:37:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] memory: size can be different from ptr_size
+In-Reply-To: <20180905104941.GB4489@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XazvUfEtwlPa6dv2XAKK3Y0f34rmYev4g"
+Subject: Re: [Qemu-devel] [PATCH v4 04/15] block/commit: refactor commit to
+ use job callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +29,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dgilbert@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> memory_region_init_ram*_ptr() take only the size of the MemoryRegion,
-> and allocate a RAMBlock with the same size. However, it may be
-> convenient to expose a smaller MemoryRegion (for ex: a few bytes) than
-> the RAMBlock (which must be a multiple of TARGET_PAGE_SIZE).
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/exec/memory.h  |  8 ++++++--
->  exec.c                 |  3 +++
->  hw/display/g364fb.c    |  2 +-
->  hw/vfio/common.c       |  3 ++-
->  hw/virtio/vhost-user.c |  2 +-
->  memory.c               | 10 ++++++----
->  6 files changed, 19 insertions(+), 9 deletions(-)
->
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index eb4f2fb249..03f257829b 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -700,6 +700,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
->   *        must be unique within any device
->   * @size: size of the region.
->   * @ptr: memory to be mapped; must contain at least @size bytes.
-                                                       ^^^^^
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XazvUfEtwlPa6dv2XAKK3Y0f34rmYev4g
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Message-ID: <78038681-9981-ce9f-e0ba-82c43c31e98d@redhat.com>
+Subject: Re: [PATCH v4 04/15] block/commit: refactor commit to use job
+ callbacks
+References: <20180904170930.28619-1-jsnow@redhat.com>
+ <20180904170930.28619-5-jsnow@redhat.com>
+ <20180904184620.GI415265@localhost.localdomain>
+ <63e2cd53-a4cb-3ed7-ae70-f49b4e11fad5@redhat.com>
+ <57dc1c6c-29bd-f134-646f-15139df7f4f4@redhat.com>
+ <20180905104941.GB4489@localhost.localdomain>
+In-Reply-To: <20180905104941.GB4489@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-this comment gets wrong with your patches
+On 2018-09-05 12:49, Kevin Wolf wrote:
+> Am 05.09.2018 um 12:27 hat Max Reitz geschrieben:
+>> On 2018-09-04 22:32, John Snow wrote:
+>>>
+>>>
+>>> On 09/04/2018 02:46 PM, Jeff Cody wrote:
+>>>> On Tue, Sep 04, 2018 at 01:09:19PM -0400, John Snow wrote:
+>>>>> Use the component callbacks; prepare, abort, and clean.
+>>>>>
+>>>>> NB: prepare is only called when the job has not yet failed;
+>>>>> and abort can be called after prepare.
+>>>>>
+>>>>> complete -> prepare -> abort -> clean
+>>>>> complete -> abort -> clean
+>>>>>
+>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>>>> ---
+>>>>>  block/commit.c | 90 ++++++++++++++++++++++++++++++++--------------=
+------------
+>>>>>  1 file changed, 49 insertions(+), 41 deletions(-)
+>>>>>
+>>>>> diff --git a/block/commit.c b/block/commit.c
+>>>>> index b6e8969877..eb3941e545 100644
+>>>>> --- a/block/commit.c
+>>>>> +++ b/block/commit.c
+>>>>> @@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
+>>>>>      BlockDriverState *commit_top_bs;
+>>>>>      BlockBackend *top;
+>>>>>      BlockBackend *base;
+>>>>> +    BlockDriverState *base_bs;
+>>>>>      BlockdevOnError on_error;
+>>>>>      int base_flags;
+>>>>>      char *backing_file_str;
+>>>>> @@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBa=
+ckend *bs, BlockBackend *base,
+>>>>>      return 0;
+>>>>>  }
+>>>>> =20
+>>>>> -static void commit_exit(Job *job)
+>>>>> +static int commit_prepare(Job *job)
+>>>>>  {
+>>>>>      CommitBlockJob *s =3D container_of(job, CommitBlockJob, common=
+=2Ejob);
+>>>>> -    BlockJob *bjob =3D &s->common;
+>>>>> -    BlockDriverState *top =3D blk_bs(s->top);
+>>>>> -    BlockDriverState *base =3D blk_bs(s->base);
+>>>>> -    BlockDriverState *commit_top_bs =3D s->commit_top_bs;
+>>>>> -    bool remove_commit_top_bs =3D false;
+>>>>> -
+>>>>> -    /* Make sure commit_top_bs and top stay around until bdrv_repl=
+ace_node() */
+>>>>> -    bdrv_ref(top);
+>>>>> -    bdrv_ref(commit_top_bs);
+>>>>> =20
+>>>>>      /* Remove base node parent that still uses BLK_PERM_WRITE/RESI=
+ZE before
+>>>>>       * the normal backing chain can be restored. */
+>>>>>      blk_unref(s->base);
+>>>>> +    s->base =3D NULL;
+>>>>> =20
+>>>>> -    if (!job_is_cancelled(job) && job->ret =3D=3D 0) {
+>>>>> -        /* success */
+>>>>> -        job->ret =3D bdrv_drop_intermediate(s->commit_top_bs, base=
+,
+>>>>> -                                          s->backing_file_str);
+>>>>> -    } else {
+>>>>> -        /* XXX Can (or should) we somehow keep 'consistent read' b=
+locked even
+>>>>> -         * after the failed/cancelled commit job is gone? If we al=
+ready wrote
+>>>>> -         * something to base, the intermediate images aren't valid=
+ any more. */
+>>>>> -        remove_commit_top_bs =3D true;
+>>>>> +    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
+>>>>> +                                  s->backing_file_str);
+>>>>> +}
+>>>>
+>>>> If we can go from prepare->abort->clean, then that means to me that =
+every
+>>>> failure case of .prepare() can be resolved without permanent changes=
+ / data
+>>>> loss.  Is this necessarily the case?
+>>>>
+>>>
+>>> That'd be a requisite to make the job a transaction, but commit, mirr=
+or
+>>> and stream are not currently transactionable.
+>>
+>> Is that already documented anywhere?
+>>
+>> (Otherwise I'd be afraid of us forgetting in like a year, asking "Why
+>> isn't this a transaction already?", just making it one, and then
+>> remembering half a year later.)
+>>
+>>> The way commit already works, for example, can leave the base and
+>>> intermediate images as unusable as standalone images. This refactorin=
+g
+>>> will not change that alone.
+>>>
+>>> So it's not necessarily a problem, but it's something that would need=
+ to
+>>> be fixed if we ever wanted transaction support.
+>>>
+>>> However, in talking on IRC we did realize that this patch does change=
 
-> + * @ptr_size: size of @ptr buffer
+>>> behavior...
+>>>
+>>> Before:
+>>>
+>>> If bdrv_drop_intermediate fails, we store the retcode but continue
+>>> cleaning up as if it didn't fail. i.e., we don't remove the commit jo=
+b's
+>>> installed top_bs node.
+>>>
+>>> After:
+>>>
+>>> if bdrv_drop_intermediate fails, we return the failure retcode and
+>>> .abort gets called as a result, i.e. we will remove the commit job's
+>>> installed top_bs node in favor of the original top_bs node.
+>>>
+>>> I think this behavior is an improvement,
+>>
+>> I agree.
+>>
+>>> however it raises a question
+>>> about the nature of failures in bdrv_drop_intermediate.
+>>>
+>>> If this function fails without making any changes, the new commit
+>>> behavior is good. If it succeeds, we're also good. The problem is wit=
+h
+>>> intermediate or partial successes.
+>>>
+>>> If top has multiple parents (I think under normal circumstances it
+>>> won't, but I'm not absolutely sure) and it fails to update their back=
+ing
+>>> file references, it might partially succeed.
+>>>
+>>> I think commit's usage here is correct, but I think we might need to
+>>> update bdrv_drop_intermediate to make it roll back changes if it
+>>> experiences a partial failure to give all-or-nothing semantics.
+>>
+>> Sure, that would be good.
+>>
+>>> Thoughts?
+>>
+>> We could start by calling bdrv_check_update_perm() on all parents befo=
+re
+>> doing any changes.  Then the roll back would consist only of invoking
+>> bdrv_abort_perm_update() and in theory reverting the
+>> c->update_filename() changes.
+>>
+>> In practice...  How do we want to revert c->update_filename()?  There
+>> currently is no way of getting the old value.  (And just using the old=
 
-> diff --git a/exec.c b/exec.c
-> index 6826c8337d..fcea614e79 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2361,6 +2361,9 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, =
-ram_addr_t max_size,
->  RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
->                                     MemoryRegion *mr, Error **errp)
->  {
-> +    assert(size >=3D TARGET_PAGE_SIZE);
-> +    assert(size % TARGET_PAGE_SIZE =3D=3D 0);
-> +
->      return qemu_ram_alloc_internal(size, size, NULL, host, false,
->                                     false, mr, errp);
->  }
+>> child's filename may well be wrong, because the old child might not be=
 
-ok with this bit.
+>> the one referenced by the image header.)
+>>
+>> I have three ideas:
+>> 1) We could introduce a way of getting the old filename the parent has=
+,
+>> so we can restore it.
+>>
+>> 2) We could make .update_filename() kind of transactionable (seems lik=
+e
+>> overkill, but it would be easier in practice, I think).
+>>
+>> 3) We basically ignore .update_filename() errors.  We'd still return
+>> them, but we don't abort the graph change operation.  So after
+>> bdrv_drop_intermediate() is done, the graph has been changed
+>> succesfully, or it hasn't changed at all -- whether the filename updat=
+es
+>> all went through, that's a different story.
+>>
+>> #3 would be the simplest solution.  It's a bit stupid, but it would wo=
+rk
+>> for most problems, I think; at least the callers would know that the
+>> graph is in exactly one of two well-defined states.
+>=20
+> Option 2 sounds nice in theory, but how do you make things
+> transactionable when they require writing to an image? Either you make
+> the change or you don't. If you make it and later notice that you
+> shouldn't have done so, you can try to write the old value back, but
+> that can fail, too.
 
-But how about to change instead to:
+Yes, that's what I mean by "kind of".  It's just #1 with the code moved
+somewhere else.
 
-void memory_region_init_ram_ptr(MemoryRegion *mr,
-                                Object *owner,
-                                const char *name,
-                                uint64_t size,
-                                void *ptr)
-{
-    uint64_t real_size =3D ROUND_UP_TARGET_PAGE_SIZE(size);
-    memory_region_init(mr, owner, name, real_size);
-    mr->ram =3D true;
-    mr->terminates =3D true;
-    mr->destructor =3D memory_region_destructor_ram;
-    mr->dirty_log_mask =3D tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+> So making .update_filename() transactionable is probably not feasible.
+> The choice that is left is whether we update it in .prepare (and
+> continue with .abort if it fails) or in .commit (and ignore errors).
 
-    /* qemu_ram_alloc_from_ptr cannot fail with ptr !=3D NULL.  */
-    assert(ptr !=3D NULL);
-    mr->ram_block =3D qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fatal);
-}
+My idea was "if we could update it one time, we can probably update it a
+second time", so reverting in .abort() would usually work.  I know that
+a "usually" is not a "definitely", so that's the "kind of" again.
 
-For a suitable ROUND_UP_TARGET_PAGE_SIZE() macro.  You get the idea.
+So the abort could still throw an error which we would have to handle
+like in #3 anyway, I suppose.
 
-And memory_region_device_ram_ptr() don't even need a change.
-We need to adjust the comments, but it looks like an easier patch to me, no?
+Max
 
-> diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
-> index fbc2b2422d..f4f5643761 100644
-> --- a/hw/display/g364fb.c
-> +++ b/hw/display/g364fb.c
-> @@ -475,7 +475,7 @@ static void g364fb_init(DeviceState *dev, G364State *=
-s)
->=20=20
->      memory_region_init_io(&s->mem_ctrl, NULL, &g364fb_ctrl_ops, s, "ctrl=
-", 0x180000);
->      memory_region_init_ram_ptr(&s->mem_vram, NULL, "vram",
-> -                               s->vram_size, s->vram);
-> +                               s->vram_size, s->vram, s->vram_size);
 
-Having to change all the devices that use the function with exactly the
-same parameter looks weird to me.
+--XazvUfEtwlPa6dv2XAKK3Y0f34rmYev4g
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-What do you think?
+-----BEGIN PGP SIGNATURE-----
 
-Later, Juan.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluPwBQACgkQ9AfbAGHV
+z0CBBAf/QxaamOpCohCIsE1dD7vDBwurbNgPZw6GVW7nOxAP1ce+0/B95yRTtPMw
+yyoJc02LxC2yIQo7w/VNra6uF+4PqBlWC054lWOaRlsYCrZIbXXU5yXS6tPrjRvd
+i2VUF0874RKfh1cHzvtFF2xpgULkYVyKkloYpX9ItCf6oGjKcvHK9a/7WDoZFU9p
+L+hOr9F9r4qB+qPJN0eKD3oJCWWdH8Vgrkn5yJiJvL0QU9vNwe9jh6H6MzFGkWmG
+bcDMUnw20XosU+Q0wt/7WAjkNjdF8h574kNCfsMljt9ODtBBtcBQLWKNMFDtZWgl
+/7l8lX2blMVYVdAxL4PKPiYhKijrJQ==
+=cIBD
+-----END PGP SIGNATURE-----
+
+--XazvUfEtwlPa6dv2XAKK3Y0f34rmYev4g--
