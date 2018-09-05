@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fxU8h-0002qk-3r
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 05:30:19 -0400
+	(envelope-from <slp@redhat.com>) id 1fxUCx-0005mP-Ph
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 05:34:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fxU8c-0005Ym-CT
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 05:30:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49400 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fxU8c-0005XF-7A
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 05:30:14 -0400
-Date: Wed, 5 Sep 2018 17:30:03 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180905093003.GC23021@xz-x1>
-References: <20180718154200.26777-1-dplotnikov@virtuozzo.com>
-	<20180720092717.GB16910@xz-mi>
-	<4c3e07f4-ba82-9b88-6d32-4407b10a9926@virtuozzo.com>
-	<20180905033255.GA16809@xz-x1>
-	<bc0fc93d-0ad8-0715-de64-82181e83e4c0@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <bc0fc93d-0ad8-0715-de64-82181e83e4c0@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v1 00/17] Background snapshots
+	(envelope-from <slp@redhat.com>) id 1fxUCx-0007zb-0W
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 05:34:43 -0400
+From: Sergio Lopez <slp@redhat.com>
+Date: Wed,  5 Sep 2018 11:33:51 +0200
+Message-Id: <20180905093351.21954-1-slp@redhat.com>
+Subject: [Qemu-devel] [PATCH] util/async: use qemu_aio_coroutine_enter in
+ co_schedule_bh_cb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +18,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: dgilbert@redhat.com, quintela@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: kwolf@redhat.com, famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>
 
-On Wed, Sep 05, 2018 at 12:18:09PM +0300, Denis Plotnikov wrote:
-> Hi Peter,
-> 
-> Thanks for the reply.
-> 
-> Ok, I understand about tcg.
-> So my only option is to wait for userfaultfd-wp.
-> Do you know if anyone is  currently working on this? And if so, then is
-> there any estimations when the userfaultfd is ready?
+AIO Coroutines shouldn't by managed by an AioContext different than the
+one assigned when they are created. aio_co_enter avoids entering a
+coroutine from a different AioContext, calling aio_co_schedule instead.
 
-I am working on it, but it's only progressing slowly.  The latest
-status is that I can run with QEMU/tcg now with Andrea's tree (will
-need two more patches to be applied upon from me) however all the
-changes are still unmature (e.g., one of the patch is discussing on
-the linux-mm list, the other one I haven't discussed with anyone; but
-these patches worked for me).
+Scheduled coroutines are then entered by co_schedule_bh_cb using
+qemu_coroutine_enter, which just calls qemu_aio_coroutine_enter with the
+current AioContext obtained with qemu_get_current_aio_context.
+Eventually, co->ctx will be set to the AioContext passed as an argument
+to qemu_aio_coroutine_enter.
 
-Let me know if want to play with the tree, at least I can share with
-you on what I got (so maybe at least you can try to run your live
-snapshot with QEMU/tcg with my userfaultfd tree; if error occurred we
-can investigate).  Again, it is always welcomed if you want to
-participate in the kernel work too.
+This means that, if an IO Thread's AioConext is being processed by the
+Main Thread (due to aio_poll being called with a BDS AioContext, as it
+happens in AIO_WAIT_WHILE among other places), the AioContext from some
+coroutines may be wrongly replaced with the one from the Main Thread.
 
-Let me know what you think about it.
+This is the root cause behind some crashes, mainly triggered by the
+drain code at block/io.c. The most common are these abort and failed
+assertion:
 
-Regards,
+util/async.c:aio_co_schedule
+456     if (scheduled) {
+457         fprintf(stderr,
+458                 "%s: Co-routine was already scheduled in '%s'\n",
+459                 __func__, scheduled);
+460         abort();
+461     }
 
+util/qemu-coroutine-lock.c:
+286     assert(mutex->holder == self);
+
+But it's also known to cause random errors at different locations, and
+even SIGSEGV with broken coroutine backtraces.
+
+By using qemu_aio_coroutine_enter directly in co_schedule_bh_cb, we can
+pass the correct AioContext as an argument, making sure co->ctx is not
+wrongly altered.
+
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+---
+ util/async.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/async.c b/util/async.c
+index 05979f8014..c10642a385 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -400,7 +400,7 @@ static void co_schedule_bh_cb(void *opaque)
+ 
+         /* Protected by write barrier in qemu_aio_coroutine_enter */
+         atomic_set(&co->scheduled, NULL);
+-        qemu_coroutine_enter(co);
++        qemu_aio_coroutine_enter(ctx, co);
+         aio_context_release(ctx);
+     }
+ }
 -- 
-Peter Xu
+2.17.0
