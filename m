@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fxUWK-00007P-UT
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 05:54:45 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fxUoy-0006Jj-Mf
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 06:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fxUWK-00018z-2b
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 05:54:44 -0400
-Date: Wed, 5 Sep 2018 11:54:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180905095431.GA4489@localhost.localdomain>
-References: <20180831222907.16257-1-jsnow@redhat.com>
-	<20180831222907.16257-6-jsnow@redhat.com>
-	<b79cdffa-a0d4-824c-b9fd-b5aba38e61bd@redhat.com>
-	<00da6ab1-d2ca-8d66-7e22-8fc848b9d861@redhat.com>
-	<ab14bcff-ae29-f1ce-a694-8aa2a4b63ac9@redhat.com>
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fxUk7-00065v-Ty
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 06:09:00 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:33985)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1fxUk7-00064L-Jo
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 06:08:59 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id t10-v6so2458799ybb.1
+	for <qemu-devel@nongnu.org>; Wed, 05 Sep 2018 03:08:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ab14bcff-ae29-f1ce-a694-8aa2a4b63ac9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 05/15] block/mirror: don't install
- backing chain on abort
+In-Reply-To: <CAKv+Gu9r+1OBOSUBW_KpDEEoKyc=iwW4zVEe04-_JUnJtSGupQ@mail.gmail.com>
+References: <1532496652-26364-1-git-send-email-hongbo.zhang@linaro.org>
+	<1532496652-26364-2-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA9hivJzqksiSZbco4+EysYj=_y0t3k_L7TobxNPS8T2dQ@mail.gmail.com>
+	<CAHmQWvC4Kp1CAeCe8ZTGtSeG7fnT=Xen4GFKfnhTBWUCJdQV+g@mail.gmail.com>
+	<20180829134219.cmyqipnvukk6k2rp@kamzik.brq.redhat.com>
+	<CAHmQWvA5t7zbbDDM0UvuKSL_Z8ey+x+vOGZumYjwsq0FC5AHGA@mail.gmail.com>
+	<20180830083117.iekobw7l3arkt24m@bivouac.eciton.net>
+	<CAFEAcA_s+9-4PYHyx_aAnxwt4e=VH77uBG7rC4JA++nOyjAaPw@mail.gmail.com>
+	<20180830100233.nr6fm3npy57zl4xx@bivouac.eciton.net>
+	<CAKv+Gu9r+1OBOSUBW_KpDEEoKyc=iwW4zVEe04-_JUnJtSGupQ@mail.gmail.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Wed, 5 Sep 2018 18:08:57 +0800
+Message-ID: <CAHmQWvBDjMeBpe9Puv+oRii3JrVULW_+AYJL9WV1tXT7F7ALfg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +38,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, jtc@redhat.com, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Leif Lindholm <leif.lindholm@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-Am 04.09.2018 um 21:30 hat Eric Blake geschrieben:
-> On 09/04/2018 02:15 PM, John Snow wrote:
-> 
-> > 
-> > post-script: I really, really hate the "fake cancel" we've implemented
-> > for mirror. It makes the job logic so much worse.
-> 
-> Mirror really does have a tri-state way to end the job (and accessible only
-> after the job has moved into the sync state):
-> 
-> cancel (gracefully end the job by detaching the mirror, so that the original
-> volume remains active - your "fake cancel")
-> complete (gracefully end the job by pivoting to the mirror, so that the
-> original volume is now the backup)
-> cancel --force (end the job now, even though it means you did not actually
-> create a mirrored copy) - only useful since commit b76e4458 (2.12)
-> 
-> The first two are conceptually similar - the job succeeds, and one of the
-> two files used in the mirroring is now the state of the other at the time
-> the job concluded.
-> 
-> Back-compat says we can't really change the block-job terminology without an
-> adequate deprecation cycle (and I don't know if libvirt has even been taught
-> about cancel --force yet); but for the newer 'job' functionality (which we
-> tried to shoehorn existing block jobs into), it does seem like it would be
-> nicer to have 'cancel' mean what blockjob cancel --force implies, and
-> instead focus on teaching 'complete' to have a way to select which of the
-> two completion modes are desired (complete by return to original, or
-> complete by pivot to mirror).  It might even be nice to have a way to
-> specify which completion mode to default to at job creation time, and/or to
-> change that default as the job is running (which also implies being able to
-> query which completion mode is currently tied to the job, if you can
-> complete without requesting either of the two modes explicitly).
+On 30 August 2018 at 21:29, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 30 August 2018 at 12:02, Leif Lindholm <leif.lindholm@linaro.org> wrote:
+>> On Thu, Aug 30, 2018 at 09:39:33AM +0100, Peter Maydell wrote:
+>>> On 30 August 2018 at 09:31, Leif Lindholm <leif.lindholm@linaro.org> wrote:
+>>> > On Thu, Aug 30, 2018 at 03:07:29PM +0800, Hongbo Zhang wrote:
+>>> >> @Ard, @Leif, is there any possibility to remove all the DT nodes?
+>>> >> On real hardware, how does UEFI find the memory size and CPU number?
+>>> >
+>>> > Usually by asking some form of SCP/PMU.
+>>> > So until we have rock-solid multi-cpu-instance (making terms up here,
+>>> > there may be a proper name already?) support upstream, we need to take
+>>> > shortcuts.
+>>>
+>>> I would expect that you'd want a "faked-on-the-QEMU end" SCP
+>>> communications endpoint to start with anyway. We have one of
+>>> those for vexpress, for instance.
+>>
+>> Ah, I wasn't aware we did!
+>>
+>> In that case - sure, that is probably the more sensible solution.
+>> Does it emulate SCMI?
+>>
+>
+> The purpose of the SBSA/SBBR qemu machine is prototyping the
+> interactions between rich firmware and the OS for things like RAS,
+> secure variable storage for UEFI or capsule update.
+>
+> How exactly the firmware figures out how many CPUs and how much memory
+> we are running with is out of scope for this, and so I don't think
+> there is a need to build something from scratch here: DT will do just
+> fine, given that both EDK2 and ARM-TF have working DT code for these
+> things.
 
-I think it's better to select the completion mode in the job-complete
-command than having to specify it from the start.
+Ard, we need to clarify which DT nodes should be kept in SBSA-ref QEMU.
+I've researched and tested, there are 3 kinds of DT nodes in the
+current 'virt' machine:
 
-Once we have support multiple completion modes (even just internally),
-nothing stops us from moving the "fake cancel" logic to the QMP layer
-(i.e. the drive-mirror/blockdev-mirror implementations) and get rid of
-it in the actual job.
+a) CPU DT node, because it is dynamic according to input parameters,
+and we don't want to get it by other way, so we agreed to keep it.
+b) GIC, UART, Timer (and RTC?) nodes, these nodes are now used by
+UEFI, if removed, UEFI needs a rework to not rely on them any longer.
+c) All the other devices nodes, such as GPIO, PCIE etc, currently the
+UEFI doesn't need them, so UEFI can boot with them removed.
 
-Kevin
+How about b) and c)?
+my idea is to keep a) only, remove b) and thus a UEFI modification
+accordingly is to be done, c) can be removed freely.
+
+So what is your consideration from firmware point of view?
+
+>
+> fw_cfg, on the other hand, is unsuitable for us. Generating ACPI
+> tables in a different way from actual bare metal is not a good idea,
+> given that things like RAS interact with ACPI as well, and fw_cfg is
+> also exposed to the OS in the default mach-virt configuration. So we
+> could tweak fw_cfg to be more suitable, but I think that does not
+> improve the usefulness of our prototype at all.
+>
+> At some point, it would be nice if we could get UEFI to receive its
+> platform description from ARM-TF in a generic manner, and it would be
+> good for EDK2 and ARM-TF to align on this. So even if we decide that
+> SCMI is more suitable way to convey this information from QEMU to the
+> guest firmware, I would object to implementing the client side of that
+> in UEFI, given that it should be ARM-TF that provides this
+> information.
