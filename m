@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fxKyQ-00047L-Gr
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:43:07 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fxLH1-0006EA-0s
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 20:02:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fxKyP-0003pH-BQ
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:43:06 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:35571)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fxKyO-0003ms-Sf
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 19:43:05 -0400
-Received: by mail-lf1-x141.google.com with SMTP id q13-v6so4444094lfc.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 16:43:04 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1fxLGz-0000gA-V5
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 20:02:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180904233919.GA25010@flamenco>
-References: <20180810173941.5301-1-cota@braap.org>
-	<20180831222249.GA28489@flamenco>
-	<CAKmqyKO2jK0YnJepSazMeCtMtFLpEMaY6UOeyHbGWKED0Z=CJw@mail.gmail.com>
-	<20180904233919.GA25010@flamenco>
+In-Reply-To: <20180901124639.19735-3-luc.michel@greensocs.com>
+References: <20180901124639.19735-1-luc.michel@greensocs.com>
+	<20180901124639.19735-3-luc.michel@greensocs.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 4 Sep 2018 16:42:32 -0700
-Message-ID: <CAKmqyKPoAhQnOMcTbCxR4g-vW2CBJJLO0EJt+ioXoTf0drSRCg@mail.gmail.com>
+Date: Tue, 4 Sep 2018 17:01:45 -0700
+Message-ID: <CAKmqyKPdwm4TPXCaigh6wH+EH0beaQfMFA9Qi_fdECK0w1ss3w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/riscv: use
- tcg_lookup_and_goto_ptr
+Subject: Re: [Qemu-devel] [PATCH 02/15] gdbstub: add multiprocess support to
+ '?' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +23,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On Tue, Sep 4, 2018 at 4:39 PM, Emilio G. Cota <cota@braap.org> wrote:
-> On Tue, Sep 04, 2018 at 13:18:28 -0700, Alistair Francis wrote:
->> On Fri, Aug 31, 2018 at 3:22 PM, Emilio G. Cota <cota@braap.org> wrote:
->> > On Fri, Aug 10, 2018 at 13:39:38 -0400, Emilio G. Cota wrote:
->> >> Changes wrt v1: changed patch 3 as suggested by Richard. Also
->> >> added his R-b's.
->> >>
->> >> You can fetch this series from:
->> >>   https://github.com/cota/qemu/tree/riscv-lookup_ptr-v2
->> >
->> > RISC-V maintainers: any plans of picking this up for 3.1?
->>
->> Thanks for CCing me.
->>
->> I think Michael must be really busy, I haven't seen any activity for
->> awhile. I'm going to send a PR with everything that has been reviewed
->> and applies cleanly.
+On Sat, Sep 1, 2018 at 5:46 AM, Luc Michel <luc.michel@greensocs.com> wrote:
+> The gdb_get_cpu_pid() function does the PID lookup for the given CPU. It
+> checks if the CPU is in a QOM container named after the
+> GDB_CPU_GROUP_NAME macro. If found, it returns the correponding PID,
+> which is the group ID plus one (group IDs start at 0, GDB PIDs at 1).
+> When the CPU is not a child of such a container, PID 1 is returned.
 >
-> Thanks!
+> The get_thread_id() function generates the string to be used to identify
+> a given thread, in a response packet for the peer. This function
+> supports generating thread IDs when multiprocess mode is enabled (in the
+> form `p<pid>.<tid>').
 >
-> Did patch 1 not apply cleanly? I see it's not part of the pullreq
-> you just sent.
+> Use it in the reply to a '?' request.
 >
-> I'd like the three patches to go in in the original order, since
-> the perf numbers in patch 3's commit log are laid out assuming
-> that is the case.
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
 
-The content of patch 1 was applied in this commit:
-
-commit 07ea28b41830f946de3841b0ac61a3413679feb9
-Author: Richard Henderson <richard.henderson@linaro.org>
-Date:   Wed May 30 18:06:23 2018 -0700
-
-    tcg: Pass tb and index to tcg_gen_exit_tb separately
-
-    Do the cast to uintptr_t within the helper, so that the compiler
-    can type check the pointer argument.  We can also do some more
-    sanity checking of the index argument.
-
-    Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-    Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-https://github.com/qemu/qemu/commit/07ea28b41830f946de3841b0ac61a3413679feb9
-
-so unfortunately the patch no longer applies.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+> ---
+>  gdbstub.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 44 insertions(+), 2 deletions(-)
 >
-> Cheers,
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 5c86218f49..ec3105dbc1 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -640,10 +640,37 @@ static int memtox(char *buf, const char *mem, int len)
+>          }
+>      }
+>      return p - buf;
+>  }
 >
->                 Emilio
+> +static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
+> +{
+> +    gchar *path;
+> +    gchar *cont;
+> +    const char *left;
+> +    unsigned long pid;
+> +
+> +    if (!s->multiprocess || (s->process_num == 1)) {
+> +        return 1;
+> +    }
+> +
+> +    path = object_get_canonical_path(OBJECT(cpu));
+> +    cont = g_strrstr(path, "/" GDB_CPU_GROUP_NAME "[");
+> +
+> +    if (cont == NULL) {
+> +        return 1;
+> +    }
+> +
+> +    cont += strlen("/" GDB_CPU_GROUP_NAME "[");
+> +
+> +    if (qemu_strtoul(cont, &left, 10, &pid)) {
+> +        return 1;
+> +    }
+> +
+> +    return pid + 1;
+> +}
+> +
+>  static const char *get_feature_xml(const char *p, const char **newp,
+>                                     CPUClass *cc)
+>  {
+>      size_t len;
+>      int i;
+> @@ -909,10 +936,24 @@ static CPUState *find_cpu(uint32_t thread_id)
+>      }
+>
+>      return NULL;
+>  }
+>
+> +static char *get_thread_id(const GDBState *s, CPUState *cpu,
+> +                           char *buf, size_t buf_size)
+> +{
+> +    if (s->multiprocess) {
+> +        snprintf(buf, buf_size, "p%02x.%02x",
+> +                 gdb_get_cpu_pid(s, cpu), cpu_gdb_index(cpu));
+> +    } else {
+> +        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
+> +
+> +    }
+> +
+> +    return buf;
+> +}
+> +
+>  static int is_query_packet(const char *p, const char *query, char separator)
+>  {
+>      unsigned int query_len = strlen(query);
+>
+>      return strncmp(p, query, query_len) == 0 &&
+> @@ -1020,22 +1061,23 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>      const char *p;
+>      uint32_t thread;
+>      int ch, reg_size, type, res;
+>      uint8_t mem_buf[MAX_PACKET_LENGTH];
+>      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+> +    char thread_id[16];
+>      uint8_t *registers;
+>      target_ulong addr, len;
+>
+>      trace_gdbstub_io_command(line_buf);
+>
+>      p = line_buf;
+>      ch = *p++;
+>      switch(ch) {
+>      case '?':
+>          /* TODO: Make this return the correct value for user-mode.  */
+> -        snprintf(buf, sizeof(buf), "T%02xthread:%02x;", GDB_SIGNAL_TRAP,
+> -                 cpu_gdb_index(s->c_cpu));
+> +        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+> +                 get_thread_id(s, s->c_cpu, thread_id, sizeof(thread_id)));
+>          put_packet(s, buf);
+>          /* Remove all the breakpoints when this query is issued,
+>           * because gdb is doing and initial connect and the state
+>           * should be cleaned up.
+>           */
+> --
+> 2.18.0
+>
+>
