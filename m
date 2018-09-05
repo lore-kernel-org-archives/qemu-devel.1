@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fxVAH-0000b6-Tn
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 06:36:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fxVEx-0002qR-2d
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 06:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fxVAD-0002C0-SZ
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 06:36:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42408)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fxVAD-00026X-M0
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 06:35:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fxVAA-0001u9-Tn
-	for <qemu-devel@nongnu.org>; Wed, 05 Sep 2018 10:35:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 22A2A2E80D2
-	for <qemu-devel@nongnu.org>; Wed,  5 Sep 2018 10:35:54 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1fxVEw-00027D-BC
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 06:40:51 -0400
+References: <20180904170930.28619-1-jsnow@redhat.com>
+	<20180904170930.28619-6-jsnow@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ba536682-1d9a-d7e1-a925-143c384aaf2e@redhat.com>
+Date: Wed, 5 Sep 2018 12:40:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Sep 2018 10:21:46 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153614290639.16471.6235135409728947643.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+In-Reply-To: <20180904170930.28619-6-jsnow@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dgh1VTNOKyU9t0jJnlXOX3MHRLzkXwBGH"
+Subject: Re: [Qemu-devel] [PATCH v4 05/15] block/mirror: don't install
+ backing chain on abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, jtc@redhat.com, Eric Blake <eblake@redhat.com>
 
-I don't have the nvidia for pass through to try this with; but I suggest
-that you try the following:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dgh1VTNOKyU9t0jJnlXOX3MHRLzkXwBGH
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Jeff Cody <jcody@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, jtc@redhat.com, Eric Blake <eblake@redhat.com>
+Message-ID: <ba536682-1d9a-d7e1-a925-143c384aaf2e@redhat.com>
+Subject: Re: [PATCH v4 05/15] block/mirror: don't install backing chain on
+ abort
+References: <20180904170930.28619-1-jsnow@redhat.com>
+ <20180904170930.28619-6-jsnow@redhat.com>
+In-Reply-To: <20180904170930.28619-6-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-  a) Start a windows vm running an older version unaffected by the bug and =
-start a 2d test =
+On 2018-09-04 19:09, John Snow wrote:
+> In cases where we abort the block/mirror job, there's no point in
+> installing the new backing chain before we finish aborting.
+>=20
+> Move this to the "success" portion of mirror_exit.
 
-  b) run 'perf top' on the host while the test is running and capture the r=
-esults
-     - make sure you have debug symbols for both qemu (and related librarie=
-s) and the kernel =
+Sounds a bit weird now that you don't do any moving.
 
-  c) now repeat a/b for the newer version of windows that's affected
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/mirror.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/block/mirror.c b/block/mirror.c
+> index cba555b4ef..3365bcfdfb 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -642,7 +642,7 @@ static void mirror_exit(Job *job)
+>       * required before it could become a backing file of target_bs. */=
 
-add the results of the 'perf top' to this bug; hopefully we'll be able
-to see qemu or the kernel spending a lot more time in some particular
-routine in the new version.
+>      bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+>                              &error_abort);
+> -    if (s->backing_mode =3D=3D MIRROR_SOURCE_BACKING_CHAIN) {
+> +    if (ret =3D=3D 0 && s->backing_mode =3D=3D MIRROR_SOURCE_BACKING_C=
+HAIN) {
+>          BlockDriverState *backing =3D s->is_none_mode ? src : s->base;=
 
--- =
+>          if (backing_bs(target_bs) !=3D backing) {
+>              bdrv_set_backing_hd(target_bs, backing, &local_err);
+> @@ -659,10 +659,7 @@ static void mirror_exit(Job *job)
+>      }
+> =20
+>      if (s->should_complete && ret =3D=3D 0) {
+> -        BlockDriverState *to_replace =3D src;
+> -        if (s->to_replace) {
+> -            to_replace =3D s->to_replace;
+> -        }
+> +        BlockDriverState *to_replace =3D s->to_replace ? s->to_replace=
+ : src;
+> =20
+>          if (bdrv_get_flags(target_bs) !=3D bdrv_get_flags(to_replace))=
+ {
+>              bdrv_reopen(target_bs, bdrv_get_flags(to_replace), NULL);
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
+And this hunk now looks out of place.  Sure, it makes sense, but why is
+it in this patch now? :-)
 
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
+(Moving it into the next patch would make more sense, I think.)
 
-Status in QEMU:
-  New
+I'd like to give an R-b anyway, but I know that I shouldn't, so I won't.
 
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
+Max
 
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
 
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
+--dgh1VTNOKyU9t0jJnlXOX3MHRLzkXwBGH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
+-----BEGIN PGP SIGNATURE-----
 
-  Background:
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluPsqUACgkQ9AfbAGHV
+z0Cb8wf/dJAMeIlFmm6oyiI9nycawjuQ5f3b1UZYB2vYzy1XBPjLbCjQ+XVKfc+Y
+6yFFqh8aVSWETeGx6RCHtj7cJ8kqvrqsDNC8iPRAGZr0bGvE0TlWSrX6PsYstjDk
+h2QEfk6hcCJs+kX70ROqmZuwrFvmxqkofyu2AY6xlJkeb2e82xFo4sjMP7vOdKtM
+8tSlWxOvEALqSFdYqxdKgwW0if/Ajs1smaNdPU3hYgTRUyxCycIQLINiCGsHHjaF
+0HNpjU/K+B8f0YFRg305FehrF3bMsSpD1wV50ttu1Wf80XUYRUli1jrKi5MBfmkM
+8XGJR4K3cGedpCSBKO7GSTdldIfD2Q==
+=rwEt
+-----END PGP SIGNATURE-----
 
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+--dgh1VTNOKyU9t0jJnlXOX3MHRLzkXwBGH--
