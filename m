@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fxYxI-0002zp-4P
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 10:38:53 -0400
+	(envelope-from <famz@redhat.com>) id 1fxZDN-0001uB-DF
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 10:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fxYxE-0004Kc-4z
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 10:38:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43704 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fxZ1c-0000Bn-8E
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 10:43:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43806 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fxYxD-0004Ii-T2
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 10:38:48 -0400
-Date: Wed, 5 Sep 2018 22:38:44 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fxZ1c-0000At-3F
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 10:43:20 -0400
+Date: Wed, 5 Sep 2018 22:43:14 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180905143844.GA21726@lemon.usersys.redhat.com>
-References: <20180904110822.12863-1-fli@suse.com>
-	<20180904110822.12863-2-fli@suse.com>
-	<20180904112620.GG22349@redhat.com>
-	<0831de15-95cb-0774-10f9-8b03f4141c10@suse.com>
-	<20180905083641.GD3026@redhat.com>
-	<c7666ea1-20c2-8037-3f9d-79f3dc12e413@suse.com>
+Message-ID: <20180905144314.GB21726@lemon.usersys.redhat.com>
+References: <20180824012126.22721-1-famz@redhat.com>
+	<8d039be4-486e-e017-88ca-5cb6ebd89519@comstyle.com>
+	<20180827090551.4lhug2yvghirb3si@sirius.home.kraxel.org>
+	<ca37c453-e198-9ea7-2bed-9b38a17e5170@comstyle.com>
+	<20180905142404.ztwfcjxznjv6ben6@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c7666ea1-20c2-8037-3f9d-79f3dc12e413@suse.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/5] Fix segmentation fault when
- qemu_signal_init fails
+In-Reply-To: <20180905142404.ztwfcjxznjv6ben6@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH] tests: vm: auto_install OpenBSD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,180 +30,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On Wed, 09/05 19:20, Fei Li wrote:
->=20
->=20
-> On 09/05/2018 04:36 PM, Daniel P. Berrang=E9 wrote:
-> > On Wed, Sep 05, 2018 at 12:17:24PM +0800, Fei Li wrote:
-> > > Thanks for the review! :)
-> > >=20
-> > >=20
-> > > On 09/04/2018 07:26 PM, Daniel P. Berrang=E9 wrote:
-> > > > On Tue, Sep 04, 2018 at 07:08:18PM +0800, Fei Li wrote:
-> > > >=20
-> ... snip ...
-> > > > >            free(info);
-> > > > >            return -1;
-> > > > >        }
-> > > > > @@ -94,17 +97,21 @@ static int qemu_signalfd_compat(const sigse=
-t_t *mask)
-> > > > >        return fds[0];
-> > > > >    }
-> > > > > -int qemu_signalfd(const sigset_t *mask)
-> > > > > +int qemu_signalfd(const sigset_t *mask, Error **errp)
-> > > > >    {
-> > > > > -#if defined(CONFIG_SIGNALFD)
-> > > > >        int ret;
-> > > > > +    Error *local_err =3D NULL;
-> > > > > +#if defined(CONFIG_SIGNALFD)
-> > > > >        ret =3D syscall(SYS_signalfd, -1, mask, _NSIG / 8);
-> > > > >        if (ret !=3D -1) {
-> > > > >            qemu_set_cloexec(ret);
-> > > > >            return ret;
-> > > > >        }
-> > > > >    #endif
-> > > > > -
-> > > > > -    return qemu_signalfd_compat(mask);
-> > > > > +    ret =3D qemu_signalfd_compat(mask, &local_err);
-> > > > > +    if (local_err) {
-> > > > > +        error_propagate(errp, local_err);
-> > > > > +    }
-> > > > Using a local_err is not required - you can just pass errp strigh=
-t
-> > > > to qemu_signalfd_compat() and then check
-> > > >=20
-> > > >      if (ret < 0)
-> > > For the use of a local error object & error_propagate call, I'd lik=
-e to
-> > > explain here. :)
-> > > In our code, the initial caller passes two kinds of Error to the ca=
-ll trace,
-> > > one is
-> > > something like &error_abort and &error_fatal, the other is NULL.
-> > >=20
-> > > For the former, the exit() occurs in the functions where
-> > > error_handle_fatal() is called
-> > > (e.g. called by error_propagate/error_setg/...). The patch3: qemu_i=
-nit_vcpu
-> > > is the case,
-> > > that means the system will exit in the final callee: qemu_thread_cr=
-eate(),
-> > > instead of
-> > > the initial caller pc_new_cpu(). In such case, I think propagating =
-seems
-> > > more reasonable.
-> > I don't really agree. It is preferrable to abort immediately at the d=
-eepest
-> > place which raises the error. The stack trace will thus show the full=
- call
-> > chain leading upto the problem.
-> Sorry for the above example, it is not exactly correct: for the patch3 =
-case,
-> the
-> system will exit in device_set_realized(), where the first error_propag=
-ate()
-> is called
-> if we pass errp directly, but not in the final callee.. Sorry for the
-> misleading.
->=20
-> For another example, its call trace:
-> qemu_thread_create(, NULL)
-> <=3D iothread_complete(, NULL)
-> <=3D=3D user_creatable_complete(, NULL)
-> <=3D=3D=3D object_new_with_propv(, errp)
-> <=3D=3D=3D=3D object_new_with_props(, errp) {... error_propagate(errp, =
-local_err);
-> ...}
-> <=3D=3D=3D=3D=3D iothread_create(, &error_abort)
-> The exit occurs in object_new_with_props where the first error_propagat=
-e is
-> called.
->=20
-> Either the device_set_realized() or object_new_with_props() is a middle
-> caller, thus
-> we can only see the top half stack trace until where error_handle_fatal=
-() is
-> called.
->=20
-> In other words, the exit() occurs neither in the final callee nor the
-> initial caller.
-> Sorry for the misleading example again..
+On Wed, 09/05 16:24, Gerd Hoffmann wrote:
+> On Wed, Sep 05, 2018 at 08:54:39AM -0400, Brad Smith wrote:
+> > On 8/27/2018 5:05 AM, Gerd Hoffmann wrote:
+> > 
+> > > On Fri, Aug 24, 2018 at 10:36:30AM -0400, Brad Smith wrote:
+> > > > I very much appreciate the effort to bump up to 6.3 as I was going
+> > > > to suggest doing that at some point. But bumping up to 6.3 at the
+> > > > moment will fail with the configure script. We've switched from GCC 4.2
+> > > > to Clang. The TLS check will fail with Clang's emulated TLS. We've
+> > > > had a local patch for awhile to fix the test but I don't think it is
+> > > > appropriate to upstream as is.
+> > > Hmm, /me looks a bit surprised.
+> > > Seems to work fine for me ...
+> > 
+> > I am quite surprised as well. Something has changed since we first brought
+> > in Clang
+> > and this patch no longer seems to be necessary. I just removed it from our
+> > ports tree.
+> 
+> Cool.  Fam, what is the status here?  There was a slirp patch on the
+> list, and I guess you also have a updated auto-install patch using that?
 
-This means using error_propagate can potentially lose the final callee in=
- the
-error_abort cases. That is why it's preferrable to just pass errp down th=
-e
-calling chain when possible. The reason why object_new_with_propv uses
-error_propagate is because both object_property_add_child and
-user_creatable_complete return void, thus cannot flag success/failure to =
-its
-caller via their return values. To check whether they succeed,
-object_new_with_propv wants a non-NULL err parameter. But like you said, =
-errp
-passed to object_new_with_propv may or may not be NULL, so a local_err lo=
-cal
-variable is defined to cope with that.
-
-Alternatively it could do this instead:
-
-{
-
-    ...
-
-    if (errp) {
-        object_property_add_child(parent, id, obj, errp);
-        if (*errp) {
-            goto error;
-        }
-    } else {
-        Error *local_err =3D NULL;
-        object_property_add_child(parent, id, obj, &local_err);
-        if (local_err) {
-            goto error;
-        }
-    }
-    ...
-
-}
-
-This way if error_abort was passed and object_property_add_child failed, =
-the
-abort point would be in the innermost function. But this is boilerplate c=
-ode so
-it's not used.
-
-On the contrary, using error_propagate when not necessary also means more=
- lines
-of code but gives less info on the call trace when aborted.
-
-So I fully agree with Dan.
+Yes, it seems pretty close to me. But backing to 6.3 is the news of the day. I
+guess I can wrap things up tomorrow and look to sending another version.
 
 Fam
-
-> >=20
-> > > How do you think passing errp straightly for the latter case, and u=
-se a
-> > > local error object &
-> > > error_propagate for the former case? This is a distinct treatment, =
-but would
-> > > shorten the code.
-> > It is inappropriate to second-guess whether the caller is a passing i=
-n
-> > NULL or &error_abort, or another Error object. What is passed in can
-> > change at any time in the future.
-> ok.
-> >=20
-> > We should only ever use a local error where the local method has a ne=
-ed
-> > to look at the error contents before returning to the caller. Any oth=
-er
-> > case should just use the errp directly.
-> >=20
-> > Regards,
-> > Daniel
-> Have a nice day, thanks
-> Fei
->=20
