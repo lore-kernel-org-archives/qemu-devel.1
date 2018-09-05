@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fxMz5-0005UA-T3
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:51:56 -0400
+	(envelope-from <jing2.liu@linux.intel.com>) id 1fxNEu-0001rP-GA
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fxMz5-0006ph-6M
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:51:55 -0400
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:41087)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fxMz4-0006n9-Ud
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:51:55 -0400
-Received: by mail-yw1-xc44.google.com with SMTP id q129-v6so2041860ywg.8
-	for <qemu-devel@nongnu.org>; Tue, 04 Sep 2018 18:51:54 -0700 (PDT)
+	(envelope-from <jing2.liu@linux.intel.com>) id 1fxNEp-0002ji-SG
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:08:14 -0400
+Received: from mga17.intel.com ([192.55.52.151]:51296)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+	id 1fxNEp-0002gV-IL
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:08:11 -0400
+From: "Liu, Jing2" <jing2.liu@linux.intel.com>
+References: <1534821487-14189-1-git-send-email-jing2.liu@linux.intel.com>
+	<1534821487-14189-3-git-send-email-jing2.liu@linux.intel.com>
+	<e88aac49-d0be-6ba9-9674-1785caa5af5b@gmail.com>
+	<b3d4db42-0ff0-9fd6-7c4e-ee74d15093e5@linux.intel.com>
+	<36d3de24-3d5e-e57a-b722-bbaaf1fd0035@gmail.com>
+	<913f0f69-eadc-eb2b-05f7-4a1398cdbf46@linux.intel.com>
+	<0abfc176-a6a6-e12d-1662-1b124a559882@gmail.com>
+	<5f440e08-33f0-6cc2-266b-d646771f385f@linux.intel.com>
+Message-ID: <74eecedd-1203-0bb1-30ed-be4bbc038d95@linux.intel.com>
+Date: Wed, 5 Sep 2018 10:08:05 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_M2L8y0pc+LsudV0Ec-EzD5S-_E-jZE7QuXof+af3KTQ@mail.gmail.com>
-References: <20180904210036.7317-1-jcmvbkbc@gmail.com>
-	<CAFEAcA-AyrFVYWkM+_aBQ8eXH-03UZfgiHrB37v=-iM+A=70DA@mail.gmail.com>
-	<CAMo8Bf+3gws2Sa24xMfVsAQ_PaZVqKPbpqpySAAHrdkvnF-erw@mail.gmail.com>
-	<CAFEAcA8M9+sZQehFQSUrrZYZ4e=CH6aDc890FfRwbMdQfUmEKA@mail.gmail.com>
-	<CAMo8Bf+bV9wAX_ctyy2pftLnyb+_7ukiVkD5sEENX94=nQmMfw@mail.gmail.com>
-	<CAFEAcA9LtXdP7MYEf4X3SkJjnpQaSDRNaFh3rYVcWeaUgKBoew@mail.gmail.com>
-	<CAMo8BfL3J-oFqHds3=0nya-Cke1FstXWpkZosvBJsvZmHJc4bw@mail.gmail.com>
-	<CAFEAcA_M2L8y0pc+LsudV0Ec-EzD5S-_E-jZE7QuXof+af3KTQ@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 4 Sep 2018 18:51:53 -0700
-Message-ID: <CAMo8Bf+RKpZA0SP11gjYbCMmq_uBbL_7ELPQg_T9yjZKkZDYnA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: do setrlimit selectively
+In-Reply-To: <5f440e08-33f0-6cc2-266b-d646771f385f@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw/pci: add PCI resource reserve
+ capability to legacy PCI bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,17 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: mst@redhat.com, "Marcel Apfelbaum (GMail address)" <marcel.apfelbaum@gmail.com>
+Cc: anthony.xu@intel.com, lersek@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Sep 4, 2018 at 6:40 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> I still think 32-on-64 is a red herring here. If ignoring
-> client attempts to set the memory rlimits makes sense on
-> 32-on-64 it makes sense for all configurations.
+Hi Marcel and Michael,
 
-Ok, I don't have anything against ignoring guest setrlimit completely, so
-if that variant has better chances for positive review I'll gladly send it.
+Got no response so I would like to ask if I need do something more for
+this serial? :)
 
--- 
-Thanks.
--- Max
+Thanks,
+Jing
+
+On 8/30/2018 10:58 AM, Liu, Jing2 wrote:
+> Ping Michael :)
+> 
+> Thanks,
+> Jing
+> 
+> On 8/25/2018 12:51 AM, Marcel Apfelbaum wrote:
+>>>>>> On 08/21/2018 06:18 AM, Jing Liu wrote:
+>>>>>>> Add hint to firmware (e.g. SeaBIOS) to reserve addtional
+>>>>>>> BUS/IO/MEM/PREF resource for legacy pci-pci bridge. Add the
+>>>>>>> resource reserve capability deleting in pci_bridge_dev_exitfn.
+>>>>>>>
+>>>>>>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+>>>>>>> ---
+>>>>>>>   hw/pci-bridge/pci_bridge_dev.c | 24 ++++++++++++++++++++++++
+>>>>>>>   1 file changed, 24 insertions(+)
+> [...]
+>>>>>> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+>>>>>>
+>>>>> Thanks for the quick reviewing and feedback.
+>>>>> So could I ask what I should do now, update a new version
+>>>>> with your rb or just waiting for pushing, or else?
+>>>>>
+>>>>
+>>>> You just need to wait until Michael adds the series
+>>>> to his next pull request. Nothing more to do.
+>>>>
+>>> OK, got it! Thanks!
+>>
+>> Please ping Michael if your code is not merged in a week or so.
+>>
+>>> BTW, do you have some suggestion on the seabios counterpart patches?
+>>> https://patchew.org/Seabios/1534386737-8131-1-git-send-email-jing2.liu@linux.intel.com/ 
+>>>
+>>
+>> I plan to have  a look this weekend.
+>>
+>> Thanks,
+>> Marcel
+> 
