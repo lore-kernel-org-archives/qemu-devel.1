@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1fxdHE-0006Ug-Mj
+	(envelope-from <wei@redhat.com>) id 1fxdHE-0006Uf-Mj
 	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:15:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1fxdHA-00084Q-Kn
+	(envelope-from <wei@redhat.com>) id 1fxdHC-00086t-9S
 	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:15:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54166)
+Received: from mx1.redhat.com ([209.132.183.28]:40102)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1fxdHA-000807-6n
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:15:40 -0400
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1fxdHC-00085w-0k
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:15:42 -0400
 From: Wei Huang <wei@redhat.com>
-Date: Wed,  5 Sep 2018 15:15:30 -0400
-Message-Id: <1536174934-26022-1-git-send-email-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V9 0/4] tests: Add migration test for aarch64
+Date: Wed,  5 Sep 2018 15:15:33 -0400
+Message-Id: <1536174934-26022-4-git-send-email-wei@redhat.com>
+In-Reply-To: <1536174934-26022-1-git-send-email-wei@redhat.com>
+References: <1536174934-26022-1-git-send-email-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH V9 3/4] tests/migration: Add migration-test
+ header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +27,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, lvivier@redhat.com, drjones@redhat.com, dgilbert@redhat.com, quintela@redhat.com, wei@redhat.com
 
-This patchset adds a migration test for aarch64. It leverages
-Dave Gilbert's migration boot block patches to create a new test case
-for aarch64.
+This patch moves the settings related migration-test from the
+migration-test.c file to a new header file.
 
-V8->V9:
- * Remove accel= setting for AArch64. It uses the default "kvm:tcg" now
- * Revise the header file comment (suggested by drjones)
- * Name x86 directory to i386 instead of x86_64; change Makefile accordingly
- * Remove $(ARCH) from the assembly and header file names
-
-V7->V8:
- * Support cross compilation by searching for CROSS_CC_GUEST option,
-   instead of using the find-cross-prefix defined in roms/Makefile
- * Use the "max" options for ARM guest VM's CPU and GIC types
- * $(TARGET)/Makefile rules are rewritten based on Laurent Vivier's comment
- * NOTE: because Patch 1/2 is re-written, I remove the "Reviewed-by" for
-   reviewers to take a look again. Thanks.
-
-V6->V7:
- * Define test memory start/end addresses for all architectures
- * Check aarch64 kernel binary size, limit under 512KB
-
-V5->V6:
- * Add Reviewed-by to patch 1-3
- * Add more design notes in patch 4 (aarch64 assembly compilation, bin space)
-
-V4->V5:
- * Extract cross compilation detection code into rules.mak for sharing
- * Minor comment and code revision in migration-test.c & aarch64-a-b-kernel.S
- 
-V3->V4:
- * Rename .s to .S, allowing assembly to include C-style header file
- * Move test defines into a new migration-test.h file
- * Use different cpu & gic settings for kvm and tcg modes on aarch64
- * Clean up aarch64-a-b-kernel.S based on Andrew Jones' comments
- 
-V2->V3:
- * Convert build script to Makefile
- * Add cross-compilation support
- * Fix CPU type for "tcg" machine type
- * Revise asm code and the compilation process from asm to header file
-
-V1->V2:
- * Similar to Dave Gilbert's recent changes to migration-test, we
-   provide the test source and a build script in V2.
- * aarch64 kernel blob is defined as "unsigned char" because the source
-   is now provided in V2.
- * Add "-machine none" to test_deprecated() because aarch64 doesn't have
-   a default machine type.
-
-RFC->V1:
- * aarch64 kernel blob is defined as an uint32_t array
- * The test code is re-written to address a data caching issue under KVM.
-   Tests passed under both x86 and aarch64.
- * Re-use init_bootfile_x86() for both x86 and aarch64
- * Other minor fixes
-
-Thanks,
--Wei
-
-Wei Huang (4):
-  tests/migration: Convert x86 boot block compilation script into
-    Makefile
-  tests/migration: Support cross compilation in generating boot header
-    file
-  tests/migration: Add migration-test header file
-  tests: Add migration test for aarch64
-
- tests/Makefile.include                             |  1 +
- tests/migration-test.c                             | 57 +++++++++++-----
- tests/migration/Makefile                           | 35 ++++++++++
- tests/migration/aarch64/Makefile                   | 20 ++++++
- tests/migration/aarch64/a-b-kernel.S               | 75 ++++++++++++++++++++++
- tests/migration/aarch64/a-b-kernel.h               | 19 ++++++
- tests/migration/i386/Makefile                      | 22 +++++++
- .../{x86-a-b-bootblock.s => i386/a-b-bootblock.S}  |  4 --
- .../{x86-a-b-bootblock.h => i386/a-b-bootblock.h}  |  8 +--
- tests/migration/migration-test.h                   | 30 +++++++++
- tests/migration/rebuild-x86-bootblock.sh           | 33 ----------
- 11 files changed, 248 insertions(+), 56 deletions(-)
- create mode 100644 tests/migration/Makefile
- create mode 100644 tests/migration/aarch64/Makefile
- create mode 100644 tests/migration/aarch64/a-b-kernel.S
- create mode 100644 tests/migration/aarch64/a-b-kernel.h
- create mode 100644 tests/migration/i386/Makefile
- rename tests/migration/{x86-a-b-bootblock.s => i386/a-b-bootblock.S} (93%)
- rename tests/migration/{x86-a-b-bootblock.h => i386/a-b-bootblock.h} (92%)
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Wei Huang <wei@redhat.com>
+---
+ tests/migration-test.c           | 28 ++++++++++++++++++----------
+ tests/migration/migration-test.h | 21 +++++++++++++++++++++
+ 2 files changed, 39 insertions(+), 10 deletions(-)
  create mode 100644 tests/migration/migration-test.h
- delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
 
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index fe6b41a..17c6896 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -21,11 +21,13 @@
+ #include "chardev/char.h"
+ #include "sysemu/sysemu.h"
+ 
++#include "migration/migration-test.h"
++
+ /* TODO actually test the results and get rid of this */
+ #define qtest_qmp_discard_response(...) qobject_unref(qtest_qmp(__VA_ARGS__))
+ 
+-const unsigned start_address = 1024 * 1024;
+-const unsigned end_address = 100 * 1024 * 1024;
++unsigned start_address;
++unsigned end_address;
+ bool got_stop;
+ static bool uffd_feature_thread_id;
+ 
+@@ -80,8 +82,8 @@ static bool ufd_version_check(void)
+ 
+ static const char *tmpfs;
+ 
+-/* A simple PC boot sector that modifies memory (1-100MB) quickly
+- * outputting a 'B' every so often if it's still running.
++/* The boot file modifies memory area in [start_address, end_address)
++ * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
+  */
+ #include "tests/migration/i386/a-b-bootblock.h"
+ 
+@@ -270,11 +272,11 @@ static void wait_for_migration_pass(QTestState *who)
+ static void check_guests_ram(QTestState *who)
+ {
+     /* Our ASM test will have been incrementing one byte from each page from
+-     * 1MB to <100MB in order.
+-     * This gives us a constraint that any page's byte should be equal or less
+-     * than the previous pages byte (mod 256); and they should all be equal
+-     * except for one transition at the point where we meet the incrementer.
+-     * (We're running this with the guest stopped).
++     * start_address to < end_address in order. This gives us a constraint
++     * that any page's byte should be equal or less than the previous pages
++     * byte (mod 256); and they should all be equal except for one transition
++     * at the point where we meet the incrementer. (We're running this with
++     * the guest stopped).
+      */
+     unsigned address;
+     uint8_t first_byte;
+@@ -285,7 +287,8 @@ static void check_guests_ram(QTestState *who)
+     qtest_memread(who, start_address, &first_byte, 1);
+     last_byte = first_byte;
+ 
+-    for (address = start_address + 4096; address < end_address; address += 4096)
++    for (address = start_address + TEST_MEM_PAGE_SIZE; address < end_address;
++         address += TEST_MEM_PAGE_SIZE)
+     {
+         uint8_t b;
+         qtest_memread(who, address, &b, 1);
+@@ -437,6 +440,8 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+                                   " -drive file=%s,format=raw"
+                                   " -incoming %s",
+                                   accel, tmpfs, bootpath, uri);
++        start_address = X86_TEST_MEM_START;
++        end_address = X86_TEST_MEM_END;
+     } else if (strcmp(arch, "ppc64") == 0) {
+         cmd_src = g_strdup_printf("-machine accel=%s -m 256M"
+                                   " -name source,debug-threads=on"
+@@ -451,6 +456,9 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+                                   " -serial file:%s/dest_serial"
+                                   " -incoming %s",
+                                   accel, tmpfs, uri);
++
++        start_address = PPC_TEST_MEM_START;
++        end_address = PPC_TEST_MEM_END;
+     } else {
+         g_assert_not_reached();
+     }
+diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
+new file mode 100644
+index 0000000..c4c0c52
+--- /dev/null
++++ b/tests/migration/migration-test.h
+@@ -0,0 +1,21 @@
++/*
++ * Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#ifndef _TEST_MIGRATION_H_
++#define _TEST_MIGRATION_H_
++
++/* Common */
++#define TEST_MEM_PAGE_SIZE 4096
++
++/* x86 */
++#define X86_TEST_MEM_START (1 * 1024 * 1024)
++#define X86_TEST_MEM_END   (100 * 1024 * 1024)
++
++/* PPC */
++#define PPC_TEST_MEM_START (1 * 1024 * 1024)
++#define PPC_TEST_MEM_END   (100 * 1024 * 1024)
++
++#endif /* _TEST_MIGRATION_H_ */
 -- 
 1.8.3.1
