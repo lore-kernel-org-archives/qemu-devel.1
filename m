@@ -1,39 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Manish.Jaggi@cavium.com>) id 1fxWGJ-0008TY-46
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:46:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fxWNC-0001EY-N8
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:53:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Manish.Jaggi@cavium.com>) id 1fxWGF-0005IS-To
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:46:19 -0400
-Received: from mail-eopbgr680051.outbound.protection.outlook.com
-	([40.107.68.51]:3994
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Manish.Jaggi@cavium.com>)
-	id 1fxWGF-0005Hi-M7
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:46:15 -0400
-From: "Jaggi, Manish" <Manish.Jaggi@cavium.com>
-Date: Wed, 5 Sep 2018 11:46:11 +0000
-Message-ID: <EF2DEC36-DDCB-4169-A30F-15F29B7F52E9@caviumnetworks.com>
-References: <CABgNM92-PHWg3X41tCVfErmV9-Hnu5GYpz_pa9-iXfbScFUCZg@mail.gmail.com>
-	<CD29DCF7-6537-406F-A127-6A2FFDDAAD79@caviumnetworks.com>
-	<87k1ohxik4.fsf@trasno.org>
-	<3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
-	<20180828172739.GA10175@work-vm>
-	<19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
-	<20180829131653.gk4yhjdi2pk5bdcd@kamzik.brq.redhat.com>
-	<DC466FE6-98B4-485B-BE4D-C4E228B36107@caviumnetworks.com>
-	<20180831111121.n7zafn6peiwe6ojn@kamzik.brq.redhat.com>
-	<1604D594-E6D4-48BB-A270-F7CF1092978B@caviumnetworks.com>
-	<20180904095402.izdnqag3xak3mgsb@kamzik.brq.redhat.com>
-In-Reply-To: <20180904095402.izdnqag3xak3mgsb@kamzik.brq.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <24F45538ADC8E144A65710971B1769BC@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1fxWNB-00024Q-Eb
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:53:26 -0400
+Date: Wed, 5 Sep 2018 13:53:10 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180905115310.GC4489@localhost.localdomain>
+References: <20180904170930.28619-1-jsnow@redhat.com>
+	<20180904170930.28619-5-jsnow@redhat.com>
+	<20180904184620.GI415265@localhost.localdomain>
+	<63e2cd53-a4cb-3ed7-ae70-f49b4e11fad5@redhat.com>
+	<57dc1c6c-29bd-f134-646f-15139df7f4f4@redhat.com>
+	<20180905104941.GB4489@localhost.localdomain>
+	<78038681-9981-ce9f-e0ba-82c43c31e98d@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
- different processor ids
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uQr8t48UFsdbeI+V"
+Content-Disposition: inline
+In-Reply-To: <78038681-9981-ce9f-e0ba-82c43c31e98d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 04/15] block/commit: refactor commit to
+ use job callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,125 +30,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Auger Eric <eric.auger@redhat.com>, "peter.maydell@linaro.org
-	qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-DQoNCj4gT24gMDQtU2VwLTIwMTgsIGF0IDM6MjQgUE0sIEFuZHJldyBKb25lcyA8ZHJqb25lc0By
-ZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IEV4dGVybmFsIEVtYWlsDQo+IA0KPiBPbiBUdWUsIFNl
-cCAwNCwgMjAxOCBhdCAwOToxNjo1OEFNICswMDAwLCBKYWdnaSwgTWFuaXNoIHdyb3RlOg0KPj4+
-IE9uIDMxLUF1Zy0yMDE4LCBhdCA0OjQxIFBNLCBBbmRyZXcgSm9uZXMgPGRyam9uZXNAcmVkaGF0
-LmNvbT4gd3JvdGU6DQo+Pj4gSSB0aGluayB0aGUgc2VxdWVuY2Ugc2hvdWxkIGxvb2sgc29tZXRo
-aW5nIGxpa2UgdGhpczoNCj4+PiANCj4+PiAxKSBHdWVzdCBydW5uaW5nIG9uIEhvc3QgQSB3aXRo
-IHByb2Nlc3NvciBhDQo+Pj4gMikgU3RvcCBndWVzdCBhbmQgc2F2ZSBpdHMgc3RhdGUgZm9yIG1p
-Z3JhdGlvbg0KPj4+IDMpIE1pZ3JhdGUgZ3Vlc3QgdG8gSG9zdCBCIHdpdGggcHJvY2Vzc29yIGIg
-KGIgaXMgImNsb3NlIGVub3VnaCIgdG8gYSkNCj4+PiA0KSBSZXN0b3JlIGd1ZXN0IHN0YXRlIGFm
-dGVyIG1pZ3JhdGlvbg0KPj4+ICAgIElmIGd1ZXN0IGlzIHJ1bm5pbmcgd2l0aCAnLWNwdSBob3N0
-Jw0KPj4+ICAgICAgNC5hKSBJbmZvcm0gS1ZNIG9mIGFueSBjb25maWd1cmF0aW9uIHRoYXQgaW1w
-YWN0cyBpbnZhcmlhbnQgcmVnaXN0ZXJzDQo+Pj4gICAgICA0LmIpIFVwZGF0ZSB0aGUgZ3Vlc3Qn
-cyB2aWV3IG9mIGFsbCBpbnZhcmlhbnQgcmVnaXN0ZXJzIHRvIG1hdGNoIHRoZQ0KPj4+ICAgICAg
-ICAgICBob3N0DQo+Pj4gICAgRW5kSWYNCj4+PiA1KSBSdW4gZ3Vlc3QNCj4+PiANCj4+PiA0LmEg
-YW5kIDQuYiByZXF1aXJlIG5ldyBjb2RlIGJvdGggaW4gUUVNVSBhbmQgS1ZNLiA0LmEgbWF5IHJl
-cXVpcmUgYSBuZXcNCj4+PiBLVk0gQVBJLCB1bmxlc3MgdGhlIGV4aXN0aW5nIEFQSSBjYW4gYmUg
-bGV2ZXJhZ2VkLg0KPj4+IA0KPj4+IFRoZSBkZWZpbml0aW9uIG9mICJjbG9zZSBlbm91Z2giIGlz
-IGxlZnQgdG8gdGhlIHVzZXJzIGFuZC9vciBoaWdoZXIgbGF5ZXJzDQo+Pj4gb2YgdGhlIFZpcnQg
-c3RhY2suDQo+Pj4gDQo+PiANCj4+IFRoYW5rcyBmb3IgZGV0YWlsaW5nIHRoZSBzZXF1ZW5jZS4N
-Cj4+IEkgZ290IGFub3RoZXIgY29tbWVudCBmcm9tIEp1YW4gYW5kIERhdmlkIHdoaWNoIGlzIG5v
-dCB0byB1c2UgLWNwdSBob3N0LCBzZWUgYmVsb3cNCj4+IA0KPj4gIkkgcmVhbGx5IHRoaW5rIHRo
-YXQgdGhlIHJpZ2h0IGFwcHJvYWNoIGhlcmUgaXMgbm90IHVzaW5nIC1jcHUgaG9zdC4gIFlvdQ0K
-Pj4gZG8gdGhlIGZ1bGwgd29yaywgY3JlYXRlIGEgbW9kZWwgYXMgRGF2aWQgc2F5cywgYW5kIGJl
-IHN1cmUgdGhhdCB5b3UgY2FyDQo+PiBydW4gdGhhdCBtb2RlbCBvbiBib3RoIGNwdXMuICBJdCBp
-cyBhIGxvdCBvZiB3b3JrLCBidXQgaXQgaXMgdGhlIG9ubHkNCj4+IHdheSB0byBtYWtlIHN1cmUg
-dGhhdCB0aGlzIGlzIGdvaW5nIHRvIHdvcmsgbG9uZyB0ZXJtLuKAnQ0KPj4gDQo+PiBOb3QgdXNp
-bmcgLWNwdSBob3N0IGlzIG9ydGhvZ29uYWwgdG8gdGhlIHNlcXVlbmNlIHdlIGhhdmUgYmVlbiBk
-aXNjdXNzaW5nIGluIHRoaXMgdGhyZWFkLg0KPj4gVXNlIHNvbWV0aGluZyBsaWtlIC1jcHUgY29y
-dGV4LWE1NyAodGhpcyBob3dldmVyIGRvZXMgbm90IHdvcmsgc28gZmFyKQ0KPj4gVGhpcyB3b3Vs
-ZCBhdm9pZCBjbG9zZS1lbm91Z2ggZGVmaW5pdGlvbiwgYnV0IHdvdWxkIG5lZWQgc3Vic3RhbnRp
-YWwgd29yay4NCj4+IA0KPj4gU28gd2hpY2ggYXBwcm9hY2ggc2hvdWxkIGJlIHRha2VuIGhlcmUs
-IHdoYXRzIHlvdXIgdGFrZS4uLg0KPj4gDQo+IA0KPiBJbnZlbnRpbmcgYSBiYXNlLUFBcmNoNjQg
-Y3B1IG1vZGVsIHRoYXQgY2FuIHRoZW4gYmUgZXh0ZW5kZWQgd2l0aCBvcHRpb25hbA0KPiBmZWF0
-dXJlcyBpcyBhIG5pY2Ugd2F5IHRvIGV4dGVuZCB0aGUgbWlncmF0YWJpbGl0eSBvZiBhIGd1ZXN0
-LCBob3dldmVyDQo+IGl0J3MgaGFyZCB0byBkbyBiZWNhdXNlIG9mIGVycmF0YS4gU2luY2UgZXJy
-YXRhIHdvcmthcm91bmRzIGFyZSBlbmFibGVkDQo+IHBlciBNSURSLCB0aGVuIHdlJ2QgbmVlZCB0
-byBpbnZlbnQgb3VyIG93biBNSURSIGFuZCBhbHNvIHNvbWUgd2F5IHRvDQo+IGNvbW11bmljYXRl
-IHdoaWNoIGVycmF0YSB3ZSB3YW50IHRvIGVuYWJsZSwgcG9zc2libHkgdGhyb3VnaCBzb21lIHBh
-cmF2aXJ0DQo+IG1lY2hhbmlzbSBvciB0aHJvdWdoIHNvbWUgaW1wbGVtZW50YXRpb24gZGVmaW5l
-ZCBzeXN0ZW0gcmVnaXN0ZXJzIHRoYXQNCj4gS1ZNIHdvdWxkIG5lZWQgdG8gcmVzZXJ2ZSBhbmQg
-ZGVmaW5lLg0KPiANCj4gVGhhdCdzIG5vdCBqdXN0IGEgdG9uIG9mIHdvcmsgZm9yIHRoZSBlbnRp
-cmUgdmlydCBzdGFjayAobm90IGp1c3QgS1ZNIGFuZA0KPiBRRU1VLCBidXQgYWxzbyBhbGwgdGhl
-IGxheWVycyBhYm92ZSksIGJ1dCBpdCdzIHBvc3NpYmxlIHRoYXQgaXQgd29uJ3QgYmUNCj4gdXNl
-ZnVsIGluIHRoZSBlbmQgYW55d2F5LiBUaGVyZSdzIHJpc2sgdGhhdCBlbmFibGluZyBqdXN0IG9u
-ZSBlcnJhdHVtDQo+IHdvcmthcm91bmQgd291bGQgcmVzdHJpY3QgdGhlIGd1ZXN0IHRvIGhvc3Rz
-IG9mIHRoZSBleGFjdCBzYW1lIHR5cGUNCj4gYW55d2F5LiBGb3IgZWFjaCBlcnJhdHVtIHRoYXQg
-bmVlZHMgdG8gYmUgZW5hYmxlZCwgdGhlIHByb2JhYmlsaXR5IG9mDQo+IGVuYWJsaW5nIGFuIGlu
-Y29tcGF0aWJsZSBvbmUgZ29lcyB1cCwgc28gaXQgbWF5IG5vdCBiZSBsaWtlbHkgdG8gZG8gbXVj
-aA0KPiBiZXR0ZXIgdGhhbiAnLWNwdSBob3N0JyBpbiB0aGUgZW5kLiBJJ20gYWZyYWlkIHRoYXQg
-dW50aWwgZXJyYXRhIGFyZQ0KPiBwcmltYXJpbHkgc2hvd2luZyB1cCBpbiBvcHRpb25hbCBDUFUg
-ZmVhdHVyZXMgdGhhdCBjYW4gc2ltcGx5IGJlIGRpc2FibGVkDQo+IGZvciB0aGUgd29ya2Fyb3Vu
-ZCwgdGhhdCB3ZSdyZSBzdHVjayB3aXRoICctY3B1IGhvc3QnLiBJJ2QgYmUgaGFwcHkgdG8NCj4g
-ZGlzY3VzcyBpdCBtb3JlIHRob3VnaC4NCj4gDQo+IEluIHNob3J0LCBJJ2QgZ28gd2l0aCB0aGUg
-cHJvcG9zYWwgYWJvdmUsIGZvciBub3csIHdpdGggcG9zc2libHkgb25lDQo+IGNoYW5nZS4gbGli
-dmlydCBmb2xrIChBbmRyZWEgQm9sb2duYW5pIGFuZCBQaW5vIFRvc2Nhbm8pIHN1Z2dlc3QgdGhh
-dA0KPiB0aGUgZ3Vlc3QgaW52YXJpYW50IHJlZ2lzdGVyIHVwZGF0aW5nIG9uIHRoZSBkZXN0aW5h
-dGlvbiBob3N0IG9ubHkgYmUNCj4gZG9uZSBpZiB0aGUgdXNlciBvcHRzLWluIHRvIGl0LiBUaGlz
-IGlzIGJlY2F1c2UgcmlnaHQgbm93IGlmIGEgdXNlcg0KPiB0cmllcyB0byBtaWdyYXRlIHRvIGEg
-aG9zdCB0aGF0IGlzIG5vdCAxMDAlIGlkZW50aWNhbCB0aGUgbWlncmF0aW9uDQo+IHdpbGwgZmFp
-bCwgd2hpY2ggbWFrZXMgdGhlICJtaXN0YWtlIiBjbGVhci4gSWYgd2Ugc2lsZW50bHkgY2hhbmdl
-IHRoZQ0KPiBiZWhhdmlvciB0byBhbGxvdyBpdCwgdGhlbiB3aGF0IGNvdWxkIGhhdmUgYmVlbiBh
-IG1pc3Rha2UsIGJlY2F1c2UNCj4gdGhlIGhvc3RzIGFyZW4ndCBhY3R1YWxseSAiY2xvc2UgZW5v
-dWdoIiwgbWF5IGdvIHVubm90aWNlZC4gSSdtIG5vdA0KPiAxMDAlIHN1cmUgd2UgbmVlZCBhbm90
-aGVyIHVzZXIgb3B0LWluIGZsYWcgdG8gYmUgc2V0LCB0aG91Z2gsIGFzIEkNCj4gdGhpbmsgdGhl
-ICctY3B1IGhvc3QnIGluZGljYXRlcyB0aGUgdXNlciBleHBlY3RzIHRoZSBWQ1BVIHRvIGxvb2sN
-Cj4gbGlrZSB0aGUgaG9zdCBDUFUsIGFuZCBldmVuIGFmdGVyIG1pZ3JhdGlvbiB0aGF0IGV4cGVj
-dGF0aW9uIHNob3VsZCBiZQ0KPiBtZXQuIFNpbXBseSwgdXNlcnMgdGhhdCBtaWdyYXRlICctY3B1
-IGhvc3QnIFZNcyBuZWVkIHRvIGtub3cgd2hhdCB0aGV5J3JlDQo+IGRvaW5nLg0KPiANCg0KRm9s
-bG93dXAgdG8gdGhlIHNlcXVlbmNlIHlvdSBoYXZlIG91dGxpbmVkLCBJIGhhdmUgYWRkZWQgYmVs
-b3cgcHNldWRvY29kZSwNClRoaXMgaXMgb25seSBmb3IgcHJvY2Vzc29ycyB3aGljaCBkaWZmZXIg
-aW4gaW52YXJpYW50IHJlZ2lzdGVycyBsaWtlIE1JRFIgYnV0DQpoYXZlIG5vIHVuZGVybHlpbmcg
-Q1BVL0dJQyBjaGFuZ2VzIG9yIGFueSBlcnJhdGEgdGhhdCBhZmZlY3RzIGd1ZXN0IGtlcm5lbC4N
-CkFuZCB1c2VyIG9wdHMgaW4gZm9yIGl0LiANCihub3Qgc2VuZGluZyBmdWxsIHBhdGNoIGp1c3Qg
-dG8gY2hlY2sgaWYgdGhlIGxvZ2ljIGlzIG9rLi4pDQoNCihhKSBDaGFuZ2VzIGluIEtWTToNCg0K
-LSBJbnRyb2R1Y2luZyBhIHNwZWNpZmljIGVycm9yIGNvZGUgKEtWTV9FSU5WQVJJQU5UKSBpbiBj
-YXNlIG9mIGludmFyaWFudCB3cml0ZXMuDQpUaGlzIHNob3VsZCBub3QgY2hhbmdlIGFueXRoaW5n
-IHRvIEFQSSBTRVRfT05FX1JFRyBLVk0gQVBJLg0KTm90IHN1cmUgd2hpY2ggaXMgdGhlIGJlc3Qg
-cGxhY2UgdG8gcHV0IHRoZSBkZWZpbmXigKYNCkkgaGF2ZSBhZGRlZCBpbiBpbmNsdWRlL3VhcGkv
-bGludXgva3ZtX3BhcmEuaC4NCg0KZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdz
-LmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jDQppbmRleCAyMmZiYmRiZWNlM2MuLmM4YTRm
-YmU4YThiYiAxMDA2NDQNCi0tLSBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMNCisrKyBiL2Fy
-Y2gvYXJtNjQva3ZtL3N5c19yZWdzLmMNCkBAIC0xMTExLDcgKzExMTEsNyBAQCBzdGF0aWMgaW50
-IF9fc2V0X2lkX3JlZyhjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwgdm9pZCBfX3VzZXIg
-KnVhZGRyLA0KIA0KICAgICAgICAvKiBUaGlzIGlzIHdoYXQgd2UgbWVhbiBieSBpbnZhcmlhbnQ6
-IHlvdSBjYW4ndCBjaGFuZ2UgaXQuICovDQogICAgICAgIGlmICh2YWwgIT0gcmVhZF9pZF9yZWco
-cmQsIHJheikpDQotICAgICAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQorICAgICAgICAgICAg
-ICAgcmV0dXJuIC1LVk1fRUlOVkFSSUFOVDsNCiANCiAgICAgICAgcmV0dXJuIDA7DQogfQ0KZGlm
-ZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm1fcGFyYS5oIGIvaW5jbHVkZS91YXBpL2xp
-bnV4L2t2bV9wYXJhLmgNCmluZGV4IDZjMGNlNDk5MzFlNS4uM2E0OWEzMjFkMGRmIDEwMDY0NA0K
-LS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bV9wYXJhLmgNCisrKyBiL2luY2x1ZGUvdWFwaS9s
-aW51eC9rdm1fcGFyYS5oDQpAQCAtMTcsNiArMTcsNyBAQA0KICNkZWZpbmUgS1ZNX0UyQklHICAg
-ICAgICAgICAgICBFMkJJRw0KICNkZWZpbmUgS1ZNX0VQRVJNICAgICAgICAgICAgICBFUEVSTQ0K
-ICNkZWZpbmUgS1ZNX0VPUE5PVFNVUFAgICAgICAgICA5NQ0KKyNkZWZpbmUgS1ZNX0VJTlZBUklB
-TlQgICAgICAgICAgOTYNCiANCiAjZGVmaW5lIEtWTV9IQ19WQVBJQ19QT0xMX0lSUSAgICAgICAg
-ICAxDQogI2RlZmluZSBLVk1fSENfTU1VX09QICAgICAgICAgICAgICAgICAgMg0KDQooYikgQ2hh
-bmdlcyBpbiBRZW11IGNvZGUNCg0KMS4gSGFuZGxpbmcgb2YgbmV3IGVycm9yIGNvZGUsIHdoaWNo
-IHdvdWxkIHVwZGF0ZQ0KZ3Vlc3Qgc3RhdGUgd2l0aCBob3N0cyBpbnZhcmlhbnQgcmVnIHZhbHVl
-cy4NCg0KZGlmZiAtLWdpdCBhL3RhcmdldC9hcm0va3ZtLmMgYi90YXJnZXQvYXJtL2t2bS5jDQpp
-bmRleCA2NWY4NjdkNTY5Li4wY2YxNDMyM2EyIDEwMDY0NA0KLS0tIGEvdGFyZ2V0L2FybS9rdm0u
-Yw0KKysrIGIvdGFyZ2V0L2FybS9rdm0uYw0KQEAgLTQ1Miw3ICs0NTIsMTUgQEAgYm9vbCB3cml0
-ZV9saXN0X3RvX2t2bXN0YXRlKEFSTUNQVSAqY3B1LCBpbnQgbGV2ZWwpDQogICAgICAgICAgICAg
-YWJvcnQoKTsNCiAgICAgICAgIH0NCiAgICAgICAgIHJldCA9IGt2bV92Y3B1X2lvY3RsKGNzLCBL
-Vk1fU0VUX09ORV9SRUcsICZyKTsNCi0gICAgICAgIGlmIChyZXQpIHsNCisgICAgICAgIGlmIChp
-Z25vcmVfaW52YXJpYW50ICYmIChyZXQgPT0gLUtWTV9FSU5WQVJJQU5UKSkgew0KKyAgICAgICAg
-ICAgIC8qIFVwZGF0ZSBHdWVzdCBpbnZhcmlhbnQgdG8gbWF0Y2ggd2l0aCBtaWdyYXRlZCBob3N0
-IHJlZ3MqLw0KKyAgICAgICAgICAgIHJldCA9IGt2bV92Y3B1X2lvY3RsKGNzLCBLVk1fR0VUX09O
-RV9SRUcsICZyKTsNCisgICAgICAgICAgICBpZiAocmV0KQ0KKyAgICAgICAgICAgICAgICBvayA9
-IGZhbHNlOw0KKyAgICAgICAgICAgIGVsc2UNCisgICAgICAgICAgICAgICAgY3B1LT5jcHJlZ192
-YWx1ZXNbaV0gPSByLmFkZHI7DQorICAgICAgICB9DQorICAgICAgICBlbHNlIGlmIChyZXQpIHsN
-CiAgICAgICAgICAgICAvKiBXZSBtaWdodCBmYWlsIGZvciAidW5rbm93biByZWdpc3RlciIgYW5k
-IGFsc28gZm9yDQogICAgICAgICAgICAgICogInlvdSB0cmllZCB0byBzZXQgYSByZWdpc3RlciB3
-aGljaCBpcyBjb25zdGFudCB3aXRoDQogICAgICAgICAgICAgICogYSBkaWZmZXJlbnQgdmFsdWUg
-ZnJvbSB3aGF0IGl0IGFjdHVhbGx5IGNvbnRhaW5zIi4NCg0KMi4gaWdub3JlX2ludmFyaWFudCBp
-cyB0aGUgZmxhZyBJIHdhcyByZWZlcnJpbmcgdG8gd2hpY2ggaXMgd2hhdCB5b3UgYWxzbw0KbWVu
-dGlvbmVkIG9wdC1pbi4gVGhpcyBjYW4gYmUgc3VwcGxpZWQgYXMgYSBjb21tYW5kIGxpbmUgcGFy
-YW1ldGVyIHRvIHFlbXUgb24gTWFjaGluZSBCLg0KDQpQUzogSSB3aWxsIGFkZCBjb2RlIHRvIHB1
-dCB3YXJuaW5nIGxvZ3MgYXMgc3VnZ2VzdGVkIGJ5IERhdmUuDQoNCi1tYW5pc2gNCg0KDQo+IFRo
-YW5rcywNCj4gZHJldw0KDQo=
+
+--uQr8t48UFsdbeI+V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 05.09.2018 um 13:37 hat Max Reitz geschrieben:
+> On 2018-09-05 12:49, Kevin Wolf wrote:
+> > Am 05.09.2018 um 12:27 hat Max Reitz geschrieben:
+> >> On 2018-09-04 22:32, John Snow wrote:
+> >>>
+> >>>
+> >>> On 09/04/2018 02:46 PM, Jeff Cody wrote:
+> >>>> On Tue, Sep 04, 2018 at 01:09:19PM -0400, John Snow wrote:
+> >>>>> Use the component callbacks; prepare, abort, and clean.
+> >>>>>
+> >>>>> NB: prepare is only called when the job has not yet failed;
+> >>>>> and abort can be called after prepare.
+> >>>>>
+> >>>>> complete -> prepare -> abort -> clean
+> >>>>> complete -> abort -> clean
+> >>>>>
+> >>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+> >>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> >>>>> ---
+> >>>>>  block/commit.c | 90 ++++++++++++++++++++++++++++++++--------------=
+------------
+> >>>>>  1 file changed, 49 insertions(+), 41 deletions(-)
+> >>>>>
+> >>>>> diff --git a/block/commit.c b/block/commit.c
+> >>>>> index b6e8969877..eb3941e545 100644
+> >>>>> --- a/block/commit.c
+> >>>>> +++ b/block/commit.c
+> >>>>> @@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
+> >>>>>      BlockDriverState *commit_top_bs;
+> >>>>>      BlockBackend *top;
+> >>>>>      BlockBackend *base;
+> >>>>> +    BlockDriverState *base_bs;
+> >>>>>      BlockdevOnError on_error;
+> >>>>>      int base_flags;
+> >>>>>      char *backing_file_str;
+> >>>>> @@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBa=
+ckend *bs, BlockBackend *base,
+> >>>>>      return 0;
+> >>>>>  }
+> >>>>> =20
+> >>>>> -static void commit_exit(Job *job)
+> >>>>> +static int commit_prepare(Job *job)
+> >>>>>  {
+> >>>>>      CommitBlockJob *s =3D container_of(job, CommitBlockJob, common=
+=2Ejob);
+> >>>>> -    BlockJob *bjob =3D &s->common;
+> >>>>> -    BlockDriverState *top =3D blk_bs(s->top);
+> >>>>> -    BlockDriverState *base =3D blk_bs(s->base);
+> >>>>> -    BlockDriverState *commit_top_bs =3D s->commit_top_bs;
+> >>>>> -    bool remove_commit_top_bs =3D false;
+> >>>>> -
+> >>>>> -    /* Make sure commit_top_bs and top stay around until bdrv_repl=
+ace_node() */
+> >>>>> -    bdrv_ref(top);
+> >>>>> -    bdrv_ref(commit_top_bs);
+> >>>>> =20
+> >>>>>      /* Remove base node parent that still uses BLK_PERM_WRITE/RESI=
+ZE before
+> >>>>>       * the normal backing chain can be restored. */
+> >>>>>      blk_unref(s->base);
+> >>>>> +    s->base =3D NULL;
+> >>>>> =20
+> >>>>> -    if (!job_is_cancelled(job) && job->ret =3D=3D 0) {
+> >>>>> -        /* success */
+> >>>>> -        job->ret =3D bdrv_drop_intermediate(s->commit_top_bs, base,
+> >>>>> -                                          s->backing_file_str);
+> >>>>> -    } else {
+> >>>>> -        /* XXX Can (or should) we somehow keep 'consistent read' b=
+locked even
+> >>>>> -         * after the failed/cancelled commit job is gone? If we al=
+ready wrote
+> >>>>> -         * something to base, the intermediate images aren't valid=
+ any more. */
+> >>>>> -        remove_commit_top_bs =3D true;
+> >>>>> +    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
+> >>>>> +                                  s->backing_file_str);
+> >>>>> +}
+> >>>>
+> >>>> If we can go from prepare->abort->clean, then that means to me that =
+every
+> >>>> failure case of .prepare() can be resolved without permanent changes=
+ / data
+> >>>> loss.  Is this necessarily the case?
+> >>>>
+> >>>
+> >>> That'd be a requisite to make the job a transaction, but commit, mirr=
+or
+> >>> and stream are not currently transactionable.
+> >>
+> >> Is that already documented anywhere?
+> >>
+> >> (Otherwise I'd be afraid of us forgetting in like a year, asking "Why
+> >> isn't this a transaction already?", just making it one, and then
+> >> remembering half a year later.)
+> >>
+> >>> The way commit already works, for example, can leave the base and
+> >>> intermediate images as unusable as standalone images. This refactoring
+> >>> will not change that alone.
+> >>>
+> >>> So it's not necessarily a problem, but it's something that would need=
+ to
+> >>> be fixed if we ever wanted transaction support.
+> >>>
+> >>> However, in talking on IRC we did realize that this patch does change
+> >>> behavior...
+> >>>
+> >>> Before:
+> >>>
+> >>> If bdrv_drop_intermediate fails, we store the retcode but continue
+> >>> cleaning up as if it didn't fail. i.e., we don't remove the commit jo=
+b's
+> >>> installed top_bs node.
+> >>>
+> >>> After:
+> >>>
+> >>> if bdrv_drop_intermediate fails, we return the failure retcode and
+> >>> .abort gets called as a result, i.e. we will remove the commit job's
+> >>> installed top_bs node in favor of the original top_bs node.
+> >>>
+> >>> I think this behavior is an improvement,
+> >>
+> >> I agree.
+> >>
+> >>> however it raises a question
+> >>> about the nature of failures in bdrv_drop_intermediate.
+> >>>
+> >>> If this function fails without making any changes, the new commit
+> >>> behavior is good. If it succeeds, we're also good. The problem is with
+> >>> intermediate or partial successes.
+> >>>
+> >>> If top has multiple parents (I think under normal circumstances it
+> >>> won't, but I'm not absolutely sure) and it fails to update their back=
+ing
+> >>> file references, it might partially succeed.
+> >>>
+> >>> I think commit's usage here is correct, but I think we might need to
+> >>> update bdrv_drop_intermediate to make it roll back changes if it
+> >>> experiences a partial failure to give all-or-nothing semantics.
+> >>
+> >> Sure, that would be good.
+> >>
+> >>> Thoughts?
+> >>
+> >> We could start by calling bdrv_check_update_perm() on all parents befo=
+re
+> >> doing any changes.  Then the roll back would consist only of invoking
+> >> bdrv_abort_perm_update() and in theory reverting the
+> >> c->update_filename() changes.
+> >>
+> >> In practice...  How do we want to revert c->update_filename()?  There
+> >> currently is no way of getting the old value.  (And just using the old
+> >> child's filename may well be wrong, because the old child might not be
+> >> the one referenced by the image header.)
+> >>
+> >> I have three ideas:
+> >> 1) We could introduce a way of getting the old filename the parent has,
+> >> so we can restore it.
+> >>
+> >> 2) We could make .update_filename() kind of transactionable (seems like
+> >> overkill, but it would be easier in practice, I think).
+> >>
+> >> 3) We basically ignore .update_filename() errors.  We'd still return
+> >> them, but we don't abort the graph change operation.  So after
+> >> bdrv_drop_intermediate() is done, the graph has been changed
+> >> succesfully, or it hasn't changed at all -- whether the filename updat=
+es
+> >> all went through, that's a different story.
+> >>
+> >> #3 would be the simplest solution.  It's a bit stupid, but it would wo=
+rk
+> >> for most problems, I think; at least the callers would know that the
+> >> graph is in exactly one of two well-defined states.
+> >=20
+> > Option 2 sounds nice in theory, but how do you make things
+> > transactionable when they require writing to an image? Either you make
+> > the change or you don't. If you make it and later notice that you
+> > shouldn't have done so, you can try to write the old value back, but
+> > that can fail, too.
+>=20
+> Yes, that's what I mean by "kind of".  It's just #1 with the code moved
+> somewhere else.
+>=20
+> > So making .update_filename() transactionable is probably not feasible.
+> > The choice that is left is whether we update it in .prepare (and
+> > continue with .abort if it fails) or in .commit (and ignore errors).
+>=20
+> My idea was "if we could update it one time, we can probably update it a
+> second time", so reverting in .abort() would usually work.  I know that
+> a "usually" is not a "definitely", so that's the "kind of" again.
+>=20
+> So the abort could still throw an error which we would have to handle
+> like in #3 anyway, I suppose.
+
+The question is whether it's better to have the new filename on-disk
+when the transaction aborted and the graph stays as it was (if reverting
+in .abort fails), or to have the old filename there when the transaction
+succeeded.
+
+Both are confusing, but confusing error cases are a bit more reasonable
+than confusing success cases, so I tend to agree that updating in
+=2Eprepare and reverting in .abort is probably the best we can do.
+
+Kevin
+
+--uQr8t48UFsdbeI+V
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJbj8OmAAoJEH8JsnLIjy/WsWMP/3mI6gwIX8GXb6qdLhgZnrV5
+ZOpdVIa4o0mBBKDsx2fWgidLu/unjSjcD1KfaPkdlvS5eRcF6feUyomM70vtgtA5
+NljLndy/8N60a8+0Lc5jTKSu2aUa/eISIFbfaGqHnUvtF++DKtoLJU9mrSD/u0Kf
+8QGUyGtE5EwZW+3K5ufUv05Vs5poYyKp4ot1vJznPoBBXn0aPzjatl8QgBk0sLtE
+pNQEtDYQOtbwTTyDQlaBmZDXdEHift1I5f0l3UMJFR6t0FYO8Ov3ddlJYsaMMGL/
+JRmWc/VcodlDlVkRpwXXmuhgNgrvnpJFmgDKdQ9TMDLoQkTXk/aZTC0YbLyz4CUV
+EXBvC/Ul1R72JarbEYTU1iG6MBZ4WsFIkHwgTlk5ecEO73Y2ECCO5QMbWN/FWLTj
+GnQfl+LPgSiD/hENA7+D7hcJ+oMhP4lw1VSv6QVb7Lm0V4efWq6PZqNJeLbyQDV5
+W4QdSwOjv11PJI5k/vGkNZmMxpuN5HpbErDzp3S9ayG+P0Lq2J+27l2q0acyy0x4
+xlMdET9a4SHMxp6lLzCCJORhTCHVE9DitaNBGjKycYWKqcdBI9sJMLTH0hakCV1j
+TkKqdew0TjCfxcg8D1bUDgF6T992SxCUGMueyUX7ObZ84fdqEFbuN9LwFJSq+ZnD
+fStBvO3zD/lXOinOKKZW
+=SZT9
+-----END PGP SIGNATURE-----
+
+--uQr8t48UFsdbeI+V--
