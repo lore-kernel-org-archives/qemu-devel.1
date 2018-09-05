@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1fxdHE-0006Ui-NI
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:15:46 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fxdrZ-0002od-S5
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:53:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1fxdHB-000860-Ht
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:15:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43578)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1fxdHB-00084I-7b
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:15:41 -0400
-From: Wei Huang <wei@redhat.com>
-Date: Wed,  5 Sep 2018 15:15:32 -0400
-Message-Id: <1536174934-26022-3-git-send-email-wei@redhat.com>
-In-Reply-To: <1536174934-26022-1-git-send-email-wei@redhat.com>
-References: <1536174934-26022-1-git-send-email-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V9 2/4] tests/migration: Support cross
- compilation in generating boot header file
+	(envelope-from <mlureau@redhat.com>) id 1fxdjn-00089T-SY
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:45:20 -0400
+Received: from mail-it0-f65.google.com ([209.85.214.65]:55784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fxdjn-00087R-My
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 15:45:15 -0400
+Received: by mail-it0-f65.google.com with SMTP id d10-v6so11573264itj.5
+	for <qemu-devel@nongnu.org>; Wed, 05 Sep 2018 12:45:15 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAMxuvaxj5eJ8MvkNfvwMVMQaZ-E09yomP-amLZz=aPBH+AWK9g@mail.gmail.com>
+References: <20180905082919.6986-1-marcandre.lureau@redhat.com>
+	<87va7k9nvc.fsf@trasno.org>
+	<CAMxuvaxj5eJ8MvkNfvwMVMQaZ-E09yomP-amLZz=aPBH+AWK9g@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 5 Sep 2018 21:45:13 +0200
+Message-ID: <CAMxuvaxFngPfeYt-RT2FoPhhsqkV2tTaT_O7rRsC91jVaSTnuQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] memory: size can be different from ptr_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,169 +30,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, lvivier@redhat.com, drjones@redhat.com, dgilbert@redhat.com, quintela@redhat.com, wei@redhat.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Recently a new configure option, CROSS_CC_GUEST, was added to
-$(TARGET)-softmmu/config-target.mak to support TCG-related tests. This
-patch tries to leverage this option to support cross compilation when the
-migration boot block file is being re-generated:
+Hi
 
- * The x86 related files are moved to a new sub-dir (named ./i386).
- * A new top-layer Makefile is created in tests/migration/ directory.
-   This Makefile searches and parses CROSS_CC_GUEST to generate CROSS_PREFIX.
-   The CROSS_PREFIX, if available, is then passed to migration/$ARCH/Makefile.
+On Wed, Sep 5, 2018 at 7:51 PM, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+> Hi
+>
+> On Wed, Sep 5, 2018 at 1:37 PM, Juan Quintela <quintela@redhat.com> wrote=
+:
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>>> memory_region_init_ram*_ptr() take only the size of the MemoryRegion,
+>>> and allocate a RAMBlock with the same size. However, it may be
+>>> convenient to expose a smaller MemoryRegion (for ex: a few bytes) than
+>>> the RAMBlock (which must be a multiple of TARGET_PAGE_SIZE).
+>>>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> ---
+>>>  include/exec/memory.h  |  8 ++++++--
+>>>  exec.c                 |  3 +++
+>>>  hw/display/g364fb.c    |  2 +-
+>>>  hw/vfio/common.c       |  3 ++-
+>>>  hw/virtio/vhost-user.c |  2 +-
+>>>  memory.c               | 10 ++++++----
+>>>  6 files changed, 19 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>>> index eb4f2fb249..03f257829b 100644
+>>> --- a/include/exec/memory.h
+>>> +++ b/include/exec/memory.h
+>>> @@ -700,6 +700,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *m=
+r,
+>>>   *        must be unique within any device
+>>>   * @size: size of the region.
+>>>   * @ptr: memory to be mapped; must contain at least @size bytes.
+>>                                                        ^^^^^
+>>
+>> this comment gets wrong with your patches
+>
+> why? it must contain at least @size (And preferrably exactly @ptr_size)
+>
+>
+>>
+>>> + * @ptr_size: size of @ptr buffer
+>>
+>>> diff --git a/exec.c b/exec.c
+>>> index 6826c8337d..fcea614e79 100644
+>>> --- a/exec.c
+>>> +++ b/exec.c
+>>> @@ -2361,6 +2361,9 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size=
+, ram_addr_t max_size,
+>>>  RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
+>>>                                     MemoryRegion *mr, Error **errp)
+>>>  {
+>>> +    assert(size >=3D TARGET_PAGE_SIZE);
+>>> +    assert(size % TARGET_PAGE_SIZE =3D=3D 0);
+>>> +
+>>>      return qemu_ram_alloc_internal(size, size, NULL, host, false,
+>>>                                     false, mr, errp);
+>>>  }
+>>
+>> ok with this bit.
+>>
+>> But how about to change instead to:
+>>
+>> void memory_region_init_ram_ptr(MemoryRegion *mr,
+>>                                 Object *owner,
+>>                                 const char *name,
+>>                                 uint64_t size,
+>>                                 void *ptr)
+>> {
+>>     uint64_t real_size =3D ROUND_UP_TARGET_PAGE_SIZE(size);
+>>     memory_region_init(mr, owner, name, real_size);
+>>     mr->ram =3D true;
+>>     mr->terminates =3D true;
+>>     mr->destructor =3D memory_region_destructor_ram;
+>>     mr->dirty_log_mask =3D tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>>
+>>     /* qemu_ram_alloc_from_ptr cannot fail with ptr !=3D NULL.  */
+>>     assert(ptr !=3D NULL);
+>>     mr->ram_block =3D qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fata=
+l);
+>> }
+>>
+>> For a suitable ROUND_UP_TARGET_PAGE_SIZE() macro.  You get the idea.
+>>
+>> And memory_region_device_ram_ptr() don't even need a change.
+>> We need to adjust the comments, but it looks like an easier patch to me,=
+ no?
+>
+> That's a good suggestion, it puts a bit more responsability into
+> caller side, put that's fair.
+>
+>>
+>>> diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
+>>> index fbc2b2422d..f4f5643761 100644
+>>> --- a/hw/display/g364fb.c
+>>> +++ b/hw/display/g364fb.c
+>>> @@ -475,7 +475,7 @@ static void g364fb_init(DeviceState *dev, G364State=
+ *s)
+>>>
+>>>      memory_region_init_io(&s->mem_ctrl, NULL, &g364fb_ctrl_ops, s, "ct=
+rl", 0x180000);
+>>>      memory_region_init_ram_ptr(&s->mem_vram, NULL, "vram",
+>>> -                               s->vram_size, s->vram);
+>>> +                               s->vram_size, s->vram, s->vram_size);
+>>
+>> Having to change all the devices that use the function with exactly the
+>> same parameter looks weird to me.
+>>
+>> What do you think?
+>
+> I'll update the patch, thanks
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Wei Huang <wei@redhat.com>
----
- tests/migration-test.c                             |  2 +-
- tests/migration/Makefile                           | 44 ++++++++++++----------
- tests/migration/i386/Makefile                      | 22 +++++++++++
- .../{x86-a-b-bootblock.S => i386/a-b-bootblock.S}  |  4 --
- .../{x86-a-b-bootblock.h => i386/a-b-bootblock.h}  |  8 ++--
- 5 files changed, 51 insertions(+), 29 deletions(-)
- create mode 100644 tests/migration/i386/Makefile
- rename tests/migration/{x86-a-b-bootblock.S => i386/a-b-bootblock.S} (93%)
- rename tests/migration/{x86-a-b-bootblock.h => i386/a-b-bootblock.h} (92%)
+Actually the patch is a bit pointless, since qemu_ram_alloc_internal()
+already HOST_PAGE_ALIGN(size). And host page is supposed to be larger
+than target page. So, I can simply over-allocate the ram ptr/device
+buffer in the TPM PPI patch.
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 0e687b7..fe6b41a 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -83,7 +83,7 @@ static const char *tmpfs;
- /* A simple PC boot sector that modifies memory (1-100MB) quickly
-  * outputting a 'B' every so often if it's still running.
-  */
--#include "tests/migration/x86-a-b-bootblock.h"
-+#include "tests/migration/i386/a-b-bootblock.h"
- 
- static void init_bootfile_x86(const char *bootpath)
- {
-diff --git a/tests/migration/Makefile b/tests/migration/Makefile
-index c0824b4..a9ed875 100644
---- a/tests/migration/Makefile
-+++ b/tests/migration/Makefile
-@@ -1,31 +1,35 @@
--# To specify cross compiler prefix, use CROSS_PREFIX=
--#   $ make CROSS_PREFIX=x86_64-linux-gnu-
-+#
-+# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
-+#
-+
-+TARGET_LIST = i386
-+
-+SRC_PATH = ../..
- 
- override define __note
--/* This file is automatically generated from
-- * tests/migration/x86-a-b-bootblock.S, edit that and then run
-- * tests/migration/rebuild-x86-bootblock.sh to update,
-- * and then remember to send both in your patch submission.
-+/* This file is automatically generated from the assembly file in
-+ * tests/migration/$@. Edit that file and then run "make all"
-+ * inside tests/migration to update, and then remember to send both
-+ * the header and the assembler differences in your patch submission.
-  */
- endef
- export __note
- 
--.PHONY: all clean
--all: x86-a-b-bootblock.h
--
--x86-a-b-bootblock.h: x86.bootsect
--	echo "$$__note" > header.tmp
--	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
--	mv header.tmp $@
-+find-arch-cross-cc = $(lastword $(shell grep -h "CROSS_CC_GUEST=" $(wildcard $(SRC_PATH)/$(patsubst i386,*86*,$(1))-softmmu/config-target.mak)))
-+parse-cross-prefix = $(subst gcc,,$(patsubst cc,gcc,$(patsubst CROSS_CC_GUEST="%",%,$(call find-arch-cross-cc,$(1)))))
-+gen-cross-prefix = $(patsubst %-,CROSS_PREFIX=%-,$(call parse-cross-prefix,$(1)))
- 
--x86.bootsect: x86.boot
--	dd if=$< of=$@ bs=256 count=2 skip=124
-+.PHONY: all $(TARGET_LIST)
- 
--x86.boot: x86.o
--	$(CROSS_PREFIX)objcopy -O binary $< $@
-+all: $(TARGET_LIST)
- 
--x86.o: x86-a-b-bootblock.S
--	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
-+$(TARGET_LIST):
-+	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
- 
- clean:
--	@rm -rf *.boot *.o *.bootsect
-+	for target in $(TARGET_LIST); do \
-+		$(MAKE) -C $$target clean; \
-+	done
-diff --git a/tests/migration/i386/Makefile b/tests/migration/i386/Makefile
-new file mode 100644
-index 0000000..5c03241
---- /dev/null
-+++ b/tests/migration/i386/Makefile
-@@ -0,0 +1,22 @@
-+# To specify cross compiler prefix, use CROSS_PREFIX=
-+#   $ make CROSS_PREFIX=x86_64-linux-gnu-
-+
-+.PHONY: all clean
-+all: a-b-bootblock.h
-+
-+a-b-bootblock.h: x86.bootsect
-+	echo "$$__note" > header.tmp
-+	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
-+	mv header.tmp $@
-+
-+x86.bootsect: x86.boot
-+	dd if=$< of=$@ bs=256 count=2 skip=124
-+
-+x86.boot: x86.o
-+	$(CROSS_PREFIX)objcopy -O binary $< $@
-+
-+x86.o: a-b-bootblock.S
-+	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
-+
-+clean:
-+	@rm -rf *.boot *.o *.bootsect
-diff --git a/tests/migration/x86-a-b-bootblock.S b/tests/migration/i386/a-b-bootblock.S
-similarity index 93%
-rename from tests/migration/x86-a-b-bootblock.S
-rename to tests/migration/i386/a-b-bootblock.S
-index b164264..3f97f28 100644
---- a/tests/migration/x86-a-b-bootblock.S
-+++ b/tests/migration/i386/a-b-bootblock.S
-@@ -3,10 +3,6 @@
- #  range.
- #  Outputs an initial 'A' on serial followed by repeated 'B's
- #
--# run   tests/migration/rebuild-x86-bootblock.sh
--#   to regenerate the hex, and remember to include both the .h and .s
--#   in any patches.
--#
- # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
- # This work is licensed under the terms of the GNU GPL, version 2 or later.
- # See the COPYING file in the top-level directory.
-diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/i386/a-b-bootblock.h
-similarity index 92%
-rename from tests/migration/x86-a-b-bootblock.h
-rename to tests/migration/i386/a-b-bootblock.h
-index 78a151f..7d459d4 100644
---- a/tests/migration/x86-a-b-bootblock.h
-+++ b/tests/migration/i386/a-b-bootblock.h
-@@ -1,7 +1,7 @@
--/* This file is automatically generated from
-- * tests/migration/x86-a-b-bootblock.s, edit that and then run
-- * tests/migration/rebuild-x86-bootblock.sh to update,
-- * and then remember to send both in your patch submission.
-+/* This file is automatically generated from the assembly file in
-+ * tests/migration/i386. Edit that file and then run "make all"
-+ * inside tests/migration to update, and then remember to send both
-+ * the header and the assembler differences in your patch submission.
-  */
- unsigned char x86_bootsect[] = {
-   0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
--- 
-1.8.3.1
+thanks
