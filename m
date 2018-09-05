@@ -1,39 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Manish.Jaggi@cavium.com>) id 1fxX8Q-0005aW-Li
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:42:15 -0400
+	(envelope-from <berto@igalia.com>) id 1fxX96-0007Lo-8y
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:43:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Manish.Jaggi@cavium.com>) id 1fxX8L-00012I-K0
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:42:14 -0400
-Received: from mail-by2nam01on0043.outbound.protection.outlook.com
-	([104.47.34.43]:17872
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Manish.Jaggi@cavium.com>)
-	id 1fxX8L-00011h-3w
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:42:09 -0400
-From: "Jaggi, Manish" <Manish.Jaggi@cavium.com>
-Date: Wed, 5 Sep 2018 12:42:05 +0000
-Message-ID: <9418075A-CF3E-4C04-8751-3E1CD7BF534B@caviumnetworks.com>
-References: <87k1ohxik4.fsf@trasno.org>
-	<3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
-	<20180828172739.GA10175@work-vm>
-	<19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
-	<20180829131653.gk4yhjdi2pk5bdcd@kamzik.brq.redhat.com>
-	<DC466FE6-98B4-485B-BE4D-C4E228B36107@caviumnetworks.com>
-	<20180831111121.n7zafn6peiwe6ojn@kamzik.brq.redhat.com>
-	<1604D594-E6D4-48BB-A270-F7CF1092978B@caviumnetworks.com>
-	<20180904095402.izdnqag3xak3mgsb@kamzik.brq.redhat.com>
-	<EF2DEC36-DDCB-4169-A30F-15F29B7F52E9@caviumnetworks.com>
-	<20180905122021.dfsvsvk6zn2ijefp@kamzik.brq.redhat.com>
-In-Reply-To: <20180905122021.dfsvsvk6zn2ijefp@kamzik.brq.redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <000C03E2E85BB24690BAE3C6D4D6C463@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berto@igalia.com>) id 1fxX94-0001oQ-6k
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:42:56 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180809213528.14738-23-mreitz@redhat.com>
+References: <20180809213528.14738-1-mreitz@redhat.com>
+	<20180809213528.14738-23-mreitz@redhat.com>
+Date: Wed, 05 Sep 2018 14:42:40 +0200
+Message-ID: <w51efe8t8sf.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
- different processor ids
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 22/31] block: Add
+ BlockDriver.bdrv_gather_child_options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,69 +23,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Auger Eric <eric.auger@redhat.com>, "peter.maydell@linaro.org
-	qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-DQoNCj4gT24gMDUtU2VwLTIwMTgsIGF0IDU6NTAgUE0sIEFuZHJldyBKb25lcyA8ZHJqb25lc0By
-ZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IEV4dGVybmFsIEVtYWlsDQo+IA0KPiBPbiBXZWQsIFNl
-cCAwNSwgMjAxOCBhdCAxMTo0NjoxMUFNICswMDAwLCBKYWdnaSwgTWFuaXNoIHdyb3RlOg0KPj4g
-KGEpIENoYW5nZXMgaW4gS1ZNOg0KPj4gDQo+PiAtIEludHJvZHVjaW5nIGEgc3BlY2lmaWMgZXJy
-b3IgY29kZSAoS1ZNX0VJTlZBUklBTlQpIGluIGNhc2Ugb2YgaW52YXJpYW50IHdyaXRlcy4NCj4+
-IFRoaXMgc2hvdWxkIG5vdCBjaGFuZ2UgYW55dGhpbmcgdG8gQVBJIFNFVF9PTkVfUkVHIEtWTSBB
-UEkuDQo+PiBOb3Qgc3VyZSB3aGljaCBpcyB0aGUgYmVzdCBwbGFjZSB0byBwdXQgdGhlIGRlZmlu
-ZeKApg0KPj4gSSBoYXZlIGFkZGVkIGluIGluY2x1ZGUvdWFwaS9saW51eC9rdm1fcGFyYS5oLg0K
-Pj4gDQo+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYyBiL2FyY2gvYXJt
-NjQva3ZtL3N5c19yZWdzLmMNCj4+IGluZGV4IDIyZmJiZGJlY2UzYy4uYzhhNGZiZThhOGJiIDEw
-MDY0NA0KPj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYw0KPj4gKysrIGIvYXJjaC9h
-cm02NC9rdm0vc3lzX3JlZ3MuYw0KPj4gQEAgLTExMTEsNyArMTExMSw3IEBAIHN0YXRpYyBpbnQg
-X19zZXRfaWRfcmVnKGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLCB2b2lkIF9fdXNlciAq
-dWFkZHIsDQo+PiANCj4+ICAgICAgICAvKiBUaGlzIGlzIHdoYXQgd2UgbWVhbiBieSBpbnZhcmlh
-bnQ6IHlvdSBjYW4ndCBjaGFuZ2UgaXQuICovDQo+PiAgICAgICAgaWYgKHZhbCAhPSByZWFkX2lk
-X3JlZyhyZCwgcmF6KSkNCj4+IC0gICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4+ICsg
-ICAgICAgICAgICAgICByZXR1cm4gLUtWTV9FSU5WQVJJQU5UOw0KPj4gDQo+PiAgICAgICAgcmV0
-dXJuIDA7DQo+PiB9DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bV9wYXJh
-LmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtX3BhcmEuaA0KPj4gaW5kZXggNmMwY2U0OTkzMWU1
-Li4zYTQ5YTMyMWQwZGYgMTAwNjQ0DQo+PiAtLS0gYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtX3Bh
-cmEuaA0KPj4gKysrIGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bV9wYXJhLmgNCj4+IEBAIC0xNyw2
-ICsxNyw3IEBADQo+PiAjZGVmaW5lIEtWTV9FMkJJRyAgICAgICAgICAgICAgRTJCSUcNCj4+ICNk
-ZWZpbmUgS1ZNX0VQRVJNICAgICAgICAgICAgICBFUEVSTQ0KPj4gI2RlZmluZSBLVk1fRU9QTk9U
-U1VQUCAgICAgICAgIDk1DQo+PiArI2RlZmluZSBLVk1fRUlOVkFSSUFOVCAgICAgICAgICA5Ng0K
-Pj4gDQo+PiAjZGVmaW5lIEtWTV9IQ19WQVBJQ19QT0xMX0lSUSAgICAgICAgICAxDQo+PiAjZGVm
-aW5lIEtWTV9IQ19NTVVfT1AgICAgICAgICAgICAgICAgICAyDQo+PiANCj4+IChiKSBDaGFuZ2Vz
-IGluIFFlbXUgY29kZQ0KPj4gDQo+PiAxLiBIYW5kbGluZyBvZiBuZXcgZXJyb3IgY29kZSwgd2hp
-Y2ggd291bGQgdXBkYXRlDQo+PiBndWVzdCBzdGF0ZSB3aXRoIGhvc3RzIGludmFyaWFudCByZWcg
-dmFsdWVzLg0KPj4gDQo+PiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2FybS9rdm0uYyBiL3RhcmdldC9h
-cm0va3ZtLmMNCj4+IGluZGV4IDY1Zjg2N2Q1NjkuLjBjZjE0MzIzYTIgMTAwNjQ0DQo+PiAtLS0g
-YS90YXJnZXQvYXJtL2t2bS5jDQo+PiArKysgYi90YXJnZXQvYXJtL2t2bS5jDQo+PiBAQCAtNDUy
-LDcgKzQ1MiwxNSBAQCBib29sIHdyaXRlX2xpc3RfdG9fa3Ztc3RhdGUoQVJNQ1BVICpjcHUsIGlu
-dCBsZXZlbCkNCj4+ICAgICAgICAgICAgIGFib3J0KCk7DQo+PiAgICAgICAgIH0NCj4+ICAgICAg
-ICAgcmV0ID0ga3ZtX3ZjcHVfaW9jdGwoY3MsIEtWTV9TRVRfT05FX1JFRywgJnIpOw0KPj4gLSAg
-ICAgICAgaWYgKHJldCkgew0KPj4gKyAgICAgICAgaWYgKGlnbm9yZV9pbnZhcmlhbnQgJiYgKHJl
-dCA9PSAtS1ZNX0VJTlZBUklBTlQpKSB7DQo+PiArICAgICAgICAgICAgLyogVXBkYXRlIEd1ZXN0
-IGludmFyaWFudCB0byBtYXRjaCB3aXRoIG1pZ3JhdGVkIGhvc3QgcmVncyovDQo+PiArICAgICAg
-ICAgICAgcmV0ID0ga3ZtX3ZjcHVfaW9jdGwoY3MsIEtWTV9HRVRfT05FX1JFRywgJnIpOw0KPj4g
-KyAgICAgICAgICAgIGlmIChyZXQpDQo+PiArICAgICAgICAgICAgICAgIG9rID0gZmFsc2U7DQo+
-PiArICAgICAgICAgICAgZWxzZQ0KPj4gKyAgICAgICAgICAgICAgICBjcHUtPmNwcmVnX3ZhbHVl
-c1tpXSA9IHIuYWRkcjsNCj4+ICsgICAgICAgIH0NCj4+ICsgICAgICAgIGVsc2UgaWYgKHJldCkg
-ew0KPj4gICAgICAgICAgICAgLyogV2UgbWlnaHQgZmFpbCBmb3IgInVua25vd24gcmVnaXN0ZXIi
-IGFuZCBhbHNvIGZvcg0KPj4gICAgICAgICAgICAgICogInlvdSB0cmllZCB0byBzZXQgYSByZWdp
-c3RlciB3aGljaCBpcyBjb25zdGFudCB3aXRoDQo+PiAgICAgICAgICAgICAgKiBhIGRpZmZlcmVu
-dCB2YWx1ZSBmcm9tIHdoYXQgaXQgYWN0dWFsbHkgY29udGFpbnMiLg0KPj4gDQo+PiAyLiBpZ25v
-cmVfaW52YXJpYW50IGlzIHRoZSBmbGFnIEkgd2FzIHJlZmVycmluZyB0byB3aGljaCBpcyB3aGF0
-IHlvdSBhbHNvDQo+PiBtZW50aW9uZWQgb3B0LWluLiBUaGlzIGNhbiBiZSBzdXBwbGllZCBhcyBh
-IGNvbW1hbmQgbGluZSBwYXJhbWV0ZXIgdG8gcWVtdSBvbiBNYWNoaW5lIEIuDQo+IA0KPiBUaGUg
-c2FtZSBsaWJ2aXJ0IGZvbGsgYWxzbyBzdWdnZXN0IHRoYXQgYSBRTVAgY29tbWFuZCBiZSBwcm92
-aWRlZCB0aGF0DQo+IGFsbG93cyB0aGUgc2VsZWN0aW9uIG9mIHRoaXMgaWdub3JlLWludmFyaWFu
-dCBtb2RlIChpbiBhZGRpdGlvbiB0byBvcg0KPiBpbnN0ZWFkIG9mIHRoZSBjb21tYW5kIGxpbmUg
-cGFyYW1ldGVyLikgT3RoZXJ3aXNlIGEgZ3Vlc3QgdGhhdCBoYXMNCj4gYWxyZWFkeSBzdGFydGVk
-IHdpdGhvdXQgdGhlIHBhcmFtZXRlciB3aWxsIG5vdCBiZSBhYmxlIHRvIG1pZ3JhdGUgdG8NCj4g
-YSAiY2xvc2UgZW5vdWdo4oCdIGhvc3QNCg0KaWdub3JlX2ludmFyaWFudDogVGhpcyBjYW4gYmUg
-c3VwcGxpZWQgYXMgYSBjb21tYW5kIGxpbmUgcGFyYW1ldGVyIHRvIHFlbXUgb24gTWFjaGluZSBC
-Lg0KTWFjaGluZSBBIFZNIGhhcyB0byBiZSBtaWdyYXRlZCB0byBCLg0KDQo+IC0gZXZlbiBpZiBp
-dCdzIGRlY2lkZWQgbGF0ZXIgdGhhdCBpdCB3b3VsZCBiZSBPSw0KPiB0byBkbyBzby4NCj4gDQo+
-PiANCj4+IFBTOiBJIHdpbGwgYWRkIGNvZGUgdG8gcHV0IHdhcm5pbmcgbG9ncyBhcyBzdWdnZXN0
-ZWQgYnkgRGF2ZS4NCj4gDQo+IFllYWgsIEkgbGlrZSB0aGF0IGlkZWEgdG9vLg0KPiANCj4gVGhp
-cyBhcHByb2FjaCBsb29rcyBnb29kIHRvIG1lLiBMZXQncyBzZWUgd2hhdCBtYWludGFpbmVycyBz
-YXkgd2hlbiB0aGV5DQo+IHNlZSB0aGUgcGF0Y2ggc3VibWlzc2lvbi4NCg0KQ29vbC4gVGhhbmtz
-Lg0KPiANCj4gVGhhbmtzLA0KPiBkcmV3DQoNCg==
+On Thu 09 Aug 2018 11:35:19 PM CEST, Max Reitz wrote:
+> Some follow-up patches will rework the way bs->full_open_options is
+> refreshed in bdrv_refresh_filename(). The new implementation will remove
+> the need for the block drivers' bdrv_refresh_filename() implementations
+> to set bs->full_open_options; instead, it will be generic and use static
+> information from each block driver.
+>
+> However, by implementing bdrv_gather_child_options(), block drivers will
+> still be able to override the way the full_open_options of their
+> children are incorporated into their own.
+>
+> We need to implement this function for VMDK because we have to prevent
+> the generic implementation from gathering the options of all children:
+> It is not possible to specify options for the extents through the
+> runtime options.
+>
+> For quorum, the child names that would be used by the generic
+> implementation and the ones that we actually (currently) want to use
+> differ. See quorum_gather_child_options() for more information.
+>
+> Note that both of these are cases which are not ideal: In case of VMDK
+> it would probably be nice to be able to specify options for all extents.
+> In case of quorum, the current runtime option structure is simply broken
+> and needs to be fixed (but that is left for another patch).
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
