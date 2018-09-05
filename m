@@ -1,26 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fxW8Q-00051y-HZ
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:38:11 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fxWFL-00080h-4D
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:45:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fxW8N-0001nn-Bf
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:38:10 -0400
-References: <20180904170930.28619-1-jsnow@redhat.com>
-	<20180904170930.28619-5-jsnow@redhat.com>
-	<20180904184620.GI415265@localhost.localdomain>
-	<63e2cd53-a4cb-3ed7-ae70-f49b4e11fad5@redhat.com>
-	<57dc1c6c-29bd-f134-646f-15139df7f4f4@redhat.com>
-	<20180905104941.GB4489@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <78038681-9981-ce9f-e0ba-82c43c31e98d@redhat.com>
-Date: Wed, 5 Sep 2018 13:37:56 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fxWFH-00037w-SX
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:45:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38546 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fxWFH-00035F-Lw
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:45:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 698148576C
+	for <qemu-devel@nongnu.org>; Wed,  5 Sep 2018 11:45:14 +0000 (UTC)
+Date: Wed, 5 Sep 2018 12:45:07 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180905114506.GB2625@work-vm>
+References: <20180903043149.4076-1-peterx@redhat.com>
+	<20180903043149.4076-5-peterx@redhat.com>
+	<87a7oz9g1y.fsf@dusky.pond.sub.org> <20180903101606.GB14774@xz-x1>
+	<87k1o2671t.fsf@dusky.pond.sub.org>
+	<55829207-b0f7-0869-6ec7-90bc2fb67e3a@redhat.com>
+	<20180903144116.GH14377@redhat.com>
+	<87y3chydeo.fsf@dusky.pond.sub.org>
+	<20180904082301.GB22349@redhat.com>
+	<87k1o1v61u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180905104941.GB4489@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XazvUfEtwlPa6dv2XAKK3Y0f34rmYev4g"
-Subject: Re: [Qemu-devel] [PATCH v4 04/15] block/commit: refactor commit to
- use job callbacks
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87k1o1v61u.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 4/7] qapi: remove COMMAND_DROPPED event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,248 +41,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XazvUfEtwlPa6dv2XAKK3Y0f34rmYev4g
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Message-ID: <78038681-9981-ce9f-e0ba-82c43c31e98d@redhat.com>
-Subject: Re: [PATCH v4 04/15] block/commit: refactor commit to use job
- callbacks
-References: <20180904170930.28619-1-jsnow@redhat.com>
- <20180904170930.28619-5-jsnow@redhat.com>
- <20180904184620.GI415265@localhost.localdomain>
- <63e2cd53-a4cb-3ed7-ae70-f49b4e11fad5@redhat.com>
- <57dc1c6c-29bd-f134-646f-15139df7f4f4@redhat.com>
- <20180905104941.GB4489@localhost.localdomain>
-In-Reply-To: <20180905104941.GB4489@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-09-05 12:49, Kevin Wolf wrote:
-> Am 05.09.2018 um 12:27 hat Max Reitz geschrieben:
->> On 2018-09-04 22:32, John Snow wrote:
->>>
->>>
->>> On 09/04/2018 02:46 PM, Jeff Cody wrote:
->>>> On Tue, Sep 04, 2018 at 01:09:19PM -0400, John Snow wrote:
->>>>> Use the component callbacks; prepare, abort, and clean.
->>>>>
->>>>> NB: prepare is only called when the job has not yet failed;
->>>>> and abort can be called after prepare.
->>>>>
->>>>> complete -> prepare -> abort -> clean
->>>>> complete -> abort -> clean
->>>>>
->>>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>>> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>>>> ---
->>>>>  block/commit.c | 90 ++++++++++++++++++++++++++++++++--------------=
-------------
->>>>>  1 file changed, 49 insertions(+), 41 deletions(-)
->>>>>
->>>>> diff --git a/block/commit.c b/block/commit.c
->>>>> index b6e8969877..eb3941e545 100644
->>>>> --- a/block/commit.c
->>>>> +++ b/block/commit.c
->>>>> @@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
->>>>>      BlockDriverState *commit_top_bs;
->>>>>      BlockBackend *top;
->>>>>      BlockBackend *base;
->>>>> +    BlockDriverState *base_bs;
->>>>>      BlockdevOnError on_error;
->>>>>      int base_flags;
->>>>>      char *backing_file_str;
->>>>> @@ -68,61 +69,65 @@ static int coroutine_fn commit_populate(BlockBa=
-ckend *bs, BlockBackend *base,
->>>>>      return 0;
->>>>>  }
->>>>> =20
->>>>> -static void commit_exit(Job *job)
->>>>> +static int commit_prepare(Job *job)
->>>>>  {
->>>>>      CommitBlockJob *s =3D container_of(job, CommitBlockJob, common=
-=2Ejob);
->>>>> -    BlockJob *bjob =3D &s->common;
->>>>> -    BlockDriverState *top =3D blk_bs(s->top);
->>>>> -    BlockDriverState *base =3D blk_bs(s->base);
->>>>> -    BlockDriverState *commit_top_bs =3D s->commit_top_bs;
->>>>> -    bool remove_commit_top_bs =3D false;
->>>>> -
->>>>> -    /* Make sure commit_top_bs and top stay around until bdrv_repl=
-ace_node() */
->>>>> -    bdrv_ref(top);
->>>>> -    bdrv_ref(commit_top_bs);
->>>>> =20
->>>>>      /* Remove base node parent that still uses BLK_PERM_WRITE/RESI=
-ZE before
->>>>>       * the normal backing chain can be restored. */
->>>>>      blk_unref(s->base);
->>>>> +    s->base =3D NULL;
->>>>> =20
->>>>> -    if (!job_is_cancelled(job) && job->ret =3D=3D 0) {
->>>>> -        /* success */
->>>>> -        job->ret =3D bdrv_drop_intermediate(s->commit_top_bs, base=
-,
->>>>> -                                          s->backing_file_str);
->>>>> -    } else {
->>>>> -        /* XXX Can (or should) we somehow keep 'consistent read' b=
-locked even
->>>>> -         * after the failed/cancelled commit job is gone? If we al=
-ready wrote
->>>>> -         * something to base, the intermediate images aren't valid=
- any more. */
->>>>> -        remove_commit_top_bs =3D true;
->>>>> +    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
->>>>> +                                  s->backing_file_str);
->>>>> +}
->>>>
->>>> If we can go from prepare->abort->clean, then that means to me that =
-every
->>>> failure case of .prepare() can be resolved without permanent changes=
- / data
->>>> loss.  Is this necessarily the case?
->>>>
->>>
->>> That'd be a requisite to make the job a transaction, but commit, mirr=
-or
->>> and stream are not currently transactionable.
->>
->> Is that already documented anywhere?
->>
->> (Otherwise I'd be afraid of us forgetting in like a year, asking "Why
->> isn't this a transaction already?", just making it one, and then
->> remembering half a year later.)
->>
->>> The way commit already works, for example, can leave the base and
->>> intermediate images as unusable as standalone images. This refactorin=
-g
->>> will not change that alone.
->>>
->>> So it's not necessarily a problem, but it's something that would need=
- to
->>> be fixed if we ever wanted transaction support.
->>>
->>> However, in talking on IRC we did realize that this patch does change=
-
->>> behavior...
->>>
->>> Before:
->>>
->>> If bdrv_drop_intermediate fails, we store the retcode but continue
->>> cleaning up as if it didn't fail. i.e., we don't remove the commit jo=
-b's
->>> installed top_bs node.
->>>
->>> After:
->>>
->>> if bdrv_drop_intermediate fails, we return the failure retcode and
->>> .abort gets called as a result, i.e. we will remove the commit job's
->>> installed top_bs node in favor of the original top_bs node.
->>>
->>> I think this behavior is an improvement,
->>
->> I agree.
->>
->>> however it raises a question
->>> about the nature of failures in bdrv_drop_intermediate.
->>>
->>> If this function fails without making any changes, the new commit
->>> behavior is good. If it succeeds, we're also good. The problem is wit=
-h
->>> intermediate or partial successes.
->>>
->>> If top has multiple parents (I think under normal circumstances it
->>> won't, but I'm not absolutely sure) and it fails to update their back=
-ing
->>> file references, it might partially succeed.
->>>
->>> I think commit's usage here is correct, but I think we might need to
->>> update bdrv_drop_intermediate to make it roll back changes if it
->>> experiences a partial failure to give all-or-nothing semantics.
->>
->> Sure, that would be good.
->>
->>> Thoughts?
->>
->> We could start by calling bdrv_check_update_perm() on all parents befo=
-re
->> doing any changes.  Then the roll back would consist only of invoking
->> bdrv_abort_perm_update() and in theory reverting the
->> c->update_filename() changes.
->>
->> In practice...  How do we want to revert c->update_filename()?  There
->> currently is no way of getting the old value.  (And just using the old=
-
->> child's filename may well be wrong, because the old child might not be=
-
->> the one referenced by the image header.)
->>
->> I have three ideas:
->> 1) We could introduce a way of getting the old filename the parent has=
-,
->> so we can restore it.
->>
->> 2) We could make .update_filename() kind of transactionable (seems lik=
-e
->> overkill, but it would be easier in practice, I think).
->>
->> 3) We basically ignore .update_filename() errors.  We'd still return
->> them, but we don't abort the graph change operation.  So after
->> bdrv_drop_intermediate() is done, the graph has been changed
->> succesfully, or it hasn't changed at all -- whether the filename updat=
-es
->> all went through, that's a different story.
->>
->> #3 would be the simplest solution.  It's a bit stupid, but it would wo=
-rk
->> for most problems, I think; at least the callers would know that the
->> graph is in exactly one of two well-defined states.
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Daniel P. Berrang=E9 <berrange@redhat.com> writes:
 >=20
-> Option 2 sounds nice in theory, but how do you make things
-> transactionable when they require writing to an image? Either you make
-> the change or you don't. If you make it and later notice that you
-> shouldn't have done so, you can try to write the old value back, but
-> that can fail, too.
+> > On Tue, Sep 04, 2018 at 08:39:27AM +0200, Markus Armbruster wrote:
+> >> Daniel P. Berrang=E9 <berrange@redhat.com> writes:
+> >>=20
+> >> > On Mon, Sep 03, 2018 at 09:30:52AM -0500, Eric Blake wrote:
+> >> >> On 09/03/2018 08:31 AM, Markus Armbruster wrote:
 
-Yes, that's what I mean by "kind of".  It's just #1 with the code moved
-somewhere else.
+> >> >> I guess when we are designing what libvirt should do, and decidin=
+g WHEN it
+> >> >> should send OOB commands, we have the luxury of designing libvirt=
+ to enforce
+> >> >> how many in-flight in-band commands it will ever have pending at =
+once
+> >> >> (whether the current 'at most 1', or even if we make it more para=
+llel to 'at
+> >> >> most 7'), so that we can still be ensured that the OOB command wi=
+ll be
+> >> >> processed without being stuck in the queue of suspended in-band c=
+ommands.
+> >> >> If we never send more than one in-band at a time, then it's not a=
+ concern
+> >> >> how deep the qemu queue is; but if we do want libvirt to start pa=
+rallel
+> >> >> in-band commands, then you are right that having a way to learn t=
+he qemu
+> >> >> queue depth is programmatically more precise than just guessing t=
+he maximum
+> >> >> depth.  But it's also hard to argue we need that complexity if we=
+ don't have
+> >> >> an immediate use envisioned for it.
+> >>=20
+> >> True.
+> >>=20
+> >> Options for the initial interface:
+> >>=20
+> >> (1) Provide means for the client to determine the queue length limit
+> >>     (introspection or configuration).  Clients that need the monitor=
+y to
+> >>     remain available for out-of-band commands can keep limit - 1 in-=
+band
+> >>     commands in flight.
+> >>=20
+> >> (2) Make the queue length limit part of the documented interface.
+> >>     Clients that need the monitory to remain available for out-of-ba=
+nd
+> >>     commands can keep limit - 1 in-band commands in flight.  We can
+> >>     increase the limit later, but not decrease it.  We can also swit=
+ch
+> >>     to (1) as needed.
+> >>=20
+> >> (3) Treat the queue length limit as implementation detail (but tacit=
+ly
+> >>     assume its at least 2, since less makes no sense[*]).  Clients t=
+hat
+> >>     need the monitory to remain available for out-of-band commands
+> >>     cannot safely keep more than one in-band command in flight.  We =
+can
+> >>     switch to (2) or (1) as needed.
+> >>=20
+> >> Opinions?
+> >
+> > If you did (3), effectively apps will be behaving as if you had done
+> > (2) with a documented queue limit of 2, so why not just do (2) right
+> > away.
+>=20
+> Yup, that's what I thought, too.
+>=20
+> I append a proposed replacement for the patch to qmp-spec.txt.  It
+> assumes the current queue size 8.  That value is of course open to
+> debate.
 
-> So making .update_filename() transactionable is probably not feasible.
-> The choice that is left is whether we update it in .prepare (and
-> continue with .abort if it fails) or in .commit (and ignore errors).
+Could you return that size in the response to qmp_capabilities
+at the start of the connection?
 
-My idea was "if we could update it one time, we can probably update it a
-second time", so reverting in .abort() would usually work.  I know that
-a "usually" is not a "definitely", so that's the "kind of" again.
+>=20
+> diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
+> index 67e44a8120..1fc6a507e2 100644
+> --- a/docs/interop/qmp-spec.txt
+> +++ b/docs/interop/qmp-spec.txt
+> @@ -130,9 +130,11 @@ to pass "id" with out-of-band commands.  Passing i=
+t with all commands
+>  is recommended for clients that accept capability "oob".
+> =20
+>  If the client sends in-band commands faster than the server can
+> -execute them, the server will stop reading the requests from the QMP
+> -channel until the request queue length is reduced to an acceptable
+> -range.
+> +execute them, the server's queue will fill up, and the server will
+> +stop reading commands from the QMP channel until the queue has space
+> +again.  Clients that need the server to remain responsive to
+> +out-of-band commands should avoid filling up the queue by limiting the
+> +number of in-band commands in flight to seven.
 
-So the abort could still throw an error which we would have to handle
-like in #3 anyway, I suppose.
+If I understand what you're saying then this is a shared limit; i.e.
+if you've got two QMP connections then you have to be aware of how many
+the other connection is queuing, which is tricky.
 
-Max
+Dave
 
-
---XazvUfEtwlPa6dv2XAKK3Y0f34rmYev4g
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluPwBQACgkQ9AfbAGHV
-z0CBBAf/QxaamOpCohCIsE1dD7vDBwurbNgPZw6GVW7nOxAP1ce+0/B95yRTtPMw
-yyoJc02LxC2yIQo7w/VNra6uF+4PqBlWC054lWOaRlsYCrZIbXXU5yXS6tPrjRvd
-i2VUF0874RKfh1cHzvtFF2xpgULkYVyKkloYpX9ItCf6oGjKcvHK9a/7WDoZFU9p
-L+hOr9F9r4qB+qPJN0eKD3oJCWWdH8Vgrkn5yJiJvL0QU9vNwe9jh6H6MzFGkWmG
-bcDMUnw20XosU+Q0wt/7WAjkNjdF8h574kNCfsMljt9ODtBBtcBQLWKNMFDtZWgl
-/7l8lX2blMVYVdAxL4PKPiYhKijrJQ==
-=cIBD
------END PGP SIGNATURE-----
-
---XazvUfEtwlPa6dv2XAKK3Y0f34rmYev4g--
+>  Only a few commands support out-of-band execution.  The ones that do
+>  have "allow-oob": true in output of query-qmp-schema.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
