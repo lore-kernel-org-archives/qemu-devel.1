@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1fxXMJ-0000EO-7V
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:56:35 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fxXML-0000Em-KJ
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1fxXMF-0002AV-CO
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:56:35 -0400
-Received: from speedy.comstyle.com ([2001:470:1d:8c::2]:40942
-	helo=mail.comstyle.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1fxXMF-000298-65
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:56:31 -0400
-References: <20180824012126.22721-1-famz@redhat.com>
-	<8d039be4-486e-e017-88ca-5cb6ebd89519@comstyle.com>
-	<20180827091845.GD19413@lemon.usersys.redhat.com>
-From: Brad Smith <brad@comstyle.com>
-Message-ID: <92b7d978-faed-9bfb-f756-058c83654d2d@comstyle.com>
-Date: Wed, 5 Sep 2018 08:56:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fxXMK-0002Jv-TQ
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 08:56:37 -0400
+References: <cover.1535983918.git.berto@igalia.com>
+	<a63ee5b8ab13edb6e339c245a5963a63a044f4ae.1535983918.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c3c62806-1fd5-8cf8-3c2b-8bfb35e1e9f6@redhat.com>
+Date: Wed, 5 Sep 2018 14:56:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180827091845.GD19413@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] tests: vm: auto_install OpenBSD
+In-Reply-To: <a63ee5b8ab13edb6e339c245a5963a63a044f4ae.1535983918.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bQkwxylLjz49vPtY3EgJCrB9BYXjGHYyh"
+Subject: Re: [Qemu-devel] [PATCH v2 10/10] block: Allow changing
+ 'force-share' on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On 8/27/2018 5:18 AM, Fam Zheng wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bQkwxylLjz49vPtY3EgJCrB9BYXjGHYyh
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <c3c62806-1fd5-8cf8-3c2b-8bfb35e1e9f6@redhat.com>
+Subject: Re: [PATCH v2 10/10] block: Allow changing 'force-share' on reopen
+References: <cover.1535983918.git.berto@igalia.com>
+ <a63ee5b8ab13edb6e339c245a5963a63a044f4ae.1535983918.git.berto@igalia.com>
+In-Reply-To: <a63ee5b8ab13edb6e339c245a5963a63a044f4ae.1535983918.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, 08/24 10:36, Brad Smith wrote:
->> I very much appreciate the effort to bump up to 6.3 as I was going
->> to suggest doing that at some point. But bumping up to 6.3 at the
->> moment will fail with the configure script. We've switched from GCC 4.2
->> to Clang. The TLS check will fail with Clang's emulated TLS. We've
->> had a local patch for awhile to fix the test but I don't think it is
->> appropriate to upstream as is.
->>
->> Index: configure
->> --- configure.orig
->> +++ configure
->> @@ -1876,7 +1876,7 @@ static __thread int tls_var;
->>   int main(void) { return tls_var; }
->>   EOF
->> -if ! compile_prog "-Werror" "" ; then
->> +if ! compile_prog "-Werror" "-pthread" ; then
->>       error_exit "Your compiler does not support the __thread specifier for " \
->>   	"Thread-Local Storage (TLS). Please upgrade to a version that does."
->>   fi
-> Are you suggesting we use 6.2 for now?
->
-> Fam
+On 2018-09-03 16:34, Alberto Garcia wrote:
+> 'force-share' is one of the basic BlockdevOptions available for all
+> drivers, but it's not handled by bdrv_reopen_prepare() so any attempt
+> to change it results in a "Cannot change the option" error:
+>=20
+>    (qemu) qemu-io virtio0 "reopen -o force-share=3Don"
+>    Cannot change the option 'force-share'
+>=20
+> Since there's no reason why we shouldn't allow changing it and the
+> implementation is simple let's just do it.
+>=20
+> It's worth noting that after this patch the above reopen call will
+> still return an error -although a different one- if the image is not
+> read-only:
+>=20
+>    (qemu) qemu-io virtio0 "reopen -o force-share=3Don"
+>    force-share=3Don can only be used with read-only images
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> ---
+>  block.c               | 30 ++++++++++++++++++++++++------
+>  include/block/block.h |  1 +
+>  2 files changed, 25 insertions(+), 6 deletions(-)
 
-Disregard what I said earlier. It seems something has changed along the 
-way since we
-first brought in Clang and the patch is no longer necessary. Please go 
-ahead with 6.3 as is.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--bQkwxylLjz49vPtY3EgJCrB9BYXjGHYyh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluP0nEACgkQ9AfbAGHV
+z0AAGQf/XcwCOyAOYIU9yVqL1HId/mArrzVCwlGV4nTZiOYgDUJ9EAaZoDY+wcXa
+RO7Qct91fmiJHgMnrioB0+BQpe2uGjOe8BXUEQGGZmKnPXR+cMow24FMLKlCBswY
+d8BIAWmKwguMJC41CKJeAgis/MXDXyazxZC6XZmlCqVDBV/K16afvSwwN2YVE6xe
++3hU/SYt159zlIDCSd0uLN+NycMDdzieanzVNP/kovZfIz5iNhWd83W+ZxzK4jaf
+0k/FVtib7rxfCm8/ofx9/ING3rPqAt/y2vKGGBZyjVMcOyX+e5S6WovjWQUU1piD
+pXoaSt0Zs/ZUtaFyK6lN2mWdfKkjjA==
+=jGdH
+-----END PGP SIGNATURE-----
+
+--bQkwxylLjz49vPtY3EgJCrB9BYXjGHYyh--
