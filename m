@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fxNEu-0001rP-GA
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:08:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fxNJc-0004fV-6c
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fxNEp-0002ji-SG
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:08:14 -0400
-Received: from mga17.intel.com ([192.55.52.151]:51296)
+	(envelope-from <ehabkost@redhat.com>) id 1fxNJX-0002km-IF
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:13:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1fxNEp-0002gV-IL
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:08:11 -0400
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-References: <1534821487-14189-1-git-send-email-jing2.liu@linux.intel.com>
-	<1534821487-14189-3-git-send-email-jing2.liu@linux.intel.com>
-	<e88aac49-d0be-6ba9-9674-1785caa5af5b@gmail.com>
-	<b3d4db42-0ff0-9fd6-7c4e-ee74d15093e5@linux.intel.com>
-	<36d3de24-3d5e-e57a-b722-bbaaf1fd0035@gmail.com>
-	<913f0f69-eadc-eb2b-05f7-4a1398cdbf46@linux.intel.com>
-	<0abfc176-a6a6-e12d-1662-1b124a559882@gmail.com>
-	<5f440e08-33f0-6cc2-266b-d646771f385f@linux.intel.com>
-Message-ID: <74eecedd-1203-0bb1-30ed-be4bbc038d95@linux.intel.com>
-Date: Wed, 5 Sep 2018 10:08:05 +0800
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fxNJX-0002ge-7f
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:13:03 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96510C0587F9
+	for <qemu-devel@nongnu.org>; Wed,  5 Sep 2018 02:13:00 +0000 (UTC)
+Date: Tue, 4 Sep 2018 23:12:55 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180905021255.GK12698@habkost.net>
+References: <1536067356-44609-1-git-send-email-imammedo@redhat.com>
+	<1536067356-44609-2-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5f440e08-33f0-6cc2-266b-d646771f385f@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw/pci: add PCI resource reserve
- capability to legacy PCI bridge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1536067356-44609-2-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] vl.c deprecate incorrect CPUs
+ topology
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +34,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, "Marcel Apfelbaum (GMail address)" <marcel.apfelbaum@gmail.com>
-Cc: anthony.xu@intel.com, lersek@redhat.com, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, drjones@redhat.com
 
-Hi Marcel and Michael,
-
-Got no response so I would like to ask if I need do something more for
-this serial? :)
-
-Thanks,
-Jing
-
-On 8/30/2018 10:58 AM, Liu, Jing2 wrote:
-> Ping Michael :)
+On Tue, Sep 04, 2018 at 03:22:35PM +0200, Igor Mammedov wrote:
+> -smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
+> so that total number of logical CPUs [sockets * cores * threads]
+> would be equal to [maxcpus], however historically we didn't have
+> such check in QEMU and it is possible to start VM with an invalid
+> topology.
+> Deprecate invalid options combination so we can make sure that
+> the topology VM started with is always correct in the future.
+> Users with an invalid sockets/cores/threads/maxcpus values should
+> fix their CLI to make sure that
+>    [sockets * cores * threads] == [maxcpus]
 > 
-> Thanks,
-> Jing
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v5:
+>   - extend deprecation doc, adding that maxcpus should be multiple of
+>     present on CLI [sockets/cores/threads] options
+>     (Eduardo Habkost <ehabkost@redhat.com>)
+> v4:
+>   - missed dot comment, fix it with s/./,/ (Andrew Jones <drjones@redhat.com>)
+> v3:
+>   - more spelling fixes (Andrew Jones <drjones@redhat.com>)
+>   - place deprecation check after (sockets * cores * threads > max_cpus) check
+>     (Eduardo Habkost <ehabkost@redhat.com>)
+> v2:
+>   - spelling&&co fixes (Andrew Jones <drjones@redhat.com>)
+> ---
+>  qemu-deprecated.texi | 19 +++++++++++++++++++
+>  vl.c                 |  7 +++++++
+>  2 files changed, 26 insertions(+)
 > 
-> On 8/25/2018 12:51 AM, Marcel Apfelbaum wrote:
->>>>>> On 08/21/2018 06:18 AM, Jing Liu wrote:
->>>>>>> Add hint to firmware (e.g. SeaBIOS) to reserve addtional
->>>>>>> BUS/IO/MEM/PREF resource for legacy pci-pci bridge. Add the
->>>>>>> resource reserve capability deleting in pci_bridge_dev_exitfn.
->>>>>>>
->>>>>>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
->>>>>>> ---
->>>>>>>   hw/pci-bridge/pci_bridge_dev.c | 24 ++++++++++++++++++++++++
->>>>>>>   1 file changed, 24 insertions(+)
-> [...]
->>>>>> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
->>>>>>
->>>>> Thanks for the quick reviewing and feedback.
->>>>> So could I ask what I should do now, update a new version
->>>>> with your rb or just waiting for pushing, or else?
->>>>>
->>>>
->>>> You just need to wait until Michael adds the series
->>>> to his next pull request. Nothing more to do.
->>>>
->>> OK, got it! Thanks!
->>
->> Please ping Michael if your code is not merged in a week or so.
->>
->>> BTW, do you have some suggestion on the seabios counterpart patches?
->>> https://patchew.org/Seabios/1534386737-8131-1-git-send-email-jing2.liu@linux.intel.com/ 
->>>
->>
->> I plan to have  a look this weekend.
->>
->> Thanks,
->> Marcel
-> 
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 87212b6..827c3ce 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -159,6 +159,25 @@ The 'file' driver for drives is no longer appropriate for character or host
+>  devices and will only accept regular files (S_IFREG). The correct driver
+>  for these file types is 'host_cdrom' or 'host_device' as appropriate.
+>  
+> +@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
+
+Minor: I suggest using @var markup, or maybe just use
+"-smp (invalid topologies) (since 3.1)" as subsection title for simplicity?
+
+> +
+> +CPU topology properties should describe whole machine topology including
+> +possible CPUs, but historically it was possible to start QEMU with
+> +an incorrect topology where
+> +  sockets * cores * threads >= X && X < maxcpus
+
+Minor: this line formatting is lost on the HTML output.  I
+suggest using @var and/or @math.
+
+Minor: I suggest not using C syntax.
+
+i.e. use something like:
+
+  @math{@var{n} <= @var{sockets} * @var{cores} * @var{threads} < @var{maxcpus}},
+
+> +which could lead to an incorrect topology enumeration by the guest.
+> +Support for invalid topologies will be removed, the user must ensure
+> +topologies described with -smp include all possible cpus, i.e.
+> +  sockets * cores * threads == maxcpus
+
+Minor: same as above.  I suggest:
+
+  @math{@var{sockets} * @var{cores} * @var{threads} = @var{maxcpus}}.
+
+
+> +Note: it's assumed that maxcpus value must be multiple of the topology
+> +options present on command line to avoid creating an invalid topology.
+> +If maxcpus isn't be multiple of present topology options then the condition
+> +(sockets * cores * threads == maxcpus) can't be satisfied and it will
+> +trigger deprecation warning which later will be converted to a error.
+> +If you get deprecation warning it's recommended to explicitly specify
+> +a correct topology to make warning go away and ensure that it will
+> +continue working in the future.
+
+I don't understand the purpose of the "Note:" section.  It seems to duplicate
+what was already said in the lines above it.  Can we just remove it?
+
+These are just suggestions in case you are going to respin the series, not
+blockers.
+
+-- 
+Eduardo
