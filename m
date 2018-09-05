@@ -1,38 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fxWFL-00080h-4D
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:45:20 -0400
+	(envelope-from <Manish.Jaggi@cavium.com>) id 1fxWGJ-0008TY-46
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fxWFH-00037w-SX
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:45:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38546 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fxWFH-00035F-Lw
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:45:15 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 698148576C
-	for <qemu-devel@nongnu.org>; Wed,  5 Sep 2018 11:45:14 +0000 (UTC)
-Date: Wed, 5 Sep 2018 12:45:07 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180905114506.GB2625@work-vm>
-References: <20180903043149.4076-1-peterx@redhat.com>
-	<20180903043149.4076-5-peterx@redhat.com>
-	<87a7oz9g1y.fsf@dusky.pond.sub.org> <20180903101606.GB14774@xz-x1>
-	<87k1o2671t.fsf@dusky.pond.sub.org>
-	<55829207-b0f7-0869-6ec7-90bc2fb67e3a@redhat.com>
-	<20180903144116.GH14377@redhat.com>
-	<87y3chydeo.fsf@dusky.pond.sub.org>
-	<20180904082301.GB22349@redhat.com>
-	<87k1o1v61u.fsf@dusky.pond.sub.org>
+	(envelope-from <Manish.Jaggi@cavium.com>) id 1fxWGF-0005IS-To
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:46:19 -0400
+Received: from mail-eopbgr680051.outbound.protection.outlook.com
+	([40.107.68.51]:3994
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Manish.Jaggi@cavium.com>)
+	id 1fxWGF-0005Hi-M7
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 07:46:15 -0400
+From: "Jaggi, Manish" <Manish.Jaggi@cavium.com>
+Date: Wed, 5 Sep 2018 11:46:11 +0000
+Message-ID: <EF2DEC36-DDCB-4169-A30F-15F29B7F52E9@caviumnetworks.com>
+References: <CABgNM92-PHWg3X41tCVfErmV9-Hnu5GYpz_pa9-iXfbScFUCZg@mail.gmail.com>
+	<CD29DCF7-6537-406F-A127-6A2FFDDAAD79@caviumnetworks.com>
+	<87k1ohxik4.fsf@trasno.org>
+	<3BE04368-1463-419A-8A40-EFC8015049B9@caviumnetworks.com>
+	<20180828172739.GA10175@work-vm>
+	<19EED7A8-CE42-4C46-9CB3-01DEB63FCE79@caviumnetworks.com>
+	<20180829131653.gk4yhjdi2pk5bdcd@kamzik.brq.redhat.com>
+	<DC466FE6-98B4-485B-BE4D-C4E228B36107@caviumnetworks.com>
+	<20180831111121.n7zafn6peiwe6ojn@kamzik.brq.redhat.com>
+	<1604D594-E6D4-48BB-A270-F7CF1092978B@caviumnetworks.com>
+	<20180904095402.izdnqag3xak3mgsb@kamzik.brq.redhat.com>
+In-Reply-To: <20180904095402.izdnqag3xak3mgsb@kamzik.brq.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <24F45538ADC8E144A65710971B1769BC@namprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87k1o1v61u.fsf@dusky.pond.sub.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 4/7] qapi: remove COMMAND_DROPPED event
+Subject: Re: [Qemu-devel] [Query] Live Migration between machines with
+ different processor ids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,111 +42,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: "Jaggi, Manish" <Manish.Jaggi@cavium.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Auger Eric <eric.auger@redhat.com>, "peter.maydell@linaro.org
+	qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Daniel P. Berrang=E9 <berrange@redhat.com> writes:
->=20
-> > On Tue, Sep 04, 2018 at 08:39:27AM +0200, Markus Armbruster wrote:
-> >> Daniel P. Berrang=E9 <berrange@redhat.com> writes:
-> >>=20
-> >> > On Mon, Sep 03, 2018 at 09:30:52AM -0500, Eric Blake wrote:
-> >> >> On 09/03/2018 08:31 AM, Markus Armbruster wrote:
-
-> >> >> I guess when we are designing what libvirt should do, and decidin=
-g WHEN it
-> >> >> should send OOB commands, we have the luxury of designing libvirt=
- to enforce
-> >> >> how many in-flight in-band commands it will ever have pending at =
-once
-> >> >> (whether the current 'at most 1', or even if we make it more para=
-llel to 'at
-> >> >> most 7'), so that we can still be ensured that the OOB command wi=
-ll be
-> >> >> processed without being stuck in the queue of suspended in-band c=
-ommands.
-> >> >> If we never send more than one in-band at a time, then it's not a=
- concern
-> >> >> how deep the qemu queue is; but if we do want libvirt to start pa=
-rallel
-> >> >> in-band commands, then you are right that having a way to learn t=
-he qemu
-> >> >> queue depth is programmatically more precise than just guessing t=
-he maximum
-> >> >> depth.  But it's also hard to argue we need that complexity if we=
- don't have
-> >> >> an immediate use envisioned for it.
-> >>=20
-> >> True.
-> >>=20
-> >> Options for the initial interface:
-> >>=20
-> >> (1) Provide means for the client to determine the queue length limit
-> >>     (introspection or configuration).  Clients that need the monitor=
-y to
-> >>     remain available for out-of-band commands can keep limit - 1 in-=
-band
-> >>     commands in flight.
-> >>=20
-> >> (2) Make the queue length limit part of the documented interface.
-> >>     Clients that need the monitory to remain available for out-of-ba=
-nd
-> >>     commands can keep limit - 1 in-band commands in flight.  We can
-> >>     increase the limit later, but not decrease it.  We can also swit=
-ch
-> >>     to (1) as needed.
-> >>=20
-> >> (3) Treat the queue length limit as implementation detail (but tacit=
-ly
-> >>     assume its at least 2, since less makes no sense[*]).  Clients t=
-hat
-> >>     need the monitory to remain available for out-of-band commands
-> >>     cannot safely keep more than one in-band command in flight.  We =
-can
-> >>     switch to (2) or (1) as needed.
-> >>=20
-> >> Opinions?
-> >
-> > If you did (3), effectively apps will be behaving as if you had done
-> > (2) with a documented queue limit of 2, so why not just do (2) right
-> > away.
->=20
-> Yup, that's what I thought, too.
->=20
-> I append a proposed replacement for the patch to qmp-spec.txt.  It
-> assumes the current queue size 8.  That value is of course open to
-> debate.
-
-Could you return that size in the response to qmp_capabilities
-at the start of the connection?
-
->=20
-> diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
-> index 67e44a8120..1fc6a507e2 100644
-> --- a/docs/interop/qmp-spec.txt
-> +++ b/docs/interop/qmp-spec.txt
-> @@ -130,9 +130,11 @@ to pass "id" with out-of-band commands.  Passing i=
-t with all commands
->  is recommended for clients that accept capability "oob".
-> =20
->  If the client sends in-band commands faster than the server can
-> -execute them, the server will stop reading the requests from the QMP
-> -channel until the request queue length is reduced to an acceptable
-> -range.
-> +execute them, the server's queue will fill up, and the server will
-> +stop reading commands from the QMP channel until the queue has space
-> +again.  Clients that need the server to remain responsive to
-> +out-of-band commands should avoid filling up the queue by limiting the
-> +number of in-band commands in flight to seven.
-
-If I understand what you're saying then this is a shared limit; i.e.
-if you've got two QMP connections then you have to be aware of how many
-the other connection is queuing, which is tricky.
-
-Dave
-
->  Only a few commands support out-of-band execution.  The ones that do
->  have "allow-oob": true in output of query-qmp-schema.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+DQoNCj4gT24gMDQtU2VwLTIwMTgsIGF0IDM6MjQgUE0sIEFuZHJldyBKb25lcyA8ZHJqb25lc0By
+ZWRoYXQuY29tPiB3cm90ZToNCj4gDQo+IEV4dGVybmFsIEVtYWlsDQo+IA0KPiBPbiBUdWUsIFNl
+cCAwNCwgMjAxOCBhdCAwOToxNjo1OEFNICswMDAwLCBKYWdnaSwgTWFuaXNoIHdyb3RlOg0KPj4+
+IE9uIDMxLUF1Zy0yMDE4LCBhdCA0OjQxIFBNLCBBbmRyZXcgSm9uZXMgPGRyam9uZXNAcmVkaGF0
+LmNvbT4gd3JvdGU6DQo+Pj4gSSB0aGluayB0aGUgc2VxdWVuY2Ugc2hvdWxkIGxvb2sgc29tZXRo
+aW5nIGxpa2UgdGhpczoNCj4+PiANCj4+PiAxKSBHdWVzdCBydW5uaW5nIG9uIEhvc3QgQSB3aXRo
+IHByb2Nlc3NvciBhDQo+Pj4gMikgU3RvcCBndWVzdCBhbmQgc2F2ZSBpdHMgc3RhdGUgZm9yIG1p
+Z3JhdGlvbg0KPj4+IDMpIE1pZ3JhdGUgZ3Vlc3QgdG8gSG9zdCBCIHdpdGggcHJvY2Vzc29yIGIg
+KGIgaXMgImNsb3NlIGVub3VnaCIgdG8gYSkNCj4+PiA0KSBSZXN0b3JlIGd1ZXN0IHN0YXRlIGFm
+dGVyIG1pZ3JhdGlvbg0KPj4+ICAgIElmIGd1ZXN0IGlzIHJ1bm5pbmcgd2l0aCAnLWNwdSBob3N0
+Jw0KPj4+ICAgICAgNC5hKSBJbmZvcm0gS1ZNIG9mIGFueSBjb25maWd1cmF0aW9uIHRoYXQgaW1w
+YWN0cyBpbnZhcmlhbnQgcmVnaXN0ZXJzDQo+Pj4gICAgICA0LmIpIFVwZGF0ZSB0aGUgZ3Vlc3Qn
+cyB2aWV3IG9mIGFsbCBpbnZhcmlhbnQgcmVnaXN0ZXJzIHRvIG1hdGNoIHRoZQ0KPj4+ICAgICAg
+ICAgICBob3N0DQo+Pj4gICAgRW5kSWYNCj4+PiA1KSBSdW4gZ3Vlc3QNCj4+PiANCj4+PiA0LmEg
+YW5kIDQuYiByZXF1aXJlIG5ldyBjb2RlIGJvdGggaW4gUUVNVSBhbmQgS1ZNLiA0LmEgbWF5IHJl
+cXVpcmUgYSBuZXcNCj4+PiBLVk0gQVBJLCB1bmxlc3MgdGhlIGV4aXN0aW5nIEFQSSBjYW4gYmUg
+bGV2ZXJhZ2VkLg0KPj4+IA0KPj4+IFRoZSBkZWZpbml0aW9uIG9mICJjbG9zZSBlbm91Z2giIGlz
+IGxlZnQgdG8gdGhlIHVzZXJzIGFuZC9vciBoaWdoZXIgbGF5ZXJzDQo+Pj4gb2YgdGhlIFZpcnQg
+c3RhY2suDQo+Pj4gDQo+PiANCj4+IFRoYW5rcyBmb3IgZGV0YWlsaW5nIHRoZSBzZXF1ZW5jZS4N
+Cj4+IEkgZ290IGFub3RoZXIgY29tbWVudCBmcm9tIEp1YW4gYW5kIERhdmlkIHdoaWNoIGlzIG5v
+dCB0byB1c2UgLWNwdSBob3N0LCBzZWUgYmVsb3cNCj4+IA0KPj4gIkkgcmVhbGx5IHRoaW5rIHRo
+YXQgdGhlIHJpZ2h0IGFwcHJvYWNoIGhlcmUgaXMgbm90IHVzaW5nIC1jcHUgaG9zdC4gIFlvdQ0K
+Pj4gZG8gdGhlIGZ1bGwgd29yaywgY3JlYXRlIGEgbW9kZWwgYXMgRGF2aWQgc2F5cywgYW5kIGJl
+IHN1cmUgdGhhdCB5b3UgY2FyDQo+PiBydW4gdGhhdCBtb2RlbCBvbiBib3RoIGNwdXMuICBJdCBp
+cyBhIGxvdCBvZiB3b3JrLCBidXQgaXQgaXMgdGhlIG9ubHkNCj4+IHdheSB0byBtYWtlIHN1cmUg
+dGhhdCB0aGlzIGlzIGdvaW5nIHRvIHdvcmsgbG9uZyB0ZXJtLuKAnQ0KPj4gDQo+PiBOb3QgdXNp
+bmcgLWNwdSBob3N0IGlzIG9ydGhvZ29uYWwgdG8gdGhlIHNlcXVlbmNlIHdlIGhhdmUgYmVlbiBk
+aXNjdXNzaW5nIGluIHRoaXMgdGhyZWFkLg0KPj4gVXNlIHNvbWV0aGluZyBsaWtlIC1jcHUgY29y
+dGV4LWE1NyAodGhpcyBob3dldmVyIGRvZXMgbm90IHdvcmsgc28gZmFyKQ0KPj4gVGhpcyB3b3Vs
+ZCBhdm9pZCBjbG9zZS1lbm91Z2ggZGVmaW5pdGlvbiwgYnV0IHdvdWxkIG5lZWQgc3Vic3RhbnRp
+YWwgd29yay4NCj4+IA0KPj4gU28gd2hpY2ggYXBwcm9hY2ggc2hvdWxkIGJlIHRha2VuIGhlcmUs
+IHdoYXRzIHlvdXIgdGFrZS4uLg0KPj4gDQo+IA0KPiBJbnZlbnRpbmcgYSBiYXNlLUFBcmNoNjQg
+Y3B1IG1vZGVsIHRoYXQgY2FuIHRoZW4gYmUgZXh0ZW5kZWQgd2l0aCBvcHRpb25hbA0KPiBmZWF0
+dXJlcyBpcyBhIG5pY2Ugd2F5IHRvIGV4dGVuZCB0aGUgbWlncmF0YWJpbGl0eSBvZiBhIGd1ZXN0
+LCBob3dldmVyDQo+IGl0J3MgaGFyZCB0byBkbyBiZWNhdXNlIG9mIGVycmF0YS4gU2luY2UgZXJy
+YXRhIHdvcmthcm91bmRzIGFyZSBlbmFibGVkDQo+IHBlciBNSURSLCB0aGVuIHdlJ2QgbmVlZCB0
+byBpbnZlbnQgb3VyIG93biBNSURSIGFuZCBhbHNvIHNvbWUgd2F5IHRvDQo+IGNvbW11bmljYXRl
+IHdoaWNoIGVycmF0YSB3ZSB3YW50IHRvIGVuYWJsZSwgcG9zc2libHkgdGhyb3VnaCBzb21lIHBh
+cmF2aXJ0DQo+IG1lY2hhbmlzbSBvciB0aHJvdWdoIHNvbWUgaW1wbGVtZW50YXRpb24gZGVmaW5l
+ZCBzeXN0ZW0gcmVnaXN0ZXJzIHRoYXQNCj4gS1ZNIHdvdWxkIG5lZWQgdG8gcmVzZXJ2ZSBhbmQg
+ZGVmaW5lLg0KPiANCj4gVGhhdCdzIG5vdCBqdXN0IGEgdG9uIG9mIHdvcmsgZm9yIHRoZSBlbnRp
+cmUgdmlydCBzdGFjayAobm90IGp1c3QgS1ZNIGFuZA0KPiBRRU1VLCBidXQgYWxzbyBhbGwgdGhl
+IGxheWVycyBhYm92ZSksIGJ1dCBpdCdzIHBvc3NpYmxlIHRoYXQgaXQgd29uJ3QgYmUNCj4gdXNl
+ZnVsIGluIHRoZSBlbmQgYW55d2F5LiBUaGVyZSdzIHJpc2sgdGhhdCBlbmFibGluZyBqdXN0IG9u
+ZSBlcnJhdHVtDQo+IHdvcmthcm91bmQgd291bGQgcmVzdHJpY3QgdGhlIGd1ZXN0IHRvIGhvc3Rz
+IG9mIHRoZSBleGFjdCBzYW1lIHR5cGUNCj4gYW55d2F5LiBGb3IgZWFjaCBlcnJhdHVtIHRoYXQg
+bmVlZHMgdG8gYmUgZW5hYmxlZCwgdGhlIHByb2JhYmlsaXR5IG9mDQo+IGVuYWJsaW5nIGFuIGlu
+Y29tcGF0aWJsZSBvbmUgZ29lcyB1cCwgc28gaXQgbWF5IG5vdCBiZSBsaWtlbHkgdG8gZG8gbXVj
+aA0KPiBiZXR0ZXIgdGhhbiAnLWNwdSBob3N0JyBpbiB0aGUgZW5kLiBJJ20gYWZyYWlkIHRoYXQg
+dW50aWwgZXJyYXRhIGFyZQ0KPiBwcmltYXJpbHkgc2hvd2luZyB1cCBpbiBvcHRpb25hbCBDUFUg
+ZmVhdHVyZXMgdGhhdCBjYW4gc2ltcGx5IGJlIGRpc2FibGVkDQo+IGZvciB0aGUgd29ya2Fyb3Vu
+ZCwgdGhhdCB3ZSdyZSBzdHVjayB3aXRoICctY3B1IGhvc3QnLiBJJ2QgYmUgaGFwcHkgdG8NCj4g
+ZGlzY3VzcyBpdCBtb3JlIHRob3VnaC4NCj4gDQo+IEluIHNob3J0LCBJJ2QgZ28gd2l0aCB0aGUg
+cHJvcG9zYWwgYWJvdmUsIGZvciBub3csIHdpdGggcG9zc2libHkgb25lDQo+IGNoYW5nZS4gbGli
+dmlydCBmb2xrIChBbmRyZWEgQm9sb2duYW5pIGFuZCBQaW5vIFRvc2Nhbm8pIHN1Z2dlc3QgdGhh
+dA0KPiB0aGUgZ3Vlc3QgaW52YXJpYW50IHJlZ2lzdGVyIHVwZGF0aW5nIG9uIHRoZSBkZXN0aW5h
+dGlvbiBob3N0IG9ubHkgYmUNCj4gZG9uZSBpZiB0aGUgdXNlciBvcHRzLWluIHRvIGl0LiBUaGlz
+IGlzIGJlY2F1c2UgcmlnaHQgbm93IGlmIGEgdXNlcg0KPiB0cmllcyB0byBtaWdyYXRlIHRvIGEg
+aG9zdCB0aGF0IGlzIG5vdCAxMDAlIGlkZW50aWNhbCB0aGUgbWlncmF0aW9uDQo+IHdpbGwgZmFp
+bCwgd2hpY2ggbWFrZXMgdGhlICJtaXN0YWtlIiBjbGVhci4gSWYgd2Ugc2lsZW50bHkgY2hhbmdl
+IHRoZQ0KPiBiZWhhdmlvciB0byBhbGxvdyBpdCwgdGhlbiB3aGF0IGNvdWxkIGhhdmUgYmVlbiBh
+IG1pc3Rha2UsIGJlY2F1c2UNCj4gdGhlIGhvc3RzIGFyZW4ndCBhY3R1YWxseSAiY2xvc2UgZW5v
+dWdoIiwgbWF5IGdvIHVubm90aWNlZC4gSSdtIG5vdA0KPiAxMDAlIHN1cmUgd2UgbmVlZCBhbm90
+aGVyIHVzZXIgb3B0LWluIGZsYWcgdG8gYmUgc2V0LCB0aG91Z2gsIGFzIEkNCj4gdGhpbmsgdGhl
+ICctY3B1IGhvc3QnIGluZGljYXRlcyB0aGUgdXNlciBleHBlY3RzIHRoZSBWQ1BVIHRvIGxvb2sN
+Cj4gbGlrZSB0aGUgaG9zdCBDUFUsIGFuZCBldmVuIGFmdGVyIG1pZ3JhdGlvbiB0aGF0IGV4cGVj
+dGF0aW9uIHNob3VsZCBiZQ0KPiBtZXQuIFNpbXBseSwgdXNlcnMgdGhhdCBtaWdyYXRlICctY3B1
+IGhvc3QnIFZNcyBuZWVkIHRvIGtub3cgd2hhdCB0aGV5J3JlDQo+IGRvaW5nLg0KPiANCg0KRm9s
+bG93dXAgdG8gdGhlIHNlcXVlbmNlIHlvdSBoYXZlIG91dGxpbmVkLCBJIGhhdmUgYWRkZWQgYmVs
+b3cgcHNldWRvY29kZSwNClRoaXMgaXMgb25seSBmb3IgcHJvY2Vzc29ycyB3aGljaCBkaWZmZXIg
+aW4gaW52YXJpYW50IHJlZ2lzdGVycyBsaWtlIE1JRFIgYnV0DQpoYXZlIG5vIHVuZGVybHlpbmcg
+Q1BVL0dJQyBjaGFuZ2VzIG9yIGFueSBlcnJhdGEgdGhhdCBhZmZlY3RzIGd1ZXN0IGtlcm5lbC4N
+CkFuZCB1c2VyIG9wdHMgaW4gZm9yIGl0LiANCihub3Qgc2VuZGluZyBmdWxsIHBhdGNoIGp1c3Qg
+dG8gY2hlY2sgaWYgdGhlIGxvZ2ljIGlzIG9rLi4pDQoNCihhKSBDaGFuZ2VzIGluIEtWTToNCg0K
+LSBJbnRyb2R1Y2luZyBhIHNwZWNpZmljIGVycm9yIGNvZGUgKEtWTV9FSU5WQVJJQU5UKSBpbiBj
+YXNlIG9mIGludmFyaWFudCB3cml0ZXMuDQpUaGlzIHNob3VsZCBub3QgY2hhbmdlIGFueXRoaW5n
+IHRvIEFQSSBTRVRfT05FX1JFRyBLVk0gQVBJLg0KTm90IHN1cmUgd2hpY2ggaXMgdGhlIGJlc3Qg
+cGxhY2UgdG8gcHV0IHRoZSBkZWZpbmXigKYNCkkgaGF2ZSBhZGRlZCBpbiBpbmNsdWRlL3VhcGkv
+bGludXgva3ZtX3BhcmEuaC4NCg0KZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdz
+LmMgYi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jDQppbmRleCAyMmZiYmRiZWNlM2MuLmM4YTRm
+YmU4YThiYiAxMDA2NDQNCi0tLSBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMNCisrKyBiL2Fy
+Y2gvYXJtNjQva3ZtL3N5c19yZWdzLmMNCkBAIC0xMTExLDcgKzExMTEsNyBAQCBzdGF0aWMgaW50
+IF9fc2V0X2lkX3JlZyhjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwgdm9pZCBfX3VzZXIg
+KnVhZGRyLA0KIA0KICAgICAgICAvKiBUaGlzIGlzIHdoYXQgd2UgbWVhbiBieSBpbnZhcmlhbnQ6
+IHlvdSBjYW4ndCBjaGFuZ2UgaXQuICovDQogICAgICAgIGlmICh2YWwgIT0gcmVhZF9pZF9yZWco
+cmQsIHJheikpDQotICAgICAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQorICAgICAgICAgICAg
+ICAgcmV0dXJuIC1LVk1fRUlOVkFSSUFOVDsNCiANCiAgICAgICAgcmV0dXJuIDA7DQogfQ0KZGlm
+ZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm1fcGFyYS5oIGIvaW5jbHVkZS91YXBpL2xp
+bnV4L2t2bV9wYXJhLmgNCmluZGV4IDZjMGNlNDk5MzFlNS4uM2E0OWEzMjFkMGRmIDEwMDY0NA0K
+LS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bV9wYXJhLmgNCisrKyBiL2luY2x1ZGUvdWFwaS9s
+aW51eC9rdm1fcGFyYS5oDQpAQCAtMTcsNiArMTcsNyBAQA0KICNkZWZpbmUgS1ZNX0UyQklHICAg
+ICAgICAgICAgICBFMkJJRw0KICNkZWZpbmUgS1ZNX0VQRVJNICAgICAgICAgICAgICBFUEVSTQ0K
+ICNkZWZpbmUgS1ZNX0VPUE5PVFNVUFAgICAgICAgICA5NQ0KKyNkZWZpbmUgS1ZNX0VJTlZBUklB
+TlQgICAgICAgICAgOTYNCiANCiAjZGVmaW5lIEtWTV9IQ19WQVBJQ19QT0xMX0lSUSAgICAgICAg
+ICAxDQogI2RlZmluZSBLVk1fSENfTU1VX09QICAgICAgICAgICAgICAgICAgMg0KDQooYikgQ2hh
+bmdlcyBpbiBRZW11IGNvZGUNCg0KMS4gSGFuZGxpbmcgb2YgbmV3IGVycm9yIGNvZGUsIHdoaWNo
+IHdvdWxkIHVwZGF0ZQ0KZ3Vlc3Qgc3RhdGUgd2l0aCBob3N0cyBpbnZhcmlhbnQgcmVnIHZhbHVl
+cy4NCg0KZGlmZiAtLWdpdCBhL3RhcmdldC9hcm0va3ZtLmMgYi90YXJnZXQvYXJtL2t2bS5jDQpp
+bmRleCA2NWY4NjdkNTY5Li4wY2YxNDMyM2EyIDEwMDY0NA0KLS0tIGEvdGFyZ2V0L2FybS9rdm0u
+Yw0KKysrIGIvdGFyZ2V0L2FybS9rdm0uYw0KQEAgLTQ1Miw3ICs0NTIsMTUgQEAgYm9vbCB3cml0
+ZV9saXN0X3RvX2t2bXN0YXRlKEFSTUNQVSAqY3B1LCBpbnQgbGV2ZWwpDQogICAgICAgICAgICAg
+YWJvcnQoKTsNCiAgICAgICAgIH0NCiAgICAgICAgIHJldCA9IGt2bV92Y3B1X2lvY3RsKGNzLCBL
+Vk1fU0VUX09ORV9SRUcsICZyKTsNCi0gICAgICAgIGlmIChyZXQpIHsNCisgICAgICAgIGlmIChp
+Z25vcmVfaW52YXJpYW50ICYmIChyZXQgPT0gLUtWTV9FSU5WQVJJQU5UKSkgew0KKyAgICAgICAg
+ICAgIC8qIFVwZGF0ZSBHdWVzdCBpbnZhcmlhbnQgdG8gbWF0Y2ggd2l0aCBtaWdyYXRlZCBob3N0
+IHJlZ3MqLw0KKyAgICAgICAgICAgIHJldCA9IGt2bV92Y3B1X2lvY3RsKGNzLCBLVk1fR0VUX09O
+RV9SRUcsICZyKTsNCisgICAgICAgICAgICBpZiAocmV0KQ0KKyAgICAgICAgICAgICAgICBvayA9
+IGZhbHNlOw0KKyAgICAgICAgICAgIGVsc2UNCisgICAgICAgICAgICAgICAgY3B1LT5jcHJlZ192
+YWx1ZXNbaV0gPSByLmFkZHI7DQorICAgICAgICB9DQorICAgICAgICBlbHNlIGlmIChyZXQpIHsN
+CiAgICAgICAgICAgICAvKiBXZSBtaWdodCBmYWlsIGZvciAidW5rbm93biByZWdpc3RlciIgYW5k
+IGFsc28gZm9yDQogICAgICAgICAgICAgICogInlvdSB0cmllZCB0byBzZXQgYSByZWdpc3RlciB3
+aGljaCBpcyBjb25zdGFudCB3aXRoDQogICAgICAgICAgICAgICogYSBkaWZmZXJlbnQgdmFsdWUg
+ZnJvbSB3aGF0IGl0IGFjdHVhbGx5IGNvbnRhaW5zIi4NCg0KMi4gaWdub3JlX2ludmFyaWFudCBp
+cyB0aGUgZmxhZyBJIHdhcyByZWZlcnJpbmcgdG8gd2hpY2ggaXMgd2hhdCB5b3UgYWxzbw0KbWVu
+dGlvbmVkIG9wdC1pbi4gVGhpcyBjYW4gYmUgc3VwcGxpZWQgYXMgYSBjb21tYW5kIGxpbmUgcGFy
+YW1ldGVyIHRvIHFlbXUgb24gTWFjaGluZSBCLg0KDQpQUzogSSB3aWxsIGFkZCBjb2RlIHRvIHB1
+dCB3YXJuaW5nIGxvZ3MgYXMgc3VnZ2VzdGVkIGJ5IERhdmUuDQoNCi1tYW5pc2gNCg0KDQo+IFRo
+YW5rcywNCj4gZHJldw0KDQo=
