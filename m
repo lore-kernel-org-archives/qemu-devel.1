@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fxT4W-0004VI-7E
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:21:57 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fxTBw-0000a4-Jq
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:29:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fxT4V-0000zn-AQ
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:21:56 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36484)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fxT4V-0000y1-1P
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:21:55 -0400
-Received: by mail-wm0-x243.google.com with SMTP id j192-v6so6783535wmj.1
-	for <qemu-devel@nongnu.org>; Wed, 05 Sep 2018 01:21:54 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fxTBr-0006Q5-LC
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:29:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48494 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fxTBr-0006Kw-E9
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:29:31 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed,  5 Sep 2018 12:29:19 +0400
+Message-Id: <20180905082919.6986-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20180831172424.12029-1-marcandre.lureau@redhat.com>
-	<20180831172424.12029-4-marcandre.lureau@redhat.com>
-	<CAJ+F1CKEjAnQDtt2n0LOu4MKT94fqWnfjXUprp3vqYY=JghfsA@mail.gmail.com>
-	<87musy1cdc.fsf@trasno.org> <20180904085152.685b47ab@redhat.com>
-In-Reply-To: <20180904085152.685b47ab@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 5 Sep 2018 12:21:39 +0400
-Message-ID: <CAJ+F1CKaRhO8sGf51SHf1mrL=RA+NmCdtLdPcpMrcufp4wfB3w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 3/6] tpm: allocate/map buffer for TPM
- Physical Presence interface
+Subject: [Qemu-devel] [PATCH] memory: size can be different from ptr_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,139 +25,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, QEMU <qemu-devel@nongnu.org>, xiaoguangrong@tencent.com, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, dgilbert@redhat.com, quintela@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hi
+memory_region_init_ram*_ptr() take only the size of the MemoryRegion,
+and allocate a RAMBlock with the same size. However, it may be
+convenient to expose a smaller MemoryRegion (for ex: a few bytes) than
+the RAMBlock (which must be a multiple of TARGET_PAGE_SIZE).
 
-On Tue, Sep 4, 2018 at 10:51 AM Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Mon, 03 Sep 2018 23:48:15 +0200
-> Juan Quintela <quintela@redhat.com> wrote:
->
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
-> > > Hi
-> > >
-> > > On Fri, Aug 31, 2018 at 7:32 PM Marc-Andr=C3=A9 Lureau
-> > > <marcandre.lureau@redhat.com> wrote:
-> > >>
-> > >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> > >>
-> > >> Implement a virtual memory device for the TPM Physical Presence inte=
-rface.
-> > >> The memory is located at 0xFED45000 and used by ACPI to send message=
-s to the
-> > >> firmware (BIOS) and by the firmware to provide parameters for each o=
-ne of
-> > >> the supported codes.
-> > >>
-> > >> This interface should be used by all TPM devices on x86 and can be
-> > >> added by calling tpm_ppi_init_io().
-> > >>
-> > >> Note: bios_linker cannot be used to allocate the PPI memory region,
-> > >> since the reserved memory should stay stable across reboots, and mig=
-ht
-> > >> be needed before the ACPI tables are installed.
-> > >>
-> > >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> > >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > >> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> >
-> >
-> > ....
-> >
-> > >> + */
-> > >> +#define TPM_PPI_ADDR_SIZE           0x400
-> > >> +#define TPM_PPI_ADDR_BASE           0xFED45000
-> >
-> > > There is a (new) issue with the PPI ram region:
-> > >
-> > > READ of size 32 at 0x61d000090480 thread T6
-> > >     #0 0x5622bd8de0f4 in buffer_zero_avx2
-> > > /home/elmarco/src/qq/util/bufferiszero.c:169
-> > >     #1 0x5622bd8de899 in select_accel_fn
-> > > /home/elmarco/src/qq/util/bufferiszero.c:282
-> > >     #2 0x5622bd8de8f1 in buffer_is_zero
-> > > /home/elmarco/src/qq/util/bufferiszero.c:309
-> > >     #3 0x5622bc209f94 in is_zero_range /home/elmarco/src/qq/migration=
-/ram.c:82
-> > >     #4 0x5622bc21938d in save_zero_page_to_file
-> > > /home/elmarco/src/qq/migration/ram.c:1694
-> > >     #5 0x5622bc219452 in save_zero_page
-> > > /home/elmarco/src/qq/migration/ram.c:1713
-> > >     #6 0x5622bc21db67 in ram_save_target_page
-> > > /home/elmarco/src/qq/migration/ram.c:2289
-> > >     #7 0x5622bc21e13e in ram_save_host_page
-> > > /home/elmarco/src/qq/migration/ram.c:2351
-> > >     #8 0x5622bc21ea3a in ram_find_and_save_block
-> > > /home/elmarco/src/qq/migration/ram.c:2413
-> > >     #9 0x5622bc223b5d in ram_save_iterate
-> > > /home/elmarco/src/qq/migration/ram.c:3193
-> > >     #10 0x5622bd16f544 in qemu_savevm_state_iterate
-> > > /home/elmarco/src/qq/migration/savevm.c:1103
-> > >     #11 0x5622bd157e75 in migration_iteration_run
-> > > /home/elmarco/src/qq/migration/migration.c:2897
-> > >     #12 0x5622bd15892e in migration_thread
-> > > /home/elmarco/src/qq/migration/migration.c:3018
-> > >     #13 0x5622bd902f31 in qemu_thread_start
-> > > /home/elmarco/src/qq/util/qemu-thread-posix.c:504
-> > >     #14 0x7f42f0ef4593 in start_thread (/lib64/libpthread.so.0+0x7593=
-)
-> > >     #15 0x7f42f0c280de in clone (/lib64/libc.so.6+0xfa0de)
-> > > 0x61d000090490 is located 0 bytes to the right of 2064-byte region
-> > > [0x61d00008fc80,0x61d000090490)
-> > >
-> > > migration code is assuming RAM is multiple of TARGET_PAGE_SIZE.
-> >
-> > Physical RAM is multiple of TARGET_PAGE_SIZE O:-)
-> > That assumtion is held in too many places, if you can change the size t=
-o
-> > be multiple of page size, that would be greate.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/exec/memory.h  |  8 ++++++--
+ exec.c                 |  3 +++
+ hw/display/g364fb.c    |  2 +-
+ hw/vfio/common.c       |  3 ++-
+ hw/virtio/vhost-user.c |  2 +-
+ memory.c               | 10 ++++++----
+ 6 files changed, 19 insertions(+), 9 deletions(-)
 
-It needs the RAMBlock to be a multiple of TARGET_PAGE_SIZE, but the
-memory region (in guest and qemu MemoryRegion) can be less. This is
-already the case with for ex, "/rom@etc/acpi/rsdp", which is 36 bytes.
-
-I suppose 2 different MemoryRegions (backed by different RAMBlock)
-that would be placed on the same page (for ex, at offset 0x0, size
-0x10 and offset 0x10, size 0x100) would work fine in general and with
-migration?
-
-> >
-> > > Should the migration code be fixed, or should the TPM code allocate
-> > > ram differently?
-> >
-> > Migration people (i.e. me) would preffer that you fix the TPM
-> > allocation.  Or you can decide that this is *not* RAM.  The unit of
-> > transfer for migrate ram is ram pages, a.k.a. TARGET_PAGE_SIZE.
-> I'd loath to waste whole page in already cramped area.
-> Can we implement it as mmio region? (it will add some bolerplate code for=
- read/write
-> handlers/migration and cause vmexits on every read/write but it's not a h=
-ot path so we might not care)
->
-
-
-I have done some small adjustments to allow
-memory_region_init_ram_device_ptr() to work with a MemoryRegions size
-!=3D backed RAMBlock, and it seems to work fine (and doesn't need to
-allocate more space of guest memory range, or fall back to mmio)
-
-thanks
-
-> > > In all case, I think the migration code should either be fixed or hav=
-e
-> > > an assert.
-> >
-> > An assert for sure.
-> >
-> > Fixed .... Do we have real devices that put ram regions that are smalle=
-r
-> > than page size?
-> >
-> > Later, Juan.
->
-
-
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index eb4f2fb249..03f257829b 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -700,6 +700,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+  *        must be unique within any device
+  * @size: size of the region.
+  * @ptr: memory to be mapped; must contain at least @size bytes.
++ * @ptr_size: size of @ptr buffer
+  *
+  * Note that this function does not do anything to cause the data in the
+  * RAM memory region to be migrated; that is the responsibility of the c=
+aller.
+@@ -708,7 +709,8 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
+                                 struct Object *owner,
+                                 const char *name,
+                                 uint64_t size,
+-                                void *ptr);
++                                void *ptr,
++                                uint64_t ptr_size);
+=20
+ /**
+  * memory_region_init_ram_device_ptr:  Initialize RAM device memory regi=
+on from
+@@ -727,6 +729,7 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
+  * @name: the name of the region.
+  * @size: size of the region.
+  * @ptr: memory to be mapped; must contain at least @size bytes.
++ * @ptr_size: size of @ptr buffer
+  *
+  * Note that this function does not do anything to cause the data in the
+  * RAM memory region to be migrated; that is the responsibility of the c=
+aller.
+@@ -736,7 +739,8 @@ void memory_region_init_ram_device_ptr(MemoryRegion *=
+mr,
+                                        struct Object *owner,
+                                        const char *name,
+                                        uint64_t size,
+-                                       void *ptr);
++                                       void *ptr,
++                                       uint64_t ptr_size);
+=20
+ /**
+  * memory_region_init_alias: Initialize a memory region that aliases all=
+ or a
+diff --git a/exec.c b/exec.c
+index 6826c8337d..fcea614e79 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2361,6 +2361,9 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, =
+ram_addr_t max_size,
+ RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
+                                    MemoryRegion *mr, Error **errp)
+ {
++    assert(size >=3D TARGET_PAGE_SIZE);
++    assert(size % TARGET_PAGE_SIZE =3D=3D 0);
++
+     return qemu_ram_alloc_internal(size, size, NULL, host, false,
+                                    false, mr, errp);
+ }
+diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
+index fbc2b2422d..f4f5643761 100644
+--- a/hw/display/g364fb.c
++++ b/hw/display/g364fb.c
+@@ -475,7 +475,7 @@ static void g364fb_init(DeviceState *dev, G364State *=
+s)
+=20
+     memory_region_init_io(&s->mem_ctrl, NULL, &g364fb_ctrl_ops, s, "ctrl=
+", 0x180000);
+     memory_region_init_ram_ptr(&s->mem_vram, NULL, "vram",
+-                               s->vram_size, s->vram);
++                               s->vram_size, s->vram, s->vram_size);
+     vmstate_register_ram(&s->mem_vram, dev);
+     memory_region_set_log(&s->mem_vram, true, DIRTY_MEMORY_VGA);
+ }
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 7c185e5a2e..e5dfbbafe3 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -854,7 +854,8 @@ int vfio_region_mmap(VFIORegion *region)
+         memory_region_init_ram_device_ptr(&region->mmaps[i].mem,
+                                           memory_region_owner(region->me=
+m),
+                                           name, region->mmaps[i].size,
+-                                          region->mmaps[i].mmap);
++                                          region->mmaps[i].mmap,
++                                          region->mmaps[i].size);
+         g_free(name);
+         memory_region_add_subregion(region->mem, region->mmaps[i].offset=
+,
+                                     &region->mmaps[i].mem);
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index b041343632..3abe960f29 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -935,7 +935,7 @@ static int vhost_user_slave_handle_vring_host_notifie=
+r(struct vhost_dev *dev,
+     name =3D g_strdup_printf("vhost-user/host-notifier@%p mmaps[%d]",
+                            user, queue_idx);
+     memory_region_init_ram_device_ptr(&n->mr, OBJECT(vdev), name,
+-                                      page_size, addr);
++                                      page_size, addr, page_size);
+     g_free(name);
+=20
+     if (virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, true)=
+) {
+diff --git a/memory.c b/memory.c
+index 9b73892768..07f8458d38 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1587,7 +1587,8 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
+                                 Object *owner,
+                                 const char *name,
+                                 uint64_t size,
+-                                void *ptr)
++                                void *ptr,
++                                uint64_t ptr_size)
+ {
+     memory_region_init(mr, owner, name, size);
+     mr->ram =3D true;
+@@ -1597,16 +1598,17 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
+=20
+     /* qemu_ram_alloc_from_ptr cannot fail with ptr !=3D NULL.  */
+     assert(ptr !=3D NULL);
+-    mr->ram_block =3D qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fata=
+l);
++    mr->ram_block =3D qemu_ram_alloc_from_ptr(ptr_size, ptr, mr, &error_=
+fatal);
+ }
+=20
+ void memory_region_init_ram_device_ptr(MemoryRegion *mr,
+                                        Object *owner,
+                                        const char *name,
+                                        uint64_t size,
+-                                       void *ptr)
++                                       void *ptr,
++                                       uint64_t ptr_size)
+ {
+-    memory_region_init_ram_ptr(mr, owner, name, size, ptr);
++    memory_region_init_ram_ptr(mr, owner, name, size, ptr, ptr_size);
+     mr->ram_device =3D true;
+     mr->ops =3D &ram_device_mem_ops;
+     mr->opaque =3D mr;
 --=20
-Marc-Andr=C3=A9 Lureau
+2.19.0.rc1
