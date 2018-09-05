@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fxMIe-0008Sy-6u
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:08:05 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fxMUR-0006Uj-Td
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fxMIa-0002vT-Qq
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:08:04 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:38141)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fxMIa-0002tG-Af
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:08:00 -0400
-Date: Tue, 4 Sep 2018 21:07:56 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180905010756.GA2373@flamenco>
-References: <20180810173941.5301-1-cota@braap.org>
-	<20180831222249.GA28489@flamenco>
-	<CAKmqyKO2jK0YnJepSazMeCtMtFLpEMaY6UOeyHbGWKED0Z=CJw@mail.gmail.com>
-	<20180904233919.GA25010@flamenco>
-	<CAKmqyKPoAhQnOMcTbCxR4g-vW2CBJJLO0EJt+ioXoTf0drSRCg@mail.gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fxMUO-000128-Ha
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 21:20:15 -0400
+Date: Wed, 5 Sep 2018 10:13:49 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180905001349.GI2679@umbus.fritz.box>
+References: <20180904194903.20712-1-hpoussin@reactos.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="7SrMUQONj8Rl9QNG"
 Content-Disposition: inline
-In-Reply-To: <CAKmqyKPoAhQnOMcTbCxR4g-vW2CBJJLO0EJt+ioXoTf0drSRCg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] target/riscv: use
- tcg_lookup_and_goto_ptr
+In-Reply-To: <20180904194903.20712-1-hpoussin@reactos.org>
+Subject: Re: [Qemu-devel] [PATCH v2] hw/ppc: on 40p machine,
+ change default firmware to OpenBIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, Michael Clark <mjc@sifive.com>, Alistair Francis <alistair.francis@wdc.com>
+To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On Tue, Sep 04, 2018 at 16:42:32 -0700, Alistair Francis wrote:
-> On Tue, Sep 4, 2018 at 4:39 PM, Emilio G. Cota <cota@braap.org> wrote:
-> > On Tue, Sep 04, 2018 at 13:18:28 -0700, Alistair Francis wrote:
-> >> On Fri, Aug 31, 2018 at 3:22 PM, Emilio G. Cota <cota@braap.org> wrote:
-> >> > On Fri, Aug 10, 2018 at 13:39:38 -0400, Emilio G. Cota wrote:
-> >> >> Changes wrt v1: changed patch 3 as suggested by Richard. Also
-> >> >> added his R-b's.
-> >> >>
-> >> >> You can fetch this series from:
-> >> >>   https://github.com/cota/qemu/tree/riscv-lookup_ptr-v2
-> >> >
-> >> > RISC-V maintainers: any plans of picking this up for 3.1?
-> >>
-> >> Thanks for CCing me.
-> >>
-> >> I think Michael must be really busy, I haven't seen any activity for
-> >> awhile. I'm going to send a PR with everything that has been reviewed
-> >> and applies cleanly.
-> >
-> > Thanks!
-> >
-> > Did patch 1 not apply cleanly? I see it's not part of the pullreq
-> > you just sent.
-> >
-> > I'd like the three patches to go in in the original order, since
-> > the perf numbers in patch 3's commit log are laid out assuming
-> > that is the case.
-> 
-> The content of patch 1 was applied in this commit:
-> 
-> commit 07ea28b41830f946de3841b0ac61a3413679feb9
-> Author: Richard Henderson <richard.henderson@linaro.org>
-> Date:   Wed May 30 18:06:23 2018 -0700
-> 
->     tcg: Pass tb and index to tcg_gen_exit_tb separately
-> 
->     Do the cast to uintptr_t within the helper, so that the compiler
->     can type check the pointer argument.  We can also do some more
->     sanity checking of the index argument.
-> 
->     Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->     Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> https://github.com/qemu/qemu/commit/07ea28b41830f946de3841b0ac61a3413679feb9
-> 
-> so unfortunately the patch no longer applies.
 
-If I rebase the 3 patches on top of the current master (19b599f7),
-the 3 patches apply cleanly, including patch 1:
+--7SrMUQONj8Rl9QNG
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -135,7 +135,7 @@ static void gen_goto_tb(DisasContext *ctx, int n, targ
-         if (ctx->base.singlestep_enabled) {
-             gen_exception_debug();
-         } else {
--            tcg_gen_exit_tb(NULL, 0);
-+            tcg_gen_lookup_and_goto_ptr();
-         }
-     }
- }
+On Tue, Sep 04, 2018 at 09:49:03PM +0200, Herv=E9 Poussineau wrote:
+> OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
+> Use it, instead of relying on an unmaintained and very limited firmware.
+>=20
+> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
 
-Did you apply the patches manually or pull from a branch?
-The latest branch I have on this is:
-   https://github.com/cota/qemu/tree/riscv-lookup_ptr-v2
-(although note that that branch doesn't have Richard's
-R-b tag for patch 3)
+Uh.. against current ppc-for-3.1, plase.
 
-Thanks,
+> ---
+>  hw/ppc/prep.c            | 2 +-
+>  tests/boot-serial-test.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 3401570d98..1558855247 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -736,7 +736,7 @@ static void ibm_40p_init(MachineState *machine)
+>      /* PCI host */
+>      dev =3D qdev_create(NULL, "raven-pcihost");
+>      if (!bios_name) {
+> -        bios_name =3D BIOS_FILENAME;
+> +        bios_name =3D "openbios-ppc";
+>      }
+>      qdev_prop_set_string(dev, "bios-name", bios_name);
+>      qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index 952a2e7ead..276ca14c97 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -76,13 +76,13 @@ static testdef_t tests[] =3D {
+>      { "alpha", "clipper", "", "PCI:" },
+>      { "ppc", "ppce500", "", "U-Boot" },
+>      { "ppc", "prep", "-m 96", "Memory size: 96 MB" },
+> -    { "ppc", "40p", "-boot d", "Booting from device d" },
+> +    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+>      { "ppc", "g3beige", "", "PowerPC,750" },
+>      { "ppc", "mac99", "", "PowerPC,G4" },
+>      { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
+>      { "ppc64", "ppce500", "", "U-Boot" },
+>      { "ppc64", "prep", "-boot e", "Booting from device e" },
+> -    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
+> +    { "ppc64", "40p", "-m 192", "Memory: 192M" },
+>      { "ppc64", "mac99", "", "PowerPC,970FX" },
+>      { "ppc64", "pseries", "", "Open Firmware" },
+>      { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
 
-		Emilio
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--7SrMUQONj8Rl9QNG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluPH7oACgkQbDjKyiDZ
+s5KgNBAAzQpZJZGZiuJTVzWGkuVsCabNtf2nclUCSvnbqq1APwukQ+0Y65mW5YUS
+wuZYsknvG4pwyHJ/trJe6xJc9fq2sZYRdNzhgyDygnz3acJcEi79ez2pF1gWR8h2
+siUYYVqJ1gORSqv6wmTBkkcbKL4H3LrJgqY3E9GnqKhGfx3V29iARWXMy7nOMX2f
+fqpM1SSGi4Tu5IZW3XTqUyLPL6u2OVmlAk6YS5R2czArF0/krfJyyol7iF5XsKiC
+K0vkXimnxU4nktHLmY5EfkKJCufTYvoPmfwPgTMCw/O71hnuSQfWgEdrl1d2+qM6
+Xy34AO/kqZ0jxKAKgibNn1qbPIWUoA8LQFzJb1CV7JYLYAbHi+zbktVdpiBf+ogT
+mm5FP1+1qRMU0ai5XTxcbbbOGutszGftwXMIVHT3Pl25C2KYUzkXyp5ARPUKiZQf
+Fp+GDibeSF2BUbZ6R7CUd+ZJDs9Z7DuyjhNFBicHiA8Sh+NLpCx7TIrs9mAJzp7M
+sIUgKarTgqyEDBwJ5KwlAicEGJX5NDjEQjZu21/r5+aNS7BZjcBbtEjYvCgYj1vW
+48VVme7jN4mdAu3slP0XOSQkI+6RoxQreJ01pEJHH8ki6foR+nrjBxHZVBmdy19F
+RX9RJYU/WZHZZZTyvzVSwqRs2kvne7UxzBPCbMfIM04Mr/LI15Y=
+=uFU5
+-----END PGP SIGNATURE-----
+
+--7SrMUQONj8Rl9QNG--
