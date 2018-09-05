@@ -1,29 +1,31 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:34722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fxTWS-0002G0-FI
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:50:49 -0400
+	(envelope-from <quintela@redhat.com>) id 1fxTWU-0002G0-M1
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fxTIr-0007NL-M4
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:36:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48700 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fxTIh-0007DH-Vy
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:36:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60770 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fxTIr-0007Mj-E0
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:36:45 -0400
-Date: Wed, 5 Sep 2018 09:36:41 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180905083641.GD3026@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180904110822.12863-1-fli@suse.com>
-	<20180904110822.12863-2-fli@suse.com>
-	<20180904112620.GG22349@redhat.com>
-	<0831de15-95cb-0774-10f9-8b03f4141c10@suse.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fxTIh-0007BU-Q8
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 04:36:35 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <CAJ+F1CKaRhO8sGf51SHf1mrL=RA+NmCdtLdPcpMrcufp4wfB3w@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 5 Sep 2018
+	12:21:39 +0400")
+References: <20180831172424.12029-1-marcandre.lureau@redhat.com>
+	<20180831172424.12029-4-marcandre.lureau@redhat.com>
+	<CAJ+F1CKEjAnQDtt2n0LOu4MKT94fqWnfjXUprp3vqYY=JghfsA@mail.gmail.com>
+	<87musy1cdc.fsf@trasno.org> <20180904085152.685b47ab@redhat.com>
+	<CAJ+F1CKaRhO8sGf51SHf1mrL=RA+NmCdtLdPcpMrcufp4wfB3w@mail.gmail.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 05 Sep 2018 10:36:27 +0200
+Message-ID: <87in3kfiic.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0831de15-95cb-0774-10f9-8b03f4141c10@suse.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/5] Fix segmentation fault when
- qemu_signal_init fails
+Subject: Re: [Qemu-devel] [PATCH v10 3/6] tpm: allocate/map buffer for TPM
+ Physical Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,155 +34,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, QEMU <qemu-devel@nongnu.org>, xiaoguangrong@tencent.com, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Sep 05, 2018 at 12:17:24PM +0800, Fei Li wrote:
-> Thanks for the review! :)
->=20
->=20
-> On 09/04/2018 07:26 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Tue, Sep 04, 2018 at 07:08:18PM +0800, Fei Li wrote:
-> > > Currently, when qemu_signal_init() fails it only returns a non-zero
-> > > value but without propagating any Error. But its callers need a
-> > > non-null err when runs error_report_err(err), or else 0->msg occurs=
-.
-> > >=20
-> > > To avoid such segmentation fault, add a new Error parameter to make
-> > > the call trace to propagate the err to the final caller.
-> > >=20
-> > > Signed-off-by: Fei Li <fli@suse.com>
-> > > ---
-> > >   include/qemu/osdep.h |  2 +-
-> > >   util/compatfd.c      | 17 ++++++++++++-----
-> > >   util/main-loop.c     | 11 +++++++----
-> > >   3 files changed, 20 insertions(+), 10 deletions(-)
-> > >=20
-> > > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > > index a91068df0e..09ed85fcb8 100644
-> > > --- a/include/qemu/osdep.h
-> > > +++ b/include/qemu/osdep.h
-> > > @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
-> > >                                additional fields in the future) */
-> > >   };
-> > > -int qemu_signalfd(const sigset_t *mask);
-> > > +int qemu_signalfd(const sigset_t *mask, Error **errp);
-> > >   void sigaction_invoke(struct sigaction *action,
-> > >                         struct qemu_signalfd_siginfo *info);
-> > >   #endif
-> > > diff --git a/util/compatfd.c b/util/compatfd.c
-> > > index 980bd33e52..65501de622 100644
-> > > --- a/util/compatfd.c
-> > > +++ b/util/compatfd.c
-> > > @@ -16,6 +16,7 @@
-> > >   #include "qemu/osdep.h"
-> > >   #include "qemu-common.h"
-> > >   #include "qemu/thread.h"
-> > > +#include "qapi/error.h"
-> > >   #include <sys/syscall.h>
-> > > @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
-> > >       }
-> > >   }
-> > > -static int qemu_signalfd_compat(const sigset_t *mask)
-> > > +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp=
-)
-> > >   {
-> > >       struct sigfd_compat_info *info;
-> > >       QemuThread thread;
-> > > @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t =
-*mask)
-> > >       info =3D malloc(sizeof(*info));
-> > >       if (info =3D=3D NULL) {
-> > > +        error_setg(errp, "Failed to malloc in %s", __func__);
-> > I'd avoid using __func__ in error messages. Instead
-> >=20
-> >     "Failed to allocate signalfd memory"
-> Ok, thanks.
-> >=20
-> > >           errno =3D ENOMEM;
-> > >           return -1;
-> > >       }
-> > >       if (pipe(fds) =3D=3D -1) {
-> > > +        error_setg(errp, "Failed to create a pipe in %s", __func__=
-);
-> >      "Failed to create signalfd pipe"
-> OK.
-> >=20
-> > >           free(info);
-> > >           return -1;
-> > >       }
-> > > @@ -94,17 +97,21 @@ static int qemu_signalfd_compat(const sigset_t =
-*mask)
-> > >       return fds[0];
-> > >   }
-> > > -int qemu_signalfd(const sigset_t *mask)
-> > > +int qemu_signalfd(const sigset_t *mask, Error **errp)
-> > >   {
-> > > -#if defined(CONFIG_SIGNALFD)
-> > >       int ret;
-> > > +    Error *local_err =3D NULL;
-> > > +#if defined(CONFIG_SIGNALFD)
-> > >       ret =3D syscall(SYS_signalfd, -1, mask, _NSIG / 8);
-> > >       if (ret !=3D -1) {
-> > >           qemu_set_cloexec(ret);
-> > >           return ret;
-> > >       }
-> > >   #endif
-> > > -
-> > > -    return qemu_signalfd_compat(mask);
-> > > +    ret =3D qemu_signalfd_compat(mask, &local_err);
-> > > +    if (local_err) {
-> > > +        error_propagate(errp, local_err);
-> > > +    }
-> > Using a local_err is not required - you can just pass errp stright
-> > to qemu_signalfd_compat() and then check
-> >=20
-> >     if (ret < 0)
-> For the use of a local error object & error_propagate call, I'd like to
-> explain here. :)
-> In our code, the initial caller passes two kinds of Error to the call t=
-race,
-> one is
-> something like &error_abort and &error_fatal, the other is NULL.
->=20
-> For the former, the exit() occurs in the functions where
-> error_handle_fatal() is called
-> (e.g. called by error_propagate/error_setg/...). The patch3: qemu_init_=
-vcpu
-> is the case,
-> that means the system will exit in the final callee: qemu_thread_create=
-(),
-> instead of
-> the initial caller pc_new_cpu(). In such case, I think propagating seem=
-s
-> more reasonable.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+Hi
 
-I don't really agree. It is preferrable to abort immediately at the deepe=
-st
-place which raises the error. The stack trace will thus show the full cal=
-l
-chain leading upto the problem.
+>> > Physical RAM is multiple of TARGET_PAGE_SIZE O:-)
+>> > That assumtion is held in too many places, if you can change the size =
+to
+>> > be multiple of page size, that would be greate.
+>
+> It needs the RAMBlock to be a multiple of TARGET_PAGE_SIZE, but the
+> memory region (in guest and qemu MemoryRegion) can be less. This is
+> already the case with for ex, "/rom@etc/acpi/rsdp", which is 36 bytes.
+>
+> I suppose 2 different MemoryRegions (backed by different RAMBlock)
+> that would be placed on the same page (for ex, at offset 0x0, size
+> 0x10 and offset 0x10, size 0x100) would work fine in general and with
+> migration?
 
-> How do you think passing errp straightly for the latter case, and use a
-> local error object &
-> error_propagate for the former case? This is a distinct treatment, but =
-would
-> shorten the code.
+Honestly I don't know.  But if the ramblock is correct, I think that we
+have no problem at all.  Migration code just does:
 
-It is inappropriate to second-guess whether the caller is a passing in
-NULL or &error_abort, or another Error object. What is passed in can
-change at any time in the future.=20
+for each ramblock
+  for each page in ramblock
 
-We should only ever use a local error where the local method has a need
-to look at the error contents before returning to the caller. Any other
-case should just use the errp directly.
+(Yes, I know,  I have oversimplified)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>> > > Should the migration code be fixed, or should the TPM code allocate
+>> > > ram differently?
+>> >
+>> > Migration people (i.e. me) would preffer that you fix the TPM
+>> > allocation.  Or you can decide that this is *not* RAM.  The unit of
+>> > transfer for migrate ram is ram pages, a.k.a. TARGET_PAGE_SIZE.
+>> I'd loath to waste whole page in already cramped area.
+>> Can we implement it as mmio region? (it will add some bolerplate
+>> code for read/write
+>> handlers/migration and cause vmexits on every read/write but it's
+>> not a hot path so we might not care)
+>>
+>
+>
+> I have done some small adjustments to allow
+> memory_region_init_ram_device_ptr() to work with a MemoryRegions size
+> !=3D backed RAMBlock, and it seems to work fine (and doesn't need to
+> allocate more space of guest memory range, or fall back to mmio)
+
+If the ramblock are full pages, everything should be ok.
+
+Later, Juan.
