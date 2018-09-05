@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fxNJc-0004fV-6c
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:13:09 -0400
+	(envelope-from <yuchenlin@synology.com>) id 1fxNLd-0007ig-2s
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:15:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fxNJX-0002km-IF
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:13:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fxNJX-0002ge-7f
-	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:13:03 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 96510C0587F9
-	for <qemu-devel@nongnu.org>; Wed,  5 Sep 2018 02:13:00 +0000 (UTC)
-Date: Tue, 4 Sep 2018 23:12:55 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180905021255.GK12698@habkost.net>
-References: <1536067356-44609-1-git-send-email-imammedo@redhat.com>
-	<1536067356-44609-2-git-send-email-imammedo@redhat.com>
+	(envelope-from <yuchenlin@synology.com>) id 1fxNLc-00064n-2c
+	for qemu-devel@nongnu.org; Tue, 04 Sep 2018 22:15:12 -0400
+Date: Wed, 5 Sep 2018 10:14:53 +0800
+From: yuchenlin <yuchenlin@synology.com>
+Message-ID: <d83ea4f7-3d79-49b1-a067-4146e7cbc745@Mail>
+In-Reply-To: <20180828031751.29507-1-yuchenlin@synology.com>
+References: <20180828031751.29507-1-yuchenlin@synology.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <1536067356-44609-2-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] vl.c deprecate incorrect CPUs
- topology
+Subject: Re: [Qemu-devel] [PATCH] vmdk: align end of file to a sector
+ boundary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,92 +24,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, drjones@redhat.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org
 
-On Tue, Sep 04, 2018 at 03:22:35PM +0200, Igor Mammedov wrote:
-> -smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-> so that total number of logical CPUs [sockets * cores * threads]
-> would be equal to [maxcpus], however historically we didn't have
-> such check in QEMU and it is possible to start VM with an invalid
-> topology.
-> Deprecate invalid options combination so we can make sure that
-> the topology VM started with is always correct in the future.
-> Users with an invalid sockets/cores/threads/maxcpus values should
-> fix their CLI to make sure that
->    [sockets * cores * threads] == [maxcpus]
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> v5:
->   - extend deprecation doc, adding that maxcpus should be multiple of
->     present on CLI [sockets/cores/threads] options
->     (Eduardo Habkost <ehabkost@redhat.com>)
-> v4:
->   - missed dot comment, fix it with s/./,/ (Andrew Jones <drjones@redhat.com>)
-> v3:
->   - more spelling fixes (Andrew Jones <drjones@redhat.com>)
->   - place deprecation check after (sockets * cores * threads > max_cpus) check
->     (Eduardo Habkost <ehabkost@redhat.com>)
-> v2:
->   - spelling&&co fixes (Andrew Jones <drjones@redhat.com>)
-> ---
->  qemu-deprecated.texi | 19 +++++++++++++++++++
->  vl.c                 |  7 +++++++
->  2 files changed, 26 insertions(+)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 87212b6..827c3ce 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -159,6 +159,25 @@ The 'file' driver for drives is no longer appropriate for character or host
->  devices and will only accept regular files (S_IFREG). The correct driver
->  for these file types is 'host_cdrom' or 'host_device' as appropriate.
->  
-> +@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
+Ping=21
 
-Minor: I suggest using @var markup, or maybe just use
-"-smp (invalid topologies) (since 3.1)" as subsection title for simplicity?
-
-> +
-> +CPU topology properties should describe whole machine topology including
-> +possible CPUs, but historically it was possible to start QEMU with
-> +an incorrect topology where
-> +  sockets * cores * threads >= X && X < maxcpus
-
-Minor: this line formatting is lost on the HTML output.  I
-suggest using @var and/or @math.
-
-Minor: I suggest not using C syntax.
-
-i.e. use something like:
-
-  @math{@var{n} <= @var{sockets} * @var{cores} * @var{threads} < @var{maxcpus}},
-
-> +which could lead to an incorrect topology enumeration by the guest.
-> +Support for invalid topologies will be removed, the user must ensure
-> +topologies described with -smp include all possible cpus, i.e.
-> +  sockets * cores * threads == maxcpus
-
-Minor: same as above.  I suggest:
-
-  @math{@var{sockets} * @var{cores} * @var{threads} = @var{maxcpus}}.
-
-
-> +Note: it's assumed that maxcpus value must be multiple of the topology
-> +options present on command line to avoid creating an invalid topology.
-> +If maxcpus isn't be multiple of present topology options then the condition
-> +(sockets * cores * threads == maxcpus) can't be satisfied and it will
-> +trigger deprecation warning which later will be converted to a error.
-> +If you get deprecation warning it's recommended to explicitly specify
-> +a correct topology to make warning go away and ensure that it will
-> +continue working in the future.
-
-I don't understand the purpose of the "Note:" section.  It seems to duplicate
-what was already said in the lines above it.  Can we just remove it?
-
-These are just suggestions in case you are going to respin the series, not
-blockers.
-
--- 
-Eduardo
+yuchenlin=40synology.com =E6=96=BC 2018-08-28 11:18 =E5=AF=AB=E9=81=93=EF=
+=BC=9A
+> =46rom: yuchenlin <yuchenlin=40synology.com> There is a rare case which=
+ the size of last compressed cluster is larger than the cluster size, whi=
+ch will cause the file is not aligned at the sector boundary. Signed-off-=
+by: yuchenlin <yuchenlin=40synology.com> --- block/vmdk.c =7C 18 ++++++++=
+++++++++++ 1 file changed, 18 insertions(+) diff --git a/block/vmdk.c b/b=
+lock/vmdk.c index a9d0084e36..a8ae7c65d2 100644 --- a/block/vmdk.c +++ b/=
+block/vmdk.c =40=40 -1698,6 +1698,24 =40=40 static int coroutine=5Ffn vmd=
+k=5Fco=5Fpwritev=5Fcompressed(BlockDriverState *bs, uint64=5Ft offset, ui=
+nt64=5Ft bytes, QEMUIOVector *qiov) =7B + if (bytes =3D=3D 0) =7B + /* al=
+ign end of file to a sector boundary. */ + BDRVVmdkState *s =3D bs->opaqu=
+e; + int i, ret; + int64=5Ft length; + + for (i =3D 0; i < s->num=5Fexten=
+ts; i++) =7B + length =3D bdrv=5Fgetlength(s->extents=5Bi=5D.file->bs); +=
+ if (length < 0) =7B + return length; + =7D + ret =3D bdrv=5Ftruncate(s->=
+extents=5Bi=5D.file, length, PREALLOC=5FMODE=5FO=46=46, NULL); + if (ret =
+< 0) =7B + return ret; + =7D + =7D + return 0; + =7D return vmdk=5Fco=5Fp=
+writev(bs, offset, bytes, qiov, 0); =7D -- 2.17.0  =20
