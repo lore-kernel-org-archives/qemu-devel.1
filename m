@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fxRBE-0005L7-C3
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 02:20:45 -0400
+	(envelope-from <peterx@redhat.com>) id 1fxRE2-0006Vw-Pz
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 02:23:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fxRBA-0001sg-HX
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 02:20:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50114)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fxRB9-0001nj-Qu
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 02:20:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fxRB8-0002rQ-FX
-	for <qemu-devel@nongnu.org>; Wed, 05 Sep 2018 06:20:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 628C82E80C9
-	for <qemu-devel@nongnu.org>; Wed,  5 Sep 2018 06:20:38 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Sep 2018 06:12:28 -0000
-From: Heiko Sieger <1788665@bugs.launchpad.net>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153612794837.31697.12340314467329480820.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+	(envelope-from <peterx@redhat.com>) id 1fxRE0-0006w6-VM
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 02:23:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57438 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fxRE0-0006gz-E2
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 02:23:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CD18A40216E6
+	for <qemu-devel@nongnu.org>; Wed,  5 Sep 2018 06:23:27 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed,  5 Sep 2018 14:23:07 +0800
+Message-Id: <20180905062313.4059-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 0/6] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,90 +28,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Here is another person confirming the bug, with a little more details:
+Based-on: <20180828191048.29806-1-armbru@redhat.com>
+Based-on: <20180901111716.1675-1-armbru@redhat.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D200877#c2
+(this series is based on Markus's monitor-next tree)
 
-Sorry for reporting the bug twice, but it is unclear to me whose going
-to take action.
+v8:
+- remove patch 1 & 2 since already in the QAPI pull
+- squash patch 3 & 4, use Markus's version of commit message (with
+  some of my additions), make sure popping and reading queue length is
+  in the same critical section [Markus]
+- add one patch to cover test for queue full [Markus]
+- add one patch to resume the monitor earlier when queue not full [Markus]
 
-** Bug watch added: Linux Kernel Bug Tracker #200877
-   https://bugzilla.kernel.org/show_bug.cgi?id=3D200877
+v7:
+- use Markus's commit message for patch "qapi: Drop
+  qapi_event_send_FOO()'s Error ** argument" [Markus]
+- update commit message for "qapi: remove COMMAND_DROPPED event" since
+  QEMU 3.0 is released [Eric/Dave]
+- rebase to Markus's monitor-next tree:
+  http://repo.or.cz/qemu/armbru.git/shortlog/refs/heads/monitor-next
+  the patch "monitor: suspend monitor instead of send CMD_DROP"
+  re-written since people prefer to drop need_resume flag so now I
+  hand-made it.  Dropped a few patches since not appliable any more.
 
--- =
+Please review.  Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
+Peter Xu (6):
+  monitor: Suspend monitor instead dropping commands
+  monitor: resume the monitor earlier if needed
+  monitor: remove "x-oob", turn oob on by default
+  Revert "tests: Add parameter to qtest_init_without_qmp_handshake"
+  tests: add oob functional test for test-qmp-cmds
+  tests: qmp-test: add queue full test
 
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
+ docs/interop/qmp-spec.txt |  5 ++-
+ include/monitor/monitor.h |  3 +-
+ monitor.c                 | 80 +++++++++++++++------------------------
+ qapi/misc.json            | 40 --------------------
+ tests/libqtest.c          | 10 ++---
+ tests/libqtest.h          |  4 +-
+ tests/qmp-test.c          | 32 ++++++++++++++--
+ tests/test-qmp-cmds.c     | 16 ++++++++
+ vl.c                      |  5 ---
+ 9 files changed, 86 insertions(+), 109 deletions(-)
 
-Status in QEMU:
-  New
-
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+-- 
+2.17.1
