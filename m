@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fxs4F-00052l-8X
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:03:23 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1fxsCB-0007E4-C7
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fxs4B-0006bU-Eg
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:03:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48474 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fxs49-0006SV-Nw
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:03:15 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180906070101.27280-1-xiaoguangrong@tencent.com> (guangrong
-	xiao's message of "Thu, 6 Sep 2018 15:00:58 +0800")
-References: <20180906070101.27280-1-xiaoguangrong@tencent.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 06 Sep 2018 13:03:00 +0200
-Message-ID: <87k1ny51nf.fsf@trasno.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] migration: compression optimization
+	(envelope-from <danielhb413@gmail.com>) id 1fxsC9-0001lx-5R
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:30 -0400
+Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:38484)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1fxsC8-0001jU-M5
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:28 -0400
+Received: by mail-qt0-x229.google.com with SMTP id x7-v6so11708769qtk.5
+	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 04:11:27 -0700 (PDT)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Date: Thu,  6 Sep 2018 08:11:04 -0300
+Message-Id: <20180906111107.30684-1-danielhb413@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use ID
+ anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-guangrong.xiao@gmail.com wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->
-> Changelog in v6:
->
-> Thanks to Juan's review, in this version we
-> 1) move flush compressed data to find_dirty_block() where it hits the end
->    of memblock
-> 2) use save_page_use_compression instead of migrate_use_compression in
->    flush_compressed_data
->
-> Xiao Guangrong (3):
->   migration: do not flush_compressed_data at the end of iteration
->   migration: show the statistics of compression
->   migration: use save_page_use_compression in flush_compressed_data
->
->  hmp.c                 | 13 +++++++++++
->  migration/migration.c | 12 ++++++++++
->  migration/ram.c       | 63 +++++++++++++++++++++++++++++++++++++++++++--------
->  migration/ram.h       |  1 +
->  qapi/migration.json   | 26 ++++++++++++++++++++-
->  5 files changed, 105 insertions(+), 10 deletions(-)
+changes in v2:
+- removed the "RFC" marker;
+- added a new patch (patch 2) that removes
+bdrv_snapshot_delete_by_id_or_name from the code;
+- made changes in patch 1 as suggested by Murilo;
+- previous patch set link:
+https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html
 
-queued
+
+It is not uncommon to see bugs being opened by testers that attempt to
+create VM snapshots using HMP. It turns out that "0" and "1" are quite
+common snapshot names and they trigger a lot of bugs. I gave an example
+in the commit message of patch 1, but to sum up here: QEMU treats the
+input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. It
+is documented as such, but this can lead to strange situations.
+
+Given that it is strange for an API to consider a parameter to be 2 fields
+at the same time, and inadvently treating them as one or the other, and
+that removing the ID field is too drastic, my idea here is to keep the
+ID field for internal control, but do not let the user set it.
+
+I guess there's room for discussion about considering this change an API
+change or not. It doesn't affect users of HMP and it doesn't affect Libvirt,
+but simplifying the meaning of the parameters of savevm/loadvm/delvm.
+
+
+Daniel Henrique Barboza (3):
+  block/snapshot.c: eliminate use of ID input in snapshot operations
+  block/snapshot: remove bdrv_snapshot_delete_by_id_or_name
+  qcow2-snapshot: remove redundant find_snapshot_by_id_and_name call
+
+ block/qcow2-snapshot.c   |  5 -----
+ block/snapshot.c         | 25 +++----------------------
+ hmp-commands.hx          | 24 ++++++++++++------------
+ include/block/snapshot.h |  3 ---
+ qemu-img.c               | 15 +++++++++++----
+ 5 files changed, 26 insertions(+), 46 deletions(-)
+
+-- 
+2.17.1
