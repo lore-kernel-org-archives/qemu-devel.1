@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fxx0n-0000P9-C8
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:20:06 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fxx1L-0000lW-0Y
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fxx0m-0006QM-0h
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:20:05 -0400
-Date: Thu, 6 Sep 2018 12:19:52 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180906161952.GB22117@localhost.localdomain>
-References: <20180906130225.5118-1-jsnow@redhat.com>
-	<20180906130225.5118-5-jsnow@redhat.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fxx1K-0007Kw-Aw
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:20:38 -0400
+References: <20180906055736.20256-1-mark.cave-ayland@ilande.co.uk>
+	<20180906055736.20256-2-mark.cave-ayland@ilande.co.uk>
+	<0223f14f-ab9a-f593-afc0-b87549d94482@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <32117dc7-495a-ec8c-233c-a2a15cbf431e@ilande.co.uk>
+Date: Thu, 6 Sep 2018 17:20:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180906130225.5118-5-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 04/16] block/commit: refactor commit to
- use job callbacks
+In-Reply-To: <0223f14f-ab9a-f593-afc0-b87549d94482@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] scsi: move lsi53c895a structures and
+ defines into separate lsi53c895a.h file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,170 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, pbonzini@redhat.com, famz@redhat.com, hpoussin@reactos.org, rth@twiddle.net, peter.maydell@linaro.org, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Thu, Sep 06, 2018 at 09:02:13AM -0400, John Snow wrote:
-> Use the component callbacks; prepare, abort, and clean.
-> 
-> NB: prepare is only called when the job has not yet failed;
-> and abort can be called after prepare.
-> 
-> complete -> prepare -> abort -> clean
-> complete -> abort -> clean
-> 
-> During refactor, a potential problem with bdrv_drop_intermediate
-> was identified, The patched behavior is no worse than the pre-patch
-> behavior, so leave a FIXME for now to be fixed in a future patch.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+On 06/09/18 12:52, Thomas Huth wrote:
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+> On 2018-09-06 07:57, Mark Cave-Ayland wrote:
+>> There is also one small change to the new header file which is the addition
+>> of the previously missing LSI53C810 define.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>  hw/scsi/lsi53c895a.c         | 116 +-----------------------------------
+>>  include/hw/scsi/lsi53c895a.h | 137 +++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 138 insertions(+), 115 deletions(-)
+>>  create mode 100644 include/hw/scsi/lsi53c895a.h
+> [...]
+>> diff --git a/include/hw/scsi/lsi53c895a.h b/include/hw/scsi/lsi53c895a.h
+>> new file mode 100644
+>> index 0000000000..d80cb78c69
+>> --- /dev/null
+>> +++ b/include/hw/scsi/lsi53c895a.h
+>> @@ -0,0 +1,137 @@
+>> +/*
+>> + * QEMU LSI53C895A SCSI Host Bus Adapter emulation
+>> + *
+>> + * Copyright (c) 2006 CodeSourcery.
+>> + * Written by Paul Brook
+>> + *
+>> + * This code is licensed under the LGPL.
+>> + */
+>> +
+>> +#ifndef LSI_H
+>> +#define LSI_H
+>> +
+>> +#include "qemu/osdep.h"
+> 
+> Please don't include osdep.h from a header, that should only be done
+> from .c files.
 
-> ---
->  block/commit.c | 92 ++++++++++++++++++++++++++++++++--------------------------
->  1 file changed, 51 insertions(+), 41 deletions(-)
-> 
-> diff --git a/block/commit.c b/block/commit.c
-> index b6e8969877..a2da5740b0 100644
-> --- a/block/commit.c
-> +++ b/block/commit.c
-> @@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
->      BlockDriverState *commit_top_bs;
->      BlockBackend *top;
->      BlockBackend *base;
-> +    BlockDriverState *base_bs;
->      BlockdevOnError on_error;
->      int base_flags;
->      char *backing_file_str;
-> @@ -68,61 +69,67 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
->      return 0;
->  }
->  
-> -static void commit_exit(Job *job)
-> +static int commit_prepare(Job *job)
->  {
->      CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-> -    BlockJob *bjob = &s->common;
-> -    BlockDriverState *top = blk_bs(s->top);
-> -    BlockDriverState *base = blk_bs(s->base);
-> -    BlockDriverState *commit_top_bs = s->commit_top_bs;
-> -    bool remove_commit_top_bs = false;
-> -
-> -    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-> -    bdrv_ref(top);
-> -    bdrv_ref(commit_top_bs);
->  
->      /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
->       * the normal backing chain can be restored. */
->      blk_unref(s->base);
-> +    s->base = NULL;
->  
-> -    if (!job_is_cancelled(job) && job->ret == 0) {
-> -        /* success */
-> -        job->ret = bdrv_drop_intermediate(s->commit_top_bs, base,
-> -                                          s->backing_file_str);
-> -    } else {
-> -        /* XXX Can (or should) we somehow keep 'consistent read' blocked even
-> -         * after the failed/cancelled commit job is gone? If we already wrote
-> -         * something to base, the intermediate images aren't valid any more. */
-> -        remove_commit_top_bs = true;
-> +    /* FIXME: bdrv_drop_intermediate treats total failures and partial failures
-> +     * identically. Further work is needed to disambiguate these cases. */
-> +    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
-> +                                  s->backing_file_str);
-> +}
-> +
-> +static void commit_abort(Job *job)
-> +{
-> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-> +    BlockDriverState *top_bs = blk_bs(s->top);
-> +
-> +    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-> +    bdrv_ref(top_bs);
-> +    bdrv_ref(s->commit_top_bs);
-> +
-> +    if (s->base) {
-> +        blk_unref(s->base);
->      }
->  
-> +    /* free the blockers on the intermediate nodes so that bdrv_replace_nodes
-> +     * can succeed */
-> +    block_job_remove_all_bdrv(&s->common);
-> +
-> +    /* If bdrv_drop_intermediate() failed (or was not invoked), remove the
-> +     * commit filter driver from the backing chain now. Do this as the final
-> +     * step so that the 'consistent read' permission can be granted.
-> +     *
-> +     * XXX Can (or should) we somehow keep 'consistent read' blocked even
-> +     * after the failed/cancelled commit job is gone? If we already wrote
-> +     * something to base, the intermediate images aren't valid any more. */
-> +    bdrv_child_try_set_perm(s->commit_top_bs->backing, 0, BLK_PERM_ALL,
-> +                            &error_abort);
-> +    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
-> +                      &error_abort);
-> +
-> +    bdrv_unref(s->commit_top_bs);
-> +    bdrv_unref(top_bs);
-> +}
-> +
-> +static void commit_clean(Job *job)
-> +{
-> +    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-> +
->      /* restore base open flags here if appropriate (e.g., change the base back
->       * to r/o). These reopens do not need to be atomic, since we won't abort
->       * even on failure here */
-> -    if (s->base_flags != bdrv_get_flags(base)) {
-> -        bdrv_reopen(base, s->base_flags, NULL);
-> +    if (s->base_flags != bdrv_get_flags(s->base_bs)) {
-> +        bdrv_reopen(s->base_bs, s->base_flags, NULL);
->      }
-> +
->      g_free(s->backing_file_str);
->      blk_unref(s->top);
-> -
-> -    /* If there is more than one reference to the job (e.g. if called from
-> -     * job_finish_sync()), job_completed() won't free it and therefore the
-> -     * blockers on the intermediate nodes remain. This would cause
-> -     * bdrv_set_backing_hd() to fail. */
-> -    block_job_remove_all_bdrv(bjob);
-> -
-> -    /* If bdrv_drop_intermediate() didn't already do that, remove the commit
-> -     * filter driver from the backing chain. Do this as the final step so that
-> -     * the 'consistent read' permission can be granted.  */
-> -    if (remove_commit_top_bs) {
-> -        bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
-> -                                &error_abort);
-> -        bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
-> -                          &error_abort);
-> -    }
-> -
-> -    bdrv_unref(commit_top_bs);
-> -    bdrv_unref(top);
->  }
->  
->  static int coroutine_fn commit_run(Job *job, Error **errp)
-> @@ -211,7 +218,9 @@ static const BlockJobDriver commit_job_driver = {
->          .user_resume   = block_job_user_resume,
->          .drain         = block_job_drain,
->          .run           = commit_run,
-> -        .exit          = commit_exit,
-> +        .prepare       = commit_prepare,
-> +        .abort         = commit_abort,
-> +        .clean         = commit_clean
->      },
->  };
->  
-> @@ -345,6 +354,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
->      if (ret < 0) {
->          goto fail;
->      }
-> +    s->base_bs = base;
->  
->      /* Required permissions are already taken with block_job_add_bdrv() */
->      s->top = blk_new(0, BLK_PERM_ALL);
-> -- 
-> 2.14.4
-> 
+Ah yes, my mistake (obviously it was a cut/paste from the .c file).
+
+I wonder if this is something to teach checkpatch about?
+
+
+ATB,
+
+Mark.
