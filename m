@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxwSJ-0002r1-Ea
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:44:28 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fxwvW-0005ER-Ea
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:14:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxwSH-0007YU-CW
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:44:27 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:36887)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fxwSF-0007Ti-IP
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:44:23 -0400
-Received: by mail-oi0-x244.google.com with SMTP id p84-v6so21412263oic.4
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 08:44:21 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fxwvQ-0000QJ-A8
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:14:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43028 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fxwvO-0000Ke-A0
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:14:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A558402332F
+	for <qemu-devel@nongnu.org>; Thu,  6 Sep 2018 16:14:28 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  6 Sep 2018 20:14:15 +0400
+Message-Id: <20180906161415.8543-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f741c912-c37b-34a6-89a3-96577d186adc@eagerm.com>
-References: <f38111ad-3fbb-210e-e7ec-49ae675ea65e@eagerm.com>
-	<a57fdd27-7a86-3f31-341c-e98101d17b9a@eagerm.com>
-	<61c2239b-f8db-6648-ba1b-203309d876eb@eagerm.com>
-	<f741c912-c37b-34a6-89a3-96577d186adc@eagerm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Sep 2018 16:44:00 +0100
-Message-ID: <CAFEAcA-8fF1F6A64Yv5G0LB9T4mBRvSSqi8oe3kENxSOGc982Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] RISC-V - Dynamic parameterization of
- RISC-V memory map
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] hostmem-memfd: add checks before adding
+ hostmem-memfd & properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +32,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Eager <eager@eagerm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On 6 September 2018 at 16:07, Michael Eager <eager@eagerm.com> wrote:
-> Any comments?
+Run some memfd-related checks before registering hostmem-memfd &
+various properties. This will help libvirt to figure out what the host
+is supposed to be capable of.
 
-I'd quite like to hear from somebody more familiar with the
-readconfig/writeconfig stuff than me about whether this
-very riscv-centric approach makes sense and fits with how
-the config file is used by other parts of QEMU.
+qemu_memfd_check() is changed to a less optimized version, since it is
+used with various flags, it no longer caches the result.
 
-I'm not sure who would be best to do that review, though. Paolo,
-any suggestions for who knows that bit of the code?
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/qemu/memfd.h     | 18 +++++++++++++++++-
+ backends/hostmem-memfd.c | 32 +++++++++++++++++++-------------
+ tests/vhost-user-test.c  |  6 +++---
+ util/memfd.c             | 35 ++++++-----------------------------
+ 4 files changed, 45 insertions(+), 46 deletions(-)
 
-thanks
--- PMM
-
-> On 08/30/2018 09:22 AM, Michael Eager wrote:
->>
->> Corrected patch attached.
->>
->> On 08/29/2018 05:48 PM, Michael Eager wrote:
->>>
->>> Whoops.  I just noticed that this patch is against the riscv-qemu
->>> repo on github, not the qemu.org repo.  I will rework it for the qemu.org
->>> repo.  Meanwhile, I welcome any comments.
->>>
->>> On 08/29/2018 05:21 PM, Michael Eager wrote:
->>>>
->>>> Memory parameters for RISC-V boards can be read from a configuration
->>>> file using the -readconfig command line option.  The configuration file
->>>> should have a section for the board and memory.  The configuration for
->>>> the VirtIO board has the following configuration variables:
->>>> [riscv-virt-mem]
->>>>    debug-base   = "0x0"
->>>>    debug-size   = "0x100"
->>>>    mrom-base    = "0x1000"
->>>>    mrom-size    = "0x11000"
->>>>    test-base    = "0x100000"
->>>>    test-size    = "0x1000"
->>>>    clint-base   = "0x2000000"
->>>>    clint-size   = "0x10000"
->>>>    plic-base    = "0xc000000"
->>>>    plic-size    = "0x4000000"
->>>>    uart0-base   = "0x10000000"
->>>>    uart0-size   = "0x100"
->>>>    virtio-base  = "0x10001000"
->>>>    virtio-size  = "0x1000"
->>>>    dram-base    = "0x80000000"
->>>>    dram-size    = "0x0"
->>>>
->>>> Values must be enclosed within quotes.
->>>>
->>>> Signed-off-by: Michael Eager <eager@eagercon.com>
->>>>
->>>
->>
->
-> --
-> Michael Eager    eager@eagerm.com
-> 1960 Park Blvd., Palo Alto, CA 94306
->
+diff --git a/include/qemu/memfd.h b/include/qemu/memfd.h
+index 49e79634da..d551c28b68 100644
+--- a/include/qemu/memfd.h
++++ b/include/qemu/memfd.h
+@@ -16,12 +16,28 @@
+ #define F_SEAL_WRITE    0x0008  /* prevent writes */
+ #endif
+=20
++#ifndef MFD_CLOEXEC
++#define MFD_CLOEXEC 0x0001U
++#endif
++
++#ifndef MFD_ALLOW_SEALING
++#define MFD_ALLOW_SEALING 0x0002U
++#endif
++
++#ifndef MFD_HUGETLB
++#define MFD_HUGETLB 0x0004U
++#endif
++
++#ifndef MFD_HUGE_SHIFT
++#define MFD_HUGE_SHIFT 26
++#endif
++
+ int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
+                       uint64_t hugetlbsize, unsigned int seals, Error **=
+errp);
+ bool qemu_memfd_alloc_check(void);
+ void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals=
+,
+                        int *fd, Error **errp);
+ void qemu_memfd_free(void *ptr, size_t size, int fd);
+-bool qemu_memfd_check(void);
++bool qemu_memfd_check(unsigned int flags);
+=20
+ #endif /* QEMU_MEMFD_H */
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index 7184918112..ccf70a0694 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -138,18 +138,22 @@ memfd_backend_class_init(ObjectClass *oc, void *dat=
+a)
+=20
+     bc->alloc =3D memfd_backend_memory_alloc;
+=20
+-    object_class_property_add_bool(oc, "hugetlb",
+-                                   memfd_backend_get_hugetlb,
+-                                   memfd_backend_set_hugetlb,
+-                                   &error_abort);
+-    object_class_property_add(oc, "hugetlbsize", "int",
+-                              memfd_backend_get_hugetlbsize,
+-                              memfd_backend_set_hugetlbsize,
+-                              NULL, NULL, &error_abort);
+-    object_class_property_add_bool(oc, "seal",
+-                                   memfd_backend_get_seal,
+-                                   memfd_backend_set_seal,
+-                                   &error_abort);
++    if (qemu_memfd_check(MFD_HUGETLB)) {
++        object_class_property_add_bool(oc, "hugetlb",
++                                       memfd_backend_get_hugetlb,
++                                       memfd_backend_set_hugetlb,
++                                       &error_abort);
++        object_class_property_add(oc, "hugetlbsize", "int",
++                                  memfd_backend_get_hugetlbsize,
++                                  memfd_backend_set_hugetlbsize,
++                                  NULL, NULL, &error_abort);
++    }
++    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
++        object_class_property_add_bool(oc, "seal",
++                                       memfd_backend_get_seal,
++                                       memfd_backend_set_seal,
++                                       &error_abort);
++    }
+ }
+=20
+ static const TypeInfo memfd_backend_info =3D {
+@@ -162,7 +166,9 @@ static const TypeInfo memfd_backend_info =3D {
+=20
+ static void register_types(void)
+ {
+-    type_register_static(&memfd_backend_info);
++    if (qemu_memfd_check(0)) {
++        type_register_static(&memfd_backend_info);
++    }
+ }
+=20
+ type_init(register_types);
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 716aff7153..45d58d8ea2 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -169,7 +169,7 @@ static char *get_qemu_cmd(TestServer *s,
+                           int mem, enum test_memfd memfd, const char *me=
+m_path,
+                           const char *chr_opts, const char *extra)
+ {
+-    if (memfd =3D=3D TEST_MEMFD_AUTO && qemu_memfd_check()) {
++    if (memfd =3D=3D TEST_MEMFD_AUTO && qemu_memfd_check(0)) {
+         memfd =3D TEST_MEMFD_YES;
+     }
+=20
+@@ -903,7 +903,7 @@ static void test_multiqueue(void)
+     s->queues =3D 2;
+     test_server_listen(s);
+=20
+-    if (qemu_memfd_check()) {
++    if (qemu_memfd_check(0)) {
+         cmd =3D g_strdup_printf(
+             QEMU_CMD_MEMFD QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=3D%d "
+             "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,vectors=3D%d",
+@@ -963,7 +963,7 @@ int main(int argc, char **argv)
+     /* run the main loop thread so the chardev may operate */
+     thread =3D g_thread_new(NULL, thread_function, loop);
+=20
+-    if (qemu_memfd_check()) {
++    if (qemu_memfd_check(0)) {
+         qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
+                             GINT_TO_POINTER(TEST_MEMFD_YES),
+                             test_read_guest_mem);
+diff --git a/util/memfd.c b/util/memfd.c
+index d248a53c3c..c4bd076182 100644
+--- a/util/memfd.c
++++ b/util/memfd.c
+@@ -45,22 +45,6 @@ static int memfd_create(const char *name, unsigned int=
+ flags)
+ }
+ #endif
+=20
+-#ifndef MFD_CLOEXEC
+-#define MFD_CLOEXEC 0x0001U
+-#endif
+-
+-#ifndef MFD_ALLOW_SEALING
+-#define MFD_ALLOW_SEALING 0x0002U
+-#endif
+-
+-#ifndef MFD_HUGETLB
+-#define MFD_HUGETLB 0x0004U
+-#endif
+-
+-#ifndef MFD_HUGE_SHIFT
+-#define MFD_HUGE_SHIFT 26
+-#endif
+-
+ int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
+                       uint64_t hugetlbsize, unsigned int seals, Error **=
+errp)
+ {
+@@ -200,23 +184,16 @@ bool qemu_memfd_alloc_check(void)
+  *
+  * Check if host supports memfd.
+  */
+-bool qemu_memfd_check(void)
++bool qemu_memfd_check(unsigned int flags)
+ {
+ #ifdef CONFIG_LINUX
+-    static int memfd_check =3D MEMFD_TODO;
++    int mfd =3D memfd_create("test", flags);
+=20
+-    if (memfd_check =3D=3D MEMFD_TODO) {
+-        int mfd =3D memfd_create("test", 0);
+-        if (mfd >=3D 0) {
+-            memfd_check =3D MEMFD_OK;
+-            close(mfd);
+-        } else {
+-            memfd_check =3D MEMFD_KO;
+-        }
++    if (mfd >=3D 0) {
++        close(mfd);
++        return true;
+     }
++#endif
+=20
+-    return memfd_check =3D=3D MEMFD_OK;
+-#else
+     return false;
+-#endif
+ }
+--=20
+2.19.0.rc1
