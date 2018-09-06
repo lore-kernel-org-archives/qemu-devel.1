@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fxoIA-0001S4-Ly
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 03:01:31 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fxoLJ-00055j-H1
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 03:04:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fxoI4-0008Bd-KX
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 03:01:26 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45462)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fxoI4-0008A4-Bu
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 03:01:20 -0400
-Received: by mail-pf1-x444.google.com with SMTP id i26-v6so4775779pfo.12
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 00:01:19 -0700 (PDT)
-From: guangrong.xiao@gmail.com
-Date: Thu,  6 Sep 2018 15:01:00 +0800
-Message-Id: <20180906070101.27280-3-xiaoguangrong@tencent.com>
-In-Reply-To: <20180906070101.27280-1-xiaoguangrong@tencent.com>
-References: <20180906070101.27280-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH v6 2/3] migration: show the statistics of
- compression
+	(envelope-from <laurent@vivier.eu>) id 1fxoLG-0002Oo-7H
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 03:04:41 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:47099)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fxoLF-0002Ne-QB
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 03:04:38 -0400
+References: <20180906065729.2487-1-sandipan@linux.ibm.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <876f77aa-ce49-2ee4-1f21-5f371076c9c9@vivier.eu>
+Date: Thu, 6 Sep 2018 09:04:19 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180906065729.2487-1-sandipan@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target-ppc: Extend HWCAP2 bits for ISA 3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,228 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, quintela@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Sandipan Das <sandipan@linux.ibm.com>, david@gibson.dropbear.id.au, richard.henderson@linaro.org
+Cc: qemu-devel@nongnu.org, riku.voipio@iki.fi, nikunj@linux.vnet.ibm.com, naveen.n.rao@linux.vnet.ibm.com
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+Le 06/09/2018 à 08:57, Sandipan Das a écrit :
+> This adds the HWCAP2 bit to detect if a linux user process is
+> running on an ISA 3.0 compliant cpu like POWER9. This can be
+> verified using a simple test program that prints the value in
+> the auxiliary vector for AT_HWCAP2 as shown below.
+> 
+> Before:
+>   $ qemu-ppc64le -cpu power8 test
+>   0x8c000000
+> 
+>   $ qemu-ppc64le -cpu power9 test
+>   0x8c000000
+> 
+> After:
+>   $ qemu-ppc64le -cpu power8 test
+>   0x8c000000
+> 
+>   $ qemu-ppc64le -cpu power9 test
+>   0x8c800000
+> 
+> Signed-off-by: Sandipan Das <sandipan@linux.ibm.com>
+> ---
+>  linux-user/elfload.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-Currently, it includes:
-pages: amount of pages compressed and transferred to the target VM
-busy: amount of count that no free thread to compress data
-busy-rate: rate of thread busy
-compressed-size: amount of bytes after compression
-compression-rate: rate of compressed size
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
----
- hmp.c                 | 13 +++++++++++++
- migration/migration.c | 12 ++++++++++++
- migration/ram.c       | 41 ++++++++++++++++++++++++++++++++++++++++-
- migration/ram.h       |  1 +
- qapi/migration.json   | 26 +++++++++++++++++++++++++-
- 5 files changed, 91 insertions(+), 2 deletions(-)
-
-diff --git a/hmp.c b/hmp.c
-index 4975fa56b0..f57b23d889 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -271,6 +271,19 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-                        info->xbzrle_cache->overflow);
-     }
- 
-+    if (info->has_compression) {
-+        monitor_printf(mon, "compression pages: %" PRIu64 " pages\n",
-+                       info->compression->pages);
-+        monitor_printf(mon, "compression busy: %" PRIu64 "\n",
-+                       info->compression->busy);
-+        monitor_printf(mon, "compression busy rate: %0.2f\n",
-+                       info->compression->busy_rate);
-+        monitor_printf(mon, "compressed size: %" PRIu64 "\n",
-+                       info->compression->compressed_size);
-+        monitor_printf(mon, "compression rate: %0.2f\n",
-+                       info->compression->compression_rate);
-+    }
-+
-     if (info->has_cpu_throttle_percentage) {
-         monitor_printf(mon, "cpu throttle percentage: %" PRIu64 "\n",
-                        info->cpu_throttle_percentage);
-diff --git a/migration/migration.c b/migration/migration.c
-index 4b316ec343..f1d662f928 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -758,6 +758,18 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-         info->xbzrle_cache->overflow = xbzrle_counters.overflow;
-     }
- 
-+    if (migrate_use_compression()) {
-+        info->has_compression = true;
-+        info->compression = g_malloc0(sizeof(*info->compression));
-+        info->compression->pages = compression_counters.pages;
-+        info->compression->busy = compression_counters.busy;
-+        info->compression->busy_rate = compression_counters.busy_rate;
-+        info->compression->compressed_size =
-+                                    compression_counters.compressed_size;
-+        info->compression->compression_rate =
-+                                    compression_counters.compression_rate;
-+    }
-+
-     if (cpu_throttle_active()) {
-         info->has_cpu_throttle_percentage = true;
-         info->cpu_throttle_percentage = cpu_throttle_get_percentage();
-diff --git a/migration/ram.c b/migration/ram.c
-index e152831254..65a563993d 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -301,6 +301,15 @@ struct RAMState {
-     uint64_t num_dirty_pages_period;
-     /* xbzrle misses since the beginning of the period */
-     uint64_t xbzrle_cache_miss_prev;
-+
-+    /* compression statistics since the beginning of the period */
-+    /* amount of count that no free thread to compress data */
-+    uint64_t compress_thread_busy_prev;
-+    /* amount bytes after compression */
-+    uint64_t compressed_size_prev;
-+    /* amount of compressed pages */
-+    uint64_t compress_pages_prev;
-+
-     /* total handled target pages at the beginning of period */
-     uint64_t target_page_count_prev;
-     /* total handled target pages since start */
-@@ -338,6 +347,8 @@ struct PageSearchStatus {
- };
- typedef struct PageSearchStatus PageSearchStatus;
- 
-+CompressionStats compression_counters;
-+
- struct CompressParam {
-     bool done;
-     bool quit;
-@@ -1593,6 +1604,7 @@ uint64_t ram_pagesize_summary(void)
- static void migration_update_rates(RAMState *rs, int64_t end_time)
- {
-     uint64_t page_count = rs->target_page_count - rs->target_page_count_prev;
-+    double compressed_size;
- 
-     /* calculate period counters */
-     ram_counters.dirty_pages_rate = rs->num_dirty_pages_period * 1000
-@@ -1607,6 +1619,26 @@ static void migration_update_rates(RAMState *rs, int64_t end_time)
-             rs->xbzrle_cache_miss_prev) / page_count;
-         rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
-     }
-+
-+    if (migrate_use_compression()) {
-+        compression_counters.busy_rate = (double)(compression_counters.busy -
-+            rs->compress_thread_busy_prev) / page_count;
-+        rs->compress_thread_busy_prev = compression_counters.busy;
-+
-+        compressed_size = compression_counters.compressed_size -
-+                          rs->compressed_size_prev;
-+        if (compressed_size) {
-+            double uncompressed_size = (compression_counters.pages -
-+                                    rs->compress_pages_prev) * TARGET_PAGE_SIZE;
-+
-+            /* Compression-Ratio = Uncompressed-size / Compressed-size */
-+            compression_counters.compression_rate =
-+                                        uncompressed_size / compressed_size;
-+
-+            rs->compress_pages_prev = compression_counters.pages;
-+            rs->compressed_size_prev = compression_counters.compressed_size;
-+        }
-+    }
- }
- 
- static void migration_bitmap_sync(RAMState *rs)
-@@ -1888,10 +1920,16 @@ exit:
- static void
- update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
- {
-+    ram_counters.transferred += bytes_xmit;
-+
-     if (param->zero_page) {
-         ram_counters.duplicate++;
-+        return;
-     }
--    ram_counters.transferred += bytes_xmit;
-+
-+    /* 8 means a header with RAM_SAVE_FLAG_CONTINUE. */
-+    compression_counters.compressed_size += bytes_xmit - 8;
-+    compression_counters.pages++;
- }
- 
- static void flush_compressed_data(RAMState *rs)
-@@ -2264,6 +2302,7 @@ static bool save_compress_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
-         return true;
-     }
- 
-+    compression_counters.busy++;
-     return false;
- }
- 
-diff --git a/migration/ram.h b/migration/ram.h
-index 457bf54b8c..a139066846 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -36,6 +36,7 @@
- 
- extern MigrationStats ram_counters;
- extern XBZRLECacheStats xbzrle_counters;
-+extern CompressionStats compression_counters;
- 
- int xbzrle_cache_resize(int64_t new_size, Error **errp);
- uint64_t ram_bytes_remaining(void);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index f62d3f9a4b..6e8c21258a 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -75,6 +75,27 @@
-            'cache-miss': 'int', 'cache-miss-rate': 'number',
-            'overflow': 'int' } }
- 
-+##
-+# @CompressionStats:
-+#
-+# Detailed migration compression statistics
-+#
-+# @pages: amount of pages compressed and transferred to the target VM
-+#
-+# @busy: count of times that no free thread was available to compress data
-+#
-+# @busy-rate: rate of thread busy
-+#
-+# @compressed-size: amount of bytes after compression
-+#
-+# @compression-rate: rate of compressed size
-+#
-+# Since: 3.1
-+##
-+{ 'struct': 'CompressionStats',
-+  'data': {'pages': 'int', 'busy': 'int', 'busy-rate': 'number',
-+	   'compressed-size': 'int', 'compression-rate': 'number' } }
-+
- ##
- # @MigrationStatus:
- #
-@@ -172,6 +193,8 @@
- #           only present when the postcopy-blocktime migration capability
- #           is enabled. (Since 3.0)
- #
-+# @compression: migration compression statistics, only returned if compression
-+#           feature is on and status is 'active' or 'completed' (Since 3.1)
- #
- # Since: 0.14.0
- ##
-@@ -186,7 +209,8 @@
-            '*cpu-throttle-percentage': 'int',
-            '*error-desc': 'str',
-            '*postcopy-blocktime' : 'uint32',
--           '*postcopy-vcpu-blocktime': ['uint32']} }
-+           '*postcopy-vcpu-blocktime': ['uint32'],
-+           '*compression': 'CompressionStats'} }
- 
- ##
- # @query-migrate:
--- 
-2.14.4
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
