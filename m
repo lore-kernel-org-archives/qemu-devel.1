@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxxfo-00034s-KY
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:02:34 -0400
+	(envelope-from <jcody@redhat.com>) id 1fxxgn-00042y-Fz
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fxxfn-0006oH-UA
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:02:28 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:42377)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fxxfn-0006nm-Gn
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:02:27 -0400
-Received: by mail-oi0-x243.google.com with SMTP id v198-v6so4204487oif.9
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 10:02:27 -0700 (PDT)
+	(envelope-from <jcody@redhat.com>) id 1fxxgm-0007QS-Bo
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:03:29 -0400
+Date: Thu, 6 Sep 2018 13:03:08 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180906170308.GM22117@localhost.localdomain>
+References: <20180906130225.5118-1-jsnow@redhat.com>
+	<20180906130225.5118-16-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c2d69fb0-fc47-e145-3b24-c7eb6c9cea45@redhat.com>
-References: <20180906055736.20256-1-mark.cave-ayland@ilande.co.uk>
-	<5c204531-2e59-4166-0325-745e4aa98531@redhat.com>
-	<CAFEAcA-Auwy1Mp=L89VYB4xoCG1BFdCWyUjhA4HHFiGmycBjzg@mail.gmail.com>
-	<c2d69fb0-fc47-e145-3b24-c7eb6c9cea45@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Sep 2018 18:02:05 +0100
-Message-ID: <CAFEAcA-rynobR_maS0ru=MDupjXOVdgnXYFHe0amPZ1zOYAQ1g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/3] scsi: remove lsi53c895a_create() and
- lsi53c810_create() functions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180906130225.5118-16-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 15/16] block/backup: qapi documentation
+ fixup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 6 September 2018 at 17:40, Thomas Huth <thuth@redhat.com> wrote:
-> On 2018-09-06 16:50, Peter Maydell wrote:
->> Nothing typically does, but the "modern" style of having QOM objects which
->> use other QOM objects do so by embedding the child object's struct into
->> the struct of the parent requires that the struct definition is available.
->
-> But in this case we don't have anything that "inherits" from LSIState,
-> so shouldn't we rather follow the "information hiding" principle and
-> keep the state local to the lsi53c895a.c file? If you want to use a
-> "LSIState *" from another .c file, you can still put an "anonymous"
->
->  struct LSIState;
->  typedef struct LSIState LSIState;
+On Thu, Sep 06, 2018 at 09:02:24AM -0400, John Snow wrote:
+> Fix documentation to match the other jobs amended for 3.1.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-This doesn't work for
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-typedef struct MySoC {
-   MyUART uart;
-   LSIState scsi;
-   ...
-} MySoC;
-
-This isn't inheritance, it's just use ("has-a", not "is-a").
-
-> in a header somewhere without revealing the implementation.
->
-> I'm fine with putting the whole LSIState into a header file if we really
-> need it, but in this case, I don't see the point.
-
-Looking at the rest of the series there doesn't seem to be
-any code that wants to do use-by-embedding, so we can
-certainly postpone moving the struct into the header file
-until we need it.
-
-thanks
--- PMM
+> ---
+>  qapi/block-core.json | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index f877e9e414..c0b3d33dbb 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1272,13 +1272,14 @@
+>  #                   a different block device than @device).
+>  #
+>  # @auto-finalize: When false, this job will wait in a PENDING state after it has
+> -#                 finished its work, waiting for @block-job-finalize.
+> -#                 When true, this job will automatically perform its abort or
+> -#                 commit actions.
+> +#                 finished its work, waiting for @block-job-finalize before
+> +#                 making any block graph changes.
+> +#                 When true, this job will automatically
+> +#                 perform its abort or commit actions.
+>  #                 Defaults to true. (Since 2.12)
+>  #
+>  # @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
+> -#                has completed ceased all work, and wait for @block-job-dismiss.
+> +#                has completely ceased all work, and awaits @block-job-dismiss.
+>  #                When true, this job will automatically disappear from the query
+>  #                list without user intervention.
+>  #                Defaults to true. (Since 2.12)
+> @@ -1327,13 +1328,14 @@
+>  #                   a different block device than @device).
+>  #
+>  # @auto-finalize: When false, this job will wait in a PENDING state after it has
+> -#                 finished its work, waiting for @block-job-finalize.
+> -#                 When true, this job will automatically perform its abort or
+> -#                 commit actions.
+> +#                 finished its work, waiting for @block-job-finalize before
+> +#                 making any block graph changes.
+> +#                 When true, this job will automatically
+> +#                 perform its abort or commit actions.
+>  #                 Defaults to true. (Since 2.12)
+>  #
+>  # @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
+> -#                has completed ceased all work, and wait for @block-job-dismiss.
+> +#                has completely ceased all work, and awaits @block-job-dismiss.
+>  #                When true, this job will automatically disappear from the query
+>  #                list without user intervention.
+>  #                Defaults to true. (Since 2.12)
+> -- 
+> 2.14.4
+> 
