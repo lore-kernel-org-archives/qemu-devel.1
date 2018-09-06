@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1fxo9b-0005Zj-3M
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 02:52:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1fxoAR-0006D2-23
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 02:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1fxo9X-00039y-19
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 02:52:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47222 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1fxo9W-00037l-Mv
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 02:52:30 -0400
-References: <20180904110822.12863-1-fli@suse.com>
-	<20180904110822.12863-4-fli@suse.com>
-	<20180904112246.GF22349@redhat.com>
-	<abfcd490-fa0c-9c18-d7a8-7e38d710cd10@redhat.com>
-From: Fei Li <fli@suse.com>
-Message-ID: <44af1c4a-c57d-09fd-6fe8-129d66e98549@suse.com>
-Date: Thu, 6 Sep 2018 14:52:25 +0800
+	(envelope-from <peterx@redhat.com>) id 1fxoAN-0004NY-14
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 02:53:26 -0400
+Date: Thu, 6 Sep 2018 14:53:12 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180906065312.GD16937@xz-x1>
+References: <20180905113158.23734-1-peterx@redhat.com>
+	<20180905085550.5a84b540@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <abfcd490-fa0c-9c18-d7a8-7e38d710cd10@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/5] qemu_init_vcpu: add a new Error
- paramater to propagate
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180905085550.5a84b540@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: do address space switching
+ when reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,125 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>
 
+On Wed, Sep 05, 2018 at 08:55:50AM -0600, Alex Williamson wrote:
+> On Wed,  5 Sep 2018 19:31:58 +0800
+> Peter Xu <peterx@redhat.com> wrote:
+> 
+> > We will drop all the mappings when system reset, however we'll still
+> > keep the existing memory layouts.  That'll be problematic since if IOMMU
+> > is enabled in the guest and then reboot the guest, SeaBIOS will try to
+> > drive a device that with no page mapped there.  What we need to do is to
+> > rebuild the GPA->HPA mapping when system resets, hence ease SeaBIOS.
+> > 
+> > Without this patch, a guest that boots on an assigned NVMe device might
+> > fail to find the boot device after a system reboot/reset and we'll be
+> > able to observe SeaBIOS errors if turned on:
+> > 
+> >   WARNING - Timeout at nvme_wait:144!
+> > 
+> > With the patch applied, the guest will be able to find the NVMe drive
+> > and bootstrap there even after multiple reboots or system resets.
+> > 
+> > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1625173
+> > CC: QEMU Stable <qemu-stable@nongnu.org>
+> > Tested-by: Cong Li <coli@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  hw/i386/intel_iommu.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index 3dfada19a6..d3eb068d43 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -3231,6 +3231,14 @@ static void vtd_reset(DeviceState *dev)
+> >       * When device reset, throw away all mappings and external caches
+> >       */
+> >      vtd_address_space_unmap_all(s);
+> > +
+> > +    /*
+> > +     * Switch address spaces if needed (e.g., when reboot from a
+> > +     * kernel that has IOMMU enabled, we should switch address spaces
+> > +     * to rebuild the GPA->HPA mappings otherwise SeaBIOS might
+> > +     * encounter DMA errors when running with e.g. a NVMe card).
+> > +     */
+> > +    vtd_switch_address_space_all(s);
+> >  }
+> >  
+> >  static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+> 
+> I'm curious why these aren't part of vtd_init().  vtd_init is where
+> GCMD is set back to it's power-on state, which disables translation, so
+> logically we should reset the address space at that point.  Similarly,
+> the root entry is reset, so it would make sense to throw away all the
+> mappings there too.  Thanks,
 
+vtd_init() is only called when realize() or reset, and AFAIU it's not
+called by GCMD operations.  However I think I get the point that
+logically we should do similar things in e.g. vtd_handle_gcmd_srtp()
+when the enable bit switches.
 
-On 09/06/2018 01:15 AM, Eric Blake wrote:
-> Adding Markus, as the maintainer of Error APIs, to make sure he sees=20
-> this thread.
-Thanks. :)
->
-> On 09/04/2018 06:22 AM, Daniel P. Berrang=C3=A9 wrote:
->> On Tue, Sep 04, 2018 at 07:08:20PM +0800, Fei Li wrote:
->
-> In the subject line: s/paramater/parameter/
-Thanks for pointing this out! :)
->
->>> The caller of qemu_init_vcpu() already passed the **errp to handle
->>> errors. In view of this, add a new Error parameter to the following
->>> call trace to propagate the error and let the final caller check it.
->>>
->>> Signed-off-by: Fei Li <fli@suse.com>
->>> ---
->
->>> -void qemu_init_vcpu(CPUState *cpu)
->>> +void qemu_init_vcpu(CPUState *cpu, Error **errp)
->>> =C2=A0 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cpu->nr_cores =3D smp_cores;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cpu->nr_threads =3D smp_threads;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cpu->stopped =3D true;
->>> +=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!cpu->as) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* If the targ=
-et cpu hasn't set up any address spaces itself,
->>> @@ -2046,17 +2047,22 @@ void qemu_init_vcpu(CPUState *cpu)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (kvm_enabled()) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_kvm_start_vcpu(cpu);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_kvm_start_vcpu(cpu, =
-&local_err);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (hax_enabled()) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_hax_start_vcpu(cpu);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_hax_start_vcpu(cpu, =
-&local_err);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (hvf_enabled()) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_hvf_start_vcpu(cpu);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_hvf_start_vcpu(cpu, =
-&local_err);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (tcg_enabled()) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_tcg_init_vcpu(cpu);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_tcg_init_vcpu(cpu, &=
-local_err);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (whpx_enabled()) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_whpx_start_vcpu(cpu)=
-;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_whpx_start_vcpu(cpu,=
- &local_err);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_dummy_start_vcpu(cpu=
-);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_dummy_start_vcpu(cpu=
-, &local_err);
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (local_err) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, loc=
-al_err);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>
->> I'd be inclined to make this method return a boolean, so....
->>
->>
->>> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
->>> index b08078e7fc..5b0b4892f2 100644
->>> --- a/target/alpha/cpu.c
->>> +++ b/target/alpha/cpu.c
->>> @@ -66,7 +66,11 @@ static void alpha_cpu_realizefn(DeviceState *dev,=20
->>> Error **errp)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0 -=C2=A0=C2=A0=C2=A0 qemu_init_vcpu(cs);
->>> +=C2=A0=C2=A0=C2=A0 qemu_init_vcpu(cs, &local_err);
->>> +=C2=A0=C2=A0=C2=A0 if (local_err) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, loc=
-al_err);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->>> +=C2=A0=C2=A0=C2=A0 }
->>
->> ...this can be simplified to get rid of the local error object
->>
->> =C2=A0=C2=A0 if (!qemu_init_vcpu(cs, errp)) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> =C2=A0=C2=A0 }
->
-> Returning a bool introduces an interesting semantic question on=20
-> whether 0 is success or failure (-1/0 vs. false/true means you have to=20
-> pay attention to return type to decide between !func() or func()<0=20
-> when using the return value to learn if errp was set).=C2=A0 But Markus=
- has=20
-> expressed some thoughts on the matter before:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00124.html
->
-> and favored a bool return if only for consistency with glib and to=20
-> avoid abuse of trying to overload the returned int when using errp is=20
-> better.
->
-Thanks for providing these instructive discussions, I read the link, and=20
-yes,
-I agree with "return a bool: false/true inside the callee". Just as the=20
-following:
+My understanding is that if other things happened rather than the
+system reboot (e.g., when root pointer is replaced, or during the
+guest running the guest driver turns DMAR from on to off) the guest
+will be responsible to do the rest of invalidations first before doing
+that switch, so we'll possibly do the unmap_all() and address space
+switches in other places (e.g., in vtd_context_global_invalidate, or
+per device invalidations).
 
- =C2=A0=C2=A0=C2=A0 if (!foo(arg, errp)) { // assuming foo() returns a bo=
-ol: false/true
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 handle the error...
- =C2=A0=C2=A0=C2=A0 }
+But maybe it's better to do it in all the places.  I'll draft another
+version soon.
 
-As this is "Nicely concise." :)
-I will prepare the next version according to all the comments.
+Thanks,
 
-Have a nice day, thanks all
-Fei
+-- 
+Peter Xu
