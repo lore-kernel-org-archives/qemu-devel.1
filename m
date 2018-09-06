@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fxxix-0006PK-BD
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:05:44 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fxxsa-0003Z2-HB
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fxxiu-00022g-HS
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:05:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44794 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fxxis-0001ar-Ie
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:05:40 -0400
-References: <20180906151227.25514-1-marcandre.lureau@redhat.com>
-	<20180906151227.25514-11-marcandre.lureau@redhat.com>
-	<02fe751d-661d-04ab-44ba-caf3469eebcd@redhat.com>
-	<CAJ+F1C+rXupKahjD5rDDfxKKg7iw9z7EhGqyyk=S3x6vVKi+pQ@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b7d0b369-eac5-dcde-1f6c-c6e005332b12@redhat.com>
-Date: Thu, 6 Sep 2018 12:05:19 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fxxsW-0006Tc-9x
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:15:40 -0400
+References: <20180906055736.20256-1-mark.cave-ayland@ilande.co.uk>
+	<5c204531-2e59-4166-0325-745e4aa98531@redhat.com>
+	<CAFEAcA-Auwy1Mp=L89VYB4xoCG1BFdCWyUjhA4HHFiGmycBjzg@mail.gmail.com>
+	<c2d69fb0-fc47-e145-3b24-c7eb6c9cea45@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <507bad9d-61fc-c513-e023-674836eb72a1@ilande.co.uk>
+Date: Thu, 6 Sep 2018 18:15:09 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+rXupKahjD5rDDfxKKg7iw9z7EhGqyyk=S3x6vVKi+pQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 10/10] vl: list user creatable propeties if
- '?' as argument
+In-Reply-To: <c2d69fb0-fc47-e145-3b24-c7eb6c9cea45@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] scsi: remove lsi53c895a_create() and
+ lsi53c810_create() functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,87 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 09/06/2018 11:27 AM, Marc-Andr=C3=A9 Lureau wrote:
+On 06/09/18 17:40, Thomas Huth wrote:
 
-> We use name=3Dtype (text) for devices properties, ex:
->=20
-> qemu-system-x86_64 -device tpm-tis,?
-> tpm-tis.tpmdev=3Dstr (ID of a tpm to use as a backend)
-> tpm-tis.irq=3Duint32
-> tpm-tis.tpm-tis-mmio[0]=3Dchild<qemu:memory-region>
->=20
-> But
-> qemu-img create -f qcow2 -o ?
->=20
->      size             Virtual disk size
->      compat           Compatibility level (0.10 or 1.1)
->      backing_file     File name of a base image
->=20
-> I think I like more "name=3Dtype - text" form I introduced in "improve
-> qemu_opts_print_help() output". I guess I should change device
-> properties help for consistency then.
-
-I don't have a strong preference for one form over the other, so much as=20
-consistency in the various applications using the form.
-
-
->>> +static gint
->>> +pstrcmp(const char **a, const char **b)
->>> +{
->>> +    return g_strcmp0(*a, *b);
->>> +}
+> On 2018-09-06 16:50, Peter Maydell wrote:
+>> On 6 September 2018 at 13:02, Thomas Huth <thuth@redhat.com> wrote:
+>>> I somehow fail to see that something outside of lsi53c895a.c should
+>>> really need to access the internals of LSIState. If there is something
+>>> that needs to be configured from the outside, it should be done via QOM
+>>> properties instead, shouldn't it? So I think I'd rather prefer if you
+>>> could do it the other way round and change the lsi*_create() functions
+>>> to return a pointer to PCIDevice instead, if possible.
 >>
->> This is the second time your series has added this static helper. Shou=
-ld
->> it be a common helper instead?
->=20
-> as qemu_pstrcmp in cutils? inline in the header?
+>> Nothing typically does, but the "modern" style of having QOM objects which
+>> use other QOM objects do so by embedding the child object's struct into
+>> the struct of the parent requires that the struct definition is available.
+> 
+> But in this case we don't have anything that "inherits" from LSIState,
+> so shouldn't we rather follow the "information hiding" principle and
+> keep the state local to the lsi53c895a.c file? If you want to use a
+> "LSIState *" from another .c file, you can still put an "anonymous"
+> 
+>  struct LSIState;
+>  typedef struct LSIState LSIState;
+> 
+> in a header somewhere without revealing the implementation.
+> 
+> I'm fine with putting the whole LSIState into a header file if we really
+> need it, but in this case, I don't see the point.
 
-Does glib not already have such a helper? cutils sounds as good a place=20
-as any, although inline may be at odds with typically using it as a=20
-callback function (I don't know how well the compiler and linker handle=20
-such a situation).
+I completely agree with you that struct members used to configure the
+device initialisation should only be done via qdev properties, however
+having the struct information and the QOM defines available is very,
+very handy.
 
->=20
->>
->>
->>> +        g_ptr_array_sort(array, (GCompareFunc)pstrcmp);
->>> +        for (i =3D 0; i < array->len; i++) {
->>> +            error_printf("%s\n", (char *)array->pdata[i]);
->>> +        }
->>> +        g_ptr_array_set_free_func(array, g_free);
->>> +        g_ptr_array_free(array, true);
->>> +        exit(0);
->>
->> Again, printing to stderr then exiting with status 0 is awkward.  Prin=
-t
->> to stdout when successfully offering help text.
->=20
-> We use error_printf() for qdev list (qdev_device_help), which
-> redirects to monitor or stderr.
->=20
-> Should I also change ir for consistency? hopefully nobody relies on
-> the output going to stderr...
+In terms of information hiding we are a long way away from this, and in
+my experience having both the compile time and runtime checks on QOM
+macros means that just doing a FOO(pci_create_simple...) or strongly
+typing object links when wiring up a board catches just about all errors
+developers can make.
 
-I don't worry too much about that. We've already fixed other places=20
-where qemu binaries were antisocial, such as commit ac1307ab fixing=20
-'qemu-img --help' to give status 0 instead of 1.
+Amusingly the main reason I need to expose the LSIState at all is to be
+able to call scsi_bus_legacy_handle_cmdline() on the SCSI bus object
+itself. I guess you could say that this is an argument in favour of the
+existing approach, but then you're effectively moving back to the
+equivalent of _init() functions for this one particular case which these
+days are considered to be bad.
 
-In general, when a user asks for help, the help text should go to=20
-stdout, and the exit status should be 0 (unless you go to great lengths=20
-to also detect write failures such as ENOSPC or EPIPE, in which case you=20
-should ALSO attempt to write to stderr prior to exiting with nonzero=20
-status that you couldn't output the help text - but since FILE* I/O can=20
-cache things, detecting all possible write errors is not reliable unless=20
-you check the result of fclose(stdout), which in turn has to be deferred=20
-to the end of your program execution, generally via atexit().  The extra=20
-complications and code maintenance for checking for --help output=20
-failures is something that I'm personally okay with skipping).
+My feeling is that since the pattern of a separate header with struct
+and QOM macros (or "modern" style) is used throughout the rest of the
+codebase, why should we make an exception for this one particular case?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I see Peter also mentions about marking members as public/private, but
+again in my opinion and experience, with the addition of runtime as well
+as compile time QOM casts a huge class of problems has now gone away -
+and as a result of this, there are now more urgent problems which is
+probably why no-one has really picked up Peter's patch in over 4 years.
+
+
+ATB,
+
+Mark.
