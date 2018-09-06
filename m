@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fxyye-00060b-28
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:26:01 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fxzDz-0003JD-8d
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:41:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fxyyZ-0008Kz-3J
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:26:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35320)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fxyyY-0008KE-Sb
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:25:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fxyyW-0003dz-Ci
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 18:25:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5E9BB2E80CC
-	for <qemu-devel@nongnu.org>; Thu,  6 Sep 2018 18:25:52 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1fxzDv-0001DO-0q
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:41:50 -0400
+Date: Thu, 6 Sep 2018 12:41:36 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180906124136.0b966adc@t450s.home>
+In-Reply-To: <20180906065312.GD16937@xz-x1>
+References: <20180905113158.23734-1-peterx@redhat.com>
+	<20180905085550.5a84b540@t450s.home> <20180906065312.GD16937@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Sep 2018 18:12:49 -0000
-From: Jonathan Marler <1790975@bugs.launchpad.net>
-Reply-To: Bug 1790975 <1790975@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153618529890.17241.16039771895973290192.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153625757022.31814.4319759623473393391.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1790975] Re: Default arm virt machine broken
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: do address space switching
+ when reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,82 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>
 
-** Summary changed:
+On Thu, 6 Sep 2018 14:53:12 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-- arm virt ecam pcie conflict
-+ Default arm virt machine broken
+> On Wed, Sep 05, 2018 at 08:55:50AM -0600, Alex Williamson wrote:
+> > On Wed,  5 Sep 2018 19:31:58 +0800
+> > Peter Xu <peterx@redhat.com> wrote:
+> >   
+> > > We will drop all the mappings when system reset, however we'll still
+> > > keep the existing memory layouts.  That'll be problematic since if IOMMU
+> > > is enabled in the guest and then reboot the guest, SeaBIOS will try to
+> > > drive a device that with no page mapped there.  What we need to do is to
+> > > rebuild the GPA->HPA mapping when system resets, hence ease SeaBIOS.
+> > > 
+> > > Without this patch, a guest that boots on an assigned NVMe device might
+> > > fail to find the boot device after a system reboot/reset and we'll be
+> > > able to observe SeaBIOS errors if turned on:
+> > > 
+> > >   WARNING - Timeout at nvme_wait:144!
+> > > 
+> > > With the patch applied, the guest will be able to find the NVMe drive
+> > > and bootstrap there even after multiple reboots or system resets.
+> > > 
+> > > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1625173
+> > > CC: QEMU Stable <qemu-stable@nongnu.org>
+> > > Tested-by: Cong Li <coli@redhat.com>
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  hw/i386/intel_iommu.c | 8 ++++++++
+> > >  1 file changed, 8 insertions(+)
+> > > 
+> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > index 3dfada19a6..d3eb068d43 100644
+> > > --- a/hw/i386/intel_iommu.c
+> > > +++ b/hw/i386/intel_iommu.c
+> > > @@ -3231,6 +3231,14 @@ static void vtd_reset(DeviceState *dev)
+> > >       * When device reset, throw away all mappings and external caches
+> > >       */
+> > >      vtd_address_space_unmap_all(s);
+> > > +
+> > > +    /*
+> > > +     * Switch address spaces if needed (e.g., when reboot from a
+> > > +     * kernel that has IOMMU enabled, we should switch address spaces
+> > > +     * to rebuild the GPA->HPA mappings otherwise SeaBIOS might
+> > > +     * encounter DMA errors when running with e.g. a NVMe card).
+> > > +     */
+> > > +    vtd_switch_address_space_all(s);
+> > >  }
+> > >  
+> > >  static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)  
+> > 
+> > I'm curious why these aren't part of vtd_init().  vtd_init is where
+> > GCMD is set back to it's power-on state, which disables translation, so
+> > logically we should reset the address space at that point.  Similarly,
+> > the root entry is reset, so it would make sense to throw away all the
+> > mappings there too.  Thanks,  
+> 
+> vtd_init() is only called when realize() or reset, and AFAIU it's not
+> called by GCMD operations.  However I think I get the point that
+> logically we should do similar things in e.g. vtd_handle_gcmd_srtp()
+> when the enable bit switches.
+> 
+> My understanding is that if other things happened rather than the
+> system reboot (e.g., when root pointer is replaced, or during the
+> guest running the guest driver turns DMAR from on to off) the guest
+> will be responsible to do the rest of invalidations first before doing
+> that switch, so we'll possibly do the unmap_all() and address space
+> switches in other places (e.g., in vtd_context_global_invalidate, or
+> per device invalidations).
 
-** Description changed:
+AIUI, the entire global command register is write-once, so the guest
+cannot disable the IOMMU or change the root pointer after it's been
+initialized, except through a system reset.  I think that means the
+guest can only operate through the invalidation queue at runtime.  The
+bug being fixed here is that the IOMMU has been reset to its power-on
+state where translation is disabled, but the emulation of that disabled
+state also needs to return the per-device address space to that of
+system memory, or identity map thereof.  The commit log seems to imply
+that there's some sort of SeaBIOS issue and we're just doing this to
+help the BIOS, when in reality, we just forgot to reset the per device
+address space and a subsequent boot of a guest that didn't enable the
+IOMMU would have the same sort of issues.  In fact any usage of an
+assigned device prior to re-enabling the IOMMU would fail, there's
+nothing unique to NVMe here.  Thanks,
 
-  This occurs on qemu_v3.0.0 but not on qemu_v2.12.2 (built from
-  qemu_v3.0.0 tag on github)
-  =
-
-  Symptom: You'll see something like this in the kernel output:
-  =
-
-  [    1.285210] OF: PCI: host bridge /pcie@10000000 ranges:
-  [    1.286246] OF: PCI:    IO 0x3eff0000..0x3effffff -> 0x00000000
-  [    1.287061] OF: PCI:   MEM 0x10000000..0x3efeffff -> 0x10000000
-  [    1.287820] OF: PCI:   MEM 0x8000000000..0xffffffffff -> 0x8000000000
-  [    1.289312] pci-host-generic 4010000000.pcie: can't claim ECAM area [m=
-em 0x10000000-0x1fffffff]: address conflict with /pcie@10000000 [mem 0x1000=
-0000-0x3efeffff]
-  [    1.290984] pci-host-generic: probe of 4010000000.pcie failed with err=
-or -16
-  =
-
-- =
-
-- Qemu Command Line: qemu-system-arm -machine virt -m 1024M -kernel zImage =
--serial stdio
-+ Qemu Command Line: qemu-system-arm -machine virt -m 1024M -kernel zImage
-+ -serial stdio
-  =
-
-  I can post my zImage if anyone has problems reproducing with their own
-  zImage.
-+ =
-
-+ Note that this problem breaks pci making the machine unusable.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1790975
-
-Title:
-  Default arm virt machine broken
-
-Status in QEMU:
-  New
-
-Bug description:
-  This occurs on qemu_v3.0.0 but not on qemu_v2.12.2 (built from
-  qemu_v3.0.0 tag on github)
-
-  Symptom: You'll see something like this in the kernel output:
-
-  [    1.285210] OF: PCI: host bridge /pcie@10000000 ranges:
-  [    1.286246] OF: PCI:    IO 0x3eff0000..0x3effffff -> 0x00000000
-  [    1.287061] OF: PCI:   MEM 0x10000000..0x3efeffff -> 0x10000000
-  [    1.287820] OF: PCI:   MEM 0x8000000000..0xffffffffff -> 0x8000000000
-  [    1.289312] pci-host-generic 4010000000.pcie: can't claim ECAM area [m=
-em 0x10000000-0x1fffffff]: address conflict with /pcie@10000000 [mem 0x1000=
-0000-0x3efeffff]
-  [    1.290984] pci-host-generic: probe of 4010000000.pcie failed with err=
-or -16
-
-  Qemu Command Line: qemu-system-arm -machine virt -m 1024M -kernel
-  zImage -serial stdio
-
-  I can post my zImage if anyone has problems reproducing with their own
-  zImage.
-
-  Note that this problem breaks pci making the machine unusable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1790975/+subscriptions
+Alex
