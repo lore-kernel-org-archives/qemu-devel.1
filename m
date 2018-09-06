@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fxqMV-00043Z-Cj
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:14:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1fxqU2-0006ma-3s
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fxqMS-0008B4-7e
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:14:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41766)
+	(envelope-from <bounces@canonical.com>) id 1fxqTy-000558-0u
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:21:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fxqMS-00089o-0d
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:14:00 -0400
+	id 1fxqTx-00051Z-QI
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:21:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fxqMP-0007aJ-Jo
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 09:13:57 +0000
+	id 1fxqTu-0001HQ-VX
+	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 09:21:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2F6B82E8191
-	for <qemu-devel@nongnu.org>; Thu,  6 Sep 2018 09:13:56 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E99B12E80C9
+	for <qemu-devel@nongnu.org>; Thu,  6 Sep 2018 09:21:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Sep 2018 08:57:00 -0000
-From: =?utf-8?q?=C5=81ukasz_Zemczak?= <1755912@bugs.launchpad.net>
+Date: Thu, 06 Sep 2018 09:07:14 -0000
+From: Launchpad Bug Tracker <1755912@bugs.launchpad.net>
 Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153622422013.17432.10431663411043996078.malone@chaenomeles.canonical.com>
+Message-Id: <153622483731.27367.9749710566555526579.malone@ackee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1755912] Update Released
+Subject: [Qemu-devel] [Bug 1755912] Re: qemu-system-x86_64 crashed with
+ SIGABRT when using option -vga qxl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,13 +39,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The verification of the Stable Release Update for qemu has completed
-successfully and the package has now been released to -updates.
-Subsequently, the Ubuntu Stable Release Updates Team is being
-unsubscribed and will not receive messages about this bug report.  In
-the event that you encounter a regression using the package from
--updates please report a new bug using ubuntu-bug and tag the bug report
-regression-update so we can easily find any regressions.
+This bug was fixed in the package qemu - 1:2.11+dfsg-1ubuntu7.5
+
+---------------
+qemu (1:2.11+dfsg-1ubuntu7.5) bionic; urgency=3Dmedium
+
+  [Christian Ehrhardt]
+  * d/p/lp-1755912-qxl-fix-local-renderer-crash.patch: Fix an issue trigger=
+ed
+    by migrations with UI frontends or frequent guest resolution changes
+    (LP: #1755912)
+
+  [ Murilo Opsfelder Araujo ]
+  * d/p/ubuntu/target-ppc-extend-eieio-for-POWER9.patch: Backport to
+    extend eieio for POWER9 emulation (LP: #1787408).
+
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Tue, 21 Aug
+2018 11:25:45 +0200
+
+** Changed in: qemu (Ubuntu Bionic)
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
