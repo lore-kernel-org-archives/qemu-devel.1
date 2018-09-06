@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fxrvv-000176-A3
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:54:44 -0400
+	(envelope-from <quintela@redhat.com>) id 1fxs4F-00052l-8X
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:03:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fxrvt-0001ax-VY
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:54:43 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:38950)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1fxrvt-0001Zc-Nz
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:54:41 -0400
-Received: by mail-qt0-x244.google.com with SMTP id o15-v6so11645461qtk.6
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 03:54:41 -0700 (PDT)
-References: <20180705200813.2033-1-danielhb413@gmail.com>
-	<20180705200813.2033-4-danielhb413@gmail.com>
-	<153619362876.28231.7392145818127711611@sif>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <8f69c32d-0e8b-b3ee-b0a2-f7e8f7b6052c@gmail.com>
-Date: Thu, 6 Sep 2018 07:54:36 -0300
+	(envelope-from <quintela@redhat.com>) id 1fxs4B-0006bU-Eg
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:03:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48474 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fxs49-0006SV-Nw
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:03:15 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180906070101.27280-1-xiaoguangrong@tencent.com> (guangrong
+	xiao's message of "Thu, 6 Sep 2018 15:00:58 +0800")
+References: <20180906070101.27280-1-xiaoguangrong@tencent.com>
+Reply-To: quintela@redhat.com
+Date: Thu, 06 Sep 2018 13:03:00 +0200
+Message-ID: <87k1ny51nf.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <153619362876.28231.7392145818127711611@sif>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 3/3] qmp hmp: Make system_wakeup check
- wake-up support and run state
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] migration: compression optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,152 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, armbru@redhat.com
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-
-
-On 09/05/2018 09:27 PM, Michael Roth wrote:
-> Quoting Daniel Henrique Barboza (2018-07-05 15:08:13)
->> The qmp/hmp command 'system_wakeup' is simply a direct call to
->> 'qemu_system_wakeup_request' from vl.c. This function verifies if
->> runstate is SUSPENDED and if the wake up reason is valid before
->> proceeding. However, no error or warning is thrown if any of those
->> pre-requirements isn't met. There is no way for the caller to
->> differentiate between a successful wakeup or an error state caused
->> when trying to wake up a guest that wasn't suspended.
->>
->> This means that system_wakeup is silently failing, which can be
->> considered a bug. Adding error handling isn't an API break in this
->> case - applications that didn't check the result will remain broken,
->> the ones that check it will have a chance to deal with it.
->>
->> Adding to that, the commit before previous created a new QMP API called
->> query-current-machine, with a new flag called wakeup-suspend-support,
->> that indicates if the guest has the capability of waking up from suspended
->> state. Although such guest will never reach SUSPENDED state and erroring
->> it out in this scenario would suffice, it is more informative for the user
->> to differentiate between a failure because the guest isn't suspended versus
->> a failure because the guest does not have support for wake up at all.
->>
->> All this considered, this patch changes qmp_system_wakeup to:
->>
->> - check if the guest has the capability to wake-up from suspend. If
->> not, error out informing about the lack of support;
->>
->> - make the runstate verification before proceeding to call
->> qemu_system_wakeup_request, firing up an error message if the user tries
->> to wake up a machine that isn't in SUSPENDED state.
->>
->> After this patch, this is the output of system_wakeup in a guest that
->> does not have wake-up from suspend support (ppc64):
->>
->> (qemu) system_wakeup
->> wake-up from suspend is not supported by this guest
->> (qemu)
->>
->> And this is the output of system_wakeup in a x86 guest that has the
->> support but isn't suspended:
->>
->> (qemu) system_wakeup
->> Unable to wake up: guest is not in suspended state
->> (qemu)
->>
->> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
->> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->> ---
->>   hmp.c                   |  5 ++++-
->>   include/sysemu/sysemu.h |  1 +
->>   qapi/misc.json          |  5 ++++-
->>   qmp.c                   | 11 ++++++++++-
->>   vl.c                    |  2 +-
->>   5 files changed, 20 insertions(+), 4 deletions(-)
->>
->> diff --git a/hmp.c b/hmp.c
->> index 41f5e39b72..83a8041d11 100644
->> --- a/hmp.c
->> +++ b/hmp.c
->> @@ -1169,7 +1169,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
->>
->>   void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
->>   {
->> -    qmp_system_wakeup(NULL);
->> +    Error *err = NULL;
->> +
->> +    qmp_system_wakeup(&err);
->> +    hmp_handle_error(mon, &err);
->>   }
->>
->>   void hmp_nmi(Monitor *mon, const QDict *qdict)
->> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->> index b921c6f3b7..483f804b36 100644
->> --- a/include/sysemu/sysemu.h
->> +++ b/include/sysemu/sysemu.h
->> @@ -70,6 +70,7 @@ void qemu_exit_preconfig_request(void);
->>   void qemu_system_reset_request(ShutdownCause reason);
->>   void qemu_system_suspend_request(void);
->>   void qemu_register_suspend_notifier(Notifier *notifier);
->> +bool qemu_wakeup_suspend_support(void);
->>   void qemu_system_wakeup_request(WakeupReason reason);
->>   void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
->>   void qemu_register_wakeup_notifier(Notifier *notifier);
->> diff --git a/qapi/misc.json b/qapi/misc.json
->> index 266f88cb09..86195d79e9 100644
->> --- a/qapi/misc.json
->> +++ b/qapi/misc.json
->> @@ -1230,7 +1230,10 @@
->>   ##
->>   # @system_wakeup:
->>   #
->> -# Wakeup guest from suspend.  Does nothing in case the guest isn't suspended.
->> +# If the guest has wake-up from suspend support enabled
->> +# (wakeup-suspend-support flag from query-current-machine), wakeup guest
->> +# from suspend if the guest is in SUSPENDED state. Returns an error
->> +# otherwise.
->>   #
->>   # Since:  1.1
->>   #
->> diff --git a/qmp.c b/qmp.c
->> index 73e46d795f..0673ff1fa5 100644
->> --- a/qmp.c
->> +++ b/qmp.c
->> @@ -215,7 +215,16 @@ void qmp_cont(Error **errp)
->>
->>   void qmp_system_wakeup(Error **errp)
->>   {
->> -    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
->> +    if (!qemu_wakeup_suspend_support()) {
->> +        error_setg(errp,
->> +                   "wake-up from suspend is not supported by this guest");
->> +        return;
->> +    }
->> +    if (!runstate_check(RUN_STATE_SUSPENDED)) {
->> +        error_setg(errp,
->> +                   "Unable to wake up: guest is not in suspended state");
->> +        return;
->> +    }
->>   }
-> Was removing qemu_system_wakeup_request() intentional or did that just get
-> lost somehow?
-
-WOW! That was a mistake! Thanks for spotting it Mike! I'll re-insert it back
-in the next spin.
-
+guangrong.xiao@gmail.com wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
 >
->>   ObjectPropertyInfoList *qmp_qom_list(const char *path, Error **errp)
->> diff --git a/vl.c b/vl.c
->> index 96ad448d57..2af10b75cb 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -1769,7 +1769,7 @@ void qemu_register_wakeup_notifier(Notifier *notifier)
->>       notifier_list_add(&wakeup_notifiers, notifier);
->>   }
->>
->> -static bool qemu_wakeup_suspend_support(void)
->> +bool qemu_wakeup_suspend_support(void)
->>   {
->>       return !QLIST_EMPTY(&wakeup_notifiers.notifiers) && acpi_enabled;
->>   }
->> -- 
->> 2.17.1
->>
+> Changelog in v6:
+>
+> Thanks to Juan's review, in this version we
+> 1) move flush compressed data to find_dirty_block() where it hits the end
+>    of memblock
+> 2) use save_page_use_compression instead of migrate_use_compression in
+>    flush_compressed_data
+>
+> Xiao Guangrong (3):
+>   migration: do not flush_compressed_data at the end of iteration
+>   migration: show the statistics of compression
+>   migration: use save_page_use_compression in flush_compressed_data
+>
+>  hmp.c                 | 13 +++++++++++
+>  migration/migration.c | 12 ++++++++++
+>  migration/ram.c       | 63 +++++++++++++++++++++++++++++++++++++++++++--------
+>  migration/ram.h       |  1 +
+>  qapi/migration.json   | 26 ++++++++++++++++++++-
+>  5 files changed, 105 insertions(+), 10 deletions(-)
+
+queued
