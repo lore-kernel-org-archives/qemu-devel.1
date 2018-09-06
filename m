@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fxqjK-0005jG-P3
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:37:40 -0400
+	(envelope-from <berto@igalia.com>) id 1fxqjK-0005j8-Mh
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:37:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fxqjG-0003Zr-P5
+	(envelope-from <berto@igalia.com>) id 1fxqjG-0003ac-Qp
 	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:37:38 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu,  6 Sep 2018 12:37:10 +0300
-Message-Id: <3c1b1ad5e50b71d98e0d6dcdc2ffb02681c600c7.1536226505.git.berto@igalia.com>
+Date: Thu,  6 Sep 2018 12:37:08 +0300
+Message-Id: <4e73b26693677b6067545590708adcba66da1c06.1536226505.git.berto@igalia.com>
 In-Reply-To: <cover.1536226505.git.berto@igalia.com>
 References: <cover.1536226505.git.berto@igalia.com>
 In-Reply-To: <cover.1536226505.git.berto@igalia.com>
 References: <cover.1536226505.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 10/10] block: Allow changing 'force-share'
- on reopen
+Subject: [Qemu-devel] [PATCH v3 08/10] block: Allow changing 'discard' on
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,103 +25,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-'force-share' is one of the basic BlockdevOptions available for all
+'discard' is one of the basic BlockdevOptions available for all
 drivers, but it's not handled by bdrv_reopen_prepare() so any attempt
-to change it results in a "Cannot change the option" error:
+to change it results in an error:
 
-   (qemu) qemu-io virtio0 "reopen -o force-share=on"
-   Cannot change the option 'force-share'
+   (qemu) qemu-io virtio0 "reopen -o discard=on"
+   Cannot change the option 'discard'
 
 Since there's no reason why we shouldn't allow changing it and the
 implementation is simple let's just do it.
 
-It's worth noting that after this patch the above reopen call will
-still return an error -although a different one- if the image is not
-read-only:
-
-   (qemu) qemu-io virtio0 "reopen -o force-share=on"
-   force-share=on can only be used with read-only images
-
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c               | 30 ++++++++++++++++++++++++------
- include/block/block.h |  1 +
- 2 files changed, 25 insertions(+), 6 deletions(-)
+ block.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/block.c b/block.c
-index 808411ebf3..57cc4161a2 100644
+index 1c0f72454a..bd8467bed8 100644
 --- a/block.c
 +++ b/block.c
-@@ -789,6 +789,18 @@ static BlockdevDetectZeroesOptions bdrv_parse_detect_zeroes(QemuOpts *opts,
-     return detect_zeroes;
- }
+@@ -3155,6 +3155,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+     BlockDriver *drv;
+     QemuOpts *opts;
+     QDict *orig_reopen_opts;
++    char *discard = NULL;
+     bool read_only;
  
-+static bool bdrv_parse_force_share(QemuOpts *opts, int flags, Error **errp)
-+{
-+    bool value = qemu_opt_get_bool_del(opts, BDRV_OPT_FORCE_SHARE, false);
-+
-+    if (value && (flags & BDRV_O_RDWR)) {
-+        error_setg(errp, BDRV_OPT_FORCE_SHARE
-+                   "=on can only be used with read-only images");
-+    }
-+
-+    return value;
-+}
-+
- /**
-  * Set open flags for a given discard mode
-  *
-@@ -1374,12 +1386,9 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
-     drv = bdrv_find_format(driver_name);
-     assert(drv != NULL);
+     assert(reopen_state != NULL);
+@@ -3177,6 +3178,15 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
  
--    bs->force_share = qemu_opt_get_bool(opts, BDRV_OPT_FORCE_SHARE, false);
--
--    if (bs->force_share && (bs->open_flags & BDRV_O_RDWR)) {
--        error_setg(errp,
--                   BDRV_OPT_FORCE_SHARE
--                   "=on can only be used with read-only images");
-+    bs->force_share = bdrv_parse_force_share(opts, bs->open_flags, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-         ret = -EINVAL;
-         goto fail_opts;
-     }
-@@ -3202,6 +3211,14 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-         goto error;
-     }
+     update_flags_from_options(&reopen_state->flags, opts);
  
-+    reopen_state->force_share =
-+        bdrv_parse_force_share(opts, reopen_state->flags, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto error;
++    discard = qemu_opt_get_del(opts, "discard");
++    if (discard != NULL) {
++        if (bdrv_parse_discard_flags(discard, &reopen_state->flags) != 0) {
++            error_setg(errp, "Invalid discard option");
++            ret = -EINVAL;
++            goto error;
++        }
 +    }
 +
      /* All other options (including node-name and driver) must be unchanged.
       * Put them back into the QDict, so that they are checked at the end
       * of this function. */
-@@ -3353,6 +3370,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
-     bs->open_flags         = reopen_state->flags;
-     bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
-     bs->detect_zeroes      = reopen_state->detect_zeroes;
-+    bs->force_share        = reopen_state->force_share;
+@@ -3290,6 +3300,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+ error:
+     qemu_opts_del(opts);
+     qobject_unref(orig_reopen_opts);
++    g_free(discard);
+     return ret;
+ }
  
-     /* Remove child references from bs->options and bs->explicit_options.
-      * Child options were already removed in bdrv_reopen_queue_child() */
-diff --git a/include/block/block.h b/include/block/block.h
-index f71fa5a1c4..a49a027c54 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -185,6 +185,7 @@ typedef struct BDRVReopenState {
-     BlockDriverState *bs;
-     int flags;
-     BlockdevDetectZeroesOptions detect_zeroes;
-+    bool force_share;
-     uint64_t perm, shared_perm;
-     QDict *options;
-     QDict *explicit_options;
 -- 
 2.11.0
