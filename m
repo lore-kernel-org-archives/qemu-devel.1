@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fxtms-0002R3-PU
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 08:53:32 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fxttA-0005SR-46
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:00:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fxtmr-0002GS-9X
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 08:53:30 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:38983)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1fxtmr-0002Eu-2f
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 08:53:29 -0400
-Received: by mail-qt0-x244.google.com with SMTP id o15-v6so12032728qtk.6
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 05:53:29 -0700 (PDT)
-References: <20180705200813.2033-1-danielhb413@gmail.com>
-	<20180705200813.2033-2-danielhb413@gmail.com>
-	<153619330576.28231.1660101217837480744@sif>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <6edd519d-490a-1b15-170a-49708a19b097@gmail.com>
-Date: Thu, 6 Sep 2018 09:53:25 -0300
-MIME-Version: 1.0
-In-Reply-To: <153619330576.28231.1660101217837480744@sif>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v8 1/3] qmp: query-current-machine with
- wakeup-suspend-support
+	(envelope-from <imammedo@redhat.com>) id 1fxtt6-0006ya-2z
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:00:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52496 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fxtt5-0006xw-Tb
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 08:59:56 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu,  6 Sep 2018 14:51:54 +0200
+Message-Id: <1536238314-108139-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] qga: ignore non present cpus when handling
+ qmp_guest_get_vcpus()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,188 +22,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: lersek@redhat.com, mdroth@linux.vnet.ibm.com
 
+If VM has VCPUs plugged sparselly (for example a VM started with
+3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
+only cpu0 and cpu2 are present), QGA will rise a error
+  error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
+  open("/sys/devices/system/cpu/cpu1/"): No such file or directory
+when
+  virsh vcpucount FOO --guest
+is executed.
+Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
 
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v2:
+  do not create CPU entry if cpu isn't present
+  (Laszlo Ersek <lersek@redhat.com>)
+---
+ qga/commands-posix.c | 115 ++++++++++++++++++++++++++-------------------------
+ 1 file changed, 59 insertions(+), 56 deletions(-)
 
-On 09/05/2018 09:21 PM, Michael Roth wrote:
-> Quoting Daniel Henrique Barboza (2018-07-05 15:08:11)
->> When issuing the qmp/hmp 'system_wakeup' command, what happens in a
->> nutshell is:
->>
->> - qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
->> and notify the event
->> - in the main_loop, all vcpus are paused, a system reset is issued, all
->> subscribers of wakeup_notifiers receives a notification, vcpus are then
->> resumed and the wake up QAPI event is fired
->>
->> Note that this procedure alone doesn't ensure that the guest will awake
->> from SUSPENDED state - the subscribers of the wake up event must take
->> action to resume the guest, otherwise the guest will simply reboot.
->>
->> At this moment, there are only two subscribers of the wake up event: one
->> in hw/acpi/core.c and another in hw/i386/xen/xen-hvm.c. This means
->> that system_wakeup does not work as intended with other architectures.
->>
->> However, only the presence of 'system_wakeup' is required for QGA to
->> support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
->> This means that the user/management will expect to suspend the guest using
->> one of those suspend commands and then resume execution using system_wakeup,
->> regardless of the support offered in system_wakeup in the first place.
->>
->> This patch creates a new API called query-current-machine [1], that holds
->> a new flag called 'wakeup-suspend-support', which indicates if the guest
->> supports wake up from suspend via system_wakeup. The guest is considered
->> to implement wake-up support if:
->>
->> - there is at least one subscriber for the wake up event;
->>
->> and, for the PC machine type:
->>
->> - ACPI is enabled.
->>
->> This is the expected output of query-current-machine when running a x86
->> guest:
->>
->> {"execute" : "query-current-machine"}
->> {"return": {"wakeup-suspend-support": true}}
->>
->> Running the same x86 guest, but with the --no-acpi option:
->>
->> {"execute" : "query-current-machine"}
->> {"return": {"wakeup-suspend-support": false}}
->>
->> This is the output when running a pseries guest:
->>
->> {"execute" : "query-current-machine"}
->> {"return": {"wakeup-suspend-support": false}}
->>
->> With this extra tool, management can avoid situations where a guest
->> that does not have proper suspend/wake capabilities ends up in
->> inconsistent state (e.g.
->> https://github.com/open-power-host-os/qemu/issues/31).
->>
->> [1] the decision of creating the query-current-machine API is based
->> on discussions in the QEMU mailing list where it was decided that
->> query-target wasn't a proper place to store the wake-up flag, neither
->> was query-machines because this isn't a static property of the
->> machine object. This new API can then be used to store other
->> dynamic machine properties that are scattered around the code
->> ATM. More info at:
->> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04235.html
->>
->> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
->> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->> ---
->>   qapi/misc.json | 24 ++++++++++++++++++++++++
->>   vl.c           | 30 ++++++++++++++++++++++++++++++
->>   2 files changed, 54 insertions(+)
->>
->> diff --git a/qapi/misc.json b/qapi/misc.json
->> index 29da7856e3..266f88cb09 100644
->> --- a/qapi/misc.json
->> +++ b/qapi/misc.json
->> @@ -2003,6 +2003,30 @@
->>   ##
->>   { 'command': 'query-machines', 'returns': ['MachineInfo'] }
->>
->> +##
->> +# @CurrentMachineParams:
->> +#
->> +# Information describing the running machine parameters.
->> +#
->> +# @wakeup-suspend-support: true if the target supports wake up from
->> +#                          suspend
->> +#
->> +# Since: 3.0.0
-> 3.1.0 now (hopefully :))
->
->> +##
->> +{ 'struct': 'CurrentMachineParams',
->> +  'data': { 'wakeup-suspend-support': 'bool'} }
->> +
->> +##
->> +# @query-current-machine:
->> +#
->> +# Return a list of parameters of the running machine.
->> +#
->> +# Returns: CurrentMachineParams
->> +#
->> +# Since: 3.0.0
->> +##
->> +{ 'command': 'query-current-machine', 'returns': 'CurrentMachineParams' }
->> +
->>   ##
->>   # @CpuDefinitionInfo:
->>   #
->> diff --git a/vl.c b/vl.c
->> index ef6cfcec40..96ad448d57 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -1747,11 +1747,41 @@ void qemu_system_wakeup_enable(WakeupReason reason, bool enabled)
->>       }
->>   }
->>
->> +/*
->> + * The existence of a wake-up notifier is being checked in the function
->> + * qemu_wakeup_suspend_support and it's used in the logic of the
->> + * wakeup-suspend-support flag of QMP 'query-current-machine' command.
->> + * The idea of this flag is to indicate whether the guest supports wake-up
->> + * from suspend (via system_wakeup QMP/HMP call for example), warning the
->> + * user that the guest can't handle both wake-up from suspend and the
->> + * suspend itself via QGA guest-suspend-ram and guest-suspend-hybrid (if
->> + * it can't wake up, it can't be suspended safely).
->> + *
->> + * An assumption is made by the wakeup-suspend-support flag that only the
->> + * guests that can go to RUN_STATE_SUSPENDED and wake up properly would
->> + * be interested in this wakeup_notifier. Adding a wakeup_notifier for
->> + * any other reason will break the logic of the wakeup-suspend-support
->> + * flag and can lead to user/management confusion about the suspend/wake-up
->> + * support of the guest.
->> + */
->>   void qemu_register_wakeup_notifier(Notifier *notifier)
->>   {
->>       notifier_list_add(&wakeup_notifiers, notifier);
->>   }
->>
->> +static bool qemu_wakeup_suspend_support(void)
->> +{
->> +    return !QLIST_EMPTY(&wakeup_notifiers.notifiers) && acpi_enabled;
->> +}
-> I think this would need to be re-worked for any machine types that
-> eventually implement wakeup even though acpi_enabled == false. It was
-> maybe a bit hacky, but kind of nice that registering a wakeup notifier
-> implicitly registered support for wakeup, but now that we already have
-> these sorts of edge cases to consider maybe it's best to just add an
-> explicit qemu_register_wakeup_support() that just sets a flag in
-> vl.c and add call that at the appropriate locations for known supported
-> configurations. Maybe one call in acpi_pm1_cnt_init() might be enough?
-
-I like the idea of qemu_register_wakeup_support(). This avoids
-overloading the existing wakeup_notifiers with an extra assumption
-like I am doing up there. New implementations will need to call
-this register function to let the new API aware of the support, but
-I don't see it as a huge deal.
-
->
-> Though I'm noticing mips malta board also calls that, would be curious
-> if that actually supports wake-from-suspend. If not, maybe the callers
-> are where we should declare support (ich9_pm_init and piix4_pm_realize
-> currently)?
->
->> +
->> +CurrentMachineParams *qmp_query_current_machine(Error **errp)
->> +{
->> +    CurrentMachineParams *params = g_malloc0(sizeof(*params));
->> +    params->wakeup_suspend_support = qemu_wakeup_suspend_support();
->> +
->> +    return params;
->> +}
->> +
->>   void qemu_system_killed(int signal, pid_t pid)
->>   {
->>       shutdown_signal = signal;
->> -- 
->> 2.17.1
->>
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 37e8a2d..42d30f0 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -2035,61 +2035,56 @@ static long sysconf_exact(int name, const char *name_str, Error **errp)
+  * Written members remain unmodified on error.
+  */
+ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
+-                          Error **errp)
++                          char *dirpath, Error **errp)
+ {
+-    char *dirpath;
++    int fd;
++    int res;
+     int dirfd;
++    static const char fn[] = "online";
+ 
+-    dirpath = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
+-                              vcpu->logical_id);
+     dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
+     if (dirfd == -1) {
+         error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
+-    } else {
+-        static const char fn[] = "online";
+-        int fd;
+-        int res;
+-
+-        fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
+-        if (fd == -1) {
+-            if (errno != ENOENT) {
+-                error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
+-            } else if (sys2vcpu) {
+-                vcpu->online = true;
+-                vcpu->can_offline = false;
+-            } else if (!vcpu->online) {
+-                error_setg(errp, "logical processor #%" PRId64 " can't be "
+-                           "offlined", vcpu->logical_id);
+-            } /* otherwise pretend successful re-onlining */
+-        } else {
+-            unsigned char status;
+-
+-            res = pread(fd, &status, 1, 0);
+-            if (res == -1) {
+-                error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
+-            } else if (res == 0) {
+-                error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
+-                           fn);
+-            } else if (sys2vcpu) {
+-                vcpu->online = (status != '0');
+-                vcpu->can_offline = true;
+-            } else if (vcpu->online != (status != '0')) {
+-                status = '0' + vcpu->online;
+-                if (pwrite(fd, &status, 1, 0) == -1) {
+-                    error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
+-                                     fn);
+-                }
+-            } /* otherwise pretend successful re-(on|off)-lining */
++        return;
++    }
+ 
+-            res = close(fd);
+-            g_assert(res == 0);
+-        }
++    fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
++    if (fd == -1) {
++        if (errno != ENOENT) {
++            error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
++        } else if (sys2vcpu) {
++            vcpu->online = true;
++            vcpu->can_offline = false;
++        } else if (!vcpu->online) {
++            error_setg(errp, "logical processor #%" PRId64 " can't be "
++                       "offlined", vcpu->logical_id);
++        } /* otherwise pretend successful re-onlining */
++    } else {
++        unsigned char status;
++
++        res = pread(fd, &status, 1, 0);
++        if (res == -1) {
++            error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
++        } else if (res == 0) {
++            error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
++                       fn);
++        } else if (sys2vcpu) {
++            vcpu->online = (status != '0');
++            vcpu->can_offline = true;
++        } else if (vcpu->online != (status != '0')) {
++            status = '0' + vcpu->online;
++            if (pwrite(fd, &status, 1, 0) == -1) {
++                error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
++                                 fn);
++            }
++        } /* otherwise pretend successful re-(on|off)-lining */
+ 
+-        res = close(dirfd);
++        res = close(fd);
+         g_assert(res == 0);
+     }
+ 
+-    g_free(dirpath);
++    res = close(dirfd);
++    g_assert(res == 0);
+ }
+ 
+ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+@@ -2107,17 +2102,21 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+     while (local_err == NULL && current < sc_max) {
+         GuestLogicalProcessor *vcpu;
+         GuestLogicalProcessorList *entry;
+-
+-        vcpu = g_malloc0(sizeof *vcpu);
+-        vcpu->logical_id = current++;
+-        vcpu->has_can_offline = true; /* lolspeak ftw */
+-        transfer_vcpu(vcpu, true, &local_err);
+-
+-        entry = g_malloc0(sizeof *entry);
+-        entry->value = vcpu;
+-
+-        *link = entry;
+-        link = &entry->next;
++        int64_t id = current++;
++        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
++                                     id);
++
++        if (g_file_test(path, G_FILE_TEST_EXISTS)) {
++            vcpu = g_malloc0(sizeof *vcpu);
++            vcpu->logical_id = id;
++            vcpu->has_can_offline = true; /* lolspeak ftw */
++            transfer_vcpu(vcpu, true, path, &local_err);
++            entry = g_malloc0(sizeof *entry);
++            entry->value = vcpu;
++            *link = entry;
++            link = &entry->next;
++        }
++        g_free(path);
+     }
+ 
+     if (local_err == NULL) {
+@@ -2138,7 +2137,11 @@ int64_t qmp_guest_set_vcpus(GuestLogicalProcessorList *vcpus, Error **errp)
+ 
+     processed = 0;
+     while (vcpus != NULL) {
+-        transfer_vcpu(vcpus->value, false, &local_err);
++        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
++                                     vcpus->value->logical_id);
++
++        transfer_vcpu(vcpus->value, false, path, &local_err);
++        g_free(path);
+         if (local_err != NULL) {
+             break;
+         }
+-- 
+2.7.4
