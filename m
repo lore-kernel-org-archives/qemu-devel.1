@@ -1,40 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fxh9H-0008DQ-O9
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 19:23:48 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fxi8x-0003z2-AJ
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fxh9C-0001eq-ME
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 19:23:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53444
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fxi8t-0002oq-92
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54130)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1fxh9C-0001du-Ek
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 19:23:42 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w85NMSl3147054
-	for <qemu-devel@nongnu.org>; Wed, 5 Sep 2018 19:23:41 -0400
+	id 1fxi8q-0002PP-Lq
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:25 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w860ORKu042384
+	for <qemu-devel@nongnu.org>; Wed, 5 Sep 2018 20:27:17 -0400
 Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2marrq814s-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2map897pdd-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Sep 2018 19:23:41 -0400
+	for <qemu-devel@nongnu.org>; Wed, 05 Sep 2018 20:27:17 -0400
 Received: from localhost
 	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 5 Sep 2018 17:23:40 -0600
+	Wed, 5 Sep 2018 18:27:16 -0600
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <951d1c8265e9ef6b36d61358fd01f267a9b83ca7.1533639095.git.tgolembi@redhat.com>
-References: <cover.1533639095.git.tgolembi@redhat.com>
-	<951d1c8265e9ef6b36d61358fd01f267a9b83ca7.1533639095.git.tgolembi@redhat.com>
-Date: Wed, 05 Sep 2018 18:21:07 -0500
-Message-Id: <153618966719.28231.7120762050650762023@sif>
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] qga: win32: fix crashes when PCI
- info cannot be retrived
+In-Reply-To: <20180705200813.2033-4-danielhb413@gmail.com>
+References: <20180705200813.2033-1-danielhb413@gmail.com>
+	<20180705200813.2033-4-danielhb413@gmail.com>
+Date: Wed, 05 Sep 2018 19:27:08 -0500
+Message-Id: <153619362876.28231.7392145818127711611@sif>
+Subject: Re: [Qemu-devel] [PATCH v8 3/3] qmp hmp: Make system_wakeup check
+ wake-up support and run state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,89 +42,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, qemu-devel@nongnu.org
-Cc: =?utf-8?q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, armbru@redhat.com
 
-Quoting Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (2018-08-07 05:51:37)
-> The guest-get-fsinfo command collects also information about PCI
-> controller where the disk is attached. When this fails for some reasons
-> it tries to return just the partial information. However in certain
-> cases the pointer to the structure was not initialized and was set to
-> NULL. This breaks the serializer and lead to crasehs of the guest agent.
+Quoting Daniel Henrique Barboza (2018-07-05 15:08:13)
+> The qmp/hmp command 'system_wakeup' is simply a direct call to
+> 'qemu_system_wakeup_request' from vl.c. This function verifies if
+> runstate is SUSPENDED and if the wake up reason is valid before
+> proceeding. However, no error or warning is thrown if any of those
+> pre-requirements isn't met. There is no way for the caller to
+> differentiate between a successful wakeup or an error state caused
+> when trying to wake up a guest that wasn't suspended.
 > =
 
-> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> This means that system_wakeup is silently failing, which can be
+> considered a bug. Adding error handling isn't an API break in this
+> case - applications that didn't check the result will remain broken,
+> the ones that check it will have a chance to deal with it.
+> =
+
+> Adding to that, the commit before previous created a new QMP API called
+> query-current-machine, with a new flag called wakeup-suspend-support,
+> that indicates if the guest has the capability of waking up from suspended
+> state. Although such guest will never reach SUSPENDED state and erroring
+> it out in this scenario would suffice, it is more informative for the user
+> to differentiate between a failure because the guest isn't suspended vers=
+us
+> a failure because the guest does not have support for wake up at all.
+> =
+
+> All this considered, this patch changes qmp_system_wakeup to:
+> =
+
+> - check if the guest has the capability to wake-up from suspend. If
+> not, error out informing about the lack of support;
+> =
+
+> - make the runstate verification before proceeding to call
+> qemu_system_wakeup_request, firing up an error message if the user tries
+> to wake up a machine that isn't in SUSPENDED state.
+> =
+
+> After this patch, this is the output of system_wakeup in a guest that
+> does not have wake-up from suspend support (ppc64):
+> =
+
+> (qemu) system_wakeup
+> wake-up from suspend is not supported by this guest
+> (qemu)
+> =
+
+> And this is the output of system_wakeup in a x86 guest that has the
+> support but isn't suspended:
+> =
+
+> (qemu) system_wakeup
+> Unable to wake up: guest is not in suspended state
+> (qemu)
+> =
+
+> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 > ---
->  qga/commands-win32.c | 27 ++++++++++++++++++++++-----
->  1 file changed, 22 insertions(+), 5 deletions(-)
+>  hmp.c                   |  5 ++++-
+>  include/sysemu/sysemu.h |  1 +
+>  qapi/misc.json          |  5 ++++-
+>  qmp.c                   | 11 ++++++++++-
+>  vl.c                    |  2 +-
+>  5 files changed, 20 insertions(+), 4 deletions(-)
 > =
 
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 36d76c22c0..995f62c2e4 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -642,15 +642,32 @@ static GuestDiskAddressList *build_guest_disk_info(=
-char *guid, Error **errp)
->          g_debug("getting pci-controller info");
->          if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi=
-_ad,
->                              sizeof(SCSI_ADDRESS), &len, NULL)) {
-> +            Error *local_err =3D NULL;
->              disk->unit =3D addr.Lun;
->              disk->target =3D addr.TargetId;
->              disk->bus =3D addr.PathId;
-> -            disk->pci_controller =3D get_pci_info(name, errp);
-> +            g_debug("unit=3D%lld target=3D%lld bus=3D%lld",
-> +                disk->unit, disk->target, disk->bus);
-> +            disk->pci_controller =3D get_pci_info(name, &local_err);
+> diff --git a/hmp.c b/hmp.c
+> index 41f5e39b72..83a8041d11 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1169,7 +1169,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
+> =
+
+>  void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
+>  {
+> -    qmp_system_wakeup(NULL);
+> +    Error *err =3D NULL;
 > +
-> +            if (local_err) {
-> +                slog("failed to get PCI controller info: %s",
-> +                    error_get_pretty(local_err));
-
-slog() is more for logging/auditing events that a guest administrator might
-be interested in knowing about, like when qga is accessing files, freezing
-filesystems, etc. General qga-side error reporting and debug logging should
-go through the normal g_debug/g_warning/etc interfaces to be captured in
-qga's log file.
-
-We should also moved patch 1 after this so we don't expose a breakage
-prior to the fix.
-
-How often are you seeing failures with the pci info? And does the
-information for the non-failures look valid to you? I tried to fix the
-CONFIG_QGA_NTDDSCSI naming screw-up a while back and some values like
-PCI func/bus/etc looked bogus, SPDRP_BUSNUMBER/SPDRP_ADDRESS/SPDRP_BUSNUMBER
-didn't seem to be returning what the current code thinks they are. If that's
-still the case it would be good to fix that before we final re-enable this
-code.
-
-> +                error_free(local_err);
-> +            } else if (disk->pci_controller !=3D NULL) {
-> +                g_debug("pci: domain=3D%lld bus=3D%lld slot=3D%lld funct=
-ion=3D%lld",
-> +                    disk->pci_controller->domain,
-> +                    disk->pci_controller->bus,
-> +                    disk->pci_controller->slot,
-> +                    disk->pci_controller->function);
-> +            }
->          }
-> -        /* We do not set error in this case, because we still have enough
-> -         * information about volume. */
-> -    } else {
-> -         disk->pci_controller =3D NULL;
-> +    }
-> +    /* We do not set error in case pci_controller is NULL, because we st=
-ill
-> +     * have enough information about volume. */
-> +    if (disk->pci_controller =3D=3D NULL) {
-> +        g_debug("no PCI controller info");
-> +        disk->pci_controller =3D g_malloc0(sizeof(GuestPCIAddress));
->      }
+> +    qmp_system_wakeup(&err);
+> +    hmp_handle_error(mon, &err);
+>  }
 > =
 
->      list =3D g_malloc0(sizeof(*list));
+>  void hmp_nmi(Monitor *mon, const QDict *qdict)
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index b921c6f3b7..483f804b36 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -70,6 +70,7 @@ void qemu_exit_preconfig_request(void);
+>  void qemu_system_reset_request(ShutdownCause reason);
+>  void qemu_system_suspend_request(void);
+>  void qemu_register_suspend_notifier(Notifier *notifier);
+> +bool qemu_wakeup_suspend_support(void);
+>  void qemu_system_wakeup_request(WakeupReason reason);
+>  void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
+>  void qemu_register_wakeup_notifier(Notifier *notifier);
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 266f88cb09..86195d79e9 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1230,7 +1230,10 @@
+>  ##
+>  # @system_wakeup:
+>  #
+> -# Wakeup guest from suspend.  Does nothing in case the guest isn't suspe=
+nded.
+> +# If the guest has wake-up from suspend support enabled
+> +# (wakeup-suspend-support flag from query-current-machine), wakeup guest
+> +# from suspend if the guest is in SUSPENDED state. Returns an error
+> +# otherwise.
+>  #
+>  # Since:  1.1
+>  #
+> diff --git a/qmp.c b/qmp.c
+> index 73e46d795f..0673ff1fa5 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -215,7 +215,16 @@ void qmp_cont(Error **errp)
+> =
+
+>  void qmp_system_wakeup(Error **errp)
+>  {
+> -    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
+> +    if (!qemu_wakeup_suspend_support()) {
+> +        error_setg(errp,
+> +                   "wake-up from suspend is not supported by this guest"=
+);
+> +        return;
+> +    }
+> +    if (!runstate_check(RUN_STATE_SUSPENDED)) {
+> +        error_setg(errp,
+> +                   "Unable to wake up: guest is not in suspended state");
+> +        return;
+> +    }
+>  }
+
+Was removing qemu_system_wakeup_request() intentional or did that just get
+lost somehow?
+
+> =
+
+>  ObjectPropertyInfoList *qmp_qom_list(const char *path, Error **errp)
+> diff --git a/vl.c b/vl.c
+> index 96ad448d57..2af10b75cb 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1769,7 +1769,7 @@ void qemu_register_wakeup_notifier(Notifier *notifi=
+er)
+>      notifier_list_add(&wakeup_notifiers, notifier);
+>  }
+> =
+
+> -static bool qemu_wakeup_suspend_support(void)
+> +bool qemu_wakeup_suspend_support(void)
+>  {
+>      return !QLIST_EMPTY(&wakeup_notifiers.notifiers) && acpi_enabled;
+>  }
 > -- =
 
-> 2.18.0
+> 2.17.1
 >=20
