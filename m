@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fxx1L-0000lW-0Y
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:20:39 -0400
+	(envelope-from <jcody@redhat.com>) id 1fxx2A-0001Ix-0L
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:21:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fxx1K-0007Kw-Aw
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:20:38 -0400
-References: <20180906055736.20256-1-mark.cave-ayland@ilande.co.uk>
-	<20180906055736.20256-2-mark.cave-ayland@ilande.co.uk>
-	<0223f14f-ab9a-f593-afc0-b87549d94482@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <32117dc7-495a-ec8c-233c-a2a15cbf431e@ilande.co.uk>
-Date: Thu, 6 Sep 2018 17:20:22 +0100
+	(envelope-from <jcody@redhat.com>) id 1fxx29-0000Hu-7e
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 12:21:29 -0400
+Date: Thu, 6 Sep 2018 12:21:21 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180906162121.GC22117@localhost.localdomain>
+References: <20180906130225.5118-1-jsnow@redhat.com>
+	<20180906130225.5118-6-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <0223f14f-ab9a-f593-afc0-b87549d94482@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] scsi: move lsi53c895a structures and
- defines into separate lsi53c895a.h file
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180906130225.5118-6-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 05/16] block/mirror: don't install
+ backing chain on abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, pbonzini@redhat.com, famz@redhat.com, hpoussin@reactos.org, rth@twiddle.net, peter.maydell@linaro.org, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 06/09/18 12:52, Thomas Huth wrote:
-
-> On 2018-09-06 07:57, Mark Cave-Ayland wrote:
->> There is also one small change to the new header file which is the addition
->> of the previously missing LSI53C810 define.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>  hw/scsi/lsi53c895a.c         | 116 +-----------------------------------
->>  include/hw/scsi/lsi53c895a.h | 137 +++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 138 insertions(+), 115 deletions(-)
->>  create mode 100644 include/hw/scsi/lsi53c895a.h
-> [...]
->> diff --git a/include/hw/scsi/lsi53c895a.h b/include/hw/scsi/lsi53c895a.h
->> new file mode 100644
->> index 0000000000..d80cb78c69
->> --- /dev/null
->> +++ b/include/hw/scsi/lsi53c895a.h
->> @@ -0,0 +1,137 @@
->> +/*
->> + * QEMU LSI53C895A SCSI Host Bus Adapter emulation
->> + *
->> + * Copyright (c) 2006 CodeSourcery.
->> + * Written by Paul Brook
->> + *
->> + * This code is licensed under the LGPL.
->> + */
->> +
->> +#ifndef LSI_H
->> +#define LSI_H
->> +
->> +#include "qemu/osdep.h"
+On Thu, Sep 06, 2018 at 09:02:14AM -0400, John Snow wrote:
+> In cases where we abort the block/mirror job, there's no point in
+> installing the new backing chain before we finish aborting.
 > 
-> Please don't include osdep.h from a header, that should only be done
-> from .c files.
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-Ah yes, my mistake (obviously it was a cut/paste from the .c file).
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-I wonder if this is something to teach checkpatch about?
-
-
-ATB,
-
-Mark.
+> ---
+>  block/mirror.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/mirror.c b/block/mirror.c
+> index cba555b4ef..bd3e908710 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -642,7 +642,7 @@ static void mirror_exit(Job *job)
+>       * required before it could become a backing file of target_bs. */
+>      bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+>                              &error_abort);
+> -    if (s->backing_mode == MIRROR_SOURCE_BACKING_CHAIN) {
+> +    if (ret == 0 && s->backing_mode == MIRROR_SOURCE_BACKING_CHAIN) {
+>          BlockDriverState *backing = s->is_none_mode ? src : s->base;
+>          if (backing_bs(target_bs) != backing) {
+>              bdrv_set_backing_hd(target_bs, backing, &local_err);
+> -- 
+> 2.14.4
+> 
