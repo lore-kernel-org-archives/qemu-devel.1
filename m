@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fxi8x-0003z2-AJ
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:32 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fxi91-00040Q-8s
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fxi8t-0002oq-92
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54130)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fxi8x-0002vP-Na
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:35 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1fxi8q-0002PP-Lq
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:25 -0400
+	id 1fxi8v-0002PS-01
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 20:27:31 -0400
 Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w860ORKu042384
+	w860OR4m042363
 	for <qemu-devel@nongnu.org>; Wed, 5 Sep 2018 20:27:17 -0400
 Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2map897pdd-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2map897pdf-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Wed, 05 Sep 2018 20:27:17 -0400
 Received: from localhost
@@ -27,13 +27,13 @@ Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180705200813.2033-4-danielhb413@gmail.com>
+In-Reply-To: <20180705200813.2033-2-danielhb413@gmail.com>
 References: <20180705200813.2033-1-danielhb413@gmail.com>
-	<20180705200813.2033-4-danielhb413@gmail.com>
-Date: Wed, 05 Sep 2018 19:27:08 -0500
-Message-Id: <153619362876.28231.7392145818127711611@sif>
-Subject: Re: [Qemu-devel] [PATCH v8 3/3] qmp hmp: Make system_wakeup check
- wake-up support and run state
+	<20180705200813.2033-2-danielhb413@gmail.com>
+Date: Wed, 05 Sep 2018 19:21:45 -0500
+Message-Id: <153619330576.28231.1660101217837480744@sif>
+Subject: Re: [Qemu-devel] [PATCH v8 1/3] qmp: query-current-machine with
+ wakeup-suspend-support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,164 +45,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
 Cc: ehabkost@redhat.com, armbru@redhat.com
 
-Quoting Daniel Henrique Barboza (2018-07-05 15:08:13)
-> The qmp/hmp command 'system_wakeup' is simply a direct call to
-> 'qemu_system_wakeup_request' from vl.c. This function verifies if
-> runstate is SUSPENDED and if the wake up reason is valid before
-> proceeding. However, no error or warning is thrown if any of those
-> pre-requirements isn't met. There is no way for the caller to
-> differentiate between a successful wakeup or an error state caused
-> when trying to wake up a guest that wasn't suspended.
+Quoting Daniel Henrique Barboza (2018-07-05 15:08:11)
+> When issuing the qmp/hmp 'system_wakeup' command, what happens in a
+> nutshell is:
 > =
 
-> This means that system_wakeup is silently failing, which can be
-> considered a bug. Adding error handling isn't an API break in this
-> case - applications that didn't check the result will remain broken,
-> the ones that check it will have a chance to deal with it.
+> - qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
+> and notify the event
+> - in the main_loop, all vcpus are paused, a system reset is issued, all
+> subscribers of wakeup_notifiers receives a notification, vcpus are then
+> resumed and the wake up QAPI event is fired
 > =
 
-> Adding to that, the commit before previous created a new QMP API called
-> query-current-machine, with a new flag called wakeup-suspend-support,
-> that indicates if the guest has the capability of waking up from suspended
-> state. Although such guest will never reach SUSPENDED state and erroring
-> it out in this scenario would suffice, it is more informative for the user
-> to differentiate between a failure because the guest isn't suspended vers=
-us
-> a failure because the guest does not have support for wake up at all.
+> Note that this procedure alone doesn't ensure that the guest will awake
+> from SUSPENDED state - the subscribers of the wake up event must take
+> action to resume the guest, otherwise the guest will simply reboot.
 > =
 
-> All this considered, this patch changes qmp_system_wakeup to:
+> At this moment, there are only two subscribers of the wake up event: one
+> in hw/acpi/core.c and another in hw/i386/xen/xen-hvm.c. This means
+> that system_wakeup does not work as intended with other architectures.
 > =
 
-> - check if the guest has the capability to wake-up from suspend. If
-> not, error out informing about the lack of support;
+> However, only the presence of 'system_wakeup' is required for QGA to
+> support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
+> This means that the user/management will expect to suspend the guest using
+> one of those suspend commands and then resume execution using system_wake=
+up,
+> regardless of the support offered in system_wakeup in the first place.
 > =
 
-> - make the runstate verification before proceeding to call
-> qemu_system_wakeup_request, firing up an error message if the user tries
-> to wake up a machine that isn't in SUSPENDED state.
+> This patch creates a new API called query-current-machine [1], that holds
+> a new flag called 'wakeup-suspend-support', which indicates if the guest
+> supports wake up from suspend via system_wakeup. The guest is considered
+> to implement wake-up support if:
 > =
 
-> After this patch, this is the output of system_wakeup in a guest that
-> does not have wake-up from suspend support (ppc64):
+> - there is at least one subscriber for the wake up event;
 > =
 
-> (qemu) system_wakeup
-> wake-up from suspend is not supported by this guest
-> (qemu)
+> and, for the PC machine type:
 > =
 
-> And this is the output of system_wakeup in a x86 guest that has the
-> support but isn't suspended:
+> - ACPI is enabled.
 > =
 
-> (qemu) system_wakeup
-> Unable to wake up: guest is not in suspended state
-> (qemu)
+> This is the expected output of query-current-machine when running a x86
+> guest:
+> =
+
+> {"execute" : "query-current-machine"}
+> {"return": {"wakeup-suspend-support": true}}
+> =
+
+> Running the same x86 guest, but with the --no-acpi option:
+> =
+
+> {"execute" : "query-current-machine"}
+> {"return": {"wakeup-suspend-support": false}}
+> =
+
+> This is the output when running a pseries guest:
+> =
+
+> {"execute" : "query-current-machine"}
+> {"return": {"wakeup-suspend-support": false}}
+> =
+
+> With this extra tool, management can avoid situations where a guest
+> that does not have proper suspend/wake capabilities ends up in
+> inconsistent state (e.g.
+> https://github.com/open-power-host-os/qemu/issues/31).
+> =
+
+> [1] the decision of creating the query-current-machine API is based
+> on discussions in the QEMU mailing list where it was decided that
+> query-target wasn't a proper place to store the wake-up flag, neither
+> was query-machines because this isn't a static property of the
+> machine object. This new API can then be used to store other
+> dynamic machine properties that are scattered around the code
+> ATM. More info at:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04235.html
 > =
 
 > Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
 > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 > ---
->  hmp.c                   |  5 ++++-
->  include/sysemu/sysemu.h |  1 +
->  qapi/misc.json          |  5 ++++-
->  qmp.c                   | 11 ++++++++++-
->  vl.c                    |  2 +-
->  5 files changed, 20 insertions(+), 4 deletions(-)
+>  qapi/misc.json | 24 ++++++++++++++++++++++++
+>  vl.c           | 30 ++++++++++++++++++++++++++++++
+>  2 files changed, 54 insertions(+)
 > =
 
-> diff --git a/hmp.c b/hmp.c
-> index 41f5e39b72..83a8041d11 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1169,7 +1169,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
-> =
-
->  void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
->  {
-> -    qmp_system_wakeup(NULL);
-> +    Error *err =3D NULL;
-> +
-> +    qmp_system_wakeup(&err);
-> +    hmp_handle_error(mon, &err);
->  }
-> =
-
->  void hmp_nmi(Monitor *mon, const QDict *qdict)
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index b921c6f3b7..483f804b36 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -70,6 +70,7 @@ void qemu_exit_preconfig_request(void);
->  void qemu_system_reset_request(ShutdownCause reason);
->  void qemu_system_suspend_request(void);
->  void qemu_register_suspend_notifier(Notifier *notifier);
-> +bool qemu_wakeup_suspend_support(void);
->  void qemu_system_wakeup_request(WakeupReason reason);
->  void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
->  void qemu_register_wakeup_notifier(Notifier *notifier);
 > diff --git a/qapi/misc.json b/qapi/misc.json
-> index 266f88cb09..86195d79e9 100644
+> index 29da7856e3..266f88cb09 100644
 > --- a/qapi/misc.json
 > +++ b/qapi/misc.json
-> @@ -1230,7 +1230,10 @@
+> @@ -2003,6 +2003,30 @@
 >  ##
->  # @system_wakeup:
->  #
-> -# Wakeup guest from suspend.  Does nothing in case the guest isn't suspe=
-nded.
-> +# If the guest has wake-up from suspend support enabled
-> +# (wakeup-suspend-support flag from query-current-machine), wakeup guest
-> +# from suspend if the guest is in SUSPENDED state. Returns an error
-> +# otherwise.
->  #
->  # Since:  1.1
->  #
-> diff --git a/qmp.c b/qmp.c
-> index 73e46d795f..0673ff1fa5 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -215,7 +215,16 @@ void qmp_cont(Error **errp)
+>  { 'command': 'query-machines', 'returns': ['MachineInfo'] }
 > =
 
->  void qmp_system_wakeup(Error **errp)
->  {
-> -    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
-> +    if (!qemu_wakeup_suspend_support()) {
-> +        error_setg(errp,
-> +                   "wake-up from suspend is not supported by this guest"=
-);
-> +        return;
-> +    }
-> +    if (!runstate_check(RUN_STATE_SUSPENDED)) {
-> +        error_setg(errp,
-> +                   "Unable to wake up: guest is not in suspended state");
-> +        return;
-> +    }
->  }
+> +##
+> +# @CurrentMachineParams:
+> +#
+> +# Information describing the running machine parameters.
+> +#
+> +# @wakeup-suspend-support: true if the target supports wake up from
+> +#                          suspend
+> +#
+> +# Since: 3.0.0
 
-Was removing qemu_system_wakeup_request() intentional or did that just get
-lost somehow?
+3.1.0 now (hopefully :))
 
-> =
-
->  ObjectPropertyInfoList *qmp_qom_list(const char *path, Error **errp)
+> +##
+> +{ 'struct': 'CurrentMachineParams',
+> +  'data': { 'wakeup-suspend-support': 'bool'} }
+> +
+> +##
+> +# @query-current-machine:
+> +#
+> +# Return a list of parameters of the running machine.
+> +#
+> +# Returns: CurrentMachineParams
+> +#
+> +# Since: 3.0.0
+> +##
+> +{ 'command': 'query-current-machine', 'returns': 'CurrentMachineParams' }
+> +
+>  ##
+>  # @CpuDefinitionInfo:
+>  #
 > diff --git a/vl.c b/vl.c
-> index 96ad448d57..2af10b75cb 100644
+> index ef6cfcec40..96ad448d57 100644
 > --- a/vl.c
 > +++ b/vl.c
-> @@ -1769,7 +1769,7 @@ void qemu_register_wakeup_notifier(Notifier *notifi=
-er)
+> @@ -1747,11 +1747,41 @@ void qemu_system_wakeup_enable(WakeupReason reaso=
+n, bool enabled)
+>      }
+>  }
+> =
+
+> +/*
+> + * The existence of a wake-up notifier is being checked in the function
+> + * qemu_wakeup_suspend_support and it's used in the logic of the
+> + * wakeup-suspend-support flag of QMP 'query-current-machine' command.
+> + * The idea of this flag is to indicate whether the guest supports wake-=
+up
+> + * from suspend (via system_wakeup QMP/HMP call for example), warning the
+> + * user that the guest can't handle both wake-up from suspend and the
+> + * suspend itself via QGA guest-suspend-ram and guest-suspend-hybrid (if
+> + * it can't wake up, it can't be suspended safely).
+> + *
+> + * An assumption is made by the wakeup-suspend-support flag that only the
+> + * guests that can go to RUN_STATE_SUSPENDED and wake up properly would
+> + * be interested in this wakeup_notifier. Adding a wakeup_notifier for
+> + * any other reason will break the logic of the wakeup-suspend-support
+> + * flag and can lead to user/management confusion about the suspend/wake=
+-up
+> + * support of the guest.
+> + */
+>  void qemu_register_wakeup_notifier(Notifier *notifier)
+>  {
 >      notifier_list_add(&wakeup_notifiers, notifier);
 >  }
 > =
 
-> -static bool qemu_wakeup_suspend_support(void)
-> +bool qemu_wakeup_suspend_support(void)
+> +static bool qemu_wakeup_suspend_support(void)
+> +{
+> +    return !QLIST_EMPTY(&wakeup_notifiers.notifiers) && acpi_enabled;
+> +}
+
+I think this would need to be re-worked for any machine types that
+eventually implement wakeup even though acpi_enabled =3D=3D false. It was
+maybe a bit hacky, but kind of nice that registering a wakeup notifier
+implicitly registered support for wakeup, but now that we already have
+these sorts of edge cases to consider maybe it's best to just add an
+explicit qemu_register_wakeup_support() that just sets a flag in
+vl.c and add call that at the appropriate locations for known supported
+configurations. Maybe one call in acpi_pm1_cnt_init() might be enough?
+
+Though I'm noticing mips malta board also calls that, would be curious
+if that actually supports wake-from-suspend. If not, maybe the callers
+are where we should declare support (ich9_pm_init and piix4_pm_realize
+currently)?
+
+> +
+> +CurrentMachineParams *qmp_query_current_machine(Error **errp)
+> +{
+> +    CurrentMachineParams *params =3D g_malloc0(sizeof(*params));
+> +    params->wakeup_suspend_support =3D qemu_wakeup_suspend_support();
+> +
+> +    return params;
+> +}
+> +
+>  void qemu_system_killed(int signal, pid_t pid)
 >  {
->      return !QLIST_EMPTY(&wakeup_notifiers.notifiers) && acpi_enabled;
->  }
+>      shutdown_signal =3D signal;
 > -- =
 
 > 2.17.1
