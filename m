@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fxzDz-0003JD-8d
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:41:52 -0400
+	(envelope-from <lersek@redhat.com>) id 1fxzU8-0002Jo-7I
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:58:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fxzDv-0001DO-0q
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:41:50 -0400
-Date: Thu, 6 Sep 2018 12:41:36 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180906124136.0b966adc@t450s.home>
-In-Reply-To: <20180906065312.GD16937@xz-x1>
-References: <20180905113158.23734-1-peterx@redhat.com>
-	<20180905085550.5a84b540@t450s.home> <20180906065312.GD16937@xz-x1>
+	(envelope-from <lersek@redhat.com>) id 1fxzU4-000772-TO
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:58:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37368 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fxzU4-000763-MV
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 14:58:28 -0400
+References: <20180831172424.12029-1-marcandre.lureau@redhat.com>
+	<20180831172424.12029-7-marcandre.lureau@redhat.com>
+	<20180904084648.680c564b@redhat.com>
+	<CAJ+F1CLDPQr04Khj-B4UXMzEV-Cu_J2e4S4j2c43NT-s3HwywQ@mail.gmail.com>
+	<20180906095802.7dffbf1b@redhat.com>
+	<CAJ+F1CJymU2J+5T2pHd=bC1FDnEQZxAAWKEt_E_fPnUjQRb_dQ@mail.gmail.com>
+	<20180906085937.GA2639@work-vm>
+	<CAJ+F1CKeo2fGc5fLUG7Ezpk0OTkMATioqQ64A3gKT7jXvULTkA@mail.gmail.com>
+	<20180906094245.GB2639@work-vm>
+	<CAJ+F1C+b8Q3P7=s4W+-GCbWeLqhVCvs_xei_LTw22YWTJ16Bmg@mail.gmail.com>
+	<20180906172304.GF2639@work-vm>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <43c91014-2ca4-681b-51e7-b8cde063014c@redhat.com>
+Date: Thu, 6 Sep 2018 20:58:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: do address space switching
- when reset
+In-Reply-To: <20180906172304.GF2639@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v10 6/6] tpm: add ACPI memory clear
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,91 +38,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 6 Sep 2018 14:53:12 +0800
-Peter Xu <peterx@redhat.com> wrote:
+On 09/06/18 19:23, Dr. David Alan Gilbert wrote:
+> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
+>> Hi
+>>
+>> On Thu, Sep 6, 2018 at 1:42 PM Dr. David Alan Gilbert
+>> <dgilbert@redhat.com> wrote:
+>>>
+>>> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
+>>>> Hi
+>>>>
+>>>> On Thu, Sep 6, 2018 at 12:59 PM Dr. David Alan Gilbert
+>>>> <dgilbert@redhat.com> wrote:
+>>>>>
+>>>>> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
+>>>>>> Hi
+>>>>>>
+>>>>>> On Thu, Sep 6, 2018 at 11:58 AM Igor Mammedov <imammedo@redhat.com=
+> wrote:
+>>>>>>>
+>>>>>>> On Thu, 6 Sep 2018 07:50:09 +0400
+>>>>>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+>>>>>>>
+>>>>>>>> Hi
+>>>>>>>>
+>>>>>>>> On Tue, Sep 4, 2018 at 10:47 AM Igor Mammedov <imammedo@redhat.c=
+om> wrote:
+>>>>>>>>>
+>>>>>>>>> On Fri, 31 Aug 2018 19:24:24 +0200
+>>>>>>>>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>>>>>>>>>
+>>>>>>>>>> This allows to pass the last failing test from the Windows HLK=
+ TPM 2.0
+>>>>>>>>>> TCG PPI 1.3 tests.
+>>>>>>>>>>
+>>>>>>>>>> The interface is described in the "TCG Platform Reset Attack
+>>>>>>>>>> Mitigation Specification", chapter 6 "ACPI _DSM Function". Acc=
+ording
+>>>>>>>>>> to Laszlo, it's not so easy to implement in OVMF, he suggested=
+ to do
+>>>>>>>>>> it in qemu instead.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat=
+.com>
+>>>>>>>>>> ---
+>>>>>>>>>>  hw/tpm/tpm_ppi.h     |  2 ++
+>>>>>>>>>>  hw/i386/acpi-build.c | 46 +++++++++++++++++++++++++++++++++++=
++++++++++
+>>>>>>>>>>  hw/tpm/tpm_crb.c     |  1 +
+>>>>>>>>>>  hw/tpm/tpm_ppi.c     | 23 ++++++++++++++++++++++
+>>>>>>>>>>  hw/tpm/tpm_tis.c     |  1 +
+>>>>>>>>>>  docs/specs/tpm.txt   |  2 ++
+>>>>>>>>>>  hw/tpm/trace-events  |  3 +++
+>>>>>>>>>>  7 files changed, 78 insertions(+)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
+>>>>>>>>>> index f6458bf87e..3239751e9f 100644
+>>>>>>>>>> --- a/hw/tpm/tpm_ppi.h
+>>>>>>>>>> +++ b/hw/tpm/tpm_ppi.h
+>>>>>>>>>> @@ -23,4 +23,6 @@ typedef struct TPMPPI {
+>>>>>>>>>>  bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+>>>>>>>>>>                    hwaddr addr, Object *obj, Error **errp);
+>>>>>>>>>>
+>>>>>>>>>> +void tpm_ppi_reset(TPMPPI *tpmppi);
+>>>>>>>>>> +
+>>>>>>>>>>  #endif /* TPM_TPM_PPI_H */
+>>>>>>>>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>>>>>>>>>> index c5e9a6e11d..2ab3e8fae7 100644
+>>>>>>>>>> --- a/hw/i386/acpi-build.c
+>>>>>>>>>> +++ b/hw/i386/acpi-build.c
+>>>>>>>>>> @@ -1824,6 +1824,13 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
+>>>>>>>>>>      pprq =3D aml_name("PPRQ");
+>>>>>>>>>>      pprm =3D aml_name("PPRM");
+>>>>>>>>>>
+>>>>>>>>>> +    aml_append(dev,
+>>>>>>>>>> +               aml_operation_region("TPP3", AML_SYSTEM_MEMORY=
+,
+>>>>>>>>>> +                                    aml_int(TPM_PPI_ADDR_BASE=
+ + 0x15a),
+>>>>>>>>>> +                                    0x1));
+>>>>>>>>>> +    field =3D aml_field("TPP3", AML_BYTE_ACC, AML_NOLOCK, AML=
+_PRESERVE);
+>>>>>>>>>> +    aml_append(field, aml_named_field("MOVV", 8));
+>>>>>>>>>> +    aml_append(dev, field);
+>>>>>>>>>>      /*
+>>>>>>>>>>       * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use =
+a dynamic
+>>>>>>>>>>       * operation region inside of a method for getting FUNC[o=
+p].
+>>>>>>>>>> @@ -2166,7 +2173,46 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
+>>>>>>>>>>              aml_append(ifctx, aml_return(aml_buffer(1, zeroby=
+te)));
+>>>>>>>>>>          }
+>>>>>>>>>>          aml_append(method, ifctx);
+>>>>>>>>>> +
+>>>>>>>>>> +        ifctx =3D aml_if(
+>>>>>>>>>> +            aml_equal(uuid,
+>>>>>>>>>> +                      aml_touuid("376054ED-CC13-4675-901C-475=
+6D7F2D45D")));
+>>>>>>>>>> +        {
+>>>>>>>>>> +            /* standard DSM query function */
+>>>>>>>>>> +            ifctx2 =3D aml_if(aml_equal(function, zero));
+>>>>>>>>>> +            {
+>>>>>>>>>> +                uint8_t byte_list[1] =3D { 0x03 };
+>>>>>>>>>> +                aml_append(ifctx2, aml_return(aml_buffer(1, b=
+yte_list)));
+>>>>>>>>>> +            }
+>>>>>>>>>> +            aml_append(ifctx, ifctx2);
+>>>>>>>>>> +
+>>>>>>>>>> +            /*
+>>>>>>>>>> +             * TCG Platform Reset Attack Mitigation Specifica=
+tion 1.0 Ch.6
+>>>>>>>>>> +             *
+>>>>>>>>>> +             * Arg 2 (Integer): Function Index =3D 1
+>>>>>>>>>> +             * Arg 3 (Package): Arguments =3D Package: Type: =
+Integer
+>>>>>>>>>> +             *                  Operation Value of the Reques=
+t
+>>>>>>>>>> +             * Returns: Type: Integer
+>>>>>>>>>> +             *          0: Success
+>>>>>>>>>> +             *          1: General Failure
+>>>>>>>>>> +             */
+>>>>>>>>>> +            ifctx2 =3D aml_if(aml_equal(function, one));
+>>>>>>>>>> +            {
+>>>>>>>>>> +                aml_append(ifctx2,
+>>>>>>>>>> +                           aml_store(aml_derefof(aml_index(ar=
+guments, zero)),
+>>>>>>>>>> +                                     op));
+>>>>>>>>>> +                {
+>>>>>>>>>> +                    aml_append(ifctx2, aml_store(op, aml_name=
+("MOVV")));
+>>>>>>>>>> +
+>>>>>>>>>> +                    /* 0: success */
+>>>>>>>>>> +                    aml_append(ifctx2, aml_return(zero));
+>>>>>>>>>> +                }
+>>>>>>>>>> +            }
+>>>>>>>>>> +            aml_append(ifctx, ifctx2);
+>>>>>>>>>> +        }
+>>>>>>>>>> +        aml_append(method, ifctx);
+>>>>>>>>>>      }
+>>>>>>>>>> +
+>>>>>>>>>>      aml_append(dev, method);
+>>>>>>>>>>  }
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
+>>>>>>>>>> index b243222fd6..48f6a716ad 100644
+>>>>>>>>>> --- a/hw/tpm/tpm_crb.c
+>>>>>>>>>> +++ b/hw/tpm/tpm_crb.c
+>>>>>>>>>> @@ -233,6 +233,7 @@ static void tpm_crb_reset(void *dev)
+>>>>>>>>>>  {
+>>>>>>>>>>      CRBState *s =3D CRB(dev);
+>>>>>>>>>>
+>>>>>>>>>> +    tpm_ppi_reset(&s->ppi);
+>>>>>>>>>>      tpm_backend_reset(s->tpmbe);
+>>>>>>>>>>
+>>>>>>>>>>      memset(s->regs, 0, sizeof(s->regs));
+>>>>>>>>>> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+>>>>>>>>>> index 8b46b9dd4b..ce43bc5729 100644
+>>>>>>>>>> --- a/hw/tpm/tpm_ppi.c
+>>>>>>>>>> +++ b/hw/tpm/tpm_ppi.c
+>>>>>>>>>> @@ -16,8 +16,30 @@
+>>>>>>>>>>  #include "qapi/error.h"
+>>>>>>>>>>  #include "cpu.h"
+>>>>>>>>>>  #include "sysemu/memory_mapping.h"
+>>>>>>>>>> +#include "sysemu/reset.h"
+>>>>>>>>>>  #include "migration/vmstate.h"
+>>>>>>>>>>  #include "tpm_ppi.h"
+>>>>>>>>>> +#include "trace.h"
+>>>>>>>>>> +
+>>>>>>>>>> +void tpm_ppi_reset(TPMPPI *tpmppi)
+>>>>>>>>>> +{
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>>> +    char *ptr =3D memory_region_get_ram_ptr(&tpmppi->ram);
+>>>>>>>>> nvdimm seems to use cpu_physical_memory_read() to access guest
+>>>>>>>>> accessible memory, so question is what's difference?
+>>>>>>>>
+>>>>>>>> cpu_physical_memory_read() is higher level, doing dispatch on ad=
+dress
+>>>>>>>> and length checks.
+>>>>>>>>
+>>>>>>>> This is a bit unnecessary, as ppi->buf could be accessed directl=
+y.
+>>>>>>> [...]
+>>>>>>>>>> +            memset(block->host_addr, 0,
+>>>>>>>>>> +                   block->target_end - block->target_start);
+>>>>>>>>>> +        }
+>>>>>>> my concern here is that if we directly touch guest memory here
+>>>>>>> we might get in trouble on migration without dirtying modified
+>>>>>>> ranges
+>>>>>>
+>>>>>> It is a read-only of one byte.
+>>>>>> by the time the reset handler is called, the memory must have been
+>>>>>> already migrated.
+>>>>>
+>>>>> Looks like a write to me?
+>>>>
+>>>> the PPI RAM memory is read for the "memory clear" byte
+>>>> The whole guest RAM is reset to 0 if set.
+>>>
+>>> Oh, I see; hmm.
+>>> How do you avoid zeroing things like persistent memory? Or ROMs? Or E=
+FI
+>>> pflash?
+>>
+>> guest_phys_blocks_append() only cares about RAM (see
+>> guest_phys_blocks_region_add)
+>=20
+> Hmm, promising; it uses:
+>     if (!memory_region_is_ram(section->mr) ||
+>         memory_region_is_ram_device(section->mr)) {
+>         return;
+>     }
+>=20
+> so ram_device is used by vfio and vhost-user; I don't see anything else=
+.
+> pflash init's as a rom_device so that's probably OK.
+> But things like backends/hostmem-file.c just use
+> memory_region_init_ram_from_file even if they're shared or PMEM.
+> So, I think this would wipe an attached PMEM device - do you want to or
+> not?
 
-> On Wed, Sep 05, 2018 at 08:55:50AM -0600, Alex Williamson wrote:
-> > On Wed,  5 Sep 2018 19:31:58 +0800
-> > Peter Xu <peterx@redhat.com> wrote:
-> >   
-> > > We will drop all the mappings when system reset, however we'll still
-> > > keep the existing memory layouts.  That'll be problematic since if IOMMU
-> > > is enabled in the guest and then reboot the guest, SeaBIOS will try to
-> > > drive a device that with no page mapped there.  What we need to do is to
-> > > rebuild the GPA->HPA mapping when system resets, hence ease SeaBIOS.
-> > > 
-> > > Without this patch, a guest that boots on an assigned NVMe device might
-> > > fail to find the boot device after a system reboot/reset and we'll be
-> > > able to observe SeaBIOS errors if turned on:
-> > > 
-> > >   WARNING - Timeout at nvme_wait:144!
-> > > 
-> > > With the patch applied, the guest will be able to find the NVMe drive
-> > > and bootstrap there even after multiple reboots or system resets.
-> > > 
-> > > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1625173
-> > > CC: QEMU Stable <qemu-stable@nongnu.org>
-> > > Tested-by: Cong Li <coli@redhat.com>
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > > 
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index 3dfada19a6..d3eb068d43 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -3231,6 +3231,14 @@ static void vtd_reset(DeviceState *dev)
-> > >       * When device reset, throw away all mappings and external caches
-> > >       */
-> > >      vtd_address_space_unmap_all(s);
-> > > +
-> > > +    /*
-> > > +     * Switch address spaces if needed (e.g., when reboot from a
-> > > +     * kernel that has IOMMU enabled, we should switch address spaces
-> > > +     * to rebuild the GPA->HPA mappings otherwise SeaBIOS might
-> > > +     * encounter DMA errors when running with e.g. a NVMe card).
-> > > +     */
-> > > +    vtd_switch_address_space_all(s);
-> > >  }
-> > >  
-> > >  static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)  
-> > 
-> > I'm curious why these aren't part of vtd_init().  vtd_init is where
-> > GCMD is set back to it's power-on state, which disables translation, so
-> > logically we should reset the address space at that point.  Similarly,
-> > the root entry is reset, so it would make sense to throw away all the
-> > mappings there too.  Thanks,  
-> 
-> vtd_init() is only called when realize() or reset, and AFAIU it's not
-> called by GCMD operations.  However I think I get the point that
-> logically we should do similar things in e.g. vtd_handle_gcmd_srtp()
-> when the enable bit switches.
-> 
-> My understanding is that if other things happened rather than the
-> system reboot (e.g., when root pointer is replaced, or during the
-> guest running the guest driver turns DMAR from on to off) the guest
-> will be responsible to do the rest of invalidations first before doing
-> that switch, so we'll possibly do the unmap_all() and address space
-> switches in other places (e.g., in vtd_context_global_invalidate, or
-> per device invalidations).
+I think that question could be put, "does the reset attack mitigation
+spec recommend / require clearing persistent memory"? I've got no idea.
+The reset attack is that the platform is re-set (forcibly, uncleanly)
+while the original OS holds some secrets in memory, then the attacker's
+OS (or firmware application) is loaded, and those scavenge the
+leftovers. Would the original OS keep secrets in PMEM? I don't know.
 
-AIUI, the entire global command register is write-once, so the guest
-cannot disable the IOMMU or change the root pointer after it's been
-initialized, except through a system reset.  I think that means the
-guest can only operate through the invalidation queue at runtime.  The
-bug being fixed here is that the IOMMU has been reset to its power-on
-state where translation is disabled, but the emulation of that disabled
-state also needs to return the per-device address space to that of
-system memory, or identity map thereof.  The commit log seems to imply
-that there's some sort of SeaBIOS issue and we're just doing this to
-help the BIOS, when in reality, we just forgot to reset the per device
-address space and a subsequent boot of a guest that didn't enable the
-IOMMU would have the same sort of issues.  In fact any usage of an
-assigned device prior to re-enabling the IOMMU would fail, there's
-nothing unique to NVMe here.  Thanks,
+I guess all address space that a guest OS could consider as "read-write
+memory" should be wiped. I think guest_phys_blocks_append() is a good
+choice here; originally I wrote that for supporting guest RAM dump; see
+commit c5d7f60f06142. Note that the is_ram_device bit was added
+separately, see commits e4dc3f5909ab9 and 21e00fa55f3fd -- but that's a
+change in the "right" direction here, because it *restricts* what
+regions qualify (for dumping, and here for clearing).
 
-Alex
+>=20
+>>>
+>>>>> Also, don't forget that a guest reset can happen during a migration=
+.
+>>>>
+>>>> Hmm, does cpu_physical_memory_read()  guarantee the memory has been =
+migrated?
+>>>> Is there a way to wait for migration to be completed in a reset hand=
+ler?
+>>>
+>>> No; remember that migration can take a significant amount of time (ma=
+ny
+>>> minutes) as you stuff many GB of RAM down a network.
+>>>
+>>> So you can be in the situation where:
+>>>      a) Migration starts
+>>>      b) Migration sends a copy of most of RAM across
+>>>      c) Guest dirties lots of RAM in parallel with b
+>>>      d) migration sends some of the RAM again
+>>>      e) guest reboots
+>>>      f) migration keeps sending ram across
+>>>      g) Migration finally completes and starts on destination
+>>>
+>>> a-f are all happening on the source side as the guest is still runnin=
+g
+>>> and doing whatever it wants (including reboots).
+>>>
+>>> Given something like acpi-build.c's acpi_ram_update's call to
+>>> memory_region_set_dirty, would that work for you?
+>>
+>> after the memset(), it should then call:
+>>
+>> memory_region_set_dirty(block->mr, 0, block->target_end - block->targe=
+t_start);
+>>
+>> looks about right?
+>=20
+> I think so.
+
+I'll admit I can't follow the dirtying discussion. But, I'm reminded of
+another commit of Dave's, namely 90c647db8d59 ("Fix pflash migration",
+2016-04-15). Would the same trick apply here?
+
+(
+
+BTW, I'm sorry about not having following this series closely -- I feel
+bad that we can't solve this within the firmware, but we really can't.
+The issue is that this memory clearing would have to occur really early
+into the firmware, at the latest in the PEI phase.
+
+However, both the 32-bit and the 64-bit variants of OVMF's PEI phase
+have access only to the lowest 4GB of the memory address space. Mapping
+all RAM (even with a "sliding bank") for clearing it would be a real
+mess. To that, add the fact that OVMF's PEI phase executes from RAM (not
+from pflash -- in OVMF, only SEC executes from pflash, and it
+decompresses the PEI + DXE firmware volumes to RAM), so PEI would have
+to clear all RAM *except* the areas its own self occupies, such as code,
+global variables (static data), heap, stack, other processor data
+structures (IDT, GDT, page tables, ...). And, no gaps inside those
+should be left out either, because the previous OS might have left
+secrets there...
+
+This is actually easier for firmware that runs on physical hardware; for
+two reasons. First, on physical hardware, the PEI phase of the firmware
+runs from pflash (it might use CAR, Cache-As-RAM, for a small temporary
+r/w storage), so it doesn't have to worry about scribbling over itself.
+Second, on physical hardware, the memory controller too has to be booted
+up -- the PEI code that does this is all vendors' most closely guarded
+secret, and *never* open source --; and when the firmware massages
+chipset registers for that, it can use non-architected means to get the
+RAM to clear itself.
+
+In comparison, in QEMU/KVM guests, the RAM just *is*. While that's a
+huge relief most of the time, in this case, the fact that the RAM can
+start out as nonzero, is a big problem. Hence my plea to implement the
+feature in QEMU.
+
+)
+
+Thanks,
+Laszlo
