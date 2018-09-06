@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fxjqt-0007SX-S1
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 22:17:00 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fxkzY-0004p7-UI
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:30:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jing2.liu@linux.intel.com>) id 1fxjqp-000812-M9
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 22:16:59 -0400
-Received: from mga11.intel.com ([192.55.52.93]:64012)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fxkzV-0003OA-IZ
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:30:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40162 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
-	id 1fxjqp-0007zN-E7
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 22:16:55 -0400
-References: <1534821487-14189-1-git-send-email-jing2.liu@linux.intel.com>
-	<1534821487-14189-3-git-send-email-jing2.liu@linux.intel.com>
-	<e88aac49-d0be-6ba9-9674-1785caa5af5b@gmail.com>
-	<b3d4db42-0ff0-9fd6-7c4e-ee74d15093e5@linux.intel.com>
-	<36d3de24-3d5e-e57a-b722-bbaaf1fd0035@gmail.com>
-	<913f0f69-eadc-eb2b-05f7-4a1398cdbf46@linux.intel.com>
-	<0abfc176-a6a6-e12d-1662-1b124a559882@gmail.com>
-	<5f440e08-33f0-6cc2-266b-d646771f385f@linux.intel.com>
-	<74eecedd-1203-0bb1-30ed-be4bbc038d95@linux.intel.com>
-	<920bf34c-7328-9fc4-446d-20a04d00c75f@gmail.com>
-From: "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <e6670c1e-6ecc-b8d2-5b26-c18f46ae1ee3@linux.intel.com>
-Date: Thu, 6 Sep 2018 10:16:42 +0800
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fxkzV-0003MK-7Q
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:29:57 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Thu,  6 Sep 2018 07:29:43 +0400
+Message-Id: <20180906032949.13753-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <920bf34c-7328-9fc4-446d-20a04d00c75f@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] hw/pci: add PCI resource reserve
- capability to legacy PCI bridge
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 0/6] Add support for TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,75 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, mst@redhat.com
-Cc: anthony.xu@intel.com, lersek@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi Marcle,
+Hi,
 
-On 9/6/2018 12:36 AM, Marcel Apfelbaum wrote:
-> 
-> 
-> On 09/05/2018 05:08 AM, Liu, Jing2 wrote:
->> Hi Marcel and Michael,
->>
->> Got no response so I would like to ask if I need do something more for
->> this serial? :)
->>
-> 
-> Hi Jing,
-> 
-> Maybe Michael is PTO, let's wait a few more days.
-> 
-Thank you, I got it :)
+The following patches implement the TPM Physical Presence Interface
+that allows a user to set a command via ACPI (sysfs entry in Linux)
+that, upon the next reboot, the firmware looks for and acts upon by
+sending sequences of commands to the TPM.
 
-BRs,
-Jing
-> Michael, I can send a pull request for this series if you are busy.
-> Thanks,
-> Marcel
-> 
->> Thanks,
->> Jing
->>
->> On 8/30/2018 10:58 AM, Liu, Jing2 wrote:
->>> Ping Michael :)
->>>
->>> Thanks,
->>> Jing
->>>
->>> On 8/25/2018 12:51 AM, Marcel Apfelbaum wrote:
->>>>>>>> On 08/21/2018 06:18 AM, Jing Liu wrote:
->>>>>>>>> Add hint to firmware (e.g. SeaBIOS) to reserve addtional
->>>>>>>>> BUS/IO/MEM/PREF resource for legacy pci-pci bridge. Add the
->>>>>>>>> resource reserve capability deleting in pci_bridge_dev_exitfn.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
->>>>>>>>> ---
->>>>>>>>>   hw/pci-bridge/pci_bridge_dev.c | 24 ++++++++++++++++++++++++
->>>>>>>>>   1 file changed, 24 insertions(+)
->>> [...]
->>>>>>>> Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
->>>>>>>>
->>>>>>> Thanks for the quick reviewing and feedback.
->>>>>>> So could I ask what I should do now, update a new version
->>>>>>> with your rb or just waiting for pushing, or else?
->>>>>>>
->>>>>>
->>>>>> You just need to wait until Michael adds the series
->>>>>> to his next pull request. Nothing more to do.
->>>>>>
->>>>> OK, got it! Thanks!
->>>>
->>>> Please ping Michael if your code is not merged in a week or so.
->>>>
->>>>> BTW, do you have some suggestion on the seabios counterpart patches?
->>>>> https://patchew.org/Seabios/1534386737-8131-1-git-send-email-jing2.liu@linux.intel.com/ 
->>>>>
->>>>
->>>> I plan to have  a look this weekend.
->>>>
->>>> Thanks,
->>>> Marcel
->>>
-> 
-> 
+A dedicated memory region is added to the TPM CRB & TIS devices, at
+address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+holds the location for that PPI region and some version details, to
+allow for future flexibility.
+
+With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+now runs successfully.
+
+It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+Implement Physical Presence interface for TPM 1.2 and 2")
+
+The edk2 support is merged upstream.
+
+v11:
+- fix migration issue with bad RAM size, round it up to host-page size
+
+v10:
+- fix 3.1 pc machines patch
+- describe PPI memory size in doc
+- change "Memory overwrite variable" location to offset 0x15a
+
+Marc-Andr=C3=A9 Lureau (3):
+  hw/i386: add pc-i440fx-3.1 & pc-q35-3.1
+  tpm: add a "ppi" boolean property
+  tpm: add ACPI memory clear interface
+
+Stefan Berger (3):
+  tpm: allocate/map buffer for TPM Physical Presence interface
+  acpi: expose TPM/PPI configuration parameters to firmware via fw_cfg
+  acpi: build TPM Physical Presence interface
+
+ hw/tpm/tpm_ppi.h      |  28 +++
+ include/hw/acpi/tpm.h |  17 ++
+ include/hw/compat.h   |  11 +-
+ include/hw/i386/pc.h  |   5 +-
+ hw/i386/acpi-build.c  | 456 +++++++++++++++++++++++++++++++++++++++++-
+ hw/i386/pc_piix.c     |  15 +-
+ hw/i386/pc_q35.c      |  13 +-
+ hw/tpm/tpm_crb.c      |  12 ++
+ hw/tpm/tpm_ppi.c      |  55 +++++
+ hw/tpm/tpm_tis.c      |  12 ++
+ docs/specs/tpm.txt    | 105 ++++++++++
+ hw/tpm/Makefile.objs  |   1 +
+ hw/tpm/trace-events   |   3 +
+ 13 files changed, 724 insertions(+), 9 deletions(-)
+ create mode 100644 hw/tpm/tpm_ppi.h
+ create mode 100644 hw/tpm/tpm_ppi.c
+
+--=20
+2.19.0.rc1
