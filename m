@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fxwAg-0002Aj-FA
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:26:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1fxwF1-0003S5-7O
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fxwAd-00062J-8X
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:26:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41560 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fxwEw-0006Y1-19
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:30:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37688 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fxwAd-00061A-2I
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:26:11 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fxwEv-0006PM-PP
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:30:37 -0400
 References: <20180906151227.25514-1-marcandre.lureau@redhat.com>
-	<20180906151227.25514-2-marcandre.lureau@redhat.com>
+	<20180906151227.25514-3-marcandre.lureau@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <82e2a979-4f01-6ed6-a220-ccb3e8fc75a4@redhat.com>
-Date: Thu, 6 Sep 2018 10:26:07 -0500
+Message-ID: <43452188-354e-5fe8-a758-28e32675faae@redhat.com>
+Date: Thu, 6 Sep 2018 10:30:32 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180906151227.25514-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180906151227.25514-3-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/10] qemu-option: add help fallback to
- print the list of options
+Subject: Re: [Qemu-devel] [PATCH 02/10] qemu-option: improve
+ qemu_opts_print_help() output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +33,62 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
 On 09/06/2018 10:12 AM, Marc-Andr=C3=A9 Lureau wrote:
-> QDev options accept '?' or 'help' in the list of parameters, which is
-> really handy to list the available options.
+> Modify qemu_opts_print_help():
+> - to print expected argument type
+> - skip description if not available
+> - sort lines
+> - prefix with the list name (like qdev, to avoid confusion)
+> - drop 16-chars alignment, use a '-' as seperator for option name and
+>    description
 >=20
-> Unfortunately, this isn't built in QemuOpts. qemu_opts_parse_noisily()
-> seems to be the common path for command line options, so place a
-> fallback to check for '?' and print help listing available options.
+> For ex, "-spice ?" output is changed from:
+
+s/?/help/
+
 >=20
-> This is very handy, for example with qemu "-spice ?".
+> port             No description available
+> tls-port         No description available
+> addr             No description available
+> [...]
+> gl               No description available
+> rendernode       No description available
+>=20
+> to:
+>=20
+> spice.addr=3Dstr
+> spice.agent-mouse=3Dbool (on/off)
+> spice.disable-agent-file-xfer=3Dbool (on/off)
+> [...]
+> spice.x509-key-password=3Dstr
+> spice.zlib-glz-wan-compression=3Dstr
+>=20
+> "qemu-img create -f qcow2 -o ?", changed from:
 
-Is that literal spelling intended (a single argument with an embedded=20
-space)? Because that would result in:
-qemu: -spice help: invalid option
+and again
 
-Or did you mean "qemu -spice '?'" (with the outer quotes delimiting what=20
-you type, and the inner quote properly escaping the ? to avoid=20
-unintended globbing if you have a one-byte file name in the current=20
-directory)?
-
-Also, I'd rather see you favor the 'help' spelling in your text; the '?'=20
-spelling should continue to work (by virtue of has_help_option), but as=20
-that form requires shell quoting while 'help' does not, we should=20
-minimize its use in our documentation to avoid people forgetting to=20
-quote it and then hitting unintended shell globbing effects.  That would=20
-make your example "qemu -spice help".
-
+>=20
+> size             Virtual disk size
+> compat           Compatibility level (0.10 or 1.1)
+> backing_file     File name of a base image
+> [...]
+> lazy_refcounts   Postpone refcount updates
+> refcount_bits    Width of a reference count entry in bits
+>=20
+> to:
+>=20
+> backing_file=3Dstr - File name of a base image
+> backing_fmt=3Dstr - Image format of the base image
+> cluster_size=3Dsize - qcow2 cluster size
+> [...]
+> refcount_bits=3Dnum - Width of a reference count entry in bits
+> size=3Dsize - Virtual disk size
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->   util/qemu-option.c | 33 ++++++++++++++++++++++-----------
->   1 file changed, 22 insertions(+), 11 deletions(-)
+>   util/qemu-option.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 42 insertions(+), 2 deletions(-)
 >=20
-> @@ -886,10 +891,16 @@ QemuOpts *qemu_opts_parse_noisily(QemuOptsList *l=
-ist, const char *params,
->   {
->       Error *err =3D NULL;
->       QemuOpts *opts;
-> +    bool invalidp =3D false;
->  =20
-> -    opts =3D opts_parse(list, params, permit_abbrev, false, &err);
-> +    opts =3D opts_parse(list, params, permit_abbrev, false, &invalidp,=
- &err);
->       if (err) {
-> -        error_report_err(err);
-> +        if (invalidp && has_help_option(params)) {
-> +            qemu_opts_print_help(list);
-> +            error_free(err);
-> +        } else {
-> +            error_report_err(err);
-> +        }
 
-This makes sense.  With a better commit message,
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
