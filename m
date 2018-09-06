@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fxvxY-00089X-8G
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:12:41 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fxvxi-0000Am-V9
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fxvxX-0001NU-7e
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:12:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43938 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fxvxg-0001hg-QO
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:12:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41090 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fxvxX-0001Mx-0k
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:12:39 -0400
+	id 1fxvxg-0001gL-KI
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 11:12:48 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  6 Sep 2018 19:12:18 +0400
-Message-Id: <20180906151227.25514-2-marcandre.lureau@redhat.com>
+Date: Thu,  6 Sep 2018 19:12:20 +0400
+Message-Id: <20180906151227.25514-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20180906151227.25514-1-marcandre.lureau@redhat.com>
 References: <20180906151227.25514-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 01/10] qemu-option: add help fallback to print
- the list of options
+Subject: [Qemu-devel] [PATCH 03/10] qom/object: fix iterating properties
+ over a class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,144 +31,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-QDev options accept '?' or 'help' in the list of parameters, which is
-really handy to list the available options.
-
-Unfortunately, this isn't built in QemuOpts. qemu_opts_parse_noisily()
-seems to be the common path for command line options, so place a
-fallback to check for '?' and print help listing available options.
-
-This is very handy, for example with qemu "-spice ?".
+object_class_property_iter_init() starts from the given class, so the
+next class should continue with the parent class.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- util/qemu-option.c | 33 ++++++++++++++++++++++-----------
- 1 file changed, 22 insertions(+), 11 deletions(-)
+ qom/object.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 01886efe90..557b6c6626 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -486,7 +486,7 @@ int qemu_opt_unset(QemuOpts *opts, const char *name)
+diff --git a/qom/object.c b/qom/object.c
+index 75d1d48944..d8666de3f2 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1108,7 +1108,7 @@ void object_class_property_iter_init(ObjectProperty=
+Iterator *iter,
+                                      ObjectClass *klass)
+ {
+     g_hash_table_iter_init(&iter->iter, klass->properties);
+-    iter->nextclass =3D klass;
++    iter->nextclass =3D object_class_get_parent(klass);
  }
 =20
- static void opt_set(QemuOpts *opts, const char *name, char *value,
--                    bool prepend, Error **errp)
-+                    bool prepend, bool *invalidp, Error **errp)
- {
-     QemuOpt *opt;
-     const QemuOptDesc *desc;
-@@ -496,6 +496,9 @@ static void opt_set(QemuOpts *opts, const char *name,=
- char *value,
-     if (!desc && !opts_accepts_any(opts)) {
-         g_free(value);
-         error_setg(errp, QERR_INVALID_PARAMETER, name);
-+        if (invalidp) {
-+            *invalidp =3D true;
-+        }
-         return;
-     }
-=20
-@@ -519,7 +522,7 @@ static void opt_set(QemuOpts *opts, const char *name,=
- char *value,
- void qemu_opt_set(QemuOpts *opts, const char *name, const char *value,
-                   Error **errp)
- {
--    opt_set(opts, name, g_strdup(value), false, errp);
-+    opt_set(opts, name, g_strdup(value), false, NULL, errp);
- }
-=20
- void qemu_opt_set_bool(QemuOpts *opts, const char *name, bool val,
-@@ -750,7 +753,8 @@ void qemu_opts_print(QemuOpts *opts, const char *sepa=
-rator)
- }
-=20
- static void opts_do_parse(QemuOpts *opts, const char *params,
--                          const char *firstname, bool prepend, Error **e=
-rrp)
-+                          const char *firstname, bool prepend,
-+                          bool *invalidp, Error **errp)
- {
-     char *option =3D NULL;
-     char *value =3D NULL;
-@@ -785,7 +789,7 @@ static void opts_do_parse(QemuOpts *opts, const char =
-*params,
-         }
-         if (strcmp(option, "id") !=3D 0) {
-             /* store and parse */
--            opt_set(opts, option, value, prepend, &local_err);
-+            opt_set(opts, option, value, prepend, invalidp, &local_err);
-             value =3D NULL;
-             if (local_err) {
-                 error_propagate(errp, local_err);
-@@ -814,11 +818,12 @@ static void opts_do_parse(QemuOpts *opts, const cha=
-r *params,
- void qemu_opts_do_parse(QemuOpts *opts, const char *params,
-                        const char *firstname, Error **errp)
- {
--    opts_do_parse(opts, params, firstname, false, errp);
-+    opts_do_parse(opts, params, firstname, false, NULL, errp);
- }
-=20
- static QemuOpts *opts_parse(QemuOptsList *list, const char *params,
--                            bool permit_abbrev, bool defaults, Error **e=
-rrp)
-+                            bool permit_abbrev, bool defaults,
-+                            bool *invalidp, Error **errp)
- {
-     const char *firstname;
-     char *id =3D NULL;
-@@ -850,7 +855,7 @@ static QemuOpts *opts_parse(QemuOptsList *list, const=
- char *params,
-         return NULL;
-     }
-=20
--    opts_do_parse(opts, params, firstname, defaults, &local_err);
-+    opts_do_parse(opts, params, firstname, defaults, invalidp, &local_er=
-r);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         qemu_opts_del(opts);
-@@ -870,7 +875,7 @@ static QemuOpts *opts_parse(QemuOptsList *list, const=
- char *params,
- QemuOpts *qemu_opts_parse(QemuOptsList *list, const char *params,
-                           bool permit_abbrev, Error **errp)
- {
--    return opts_parse(list, params, permit_abbrev, false, errp);
-+    return opts_parse(list, params, permit_abbrev, false, NULL, errp);
- }
-=20
- /**
-@@ -886,10 +891,16 @@ QemuOpts *qemu_opts_parse_noisily(QemuOptsList *lis=
-t, const char *params,
- {
-     Error *err =3D NULL;
-     QemuOpts *opts;
-+    bool invalidp =3D false;
-=20
--    opts =3D opts_parse(list, params, permit_abbrev, false, &err);
-+    opts =3D opts_parse(list, params, permit_abbrev, false, &invalidp, &=
-err);
-     if (err) {
--        error_report_err(err);
-+        if (invalidp && has_help_option(params)) {
-+            qemu_opts_print_help(list);
-+            error_free(err);
-+        } else {
-+            error_report_err(err);
-+        }
-     }
-     return opts;
- }
-@@ -899,7 +910,7 @@ void qemu_opts_set_defaults(QemuOptsList *list, const=
- char *params,
- {
-     QemuOpts *opts;
-=20
--    opts =3D opts_parse(list, params, permit_abbrev, true, NULL);
-+    opts =3D opts_parse(list, params, permit_abbrev, true, NULL, NULL);
-     assert(opts);
- }
-=20
+ ObjectProperty *object_class_property_find(ObjectClass *klass, const cha=
+r *name,
 --=20
 2.19.0.rc1
