@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxtvw-0006jg-PY
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:02:56 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fxtvw-0006jh-Pa
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxtvr-0000sj-1W
+	(envelope-from <jsnow@redhat.com>) id 1fxtvq-0000rr-KN
 	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:02:52 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu,  6 Sep 2018 09:02:13 -0400
-Message-Id: <20180906130225.5118-5-jsnow@redhat.com>
+Date: Thu,  6 Sep 2018 09:02:20 -0400
+Message-Id: <20180906130225.5118-12-jsnow@redhat.com>
 In-Reply-To: <20180906130225.5118-1-jsnow@redhat.com>
 References: <20180906130225.5118-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 04/16] block/commit: refactor commit to use
- job callbacks
+Subject: [Qemu-devel] [PATCH v5 11/16] jobs: remove .exit callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,162 +22,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: jtc@redhat.com, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-Use the component callbacks; prepare, abort, and clean.
+Now that all of the jobs use the component finalization callbacks,
+there's no use for the heavy-hammer .exit callback anymore.
 
-NB: prepare is only called when the job has not yet failed;
-and abort can be called after prepare.
+job_exit becomes a glorified type shim so that we can call
+job_completed from aio_bh_schedule_oneshot.
 
-complete -> prepare -> abort -> clean
-complete -> abort -> clean
-
-During refactor, a potential problem with bdrv_drop_intermediate
-was identified, The patched behavior is no worse than the pre-patch
-behavior, so leave a FIXME for now to be fixed in a future patch.
+Move these three functions down into job.c to eliminate a
+forward reference.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/commit.c | 92 ++++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 51 insertions(+), 41 deletions(-)
+ include/qemu/job.h | 11 --------
+ job.c              | 77 ++++++++++++++++++++++++------------------------------
+ 2 files changed, 34 insertions(+), 54 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index b6e8969877..a2da5740b0 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -36,6 +36,7 @@ typedef struct CommitBlockJob {
-     BlockDriverState *commit_top_bs;
-     BlockBackend *top;
-     BlockBackend *base;
-+    BlockDriverState *base_bs;
-     BlockdevOnError on_error;
-     int base_flags;
-     char *backing_file_str;
-@@ -68,61 +69,67 @@ static int coroutine_fn commit_populate(BlockBackend *bs, BlockBackend *base,
-     return 0;
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index e0cff702b7..5cb0681834 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -221,17 +221,6 @@ struct JobDriver {
+      */
+     void (*drain)(Job *job);
+ 
+-    /**
+-     * If the callback is not NULL, exit will be invoked from the main thread
+-     * when the job's coroutine has finished, but before transactional
+-     * convergence; before @prepare or @abort.
+-     *
+-     * FIXME TODO: This callback is only temporary to transition remaining jobs
+-     * to prepare/commit/abort/clean callbacks and will be removed before 3.1.
+-     * is released.
+-     */
+-    void (*exit)(Job *job);
+-
+     /**
+      * If the callback is not NULL, prepare will be invoked when all the jobs
+      * belonging to the same transaction complete; or upon this job's completion
+diff --git a/job.c b/job.c
+index 01dd97fee3..72f7de1f36 100644
+--- a/job.c
++++ b/job.c
+@@ -535,49 +535,6 @@ void job_drain(Job *job)
+     }
  }
  
--static void commit_exit(Job *job)
-+static int commit_prepare(Job *job)
- {
-     CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
--    BlockJob *bjob = &s->common;
--    BlockDriverState *top = blk_bs(s->top);
--    BlockDriverState *base = blk_bs(s->base);
--    BlockDriverState *commit_top_bs = s->commit_top_bs;
--    bool remove_commit_top_bs = false;
+-static void job_completed(Job *job);
 -
--    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
--    bdrv_ref(top);
--    bdrv_ref(commit_top_bs);
- 
-     /* Remove base node parent that still uses BLK_PERM_WRITE/RESIZE before
-      * the normal backing chain can be restored. */
-     blk_unref(s->base);
-+    s->base = NULL;
- 
--    if (!job_is_cancelled(job) && job->ret == 0) {
--        /* success */
--        job->ret = bdrv_drop_intermediate(s->commit_top_bs, base,
--                                          s->backing_file_str);
--    } else {
--        /* XXX Can (or should) we somehow keep 'consistent read' blocked even
--         * after the failed/cancelled commit job is gone? If we already wrote
--         * something to base, the intermediate images aren't valid any more. */
--        remove_commit_top_bs = true;
-+    /* FIXME: bdrv_drop_intermediate treats total failures and partial failures
-+     * identically. Further work is needed to disambiguate these cases. */
-+    return bdrv_drop_intermediate(s->commit_top_bs, s->base_bs,
-+                                  s->backing_file_str);
-+}
-+
-+static void commit_abort(Job *job)
-+{
-+    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-+    BlockDriverState *top_bs = blk_bs(s->top);
-+
-+    /* Make sure commit_top_bs and top stay around until bdrv_replace_node() */
-+    bdrv_ref(top_bs);
-+    bdrv_ref(s->commit_top_bs);
-+
-+    if (s->base) {
-+        blk_unref(s->base);
-     }
- 
-+    /* free the blockers on the intermediate nodes so that bdrv_replace_nodes
-+     * can succeed */
-+    block_job_remove_all_bdrv(&s->common);
-+
-+    /* If bdrv_drop_intermediate() failed (or was not invoked), remove the
-+     * commit filter driver from the backing chain now. Do this as the final
-+     * step so that the 'consistent read' permission can be granted.
-+     *
-+     * XXX Can (or should) we somehow keep 'consistent read' blocked even
-+     * after the failed/cancelled commit job is gone? If we already wrote
-+     * something to base, the intermediate images aren't valid any more. */
-+    bdrv_child_try_set_perm(s->commit_top_bs->backing, 0, BLK_PERM_ALL,
-+                            &error_abort);
-+    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
-+                      &error_abort);
-+
-+    bdrv_unref(s->commit_top_bs);
-+    bdrv_unref(top_bs);
-+}
-+
-+static void commit_clean(Job *job)
-+{
-+    CommitBlockJob *s = container_of(job, CommitBlockJob, common.job);
-+
-     /* restore base open flags here if appropriate (e.g., change the base back
-      * to r/o). These reopens do not need to be atomic, since we won't abort
-      * even on failure here */
--    if (s->base_flags != bdrv_get_flags(base)) {
--        bdrv_reopen(base, s->base_flags, NULL);
-+    if (s->base_flags != bdrv_get_flags(s->base_bs)) {
-+        bdrv_reopen(s->base_bs, s->base_flags, NULL);
-     }
-+
-     g_free(s->backing_file_str);
-     blk_unref(s->top);
+-static void job_exit(void *opaque)
+-{
+-    Job *job = (Job *)opaque;
+-    AioContext *aio_context = job->aio_context;
 -
--    /* If there is more than one reference to the job (e.g. if called from
--     * job_finish_sync()), job_completed() won't free it and therefore the
--     * blockers on the intermediate nodes remain. This would cause
--     * bdrv_set_backing_hd() to fail. */
--    block_job_remove_all_bdrv(bjob);
--
--    /* If bdrv_drop_intermediate() didn't already do that, remove the commit
--     * filter driver from the backing chain. Do this as the final step so that
--     * the 'consistent read' permission can be granted.  */
--    if (remove_commit_top_bs) {
--        bdrv_child_try_set_perm(commit_top_bs->backing, 0, BLK_PERM_ALL,
--                                &error_abort);
--        bdrv_replace_node(commit_top_bs, backing_bs(commit_top_bs),
--                          &error_abort);
+-    if (job->driver->exit) {
+-        aio_context_acquire(aio_context);
+-        job->driver->exit(job);
+-        aio_context_release(aio_context);
 -    }
+-    job_completed(job);
+-}
 -
--    bdrv_unref(commit_top_bs);
--    bdrv_unref(top);
+-/**
+- * All jobs must allow a pause point before entering their job proper. This
+- * ensures that jobs can be paused prior to being started, then resumed later.
+- */
+-static void coroutine_fn job_co_entry(void *opaque)
+-{
+-    Job *job = opaque;
+-
+-    assert(job && job->driver && job->driver->run);
+-    job_pause_point(job);
+-    job->ret = job->driver->run(job, &job->err);
+-    job->deferred_to_main_loop = true;
+-    aio_bh_schedule_oneshot(qemu_get_aio_context(), job_exit, job);
+-}
+-
+-
+-void job_start(Job *job)
+-{
+-    assert(job && !job_started(job) && job->paused &&
+-           job->driver && job->driver->run);
+-    job->co = qemu_coroutine_create(job_co_entry, job);
+-    job->pause_count--;
+-    job->busy = true;
+-    job->paused = false;
+-    job_state_transition(job, JOB_STATUS_RUNNING);
+-    aio_co_enter(job->aio_context, job->co);
+-}
+-
+ /* Assumes the block_job_mutex is held */
+ static bool job_timer_not_pending(Job *job)
+ {
+@@ -894,6 +851,40 @@ static void job_completed(Job *job)
+     }
  }
  
- static int coroutine_fn commit_run(Job *job, Error **errp)
-@@ -211,7 +218,9 @@ static const BlockJobDriver commit_job_driver = {
-         .user_resume   = block_job_user_resume,
-         .drain         = block_job_drain,
-         .run           = commit_run,
--        .exit          = commit_exit,
-+        .prepare       = commit_prepare,
-+        .abort         = commit_abort,
-+        .clean         = commit_clean
-     },
- };
- 
-@@ -345,6 +354,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-     if (ret < 0) {
-         goto fail;
-     }
-+    s->base_bs = base;
- 
-     /* Required permissions are already taken with block_job_add_bdrv() */
-     s->top = blk_new(0, BLK_PERM_ALL);
++/** Useful only as a type shim for aio_bh_schedule_oneshot. */
++static void job_exit(void *opaque)
++{
++    Job *job = (Job *)opaque;
++    job_completed(job);
++}
++
++/**
++ * All jobs must allow a pause point before entering their job proper. This
++ * ensures that jobs can be paused prior to being started, then resumed later.
++ */
++static void coroutine_fn job_co_entry(void *opaque)
++{
++    Job *job = opaque;
++
++    assert(job && job->driver && job->driver->run);
++    job_pause_point(job);
++    job->ret = job->driver->run(job, &job->err);
++    job->deferred_to_main_loop = true;
++    aio_bh_schedule_oneshot(qemu_get_aio_context(), job_exit, job);
++}
++
++void job_start(Job *job)
++{
++    assert(job && !job_started(job) && job->paused &&
++           job->driver && job->driver->run);
++    job->co = qemu_coroutine_create(job_co_entry, job);
++    job->pause_count--;
++    job->busy = true;
++    job->paused = false;
++    job_state_transition(job, JOB_STATUS_RUNNING);
++    aio_co_enter(job->aio_context, job->co);
++}
++
+ void job_cancel(Job *job, bool force)
+ {
+     if (job->status == JOB_STATUS_CONCLUDED) {
 -- 
 2.14.4
