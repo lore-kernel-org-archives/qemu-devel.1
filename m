@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fxxes-00027q-Dj
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:01:31 -0400
+	(envelope-from <jcody@redhat.com>) id 1fxxfc-0002pb-MG
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:02:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fxxer-0006Oy-E0
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:01:30 -0400
-Date: Thu, 6 Sep 2018 13:01:20 -0400
+	(envelope-from <jcody@redhat.com>) id 1fxxfY-0006ho-KA
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 13:02:16 -0400
+Date: Thu, 6 Sep 2018 13:01:57 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180906170120.GJ22117@localhost.localdomain>
+Message-ID: <20180906170157.GK22117@localhost.localdomain>
 References: <20180906130225.5118-1-jsnow@redhat.com>
-	<20180906130225.5118-13-jsnow@redhat.com>
+	<20180906130225.5118-14-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180906130225.5118-13-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 12/16] qapi/block-commit: expose new job
+In-Reply-To: <20180906130225.5118-14-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 13/16] qapi/block-mirror: expose new job
  properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,33 +27,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: John Snow <jsnow@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu, Sep 06, 2018 at 09:02:21AM -0400, John Snow wrote:
+On Thu, Sep 06, 2018 at 09:02:22AM -0400, John Snow wrote:
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 
 > ---
->  blockdev.c           |  8 ++++++++
->  qapi/block-core.json | 16 +++++++++++++++-
->  2 files changed, 23 insertions(+), 1 deletion(-)
+>  blockdev.c           | 14 ++++++++++++++
+>  qapi/block-core.json | 30 ++++++++++++++++++++++++++++--
+>  2 files changed, 42 insertions(+), 2 deletions(-)
 > 
 > diff --git a/blockdev.c b/blockdev.c
-> index ec90eb1cf9..98b91e75a7 100644
+> index 98b91e75a7..429cdf9901 100644
 > --- a/blockdev.c
 > +++ b/blockdev.c
-> @@ -3204,6 +3204,8 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
->                        bool has_backing_file, const char *backing_file,
->                        bool has_speed, int64_t speed,
->                        bool has_filter_node_name, const char *filter_node_name,
-> +                      bool has_auto_finalize, bool auto_finalize,
-> +                      bool has_auto_dismiss, bool auto_dismiss,
->                        Error **errp)
+> @@ -3597,6 +3597,8 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
+>                                     bool has_filter_node_name,
+>                                     const char *filter_node_name,
+>                                     bool has_copy_mode, MirrorCopyMode copy_mode,
+> +                                   bool has_auto_finalize, bool auto_finalize,
+> +                                   bool has_auto_dismiss, bool auto_dismiss,
+>                                     Error **errp)
 >  {
->      BlockDriverState *bs;
-> @@ -3223,6 +3225,12 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
->      if (!has_filter_node_name) {
->          filter_node_name = NULL;
+>      int job_flags = JOB_DEFAULT;
+> @@ -3625,6 +3627,12 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
+>      if (!has_copy_mode) {
+>          copy_mode = MIRROR_COPY_MODE_BACKGROUND;
 >      }
 > +    if (has_auto_finalize && !auto_finalize) {
 > +        job_flags |= JOB_MANUAL_FINALIZE;
@@ -62,15 +62,42 @@ Reviewed-by: Jeff Cody <jcody@redhat.com>
 > +        job_flags |= JOB_MANUAL_DISMISS;
 > +    }
 >  
->      /* Important Note:
->       *  libvirt relies on the DeviceNotFound error class in order to probe for
+>      if (granularity != 0 && (granularity < 512 || granularity > 1048576 * 64)) {
+>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "granularity",
+> @@ -3802,6 +3810,8 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+>                             arg->has_unmap, arg->unmap,
+>                             false, NULL,
+>                             arg->has_copy_mode, arg->copy_mode,
+> +                           arg->has_auto_finalize, arg->auto_finalize,
+> +                           arg->has_auto_dismiss, arg->auto_dismiss,
+>                             &local_err);
+>      bdrv_unref(target_bs);
+>      error_propagate(errp, local_err);
+> @@ -3823,6 +3833,8 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+>                           bool has_filter_node_name,
+>                           const char *filter_node_name,
+>                           bool has_copy_mode, MirrorCopyMode copy_mode,
+> +                         bool has_auto_finalize, bool auto_finalize,
+> +                         bool has_auto_dismiss, bool auto_dismiss,
+>                           Error **errp)
+>  {
+>      BlockDriverState *bs;
+> @@ -3856,6 +3868,8 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+>                             true, true,
+>                             has_filter_node_name, filter_node_name,
+>                             has_copy_mode, copy_mode,
+> +                           has_auto_finalize, auto_finalize,
+> +                           has_auto_dismiss, auto_dismiss,
+>                             &local_err);
+>      error_propagate(errp, local_err);
+>  
 > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 4c7a37afdc..d5b62e50d7 100644
+> index d5b62e50d7..e785c2e9fe 100644
 > --- a/qapi/block-core.json
 > +++ b/qapi/block-core.json
-> @@ -1498,6 +1498,19 @@
->  #                    above @top. If this option is not given, a node name is
->  #                    autogenerated. (Since: 2.9)
+> @@ -1729,6 +1729,18 @@
+>  # @copy-mode: when to copy data to the destination; defaults to 'background'
+>  #             (Since: 3.0)
 >  #
 > +# @auto-finalize: When false, this job will wait in a PENDING state after it has
 > +#                 finished its work, waiting for @block-job-finalize before
@@ -84,20 +111,48 @@ Reviewed-by: Jeff Cody <jcody@redhat.com>
 > +#                When true, this job will automatically disappear from the query
 > +#                list without user intervention.
 > +#                Defaults to true. (Since 3.1)
-> +#
->  # Returns: Nothing on success
->  #          If @device does not exist, DeviceNotFound
->  #          Any other error returns a GenericError.
-> @@ -1515,7 +1528,8 @@
->  { 'command': 'block-commit',
->    'data': { '*job-id': 'str', 'device': 'str', '*base': 'str', '*top': 'str',
->              '*backing-file': 'str', '*speed': 'int',
-> -            '*filter-node-name': 'str' } }
-> +            '*filter-node-name': 'str',
+>  # Since: 1.3
+>  ##
+>  { 'struct': 'DriveMirror',
+> @@ -1738,7 +1750,8 @@
+>              '*speed': 'int', '*granularity': 'uint32',
+>              '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
+>              '*on-target-error': 'BlockdevOnError',
+> -            '*unmap': 'bool', '*copy-mode': 'MirrorCopyMode' } }
+> +            '*unmap': 'bool', '*copy-mode': 'MirrorCopyMode',
 > +            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
 >  
 >  ##
->  # @drive-backup:
+>  # @BlockDirtyBitmap:
+> @@ -2004,6 +2017,18 @@
+>  # @copy-mode: when to copy data to the destination; defaults to 'background'
+>  #             (Since: 3.0)
+>  #
+> +# @auto-finalize: When false, this job will wait in a PENDING state after it has
+> +#                 finished its work, waiting for @block-job-finalize before
+> +#                 making any block graph changes.
+> +#                 When true, this job will automatically
+> +#                 perform its abort or commit actions.
+> +#                 Defaults to true. (Since 3.1)
+> +#
+> +# @auto-dismiss: When false, this job will wait in a CONCLUDED state after it
+> +#                has completely ceased all work, and awaits @block-job-dismiss.
+> +#                When true, this job will automatically disappear from the query
+> +#                list without user intervention.
+> +#                Defaults to true. (Since 3.1)
+>  # Returns: nothing on success.
+>  #
+>  # Since: 2.6
+> @@ -2025,7 +2050,8 @@
+>              '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
+>              '*on-target-error': 'BlockdevOnError',
+>              '*filter-node-name': 'str',
+> -            '*copy-mode': 'MirrorCopyMode' } }
+> +            '*copy-mode': 'MirrorCopyMode',
+> +            '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+>  
+>  ##
+>  # @block_set_io_throttle:
 > -- 
 > 2.14.4
 > 
