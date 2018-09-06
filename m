@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fxl0D-0005Dv-Q9
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:30:44 -0400
+	(envelope-from <peterx@redhat.com>) id 1fxl7t-00035o-W8
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fxl0C-0004La-HV
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:30:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47498 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fxl7q-0006hp-Ls
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:38:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36312 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fxl0A-0004GZ-3w
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:30:39 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  6 Sep 2018 07:29:49 +0400
-Message-Id: <20180906032949.13753-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20180906032949.13753-1-marcandre.lureau@redhat.com>
-References: <20180906032949.13753-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fxl7q-0006fC-EG
+	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:38:34 -0400
+Date: Thu, 6 Sep 2018 11:38:25 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180906033825.GB16937@xz-x1>
+References: <20180618140854.17824-1-armbru@redhat.com>
+	<20180618140854.17824-7-armbru@redhat.com>
+	<20180905150510.wn4cfhj73z7cbtvb@olga.proxmox.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 6/6] tpm: add ACPI memory clear interface
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180905150510.wn4cfhj73z7cbtvb@olga.proxmox.com>
+Subject: Re: [Qemu-devel] [PULL 6/7] monitor: move init global earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,207 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-This allows to pass the last failing test from the Windows HLK TPM 2.0
-TCG PPI 1.3 tests.
+On Wed, Sep 05, 2018 at 05:05:10PM +0200, Wolfgang Bumiller wrote:
+> On Mon, Jun 18, 2018 at 04:08:53PM +0200, Markus Armbruster wrote:
+> > From: Peter Xu <peterx@redhat.com>
+> > 
+> > Before this patch, monitor fd helpers might be called even earlier than
+> > monitor_init_globals().  This can be problematic.
+> > 
+> > After previous work, now monitor_init_globals() does not depend on
+> > accelerator initialization any more.  Call it earlier (before CLI
+> > parsing; that's where the monitor APIs might be called) to make sure it
+> > is called before any of the monitor APIs.
+> 
+> It looks like this patch moves the creation of the 'IO mon_iothread' to
+> before the call to os_daemonize().
+> With qemu 3.0 I'm experiencing crashes when shutting down daemonized
+> qemu instances, at pthread_join() on the 'IO mon_iothread' thread.
+> 
+> monitor_init_globals() calls monitor_iothread_init(), which in turn uses
+> iothread_create() to create a joinable thread. Then os_daemonize() is
+> called after which the thread is no longer "ours".
+> Debug-writing the thread IDs at pthread_create() and pthread_join()
+> together with the 'detachable' flag revealed that the mon_iothread ID is
+> already being reused, in my trace for a detached thread, and the join
+> then ends with a coredump and ugly log output.
 
-The interface is described in the "TCG Platform Reset Attack
-Mitigation Specification", chapter 6 "ACPI _DSM Function". According
-to Laszlo, it's not so easy to implement in OVMF, he suggested to do
-it in qemu instead.
+Indeed.  So we have these ordering constraints:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/tpm/tpm_ppi.h     |  2 ++
- hw/i386/acpi-build.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
- hw/tpm/tpm_crb.c     |  1 +
- hw/tpm/tpm_ppi.c     | 23 ++++++++++++++++++++++
- hw/tpm/tpm_tis.c     |  1 +
- docs/specs/tpm.txt   |  2 ++
- hw/tpm/trace-events  |  3 +++
- 7 files changed, 78 insertions(+)
+  init mon locks [1]
+  cli parsing
+  daemonize
+  create mon iothread [2]
 
-diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-index c2ab2ed300..b8f67962c7 100644
---- a/hw/tpm/tpm_ppi.h
-+++ b/hw/tpm/tpm_ppi.h
-@@ -23,4 +23,6 @@ typedef struct TPMPPI {
- bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj, Error **errp);
-=20
-+void tpm_ppi_reset(TPMPPI *tpmppi);
-+
- #endif /* TPM_TPM_PPI_H */
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index c5e9a6e11d..2ab3e8fae7 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1824,6 +1824,13 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
-     pprq =3D aml_name("PPRQ");
-     pprm =3D aml_name("PPRM");
-=20
-+    aml_append(dev,
-+               aml_operation_region("TPP3", AML_SYSTEM_MEMORY,
-+                                    aml_int(TPM_PPI_ADDR_BASE + 0x15a),
-+                                    0x1));
-+    field =3D aml_field("TPP3", AML_BYTE_ACC, AML_NOLOCK, AML_PRESERVE);
-+    aml_append(field, aml_named_field("MOVV", 8));
-+    aml_append(dev, field);
-     /*
-      * DerefOf in Windows is broken with SYSTEM_MEMORY.  Use a dynamic
-      * operation region inside of a method for getting FUNC[op].
-@@ -2166,7 +2173,46 @@ build_tpm_ppi(TPMIf *tpm, Aml *dev)
-             aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
-         }
-         aml_append(method, ifctx);
-+
-+        ifctx =3D aml_if(
-+            aml_equal(uuid,
-+                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D")=
-));
-+        {
-+            /* standard DSM query function */
-+            ifctx2 =3D aml_if(aml_equal(function, zero));
-+            {
-+                uint8_t byte_list[1] =3D { 0x03 };
-+                aml_append(ifctx2, aml_return(aml_buffer(1, byte_list)))=
-;
-+            }
-+            aml_append(ifctx, ifctx2);
-+
-+            /*
-+             * TCG Platform Reset Attack Mitigation Specification 1.0 Ch=
-.6
-+             *
-+             * Arg 2 (Integer): Function Index =3D 1
-+             * Arg 3 (Package): Arguments =3D Package: Type: Integer
-+             *                  Operation Value of the Request
-+             * Returns: Type: Integer
-+             *          0: Success
-+             *          1: General Failure
-+             */
-+            ifctx2 =3D aml_if(aml_equal(function, one));
-+            {
-+                aml_append(ifctx2,
-+                           aml_store(aml_derefof(aml_index(arguments, ze=
-ro)),
-+                                     op));
-+                {
-+                    aml_append(ifctx2, aml_store(op, aml_name("MOVV")));
-+
-+                    /* 0: success */
-+                    aml_append(ifctx2, aml_return(zero));
-+                }
-+            }
-+            aml_append(ifctx, ifctx2);
-+        }
-+        aml_append(method, ifctx);
-     }
-+
-     aml_append(dev, method);
- }
-=20
-diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-index b243222fd6..48f6a716ad 100644
---- a/hw/tpm/tpm_crb.c
-+++ b/hw/tpm/tpm_crb.c
-@@ -233,6 +233,7 @@ static void tpm_crb_reset(void *dev)
- {
-     CRBState *s =3D CRB(dev);
-=20
-+    tpm_ppi_reset(&s->ppi);
-     tpm_backend_reset(s->tpmbe);
-=20
-     memset(s->regs, 0, sizeof(s->regs));
-diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-index f2f07f895e..46ca8ea3ea 100644
---- a/hw/tpm/tpm_ppi.c
-+++ b/hw/tpm/tpm_ppi.c
-@@ -16,8 +16,30 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "sysemu/memory_mapping.h"
-+#include "sysemu/reset.h"
- #include "migration/vmstate.h"
- #include "tpm_ppi.h"
-+#include "trace.h"
-+
-+void tpm_ppi_reset(TPMPPI *tpmppi)
-+{
-+    char *ptr =3D memory_region_get_ram_ptr(&tpmppi->ram);
-+
-+    if (ptr[0x15a] & 0x1) {
-+        GuestPhysBlockList guest_phys_blocks;
-+        GuestPhysBlock *block;
-+
-+        guest_phys_blocks_init(&guest_phys_blocks);
-+        guest_phys_blocks_append(&guest_phys_blocks);
-+        QTAILQ_FOREACH(block, &guest_phys_blocks.head, next) {
-+            trace_tpm_ppi_memset(block->host_addr,
-+                             block->target_end - block->target_start);
-+            memset(block->host_addr, 0,
-+                   block->target_end - block->target_start);
-+        }
-+        guest_phys_blocks_free(&guest_phys_blocks);
-+    }
-+}
-=20
- bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
-                   hwaddr addr, Object *obj, Error **errp)
-@@ -28,5 +50,6 @@ bool tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *=
-m,
-     vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
-=20
-     memory_region_add_subregion(m, addr, &tpmppi->ram);
-+
-     return true;
- }
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 70432ffe8b..d9bfa956cc 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -868,6 +868,7 @@ static void tpm_tis_reset(DeviceState *dev)
-     s->be_buffer_size =3D MIN(tpm_backend_get_buffer_size(s->be_driver),
-                             TPM_TIS_BUFFER_MAX);
-=20
-+    tpm_ppi_reset(&s->ppi);
-     tpm_backend_reset(s->be_driver);
-=20
-     s->active_locty =3D TPM_TIS_NO_LOCALITY;
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 332c2ae597..ce9bda3c89 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -121,6 +121,8 @@ layout:
-  +----------+--------+--------+-----------------------------------------=
---+
-  | next_step|   0x1  |  0x159 | Operation to execute after reboot by    =
-  |
-  |          |        |        | firmware. Used by firmware.             =
-  |
-+ +----------+--------+--------+-----------------------------------------=
---+
-+ | movv     |   0x1  |  0x15a | Memory overwrite variable               =
-  |
-  +----------+--------+--------+-----------------------------------------=
---+
-=20
-    The following values are supported for the 'func' field. They corresp=
-ond
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 25bee0cecf..920d32ad55 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -51,3 +51,6 @@ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
- tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
- tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
-d to TPM: 0x%08x (size=3D%d)"
- tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
-t =3D %u"
-+
-+# hw/tpm/tpm_ppi.c
-+tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
---=20
-2.19.0.rc1
+I can't figure out a way unless we split the global init routine for
+the monitors, possibly (and simply) by postpone creation of the
+iothread.  Thoughts?
+
+(Note that AFAICT Markus is on holiday and will be back after two weeks)
+
+Regards,
+
+-- 
+Peter Xu
