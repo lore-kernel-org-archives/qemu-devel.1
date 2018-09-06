@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fxqjK-0005jB-NV
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:37:40 -0400
+	(envelope-from <quintela@redhat.com>) id 1fxqk0-0006MF-VU
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:38:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fxqjG-0003Zc-Ns
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:37:38 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Thu,  6 Sep 2018 12:37:01 +0300
-Message-Id: <d28455bf275716e499070813a01afced1a24c6c1.1536226505.git.berto@igalia.com>
-In-Reply-To: <cover.1536226505.git.berto@igalia.com>
-References: <cover.1536226505.git.berto@igalia.com>
-In-Reply-To: <cover.1536226505.git.berto@igalia.com>
-References: <cover.1536226505.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 01/10] qemu-io: Fix writethrough check in
- reopen
+	(envelope-from <quintela@redhat.com>) id 1fxqjw-0006qy-UR
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:38:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57452 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fxqjw-0006oX-Nm
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:38:16 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180906070101.27280-2-xiaoguangrong@tencent.com> (guangrong
+	xiao's message of "Thu, 6 Sep 2018 15:00:59 +0800")
+References: <20180906070101.27280-1-xiaoguangrong@tencent.com>
+	<20180906070101.27280-2-xiaoguangrong@tencent.com>
+Reply-To: quintela@redhat.com
+Date: Thu, 06 Sep 2018 11:38:03 +0200
+Message-ID: <87sh2n3r0k.fsf@trasno.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 1/3] migration: do not
+ flush_compressed_data at the end of iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,36 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-"qemu-io reopen" doesn't allow changing the writethrough setting of
-the cache, but the check is wrong, causing an error even on a simple
-reopen with the default parameters:
+guangrong.xiao@gmail.com wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>
+> flush_compressed_data() needs to wait all compression threads to
+> finish their work, after that all threads are free until the
+> migration feeds new request to them, reducing its call can improve
+> the throughput and use CPU resource more effectively
+>
+> We do not need to flush all threads at the end of iteration, the
+> data can be kept locally until the memory block is changed or
+> memory migration starts over in that case we will meet a dirtied
+> page which may still exists in compression threads's ring
+>
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-   $ qemu-img create -f qcow2 hd.qcow2 1M
-   $ qemu-system-x86_64 -monitor stdio -drive if=virtio,file=hd.qcow2
-   (qemu) qemu-io virtio0 reopen
-   Cannot change cache.writeback: Device attached
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- qemu-io-cmds.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 5bf5f28178..db0b3ee5ef 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2025,7 +2025,7 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
-     }
- 
--    if (writethrough != blk_enable_write_cache(blk) &&
-+    if (!writethrough != blk_enable_write_cache(blk) &&
-         blk_get_attached_dev(blk))
-     {
-         error_report("Cannot change cache.writeback: Device attached");
--- 
-2.11.0
+Reviewed-by: Juan Quintela <quintela@redhat.com>
