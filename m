@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fxrsM-0007HP-0b
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:51:03 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1fxrvv-000176-A3
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:54:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fxrsH-0003dn-VX
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:51:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53906 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fxrsH-0003dT-PF
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:50:57 -0400
-Date: Thu, 6 Sep 2018 12:50:54 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180906125054.764d3baa@redhat.com>
-In-Reply-To: <da47aba6-2007-d473-49be-4280b3d961c2@redhat.com>
-References: <1535630903-146863-1-git-send-email-imammedo@redhat.com>
-	<38b3347b-8923-26e9-82a4-f69002262767@redhat.com>
-	<20180906114945.1acd0b8e@redhat.com>
-	<da47aba6-2007-d473-49be-4280b3d961c2@redhat.com>
+	(envelope-from <danielhb413@gmail.com>) id 1fxrvt-0001ax-VY
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:54:43 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:38950)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1fxrvt-0001Zc-Nz
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:54:41 -0400
+Received: by mail-qt0-x244.google.com with SMTP id o15-v6so11645461qtk.6
+	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 03:54:41 -0700 (PDT)
+References: <20180705200813.2033-1-danielhb413@gmail.com>
+	<20180705200813.2033-4-danielhb413@gmail.com>
+	<153619362876.28231.7392145818127711611@sif>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <8f69c32d-0e8b-b3ee-b0a2-f7e8f7b6052c@gmail.com>
+Date: Thu, 6 Sep 2018 07:54:36 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <153619362876.28231.7392145818127711611@sif>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qga: ignore non present cpus when handling
- qmp_guest_get_vcpus()
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v8 3/3] qmp hmp: Make system_wakeup check
+ wake-up support and run state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +33,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, Drew Jones <drjones@redhat.com>, mdroth@linux.vnet.ibm.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, armbru@redhat.com
 
-On Thu, 6 Sep 2018 12:26:12 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
 
-> On 09/06/18 11:49, Igor Mammedov wrote:
-> > On Thu, 30 Aug 2018 17:51:13 +0200
-> > Laszlo Ersek <lersek@redhat.com> wrote:
-> >   
-> >> +Drew
-> >>
-> >> On 08/30/18 14:08, Igor Mammedov wrote:  
-> >>> If VM has VCPUs plugged sparselly (for example a VM started with
-> >>> 3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
-> >>> only cpu0 and cpu2 are present), QGA will rise a error
-> >>>   error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
-> >>>   open("/sys/devices/system/cpu/cpu1/"): No such file or directory
-> >>> when
-> >>>   virsh vcpucount FOO --guest
-> >>> is executed.
-> >>> Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
-> >>>
-> >>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> >>> ---
-> >>>  qga/commands-posix.c | 4 +++-
-> >>>  1 file changed, 3 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> >>> index 37e8a2d..2929872 100644
-> >>> --- a/qga/commands-posix.c
-> >>> +++ b/qga/commands-posix.c
-> >>> @@ -2044,7 +2044,9 @@ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
-> >>>                                vcpu->logical_id);
-> >>>      dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
-> >>>      if (dirfd == -1) {
-> >>> -        error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
-> >>> +        if (!(sys2vcpu && errno == ENOENT)) {
-> >>> +            error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
-> >>> +        }
-> >>>      } else {
-> >>>          static const char fn[] = "online";
-> >>>          int fd;
-> >>>     
-> > [...]
-> >    
-> >> I wonder if, instead of this patch, we should rework
-> >> qmp_guest_get_vcpus(), to silently skip processors for which this
-> >> dirpath ENOENT condition arises (i.e., return a shorter list of
-> >> GuestLogicalProcessor objects).  
-> > would something like this on top of this patch do?
-> > 
-> > diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> > index 2929872..990bb80 100644
-> > --- a/qga/commands-posix.c
-> > +++ b/qga/commands-posix.c
-> > @@ -2114,12 +2114,14 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-> >          vcpu->logical_id = current++;
-> >          vcpu->has_can_offline = true; /* lolspeak ftw */
-> >          transfer_vcpu(vcpu, true, &local_err);
-> > -
-> > -        entry = g_malloc0(sizeof *entry);
-> > -        entry->value = vcpu;
-> > -
-> > -        *link = entry;
-> > -        link = &entry->next;
-> > +        if (errno == ENOENT) {
-> > +            g_free(vcpu);
-> > +        } else {
-> > +            entry = g_malloc0(sizeof *entry);
-> > +            entry->value = vcpu;
-> > +            *link = entry;
-> > +            link = &entry->next;
-> > +        }
-> >      }
-> >  
-> >      if (local_err == NULL) {
-> > 
-> > [...]
-> >   
-> 
-> To me that looks like the right approach, but the details should be
-> polished a bit:
-> 
-> - After we drop the vcpu object, "local_err" is still set, and would
-> terminate the loop in the next iteration.
-local_error is not set due 'if (!(sys2vcpu && errno == ENOENT))'
-condition in the in the transfer_vcpu().
-the thing is that in case of vcpu2sys direction ENOENT is hard error.
 
-> - It seems like ENOENT can indeed only come from openat(), in
-> transfer_vcpu(), however, it would be nice if we could grab the error
-> code from the error object somehow, and not from the "errno" variable. I
-> vaguely recall this is what error classes were originally invented for,
-> but now we just use ERROR_CLASS_GENERIC_ERROR...
-I've checked it and errno is preserved during error_setg_errno() call but
-not saved in Error, so I've dropped that idea.
- 
-> How about this: we could add a boolean output param to transfer_vcpu(),
-> called "fatal". Ignored when the function succeeds. When the function
-> fails (seen from "local_err"), the loop consults "fatal". If the error
-> is fatal, we act as before; otherwise, we drop the vcpu object, release
-> -- and zero out -- "local_err" as well, and continue. I think this is
-> more generic / safer than trying to infer the failure location from the
-> outside.
-It looked more uglier to me, so I've turned to libc style of reporting
-(assuming that g_free() doesn't touch errno ever)
+On 09/05/2018 09:27 PM, Michael Roth wrote:
+> Quoting Daniel Henrique Barboza (2018-07-05 15:08:13)
+>> The qmp/hmp command 'system_wakeup' is simply a direct call to
+>> 'qemu_system_wakeup_request' from vl.c. This function verifies if
+>> runstate is SUSPENDED and if the wake up reason is valid before
+>> proceeding. However, no error or warning is thrown if any of those
+>> pre-requirements isn't met. There is no way for the caller to
+>> differentiate between a successful wakeup or an error state caused
+>> when trying to wake up a guest that wasn't suspended.
+>>
+>> This means that system_wakeup is silently failing, which can be
+>> considered a bug. Adding error handling isn't an API break in this
+>> case - applications that didn't check the result will remain broken,
+>> the ones that check it will have a chance to deal with it.
+>>
+>> Adding to that, the commit before previous created a new QMP API called
+>> query-current-machine, with a new flag called wakeup-suspend-support,
+>> that indicates if the guest has the capability of waking up from suspended
+>> state. Although such guest will never reach SUSPENDED state and erroring
+>> it out in this scenario would suffice, it is more informative for the user
+>> to differentiate between a failure because the guest isn't suspended versus
+>> a failure because the guest does not have support for wake up at all.
+>>
+>> All this considered, this patch changes qmp_system_wakeup to:
+>>
+>> - check if the guest has the capability to wake-up from suspend. If
+>> not, error out informing about the lack of support;
+>>
+>> - make the runstate verification before proceeding to call
+>> qemu_system_wakeup_request, firing up an error message if the user tries
+>> to wake up a machine that isn't in SUSPENDED state.
+>>
+>> After this patch, this is the output of system_wakeup in a guest that
+>> does not have wake-up from suspend support (ppc64):
+>>
+>> (qemu) system_wakeup
+>> wake-up from suspend is not supported by this guest
+>> (qemu)
+>>
+>> And this is the output of system_wakeup in a x86 guest that has the
+>> support but isn't suspended:
+>>
+>> (qemu) system_wakeup
+>> Unable to wake up: guest is not in suspended state
+>> (qemu)
+>>
+>> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+>> ---
+>>   hmp.c                   |  5 ++++-
+>>   include/sysemu/sysemu.h |  1 +
+>>   qapi/misc.json          |  5 ++++-
+>>   qmp.c                   | 11 ++++++++++-
+>>   vl.c                    |  2 +-
+>>   5 files changed, 20 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index 41f5e39b72..83a8041d11 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -1169,7 +1169,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
+>>
+>>   void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
+>>   {
+>> -    qmp_system_wakeup(NULL);
+>> +    Error *err = NULL;
+>> +
+>> +    qmp_system_wakeup(&err);
+>> +    hmp_handle_error(mon, &err);
+>>   }
+>>
+>>   void hmp_nmi(Monitor *mon, const QDict *qdict)
+>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+>> index b921c6f3b7..483f804b36 100644
+>> --- a/include/sysemu/sysemu.h
+>> +++ b/include/sysemu/sysemu.h
+>> @@ -70,6 +70,7 @@ void qemu_exit_preconfig_request(void);
+>>   void qemu_system_reset_request(ShutdownCause reason);
+>>   void qemu_system_suspend_request(void);
+>>   void qemu_register_suspend_notifier(Notifier *notifier);
+>> +bool qemu_wakeup_suspend_support(void);
+>>   void qemu_system_wakeup_request(WakeupReason reason);
+>>   void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
+>>   void qemu_register_wakeup_notifier(Notifier *notifier);
+>> diff --git a/qapi/misc.json b/qapi/misc.json
+>> index 266f88cb09..86195d79e9 100644
+>> --- a/qapi/misc.json
+>> +++ b/qapi/misc.json
+>> @@ -1230,7 +1230,10 @@
+>>   ##
+>>   # @system_wakeup:
+>>   #
+>> -# Wakeup guest from suspend.  Does nothing in case the guest isn't suspended.
+>> +# If the guest has wake-up from suspend support enabled
+>> +# (wakeup-suspend-support flag from query-current-machine), wakeup guest
+>> +# from suspend if the guest is in SUSPENDED state. Returns an error
+>> +# otherwise.
+>>   #
+>>   # Since:  1.1
+>>   #
+>> diff --git a/qmp.c b/qmp.c
+>> index 73e46d795f..0673ff1fa5 100644
+>> --- a/qmp.c
+>> +++ b/qmp.c
+>> @@ -215,7 +215,16 @@ void qmp_cont(Error **errp)
+>>
+>>   void qmp_system_wakeup(Error **errp)
+>>   {
+>> -    qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
+>> +    if (!qemu_wakeup_suspend_support()) {
+>> +        error_setg(errp,
+>> +                   "wake-up from suspend is not supported by this guest");
+>> +        return;
+>> +    }
+>> +    if (!runstate_check(RUN_STATE_SUSPENDED)) {
+>> +        error_setg(errp,
+>> +                   "Unable to wake up: guest is not in suspended state");
+>> +        return;
+>> +    }
+>>   }
+> Was removing qemu_system_wakeup_request() intentional or did that just get
+> lost somehow?
 
-But if you prefer using extra parameter, I'll respin patch with it.
+WOW! That was a mistake! Thanks for spotting it Mike! I'll re-insert it back
+in the next spin.
 
-> I'm not quite up to date on structured error propagation in QEMU, so
-> take the above with a grain of salt...
-> 
-> Thanks,
-> Laszlo
+>
+>>   ObjectPropertyInfoList *qmp_qom_list(const char *path, Error **errp)
+>> diff --git a/vl.c b/vl.c
+>> index 96ad448d57..2af10b75cb 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -1769,7 +1769,7 @@ void qemu_register_wakeup_notifier(Notifier *notifier)
+>>       notifier_list_add(&wakeup_notifiers, notifier);
+>>   }
+>>
+>> -static bool qemu_wakeup_suspend_support(void)
+>> +bool qemu_wakeup_suspend_support(void)
+>>   {
+>>       return !QLIST_EMPTY(&wakeup_notifiers.notifiers) && acpi_enabled;
+>>   }
+>> -- 
+>> 2.17.1
+>>
