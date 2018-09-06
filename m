@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fxsCJ-0007HZ-4s
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:39 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1fxsCN-0007Ko-AU
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fxsCF-0001rX-Qs
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:39 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:38529)
+	(envelope-from <danielhb413@gmail.com>) id 1fxsCJ-0001tN-5Y
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:40 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:44871)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1fxsCD-0001o1-Fl
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:34 -0400
-Received: by mail-qt0-x241.google.com with SMTP id x7-v6so11709033qtk.5
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 04:11:32 -0700 (PDT)
+	id 1fxsCF-0001pz-Qf
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:37 -0400
+Received: by mail-qt0-x243.google.com with SMTP id k38-v6so11674602qtk.11
+	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 04:11:35 -0700 (PDT)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Date: Thu,  6 Sep 2018 08:11:06 -0300
-Message-Id: <20180906111107.30684-3-danielhb413@gmail.com>
+Date: Thu,  6 Sep 2018 08:11:07 -0300
+Message-Id: <20180906111107.30684-4-danielhb413@gmail.com>
 In-Reply-To: <20180906111107.30684-1-danielhb413@gmail.com>
 References: <20180906111107.30684-1-danielhb413@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] block/snapshot: remove
- bdrv_snapshot_delete_by_id_or_name
+Subject: [Qemu-devel] [PATCH v2 3/3] qcow2-snapshot: remove redundant
+ find_snapshot_by_id_and_name call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,106 +30,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-After the previous patch, the only instance of this function left
-is inside qemu-img.c.
+In qcow2_snapshot_create there is the following code block:
 
-qemu-img is using it inside the 'img_snapshot' function to delete
-snapshots in the SNAPSHOT_DELETE case, based on a "snapshot_name"
-string that refers to the tag, not ID, of the QEMUSnapshotInfo struct.
-This can be verified by checking the SNAPSHOT_CREATE case that
-comes shortly before SNAPSHOT_DELETE. In that case, the same
-"snapshot_name" variable is being strcpy to the 'name' field
-of the QEMUSnapshotInfo struct sn:
+    /* Generate an ID */
+    find_new_snapshot_id(bs, sn_info->id_str, sizeof(sn_info->id_str));
 
-pstrcpy(sn.name, sizeof(sn.name), snapshot_name);
+    /* Check that the ID is unique */
+    if (find_snapshot_by_id_and_name(bs, sn_info->id_str, NULL) >= 0) {
+        return -EEXIST;
+    }
 
-Based on that, it is unlikely that "snapshot_name" might contain
-an "id" in SNAPSHOT_DELETE.
+find_new_snapshot_id cycles through all snapshots, getting the id_str
+as an unsigned long int, calculating the max id_max value of all the
+existing id_strs and writing in the id_str pointer id_max + 1:
 
-This patch changes SNAPSHOT_DELETE to use snapshot_find() and
-snapshot_delete() instead of bdrv_snapshot_delete_by_id_or_name.
-After that, there is no instances left of bdrv_snapshot_delete_by_id_or_name
-in the code, so it is safe to remove it entirely.
+    for(i = 0; i < s->nb_snapshots; i++) {
+        sn = s->snapshots + i;
+        id = strtoul(sn->id_str, NULL, 10);
+        if (id > id_max)
+            id_max = id;
+    }
+    snprintf(id_str, id_str_size, "%lu", id_max + 1);
 
-Suggested-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Here, sn_info->id_str will have the unique value id_max + 1. Right
+after that, find_snapshot_by_id_and_name is called with
+id = sn_info->id_str and name = NULL. This will cause the function
+to execute the following:
+
+    } else if (id) {
+        for (i = 0; i < s->nb_snapshots; i++) {
+            if (!strcmp(s->snapshots[i].id_str, id)) {
+                return i;
+            }
+        }
+    }
+
+In short, we're searching the existing snapshots to see if sn_info->id_str
+matches any existing id, right after we set in the previous line a
+sn_info->id_str value that is already unique.
+
+The first code block goes way back to commit 585f8587ad, a 2006 commit from
+Fabrice Bellard that simply says "new qcow2 disk image format". No more
+info is provided about this logic in any subsequent commits that moved
+this code block around.
+
+I can't say about the original design, but the current logic is redundant.
+bdrv_snapshot_create is called in aio_context lock, forbidding any
+concurrent call to accidentally create a new snapshot between
+the find_new_snapshot_id and find_snapshot_by_id_and_name calls. What
+we're ending up doing is to cycle through the snapshots two times
+for no viable reason.
+
+This patch eliminates the redundancy by removing the 'id is unique'
+check that calls find_snapshot_by_id_and_name.
+
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- block/snapshot.c         | 20 --------------------
- include/block/snapshot.h |  3 ---
- qemu-img.c               | 15 +++++++++++----
- 3 files changed, 11 insertions(+), 27 deletions(-)
+ block/qcow2-snapshot.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/block/snapshot.c b/block/snapshot.c
-index e371d2243d..f2f48f926a 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -301,26 +301,6 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
-     return ret;
- }
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index bb6a5b7516..20e8472191 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -358,11 +358,6 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+     /* Generate an ID */
+     find_new_snapshot_id(bs, sn_info->id_str, sizeof(sn_info->id_str));
  
--int bdrv_snapshot_delete_by_id_or_name(BlockDriverState *bs,
--                                       const char *id_or_name,
--                                       Error **errp)
--{
--    int ret;
--    Error *local_err = NULL;
--
--    ret = bdrv_snapshot_delete(bs, id_or_name, NULL, &local_err);
--    if (ret == -ENOENT || ret == -EINVAL) {
--        error_free(local_err);
--        local_err = NULL;
--        ret = bdrv_snapshot_delete(bs, NULL, id_or_name, &local_err);
+-    /* Check that the ID is unique */
+-    if (find_snapshot_by_id_and_name(bs, sn_info->id_str, NULL) >= 0) {
+-        return -EEXIST;
 -    }
 -
--    if (ret < 0) {
--        error_propagate(errp, local_err);
--    }
--    return ret;
--}
--
- int bdrv_snapshot_list(BlockDriverState *bs,
-                        QEMUSnapshotInfo **psn_info)
- {
-diff --git a/include/block/snapshot.h b/include/block/snapshot.h
-index f73d1094af..b5d5084a12 100644
---- a/include/block/snapshot.h
-+++ b/include/block/snapshot.h
-@@ -61,9 +61,6 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
-                          const char *snapshot_id,
-                          const char *name,
-                          Error **errp);
--int bdrv_snapshot_delete_by_id_or_name(BlockDriverState *bs,
--                                       const char *id_or_name,
--                                       Error **errp);
- int bdrv_snapshot_list(BlockDriverState *bs,
-                        QEMUSnapshotInfo **psn_info);
- int bdrv_snapshot_load_tmp(BlockDriverState *bs,
-diff --git a/qemu-img.c b/qemu-img.c
-index b12f4cd19b..62bb35f1f0 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3121,11 +3121,18 @@ static int img_snapshot(int argc, char **argv)
-         break;
- 
-     case SNAPSHOT_DELETE:
--        bdrv_snapshot_delete_by_id_or_name(bs, snapshot_name, &err);
--        if (err) {
--            error_reportf_err(err, "Could not delete snapshot '%s': ",
--                              snapshot_name);
-+        ret = bdrv_snapshot_find(bs, &sn, snapshot_name);
-+        if (ret < 0) {
-+            error_report("Could not delete snapshot '%s': snapshot not "
-+                         "found", snapshot_name);
-             ret = 1;
-+        } else {
-+            ret = bdrv_snapshot_delete(bs, sn.id_str, sn.name, &err);
-+            if (ret < 0) {
-+                error_reportf_err(err, "Could not delete snapshot '%s': ",
-+                                  snapshot_name);
-+                ret = 1;
-+            }
-         }
-         break;
-     }
+     /* Populate sn with passed data */
+     sn->id_str = g_strdup(sn_info->id_str);
+     sn->name = g_strdup(sn_info->name);
 -- 
 2.17.1
