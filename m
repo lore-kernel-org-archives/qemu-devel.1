@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fxsCN-0007Ko-AU
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1fxsq2-0006tS-0I
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fxsCJ-0001tN-5Y
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:40 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:44871)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1fxsCF-0001pz-Qf
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:11:37 -0400
-Received: by mail-qt0-x243.google.com with SMTP id k38-v6so11674602qtk.11
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 04:11:35 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Date: Thu,  6 Sep 2018 08:11:07 -0300
-Message-Id: <20180906111107.30684-4-danielhb413@gmail.com>
-In-Reply-To: <20180906111107.30684-1-danielhb413@gmail.com>
-References: <20180906111107.30684-1-danielhb413@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] qcow2-snapshot: remove redundant
- find_snapshot_by_id_and_name call
+	(envelope-from <thuth@redhat.com>) id 1fxspy-0002fp-Mu
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:52:41 -0400
+References: <20180906055736.20256-1-mark.cave-ayland@ilande.co.uk>
+	<20180906055736.20256-2-mark.cave-ayland@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0223f14f-ab9a-f593-afc0-b87549d94482@redhat.com>
+Date: Thu, 6 Sep 2018 13:52:31 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180906055736.20256-2-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] scsi: move lsi53c895a structures and
+ defines into separate lsi53c895a.h file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,83 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, muriloo@linux.ibm.com, Daniel Henrique Barboza <danielhb413@gmail.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, pbonzini@redhat.com, famz@redhat.com, hpoussin@reactos.org, rth@twiddle.net, peter.maydell@linaro.org, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-In qcow2_snapshot_create there is the following code block:
-
-    /* Generate an ID */
-    find_new_snapshot_id(bs, sn_info->id_str, sizeof(sn_info->id_str));
-
-    /* Check that the ID is unique */
-    if (find_snapshot_by_id_and_name(bs, sn_info->id_str, NULL) >= 0) {
-        return -EEXIST;
-    }
-
-find_new_snapshot_id cycles through all snapshots, getting the id_str
-as an unsigned long int, calculating the max id_max value of all the
-existing id_strs and writing in the id_str pointer id_max + 1:
-
-    for(i = 0; i < s->nb_snapshots; i++) {
-        sn = s->snapshots + i;
-        id = strtoul(sn->id_str, NULL, 10);
-        if (id > id_max)
-            id_max = id;
-    }
-    snprintf(id_str, id_str_size, "%lu", id_max + 1);
-
-Here, sn_info->id_str will have the unique value id_max + 1. Right
-after that, find_snapshot_by_id_and_name is called with
-id = sn_info->id_str and name = NULL. This will cause the function
-to execute the following:
-
-    } else if (id) {
-        for (i = 0; i < s->nb_snapshots; i++) {
-            if (!strcmp(s->snapshots[i].id_str, id)) {
-                return i;
-            }
-        }
-    }
-
-In short, we're searching the existing snapshots to see if sn_info->id_str
-matches any existing id, right after we set in the previous line a
-sn_info->id_str value that is already unique.
-
-The first code block goes way back to commit 585f8587ad, a 2006 commit from
-Fabrice Bellard that simply says "new qcow2 disk image format". No more
-info is provided about this logic in any subsequent commits that moved
-this code block around.
-
-I can't say about the original design, but the current logic is redundant.
-bdrv_snapshot_create is called in aio_context lock, forbidding any
-concurrent call to accidentally create a new snapshot between
-the find_new_snapshot_id and find_snapshot_by_id_and_name calls. What
-we're ending up doing is to cycle through the snapshots two times
-for no viable reason.
-
-This patch eliminates the redundancy by removing the 'id is unique'
-check that calls find_snapshot_by_id_and_name.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
- block/qcow2-snapshot.c | 5 -----
- 1 file changed, 5 deletions(-)
-
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index bb6a5b7516..20e8472191 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -358,11 +358,6 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
-     /* Generate an ID */
-     find_new_snapshot_id(bs, sn_info->id_str, sizeof(sn_info->id_str));
- 
--    /* Check that the ID is unique */
--    if (find_snapshot_by_id_and_name(bs, sn_info->id_str, NULL) >= 0) {
--        return -EEXIST;
--    }
+On 2018-09-06 07:57, Mark Cave-Ayland wrote:
+> There is also one small change to the new header file which is the addi=
+tion
+> of the previously missing LSI53C810 define.
+>=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/scsi/lsi53c895a.c         | 116 +----------------------------------=
 -
-     /* Populate sn with passed data */
-     sn->id_str = g_strdup(sn_info->id_str);
-     sn->name = g_strdup(sn_info->name);
--- 
-2.17.1
+>  include/hw/scsi/lsi53c895a.h | 137 +++++++++++++++++++++++++++++++++++=
+++++++++
+>  2 files changed, 138 insertions(+), 115 deletions(-)
+>  create mode 100644 include/hw/scsi/lsi53c895a.h
+[...]
+> diff --git a/include/hw/scsi/lsi53c895a.h b/include/hw/scsi/lsi53c895a.=
+h
+> new file mode 100644
+> index 0000000000..d80cb78c69
+> --- /dev/null
+> +++ b/include/hw/scsi/lsi53c895a.h
+> @@ -0,0 +1,137 @@
+> +/*
+> + * QEMU LSI53C895A SCSI Host Bus Adapter emulation
+> + *
+> + * Copyright (c) 2006 CodeSourcery.
+> + * Written by Paul Brook
+> + *
+> + * This code is licensed under the LGPL.
+> + */
+> +
+> +#ifndef LSI_H
+> +#define LSI_H
+> +
+> +#include "qemu/osdep.h"
+
+Please don't include osdep.h from a header, that should only be done
+from .c files.
+
+ Thanks,
+  Thomas
