@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Simon.Hausmann@qt.io>) id 1fxqLd-0003gJ-I8
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:13:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1fxqMV-00043Z-Cj
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Simon.Hausmann@qt.io>) id 1fxqLa-0007CQ-AU
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:13:09 -0400
-Received: from mail-eopbgr10092.outbound.protection.outlook.com
-	([40.107.1.92]:50336
-	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Simon.Hausmann@qt.io>)
-	id 1fxqLZ-0007Ad-Bq
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:13:06 -0400
-References: <20180827084037.25316-1-simon.hausmann@qt.io>
-From: Simon Hausmann <simon.hausmann@qt.io>
-Message-ID: <2f9bc49c-ea80-7baa-839e-16f70575da4c@qt.io>
-Date: Thu, 6 Sep 2018 11:12:45 +0200
+	(envelope-from <bounces@canonical.com>) id 1fxqMS-0008B4-7e
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:14:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41766)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fxqMS-00089o-0d
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:14:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fxqMP-0007aJ-Jo
+	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 09:13:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2F6B82E8191
+	for <qemu-devel@nongnu.org>; Thu,  6 Sep 2018 09:13:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180827084037.25316-1-simon.hausmann@qt.io>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user: add support for
- MADV_DONTNEED
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 06 Sep 2018 08:57:00 -0000
+From: =?utf-8?q?=C5=81ukasz_Zemczak?= <1755912@bugs.launchpad.net>
+Reply-To: Bug 1755912 <1755912@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152106105315.14602.6749093724412548748.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153622422013.17432.10431663411043996078.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1755912] Update Released
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,293 +37,181 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Simon Hausmann <simon.hausmann@qt.io>
 
+The verification of the Stable Release Update for qemu has completed
+successfully and the package has now been released to -updates.
+Subsequently, the Ubuntu Stable Release Updates Team is being
+unsubscribed and will not receive messages about this bug report.  In
+the event that you encounter a regression using the package from
+-updates please report a new bug using ubuntu-bug and tag the bug report
+regression-update so we can easily find any regressions.
 
-Ping :)
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1755912
 
+Title:
+  qemu-system-x86_64 crashed with SIGABRT when using option -vga qxl
 
-On 8/27/18 10:40 AM, Simon Hausmann wrote:
-> Most flags to madvise() are just hints, so typically ignoring the
-> syscall and returning okay is fine. However applications exist that do
-> rely on MADV_DONTNEED behavior to guarantee that upon subsequent access
-> the mapping is refreshed from the backing file or zero for anonymous
-> mappings. The file backed mappings this is tricky - hence the original
-> comment - but for anonymous mappings it is safe to forward. We just need
-> to remember which those mappings are, which is now stored in the flags.
->
-> Cc: Riku Voipio <riku.voipio@iki.fi>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Cc: Sami Nurmenniemi <sami.nurmenniemi@qt.io>
-> Signed-off-by: Simon Hausmann <simon.hausmann@qt.io>
->
-> --
-> v2:
->    - align start and len on host page size
-> v3:
->    - align start and len to target page size as it may be bigger than
->      host
->    - use immediate return in do_syscall
->    - forward MADV_DONTNEED advice only for anonymously mapped pages
->    - remember which mappings are anonymous in the page flags and preserve
->      those bits across mprotect calls.
-> ---
->   accel/tcg/translate-all.c |  8 +++++--
->   bsd-user/mmap.c           |  8 +++----
->   include/exec/cpu-all.h    | 11 ++++++++-
->   linux-user/elfload.c      |  3 ++-
->   linux-user/mmap.c         | 49 +++++++++++++++++++++++++++++++++++----
->   linux-user/qemu.h         |  1 +
->   linux-user/syscall.c      | 12 ++++------
->   7 files changed, 72 insertions(+), 20 deletions(-)
->
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 898c3bb3d1..467fbd9aeb 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -2481,7 +2481,8 @@ int page_get_flags(target_ulong address)
->   /* Modify the flags of a page and invalidate the code if necessary.
->      The flag PAGE_WRITE_ORG is positioned automatically depending
->      on PAGE_WRITE.  The mmap_lock should already be held.  */
-> -void page_set_flags(target_ulong start, target_ulong end, int flags)
-> +void page_set_flags(target_ulong start, target_ulong end, int flags,
-> +                    enum page_set_flags_mode mode)
->   {
->       target_ulong addr, len;
->   
-> @@ -2513,7 +2514,10 @@ void page_set_flags(target_ulong start, target_ulong end, int flags)
->               p->first_tb) {
->               tb_invalidate_phys_page(addr, 0);
->           }
-> -        p->flags = flags;
-> +        if (mode == PAGE_SET_ALL_FLAGS)
-> +            p->flags = flags;
-> +        else /* PAGE_SET_PROTECTION */
-> +            p->flags |= (p->flags & ~(PAGE_BITS - 1)) | (flags & PAGE_BITS);
->       }
->   }
->   
-> diff --git a/bsd-user/mmap.c b/bsd-user/mmap.c
-> index 17f4cd80aa..4bfac81af4 100644
-> --- a/bsd-user/mmap.c
-> +++ b/bsd-user/mmap.c
-> @@ -125,7 +125,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
->           if (ret != 0)
->               goto error;
->       }
-> -    page_set_flags(start, start + len, prot | PAGE_VALID);
-> +    page_set_flags(start, start + len, prot, PAGE_SET_PROTECTION);
->       mmap_unlock();
->       return 0;
->   error:
-> @@ -214,7 +214,7 @@ static abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
->              to mmap.  */
->           page_set_flags(last_brk & TARGET_PAGE_MASK,
->                          TARGET_PAGE_ALIGN(new_brk),
-> -                       PAGE_RESERVED);
-> +                       PAGE_RESERVED, PAGE_SET_ALL_FLAGS);
->       }
->       last_brk = new_brk;
->   
-> @@ -397,7 +397,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
->           }
->       }
->    the_end1:
-> -    page_set_flags(start, start + len, prot | PAGE_VALID);
-> +    page_set_flags(start, start + len, prot | PAGE_VALID, PAGE_SET_ALL_FLAGS);
->    the_end:
->   #ifdef DEBUG_MMAP
->       printf("ret=0x" TARGET_FMT_lx "\n", start);
-> @@ -460,7 +460,7 @@ int target_munmap(abi_ulong start, abi_ulong len)
->       }
->   
->       if (ret == 0)
-> -        page_set_flags(start, start + len, 0);
-> +        page_set_flags(start, start + len, 0, PAGE_SET_ALL_FLAGS);
->       mmap_unlock();
->       return ret;
->   }
-> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> index 117d2fbbca..100388dcd4 100644
-> --- a/include/exec/cpu-all.h
-> +++ b/include/exec/cpu-all.h
-> @@ -249,6 +249,9 @@ extern intptr_t qemu_host_page_mask;
->   /* FIXME: Code that sets/uses this is broken and needs to go away.  */
->   #define PAGE_RESERVED  0x0020
->   #endif
-> +#if defined(CONFIG_LINUX) && defined(CONFIG_USER_ONLY)
-> +#define PAGE_MAP_ANONYMOUS 0x0080
-> +#endif
->   
->   #if defined(CONFIG_USER_ONLY)
->   void page_dump(FILE *f);
-> @@ -257,8 +260,14 @@ typedef int (*walk_memory_regions_fn)(void *, target_ulong,
->                                         target_ulong, unsigned long);
->   int walk_memory_regions(void *, walk_memory_regions_fn);
->   
-> +enum page_set_flags_mode {
-> +    PAGE_SET_ALL_FLAGS,
-> +    PAGE_SET_PROTECTION
-> +};
-> +
->   int page_get_flags(target_ulong address);
-> -void page_set_flags(target_ulong start, target_ulong end, int flags);
-> +void page_set_flags(target_ulong start, target_ulong end, int flags,
-> +                    enum page_set_flags_mode);
->   int page_check_range(target_ulong start, target_ulong len, int flags);
->   #endif
->   
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 8638612aec..c59cf4359c 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -1702,7 +1702,8 @@ static void zero_bss(abi_ulong elf_bss, abi_ulong last_bss, int prot)
->   
->       /* Ensure that the bss page(s) are valid */
->       if ((page_get_flags(last_bss-1) & prot) != prot) {
-> -        page_set_flags(elf_bss & TARGET_PAGE_MASK, last_bss, prot | PAGE_VALID);
-> +        page_set_flags(elf_bss & TARGET_PAGE_MASK, last_bss, prot,
-> +                       PAGE_SET_PROTECTION);
->       }
->   
->       if (host_start < host_map_start) {
-> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-> index 41e0983ce8..fff29ee04b 100644
-> --- a/linux-user/mmap.c
-> +++ b/linux-user/mmap.c
-> @@ -124,7 +124,7 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
->           if (ret != 0)
->               goto error;
->       }
-> -    page_set_flags(start, start + len, prot | PAGE_VALID);
-> +    page_set_flags(start, start + len, prot, PAGE_SET_PROTECTION);
->       mmap_unlock();
->       return 0;
->   error:
-> @@ -362,6 +362,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
->                        int flags, int fd, abi_ulong offset)
->   {
->       abi_ulong ret, end, real_start, real_end, retaddr, host_offset, host_len;
-> +    int page_flags;
->   
->       mmap_lock();
->   #ifdef DEBUG_MMAP
-> @@ -562,7 +563,11 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
->           }
->       }
->    the_end1:
-> -    page_set_flags(start, start + len, prot | PAGE_VALID);
-> +    page_flags = prot | PAGE_VALID;
-> +    if (flags & MAP_ANONYMOUS) {
-> +        page_flags |= PAGE_MAP_ANONYMOUS;
-> +    }
-> +    page_set_flags(start, start + len, page_flags, PAGE_SET_ALL_FLAGS);
->    the_end:
->   #ifdef DEBUG_MMAP
->       printf("ret=0x" TARGET_ABI_FMT_lx "\n", start);
-> @@ -675,7 +680,7 @@ int target_munmap(abi_ulong start, abi_ulong len)
->       }
->   
->       if (ret == 0) {
-> -        page_set_flags(start, start + len, 0);
-> +        page_set_flags(start, start + len, 0, PAGE_SET_ALL_FLAGS);
->           tb_invalidate_phys_range(start, start + len);
->       }
->       mmap_unlock();
-> @@ -755,10 +760,44 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
->       } else {
->           new_addr = h2g(host_addr);
->           prot = page_get_flags(old_addr);
-> -        page_set_flags(old_addr, old_addr + old_size, 0);
-> -        page_set_flags(new_addr, new_addr + new_size, prot | PAGE_VALID);
-> +        page_set_flags(old_addr, old_addr + old_size, 0,
-> +                       PAGE_SET_ALL_FLAGS);
-> +        page_set_flags(new_addr, new_addr + new_size, prot | PAGE_VALID,
-> +                       PAGE_SET_ALL_FLAGS);
->       }
->       tb_invalidate_phys_range(new_addr, new_addr + new_size);
->       mmap_unlock();
->       return new_addr;
->   }
-> +
-> +int target_madvise(abi_ulong start, abi_ulong len, int advice)
-> +{
-> +    abi_ulong end, addr;
-> +    int ret;
-> +
-> +    len = TARGET_PAGE_ALIGN(len);
-> +    start &= TARGET_PAGE_MASK;
-> +
-> +    if (!guest_range_valid(start, len)) {
-> +        errno = EINVAL;
-> +        return -1;
-> +    }
-> +
-> +    /* A straight passthrough may not be safe because qemu sometimes
-> +       turns private file-backed mappings into anonymous mappings.
-> +       Most flags are hints so we ignore them.
-> +       One exception is made for MADV_DONTNEED on anonymous mappings,
-> +       that applications may rely on to zero out pages. */
-> +    if (advice & MADV_DONTNEED) {
-> +        end = start + len;
-> +        for (addr = start; addr < end; addr += TARGET_PAGE_SIZE) {
-> +            if (page_get_flags(addr) & PAGE_MAP_ANONYMOUS) {
-> +                ret = madvise(g2h(addr), TARGET_PAGE_SIZE, MADV_DONTNEED);
-> +                if (ret != 0) {
-> +                    return ret;
-> +                }
-> +            }
-> +        }
-> +    }
-> +    return 0;
-> +}
-> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-> index b4959e41c6..e5ac5e9c6a 100644
-> --- a/linux-user/qemu.h
-> +++ b/linux-user/qemu.h
-> @@ -437,6 +437,7 @@ int target_munmap(abi_ulong start, abi_ulong len);
->   abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
->                          abi_ulong new_size, unsigned long flags,
->                          abi_ulong new_addr);
-> +int target_madvise(abi_ulong start, abi_ulong len, int advice);
->   extern unsigned long last_brk;
->   extern abi_ulong mmap_next_start;
->   abi_ulong mmap_find_vma(abi_ulong, abi_ulong);
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 850b72a0c7..4478de5fc8 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -5124,7 +5124,8 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
->   
->       page_set_flags(raddr, raddr + shm_info.shm_segsz,
->                      PAGE_VALID | PAGE_READ |
-> -                   ((shmflg & SHM_RDONLY)? 0 : PAGE_WRITE));
-> +                   ((shmflg & SHM_RDONLY) ? 0 : PAGE_WRITE),
-> +                   PAGE_SET_ALL_FLAGS);
->   
->       for (i = 0; i < N_SHM_REGIONS; i++) {
->           if (!shm_regions[i].in_use) {
-> @@ -5150,7 +5151,8 @@ static inline abi_long do_shmdt(abi_ulong shmaddr)
->       for (i = 0; i < N_SHM_REGIONS; ++i) {
->           if (shm_regions[i].in_use && shm_regions[i].start == shmaddr) {
->               shm_regions[i].in_use = false;
-> -            page_set_flags(shmaddr, shmaddr + shm_regions[i].size, 0);
-> +            page_set_flags(shmaddr, shmaddr + shm_regions[i].size, 0,
-> +                           PAGE_SET_ALL_FLAGS);
->               break;
->           }
->       }
-> @@ -11559,11 +11561,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->   
->   #ifdef TARGET_NR_madvise
->       case TARGET_NR_madvise:
-> -        /* A straight passthrough may not be safe because qemu sometimes
-> -           turns private file-backed mappings into anonymous mappings.
-> -           This will break MADV_DONTNEED.
-> -           This is a hint, so ignoring and returning success is ok.  */
-> -        return 0;
-> +        return get_errno(target_madvise(arg1, arg2, arg3));
->   #endif
->   #if TARGET_ABI_BITS == 32
->       case TARGET_NR_fcntl64:
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Bionic:
+  Fix Released
+
+Bug description:
+  [Impact]
+
+   * There are conditions where the vga/qxl driver can crash the qemu =
+
+     process.
+
+   * It is like a very complex case of a non initialized var - without the =
+
+     fix it might try to ask for updates without having a valid primary =
+
+     surface.
+
+   * Backport from upstream
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D5bd5c27c7d284d01477c5cc=
+022ce22438c46bf9f
+  to avoid the crash
+
+  =
+
+  [Test Case]
+
+   * Sometimes booting xubuntu was reported to be enough, at other times
+  it was needed to change resolution a few times to trigger.
+
+    # get xubuntu iso (actually other UI Isos should do as well)
+    $ qemu-system-x86_64 -vga qxl -enable-kvm -cpu host -smp cores=3D2,thre=
+ads=3D2 -m 2048 -cdrom xubuntu-18.04-desktop-amd64.iso
+    # If it boots successfully, change resolution until it crashes.
+    $ while true ; do xrandr --output Virtual-0 --mode 640x480 ; sleep 1 ; =
+xrandr --output Virtual-0 --mode 1280x720 ; sleep 1 ; xrandr --output Virtu=
+al-0 --mode 1920x1080 ; sleep 1 ; done
+
+   * Without the fix that will trigger the qemu crash
+
+  [Regression Potential]
+
+   * The change "just" adds QXL_MODE_UNDEFINED as one more trigger to leave =
+
+     the rendering update. That sounds rather safe. But thinking hard on =
+
+     potential updates I could think of theoretical setups that were  in =
+
+     undefined mode all the time (unlikely or impossible I think) that now =
+
+     would get no updates anymore. Well I really don't think this is an =
+
+     issue, but since this section should be open thinking on "potential" =
+
+     regressions that is what comes to my mind.
+
+  [Other Info]
+   =
+
+   * Thanks to Leonardo for most of the bisecting and discussion work!
+
+  =
+
+  ---
+
+  =
+
+  When using qemu-system-x86_64 with the option -vga qxl, it crashes. The e=
+asiest way to crash it is by trying to change the guest's resolution. Howev=
+er, the system may randomly crash too, not happening only when changing res=
+olution. Here is the terminal output of one of these random crashes:
+
+  --------
+
+  $ qemu-system-x86_64 -hda /dev/sdb -m 2048 -enable-kvm -cpu host -vga qxl=
+ -nodefaults -netdev user,id=3Dhostnet0 -device virtio-net-pci,id=3Dnet0,ne=
+tdev=3Dhostnet0
+  WARNING: Image format was not specified for '/dev/sdb' and probing guesse=
+d raw.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Automatically detec=
+ting the format is dangerous for raw images, write operations on block 0 wi=
+ll be restricted.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Specify the 'raw' f=
+ormat explicitly to remove the restrictions.
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2431:display_channel_validate_surface: canvas address is
+  0x7f8eb948ab18 for 0 (and is NULL)
+
+  (process:21313): Spice-WARNING **: 16:01:45.759: display-
+  channel.c:2432:display_channel_validate_surface: failed on 0
+
+  (process:21313): Spice-CRITICAL **: 16:01:45.759: display-channel.c:2035:=
+display_channel_update: condition `display_channel_validate_surface(display=
+, surface_id)' failed
+  Abortado (imagem do n=C3=BAcleo gravada)
+
+  --------
+
+  I was running QEMU as a normal user which is on the groups kvm and
+  disk. Initially I supposed the problem was because I was running QEMU
+  as root, but as a normal user this happens too.
+
+  I have tested with guests with different Ubuntu version: 18.04, 17.10
+  and 16.04. It is happening with them all.
+
+  ProblemType: Crash
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu4
+  ProcVersionSignature: Ubuntu 4.15.0-10.11-generic 4.15.3
+  Uname: Linux 4.15.0-10-generic x86_64
+  ApportVersion: 2.20.8-0ubuntu10
+  Architecture: amd64
+  CurrentDesktop: XFCE
+  Date: Wed Mar 14 17:13:52 2018
+  ExecutablePath: /usr/bin/qemu-system-x86_64
+  InstallationDate: Installed on 2017-06-13 (273 days ago)
+  InstallationMedia: Xubuntu 17.04 "Zesty Zapus" - Release amd64 (20170412)
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: LENOVO 80UG
+  ProcCmdline: qemu-system-x86_64 -hda /dev/sdb -smp cpus=3D2 -m 512 -enabl=
+e-kvm -cpu host -vga qxl -nodefaults -netdev user,id=3Dhostnet0 -device vir=
+tio-net-pci,id=3Dnet0,netdev=3Dhostnet0
+  ProcKernelCmdLine: BOOT_IMAGE=3D/boot/vmlinuz-4.15.0-10-generic.efi.signe=
+d root=3DUUID=3D6b4ae5c0-c78c-49a6-a1ba-029192618a7a ro quiet
+  Signal: 6
+  SourcePackage: qemu
+  StacktraceTop:
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  =C2=A0() at /usr/lib/x86_64-linux-gnu/libspice-server.so.1
+  Title: qemu-system-x86_64 crashed with SIGABRT
+  UpgradeStatus: Upgraded to bionic on 2017-10-20 (145 days ago)
+  UserGroups: adm bluetooth cdrom dialout dip disk kvm libvirt lpadmin netd=
+ev plugdev sambashare sudo
+  dmi.bios.date: 07/10/2017
+  dmi.bios.vendor: LENOVO
+  dmi.bios.version: 0XCN43WW
+  dmi.board.asset.tag: NO Asset Tag
+  dmi.board.name: Toronto 4A2
+  dmi.board.vendor: LENOVO
+  dmi.board.version: SDK0J40679 WIN
+  dmi.chassis.asset.tag: NO Asset Tag
+  dmi.chassis.type: 10
+  dmi.chassis.vendor: LENOVO
+  dmi.chassis.version: Lenovo ideapad 310-14ISK
+  dmi.modalias: dmi:bvnLENOVO:bvr0XCN43WW:bd07/10/2017:svnLENOVO:pn80UG:pvr=
+Lenovoideapad310-14ISK:rvnLENOVO:rnToronto4A2:rvrSDK0J40679WIN:cvnLENOVO:ct=
+10:cvrLenovoideapad310-14ISK:
+  dmi.product.family: IDEAPAD
+  dmi.product.name: 80UG
+  dmi.product.version: Lenovo ideapad 310-14ISK
+  dmi.sys.vendor: LENOVO
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1755912/+subscriptions
