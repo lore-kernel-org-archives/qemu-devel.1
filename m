@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fxqjK-0005jA-NM
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:37:41 -0400
+	(envelope-from <berto@igalia.com>) id 1fxqjK-0005j9-NK
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:37:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fxqjG-0003aA-SB
+	(envelope-from <berto@igalia.com>) id 1fxqjG-0003aC-Qm
 	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 05:37:38 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu,  6 Sep 2018 12:37:07 +0300
-Message-Id: <aaed0eb19c2c52d7a088145cd784efdaca186ec0.1536226505.git.berto@igalia.com>
+Date: Thu,  6 Sep 2018 12:37:03 +0300
+Message-Id: <f52b867ed7c8482fbe70ff7233467a636c420394.1536226505.git.berto@igalia.com>
 In-Reply-To: <cover.1536226505.git.berto@igalia.com>
 References: <cover.1536226505.git.berto@igalia.com>
 In-Reply-To: <cover.1536226505.git.berto@igalia.com>
 References: <cover.1536226505.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v3 07/10] file-posix: Forbid trying to change
- unsupported options during reopen
+Subject: [Qemu-devel] [PATCH v3 03/10] block: Remove child references from
+ bs->{options, explicit_options}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +25,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-The file-posix code is used for the "file", "host_device" and
-"host_cdrom" drivers, and it allows reopening images. However the only
-option that is actually processed is "x-check-cache-dropped", and
-changes in all other options (e.g. "filename") are silently ignored:
+Block drivers allow opening their children using a reference to an
+existing BlockDriverState. These references remain stored in the
+'options' and 'explicit_options' QDicts, but we don't need to keep
+them once everything is open.
 
-   (qemu) qemu-io virtio0 "reopen -o file.filename=no-such-file"
+What is more important, these values can become wrong if the children
+change:
 
-While we could allow changing some of the other options, let's keep
-things as they are for now but return an error if the user tries to
-change any of them.
+    $ qemu-img create -f qcow2 hd0.qcow2 10M
+    $ qemu-img create -f qcow2 hd1.qcow2 10M
+    $ qemu-img create -f qcow2 hd2.qcow2 10M
+    $ $QEMU -drive if=none,file=hd0.qcow2,node-name=hd0 \
+            -drive if=none,file=hd1.qcow2,node-name=hd1,backing=hd0 \
+            -drive file=hd2.qcow2,node-name=hd2,backing=hd1
+
+After this hd2 has hd1 as its backing file. Now let's remove it using
+block_stream:
+
+    (qemu) block_stream hd2 0 hd0.qcow2
+
+Now hd0 is the backing file of hd2, but hd2's options QDicts still
+contain backing=hd1.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/file-posix.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ block.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index ddac0cc3e6..d4ec2cb3dd 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -850,8 +850,13 @@ static int raw_reopen_prepare(BDRVReopenState *state,
-         goto out;
+diff --git a/block.c b/block.c
+index 0dbb1fcc7b..c764eb731c 100644
+--- a/block.c
++++ b/block.c
+@@ -2763,12 +2763,15 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+         }
      }
  
--    rs->check_cache_dropped = qemu_opt_get_bool(opts, "x-check-cache-dropped",
--                                                false);
-+    rs->check_cache_dropped =
-+        qemu_opt_get_bool_del(opts, "x-check-cache-dropped", false);
-+
-+    /* This driver's reopen function doesn't currently allow changing
-+     * other options, so let's put them back in the original QDict and
-+     * bdrv_reopen_prepare() will detect changes and complain. */
-+    qemu_opts_to_qdict(opts, state->options);
+-    /* Remove all children options from bs->options and bs->explicit_options */
++    /* Remove all children options and references
++     * from bs->options and bs->explicit_options */
+     QLIST_FOREACH(child, &bs->children, next) {
+         char *child_key_dot;
+         child_key_dot = g_strdup_printf("%s.", child->name);
+         qdict_extract_subqdict(bs->explicit_options, NULL, child_key_dot);
+         qdict_extract_subqdict(bs->options, NULL, child_key_dot);
++        qdict_del(bs->explicit_options, child->name);
++        qdict_del(bs->options, child->name);
+         g_free(child_key_dot);
+     }
  
-     if (s->type == FTYPE_CD) {
-         rs->open_flags |= O_NONBLOCK;
+@@ -3289,6 +3292,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+ {
+     BlockDriver *drv;
+     BlockDriverState *bs;
++    BdrvChild *child;
+     bool old_can_write, new_can_write;
+ 
+     assert(reopen_state != NULL);
+@@ -3313,6 +3317,13 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+     bs->open_flags         = reopen_state->flags;
+     bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
+ 
++    /* Remove child references from bs->options and bs->explicit_options.
++     * Child options were already removed in bdrv_reopen_queue_child() */
++    QLIST_FOREACH(child, &bs->children, next) {
++        qdict_del(bs->explicit_options, child->name);
++        qdict_del(bs->options, child->name);
++    }
++
+     bdrv_refresh_limits(bs, NULL);
+ 
+     bdrv_set_perm(reopen_state->bs, reopen_state->perm,
 -- 
 2.11.0
