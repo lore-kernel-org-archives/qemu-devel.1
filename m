@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fxlJq-0006k6-2U
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:50:59 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fxm4K-0004j5-Pt
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 00:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fxlJm-0006wX-RX
-	for qemu-devel@nongnu.org; Wed, 05 Sep 2018 23:50:58 -0400
-Date: Thu, 6 Sep 2018 13:25:43 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180906032543.GA26021@umbus.fritz.box>
-References: <20180904092418.2380-1-nikunj@linux.ibm.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fxm4H-0003Rl-Em
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 00:39:00 -0400
+References: <20180904194903.20712-1-hpoussin@reactos.org>
+	<20180905001349.GI2679@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <352cb605-d2d3-e5de-bc5d-c1924b3fc793@ilande.co.uk>
+Date: Thu, 6 Sep 2018 05:38:26 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IJpNTDwzlM2Ie8A6"
-Content-Disposition: inline
-In-Reply-To: <20180904092418.2380-1-nikunj@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] target/ppc/kvm: set vcpu as
- online/offline
+In-Reply-To: <20180905001349.GI2679@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/ppc: on 40p machine,
+ change default firmware to OpenBIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,139 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, paulus@samba.org
+To: David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+
+On 05/09/18 01:13, David Gibson wrote:
+
+> On Tue, Sep 04, 2018 at 09:49:03PM +0200, Hervé Poussineau wrote:
+>> OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
+>> Use it, instead of relying on an unmaintained and very limited firmware.
+>>
+>> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+> 
+> Uh.. against current ppc-for-3.1, plase.
+
+I was a bit confused as to why this failed to apply since the original
+had been part of a local branch for a while, but just noticed it was
+because of this change to Hervé's original which I had missed:
+
+[dwg: Drop prep from boot-serial test to avoid deprecation warnings]
+
+Included below is the new diff against ppc-for-3.1: David, is this
+enough for you to be able to fix up manually without a v3?
+
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 162b27a3b8..baca1d7c04 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -651,7 +651,7 @@ static void ibm_40p_init(MachineState *machine)
+     /* PCI host */
+     dev = qdev_create(NULL, "raven-pcihost");
+     if (!bios_name) {
+-        bios_name = BIOS_FILENAME;
++        bios_name = "openbios-ppc";
+     }
+     qdev_prop_set_string(dev, "bios-name", bios_name);
+     qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index f123b15e3e..f865822e32 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -75,12 +75,12 @@ typedef struct testdef {
+ static testdef_t tests[] = {
+     { "alpha", "clipper", "", "PCI:" },
+     { "ppc", "ppce500", "", "U-Boot" },
+-    { "ppc", "40p", "-boot d", "Booting from device d" },
++    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+     { "ppc", "g3beige", "", "PowerPC,750" },
+     { "ppc", "mac99", "", "PowerPC,G4" },
+     { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
+     { "ppc64", "ppce500", "", "U-Boot" },
+-    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
++    { "ppc64", "40p", "-m 192", "Memory: 192M" },
+     { "ppc64", "mac99", "", "PowerPC,970FX" },
+     { "ppc64", "pseries", "", "Open Firmware" },
+     { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
 
 
---IJpNTDwzlM2Ie8A6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+ATB,
 
-On Tue, Sep 04, 2018 at 02:54:18PM +0530, Nikunj A Dadhania wrote:
-> Set the newly added register(KVM_REG_PPC_ONLINE) to indicate if the vcpu =
-is
-> online(1) or offline(0)
->=20
-> KVM will use this information to set the RWMR register, which controls th=
-e PURR
-> and SPURR accumulation.
->=20
-> CC: paulus@samba.org
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.ibm.com>
-
-Merged to ppc-for-3.1, thanks.
-
-> ---
->  hw/ppc/spapr_cpu_core.c | 1 +
->  hw/ppc/spapr_rtas.c     | 2 ++
->  target/ppc/kvm.c        | 9 +++++++++
->  target/ppc/kvm_ppc.h    | 7 +++++++
->  4 files changed, 19 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 876f0b3d9d..9863221756 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -90,6 +90,7 @@ void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_=
-ulong nip, target_ulong r
-> =20
->      env->nip =3D nip;
->      env->gpr[3] =3D r3;
-> +    kvmppc_set_reg_ppc_online(cpu, 1);
->      CPU(cpu)->halted =3D 0;
->      /* Enable Power-saving mode Exit Cause exceptions */
->      ppc_store_lpcr(cpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 4ac96bc94b..d6a0952154 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -33,6 +33,7 @@
->  #include "sysemu/device_tree.h"
->  #include "sysemu/cpus.h"
->  #include "sysemu/hw_accel.h"
-> +#include "kvm_ppc.h"
-> =20
->  #include "hw/ppc/spapr.h"
->  #include "hw/ppc/spapr_vio.h"
-> @@ -207,6 +208,7 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPRMach=
-ineState *spapr,
->       * guest */
->      ppc_store_lpcr(cpu, env->spr[SPR_LPCR] & ~pcc->lpcr_pm);
->      cs->halted =3D 1;
-> +    kvmppc_set_reg_ppc_online(cpu, 0);
->      qemu_cpu_kick(cs);
->  }
-> =20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 9211ee2ee1..7be8081968 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2785,3 +2785,12 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cp=
-u)
-> =20
->      return !kvmppc_is_pr(cs->kvm_state);
->  }
-> +
-> +void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online)
-> +{
-> +    CPUState *cs =3D CPU(cpu);
-> +
-> +    if (kvm_enabled()) {
-> +        kvm_set_one_reg(cs, KVM_REG_PPC_ONLINE, &online);
-> +    }
-> +}
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 657582bb32..f696c6e498 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -72,6 +72,7 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
-> =20
->  bool kvmppc_hpt_needs_host_contiguous_pages(void);
->  void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
-> +void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
-> =20
->  #else
-> =20
-> @@ -187,6 +188,12 @@ static inline target_ulong kvmppc_configure_v3_mmu(P=
-owerPCCPU *cpu,
->      return 0;
->  }
-> =20
-> +static inline void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu,
-> +                                             unsigned int online)
-> +{
-> +    return;
-> +}
-> +
->  #ifndef CONFIG_USER_ONLY
->  static inline bool kvmppc_spapr_use_multitce(void)
->  {
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---IJpNTDwzlM2Ie8A6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluQnjUACgkQbDjKyiDZ
-s5IjnA/+Oh/oRrOI/bXO9lH1qrTA6kK42OA4svP2Yibvn/U+hATgpI/pBu0HOFyb
-0JhDxZ1qMhFWaG0d16M6jgOOIVK76VZrH7I1WYPSeMWxIbADGCXfZjaJK4ykiWSZ
-FendlnSkEzfT54cFuFV9Gx+OBqN4zxgMNaDme3o7LuVb0Px9uRAHABb1/xO1b8kX
-6VAylyPHin7ekm+RMIIDggwhyNqDG3PmlEqFMf/h7mvZ3kdowNS0Rjz2v8SYvr0U
-WFXYl3UeTSKvCTI7k+31sTGein6jaFbmOPqJhkjmIfaPWkwyOdzSaTkZOr25kxMI
-UH8he6uANovBZtQJTFd/GbsdLVj1MLRKC0AXApfBN3ZZcPGO8ZF7Z9fdnKckHWTO
-y6MQBLdPKIw4rKmEUJkY5XYhuWctE3KlAF46sNnIznAm9Qi+ZBwTyTgTvALeURs6
-t3CPfHzpa84yB+NRYQwoZfcu8cwlkempDHSuIIs3JQFOyGa32KpDd9lFsPbob6Ar
-Yrk6ZgaPPfcWipUFS/t2dM7NxKLwWlzLYghnCuc2leCl406BiNVriWwRpT15EI7u
-xrdLOPaT03mbG+FU7TQGw5o6CThjgNPozdliYVJ2qNfoyiDDrHxUex3VaV8LeIPR
-7Wvh1tqllc7McXz8+z9ObcHVdHUNJvZqlXinXg7Yb9dUPoW8K5o=
-=56i7
------END PGP SIGNATURE-----
-
---IJpNTDwzlM2Ie8A6--
+Mark.
