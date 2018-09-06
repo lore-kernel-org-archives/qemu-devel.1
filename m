@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fxsqF-0007Vb-9L
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:52:56 -0400
+	(envelope-from <drjones@redhat.com>) id 1fxtC4-00079s-9q
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 08:15:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fxsqB-0003BP-Tq
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:52:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38146 helo=mx1.redhat.com)
+	(envelope-from <drjones@redhat.com>) id 1fxt0c-0004Ly-GR
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 08:03:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50730 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fxsqB-00039B-N8
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 07:52:51 -0400
-References: <1535630903-146863-1-git-send-email-imammedo@redhat.com>
-	<38b3347b-8923-26e9-82a4-f69002262767@redhat.com>
-	<20180906114945.1acd0b8e@redhat.com>
-	<da47aba6-2007-d473-49be-4280b3d961c2@redhat.com>
-	<20180906125054.764d3baa@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <914f169f-946d-901f-008e-f426183b9119@redhat.com>
-Date: Thu, 6 Sep 2018 13:52:49 +0200
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fxt0c-0004Jt-9j
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 08:03:38 -0400
+Date: Thu, 6 Sep 2018 14:03:32 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180906120332.w7rhhurm6vtibc2t@kamzik.brq.redhat.com>
+References: <1536174934-26022-1-git-send-email-wei@redhat.com>
+	<1536174934-26022-3-git-send-email-wei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180906125054.764d3baa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qga: ignore non present cpus when handling
- qmp_guest_get_vcpus()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1536174934-26022-3-git-send-email-wei@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V9 2/4] tests/migration: Support cross
+ compilation in generating boot header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,130 +28,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, mdroth@linux.vnet.ibm.com
-Cc: qemu-devel@nongnu.org, Drew Jones <drjones@redhat.com>
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, dgilbert@redhat.com, alex.bennee@linaro.org
 
-On 09/06/18 12:50, Igor Mammedov wrote:
-> On Thu, 6 Sep 2018 12:26:12 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
+On Wed, Sep 05, 2018 at 03:15:32PM -0400, Wei Huang wrote:
+> Recently a new configure option, CROSS_CC_GUEST, was added to
+> $(TARGET)-softmmu/config-target.mak to support TCG-related tests. This
+> patch tries to leverage this option to support cross compilation when the
+> migration boot block file is being re-generated:
 > 
->> On 09/06/18 11:49, Igor Mammedov wrote:
->>> On Thu, 30 Aug 2018 17:51:13 +0200
->>> Laszlo Ersek <lersek@redhat.com> wrote:
->>>   
->>>> +Drew
->>>>
->>>> On 08/30/18 14:08, Igor Mammedov wrote:  
->>>>> If VM has VCPUs plugged sparselly (for example a VM started with
->>>>> 3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
->>>>> only cpu0 and cpu2 are present), QGA will rise a error
->>>>>   error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
->>>>>   open("/sys/devices/system/cpu/cpu1/"): No such file or directory
->>>>> when
->>>>>   virsh vcpucount FOO --guest
->>>>> is executed.
->>>>> Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
->>>>>
->>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>>>> ---
->>>>>  qga/commands-posix.c | 4 +++-
->>>>>  1 file changed, 3 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
->>>>> index 37e8a2d..2929872 100644
->>>>> --- a/qga/commands-posix.c
->>>>> +++ b/qga/commands-posix.c
->>>>> @@ -2044,7 +2044,9 @@ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
->>>>>                                vcpu->logical_id);
->>>>>      dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
->>>>>      if (dirfd == -1) {
->>>>> -        error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
->>>>> +        if (!(sys2vcpu && errno == ENOENT)) {
->>>>> +            error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
->>>>> +        }
->>>>>      } else {
->>>>>          static const char fn[] = "online";
->>>>>          int fd;
->>>>>     
->>> [...]
->>>    
->>>> I wonder if, instead of this patch, we should rework
->>>> qmp_guest_get_vcpus(), to silently skip processors for which this
->>>> dirpath ENOENT condition arises (i.e., return a shorter list of
->>>> GuestLogicalProcessor objects).  
->>> would something like this on top of this patch do?
->>>
->>> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
->>> index 2929872..990bb80 100644
->>> --- a/qga/commands-posix.c
->>> +++ b/qga/commands-posix.c
->>> @@ -2114,12 +2114,14 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
->>>          vcpu->logical_id = current++;
->>>          vcpu->has_can_offline = true; /* lolspeak ftw */
->>>          transfer_vcpu(vcpu, true, &local_err);
->>> -
->>> -        entry = g_malloc0(sizeof *entry);
->>> -        entry->value = vcpu;
->>> -
->>> -        *link = entry;
->>> -        link = &entry->next;
->>> +        if (errno == ENOENT) {
->>> +            g_free(vcpu);
->>> +        } else {
->>> +            entry = g_malloc0(sizeof *entry);
->>> +            entry->value = vcpu;
->>> +            *link = entry;
->>> +            link = &entry->next;
->>> +        }
->>>      }
->>>  
->>>      if (local_err == NULL) {
->>>
->>> [...]
->>>   
->>
->> To me that looks like the right approach, but the details should be
->> polished a bit:
->>
->> - After we drop the vcpu object, "local_err" is still set, and would
->> terminate the loop in the next iteration.
-> local_error is not set due 'if (!(sys2vcpu && errno == ENOENT))'
-> condition in the in the transfer_vcpu().
-
-ah, sorry, you did say this was on top of your original patch, but I had
-forgotten the details of that.
-
-> the thing is that in case of vcpu2sys direction ENOENT is hard error.
+>  * The x86 related files are moved to a new sub-dir (named ./i386).
+>  * A new top-layer Makefile is created in tests/migration/ directory.
+>    This Makefile searches and parses CROSS_CC_GUEST to generate CROSS_PREFIX.
+>    The CROSS_PREFIX, if available, is then passed to migration/$ARCH/Makefile.
 > 
->> - It seems like ENOENT can indeed only come from openat(), in
->> transfer_vcpu(), however, it would be nice if we could grab the error
->> code from the error object somehow, and not from the "errno" variable. I
->> vaguely recall this is what error classes were originally invented for,
->> but now we just use ERROR_CLASS_GENERIC_ERROR...
-> I've checked it and errno is preserved during error_setg_errno() call but
-> not saved in Error, so I've dropped that idea.
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  tests/migration-test.c                             |  2 +-
+>  tests/migration/Makefile                           | 44 ++++++++++++----------
+>  tests/migration/i386/Makefile                      | 22 +++++++++++
+>  .../{x86-a-b-bootblock.S => i386/a-b-bootblock.S}  |  4 --
+>  .../{x86-a-b-bootblock.h => i386/a-b-bootblock.h}  |  8 ++--
+>  5 files changed, 51 insertions(+), 29 deletions(-)
+>  create mode 100644 tests/migration/i386/Makefile
+>  rename tests/migration/{x86-a-b-bootblock.S => i386/a-b-bootblock.S} (93%)
+>  rename tests/migration/{x86-a-b-bootblock.h => i386/a-b-bootblock.h} (92%)
+> 
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 0e687b7..fe6b41a 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -83,7 +83,7 @@ static const char *tmpfs;
+>  /* A simple PC boot sector that modifies memory (1-100MB) quickly
+>   * outputting a 'B' every so often if it's still running.
+>   */
+> -#include "tests/migration/x86-a-b-bootblock.h"
+> +#include "tests/migration/i386/a-b-bootblock.h"
 >  
->> How about this: we could add a boolean output param to transfer_vcpu(),
->> called "fatal". Ignored when the function succeeds. When the function
->> fails (seen from "local_err"), the loop consults "fatal". If the error
->> is fatal, we act as before; otherwise, we drop the vcpu object, release
->> -- and zero out -- "local_err" as well, and continue. I think this is
->> more generic / safer than trying to infer the failure location from the
->> outside.
-> It looked more uglier to me, so I've turned to libc style of reporting
-> (assuming that g_free() doesn't touch errno ever)
-> 
-> But if you prefer using extra parameter, I'll respin patch with it.
+>  static void init_bootfile_x86(const char *bootpath)
+>  {
+> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> index c0824b4..a9ed875 100644
+> --- a/tests/migration/Makefile
+> +++ b/tests/migration/Makefile
+> @@ -1,31 +1,35 @@
+> -# To specify cross compiler prefix, use CROSS_PREFIX=
+> -#   $ make CROSS_PREFIX=x86_64-linux-gnu-
+> +#
+> +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
+> +# See the COPYING file in the top-level directory.
+> +#
+> +
+> +TARGET_LIST = i386
+> +
+> +SRC_PATH = ../..
+>  
+>  override define __note
+> -/* This file is automatically generated from
+> - * tests/migration/x86-a-b-bootblock.S, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> - * and then remember to send both in your patch submission.
+> +/* This file is automatically generated from the assembly file in
+> + * tests/migration/$@. Edit that file and then run "make all"
+> + * inside tests/migration to update, and then remember to send both
+> + * the header and the assembler differences in your patch submission.
+>   */
+>  endef
+>  export __note
+>  
+> -.PHONY: all clean
+> -all: x86-a-b-bootblock.h
+> -
+> -x86-a-b-bootblock.h: x86.bootsect
+> -	echo "$$__note" > header.tmp
+> -	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
+> -	mv header.tmp $@
+> +find-arch-cross-cc = $(lastword $(shell grep -h "CROSS_CC_GUEST=" $(wildcard $(SRC_PATH)/$(patsubst i386,*86*,$(1))-softmmu/config-target.mak)))
 
-Michael, what is your preference? I guess I'll be fine both ways.
+The above function hangs unless configuring with
+'--target-list=x86_64-softmmu,aarch64-softmmu'. I tried just x86_64 alone,
+just aarch64 alone, and also configuring both x86_64 and i386, but none
+of those worked. For some reason grep isn't happy with the generated path
+list. I tested like this
+
+ ./configure --target-list=x86_64-softmmu,i386-softmmu
+ make -C tests/migration
+
+And, while not an issue of this series, I had to manually add
+CROSS_CC_GUEST="aarch64-linux-gnu-gcc" to aarch64-softmmu/config-target.mak
+for it to work, because configure's compiler test fails with the Fedora
+aarch64-linux-gnu-gcc installation (the linker can't find code it needs
+to a build a program with main()). I'm not sure if building programs with
+main() is something the CROSS_CC_GUEST compiler needs to do. Maybe that
+test can be relaxed. Alex?
 
 Thanks,
-Laszlo
+drew
 
+> +parse-cross-prefix = $(subst gcc,,$(patsubst cc,gcc,$(patsubst CROSS_CC_GUEST="%",%,$(call find-arch-cross-cc,$(1)))))
+> +gen-cross-prefix = $(patsubst %-,CROSS_PREFIX=%-,$(call parse-cross-prefix,$(1)))
+>  
+> -x86.bootsect: x86.boot
+> -	dd if=$< of=$@ bs=256 count=2 skip=124
+> +.PHONY: all $(TARGET_LIST)
+>  
+> -x86.boot: x86.o
+> -	$(CROSS_PREFIX)objcopy -O binary $< $@
+> +all: $(TARGET_LIST)
+>  
+> -x86.o: x86-a-b-bootblock.S
+> -	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
+> +$(TARGET_LIST):
+> +	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
+>  
+>  clean:
+> -	@rm -rf *.boot *.o *.bootsect
+> +	for target in $(TARGET_LIST); do \
+> +		$(MAKE) -C $$target clean; \
+> +	done
+> diff --git a/tests/migration/i386/Makefile b/tests/migration/i386/Makefile
+> new file mode 100644
+> index 0000000..5c03241
+> --- /dev/null
+> +++ b/tests/migration/i386/Makefile
+> @@ -0,0 +1,22 @@
+> +# To specify cross compiler prefix, use CROSS_PREFIX=
+> +#   $ make CROSS_PREFIX=x86_64-linux-gnu-
+> +
+> +.PHONY: all clean
+> +all: a-b-bootblock.h
+> +
+> +a-b-bootblock.h: x86.bootsect
+> +	echo "$$__note" > header.tmp
+> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
+> +	mv header.tmp $@
+> +
+> +x86.bootsect: x86.boot
+> +	dd if=$< of=$@ bs=256 count=2 skip=124
+> +
+> +x86.boot: x86.o
+> +	$(CROSS_PREFIX)objcopy -O binary $< $@
+> +
+> +x86.o: a-b-bootblock.S
+> +	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
+> +
+> +clean:
+> +	@rm -rf *.boot *.o *.bootsect
+> diff --git a/tests/migration/x86-a-b-bootblock.S b/tests/migration/i386/a-b-bootblock.S
+> similarity index 93%
+> rename from tests/migration/x86-a-b-bootblock.S
+> rename to tests/migration/i386/a-b-bootblock.S
+> index b164264..3f97f28 100644
+> --- a/tests/migration/x86-a-b-bootblock.S
+> +++ b/tests/migration/i386/a-b-bootblock.S
+> @@ -3,10 +3,6 @@
+>  #  range.
+>  #  Outputs an initial 'A' on serial followed by repeated 'B's
+>  #
+> -# run   tests/migration/rebuild-x86-bootblock.sh
+> -#   to regenerate the hex, and remember to include both the .h and .s
+> -#   in any patches.
+> -#
+>  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+>  # This work is licensed under the terms of the GNU GPL, version 2 or later.
+>  # See the COPYING file in the top-level directory.
+> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/i386/a-b-bootblock.h
+> similarity index 92%
+> rename from tests/migration/x86-a-b-bootblock.h
+> rename to tests/migration/i386/a-b-bootblock.h
+> index 78a151f..7d459d4 100644
+> --- a/tests/migration/x86-a-b-bootblock.h
+> +++ b/tests/migration/i386/a-b-bootblock.h
+> @@ -1,7 +1,7 @@
+> -/* This file is automatically generated from
+> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> - * and then remember to send both in your patch submission.
+> +/* This file is automatically generated from the assembly file in
+> + * tests/migration/i386. Edit that file and then run "make all"
+> + * inside tests/migration to update, and then remember to send both
+> + * the header and the assembler differences in your patch submission.
+>   */
+>  unsigned char x86_bootsect[] = {
+>    0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
+> -- 
+> 1.8.3.1
 > 
->> I'm not quite up to date on structured error propagation in QEMU, so
->> take the above with a grain of salt...
->>
->> Thanks,
->> Laszlo
 > 
