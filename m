@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fxri8-0003H9-0q
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:40:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fxriA-0003I4-Do
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:40:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fxri3-0007wz-MI
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:40:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35792 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fxri3-0007se-H6
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:40:23 -0400
-References: <153618529890.17241.16039771895973290192.malonedeb@chaenomeles.canonical.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <05c3d8dc-2d22-ceb8-3fef-30776797d171@redhat.com>
-Date: Thu, 6 Sep 2018 12:40:20 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fxri9-0008Bo-8q
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:40:30 -0400
+Date: Thu, 6 Sep 2018 12:40:17 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180906104017.GA4104@localhost.localdomain>
+References: <20180905112334.26911-1-slp@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <153618529890.17241.16039771895973290192.malonedeb@chaenomeles.canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug 1790975] [NEW] arm virt ecam pcie conflict
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180905112334.26911-1-slp@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block/linux-aio: acquire AioContext before
+ qemu_laio_process_completions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +23,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1790975 <1790975@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: Sergio Lopez <slp@redhat.com>
+Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Hi,
+Am 05.09.2018 um 13:23 hat Sergio Lopez geschrieben:
+> In qemu_laio_process_completions_and_submit, the AioContext is acquired
+> before the ioq_submit iteration and after qemu_laio_process_completions,
+> but the latter is not thread safe either.
+> 
+> This change avoids a number of random crashes when the Main Thread and
+> an IO Thread collide processing completions for the same AioContext.
+> This is an example of such crash:
+> 
+>  - The IO Thread is trying to acquire the AioContext at aio_co_enter,
+>    which evidences that it didn't lock it before:
+> 
+> Thread 3 (Thread 0x7fdfd8bd8700 (LWP 36743)):
+>  #0  0x00007fdfe0dd542d in __lll_lock_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
+>  #1  0x00007fdfe0dd0de6 in _L_lock_870 () at /lib64/libpthread.so.0
+>  #2  0x00007fdfe0dd0cdf in __GI___pthread_mutex_lock (mutex=mutex@entry=0x5631fde0e6c0)
+>     at ../nptl/pthread_mutex_lock.c:114
+>  #3  0x00005631fc0603a7 in qemu_mutex_lock_impl (mutex=0x5631fde0e6c0, file=0x5631fc23520f "util/async.c", line=511) at util/qemu-thread-posix.c:66
+>  #4  0x00005631fc05b558 in aio_co_enter (ctx=0x5631fde0e660, co=0x7fdfcc0c2b40) at util/async.c:493
+>  #5  0x00005631fc05b5ac in aio_co_wake (co=<optimized out>) at util/async.c:478
+>  #6  0x00005631fbfc51ad in qemu_laio_process_completion (laiocb=<optimized out>) at block/linux-aio.c:104
+>  #7  0x00005631fbfc523c in qemu_laio_process_completions (s=s@entry=0x7fdfc0297670)
+>     at block/linux-aio.c:222
+>  #8  0x00005631fbfc5499 in qemu_laio_process_completions_and_submit (s=0x7fdfc0297670)
+>     at block/linux-aio.c:237
+>  #9  0x00005631fc05d978 in aio_dispatch_handlers (ctx=ctx@entry=0x5631fde0e660) at util/aio-posix.c:406
+>  #10 0x00005631fc05e3ea in aio_poll (ctx=0x5631fde0e660, blocking=blocking@entry=true)
+>     at util/aio-posix.c:693
+>  #11 0x00005631fbd7ad96 in iothread_run (opaque=0x5631fde0e1c0) at iothread.c:64
+>  #12 0x00007fdfe0dcee25 in start_thread (arg=0x7fdfd8bd8700) at pthread_create.c:308
+>  #13 0x00007fdfe0afc34d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:113
+> 
+>  - The Main Thread is also processing completions from the same
+>    AioContext, and crashes due to failed assertion at util/iov.c:78:
+> 
+> Thread 1 (Thread 0x7fdfeb5eac80 (LWP 36740)):
+>  #0  0x00007fdfe0a391f7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
+>  #1  0x00007fdfe0a3a8e8 in __GI_abort () at abort.c:90
+>  #2  0x00007fdfe0a32266 in __assert_fail_base (fmt=0x7fdfe0b84e68 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", assertion=assertion@entry=0x5631fc238ccb "offset == 0", file=file@entry=0x5631fc23698e "util/iov.c", line=line@entry=78, function=function@entry=0x5631fc236adc <__PRETTY_FUNCTION__.15220> "iov_memset")
+>     at assert.c:92
+>  #3  0x00007fdfe0a32312 in __GI___assert_fail (assertion=assertion@entry=0x5631fc238ccb "offset == 0", file=file@entry=0x5631fc23698e "util/iov.c", line=line@entry=78, function=function@entry=0x5631fc236adc <__PRETTY_FUNCTION__.15220> "iov_memset") at assert.c:101
+>  #4  0x00005631fc065287 in iov_memset (iov=<optimized out>, iov_cnt=<optimized out>, offset=<optimized out>, offset@entry=65536, fillc=fillc@entry=0, bytes=15515191315812405248) at util/iov.c:78
+>  #5  0x00005631fc065a63 in qemu_iovec_memset (qiov=<optimized out>, offset=offset@entry=65536, fillc=fillc@entry=0, bytes=<optimized out>) at util/iov.c:410
+>  #6  0x00005631fbfc5178 in qemu_laio_process_completion (laiocb=0x7fdd920df630) at block/linux-aio.c:88
+>  #7  0x00005631fbfc523c in qemu_laio_process_completions (s=s@entry=0x7fdfc0297670)
+>     at block/linux-aio.c:222
+>  #8  0x00005631fbfc5499 in qemu_laio_process_completions_and_submit (s=0x7fdfc0297670)
+>     at block/linux-aio.c:237
+>  #9  0x00005631fbfc54ed in qemu_laio_poll_cb (opaque=<optimized out>) at block/linux-aio.c:272
+>  #10 0x00005631fc05d85e in run_poll_handlers_once (ctx=ctx@entry=0x5631fde0e660) at util/aio-posix.c:497
+>  #11 0x00005631fc05e2ca in aio_poll (blocking=false, ctx=0x5631fde0e660) at util/aio-posix.c:574
+>  #12 0x00005631fc05e2ca in aio_poll (ctx=0x5631fde0e660, blocking=blocking@entry=false)
+>     at util/aio-posix.c:604
+>  #13 0x00005631fbfcb8a3 in bdrv_do_drained_begin (ignore_parent=<optimized out>, recursive=<optimized out>, bs=<optimized out>) at block/io.c:273
+>  #14 0x00005631fbfcb8a3 in bdrv_do_drained_begin (bs=0x5631fe8b6200, recursive=<optimized out>, parent=0x0, ignore_bds_parents=<optimized out>, poll=<optimized out>) at block/io.c:390
+>  #15 0x00005631fbfbcd2e in blk_drain (blk=0x5631fe83ac80) at block/block-backend.c:1590
+>  #16 0x00005631fbfbe138 in blk_remove_bs (blk=blk@entry=0x5631fe83ac80) at block/block-backend.c:774
+>  #17 0x00005631fbfbe3d6 in blk_unref (blk=0x5631fe83ac80) at block/block-backend.c:401
+>  #18 0x00005631fbfbe3d6 in blk_unref (blk=0x5631fe83ac80) at block/block-backend.c:449
+>  #19 0x00005631fbfc9a69 in commit_complete (job=0x5631fe8b94b0, opaque=0x7fdfcc1bb080)
+>     at block/commit.c:92
+>  #20 0x00005631fbf7d662 in job_defer_to_main_loop_bh (opaque=0x7fdfcc1b4560) at job.c:973
+>  #21 0x00005631fc05ad41 in aio_bh_poll (bh=0x7fdfcc01ad90) at util/async.c:90
+>  #22 0x00005631fc05ad41 in aio_bh_poll (ctx=ctx@entry=0x5631fddffdb0) at util/async.c:118
+>  #23 0x00005631fc05e210 in aio_dispatch (ctx=0x5631fddffdb0) at util/aio-posix.c:436
+>  #24 0x00005631fc05ac1e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
+>  #25 0x00007fdfeaae44c9 in g_main_context_dispatch (context=0x5631fde00140) at gmain.c:3201
+>  #26 0x00007fdfeaae44c9 in g_main_context_dispatch (context=context@entry=0x5631fde00140) at gmain.c:3854
+>  #27 0x00005631fc05d503 in main_loop_wait () at util/main-loop.c:215
+>  #28 0x00005631fc05d503 in main_loop_wait (timeout=<optimized out>) at util/main-loop.c:238
+>  #29 0x00005631fc05d503 in main_loop_wait (nonblocking=nonblocking@entry=0) at util/main-loop.c:497
+>  #30 0x00005631fbd81412 in main_loop () at vl.c:1866
+>  #31 0x00005631fbc18ff3 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
+>     at vl.c:4647
+> 
+>  - A closer examination shows that s->io_q.in_flight appears to have
+>    gone backwards:
+> 
+> (gdb) frame 7
+>  #7  0x00005631fbfc523c in qemu_laio_process_completions (s=s@entry=0x7fdfc0297670)
+>     at block/linux-aio.c:222
+> 222	            qemu_laio_process_completion(laiocb);
+> (gdb) p s
+> $2 = (LinuxAioState *) 0x7fdfc0297670
+> (gdb) p *s
+> $3 = {aio_context = 0x5631fde0e660, ctx = 0x7fdfeb43b000, e = {rfd = 33, wfd = 33}, io_q = {plugged = 0,
+>     in_queue = 0, in_flight = 4294967280, blocked = false, pending = {sqh_first = 0x0,
+>       sqh_last = 0x7fdfc0297698}}, completion_bh = 0x7fdfc0280ef0, event_idx = 21, event_max = 241}
+> (gdb) p/x s->io_q.in_flight
+> $4 = 0xfffffff0
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
 
-On 09/06/2018 12:08 AM, Jonathan Marler wrote:
-> Public bug reported:
-> 
-> This occurs on qemu_v3.0.0 but not on qemu_v2.12.2 (built from
-> qemu_v3.0.0 tag on github)
-> 
-> Symptom: You'll see something like this in the kernel output:
-> 
-> [    1.285210] OF: PCI: host bridge /pcie@10000000 ranges:
-> [    1.286246] OF: PCI:    IO 0x3eff0000..0x3effffff -> 0x00000000
-> [    1.287061] OF: PCI:   MEM 0x10000000..0x3efeffff -> 0x10000000
-> [    1.287820] OF: PCI:   MEM 0x8000000000..0xffffffffff -> 0x8000000000
-> [    1.289312] pci-host-generic 4010000000.pcie: can't claim ECAM area [mem 0x10000000-0x1fffffff]: address conflict with /pcie@10000000 [mem 0x10000000-0x3efeffff]
-> [    1.290984] pci-host-generic: probe of 4010000000.pcie failed with error -16
-> 
-> 
-> Qemu Command Line: qemu-system-arm -machine virt -m 1024M -kernel zImage -serial stdio
+Thanks, applied to the block branch.
 
-Please can you try using
-qemu-system-arm -machine virt,highmem=off -m 1024M -kernel zImage
--serial stdio
-
-Does your guest support LPAE? This may be the cause.
-
-Thanks
-
-Eric
-> 
-> I can post my zImage if anyone has problems reproducing with their own
-> zImage.
-> 
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
-> 
+Kevin
