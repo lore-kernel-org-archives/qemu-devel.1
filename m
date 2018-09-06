@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fxriA-0003I4-Do
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:40:33 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fxrsM-0007HP-0b
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:51:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fxri9-0008Bo-8q
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:40:30 -0400
-Date: Thu, 6 Sep 2018 12:40:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180906104017.GA4104@localhost.localdomain>
-References: <20180905112334.26911-1-slp@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1fxrsH-0003dn-VX
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:51:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53906 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fxrsH-0003dT-PF
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 06:50:57 -0400
+Date: Thu, 6 Sep 2018 12:50:54 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180906125054.764d3baa@redhat.com>
+In-Reply-To: <da47aba6-2007-d473-49be-4280b3d961c2@redhat.com>
+References: <1535630903-146863-1-git-send-email-imammedo@redhat.com>
+	<38b3347b-8923-26e9-82a4-f69002262767@redhat.com>
+	<20180906114945.1acd0b8e@redhat.com>
+	<da47aba6-2007-d473-49be-4280b3d961c2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180905112334.26911-1-slp@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block/linux-aio: acquire AioContext before
- qemu_laio_process_completions
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qga: ignore non present cpus when handling
+ qmp_guest_get_vcpus()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,102 +30,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio Lopez <slp@redhat.com>
-Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, Drew Jones <drjones@redhat.com>, mdroth@linux.vnet.ibm.com
 
-Am 05.09.2018 um 13:23 hat Sergio Lopez geschrieben:
-> In qemu_laio_process_completions_and_submit, the AioContext is acquired
-> before the ioq_submit iteration and after qemu_laio_process_completions,
-> but the latter is not thread safe either.
-> 
-> This change avoids a number of random crashes when the Main Thread and
-> an IO Thread collide processing completions for the same AioContext.
-> This is an example of such crash:
-> 
->  - The IO Thread is trying to acquire the AioContext at aio_co_enter,
->    which evidences that it didn't lock it before:
-> 
-> Thread 3 (Thread 0x7fdfd8bd8700 (LWP 36743)):
->  #0  0x00007fdfe0dd542d in __lll_lock_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
->  #1  0x00007fdfe0dd0de6 in _L_lock_870 () at /lib64/libpthread.so.0
->  #2  0x00007fdfe0dd0cdf in __GI___pthread_mutex_lock (mutex=mutex@entry=0x5631fde0e6c0)
->     at ../nptl/pthread_mutex_lock.c:114
->  #3  0x00005631fc0603a7 in qemu_mutex_lock_impl (mutex=0x5631fde0e6c0, file=0x5631fc23520f "util/async.c", line=511) at util/qemu-thread-posix.c:66
->  #4  0x00005631fc05b558 in aio_co_enter (ctx=0x5631fde0e660, co=0x7fdfcc0c2b40) at util/async.c:493
->  #5  0x00005631fc05b5ac in aio_co_wake (co=<optimized out>) at util/async.c:478
->  #6  0x00005631fbfc51ad in qemu_laio_process_completion (laiocb=<optimized out>) at block/linux-aio.c:104
->  #7  0x00005631fbfc523c in qemu_laio_process_completions (s=s@entry=0x7fdfc0297670)
->     at block/linux-aio.c:222
->  #8  0x00005631fbfc5499 in qemu_laio_process_completions_and_submit (s=0x7fdfc0297670)
->     at block/linux-aio.c:237
->  #9  0x00005631fc05d978 in aio_dispatch_handlers (ctx=ctx@entry=0x5631fde0e660) at util/aio-posix.c:406
->  #10 0x00005631fc05e3ea in aio_poll (ctx=0x5631fde0e660, blocking=blocking@entry=true)
->     at util/aio-posix.c:693
->  #11 0x00005631fbd7ad96 in iothread_run (opaque=0x5631fde0e1c0) at iothread.c:64
->  #12 0x00007fdfe0dcee25 in start_thread (arg=0x7fdfd8bd8700) at pthread_create.c:308
->  #13 0x00007fdfe0afc34d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:113
-> 
->  - The Main Thread is also processing completions from the same
->    AioContext, and crashes due to failed assertion at util/iov.c:78:
-> 
-> Thread 1 (Thread 0x7fdfeb5eac80 (LWP 36740)):
->  #0  0x00007fdfe0a391f7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
->  #1  0x00007fdfe0a3a8e8 in __GI_abort () at abort.c:90
->  #2  0x00007fdfe0a32266 in __assert_fail_base (fmt=0x7fdfe0b84e68 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", assertion=assertion@entry=0x5631fc238ccb "offset == 0", file=file@entry=0x5631fc23698e "util/iov.c", line=line@entry=78, function=function@entry=0x5631fc236adc <__PRETTY_FUNCTION__.15220> "iov_memset")
->     at assert.c:92
->  #3  0x00007fdfe0a32312 in __GI___assert_fail (assertion=assertion@entry=0x5631fc238ccb "offset == 0", file=file@entry=0x5631fc23698e "util/iov.c", line=line@entry=78, function=function@entry=0x5631fc236adc <__PRETTY_FUNCTION__.15220> "iov_memset") at assert.c:101
->  #4  0x00005631fc065287 in iov_memset (iov=<optimized out>, iov_cnt=<optimized out>, offset=<optimized out>, offset@entry=65536, fillc=fillc@entry=0, bytes=15515191315812405248) at util/iov.c:78
->  #5  0x00005631fc065a63 in qemu_iovec_memset (qiov=<optimized out>, offset=offset@entry=65536, fillc=fillc@entry=0, bytes=<optimized out>) at util/iov.c:410
->  #6  0x00005631fbfc5178 in qemu_laio_process_completion (laiocb=0x7fdd920df630) at block/linux-aio.c:88
->  #7  0x00005631fbfc523c in qemu_laio_process_completions (s=s@entry=0x7fdfc0297670)
->     at block/linux-aio.c:222
->  #8  0x00005631fbfc5499 in qemu_laio_process_completions_and_submit (s=0x7fdfc0297670)
->     at block/linux-aio.c:237
->  #9  0x00005631fbfc54ed in qemu_laio_poll_cb (opaque=<optimized out>) at block/linux-aio.c:272
->  #10 0x00005631fc05d85e in run_poll_handlers_once (ctx=ctx@entry=0x5631fde0e660) at util/aio-posix.c:497
->  #11 0x00005631fc05e2ca in aio_poll (blocking=false, ctx=0x5631fde0e660) at util/aio-posix.c:574
->  #12 0x00005631fc05e2ca in aio_poll (ctx=0x5631fde0e660, blocking=blocking@entry=false)
->     at util/aio-posix.c:604
->  #13 0x00005631fbfcb8a3 in bdrv_do_drained_begin (ignore_parent=<optimized out>, recursive=<optimized out>, bs=<optimized out>) at block/io.c:273
->  #14 0x00005631fbfcb8a3 in bdrv_do_drained_begin (bs=0x5631fe8b6200, recursive=<optimized out>, parent=0x0, ignore_bds_parents=<optimized out>, poll=<optimized out>) at block/io.c:390
->  #15 0x00005631fbfbcd2e in blk_drain (blk=0x5631fe83ac80) at block/block-backend.c:1590
->  #16 0x00005631fbfbe138 in blk_remove_bs (blk=blk@entry=0x5631fe83ac80) at block/block-backend.c:774
->  #17 0x00005631fbfbe3d6 in blk_unref (blk=0x5631fe83ac80) at block/block-backend.c:401
->  #18 0x00005631fbfbe3d6 in blk_unref (blk=0x5631fe83ac80) at block/block-backend.c:449
->  #19 0x00005631fbfc9a69 in commit_complete (job=0x5631fe8b94b0, opaque=0x7fdfcc1bb080)
->     at block/commit.c:92
->  #20 0x00005631fbf7d662 in job_defer_to_main_loop_bh (opaque=0x7fdfcc1b4560) at job.c:973
->  #21 0x00005631fc05ad41 in aio_bh_poll (bh=0x7fdfcc01ad90) at util/async.c:90
->  #22 0x00005631fc05ad41 in aio_bh_poll (ctx=ctx@entry=0x5631fddffdb0) at util/async.c:118
->  #23 0x00005631fc05e210 in aio_dispatch (ctx=0x5631fddffdb0) at util/aio-posix.c:436
->  #24 0x00005631fc05ac1e in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
->  #25 0x00007fdfeaae44c9 in g_main_context_dispatch (context=0x5631fde00140) at gmain.c:3201
->  #26 0x00007fdfeaae44c9 in g_main_context_dispatch (context=context@entry=0x5631fde00140) at gmain.c:3854
->  #27 0x00005631fc05d503 in main_loop_wait () at util/main-loop.c:215
->  #28 0x00005631fc05d503 in main_loop_wait (timeout=<optimized out>) at util/main-loop.c:238
->  #29 0x00005631fc05d503 in main_loop_wait (nonblocking=nonblocking@entry=0) at util/main-loop.c:497
->  #30 0x00005631fbd81412 in main_loop () at vl.c:1866
->  #31 0x00005631fbc18ff3 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>)
->     at vl.c:4647
-> 
->  - A closer examination shows that s->io_q.in_flight appears to have
->    gone backwards:
-> 
-> (gdb) frame 7
->  #7  0x00005631fbfc523c in qemu_laio_process_completions (s=s@entry=0x7fdfc0297670)
->     at block/linux-aio.c:222
-> 222	            qemu_laio_process_completion(laiocb);
-> (gdb) p s
-> $2 = (LinuxAioState *) 0x7fdfc0297670
-> (gdb) p *s
-> $3 = {aio_context = 0x5631fde0e660, ctx = 0x7fdfeb43b000, e = {rfd = 33, wfd = 33}, io_q = {plugged = 0,
->     in_queue = 0, in_flight = 4294967280, blocked = false, pending = {sqh_first = 0x0,
->       sqh_last = 0x7fdfc0297698}}, completion_bh = 0x7fdfc0280ef0, event_idx = 21, event_max = 241}
-> (gdb) p/x s->io_q.in_flight
-> $4 = 0xfffffff0
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
+On Thu, 6 Sep 2018 12:26:12 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-Thanks, applied to the block branch.
+> On 09/06/18 11:49, Igor Mammedov wrote:
+> > On Thu, 30 Aug 2018 17:51:13 +0200
+> > Laszlo Ersek <lersek@redhat.com> wrote:
+> >   
+> >> +Drew
+> >>
+> >> On 08/30/18 14:08, Igor Mammedov wrote:  
+> >>> If VM has VCPUs plugged sparselly (for example a VM started with
+> >>> 3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
+> >>> only cpu0 and cpu2 are present), QGA will rise a error
+> >>>   error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
+> >>>   open("/sys/devices/system/cpu/cpu1/"): No such file or directory
+> >>> when
+> >>>   virsh vcpucount FOO --guest
+> >>> is executed.
+> >>> Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
+> >>>
+> >>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> >>> ---
+> >>>  qga/commands-posix.c | 4 +++-
+> >>>  1 file changed, 3 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> >>> index 37e8a2d..2929872 100644
+> >>> --- a/qga/commands-posix.c
+> >>> +++ b/qga/commands-posix.c
+> >>> @@ -2044,7 +2044,9 @@ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
+> >>>                                vcpu->logical_id);
+> >>>      dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
+> >>>      if (dirfd == -1) {
+> >>> -        error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
+> >>> +        if (!(sys2vcpu && errno == ENOENT)) {
+> >>> +            error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
+> >>> +        }
+> >>>      } else {
+> >>>          static const char fn[] = "online";
+> >>>          int fd;
+> >>>     
+> > [...]
+> >    
+> >> I wonder if, instead of this patch, we should rework
+> >> qmp_guest_get_vcpus(), to silently skip processors for which this
+> >> dirpath ENOENT condition arises (i.e., return a shorter list of
+> >> GuestLogicalProcessor objects).  
+> > would something like this on top of this patch do?
+> > 
+> > diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> > index 2929872..990bb80 100644
+> > --- a/qga/commands-posix.c
+> > +++ b/qga/commands-posix.c
+> > @@ -2114,12 +2114,14 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+> >          vcpu->logical_id = current++;
+> >          vcpu->has_can_offline = true; /* lolspeak ftw */
+> >          transfer_vcpu(vcpu, true, &local_err);
+> > -
+> > -        entry = g_malloc0(sizeof *entry);
+> > -        entry->value = vcpu;
+> > -
+> > -        *link = entry;
+> > -        link = &entry->next;
+> > +        if (errno == ENOENT) {
+> > +            g_free(vcpu);
+> > +        } else {
+> > +            entry = g_malloc0(sizeof *entry);
+> > +            entry->value = vcpu;
+> > +            *link = entry;
+> > +            link = &entry->next;
+> > +        }
+> >      }
+> >  
+> >      if (local_err == NULL) {
+> > 
+> > [...]
+> >   
+> 
+> To me that looks like the right approach, but the details should be
+> polished a bit:
+> 
+> - After we drop the vcpu object, "local_err" is still set, and would
+> terminate the loop in the next iteration.
+local_error is not set due 'if (!(sys2vcpu && errno == ENOENT))'
+condition in the in the transfer_vcpu().
+the thing is that in case of vcpu2sys direction ENOENT is hard error.
 
-Kevin
+> - It seems like ENOENT can indeed only come from openat(), in
+> transfer_vcpu(), however, it would be nice if we could grab the error
+> code from the error object somehow, and not from the "errno" variable. I
+> vaguely recall this is what error classes were originally invented for,
+> but now we just use ERROR_CLASS_GENERIC_ERROR...
+I've checked it and errno is preserved during error_setg_errno() call but
+not saved in Error, so I've dropped that idea.
+ 
+> How about this: we could add a boolean output param to transfer_vcpu(),
+> called "fatal". Ignored when the function succeeds. When the function
+> fails (seen from "local_err"), the loop consults "fatal". If the error
+> is fatal, we act as before; otherwise, we drop the vcpu object, release
+> -- and zero out -- "local_err" as well, and continue. I think this is
+> more generic / safer than trying to infer the failure location from the
+> outside.
+It looked more uglier to me, so I've turned to libc style of reporting
+(assuming that g_free() doesn't touch errno ever)
+
+But if you prefer using extra parameter, I'll respin patch with it.
+
+> I'm not quite up to date on structured error propagation in QEMU, so
+> take the above with a grain of salt...
+> 
+> Thanks,
+> Laszlo
