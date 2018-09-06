@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxtw0-0006kt-M5
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:02:57 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fxtvt-0006fb-TO
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fxtvr-0000tg-Mg
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:02:55 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fxtvr-0000tL-GS
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 09:02:49 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu,  6 Sep 2018 09:02:17 -0400
-Message-Id: <20180906130225.5118-9-jsnow@redhat.com>
+Date: Thu,  6 Sep 2018 09:02:16 -0400
+Message-Id: <20180906130225.5118-8-jsnow@redhat.com>
 In-Reply-To: <20180906130225.5118-1-jsnow@redhat.com>
 References: <20180906130225.5118-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 08/16] tests/blockjob: replace Blockjob with
- Job
+Subject: [Qemu-devel] [PATCH v5 07/16] block/stream: refactor stream to use
+ job callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,215 +23,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: jtc@redhat.com, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Jeff Cody <jcody@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-These tests don't actually test blockjobs anymore, they test
-generic Job lifetimes. Change the types accordingly.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/test-blockjob.c | 98 ++++++++++++++++++++++++++-------------------------
- 1 file changed, 50 insertions(+), 48 deletions(-)
+ block/stream.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index ad4a65bc78..8e8b680416 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -206,18 +206,20 @@ static const BlockJobDriver test_cancel_driver = {
+diff --git a/block/stream.c b/block/stream.c
+index 700eb239e4..81a7ec8ece 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -54,16 +54,16 @@ static int coroutine_fn stream_populate(BlockBackend *blk,
+     return blk_co_preadv(blk, offset, qiov.size, &qiov, BDRV_REQ_COPY_ON_READ);
+ }
+ 
+-static void stream_exit(Job *job)
++static int stream_prepare(Job *job)
+ {
+     StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
+     BlockJob *bjob = &s->common;
+     BlockDriverState *bs = blk_bs(bjob->blk);
+     BlockDriverState *base = s->base;
+     Error *local_err = NULL;
+-    int ret = job->ret;
++    int ret = 0;
+ 
+-    if (!job_is_cancelled(job) && bs->backing && ret == 0) {
++    if (bs->backing) {
+         const char *base_id = NULL, *base_fmt = NULL;
+         if (base) {
+             base_id = s->backing_file_str;
+@@ -75,12 +75,19 @@ static void stream_exit(Job *job)
+         bdrv_set_backing_hd(bs, base, &local_err);
+         if (local_err) {
+             error_report_err(local_err);
+-            ret = -EPERM;
+-            goto out;
++            return -EPERM;
+         }
+     }
+ 
+-out:
++    return ret;
++}
++
++static void stream_clean(Job *job)
++{
++    StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
++    BlockJob *bjob = &s->common;
++    BlockDriverState *bs = blk_bs(bjob->blk);
++
+     /* Reopen the image back in read-only mode if necessary */
+     if (s->bs_flags != bdrv_get_flags(bs)) {
+         /* Give up write permissions before making it read-only */
+@@ -89,7 +96,6 @@ out:
+     }
+ 
+     g_free(s->backing_file_str);
+-    job->ret = ret;
+ }
+ 
+ static int coroutine_fn stream_run(Job *job, Error **errp)
+@@ -206,7 +212,8 @@ static const BlockJobDriver stream_job_driver = {
+         .job_type      = JOB_TYPE_STREAM,
+         .free          = block_job_free,
+         .run           = stream_run,
+-        .exit          = stream_exit,
++        .prepare       = stream_prepare,
++        .clean         = stream_clean,
+         .user_resume   = block_job_user_resume,
+         .drain         = block_job_drain,
      },
- };
- 
--static CancelJob *create_common(BlockJob **pjob)
-+static CancelJob *create_common(Job **pjob)
- {
-     BlockBackend *blk;
--    BlockJob *job;
-+    Job *job;
-+    BlockJob *bjob;
-     CancelJob *s;
- 
-     blk = create_blk(NULL);
--    job = mk_job(blk, "Steve", &test_cancel_driver, true,
--                 JOB_MANUAL_FINALIZE | JOB_MANUAL_DISMISS);
--    job_ref(&job->job);
--    assert(job->job.status == JOB_STATUS_CREATED);
--    s = container_of(job, CancelJob, common);
-+    bjob = mk_job(blk, "Steve", &test_cancel_driver, true,
-+                  JOB_MANUAL_FINALIZE | JOB_MANUAL_DISMISS);
-+    job = &bjob->job;
-+    job_ref(job);
-+    assert(job->status == JOB_STATUS_CREATED);
-+    s = container_of(bjob, CancelJob, common);
-     s->blk = blk;
- 
-     *pjob = job;
-@@ -242,7 +244,7 @@ static void cancel_common(CancelJob *s)
- 
- static void test_cancel_created(void)
- {
--    BlockJob *job;
-+    Job *job;
-     CancelJob *s;
- 
-     s = create_common(&job);
-@@ -251,119 +253,119 @@ static void test_cancel_created(void)
- 
- static void test_cancel_running(void)
- {
--    BlockJob *job;
-+    Job *job;
-     CancelJob *s;
- 
-     s = create_common(&job);
- 
--    job_start(&job->job);
--    assert(job->job.status == JOB_STATUS_RUNNING);
-+    job_start(job);
-+    assert(job->status == JOB_STATUS_RUNNING);
- 
-     cancel_common(s);
- }
- 
- static void test_cancel_paused(void)
- {
--    BlockJob *job;
-+    Job *job;
-     CancelJob *s;
- 
-     s = create_common(&job);
- 
--    job_start(&job->job);
--    assert(job->job.status == JOB_STATUS_RUNNING);
-+    job_start(job);
-+    assert(job->status == JOB_STATUS_RUNNING);
- 
--    job_user_pause(&job->job, &error_abort);
--    job_enter(&job->job);
--    assert(job->job.status == JOB_STATUS_PAUSED);
-+    job_user_pause(job, &error_abort);
-+    job_enter(job);
-+    assert(job->status == JOB_STATUS_PAUSED);
- 
-     cancel_common(s);
- }
- 
- static void test_cancel_ready(void)
- {
--    BlockJob *job;
-+    Job *job;
-     CancelJob *s;
- 
-     s = create_common(&job);
- 
--    job_start(&job->job);
--    assert(job->job.status == JOB_STATUS_RUNNING);
-+    job_start(job);
-+    assert(job->status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
--    job_enter(&job->job);
--    assert(job->job.status == JOB_STATUS_READY);
-+    job_enter(job);
-+    assert(job->status == JOB_STATUS_READY);
- 
-     cancel_common(s);
- }
- 
- static void test_cancel_standby(void)
- {
--    BlockJob *job;
-+    Job *job;
-     CancelJob *s;
- 
-     s = create_common(&job);
- 
--    job_start(&job->job);
--    assert(job->job.status == JOB_STATUS_RUNNING);
-+    job_start(job);
-+    assert(job->status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
--    job_enter(&job->job);
--    assert(job->job.status == JOB_STATUS_READY);
-+    job_enter(job);
-+    assert(job->status == JOB_STATUS_READY);
- 
--    job_user_pause(&job->job, &error_abort);
--    job_enter(&job->job);
--    assert(job->job.status == JOB_STATUS_STANDBY);
-+    job_user_pause(job, &error_abort);
-+    job_enter(job);
-+    assert(job->status == JOB_STATUS_STANDBY);
- 
-     cancel_common(s);
- }
- 
- static void test_cancel_pending(void)
- {
--    BlockJob *job;
-+    Job *job;
-     CancelJob *s;
- 
-     s = create_common(&job);
- 
--    job_start(&job->job);
--    assert(job->job.status == JOB_STATUS_RUNNING);
-+    job_start(job);
-+    assert(job->status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
--    job_enter(&job->job);
--    assert(job->job.status == JOB_STATUS_READY);
-+    job_enter(job);
-+    assert(job->status == JOB_STATUS_READY);
- 
--    job_complete(&job->job, &error_abort);
--    job_enter(&job->job);
-+    job_complete(job, &error_abort);
-+    job_enter(job);
-     while (!s->completed) {
-         aio_poll(qemu_get_aio_context(), true);
-     }
--    assert(job->job.status == JOB_STATUS_PENDING);
-+    assert(job->status == JOB_STATUS_PENDING);
- 
-     cancel_common(s);
- }
- 
- static void test_cancel_concluded(void)
- {
--    BlockJob *job;
-+    Job *job;
-     CancelJob *s;
- 
-     s = create_common(&job);
- 
--    job_start(&job->job);
--    assert(job->job.status == JOB_STATUS_RUNNING);
-+    job_start(job);
-+    assert(job->status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
--    job_enter(&job->job);
--    assert(job->job.status == JOB_STATUS_READY);
-+    job_enter(job);
-+    assert(job->status == JOB_STATUS_READY);
- 
--    job_complete(&job->job, &error_abort);
--    job_enter(&job->job);
-+    job_complete(job, &error_abort);
-+    job_enter(job);
-     while (!s->completed) {
-         aio_poll(qemu_get_aio_context(), true);
-     }
--    assert(job->job.status == JOB_STATUS_PENDING);
-+    assert(job->status == JOB_STATUS_PENDING);
- 
--    job_finalize(&job->job, &error_abort);
--    assert(job->job.status == JOB_STATUS_CONCLUDED);
-+    job_finalize(job, &error_abort);
-+    assert(job->status == JOB_STATUS_CONCLUDED);
- 
-     cancel_common(s);
- }
 -- 
 2.14.4
