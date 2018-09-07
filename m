@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
-	id 1fyJGY-0001Wx-LA
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:05:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fyJQU-0006AF-Jh
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
-	id 1fyJGU-0000XT-CD
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:05:50 -0400
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:42513
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
-	id 1fyJGU-0000Qb-0X
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:05:46 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 7 Sep 2018 16:05:39 +0000
-Message-ID: <a1965c46010944028c29dc2da212eca1@AMSPEX02CL03.citrite.net>
-References: <153631568068.32214.13361287430751567885.stgit@dhcp-3-135.uk.xensource.com>
-	<153631569081.32214.17009673757832831029.stgit@dhcp-3-135.uk.xensource.com>
-In-Reply-To: <153631569081.32214.17009673757832831029.stgit@dhcp-3-135.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/3] Avoid repeated memory allocation in
- xen_disk
+	(envelope-from <kwolf@redhat.com>) id 1fyJQS-00040q-3a
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:16:05 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri,  7 Sep 2018 18:15:08 +0200
+Message-Id: <20180907161520.26349-3-kwolf@redhat.com>
+In-Reply-To: <20180907161520.26349-1-kwolf@redhat.com>
+References: <20180907161520.26349-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 02/14] test-bdrv-drain: Drain with block jobs
+ in an I/O thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +20,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tim Smith <tim.smith@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, qemu-devel@nongnu.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsIFttYWlsdG86
-cWVtdS1kZXZlbC0NCj4gYm91bmNlcytwYXVsLmR1cnJhbnQ9Y2l0cml4LmNvbUBub25nbnUub3Jn
-XSBPbiBCZWhhbGYgT2YgVGltIFNtaXRoDQo+IFNlbnQ6IDA3IFNlcHRlbWJlciAyMDE4IDExOjIy
-DQo+IFRvOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQ
-QVRDSCAzLzNdIEF2b2lkIHJlcGVhdGVkIG1lbW9yeSBhbGxvY2F0aW9uIGluDQo+IHhlbl9kaXNr
-DQo+IA0KPiB4ZW5fZGlzayBjdXJyZW50bHkgYWxsb2NhdGVzIG1lbW9yeSB0byBob2xkIHRoZSBk
-YXRhIGZvciBlYWNoIGlvcmVxDQo+IGFzIHRoYXQgaW9yZXEgaXMgdXNlZCwgYW5kIGZyZWVzIGl0
-IGFmdGVyd2FyZHMuIEJlY2F1c2UgaXQgcmVxdWlyZXMNCj4gcGFnZS1hbGlnbmVkIGJsb2Nrcywg
-dGhpcyBpbnRlcmFjdHMgcG9vcmx5IHdpdGggbm9uLXBhZ2UtYWxpZ25lZA0KPiBhbGxvY2F0aW9u
-cyBhbmQgYmFsbG9vbnMgdGhlIGhlYXAuDQo+IA0KPiBJbnN0ZWFkLCBhbGxvY2F0ZSB0aGUgbWF4
-aW11bSBwb3NzaWJsZSByZXF1aXJlbWVudCwgd2hpY2ggaXMNCj4gQkxLSUZfTUFYX1NFR01FTlRT
-X1BFUl9SRVFVRVNUIHBhZ2VzIChjdXJyZW50bHkgMTEgcGFnZXMpIHdoZW4NCj4gdGhlIGlvcmVx
-IGlzIGNyZWF0ZWQsIGFuZCBrZWVwIHRoYXQgYWxsb2NhdGlvbiB1bnRpbCBpdCBpcyBkZXN0cm95
-ZWQuDQo+IFNpbmNlIHRoZSBpb3JlcXMgdGhlbXNlbHZlcyBhcmUgcmUtdXNlZCB2aWEgYSBmcmVl
-IGxpc3QsIHRoaXMNCj4gc2hvdWxkIGFjdHVhbGx5IGltcHJvdmUgbWVtb3J5IHVzYWdlLg0KPiAN
-Cj4gU2lnbmVkLW9mZi1ieTogVGltIFNtaXRoIDx0aW0uc21pdGhAY2l0cml4LmNvbT4NCg0KUmV2
-aWV3ZWQtYnk6IFBhdWwgRHVycmFudCA8cGF1bC5kdXJyYW50QGNpdHJpeC5jb20+DQoNCj4gLS0t
-DQo+ICBody9ibG9jay94ZW5fZGlzay5jIHwgICAxMCArKysrKy0tLS0tDQo+ICAxIGZpbGUgY2hh
-bmdlZCwgNSBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBh
-L2h3L2Jsb2NrL3hlbl9kaXNrLmMgYi9ody9ibG9jay94ZW5fZGlzay5jDQo+IGluZGV4IGMxMWNk
-MjFkMzcuLjY3Zjg5NGJiYTUgMTAwNjQ0DQo+IC0tLSBhL2h3L2Jsb2NrL3hlbl9kaXNrLmMNCj4g
-KysrIGIvaHcvYmxvY2sveGVuX2Rpc2suYw0KPiBAQCAtMTEyLDcgKzExMiw2IEBAIHN0YXRpYyB2
-b2lkIGlvcmVxX3Jlc2V0KHN0cnVjdCBpb3JlcSAqaW9yZXEpDQo+ICAgICAgbWVtc2V0KCZpb3Jl
-cS0+cmVxLCAwLCBzaXplb2YoaW9yZXEtPnJlcSkpOw0KPiAgICAgIGlvcmVxLT5zdGF0dXMgPSAw
-Ow0KPiAgICAgIGlvcmVxLT5zdGFydCA9IDA7DQo+IC0gICAgaW9yZXEtPmJ1ZiA9IE5VTEw7DQo+
-ICAgICAgaW9yZXEtPnNpemUgPSAwOw0KPiAgICAgIGlvcmVxLT5wcmVzeW5jID0gMDsNCj4gDQo+
-IEBAIC0xMzcsNiArMTM2LDEwIEBAIHN0YXRpYyBzdHJ1Y3QgaW9yZXEgKmlvcmVxX3N0YXJ0KHN0
-cnVjdCBYZW5CbGtEZXYNCj4gKmJsa2RldikNCj4gICAgICAgICAgLyogYWxsb2NhdGUgbmV3IHN0
-cnVjdCAqLw0KPiAgICAgICAgICBpb3JlcSA9IGdfbWFsbG9jMChzaXplb2YoKmlvcmVxKSk7DQo+
-ICAgICAgICAgIGlvcmVxLT5ibGtkZXYgPSBibGtkZXY7DQo+ICsgICAgICAgIC8qIFdlIGNhbm5v
-dCBuZWVkIG1vcmUgcGFnZXMgcGVyIGlvcmVxIHRoYW4gdGhpcywgYW5kIHdlIGRvIHJlLXVzZQ0K
-PiBpb3JlcXMsDQo+ICsgICAgICAgICAqIHNvIGFsbG9jYXRlIHRoZSBtZW1vcnkgb25jZSBoZXJl
-LCB0byBiZSBmcmVlZCBpbiBibGtfZnJlZSgpIHdoZW4NCj4gdGhlDQo+ICsgICAgICAgICAqIGlv
-cmVxIGlzIGZyZWVkLiAqLw0KPiArICAgICAgICBpb3JlcS0+YnVmID0gcWVtdV9tZW1hbGlnbihY
-Q19QQUdFX1NJWkUsDQo+IEJMS0lGX01BWF9TRUdNRU5UU19QRVJfUkVRVUVTVCAqIFhDX1BBR0Vf
-U0laRSk7DQo+ICAgICAgICAgIGJsa2Rldi0+cmVxdWVzdHNfdG90YWwrKzsNCj4gICAgICAgICAg
-cWVtdV9pb3ZlY19pbml0KCZpb3JlcS0+diwgMSk7DQo+ICAgICAgfSBlbHNlIHsNCj4gQEAgLTMx
-MywxNCArMzE2LDEyIEBAIHN0YXRpYyB2b2lkIHFlbXVfYWlvX2NvbXBsZXRlKHZvaWQgKm9wYXF1
-ZSwgaW50DQo+IHJldCkNCj4gICAgICAgICAgaWYgKHJldCA9PSAwKSB7DQo+ICAgICAgICAgICAg
-ICBpb3JlcV9ncmFudF9jb3B5KGlvcmVxKTsNCj4gICAgICAgICAgfQ0KPiAtICAgICAgICBxZW11
-X3ZmcmVlKGlvcmVxLT5idWYpOw0KPiAgICAgICAgICBicmVhazsNCj4gICAgICBjYXNlIEJMS0lG
-X09QX1dSSVRFOg0KPiAgICAgIGNhc2UgQkxLSUZfT1BfRkxVU0hfRElTS0NBQ0hFOg0KPiAgICAg
-ICAgICBpZiAoIWlvcmVxLT5yZXEubnJfc2VnbWVudHMpIHsNCj4gICAgICAgICAgICAgIGJyZWFr
-Ow0KPiAgICAgICAgICB9DQo+IC0gICAgICAgIHFlbXVfdmZyZWUoaW9yZXEtPmJ1Zik7DQo+ICAg
-ICAgICAgIGJyZWFrOw0KPiAgICAgIGRlZmF1bHQ6DQo+ICAgICAgICAgIGJyZWFrOw0KPiBAQCAt
-MzkyLDEyICszOTMsMTAgQEAgc3RhdGljIGludCBpb3JlcV9ydW5pb19xZW11X2FpbyhzdHJ1Y3Qg
-aW9yZXENCj4gKmlvcmVxKQ0KPiAgew0KPiAgICAgIHN0cnVjdCBYZW5CbGtEZXYgKmJsa2RldiA9
-IGlvcmVxLT5ibGtkZXY7DQo+IA0KPiAtICAgIGlvcmVxLT5idWYgPSBxZW11X21lbWFsaWduKFhD
-X1BBR0VfU0laRSwgaW9yZXEtPnNpemUpOw0KPiAgICAgIGlmIChpb3JlcS0+cmVxLm5yX3NlZ21l
-bnRzICYmDQo+ICAgICAgICAgIChpb3JlcS0+cmVxLm9wZXJhdGlvbiA9PSBCTEtJRl9PUF9XUklU
-RSB8fA0KPiAgICAgICAgICAgaW9yZXEtPnJlcS5vcGVyYXRpb24gPT0gQkxLSUZfT1BfRkxVU0hf
-RElTS0NBQ0hFKSAmJg0KPiAgICAgICAgICBpb3JlcV9ncmFudF9jb3B5KGlvcmVxKSkgew0KPiAt
-ICAgICAgICBxZW11X3ZmcmVlKGlvcmVxLT5idWYpOw0KPiAgICAgICAgICBnb3RvIGVycjsNCj4g
-ICAgICB9DQo+IA0KPiBAQCAtOTg5LDYgKzk4OCw3IEBAIHN0YXRpYyBpbnQgYmxrX2ZyZWUoc3Ry
-dWN0IFhlbkRldmljZSAqeGVuZGV2KQ0KPiAgICAgICAgICBpb3JlcSA9IFFMSVNUX0ZJUlNUKCZi
-bGtkZXYtPmZyZWVsaXN0KTsNCj4gICAgICAgICAgUUxJU1RfUkVNT1ZFKGlvcmVxLCBsaXN0KTsN
-Cj4gICAgICAgICAgcWVtdV9pb3ZlY19kZXN0cm95KCZpb3JlcS0+dik7DQo+ICsgICAgICAgIHFl
-bXVfdmZyZWUoaW9yZXEtPmJ1Zik7DQo+ICAgICAgICAgIGdfZnJlZShpb3JlcSk7DQo+ICAgICAg
-fQ0KPiANCj4gDQoNCg==
+This extends the existing drain test with a block job to include
+variants where the block job runs in a different AioContext.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/test-bdrv-drain.c | 92 +++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 86 insertions(+), 6 deletions(-)
+
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 17bb8508ae..ab055e85f8 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -174,6 +174,28 @@ static void do_drain_end(enum drain_type drain_type, BlockDriverState *bs)
+     }
+ }
+ 
++static void do_drain_begin_unlocked(enum drain_type drain_type, BlockDriverState *bs)
++{
++    if (drain_type != BDRV_DRAIN_ALL) {
++        aio_context_acquire(bdrv_get_aio_context(bs));
++    }
++    do_drain_begin(drain_type, bs);
++    if (drain_type != BDRV_DRAIN_ALL) {
++        aio_context_release(bdrv_get_aio_context(bs));
++    }
++}
++
++static void do_drain_end_unlocked(enum drain_type drain_type, BlockDriverState *bs)
++{
++    if (drain_type != BDRV_DRAIN_ALL) {
++        aio_context_acquire(bdrv_get_aio_context(bs));
++    }
++    do_drain_end(drain_type, bs);
++    if (drain_type != BDRV_DRAIN_ALL) {
++        aio_context_release(bdrv_get_aio_context(bs));
++    }
++}
++
+ static void test_drv_cb_common(enum drain_type drain_type, bool recursive)
+ {
+     BlockBackend *blk;
+@@ -790,11 +812,13 @@ BlockJobDriver test_job_driver = {
+     },
+ };
+ 
+-static void test_blockjob_common(enum drain_type drain_type)
++static void test_blockjob_common(enum drain_type drain_type, bool use_iothread)
+ {
+     BlockBackend *blk_src, *blk_target;
+     BlockDriverState *src, *target;
+     BlockJob *job;
++    IOThread *iothread = NULL;
++    AioContext *ctx;
+     int ret;
+ 
+     src = bdrv_new_open_driver(&bdrv_test, "source", BDRV_O_RDWR,
+@@ -802,21 +826,31 @@ static void test_blockjob_common(enum drain_type drain_type)
+     blk_src = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
+     blk_insert_bs(blk_src, src, &error_abort);
+ 
++    if (use_iothread) {
++        iothread = iothread_new();
++        ctx = iothread_get_aio_context(iothread);
++        blk_set_aio_context(blk_src, ctx);
++    } else {
++        ctx = qemu_get_aio_context();
++    }
++
+     target = bdrv_new_open_driver(&bdrv_test, "target", BDRV_O_RDWR,
+                                   &error_abort);
+     blk_target = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
+     blk_insert_bs(blk_target, target, &error_abort);
+ 
++    aio_context_acquire(ctx);
+     job = block_job_create("job0", &test_job_driver, NULL, src, 0, BLK_PERM_ALL,
+                            0, 0, NULL, NULL, &error_abort);
+     block_job_add_bdrv(job, "target", target, 0, BLK_PERM_ALL, &error_abort);
+     job_start(&job->job);
++    aio_context_release(ctx);
+ 
+     g_assert_cmpint(job->job.pause_count, ==, 0);
+     g_assert_false(job->job.paused);
+     g_assert_true(job->job.busy); /* We're in job_sleep_ns() */
+ 
+-    do_drain_begin(drain_type, src);
++    do_drain_begin_unlocked(drain_type, src);
+ 
+     if (drain_type == BDRV_DRAIN_ALL) {
+         /* bdrv_drain_all() drains both src and target */
+@@ -827,7 +861,14 @@ static void test_blockjob_common(enum drain_type drain_type)
+     g_assert_true(job->job.paused);
+     g_assert_false(job->job.busy); /* The job is paused */
+ 
+-    do_drain_end(drain_type, src);
++    do_drain_end_unlocked(drain_type, src);
++
++    if (use_iothread) {
++        /* paused is reset in the I/O thread, wait for it */
++        while (job->job.paused) {
++            aio_poll(qemu_get_aio_context(), false);
++        }
++    }
+ 
+     g_assert_cmpint(job->job.pause_count, ==, 0);
+     g_assert_false(job->job.paused);
+@@ -846,32 +887,64 @@ static void test_blockjob_common(enum drain_type drain_type)
+ 
+     do_drain_end(drain_type, target);
+ 
++    if (use_iothread) {
++        /* paused is reset in the I/O thread, wait for it */
++        while (job->job.paused) {
++            aio_poll(qemu_get_aio_context(), false);
++        }
++    }
++
+     g_assert_cmpint(job->job.pause_count, ==, 0);
+     g_assert_false(job->job.paused);
+     g_assert_true(job->job.busy); /* We're in job_sleep_ns() */
+ 
++    aio_context_acquire(ctx);
+     ret = job_complete_sync(&job->job, &error_abort);
+     g_assert_cmpint(ret, ==, 0);
+ 
++    if (use_iothread) {
++        blk_set_aio_context(blk_src, qemu_get_aio_context());
++    }
++    aio_context_release(ctx);
++
+     blk_unref(blk_src);
+     blk_unref(blk_target);
+     bdrv_unref(src);
+     bdrv_unref(target);
++
++    if (iothread) {
++        iothread_join(iothread);
++    }
+ }
+ 
+ static void test_blockjob_drain_all(void)
+ {
+-    test_blockjob_common(BDRV_DRAIN_ALL);
++    test_blockjob_common(BDRV_DRAIN_ALL, false);
+ }
+ 
+ static void test_blockjob_drain(void)
+ {
+-    test_blockjob_common(BDRV_DRAIN);
++    test_blockjob_common(BDRV_DRAIN, false);
+ }
+ 
+ static void test_blockjob_drain_subtree(void)
+ {
+-    test_blockjob_common(BDRV_SUBTREE_DRAIN);
++    test_blockjob_common(BDRV_SUBTREE_DRAIN, false);
++}
++
++static void test_blockjob_iothread_drain_all(void)
++{
++    test_blockjob_common(BDRV_DRAIN_ALL, true);
++}
++
++static void test_blockjob_iothread_drain(void)
++{
++    test_blockjob_common(BDRV_DRAIN, true);
++}
++
++static void test_blockjob_iothread_drain_subtree(void)
++{
++    test_blockjob_common(BDRV_SUBTREE_DRAIN, true);
+ }
+ 
+ 
+@@ -1342,6 +1415,13 @@ int main(int argc, char **argv)
+     g_test_add_func("/bdrv-drain/blockjob/drain_subtree",
+                     test_blockjob_drain_subtree);
+ 
++    g_test_add_func("/bdrv-drain/blockjob/iothread/drain_all",
++                    test_blockjob_iothread_drain_all);
++    g_test_add_func("/bdrv-drain/blockjob/iothread/drain",
++                    test_blockjob_iothread_drain);
++    g_test_add_func("/bdrv-drain/blockjob/iothread/drain_subtree",
++                    test_blockjob_iothread_drain_subtree);
++
+     g_test_add_func("/bdrv-drain/deletion/drain", test_delete_by_drain);
+     g_test_add_func("/bdrv-drain/detach/drain_all", test_detach_by_drain_all);
+     g_test_add_func("/bdrv-drain/detach/drain", test_detach_by_drain);
+-- 
+2.13.6
