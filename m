@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fy5e0-0004u6-4D
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 21:33:11 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fy618-00057C-RE
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 21:57:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fy5dn-00072J-Nc
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 21:33:02 -0400
-Received: from ozlabs.org ([203.11.71.1]:58463)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fy5dm-0006sq-5P
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 21:32:55 -0400
-Date: Fri, 7 Sep 2018 11:30:10 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180907013010.GC26021@umbus.fritz.box>
-References: <20180906065729.2487-1-sandipan@linux.ibm.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1fy615-0004tL-AN
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 21:57:02 -0400
+Date: Thu, 6 Sep 2018 19:56:49 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180906195649.763d3f5d@t450s.home>
+In-Reply-To: <20180907010031.GI16937@xz-x1>
+References: <20180905113158.23734-1-peterx@redhat.com>
+	<20180905085550.5a84b540@t450s.home> <20180906065312.GD16937@xz-x1>
+	<20180906124136.0b966adc@t450s.home> <20180907010031.GI16937@xz-x1>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WplhKdTI2c8ulnbP"
-Content-Disposition: inline
-In-Reply-To: <20180906065729.2487-1-sandipan@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target-ppc: Extend HWCAP2 bits for ISA 3.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: do address space switching
+ when reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +25,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sandipan Das <sandipan@linux.ibm.com>
-Cc: richard.henderson@linaro.org, qemu-devel@nongnu.org, laurent@vivier.eu, riku.voipio@iki.fi, nikunj@linux.vnet.ibm.com, naveen.n.rao@linux.vnet.ibm.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>
 
+On Fri, 7 Sep 2018 09:00:31 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
---WplhKdTI2c8ulnbP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Thu, Sep 06, 2018 at 12:41:36PM -0600, Alex Williamson wrote:
+> > On Thu, 6 Sep 2018 14:53:12 +0800
+> > Peter Xu <peterx@redhat.com> wrote:
+> >   
+> > > On Wed, Sep 05, 2018 at 08:55:50AM -0600, Alex Williamson wrote:  
+> > > > On Wed,  5 Sep 2018 19:31:58 +0800
+> > > > Peter Xu <peterx@redhat.com> wrote:
+> > > >     
+> > > > > We will drop all the mappings when system reset, however we'll still
+> > > > > keep the existing memory layouts.  That'll be problematic since if IOMMU
+> > > > > is enabled in the guest and then reboot the guest, SeaBIOS will try to
+> > > > > drive a device that with no page mapped there.  What we need to do is to
+> > > > > rebuild the GPA->HPA mapping when system resets, hence ease SeaBIOS.
+> > > > > 
+> > > > > Without this patch, a guest that boots on an assigned NVMe device might
+> > > > > fail to find the boot device after a system reboot/reset and we'll be
+> > > > > able to observe SeaBIOS errors if turned on:
+> > > > > 
+> > > > >   WARNING - Timeout at nvme_wait:144!
+> > > > > 
+> > > > > With the patch applied, the guest will be able to find the NVMe drive
+> > > > > and bootstrap there even after multiple reboots or system resets.
+> > > > > 
+> > > > > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1625173
+> > > > > CC: QEMU Stable <qemu-stable@nongnu.org>
+> > > > > Tested-by: Cong Li <coli@redhat.com>
+> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > ---
+> > > > >  hw/i386/intel_iommu.c | 8 ++++++++
+> > > > >  1 file changed, 8 insertions(+)
+> > > > > 
+> > > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > > > > index 3dfada19a6..d3eb068d43 100644
+> > > > > --- a/hw/i386/intel_iommu.c
+> > > > > +++ b/hw/i386/intel_iommu.c
+> > > > > @@ -3231,6 +3231,14 @@ static void vtd_reset(DeviceState *dev)
+> > > > >       * When device reset, throw away all mappings and external caches
+> > > > >       */
+> > > > >      vtd_address_space_unmap_all(s);
+> > > > > +
+> > > > > +    /*
+> > > > > +     * Switch address spaces if needed (e.g., when reboot from a
+> > > > > +     * kernel that has IOMMU enabled, we should switch address spaces
+> > > > > +     * to rebuild the GPA->HPA mappings otherwise SeaBIOS might
+> > > > > +     * encounter DMA errors when running with e.g. a NVMe card).
+> > > > > +     */
+> > > > > +    vtd_switch_address_space_all(s);
+> > > > >  }
+> > > > >  
+> > > > >  static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)    
+> > > > 
+> > > > I'm curious why these aren't part of vtd_init().  vtd_init is where
+> > > > GCMD is set back to it's power-on state, which disables translation, so
+> > > > logically we should reset the address space at that point.  Similarly,
+> > > > the root entry is reset, so it would make sense to throw away all the
+> > > > mappings there too.  Thanks,    
+> > > 
+> > > vtd_init() is only called when realize() or reset, and AFAIU it's not
+> > > called by GCMD operations.  However I think I get the point that
+> > > logically we should do similar things in e.g. vtd_handle_gcmd_srtp()
+> > > when the enable bit switches.
+> > > 
+> > > My understanding is that if other things happened rather than the
+> > > system reboot (e.g., when root pointer is replaced, or during the
+> > > guest running the guest driver turns DMAR from on to off) the guest
+> > > will be responsible to do the rest of invalidations first before doing
+> > > that switch, so we'll possibly do the unmap_all() and address space
+> > > switches in other places (e.g., in vtd_context_global_invalidate, or
+> > > per device invalidations).  
+> > 
+> > AIUI, the entire global command register is write-once, so the guest
+> > cannot disable the IOMMU or change the root pointer after it's been
+> > initialized, except through a system reset.  
+> 
+> I'm not sure about this one.  The spec has this though (chap 10.4.4,
+> Global Command Register):
+> 
+>         Register to control remapping hardware. If multiple control
+>         fields in this register need to be modified, software must
+>         serialize the modifications through multiple writes to this
+>         register.
+> 
+> So AFAIU it's at least not write-once register since after all the
+> guest software need to update the register in a per-bit fashion.  And
+> AFAIU there's no restriction too on turning the global DMAR off after
+> it's turned on (though Linux won't do that).
 
-On Thu, Sep 06, 2018 at 12:27:29PM +0530, Sandipan Das wrote:
-> This adds the HWCAP2 bit to detect if a linux user process is
-> running on an ISA 3.0 compliant cpu like POWER9. This can be
-> verified using a simple test program that prints the value in
-> the auxiliary vector for AT_HWCAP2 as shown below.
->=20
-> Before:
->   $ qemu-ppc64le -cpu power8 test
->   0x8c000000
->=20
->   $ qemu-ppc64le -cpu power9 test
->   0x8c000000
->=20
-> After:
->   $ qemu-ppc64le -cpu power8 test
->   0x8c000000
->=20
->   $ qemu-ppc64le -cpu power9 test
->   0x8c800000
->=20
-> Signed-off-by: Sandipan Das <sandipan@linux.ibm.com>
+I'm sorry, my brain was elsewhere, WO = Write Only, not sure where I
+came up with Write Once.  I do have an impression that there's
+something one-way about enabling the IOMMU, but I'm not sure where it
+is.
 
-Applied, thanks.
+> > I think that means the
+> > guest can only operate through the invalidation queue at runtime.  The
+> > bug being fixed here is that the IOMMU has been reset to its power-on
+> > state where translation is disabled, but the emulation of that disabled
+> > state also needs to return the per-device address space to that of
+> > system memory, or identity map thereof.  The commit log seems to imply
+> > that there's some sort of SeaBIOS issue and we're just doing this to
+> > help the BIOS, when in reality, we just forgot to reset the per device
+> > address space and a subsequent boot of a guest that didn't enable the
+> > IOMMU would have the same sort of issues.  In fact any usage of an
+> > assigned device prior to re-enabling the IOMMU would fail, there's
+> > nothing unique to NVMe here.  Thanks,  
+> 
+> Sorry for the confusion on the warning line.  I pasted that line to
+> mainly help people when looking for solutions of problem (by searching
+> with the error line).  It's of course nothing related to SeaBIOS.  How
+> about I add another line after the WARNING one: "it's not a SeaBIOS
+> bug, it's QEMU's problem that caused SeaBIOS to timeout on a DMAR
+> error"?
+> 
+> And yes it should be a general issue but I'm not sure what will
+> trigger that except this known one.  E.g., I don't think NICs will
+> easily trigger this since I don't think SeaBIOS will do DMA on the
+> NICs but I'm not sure.  For other block devices to bootstrap I haven't
+> tested any (e.g., what if some bios drivers use MMIO/PIO only?  I have
+> totally no idea...), but I think it'll get that error of course as
+> long as SeaBIOS/... (anything runs earlier than kernel) tries to do
+> any form of DMA to any device. If you won't mind, I'll just still keep
+> the NVMe example to be clear on what's the exact problem we have
+> encountered, and I add another paragraph emphasizing that it'll also
+> solve the problem of similar issues where host gets DMA errors during
+> SeaBIOS boots, and mentioning that this is a common issue.  Would that
+> work for you?
 
-> ---
->  linux-user/elfload.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index 8638612aec..e97c4cde49 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -710,6 +710,7 @@ enum {
->      QEMU_PPC_FEATURE2_HAS_EBB =3D 0x10000000, /* Event Base Branching */
->      QEMU_PPC_FEATURE2_HAS_ISEL =3D 0x08000000, /* Integer Select */
->      QEMU_PPC_FEATURE2_HAS_TAR =3D 0x04000000, /* Target Address Register=
- */
-> +    QEMU_PPC_FEATURE2_ARCH_3_00 =3D 0x00800000, /* ISA 3.00 */
->  };
-> =20
->  #define ELF_HWCAP get_elf_hwcap()
-> @@ -764,6 +765,7 @@ static uint32_t get_elf_hwcap2(void)
->      GET_FEATURE2(PPC2_BCTAR_ISA207, QEMU_PPC_FEATURE2_HAS_TAR);
->      GET_FEATURE2((PPC2_BCTAR_ISA207 | PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207=
- |
->                    PPC2_ISA207S), QEMU_PPC_FEATURE2_ARCH_2_07);
-> +    GET_FEATURE2(PPC2_ISA300, QEMU_PPC_FEATURE2_ARCH_3_00);
-> =20
->  #undef GET_FEATURE
->  #undef GET_FEATURE2
+Yep, I think it's a good idea to have the NVMe error message, so long
+as we also mention that any assigned device that does DMA prior to the
+IOMMU being re-enabled could experience the issue as well and not
+implicate SeaBIOS ("ease SeaBIOS" is a strange phrase).  You might be
+right that assigned NICs typically don't do DMA, an assigned SATA
+controller might though, and we don't really have control since the
+device could be providing the driver via option ROM.  Thanks,
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---WplhKdTI2c8ulnbP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluR1J8ACgkQbDjKyiDZ
-s5JyfhAAnz/Kubk7WlVgSrUjeLHfyrBus4ECP1c1pk3Ucgp/rsR9RpO3ANhjbnb/
-BVrOZEx6cbD8LN5I+lAEnP2zK8hs4373mT8+Lg+l+2K/G6lmhhJs717WiCYPiB6J
-i3+WNXs3G5dweE2IvtwqZtucGNM3uNgpeKRdsJLujGJZNjKx5cGQMHxFNnRiE+gZ
-VAFQzhYbv8UAoAt2G29AxosNi6FAno2rR0SUghFBLqu5AUxhFGkHiqgiAwOUN4DG
-NLoDiwP9VA1hKyUGe+/cScaz9dA5VxNXUBvBVaDXLKKLPPWDx3Ea0g+hTlCqoqXJ
-DRPj23aN3WAeFOsp246KoW3RZLR2KiMLKd86eLr6mAOg5SrOJXRY7aMhzwaXdvYZ
-lHNXDa1bDeG2FLGXJZMS2mrqXTprVGjHcV3bOBHvaYZ9yqpVJQBHWYGij2tBM1N+
-hvrV3vZAjsDeKgj222Q4hN/++J+mWHpRCmKirdSSxDXj6E5TUzB9rto+EG2OcNTP
-zn+HfPlMmaP6tfqYmpzqTm4wvFyAaL6SGRr0NhkfBe8G38QRvY7uqN1+4b5SZfFl
-0OKkngGYmrP/EANC6ws1J1KmnHaQ6FI2gsCZPebRNN3nt/tAiUI+uP6Vi592XFrW
-LhASof1sak4QYf1p/mpku1BzZJ6T+XVvntA5sWU1I4OGOZ1VYfo=
-=pDbb
------END PGP SIGNATURE-----
-
---WplhKdTI2c8ulnbP--
+Alex
