@@ -1,20 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyNcO-0007tp-H8
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:44:41 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fyNdP-0008QT-NS
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyNcK-0006l1-7X
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:44:40 -0400
-Date: Fri, 7 Sep 2018 16:44:34 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180907164402-mutt-send-email-mst@kernel.org>
-References: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fyNdE-0000Bb-QU
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:45:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37632
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fyNdE-00005I-Aa
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:45:32 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w87KiJq4039121
+	for <qemu-devel@nongnu.org>; Fri, 7 Sep 2018 16:45:30 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2mbyepacuu-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 16:45:30 -0400
+Received: from localhost
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Fri, 7 Sep 2018 16:45:29 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Fri,  7 Sep 2018 16:45:24 -0400
+In-Reply-To: <20180907204524.2275697-1-stefanb@linux.vnet.ibm.com>
+References: <20180907204524.2275697-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: revert back to 1 SRAT entry for
- hotpluggable area
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20180907204524.2275697-2-stefanb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v1 1/1] tests: Fix signalling race condition in
+ TPM tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,140 +42,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, haozhong.zhang@intel.com, qemu-stable@nongnu.org, ehabkost@redhat.com, lersek@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, marcandre.lureau@gmail.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On Wed, Aug 22, 2018 at 11:46:44AM +0200, Igor Mammedov wrote:
-> Commit
->   10efd7e108 "pc: acpi: fix memory hotplug regression by reducing stub SRAT entry size"
-> attemped to fix hotplug regression introduced by
->   848a1cc1e "hw/acpi-build: build SRAT memory affinity structures for DIMM devices"
-> 
-> fixed issue for Windows/3.0+ linux kernels, however it regressed 2.6 based
-> kernels (RHEL6) to the point where guest might crash at boot.
-> Reason is that 2.6 kernel discards SRAT table due too small last entry
-> which down the road leads to crashes. Hack I've tried in 10efd7e108 is also
-> not ACPI spec compliant according to which whole possible RAM should be
-> described in SRAT. Revert 10efd7e108 to fix regression for 2.6 based kernels.
-> 
-> With 10efd7e108 reverted, I've also tried splitting SRAT table statically
-> in different ways %/node and %/slot but Windows still fails to online
-> 2nd pc-dimm hot-plugged into node 0 (as described in 10efd7e108) and
-> sometimes even coldplugged pc-dimms where affected with static SRAT
-> partitioning.
-> The only known so far way where Windows stays happy is when we have 1
-> SRAT entry in the last node covering all hotplug area.
-> 
-> Revert 848a1cc1e until we come up with a way to avoid regression
-> on Windows with hotplug area split in several entries.
-> Tested this with 2.6/3.0 based kernels (RHEL6/7) and WS20[08/12/12R2/16]).
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+This patch fixes a race condition and test failure where the main process
+waits for the signal of a thread but the thread already sent that signal
+via a condition. Since these signals are non-sticky, we need to introduce=
+ a
+separate variable to make this signal sticky.
 
-BTW should this cause any aml test blobs to change?
-Does not seem to ...
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ tests/tpm-crb-test.c |  1 +
+ tests/tpm-emu.c      | 11 ++++++++++-
+ tests/tpm-emu.h      |  1 +
+ tests/tpm-tis-test.c |  1 +
+ 4 files changed, 13 insertions(+), 1 deletion(-)
 
-> ---
-> CC: haozhong.zhang@intel.com
-> CC: mst@redhat.com
-> CC: qemu-stable@nongnu.org
-> CC: ehabkost@redhat.com
-> CC: lersek@redhat.com
-> ---
->  hw/i386/acpi-build.c | 73 +++++++++-------------------------------------------
->  1 file changed, 12 insertions(+), 61 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index e1ee8ae..1599caa 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2251,64 +2251,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->  #define HOLE_640K_START  (640 * KiB)
->  #define HOLE_640K_END   (1 * MiB)
->  
-> -static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-> -                                           uint64_t len, int default_node)
-> -{
-> -    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
-> -    MemoryDeviceInfoList *info;
-> -    MemoryDeviceInfo *mi;
-> -    PCDIMMDeviceInfo *di;
-> -    uint64_t end = base + len, cur, size;
-> -    bool is_nvdimm;
-> -    AcpiSratMemoryAffinity *numamem;
-> -    MemoryAffinityFlags flags;
-> -
-> -    for (cur = base, info = info_list;
-> -         cur < end;
-> -         cur += size, info = info->next) {
-> -        numamem = acpi_data_push(table_data, sizeof *numamem);
-> -
-> -        if (!info) {
-> -            /*
-> -             * Entry is required for Windows to enable memory hotplug in OS
-> -             * and for Linux to enable SWIOTLB when booted with less than
-> -             * 4G of RAM. Windows works better if the entry sets proximity
-> -             * to the highest NUMA node in the machine at the end of the
-> -             * reserved space.
-> -             * Memory devices may override proximity set by this entry,
-> -             * providing _PXM method if necessary.
-> -             */
-> -            build_srat_memory(numamem, end - 1, 1, default_node,
-> -                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> -            break;
-> -        }
-> -
-> -        mi = info->value;
-> -        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-> -        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
-> -
-> -        if (cur < di->addr) {
-> -            build_srat_memory(numamem, cur, di->addr - cur, default_node,
-> -                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> -            numamem = acpi_data_push(table_data, sizeof *numamem);
-> -        }
-> -
-> -        size = di->size;
-> -
-> -        flags = MEM_AFFINITY_ENABLED;
-> -        if (di->hotpluggable) {
-> -            flags |= MEM_AFFINITY_HOTPLUGGABLE;
-> -        }
-> -        if (is_nvdimm) {
-> -            flags |= MEM_AFFINITY_NON_VOLATILE;
-> -        }
-> -
-> -        build_srat_memory(numamem, di->addr, size, di->node, flags);
-> -    }
-> -
-> -    qapi_free_MemoryDeviceInfoList(info_list);
-> -}
-> -
->  static void
->  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->  {
-> @@ -2414,10 +2356,19 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->          build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
->      }
->  
-> +    /*
-> +     * Entry is required for Windows to enable memory hotplug in OS
-> +     * and for Linux to enable SWIOTLB when booted with less than
-> +     * 4G of RAM. Windows works better if the entry sets proximity
-> +     * to the highest NUMA node in the machine.
-> +     * Memory devices may override proximity set by this entry,
-> +     * providing _PXM method if necessary.
-> +     */
->      if (hotplugabble_address_space_size) {
-> -        build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
-> -                                       hotplugabble_address_space_size,
-> -                                       pcms->numa_nodes - 1);
-> +        numamem = acpi_data_push(table_data, sizeof *numamem);
-> +        build_srat_memory(numamem, machine->device_memory->base,
-> +                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
-> +                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
->      }
->  
->      build_header(linker, table_data,
-> -- 
-> 2.7.4
+diff --git a/tests/tpm-crb-test.c b/tests/tpm-crb-test.c
+index d8f9569203..6fde579bab 100644
+--- a/tests/tpm-crb-test.c
++++ b/tests/tpm-crb-test.c
+@@ -151,6 +151,7 @@ int main(int argc, char **argv)
+     test.addr->u.q_unix.path =3D g_build_filename(tmp_path, "sock", NULL=
+);
+     g_mutex_init(&test.data_mutex);
+     g_cond_init(&test.data_cond);
++    test.data_cond_signal =3D false;
+=20
+     thread =3D g_thread_new(NULL, tpm_emu_ctrl_thread, &test);
+     tpm_emu_test_wait_cond(&test);
+diff --git a/tests/tpm-emu.c b/tests/tpm-emu.c
+index 8c2bd53cad..125e697181 100644
+--- a/tests/tpm-emu.c
++++ b/tests/tpm-emu.c
+@@ -23,9 +23,14 @@ void tpm_emu_test_wait_cond(TestState *s)
+     gint64 end_time =3D g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
+=20
+     g_mutex_lock(&s->data_mutex);
+-    if (!g_cond_wait_until(&s->data_cond, &s->data_mutex, end_time)) {
++
++    if (!s->data_cond_signal &&
++        !g_cond_wait_until(&s->data_cond, &s->data_mutex, end_time)) {
+         g_assert_not_reached();
+     }
++
++    s->data_cond_signal =3D false;
++
+     g_mutex_unlock(&s->data_mutex);
+ }
+=20
+@@ -72,6 +77,10 @@ void *tpm_emu_ctrl_thread(void *data)
+     QIOChannel *ioc;
+=20
+     qio_channel_socket_listen_sync(lioc, s->addr, &error_abort);
++
++    g_mutex_lock(&s->data_mutex);
++    s->data_cond_signal =3D true;
++    g_mutex_unlock(&s->data_mutex);
+     g_cond_signal(&s->data_cond);
+=20
+     qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
+diff --git a/tests/tpm-emu.h b/tests/tpm-emu.h
+index 08f902485e..8eb802a79e 100644
+--- a/tests/tpm-emu.h
++++ b/tests/tpm-emu.h
+@@ -26,6 +26,7 @@ struct tpm_hdr {
+ typedef struct TestState {
+     GMutex data_mutex;
+     GCond data_cond;
++    bool data_cond_signal;
+     SocketAddress *addr;
+     QIOChannel *tpm_ioc;
+     GThread *emu_tpm_thread;
+diff --git a/tests/tpm-tis-test.c b/tests/tpm-tis-test.c
+index 14754d9706..c8ec14888f 100644
+--- a/tests/tpm-tis-test.c
++++ b/tests/tpm-tis-test.c
+@@ -446,6 +446,7 @@ int main(int argc, char **argv)
+     test.addr->u.q_unix.path =3D g_build_filename(tmp_path, "sock", NULL=
+);
+     g_mutex_init(&test.data_mutex);
+     g_cond_init(&test.data_cond);
++    test.data_cond_signal =3D false;
+=20
+     thread =3D g_thread_new(NULL, tpm_emu_ctrl_thread, &test);
+     tpm_emu_test_wait_cond(&test);
+--=20
+2.14.4
