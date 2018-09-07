@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fyOun-0003sq-3V
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 18:07:49 -0400
+	(envelope-from <cota@braap.org>) id 1fyOuo-0003wS-Er
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 18:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fyOui-0005Qq-EG
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 18:07:45 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:50105)
+	(envelope-from <cota@braap.org>) id 1fyOui-0005Qw-Es
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 18:07:46 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36211)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fyOui-0005P5-2W
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fyOui-0005P6-2X
 	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 18:07:40 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri,  7 Sep 2018 18:07:29 -0400
-Message-Id: <20180907220731.19368-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 0/2] softfloat tests based on berkeley's
- testfloat
+Date: Fri,  7 Sep 2018 18:07:31 -0400
+Message-Id: <20180907220731.19368-3-cota@braap.org>
+In-Reply-To: <20180907220731.19368-1-cota@braap.org>
+References: <20180907220731.19368-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 2/2] tests: add floating point tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,1921 +26,2378 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-Alex was not too pleased with my previous fp-test incarnation;
-it only tested some 32 and 64 primitives, and it relied on test
-files by IBM that had no particular license (so we could not
-redistribute them, and IBM might pull them off the web any time).
+By leveraging berkeley's softfloat and testfloat.
 
-This attempt leverages berkeley's softfloat and testfloat, which
-are BSD-licensed and therefore we can pull in as submodules.
+fp-test.c is derived from testfloat's testsoftfloat.c. To ease
+the tracking of upstream changes to the latter file, fp-test.c
+keeps the original camel-case variable naming, and includes
+most new code via wrap.inc.c.
 
-Not everything that berkeley's softfloat does is implemented in
-QEMU (and vice versa), but the coverage of our implementation with
-this test is quite high.
+Most changes to the original code are simple style changes,
+although a few hacks have been added because our implementation
+does not provide exactly the same features as softfloat.
+I've noted these hacks with XXX comments.
 
-Regarding regressions, it shows at least one regression since
-the recent FP refactor, e.g. with -all2 -errors 1:
-
-Testing f64_div, rounding near_even.
-46464 tests total.
-Errors found in f64_div, rounding near_even:
-+7FE.FFFFFFEFFBFFE  +480.0000007FFEFFE
-        => +77D.FFFFFEEFFE00B ....x  expected +77D.FFFFFEEFFE00A ....x
-15469 tests performed; 1 error found.
-
-If I bring back the code before cf07323d49 ("fpu/softfloat:
-re-factor div", 2018-02-21), that error goes away.
-
-Many errors are reported for both 80-bit and 128-bit implementations.
-I don't know whether those have always been there or not,
-or perhaps I'm doing something wrong when converting
-80-bit and 128-bit floats between our implementation and
-softfloat.
-
-I'm appending to this message the output of two runs (-all1 and -all2);
--errors 1 means "stop testing this particular op when 1 error is found".
-
-You can pull this tree from:
-  https://github.com/cota/qemu/tree/fp-test
-Bear in mind that you'll need to initialize the submodules.
-
-BTW checkpatch points to some errors, but they're false positives.
-
-Thanks,
-
-		Emilio
-
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
-
-$ ./fp-test -all1 -errors 1
-Testing ui32_to_f16, rounding near_even.
-
-372 tests total.
-
-372 tests performed.
-In 372 tests, no errors found in ui32_to_f16, rounding near_even.
-Testing ui32_to_f32, rounding near_even.
-
-372 tests total.
-
-372 tests performed.
-In 372 tests, no errors found in ui32_to_f32, rounding near_even.
-Testing ui32_to_f64.
-
-372 tests total.
-
-372 tests performed.
-In 372 tests, no errors found in ui32_to_f64.
-Testing ui32_to_extF80.
-Testing ui32_to_f128.
-Testing ui64_to_f16, rounding near_even.
-
-756 tests total.
-
-756 tests performed.
-In 756 tests, no errors found in ui64_to_f16, rounding near_even.
-Testing ui64_to_f32, rounding near_even.
-
-756 tests total.
-
-756 tests performed.
-In 756 tests, no errors found in ui64_to_f32, rounding near_even.
-Testing ui64_to_f64, rounding near_even.
-
-756 tests total.
-
-756 tests performed.
-In 756 tests, no errors found in ui64_to_f64, rounding near_even.
-Testing ui64_to_extF80.
-Testing ui64_to_f128.
-
-756 tests total.
-
-Errors found in ui64_to_f128:
-F8003FFFFFFFDFFE  => -3FFC.000000000000403EF0007FFFFFFF .....
-	expected +403E.F0007FFFFFFFBFFC000000000000 .....
-
-1 tests performed; 1 error found.
-Testing i32_to_f16, rounding near_even.
-
-372 tests total.
-
-372 tests performed.
-In 372 tests, no errors found in i32_to_f16, rounding near_even.
-Testing i32_to_f32, rounding near_even.
-
-372 tests total.
-
-372 tests performed.
-In 372 tests, no errors found in i32_to_f32, rounding near_even.
-Testing i32_to_f64.
-
-372 tests total.
-
-372 tests performed.
-In 372 tests, no errors found in i32_to_f64.
-Testing i32_to_extF80.
-
-372 tests total.
-
-Errors found in i32_to_extF80:
-0100001E
-	=> +0000.0000000000004017 .....  expected +4017.80000F0000000000 .....
-
-1 tests performed; 1 error found.
-Testing i32_to_f128.
-
-372 tests total.
-
-Errors found in i32_to_f128:
-3EFFDFFE  => +0000.000000000000401CF7FEFFF00000 .....
-	expected +401C.F7FEFFF000000000000000000000 .....
-
-1 tests performed; 1 error found.
-Testing i64_to_f16, rounding near_even.
-
-756 tests total.
-
-756 tests performed.
-In 756 tests, no errors found in i64_to_f16, rounding near_even.
-Testing i64_to_f32, rounding near_even.
-
-756 tests total.
-
-756 tests performed.
-In 756 tests, no errors found in i64_to_f32, rounding near_even.
-Testing i64_to_f64, rounding near_even.
-
-756 tests total.
-
-756 tests performed.
-In 756 tests, no errors found in i64_to_f64, rounding near_even.
-Testing i64_to_extF80.
-
-756 tests total.
-
-Errors found in i64_to_extF80:
-0000000800001FFE
-	=> +0000.0000000000004022 .....  expected +4022.800001FFE0000000 .....
-
-1 tests performed; 1 error found.
-Testing i64_to_f128.
-
-756 tests total.
-
-Errors found in i64_to_f128:
-FF7FFFFFFF0001FE  => +0400.000000000000C03600000001FFFC .....
-	expected -4036.00000001FFFC0400000000000000 .....
-
-1 tests performed; 1 error found.
-Testing f16_to_ui32, rounding near_even, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui32, rounding near_even, exact.
-Testing f16_to_ui32, rounding minMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui32, rounding minMag, exact.
-Testing f16_to_ui32, rounding min, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui32, rounding min, exact.
-Testing f16_to_ui32, rounding max, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui32, rounding max, exact.
-Testing f16_to_ui32, rounding near_maxMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui32, rounding near_maxMag, exact.
-Testing f16_to_ui64, rounding near_even, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui64, rounding near_even, exact.
-Testing f16_to_ui64, rounding minMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui64, rounding minMag, exact.
-Testing f16_to_ui64, rounding min, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui64, rounding min, exact.
-Testing f16_to_ui64, rounding max, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui64, rounding max, exact.
-Testing f16_to_ui64, rounding near_maxMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_ui64, rounding near_maxMag, exact.
-Testing f16_to_i32, rounding near_even, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i32, rounding near_even, exact.
-Testing f16_to_i32, rounding minMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i32, rounding minMag, exact.
-Testing f16_to_i32, rounding min, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i32, rounding min, exact.
-Testing f16_to_i32, rounding max, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i32, rounding max, exact.
-Testing f16_to_i32, rounding near_maxMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i32, rounding near_maxMag, exact.
-Testing f16_to_i64, rounding near_even, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i64, rounding near_even, exact.
-Testing f16_to_i64, rounding minMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i64, rounding minMag, exact.
-Testing f16_to_i64, rounding min, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i64, rounding min, exact.
-Testing f16_to_i64, rounding max, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i64, rounding max, exact.
-Testing f16_to_i64, rounding near_maxMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_i64, rounding near_maxMag, exact.
-Testing f16_to_ui32_r_minMag, exact.
-Testing f16_to_ui64_r_minMag, exact.
-Testing f16_to_i32_r_minMag, exact.
-Testing f16_to_i64_r_minMag, exact.
-Testing f16_to_f32.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_f32.
-Testing f16_to_f64.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_to_f64.
-Testing f16_to_extF80.
-Testing f16_to_f128.
-Testing f16_roundToInt, rounding near_even, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_roundToInt, rounding near_even, exact.
-Testing f16_roundToInt, rounding minMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_roundToInt, rounding minMag, exact.
-Testing f16_roundToInt, rounding min, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_roundToInt, rounding min, exact.
-Testing f16_roundToInt, rounding max, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_roundToInt, rounding max, exact.
-Testing f16_roundToInt, rounding near_maxMag, exact.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_roundToInt, rounding near_maxMag, exact.
-Testing f16_sqrt, rounding near_even.
-
-408 tests total.
-
-408 tests performed.
-In 408 tests, no errors found in f16_sqrt, rounding near_even.
-Testing f32_to_ui32, rounding near_even, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui32, rounding near_even, exact.
-Testing f32_to_ui32, rounding minMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui32, rounding minMag, exact.
-Testing f32_to_ui32, rounding min, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui32, rounding min, exact.
-Testing f32_to_ui32, rounding max, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui32, rounding max, exact.
-Testing f32_to_ui32, rounding near_maxMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui32, rounding near_maxMag, exact.
-Testing f32_to_ui64, rounding near_even, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui64, rounding near_even, exact.
-Testing f32_to_ui64, rounding minMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui64, rounding minMag, exact.
-Testing f32_to_ui64, rounding min, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui64, rounding min, exact.
-Testing f32_to_ui64, rounding max, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui64, rounding max, exact.
-Testing f32_to_ui64, rounding near_maxMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_ui64, rounding near_maxMag, exact.
-Testing f32_to_i32, rounding near_even, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i32, rounding near_even, exact.
-Testing f32_to_i32, rounding minMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i32, rounding minMag, exact.
-Testing f32_to_i32, rounding min, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i32, rounding min, exact.
-Testing f32_to_i32, rounding max, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i32, rounding max, exact.
-Testing f32_to_i32, rounding near_maxMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i32, rounding near_maxMag, exact.
-Testing f32_to_i64, rounding near_even, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i64, rounding near_even, exact.
-Testing f32_to_i64, rounding minMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i64, rounding minMag, exact.
-Testing f32_to_i64, rounding min, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i64, rounding min, exact.
-Testing f32_to_i64, rounding max, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i64, rounding max, exact.
-Testing f32_to_i64, rounding near_maxMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_i64, rounding near_maxMag, exact.
-Testing f32_to_ui32_r_minMag, exact.
-Testing f32_to_ui64_r_minMag, exact.
-Testing f32_to_i32_r_minMag, exact.
-Testing f32_to_i64_r_minMag, exact.
-Testing f32_to_f16, rounding near_even, tininess before rounding.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_f16, rounding near_even, tininess before rounding.
-Testing f32_to_f16, rounding near_even, tininess after rounding.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_f16, rounding near_even, tininess after rounding.
-Testing f32_to_f64.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_to_f64.
-Testing f32_to_extF80.
-
-600 tests total.
-
-Errors found in f32_to_extF80:
--9F.7FFEEF
-	=> +0000.000000000000C01F .....  expected -401F.FFFEEF0000000000 .....
-
-1 tests performed; 1 error found.
-Testing f32_to_f128.
-
-600 tests total.
-
-Errors found in f32_to_f128:
-+7D.041FFF  => +0000.0000000000003FFD083FFE000000 .....
-	expected +3FFD.083FFE0000000000000000000000 .....
-
-1 tests performed; 1 error found.
-Testing f32_roundToInt, rounding near_even, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_roundToInt, rounding near_even, exact.
-Testing f32_roundToInt, rounding minMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_roundToInt, rounding minMag, exact.
-Testing f32_roundToInt, rounding min, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_roundToInt, rounding min, exact.
-Testing f32_roundToInt, rounding max, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_roundToInt, rounding max, exact.
-Testing f32_roundToInt, rounding near_maxMag, exact.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_roundToInt, rounding near_maxMag, exact.
-Testing f32_sqrt, rounding near_even.
-
-600 tests total.
-
-600 tests performed.
-In 600 tests, no errors found in f32_sqrt, rounding near_even.
-Testing f64_to_ui32, rounding near_even, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui32, rounding near_even, exact.
-Testing f64_to_ui32, rounding minMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui32, rounding minMag, exact.
-Testing f64_to_ui32, rounding min, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui32, rounding min, exact.
-Testing f64_to_ui32, rounding max, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui32, rounding max, exact.
-Testing f64_to_ui32, rounding near_maxMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui32, rounding near_maxMag, exact.
-Testing f64_to_ui64, rounding near_even, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui64, rounding near_even, exact.
-Testing f64_to_ui64, rounding minMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui64, rounding minMag, exact.
-Testing f64_to_ui64, rounding min, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui64, rounding min, exact.
-Testing f64_to_ui64, rounding max, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui64, rounding max, exact.
-Testing f64_to_ui64, rounding near_maxMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_ui64, rounding near_maxMag, exact.
-Testing f64_to_i32, rounding near_even, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i32, rounding near_even, exact.
-Testing f64_to_i32, rounding minMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i32, rounding minMag, exact.
-Testing f64_to_i32, rounding min, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i32, rounding min, exact.
-Testing f64_to_i32, rounding max, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i32, rounding max, exact.
-Testing f64_to_i32, rounding near_maxMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i32, rounding near_maxMag, exact.
-Testing f64_to_i64, rounding near_even, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i64, rounding near_even, exact.
-Testing f64_to_i64, rounding minMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i64, rounding minMag, exact.
-Testing f64_to_i64, rounding min, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i64, rounding min, exact.
-Testing f64_to_i64, rounding max, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i64, rounding max, exact.
-Testing f64_to_i64, rounding near_maxMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_i64, rounding near_maxMag, exact.
-Testing f64_to_ui32_r_minMag, exact.
-Testing f64_to_ui64_r_minMag, exact.
-Testing f64_to_i32_r_minMag, exact.
-Testing f64_to_i64_r_minMag, exact.
-Testing f64_to_f16, rounding near_even, tininess before rounding.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_f16, rounding near_even, tininess before rounding.
-Testing f64_to_f16, rounding near_even, tininess after rounding.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_f16, rounding near_even, tininess after rounding.
-Testing f64_to_f32, rounding near_even, tininess before rounding.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_f32, rounding near_even, tininess before rounding.
-Testing f64_to_f32, rounding near_even, tininess after rounding.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_to_f32, rounding near_even, tininess after rounding.
-Testing f64_to_extF80.
-
-768 tests total.
-
-Errors found in f64_to_extF80:
--388.FFFFFFFFFEFBF
-	=> -7800.000000000000BF88 .....  expected -3F88.FFFFFFFFFF7DF800 .....
-
-1 tests performed; 1 error found.
-Testing f64_to_f128.
-
-768 tests total.
-
-Errors found in f64_to_f128:
-+3E2.00001FBFFFFFF  => -7000.0000000000003FE200001FBFFFFF .....
-	expected +3FE2.00001FBFFFFFF000000000000000 .....
-
-1 tests performed; 1 error found.
-Testing f64_roundToInt, rounding near_even, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_roundToInt, rounding near_even, exact.
-Testing f64_roundToInt, rounding minMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_roundToInt, rounding minMag, exact.
-Testing f64_roundToInt, rounding min, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_roundToInt, rounding min, exact.
-Testing f64_roundToInt, rounding max, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_roundToInt, rounding max, exact.
-Testing f64_roundToInt, rounding near_maxMag, exact.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_roundToInt, rounding near_maxMag, exact.
-Testing f64_sqrt, rounding near_even.
-
-768 tests total.
-
-768 tests performed.
-In 768 tests, no errors found in f64_sqrt, rounding near_even.
-Testing extF80_to_ui32, rounding near_even, exact.
-Testing extF80_to_ui32, rounding minMag, exact.
-Testing extF80_to_ui32, rounding min, exact.
-Testing extF80_to_ui32, rounding max, exact.
-Testing extF80_to_ui32, rounding near_maxMag, exact.
-Testing extF80_to_ui64, rounding near_even, exact.
-Testing extF80_to_ui64, rounding minMag, exact.
-Testing extF80_to_ui64, rounding min, exact.
-Testing extF80_to_ui64, rounding max, exact.
-Testing extF80_to_ui64, rounding near_maxMag, exact.
-Testing extF80_to_i32, rounding near_even, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i32, rounding near_even, exact:
--0001.FFDDFFFFFFFFFFFF  => 80000000 v....  expected 00000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_to_i32, rounding minMag, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i32, rounding minMag, exact:
-+4010.FFFFC00100000000  => 00000000 ....x  expected 0003FFFF ....x
-
-4 tests performed; 1 error found.
-Testing extF80_to_i32, rounding min, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i32, rounding min, exact:
--4001.FEFFFFFFFFFFFBFF  => 80000000 v....  expected FFFFFFF8 ....x
-
-2 tests performed; 1 error found.
-Testing extF80_to_i32, rounding max, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i32, rounding max, exact:
--3FFF.FFFFFF0000080000  => 00000001 ....x  expected FFFFFFFF ....x
-
-1 tests performed; 1 error found.
-Testing extF80_to_i32, rounding near_maxMag, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i32, rounding near_maxMag, exact:
--38C2.8000020000000080  => 80000000 v....  expected 00000000 ....x
-
-2 tests performed; 1 error found.
-Testing extF80_to_i64, rounding near_even, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i64, rounding near_even, exact:
--2969.FFFFFEFFFBFFFFFE
-	=> 8000000000000000 v....  expected 0000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_to_i64, rounding minMag, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i64, rounding minMag, exact:
-+4005.803FFFFFFF7FFFFF
-	=> 8000000000000000 v....  expected 0000000000000040 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_to_i64, rounding min, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i64, rounding min, exact:
--0603.FFFFFFFF9FFFFFFF
-	=> 8000000000000000 v....  expected FFFFFFFFFFFFFFFF ....x
-
-1 tests performed; 1 error found.
-Testing extF80_to_i64, rounding max, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i64, rounding max, exact:
--4080.8007800000000000
-	=> 0000000000000001 ....x  expected 8000000000000000 v....
-
-2 tests performed; 1 error found.
-Testing extF80_to_i64, rounding near_maxMag, exact.
-
-912 tests total.
-
-Errors found in extF80_to_i64, rounding near_maxMag, exact:
--4016.8DC95F52FED40FC8
-	=> 8000000000000000 v....  expected FFFFFFFFFF7236A1 ....x
-
-4 tests performed; 1 error found.
-Testing extF80_to_ui32_r_minMag, exact.
-Testing extF80_to_ui64_r_minMag, exact.
-Testing extF80_to_i32_r_minMag, exact.
-Testing extF80_to_i64_r_minMag, exact.
-Testing extF80_to_f16, rounding near_even, tininess before rounding.
-Testing extF80_to_f16, rounding near_even, tininess after rounding.
-Testing extF80_to_f32, rounding near_even, tininess before rounding.
-
-912 tests total.
-
-Errors found in extF80_to_f32, rounding near_even, tininess before rounding:
-+4002.80200007FFFFFFFE  => +FF.400000 v....  expected +82.002000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_to_f32, rounding near_even, tininess after rounding.
-
-912 tests total.
-
-Errors found in extF80_to_f32, rounding near_even, tininess after rounding:
-+4005.FFFFFFE0001FFFFF  => +FF.400000 v....  expected +86.000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_to_f64, rounding near_even, tininess before rounding.
-
-912 tests total.
-
-Errors found in extF80_to_f64, rounding near_even, tininess before rounding:
-+3C01.FFFDFFFF80000000
-	=> +000.0000000000000 ...ux  expected +001.FFFBFFFF00000 .....
-
-1 tests performed; 1 error found.
-Testing extF80_to_f64, rounding near_even, tininess after rounding.
-
-912 tests total.
-
-Errors found in extF80_to_f64, rounding near_even, tininess after rounding:
-+4002.FFFFFFFFFFFF0008
-	=> +7FF.8000000000000 v....  expected +402.FFFFFFFFFFFE0 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_to_f128.
-
-912 tests total.
-
-Errors found in extF80_to_f128:
-+7ABE.80000FFFFFFFFFF7  => +0000.0000000000007FFF800000000000 v....
-	expected +7ABE.00001FFFFFFFFFEE000000000000 .....
-
-1 tests performed; 1 error found.
-Testing extF80_roundToInt, rounding near_even, exact.
-
-912 tests total.
-
-Errors found in extF80_roundToInt, rounding near_even, exact:
--3D85.FFDFFFFFFFFFBFFE
-	=> +0000.000000000000FFFF v....  expected -0000.0000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_roundToInt, rounding minMag, exact.
-
-912 tests total.
-
-Errors found in extF80_roundToInt, rounding minMag, exact:
--401C.FFFFF9FFFFFFFFFE
-	=> +0000.000000000000FFFF v....  expected -401C.FFFFF9FC00000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_roundToInt, rounding min, exact.
-
-912 tests total.
-
-Errors found in extF80_roundToInt, rounding min, exact:
-+3F81.FFFFFFFFFDDFFFFE
-	=> +0000.000000000000FFFF v....  expected +0000.0000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_roundToInt, rounding max, exact.
-
-912 tests total.
-
-Errors found in extF80_roundToInt, rounding max, exact:
--349C.FFFFFFFDFFFFFFFC
-	=> +0000.000000000000FFFF v....  expected -0000.0000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_roundToInt, rounding near_maxMag, exact.
-
-912 tests total.
-
-Errors found in extF80_roundToInt, rounding near_maxMag, exact:
-+403A.FFFFFFFEFFFFFDFE
-	=> +0000.000000000000FFFF v....  expected +403A.FFFFFFFEFFFFFE00 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_sqrt, precision 32, rounding near_even.
-
-912 tests total.
-
-Errors found in extF80_sqrt, precision 32, rounding near_even:
-+3FFB.800FFE0000000000
-	=> +0000.0000000000001FE7 ....x  expected +3FFD.8007FF0000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_sqrt, precision 64, rounding near_even.
-
-912 tests total.
-
-Errors found in extF80_sqrt, precision 64, rounding near_even:
--4AF3.E48BE55C338B96E5
-	=> +0000.000000000000FFFF v....  expected -7FFF.FFFFFFFFFFFFFFFF v....
-
-1 tests performed; 1 error found.
-Testing extF80_sqrt, precision 80, rounding near_even.
-
-912 tests total.
-
-Errors found in extF80_sqrt, precision 80, rounding near_even:
-+4003.8000000003FFFFFD
-	=> +0000.000000000000FFFF v....  expected +4001.8000000001FFFFFE ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_ui32, rounding near_even, exact.
-Testing f128_to_ui32, rounding minMag, exact.
-Testing f128_to_ui32, rounding min, exact.
-Testing f128_to_ui32, rounding max, exact.
-Testing f128_to_ui32, rounding near_maxMag, exact.
-Testing f128_to_ui64, rounding near_even, exact.
-
-936 tests total.
-
-Errors found in f128_to_ui64, rounding near_even, exact:
-+4080.00000000000080000000000007FF
-	=> 0000000000000000 ....x  expected FFFFFFFFFFFFFFFF v....
-
-1 tests performed; 1 error found.
-Testing f128_to_ui64, rounding minMag, exact.
-
-936 tests total.
-
-Errors found in f128_to_ui64, rounding minMag, exact:
--3FEC.FFFFFFFFFFFFFFFFFF80000001FF
-	=> FFFFFFFFFFFFFFFF v....  expected 0000000000000000 ....x
-
-2 tests performed; 1 error found.
-Testing f128_to_ui64, rounding min, exact.
-
-936 tests total.
-
-Errors found in f128_to_ui64, rounding min, exact:
--7FFE.0400000000000040000000000000
-	=> 0000000000000000 ....x  expected 0000000000000000 v....
-
-5 tests performed; 1 error found.
-Testing f128_to_ui64, rounding max, exact.
-
-936 tests total.
-
-Errors found in f128_to_ui64, rounding max, exact:
--4070.0000000004000000080000000000
-	=> 0000000000000001 ....x  expected 0000000000000000 v....
-
-4 tests performed; 1 error found.
-Testing f128_to_ui64, rounding near_maxMag, exact.
-
-936 tests total.
-
-Errors found in f128_to_ui64, rounding near_maxMag, exact:
--27B3.1C5ACEDF8F927769DC95EF2810A5
-	=> FFFFFFFFFFFFFFFF v....  expected 0000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_i32, rounding near_even, exact.
-
-936 tests total.
-
-Errors found in f128_to_i32, rounding near_even, exact:
-+408A.00000000020001FFFFFFFFFFFFFF  => 00000000 ....x  expected 7FFFFFFF v....
-
-1 tests performed; 1 error found.
-Testing f128_to_i32, rounding minMag, exact.
-
-936 tests total.
-
-Errors found in f128_to_i32, rounding minMag, exact:
-+3FFF.0000000000001FFFFFFFF7FFFFFF  => 00000000 ....x  expected 00000001 ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_i32, rounding min, exact.
-
-936 tests total.
-
-Errors found in f128_to_i32, rounding min, exact:
-+3EFF.1FFFFFFFFFFFFFFFFFFFFFFFFFFE  => 7FFFFFFF v....  expected 00000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_i32, rounding max, exact.
-
-936 tests total.
-
-Errors found in f128_to_i32, rounding max, exact:
-+3F38.003FFFFFFFFFFFFFFEFFFFFFFFFE  => 7FFFFFFF v....  expected 00000001 ....x
-
-2 tests performed; 1 error found.
-Testing f128_to_i32, rounding near_maxMag, exact.
-
-936 tests total.
-
-Errors found in f128_to_i32, rounding near_maxMag, exact:
-+3FFE.DBDDEB45B111767526204FC55847  => 7FFFFFFF v....  expected 00000001 ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_i64, rounding near_even, exact.
-
-936 tests total.
-
-Errors found in f128_to_i64, rounding near_even, exact:
-+3F81.7FFFFFFFFDFFFFFFFFFFFFFFFFFE
-	=> 7FFFFFFFFFFFFFFF v....  expected 0000000000000000 ....x
-
-2 tests performed; 1 error found.
-Testing f128_to_i64, rounding minMag, exact.
-
-936 tests total.
-
-Errors found in f128_to_i64, rounding minMag, exact:
-+3FFC.FFFFFFFFFFFFBFFFBFFFFFFFFFFF
-	=> FFFFFFFFFFFFFFFF ....x  expected 0000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_i64, rounding min, exact.
-
-936 tests total.
-
-Errors found in f128_to_i64, rounding min, exact:
--4CBA.000000000000008007FFFFFFFFFE
-	=> 0000000000000000 ....x  expected 8000000000000000 v....
-
-2 tests performed; 1 error found.
-Testing f128_to_i64, rounding max, exact.
-
-936 tests total.
-
-Errors found in f128_to_i64, rounding max, exact:
--3B9B.DD44B67959B70B5E2279FE1E3B8D
-	=> 0000000000000001 ....x  expected 0000000000000000 ....x
-
-2 tests performed; 1 error found.
-Testing f128_to_i64, rounding near_maxMag, exact.
-
-936 tests total.
-
-Errors found in f128_to_i64, rounding near_maxMag, exact:
--3FFB.0000080001FFFFFFFFFFFFFFFFFF
-	=> 7FFFFFFFFFFFFFFF v....  expected 0000000000000000 ....x
-
-2 tests performed; 1 error found.
-Testing f128_to_ui32_r_minMag, exact.
-Testing f128_to_ui64_r_minMag, exact.
-Testing f128_to_i32_r_minMag, exact.
-Testing f128_to_i64_r_minMag, exact.
-Testing f128_to_f16, rounding near_even, tininess before rounding.
-Testing f128_to_f16, rounding near_even, tininess after rounding.
-Testing f128_to_f32, rounding near_even, tininess before rounding.
-
-936 tests total.
-
-Errors found in f128_to_f32, rounding near_even, tininess before rounding:
--3FF2.FFFFFFFFFFFFFEFFFFF7FFFFFFFE
-	=> -FF.000000 ..o.x  expected -73.000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_f32, rounding near_even, tininess after rounding.
-
-936 tests total.
-
-Errors found in f128_to_f32, rounding near_even, tininess after rounding:
-+4005.000407FFFFFFFFFFFFFFFFFFFFFE
-	=> -FF.7FFFFF .....  expected +85.000204 ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_f64, rounding near_even, tininess before rounding.
-
-936 tests total.
-
-Errors found in f128_to_f64, rounding near_even, tininess before rounding:
--403D.FEFC000000000000000000000000
-	=> +000.0000000000000 ...ux  expected -43D.FEFC000000000 .....
-
-1 tests performed; 1 error found.
-Testing f128_to_f64, rounding near_even, tininess after rounding.
-
-936 tests total.
-
-Errors found in f128_to_f64, rounding near_even, tininess after rounding:
-+609B.FFFFFFFF000000000000003FFFFE
-	=> +000.0000000000000 ...ux  expected +7FF.0000000000000 ..o.x
-
-1 tests performed; 1 error found.
-Testing f128_to_extF80, rounding near_even, tininess before rounding.
-
-936 tests total.
-
-Errors found in f128_to_extF80, rounding near_even, tininess before rounding:
--3905.E695B832466AE04C1E31C2EF6F9E
-	=> +5C83.000000000000E04C ....x  expected -3905.F34ADC1923357026 ....x
-
-1 tests performed; 1 error found.
-Testing f128_to_extF80, rounding near_even, tininess after rounding.
-
-936 tests total.
-
-Errors found in f128_to_extF80, rounding near_even, tininess after rounding:
-+3F80.FFF9FFFFFFFFFFFFFFFFFFFFFFFF
-	=> -1FC0.000000000000FFFF .....  expected +3F80.FFFD000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_roundToInt, rounding near_even, exact.
-
-936 tests total.
-
-Errors found in f128_roundToInt, rounding near_even, exact:
--3F7E.000000004000000000000000007F  => +0000.0000000000000000000000000000 ....x
-	expected -0000.0000000000000000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_roundToInt, rounding minMag, exact.
-
-936 tests total.
-
-Errors found in f128_roundToInt, rounding minMag, exact:
-+0002.EACBC11D122BFE5E4A2F21399EBF  => +0002.EACBC11D122BFE5E4A2F21399EBF .....
-	expected +0000.0000000000000000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_roundToInt, rounding min, exact.
-
-936 tests total.
-
-Errors found in f128_roundToInt, rounding min, exact:
-+407E.4F04776B088F226593269B9C1166  => +0000.0000000000000000000000000000 ....x
-	expected +407E.4F04776B088F226593269B9C1166 .....
-
-1 tests performed; 1 error found.
-Testing f128_roundToInt, rounding max, exact.
-
-936 tests total.
-
-Errors found in f128_roundToInt, rounding max, exact:
--3FFF.000007FFFFFFFFDFFFFFFFFFFFFF  => -3FFF.000007FFFFFFFFDFFFFFFFFFFFFF .....
-	expected -3FFF.0000000000000000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_roundToInt, rounding near_maxMag, exact.
-
-936 tests total.
-
-Errors found in f128_roundToInt, rounding near_maxMag, exact:
--403D.000000001000000000000FFFFFFF  => +0000.0000000000000000000000000000 ....x
-	expected -403D.0000000010000000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing f128_sqrt, rounding near_even.
-
-936 tests total.
-
-Errors found in f128_sqrt, rounding near_even:
--43FE.FFFFFFC000000000000100000000  => +7FFF.ED1E30FFE73A1FF80000000061FF ....x
-	expected -7FFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFF v....
-
-1 tests performed; 1 error found.
-
-
-./fp-test -all2 -errors 1
-Testing f16_add, rounding near_even.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_add, rounding near_even.
-Testing f16_sub, rounding near_even.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_sub, rounding near_even.
-Testing f16_mul, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_mul, rounding near_even, tininess before rounding.
-Testing f16_mul, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_mul, rounding near_even, tininess after rounding.
-Testing f16_div, rounding near_even.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_div, rounding near_even.
-Testing f16_rem.
-Testing f16_eq.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_eq.
-Testing f16_le.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_le.
-Testing f16_lt.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_lt.
-Testing f16_eq_signaling.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_eq_signaling.
-Testing f16_le_quiet.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_le_quiet.
-Testing f16_lt_quiet.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f16_lt_quiet.
-Testing f32_add, rounding near_even.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_add, rounding near_even.
-Testing f32_sub, rounding near_even.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_sub, rounding near_even.
-Testing f32_mul, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_mul, rounding near_even, tininess before rounding.
-Testing f32_mul, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_mul, rounding near_even, tininess after rounding.
-Testing f32_div, rounding near_even.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_div, rounding near_even.
-Testing f32_rem.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_rem.
-Testing f32_eq.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_eq.
-Testing f32_le.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_le.
-Testing f32_lt.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_lt.
-Testing f32_eq_signaling.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_eq_signaling.
-Testing f32_le_quiet.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_le_quiet.
-Testing f32_lt_quiet.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f32_lt_quiet.
-Testing f64_add, rounding near_even.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_add, rounding near_even.
-Testing f64_sub, rounding near_even.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_sub, rounding near_even.
-Testing f64_mul, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_mul, rounding near_even, tininess before rounding.
-Testing f64_mul, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_mul, rounding near_even, tininess after rounding.
-Testing f64_div, rounding near_even.
-
-46464 tests total.
-
-  10000
-Errors found in f64_div, rounding near_even:
-+7FE.FFFFFFEFFBFFE  +480.0000007FFEFFE
-	=> +77D.FFFFFEEFFE00B ....x  expected +77D.FFFFFEEFFE00A ....x
-
-15469 tests performed; 1 error found.
-Testing f64_rem.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_rem.
-Testing f64_eq.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_eq.
-Testing f64_le.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_le.
-Testing f64_lt.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_lt.
-Testing f64_eq_signaling.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_eq_signaling.
-Testing f64_le_quiet.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_le_quiet.
-Testing f64_lt_quiet.
-
-46464 tests total.
-
-  10000
-  20000
-  30000
-  40000
-46464 tests performed.
-In 46464 tests, no errors found in f64_lt_quiet.
-Testing extF80_add, precision 32, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_add, precision 32, rounding near_even, tininess before rounding:
--4015.81000000003FFFFF  -4004.BE9D91BC33D9E829
-	=> +0000.000000000000FFFF v....  expected -4015.81005F0000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_add, precision 32, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_add, precision 32, rounding near_even, tininess after rounding:
--4002.FFF0000000010000  +4006.FFFFF8000000007F
-	=> +0000.000000000000FFFF v....  expected +4006.F000F80000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_add, precision 64, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_add, precision 64, rounding near_even, tininess before rounding:
--3B08.80001FFFFFFFFFFC  -4004.FFFFBFFFFFF00000
-	=> +0000.000000000000FFFF v....  expected -4004.FFFFBFFFFFF00000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_add, precision 64, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_add, precision 64, rounding near_even, tininess after rounding:
-+3C00.FFFFFF3FFFFFFFFE  +4001.F7FFFFFFFFFE0000
-	=> +0000.000000000000FFFF v....  expected +4001.F7FFFFFFFFFE0000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_add, precision 80, rounding near_even.
-
-46464 tests total.
-
-Errors found in extF80_add, precision 80, rounding near_even:
--3BFF.C8F98DA74B7F0494  +3C01.92E0F8D071CC39C0
-	=> +0000.000000000000FFFF v....  expected +3C00.C1452ACD3DD8F136 .....
-
-1 tests performed; 1 error found.
-Testing extF80_sub, precision 32, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_sub, precision 32, rounding near_even, tininess before rounding:
--3CE4.820000000000007F  -4003.AAF5E1DD492AD6D7
-	=> +0000.000000000000FFFF v....  expected +4003.AAF5E20000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_sub, precision 32, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_sub, precision 32, rounding near_even, tininess after rounding:
-+4000.FFFFFFC7FFFFFFFF  -41C9.CADB9ABCA8D47DE7
-	=> +0000.000000000000FFFF v....  expected +41C9.CADB9B0000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_sub, precision 64, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_sub, precision 64, rounding near_even, tininess before rounding:
-+7FFE.800040000000FFFF  -403C.FEFFFFFFFFFFFDFE
-	=> +0000.000000000000FFFF v....  expected +7FFE.8000400000010000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_sub, precision 64, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_sub, precision 64, rounding near_even, tininess after rounding:
--3FFD.92BD936994658CEC  +3E1F.FFFFFFF000000FFF
-	=> +0000.000000000000FFFF v....  expected -3FFD.92BD936994659000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_sub, precision 80, rounding near_even.
-
-46464 tests total.
-
-Errors found in extF80_sub, precision 80, rounding near_even:
--3F7F.A37BDA8A84245595  +4000.C784770517E09A7D
-	=> +0000.000000000000FFFF v....  expected -4000.C784770517E09A7D ....x
-
-1 tests performed; 1 error found.
-Testing extF80_mul, precision 32, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_mul, precision 32, rounding near_even, tininess before rounding:
--4030.800000010FFFFFFE  -3F64.800000001FFFFFDF
-	=> +0000.000000000000FFFF v....  expected +3F95.8000000000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_mul, precision 32, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_mul, precision 32, rounding near_even, tininess after rounding:
-+0001.800000003DFFFFFF  +3C00.8000080000100000
-	=> +0000.000000000000FFFF v....  expected +0000.0000000000000000 ...ux
-
-1 tests performed; 1 error found.
-Testing extF80_mul, precision 64, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_mul, precision 64, rounding near_even, tininess before rounding:
--3F66.F9B146142FB39AE9  -401C.C220F69785D21065
-	=> +0000.000000000000FFFF v....  expected +3F84.BD587DC83219C800 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_mul, precision 64, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_mul, precision 64, rounding near_even, tininess after rounding:
-+3F80.8000FFFFFEFFFFFF  -4001.98D85F0D72C68624
-	=> +0000.000000000000FFFF v....  expected -3F82.98D990BE2FAFB800 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_mul, precision 80, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_mul, precision 80, rounding near_even, tininess before rounding:
-+4000.8810000000000000  +4400.A497C976A72E00BA
-	=> +0000.000000000000FFFF v....  expected +4401.AEF5D9074075C686 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_mul, precision 80, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_mul, precision 80, rounding near_even, tininess after rounding:
-+40BA.D7BF9337CC05FD53  +3C00.80000000000007FE
-	=> +0000.000000000000FFFF v....  expected +3CBB.D7BF9337CC060ACC ....x
-
-1 tests performed; 1 error found.
-Testing extF80_div, precision 32, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_div, precision 32, rounding near_even, tininess before rounding:
-+4001.E000000000000FFE  +403C.FFFFEFFFFFFFFF80
-	=> +0000.000000000000FFFF v....  expected +3FC3.E0000E0000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_div, precision 32, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_div, precision 32, rounding near_even, tininess after rounding:
-+401C.EDB32254DADC2C99  +3F75.E0B99F6AA81C34CC
-	=> +0000.000000000000FFFF v....  expected +40A6.8763E20000000000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_div, precision 64, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in extF80_div, precision 64, rounding near_even, tininess before rounding:
--3E8F.FFFFFF0000080000  -0002.8000000100000001
-	=> +0000.000000000000FFFF v....  expected +7E8C.FFFFFEFE00080000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_div, precision 64, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in extF80_div, precision 64, rounding near_even, tininess after rounding:
--43FE.9D44667A7000EAD3  +401F.8003FFFBFFFFFFFE
-	=> +0000.000000000000FFFF v....  expected -43DE.9D3F7C8375E12000 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_div, precision 80, rounding near_even.
-
-46464 tests total.
-
-Errors found in extF80_div, precision 80, rounding near_even:
--7FFE.8000000000000106  -403D.FFBC000000000000
-	=> +0000.000000000000FFFF v....  expected +7FBF.8022090A66C34CE6 ....x
-
-1 tests performed; 1 error found.
-Testing extF80_rem.
-
-46464 tests total.
-
-Errors found in extF80_rem:
-+7FFE.8400000000400000  -403C.8000600000000000
-	=> +403E.0000000000008000 .....  expected -403A.F39D000000000000 .....
-
-1 tests performed; 1 error found.
-Testing extF80_eq.
-
-46464 tests total.
-
-Errors found in extF80_eq:
-+39C2.FFFFFFFFFEFFFFDF  +4006.FC926A1083604304  => 0 v....  expected 0 .....
-
-1 tests performed; 1 error found.
-Testing extF80_le.
-
-46464 tests total.
-
-Errors found in extF80_le:
-+3FC8.FFFFFFFFFFFFFFFE  +6A14.8D99437CC95C3F5E  => 0 v....  expected 1 .....
-
-1 tests performed; 1 error found.
-Testing extF80_lt.
-
-46464 tests total.
-
-Errors found in extF80_lt:
-+444C.80001FFFFFEFFFFE  -3161.FFFFFFFFFC0FFFFE  => 0 v....  expected 0 .....
-
-1 tests performed; 1 error found.
-Testing extF80_eq_signaling.
-
-46464 tests total.
-
-Errors found in extF80_eq_signaling:
-+38CB.FEFFFFFFFFFFBFFF  -43FF.80000000007FEFFF  => 0 v....  expected 0 .....
-
-1 tests performed; 1 error found.
-Testing extF80_le_quiet.
-
-46464 tests total.
-
-Errors found in extF80_le_quiet:
--3F80.81FFFFFBFFFFFFFF  +4013.80FEFFFFFFFFFFFE  => 0 v....  expected 1 .....
-
-1 tests performed; 1 error found.
-Testing extF80_lt_quiet.
-
-46464 tests total.
-
-Errors found in extF80_lt_quiet:
-+4080.80000003FFFFFFFE  +0000.000FFFFFFFFF7FFF  => 0 v....  expected 0 .....
-
-1 tests performed; 1 error found.
-Testing f128_add, rounding near_even.
-
-46464 tests total.
-
-Errors found in f128_add, rounding near_even:
-+4003.3D7CA128D17828B3E96B11240AAF  -49E0.FFFFFFFFFFFFFFFFFFFEFFFFF7FF
-	=> -49E0.FFFFFFFFFFFFFFFFFFFEFFFFF7FF .....
-	expected -49E0.FFFFFFFFFFFFFFFFFFFEFFFFF7FF ....x
-
-1 tests performed; 1 error found.
-Testing f128_sub, rounding near_even.
-
-46464 tests total.
-
-Errors found in f128_sub, rounding near_even:
-+7FFD.FFFFFFFFFFFFFFEFFFFFFFFF7FFF  +3FFE.FFFFFFFFFFFFFFF7DFFFFFFFFFFF
-	=> +407F.01FFFFFFFFFF7FF7DE000000007F ....x
-	expected +7FFD.FFFFFFFFFFFFFFEFFFFFFFFF7FFF ....x
-
-1 tests performed; 1 error found.
-Testing f128_mul, rounding near_even, tininess before rounding.
-
-46464 tests total.
-
-Errors found in f128_mul, rounding near_even, tininess before rounding:
--4003.87801299A41C48629BCBCCDCEE75  -3F65.FFFFBFFFFFFEFFFFFFFFFFFFFFFF
-	=> -3F65.FFFFBFFFFFFEFFFFFFFFFFFFFFFF .....
-	expected +3F6A.877FE1A9A1C8501F0972A75550A7 ....x
-
-1 tests performed; 1 error found.
-Testing f128_mul, rounding near_even, tininess after rounding.
-
-46464 tests total.
-
-Errors found in f128_mul, rounding near_even, tininess after rounding:
-+3FFB.FFFF0000000000000000000007FF  -4AF9.CD3F1616A1B2E16E8ECFE44AB7E3
-	=> -0E46.4A975ECC90CEA14B8EAA8005E8BE ....x
-	expected -4AF6.CD3E2F7716A790951E189CE2CCF2 ....x
-
-1 tests performed; 1 error found.
-Testing f128_div, rounding near_even.
-
-46464 tests total.
-
-Errors found in f128_div, rounding near_even:
-+3BFF.0000000000000000000004001FFF  -3FD8.0004000003FFFFFFFFFFFFFFFFFF
-	=> -3FD8.0004000003FFFFFFFFFFFFFFFFFF .....
-	expected -3C25.FFF8001FF78041FE78282657ACC1 ....x
-
-1 tests performed; 1 error found.
-Testing f128_rem.
-
-46464 tests total.
-
-Errors found in f128_rem:
--3FFB.FFFFFFFFFFFFBFFFFFFFFFFFFFF7  +4001.FFFFFFFFFFF7FFFFBFFFFFFFFFFF
-	=> +4001.FFFFFFFFFFF7FFFFBFFFFFFFFFFF .....
-	expected -3FFB.FFFFFFFFFFFFBFFFFFFFFFFFFFF7 .....
-
-1 tests performed; 1 error found.
-Testing f128_eq.
-
-46464 tests total.
-
-Errors found in f128_eq:
-+407F.000000003FFFFFFF000000000000  +4080.FFFFFFFFFFFFF7FFFFFFFFFFFFC0
-	=> 0 v....  expected 0 .....
-
-69 tests performed; 1 error found.
-Testing f128_le.
-
-46464 tests total.
-
-Errors found in f128_le:
-+3562.F92FC606839A91DE4E432E5B76BD  +3F80.FFBFFFFFFFFFFFFFFFFFFFFFFFFE
-	=> 0 v....  expected 1 .....
-
-3 tests performed; 1 error found.
-Testing f128_lt.
-
-46464 tests total.
-
-Errors found in f128_lt:
--4070.008000000000000000000000FFFE  +407E.FFFFFFFFFFFFFFF000000007FFFE
-	=> 0 .....  expected 1 .....
-
-1 tests performed; 1 error found.
-Testing f128_eq_signaling.
-
-46464 tests total.
-
-Errors found in f128_eq_signaling:
--3E25.FFFFFDFFFFFFFFFFFFFFFFFFFDFF  +21BE.A2F25F3E05B214685C99F23722DE
-	=> 0 v....  expected 0 .....
-
-1 tests performed; 1 error found.
-Testing f128_le_quiet.
-
-46464 tests total.
-
-Errors found in f128_le_quiet:
--43FE.DF51357B00807226877347461639  -3FE2.FFFFFFFFFFFFFF7F800000000000
-	=> 0 .....  expected 1 .....
-
-1 tests performed; 1 error found.
-Testing f128_lt_quiet.
-
-46464 tests total.
-
-Errors found in f128_lt_quiet:
-+0000.0000000000000000000000000000  +43FF.FFFFBFFFEFFFFFFFFFFFFFFFFFFF
-	=> 0 .....  expected 1 .....
-
-2 tests performed; 1 error found.
+ configure              |    2 +
+ tests/fp/platform.h    |   41 ++
+ tests/fp/fp-test.c     | 1052 ++++++++++++++++++++++++++++++++++++++++
+ tests/fp/wrap.inc.c    |  599 +++++++++++++++++++++++
+ tests/Makefile.include |    3 +
+ tests/fp/.gitignore    |    1 +
+ tests/fp/Makefile      |  589 ++++++++++++++++++++++
+ 7 files changed, 2287 insertions(+)
+ create mode 100644 tests/fp/platform.h
+ create mode 100644 tests/fp/fp-test.c
+ create mode 100644 tests/fp/wrap.inc.c
+ create mode 100644 tests/fp/.gitignore
+ create mode 100644 tests/fp/Makefile
+
+diff --git a/configure b/configure
+index 58862d2ae8..b02da8c0b4 100755
+--- a/configure
++++ b/configure
+@@ -7451,12 +7451,14 @@ fi
+ 
+ # build tree in object directory in case the source is not in the current directory
+ DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
++DIRS="$DIRS tests/fp"
+ DIRS="$DIRS docs docs/interop fsdev scsi"
+ DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
+ DIRS="$DIRS roms/seabios roms/vgabios"
+ FILES="Makefile tests/tcg/Makefile qdict-test-data.txt"
+ FILES="$FILES tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
+ FILES="$FILES tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
++FILES="$FILES tests/fp/Makefile"
+ FILES="$FILES pc-bios/optionrom/Makefile pc-bios/keymaps"
+ FILES="$FILES pc-bios/spapr-rtas/Makefile"
+ FILES="$FILES pc-bios/s390-ccw/Makefile"
+diff --git a/tests/fp/platform.h b/tests/fp/platform.h
+new file mode 100644
+index 0000000000..80af8a94b6
+--- /dev/null
++++ b/tests/fp/platform.h
+@@ -0,0 +1,41 @@
++#ifndef QEMU_TESTFLOAT_PLATFORM_H
++#define QEMU_TESTFLOAT_PLATFORM_H
++/*
++ * Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
++ * California.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *
++ *  1. Redistributions of source code must retain the above copyright notice,
++ *     this list of conditions, and the following disclaimer.
++ *
++ *  2. Redistributions in binary form must reproduce the above copyright notice,
++ *     this list of conditions, and the following disclaimer in the documentation
++ *     and/or other materials provided with the distribution.
++ *
++ *  3. Neither the name of the University nor the names of its contributors may
++ *     be used to endorse or promote products derived from this software without
++ *     specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
++ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++#include "config-host.h"
++
++#ifndef HOST_WORDS_BIGENDIAN
++#define LITTLEENDIAN 1
++/* otherwise do not define it */
++#endif
++
++#define INLINE static inline
++
++#endif /* QEMU_TESTFLOAT_PLATFORM_H */
+diff --git a/tests/fp/fp-test.c b/tests/fp/fp-test.c
+new file mode 100644
+index 0000000000..58405fdd89
+--- /dev/null
++++ b/tests/fp/fp-test.c
+@@ -0,0 +1,1052 @@
++/*
++ * fp-test.c - test QEMU's softfloat implementation using Berkeley's Testfloat
++ *
++ * Derived from testfloat/source/testsoftfloat.c.
++ *
++ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
++ * Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 The Regents of the
++ * University of California.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *
++ *  1. Redistributions of source code must retain the above copyright notice,
++ *     this list of conditions, and the following disclaimer.
++ *
++ *  2. Redistributions in binary form must reproduce the above copyright notice,
++ *     this list of conditions, and the following disclaimer in the
++ *     documentation and/or other materials provided with the distribution.
++ *
++ *  3. Neither the name of the University nor the names of its contributors may
++ *     be used to endorse or promote products derived from this software without
++ *     specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
++ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
++ * DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++#ifndef HW_POISON_H
++#error Must define HW_POISON_H to work around TARGET_* poisoning
++#endif
++
++#include "qemu/osdep.h"
++#include "qemu/cutils.h"
++#include <math.h>
++#include "fpu/softfloat.h"
++#include "platform.h"
++
++#include "fail.h"
++#include "slowfloat.h"
++#include "functions.h"
++#include "genCases.h"
++#include "verCases.h"
++#include "writeCase.h"
++#include "testLoops.h"
++
++/* keep most code separate to make tracking upstream changes more easily */
++#include "wrap.inc.c"
++
++enum {
++    EXACT_FALSE = 1,
++    EXACT_TRUE
++};
++
++static void catchSIGINT(int signalCode)
++{
++    if (verCases_stop) {
++        exit(EXIT_FAILURE);
++    }
++    verCases_stop = true;
++}
++
++static void
++testFunctionInstance(int functionCode, uint_fast8_t roundingMode, bool exact)
++{
++    float16_t (*trueFunction_abz_f16)(float16_t, float16_t);
++    float16_t (*subjFunction_abz_f16)(float16_t, float16_t);
++    bool (*trueFunction_ab_f16_z_bool)(float16_t, float16_t);
++    bool (*subjFunction_ab_f16_z_bool)(float16_t, float16_t);
++    float32_t (*trueFunction_abz_f32)(float32_t, float32_t);
++    float32_t (*subjFunction_abz_f32)(float32_t, float32_t);
++    bool (*trueFunction_ab_f32_z_bool)(float32_t, float32_t);
++    bool (*subjFunction_ab_f32_z_bool)(float32_t, float32_t);
++    float64_t (*trueFunction_abz_f64)(float64_t, float64_t);
++    float64_t (*subjFunction_abz_f64)(float64_t, float64_t);
++    bool (*trueFunction_ab_f64_z_bool)(float64_t, float64_t);
++    bool (*subjFunction_ab_f64_z_bool)(float64_t, float64_t);
++    void (*trueFunction_abz_extF80M)(
++        const extFloat80_t *, const extFloat80_t *, extFloat80_t *);
++    void (*subjFunction_abz_extF80M)(
++        const extFloat80_t *, const extFloat80_t *, extFloat80_t *);
++    bool (*trueFunction_ab_extF80M_z_bool)(
++        const extFloat80_t *, const extFloat80_t *);
++    bool (*subjFunction_ab_extF80M_z_bool)(
++        const extFloat80_t *, const extFloat80_t *);
++    void (*trueFunction_abz_f128M)(
++        const float128_t *, const float128_t *, float128_t *);
++    void (*subjFunction_abz_f128M)(
++        const float128_t *, const float128_t *, float128_t *);
++    bool (*trueFunction_ab_f128M_z_bool)(
++        const float128_t *, const float128_t *);
++    bool (*subjFunction_ab_f128M_z_bool)(
++        const float128_t *, const float128_t *);
++
++    fputs("Testing ", stderr);
++    verCases_writeFunctionName(stderr);
++    fputs(".\n", stderr);
++
++    switch (functionCode) {
++        /*--------------------------------------------------------------------
++         *--------------------------------------------------------------------*/
++    case UI32_TO_F16:
++        test_a_ui32_z_f16(slow_ui32_to_f16, qemu_ui32_to_f16);
++        break;
++    case UI32_TO_F32:
++        test_a_ui32_z_f32(slow_ui32_to_f32, qemu_ui32_to_f32);
++        break;
++    case UI32_TO_F64:
++        test_a_ui32_z_f64(slow_ui32_to_f64, qemu_ui32_to_f64);
++        break;
++    case UI32_TO_EXTF80:
++        /* not implemented */
++        break;
++    case UI32_TO_F128:
++        /* not implemented */
++        break;
++    case UI64_TO_F16:
++        test_a_ui64_z_f16(slow_ui64_to_f16, qemu_ui64_to_f16);
++        break;
++    case UI64_TO_F32:
++        test_a_ui64_z_f32(slow_ui64_to_f32, qemu_ui64_to_f32);
++        break;
++    case UI64_TO_F64:
++        test_a_ui64_z_f64(slow_ui64_to_f64, qemu_ui64_to_f64);
++        break;
++    case UI64_TO_EXTF80:
++        /* not implemented */
++        break;
++    case UI64_TO_F128:
++        test_a_ui64_z_f128(slow_ui64_to_f128M, qemu_ui64_to_f128M);
++        break;
++    case I32_TO_F16:
++        test_a_i32_z_f16(slow_i32_to_f16, qemu_i32_to_f16);
++        break;
++    case I32_TO_F32:
++        test_a_i32_z_f32(slow_i32_to_f32, qemu_i32_to_f32);
++        break;
++    case I32_TO_F64:
++        test_a_i32_z_f64(slow_i32_to_f64, qemu_i32_to_f64);
++        break;
++    case I32_TO_EXTF80:
++        test_a_i32_z_extF80(slow_i32_to_extF80M, qemu_i32_to_extF80M);
++        break;
++    case I32_TO_F128:
++        test_a_i32_z_f128(slow_i32_to_f128M, qemu_i32_to_f128M);
++        break;
++    case I64_TO_F16:
++        test_a_i64_z_f16(slow_i64_to_f16, qemu_i64_to_f16);
++        break;
++    case I64_TO_F32:
++        test_a_i64_z_f32(slow_i64_to_f32, qemu_i64_to_f32);
++        break;
++    case I64_TO_F64:
++        test_a_i64_z_f64(slow_i64_to_f64, qemu_i64_to_f64);
++        break;
++    case I64_TO_EXTF80:
++        test_a_i64_z_extF80(slow_i64_to_extF80M, qemu_i64_to_extF80M);
++        break;
++    case I64_TO_F128:
++        test_a_i64_z_f128(slow_i64_to_f128M, qemu_i64_to_f128M);
++        break;
++        /*--------------------------------------------------------------------
++         *--------------------------------------------------------------------*/
++    case F16_TO_UI32:
++        test_a_f16_z_ui32_rx(
++        slow_f16_to_ui32, qemu_f16_to_ui32, roundingMode, exact);
++        break;
++    case F16_TO_UI64:
++        test_a_f16_z_ui64_rx(
++        slow_f16_to_ui64, qemu_f16_to_ui64, roundingMode, exact);
++        break;
++    case F16_TO_I32:
++        test_a_f16_z_i32_rx(
++        slow_f16_to_i32, qemu_f16_to_i32, roundingMode, exact);
++        break;
++    case F16_TO_I64:
++        test_a_f16_z_i64_rx(
++        slow_f16_to_i64, qemu_f16_to_i64, roundingMode, exact);
++        break;
++    case F16_TO_UI32_R_MINMAG:
++        /* not implemented */
++        break;
++    case F16_TO_UI64_R_MINMAG:
++        /* not implemented */
++        break;
++    case F16_TO_I32_R_MINMAG:
++        /* not implemented */
++        break;
++    case F16_TO_I64_R_MINMAG:
++        /* not implemented */
++        break;
++    case F16_TO_F32:
++        test_a_f16_z_f32(slow_f16_to_f32, qemu_f16_to_f32);
++        break;
++    case F16_TO_F64:
++        test_a_f16_z_f64(slow_f16_to_f64, qemu_f16_to_f64);
++        break;
++    case F16_TO_EXTF80:
++        /* not implemented */
++        break;
++    case F16_TO_F128:
++        /* not implemented */
++        break;
++    case F16_ROUNDTOINT:
++        test_az_f16_rx(
++        slow_f16_roundToInt, qemu_f16_roundToInt, roundingMode, exact);
++        break;
++    case F16_ADD:
++        trueFunction_abz_f16 = slow_f16_add;
++        subjFunction_abz_f16 = qemu_f16_add;
++        goto test_abz_f16;
++    case F16_SUB:
++        trueFunction_abz_f16 = slow_f16_sub;
++        subjFunction_abz_f16 = qemu_f16_sub;
++        goto test_abz_f16;
++    case F16_MUL:
++        trueFunction_abz_f16 = slow_f16_mul;
++        subjFunction_abz_f16 = qemu_f16_mul;
++        goto test_abz_f16;
++    case F16_DIV:
++        trueFunction_abz_f16 = slow_f16_div;
++        subjFunction_abz_f16 = qemu_f16_div;
++        goto test_abz_f16;
++    case F16_REM:
++        /* not implemented */
++        break;
++    test_abz_f16:
++        test_abz_f16(trueFunction_abz_f16, subjFunction_abz_f16);
++        break;
++    case F16_MULADD:
++        test_abcz_f16(slow_f16_mulAdd, qemu_f16_mulAdd);
++        break;
++    case F16_SQRT:
++        test_az_f16(slow_f16_sqrt, qemu_f16_sqrt);
++        break;
++    case F16_EQ:
++        trueFunction_ab_f16_z_bool = slow_f16_eq;
++        subjFunction_ab_f16_z_bool = qemu_f16_eq;
++        goto test_ab_f16_z_bool;
++    case F16_LE:
++        trueFunction_ab_f16_z_bool = slow_f16_le;
++        subjFunction_ab_f16_z_bool = qemu_f16_le;
++        goto test_ab_f16_z_bool;
++    case F16_LT:
++        trueFunction_ab_f16_z_bool = slow_f16_lt;
++        subjFunction_ab_f16_z_bool = qemu_f16_lt;
++        goto test_ab_f16_z_bool;
++    case F16_EQ_SIGNALING:
++        trueFunction_ab_f16_z_bool = slow_f16_eq_signaling;
++        subjFunction_ab_f16_z_bool = qemu_f16_eq_signaling;
++        goto test_ab_f16_z_bool;
++    case F16_LE_QUIET:
++        trueFunction_ab_f16_z_bool = slow_f16_le_quiet;
++        subjFunction_ab_f16_z_bool = qemu_f16_le_quiet;
++        goto test_ab_f16_z_bool;
++    case F16_LT_QUIET:
++        trueFunction_ab_f16_z_bool = slow_f16_lt_quiet;
++        subjFunction_ab_f16_z_bool = qemu_f16_lt_quiet;
++    test_ab_f16_z_bool:
++        test_ab_f16_z_bool(
++        trueFunction_ab_f16_z_bool, subjFunction_ab_f16_z_bool);
++        break;
++        /*--------------------------------------------------------------------
++         *--------------------------------------------------------------------*/
++    case F32_TO_UI32:
++        test_a_f32_z_ui32_rx(
++        slow_f32_to_ui32, qemu_f32_to_ui32, roundingMode, exact);
++        break;
++    case F32_TO_UI64:
++        test_a_f32_z_ui64_rx(
++        slow_f32_to_ui64, qemu_f32_to_ui64, roundingMode, exact);
++        break;
++    case F32_TO_I32:
++        test_a_f32_z_i32_rx(
++        slow_f32_to_i32, qemu_f32_to_i32, roundingMode, exact);
++        break;
++    case F32_TO_I64:
++        test_a_f32_z_i64_rx(
++        slow_f32_to_i64, qemu_f32_to_i64, roundingMode, exact);
++        break;
++    case F32_TO_UI32_R_MINMAG:
++        /* not implemented */
++        break;
++    case F32_TO_UI64_R_MINMAG:
++        /* not implemented */
++        break;
++    case F32_TO_I32_R_MINMAG:
++        /* not implemented */
++        break;
++    case F32_TO_I64_R_MINMAG:
++        /* not implemented */
++        break;
++    case F32_TO_F16:
++        test_a_f32_z_f16(slow_f32_to_f16, qemu_f32_to_f16);
++        break;
++    case F32_TO_F64:
++        test_a_f32_z_f64(slow_f32_to_f64, qemu_f32_to_f64);
++        break;
++    case F32_TO_EXTF80:
++        test_a_f32_z_extF80(slow_f32_to_extF80M, qemu_f32_to_extF80M);
++        break;
++    case F32_TO_F128:
++        test_a_f32_z_f128(slow_f32_to_f128M, qemu_f32_to_f128M);
++        break;
++    case F32_ROUNDTOINT:
++        test_az_f32_rx(
++        slow_f32_roundToInt, qemu_f32_roundToInt, roundingMode, exact);
++        break;
++    case F32_ADD:
++        trueFunction_abz_f32 = slow_f32_add;
++        subjFunction_abz_f32 = qemu_f32_add;
++        goto test_abz_f32;
++    case F32_SUB:
++        trueFunction_abz_f32 = slow_f32_sub;
++        subjFunction_abz_f32 = qemu_f32_sub;
++        goto test_abz_f32;
++    case F32_MUL:
++        trueFunction_abz_f32 = slow_f32_mul;
++        subjFunction_abz_f32 = qemu_f32_mul;
++        goto test_abz_f32;
++    case F32_DIV:
++        trueFunction_abz_f32 = slow_f32_div;
++        subjFunction_abz_f32 = qemu_f32_div;
++        goto test_abz_f32;
++    case F32_REM:
++        trueFunction_abz_f32 = slow_f32_rem;
++        subjFunction_abz_f32 = qemu_f32_rem;
++    test_abz_f32:
++        test_abz_f32(trueFunction_abz_f32, subjFunction_abz_f32);
++        break;
++    case F32_MULADD:
++        test_abcz_f32(slow_f32_mulAdd, qemu_f32_mulAdd);
++        break;
++    case F32_SQRT:
++        test_az_f32(slow_f32_sqrt, qemu_f32_sqrt);
++        break;
++    case F32_EQ:
++        trueFunction_ab_f32_z_bool = slow_f32_eq;
++        subjFunction_ab_f32_z_bool = qemu_f32_eq;
++        goto test_ab_f32_z_bool;
++    case F32_LE:
++        trueFunction_ab_f32_z_bool = slow_f32_le;
++        subjFunction_ab_f32_z_bool = qemu_f32_le;
++        goto test_ab_f32_z_bool;
++    case F32_LT:
++        trueFunction_ab_f32_z_bool = slow_f32_lt;
++        subjFunction_ab_f32_z_bool = qemu_f32_lt;
++        goto test_ab_f32_z_bool;
++    case F32_EQ_SIGNALING:
++        trueFunction_ab_f32_z_bool = slow_f32_eq_signaling;
++        subjFunction_ab_f32_z_bool = qemu_f32_eq_signaling;
++        goto test_ab_f32_z_bool;
++    case F32_LE_QUIET:
++        trueFunction_ab_f32_z_bool = slow_f32_le_quiet;
++        subjFunction_ab_f32_z_bool = qemu_f32_le_quiet;
++        goto test_ab_f32_z_bool;
++    case F32_LT_QUIET:
++        trueFunction_ab_f32_z_bool = slow_f32_lt_quiet;
++        subjFunction_ab_f32_z_bool = qemu_f32_lt_quiet;
++    test_ab_f32_z_bool:
++        test_ab_f32_z_bool(
++        trueFunction_ab_f32_z_bool, subjFunction_ab_f32_z_bool);
++        break;
++        /*--------------------------------------------------------------------
++         *--------------------------------------------------------------------*/
++    case F64_TO_UI32:
++        test_a_f64_z_ui32_rx(
++        slow_f64_to_ui32, qemu_f64_to_ui32, roundingMode, exact);
++        break;
++    case F64_TO_UI64:
++        test_a_f64_z_ui64_rx(
++        slow_f64_to_ui64, qemu_f64_to_ui64, roundingMode, exact);
++        break;
++    case F64_TO_I32:
++        test_a_f64_z_i32_rx(
++        slow_f64_to_i32, qemu_f64_to_i32, roundingMode, exact);
++        break;
++    case F64_TO_I64:
++        test_a_f64_z_i64_rx(
++        slow_f64_to_i64, qemu_f64_to_i64, roundingMode, exact);
++        break;
++    case F64_TO_UI32_R_MINMAG:
++        /* not implemented */
++        break;
++    case F64_TO_UI64_R_MINMAG:
++        /* not implemented */
++        break;
++    case F64_TO_I32_R_MINMAG:
++        /* not implemented */
++        break;
++    case F64_TO_I64_R_MINMAG:
++        /* not implemented */
++        break;
++    case F64_TO_F16:
++        test_a_f64_z_f16(slow_f64_to_f16, qemu_f64_to_f16);
++        break;
++    case F64_TO_F32:
++        test_a_f64_z_f32(slow_f64_to_f32, qemu_f64_to_f32);
++        break;
++    case F64_TO_EXTF80:
++        test_a_f64_z_extF80(slow_f64_to_extF80M, qemu_f64_to_extF80M);
++        break;
++    case F64_TO_F128:
++        test_a_f64_z_f128(slow_f64_to_f128M, qemu_f64_to_f128M);
++        break;
++    case F64_ROUNDTOINT:
++        test_az_f64_rx(
++        slow_f64_roundToInt, qemu_f64_roundToInt, roundingMode, exact);
++        break;
++    case F64_ADD:
++        trueFunction_abz_f64 = slow_f64_add;
++        subjFunction_abz_f64 = qemu_f64_add;
++        goto test_abz_f64;
++    case F64_SUB:
++        trueFunction_abz_f64 = slow_f64_sub;
++        subjFunction_abz_f64 = qemu_f64_sub;
++        goto test_abz_f64;
++    case F64_MUL:
++        trueFunction_abz_f64 = slow_f64_mul;
++        subjFunction_abz_f64 = qemu_f64_mul;
++        goto test_abz_f64;
++    case F64_DIV:
++        trueFunction_abz_f64 = slow_f64_div;
++        subjFunction_abz_f64 = qemu_f64_div;
++        goto test_abz_f64;
++    case F64_REM:
++        trueFunction_abz_f64 = slow_f64_rem;
++        subjFunction_abz_f64 = qemu_f64_rem;
++    test_abz_f64:
++        test_abz_f64(trueFunction_abz_f64, subjFunction_abz_f64);
++        break;
++    case F64_MULADD:
++        test_abcz_f64(slow_f64_mulAdd, qemu_f64_mulAdd);
++        break;
++    case F64_SQRT:
++        test_az_f64(slow_f64_sqrt, qemu_f64_sqrt);
++        break;
++    case F64_EQ:
++        trueFunction_ab_f64_z_bool = slow_f64_eq;
++        subjFunction_ab_f64_z_bool = qemu_f64_eq;
++        goto test_ab_f64_z_bool;
++    case F64_LE:
++        trueFunction_ab_f64_z_bool = slow_f64_le;
++        subjFunction_ab_f64_z_bool = qemu_f64_le;
++        goto test_ab_f64_z_bool;
++    case F64_LT:
++        trueFunction_ab_f64_z_bool = slow_f64_lt;
++        subjFunction_ab_f64_z_bool = qemu_f64_lt;
++        goto test_ab_f64_z_bool;
++    case F64_EQ_SIGNALING:
++        trueFunction_ab_f64_z_bool = slow_f64_eq_signaling;
++        subjFunction_ab_f64_z_bool = qemu_f64_eq_signaling;
++        goto test_ab_f64_z_bool;
++    case F64_LE_QUIET:
++        trueFunction_ab_f64_z_bool = slow_f64_le_quiet;
++        subjFunction_ab_f64_z_bool = qemu_f64_le_quiet;
++        goto test_ab_f64_z_bool;
++    case F64_LT_QUIET:
++        trueFunction_ab_f64_z_bool = slow_f64_lt_quiet;
++        subjFunction_ab_f64_z_bool = qemu_f64_lt_quiet;
++    test_ab_f64_z_bool:
++        test_ab_f64_z_bool(
++        trueFunction_ab_f64_z_bool, subjFunction_ab_f64_z_bool);
++        break;
++        /*--------------------------------------------------------------------
++         *--------------------------------------------------------------------*/
++    case EXTF80_TO_UI32:
++        /* not implemented */
++        break;
++    case EXTF80_TO_UI64:
++        /* not implemented */
++        break;
++    case EXTF80_TO_I32:
++        test_a_extF80_z_i32_rx(
++        slow_extF80M_to_i32, qemu_extF80M_to_i32, roundingMode, exact);
++        break;
++    case EXTF80_TO_I64:
++        test_a_extF80_z_i64_rx(
++        slow_extF80M_to_i64, qemu_extF80M_to_i64, roundingMode, exact);
++        break;
++    case EXTF80_TO_UI32_R_MINMAG:
++        /* not implemented */
++        break;
++    case EXTF80_TO_UI64_R_MINMAG:
++        /* not implemented */
++        break;
++    case EXTF80_TO_I32_R_MINMAG:
++        /* not implemented */
++        break;
++    case EXTF80_TO_I64_R_MINMAG:
++        /* not implemented */
++        break;
++    case EXTF80_TO_F16:
++        /* not implemented */
++        break;
++    case EXTF80_TO_F32:
++        test_a_extF80_z_f32(slow_extF80M_to_f32, qemu_extF80M_to_f32);
++        break;
++    case EXTF80_TO_F64:
++        test_a_extF80_z_f64(slow_extF80M_to_f64, qemu_extF80M_to_f64);
++        break;
++    case EXTF80_TO_F128:
++        test_a_extF80_z_f128(slow_extF80M_to_f128M, qemu_extF80M_to_f128M);
++        break;
++    case EXTF80_ROUNDTOINT:
++        test_az_extF80_rx(
++        slow_extF80M_roundToInt, qemu_extF80M_roundToInt, roundingMode, exact);
++        break;
++    case EXTF80_ADD:
++        trueFunction_abz_extF80M = slow_extF80M_add;
++        subjFunction_abz_extF80M = qemu_extF80M_add;
++        goto test_abz_extF80;
++    case EXTF80_SUB:
++        trueFunction_abz_extF80M = slow_extF80M_sub;
++        subjFunction_abz_extF80M = qemu_extF80M_sub;
++        goto test_abz_extF80;
++    case EXTF80_MUL:
++        trueFunction_abz_extF80M = slow_extF80M_mul;
++        subjFunction_abz_extF80M = qemu_extF80M_mul;
++        goto test_abz_extF80;
++    case EXTF80_DIV:
++        trueFunction_abz_extF80M = slow_extF80M_div;
++        subjFunction_abz_extF80M = qemu_extF80M_div;
++        goto test_abz_extF80;
++    case EXTF80_REM:
++        trueFunction_abz_extF80M = slow_extF80M_rem;
++        subjFunction_abz_extF80M = qemu_extF80M_rem;
++    test_abz_extF80:
++        test_abz_extF80(trueFunction_abz_extF80M, subjFunction_abz_extF80M);
++        break;
++    case EXTF80_SQRT:
++        test_az_extF80(slow_extF80M_sqrt, qemu_extF80M_sqrt);
++        break;
++    case EXTF80_EQ:
++        trueFunction_ab_extF80M_z_bool = slow_extF80M_eq;
++        subjFunction_ab_extF80M_z_bool = qemu_extF80M_eq;
++        goto test_ab_extF80_z_bool;
++    case EXTF80_LE:
++        trueFunction_ab_extF80M_z_bool = slow_extF80M_le;
++        subjFunction_ab_extF80M_z_bool = qemu_extF80M_le;
++        goto test_ab_extF80_z_bool;
++    case EXTF80_LT:
++        trueFunction_ab_extF80M_z_bool = slow_extF80M_lt;
++        subjFunction_ab_extF80M_z_bool = qemu_extF80M_lt;
++        goto test_ab_extF80_z_bool;
++    case EXTF80_EQ_SIGNALING:
++        trueFunction_ab_extF80M_z_bool = slow_extF80M_eq_signaling;
++        subjFunction_ab_extF80M_z_bool = qemu_extF80M_eq_signaling;
++        goto test_ab_extF80_z_bool;
++    case EXTF80_LE_QUIET:
++        trueFunction_ab_extF80M_z_bool = slow_extF80M_le_quiet;
++        subjFunction_ab_extF80M_z_bool = qemu_extF80M_le_quiet;
++        goto test_ab_extF80_z_bool;
++    case EXTF80_LT_QUIET:
++        trueFunction_ab_extF80M_z_bool = slow_extF80M_lt_quiet;
++        subjFunction_ab_extF80M_z_bool = qemu_extF80M_lt_quiet;
++    test_ab_extF80_z_bool:
++        test_ab_extF80_z_bool(
++        trueFunction_ab_extF80M_z_bool, subjFunction_ab_extF80M_z_bool);
++        break;
++        /*--------------------------------------------------------------------
++         *--------------------------------------------------------------------*/
++    case F128_TO_UI32:
++        /* not implemented */
++        break;
++    case F128_TO_UI64:
++        test_a_f128_z_ui64_rx(
++        slow_f128M_to_ui64, qemu_f128M_to_ui64, roundingMode, exact);
++        break;
++    case F128_TO_I32:
++        test_a_f128_z_i32_rx(
++        slow_f128M_to_i32, qemu_f128M_to_i32, roundingMode, exact);
++        break;
++    case F128_TO_I64:
++        test_a_f128_z_i64_rx(
++        slow_f128M_to_i64, qemu_f128M_to_i64, roundingMode, exact);
++        break;
++    case F128_TO_UI32_R_MINMAG:
++        /* not implemented */
++        break;
++    case F128_TO_UI64_R_MINMAG:
++        /* not implemented */
++        break;
++    case F128_TO_I32_R_MINMAG:
++        /* not implemented */
++        break;
++    case F128_TO_I64_R_MINMAG:
++        /* not implemented */
++        break;
++    case F128_TO_F16:
++        /* not implemented */
++        break;
++    case F128_TO_F32:
++        test_a_f128_z_f32(slow_f128M_to_f32, qemu_f128M_to_f32);
++        break;
++    case F128_TO_F64:
++        test_a_f128_z_f64(slow_f128M_to_f64, qemu_f128M_to_f64);
++        break;
++    case F128_TO_EXTF80:
++        test_a_f128_z_extF80(slow_f128M_to_extF80M, qemu_f128M_to_extF80M);
++        break;
++    case F128_ROUNDTOINT:
++        test_az_f128_rx(
++        slow_f128M_roundToInt, qemu_f128M_roundToInt, roundingMode, exact);
++        break;
++    case F128_ADD:
++        trueFunction_abz_f128M = slow_f128M_add;
++        subjFunction_abz_f128M = qemu_f128M_add;
++        goto test_abz_f128;
++    case F128_SUB:
++        trueFunction_abz_f128M = slow_f128M_sub;
++        subjFunction_abz_f128M = qemu_f128M_sub;
++        goto test_abz_f128;
++    case F128_MUL:
++        trueFunction_abz_f128M = slow_f128M_mul;
++        subjFunction_abz_f128M = qemu_f128M_mul;
++        goto test_abz_f128;
++    case F128_DIV:
++        trueFunction_abz_f128M = slow_f128M_div;
++        subjFunction_abz_f128M = qemu_f128M_div;
++        goto test_abz_f128;
++    case F128_REM:
++        trueFunction_abz_f128M = slow_f128M_rem;
++        subjFunction_abz_f128M = qemu_f128M_rem;
++    test_abz_f128:
++        test_abz_f128(trueFunction_abz_f128M, subjFunction_abz_f128M);
++        break;
++    case F128_MULADD:
++        /* not implemented */
++        break;
++    case F128_SQRT:
++        test_az_f128(slow_f128M_sqrt, qemu_f128M_sqrt);
++        break;
++    case F128_EQ:
++        trueFunction_ab_f128M_z_bool = slow_f128M_eq;
++        subjFunction_ab_f128M_z_bool = qemu_f128M_eq;
++        goto test_ab_f128_z_bool;
++    case F128_LE:
++        trueFunction_ab_f128M_z_bool = slow_f128M_le;
++        subjFunction_ab_f128M_z_bool = qemu_f128M_le;
++        goto test_ab_f128_z_bool;
++    case F128_LT:
++        trueFunction_ab_f128M_z_bool = slow_f128M_lt;
++        subjFunction_ab_f128M_z_bool = qemu_f128M_lt;
++        goto test_ab_f128_z_bool;
++    case F128_EQ_SIGNALING:
++        trueFunction_ab_f128M_z_bool = slow_f128M_eq_signaling;
++        subjFunction_ab_f128M_z_bool = qemu_f128M_eq_signaling;
++        goto test_ab_f128_z_bool;
++    case F128_LE_QUIET:
++        trueFunction_ab_f128M_z_bool = slow_f128M_le_quiet;
++        subjFunction_ab_f128M_z_bool = qemu_f128M_le_quiet;
++        goto test_ab_f128_z_bool;
++    case F128_LT_QUIET:
++        trueFunction_ab_f128M_z_bool = slow_f128M_lt_quiet;
++        subjFunction_ab_f128M_z_bool = qemu_f128M_lt_quiet;
++    test_ab_f128_z_bool:
++        test_ab_f128_z_bool(
++        trueFunction_ab_f128M_z_bool, subjFunction_ab_f128M_z_bool);
++        break;
++    }
++    if ((verCases_errorStop && verCases_anyErrors) || verCases_stop) {
++        verCases_exitWithStatus();
++    }
++}
++
++static void
++testFunction(int functionCode, uint_fast8_t roundingPrecisionIn,
++             int roundingCodeIn, int tininessCodeIn, int exactCodeIn)
++{
++    int functionAttribs;
++    uint_fast8_t roundingPrecision;
++    int roundingCode;
++    uint_fast8_t roundingMode = { 0 };
++    int exactCode;
++    bool exact;
++    int tininessCode;
++    uint_fast8_t tininessMode;
++
++    functionAttribs = functionInfos[functionCode].attribs;
++    verCases_functionNamePtr = functionInfos[functionCode].namePtr;
++    roundingPrecision = 32;
++    for (;;) {
++        if (functionAttribs & FUNC_EFF_ROUNDINGPRECISION) {
++            if (roundingPrecisionIn) {
++                roundingPrecision = roundingPrecisionIn;
++            }
++        } else {
++            roundingPrecision = 0;
++        }
++        verCases_roundingPrecision = roundingPrecision;
++        if (roundingPrecision) {
++            slow_extF80_roundingPrecision = roundingPrecision;
++            qsf.floatx80_rounding_precision = roundingPrecision;
++        }
++        /* XXX: not testing ROUND_ODD */
++        for (roundingCode = 1; roundingCode < NUM_ROUNDINGMODES - 1;
++             ++roundingCode) {
++            if (
++                functionAttribs
++                & (FUNC_ARG_ROUNDINGMODE | FUNC_EFF_ROUNDINGMODE)
++                ) {
++                if (roundingCodeIn) {
++                    roundingCode = roundingCodeIn;
++                }
++            } else {
++                roundingCode = 0;
++            }
++            verCases_roundingCode = roundingCode;
++            if (roundingCode) {
++                roundingMode = roundingModes[roundingCode];
++                if (functionAttribs & FUNC_EFF_ROUNDINGMODE) {
++                    slowfloat_roundingMode = roundingMode;
++                    qsf.float_rounding_mode =
++                        softfloat_rounding_to_qemu(roundingMode);
++                }
++            }
++            /*
++             * XXX not testing EXACT_FALSE
++             *   for (exactCode = EXACT_FALSE; exactCode <= EXACT_TRUE;
++             *   ++exactCode)
++             */
++            exactCode = EXACT_TRUE;
++            {
++                if (functionAttribs & FUNC_ARG_EXACT) {
++                    if (exactCodeIn) {
++                        exactCode = exactCodeIn;
++                    }
++                } else {
++                    exactCode = 0;
++                }
++                exact = (exactCode == EXACT_TRUE);
++                verCases_usesExact = (exactCode != 0);
++                verCases_exact = exact;
++                for (
++                    tininessCode = 1;
++                    tininessCode < NUM_TININESSMODES;
++                    ++tininessCode
++                    ) {
++                    if (
++                        (functionAttribs & FUNC_EFF_TININESSMODE)
++                        || ((functionAttribs
++                             & FUNC_EFF_TININESSMODE_REDUCEDPREC)
++                            && roundingPrecision
++                            && (roundingPrecision < 80))
++                        ) {
++                        if (tininessCodeIn) {
++                            tininessCode = tininessCodeIn;
++                        }
++                    } else {
++                        tininessCode = 0;
++                    }
++                    verCases_tininessCode = tininessCode;
++                    if (tininessCode) {
++                        tininessMode = tininessModes[tininessCode];
++                        slowfloat_detectTininess = tininessMode;
++                        qsf.float_detect_tininess =
++                            softfloat_tininess_to_qemu(tininessMode);
++                    }
++                    testFunctionInstance(functionCode, roundingMode, exact);
++                    if (tininessCodeIn || !tininessCode) {
++                        break;
++                    }
++                }
++                if (exactCodeIn || !exactCode) {
++                    break;
++                }
++            }
++            if (roundingCodeIn || !roundingCode) {
++                break;
++            }
++        }
++        if (roundingPrecisionIn || !roundingPrecision) {
++            break;
++        }
++        if (roundingPrecision == 80) {
++            break;
++        } else if (roundingPrecision == 64) {
++            roundingPrecision = 80;
++        } else if (roundingPrecision == 32) {
++            roundingPrecision = 64;
++        }
++    }
++
++}
++
++int main(int argc, char *argv[])
++{
++    bool haveFunctionArg;
++    int functionCode, numOperands;
++    uint_fast8_t roundingPrecision;
++    int roundingCode, tininessCode, exactCode;
++    const char *argPtr;
++    unsigned long ui;
++    long i;
++    int functionMatchAttrib;
++    struct sigaction sigact;
++
++    /*------------------------------------------------------------------------
++     *------------------------------------------------------------------------*/
++    fail_programName = (char *)"testsoftfloat";
++    if (argc <= 1) {
++        goto writeHelpMessage;
++    }
++    genCases_setLevel(1);
++    verCases_maxErrorCount = 20;
++    testLoops_trueFlagsPtr = &slowfloat_exceptionFlags;
++    testLoops_subjFlagsFunction = qemu_softfloat_clearExceptionFlags;
++    haveFunctionArg = false;
++    functionCode = 0;
++    numOperands = 0;
++    roundingPrecision = 0;
++    roundingCode = 0;
++    tininessCode = 0;
++    exactCode = 0;
++    for (;;) {
++        --argc;
++        if (!argc) {
++            break;
++        }
++        argPtr = *++argv;
++        if (!argPtr) {
++            break;
++        }
++        if (argPtr[0] == '-') {
++            ++argPtr;
++        }
++        if (
++            !strcmp(argPtr, "help") || !strcmp(argPtr, "-help")
++            || !strcmp(argPtr, "h")
++            ) {
++        writeHelpMessage:
++            fputs(
++                "testsoftfloat [<option>...] <function>\n"
++                "  <option>:  (* is default)\n"
++                "    -help            --Write this message and exit.\n"
++                "    -seed <num>      --Set pseudo-random number generator seed to <num>.\n"
++                " *  -seed 1\n"
++                "    -level <num>     --Testing level <num> (1 or 2).\n"
++                " *  -level 1\n"
++                "    -errors <num>    --Stop each function test after <num> errors.\n"
++                " *  -errors 20\n"
++                "    -errorstop       --Exit after first function with any error.\n"
++                "    -forever         --Test one function repeatedly (implies '-level 2').\n"
++                "    -precision32     --For extF80, test only 32-bit rounding precision.\n"
++                "    -precision64     --For extF80, test only 64-bit rounding precision.\n"
++                "    -precision80     --For extF80, test only 80-bit rounding precision.\n"
++                "    -rnear_even      --Test only rounding to nearest/even.\n"
++                "    -rminMag         --Test only rounding to minimum magnitude (toward zero).\n"
++                "    -rmin            --Test only rounding to minimum (down).\n"
++                "    -rmax            --Test only rounding to maximum (up).\n"
++                "    -rnear_maxMag    --Test only rounding to nearest/maximum magnitude\n"
++                "                         (nearest/away).\n"
++                "    -rodd            --Test only rounding to odd (jamming).  (For rounding to\n"
++                "                         an integer value, 'minMag' rounding is done instead.)\n"
++                "    -tininessbefore  --Test only underflow tininess detected before rounding.\n"
++                "    -tininessafter   --Test only underflow tininess detected after rounding.\n"
++                "    -notexact        --Test only non-exact rounding to integer (no inexact\n"
++                "                         exceptions).\n"
++                "    -exact           --Test only exact rounding to integer (raising inexact\n"
++                "                         exceptions).\n"
++                "  <function>:\n"
++                "    <int>_to_<float>            <float>_add      <float>_eq\n"
++                "    <float>_to_<int>            <float>_sub      <float>_le\n"
++                "    <float>_to_<int>_r_minMag   <float>_mul      <float>_lt\n"
++                "    <float>_to_<float>          <float>_mulAdd   <float>_eq_signaling\n"
++                "    <float>_roundToInt          <float>_div      <float>_le_quiet\n"
++                "                                <float>_rem      <float>_lt_quiet\n"
++                "                                <float>_sqrt\n"
++                "    -all1            --All unary functions.\n"
++                "    -all2            --All binary functions.\n"
++                "  <int>:\n"
++                "    ui32             --Unsigned 32-bit integer.\n"
++                "    ui64             --Unsigned 64-bit integer.\n"
++                "    i32              --Signed 32-bit integer.\n"
++                "    i64              --Signed 64-bit integer.\n"
++                "  <float>:\n"
++                "    f16              --Binary 16-bit floating-point (half-precision).\n"
++                "    f32              --Binary 32-bit floating-point (single-precision).\n"
++                "    f64              --Binary 64-bit floating-point (double-precision).\n"
++                "    extF80           --Binary 80-bit extended floating-point.\n"
++                "    f128             --Binary 128-bit floating-point (quadruple-precision).\n"
++                ,
++                stdout
++                );
++            return EXIT_SUCCESS;
++        } else if (!strcmp(argPtr, "seed")) {
++            if (argc < 2) {
++                goto optionError;
++            }
++            if (qemu_strtoul(argv[1], &argPtr, 10, &ui)) {
++                goto optionError;
++            }
++            if (*argPtr) {
++                goto optionError;
++            }
++            srand(ui);
++            --argc;
++            ++argv;
++        } else if (!strcmp(argPtr, "level")) {
++            if (argc < 2) {
++                goto optionError;
++            }
++            if (qemu_strtol(argv[1], &argPtr, 10, &i)) {
++                goto optionError;
++            }
++            if (*argPtr) {
++                goto optionError;
++            }
++            genCases_setLevel(i);
++            --argc;
++            ++argv;
++        } else if (!strcmp(argPtr, "level1")) {
++            genCases_setLevel(1);
++        } else if (!strcmp(argPtr, "level2")) {
++            genCases_setLevel(2);
++        } else if (!strcmp(argPtr, "errors")) {
++            if (argc < 2) {
++                goto optionError;
++            }
++            if (qemu_strtol(argv[1], &argPtr, 10, &i)) {
++                goto optionError;
++            }
++            if (*argPtr) {
++                goto optionError;
++            }
++            verCases_maxErrorCount = i;
++            --argc;
++            ++argv;
++        } else if (!strcmp(argPtr, "errorstop")) {
++            verCases_errorStop = true;
++        } else if (!strcmp(argPtr, "forever")) {
++            genCases_setLevel(2);
++            testLoops_forever = true;
++        } else if (!strcmp(argPtr, "precision32")) {
++            roundingPrecision = 32;
++        } else if (!strcmp(argPtr, "precision64")) {
++            roundingPrecision = 64;
++        } else if (!strcmp(argPtr, "precision80")) {
++            roundingPrecision = 80;
++        } else if (
++            !strcmp(argPtr, "rnear_even")
++            || !strcmp(argPtr, "rneareven")
++            || !strcmp(argPtr, "rnearest_even")
++            ) {
++            roundingCode = ROUND_NEAR_EVEN;
++        } else if (
++            !strcmp(argPtr, "rminmag") || !strcmp(argPtr, "rminMag")
++            ) {
++            roundingCode = ROUND_MINMAG;
++        } else if (!strcmp(argPtr, "rmin")) {
++            roundingCode = ROUND_MIN;
++        } else if (!strcmp(argPtr, "rmax")) {
++            roundingCode = ROUND_MAX;
++        } else if (
++            !strcmp(argPtr, "rnear_maxmag")
++            || !strcmp(argPtr, "rnear_maxMag")
++            || !strcmp(argPtr, "rnearmaxmag")
++            || !strcmp(argPtr, "rnearest_maxmag")
++            || !strcmp(argPtr, "rnearest_maxMag")
++            ) {
++            roundingCode = ROUND_NEAR_MAXMAG;
++        } else if (!strcmp(argPtr, "rodd")) {
++            roundingCode = ROUND_ODD;
++        } else if (!strcmp(argPtr, "tininessbefore")) {
++            tininessCode = TININESS_BEFORE_ROUNDING;
++        } else if (!strcmp(argPtr, "tininessafter")) {
++            tininessCode = TININESS_AFTER_ROUNDING;
++        } else if (!strcmp(argPtr, "notexact")) {
++            exactCode = EXACT_FALSE;
++        } else if (!strcmp(argPtr, "exact")) {
++            exactCode = EXACT_TRUE;
++        } else if (!strcmp(argPtr, "all1")) {
++            haveFunctionArg = true;
++            functionCode = 0;
++            numOperands = 1;
++        } else if (!strcmp(argPtr, "all2")) {
++            haveFunctionArg = true;
++            functionCode = 0;
++            numOperands = 2;
++        } else {
++            functionCode = 1;
++            while (strcmp(argPtr, functionInfos[functionCode].namePtr)) {
++                ++functionCode;
++                if (functionCode == NUM_FUNCTIONS) {
++                    fail("Invalid argument '%s'", *argv);
++                }
++            }
++            haveFunctionArg = true;
++        }
++    }
++    if (!haveFunctionArg) {
++        fail("Function argument required");
++    }
++    /*------------------------------------------------------------------------
++     *------------------------------------------------------------------------*/
++    sigact = (struct sigaction) {
++        .sa_handler = catchSIGINT,
++        .sa_flags = SA_RESETHAND | SA_NODEFER,
++    };
++    sigemptyset(&sigact.sa_mask);
++    sigaction(SIGINT, &sigact, NULL);
++    sigaction(SIGTERM, &sigact, NULL);
++    if (functionCode) {
++        if (testLoops_forever) {
++            if (!roundingPrecision) {
++                roundingPrecision = 80;
++            }
++            if (!roundingCode) {
++                roundingCode = ROUND_NEAR_EVEN;
++            }
++        }
++        testFunction(
++            functionCode,
++            roundingPrecision,
++            roundingCode,
++            tininessCode,
++            exactCode
++            );
++    } else {
++        if (testLoops_forever) {
++            fail("Can test only one function with '-forever' option");
++        }
++        functionMatchAttrib =
++            (numOperands == 1) ? FUNC_ARG_UNARY : FUNC_ARG_BINARY;
++        for (
++            functionCode = 1; functionCode < NUM_FUNCTIONS; ++functionCode
++            ) {
++            if (functionInfos[functionCode].attribs & functionMatchAttrib) {
++                testFunction(
++                    functionCode,
++                    roundingPrecision,
++                    roundingCode,
++                    tininessCode,
++                    exactCode
++                    );
++            }
++        }
++    }
++    verCases_exitWithStatus();
++    /*------------------------------------------------------------------------
++     *------------------------------------------------------------------------*/
++ optionError:
++    fail("'%s' option requires numeric argument", *argv);
++    return 1;
++}
+diff --git a/tests/fp/wrap.inc.c b/tests/fp/wrap.inc.c
+new file mode 100644
+index 0000000000..df8a33cc47
+--- /dev/null
++++ b/tests/fp/wrap.inc.c
+@@ -0,0 +1,599 @@
++/* wrap QEMU softfloat functions to mimic those in upstream softfloat */
++
++/* qemu softfloat status */
++static float_status qsf;
++
++static signed char softfloat_tininess_to_qemu(uint_fast8_t mode)
++{
++    switch (mode) {
++    case softfloat_tininess_beforeRounding:
++        return float_tininess_before_rounding;
++    case softfloat_tininess_afterRounding:
++        return float_tininess_after_rounding;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static signed char softfloat_rounding_to_qemu(uint_fast8_t mode)
++{
++    switch (mode) {
++    case softfloat_round_near_even:
++        return float_round_nearest_even;
++    case softfloat_round_minMag:
++        return float_round_to_zero;
++    case softfloat_round_min:
++        return float_round_down;
++    case softfloat_round_max:
++        return float_round_up;
++    case softfloat_round_near_maxMag:
++        return float_round_ties_away;
++    case softfloat_round_odd:
++        return float_round_to_odd;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static uint_fast8_t qemu_flags_to_softfloat(uint8_t qflags)
++{
++    uint_fast8_t ret = 0;
++
++    if (qflags & float_flag_invalid) {
++        ret |= softfloat_flag_invalid;
++    }
++    if (qflags & float_flag_divbyzero) {
++        ret |= softfloat_flag_infinite;
++    }
++    if (qflags & float_flag_overflow) {
++        ret |= softfloat_flag_overflow;
++    }
++    if (qflags & float_flag_underflow) {
++        ret |= softfloat_flag_underflow;
++    }
++    if (qflags & float_flag_inexact) {
++        ret |= softfloat_flag_inexact;
++    }
++    return ret;
++}
++
++static uint_fast8_t qemu_softfloat_clearExceptionFlags(void)
++{
++    uint_fast8_t prevFlags;
++
++    prevFlags = qemu_flags_to_softfloat(qsf.float_exception_flags);
++    qsf.float_exception_flags = 0;
++    return prevFlags;
++}
++
++/*
++ * softfloat/testfloat calls look very different from QEMU ones.
++ * With these macros we wrap the QEMU calls to look like softfloat/testfloat's,
++ * so that we can use the testfloat infrastructure as-is.
++ */
++
++/* XXX convert this one to qemu_to_soft80 */
++static void copy_qemu_to_soft80(extFloat80_t *to, const floatx80 *from)
++{
++    void *p = to;
++
++    memcpy(p, &from->high, sizeof(from->high));
++    memcpy(p + 8, &from->low, sizeof(from->low));
++}
++
++static floatx80 soft_to_qemu80(extFloat80_t a)
++{
++    floatx80 ret;
++    void *p = &a;
++
++    memcpy(&ret.high, p, sizeof(ret.high));
++    memcpy(&ret.low, p + 8, sizeof(ret.low));
++    return ret;
++}
++
++static float128_t qemu_to_soft128(float128 a)
++{
++    float128_t ret;
++    struct uint128 *to = (struct uint128 *)&ret;
++
++#ifdef HOST_WORDS_BIGENDIAN
++    to->v0 = a.low;
++    to->v64 = a.high;
++#else
++    to->v0 = a.high;
++    to->v64 = a.low;
++#endif
++    return ret;
++}
++
++static float128 soft_to_qemu128(float128_t a)
++{
++    struct uint128 *from = (struct uint128 *)&a;
++    float128 ret;
++
++#ifdef HOST_WORDS_BIGENDIAN
++    ret.low = from->v0;
++    ret.high = from->v64;
++#else
++    ret.high = from->v0;
++    ret.low = from->v64;
++#endif
++    return ret;
++}
++
++/* conversions */
++#define WRAP_SF_TO_SF_IEEE(name, func, a_type, b_type)  \
++    static b_type##_t name(a_type##_t a)                \
++    {                                                   \
++        a_type *ap = (a_type *)&a;                      \
++        b_type ret;                                     \
++                                                        \
++        ret = func(*ap, true, &qsf);                    \
++        return *(b_type##_t *)&ret;                     \
++    }
++
++WRAP_SF_TO_SF_IEEE(qemu_f16_to_f32, float16_to_float32, float16, float32)
++WRAP_SF_TO_SF_IEEE(qemu_f16_to_f64, float16_to_float64, float16, float64)
++
++WRAP_SF_TO_SF_IEEE(qemu_f32_to_f16, float32_to_float16, float32, float16)
++WRAP_SF_TO_SF_IEEE(qemu_f64_to_f16, float64_to_float16, float64, float16)
++#undef WRAP_SF_TO_SF_IEEE
++
++#define WRAP_SF_TO_SF(name, func, a_type, b_type)       \
++    static b_type##_t name(a_type##_t a)                \
++    {                                                   \
++        a_type *ap = (a_type *)&a;                      \
++        b_type ret;                                     \
++                                                        \
++        ret = func(*ap, &qsf);                          \
++        return *(b_type##_t *)&ret;                     \
++    }
++
++WRAP_SF_TO_SF(qemu_f32_to_f64, float32_to_float64, float32, float64)
++WRAP_SF_TO_SF(qemu_f64_to_f32, float64_to_float32, float64, float32)
++#undef WRAP_SF_TO_SF
++
++#define WRAP_SF_TO_80(name, func, type)                 \
++    static void name(type##_t a, extFloat80_t *res)     \
++    {                                                   \
++        floatx80 ret;                                   \
++        type *ap = (type *)&a;                          \
++                                                        \
++        ret = func(*ap, &qsf);                          \
++        copy_qemu_to_soft80(res, &ret);                 \
++    }
++
++WRAP_SF_TO_80(qemu_f32_to_extF80M, float32_to_floatx80, float32)
++WRAP_SF_TO_80(qemu_f64_to_extF80M, float64_to_floatx80, float64)
++#undef WRAP_SF_TO_80
++
++#define WRAP_SF_TO_128(name, func, type)                \
++    static void name(type##_t a, float128_t *res)       \
++    {                                                   \
++        float128 ret;                                   \
++        type *ap = (type *)&a;                          \
++                                                        \
++        ret = func(*ap, &qsf);                          \
++        *res = qemu_to_soft128(ret);                    \
++    }
++
++WRAP_SF_TO_128(qemu_f32_to_f128M, float32_to_float128, float32)
++WRAP_SF_TO_128(qemu_f64_to_f128M, float64_to_float128, float64)
++#undef WRAP_SF_TO_128
++
++/* Note: exact is ignored since qemu's softfloat assumes it is set */
++#define WRAP_SF_TO_INT(name, scalfunc, type, int_type, fast_type)       \
++    static fast_type name(type##_t a, uint_fast8_t round, bool exact)   \
++    {                                                                   \
++        type *ap = (type *)&a;                                          \
++        int r = softfloat_rounding_to_qemu(round);                      \
++                                                                        \
++        return scalfunc(*ap, r, 0, &qsf);                               \
++    }
++
++WRAP_SF_TO_INT(qemu_f16_to_ui32, float16_to_uint32_scalbn, float16, uint32_t,
++               uint_fast32_t)
++WRAP_SF_TO_INT(qemu_f16_to_ui64, float16_to_uint64_scalbn, float16, uint64_t,
++               uint_fast64_t)
++
++WRAP_SF_TO_INT(qemu_f32_to_ui32, float32_to_uint32_scalbn, float32, uint32_t,
++               uint_fast32_t)
++WRAP_SF_TO_INT(qemu_f32_to_ui64, float32_to_uint64_scalbn, float32, uint64_t,
++               uint_fast64_t)
++
++WRAP_SF_TO_INT(qemu_f64_to_ui32, float64_to_uint32_scalbn, float64, uint32_t,
++               uint_fast32_t)
++WRAP_SF_TO_INT(qemu_f64_to_ui64, float64_to_uint64_scalbn, float64, uint64_t,
++               uint_fast64_t)
++
++WRAP_SF_TO_INT(qemu_f16_to_i32, float16_to_int32_scalbn, float16, int32_t,
++               int_fast32_t)
++WRAP_SF_TO_INT(qemu_f16_to_i64, float16_to_int64_scalbn, float16, int64_t,
++               int_fast64_t)
++
++WRAP_SF_TO_INT(qemu_f32_to_i32, float32_to_int32_scalbn, float32, int32_t,
++               int_fast32_t)
++WRAP_SF_TO_INT(qemu_f32_to_i64, float32_to_int64_scalbn, float32, int64_t,
++               int_fast64_t)
++
++WRAP_SF_TO_INT(qemu_f64_to_i32, float64_to_int32_scalbn, float64, int32_t,
++               int_fast32_t)
++WRAP_SF_TO_INT(qemu_f64_to_i64, float64_to_int64_scalbn, float64, int64_t,
++               int_fast64_t)
++#undef WRAP_SF_TO_INT
++
++#define WRAP_80_TO_SF(name, func, type)                 \
++    static type##_t name(const extFloat80_t *ap)        \
++    {                                                   \
++        floatx80 a;                                     \
++        type ret;                                       \
++                                                        \
++        a = soft_to_qemu80(*ap);                        \
++        ret = func(a, &qsf);                            \
++        return *(type##_t *)&ret;                       \
++    }
++
++WRAP_80_TO_SF(qemu_extF80M_to_f32, floatx80_to_float32, float32)
++WRAP_80_TO_SF(qemu_extF80M_to_f64, floatx80_to_float64, float64)
++#undef WRAP_80_TO_SF
++
++#define WRAP_128_TO_SF(name, func, type)                \
++    static type##_t name(const float128_t *ap)          \
++    {                                                   \
++        float128 a;                                     \
++        type ret;                                       \
++                                                        \
++        a = soft_to_qemu128(*ap);                       \
++        ret = func(a, &qsf);                            \
++        return *(type##_t *)&ret;                       \
++    }
++
++WRAP_128_TO_SF(qemu_f128M_to_f32, float128_to_float32, float32)
++WRAP_128_TO_SF(qemu_f128M_to_f64, float128_to_float64, float64)
++#undef WRAP_80_TO_SF
++
++static void qemu_extF80M_to_f128M(const extFloat80_t *from, float128_t *to)
++{
++    floatx80 qfrom;
++    float128 qto;
++
++    qfrom = soft_to_qemu80(*from);
++    qto = floatx80_to_float128(qfrom, &qsf);
++    *to = qemu_to_soft128(qto);
++}
++
++static void qemu_f128M_to_extF80M(const float128_t *from, extFloat80_t *to)
++{
++    float128 qfrom;
++    floatx80 qto;
++
++    qfrom = soft_to_qemu128(*from);
++    qto = float128_to_floatx80(qfrom, &qsf);
++    copy_qemu_to_soft80(to, &qto);
++}
++
++#define WRAP_INT_TO_SF(name, func, int_type, type)      \
++    static type##_t name(int_type a)                    \
++    {                                                   \
++        type ret;                                       \
++                                                        \
++        ret = func(a, &qsf);                            \
++        return *(type##_t *)&ret;                       \
++    }
++
++WRAP_INT_TO_SF(qemu_ui32_to_f16, uint32_to_float16, uint32_t, float16)
++WRAP_INT_TO_SF(qemu_ui32_to_f32, uint32_to_float32, uint32_t, float32)
++WRAP_INT_TO_SF(qemu_ui32_to_f64, uint32_to_float64, uint32_t, float64)
++
++WRAP_INT_TO_SF(qemu_ui64_to_f16, uint64_to_float16, uint64_t, float16)
++WRAP_INT_TO_SF(qemu_ui64_to_f32, uint64_to_float32, uint64_t, float32)
++WRAP_INT_TO_SF(qemu_ui64_to_f64, uint64_to_float64, uint64_t, float64)
++
++WRAP_INT_TO_SF(qemu_i32_to_f16, int32_to_float16, int32_t, float16)
++WRAP_INT_TO_SF(qemu_i32_to_f32, int32_to_float32, int32_t, float32)
++WRAP_INT_TO_SF(qemu_i32_to_f64, int32_to_float64, int32_t, float64)
++
++WRAP_INT_TO_SF(qemu_i64_to_f16, int64_to_float16, int64_t, float16)
++WRAP_INT_TO_SF(qemu_i64_to_f32, int64_to_float32, int64_t, float32)
++WRAP_INT_TO_SF(qemu_i64_to_f64, int64_to_float64, int64_t, float64)
++#undef WRAP_INT_TO_SF
++
++#define WRAP_INT_TO_80(name, func, int_type)            \
++    static void name(int_type a, extFloat80_t *res)     \
++    {                                                   \
++        floatx80 ret;                                   \
++                                                        \
++        ret = func(a, &qsf);                            \
++        copy_qemu_to_soft80(res, &ret);                 \
++    }
++
++WRAP_INT_TO_80(qemu_i32_to_extF80M, int32_to_floatx80, int32_t)
++WRAP_INT_TO_80(qemu_i64_to_extF80M, int64_to_floatx80, int64_t)
++#undef WRAP_INT_TO_80
++
++/* Note: exact is ignored since qemu's softfloat assumes it is set */
++#define WRAP_80_TO_INT(name, func, int_type, fast_type)                 \
++    static fast_type name(const extFloat80_t *ap, uint_fast8_t round,   \
++                          bool exact)                                   \
++    {                                                                   \
++        floatx80 a;                                                     \
++        int_type ret;                                                   \
++                                                                        \
++        a = soft_to_qemu80(*ap);                                        \
++        qsf.float_rounding_mode = softfloat_rounding_to_qemu(round);    \
++        ret = func(a, &qsf);                                            \
++        return ret;                                                     \
++    }
++
++WRAP_80_TO_INT(qemu_extF80M_to_i32, floatx80_to_int32, int32_t, int_fast32_t)
++WRAP_80_TO_INT(qemu_extF80M_to_i64, floatx80_to_int64, int64_t, int_fast64_t)
++#undef WRAP_80_TO_INT
++
++/* Note: exact is ignored since qemu's softfloat assumes it is set */
++#define WRAP_128_TO_INT(name, func, int_type, fast_type)                \
++    static fast_type name(const float128_t *ap, uint_fast8_t round,     \
++                          bool exact)                                   \
++    {                                                                   \
++        float128 a;                                                     \
++        int_type ret;                                                   \
++                                                                        \
++        a = soft_to_qemu128(*ap);                                       \
++        qsf.float_rounding_mode = softfloat_rounding_to_qemu(round);    \
++        ret = func(a, &qsf);                                            \
++        return ret;                                                     \
++    }
++
++WRAP_128_TO_INT(qemu_f128M_to_i32, float128_to_int32, int32_t, int_fast32_t)
++WRAP_128_TO_INT(qemu_f128M_to_i64, float128_to_int64, int64_t, int_fast64_t)
++
++WRAP_128_TO_INT(qemu_f128M_to_ui64, float128_to_uint64, uint64_t, uint_fast64_t)
++#undef WRAP_80_TO_INT
++
++#define WRAP_INT_TO_128(name, func, int_type)           \
++    static void name(int_type a, float128_t *res)       \
++    {                                                   \
++        float128 ret;                                   \
++                                                        \
++        ret = func(a, &qsf);                            \
++        *res = qemu_to_soft128(ret);                    \
++    }
++
++WRAP_INT_TO_128(qemu_ui64_to_f128M, uint64_to_float128, uint64_t)
++
++WRAP_INT_TO_128(qemu_i32_to_f128M, int32_to_float128, int32_t)
++WRAP_INT_TO_128(qemu_i64_to_f128M, int64_to_float128, int64_t)
++#undef WRAP_INT_TO_128
++
++/* Note: exact is ignored since qemu's softfloat assumes it is set */
++#define WRAP_ROUND_TO_INT(name, func, type)                             \
++    static type##_t name(type##_t a, uint_fast8_t round, bool exact)    \
++    {                                                                   \
++        type *ap = (type *)&a;                                          \
++        type ret;                                                       \
++                                                                        \
++        qsf.float_rounding_mode = softfloat_rounding_to_qemu(round);    \
++        ret = func(*ap, &qsf);                                          \
++        return *(type##_t *)&ret;                                       \
++    }
++
++WRAP_ROUND_TO_INT(qemu_f16_roundToInt, float16_round_to_int, float16)
++WRAP_ROUND_TO_INT(qemu_f32_roundToInt, float32_round_to_int, float32)
++WRAP_ROUND_TO_INT(qemu_f64_roundToInt, float64_round_to_int, float64)
++#undef WRAP_ROUND_TO_INT
++
++static void qemu_extF80M_roundToInt(const extFloat80_t *ap, uint_fast8_t round,
++                                    bool exact, extFloat80_t *res)
++{
++    floatx80 a;
++    floatx80 ret;
++
++    a = soft_to_qemu80(*ap);
++    qsf.float_rounding_mode = softfloat_rounding_to_qemu(round);
++    ret = floatx80_round_to_int(a, &qsf);
++    copy_qemu_to_soft80(res, &ret);
++}
++
++static void qemu_f128M_roundToInt(const float128_t *ap, uint_fast8_t round,
++                                  bool exact, float128_t *res)
++{
++    float128 a;
++    float128 ret;
++
++    a = soft_to_qemu128(*ap);
++    qsf.float_rounding_mode = softfloat_rounding_to_qemu(round);
++    ret = float128_round_to_int(a, &qsf);
++    *res = qemu_to_soft128(ret);
++}
++
++/* operations */
++#define WRAP1(name, func, type)                 \
++    static type##_t name(type##_t a)            \
++    {                                           \
++        type *ap = (type *)&a;                  \
++        type ret;                               \
++                                                \
++        ret = func(*ap, &qsf);                  \
++        return *(type##_t *)&ret;               \
++    }
++
++#define WRAP2(name, func, type)                         \
++    static type##_t name(type##_t a, type##_t b)        \
++    {                                                   \
++        type *ap = (type *)&a;                          \
++        type *bp = (type *)&b;                          \
++        type ret;                                       \
++                                                        \
++        ret = func(*ap, *bp, &qsf);                     \
++        return *(type##_t *)&ret;                       \
++    }
++
++#define WRAP_COMMON_OPS(b)                              \
++    WRAP1(qemu_f##b##_sqrt, float##b##_sqrt, float##b)  \
++    WRAP2(qemu_f##b##_add, float##b##_add, float##b)    \
++    WRAP2(qemu_f##b##_sub, float##b##_sub, float##b)    \
++    WRAP2(qemu_f##b##_mul, float##b##_mul, float##b)    \
++    WRAP2(qemu_f##b##_div, float##b##_div, float##b)
++
++WRAP_COMMON_OPS(16)
++WRAP_COMMON_OPS(32)
++WRAP_COMMON_OPS(64)
++#undef WRAP_COMMON
++
++WRAP2(qemu_f32_rem, float32_rem, float32)
++WRAP2(qemu_f64_rem, float64_rem, float64)
++#undef WRAP2
++#undef WRAP1
++
++#define WRAP1_80(name, func)                                    \
++    static void name(const extFloat80_t *ap, extFloat80_t *res) \
++    {                                                           \
++        floatx80 a;                                             \
++        floatx80 ret;                                           \
++                                                                \
++        a = soft_to_qemu80(*ap);                                \
++        ret = func(a, &qsf);                                    \
++        copy_qemu_to_soft80(res, &ret);                         \
++    }
++
++WRAP1_80(qemu_extF80M_sqrt, floatx80_sqrt)
++#undef WRAP1_80
++
++#define WRAP1_128(name, func)                                   \
++    static void name(const float128_t *ap, float128_t *res)     \
++    {                                                           \
++        float128 a;                                             \
++        float128 ret;                                           \
++                                                                \
++        a = soft_to_qemu128(*ap);                               \
++        ret = func(a, &qsf);                                    \
++        *res = qemu_to_soft128(ret);                            \
++    }
++
++WRAP1_128(qemu_f128M_sqrt, float128_sqrt)
++#undef WRAP1_128
++
++#define WRAP2_80(name, func)                                            \
++    static void name(const extFloat80_t *ap, const extFloat80_t *bp,    \
++                     extFloat80_t *res)                                 \
++    {                                                                   \
++        floatx80 a;                                                     \
++        floatx80 b;                                                     \
++        floatx80 ret;                                                   \
++                                                                        \
++        a = soft_to_qemu80(*ap);                                        \
++        b = soft_to_qemu80(*bp);                                        \
++        ret = func(a, b, &qsf);                                         \
++        copy_qemu_to_soft80(res, &ret);                                 \
++    }
++
++WRAP2_80(qemu_extF80M_add, floatx80_add)
++WRAP2_80(qemu_extF80M_sub, floatx80_sub)
++WRAP2_80(qemu_extF80M_mul, floatx80_mul)
++WRAP2_80(qemu_extF80M_div, floatx80_div)
++WRAP2_80(qemu_extF80M_rem, floatx80_rem)
++#undef WRAP2_80
++
++#define WRAP2_128(name, func)                                           \
++    static void name(const float128_t *ap, const float128_t *bp,        \
++                     float128_t *res)                                   \
++    {                                                                   \
++        float128 a;                                                     \
++        float128 b;                                                     \
++        float128 ret;                                                   \
++                                                                        \
++        a = soft_to_qemu128(*ap);                                       \
++        b = soft_to_qemu128(*bp);                                       \
++        ret = func(a, b, &qsf);                                         \
++        *res = qemu_to_soft128(ret);                                    \
++    }
++
++WRAP2_128(qemu_f128M_add, float128_add)
++WRAP2_128(qemu_f128M_sub, float128_sub)
++WRAP2_128(qemu_f128M_mul, float128_mul)
++WRAP2_128(qemu_f128M_div, float128_div)
++WRAP2_128(qemu_f128M_rem, float128_rem)
++#undef WRAP2_128
++
++#define WRAP_MULADD(name, func, type)                           \
++    static type##_t name(type##_t a, type##_t b, type##_t c)    \
++    {                                                           \
++        type *ap = (type *)&a;                                  \
++        type *bp = (type *)&b;                                  \
++        type *cp = (type *)&c;                                  \
++        type ret;                                               \
++                                                                \
++        ret = func(*ap, *bp, *cp, 0, &qsf);                     \
++        return *(type##_t *)&ret;                               \
++    }
++
++WRAP_MULADD(qemu_f16_mulAdd, float16_muladd, float16)
++WRAP_MULADD(qemu_f32_mulAdd, float32_muladd, float32)
++WRAP_MULADD(qemu_f64_mulAdd, float64_muladd, float64)
++#undef WRAP_MULADD
++
++#define WRAP_CMP(name, func, type, retcond)     \
++    static bool name(type##_t a, type##_t b)    \
++    {                                           \
++        type *ap = (type *)&a;                  \
++        type *bp = (type *)&b;                  \
++        int ret;                                \
++                                                \
++        ret = func(*ap, *bp, &qsf);             \
++        return retcond;                         \
++    }
++
++#define GEN_WRAP_CMP(b)                                                      \
++WRAP_CMP(qemu_f##b##_eq_signaling, float##b##_compare, float##b, ret == 0)   \
++WRAP_CMP(qemu_f##b##_eq, float##b##_compare_quiet, float##b, ret == 0)       \
++WRAP_CMP(qemu_f##b##_le, float##b##_compare, float##b, ret <= 0)             \
++WRAP_CMP(qemu_f##b##_lt, float##b##_compare, float##b, ret < 0)              \
++WRAP_CMP(qemu_f##b##_le_quiet, float##b##_compare_quiet, float##b, ret <= 0) \
++WRAP_CMP(qemu_f##b##_lt_quiet, float##b##_compare_quiet, float##b, ret < 0)
++
++GEN_WRAP_CMP(16)
++GEN_WRAP_CMP(32)
++GEN_WRAP_CMP(64)
++#undef GEN_WRAP_CMP
++#undef WRAP_CMP
++
++#define WRAP_CMP80(name, func, retcond)                                 \
++    static bool name(const extFloat80_t *ap, const extFloat80_t *bp)    \
++    {                                                                   \
++        floatx80 a;                                                     \
++        floatx80 b;                                                     \
++        int ret;                                                        \
++                                                                        \
++        a = soft_to_qemu80(*ap);                                        \
++        b = soft_to_qemu80(*bp);                                        \
++        ret = func(a, b, &qsf);                                         \
++        return retcond;                                                 \
++    }
++
++WRAP_CMP80(qemu_extF80M_eq_signaling, floatx80_compare, ret == 0)
++WRAP_CMP80(qemu_extF80M_eq, floatx80_compare_quiet, ret == 0)
++WRAP_CMP80(qemu_extF80M_le, floatx80_compare, ret <= 0)
++WRAP_CMP80(qemu_extF80M_lt, floatx80_compare, ret < 0)
++WRAP_CMP80(qemu_extF80M_le_quiet, floatx80_compare_quiet, ret <= 0)
++WRAP_CMP80(qemu_extF80M_lt_quiet, floatx80_compare_quiet, ret < 0)
++#undef WRAP_CMP80
++
++#define WRAP_CMP80(name, func, retcond)                                 \
++    static bool name(const float128_t *ap, const float128_t *bp)        \
++    {                                                                   \
++        float128 a;                                                     \
++        float128 b;                                                     \
++        int ret;                                                        \
++                                                                        \
++        a = soft_to_qemu128(*ap);                                       \
++        b = soft_to_qemu128(*bp);                                       \
++        ret = func(a, b, &qsf);                                         \
++        return retcond;                                                 \
++    }
++
++WRAP_CMP80(qemu_f128M_eq_signaling, float128_compare, ret == 0)
++WRAP_CMP80(qemu_f128M_eq, float128_compare_quiet, ret == 0)
++WRAP_CMP80(qemu_f128M_le, float128_compare, ret <= 0)
++WRAP_CMP80(qemu_f128M_lt, float128_compare, ret < 0)
++WRAP_CMP80(qemu_f128M_le_quiet, float128_compare_quiet, ret <= 0)
++WRAP_CMP80(qemu_f128M_lt_quiet, float128_compare_quiet, ret < 0)
++#undef WRAP_CMP80
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 87c81d1dcc..363f133101 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -657,6 +657,9 @@ tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
+ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
+ tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
+ 
++tests/fp/%:
++	$(MAKE) -C $(dir $@) $(notdir $@)
++
+ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+ 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+ 	hw/core/bus.o \
+diff --git a/tests/fp/.gitignore b/tests/fp/.gitignore
+new file mode 100644
+index 0000000000..8d45d18ac4
+--- /dev/null
++++ b/tests/fp/.gitignore
+@@ -0,0 +1 @@
++fp-test
+diff --git a/tests/fp/Makefile b/tests/fp/Makefile
+new file mode 100644
+index 0000000000..3766589969
+--- /dev/null
++++ b/tests/fp/Makefile
+@@ -0,0 +1,589 @@
++BUILD_DIR := $(CURDIR)/../..
++
++include $(BUILD_DIR)/config-host.mak
++include $(SRC_PATH)/rules.mak
++
++SOFTFLOAT_DIR := $(SRC_PATH)/tests/fp/berkeley-softfloat-3
++TESTFLOAT_DIR := $(SRC_PATH)/tests/fp/berkeley-testfloat-3
++
++SF_SOURCE_DIR  := $(SOFTFLOAT_DIR)/source
++SF_INCLUDE_DIR := $(SOFTFLOAT_DIR)/source/include
++# we could use any specialize here, it doesn't matter
++SF_SPECIALIZE := 8086-SSE
++SF_SPECIALIZE_DIR := $(SF_SOURCE_DIR)/$(SF_SPECIALIZE)
++
++TF_SOURCE_DIR := $(TESTFLOAT_DIR)/source
++
++$(call set-vpath, $(SRC_PATH)/fpu $(SRC_PATH)/tests/fp)
++
++LIBQEMUUTIL := $(BUILD_DIR)/libqemuutil.a
++
++# Use this variable to be clear when we pull in our own implementation
++# We build the object with a default rule thanks to the vpath above
++QEMU_SOFTFLOAT_OBJ := softfloat.o
++
++QEMU_INCLUDES += -I$(SRC_PATH)/tests/fp
++QEMU_INCLUDES += -I$(SF_INCLUDE_DIR)
++QEMU_INCLUDES += -I$(SF_SPECIALIZE_DIR)
++QEMU_INCLUDES += -I$(TF_SOURCE_DIR)
++
++# work around TARGET_* poisoning
++QEMU_CFLAGS += -DHW_POISON_H
++
++# capstone has a platform.h file that clashes with softfloat's
++QEMU_CFLAGS := $(filter-out %capstone, $(QEMU_CFLAGS))
++
++# softfloat defines
++SF_OPTS :=
++SF_OPTS += -DSOFTFLOAT_ROUND_ODD
++SF_OPTS += -DINLINE_LEVEL=5
++SF_OPTS += -DSOFTFLOAT_FAST_DIV32TO16
++SF_OPTS += -DSOFTFLOAT_FAST_DIV64TO32
++SF_OPTS += -DSOFTFLOAT_FAST_INT64
++QEMU_CFLAGS += $(SF_OPTS)
++
++# silence the build of softfloat objects
++SF_CFLAGS += -Wno-missing-prototypes
++SF_CFLAGS += -Wno-redundant-decls
++SF_CFLAGS += -Wno-return-type
++SF_CFLAGS += -Wno-error
++
++# testfloat defines
++TF_OPTS :=
++TF_OPTS += -DFLOAT16
++TF_OPTS += -DFLOAT64
++TF_OPTS += -DEXTFLOAT80
++TF_OPTS += -DFLOAT128
++TF_OPTS += -DFLOAT_ROUND_ODD
++TF_OPTS += -DLONG_DOUBLE_IS_EXTFLOAT80
++QEMU_CFLAGS += $(TF_OPTS)
++
++# silence the build of testfloat objects
++TF_CFLAGS :=
++TF_CFLAGS += -Wno-strict-prototypes
++TF_CFLAGS += -Wno-unknown-pragmas
++TF_CFLAGS += -Wno-discarded-qualifiers
++TF_CFLAGS += -Wno-maybe-uninitialized
++TF_CFLAGS += -Wno-missing-prototypes
++TF_CFLAGS += -Wno-return-type
++TF_CFLAGS += -Wno-unused-function
++TF_CFLAGS += -Wno-error
++
++# softfloat objects
++SF_OBJS_PRIMITIVES :=
++SF_OBJS_PRIMITIVES += s_eq128.o
++SF_OBJS_PRIMITIVES += s_le128.o
++SF_OBJS_PRIMITIVES += s_lt128.o
++SF_OBJS_PRIMITIVES += s_shortShiftLeft128.o
++SF_OBJS_PRIMITIVES += s_shortShiftRight128.o
++SF_OBJS_PRIMITIVES += s_shortShiftRightJam64.o
++SF_OBJS_PRIMITIVES += s_shortShiftRightJam64Extra.o
++SF_OBJS_PRIMITIVES += s_shortShiftRightJam128.o
++SF_OBJS_PRIMITIVES += s_shortShiftRightJam128Extra.o
++SF_OBJS_PRIMITIVES += s_shiftRightJam32.o
++SF_OBJS_PRIMITIVES += s_shiftRightJam64.o
++SF_OBJS_PRIMITIVES += s_shiftRightJam64Extra.o
++SF_OBJS_PRIMITIVES += s_shiftRightJam128.o
++SF_OBJS_PRIMITIVES += s_shiftRightJam128Extra.o
++SF_OBJS_PRIMITIVES += s_shiftRightJam256M.o
++SF_OBJS_PRIMITIVES += s_countLeadingZeros8.o
++SF_OBJS_PRIMITIVES += s_countLeadingZeros16.o
++SF_OBJS_PRIMITIVES += s_countLeadingZeros32.o
++SF_OBJS_PRIMITIVES += s_countLeadingZeros64.o
++SF_OBJS_PRIMITIVES += s_add128.o
++SF_OBJS_PRIMITIVES += s_add256M.o
++SF_OBJS_PRIMITIVES += s_sub128.o
++SF_OBJS_PRIMITIVES += s_sub256M.o
++SF_OBJS_PRIMITIVES += s_mul64ByShifted32To128.o
++SF_OBJS_PRIMITIVES += s_mul64To128.o
++SF_OBJS_PRIMITIVES += s_mul128By32.o
++SF_OBJS_PRIMITIVES += s_mul128To256M.o
++SF_OBJS_PRIMITIVES += s_approxRecip_1Ks.o
++SF_OBJS_PRIMITIVES += s_approxRecip32_1.o
++SF_OBJS_PRIMITIVES += s_approxRecipSqrt_1Ks.o
++SF_OBJS_PRIMITIVES += s_approxRecipSqrt32_1.o
++
++SF_OBJS_SPECIALIZE :=
++SF_OBJS_SPECIALIZE += softfloat_raiseFlags.o
++SF_OBJS_SPECIALIZE += s_f16UIToCommonNaN.o
++SF_OBJS_SPECIALIZE += s_commonNaNToF16UI.o
++SF_OBJS_SPECIALIZE += s_propagateNaNF16UI.o
++SF_OBJS_SPECIALIZE += s_f32UIToCommonNaN.o
++SF_OBJS_SPECIALIZE += s_commonNaNToF32UI.o
++SF_OBJS_SPECIALIZE += s_propagateNaNF32UI.o
++SF_OBJS_SPECIALIZE += s_f64UIToCommonNaN.o
++SF_OBJS_SPECIALIZE += s_commonNaNToF64UI.o
++SF_OBJS_SPECIALIZE += s_propagateNaNF64UI.o
++SF_OBJS_SPECIALIZE += extF80M_isSignalingNaN.o
++SF_OBJS_SPECIALIZE += s_extF80UIToCommonNaN.o
++SF_OBJS_SPECIALIZE += s_commonNaNToExtF80UI.o
++SF_OBJS_SPECIALIZE += s_propagateNaNExtF80UI.o
++SF_OBJS_SPECIALIZE += f128M_isSignalingNaN.o
++SF_OBJS_SPECIALIZE += s_f128UIToCommonNaN.o
++SF_OBJS_SPECIALIZE += s_commonNaNToF128UI.o
++SF_OBJS_SPECIALIZE += s_propagateNaNF128UI.o
++
++SF_OBJS_OTHERS :=
++SF_OBJS_OTHERS += s_roundToUI32.o
++SF_OBJS_OTHERS += s_roundToUI64.o
++SF_OBJS_OTHERS += s_roundToI32.o
++SF_OBJS_OTHERS += s_roundToI64.o
++SF_OBJS_OTHERS += s_normSubnormalF16Sig.o
++SF_OBJS_OTHERS += s_roundPackToF16.o
++SF_OBJS_OTHERS += s_normRoundPackToF16.o
++SF_OBJS_OTHERS += s_addMagsF16.o
++SF_OBJS_OTHERS += s_subMagsF16.o
++SF_OBJS_OTHERS += s_mulAddF16.o
++SF_OBJS_OTHERS += s_normSubnormalF32Sig.o
++SF_OBJS_OTHERS += s_roundPackToF32.o
++SF_OBJS_OTHERS += s_normRoundPackToF32.o
++SF_OBJS_OTHERS += s_addMagsF32.o
++SF_OBJS_OTHERS += s_subMagsF32.o
++SF_OBJS_OTHERS += s_mulAddF32.o
++SF_OBJS_OTHERS += s_normSubnormalF64Sig.o
++SF_OBJS_OTHERS += s_roundPackToF64.o
++SF_OBJS_OTHERS += s_normRoundPackToF64.o
++SF_OBJS_OTHERS += s_addMagsF64.o
++SF_OBJS_OTHERS += s_subMagsF64.o
++SF_OBJS_OTHERS += s_mulAddF64.o
++SF_OBJS_OTHERS += s_normSubnormalExtF80Sig.o
++SF_OBJS_OTHERS += s_roundPackToExtF80.o
++SF_OBJS_OTHERS += s_normRoundPackToExtF80.o
++SF_OBJS_OTHERS += s_addMagsExtF80.o
++SF_OBJS_OTHERS += s_subMagsExtF80.o
++SF_OBJS_OTHERS += s_normSubnormalF128Sig.o
++SF_OBJS_OTHERS += s_roundPackToF128.o
++SF_OBJS_OTHERS += s_normRoundPackToF128.o
++SF_OBJS_OTHERS += s_addMagsF128.o
++SF_OBJS_OTHERS += s_subMagsF128.o
++SF_OBJS_OTHERS += s_mulAddF128.o
++SF_OBJS_OTHERS += softfloat_state.o
++SF_OBJS_OTHERS += ui32_to_f16.o
++SF_OBJS_OTHERS += ui32_to_f32.o
++SF_OBJS_OTHERS += ui32_to_f64.o
++SF_OBJS_OTHERS += ui32_to_extF80.o
++SF_OBJS_OTHERS += ui32_to_extF80M.o
++SF_OBJS_OTHERS += ui32_to_f128.o
++SF_OBJS_OTHERS += ui32_to_f128M.o
++SF_OBJS_OTHERS += ui64_to_f16.o
++SF_OBJS_OTHERS += ui64_to_f32.o
++SF_OBJS_OTHERS += ui64_to_f64.o
++SF_OBJS_OTHERS += ui64_to_extF80.o
++SF_OBJS_OTHERS += ui64_to_extF80M.o
++SF_OBJS_OTHERS += ui64_to_f128.o
++SF_OBJS_OTHERS += ui64_to_f128M.o
++SF_OBJS_OTHERS += i32_to_f16.o
++SF_OBJS_OTHERS += i32_to_f32.o
++SF_OBJS_OTHERS += i32_to_f64.o
++SF_OBJS_OTHERS += i32_to_extF80.o
++SF_OBJS_OTHERS += i32_to_extF80M.o
++SF_OBJS_OTHERS += i32_to_f128.o
++SF_OBJS_OTHERS += i32_to_f128M.o
++SF_OBJS_OTHERS += i64_to_f16.o
++SF_OBJS_OTHERS += i64_to_f32.o
++SF_OBJS_OTHERS += i64_to_f64.o
++SF_OBJS_OTHERS += i64_to_extF80.o
++SF_OBJS_OTHERS += i64_to_extF80M.o
++SF_OBJS_OTHERS += i64_to_f128.o
++SF_OBJS_OTHERS += i64_to_f128M.o
++SF_OBJS_OTHERS += f16_to_ui32.o
++SF_OBJS_OTHERS += f16_to_ui64.o
++SF_OBJS_OTHERS += f16_to_i32.o
++SF_OBJS_OTHERS += f16_to_i64.o
++SF_OBJS_OTHERS += f16_to_ui32_r_minMag.o
++SF_OBJS_OTHERS += f16_to_ui64_r_minMag.o
++SF_OBJS_OTHERS += f16_to_i32_r_minMag.o
++SF_OBJS_OTHERS += f16_to_i64_r_minMag.o
++SF_OBJS_OTHERS += f16_to_f32.o
++SF_OBJS_OTHERS += f16_to_f64.o
++SF_OBJS_OTHERS += f16_to_extF80.o
++SF_OBJS_OTHERS += f16_to_extF80M.o
++SF_OBJS_OTHERS += f16_to_f128.o
++SF_OBJS_OTHERS += f16_to_f128M.o
++SF_OBJS_OTHERS += f16_roundToInt.o
++SF_OBJS_OTHERS += f16_add.o
++SF_OBJS_OTHERS += f16_sub.o
++SF_OBJS_OTHERS += f16_mul.o
++SF_OBJS_OTHERS += f16_mulAdd.o
++SF_OBJS_OTHERS += f16_div.o
++SF_OBJS_OTHERS += f16_rem.o
++SF_OBJS_OTHERS += f16_sqrt.o
++SF_OBJS_OTHERS += f16_eq.o
++SF_OBJS_OTHERS += f16_le.o
++SF_OBJS_OTHERS += f16_lt.o
++SF_OBJS_OTHERS += f16_eq_signaling.o
++SF_OBJS_OTHERS += f16_le_quiet.o
++SF_OBJS_OTHERS += f16_lt_quiet.o
++SF_OBJS_OTHERS += f16_isSignalingNaN.o
++SF_OBJS_OTHERS += f32_to_ui32.o
++SF_OBJS_OTHERS += f32_to_ui64.o
++SF_OBJS_OTHERS += f32_to_i32.o
++SF_OBJS_OTHERS += f32_to_i64.o
++SF_OBJS_OTHERS += f32_to_ui32_r_minMag.o
++SF_OBJS_OTHERS += f32_to_ui64_r_minMag.o
++SF_OBJS_OTHERS += f32_to_i32_r_minMag.o
++SF_OBJS_OTHERS += f32_to_i64_r_minMag.o
++SF_OBJS_OTHERS += f32_to_f16.o
++SF_OBJS_OTHERS += f32_to_f64.o
++SF_OBJS_OTHERS += f32_to_extF80.o
++SF_OBJS_OTHERS += f32_to_extF80M.o
++SF_OBJS_OTHERS += f32_to_f128.o
++SF_OBJS_OTHERS += f32_to_f128M.o
++SF_OBJS_OTHERS += f32_roundToInt.o
++SF_OBJS_OTHERS += f32_add.o
++SF_OBJS_OTHERS += f32_sub.o
++SF_OBJS_OTHERS += f32_mul.o
++SF_OBJS_OTHERS += f32_mulAdd.o
++SF_OBJS_OTHERS += f32_div.o
++SF_OBJS_OTHERS += f32_rem.o
++SF_OBJS_OTHERS += f32_sqrt.o
++SF_OBJS_OTHERS += f32_eq.o
++SF_OBJS_OTHERS += f32_le.o
++SF_OBJS_OTHERS += f32_lt.o
++SF_OBJS_OTHERS += f32_eq_signaling.o
++SF_OBJS_OTHERS += f32_le_quiet.o
++SF_OBJS_OTHERS += f32_lt_quiet.o
++SF_OBJS_OTHERS += f32_isSignalingNaN.o
++SF_OBJS_OTHERS += f64_to_ui32.o
++SF_OBJS_OTHERS += f64_to_ui64.o
++SF_OBJS_OTHERS += f64_to_i32.o
++SF_OBJS_OTHERS += f64_to_i64.o
++SF_OBJS_OTHERS += f64_to_ui32_r_minMag.o
++SF_OBJS_OTHERS += f64_to_ui64_r_minMag.o
++SF_OBJS_OTHERS += f64_to_i32_r_minMag.o
++SF_OBJS_OTHERS += f64_to_i64_r_minMag.o
++SF_OBJS_OTHERS += f64_to_f16.o
++SF_OBJS_OTHERS += f64_to_f32.o
++SF_OBJS_OTHERS += f64_to_extF80.o
++SF_OBJS_OTHERS += f64_to_extF80M.o
++SF_OBJS_OTHERS += f64_to_f128.o
++SF_OBJS_OTHERS += f64_to_f128M.o
++SF_OBJS_OTHERS += f64_roundToInt.o
++SF_OBJS_OTHERS += f64_add.o
++SF_OBJS_OTHERS += f64_sub.o
++SF_OBJS_OTHERS += f64_mul.o
++SF_OBJS_OTHERS += f64_mulAdd.o
++SF_OBJS_OTHERS += f64_div.o
++SF_OBJS_OTHERS += f64_rem.o
++SF_OBJS_OTHERS += f64_sqrt.o
++SF_OBJS_OTHERS += f64_eq.o
++SF_OBJS_OTHERS += f64_le.o
++SF_OBJS_OTHERS += f64_lt.o
++SF_OBJS_OTHERS += f64_eq_signaling.o
++SF_OBJS_OTHERS += f64_le_quiet.o
++SF_OBJS_OTHERS += f64_lt_quiet.o
++SF_OBJS_OTHERS += f64_isSignalingNaN.o
++SF_OBJS_OTHERS += extF80_to_ui32.o
++SF_OBJS_OTHERS += extF80_to_ui64.o
++SF_OBJS_OTHERS += extF80_to_i32.o
++SF_OBJS_OTHERS += extF80_to_i64.o
++SF_OBJS_OTHERS += extF80_to_ui32_r_minMag.o
++SF_OBJS_OTHERS += extF80_to_ui64_r_minMag.o
++SF_OBJS_OTHERS += extF80_to_i32_r_minMag.o
++SF_OBJS_OTHERS += extF80_to_i64_r_minMag.o
++SF_OBJS_OTHERS += extF80_to_f16.o
++SF_OBJS_OTHERS += extF80_to_f32.o
++SF_OBJS_OTHERS += extF80_to_f64.o
++SF_OBJS_OTHERS += extF80_to_f128.o
++SF_OBJS_OTHERS += extF80_roundToInt.o
++SF_OBJS_OTHERS += extF80_add.o
++SF_OBJS_OTHERS += extF80_sub.o
++SF_OBJS_OTHERS += extF80_mul.o
++SF_OBJS_OTHERS += extF80_div.o
++SF_OBJS_OTHERS += extF80_rem.o
++SF_OBJS_OTHERS += extF80_sqrt.o
++SF_OBJS_OTHERS += extF80_eq.o
++SF_OBJS_OTHERS += extF80_le.o
++SF_OBJS_OTHERS += extF80_lt.o
++SF_OBJS_OTHERS += extF80_eq_signaling.o
++SF_OBJS_OTHERS += extF80_le_quiet.o
++SF_OBJS_OTHERS += extF80_lt_quiet.o
++SF_OBJS_OTHERS += extF80_isSignalingNaN.o
++SF_OBJS_OTHERS += extF80M_to_ui32.o
++SF_OBJS_OTHERS += extF80M_to_ui64.o
++SF_OBJS_OTHERS += extF80M_to_i32.o
++SF_OBJS_OTHERS += extF80M_to_i64.o
++SF_OBJS_OTHERS += extF80M_to_ui32_r_minMag.o
++SF_OBJS_OTHERS += extF80M_to_ui64_r_minMag.o
++SF_OBJS_OTHERS += extF80M_to_i32_r_minMag.o
++SF_OBJS_OTHERS += extF80M_to_i64_r_minMag.o
++SF_OBJS_OTHERS += extF80M_to_f16.o
++SF_OBJS_OTHERS += extF80M_to_f32.o
++SF_OBJS_OTHERS += extF80M_to_f64.o
++SF_OBJS_OTHERS += extF80M_to_f128M.o
++SF_OBJS_OTHERS += extF80M_roundToInt.o
++SF_OBJS_OTHERS += extF80M_add.o
++SF_OBJS_OTHERS += extF80M_sub.o
++SF_OBJS_OTHERS += extF80M_mul.o
++SF_OBJS_OTHERS += extF80M_div.o
++SF_OBJS_OTHERS += extF80M_rem.o
++SF_OBJS_OTHERS += extF80M_sqrt.o
++SF_OBJS_OTHERS += extF80M_eq.o
++SF_OBJS_OTHERS += extF80M_le.o
++SF_OBJS_OTHERS += extF80M_lt.o
++SF_OBJS_OTHERS += extF80M_eq_signaling.o
++SF_OBJS_OTHERS += extF80M_le_quiet.o
++SF_OBJS_OTHERS += extF80M_lt_quiet.o
++SF_OBJS_OTHERS += f128_to_ui32.o
++SF_OBJS_OTHERS += f128_to_ui64.o
++SF_OBJS_OTHERS += f128_to_i32.o
++SF_OBJS_OTHERS += f128_to_i64.o
++SF_OBJS_OTHERS += f128_to_ui32_r_minMag.o
++SF_OBJS_OTHERS += f128_to_ui64_r_minMag.o
++SF_OBJS_OTHERS += f128_to_i32_r_minMag.o
++SF_OBJS_OTHERS += f128_to_i64_r_minMag.o
++SF_OBJS_OTHERS += f128_to_f16.o
++SF_OBJS_OTHERS += f128_to_f32.o
++SF_OBJS_OTHERS += f128_to_extF80.o
++SF_OBJS_OTHERS += f128_to_f64.o
++SF_OBJS_OTHERS += f128_roundToInt.o
++SF_OBJS_OTHERS += f128_add.o
++SF_OBJS_OTHERS += f128_sub.o
++SF_OBJS_OTHERS += f128_mul.o
++SF_OBJS_OTHERS += f128_mulAdd.o
++SF_OBJS_OTHERS += f128_div.o
++SF_OBJS_OTHERS += f128_rem.o
++SF_OBJS_OTHERS += f128_sqrt.o
++SF_OBJS_OTHERS += f128_eq.o
++SF_OBJS_OTHERS += f128_le.o
++SF_OBJS_OTHERS += f128_lt.o
++SF_OBJS_OTHERS += f128_eq_signaling.o
++SF_OBJS_OTHERS += f128_le_quiet.o
++SF_OBJS_OTHERS += f128_lt_quiet.o
++SF_OBJS_OTHERS += f128_isSignalingNaN.o
++SF_OBJS_OTHERS += f128M_to_ui32.o
++SF_OBJS_OTHERS += f128M_to_ui64.o
++SF_OBJS_OTHERS += f128M_to_i32.o
++SF_OBJS_OTHERS += f128M_to_i64.o
++SF_OBJS_OTHERS += f128M_to_ui32_r_minMag.o
++SF_OBJS_OTHERS += f128M_to_ui64_r_minMag.o
++SF_OBJS_OTHERS += f128M_to_i32_r_minMag.o
++SF_OBJS_OTHERS += f128M_to_i64_r_minMag.o
++SF_OBJS_OTHERS += f128M_to_f16.o
++SF_OBJS_OTHERS += f128M_to_f32.o
++SF_OBJS_OTHERS += f128M_to_extF80M.o
++SF_OBJS_OTHERS += f128M_to_f64.o
++SF_OBJS_OTHERS += f128M_roundToInt.o
++SF_OBJS_OTHERS += f128M_add.o
++SF_OBJS_OTHERS += f128M_sub.o
++SF_OBJS_OTHERS += f128M_mul.o
++SF_OBJS_OTHERS += f128M_mulAdd.o
++SF_OBJS_OTHERS += f128M_div.o
++SF_OBJS_OTHERS += f128M_rem.o
++SF_OBJS_OTHERS += f128M_sqrt.o
++SF_OBJS_OTHERS += f128M_eq.o
++SF_OBJS_OTHERS += f128M_le.o
++SF_OBJS_OTHERS += f128M_lt.o
++SF_OBJS_OTHERS += f128M_eq_signaling.o
++SF_OBJS_OTHERS += f128M_le_quiet.o
++SF_OBJS_OTHERS += f128M_lt_quiet.o
++
++SF_OBJS_ALL_NOSPEC :=
++SF_OBJS_ALL_NOSPEC += $(SF_OBJS_PRIMITIVES)
++SF_OBJS_ALL_NOSPEC += $(SF_OBJS_OTHERS)
++
++SF_OBJS_ALL :=
++SF_OBJS_ALL += $(SF_OBJS_ALL_NOSPEC)
++SF_OBJS_ALL += $(SF_OBJS_SPECIALIZE)
++
++# testfloat objects
++TF_OBJS_GENCASES :=
++TF_OBJS_GENCASES += genCases_ui32.o
++TF_OBJS_GENCASES += genCases_ui64.o
++TF_OBJS_GENCASES += genCases_i32.o
++TF_OBJS_GENCASES += genCases_i64.o
++TF_OBJS_GENCASES += genCases_f16.o
++TF_OBJS_GENCASES += genCases_f32.o
++TF_OBJS_GENCASES += genCases_f64.o
++TF_OBJS_GENCASES += genCases_extF80.o
++TF_OBJS_GENCASES += genCases_f128.o
++
++TF_OBJS_WRITECASE :=
++TF_OBJS_WRITECASE += writeCase_a_ui32.o
++TF_OBJS_WRITECASE += writeCase_a_ui64.o
++TF_OBJS_WRITECASE += writeCase_a_f16.o
++TF_OBJS_WRITECASE += writeCase_ab_f16.o
++TF_OBJS_WRITECASE += writeCase_abc_f16.o
++TF_OBJS_WRITECASE += writeCase_a_f32.o
++TF_OBJS_WRITECASE += writeCase_ab_f32.o
++TF_OBJS_WRITECASE += writeCase_abc_f32.o
++TF_OBJS_WRITECASE += writeCase_a_f64.o
++TF_OBJS_WRITECASE += writeCase_ab_f64.o
++TF_OBJS_WRITECASE += writeCase_abc_f64.o
++TF_OBJS_WRITECASE += writeCase_a_extF80M.o
++TF_OBJS_WRITECASE += writeCase_ab_extF80M.o
++TF_OBJS_WRITECASE += writeCase_a_f128M.o
++TF_OBJS_WRITECASE += writeCase_ab_f128M.o
++TF_OBJS_WRITECASE += writeCase_abc_f128M.o
++TF_OBJS_WRITECASE += writeCase_z_bool.o
++TF_OBJS_WRITECASE += writeCase_z_ui32.o
++TF_OBJS_WRITECASE += writeCase_z_ui64.o
++TF_OBJS_WRITECASE += writeCase_z_f16.o
++TF_OBJS_WRITECASE += writeCase_z_f32.o
++TF_OBJS_WRITECASE += writeCase_z_f64.o
++TF_OBJS_WRITECASE += writeCase_z_extF80M.o
++TF_OBJS_WRITECASE += writeCase_z_f128M.o
++
++TF_OBJS_TEST :=
++TF_OBJS_TEST += test_a_ui32_z_f16.o
++TF_OBJS_TEST += test_a_ui32_z_f32.o
++TF_OBJS_TEST += test_a_ui32_z_f64.o
++TF_OBJS_TEST += test_a_ui32_z_extF80.o
++TF_OBJS_TEST += test_a_ui32_z_f128.o
++TF_OBJS_TEST += test_a_ui64_z_f16.o
++TF_OBJS_TEST += test_a_ui64_z_f32.o
++TF_OBJS_TEST += test_a_ui64_z_f64.o
++TF_OBJS_TEST += test_a_ui64_z_extF80.o
++TF_OBJS_TEST += test_a_ui64_z_f128.o
++TF_OBJS_TEST += test_a_i32_z_f16.o
++TF_OBJS_TEST += test_a_i32_z_f32.o
++TF_OBJS_TEST += test_a_i32_z_f64.o
++TF_OBJS_TEST += test_a_i32_z_extF80.o
++TF_OBJS_TEST += test_a_i32_z_f128.o
++TF_OBJS_TEST += test_a_i64_z_f16.o
++TF_OBJS_TEST += test_a_i64_z_f32.o
++TF_OBJS_TEST += test_a_i64_z_f64.o
++TF_OBJS_TEST += test_a_i64_z_extF80.o
++TF_OBJS_TEST += test_a_i64_z_f128.o
++TF_OBJS_TEST += test_a_f16_z_ui32_rx.o
++TF_OBJS_TEST += test_a_f16_z_ui64_rx.o
++TF_OBJS_TEST += test_a_f16_z_i32_rx.o
++TF_OBJS_TEST += test_a_f16_z_i64_rx.o
++TF_OBJS_TEST += test_a_f16_z_ui32_x.o
++TF_OBJS_TEST += test_a_f16_z_ui64_x.o
++TF_OBJS_TEST += test_a_f16_z_i32_x.o
++TF_OBJS_TEST += test_a_f16_z_i64_x.o
++TF_OBJS_TEST += test_a_f16_z_f32.o
++TF_OBJS_TEST += test_a_f16_z_f64.o
++TF_OBJS_TEST += test_a_f16_z_extF80.o
++TF_OBJS_TEST += test_a_f16_z_f128.o
++TF_OBJS_TEST += test_az_f16.o
++TF_OBJS_TEST += test_az_f16_rx.o
++TF_OBJS_TEST += test_abz_f16.o
++TF_OBJS_TEST += test_abcz_f16.o
++TF_OBJS_TEST += test_ab_f16_z_bool.o
++TF_OBJS_TEST += test_a_f32_z_ui32_rx.o
++TF_OBJS_TEST += test_a_f32_z_ui64_rx.o
++TF_OBJS_TEST += test_a_f32_z_i32_rx.o
++TF_OBJS_TEST += test_a_f32_z_i64_rx.o
++TF_OBJS_TEST += test_a_f32_z_ui32_x.o
++TF_OBJS_TEST += test_a_f32_z_ui64_x.o
++TF_OBJS_TEST += test_a_f32_z_i32_x.o
++TF_OBJS_TEST += test_a_f32_z_i64_x.o
++TF_OBJS_TEST += test_a_f32_z_f16.o
++TF_OBJS_TEST += test_a_f32_z_f64.o
++TF_OBJS_TEST += test_a_f32_z_extF80.o
++TF_OBJS_TEST += test_a_f32_z_f128.o
++TF_OBJS_TEST += test_az_f32.o
++TF_OBJS_TEST += test_az_f32_rx.o
++TF_OBJS_TEST += test_abz_f32.o
++TF_OBJS_TEST += test_abcz_f32.o
++TF_OBJS_TEST += test_ab_f32_z_bool.o
++TF_OBJS_TEST += test_a_f64_z_ui32_rx.o
++TF_OBJS_TEST += test_a_f64_z_ui64_rx.o
++TF_OBJS_TEST += test_a_f64_z_i32_rx.o
++TF_OBJS_TEST += test_a_f64_z_i64_rx.o
++TF_OBJS_TEST += test_a_f64_z_ui32_x.o
++TF_OBJS_TEST += test_a_f64_z_ui64_x.o
++TF_OBJS_TEST += test_a_f64_z_i32_x.o
++TF_OBJS_TEST += test_a_f64_z_i64_x.o
++TF_OBJS_TEST += test_a_f64_z_f16.o
++TF_OBJS_TEST += test_a_f64_z_f32.o
++TF_OBJS_TEST += test_a_f64_z_extF80.o
++TF_OBJS_TEST += test_a_f64_z_f128.o
++TF_OBJS_TEST += test_az_f64.o
++TF_OBJS_TEST += test_az_f64_rx.o
++TF_OBJS_TEST += test_abz_f64.o
++TF_OBJS_TEST += test_abcz_f64.o
++TF_OBJS_TEST += test_ab_f64_z_bool.o
++TF_OBJS_TEST += test_a_extF80_z_ui32_rx.o
++TF_OBJS_TEST += test_a_extF80_z_ui64_rx.o
++TF_OBJS_TEST += test_a_extF80_z_i32_rx.o
++TF_OBJS_TEST += test_a_extF80_z_i64_rx.o
++TF_OBJS_TEST += test_a_extF80_z_ui32_x.o
++TF_OBJS_TEST += test_a_extF80_z_ui64_x.o
++TF_OBJS_TEST += test_a_extF80_z_i32_x.o
++TF_OBJS_TEST += test_a_extF80_z_i64_x.o
++TF_OBJS_TEST += test_a_extF80_z_f16.o
++TF_OBJS_TEST += test_a_extF80_z_f32.o
++TF_OBJS_TEST += test_a_extF80_z_f64.o
++TF_OBJS_TEST += test_a_extF80_z_f128.o
++TF_OBJS_TEST += test_az_extF80.o
++TF_OBJS_TEST += test_az_extF80_rx.o
++TF_OBJS_TEST += test_abz_extF80.o
++TF_OBJS_TEST += test_ab_extF80_z_bool.o
++TF_OBJS_TEST += test_a_f128_z_ui32_rx.o
++TF_OBJS_TEST += test_a_f128_z_ui64_rx.o
++TF_OBJS_TEST += test_a_f128_z_i32_rx.o
++TF_OBJS_TEST += test_a_f128_z_i64_rx.o
++TF_OBJS_TEST += test_a_f128_z_ui32_x.o
++TF_OBJS_TEST += test_a_f128_z_ui64_x.o
++TF_OBJS_TEST += test_a_f128_z_i32_x.o
++TF_OBJS_TEST += test_a_f128_z_i64_x.o
++TF_OBJS_TEST += test_a_f128_z_f16.o
++TF_OBJS_TEST += test_a_f128_z_f32.o
++TF_OBJS_TEST += test_a_f128_z_f64.o
++TF_OBJS_TEST += test_a_f128_z_extF80.o
++TF_OBJS_TEST += test_az_f128.o
++TF_OBJS_TEST += test_az_f128_rx.o
++TF_OBJS_TEST += test_abz_f128.o
++TF_OBJS_TEST += test_abcz_f128.o
++TF_OBJS_TEST += test_ab_f128_z_bool.o
++
++TF_OBJS_LIB :=
++TF_OBJS_LIB += uint128_inline.o
++TF_OBJS_LIB += uint128.o
++TF_OBJS_LIB += fail.o
++TF_OBJS_LIB += functions_common.o
++TF_OBJS_LIB += functionInfos.o
++TF_OBJS_LIB += standardFunctionInfos.o
++TF_OBJS_LIB += random.o
++TF_OBJS_LIB += genCases_common.o
++TF_OBJS_LIB += $(TF_OBJS_GENCASES)
++TF_OBJS_LIB += genCases_writeTestsTotal.o
++TF_OBJS_LIB += verCases_inline.o
++TF_OBJS_LIB += verCases_common.o
++TF_OBJS_LIB += verCases_writeFunctionName.o
++TF_OBJS_LIB += readHex.o
++TF_OBJS_LIB += writeHex.o
++TF_OBJS_LIB += $(TF_OBJS_WRITECASE)
++TF_OBJS_LIB += testLoops_common.o
++TF_OBJS_LIB += $(TF_OBJS_TEST)
++
++BINARIES := fp-test$(EXESUF)
++
++all: $(BINARIES)
++
++$(LIBQEMUUTIL):
++	$(MAKE) -C $(BUILD_DIR) libqemuutil.a
++
++# libtestfloat.a depends on libsoftfloat.a, so specify it first
++FP_TEST_LIBS := libtestfloat.a libsoftfloat.a $(LIBQEMUUTIL)
++
++fp-test$(EXESUF): fp-test.o slowfloat.o $(QEMU_SOFTFLOAT_OBJ) $(FP_TEST_LIBS)
++
++# Custom rule to build with SF_CFLAGS
++SF_BUILD = $(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
++		$(QEMU_CFLAGS) $(SF_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) \
++		$($@-cflags) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
++
++$(SF_OBJS_ALL_NOSPEC): %.o: $(SF_SOURCE_DIR)/%.c
++	$(SF_BUILD)
++$(SF_OBJS_SPECIALIZE): %.o: $(SF_SPECIALIZE_DIR)/%.c
++	$(SF_BUILD)
++
++libsoftfloat.a: $(SF_OBJS_ALL)
++
++# Custom rule to build with TF_CFLAGS
++$(TF_OBJS_LIB) slowfloat.o: %.o: $(TF_SOURCE_DIR)/%.c
++	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
++		$(QEMU_CFLAGS) $(TF_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) \
++		$($@-cflags) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
++
++libtestfloat.a: $(TF_OBJS_LIB)
++
++clean:
++	rm -f *.o *.d $(BINARIES)
++	rm -f fp-test$(EXESUF)
++	rm -f libsoftfloat.a
++	rm -f libtestfloat.a
+-- 
+2.17.1
