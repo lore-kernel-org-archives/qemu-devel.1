@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFU-0007UL-L2
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:13 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFW-0007cz-Hj
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFT-00054v-9N
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFQ-00053H-JG
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:14 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  7 Sep 2018 17:31:47 +1000
-Message-Id: <20180907073155.26200-7-david@gibson.dropbear.id.au>
+Date: Fri,  7 Sep 2018 17:31:44 +1000
+Message-Id: <20180907073155.26200-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20180907073155.26200-1-david@gibson.dropbear.id.au>
 References: <20180907073155.26200-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 06/14] macio: add addr property to macio IDE
- object
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/14] spapr_pci: fix potential NULL pointer
+ dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +26,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: Greg Kurz <groug@kaod.org>
 
-This contains the offset of the IDE controller within the macio address space
-and is required to allow the address to be included within the fw path.
+Commit 2c88b098e76fd added a call to SPAPR_MACHINE_GET_CLASS(spapr) in
+spapr_phb_realize() before we check spapr isn't NULL. This causes QEMU
+to crash when starting a non-pseries machine with a sPAPR PHB.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+This could be fixed by setting the smc variable after the null check,
+but it seems more explicit to use a ternary operator to skip the call
+to SPAPR_MACHINE_GET_CLASS() if spapr is NULL, since spapr_phb_realize()
+will return immediately in this case.
+
+This was reported by Coverity (CID 1395170 and 1395183).
+
+Fixes: 2c88b098e76fde0c7fcc0476dd3f80ce58409505
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ide/macio.c                | 1 +
- hw/misc/macio/macio.c         | 5 +++--
- include/hw/misc/macio/macio.h | 1 +
- 3 files changed, 5 insertions(+), 2 deletions(-)
+ hw/ppc/spapr_pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ide/macio.c b/hw/ide/macio.c
-index f23961e241..bab8c45a43 100644
---- a/hw/ide/macio.c
-+++ b/hw/ide/macio.c
-@@ -461,6 +461,7 @@ static void macio_ide_initfn(Object *obj)
- 
- static Property macio_ide_properties[] = {
-     DEFINE_PROP_UINT32("channel", MACIOIDEState, channel, 0),
-+    DEFINE_PROP_UINT32("addr", MACIOIDEState, addr, -1),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index 229bfddb90..94da85c8d7 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -219,10 +219,11 @@ static void macio_init_ide(MacIOState *s, MACIOIDEState *ide, size_t ide_size,
-                            int index)
- {
-     gchar *name = g_strdup_printf("ide[%i]", index);
-+    uint32_t addr = 0x1f000 + ((index + 1) * 0x1000);
- 
-     macio_init_child_obj(s, name, ide, ide_size, TYPE_MACIO_IDE);
--    memory_region_add_subregion(&s->bar, 0x1f000 + ((index + 1) * 0x1000),
--                                &ide->mem);
-+    qdev_prop_set_uint32(DEVICE(ide), "addr", addr);
-+    memory_region_add_subregion(&s->bar, addr, &ide->mem);
-     g_free(name);
- }
- 
-diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
-index 3189973ee6..970058b6ed 100644
---- a/include/hw/misc/macio/macio.h
-+++ b/include/hw/misc/macio/macio.h
-@@ -51,6 +51,7 @@ typedef struct MACIOIDEState {
-     /*< private >*/
-     SysBusDevice parent_obj;
-     /*< public >*/
-+    uint32_t addr;
-     uint32_t channel;
-     qemu_irq real_ide_irq;
-     qemu_irq real_dma_irq;
--- 
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 5cd676e443..6bcb4f419b 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1559,7 +1559,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+     sPAPRMachineState *spapr =3D
+         (sPAPRMachineState *) object_dynamic_cast(qdev_get_machine(),
+                                                   TYPE_SPAPR_MACHINE);
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
++    sPAPRMachineClass *smc =3D spapr ? SPAPR_MACHINE_GET_CLASS(spapr) : =
+NULL;
+     SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
+     sPAPRPHBState *sphb =3D SPAPR_PCI_HOST_BRIDGE(s);
+     PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
+--=20
 2.17.1
