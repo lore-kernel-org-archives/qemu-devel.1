@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyHvU-0000l4-VZ
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:40:02 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fyHyU-0003Kf-Fn
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyHvQ-0001OO-58
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:39:59 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:43677)
+	(envelope-from <alex.bennee@linaro.org>) id 1fyHyR-0003sk-Be
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:43:06 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52904)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fyHvN-0001Iz-Tq
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:39:54 -0400
-Received: by mail-wr1-x430.google.com with SMTP id k5-v6so15201634wre.10
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:39:53 -0700 (PDT)
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+	id 1fyHyR-0003ro-3B
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:43:03 -0400
+Received: by mail-wm0-x244.google.com with SMTP id y139-v6so14882212wmc.2
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:43:02 -0700 (PDT)
+References: <20180817232923.28899-1-cota@braap.org>
+	<20180817232923.28899-2-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-Date: Fri, 07 Sep 2018 15:39:50 +0100
-Message-ID: <87lg8dz809.fsf@linaro.org>
+In-reply-to: <20180817232923.28899-2-cota@braap.org>
+Date: Fri, 07 Sep 2018 15:43:00 +0100
+Message-ID: <87k1nxz7uz.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
- prototype
+Subject: Re: [Qemu-devel] [PATCH 1/6] qht: remove unused map param from
+ qht_remove__locked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,140 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+Emilio G. Cota <cota@braap.org> writes:
 
-> The following series implements dynamic binary instrumentation upon
-> QEMU.
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-OK I've done a pass through the patches, final comments bellow.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-<snip>
->
-> For the current patches the plugins should provide the following
-> callbacks:
->  - "needs" callback to check whether the specific instruction
->    should be instrumented by this plugin
->  - "run" callback which called before executing the instuction
-
-I think with a little re-jigging we could reduce this to a single run
-call which can then decide if it is going to deal with things in this
-case.
-
-> Our instrumentation subsystem exploits TCG helper mechanism to embed
-> callbacks into the translation blocks. These callbacks may be inserted
-> before the specific instructions.
->
-> The aim of submission of this series at that early stage is to get
-> the feedback which will guide the development process. We are faced
-> the following questions:
->  1. Does every plugins should have its own callback embedded into the TB
->     (which will cause TB extra growth in case of multiple plugins),
->     or the instrumentation layer's callback should invoke the plugins
->     that wanted to instrument that specific instruction?
-
-The common case is having one plugin and I'd rather give the flexibility
-of what helper to call and how much information to give it to the plugin
-and deal with the potential to have multiple helper calls per
-instruction for the complex cases.
-
-Now I can see arguments against it from an interface complexity point of
-view but I think plugins should get access to the TCG functions so they
-can generate their own op sequences if need be and not have to call a
-helper at all if they don't need to.
-
->  2. How the plugins should function? Will they work as a binary dynamic
->     libraries or a script on some interpreted language?
-
-I think plain C dynamic libraries with optional TCG ops would be a
-sensible starting point. For the sort of analysis that potentially
-involves lots of operations adding an interpreted language would be:
-
-  - a bike-shedding operation (everyone has a favourite)
-  - slower than C
-
->  3. Should the plugins reuse QEMU configuration script results?
->     Now there is no possibility for using platform-specific macros
->     generated by QEMU configure.
-
-It depends but I'm of the opinion that you build your plugins for the
-QEMU you have and not expect them to run with any other version.
-Defining some sort of cross-version API stability is just making a rod
-for our own back.
-
->  4. Maybe QEMU module infrastructure should be extended to support
->     plugins too?
-
-Pass - I'm not very knowledgeable about what the existing module stuff
-does.
-
->  5. How the GDB-related CPU inspection interface may be used better?
->     We should pass a register code to read the value. These codes
->     are not described in any of the files. Maybe a function for
->     accessing register by name should be added?
-
-Personally it feels a bit hacky at the moment. Perhaps we should be
-looking at exposing tcg_global to the plugin interface. They are already
-registered with names and it would be more efficient to load from TCG
-code into the helper.
-
->
->
-> v2 changes:
->  - added a subsystem for the plugins
->  - added QEMU side API for plugins
->  - added sample plugins for simple tracing
->
 > ---
+>  util/qht.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
-> Pavel Dovgalyuk (7):
->       tcg: add headers for non-target helpers
->       Add plugin support
->       plugins: provide helper functions for plugins
->       tcg: add instrumenting module
->       plugins: add plugin template
->       plugin: add instruction execution logger
->       plugins: add syscall logging plugin sample
+> diff --git a/util/qht.c b/util/qht.c
+> index c138777a9c..7b57b50a24 100644
+> --- a/util/qht.c
+> +++ b/util/qht.c
+> @@ -665,8 +665,7 @@ static inline void qht_bucket_remove_entry(struct qht=
+_bucket *orig, int pos)
 >
+>  /* call with b->lock held */
+>  static inline
+> -bool qht_remove__locked(struct qht_map *map, struct qht_bucket *head,
+> -                        const void *p, uint32_t hash)
+> +bool qht_remove__locked(struct qht_bucket *head, const void *p, uint32_t=
+ hash)
+>  {
+>      struct qht_bucket *b =3D head;
+>      int i;
+> @@ -701,7 +700,7 @@ bool qht_remove(struct qht *ht, const void *p, uint32=
+_t hash)
+>      qht_debug_assert(p);
 >
->  Makefile.target                   |    1
->  accel/tcg/translator.c            |    5 +
->  configure                         |   14 ++++
->  include/exec/helper-register.h    |   53 +++++++++++++++
->  include/qemu/instrument.h         |    7 ++
->  include/qemu/plugins.h            |    8 ++
->  plugins/exec-log/Makefile         |   19 +++++
->  plugins/exec-log/exec-log.c       |   18 +++++
->  plugins/helper.h                  |    1
->  plugins/include/plugins.h         |   18 +++++
->  plugins/plugins.c                 |  132 +++++++++++++++++++++++++++++++=
-++++++
->  plugins/qemulib.c                 |   31 +++++++++
->  plugins/syscall-log/Makefile      |   19 +++++
->  plugins/syscall-log/syscall-log.c |   44 ++++++++++++
->  plugins/template/Makefile         |   19 +++++
->  plugins/template/template.c       |   19 +++++
->  qemu-options.hx                   |   10 +++
->  tcg/tcg.c                         |   12 +++
->  tcg/tcg.h                         |    3 +
->  vl.c                              |    8 ++
->  20 files changed, 440 insertions(+), 1 deletion(-)
->  create mode 100644 include/exec/helper-register.h
->  create mode 100644 include/qemu/instrument.h
->  create mode 100644 include/qemu/plugins.h
->  create mode 100644 plugins/exec-log/Makefile
->  create mode 100644 plugins/exec-log/exec-log.c
->  create mode 100644 plugins/helper.h
->  create mode 100644 plugins/include/plugins.h
->  create mode 100644 plugins/plugins.c
->  create mode 100644 plugins/qemulib.c
->  create mode 100644 plugins/syscall-log/Makefile
->  create mode 100644 plugins/syscall-log/syscall-log.c
->  create mode 100644 plugins/template/Makefile
->  create mode 100644 plugins/template/template.c
+>      b =3D qht_bucket_lock__no_stale(ht, hash, &map);
+> -    ret =3D qht_remove__locked(map, b, p, hash);
+> +    ret =3D qht_remove__locked(b, p, hash);
+>      qht_bucket_debug__locked(b);
+>      qemu_spin_unlock(&b->lock);
+>      return ret;
 
 
 --
