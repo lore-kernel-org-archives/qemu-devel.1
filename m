@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fyMzT-0000jc-Ko
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:04:28 -0400
+	(envelope-from <mst@redhat.com>) id 1fyNTw-00041U-Bc
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fyMzQ-0003ci-72
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:04:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33140 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fyNTs-0005qw-3s
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:35:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59270 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fyMzQ-0003W5-1R
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:04:24 -0400
-References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
-	<153634345465.24629.12107192195596244951.malone@gac.canonical.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e44e6746-8b94-c9e9-698f-514265208e68@redhat.com>
-Date: Fri, 7 Sep 2018 15:04:22 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyNTr-0005QL-SS
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:35:52 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A47E787927
+	for <qemu-devel@nongnu.org>; Fri,  7 Sep 2018 20:35:49 +0000 (UTC)
+Date: Fri, 7 Sep 2018 16:35:42 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180907163253-mutt-send-email-mst@kernel.org>
+References: <20180308195811.24894-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <153634345465.24629.12107192195596244951.malone@gac.canonical.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX
- creates corrupt images
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180308195811.24894-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 00/29] postcopy+vhost-user/shared ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +32,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1776920 <1776920@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, peterx@redhat.com, quintela@redhat.com, aarcange@redhat.com
 
-On 09/07/2018 01:04 PM, Yan-Jie Wang wrote:
-> I have done some experiments and find out that
-> the behavior of lseek with whence set to SEEK_DATA is different from the behavior of Linux's lseek.
+On Thu, Mar 08, 2018 at 07:57:42PM +0000, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> If the supplied offset is in the middle of a data region, it returns the
-> start of the next data region.  There may be many data regions in a big
-> file even though it has no hole.
+>   This set enables postcopy migration with shared memory to a vhost user process.
+> It's based off current head.
 > 
-> return value of lseek with whence set to SEEK_DATA:
+>   Testing is mostly performed with dpdk, with corresponding modifications by
+> Maxime.
 > 
-> |--(offset)--Data----|(return value)----Data----|
-> |--(offset)--Data----|----Hole----|(return value)----Data----|
+>   v4 is mostly just fixes from comments received during review of v3,
+> and the normal updating of all the virtio enum's to catch up with other
+> things getting in before us.
 > 
+> Dave
+
+For vhost bits:
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+So how is all this going to be merged?
+If it's through my tree pls let me know.
+I'm fine with another tree though.
+
 > 
-> ** Patch added: "macOS-lseek.patch"
->     https://bugs.launchpad.net/qemu/+bug/1776920/+attachment/5186138/+files/macOS-lseek.patch
-
-While a developer can chase a URL, our CI tools can't.  Can you please 
-also send that patch directly to qemu-devel@nongnu.org, so that it gets 
-the same level of review as other patches?
-
-But I am very reluctant to take your patch. MacOS is flat-out buggy and 
-in violation of the specification of lseek(SEEK_DATA), so making all 
-applications work around their bug is not going to scale as well as 
-having them fix their bug in the first place.
-
-Here's the proposed POSIX specification for what lseek(SEEK_DATA) is 
-supposed to do:
-http://austingroupbugs.net/view.php?id=415#c862
-
-That text has been present for 7 years now - so anyone implementing 
-SEEK_DATA should really be paying attention to interoperability with 
-that text.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> Dr. David Alan Gilbert (29):
+>   migrate: Update ram_block_discard_range for shared
+>   qemu_ram_block_host_offset
+>   postcopy: use UFFDIO_ZEROPAGE only when available
+>   postcopy: Add notifier chain
+>   postcopy: Add vhost-user flag for postcopy and check it
+>   vhost-user: Add 'VHOST_USER_POSTCOPY_ADVISE' message
+>   libvhost-user: Support sending fds back to qemu
+>   libvhost-user: Open userfaultfd
+>   postcopy: Allow registering of fd handler
+>   vhost+postcopy: Register shared ufd with postcopy
+>   vhost+postcopy: Transmit 'listen' to client
+>   postcopy+vhost-user: Split set_mem_table for postcopy
+>   migration/ram: ramblock_recv_bitmap_test_byte_offset
+>   libvhost-user+postcopy: Register new regions with the ufd
+>   vhost+postcopy: Send address back to qemu
+>   vhost+postcopy: Stash RAMBlock and offset
+>   vhost+postcopy: Send requests to source for shared pages
+>   vhost+postcopy: Resolve client address
+>   postcopy: helper for waking shared
+>   postcopy: postcopy_notify_shared_wake
+>   vhost+postcopy: Add vhost waker
+>   vhost+postcopy: Call wakeups
+>   libvhost-user: mprotect & madvises for postcopy
+>   vhost-user: Add VHOST_USER_POSTCOPY_END message
+>   vhost+postcopy: Wire up POSTCOPY_END notify
+>   vhost: Huge page align and merge
+>   postcopy: Allow shared memory
+>   libvhost-user: Claim support for postcopy
+>   postcopy shared docs
+> 
+>  contrib/libvhost-user/libvhost-user.c | 303 ++++++++++++++++++++++++-
+>  contrib/libvhost-user/libvhost-user.h |  11 +
+>  docs/devel/migration.rst              |  41 ++++
+>  docs/interop/vhost-user.txt           |  51 +++++
+>  exec.c                                |  86 +++++--
+>  hw/virtio/trace-events                |  16 +-
+>  hw/virtio/vhost-user.c                | 411 +++++++++++++++++++++++++++++++++-
+>  hw/virtio/vhost.c                     |  66 +++++-
+>  include/exec/cpu-common.h             |   4 +
+>  migration/migration.c                 |   6 +
+>  migration/migration.h                 |   4 +
+>  migration/postcopy-ram.c              | 354 +++++++++++++++++++++++------
+>  migration/postcopy-ram.h              |  69 ++++++
+>  migration/ram.c                       |   5 +
+>  migration/ram.h                       |   1 +
+>  migration/savevm.c                    |  13 ++
+>  migration/trace-events                |   6 +
+>  trace-events                          |   3 +-
+>  vl.c                                  |   2 +
+>  19 files changed, 1354 insertions(+), 98 deletions(-)
+> 
+> -- 
+> 2.14.3
