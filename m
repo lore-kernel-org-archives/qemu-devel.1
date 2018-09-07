@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fyGg7-0007Dc-EB
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:20:04 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fyGwG-0004kf-6H
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:36:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fyGg4-0008CA-9c
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:20:03 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  7 Sep 2018 15:19:54 +0200
-Message-Id: <1536326394-6466-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] target/ppc/cpu-models: Re-group the 970 CPUs
- together again
+	(envelope-from <alex.bennee@linaro.org>) id 1fyGwB-0001UC-GH
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:36:44 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fyGwB-0001S8-5J
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:36:39 -0400
+Received: by mail-wr1-x444.google.com with SMTP id e1-v6so5949290wrt.3
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 06:36:39 -0700 (PDT)
+References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+	<152819517756.30857.1862569750260837574.stgit@pasha-ThinkPad-T60>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <152819517756.30857.1862569750260837574.stgit@pasha-ThinkPad-T60>
+Date: Fri, 07 Sep 2018 14:36:36 +0100
+Message-ID: <87tvn1zaxn.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 4/7] tcg: add instrumenting module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,93 +30,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu, Richard Henderson <richard.henderson@linaro.org>
 
-The addition of the POWER9 CPUs divided the entries for the 970 CPUs,
-which is a little bit confusing when you look at the code. So let's
-re-group the 970 CPUs together again, and since these chips have been
-based on the POWER4 processor, move them also in front of the POWER5
-chips now.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- target/ppc/cpu-models.c | 40 +++++++++++++++++++---------------------
- 1 file changed, 19 insertions(+), 21 deletions(-)
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
-index 6c9bfde..7c75963 100644
---- a/target/ppc/cpu-models.c
-+++ b/target/ppc/cpu-models.c
-@@ -741,26 +741,8 @@
-                 "PowerPC 7457A v1.2 (G4)")
-     /* 64 bits PowerPC                                                       */
- #if defined (TARGET_PPC64)
--    POWERPC_DEF("power5+_v2.1",  CPU_POWERPC_POWER5P_v21,            POWER5P,
--                "POWER5+ v2.1")
--    POWERPC_DEF("power7_v2.3",   CPU_POWERPC_POWER7_v23,             POWER7,
--                "POWER7 v2.3")
--    POWERPC_DEF("power7+_v2.1",  CPU_POWERPC_POWER7P_v21,            POWER7,
--                "POWER7+ v2.1")
--    POWERPC_DEF("power8e_v2.1",  CPU_POWERPC_POWER8E_v21,            POWER8,
--                "POWER8E v2.1")
--    POWERPC_DEF("power8_v2.0",   CPU_POWERPC_POWER8_v20,             POWER8,
--                "POWER8 v2.0")
--    POWERPC_DEF("power8nvl_v1.0", CPU_POWERPC_POWER8NVL_v10,         POWER8,
--                "POWER8NVL v1.0")
-     POWERPC_DEF("970_v2.2",      CPU_POWERPC_970_v22,                970,
-                 "PowerPC 970 v2.2")
--
--    POWERPC_DEF("power9_v1.0",   CPU_POWERPC_POWER9_DD1,             POWER9,
--                "POWER9 v1.0")
--    POWERPC_DEF("power9_v2.0",   CPU_POWERPC_POWER9_DD20,            POWER9,
--                "POWER9 v2.0")
--
-     POWERPC_DEF("970fx_v1.0",    CPU_POWERPC_970FX_v10,              970,
-                 "PowerPC 970FX v1.0 (G5)")
-     POWERPC_DEF("970fx_v2.0",    CPU_POWERPC_970FX_v20,              970,
-@@ -775,6 +757,22 @@
-                 "PowerPC 970MP v1.0")
-     POWERPC_DEF("970mp_v1.1",    CPU_POWERPC_970MP_v11,              970,
-                 "PowerPC 970MP v1.1")
-+    POWERPC_DEF("power5+_v2.1",  CPU_POWERPC_POWER5P_v21,            POWER5P,
-+                "POWER5+ v2.1")
-+    POWERPC_DEF("power7_v2.3",   CPU_POWERPC_POWER7_v23,             POWER7,
-+                "POWER7 v2.3")
-+    POWERPC_DEF("power7+_v2.1",  CPU_POWERPC_POWER7P_v21,            POWER7,
-+                "POWER7+ v2.1")
-+    POWERPC_DEF("power8e_v2.1",  CPU_POWERPC_POWER8E_v21,            POWER8,
-+                "POWER8E v2.1")
-+    POWERPC_DEF("power8_v2.0",   CPU_POWERPC_POWER8_v20,             POWER8,
-+                "POWER8 v2.0")
-+    POWERPC_DEF("power8nvl_v1.0", CPU_POWERPC_POWER8NVL_v10,         POWER8,
-+                "POWER8NVL v1.0")
-+    POWERPC_DEF("power9_v1.0",   CPU_POWERPC_POWER9_DD1,             POWER9,
-+                "POWER9 v1.0")
-+    POWERPC_DEF("power9_v2.0",   CPU_POWERPC_POWER9_DD20,            POWER9,
-+                "POWER9 v2.0")
- #endif /* defined (TARGET_PPC64) */
- 
- /***************************************************************************/
-@@ -940,6 +938,9 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
-     { "7457a", "7457a_v1.2" },
-     { "apollo7pm", "7457a_v1.0" },
- #if defined(TARGET_PPC64)
-+    { "970", "970_v2.2" },
-+    { "970fx", "970fx_v3.1" },
-+    { "970mp", "970mp_v1.1" },
-     { "power5+", "power5+_v2.1" },
-     { "power5gs", "power5+_v2.1" },
-     { "power7", "power7_v2.3" },
-@@ -948,9 +949,6 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
-     { "power8", "power8_v2.0" },
-     { "power8nvl", "power8nvl_v1.0" },
-     { "power9", "power9_v2.0" },
--    { "970", "970_v2.2" },
--    { "970fx", "970fx_v3.1" },
--    { "970mp", "970mp_v1.1" },
- #endif
- 
-     /* Generic PowerPCs */
--- 
-1.8.3.1
+> From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
+>
+> This is a samples of the instrumenting interface and implementation
+> of some instruction tracing tasks.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> ---
+>  accel/tcg/translator.c    |    5 +++++
+>  include/qemu/instrument.h |    7 +++++++
+>  plugins/helper.h          |    1 +
+>  plugins/plugins.c         |   41 +++++++++++++++++++++++++++++++++++++++=
+++
+>  4 files changed, 54 insertions(+)
+>  create mode 100644 include/qemu/instrument.h
+>  create mode 100644 plugins/helper.h
+>
+> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+> index 0f9dca9..48773ac 100644
+> --- a/accel/tcg/translator.c
+> +++ b/accel/tcg/translator.c
+> @@ -17,6 +17,7 @@
+>  #include "exec/gen-icount.h"
+>  #include "exec/log.h"
+>  #include "exec/translator.h"
+> +#include "qemu/instrument.h"
+>
+>  /* Pairs with tcg_clear_temp_count.
+>     To be called by #TranslatorOps.{translate_insn,tb_stop} if
+> @@ -89,6 +90,10 @@ void translator_loop(const TranslatorOps *ops, DisasCo=
+ntextBase *db,
+>              }
+>          }
+>
+> +        if (plugins_need_before_insn(db->pc_next, cpu)) {
+> +            plugins_instrument_before_insn(db->pc_next, cpu);
+> +        }
+> +
+
+I don't really see the need for a plugin_need_foo call here. Can't we
+just iterate over all plugins that provide a before_insn binding and
+leave it at that?
+
+If the plugin decides it doesn't want to do anything with this
+particular instruction it can always bail early.
+
+>          /* Disassemble one instruction.  The translate_insn hook should
+>             update db->pc_next and db->is_jmp to indicate what should be
+>             done next -- either exiting this loop or locate the start of
+> diff --git a/include/qemu/instrument.h b/include/qemu/instrument.h
+> new file mode 100644
+> index 0000000..e8f279f
+> --- /dev/null
+> +++ b/include/qemu/instrument.h
+> @@ -0,0 +1,7 @@
+> +#ifndef INSTRUMENT_H
+> +#define INSTRUMENT_H
+> +
+> +bool plugins_need_before_insn(target_ulong pc, CPUState *cpu);
+> +void plugins_instrument_before_insn(target_ulong pc, CPUState *cpu);
+
+Need empty inline cases for #ifndef CONFIG_PLUGINS
+
+> +
+> +#endif /* INSTRUMENT_H */
+> diff --git a/plugins/helper.h b/plugins/helper.h
+> new file mode 100644
+> index 0000000..007b395
+> --- /dev/null
+> +++ b/plugins/helper.h
+> @@ -0,0 +1 @@
+> +DEF_HELPER_2(before_insn, void, tl, ptr)
+
+I wonder if we should have an explicit DEF_HELPER_FLAGS_2. Looking at
+the flags though:
+
+  /* call flags */
+  /* Helper does not read globals (either directly or through an exception)=
+. It
+     implies TCG_CALL_NO_WRITE_GLOBALS. */
+  #define TCG_CALL_NO_READ_GLOBALS    0x0010
+  /* Helper does not write globals */
+  #define TCG_CALL_NO_WRITE_GLOBALS   0x0020
+  /* Helper can be safely suppressed if the return value is not used. */
+  #define TCG_CALL_NO_SIDE_EFFECTS    0x0040
+
+  /* convenience version of most used call flags */
+  #define TCG_CALL_NO_RWG         TCG_CALL_NO_READ_GLOBALS
+  #define TCG_CALL_NO_WG          TCG_CALL_NO_WRITE_GLOBALS
+  #define TCG_CALL_NO_SE          TCG_CALL_NO_SIDE_EFFECTS
+  #define TCG_CALL_NO_RWG_SE      (TCG_CALL_NO_RWG | TCG_CALL_NO_SE)
+  #define TCG_CALL_NO_WG_SE       (TCG_CALL_NO_WG | TCG_CALL_NO_SE)
+
+I guess no flags means machine state is fully consistent before we make
+the helper call?
+
+> diff --git a/plugins/plugins.c b/plugins/plugins.c
+> index eabc931..5a08e71 100644
+> --- a/plugins/plugins.c
+> +++ b/plugins/plugins.c
+> @@ -1,8 +1,13 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> +#include "cpu.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/plugins.h"
+> +#include "qemu/instrument.h"
+> +#include "tcg/tcg.h"
+> +#include "tcg/tcg-op.h"
+>  #include "qemu/queue.h"
+> +#include "qemu/option.h"
+>  #include <gmodule.h>
+>
+>  typedef bool (*PluginInitFunc)(const char *);
+> @@ -80,6 +85,40 @@ void qemu_plugin_load(const char *filename, const char=
+ *args)
+>      return;
+>  }
+>
+> +bool plugins_need_before_insn(target_ulong pc, CPUState *cpu)
+> +{
+> +    QemuPluginInfo *info;
+> +    QLIST_FOREACH(info, &qemu_plugins, next) {
+> +        if (info->needs_before_insn && info->needs_before_insn(pc, cpu))=
+ {
+> +            return true;
+> +        }
+> +    }
+> +
+> +    return false;
+> +}
+> +
+> +void plugins_instrument_before_insn(target_ulong pc, CPUState *cpu)
+> +{
+> +    TCGv t_pc =3D tcg_const_tl(pc);
+> +    TCGv_ptr t_cpu =3D tcg_const_ptr(cpu);
+> +    /* We will dispatch plugins' callbacks in our own helper below */
+> +    gen_helper_before_insn(t_pc, t_cpu);
+> +    tcg_temp_free(t_pc);
+> +    tcg_temp_free_ptr(t_cpu);
+> +}
+
+OK I see what is happening here - but I worry about pushing off all
+plugins into a single helper call with a fairly fixed amount of
+information.
+
+Would it be better to expose the generate helper API and maybe a few TCG
+constants to the plugin function itself. It could then either emit
+additional TCG operations or call to the helper - and deal with the
+logic about if it should or shouldn't in a single call rather than doing
+the need_foo call first.
+
+Richard,
+
+Will the TCG be smart enough to drop the pc/t_cpu variables if they are
+ultimately not used by the instrument in this particular iteration?
+
+> +
+> +void helper_before_insn(target_ulong pc, void *cpu)
+> +{
+> +    QemuPluginInfo *info;
+> +    QLIST_FOREACH(info, &qemu_plugins, next) {
+> +        if (info->needs_before_insn && info->needs_before_insn(pc, cpu))=
+ {
+> +            if (info->before_insn) {
+> +                info->before_insn(pc, cpu);
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>  void qemu_plugins_init(void)
+>  {
+>      QemuPluginInfo *info;
+> @@ -88,4 +127,6 @@ void qemu_plugins_init(void)
+>              info->init(info->args);
+>          }
+>      }
+> +
+> +#include "exec/helper-register.h"
+>  }
+
+
+--
+Alex Benn=C3=A9e
