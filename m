@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1fyF9g-0000vS-19
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:42:29 -0400
+	(envelope-from <lersek@redhat.com>) id 1fyFHL-00077O-Uh
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:50:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1fyF9b-0004BU-QE
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:42:27 -0400
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:50803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1fyF9b-0004Ap-JC
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:42:23 -0400
-Received: by mail-wm0-f67.google.com with SMTP id s12-v6so14473712wmc.0
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 04:42:23 -0700 (PDT)
-From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
-Date: Fri,  7 Sep 2018 13:42:13 +0200
-Message-Id: <88c65dd59a7bbf55ad055447cccf4be39fcb824b.1536320522.git.tgolembi@redhat.com>
-In-Reply-To: <cover.1536320522.git.tgolembi@redhat.com>
-References: <cover.1536320522.git.tgolembi@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1fyFHI-0001b4-N4
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:50:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45932 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fyFHI-0001ZN-Fu
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:50:20 -0400
+References: <1536238314-108139-1-git-send-email-imammedo@redhat.com>
+	<e0d0c3ee-b690-d668-02fa-3ac2ff3c5259@redhat.com>
+	<20180907133054.2ca10203@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <fb4fdacc-5d28-d46d-0522-e901b7230416@redhat.com>
+Date: Fri, 7 Sep 2018 13:50:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 5/5] qga: return disk device in
- guest-get-fsinfo
+In-Reply-To: <20180907133054.2ca10203@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] qga: ignore non present cpus when
+ handling qmp_guest_get_vcpus()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,318 +30,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Olga Krishtal <okrishtal@virtuozzo.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-Report device node of the disk. It is implemented for Linux (needs udev)
-and Windows. The node is reported e.g. as "/dev/sda2" on Linux and as
-"\\?\PhysicalDriveX" on Windows.
+On 09/07/18 13:30, Igor Mammedov wrote:
+> On Thu, 6 Sep 2018 16:13:52 +0200
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> On 09/06/18 14:51, Igor Mammedov wrote:
+>>> If VM has VCPUs plugged sparselly (for example a VM started with
+>>> 3 VCPUs (cpu0, cpu1 and cpu2) and then cpu1 was hotunplugged so
+>>> only cpu0 and cpu2 are present), QGA will rise a error
+>>>   error: internal error: unable to execute QEMU agent command 'guest-get-vcpus':
+>>>   open("/sys/devices/system/cpu/cpu1/"): No such file or directory
+>>> when
+>>>   virsh vcpucount FOO --guest
+>>> is executed.
+>>> Fix it by ignoring non present CPUs when fetching CPUs status from sysfs.
+>>>
+>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>> ---
+>>> v2:
+>>>   do not create CPU entry if cpu isn't present
+>>>   (Laszlo Ersek <lersek@redhat.com>)
+>>> ---
+>>>  qga/commands-posix.c | 115 ++++++++++++++++++++++++++-------------------------
+>>>  1 file changed, 59 insertions(+), 56 deletions(-)
+>>>
+>>> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+>>> index 37e8a2d..42d30f0 100644
+>>> --- a/qga/commands-posix.c
+>>> +++ b/qga/commands-posix.c
+>>> @@ -2035,61 +2035,56 @@ static long sysconf_exact(int name, const char *name_str, Error **errp)
+>>>   * Written members remain unmodified on error.
+>>>   */
+>>>  static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
+>>> -                          Error **errp)
+>>> +                          char *dirpath, Error **errp)
+>>>  {
+>>> -    char *dirpath;
+>>> +    int fd;
+>>> +    int res;
+>>>      int dirfd;
+>>> +    static const char fn[] = "online";
+>>>
+>>> -    dirpath = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
+>>> -                              vcpu->logical_id);
+>>>      dirfd = open(dirpath, O_RDONLY | O_DIRECTORY);
+>>>      if (dirfd == -1) {
+>>>          error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
+>>> -    } else {
+>>> -        static const char fn[] = "online";
+>>> -        int fd;
+>>> -        int res;
+>>> -
+>>> -        fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
+>>> -        if (fd == -1) {
+>>> -            if (errno != ENOENT) {
+>>> -                error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
+>>> -            } else if (sys2vcpu) {
+>>> -                vcpu->online = true;
+>>> -                vcpu->can_offline = false;
+>>> -            } else if (!vcpu->online) {
+>>> -                error_setg(errp, "logical processor #%" PRId64 " can't be "
+>>> -                           "offlined", vcpu->logical_id);
+>>> -            } /* otherwise pretend successful re-onlining */
+>>> -        } else {
+>>> -            unsigned char status;
+>>> -
+>>> -            res = pread(fd, &status, 1, 0);
+>>> -            if (res == -1) {
+>>> -                error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
+>>> -            } else if (res == 0) {
+>>> -                error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
+>>> -                           fn);
+>>> -            } else if (sys2vcpu) {
+>>> -                vcpu->online = (status != '0');
+>>> -                vcpu->can_offline = true;
+>>> -            } else if (vcpu->online != (status != '0')) {
+>>> -                status = '0' + vcpu->online;
+>>> -                if (pwrite(fd, &status, 1, 0) == -1) {
+>>> -                    error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
+>>> -                                     fn);
+>>> -                }
+>>> -            } /* otherwise pretend successful re-(on|off)-lining */
+>>> +        return;
+>>> +    }
+>>>
+>>> -            res = close(fd);
+>>> -            g_assert(res == 0);
+>>> -        }
+>>> +    fd = openat(dirfd, fn, sys2vcpu ? O_RDONLY : O_RDWR);
+>>> +    if (fd == -1) {
+>>> +        if (errno != ENOENT) {
+>>> +            error_setg_errno(errp, errno, "open(\"%s/%s\")", dirpath, fn);
+>>> +        } else if (sys2vcpu) {
+>>> +            vcpu->online = true;
+>>> +            vcpu->can_offline = false;
+>>> +        } else if (!vcpu->online) {
+>>> +            error_setg(errp, "logical processor #%" PRId64 " can't be "
+>>> +                       "offlined", vcpu->logical_id);
+>>> +        } /* otherwise pretend successful re-onlining */
+>>> +    } else {
+>>> +        unsigned char status;
+>>> +
+>>> +        res = pread(fd, &status, 1, 0);
+>>> +        if (res == -1) {
+>>> +            error_setg_errno(errp, errno, "pread(\"%s/%s\")", dirpath, fn);
+>>> +        } else if (res == 0) {
+>>> +            error_setg(errp, "pread(\"%s/%s\"): unexpected EOF", dirpath,
+>>> +                       fn);
+>>> +        } else if (sys2vcpu) {
+>>> +            vcpu->online = (status != '0');
+>>> +            vcpu->can_offline = true;
+>>> +        } else if (vcpu->online != (status != '0')) {
+>>> +            status = '0' + vcpu->online;
+>>> +            if (pwrite(fd, &status, 1, 0) == -1) {
+>>> +                error_setg_errno(errp, errno, "pwrite(\"%s/%s\")", dirpath,
+>>> +                                 fn);
+>>> +            }
+>>> +        } /* otherwise pretend successful re-(on|off)-lining */
+>>>
+>>> -        res = close(dirfd);
+>>> +        res = close(fd);
+>>>          g_assert(res == 0);
+>>>      }
+>>>
+>>> -    g_free(dirpath);
+>>> +    res = close(dirfd);
+>>> +    g_assert(res == 0);
+>>>  }
+>>>
+>>>  GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+>>> @@ -2107,17 +2102,21 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+>>>      while (local_err == NULL && current < sc_max) {
+>>>          GuestLogicalProcessor *vcpu;
+>>>          GuestLogicalProcessorList *entry;
+>>> -
+>>> -        vcpu = g_malloc0(sizeof *vcpu);
+>>> -        vcpu->logical_id = current++;
+>>> -        vcpu->has_can_offline = true; /* lolspeak ftw */
+>>> -        transfer_vcpu(vcpu, true, &local_err);
+>>> -
+>>> -        entry = g_malloc0(sizeof *entry);
+>>> -        entry->value = vcpu;
+>>> -
+>>> -        *link = entry;
+>>> -        link = &entry->next;
+>>> +        int64_t id = current++;
+>>> +        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
+>>> +                                     id);
+>>> +
+>>> +        if (g_file_test(path, G_FILE_TEST_EXISTS)) {
+>>> +            vcpu = g_malloc0(sizeof *vcpu);
+>>> +            vcpu->logical_id = id;
+>>> +            vcpu->has_can_offline = true; /* lolspeak ftw */
+>>> +            transfer_vcpu(vcpu, true, path, &local_err);
+>>> +            entry = g_malloc0(sizeof *entry);
+>>> +            entry->value = vcpu;
+>>> +            *link = entry;
+>>> +            link = &entry->next;
+>>> +        }
+>>> +        g_free(path);
+>>>      }
+>>>
+>>>      if (local_err == NULL) {
+>>> @@ -2138,7 +2137,11 @@ int64_t qmp_guest_set_vcpus(GuestLogicalProcessorList *vcpus, Error **errp)
+>>>
+>>>      processed = 0;
+>>>      while (vcpus != NULL) {
+>>> -        transfer_vcpu(vcpus->value, false, &local_err);
+>>> +        char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
+>>> +                                     vcpus->value->logical_id);
+>>> +
+>>> +        transfer_vcpu(vcpus->value, false, path, &local_err);
+>>> +        g_free(path);
+>>>          if (local_err != NULL) {
+>>>              break;
+>>>          }
+>>>  
+>>
+>> This looks good. The things that I could raise, if I wanted to annoy you
+>> :) , are:
+>>
+>> - transfer_vcpu() should take "const char *dirpath", not just "char
+>>   *dirpath",
+>>
+>> - there's a small window between g_file_test() and open() -- not sure if
+>>   we care, but it catches my eye,
+> Even if dirpath is opened cpu removal might still race vs accesses inside that directory.
+> I'd say it's not worth effort to make race free,
+> just don't use damn thing with real unplug.
+> 
+>  
+>> - the pathname formatting is now duplicated.
+> Yep, is wasn't worth adding helper func since it just increases amount of code.
+> But I don't really care can add it if I respin patch.
+> 
+>> How about a helper function like this:
+>>
+>>> static int open_cpu_dir(int64_t cpu_id, Error **errp)
+>>> {
+>>>   char *dirpath;
+>>>   int rc;
+>>>
+>>>   dirpath = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/", cpu_id);
+>>>   rc = open(dirpath, O_RDONLY | O_DIRECTORY);
+>>>   if (rc == -1) {
+>>>     rc = -errno;
+>>>     error_setg_errno(errp, errno, "open(\"%s\")", dirpath);
+>>>   }
+>>>   g_free(dirpath);
+>>>   return rc;
+>>> }
+>>
+>> Then you can:
+>>
+>> (1) remove g_file_test() from qmp_guest_get_vcpus(),
+>>
+>> (2) remove open() from transfer_vcpu(),
+>>
+>> (3) take a dirfd in transfer_vcpu(), rather than a dirpath,
+> I've considered it, but if we don't pass dirpath to transfer_vcpu()
+> we loose on path in error messages hence dropped whole idea as excessive.
+> 
+> 
+>> (4) distinguish "success" (non-negative), (-ENOENT), and "other error"
+>>     (negative) in qmp_guest_get_vcpus(), and act accordingly (call
+>>     transfer_vcpu(), skip, or bail for good; respectively),
+>>
+>> (5) eliminate the formatting from qmp_guest_set_vcpus().
+>>
+>> I think the only quirk is that, when skipping in (4), local_err has to
+>> be freed with error_free(), and re-set to NULL.
+>>
+>> What do you think? (If it's too much work for little gain, I'm ready to
+>> ACK v2 as well; don't want to waste your time.)
+> I doesn't matter to me. Since you happen to be original author,
+> I'll deffer to your opinion.
 
-As part of this effort the Windows code was changed to probe disk
-extents and return list of all disks. Originally only first disk of
-composite volume was returned.
+OK, I'm fine with the current patch.
 
-Note that the patch changes get_pci_info() from one state of brokenness
-into a different state of brokenness. In other words it still does not do
-what it's supposed to do (see comment in code). If anyone knows how to
-fix it, please step in.
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
----
- qga/commands-posix.c |   7 +-
- qga/commands-win32.c | 163 +++++++++++++++++++++++++++++++++++--------
- qga/qapi-schema.json |   3 +-
- 3 files changed, 142 insertions(+), 31 deletions(-)
-
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 37fedd123b..d0d6ba49cb 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -947,7 +947,12 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
-     if (udev == NULL || udevice == NULL) {
-         g_debug("failed to query udev");
-     } else {
--        const char *serial;
-+        const char *devnode, *serial;
-+        devnode = udev_device_get_devnode(udevice);
-+        if (devnode != NULL) {
-+            disk->dev = g_strdup(devnode);
-+            disk->has_dev = true;
-+        }
-         serial = udev_device_get_property_value(udevice, "ID_SERIAL");
-         if (serial != NULL && *serial != 0) {
-             disk->serial = g_strdup(serial);
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index fa186154a8..2cde6bd0af 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -477,9 +477,26 @@ static GuestDiskBusType find_bus_type(STORAGE_BUS_TYPE bus)
-     return win2qemu[(int)bus];
- }
- 
-+/* XXX: The following function is BROKEN!
-+ *
-+ * It does not work and probably has never worked. When we query for list of
-+ * disks we get cryptic names like "\Device\0000001d" instead of
-+ * "\PhysicalDriveX" or "\HarddiskX". Whether the names can be translated one
-+ * way or the other for comparison is an open question.
-+ *
-+ * When we query volume names (the original version) we are able to match those
-+ * but then the property queries report error "Invalid function". (duh!)
-+ */
-+
-+/*
- DEFINE_GUID(GUID_DEVINTERFACE_VOLUME,
-         0x53f5630dL, 0xb6bf, 0x11d0, 0x94, 0xf2,
-         0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b);
-+*/
-+DEFINE_GUID(GUID_DEVINTERFACE_DISK,
-+        0x53f56307L, 0xb6bf, 0x11d0, 0x94, 0xf2,
-+        0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b);
-+
- 
- static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
- {
-@@ -497,7 +514,7 @@ static GuestPCIAddress *get_pci_info(char *guid, Error **errp)
-         goto out;
-     }
- 
--    dev_info = SetupDiGetClassDevs(&GUID_DEVINTERFACE_VOLUME, 0, 0,
-+    dev_info = SetupDiGetClassDevs(&GUID_DEVINTERFACE_DISK, 0, 0,
-                                    DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
-     if (dev_info == INVALID_HANDLE_VALUE) {
-         error_setg_win32(errp, GetLastError(), "failed to get devices tree");
-@@ -632,31 +649,24 @@ out_free:
-     return;
- }
- 
--/* VSS provider works with volumes, thus there is no difference if
-- * the volume consist of spanned disks. Info about the first disk in the
-- * volume is returned for the spanned disk group (LVM) */
--static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-+static void get_single_disk_info(GuestDiskAddress *disk, Error **errp)
- {
--    GuestDiskAddressList *list = NULL;
--    GuestDiskAddress *disk;
-     SCSI_ADDRESS addr, *scsi_ad;
-     DWORD len;
--    HANDLE vol_h;
-+    HANDLE disk_h;
-     Error *local_err = NULL;
- 
-     scsi_ad = &addr;
--    char *name = g_strndup(guid, strlen(guid)-1);
- 
--    g_debug("getting disk info for: %s", name);
--    vol_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-+    g_debug("getting disk info for: %s", disk->dev);
-+    disk_h = CreateFile(disk->dev, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-                        0, NULL);
--    if (vol_h == INVALID_HANDLE_VALUE) {
--        error_setg_win32(errp, GetLastError(), "failed to open volume");
--        goto err;
-+    if (disk_h == INVALID_HANDLE_VALUE) {
-+        error_setg_win32(errp, GetLastError(), "failed to open disk");
-+        return;
-     }
- 
--    disk = g_malloc0(sizeof(*disk));
--    get_disk_properties(vol_h, disk, &local_err);
-+    get_disk_properties(disk_h, disk, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto err_close;
-@@ -674,20 +684,20 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-          * according to Microsoft docs
-          * https://technet.microsoft.com/en-us/library/ee851589(v=ws.10).aspx */
-         g_debug("getting pci-controller info");
--        if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi_ad,
-+        if (DeviceIoControl(disk_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi_ad,
-                             sizeof(SCSI_ADDRESS), &len, NULL)) {
--            Error *local_err = NULL;
-             disk->unit = addr.Lun;
-             disk->target = addr.TargetId;
-             disk->bus = addr.PathId;
-             g_debug("unit=%lld target=%lld bus=%lld",
-                 disk->unit, disk->target, disk->bus);
--            disk->pci_controller = get_pci_info(name, &local_err);
-+            disk->pci_controller = get_pci_info(disk->dev, &local_err);
- 
-             if (local_err) {
-                 g_debug("failed to get PCI controller info: %s",
-                     error_get_pretty(local_err));
-                 error_free(local_err);
-+                local_err = NULL;
-             } else if (disk->pci_controller != NULL) {
-                 g_debug("pci: domain=%lld bus=%lld slot=%lld function=%lld",
-                     disk->pci_controller->domain,
-@@ -704,19 +714,107 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-         disk->pci_controller = g_malloc0(sizeof(GuestPCIAddress));
-     }
- 
--    list = g_malloc0(sizeof(*list));
--    list->value = disk;
--    list->next = NULL;
--    CloseHandle(vol_h);
--    return list;
--
- err_close:
-+    CloseHandle(disk_h);
-+    return;
-+}
-+
-+static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-+{
-+    Error *local_err = NULL;
-+    GuestDiskAddressList *list = NULL, *cur_item = NULL;
-+    GuestDiskAddress *disk = NULL;
-+    int i;
-+    HANDLE vol_h;
-+    DWORD size;
-+    PVOLUME_DISK_EXTENTS extents = NULL;
-+
-+    /* strip final backslash */
-+    char *name = g_strndup(guid, strlen(guid)-1);
-+
-+    g_debug("opening %s", name);
-+    vol_h = CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-+                       0, NULL);
-+    if (vol_h == INVALID_HANDLE_VALUE) {
-+        error_setg_win32(errp, GetLastError(), "failed to open volume");
-+        goto out;
-+    }
-+
-+    /* Get list of extents */
-+    g_debug("getting disk extents");
-+    size = sizeof(VOLUME_DISK_EXTENTS);
-+    extents = g_malloc0(size);
-+    if (!DeviceIoControl(vol_h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL,
-+                         0, extents, size, NULL, NULL)) {
-+        DWORD last_err = GetLastError();
-+        if (last_err == ERROR_MORE_DATA) {
-+            /* Try once more with big enough buffer */
-+            size = sizeof(VOLUME_DISK_EXTENTS)
-+                + extents->NumberOfDiskExtents * sizeof(DISK_EXTENT);
-+            g_free(extents);
-+            extents = g_malloc0(size);
-+            if (!DeviceIoControl(
-+                    vol_h, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL,
-+                    0, extents, size, NULL, NULL)) {
-+                error_setg_win32(errp, GetLastError(), "failed to get disk extents");
-+                return NULL;
-+            }
-+        } else if (last_err == ERROR_INVALID_FUNCTION) {
-+            /* Possibly CD-ROM or a shared drive. Try to pass the volume */
-+            g_debug("volume not on disk");
-+            disk = g_malloc0(sizeof(GuestDiskAddress));
-+            disk->has_dev = true;
-+            disk->dev = g_strdup(name);
-+            get_single_disk_info(disk, &local_err);
-+            if (local_err) {
-+                g_debug("failed to get disk info, ignoring error: %s",
-+                    error_get_pretty(local_err));
-+                error_free(local_err);
-+                goto out;
-+            }
-+            list = g_malloc0(sizeof(*list));
-+            list->value = disk;
-+            disk = NULL;
-+            list->next = NULL;
-+            goto out;
-+        } else {
-+            error_setg_win32(errp, GetLastError(), "failed to get disk extents");
-+            goto out;
-+        }
-+    }
-+    g_debug("Number of extents: %lu", extents->NumberOfDiskExtents);
-+
-+    /* Go through each extent */
-+    for (i = 0; i < extents->NumberOfDiskExtents; i++) {
-+        disk = g_malloc0(sizeof(GuestDiskAddress));
-+
-+        /* Disk numbers directly correspond to numbers used in UNCs
-+         * See documentation for DISK_EXTENT:
-+         * https://docs.microsoft.com/en-us/windows/desktop/api/winioctl/ns-winioctl-_disk_extent
-+         */
-+        disk->has_dev = true;
-+        disk->dev = g_strdup_printf("\\\\?\\PhysicalDrive%lu",
-+            extents->Extents[i].DiskNumber);
-+
-+        get_single_disk_info(disk, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            goto out;
-+        }
-+        cur_item = g_malloc0(sizeof(*list));
-+        cur_item->value = disk;
-+        disk = NULL;
-+        cur_item->next = list;
-+        list = cur_item;
-+    }
-+
-+
-+out:
-+    g_free(extents);
-     g_free(disk);
--    CloseHandle(vol_h);
--err:
-     g_free(name);
- 
--    return NULL;
-+    return list;
- }
- 
- #else
-@@ -783,6 +881,12 @@ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
-     }
-     fs->type = g_strdup(fs_name);
-     fs->disk = build_guest_disk_info(guid, errp);
-+    if (fs->disk == NULL) {
-+        g_free(fs);
-+        fs = NULL;
-+        goto free;
-+    }
-+
- free:
-     g_free(mnt_point);
-     return fs;
-@@ -803,7 +907,7 @@ GuestFilesystemInfoList *qmp_guest_get_fsinfo(Error **errp)
-     do {
-         GuestFilesystemInfo *info = build_guest_fsinfo(guid, errp);
-         if (info == NULL) {
--            continue;
-+            goto out;
-         }
-         new = g_malloc(sizeof(*ret));
-         new->value = info;
-@@ -815,6 +919,7 @@ GuestFilesystemInfoList *qmp_guest_get_fsinfo(Error **errp)
-         error_setg_win32(errp, GetLastError(), "failed to find next volume");
-     }
- 
-+out:
-     FindVolumeClose(vol_h);
-     return ret;
- }
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 3bcda6257e..c6725b3ec8 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -835,6 +835,7 @@
- # @target: target id
- # @unit: unit id
- # @serial: serial number (since: 3.1)
-+# @dev: device node (POSIX) or device UNC (Windows) (since: 3.1)
- #
- # Since: 2.2
- ##
-@@ -842,7 +843,7 @@
-   'data': {'pci-controller': 'GuestPCIAddress',
-            'bus-type': 'GuestDiskBusType',
-            'bus': 'int', 'target': 'int', 'unit': 'int',
--           '*serial': 'str'} }
-+           '*serial': 'str', '*dev': 'str'} }
- 
- ##
- # @GuestFilesystemInfo:
--- 
-2.18.0
+Thanks
+Laszlo
