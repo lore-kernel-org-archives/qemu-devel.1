@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFo-0000Ey-Q8
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFs-0000FZ-1n
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFn-0005HP-O5
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:32 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFr-0005L1-46
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:36 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  7 Sep 2018 17:31:54 +1000
-Message-Id: <20180907073155.26200-14-david@gibson.dropbear.id.au>
+Date: Fri,  7 Sep 2018 17:31:53 +1000
+Message-Id: <20180907073155.26200-13-david@gibson.dropbear.id.au>
 In-Reply-To: <20180907073155.26200-1-david@gibson.dropbear.id.au>
 References: <20180907073155.26200-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 13/14] target/ppc/kvm: set vcpu as online/offline
+Subject: [Qemu-devel] [PULL 12/14] Fix a deadlock case in the CPU hotplug
+ flow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,99 +21,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, mark.cave-ayland@ilande.co.uk, Nikunj A Dadhania <nikunj@linux.ibm.com>, paulus@samba.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, mark.cave-ayland@ilande.co.uk, Jose Ricardo Ziviani <joserz@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.ibm.com>
+From: Jose Ricardo Ziviani <joserz@linux.ibm.com>
 
-Set the newly added register(KVM_REG_PPC_ONLINE) to indicate if the vcpu is
-online(1) or offline(0)
+We need to set cs->halted to 1 before calling ppc_set_compat. The reason
+is that ppc_set_compat kicks up the new thread created to manage the
+hotplugged KVM virtual CPU and the code drives directly to KVM_RUN
+ioctl. When cs->halted is 1, the code:
 
-KVM will use this information to set the RWMR register, which controls the PURR
-and SPURR accumulation.
+int kvm_cpu_exec(CPUState *cpu)
+...
+     if (kvm_arch_process_async_events(cpu)) {
+         atomic_set(&cpu->exit_request, 0);
+         return EXCP_HLT;
+     }
+...
 
-CC: paulus@samba.org
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.ibm.com>
+returns before it reaches KVM_RUN, giving time to the main thread to
+finish its job. Otherwise we can fall in a deadlock because the KVM
+thread will issue the KVM_RUN ioctl while the main thread is setting up
+KVM registers. Depending on how these jobs are scheduled we'll end up
+freezing QEMU.
+
+The following output shows kvm_vcpu_ioctl sleeping because it cannot get
+the mutex and never will.
+PS: kvm_vcpu_ioctl was triggered kvm_set_one_reg - compat_pvr.
+
+STATE: TASK_UNINTERRUPTIBLE|TASK_WAKEKILL
+
+PID: 61564  TASK: c000003e981e0780  CPU: 48  COMMAND: "qemu-system-ppc"
+ #0 [c000003e982679a0] __schedule at c000000000b10a44
+ #1 [c000003e98267a60] schedule at c000000000b113a8
+ #2 [c000003e98267a90] schedule_preempt_disabled at c000000000b11910
+ #3 [c000003e98267ab0] __mutex_lock at c000000000b132ec
+ #4 [c000003e98267bc0] kvm_vcpu_ioctl at c00800000ea03140 [kvm]
+ #5 [c000003e98267d20] do_vfs_ioctl at c000000000407d30
+ #6 [c000003e98267dc0] ksys_ioctl at c000000000408674
+ #7 [c000003e98267e10] sys_ioctl at c0000000004086f8
+ #8 [c000003e98267e30] system_call at c00000000000b488
+
+crash> struct -x kvm.vcpus 0xc000003da0000000
+vcpus = {0xc000003db4880000, 0xc000003d52b80000, 0xc0000039e9c80000, 0xc000003d0e200000, 0xc000003d58280000, 0x0, 0x0, ...}
+
+crash> struct -x kvm_vcpu.mutex.owner 0xc000003d58280000
+  mutex.owner = {
+    counter = 0xc000003a23a5c881 <- flag 1: waiters
+  },
+
+crash> bt 0xc000003a23a5c880
+PID: 61579  TASK: c000003a23a5c880  CPU: 9   COMMAND: "CPU 4/KVM"
+(active)
+
+crash> struct -x kvm_vcpu.mutex.wait_list 0xc000003d58280000
+  mutex.wait_list = {
+    next = 0xc000003e98267b10,
+    prev = 0xc000003e98267b10
+  },
+
+crash> struct -x mutex_waiter.task 0xc000003e98267b10
+  task = 0xc000003e981e0780
+
+The following command-line was used to reproduce the problem (note: gdb
+and trace can change the results).
+
+ $ qemu-ppc/build/ppc64-softmmu/qemu-system-ppc64 -cpu host \
+     -enable-kvm -m 4096 \
+     -smp 4,maxcpus=8,sockets=1,cores=2,threads=4 \
+     -display none -nographic \
+     -drive file=disk1.qcow2,format=qcow2
+ ...
+ (qemu) device_add host-spapr-cpu-core,core-id=4
+[no interaction is possible after it, only SIGKILL to take the terminal
+back]
+
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.ibm.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 1 +
- hw/ppc/spapr_rtas.c     | 2 ++
- target/ppc/kvm.c        | 9 +++++++++
- target/ppc/kvm_ppc.h    | 7 +++++++
- 4 files changed, 19 insertions(+)
+ hw/ppc/spapr_cpu_core.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index a73b244a3f..2398ce62c0 100644
+index 876f0b3d9d..a73b244a3f 100644
 --- a/hw/ppc/spapr_cpu_core.c
 +++ b/hw/ppc/spapr_cpu_core.c
-@@ -90,6 +90,7 @@ void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r
+@@ -34,16 +34,16 @@ static void spapr_cpu_reset(void *opaque)
  
-     env->nip = nip;
-     env->gpr[3] = r3;
-+    kvmppc_set_reg_ppc_online(cpu, 1);
-     CPU(cpu)->halted = 0;
-     /* Enable Power-saving mode Exit Cause exceptions */
-     ppc_store_lpcr(cpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 4ac96bc94b..d6a0952154 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -33,6 +33,7 @@
- #include "sysemu/device_tree.h"
- #include "sysemu/cpus.h"
- #include "sysemu/hw_accel.h"
-+#include "kvm_ppc.h"
+     cpu_reset(cs);
  
- #include "hw/ppc/spapr.h"
- #include "hw/ppc/spapr_vio.h"
-@@ -207,6 +208,7 @@ static void rtas_stop_self(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-      * guest */
-     ppc_store_lpcr(cpu, env->spr[SPR_LPCR] & ~pcc->lpcr_pm);
+-    /* Set compatibility mode to match the boot CPU, which was either set
+-     * by the machine reset code or by CAS. This should never fail.
+-     */
+-    ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort);
+-
+     /* All CPUs start halted.  CPU0 is unhalted from the machine level
+      * reset code and the rest are explicitly started up by the guest
+      * using an RTAS call */
      cs->halted = 1;
-+    kvmppc_set_reg_ppc_online(cpu, 0);
-     qemu_cpu_kick(cs);
- }
  
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index ef63842217..30aeafa7de 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2783,3 +2783,12 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
- 
-     return !kvmppc_is_pr(cs->kvm_state);
- }
++    /* Set compatibility mode to match the boot CPU, which was either set
++     * by the machine reset code or by CAS. This should never fail.
++     */
++    ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort);
 +
-+void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online)
-+{
-+    CPUState *cs = CPU(cpu);
-+
-+    if (kvm_enabled()) {
-+        kvm_set_one_reg(cs, KVM_REG_PPC_ONLINE, &online);
-+    }
-+}
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 657582bb32..f696c6e498 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -72,6 +72,7 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+     env->spr[SPR_HIOR] = 0;
  
- bool kvmppc_hpt_needs_host_contiguous_pages(void);
- void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
-+void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
- 
- #else
- 
-@@ -187,6 +188,12 @@ static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
-     return 0;
- }
- 
-+static inline void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu,
-+                                             unsigned int online)
-+{
-+    return;
-+}
-+
- #ifndef CONFIG_USER_ONLY
- static inline bool kvmppc_spapr_use_multitce(void)
- {
+     lpcr = env->spr[SPR_LPCR];
 -- 
 2.17.1
