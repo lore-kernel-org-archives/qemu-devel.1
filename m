@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyImq-0000LG-Sq
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 11:35:10 -0400
+	(envelope-from <cota@braap.org>) id 1fyIxd-0005gj-7o
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 11:46:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyIml-0005bd-OU
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 11:35:08 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:41314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fyImk-0005A8-ES
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 11:35:03 -0400
-Received: by mail-wr1-x435.google.com with SMTP id z96-v6so15392548wrb.8
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 08:34:57 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1fyIxZ-000057-RH
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 11:46:17 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:49299)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fyIxQ-0007tt-Jm
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 11:46:06 -0400
+Date: Fri, 7 Sep 2018 11:45:45 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180907154545.GA1963@flamenco>
 References: <20180817232923.28899-1-cota@braap.org>
-	<20180817232923.28899-7-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180817232923.28899-7-cota@braap.org>
-Date: Fri, 07 Sep 2018 16:34:55 +0100
-Message-ID: <87d0tpz5gg.fsf@linaro.org>
+	<20180817232923.28899-3-cota@braap.org> <87in3hz7hb.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/6] test-qht: speed up + test qht_resize
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87in3hz7hb.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 2/6] qht: add qht_iter_remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
+On Fri, Sep 07, 2018 at 15:51:12 +0100, Alex Bennée wrote:
+> 
+> Emilio G. Cota <cota@braap.org> writes:
+> 
+> > This currently has no users, but the use case is so common that I
+> > think we must support it.
+> >
+> > Note that without the appended we cannot safely remove a set of
+> > elements; a 2-step approach (i.e. qht_iter first, keep track of
+> > the to-be-deleted elements, and then a bunch of qht_remove calls)
+> > would be racy, since between the iteration and the removals other
+> > threads might insert additional elements.
+> >
+> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> > ---
+> >  include/qemu/qht.h | 19 ++++++++++++
+> >  util/qht.c         | 74 +++++++++++++++++++++++++++++++++++++++++-----
+> >  2 files changed, 85 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/include/qemu/qht.h b/include/qemu/qht.h
+> > index 1fb9116fa0..91bc9b00cf 100644
+> > --- a/include/qemu/qht.h
+> > +++ b/include/qemu/qht.h
+> > @@ -44,6 +44,8 @@ struct qht_stats {
+> >
+> >  typedef bool (*qht_lookup_func_t)(const void *obj, const void *userp);
+> >  typedef void (*qht_iter_func_t)(struct qht *ht, void *p, uint32_t h, void *up);
+> > +typedef bool (*qht_iter_bool_func_t)(struct qht *ht, void *p, uint32_t h,
+> > +                                     void *up);
+> >
+> >  #define QHT_MODE_AUTO_RESIZE 0x1 /* auto-resize when heavily loaded */
+> >
+> > @@ -178,9 +180,26 @@ bool qht_resize(struct qht *ht, size_t n_elems);
+> >   *
+> >   * Each time it is called, user-provided @func is passed a pointer-hash pair,
+> >   * plus @userp.
+> > + *
+> > + * Note: @ht cannot be accessed from @func
+> 
+> I'm confused by this comment. If @ht cannot be accessed (or shouldn't be
+> accessed) from @func then why are we passing it?
 
-Emilio G. Cota <cota@braap.org> writes:
+We could probably do without. My original thinking was to pass the *ht
+to tell the iter function which ht his k-v pair comes from.
+But that's not a common use case, so we should remove it to
+simplify the interface.
 
-> Perform first the tests that exercise code paths that are
-> easier to hit at small table sizes, and then resize the table
-> to speed up subsequent tests. If this resize is not too large,
-> we can make the test faster with no code coverage loss.
->
-> - With gcov enabled:
->
-> Before: 20.568s, 90.28% qht.c coverage
-> After:   5.168s, 93.06% qht.c coverage
->
-> The coverage increase is entirely due to calling qht_resize,
-> which we weren't calling before. Note that the code paths
-> that remain to be tested are either error handling or
-> can only occur when several threads are accessing the
-> hash table concurrently (e.g. seqlock retry, trylock fail).
->
-> - Without gcov:
->
-> Before: 1.987s
-> After:  0.528s
->
-> The speedup is almost the same as with gcov, although the
-> "before" run is a lot faster.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+I think the comment is important right now; note that we can't even
+perform a lookup from the callback without deadlock.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+So I'll take your R-b for this patch and remove the *ht in
+another patch.
 
-> ---
->  tests/test-qht.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/tests/test-qht.c b/tests/test-qht.c
-> index 77666e8c5f..1ec039d636 100644
-> --- a/tests/test-qht.c
-> +++ b/tests/test-qht.c
-> @@ -189,6 +189,10 @@ static void qht_do_test(unsigned int mode, size_t in=
-it_entries)
->      rm_nonexist(7, 8);
->      iter_rm_mod(1);
->
-> +    if (!(mode & QHT_MODE_AUTO_RESIZE)) {
-> +        qht_resize(&ht, init_entries * 4 + 4);
-> +    }
-> +
->      check_n(0);
->      rm_nonexist(0, 10);
->      insert(0, N);
+Thanks,
 
-
---
-Alex Benn=C3=A9e
+		Emilio
