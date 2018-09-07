@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fyCED-0007bo-Oa
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:34:58 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fyCmE-0007pZ-5F
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 05:10:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fyCEA-0000cs-CE
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:34:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40564 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fyCEA-0000bL-6I
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:34:54 -0400
-References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
-	<20180907075948.26917-3-marcandre.lureau@redhat.com>
-	<fbd32e27-eaa3-5ef0-c6ec-926577a14d56@redhat.com>
-	<CAJ+F1CJz=_Hfaw0wh+kCGzdF4LKD9SC2Fes70OEzzJBJvBDnhw@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <929c4e4d-82e2-4b2f-ed20-8408121fc09a@redhat.com>
-Date: Fri, 7 Sep 2018 10:34:50 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fyCmA-0004ym-7R
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 05:10:06 -0400
+References: <20180904194903.20712-1-hpoussin@reactos.org>
+	<20180905001349.GI2679@umbus.fritz.box>
+	<352cb605-d2d3-e5de-bc5d-c1924b3fc793@ilande.co.uk>
+	<20180907013240.GE26021@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <8540c0e0-c96a-d7e6-3796-c1e152ae6307@ilande.co.uk>
+Date: Fri, 7 Sep 2018 10:09:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CJz=_Hfaw0wh+kCGzdF4LKD9SC2Fes70OEzzJBJvBDnhw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/12] cutils: add qemu_pstrcmp
+In-Reply-To: <20180907013240.GE26021@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/ppc: on 40p machine,
+ change default firmware to OpenBIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On 2018-09-07 10:29, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Fri, Sep 7, 2018 at 12:26 PM Thomas Huth <thuth@redhat.com> wrote:
+On 07/09/18 02:32, David Gibson wrote:
+
+> On Thu, Sep 06, 2018 at 05:38:26AM +0100, Mark Cave-Ayland wrote:
+>> On 05/09/18 01:13, David Gibson wrote:
 >>
->> On 2018-09-07 09:59, Marc-Andr=C3=A9 Lureau wrote:
->>> A char** variant of strcmp().
+>>> On Tue, Sep 04, 2018 at 09:49:03PM +0200, Hervé Poussineau wrote:
+>>>> OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
+>>>> Use it, instead of relying on an unmaintained and very limited firmware.
+>>>>
+>>>> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
 >>>
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  include/qemu/cutils.h | 12 ++++++++++++
->>>  util/cutils.c         |  5 +++++
->>>  2 files changed, 17 insertions(+)
->>>
->>> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
->>> index 47aaa3b0b9..0941639f36 100644
->>> --- a/include/qemu/cutils.h
->>> +++ b/include/qemu/cutils.h
->>> @@ -169,4 +169,16 @@ bool test_buffer_is_zero_next_accel(void);
->>>  int uleb128_encode_small(uint8_t *out, uint32_t n);
->>>  int uleb128_decode_small(const uint8_t *in, uint32_t *n);
->>>
->>> +/**
->>> + * qemu_pstrcmp:
->>> + * @str1: a pointer to a C string
->>> + * @str2: a pointer to a C string
->>> + *
->>> + * Compares *str1 and *str2 with g_strcmp0().
->>> + *
->>> + * Returns: an integer less than, equal to, or greater than zero, if
->>> + * *str1 is <, =3D=3D or > than *str2 .
->>> + */
+>>> Uh.. against current ppc-for-3.1, plase.
 >>
->> Maybe add a comment that str1 or str2 can also be NULL?
->=20
-> *str1 or *str2 (not str1 or str2). ok
+>> I was a bit confused as to why this failed to apply since the original
+>> had been part of a local branch for a while, but just noticed it was
+>> because of this change to Hervé's original which I had missed:
+>>
+>> [dwg: Drop prep from boot-serial test to avoid deprecation warnings]
+>>
+>> Included below is the new diff against ppc-for-3.1: David, is this
+>> enough for you to be able to fix up manually without a v3?
+> 
+> Well, I could have fixed it up manually from v2 - but I'm pushing that
+> busy work back on you as a contributor, because I'm having trouble
+> enough finding dtc maintenance time as it is.
 
-Ah, right, that's what I meant. Maybe clarify both conditions in the
-comment ;-)
+Fair comment :)  Although I do have a few 40p-related patches waiting on
+this, I'm keen for this particular patch to come from Hervé, since it's
+quite a big change and I'm not a PReP maintainer.
 
- Thomas
+
+ATB,
+
+Mark.
