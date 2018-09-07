@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fyJQf-0006K5-3Z
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:16:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fyJQg-0006M1-RV
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:16:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fyJQa-0004Lv-LS
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:16:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fyJQa-0004MI-Sj
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:16:16 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Sep 2018 18:15:17 +0200
-Message-Id: <20180907161520.26349-12-kwolf@redhat.com>
+Date: Fri,  7 Sep 2018 18:15:14 +0200
+Message-Id: <20180907161520.26349-9-kwolf@redhat.com>
 In-Reply-To: <20180907161520.26349-1-kwolf@redhat.com>
 References: <20180907161520.26349-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/14] mirror: Fix potential use-after-free in
- active commit
+Subject: [Qemu-devel] [PATCH 08/14] block-backend: Add .drained_poll callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +22,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, qemu-devel@nongnu.org
 
-When starting an active commit job, other callbacks can run before
-mirror_start_job() calls bdrv_ref() where needed and cause the nodes to
-go away. Add another pair of bdrv_ref/unref() around it to protect
-against this case.
+A bdrv_drain operation must ensure that all parents are quiesced, this
+includes BlockBackends. Otherwise, callbacks called by requests that are
+completed on the BDS layer, but not quite yet on the BlockBackend layer
+could still create new requests.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/mirror.c | 9 +++++++++
+ block/block-backend.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 6cc10df5c9..c42999eadf 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1679,6 +1679,11 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
+diff --git a/block/block-backend.c b/block/block-backend.c
+index fa120630be..efa8d8011c 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -121,6 +121,7 @@ static void blk_root_inherit_options(int *child_flags, QDict *child_options,
+     abort();
+ }
+ static void blk_root_drained_begin(BdrvChild *child);
++static bool blk_root_drained_poll(BdrvChild *child);
+ static void blk_root_drained_end(BdrvChild *child);
  
-     orig_base_flags = bdrv_get_flags(base);
+ static void blk_root_change_media(BdrvChild *child, bool load);
+@@ -294,6 +295,7 @@ static const BdrvChildRole child_root = {
+     .get_parent_desc    = blk_root_get_parent_desc,
  
-+    /* bdrv_reopen() drains, which might make the BDSes go away before a
-+     * reference is taken in mirror_start_job(). */
-+    bdrv_ref(bs);
-+    bdrv_ref(base);
-+
-     if (bdrv_reopen(base, bs->open_flags, errp)) {
-         return;
+     .drained_begin      = blk_root_drained_begin,
++    .drained_poll       = blk_root_drained_poll,
+     .drained_end        = blk_root_drained_end,
+ 
+     .activate           = blk_root_activate,
+@@ -2191,6 +2193,13 @@ static void blk_root_drained_begin(BdrvChild *child)
      }
-@@ -1689,6 +1694,10 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-                      &commit_active_job_driver, false, base, auto_complete,
-                      filter_node_name, false, MIRROR_COPY_MODE_BACKGROUND,
-                      &local_err);
+ }
+ 
++static bool blk_root_drained_poll(BdrvChild *child)
++{
++    BlockBackend *blk = child->opaque;
++    assert(blk->quiesce_counter);
++    return !!blk->in_flight;
++}
 +
-+    bdrv_unref(bs);
-+    bdrv_unref(base);
-+
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto error_restore_flags;
+ static void blk_root_drained_end(BdrvChild *child)
+ {
+     BlockBackend *blk = child->opaque;
 -- 
 2.13.6
