@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fyGK9-0000hy-IR
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:57:22 -0400
+	(envelope-from <bounces@canonical.com>) id 1fyEfd-0004ls-Df
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fyGK7-0007fZ-UU
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:57:21 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri,  7 Sep 2018 13:56:52 +0100
-Message-Id: <20180907125653.5010-3-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
-References: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v2 2/3] scsi: move lsi53c8xx_create() callers
- to lsi53c8xx_handle_legacy_cmdline()
+	(envelope-from <bounces@canonical.com>) id 1fyEfZ-0005Y9-05
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:11:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fyEfY-0005JM-No
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:11:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fyEfM-0001LW-5a
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 11:11:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5A6E02E80D9
+	for <qemu-devel@nongnu.org>; Fri,  7 Sep 2018 11:11:07 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Sep 2018 10:56:33 -0000
+From: Tony Garnock-Jones <tonygarnockjones@gmail.com>
+Reply-To: Bug 1716292 <1716292@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150508616435.31900.3449336177179115668.malonedeb@soybean.canonical.com>
+Message-Id: <153631779391.32364.10223889931938570979.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716292] Re: User mode emulation returns wrong
+ value for write(fd, NULL, 0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,90 +37,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, famz@redhat.com, hpoussin@reactos.org, rth@twiddle.net, peter.maydell@linaro.org, thuth@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
-As part of commits a64aa5785d "hw: Deprecate -drive if=scsi with non-onboard
-HBAs" and b891538e81 "hw/ppc/prep: Fix implicit creation of "-drive if=scsi"
-devices" the lsi53c895a_create() and lsi53c810_create() functions were added
-to wrap pci_create_simple() and scsi_bus_legacy_handle_cmdline().
+This happens for me also, with qemu version 2.12.0 (Debian
+1:2.12+dfsg-3).
 
-Unfortunately this prevents us from changing qdev properties on the device
-and/or changing the PCI configuration. By switching over to using the new
-lsi53c8xx_handle_legacy_cmdline() function then the caller can now configure
-and realize the LSI SCSI device exactly as required.
+An initial patch was proposed here: https://lists.gnu.org/archive/html
+/qemu-devel/2017-09/msg08073.html
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/arm/realview.c    | 3 ++-
- hw/arm/versatilepb.c | 3 ++-
- hw/hppa/machine.c    | 4 +++-
- hw/ppc/prep.c        | 4 +++-
- 4 files changed, 10 insertions(+), 4 deletions(-)
+Discussion pointed out some problems, and the patch languished and was
+not accepted.
 
-diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-index ab8c14fde3..242f5a87b6 100644
---- a/hw/arm/realview.c
-+++ b/hw/arm/realview.c
-@@ -257,7 +257,8 @@ static void realview_init(MachineState *machine,
-         }
-         n = drive_get_max_bus(IF_SCSI);
-         while (n >= 0) {
--            lsi53c895a_create(pci_bus);
-+            dev = DEVICE(pci_create_simple(pci_bus, -1, "lsi53c895a"));
-+            lsi53c8xx_handle_legacy_cmdline(dev);
-             n--;
-         }
-     }
-diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
-index 8b74857059..22b09a1e61 100644
---- a/hw/arm/versatilepb.c
-+++ b/hw/arm/versatilepb.c
-@@ -278,7 +278,8 @@ static void versatile_init(MachineState *machine, int board_id)
-     }
-     n = drive_get_max_bus(IF_SCSI);
-     while (n >= 0) {
--        lsi53c895a_create(pci_bus);
-+        dev = DEVICE(pci_create_simple(pci_bus, -1, "lsi53c895a"));
-+        lsi53c8xx_handle_legacy_cmdline(dev);
-         n--;
-     }
- 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index cf7c61c6cc..0fb8fb877e 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -59,6 +59,7 @@ static void machine_hppa_init(MachineState *machine)
-     const char *kernel_filename = machine->kernel_filename;
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     const char *initrd_filename = machine->initrd_filename;
-+    DeviceState *dev;
-     PCIBus *pci_bus;
-     ISABus *isa_bus;
-     qemu_irq rtc_irq, serial_irq;
-@@ -115,7 +116,8 @@ static void machine_hppa_init(MachineState *machine)
-     }
- 
-     /* SCSI disk setup. */
--    lsi53c895a_create(pci_bus);
-+    dev = DEVICE(pci_create_simple(pci_bus, -1, "lsi53c895a"));
-+    lsi53c8xx_handle_legacy_cmdline(dev);
- 
-     /* Network setup.  e1000 is good enough, failing Tulip support.  */
-     for (i = 0; i < nb_nics; i++) {
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 162b27a3b8..b0ea20416e 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -702,7 +702,9 @@ static void ibm_40p_init(MachineState *machine)
-         qdev_prop_set_uint32(dev, "equipment", 0xc0);
-         qdev_init_nofail(dev);
- 
--        lsi53c810_create(pci_bus, PCI_DEVFN(1, 0));
-+        dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
-+                                       "lsi53c810"));
-+        lsi53c8xx_handle_legacy_cmdline(dev);
- 
-         /* XXX: s3-trio at PCI_DEVFN(2, 0) */
-         pci_vga_init(pci_bus);
--- 
-2.11.0
+Here is a summary of the changes needed for it to be more likely for the
+patch to be accepted: https://lists.gnu.org/archive/html/qemu-
+devel/2018-02/msg03964.html
+
+ - change from "ret =3D 0" to something like "ret =3D get_errno(safe_write(=
+arg1, NULL, 0))"
+ - change TARGET_NR_read to do the same, instead of its current short-circu=
+it behaviour for count=3D=3D0
+ - check pread64/pwrite64 to see if they need a similar change as well
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716292
+
+Title:
+  User mode emulation returns wrong value for write(fd, NULL, 0)
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU version: latest master (fcea73709b966a7ded9efa7b106ea50c7fe9025c)
+  OS version: Ubuntu 14.04.5
+  Configured with: ../configure --target-list=3Dx86_64-linux-user
+
+  QEMU Linux usermode emulation does not handle write() syscalls with
+  zero length and a null pointer correctly: on Linux this returns 0, but
+  in emulation this returns -1.
+
+  I ran into this while using an aarch64 abuild-tar from Alpine Linux in
+  user-mode emulation; here's the minimized reproduction test case:
+
+  zhuowei@zhuowei-tablet:/tmp$ cat writezerobytes.c
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <fcntl.h>
+
+  int main() {
+  =C2=A0ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
+  =C2=A0fprintf(stderr, "write returned %ld\n", ret);
+  =C2=A0return 0;
+  }
+  zhuowei@zhuowei-tablet:/tmp$ gcc -o writezerobytes writezerobytes.c
+  zhuowei@zhuowei-tablet:/tmp$ uname -a
+  Linux zhuowei-tablet 3.13.0-129-generic #178-Ubuntu SMP Fri Aug 11 12:48:=
+20 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+  zhuowei@zhuowei-tablet:/tmp$ ./writezerobytes
+  write returned 0
+  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
+x86_64-linux-user/qemu-x86_64 ./writezerobytes
+  write returned -1
+  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
+x86_64-linux-user/qemu-x86_64 --version
+  qemu-x86_64 version 2.10.50 (v2.10.0-471-gfcea737-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716292/+subscriptions
