@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyHT7-0001Wb-8y
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:10:42 -0400
+	(envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
+	id 1fyHUN-0002Jt-TP
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyHT3-00049z-M4
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:10:41 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44319)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fyHT3-00047h-Ed
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:10:37 -0400
-Received: by mail-wr1-x436.google.com with SMTP id v16-v6so15101467wro.11
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:10:36 -0700 (PDT)
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<CAFEAcA-3UPDD3muShM=yYgiwQcN-U+f_TyEiu-Z=EWb7_hFaCw@mail.gmail.com>
-	<001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
-	<007e01d40c47$cc465640$64d302c0$@ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <007e01d40c47$cc465640$64d302c0$@ru>
-Date: Fri, 07 Sep 2018 15:10:34 +0100
-Message-ID: <87o9d9z9d1.fsf@linaro.org>
+	(envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
+	id 1fyHUK-00055s-No
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:11:59 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:36863)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
+	id 1fyHUK-00052O-AS
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:11:56 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Fri, 7 Sep 2018 14:11:50 +0000
+Message-ID: <c198c53f0f50488f94db1e8752a1aa85@AMSPEX02CL03.citrite.net>
+References: <153631568068.32214.13361287430751567885.stgit@dhcp-3-135.uk.xensource.com>
+In-Reply-To: <153631568068.32214.13361287430751567885.stgit@dhcp-3-135.uk.xensource.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
- prototype
+Subject: Re: [Qemu-devel] [PATCH 1/3] Improve xen_disk batching behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,123 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, maria.klimushenkova@ispras.ru, 'QEMU Developers' <qemu-devel@nongnu.org>, =?utf-8?Q?'Llu=C3=ADs?= Vilanova' <vilanova@ac.upc.edu>
+To: Tim Smith <tim.smith@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-
-> Peter, what about this one?
->
-> Pavel Dovgalyuk
->
->> -----Original Message-----
->> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
->> Sent: Tuesday, June 05, 2018 2:56 PM
->> To: 'Peter Maydell'; 'Pavel Dovgalyuk'
->> Cc: 'QEMU Developers'; maria.klimushenkova@ispras.ru; 'Paolo Bonzini'; '=
-Llu=C3=ADs Vilanova'
->> Subject: RE: [RFC PATCH v2 0/7] QEMU binary instrumentation prototype
->>
->> > From: Peter Maydell [mailto:peter.maydell@linaro.org]
->> >
->> > This series doesn't seem to add anything to Documentation/ that
->> > describes the API we make available to plugins. I'm a lot more
->> > interested in reviewing the API that will be used by plugins
->> > than I am in the implementation at this stage. Can you provide
->> > a description/documentation of the API for review, please?
->>
->>
->> Here is the draft:
->>
->> Introduction
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> This document describes an API for creating the QEMU
->> instrumentation plugins.
->>
->> It is based on the following prior sources:
->>  - KVM Forum 2017 talk "Instrumenting, Introspection, and Debugging with=
- QEMU"
->>    https://www.linux-kvm.org/images/3/3d/Introspect.pdf
->>  - Discussion on Lluis Vilanova instrumentation patch series
->>    https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03357.html
->>
->> The aim of the instrumentation is implementing different runtime
->> tracers that can track the executed instructions, memory and
->> hardware operations.
->>
->> Instrumenting the code
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> Instrumentation subsystem exploits TCG helper mechanism to embed
->> callbacks into the translation blocks. These callbacks may be inserted
->> before the specific instructions, when the plugins require such filterin=
-g.
->>
->> Translator uses two functions for embedding the callbacks:
->>  - first function checks whether the current instruction should be
->>    instrumented
->>  - second function embeds the callback for executing the plugin-specific
->>    code before that instruction
->>
->> The similar method may be used for memory access instrumentation.
->>
->> QEMU->Plugin API
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> Instrumentation layer passes the requests from the translator
->> to the dynamically loaded plugins. Every plugin may provide
->> the following functions to perform the instrumentation:
->>
->>  1. bool plugin_init(const char *args);
->>     Initialization function. May return false if the plugin
->>     can't work in the current environment.
->>
->>  2. bool plugin_needs_before_insn(uint64_t pc, void *cpu);
->>     Returns true if the plugin needs to instrument the current instructi=
-on.
->>     It may use the address (pc) for making the decision or the guest
->>     CPU state (cpu), which can be passed back to QEMU core API
->>     (e.g., for reading the guest memory).
->>     This function is called at both translation and execution phases.
->>
->>  3. void plugin_before_insn(uint64_t pc, void *cpu);
->>     If the previous function returned true for some instruction,
->>     then this function will be called. This process is repeated before
->>     every execution of the instruction, if it was instrumented.
->>
->> The similar pair of functions will also be added for the memory
->> operations.
->>
->> Plugin->QEMU API
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
->> QEMU core exports some functions to let the plugins introspect the guest
->> or perform some interaction with other QEMU services (e.g., logging).
->> API doesn't contain any data structures, because their memory layout dep=
-end
->> on the compilation settings.
->>
->> QEMU exports the following functions that may be called from the plugins:
->>
->>  1. void qemulib_log(const char *fmt, ...);
->>     Wrapper for qemu_log.
->>
->>  2. int qemulib_read_memory(void *cpu, uint64_t addr, uint8_t *buf, int =
-len);
->>     Reads guest memory into the buffer. Wrapper for cpu_memory_rw_debug.
->>
->>  3. int qemulib_read_register(void *cpu, uint8_t *mem_buf, int reg);
->>     Uses target gdb interface for accessing the guest registers.
->>     'reg' is the id of the desired register as it is coded by gdb.
->>
->> There also should be a function for flushing the translated blocks to
->> ensure that the instrumentation will occur in the case of changing
->> the internal plugin state.
-
-This would certainly be the case if we could generate TCG code in the plugi=
-ns.
-
---
-Alex Benn=C3=A9e
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsIFttYWlsdG86
+cWVtdS1kZXZlbC0NCj4gYm91bmNlcytwYXVsLmR1cnJhbnQ9Y2l0cml4LmNvbUBub25nbnUub3Jn
+XSBPbiBCZWhhbGYgT2YgVGltIFNtaXRoDQo+IFNlbnQ6IDA3IFNlcHRlbWJlciAyMDE4IDExOjIx
+DQo+IFRvOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQ
+QVRDSCAxLzNdIEltcHJvdmUgeGVuX2Rpc2sgYmF0Y2hpbmcgYmVoYXZpb3VyDQo+IA0KPiBXaGVu
+IEkvTyBjb25zaXN0cyBvZiBtYW55IHNtYWxsIHJlcXVlc3RzLCBwZXJmb3JtYW5jZSBpcyBpbXBy
+b3ZlZCBieQ0KPiBiYXRjaGluZyB0aGVtIHRvZ2V0aGVyIGluIGEgc2luZ2xlIGlvX3N1Ym1pdCgp
+IGNhbGwuIFdoZW4gdGhlcmUgYXJlDQo+IHJlbGF0aXZlbHkgZmV3IHJlcXVlc3RzLCB0aGUgZXh0
+cmEgb3ZlcmhlYWQgaXMgbm90IHdvcnRoIGl0LiBUaGlzDQo+IGludHJvZHVjZXMgYSBjaGVjayB0
+byBzdGFydCBiYXRjaGluZyBJL08gcmVxdWVzdHMgdmlhIGJsa19pb19wbHVnKCkvDQo+IGJsa19p
+b191bnBsdWcoKSBpbiBhbiBhbW91bnQgcHJvcG9ydGlvbmFsIHRvIHRoZSBudW1iZXIgd2hpY2gg
+d2VyZQ0KPiBhbHJlYWR5IGluIGZsaWdodCBhdCB0aGUgdGltZSB3ZSBzdGFydGVkIHJlYWRpbmcg
+dGhlIHJpbmcuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBUaW0gU21pdGggPHRpbS5zbWl0aEBjaXRy
+aXguY29tPg0KDQpSZXZpZXdlZC1ieTogUGF1bCBEdXJyYW50IDxwYXVsLmR1cnJhbnRAY2l0cml4
+LmNvbT4NCg0KPiAtLS0NCj4gIGh3L2Jsb2NrL3hlbl9kaXNrLmMgfCAgIDI5ICsrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwgMjkgaW5zZXJ0aW9ucygrKQ0K
+PiANCj4gZGlmZiAtLWdpdCBhL2h3L2Jsb2NrL3hlbl9kaXNrLmMgYi9ody9ibG9jay94ZW5fZGlz
+ay5jDQo+IGluZGV4IDM2ZWZmOTRmODQuLjZjYjQwZDY2ZmEgMTAwNjQ0DQo+IC0tLSBhL2h3L2Js
+b2NrL3hlbl9kaXNrLmMNCj4gKysrIGIvaHcvYmxvY2sveGVuX2Rpc2suYw0KPiBAQCAtMTAxLDYg
+KzEwMSw5IEBAIHN0cnVjdCBYZW5CbGtEZXYgew0KPiAgICAgIEFpb0NvbnRleHQgICAgICAgICAg
+KmN0eDsNCj4gIH07DQo+IA0KPiArLyogVGhyZXNob2xkIG9mIGluLWZsaWdodCByZXF1ZXN0cyBh
+Ym92ZSB3aGljaCB3ZSB3aWxsIHN0YXJ0IHVzaW5nDQo+ICsgKiBibGtfaW9fcGx1ZygpL2Jsa19p
+b191bnBsdWcoKSB0byBiYXRjaCByZXF1ZXN0cyAqLw0KPiArI2RlZmluZSBJT19QTFVHX1RIUkVT
+SE9MRCAxDQo+ICAvKiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tICovDQo+IA0KPiAgc3RhdGljIHZvaWQgaW9yZXFfcmVzZXQoc3Ry
+dWN0IGlvcmVxICppb3JlcSkNCj4gQEAgLTU0Miw2ICs1NDUsOCBAQCBzdGF0aWMgdm9pZCBibGtf
+aGFuZGxlX3JlcXVlc3RzKHN0cnVjdCBYZW5CbGtEZXYNCj4gKmJsa2RldikNCj4gIHsNCj4gICAg
+ICBSSU5HX0lEWCByYywgcnA7DQo+ICAgICAgc3RydWN0IGlvcmVxICppb3JlcTsNCj4gKyAgICBp
+bnQgaW5mbGlnaHRfYXRzdGFydCA9IGJsa2Rldi0+cmVxdWVzdHNfaW5mbGlnaHQ7DQo+ICsgICAg
+aW50IGJhdGNoZWQgPSAwOw0KPiANCj4gICAgICBibGtkZXYtPm1vcmVfd29yayA9IDA7DQo+IA0K
+PiBAQCAtNTUwLDYgKzU1NSwxNiBAQCBzdGF0aWMgdm9pZCBibGtfaGFuZGxlX3JlcXVlc3RzKHN0
+cnVjdCBYZW5CbGtEZXYNCj4gKmJsa2RldikNCj4gICAgICB4ZW5fcm1iKCk7IC8qIEVuc3VyZSB3
+ZSBzZWUgcXVldWVkIHJlcXVlc3RzIHVwIHRvICdycCcuICovDQo+IA0KPiAgICAgIGJsa19zZW5k
+X3Jlc3BvbnNlX2FsbChibGtkZXYpOw0KPiArICAgIC8qIElmIHRoZXJlIHdhcyBtb3JlIHRoYW4g
+SU9fUExVR19USFJFU0hPTEQgaW9yZXFzIGluIGZsaWdodA0KPiArICAgICAqIHdoZW4gd2UgZ290
+IGhlcmUsIHRoaXMgaXMgYW4gaW5kaWNhdGlvbiB0aGF0IHRoZXJlIHRoZSBib3R0bGVuZWNrDQo+
+ICsgICAgICogaXMgYmVsb3cgdXMsIHNvIGl0J3Mgd29ydGggYmVnaW5uaW5nIHRvIGJhdGNoIHVw
+IEkvTyByZXF1ZXN0cw0KPiArICAgICAqIHJhdGhlciB0aGFuIHN1Ym1pdHRpbmcgdGhlbSBpbW1l
+ZGlhdGVseS4gVGhlIG1heGltdW0gbnVtYmVyDQo+ICsgICAgICogb2YgcmVxdWVzdHMgd2UncmUg
+d2lsbGluZyB0byBiYXRjaCBpcyB0aGUgbnVtYmVyIGFscmVhZHkgaW4NCj4gKyAgICAgKiBmbGln
+aHQsIHNvIGl0IGNhbiBncm93IHVwIHRvIG1heF9yZXF1ZXN0cyB3aGVuIHRoZSBib3R0bGVuZWNr
+DQo+ICsgICAgICogaXMgYmVsb3cgdXMgKi8NCj4gKyAgICBpZiAoaW5mbGlnaHRfYXRzdGFydCA+
+IElPX1BMVUdfVEhSRVNIT0xEKSB7DQo+ICsgICAgICAgIGJsa19pb19wbHVnKGJsa2Rldi0+Ymxr
+KTsNCj4gKyAgICB9DQo+ICAgICAgd2hpbGUgKHJjICE9IHJwKSB7DQo+ICAgICAgICAgIC8qIHB1
+bGwgcmVxdWVzdCBmcm9tIHJpbmcgKi8NCj4gICAgICAgICAgaWYgKFJJTkdfUkVRVUVTVF9DT05T
+X09WRVJGTE9XKCZibGtkZXYtPnJpbmdzLmNvbW1vbiwgcmMpKSB7DQo+IEBAIC01ODksNyArNjA0
+LDIxIEBAIHN0YXRpYyB2b2lkIGJsa19oYW5kbGVfcmVxdWVzdHMoc3RydWN0IFhlbkJsa0Rldg0K
+PiAqYmxrZGV2KQ0KPiAgICAgICAgICAgICAgY29udGludWU7DQo+ICAgICAgICAgIH0NCj4gDQo+
+ICsgICAgICAgIGlmIChpbmZsaWdodF9hdHN0YXJ0ID4gSU9fUExVR19USFJFU0hPTEQgJiYgYmF0
+Y2hlZCA+PQ0KPiBpbmZsaWdodF9hdHN0YXJ0KSB7DQo+ICsgICAgICAgICAgICBibGtfaW9fdW5w
+bHVnKGJsa2Rldi0+YmxrKTsNCj4gKyAgICAgICAgfQ0KPiAgICAgICAgICBpb3JlcV9ydW5pb19x
+ZW11X2Fpbyhpb3JlcSk7DQo+ICsgICAgICAgIGlmIChpbmZsaWdodF9hdHN0YXJ0ID4gSU9fUExV
+R19USFJFU0hPTEQpIHsNCj4gKyAgICAgICAgICAgIGlmIChiYXRjaGVkID49IGluZmxpZ2h0X2F0
+c3RhcnQpIHsNCj4gKyAgICAgICAgICAgICAgICBibGtfaW9fcGx1ZyhibGtkZXYtPmJsayk7DQo+
+ICsgICAgICAgICAgICAgICAgYmF0Y2hlZD0wOw0KPiArICAgICAgICAgICAgfSBlbHNlIHsNCj4g
+KyAgICAgICAgICAgICAgICBiYXRjaGVkKys7DQo+ICsgICAgICAgICAgICB9DQo+ICsgICAgICAg
+IH0NCj4gKyAgICB9DQo+ICsgICAgaWYgKGluZmxpZ2h0X2F0c3RhcnQgPiBJT19QTFVHX1RIUkVT
+SE9MRCkgew0KPiArICAgICAgICBibGtfaW9fdW5wbHVnKGJsa2Rldi0+YmxrKTsNCj4gICAgICB9
+DQo+IA0KPiAgICAgIGlmIChibGtkZXYtPm1vcmVfd29yayAmJiBibGtkZXYtPnJlcXVlc3RzX2lu
+ZmxpZ2h0IDwgYmxrZGV2LQ0KPiA+bWF4X3JlcXVlc3RzKSB7DQo+IA0KDQo=
