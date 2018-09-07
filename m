@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyHyU-0003Kf-Fn
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:43:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fyI6R-0007CP-Qo
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyHyR-0003sk-Be
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:43:06 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52904)
+	(envelope-from <alex.bennee@linaro.org>) id 1fyI6N-0007n7-AI
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:51:19 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:52195)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fyHyR-0003ro-3B
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:43:03 -0400
-Received: by mail-wm0-x244.google.com with SMTP id y139-v6so14882212wmc.2
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:43:02 -0700 (PDT)
+	id 1fyI6M-0007mN-T5
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:51:15 -0400
+Received: by mail-wm0-x244.google.com with SMTP id y2-v6so15029355wma.1
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:51:14 -0700 (PDT)
 References: <20180817232923.28899-1-cota@braap.org>
-	<20180817232923.28899-2-cota@braap.org>
+	<20180817232923.28899-3-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180817232923.28899-2-cota@braap.org>
-Date: Fri, 07 Sep 2018 15:43:00 +0100
-Message-ID: <87k1nxz7uz.fsf@linaro.org>
+In-reply-to: <20180817232923.28899-3-cota@braap.org>
+Date: Fri, 07 Sep 2018 15:51:12 +0100
+Message-ID: <87in3hz7hb.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/6] qht: remove unused map param from
- qht_remove__locked
+Subject: Re: [Qemu-devel] [PATCH 2/6] qht: add qht_iter_remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +36,225 @@ Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
 Emilio G. Cota <cota@braap.org> writes:
 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  util/qht.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+> This currently has no users, but the use case is so common that I
+> think we must support it.
 >
+> Note that without the appended we cannot safely remove a set of
+> elements; a 2-step approach (i.e. qht_iter first, keep track of
+> the to-be-deleted elements, and then a bunch of qht_remove calls)
+> would be racy, since between the iteration and the removals other
+> threads might insert additional elements.
+>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  include/qemu/qht.h | 19 ++++++++++++
+>  util/qht.c         | 74 +++++++++++++++++++++++++++++++++++++++++-----
+>  2 files changed, 85 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/qemu/qht.h b/include/qemu/qht.h
+> index 1fb9116fa0..91bc9b00cf 100644
+> --- a/include/qemu/qht.h
+> +++ b/include/qemu/qht.h
+> @@ -44,6 +44,8 @@ struct qht_stats {
+>
+>  typedef bool (*qht_lookup_func_t)(const void *obj, const void *userp);
+>  typedef void (*qht_iter_func_t)(struct qht *ht, void *p, uint32_t h, voi=
+d *up);
+> +typedef bool (*qht_iter_bool_func_t)(struct qht *ht, void *p, uint32_t h,
+> +                                     void *up);
+>
+>  #define QHT_MODE_AUTO_RESIZE 0x1 /* auto-resize when heavily loaded */
+>
+> @@ -178,9 +180,26 @@ bool qht_resize(struct qht *ht, size_t n_elems);
+>   *
+>   * Each time it is called, user-provided @func is passed a pointer-hash =
+pair,
+>   * plus @userp.
+> + *
+> + * Note: @ht cannot be accessed from @func
+
+I'm confused by this comment. If @ht cannot be accessed (or shouldn't be
+accessed) from @func then why are we passing it?
+
+> + * See also: qht_iter_remove()
+>   */
+>  void qht_iter(struct qht *ht, qht_iter_func_t func, void *userp);
+>
+> +/**
+> + * qht_iter_remove - Iterate over a QHT, optionally removing entries
+> + * @ht: QHT to be iterated over
+> + * @func: function to be called for each entry in QHT
+> + * @userp: additional pointer to be passed to @func
+> + *
+> + * Each time it is called, user-provided @func is passed a pointer-hash =
+pair,
+> + * plus @userp. If @func returns true, the pointer-hash pair is removed.
+> + *
+> + * Note: @ht cannot be accessed from @func
+> + * See also: qht_iter()
+> + */
+> +void qht_iter_remove(struct qht *ht, qht_iter_bool_func_t func, void *us=
+erp);
+> +
+>  /**
+>   * qht_statistics_init - Gather statistics from a QHT
+>   * @ht: QHT to gather statistics from
 > diff --git a/util/qht.c b/util/qht.c
-> index c138777a9c..7b57b50a24 100644
+> index 7b57b50a24..caec53dd0e 100644
 > --- a/util/qht.c
 > +++ b/util/qht.c
-> @@ -665,8 +665,7 @@ static inline void qht_bucket_remove_entry(struct qht=
-_bucket *orig, int pos)
+> @@ -89,6 +89,19 @@
+>  #define QHT_BUCKET_ENTRIES 4
+>  #endif
 >
->  /* call with b->lock held */
->  static inline
-> -bool qht_remove__locked(struct qht_map *map, struct qht_bucket *head,
-> -                        const void *p, uint32_t hash)
-> +bool qht_remove__locked(struct qht_bucket *head, const void *p, uint32_t=
- hash)
->  {
->      struct qht_bucket *b =3D head;
->      int i;
-> @@ -701,7 +700,7 @@ bool qht_remove(struct qht *ht, const void *p, uint32=
-_t hash)
->      qht_debug_assert(p);
->
->      b =3D qht_bucket_lock__no_stale(ht, hash, &map);
-> -    ret =3D qht_remove__locked(map, b, p, hash);
-> +    ret =3D qht_remove__locked(b, p, hash);
->      qht_bucket_debug__locked(b);
->      qemu_spin_unlock(&b->lock);
+> +enum qht_iter_type {
+> +    QHT_ITER_VOID,    /* do nothing; use retvoid */
+> +    QHT_ITER_RM,      /* remove element if retbool returns true */
+> +};
+> +
+> +struct qht_iter {
+> +    union {
+> +        qht_iter_func_t retvoid;
+> +        qht_iter_bool_func_t retbool;
+> +    } f;
+> +    enum qht_iter_type type;
+> +};
+> +
+>  /*
+>   * Note: reading partially-updated pointers in @pointers could lead to
+>   * segfaults. We thus access them with atomic_read/set; this guarantees
+> @@ -706,9 +719,10 @@ bool qht_remove(struct qht *ht, const void *p, uint3=
+2_t hash)
 >      return ret;
+>  }
+>
+> -static inline void qht_bucket_iter(struct qht *ht, struct qht_bucket *b,
+> -                                   qht_iter_func_t func, void *userp)
+> +static inline void qht_bucket_iter(struct qht *ht, struct qht_bucket *he=
+ad,
+> +                                   const struct qht_iter *iter, void *us=
+erp)
+>  {
+> +    struct qht_bucket *b =3D head;
+>      int i;
+>
+>      do {
+> @@ -716,7 +730,25 @@ static inline void qht_bucket_iter(struct qht *ht, s=
+truct qht_bucket *b,
+>              if (b->pointers[i] =3D=3D NULL) {
+>                  return;
+>              }
+> -            func(ht, b->pointers[i], b->hashes[i], userp);
+> +            switch (iter->type) {
+> +            case QHT_ITER_VOID:
+> +                iter->f.retvoid(ht, b->pointers[i], b->hashes[i], userp);
+> +                break;
+> +            case QHT_ITER_RM:
+> +                if (iter->f.retbool(ht, b->pointers[i], b->hashes[i], us=
+erp)) {
+> +                    /* replace i with the last valid element in the buck=
+et */
+> +                    seqlock_write_begin(&head->sequence);
+> +                    qht_bucket_remove_entry(b, i);
+> +                    seqlock_write_end(&head->sequence);
+> +                    qht_bucket_debug__locked(b);
+> +                    /* reevaluate i, since it just got replaced */
+> +                    i--;
+> +                    continue;
+> +                }
+> +                break;
+> +            default:
+> +                g_assert_not_reached();
+> +            }
+>          }
+>          b =3D b->next;
+>      } while (b);
+> @@ -724,26 +756,48 @@ static inline void qht_bucket_iter(struct qht *ht, =
+struct qht_bucket *b,
+>
+>  /* call with all of the map's locks held */
+>  static inline void qht_map_iter__all_locked(struct qht *ht, struct qht_m=
+ap *map,
+> -                                            qht_iter_func_t func, void *=
+userp)
+> +                                            const struct qht_iter *iter,
+> +                                            void *userp)
+>  {
+>      size_t i;
+>
+>      for (i =3D 0; i < map->n_buckets; i++) {
+> -        qht_bucket_iter(ht, &map->buckets[i], func, userp);
+> +        qht_bucket_iter(ht, &map->buckets[i], iter, userp);
+>      }
+>  }
+>
+> -void qht_iter(struct qht *ht, qht_iter_func_t func, void *userp)
+> +static inline void
+> +do_qht_iter(struct qht *ht, const struct qht_iter *iter, void *userp)
+>  {
+>      struct qht_map *map;
+>
+>      map =3D atomic_rcu_read(&ht->map);
+>      qht_map_lock_buckets(map);
+>      /* Note: ht here is merely for carrying ht->mode; ht->map won't be r=
+ead */
+> -    qht_map_iter__all_locked(ht, map, func, userp);
+> +    qht_map_iter__all_locked(ht, map, iter, userp);
+>      qht_map_unlock_buckets(map);
+>  }
+>
+> +void qht_iter(struct qht *ht, qht_iter_func_t func, void *userp)
+> +{
+> +    const struct qht_iter iter =3D {
+> +        .f.retvoid =3D func,
+> +        .type =3D QHT_ITER_VOID,
+> +    };
+> +
+> +    do_qht_iter(ht, &iter, userp);
+> +}
+> +
+> +void qht_iter_remove(struct qht *ht, qht_iter_bool_func_t func, void *us=
+erp)
+> +{
+> +    const struct qht_iter iter =3D {
+> +        .f.retbool =3D func,
+> +        .type =3D QHT_ITER_RM,
+> +    };
+> +
+> +    do_qht_iter(ht, &iter, userp);
+> +}
+> +
+>  static void qht_map_copy(struct qht *ht, void *p, uint32_t hash, void *u=
+serp)
+>  {
+>      struct qht_map *new =3D userp;
+> @@ -760,6 +814,10 @@ static void qht_map_copy(struct qht *ht, void *p, ui=
+nt32_t hash, void *userp)
+>  static void qht_do_resize_reset(struct qht *ht, struct qht_map *new, boo=
+l reset)
+>  {
+>      struct qht_map *old;
+> +    const struct qht_iter iter =3D {
+> +        .f.retvoid =3D qht_map_copy,
+> +        .type =3D QHT_ITER_VOID,
+> +    };
+>
+>      old =3D ht->map;
+>      qht_map_lock_buckets(old);
+> @@ -774,7 +832,7 @@ static void qht_do_resize_reset(struct qht *ht, struc=
+t qht_map *new, bool reset)
+>      }
+>
+>      g_assert(new->n_buckets !=3D old->n_buckets);
+> -    qht_map_iter__all_locked(ht, old, qht_map_copy, new);
+> +    qht_map_iter__all_locked(ht, old, &iter, new);
+>      qht_map_debug__all_locked(new);
+>
+>      atomic_rcu_set(&ht->map, new);
 
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 --
 Alex Benn=C3=A9e
