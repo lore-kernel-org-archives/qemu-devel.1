@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1fyAKH-00077g-O9
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:33:06 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fyAO1-000872-TO
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:36:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1fyAKG-00006Y-Or
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:33:05 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:42103)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1fyAKG-0008TD-IK
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:33:04 -0400
-Received: by mail-qk1-x742.google.com with SMTP id g13-v6so9049993qki.9
-	for <qemu-devel@nongnu.org>; Thu, 06 Sep 2018 23:33:04 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fyANy-0005z8-NJ
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:36:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38318 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fyANy-0005w5-Gf
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:36:54 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DCE31402315B
+	for <qemu-devel@nongnu.org>; Fri,  7 Sep 2018 06:36:53 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri,  7 Sep 2018 10:36:34 +0400
+Message-Id: <20180907063634.359-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 7 Sep 2018 14:32:26 +0800
-Message-ID: <CAKXe6S+5ucQuyA4Ru5J4_WLJWMy4znnmnPAJcPX3+j+uSiSW4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [Question] Question about the i440FX device
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] vnc: call sasl_server_init() only when
+ required
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +32,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>, mst@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
-Cc: liqiang02@corp.netease.com
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, dgilbert@redhat.com, berrange@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hello all,
+VNC server is calling sasl_server_init() during startup of QEMU, even
+if SASL auth has not been enabled.
 
-I want to know why the i440FX in the following 'info qtree' information is
-laid under the pci.0 bus.  In the chip spec here:
--->https://wiki.qemu.org/images/b/bb/29054901.pdf
-I don't see this device.
+This may create undesirable warnings like "Could not find keytab file:
+/etc/qemu/krb5.tab" when the user didn't configure SASL on host and
+started VNC server.
 
-Can anyone give me some hints?
+Instead, only initialize SASL when needed. Note that HMP/QMP "change
+vnc" calls vnc_display_open() again, which will initialize SASL if
+needed.
 
-Thanks,
-Li Qiang
+Fix assignment in if condition, while touching this code.
 
-bus: main-system-bus
-  type System
-  dev: hpet, id ""
-  dev: kvm-ioapic, id ""
-  dev: i440FX-pcihost, id ""
-    pci-hole64-size = 18446744073709551615 (16 EiB)
-    short_root_bus = 0 (0x0)
-    bus: pci.0
-      type PCI
-      dev: virtio-balloon-pci, id "balloon0"
-      dev: cirrus-vga, id "video0"
-      dev: PIIX4_PM, id "
-      dev: piix3-ide, id ""
+Related to:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1609327
 
-      dev: PIIX3, id ""
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ ui/vnc.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-      dev: *i440FX*, id ""
-        addr = 00.0
-        romfile = ""
-        rombar = 1 (0x1)
-        multifunction = false
-        command_serr_enable = true
-        x-pcie-lnksta-dllla = true
-        class Host bridge, addr 00:00.0, pci id 8086:1237 (sub 1af4:1100)
+diff --git a/ui/vnc.c b/ui/vnc.c
+index ccb1335d86..458e1d0fcb 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3822,9 +3822,6 @@ void vnc_display_open(const char *id, Error **errp)
+     bool reverse =3D false;
+     const char *credid;
+     bool sasl =3D false;
+-#ifdef CONFIG_VNC_SASL
+-    int saslErr;
+-#endif
+     int acl =3D 0;
+     int lock_key_sync =3D 1;
+     int key_delay_ms;
+@@ -3964,10 +3961,14 @@ void vnc_display_open(const char *id, Error **err=
+p)
+     trace_vnc_auth_init(vd, 1, vd->ws_auth, vd->ws_subauth);
+=20
+ #ifdef CONFIG_VNC_SASL
+-    if ((saslErr =3D sasl_server_init(NULL, "qemu")) !=3D SASL_OK) {
+-        error_setg(errp, "Failed to initialize SASL auth: %s",
+-                   sasl_errstring(saslErr, NULL, NULL));
+-        goto fail;
++    if (sasl) {
++        int saslErr =3D sasl_server_init(NULL, "qemu");
++
++        if (saslErr !=3D SASL_OK) {
++            error_setg(errp, "Failed to initialize SASL auth: %s",
++                       sasl_errstring(saslErr, NULL, NULL));
++            goto fail;
++        }
+     }
+ #endif
+     vd->lock_key_sync =3D lock_key_sync;
+--=20
+2.19.0.rc1
