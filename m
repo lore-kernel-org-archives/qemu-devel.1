@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fyEfd-0004ls-Df
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:11:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1fyFWc-0003sD-4u
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fyEfZ-0005Y9-05
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:11:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49150)
+	(envelope-from <bounces@canonical.com>) id 1fyFWY-0006Xo-Vp
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:06:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59182)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fyEfY-0005JM-No
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:11:20 -0400
+	id 1fyFWY-0006Tz-OP
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:06:06 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fyEfM-0001LW-5a
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 11:11:08 +0000
+	id 1fyFWW-00042V-Bf
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 12:06:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5A6E02E80D9
-	for <qemu-devel@nongnu.org>; Fri,  7 Sep 2018 11:11:07 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3AE6C2E80D2
+	for <qemu-devel@nongnu.org>; Fri,  7 Sep 2018 12:06:04 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Sep 2018 10:56:33 -0000
+Date: Fri, 07 Sep 2018 11:51:50 -0000
 From: Tony Garnock-Jones <tonygarnockjones@gmail.com>
 Reply-To: Bug 1716292 <1716292@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150508616435.31900.3449336177179115668.malonedeb@soybean.canonical.com>
-Message-Id: <153631779391.32364.10223889931938570979.malone@soybean.canonical.com>
+Message-Id: <153632111093.28287.15726623039416245550.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1716292] Re: User mode emulation returns wrong
  value for write(fd, NULL, 0)
@@ -39,24 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This happens for me also, with qemu version 2.12.0 (Debian
-1:2.12+dfsg-3).
-
-An initial patch was proposed here: https://lists.gnu.org/archive/html
-/qemu-devel/2017-09/msg08073.html
-
-Discussion pointed out some problems, and the patch languished and was
-not accepted.
-
-Here is a summary of the changes needed for it to be more likely for the
-patch to be accepted: https://lists.gnu.org/archive/html/qemu-
-devel/2018-02/msg03964.html
-
- - change from "ret =3D 0" to something like "ret =3D get_errno(safe_write(=
-arg1, NULL, 0))"
- - change TARGET_NR_read to do the same, instead of its current short-circu=
-it behaviour for count=3D=3D0
- - check pread64/pwrite64 to see if they need a similar change as well
+** Patch added: "0001-Bring-linux-user-write-2-handling-into-line-with-lin.=
+patch"
+   https://bugs.launchpad.net/qemu/+bug/1716292/+attachment/5186008/+files/=
+0001-Bring-linux-user-write-2-handling-into-line-with-lin.patch
 
 -- =
 
