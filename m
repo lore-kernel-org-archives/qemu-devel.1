@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyGTL-0008Pw-Uh
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:06:52 -0400
+	(envelope-from <thuth@redhat.com>) id 1fyGVi-0001xo-RT
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyGTH-0006cI-9q
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:06:51 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:34991)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fyGTG-0006Yk-PK
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:06:47 -0400
-Received: by mail-wr1-x429.google.com with SMTP id j26-v6so14937547wre.2
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 06:06:46 -0700 (PDT)
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<152819517217.30857.1806942753626059939.stgit@pasha-ThinkPad-T60>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <152819517217.30857.1806942753626059939.stgit@pasha-ThinkPad-T60>
-Date: Fri, 07 Sep 2018 14:06:44 +0100
-Message-ID: <87va7hzcbf.fsf@linaro.org>
+	(envelope-from <thuth@redhat.com>) id 1fyGVd-0002XV-SC
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 09:09:18 -0400
+References: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
+	<20180907125653.5010-3-mark.cave-ayland@ilande.co.uk>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2625edb6-7263-fe59-97ed-122d84d9de53@redhat.com>
+Date: Fri, 7 Sep 2018 15:09:05 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180907125653.5010-3-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 3/7] plugins: provide helper
- functions for plugins
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] scsi: move lsi53c8xx_create()
+ callers to lsi53c8xx_handle_legacy_cmdline()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,97 +25,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, pbonzini@redhat.com, famz@redhat.com, hpoussin@reactos.org, rth@twiddle.net, peter.maydell@linaro.org, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
-
-> From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
->
-> This patch adds interface functions that may be called from the loaded pl=
-ugins.
-> Such functions are needed to inspect the VM state and to pass data
-> to the QEMU (e.g., QEMU-side logging).
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 2018-09-07 14:56, Mark Cave-Ayland wrote:
+> As part of commits a64aa5785d "hw: Deprecate -drive if=scsi with non-onboard
+> HBAs" and b891538e81 "hw/ppc/prep: Fix implicit creation of "-drive if=scsi"
+> devices" the lsi53c895a_create() and lsi53c810_create() functions were added
+> to wrap pci_create_simple() and scsi_bus_legacy_handle_cmdline().
+> 
+> Unfortunately this prevents us from changing qdev properties on the device
+> and/or changing the PCI configuration. By switching over to using the new
+> lsi53c8xx_handle_legacy_cmdline() function then the caller can now configure
+> and realize the LSI SCSI device exactly as required.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->  Makefile.target           |    2 +-
->  plugins/include/plugins.h |    6 ++++++
->  plugins/qemulib.c         |   31 +++++++++++++++++++++++++++++++
->  3 files changed, 38 insertions(+), 1 deletion(-)
->  create mode 100644 plugins/qemulib.c
->
-> diff --git a/Makefile.target b/Makefile.target
-> index 4cffd96..5648c9c 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -93,7 +93,7 @@ all: $(PROGS) stap
->  # cpu emulator library
->  obj-y +=3D exec.o
->  obj-y +=3D accel/
-> -obj-$(CONFIG_PLUGINS) +=3D plugins/plugins.o
-> +obj-$(CONFIG_PLUGINS) +=3D plugins/plugins.o plugins/qemulib.o
->  obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-o=
-p-gvec.o
->  obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/optimize.o
->  obj-$(CONFIG_TCG_INTERPRETER) +=3D tcg/tci.o
-> diff --git a/plugins/include/plugins.h b/plugins/include/plugins.h
-> index 100a786..fa624ea 100644
-> --- a/plugins/include/plugins.h
-> +++ b/plugins/include/plugins.h
-> @@ -9,4 +9,10 @@ bool plugin_init(const char *args);
->  bool plugin_needs_before_insn(uint64_t pc, void *cpu);
->  void plugin_before_insn(uint64_t pc, void *cpu);
->
-> +/* QEMU interface */
-> +
-> +void qemulib_log(const char *fmt, ...) /*GCC_FMT_ATTR(1, 2)*/;
-> +int qemulib_read_memory(void *cpu, uint64_t addr, uint8_t *buf, int len);
-> +int qemulib_read_register(void *cpu, uint8_t *mem_buf, int reg);
-> +
->  #endif /* PLUGINS_INTERFACE_H */
-> diff --git a/plugins/qemulib.c b/plugins/qemulib.c
-> new file mode 100644
-> index 0000000..eb812c1
-> --- /dev/null
-> +++ b/plugins/qemulib.c
-> @@ -0,0 +1,31 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "cpu.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/plugins.h"
-> +#include "qemu/log.h"
-> +#include "include/plugins.h"
-> +
-> +void qemulib_log(const char *fmt, ...)
-> +{
-> +    va_list args;
-> +    va_start(args, fmt);
-> +    qemu_log_vprintf(fmt, args);
-> +    va_end(args);
-> +}
-> +
-> +int qemulib_read_memory(void *cpu, uint64_t addr, uint8_t *buf, int len)
-> +{
-> +    return cpu_memory_rw_debug(cpu, addr, buf, len, false);
-> +}
-> +
-> +int qemulib_read_register(void *cpu, uint8_t *mem_buf, int reg)
-> +{
-> +    CPUClass *cc =3D CPU_GET_CLASS(cpu);
-> +
-> +    if (reg < cc->gdb_num_core_regs) {
-> +        return cc->gdb_read_register(cpu, mem_buf, reg);
-> +    }
-> +
-> +    return 0;
-> +}
+>  hw/arm/realview.c    | 3 ++-
+>  hw/arm/versatilepb.c | 3 ++-
+>  hw/hppa/machine.c    | 4 +++-
+>  hw/ppc/prep.c        | 4 +++-
+>  4 files changed, 10 insertions(+), 4 deletions(-)
 
-
---
-Alex Benn=C3=A9e
+Reviewed-by: Thomas Huth <thuth@redhat.com>
