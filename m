@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
-	id 1fyHUN-0002Jt-TP
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:12:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fyHWf-0005Bl-Ho
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
-	id 1fyHUK-00055s-No
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:11:59 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:36863)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=781bf32a7=Paul.Durrant@citrix.com>)
-	id 1fyHUK-00052O-AS
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:11:56 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 7 Sep 2018 14:11:50 +0000
-Message-ID: <c198c53f0f50488f94db1e8752a1aa85@AMSPEX02CL03.citrite.net>
-References: <153631568068.32214.13361287430751567885.stgit@dhcp-3-135.uk.xensource.com>
-In-Reply-To: <153631568068.32214.13361287430751567885.stgit@dhcp-3-135.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1fyHWc-0000Hx-8J
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:14:21 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:40456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fyHWc-0000HA-1Q
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:14:18 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id 207-v6so14718373wme.5
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:14:17 -0700 (PDT)
+References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+	<152819516675.30857.9162557650483931182.stgit@pasha-ThinkPad-T60>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <152819516675.30857.9162557650483931182.stgit@pasha-ThinkPad-T60>
+Date: Fri, 07 Sep 2018 15:14:15 +0100
+Message-ID: <87mustz96w.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/3] Improve xen_disk batching behaviour
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 2/7] Add plugin support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +30,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tim Smith <tim.smith@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsIFttYWlsdG86
-cWVtdS1kZXZlbC0NCj4gYm91bmNlcytwYXVsLmR1cnJhbnQ9Y2l0cml4LmNvbUBub25nbnUub3Jn
-XSBPbiBCZWhhbGYgT2YgVGltIFNtaXRoDQo+IFNlbnQ6IDA3IFNlcHRlbWJlciAyMDE4IDExOjIx
-DQo+IFRvOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQ
-QVRDSCAxLzNdIEltcHJvdmUgeGVuX2Rpc2sgYmF0Y2hpbmcgYmVoYXZpb3VyDQo+IA0KPiBXaGVu
-IEkvTyBjb25zaXN0cyBvZiBtYW55IHNtYWxsIHJlcXVlc3RzLCBwZXJmb3JtYW5jZSBpcyBpbXBy
-b3ZlZCBieQ0KPiBiYXRjaGluZyB0aGVtIHRvZ2V0aGVyIGluIGEgc2luZ2xlIGlvX3N1Ym1pdCgp
-IGNhbGwuIFdoZW4gdGhlcmUgYXJlDQo+IHJlbGF0aXZlbHkgZmV3IHJlcXVlc3RzLCB0aGUgZXh0
-cmEgb3ZlcmhlYWQgaXMgbm90IHdvcnRoIGl0LiBUaGlzDQo+IGludHJvZHVjZXMgYSBjaGVjayB0
-byBzdGFydCBiYXRjaGluZyBJL08gcmVxdWVzdHMgdmlhIGJsa19pb19wbHVnKCkvDQo+IGJsa19p
-b191bnBsdWcoKSBpbiBhbiBhbW91bnQgcHJvcG9ydGlvbmFsIHRvIHRoZSBudW1iZXIgd2hpY2gg
-d2VyZQ0KPiBhbHJlYWR5IGluIGZsaWdodCBhdCB0aGUgdGltZSB3ZSBzdGFydGVkIHJlYWRpbmcg
-dGhlIHJpbmcuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBUaW0gU21pdGggPHRpbS5zbWl0aEBjaXRy
-aXguY29tPg0KDQpSZXZpZXdlZC1ieTogUGF1bCBEdXJyYW50IDxwYXVsLmR1cnJhbnRAY2l0cml4
-LmNvbT4NCg0KPiAtLS0NCj4gIGh3L2Jsb2NrL3hlbl9kaXNrLmMgfCAgIDI5ICsrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwgMjkgaW5zZXJ0aW9ucygrKQ0K
-PiANCj4gZGlmZiAtLWdpdCBhL2h3L2Jsb2NrL3hlbl9kaXNrLmMgYi9ody9ibG9jay94ZW5fZGlz
-ay5jDQo+IGluZGV4IDM2ZWZmOTRmODQuLjZjYjQwZDY2ZmEgMTAwNjQ0DQo+IC0tLSBhL2h3L2Js
-b2NrL3hlbl9kaXNrLmMNCj4gKysrIGIvaHcvYmxvY2sveGVuX2Rpc2suYw0KPiBAQCAtMTAxLDYg
-KzEwMSw5IEBAIHN0cnVjdCBYZW5CbGtEZXYgew0KPiAgICAgIEFpb0NvbnRleHQgICAgICAgICAg
-KmN0eDsNCj4gIH07DQo+IA0KPiArLyogVGhyZXNob2xkIG9mIGluLWZsaWdodCByZXF1ZXN0cyBh
-Ym92ZSB3aGljaCB3ZSB3aWxsIHN0YXJ0IHVzaW5nDQo+ICsgKiBibGtfaW9fcGx1ZygpL2Jsa19p
-b191bnBsdWcoKSB0byBiYXRjaCByZXF1ZXN0cyAqLw0KPiArI2RlZmluZSBJT19QTFVHX1RIUkVT
-SE9MRCAxDQo+ICAvKiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tICovDQo+IA0KPiAgc3RhdGljIHZvaWQgaW9yZXFfcmVzZXQoc3Ry
-dWN0IGlvcmVxICppb3JlcSkNCj4gQEAgLTU0Miw2ICs1NDUsOCBAQCBzdGF0aWMgdm9pZCBibGtf
-aGFuZGxlX3JlcXVlc3RzKHN0cnVjdCBYZW5CbGtEZXYNCj4gKmJsa2RldikNCj4gIHsNCj4gICAg
-ICBSSU5HX0lEWCByYywgcnA7DQo+ICAgICAgc3RydWN0IGlvcmVxICppb3JlcTsNCj4gKyAgICBp
-bnQgaW5mbGlnaHRfYXRzdGFydCA9IGJsa2Rldi0+cmVxdWVzdHNfaW5mbGlnaHQ7DQo+ICsgICAg
-aW50IGJhdGNoZWQgPSAwOw0KPiANCj4gICAgICBibGtkZXYtPm1vcmVfd29yayA9IDA7DQo+IA0K
-PiBAQCAtNTUwLDYgKzU1NSwxNiBAQCBzdGF0aWMgdm9pZCBibGtfaGFuZGxlX3JlcXVlc3RzKHN0
-cnVjdCBYZW5CbGtEZXYNCj4gKmJsa2RldikNCj4gICAgICB4ZW5fcm1iKCk7IC8qIEVuc3VyZSB3
-ZSBzZWUgcXVldWVkIHJlcXVlc3RzIHVwIHRvICdycCcuICovDQo+IA0KPiAgICAgIGJsa19zZW5k
-X3Jlc3BvbnNlX2FsbChibGtkZXYpOw0KPiArICAgIC8qIElmIHRoZXJlIHdhcyBtb3JlIHRoYW4g
-SU9fUExVR19USFJFU0hPTEQgaW9yZXFzIGluIGZsaWdodA0KPiArICAgICAqIHdoZW4gd2UgZ290
-IGhlcmUsIHRoaXMgaXMgYW4gaW5kaWNhdGlvbiB0aGF0IHRoZXJlIHRoZSBib3R0bGVuZWNrDQo+
-ICsgICAgICogaXMgYmVsb3cgdXMsIHNvIGl0J3Mgd29ydGggYmVnaW5uaW5nIHRvIGJhdGNoIHVw
-IEkvTyByZXF1ZXN0cw0KPiArICAgICAqIHJhdGhlciB0aGFuIHN1Ym1pdHRpbmcgdGhlbSBpbW1l
-ZGlhdGVseS4gVGhlIG1heGltdW0gbnVtYmVyDQo+ICsgICAgICogb2YgcmVxdWVzdHMgd2UncmUg
-d2lsbGluZyB0byBiYXRjaCBpcyB0aGUgbnVtYmVyIGFscmVhZHkgaW4NCj4gKyAgICAgKiBmbGln
-aHQsIHNvIGl0IGNhbiBncm93IHVwIHRvIG1heF9yZXF1ZXN0cyB3aGVuIHRoZSBib3R0bGVuZWNr
-DQo+ICsgICAgICogaXMgYmVsb3cgdXMgKi8NCj4gKyAgICBpZiAoaW5mbGlnaHRfYXRzdGFydCA+
-IElPX1BMVUdfVEhSRVNIT0xEKSB7DQo+ICsgICAgICAgIGJsa19pb19wbHVnKGJsa2Rldi0+Ymxr
-KTsNCj4gKyAgICB9DQo+ICAgICAgd2hpbGUgKHJjICE9IHJwKSB7DQo+ICAgICAgICAgIC8qIHB1
-bGwgcmVxdWVzdCBmcm9tIHJpbmcgKi8NCj4gICAgICAgICAgaWYgKFJJTkdfUkVRVUVTVF9DT05T
-X09WRVJGTE9XKCZibGtkZXYtPnJpbmdzLmNvbW1vbiwgcmMpKSB7DQo+IEBAIC01ODksNyArNjA0
-LDIxIEBAIHN0YXRpYyB2b2lkIGJsa19oYW5kbGVfcmVxdWVzdHMoc3RydWN0IFhlbkJsa0Rldg0K
-PiAqYmxrZGV2KQ0KPiAgICAgICAgICAgICAgY29udGludWU7DQo+ICAgICAgICAgIH0NCj4gDQo+
-ICsgICAgICAgIGlmIChpbmZsaWdodF9hdHN0YXJ0ID4gSU9fUExVR19USFJFU0hPTEQgJiYgYmF0
-Y2hlZCA+PQ0KPiBpbmZsaWdodF9hdHN0YXJ0KSB7DQo+ICsgICAgICAgICAgICBibGtfaW9fdW5w
-bHVnKGJsa2Rldi0+YmxrKTsNCj4gKyAgICAgICAgfQ0KPiAgICAgICAgICBpb3JlcV9ydW5pb19x
-ZW11X2Fpbyhpb3JlcSk7DQo+ICsgICAgICAgIGlmIChpbmZsaWdodF9hdHN0YXJ0ID4gSU9fUExV
-R19USFJFU0hPTEQpIHsNCj4gKyAgICAgICAgICAgIGlmIChiYXRjaGVkID49IGluZmxpZ2h0X2F0
-c3RhcnQpIHsNCj4gKyAgICAgICAgICAgICAgICBibGtfaW9fcGx1ZyhibGtkZXYtPmJsayk7DQo+
-ICsgICAgICAgICAgICAgICAgYmF0Y2hlZD0wOw0KPiArICAgICAgICAgICAgfSBlbHNlIHsNCj4g
-KyAgICAgICAgICAgICAgICBiYXRjaGVkKys7DQo+ICsgICAgICAgICAgICB9DQo+ICsgICAgICAg
-IH0NCj4gKyAgICB9DQo+ICsgICAgaWYgKGluZmxpZ2h0X2F0c3RhcnQgPiBJT19QTFVHX1RIUkVT
-SE9MRCkgew0KPiArICAgICAgICBibGtfaW9fdW5wbHVnKGJsa2Rldi0+YmxrKTsNCj4gICAgICB9
-DQo+IA0KPiAgICAgIGlmIChibGtkZXYtPm1vcmVfd29yayAmJiBibGtkZXYtPnJlcXVlc3RzX2lu
-ZmxpZ2h0IDwgYmxrZGV2LQ0KPiA+bWF4X3JlcXVlc3RzKSB7DQo+IA0KDQo=
+
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+
+> This patch adds support for dynamically loaded plugins.
+> Every plugin is a dynamic library with a set of optional exported
+> functions that will be called from QEMU.
+>
+<snip>
+> +
+> +static QLIST_HEAD(, QemuPluginInfo) qemu_plugins
+> +                                =3D QLIST_HEAD_INITIALIZER(qemu_plugins);
+> +
+> +static QemuOptsList qemu_plugin_opts =3D {
+> +    .name =3D "plugin",
+> +    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_plugin_opts.head),
+> +    .desc =3D {
+> +        {
+> +            .name =3D "file",
+> +            .type =3D QEMU_OPT_STRING,
+> +        },{
+> +            .name =3D "args",
+> +            .type =3D QEMU_OPT_STRING,
+> +        },
+> +        { /* end of list */ }
+> +    },
+> +};
+> +
+> +void qemu_plugin_parse_cmd_args(const char *optarg)
+> +{
+> +    QemuOpts *opts =3D qemu_opts_parse_noisily(&qemu_plugin_opts, optarg=
+, false);
+> +    qemu_plugin_load(qemu_opt_get(opts, "file"),
+> +        qemu_opt_get(opts, "args"));
+> +}
+
+Currently this is only available to system mode emulation. Can it be
+extended to include linux-user as well?
+
+> +
+> +void qemu_plugin_load(const char *filename, const char *args)
+> +{
+> +    GModule *g_module;
+> +    QemuPluginInfo *info =3D NULL;
+> +    if (!filename) {
+> +        error_report("plugin name was not specified");
+> +        return;
+> +    }
+> +    g_module =3D g_module_open(filename,
+> +        G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL);
+> +    if (!g_module) {
+> +        error_report("can't load plugin '%s'", filename);
+> +        return;
+> +    }
+> +    info =3D g_new0(QemuPluginInfo, 1);
+> +    info->filename =3D g_strdup(filename);
+> +    info->g_module =3D g_module;
+> +    if (args) {
+> +        info->args =3D g_strdup(args);
+> +    }
+> +
+> +    g_module_symbol(g_module, "plugin_init", (gpointer*)&info->init);
+> +
+> +    /* Get the instrumentation callbacks */
+> +    g_module_symbol(g_module, "plugin_needs_before_insn",
+> +        (gpointer*)&info->needs_before_insn);
+> +    g_module_symbol(g_module, "plugin_before_insn",
+> +        (gpointer*)&info->before_insn);
+> +
+> +    QLIST_INSERT_HEAD(&qemu_plugins, info, next);
+> +
+> +    return;
+> +}
+> +
+> +void qemu_plugins_init(void)
+> +{
+> +    QemuPluginInfo *info;
+> +    QLIST_FOREACH(info, &qemu_plugins, next) {
+> +        if (info->init) {
+> +            info->init(info->args);
+> +        }
+> +    }
+> +}
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index c0d3951..d171544 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3950,6 +3950,16 @@ Dump json-encoded vmstate information for current =
+machine type to file
+>  in @var{file}
+>  ETEXI
+>
+> +#ifdef CONFIG_PLUGINS
+> +DEF("plugin", HAS_ARG, QEMU_OPTION_plugin, \
+> +           "-plugin file=3D<file>[,args=3D<args>] load <dso> plugin with=
+ <args>\n", QEMU_ARCH_ALL)
+> +STEXI
+> +@item -plugin file=3D@var{file}[,args=3D@var{args}]
+> +@findex -plugin
+> +Load @var{file} plugin passing @var{args} arguments.
+> +ETEXI
+> +#endif
+> +
+>  STEXI
+>  @end table
+>  ETEXI
+> diff --git a/vl.c b/vl.c
+> index 0603171..05420bf 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -129,6 +129,7 @@ int main(int argc, char **argv)
+>  #include "qapi/qapi-commands-run-state.h"
+>  #include "qapi/qmp/qerror.h"
+>  #include "sysemu/iothread.h"
+> +#include "qemu/plugins.h"
+>
+>  #define MAX_VIRTIO_CONSOLES 1
+>
+> @@ -3925,6 +3926,11 @@ int main(int argc, char **argv, char **envp)
+>                      exit(1);
+>                  }
+>                  break;
+> +#ifdef CONFIG_PLUGINS
+> +            case QEMU_OPTION_plugin:
+> +                qemu_plugin_parse_cmd_args(optarg);
+> +                break;
+> +#endif
+>              case QEMU_OPTION_nodefconfig:
+>              case QEMU_OPTION_nouserconfig:
+>                  /* Nothing to be parsed here. Especially, do not error o=
+ut below. */
+> @@ -4470,6 +4476,8 @@ int main(int argc, char **argv, char **envp)
+>      }
+>      parse_numa_opts(current_machine);
+>
+> +    qemu_plugins_init();
+> +
+>      /* do monitor/qmp handling at preconfig state if requested */
+>      main_loop();
+>
+
+
+--
+Alex Benn=C3=A9e
