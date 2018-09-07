@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyHPP-0007vj-CH
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:06:52 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fyHT7-0001Wb-8y
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:10:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyHPL-0000n5-UD
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:06:51 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44566)
+	(envelope-from <alex.bennee@linaro.org>) id 1fyHT3-00049z-M4
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:10:41 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:44319)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fyHPK-0000mD-VZ
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:06:47 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v16-v6so15088392wro.11
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:06:46 -0700 (PDT)
+	id 1fyHT3-00047h-Ed
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 10:10:37 -0400
+Received: by mail-wr1-x436.google.com with SMTP id v16-v6so15101467wro.11
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:10:36 -0700 (PDT)
 References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<152819519376.30857.17032517857304957536.stgit@pasha-ThinkPad-T60>
+	<CAFEAcA-3UPDD3muShM=yYgiwQcN-U+f_TyEiu-Z=EWb7_hFaCw@mail.gmail.com>
+	<001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
+	<007e01d40c47$cc465640$64d302c0$@ru>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <152819519376.30857.17032517857304957536.stgit@pasha-ThinkPad-T60>
-Date: Fri, 07 Sep 2018 15:06:44 +0100
-Message-ID: <87pnxpz9jf.fsf@linaro.org>
+In-reply-to: <007e01d40c47$cc465640$64d302c0$@ru>
+Date: Fri, 07 Sep 2018 15:10:34 +0100
+Message-ID: <87o9d9z9d1.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 7/7] plugins: add syscall logging
- plugin sample
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
+ prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,108 +33,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, maria.klimushenkova@ispras.ru, 'QEMU Developers' <qemu-devel@nongnu.org>, =?utf-8?Q?'Llu=C3=ADs?= Vilanova' <vilanova@ac.upc.edu>
 
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-> This is an example of plugin which instruments only specific instructions:
-> sysenter and sysexit. When executing them, it prints system call id
-> and return code to the QEMU log.
-
-Again I'm not sure this is a very useful example either. It doesn't
-achieve anything we can't already do with the existing logging/strace
-stuff and it is quite ugly in it's knowledge of a single architecture to
-try and figure out what's going on.
-
+> Peter, what about this one?
 >
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> ---
->  plugins/syscall-log/Makefile      |   19 ++++++++++++++++
->  plugins/syscall-log/syscall-log.c |   44 +++++++++++++++++++++++++++++++=
-++++++
->  2 files changed, 63 insertions(+)
->  create mode 100644 plugins/syscall-log/Makefile
->  create mode 100644 plugins/syscall-log/syscall-log.c
+> Pavel Dovgalyuk
 >
-> diff --git a/plugins/syscall-log/Makefile b/plugins/syscall-log/Makefile
-> new file mode 100644
-> index 0000000..1bbdf04
-> --- /dev/null
-> +++ b/plugins/syscall-log/Makefile
-> @@ -0,0 +1,19 @@
-> +CFLAGS +=3D -I../include -fno-PIE -fPIC -O3
-> +LDFLAGS +=3D -shared
-> +# TODO: Windows
-> +DSOSUF :=3D .so
-> +
-> +NAME:=3D syscall-log
-> +BIN :=3D $(NAME)$(DSOSUF)
-> +
-> +FILES :=3D syscall-log.o
-> +
-> +%.o: %.c
-> +	$(CC) -c -o $@ $< $(CFLAGS)
-> +
-> +all: $(FILES)
-> +	$(CC) $(LDFLAGS) -o $(BIN) $(FILES)
-> +
-> +clean:
-> +	rm $(FILES)
-> +	rm $(BIN)
-> diff --git a/plugins/syscall-log/syscall-log.c b/plugins/syscall-log/sysc=
-all-log.c
-> new file mode 100644
-> index 0000000..1f5d55f
-> --- /dev/null
-> +++ b/plugins/syscall-log/syscall-log.c
-> @@ -0,0 +1,44 @@
-> +#include <stdint.h>
-> +#include <stdio.h>
-> +#include "plugins.h"
-> +
-> +bool plugin_init(const char *args)
-> +{
-> +    return true;
-> +}
-> +
-> +bool plugin_needs_before_insn(uint64_t pc, void *cpu)
-> +{
-> +    uint8_t code =3D 0;
-> +    if (!qemulib_read_memory(cpu, pc, &code, 1)
-> +        && code =3D=3D 0x0f) {
-> +        if (qemulib_read_memory(cpu, pc + 1, &code, 1)) {
-> +            return false;
-> +        }
-> +        if (code =3D=3D 0x34) {
-> +            /* sysenter */
-> +            return true;
-> +        }
-> +        if (code =3D=3D 0x35) {
-> +            /* sysexit */
-> +            return true;
-> +        }
-> +    }
-> +    return false;
-> +}
-> +
-> +void plugin_before_insn(uint64_t pc, void *cpu)
-> +{
-> +    uint8_t code =3D 0;
-> +    uint32_t reg;
-> +    qemulib_read_memory(cpu, pc + 1, &code, 1);
-> +    /* Read EAX. There should be a header with register ids
-> +       or a function for reading the register by the name */
-> +    qemulib_read_register(cpu, (uint8_t*)&reg, 0);
-> +    /* log system calls */
-> +    if (code =3D=3D 0x34) {
-> +        qemulib_log("sysenter %x\n", reg);
-> +    } else if (code =3D=3D 0x35) {
-> +        qemulib_log("sysexit %x\n", reg);
-> +    }
-> +}
+>> -----Original Message-----
+>> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
+>> Sent: Tuesday, June 05, 2018 2:56 PM
+>> To: 'Peter Maydell'; 'Pavel Dovgalyuk'
+>> Cc: 'QEMU Developers'; maria.klimushenkova@ispras.ru; 'Paolo Bonzini'; '=
+Llu=C3=ADs Vilanova'
+>> Subject: RE: [RFC PATCH v2 0/7] QEMU binary instrumentation prototype
+>>
+>> > From: Peter Maydell [mailto:peter.maydell@linaro.org]
+>> >
+>> > This series doesn't seem to add anything to Documentation/ that
+>> > describes the API we make available to plugins. I'm a lot more
+>> > interested in reviewing the API that will be used by plugins
+>> > than I am in the implementation at this stage. Can you provide
+>> > a description/documentation of the API for review, please?
+>>
+>>
+>> Here is the draft:
+>>
+>> Introduction
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> This document describes an API for creating the QEMU
+>> instrumentation plugins.
+>>
+>> It is based on the following prior sources:
+>>  - KVM Forum 2017 talk "Instrumenting, Introspection, and Debugging with=
+ QEMU"
+>>    https://www.linux-kvm.org/images/3/3d/Introspect.pdf
+>>  - Discussion on Lluis Vilanova instrumentation patch series
+>>    https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03357.html
+>>
+>> The aim of the instrumentation is implementing different runtime
+>> tracers that can track the executed instructions, memory and
+>> hardware operations.
+>>
+>> Instrumenting the code
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> Instrumentation subsystem exploits TCG helper mechanism to embed
+>> callbacks into the translation blocks. These callbacks may be inserted
+>> before the specific instructions, when the plugins require such filterin=
+g.
+>>
+>> Translator uses two functions for embedding the callbacks:
+>>  - first function checks whether the current instruction should be
+>>    instrumented
+>>  - second function embeds the callback for executing the plugin-specific
+>>    code before that instruction
+>>
+>> The similar method may be used for memory access instrumentation.
+>>
+>> QEMU->Plugin API
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> Instrumentation layer passes the requests from the translator
+>> to the dynamically loaded plugins. Every plugin may provide
+>> the following functions to perform the instrumentation:
+>>
+>>  1. bool plugin_init(const char *args);
+>>     Initialization function. May return false if the plugin
+>>     can't work in the current environment.
+>>
+>>  2. bool plugin_needs_before_insn(uint64_t pc, void *cpu);
+>>     Returns true if the plugin needs to instrument the current instructi=
+on.
+>>     It may use the address (pc) for making the decision or the guest
+>>     CPU state (cpu), which can be passed back to QEMU core API
+>>     (e.g., for reading the guest memory).
+>>     This function is called at both translation and execution phases.
+>>
+>>  3. void plugin_before_insn(uint64_t pc, void *cpu);
+>>     If the previous function returned true for some instruction,
+>>     then this function will be called. This process is repeated before
+>>     every execution of the instruction, if it was instrumented.
+>>
+>> The similar pair of functions will also be added for the memory
+>> operations.
+>>
+>> Plugin->QEMU API
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> QEMU core exports some functions to let the plugins introspect the guest
+>> or perform some interaction with other QEMU services (e.g., logging).
+>> API doesn't contain any data structures, because their memory layout dep=
+end
+>> on the compilation settings.
+>>
+>> QEMU exports the following functions that may be called from the plugins:
+>>
+>>  1. void qemulib_log(const char *fmt, ...);
+>>     Wrapper for qemu_log.
+>>
+>>  2. int qemulib_read_memory(void *cpu, uint64_t addr, uint8_t *buf, int =
+len);
+>>     Reads guest memory into the buffer. Wrapper for cpu_memory_rw_debug.
+>>
+>>  3. int qemulib_read_register(void *cpu, uint8_t *mem_buf, int reg);
+>>     Uses target gdb interface for accessing the guest registers.
+>>     'reg' is the id of the desired register as it is coded by gdb.
+>>
+>> There also should be a function for flushing the translated blocks to
+>> ensure that the instrumentation will occur in the case of changing
+>> the internal plugin state.
 
+This would certainly be the case if we could generate TCG code in the plugi=
+ns.
 
 --
 Alex Benn=C3=A9e
