@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=781850b12=tim.smith@citrix.com>)
-	id 1fyDtP-0002EI-I4
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:21:36 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1fyEsh-0001Qm-0A
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=781850b12=tim.smith@citrix.com>)
-	id 1fyDtO-0002p2-Hi
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:21:35 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:46161)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=781850b12=tim.smith@citrix.com>)
-	id 1fyDtO-0002ey-8Y
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:21:34 -0400
-From: Tim Smith <tim.smith@citrix.com>
-Date: Fri, 7 Sep 2018 11:21:25 +0100
-Message-ID: <153631568573.32214.15572432320859976670.stgit@dhcp-3-135.uk.xensource.com>
-In-Reply-To: <153631568068.32214.13361287430751567885.stgit@dhcp-3-135.uk.xensource.com>
-References: <153631568068.32214.13361287430751567885.stgit@dhcp-3-135.uk.xensource.com>
+	(envelope-from <tgolembi@redhat.com>) id 1fyEsc-0008H9-1p
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:24:54 -0400
+Received: from mail-wr1-f51.google.com ([209.85.221.51]:38787)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1fyEsb-0008Gl-Qu
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 07:24:49 -0400
+Received: by mail-wr1-f51.google.com with SMTP id w11-v6so14616629wrc.5
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 04:24:49 -0700 (PDT)
+Date: Fri, 7 Sep 2018 13:24:44 +0200
+From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Message-ID: <20180907132444.19bdddf8@fiorina>
+In-Reply-To: <153618966719.28231.7120762050650762023@sif>
+References: <cover.1533639095.git.tgolembi@redhat.com>
+	<951d1c8265e9ef6b36d61358fd01f267a9b83ca7.1533639095.git.tgolembi@redhat.com>
+	<153618966719.28231.7120762050650762023@sif>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2/3] Improve xen_disk response latency
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] qga: win32: fix crashes when PCI
+ info cannot be retrived
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,146 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
 
-If the I/O ring is full, the guest cannot send any more requests
-until some responses are sent. Only sending all available responses
-just before checking for new work does not leave much time for the
-guest to supply new work, so this will cause stalls if the ring gets
-full. Also, not completing reads as soon as possible adds latency
-to the guest.
+On Wed, 05 Sep 2018 18:21:07 -0500
+Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
 
-To alleviate that, complete IO requests as soon as they come back.
-blk_send_response() already returns a value indicating whether
-a notify should be sent, which is all the batching we need.
+> Quoting Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (2018-08-07 05:51:37)
+> > The guest-get-fsinfo command collects also information about PCI
+> > controller where the disk is attached. When this fails for some reasons
+> > it tries to return just the partial information. However in certain
+> > cases the pointer to the structure was not initialized and was set to
+> > NULL. This breaks the serializer and lead to crasehs of the guest agent.
+> >=20
+> > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> > ---
+> >  qga/commands-win32.c | 27 ++++++++++++++++++++++-----
+> >  1 file changed, 22 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> > index 36d76c22c0..995f62c2e4 100644
+> > --- a/qga/commands-win32.c
+> > +++ b/qga/commands-win32.c
+> > @@ -642,15 +642,32 @@ static GuestDiskAddressList *build_guest_disk_inf=
+o(char *guid, Error **errp)
+> >          g_debug("getting pci-controller info");
+> >          if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, sc=
+si_ad,
+> >                              sizeof(SCSI_ADDRESS), &len, NULL)) {
+> > +            Error *local_err =3D NULL;
+> >              disk->unit =3D addr.Lun;
+> >              disk->target =3D addr.TargetId;
+> >              disk->bus =3D addr.PathId;
+> > -            disk->pci_controller =3D get_pci_info(name, errp);
+> > +            g_debug("unit=3D%lld target=3D%lld bus=3D%lld",
+> > +                disk->unit, disk->target, disk->bus);
+> > +            disk->pci_controller =3D get_pci_info(name, &local_err);
+> > +
+> > +            if (local_err) {
+> > +                slog("failed to get PCI controller info: %s",
+> > +                    error_get_pretty(local_err)); =20
+>=20
+> slog() is more for logging/auditing events that a guest administrator mig=
+ht
+> be interested in knowing about, like when qga is accessing files, freezing
+> filesystems, etc. General qga-side error reporting and debug logging shou=
+ld
+> go through the normal g_debug/g_warning/etc interfaces to be captured in
+> qga's log file.
 
-Signed-off-by: Tim Smith <tim.smith@citrix.com>
----
- hw/block/xen_disk.c |   43 ++++++++++++-------------------------------
- 1 file changed, 12 insertions(+), 31 deletions(-)
+ok
 
-diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index 6cb40d66fa..c11cd21d37 100644
---- a/hw/block/xen_disk.c
-+++ b/hw/block/xen_disk.c
-@@ -83,11 +83,9 @@ struct XenBlkDev {
- 
-     /* request lists */
-     QLIST_HEAD(inflight_head, ioreq) inflight;
--    QLIST_HEAD(finished_head, ioreq) finished;
-     QLIST_HEAD(freelist_head, ioreq) freelist;
-     int                 requests_total;
-     int                 requests_inflight;
--    int                 requests_finished;
-     unsigned int        max_requests;
- 
-     gboolean            feature_discard;
-@@ -104,6 +102,9 @@ struct XenBlkDev {
- /* Threshold of in-flight requests above which we will start using
-  * blk_io_plug()/blk_io_unplug() to batch requests */
- #define IO_PLUG_THRESHOLD 1
-+
-+static int blk_send_response(struct ioreq *ioreq);
-+
- /* ------------------------------------------------------------- */
- 
- static void ioreq_reset(struct ioreq *ioreq)
-@@ -155,12 +156,10 @@ static void ioreq_finish(struct ioreq *ioreq)
-     struct XenBlkDev *blkdev = ioreq->blkdev;
- 
-     QLIST_REMOVE(ioreq, list);
--    QLIST_INSERT_HEAD(&blkdev->finished, ioreq, list);
-     blkdev->requests_inflight--;
--    blkdev->requests_finished++;
- }
- 
--static void ioreq_release(struct ioreq *ioreq, bool finish)
-+static void ioreq_release(struct ioreq *ioreq)
- {
-     struct XenBlkDev *blkdev = ioreq->blkdev;
- 
-@@ -168,11 +167,7 @@ static void ioreq_release(struct ioreq *ioreq, bool finish)
-     ioreq_reset(ioreq);
-     ioreq->blkdev = blkdev;
-     QLIST_INSERT_HEAD(&blkdev->freelist, ioreq, list);
--    if (finish) {
--        blkdev->requests_finished--;
--    } else {
--        blkdev->requests_inflight--;
--    }
-+    blkdev->requests_inflight--;
- }
- 
- /*
-@@ -351,6 +346,10 @@ static void qemu_aio_complete(void *opaque, int ret)
-     default:
-         break;
-     }
-+    if (blk_send_response(ioreq)) {
-+        xen_pv_send_notify(&blkdev->xendev);
-+    }
-+    ioreq_release(ioreq);
-     qemu_bh_schedule(blkdev->bh);
- 
- done:
-@@ -455,7 +454,7 @@ err:
-     return -1;
- }
- 
--static int blk_send_response_one(struct ioreq *ioreq)
-+static int blk_send_response(struct ioreq *ioreq)
- {
-     struct XenBlkDev  *blkdev = ioreq->blkdev;
-     int               send_notify   = 0;
-@@ -504,22 +503,6 @@ static int blk_send_response_one(struct ioreq *ioreq)
-     return send_notify;
- }
- 
--/* walk finished list, send outstanding responses, free requests */
--static void blk_send_response_all(struct XenBlkDev *blkdev)
--{
--    struct ioreq *ioreq;
--    int send_notify = 0;
--
--    while (!QLIST_EMPTY(&blkdev->finished)) {
--        ioreq = QLIST_FIRST(&blkdev->finished);
--        send_notify += blk_send_response_one(ioreq);
--        ioreq_release(ioreq, true);
--    }
--    if (send_notify) {
--        xen_pv_send_notify(&blkdev->xendev);
--    }
--}
--
- static int blk_get_request(struct XenBlkDev *blkdev, struct ioreq *ioreq, RING_IDX rc)
- {
-     switch (blkdev->protocol) {
-@@ -554,7 +537,6 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
-     rp = blkdev->rings.common.sring->req_prod;
-     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
- 
--    blk_send_response_all(blkdev);
-     /* If there was more than IO_PLUG_THRESHOLD ioreqs in flight
-      * when we got here, this is an indication that there the bottleneck
-      * is below us, so it's worth beginning to batch up I/O requests
-@@ -597,10 +579,10 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
-                 break;
-             };
- 
--            if (blk_send_response_one(ioreq)) {
-+            if (blk_send_response(ioreq)) {
-                 xen_pv_send_notify(&blkdev->xendev);
-             }
--            ioreq_release(ioreq, false);
-+            ioreq_release(ioreq);
-             continue;
-         }
- 
-@@ -645,7 +627,6 @@ static void blk_alloc(struct XenDevice *xendev)
-     trace_xen_disk_alloc(xendev->name);
- 
-     QLIST_INIT(&blkdev->inflight);
--    QLIST_INIT(&blkdev->finished);
-     QLIST_INIT(&blkdev->freelist);
- 
-     blkdev->iothread = iothread_create(xendev->name, &err);
+>=20
+> We should also moved patch 1 after this so we don't expose a breakage
+> prior to the fix.
+
+ok
+
+>=20
+> How often are you seeing failures with the pci info?
+
+On Windows 10 Enterprise every the time. On Windows 8 the original code
+fails terribly much sooner.
+
+> And does the
+> information for the non-failures look valid to you?
+
+I'll tell you when I see that. :)
+
+
+> I tried to fix the
+> CONFIG_QGA_NTDDSCSI naming screw-up a while back and some values like
+> PCI func/bus/etc looked bogus, SPDRP_BUSNUMBER/SPDRP_ADDRESS/SPDRP_BUSNUM=
+BER
+> didn't seem to be returning what the current code thinks they are. If tha=
+t's
+> still the case it would be good to fix that before we final re-enable this
+> code.
+
+Does that mean the queries for SPDRP_* properties work for you?
+The issue is that it fails every time as the request is for a
+volume not a disk.
+
+Unfortunately I don't know how to fix that at the moment. See my comment
+in the followup version of the series that I will send shortly.
+
+    Tomas
+
+>=20
+> > +                error_free(local_err);
+> > +            } else if (disk->pci_controller !=3D NULL) {
+> > +                g_debug("pci: domain=3D%lld bus=3D%lld slot=3D%lld fun=
+ction=3D%lld",
+> > +                    disk->pci_controller->domain,
+> > +                    disk->pci_controller->bus,
+> > +                    disk->pci_controller->slot,
+> > +                    disk->pci_controller->function);
+> > +            }
+> >          }
+> > -        /* We do not set error in this case, because we still have eno=
+ugh
+> > -         * information about volume. */
+> > -    } else {
+> > -         disk->pci_controller =3D NULL;
+> > +    }
+> > +    /* We do not set error in case pci_controller is NULL, because we =
+still
+> > +     * have enough information about volume. */
+> > +    if (disk->pci_controller =3D=3D NULL) {
+> > +        g_debug("no PCI controller info");
+> > +        disk->pci_controller =3D g_malloc0(sizeof(GuestPCIAddress));
+> >      }
+> >=20
+> >      list =3D g_malloc0(sizeof(*list));
+> > --=20
+> > 2.18.0
+> >  =20
+>=20
+
+
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
