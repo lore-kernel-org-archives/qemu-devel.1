@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fyOcq-0007WD-Kl
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:49:13 -0400
+	(envelope-from <mst@redhat.com>) id 1fyOex-00004v-O6
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fyOcp-0002uY-AH
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:49:12 -0400
-References: <20180814121443.33114-1-vsementsov@virtuozzo.com>
-	<20180814121443.33114-2-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <954db07e-d338-9cd4-341f-d8916470b89b@redhat.com>
-Date: Fri, 7 Sep 2018 17:49:00 -0400
+	(envelope-from <mst@redhat.com>) id 1fyOeu-0005ml-Rf
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51484 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyOeu-0005ma-L0
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:20 -0400
+Date: Fri, 7 Sep 2018 17:51:19 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180907215109.146867-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180814121443.33114-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] dirty-bitmap: improve
- bdrv_dirty_bitmap_next_zero
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PULL 0/7] pci, pc, virtio: fixes, features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,201 +24,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
+The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd241557452:
 
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27-v2' into staging (2018-08-27 16:44:20 +0100)
 
-On 08/14/2018 08:14 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Add bytes parameter to the function, to limit searched range.
-> 
+are available in the Git repository at:
 
-I'm going to assume that Eric Blake has been through here and commented
-on the interface itself.
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/dirty-bitmap.h |  3 ++-
->  include/qemu/hbitmap.h       | 10 ++++++++--
->  block/backup.c               |  2 +-
->  block/dirty-bitmap.c         |  5 +++--
->  nbd/server.c                 |  2 +-
->  tests/test-hbitmap.c         |  2 +-
->  util/hbitmap.c               | 25 ++++++++++++++++++++-----
->  7 files changed, 36 insertions(+), 13 deletions(-)
-> 
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 259bd27c40..27f5299c4e 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -98,7 +98,8 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
->  BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
->                                          BdrvDirtyBitmap *bitmap);
->  char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
-> -int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start);
-> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start,
-> +                                    int64_t end);
->  BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
->                                                    BdrvDirtyBitmap *bitmap,
->                                                    Error **errp);
-> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-> index ddca52c48e..fe4dfde27a 100644
-> --- a/include/qemu/hbitmap.h
-> +++ b/include/qemu/hbitmap.h
-> @@ -295,10 +295,16 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
->  /* hbitmap_next_zero:
->   * @hb: The HBitmap to operate on
->   * @start: The bit to start from.
-> + * @end: End of range to search in. If @end is -1, search up to the bitmap
-> + *       end.
->   *
-> - * Find next not dirty bit.
-> + * Find next not dirty bit within range [@start, @end), or from
-> + * @start to the bitmap end if @end is -1. If not found, return -1.
-> + *
-> + * @end may be greater than original bitmap size, in this case, search up to
+for you to fetch changes up to d2a1b1d602986a5f02658f6d4fc9ed422f8ddebf:
 
-"original" bitmap size? I think that's just an implementation detail, we
-can drop 'original' here, yes?
+  tests: update acpi expected files (2018-09-07 17:43:22 -0400)
 
-> + * the bitmap end.
->   */
-> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start);
-> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, int64_t end);
->  
+----------------------------------------------------------------
+pci, pc, virtio: fixes, features
 
-The interface looks weird because we can define a 'start' that's beyond
-the 'end'.
+pci resource capability + misc fixes everywhere.
 
-I realize that you need a signed integer for 'end' to signify EOF...
-should we do a 'bytes' parameter instead? (Did you already do that in an
-earlier version and we changed it?)
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-Well, it's not a big deal to me personally.
+----------------------------------------------------------------
+Igor Mammedov (2):
+      pc: acpi: revert back to 1 SRAT entry for hotpluggable area
+      pc: make sure that guest isn't able to unplug the first cpu
 
->  /* hbitmap_create_meta:
->   * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.
-> diff --git a/block/backup.c b/block/backup.c
-> index 8630d32926..9bfd3f7189 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -458,7 +458,7 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
->              break;
->          }
->  
-> -        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset);
-> +        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset, -1);
->          if (offset == -1) {
->              hbitmap_set(job->copy_bitmap, cluster, end - cluster);
->              break;
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index c9b8a6fd52..037ae62726 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -785,9 +785,10 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
->      return hbitmap_sha256(bitmap->bitmap, errp);
->  }
->  
-> -int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
-> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
-> +                                    int64_t end)
->  {
-> -    return hbitmap_next_zero(bitmap->bitmap, offset);
-> +    return hbitmap_next_zero(bitmap->bitmap, offset, end);
->  }
->  
->  void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
-> diff --git a/nbd/server.c b/nbd/server.c
-> index ea5fe0eb33..07920d123b 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -1952,7 +1952,7 @@ static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
->      assert(begin < overall_end && nb_extents);
->      while (begin < overall_end && i < nb_extents) {
->          if (dirty) {
-> -            end = bdrv_dirty_bitmap_next_zero(bitmap, begin);
-> +            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, -1);
->          } else {
->              bdrv_set_dirty_iter(it, begin);
->              end = bdrv_dirty_iter_next(it);
-> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-> index 5e67ac1d3a..6b6a40bddd 100644
-> --- a/tests/test-hbitmap.c
-> +++ b/tests/test-hbitmap.c
-> @@ -939,7 +939,7 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
->  
->  static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
->  {
-> -    int64_t ret1 = hbitmap_next_zero(data->hb, start);
-> +    int64_t ret1 = hbitmap_next_zero(data->hb, start, -1);
->      int64_t ret2 = start;
->      for ( ; ret2 < data->size && hbitmap_get(data->hb, ret2); ret2++) {
->          ;
-> diff --git a/util/hbitmap.c b/util/hbitmap.c
-> index bcd304041a..1687372504 100644
-> --- a/util/hbitmap.c
-> +++ b/util/hbitmap.c
-> @@ -53,6 +53,9 @@
->   */
->  
->  struct HBitmap {
-> +    /* Size of the bitmap, as requested in hbitmap_alloc. */
-> +    uint64_t orig_size;
-> +
->      /* Number of total bits in the bottom level.  */
->      uint64_t size;
->  
-> @@ -192,16 +195,26 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
->      }
->  }
->  
-> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
-> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, int64_t end)
->  {
->      size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
->      unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
-> -    uint64_t sz = hb->sizes[HBITMAP_LEVELS - 1];
->      unsigned long cur = last_lev[pos];
-> -    unsigned start_bit_offset =
-> -            (start >> hb->granularity) & (BITS_PER_LONG - 1);
-> +    unsigned start_bit_offset;
-> +    uint64_t end_bit, sz;
->      int64_t res;
->  
-> +    if (start >= hb->orig_size || (end != -1 && end <= start)) {
-> +        return -1;
-> +    }
-> +
-> +    end_bit = end == -1 ? hb->size : ((end - 1) >> hb->granularity) + 1;
-> +    sz = (end_bit + BITS_PER_LONG - 1) >> BITS_PER_LEVEL;
-> +
-> +    /* There may be some zero bits in @cur before @start. We are not interested
-> +     * in them, let's set them.
-> +     */
-> +    start_bit_offset = (start >> hb->granularity) & (BITS_PER_LONG - 1);
->      cur |= (1UL << start_bit_offset) - 1;
->      assert((start >> hb->granularity) < hb->size);
->  
-> @@ -218,7 +231,7 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
->      }
->  
->      res = (pos << BITS_PER_LEVEL) + ctol(cur);
-> -    if (res >= hb->size) {
-> +    if (res >= end_bit) {
->          return -1;
->      }
->  
-> @@ -652,6 +665,8 @@ HBitmap *hbitmap_alloc(uint64_t size, int granularity)
->      HBitmap *hb = g_new0(struct HBitmap, 1);
->      unsigned i;
->  
-> +    hb->orig_size = size;
-> +
->      assert(granularity >= 0 && granularity < 64);
->      size = (size + (1ULL << granularity) - 1) >> granularity;
->      assert(size <= ((uint64_t)1 << HBITMAP_LOG_MAX_SIZE));
-> 
+Jing Liu (2):
+      hw/pci: factor PCI reserve resources to a separate structure
+      hw/pci: add PCI resource reserve capability to legacy PCI bridge
 
-Despite my comments, I'm OK with or without changes.
+Michael S. Tsirkin (1):
+      tests: update acpi expected files
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Paolo Bonzini (1):
+      virtio: update MemoryRegionCaches when guest negotiates features
+
+Yury Kotov (1):
+      vhost: fix invalid downcast
+
+ include/hw/pci/pci_bridge.h           |  18 ++++++---
+ hw/acpi/cpu.c                         |  10 +++--
+ hw/i386/acpi-build.c                  |  73 ++++++----------------------------
+ hw/pci-bridge/gen_pcie_root_port.c    |  33 +++++++--------
+ hw/pci-bridge/pci_bridge_dev.c        |  24 +++++++++++
+ hw/pci/pci_bridge.c                   |  38 ++++++++----------
+ hw/virtio/vhost.c                     |   4 +-
+ hw/virtio/virtio.c                    |  15 ++++++-
+ tests/acpi-test-data/pc/DSDT          | Bin 5144 -> 5131 bytes
+ tests/acpi-test-data/pc/DSDT.bridge   | Bin 7003 -> 6990 bytes
+ tests/acpi-test-data/pc/DSDT.cphp     | Bin 5607 -> 5594 bytes
+ tests/acpi-test-data/pc/DSDT.dimmpxm  | Bin 6803 -> 6790 bytes
+ tests/acpi-test-data/pc/DSDT.ipmikcs  | Bin 5216 -> 5203 bytes
+ tests/acpi-test-data/pc/DSDT.memhp    | Bin 6509 -> 6496 bytes
+ tests/acpi-test-data/pc/DSDT.numamem  | Bin 5150 -> 5137 bytes
+ tests/acpi-test-data/pc/SRAT.dimmpxm  | Bin 472 -> 392 bytes
+ tests/acpi-test-data/pc/SRAT.memhp    | Bin 264 -> 264 bytes
+ tests/acpi-test-data/q35/DSDT         | Bin 7828 -> 7815 bytes
+ tests/acpi-test-data/q35/DSDT.bridge  | Bin 7845 -> 7832 bytes
+ tests/acpi-test-data/q35/DSDT.cphp    | Bin 8291 -> 8278 bytes
+ tests/acpi-test-data/q35/DSDT.dimmpxm | Bin 9487 -> 9474 bytes
+ tests/acpi-test-data/q35/DSDT.ipmibt  | Bin 7903 -> 7890 bytes
+ tests/acpi-test-data/q35/DSDT.memhp   | Bin 9193 -> 9180 bytes
+ tests/acpi-test-data/q35/DSDT.numamem | Bin 7834 -> 7821 bytes
+ tests/acpi-test-data/q35/SRAT.dimmpxm | Bin 472 -> 392 bytes
+ tests/acpi-test-data/q35/SRAT.memhp   | Bin 264 -> 264 bytes
+ 26 files changed, 103 insertions(+), 112 deletions(-)
