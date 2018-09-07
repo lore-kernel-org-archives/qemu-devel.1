@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFU-0007VT-VG
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFT-0007UE-QQ
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFT-00055G-M9
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFQ-00053B-JD
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:11 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  7 Sep 2018 17:31:49 +1000
-Message-Id: <20180907073155.26200-9-david@gibson.dropbear.id.au>
+Date: Fri,  7 Sep 2018 17:31:45 +1000
+Message-Id: <20180907073155.26200-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20180907073155.26200-1-david@gibson.dropbear.id.au>
 References: <20180907073155.26200-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/14] mac_oldworld: implement custom
- FWPathProvider
+Subject: [Qemu-devel] [PULL 04/14] macio: move MACIOIDEState type
+ declarations to macio.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,112 +25,99 @@ Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.o
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This enables the correct generation of bootdevice fw paths for in-built IDE
-and virtio-pci-blk devices suitable for OpenBIOS.
-
-Note we also set the MachineClass ignore_boot_device_suffixes property to true
-since an additional disk node should not be added except for virtio devices.
-
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/mac_oldworld.c | 58 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 57 insertions(+), 1 deletion(-)
+ hw/ide/macio.c                |  1 +
+ hw/ppc/mac.h                  | 26 --------------------------
+ include/hw/misc/macio/macio.h | 26 ++++++++++++++++++++++++++
+ 3 files changed, 27 insertions(+), 26 deletions(-)
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index c7b73e274f..9891c325a9 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -42,6 +42,7 @@
- #include "hw/misc/macio/macio.h"
- #include "hw/ide.h"
- #include "hw/loader.h"
-+#include "hw/fw-path-provider.h"
- #include "elf.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-@@ -373,6 +374,54 @@ static void ppc_heathrow_init(MachineState *machine)
-     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
- }
+diff --git a/hw/ide/macio.c b/hw/ide/macio.c
+index d3a85cba3b..f23961e241 100644
+--- a/hw/ide/macio.c
++++ b/hw/ide/macio.c
+@@ -26,6 +26,7 @@
+ #include "hw/hw.h"
+ #include "hw/ppc/mac.h"
+ #include "hw/ppc/mac_dbdma.h"
++#include "hw/misc/macio/macio.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/dma.h"
  
-+/*
-+ * Implementation of an interface to adjust firmware path
-+ * for the bootindex property handling.
-+ */
-+static char *heathrow_fw_dev_path(FWPathProvider *p, BusState *bus,
-+                                  DeviceState *dev)
-+{
-+    PCIDevice *pci;
-+    IDEBus *ide_bus;
-+    IDEState *ide_s;
-+    MACIOIDEState *macio_ide;
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "macio-oldworld")) {
-+        pci = PCI_DEVICE(dev);
-+        return g_strdup_printf("mac-io@%x", PCI_SLOT(pci->devfn));
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "macio-ide")) {
-+        macio_ide = MACIO_IDE(dev);
-+        return g_strdup_printf("ata-3@%x", macio_ide->addr);
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-drive")) {
-+        ide_bus = IDE_BUS(qdev_get_parent_bus(dev));
-+        ide_s = idebus_active_if(ide_bus);
-+
-+        if (ide_s->drive_kind == IDE_CD) {
-+            return g_strdup("cdrom");
-+        }
-+
-+        return g_strdup("hd");
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-hd")) {
-+        return g_strdup("hd");
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-cd")) {
-+        return g_strdup("cdrom");
-+    }
-+
-+    if (!strcmp(object_get_typename(OBJECT(dev)), "virtio-blk-device")) {
-+        return g_strdup("disk");
-+    }
-+
-+    return NULL;
-+}
-+
- static int heathrow_kvm_type(const char *arg)
- {
-     /* Always force PR KVM */
-@@ -382,6 +431,7 @@ static int heathrow_kvm_type(const char *arg)
- static void heathrow_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-+    FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(oc);
+diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
+index 41fd289e81..a741300ac9 100644
+--- a/hw/ppc/mac.h
++++ b/hw/ppc/mac.h
+@@ -86,32 +86,6 @@ typedef struct Core99MachineState {
+     uint8_t via_config;
+ } Core99MachineState;
  
-     mc->desc = "Heathrow based PowerMAC";
-     mc->init = ppc_heathrow_init;
-@@ -395,12 +445,18 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
-     mc->kvm_type = heathrow_kvm_type;
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("750_v3.1");
-     mc->default_display = "std";
-+    mc->ignore_boot_device_suffixes = true;
-+    fwc->get_dev_path = heathrow_fw_dev_path;
- }
+-/* MacIO */
+-#define TYPE_MACIO_IDE "macio-ide"
+-#define MACIO_IDE(obj) OBJECT_CHECK(MACIOIDEState, (obj), TYPE_MACIO_IDE)
+-
+-typedef struct MACIOIDEState {
+-    /*< private >*/
+-    SysBusDevice parent_obj;
+-    /*< public >*/
+-    uint32_t channel;
+-    qemu_irq real_ide_irq;
+-    qemu_irq real_dma_irq;
+-    qemu_irq ide_irq;
+-    qemu_irq dma_irq;
+-
+-    MemoryRegion mem;
+-    IDEBus bus;
+-    IDEDMA dma;
+-    void *dbdma;
+-    bool dma_active;
+-    uint32_t timing_reg;
+-    uint32_t irq_reg;
+-} MACIOIDEState;
+-
+-void macio_ide_init_drives(MACIOIDEState *ide, DriveInfo **hd_table);
+-void macio_ide_register_dma(MACIOIDEState *ide);
+-
+ /* Grackle PCI */
+ #define TYPE_GRACKLE_PCI_HOST_BRIDGE "grackle-pcihost"
  
- static const TypeInfo ppc_heathrow_machine_info = {
-     .name          = MACHINE_TYPE_NAME("g3beige"),
-     .parent        = TYPE_MACHINE,
--    .class_init    = heathrow_class_init
-+    .class_init    = heathrow_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_FW_PATH_PROVIDER },
-+        { }
-+    },
- };
+diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
+index cfaa145500..0c3964ec12 100644
+--- a/include/hw/misc/macio/macio.h
++++ b/include/hw/misc/macio/macio.h
+@@ -34,6 +34,32 @@
+ #include "hw/ppc/mac_dbdma.h"
+ #include "hw/ppc/openpic.h"
  
- static void ppc_heathrow_register_types(void)
++/* MacIO IDE */
++#define TYPE_MACIO_IDE "macio-ide"
++#define MACIO_IDE(obj) OBJECT_CHECK(MACIOIDEState, (obj), TYPE_MACIO_IDE)
++
++typedef struct MACIOIDEState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++    uint32_t channel;
++    qemu_irq real_ide_irq;
++    qemu_irq real_dma_irq;
++    qemu_irq ide_irq;
++    qemu_irq dma_irq;
++
++    MemoryRegion mem;
++    IDEBus bus;
++    IDEDMA dma;
++    void *dbdma;
++    bool dma_active;
++    uint32_t timing_reg;
++    uint32_t irq_reg;
++} MACIOIDEState;
++
++void macio_ide_init_drives(MACIOIDEState *ide, DriveInfo **hd_table);
++void macio_ide_register_dma(MACIOIDEState *ide);
++
+ #define TYPE_MACIO "macio"
+ #define MACIO(obj) OBJECT_CHECK(MacIOState, (obj), TYPE_MACIO)
+ 
 -- 
 2.17.1
