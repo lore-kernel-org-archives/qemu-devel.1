@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyNTw-00041U-Bc
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:35:57 -0400
+	(envelope-from <mst@redhat.com>) id 1fyNV0-0004Vc-5S
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:37:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyNTs-0005qw-3s
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:35:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59270 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fyNUw-0007yS-0B
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:37:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34932 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyNTr-0005QL-SS
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:35:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A47E787927
-	for <qemu-devel@nongnu.org>; Fri,  7 Sep 2018 20:35:49 +0000 (UTC)
-Date: Fri, 7 Sep 2018 16:35:42 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyNUv-0007xt-RO
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 16:36:57 -0400
+Date: Fri, 7 Sep 2018 16:36:54 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180907163253-mutt-send-email-mst@kernel.org>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
+Message-ID: <20180907163625-mutt-send-email-mst@kernel.org>
+References: <48ae78d8-58ec-8813-8680-6f407ea46041@siemens.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180308195811.24894-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 00/29] postcopy+vhost-user/shared ram
+In-Reply-To: <48ae78d8-58ec-8813-8680-6f407ea46041@siemens.com>
+Subject: Re: [Qemu-devel] [PATCH] kvm: x86: Fix kvm_arch_fixup_msi_route for
+ remap-less case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, peterx@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Christopher Goldsworthy <christopher.goldsworthy@outlook.com>
 
-On Thu, Mar 08, 2018 at 07:57:42PM +0000, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Mon, Aug 27, 2018 at 10:47:51AM +0200, Jan Kiszka wrote:
+> The AMD IOMMU does not (yet) support interrupt remapping. But
+> kvm_arch_fixup_msi_route assumes that all implementations do and crashes
+> when the AMD IOMMU is used in KVM mode.
 > 
->   This set enables postcopy migration with shared memory to a vhost user process.
-> It's based off current head.
-> 
->   Testing is mostly performed with dpdk, with corresponding modifications by
-> Maxime.
-> 
->   v4 is mostly just fixes from comments received during review of v3,
-> and the normal updating of all the virtio enum's to catch up with other
-> things getting in before us.
-> 
-> Dave
+> Fixes: 8b5ed7dffa1f ("intel_iommu: add support for split irqchip")
+> Reported-by: Christopher Goldsworthy <christopher.goldsworthy@outlook.com>
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 
-For vhost bits:
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-So how is all this going to be merged?
-If it's through my tree pls let me know.
-I'm fine with another tree though.
-
+> ---
+>  target/i386/kvm.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> Dr. David Alan Gilbert (29):
->   migrate: Update ram_block_discard_range for shared
->   qemu_ram_block_host_offset
->   postcopy: use UFFDIO_ZEROPAGE only when available
->   postcopy: Add notifier chain
->   postcopy: Add vhost-user flag for postcopy and check it
->   vhost-user: Add 'VHOST_USER_POSTCOPY_ADVISE' message
->   libvhost-user: Support sending fds back to qemu
->   libvhost-user: Open userfaultfd
->   postcopy: Allow registering of fd handler
->   vhost+postcopy: Register shared ufd with postcopy
->   vhost+postcopy: Transmit 'listen' to client
->   postcopy+vhost-user: Split set_mem_table for postcopy
->   migration/ram: ramblock_recv_bitmap_test_byte_offset
->   libvhost-user+postcopy: Register new regions with the ufd
->   vhost+postcopy: Send address back to qemu
->   vhost+postcopy: Stash RAMBlock and offset
->   vhost+postcopy: Send requests to source for shared pages
->   vhost+postcopy: Resolve client address
->   postcopy: helper for waking shared
->   postcopy: postcopy_notify_shared_wake
->   vhost+postcopy: Add vhost waker
->   vhost+postcopy: Call wakeups
->   libvhost-user: mprotect & madvises for postcopy
->   vhost-user: Add VHOST_USER_POSTCOPY_END message
->   vhost+postcopy: Wire up POSTCOPY_END notify
->   vhost: Huge page align and merge
->   postcopy: Allow shared memory
->   libvhost-user: Claim support for postcopy
->   postcopy shared docs
-> 
->  contrib/libvhost-user/libvhost-user.c | 303 ++++++++++++++++++++++++-
->  contrib/libvhost-user/libvhost-user.h |  11 +
->  docs/devel/migration.rst              |  41 ++++
->  docs/interop/vhost-user.txt           |  51 +++++
->  exec.c                                |  86 +++++--
->  hw/virtio/trace-events                |  16 +-
->  hw/virtio/vhost-user.c                | 411 +++++++++++++++++++++++++++++++++-
->  hw/virtio/vhost.c                     |  66 +++++-
->  include/exec/cpu-common.h             |   4 +
->  migration/migration.c                 |   6 +
->  migration/migration.h                 |   4 +
->  migration/postcopy-ram.c              | 354 +++++++++++++++++++++++------
->  migration/postcopy-ram.h              |  69 ++++++
->  migration/ram.c                       |   5 +
->  migration/ram.h                       |   1 +
->  migration/savevm.c                    |  13 ++
->  migration/trace-events                |   6 +
->  trace-events                          |   3 +-
->  vl.c                                  |   2 +
->  19 files changed, 1354 insertions(+), 98 deletions(-)
-> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 9313602d3d..1fe3a73a10 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -3677,6 +3677,10 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>          MSIMessage src, dst;
+>          X86IOMMUClass *class = X86_IOMMU_GET_CLASS(iommu);
+>  
+> +        if (!class->int_remap) {
+> +            return 0;
+> +        }
+> +
+>          src.address = route->u.msi.address_hi;
+>          src.address <<= VTD_MSI_ADDR_HI_SHIFT;
+>          src.address |= route->u.msi.address_lo;
 > -- 
-> 2.14.3
+> 2.16.4
