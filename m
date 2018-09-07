@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fyBh1-0002mc-6i
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:00:49 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fyBhC-0002rt-MT
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fyBgy-00007o-Pd
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:00:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43026 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fyBh6-0000Pi-T0
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:00:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45060 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fyBgy-0008Vr-JB
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:00:36 -0400
+	id 1fyBh6-0000Or-MT
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:00:44 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  7 Sep 2018 11:59:42 +0400
-Message-Id: <20180907075948.26917-7-marcandre.lureau@redhat.com>
+Date: Fri,  7 Sep 2018 11:59:44 +0400
+Message-Id: <20180907075948.26917-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20180907075948.26917-1-marcandre.lureau@redhat.com>
 References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 06/12] qom/object: register 'type' property
- as class property
+Subject: [Qemu-devel] [PATCH v2 08/12] tests/qom-proplist: check properties
+ are not listed multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +31,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Let's save a few byte in each object instance.
-
-(Is this property really used anywhere? Only qom-get could read it)
+And factor out a common function used by the follow class properties
+iterator test.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qom/object.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ tests/check-qom-proplist.c | 44 +++++++++++++++++++++-----------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index d8666de3f2..185d1dd9f8 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -2423,9 +2423,10 @@ void object_class_property_set_description(ObjectC=
-lass *klass,
-     op->description =3D g_strdup(description);
+diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+index 0f6d9c1ce3..8e1b9c27f3 100644
+--- a/tests/check-qom-proplist.c
++++ b/tests/check-qom-proplist.c
+@@ -520,32 +520,19 @@ static void test_dummy_getenum(void)
  }
 =20
--static void object_instance_init(Object *obj)
-+static void object_class_init(ObjectClass *klass, void *data)
+=20
+-static void test_dummy_iterator(void)
++static void test_dummy_prop_iterator(ObjectPropertyIterator *iter)
  {
--    object_property_add_str(obj, "type", qdev_get_type, NULL, NULL);
-+    object_class_property_add_str(klass, "type", qdev_get_type,
-+                                  NULL, &error_abort);
- }
+-    Object *parent =3D object_get_objects_root();
+-    DummyObject *dobj =3D DUMMY_OBJECT(
+-        object_new_with_props(TYPE_DUMMY,
+-                              parent,
+-                              "dummy0",
+-                              &error_abort,
+-                              "bv", "yes",
+-                              "sv", "Hiss hiss hiss",
+-                              "av", "platypus",
+-                              NULL));
+-
+-    ObjectProperty *prop;
+-    ObjectPropertyIterator iter;
+     bool seenbv =3D false, seensv =3D false, seenav =3D false, seentype;
++    ObjectProperty *prop;
 =20
- static void register_types(void)
-@@ -2439,7 +2440,7 @@ static void register_types(void)
-     static TypeInfo object_info =3D {
-         .name =3D TYPE_OBJECT,
-         .instance_size =3D sizeof(Object),
--        .instance_init =3D object_instance_init,
-+        .class_init =3D object_class_init,
-         .abstract =3D true,
-     };
+-    object_property_iter_init(&iter, OBJECT(dobj));
+-    while ((prop =3D object_property_iter_next(&iter))) {
+-        if (g_str_equal(prop->name, "bv")) {
++    while ((prop =3D object_property_iter_next(iter))) {
++        if (!seenbv && g_str_equal(prop->name, "bv")) {
+             seenbv =3D true;
+-        } else if (g_str_equal(prop->name, "sv")) {
++        } else if (!seensv && g_str_equal(prop->name, "sv")) {
+             seensv =3D true;
+-        } else if (g_str_equal(prop->name, "av")) {
++        } else if (!seenav && g_str_equal(prop->name, "av")) {
+             seenav =3D true;
+-        } else if (g_str_equal(prop->name, "type")) {
++        } else if (!seentype && g_str_equal(prop->name, "type")) {
+             /* This prop comes from the base Object class */
+             seentype =3D true;
+         } else {
+@@ -557,7 +544,24 @@ static void test_dummy_iterator(void)
+     g_assert(seenav);
+     g_assert(seensv);
+     g_assert(seentype);
++}
++
++static void test_dummy_iterator(void)
++{
++    Object *parent =3D object_get_objects_root();
++    DummyObject *dobj =3D DUMMY_OBJECT(
++        object_new_with_props(TYPE_DUMMY,
++                              parent,
++                              "dummy0",
++                              &error_abort,
++                              "bv", "yes",
++                              "sv", "Hiss hiss hiss",
++                              "av", "platypus",
++                              NULL));
++    ObjectPropertyIterator iter;
+=20
++    object_property_iter_init(&iter, OBJECT(dobj));
++    test_dummy_prop_iterator(&iter);
+     object_unparent(OBJECT(dobj));
+ }
 =20
 --=20
 2.19.0.rc1
