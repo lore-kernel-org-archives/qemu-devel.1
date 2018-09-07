@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyOf0-00005U-1W
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:26 -0400
+	(envelope-from <mst@redhat.com>) id 1fyOf1-00006y-MI
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyOez-0005qW-5w
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36450 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fyOf0-0005rh-Qq
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39220 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyOey-0005q6-Vb
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:25 -0400
-Date: Fri, 7 Sep 2018 17:51:24 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyOf0-0005rJ-K9
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:26 -0400
+Date: Fri, 7 Sep 2018 17:51:25 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180907215109.146867-5-mst@redhat.com>
+Message-ID: <20180907215109.146867-6-mst@redhat.com>
 References: <20180907215109.146867-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20180907215109.146867-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 4/7] hw/pci: add PCI resource reserve capability
- to legacy PCI bridge
+Subject: [Qemu-devel] [PULL 5/7] pc: make sure that guest isn't able to
+ unplug the first cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +28,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jing Liu <jing2.liu@linux.intel.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
 
-From: Jing Liu <jing2.liu@linux.intel.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Add hint to firmware (e.g. SeaBIOS) to reserve addtional
-BUS/IO/MEM/PREF resource for legacy pci-pci bridge. Add the
-resource reserve capability deleting in pci_bridge_dev_exitfn.
+The first cpu unplug wasn't ever supported and corresponding
+monitor/qmp commands refuse to unplug it. However guest is able
+to issue eject request either using following command:
+  # echo 1 >/sys/devices/system/cpu/cpu0/firmware_node/eject
+or directly writing to cpu hotplug registers, which makes
+qemu crash with SIGSEGV following back trace:
 
-Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+   kvm_flush_coalesced_mmio_buffer ()
+       while (ring->first != ring->last)
+   ...
+   qemu_flush_coalesced_mmio_buffer
+   prepare_mmio_access
+   flatview_read_continue
+   flatview_read
+   address_space_read_full
+   address_space_rw
+   kvm_cpu_exec(cpu!0)
+   qemu_kvm_cpu_thread_fn
+
+the reason for which is that ring == KVMState::coalesced_mmio_ring
+happens to be a part of 1st CPU that was uplugged by guest.
+
+Fix it by forbidding 1st cpu unplug from guest side and in addition
+remove CPU0._EJ0 ACPI method to make clear that unplug of the first
+CPU is not supported.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci-bridge/pci_bridge_dev.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ hw/acpi/cpu.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
-index b2d861d216..97a8e8b6a4 100644
---- a/hw/pci-bridge/pci_bridge_dev.c
-+++ b/hw/pci-bridge/pci_bridge_dev.c
-@@ -46,6 +46,9 @@ struct PCIBridgeDev {
-     uint32_t flags;
+diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+index 5ae595ecbe..4bb83713c5 100644
+--- a/hw/acpi/cpu.c
++++ b/hw/acpi/cpu.c
+@@ -117,7 +117,7 @@ static void cpu_hotplug_wr(void *opaque, hwaddr addr, uint64_t data,
+             DeviceState *dev = NULL;
+             HotplugHandler *hotplug_ctrl = NULL;
  
-     OnOffAuto msi;
-+
-+    /* additional resources to reserve */
-+    PCIResReserve res_reserve;
- };
- typedef struct PCIBridgeDev PCIBridgeDev;
+-            if (!cdev->cpu) {
++            if (!cdev->cpu || cdev->cpu == first_cpu) {
+                 trace_cpuhp_acpi_ejecting_invalid_cpu(cpu_st->selector);
+                 break;
+             }
+@@ -541,9 +541,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+                 aml_buffer(madt_buf->len, (uint8_t *)madt_buf->data)));
+             g_array_free(madt_buf, true);
  
-@@ -95,6 +98,12 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
-         error_free(local_err);
-     }
+-            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+-            aml_append(method, aml_call1(CPU_EJECT_METHOD, uid));
+-            aml_append(dev, method);
++            if (CPU(arch_ids->cpus[i].cpu) != first_cpu) {
++                method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
++                aml_append(method, aml_call1(CPU_EJECT_METHOD, uid));
++                aml_append(dev, method);
++            }
  
-+    err = pci_bridge_qemu_reserve_cap_init(dev, 0,
-+                                         bridge_dev->res_reserve, errp);
-+    if (err) {
-+        goto cap_error;
-+    }
-+
-     if (shpc_present(dev)) {
-         /* TODO: spec recommends using 64 bit prefetcheable BAR.
-          * Check whether that works well. */
-@@ -103,6 +112,8 @@ static void pci_bridge_dev_realize(PCIDevice *dev, Error **errp)
-     }
-     return;
- 
-+cap_error:
-+    msi_uninit(dev);
- msi_error:
-     slotid_cap_cleanup(dev);
- slotid_error:
-@@ -116,6 +127,8 @@ shpc_error:
- static void pci_bridge_dev_exitfn(PCIDevice *dev)
- {
-     PCIBridgeDev *bridge_dev = PCI_BRIDGE_DEV(dev);
-+
-+    pci_del_capability(dev, PCI_CAP_ID_VNDR, sizeof(PCIBridgeQemuCap));
-     if (msi_present(dev)) {
-         msi_uninit(dev);
-     }
-@@ -162,6 +175,17 @@ static Property pci_bridge_dev_properties[] = {
-                             ON_OFF_AUTO_AUTO),
-     DEFINE_PROP_BIT(PCI_BRIDGE_DEV_PROP_SHPC, PCIBridgeDev, flags,
-                     PCI_BRIDGE_DEV_F_SHPC_REQ, true),
-+    DEFINE_PROP_UINT32("bus-reserve", PCIBridgeDev,
-+                       res_reserve.bus, -1),
-+    DEFINE_PROP_SIZE("io-reserve", PCIBridgeDev,
-+                     res_reserve.io, -1),
-+    DEFINE_PROP_SIZE("mem-reserve", PCIBridgeDev,
-+                     res_reserve.mem_non_pref, -1),
-+    DEFINE_PROP_SIZE("pref32-reserve", PCIBridgeDev,
-+                     res_reserve.mem_pref_32, -1),
-+    DEFINE_PROP_SIZE("pref64-reserve", PCIBridgeDev,
-+                     res_reserve.mem_pref_64, -1),
-+
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+             method = aml_method("_OST", 3, AML_SERIALIZED);
+             aml_append(method,
 -- 
 MST
