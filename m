@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyOex-00004v-O6
+	(envelope-from <mst@redhat.com>) id 1fyOex-00004u-O8
 	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyOeu-0005ml-Rf
+	(envelope-from <mst@redhat.com>) id 1fyOev-0005nq-Nq
 	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51484 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33194 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyOeu-0005ma-L0
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:20 -0400
-Date: Fri, 7 Sep 2018 17:51:19 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyOev-0005mv-G0
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:21 -0400
+Date: Fri, 7 Sep 2018 17:51:20 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180907215109.146867-1-mst@redhat.com>
+Message-ID: <20180907215109.146867-2-mst@redhat.com>
+References: <20180907215109.146867-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PULL 0/7] pci, pc, virtio: fixes, features
+In-Reply-To: <20180907215109.146867-1-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 1/7] pc: acpi: revert back to 1 SRAT entry for
+ hotpluggable area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +28,134 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd241557452:
+From: Igor Mammedov <imammedo@redhat.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27-v2' into staging (2018-08-27 16:44:20 +0100)
+Commit
+  10efd7e108 "pc: acpi: fix memory hotplug regression by reducing stub SRAT entry size"
+attemped to fix hotplug regression introduced by
+  848a1cc1e "hw/acpi-build: build SRAT memory affinity structures for DIMM devices"
 
-are available in the Git repository at:
+fixed issue for Windows/3.0+ linux kernels, however it regressed 2.6 based
+kernels (RHEL6) to the point where guest might crash at boot.
+Reason is that 2.6 kernel discards SRAT table due too small last entry
+which down the road leads to crashes. Hack I've tried in 10efd7e108 is also
+not ACPI spec compliant according to which whole possible RAM should be
+described in SRAT. Revert 10efd7e108 to fix regression for 2.6 based kernels.
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+With 10efd7e108 reverted, I've also tried splitting SRAT table statically
+in different ways %/node and %/slot but Windows still fails to online
+2nd pc-dimm hot-plugged into node 0 (as described in 10efd7e108) and
+sometimes even coldplugged pc-dimms where affected with static SRAT
+partitioning.
+The only known so far way where Windows stays happy is when we have 1
+SRAT entry in the last node covering all hotplug area.
 
-for you to fetch changes up to d2a1b1d602986a5f02658f6d4fc9ed422f8ddebf:
+Revert 848a1cc1e until we come up with a way to avoid regression
+on Windows with hotplug area split in several entries.
+Tested this with 2.6/3.0 based kernels (RHEL6/7) and WS20[08/12/12R2/16]).
 
-  tests: update acpi expected files (2018-09-07 17:43:22 -0400)
-
-----------------------------------------------------------------
-pci, pc, virtio: fixes, features
-
-pci resource capability + misc fixes everywhere.
-
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/i386/acpi-build.c | 73 ++++++++------------------------------------
+ 1 file changed, 12 insertions(+), 61 deletions(-)
 
-----------------------------------------------------------------
-Igor Mammedov (2):
-      pc: acpi: revert back to 1 SRAT entry for hotpluggable area
-      pc: make sure that guest isn't able to unplug the first cpu
-
-Jing Liu (2):
-      hw/pci: factor PCI reserve resources to a separate structure
-      hw/pci: add PCI resource reserve capability to legacy PCI bridge
-
-Michael S. Tsirkin (1):
-      tests: update acpi expected files
-
-Paolo Bonzini (1):
-      virtio: update MemoryRegionCaches when guest negotiates features
-
-Yury Kotov (1):
-      vhost: fix invalid downcast
-
- include/hw/pci/pci_bridge.h           |  18 ++++++---
- hw/acpi/cpu.c                         |  10 +++--
- hw/i386/acpi-build.c                  |  73 ++++++----------------------------
- hw/pci-bridge/gen_pcie_root_port.c    |  33 +++++++--------
- hw/pci-bridge/pci_bridge_dev.c        |  24 +++++++++++
- hw/pci/pci_bridge.c                   |  38 ++++++++----------
- hw/virtio/vhost.c                     |   4 +-
- hw/virtio/virtio.c                    |  15 ++++++-
- tests/acpi-test-data/pc/DSDT          | Bin 5144 -> 5131 bytes
- tests/acpi-test-data/pc/DSDT.bridge   | Bin 7003 -> 6990 bytes
- tests/acpi-test-data/pc/DSDT.cphp     | Bin 5607 -> 5594 bytes
- tests/acpi-test-data/pc/DSDT.dimmpxm  | Bin 6803 -> 6790 bytes
- tests/acpi-test-data/pc/DSDT.ipmikcs  | Bin 5216 -> 5203 bytes
- tests/acpi-test-data/pc/DSDT.memhp    | Bin 6509 -> 6496 bytes
- tests/acpi-test-data/pc/DSDT.numamem  | Bin 5150 -> 5137 bytes
- tests/acpi-test-data/pc/SRAT.dimmpxm  | Bin 472 -> 392 bytes
- tests/acpi-test-data/pc/SRAT.memhp    | Bin 264 -> 264 bytes
- tests/acpi-test-data/q35/DSDT         | Bin 7828 -> 7815 bytes
- tests/acpi-test-data/q35/DSDT.bridge  | Bin 7845 -> 7832 bytes
- tests/acpi-test-data/q35/DSDT.cphp    | Bin 8291 -> 8278 bytes
- tests/acpi-test-data/q35/DSDT.dimmpxm | Bin 9487 -> 9474 bytes
- tests/acpi-test-data/q35/DSDT.ipmibt  | Bin 7903 -> 7890 bytes
- tests/acpi-test-data/q35/DSDT.memhp   | Bin 9193 -> 9180 bytes
- tests/acpi-test-data/q35/DSDT.numamem | Bin 7834 -> 7821 bytes
- tests/acpi-test-data/q35/SRAT.dimmpxm | Bin 472 -> 392 bytes
- tests/acpi-test-data/q35/SRAT.memhp   | Bin 264 -> 264 bytes
- 26 files changed, 103 insertions(+), 112 deletions(-)
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index e1ee8ae9e0..1599caa7c5 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2251,64 +2251,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+ #define HOLE_640K_START  (640 * KiB)
+ #define HOLE_640K_END   (1 * MiB)
+ 
+-static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
+-                                           uint64_t len, int default_node)
+-{
+-    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
+-    MemoryDeviceInfoList *info;
+-    MemoryDeviceInfo *mi;
+-    PCDIMMDeviceInfo *di;
+-    uint64_t end = base + len, cur, size;
+-    bool is_nvdimm;
+-    AcpiSratMemoryAffinity *numamem;
+-    MemoryAffinityFlags flags;
+-
+-    for (cur = base, info = info_list;
+-         cur < end;
+-         cur += size, info = info->next) {
+-        numamem = acpi_data_push(table_data, sizeof *numamem);
+-
+-        if (!info) {
+-            /*
+-             * Entry is required for Windows to enable memory hotplug in OS
+-             * and for Linux to enable SWIOTLB when booted with less than
+-             * 4G of RAM. Windows works better if the entry sets proximity
+-             * to the highest NUMA node in the machine at the end of the
+-             * reserved space.
+-             * Memory devices may override proximity set by this entry,
+-             * providing _PXM method if necessary.
+-             */
+-            build_srat_memory(numamem, end - 1, 1, default_node,
+-                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+-            break;
+-        }
+-
+-        mi = info->value;
+-        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
+-        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
+-
+-        if (cur < di->addr) {
+-            build_srat_memory(numamem, cur, di->addr - cur, default_node,
+-                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+-            numamem = acpi_data_push(table_data, sizeof *numamem);
+-        }
+-
+-        size = di->size;
+-
+-        flags = MEM_AFFINITY_ENABLED;
+-        if (di->hotpluggable) {
+-            flags |= MEM_AFFINITY_HOTPLUGGABLE;
+-        }
+-        if (is_nvdimm) {
+-            flags |= MEM_AFFINITY_NON_VOLATILE;
+-        }
+-
+-        build_srat_memory(numamem, di->addr, size, di->node, flags);
+-    }
+-
+-    qapi_free_MemoryDeviceInfoList(info_list);
+-}
+-
+ static void
+ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+ {
+@@ -2414,10 +2356,19 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+         build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
+     }
+ 
++    /*
++     * Entry is required for Windows to enable memory hotplug in OS
++     * and for Linux to enable SWIOTLB when booted with less than
++     * 4G of RAM. Windows works better if the entry sets proximity
++     * to the highest NUMA node in the machine.
++     * Memory devices may override proximity set by this entry,
++     * providing _PXM method if necessary.
++     */
+     if (hotplugabble_address_space_size) {
+-        build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
+-                                       hotplugabble_address_space_size,
+-                                       pcms->numa_nodes - 1);
++        numamem = acpi_data_push(table_data, sizeof *numamem);
++        build_srat_memory(numamem, machine->device_memory->base,
++                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
++                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+     }
+ 
+     build_header(linker, table_data,
+-- 
+MST
