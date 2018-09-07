@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fyFe4-00077A-Ta
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:13:53 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fyFgt-0000dy-UL
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:16:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fyFe2-0004sr-3e
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:13:52 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  7 Sep 2018 16:13:19 +0400
-Message-Id: <20180907121319.8607-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20180907121319.8607-1-marcandre.lureau@redhat.com>
-References: <20180907121319.8607-1-marcandre.lureau@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fyFgq-0006AN-LT
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:16:47 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:40612)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fyFgq-00066h-7K
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 08:16:44 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id 207-v6so14344821wme.5
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 05:16:44 -0700 (PDT)
+References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+	<152819516132.30857.1700667353240369481.stgit@pasha-ThinkPad-T60>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <152819516132.30857.1700667353240369481.stgit@pasha-ThinkPad-T60>
+Date: Fri, 07 Sep 2018 13:16:41 +0100
+Message-ID: <87y3cdzemu.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/3] Delete PID file on exit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/7] tcg: add headers for non-target
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,56 +31,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
 
-Register an exit notifier to remove the PID file. By the time atexit()
-is called, qemu_write_pidfile() guarantees QEMU owns the PID file,
-thus we could safely remove it when exiting.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- vl.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
 
-diff --git a/vl.c b/vl.c
-index 0eaf948d32..51af016602 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2603,6 +2603,16 @@ static void qemu_run_exit_notifiers(void)
-     notifier_list_notify(&exit_notifiers, NULL);
- }
-=20
-+static const char *pid_file;
-+static Notifier qemu_unlink_pidfile_notifier;
-+
-+static void qemu_unlink_pidfile(Notifier *n, void *data)
-+{
-+    if (pid_file) {
-+        unlink(pid_file);
-+    }
-+}
-+
- bool machine_init_done;
-=20
- void qemu_add_machine_init_done_notifier(Notifier *notify)
-@@ -2927,7 +2937,6 @@ int main(int argc, char **argv, char **envp)
-     const char *vga_model =3D NULL;
-     const char *qtest_chrdev =3D NULL;
-     const char *qtest_log =3D NULL;
--    const char *pid_file =3D NULL;
-     const char *incoming =3D NULL;
-     bool userconfig =3D true;
-     bool nographic =3D false;
-@@ -4001,6 +4010,9 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
-=20
-+    qemu_unlink_pidfile_notifier.notify =3D qemu_unlink_pidfile;
-+    qemu_add_exit_notifier(&qemu_unlink_pidfile_notifier);
-+
-     if (qemu_init_main_loop(&main_loop_err)) {
-         error_report_err(main_loop_err);
-         exit(1);
---=20
-2.19.0.rc1
+> From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
+>
+> This patch adds functions and headers for adding the helpers from
+> the modules other than the target translators.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> ---
+>  include/exec/helper-register.h |   53 ++++++++++++++++++++++++++++++++++=
+++++++
+>  tcg/tcg.c                      |   12 +++++++++
+>  tcg/tcg.h                      |    3 ++
+>  3 files changed, 68 insertions(+)
+>  create mode 100644 include/exec/helper-register.h
+>
+> diff --git a/include/exec/helper-register.h b/include/exec/helper-registe=
+r.h
+> new file mode 100644
+> index 0000000..aeface9
+> --- /dev/null
+> +++ b/include/exec/helper-register.h
+> @@ -0,0 +1,53 @@
+> +#ifndef HELPER_REGISTER_H
+> +#define HELPER_REGISTER_H
+> +
+> +#include "exec/helper-head.h"
+> +
+> +/* Need one more level of indirection before stringification
+> +   to get all the macros expanded first.  */
+> +#define str(s) #s
+> +
+> +#define DEF_HELPER_FLAGS_0(NAME, FLAGS, ret) \
+> +    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, dh_sizemask(ret,=
+ 0));
+> +
+> +#define DEF_HELPER_FLAGS_1(NAME, FLAGS, ret, t1) \
+> +    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
+> +        dh_sizemask(ret, 0) | dh_sizemask(t1, 1));
+> +
+> +#define DEF_HELPER_FLAGS_2(NAME, FLAGS, ret, t1, t2) \
+> +    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
+> +        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2));
+> +
+> +#define DEF_HELPER_FLAGS_3(NAME, FLAGS, ret, t1, t2, t3) \
+> +    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
+> +        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
+> +        | dh_sizemask(t3, 3));
+> +
+> +#define DEF_HELPER_FLAGS_4(NAME, FLAGS, ret, t1, t2, t3, t4) \
+> +    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
+> +        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
+> +        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4));
+> +
+> +#define DEF_HELPER_FLAGS_5(NAME, FLAGS, ret, t1, t2, t3, t4, t5) \
+> +    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
+> +        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
+> +        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) | dh_sizemask(t5, 5));
+> +
+> +#define DEF_HELPER_FLAGS_6(NAME, FLAGS, ret, t1, t2, t3, t4, t5, t6) \
+> +    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
+> +        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
+> +        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) | dh_sizemask(t5, 5) \
+> +        | dh_sizemask(t6, 6));
+> +
+> +#include "helper.h"
+> +
+> +#undef str
+> +#undef DEF_HELPER_FLAGS_0
+> +#undef DEF_HELPER_FLAGS_1
+> +#undef DEF_HELPER_FLAGS_2
+> +#undef DEF_HELPER_FLAGS_3
+> +#undef DEF_HELPER_FLAGS_4
+> +#undef DEF_HELPER_FLAGS_5
+> +#undef DEF_HELPER_FLAGS_6
+> +
+> +#endif /* HELPER_REGISTER_H */
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index 6eeebe0..8191381 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -1623,6 +1623,18 @@ static inline const char *tcg_find_helper(TCGConte=
+xt *s, uintptr_t val)
+>      return ret;
+>  }
+>
+> +void tcg_register_helper(void *func, const char *name,
+> +                         unsigned flags, unsigned sizemask)
+> +{
+> +    TCGHelperInfo *info =3D g_new0(TCGHelperInfo, 1);
+> +    info->func =3D func;
+> +    info->name =3D name;
+> +    info->flags =3D flags;
+> +    info->sizemask =3D sizemask;
+> +
+> +    g_hash_table_insert(helper_table, func, info);
+> +}
+> +
+>  static const char * const cond_name[] =3D
+>  {
+>      [TCG_COND_NEVER] =3D "never",
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 08f8bbf..7a4b750 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -890,6 +890,9 @@ void tcg_register_thread(void);
+>  void tcg_prologue_init(TCGContext *s);
+>  void tcg_func_start(TCGContext *s);
+>
+
+A small comment might be worthwhile here, maybe something like:
+
+/**
+ * tcg_register_helper
+ *
+ * Used by the helper-register.h machinery to register non-core helpers
+ * from plugins. Built-in helpers are installed via all_helpers[]
+ */
+
+> +void tcg_register_helper(void *func, const char *name,
+> +                         unsigned flags, unsigned sizemask);
+> +
+>  int tcg_gen_code(TCGContext *s, TranslationBlock *tb);
+>
+>  void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t s=
+ize);
+
+
+--
+Alex Benn=C3=A9e
