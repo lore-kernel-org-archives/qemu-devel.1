@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyOex-00004u-O8
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:24 -0400
+	(envelope-from <mst@redhat.com>) id 1fyOez-00005C-RZ
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyOev-0005nq-Nq
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33194 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fyOey-0005qC-OH
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51492 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyOev-0005mv-G0
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:21 -0400
-Date: Fri, 7 Sep 2018 17:51:20 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyOey-0005pk-Fo
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:51:24 -0400
+Date: Fri, 7 Sep 2018 17:51:23 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180907215109.146867-2-mst@redhat.com>
+Message-ID: <20180907215109.146867-4-mst@redhat.com>
 References: <20180907215109.146867-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20180907215109.146867-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 1/7] pc: acpi: revert back to 1 SRAT entry for
- hotpluggable area
+Subject: [Qemu-devel] [PULL 3/7] hw/pci: factor PCI reserve resources to a
+ separate structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,134 +28,189 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jing Liu <jing2.liu@linux.intel.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Jing Liu <jing2.liu@linux.intel.com>
 
-Commit
-  10efd7e108 "pc: acpi: fix memory hotplug regression by reducing stub SRAT entry size"
-attemped to fix hotplug regression introduced by
-  848a1cc1e "hw/acpi-build: build SRAT memory affinity structures for DIMM devices"
+Factor "bus_reserve", "io_reserve", "mem_reserve", "pref32_reserve"
+and "pref64_reserve" fields of the "GenPCIERootPort" structure out
+to "PCIResReserve" structure, so that other PCI bridges can
+reuse it to add resource reserve capability.
 
-fixed issue for Windows/3.0+ linux kernels, however it regressed 2.6 based
-kernels (RHEL6) to the point where guest might crash at boot.
-Reason is that 2.6 kernel discards SRAT table due too small last entry
-which down the road leads to crashes. Hack I've tried in 10efd7e108 is also
-not ACPI spec compliant according to which whole possible RAM should be
-described in SRAT. Revert 10efd7e108 to fix regression for 2.6 based kernels.
-
-With 10efd7e108 reverted, I've also tried splitting SRAT table statically
-in different ways %/node and %/slot but Windows still fails to online
-2nd pc-dimm hot-plugged into node 0 (as described in 10efd7e108) and
-sometimes even coldplugged pc-dimms where affected with static SRAT
-partitioning.
-The only known so far way where Windows stays happy is when we have 1
-SRAT entry in the last node covering all hotplug area.
-
-Revert 848a1cc1e until we come up with a way to avoid regression
-on Windows with hotplug area split in several entries.
-Tested this with 2.6/3.0 based kernels (RHEL6/7) and WS20[08/12/12R2/16]).
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/acpi-build.c | 73 ++++++++------------------------------------
- 1 file changed, 12 insertions(+), 61 deletions(-)
+ include/hw/pci/pci_bridge.h        | 18 ++++++++++----
+ hw/pci-bridge/gen_pcie_root_port.c | 33 +++++++++++++-------------
+ hw/pci/pci_bridge.c                | 38 +++++++++++++-----------------
+ 3 files changed, 47 insertions(+), 42 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index e1ee8ae9e0..1599caa7c5 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2251,64 +2251,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
- #define HOLE_640K_START  (640 * KiB)
- #define HOLE_640K_END   (1 * MiB)
+diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+index 0347da52d2..cdff7edfd1 100644
+--- a/include/hw/pci/pci_bridge.h
++++ b/include/hw/pci/pci_bridge.h
+@@ -133,11 +133,19 @@ typedef struct PCIBridgeQemuCap {
  
--static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
--                                           uint64_t len, int default_node)
--{
--    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
--    MemoryDeviceInfoList *info;
--    MemoryDeviceInfo *mi;
--    PCDIMMDeviceInfo *di;
--    uint64_t end = base + len, cur, size;
--    bool is_nvdimm;
--    AcpiSratMemoryAffinity *numamem;
--    MemoryAffinityFlags flags;
--
--    for (cur = base, info = info_list;
--         cur < end;
--         cur += size, info = info->next) {
--        numamem = acpi_data_push(table_data, sizeof *numamem);
--
--        if (!info) {
--            /*
--             * Entry is required for Windows to enable memory hotplug in OS
--             * and for Linux to enable SWIOTLB when booted with less than
--             * 4G of RAM. Windows works better if the entry sets proximity
--             * to the highest NUMA node in the machine at the end of the
--             * reserved space.
--             * Memory devices may override proximity set by this entry,
--             * providing _PXM method if necessary.
--             */
--            build_srat_memory(numamem, end - 1, 1, default_node,
--                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
--            break;
--        }
--
--        mi = info->value;
--        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
--        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
--
--        if (cur < di->addr) {
--            build_srat_memory(numamem, cur, di->addr - cur, default_node,
--                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
--            numamem = acpi_data_push(table_data, sizeof *numamem);
--        }
--
--        size = di->size;
--
--        flags = MEM_AFFINITY_ENABLED;
--        if (di->hotpluggable) {
--            flags |= MEM_AFFINITY_HOTPLUGGABLE;
--        }
--        if (is_nvdimm) {
--            flags |= MEM_AFFINITY_NON_VOLATILE;
--        }
--
--        build_srat_memory(numamem, di->addr, size, di->node, flags);
--    }
--
--    qapi_free_MemoryDeviceInfoList(info_list);
--}
--
- static void
- build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+ #define REDHAT_PCI_CAP_RESOURCE_RESERVE 1
+ 
++/*
++ * PCI BUS/IO/MEM/PREFMEM additional resources recorded as a
++ * capability in PCI configuration space to reserve on firmware init.
++ */
++typedef struct PCIResReserve {
++    uint32_t bus;
++    uint64_t io;
++    uint64_t mem_non_pref;
++    uint64_t mem_pref_32;
++    uint64_t mem_pref_64;
++} PCIResReserve;
++
+ int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
+-                              uint32_t bus_reserve, uint64_t io_reserve,
+-                              uint64_t mem_non_pref_reserve,
+-                              uint64_t mem_pref_32_reserve,
+-                              uint64_t mem_pref_64_reserve,
+-                              Error **errp);
++                               PCIResReserve res_reserve, Error **errp);
+ 
+ #endif /* QEMU_PCI_BRIDGE_H */
+diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+index d117e20325..299de429ec 100644
+--- a/hw/pci-bridge/gen_pcie_root_port.c
++++ b/hw/pci-bridge/gen_pcie_root_port.c
+@@ -29,12 +29,8 @@ typedef struct GenPCIERootPort {
+ 
+     bool migrate_msix;
+ 
+-    /* additional resources to reserve on firmware init */
+-    uint32_t bus_reserve;
+-    uint64_t io_reserve;
+-    uint64_t mem_reserve;
+-    uint64_t pref32_reserve;
+-    uint64_t pref64_reserve;
++    /* additional resources to reserve */
++    PCIResReserve res_reserve;
+ } GenPCIERootPort;
+ 
+ static uint8_t gen_rp_aer_vector(const PCIDevice *d)
+@@ -82,16 +78,15 @@ static void gen_rp_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    int rc = pci_bridge_qemu_reserve_cap_init(d, 0, grp->bus_reserve,
+-            grp->io_reserve, grp->mem_reserve, grp->pref32_reserve,
+-            grp->pref64_reserve, errp);
++    int rc = pci_bridge_qemu_reserve_cap_init(d, 0,
++                                              grp->res_reserve, errp);
+ 
+     if (rc < 0) {
+         rpc->parent_class.exit(d);
+         return;
+     }
+ 
+-    if (!grp->io_reserve) {
++    if (!grp->res_reserve.io) {
+         pci_word_test_and_clear_mask(d->wmask + PCI_COMMAND,
+                                      PCI_COMMAND_IO);
+         d->wmask[PCI_IO_BASE] = 0;
+@@ -117,12 +112,18 @@ static const VMStateDescription vmstate_rp_dev = {
+ };
+ 
+ static Property gen_rp_props[] = {
+-    DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
+-    DEFINE_PROP_UINT32("bus-reserve", GenPCIERootPort, bus_reserve, -1),
+-    DEFINE_PROP_SIZE("io-reserve", GenPCIERootPort, io_reserve, -1),
+-    DEFINE_PROP_SIZE("mem-reserve", GenPCIERootPort, mem_reserve, -1),
+-    DEFINE_PROP_SIZE("pref32-reserve", GenPCIERootPort, pref32_reserve, -1),
+-    DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort, pref64_reserve, -1),
++    DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort,
++                     migrate_msix, true),
++    DEFINE_PROP_UINT32("bus-reserve", GenPCIERootPort,
++                       res_reserve.bus, -1),
++    DEFINE_PROP_SIZE("io-reserve", GenPCIERootPort,
++                     res_reserve.io, -1),
++    DEFINE_PROP_SIZE("mem-reserve", GenPCIERootPort,
++                     res_reserve.mem_non_pref, -1),
++    DEFINE_PROP_SIZE("pref32-reserve", GenPCIERootPort,
++                     res_reserve.mem_pref_32, -1),
++    DEFINE_PROP_SIZE("pref64-reserve", GenPCIERootPort,
++                     res_reserve.mem_pref_64, -1),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+index 40a39f57cb..08b7e44e2e 100644
+--- a/hw/pci/pci_bridge.c
++++ b/hw/pci/pci_bridge.c
+@@ -411,38 +411,34 @@ void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
+ 
+ 
+ int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
+-                                     uint32_t bus_reserve, uint64_t io_reserve,
+-                                     uint64_t mem_non_pref_reserve,
+-                                     uint64_t mem_pref_32_reserve,
+-                                     uint64_t mem_pref_64_reserve,
+-                                     Error **errp)
++                                     PCIResReserve res_reserve, Error **errp)
  {
-@@ -2414,10 +2356,19 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-         build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
+-    if (mem_pref_32_reserve != (uint64_t)-1 &&
+-        mem_pref_64_reserve != (uint64_t)-1) {
++    if (res_reserve.mem_pref_32 != (uint64_t)-1 &&
++        res_reserve.mem_pref_64 != (uint64_t)-1) {
+         error_setg(errp,
+                    "PCI resource reserve cap: PREF32 and PREF64 conflict");
+         return -EINVAL;
      }
  
-+    /*
-+     * Entry is required for Windows to enable memory hotplug in OS
-+     * and for Linux to enable SWIOTLB when booted with less than
-+     * 4G of RAM. Windows works better if the entry sets proximity
-+     * to the highest NUMA node in the machine.
-+     * Memory devices may override proximity set by this entry,
-+     * providing _PXM method if necessary.
-+     */
-     if (hotplugabble_address_space_size) {
--        build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
--                                       hotplugabble_address_space_size,
--                                       pcms->numa_nodes - 1);
-+        numamem = acpi_data_push(table_data, sizeof *numamem);
-+        build_srat_memory(numamem, machine->device_memory->base,
-+                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
-+                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+-    if (mem_non_pref_reserve != (uint64_t)-1 &&
+-        mem_non_pref_reserve >= (1ULL << 32)) {
++    if (res_reserve.mem_non_pref != (uint64_t)-1 &&
++        res_reserve.mem_non_pref >= (1ULL << 32)) {
+         error_setg(errp,
+                    "PCI resource reserve cap: mem-reserve must be less than 4G");
+         return -EINVAL;
      }
  
-     build_header(linker, table_data,
+-    if (mem_pref_32_reserve != (uint64_t)-1 &&
+-        mem_pref_32_reserve >= (1ULL << 32)) {
++    if (res_reserve.mem_pref_32 != (uint64_t)-1 &&
++        res_reserve.mem_pref_32 >= (1ULL << 32)) {
+         error_setg(errp,
+                    "PCI resource reserve cap: pref32-reserve  must be less than 4G");
+         return -EINVAL;
+     }
+ 
+-    if (bus_reserve == (uint32_t)-1 &&
+-        io_reserve == (uint64_t)-1 &&
+-        mem_non_pref_reserve == (uint64_t)-1 &&
+-        mem_pref_32_reserve == (uint64_t)-1 &&
+-        mem_pref_64_reserve == (uint64_t)-1) {
++    if (res_reserve.bus == (uint32_t)-1 &&
++        res_reserve.io == (uint64_t)-1 &&
++        res_reserve.mem_non_pref == (uint64_t)-1 &&
++        res_reserve.mem_pref_32 == (uint64_t)-1 &&
++        res_reserve.mem_pref_64 == (uint64_t)-1) {
+         return 0;
+     }
+ 
+@@ -450,11 +446,11 @@ int pci_bridge_qemu_reserve_cap_init(PCIDevice *dev, int cap_offset,
+     PCIBridgeQemuCap cap = {
+             .len = cap_len,
+             .type = REDHAT_PCI_CAP_RESOURCE_RESERVE,
+-            .bus_res = bus_reserve,
+-            .io = io_reserve,
+-            .mem = mem_non_pref_reserve,
+-            .mem_pref_32 = mem_pref_32_reserve,
+-            .mem_pref_64 = mem_pref_64_reserve
++            .bus_res = res_reserve.bus,
++            .io = res_reserve.io,
++            .mem = res_reserve.mem_non_pref,
++            .mem_pref_32 = res_reserve.mem_pref_32,
++            .mem_pref_64 = res_reserve.mem_pref_64
+     };
+ 
+     int offset = pci_add_capability(dev, PCI_CAP_ID_VNDR,
 -- 
 MST
