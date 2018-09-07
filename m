@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyOLM-0000Z2-UD
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:31:09 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fyOcq-0007WD-Kl
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fyOLI-0005Ca-LW
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:31:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34026 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fyOLI-00059z-7S
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:31:04 -0400
-Date: Fri, 7 Sep 2018 17:30:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180907173002-mutt-send-email-mst@kernel.org>
-References: <1535071416-212072-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <jsnow@redhat.com>) id 1fyOcp-0002uY-AH
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 17:49:12 -0400
+References: <20180814121443.33114-1-vsementsov@virtuozzo.com>
+	<20180814121443.33114-2-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <954db07e-d338-9cd4-341f-d8916470b89b@redhat.com>
+Date: Fri, 7 Sep 2018 17:49:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1535071416-212072-1-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [virtio-dev] [PATCH v25 0/2] virtio-crypto: virtio
- crypto device specification
+In-Reply-To: <20180814121443.33114-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] dirty-bitmap: improve
+ bdrv_dirty_bitmap_next_zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,116 +25,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cohuck@redhat.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@huawei.com, pasic@linux.vnet.ibm.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jianjay.zhou@huawei.com
-
-OK it is time to apply this.
-If I do I get latex errors (undefined and multiple-defined
-labels). Please post patches on top to fix this up,
-I will squash.
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
 
 
-On Fri, Aug 24, 2018 at 08:43:34AM +0800, Longpeng(Mike) wrote:
+
+On 08/14/2018 08:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Add bytes parameter to the function, to limit searched range.
+> 
+
+I'm going to assume that Eric Blake has been through here and commented
+on the interface itself.
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-> v25 -> v24
->  - fix some typos and letex grammar.
+>  include/block/dirty-bitmap.h |  3 ++-
+>  include/qemu/hbitmap.h       | 10 ++++++++--
+>  block/backup.c               |  2 +-
+>  block/dirty-bitmap.c         |  5 +++--
+>  nbd/server.c                 |  2 +-
+>  tests/test-hbitmap.c         |  2 +-
+>  util/hbitmap.c               | 25 ++++++++++++++++++++-----
+>  7 files changed, 36 insertions(+), 13 deletions(-)
 > 
-> v24 -> v23
->  - Some enhancements based on Halil's suggestion. [Halil]
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 259bd27c40..27f5299c4e 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -98,7 +98,8 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+>  BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+>                                          BdrvDirtyBitmap *bitmap);
+>  char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
+> -int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start);
+> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start,
+> +                                    int64_t end);
+>  BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+>                                                    BdrvDirtyBitmap *bitmap,
+>                                                    Error **errp);
+> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+> index ddca52c48e..fe4dfde27a 100644
+> --- a/include/qemu/hbitmap.h
+> +++ b/include/qemu/hbitmap.h
+> @@ -295,10 +295,16 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
+>  /* hbitmap_next_zero:
+>   * @hb: The HBitmap to operate on
+>   * @start: The bit to start from.
+> + * @end: End of range to search in. If @end is -1, search up to the bitmap
+> + *       end.
+>   *
+> - * Find next not dirty bit.
+> + * Find next not dirty bit within range [@start, @end), or from
+> + * @start to the bitmap end if @end is -1. If not found, return -1.
+> + *
+> + * @end may be greater than original bitmap size, in this case, search up to
+
+"original" bitmap size? I think that's just an implementation detail, we
+can drop 'original' here, yes?
+
+> + * the bitmap end.
+>   */
+> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start);
+> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, int64_t end);
+>  
+
+The interface looks weird because we can define a 'start' that's beyond
+the 'end'.
+
+I realize that you need a signed integer for 'end' to signify EOF...
+should we do a 'bytes' parameter instead? (Did you already do that in an
+earlier version and we changed it?)
+
+Well, it's not a big deal to me personally.
+
+>  /* hbitmap_create_meta:
+>   * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.
+> diff --git a/block/backup.c b/block/backup.c
+> index 8630d32926..9bfd3f7189 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -458,7 +458,7 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+>              break;
+>          }
+>  
+> -        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset);
+> +        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset, -1);
+>          if (offset == -1) {
+>              hbitmap_set(job->copy_bitmap, cluster, end - cluster);
+>              break;
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index c9b8a6fd52..037ae62726 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -785,9 +785,10 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
+>      return hbitmap_sha256(bitmap->bitmap, errp);
+>  }
+>  
+> -int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
+> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
+> +                                    int64_t end)
+>  {
+> -    return hbitmap_next_zero(bitmap->bitmap, offset);
+> +    return hbitmap_next_zero(bitmap->bitmap, offset, end);
+>  }
+>  
+>  void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+> diff --git a/nbd/server.c b/nbd/server.c
+> index ea5fe0eb33..07920d123b 100644
+> --- a/nbd/server.c
+> +++ b/nbd/server.c
+> @@ -1952,7 +1952,7 @@ static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
+>      assert(begin < overall_end && nb_extents);
+>      while (begin < overall_end && i < nb_extents) {
+>          if (dirty) {
+> -            end = bdrv_dirty_bitmap_next_zero(bitmap, begin);
+> +            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, -1);
+>          } else {
+>              bdrv_set_dirty_iter(it, begin);
+>              end = bdrv_dirty_iter_next(it);
+> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+> index 5e67ac1d3a..6b6a40bddd 100644
+> --- a/tests/test-hbitmap.c
+> +++ b/tests/test-hbitmap.c
+> @@ -939,7 +939,7 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
+>  
+>  static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
+>  {
+> -    int64_t ret1 = hbitmap_next_zero(data->hb, start);
+> +    int64_t ret1 = hbitmap_next_zero(data->hb, start, -1);
+>      int64_t ret2 = start;
+>      for ( ; ret2 < data->size && hbitmap_get(data->hb, ret2); ret2++) {
+>          ;
+> diff --git a/util/hbitmap.c b/util/hbitmap.c
+> index bcd304041a..1687372504 100644
+> --- a/util/hbitmap.c
+> +++ b/util/hbitmap.c
+> @@ -53,6 +53,9 @@
+>   */
+>  
+>  struct HBitmap {
+> +    /* Size of the bitmap, as requested in hbitmap_alloc. */
+> +    uint64_t orig_size;
+> +
+>      /* Number of total bits in the bottom level.  */
+>      uint64_t size;
+>  
+> @@ -192,16 +195,26 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
+>      }
+>  }
+>  
+> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
+> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, int64_t end)
+>  {
+>      size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
+>      unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
+> -    uint64_t sz = hb->sizes[HBITMAP_LEVELS - 1];
+>      unsigned long cur = last_lev[pos];
+> -    unsigned start_bit_offset =
+> -            (start >> hb->granularity) & (BITS_PER_LONG - 1);
+> +    unsigned start_bit_offset;
+> +    uint64_t end_bit, sz;
+>      int64_t res;
+>  
+> +    if (start >= hb->orig_size || (end != -1 && end <= start)) {
+> +        return -1;
+> +    }
+> +
+> +    end_bit = end == -1 ? hb->size : ((end - 1) >> hb->granularity) + 1;
+> +    sz = (end_bit + BITS_PER_LONG - 1) >> BITS_PER_LEVEL;
+> +
+> +    /* There may be some zero bits in @cur before @start. We are not interested
+> +     * in them, let's set them.
+> +     */
+> +    start_bit_offset = (start >> hb->granularity) & (BITS_PER_LONG - 1);
+>      cur |= (1UL << start_bit_offset) - 1;
+>      assert((start >> hb->granularity) < hb->size);
+>  
+> @@ -218,7 +231,7 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
+>      }
+>  
+>      res = (pos << BITS_PER_LEVEL) + ctol(cur);
+> -    if (res >= hb->size) {
+> +    if (res >= end_bit) {
+>          return -1;
+>      }
+>  
+> @@ -652,6 +665,8 @@ HBitmap *hbitmap_alloc(uint64_t size, int granularity)
+>      HBitmap *hb = g_new0(struct HBitmap, 1);
+>      unsigned i;
+>  
+> +    hb->orig_size = size;
+> +
+>      assert(granularity >= 0 && granularity < 64);
+>      size = (size + (1ULL << granularity) - 1) >> granularity;
+>      assert(size <= ((uint64_t)1 << HBITMAP_LOG_MAX_SIZE));
 > 
-> v23 -> v22
->  - rename MUX_MODE to REVISION_1 [Halil]
->  - fixed-length paramenters' instead of 'header' and
->    'variable-length parameters' instead of 'extra parameters' [Halil]
->  - add guidance about VIRTIO_CRYPTO_FLAG_SESSION_MODE [Halil]
->  - other fixes. [Longpeng]
-> 
-> v22 -> v21
->  - fix some typos and grammar fixes [Halil, Stefan]
->  - reorder names in alphabetical order [Stefan]
->  - redescribe the date format [Halil]
-> 
-> v21 -> v20
->  - rename 'queue_id' to 'reserved' [Halil]
->  - redescribe the format of the structures which using 'union'
->    in the previous version [Halil]
-> 
-> v20 -> v19
->  - fix some typos and grammar fixes [Halil]
->  - make queue_id reserved [Halil]
->  - remove 'Steps of Operation'
-> 
-> v19 -> v18:
->  - fix some typos and grammar fixes [Stefan, Halil]
->  - rename VIRTIO_CRYPTO_F_STATELESS_MODE to VIRTIO_CRYPTO_F_MUX_MODE
->  - describe the VIRTIO_CRYPTO_STATUS in detial. [Halil]
->  - refactor and redescribe the controlq/dataq request's format
->    of mux mode. [Halil]
->  - other small fixes. [Halil]
-> 
-> v18 -> v17:
->  - fix many English grammar problems suggested by Stefan, Thanks a lot!
-> 
-> v17 -> v16:
->  - Some grammar fixes [Stefan, Halil, Michael]
->  - add a section named "Supported crypto services" in order to explain bit
->    numbers and valuse clearly. [Halil, Cornelia]
->  - avoid word reptition [Halil]
->  - rename non-session mode to stateless mode [Halil]
->  - change descriptions for all elements in struct virtio_crypto_config [Halil]
->  - add Halil as a reviewer in the ackonwledgement part, thanks for his work.
->  - other fixes here and there.
-> 
-> Changes since v15:
->  - use feature bits for non-session mode in order to keep compatibility with
->    pre-existing code. [Halil & Michael]
->  - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all other
->    non-session mode feature bits.
->  - fix some typos. [Stefan]
->  - introduce struct virtio_crypto_op_data_req_mux to support both session
->    and non-session based crypto operations and keep compatibility with
->    pre-existing code.
-> 
-> Changes since v14:
->  - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
->  - correct a sentence about dataqueue and controlq in the first paragraph. 
-> [Halil]
->  - change a MAY to MUST about max_dataqueues. [Halil]
->  - add non-session mode support
->    a) add four features for different crypto services to identify wheather 
-> support session mode.
->    b) rewrite some
-> 
-> For pervious versions of virtio crypto spec, Pls see:
-> 
-> [v18]:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg444897.html
-> 
-> [v14]:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
-> 
-> [v13]:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
-> 
-> For more information, please see:
->  http://qemu-project.org/Features/VirtioCrypto
-> 
-> Longpeng(Mike) (2):
->   virtio-crypto: Add virtio crypto device specification
->   virtio-crypto: Add conformance clauses
-> 
->  acknowledgements.tex |    4 +
->  conformance.tex      |   29 +
->  content.tex          |    2 +
->  virtio-crypto.tex    | 1533 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 1568 insertions(+)
->  create mode 100644 virtio-crypto.tex
-> 
-> -- 
-> 1.8.3.1
-> 
-> 
-> 
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+
+Despite my comments, I'm OK with or without changes.
+
+Reviewed-by: John Snow <jsnow@redhat.com>
