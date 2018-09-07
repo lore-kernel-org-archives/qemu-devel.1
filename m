@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fyAF5-0002hb-4K
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:27:43 -0400
+	(envelope-from <linzhecheng@huawei.com>) id 1fyAFm-0003SR-1T
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:28:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fyAF1-00018w-Tj
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:27:43 -0400
-References: <20180906055736.20256-1-mark.cave-ayland@ilande.co.uk>
-	<5c204531-2e59-4166-0325-745e4aa98531@redhat.com>
-	<CAFEAcA-Auwy1Mp=L89VYB4xoCG1BFdCWyUjhA4HHFiGmycBjzg@mail.gmail.com>
-	<c2d69fb0-fc47-e145-3b24-c7eb6c9cea45@redhat.com>
-	<507bad9d-61fc-c513-e023-674836eb72a1@ilande.co.uk>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4fa06493-e79b-79f2-ba7c-920de9dc51b2@redhat.com>
-Date: Fri, 7 Sep 2018 08:27:33 +0200
+	(envelope-from <linzhecheng@huawei.com>) id 1fyAFi-0003fr-P8
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:28:25 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:33710 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1fyAFi-0003TW-CG
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 02:28:22 -0400
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Fri, 7 Sep 2018 06:27:59 +0000
+Message-ID: <D9DE8DBB19F2A24080482022C1DE758302CED816@DGGEMM529-MBX.china.huawei.com>
+References: <D9DE8DBB19F2A24080482022C1DE758302CED514@DGGEMM529-MBX.china.huawei.com>
+	<20180906120404.zuvf3kkgmzwkb6a3@sirius.home.kraxel.org>
+	<D9DE8DBB19F2A24080482022C1DE758302CED55C@DGGEMM529-MBX.china.huawei.com>
+	<20180906135223.fy5bsibinxqdhp7t@sirius.home.kraxel.org>
+	<9cc5ff6.583e8.165af44797e.Coremail.linzc@zju.edu.cn>
+	<20180907062307.f7dnpvbok37ztkvo@sirius.home.kraxel.org>
+In-Reply-To: <20180907062307.f7dnpvbok37ztkvo@sirius.home.kraxel.org>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <507bad9d-61fc-c513-e023-674836eb72a1@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] scsi: remove lsi53c895a_create() and
- lsi53c810_create() functions
+Subject: Re: [Qemu-devel] Some confusion about live migration of usb device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: gerd hoffmann <kraxel@redhat.com>, CheneyLin <linzc@zju.edu.cn>
+Cc: "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 2018-09-06 19:15, Mark Cave-Ayland wrote:
-> On 06/09/18 17:40, Thomas Huth wrote:
-[...]
-> Amusingly the main reason I need to expose the LSIState at all is to be
-> able to call scsi_bus_legacy_handle_cmdline() on the SCSI bus object
-> itself. I guess you could say that this is an argument in favour of the
-> existing approach, but then you're effectively moving back to the
-> equivalent of _init() functions for this one particular case which thes=
-e
-> days are considered to be bad.
-
-If you mind that the "init" function creates the object, too, then
-simply remove the two "lsi53c*_create" functions and provide a function
-that looks like this instead:
-
-void lsi53c8xx_handle_legacy_cmdline(DeviceState *lsi_dev)
-{
-    LSIState *s =3D LSI53C895A(lsi_dev);
-
-    scsi_bus_legacy_handle_cmdline(&s->bus);
-}
-
-Then you can create the device from another .c file and simply call this
-new function instead of scsi_bus_legacy_handle_cmdline() in that other
-.c file.
-
-In the long run, I think we should maybe also rather get rid of
-scsi_bus_legacy_handle_cmdline() and either remove -drive if=3Dscsi or
-provide another more generic solution instead (e.g. some code that scans
-the qdev tree for SCSI controllers and attaches the devices declared
-with -drive if=3Dscsi automatically there).
-
-> My feeling is that since the pattern of a separate header with struct
-> and QOM macros (or "modern" style) is used throughout the rest of the
-> codebase, why should we make an exception for this one particular case?
-
-I don't mind too much, so if you post your series again, I won't object
-again. But still, even if it's a little bit more work for you now, if we
-reconsider in a couple of years that information hiding would be a good
-idea, it very likely way more work to make the struct private again, so
-I'd really prefer if you could keep it private now if possible.
-
- Thomas
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogZ2VyZCBob2ZmbWFubiBb
+bWFpbHRvOmtyYXhlbEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlkYXksIFNlcHRlbWJlciAwNywg
+MjAxOCAyOjIzIFBNDQo+IFRvOiBDaGVuZXlMaW4gPGxpbnpjQHpqdS5lZHUuY24+DQo+IENjOiBs
+aW56aGVjaGVuZyA8bGluemhlY2hlbmdAaHVhd2VpLmNvbT47IHdhbmd4aW4gKFUpDQo+IDx3YW5n
+eGlueGluLndhbmdAaHVhd2VpLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBTdWJqZWN0
+OiBSZTogW1FlbXUtZGV2ZWxdIFNvbWUgY29uZnVzaW9uIGFib3V0IGxpdmUgbWlncmF0aW9uIG9m
+IHVzYiBkZXZpY2UNCj4gDQo+IE9uIFRodSwgU2VwIDA2LCAyMDE4IGF0IDEwOjIzOjQ1UE0gKzA4
+MDAsIENoZW5leUxpbiB3cm90ZToNCj4gPg0KPiA+DQo+ID4NCj4gPiA+IC0tLS0t5Y6f5aeL6YKu
+5Lu2LS0tLS0NCj4gPiA+IOWPkeS7tuS6ujogImdlcmQgaG9mZm1hbm4iIDxrcmF4ZWxAcmVkaGF0
+LmNvbT4NCj4gPiA+IOWPkemAgeaXtumXtDogMjAxOC0wOS0wNiAyMTo1MjoyMyAo5pif5pyf5Zub
+KQ0KPiA+ID4g5pS25Lu25Lq6OiBsaW56aGVjaGVuZyA8bGluemhlY2hlbmdAaHVhd2VpLmNvbT4N
+Cj4gPiA+IOaKhOmAgTogIndhbmd4aW4gKFUpIiA8d2FuZ3hpbnhpbi53YW5nQGh1YXdlaS5jb20+
+LCBDaGVuZXlMaW4NCj4gPiA+IDxsaW56Y0B6anUuZWR1LmNuPiwgInFlbXUtZGV2ZWxAbm9uZ251
+Lm9yZyIgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gPiA+IOS4u+mimDogUmU6IFtRZW11LWRl
+dmVsXSBTb21lIGNvbmZ1c2lvbiBhYm91dCBsaXZlIG1pZ3JhdGlvbiBvZiB1c2INCj4gPiA+IGRl
+dmljZQ0KPiA+ID4NCj4gPiA+IE9uIFRodSwgU2VwIDA2LCAyMDE4IGF0IDEyOjEwOjA4UE0gKzAw
+MDAsIGxpbnpoZWNoZW5nIHdyb3RlOg0KPiA+ID4gPiBZb3UgaGFkIHNhaWQgdGhhdCBjb3B5aW5n
+IHZtc3RhdGUgb2YgdXNiLWhvc3QgaXMgcG9pbnRsZXNzLCBzbw0KPiA+ID4gPiBqdXN0IHVucHVs
+ZyBhbmQgcGx1ZyBpdCBhZnRlciBtaWdyYXRpb24gaXMgYWxsIHJpZ2h0LCAgYnV0IHdpbGwgb3Ro
+ZXIgdXNiDQo+IGRldmljZXMgbGlrZSB1c2Itc3RvcmFnZSBkZXZpY2VzIGxvc2UgcGVuZGluZyBV
+U0JQYWNrZXRzIHRoZW4/DQo+ID4gPg0KPiA+ID4gQWgsIGVtdWxhdGVkIHVzYiBkZXZpY2VzLiAg
+VGhlIHVzYiBob3N0IGFkYXB0ZXJzIHdpbGwgcmUtc3VibWl0IGFueQ0KPiA+ID4gdW5maW5pc2hl
+ZCB1c2IgdHJhbnNmZXJzIG9uIHRoZSB0YXJnZXQgbWFjaGluZS4NCj4gPiBZb3UgbWVhbiB0YXJn
+ZXQgdm0gdXNiIGNvbnRyb2xsZXJzIHdpbGwgcmUtc3VibWl0IHRoZW0/DQo+IA0KPiBZZXMuDQo+
+IA0KPiA+IEFuZCB3aGF0IGFib3V0IHVzYi1yZWRpciwgYnR3Pw0KPiANCj4gQmFzaWNhbGx5IHRo
+ZSBzYW1lLiAgQnV0IHNvbWUgZXh0cmEgY2FyZSBpcyBuZWVkZWQgdG8gbWFrZSBzdXJlIHRoZSBw
+aHlzaWNhbA0KPiBkZXZpY2Ugd2lsbCBub3Qgc2VlIHJlcXVlc3RzIHR3aWNlIHdoZW4gdGhlIHRh
+cmdldCBzdGFydHMgcmVwbGF5aW5nIHVuZmluaXNoZWQNCj4gcmVxdWVzdHMuICBBbGwgdXNiIHJl
+cXVlc3RzIGdldCBhIHVuaXF1ZSB0YWcNCj4gKFVTQlBhY2tldC0+aWQpIHNvIHRoZSB1c2JyZWRp
+ciBzZXJ2ZXIgKHR5cGljYWxseSBzcGljZSBjbGllbnQpIGhhcyBhIGNoYW5jZSB0bw0KPiBoYW5k
+bGUgdGhpcyBjb3JyZWN0bHkuDQpJIGdvdCBpdCEgVGhhbmsgeW91IGZvciBwYXRpZW50bHkgYW5z
+d2VyaW5nIG15IHF1ZXN0aW9ucy4NCj4gDQo+IGNoZWVycywNCj4gICBHZXJkDQoNCg==
