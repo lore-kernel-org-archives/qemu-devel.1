@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFs-0000FZ-1n
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFo-0000EZ-6H
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFr-0005L1-46
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFn-0005Gw-CT
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:32 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  7 Sep 2018 17:31:53 +1000
-Message-Id: <20180907073155.26200-13-david@gibson.dropbear.id.au>
+Date: Fri,  7 Sep 2018 17:31:48 +1000
+Message-Id: <20180907073155.26200-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20180907073155.26200-1-david@gibson.dropbear.id.au>
 References: <20180907073155.26200-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/14] Fix a deadlock case in the CPU hotplug
- flow
+Subject: [Qemu-devel] [PULL 07/14] grackle: set device fw_name and address
+ for correct fw path generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,112 +21,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, mark.cave-ayland@ilande.co.uk, Jose Ricardo Ziviani <joserz@linux.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
 
-From: Jose Ricardo Ziviani <joserz@linux.ibm.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-We need to set cs->halted to 1 before calling ppc_set_compat. The reason
-is that ppc_set_compat kicks up the new thread created to manage the
-hotplugged KVM virtual CPU and the code drives directly to KVM_RUN
-ioctl. When cs->halted is 1, the code:
-
-int kvm_cpu_exec(CPUState *cpu)
-...
-     if (kvm_arch_process_async_events(cpu)) {
-         atomic_set(&cpu->exit_request, 0);
-         return EXCP_HLT;
-     }
-...
-
-returns before it reaches KVM_RUN, giving time to the main thread to
-finish its job. Otherwise we can fall in a deadlock because the KVM
-thread will issue the KVM_RUN ioctl while the main thread is setting up
-KVM registers. Depending on how these jobs are scheduled we'll end up
-freezing QEMU.
-
-The following output shows kvm_vcpu_ioctl sleeping because it cannot get
-the mutex and never will.
-PS: kvm_vcpu_ioctl was triggered kvm_set_one_reg - compat_pvr.
-
-STATE: TASK_UNINTERRUPTIBLE|TASK_WAKEKILL
-
-PID: 61564  TASK: c000003e981e0780  CPU: 48  COMMAND: "qemu-system-ppc"
- #0 [c000003e982679a0] __schedule at c000000000b10a44
- #1 [c000003e98267a60] schedule at c000000000b113a8
- #2 [c000003e98267a90] schedule_preempt_disabled at c000000000b11910
- #3 [c000003e98267ab0] __mutex_lock at c000000000b132ec
- #4 [c000003e98267bc0] kvm_vcpu_ioctl at c00800000ea03140 [kvm]
- #5 [c000003e98267d20] do_vfs_ioctl at c000000000407d30
- #6 [c000003e98267dc0] ksys_ioctl at c000000000408674
- #7 [c000003e98267e10] sys_ioctl at c0000000004086f8
- #8 [c000003e98267e30] system_call at c00000000000b488
-
-crash> struct -x kvm.vcpus 0xc000003da0000000
-vcpus = {0xc000003db4880000, 0xc000003d52b80000, 0xc0000039e9c80000, 0xc000003d0e200000, 0xc000003d58280000, 0x0, 0x0, ...}
-
-crash> struct -x kvm_vcpu.mutex.owner 0xc000003d58280000
-  mutex.owner = {
-    counter = 0xc000003a23a5c881 <- flag 1: waiters
-  },
-
-crash> bt 0xc000003a23a5c880
-PID: 61579  TASK: c000003a23a5c880  CPU: 9   COMMAND: "CPU 4/KVM"
-(active)
-
-crash> struct -x kvm_vcpu.mutex.wait_list 0xc000003d58280000
-  mutex.wait_list = {
-    next = 0xc000003e98267b10,
-    prev = 0xc000003e98267b10
-  },
-
-crash> struct -x mutex_waiter.task 0xc000003e98267b10
-  task = 0xc000003e981e0780
-
-The following command-line was used to reproduce the problem (note: gdb
-and trace can change the results).
-
- $ qemu-ppc/build/ppc64-softmmu/qemu-system-ppc64 -cpu host \
-     -enable-kvm -m 4096 \
-     -smp 4,maxcpus=8,sockets=1,cores=2,threads=4 \
-     -display none -nographic \
-     -drive file=disk1.qcow2,format=qcow2
- ...
- (qemu) device_add host-spapr-cpu-core,core-id=4
-[no interaction is possible after it, only SIGKILL to take the terminal
-back]
-
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/pci-host/grackle.c | 17 +++++++++++++++++
+ hw/ppc/mac_oldworld.c |  1 +
+ 2 files changed, 18 insertions(+)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 876f0b3d9d..a73b244a3f 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -34,16 +34,16 @@ static void spapr_cpu_reset(void *opaque)
+diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
+index 4810a4de79..5a151e93e9 100644
+--- a/hw/pci-host/grackle.c
++++ b/hw/pci-host/grackle.c
+@@ -37,6 +37,7 @@
+ typedef struct GrackleState {
+     PCIHostState parent_obj;
  
-     cpu_reset(cs);
++    uint32_t ofw_addr;
+     HeathrowState *pic;
+     qemu_irq irqs[4];
+     MemoryRegion pci_mmio;
+@@ -146,12 +147,28 @@ static const TypeInfo grackle_pci_info = {
+     },
+ };
  
--    /* Set compatibility mode to match the boot CPU, which was either set
--     * by the machine reset code or by CAS. This should never fail.
--     */
--    ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort);
--
-     /* All CPUs start halted.  CPU0 is unhalted from the machine level
-      * reset code and the rest are explicitly started up by the guest
-      * using an RTAS call */
-     cs->halted = 1;
- 
-+    /* Set compatibility mode to match the boot CPU, which was either set
-+     * by the machine reset code or by CAS. This should never fail.
-+     */
-+    ppc_set_compat(cpu, POWERPC_CPU(first_cpu)->compat_pvr, &error_abort);
++static char *grackle_ofw_unit_address(const SysBusDevice *dev)
++{
++    GrackleState *s = GRACKLE_PCI_HOST_BRIDGE(dev);
 +
-     env->spr[SPR_HIOR] = 0;
++    return g_strdup_printf("%x", s->ofw_addr);
++}
++
++static Property grackle_properties[] = {
++    DEFINE_PROP_UINT32("ofw-addr", GrackleState, ofw_addr, -1),
++    DEFINE_PROP_END_OF_LIST()
++};
++
+ static void grackle_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
++    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
  
-     lpcr = env->spr[SPR_LPCR];
+     dc->realize = grackle_realize;
++    dc->props = grackle_properties;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++    dc->fw_name = "pci";
++    sbc->explicit_ofw_unit_address = grackle_ofw_unit_address;
+ }
+ 
+ static const TypeInfo grackle_host_info = {
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 80b5525775..c7b73e274f 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -254,6 +254,7 @@ static void ppc_heathrow_init(MachineState *machine)
+ 
+     /* Grackle PCI host bridge */
+     dev = qdev_create(NULL, TYPE_GRACKLE_PCI_HOST_BRIDGE);
++    qdev_prop_set_uint32(dev, "ofw-addr", 0x80000000);
+     object_property_set_link(OBJECT(dev), OBJECT(pic_dev), "pic",
+                              &error_abort);
+     qdev_init_nofail(dev);
 -- 
 2.17.1
