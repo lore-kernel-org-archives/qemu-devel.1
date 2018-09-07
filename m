@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fyBXp-0007JU-LR
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:51:10 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fyBgN-0002Is-NA
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:00:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fyBXk-0004Lh-Ms
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:51:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37218)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fyBXk-0004Id-Gl
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:51:04 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fyBXg-0004iH-Ab
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 07:51:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 611D32E8193
-	for <qemu-devel@nongnu.org>; Fri,  7 Sep 2018 07:50:57 +0000 (UTC)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fyBgI-0007OU-Nw
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:59:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42986 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fyBgI-0007NL-He
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:59:54 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri,  7 Sep 2018 11:59:36 +0400
+Message-Id: <20180907075948.26917-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Sep 2018 07:45:32 -0000
-From: Eric Auger <1790975@bugs.launchpad.net>
-Reply-To: Bug 1790975 <1790975@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153618529890.17241.16039771895973290192.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153630633266.31534.961905715382881686.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1790975] Re: Default arm virt machine broken
+Subject: [Qemu-devel] [PATCH v2 00/12] Various qemu command line options
+ help improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +27,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi Jonathan,
+Hi,
 
-I sent an email yesterday on the qemu ML.
+This is a compilation of patches I have to improve command line help
+support. The "qemu-option" patches have already been sent earlier, I
+modified the first to fix an issue reported by Markus. The other
+patches add support for -object help. A few related patches for QOM,
+to fix/improve some minor issues.
 
-"
-Please can you try using
-qemu-system-arm -machine virt,highmem=3Doff -m 1024M -kernel zImage
--serial stdio
+v2: after Eric Blake review
+- add "qdev-monitor: print help to stdout"
+- add "cutils: add qemu_pstrcmp"
+- use consistently "arg=3Dtype - desc" help format
 
-Does your guest support LPAE? This may be the cause.
+Marc-Andr=C3=A9 Lureau (12):
+  qdev-monitor: print help to stdout
+  cutils: add qemu_pstrcmp
+  qemu-option: add help fallback to print the list of options
+  qemu-option: improve qemu_opts_print_help() output
+  qom/object: fix iterating properties over a class
+  qom/object: register 'type' property as class property
+  tests/qom-proplist: check duplicate "bv" property registration failed
+  tests/qom-proplist: check properties are not listed multiple times
+  tests/qom-proplist: check class properties iterator
+  vl: handle -object help
+  hostmem: add some properties description
+  vl: list user creatable properties when 'help' is argument
 
-Thanks
+ include/monitor/monitor.h  |  2 ++
+ include/qemu/cutils.h      | 12 +++++++
+ backends/hostmem-memfd.c   |  9 +++++
+ backends/hostmem.c         | 14 ++++++++
+ monitor.c                  | 16 +++++++--
+ qdev-monitor.c             | 32 ++++++++++-------
+ qom/object.c               |  9 ++---
+ qom/object_interfaces.c    |  6 ++--
+ tests/check-qom-proplist.c | 58 ++++++++++++++++++++-----------
+ util/cutils.c              |  5 +++
+ util/qemu-option.c         | 71 +++++++++++++++++++++++++++++++-------
+ vl.c                       | 53 ++++++++++++++++++++++++++--
+ 12 files changed, 227 insertions(+), 60 deletions(-)
 
-Eric
-"
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1790975
-
-Title:
-  Default arm virt machine broken
-
-Status in QEMU:
-  New
-
-Bug description:
-  This occurs on qemu_v3.0.0 but not on qemu_v2.12.2 (built from
-  qemu_v3.0.0 tag on github)
-
-  Symptom: You'll see something like this in the kernel output:
-
-  [    1.285210] OF: PCI: host bridge /pcie@10000000 ranges:
-  [    1.286246] OF: PCI:    IO 0x3eff0000..0x3effffff -> 0x00000000
-  [    1.287061] OF: PCI:   MEM 0x10000000..0x3efeffff -> 0x10000000
-  [    1.287820] OF: PCI:   MEM 0x8000000000..0xffffffffff -> 0x8000000000
-  [    1.289312] pci-host-generic 4010000000.pcie: can't claim ECAM area [m=
-em 0x10000000-0x1fffffff]: address conflict with /pcie@10000000 [mem 0x1000=
-0000-0x3efeffff]
-  [    1.290984] pci-host-generic: probe of 4010000000.pcie failed with err=
-or -16
-
-  Qemu Command Line: qemu-system-arm -machine virt -m 1024M -kernel
-  zImage -serial stdio
-
-  I can post my zImage if anyone has problems reproducing with their own
-  zImage.
-
-  Note that this problem breaks pci making the machine unusable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1790975/+subscriptions
+--=20
+2.19.0.rc1
