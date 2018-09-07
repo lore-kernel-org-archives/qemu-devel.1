@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fyC1t-0001OG-E6
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:22:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1fyC5T-0002Qg-Ar
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fyC1o-0003CX-EE
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:22:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45762 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fyC5O-00066O-CI
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:25:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41060 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fyC1o-00038x-7n
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:22:08 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fyC5O-00063z-6F
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 04:25:50 -0400
 References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
-	<20180907075948.26917-2-marcandre.lureau@redhat.com>
+	<20180907075948.26917-3-marcandre.lureau@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0b0ef581-6cc4-d036-28f1-dfdbd4c36939@redhat.com>
-Date: Fri, 7 Sep 2018 10:22:03 +0200
+Message-ID: <fbd32e27-eaa3-5ef0-c6ec-926577a14d56@redhat.com>
+Date: Fri, 7 Sep 2018 10:25:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180907075948.26917-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180907075948.26917-3-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/12] qdev-monitor: print help to stdout
+Subject: Re: [Qemu-devel] [PATCH v2 02/12] cutils: add qemu_pstrcmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +32,33 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
 On 2018-09-07 09:59, Marc-Andr=C3=A9 Lureau wrote:
-> qdev_device_help() is used from command line "-device help", or from
-> HMP "device_add". If used from command line, print help to stdout
-> (it is only printed on explicit demand).
-
-Good idea, it always bugged me that "-device help" behaves differently
-than "-help"!
-
+> A char** variant of strcmp().
+>=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  include/monitor/monitor.h |  2 ++
->  monitor.c                 | 16 +++++++++++++---
->  qdev-monitor.c            | 32 +++++++++++++++++++-------------
->  3 files changed, 34 insertions(+), 16 deletions(-)
+>  include/qemu/cutils.h | 12 ++++++++++++
+>  util/cutils.c         |  5 +++++
+>  2 files changed, 17 insertions(+)
 >=20
-> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-> index 2ef5e04b37..e7667fda35 100644
-> --- a/include/monitor/monitor.h
-> +++ b/include/monitor/monitor.h
-> @@ -47,4 +47,6 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int du=
-p_fd);
->  void monitor_fdset_dup_fd_remove(int dup_fd);
->  int monitor_fdset_dup_fd_find(int dup_fd);
+> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+> index 47aaa3b0b9..0941639f36 100644
+> --- a/include/qemu/cutils.h
+> +++ b/include/qemu/cutils.h
+> @@ -169,4 +169,16 @@ bool test_buffer_is_zero_next_accel(void);
+>  int uleb128_encode_small(uint8_t *out, uint32_t n);
+>  int uleb128_decode_small(const uint8_t *in, uint32_t *n);
 > =20
-> +void out_vprintf(FILE *stream, const char *fmt, va_list ap) GCC_FMT_AT=
-TR(2, 0);
+> +/**
+> + * qemu_pstrcmp:
+> + * @str1: a pointer to a C string
+> + * @str2: a pointer to a C string
+> + *
+> + * Compares *str1 and *str2 with g_strcmp0().
+> + *
+> + * Returns: an integer less than, equal to, or greater than zero, if
+> + * *str1 is <, =3D=3D or > than *str2 .
+> + */
 
-The name is a little bit too generic for my taste ... but I also fail to
-come up with really good suggestions... maybe "mon_file_vprintf()" or
-something similar?
+Maybe add a comment that str1 or str2 can also be NULL?
 
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
