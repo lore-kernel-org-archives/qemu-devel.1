@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fy6P1-0005Sb-Li
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 22:21:45 -0400
+	(envelope-from <peterx@redhat.com>) id 1fy6nQ-0004vq-Ca
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 22:46:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fy6Ox-00006h-J9
-	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 22:21:43 -0400
-Date: Fri, 7 Sep 2018 10:21:28 +0800
+	(envelope-from <peterx@redhat.com>) id 1fy6nN-0000Vc-2P
+	for qemu-devel@nongnu.org; Thu, 06 Sep 2018 22:46:56 -0400
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180907022128.GK16937@xz-x1>
-References: <20180905113158.23734-1-peterx@redhat.com>
-	<20180905085550.5a84b540@t450s.home> <20180906065312.GD16937@xz-x1>
-	<20180906124136.0b966adc@t450s.home> <20180907010031.GI16937@xz-x1>
-	<20180906195649.763d3f5d@t450s.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180906195649.763d3f5d@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: do address space switching
- when reset
+Date: Fri,  7 Sep 2018 10:46:40 +0800
+Message-Id: <20180907024640.15351-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] intel_iommu: better handling of dmar state
+ switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,160 +18,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>
 
-On Thu, Sep 06, 2018 at 07:56:49PM -0600, Alex Williamson wrote:
-> On Fri, 7 Sep 2018 09:00:31 +0800
-> Peter Xu <peterx@redhat.com> wrote:
-> 
-> > On Thu, Sep 06, 2018 at 12:41:36PM -0600, Alex Williamson wrote:
-> > > On Thu, 6 Sep 2018 14:53:12 +0800
-> > > Peter Xu <peterx@redhat.com> wrote:
-> > >   
-> > > > On Wed, Sep 05, 2018 at 08:55:50AM -0600, Alex Williamson wrote:  
-> > > > > On Wed,  5 Sep 2018 19:31:58 +0800
-> > > > > Peter Xu <peterx@redhat.com> wrote:
-> > > > >     
-> > > > > > We will drop all the mappings when system reset, however we'll still
-> > > > > > keep the existing memory layouts.  That'll be problematic since if IOMMU
-> > > > > > is enabled in the guest and then reboot the guest, SeaBIOS will try to
-> > > > > > drive a device that with no page mapped there.  What we need to do is to
-> > > > > > rebuild the GPA->HPA mapping when system resets, hence ease SeaBIOS.
-> > > > > > 
-> > > > > > Without this patch, a guest that boots on an assigned NVMe device might
-> > > > > > fail to find the boot device after a system reboot/reset and we'll be
-> > > > > > able to observe SeaBIOS errors if turned on:
-> > > > > > 
-> > > > > >   WARNING - Timeout at nvme_wait:144!
-> > > > > > 
-> > > > > > With the patch applied, the guest will be able to find the NVMe drive
-> > > > > > and bootstrap there even after multiple reboots or system resets.
-> > > > > > 
-> > > > > > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1625173
-> > > > > > CC: QEMU Stable <qemu-stable@nongnu.org>
-> > > > > > Tested-by: Cong Li <coli@redhat.com>
-> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > > ---
-> > > > > >  hw/i386/intel_iommu.c | 8 ++++++++
-> > > > > >  1 file changed, 8 insertions(+)
-> > > > > > 
-> > > > > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > > > > index 3dfada19a6..d3eb068d43 100644
-> > > > > > --- a/hw/i386/intel_iommu.c
-> > > > > > +++ b/hw/i386/intel_iommu.c
-> > > > > > @@ -3231,6 +3231,14 @@ static void vtd_reset(DeviceState *dev)
-> > > > > >       * When device reset, throw away all mappings and external caches
-> > > > > >       */
-> > > > > >      vtd_address_space_unmap_all(s);
-> > > > > > +
-> > > > > > +    /*
-> > > > > > +     * Switch address spaces if needed (e.g., when reboot from a
-> > > > > > +     * kernel that has IOMMU enabled, we should switch address spaces
-> > > > > > +     * to rebuild the GPA->HPA mappings otherwise SeaBIOS might
-> > > > > > +     * encounter DMA errors when running with e.g. a NVMe card).
-> > > > > > +     */
-> > > > > > +    vtd_switch_address_space_all(s);
-> > > > > >  }
-> > > > > >  
-> > > > > >  static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)    
-> > > > > 
-> > > > > I'm curious why these aren't part of vtd_init().  vtd_init is where
-> > > > > GCMD is set back to it's power-on state, which disables translation, so
-> > > > > logically we should reset the address space at that point.  Similarly,
-> > > > > the root entry is reset, so it would make sense to throw away all the
-> > > > > mappings there too.  Thanks,    
-> > > > 
-> > > > vtd_init() is only called when realize() or reset, and AFAIU it's not
-> > > > called by GCMD operations.  However I think I get the point that
-> > > > logically we should do similar things in e.g. vtd_handle_gcmd_srtp()
-> > > > when the enable bit switches.
-> > > > 
-> > > > My understanding is that if other things happened rather than the
-> > > > system reboot (e.g., when root pointer is replaced, or during the
-> > > > guest running the guest driver turns DMAR from on to off) the guest
-> > > > will be responsible to do the rest of invalidations first before doing
-> > > > that switch, so we'll possibly do the unmap_all() and address space
-> > > > switches in other places (e.g., in vtd_context_global_invalidate, or
-> > > > per device invalidations).  
-> > > 
-> > > AIUI, the entire global command register is write-once, so the guest
-> > > cannot disable the IOMMU or change the root pointer after it's been
-> > > initialized, except through a system reset.  
-> > 
-> > I'm not sure about this one.  The spec has this though (chap 10.4.4,
-> > Global Command Register):
-> > 
-> >         Register to control remapping hardware. If multiple control
-> >         fields in this register need to be modified, software must
-> >         serialize the modifications through multiple writes to this
-> >         register.
-> > 
-> > So AFAIU it's at least not write-once register since after all the
-> > guest software need to update the register in a per-bit fashion.  And
-> > AFAIU there's no restriction too on turning the global DMAR off after
-> > it's turned on (though Linux won't do that).
-> 
-> I'm sorry, my brain was elsewhere, WO = Write Only, not sure where I
-> came up with Write Once.  I do have an impression that there's
-> something one-way about enabling the IOMMU, but I'm not sure where it
-> is.
+QEMU is not handling the global DMAR switch well, especially when from
+"on" to "off".
 
-No problem.  My impression was that I kept that idea until someday
-someone told me something like "the spec does not forbid turning DMAR
-off again even after it's turned on, so we'd better follow that as an
-emulator", though I can't remember who told me so...
+Let's first take the example of system reset.
 
-CC Kevin Tian in case there's further input.
+Assuming that a guest has IOMMU enabled.  When it reboots, we will drop
+all the existing DMAR mappings to handle the system reset, however we'll
+still keep the existing memory layouts which has the IOMMU memory region
+enabled.  So after the reboot and before the kernel reloads again, there
+will be no mapping at all for the host device.  That's problematic since
+any software (for example, SeaBIOS) that runs earlier than the kernel
+after the reboot will assume the IOMMU is disabled, so any DMA from the
+software will fail.
 
-> 
-> > > I think that means the
-> > > guest can only operate through the invalidation queue at runtime.  The
-> > > bug being fixed here is that the IOMMU has been reset to its power-on
-> > > state where translation is disabled, but the emulation of that disabled
-> > > state also needs to return the per-device address space to that of
-> > > system memory, or identity map thereof.  The commit log seems to imply
-> > > that there's some sort of SeaBIOS issue and we're just doing this to
-> > > help the BIOS, when in reality, we just forgot to reset the per device
-> > > address space and a subsequent boot of a guest that didn't enable the
-> > > IOMMU would have the same sort of issues.  In fact any usage of an
-> > > assigned device prior to re-enabling the IOMMU would fail, there's
-> > > nothing unique to NVMe here.  Thanks,  
-> > 
-> > Sorry for the confusion on the warning line.  I pasted that line to
-> > mainly help people when looking for solutions of problem (by searching
-> > with the error line).  It's of course nothing related to SeaBIOS.  How
-> > about I add another line after the WARNING one: "it's not a SeaBIOS
-> > bug, it's QEMU's problem that caused SeaBIOS to timeout on a DMAR
-> > error"?
-> > 
-> > And yes it should be a general issue but I'm not sure what will
-> > trigger that except this known one.  E.g., I don't think NICs will
-> > easily trigger this since I don't think SeaBIOS will do DMA on the
-> > NICs but I'm not sure.  For other block devices to bootstrap I haven't
-> > tested any (e.g., what if some bios drivers use MMIO/PIO only?  I have
-> > totally no idea...), but I think it'll get that error of course as
-> > long as SeaBIOS/... (anything runs earlier than kernel) tries to do
-> > any form of DMA to any device. If you won't mind, I'll just still keep
-> > the NVMe example to be clear on what's the exact problem we have
-> > encountered, and I add another paragraph emphasizing that it'll also
-> > solve the problem of similar issues where host gets DMA errors during
-> > SeaBIOS boots, and mentioning that this is a common issue.  Would that
-> > work for you?
-> 
-> Yep, I think it's a good idea to have the NVMe error message, so long
-> as we also mention that any assigned device that does DMA prior to the
-> IOMMU being re-enabled could experience the issue as well and not
-> implicate SeaBIOS ("ease SeaBIOS" is a strange phrase).
+For example, a guest that boots on an assigned NVMe device might fail to
+find the boot device after a system reboot/reset and we'll be able to
+observe SeaBIOS errors if we capture the debugging log:
 
-Indeed that's misleading.  I'll rephrase there.
+  WARNING - Timeout at nvme_wait:144!
 
-> You might be
-> right that assigned NICs typically don't do DMA, an assigned SATA
-> controller might though, and we don't really have control since the
-> device could be providing the driver via option ROM.  Thanks,
+Meanwhile, we should see DMAR errors on the host of that NVMe device.
+It's the DMA fault that caused a NVMe driver timeout.
 
-Thank you!  I'll repost with another one with a better commit message.
+The correct fix should be that we do proper switching of device DMA
+address spaces when system resets, which will setup correct memory
+regions and notify the backend of the devices.  This might not affect
+much on non-assigned devices since QEMU VT-d emulation will assume a
+default passthrough mapping if DMAR is not enabled in the GCMD
+register (please refer to vtd_iommu_translate).  However that's required
+for an assigned devices, since that'll rebuild the correct GPA to HPA
+mapping that is needed for any DMA operation during guest bootstrap.
 
+Besides the system reset, we have some other places that might change
+the global DMAR status and we'd better do the same thing there.  For
+example, when we change the state of GCMD register, or the DMAR root
+pointer.  Do the same refresh for all these places.
+
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1625173
+CC: QEMU Stable <qemu-stable@nongnu.org>
+Reported-by: Cong Li <coli@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+--
+v2:
+- do the same for GCMD write, or root pointer update [Alex]
+- test is carried out by me this time, by observing the
+  vtd_switch_address_space tracepoint after system reboot
+v3:
+- rewrite commit message as suggested by Alex
+---
+ hw/i386/intel_iommu.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 3dfada19a6..59dc155911 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -37,6 +37,8 @@
+ #include "kvm_i386.h"
+ #include "trace.h"
+ 
++static void vtd_address_space_refresh_all(IntelIOMMUState *s);
++
+ static void vtd_define_quad(IntelIOMMUState *s, hwaddr addr, uint64_t val,
+                             uint64_t wmask, uint64_t w1cmask)
+ {
+@@ -1428,7 +1430,7 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
+         vtd_reset_context_cache_locked(s);
+     }
+     vtd_iommu_unlock(s);
+-    vtd_switch_address_space_all(s);
++    vtd_address_space_refresh_all(s);
+     /*
+      * From VT-d spec 6.5.2.1, a global context entry invalidation
+      * should be followed by a IOTLB global invalidation, so we should
+@@ -1719,6 +1721,7 @@ static void vtd_handle_gcmd_srtp(IntelIOMMUState *s)
+     vtd_root_table_setup(s);
+     /* Ok - report back to driver */
+     vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_RTPS);
++    vtd_address_space_refresh_all(s);
+ }
+ 
+ /* Set Interrupt Remap Table Pointer */
+@@ -1751,7 +1754,7 @@ static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
+         vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0);
+     }
+ 
+-    vtd_switch_address_space_all(s);
++    vtd_address_space_refresh_all(s);
+ }
+ 
+ /* Handle Interrupt Remap Enable/Disable */
+@@ -3051,6 +3054,12 @@ static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+     }
+ }
+ 
++static void vtd_address_space_refresh_all(IntelIOMMUState *s)
++{
++    vtd_address_space_unmap_all(s);
++    vtd_switch_address_space_all(s);
++}
++
+ static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
+ {
+     memory_region_notify_one((IOMMUNotifier *)private, entry);
+@@ -3226,11 +3235,7 @@ static void vtd_reset(DeviceState *dev)
+     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
+ 
+     vtd_init(s);
+-
+-    /*
+-     * When device reset, throw away all mappings and external caches
+-     */
+-    vtd_address_space_unmap_all(s);
++    vtd_address_space_refresh_all(s);
+ }
+ 
+ static AddressSpace *vtd_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
 -- 
-Peter Xu
+2.17.1
