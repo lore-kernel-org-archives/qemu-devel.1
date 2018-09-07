@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFT-0007UH-Qn
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:13 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFU-0007VT-VG
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fyBFQ-000531-I4
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fyBFT-00055G-M9
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 03:32:12 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  7 Sep 2018 17:31:41 +1000
-Message-Id: <20180907073155.26200-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/14] ppc-for-3.1 queue 20180907
+Date: Fri,  7 Sep 2018 17:31:49 +1000
+Message-Id: <20180907073155.26200-9-david@gibson.dropbear.id.au>
+In-Reply-To: <20180907073155.26200-1-david@gibson.dropbear.id.au>
+References: <20180907073155.26200-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 08/14] mac_oldworld: implement custom
+ FWPathProvider
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,92 +23,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, mark.cave-ayland@ilande.co.uk, David Gibson <david@gibson.dropbear.id.au>
 
-The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd2415574=
-52:
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27=
--v2' into staging (2018-08-27 16:44:20 +0100)
+This enables the correct generation of bootdevice fw paths for in-built IDE
+and virtio-pci-blk devices suitable for OpenBIOS.
 
-are available in the Git repository at:
+Note we also set the MachineClass ignore_boot_device_suffixes property to true
+since an additional disk node should not be added except for virtio devices.
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-3.1-20180907
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/mac_oldworld.c | 58 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
-for you to fetch changes up to be0c46d464c7c6b601adcd21fe9d2dd054a6a2cf:
-
-  target-ppc: Extend HWCAP2 bits for ISA 3.0 (2018-09-07 11:29:50 +1000)
-
-----------------------------------------------------------------
-ppc patch queue 2018-09-07
-
-Here's another pull request for qemu-3.1.  No real theme here, just an
-assortment of various fixes.  Probably the most notable thing is the
-removal of the ppcemb target which has been deprecated for some time
-now.
-
-----------------------------------------------------------------
-Emilio G. Cota (1):
-      spapr: fix leak of rev array
-
-Greg Kurz (1):
-      spapr_pci: fix potential NULL pointer dereference
-
-Jose Ricardo Ziviani (1):
-      Fix a deadlock case in the CPU hotplug flow
-
-Mark Cave-Ayland (7):
-      macio: move MACIOIDEState type declarations to macio.h
-      macio: add macio bus to help with fw path generation
-      macio: add addr property to macio IDE object
-      grackle: set device fw_name and address for correct fw path generat=
-ion
-      mac_oldworld: implement custom FWPathProvider
-      uninorth: add ofw-addr property to allow correct fw path generation
-      mac_newworld: implement custom FWPathProvider
-
-Nikunj A Dadhania (1):
-      target/ppc/kvm: set vcpu as online/offline
-
-Sam Bobroff (1):
-      spapr: Correct reference count on spapr-cpu-core
-
-Sandipan Das (1):
-      target-ppc: Extend HWCAP2 bits for ISA 3.0
-
-Thomas Huth (1):
-      ppc: Remove deprecated ppcemb target
-
- configure                          | 13 ++-------
- cpus.c                             |  1 -
- default-configs/ppcemb-softmmu.mak | 23 ---------------
- hw/ide/macio.c                     |  2 ++
- hw/misc/macio/macio.c              | 42 ++++++++++++++++++++-------
- hw/pci-host/grackle.c              | 17 +++++++++++
- hw/pci-host/uninorth.c             | 16 +++++++++++
- hw/ppc/mac.h                       | 26 -----------------
- hw/ppc/mac_newworld.c              | 59 ++++++++++++++++++++++++++++++++=
-+++++-
- hw/ppc/mac_oldworld.c              | 59 ++++++++++++++++++++++++++++++++=
-+++++-
- hw/ppc/ppc405_boards.c             | 14 ---------
- hw/ppc/ppc440_bamboo.c             |  7 -----
- hw/ppc/sam460ex.c                  |  7 -----
- hw/ppc/spapr.c                     |  3 ++
- hw/ppc/spapr_cpu_core.c            | 11 +++----
- hw/ppc/spapr_pci.c                 |  2 +-
- hw/ppc/spapr_rtas.c                |  2 ++
- hw/ppc/virtex_ml507.c              |  7 -----
- include/exec/poison.h              |  1 -
- include/hw/misc/macio/macio.h      | 37 ++++++++++++++++++++++++
- include/hw/pci-host/uninorth.h     |  1 +
- linux-user/elfload.c               |  2 ++
- qapi/common.json                   |  2 +-
- qemu-deprecated.texi               |  6 ----
- target/ppc/cpu-qom.h               |  2 --
- target/ppc/cpu.h                   | 16 -----------
- target/ppc/kvm.c                   | 13 +++++++--
- target/ppc/kvm_ppc.h               |  7 +++++
- target/ppc/mmu_helper.c            |  6 ++--
- target/ppc/translate_init.inc.c    | 35 +---------------------
- tests/machine-none-test.c          |  1 -
- 31 files changed, 259 insertions(+), 181 deletions(-)
- delete mode 100644 default-configs/ppcemb-softmmu.mak
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index c7b73e274f..9891c325a9 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -42,6 +42,7 @@
+ #include "hw/misc/macio/macio.h"
+ #include "hw/ide.h"
+ #include "hw/loader.h"
++#include "hw/fw-path-provider.h"
+ #include "elf.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/kvm.h"
+@@ -373,6 +374,54 @@ static void ppc_heathrow_init(MachineState *machine)
+     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
+ }
+ 
++/*
++ * Implementation of an interface to adjust firmware path
++ * for the bootindex property handling.
++ */
++static char *heathrow_fw_dev_path(FWPathProvider *p, BusState *bus,
++                                  DeviceState *dev)
++{
++    PCIDevice *pci;
++    IDEBus *ide_bus;
++    IDEState *ide_s;
++    MACIOIDEState *macio_ide;
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "macio-oldworld")) {
++        pci = PCI_DEVICE(dev);
++        return g_strdup_printf("mac-io@%x", PCI_SLOT(pci->devfn));
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "macio-ide")) {
++        macio_ide = MACIO_IDE(dev);
++        return g_strdup_printf("ata-3@%x", macio_ide->addr);
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-drive")) {
++        ide_bus = IDE_BUS(qdev_get_parent_bus(dev));
++        ide_s = idebus_active_if(ide_bus);
++
++        if (ide_s->drive_kind == IDE_CD) {
++            return g_strdup("cdrom");
++        }
++
++        return g_strdup("hd");
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-hd")) {
++        return g_strdup("hd");
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "ide-cd")) {
++        return g_strdup("cdrom");
++    }
++
++    if (!strcmp(object_get_typename(OBJECT(dev)), "virtio-blk-device")) {
++        return g_strdup("disk");
++    }
++
++    return NULL;
++}
++
+ static int heathrow_kvm_type(const char *arg)
+ {
+     /* Always force PR KVM */
+@@ -382,6 +431,7 @@ static int heathrow_kvm_type(const char *arg)
+ static void heathrow_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
++    FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(oc);
+ 
+     mc->desc = "Heathrow based PowerMAC";
+     mc->init = ppc_heathrow_init;
+@@ -395,12 +445,18 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
+     mc->kvm_type = heathrow_kvm_type;
+     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("750_v3.1");
+     mc->default_display = "std";
++    mc->ignore_boot_device_suffixes = true;
++    fwc->get_dev_path = heathrow_fw_dev_path;
+ }
+ 
+ static const TypeInfo ppc_heathrow_machine_info = {
+     .name          = MACHINE_TYPE_NAME("g3beige"),
+     .parent        = TYPE_MACHINE,
+-    .class_init    = heathrow_class_init
++    .class_init    = heathrow_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_FW_PATH_PROVIDER },
++        { }
++    },
+ };
+ 
+ static void ppc_heathrow_register_types(void)
+-- 
+2.17.1
