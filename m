@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyDjK-0007d4-1x
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:11:11 -0400
+	(envelope-from <prvs=781850b12=tim.smith@citrix.com>)
+	id 1fyDtK-0001tz-6M
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fyDjG-0003Fd-Qa
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:11:10 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:46495)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fyDjG-000328-6r
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:11:06 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id a108-v6so14331413wrc.13
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 03:11:04 -0700 (PDT)
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<152819516675.30857.9162557650483931182.stgit@pasha-ThinkPad-T60>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <152819516675.30857.9162557650483931182.stgit@pasha-ThinkPad-T60>
-Date: Fri, 07 Sep 2018 11:11:02 +0100
-Message-ID: <87zhwtzkg9.fsf@linaro.org>
+	(envelope-from <prvs=781850b12=tim.smith@citrix.com>)
+	id 1fyDtF-0001vs-9l
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:21:30 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:46156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=781850b12=tim.smith@citrix.com>)
+	id 1fyDtF-0001fZ-04
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 06:21:25 -0400
+From: Tim Smith <tim.smith@citrix.com>
+Date: Fri, 7 Sep 2018 11:21:20 +0100
+Message-ID: <153631568068.32214.13361287430751567885.stgit@dhcp-3-135.uk.xensource.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 2/7] Add plugin support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH 1/3] Improve xen_disk batching behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,300 +27,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
+To: qemu-devel@nongnu.org
 
+When I/O consists of many small requests, performance is improved by
+batching them together in a single io_submit() call. When there are
+relatively few requests, the extra overhead is not worth it. This
+introduces a check to start batching I/O requests via blk_io_plug()/
+blk_io_unplug() in an amount proportional to the number which were
+already in flight at the time we started reading the ring.
 
-Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+Signed-off-by: Tim Smith <tim.smith@citrix.com>
+---
+ hw/block/xen_disk.c |   29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-> This patch adds support for dynamically loaded plugins.
-> Every plugin is a dynamic library with a set of optional exported
-> functions that will be called from QEMU.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> ---
-<snip>
->  qemu-options.hx           |   10 +++++
->  vl.c                      |    8 ++++
-
-There are a couple of trivial conflicts vs master here, simple to fix.
-
->  7 files changed, 143 insertions(+), 1 deletion(-)
->  create mode 100644 include/qemu/plugins.h
->  create mode 100644 plugins/include/plugins.h
->  create mode 100644 plugins/plugins.c
->
-> diff --git a/Makefile.target b/Makefile.target
-> index dad2cf8..4cffd96 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -93,6 +93,7 @@ all: $(PROGS) stap
->  # cpu emulator library
->  obj-y +=3D exec.o
->  obj-y +=3D accel/
-> +obj-$(CONFIG_PLUGINS) +=3D plugins/plugins.o
->  obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-o=
-p-gvec.o
->  obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/optimize.o
->  obj-$(CONFIG_TCG_INTERPRETER) +=3D tcg/tci.o
-> diff --git a/configure b/configure
-> index a71bf9b..34e6f00 100755
-> --- a/configure
-> +++ b/configure
-> @@ -373,6 +373,7 @@ EXESUF=3D""
->  DSOSUF=3D".so"
->  LDFLAGS_SHARED=3D"-shared"
->  modules=3D"no"
-> +plugins=3D"no"
->  prefix=3D"/usr/local"
->  mandir=3D"\${prefix}/share/man"
->  datadir=3D"\${prefix}/share"
-> @@ -922,6 +923,12 @@ for opt do
->    --disable-modules)
->        modules=3D"no"
->    ;;
-> +  --enable-plugins)
-> +      plugins=3D"yes"
-> +  ;;
-> +  --disable-plugins)
-> +      plugins=3D"no"
-> +  ;;
->    --cpu=3D*)
->    ;;
->    --target-list=3D*) target_list=3D"$optarg"
-> @@ -1567,6 +1574,7 @@ disabled with --disable-FEATURE, default is enabled=
- if available:
->    guest-agent-msi build guest agent Windows MSI installation package
->    pie             Position Independent Executables
->    modules         modules support
-> +  plugins         plugins support
->    debug-tcg       TCG debugging (default is disabled)
->    debug-info      debugging information
->    sparse          sparse checker
-> @@ -3392,7 +3400,7 @@ else
->      glib_req_ver=3D2.22
->  fi
->  glib_modules=3Dgthread-2.0
-> -if test "$modules" =3D yes; then
-> +if test "$modules" =3D yes || test "$plugins" =3D yes; then
->      glib_modules=3D"$glib_modules gmodule-export-2.0"
->  fi
->
-> @@ -5777,6 +5785,7 @@ if test "$slirp" =3D "yes" ; then
->      echo "smbd              $smbd"
->  fi
->  echo "module support    $modules"
-> +echo "plugin support    $plugins"
->  echo "host CPU          $cpu"
->  echo "host big endian   $bigendian"
->  echo "target list       $target_list"
-> @@ -6111,6 +6120,9 @@ if test "$modules" =3D "yes"; then
->    echo "CONFIG_STAMP=3D_$( (echo $qemu_version; echo $pkgversion; cat $0=
-) | $shacmd - | cut -f1 -d\ )" >> $config_host_mak
->    echo "CONFIG_MODULES=3Dy" >> $config_host_mak
->  fi
-> +if test "$plugins" =3D "yes"; then
-> +  echo "CONFIG_PLUGINS=3Dy" >> $config_host_mak
-> +fi
->  if test "$have_x11" =3D "yes" -a "$need_x11" =3D "yes"; then
->    echo "CONFIG_X11=3Dy" >> $config_host_mak
->    echo "X11_CFLAGS=3D$x11_cflags" >> $config_host_mak
-> diff --git a/include/qemu/plugins.h b/include/qemu/plugins.h
-> new file mode 100644
-> index 0000000..4464822
-> --- /dev/null
-> +++ b/include/qemu/plugins.h
-> @@ -0,0 +1,8 @@
-> +#ifndef PLUGINS_H
-> +#define PLUGINS_H
-> +
-> +void qemu_plugin_parse_cmd_args(const char *optarg);
-> +void qemu_plugin_load(const char *filename, const char *args);
-> +void qemu_plugins_init(void);
-> +
-> +#endif /* PLUGINS_H */
-> diff --git a/plugins/include/plugins.h b/plugins/include/plugins.h
-> new file mode 100644
-> index 0000000..100a786
-> --- /dev/null
-> +++ b/plugins/include/plugins.h
-> @@ -0,0 +1,12 @@
-> +#ifndef PLUGINS_INTERFACE_H
-> +#define PLUGINS_INTERFACE_H
-> +
-> +#include <stdbool.h>
-> +
-> +/* Plugin interface */
-> +
-> +bool plugin_init(const char *args);
-> +bool plugin_needs_before_insn(uint64_t pc, void *cpu);
-> +void plugin_before_insn(uint64_t pc, void *cpu);
-> +
-> +#endif /* PLUGINS_INTERFACE_H */
-> diff --git a/plugins/plugins.c b/plugins/plugins.c
-> new file mode 100644
-> index 0000000..eabc931
-> --- /dev/null
-> +++ b/plugins/plugins.c
-> @@ -0,0 +1,91 @@
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/plugins.h"
-> +#include "qemu/queue.h"
-> +#include <gmodule.h>
-> +
-> +typedef bool (*PluginInitFunc)(const char *);
-> +typedef bool (*PluginNeedsBeforeInsnFunc)(uint64_t, void *);
-> +typedef void (*PluginBeforeInsnFunc)(uint64_t, void *);
-> +
-> +typedef struct QemuPluginInfo {
-> +    const char *filename;
-> +    const char *args;
-> +    GModule *g_module;
-> +
-> +    PluginInitFunc init;
-> +    PluginNeedsBeforeInsnFunc needs_before_insn;
-
-It seems a bit heavyweight to have a query function here. Is this
-dynamic state the plugin might change during execution? If not could we
-not better report plugin requirements during initialisation?
-
-> +    PluginBeforeInsnFunc before_insn;
-> +
-> +    QLIST_ENTRY(QemuPluginInfo) next;
-> +} QemuPluginInfo;
-> +
-> +static QLIST_HEAD(, QemuPluginInfo) qemu_plugins
-> +                                =3D QLIST_HEAD_INITIALIZER(qemu_plugins);
-> +
-> +static QemuOptsList qemu_plugin_opts =3D {
-> +    .name =3D "plugin",
-> +    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_plugin_opts.head),
-> +    .desc =3D {
-> +        {
-> +            .name =3D "file",
-> +            .type =3D QEMU_OPT_STRING,
-> +        },{
-> +            .name =3D "args",
-> +            .type =3D QEMU_OPT_STRING,
-> +        },
-> +        { /* end of list */ }
-> +    },
-> +};
-> +
-> +void qemu_plugin_parse_cmd_args(const char *optarg)
-> +{
-> +    QemuOpts *opts =3D qemu_opts_parse_noisily(&qemu_plugin_opts, optarg=
-, false);
-> +    qemu_plugin_load(qemu_opt_get(opts, "file"),
-> +        qemu_opt_get(opts, "args"));
-> +}
-> +
-> +void qemu_plugin_load(const char *filename, const char *args)
-> +{
-> +    GModule *g_module;
-> +    QemuPluginInfo *info =3D NULL;
-> +    if (!filename) {
-> +        error_report("plugin name was not specified");
-> +        return;
-> +    }
-> +    g_module =3D g_module_open(filename,
-> +        G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL);
-> +    if (!g_module) {
-> +        error_report("can't load plugin '%s'", filename);
-> +        return;
-> +    }
-> +    info =3D g_new0(QemuPluginInfo, 1);
-> +    info->filename =3D g_strdup(filename);
-> +    info->g_module =3D g_module;
-> +    if (args) {
-> +        info->args =3D g_strdup(args);
-> +    }
-> +
-> +    g_module_symbol(g_module, "plugin_init", (gpointer*)&info->init);
-> +
-> +    /* Get the instrumentation callbacks */
-> +    g_module_symbol(g_module, "plugin_needs_before_insn",
-> +        (gpointer*)&info->needs_before_insn);
-> +    g_module_symbol(g_module, "plugin_before_insn",
-> +        (gpointer*)&info->before_insn);
-
-In fact could the presence of an "optional" symbol imply it's need here?
-
-> +
-> +    QLIST_INSERT_HEAD(&qemu_plugins, info, next);
-> +
-> +    return;
-> +}
-> +
-> +void qemu_plugins_init(void)
-> +{
-> +    QemuPluginInfo *info;
-> +    QLIST_FOREACH(info, &qemu_plugins, next) {
-> +        if (info->init) {
-> +            info->init(info->args);
-> +        }
-> +    }
-> +}
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index c0d3951..d171544 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3950,6 +3950,16 @@ Dump json-encoded vmstate information for current =
-machine type to file
->  in @var{file}
->  ETEXI
->
-> +#ifdef CONFIG_PLUGINS
-> +DEF("plugin", HAS_ARG, QEMU_OPTION_plugin, \
-> +           "-plugin file=3D<file>[,args=3D<args>] load <dso> plugin with=
- <args>\n", QEMU_ARCH_ALL)
-> +STEXI
-> +@item -plugin file=3D@var{file}[,args=3D@var{args}]
-> +@findex -plugin
-> +Load @var{file} plugin passing @var{args} arguments.
-> +ETEXI
-> +#endif
-> +
->  STEXI
->  @end table
->  ETEXI
-> diff --git a/vl.c b/vl.c
-> index 0603171..05420bf 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -129,6 +129,7 @@ int main(int argc, char **argv)
->  #include "qapi/qapi-commands-run-state.h"
->  #include "qapi/qmp/qerror.h"
->  #include "sysemu/iothread.h"
-> +#include "qemu/plugins.h"
->
->  #define MAX_VIRTIO_CONSOLES 1
->
-> @@ -3925,6 +3926,11 @@ int main(int argc, char **argv, char **envp)
->                      exit(1);
->                  }
->                  break;
-> +#ifdef CONFIG_PLUGINS
-> +            case QEMU_OPTION_plugin:
-> +                qemu_plugin_parse_cmd_args(optarg);
-> +                break;
-> +#endif
->              case QEMU_OPTION_nodefconfig:
->              case QEMU_OPTION_nouserconfig:
->                  /* Nothing to be parsed here. Especially, do not error o=
-ut below. */
-> @@ -4470,6 +4476,8 @@ int main(int argc, char **argv, char **envp)
->      }
->      parse_numa_opts(current_machine);
->
-> +    qemu_plugins_init();
-> +
->      /* do monitor/qmp handling at preconfig state if requested */
->      main_loop();
->
-
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+index 36eff94f84..6cb40d66fa 100644
+--- a/hw/block/xen_disk.c
++++ b/hw/block/xen_disk.c
+@@ -101,6 +101,9 @@ struct XenBlkDev {
+     AioContext          *ctx;
+ };
+ 
++/* Threshold of in-flight requests above which we will start using
++ * blk_io_plug()/blk_io_unplug() to batch requests */
++#define IO_PLUG_THRESHOLD 1
+ /* ------------------------------------------------------------- */
+ 
+ static void ioreq_reset(struct ioreq *ioreq)
+@@ -542,6 +545,8 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
+ {
+     RING_IDX rc, rp;
+     struct ioreq *ioreq;
++    int inflight_atstart = blkdev->requests_inflight;
++    int batched = 0;
+ 
+     blkdev->more_work = 0;
+ 
+@@ -550,6 +555,16 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
+     xen_rmb(); /* Ensure we see queued requests up to 'rp'. */
+ 
+     blk_send_response_all(blkdev);
++    /* If there was more than IO_PLUG_THRESHOLD ioreqs in flight
++     * when we got here, this is an indication that there the bottleneck
++     * is below us, so it's worth beginning to batch up I/O requests
++     * rather than submitting them immediately. The maximum number
++     * of requests we're willing to batch is the number already in
++     * flight, so it can grow up to max_requests when the bottleneck
++     * is below us */
++    if (inflight_atstart > IO_PLUG_THRESHOLD) {
++        blk_io_plug(blkdev->blk);
++    }
+     while (rc != rp) {
+         /* pull request from ring */
+         if (RING_REQUEST_CONS_OVERFLOW(&blkdev->rings.common, rc)) {
+@@ -589,7 +604,21 @@ static void blk_handle_requests(struct XenBlkDev *blkdev)
+             continue;
+         }
+ 
++        if (inflight_atstart > IO_PLUG_THRESHOLD && batched >= inflight_atstart) {
++            blk_io_unplug(blkdev->blk);
++        }
+         ioreq_runio_qemu_aio(ioreq);
++        if (inflight_atstart > IO_PLUG_THRESHOLD) {
++            if (batched >= inflight_atstart) {
++                blk_io_plug(blkdev->blk);
++                batched=0;
++            } else {
++                batched++;
++            }
++        }
++    }
++    if (inflight_atstart > IO_PLUG_THRESHOLD) {
++        blk_io_unplug(blkdev->blk);
+     }
+ 
+     if (blkdev->more_work && blkdev->requests_inflight < blkdev->max_requests) {
