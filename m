@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fyJQg-0006M9-Vc
+	(envelope-from <kwolf@redhat.com>) id 1fyJQg-0006Lz-Qk
 	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:16:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fyJQb-0004MT-Og
+	(envelope-from <kwolf@redhat.com>) id 1fyJQa-0004M8-RC
 	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 12:16:16 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri,  7 Sep 2018 18:15:19 +0200
-Message-Id: <20180907161520.26349-14-kwolf@redhat.com>
+Date: Fri,  7 Sep 2018 18:15:15 +0200
+Message-Id: <20180907161520.26349-10-kwolf@redhat.com>
 In-Reply-To: <20180907161520.26349-1-kwolf@redhat.com>
 References: <20180907161520.26349-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 13/14] block: Remove aio_poll() in
- bdrv_drain_poll variants
+Subject: [Qemu-devel] [PATCH 09/14] block-backend: Fix potential double
+ blk_delete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +23,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, qemu-devel@nongnu.org
 
-bdrv_drain_poll_top_level() was buggy because it didn't release the
-AioContext lock of the node to be drained before calling aio_poll().
-This way, callbacks called by aio_poll() would possibly take the lock a
-second time and run into a deadlock with a nested AIO_WAIT_WHILE() call.
+blk_unref() first decreases the refcount of the BlockBackend and calls
+blk_delete() if the refcount reaches zero. Requests can still be in
+flight at this point, they are only drained during blk_delete():
 
-However, it turns out that the aio_poll() call isn't actually needed any
-more. It was introduced in commit 91af091f923, which is effectively
-reverted by this patch. The cases it was supposed to fix are now covered
-by bdrv_drain_poll(), which waits for block jobs to reach a quiescent
-state.
+At this point, arbitrary callbacks can run. If any callback takes a
+temporary BlockBackend reference, it will first increase the refcount to
+1 and then decrease it to 0 again, triggering another blk_delete(). This
+will cause a use-after-free crash in the outer blk_delete().
+
+Fix it by draining the BlockBackend before decreasing to refcount to 0.
+Assert in blk_ref() that it never takes the first refcount (which would
+mean that the BlockBackend is already being deleted).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/io.c | 8 --------
- 1 file changed, 8 deletions(-)
+ block/block-backend.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/block/io.c b/block/io.c
-index 914ba78f1a..8b81ff3913 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -268,10 +268,6 @@ bool bdrv_drain_poll(BlockDriverState *bs, bool recursive,
- static bool bdrv_drain_poll_top_level(BlockDriverState *bs, bool recursive,
-                                       BdrvChild *ignore_parent)
+diff --git a/block/block-backend.c b/block/block-backend.c
+index efa8d8011c..1b2d7a6ff5 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -435,6 +435,7 @@ int blk_get_refcnt(BlockBackend *blk)
+  */
+ void blk_ref(BlockBackend *blk)
  {
--    /* Execute pending BHs first and check everything else only after the BHs
--     * have executed. */
--    while (aio_poll(bs->aio_context, false));
--
-     return bdrv_drain_poll(bs, recursive, ignore_parent, false);
++    assert(blk->refcnt > 0);
+     blk->refcnt++;
  }
  
-@@ -511,10 +507,6 @@ static bool bdrv_drain_all_poll(void)
-     BlockDriverState *bs = NULL;
-     bool result = false;
- 
--    /* Execute pending BHs first (may modify the graph) and check everything
--     * else only after the BHs have executed. */
--    while (aio_poll(qemu_get_aio_context(), false));
--
-     /* bdrv_drain_poll() can't make changes to the graph and we are holding the
-      * main AioContext lock, so iterating bdrv_next_all_states() is safe. */
-     while ((bs = bdrv_next_all_states(bs))) {
+@@ -447,7 +448,11 @@ void blk_unref(BlockBackend *blk)
+ {
+     if (blk) {
+         assert(blk->refcnt > 0);
+-        if (!--blk->refcnt) {
++        if (blk->refcnt > 1) {
++            blk->refcnt--;
++        } else {
++            blk_drain(blk);
++            blk->refcnt = 0;
+             blk_delete(blk);
+         }
+     }
 -- 
 2.13.6
