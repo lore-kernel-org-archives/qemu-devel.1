@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fybBH-0004fq-Rf
-	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 07:13:36 -0400
+	(envelope-from <macro@linux-mips.org>) id 1fybSN-0001YL-N0
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 07:31:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fybBE-0008Oq-Op
-	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 07:13:35 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3b38ed9b-9fa4-85c5-5f79-033bd7f28e84@amsat.org>
-Date: Sat, 8 Sep 2018 08:08:12 -0300
+	(envelope-from <macro@linux-mips.org>) id 1fybSJ-00018l-NP
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 07:31:15 -0400
+Received: from eddie.linux-mips.org ([148.251.95.138]:55222
+	helo=cvs.linux-mips.org) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <macro@linux-mips.org>) id 1fybSI-0000yG-AU
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 07:31:11 -0400
+Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
+	with ESMTP id S23994059AbeIHLbAUy7Je (ORCPT
+	<rfc822;qemu-devel@nongnu.org>); Sat, 8 Sep 2018 13:31:00 +0200
+Date: Sat, 8 Sep 2018 12:31:00 +0100 (BST)
+Sender: "Maciej W. Rozycki" <macro@linux-mips.org>
+From: "Maciej W. Rozycki" <macro@linux-mips.org>
+In-Reply-To: <20180907191619.GA11275@r52>
+Message-ID: <alpine.LFD.2.21.1809081228590.764@eddie.linux-mips.org>
+References: <20180707194137.GB14409@localhost.localdomain>
+	<alpine.LFD.2.21.1808010159390.4967@eddie.linux-mips.org>
+	<20180801133922.GC2371@localhost.localdomain>
+	<c4b04967-c6fa-eea6-4c6e-7001c48344ba@linaro.org>
+	<20180907191619.GA11275@r52>
 MIME-Version: 1.0
-In-Reply-To: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] scsi: replace lsi53c895a_create()
- and lsi53c810_create() functions
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2] target/mips: Initial support for MIPS
+ R5900
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +34,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, pbonzini@redhat.com, famz@redhat.com, hpoussin@reactos.org, rth@twiddle.net, peter.maydell@linaro.org, thuth@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Fredrik Noring <noring@nocrew.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <aleksandar.markovic@mips.com>, =?UTF-8?Q?J=C3=BCrgen_Urban?= <JuergenUrban@gmx.de>, qemu-devel@nongnu.org
 
-On 9/7/18 9:56 AM, Mark Cave-Ayland wrote:
-> As part of an upcoming 40p patchset I have a requirement to change the PCI
-> configuration of the LSI SCSI. However since commits a64aa5785d "hw: Deprecate -drive
-> if=scsi with non-onboard HBAs" and b891538e81 "hw/ppc/prep: Fix implicit creation of
-> "-drive if=scsi", the lsi53c8*_create() wrapper functions don't return the device
-> state itself.
-> 
-> This patchset replaces the lsi53c895a_create() and lsi53c810_create() functions
-> with a single lsi53c8xx_handle_legacy_cmdline() function as suggested by Thomas,
-> which makes the caller responsible for initing the LSI SCSI device and hence
-> allowing it to be configured as required.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Hi Fredrik,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Aleksandar, Aurelien, Maciej -- are you happy with this initial v2 patch?
 
-> 
-> v2:
-> - Don't split LSIState into separate lsi53c895a.h header but instead use a new
->   lsi53c8xx_handle_legacy_cmdline() function as suggested by Thomas
-> 
-> 
-> Mark Cave-Ayland (3):
->   scsi: add lsi53c8xx_handle_legacy_cmdline() function
->   scsi: move lsi53c8xx_create() callers to
->     lsi53c8xx_handle_legacy_cmdline()
->   scsi: remove unused lsi53c895a_create() and lsi53c810_create()
->     functions
-> 
->  hw/arm/realview.c    |  3 ++-
->  hw/arm/versatilepb.c |  3 ++-
->  hw/hppa/machine.c    |  4 +++-
->  hw/ppc/prep.c        |  4 +++-
->  hw/scsi/lsi53c895a.c | 11 ++---------
->  include/hw/pci/pci.h |  3 +--
->  6 files changed, 13 insertions(+), 15 deletions(-)
-> 
+ I have skimmed over and I have a couple of comments.  I'll try to 
+finalise them ASAP, however I'm currently at the GNU Tools Cauldron and 
+much of my time is taken by the event.
+
+  Maciej
