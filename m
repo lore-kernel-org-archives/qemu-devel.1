@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fyQqe-0001JC-Td
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 20:11:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fyRZK-0006Ah-NP
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 20:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fyQiY-0004zK-39
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 20:03:18 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:39891)
+	(envelope-from <peter.maydell@linaro.org>) id 1fyRZJ-0000oU-GJ
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 20:57:46 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:40893)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fyQiX-0004w8-Rb
-	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 20:03:14 -0400
-Received: by mail-wm0-x232.google.com with SMTP id q8-v6so16091809wmq.4
-	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 17:03:13 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180707194137.GB14409@localhost.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <dde6d3cb-f2a4-e36b-69ac-8147fc5e752d@amsat.org>
-Date: Fri, 7 Sep 2018 21:03:01 -0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fyRZF-0000V2-Qv
+	for qemu-devel@nongnu.org; Fri, 07 Sep 2018 20:57:45 -0400
+Received: by mail-oi0-x241.google.com with SMTP id l202-v6so30461143oig.7
+	for <qemu-devel@nongnu.org>; Fri, 07 Sep 2018 17:57:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180707194137.GB14409@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="CbPhDbTYNftN9T9B71LYk8KtAYqC3IrGN"
-Subject: Re: [Qemu-devel] [RFC] target/mips: Initial support for MIPS R5900
+In-Reply-To: <87lg8dz809.fsf@linaro.org>
+References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+	<87lg8dz809.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 8 Sep 2018 01:57:19 +0100
+Message-ID: <CAFEAcA-iTfGnjc+0ndTMxZ=RYRCK3_RRmE1RCNgDnTVL_brrXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
+ prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,76 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <aleksandar.markovic@mips.com>
-Cc: Fredrik Noring <noring@nocrew.org>, =?UTF-8?Q?J=c3=bcrgen_Urban?= <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, maria.klimushenkova@ispras.ru, Pavel Dovgalyuk <dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CbPhDbTYNftN9T9B71LYk8KtAYqC3IrGN
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Aleksandar Markovic <aleksandar.markovic@mips.com>
-Cc: Fredrik Noring <noring@nocrew.org>, =?UTF-8?Q?J=c3=bcrgen_Urban?=
- <JuergenUrban@gmx.de>, "Maciej W. Rozycki" <macro@linux-mips.org>
-Message-ID: <dde6d3cb-f2a4-e36b-69ac-8147fc5e752d@amsat.org>
-Subject: Re: [Qemu-devel] [RFC] target/mips: Initial support for MIPS R5900
-References: <20180707194137.GB14409@localhost.localdomain>
-In-Reply-To: <20180707194137.GB14409@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 7 September 2018 at 15:39, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
+>
+>> The following series implements dynamic binary instrumentation upon
+>> QEMU.
+>
+> OK I've done a pass through the patches, final comments bellow.
+>
+> <snip>
+>>
+>> For the current patches the plugins should provide the following
+>> callbacks:
+>>  - "needs" callback to check whether the specific instruction
+>>    should be instrumented by this plugin
+>>  - "run" callback which called before executing the instuction
+>
+> I think with a little re-jigging we could reduce this to a single run
+> call which can then decide if it is going to deal with things in this
+> case.
+>
+>> Our instrumentation subsystem exploits TCG helper mechanism to embed
+>> callbacks into the translation blocks. These callbacks may be inserted
+>> before the specific instructions.
+>>
+>> The aim of submission of this series at that early stage is to get
+>> the feedback which will guide the development process. We are faced
+>> the following questions:
+>>  1. Does every plugins should have its own callback embedded into the TB
+>>     (which will cause TB extra growth in case of multiple plugins),
+>>     or the instrumentation layer's callback should invoke the plugins
+>>     that wanted to instrument that specific instruction?
+>
+> The common case is having one plugin and I'd rather give the flexibility
+> of what helper to call and how much information to give it to the plugin
+> and deal with the potential to have multiple helper calls per
+> instruction for the complex cases.
+>
+> Now I can see arguments against it from an interface complexity point of
+> view but I think plugins should get access to the TCG functions so they
+> can generate their own op sequences if need be and not have to call a
+> helper at all if they don't need to.
 
-Hi,
+I strongly disagree -- plugins should not have access to details
+of QEMU internals that might change from version to version, and
+definitely not access to generating their own TCG code.
 
-On 7/7/18 4:41 PM, Fredrik Noring wrote:
-[...]
-> --- a/target/mips/mips-defs.h
-> +++ b/target/mips/mips-defs.h
-> @@ -52,6 +52,7 @@
->  #define   ASE_MSA       0x01000000
-> =20
->  /* Chip specific instructions. */
-> +#define		INSN_R5900	0x10000000
-
-We have 4 bits to store the chip-specific instructions and this is the
-last bit available.
-
-Any objection to upraise CPUMIPSState.insn_flags to a uint64_t?
-I'd then shift the chip-specific bits to the 32 upper bits, to keep this
-flag clean.
-
->  #define		INSN_LOONGSON2E  0x20000000
->  #define		INSN_LOONGSON2F  0x40000000
->  #define		INSN_VR54XX	0x80000000
-> @@ -62,6 +63,7 @@
->  #define		CPU_MIPS3	(CPU_MIPS2 | ISA_MIPS3)
->  #define		CPU_MIPS4	(CPU_MIPS3 | ISA_MIPS4)
->  #define		CPU_VR54XX	(CPU_MIPS4 | INSN_VR54XX)
-> +#define		CPU_R5900	(CPU_MIPS4 | INSN_R5900)
->  #define		CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
->  #define		CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F)
-[...]
-
-
---CbPhDbTYNftN9T9B71LYk8KtAYqC3IrGN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAluTEbYACgkQ4+MsLN6t
-wN5hhA/+LWiUbyglR4JHUMdEpcox/xJRo7X1+QbHFib6GREcMeluAoGI9C8yCQoK
-gXTb1vzA7mlZeCm4mp3u+SM6RoNO52tWxM6CRg9s0gWHxmNZTnYjacUnumqjBbPG
-WyIoXFP8DMUZGuYP8u2K4OytjSMjzm4dj5QvHL4fof4x7/R4wN/VI07/+dCD52ma
-9Aq80DiQTAuzCv7bsYC70x52twIRKPZsA2x+KHY3fzO3RDDCg6ySTqKJudDavq2q
-FkwWOj76xX/hxL7NfC4MQhEHZNPHhMRtPF4PL+r+0Bl8nqMHir2ZmwnAgCngqNdc
-ufqOsUbBaWI0QmpbA9zxcwniqBFDyXxOPKpm2ESRoi3bS5Hyd0S0AOygF/yILpAt
-mBJP3BGAq+x3CBg8WSqi2jly3AhH8O3b6Vo8YM3QH+wPAqq9UtEp1G9fcdhwNQWE
-xjeXLncUvTYYwwYKSSaSoN8WfiNjs2cm6e9rfH2bv+uq30vkyafImY6p4rqb/zb+
-0pzGhbR+Z+mM47ic5BBDSoKQkKfS/jfnxGlE9mxA/Zu3JCC0S91wOFUZ481mMh/g
-XpBP6KU+CUIuChdt7wwxSaDAl37A8lmodkZlDi5svCJuBTZ6lVgMVyl5Vd4iySFo
-xTUj9huyzB+UzEMLY8HsUwQpYNFqRKAhIOtSorx2xNuUKQzzCGE=
-=fhGx
------END PGP SIGNATURE-----
-
---CbPhDbTYNftN9T9B71LYk8KtAYqC3IrGN--
+thanks
+-- PMM
