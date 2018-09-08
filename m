@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fyYuj-0004Uo-A9
-	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 04:48:22 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fyZEV-0002nD-Kb
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 05:08:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fyYuf-0007Me-57
-	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 04:48:21 -0400
-References: <20180827110544.12256-1-mark.cave-ayland@ilande.co.uk>
-	<alpine.BSF.2.21.1808271903170.61025@zero.eik.bme.hu>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fyZES-0003Of-H4
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 05:08:47 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <df6be48b-1bff-b48e-d698-da1c6fea7961@ilande.co.uk>
-Date: Sat, 8 Sep 2018 09:47:55 +0100
-MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1808271903170.61025@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] 40p: fix PCI interrupt routing
+Date: Sat,  8 Sep 2018 10:08:17 +0100
+Message-Id: <20180908090820.15591-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH v2 0/3] 40p: fix PCI interrupt routing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +17,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-ppc@nongnu.org, hpoussin@reactos.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: hpoussin@reactos.org, david@gibson.dropbear.id.au, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 27/08/18 18:12, BALATON Zoltan wrote:
+According to the PReP specification section 6.1.6 "System Interrupt
+Assignments", all PCI interrupts are routed via IRQ 15.
 
-> On Mon, 27 Aug 2018, Mark Cave-Ayland wrote:
->> According to the PReP specification section 6.1.6 "System Interrupt
->> Assignments", all PCI interrupts are routed via IRQ 15.
->>
->> With this patch applied it is now possible to boot the sandalfoot
->> zImage all the way through to a working userspace when using
->> OpenBIOS.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->> hw/ppc/prep.c | 9 +++++----
->> 1 file changed, 5 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
->> index 162b27a3b8..e82c1355d9 100644
->> --- a/hw/ppc/prep.c
->> +++ b/hw/ppc/prep.c
->> @@ -668,10 +668,11 @@ static void ibm_40p_init(MachineState *machine)
->>     dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"));
->>     qdev_connect_gpio_out(dev, 0,
->>                           cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
->> -    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
->> -    sysbus_connect_irq(pcihost, 1, qdev_get_gpio_in(dev, 13));
->> -    sysbus_connect_irq(pcihost, 2, qdev_get_gpio_in(dev, 15));
->> -    sysbus_connect_irq(pcihost, 3, qdev_get_gpio_in(dev, 13));
->> +    /* According to PReP specification section 6.1.6 "System Interrupt
->> +     * Assignments", all PCI interrupts are routed via IRQ 15 */
->> +    for (i = 0; i < PCI_NUM_PINS; i++) {
->> +        sysbus_connect_irq(pcihost, i, qdev_get_gpio_in(dev, 15));
->> +    }
-> 
-> I'm not sure but this looks similar to what we had with sam460ex:
-> 
-> http://lists.nongnu.org/archive/html/qemu-ppc/2018-07/msg00359.html
-> 
-> I think you may not connect multiple interrupts to the same host irq
-> line this way but you either need an OR gate or handle it within the
-> mapping in the PCI host model (which is what we ended up with for the
-> sam460ex). Peter's suggestion was to do whichever matches real hardware
-> the most if you can find out that (as noted here also with more
-> explanation that could be useful):
-> 
-> http://lists.nongnu.org/archive/html/qemu-ppc/2018-07/msg00360.html
-> 
-> But I could be mistaken in this case, haven't checked it in detail.
+In the case of the 40p machine this isn't quite true in that it has a routing
+quirk: the LSI SCSI device is always routed to IRQ 13. At least Linux and
+NetBSD compare the model name presented by the firmware to "IBM PPS Model
+6015", and if it matches will active this quirk.
 
-Thanks for the pointer. I now have a follow-up patchset that implements
-this, however it seems the real 40p machine has a routing quirk: the LSI
-SCSI device is separately routed to IRQ 13. So while it's not quite a
-pure OR of the 4 PCI IRQs, it's fairly close...
+There is also a slight issue in that whilst the legacy PReP machine is still
+present in the codebase, the old IRQ routing must still be preserved. This is
+done by introducing a new "is-legacy-prep" qdev property to the raven PCI host
+bridge which preserves the old routing for -M prep until that code is finally
+removed.
 
+In order for guest OSs to make use of the fixed IRQ routing, the model name
+in the residual data must be changed in OpenBIOS using the diff below:
 
-ATB,
+diff --git a/arch/ppc/qemu/context.c b/arch/ppc/qemu/context.c
+index 06e0122..5815895 100644
+--- a/arch/ppc/qemu/context.c
++++ b/arch/ppc/qemu/context.c
+@@ -111,7 +111,7 @@ static void *
+ residual_build(uint32_t memsize, uint32_t load_base, uint32_t load_size)
+ {
+     residual_t *res;
+-    const unsigned char model[] = "Qemu\0PPC\0";
++    const unsigned char model[] = "IBM PPS Model 6015\0";
+     int i;
+ 
+     res = malloc(sizeof(residual_t));
 
-Mark.
+With the above OpenBIOS patch applied as well as this patchset, it is now
+possible to boot the sandalfoot zImage all the way through to a working
+userspace when using OpenBIOS.
+
+(Note: this patchset requires the changes in my previous patchset "scsi:
+replace lsi53c895a_create() and lsi53c810_create() functions)
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Based-on: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
+
+Mark Cave-Ayland (3):
+  raven: some minor IRQ-related tidy-ups
+  40p: use OR gate to wire up raven PCI interrupts
+  40p: add fixed IRQ routing for LSI SCSI device
+
+ hw/pci-host/prep.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++-------
+ hw/ppc/prep.c      | 12 ++++++----
+ 2 files changed, 66 insertions(+), 13 deletions(-)
+
+-- 
+2.11.0
