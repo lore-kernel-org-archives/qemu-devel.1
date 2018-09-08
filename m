@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1fyfsW-0006kG-4f
-	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 12:14:33 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1fygAF-000544-CQ
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 12:32:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1fyfsS-00050w-Ra
-	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 12:14:32 -0400
-From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sat,  8 Sep 2018 18:14:21 +0200
-Message-Id: <20180908161421.18089-1-hpoussin@reactos.org>
+	(envelope-from <hpoussin@reactos.org>) id 1fyg4q-0002Tp-89
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 12:27:16 -0400
+References: <20180908161421.18089-1-hpoussin@reactos.org>
+	<4be43e71-1fdc-bc8a-8554-24b1a487b97b@weilnetz.de>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <9c583862-6945-951f-9da0-174ff8ced5a7@reactos.org>
+Date: Sat, 8 Sep 2018 18:27:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <4be43e71-1fdc-bc8a-8554-24b1a487b97b@weilnetz.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] hw/ppc: on 40p machine,
+Subject: Re: [Qemu-devel] [PATCH v3] hw/ppc: on 40p machine,
  change default firmware to OpenBIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,56 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
-Use it, instead of relying on an unmaintained and very limited firmware.
+Le 08/09/2018 à 18:20, Stefan Weil a écrit :
+> Am 08.09.2018 um 18:14 schrieb Hervé Poussineau:
+> [...]
+>> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+>> index f123b15e3e..f865822e32 100644
+>> --- a/tests/boot-serial-test.c
+>> +++ b/tests/boot-serial-test.c
+>> @@ -75,12 +75,12 @@ typedef struct testdef {
+>>   static testdef_t tests[] = {
+>>       { "alpha", "clipper", "", "PCI:" },
+>>       { "ppc", "ppce500", "", "U-Boot" },
+>> -    { "ppc", "40p", "-boot d", "Booting from device d" },
+>> +    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+>>       { "ppc", "g3beige", "", "PowerPC,750" },
+>>       { "ppc", "mac99", "", "PowerPC,G4" },
+>>       { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
+>>       { "ppc64", "ppce500", "", "U-Boot" },
+>> -    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
+>> +    { "ppc64", "40p", "-m 192", "Memory: 192M" },
+> 
+> I suggest using "Memory: 192 MiB" (like in the code for sam460ex above).
 
-Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
----
-Changes v2->v3:
-- rebased on dgibson/ppc-for-3.1
+No, because OpenBIOS doesn't print the "iB" letters...
 
-Changes v1->v2:
-- rebased on master
-- fixed tests
-
- hw/ppc/prep.c            | 2 +-
- tests/boot-serial-test.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 162b27a3b8..baca1d7c04 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -651,7 +651,7 @@ static void ibm_40p_init(MachineState *machine)
-     /* PCI host */
-     dev = qdev_create(NULL, "raven-pcihost");
-     if (!bios_name) {
--        bios_name = BIOS_FILENAME;
-+        bios_name = "openbios-ppc";
-     }
-     qdev_prop_set_string(dev, "bios-name", bios_name);
-     qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index f123b15e3e..f865822e32 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -75,12 +75,12 @@ typedef struct testdef {
- static testdef_t tests[] = {
-     { "alpha", "clipper", "", "PCI:" },
-     { "ppc", "ppce500", "", "U-Boot" },
--    { "ppc", "40p", "-boot d", "Booting from device d" },
-+    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
-     { "ppc", "g3beige", "", "PowerPC,750" },
-     { "ppc", "mac99", "", "PowerPC,G4" },
-     { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
-     { "ppc64", "ppce500", "", "U-Boot" },
--    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
-+    { "ppc64", "40p", "-m 192", "Memory: 192M" },
-     { "ppc64", "mac99", "", "PowerPC,970FX" },
-     { "ppc64", "pseries", "", "Open Firmware" },
-     { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
--- 
-2.11.0
+Hervé
