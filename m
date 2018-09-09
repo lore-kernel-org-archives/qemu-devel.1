@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fz4Ny-0000tr-HS
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 14:24:39 -0400
+	(envelope-from <viktor.prutyanov@phystech.edu>) id 1fz4Re-0003BN-Ia
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 14:28:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fz4Nu-0007DY-Fp
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 14:24:38 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <817e08da-e255-7d1f-4668-503bd3c009d1@weilnetz.de>
-Date: Sun, 9 Sep 2018 14:24:31 -0400
+	(envelope-from <viktor.prutyanov@phystech.edu>) id 1fz4Ra-0002p6-Gu
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 14:28:26 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:43935)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <viktor.prutyanov@phystech.edu>)
+	id 1fz4Ra-0002lp-8C
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 14:28:22 -0400
+Received: by mail-lj1-x241.google.com with SMTP id m84-v6so15981385lje.10
+	for <qemu-devel@nongnu.org>; Sun, 09 Sep 2018 11:28:20 -0700 (PDT)
+Date: Sun, 9 Sep 2018 21:28:16 +0300
+From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Message-ID: <20180909212816.6e0f0ee5@phystech.edu>
+In-Reply-To: <1535567456-6904-1-git-send-email-viktor.prutyanov@virtuozzo.com>
+References: <1535567456-6904-1-git-send-email-viktor.prutyanov@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <2DD892A7-1C5C-452E-9D5D-4FEABB5CB48B@gmail.com>
-References: <20180909153238.4046-1-programmingkidx@gmail.com>
-	<817e08da-e255-7d1f-4668-503bd3c009d1@weilnetz.de>
-Subject: Re: [Qemu-devel] [PATCH] qemu-common.h: update copyright date to
- 2018
+Subject: Re: [Qemu-devel] [PATCH] dump: fix Windows dump memory run mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
+To: pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, rkagan@virtuozzo.com
 
+=D0=92 Wed, 29 Aug 2018 21:30:56 +0300
+Viktor Prutyanov <viktor.prutyanov@virtuozzo.com> =D0=BF=D0=B8=D1=88=D0=B5=
+=D1=82:
 
-> On Sep 9, 2018, at 1:34 PM, Stefan Weil <sw@weilnetz.de> wrote:
+> We should map and use guest memory run by parts if it can't be mapped
+> as a whole.
+> After this patch, continuos guest physical memory blocks which are not
+> continuos in host virtual address space will be processed correctly.
 >=20
-> Am 09.09.2018 um 17:32 schrieb John Arbuckle:
->> Currently the copyright date is set to 2017. Update the date to say
->> 2018.
->>=20
->> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
->> ---
->> include/qemu-common.h | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>=20
->> diff --git a/include/qemu-common.h b/include/qemu-common.h
->> index 85f4749aef..ed60ba251d 100644
->> --- a/include/qemu-common.h
->> +++ b/include/qemu-common.h
->> @@ -17,7 +17,7 @@
->> #define TFR(expr) do { if ((expr) !=3D -1) break; } while (errno =3D=3D=
- EINTR)
->>=20
->> /* Copyright string for -version arguments, About dialogs, etc */
->> -#define QEMU_COPYRIGHT "Copyright (c) 2003-2017 " \
->> +#define QEMU_COPYRIGHT "Copyright (c) 2003-2018 " \
->>     "Fabrice Bellard and the QEMU Project developers"
->>=20
->> /* Bug reporting information for --help arguments, About dialogs, etc =
-*/
->>=20
+> Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+> ---
+>  win_dump.c | 40 ++++++++++++++++++++++------------------
+>  1 file changed, 22 insertions(+), 18 deletions(-)
 >=20
->=20
-> Reviewed-by: Stefan Weil <sw@weilnetz.de>
->=20
-> I think this is trivial enough for qemu-trivial.
->=20
-> Thanks,
-> Stefan
+> diff --git a/win_dump.c b/win_dump.c
+> index b15c191..aa39d9c 100644
+> --- a/win_dump.c
+> +++ b/win_dump.c
+> @@ -30,28 +30,32 @@ static size_t write_run(WinDumpPhyMemRun64 *run,
+> int fd, Error **errp) void *buf;
+>      uint64_t addr =3D run->BasePage << TARGET_PAGE_BITS;
+>      uint64_t size =3D run->PageCount << TARGET_PAGE_BITS;
+> -    uint64_t len =3D size;
+> +    uint64_t len, l;
+> +    size_t total =3D 0;
+> =20
+> -    buf =3D cpu_physical_memory_map(addr, &len, false);
+> -    if (!buf) {
+> -        error_setg(errp, "win-dump: failed to map run");
+> -        return 0;
+> -    }
+> -    if (len !=3D size) {
+> -        error_setg(errp, "win-dump: failed to map entire run");
+> -        len =3D 0;
+> -        goto out_unmap;
+> -    }
+> +    while (size) {
+> +        len =3D size;
+> =20
+> -    len =3D qemu_write_full(fd, buf, len);
+> -    if (len !=3D size) {
+> -        error_setg(errp, QERR_IO_ERROR);
+> -    }
+> +        buf =3D cpu_physical_memory_map(addr, &len, false);
+> +        if (!buf) {
+> +            error_setg(errp, "win-dump: failed to map physical range"
+> +                             " 0x%016lx-0x%016lx", addr, addr + size
+> - 1);
+> +            return 0;
+> +        }
+> +
+> +        l =3D qemu_write_full(fd, buf, len);
+> +        cpu_physical_memory_unmap(buf, addr, false, len);
+> +        if (l !=3D len) {
+> +            error_setg(errp, QERR_IO_ERROR);
+> +            return 0;
+> +        }
+> =20
+> -out_unmap:
+> -    cpu_physical_memory_unmap(buf, addr, false, len);
+> +        addr +=3D l;
+> +        size -=3D l;
+> +        total +=3D l;
+> +    }
+> =20
+> -    return len;
+> +    return total;
+>  }
+> =20
+>  static void write_runs(DumpState *s, WinDumpHeader64 *h, Error
+> **errp)
 
-Thank you for reviewing my patch. Yeah it probably should be considered =
-trivial.=
+ping
