@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51112)
+Received: from eggs.gnu.org ([208.118.235.92]:33173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <viktor.prutyanov@phystech.edu>) id 1fz4Re-0003BN-Ia
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 14:28:27 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fz6W9-0000qk-Ib
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 16:41:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <viktor.prutyanov@phystech.edu>) id 1fz4Ra-0002p6-Gu
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 14:28:26 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:43935)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fz6Po-0008Ka-Gk
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 16:34:44 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:43809)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <viktor.prutyanov@phystech.edu>)
-	id 1fz4Ra-0002lp-8C
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 14:28:22 -0400
-Received: by mail-lj1-x241.google.com with SMTP id m84-v6so15981385lje.10
-	for <qemu-devel@nongnu.org>; Sun, 09 Sep 2018 11:28:20 -0700 (PDT)
-Date: Sun, 9 Sep 2018 21:28:16 +0300
-From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-Message-ID: <20180909212816.6e0f0ee5@phystech.edu>
-In-Reply-To: <1535567456-6904-1-git-send-email-viktor.prutyanov@virtuozzo.com>
-References: <1535567456-6904-1-git-send-email-viktor.prutyanov@virtuozzo.com>
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1fz6Po-0008JW-A9
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 16:34:40 -0400
+Received: by mail-wr1-x434.google.com with SMTP id k5-v6so19743555wre.10
+	for <qemu-devel@nongnu.org>; Sun, 09 Sep 2018 13:34:40 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20180824093343.11346-1-peter.maydell@linaro.org>
+	<20180824093343.11346-22-peter.maydell@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <141d1a23-9559-25ed-d1ea-eae14e3f7daf@redhat.com>
+Date: Sun, 9 Sep 2018 22:34:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] dump: fix Windows dump memory run mapping
+In-Reply-To: <20180824093343.11346-22-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 21/52] hw/timer/cmsdk-apb-dualtimer:
+ Implement CMSDK dual timer module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, rkagan@virtuozzo.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 
-=D0=92 Wed, 29 Aug 2018 21:30:56 +0300
-Viktor Prutyanov <viktor.prutyanov@virtuozzo.com> =D0=BF=D0=B8=D1=88=D0=B5=
-=D1=82:
-
-> We should map and use guest memory run by parts if it can't be mapped
-> as a whole.
-> After this patch, continuos guest physical memory blocks which are not
-> continuos in host virtual address space will be processed correctly.
->=20
-> Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
-> ---
->  win_dump.c | 40 ++++++++++++++++++++++------------------
->  1 file changed, 22 insertions(+), 18 deletions(-)
->=20
-> diff --git a/win_dump.c b/win_dump.c
-> index b15c191..aa39d9c 100644
-> --- a/win_dump.c
-> +++ b/win_dump.c
-> @@ -30,28 +30,32 @@ static size_t write_run(WinDumpPhyMemRun64 *run,
-> int fd, Error **errp) void *buf;
->      uint64_t addr =3D run->BasePage << TARGET_PAGE_BITS;
->      uint64_t size =3D run->PageCount << TARGET_PAGE_BITS;
-> -    uint64_t len =3D size;
-> +    uint64_t len, l;
-> +    size_t total =3D 0;
-> =20
-> -    buf =3D cpu_physical_memory_map(addr, &len, false);
-> -    if (!buf) {
-> -        error_setg(errp, "win-dump: failed to map run");
-> -        return 0;
-> -    }
-> -    if (len !=3D size) {
-> -        error_setg(errp, "win-dump: failed to map entire run");
-> -        len =3D 0;
-> -        goto out_unmap;
-> -    }
-> +    while (size) {
-> +        len =3D size;
-> =20
-> -    len =3D qemu_write_full(fd, buf, len);
-> -    if (len !=3D size) {
-> -        error_setg(errp, QERR_IO_ERROR);
-> -    }
-> +        buf =3D cpu_physical_memory_map(addr, &len, false);
-> +        if (!buf) {
-> +            error_setg(errp, "win-dump: failed to map physical range"
-> +                             " 0x%016lx-0x%016lx", addr, addr + size
-> - 1);
-> +            return 0;
-> +        }
+On 24/08/2018 11:33, Peter Maydell wrote:
+> ze);
 > +
-> +        l =3D qemu_write_full(fd, buf, len);
-> +        cpu_physical_memory_unmap(buf, addr, false, len);
-> +        if (l !=3D len) {
-> +            error_setg(errp, QERR_IO_ERROR);
-> +            return 0;
-> +        }
-> =20
-> -out_unmap:
-> -    cpu_physical_memory_unmap(buf, addr, false, len);
-> +        addr +=3D l;
-> +        size -=3D l;
-> +        total +=3D l;
-> +    }
-> =20
-> -    return len;
-> +    return total;
->  }
-> =20
->  static void write_runs(DumpState *s, WinDumpHeader64 *h, Error
-> **errp)
+> + if (offset >= A_TIMERITCR) {
+> + switch (offset) {
+> + case A_TIMERITCR:
+> + s->timeritcr = value & R_TIMERITCR_VALID_MASK;
+> + cmsdk_apb_dualtimer_update(s);
+> + case A_TIMERITOP:
+> + s->timeritop = value & R_TIMERITOP_VALID_MASK;
+> + cmsdk_apb_dualtimer_update(s);
+> + default:
 
-ping
+Two missing "break"s here (Coverity CID 1395626 and 1395633).
+
+Paolo
