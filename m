@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([208.118.235.92]:40945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fyx0e-0005dd-4C
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 06:32:05 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fz1tW-0000EW-Nm
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 11:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fywyW-0003M9-7V
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 06:29:53 -0400
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:40910)
+	(envelope-from <programmingkidx@gmail.com>) id 1fz1hn-0003Oc-9n
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 11:32:58 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:51857)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1fywyV-0003L3-Qg
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 06:29:52 -0400
-Received: by mail-yw1-xc43.google.com with SMTP id z143-v6so6870570ywa.7
-	for <qemu-devel@nongnu.org>; Sun, 09 Sep 2018 03:29:51 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180905150033.ntsvj4vtqzcreiwi@kamzik.brq.redhat.com>
-References: <CAHmQWvC4Kp1CAeCe8ZTGtSeG7fnT=Xen4GFKfnhTBWUCJdQV+g@mail.gmail.com>
-	<20180829134219.cmyqipnvukk6k2rp@kamzik.brq.redhat.com>
-	<CAHmQWvA5t7zbbDDM0UvuKSL_Z8ey+x+vOGZumYjwsq0FC5AHGA@mail.gmail.com>
-	<20180830083117.iekobw7l3arkt24m@bivouac.eciton.net>
-	<CAFEAcA_s+9-4PYHyx_aAnxwt4e=VH77uBG7rC4JA++nOyjAaPw@mail.gmail.com>
-	<20180830100233.nr6fm3npy57zl4xx@bivouac.eciton.net>
-	<CAKv+Gu9r+1OBOSUBW_KpDEEoKyc=iwW4zVEe04-_JUnJtSGupQ@mail.gmail.com>
-	<CAHmQWvBDjMeBpe9Puv+oRii3JrVULW_+AYJL9WV1tXT7F7ALfg@mail.gmail.com>
-	<20180905120248.unyh6q4msvyx4f43@kamzik.brq.redhat.com>
-	<CAHmQWvAD2Zaz94AxoAScBT8jL8WZqiTMdiuzKPxrZ_3Uvk5ihg@mail.gmail.com>
-	<20180905150033.ntsvj4vtqzcreiwi@kamzik.brq.redhat.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Sun, 9 Sep 2018 18:29:50 +0800
-Message-ID: <CAHmQWvBPG7LBuFOPr4wq+w_jczN8mWFv3fPywFdB8P+c98Dqnw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/arm: Add Arm Enterprise machine
- type
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1fz1hn-0003OO-4G
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 11:32:55 -0400
+Received: by mail-it0-x244.google.com with SMTP id e14-v6so26461730itf.1
+	for <qemu-devel@nongnu.org>; Sun, 09 Sep 2018 08:32:54 -0700 (PDT)
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Sun,  9 Sep 2018 11:32:38 -0400
+Message-Id: <20180909153238.4046-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH] qemu-common.h: update copyright date to 2018
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,140 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-Well, thank you all for the discussions, we achieved some agreement,
-and there are still things for further review.
-The v3 patch has been sent out, we can move there and review/discuss
-the updated patch now.
+Currently the copyright date is set to 2017. Update the date to say
+2018.
 
-Thanks.
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+ include/qemu-common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 5 September 2018 at 23:00, Andrew Jones <drjones@redhat.com> wrote:
-> On Wed, Sep 05, 2018 at 10:09:46PM +0800, Hongbo Zhang wrote:
->> On 5 September 2018 at 20:02, Andrew Jones <drjones@redhat.com> wrote:
->> > On Wed, Sep 05, 2018 at 06:08:57PM +0800, Hongbo Zhang wrote:
->> >> On 30 August 2018 at 21:29, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> >> > On 30 August 2018 at 12:02, Leif Lindholm <leif.lindholm@linaro.org> wrote:
->> >> >> On Thu, Aug 30, 2018 at 09:39:33AM +0100, Peter Maydell wrote:
->> >> >>> On 30 August 2018 at 09:31, Leif Lindholm <leif.lindholm@linaro.org> wrote:
->> >> >>> > On Thu, Aug 30, 2018 at 03:07:29PM +0800, Hongbo Zhang wrote:
->> >> >>> >> @Ard, @Leif, is there any possibility to remove all the DT nodes?
->> >> >>> >> On real hardware, how does UEFI find the memory size and CPU number?
->> >> >>> >
->> >> >>> > Usually by asking some form of SCP/PMU.
->> >> >>> > So until we have rock-solid multi-cpu-instance (making terms up here,
->> >> >>> > there may be a proper name already?) support upstream, we need to take
->> >> >>> > shortcuts.
->> >> >>>
->> >> >>> I would expect that you'd want a "faked-on-the-QEMU end" SCP
->> >> >>> communications endpoint to start with anyway. We have one of
->> >> >>> those for vexpress, for instance.
->> >> >>
->> >> >> Ah, I wasn't aware we did!
->> >> >>
->> >> >> In that case - sure, that is probably the more sensible solution.
->> >> >> Does it emulate SCMI?
->> >> >>
->> >> >
->> >> > The purpose of the SBSA/SBBR qemu machine is prototyping the
->> >> > interactions between rich firmware and the OS for things like RAS,
->> >> > secure variable storage for UEFI or capsule update.
->> >> >
->> >> > How exactly the firmware figures out how many CPUs and how much memory
->> >> > we are running with is out of scope for this, and so I don't think
->> >> > there is a need to build something from scratch here: DT will do just
->> >> > fine, given that both EDK2 and ARM-TF have working DT code for these
->> >> > things.
->> >>
->> >> Ard, we need to clarify which DT nodes should be kept in SBSA-ref QEMU.
->> >> I've researched and tested, there are 3 kinds of DT nodes in the
->> >> current 'virt' machine:
->> >>
->> >> a) CPU DT node, because it is dynamic according to input parameters,
->> >> and we don't want to get it by other way, so we agreed to keep it.
->> >
->> > I have a patch series on the list[*] (which I need to refresh) that
->> > would also add a generated cpu-map node. I think the SBSA-ref machine
->> > may be interested in testing more complex cpu topologies, but that won't
->> > be easy to do with ACPI boot guests unless the topology is hard coded.
->> > How will sbsa-ref know when it should use a hard coded cpu topology vs.
->> > a dynamic number of cpus in a flat topology?
->> >
->> If I understand you question correctly: for the cpu topology, firmware
->> always get CPU DT from QEMU (which is generated dynamically form
->> command parameter), so it is always dynamic, not hard coded in this
->> case.
->> (and then firmware may translate this DT and insert it into a whole
->> ACPI to load OS, it is up to the firmware developer)
->
-> I doubt firmware developers will want to generate ACPI tables. Maybe
-> multiple tables can be pre-generated and then selected by firmware
-> using a parameter passed to it from QEMU through the DT though.
->
->>
->> And I even considered, do we really need dynamic CPU nodes for such
->> platform?
->
-> That was my question. If you do, then I think things get complicated
-> quick.
->
->> memory size has to be dynamic, but it isn't in DT.
->
-> Memory size is in the DT. Making it dynamic may also be complicated
-> though unless you only want one chunk of contiguous memory. If you
-> want to represent SBSA machines that have multiple NUMA nodes and/or
-> gaps in the physical address space, then your ACPI tables will not
-> be patched easily. I.e. you'll want static ACPI tables regarding
-> different memory configurations too.
->
->>
->> > [*] http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg01170.html
->> >
->> >> b) GIC, UART, Timer (and RTC?) nodes, these nodes are now used by
->> >> UEFI, if removed, UEFI needs a rework to not rely on them any longer.
->> >
->> > Will sbsa-ref support GICv2? If so, then timer and pmu DT nodes will
->> > need to have their irqflags fields modified depending on the number of
->> > configured CPUs.
->> >
->> No, I removed the GICv2 in next patch.
->>
->> >> c) All the other devices nodes, such as GPIO, PCIE etc, currently the
->> >> UEFI doesn't need them, so UEFI can boot with them removed.
->> >>
->> >> How about b) and c)?
->> >> my idea is to keep a) only, remove b) and thus a UEFI modification
->> >> accordingly is to be done, c) can be removed freely.
->> >
->> > So UEFI would learn to augment static DTBs with QEMU generated
->> > DT nodes and/or other auxiliary info from QEMU passed to it
->> > through the "guest DT" (which is now looking more like a guest
->> > firmware configuration description)? Is it worth it? Why not
->> > just require the entire DTB to be provided by the user on the
->> > QEMU command line and completely ignore QEMU parameters like
->> > '-smp'?
->> >
->> UEFI loads OS by ACPI, not DT for this machine.
->> But UEFI has to handle DT too, becuase there is DT passing info from
->> ARMTF to UEFI, and this dynamic CPU DT as well.
->> I think every thing UEFI gets from DT should translated into ACPI,
->> again,it is my understaning now, it is up to firmware developers.
->>
->> "entire DTB provided by the user on the QEMU command line", you mean
->> firmware can use it to load OS? it is not fine, some featurs such as
->> RAS, may still need ACPI, so ACPI is to be used to load OS on this
->> sbsa-ref machine.
->
-> If booting the guest with ACPI is the plan, but using QEMU's ACPI
-> generation is not the plan. Then either firmware will have to reinvent
-> that generation (unlikely) or multiple ACPI tables representing all
-> the desired configs will need to be pre-generated and made selectable
-> in some way. Either by choosing from multiple UEFI builds where each
-> build has one set of tables, or by having all the tables in one UEFI
-> build and then adding some UEFI code to select them based on parameters
-> it can get from QEMU through DT.
->
-> Thanks,
-> drew
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index 85f4749aef..ed60ba251d 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -17,7 +17,7 @@
+ #define TFR(expr) do { if ((expr) != -1) break; } while (errno == EINTR)
+ 
+ /* Copyright string for -version arguments, About dialogs, etc */
+-#define QEMU_COPYRIGHT "Copyright (c) 2003-2017 " \
++#define QEMU_COPYRIGHT "Copyright (c) 2003-2018 " \
+     "Fabrice Bellard and the QEMU Project developers"
+ 
+ /* Bug reporting information for --help arguments, About dialogs, etc */
+-- 
+2.14.3 (Apple Git-98)
