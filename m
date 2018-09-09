@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fyowQ-0004B1-Rf
-	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 21:55:11 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fypM4-0005go-Pt
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 22:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fyojz-0002AN-Iu
-	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 21:42:22 -0400
-MIME-Version: 1.0
-References: <20180908182205.GB409@mornington.dcs.gla.ac.uk>
-In-Reply-To: <20180908182205.GB409@mornington.dcs.gla.ac.uk>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 8 Sep 2018 22:42:07 -0300
-Message-ID: <CAAdtpL5h3tciBS_uyDzWXdZ1vynt4TxfwpjT_=dq62Hs=XCZ8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] linux-user: write(fd, NULL,
- 0) parity with linux's treatment of same
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fypM3-0005cb-KI
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 22:21:40 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:33227)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fypM3-0005aP-B8
+	for qemu-devel@nongnu.org; Sat, 08 Sep 2018 22:21:39 -0400
+Received: by mail-lj1-x243.google.com with SMTP id s12-v6so15133500ljj.0
+	for <qemu-devel@nongnu.org>; Sat, 08 Sep 2018 19:21:39 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Sat,  8 Sep 2018 19:21:04 -0700
+Message-Id: <20180909022104.5939-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PATCH] target/xtensa: support input from chardev
+ console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tony.garnock-jones@glasgow.ac.uk, Laurent Vivier <laurent@vivier.eu>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-stable <qemu-stable@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-On Sat, Sep 8, 2018 at 6:04 PM Tony Garnock-Jones
-<tony.garnock-jones@glasgow.ac.uk> wrote:
->
-> Bring linux-user write(2) handling into line with linux for the case
-> of a 0-byte write with a NULL buffer. Based on a patch originally
-> written by Zhuowei Zhang.
->
-> Addresses https://bugs.launchpad.net/qemu/+bug/1716292.
->
-> From Zhuowei Zhang's patch (https://lists.gnu.org/archive/html/qemu-devel=
-/2017-09/msg08073.html):
->
->     Linux returns success for the special case of calling write with a
->     zero-length NULL buffer: compiling and running
->
->     int main() {
->        ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
->        fprintf(stderr, "write returned %ld\n", ret);
->        return 0;
->     }
->
->     gives "write returned 0" when run directly, but "write returned
->     -1" in QEMU.
->
->     This commit checks for this situation and returns success if
->     found.
->
-> Subsequent discussion raised the following questions (and my answers):
->
->  - Q. Should TARGET_NR_read pass through to safe_read in this
->       situation too?
->    A. I'm wary of changing unrelated code to the specific problem I'm
->       addressing. TARGET_NR_read is already consistent with Linux for
->       this case.
->
->  - Q. Do pread64/pwrite64 need to be changed similarly?
->    A. Experiment suggests not: both linux and linux-user yield -1 for
->       NULL 0-length reads/writes.
->
-> Signed-off-by: Tony Garnock-Jones <tonygarnockjones@gmail.com>
+Complete xtensa-semi chardev console implementation: allow reading input
+characters from file descriptor 0 and call sys_select_one simcall on it.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ target/xtensa/xtensa-semi.c | 55 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 52 insertions(+), 3 deletions(-)
 
-> ---
->  linux-user/syscall.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 850b72a0c7..8f46540534 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -8168,6 +8168,9 @@ static abi_long do_syscall1(void *cpu_env, int num,=
- abi_long arg1,
->          }
->          return ret;
->      case TARGET_NR_write:
-> +        if (arg2 =3D=3D 0 && arg3 =3D=3D 0) {
-> +            return get_errno(safe_write(arg1, 0, 0));
-> +        }
->          if (!(p =3D lock_user(VERIFY_READ, arg2, arg3, 1)))
->              return -TARGET_EFAULT;
->          if (fd_trans_target_to_host_data(arg1)) {
-> --
-> 2.18.0
->
->
-> [University of Glasgow: The Times Scottish University of the Year 2018]
->
+diff --git a/target/xtensa/xtensa-semi.c b/target/xtensa/xtensa-semi.c
+index 7aa1d1357bda..f3c23f8625c2 100644
+--- a/target/xtensa/xtensa-semi.c
++++ b/target/xtensa/xtensa-semi.c
+@@ -34,8 +34,6 @@
+ #include "qemu/log.h"
+ #include "sysemu/sysemu.h"
+ 
+-static CharBackend *xtensa_sim_console;
+-
+ enum {
+     TARGET_SYS_exit = 1,
+     TARGET_SYS_read = 3,
+@@ -153,12 +151,45 @@ static uint32_t errno_h2g(int host_errno)
+     }
+ }
+ 
++typedef struct SimInputBuffer {
++    char buffer[16];
++    size_t offset;
++} SimInputBuffer;
++
++static CharBackend *xtensa_sim_console;
++static SimInputBuffer sim_input_buffer;
++
++static IOCanReadHandler xtensa_sim_console_can_read;
++static int xtensa_sim_console_can_read(void *opaque)
++{
++    SimInputBuffer *p = opaque;
++
++    return sizeof(p->buffer) - p->offset;
++}
++
++static IOReadHandler xtensa_sim_console_read;
++static void xtensa_sim_console_read(void *opaque, const uint8_t *buf, int size)
++{
++    SimInputBuffer *p = opaque;
++    size_t copy = sizeof(p->buffer) - p->offset;
++
++    if (size < copy) {
++        copy = size;
++    }
++    memcpy(p->buffer + p->offset, buf, copy);
++    p->offset += copy;
++}
++
+ void xtensa_sim_open_console(Chardev *chr)
+ {
+     static CharBackend console;
+ 
+     qemu_chr_fe_init(&console, chr, &error_abort);
+-    qemu_chr_fe_set_handlers(&console, NULL, NULL, NULL, NULL, NULL, NULL, true);
++    qemu_chr_fe_set_handlers(&console,
++                             xtensa_sim_console_can_read,
++                             xtensa_sim_console_read,
++                             NULL, NULL, &sim_input_buffer,
++                             NULL, true);
+     xtensa_sim_console = &console;
+ }
+ 
+@@ -200,6 +231,22 @@ void HELPER(simcall)(CPUXtensaState *env)
+                             io_done = qemu_chr_fe_write_all(xtensa_sim_console,
+                                                             buf, io_sz);
+                             regs[3] = errno_h2g(errno);
++                        } else if (!is_write && fd == 0) {
++                            if (sim_input_buffer.offset) {
++                                io_done = sim_input_buffer.offset;
++                                if (io_sz < io_done) {
++                                    io_done = io_sz;
++                                }
++                                memcpy(buf, sim_input_buffer.buffer, io_done);
++                                memmove(sim_input_buffer.buffer,
++                                        sim_input_buffer.buffer + io_done,
++                                        sim_input_buffer.offset - io_done);
++                                sim_input_buffer.offset -= io_done;
++                                qemu_chr_fe_accept_input(xtensa_sim_console);
++                            } else {
++                                io_done = -1;
++                                regs[3] = TARGET_EAGAIN;
++                            }
+                         } else {
+                             qemu_log_mask(LOG_GUEST_ERROR,
+                                           "%s fd %d is not supported with chardev console\n",
+@@ -295,6 +342,8 @@ void HELPER(simcall)(CPUXtensaState *env)
+             if (fd < 3 && xtensa_sim_console) {
+                 if ((fd == 1 || fd == 2) && rq == SELECT_ONE_WRITE) {
+                     regs[2] = 1;
++                } else if (fd == 0 && rq == SELECT_ONE_READ) {
++                    regs[2] = sim_input_buffer.offset > 0;
+                 } else {
+                     regs[2] = 0;
+                 }
+-- 
+2.11.0
