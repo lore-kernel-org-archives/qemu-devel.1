@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzMiI-0002kR-B4
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:58:51 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fzMiT-0002Qr-FW
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzMiA-0001au-Sz
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:58:49 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:38888)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fzMi5-0001SR-IN
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:58:39 -0400
-Received: by mail-wm0-x244.google.com with SMTP id t25-v6so21510815wmi.3
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 06:58:36 -0700 (PDT)
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<152819519376.30857.17032517857304957536.stgit@pasha-ThinkPad-T60>
-	<87pnxpz9jf.fsf@linaro.org> <001501d448e7$37421570$a5c64050$@ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <001501d448e7$37421570$a5c64050$@ru>
-Date: Mon, 10 Sep 2018 14:58:33 +0100
-Message-ID: <874lexcv3q.fsf@linaro.org>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fzMZm-0003Y7-RG
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:50:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49920 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fzMZk-0003T8-Sj
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:50:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C7B9D40216ED
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 13:49:54 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon, 10 Sep 2018 17:49:46 +0400
+Message-Id: <20180910134946.16773-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 7/7] plugins: add syscall logging
- plugin sample
+Subject: [Qemu-devel] [PATCH v2] hostmem: no need to check for
+ host_memory_backend_mr_inited() in alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,138 +32,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
+memfd_backend_memory_alloc/file_backend_memory_alloc both needlessly
+are are calling host_memory_backend_mr_inited() which creates an
+illusion that alloc could be called multiple times but it isn't, it's
+called once from UserCreatable complete().
 
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ backends/hostmem-file.c  | 24 ++++++++++++------------
+ backends/hostmem-memfd.c |  4 ----
+ 2 files changed, 12 insertions(+), 16 deletions(-)
 
->> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
->> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
->>
->> > This is an example of plugin which instruments only specific instructi=
-ons:
->> > sysenter and sysexit. When executing them, it prints system call id
->> > and return code to the QEMU log.
->>
->> Again I'm not sure this is a very useful example either. It doesn't
->> achieve anything we can't already do with the existing logging/strace
->> stuff and it is quite ugly in it's knowledge of a single architecture to
->> try and figure out what's going on.
->
-> Not exactly. strace is intrusive, when running within the VM.
-> And this plugin does not affect the emulated system at all (except the
-> slowdown).
+v2:
+ - cosmetic: remove extra indentation in backends/hostmem-file.c
 
-Ahh in system emulation of course. However its still seems pretty ugly
-given we start poking around in memory to figure out if we want to trap
-in or around this particular x86 instruction.
-
-It would be nice to have a generalised interface to say "I want to hook
-before/after a certain pattern is decoded" but I guess this is tricky
-given the translator is free to end any block after an instruction and
-it doesn't know what is coming up before you enter translation. I guess
-that would involve splitting .translate_insn into a decode and translate
-step and that would be quite messy for the non-regular instruction
-decoders like x86.
-
-Maybe the API is always destined to be a messy one?
-
->
-> Pavel Dovgalyuk
->>
->> >
->> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->> > ---
->> >  plugins/syscall-log/Makefile      |   19 ++++++++++++++++
->> >  plugins/syscall-log/syscall-log.c |   44 ++++++++++++++++++++++++++++=
-+++++++++
->> >  2 files changed, 63 insertions(+)
->> >  create mode 100644 plugins/syscall-log/Makefile
->> >  create mode 100644 plugins/syscall-log/syscall-log.c
->> >
->> > diff --git a/plugins/syscall-log/Makefile b/plugins/syscall-log/Makefi=
-le
->> > new file mode 100644
->> > index 0000000..1bbdf04
->> > --- /dev/null
->> > +++ b/plugins/syscall-log/Makefile
->> > @@ -0,0 +1,19 @@
->> > +CFLAGS +=3D -I../include -fno-PIE -fPIC -O3
->> > +LDFLAGS +=3D -shared
->> > +# TODO: Windows
->> > +DSOSUF :=3D .so
->> > +
->> > +NAME:=3D syscall-log
->> > +BIN :=3D $(NAME)$(DSOSUF)
->> > +
->> > +FILES :=3D syscall-log.o
->> > +
->> > +%.o: %.c
->> > +	$(CC) -c -o $@ $< $(CFLAGS)
->> > +
->> > +all: $(FILES)
->> > +	$(CC) $(LDFLAGS) -o $(BIN) $(FILES)
->> > +
->> > +clean:
->> > +	rm $(FILES)
->> > +	rm $(BIN)
->> > diff --git a/plugins/syscall-log/syscall-log.c b/plugins/syscall-log/s=
-yscall-log.c
->> > new file mode 100644
->> > index 0000000..1f5d55f
->> > --- /dev/null
->> > +++ b/plugins/syscall-log/syscall-log.c
->> > @@ -0,0 +1,44 @@
->> > +#include <stdint.h>
->> > +#include <stdio.h>
->> > +#include "plugins.h"
->> > +
->> > +bool plugin_init(const char *args)
->> > +{
->> > +    return true;
->> > +}
->> > +
->> > +bool plugin_needs_before_insn(uint64_t pc, void *cpu)
->> > +{
->> > +    uint8_t code =3D 0;
->> > +    if (!qemulib_read_memory(cpu, pc, &code, 1)
->> > +        && code =3D=3D 0x0f) {
->> > +        if (qemulib_read_memory(cpu, pc + 1, &code, 1)) {
->> > +            return false;
->> > +        }
->> > +        if (code =3D=3D 0x34) {
->> > +            /* sysenter */
->> > +            return true;
->> > +        }
->> > +        if (code =3D=3D 0x35) {
->> > +            /* sysexit */
->> > +            return true;
->> > +        }
->> > +    }
->> > +    return false;
->> > +}
->> > +
->> > +void plugin_before_insn(uint64_t pc, void *cpu)
->> > +{
->> > +    uint8_t code =3D 0;
->> > +    uint32_t reg;
->> > +    qemulib_read_memory(cpu, pc + 1, &code, 1);
->> > +    /* Read EAX. There should be a header with register ids
->> > +       or a function for reading the register by the name */
->> > +    qemulib_read_register(cpu, (uint8_t*)&reg, 0);
->> > +    /* log system calls */
->> > +    if (code =3D=3D 0x34) {
->> > +        qemulib_log("sysenter %x\n", reg);
->> > +    } else if (code =3D=3D 0x35) {
->> > +        qemulib_log("sysexit %x\n", reg);
->> > +    }
->> > +}
->>
->>
->> --
->> Alex Benn=C3=A9e
-
-
---
-Alex Benn=C3=A9e
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index 2476dcb435..09b21280ce 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -42,6 +42,9 @@ static void
+ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+ {
+     HostMemoryBackendFile *fb =3D MEMORY_BACKEND_FILE(backend);
++#ifdef CONFIG_LINUX
++    gchar *path;
++#endif
+=20
+     if (!backend->size) {
+         error_setg(errp, "can't create backend with size 0");
+@@ -54,18 +57,15 @@ file_backend_memory_alloc(HostMemoryBackend *backend,=
+ Error **errp)
+ #ifndef CONFIG_LINUX
+     error_setg(errp, "-mem-path not supported on this host");
+ #else
+-    if (!host_memory_backend_mr_inited(backend)) {
+-        gchar *path;
+-        backend->force_prealloc =3D mem_prealloc;
+-        path =3D object_get_canonical_path(OBJECT(backend));
+-        memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
+-                                 path,
+-                                 backend->size, fb->align,
+-                                 (backend->share ? RAM_SHARED : 0) |
+-                                 (fb->is_pmem ? RAM_PMEM : 0),
+-                                 fb->mem_path, errp);
+-        g_free(path);
+-    }
++    backend->force_prealloc =3D mem_prealloc;
++    path =3D object_get_canonical_path(OBJECT(backend));
++    memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
++                                     path,
++                                     backend->size, fb->align,
++                                     (backend->share ? RAM_SHARED : 0) |
++                                     (fb->is_pmem ? RAM_PMEM : 0),
++                                     fb->mem_path, errp);
++    g_free(path);
+ #endif
+ }
+=20
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index abd52364db..7184918112 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -44,10 +44,6 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend,=
+ Error **errp)
+         return;
+     }
+=20
+-    if (host_memory_backend_mr_inited(backend)) {
+-        return;
+-    }
+-
+     backend->force_prealloc =3D mem_prealloc;
+     fd =3D qemu_memfd_create(TYPE_MEMORY_BACKEND_MEMFD, backend->size,
+                            m->hugetlb, m->hugetlbsize, m->seal ?
+--=20
+2.19.0.rc1
