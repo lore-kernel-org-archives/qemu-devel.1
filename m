@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fzHPq-0004bT-Lc
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:19:27 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fzHRm-0005zg-FF
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:21:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fzHPn-0002uC-Dp
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:19:26 -0400
-Date: Mon, 10 Sep 2018 10:19:16 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fzHRj-0004K3-3D
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:21:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55712 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fzHRi-0004JW-Re
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:21:23 -0400
+Date: Mon, 10 Sep 2018 10:21:15 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180910101916.0e49da7d@redhat.com>
-In-Reply-To: <20180907164402-mutt-send-email-mst@kernel.org>
-References: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
-	<20180907164402-mutt-send-email-mst@kernel.org>
+Message-ID: <20180910102115.238017e4@redhat.com>
+In-Reply-To: <20180907165052-mutt-send-email-mst@kernel.org>
+References: <1535368030-214556-1-git-send-email-imammedo@redhat.com>
+	<20180827160239.54cc993a@bahia.lan>
+	<20180828005237.GC2222@umbus.fritz.box>
+	<20180828151848.3d09ca06@redhat.com>
+	<20180829025440.GE2222@umbus.fritz.box>
+	<20180829104311.5ea1a69e@redhat.com>
+	<20180829091453-mutt-send-email-mst@kernel.org>
+	<20180829155138.5e9af6af@redhat.com>
+	<20180907165052-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc: acpi: revert back to 1 SRAT entry for
- hotpluggable area
+Subject: Re: [Qemu-devel] [PATCH] pc: make sure that guest isn't able to
+ unplug the first cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,146 +36,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: haozhong.zhang@intel.com, lersek@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, qemu-stable@nongnu.org
+Cc: david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, pbonzini@redhat.com, Laszlo Ersek <lersek@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, 7 Sep 2018 16:44:34 -0400
+On Fri, 7 Sep 2018 16:52:17 -0400
 "Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Wed, Aug 22, 2018 at 11:46:44AM +0200, Igor Mammedov wrote:
-> > Commit
-> >   10efd7e108 "pc: acpi: fix memory hotplug regression by reducing stub SRAT entry size"
-> > attemped to fix hotplug regression introduced by
-> >   848a1cc1e "hw/acpi-build: build SRAT memory affinity structures for DIMM devices"
+> On Wed, Aug 29, 2018 at 03:51:38PM +0200, Igor Mammedov wrote:
+> > On Wed, 29 Aug 2018 09:15:53 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Wed, Aug 29, 2018 at 10:43:11AM +0200, Igor Mammedov wrote:  
+> > > > On Wed, 29 Aug 2018 12:54:40 +1000
+> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > >     
+> > > > > On Tue, Aug 28, 2018 at 03:18:48PM +0200, Igor Mammedov wrote:    
+> > > > > > On Tue, 28 Aug 2018 10:52:37 +1000
+> > > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > > > >       
+> > > > > > > On Mon, Aug 27, 2018 at 04:02:39PM +0200, Greg Kurz wrote:      
+> > > > > > > > On Mon, 27 Aug 2018 13:07:10 +0200
+> > > > > > > > Igor Mammedov <imammedo@redhat.com> wrote:
+> > > > > > > >         
+> > > > > > > > > The first cpu unplug wasn't ever supported and corresponding
+> > > > > > > > > monitor/qmp commands refuse to unplug it. However guest is able
+> > > > > > > > > to issue eject request either using following command:
+> > > > > > > > >   # echo 1 >/sys/devices/system/cpu/cpu0/firmware_node/eject        
+> > > > > > > > 
+> > > > > > > > I can't reproduce the issue with a pc guest and current master...
+> > > > > > > > 
+> > > > > > > > All I seem to get is an error in dmesg:
+> > > > > > > > 
+> > > > > > > > [   97.435446] processor cpu0: Offline failed.
+> > > > > > > >         
+> > > > > > > > > or directly writing to cpu hotplug registers, which makes
+> > > > > > > > > qemu crash with SIGSEGV following back trace:
+> > > > > > > > > 
+> > > > > > > > >    kvm_flush_coalesced_mmio_buffer ()
+> > > > > > > > >        while (ring->first != ring->last)
+> > > > > > > > >    ...
+> > > > > > > > >    qemu_flush_coalesced_mmio_buffer
+> > > > > > > > >    prepare_mmio_access
+> > > > > > > > >    flatview_read_continue
+> > > > > > > > >    flatview_read
+> > > > > > > > >    address_space_read_full
+> > > > > > > > >    address_space_rw
+> > > > > > > > >    kvm_cpu_exec(cpu!0)
+> > > > > > > > >    qemu_kvm_cpu_thread_fn
+> > > > > > > > > 
+> > > > > > > > > the reason for which is that ring == KVMState::coalesced_mmio_ring
+> > > > > > > > > happens to be a part of 1st CPU that was uplugged by guest.
+> > > > > > > > > 
+> > > > > > > > > Fix it by forbidding 1st cpu unplug from guest side and in addition
+> > > > > > > > > remove CPU0._EJ0 ACPI method to make clear that unplug of the first
+> > > > > > > > > CPU is not supported.
+> > > > > > > > > 
+> > > > > > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > > > > > > ---
+> > > > > > > > > CCing spapr and s390x folks in case targets need to prevent 1st CPU unplug as well
+> > > > > > > > >         
+> > > > > > > > 
+> > > > > > > > A spapr guest can _release_ the first cpu by doing something like:
+> > > > > > > > 
+> > > > > > > > # echo -n "/cpus/PowerPC,POWER8@0" > /sys/devices/system/cpu/release
+> > > > > > > > 
+> > > > > > > > But AFAIK, this doesn't unplug the cpu from a QEMU standpoint.        
+> > > > > > > 
+> > > > > > > Unplugging CPU 0 with device_del should be ok too.      
+> > > > > > Do you mean real unplugging (cpu0 object freed) or just remove request?      
+> > > > > 
+> > > > > Real unplugging should be possible.  I'm not sure how thorougly it's
+> > > > > been tested, though.    
+> > > > Well, common kvm code in qemu seems to be in disagreement with it
+> > > > as backtrace in this patch shows also usage of first_cpu macro
+> > > > won't survive such unplug.    
+> > > 
+> > > Paolo - any take on this? Do we need to make cpu 0 special like this?  
+> > It probably would take a bunch of refactoring to get rid of first_cpu&co
+> > dependencies and besides of experimenting with cpu0 unplug in guest kernel
+> > there isn't any other value in it, so it probably not worth the effort.
 > > 
-> > fixed issue for Windows/3.0+ linux kernels, however it regressed 2.6 based
-> > kernels (RHEL6) to the point where guest might crash at boot.
-> > Reason is that 2.6 kernel discards SRAT table due too small last entry
-> > which down the road leads to crashes. Hack I've tried in 10efd7e108 is also
-> > not ACPI spec compliant according to which whole possible RAM should be
-> > described in SRAT. Revert 10efd7e108 to fix regression for 2.6 based kernels.
+> > On top of that, for pc/q35 machine we would need to select boot cpu
+> > in some other way (right now it's hardwired to first_cpu).
 > > 
-> > With 10efd7e108 reverted, I've also tried splitting SRAT table statically
-> > in different ways %/node and %/slot but Windows still fails to online
-> > 2nd pc-dimm hot-plugged into node 0 (as described in 10efd7e108) and
-> > sometimes even coldplugged pc-dimms where affected with static SRAT
-> > partitioning.
-> > The only known so far way where Windows stays happy is when we have 1
-> > SRAT entry in the last node covering all hotplug area.
-> > 
-> > Revert 848a1cc1e until we come up with a way to avoid regression
-> > on Windows with hotplug area split in several entries.
-> > Tested this with 2.6/3.0 based kernels (RHEL6/7) and WS20[08/12/12R2/16]).
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> > It seems that seabios might work if cpu0 isn't present, don't know about OVMF.  
 > 
-> BTW should this cause any aml test blobs to change?
-> Does not seem to ...
-test variants memhp and dimmpxm should be affected by this
-(I see your pull req has relevant updates to reference SRAT tables)
-
-> 
-> > ---
-> > CC: haozhong.zhang@intel.com
-> > CC: mst@redhat.com
-> > CC: qemu-stable@nongnu.org
-> > CC: ehabkost@redhat.com
-> > CC: lersek@redhat.com
-> > ---
-> >  hw/i386/acpi-build.c | 73 +++++++++-------------------------------------------
-> >  1 file changed, 12 insertions(+), 61 deletions(-)
-> > 
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index e1ee8ae..1599caa 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -2251,64 +2251,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
-> >  #define HOLE_640K_START  (640 * KiB)
-> >  #define HOLE_640K_END   (1 * MiB)
-> >  
-> > -static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-> > -                                           uint64_t len, int default_node)
-> > -{
-> > -    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
-> > -    MemoryDeviceInfoList *info;
-> > -    MemoryDeviceInfo *mi;
-> > -    PCDIMMDeviceInfo *di;
-> > -    uint64_t end = base + len, cur, size;
-> > -    bool is_nvdimm;
-> > -    AcpiSratMemoryAffinity *numamem;
-> > -    MemoryAffinityFlags flags;
-> > -
-> > -    for (cur = base, info = info_list;
-> > -         cur < end;
-> > -         cur += size, info = info->next) {
-> > -        numamem = acpi_data_push(table_data, sizeof *numamem);
-> > -
-> > -        if (!info) {
-> > -            /*
-> > -             * Entry is required for Windows to enable memory hotplug in OS
-> > -             * and for Linux to enable SWIOTLB when booted with less than
-> > -             * 4G of RAM. Windows works better if the entry sets proximity
-> > -             * to the highest NUMA node in the machine at the end of the
-> > -             * reserved space.
-> > -             * Memory devices may override proximity set by this entry,
-> > -             * providing _PXM method if necessary.
-> > -             */
-> > -            build_srat_memory(numamem, end - 1, 1, default_node,
-> > -                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> > -            break;
-> > -        }
-> > -
-> > -        mi = info->value;
-> > -        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-> > -        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
-> > -
-> > -        if (cur < di->addr) {
-> > -            build_srat_memory(numamem, cur, di->addr - cur, default_node,
-> > -                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> > -            numamem = acpi_data_push(table_data, sizeof *numamem);
-> > -        }
-> > -
-> > -        size = di->size;
-> > -
-> > -        flags = MEM_AFFINITY_ENABLED;
-> > -        if (di->hotpluggable) {
-> > -            flags |= MEM_AFFINITY_HOTPLUGGABLE;
-> > -        }
-> > -        if (is_nvdimm) {
-> > -            flags |= MEM_AFFINITY_NON_VOLATILE;
-> > -        }
-> > -
-> > -        build_srat_memory(numamem, di->addr, size, di->node, flags);
-> > -    }
-> > -
-> > -    qapi_free_MemoryDeviceInfoList(info_list);
-> > -}
-> > -
-> >  static void
-> >  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-> >  {
-> > @@ -2414,10 +2356,19 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-> >          build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
-> >      }
-> >  
-> > +    /*
-> > +     * Entry is required for Windows to enable memory hotplug in OS
-> > +     * and for Linux to enable SWIOTLB when booted with less than
-> > +     * 4G of RAM. Windows works better if the entry sets proximity
-> > +     * to the highest NUMA node in the machine.
-> > +     * Memory devices may override proximity set by this entry,
-> > +     * providing _PXM method if necessary.
-> > +     */
-> >      if (hotplugabble_address_space_size) {
-> > -        build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
-> > -                                       hotplugabble_address_space_size,
-> > -                                       pcms->numa_nodes - 1);
-> > +        numamem = acpi_data_push(table_data, sizeof *numamem);
-> > +        build_srat_memory(numamem, machine->device_memory->base,
-> > +                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
-> > +                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
-> >      }
-> >  
-> >      build_header(linker, table_data,
-> > -- 
-> > 2.7.4  
-> 
+> OK, I queued this, but can you please add some code comments
+> so we remember why it is like this if someone changes the code?
+> Even better maybe to add an API along the lines of:
+>     cpu_is_hotpluggable
+>         return cpu != first_cpu
+I like an API idea,
+I'll try to look into how to use use it in a generic way.
