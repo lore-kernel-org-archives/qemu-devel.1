@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fzHOG-0003XZ-Nl
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:17:50 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fzHPq-0004bT-Lc
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:19:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fzHOE-0001hh-Ix
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:17:48 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35632)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fzHOE-0001hI-6w
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:17:46 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j26-v6so20904395wre.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 01:17:45 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1fzHPn-0002uC-Dp
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:19:26 -0400
+Date: Mon, 10 Sep 2018 10:19:16 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180910101916.0e49da7d@redhat.com>
+In-Reply-To: <20180907164402-mutt-send-email-mst@kernel.org>
+References: <1534931204-112747-1-git-send-email-imammedo@redhat.com>
+	<20180907164402-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <20180903043900.28592-1-zhangckid@gmail.com>
-In-Reply-To: <20180903043900.28592-1-zhangckid@gmail.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 10 Sep 2018 16:16:08 +0800
-Message-ID: <CAK3tnv+FV_Bq10sUU4_p-ma63rU5_dGgSMNK1WkLN2uNhVLj=A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V12 00/19] COLO: integrate colo frame with
- block replication and COLO proxy
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc: acpi: revert back to 1 SRAT entry for
+ hotpluggable area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,151 +24,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, jasowang@redhat.com, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: zhang.zhanghailiang@huawei.com, lizhijian@cn.fujitsu.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: haozhong.zhang@intel.com, lersek@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com, qemu-stable@nongnu.org
 
-Hi All.
-Have any comments?
-Ping...
+On Fri, 7 Sep 2018 16:44:34 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Thanks
-Zhang Chen
+> On Wed, Aug 22, 2018 at 11:46:44AM +0200, Igor Mammedov wrote:
+> > Commit
+> >   10efd7e108 "pc: acpi: fix memory hotplug regression by reducing stub SRAT entry size"
+> > attemped to fix hotplug regression introduced by
+> >   848a1cc1e "hw/acpi-build: build SRAT memory affinity structures for DIMM devices"
+> > 
+> > fixed issue for Windows/3.0+ linux kernels, however it regressed 2.6 based
+> > kernels (RHEL6) to the point where guest might crash at boot.
+> > Reason is that 2.6 kernel discards SRAT table due too small last entry
+> > which down the road leads to crashes. Hack I've tried in 10efd7e108 is also
+> > not ACPI spec compliant according to which whole possible RAM should be
+> > described in SRAT. Revert 10efd7e108 to fix regression for 2.6 based kernels.
+> > 
+> > With 10efd7e108 reverted, I've also tried splitting SRAT table statically
+> > in different ways %/node and %/slot but Windows still fails to online
+> > 2nd pc-dimm hot-plugged into node 0 (as described in 10efd7e108) and
+> > sometimes even coldplugged pc-dimms where affected with static SRAT
+> > partitioning.
+> > The only known so far way where Windows stays happy is when we have 1
+> > SRAT entry in the last node covering all hotplug area.
+> > 
+> > Revert 848a1cc1e until we come up with a way to avoid regression
+> > on Windows with hotplug area split in several entries.
+> > Tested this with 2.6/3.0 based kernels (RHEL6/7) and WS20[08/12/12R2/16]).
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> 
+> BTW should this cause any aml test blobs to change?
+> Does not seem to ...
+test variants memhp and dimmpxm should be affected by this
+(I see your pull req has relevant updates to reference SRAT tables)
 
-
-On Mon, Sep 3, 2018 at 12:39 PM Zhang Chen <zhangckid@gmail.com> wrote:
-
-> Hi~ All~
->
-> COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
-> filter-redirector,filter-rewriter) have been exist in qemu
-> for long time, it's time to integrate these three parts to make COLO
-> really works.
->
-> In this series, we have some optimizations for COLO frame, including
-> separating the
-> process of saving ram and device state, using an COLO_EXIT event to notify
-> users that
-> VM exits COLO, for these parts, most of them have been reviewed long time
-> ago in old version,
-> but since this series have just rebased on upstream which had merged a new
-> series of migration,
-> parts of pathes in this series deserve review again.
->
-> We use notifier/callback method for COLO compare to notify COLO frame about
-> net packets inconsistent event, and add a handle_event method for
-> NetFilterClass to
-> help COLO frame to notify filters and colo-compare about
-> checkpoint/failover event,
-> it is flexible.
->
-> For the neweset version, please refer to:
-> https://github.com/zhangckid/qemu/tree/qemu-colo-18sep1
->
-> Please review, thanks.
->
-> V12:
->  - Rebased on upstream.
->  - Removed the patch 15/20 for feature work as Jason's comments.
->  - Fixed failover bugs in patch 16/19.
->  - Renamed the dummy_handle_event to default_handle_event in patch 15/19.
->  - Cleaned needless check job.
->
-> V11:
->  - Rebased on upstream.
->  - Used "RAMBLOCK_FOREACH_MIGRATABLE()" to replace "QLIST_FOREACH_RCU()"
-> in patch 08/20.
->  - Fixed COLO related qapi command's since version in patch 10/20.
->
-> V10:
->  - Rebased on upstream.
->  - Removed the "active" in COLOState.
->  - Fixed some comments.
->
-> V9:
->  - Rebased on upstream codes.
->  - Addressed Jason's comments add TCP state machine track in
->    filter-rewriter.
->  - Fix some bug in colo-compare.
->  - Fix typo.
->  - Add filter-rewriter failover handle.
->  - Add net client type check in colo-compare.
->  - Add COLO state diagram.
->  - Addressed Markus and Daive's comments.
->
-> V8:
->  - Rebased on upstream codes.
->  - Addressed Markus's comments in patch 10/17.
->  - Addressed Markus's comments in patch 11/17.
->  - Removed some comments in patch 4/17.
->  - Moved the "migration_bitmap_clear_dirty()" to suitable position in
->    patch 9/17.
->  - Rewrote the patch 07/17 to address Davie's comments.
->  - Moved the "qemu_savevm_live_state" out of the
->    qemu_mutex_lock_iothread.
->  - Fixed the bug that in some status COLO vm crash with segmentation fault.
->
-> V7:
->  - Addressed Markus's comments in 11/17.
->  - Rebased on upstream.
->
-> V6:
->  - Addressed Eric Blake's comments, use the enum to feedback in patch
-> 11/17.
->  - Fixed QAPI command separator problem in patch 11/17.
->
->
-> Zhang Chen (15):
->   filter-rewriter: Add TCP state machine and fix memory leak in
->     connection_track_table
->   colo-compare: implement the process of checkpoint
->   colo-compare: use notifier to notify packets comparing result
->   COLO: integrate colo compare with colo frame
->   COLO: Add block replication into colo process
->   COLO: Remove colo_state migration struct
->   COLO: Load dirty pages into SVM's RAM cache firstly
->   ram/COLO: Record the dirty pages that SVM received
->   COLO: Flush memory data from ram cache
->   qapi/migration.json: Rename COLO unknown mode to none mode.
->   qapi: Add new command to query colo status
->   savevm: split the process of different stages for loadvm/savevm
->   filter: Add handle_event method for NetFilterClass
->   filter-rewriter: handle checkpoint and failover event
->   docs: Add COLO status diagram to COLO-FT.txt
->
-> zhanghailiang (4):
->   qmp event: Add COLO_EXIT event to notify users while exited COLO
->   COLO: flush host dirty ram from cache
->   COLO: notify net filters about checkpoint/failover event
->   COLO: quick failover process by kick COLO thread
->
->  docs/COLO-FT.txt          |  34 ++++++
->  include/exec/ram_addr.h   |   1 +
->  include/migration/colo.h  |  11 +-
->  include/net/filter.h      |   5 +
->  migration/Makefile.objs   |   2 +-
->  migration/colo-comm.c     |  76 --------------
->  migration/colo-failover.c |   2 +-
->  migration/colo.c          | 212 ++++++++++++++++++++++++++++++++++++--
->  migration/migration.c     |  46 ++++++++-
->  migration/ram.c           | 166 ++++++++++++++++++++++++++++-
->  migration/ram.h           |   4 +
->  migration/savevm.c        |  53 ++++++++--
->  migration/savevm.h        |   5 +
->  migration/trace-events    |   3 +
->  net/colo-compare.c        | 115 +++++++++++++++++++--
->  net/colo-compare.h        |  24 +++++
->  net/colo.c                |  10 +-
->  net/colo.h                |  11 +-
->  net/filter-rewriter.c     | 162 +++++++++++++++++++++++++++--
->  net/filter.c              |  17 +++
->  net/net.c                 |  19 ++++
->  qapi/migration.json       |  80 +++++++++++++-
->  vl.c                      |   2 -
->  23 files changed, 921 insertions(+), 139 deletions(-)
->  delete mode 100644 migration/colo-comm.c
->  create mode 100644 net/colo-compare.h
->
-> --
-> 2.17.GIT
->
->
+> 
+> > ---
+> > CC: haozhong.zhang@intel.com
+> > CC: mst@redhat.com
+> > CC: qemu-stable@nongnu.org
+> > CC: ehabkost@redhat.com
+> > CC: lersek@redhat.com
+> > ---
+> >  hw/i386/acpi-build.c | 73 +++++++++-------------------------------------------
+> >  1 file changed, 12 insertions(+), 61 deletions(-)
+> > 
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index e1ee8ae..1599caa 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -2251,64 +2251,6 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+> >  #define HOLE_640K_START  (640 * KiB)
+> >  #define HOLE_640K_END   (1 * MiB)
+> >  
+> > -static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
+> > -                                           uint64_t len, int default_node)
+> > -{
+> > -    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
+> > -    MemoryDeviceInfoList *info;
+> > -    MemoryDeviceInfo *mi;
+> > -    PCDIMMDeviceInfo *di;
+> > -    uint64_t end = base + len, cur, size;
+> > -    bool is_nvdimm;
+> > -    AcpiSratMemoryAffinity *numamem;
+> > -    MemoryAffinityFlags flags;
+> > -
+> > -    for (cur = base, info = info_list;
+> > -         cur < end;
+> > -         cur += size, info = info->next) {
+> > -        numamem = acpi_data_push(table_data, sizeof *numamem);
+> > -
+> > -        if (!info) {
+> > -            /*
+> > -             * Entry is required for Windows to enable memory hotplug in OS
+> > -             * and for Linux to enable SWIOTLB when booted with less than
+> > -             * 4G of RAM. Windows works better if the entry sets proximity
+> > -             * to the highest NUMA node in the machine at the end of the
+> > -             * reserved space.
+> > -             * Memory devices may override proximity set by this entry,
+> > -             * providing _PXM method if necessary.
+> > -             */
+> > -            build_srat_memory(numamem, end - 1, 1, default_node,
+> > -                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+> > -            break;
+> > -        }
+> > -
+> > -        mi = info->value;
+> > -        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
+> > -        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
+> > -
+> > -        if (cur < di->addr) {
+> > -            build_srat_memory(numamem, cur, di->addr - cur, default_node,
+> > -                              MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+> > -            numamem = acpi_data_push(table_data, sizeof *numamem);
+> > -        }
+> > -
+> > -        size = di->size;
+> > -
+> > -        flags = MEM_AFFINITY_ENABLED;
+> > -        if (di->hotpluggable) {
+> > -            flags |= MEM_AFFINITY_HOTPLUGGABLE;
+> > -        }
+> > -        if (is_nvdimm) {
+> > -            flags |= MEM_AFFINITY_NON_VOLATILE;
+> > -        }
+> > -
+> > -        build_srat_memory(numamem, di->addr, size, di->node, flags);
+> > -    }
+> > -
+> > -    qapi_free_MemoryDeviceInfoList(info_list);
+> > -}
+> > -
+> >  static void
+> >  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+> >  {
+> > @@ -2414,10 +2356,19 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+> >          build_srat_memory(numamem, 0, 0, 0, MEM_AFFINITY_NOFLAGS);
+> >      }
+> >  
+> > +    /*
+> > +     * Entry is required for Windows to enable memory hotplug in OS
+> > +     * and for Linux to enable SWIOTLB when booted with less than
+> > +     * 4G of RAM. Windows works better if the entry sets proximity
+> > +     * to the highest NUMA node in the machine.
+> > +     * Memory devices may override proximity set by this entry,
+> > +     * providing _PXM method if necessary.
+> > +     */
+> >      if (hotplugabble_address_space_size) {
+> > -        build_srat_hotpluggable_memory(table_data, machine->device_memory->base,
+> > -                                       hotplugabble_address_space_size,
+> > -                                       pcms->numa_nodes - 1);
+> > +        numamem = acpi_data_push(table_data, sizeof *numamem);
+> > +        build_srat_memory(numamem, machine->device_memory->base,
+> > +                          hotplugabble_address_space_size, pcms->numa_nodes - 1,
+> > +                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+> >      }
+> >  
+> >      build_header(linker, table_data,
+> > -- 
+> > 2.7.4  
+> 
