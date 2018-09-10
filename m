@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzOtq-0003ZP-Cc
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:18:59 -0400
+	(envelope-from <cota@braap.org>) id 1fzP0j-00087Y-H0
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:26:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzOtf-0007nT-99
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:18:49 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37781)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fzOtd-0007VN-4Q
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:18:43 -0400
-Received: by mail-wm0-x242.google.com with SMTP id n11-v6so22031133wmc.2
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 09:18:17 -0700 (PDT)
-References: <1536174934-26022-1-git-send-email-wei@redhat.com>
-	<1536174934-26022-3-git-send-email-wei@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1536174934-26022-3-git-send-email-wei@redhat.com>
-Date: Mon, 10 Sep 2018 17:18:15 +0100
-Message-ID: <871sa1comw.fsf@linaro.org>
+	(envelope-from <cota@braap.org>) id 1fzP0W-000515-I7
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:25:55 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:33885)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzP0V-0004we-PS
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:25:48 -0400
+Date: Mon, 10 Sep 2018 12:25:41 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180910162541.GA31634@flamenco>
+References: <20180908191735.22861-1-cota@braap.org> <878t49d24d.fsf@linaro.org>
+	<20180910151424.GC19941@flamenco> <8736uhcqce.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V9 2/4] tests/migration: Support cross
- compilation in generating boot header file
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8736uhcqce.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] softfloat tests based on berkeley's
+ testfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,199 +29,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peter.maydell@linaro.org, drjones@redhat.com, quintela@redhat.com, dgilbert@redhat.com
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
+On Mon, Sep 10, 2018 at 16:41:21 +0100, Alex Bennée wrote:
+> 
+> Emilio G. Cota <cota@braap.org> writes:
+> 
+> > On Mon, Sep 10, 2018 at 12:26:58 +0100, Alex Bennée wrote:
+> >>
+> >> Emilio G. Cota <cota@braap.org> writes:
+> >>
+> >> > A few fixes since yesterday's v1:
+> >> >   https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00884.html
+> >> >
+> >> > - Convert copy_qemu_to_soft80 to qemu_to_soft80, just like the other
+> >> >   conversion functions
+> >> > - Set fp-test as the program name as reported by itself
+> >> > - Fix Makefile to include .d files so that dependencies are
+> >> >   properly tracked
+> >> > - Update commit log
+> >>
+> >> Just some general comments:
+> >>
+> >>  - I think this is a better way to go than the IBM test suite
+> >>  - I'm ambivalent about maintaining our fp-test.c in close alignment to
+> >>    softfloat unless we expect much upstreaming of changes.
+> >
+> > I don't think there'll be any, to be honest. They have a git repo but
+> > I doubt they'll take any patches. This was just a minimum attempt to
+> > get some tests working (I don't have a lot of time to work on this)
+> >
+> >>  - the coverage seems a bit low. Rebuilding everything with
+> >>    --enable-gcov and running -all1 -all2 I get:
+> >>
+> >>   tests/fp/fp-test.c - 53.5 % coverage 43.3 % branch coverage
+> >>   fpu/softfloat.c - 32.5 % coverage 25.1 % branch coverage
+> >>
+> >> But maybe I didn't pass enough options to fp-test? I could really do
+> >> with a --just-run-everything-and-summarise-failing-functions option so I
+> >> can then go through in more detail with fp-test fFOO_BAR.
+> >
+> > Yes right now to get better coverage you need to run it several times.
+> > After a few runs I got it to 58%, but still without testing some
+> > rounding modes. So considering we're coming from 0% coverage, I'd
+> > say coverage is pretty good!
+> 
+> I agree ;-)
+> 
+> >
+> > But yes, we should add a flag to just test -all.
+> >
+> > There are some functions that we are not testing yet though, but
+> > that can be fixed over time (we can add more tests to fp-test even
+> > though they're not in testfloat, such as testing flush-to-zero/
+> > denormals-are-zero, or the muladd variants that we have).
+> >
+> > I have basically no time left to work on this. What do you think about
+> > the following plan?
+> >
+> > 1. Have our own clones (forks) of testfloat/softfloat in qemu servers.
+> > 2. Add those as submodules
+> > 3. Add fp-test with as you said an -all flag that reports all
+> >    errors to get decent coverage.
+> 
+> Works for me.
+> 
+> > 4. Add hardfloat patches, with tests. This requires a small
+> >    change to testfloat:
+> >    https://github.com/cota/berkeley-testfloat-3/commit/ca9fa2ba05
+> 
+> It seems a shame to have our mirror of testfloat diverge but if it can't
+> be avoided I guess it will have to do. Couldn't we just zero the HW
+> flags in the wrapped up function? I may be misremembering but don't we
+> fall-back to softfloat code anyway if we have reached any limits that
+> trigger exception flags?
 
-Wei Huang <wei@redhat.com> writes:
+testfloat compares the result of the ops as well as the resulting flags.
+It zeroes the exception flags register before computing the
+"golden" result/flags. The hardfloat code only kicks in when inexact
+is set, so we need to add the above patch to testfloat so that we can
+control the initial flags from outside. With this patch + a patch
+on the fp-test side to set the initial flags, we can choose whether
+to test hardfloat or not.
 
-> Recently a new configure option, CROSS_CC_GUEST, was added to
-> $(TARGET)-softmmu/config-target.mak to support TCG-related tests. This
-> patch tries to leverage this option to support cross compilation when the
-> migration boot block file is being re-generated:
->
->  * The x86 related files are moved to a new sub-dir (named ./i386).
->  * A new top-layer Makefile is created in tests/migration/ directory.
->    This Makefile searches and parses CROSS_CC_GUEST to generate CROSS_PRE=
-FIX.
->    The CROSS_PREFIX, if available, is then passed to migration/$ARCH/Make=
-file.
->
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  tests/migration-test.c                             |  2 +-
->  tests/migration/Makefile                           | 44 ++++++++++++----=
-------
->  tests/migration/i386/Makefile                      | 22 +++++++++++
->  .../{x86-a-b-bootblock.S =3D> i386/a-b-bootblock.S}  |  4 --
->  .../{x86-a-b-bootblock.h =3D> i386/a-b-bootblock.h}  |  8 ++--
->  5 files changed, 51 insertions(+), 29 deletions(-)
->  create mode 100644 tests/migration/i386/Makefile
->  rename tests/migration/{x86-a-b-bootblock.S =3D> i386/a-b-bootblock.S} (=
-93%)
->  rename tests/migration/{x86-a-b-bootblock.h =3D> i386/a-b-bootblock.h} (=
-92%)
->
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 0e687b7..fe6b41a 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -83,7 +83,7 @@ static const char *tmpfs;
->  /* A simple PC boot sector that modifies memory (1-100MB) quickly
->   * outputting a 'B' every so often if it's still running.
->   */
-> -#include "tests/migration/x86-a-b-bootblock.h"
-> +#include "tests/migration/i386/a-b-bootblock.h"
->
->  static void init_bootfile_x86(const char *bootpath)
->  {
-> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
-> index c0824b4..a9ed875 100644
-> --- a/tests/migration/Makefile
-> +++ b/tests/migration/Makefile
-> @@ -1,31 +1,35 @@
-> -# To specify cross compiler prefix, use CROSS_PREFIX=3D
-> -#   $ make CROSS_PREFIX=3Dx86_64-linux-gnu-
-> +#
-> +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or lat=
-er.
-> +# See the COPYING file in the top-level directory.
-> +#
-> +
-> +TARGET_LIST =3D i386
-> +
-> +SRC_PATH =3D ../..
->
->  override define __note
-> -/* This file is automatically generated from
-> - * tests/migration/x86-a-b-bootblock.S, edit that and then run
-> - * tests/migration/rebuild-x86-bootblock.sh to update,
-> - * and then remember to send both in your patch submission.
-> +/* This file is automatically generated from the assembly file in
-> + * tests/migration/$@. Edit that file and then run "make all"
-> + * inside tests/migration to update, and then remember to send both
-> + * the header and the assembler differences in your patch submission.
->   */
->  endef
->  export __note
->
-> -.PHONY: all clean
-> -all: x86-a-b-bootblock.h
-> -
-> -x86-a-b-bootblock.h: x86.bootsect
-> -	echo "$$__note" > header.tmp
-> -	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
-> -	mv header.tmp $@
-> +find-arch-cross-cc =3D $(lastword $(shell grep -h "CROSS_CC_GUEST=3D" $(=
-wildcard $(SRC_PATH)/$(patsubst i386,*86*,$(1))-softmmu/config-target.mak)))
-> +parse-cross-prefix =3D $(subst gcc,,$(patsubst cc,gcc,$(patsubst CROSS_C=
-C_GUEST=3D"%",%,$(call find-arch-cross-cc,$(1)))))
-> +gen-cross-prefix =3D $(patsubst %-,CROSS_PREFIX=3D%-,$(call
-> parse-cross-prefix,$(1)))
+About your second question: yes, for corner cases we defer to softfloat.
+But to reach those corner cases we first have to reach the hardfloat
+code, which requires inexact to be set.
 
-This all seems awfully fiddly compared to moving the code to tests/tcg
-and building with the existing machinery. You don't even get the docker
-fall-back this way.
+> > I'd then leave adding further tests to increase coverage and fixing
+> > the existing bugs (prior to hardfloat) to someone else with
+> > more time/resources.
+> 
+> Agreed. I should have time to chase down the softfloat regressions once
+> I'm back from Connect after next week.
 
-The aim being to have the ability to build the binary and manually
-update the .hex/.S encoded version actually used in the test when you
-don't have cross compilers available right?
+Nice! I'll try to have something ready later today.
 
-I've got some TODOs in tests/tcg to start building the various system
-tests. Perhaps I should port the various migration kernels when I get to
-that?
-
->
-> -x86.bootsect: x86.boot
-> -	dd if=3D$< of=3D$@ bs=3D256 count=3D2 skip=3D124
-> +.PHONY: all $(TARGET_LIST)
->
-> -x86.boot: x86.o
-> -	$(CROSS_PREFIX)objcopy -O binary $< $@
-> +all: $(TARGET_LIST)
->
-> -x86.o: x86-a-b-bootblock.S
-> -	$(CROSS_PREFIX)gcc -m32 -march=3Di486 -c $< -o $@
-> +$(TARGET_LIST):
-> +	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
->
->  clean:
-> -	@rm -rf *.boot *.o *.bootsect
-> +	for target in $(TARGET_LIST); do \
-> +		$(MAKE) -C $$target clean; \
-> +	done
-> diff --git a/tests/migration/i386/Makefile b/tests/migration/i386/Makefile
-> new file mode 100644
-> index 0000000..5c03241
-> --- /dev/null
-> +++ b/tests/migration/i386/Makefile
-> @@ -0,0 +1,22 @@
-> +# To specify cross compiler prefix, use CROSS_PREFIX=3D
-> +#   $ make CROSS_PREFIX=3Dx86_64-linux-gnu-
-> +
-> +.PHONY: all clean
-> +all: a-b-bootblock.h
-> +
-> +a-b-bootblock.h: x86.bootsect
-> +	echo "$$__note" > header.tmp
-> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
-> +	mv header.tmp $@
-> +
-> +x86.bootsect: x86.boot
-> +	dd if=3D$< of=3D$@ bs=3D256 count=3D2 skip=3D124
-> +
-> +x86.boot: x86.o
-> +	$(CROSS_PREFIX)objcopy -O binary $< $@
-> +
-> +x86.o: a-b-bootblock.S
-> +	$(CROSS_PREFIX)gcc -m32 -march=3Di486 -c $< -o $@
-> +
-> +clean:
-> +	@rm -rf *.boot *.o *.bootsect
-> diff --git a/tests/migration/x86-a-b-bootblock.S b/tests/migration/i386/a=
--b-bootblock.S
-> similarity index 93%
-> rename from tests/migration/x86-a-b-bootblock.S
-> rename to tests/migration/i386/a-b-bootblock.S
-> index b164264..3f97f28 100644
-> --- a/tests/migration/x86-a-b-bootblock.S
-> +++ b/tests/migration/i386/a-b-bootblock.S
-> @@ -3,10 +3,6 @@
->  #  range.
->  #  Outputs an initial 'A' on serial followed by repeated 'B's
->  #
-> -# run   tests/migration/rebuild-x86-bootblock.sh
-> -#   to regenerate the hex, and remember to include both the .h and .s
-> -#   in any patches.
-> -#
->  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
->  # This work is licensed under the terms of the GNU GPL, version 2 or lat=
-er.
->  # See the COPYING file in the top-level directory.
-> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/i386/a=
--b-bootblock.h
-> similarity index 92%
-> rename from tests/migration/x86-a-b-bootblock.h
-> rename to tests/migration/i386/a-b-bootblock.h
-> index 78a151f..7d459d4 100644
-> --- a/tests/migration/x86-a-b-bootblock.h
-> +++ b/tests/migration/i386/a-b-bootblock.h
-> @@ -1,7 +1,7 @@
-> -/* This file is automatically generated from
-> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
-> - * tests/migration/rebuild-x86-bootblock.sh to update,
-> - * and then remember to send both in your patch submission.
-> +/* This file is automatically generated from the assembly file in
-> + * tests/migration/i386. Edit that file and then run "make all"
-> + * inside tests/migration to update, and then remember to send both
-> + * the header and the assembler differences in your patch submission.
->   */
->  unsigned char x86_bootsect[] =3D {
->    0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
-
-
---
-Alex Benn=C3=A9e
+		Emilio
