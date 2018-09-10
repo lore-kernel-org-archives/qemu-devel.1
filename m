@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fzLmv-0001nu-2Q
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 08:59:33 -0400
+	(envelope-from <jthumshirn@suse.de>) id 1fzM49-00005q-OX
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:17:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fzLmr-0008Dg-S9
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 08:59:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59256 helo=mx1.redhat.com)
+	(envelope-from <jthumshirn@suse.de>) id 1fzLrU-00033e-Ew
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:04:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40216 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fzLmr-0008DJ-MI
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 08:59:29 -0400
-References: <20180820150903.1224-4-pbonzini@redhat.com>
-	<000001d43ea0$02146ed0$063d4c70$@ru>
-	<5b9a85eb-cefd-925c-b24b-95b93bbbfce8@redhat.com>
-	<000a01d448c8$4a55c0e0$df0142a0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ea5f162e-bd8a-001c-b78c-25378e3b2919@redhat.com>
-Date: Mon, 10 Sep 2018 14:59:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <000a01d448c8$4a55c0e0$df0142a0$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [3/4] cpus: protect TimerState writes with a
- spinlock
+	(Exim 4.71) (envelope-from <jthumshirn@suse.de>) id 1fzLrU-00030Q-38
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:04:16 -0400
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Date: Mon, 10 Sep 2018 15:04:07 +0200
+Message-Id: <20180910130407.24981-5-jthumshirn@suse.de>
+In-Reply-To: <20180910130407.24981-1-jthumshirn@suse.de>
+References: <20180910130407.24981-1-jthumshirn@suse.de>
+Subject: [Qemu-devel] [RESEND PATCH v2 4/4] wdt_z069: Add support for MEN
+ 16z069 Watchdog
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,158 +24,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: "'Emilio G . Cota'" <cota@braap.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Johannes Thumshirn <jthumshirn@suse.de>
 
-On 10/09/2018 07:36, Pavel Dovgalyuk wrote:
-> After locking here,
->=20
->>      if (runstate_is_running()) {
->>          int64_t clock =3D REPLAY_CLOCK(REPLAY_CLOCK_VIRTUAL_RT,
->>                                       cpu_get_clock_locked());
-> REPLAY_CLOCK can't request icount with cpu_get_icount_raw, because
-> it loops infinitely here:
->=20
->     do {
->         start =3D seqlock_read_begin(&timers_state.vm_clock_seqlock);
->         icount =3D cpu_get_icount_raw_locked();
->     } while (seqlock_read_retry(&timers_state.vm_clock_seqlock, start))=
-;
+Add 16z069 Watchdog over MEN Chameleon BUS emulation.
 
-Yeah, I meant to ask for the backtrace but I can see that the issue is in
-replay_save_instructions().  Does this work?
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ hw/watchdog/Makefile.objs |   1 +
+ hw/watchdog/wdt_z069.c    | 215 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 216 insertions(+)
+ create mode 100644 hw/watchdog/wdt_z069.c
 
-diff --git a/cpus.c b/cpus.c
-index 8ee6e5db93..f257a6ef12 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -502,8 +502,8 @@ static void icount_warp_rt(void)
-     seqlock_write_lock(&timers_state.vm_clock_seqlock,
-                        &timers_state.vm_clock_lock);
-     if (runstate_is_running()) {
--        int64_t clock =3D REPLAY_CLOCK(REPLAY_CLOCK_VIRTUAL_RT,
--                                     cpu_get_clock_locked());
-+        int64_t clock =3D REPLAY_CLOCK_LOCKED(REPLAY_CLOCK_VIRTUAL_RT,
-+                                            cpu_get_clock_locked());
-         int64_t warp_delta;
-=20
-         warp_delta =3D clock - timers_state.vm_clock_warp_start;
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 3ced6bc231..bb8660b4e4 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -100,14 +100,20 @@ bool replay_has_interrupt(void);
- /* Processing clocks and other time sources */
-=20
- /*! Save the specified clock */
--int64_t replay_save_clock(ReplayClockKind kind, int64_t clock);
-+int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
-+                          int64_t raw_icount);
- /*! Read the specified clock from the log or return cached data */
- int64_t replay_read_clock(ReplayClockKind kind);
- /*! Saves or reads the clock depending on the current replay mode. */
- #define REPLAY_CLOCK(clock, value)                                      =
-\
-     (replay_mode =3D=3D REPLAY_MODE_PLAY ? replay_read_clock((clock))   =
-    \
-         : replay_mode =3D=3D REPLAY_MODE_RECORD                         =
-    \
--            ? replay_save_clock((clock), (value))                       =
-\
-+            ? replay_save_clock((clock), (value), cpu_get_icount_raw()) =
-\
-+        : (value))
-+#define REPLAY_CLOCK_LOCKED(clock, value)                               =
-\
-+    (replay_mode =3D=3D REPLAY_MODE_PLAY ? replay_read_clock((clock))   =
-    \
-+        : replay_mode =3D=3D REPLAY_MODE_RECORD                         =
-    \
-+            ? replay_save_clock((clock), (value), cpu_get_icount_raw_loc=
-ked()) \
-         : (value))
-=20
- /* Events */
-diff --git a/replay/replay-internal.c b/replay/replay-internal.c
-index b077cb5fd5..7be4c010d0 100644
---- a/replay/replay-internal.c
-+++ b/replay/replay-internal.c
-@@ -217,20 +217,25 @@ void replay_mutex_unlock(void)
-     }
- }
-=20
-+void replay_advance_current_step(uint64_t current_step)
+diff --git a/hw/watchdog/Makefile.objs b/hw/watchdog/Makefile.objs
+index 9589bed63a3d..ada010f1eb69 100644
+--- a/hw/watchdog/Makefile.objs
++++ b/hw/watchdog/Makefile.objs
+@@ -3,3 +3,4 @@ common-obj-$(CONFIG_WDT_IB6300ESB) += wdt_i6300esb.o
+ common-obj-$(CONFIG_WDT_IB700) += wdt_ib700.o
+ common-obj-$(CONFIG_WDT_DIAG288) += wdt_diag288.o
+ common-obj-$(CONFIG_ASPEED_SOC) += wdt_aspeed.o
++common-obj-$(CONFIG_MCB) += wdt_z069.o
+diff --git a/hw/watchdog/wdt_z069.c b/hw/watchdog/wdt_z069.c
+new file mode 100644
+index 000000000000..9cd900bfdc17
+--- /dev/null
++++ b/hw/watchdog/wdt_z069.c
+@@ -0,0 +1,215 @@
++/*
++ * QEMU MEN 16z069 Watchdog over MCB emulation
++ *
++ * Copyright (C) 2018 Johannes Thumshirn <jth@kernel.org>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qemu/timer.h"
++#include "sysemu/watchdog.h"
++#include "hw/mcb/mcb.h"
++
++/* #define Z069_DEBUG 1 */
++
++#ifdef Z069_DEBUG
++#define z069_debug(fmt, ...)                                        \
++    fprintf(stderr, "wdt_z069: %s: "fmt, __func__, ##__VA_ARGS__)
++#else
++#define z069_debug(fmt, ...)
++#endif
++
++#define MEN_Z069_WTR 0x10
++#define MEN_Z069_WTR_WDEN BIT(15)
++#define MEN_Z069_WTR_WDET_MASK  0x7fff
++#define MEN_Z069_WVR 0x14
++
++#define CLK_500(x) ((x) * 2) /* 500Hz in ms */
++
++typedef struct {
++    /*< private >*/
++    MCBDevice dev;
++
++    /*< public >*/
++    QEMUTimer *timer;
++
++    bool enabled;
++    unsigned int timeout;
++
++    MemoryRegion mmio;
++
++    /* Registers */
++    uint16_t wtr;
++    uint16_t wvr;
++} MENZ069State;
++
++static void men_z069_wdt_enable(MENZ069State *s)
 +{
-+    int diff =3D (int)(current_step - replay_state.current_step);
-+
-+    /* Time can only go forward */
-+    assert(diff >=3D 0);
-+
-+    if (diff > 0) {
-+        replay_put_event(EVENT_INSTRUCTION);
-+        replay_put_dword(diff);
-+        replay_state.current_step +=3D diff;
-+    }
++    z069_debug("next timeout will fire in +%dms\n", s->timeout);
++    timer_mod(s->timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->timeout);
 +}
 +
- /*! Saves cached instructions. */
- void replay_save_instructions(void)
- {
-     if (replay_file && replay_mode =3D=3D REPLAY_MODE_RECORD) {
-         g_assert(replay_mutex_locked());
--        int diff =3D (int)(replay_get_current_step() - replay_state.curr=
-ent_step);
--
--        /* Time can only go forward */
--        assert(diff >=3D 0);
--
--        if (diff > 0) {
--            replay_put_event(EVENT_INSTRUCTION);
--            replay_put_dword(diff);
--            replay_state.current_step +=3D diff;
--        }
-+        replay_advance_current_step(replay_get_current_step());
-     }
- }
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index ac4b27b674..4f82676209 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -122,6 +122,8 @@ void replay_finish_event(void);
-     data_kind variable. */
- void replay_fetch_data_kind(void);
-=20
-+/*! Advance replay_state.current_step to the specified value. */
-+void replay_advance_current_step(uint64_t current_step);
- /*! Saves queued events (like instructions and sound). */
- void replay_save_instructions(void);
-=20
-diff --git a/replay/replay-time.c b/replay/replay-time.c
-index 6a7565ec8d..17caf35e74 100644
---- a/replay/replay-time.c
-+++ b/replay/replay-time.c
-@@ -15,13 +15,15 @@
- #include "replay-internal.h"
- #include "qemu/error-report.h"
-=20
--int64_t replay_save_clock(ReplayClockKind kind, int64_t clock)
-+int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t r=
-aw_icount)
- {
--
-     if (replay_file) {
-         g_assert(replay_mutex_locked());
-=20
--        replay_save_instructions();
-+        /* Due to the caller's locking requirements we get the icount fr=
-om it instead
-+         * of using replay_save_instructions().
-+         */
-+        replay_advance_current_step(raw_icount);
-         replay_put_event(EVENT_CLOCK + kind);
-         replay_put_qword(clock);
-     }
-
-Thanks,
-
-Paolo
++static void men_z069_wdt_disable(MENZ069State *s)
++{
++    timer_del(s->timer);
++}
++
++static uint64_t men_z069_wdt_read(void *opaque, hwaddr addr, unsigned size)
++{
++    MENZ069State *s = opaque;
++    uint64_t ret;
++
++    switch (addr) {
++    case MEN_Z069_WTR:
++        ret = s->wtr;
++        break;
++    case MEN_Z069_WVR:
++        ret = s->wvr;
++        break;
++    default:
++        ret = 0UL;
++        break;
++    }
++
++    z069_debug("returning: 0x%"PRIx64" @ 0x%lx\n", ret, addr);
++    return ret;
++}
++
++static void men_z069_wdt_write(void *opaque, hwaddr addr, uint64_t v,
++                               unsigned size)
++{
++    MENZ069State *s = opaque;
++    bool old_ena = s->enabled;
++    uint16_t val = v & 0xffff;
++    uint16_t tout;
++
++    z069_debug("got: 0x%"PRIx64" @ 0x%lx\n", v, addr);
++
++    switch (addr) {
++    case MEN_Z069_WTR:
++        s->wtr = val;
++        tout = val & MEN_Z069_WTR_WDET_MASK;
++        s->timeout = CLK_500(tout);
++        s->enabled = val & MEN_Z069_WTR_WDEN;
++        z069_debug("new timeout: %u (0x%x) %u\n", tout, tout, s->timeout);
++
++        if (old_ena && !s->enabled) {
++            men_z069_wdt_disable(s);
++        } else if (!old_ena && s->enabled) {
++            men_z069_wdt_enable(s);
++        }
++
++        break;
++    case MEN_Z069_WVR:
++        /* The watchdog trigger value toggles between 0x5555 and 0xaaaa */
++        if (val == (s->wvr ^ 0xffff)) {
++            s->wvr = val;
++            z069_debug("watchdog triggered, next timeout will fire in +%dms\n",
++                       s->timeout);
++            timer_mod(s->timer,
++                      qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + s->timeout);
++        }
++        break;
++    default:
++        break;
++    }
++    return;
++}
++
++static const MemoryRegionOps men_z069_io_ops = {
++    .read = men_z069_wdt_read,
++    .write = men_z069_wdt_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    },
++    .impl = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    },
++};
++
++static void men_z069_timer_expired(void *opaque)
++{
++    MENZ069State *s = opaque;
++
++    watchdog_perform_action();
++    timer_del(s->timer);
++}
++
++static void men_z069_wdt_realize(DeviceState *dev, Error **errp)
++{
++    MCBDevice *mdev = MCB_DEVICE(dev);
++    MENZ069State *s = DO_UPCAST(MENZ069State, dev, mdev);
++    MCBus *bus = MCB_BUS(qdev_get_parent_bus(DEVICE(dev)));
++
++    mdev->gdd = mcb_new_chameleon_descriptor(bus, 69, mdev->rev,
++                                             mdev->var, 0x18);
++    if (!mdev->gdd) {
++        return;
++    }
++
++    s->wvr = 0x5555;
++    s->wtr = 0x7fff;
++    s->timeout = CLK_500(s->wtr & MEN_Z069_WTR_WDET_MASK);
++    s->timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
++                            men_z069_timer_expired, s);
++
++    memory_region_init_io(&s->mmio, OBJECT(s),
++                          &men_z069_io_ops, s, "z069.wdt", 0x16);
++    memory_region_add_subregion(&bus->mmio_region, mdev->gdd->offset,
++                                &s->mmio);
++}
++
++static void men_z069_wdt_unrealize(DeviceState *dev, Error **errp)
++{
++    MCBDevice *mdev = MCB_DEVICE(dev);
++
++    g_free(&mdev->gdd);
++}
++
++static const VMStateDescription vmstate_z069_wdt = {
++    .name = "z069-wdt",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_MCB_DEVICE(dev, MENZ069State),
++        VMSTATE_TIMER_PTR(timer, MENZ069State),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property men_z069_wdt_properties[] = {
++    DEFINE_PROP_UINT8("rev", MENZ069State, dev.rev, 0),
++    DEFINE_PROP_UINT8("var", MENZ069State, dev.var, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void men_z069_wdt_class_intifn(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    MCBDeviceClass *mc = MCB_DEVICE_CLASS(klass);
++
++    mc->realize = men_z069_wdt_realize;
++    mc->unrealize = men_z069_wdt_unrealize;
++
++    dc->desc = "MEN 16z069 Watchdog Timer";
++    dc->vmsd = &vmstate_z069_wdt;
++    dc->props = men_z069_wdt_properties;
++}
++
++static const TypeInfo men_z069_wdt_info = {
++    .name = "z069-wdt",
++    .parent = TYPE_MCB_DEVICE,
++    .instance_size = sizeof(MENZ069State),
++    .class_init = men_z069_wdt_class_intifn,
++};
++
++static void men_z069_wdt_register_types(void)
++{
++    type_register_static(&men_z069_wdt_info);
++}
++
++type_init(men_z069_wdt_register_types);
+-- 
+2.16.4
