@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57395)
+Received: from eggs.gnu.org ([208.118.235.92]:43588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzP1s-0000Sp-K3
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:27:17 -0400
+	(envelope-from <berto@igalia.com>) id 1fzPE0-0004jR-4j
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:39:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzP1i-0005dd-0D
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:27:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzP1f-0005ZN-SN
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:27:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzP1V-0003yD-Fq
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 16:26:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 69A852E8052
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 16:26:49 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1fzPDw-00060o-Qr
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:39:43 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <7d9487b1-53d6-547b-8c28-f9a1fad4991b@redhat.com>
+References: <20180910092924.23403-1-berto@igalia.com>
+	<20180910095748.GD4901@dhcp-200-186.str.redhat.com>
+	<7d9487b1-53d6-547b-8c28-f9a1fad4991b@redhat.com>
+Date: Mon, 10 Sep 2018 18:39:37 +0200
+Message-ID: <w51h8ixtigm.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Sep 2018 16:07:01 -0000
-From: Jan Marti <1404278@bugs.launchpad.net>
-Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
-Message-Id: <153659562198.29061.508545728408551578.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
- windows host
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Test snapshot=on with
+ nonexistent TMPDIR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-when i install tap driver from https://openvpn.net/index.php/open-
-source/downloads.html im able to start with tap01 (when i rename the tap
-interface to "tap01"..)
+On Mon 10 Sep 2018 05:55:15 PM CEST, Eric Blake wrote:
+>> Hm, it actually doesn't crash for me even without the fix. Anyway, I
+>> don't have a good idea to make it more likely to crash and it's
+>> certainly better than nothing.
+>
+> Does running the test under valgrind reliably see the use-after-free?
 
-but on start i get an apipa address with that config:
+Good question! :-)
 
-qemu-system-arm.exe -M versatilepb -cpu arm1176 -hda
-2018-09-03_stretch_inkl_phalcon.img -kernel kernel-qemu-4.4.34-jessie -m
-512 -append "root=3D/dev/sda2 panic=3D1 rootfstype=3Dext4 rw" -no-reboot -m
-256 -net nic -net tap,ifname=3Dtap01
+Unfortunately valgrind also needs a valid TMPDIR, so if you change it in
+order to reproduce the bug then valgrind won't run.
 
+I don't know if there's a way to tell valgrind to run the specified
+program with its own environment variables, but you can simply edit
+QEMU's get_tmp_filename() to always return an invalid directory, and
+then you get the expected result:
 
-why??
+ Invalid read of size 8 
+    at 0x859914: qobject_unref_impl (qobject.h:98)
+    by 0x85F8EA: bdrv_open_inherit (block.c:2831)
+    by 0x85F963: bdrv_open (block.c:2839)
+    by 0x8BDD19: blk_new_open (block-backend.c:375)
+    by 0x58A88A: blockdev_init (blockdev.c:599)
+    by 0x58B6C4: drive_new (blockdev.c:990)
+    by 0x59C004: drive_init_func (vl.c:1143)
+    by 0x9A0CE3: qemu_opts_foreach (qemu-option.c:1106)
+    by 0x5A4692: main (vl.c:4454)
+  Address 0x1df67458 is 8 bytes inside a block of size 4,120 free'd
+    at 0x4C2CDDB: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+    by 0x97AD5F: qdict_destroy_obj (qdict.c:459)
+    by 0x97CC04: qobject_destroy (qobject.c:41)
+    by 0x85996F: qobject_unref_impl (qobject.h:100)
+    by 0x85F6D4: bdrv_open_inherit (block.c:2794)
+    by 0x85F963: bdrv_open (block.c:2839)
+      [...]
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1404278
-
-Title:
-  tap connections not working on windows host
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  using latest qemu 2.2.0 64bit for windows host (installed from
-  qemu-w64-setup-20141210.exe obtained from http://qemu.weilnetz.de/w64/
-  ),OpenVPN 2.6.3-I601 64bit tap adapter named tap01 and calling qemu
-  using the following.
-
-  qemu-system-x86_64.exe -m 512 -net nic -net tap,ifname=3Dtap01 -hda
-  "c:\\data\\images\\test.img"
-
-  where the image contains a slackware 14.0 64bit install.
-  The tap is bridged with the real network adapter and the bridge is given =
-an ip of 10.1.1.41 (which works as the ip for the windows host). The tap ad=
-apter (in network connections) shows connected when the qemu vm is running.=
- inside the vm, the network is given an ip of 10.1.1.143 (the netmask and d=
-efault gateway are the same for the virtual and real pc).
-  fault.
-  The vm cannot see the rest of the local network or visa-versa. This used =
-to work in early (0.9 32bit) versions of qemu.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1404278/+subscriptions
+Berto
