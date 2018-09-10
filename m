@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fzPNp-00082n-JM
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:49:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fzPPI-0000I5-HA
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:51:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fzPNo-0002qt-3T
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:49:53 -0400
-References: <20180814121443.33114-1-vsementsov@virtuozzo.com>
-	<20180814121443.33114-2-vsementsov@virtuozzo.com>
-	<954db07e-d338-9cd4-341f-d8916470b89b@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <443e612e-399b-7bf9-9379-cfa6ea516dfb@virtuozzo.com>
-Date: Mon, 10 Sep 2018 19:49:36 +0300
+	(envelope-from <mreitz@redhat.com>) id 1fzPPH-0004Ex-II
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:51:24 -0400
+References: <20180809213528.14738-1-mreitz@redhat.com>
+	<20180910151848.GJ4901@dhcp-200-186.str.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a043566e-f794-5be0-b0dd-29490f735486@redhat.com>
+Date: Mon, 10 Sep 2018 18:51:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <954db07e-d338-9cd4-341f-d8916470b89b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] dirty-bitmap: improve
- bdrv_dirty_bitmap_next_zero
+In-Reply-To: <20180910151848.GJ4901@dhcp-200-186.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1a6U3gaRGamShXn39KxFIXDddGech5Pd1"
+Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 00/31] block: Fix some filename
+ generation issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,210 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-08.09.2018 00:49, John Snow wrote:
->
-> On 08/14/2018 08:14 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Add bytes parameter to the function, to limit searched range.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1a6U3gaRGamShXn39KxFIXDddGech5Pd1
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>
+Message-ID: <a043566e-f794-5be0-b0dd-29490f735486@redhat.com>
+Subject: Re: [PATCH for-3.1 v10 00/31] block: Fix some filename generation
+ issues
+References: <20180809213528.14738-1-mreitz@redhat.com>
+ <20180910151848.GJ4901@dhcp-200-186.str.redhat.com>
+In-Reply-To: <20180910151848.GJ4901@dhcp-200-186.str.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 10.09.18 17:18, Kevin Wolf wrote:
+> Am 09.08.2018 um 23:34 hat Max Reitz geschrieben:
+>> Once more, I=E2=80=99ll spare both me and you another iteration of the=
+ cover
+>> letter, so see here:
 >>
-> I'm going to assume that Eric Blake has been through here and commented
-> on the interface itself.
->
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/block/dirty-bitmap.h |  3 ++-
->>   include/qemu/hbitmap.h       | 10 ++++++++--
->>   block/backup.c               |  2 +-
->>   block/dirty-bitmap.c         |  5 +++--
->>   nbd/server.c                 |  2 +-
->>   tests/test-hbitmap.c         |  2 +-
->>   util/hbitmap.c               | 25 ++++++++++++++++++++-----
->>   7 files changed, 36 insertions(+), 13 deletions(-)
+>> http://lists.nongnu.org/archive/html/qemu-block/2017-09/msg01030.html
 >>
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
->> index 259bd27c40..27f5299c4e 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -98,7 +98,8 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
->>   BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
->>                                           BdrvDirtyBitmap *bitmap);
->>   char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
->> -int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start);
->> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start,
->> +                                    int64_t end);
->>   BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
->>                                                     BdrvDirtyBitmap *bitmap,
->>                                                     Error **errp);
->> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
->> index ddca52c48e..fe4dfde27a 100644
->> --- a/include/qemu/hbitmap.h
->> +++ b/include/qemu/hbitmap.h
->> @@ -295,10 +295,16 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
->>   /* hbitmap_next_zero:
->>    * @hb: The HBitmap to operate on
->>    * @start: The bit to start from.
->> + * @end: End of range to search in. If @end is -1, search up to the bitmap
->> + *       end.
->>    *
->> - * Find next not dirty bit.
->> + * Find next not dirty bit within range [@start, @end), or from
->> + * @start to the bitmap end if @end is -1. If not found, return -1.
->> + *
->> + * @end may be greater than original bitmap size, in this case, search up to
-> "original" bitmap size? I think that's just an implementation detail, we
-> can drop 'original' here, yes?
-
-hm, no. we have field "size", which is not "original". But it all means 
-that this place needs a bit more refactoring.
-
->
->> + * the bitmap end.
->>    */
->> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start);
->> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, int64_t end);
->>   
-> The interface looks weird because we can define a 'start' that's beyond
-> the 'end'.
->
-> I realize that you need a signed integer for 'end' to signify EOF...
-> should we do a 'bytes' parameter instead? (Did you already do that in an
-> earlier version and we changed it?)
->
-> Well, it's not a big deal to me personally.
-
-interface with constant end parameter is more comfortable for loop: we 
-don't need to update 'bytes' parameter on each iteration
-
->
->>   /* hbitmap_create_meta:
->>    * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.
->> diff --git a/block/backup.c b/block/backup.c
->> index 8630d32926..9bfd3f7189 100644
->> --- a/block/backup.c
->> +++ b/block/backup.c
->> @@ -458,7 +458,7 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
->>               break;
->>           }
->>   
->> -        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset);
->> +        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset, -1);
->>           if (offset == -1) {
->>               hbitmap_set(job->copy_bitmap, cluster, end - cluster);
->>               break;
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index c9b8a6fd52..037ae62726 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -785,9 +785,10 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
->>       return hbitmap_sha256(bitmap->bitmap, errp);
->>   }
->>   
->> -int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
->> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
->> +                                    int64_t end)
->>   {
->> -    return hbitmap_next_zero(bitmap->bitmap, offset);
->> +    return hbitmap_next_zero(bitmap->bitmap, offset, end);
->>   }
->>   
->>   void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
->> diff --git a/nbd/server.c b/nbd/server.c
->> index ea5fe0eb33..07920d123b 100644
->> --- a/nbd/server.c
->> +++ b/nbd/server.c
->> @@ -1952,7 +1952,7 @@ static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
->>       assert(begin < overall_end && nb_extents);
->>       while (begin < overall_end && i < nb_extents) {
->>           if (dirty) {
->> -            end = bdrv_dirty_bitmap_next_zero(bitmap, begin);
->> +            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, -1);
->>           } else {
->>               bdrv_set_dirty_iter(it, begin);
->>               end = bdrv_dirty_iter_next(it);
->> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
->> index 5e67ac1d3a..6b6a40bddd 100644
->> --- a/tests/test-hbitmap.c
->> +++ b/tests/test-hbitmap.c
->> @@ -939,7 +939,7 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
->>   
->>   static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
->>   {
->> -    int64_t ret1 = hbitmap_next_zero(data->hb, start);
->> +    int64_t ret1 = hbitmap_next_zero(data->hb, start, -1);
->>       int64_t ret2 = start;
->>       for ( ; ret2 < data->size && hbitmap_get(data->hb, ret2); ret2++) {
->>           ;
->> diff --git a/util/hbitmap.c b/util/hbitmap.c
->> index bcd304041a..1687372504 100644
->> --- a/util/hbitmap.c
->> +++ b/util/hbitmap.c
->> @@ -53,6 +53,9 @@
->>    */
->>   
->>   struct HBitmap {
->> +    /* Size of the bitmap, as requested in hbitmap_alloc. */
->> +    uint64_t orig_size;
->> +
->>       /* Number of total bits in the bottom level.  */
->>       uint64_t size;
->>   
->> @@ -192,16 +195,26 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
->>       }
->>   }
->>   
->> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
->> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, int64_t end)
->>   {
->>       size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
->>       unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
->> -    uint64_t sz = hb->sizes[HBITMAP_LEVELS - 1];
->>       unsigned long cur = last_lev[pos];
->> -    unsigned start_bit_offset =
->> -            (start >> hb->granularity) & (BITS_PER_LONG - 1);
->> +    unsigned start_bit_offset;
->> +    uint64_t end_bit, sz;
->>       int64_t res;
->>   
->> +    if (start >= hb->orig_size || (end != -1 && end <= start)) {
->> +        return -1;
->> +    }
->> +
->> +    end_bit = end == -1 ? hb->size : ((end - 1) >> hb->granularity) + 1;
->> +    sz = (end_bit + BITS_PER_LONG - 1) >> BITS_PER_LEVEL;
->> +
->> +    /* There may be some zero bits in @cur before @start. We are not interested
->> +     * in them, let's set them.
->> +     */
->> +    start_bit_offset = (start >> hb->granularity) & (BITS_PER_LONG - 1);
->>       cur |= (1UL << start_bit_offset) - 1;
->>       assert((start >> hb->granularity) < hb->size);
->>   
->> @@ -218,7 +231,7 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
->>       }
->>   
->>       res = (pos << BITS_PER_LEVEL) + ctol(cur);
->> -    if (res >= hb->size) {
->> +    if (res >= end_bit) {
->>           return -1;
->>       }
->>   
->> @@ -652,6 +665,8 @@ HBitmap *hbitmap_alloc(uint64_t size, int granularity)
->>       HBitmap *hb = g_new0(struct HBitmap, 1);
->>       unsigned i;
->>   
->> +    hb->orig_size = size;
->> +
->>       assert(granularity >= 0 && granularity < 64);
->>       size = (size + (1ULL << granularity) - 1) >> granularity;
->>       assert(size <= ((uint64_t)1 << HBITMAP_LOG_MAX_SIZE));
+>> (Although this series no longer includes a @base-directory option.)
 >>
-> Despite my comments, I'm OK with or without changes.
->
-> Reviewed-by: John Snow <jsnow@redhat.com>
+>> In regards to the last version, the biggest change is that I dropped
+>> backing_overridden and instead try to compare the filename from the
+>> image header with the filename of the actual backing BDS to find out
+>> whether the backing file has been overridden.
+>>
+>> In order that this doesn=E2=80=99t break whenever the header contains =
+a slightly
+>> unusual (=E2=80=9Cnon-canonical=E2=80=9D) backing filename (e.g. =E2=80=
+=9Cfile:foo.qcow2=E2=80=9D or
+>> =E2=80=9Cnbd:localhost:10809=E2=80=9D instead of =E2=80=9Cnbd://localh=
+ost:10809=E2=80=9D, i.e. something
+>> different from what bdrv_refresh_filename() would generate), when the
+>> reference filename in the BDS (auto_backing_file) is used to open the
+>> backing file, it is updated from the backing BDS's resulting filename.=
+
+>=20
+> This doesn't seem to apply cleanly any more.
+
+I know, but is that a "Please send your current v11 to the list"?
+
+Max
 
 
--- 
-Best regards,
-Vladimir
+--1a6U3gaRGamShXn39KxFIXDddGech5Pd1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluWoPwACgkQ9AfbAGHV
+z0Aklgf+L88iHMoKSLvDLWRJ84+flH0vYqNIrQp4Lm0lOk6A/HbzWhNdCk7sW9/T
+ph9x55RPiLpBhdQCGzn56pk/Rx3Iil3788QF016Acys6ZB/LQj3rMPkckHK8LY3i
+DebK2MjycsnL2HRvOb7I8UVVEdgCBc8vuoJoyaqo2IX3tpT+qFeO41M2g5voev4J
+m2lCW7F9V4glNMFmQSazJzDloY79A8jQiMzVS5LY9ta1SIAgx4oRDRVy8IpmovA4
+lWTMf/nSsKzM9YpGi320CcSdctAMcBR+wr0dXBTqdq9zQaPb5dl5/X8ajDFseuvD
+Y7QOCFQzX2mTJjsq7MJ+Im6bP60HLw==
+=kAvd
+-----END PGP SIGNATURE-----
+
+--1a6U3gaRGamShXn39KxFIXDddGech5Pd1--
