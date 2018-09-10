@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fzQSG-0008Al-Tj
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 13:58:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1fzQWs-00024L-K4
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:03:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fzQSC-0002GN-De
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 13:58:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40182 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fzQWl-0005V4-NC
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:03:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53886 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fzQSC-0002Fk-8o
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 13:58:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fzQWl-0005Ul-Hz
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:03:11 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E4CD400C3C2
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 17:58:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF2DCDFF3
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 18:03:10 +0000 (UTC)
 References: <1536067356-44609-1-git-send-email-imammedo@redhat.com>
 	<1536067356-44609-2-git-send-email-imammedo@redhat.com>
+	<20180905021255.GK12698@habkost.net>
+	<20180905112511.1d245cc8@igors-macbook-pro.local>
+	<20180905134512.GL12698@habkost.net>
+	<20180906100213.3d03e9d0@redhat.com>
+	<20180910174923.GE12698@habkost.net>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <94590e00-d0ae-2ac2-ea88-abb883066037@redhat.com>
-Date: Mon, 10 Sep 2018 12:58:24 -0500
+Message-ID: <8be73d98-6ccb-6b12-252c-d2bd4c41133c@redhat.com>
+Date: Mon, 10 Sep 2018 13:03:07 -0500
 MIME-Version: 1.0
-In-Reply-To: <1536067356-44609-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <20180910174923.GE12698@habkost.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -35,53 +40,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, drjones@redhat.com, ehabkost@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: libvir-list@redhat.com, drjones@redhat.com, qemu-devel@nongnu.org
 
-On 9/4/18 8:22 AM, Igor Mammedov wrote:
-> -smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-> so that total number of logical CPUs [sockets * cores * threads]
-> would be equal to [maxcpus], however historically we didn't have
-> such check in QEMU and it is possible to start VM with an invalid
-> topology.
-> Deprecate invalid options combination so we can make sure that
-> the topology VM started with is always correct in the future.
-> Users with an invalid sockets/cores/threads/maxcpus values should
-> fix their CLI to make sure that
->     [sockets * cores * threads] == [maxcpus]
+On 9/10/18 12:49 PM, Eduardo Habkost wrote:
+
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> I was considering something like this:
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 060e015be6..74f6a64b8b 100644
+> --- a/qemu-deprecated.texi
 
+> +++ b/qemu-options.hx
+> @@ -155,8 +155,13 @@ to 4.
+>   For the PC target, the number of @var{cores} per socket, the number
+>   of @var{threads} per cores and the total number of @var{sockets} can be
+>   specified. Missing values will be computed. If any on the three values is
+
+while here, s/on/of/
+
+> -given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
+> -specifies the maximum number of hotpluggable CPUs.
+> +given, the total number of CPUs @var{n} can be omitted.
+> +
+> +@var{maxcpus} specifies the maximum number of hotpluggable CPUs
+> +and should be equal to @math{@var{sockets} * @var{cores} * @var{threads}}
+> +(even if @var{sockets}, @var{cores}, or @var{threads} is omitted
+> +and computed automatically).
+> +
+>   ETEXI
 >   
-> +@subsection -smp X,[socket=a,core=b,thread=c],maxcpus=Y (since 3.1)
-> +
-> +CPU topology properties should describe whole machine topology including
-> +possible CPUs, but historically it was possible to start QEMU with
-> +an incorrect topology where
-> +  sockets * cores * threads >= X && X < maxcpus
-> +which could lead to an incorrect topology enumeration by the guest.
-> +Support for invalid topologies will be removed, the user must ensure
-> +topologies described with -smp include all possible cpus, i.e.
-> +  sockets * cores * threads == maxcpus
-> +Note: it's assumed that maxcpus value must be multiple of the topology
-> +options present on command line to avoid creating an invalid topology.
-> +If maxcpus isn't be multiple of present topology options then the condition
+>   DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+> 
 
-s/be/a/
-
-> +(sockets * cores * threads == maxcpus) can't be satisfied and it will
-> +trigger deprecation warning which later will be converted to a error.
-
-a/a error/an error/
-
-> +If you get deprecation warning it's recommended to explicitly specify
-
-s/get/get a/
-
-> +a correct topology to make warning go away and ensure that it will
-> +continue working in the future.
-> +
 -- 
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
