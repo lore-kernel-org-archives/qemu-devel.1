@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fzCk0-0004tf-NF
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:20:00 -0400
+	(envelope-from <famz@redhat.com>) id 1fzDKO-0002yD-80
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fzCbA-0004wx-CI
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:10:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33874 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fzDKL-0004e8-22
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:57:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35114 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fzCbA-0004vJ-5W
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:10:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F8772E9BF
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 03:10:46 +0000 (UTC)
-References: <1534495027-6621-1-git-send-email-jasowang@redhat.com>
-	<20180907164811-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <42a56a37-768f-93de-f9e5-b67633faa193@redhat.com>
-Date: Mon, 10 Sep 2018 11:10:40 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fzDKK-0004dg-Tv
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:57:28 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Mon, 10 Sep 2018 11:57:14 +0800
+Message-Id: <20180910035719.18056-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180907164811-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] linux-headers: update to mainline
- 5c60a7389d79
+Subject: [Qemu-devel] [PULL 0/5] Docker patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,20 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
+The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd2415574=
+52:
 
+  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27=
+-v2' into staging (2018-08-27 16:44:20 +0100)
 
-On 2018=E5=B9=B409=E6=9C=8808=E6=97=A5 04:48, Michael S. Tsirkin wrote:
-> On Fri, Aug 17, 2018 at 04:37:06PM +0800, Jason Wang wrote:
->> Sync linux headers to 5c60a7389d79 ("Merge tag 'for-linus-4.19-ofs1' o=
-f git://git.kernel.org/pub/scm/linux/kernel/git/hubcap/linux").
->>
->> Signed-off-by: Jason Wang<jasowang@redhat.com>
-> so there will be a new version of this as ioctl has changed, right?
->
+are available in the Git repository at:
 
-Want me to repost the series or another patch to sync it on top?
+  git://github.com/famz/qemu.git tags/docker-pull-request
 
-Thanks
+for you to fetch changes up to b28ef6b9eb2401b9500c59cb32ff5fe43400f0be:
+
+  docker: Clean dangling tarball files (2018-09-10 11:50:06 +0800)
+
+----------------------------------------------------------------
+docker testing improvements by Phil.
+
+----------------------------------------------------------------
+
+Philippe Mathieu-Daud=C3=A9 (5):
+  docker: Sort Fedora packages
+  docker: Sort Fedora packages (i386-cross)
+  docker: Sort Ubuntu packages
+  docker: Sort CentOS packages
+  docker: Clean dangling tarball files
+
+ tests/docker/Makefile.include                 |   1 +
+ tests/docker/dockerfiles/centos7.docker       |   2 +-
+ .../dockerfiles/fedora-i386-cross.docker      |   9 +-
+ tests/docker/dockerfiles/fedora.docker        | 102 ++++++++++++++----
+ tests/docker/dockerfiles/ubuntu.docker        |  61 +++++++++--
+ 5 files changed, 142 insertions(+), 33 deletions(-)
+
+--=20
+2.17.1
