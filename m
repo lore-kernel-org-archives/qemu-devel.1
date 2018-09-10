@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([208.118.235.92]:43588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fzPE0-0004jR-4j
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:39:45 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fzPNp-00082n-JM
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:49:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fzPDw-00060o-Qr
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:39:43 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <7d9487b1-53d6-547b-8c28-f9a1fad4991b@redhat.com>
-References: <20180910092924.23403-1-berto@igalia.com>
-	<20180910095748.GD4901@dhcp-200-186.str.redhat.com>
-	<7d9487b1-53d6-547b-8c28-f9a1fad4991b@redhat.com>
-Date: Mon, 10 Sep 2018 18:39:37 +0200
-Message-ID: <w51h8ixtigm.fsf@maestria.local.igalia.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fzPNo-0002qt-3T
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:49:53 -0400
+References: <20180814121443.33114-1-vsementsov@virtuozzo.com>
+	<20180814121443.33114-2-vsementsov@virtuozzo.com>
+	<954db07e-d338-9cd4-341f-d8916470b89b@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <443e612e-399b-7bf9-9379-cfa6ea516dfb@virtuozzo.com>
+Date: Mon, 10 Sep 2018 19:49:36 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Test snapshot=on with
- nonexistent TMPDIR
+In-Reply-To: <954db07e-d338-9cd4-341f-d8916470b89b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] dirty-bitmap: improve
+ bdrv_dirty_bitmap_next_zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +26,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-On Mon 10 Sep 2018 05:55:15 PM CEST, Eric Blake wrote:
->> Hm, it actually doesn't crash for me even without the fix. Anyway, I
->> don't have a good idea to make it more likely to crash and it's
->> certainly better than nothing.
+08.09.2018 00:49, John Snow wrote:
 >
-> Does running the test under valgrind reliably see the use-after-free?
+> On 08/14/2018 08:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Add bytes parameter to the function, to limit searched range.
+>>
+> I'm going to assume that Eric Blake has been through here and commented
+> on the interface itself.
+>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/block/dirty-bitmap.h |  3 ++-
+>>   include/qemu/hbitmap.h       | 10 ++++++++--
+>>   block/backup.c               |  2 +-
+>>   block/dirty-bitmap.c         |  5 +++--
+>>   nbd/server.c                 |  2 +-
+>>   tests/test-hbitmap.c         |  2 +-
+>>   util/hbitmap.c               | 25 ++++++++++++++++++++-----
+>>   7 files changed, 36 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+>> index 259bd27c40..27f5299c4e 100644
+>> --- a/include/block/dirty-bitmap.h
+>> +++ b/include/block/dirty-bitmap.h
+>> @@ -98,7 +98,8 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+>>   BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+>>                                           BdrvDirtyBitmap *bitmap);
+>>   char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
+>> -int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start);
+>> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t start,
+>> +                                    int64_t end);
+>>   BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+>>                                                     BdrvDirtyBitmap *bitmap,
+>>                                                     Error **errp);
+>> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+>> index ddca52c48e..fe4dfde27a 100644
+>> --- a/include/qemu/hbitmap.h
+>> +++ b/include/qemu/hbitmap.h
+>> @@ -295,10 +295,16 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
+>>   /* hbitmap_next_zero:
+>>    * @hb: The HBitmap to operate on
+>>    * @start: The bit to start from.
+>> + * @end: End of range to search in. If @end is -1, search up to the bitmap
+>> + *       end.
+>>    *
+>> - * Find next not dirty bit.
+>> + * Find next not dirty bit within range [@start, @end), or from
+>> + * @start to the bitmap end if @end is -1. If not found, return -1.
+>> + *
+>> + * @end may be greater than original bitmap size, in this case, search up to
+> "original" bitmap size? I think that's just an implementation detail, we
+> can drop 'original' here, yes?
 
-Good question! :-)
+hm, no. we have field "size", which is not "original". But it all means 
+that this place needs a bit more refactoring.
 
-Unfortunately valgrind also needs a valid TMPDIR, so if you change it in
-order to reproduce the bug then valgrind won't run.
+>
+>> + * the bitmap end.
+>>    */
+>> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start);
+>> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, int64_t end);
+>>   
+> The interface looks weird because we can define a 'start' that's beyond
+> the 'end'.
+>
+> I realize that you need a signed integer for 'end' to signify EOF...
+> should we do a 'bytes' parameter instead? (Did you already do that in an
+> earlier version and we changed it?)
+>
+> Well, it's not a big deal to me personally.
 
-I don't know if there's a way to tell valgrind to run the specified
-program with its own environment variables, but you can simply edit
-QEMU's get_tmp_filename() to always return an invalid directory, and
-then you get the expected result:
+interface with constant end parameter is more comfortable for loop: we 
+don't need to update 'bytes' parameter on each iteration
 
- Invalid read of size 8 
-    at 0x859914: qobject_unref_impl (qobject.h:98)
-    by 0x85F8EA: bdrv_open_inherit (block.c:2831)
-    by 0x85F963: bdrv_open (block.c:2839)
-    by 0x8BDD19: blk_new_open (block-backend.c:375)
-    by 0x58A88A: blockdev_init (blockdev.c:599)
-    by 0x58B6C4: drive_new (blockdev.c:990)
-    by 0x59C004: drive_init_func (vl.c:1143)
-    by 0x9A0CE3: qemu_opts_foreach (qemu-option.c:1106)
-    by 0x5A4692: main (vl.c:4454)
-  Address 0x1df67458 is 8 bytes inside a block of size 4,120 free'd
-    at 0x4C2CDDB: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-    by 0x97AD5F: qdict_destroy_obj (qdict.c:459)
-    by 0x97CC04: qobject_destroy (qobject.c:41)
-    by 0x85996F: qobject_unref_impl (qobject.h:100)
-    by 0x85F6D4: bdrv_open_inherit (block.c:2794)
-    by 0x85F963: bdrv_open (block.c:2839)
-      [...]
+>
+>>   /* hbitmap_create_meta:
+>>    * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.
+>> diff --git a/block/backup.c b/block/backup.c
+>> index 8630d32926..9bfd3f7189 100644
+>> --- a/block/backup.c
+>> +++ b/block/backup.c
+>> @@ -458,7 +458,7 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
+>>               break;
+>>           }
+>>   
+>> -        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset);
+>> +        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset, -1);
+>>           if (offset == -1) {
+>>               hbitmap_set(job->copy_bitmap, cluster, end - cluster);
+>>               break;
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index c9b8a6fd52..037ae62726 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -785,9 +785,10 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
+>>       return hbitmap_sha256(bitmap->bitmap, errp);
+>>   }
+>>   
+>> -int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
+>> +int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
+>> +                                    int64_t end)
+>>   {
+>> -    return hbitmap_next_zero(bitmap->bitmap, offset);
+>> +    return hbitmap_next_zero(bitmap->bitmap, offset, end);
+>>   }
+>>   
+>>   void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>> diff --git a/nbd/server.c b/nbd/server.c
+>> index ea5fe0eb33..07920d123b 100644
+>> --- a/nbd/server.c
+>> +++ b/nbd/server.c
+>> @@ -1952,7 +1952,7 @@ static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
+>>       assert(begin < overall_end && nb_extents);
+>>       while (begin < overall_end && i < nb_extents) {
+>>           if (dirty) {
+>> -            end = bdrv_dirty_bitmap_next_zero(bitmap, begin);
+>> +            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, -1);
+>>           } else {
+>>               bdrv_set_dirty_iter(it, begin);
+>>               end = bdrv_dirty_iter_next(it);
+>> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+>> index 5e67ac1d3a..6b6a40bddd 100644
+>> --- a/tests/test-hbitmap.c
+>> +++ b/tests/test-hbitmap.c
+>> @@ -939,7 +939,7 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
+>>   
+>>   static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
+>>   {
+>> -    int64_t ret1 = hbitmap_next_zero(data->hb, start);
+>> +    int64_t ret1 = hbitmap_next_zero(data->hb, start, -1);
+>>       int64_t ret2 = start;
+>>       for ( ; ret2 < data->size && hbitmap_get(data->hb, ret2); ret2++) {
+>>           ;
+>> diff --git a/util/hbitmap.c b/util/hbitmap.c
+>> index bcd304041a..1687372504 100644
+>> --- a/util/hbitmap.c
+>> +++ b/util/hbitmap.c
+>> @@ -53,6 +53,9 @@
+>>    */
+>>   
+>>   struct HBitmap {
+>> +    /* Size of the bitmap, as requested in hbitmap_alloc. */
+>> +    uint64_t orig_size;
+>> +
+>>       /* Number of total bits in the bottom level.  */
+>>       uint64_t size;
+>>   
+>> @@ -192,16 +195,26 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
+>>       }
+>>   }
+>>   
+>> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
+>> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, int64_t end)
+>>   {
+>>       size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
+>>       unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
+>> -    uint64_t sz = hb->sizes[HBITMAP_LEVELS - 1];
+>>       unsigned long cur = last_lev[pos];
+>> -    unsigned start_bit_offset =
+>> -            (start >> hb->granularity) & (BITS_PER_LONG - 1);
+>> +    unsigned start_bit_offset;
+>> +    uint64_t end_bit, sz;
+>>       int64_t res;
+>>   
+>> +    if (start >= hb->orig_size || (end != -1 && end <= start)) {
+>> +        return -1;
+>> +    }
+>> +
+>> +    end_bit = end == -1 ? hb->size : ((end - 1) >> hb->granularity) + 1;
+>> +    sz = (end_bit + BITS_PER_LONG - 1) >> BITS_PER_LEVEL;
+>> +
+>> +    /* There may be some zero bits in @cur before @start. We are not interested
+>> +     * in them, let's set them.
+>> +     */
+>> +    start_bit_offset = (start >> hb->granularity) & (BITS_PER_LONG - 1);
+>>       cur |= (1UL << start_bit_offset) - 1;
+>>       assert((start >> hb->granularity) < hb->size);
+>>   
+>> @@ -218,7 +231,7 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start)
+>>       }
+>>   
+>>       res = (pos << BITS_PER_LEVEL) + ctol(cur);
+>> -    if (res >= hb->size) {
+>> +    if (res >= end_bit) {
+>>           return -1;
+>>       }
+>>   
+>> @@ -652,6 +665,8 @@ HBitmap *hbitmap_alloc(uint64_t size, int granularity)
+>>       HBitmap *hb = g_new0(struct HBitmap, 1);
+>>       unsigned i;
+>>   
+>> +    hb->orig_size = size;
+>> +
+>>       assert(granularity >= 0 && granularity < 64);
+>>       size = (size + (1ULL << granularity) - 1) >> granularity;
+>>       assert(size <= ((uint64_t)1 << HBITMAP_LOG_MAX_SIZE));
+>>
+> Despite my comments, I'm OK with or without changes.
+>
+> Reviewed-by: John Snow <jsnow@redhat.com>
 
-Berto
+
+-- 
+Best regards,
+Vladimir
