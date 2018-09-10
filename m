@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzNq0-0004EP-QK
+	(envelope-from <bounces@canonical.com>) id 1fzNq0-0004EV-RH
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzNpz-0008Ik-Q0
+	(envelope-from <bounces@canonical.com>) id 1fzNpy-0008Hd-58
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35934)
+Received: from indium.canonical.com ([91.189.90.7]:35898)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzNpz-0008IA-I7
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:51 -0400
+	id 1fzNpx-0008Gz-VD
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:50 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzNpy-0008Nw-S4
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:50 +0000
+	id 1fzNpx-0008GE-9h
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CF8F42E806B
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 449AC2E806B
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Sep 2018 15:05:09 -0000
+Date: Mon, 10 Sep 2018 15:00:08 -0000
 From: Jan Marti <1791680@bugs.launchpad.net>
 Reply-To: Bug 1791680 <1791680@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153658763815.28323.7728344780520066918.malonedeb@wampee.canonical.com>
-Message-Id: <153659190922.24629.8579002175688596973.malone@gac.canonical.com>
+Message-Id: <153659160843.16875.15181817713614653370.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1791680] Re: network bridge does not work
 List-Id: <qemu-devel.nongnu.org>
@@ -38,9 +38,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-"-nic tap,model=3De1000"
+currently, only one nic adapter is enabled on my win10 host: the
+ethernet controller.
 
--> "Device 'tap' colud not be found
+the other 2, 1x internal wlan and 1x usb wlan is disabled..
 
 -- =
 
