@@ -1,37 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fzM4C-0008Hd-V2
+	(envelope-from <jthumshirn@suse.de>) id 1fzM4C-0008Ts-In
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:17:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fzLrD-0002s6-8Y
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:04:00 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36392)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fzLrD-0002rh-1W
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:03:59 -0400
-Received: by mail-wm0-x241.google.com with SMTP id j192-v6so21430926wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 06:03:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180904084648.680c564b@redhat.com>
-	<CAJ+F1CLDPQr04Khj-B4UXMzEV-Cu_J2e4S4j2c43NT-s3HwywQ@mail.gmail.com>
-	<20180906095802.7dffbf1b@redhat.com>
-	<CAJ+F1CJymU2J+5T2pHd=bC1FDnEQZxAAWKEt_E_fPnUjQRb_dQ@mail.gmail.com>
-	<20180906085937.GA2639@work-vm>
-	<CAJ+F1CKeo2fGc5fLUG7Ezpk0OTkMATioqQ64A3gKT7jXvULTkA@mail.gmail.com>
-	<20180906094245.GB2639@work-vm>
-	<CAJ+F1C+b8Q3P7=s4W+-GCbWeLqhVCvs_xei_LTw22YWTJ16Bmg@mail.gmail.com>
-	<20180906172304.GF2639@work-vm>
-	<43c91014-2ca4-681b-51e7-b8cde063014c@redhat.com>
-	<20180910104408.GE2482@work-vm>
-In-Reply-To: <20180910104408.GE2482@work-vm>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 10 Sep 2018 17:03:39 +0400
-Message-ID: <CAJ+F1CJEnLkJo29eahWS6F1cRyvS1nJZy-kGvQH04mGZdntbCw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 6/6] tpm: add ACPI memory clear
- interface
+	(envelope-from <jthumshirn@suse.de>) id 1fzLrU-00033Q-CA
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:04:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40206 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jthumshirn@suse.de>) id 1fzLrU-00030G-0J
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 09:04:16 -0400
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Date: Mon, 10 Sep 2018 15:04:06 +0200
+Message-Id: <20180910130407.24981-4-jthumshirn@suse.de>
+In-Reply-To: <20180910130407.24981-1-jthumshirn@suse.de>
+References: <20180910130407.24981-1-jthumshirn@suse.de>
+Subject: [Qemu-devel] [RESEND PATCH v2 3/4] serial-mcb: Add serial via MEN
+ chameleon bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,27 +24,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Johannes Thumshirn <jthumshirn@suse.de>
 
-Hi
+Add MEN z125 UART over MEN Chameleon Bus emulation.
 
-On Mon, Sep 10, 2018 at 2:44 PM Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> (I didn't know about guest_phys_block* and would have probably just used
-> qemu_ram_foreach_block )
->
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ hw/char/Makefile.objs |   1 +
+ hw/char/serial-mcb.c  | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+)
+ create mode 100644 hw/char/serial-mcb.c
 
-guest_phys_block*() seems to fit, as it lists only the blocks actually
-used, and already skip the device RAM.
-
-Laszlo, you wrote the functions
-(https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dc5d7f60f0614250bd925071e=
-25220ce5958f75d0),
-do you think it's appropriate to list the memory to clear, or we
-should rather use qemu_ram_foreach_block() ?
-
-thanks
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index b57053129107..063f1720974d 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -6,6 +6,7 @@ common-obj-$(CONFIG_PL011) += pl011.o
+ common-obj-$(CONFIG_SERIAL) += serial.o
+ common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
+ common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
++common-obj-$(CONFIG_MCB) += serial-mcb.o
+ common-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-console.o
+ common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
+ common-obj-$(CONFIG_XEN) += xen_console.o
+diff --git a/hw/char/serial-mcb.c b/hw/char/serial-mcb.c
+new file mode 100644
+index 000000000000..5e1ef27815c6
+--- /dev/null
++++ b/hw/char/serial-mcb.c
+@@ -0,0 +1,100 @@
++/*
++ * QEMU MEN 16z125 UART over MCB emulation
++ *
++ * Copyright (C) 2016 - 2018 Johannes Thumshirn <jth@kernel.org>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/char/serial.h"
++#include "hw/mcb/mcb.h"
++
++typedef struct {
++    /*< private >*/
++    MCBDevice dev;
++    /*< public >*/
++
++    SerialState state;
++} MCBSerialState;
++
++static void serial_mcb_realize(DeviceState *dev, Error **errp)
++{
++    MCBDevice *mdev = MCB_DEVICE(dev);
++    MCBSerialState *mss = DO_UPCAST(MCBSerialState, dev, mdev);
++    MCBus *bus = MCB_BUS(qdev_get_parent_bus(DEVICE(dev)));
++    SerialState *s = &mss->state;
++    Error *err = 0;
++
++    mdev->gdd = mcb_new_chameleon_descriptor(bus, 125, mdev->rev,
++                                             mdev->var, 0x10);
++    if (!mdev->gdd) {
++        return;
++    }
++
++    s->baudbase = 115200;
++    serial_realize_core(s, &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    s->irq = mcb_allocate_irq(&mss->dev);
++    memory_region_init_io(&s->io, OBJECT(mss), &serial_io_ops, s, "serial", 8);
++    memory_region_add_subregion(&bus->mmio_region, mdev->gdd->offset, &s->io);
++}
++
++static void serial_mcb_unrealize(DeviceState *dev, Error **errp)
++{
++    MCBDevice *mdev = MCB_DEVICE(dev);
++
++    g_free(&mdev->gdd);
++}
++
++static const VMStateDescription vmstate_mcb_serial = {
++    .name = "mcb-serial",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_MCB_DEVICE(dev, MCBSerialState),
++        VMSTATE_STRUCT(state, MCBSerialState, 0, vmstate_serial, SerialState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property serial_mcb_properties[] = {
++    DEFINE_PROP_CHR("chardev", MCBSerialState, state.chr),
++    DEFINE_PROP_UINT8("rev", MCBSerialState, dev.rev, 0),
++    DEFINE_PROP_UINT8("var", MCBSerialState, dev.var, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void serial_mcb_class_initfn(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    MCBDeviceClass *mc = MCB_DEVICE_CLASS(klass);
++
++    mc->realize = serial_mcb_realize;
++    mc->unrealize = serial_mcb_unrealize;
++
++    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
++    dc->desc = "MEN 16z125 UART over MCB";
++    dc->vmsd = &vmstate_mcb_serial;
++    dc->props = serial_mcb_properties;
++}
++
++static const TypeInfo serial_mcb_info = {
++    .name = "mcb-serial",
++    .parent = TYPE_MCB_DEVICE,
++    .instance_size = sizeof(MCBSerialState),
++    .class_init = serial_mcb_class_initfn,
++};
++
++static void serial_mcb_register_types(void)
++{
++    type_register_static(&serial_mcb_info);
++}
++
++type_init(serial_mcb_register_types);
+-- 
+2.16.4
