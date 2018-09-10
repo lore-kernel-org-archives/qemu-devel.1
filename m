@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzOJm-0006sW-MO
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:41:39 -0400
+	(envelope-from <cota@braap.org>) id 1fzON0-0000uX-Ul
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzOJe-0003GO-7y
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:41:34 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36404)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fzOJa-0003Ak-Qm
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:41:27 -0400
-Received: by mail-wm0-x243.google.com with SMTP id j192-v6so22039148wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 08:41:24 -0700 (PDT)
-References: <20180908191735.22861-1-cota@braap.org>
-	<878t49d24d.fsf@linaro.org> <20180910151424.GC19941@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180910151424.GC19941@flamenco>
-Date: Mon, 10 Sep 2018 16:41:21 +0100
-Message-ID: <8736uhcqce.fsf@linaro.org>
+	(envelope-from <cota@braap.org>) id 1fzOMw-0007N4-Me
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:44:58 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:59523)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzOMp-0007KB-V2
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:44:50 -0400
+Date: Mon, 10 Sep 2018 11:44:42 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180910154442.GD19941@flamenco>
+References: <20180903171831.15446-1-cota@braap.org>
+	<20180903171831.15446-2-cota@braap.org>
+	<e0055fc2-778d-c9cd-c157-29032085e2e7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] softfloat tests based on berkeley's
- testfloat
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0055fc2-778d-c9cd-c157-29032085e2e7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] qsp: drop atomics when using the
+ seqlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
+On Mon, Sep 10, 2018 at 01:32:15 +0200, Paolo Bonzini wrote:
+> On 03/09/2018 19:18, Emilio G. Cota wrote:
+> > Using atomics here is a mistake since they're not guaranteed
+> > to compile.
+> 
+> But isn't it technically a C11 data race if you don't use atomics?
 
-Emilio G. Cota <cota@braap.org> writes:
+Yes, it's undefined behaviour.
 
-> On Mon, Sep 10, 2018 at 12:26:58 +0100, Alex Benn=C3=A9e wrote:
->>
->> Emilio G. Cota <cota@braap.org> writes:
->>
->> > A few fixes since yesterday's v1:
->> >   https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00884.html
->> >
->> > - Convert copy_qemu_to_soft80 to qemu_to_soft80, just like the other
->> >   conversion functions
->> > - Set fp-test as the program name as reported by itself
->> > - Fix Makefile to include .d files so that dependencies are
->> >   properly tracked
->> > - Update commit log
->>
->> Just some general comments:
->>
->>  - I think this is a better way to go than the IBM test suite
->>  - I'm ambivalent about maintaining our fp-test.c in close alignment to
->>    softfloat unless we expect much upstreaming of changes.
->
-> I don't think there'll be any, to be honest. They have a git repo but
-> I doubt they'll take any patches. This was just a minimum attempt to
-> get some tests working (I don't have a lot of time to work on this)
->
->>  - the coverage seems a bit low. Rebuilding everything with
->>    --enable-gcov and running -all1 -all2 I get:
->>
->>   tests/fp/fp-test.c - 53.5 % coverage 43.3 % branch coverage
->>   fpu/softfloat.c - 32.5 % coverage 25.1 % branch coverage
->>
->> But maybe I didn't pass enough options to fp-test? I could really do
->> with a --just-run-everything-and-summarise-failing-functions option so I
->> can then go through in more detail with fp-test fFOO_BAR.
->
-> Yes right now to get better coverage you need to run it several times.
-> After a few runs I got it to 58%, but still without testing some
-> rounding modes. So considering we're coming from 0% coverage, I'd
-> say coverage is pretty good!
+> Could we make nocheck read/set degrade to just a volatile access when
+> used on a variable that is bigger than pointers, or perhaps always
+> except when using tsan?
 
-I agree ;-)
+But volatile wouldn't save you from undefined behaviour, would it?
 
->
-> But yes, we should add a flag to just test -all.
->
-> There are some functions that we are not testing yet though, but
-> that can be fixed over time (we can add more tests to fp-test even
-> though they're not in testfloat, such as testing flush-to-zero/
-> denormals-are-zero, or the muladd variants that we have).
->
-> I have basically no time left to work on this. What do you think about
-> the following plan?
->
-> 1. Have our own clones (forks) of testfloat/softfloat in qemu servers.
-> 2. Add those as submodules
-> 3. Add fp-test with as you said an -all flag that reports all
->    errors to get decent coverage.
+A simpler and definitely correct alternative is to just use a
+spinlock instead of the seqlock also for reads when !CONFIG_ATOMIC64.
+We don't care about scalability on those rare hosts anyway, so
+I'd go with that.
 
-Works for me.
+Thanks,
 
-> 4. Add hardfloat patches, with tests. This requires a small
->    change to testfloat:
->    https://github.com/cota/berkeley-testfloat-3/commit/ca9fa2ba05
-
-It seems a shame to have our mirror of testfloat diverge but if it can't
-be avoided I guess it will have to do. Couldn't we just zero the HW
-flags in the wrapped up function? I may be misremembering but don't we
-fall-back to softfloat code anyway if we have reached any limits that
-trigger exception flags?
-
-> I'd then leave adding further tests to increase coverage and fixing
-> the existing bugs (prior to hardfloat) to someone else with
-> more time/resources.
-
-Agreed. I should have time to chase down the softfloat regressions once
-I'm back from Connect after next week.
-
->
-> Thanks,
->
-> 		Emilio
-
-
---
-Alex Benn=C3=A9e
+		Emilio
