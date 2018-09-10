@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzDKX-0003I4-OT
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:57:42 -0400
+	(envelope-from <famz@redhat.com>) id 1fzDML-0005LW-2M
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzDKU-0004rw-JK
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:57:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45802 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fzDKU-0004rS-EP
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:57:38 -0400
+	(envelope-from <famz@redhat.com>) id 1fzDMI-0005tZ-3c
+	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:59:31 -0400
+Date: Mon, 10 Sep 2018 11:59:14 +0800
 From: Fam Zheng <famz@redhat.com>
-Date: Mon, 10 Sep 2018 11:57:19 +0800
-Message-Id: <20180910035719.18056-6-famz@redhat.com>
-In-Reply-To: <20180910035719.18056-1-famz@redhat.com>
-References: <20180910035719.18056-1-famz@redhat.com>
+Message-ID: <20180910035914.GA21370@lemon.usersys.redhat.com>
+References: <20180809132259.18402-1-famz@redhat.com>
+	<20180809132259.18402-3-famz@redhat.com>
+	<20180907155101.GA31915@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 5/5] docker: Clean dangling tarball files
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180907155101.GA31915@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 2/2] aio: Do
+ aio_notify_accept only during blocking aio_poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com, lersek@redhat.com, slp@redhat.com
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Fri, 09/07 17:51, Kevin Wolf wrote:
+> Am 09.08.2018 um 15:22 hat Fam Zheng geschrieben:
+> > Furthermore, blocking aio_poll is only allowed on home thread
+> > (in_aio_context_home_thread), because otherwise two blocking
+> > aio_poll()'s can steal each other's ctx->notifier event and cause
+> > hanging just like described above.
+> 
+> It's good to have this assertion now at least, but after digging into
+> some bugs, I think in fact that any aio_poll() (even non-blocking) is
+> only allowed in the home thread: At least one reason is that if you run
+> it from a different thread, qemu_get_current_aio_context() returns the
+> wrong AioContext in any callbacks called by aio_poll(). Anything else
+> using TLS can have similar problems.
+> 
+> One instance where this matters is fixed/worked around by Sergio's
+> "util/async: use qemu_aio_coroutine_enter in co_schedule_bh_cb". We
+> wouldn't even need that patch if we could make sure that aio_poll() is
+> never called from the wrong thread. This would feel more robust.
+> 
+> I'll fix the aio_poll() calls in drain (the AIO_WAIT_WHILE() ones are
+> already fine, the rest by removing them). After that,
+> bdrv_set_aio_context() is still problematic, but the rest should be
+> okay. Hopefully we can use the tighter assertion then.
 
-When a container fails, it leaves a dangling tarball which name is
-based on a timestamp. Further uses of make won't clean those files,
-neither calling the 'docker-clean' target.
+Fully agree with you.
 
-Use the .DELETE_ON_ERROR built-in target to let make remove those
-temporary tarballs in case of failure.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20180818030337.22271-1-f4bug@amsat.org>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/Makefile.include | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
-e
-index d3101afecd..6e03235ab9 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -25,6 +25,7 @@ IMAGES ?=3D %
- CUR_TIME :=3D $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
- DOCKER_SRC_COPY :=3D $(BUILD_DIR)/docker-src.$(CUR_TIME)
-=20
-+.DELETE_ON_ERROR: $(DOCKER_SRC_COPY)
- $(DOCKER_SRC_COPY):
- 	@mkdir $@
- 	$(if $(SRC_ARCHIVE), \
---=20
-2.17.1
+Fam
