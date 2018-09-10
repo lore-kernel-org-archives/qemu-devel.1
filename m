@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzRPX-0001Nw-5w
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:59:48 -0400
+	(envelope-from <cota@braap.org>) id 1fzRPc-0001Tk-Qa
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:59:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzRPP-0001Dq-Fw
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:59:43 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:32811)
+	(envelope-from <cota@braap.org>) id 1fzRPb-0001Kw-3l
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:59:52 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:35791)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzRPP-000195-5r
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:59:39 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzRPa-0001DR-Tn
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:59:50 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 10 Sep 2018 14:58:54 -0400
-Message-Id: <20180910185859.27917-8-cota@braap.org>
+Date: Mon, 10 Sep 2018 14:58:59 -0400
+Message-Id: <20180910185859.27917-13-cota@braap.org>
 In-Reply-To: <20180910185859.27917-1-cota@braap.org>
 References: <20180910185859.27917-1-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 07/12] qht: drop ht argument from qht
- iterators
+Subject: [Qemu-devel] [PATCH v2 12/12] qht-bench: add -p flag to precompute
+ hash values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,231 +27,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Accessing the HT from an iterator results almost always
-in a deadlock. Given that only one qht-internal function
-uses this argument, drop it from the interface.
+Precomputing the hash values allows us to perform more frequent
+accesses to the hash table, thereby reaching higher throughputs.
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+We keep the old behaviour by default, since (1) we might confuse
+users if they measured a speedup without changing anything in
+the QHT implementation, and (2) benchmarking the hash function
+"on line" is also valuable.
+
+Before:
+$ taskset -c 0 tests/qht-bench -n 1
+ Throughput:        38.18 MT/s
+
+After:
+$ taskset -c 0 tests/qht-bench -n 1
+ Throughput:        38.16 MT/s
+
+After (with precomputing):
+$ taskset -c 0 tests/qht-bench -n 1 -p
+ Throughput:        50.87 MT/s
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/qemu/qht.h        |  5 ++---
- accel/tcg/translate-all.c |  6 ++----
- tests/test-qht.c          |  6 +++---
- util/qht.c                | 29 +++++++++++++++++++----------
- util/qsp.c                | 11 +++++------
- 5 files changed, 31 insertions(+), 26 deletions(-)
+ tests/qht-bench.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/include/qemu/qht.h b/include/qemu/qht.h
-index 3a9618db69..6484837487 100644
---- a/include/qemu/qht.h
-+++ b/include/qemu/qht.h
-@@ -43,9 +43,8 @@ struct qht_stats {
- };
+diff --git a/tests/qht-bench.c b/tests/qht-bench.c
+index f492b3a20a..2089e2bed1 100644
+--- a/tests/qht-bench.c
++++ b/tests/qht-bench.c
+@@ -53,6 +53,7 @@ static unsigned long resize_delay = 1000;
+ static double resize_rate; /* 0.0 to 1.0 */
+ static unsigned int n_rz_threads = 1;
+ static QemuThread *rz_threads;
++static bool precompute_hash;
  
- typedef bool (*qht_lookup_func_t)(const void *obj, const void *userp);
--typedef void (*qht_iter_func_t)(struct qht *ht, void *p, uint32_t h, void *up);
--typedef bool (*qht_iter_bool_func_t)(struct qht *ht, void *p, uint32_t h,
--                                     void *up);
-+typedef void (*qht_iter_func_t)(void *p, uint32_t h, void *up);
-+typedef bool (*qht_iter_bool_func_t)(void *p, uint32_t h, void *up);
+ static double update_rate; /* 0.0 to 1.0 */
+ static uint64_t update_threshold;
+@@ -101,11 +102,18 @@ static bool is_equal(const void *ap, const void *bp)
+     return *a == *b;
+ }
  
- #define QHT_MODE_AUTO_RESIZE 0x1 /* auto-resize when heavily loaded */
- #define QHT_MODE_RAW_MUTEXES 0x2 /* bypass the profiler (QSP) */
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 898c3bb3d1..9ffbbc2fbd 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1282,8 +1282,7 @@ void tb_flush(CPUState *cpu)
-  */
- #ifdef CONFIG_USER_ONLY
- 
--static void
--do_tb_invalidate_check(struct qht *ht, void *p, uint32_t hash, void *userp)
-+static void do_tb_invalidate_check(void *p, uint32_t hash, void *userp)
+-static inline uint32_t h(unsigned long v)
++static uint32_t h(unsigned long v)
  {
-     TranslationBlock *tb = p;
-     target_ulong addr = *(target_ulong *)userp;
-@@ -1304,8 +1303,7 @@ static void tb_invalidate_check(target_ulong address)
-     qht_iter(&tb_ctx.htable, do_tb_invalidate_check, &address);
+     return tb_hash_func7(v, 0, 0, 0, 0);
  }
  
--static void
--do_tb_page_check(struct qht *ht, void *p, uint32_t hash, void *userp)
-+static void do_tb_page_check(void *p, uint32_t hash, void *userp)
- {
-     TranslationBlock *tb = p;
-     int flags1, flags2;
-diff --git a/tests/test-qht.c b/tests/test-qht.c
-index 1ec039d636..4d23cefab6 100644
---- a/tests/test-qht.c
-+++ b/tests/test-qht.c
-@@ -98,7 +98,7 @@ static void check(int a, int b, bool expected)
-     qht_statistics_destroy(&stats);
- }
- 
--static void count_func(struct qht *ht, void *p, uint32_t hash, void *userp)
-+static void count_func(void *p, uint32_t hash, void *userp)
- {
-     unsigned int *curr = userp;
- 
-@@ -122,7 +122,7 @@ static void iter_check(unsigned int count)
-     g_assert_cmpuint(curr, ==, count);
- }
- 
--static void sum_func(struct qht *ht, void *p, uint32_t hash, void *userp)
-+static void sum_func(void *p, uint32_t hash, void *userp)
- {
-     uint32_t *sum = userp;
-     uint32_t a = *(uint32_t *)p;
-@@ -138,7 +138,7 @@ static void iter_sum_check(unsigned int expected)
-     g_assert_cmpuint(sum, ==, expected);
- }
- 
--static bool rm_mod_func(struct qht *ht, void *p, uint32_t hash, void *userp)
-+static bool rm_mod_func(void *p, uint32_t hash, void *userp)
- {
-     uint32_t a = *(uint32_t *)p;
-     unsigned int mod = *(unsigned int *)userp;
-diff --git a/util/qht.c b/util/qht.c
-index c190e89f5b..50ed7a2102 100644
---- a/util/qht.c
-+++ b/util/qht.c
-@@ -746,7 +746,7 @@ bool qht_remove(struct qht *ht, const void *p, uint32_t hash)
-     return ret;
- }
- 
--static inline void qht_bucket_iter(struct qht *ht, struct qht_bucket *head,
-+static inline void qht_bucket_iter(struct qht_bucket *head,
-                                    const struct qht_iter *iter, void *userp)
- {
-     struct qht_bucket *b = head;
-@@ -759,10 +759,10 @@ static inline void qht_bucket_iter(struct qht *ht, struct qht_bucket *head,
-             }
-             switch (iter->type) {
-             case QHT_ITER_VOID:
--                iter->f.retvoid(ht, b->pointers[i], b->hashes[i], userp);
-+                iter->f.retvoid(b->pointers[i], b->hashes[i], userp);
-                 break;
-             case QHT_ITER_RM:
--                if (iter->f.retbool(ht, b->pointers[i], b->hashes[i], userp)) {
-+                if (iter->f.retbool(b->pointers[i], b->hashes[i], userp)) {
-                     /* replace i with the last valid element in the bucket */
-                     seqlock_write_begin(&head->sequence);
-                     qht_bucket_remove_entry(b, i);
-@@ -782,14 +782,14 @@ static inline void qht_bucket_iter(struct qht *ht, struct qht_bucket *head,
- }
- 
- /* call with all of the map's locks held */
--static inline void qht_map_iter__all_locked(struct qht *ht, struct qht_map *map,
-+static inline void qht_map_iter__all_locked(struct qht_map *map,
-                                             const struct qht_iter *iter,
-                                             void *userp)
- {
-     size_t i;
- 
-     for (i = 0; i < map->n_buckets; i++) {
--        qht_bucket_iter(ht, &map->buckets[i], iter, userp);
-+        qht_bucket_iter(&map->buckets[i], iter, userp);
-     }
- }
- 
-@@ -800,8 +800,7 @@ do_qht_iter(struct qht *ht, const struct qht_iter *iter, void *userp)
- 
-     map = atomic_rcu_read(&ht->map);
-     qht_map_lock_buckets(map);
--    /* Note: ht here is merely for carrying ht->mode; ht->map won't be read */
--    qht_map_iter__all_locked(ht, map, iter, userp);
-+    qht_map_iter__all_locked(map, iter, userp);
-     qht_map_unlock_buckets(map);
- }
- 
-@@ -825,9 +824,16 @@ void qht_iter_remove(struct qht *ht, qht_iter_bool_func_t func, void *userp)
-     do_qht_iter(ht, &iter, userp);
- }
- 
--static void qht_map_copy(struct qht *ht, void *p, uint32_t hash, void *userp)
-+struct qht_map_copy_data {
-+    struct qht *ht;
-+    struct qht_map *new;
-+};
++static uint32_t hval(unsigned long v)
++{
++    return v;
++}
 +
-+static void qht_map_copy(void *p, uint32_t hash, void *userp)
- {
--    struct qht_map *new = userp;
-+    struct qht_map_copy_data *data = userp;
-+    struct qht *ht = data->ht;
-+    struct qht_map *new = data->new;
-     struct qht_bucket *b = qht_map_to_bucket(new, hash);
++static uint32_t (*hfunc)(unsigned long v) = h;
++
+ /*
+  * From: https://en.wikipedia.org/wiki/Xorshift
+  * This is faster than rand_r(), and gives us a wider range (RAND_MAX is only
+@@ -149,7 +157,7 @@ static void do_rw(struct thread_info *info)
+         bool read;
  
-     /* no need to acquire b->lock because no thread has seen this map yet */
-@@ -845,6 +851,7 @@ static void qht_do_resize_reset(struct qht *ht, struct qht_map *new, bool reset)
-         .f.retvoid = qht_map_copy,
-         .type = QHT_ITER_VOID,
-     };
-+    struct qht_map_copy_data data;
+         p = &keys[info->r & (lookup_range - 1)];
+-        hash = h(*p);
++        hash = hfunc(*p);
+         read = qht_lookup(&ht, p, hash);
+         if (read) {
+             stats->rd++;
+@@ -158,7 +166,7 @@ static void do_rw(struct thread_info *info)
+         }
+     } else {
+         p = &keys[info->r & (update_range - 1)];
+-        hash = h(*p);
++        hash = hfunc(*p);
+         if (info->write_op) {
+             bool written = false;
  
-     old = ht->map;
-     qht_map_lock_buckets(old);
-@@ -859,7 +866,9 @@ static void qht_do_resize_reset(struct qht *ht, struct qht_map *new, bool reset)
+@@ -289,7 +297,9 @@ static void htable_init(void)
+     /* avoid allocating memory later by allocating all the keys now */
+     keys = g_malloc(sizeof(*keys) * n);
+     for (i = 0; i < n; i++) {
+-        keys[i] = populate_offset + i;
++        long val = populate_offset + i;
++
++        keys[i] = precompute_hash ? h(val) : hval(val);
      }
  
-     g_assert(new->n_buckets != old->n_buckets);
--    qht_map_iter__all_locked(ht, old, &iter, new);
-+    data.ht = ht;
-+    data.new = new;
-+    qht_map_iter__all_locked(old, &iter, &data);
-     qht_map_debug__all_locked(new);
+     /* some sanity checks */
+@@ -321,7 +331,7 @@ static void htable_init(void)
  
-     atomic_rcu_set(&ht->map, new);
-diff --git a/util/qsp.c b/util/qsp.c
-index b0c2575d10..2de3a97594 100644
---- a/util/qsp.c
-+++ b/util/qsp.c
-@@ -533,7 +533,7 @@ static gint qsp_tree_cmp(gconstpointer ap, gconstpointer bp, gpointer up)
-     }
- }
+             r = xorshift64star(r);
+             p = &keys[r & (init_range - 1)];
+-            hash = h(*p);
++            hash = hfunc(*p);
+             if (qht_insert(&ht, p, hash, NULL)) {
+                 break;
+             }
+@@ -412,7 +422,7 @@ static void parse_args(int argc, char *argv[])
+     int c;
  
--static void qsp_sort(struct qht *ht, void *p, uint32_t h, void *userp)
-+static void qsp_sort(void *p, uint32_t h, void *userp)
- {
-     QSPEntry *e = p;
-     GTree *tree = userp;
-@@ -541,7 +541,7 @@ static void qsp_sort(struct qht *ht, void *p, uint32_t h, void *userp)
-     g_tree_insert(tree, e, NULL);
- }
- 
--static void qsp_aggregate(struct qht *global_ht, void *p, uint32_t h, void *up)
-+static void qsp_aggregate(void *p, uint32_t h, void *up)
- {
-     struct qht *ht = up;
-     const QSPEntry *e = p;
-@@ -553,7 +553,7 @@ static void qsp_aggregate(struct qht *global_ht, void *p, uint32_t h, void *up)
-     qsp_entry_aggregate(agg, e);
- }
- 
--static void qsp_iter_diff(struct qht *orig, void *p, uint32_t hash, void *htp)
-+static void qsp_iter_diff(void *p, uint32_t hash, void *htp)
- {
-     struct qht *ht = htp;
-     QSPEntry *old = p;
-@@ -583,8 +583,7 @@ static void qsp_diff(struct qht *orig, struct qht *new)
-     qht_iter(orig, qsp_iter_diff, new);
- }
- 
--static void
--qsp_iter_callsite_coalesce(struct qht *orig, void *p, uint32_t h, void *htp)
-+static void qsp_iter_callsite_coalesce(void *p, uint32_t h, void *htp)
- {
-     struct qht *ht = htp;
-     QSPEntry *old = p;
-@@ -603,7 +602,7 @@ qsp_iter_callsite_coalesce(struct qht *orig, void *p, uint32_t h, void *htp)
-     e->n_acqs += old->n_acqs;
- }
- 
--static void qsp_ht_delete(struct qht *ht, void *p, uint32_t h, void *htp)
-+static void qsp_ht_delete(void *p, uint32_t h, void *htp)
- {
-     g_free(p);
- }
+     for (;;) {
+-        c = getopt(argc, argv, "d:D:g:k:K:l:hn:N:o:r:Rs:S:u:");
++        c = getopt(argc, argv, "d:D:g:k:K:l:hn:N:o:pr:Rs:S:u:");
+         if (c < 0) {
+             break;
+         }
+@@ -451,6 +461,10 @@ static void parse_args(int argc, char *argv[])
+         case 'o':
+             populate_offset = atol(optarg);
+             break;
++        case 'p':
++            precompute_hash = true;
++            hfunc = hval;
++            break;
+         case 'r':
+             update_range = pow2ceil(atol(optarg));
+             break;
 -- 
 2.17.1
