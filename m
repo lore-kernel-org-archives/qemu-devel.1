@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzNi6-0006Cy-6I
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:02:47 -0400
+	(envelope-from <groug@kaod.org>) id 1fzNie-0006qr-S0
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzNhw-00016s-3r
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:02:41 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 10 Sep 2018 22:56:15 +0800
-Message-Id: <20180910145616.8598-2-famz@redhat.com>
-In-Reply-To: <20180910145616.8598-1-famz@redhat.com>
-References: <20180910145616.8598-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] virtio: Return true from
- virtio_queue_empty if broken
+	(envelope-from <groug@kaod.org>) id 1fzNiZ-0001ai-NT
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:03:16 -0400
+Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:38534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fzNiX-0001Sy-Qx
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:03:11 -0400
+Received: from player772.ha.ovh.net (unknown [10.109.143.3])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 1FEF6F7B30
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 17:03:01 +0200 (CEST)
+Date: Mon, 10 Sep 2018 17:02:53 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180910170253.50f4cd88@bahia.lan>
+In-Reply-To: <20180910110222.8162-1-clg@kaod.org>
+References: <20180910110222.8162-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] spapr: introduce a new sPAPRIrq backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,88 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Both virtio-blk and virtio-scsi use virtio_queue_empty() as the
-loop condition in VQ handlers (virtio_blk_handle_vq,
-virtio_scsi_handle_cmd_vq). When a device is marked broken in
-virtqueue_pop, for example if a vIOMMU address translation failed, we
-want to break out of the loop.
+On Mon, 10 Sep 2018 13:02:19 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-This fixes a hanging problem when booting a CentOS 3.10.0-862.el7.x86_64
-kernel with ATS enabled:
+> Hello,
+>=20
+> This series adds a new sPAPRIrq backend increasing the number of
+> available IRQ numbers in pseries-3.1 machines. This change is an
+> opportunity to also fix the "ibm,pe-total-#msi" and remove the old
+> XICS_IRQS_SPAPR definition.
+>=20
 
-  $ qemu-system-x86_64 \
-    ... \
-    -device intel-iommu,intremap=on,caching-mode=on,eim=on,device-iotlb=on \
-    -device virtio-scsi-pci,iommu_platform=on,ats=on,id=scsi0,bus=pci.4,addr=0x0
+This cleanup looks sane but I still have a concern with the semantics of
+"ibm,pe-total-#msi".
 
-The dead loop happens immediately when the kernel boots and initializes
-the device, where virtio_scsi_data_plane_handle_cmd will not return:
+According to LoPAPR:
 
-    > ...
-    > #13 0x00005586602b7793 in virtio_scsi_handle_cmd_vq
-    > #14 0x00005586602b8d66 in virtio_scsi_data_plane_handle_cmd
-    > #15 0x00005586602ddab7 in virtio_queue_notify_aio_vq
-    > #16 0x00005586602dfc9f in virtio_queue_host_notifier_aio_poll
-    > #17 0x00005586607885da in run_poll_handlers_once
-    > #18 0x000055866078880e in try_poll_mode
-    > #19 0x00005586607888eb in aio_poll
-    > #20 0x0000558660784561 in aio_wait_bh_oneshot
-    > #21 0x00005586602b9582 in virtio_scsi_dataplane_stop
-    > #22 0x00005586605a7110 in virtio_bus_stop_ioeventfd
-    > #23 0x00005586605a9426 in virtio_pci_stop_ioeventfd
-    > #24 0x00005586605ab808 in virtio_pci_common_write
-    > #25 0x0000558660242396 in memory_region_write_accessor
-    > #26 0x00005586602425ab in access_with_adjusted_size
-    > #27 0x0000558660245281 in memory_region_dispatch_write
-    > #28 0x00005586601e008e in flatview_write_continue
-    > #29 0x00005586601e01d8 in flatview_write
-    > #30 0x00005586601e04de in address_space_write
-    > #31 0x00005586601e052f in address_space_rw
-    > #32 0x00005586602607f2 in kvm_cpu_exec
-    > #33 0x0000558660227148 in qemu_kvm_cpu_thread_fn
-    > #34 0x000055866078bde7 in qemu_thread_start
-    > #35 0x00007f5784906594 in start_thread
-    > #36 0x00007f5784639e6f in clone
+"ibm,pe-total-#msi"
 
-With this patch, virtio_queue_empty will now return 1 as soon as the
-vdev is marked as broken, after a "virtio: zero sized buffers are not
-allowed" error.
+property name defines the maximum number of Message Signaled Interrupts (MS=
+I plus MSI-X) that are available
+to the PE below this device tree node. This number only indicates the numbe=
+r of available interrupts, not the num-
+ber assigned. The number assigned for an IOA may be obtained by Function 0 =
+(Query only) of the ibm,change-msi
+RTAS call.
+prop-encoded-array: Maximum number of interrupts encoded as with encode-int.
 
-To be consistent, update virtio_queue_empty_rcu as well.
+IIUC, the PHB is given ibm,pe-total-#msi MSIs that it can assign to devices.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- hw/virtio/virtio.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+But we currently have only one global allocator in the machine, so having
+each PHB advertising the full range of the allocator still looks weird.
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index d4e4d98b59..7a05c9e52c 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -358,6 +358,10 @@ int virtio_queue_ready(VirtQueue *vq)
-  * Called within rcu_read_lock().  */
- static int virtio_queue_empty_rcu(VirtQueue *vq)
- {
-+    if (unlikely(vq->vdev->broken)) {
-+        return 1;
-+    }
-+
-     if (unlikely(!vq->vring.avail)) {
-         return 1;
-     }
-@@ -373,6 +377,10 @@ int virtio_queue_empty(VirtQueue *vq)
- {
-     bool empty;
- 
-+    if (unlikely(vq->vdev->broken)) {
-+        return 1;
-+    }
-+
-     if (unlikely(!vq->vring.avail)) {
-         return 1;
-     }
--- 
-2.17.1
+Shouldn't this be divided by the number of PHBs ? Or should we have one
+separate allocator for each PHB ?
+
+> Thanks,
+>=20
+> C.
+>=20
+> C=C3=A9dric Le Goater (3):
+>   spapr: introduce a spapr_irq class 'nr_msis' attribute
+>   spapr: increase the size of the IRQ number space
+>   spapr_pci: fix "ibm,pe-total-#msi" value
+>=20
+>  include/hw/ppc/spapr_irq.h |  2 ++
+>  include/hw/ppc/xics.h      |  2 --
+>  hw/ppc/spapr.c             |  1 +
+>  hw/ppc/spapr_irq.c         | 22 ++++++++++++++++++++--
+>  hw/ppc/spapr_pci.c         |  5 +++--
+>  5 files changed, 26 insertions(+), 6 deletions(-)
+>=20
