@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzOBY-0008Ue-QD
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:33:12 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fzOBp-000051-42
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:33:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzO9b-00047Y-Ap
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:31:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51502)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzO9b-00046M-2R
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:31:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzO9R-00059N-AP
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:30:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 66B082E81A0
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:30:51 +0000 (UTC)
+	(envelope-from <kwolf@redhat.com>) id 1fzO6P-0002d8-4G
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:27:53 -0400
+Date: Mon, 10 Sep 2018 17:27:24 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180910152724.GK4901@dhcp-200-186.str.redhat.com>
+References: <20180824024342.749-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Sep 2018 15:20:46 -0000
-From: Jan Marti <1791680@bugs.launchpad.net>
-Reply-To: Bug 1791680 <1791680@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153658763815.28323.7728344780520066918.malonedeb@wampee.canonical.com>
-Message-Id: <153659284630.31814.17002500859293740673.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1791680] Re: network bridge does not work
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180824024342.749-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] job: Fix nested aio_poll() hanging in
+ job_txn_apply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org, Jeff Cody <jcody@redhat.com>, mreitz@redhat.com, pbonzini@redhat.com, eblake@redhat.com
 
-incompatible with windows, right? so i need a linux machine with ethx??
+Am 24.08.2018 um 04:43 hat Fam Zheng geschrieben:
+> All callers have acquired ctx already. Doing that again results in
+> aio_poll() hang. This fixes the problem that a BDRV_POLL_WHILE() in the
+> callback cannot make progress because ctx is recursively locked, for
+> example, when drive-backup finishes.
+> 
+> There are two callers of job_finalize():
+> 
+>     fam@lemon:~/work/qemu [master]$ git grep -w -A1 '^\s*job_finalize'
+>     blockdev.c:    job_finalize(&job->job, errp);
+>     blockdev.c-    aio_context_release(aio_context);
+>     --
+>     job-qmp.c:    job_finalize(job, errp);
+>     job-qmp.c-    aio_context_release(aio_context);
+>     --
+>     tests/test-blockjob.c:    job_finalize(&job->job, &error_abort);
+>     tests/test-blockjob.c-    assert(job->job.status == JOB_STATUS_CONCLUDED);
+> 
+> Ignoring the test, it's easy to see both callers to job_finalize (and
+> job_do_finalize) have acquired the context.
+> 
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Gu Nini <ngu@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
--- =
+Thanks, applied to the block branch.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1791680
-
-Title:
-  network bridge does not work
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  hi there
-
-  the network bridge does not seem to work described as here:
-  https://en.wikibooks.org/wiki/QEMU/Networking
-
-  When i add that parameters in a 192.168.80.x subnet, my emulated
-  raspbian ARM gets the IP 10.0.2.15.... While all other computers get
-  192.168.80.x
-
-  The command i use is:
-
-  =
-
-  qemu-system-arm.exe -M versatilepb -cpu arm1176 -hda 2018-09-03_stretch_i=
-nkl_phalcon.img -kernel kernel-qemu-4.4.34-jessie -m 192 -append "root=3D/d=
-ev/sda2 panic=3D1 rootfstype=3Dext4 rw" -no-reboot -net nic -net user -devi=
-ce e1000,mac=3D52:54:00:12:34:56 &
-
-  =
-
-  Does not build up a network bridge to 192.168.80.x...
-
-  The host system i use is win10 x64 v1803
-
-  Best regards,
-  Jan
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1791680/+subscriptions
+Kevin
