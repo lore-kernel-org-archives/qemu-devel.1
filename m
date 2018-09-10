@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fzHRm-0005zg-FF
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:21:30 -0400
+	(envelope-from <otubo@redhat.com>) id 1fzHqK-000196-QY
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:46:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fzHRj-0004K3-3D
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:21:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55712 helo=mx1.redhat.com)
+	(envelope-from <otubo@redhat.com>) id 1fzHgV-0004Ao-3E
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:36:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57028 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fzHRi-0004JW-Re
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:21:23 -0400
-Date: Mon, 10 Sep 2018 10:21:15 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180910102115.238017e4@redhat.com>
-In-Reply-To: <20180907165052-mutt-send-email-mst@kernel.org>
-References: <1535368030-214556-1-git-send-email-imammedo@redhat.com>
-	<20180827160239.54cc993a@bahia.lan>
-	<20180828005237.GC2222@umbus.fritz.box>
-	<20180828151848.3d09ca06@redhat.com>
-	<20180829025440.GE2222@umbus.fritz.box>
-	<20180829104311.5ea1a69e@redhat.com>
-	<20180829091453-mutt-send-email-mst@kernel.org>
-	<20180829155138.5e9af6af@redhat.com>
-	<20180907165052-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1fzHgU-0004AU-TH
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:36:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EAFD7807A0C3
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 08:36:37 +0000 (UTC)
+Date: Mon, 10 Sep 2018 10:36:33 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20180910083633.GD5786@vader>
+References: <20180830143348.10595-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc: make sure that guest isn't able to
- unplug the first cpu
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Ycz6tD7Th1CMF4v7"
+Content-Disposition: inline
+In-Reply-To: <20180830143348.10595-1-marcandre.lureau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] seccomp: check TSYNC host capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +33,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, pbonzini@redhat.com, Laszlo Ersek <lersek@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com
 
-On Fri, 7 Sep 2018 16:52:17 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Wed, Aug 29, 2018 at 03:51:38PM +0200, Igor Mammedov wrote:
-> > On Wed, 29 Aug 2018 09:15:53 -0400
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Wed, Aug 29, 2018 at 10:43:11AM +0200, Igor Mammedov wrote:  
-> > > > On Wed, 29 Aug 2018 12:54:40 +1000
-> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > >     
-> > > > > On Tue, Aug 28, 2018 at 03:18:48PM +0200, Igor Mammedov wrote:    
-> > > > > > On Tue, 28 Aug 2018 10:52:37 +1000
-> > > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > > > >       
-> > > > > > > On Mon, Aug 27, 2018 at 04:02:39PM +0200, Greg Kurz wrote:      
-> > > > > > > > On Mon, 27 Aug 2018 13:07:10 +0200
-> > > > > > > > Igor Mammedov <imammedo@redhat.com> wrote:
-> > > > > > > >         
-> > > > > > > > > The first cpu unplug wasn't ever supported and corresponding
-> > > > > > > > > monitor/qmp commands refuse to unplug it. However guest is able
-> > > > > > > > > to issue eject request either using following command:
-> > > > > > > > >   # echo 1 >/sys/devices/system/cpu/cpu0/firmware_node/eject        
-> > > > > > > > 
-> > > > > > > > I can't reproduce the issue with a pc guest and current master...
-> > > > > > > > 
-> > > > > > > > All I seem to get is an error in dmesg:
-> > > > > > > > 
-> > > > > > > > [   97.435446] processor cpu0: Offline failed.
-> > > > > > > >         
-> > > > > > > > > or directly writing to cpu hotplug registers, which makes
-> > > > > > > > > qemu crash with SIGSEGV following back trace:
-> > > > > > > > > 
-> > > > > > > > >    kvm_flush_coalesced_mmio_buffer ()
-> > > > > > > > >        while (ring->first != ring->last)
-> > > > > > > > >    ...
-> > > > > > > > >    qemu_flush_coalesced_mmio_buffer
-> > > > > > > > >    prepare_mmio_access
-> > > > > > > > >    flatview_read_continue
-> > > > > > > > >    flatview_read
-> > > > > > > > >    address_space_read_full
-> > > > > > > > >    address_space_rw
-> > > > > > > > >    kvm_cpu_exec(cpu!0)
-> > > > > > > > >    qemu_kvm_cpu_thread_fn
-> > > > > > > > > 
-> > > > > > > > > the reason for which is that ring == KVMState::coalesced_mmio_ring
-> > > > > > > > > happens to be a part of 1st CPU that was uplugged by guest.
-> > > > > > > > > 
-> > > > > > > > > Fix it by forbidding 1st cpu unplug from guest side and in addition
-> > > > > > > > > remove CPU0._EJ0 ACPI method to make clear that unplug of the first
-> > > > > > > > > CPU is not supported.
-> > > > > > > > > 
-> > > > > > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > > > > > > ---
-> > > > > > > > > CCing spapr and s390x folks in case targets need to prevent 1st CPU unplug as well
-> > > > > > > > >         
-> > > > > > > > 
-> > > > > > > > A spapr guest can _release_ the first cpu by doing something like:
-> > > > > > > > 
-> > > > > > > > # echo -n "/cpus/PowerPC,POWER8@0" > /sys/devices/system/cpu/release
-> > > > > > > > 
-> > > > > > > > But AFAIK, this doesn't unplug the cpu from a QEMU standpoint.        
-> > > > > > > 
-> > > > > > > Unplugging CPU 0 with device_del should be ok too.      
-> > > > > > Do you mean real unplugging (cpu0 object freed) or just remove request?      
-> > > > > 
-> > > > > Real unplugging should be possible.  I'm not sure how thorougly it's
-> > > > > been tested, though.    
-> > > > Well, common kvm code in qemu seems to be in disagreement with it
-> > > > as backtrace in this patch shows also usage of first_cpu macro
-> > > > won't survive such unplug.    
-> > > 
-> > > Paolo - any take on this? Do we need to make cpu 0 special like this?  
-> > It probably would take a bunch of refactoring to get rid of first_cpu&co
-> > dependencies and besides of experimenting with cpu0 unplug in guest kernel
-> > there isn't any other value in it, so it probably not worth the effort.
-> > 
-> > On top of that, for pc/q35 machine we would need to select boot cpu
-> > in some other way (right now it's hardwired to first_cpu).
-> > 
-> > It seems that seabios might work if cpu0 isn't present, don't know about OVMF.  
-> 
-> OK, I queued this, but can you please add some code comments
-> so we remember why it is like this if someone changes the code?
-> Even better maybe to add an API along the lines of:
->     cpu_is_hotpluggable
->         return cpu != first_cpu
-I like an API idea,
-I'll try to look into how to use use it in a generic way.
+--Ycz6tD7Th1CMF4v7
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 30/08/2018 - 16:33:48, Marc-Andr=C3=A9 Lureau wrote:
+> Remove -sandbox option if the host is not capable of TSYNC, since the
+> sandbox will fail at setup time otherwise. This will help libvirt, for
+> ex, to figure out if -sandbox will work.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qemu-seccomp.c | 19 ++++++++++++++++++-
+>  vl.c           |  4 ++--
+>  2 files changed, 20 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+> index 4729eb107f..1baa5c69ed 100644
+> --- a/qemu-seccomp.c
+> +++ b/qemu-seccomp.c
+> @@ -282,7 +282,24 @@ static QemuOptsList qemu_sandbox_opts =3D {
+> =20
+>  static void seccomp_register(void)
+>  {
+> -    qemu_add_opts(&qemu_sandbox_opts);
+> +    bool add =3D false;
+> +
+> +    /* FIXME: use seccomp_api_get() >=3D 2 check when released */
+> +
+> +#if defined(SECCOMP_FILTER_FLAG_TSYNC)
+> +    int check;
+> +
+> +    /* check host TSYNC capability, it returns errno =3D=3D ENOSYS if un=
+available */
+> +    check =3D qemu_seccomp(SECCOMP_SET_MODE_FILTER,
+> +                         SECCOMP_FILTER_FLAG_TSYNC, NULL);
+> +    if (check < 0 && errno =3D=3D EFAULT) {
+> +        add =3D true;
+> +    }
+> +#endif
+> +
+> +    if (add) {
+> +        qemu_add_opts(&qemu_sandbox_opts);
+> +    }
+>  }
+>  opts_init(seccomp_register);
+>  #endif
+> diff --git a/vl.c b/vl.c
+> index 408bff9c1e..70c2449b86 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4007,8 +4007,8 @@ int main(int argc, char **argv, char **envp)
+>      }
+> =20
+>  #ifdef CONFIG_SECCOMP
+> -    if (qemu_opts_foreach(qemu_find_opts("sandbox"),
+> -                          parse_sandbox, NULL, NULL)) {
+> +    olist =3D qemu_find_opts_err("sandbox", NULL);
+> +    if (olist && qemu_opts_foreach(olist, parse_sandbox, NULL, NULL)) {
+>          exit(1);
+>      }
+>  #endif
+> --=20
+> 2.19.0.rc0.48.gb9dfa238d5
+>=20
+Acked-by: Eduardo Otubo <otubo@redhat.com>
+
+--Ycz6tD7Th1CMF4v7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbli0RAAoJEN8y58Dw//miQSsH/2UW996QbRb8Jo8ZVS0W35G4
+32w+Md8T8ruA4wr/gg/VdXZeGTRXX7rV+W8DudwQxLUBu1C2OgmuQcfaTWi1G210
+6xaJhx2GA6vs0Ogaxy8m4BYtzAtCo6TihfjxfyoM1TgKF3UKUsCUHUrfqlRlc33E
+Lm5hMT4v8v9/qpxsVEBgXE+epHA/AMSjEGkeDQjR8vVHmY2iK9XmN20ShgX82cJQ
+yDB2hjPtzbm3dv5DoFU7ycHq8NJT8HXRqp13p9RmxcYjQS92YYEovqV4LIogrq7N
+2AQaExDV+1CtrD3Ll/V0c8oSCRw9c6AQ1TnOXd6CErTMZ5ETee5Ut7E/CZRqfrQ=
+=Ielq
+-----END PGP SIGNATURE-----
+
+--Ycz6tD7Th1CMF4v7--
