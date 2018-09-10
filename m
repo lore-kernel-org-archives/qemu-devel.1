@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([208.118.235.92]:52938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fzFvr-0003fP-2z
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 02:44:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1fzHLi-0000Cx-7D
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:15:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fzFvI-0006EB-4R
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 02:43:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54160 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fzFvH-0006Df-Up
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 02:43:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7DFAB805A6D9
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 06:43:47 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 10 Sep 2018 08:43:38 +0200
-Message-Id: <20180910064340.30745-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] hw/vfio/display: add ramfb support
+	(envelope-from <thuth@redhat.com>) id 1fzHGa-00040m-UT
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:09:57 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 10 Sep 2018 10:09:39 +0200
+Message-Id: <1536566979-6868-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/qdev-core: Fix description of instance_init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +17,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-So we have a boot display when using a vgpu as primary display.
+The part of the documentation of DeviceClass that talks about instance_init
+is partly wrong: instance_init() functions must not abort or exit, since
+the function is also called during introspection of the device already.
+So if a device calls exit() during its instance_init() function, QEMU
+terminates unexpectedly if somebody tries to just have a look at the
+interfaces from the device with "device_add xyz,help" or with the
+"device-list-properties" QOM command. This should never happen.
 
-Gerd Hoffmann (2):
-  stubs: add ramfb
-  hw/vfio/display: add ramfb support
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/hw/qdev-core.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
- include/hw/vfio/vfio-common.h |  2 ++
- hw/vfio/display.c             | 12 ++++++++++++
- hw/vfio/pci.c                 | 15 +++++++++++++++
- stubs/ramfb.c                 | 13 +++++++++++++
- stubs/Makefile.objs           |  1 +
- 5 files changed, 43 insertions(+)
- create mode 100644 stubs/ramfb.c
-
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index f1fd0f8..a24d0dd 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -51,8 +51,9 @@ struct VMStateDescription;
+  * Devices are constructed in two stages,
+  * 1) object instantiation via object_initialize() and
+  * 2) device realization via #DeviceState:realized property.
+- * The former may not fail (it might assert or exit), the latter may return
+- * error information to the caller and must be re-entrant.
++ * The former may not fail (and must not abort or exit, since it is called
++ * during device introspection already), and the latter may return error
++ * information to the caller and must be re-entrant.
+  * Trivial field initializations should go into #TypeInfo.instance_init.
+  * Operations depending on @props static properties should go into @realize.
+  * After successful realization, setting static properties will fail.
 -- 
-2.9.3
+1.8.3.1
