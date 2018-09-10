@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fzT5C-000695-K4
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fzT5C-000696-KO
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 16:46:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fzT59-000374-Ji
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fzT59-00036j-BR
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 16:46:54 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Mon, 10 Sep 2018 21:46:31 +0100
-Message-Id: <20180910204631.24106-3-mark.cave-ayland@ilande.co.uk>
+Date: Mon, 10 Sep 2018 21:46:30 +0100
+Message-Id: <20180910204631.24106-2-mark.cave-ayland@ilande.co.uk>
 In-Reply-To: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
 References: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH v3 2/2] 40p: add fixed IRQ routing for LSI SCSI
- device
+Subject: [Qemu-devel] [PATCH v3 1/2] lsi53c895a: add optional external IRQ
+ via qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +22,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: hpoussin@reactos.org, david@gibson.dropbear.id.au, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Whilst the PReP specification describes how all PCI IRQs are routed via IRQ
-15 on the interrupt controller, the real 40p machine has a routing quirk in
-that the LSI SCSI device is routed directly to IRQ 13.
+On some early machines the on-board PCI devices IRQs are wired directly to
+the interrupt controller instead of via the PCI host bridge.
 
-Enable the external IRQ for the LSI SCSI device by wiring up the IRQ with
-qdev to the relevant interrupt controller gpio.
+Add an optional external IRQ that if wired up via qdev will replace the
+in-built PCI IRQ.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/ppc/prep.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ hw/scsi/lsi53c895a.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 615865e46c..94fc36b7ef 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -621,7 +621,7 @@ static void ibm_40p_init(MachineState *machine)
-     CPUPPCState *env = NULL;
-     uint16_t cmos_checksum;
-     PowerPCCPU *cpu;
--    DeviceState *dev;
-+    DeviceState *dev, *i82378_dev;
-     SysBusDevice *pcihost, *s;
-     Nvram *m48t59 = NULL;
-     PCIBus *pci_bus;
-@@ -666,11 +666,11 @@ static void ibm_40p_init(MachineState *machine)
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index f5cbbf653c..996b40650d 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -207,6 +207,7 @@ typedef struct {
+     PCIDevice parent_obj;
+     /*< public >*/
+ 
++    qemu_irq ext_irq;
+     MemoryRegion mmio_io;
+     MemoryRegion ram_io;
+     MemoryRegion io_io;
+@@ -443,9 +444,19 @@ static void lsi_stop_script(LSIState *s)
+     s->istat1 &= ~LSI_ISTAT1_SRUN;
+ }
+ 
+-static void lsi_update_irq(LSIState *s)
++static void lsi_set_irq(LSIState *s, int level)
+ {
+     PCIDevice *d = PCI_DEVICE(s);
++
++    if (s->ext_irq) {
++        qemu_set_irq(s->ext_irq, level);
++    } else {
++        pci_set_irq(d, level);
++    }
++}
++
++static void lsi_update_irq(LSIState *s)
++{
+     int level;
+     static int last_level;
+     lsi_request *p;
+@@ -477,7 +488,7 @@ static void lsi_update_irq(LSIState *s)
+                 level, s->dstat, s->sist1, s->sist0);
+         last_level = level;
      }
+-    pci_set_irq(d, level);
++    lsi_set_irq(s, level);
  
-     /* PCI -> ISA bridge */
--    dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"));
--    qdev_connect_gpio_out(dev, 0,
-+    i82378_dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"));
-+    qdev_connect_gpio_out(i82378_dev, 0,
-                           cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
--    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
--    isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
-+    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(i82378_dev, 15));
-+    isa_bus = ISA_BUS(qdev_get_child_bus(i82378_dev, "isa.0"));
+     if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
+         DPRINTF("Handled IRQs & disconnected, looking for pending "
+@@ -2213,6 +2224,7 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
+                           "lsi-io", 256);
  
-     /* Memory controller */
-     dev = DEVICE(isa_create(isa_bus, "rs6000-mc"));
-@@ -703,6 +703,7 @@ static void ibm_40p_init(MachineState *machine)
-         dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
-                                        "lsi53c810"));
-         lsi53c8xx_handle_legacy_cmdline(dev);
-+        qdev_connect_gpio_out(dev, 0, qdev_get_gpio_in(i82378_dev, 13));
+     address_space_init(&s->pci_io_as, pci_address_space_io(dev), "lsi-pci-io");
++    qdev_init_gpio_out(d, &s->ext_irq, 1);
  
-         /* XXX: s3-trio at PCI_DEVFN(2, 0) */
-         pci_vga_init(pci_bus);
+     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io_io);
+     pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mmio_io);
 -- 
 2.11.0
