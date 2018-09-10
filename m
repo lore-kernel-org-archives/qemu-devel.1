@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzN8A-0004AI-Mq
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 10:25:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fzNG2-0003DR-Qx
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 10:33:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzMyi-00087x-BI
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 10:15:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41536)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzMyi-00085d-4N
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 10:15:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzMyf-0006Pr-Rm
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 14:15:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BD68F2E807C
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 14:15:45 +0000 (UTC)
+	(envelope-from <kwolf@redhat.com>) id 1fzNFw-0006gh-Or
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 10:33:42 -0400
+Date: Mon, 10 Sep 2018 16:33:23 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180910143323.GI4901@dhcp-200-186.str.redhat.com>
+References: <20180813010729.4844-1-lbloch@janustech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Sep 2018 13:59:29 -0000
-From: Jan Marti <1791680@bugs.launchpad.net>
-Reply-To: Bug 1791680 <1791680@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153658763815.28323.7728344780520066918.malonedeb@wampee.canonical.com>
-Message-Id: <153658796909.24589.16964226398134536435.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1791680] Re: network bridge does not work
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180813010729.4844-1-lbloch@janustech.com>
+Subject: Re: [Qemu-devel] [PATCH v8 0/8] Take the image size into account
+ when allocating the L2 cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,63 +23,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Leonid Bloch <lbloch@janustech.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-J:\Tools\qemu>qemu-system-arm.exe -M versatilepb -cpu arm1176 -hda 2018-09-=
-03_stretch_inkl_phalcon.img -kernel kernel-qe
-mu-4.4.34-jessie -m 192 -append "root=3D/dev/sda2 panic=3D1 rootfstype=3Dex=
-t4 rw" -no-reboot -net nic -net user -device e1000,
-mac=3D52:54:00:12:34:56
-WARNING: Image format was not specified for '2018-09-03_stretch_inkl_phalco=
-n.img' and probing guessed raw.
-         Automatically detecting the format is dangerous for raw images, wr=
-ite operations on block 0 will be restricted.
+Hi Leonid,
 
-         Specify the 'raw' format explicitly to remove the restrictions.
-dsound: Could not initialize DirectSoundCapture
-dsound: Reason: No sound driver is available for use, or the given GUID is =
-not a valid DirectSound device ID
-qemu-system-arm.exe: warning: nic e1000.0 has no peer
+Am 13.08.2018 um 03:07 hat Leonid Bloch geschrieben:
+> This series makes the qcow2 L2 cache assignment aware of the image size,
+> with the intention for it to cover the entire image. The importance of
+> this change is in noticeable performance improvement, especially with
+> heavy random I/O. The memory overhead is not big in most cases, as only
+> 1 MB of cache for every 8 GB of image size is used. For cases with very
+> large images and/or small cluster sizes, or systems with limited RAM
+> resources, there is an upper limit on the default L2 cache: 32 MB. To
+> modify this limit one can use the already existing 'l2-cache-size' and
+> 'cache-size' options. Moreover, this fixes the behavior of 'l2-cache-size',
+> as it was documented as the *maximum* L2 cache size, but in practice
+> behaved as the absolute size.
+> 
+> To compensate the memory overhead which may be increased following this
+> behavior, the default cache-clean-interval is set to 10 minutes by default
+> (was disabled by default before).
+> 
+> The L2 cache is also resized accordingly, by default, if the image is
+> resized.
 
--- =
+after digging through the most urgent part of my post-vacation backlog,
+I saw this series again. It's been a while, but I don't think much is
+missing, so let's get this finished now. :-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1791680
+We had some discussion in the v7 thread after you posted v8, and you
+mentioned there that you'd do some changes in a v9 (at first sight, just
+some test case stuff). Are you still planning to send that v9?
 
-Title:
-  network bridge does not work
-
-Status in QEMU:
-  New
-
-Bug description:
-  hi there
-
-  the network bridge does not seem to work described as here:
-  https://en.wikibooks.org/wiki/QEMU/Networking
-
-  When i add that parameters in a 192.168.80.x subnet, my emulated
-  raspbian ARM gets the IP 10.0.2.15.... While all other computers get
-  192.168.80.x
-
-  The command i use is:
-
-  =
-
-  qemu-system-arm.exe -M versatilepb -cpu arm1176 -hda 2018-09-03_stretch_i=
-nkl_phalcon.img -kernel kernel-qemu-4.4.34-jessie -m 192 -append "root=3D/d=
-ev/sda2 panic=3D1 rootfstype=3Dext4 rw" -no-reboot -net nic -net user -devi=
-ce e1000,mac=3D52:54:00:12:34:56 &
-
-  =
-
-  Does not build up a network bridge to 192.168.80.x...
-
-  The host system i use is win10 x64 v1803
-
-  Best regards,
-  Jan
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1791680/+subscriptions
+Kevin
