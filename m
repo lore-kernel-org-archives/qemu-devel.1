@@ -1,22 +1,22 @@
 Received: from eggs.gnu.org ([208.118.235.92]:39928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fzTO2-0008ER-BU
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 17:06:26 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fzTOE-0008ER-G7
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 17:06:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fzTC3-0001Cq-Dt
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 16:54:00 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fzT9Q-00062v-S0
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 16:51:21 -0400
 References: <20180814121443.33114-1-vsementsov@virtuozzo.com>
-	<20180814121443.33114-9-vsementsov@virtuozzo.com>
+	<20180814121443.33114-6-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <973adbae-7811-ebba-d566-b1c9a416b63a@redhat.com>
-Date: Mon, 10 Sep 2018 16:53:51 -0400
+Message-ID: <bf1d0208-77a0-447c-af51-0ca7ccfe0d5e@redhat.com>
+Date: Mon, 10 Sep 2018 16:51:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180814121443.33114-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20180814121443.33114-6-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] Revert "hbitmap: Add @advance param
- to hbitmap_iter_next()"
+Subject: Re: [Qemu-devel] [PATCH v3 5/8] block/mirror: fix and improve
+ do_sync_target_write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,179 +31,98 @@ Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, den@
 
 
 On 08/14/2018 08:14 AM, Vladimir Sementsov-Ogievskiy wrote:
-> This reverts commit a33fbb4f8b64226becf502a123733776ce319b24.
+> Use bdrv_dirty_bitmap_next_dirty_area() instead of
+> bdrv_dirty_iter_next_area(), because of the following problems of
+> bdrv_dirty_iter_next_area():
 > 
-> The functionality is unused.
+> 1. Using HBitmap iterators we should carefully handle unaligned offset,
+> as first call to hbitmap_iter_next() may return a value less than
+> original offset (actually, it will be original offset rounded down to
+> bitmap granularity). This handling is not done in
+> do_sync_target_write().
 > 
-> Note: in addition to automatic revert, drop second parameter in
-> hbitmap_iter_next() call from hbitmap_next_dirty_area() too.
+> 2. bdrv_dirty_iter_next_area() handles unaligned max_offset
+> incorrectly:
 > 
-
-Hm, it's not really a "revert" in the revision control sense then, but I
-don't think I care about that kind of pedantic distinction personally.
-
-6,7,8: Reviewed-by: John Snow <jsnow@redhat.com>
-
+> look at the code:
+>     if (max_offset == iter->bitmap->size) {
+>         /* If max_offset points to the image end, round it up by the
+>          * bitmap granularity */
+>         gran_max_offset = ROUND_UP(max_offset, granularity);
+>     } else {
+>         gran_max_offset = max_offset;
+>     }
+> 
+>     ret = hbitmap_iter_next(&iter->hbi, false);
+>     if (ret < 0 || ret + granularity > gran_max_offset) {
+>         return false;
+>     }
+> 
+> and assume that max_offset != iter->bitmap->size but still unaligned.
+> if 0 < ret < max_offset we found dirty area, but the function can
+> return false in this case (if ret + granularity > max_offset).
+> 
+> 3. bdrv_dirty_iter_next_area() uses inefficient loop to find the end of
+> the dirty area. Let's use more efficient hbitmap_next_zero instead
+> (bdrv_dirty_bitmap_next_dirty_area() do so)
+> 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  include/qemu/hbitmap.h |  5 +----
->  block/backup.c         |  2 +-
->  block/dirty-bitmap.c   |  2 +-
->  tests/test-hbitmap.c   | 26 +++++++++++++-------------
->  util/hbitmap.c         | 12 ++++--------
->  5 files changed, 20 insertions(+), 27 deletions(-)
+>  block/mirror.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
 > 
-> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-> index 7800317bf3..6d205167ce 100644
-> --- a/include/qemu/hbitmap.h
-> +++ b/include/qemu/hbitmap.h
-> @@ -345,14 +345,11 @@ void hbitmap_free_meta(HBitmap *hb);
->  /**
->   * hbitmap_iter_next:
->   * @hbi: HBitmapIter to operate on.
-> - * @advance: If true, advance the iterator.  Otherwise, the next call
-> - *           of this function will return the same result (if that
-> - *           position is still dirty).
->   *
->   * Return the next bit that is set in @hbi's associated HBitmap,
->   * or -1 if all remaining bits are zero.
->   */
-> -int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance);
-> +int64_t hbitmap_iter_next(HBitmapIter *hbi);
->  
->  /**
->   * hbitmap_iter_next_word:
-> diff --git a/block/backup.c b/block/backup.c
-> index 9bfd3f7189..f033148f21 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -421,7 +421,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
->      HBitmapIter hbi;
->  
->      hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
-> -    while ((cluster = hbitmap_iter_next(&hbi, true)) != -1) {
-> +    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
->          do {
->              if (yield_and_check(job)) {
->                  return 0;
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index d9333175b3..d0d602ff52 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -525,7 +525,7 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
->  
->  int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
+> diff --git a/block/mirror.c b/block/mirror.c
+> index b48c3f8cf5..d2806812c8 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -1167,25 +1167,22 @@ static void do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
+>                                   uint64_t offset, uint64_t bytes,
+>                                   QEMUIOVector *qiov, int flags)
 >  {
-> -    return hbitmap_iter_next(&iter->hbi, true);
-> +    return hbitmap_iter_next(&iter->hbi);
->  }
+> -    BdrvDirtyBitmapIter *iter;
+>      QEMUIOVector target_qiov;
+> -    uint64_t dirty_offset;
+> -    int dirty_bytes;
+> +    uint64_t dirty_offset = offset;
+> +    uint64_t dirty_bytes;
 >  
->  /* Called within bdrv_dirty_bitmap_lock..unlock */
-> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-> index 5e43056970..17a3c807de 100644
-> --- a/tests/test-hbitmap.c
-> +++ b/tests/test-hbitmap.c
-> @@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
->  
->      i = first;
->      for (;;) {
-> -        next = hbitmap_iter_next(&hbi, true);
-> +        next = hbitmap_iter_next(&hbi);
->          if (next < 0) {
->              next = data->size;
->          }
-> @@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
->      /* Note that hbitmap_test_check has to be invoked manually in this test.  */
->      hbitmap_test_init(data, 131072 << 7, 7);
->      hbitmap_iter_init(&hbi, data->hb, 0);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->  
->      hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
->      hbitmap_iter_init(&hbi, data->hb, 0);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->  
->      hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->  
->      hbitmap_test_set(data, (131072 << 7) - 8, 8);
->      hbitmap_iter_init(&hbi, data->hb, 0);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->  
->      hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
-> -    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
-> +    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
->  }
->  
->  static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
-> @@ -893,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
->      for (i = 0; i < num_positions; i++) {
->          hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
->          hbitmap_iter_init(&iter, data->hb, 0);
-> -        next = hbitmap_iter_next(&iter, true);
-> +        next = hbitmap_iter_next(&iter);
->          if (i == num_positions - 1) {
->              g_assert_cmpint(next, ==, -1);
->          } else {
-> @@ -919,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
->  
->      hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
->  
-> -    hbitmap_iter_next(&hbi, true);
-> +    hbitmap_iter_next(&hbi);
->  
->      hbitmap_reset_all(data->hb);
-> -    hbitmap_iter_next(&hbi, true);
-> +    hbitmap_iter_next(&hbi);
->  }
->  
->  static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
-> diff --git a/util/hbitmap.c b/util/hbitmap.c
-> index bf88c1223e..b00e05a85b 100644
-> --- a/util/hbitmap.c
-> +++ b/util/hbitmap.c
-> @@ -144,7 +144,7 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
->      return cur;
->  }
->  
-> -int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
-> +int64_t hbitmap_iter_next(HBitmapIter *hbi)
->  {
->      unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
->              hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
-> @@ -157,12 +157,8 @@ int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
->          }
+>      if (qiov) {
+>          qemu_iovec_init(&target_qiov, qiov->niov);
 >      }
 >  
-> -    if (advance) {
-> -        /* The next call will resume work from the next bit.  */
-> -        hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
-> -    } else {
-> -        hbi->cur[HBITMAP_LEVELS - 1] = cur;
-> -    }
-> +    /* The next call will resume work from the next bit.  */
-> +    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
->      item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
+> -    iter = bdrv_dirty_iter_new(job->dirty_bitmap);
+> -    bdrv_set_dirty_iter(iter, offset);
+> -
+>      while (true) {
+>          bool valid_area;
+>          int ret;
 >  
->      return item << hbi->granularity;
-> @@ -256,7 +252,7 @@ bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *offset,
+>          bdrv_dirty_bitmap_lock(job->dirty_bitmap);
+> -        valid_area = bdrv_dirty_iter_next_area(iter, offset + bytes,
+> -                                               &dirty_offset, &dirty_bytes);
+> +        valid_area = bdrv_dirty_bitmap_next_dirty_area(
+> +            job->dirty_bitmap, &dirty_offset,
+> +            MIN(offset + bytes, dirty_offset + INT_MAX), &dirty_bytes);
+
+Looks correct, though the invocation looks harder to read now. Might be
+a sign that changing the signature is a good idea.... which I think
+you're planning to do.
+
+ACK.
+
+>          if (!valid_area) {
+>              bdrv_dirty_bitmap_unlock(job->dirty_bitmap);
+>              break;
+> @@ -1241,9 +1238,10 @@ static void do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
+>                  break;
+>              }
+>          }
+> +
+> +        dirty_offset += dirty_bytes;
 >      }
 >  
->      hbitmap_iter_init(&hbi, hb, *offset);
-> -    off1 = hbitmap_iter_next(&hbi, true);
-> +    off1 = hbitmap_iter_next(&hbi);
->  
->      if (off1 < 0 || off1 >= end) {
->          return false;
+> -    bdrv_dirty_iter_free(iter);
+>      if (qiov) {
+>          qemu_iovec_destroy(&target_qiov);
+>      }
 > 
