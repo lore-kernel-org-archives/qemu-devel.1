@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fzJyD-00026T-Oa
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:03:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fzKLQ-0004qA-PO
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:27:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fzJy6-0001JI-UF
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:03:04 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:33935)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fzJy4-0001Eo-LX
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:02:58 -0400
-Received: from player691.ha.ovh.net (unknown [10.109.159.7])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 531E315A2B5
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 13:02:53 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 10 Sep 2018 13:02:22 +0200
-Message-Id: <20180910110222.8162-4-clg@kaod.org>
-In-Reply-To: <20180910110222.8162-1-clg@kaod.org>
-References: <20180910110222.8162-1-clg@kaod.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fzKLM-0002rB-V7
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:27:04 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33879)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fzKLM-0002qP-Ha
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:27:00 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g33-v6so21552874wrd.1
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 04:27:00 -0700 (PDT)
+References: <20180908191735.22861-1-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180908191735.22861-1-cota@braap.org>
+Date: Mon, 10 Sep 2018 12:26:58 +0100
+Message-ID: <878t49d24d.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] spapr_pci: fix "ibm,pe-total-#msi" value
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] softfloat tests based on berkeley's
+ testfloat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-The "ibm,pe-total-#msi" property of the sPAPR PHB defines the number
-of allocatable MSI interrupts. This is currently set to XICS_IRQS_SPAPR
-which covers the full IRQ number space of the machine. This is wrong.
 
-Fix the definition by using the 'nr_msis' attribute of the sPAPRIrq
-class and remove XICS_IRQS_SPAPR which is now unused.
+Emilio G. Cota <cota@braap.org> writes:
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/xics.h | 2 --
- hw/ppc/spapr_irq.c    | 2 +-
- hw/ppc/spapr_pci.c    | 5 +++--
- 3 files changed, 4 insertions(+), 5 deletions(-)
+> A few fixes since yesterday's v1:
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00884.html
+>
+> - Convert copy_qemu_to_soft80 to qemu_to_soft80, just like the other
+>   conversion functions
+> - Set fp-test as the program name as reported by itself
+> - Fix Makefile to include .d files so that dependencies are
+>   properly tracked
+> - Update commit log
 
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 9c2916c9b23a..9958443d1984 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -181,8 +181,6 @@ typedef struct XICSFabricClass {
-     ICPState *(*icp_get)(XICSFabric *xi, int server);
- } XICSFabricClass;
-=20
--#define XICS_IRQS_SPAPR               1024
--
- void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
-=20
- ICPState *xics_icp_get(XICSFabric *xi, int server);
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index b14d7bce00ea..e77b94cc685e 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -290,7 +290,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int num,=
- bool align, Error **errp)
-     return first + ics->offset;
- }
-=20
--#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     XICS_IRQS_SPAPR
-+#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     0x400
-=20
- sPAPRIrq spapr_irq_xics_legacy =3D {
-     .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 6bcb4f419b6b..bb736177e76c 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -2121,6 +2121,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
-     sPAPRTCETable *tcet;
-     PCIBus *bus =3D PCI_HOST_BRIDGE(phb)->bus;
-     sPAPRFDT s_fdt;
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(qdev_get_machine(=
-));
-=20
-     /* Start populating the FDT */
-     nodename =3D g_strdup_printf("pci@%" PRIx64, phb->buid);
-@@ -2138,8 +2139,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
-     _FDT(fdt_setprop(fdt, bus_off, "ranges", &ranges, sizeof_ranges));
-     _FDT(fdt_setprop(fdt, bus_off, "reg", &bus_reg, sizeof(bus_reg)));
-     _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pci-config-space-type", 0x1=
-));
--    /* TODO: fine tune the total count of allocatable MSIs per PHB */
--    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", XICS_IRQS_S=
-PAPR));
-+    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi",
-+                          smc->irq->nr_msis));
-=20
-     /* Dynamic DMA window */
-     if (phb->ddw_enabled) {
---=20
-2.17.1
+Just some general comments:
+
+ - I think this is a better way to go than the IBM test suite
+ - I'm ambivalent about maintaining our fp-test.c in close alignment to
+   softfloat unless we expect much upstreaming of changes.
+ - the coverage seems a bit low. Rebuilding everything with
+   --enable-gcov and running -all1 -all2 I get:
+
+  tests/fp/fp-test.c - 53.5 % coverage 43.3 % branch coverage
+  fpu/softfloat.c - 32.5 % coverage 25.1 % branch coverage
+
+But maybe I didn't pass enough options to fp-test? I could really do
+with a --just-run-everything-and-summarise-failing-functions option so I
+can then go through in more detail with fp-test fFOO_BAR.
+
+>
+> Grab this from:
+>   https://github.com/cota/qemu/tree/fp-test-v2
+>
+> Thanks,
+>
+> 		Emilio
+
+
+--
+Alex Benn=C3=A9e
