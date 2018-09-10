@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fzKeK-0004Yf-DE
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:46:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fzKih-0000NX-3l
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fzKZM-0001Dt-G5
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:41:32 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:50676)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fzKZM-0001DN-3t
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:41:28 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<152819516675.30857.9162557650483931182.stgit@pasha-ThinkPad-T60>
-	<87mustz96w.fsf@linaro.org>
-In-Reply-To: <87mustz96w.fsf@linaro.org>
-Date: Mon, 10 Sep 2018 14:41:24 +0300
-Message-ID: <001901d448fb$342c0bc0$9c842340$@ru>
+	(envelope-from <pbonzini@redhat.com>) id 1fzKib-0006Ba-3t
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:51:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57466 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fzKiZ-0006AZ-5W
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:51:00 -0400
+References: <f38111ad-3fbb-210e-e7ec-49ae675ea65e@eagerm.com>
+	<a57fdd27-7a86-3f31-341c-e98101d17b9a@eagerm.com>
+	<61c2239b-f8db-6648-ba1b-203309d876eb@eagerm.com>
+	<f741c912-c37b-34a6-89a3-96577d186adc@eagerm.com>
+	<CAFEAcA-8fF1F6A64Yv5G0LB9T4mBRvSSqi8oe3kENxSOGc982Q@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <31902dac-e381-412f-5ec4-e8d39fe63961@redhat.com>
+Date: Mon, 10 Sep 2018 13:50:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v2 2/7] Add plugin support
+In-Reply-To: <CAFEAcA-8fF1F6A64Yv5G0LB9T4mBRvSSqi8oe3kENxSOGc982Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] RISC-V - Dynamic parameterization of
+ RISC-V memory map
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
+To: Peter Maydell <peter.maydell@linaro.org>, Michael Eager <eager@eagerm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
->=20
-> > This patch adds support for dynamically loaded plugins.
-> > Every plugin is a dynamic library with a set of optional exported
-> > functions that will be called from QEMU.
-> >
-> <snip>
-> > +
-> > +static QLIST_HEAD(, QemuPluginInfo) qemu_plugins
-> > +                                =3D =
-QLIST_HEAD_INITIALIZER(qemu_plugins);
-> > +
-> > +static QemuOptsList qemu_plugin_opts =3D {
-> > +    .name =3D "plugin",
-> > +    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_plugin_opts.head),
-> > +    .desc =3D {
-> > +        {
-> > +            .name =3D "file",
-> > +            .type =3D QEMU_OPT_STRING,
-> > +        },{
-> > +            .name =3D "args",
-> > +            .type =3D QEMU_OPT_STRING,
-> > +        },
-> > +        { /* end of list */ }
-> > +    },
-> > +};
-> > +
-> > +void qemu_plugin_parse_cmd_args(const char *optarg)
-> > +{
-> > +    QemuOpts *opts =3D qemu_opts_parse_noisily(&qemu_plugin_opts, =
-optarg, false);
-> > +    qemu_plugin_load(qemu_opt_get(opts, "file"),
-> > +        qemu_opt_get(opts, "args"));
-> > +}
->=20
-> Currently this is only available to system mode emulation. Can it be
-> extended to include linux-user as well?
+On 06/09/2018 17:44, Peter Maydell wrote:
+> On 6 September 2018 at 16:07, Michael Eager <eager@eagerm.com> wrote:
+>> Any comments?
+> I'd quite like to hear from somebody more familiar with the
+> readconfig/writeconfig stuff than me about whether this
+> very riscv-centric approach makes sense and fits with how
+> the config file is used by other parts of QEMU.
+> 
+> I'm not sure who would be best to do that review, though. Paolo,
+> any suggestions for who knows that bit of the code?
 
-Why not? I'm not familiar with linux-user, so I'll need some time to =
-try.
+I'm not sure why you need a readconfig-specific section and you cannot
+just use -machine (adding properties to the RISC-V machine classes).
+That would be usable through either command line or -readconfig.
 
-Pavel Dovgalyuk
+Paolo
