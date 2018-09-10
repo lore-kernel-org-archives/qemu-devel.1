@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fzLeM-0001v3-A4
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 08:50:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fzLmv-0001nu-2Q
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 08:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fzLW2-00052O-3f
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 08:42:07 -0400
-Date: Mon, 10 Sep 2018 14:41:53 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180910124136.GF4901@dhcp-200-186.str.redhat.com>
-References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
-	<20180629124052.331406-3-dplotnikov@virtuozzo.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fzLmr-0008Dg-S9
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 08:59:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59256 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fzLmr-0008DJ-MI
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 08:59:29 -0400
+References: <20180820150903.1224-4-pbonzini@redhat.com>
+	<000001d43ea0$02146ed0$063d4c70$@ru>
+	<5b9a85eb-cefd-925c-b24b-95b93bbbfce8@redhat.com>
+	<000a01d448c8$4a55c0e0$df0142a0$@ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea5f162e-bd8a-001c-b78c-25378e3b2919@redhat.com>
+Date: Mon, 10 Sep 2018 14:59:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180629124052.331406-3-dplotnikov@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v0 2/2] block: postpone the coroutine
- executing if the BDS's is drained
+In-Reply-To: <000a01d448c8$4a55c0e0$df0142a0$@ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [3/4] cpus: protect TimerState writes with a
+ spinlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +31,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: mreitz@redhat.com, stefanha@redhat.com, famz@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: "'Emilio G . Cota'" <cota@braap.org>
 
-Am 29.06.2018 um 14:40 hat Denis Plotnikov geschrieben:
-> Fixes the problem of ide request appearing when the BDS is in
-> the "drained section".
-> 
-> Without the patch the request can come and be processed by the main
-> event loop, as the ide requests are processed by the main event loop
-> and the main event loop doesn't stop when its context is in the
-> "drained section".
-> The request execution is postponed until the end of "drained section".
-> 
-> The patch doesn't modify ide specific code, as well as any other
-> device code. Instead, it modifies the infrastructure of asynchronous
-> Block Backend requests, in favor of postponing the requests arisen
-> when in "drained section" to remove the possibility of request appearing
-> for all the infrastructure clients.
-> 
-> This approach doesn't make vCPU processing the request wait untill
-> the end of request processing.
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+On 10/09/2018 07:36, Pavel Dovgalyuk wrote:
+> After locking here,
+>=20
+>>      if (runstate_is_running()) {
+>>          int64_t clock =3D REPLAY_CLOCK(REPLAY_CLOCK_VIRTUAL_RT,
+>>                                       cpu_get_clock_locked());
+> REPLAY_CLOCK can't request icount with cpu_get_icount_raw, because
+> it loops infinitely here:
+>=20
+>     do {
+>         start =3D seqlock_read_begin(&timers_state.vm_clock_seqlock);
+>         icount =3D cpu_get_icount_raw_locked();
+>     } while (seqlock_read_retry(&timers_state.vm_clock_seqlock, start))=
+;
 
-I generally agree with the idea that requests should be queued during a
-drained section. However, I think there are a few fundamental problems
-with the implementation in this series:
+Yeah, I meant to ask for the backtrace but I can see that the issue is in
+replay_save_instructions().  Does this work?
 
-1) aio_disable_external() is already a layering violation and we'd like
-   to get rid of it (by replacing it with a BlockDevOps callback from
-   BlockBackend to the devices), so adding more functionality there
-   feels like a step in the wrong direction.
+diff --git a/cpus.c b/cpus.c
+index 8ee6e5db93..f257a6ef12 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -502,8 +502,8 @@ static void icount_warp_rt(void)
+     seqlock_write_lock(&timers_state.vm_clock_seqlock,
+                        &timers_state.vm_clock_lock);
+     if (runstate_is_running()) {
+-        int64_t clock =3D REPLAY_CLOCK(REPLAY_CLOCK_VIRTUAL_RT,
+-                                     cpu_get_clock_locked());
++        int64_t clock =3D REPLAY_CLOCK_LOCKED(REPLAY_CLOCK_VIRTUAL_RT,
++                                            cpu_get_clock_locked());
+         int64_t warp_delta;
+=20
+         warp_delta =3D clock - timers_state.vm_clock_warp_start;
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 3ced6bc231..bb8660b4e4 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -100,14 +100,20 @@ bool replay_has_interrupt(void);
+ /* Processing clocks and other time sources */
+=20
+ /*! Save the specified clock */
+-int64_t replay_save_clock(ReplayClockKind kind, int64_t clock);
++int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
++                          int64_t raw_icount);
+ /*! Read the specified clock from the log or return cached data */
+ int64_t replay_read_clock(ReplayClockKind kind);
+ /*! Saves or reads the clock depending on the current replay mode. */
+ #define REPLAY_CLOCK(clock, value)                                      =
+\
+     (replay_mode =3D=3D REPLAY_MODE_PLAY ? replay_read_clock((clock))   =
+    \
+         : replay_mode =3D=3D REPLAY_MODE_RECORD                         =
+    \
+-            ? replay_save_clock((clock), (value))                       =
+\
++            ? replay_save_clock((clock), (value), cpu_get_icount_raw()) =
+\
++        : (value))
++#define REPLAY_CLOCK_LOCKED(clock, value)                               =
+\
++    (replay_mode =3D=3D REPLAY_MODE_PLAY ? replay_read_clock((clock))   =
+    \
++        : replay_mode =3D=3D REPLAY_MODE_RECORD                         =
+    \
++            ? replay_save_clock((clock), (value), cpu_get_icount_raw_loc=
+ked()) \
+         : (value))
+=20
+ /* Events */
+diff --git a/replay/replay-internal.c b/replay/replay-internal.c
+index b077cb5fd5..7be4c010d0 100644
+--- a/replay/replay-internal.c
++++ b/replay/replay-internal.c
+@@ -217,20 +217,25 @@ void replay_mutex_unlock(void)
+     }
+ }
+=20
++void replay_advance_current_step(uint64_t current_step)
++{
++    int diff =3D (int)(current_step - replay_state.current_step);
++
++    /* Time can only go forward */
++    assert(diff >=3D 0);
++
++    if (diff > 0) {
++        replay_put_event(EVENT_INSTRUCTION);
++        replay_put_dword(diff);
++        replay_state.current_step +=3D diff;
++    }
++}
++
+ /*! Saves cached instructions. */
+ void replay_save_instructions(void)
+ {
+     if (replay_file && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+         g_assert(replay_mutex_locked());
+-        int diff =3D (int)(replay_get_current_step() - replay_state.curr=
+ent_step);
+-
+-        /* Time can only go forward */
+-        assert(diff >=3D 0);
+-
+-        if (diff > 0) {
+-            replay_put_event(EVENT_INSTRUCTION);
+-            replay_put_dword(diff);
+-            replay_state.current_step +=3D diff;
+-        }
++        replay_advance_current_step(replay_get_current_step());
+     }
+ }
+diff --git a/replay/replay-internal.h b/replay/replay-internal.h
+index ac4b27b674..4f82676209 100644
+--- a/replay/replay-internal.h
++++ b/replay/replay-internal.h
+@@ -122,6 +122,8 @@ void replay_finish_event(void);
+     data_kind variable. */
+ void replay_fetch_data_kind(void);
+=20
++/*! Advance replay_state.current_step to the specified value. */
++void replay_advance_current_step(uint64_t current_step);
+ /*! Saves queued events (like instructions and sound). */
+ void replay_save_instructions(void);
+=20
+diff --git a/replay/replay-time.c b/replay/replay-time.c
+index 6a7565ec8d..17caf35e74 100644
+--- a/replay/replay-time.c
++++ b/replay/replay-time.c
+@@ -15,13 +15,15 @@
+ #include "replay-internal.h"
+ #include "qemu/error-report.h"
+=20
+-int64_t replay_save_clock(ReplayClockKind kind, int64_t clock)
++int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t r=
+aw_icount)
+ {
+-
+     if (replay_file) {
+         g_assert(replay_mutex_locked());
+=20
+-        replay_save_instructions();
++        /* Due to the caller's locking requirements we get the icount fr=
+om it instead
++         * of using replay_save_instructions().
++         */
++        replay_advance_current_step(raw_icount);
+         replay_put_event(EVENT_CLOCK + kind);
+         replay_put_qword(clock);
+     }
 
-2) Only blk_aio_* are fixed, while we also have synchronous public
-   interfaces (blk_pread/pwrite) as well as coroutine-based ones
-   (blk_co_*). They need to be postponed as well.
+Thanks,
 
-   blk_co_preadv/pwritev() are the common point in the call chain for
-   all of these variants, so this is where the fix needs to live.
-
-3) Within a drained section, you want requests from other users to be
-   blocked, but not your own ones (essentially you want exclusive
-   access). We don't have blk_drained_begin/end() yet, so this is not
-   something to implement right now, but let's keep this requirement in
-   mind and choose a design that allows this.
-
-I believe the whole logic should be kept local to BlockBackend, and
-blk_root_drained_begin/end() should be the functions that start queuing
-requests or let queued requests resume.
-
-As we are already in coroutine context in blk_co_preadv/pwritev(), after
-checking that blk->quiesce_counter > 0, we can enter the coroutine
-object into a list and yield. blk_root_drained_end() calls aio_co_wake()
-for each of the queued coroutines. This should be all that we need to
-manage.
-
-Kevin
+Paolo
