@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fzHLl-0000Cx-02
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:15:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fzHNS-0001Yq-Ia
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fzHFU-0003bz-Ak
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:08:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42098 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fzHFU-0003ba-3c
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:08:44 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A75164B765
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 08:08:42 +0000 (UTC)
-Date: Mon, 10 Sep 2018 09:08:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180910080831.GA2482@work-vm>
-References: <20180308195811.24894-1-dgilbert@redhat.com>
-	<20180907163253-mutt-send-email-mst@kernel.org>
+	(envelope-from <kwolf@redhat.com>) id 1fzHNR-0001Pz-9B
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 04:16:58 -0400
+Date: Mon, 10 Sep 2018 10:16:49 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180910081649.GA4901@dhcp-200-186.str.redhat.com>
+References: <20180908030136.844-1-programmingkidx@gmail.com>
+	<CAFEAcA-W-J30u=AaJ6U8eAD6HppWW37h6pW95kVOd8rXE6mpEA@mail.gmail.com>
+	<6386A97A-3BAB-43D2-B3BF-D6B72FC3D068@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180907163253-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v4 00/29] postcopy+vhost-user/shared ram
+In-Reply-To: <6386A97A-3BAB-43D2-B3BF-D6B72FC3D068@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img.c: add help for each command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, marcandre.lureau@redhat.com, peterx@redhat.com, quintela@redhat.com, aarcange@redhat.com
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Thu, Mar 08, 2018 at 07:57:42PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> >   This set enables postcopy migration with shared memory to a vhost user process.
-> > It's based off current head.
-> > 
-> >   Testing is mostly performed with dpdk, with corresponding modifications by
-> > Maxime.
-> > 
-> >   v4 is mostly just fixes from comments received during review of v3,
-> > and the normal updating of all the virtio enum's to catch up with other
-> > things getting in before us.
-> > 
-> > Dave
+Am 08.09.2018 um 05:16 hat Programmingkid geschrieben:
 > 
-> For vhost bits:
+> > On Sep 7, 2018, at 11:13 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > 
+> > On 8 September 2018 at 04:01, John Arbuckle <programmingkidx@gmail.com> wrote:
+> > 
+> >> +    /* print the help for this command */
+> >> +    if (strcmp("--help", argv[optind + 1]) == 0) {
+> >> +        if (strcmp("amend", cmdname) == 0) {
+> >> +            help_amend();
+> >> +        } else if (strcmp("bench", cmdname) == 0) {
+> >> +            help_bench();
+> >> +        } else if (strcmp("check", cmdname) == 0) {
+> >> +            help_check();
+> >> +        } else if (strcmp("commit", cmdname) == 0) {
+> >> +            help_commit();
+> >> +        } else if (strcmp("compare", cmdname) == 0) {
+> >> +            help_compare();
+> >> +        } else if (strcmp("convert", cmdname) == 0) {
+> >> +            help_convert();
+> >> +        } else if (strcmp("create", cmdname) == 0) {
+> >> +            help_create();
+> >> +        } else if (strcmp("dd", cmdname) == 0) {
+> >> +            help_dd();
+> >> +        } else if (strcmp("info", cmdname) == 0) {
+> >> +            help_info();
+> >> +        } else if (strcmp("map", cmdname) == 0) {
+> >> +            help_map();
+> >> +        } else if (strcmp("measure", cmdname) == 0) {
+> >> +            help_measure();
+> >> +        } else if (strcmp("snapshot", cmdname) == 0) {
+> >> +            help_snapshot();
+> >> +        } else if (strcmp("rebase", cmdname) == 0) {
+> >> +            help_rebase();
+> >> +        } else if (strcmp("resize", cmdname) == 0) {
+> >> +            help_resize();
+> > 
+> > Any time you find yourself writing very repetitive code like
+> > this, it's a good idea to ask yourself "is there a way to make
+> > this data-driven?".
+> > 
+> > thanks
+> > -- PMM
 > 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> So how is all this going to be merged?
-> If it's through my tree pls let me know.
-> I'm fine with another tree though.
+> Did you want me to loop thru an array of strings instead?
 
-You already merged it!  Back in March in ed627b2ad37469eeba9e
-Maxime has a dpdk set to be merged, but we're just working a bug
-at the moment that we've not figured out yet (could be either side).
+There is already an array of all subcommands, img_cmds. You should
+probably add another field there for the help text.
 
-Dave
+Also, your line wrapping (even mid-word!) is awful. I'm not sure we
+really have to fill 80 characters in the output and can't simply keep
+the lines a bit shorter so that 80 characters in the source are enough.
 
-> 
-> > 
-> > Dr. David Alan Gilbert (29):
-> >   migrate: Update ram_block_discard_range for shared
-> >   qemu_ram_block_host_offset
-> >   postcopy: use UFFDIO_ZEROPAGE only when available
-> >   postcopy: Add notifier chain
-> >   postcopy: Add vhost-user flag for postcopy and check it
-> >   vhost-user: Add 'VHOST_USER_POSTCOPY_ADVISE' message
-> >   libvhost-user: Support sending fds back to qemu
-> >   libvhost-user: Open userfaultfd
-> >   postcopy: Allow registering of fd handler
-> >   vhost+postcopy: Register shared ufd with postcopy
-> >   vhost+postcopy: Transmit 'listen' to client
-> >   postcopy+vhost-user: Split set_mem_table for postcopy
-> >   migration/ram: ramblock_recv_bitmap_test_byte_offset
-> >   libvhost-user+postcopy: Register new regions with the ufd
-> >   vhost+postcopy: Send address back to qemu
-> >   vhost+postcopy: Stash RAMBlock and offset
-> >   vhost+postcopy: Send requests to source for shared pages
-> >   vhost+postcopy: Resolve client address
-> >   postcopy: helper for waking shared
-> >   postcopy: postcopy_notify_shared_wake
-> >   vhost+postcopy: Add vhost waker
-> >   vhost+postcopy: Call wakeups
-> >   libvhost-user: mprotect & madvises for postcopy
-> >   vhost-user: Add VHOST_USER_POSTCOPY_END message
-> >   vhost+postcopy: Wire up POSTCOPY_END notify
-> >   vhost: Huge page align and merge
-> >   postcopy: Allow shared memory
-> >   libvhost-user: Claim support for postcopy
-> >   postcopy shared docs
-> > 
-> >  contrib/libvhost-user/libvhost-user.c | 303 ++++++++++++++++++++++++-
-> >  contrib/libvhost-user/libvhost-user.h |  11 +
-> >  docs/devel/migration.rst              |  41 ++++
-> >  docs/interop/vhost-user.txt           |  51 +++++
-> >  exec.c                                |  86 +++++--
-> >  hw/virtio/trace-events                |  16 +-
-> >  hw/virtio/vhost-user.c                | 411 +++++++++++++++++++++++++++++++++-
-> >  hw/virtio/vhost.c                     |  66 +++++-
-> >  include/exec/cpu-common.h             |   4 +
-> >  migration/migration.c                 |   6 +
-> >  migration/migration.h                 |   4 +
-> >  migration/postcopy-ram.c              | 354 +++++++++++++++++++++++------
-> >  migration/postcopy-ram.h              |  69 ++++++
-> >  migration/ram.c                       |   5 +
-> >  migration/ram.h                       |   1 +
-> >  migration/savevm.c                    |  13 ++
-> >  migration/trace-events                |   6 +
-> >  trace-events                          |   3 +-
-> >  vl.c                                  |   2 +
-> >  19 files changed, 1354 insertions(+), 98 deletions(-)
-> > 
-> > -- 
-> > 2.14.3
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+But if we do want to use the full 80 characters in the output, I'd
+rather break the limit from the coding style and use longer lines in the
+source coe than doing what you did.
+
+Kevin
