@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzVjm-0003bp-Oc
+	(envelope-from <cota@braap.org>) id 1fzVjn-0003bg-0F
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzVbe-0005Sq-8q
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:28:38 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:48465)
+	(envelope-from <cota@braap.org>) id 1fzVbU-0005L2-CU
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:28:25 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:42499)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzVbe-0005Jv-1I
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:28:34 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzVbU-0005Jx-56
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:28:24 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 10 Sep 2018 19:27:50 -0400
-Message-Id: <20180910232752.31565-11-cota@braap.org>
+Date: Mon, 10 Sep 2018 19:27:52 -0400
+Message-Id: <20180910232752.31565-13-cota@braap.org>
 In-Reply-To: <20180910232752.31565-1-cota@braap.org>
 References: <20180910232752.31565-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 10/12] cpus: access .qemu_icount_bias with
- atomic64
+Subject: [Qemu-devel] [PATCH v2 12/12] configure: enable mttcg for i386 and
+ x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +29,27 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gm
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- cpus.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ configure | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index f045416c94..5a16a0186c 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -277,7 +277,8 @@ static int64_t cpu_get_icount_raw_locked(void)
- static int64_t cpu_get_icount_locked(void)
- {
-     int64_t icount = cpu_get_icount_raw_locked();
--    return atomic_read__nocheck(&timers_state.qemu_icount_bias) + cpu_icount_to_ns(icount);
-+    return atomic_read_i64(&timers_state.qemu_icount_bias) +
-+        cpu_icount_to_ns(icount);
- }
+diff --git a/configure b/configure
+index 58862d2ae8..f715252c9f 100755
+--- a/configure
++++ b/configure
+@@ -7025,12 +7025,14 @@ TARGET_ABI_DIR=""
  
- int64_t cpu_get_icount_raw(void)
-@@ -450,9 +451,9 @@ static void icount_adjust(void)
-                    timers_state.icount_time_shift + 1);
-     }
-     last_delta = delta;
--    atomic_set__nocheck(&timers_state.qemu_icount_bias,
--                        cur_icount - (timers_state.qemu_icount
--                                      << timers_state.icount_time_shift));
-+    atomic_set_i64(&timers_state.qemu_icount_bias,
-+                   cur_icount - (timers_state.qemu_icount
-+                                 << timers_state.icount_time_shift));
-     seqlock_write_unlock(&timers_state.vm_clock_seqlock,
-                          &timers_state.vm_clock_lock);
- }
-@@ -512,8 +513,8 @@ static void icount_warp_rt(void)
-             int64_t delta = clock - cur_icount;
-             warp_delta = MIN(warp_delta, delta);
-         }
--        atomic_set__nocheck(&timers_state.qemu_icount_bias,
--                            timers_state.qemu_icount_bias + warp_delta);
-+        atomic_set_i64(&timers_state.qemu_icount_bias,
-+                       timers_state.qemu_icount_bias + warp_delta);
-     }
-     timers_state.vm_clock_warp_start = -1;
-     seqlock_write_unlock(&timers_state.vm_clock_seqlock,
-@@ -544,8 +545,8 @@ void qtest_clock_warp(int64_t dest)
- 
-         seqlock_write_lock(&timers_state.vm_clock_seqlock,
-                            &timers_state.vm_clock_lock);
--        atomic_set__nocheck(&timers_state.qemu_icount_bias,
--                            timers_state.qemu_icount_bias + warp);
-+        atomic_set_i64(&timers_state.qemu_icount_bias,
-+                       timers_state.qemu_icount_bias + warp);
-         seqlock_write_unlock(&timers_state.vm_clock_seqlock,
-                              &timers_state.vm_clock_lock);
- 
-@@ -616,8 +617,8 @@ void qemu_start_warp_timer(void)
-              */
-             seqlock_write_lock(&timers_state.vm_clock_seqlock,
-                                &timers_state.vm_clock_lock);
--            atomic_set__nocheck(&timers_state.qemu_icount_bias,
--                                timers_state.qemu_icount_bias + deadline);
-+            atomic_set_i64(&timers_state.qemu_icount_bias,
-+                           timers_state.qemu_icount_bias + deadline);
-             seqlock_write_unlock(&timers_state.vm_clock_seqlock,
-                                  &timers_state.vm_clock_lock);
-             qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
+ case "$target_name" in
+   i386)
++    mttcg="yes"
+     gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
+     target_compiler=$cross_cc_i386
+     target_compiler_cflags=$cross_cc_ccflags_i386
+   ;;
+   x86_64)
+     TARGET_BASE_ARCH=i386
++    mttcg="yes"
+     gdb_xml_files="i386-64bit.xml i386-64bit-core.xml i386-64bit-sse.xml"
+     target_compiler=$cross_cc_x86_64
+   ;;
 -- 
 2.17.1
