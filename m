@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzNq0-0004ET-Qj
+	(envelope-from <bounces@canonical.com>) id 1fzNq0-0004ER-Qf
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzNpv-0008Fk-PV
+	(envelope-from <bounces@canonical.com>) id 1fzNpy-0008I6-UK
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35828)
+Received: from indium.canonical.com ([91.189.90.7]:35918)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzNpv-0008FI-It
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:47 -0400
+	id 1fzNpy-0008Hi-Mu
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:50 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzNpu-0008Io-OP
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:46 +0000
+	id 1fzNpy-0008NP-1a
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B48A32E8023
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 06BE42E806B
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Sep 2018 14:52:33 -0000
+Date: Mon, 10 Sep 2018 15:01:48 -0000
 From: Jan Marti <1791680@bugs.launchpad.net>
 Reply-To: Bug 1791680 <1791680@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153658763815.28323.7728344780520066918.malonedeb@wampee.canonical.com>
-Message-Id: <153659115322.32420.11744990178492042220.malone@soybean.canonical.com>
+Message-Id: <153659170894.32420.15027846090077899365.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1791680] Re: network bridge does not work
 List-Id: <qemu-devel.nongnu.org>
@@ -38,11 +38,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-OK thx.
+"That comment about e1000 is only true for qemu-system-i386. For ARM
+machines, there are other default NICs."
 
-"The -device option can only be used for pluggable NICs. Boards (e.g.
-embedded boards) which feature an on-board NIC cannot be configured with
--device yet, so -net nic,netdev=3D<id> must be used here instead."
+but why im able to ping google with that config??
 
 -- =
 
