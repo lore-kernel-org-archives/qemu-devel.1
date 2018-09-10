@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzVjm-0003X0-UC
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:37:03 -0400
+	(envelope-from <cota@braap.org>) id 1fzVjt-0003bp-7o
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzVbS-0005Ix-0b
+	(envelope-from <cota@braap.org>) id 1fzVbR-0005Io-W5
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:28:25 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:38513)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:39037)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzVbR-0005Hp-PC
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzVbR-0005HY-MO
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 19:28:21 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 10 Sep 2018 19:27:44 -0400
-Message-Id: <20180910232752.31565-5-cota@braap.org>
+Date: Mon, 10 Sep 2018 19:27:43 -0400
+Message-Id: <20180910232752.31565-4-cota@braap.org>
 In-Reply-To: <20180910232752.31565-1-cota@braap.org>
 References: <20180910232752.31565-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v2 04/12] qsp: use atomic64 accessors
+Subject: [Qemu-devel] [PATCH v2 03/12] tests: add atomic64-bench
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +26,218 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 
-With the seqlock, we either have to use atomics to remain
-within defined behaviour (and note that 64-bit atomics aren't
-always guaranteed to compile, irrespective of __nocheck), or
-drop the atomics and be in undefined behaviour territory.
-
-Fix it by dropping the seqlock and using atomic64 accessors.
-This will limit scalability when !CONFIG_ATOMIC64, but those
-machines (1) don't have many users and (2) are unlikely to
-have many cores.
-
 - With CONFIG_ATOMIC64:
-$ tests/atomic_add-bench -n 1 -m -p
- Throughput:         13.00 Mops/s
+$ tests/atomic64-bench  -n 1
+ Throughput:         310.40 Mops/s
 
-- Forcing !CONFIG_ATOMIC64:
-$ tests/atomic_add-bench -n 1 -m -p
- Throughput:         10.89 Mops/s
+- Without:
+$ tests/atomic64-bench  -n 1
+ Throughput:         149.08 Mops/s
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- util/qsp.c | 49 ++++++++-----------------------------------------
- 1 file changed, 8 insertions(+), 41 deletions(-)
+ tests/atomic64-bench.c | 171 +++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include |   3 +-
+ 2 files changed, 173 insertions(+), 1 deletion(-)
+ create mode 100644 tests/atomic64-bench.c
 
-diff --git a/util/qsp.c b/util/qsp.c
-index b0c2575d10..c16af03f6a 100644
---- a/util/qsp.c
-+++ b/util/qsp.c
-@@ -84,13 +84,6 @@ struct QSPEntry {
-     uint64_t n_acqs;
-     uint64_t ns;
-     unsigned int n_objs; /* count of coalesced objs; only used for reporting */
--#ifndef CONFIG_ATOMIC64
--    /*
--     * If we cannot update the counts atomically, then use a seqlock.
--     * We don't need an associated lock because the updates are thread-local.
--     */
--    QemuSeqLock sequence;
--#endif
- };
- typedef struct QSPEntry QSPEntry;
+diff --git a/tests/atomic64-bench.c b/tests/atomic64-bench.c
+new file mode 100644
+index 0000000000..71692560ed
+--- /dev/null
++++ b/tests/atomic64-bench.c
+@@ -0,0 +1,171 @@
++/*
++ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qemu/thread.h"
++#include "qemu/host-utils.h"
++#include "qemu/processor.h"
++
++struct thread_info {
++    uint64_t r;
++    uint64_t accesses;
++} QEMU_ALIGNED(64);
++
++struct count {
++    int64_t i64;
++} QEMU_ALIGNED(64);
++
++static QemuThread *threads;
++static struct thread_info *th_info;
++static unsigned int n_threads = 1;
++static unsigned int n_ready_threads;
++static struct count *counts;
++static unsigned int duration = 1;
++static unsigned int range = 1024;
++static bool test_start;
++static bool test_stop;
++
++static const char commands_string[] =
++    " -d = duration in seconds\n"
++    " -n = number of threads\n"
++    " -r = range (will be rounded up to pow2)";
++
++static void usage_complete(char *argv[])
++{
++    fprintf(stderr, "Usage: %s [options]\n", argv[0]);
++    fprintf(stderr, "options:\n%s\n", commands_string);
++}
++
++/*
++ * From: https://en.wikipedia.org/wiki/Xorshift
++ * This is faster than rand_r(), and gives us a wider range (RAND_MAX is only
++ * guaranteed to be >= INT_MAX).
++ */
++static uint64_t xorshift64star(uint64_t x)
++{
++    x ^= x >> 12; /* a */
++    x ^= x << 25; /* b */
++    x ^= x >> 27; /* c */
++    return x * UINT64_C(2685821657736338717);
++}
++
++static void *thread_func(void *arg)
++{
++    struct thread_info *info = arg;
++
++    atomic_inc(&n_ready_threads);
++    while (!atomic_read(&test_start)) {
++        cpu_relax();
++    }
++
++    while (!atomic_read(&test_stop)) {
++        unsigned int index;
++
++        info->r = xorshift64star(info->r);
++        index = info->r & (range - 1);
++        atomic_read_i64(&counts[index].i64);
++        info->accesses++;
++    }
++    return NULL;
++}
++
++static void run_test(void)
++{
++    unsigned int remaining;
++    unsigned int i;
++
++    while (atomic_read(&n_ready_threads) != n_threads) {
++        cpu_relax();
++    }
++    atomic_set(&test_start, true);
++    do {
++        remaining = sleep(duration);
++    } while (remaining);
++    atomic_set(&test_stop, true);
++
++    for (i = 0; i < n_threads; i++) {
++        qemu_thread_join(&threads[i]);
++    }
++}
++
++static void create_threads(void)
++{
++    unsigned int i;
++
++    threads = g_new(QemuThread, n_threads);
++    th_info = g_new(struct thread_info, n_threads);
++    counts = g_malloc0_n(range, sizeof(*counts));
++
++    for (i = 0; i < n_threads; i++) {
++        struct thread_info *info = &th_info[i];
++
++        info->r = (i + 1) ^ time(NULL);
++        info->accesses = 0;
++        qemu_thread_create(&threads[i], NULL, thread_func, info,
++                           QEMU_THREAD_JOINABLE);
++    }
++}
++
++static void pr_params(void)
++{
++    printf("Parameters:\n");
++    printf(" # of threads:      %u\n", n_threads);
++    printf(" duration:          %u\n", duration);
++    printf(" ops' range:        %u\n", range);
++}
++
++static void pr_stats(void)
++{
++    unsigned long long val = 0;
++    double tx;
++    int i;
++
++    for (i = 0; i < n_threads; i++) {
++        val += th_info[i].accesses;
++    }
++    tx = val / duration / 1e6;
++
++    printf("Results:\n");
++    printf("Duration:            %u s\n", duration);
++    printf(" Throughput:         %.2f Mops/s\n", tx);
++    printf(" Throughput/thread:  %.2f Mops/s/thread\n", tx / n_threads);
++}
++
++static void parse_args(int argc, char *argv[])
++{
++    int c;
++
++    for (;;) {
++        c = getopt(argc, argv, "hd:n:r:");
++        if (c < 0) {
++            break;
++        }
++        switch (c) {
++        case 'h':
++            usage_complete(argv);
++            exit(0);
++        case 'd':
++            duration = atoi(optarg);
++            break;
++        case 'n':
++            n_threads = atoi(optarg);
++            break;
++        case 'r':
++            range = pow2ceil(atoi(optarg));
++            break;
++        }
++    }
++}
++
++int main(int argc, char *argv[])
++{
++    parse_args(argc, argv);
++    pr_params();
++    create_threads();
++    run_test();
++    pr_stats();
++    return 0;
++}
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 87c81d1dcc..b12b6a867a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -601,7 +601,7 @@ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+ 	tests/test-rcu-tailq.o \
+ 	tests/test-qdist.o tests/test-shift128.o \
+ 	tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
+-	tests/atomic_add-bench.o
++	tests/atomic_add-bench.o tests/atomic64-bench.o
  
-@@ -344,47 +337,16 @@ static QSPEntry *qsp_entry_get(const void *obj, const char *file, int line,
-     return qsp_entry_find(&qsp_ht, &orig, hash);
- }
+ $(test-obj-y): QEMU_INCLUDES += -Itests
+ QEMU_CFLAGS += -I$(SRC_PATH)/tests
+@@ -656,6 +656,7 @@ tests/test-qht-par$(EXESUF): tests/test-qht-par.o tests/qht-bench$(EXESUF) $(tes
+ tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
+ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
+ tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
++tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
  
--/*
-- * @from is in the global hash table; read it atomically if the host
-- * supports it, otherwise use the seqlock.
-- */
--static void qsp_entry_aggregate(QSPEntry *to, const QSPEntry *from)
--{
--#ifdef CONFIG_ATOMIC64
--    to->ns += atomic_read__nocheck(&from->ns);
--    to->n_acqs += atomic_read__nocheck(&from->n_acqs);
--#else
--    unsigned int version;
--    uint64_t ns, n_acqs;
--
--    do {
--        version = seqlock_read_begin(&from->sequence);
--        ns = atomic_read__nocheck(&from->ns);
--        n_acqs = atomic_read__nocheck(&from->n_acqs);
--    } while (seqlock_read_retry(&from->sequence, version));
--
--    to->ns += ns;
--    to->n_acqs += n_acqs;
--#endif
--}
--
- /*
-  * @e is in the global hash table; it is only written to by the current thread,
-  * so we write to it atomically (as in "write once") to prevent torn reads.
-- * If the host doesn't support u64 atomics, use the seqlock.
-  */
- static inline void do_qsp_entry_record(QSPEntry *e, int64_t delta, bool acq)
- {
--#ifndef CONFIG_ATOMIC64
--    seqlock_write_begin(&e->sequence);
--#endif
--    atomic_set__nocheck(&e->ns, e->ns + delta);
-+    atomic_set_u64(&e->ns, e->ns + delta);
-     if (acq) {
--        atomic_set__nocheck(&e->n_acqs, e->n_acqs + 1);
-+        atomic_set_u64(&e->n_acqs, e->n_acqs + 1);
-     }
--#ifndef CONFIG_ATOMIC64
--    seqlock_write_end(&e->sequence);
--#endif
- }
- 
- static inline void qsp_entry_record(QSPEntry *e, int64_t delta)
-@@ -550,7 +512,12 @@ static void qsp_aggregate(struct qht *global_ht, void *p, uint32_t h, void *up)
- 
-     hash = qsp_entry_no_thread_hash(e);
-     agg = qsp_entry_find(ht, e, hash);
--    qsp_entry_aggregate(agg, e);
-+    /*
-+     * The entry is in the global hash table; read from it atomically (as in
-+     * "read once").
-+     */
-+    agg->ns += atomic_read_u64(&e->ns);
-+    agg->n_acqs += atomic_read_u64(&e->n_acqs);
- }
- 
- static void qsp_iter_diff(struct qht *orig, void *p, uint32_t hash, void *htp)
+ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+ 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
 -- 
 2.17.1
