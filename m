@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzP0j-00087Y-H0
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:26:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1fzP1s-0000Sp-K3
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:27:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzP0W-000515-I7
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:25:55 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:33885)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzP0V-0004we-PS
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:25:48 -0400
-Date: Mon, 10 Sep 2018 12:25:41 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180910162541.GA31634@flamenco>
-References: <20180908191735.22861-1-cota@braap.org> <878t49d24d.fsf@linaro.org>
-	<20180910151424.GC19941@flamenco> <8736uhcqce.fsf@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1fzP1i-0005dd-0D
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:27:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60644)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fzP1f-0005ZN-SN
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:27:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fzP1V-0003yD-Fq
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 16:26:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 69A852E8052
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 16:26:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8736uhcqce.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] softfloat tests based on berkeley's
- testfloat
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Sep 2018 16:07:01 -0000
+From: Jan Marti <1404278@bugs.launchpad.net>
+Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
+Message-Id: <153659562198.29061.508545728408551578.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
+ windows host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +37,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <richard.henderson@linaro.org>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
 
-On Mon, Sep 10, 2018 at 16:41:21 +0100, Alex Bennée wrote:
-> 
-> Emilio G. Cota <cota@braap.org> writes:
-> 
-> > On Mon, Sep 10, 2018 at 12:26:58 +0100, Alex Bennée wrote:
-> >>
-> >> Emilio G. Cota <cota@braap.org> writes:
-> >>
-> >> > A few fixes since yesterday's v1:
-> >> >   https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00884.html
-> >> >
-> >> > - Convert copy_qemu_to_soft80 to qemu_to_soft80, just like the other
-> >> >   conversion functions
-> >> > - Set fp-test as the program name as reported by itself
-> >> > - Fix Makefile to include .d files so that dependencies are
-> >> >   properly tracked
-> >> > - Update commit log
-> >>
-> >> Just some general comments:
-> >>
-> >>  - I think this is a better way to go than the IBM test suite
-> >>  - I'm ambivalent about maintaining our fp-test.c in close alignment to
-> >>    softfloat unless we expect much upstreaming of changes.
-> >
-> > I don't think there'll be any, to be honest. They have a git repo but
-> > I doubt they'll take any patches. This was just a minimum attempt to
-> > get some tests working (I don't have a lot of time to work on this)
-> >
-> >>  - the coverage seems a bit low. Rebuilding everything with
-> >>    --enable-gcov and running -all1 -all2 I get:
-> >>
-> >>   tests/fp/fp-test.c - 53.5 % coverage 43.3 % branch coverage
-> >>   fpu/softfloat.c - 32.5 % coverage 25.1 % branch coverage
-> >>
-> >> But maybe I didn't pass enough options to fp-test? I could really do
-> >> with a --just-run-everything-and-summarise-failing-functions option so I
-> >> can then go through in more detail with fp-test fFOO_BAR.
-> >
-> > Yes right now to get better coverage you need to run it several times.
-> > After a few runs I got it to 58%, but still without testing some
-> > rounding modes. So considering we're coming from 0% coverage, I'd
-> > say coverage is pretty good!
-> 
-> I agree ;-)
-> 
-> >
-> > But yes, we should add a flag to just test -all.
-> >
-> > There are some functions that we are not testing yet though, but
-> > that can be fixed over time (we can add more tests to fp-test even
-> > though they're not in testfloat, such as testing flush-to-zero/
-> > denormals-are-zero, or the muladd variants that we have).
-> >
-> > I have basically no time left to work on this. What do you think about
-> > the following plan?
-> >
-> > 1. Have our own clones (forks) of testfloat/softfloat in qemu servers.
-> > 2. Add those as submodules
-> > 3. Add fp-test with as you said an -all flag that reports all
-> >    errors to get decent coverage.
-> 
-> Works for me.
-> 
-> > 4. Add hardfloat patches, with tests. This requires a small
-> >    change to testfloat:
-> >    https://github.com/cota/berkeley-testfloat-3/commit/ca9fa2ba05
-> 
-> It seems a shame to have our mirror of testfloat diverge but if it can't
-> be avoided I guess it will have to do. Couldn't we just zero the HW
-> flags in the wrapped up function? I may be misremembering but don't we
-> fall-back to softfloat code anyway if we have reached any limits that
-> trigger exception flags?
+when i install tap driver from https://openvpn.net/index.php/open-
+source/downloads.html im able to start with tap01 (when i rename the tap
+interface to "tap01"..)
 
-testfloat compares the result of the ops as well as the resulting flags.
-It zeroes the exception flags register before computing the
-"golden" result/flags. The hardfloat code only kicks in when inexact
-is set, so we need to add the above patch to testfloat so that we can
-control the initial flags from outside. With this patch + a patch
-on the fp-test side to set the initial flags, we can choose whether
-to test hardfloat or not.
+but on start i get an apipa address with that config:
 
-About your second question: yes, for corner cases we defer to softfloat.
-But to reach those corner cases we first have to reach the hardfloat
-code, which requires inexact to be set.
+qemu-system-arm.exe -M versatilepb -cpu arm1176 -hda
+2018-09-03_stretch_inkl_phalcon.img -kernel kernel-qemu-4.4.34-jessie -m
+512 -append "root=3D/dev/sda2 panic=3D1 rootfstype=3Dext4 rw" -no-reboot -m
+256 -net nic -net tap,ifname=3Dtap01
 
-> > I'd then leave adding further tests to increase coverage and fixing
-> > the existing bugs (prior to hardfloat) to someone else with
-> > more time/resources.
-> 
-> Agreed. I should have time to chase down the softfloat regressions once
-> I'm back from Connect after next week.
 
-Nice! I'll try to have something ready later today.
+why??
 
-		Emilio
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1404278
+
+Title:
+  tap connections not working on windows host
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  using latest qemu 2.2.0 64bit for windows host (installed from
+  qemu-w64-setup-20141210.exe obtained from http://qemu.weilnetz.de/w64/
+  ),OpenVPN 2.6.3-I601 64bit tap adapter named tap01 and calling qemu
+  using the following.
+
+  qemu-system-x86_64.exe -m 512 -net nic -net tap,ifname=3Dtap01 -hda
+  "c:\\data\\images\\test.img"
+
+  where the image contains a slackware 14.0 64bit install.
+  The tap is bridged with the real network adapter and the bridge is given =
+an ip of 10.1.1.41 (which works as the ip for the windows host). The tap ad=
+apter (in network connections) shows connected when the qemu vm is running.=
+ inside the vm, the network is given an ip of 10.1.1.143 (the netmask and d=
+efault gateway are the same for the virtual and real pc).
+  fault.
+  The vm cannot see the rest of the local network or visa-versa. This used =
+to work in early (0.9 32bit) versions of qemu.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1404278/+subscriptions
