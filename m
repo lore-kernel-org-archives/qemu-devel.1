@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fzSIO-0003oV-BD
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 15:56:31 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fzSrf-0007NI-VA
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 16:32:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fzRxw-0006KV-Rt
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 15:35:21 -0400
-References: <20180802144834.520904-1-eblake@redhat.com>
-	<f58d46ef-744b-e886-4b5b-a3dd2e2a57d8@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <42d6dbed-5b91-39d9-24a0-105f63ff741e@redhat.com>
-Date: Mon, 10 Sep 2018 14:35:11 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fzSrZ-0000D7-L9
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 16:32:55 -0400
+References: <20180908090820.15591-1-mark.cave-ayland@ilande.co.uk>
+	<20180908090820.15591-4-mark.cave-ayland@ilande.co.uk>
+	<20180910034837.GD2890@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <39035d04-e556-5d06-61ed-7cac87d9522f@ilande.co.uk>
+Date: Mon, 10 Sep 2018 21:32:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <f58d46ef-744b-e886-4b5b-a3dd2e2a57d8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20180910034837.GD2890@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/4 for-3.0?] NBD fixes for
- unaligned images
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] 40p: add fixed IRQ routing for LSI
+ SCSI device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, hpoussin@reactos.org, qemu-devel@nongnu.org
 
-On 9/10/18 2:25 PM, John Snow wrote:
-> Hi, has this series been superseded or do we need a respin for 3.1?
+On 10/09/18 04:48, David Gibson wrote:
 
-Needs a respin.
+> On Sat, Sep 08, 2018 at 10:08:20AM +0100, Mark Cave-Ayland wrote:
+>> Whilst the PReP specification describes how all PCI IRQs are routed via IRQ
+>> 15 on the interrupt controller, the real 40p machine has routing quirk in
+>> that the LSI SCSI device is routed to IRQ 13.
+>>
+>> This is implemented using a little hack: the existing IRQ routing code uses
+>> (irq_num + (pci_dev->devfn >> 3)) & 1 to give the PCI interrupt pin, where
+>> the "& 1" ensures that the only pins A and B (0 and 1) will ever be used.
+>>
+>> Rather than fix the mask to "& 3" we leave the existing routing above as-is
+>> and then force the LSI SCSI device to use pin C (2). This enables us to
+>> route pin 2 permanantly to IRQ 13 since the LSI SCSI device will be its
+>> only user.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> I don't think this is really the right approach.
+> 
+> As noted in an earlier mail, it's really common for on-board devices
+> on pre-express PCI boards to have their LSIs wired specially, rather
+> than via the PCI irq pins which are used for "slotted" devices.
+> 
+> I think we should explicitly model it like that: wiring the SCSI
+> device's irq directly to system IRQ 13, rather than wiring it via a
+> PCI LSI pin.
+> 
+> Wiring the SCSI to an otherwise unused pin, then routing that
+> specially to the system irq is confusing.  It also might be incorrect
+> if we tried to add a "slotted" device that actually used PINC (rare,
+> I'll grant you).
 
-There are two issues still to be solved:
+Okay. I was hoping to get away with not altering the LSI SCSI device
+itself, but after some experimentation I managed to come up with a
+solution that is not too invasive and certainly more readable than this
+attempt. Let me tidy up and post a v3.
 
-1. Asking the top-most block layer for its alignment isn't necessarily 
-right for qemu as server.  If we have:
 
-backing (512) <- active (4k)
+ATB,
 
-and tell the client that they can't access anything smaller than 4k 
-granularity, but then read through to the backing layer which does just 
-that, then we're wrong.  Either the block layer has to be beefed up to 
-make bdrv_block_status() round backing file's smaller granularity into 
-the size we advertised (perhaps by adding a flag to bdrv_block_status() 
-to declare whether we prefer the most accurate information vs. the 
-rounded information) - or else qemu as NBD server should ALWAYS 
-advertise a blocksize of 1-512 (1 because we can, even if by 
-read-modify-write; or 512 because except for EOF issues on a 
-non-sector-aligned file, we don't encounter mid-sector transitions 
-anywhere else, and EOF is easier to special case than everywhere).
-
-2. Patch 5 fixes qemu as client to not round valid requests past EOF, 
-but does not fix the case of a request that intentionally exceeds EOF 
-but fits within the rounded file size from reaching the server. Either 
-the NBD client code should itself perform EOF validation (reads from the 
-EOF hole see zero, writes of anything other than zero fail with ENOSPC), 
-or the NBD client code should round the server's file size down instead 
-of up.  I haven't decided which approach is better.
-
-But right now, these fixes are taking a back seat to me trying to get a 
-libvirt incremental backup demo working.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Mark.
