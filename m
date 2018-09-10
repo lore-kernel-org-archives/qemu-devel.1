@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <afaerber@suse.de>) id 1fzKe9-0004YU-FW
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:46:26 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fzKeB-0004Yf-6T
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <afaerber@suse.de>) id 1fzKca-0002j9-1p
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:44:51 -0400
-References: <1536566979-6868-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
-Message-ID: <738a767d-1f9e-57ea-0cdc-d98d71f4df2a@suse.de>
-Date: Mon, 10 Sep 2018 13:44:44 +0200
+	(envelope-from <dovgaluk@ispras.ru>) id 1fzKcC-0002c2-95
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:44:27 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:50960)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fzKcC-0002bo-0D
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 07:44:24 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+	<87lg8dz809.fsf@linaro.org>
+	<CAFEAcA-iTfGnjc+0ndTMxZ=RYRCK3_RRmE1RCNgDnTVL_brrXQ@mail.gmail.com>
+	<87h8ixd8vb.fsf@linaro.org>
+In-Reply-To: <87h8ixd8vb.fsf@linaro.org>
+Date: Mon, 10 Sep 2018 14:44:24 +0300
+Message-ID: <001a01d448fb$9f1d3670$dd57a350$@ru>
 MIME-Version: 1.0
-In-Reply-To: <1536566979-6868-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/qdev-core: Fix description of
- instance_init
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
+ prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Peter Maydell' <peter.maydell@linaro.org>
+Cc: 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, 'QEMU Developers' <qemu-devel@nongnu.org>, maria.klimushenkova@ispras.ru, 'Paolo Bonzini' <pbonzini@redhat.com>, =?utf-8?Q?'Llu=C3=ADs_Vilanova'?= <vilanova@ac.upc.edu>
 
-Am 10.09.18 um 10:09 schrieb Thomas Huth:
-> The part of the documentation of DeviceClass that talks about instance_=
-init
-> is partly wrong: instance_init() functions must not abort or exit, sinc=
-e
-> the function is also called during introspection of the device already.
-> So if a device calls exit() during its instance_init() function, QEMU
-> terminates unexpectedly if somebody tries to just have a look at the
-> interfaces from the device with "device_add xyz,help" or with the
-> "device-list-properties" QOM command. This should never happen.
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> Peter Maydell <peter.maydell@linaro.org> writes:
 >=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> <snip>
+> >> Now I can see arguments against it from an interface complexity =
+point of
+> >> view but I think plugins should get access to the TCG functions so =
+they
+> >> can generate their own op sequences if need be and not have to call =
+a
+> >> helper at all if they don't need to.
+> >
+> > I strongly disagree -- plugins should not have access to details
+> > of QEMU internals that might change from version to version, and
+> > definitely not access to generating their own TCG code.
+>=20
+> In terms of the wider problem about exposing internals that might =
+change
+> from version to version I wonder if we should care? Is the plugin API
+> one where we should provide ABI stability or should we take the =
+approach
+> that Linux does and say if your code lives out-of-tree then it's your
+> problem to keep up if/when we change.
 
-Reviewed-by: Andreas F=C3=A4rber <afaerber@suse.de>
+Then one can just omit the plugins and embed the analysis code into =
+QEMU.
+The idea behind the plugins is making the maintenance less =
+time-consuming
+by providing the stable interface.
 
-Regards,
-Andreas
-
---=20
-SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, Germany
-GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
-HRB 21284 (AG N=C3=BCrnberg)
+Pavel Dovgalyuk
