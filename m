@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([208.118.235.92]:37294)
+Received: from eggs.gnu.org ([208.118.235.92]:37771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzOtF-0002sQ-LC
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:18:22 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fzOtq-0003ZP-Cc
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:18:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzOsC-0005X2-K2
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:17:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50126)
+	(envelope-from <alex.bennee@linaro.org>) id 1fzOtf-0007nT-99
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:18:49 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37781)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzOsC-00045U-75
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:17:12 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzOrX-0008CY-IS
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 16:16:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7CFCD2E8055
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 16:16:31 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fzOtd-0007VN-4Q
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 12:18:43 -0400
+Received: by mail-wm0-x242.google.com with SMTP id n11-v6so22031133wmc.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 09:18:17 -0700 (PDT)
+References: <1536174934-26022-1-git-send-email-wei@redhat.com>
+	<1536174934-26022-3-git-send-email-wei@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1536174934-26022-3-git-send-email-wei@redhat.com>
+Date: Mon, 10 Sep 2018 17:18:15 +0100
+Message-ID: <871sa1comw.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Sep 2018 15:59:02 -0000
-From: Jan Marti <1404278@bugs.launchpad.net>
-Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
-Message-Id: <153659514248.32283.10918095304258067498.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
- windows host
+Subject: Re: [Qemu-devel] [PATCH V9 2/4] tests/migration: Support cross
+ compilation in generating boot header file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,54 +31,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-"it works with qemu-w64-setup-20180519.exe"
-
-not really:
-
-J:\Tools\qemu>.\run.bat
-J:\Tools\qemu>qemu-system-arm.exe -M versatilepb -cpu arm1176 -hda 2018-09-=
-03_stretch_inkl_phalcon.img -kernel kernel-qe
-mu-4.4.34-jessie -m 512 -append "root=3D/dev/sda2 panic=3D1 rootfstype=3Dex=
-t4 rw init=3D/bin/bash" -no-reboot -m 256 -net nic -n
-et tap,ifname=3Dtap01
-tap: Could not open 'tap01'
-qemu-system-arm.exe: Device 'tap' could not be initialized
+To: Wei Huang <wei@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peter.maydell@linaro.org, drjones@redhat.com, quintela@redhat.com, dgilbert@redhat.com
 
 
-Do i need to install some tap adapers on windows??
+Wei Huang <wei@redhat.com> writes:
 
--- =
+> Recently a new configure option, CROSS_CC_GUEST, was added to
+> $(TARGET)-softmmu/config-target.mak to support TCG-related tests. This
+> patch tries to leverage this option to support cross compilation when the
+> migration boot block file is being re-generated:
+>
+>  * The x86 related files are moved to a new sub-dir (named ./i386).
+>  * A new top-layer Makefile is created in tests/migration/ directory.
+>    This Makefile searches and parses CROSS_CC_GUEST to generate CROSS_PRE=
+FIX.
+>    The CROSS_PREFIX, if available, is then passed to migration/$ARCH/Make=
+file.
+>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  tests/migration-test.c                             |  2 +-
+>  tests/migration/Makefile                           | 44 ++++++++++++----=
+------
+>  tests/migration/i386/Makefile                      | 22 +++++++++++
+>  .../{x86-a-b-bootblock.S =3D> i386/a-b-bootblock.S}  |  4 --
+>  .../{x86-a-b-bootblock.h =3D> i386/a-b-bootblock.h}  |  8 ++--
+>  5 files changed, 51 insertions(+), 29 deletions(-)
+>  create mode 100644 tests/migration/i386/Makefile
+>  rename tests/migration/{x86-a-b-bootblock.S =3D> i386/a-b-bootblock.S} (=
+93%)
+>  rename tests/migration/{x86-a-b-bootblock.h =3D> i386/a-b-bootblock.h} (=
+92%)
+>
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index 0e687b7..fe6b41a 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -83,7 +83,7 @@ static const char *tmpfs;
+>  /* A simple PC boot sector that modifies memory (1-100MB) quickly
+>   * outputting a 'B' every so often if it's still running.
+>   */
+> -#include "tests/migration/x86-a-b-bootblock.h"
+> +#include "tests/migration/i386/a-b-bootblock.h"
+>
+>  static void init_bootfile_x86(const char *bootpath)
+>  {
+> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> index c0824b4..a9ed875 100644
+> --- a/tests/migration/Makefile
+> +++ b/tests/migration/Makefile
+> @@ -1,31 +1,35 @@
+> -# To specify cross compiler prefix, use CROSS_PREFIX=3D
+> -#   $ make CROSS_PREFIX=3Dx86_64-linux-gnu-
+> +#
+> +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or lat=
+er.
+> +# See the COPYING file in the top-level directory.
+> +#
+> +
+> +TARGET_LIST =3D i386
+> +
+> +SRC_PATH =3D ../..
+>
+>  override define __note
+> -/* This file is automatically generated from
+> - * tests/migration/x86-a-b-bootblock.S, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> - * and then remember to send both in your patch submission.
+> +/* This file is automatically generated from the assembly file in
+> + * tests/migration/$@. Edit that file and then run "make all"
+> + * inside tests/migration to update, and then remember to send both
+> + * the header and the assembler differences in your patch submission.
+>   */
+>  endef
+>  export __note
+>
+> -.PHONY: all clean
+> -all: x86-a-b-bootblock.h
+> -
+> -x86-a-b-bootblock.h: x86.bootsect
+> -	echo "$$__note" > header.tmp
+> -	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
+> -	mv header.tmp $@
+> +find-arch-cross-cc =3D $(lastword $(shell grep -h "CROSS_CC_GUEST=3D" $(=
+wildcard $(SRC_PATH)/$(patsubst i386,*86*,$(1))-softmmu/config-target.mak)))
+> +parse-cross-prefix =3D $(subst gcc,,$(patsubst cc,gcc,$(patsubst CROSS_C=
+C_GUEST=3D"%",%,$(call find-arch-cross-cc,$(1)))))
+> +gen-cross-prefix =3D $(patsubst %-,CROSS_PREFIX=3D%-,$(call
+> parse-cross-prefix,$(1)))
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1404278
+This all seems awfully fiddly compared to moving the code to tests/tcg
+and building with the existing machinery. You don't even get the docker
+fall-back this way.
 
-Title:
-  tap connections not working on windows host
+The aim being to have the ability to build the binary and manually
+update the .hex/.S encoded version actually used in the test when you
+don't have cross compilers available right?
 
-Status in QEMU:
-  Fix Released
+I've got some TODOs in tests/tcg to start building the various system
+tests. Perhaps I should port the various migration kernels when I get to
+that?
 
-Bug description:
-  using latest qemu 2.2.0 64bit for windows host (installed from
-  qemu-w64-setup-20141210.exe obtained from http://qemu.weilnetz.de/w64/
-  ),OpenVPN 2.6.3-I601 64bit tap adapter named tap01 and calling qemu
-  using the following.
+>
+> -x86.bootsect: x86.boot
+> -	dd if=3D$< of=3D$@ bs=3D256 count=3D2 skip=3D124
+> +.PHONY: all $(TARGET_LIST)
+>
+> -x86.boot: x86.o
+> -	$(CROSS_PREFIX)objcopy -O binary $< $@
+> +all: $(TARGET_LIST)
+>
+> -x86.o: x86-a-b-bootblock.S
+> -	$(CROSS_PREFIX)gcc -m32 -march=3Di486 -c $< -o $@
+> +$(TARGET_LIST):
+> +	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
+>
+>  clean:
+> -	@rm -rf *.boot *.o *.bootsect
+> +	for target in $(TARGET_LIST); do \
+> +		$(MAKE) -C $$target clean; \
+> +	done
+> diff --git a/tests/migration/i386/Makefile b/tests/migration/i386/Makefile
+> new file mode 100644
+> index 0000000..5c03241
+> --- /dev/null
+> +++ b/tests/migration/i386/Makefile
+> @@ -0,0 +1,22 @@
+> +# To specify cross compiler prefix, use CROSS_PREFIX=3D
+> +#   $ make CROSS_PREFIX=3Dx86_64-linux-gnu-
+> +
+> +.PHONY: all clean
+> +all: a-b-bootblock.h
+> +
+> +a-b-bootblock.h: x86.bootsect
+> +	echo "$$__note" > header.tmp
+> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
+> +	mv header.tmp $@
+> +
+> +x86.bootsect: x86.boot
+> +	dd if=3D$< of=3D$@ bs=3D256 count=3D2 skip=3D124
+> +
+> +x86.boot: x86.o
+> +	$(CROSS_PREFIX)objcopy -O binary $< $@
+> +
+> +x86.o: a-b-bootblock.S
+> +	$(CROSS_PREFIX)gcc -m32 -march=3Di486 -c $< -o $@
+> +
+> +clean:
+> +	@rm -rf *.boot *.o *.bootsect
+> diff --git a/tests/migration/x86-a-b-bootblock.S b/tests/migration/i386/a=
+-b-bootblock.S
+> similarity index 93%
+> rename from tests/migration/x86-a-b-bootblock.S
+> rename to tests/migration/i386/a-b-bootblock.S
+> index b164264..3f97f28 100644
+> --- a/tests/migration/x86-a-b-bootblock.S
+> +++ b/tests/migration/i386/a-b-bootblock.S
+> @@ -3,10 +3,6 @@
+>  #  range.
+>  #  Outputs an initial 'A' on serial followed by repeated 'B's
+>  #
+> -# run   tests/migration/rebuild-x86-bootblock.sh
+> -#   to regenerate the hex, and remember to include both the .h and .s
+> -#   in any patches.
+> -#
+>  # Copyright (c) 2016 Red Hat, Inc. and/or its affiliates
+>  # This work is licensed under the terms of the GNU GPL, version 2 or lat=
+er.
+>  # See the COPYING file in the top-level directory.
+> diff --git a/tests/migration/x86-a-b-bootblock.h b/tests/migration/i386/a=
+-b-bootblock.h
+> similarity index 92%
+> rename from tests/migration/x86-a-b-bootblock.h
+> rename to tests/migration/i386/a-b-bootblock.h
+> index 78a151f..7d459d4 100644
+> --- a/tests/migration/x86-a-b-bootblock.h
+> +++ b/tests/migration/i386/a-b-bootblock.h
+> @@ -1,7 +1,7 @@
+> -/* This file is automatically generated from
+> - * tests/migration/x86-a-b-bootblock.s, edit that and then run
+> - * tests/migration/rebuild-x86-bootblock.sh to update,
+> - * and then remember to send both in your patch submission.
+> +/* This file is automatically generated from the assembly file in
+> + * tests/migration/i386. Edit that file and then run "make all"
+> + * inside tests/migration to update, and then remember to send both
+> + * the header and the assembler differences in your patch submission.
+>   */
+>  unsigned char x86_bootsect[] =3D {
+>    0xfa, 0x0f, 0x01, 0x16, 0x74, 0x7c, 0x66, 0xb8, 0x01, 0x00, 0x00, 0x00,
 
-  qemu-system-x86_64.exe -m 512 -net nic -net tap,ifname=3Dtap01 -hda
-  "c:\\data\\images\\test.img"
 
-  where the image contains a slackware 14.0 64bit install.
-  The tap is bridged with the real network adapter and the bridge is given =
-an ip of 10.1.1.41 (which works as the ip for the windows host). The tap ad=
-apter (in network connections) shows connected when the qemu vm is running.=
- inside the vm, the network is given an ip of 10.1.1.143 (the netmask and d=
-efault gateway are the same for the virtual and real pc).
-  fault.
-  The vm cannot see the rest of the local network or visa-versa. This used =
-to work in early (0.9 32bit) versions of qemu.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1404278/+subscriptions
+--
+Alex Benn=C3=A9e
