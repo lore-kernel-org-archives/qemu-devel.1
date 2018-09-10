@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzDML-0005LW-2M
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:59:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fzDpp-000288-K9
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 00:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzDMI-0005tZ-3c
-	for qemu-devel@nongnu.org; Sun, 09 Sep 2018 23:59:31 -0400
-Date: Mon, 10 Sep 2018 11:59:14 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180910035914.GA21370@lemon.usersys.redhat.com>
-References: <20180809132259.18402-1-famz@redhat.com>
-	<20180809132259.18402-3-famz@redhat.com>
-	<20180907155101.GA31915@localhost.localdomain>
+	(envelope-from <dgibson@ozlabs.org>) id 1fzDm5-0005z5-7H
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 00:26:12 -0400
+Date: Mon, 10 Sep 2018 12:49:21 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180910024921.GC2890@umbus.fritz.box>
+References: <20180908161421.18089-1-hpoussin@reactos.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4ZLFUWh1odzi/v6L"
 Content-Disposition: inline
-In-Reply-To: <20180907155101.GA31915@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 2/2] aio: Do
- aio_notify_accept only during blocking aio_poll
+In-Reply-To: <20180908161421.18089-1-hpoussin@reactos.org>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/ppc: on 40p machine,
+ change default firmware to OpenBIOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com, lersek@redhat.com, slp@redhat.com
+To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-On Fri, 09/07 17:51, Kevin Wolf wrote:
-> Am 09.08.2018 um 15:22 hat Fam Zheng geschrieben:
-> > Furthermore, blocking aio_poll is only allowed on home thread
-> > (in_aio_context_home_thread), because otherwise two blocking
-> > aio_poll()'s can steal each other's ctx->notifier event and cause
-> > hanging just like described above.
-> 
-> It's good to have this assertion now at least, but after digging into
-> some bugs, I think in fact that any aio_poll() (even non-blocking) is
-> only allowed in the home thread: At least one reason is that if you run
-> it from a different thread, qemu_get_current_aio_context() returns the
-> wrong AioContext in any callbacks called by aio_poll(). Anything else
-> using TLS can have similar problems.
-> 
-> One instance where this matters is fixed/worked around by Sergio's
-> "util/async: use qemu_aio_coroutine_enter in co_schedule_bh_cb". We
-> wouldn't even need that patch if we could make sure that aio_poll() is
-> never called from the wrong thread. This would feel more robust.
-> 
-> I'll fix the aio_poll() calls in drain (the AIO_WAIT_WHILE() ones are
-> already fine, the rest by removing them). After that,
-> bdrv_set_aio_context() is still problematic, but the rest should be
-> okay. Hopefully we can use the tighter assertion then.
 
-Fully agree with you.
+--4ZLFUWh1odzi/v6L
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fam
+On Sat, Sep 08, 2018 at 06:14:21PM +0200, Herv=E9 Poussineau wrote:
+> OpenBIOS gained 40p support in 5b20e4cacecb62fb2bdc6867c11d44cddd77c4ff
+> Use it, instead of relying on an unmaintained and very limited firmware.
+>=20
+> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
+
+Applied to ppc-for-3.1, thanks.
+
+> ---
+> Changes v2->v3:
+> - rebased on dgibson/ppc-for-3.1
+>=20
+> Changes v1->v2:
+> - rebased on master
+> - fixed tests
+>=20
+>  hw/ppc/prep.c            | 2 +-
+>  tests/boot-serial-test.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 162b27a3b8..baca1d7c04 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -651,7 +651,7 @@ static void ibm_40p_init(MachineState *machine)
+>      /* PCI host */
+>      dev =3D qdev_create(NULL, "raven-pcihost");
+>      if (!bios_name) {
+> -        bios_name =3D BIOS_FILENAME;
+> +        bios_name =3D "openbios-ppc";
+>      }
+>      qdev_prop_set_string(dev, "bios-name", bios_name);
+>      qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index f123b15e3e..f865822e32 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -75,12 +75,12 @@ typedef struct testdef {
+>  static testdef_t tests[] =3D {
+>      { "alpha", "clipper", "", "PCI:" },
+>      { "ppc", "ppce500", "", "U-Boot" },
+> -    { "ppc", "40p", "-boot d", "Booting from device d" },
+> +    { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+>      { "ppc", "g3beige", "", "PowerPC,750" },
+>      { "ppc", "mac99", "", "PowerPC,G4" },
+>      { "ppc", "sam460ex", "-m 256", "DRAM:  256 MiB" },
+>      { "ppc64", "ppce500", "", "U-Boot" },
+> -    { "ppc64", "40p", "-m 192", "Memory size: 192 MB" },
+> +    { "ppc64", "40p", "-m 192", "Memory: 192M" },
+>      { "ppc64", "mac99", "", "PowerPC,970FX" },
+>      { "ppc64", "pseries", "", "Open Firmware" },
+>      { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--4ZLFUWh1odzi/v6L
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluV268ACgkQbDjKyiDZ
+s5I+CA/+O2yXw0BtgtJrPorT9gBdaM6R5QDtlSIoOZqRmuNa5Hmt/sT1z3g8rvsZ
+/4ScVbnJNJNOFf3ZrrGh/WYH0doExkuNxqOV+AZwgcLWXXP68JdjjxNFwFOfY098
+KzquoUVi/D7n9nVH0pJEu793WYFXKth5Ewu9CwKOYUclkOiyR8kPixeF8ZwrJ0Fe
+BprMYbENDPIFiKlb4Ip8enIY5fSB7Tfx3KNOTOrgvwRMM0Oh8YAD8WXbrLKIu7BA
+Pf2XH2YwwQCjfH64Jzxd8XS/WoCxMiWejLGSZncXxYQr7tfrYogF3W0Atrz9rBen
+2ot4ptzpLtCH3aZkYEpeQdS7+OvuSVwB8mDBBO54N/A6yu5zAhuzNJ8wBMXdt469
+71YueqHjVg40yxjhR8MskOEFfMlE/LxfcTEg7wd7Ykq2PoDdfUwwCdS75Wle5yHw
+stUesBC6+lELop/sHpDiSkH9h5yrVBBHkUMC9zA9CnLR/JHiwQLXSTFXtgjvqtDh
+I0bNn2A/LEfmOVGYrZXgwaFYZvULl9IRht/IkYpuy97BLHnHmzCI8JzGLY0XPgRp
+t838KaVX85/A8QpU3PNGO+sO9MICWPMy+w35X7m5FpeawPea41SSr6yeOEAdXdtl
+dhohWsbtn1TqsOr+giFcskFbGqqKnBNmKay3/Hy8pBqxzakZZKg=
+=n2b8
+-----END PGP SIGNATURE-----
+
+--4ZLFUWh1odzi/v6L--
