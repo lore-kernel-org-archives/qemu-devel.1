@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzNq0-0004EQ-QY
+	(envelope-from <bounces@canonical.com>) id 1fzNq0-0004EU-Qy
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzNpx-0008Gs-Ad
+	(envelope-from <bounces@canonical.com>) id 1fzNpw-0008GF-IA
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35878)
+Received: from indium.canonical.com ([91.189.90.7]:35858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzNpx-0008GK-3b
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:49 -0400
+	id 1fzNpw-0008Fo-Az
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 11:10:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzNpw-0008GE-Cw
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:48 +0000
+	id 1fzNpv-0008Jy-KA
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5E8922E806B
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9455D2E8023
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 15:10:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Sep 2018 14:57:43 -0000
+Date: Mon, 10 Sep 2018 14:53:54 -0000
 From: Jan Marti <1791680@bugs.launchpad.net>
 Reply-To: Bug 1791680 <1791680@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <153658763815.28323.7728344780520066918.malonedeb@wampee.canonical.com>
-Message-Id: <153659146358.32319.13458281620861416248.malone@soybean.canonical.com>
+Message-Id: <153659123435.17394.11018879791884975741.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1791680] Re: network bridge does not work
 List-Id: <qemu-devel.nongnu.org>
@@ -38,8 +38,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-what do i need for netdev id? n1 as described in your links does not
-work. messsage: "netdev 'n1' not found"
+when i only use "-net nic", i get an apipa address
 
 -- =
 
