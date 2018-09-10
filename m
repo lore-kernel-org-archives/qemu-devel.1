@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzIEt-0000GV-2H
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 05:12:11 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fzIG9-0002HR-8p
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 05:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzIEp-0000lm-5G
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 05:12:11 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36551)
+	(envelope-from <alex.bennee@linaro.org>) id 1fzIG8-0002LA-JD
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 05:13:29 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:53177)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fzIEo-0000lE-Ud
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 05:12:07 -0400
-Received: by mail-wm0-x242.google.com with SMTP id j192-v6so20654607wmj.1
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 02:12:06 -0700 (PDT)
+	id 1fzIG8-0002KA-Ao
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 05:13:28 -0400
+Received: by mail-wm0-x241.google.com with SMTP id y139-v6so20590294wmc.2
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 02:13:28 -0700 (PDT)
 References: <20180903171831.15446-1-cota@braap.org>
-	<20180903171831.15446-4-cota@braap.org>
+	<20180903171831.15446-5-cota@braap.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180903171831.15446-4-cota@braap.org>
-Date: Mon, 10 Sep 2018 10:12:04 +0100
-Message-ID: <87ftyhd8d7.fsf@linaro.org>
+In-reply-to: <20180903171831.15446-5-cota@braap.org>
+Date: Mon, 10 Sep 2018 10:13:26 +0100
+Message-ID: <87efe1d8ax.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/6] atomic: fix comment s/x64_64/x86_64/
+Subject: Re: [Qemu-devel] [PATCH 4/6] cpus: initialize
+ timers_state.vm_clock_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,27 +37,31 @@ Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwait
 
 Emilio G. Cota <cota@braap.org> writes:
 
+> We forgot to initialize the spinlock introduced in 94377115b2
+> ("cpus: protect TimerState writes with a spinlock", 2018-08-23).
+> Fix it.
+>
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  include/qemu/atomic.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  cpus.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/include/qemu/atomic.h b/include/qemu/atomic.h
-> index 9ed39effd3..de3e36f400 100644
-> --- a/include/qemu/atomic.h
-> +++ b/include/qemu/atomic.h
-> @@ -98,7 +98,7 @@
->   * We'd prefer not want to pull in everything else TCG related, so handle
->   * those few cases by hand.
->   *
-> - * Note that x32 is fully detected with __x64_64__ + _ILP32, and that for
-> + * Note that x32 is fully detected with __x86_64__ + _ILP32, and that for
->   * Sparc we always force the use of sparcv9 in configure.
->   */
->  #if defined(__x86_64__) || defined(__sparc__)
+> diff --git a/cpus.c b/cpus.c
+> index 8ee6e5db93..ebc13bac2d 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -823,6 +823,7 @@ int cpu_throttle_get_percentage(void)
+>  void cpu_ticks_init(void)
+>  {
+>      seqlock_init(&timers_state.vm_clock_seqlock);
+> +    qemu_spin_init(&timers_state.vm_clock_lock);
+>      vmstate_register(NULL, 0, &vmstate_timers, &timers_state);
+>      throttle_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL_RT,
+>                                             cpu_throttle_timer_tick, NULL=
+);
+
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
 
 --=20
 Alex Benn=C3=A9e
