@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzQot-0007Ls-Ot
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:21:58 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fzRKJ-00087P-MY
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:54:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzQeA-0002QD-OZ
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:10:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32958)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzQe9-0002Kl-S0
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:10:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzQe6-0005uQ-GH
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 18:10:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 797BE2E807B
-	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 18:10:46 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1fzRKF-0007Dq-EZ
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:54:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48430)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fzRKF-0007DS-5X
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 14:54:19 -0400
+Received: from smtp.corp.redhat.com (int-mx12.intmail.prod.int.phx2.redhat.com
+	[10.5.11.27])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9B59B87625
+	for <qemu-devel@nongnu.org>; Mon, 10 Sep 2018 18:54:17 +0000 (UTC)
+Date: Mon, 10 Sep 2018 12:54:09 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180910125409.2b49be3b@t450s.home>
+In-Reply-To: <20180910064340.30745-3-kraxel@redhat.com>
+References: <20180910064340.30745-1-kraxel@redhat.com>
+	<20180910064340.30745-3-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Sep 2018 17:56:59 -0000
-From: Jan Marti <1791680@bugs.launchpad.net>
-Reply-To: Bug 1791680 <1791680@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153658763815.28323.7728344780520066918.malonedeb@wampee.canonical.com>
-Message-Id: <153660221989.16597.7707486366525538297.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1791680] Re: network bridge does not work
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/vfio/display: add ramfb support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +34,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, libvir-list@redhat.com
 
-problem solved! :-)
+On Mon, 10 Sep 2018 08:43:40 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
--- =
+> So we have a boot display when using a vgpu as primary display.
+> 
+> Use vfio-pci-ramfb instead of vfio-pci to enable it.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/hw/vfio/vfio-common.h |  2 ++
+>  hw/vfio/display.c             | 12 ++++++++++++
+>  hw/vfio/pci.c                 | 15 +++++++++++++++
+>  3 files changed, 29 insertions(+)
+> 
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 821def0565..0d85a0a6f8 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -26,6 +26,7 @@
+>  #include "qemu/queue.h"
+>  #include "qemu/notify.h"
+>  #include "ui/console.h"
+> +#include "hw/display/ramfb.h"
+>  #ifdef CONFIG_LINUX
+>  #include <linux/vfio.h>
+>  #endif
+> @@ -146,6 +147,7 @@ typedef struct VFIODMABuf {
+>  
+>  typedef struct VFIODisplay {
+>      QemuConsole *con;
+> +    RAMFBState *ramfb;
+>      struct {
+>          VFIORegion buffer;
+>          DisplaySurface *surface;
+> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+> index 59c0e5d1d7..3901f580c6 100644
+> --- a/hw/vfio/display.c
+> +++ b/hw/vfio/display.c
+> @@ -124,6 +124,9 @@ static void vfio_display_dmabuf_update(void *opaque)
+>  
+>      primary = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
+>      if (primary == NULL) {
+> +        if (dpy->ramfb) {
+> +            ramfb_display_update(dpy->con, dpy->ramfb);
+> +        }
+>          return;
+>      }
+>  
+> @@ -181,6 +184,9 @@ static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
+>      vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
+>                                            &vfio_display_dmabuf_ops,
+>                                            vdev);
+> +    if (strcmp(object_get_typename(OBJECT(vdev)), "vfio-pci-ramfb") == 0) {
+> +        vdev->dpy->ramfb = ramfb_setup(errp);
+> +    }
+>      return 0;
+>  }
+>  
+> @@ -228,6 +234,9 @@ static void vfio_display_region_update(void *opaque)
+>          return;
+>      }
+>      if (!plane.drm_format || !plane.size) {
+> +        if (dpy->ramfb) {
+> +            ramfb_display_update(dpy->con, dpy->ramfb);
+> +        }
+>          return;
+>      }
+>      format = qemu_drm_format_to_pixman(plane.drm_format);
+> @@ -300,6 +309,9 @@ static int vfio_display_region_init(VFIOPCIDevice *vdev, Error **errp)
+>      vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
+>                                            &vfio_display_region_ops,
+>                                            vdev);
+> +    if (strcmp(object_get_typename(OBJECT(vdev)), "vfio-pci-ramfb") == 0) {
+> +        vdev->dpy->ramfb = ramfb_setup(errp);
+> +    }
+>      return 0;
+>  }
+>  
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 866f0deeb7..7c0628756e 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -3258,9 +3258,24 @@ static const TypeInfo vfio_pci_dev_info = {
+>      },
+>  };
+>  
+> +static void vfio_pci_ramfb_dev_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->hotpluggable = false;
+> +}
+> +
+> +static const TypeInfo vfio_pci_ramfb_dev_info = {
+> +    .name = "vfio-pci-ramfb",
+> +    .parent = "vfio-pci",
+> +    .instance_size = sizeof(VFIOPCIDevice),
+> +    .class_init = vfio_pci_ramfb_dev_class_init,
+> +};
+> +
+>  static void register_vfio_pci_dev_type(void)
+>  {
+>      type_register_static(&vfio_pci_dev_info);
+> +    type_register_static(&vfio_pci_ramfb_dev_info);
+>  }
+>  
+>  type_init(register_vfio_pci_dev_type)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1791680
 
-Title:
-  network bridge does not work
+My concern here is still all of the extra tooling that needs to be
+added to management layers above QEMU for this device that exists only
+because we can't hotplug the primary display in QEMU.  What happens when
+we can hotplug the primary display?  Aren't disabling hotplug of a
+vfio-pci device and supporting ramfb two separate things?  I think
+we're leaking current implementation issues out to the device options
+when really we'd rather have a "ramfb" (or perhaps "console") option on
+the vfio-pci device and the hotplug capability determined automatically
+and available through introspection of the device.  Thanks,
 
-Status in QEMU:
-  Invalid
-
-Bug description:
-  hi there
-
-  the network bridge does not seem to work described as here:
-  https://en.wikibooks.org/wiki/QEMU/Networking
-
-  When i add that parameters in a 192.168.80.x subnet, my emulated
-  raspbian ARM gets the IP 10.0.2.15.... While all other computers get
-  192.168.80.x
-
-  The command i use is:
-
-  =
-
-  qemu-system-arm.exe -M versatilepb -cpu arm1176 -hda 2018-09-03_stretch_i=
-nkl_phalcon.img -kernel kernel-qemu-4.4.34-jessie -m 192 -append "root=3D/d=
-ev/sda2 panic=3D1 rootfstype=3Dext4 rw" -no-reboot -net nic -net user -devi=
-ce e1000,mac=3D52:54:00:12:34:56 &
-
-  =
-
-  Does not build up a network bridge to 192.168.80.x...
-
-  The host system i use is win10 x64 v1803
-
-  Best regards,
-  Jan
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1791680/+subscriptions
+Alex
