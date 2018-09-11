@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fziQ9-0005Az-0y
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:09:33 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fziQf-0005bB-T2
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:10:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fziQ5-0000jA-TT
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:09:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44776 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fziQY-0000ys-KL
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:10:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41602 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fziQ5-0000is-En
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:09:29 -0400
-References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fziQY-0000xI-94
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:09:58 -0400
+References: <48ae78d8-58ec-8813-8680-6f407ea46041@siemens.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <120d75f8-24f7-641a-9b30-4a1ebfbca34d@redhat.com>
-Date: Tue, 11 Sep 2018 15:09:23 +0200
+Message-ID: <94aed630-5087-d523-1d14-475b79af80d1@redhat.com>
+Date: Tue, 11 Sep 2018 15:09:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180907075948.26917-1-marcandre.lureau@redhat.com>
+In-Reply-To: <48ae78d8-58ec-8813-8680-6f407ea46041@siemens.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] Various qemu command line options
- help improvements
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] kvm: x86: Fix kvm_arch_fixup_msi_route for
+ remap-less case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com
+To: Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>, Christopher Goldsworthy <christopher.goldsworthy@outlook.com>
 
-On 07/09/2018 09:59, Marc-Andr=C3=A9 Lureau wrote:
-> Hi,
->=20
-> This is a compilation of patches I have to improve command line help
-> support. The "qemu-option" patches have already been sent earlier, I
-> modified the first to fix an issue reported by Markus. The other
-> patches add support for -object help. A few related patches for QOM,
-> to fix/improve some minor issues.
->=20
-> v2: after Eric Blake review
-> - add "qdev-monitor: print help to stdout"
-> - add "cutils: add qemu_pstrcmp"
-> - use consistently "arg=3Dtype - desc" help format
+On 27/08/2018 10:47, Jan Kiszka wrote:
+> The AMD IOMMU does not (yet) support interrupt remapping. But
+> kvm_arch_fixup_msi_route assumes that all implementations do and crashes
+> when the AMD IOMMU is used in KVM mode.
+> 
+> Fixes: 8b5ed7dffa1f ("intel_iommu: add support for split irqchip")
+> Reported-by: Christopher Goldsworthy <christopher.goldsworthy@outlook.com>
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+>  target/i386/kvm.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 9313602d3d..1fe3a73a10 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -3677,6 +3677,10 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>          MSIMessage src, dst;
+>          X86IOMMUClass *class = X86_IOMMU_GET_CLASS(iommu);
+>  
+> +        if (!class->int_remap) {
+> +            return 0;
+> +        }
+> +
+>          src.address = route->u.msi.address_hi;
+>          src.address <<= VTD_MSI_ADDR_HI_SHIFT;
+>          src.address |= route->u.msi.address_lo;
+> 
 
-Feel free to send a pull request yourself with the minor fixes requested
-during review.
+Queued, thanks.
 
 Paolo
-
-> Marc-Andr=C3=A9 Lureau (12):
->   qdev-monitor: print help to stdout
->   cutils: add qemu_pstrcmp
->   qemu-option: add help fallback to print the list of options
->   qemu-option: improve qemu_opts_print_help() output
->   qom/object: fix iterating properties over a class
->   qom/object: register 'type' property as class property
->   tests/qom-proplist: check duplicate "bv" property registration failed
->   tests/qom-proplist: check properties are not listed multiple times
->   tests/qom-proplist: check class properties iterator
->   vl: handle -object help
->   hostmem: add some properties description
->   vl: list user creatable properties when 'help' is argument
->=20
->  include/monitor/monitor.h  |  2 ++
->  include/qemu/cutils.h      | 12 +++++++
->  backends/hostmem-memfd.c   |  9 +++++
->  backends/hostmem.c         | 14 ++++++++
->  monitor.c                  | 16 +++++++--
->  qdev-monitor.c             | 32 ++++++++++-------
->  qom/object.c               |  9 ++---
->  qom/object_interfaces.c    |  6 ++--
->  tests/check-qom-proplist.c | 58 ++++++++++++++++++++-----------
->  util/cutils.c              |  5 +++
->  util/qemu-option.c         | 71 +++++++++++++++++++++++++++++++-------
->  vl.c                       | 53 ++++++++++++++++++++++++++--
->  12 files changed, 227 insertions(+), 60 deletions(-)
->=20
