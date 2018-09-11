@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fzqZI-0002uX-6c
+	(envelope-from <jcody@redhat.com>) id 1fzqZI-0002qw-9T
 	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 17:51:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fzqJv-0002F5-Pw
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 17:35:41 -0400
+	(envelope-from <jcody@redhat.com>) id 1fzqJs-0002DH-OX
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 17:35:38 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 11 Sep 2018 17:34:56 -0400
-Message-Id: <fb330b4c21bf6c53cc4ada53f3f33e13e531ee6c.1536701561.git.jcody@redhat.com>
+Date: Tue, 11 Sep 2018 17:34:53 -0400
+Message-Id: <5b49a980f2cde6610ab1df41bb0277d00b5db893.1536701561.git.jcody@redhat.com>
 In-Reply-To: <cover.1536701561.git.jcody@redhat.com>
 References: <cover.1536701561.git.jcody@redhat.com>
 In-Reply-To: <cover.1536701561.git.jcody@redhat.com>
 References: <cover.1536701561.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] block/rbd: add deprecation documenation
- for filename keyvalue pairs
+Subject: [Qemu-devel] [PATCH v3 1/4] block/rbd: pull out
+ qemu_rbd_convert_options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +25,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com
 
+Code movement to pull the conversion from Qdict to BlockdevOptionsRbd
+into a helper function.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- qemu-deprecated.texi | 7 +++++++
- 1 file changed, 7 insertions(+)
+ block/rbd.c | 36 ++++++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 12 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 1b9c007f12..4df8ac442d 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -190,6 +190,13 @@ used instead.
- In order to prevent QEMU from automatically opening an image's backing
- chain, use ``"backing": null'' instead.
+diff --git a/block/rbd.c b/block/rbd.c
+index ca8e5bbace..b199450f9f 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -655,12 +655,34 @@ failed_opts:
+     return r;
+ }
  
-+@subsubsection "rbd keyvalue pair encoded filenames": "" (since 3.1.0)
++static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
++                                    Error **errp)
++{
++    Visitor *v;
++    Error *local_err = NULL;
 +
-+Options for ``rbd'' should be specified according to its runtime options,
-+like other block drivers.  Legacy parsing of keyvalue pair encoded
-+filenames is useful to open images with the old format for backing files;
-+These image files should be updated to use the current format.
++    /* Convert the remaining options into a QAPI object */
++    v = qobject_input_visitor_new_flat_confused(options, errp);
++    if (!v) {
++        return -EINVAL;
++    }
 +
- @subsection vio-spapr-device device options
++    visit_type_BlockdevOptionsRbd(v, NULL, opts, &local_err);
++    visit_free(v);
++
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
+ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+                          Error **errp)
+ {
+     BDRVRBDState *s = bs->opaque;
+     BlockdevOptionsRbd *opts = NULL;
+-    Visitor *v;
+     const QDictEntry *e;
+     Error *local_err = NULL;
+     char *keypairs, *secretid;
+@@ -676,19 +698,9 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+         qdict_del(options, "password-secret");
+     }
  
- @subsubsection "irq": "" (since 3.0.0)
+-    /* Convert the remaining options into a QAPI object */
+-    v = qobject_input_visitor_new_flat_confused(options, errp);
+-    if (!v) {
+-        r = -EINVAL;
+-        goto out;
+-    }
+-
+-    visit_type_BlockdevOptionsRbd(v, NULL, &opts, &local_err);
+-    visit_free(v);
+-
++    r = qemu_rbd_convert_options(options, &opts, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        r = -EINVAL;
+         goto out;
+     }
+ 
 -- 
 2.17.1
