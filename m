@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fzrDS-0004ls-C8
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 18:33:03 -0400
+	(envelope-from <jcody@redhat.com>) id 1fzrDS-0004oL-OJ
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 18:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fzrDR-0006pV-F2
+	(envelope-from <jcody@redhat.com>) id 1fzrDR-0006pL-Dm
 	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 18:33:02 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 11 Sep 2018 18:32:33 -0400
-Message-Id: <647f5b5ab7efd8bf567a504c832b1d2d6f719b23.1536704901.git.jcody@redhat.com>
+Date: Tue, 11 Sep 2018 18:32:32 -0400
+Message-Id: <f830580e339b974a83ed4870d11adcdc17f49a47.1536704901.git.jcody@redhat.com>
 In-Reply-To: <cover.1536704901.git.jcody@redhat.com>
 References: <cover.1536704901.git.jcody@redhat.com>
 In-Reply-To: <cover.1536704901.git.jcody@redhat.com>
 References: <cover.1536704901.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 4/4] block/rbd: add deprecation
- documentation for filename keyvalue pairs
+Subject: [Qemu-devel] [PATCH v4 3/4] block/rbd: add iotest for rbd legacy
+ keyvalue filename parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +25,118 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com, libvir-list@redhat.com, mreitz@redhat.com, kwolf@redhat.com
 
+This is a small test that will check for the ability to parse
+both legacy and modern options for rbd.
+
+The way the test is set up is for failure to occur, but without
+having to wait to timeout on a non-existent rbd server.  The error
+messages in the success path show that the arguments were parsed.
+
+The failure behavior prior to the patch series that has this test, is
+qemu-img complaining about mandatory options (e.g. 'pool') not being
+provided.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- qemu-deprecated.texi | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ tests/qemu-iotests/231     | 62 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/231.out |  9 ++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 72 insertions(+)
+ create mode 100755 tests/qemu-iotests/231
+ create mode 100644 tests/qemu-iotests/231.out
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 1b9c007f12..8d285b281e 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -190,6 +190,21 @@ used instead.
- In order to prevent QEMU from automatically opening an image's backing
- chain, use ``"backing": null'' instead.
- 
-+@subsubsection rbd keyvalue pair encoded filenames: "" (since 3.1.0)
+diff --git a/tests/qemu-iotests/231 b/tests/qemu-iotests/231
+new file mode 100755
+index 0000000000..3e283708b4
+--- /dev/null
++++ b/tests/qemu-iotests/231
+@@ -0,0 +1,62 @@
++#!/bin/bash
++#
++# Test legacy and modern option parsing for rbd/ceph.  This will not
++# actually connect to a ceph server, but rather looks for the appropriate
++# error message that indicates we parsed the options correctly.
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+Options for ``rbd'' should be specified according to its runtime options,
-+like other block drivers.  Legacy parsing of keyvalue pair encoded
-+filenames is useful to open images with the old format for backing files;
-+These image files should be updated to use the current format.
++# creator
++owner=jcody@redhat.com
 +
-+Example of legacy encoding:
++seq=`basename $0`
++echo "QA output created by $seq"
 +
-+@code{json:@{"file.driver":"rbd", "file.filename":"rbd:rbd/name"@}}
++here=`pwd`
++status=1	# failure is the default!
 +
-+The above, converted to the current supported format:
++_cleanup()
++{
++    rm "${BOGUS_CONF}"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
-+@code{json:@{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"@}}
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
 +
- @subsection vio-spapr-device device options
- 
- @subsubsection "irq": "" (since 3.0.0)
++_supported_fmt generic
++_supported_proto rbd
++_supported_os Linux
++
++BOGUS_CONF=${TEST_DIR}/ceph-$$.conf
++touch "${BOGUS_CONF}"
++
++_filter_conf()
++{
++    sed -e "s#$BOGUS_CONF#BOGUS_CONF#g"
++}
++
++# We expect this to fail, with no monitor ip provided and a null conf file.  Just want it
++# to fail in the right way.
++$QEMU_IMG info "json:{'file.driver':'rbd','file.filename':'rbd:rbd/bogus:conf=${BOGUS_CONF}'}" 2>&1 | _filter_conf
++$QEMU_IMG info "json:{'file.driver':'rbd','file.pool':'rbd','file.image':'bogus','file.conf':'${BOGUS_CONF}'}" 2>&1 | _filter_conf
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/231.out b/tests/qemu-iotests/231.out
+new file mode 100644
+index 0000000000..579ba11c16
+--- /dev/null
++++ b/tests/qemu-iotests/231.out
+@@ -0,0 +1,9 @@
++QA output created by 231
++qemu-img: RBD options encoded in the filename as keyvalue pairs is deprecated.  Future versions may cease to parse these options in the future.
++unable to get monitor info from DNS SRV with service name: ceph-mon
++no monitors specified to connect to.
++qemu-img: Could not open 'json:{'file.driver':'rbd','file.filename':'rbd:rbd/bogus:conf=BOGUS_CONF'}': error connecting: No such file or directory
++unable to get monitor info from DNS SRV with service name: ceph-mon
++no monitors specified to connect to.
++qemu-img: Could not open 'json:{'file.driver':'rbd','file.pool':'rbd','file.image':'bogus','file.conf':'BOGUS_CONF'}': error connecting: No such file or directory
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 743790745b..31f6e77dcb 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -226,3 +226,4 @@
+ 226 auto quick
+ 227 auto quick
+ 229 auto quick
++231 auto quick
 -- 
 2.17.1
