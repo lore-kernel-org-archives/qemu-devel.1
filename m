@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fzke7-00043O-NR
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 11:32:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fzkmb-0008Kr-3e
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 11:40:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fzke1-0000zI-Ov
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 11:32:05 -0400
-References: <20180910145616.8598-1-famz@redhat.com>
-	<20180910145616.8598-3-famz@redhat.com>
-	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
-	<20180911141245.GQ19292@lemon.usersys.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
-Date: Tue, 11 Sep 2018 17:30:41 +0200
+	(envelope-from <bounces@canonical.com>) id 1fzkmX-0005XQ-T9
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 11:40:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40600)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fzkmX-0005XB-N1
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 11:40:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fzkmW-0003u0-In
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 15:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 881AE2E806B
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 15:40:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180911141245.GQ19292@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
- handlers when stopping vq handler
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Sep 2018 15:34:27 -0000
+From: Sandra Loosemore <1791796@bugs.launchpad.net>
+Reply-To: Bug 1791796 <1791796@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153660698641.24944.17107147595708483311.malonedeb@gac.canonical.com>
+Message-Id: <153668006744.31966.11333457437734513810.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1791796] Re: unimplemented thread syscalls in
+ nios2 user-mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +37,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 11/09/2018 16:12, Fam Zheng wrote:
-> On Tue, 09/11 13:32, Paolo Bonzini wrote:
->> On 10/09/2018 16:56, Fam Zheng wrote:
->>> We have this unwanted call stack:
->>>
->>>   > ...
->>>   > #13 0x00005586602b7793 in virtio_scsi_handle_cmd_vq
->>>   > #14 0x00005586602b8d66 in virtio_scsi_data_plane_handle_cmd
->>>   > #15 0x00005586602ddab7 in virtio_queue_notify_aio_vq
->>>   > #16 0x00005586602dfc9f in virtio_queue_host_notifier_aio_poll
->>>   > #17 0x00005586607885da in run_poll_handlers_once
->>>   > #18 0x000055866078880e in try_poll_mode
->>>   > #19 0x00005586607888eb in aio_poll
->>>   > #20 0x0000558660784561 in aio_wait_bh_oneshot
->>>   > #21 0x00005586602b9582 in virtio_scsi_dataplane_stop
->>>   > #22 0x00005586605a7110 in virtio_bus_stop_ioeventfd
->>>   > #23 0x00005586605a9426 in virtio_pci_stop_ioeventfd
->>>   > #24 0x00005586605ab808 in virtio_pci_common_write
->>>   > #25 0x0000558660242396 in memory_region_write_accessor
->>>   > #26 0x00005586602425ab in access_with_adjusted_size
->>>   > #27 0x0000558660245281 in memory_region_dispatch_write
->>>   > #28 0x00005586601e008e in flatview_write_continue
->>>   > #29 0x00005586601e01d8 in flatview_write
->>>   > #30 0x00005586601e04de in address_space_write
->>>   > #31 0x00005586601e052f in address_space_rw
->>>   > #32 0x00005586602607f2 in kvm_cpu_exec
->>>   > #33 0x0000558660227148 in qemu_kvm_cpu_thread_fn
->>>   > #34 0x000055866078bde7 in qemu_thread_start
->>>   > #35 0x00007f5784906594 in start_thread
->>>   > #36 0x00007f5784639e6f in clone
->>>
->>> Avoid it with the aio_disable_external/aio_enable_external pair, so that
->>> no vq poll handlers can be called in aio_wait_bh_oneshot.
->>
->> I don't understand.  We are in the vCPU thread, so not in the
->> AioContext's home thread.  Why is aio_wait_bh_oneshot polling rather
->> than going through the aio_wait_bh path?
-> 
-> What do you mean by 'aio_wait_bh path'? Here is aio_wait_bh_oneshot:
+If you need a Nios II GNU/Linux toolchain, I think the most recent
+CodeBench Lite release will work:
 
-Sorry, I meant the "atomic_inc(&wait_->num_waiters);" path.  But if this
-backtrace is obtained without dataplane, that's the answer I was seeking.
+https://sourcery.mentor.com/GNUToolchain/subscription42545
 
-> void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
-> {
->     AioWaitBHData data = {
->         .cb = cb,
->         .opaque = opaque,
->     };
-> 
->     assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-> 
->     aio_bh_schedule_oneshot(ctx, aio_wait_bh, &data);
->     AIO_WAIT_WHILE(&data.wait, ctx, !data.done);
-> }
-> 
-> ctx is qemu_aio_context here, so there's no interaction with IOThread.
+We're planning on adding user-mode QEMU to the upcoming 2018.11
+release....  that's actually what I've been testing it for.  Results on
+the GCC testsuite actually don't look too bad, but I have a patch I
+haven't submitted yet that's required to make the GDB stub work, and
+there are a lot of GDB test failures I haven't triaged yet.
 
-In this case, it should be okay to have the reentrancy, what is the bug
-that this patch is fixing?
+-- =
 
-Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1791796
 
-Paolo
+Title:
+  unimplemented thread syscalls in nios2 user-mode emulation
+
+Status in QEMU:
+  New
+
+Bug description:
+  This bug is reported against the 3.0 release.
+
+  I noticed that the GCC test gcc.dg/torture/tls/tls-test.c is failing
+  when run in user-mode qemu for nios2 target.  The problem appears to
+  be that the thread-related syscalls are unimplemented in qemu.  Here
+  is output from running with -strace:
+
+  22484 brk(NULL) =3D 0x00005000
+  22484 uname(0x7fffef5a) =3D 0
+  22484 faccessat(AT_FDCWD,"/etc/ld.so.preload",R_OK,0x5) =3D -1 errno=3D2 =
+(No such file or directory)
+  22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2018.1=
+1-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2-li=
+nux-gnu/libc/./lib/./tls/libm.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D -1 =
+errno=3D2 (No such file or directory)
+  22484 fstatat64(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-201=
+8.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2=
+-linux-gnu/libc/./lib/./tls",0x7fffe870,0) =3D -1 errno=3D2 (No such file o=
+r directory)
+  22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2018.1=
+1-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2-li=
+nux-gnu/libc/./lib/./libm.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D 3
+  22484 read(3,0x7fffe954,512) =3D 512
+  22484 fstat64(3,0x7fffe870) =3D 0
+  22484 mmap2(NULL,803596,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,3,0=
+) =3D 0x7f716000
+  22484 mmap2(0x7f7d8000,12288,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYWRI=
+TE|MAP_FIXED,3,0xc1) =3D 0x7f7d8000
+  22484 close(3) =3D 0
+  22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2018.1=
+1-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2-li=
+nux-gnu/libc/./lib/./libpthread.so.0",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D 3
+  22484 read(3,0x7fffe948,512) =3D 512
+  22484 mmap2(NULL,8192,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS,-1,0=
+) =3D 0x7f714000
+  22484 fstat64(3,0x7fffe864) =3D 0
+  22484 mmap2(NULL,120700,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,3,0=
+) =3D 0x7f6f6000
+  22484 mprotect(0x7f70e000,4096,PROT_NONE) =3D 0
+  22484 mmap2(0x7f70f000,12288,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYWRI=
+TE|MAP_FIXED,3,0x18) =3D 0x7f70f000
+  22484 mmap2(0x7f712000,6012,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOU=
+S|MAP_FIXED,-1,0) =3D 0x7f712000
+  22484 close(3) =3D 0
+  22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2018.1=
+1-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2-li=
+nux-gnu/libc/./lib/./libc.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D 3
+  22484 read(3,0x7fffe93c,512) =3D 512
+  22484 fstat64(3,0x7fffe858) =3D 0
+  22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,3,=
+0) =3D 0x7f589000
+  22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYWRI=
+TE|MAP_FIXED,3,0x154) =3D 0x7f6de000
+  22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOU=
+S|MAP_FIXED,-1,0) =3D 0x7f6f3000
+  22484 close(3) =3D 0
+  22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
+  22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
+  22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
+  22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
+  22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
+  22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,87148,4=
+7) =3D 22484
+  22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errno=
+=3D38 (Function not implemented)
+  22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
+  22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argumen=
+t)
+  22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
+  22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
+  22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-1,0=
+) =3D 0x7ed88000
+  22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
+  22484 brk(NULL) =3D 0x00005000
+  22484 brk(0x00026000) =3D 0x00026000
+  22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLON=
+E_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_stack=
+=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidptr=3D0x=
+7f5884fc) =3D 22503
+  22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,4100) =
+=3D -1 errno=3D38 (Function not implemented)
+  22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_list=
+(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not impl=
+emented)
+  22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
+  22484 exit(0)
+   =3D 0
+  22484 fstat64(1,0x7fffef48) =3D 0
+  22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f715120
+   =3D 42
+  22484 exit_group(1)
+  sandra@build2-trusty-cs:/scratch/sandra/nios2-linux-trunk3$ =
+
+  22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,3,=
+0) =3D 0x7f589000
+  22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYWRI=
+TE|MAP_FIXED,3,0x154) =3D 0x7f6de000
+  22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOU=
+S|MAP_FIXED,-1,0) =3D 0x7f6f3000
+  22484 close(3) =3D 0
+  22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
+  22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
+  22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
+  22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
+  22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
+  22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,87148,4=
+7) =3D 22484
+  22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errno=
+=3D38 (Function not implemented)
+  22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
+  22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argumen=
+t)
+  22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
+  22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
+  22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-1,0=
+) =3D 0x7ed88000
+  22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
+  22484 brk(NULL) =3D 0x00005000
+  22484 brk(0x00026000) =3D 0x00026000
+  22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLON=
+E_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_stack=
+=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidptr=3D0x=
+7f5884fc) =3D 22503
+  22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,4100) =
+=3D -1 errno=3D38 (Function not implemented)
+  22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_list=
+(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not impl=
+emented)
+  22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
+  22484 exit(0)
+   =3D 0
+  22484 fstat64(1,0x7fffef48) =3D 0
+  22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f715120
+   =3D 42
+  22484 exit_group(1)
+  sandra@build2-trusty-cs:/scratch/sandra/nios2-linux-trunk3$ =
+
+  22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,3,=
+0) =3D 0x7f589000
+  22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYWRI=
+TE|MAP_FIXED,3,0x154) =3D 0x7f6de000
+  22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOU=
+S|MAP_FIXED,-1,0) =3D 0x7f6f3000
+  22484 close(3) =3D 0
+  22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
+  22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
+  22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
+  22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
+  22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
+  22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,87148,4=
+7) =3D 22484
+  22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errno=
+=3D38 (Function not implemented)
+  22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
+  22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argumen=
+t)
+  22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
+  22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
+  22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-1,0=
+) =3D 0x7ed88000
+  22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
+  22484 brk(NULL) =3D 0x00005000
+  22484 brk(0x00026000) =3D 0x00026000
+  22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLON=
+E_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_stack=
+=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidptr=3D0x=
+7f5884fc) =3D 22503
+  22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,4100) =
+=3D -1 errno=3D38 (Function not implemented)
+  22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_list=
+(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not impl=
+emented)
+  22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
+  22484 exit(0)
+   =3D 0
+  22484 fstat64(1,0x7fffef48) =3D 0
+  22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f715120
+   =3D 42
+  22484 exit_group(1)
+
+  Note that set_robust_list and clone are reported as unimplemented.
+
+  I've reported the problems with the signal syscalls separately here.
+  https://bugs.launchpad.net/qemu/+bug/1791763
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1791796/+subscriptions
