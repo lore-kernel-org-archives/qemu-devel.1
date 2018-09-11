@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fzpZZ-0003o2-Rz
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 16:47:46 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fzpaS-0005CC-SQ
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 16:48:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fzpZV-0000uf-02
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 16:47:45 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39748)
+	(envelope-from <rth7680@gmail.com>) id 1fzpaL-0001gP-BG
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 16:48:38 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35171)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fzpZU-0000Wu-BW
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 16:47:40 -0400
-Received: by mail-pf1-x443.google.com with SMTP id j8-v6so12804919pff.6
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 13:47:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fzpaF-0001Yi-6R
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 16:48:29 -0400
+Received: by mail-pl1-x641.google.com with SMTP id g2-v6so10917979plo.2
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 13:48:22 -0700 (PDT)
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20180911202823.21657-1-cota@braap.org>
-	<20180911202823.21657-4-cota@braap.org>
+	<20180911202823.21657-5-cota@braap.org>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <54b14c23-225f-8d83-38b2-40858a4808da@twiddle.net>
-Date: Tue, 11 Sep 2018 13:47:27 -0700
+Message-ID: <b512699d-4776-d473-4532-d82bf41f9281@twiddle.net>
+Date: Tue, 11 Sep 2018 13:48:19 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180911202823.21657-4-cota@braap.org>
+In-Reply-To: <20180911202823.21657-5-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 03/13] target/i386: move cpu_T0 to
+Subject: Re: [Qemu-devel] [PATCH v3 04/13] target/i386: move cpu_T1 to
  DisasContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -38,8 +38,8 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gm
 On 09/11/2018 01:28 PM, Emilio G. Cota wrote:
 > Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  target/i386/translate.c | 1174 ++++++++++++++++++++-------------------
->  1 file changed, 594 insertions(+), 580 deletions(-)
+>  target/i386/translate.c | 341 ++++++++++++++++++++--------------------
+>  1 file changed, 170 insertions(+), 171 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
