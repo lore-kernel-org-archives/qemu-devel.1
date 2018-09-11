@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzeXZ-00007K-MM
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:00:58 -0400
+	(envelope-from <famz@redhat.com>) id 1fzeei-0005RQ-GH
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:08:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fzeXW-0007Rv-Gs
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:00:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55870)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fzeXW-0007RF-AF
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:00:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fzeXV-0000lM-Gz
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 09:00:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5E2932E8076
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 09:00:53 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1fzeef-0005lN-CL
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:08:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38198 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fzeed-0005ke-EP
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:08:17 -0400
+Date: Tue, 11 Sep 2018 17:08:10 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180911090810.GP19292@lemon.usersys.redhat.com>
+References: <20180906054340.28988-1-famz@redhat.com>
+	<20180911090018.yjcnv45hyls2cqyc@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Sep 2018 08:48:42 -0000
-From: timsoft <tim@tree-of-life.co.uk>
-Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
-Message-Id: <153665572263.17203.10752057782722198266.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
- windows host
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180911090018.yjcnv45hyls2cqyc@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] tests: VM build in OpenBSD 6.3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Thomas Huth <thuth@redhat.com>, Brad Smith <brad@comstyle.com>, Eric Blake <eblake@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-hi jan, would you care to elaberate for the benefit of everyone "out
-there".
+On Tue, 09/11 11:00, Gerd Hoffmann wrote:
+> On Thu, Sep 06, 2018 at 01:43:36PM +0800, Fam Zheng wrote:
+> > In this new version:
+> > 
+> >     - Include the virtio fix by Paolo so that it's easier to test this series.
+> >     - Improve the slirp patch on input validation and buffer overflow. [Thomas]
+> >     - Use OpenBSD 6.3 image; Use guestfwd and tftp-server-name.
+> > 
+> > Thanks to the loose dependency, the three parts (patch 1; patches 2+3; patch 4)
+> > can go to individual maintainers if desired.
+> > 
+> > Fam Zheng (3):
+> >   slirp: Add sanity check for str option length
+> >   slirp: Implement RFC2132 TFTP server name
+> >   tests: vm: auto_install OpenBSD
+> > 
+> > Paolo Bonzini (1):
+> >   virtio: update MemoryRegionCaches when guest negotiates features
+> 
+> Tested-by: Gerd Hoffmann <kraxel@redhat.com>
+> 
 
--- =
+Thanks. I think Michael has included the virtio patch in a pull already. I'll
+pick up your tested-by tag and queue the OpenBSD patch, then leave the slirp
+ones to Samuel (the test script will still depend on the new slirp options, of
+course).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1404278
-
-Title:
-  tap connections not working on windows host
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  using latest qemu 2.2.0 64bit for windows host (installed from
-  qemu-w64-setup-20141210.exe obtained from http://qemu.weilnetz.de/w64/
-  ),OpenVPN 2.6.3-I601 64bit tap adapter named tap01 and calling qemu
-  using the following.
-
-  qemu-system-x86_64.exe -m 512 -net nic -net tap,ifname=3Dtap01 -hda
-  "c:\\data\\images\\test.img"
-
-  where the image contains a slackware 14.0 64bit install.
-  The tap is bridged with the real network adapter and the bridge is given =
-an ip of 10.1.1.41 (which works as the ip for the windows host). The tap ad=
-apter (in network connections) shows connected when the qemu vm is running.=
- inside the vm, the network is given an ip of 10.1.1.143 (the netmask and d=
-efault gateway are the same for the virtual and real pc).
-  fault.
-  The vm cannot see the rest of the local network or visa-versa. This used =
-to work in early (0.9 32bit) versions of qemu.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1404278/+subscriptions
+Fam
