@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fzgz8-0006Cx-4H
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 07:37:34 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fzhDo-0006h7-5x
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 07:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fzgz4-0005ZA-R7
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 07:37:34 -0400
-References: <20180910145616.8598-1-famz@redhat.com>
-	<20180910145616.8598-3-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
-Date: Tue, 11 Sep 2018 13:32:13 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fzhDi-0004Z4-Gr
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 07:52:42 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38845)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fzhDi-0004VA-8q
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 07:52:38 -0400
+Received: by mail-wm0-x242.google.com with SMTP id t25-v6so648608wmi.3
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 04:52:32 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180909013444.18936-1-f4bug@amsat.org>
+	<20180909013444.18936-2-f4bug@amsat.org>
+	<BN7PR08MB4868831CF81522919CC4EEC3C6040@BN7PR08MB4868.namprd08.prod.outlook.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6cdb730b-266e-5a43-7058-f24a4d8e3798@amsat.org>
+Date: Tue, 11 Sep 2018 08:52:28 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180910145616.8598-3-famz@redhat.com>
+In-Reply-To: <BN7PR08MB4868831CF81522919CC4EEC3C6040@BN7PR08MB4868.namprd08.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
- handlers when stopping vq handler
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] target/mips: Increase the 'supported
+ instructions' flags holder size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +37,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Fredrik Noring <noring@nocrew.org>, Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 10/09/2018 16:56, Fam Zheng wrote:
-> We have this unwanted call stack:
+On 9/11/18 6:33 AM, Aleksandar Markovic wrote:
+>> From: Philippe Mathieu-Daudé <philippe.mathieu.daude@gmail.com> on behalf of Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Sent: Sunday, September 9, 2018 3:34 AM
+>>
+>> Subject: [PATCH 1/2] target/mips: Increase the 'supported instructions' flags holder size
+>>
+>> Currently this holder is limited to at most 32 flags on
+>> a 32-bit architecture, which lets an unique bit available
+>> for another 'chip specific instructions' flag.
+>>
+>> Relax this limit using a 64-bit integer.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>> target/mips/cpu.h       | 2 +-
+>> target/mips/internal.h  | 2 +-
+>> target/mips/translate.c | 4 ++--
+>> 3 files changed, 4 insertions(+), 4 deletions(-)
 > 
->   > ...
->   > #13 0x00005586602b7793 in virtio_scsi_handle_cmd_vq
->   > #14 0x00005586602b8d66 in virtio_scsi_data_plane_handle_cmd
->   > #15 0x00005586602ddab7 in virtio_queue_notify_aio_vq
->   > #16 0x00005586602dfc9f in virtio_queue_host_notifier_aio_poll
->   > #17 0x00005586607885da in run_poll_handlers_once
->   > #18 0x000055866078880e in try_poll_mode
->   > #19 0x00005586607888eb in aio_poll
->   > #20 0x0000558660784561 in aio_wait_bh_oneshot
->   > #21 0x00005586602b9582 in virtio_scsi_dataplane_stop
->   > #22 0x00005586605a7110 in virtio_bus_stop_ioeventfd
->   > #23 0x00005586605a9426 in virtio_pci_stop_ioeventfd
->   > #24 0x00005586605ab808 in virtio_pci_common_write
->   > #25 0x0000558660242396 in memory_region_write_accessor
->   > #26 0x00005586602425ab in access_with_adjusted_size
->   > #27 0x0000558660245281 in memory_region_dispatch_write
->   > #28 0x00005586601e008e in flatview_write_continue
->   > #29 0x00005586601e01d8 in flatview_write
->   > #30 0x00005586601e04de in address_space_write
->   > #31 0x00005586601e052f in address_space_rw
->   > #32 0x00005586602607f2 in kvm_cpu_exec
->   > #33 0x0000558660227148 in qemu_kvm_cpu_thread_fn
->   > #34 0x000055866078bde7 in qemu_thread_start
->   > #35 0x00007f5784906594 in start_thread
->   > #36 0x00007f5784639e6f in clone
-> 
-> Avoid it with the aio_disable_external/aio_enable_external pair, so that
-> no vq poll handlers can be called in aio_wait_bh_oneshot.
+> "int insn_flags;" in DisasContext definition in target/mips/translate.c needs to be updated as well.
 
-I don't understand.  We are in the vCPU thread, so not in the
-AioContext's home thread.  Why is aio_wait_bh_oneshot polling rather
-than going through the aio_wait_bh path?
-
-Thanks,
-
-Paolo
+Oops I missed this one, good catch :)
