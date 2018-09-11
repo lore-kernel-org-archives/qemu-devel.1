@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fzY16-000287-Nr
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 22:03:01 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fzY17-0000Vu-FO
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 22:03:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fzXrP-0007dV-3u
+	(envelope-from <dgibson@ozlabs.org>) id 1fzXrP-0007da-42
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 21:53:02 -0400
-Date: Tue, 11 Sep 2018 11:49:38 +1000
+Date: Tue, 11 Sep 2018 11:50:32 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180911014938.GF7978@umbus.fritz.box>
+Message-ID: <20180911015032.GG7978@umbus.fritz.box>
 References: <20180910110222.8162-1-clg@kaod.org>
-	<20180910110222.8162-3-clg@kaod.org>
+	<20180910110222.8162-4-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="E7i4zwmWs5DOuDSH"
+	protocol="application/pgp-signature"; boundary="kjpMrWxdCilgNbo1"
 Content-Disposition: inline
-In-Reply-To: <20180910110222.8162-3-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] spapr: increase the size of the IRQ
- number space
+In-Reply-To: <20180910110222.8162-4-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 3/3] spapr_pci: fix "ibm,
+ pe-total-#msi" value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +29,83 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
 
---E7i4zwmWs5DOuDSH
+--kjpMrWxdCilgNbo1
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 10, 2018 at 01:02:21PM +0200, C=E9dric Le Goater wrote:
-> The new layout using static IRQ number does not leave much space to
-> the dynamic MSI range, only 0x100 IRQ numbers. Increase the total
-> number of IRQS for newer machines and introduce a legacy XICS backend
-> for pre-3.1 machines to maintain compatibility.
+On Mon, Sep 10, 2018 at 01:02:22PM +0200, C=E9dric Le Goater wrote:
+> The "ibm,pe-total-#msi" property of the sPAPR PHB defines the number
+> of allocatable MSI interrupts. This is currently set to XICS_IRQS_SPAPR
+> which covers the full IRQ number space of the machine. This is wrong.
 >=20
-> For the old backend, provide a 'nr_msis' value covering the full IRQ
-> number space as it does not use the bitmap allocator to allocate MSI
-> interrupt numbers.
+> Fix the definition by using the 'nr_msis' attribute of the sPAPRIrq
+> class and remove XICS_IRQS_SPAPR which is now unused.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Oh.. right.. I think it makes more sense to just merge this into the
+first patch.
+
 > ---
->  include/hw/ppc/spapr_irq.h |  1 +
->  hw/ppc/spapr.c             |  1 +
->  hw/ppc/spapr_irq.c         | 15 ++++++++++++++-
->  3 files changed, 16 insertions(+), 1 deletion(-)
+>  include/hw/ppc/xics.h | 2 --
+>  hw/ppc/spapr_irq.c    | 2 +-
+>  hw/ppc/spapr_pci.c    | 5 +++--
+>  3 files changed, 4 insertions(+), 5 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 650f810ad2aa..a467ce696ee4 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -41,6 +41,7 @@ typedef struct sPAPRIrq {
->  } sPAPRIrq;
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 9c2916c9b23a..9958443d1984 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -181,8 +181,6 @@ typedef struct XICSFabricClass {
+>      ICPState *(*icp_get)(XICSFabric *xi, int server);
+>  } XICSFabricClass;
 > =20
->  extern sPAPRIrq spapr_irq_xics;
-> +extern sPAPRIrq spapr_irq_xics_legacy;
+> -#define XICS_IRQS_SPAPR               1024
+> -
+>  void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
 > =20
->  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
->  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 4a9dd4d9bc14..eba7d60a30a7 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3971,6 +3971,7 @@ static void spapr_machine_3_0_class_options(Machine=
-Class *mc)
->      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_0);
-> =20
->      smc->legacy_irq_allocation =3D true;
-> +    smc->irq =3D &spapr_irq_xics_legacy;
->  }
-> =20
->  DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
+>  ICPState *xics_icp_get(XICSFabric *xi, int server);
 > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index d369ac96f5cd..b14d7bce00ea 100644
+> index b14d7bce00ea..e77b94cc685e 100644
 > --- a/hw/ppc/spapr_irq.c
 > +++ b/hw/ppc/spapr_irq.c
-> @@ -195,7 +195,7 @@ static void spapr_irq_print_info_xics(sPAPRMachineSta=
-te *spapr, Monitor *mon)
->      ics_pic_print_info(spapr->ics, mon);
->  }
-> =20
-> -#define SPAPR_IRQ_XICS_NR_IRQS     XICS_IRQS_SPAPR
-> +#define SPAPR_IRQ_XICS_NR_IRQS     0x1000
->  #define SPAPR_IRQ_XICS_NR_MSIS     \
->      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-> =20
-> @@ -289,3 +289,16 @@ int spapr_irq_find(sPAPRMachineState *spapr, int num=
-, bool align, Error **errp)
-> =20
+> @@ -290,7 +290,7 @@ int spapr_irq_find(sPAPRMachineState *spapr, int num,=
+ bool align, Error **errp)
 >      return first + ics->offset;
 >  }
-> +
-> +#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     XICS_IRQS_SPAPR
-
-AFAICT this is the last user of XICS_IRQS_SPAPR, so better to put the
-constant right here, rather than copying it from a define with a
-misleading name.
-
-> +
-> +sPAPRIrq spapr_irq_xics_legacy =3D {
-> +    .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
-> +    .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
-> +
-> +    .init        =3D spapr_irq_init_xics,
-> +    .claim       =3D spapr_irq_claim_xics,
-> +    .free        =3D spapr_irq_free_xics,
-> +    .qirq        =3D spapr_qirq_xics,
-> +    .print_info  =3D spapr_irq_print_info_xics,
-> +};
+> =20
+> -#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     XICS_IRQS_SPAPR
+> +#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     0x400
+> =20
+>  sPAPRIrq spapr_irq_xics_legacy =3D {
+>      .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 6bcb4f419b6b..bb736177e76c 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -2121,6 +2121,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+>      sPAPRTCETable *tcet;
+>      PCIBus *bus =3D PCI_HOST_BRIDGE(phb)->bus;
+>      sPAPRFDT s_fdt;
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(qdev_get_machine(=
+));
+> =20
+>      /* Start populating the FDT */
+>      nodename =3D g_strdup_printf("pci@%" PRIx64, phb->buid);
+> @@ -2138,8 +2139,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+>      _FDT(fdt_setprop(fdt, bus_off, "ranges", &ranges, sizeof_ranges));
+>      _FDT(fdt_setprop(fdt, bus_off, "reg", &bus_reg, sizeof(bus_reg)));
+>      _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pci-config-space-type", 0x1=
+));
+> -    /* TODO: fine tune the total count of allocatable MSIs per PHB */
+> -    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", XICS_IRQS_S=
+PAPR));
+> +    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi",
+> +                          smc->irq->nr_msis));
+> =20
+>      /* Dynamic DMA window */
+>      if (phb->ddw_enabled) {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -121,24 +113,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---E7i4zwmWs5DOuDSH
+--kjpMrWxdCilgNbo1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluXHzIACgkQbDjKyiDZ
-s5IIzQ//c+3Ay30p1E8yMS6EZW83dmk7OccBXPEzURGN6u+kc5EgelC2Jte4AwW3
-wsE9VH2YW/nBKr6l8xVhtsC9aXREt+sRkre2f7dkK+BRJbrsnyT/4niAuBSm1XG+
-kRhxLyqExlQPKO6Kotp/zry5Trz+YgwHlv1MbwBxksSwz0Ap58XdsepPZ/895w87
-cmWwfms1mpomWbryH5WskTLuCPCbW8bqSPYs8E2ooKTT8ViEtBJGAkeT2MlHb3Ww
-vGmqKmU+vkyZLQvPJ1SXGxMXNgKQnblmdQ/QMLz64MJMRxqn5RwuG0r6DjX1+blF
-SS/pjiqPsyBcUwWVEIWRFwID5XnvAt0LXAV0ZhS06lJthbmP7iTf3WXaV6un4qQq
-nCxMXWhJjbNYWv9yZ2/FkwexLOQsNnXgwP1n6D+tard2lTwgnbCn/7Q1XhS9NuAD
-IHq+j8DwZP1NeoPw2/Q2ye5P0b3X7Uud/WIGLLC346+EzynlOrqExZP/oAPioqJb
-Gtc3iQoMzccy+P1NxFjJXHfn2zH7jHjmcQZM8TjYNfjhXbRSC8amxFg+wLcRjo1B
-MnNsVTCfADNBmld3SsEbGuxZ4N72GmyUT41UCyuqskKb0oaa7K6L1V4gjeaMsLff
-0xxhYF6IaE8RDf7VgeHmcxaQw2p/Vwi8eGLHZugBdSbt40z7ML0=
-=kMyQ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluXH2gACgkQbDjKyiDZ
+s5LNbhAAhA7t0Djf7Sq4rnnxO7si/j6cPpW3iRX8IEZijofQy0DJruYJ5LaWhS28
+4hG60KNR4JA43VUbxwxO2DpOojbGfCXPraoBqxk6risFIaOJQZoMYeCzAyFPRJBY
+85hGohLH5SNo3NMdyWrWDwlLqsO920Q8ZstQ0mWrzrJ8WiQmxE6wMIwpLdvCpkWX
+Hs9x19yFND2BrQP69TMTQpugVDbw4A9b2scwf0p8KniVRNGQWPiNIjN7oyi3EHJP
+8nf73GHaEFONljeaZhSwsg62XrlK3UFeAxOdZP0HYyjH/alf9yBPTZ4UhIbk+3jH
+gnkPJG5u2ACv7TMDzwKIpioEveUaPtFB03y4XhZFsH7Lah9TNU5t/0SYrrdMv6yN
+OsJj8dvOojEGsB/I+B2EH4E10gemdGDaX18YzhwBmjoPTdQWVixRw9azcE+TfXSE
+q49zg9JXKc4TvAHvMIiKp5FpOruqhqAzXSKdaWXALfx272uVpD1DpPJlcGKN7QMq
+6qO5Uzsitl1XFlVGIde57TFdY0a7l3+SeqX0eMfPTYRVKPXOPILr73jCd0hCMeez
+6EJPAZUmCaq7kqF0nDq7dd/kJkkzHjST3SlLoCAPavBvdRqg/ON7BwWa1pBuAMg8
+inZ4/ZBDV4lEWZuiMA34ynyh8MTYw7FQSCCk9IfOWDSVRrPninU=
+=CjZL
 -----END PGP SIGNATURE-----
 
---E7i4zwmWs5DOuDSH--
+--kjpMrWxdCilgNbo1--
