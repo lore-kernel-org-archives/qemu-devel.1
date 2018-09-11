@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=785d5c3bf=jancraig@amazon.com>)
-	id 1fzhxN-0000iK-5I
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:39:53 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fzi1I-0006Cz-C9
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=785d5c3bf=jancraig@amazon.com>)
-	id 1fzhqX-00053r-Es
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:32:49 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:46758)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=785d5c3bf=jancraig@amazon.com>)
-	id 1fzhqX-0004tf-6C
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:32:45 -0400
-From: "Janeczek, Craig" <jancraig@amazon.com>
-Date: Tue, 11 Sep 2018 12:27:28 +0000
-Message-ID: <ec22dcbb7c4b4dbabb5052a05524c1d1@EX13D12UEA003.ant.amazon.com>
-References: <20180830193019.20104-1-jancraig@amazon.com>
-	<BN7PR08MB48688D7CF58F3239D42AE18BC6020@BN7PR08MB4868.namprd08.prod.outlook.com>
-In-Reply-To: <BN7PR08MB48688D7CF58F3239D42AE18BC6020@BN7PR08MB4868.namprd08.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <rth7680@gmail.com>) id 1fzi1C-0008Pf-N2
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:43:51 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fzi1A-0008D3-Pd
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:43:45 -0400
+Received: by mail-pg1-x543.google.com with SMTP id 7-v6so12224094pgf.2
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 05:43:41 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180910232752.31565-1-cota@braap.org>
+	<20180910232752.31565-3-cota@braap.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f6d7f508-eee6-cc53-248c-9553b68d15f5@twiddle.net>
+Date: Tue, 11 Sep 2018 05:43:38 -0700
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 0/9] Add limited MXU instruction support
+In-Reply-To: <20180910232752.31565-3-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/12] util: add atomic64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 
-I plan on getting back to this development effort next week.
+On 09/10/2018 04:27 PM, Emilio G. Cota wrote:
+> +#define GEN_READ(name, type)                    \
+> +    type name(const type *ptr)                  \
+> +    {                                           \
+> +        QemuSpin *lock = addr_to_lock(ptr);     \
+> +        type ret;                               \
+> +                                                \
+> +        qemu_spin_lock(lock);                   \
+> +        ret = *ptr;                             \
+> +        qemu_spin_unlock(lock);                 \
+> +        return ret;                             \
+> +    }
+> +
+> +GEN_READ(atomic_read_i64, int64_t)
+> +GEN_READ(atomic_read_u64, uint64_t)
 
------Original Message-----
-From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
-Sent: Wednesday, September 5, 2018 9:36 AM
-To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net
-Subject: Re: [PATCH v4 0/9] Add limited MXU instruction support
+Is there really a good reason to have two external
+functions instead of having one of them inline and
+perform a cast?
 
-> From: Craig Janeczek <jancraig@amazon.com>
-> Sent: Thursday, August 30, 2018 9:30 PM
->
-> Subject: [PATCH v4 0/9] Add limited MXU instruction support
+Is this any better than using libatomic?
 
-> This patch set begins to add MXU instruction support for mips emulation.
 
-Hi, Craig,
-
-I mentioned some time ago that we planned to revamp translate.c. Related to=
- that, I would like to tweak your whole series (this will be most of the ti=
-me moving code from place to place, and basically leaving your code intact,=
- just reorganized differently; I'll try to collect most of the MXU code in =
-a separate file). To be efficient (avoid long explanation and email threads=
-), I would like to do it just after you submit v5 - I would then submit v6,=
- and you would continue working on such modified series, creating v7 by you=
-rself etc., if needed.
-
-In relation to that, when do you plan to submit v5?
-
-Thanks,
-Aleksandar
+r~
