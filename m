@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fzjHA-0006hA-Bi
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 10:04:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fzjJR-0008Rb-N3
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 10:06:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fzj2l-0002Wn-OV
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:49:28 -0400
-References: <20180911083706.5378-1-mahaocong_work@163.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <415d6345-d422-e069-dda6-290f63c806a8@redhat.com>
-Date: Tue, 11 Sep 2018 08:49:19 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1fzjJN-0007YP-W4
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 10:06:41 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:42879)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fzjJN-0007XN-Mg
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 10:06:37 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id v17-v6so26187548wrr.9
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 07:06:37 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 11 Sep 2018 15:06:31 +0100
+Message-Id: <20180911140631.18481-5-alex.bennee@linaro.org>
+In-Reply-To: <20180911140631.18481-1-alex.bennee@linaro.org>
+References: <20180911140631.18481-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180911083706.5378-1-mahaocong_work@163.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/1] qemu-img: add new function to
- remove bitmap in image
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH 4/4] tests/tcg: add nios2 architecture
+ (NEEDS FIXES)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,25 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ma Haocong <mahaocong_work@163.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: 1791796@bugs.launchpad.net, thuth@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 9/11/18 3:37 AM, Ma Haocong wrote:
-> Hello,
-> 
-> In our scene, we need to delete dirty-bitmap created by using qmp command
-> 'block-dirty-bitmap-add'. we can use qmp command 'block-dirty-bitmap-remove'
-> to remove bitmap. Then I think that we should add a new function in qemu-img
-> to do the same work.
-> 
-> The command format is: qemu-img removebmp file-name bitmap-name
+Now we have a docker image with a nios2 compiler we can add the bits
+to build our TCG tests.
 
-John was working on a more general 'qemu-img bitmap' command that did 
-multiple operations from qemu-img, rather than just remove. That feels 
-like a more extensible approach than adding a new command for every 
-individual bitmap operation.
+Current failures:
+  testmmap - fails in check_file_fixed_eof_mmaps due to inversion of offset
+  linux-test - unimplemented lseek (probably others as well)
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/tcg/nios2/Makefile.include | 2 ++
+ 1 file changed, 2 insertions(+)
+ create mode 100644 tests/tcg/nios2/Makefile.include
+
+diff --git a/tests/tcg/nios2/Makefile.include b/tests/tcg/nios2/Makefile.include
+new file mode 100644
+index 0000000000..2ab4160435
+--- /dev/null
++++ b/tests/tcg/nios2/Makefile.include
+@@ -0,0 +1,2 @@
++DOCKER_IMAGE=buildroot-nios2-cross
++DOCKER_CROSS_COMPILER=nios2-linux-gcc
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.1
