@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fzi1I-0006Cz-C9
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:43:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fziLP-0007xu-9t
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:04:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fzi1C-0008Pf-N2
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:43:51 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fzi1A-0008D3-Pd
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:43:45 -0400
-Received: by mail-pg1-x543.google.com with SMTP id 7-v6so12224094pgf.2
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 05:43:41 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180910232752.31565-1-cota@braap.org>
-	<20180910232752.31565-3-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <f6d7f508-eee6-cc53-248c-9553b68d15f5@twiddle.net>
-Date: Tue, 11 Sep 2018 05:43:38 -0700
+	(envelope-from <pbonzini@redhat.com>) id 1fziLM-00060e-2Y
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:04:39 -0400
+References: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3c385908-58e8-e804-f3cd-df6b9043516b@redhat.com>
+Date: Tue, 11 Sep 2018 15:04:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180910232752.31565-3-cota@braap.org>
+In-Reply-To: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/12] util: add atomic64
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] scsi: replace lsi53c895a_create()
+ and lsi53c810_create() functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, famz@redhat.com, hpoussin@reactos.org, rth@twiddle.net, peter.maydell@linaro.org, thuth@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On 09/10/2018 04:27 PM, Emilio G. Cota wrote:
-> +#define GEN_READ(name, type)                    \
-> +    type name(const type *ptr)                  \
-> +    {                                           \
-> +        QemuSpin *lock = addr_to_lock(ptr);     \
-> +        type ret;                               \
-> +                                                \
-> +        qemu_spin_lock(lock);                   \
-> +        ret = *ptr;                             \
-> +        qemu_spin_unlock(lock);                 \
-> +        return ret;                             \
-> +    }
-> +
-> +GEN_READ(atomic_read_i64, int64_t)
-> +GEN_READ(atomic_read_u64, uint64_t)
+On 07/09/2018 14:56, Mark Cave-Ayland wrote:
+> As part of an upcoming 40p patchset I have a requirement to change the PCI
+> configuration of the LSI SCSI. However since commits a64aa5785d "hw: Deprecate -drive
+> if=scsi with non-onboard HBAs" and b891538e81 "hw/ppc/prep: Fix implicit creation of
+> "-drive if=scsi", the lsi53c8*_create() wrapper functions don't return the device
+> state itself.
+> 
+> This patchset replaces the lsi53c895a_create() and lsi53c810_create() functions
+> with a single lsi53c8xx_handle_legacy_cmdline() function as suggested by Thomas,
+> which makes the caller responsible for initing the LSI SCSI device and hence
+> allowing it to be configured as required.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> v2:
+> - Don't split LSIState into separate lsi53c895a.h header but instead use a new
+>   lsi53c8xx_handle_legacy_cmdline() function as suggested by Thomas
+> 
+> 
+> Mark Cave-Ayland (3):
+>   scsi: add lsi53c8xx_handle_legacy_cmdline() function
+>   scsi: move lsi53c8xx_create() callers to
+>     lsi53c8xx_handle_legacy_cmdline()
+>   scsi: remove unused lsi53c895a_create() and lsi53c810_create()
+>     functions
+> 
+>  hw/arm/realview.c    |  3 ++-
+>  hw/arm/versatilepb.c |  3 ++-
+>  hw/hppa/machine.c    |  4 +++-
+>  hw/ppc/prep.c        |  4 +++-
+>  hw/scsi/lsi53c895a.c | 11 ++---------
+>  include/hw/pci/pci.h |  3 +--
+>  6 files changed, 13 insertions(+), 15 deletions(-)
+> 
 
-Is there really a good reason to have two external
-functions instead of having one of them inline and
-perform a cast?
+Queued, thanks.
 
-Is this any better than using libatomic?
-
-
-r~
+Paolo
