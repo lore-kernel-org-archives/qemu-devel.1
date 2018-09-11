@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fzaZS-0005iW-Ia
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 00:46:41 -0400
+	(envelope-from <jcody@redhat.com>) id 1fzb3n-0004Tx-82
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 01:18:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fzaRz-0006wT-F5
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 00:38:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43246 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fzaRv-0006uM-5L
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 00:38:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 699FCDFED
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 04:38:48 +0000 (UTC)
-Date: Tue, 11 Sep 2018 06:38:43 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180911043843.egzz6pqe5ouzju3g@sirius.home.kraxel.org>
-References: <20180910064340.30745-1-kraxel@redhat.com>
-	<20180910064340.30745-3-kraxel@redhat.com>
-	<20180910125409.2b49be3b@t450s.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180910125409.2b49be3b@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw/vfio/display: add ramfb support
+	(envelope-from <jcody@redhat.com>) id 1fzb1t-0004hw-Ry
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 01:16:02 -0400
+From: Jeff Cody <jcody@redhat.com>
+Date: Tue, 11 Sep 2018 01:15:49 -0400
+Message-Id: <570e8585c94d6f1bd7406ce5d35f68a82b6ea28c.1536642773.git.jcody@redhat.com>
+In-Reply-To: <cover.1536642773.git.jcody@redhat.com>
+References: <cover.1536642773.git.jcody@redhat.com>
+In-Reply-To: <cover.1536642773.git.jcody@redhat.com>
+References: <cover.1536642773.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] block/rbd: Attempt to parse legacy
+ filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +22,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, libvir-list@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, kwolf@redhat.com, armbru@redhat.com
 
-  Hi,
+When we converted rbd to get rid of the older key/value-centric
+encoding format, we broke compatibility with image files with backing
+file strings encoded in the old format.
 
-> >      type_register_static(&vfio_pci_dev_info);
-> > +    type_register_static(&vfio_pci_ramfb_dev_info);
+This leaves a bit of an ugly conundrum, and a hacky solution.
 
-> My concern here is still all of the extra tooling that needs to be
-> added to management layers above QEMU for this device that exists only
-> because we can't hotplug the primary display in QEMU.  What happens when
-> we can hotplug the primary display?
+If the initial attempt to parse the "proper" options fails, it assumes
+that we may have an older key/value encoded filename.  Fall back to
+attempting to parse the filename, and extract the required options from
+it.  If that fails, pass along the original error message.
 
-Ramfb uses fw_cfg, and fw_cfg files can't be added or removed at
-runtime, the interface simply isn't designed for that.
+This approach has a potential drawback: if for some reason there are
+some options supplied the new way, and some the old way, we may not
+catch all the old options if they are not required options (since it
+won't cause the initial failure).
 
-> Aren't disabling hotplug of a
-> vfio-pci device and supporting ramfb two separate things?  I think
-> we're leaking current implementation issues out to the device options
-> when really we'd rather have a "ramfb" (or perhaps "console") option on
-> the vfio-pci device and the hotplug capability determined automatically
-> and available through introspection of the device.
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ block/rbd.c | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
 
-Well, I don't think libvirt will have too much trouble handling this.
-We have two variants (with and without vga compatibility) of other
-devices: qxl-vga and qxl, virtio-vga and virtio-gpu-pci.  libvirt copes
-just fine and picks the right one (I think depending on video model
-'primary' property).
-
-Also libvirt manages hotpluggability per device *class*, not per device
-*instance*.  So a device being hotpluggable or not depending on some
-device property is a problem for libvirt ...
-
-I'm open to suggestions how to handle this better, as long as the
-libvirt people are on board with the approach.
-
-cheers,
-  Gerd
+diff --git a/block/rbd.c b/block/rbd.c
+index a8e79d01d2..bce86b8bde 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -685,7 +685,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+     BlockdevOptionsRbd *opts = NULL;
+     const QDictEntry *e;
+     Error *local_err = NULL;
+-    char *keypairs, *secretid;
++    char *keypairs, *secretid, *filename;
+     int r;
+ 
+     keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
+@@ -700,8 +700,32 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     r = qemu_rbd_convert_options(bs, options, &opts, &local_err);
+     if (local_err) {
+-        error_propagate(errp, local_err);
+-        goto out;
++        /* If the initial attempt to convert and process the options failed,
++         * we may be attempting to open an image file that has the rbd options
++         * specified in the older format consisting of all key/value pairs
++         * encoded in the filename.  Go ahead and attempt to parse the
++         * filename, and see if we can pull out the required options */
++        Error *parse_err = NULL;
++
++        filename = g_strdup(qdict_get_try_str(options, "filename"));
++        qdict_del(options, "filename");
++
++        qemu_rbd_parse_filename(filename, options, NULL);
++
++        g_free(keypairs);
++        keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
++        if (keypairs) {
++            qdict_del(options, "=keyvalue-pairs");
++        }
++
++        r = qemu_rbd_convert_options(bs, options, &opts, &parse_err);
++        if (parse_err) {
++            /* if the second attempt failed, pass along the original error
++             * message for the current format */
++            error_propagate(errp, local_err);
++            error_free(parse_err);
++            goto out;
++        }
+     }
+ 
+     /* Remove the processed options from the QDict (the visitor processes
+-- 
+2.17.1
