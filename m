@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fzXfp-0006jz-AL
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 21:41:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fzXfs-0006ku-Dx
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 21:41:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fzXfo-00014O-8z
-	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 21:41:01 -0400
-Date: Tue, 11 Sep 2018 11:27:39 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fzXfo-00014I-8P
+	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 21:41:04 -0400
+Date: Tue, 11 Sep 2018 11:27:26 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180911012739.GC7978@umbus.fritz.box>
+Message-ID: <20180911012726.GB7978@umbus.fritz.box>
 References: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
-	<20180910204631.24106-3-mark.cave-ayland@ilande.co.uk>
+	<20180910204631.24106-2-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="S1BNGpv0yoYahz37"
+	protocol="application/pgp-signature"; boundary="61jdw2sOBCFtR2d/"
 Content-Disposition: inline
-In-Reply-To: <20180910204631.24106-3-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] 40p: add fixed IRQ routing for LSI
- SCSI device
+In-Reply-To: <20180910204631.24106-2-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] lsi53c895a: add optional external
+ IRQ via qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +29,80 @@ To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Cc: hpoussin@reactos.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---S1BNGpv0yoYahz37
+--61jdw2sOBCFtR2d/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 10, 2018 at 09:46:31PM +0100, Mark Cave-Ayland wrote:
-> Whilst the PReP specification describes how all PCI IRQs are routed via I=
-RQ
-> 15 on the interrupt controller, the real 40p machine has a routing quirk =
-in
-> that the LSI SCSI device is routed directly to IRQ 13.
+On Mon, Sep 10, 2018 at 09:46:30PM +0100, Mark Cave-Ayland wrote:
+> On some early machines the on-board PCI devices IRQs are wired directly to
+> the interrupt controller instead of via the PCI host bridge.
 >=20
-> Enable the external IRQ for the LSI SCSI device by wiring up the IRQ with
-> qdev to the relevant interrupt controller gpio.
+> Add an optional external IRQ that if wired up via qdev will replace the
+> in-built PCI IRQ.
 >=20
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+Fam, if I get an Acked-by from you I'm happy to take this through my tree.
 
 > ---
->  hw/ppc/prep.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+>  hw/scsi/lsi53c895a.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 615865e46c..94fc36b7ef 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -621,7 +621,7 @@ static void ibm_40p_init(MachineState *machine)
->      CPUPPCState *env =3D NULL;
->      uint16_t cmos_checksum;
->      PowerPCCPU *cpu;
-> -    DeviceState *dev;
-> +    DeviceState *dev, *i82378_dev;
->      SysBusDevice *pcihost, *s;
->      Nvram *m48t59 =3D NULL;
->      PCIBus *pci_bus;
-> @@ -666,11 +666,11 @@ static void ibm_40p_init(MachineState *machine)
+> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+> index f5cbbf653c..996b40650d 100644
+> --- a/hw/scsi/lsi53c895a.c
+> +++ b/hw/scsi/lsi53c895a.c
+> @@ -207,6 +207,7 @@ typedef struct {
+>      PCIDevice parent_obj;
+>      /*< public >*/
+> =20
+> +    qemu_irq ext_irq;
+>      MemoryRegion mmio_io;
+>      MemoryRegion ram_io;
+>      MemoryRegion io_io;
+> @@ -443,9 +444,19 @@ static void lsi_stop_script(LSIState *s)
+>      s->istat1 &=3D ~LSI_ISTAT1_SRUN;
+>  }
+> =20
+> -static void lsi_update_irq(LSIState *s)
+> +static void lsi_set_irq(LSIState *s, int level)
+>  {
+>      PCIDevice *d =3D PCI_DEVICE(s);
+> +
+> +    if (s->ext_irq) {
+> +        qemu_set_irq(s->ext_irq, level);
+> +    } else {
+> +        pci_set_irq(d, level);
+> +    }
+> +}
+> +
+> +static void lsi_update_irq(LSIState *s)
+> +{
+>      int level;
+>      static int last_level;
+>      lsi_request *p;
+> @@ -477,7 +488,7 @@ static void lsi_update_irq(LSIState *s)
+>                  level, s->dstat, s->sist1, s->sist0);
+>          last_level =3D level;
 >      }
+> -    pci_set_irq(d, level);
+> +    lsi_set_irq(s, level);
 > =20
->      /* PCI -> ISA bridge */
-> -    dev =3D DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"=
-));
-> -    qdev_connect_gpio_out(dev, 0,
-> +    i82378_dev =3D DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "=
-i82378"));
-> +    qdev_connect_gpio_out(i82378_dev, 0,
->                            cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
-> -    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
-> -    isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
-> +    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(i82378_dev, 15));
-> +    isa_bus =3D ISA_BUS(qdev_get_child_bus(i82378_dev, "isa.0"));
+>      if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
+>          DPRINTF("Handled IRQs & disconnected, looking for pending "
+> @@ -2213,6 +2224,7 @@ static void lsi_scsi_realize(PCIDevice *dev, Error =
+**errp)
+>                            "lsi-io", 256);
 > =20
->      /* Memory controller */
->      dev =3D DEVICE(isa_create(isa_bus, "rs6000-mc"));
-> @@ -703,6 +703,7 @@ static void ibm_40p_init(MachineState *machine)
->          dev =3D DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
->                                         "lsi53c810"));
->          lsi53c8xx_handle_legacy_cmdline(dev);
-> +        qdev_connect_gpio_out(dev, 0, qdev_get_gpio_in(i82378_dev, 13));
+>      address_space_init(&s->pci_io_as, pci_address_space_io(dev), "lsi-pc=
+i-io");
+> +    qdev_init_gpio_out(d, &s->ext_irq, 1);
 > =20
->          /* XXX: s3-trio at PCI_DEVFN(2, 0) */
->          pci_vga_init(pci_bus);
+>      pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io_io);
+>      pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mmio_io);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -98,24 +110,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---S1BNGpv0yoYahz37
+--61jdw2sOBCFtR2d/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluXGgsACgkQbDjKyiDZ
-s5KX6w//T5b+qqO7OFKvGQCH7w/yPdryETR+q/mNkkY2KKp+9hBKdmT2OsNWFmIu
-z4MAlQFpSq13FdAzROLmwP05TvrzpxGbIBlhr4zKmHjvCbXSaKn0DSnLM3DrEduQ
-gfPmsLwKjb/yi/ierfi8k9zzSTJ4C4vxVdkbbax+l0hOofJPQXJfrguolgNa7ixB
-4G6/G5TvhXs2YM560MOTmBYh5wDOgpYDoH+HUE5WmmwmxxpdeNa7uA/8RED3ZUKs
-kyitXxhAryGzezLBgqeNVPbAE+DafJRXR7qAZuQ6fx3kHbpt4iE4O1vdpFtitKc9
-WJHTx9gmNXcSjdxW2hOaPix44adaeBq7EzRuWbdXs6D1dS9VGAtYQ3NvFeXBrBgf
-PEtO1L5EAc3R3UCTuv/7HdmpQLVRIiPW5833vJ+GuoX0lWOFR7zOkdWGFNZLZ8eq
-hQr3wHMQO3bsGLcCXkLCOSGQgdbHCaLME+uQVaXF8VTIy2YwWpoFw6zheD8Tg7lH
-2Uhy6jGXUEAUIs41VMNT1z7Rp98x5BufjszDtT6OhK+thwZG3aZPWeKGleZI4ca4
-qLSGClteDISXP7tUdcf7GEYcIY3WpIaY5dwTMjYZ4AD0UH9VqMBIr5EFs4V3dsHl
-jPejE6ZKEUN/wKc8Xnzp8p4oX5xwRlonlBZvEoVW4GPsraliS7A=
-=A/Qb
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluXGfwACgkQbDjKyiDZ
+s5L8Hg//YyM47IAtnbuHrJxRgEEk1fzTFYWgt9/VMFUmQM4Yq6zIcOhN05HRiW/c
+79+AtNKjvXJOPUS2ZMwGfhtCoPT468anNuGdj7NRT1TpjfOwJ5EZVz9PmiXRp0AN
+V8x9eTgJP680O4YsZgBw53fqwCBPPMUvIXUONq/mDbnBJ5Zkasq+qBacSdMHRx/D
+dHS2oa1OaCqe3TiduHSuz4hNR70kB7dzDjVEhQy/3s2BNIT4TKuWH+jv2zaGKenP
+Ij/o0n0qoSoYRAAGbfyiu+ZpJnDXNhoyJmzdXVK7oB9xx5aalgTEYmJ8i8mxqYPT
+LgfJEPc5xzCEsTC194XEgsMx6Dd8BExBSO3qw/fDe+h9Qf3+yh5ttqRquS9mRZ2n
+YNao2qun98R5PimznbTxeEEPiQYvDB84E1L0Sn6xmQ8ZWNEx0w53Klt1/KPinwtb
+5ioReV8zL9KeBQhsHxMUOH8CLYhWvrDUmQ1AVF3Qr4d/zOdG3b/IYEir440xJT2L
+dxYAk9Dz/84KWkarHLOdmFag2toD00Et3bl55KPHL7ZGSLbeqN7RjOQpZcD6n+ib
+QzEeMkr1R9MP5lh5dtjPXVBAL1wXBGgr8Rgm9a2Thn8+fQQZI1AOXWf+oH7zffX5
+A2pNp6YWuyoRKdl10A5TVK+C8bma2umUpRMyoAYkFRNKA5Yk1zs=
+=J1Ci
 -----END PGP SIGNATURE-----
 
---S1BNGpv0yoYahz37--
+--61jdw2sOBCFtR2d/--
