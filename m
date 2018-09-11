@@ -1,29 +1,26 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:55196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1fzf6S-0001QU-E6
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:37:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1fzf6X-0001QU-Gj
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:37:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <slp@redhat.com>) id 1fzeyk-0000hD-1D
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:29:05 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44559)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1fzeyj-0000gf-R4
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:29:01 -0400
-Received: by mail-wr1-f67.google.com with SMTP id v16-v6so24970904wro.11
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 02:29:01 -0700 (PDT)
-Date: Tue, 11 Sep 2018 11:28:58 +0200
-From: Sergio Lopez <slp@redhat.com>
-Message-ID: <20180911092858.z7ocrtr27ifhqett@dritchie>
-References: <20180907161520.26349-1-kwolf@redhat.com>
-	<20180907161520.26349-7-kwolf@redhat.com>
-	<20180911082311.GG19292@lemon.usersys.redhat.com>
-	<20180911091720.GB3994@localhost.localdomain>
+	(envelope-from <thuth@redhat.com>) id 1fzex4-00085X-Iq
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:27:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34358 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fzex4-00085B-8s
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:27:18 -0400
+References: <153660698641.24944.17107147595708483311.malonedeb@gac.canonical.com>
+	<87zhwobeqn.fsf@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f6c394eb-2ef0-601f-ba53-4479b0625fd2@redhat.com>
+Date: Tue, 11 Sep 2018 11:27:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180911091720.GB3994@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 06/14] block: Add missing locking in
- bdrv_co_drain_bh_cb()
+In-Reply-To: <87zhwobeqn.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1791796] [NEW] unimplemented thread syscalls
+ in nios2 user-mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +29,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Bug 1791796 <1791796@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
 
-On Tue, Sep 11, 2018 at 11:17:20AM +0200, Kevin Wolf wrote:
-> Am 11.09.2018 um 10:23 hat Fam Zheng geschrieben:
-> > On Fri, 09/07 18:15, Kevin Wolf wrote:
-> > > bdrv_do_drained_begin/end() assume that they are called with the
-> > > AioContext lock of bs held. If we call drain functions from a coroutine
-> > > with the AioContext lock held, we yield and schedule a BH to move out of
-> > > coroutine context. This means that the lock for the home context of the
-> > > coroutine is released and must be re-acquired in the bottom half.
-> > > 
-> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > ---
-> > >  include/qemu/coroutine.h |  5 +++++
-> > >  block/io.c               | 15 +++++++++++++++
-> > >  util/qemu-coroutine.c    |  5 +++++
-> > >  3 files changed, 25 insertions(+)
-> > > 
-> > > diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-> > > index 6f8a487041..9801e7f5a4 100644
-> > > --- a/include/qemu/coroutine.h
-> > > +++ b/include/qemu/coroutine.h
-> > > @@ -90,6 +90,11 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co);
-> > >  void coroutine_fn qemu_coroutine_yield(void);
-> > >  
-> > >  /**
-> > > + * Get the AioContext of the given coroutine
-> > > + */
-> > > +AioContext *coroutine_fn qemu_coroutine_get_aio_context(Coroutine *co);
-> > > +
-> > > +/**
-> > >   * Get the currently executing coroutine
-> > >   */
-> > >  Coroutine *coroutine_fn qemu_coroutine_self(void);
-> > > diff --git a/block/io.c b/block/io.c
-> > > index 7100344c7b..914ba78f1a 100644
-> > > --- a/block/io.c
-> > > +++ b/block/io.c
-> > > @@ -288,6 +288,18 @@ static void bdrv_co_drain_bh_cb(void *opaque)
-> > >      BlockDriverState *bs = data->bs;
-> > >  
-> > >      if (bs) {
-> > > +        AioContext *ctx = bdrv_get_aio_context(bs);
-> > > +        AioContext *co_ctx = qemu_coroutine_get_aio_context(co);
-> > > +
-> > > +        /*
-> > > +         * When the coroutine yielded, the lock for its home context was
-> > > +         * released, so we need to re-acquire it here. If it explicitly
-> > > +         * acquired a different context, the lock is still held and we don't
-> > > +         * want to lock it a second time (or AIO_WAIT_WHILE() would hang).
-> > > +         */
-> > 
-> > This condition is rather obscure. When is ctx not equal to co_ctx?
-> 
-> Whenever you drain a BlockDriverState that is in a different AioContext.
-> The common case is a bdrv_drain() from the main loop thread for a BDS in
-> an iothread.
+On 2018-09-11 10:49, Alex Benn=C3=A9e wrote:
+>=20
+> Sandra Loosemore <1791796@bugs.launchpad.net> writes:
+>=20
+>> Public bug reported:
+>>
+>> This bug is reported against the 3.0 release.
+>>
+>> I noticed that the GCC test gcc.dg/torture/tls/tls-test.c is failing
+>> when run in user-mode qemu for nios2 target.  The problem appears to b=
+e
+>> that the thread-related syscalls are unimplemented in qemu.  Here is
+>> output from running with -strace:
+>=20
+> One thing that would help in better supporting NIOS is if we could add
+> support for building linux-user tests for it in test/tcg. For this we
+> need a distribution that ships a decent cross compiler or create a
+> docker recipe that packages it up so we can build and run the tests.
+>=20
+> Are you just building GCC straight from source or can you point to a
+> recommended location for a decent packaged gcc?
 
-Isn't this a consequence of using qemu_coroutine_enter in co_schedule_bh
-[1]?
+Not sure if it's of any help, but buildroot.org has support for nios2,
+including automatic setup of a cross-compiler...
 
-AFAIK, even if an IOThread's AioContext is being polled by the main loop
-thread, all coroutines should be running with the IOThread/BDS
-AioContext.
+ Thomas
 
-Sergio.
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg00450.html
+>> 22484 brk(NULL) =3D 0x00005000
+>> 22484 uname(0x7fffef5a) =3D 0
+>> 22484 faccessat(AT_FDCWD,"/etc/ld.so.preload",R_OK,0x5) =3D -1 errno=3D=
+2 (No such file or directory)
+>> 22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-201=
+8.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nio=
+s2-linux-gnu/libc/./lib/./tls/libm.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =
+=3D -1 errno=3D2 (No such file or directory)
+>> 22484 fstatat64(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-=
+2018.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/=
+nios2-linux-gnu/libc/./lib/./tls",0x7fffe870,0) =3D -1 errno=3D2 (No such=
+ file or directory)
+>> 22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-201=
+8.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nio=
+s2-linux-gnu/libc/./lib/./libm.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D =
+3
+>> 22484 read(3,0x7fffe954,512) =3D 512
+>> 22484 fstat64(3,0x7fffe870) =3D 0
+>> 22484 mmap2(NULL,803596,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,=
+3,0) =3D 0x7f716000
+>> 22484 mmap2(0x7f7d8000,12288,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENY=
+WRITE|MAP_FIXED,3,0xc1) =3D 0x7f7d8000
+>> 22484 close(3) =3D 0
+>> 22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-201=
+8.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nio=
+s2-linux-gnu/libc/./lib/./libpthread.so.0",O_RDONLY|O_LARGEFILE|O_CLOEXEC=
+) =3D 3
+>> 22484 read(3,0x7fffe948,512) =3D 512
+>> 22484 mmap2(NULL,8192,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS,-=
+1,0) =3D 0x7f714000
+>> 22484 fstat64(3,0x7fffe864) =3D 0
+>> 22484 mmap2(NULL,120700,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,=
+3,0) =3D 0x7f6f6000
+>> 22484 mprotect(0x7f70e000,4096,PROT_NONE) =3D 0
+>> 22484 mmap2(0x7f70f000,12288,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENY=
+WRITE|MAP_FIXED,3,0x18) =3D 0x7f70f000
+>> 22484 mmap2(0x7f712000,6012,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONY=
+MOUS|MAP_FIXED,-1,0) =3D 0x7f712000
+>> 22484 close(3) =3D 0
+>> 22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-201=
+8.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nio=
+s2-linux-gnu/libc/./lib/./libc.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D =
+3
+>> 22484 read(3,0x7fffe93c,512) =3D 512
+>> 22484 fstat64(3,0x7fffe858) =3D 0
+>> 22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE=
+,3,0) =3D 0x7f589000
+>> 22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENY=
+WRITE|MAP_FIXED,3,0x154) =3D 0x7f6de000
+>> 22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONY=
+MOUS|MAP_FIXED,-1,0) =3D 0x7f6f3000
+>> 22484 close(3) =3D 0
+>> 22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
+>> 22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
+>> 22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,8714=
+8,47) =3D 22484
+>> 22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errn=
+o=3D38 (Function not implemented)
+>> 22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
+>> 22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argu=
+ment)
+>> 22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
+>> 22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
+>> 22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-=
+1,0) =3D 0x7ed88000
+>> 22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
+>> 22484 brk(NULL) =3D 0x00005000
+>> 22484 brk(0x00026000) =3D 0x00026000
+>> 22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|C=
+LONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_=
+stack=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidp=
+tr=3D0x7f5884fc) =3D 22503
+>> 22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,410=
+0) =3D -1 errno=3D38 (Function not implemented)
+>> 22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_l=
+ist(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not=
+ implemented)
+>> 22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
+>> 22484 exit(0)
+>>  =3D 0
+>> 22484 fstat64(1,0x7fffef48) =3D 0
+>> 22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f71512=
+0
+>>  =3D 42
+>> 22484 exit_group(1)
+>> sandra@build2-trusty-cs:/scratch/sandra/nios2-linux-trunk3$
+>> 22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE=
+,3,0) =3D 0x7f589000
+>> 22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENY=
+WRITE|MAP_FIXED,3,0x154) =3D 0x7f6de000
+>> 22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONY=
+MOUS|MAP_FIXED,-1,0) =3D 0x7f6f3000
+>> 22484 close(3) =3D 0
+>> 22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
+>> 22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
+>> 22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,8714=
+8,47) =3D 22484
+>> 22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errn=
+o=3D38 (Function not implemented)
+>> 22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
+>> 22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argu=
+ment)
+>> 22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
+>> 22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
+>> 22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-=
+1,0) =3D 0x7ed88000
+>> 22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
+>> 22484 brk(NULL) =3D 0x00005000
+>> 22484 brk(0x00026000) =3D 0x00026000
+>> 22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|C=
+LONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_=
+stack=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidp=
+tr=3D0x7f5884fc) =3D 22503
+>> 22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,410=
+0) =3D -1 errno=3D38 (Function not implemented)
+>> 22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_l=
+ist(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not=
+ implemented)
+>> 22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
+>> 22484 exit(0)
+>>  =3D 0
+>> 22484 fstat64(1,0x7fffef48) =3D 0
+>> 22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f71512=
+0
+>>  =3D 42
+>> 22484 exit_group(1)
+>> sandra@build2-trusty-cs:/scratch/sandra/nios2-linux-trunk3$
+>> 22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE=
+,3,0) =3D 0x7f589000
+>> 22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENY=
+WRITE|MAP_FIXED,3,0x154) =3D 0x7f6de000
+>> 22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONY=
+MOUS|MAP_FIXED,-1,0) =3D 0x7f6f3000
+>> 22484 close(3) =3D 0
+>> 22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
+>> 22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
+>> 22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
+>> 22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,8714=
+8,47) =3D 22484
+>> 22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errn=
+o=3D38 (Function not implemented)
+>> 22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
+>> 22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argu=
+ment)
+>> 22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
+>> 22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
+>> 22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-=
+1,0) =3D 0x7ed88000
+>> 22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
+>> 22484 brk(NULL) =3D 0x00005000
+>> 22484 brk(0x00026000) =3D 0x00026000
+>> 22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|C=
+LONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_=
+stack=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidp=
+tr=3D0x7f5884fc) =3D 22503
+>> 22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,410=
+0) =3D -1 errno=3D38 (Function not implemented)
+>> 22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_l=
+ist(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not=
+ implemented)
+>> 22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
+>> 22484 exit(0)
+>>  =3D 0
+>> 22484 fstat64(1,0x7fffef48) =3D 0
+>> 22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f71512=
+0
+>>  =3D 42
+>> 22484 exit_group(1)
+>>
+>> Note that set_robust_list and clone are reported as unimplemented.
+>>
+>> I've reported the problems with the signal syscalls separately here.
+>> https://bugs.launchpad.net/qemu/+bug/1791763
+>>
+>> ** Affects: qemu
+>>      Importance: Undecided
+>>          Status: New
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
+>=20
