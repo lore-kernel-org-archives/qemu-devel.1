@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fzY16-0001kN-Ml
+	(envelope-from <dgibson@ozlabs.org>) id 1fzY16-000287-Nr
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 22:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fzXrP-0007dM-3I
+	(envelope-from <dgibson@ozlabs.org>) id 1fzXrP-0007dV-3u
 	for qemu-devel@nongnu.org; Mon, 10 Sep 2018 21:53:02 -0400
-Date: Tue, 11 Sep 2018 11:48:21 +1000
+Date: Tue, 11 Sep 2018 11:49:38 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180911014821.GE7978@umbus.fritz.box>
+Message-ID: <20180911014938.GF7978@umbus.fritz.box>
 References: <20180910110222.8162-1-clg@kaod.org>
-	<20180910110222.8162-2-clg@kaod.org>
+	<20180910110222.8162-3-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gDGSpKKIBgtShtf+"
+	protocol="application/pgp-signature"; boundary="E7i4zwmWs5DOuDSH"
 Content-Disposition: inline
-In-Reply-To: <20180910110222.8162-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 1/3] spapr: introduce a spapr_irq class
- 'nr_msis' attribute
+In-Reply-To: <20180910110222.8162-3-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 2/3] spapr: increase the size of the IRQ
+ number space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +29,91 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
 
---gDGSpKKIBgtShtf+
+--E7i4zwmWs5DOuDSH
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 10, 2018 at 01:02:20PM +0200, C=E9dric Le Goater wrote:
-11;rgb:ffff/ffff/ffff> The number of MSI interrupts a sPAPR machine can all=
-ocate is in direct
-> relation with the number of interrupts of the sPAPRIrq backend. Define
-> statically this value at the sPAPRIrq class level.
+On Mon, Sep 10, 2018 at 01:02:21PM +0200, C=E9dric Le Goater wrote:
+> The new layout using static IRQ number does not leave much space to
+> the dynamic MSI range, only 0x100 IRQ numbers. Increase the total
+> number of IRQS for newer machines and introduce a legacy XICS backend
+> for pre-3.1 machines to maintain compatibility.
+>=20
+> For the old backend, provide a 'nr_msis' value covering the full IRQ
+> number space as it does not use the bitmap allocator to allocate MSI
+> interrupt numbers.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  include/hw/ppc/spapr_irq.h | 1 +
->  hw/ppc/spapr_irq.c         | 9 +++++++--
->  2 files changed, 8 insertions(+), 2 deletions(-)
+>  include/hw/ppc/spapr_irq.h |  1 +
+>  hw/ppc/spapr.c             |  1 +
+>  hw/ppc/spapr_irq.c         | 15 ++++++++++++++-
+>  3 files changed, 16 insertions(+), 1 deletion(-)
 >=20
 > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 0e98c4474bb2..650f810ad2aa 100644
+> index 650f810ad2aa..a467ce696ee4 100644
 > --- a/include/hw/ppc/spapr_irq.h
 > +++ b/include/hw/ppc/spapr_irq.h
-> @@ -31,6 +31,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+> @@ -41,6 +41,7 @@ typedef struct sPAPRIrq {
+>  } sPAPRIrq;
 > =20
->  typedef struct sPAPRIrq {
->      uint32_t    nr_irqs;
-> +    uint32_t    nr_msis;
+>  extern sPAPRIrq spapr_irq_xics;
+> +extern sPAPRIrq spapr_irq_xics_legacy;
 > =20
->      void (*init)(sPAPRMachineState *spapr, Error **errp);
->      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error **er=
-rp);
+>  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 4a9dd4d9bc14..eba7d60a30a7 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3971,6 +3971,7 @@ static void spapr_machine_3_0_class_options(Machine=
+Class *mc)
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_3_0);
+> =20
+>      smc->legacy_irq_allocation =3D true;
+> +    smc->irq =3D &spapr_irq_xics_legacy;
+>  }
+> =20
+>  DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
 > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 0cbb5dd39368..d369ac96f5cd 100644
+> index d369ac96f5cd..b14d7bce00ea 100644
 > --- a/hw/ppc/spapr_irq.c
 > +++ b/hw/ppc/spapr_irq.c
-> @@ -99,7 +99,7 @@ static void spapr_irq_init_xics(sPAPRMachineState *spap=
-r, Error **errp)
-> =20
->      /* Initialize the MSI IRQ allocator. */
->      if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> -        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ_MS=
-I);
-> +        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
->      }
-> =20
->      if (kvm_enabled()) {
-> @@ -195,8 +195,13 @@ static void spapr_irq_print_info_xics(sPAPRMachineSt=
-ate *spapr, Monitor *mon)
+> @@ -195,7 +195,7 @@ static void spapr_irq_print_info_xics(sPAPRMachineSta=
+te *spapr, Monitor *mon)
 >      ics_pic_print_info(spapr->ics, mon);
 >  }
 > =20
-> +#define SPAPR_IRQ_XICS_NR_IRQS     XICS_IRQS_SPAPR
-> +#define SPAPR_IRQ_XICS_NR_MSIS     \
-> +    (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-
-Uh.. I'm not quite understanding how XICS_IRQ_BASE gets into this.
-
->  sPAPRIrq spapr_irq_xics =3D {
-> -    .nr_irqs     =3D XICS_IRQS_SPAPR,
-> +    .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
-> +    .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
+> -#define SPAPR_IRQ_XICS_NR_IRQS     XICS_IRQS_SPAPR
+> +#define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+>  #define SPAPR_IRQ_XICS_NR_MSIS     \
+>      (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
 > =20
->      .init        =3D spapr_irq_init_xics,
->      .claim       =3D spapr_irq_claim_xics,
+> @@ -289,3 +289,16 @@ int spapr_irq_find(sPAPRMachineState *spapr, int num=
+, bool align, Error **errp)
+> =20
+>      return first + ics->offset;
+>  }
+> +
+> +#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     XICS_IRQS_SPAPR
+
+AFAICT this is the last user of XICS_IRQS_SPAPR, so better to put the
+constant right here, rather than copying it from a define with a
+misleading name.
+
+> +
+> +sPAPRIrq spapr_irq_xics_legacy =3D {
+> +    .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> +    .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> +
+> +    .init        =3D spapr_irq_init_xics,
+> +    .claim       =3D spapr_irq_claim_xics,
+> +    .free        =3D spapr_irq_free_xics,
+> +    .qirq        =3D spapr_qirq_xics,
+> +    .print_info  =3D spapr_irq_print_info_xics,
+> +};
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -99,24 +121,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gDGSpKKIBgtShtf+
+--E7i4zwmWs5DOuDSH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluXHuUACgkQbDjKyiDZ
-s5KSYxAAkqcD7ZWyv1RKFA7HmcvbQ3EYbBU2rKlmZ6eq0fwoGVG00yl3Ox6VxCfJ
-jpzPdlN8Tm0OllUrPOfPczRarWUg4GKeWOA3MLnkBC1XWmxkWXrhrtPvGIAiDMyv
-coIdNqfBxY6bgenUDwaTzdt/wJWsDbShesnL5NpIPXLzetnnGEzlEFBIimCBhnVw
-YE+K6OhpbYYjKhHH7GdeFVg2ciel5awVTRSewgZnQjYMMNsJJkRRWukV5tSsxEkc
-RH4UoAgQGmEhm4H4tpuJefKrwLuv7WcvclueRcNIYLt0ApKO3cmEbF2yO+rdevEs
-fBBH3byrf4QQVkKC9RhR41a4fO5CFm2/RhmLdQolwieAdE4GdURhsV11LSrVb8/t
-ZHFncKr5l+U6IK6w4Ub2QDwBrbxOKCsOS96DfFE0eexuoMh1VYb64D5pN/bqUkhe
-1fctRmL2hsylO9PVVWgFFZU1PUesxzsDKxUuvU/kVt3QSruZawIQoQ+iOXt+IYDC
-EsbalcZMUlWZBoWkv30QOKMtBjTm2IUflyU4+UKX77aBu3gU8HPZpnINqarMrEq+
-W/wcezgmDqPbepoqU5Xn7sp7B7VZzEvCisSxHUqvC1SDyMLBY5xLHVCDJmrjtJYQ
-JT3dciEjPm9a8R4Y33JRl9C8OkvDIPJjIAG5YEG+Jnz0rXtu1dM=
-=GPBY
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluXHzIACgkQbDjKyiDZ
+s5IIzQ//c+3Ay30p1E8yMS6EZW83dmk7OccBXPEzURGN6u+kc5EgelC2Jte4AwW3
+wsE9VH2YW/nBKr6l8xVhtsC9aXREt+sRkre2f7dkK+BRJbrsnyT/4niAuBSm1XG+
+kRhxLyqExlQPKO6Kotp/zry5Trz+YgwHlv1MbwBxksSwz0Ap58XdsepPZ/895w87
+cmWwfms1mpomWbryH5WskTLuCPCbW8bqSPYs8E2ooKTT8ViEtBJGAkeT2MlHb3Ww
+vGmqKmU+vkyZLQvPJ1SXGxMXNgKQnblmdQ/QMLz64MJMRxqn5RwuG0r6DjX1+blF
+SS/pjiqPsyBcUwWVEIWRFwID5XnvAt0LXAV0ZhS06lJthbmP7iTf3WXaV6un4qQq
+nCxMXWhJjbNYWv9yZ2/FkwexLOQsNnXgwP1n6D+tard2lTwgnbCn/7Q1XhS9NuAD
+IHq+j8DwZP1NeoPw2/Q2ye5P0b3X7Uud/WIGLLC346+EzynlOrqExZP/oAPioqJb
+Gtc3iQoMzccy+P1NxFjJXHfn2zH7jHjmcQZM8TjYNfjhXbRSC8amxFg+wLcRjo1B
+MnNsVTCfADNBmld3SsEbGuxZ4N72GmyUT41UCyuqskKb0oaa7K6L1V4gjeaMsLff
+0xxhYF6IaE8RDf7VgeHmcxaQw2p/Vwi8eGLHZugBdSbt40z7ML0=
+=kMyQ
 -----END PGP SIGNATURE-----
 
---gDGSpKKIBgtShtf+--
+--E7i4zwmWs5DOuDSH--
