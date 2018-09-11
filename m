@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fziVD-0002fb-MP
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:14:48 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fzirG-0001pb-1f
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:37:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fziVA-0003BC-JX
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:14:47 -0400
-References: <20180831145314.14736-1-marcandre.lureau@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fzibr-0006Lr-Qi
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:21:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58452 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fzibr-0006LP-G1
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:21:39 -0400
+References: <20180831233736.GA10164@roeck-us.net>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <13256e6e-cdac-59e2-ecf2-9f295a7d390d@redhat.com>
-Date: Tue, 11 Sep 2018 15:14:27 +0200
+Message-ID: <e0b4bcce-6513-5614-88b1-5ee445d1bcc8@redhat.com>
+Date: Tue, 11 Sep 2018 15:21:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180831145314.14736-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20180831233736.GA10164@roeck-us.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] util: add qemu_write_pidfile()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] PC Chipset: Improve serial divisor
+ calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Guenter Roeck <linux@roeck-us.net>, Calvin Lee <cyrus296@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-On 31/08/2018 16:53, Marc-Andr=C3=A9 Lureau wrote:
-> Hi,
->=20
-> Here are a few PID file related patches extracted from "[PATCH v4
-> 00/29] vhost-user for input & GPU" series, with suggestions from
-> Daniel Berrang=C3=A9.
->=20
-> thanks
->=20
-> Marc-Andr=C3=A9 Lureau (3):
->   util: add qemu_write_pidfile()
->   util: use fcntl() for qemu_write_pidfile() locking
->   RFC: delete PID file on exit
->=20
->  include/qemu/osdep.h  |  3 +-
->  os-posix.c            | 24 --------------
->  os-win32.c            | 25 ---------------
->  qga/main.c            | 54 ++++++--------------------------
->  scsi/qemu-pr-helper.c | 40 +++---------------------
->  util/oslib-posix.c    | 73 +++++++++++++++++++++++++++++++++++++++++++
->  util/oslib-win32.c    | 27 ++++++++++++++++
->  vl.c                  | 15 +++++++--
->  8 files changed, 129 insertions(+), 132 deletions(-)
->=20
+On 01/09/2018 01:37, Guenter Roeck wrote:
+> The patch results in an unexpected DLL register value. Here is the
+> surrounding code from drivers/tty/serial/pxa.c:
+> 
+> 	serial_out(up, UART_DLL, quot & 0xff);		/* LS of divisor */
+> 
+> 	/*
+> 	 * work around Errata #75 according to Intel(R) PXA27x
+> 	 * Processor Family Specification Update (Nov 2005)
+> 	 */
+> 	dll = serial_in(up, UART_DLL);
+> 	WARN_ON(dll != (quot & 0xff));	// <-- warning
+> 
+> Reverting the patch fixes the problem.
 
-Queued 1-2, thanks.
+I think it's a typo.  Can you try this:
+
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 251f40fdac..02463e3388 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -345,9 +345,9 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+     default:
+     case 0:
+         if (s->lcr & UART_LCR_DLAB) {
+-            if (size == 2) {
++            if (size == 1) {
+                 s->divider = (s->divider & 0xff00) | val;
+-            } else if (size == 4) {
++            } else {
+                 s->divider = val;
+             }
+             serial_update_parameters(s);
+
+Thanks,
 
 Paolo
