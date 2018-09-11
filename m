@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fzrDP-0004Vv-1L
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 18:33:00 -0400
+	(envelope-from <jcody@redhat.com>) id 1fzrDS-0004ls-C8
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 18:33:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fzrDJ-0006kL-Vr
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 18:32:58 -0400
+	(envelope-from <jcody@redhat.com>) id 1fzrDR-0006pV-F2
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 18:33:02 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 11 Sep 2018 18:32:31 -0400
-Message-Id: <15b332e5432ad069441f7275a46080f465d789a0.1536704901.git.jcody@redhat.com>
+Date: Tue, 11 Sep 2018 18:32:33 -0400
+Message-Id: <647f5b5ab7efd8bf567a504c832b1d2d6f719b23.1536704901.git.jcody@redhat.com>
 In-Reply-To: <cover.1536704901.git.jcody@redhat.com>
 References: <cover.1536704901.git.jcody@redhat.com>
 In-Reply-To: <cover.1536704901.git.jcody@redhat.com>
 References: <cover.1536704901.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/4] block/rbd: Attempt to parse legacy
- filenames
+Subject: [Qemu-devel] [PATCH v4 4/4] block/rbd: add deprecation
+ documentation for filename keyvalue pairs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +25,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com, libvir-list@redhat.com, mreitz@redhat.com, kwolf@redhat.com
 
-When we converted rbd to get rid of the older key/value-centric
-encoding format, we broke compatibility with image files with backing
-file strings encoded in the old format.
-
-This leaves a bit of an ugly conundrum, and a hacky solution.
-
-If the initial attempt to parse the "proper" options fails, it assumes
-that we may have an older key/value encoded filename.  Fall back to
-attempting to parse the filename, and extract the required options from
-it.  If that fails, pass along the original error message.
-
-We do not support mixed modern usage alongside legacy keyvalue pair
-usage.
-
-A deprecation warning has been added, although care should be taken
-when actually deprecating since the impact is not limited to
-commandline or qapi usage, but also opening existing images.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/rbd.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 51 insertions(+), 2 deletions(-)
+ qemu-deprecated.texi | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index b199450f9f..5090e4f662 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -678,6 +678,33 @@ static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
-     return 0;
- }
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 1b9c007f12..8d285b281e 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -190,6 +190,21 @@ used instead.
+ In order to prevent QEMU from automatically opening an image's backing
+ chain, use ``"backing": null'' instead.
  
-+static int qemu_rbd_attempt_legacy_options(QDict *options,
-+                                           BlockdevOptionsRbd **opts,
-+                                           char **keypairs)
-+{
-+    char *filename;
-+    int r;
++@subsubsection rbd keyvalue pair encoded filenames: "" (since 3.1.0)
 +
-+    filename = g_strdup(qdict_get_try_str(options, "filename"));
-+    if (!filename) {
-+        return -EINVAL;
-+    }
-+    qdict_del(options, "filename");
++Options for ``rbd'' should be specified according to its runtime options,
++like other block drivers.  Legacy parsing of keyvalue pair encoded
++filenames is useful to open images with the old format for backing files;
++These image files should be updated to use the current format.
 +
-+    qemu_rbd_parse_filename(filename, options, NULL);
++Example of legacy encoding:
 +
-+    /* keypairs freed by caller */
-+    *keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
-+    if (*keypairs) {
-+        qdict_del(options, "=keyvalue-pairs");
-+    }
++@code{json:@{"file.driver":"rbd", "file.filename":"rbd:rbd/name"@}}
 +
-+    r = qemu_rbd_convert_options(options, opts, NULL);
++The above, converted to the current supported format:
 +
-+    g_free(filename);
-+    return r;
-+}
++@code{json:@{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"@}}
 +
- static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
- {
-@@ -700,8 +727,30 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+ @subsection vio-spapr-device device options
  
-     r = qemu_rbd_convert_options(options, &opts, &local_err);
-     if (local_err) {
--        error_propagate(errp, local_err);
--        goto out;
-+        /* If keypairs are present, that means some options are present in
-+         * the modern option format.  Don't attempt to parse legacy option
-+         * formats, as we won't support mixed usage. */
-+        if (keypairs) {
-+            error_propagate(errp, local_err);
-+            goto out;
-+        }
-+
-+        /* If the initial attempt to convert and process the options failed,
-+         * we may be attempting to open an image file that has the rbd options
-+         * specified in the older format consisting of all key/value pairs
-+         * encoded in the filename.  Go ahead and attempt to parse the
-+         * filename, and see if we can pull out the required options. */
-+        r = qemu_rbd_attempt_legacy_options(options, &opts, &keypairs);
-+        if (r < 0) {
-+            error_propagate(errp, local_err);
-+            goto out;
-+        }
-+        /* Take care whenever deciding to actually deprecate; once this ability
-+         * is removed, we will not be able to open any images with legacy-styled
-+         * backing image strings. */
-+        error_report("RBD options encoded in the filename as keyvalue pairs "
-+                     "is deprecated.  Future versions may cease to parse "
-+                     "these options in the future.");
-     }
- 
-     /* Remove the processed options from the QDict (the visitor processes
+ @subsubsection "irq": "" (since 3.0.0)
 -- 
 2.17.1
