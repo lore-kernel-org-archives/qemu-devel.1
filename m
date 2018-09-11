@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fzhxC-0000iN-Po
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:39:39 -0400
+	(envelope-from <prvs=785d5c3bf=jancraig@amazon.com>)
+	id 1fzhxN-0000iK-5I
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:39:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fzhrc-0006V8-4i
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:33:57 -0400
-From: Alberto Garcia <berto@igalia.com>
-Date: Tue, 11 Sep 2018 15:32:56 +0300
-Message-Id: <20180911123256.23601-1-berto@igalia.com>
-Subject: [Qemu-devel] [PATCH] block: Don't call update_flags_from_options()
- if the options are wrong
+	(envelope-from <prvs=785d5c3bf=jancraig@amazon.com>)
+	id 1fzhqX-00053r-Es
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:32:49 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:46758)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=785d5c3bf=jancraig@amazon.com>)
+	id 1fzhqX-0004tf-6C
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:32:45 -0400
+From: "Janeczek, Craig" <jancraig@amazon.com>
+Date: Tue, 11 Sep 2018 12:27:28 +0000
+Message-ID: <ec22dcbb7c4b4dbabb5052a05524c1d1@EX13D12UEA003.ant.amazon.com>
+References: <20180830193019.20104-1-jancraig@amazon.com>
+	<BN7PR08MB48688D7CF58F3239D42AE18BC6020@BN7PR08MB4868.namprd08.prod.outlook.com>
+In-Reply-To: <BN7PR08MB48688D7CF58F3239D42AE18BC6020@BN7PR08MB4868.namprd08.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] Add limited MXU instruction support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,83 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-If qemu_opts_absorb_qdict() fails and we carry on and call
-update_flags_from_options() then that can result on a failed
-assertion:
+I plan on getting back to this development effort next week.
 
-   $ qemu-io -c 'reopen -o read-only=foo' hd.qcow2
-   block.c:1101: update_flags_from_options: Assertion `qemu_opt_find(opts, BDRV_OPT_CACHE_DIRECT)' failed.
-   Aborted
+-----Original Message-----
+From: Aleksandar Markovic <amarkovic@wavecomp.com>=20
+Sent: Wednesday, September 5, 2018 9:36 AM
+To: Janeczek, Craig <jancraig@amazon.com>; qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net
+Subject: Re: [PATCH v4 0/9] Add limited MXU instruction support
 
-This only happens in bdrv_reopen_queue_child(). Although this function
-doesn't return errors, we can simply keep the wrong options in the
-reopen queue and later bdrv_reopen_prepare() will fail.
+> From: Craig Janeczek <jancraig@amazon.com>
+> Sent: Thursday, August 30, 2018 9:30 PM
+>
+> Subject: [PATCH v4 0/9] Add limited MXU instruction support
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block.c                    | 11 +++++++++--
- tests/qemu-iotests/133     |  6 ++++++
- tests/qemu-iotests/133.out |  4 ++++
- 3 files changed, 19 insertions(+), 2 deletions(-)
+> This patch set begins to add MXU instruction support for mips emulation.
 
-diff --git a/block.c b/block.c
-index 0dbb1fcc7b..739d9073a6 100644
---- a/block.c
-+++ b/block.c
-@@ -2931,12 +2931,19 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
-     if (parent_options) {
-         QemuOpts *opts;
-         QDict *options_copy;
-+        Error *local_err = NULL;
-         assert(!flags);
-         role->inherit_options(&flags, options, parent_flags, parent_options);
-         options_copy = qdict_clone_shallow(options);
-         opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
--        qemu_opts_absorb_qdict(opts, options_copy, NULL);
--        update_flags_from_options(&flags, opts);
-+        qemu_opts_absorb_qdict(opts, options_copy, &local_err);
-+        /* Don't call update_flags_from_options() if the options are wrong.
-+         * bdrv_reopen_prepare() will later return an error. */
-+        if (!local_err) {
-+            update_flags_from_options(&flags, opts);
-+        } else {
-+            error_free(local_err);
-+        }
-         qemu_opts_del(opts);
-         qobject_unref(options_copy);
-     }
-diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
-index af6b3e1dd4..b9f17c996f 100755
---- a/tests/qemu-iotests/133
-+++ b/tests/qemu-iotests/133
-@@ -92,6 +92,12 @@ echo
- IMGOPTSSYNTAX=false $QEMU_IO -f null-co -c 'reopen' -c 'info' \
-     "json:{'driver': 'null-co', 'size': 65536}"
- 
-+echo
-+echo "=== Check that invalid options are handled correctly ==="
-+echo
-+
-+$QEMU_IO -c 'reopen -o read-only=foo' $TEST_IMG
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
-index f4a85aeb63..570f623b6b 100644
---- a/tests/qemu-iotests/133.out
-+++ b/tests/qemu-iotests/133.out
-@@ -24,4 +24,8 @@ Cannot change the option 'driver'
- 
- format name: null-co
- format name: null-co
-+
-+=== Check that invalid options are handled correctly ===
-+
-+Parameter 'read-only' expects 'on' or 'off'
- *** done
--- 
-2.11.0
+Hi, Craig,
+
+I mentioned some time ago that we planned to revamp translate.c. Related to=
+ that, I would like to tweak your whole series (this will be most of the ti=
+me moving code from place to place, and basically leaving your code intact,=
+ just reorganized differently; I'll try to collect most of the MXU code in =
+a separate file). To be efficient (avoid long explanation and email threads=
+), I would like to do it just after you submit v5 - I would then submit v6,=
+ and you would continue working on such modified series, creating v7 by you=
+rself etc., if needed.
+
+In relation to that, when do you plan to submit v5?
+
+Thanks,
+Aleksandar
