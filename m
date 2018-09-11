@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fzbjV-0001zC-7e
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 02:01:06 -0400
+	(envelope-from <famz@redhat.com>) id 1fzcK6-0002P5-QL
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 02:38:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fzbjQ-0005hQ-7d
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 02:01:05 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:49644)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fzbjP-0005gU-NO
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 02:01:00 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180820150903.1224-4-pbonzini@redhat.com>
-	<000001d43ea0$02146ed0$063d4c70$@ru>
-	<5b9a85eb-cefd-925c-b24b-95b93bbbfce8@redhat.com>
-	<000a01d448c8$4a55c0e0$df0142a0$@ru>
-	<ea5f162e-bd8a-001c-b78c-25378e3b2919@redhat.com>
-In-Reply-To: <ea5f162e-bd8a-001c-b78c-25378e3b2919@redhat.com>
-Date: Tue, 11 Sep 2018 09:00:58 +0300
-Message-ID: <001e01d44994$d02acb80$70806280$@ru>
+	(envelope-from <famz@redhat.com>) id 1fzcJr-0004KV-Cx
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 02:38:46 -0400
+Date: Tue, 11 Sep 2018 14:38:34 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180911063834.GA19292@lemon.usersys.redhat.com>
+References: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
+	<20180910204631.24106-2-mark.cave-ayland@ilande.co.uk>
+	<20180911012726.GB7978@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [3/4] cpus: protect TimerState writes with a
- spinlock
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180911012726.GB7978@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] lsi53c895a: add optional external
+ IRQ via qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,178 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "'Emilio G . Cota'" <cota@braap.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, hpoussin@reactos.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 10/09/2018 07:36, Pavel Dovgalyuk wrote:
-> > After locking here,
-> >
-> >>      if (runstate_is_running()) {
-> >>          int64_t clock = REPLAY_CLOCK(REPLAY_CLOCK_VIRTUAL_RT,
-> >>                                       cpu_get_clock_locked());
-> > REPLAY_CLOCK can't request icount with cpu_get_icount_raw, because
-> > it loops infinitely here:
-> >
-> >     do {
-> >         start = seqlock_read_begin(&timers_state.vm_clock_seqlock);
-> >         icount = cpu_get_icount_raw_locked();
-> >     } while (seqlock_read_retry(&timers_state.vm_clock_seqlock, start));
+On Tue, 09/11 11:27, David Gibson wrote:
+> On Mon, Sep 10, 2018 at 09:46:30PM +0100, Mark Cave-Ayland wrote:
+> > On some early machines the on-board PCI devices IRQs are wired directly to
+> > the interrupt controller instead of via the PCI host bridge.
+> > 
+> > Add an optional external IRQ that if wired up via qdev will replace the
+> > in-built PCI IRQ.
+> > 
+> > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > 
-> Yeah, I meant to ask for the backtrace but I can see that the issue is in
-> replay_save_instructions().  Does this work?
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> 
+> Fam, if I get an Acked-by from you I'm happy to take this through my tree.
 
-Thanks, that works. Here is the updated diff (stubs were added).
-Will you apply it?
+This looks good to me, but I'm only 'R:' of scsi code. You'd perhaps need Paolo
+to ack.  But anyway:
 
+Reviewed-by: Fam Zheng <famz@redhat.com>
 
-Pavel Dovgalyuk
-
-
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 3ced6bc..bb8660b 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -100,14 +100,20 @@ bool replay_has_interrupt(void);
- /* Processing clocks and other time sources */
- 
- /*! Save the specified clock */
--int64_t replay_save_clock(ReplayClockKind kind, int64_t clock);
-+int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
-+                          int64_t raw_icount);
- /*! Read the specified clock from the log or return cached data */
- int64_t replay_read_clock(ReplayClockKind kind);
- /*! Saves or reads the clock depending on the current replay mode. */
- #define REPLAY_CLOCK(clock, value)                                      \
-     (replay_mode == REPLAY_MODE_PLAY ? replay_read_clock((clock))       \
-         : replay_mode == REPLAY_MODE_RECORD                             \
--            ? replay_save_clock((clock), (value))                       \
-+            ? replay_save_clock((clock), (value), cpu_get_icount_raw()) \
-+        : (value))
-+#define REPLAY_CLOCK_LOCKED(clock, value)                               \
-+    (replay_mode == REPLAY_MODE_PLAY ? replay_read_clock((clock))       \
-+        : replay_mode == REPLAY_MODE_RECORD                             \
-+            ? replay_save_clock((clock), (value), cpu_get_icount_raw_locked()) 
-         : (value))
- 
- /* Events */
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index ac4b27b..4f82676 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -122,6 +122,8 @@ void replay_finish_event(void);
-     data_kind variable. */
- void replay_fetch_data_kind(void);
- 
-+/*! Advance replay_state.current_step to the specified value. */
-+void replay_advance_current_step(uint64_t current_step);
- /*! Saves queued events (like instructions and sound). */
- void replay_save_instructions(void);
- 
-diff --git a/cpus.c b/cpus.c
-index 8ee6e5d..f257a6e 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -502,8 +502,8 @@ static void icount_warp_rt(void)
-     seqlock_write_lock(&timers_state.vm_clock_seqlock,
-                        &timers_state.vm_clock_lock);
-     if (runstate_is_running()) {
--        int64_t clock = REPLAY_CLOCK(REPLAY_CLOCK_VIRTUAL_RT,
--                                     cpu_get_clock_locked());
-+        int64_t clock = REPLAY_CLOCK_LOCKED(REPLAY_CLOCK_VIRTUAL_RT,
-+                                            cpu_get_clock_locked());
-         int64_t warp_delta;
- 
-         warp_delta = clock - timers_state.vm_clock_warp_start;
-diff --git a/replay/replay-internal.c b/replay/replay-internal.c
-index b077cb5..7be4c01 100644
---- a/replay/replay-internal.c
-+++ b/replay/replay-internal.c
-@@ -217,20 +217,25 @@ void replay_mutex_unlock(void)
-     }
- }
- 
-+void replay_advance_current_step(uint64_t current_step)
-+{
-+    int diff = (int)(current_step - replay_state.current_step);
-+
-+    /* Time can only go forward */
-+    assert(diff >= 0);
-+
-+    if (diff > 0) {
-+        replay_put_event(EVENT_INSTRUCTION);
-+        replay_put_dword(diff);
-+        replay_state.current_step += diff;
-+    }
-+}
-+
- /*! Saves cached instructions. */
- void replay_save_instructions(void)
- {
-     if (replay_file && replay_mode == REPLAY_MODE_RECORD) {
-         g_assert(replay_mutex_locked());
--        int diff = (int)(replay_get_current_step() - replay_state.current_step)
--
--        /* Time can only go forward */
--        assert(diff >= 0);
--
--        if (diff > 0) {
--            replay_put_event(EVENT_INSTRUCTION);
--            replay_put_dword(diff);
--            replay_state.current_step += diff;
--        }
-+        replay_advance_current_step(replay_get_current_step());
-     }
- }
-diff --git a/replay/replay-time.c b/replay/replay-time.c
-index 6a7565e..17caf35 100644
---- a/replay/replay-time.c
-+++ b/replay/replay-time.c
-@@ -15,13 +15,15 @@
- #include "replay-internal.h"
- #include "qemu/error-report.h"
- 
--int64_t replay_save_clock(ReplayClockKind kind, int64_t clock)
-+int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t raw_icou
- {
--
-     if (replay_file) {
-         g_assert(replay_mutex_locked());
- 
--        replay_save_instructions();
-+        /* Due to the caller's locking requirements we get the icount from it i
-+         * of using replay_save_instructions().
-+         */
-+        replay_advance_current_step(raw_icount);
-         replay_put_event(EVENT_CLOCK + kind);
-         replay_put_qword(clock);
-     }
-diff --git a/stubs/cpu-get-icount.c b/stubs/cpu-get-icount.c
-index 0b7239d..35f0c1e 100644
---- a/stubs/cpu-get-icount.c
-+++ b/stubs/cpu-get-icount.c
-@@ -11,6 +11,11 @@ int64_t cpu_get_icount(void)
-     abort();
- }
- 
-+int64_t cpu_get_icount_raw(void)
-+{
-+    abort();
-+}
-+
- void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
- {
-     qemu_notify_event();
-diff --git a/stubs/replay.c b/stubs/replay.c
-index 04279ab..4ac6078 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -4,7 +4,7 @@
- 
- ReplayMode replay_mode;
- 
--int64_t replay_save_clock(unsigned int kind, int64_t clock)
-+int64_t replay_save_clock(unsigned int kind, int64_t clock, int64_t raw_icount)
- {
-     abort();
-     return 0;
+> 
+> > ---
+> >  hw/scsi/lsi53c895a.c | 16 ++++++++++++++--
+> >  1 file changed, 14 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+> > index f5cbbf653c..996b40650d 100644
+> > --- a/hw/scsi/lsi53c895a.c
+> > +++ b/hw/scsi/lsi53c895a.c
+> > @@ -207,6 +207,7 @@ typedef struct {
+> >      PCIDevice parent_obj;
+> >      /*< public >*/
+> >  
+> > +    qemu_irq ext_irq;
+> >      MemoryRegion mmio_io;
+> >      MemoryRegion ram_io;
+> >      MemoryRegion io_io;
+> > @@ -443,9 +444,19 @@ static void lsi_stop_script(LSIState *s)
+> >      s->istat1 &= ~LSI_ISTAT1_SRUN;
+> >  }
+> >  
+> > -static void lsi_update_irq(LSIState *s)
+> > +static void lsi_set_irq(LSIState *s, int level)
+> >  {
+> >      PCIDevice *d = PCI_DEVICE(s);
+> > +
+> > +    if (s->ext_irq) {
+> > +        qemu_set_irq(s->ext_irq, level);
+> > +    } else {
+> > +        pci_set_irq(d, level);
+> > +    }
+> > +}
+> > +
+> > +static void lsi_update_irq(LSIState *s)
+> > +{
+> >      int level;
+> >      static int last_level;
+> >      lsi_request *p;
+> > @@ -477,7 +488,7 @@ static void lsi_update_irq(LSIState *s)
+> >                  level, s->dstat, s->sist1, s->sist0);
+> >          last_level = level;
+> >      }
+> > -    pci_set_irq(d, level);
+> > +    lsi_set_irq(s, level);
+> >  
+> >      if (!level && lsi_irq_on_rsl(s) && !(s->scntl1 & LSI_SCNTL1_CON)) {
+> >          DPRINTF("Handled IRQs & disconnected, looking for pending "
+> > @@ -2213,6 +2224,7 @@ static void lsi_scsi_realize(PCIDevice *dev, Error **errp)
+> >                            "lsi-io", 256);
+> >  
+> >      address_space_init(&s->pci_io_as, pci_address_space_io(dev), "lsi-pci-io");
+> > +    qdev_init_gpio_out(d, &s->ext_irq, 1);
+> >  
+> >      pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io_io);
+> >      pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mmio_io);
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
