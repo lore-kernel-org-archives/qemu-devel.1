@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fziMh-0000Wg-Ja
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:06:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fziQ9-0005Az-0y
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fziMg-00076s-3U
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:05:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44362 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fziQ5-0000jA-TT
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:09:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44776 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fziMc-0006zz-Az
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:05:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 26F3B406F8B9
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 13:05:46 +0000 (UTC)
-References: <20180906161415.8543-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fziQ5-0000is-En
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:09:29 -0400
+References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ca74abb2-337e-5245-f3d3-20edb4821ca3@redhat.com>
-Date: Tue, 11 Sep 2018 15:05:40 +0200
+Message-ID: <120d75f8-24f7-641a-9b30-4a1ebfbca34d@redhat.com>
+Date: Tue, 11 Sep 2018 15:09:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180906161415.8543-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20180907075948.26917-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hostmem-memfd: add checks before adding
- hostmem-memfd & properties
+Subject: Re: [Qemu-devel] [PATCH v2 00/12] Various qemu command line options
+ help improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,206 +29,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, eblake@redhat.com
 
-On 06/09/2018 18:14, Marc-Andr=C3=A9 Lureau wrote:
-> Run some memfd-related checks before registering hostmem-memfd &
-> various properties. This will help libvirt to figure out what the host
-> is supposed to be capable of.
+On 07/09/2018 09:59, Marc-Andr=C3=A9 Lureau wrote:
+> Hi,
 >=20
-> qemu_memfd_check() is changed to a less optimized version, since it is
-> used with various flags, it no longer caches the result.
+> This is a compilation of patches I have to improve command line help
+> support. The "qemu-option" patches have already been sent earlier, I
+> modified the first to fix an issue reported by Markus. The other
+> patches add support for -object help. A few related patches for QOM,
+> to fix/improve some minor issues.
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/qemu/memfd.h     | 18 +++++++++++++++++-
->  backends/hostmem-memfd.c | 32 +++++++++++++++++++-------------
->  tests/vhost-user-test.c  |  6 +++---
->  util/memfd.c             | 35 ++++++-----------------------------
->  4 files changed, 45 insertions(+), 46 deletions(-)
->=20
-> diff --git a/include/qemu/memfd.h b/include/qemu/memfd.h
-> index 49e79634da..d551c28b68 100644
-> --- a/include/qemu/memfd.h
-> +++ b/include/qemu/memfd.h
-> @@ -16,12 +16,28 @@
->  #define F_SEAL_WRITE    0x0008  /* prevent writes */
->  #endif
-> =20
-> +#ifndef MFD_CLOEXEC
-> +#define MFD_CLOEXEC 0x0001U
-> +#endif
-> +
-> +#ifndef MFD_ALLOW_SEALING
-> +#define MFD_ALLOW_SEALING 0x0002U
-> +#endif
-> +
-> +#ifndef MFD_HUGETLB
-> +#define MFD_HUGETLB 0x0004U
-> +#endif
-> +
-> +#ifndef MFD_HUGE_SHIFT
-> +#define MFD_HUGE_SHIFT 26
-> +#endif
-> +
->  int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
->                        uint64_t hugetlbsize, unsigned int seals, Error =
-**errp);
->  bool qemu_memfd_alloc_check(void);
->  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int sea=
-ls,
->                         int *fd, Error **errp);
->  void qemu_memfd_free(void *ptr, size_t size, int fd);
-> -bool qemu_memfd_check(void);
-> +bool qemu_memfd_check(unsigned int flags);
-> =20
->  #endif /* QEMU_MEMFD_H */
-> diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> index 7184918112..ccf70a0694 100644
-> --- a/backends/hostmem-memfd.c
-> +++ b/backends/hostmem-memfd.c
-> @@ -138,18 +138,22 @@ memfd_backend_class_init(ObjectClass *oc, void *d=
-ata)
-> =20
->      bc->alloc =3D memfd_backend_memory_alloc;
-> =20
-> -    object_class_property_add_bool(oc, "hugetlb",
-> -                                   memfd_backend_get_hugetlb,
-> -                                   memfd_backend_set_hugetlb,
-> -                                   &error_abort);
-> -    object_class_property_add(oc, "hugetlbsize", "int",
-> -                              memfd_backend_get_hugetlbsize,
-> -                              memfd_backend_set_hugetlbsize,
-> -                              NULL, NULL, &error_abort);
-> -    object_class_property_add_bool(oc, "seal",
-> -                                   memfd_backend_get_seal,
-> -                                   memfd_backend_set_seal,
-> -                                   &error_abort);
-> +    if (qemu_memfd_check(MFD_HUGETLB)) {
-> +        object_class_property_add_bool(oc, "hugetlb",
-> +                                       memfd_backend_get_hugetlb,
-> +                                       memfd_backend_set_hugetlb,
-> +                                       &error_abort);
-> +        object_class_property_add(oc, "hugetlbsize", "int",
-> +                                  memfd_backend_get_hugetlbsize,
-> +                                  memfd_backend_set_hugetlbsize,
-> +                                  NULL, NULL, &error_abort);
-> +    }
-> +    if (qemu_memfd_check(MFD_ALLOW_SEALING)) {
-> +        object_class_property_add_bool(oc, "seal",
-> +                                       memfd_backend_get_seal,
-> +                                       memfd_backend_set_seal,
-> +                                       &error_abort);
-> +    }
->  }
-> =20
->  static const TypeInfo memfd_backend_info =3D {
-> @@ -162,7 +166,9 @@ static const TypeInfo memfd_backend_info =3D {
-> =20
->  static void register_types(void)
->  {
-> -    type_register_static(&memfd_backend_info);
-> +    if (qemu_memfd_check(0)) {
-> +        type_register_static(&memfd_backend_info);
-> +    }
->  }
-> =20
->  type_init(register_types);
-> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-> index 716aff7153..45d58d8ea2 100644
-> --- a/tests/vhost-user-test.c
-> +++ b/tests/vhost-user-test.c
-> @@ -169,7 +169,7 @@ static char *get_qemu_cmd(TestServer *s,
->                            int mem, enum test_memfd memfd, const char *=
-mem_path,
->                            const char *chr_opts, const char *extra)
->  {
-> -    if (memfd =3D=3D TEST_MEMFD_AUTO && qemu_memfd_check()) {
-> +    if (memfd =3D=3D TEST_MEMFD_AUTO && qemu_memfd_check(0)) {
->          memfd =3D TEST_MEMFD_YES;
->      }
-> =20
-> @@ -903,7 +903,7 @@ static void test_multiqueue(void)
->      s->queues =3D 2;
->      test_server_listen(s);
-> =20
-> -    if (qemu_memfd_check()) {
-> +    if (qemu_memfd_check(0)) {
->          cmd =3D g_strdup_printf(
->              QEMU_CMD_MEMFD QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=3D%d =
-"
->              "-device virtio-net-pci,netdev=3Dnet0,mq=3Don,vectors=3D%d=
-",
-> @@ -963,7 +963,7 @@ int main(int argc, char **argv)
->      /* run the main loop thread so the chardev may operate */
->      thread =3D g_thread_new(NULL, thread_function, loop);
-> =20
-> -    if (qemu_memfd_check()) {
-> +    if (qemu_memfd_check(0)) {
->          qtest_add_data_func("/vhost-user/read-guest-mem/memfd",
->                              GINT_TO_POINTER(TEST_MEMFD_YES),
->                              test_read_guest_mem);
-> diff --git a/util/memfd.c b/util/memfd.c
-> index d248a53c3c..c4bd076182 100644
-> --- a/util/memfd.c
-> +++ b/util/memfd.c
-> @@ -45,22 +45,6 @@ static int memfd_create(const char *name, unsigned i=
-nt flags)
->  }
->  #endif
-> =20
-> -#ifndef MFD_CLOEXEC
-> -#define MFD_CLOEXEC 0x0001U
-> -#endif
-> -
-> -#ifndef MFD_ALLOW_SEALING
-> -#define MFD_ALLOW_SEALING 0x0002U
-> -#endif
-> -
-> -#ifndef MFD_HUGETLB
-> -#define MFD_HUGETLB 0x0004U
-> -#endif
-> -
-> -#ifndef MFD_HUGE_SHIFT
-> -#define MFD_HUGE_SHIFT 26
-> -#endif
-> -
->  int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
->                        uint64_t hugetlbsize, unsigned int seals, Error =
-**errp)
->  {
-> @@ -200,23 +184,16 @@ bool qemu_memfd_alloc_check(void)
->   *
->   * Check if host supports memfd.
->   */
-> -bool qemu_memfd_check(void)
-> +bool qemu_memfd_check(unsigned int flags)
->  {
->  #ifdef CONFIG_LINUX
-> -    static int memfd_check =3D MEMFD_TODO;
-> +    int mfd =3D memfd_create("test", flags);
-> =20
-> -    if (memfd_check =3D=3D MEMFD_TODO) {
-> -        int mfd =3D memfd_create("test", 0);
-> -        if (mfd >=3D 0) {
-> -            memfd_check =3D MEMFD_OK;
-> -            close(mfd);
-> -        } else {
-> -            memfd_check =3D MEMFD_KO;
-> -        }
-> +    if (mfd >=3D 0) {
-> +        close(mfd);
-> +        return true;
->      }
-> +#endif
-> =20
-> -    return memfd_check =3D=3D MEMFD_OK;
-> -#else
->      return false;
-> -#endif
->  }
->=20
+> v2: after Eric Blake review
+> - add "qdev-monitor: print help to stdout"
+> - add "cutils: add qemu_pstrcmp"
+> - use consistently "arg=3Dtype - desc" help format
 
-Queued, thanks.
+Feel free to send a pull request yourself with the minor fixes requested
+during review.
 
 Paolo
+
+> Marc-Andr=C3=A9 Lureau (12):
+>   qdev-monitor: print help to stdout
+>   cutils: add qemu_pstrcmp
+>   qemu-option: add help fallback to print the list of options
+>   qemu-option: improve qemu_opts_print_help() output
+>   qom/object: fix iterating properties over a class
+>   qom/object: register 'type' property as class property
+>   tests/qom-proplist: check duplicate "bv" property registration failed
+>   tests/qom-proplist: check properties are not listed multiple times
+>   tests/qom-proplist: check class properties iterator
+>   vl: handle -object help
+>   hostmem: add some properties description
+>   vl: list user creatable properties when 'help' is argument
+>=20
+>  include/monitor/monitor.h  |  2 ++
+>  include/qemu/cutils.h      | 12 +++++++
+>  backends/hostmem-memfd.c   |  9 +++++
+>  backends/hostmem.c         | 14 ++++++++
+>  monitor.c                  | 16 +++++++--
+>  qdev-monitor.c             | 32 ++++++++++-------
+>  qom/object.c               |  9 ++---
+>  qom/object_interfaces.c    |  6 ++--
+>  tests/check-qom-proplist.c | 58 ++++++++++++++++++++-----------
+>  util/cutils.c              |  5 +++
+>  util/qemu-option.c         | 71 +++++++++++++++++++++++++++++++-------
+>  vl.c                       | 53 ++++++++++++++++++++++++++--
+>  12 files changed, 227 insertions(+), 60 deletions(-)
+>=20
