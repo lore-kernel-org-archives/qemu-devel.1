@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fziLw-0007pk-MT
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:05:18 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fziM2-0007xu-TK
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 09:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fziEP-0002yD-Co
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:57:28 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41983)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fziEP-0002xp-4T
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:57:25 -0400
-Received: by mail-pl1-x642.google.com with SMTP id b12-v6so11293767plr.8
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 05:57:25 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fziD9-0002W4-BL
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:56:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39684 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fziD9-0002Vi-59
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:56:07 -0400
 References: <20180910232752.31565-1-cota@braap.org>
-	<20180910232752.31565-12-cota@braap.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <625a1e52-e2e3-51dd-be03-bae4dcf831b4@twiddle.net>
-Date: Tue, 11 Sep 2018 05:57:21 -0700
+	<20180910232752.31565-9-cota@braap.org>
+	<9ef6906f-7fbc-1b41-b5f3-3fd5c9a87e5b@twiddle.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <23bf97d3-d2af-24ea-17e2-9186453dc4de@redhat.com>
+Date: Tue, 11 Sep 2018 14:55:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180910232752.31565-12-cota@braap.org>
+In-Reply-To: <9ef6906f-7fbc-1b41-b5f3-3fd5c9a87e5b@twiddle.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/12] target/i386/translate: use
- thread-local storage in !user-mode
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/12] cpus: always call seqlock_write
+ in cpu_update_icount
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+To: Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
 
-On 09/10/2018 04:27 PM, Emilio G. Cota wrote:
-> Needed for MTTCG.
-> 
-> Note that in user-mode, code generation is serialized by
-> mmap_lock, so making these variables per-thread would
-> just waste TLS space.
-> 
-> Acked-by: Alex Bennée <alex.bennee@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
+On 11/09/2018 14:53, Richard Henderson wrote:
+>>  
+>> -#ifndef CONFIG_ATOMIC64
+>>      seqlock_write_lock(&timers_state.vm_clock_seqlock,
+>>                         &timers_state.vm_clock_lock);
+>> -#endif
+>>      atomic_set__nocheck(&timers_state.qemu_icount,
+>>                          timers_state.qemu_icount + executed);
+>> -#ifndef CONFIG_ATOMIC64
+>>      seqlock_write_unlock(&timers_state.vm_clock_seqlock,
+>>                           &timers_state.vm_clock_lock);
+>> -#endif
+> I don't understand this.  Surely you either want atomic64_set,
+> or an actual atomic64_add, but no extra lock when CONFIG_ATOMIC64.
 
-This is ok for now, but we really really should move these into DisasContext.
+Even though writes of qemu_icount can safely race with reads in
+qemu_icount_raw, qemu_icount is also read by icount_adjust, which runs
+in the I/O thread.  Therefore, writes do need protection of the
+vm_clock_lock; for simplicity Emilio's patch protects it with both
+seqlock+spinlock, which we already do for hosts that lack 64-bit atomics.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+The bug actually predated the introduction of vm_clock_lock;
+cpu_update_icount would have needed the BQL before the spinlock was
+introduced.
 
+The above could have been a commit message, by the way. :)
 
-r~
+Paolo
