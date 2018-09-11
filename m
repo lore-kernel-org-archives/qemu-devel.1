@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fzeh5-0006DS-4s
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:10:48 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fzemj-0000S5-SO
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fzeh1-00079T-MF
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:10:46 -0400
-Date: Tue, 11 Sep 2018 11:10:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180911091005.GA3994@localhost.localdomain>
-References: <20180809213528.14738-1-mreitz@redhat.com>
-	<20180910151848.GJ4901@dhcp-200-186.str.redhat.com>
-	<a043566e-f794-5be0-b0dd-29490f735486@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fzemi-0001aC-Rm
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:16:37 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42250)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fzemi-0001ZK-K1
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:16:36 -0400
+Received: by mail-wr1-x444.google.com with SMTP id v17-v6so24900903wrr.9
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 02:16:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EeQfGwPcQSOJBaQU"
-Content-Disposition: inline
-In-Reply-To: <a043566e-f794-5be0-b0dd-29490f735486@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-3.1 v10 00/31] block: Fix some filename
- generation issues
+References: <20180713130916.4153-1-marcandre.lureau@redhat.com>
+	<20180829095035.GI31005@redhat.com>
+	<CAMxuvayUDC+dZegONEwto36qTqaJFUEF9UrvNiY+1HJ_6nrzYg@mail.gmail.com>
+	<CAJ+F1CKcSkd6aKPBss6eNtaD8-NonafNdyLB_66BsH5sKParPA@mail.gmail.com>
+	<20180911085928.rp5drknyoqcvs4xf@sirius.home.kraxel.org>
+In-Reply-To: <20180911085928.rp5drknyoqcvs4xf@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 11 Sep 2018 13:16:22 +0400
+Message-ID: <CAJ+F1CKPz=qnez+_9g6rDVrgW8bQTL9A90kJwO2TB7N6G1nGSw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 00/29] vhost-user for input & GPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +33,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, David Airlie <airlied@redhat.com>, QEMU <qemu-devel@nongnu.org>
+
+Hi
+
+On Tue, Sep 11, 2018 at 12:59 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> > > >  $ ./vhost-user-gpu --virgl -s vgpu.sock &
+> > > >  $ qemu...
+> > > >    -chardev socket,id=3Dchr,path=3Dvgpu.sock
+> > > >    -object vhost-user-backend,id=3Dvug,chardev=3Dchr
+> > > >    -device vhost-user-vga,vhost-user=3Dvug
+> > >
+> > > That's a bit incovenient for qemu command line users. But who runs
+> > > qemu this way but some developers? (others have higher-level scripts =
+/
+> > > tools or libvirt)
+>
+> In practice this will *allways* run over a unix socket, right?
+> So I'm wondering whenever it makes sense to take the chardev
+> indirection here ...
+
+The management layer can set things up and pass fd around, avoiding
+socket paths etc.
+
+>
+> > I suggest the vhost-user binary (vhost-user-gpu or vhost-user-input
+> > etc), the default binary be in the system PATH, so that libvirt & co
+> > can find it. Host administrator can use update-alternative or such if
+> > they are other implementations. (other selections mechanisms can be
+> > added later)
+>
+> Might make sense to place them in /usr/libexec instead.
+
+ok (slightly less convenient for command line users though)
+
+>
+> > I thinks the vhost-user backends could have the following common
+> > options handling:
+> > - take a "--fd=3DFDNUM" argument, that would indicate which fd the
+> > socket has been passed on.
+>
+> Which is what libvirt would use, right?
+
+yes (see the related libvirt series / branch)
+
+>
+> > - OR take a "--socket-path=3DPATH"
+>
+> Convinient when not using libvirt, looks ok to me.
+>
+> > - optionally? take a "--pid=3DPATH" argument, to write out the process =
+PID
+>
+> Do we need that?  When libvirt forks off the process it knows the PID
+> without pidfile, right?
+
+Yes I am not sure it is strictly necessary (that's why I put
+optionally). The helper could fork itself, for various reasons.
+
+>
+> > We probably need a way to list the capabilities of the backend.:
+> > --dump-caps, could list known keywords, one per line? (grab, virgl,
+> > opengles, etc...)
+>
+> Hmm, good question.
+>
+> I'd tend include more information here.  Such as a description of the
+> capability.  The command line switch to enable it.  Print as json, we
+> have support in both qemu and libvirt.  Something like
+>
+>   [ 'name'   : 'vulkan',
+>     'help'   : 'enable virgl vulkan support',
+>     'switch' : '--enable-vulkan' ]
+>
+
+I wouldn't go so far as describing the command line arguments here. Or
+else, we will have to specify the argument type etc.
+Instead, I would use a  list of well-known keywords, described in the
+specification.
+
+"vulkan" caps would mean that --enable-vulkan (without argument) is
+accepted and has an expected behaviour (to handle vulkan commands /
+rendering etc)
+
+I don't see a problem putting the list in a json array, but I don't
+see much benefit either doing it.
+
+> What would libvirt like to consume here?  Would it actually be able to
+> use whatever it finds there?  Or would libvirt look for specific known
+> features only, matching them with domain xml attributes?
+
+I am not sure I understand the qestion. libvirt would deal with the
+binary capabilities like it deals with qemu capabilities.
+
+It would use the best combination of options given a domain XML and
+the capabilities.
+
+If the domain XML requests a feature that the backend is not able to
+support, it would provide a sensible error.
+
+Unknown capabilities would be ignored.
+
+>
+> > Other options may vary based on the backend type, for ex:
+> > - vhost-user-input EVDEV-PATH (required)
+>
+> I'd go for "--evdev-path=3D/dev/input/..." syntax even for mandatory
+> arguments.
+
+ok
+
+>
+> > - vhost-user-gpu --render-node=3DPATH (optional)
+> >
+> > I am not sure how this should be documented.
+>
+> docs/specs/ ?
+
+ok, I suppose I can start some document and include libvir-list for discuss=
+ion.
 
 
---EeQfGwPcQSOJBaQU
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 10.09.2018 um 18:51 hat Max Reitz geschrieben:
-> On 10.09.18 17:18, Kevin Wolf wrote:
-> > Am 09.08.2018 um 23:34 hat Max Reitz geschrieben:
-> >> Once more, I=E2=80=99ll spare both me and you another iteration of the=
- cover
-> >> letter, so see here:
-> >>
-> >> http://lists.nongnu.org/archive/html/qemu-block/2017-09/msg01030.html
-> >>
-> >> (Although this series no longer includes a @base-directory option.)
-> >>
-> >> In regards to the last version, the biggest change is that I dropped
-> >> backing_overridden and instead try to compare the filename from the
-> >> image header with the filename of the actual backing BDS to find out
-> >> whether the backing file has been overridden.
-> >>
-> >> In order that this doesn=E2=80=99t break whenever the header contains =
-a slightly
-> >> unusual (=E2=80=9Cnon-canonical=E2=80=9D) backing filename (e.g. =E2=
-=80=9Cfile:foo.qcow2=E2=80=9D or
-> >> =E2=80=9Cnbd:localhost:10809=E2=80=9D instead of =E2=80=9Cnbd://localh=
-ost:10809=E2=80=9D, i.e. something
-> >> different from what bdrv_refresh_filename() would generate), when the
-> >> reference filename in the BDS (auto_backing_file) is used to open the
-> >> backing file, it is updated from the backing BDS's resulting filename.
-> >=20
-> > This doesn't seem to apply cleanly any more.
->=20
-> I know, but is that a "Please send your current v11 to the list"?
-
-Depends on how urgently you want me to review this. I don't like
-reviewing patches directly from emails, without being able to apply
-them.
-
-Or maybe if you just can give me the commit ID this is based on? I
-wouldn't mind applying it to an old tree as long as I can apply it
-somewhere.
-
-Kevin
-
---EeQfGwPcQSOJBaQU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJbl4ZtAAoJEH8JsnLIjy/WFMIP/0PyehY4HTH/jt/pvHJK4WjO
-h1BQIg+Tr3GMg+8C22uy4XDZsmYwOQooxbDpj0kXhXwjAJvV1WyYK4PFtypHiQnt
-3v71/ax25JnVHFolRomO/j20iCbrPNkahGyJVzv6yKB690EIxsk/Adr+xNrSNZnd
-W5DPs2UqA6PWSbP7FABFzMsHLJnXqfXZ4Fe6/Cm9hst1RQwrZ9O8ufP3z2mzx7aG
-LBP1qOdNjuZvWbk4R3oq+unxlPSSNY0K3bXFJ95TTMC4+pydQuPzaIWUmLyTBtyf
-TO1mLB2/4Ixn3yjjvxvSm3RBzxCV0o7csHNduxMU+Loy+8o5gW7EfzF6TzFZciP4
-rAzwE9mFaVooEJ1ugB8nMifvVypHo1Mfa6slwOxl3nqJ9AjwlIFmEIfZ8ss3XZMD
-zudeAMZNsWzfCegeZjnCybYGWhU+7ABeb4uddlkl0vPkVABZzUPOuFen/YQwJ3UU
-/VZQszXFOhL4ZHmyz+FAPHopDCnawO2hbUbHw9SWQYGRV/FySO+bGdjzXh9U8ALF
-QR4gnurYZ23bW2+DdVo8SgRhHgFGWGW71H2V6UeDt/wyHzx9gQuHbU+vn0xjZWFX
-+6TLzZe4CrG7SwJrKYX1Ntccy3ues/NjyCPI0x/vgzRTd5R89K+dsH4b/tH9Zy6e
-JYaf94QvZZeNqTtmBz6C
-=nPrX
------END PGP SIGNATURE-----
-
---EeQfGwPcQSOJBaQU--
+--=20
+Marc-Andr=C3=A9 Lureau
