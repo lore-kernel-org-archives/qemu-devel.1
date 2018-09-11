@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fzqZO-0002pE-Ag
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 17:51:44 -0400
+	(envelope-from <groeck7@gmail.com>) id 1fzqt3-0006Gk-LQ
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 18:12:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fzqJi-00028g-QS
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 17:35:27 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 11 Sep 2018 17:34:52 -0400
-Message-Id: <cover.1536701561.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/4] block/rbd: enable filename parsing on
- open
+	(envelope-from <groeck7@gmail.com>) id 1fzqhI-0004UE-Tp
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 17:59:56 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33016)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1fzqhI-0004Dg-HZ
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 17:59:48 -0400
+Received: by mail-pl1-x642.google.com with SMTP id b30-v6so9665274pla.0
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 14:59:33 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Tue, 11 Sep 2018 14:59:30 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180911215930.GB23260@roeck-us.net>
+References: <20180831233736.GA10164@roeck-us.net>
+	<e0b4bcce-6513-5614-88b1-5ee445d1bcc8@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e0b4bcce-6513-5614-88b1-5ee445d1bcc8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] PC Chipset: Improve serial divisor
+ calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,57 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Calvin Lee <cyrus296@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-Changes from v2:
-=================
+On Tue, Sep 11, 2018 at 03:21:34PM +0200, Paolo Bonzini wrote:
+> On 01/09/2018 01:37, Guenter Roeck wrote:
+> > The patch results in an unexpected DLL register value. Here is the
+> > surrounding code from drivers/tty/serial/pxa.c:
+> > 
+> > 	serial_out(up, UART_DLL, quot & 0xff);		/* LS of divisor */
+> > 
+> > 	/*
+> > 	 * work around Errata #75 according to Intel(R) PXA27x
+> > 	 * Processor Family Specification Update (Nov 2005)
+> > 	 */
+> > 	dll = serial_in(up, UART_DLL);
+> > 	WARN_ON(dll != (quot & 0xff));	// <-- warning
+> > 
+> > Reverting the patch fixes the problem.
+> 
+> I think it's a typo.  Can you try this:
+> 
 
-Patch 4: New, document deprecation. [Eric]
-Patch 3,2: Add r-b's
+You are correct, the patch below fixes the problem.
 
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 
-Changes from v1:
-=================
+Thanks!
+Guenter
 
-Patch 1: Don't pass unused BlockDriverState to helper function
-
-Patch 2: Do not allow mixed usage; fail if keyvalue is present [Eric]
-         Add deprecation warning [John]
-         Pull legacy parsing code into function [John]
-         Fixed filename leak
-
-Patch 3: New; iotest 231. [Eric]
-
-
-iotest failure on current master:
-
- QA output created by 231
--qemu-img: RBD options encoded in the filename as keyvalue pairs is deprecated.  Future versions may cease to parse these options in the future.
--unable to get monitor info from DNS SRV with service name: ceph-mon
--no monitors specified to connect to.
--qemu-img: Could not open 'json:{'file.driver':'rbd','file.filename':'rbd:rbd/bogus:conf=BOGUS_CONF'}': error connecting: No such file or directory
-+qemu-img: Could not open 'json:{'file.driver':'rbd','file.filename':'rbd:rbd/bogus:conf=BOGUS_CONF'}': Parameter 'pool' is missing
- unable to get monitor info from DNS SRV with service name: ceph-mon
- no monitors specified to connect to.
- qemu-img: Could not open 'json:{'file.driver':'rbd','file.pool':'rbd','file.image':'bogus','file.conf':'BOGUS_CONF'}': error connecting: No such file or directory
-Failures: 231
-Failed 1 of 1 tests
-
-Jeff Cody (4):
-  block/rbd: pull out qemu_rbd_convert_options
-  block/rbd: Attempt to parse legacy filenames
-  block/rbd: add iotest for rbd legacy keyvalue filename parsing
-  block/rbd: add deprecation documenation for filename keyvalue pairs
-
- block/rbd.c                | 89 ++++++++++++++++++++++++++++++++------
- qemu-deprecated.texi       |  7 +++
- tests/qemu-iotests/231     | 62 ++++++++++++++++++++++++++
- tests/qemu-iotests/231.out |  9 ++++
- tests/qemu-iotests/group   |  1 +
- 5 files changed, 154 insertions(+), 14 deletions(-)
- create mode 100755 tests/qemu-iotests/231
- create mode 100644 tests/qemu-iotests/231.out
-
--- 
-2.17.1
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index 251f40fdac..02463e3388 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -345,9 +345,9 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+>      default:
+>      case 0:
+>          if (s->lcr & UART_LCR_DLAB) {
+> -            if (size == 2) {
+> +            if (size == 1) {
+>                  s->divider = (s->divider & 0xff00) | val;
+> -            } else if (size == 4) {
+> +            } else {
+>                  s->divider = val;
+>              }
+>              serial_update_parameters(s);
+> 
+> Thanks,
+> 
+> Paolo
