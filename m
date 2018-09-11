@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fzmOa-0000Gi-TC
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 13:24:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1fzmoQ-0005if-Ts
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 13:50:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fzmOY-0008PK-8a
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 13:24:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48896 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fzmOY-0008Ob-29
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 13:24:10 -0400
-References: <CAKXe6SKtGLjDgh0thEemmoodtPZGKOcepbsJ6m76xhznuP3=VA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <28a08ba6-3f7d-5fa1-525b-2790b139c6bb@redhat.com>
-Date: Tue, 11 Sep 2018 19:24:04 +0200
+	(envelope-from <eblake@redhat.com>) id 1fzmoQ-0007Td-8a
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 13:50:54 -0400
+References: <cover.1536642773.git.jcody@redhat.com>
+	<78d2f47b07325fce34a03b115159830f662b7f90.1536642773.git.jcody@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ed272342-31ce-0cf6-be8e-392b6525df63@redhat.com>
+Date: Tue, 11 Sep 2018 12:50:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SKtGLjDgh0thEemmoodtPZGKOcepbsJ6m76xhznuP3=VA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <78d2f47b07325fce34a03b115159830f662b7f90.1536642773.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Question] Question about ACPI table in qemu
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/rbd: pull out
+ qemu_rbd_convert_options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, mst@redhat.com, Laszlo Ersek <lersek@redhat.com>, kevin@koconnor.net
-Cc: Qemu Developers <qemu-devel@nongnu.org>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-On 11/09/2018 18:54, Li Qiang wrote:
-> Hi all,
+On 9/11/18 12:15 AM, Jeff Cody wrote:
+> Code movement to pull the conversion from Qdict to BlockdevOptionsRbd
+> into a helper function.
 > 
-> I noticed that both qemu and seabios create the ACPI table.
-> Once I think he bios' ACPI table will overwrite the qemu's if seabios
-> compiled with CONFIG_ACPI.
-
-Yes, SeaBIOS's ACPI tables are not used anymore, to remove the need to
-update QEMU and SeaBIOS in sync.
-
-> But after I read this -->
-> https://lists.gnu.org/archive/html/qemu-devel/2013-02/msg04555.html
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
+>   block/rbd.c | 36 ++++++++++++++++++++++++------------
+>   1 file changed, 24 insertions(+), 12 deletions(-)
 > 
-> There say:
-> 
-> "just have QEMU pass the tables to SeaBIOS for it to copy
->>>> into memory like it does on CSM, coreboot, and Xen"
-> 
-> So where does this 'copy' happens? or is there something others I missed?
 
-The copy happens in SeaBIOS's romfile_loader_execute function (called by
-qemu_platform_setup).
+> -
+> +    r = qemu_rbd_convert_options(bs, options, &opts, &local_err);
+>       if (local_err) {
+>           error_propagate(errp, local_err);
+> -        r = -EINVAL;
+>           goto out;
+>       }
 
-Thanks,
+You could simplify this to:
 
-Paolo
+r = qemu_rbd_convert_options(bs, options, &opts, errp);
+if (r < 0) {
+     goto out;
+}
+
+Either way, this refactoring looks correct.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
