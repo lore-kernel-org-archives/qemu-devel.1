@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzfQZ-0008H6-VU
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:57:49 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1fzfkW-0000tL-8h
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 06:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fzfQW-0000xC-MT
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:57:47 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:43390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fzfQW-0000wt-5f
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 05:57:44 -0400
-Received: by mail-wr1-x429.google.com with SMTP id k5-v6so25174384wre.10
-	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 02:57:43 -0700 (PDT)
-References: <153660698641.24944.17107147595708483311.malonedeb@gac.canonical.com>
-	<87zhwobeqn.fsf@linaro.org>
-	<f6c394eb-2ef0-601f-ba53-4479b0625fd2@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <f6c394eb-2ef0-601f-ba53-4479b0625fd2@redhat.com>
-Date: Tue, 11 Sep 2018 10:57:40 +0100
-Message-ID: <87y3c8bbl7.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1fzfkT-0002lk-2z
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 06:18:24 -0400
+Received: from mail-eopbgr680106.outbound.protection.outlook.com
+	([40.107.68.106]:40480
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1fzfkR-0002jU-UN
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 06:18:20 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Tue, 11 Sep 2018 10:18:15 +0000
+Message-ID: <BN7PR08MB48680659BC5FC0C4DB998F7CC6040@BN7PR08MB4868.namprd08.prod.outlook.com>
+References: <20180909013444.18936-1-f4bug@amsat.org>,
+	<20180909013444.18936-3-f4bug@amsat.org>
+In-Reply-To: <20180909013444.18936-3-f4bug@amsat.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1791796] [NEW] unimplemented thread syscalls
- in nios2 user-mode emulation
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 2/2] target/mips: Add entries for the
+ Toshiba's R3900 and R5900 cores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,229 +32,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Bug 1791796 <1791796@bugs.launchpad.net>, qemu-devel@nongnu.org, Chris Wulff <crwulff@gmail.com>, Marek Vasut <marex@denx.de>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Fredrik Noring <noring@nocrew.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
+
+> From: Philippe Mathieu-Daud=E9 <philippe.mathieu.daude@gmail.com> on beha=
+lf of Philippe > Mathieu-Daud=E9 <f4bug@amsat.org>
+> Sent: Sunday, September 9, 2018 3:34 AM
+> To: Fredrik Noring; Aleksandar Markovic
+> Cc: Philippe Mathieu-Daud=E9; qemu-devel@nongnu.org; Richard Henderson; A=
+urelien Jarno
+> Subject: [PATCH 2/2] target/mips: Add entries for the Toshiba's R3900 and=
+ R5900 cores
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  target/mips/mips-defs.h | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+> index c8e99791ad..9875bdac82 100644
+> --- a/target/mips/mips-defs.h
+> +++ b/target/mips/mips-defs.h
+> @@ -56,6 +56,8 @@
+>  #define                INSN_LOONGSON2E  0x20000000
+>  #define                INSN_LOONGSON2F  0x40000000
+>  #define                INSN_VR54XX     0x80000000
+> +#define     INSN_R3900       0x100000000ULL
+> +#define     INSN_R5900       0x200000000ULL
+>=20
+>  /* MIPS CPU defines. */
+>  #define                CPU_MIPS1       (ISA_MIPS1)
+
+I don't think we should add flags for not yet supported CPUs ot ASEs. (Corr=
+esponding ELF flags in other headers are OK, since they originate from exte=
+rnal headers - however, "insn_flags" is a purely internal QEMU construct.)
+
+Instead, I would reorganize existing flags (as you, as well, indicated in a=
+ previous message).
+
+Let's say, something like this:
 
 
-Thomas Huth <thuth@redhat.com> writes:
+/*
+ * insn_flags
+ */
 
-> On 2018-09-11 10:49, Alex Benn=C3=A9e wrote:
->>
->> Sandra Loosemore <1791796@bugs.launchpad.net> writes:
->>
->>> Public bug reported:
->>>
->>> This bug is reported against the 3.0 release.
->>>
->>> I noticed that the GCC test gcc.dg/torture/tls/tls-test.c is failing
->>> when run in user-mode qemu for nios2 target.  The problem appears to be
->>> that the thread-related syscalls are unimplemented in qemu.  Here is
->>> output from running with -strace:
->>
->> One thing that would help in better supporting NIOS is if we could add
->> support for building linux-user tests for it in test/tcg. For this we
->> need a distribution that ships a decent cross compiler or create a
->> docker recipe that packages it up so we can build and run the tests.
->>
->> Are you just building GCC straight from source or can you point to a
->> recommended location for a decent packaged gcc?
->
-> Not sure if it's of any help, but buildroot.org has support for nios2,
-> including automatic setup of a cross-compiler...
+/*
+ * bits 0-31 MIPS base instruction sets
+ */=20
+#define ISA_MIPS1         0x0000000000000001
+#define ISA_MIPS2         0x0000000000000002
+#define ISA_MIPS3         0x0000000000000004
+#define ISA_MIPS4         0x0000000000000008
+#define ISA_MIPS5         0x0000000000000010
+#define ISA_MIPS32        0x0000000000000020
+#define ISA_MIPS32R2      0x0000000000000040
+#define ISA_MIPS64        0x0000000000000080
+#define ISA_MIPS64R2      0x0000000000000100
+#define ISA_MIPS32R3      0x0000000000000200
+#define ISA_MIPS64R3      0x0000000000000400
+#define ISA_MIPS32R5      0x0000000000000800
+#define ISA_MIPS64R5      0x0000000000001000
+#define ISA_MIPS32R6      0x0000000000002000
+#define ISA_MIPS64R6      0x0000000000004000
+#define ISA_NANOMIPS32    0x0000000000008000
 
-Maybe its time to add a buildroot base docker image with rules for
-building the various additional toolchains. I'll have a go.
+/*
+ * bits 32-47 MIPS ASEs
+ */=20
+#define ASE_MIPS16        0x0000000100000000
+#define ASE_MIPS3D        0x0000000200000000
+#define ASE_MDMX          0x0000000400000000
+#define ASE_DSP           0x0000000800000000
+#define ASE_DSPR2         0x0000001000000000
+#define ASE_DSPR3         0x0000002000000000
+#define ASE_MT            0x0000004000000000
+#define ASE_SMARTMIPS     0x0000008000000000
+#define ASE_MICROMIPS     0x0000010000000000
+#define ASE_MSA           0x0000020000000000
 
->
->  Thomas
->
->
->>> 22484 brk(NULL) =3D 0x00005000
->>> 22484 uname(0x7fffef5a) =3D 0
->>> 22484 faccessat(AT_FDCWD,"/etc/ld.so.preload",R_OK,0x5) =3D -1 errno=3D=
-2 (No such file or directory)
->>> 22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2018=
-.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2-=
-linux-gnu/libc/./lib/./tls/libm.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D -=
-1 errno=3D2 (No such file or directory)
->>> 22484 fstatat64(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2=
-018.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nio=
-s2-linux-gnu/libc/./lib/./tls",0x7fffe870,0) =3D -1 errno=3D2 (No such file=
- or directory)
->>> 22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2018=
-.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2-=
-linux-gnu/libc/./lib/./libm.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D 3
->>> 22484 read(3,0x7fffe954,512) =3D 512
->>> 22484 fstat64(3,0x7fffe870) =3D 0
->>> 22484 mmap2(NULL,803596,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,3=
-,0) =3D 0x7f716000
->>> 22484 mmap2(0x7f7d8000,12288,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYW=
-RITE|MAP_FIXED,3,0xc1) =3D 0x7f7d8000
->>> 22484 close(3) =3D 0
->>> 22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2018=
-.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2-=
-linux-gnu/libc/./lib/./libpthread.so.0",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D=
- 3
->>> 22484 read(3,0x7fffe948,512) =3D 512
->>> 22484 mmap2(NULL,8192,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS,-1=
-,0) =3D 0x7f714000
->>> 22484 fstat64(3,0x7fffe864) =3D 0
->>> 22484 mmap2(NULL,120700,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,3=
-,0) =3D 0x7f6f6000
->>> 22484 mprotect(0x7f70e000,4096,PROT_NONE) =3D 0
->>> 22484 mmap2(0x7f70f000,12288,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYW=
-RITE|MAP_FIXED,3,0x18) =3D 0x7f70f000
->>> 22484 mmap2(0x7f712000,6012,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYM=
-OUS|MAP_FIXED,-1,0) =3D 0x7f712000
->>> 22484 close(3) =3D 0
->>> 22484 openat(AT_FDCWD,"/scratch/sandra/nios2-linux-trunk3/obj/test-2018=
-.11-999999-nios2-linux-gnu/host-x86_64-linux-gnu/sourceryg++-2018.11/nios2-=
-linux-gnu/libc/./lib/./libc.so.6",O_RDONLY|O_LARGEFILE|O_CLOEXEC) =3D 3
->>> 22484 read(3,0x7fffe93c,512) =3D 512
->>> 22484 fstat64(3,0x7fffe858) =3D 0
->>> 22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,=
-3,0) =3D 0x7f589000
->>> 22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYW=
-RITE|MAP_FIXED,3,0x154) =3D 0x7f6de000
->>> 22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYM=
-OUS|MAP_FIXED,-1,0) =3D 0x7f6f3000
->>> 22484 close(3) =3D 0
->>> 22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
->>> 22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
->>> 22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,87148=
-,47) =3D 22484
->>> 22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errno=
-=3D38 (Function not implemented)
->>> 22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
->>> 22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argum=
-ent)
->>> 22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
->>> 22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
->>> 22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-1=
-,0) =3D 0x7ed88000
->>> 22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
->>> 22484 brk(NULL) =3D 0x00005000
->>> 22484 brk(0x00026000) =3D 0x00026000
->>> 22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CL=
-ONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_sta=
-ck=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidptr=3D=
-0x7f5884fc) =3D 22503
->>> 22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,4100=
-) =3D -1 errno=3D38 (Function not implemented)
->>> 22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_li=
-st(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not im=
-plemented)
->>> 22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
->>> 22484 exit(0)
->>>  =3D 0
->>> 22484 fstat64(1,0x7fffef48) =3D 0
->>> 22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f715120
->>>  =3D 42
->>> 22484 exit_group(1)
->>> sandra@build2-trusty-cs:/scratch/sandra/nios2-linux-trunk3$
->>> 22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,=
-3,0) =3D 0x7f589000
->>> 22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYW=
-RITE|MAP_FIXED,3,0x154) =3D 0x7f6de000
->>> 22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYM=
-OUS|MAP_FIXED,-1,0) =3D 0x7f6f3000
->>> 22484 close(3) =3D 0
->>> 22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
->>> 22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
->>> 22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,87148=
-,47) =3D 22484
->>> 22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errno=
-=3D38 (Function not implemented)
->>> 22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
->>> 22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argum=
-ent)
->>> 22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
->>> 22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
->>> 22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-1=
-,0) =3D 0x7ed88000
->>> 22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
->>> 22484 brk(NULL) =3D 0x00005000
->>> 22484 brk(0x00026000) =3D 0x00026000
->>> 22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CL=
-ONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_sta=
-ck=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidptr=3D=
-0x7f5884fc) =3D 22503
->>> 22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,4100=
-) =3D -1 errno=3D38 (Function not implemented)
->>> 22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_li=
-st(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not im=
-plemented)
->>> 22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
->>> 22484 exit(0)
->>>  =3D 0
->>> 22484 fstat64(1,0x7fffef48) =3D 0
->>> 22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f715120
->>>  =3D 42
->>> 22484 exit_group(1)
->>> sandra@build2-trusty-cs:/scratch/sandra/nios2-linux-trunk3$
->>> 22484 mmap2(NULL,1491048,PROT_EXEC|PROT_READ,MAP_PRIVATE|MAP_DENYWRITE,=
-3,0) =3D 0x7f589000
->>> 22484 mmap2(0x7f6de000,86016,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_DENYW=
-RITE|MAP_FIXED,3,0x154) =3D 0x7f6de000
->>> 22484 mmap2(0x7f6f3000,8296,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYM=
-OUS|MAP_FIXED,-1,0) =3D 0x7f6f3000
->>> 22484 close(3) =3D 0
->>> 22484 mprotect(0x7f6de000,65536,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f70f000,8192,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f7d8000,4096,PROT_READ) =3D 0
->>> 22484 mprotect(0x00003000,4096,PROT_READ) =3D 0
->>> 22484 mprotect(0x7f7fc000,4096,PROT_READ) =3D 0
->>> 22484 set_tid_address(2138131700,2147480980,2147480988,2147480988,87148=
-,47) =3D 22484
->>> 22484 set_robust_list(2138131708,12,2147480988,0,87148,47) =3D -1 errno=
-=3D38 (Function not implemented)
->>> 22484 rt_sigaction(32,0x7ffff36c,NULL) =3D 0
->>> 22484 rt_sigaction(33,0x7ffff36c,NULL) =3D -1 errno=3D22 (Invalid argum=
-ent)
->>> 22484 rt_sigprocmask(SIG_UNBLOCK,0x7ffff4a8,NULL) =3D 0
->>> 22484 getrlimit(3,2147480732,3,0,62512,47) =3D 0
->>> 22484 mmap2(NULL,8392704,PROT_NONE,MAP_PRIVATE|MAP_ANONYMOUS|0x20000,-1=
-,0) =3D 0x7ed88000
->>> 22484 mprotect(0x7ed89000,8388608,PROT_READ|PROT_WRITE) =3D 0
->>> 22484 brk(NULL) =3D 0x00005000
->>> 22484 brk(0x00026000) =3D 0x00026000
->>> 22484 clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CL=
-ONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID,child_sta=
-ck=3D0x7f588018,parent_tidptr=3D0x7f5884fc,tls=3D0x7f58f928,child_tidptr=3D=
-0x7f5884fc) =3D 22503
->>> 22484 io_setup(4001536,2136506392,2136507644,2136507644,2136537384,4100=
-) =3D -1 errno=3D38 (Function not implemented)
->>> 22484 futex(0x7f5884fc,FUTEX_WAIT,22503,NULL,NULL,0)22484 set_robust_li=
-st(2136507652,12,0,4100,2136508076,4100) =3D -1 errno=3D38 (Function not im=
-plemented)
->>> 22484 madvise(2128117760,8372224,4,2136507672,528660,4100) =3D 0
->>> 22484 exit(0)
->>>  =3D 0
->>> 22484 fstat64(1,0x7fffef48) =3D 0
->>> 22484 write(1,0x51e8,42)FAIL: a=3D 10, thr_a =3D 10 Addr =3D 0x7f715120
->>>  =3D 42
->>> 22484 exit_group(1)
->>>
->>> Note that set_robust_list and clone are reported as unimplemented.
->>>
->>> I've reported the problems with the signal syscalls separately here.
->>> https://bugs.launchpad.net/qemu/+bug/1791763
->>>
->>> ** Affects: qemu
->>>      Importance: Undecided
->>>          Status: New
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
+/*
+ * bits 48-55 vendor-specific base instruction sets
+ */=20
+#define	INSN_LOONGSON2E   0x0001000000000000
+#define	INSN_LOONGSON2F   0x0002000000000000
+#define	INSN_VR54XX	  0x0004000000000000
 
+/*
+ * bits 56-63 vendor-specific ASEs
+ */=20
 
---
-Alex Benn=C3=A9e
+Notice that I inserted ASE_DSPR3, that was missing (there is an instruction=
+ from DSP R3 already implemented, and needing this flag for correct availab=
+ility control.).
+
+INSN_R5900 would belong to the third category. ASE_MXU and ASE MXU2 (not ye=
+t implemented in QEMU) from Igenic would be examples for the fourth categor=
+y. The fourth category would be empty for now.
+
+Thanks,
+Aleksandar
