@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fzhLq-000352-BN
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:01:05 -0400
+	(envelope-from <schwab@suse.de>) id 1fzhNv-000585-Mj
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:03:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fzhLh-0003OB-9F
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:00:59 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1536566979-6868-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <45864da2-c372-a4ec-da97-512f946a3a5e@amsat.org>
-Date: Tue, 11 Sep 2018 09:00:35 -0300
+	(envelope-from <schwab@suse.de>) id 1fzhNp-00061S-Ut
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:03:11 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54158 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <schwab@suse.de>) id 1fzhNp-000601-OF
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 08:03:05 -0400
+Received: from relay1.suse.de (unknown [195.135.220.254])
+	by mx1.suse.de (Postfix) with ESMTP id AE247AF7C
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 12:03:04 +0000 (UTC)
+From: Andreas Schwab <schwab@suse.de>
+Date: Tue, 11 Sep 2018 14:03:04 +0200
+Message-ID: <mvmd0tkckcn.fsf@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <1536566979-6868-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw/qdev-core: Fix
- description of instance_init
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] linux-user: don't short-circuit read with zero
+ length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: qemu-devel@nongnu.org
 
-On 9/10/18 5:09 AM, Thomas Huth wrote:
-> The part of the documentation of DeviceClass that talks about instance_init
-> is partly wrong: instance_init() functions must not abort or exit, since
-> the function is also called during introspection of the device already.
-> So if a device calls exit() during its instance_init() function, QEMU
-> terminates unexpectedly if somebody tries to just have a look at the
-> interfaces from the device with "device_add xyz,help" or with the
-> "device-list-properties" QOM command. This should never happen.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+A zero-length read still needs to do the usual checks, thus it may return
+errors like EBADF.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Andreas Schwab <schwab@suse.de>
+---
+ linux-user/syscall.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
-> ---
->  include/hw/qdev-core.h | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index f1fd0f8..a24d0dd 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -51,8 +51,9 @@ struct VMStateDescription;
->   * Devices are constructed in two stages,
->   * 1) object instantiation via object_initialize() and
->   * 2) device realization via #DeviceState:realized property.
-> - * The former may not fail (it might assert or exit), the latter may return
-> - * error information to the caller and must be re-entrant.
-> + * The former may not fail (and must not abort or exit, since it is called
-> + * during device introspection already), and the latter may return error
-> + * information to the caller and must be re-entrant.
->   * Trivial field initializations should go into #TypeInfo.instance_init.
->   * Operations depending on @props static properties should go into @realize.
->   * After successful realization, setting static properties will fail.
-> 
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 643b8833de..202d3c287d 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7930,18 +7930,14 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         ret = 0; /* avoid warning */
+         break;
+     case TARGET_NR_read:
+-        if (arg3 == 0)
+-            ret = 0;
+-        else {
+-            if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+-                goto efault;
+-            ret = get_errno(safe_read(arg1, p, arg3));
+-            if (ret >= 0 &&
+-                fd_trans_host_to_target_data(arg1)) {
+-                ret = fd_trans_host_to_target_data(arg1)(p, ret);
+-            }
+-            unlock_user(p, arg2, ret);
++        if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
++            goto efault;
++        ret = get_errno(safe_read(arg1, p, arg3));
++        if (ret >= 0 &&
++            fd_trans_host_to_target_data(arg1)) {
++            ret = fd_trans_host_to_target_data(arg1)(p, ret);
+         }
++        unlock_user(p, arg2, ret);
+         break;
+     case TARGET_NR_write:
+         if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+-- 
+2.18.0
+
+-- 
+Andreas Schwab, SUSE Labs, schwab@suse.de
+GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
+"And now for something completely different."
