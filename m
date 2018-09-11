@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fznZt-00038p-Mx
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 14:39:59 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fzo3d-0004HY-8y
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 15:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fznZs-00039l-OJ
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 14:39:57 -0400
-References: <cover.1536642773.git.jcody@redhat.com>
-	<570e8585c94d6f1bd7406ce5d35f68a82b6ea28c.1536642773.git.jcody@redhat.com>
-	<10f55c86-32dc-957a-c050-32a58baaddbd@redhat.com>
-	<20180911183700.GQ22117@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ececc2ac-3b43-180c-bc28-fe0ec598793d@redhat.com>
-Date: Tue, 11 Sep 2018 14:39:43 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fznxA-0008Tp-SK
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 15:04:05 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45213)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fznx6-0008Pw-5B
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 15:03:58 -0400
+Received: by mail-wr1-x441.google.com with SMTP id 20-v6so27136351wrb.12
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 12:03:52 -0700 (PDT)
+References: <153660698641.24944.17107147595708483311.malonedeb@gac.canonical.com>
+	<153668006744.31966.11333457437734513810.malone@soybean.canonical.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <153668006744.31966.11333457437734513810.malone@soybean.canonical.com>
+Date: Tue, 11 Sep 2018 20:03:50 +0100
+Message-ID: <87r2hzc0vd.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180911183700.GQ22117@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/rbd: Attempt to parse legacy
- filenames
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1791796] Re: unimplemented thread syscalls in
+ nios2 user-mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
+To: Bug 1791796 <1791796@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
 
+Sandra Loosemore <1791796@bugs.launchpad.net> writes:
 
-On 09/11/2018 02:37 PM, Jeff Cody wrote:
-> On Tue, Sep 11, 2018 at 02:22:31PM -0400, John Snow wrote:
->>
->>
->> On 09/11/2018 01:15 AM, Jeff Cody wrote:
->>> When we converted rbd to get rid of the older key/value-centric
->>> encoding format, we broke compatibility with image files with backing
->>> file strings encoded in the old format.
->>>
->>> This leaves a bit of an ugly conundrum, and a hacky solution.
->>>
->>> If the initial attempt to parse the "proper" options fails, it assumes
->>> that we may have an older key/value encoded filename.  Fall back to
->>> attempting to parse the filename, and extract the required options from
->>> it.  If that fails, pass along the original error message.
->>>
->>> This approach has a potential drawback: if for some reason there are
->>> some options supplied the new way, and some the old way, we may not
->>> catch all the old options if they are not required options (since it
->>> won't cause the initial failure).
->>>
->>> Signed-off-by: Jeff Cody <jcody@redhat.com>
->>> ---
->>>  block/rbd.c | 30 +++++++++++++++++++++++++++---
->>>  1 file changed, 27 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/block/rbd.c b/block/rbd.c
->>> index a8e79d01d2..bce86b8bde 100644
->>> --- a/block/rbd.c
->>> +++ b/block/rbd.c
->>> @@ -685,7 +685,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->>>      BlockdevOptionsRbd *opts = NULL;
->>>      const QDictEntry *e;
->>>      Error *local_err = NULL;
->>> -    char *keypairs, *secretid;
->>> +    char *keypairs, *secretid, *filename;
->>>      int r;
->>>  
->>>      keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
->>> @@ -700,8 +700,32 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->>>  
->>>      r = qemu_rbd_convert_options(bs, options, &opts, &local_err);
->>>      if (local_err) {
->>> -        error_propagate(errp, local_err);
->>> -        goto out;
->>> +        /* If the initial attempt to convert and process the options failed,
->>> +         * we may be attempting to open an image file that has the rbd options
->>> +         * specified in the older format consisting of all key/value pairs
->>> +         * encoded in the filename.  Go ahead and attempt to parse the
->>> +         * filename, and see if we can pull out the required options */
->>
->> Is it worth splitting out the legacy parsing routine here into its own
->> function, given that we will generally depend on it not being invoked?
->> i.e., for readability, it doesn't need to distract us.
->>
-> 
-> Yeah, that would probably be good.
-> 
->>> +        Error *parse_err = NULL;
->>> +
->>> +        filename = g_strdup(qdict_get_try_str(options, "filename"));
->>> +        qdict_del(options, "filename");
->>> +
->>> +        qemu_rbd_parse_filename(filename, options, NULL);
->>> +
->>> +        g_free(keypairs);
->>
->> As Eric already noticed, better to just return with error if this is
->> already set.
->>
->>> +        keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
->>> +        if (keypairs) {
->>> +            qdict_del(options, "=keyvalue-pairs");
->>> +        }
->>> +
->>> +        r = qemu_rbd_convert_options(bs, options, &opts, &parse_err);
->>> +        if (parse_err) {
->>> +            /* if the second attempt failed, pass along the original error
->>> +             * message for the current format */
->>> +            error_propagate(errp, local_err);
->>> +            error_free(parse_err);
->>> +            goto out;
->>> +        }
->>
->> If it does succeed, though, ought we emit a deprecated warning that the
->> old specification syntax is not supported?
->>
-> 
-> I don't know.  Without this support, we can't open some existing images.  At
-> what point would we actually remove that support?
-> 
+> If you need a Nios II GNU/Linux toolchain, I think the most recent
+> CodeBench Lite release will work:
+>
+> https://sourcery.mentor.com/GNUToolchain/subscription42545
 
-Yeah, probably never -- but there are some versions of QEMU in the wild
-that now simply don't support this format, so some urging to switch is
-probably not harmful was my thought.
+Hmm I tried automating that but it seems the installer has GTK
+dependencies!?
 
-(At least, that was my read. When did we switch RBD formats? Just for
-3.1? In that case, no warning is necessary.)
+  Setup:
+  GTK+ Version Check
+  Setup:
+  An error has occurred. See the log file
+  /root/.mentor/logs/20180911185933/.metadata/.log.
+  root@0ef91b5e50f2:/opt# cat /root/.mentor/logs/20180911185933/.metadata/.=
+log
+  !SESSION 2018-09-11 18:59:36.197 ----------------------------------------=
+-------
+  eclipse.buildId=3Dunknown
+  java.version=3D1.8.0_102
+  java.vendor=3DOracle Corporation
+  BootLoader constants: OS=3Dlinux, ARCH=3Dx86, WS=3Dgtk, NL=3Den_US
+  Framework arguments:  -install.once -install.data=3D/root/.mentor
+  Command-line arguments:  -os linux -ws gtk -arch x86 -install.once -insta=
+ll.data=3D/root/.mentor -data /root/.mentor/logs/20180911185933
 
->> Once we load the image, will the header get rewritten into a compliant
->> format?
->>
-> 
-> Hmm - I think in some code paths, but not all.  I don't think the answer is
-> 'yes' universally, alas.
-> 
+  !ENTRY org.eclipse.osgi 4 0 2018-09-11 18:59:37.407
+  !MESSAGE Application error
+  !STACK 1
+  java.lang.UnsatisfiedLinkError: Could not load SWT library. Reasons:
+          /tmp/sourceryg++-2018.05-5-nios2-linux-gnu.bin_sfx.f9eaefb7/insta=
+ller/configuration/org.eclipse.osgi/148/0/.cp/libswt-pi-gtk-4530.so: libgtk=
+-x11-2.0.so.0: cannot open shared object file: No such file or directory
+          no swt-pi-gtk in java.library.path
+          Can't load library: /root/.swt/lib/linux/x86/libswt-pi-gtk-4530.so
+          Can't load library: /root/.swt/lib/linux/x86/libswt-pi-gtk.so
+          /root/.swt/lib/linux/x86/libswt-pi-gtk-4530.so: libgtk-x11-2.0.so=
+.0: cannot open shared object file: No such file or directory
+
+Should I just try the tarball approach?
+
+> We're planning on adding user-mode QEMU to the upcoming 2018.11
+> release....  that's actually what I've been testing it for.  Results on
+> the GCC testsuite actually don't look too bad,
+
+OK - I'm a little surprised given the failures I saw in our own
+test/tcg/multiarch but it's totally possible that:
+
+  - the buildroot toolchain if foobar
+  - the (ancient) tests need tweaking
+
+but it would be nice if we get to a point that QEMU's internal
+linux-user tests also pass.
+
+> but I have a patch I
+> haven't submitted yet that's required to make the GDB stub work, and
+> there are a lot of GDB test failures I haven't triaged yet.
+
+When you do post the gdb patch feel free to CC me as I've poked around
+in that before.
+
+--
+Alex Benn=C3=A9e
