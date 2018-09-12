@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gersner@gmail.com>) id 1g0BDF-0002oP-M4
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:54:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g0BIS-0004sK-T2
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gersner@gmail.com>) id 1g0BDD-0006HE-JJ
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:54:09 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g0BIN-00040M-Qf
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:59:32 -0400
+Received: from mail-pl1-x62b.google.com ([2607:f8b0:4864:20::62b]:44446)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g0BIN-000407-1a
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:59:27 -0400
+Received: by mail-pl1-x62b.google.com with SMTP id ba4-v6so1471813plb.11
+	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 12:59:26 -0700 (PDT)
+References: <20180830193019.20104-1-jancraig@amazon.com>
+	<20180830193019.20104-2-jancraig@amazon.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7bd83ad3-0286-3207-4e4d-de4f390ca43a@linaro.org>
+Date: Wed, 12 Sep 2018 12:59:22 -0700
 MIME-Version: 1.0
-References: <20180622112237.2131-1-gersner@gmail.com>
-	<CAGFXeQL4FPVeFrEiQpRjGnBMBs5oCjxjXFJ_NGWsGmOjvk75pg@mail.gmail.com>
-	<CALKrh6mPkirNjwkCMLWU4d+eQnnkYDmjPVAWccP4K4tQDxxLaA@mail.gmail.com>
-	<CAGFXeQKjnCvY7hRw_1MxZOROhHbsdHM9YPL-QzzWeJZcu0A8Jg@mail.gmail.com>
-In-Reply-To: <CAGFXeQKjnCvY7hRw_1MxZOROhHbsdHM9YPL-QzzWeJZcu0A8Jg@mail.gmail.com>
-From: Gersner <gersner@gmail.com>
-Date: Wed, 12 Sep 2018 22:53:25 +0300
-Message-ID: <CALKrh6kHp05SjoQ-YMecejj=TxHUFY9P-gCmW3E5wDFRCnP2mQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 1/5] nvme: PCI/e configuration from
- specification
+In-Reply-To: <20180830193019.20104-2-jancraig@amazon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/9] target/mips: Introduce MXU registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,151 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: daniel@drv.nu
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, David S <davidsa@openu.ac.il>, Max Reitz <mreitz@redhat.com>
+To: Craig Janeczek <jancraig@amazon.com>, qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, amarkovic@wavecomp.com
 
-Hi Daniel,
+On 08/30/2018 12:30 PM, Craig Janeczek via Qemu-devel wrote:
+> +static const char * const mxuregnames[] = {
+> +    "XR1", "XR2",  "XR3",  "XR4",  "XR5",  "XR6",  "XR7",  "XR8",
+> +    "XR9", "XR10", "XR11", "XR12", "XR13", "XR14", "XR15", "XR16",
+> +};
 
-Sorry for the long round-trips, we had a busy month. We have implemented
-all the changes. Waiting for a final clarification.
-
-Should the new patches be posted on this thread or a new one?
-
-Thanks for you time.
-
-Gersner.
-
-On Thu, Aug 30, 2018 at 6:45 PM Daniel Verkamp <daniel@drv.nu> wrote:
-
-> Hi Shimi,
->
-> On Sun, Aug 26, 2018 at 2:50 PM Gersner <gersner@gmail.com> wrote:
-> >
-> > Hi Daniel,
-> > Thanks for taking a look. Comments are inline.
-> >
-> > Gersner.
-> >
-> > On Sun, Jul 15, 2018 at 9:21 AM Daniel Verkamp <daniel@drv.nu> wrote:
-> >>
-> >> On Fri, Jun 22, 2018 at 4:22 AM, Shimi Gersner <gersner@gmail.com>
-> wrote:
-> >> > PCI/e configuration currently does not meets specifications.
-> >> >
-> >> > Patch includes various configuration changes to support specifications
-> >> > - BAR2 to return zero when read and CMD.IOSE is not set.
-> >> > - Expose NVME configuration through IO space (Optional).
-> >> > - PCI Power Management v1.2.
-> >> > - PCIe Function Level Reset.
-> >> > - Disable QEMUs default use of PCIe Link Status (DLLLA).
-> >> > - PCIe missing AOC compliance flag.
-> >> > - Mask PCIe End-to-End TLP as RO (Unspecified by specification).
-> >> [...]
-> >> >      n->num_namespaces = 1;
-> >> >      n->num_queues = 64;
-> >> > -    n->reg_size = pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
-> >> > +    n->reg_size = pow2ceil(0x2000 + 2 * (n->num_queues + 1) * 4);
-> >>
-> >> The existing math looks OK to me (maybe already 4 bytes larger than
-> >> necessary?). The controller registers should be 0x1000 bytes for the
-> >> fixed register set, then 2 * 4 bytes for each doorbell pair (+ 1 is
-> >> for the admin queue, and CAP.DSTRD is set to 0, so there is no extra
-> >> padding between queues). The result is also rounded up to a power of
-> >> two, so the result will typically be 8 KB.  What is the rationale for
-> >> this change?
-> >
-> > You are correct, this change shouldn't be here. It was made during tests
-> against the
-> > nvme compliance which failed here.
->
-> If the NVMe compliance test requires it, that is probably sufficient
-> reason to change it - although it would be interesting to hear their
-> rationale.
->
-> > The specification states that bits 0 to 13 are RO, which implicitly
-> suggests
-> > that the minimal size of this BAR should be at least 16K as this is a
-> standard
-> > way to determine the BAR size on PCI (AFAIK). On the contrary it doesn't
-> > fit very well with the memory mapped laid out on 3.1 Register Definition
-> > of the 1.3b nvme spec. Any idea?
->
-> You're right, the MLBAR section of the NVMe spec does seem to indicate
-> that up to bit 13 should be reserved/RO.  This is also probably a good
-> enough reason to make the change, as long as this reason is provided.
->
-> >
-> > Additionally it does look like it has an extra 4 bytes.
-> >
-> >>
-> >>
-> >> >      n->ns_size = bs_size / (uint64_t)n->num_namespaces;
-> >> >
-> >> >      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
-> >> > @@ -1245,6 +1295,10 @@ static void nvme_realize(PCIDevice *pci_dev,
-> Error **errp)
-> >> >      pci_register_bar(&n->parent_obj, 0,
-> >> >          PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
-> >> >          &n->iomem);
-> >> > +
-> >> > +    // Expose the NVME memory through Address Space IO (Optional by
-> spec)
-> >> > +    pci_register_bar(&n->parent_obj, 2, PCI_BASE_ADDRESS_SPACE_IO,
-> &n->iomem);
-> >>
-> >> This looks like it will register the whole 4KB+ NVMe register set
-> >> (n->iomem) as an I/O space BAR, but this doesn't match the spec (see
-> >> NVMe 1.3c section 3.2, "Index/Data Pair registers"). The I/O BAR (if
-> >> implemented) should just contain two 4-byte registers, Index and Data,
-> >> that can be used to indirectly access the NVMe register set.  (Just
-> >> for curiosity, do you know of any software that uses this feature? It
-> >> could be useful for testing the implementation.)
-> >
-> > Very nice catch. We indeed totally miss-interpreted the specification
-> here.
-> >
-> > We use the compliance suit for sanity, but it doesn't actually use this
-> feature,
-> > just verifies the configuration of the registers.
-> >
-> > We will go with rolling back this feature as this is optional.
->
-> This is probably the right move; I don't know of any real hardware
-> devices that implement it (and therefore I doubt any software will
-> require it).  However, it should not be too difficult to add an
-> implementation of this feature; if you are interested, take a look at
-> the ahci_idp_read/ahci_idp_write functions - the NVMe index/data pair
-> should be very similar.
->
-Nice, It does seem easy to implement. We decided to go without due to lack
-of real-world software we could test against the new facility.
+XR16 is unused.  Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
->
-> > Question - I'm having hard time to determine from the specification - As
-> > this is optional, how device drivers determine if it is available? Does
-> it
-> > simply the CMD.IOSE flag from the PCI? And if so, what is
-> > the standard way in QEMU to disable the flag completely?
->
-> Based on the wording in NVMe 1.3 section 3.2, it seems like the only
-> indication of support for Index/Data Pair is whether BAR2 is filled
-> out.  I believe PCI defines unused BARs to be all 0s, so software
-> should be able to use this to determine whether the feature is
-> provided by a particular NVMe PCIe device, and removing the
-> pci_register_bar() call should be enough to accomplish this from the
-> QEMU side.
->
-Agree, that was indeed what I also understood from the spec. On the contrary
-for some reason the compliance
-<https://github.com/nvmecompliance/tnvme/blob/30a19c6829b571b2c7bdf854daf0351bfe038032/GrpPciRegisters/allPciRegs_r10b.cpp#L382>
-tests assume that IOSE==1 means
-that the Index/Data pair is enabled. They probably had a good reason.
-I'm not even sure who turns the IOSE flag up, I found no relevant code in
-QEMU.
-
-
->
-> Thanks,
-> -- Daniel
->
+r~
