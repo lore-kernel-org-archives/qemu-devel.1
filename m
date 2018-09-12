@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g04XC-0001F3-QU
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:46:19 -0400
+	(envelope-from <jcody@redhat.com>) id 1g04aJ-00031X-7k
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:49:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g04X8-0005gj-Vr
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:46:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38554 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g04X7-0005f1-1S
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:46:13 -0400
-References: <20180911202823.21657-1-cota@braap.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1eb7d6cd-268b-4066-c024-4622451d3de0@redhat.com>
-Date: Wed, 12 Sep 2018 14:46:05 +0200
+	(envelope-from <jcody@redhat.com>) id 1g04aI-0001cP-Ex
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:49:31 -0400
+Date: Wed, 12 Sep 2018 08:49:22 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180912124922.GU22117@localhost.localdomain>
+References: <cover.1536642773.git.jcody@redhat.com>
+	<570e8585c94d6f1bd7406ce5d35f68a82b6ea28c.1536642773.git.jcody@redhat.com>
+	<10f55c86-32dc-957a-c050-32a58baaddbd@redhat.com>
+	<20180911183700.GQ22117@localhost.localdomain>
+	<20180912103856.GC5846@localhost.localdomain>
+	<20180912124215.GT22117@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180911202823.21657-1-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 00/13] i386 + x86_64 mttcg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180912124215.GT22117@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 2/2] block/rbd: Attempt to parse legacy
+ filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-On 11/09/2018 22:28, Emilio G. Cota wrote:
-> v2: https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg01122.html
+On Wed, Sep 12, 2018 at 08:42:15AM -0400, Jeff Cody wrote:
+> On Wed, Sep 12, 2018 at 12:38:56PM +0200, Kevin Wolf wrote:
+> > Am 11.09.2018 um 20:37 hat Jeff Cody geschrieben:
+> > > On Tue, Sep 11, 2018 at 02:22:31PM -0400, John Snow wrote:
+> > > > Once we load the image, will the header get rewritten into a compliant
+> > > > format?
+> > > 
+> > > Hmm - I think in some code paths, but not all.  I don't think the answer is
+> > > 'yes' universally, alas.
+> > 
+> > Can't we explicitly call BdrvChildRole.update_filename() for all parents
+> > when we open a legacy filename? We'd just need to add the callback to
+> > child_file, which would propagate it to the parents of the format layer,
+> > and then just opening the image with a legacy backing file link once
+> > would fix the problem for this image.
+> >
 > 
-> Changes since v2:
-> 
-> - Add rth's R-b tag to the last patch
-> - Drop v2's first 10 patches, since Paolo already picked those up
-> - Move TCG temps + x86_64_hregs to DisasContext
->   + While at it, drop the cpu_ prefix from the TCG temps,
->     e.g. cpu_A0 -> s->A0
->   + Split the conversion into separate patches to ease review.
->     The patches are quite boring and long because the temps
->     are everywhere, and I had to add DisasContext *s to quite a few
->     functions
-> 
-> The series is checkpatch-clean.
-> 
-> You can fetch these patches from:
->   https://github.com/cota/qemu/tree/i386-mttcg-v3
+> Yes, that is a good idea.  I will spin a v5 with that added.
 
-Great, thanks!
+On second thought; how about we address updating the legacy filename header
+in a separate patch series?
 
-Paolo
+-Jeff
