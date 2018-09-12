@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g04hL-00081R-Gz
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g04zt-0006nq-B9
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 09:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g04hI-0000Gm-BI
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49734 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g04hI-0000Fy-4U
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:44 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 12 Sep 2018 16:55:31 +0400
-Message-Id: <20180912125531.32131-10-marcandre.lureau@redhat.com>
-In-Reply-To: <20180912125531.32131-1-marcandre.lureau@redhat.com>
-References: <20180912125531.32131-1-marcandre.lureau@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1g04zo-0000vv-2f
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 09:15:57 -0400
+Date: Wed, 12 Sep 2018 15:15:03 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180912131503.GD5846@localhost.localdomain>
+References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
+	<20180629124052.331406-3-dplotnikov@virtuozzo.com>
+	<20180910124136.GF4901@dhcp-200-186.str.redhat.com>
+	<81346e2a-5ce2-50d3-791e-3cab5e2464d9@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 9/9] hostmem-ram: use whole path for memory
- region name with >= 3.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81346e2a-5ce2-50d3-791e-3cab5e2464d9@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v0 2/2] block: postpone the coroutine
+ executing if the BDS's is drained
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,145 +26,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Cc: mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, famz@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-hostmem-file and hostmem-memfd use the whole object path for the
-memory region name, but hostname-ram uses only the path component (the
-basename):
+Am 12.09.2018 um 14:03 hat Denis Plotnikov geschrieben:
+> On 10.09.2018 15:41, Kevin Wolf wrote:
+> > Am 29.06.2018 um 14:40 hat Denis Plotnikov geschrieben:
+> > > Fixes the problem of ide request appearing when the BDS is in
+> > > the "drained section".
+> > > 
+> > > Without the patch the request can come and be processed by the main
+> > > event loop, as the ide requests are processed by the main event loop
+> > > and the main event loop doesn't stop when its context is in the
+> > > "drained section".
+> > > The request execution is postponed until the end of "drained section".
+> > > 
+> > > The patch doesn't modify ide specific code, as well as any other
+> > > device code. Instead, it modifies the infrastructure of asynchronous
+> > > Block Backend requests, in favor of postponing the requests arisen
+> > > when in "drained section" to remove the possibility of request appearing
+> > > for all the infrastructure clients.
+> > > 
+> > > This approach doesn't make vCPU processing the request wait untill
+> > > the end of request processing.
+> > > 
+> > > Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> > 
+> > I generally agree with the idea that requests should be queued during a
+> > drained section. However, I think there are a few fundamental problems
+> > with the implementation in this series:
+> > 
+> > 1) aio_disable_external() is already a layering violation and we'd like
+> >     to get rid of it (by replacing it with a BlockDevOps callback from
+> >     BlockBackend to the devices), so adding more functionality there
+> >     feels like a step in the wrong direction.
+> > 
+> > 2) Only blk_aio_* are fixed, while we also have synchronous public
+> >     interfaces (blk_pread/pwrite) as well as coroutine-based ones
+> >     (blk_co_*). They need to be postponed as well.
+> Good point! Thanks!
+> > 
+> >     blk_co_preadv/pwritev() are the common point in the call chain for
+> >     all of these variants, so this is where the fix needs to live.
+> Using the common point might be a good idea, but in case aio requests we
+> also have to mane completions which out of the scope of
+> blk_co_p(read|write)v:
 
-qemu -m 1024 -object memory-backend-ram,id=3Dmem,size=3D1G -numa node,mem=
-dev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-                     mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
+I don't understand what you mean here (possibly because I fail to
+understand the word "mane") and what completions have to do with
+queueing of requests.
 
-qemu -m 1024 -object memory-backend-file,id=3Dmem,size=3D1G,mem-path=3D/t=
-mp/foo -numa node,memdev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
+Just to clarify, we are talking about the following situation, right?
+bdrv_drain_all_begin() has returned, so all the old requests have
+already been drained and their completion callback has already been
+called. For any new requests that come in, we need to queue them until
+the drained section ends. In other words, they won't reach the point
+where they could possibly complete before .drained_end.
 
-qemu -m 1024 -object memory-backend-memfd,id=3Dmem,size=3D1G -numa node,m=
-emdev=3Dmem -monitor stdio
-(qemu) info ramblock
-              Block Name    PSize              Offset               Used =
-             Total
-            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
-0x0000000040000000
+> static void blk_aio_write_entry(void *opaque) {
+>     ...
+>     rwco->ret = blk_co_pwritev(...);
+> 
+>     blk_aio_complete(acb);
+>     ...
+> }
+> 
+> This makes the difference.
+> I would suggest adding waiting until "drained_end" is done on the
+> synchronous read/write at blk_prw
 
-Use the whole path name with >=3D 3.1. Having a consistent naming allow
-to migrate to different hostmem backends.
+It is possible, but then the management becomes a bit more complicated
+because you have more than just a list of Coroutines that you need to
+wake up.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/hw/compat.h    |  6 +++++-
- backends/hostmem-ram.c | 47 ++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 48 insertions(+), 5 deletions(-)
+One thing that could be problematic in blk_co_preadv/pwritev is that
+blk->in_flight would count even requests that are queued if we're not
+careful. Then a nested drain would deadlock because the BlockBackend
+would never say that it's quiesced.
 
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 6f4d5fc647..8ce7a7057b 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -2,7 +2,11 @@
- #define HW_COMPAT_H
-=20
- #define HW_COMPAT_3_0 \
--    /* empty */
-+    {\
-+        .driver   =3D "memory-backend-ram",\
-+        .property =3D "x-component-name",\
-+        .value    =3D "true",\
-+    },
-=20
- #define HW_COMPAT_2_12 \
-     {\
-diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
-index 7ddd08d370..a9eb99cf1b 100644
---- a/backends/hostmem-ram.c
-+++ b/backends/hostmem-ram.c
-@@ -16,21 +16,56 @@
-=20
- #define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
-=20
-+typedef struct RamMemoryBackend {
-+    HostMemoryBackend parent;
-+
-+    bool component_name;
-+} RamMemoryBackend;
-+
-+#define RAM_BACKEND(obj) \
-+    OBJECT_CHECK(RamMemoryBackend, (obj), TYPE_MEMORY_BACKEND_RAM)
-+
-+static char *
-+ram_backend_get_name(RamMemoryBackend *self)
-+{
-+    /* < 3.1 use the component as memory region name */
-+    if (self->component_name) {
-+        return object_get_canonical_path_component(OBJECT(self));
-+    }
-+
-+    return object_get_canonical_path(OBJECT(self));
-+}
-=20
- static void
- ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
- {
--    char *path;
-+    char *name;
-=20
-     if (!backend->size) {
-         error_setg(errp, "can't create backend with size 0");
-         return;
-     }
-=20
--    path =3D object_get_canonical_path_component(OBJECT(backend));
--    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
-), path,
-+    name =3D ram_backend_get_name(RAM_BACKEND(backend));
-+    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
-), name,
-                            backend->size, backend->share, errp);
--    g_free(path);
-+    g_free(name);
-+}
-+
-+static bool
-+ram_backend_get_component_name(Object *obj, Error **errp)
-+{
-+    RamMemoryBackend *self =3D RAM_BACKEND(obj);
-+
-+    return self->component_name;
-+}
-+
-+static void
-+ram_backend_set_component_name(Object *obj, bool value, Error **errp)
-+{
-+    RamMemoryBackend *self =3D RAM_BACKEND(obj);
-+
-+    self->component_name =3D value;
- }
-=20
- static void
-@@ -39,11 +74,15 @@ ram_backend_class_init(ObjectClass *oc, void *data)
-     HostMemoryBackendClass *bc =3D MEMORY_BACKEND_CLASS(oc);
-=20
-     bc->alloc =3D ram_backend_memory_alloc;
-+    object_class_property_add_bool(oc, "x-component-name",
-+        ram_backend_get_component_name,
-+        ram_backend_set_component_name, &error_abort);
- }
-=20
- static const TypeInfo ram_backend_info =3D {
-     .name =3D TYPE_MEMORY_BACKEND_RAM,
-     .parent =3D TYPE_MEMORY_BACKEND,
-+    .instance_size =3D sizeof(RamMemoryBackend),
-     .class_init =3D ram_backend_class_init,
- };
-=20
---=20
-2.19.0.rc1
+>                               >
+> > 3) Within a drained section, you want requests from other users to be
+> >     blocked, but not your own ones (essentially you want exclusive
+> >     access). We don't have blk_drained_begin/end() yet, so this is not
+> >     something to implement right now, but let's keep this requirement in
+> >     mind and choose a design that allows this.
+> There is an idea to distinguish the requests that should be done without
+> respect to "drained section" by using a flag in BdrvRequestFlags. The
+> requests with a flag set should be processed anyway.
+
+I don't think that would work because the accesses can be nested quite
+deeply in functions that can be called from anywhere.
+
+But possibly all of the interesting cases are directly calling BDS
+functions anyway and not BlockBackend.
+
+> > I believe the whole logic should be kept local to BlockBackend, and
+> > blk_root_drained_begin/end() should be the functions that start queuing
+> > requests or let queued requests resume.
+> > 
+> > As we are already in coroutine context in blk_co_preadv/pwritev(), after
+> > checking that blk->quiesce_counter > 0, we can enter the coroutine
+> > object into a list and yield. blk_root_drained_end() calls aio_co_wake()
+> > for each of the queued coroutines. This should be all that we need to
+> > manage.
+> In my understanding by using brdv_drained_begin/end we want to protect a
+> certain BlockDriverState from external access but not the whole BlockBackend
+> which may involve using a number of BlockDriverState-s.
+> I though it because we could possibly change a backing file for some
+> BlockDriverState. And for the time of changing we need to prevent external
+> access to it but keep the io going.
+> By using blk_root_drained_begin/end() we put to "drained section" all the
+> BlockDriverState-s linked to that root.
+> Does it have to be so?
+
+It's the other way round, actually.
+
+In order for a BDS to be fully drained, it must make sure that it
+doesn't get new requests from its parents any more. So drain propagates
+towards the parents, not towards the children.
+
+blk_root_drained_begin/end() are functions that are called when
+blk->root.bs is drained.
+
+Kevin
