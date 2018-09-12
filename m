@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00Mz-0001FD-L2
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00Mz-0001FG-Lm
 	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:19:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00Mu-0000eV-MC
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00Mv-0000fN-Ny
 	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:19:29 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:55942)
+Received: from mail.ispras.ru ([83.149.199.45]:56032)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00Mu-0000Vx-Ch
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:19:24 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00Mv-0000eE-9f
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:19:25 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 12 Sep 2018 11:19:05 +0300
-Message-ID: <20180912081905.3228.46426.stgit@pasha-VirtualBox>
+Date: Wed, 12 Sep 2018 11:19:22 +0300
+Message-ID: <20180912081922.3228.36913.stgit@pasha-VirtualBox>
 In-Reply-To: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
 References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v6 13/25] replay: refine replay-time module
+Subject: [Qemu-devel] [PATCH v6 16/25] gdbstub: add reverse step support in
+ replay mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +30,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-This patch removes refactoring artifacts from the replay/replay-time.c
+GDB remote protocol supports two reverse debugging commands:
+reverse step and reverse continue.
+This patch adds support of the first one to the gdbstub.
+Reverse step is intended to step one instruction in the backwards
+direction. This is not possible in regular execution.
+But replayed execution is deterministic, therefore we can load one of
+the prior snapshots and proceed to the desired step. It is equivalent
+to stepping one instruction back.
+There should be at least one snapshot preceding the debugged part of
+the replay log.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- replay/replay-time.c |   32 +++++++++++++-------------------
- 1 file changed, 13 insertions(+), 19 deletions(-)
+ accel/tcg/translator.c    |    1 +
+ cpus.c                    |   14 +++++++++++---
+ exec.c                    |    5 +++++
+ gdbstub.c                 |   42 +++++++++++++++++++++++++++++++++++++++---
+ include/sysemu/replay.h   |    7 +++++++
+ replay/replay-debugging.c |   33 +++++++++++++++++++++++++++++++++
+ stubs/replay.c            |    5 +++++
+ 7 files changed, 101 insertions(+), 6 deletions(-)
 
-diff --git a/replay/replay-time.c b/replay/replay-time.c
-index 17caf35..8986054 100644
---- a/replay/replay-time.c
-+++ b/replay/replay-time.c
-@@ -17,16 +17,15 @@
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index afd0a49..33a543e 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -17,6 +17,7 @@
+ #include "exec/gen-icount.h"
+ #include "exec/log.h"
+ #include "exec/translator.h"
++#include "sysemu/replay.h"
  
- int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t raw_icount)
+ /* Pairs with tcg_clear_temp_count.
+    To be called by #TranslatorOps.{translate_insn,tb_stop} if
+diff --git a/cpus.c b/cpus.c
+index 0ce5640..09248dd 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1084,9 +1084,17 @@ static bool cpu_can_run(CPUState *cpu)
+ 
+ static void cpu_handle_guest_debug(CPUState *cpu)
  {
--    if (replay_file) {
--        g_assert(replay_mutex_locked());
-+    g_assert(replay_file);
-+    g_assert(replay_mutex_locked());
+-    gdb_set_stop_cpu(cpu);
+-    qemu_system_debug_request();
+-    cpu->stopped = true;
++    if (!replay_running_debug()) {
++        gdb_set_stop_cpu(cpu);
++        qemu_system_debug_request();
++        cpu->stopped = true;
++    } else {
++        if (!cpu->singlestep_enabled) {
++            cpu_single_step(cpu, SSTEP_ENABLE);
++        } else {
++            cpu_single_step(cpu, 0);
++        }
++    }
+ }
  
--        /* Due to the caller's locking requirements we get the icount from it instead
--         * of using replay_save_instructions().
--         */
--        replay_advance_current_step(raw_icount);
--        replay_put_event(EVENT_CLOCK + kind);
--        replay_put_qword(clock);
--    }
-+    /* Due to the caller's locking requirements we get the icount from it instead
-+     * of using replay_save_instructions().
+ #ifdef CONFIG_LINUX
+diff --git a/exec.c b/exec.c
+index 6826c83..eedddba 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2738,6 +2738,11 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
+     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+         if (cpu_watchpoint_address_matches(wp, vaddr, len)
+             && (wp->flags & flags)) {
++            if (replay_running_debug()) {
++                /* Don't process the watchpoints when we are
++                   in a reverse debugging operation. */
++                return;
++            }
+             if (flags == BP_MEM_READ) {
+                 wp->flags |= BP_WATCHPOINT_HIT_READ;
+             } else {
+diff --git a/gdbstub.c b/gdbstub.c
+index d6ab950..fa108f4 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -39,6 +39,7 @@
+ #include "sysemu/kvm.h"
+ #include "exec/semihost.h"
+ #include "exec/exec-all.h"
++#include "sysemu/replay.h"
+ 
+ #ifdef CONFIG_USER_ONLY
+ #define GDB_ATTACHED "0"
+@@ -334,6 +335,19 @@ typedef struct GDBState {
+  */
+ static int sstep_flags = SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
+ 
++/*! Retrieves flags for single step mode. */
++static int get_sstep_flags(void)
++{
++    /* In replay mode all events written into the log should be replayed.
++     * That is why NOIRQ flag is removed in this mode.
 +     */
-+    replay_advance_current_step(raw_icount);
-+    replay_put_event(EVENT_CLOCK + kind);
-+    replay_put_qword(clock);
++    if (replay_mode != REPLAY_MODE_NONE) {
++        return SSTEP_ENABLE;
++    } else {
++        return sstep_flags;
++    }
++}
++
+ static GDBState *gdbserver_state;
  
-     return clock;
- }
-@@ -48,20 +47,15 @@ void replay_read_next_clock(ReplayClockKind kind)
- /*! Reads next clock event from the input. */
- int64_t replay_read_clock(ReplayClockKind kind)
- {
-+    int64_t ret;
-     g_assert(replay_file && replay_mutex_locked());
- 
-     replay_account_executed_instructions();
- 
--    if (replay_file) {
--        int64_t ret;
--        if (replay_next_event_is(EVENT_CLOCK + kind)) {
--            replay_read_next_clock(kind);
--        }
--        ret = replay_state.cached_clock[kind];
--
--        return ret;
-+    if (replay_next_event_is(EVENT_CLOCK + kind)) {
-+        replay_read_next_clock(kind);
+ bool gdb_has_xml;
+@@ -424,7 +438,7 @@ static int gdb_continue_partial(GDBState *s, char *newstates)
+     CPU_FOREACH(cpu) {
+         if (newstates[cpu->cpu_index] == 's') {
+             trace_gdbstub_op_stepping(cpu->cpu_index);
+-            cpu_single_step(cpu, sstep_flags);
++            cpu_single_step(cpu, get_sstep_flags());
+         }
      }
-+    ret = replay_state.cached_clock[kind];
+     s->running_state = 1;
+@@ -443,7 +457,7 @@ static int gdb_continue_partial(GDBState *s, char *newstates)
+                 break; /* nothing to do here */
+             case 's':
+                 trace_gdbstub_op_stepping(cpu->cpu_index);
+-                cpu_single_step(cpu, sstep_flags);
++                cpu_single_step(cpu, get_sstep_flags());
+                 cpu_resume(cpu);
+                 flag = 1;
+                 break;
+@@ -1082,9 +1096,28 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+             addr = strtoull(p, (char **)&p, 16);
+             gdb_set_cpu_pc(s, addr);
+         }
+-        cpu_single_step(s->c_cpu, sstep_flags);
++        cpu_single_step(s->c_cpu, get_sstep_flags());
+         gdb_continue(s);
+         return RS_IDLE;
++    case 'b':
++        /* Backward debugging commands */
++        if (replay_mode == REPLAY_MODE_PLAY) {
++            switch (*p) {
++            case 's':
++                if (replay_reverse_step()) {
++                    gdb_continue(s);
++                    return RS_IDLE;
++                } else {
++                    put_packet(s, "E14");
++                    break;
++                }
++            default:
++                goto unknown_command;
++            }
++        } else {
++            put_packet(s, "E22");
++        }
++        goto unknown_command;
+     case 'F':
+         {
+             target_ulong ret;
+@@ -1347,6 +1380,9 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+             if (cc->gdb_core_xml_file != NULL) {
+                 pstrcat(buf, sizeof(buf), ";qXfer:features:read+");
+             }
++            if (replay_mode == REPLAY_MODE_PLAY) {
++                pstrcat(buf, sizeof(buf), ";ReverseStep+");
++            }
+             put_packet(s, buf);
+             break;
+         }
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 7a4890d..55a272a 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -76,6 +76,13 @@ const char *replay_get_filename(void);
+ /*! Sets breakpoint at the specified step.
+     If step = -1LL the existing breakpoint is removed. */
+ void replay_break(int64_t step, QEMUTimerCB callback, void *opaque);
++/*! Start making one step in backward direction.
++    Used by gdbstub for backwards debugging.
++    Returns true on success. */
++bool replay_reverse_step(void);
++/*! Returns true if replay module is processing
++    reverse_continue or reverse_step request */
++bool replay_running_debug(void);
  
--    error_report("REPLAY INTERNAL ERROR %d", __LINE__);
--    exit(1);
-+    return ret;
+ /* Processing the instructions */
+ 
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index e605ee0..a49d91e 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -21,6 +21,13 @@
+ #include "block/snapshot.h"
+ #include "migration/snapshot.h"
+ 
++static bool replay_is_debugging;
++
++bool replay_running_debug(void)
++{
++    return replay_is_debugging;
++}
++
+ void hmp_info_replay(Monitor *mon, const QDict *qdict)
+ {
+     if (replay_mode == REPLAY_MODE_NONE) {
+@@ -183,3 +190,29 @@ void hmp_replay_seek(Monitor *mon, const QDict *qdict)
+         return;
+     }
  }
++
++static void replay_stop_vm_debug(void *opaque)
++{
++    replay_is_debugging = false;
++    vm_stop(RUN_STATE_DEBUG);
++    replay_break(-1LL, NULL, NULL);
++}
++
++bool replay_reverse_step(void)
++{
++    Error *err = NULL;
++
++    assert(replay_mode == REPLAY_MODE_PLAY);
++
++    if (replay_get_current_step() != 0) {
++        replay_seek(replay_get_current_step() - 1, &err, replay_stop_vm_debug);
++        if (err) {
++            error_free(err);
++            return false;
++        }
++        replay_is_debugging = true;
++        return true;
++    }
++
++    return false;
++}
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 4ac6078..521552f 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -80,3 +80,8 @@ void replay_mutex_lock(void)
+ void replay_mutex_unlock(void)
+ {
+ }
++
++bool replay_reverse_step(void)
++{
++    return false;
++}
