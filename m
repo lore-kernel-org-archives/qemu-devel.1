@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1g08Fa-0002rO-Kr
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:44:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1g08Hz-0004PA-EG
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1g08FW-00073D-Jd
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:44:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34546 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1g08Hv-0001pm-AI
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:46:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33754 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1g08FW-00072r-DX
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:44:18 -0400
-Date: Wed, 12 Sep 2018 12:44:15 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180912124233-mutt-send-email-mst@kernel.org>
-References: <20180723045956.27521-1-tiwei.bie@intel.com>
-	<20180723045956.27521-4-tiwei.bie@intel.com>
-	<20180726144539.740acf4d@t450s.home>
-	<20180727015805.GA11247@debian>
-	<20180727140300.022d9872@t450s.home>
-	<20180730081003.GA10680@debian>
-	<20180730121704-mutt-send-email-mst@kernel.org>
-	<20180912080400.GA9173@fbsd1.sh.intel.com>
-	<20180912121306-mutt-send-email-mst@kernel.org>
-	<20180912103443.3dd703a6@t450s.home>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g08Hv-0001pL-44
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:46:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F33340241C4
+	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 16:46:46 +0000 (UTC)
+References: <1536769155-269737-1-git-send-email-imammedo@redhat.com>
+	<1536769155-269737-2-git-send-email-imammedo@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e6e03aba-1fc2-6950-3860-318f7a979441@redhat.com>
+Date: Wed, 12 Sep 2018 11:46:43 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180912103443.3dd703a6@t450s.home>
-Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
- group in master
+In-Reply-To: <1536769155-269737-2-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [libvirt] [PATCH v7 1/2] vl.c deprecate incorrect
+ CPUs topology
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +35,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Tiwei Bie <tiwei.bie@intel.com>, jasowang@redhat.com, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, ehabkost@redhat.com
 
-On Wed, Sep 12, 2018 at 10:34:43AM -0600, Alex Williamson wrote:
-> On Wed, 12 Sep 2018 12:14:44 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 9/12/18 11:19 AM, Igor Mammedov wrote:
+> -smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
+> so that total number of logical CPUs [sockets * cores * threads]
+> would be equal to [maxcpus], however historically we didn't have
+> such check in QEMU and it is possible to start VM with an invalid
+> topology.
+> Deprecate invalid options combination so we can make sure that
+> the topology VM started with is always correct in the future.
+> Users with an invalid sockets/cores/threads/maxcpus values should
+> fix their CLI to make sure that
+>     [sockets * cores * threads] == [maxcpus]
 > 
-> > On Wed, Sep 12, 2018 at 04:04:00PM +0800, Tiwei Bie wrote:
-> > > On Mon, Jul 30, 2018 at 12:30:58PM +0300, Michael S. Tsirkin wrote:
-> > > [...]  
-> > > > 
-> > > > I generally wonder how are restarts of the backend handled
-> > > > with this approach: closing the VFIO device tends to reset
-> > > > the whole device.  
-> > > 
-> > > Hi Michael,
-> > > 
-> > > I missed this comment previously.. This is a good point!
-> > > In this RFC, before sending the VFIO group fd to QEMU,
-> > > backend needs to close the VFIO device and unset the VFIO
-> > > container first. Otherwise, QEMU won't be able to set the
-> > > VFIO container for the VFIO group.
-> > > 
-> > > Another option is to share the container fd instead of
-> > > the group fd to QEMU. In this case, backend won't need
-> > > to close any fd. But there is one problem that, it's
-> > > hard to unmap the old mappings, especially when QEMU
-> > > crashes.  
-> > 
-> > What are these old mappings and who creates them?
-> > If you want to just reset everything the way it was
-> > on open, surely it would be easy to add such a reset ioctl.
-> > 
-> > > Do you have any suggestions? Thanks!
-> > > 
-> > > Best regards,
-> > > Tiwei Bie  
-> > 
-> > Donnu. Alex, any thoughts? Which approach would you prefer?
-> 
-> The existing UNMAP_DMA ioctl for the vfio type1 IOMMU only requires
-> that an unmap does not bisect previous mappings, ie. a previous mapping
-> cannot be partially unmapped.  Therefore you can already dump the
-> entire IOVA space for a container with one UNMAP_DMA call, iova = 0,
-> size = (u64)-1.  Thanks,
-> 
-> Alex
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
 
-Hmm this would exclude the last byte (address (u64)-1).
-VTD does not support such iova values for now but something
-to keep in mind e.g. for virtio-iommu with nested virt
-which does.
+> +++ b/qemu-deprecated.texi
+> @@ -139,6 +139,19 @@ The 'file' driver for drives is no longer appropriate for character or host
+>   devices and will only accept regular files (S_IFREG). The correct driver
+>   for these file types is 'host_cdrom' or 'host_device' as appropriate.
+>   
+> +@subsection -smp (invalid topologies) (since 3.1)
+> +
+> +CPU topology properties should describe whole machine topology including
+> +possible CPUs. In other words: @var{maxcpus} should be equal to
+> +@math{@var{sockets} * @var{cores} * @var{threads}}.
+
+This sentence...
+
+> +
+> +However, historically it was possible to start QEMU with an incorrect topology
+> +where @math{@var{n} <= @var{sockets} * @var{cores} * @var{threads} < @var{maxcpus}},
+> +which could lead to an incorrect topology enumeration by the guest.
+> +Support for invalid topologies will be removed, the user must ensure
+> +topologies described with -smp include all possible cpus, i.e.
+> +  @math{@var{sockets} * @var{cores} * @var{threads} = @var{maxcpus}}.
+
+...and this recommendation sound repetitive.  I'd be okay if you removed 
+the "In other words" sentence above, leaving just the intro statement 
+(what -cpu is supposed to do), then the second paragraph (what we also 
+allowed in the past, and how you should fix it before we stop allowing 
+that).
 
 -- 
-MST
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
