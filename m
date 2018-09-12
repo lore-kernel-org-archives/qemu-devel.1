@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g04hB-0007r3-9J
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:38 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g04hL-00081R-Gz
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g04hA-000085-C8
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38838 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g04hI-0000Gm-BI
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49734 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g04hA-00007W-2F
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:36 -0400
+	id 1g04hI-0000Fy-4U
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:56:44 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 12 Sep 2018 16:55:30 +0400
-Message-Id: <20180912125531.32131-9-marcandre.lureau@redhat.com>
+Date: Wed, 12 Sep 2018 16:55:31 +0400
+Message-Id: <20180912125531.32131-10-marcandre.lureau@redhat.com>
 In-Reply-To: <20180912125531.32131-1-marcandre.lureau@redhat.com>
 References: <20180912125531.32131-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 8/9] hw/i386: add pc-i440fx-3.1 & pc-q35-3.1
+Subject: [Qemu-devel] [PATCH 9/9] hostmem-ram: use whole path for memory
+ region name with >= 3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +31,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The following patch is going to add compatiblity parameters.
+hostmem-file and hostmem-memfd use the whole object path for the
+memory region name, but hostname-ram uses only the path component (the
+basename):
+
+qemu -m 1024 -object memory-backend-ram,id=3Dmem,size=3D1G -numa node,mem=
+dev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+                     mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+qemu -m 1024 -object memory-backend-file,id=3Dmem,size=3D1G,mem-path=3D/t=
+mp/foo -numa node,memdev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+qemu -m 1024 -object memory-backend-memfd,id=3Dmem,size=3D1G -numa node,m=
+emdev=3Dmem -monitor stdio
+(qemu) info ramblock
+              Block Name    PSize              Offset               Used =
+             Total
+            /objects/mem    4 KiB  0x0000000000000000 0x0000000040000000 =
+0x0000000040000000
+
+Use the whole path name with >=3D 3.1. Having a consistent naming allow
+to migrate to different hostmem backends.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/hw/i386/pc.h |  5 ++++-
- hw/i386/pc_piix.c    | 15 ++++++++++++---
- hw/i386/pc_q35.c     | 13 +++++++++++--
- 3 files changed, 27 insertions(+), 6 deletions(-)
+ include/hw/compat.h    |  6 +++++-
+ backends/hostmem-ram.c | 47 ++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 48 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 6894f37df1..09b0365a8e 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -294,7 +294,10 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 6f4d5fc647..8ce7a7057b 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -2,7 +2,11 @@
+ #define HW_COMPAT_H
 =20
--#define PC_COMPAT_2_12 \
-+#define PC_COMPAT_3_0 \
-+    HW_COMPAT_3_0
-+
-+#define PC_COMPAT_2_12                          \
-     HW_COMPAT_2_12 \
+ #define HW_COMPAT_3_0 \
+-    /* empty */
++    {\
++        .driver   =3D "memory-backend-ram",\
++        .property =3D "x-component-name",\
++        .value    =3D "true",\
++    },
+=20
+ #define HW_COMPAT_2_12 \
      {\
-         .driver   =3D TYPE_X86_CPU,\
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index dc09466b3e..7092d6d13f 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -428,21 +428,30 @@ static void pc_i440fx_machine_options(MachineClass =
-*m)
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
- }
+diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
+index 7ddd08d370..a9eb99cf1b 100644
+--- a/backends/hostmem-ram.c
++++ b/backends/hostmem-ram.c
+@@ -16,21 +16,56 @@
 =20
--static void pc_i440fx_3_0_machine_options(MachineClass *m)
-+static void pc_i440fx_3_1_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias =3D "pc";
-     m->is_default =3D 1;
- }
+ #define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
 =20
-+DEFINE_I440FX_MACHINE(v3_1, "pc-i440fx-3.1", NULL,
-+                      pc_i440fx_3_1_machine_options);
++typedef struct RamMemoryBackend {
++    HostMemoryBackend parent;
 +
-+static void pc_i440fx_3_0_machine_options(MachineClass *m)
++    bool component_name;
++} RamMemoryBackend;
++
++#define RAM_BACKEND(obj) \
++    OBJECT_CHECK(RamMemoryBackend, (obj), TYPE_MEMORY_BACKEND_RAM)
++
++static char *
++ram_backend_get_name(RamMemoryBackend *self)
 +{
-+    pc_i440fx_3_1_machine_options(m);
-+    m->is_default =3D 0;
-+    m->alias =3D NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
++    /* < 3.1 use the component as memory region name */
++    if (self->component_name) {
++        return object_get_canonical_path_component(OBJECT(self));
++    }
++
++    return object_get_canonical_path(OBJECT(self));
++}
+=20
+ static void
+ ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+ {
+-    char *path;
++    char *name;
+=20
+     if (!backend->size) {
+         error_setg(errp, "can't create backend with size 0");
+         return;
+     }
+=20
+-    path =3D object_get_canonical_path_component(OBJECT(backend));
+-    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
+), path,
++    name =3D ram_backend_get_name(RAM_BACKEND(backend));
++    memory_region_init_ram_shared_nomigrate(&backend->mr, OBJECT(backend=
+), name,
+                            backend->size, backend->share, errp);
+-    g_free(path);
++    g_free(name);
 +}
 +
- DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-                       pc_i440fx_3_0_machine_options);
-=20
- static void pc_i440fx_2_12_machine_options(MachineClass *m)
- {
-     pc_i440fx_3_0_machine_options(m);
--    m->is_default =3D 0;
--    m->alias =3D NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
-=20
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 532241e3f8..4702bb13c4 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -311,19 +311,28 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus =3D 288;
- }
-=20
--static void pc_q35_3_0_machine_options(MachineClass *m)
-+static void pc_q35_3_1_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias =3D "q35";
- }
-=20
-+DEFINE_Q35_MACHINE(v3_1, "pc-q35-3.1", NULL,
-+                   pc_q35_3_1_machine_options);
-+
-+static void pc_q35_3_0_machine_options(MachineClass *m)
++static bool
++ram_backend_get_component_name(Object *obj, Error **errp)
 +{
-+    pc_q35_3_1_machine_options(m);
-+    m->alias =3D NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_3_0);
++    RamMemoryBackend *self =3D RAM_BACKEND(obj);
++
++    return self->component_name;
 +}
 +
- DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
-                     pc_q35_3_0_machine_options);
-=20
- static void pc_q35_2_12_machine_options(MachineClass *m)
- {
-     pc_q35_3_0_machine_options(m);
--    m->alias =3D NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
++static void
++ram_backend_set_component_name(Object *obj, bool value, Error **errp)
++{
++    RamMemoryBackend *self =3D RAM_BACKEND(obj);
++
++    self->component_name =3D value;
  }
+=20
+ static void
+@@ -39,11 +74,15 @@ ram_backend_class_init(ObjectClass *oc, void *data)
+     HostMemoryBackendClass *bc =3D MEMORY_BACKEND_CLASS(oc);
+=20
+     bc->alloc =3D ram_backend_memory_alloc;
++    object_class_property_add_bool(oc, "x-component-name",
++        ram_backend_get_component_name,
++        ram_backend_set_component_name, &error_abort);
+ }
+=20
+ static const TypeInfo ram_backend_info =3D {
+     .name =3D TYPE_MEMORY_BACKEND_RAM,
+     .parent =3D TYPE_MEMORY_BACKEND,
++    .instance_size =3D sizeof(RamMemoryBackend),
+     .class_init =3D ram_backend_class_init,
+ };
 =20
 --=20
 2.19.0.rc1
