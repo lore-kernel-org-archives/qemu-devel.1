@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g08fF-0004S4-Nq
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:10:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g08fH-0004Tw-RQ
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g08fF-0006qG-4U
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:10:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g08fH-0006rf-2v
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:10:55 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Sep 2018 19:10:37 +0200
-Message-Id: <20180912171040.1732-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/3] aio-posix: polling mode bug fixes
+Date: Wed, 12 Sep 2018 19:10:40 +0200
+Message-Id: <20180912171040.1732-4-pbonzini@redhat.com>
+In-Reply-To: <20180912171040.1732-1-pbonzini@redhat.com>
+References: <20180912171040.1732-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 3/3] aio-posix: do skip system call if
+ ctx->notifier polling succeeds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,27 +23,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, famz@redhat.com, kwolf@redhat.com, stefanha@redhat.com
 
-Patch 1 fixes a too-strict assertion that could fire when aio_poll
-is called in parallel with aio_set_fd_handler.
+Commit 70232b5253 ("aio-posix: Don't count ctx->notifier as progress when
+2018-08-15), by not reporting progress, causes aio_poll to execute the
+system call when polling succeeds because of ctx->notifier.  This introduces
+latency before the call to aio_bh_poll() and negates the advantages of
+polling, unfortunately.
 
-Patch 2 and 3 reinstate the performance benefits of polling, which were
-essentially disabled by commit 70232b5253 ("aio-posix: Don't count
-ctx->notifier as progress when polling", 2018-08-15).
+The fix builds on the previous patch, separating the effect of polling on
+the timeout from the progress reported to aio_poll().  ctx->notifier
+does zero the timeout, causing the caller to skip the system call,
+but it does not report progress, so that the bug fix of commit 70232b5253
+still stands.
 
-Please review carefully! :)
+Fixes: 70232b5253a3c4e03ed1ac47ef9246a8ac66c6fa
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ util/aio-posix.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Thanks,
-
-Paolo
-
-Paolo Bonzini (3):
-  aio-posix: fix concurrent access to poll_disable_cnt
-  aio-posix: compute timeout before polling
-  aio-posix: do skip system call if ctx->notifier polling succeeds
-
- util/aio-posix.c  | 88 +++++++++++++++++++++++++++--------------------
- util/trace-events |  4 +--
- 2 files changed, 53 insertions(+), 39 deletions(-)
-
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 21d8987179..efa79b9e62 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -498,10 +498,11 @@ static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
+     QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
+         if (!node->deleted && node->io_poll &&
+             aio_node_check(ctx, node->is_external) &&
+-            node->io_poll(node->opaque) &&
+-            node->opaque != &ctx->notifier) {
++            node->io_poll(node->opaque)) {
+             *timeout = 0;
+-            progress = true;
++            if (node->opaque != &ctx->notifier) {
++                progress = true;
++            }
+         }
+ 
+         /* Caller handles freeing deleted nodes.  Don't do it here. */
 -- 
 2.17.1
