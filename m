@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g07aU-00072g-Hr
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:55 -0400
+	(envelope-from <liq3ea@163.com>) id 1g07ab-000775-Tj
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g07aT-0003e3-PD
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:54 -0400
-Received: from m12-15.163.com ([220.181.12.15]:52050)
+	(envelope-from <liq3ea@163.com>) id 1g07aa-0003ia-5h
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:02:01 -0400
+Received: from m12-15.163.com ([220.181.12.15]:52844)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g07aS-0003cd-Vy
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:53 -0400
+	(envelope-from <liq3ea@163.com>) id 1g07aZ-0003eD-Bq
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:02:00 -0400
 From: Li Qiang <liq3ea@163.com>
-Date: Wed, 12 Sep 2018 09:01:13 -0700
-Message-Id: <20180912160118.21158-4-liq3ea@163.com>
+Date: Wed, 12 Sep 2018 09:01:15 -0700
+Message-Id: <20180912160118.21158-6-liq3ea@163.com>
 In-Reply-To: <20180912160118.21158-1-liq3ea@163.com>
 References: <20180912160118.21158-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH 3/8] hw: hyperv_testdev: add read callback
+Subject: [Qemu-devel] [PATCH 5/8] hw: designware: add read memory region
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +31,33 @@ From: Li Qiang <liq3ea@gmail.com>
 
 Signed-off-by: Li Qiang <liq3ea@gmail.com>
 ---
- hw/misc/hyperv_testdev.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ hw/pci-host/designware.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/hw/misc/hyperv_testdev.c b/hw/misc/hyperv_testdev.c
-index bf6bbfa8cf..7549f470b1 100644
---- a/hw/misc/hyperv_testdev.c
-+++ b/hw/misc/hyperv_testdev.c
-@@ -105,7 +105,12 @@ static void hv_synic_test_dev_control(HypervTestDev *dev, uint32_t ctl,
-     }
+diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
+index 29ea313798..f5641b5c8c 100644
+--- a/hw/pci-host/designware.c
++++ b/hw/pci-host/designware.c
+@@ -57,6 +57,12 @@ designware_pcie_root_to_host(DesignwarePCIERoot *root)
+     return DESIGNWARE_PCIE_HOST(bus->parent);
  }
  
--static void hv_test_dev_control(void *opaque, hwaddr addr, uint64_t data,
-+static uint64_t hv_test_dev_read(void *opaque, hwaddr addr, unsigned size)
++static uint64_t designware_pcie_root_msi_read(void *opaque, hwaddr addr,
++                                              unsigned size)
 +{
 +    return 0;
 +}
 +
-+static void hv_test_dev_write(void *opaque, hwaddr addr, uint64_t data,
-                                 uint32_t len)
+ static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
+                                            uint64_t val, unsigned len)
  {
-     HypervTestDev *dev = HYPERV_TEST_DEV(opaque);
-@@ -127,7 +132,8 @@ static void hv_test_dev_control(void *opaque, hwaddr addr, uint64_t data,
+@@ -71,6 +77,7 @@ static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
  }
  
- static const MemoryRegionOps synic_test_sint_ops = {
--    .write = hv_test_dev_control,
-+    .read = hv_test_dev_read,
-+    .write = hv_test_dev_write,
-     .valid.min_access_size = 4,
-     .valid.max_access_size = 4,
+ static const MemoryRegionOps designware_pci_host_msi_ops = {
++    .read = designware_pcie_root_msi_read,
+     .write = designware_pcie_root_msi_write,
      .endianness = DEVICE_LITTLE_ENDIAN,
+     .valid = {
 -- 
 2.17.1
