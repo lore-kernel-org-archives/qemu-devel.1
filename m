@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g02OR-0000iS-Ai
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 06:29:10 -0400
+	(envelope-from <lersek@redhat.com>) id 1g02Vh-0002hk-1i
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 06:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g02OP-0004ob-G8
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 06:29:07 -0400
-Date: Wed, 12 Sep 2018 12:28:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180912102841.GB5846@localhost.localdomain>
-References: <20180905093351.21954-1-slp@redhat.com>
-	<20180912074159.GA11164@lemon.usersys.redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1g02Vd-0001te-0g
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 06:36:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50872 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1g02Vc-0001sT-Er
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 06:36:32 -0400
+References: <1536729461-2692-1-git-send-email-liq3ea@gmail.com>
+	<CAJ+F1C+nhYjE1qCjJBuxePJ2LQkjGfoQF4=J=AdRF9EfJRVnWg@mail.gmail.com>
+	<CAKXe6S+OHNaxaDBORcDno1Wf3WTevgyNRJQTr6SVAXLV7-rFVA@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <84da6f02-1f60-4bc7-92da-6a7f74deded3@redhat.com>
+Date: Wed, 12 Sep 2018 12:36:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180912074159.GA11164@lemon.usersys.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] util/async: use qemu_aio_coroutine_enter
- in co_schedule_bh_cb
+In-Reply-To: <CAKXe6S+OHNaxaDBORcDno1Wf3WTevgyNRJQTr6SVAXLV7-rFVA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg_mem: add read memory region callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Sergio Lopez <slp@redhat.com>, stefanha@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Li Qiang <liq3ea@gmail.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: mst@redhat.com, ehabkost@redhat.com, Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org, Qemu Developers <qemu-devel@nongnu.org>
 
-Am 12.09.2018 um 09:41 hat Fam Zheng geschrieben:
-> On Wed, 09/05 11:33, Sergio Lopez wrote:
-> > AIO Coroutines shouldn't by managed by an AioContext different than the
-> > one assigned when they are created. aio_co_enter avoids entering a
-> > coroutine from a different AioContext, calling aio_co_schedule instead.
-> > 
-> > Scheduled coroutines are then entered by co_schedule_bh_cb using
-> > qemu_coroutine_enter, which just calls qemu_aio_coroutine_enter with the
-> > current AioContext obtained with qemu_get_current_aio_context.
-> > Eventually, co->ctx will be set to the AioContext passed as an argument
-> > to qemu_aio_coroutine_enter.
-> > 
-> > This means that, if an IO Thread's AioConext is being processed by the
-> > Main Thread (due to aio_poll being called with a BDS AioContext, as it
-> > happens in AIO_WAIT_WHILE among other places), the AioContext from some
-> > coroutines may be wrongly replaced with the one from the Main Thread.
-> > 
-> > This is the root cause behind some crashes, mainly triggered by the
-> > drain code at block/io.c. The most common are these abort and failed
-> > assertion:
-> > 
-> > util/async.c:aio_co_schedule
-> > 456     if (scheduled) {
-> > 457         fprintf(stderr,
-> > 458                 "%s: Co-routine was already scheduled in '%s'\n",
-> > 459                 __func__, scheduled);
-> > 460         abort();
-> > 461     }
-> > 
-> > util/qemu-coroutine-lock.c:
-> > 286     assert(mutex->holder == self);
-> > 
-> > But it's also known to cause random errors at different locations, and
-> > even SIGSEGV with broken coroutine backtraces.
-> > 
-> > By using qemu_aio_coroutine_enter directly in co_schedule_bh_cb, we can
-> > pass the correct AioContext as an argument, making sure co->ctx is not
-> > wrongly altered.
-> > 
-> > Signed-off-by: Sergio Lopez <slp@redhat.com>
-> > ---
-> >  util/async.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/util/async.c b/util/async.c
-> > index 05979f8014..c10642a385 100644
-> > --- a/util/async.c
-> > +++ b/util/async.c
-> > @@ -400,7 +400,7 @@ static void co_schedule_bh_cb(void *opaque)
-> >  
-> >          /* Protected by write barrier in qemu_aio_coroutine_enter */
-> >          atomic_set(&co->scheduled, NULL);
-> > -        qemu_coroutine_enter(co);
-> > +        qemu_aio_coroutine_enter(ctx, co);
-> >          aio_context_release(ctx);
-> >      }
-> >  }
-> 
-> Kevin, could you test this patch together with your next version of the drain
-> fix series? Since they are related, it's better if you could include it in your
-> series or even apply it yourself. Peter is not processing pull requests, so
-> scattering fixes in various trees will do no good.
+On 09/12/18 10:02, Li Qiang wrote:
+> Hi,
+>=20
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> =E4=BA=8E2018=E5=B9=
+=B49=E6=9C=8812=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=883:16=E5=86=99=
+=E9=81=93=EF=BC=9A
+>=20
+>> Hi
+>>
+>> On Wed, Sep 12, 2018 at 9:22 AM Li Qiang <liq3ea@gmail.com> wrote:
+>>>
+>>> The write/read should be paired, this can avoid the
+>>> NULL-deref while the guest reads the fw_cfg port.
+>>>
+>>> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+>>
+>> Do you have a reproducer and/or a backtrace?
+>> memory_region_dispatch_write() checks if ops->write !=3D NULL.
+>>
+>=20
+> As far as I can see, the fw_cfg_mem is not used in x86 and used in arm.
+> And from my impression, this will NULL read will be a issue. So I just
+> omit the 'read' field in fw_cfg_comb_mem_ops(this is used for x86) to
+> emulate the
+> issue.
+>=20
+> When using gdb, I got the following backtrack.
+>=20
+> Thread 5 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+> [Switching to Thread 0x7fffca15b700 (LWP 7637)]
+> 0x0000000000000000 in ?? ()
+> (gdb) bt
+> #0  0x0000000000000000 in ?? ()
+> #1  0x0000555555872492 in memory_region_oldmmio_read_accessor
+> (mr=3D0x5555567fa870, addr=3D1, value=3D0x7fffca158510, size=3D1, shift=
+=3D0,
+> mask=3D255, attrs=3D...) at /home/liqiang02/qemu-devel/qemu/memory.c:40=
+9
+> #2  0x000055555586f2dd in access_with_adjusted_size (addr=3Daddr@entry=3D=
+1,
+> value=3Dvalue@entry=3D0x7fffca158510, size=3Dsize@entry=3D1,
+> access_size_min=3D<optimized out>, access_size_max=3D<optimized out>,
+>     access_fn=3D0x555555872440 <memory_region_oldmmio_read_accessor>,
+> mr=3D0x5555567fa870, attrs=3D...) at
+> /home/liqiang02/qemu-devel/qemu/memory.c:593
+> #3  0x0000555555873e90 in memory_region_dispatch_read1 (attrs=3D..., si=
+ze=3D1,
+> pval=3D0x7fffca158510, addr=3D1, mr=3D0x5555567fa870) at
+> /home/liqiang02/qemu-devel/qemu/memory.c:1404
+> #4  memory_region_dispatch_read (mr=3Dmr@entry=3D0x5555567fa870, addr=3D=
+1,
+> pval=3Dpval@entry=3D0x7fffca158510, size=3D1, attrs=3Dattrs@entry=3D...=
+) at
+> /home/liqiang02/qemu-devel/qemu/memory.c:1423
+> #5  0x0000555555821e42 in flatview_read_continue (fv=3Dfv@entry=3D0x7ff=
+fbc03f370,
+> addr=3Daddr@entry=3D1297, attrs=3D..., buf=3D<optimized out>, buf@entry=
+=3D0x7ffff7fee000
+> "", len=3Dlen@entry=3D1, addr1=3D<optimized out>, l=3D<optimized out>,
+> mr=3D0x5555567fa870)
+>     at /home/liqiang02/qemu-devel/qemu/exec.c:3293
+> #6  0x0000555555822006 in flatview_read (fv=3D0x7fffbc03f370, addr=3D12=
+97,
+> attrs=3D..., buf=3D0x7ffff7fee000 "", len=3D1) at
+> /home/liqiang02/qemu-devel/qemu/exec.c:3331
+> #7  0x000055555582211f in address_space_read_full (as=3D<optimized out>=
+,
+> addr=3Daddr@entry=3D1297, attrs=3D..., buf=3Dbuf@entry=3D0x7ffff7fee000=
+ "",
+> len=3Dlen@entry=3D1) at /home/liqiang02/qemu-devel/qemu/exec.c:3344
+> #8  0x000055555582225a in address_space_rw (as=3D<optimized out>,
+> addr=3Daddr@entry=3D1297, attrs=3D..., attrs@entry=3D..., buf=3Dbuf@ent=
+ry=3D0x7ffff7fee000
+> "", len=3Dlen@entry=3D1, is_write=3Dis_write@entry=3Dfalse)
+>     at /home/liqiang02/qemu-devel/qemu/exec.c:3374
+> #9  0x0000555555886239 in kvm_handle_io (count=3D1, size=3D1,
+> direction=3D<optimized out>, data=3D<optimized out>, attrs=3D..., port=3D=
+1297) at
+> /home/liqiang02/qemu-devel/qemu/accel/kvm/kvm-all.c:1731
+> #10 kvm_cpu_exec (cpu=3Dcpu@entry=3D0x5555566e9990) at
+> /home/liqiang02/qemu-devel/qemu/accel/kvm/kvm-all.c:1971
+> #11 0x000055555585d3de in qemu_kvm_cpu_thread_fn (arg=3D0x5555566e9990)=
+ at
+> /home/liqiang02/qemu-devel/qemu/cpus.c:1257
+> #12 0x00007fffdbd58494 in start_thread () from
+> /lib/x86_64-linux-gnu/libpthread.so.0
+> #13 0x00007fffdba9aacf in clone () from /lib/x86_64-linux-gnu/libc.so.6
+>=20
+> So I send out this path.
+>=20
+> But this time when I not use gdb, there is no segmentation.
+>=20
+> So this may not a issue.
+>=20
+> If who has a arm environment, he can try this, the PoC is just easy. ju=
+st
+> read the 0x510 port with word.
 
-Apparently I forgot to send an email, but I already applied this to my
-block branch.
+I don't understand your description of how you managed to trigger this
+SIGSEGV.
 
-Kevin
+FWIW, looking at the codebase, there's a good number of static
+MemoryRegionOps structures for which the "read_with_attrs" and "read"
+members are default-initialized to NULL. It seems unlikely they are all
+wrong.
+
+- exec.c:                    notdirty_mem_ops, readonly_mem_ops
+- hw/misc/debugexit.c:       debug_exit_ops
+- hw/misc/hyperv_testdev.c:  synic_test_sint_ops
+- hw/misc/pc-testdev.c:      test_irq_ops, test_flush_ops
+- hw/pci-host/designware.c:  designware_pci_host_msi_ops
+- hw/rdma/vmw/pvrdma_main.c: uar_ops
+- hw/sparc64/sun4u.c:        power_mem_ops
+
+Laszlo
