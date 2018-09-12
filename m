@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g04fu-0006qF-6c
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:55:18 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g04gI-000796-Q3
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g04fs-0007GD-J0
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:55:18 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:38381)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g04fr-0007AU-O3
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:55:16 -0400
-Received: by mail-oi0-x244.google.com with SMTP id x197-v6so3435253oix.5
-	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 05:55:12 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g04gF-0007aj-KG
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:55:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54468 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1g04gF-0007aF-ER
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:55:39 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed, 12 Sep 2018 16:55:22 +0400
+Message-Id: <20180912125531.32131-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1536755529-2709-1-git-send-email-liq3ea@gmail.com>
-References: <1536755529-2709-1-git-send-email-liq3ea@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 12 Sep 2018 13:54:50 +0100
-Message-ID: <CAFEAcA-gybpeAucvWuUW3QAyvwjMVcxL_5xxrcaaekJS51vT4Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] memory region: check the old.mmio.read
- status
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/9] hostmem-ram: use whole path for region
+ name with >= 3.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, dgilbert@redhat.com, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 12 September 2018 at 13:32, Li Qiang <liq3ea@gmail.com> wrote:
-> To avoid NULL-deref for the devices without read callbacks
->
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->  memory.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/memory.c b/memory.c
-> index 9b73892768..48d025426b 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -406,6 +406,10 @@ static MemTxResult memory_region_oldmmio_read_accessor(MemoryRegion *mr,
->  {
->      uint64_t tmp;
->
-> +    if (!mr->ops->old_mmio.read[ctz32(size)]) {
-> +        return MEMTX_DECODE_ERROR;
-> +    }
-> +
->      tmp = mr->ops->old_mmio.read[ctz32(size)](mr->opaque, addr);
->      if (mr->subpage) {
->          trace_memory_region_subpage_read(get_cpu_index(), mr, addr, tmp, size);
-> --
-> 2.11.0
->
+Hi,
 
-There's patches on-list which drop the old_mmio field from the MemoryRegion
-struct entirely, so I think this patch as it stands is obsolete.
+The migration code expects the RAM block name to match between the
+source and destination.  However the backend type may change, so it is
+possible (so far) to migrate from a hostmem-file to a hostmem-memfd
+for example.
 
-Currently our semantics are "you must provide both read and write, even
-if one of them just always returns 0 / does nothing / returns an error".
-We could probably reasonably assert this at the point when the
-MemoryRegionOps is registered.
+However, hostmem backends use inconsistent RAM naming, which can cause
+a name mismatch. hostmem-file and hostmem-memfd use the whole object
+path as memory name, while -ram use only the "component" (or basename)
+of the path.
 
-thanks
--- PMM
+This series adds global/compat property support for objects others
+than TYPE_DEVICE (only TYPE_USER_CREATABLE for now), and a new compat
+property "x-component-name" to hostmem-ram. Machines >=3D 3.1 will use
+the whole path for the -ram memory name (like -file and -memfd).
+
+Marc-Andr=C3=A9 Lureau (9):
+  qom/user-creatable: add a few helper macros
+  accel: register global_props like machine globals
+  qdev: move qdev_prop_register_global_list() to tests
+  qom/globals: move qdev globals to qom
+  qom/globals: generalize object_property_set_globals()
+  qom/object: set globals when initializing object
+  tests: add user-creatable test to test-qdev-global-props
+  hw/i386: add pc-i440fx-3.1 & pc-q35-3.1
+  hostmem-ram: use whole path for memory region name with >=3D 3.1
+
+ include/hw/compat.h                           |   6 +-
+ include/hw/i386/pc.h                          |   5 +-
+ include/hw/qdev-core.h                        |  20 ---
+ include/hw/qdev-properties.h                  |  34 +---
+ include/qom/globals.h                         |  32 ++++
+ include/qom/object_interfaces.h               |   4 +
+ accel/accel.c                                 |   9 +-
+ backends/hostmem-ram.c                        |  47 +++++-
+ hw/core/machine.c                             |   2 +-
+ hw/core/qdev-properties.c                     |  97 -----------
+ hw/core/qdev.c                                |   6 -
+ hw/i386/pc_piix.c                             |  15 +-
+ hw/i386/pc_q35.c                              |  13 +-
+ qom/cpu.c                                     |   2 +-
+ qom/globals.c                                 |  81 ++++++++++
+ qom/object.c                                  |   6 +-
+ qom/object_interfaces.c                       |   9 +-
+ target/i386/cpu.c                             |   2 +-
+ target/sparc/cpu.c                            |   2 +-
+ ...dev-global-props.c =3D> test-global-props.c} | 150 +++++++++++++++---
+ vl.c                                          |   8 +-
+ qom/Makefile.objs                             |   2 +-
+ tests/Makefile.include                        |   4 +-
+ 23 files changed, 350 insertions(+), 206 deletions(-)
+ create mode 100644 include/qom/globals.h
+ create mode 100644 qom/globals.c
+ rename tests/{test-qdev-global-props.c =3D> test-global-props.c} (71%)
+
+--=20
+2.19.0.rc1
