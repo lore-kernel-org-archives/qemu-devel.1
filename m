@@ -1,20 +1,26 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:42391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1g0ApP-0003fs-EB
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:29:36 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1g0Apd-0003fs-AT
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:29:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1g0Ajv-0005Ij-6v
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:23:52 -0400
-References: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <ebdf2af9-e1fe-e570-9b8a-b806f96b023b@reactos.org>
-Date: Wed, 12 Sep 2018 21:23:33 +0200
+	(envelope-from <atar4qemu@gmail.com>) id 1g0Aix-0004r5-Nc
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:22:52 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:43176)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1g0Aix-0004qo-IS
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:22:51 -0400
+Received: by mail-io1-xd44.google.com with SMTP id y10-v6so1144570ioa.10
+	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 12:22:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] 40p: fix PCI interrupt routing
+References: <20180912160118.21158-1-liq3ea@163.com>
+	<20180912160118.21158-8-liq3ea@163.com>
+In-Reply-To: <20180912160118.21158-8-liq3ea@163.com>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Wed, 12 Sep 2018 21:22:34 +0200
+Message-ID: <CACXAS8CwxjB1YGHrs8uUarw4VxvNcXPBra+P_91YYkhGYzDccQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 7/8] hw: sun4c: add read memory region
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, david@gibson.dropbear.id.au, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: liq3ea@163.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, lersek@redhat.com, marcandre.lureau@gmail.com, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, ppandit@redhat.com, liq3ea@gmail.com, qemu-devel <qemu-devel@nongnu.org>
 
-Le 10/09/2018 à 22:46, Mark Cave-Ayland a écrit :
-> According to the PReP specification section 6.1.6 "System Interrupt
-> Assignments", all PCI interrupts are routed via IRQ 15.
-> 
-> In the case of the 40p machine this isn't quite true in that it has a routing
-> quirk: the LSI SCSI device is always routed to IRQ 13. At least Linux and
-> NetBSD compare the model name presented by the firmware to "IBM PPS Model
-> 6015", and if it matches will active this quirk.
-> 
-> In order for guest OSs to make use of the fixed IRQ routing, the model name
-> in the residual data must be changed in OpenBIOS using the diff below:
-> 
-> diff --git a/arch/ppc/qemu/context.c b/arch/ppc/qemu/context.c
-> index 06e0122..5815895 100644
-> --- a/arch/ppc/qemu/context.c
-> +++ b/arch/ppc/qemu/context.c
-> @@ -111,7 +111,7 @@ static void *
->   residual_build(uint32_t memsize, uint32_t load_base, uint32_t load_size)
->   {
->       residual_t *res;
-> -    const unsigned char model[] = "Qemu\0PPC\0";
-> +    const unsigned char model[] = "IBM PPS Model 6015\0";
->       int i;
->   
->       res = malloc(sizeof(residual_t));
-> 
-> With the above OpenBIOS patch applied as well as this patchset, it is now
-> possible to boot the sandalfoot zImage all the way through to a working
-> userspace when using OpenBIOS.
-> 
-> (Note: this patchset requires the changes in my previous patchset "scsi:
-> replace lsi53c895a_create() and lsi53c810_create() functions)
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Based-on: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
-> 
-> v3:
-> - Add external IRQ to LSI SCSI device instead of hacking the PCI interrupt
->    routing as suggested by David
-> - Rebase onto the patches from v2 already applied to ppc-for-3.1
-> 
-> v2:
-> - Add OR gate as recommended by Zoltan and implement routing quirk by hacking
->    the raven PCI interrupt routing
-> 
-> 
-> Mark Cave-Ayland (2):
->    lsi53c895a: add optional external IRQ via qdev
->    40p: add fixed IRQ routing for LSI SCSI device
-> 
->   hw/ppc/prep.c        | 11 ++++++-----
->   hw/scsi/lsi53c895a.c | 16 ++++++++++++++--
->   2 files changed, 20 insertions(+), 7 deletions(-)
-> 
+Please correct the typo in the subject. I was scared that someone dug
+out the sun4c zombie emulation.
 
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Tested-by: Hervé Poussineau <hpoussin@reactos.org>
+In the particular case of sun4u, I think the proper way is not to have
+the read callback, but throw an 'Unassigned memory access' exception
+
+Regards,
+Artyom
+On Wed, Sep 12, 2018 at 6:09 PM Li Qiang <liq3ea@163.com> wrote:
+>
+> From: Li Qiang <liq3ea@gmail.com>
+>
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> ---
+>  hw/sparc64/sun4u.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index d16843b30e..74c55a82f4 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -212,6 +212,11 @@ typedef struct PowerDevice {
+>      MemoryRegion power_mmio;
+>  } PowerDevice;
+>
+> +static uint64_t power_mem_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    return 0;
+> +}
+> +
+>  /* Power */
+>  static void power_mem_write(void *opaque, hwaddr addr,
+>                              uint64_t val, unsigned size)
+> @@ -223,6 +228,7 @@ static void power_mem_write(void *opaque, hwaddr addr,
+>  }
+>
+>  static const MemoryRegionOps power_mem_ops = {
+> +    .read = power_mem_read,
+>      .write = power_mem_write,
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>      .valid = {
+> --
+> 2.17.1
+>
+>
+>
+
+
+-- 
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
