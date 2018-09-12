@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g0BcB-0005Ul-Qy
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 16:19:56 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g0BdE-00062q-FJ
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 16:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g0Bc6-0001qd-4k
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 16:19:55 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44377)
+	(envelope-from <richard.henderson@linaro.org>) id 1g0BdD-0002kw-QX
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 16:21:00 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43486)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g0Bc2-0001km-0t
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 16:19:48 -0400
-Received: by mail-pg1-x543.google.com with SMTP id r1-v6so1600508pgp.11
-	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 13:19:45 -0700 (PDT)
+	id 1g0BdD-0002kX-KH
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 16:20:59 -0400
+Received: by mail-pl1-x641.google.com with SMTP id f66-v6so1502787plb.10
+	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 13:20:59 -0700 (PDT)
 References: <20180830193019.20104-1-jancraig@amazon.com>
 	<20180830193019.20104-6-jancraig@amazon.com>
+	<BN7PR08MB48683D162B911B8944759A86C60F0@BN7PR08MB4868.namprd08.prod.outlook.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8542d2e6-c2e2-fa86-28e6-af4be0929801@linaro.org>
-Date: Wed, 12 Sep 2018 13:19:42 -0700
+Message-ID: <a92e4f0d-43b8-63cb-f650-9859c8e9dc11@linaro.org>
+Date: Wed, 12 Sep 2018 13:20:55 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180830193019.20104-6-jancraig@amazon.com>
+In-Reply-To: <BN7PR08MB48683D162B911B8944759A86C60F0@BN7PR08MB4868.namprd08.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -32,25 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Craig Janeczek <jancraig@amazon.com>, qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, amarkovic@wavecomp.com
+To: Aleksandar Markovic <amarkovic@wavecomp.com>, Craig Janeczek <jancraig@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, Petar Jovanovic <pjovanovic@wavecomp.com>
 
-On 08/30/2018 12:30 PM, Craig Janeczek via Qemu-devel wrote:
-> +    gen_load_mxu_cr(t0);
-> +    tcg_gen_andi_tl(t0, t0, MXUEN);
-> +    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXUEN, l0);
+On 08/31/2018 06:39 AM, Aleksandar Markovic wrote:
+>> +    gen_load_mxu_cr(t0);
+>> +    tcg_gen_andi_tl(t0, t0, MXUEN);
+>> +    tcg_gen_brcondi_tl(TCG_COND_NE, t0, MXUEN, l0);
+>> +
+>> +    gen_load_gpr(t0, rb);
+>> +    tcg_gen_addi_tl(t0, t0, (int8_t)s8);
+> 
+> I am not sure if this works as desired, with respect to branching. In order to survive branching, tcg variables must be initialized with tcg_temp_local_new(), rather than with tcg_tem_new(). Please retest, and amend if needed.
 
-Probably MXUEN should be included in env->hflags, and therefore
-tested via ctx->hflags.  (Which also means ending a TB after a
-write to MCR, which can change this value).
+There is no value live across the branch here.
 
-The documentation says that if MXUEN is unset the result is
-"unpredictable".  What does real hardware do?  Does it really
-treat the instruction as a nop?  Does it raise an exception?
+T0 is used before the branch, yes, but it is also reset
+immediately via the gen_load_gpr after the branch.
 
-Otherwise another possibility for "unpredictable" is to simply
-execute the instruction.  Which would certainly be the easiest
-implementation...
+This is fine.
 
 
 r~
