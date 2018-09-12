@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g06mN-0000up-L8
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 11:10:08 -0400
+	(envelope-from <berto@igalia.com>) id 1g06my-0001TR-7o
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 11:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g06mM-0008Gu-HE
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 11:10:07 -0400
-Date: Wed, 12 Sep 2018 17:09:51 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180912150951.GE5846@localhost.localdomain>
-References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
-	<20180629124052.331406-3-dplotnikov@virtuozzo.com>
-	<20180910124136.GF4901@dhcp-200-186.str.redhat.com>
-	<81346e2a-5ce2-50d3-791e-3cab5e2464d9@virtuozzo.com>
-	<20180912131503.GD5846@localhost.localdomain>
-	<c8cd924a-9be7-933d-39c1-72b920ad50d8@virtuozzo.com>
+	(envelope-from <berto@igalia.com>) id 1g06mu-0000QW-BB
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 11:10:44 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180621130622.GH5024@localhost.localdomain>
+References: <cover.1528991017.git.berto@igalia.com>
+	<6782db91216488e4fc1509a267a362a3f15a1aaa.1528991017.git.berto@igalia.com>
+	<20180618143801.GC4667@localhost.localdomain>
+	<w51in6gp213.fsf@maestria.local.igalia.com>
+	<20180618161229.GD4667@localhost.localdomain>
+	<w51vaaf0xnj.fsf@maestria.local.igalia.com>
+	<20180619130509.GA21115@dhcp-200-186.str.redhat.com>
+	<w51sh5i5047.fsf@maestria.local.igalia.com>
+	<20180620105854.GC3946@localhost.localdomain>
+	<w51vaadr5ys.fsf@maestria.local.igalia.com>
+	<20180621130622.GH5024@localhost.localdomain>
+Date: Wed, 12 Sep 2018 17:09:48 +0200
+Message-ID: <w51sh2eiwg3.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c8cd924a-9be7-933d-39c1-72b920ad50d8@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v0 2/2] block: postpone the coroutine
- executing if the BDS's is drained
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 06/10] block: Allow changing the
+ backing file on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,141 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Cc: mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, famz@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Gonglei <arei.gonglei@huawei.com>, Wang WeiWei <wangww.fnst@cn.fujitsu.com>, Wen Congyang <wency@cn.fujitsu.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Am 12.09.2018 um 16:53 hat Denis Plotnikov geschrieben:
-> On 12.09.2018 16:15, Kevin Wolf wrote:
-> > Am 12.09.2018 um 14:03 hat Denis Plotnikov geschrieben:
-> > > On 10.09.2018 15:41, Kevin Wolf wrote:
-> > > > Am 29.06.2018 um 14:40 hat Denis Plotnikov geschrieben:
-> > > > > Fixes the problem of ide request appearing when the BDS is in
-> > > > > the "drained section".
-> > > > > 
-> > > > > Without the patch the request can come and be processed by the main
-> > > > > event loop, as the ide requests are processed by the main event loop
-> > > > > and the main event loop doesn't stop when its context is in the
-> > > > > "drained section".
-> > > > > The request execution is postponed until the end of "drained section".
-> > > > > 
-> > > > > The patch doesn't modify ide specific code, as well as any other
-> > > > > device code. Instead, it modifies the infrastructure of asynchronous
-> > > > > Block Backend requests, in favor of postponing the requests arisen
-> > > > > when in "drained section" to remove the possibility of request appearing
-> > > > > for all the infrastructure clients.
-> > > > > 
-> > > > > This approach doesn't make vCPU processing the request wait untill
-> > > > > the end of request processing.
-> > > > > 
-> > > > > Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> > > > 
-> > > > I generally agree with the idea that requests should be queued during a
-> > > > drained section. However, I think there are a few fundamental problems
-> > > > with the implementation in this series:
-> > > > 
-> > > > 1) aio_disable_external() is already a layering violation and we'd like
-> > > >      to get rid of it (by replacing it with a BlockDevOps callback from
-> > > >      BlockBackend to the devices), so adding more functionality there
-> > > >      feels like a step in the wrong direction.
-> > > > 
-> > > > 2) Only blk_aio_* are fixed, while we also have synchronous public
-> > > >      interfaces (blk_pread/pwrite) as well as coroutine-based ones
-> > > >      (blk_co_*). They need to be postponed as well.
-> > > Good point! Thanks!
-> > > > 
-> > > >      blk_co_preadv/pwritev() are the common point in the call chain for
-> > > >      all of these variants, so this is where the fix needs to live.
-> > > Using the common point might be a good idea, but in case aio requests we
-> > > also have to mane completions which out of the scope of
-> > > blk_co_p(read|write)v:
-> > 
-> > I don't understand what you mean here (possibly because I fail to
-> > understand the word "mane") and what completions have to do with
-> mane = make
-> > queueing of requests.
-> > 
-> > Just to clarify, we are talking about the following situation, right?
-> > bdrv_drain_all_begin() has returned, so all the old requests have
-> > already been drained and their completion callback has already been
-> > called. For any new requests that come in, we need to queue them until
-> > the drained section ends. In other words, they won't reach the point
-> > where they could possibly complete before .drained_end.
-> Yes
-> 
-> To make it clear: I'm trying to defend the idea that putting the postponing
-> routine in blk_co_preadv/pwritev is not the best choice and that's why:
-> 
-> If I understood your idea correctly, if we do the postponing inside
-> blk_co_p(write|read)v we don't know whether we do synchronous or
-> asynchronous request.
-> We need to know this because if we postpone an async request then, later, on
-> the postponed requests processing, we must to make "a completion" for that
-> request stating that it's finally "done".
+On Thu 21 Jun 2018 03:06:22 PM CEST, Kevin Wolf wrote:
+>> > Actually, do we ever use bdrv_reopen() for flags other than
+>> > read-only?  Maybe we should get rid of that flags nonsense and
+>> > simply make it a bdrv_reopen_set_readonly() taking a boolean.
+>> 
+>> I think that's a good idea. There's however one case where other
+>> flags are changed: reopen_backing_file() in block/replication.c that
+>> also clears BDRV_O_INACTIVE. I'd need to take a closer look to that
+>> code to see what we can do about it.
+>
+> Uh, and that works?
+>
+> Clearing BDRV_O_INACTIVE with bdrv_reopen() (which means, without
+> calling bdrv_invalidate_cache()) is surely suspicious. Probably this
+> code is buggy.
+>
+> Another reason for removing flags from the interface: We didn't do any
+> sanity checks for the flag changes.
 
-Yes, for AIO requests, the completion callback must be called
-eventually. This is not different between normal and postponed requests,
-though. This is why blk_aio_read/write_entry() call blk_aio_complete()
-before they return. This call will be made for postponed requests, too,
-so there is nothing that you would need to do additionally inside
-blk_co_preadv/pwritev().
+I'm working on removing the flags parameter from bdrv_reopen() and
+friends, and I think this is the only clearly strange thing on the way.
 
-> Furthermore, for sync requests if we postpone them, we must block the
-> clients issued them until the requests postponed have been processed on
-> drained section leaving. This would ask an additional notification
-> mechanism. Instead, we can just check whether we could proceed in
-> blk_p(write|read) and if not (we're in drained) to wait there.
+The documentation is in https://wiki.qemu.org/Features/BlockReplication
+or in docs/block-replication.txt.
 
-Again, this is the same for normal requests. The BDRV_POLL_WHILE() in
-blk_prw() already implements the waiting. You don't need another
-mechanism.
+As far as I can see there's the following backing chain:
 
-> We avoid the things above if we postponing in blk_aio_prwv and waiting in
-> blk_prw without postponing.
-> 
-> What do you think?
-> 
-> > 
-> > > static void blk_aio_write_entry(void *opaque) {
-> > >      ...
-> > >      rwco->ret = blk_co_pwritev(...);
-> > > 
-> > >      blk_aio_complete(acb);
-> > >      ...
-> > > }
-> > > 
-> > > This makes the difference.
-> > > I would suggest adding waiting until "drained_end" is done on the
-> > > synchronous read/write at blk_prw
-> > 
-> > It is possible, but then the management becomes a bit more complicated
-> > because you have more than just a list of Coroutines that you need to
-> > wake up.
-> > 
-> > One thing that could be problematic in blk_co_preadv/pwritev is that
-> > blk->in_flight would count even requests that are queued if we're not
-> > careful. Then a nested drain would deadlock because the BlockBackend
-> > would never say that it's quiesced.
-> > 
-> > >                                >
-> > > > 3) Within a drained section, you want requests from other users to be
-> > > >      blocked, but not your own ones (essentially you want exclusive
-> > > >      access). We don't have blk_drained_begin/end() yet, so this is not
-> > > >      something to implement right now, but let's keep this requirement in
-> > > >      mind and choose a design that allows this.
-> > > There is an idea to distinguish the requests that should be done without
-> > > respect to "drained section" by using a flag in BdrvRequestFlags. The
-> > > requests with a flag set should be processed anyway.
-> > 
-> > I don't think that would work because the accesses can be nested quite
-> > deeply in functions that can be called from anywhere.
-> > 
-> > But possibly all of the interesting cases are directly calling BDS
-> > functions anyway and not BlockBackend.
-> I hope it's so but what If not, fixing everywhere?
+  [secondary] <- [hidden] <- [active]
 
-If you keep things local to the BlockBackend (instead of involving the
-AioContext), you can block requests for all other BlockBackends, but
-still allow them on the BlockBackend whose user requested draining
-(i.e. exclusive access).
+There's an NBD server writing on [secondary], a backup job copying data
+from [secondary] to [hidden], and the VM writing to [active].
 
-Kevin
+The reopen_backing_file() function in question simply puts the two
+backing images in read-write mode (clearing BDRV_O_INACTIVE along the
+way) so the NBD server and the backup job can write to them.
+
+This is done by replication_start(), which can only be reached with the
+QMP command "xen-set-replication". There's a comment that says "The
+caller of the function MUST make sure vm stopped" but no one seems to
+check that the vm is indeed stopped (?). This API was btw added half a
+year after the replication driver, and before this point the only user
+of replication_start() was a unit test.
+
+Without having tested the COLO / replication code before, I don't see
+any reason why it would make sense to clear the BDRV_O_INACTIVE flag on
+the backing files, or why that flag would be there in the first place
+(and I'm not even talking about whether that flag is supposed to be
+set/cleared with a simple bdrv_reopen()). So I'm thinking to simply
+remove it from there.
+
+If anyone else has more information I'd be happy to hear it.
+
+Berto
