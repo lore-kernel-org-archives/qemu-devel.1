@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1g04TR-00084j-Tt
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:42:26 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g04U3-0008Qv-KK
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:43:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1g04TR-0002pD-A7
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:42:25 -0400
-Date: Wed, 12 Sep 2018 08:42:15 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180912124215.GT22117@localhost.localdomain>
-References: <cover.1536642773.git.jcody@redhat.com>
-	<570e8585c94d6f1bd7406ce5d35f68a82b6ea28c.1536642773.git.jcody@redhat.com>
-	<10f55c86-32dc-957a-c050-32a58baaddbd@redhat.com>
-	<20180911183700.GQ22117@localhost.localdomain>
-	<20180912103856.GC5846@localhost.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1g04U2-0003BT-SK
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:43:03 -0400
+References: <20180910145616.8598-1-famz@redhat.com>
+	<20180910145616.8598-3-famz@redhat.com>
+	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
+	<20180911141245.GQ19292@lemon.usersys.redhat.com>
+	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
+	<20180912013134.GA2526@lemon.usersys.redhat.com>
+	<3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
+	<20180912115020.GH2526@lemon.usersys.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
+Date: Wed, 12 Sep 2018 14:42:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180912103856.GC5846@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/rbd: Attempt to parse legacy
- filenames
+In-Reply-To: <20180912115020.GH2526@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
+ handlers when stopping vq handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Sep 12, 2018 at 12:38:56PM +0200, Kevin Wolf wrote:
-> Am 11.09.2018 um 20:37 hat Jeff Cody geschrieben:
-> > On Tue, Sep 11, 2018 at 02:22:31PM -0400, John Snow wrote:
-> > > Once we load the image, will the header get rewritten into a compliant
-> > > format?
-> > 
-> > Hmm - I think in some code paths, but not all.  I don't think the answer is
-> > 'yes' universally, alas.
-> 
-> Can't we explicitly call BdrvChildRole.update_filename() for all parents
-> when we open a legacy filename? We'd just need to add the callback to
-> child_file, which would propagate it to the parents of the format layer,
-> and then just opening the image with a legacy backing file link once
-> would fix the problem for this image.
->
+On 12/09/2018 13:50, Fam Zheng wrote:
+>> I think it's okay if it is invoked.  The sequence is first you stop th=
+e
+>> vq, then you drain the BlockBackends, then you switch AioContext.  All
+>> that matters is the outcome when virtio_scsi_dataplane_stop returns.
+> Yes, but together with vIOMMU, it also effectively leads to a virtio_er=
+ror(),
+> which is not clean. QEMU stderr when this call happens (with patch 1 bu=
+t not
+> this patch):
+>=20
+> 2018-09-12T11:48:10.193023Z qemu-system-x86_64: vtd_iommu_translate: de=
+tected translation failure (dev=3D02:00:00, iova=3D0x0)
+> 2018-09-12T11:48:10.193044Z qemu-system-x86_64: New fault is not record=
+ed due to compression of faults
+> 2018-09-12T11:48:10.193061Z qemu-system-x86_64: virtio: zero sized buff=
+ers are not allowed
 
-Yes, that is a good idea.  I will spin a v5 with that added.
+But with iothread, virtio_scsi_dataplane_stop runs in another thread
+than the iothread; in that case you still have a race where the iothread
+can process the vq before aio_disable_external and print the error.
+
+IIUC the guest has cleared the IOMMU page tables _before_ clearing the
+DRIVER_OK bit in the status field.  Could this be a guest bug?
+
+Paolo
