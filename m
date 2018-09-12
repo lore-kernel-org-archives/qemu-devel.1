@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g08K5-0005SK-Mq
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:49:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1g08Nn-0006U8-8Q
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:52:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g08K1-0003id-J6
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:49:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40488)
+	(envelope-from <eblake@redhat.com>) id 1g08Nj-0006WH-6q
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:52:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33920 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g08K1-0003hx-DF
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:48:57 -0400
-References: <20180912160118.21158-1-liq3ea@163.com>
-	<20180912160118.21158-2-liq3ea@163.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g08Nj-0006Vv-0j
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:52:47 -0400
+References: <1536729461-2692-1-git-send-email-liq3ea@gmail.com>
+	<CAJ+F1C+nhYjE1qCjJBuxePJ2LQkjGfoQF4=J=AdRF9EfJRVnWg@mail.gmail.com>
+	<CAKXe6S+OHNaxaDBORcDno1Wf3WTevgyNRJQTr6SVAXLV7-rFVA@mail.gmail.com>
+	<84da6f02-1f60-4bc7-92da-6a7f74deded3@redhat.com>
+	<CAKXe6SJjxne34PvxrbLKE3mz+XCowLxo_MSngPTazsVkPRqJUg@mail.gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0ae12445-6a06-859a-5609-7e64825c0b6d@redhat.com>
-Date: Wed, 12 Sep 2018 11:48:45 -0500
+Message-ID: <6973b8ab-ab3a-d320-0080-4171d8bce427@redhat.com>
+Date: Wed, 12 Sep 2018 11:52:43 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180912160118.21158-2-liq3ea@163.com>
+In-Reply-To: <CAKXe6SJjxne34PvxrbLKE3mz+XCowLxo_MSngPTazsVkPRqJUg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/8] fw_cfg_mem: add read memory region
- callback
+Subject: Re: [Qemu-devel] [PATCH] fw_cfg_mem: add read memory region callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@163.com>, pbonzini@redhat.com, lersek@redhat.com, marcandre.lureau@gmail.com, ehabkost@redhat.com, mst@redhat.com, peter.maydell@linaro.org, ppandit@redhat.com
-Cc: Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org
+To: Li Qiang <liq3ea@gmail.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com, mst@redhat.com, richard.henderson@linaro.org, Qemu Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
 
-On 9/12/18 11:01 AM, Li Qiang wrote:
-> From: Li Qiang <liq3ea@gmail.com>
+On 9/12/18 7:33 AM, Li Qiang wrote:
+>>>>
+>>>> Do you have a reproducer and/or a backtrace?
+>>>> memory_region_dispatch_write() checks if ops->write != NULL.
+>>>>
+
+>> FWIW, looking at the codebase, there's a good number of static
+>> MemoryRegionOps structures for which the "read_with_attrs" and "read"
+>> members are default-initialized to NULL. It seems unlikely they are all
+>> wrong.
+>>
+>>
+> I uses the debugexit.
 > 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> QEMU command: gdb --args qemu-system-x86_64  -m 2048 -hda
+> /home/liqiang02/ubuntu1801.img -enable-kvm  -vnc :100 -device isa-debug-exit
+> 
+> guest: inw(0x501)
+> 
+> We can get the following backtrack.
+> 
+> Starting program: /usr/local/bin/qemu-system-x86_64 -m 2048 -hda
+> /home/liqiang02/ubuntu1801.img -enable-kvm -vnc :100 -device isa-debug-exit
 
-This commit message doesn't state why. The cover letter does, but that 
-doesn't get checked into git. A year from now, if someone lands on this 
-commit during a bisect, it would help if the commit message told them 
-why you are adding a no-op callback here, instead of trying to fix the 
-caller to treat a NULL callback as acceptable.
+> Thread 4 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+> [Switching to Thread 0x7fffcca3c700 (LWP 52826)]
+> 0x0000000000000000 in ?? ()
+> (gdb) bt
+> #0  0x0000000000000000 in ?? ()
+> #1  0x00005555557c1f81 in memory_region_oldmmio_read_accessor
+> (mr=0x5555577b32b0, addr=0, value=0x7fffcca39568, size=2, shift=0,
+> mask=65535, attrs=...) at /home/liqiang02/qemu_max_cpu/qemu-2.8/memory.c:409
+
+Doesn't that mean we should fix memory_region_oldmmio_read_accessor() to 
+deal with a NULL callback, rather than hacking up a large number of 
+devices to supply a no-op callback?
 
 -- 
 Eric Blake, Principal Software Engineer
