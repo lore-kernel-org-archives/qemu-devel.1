@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g03FI-00006H-KH
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:23:47 -0400
+	(envelope-from <famz@redhat.com>) id 1g03kB-0003ye-BQ
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:55:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g033T-0007NF-1P
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:11:31 -0400
-References: <20180910145616.8598-1-famz@redhat.com>
-	<20180910145616.8598-3-famz@redhat.com>
-	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
-	<20180911141245.GQ19292@lemon.usersys.redhat.com>
-	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
-	<20180912013134.GA2526@lemon.usersys.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
-Date: Wed, 12 Sep 2018 13:11:17 +0200
+	(envelope-from <famz@redhat.com>) id 1g03j2-0001Uf-U1
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:54:29 -0400
+Date: Wed, 12 Sep 2018 19:54:21 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180912115421.GJ2526@lemon.usersys.redhat.com>
+References: <20180828031751.29507-1-yuchenlin@synology.com>
 MIME-Version: 1.0
-In-Reply-To: <20180912013134.GA2526@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
- handlers when stopping vq handler
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180828031751.29507-1-yuchenlin@synology.com>
+Subject: Re: [Qemu-devel] [PATCH] vmdk: align end of file to a sector
+ boundary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: yuchenlin@synology.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 12/09/2018 03:31, Fam Zheng wrote:
->>>
->>> ctx is qemu_aio_context here, so there's no interaction with IOThread.
->> In this case, it should be okay to have the reentrancy, what is the bug
->> that this patch is fixing?
-> The same symptom as in the previous patch: virtio_scsi_handle_cmd_vq hangs. The
-> reason it hangs is fixed by the previous patch, but I don't think it should be
-> invoked as we're in the middle of virtio_scsi_dataplane_stop(). Applying either
-> one of the two patches avoids the problem, but this one is more superficial.
-> What do you think?
+On Tue, 08/28 11:17, yuchenlin@synology.com wrote:
+> From: yuchenlin <yuchenlin@synology.com>
+> 
+> There is a rare case which the size of last compressed cluster
+> is larger than the cluster size, which will cause the file is
+> not aligned at the sector boundary.
+> 
+> Signed-off-by: yuchenlin <yuchenlin@synology.com>
+> ---
+>  block/vmdk.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/block/vmdk.c b/block/vmdk.c
+> index a9d0084e36..a8ae7c65d2 100644
+> --- a/block/vmdk.c
+> +++ b/block/vmdk.c
+> @@ -1698,6 +1698,24 @@ static int coroutine_fn
+>  vmdk_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+>                             uint64_t bytes, QEMUIOVector *qiov)
+>  {
+> +    if (bytes == 0) {
+> +        /* align end of file to a sector boundary. */
+> +        BDRVVmdkState *s = bs->opaque;
+> +        int i, ret;
+> +        int64_t length;
+> +
+> +        for (i = 0; i < s->num_extents; i++) {
+> +            length = bdrv_getlength(s->extents[i].file->bs);
+> +            if (length < 0) {
+> +                return length;
+> +            }
 
-I think it's okay if it is invoked.  The sequence is first you stop the
-vq, then you drain the BlockBackends, then you switch AioContext.  All
-that matters is the outcome when virtio_scsi_dataplane_stop returns.
+Could you add "length = QEMU_ALIGN_UP(length, BDRV_SECTOR_SIZE);" to show the
+intention more clearly?
 
-Paolo
+Fam
+
+> +            ret = bdrv_truncate(s->extents[i].file, length, PREALLOC_MODE_OFF, NULL);
+> +            if (ret < 0) {
+> +                return ret;
+> +            }
+> +        }
+> +        return 0;
+> +    }
+>      return vmdk_co_pwritev(bs, offset, bytes, qiov, 0);
+>  }
+>  
+> -- 
+> 2.17.0
+> 
