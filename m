@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzu4o-0001Bw-3x
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:36:18 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fzuFV-0003Th-Tc
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:47:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fzu4i-0000NK-5R
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:36:17 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:35681)
+	(envelope-from <robert.hu@linux.intel.com>) id 1fzuFR-0005wW-4O
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:47:21 -0400
+Received: from mga07.intel.com ([134.134.136.100]:28623)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fzu4h-0000Ic-2X
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:36:11 -0400
-Date: Tue, 11 Sep 2018 21:36:02 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180912013602.GA24650@flamenco>
-References: <20180910185859.27917-1-cota@braap.org>
-	<20180910185859.27917-13-cota@braap.org>
-	<8fc81928-961d-7c5b-b34e-38f55d4257af@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8fc81928-961d-7c5b-b34e-38f55d4257af@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 12/12] qht-bench: add -p flag to
- precompute hash values
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fzuFQ-0005Pa-JN
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:47:16 -0400
+Message-ID: <1536716741.4003.2.camel@linux.intel.com>
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Wed, 12 Sep 2018 09:45:41 +0800
+In-Reply-To: <1535888767-154680-1-git-send-email-robert.hu@linux.intel.com>
+References: <1535888767-154680-1-git-send-email-robert.hu@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] x86: QEMU side support on MSR based
+ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, thomas.lendacky@amd.com
+Cc: robert.hu@intel.com, robert.hu@linux.intel.com, qemu-devel@nongnu.org
 
-On Tue, Sep 11, 2018 at 17:46:41 -0700, Richard Henderson wrote:
-> On 09/10/2018 11:58 AM, Emilio G. Cota wrote:
-> > @@ -289,7 +297,9 @@ static void htable_init(void)
-> >      /* avoid allocating memory later by allocating all the keys now */
-> >      keys = g_malloc(sizeof(*keys) * n);
-> >      for (i = 0; i < n; i++) {
-> > -        keys[i] = populate_offset + i;
-> > +        long val = populate_offset + i;
-> > +
-> > +        keys[i] = precompute_hash ? h(val) : hval(val);
+On Sun, 2018-09-02 at 19:46 +0800, Robert Hoo wrote:
+Ping ... :-)
+> KVM side has added the framework (kvm.git:d1d93fa90) to support MSR
+> based features.
+> Here is the QEMU part, including data structure changes/expanding,
+> referring
+> functions changes, and the implementations on 
+> KVM_GET_MSR_FEATURE_INDEX_LIST and KVM_GET_MSRS system ioctl.
 > 
-> hfunc?
-
-Here is where precomputation happens, so if precompute_hash is set,
-then we insert the hashed value. Otherwise we insert the non-hashed
-value (with hval()). In all other instances we use hfunc, since
-hfunc is set to the "other" hash function wrt the above--see
-this later hunk:
-
-@@ -451,6 +461,10 @@ static void parse_args(int argc, char *argv[])
-         case 'o':
-             populate_offset = atol(optarg);
-             break;
-+        case 'p':
-+            precompute_hash = true;
-+            hfunc = hval;
-+            break;
-
-Thanks,
-
-		Emilio
+> Changelog:
+> v4:
+> 	Re-organize patch set to conform to request of individually
+> build pass.
+> 	Add KVM capability check for KVM_GET_MSR_INDEX_LIST before
+> fetch.
+> 	Special treatment for MSR_IA32_ARCH_CAPABILITIES.RSBA.
+> 	Use more convenient glib wrapper (g_strdup_printf) instead of
+> native
+> (sprintf).
+> 	
+> v3: patch 2&3 in v2 are corrupted. Re-format patches.
+> v2: coding style changes to pass ./scripts/checkpatch.pl.
+> 
+> Robert Hoo (3):
+>   x86: Data structure changes to support MSR based features
+>   kvm: Add support to KVM_GET_MSR_FEATURE_INDEX_LIST and     
+>     KVM_GET_MSRS system ioctl
+>   x86: define a new MSR based feature word --
+>     FEATURE_WORDS_ARCH_CAPABILITIES
+> 
+>  include/sysemu/kvm.h |   2 +
+>  target/i386/cpu.c    | 200 +++++++++++++++++++++++++++++++++++++--
+> ------------
+>  target/i386/cpu.h    |  12 ++++
+>  target/i386/kvm.c    |  72 +++++++++++++++++++
+>  4 files changed, 233 insertions(+), 53 deletions(-)
+> 
