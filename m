@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1g052x-00087c-Nd
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 09:19:13 -0400
+	(envelope-from <jcody@redhat.com>) id 1g0538-0008Eg-0H
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 09:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1g052r-00032h-St
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 09:19:07 -0400
+	(envelope-from <jcody@redhat.com>) id 1g052x-00035T-Do
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 09:19:16 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 12 Sep 2018 09:18:50 -0400
-Message-Id: <20180912131853.1249324-2-jcody@redhat.com>
+Date: Wed, 12 Sep 2018 09:18:51 -0400
+Message-Id: <20180912131853.1249324-3-jcody@redhat.com>
 In-Reply-To: <20180912131853.1249324-1-jcody@redhat.com>
 References: <20180912131853.1249324-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] block/rbd: pull out qemu_rbd_convert_options
+Subject: [Qemu-devel] [PULL 2/4] block/rbd: Attempt to parse legacy filenames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +22,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Code movement to pull the conversion from Qdict to BlockdevOptionsRbd
-into a helper function.
+When we converted rbd to get rid of the older key/value-centric
+encoding format, we broke compatibility with image files with backing
+file strings encoded in the old format.
+
+This leaves a bit of an ugly conundrum, and a hacky solution.
+
+If the initial attempt to parse the "proper" options fails, it assumes
+that we may have an older key/value encoded filename.  Fall back to
+attempting to parse the filename, and extract the required options from
+it.  If that fails, pass along the original error message.
+
+We do not support mixed modern usage alongside legacy keyvalue pair
+usage.
+
+A deprecation warning has been added, although care should be taken
+when actually deprecating since the impact is not limited to
+commandline or qapi usage, but also opening existing images.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
-Message-id: 5b49a980f2cde6610ab1df41bb0277d00b5db893.1536704901.git.jcody@redhat.com
+Message-id: 15b332e5432ad069441f7275a46080f465d789a0.1536704901.git.jcody@redhat.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/rbd.c | 36 ++++++++++++++++++++++++------------
- 1 file changed, 24 insertions(+), 12 deletions(-)
+ block/rbd.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 51 insertions(+), 2 deletions(-)
 
 diff --git a/block/rbd.c b/block/rbd.c
-index ca8e5bbace..b199450f9f 100644
+index b199450f9f..5090e4f662 100644
 --- a/block/rbd.c
 +++ b/block/rbd.c
-@@ -655,12 +655,34 @@ failed_opts:
-     return r;
+@@ -678,6 +678,33 @@ static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
+     return 0;
  }
  
-+static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
-+                                    Error **errp)
++static int qemu_rbd_attempt_legacy_options(QDict *options,
++                                           BlockdevOptionsRbd **opts,
++                                           char **keypairs)
 +{
-+    Visitor *v;
-+    Error *local_err = NULL;
++    char *filename;
++    int r;
 +
-+    /* Convert the remaining options into a QAPI object */
-+    v = qobject_input_visitor_new_flat_confused(options, errp);
-+    if (!v) {
++    filename = g_strdup(qdict_get_try_str(options, "filename"));
++    if (!filename) {
 +        return -EINVAL;
 +    }
++    qdict_del(options, "filename");
 +
-+    visit_type_BlockdevOptionsRbd(v, NULL, opts, &local_err);
-+    visit_free(v);
++    qemu_rbd_parse_filename(filename, options, NULL);
 +
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return -EINVAL;
++    /* keypairs freed by caller */
++    *keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
++    if (*keypairs) {
++        qdict_del(options, "=keyvalue-pairs");
 +    }
 +
-+    return 0;
++    r = qemu_rbd_convert_options(options, opts, NULL);
++
++    g_free(filename);
++    return r;
 +}
 +
  static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
                           Error **errp)
  {
-     BDRVRBDState *s = bs->opaque;
-     BlockdevOptionsRbd *opts = NULL;
--    Visitor *v;
-     const QDictEntry *e;
-     Error *local_err = NULL;
-     char *keypairs, *secretid;
-@@ -676,19 +698,9 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         qdict_del(options, "password-secret");
-     }
+@@ -700,8 +727,30 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
  
--    /* Convert the remaining options into a QAPI object */
--    v = qobject_input_visitor_new_flat_confused(options, errp);
--    if (!v) {
--        r = -EINVAL;
--        goto out;
--    }
--
--    visit_type_BlockdevOptionsRbd(v, NULL, &opts, &local_err);
--    visit_free(v);
--
-+    r = qemu_rbd_convert_options(options, &opts, &local_err);
+     r = qemu_rbd_convert_options(options, &opts, &local_err);
      if (local_err) {
-         error_propagate(errp, local_err);
--        r = -EINVAL;
-         goto out;
+-        error_propagate(errp, local_err);
+-        goto out;
++        /* If keypairs are present, that means some options are present in
++         * the modern option format.  Don't attempt to parse legacy option
++         * formats, as we won't support mixed usage. */
++        if (keypairs) {
++            error_propagate(errp, local_err);
++            goto out;
++        }
++
++        /* If the initial attempt to convert and process the options failed,
++         * we may be attempting to open an image file that has the rbd options
++         * specified in the older format consisting of all key/value pairs
++         * encoded in the filename.  Go ahead and attempt to parse the
++         * filename, and see if we can pull out the required options. */
++        r = qemu_rbd_attempt_legacy_options(options, &opts, &keypairs);
++        if (r < 0) {
++            error_propagate(errp, local_err);
++            goto out;
++        }
++        /* Take care whenever deciding to actually deprecate; once this ability
++         * is removed, we will not be able to open any images with legacy-styled
++         * backing image strings. */
++        error_report("RBD options encoded in the filename as keyvalue pairs "
++                     "is deprecated.  Future versions may cease to parse "
++                     "these options in the future.");
      }
  
+     /* Remove the processed options from the QDict (the visitor processes
 -- 
 2.17.1
