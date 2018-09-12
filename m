@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzu0d-00089I-Hy
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:32:04 -0400
+	(envelope-from <pahome.chen@mirlab.org>) id 1fzu1I-00004q-MC
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:32:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzu0Y-0007J3-A6
-	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:31:56 -0400
-Date: Wed, 12 Sep 2018 09:31:34 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180912013134.GA2526@lemon.usersys.redhat.com>
-References: <20180910145616.8598-1-famz@redhat.com>
-	<20180910145616.8598-3-famz@redhat.com>
-	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
-	<20180911141245.GQ19292@lemon.usersys.redhat.com>
-	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
+	(envelope-from <pahome.chen@mirlab.org>) id 1fzu1H-0007Xp-UT
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:32:40 -0400
+Received: from mail-ua1-x92a.google.com ([2607:f8b0:4864:20::92a]:38857)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pahome.chen@mirlab.org>)
+	id 1fzu1H-0007Rx-MQ
+	for qemu-devel@nongnu.org; Tue, 11 Sep 2018 21:32:39 -0400
+Received: by mail-ua1-x92a.google.com with SMTP id o11-v6so264127uak.5
+	for <qemu-devel@nongnu.org>; Tue, 11 Sep 2018 18:32:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
- handlers when stopping vq handler
+From: lampahome <pahome.chen@mirlab.org>
+Date: Wed, 12 Sep 2018 09:32:26 +0800
+Message-ID: <CAB3eZfv6QFAABhzxCKjVY_36j9th_3sbcbzaOQTGkm0mhJ-BoQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] What kind of situation to use internal or external
+ snapshot?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +27,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 09/11 17:30, Paolo Bonzini wrote:
-> On 11/09/2018 16:12, Fam Zheng wrote:
-> > On Tue, 09/11 13:32, Paolo Bonzini wrote:
-> >> On 10/09/2018 16:56, Fam Zheng wrote:
-> >>> We have this unwanted call stack:
-> >>>
-> >>>   > ...
-> >>>   > #13 0x00005586602b7793 in virtio_scsi_handle_cmd_vq
-> >>>   > #14 0x00005586602b8d66 in virtio_scsi_data_plane_handle_cmd
-> >>>   > #15 0x00005586602ddab7 in virtio_queue_notify_aio_vq
-> >>>   > #16 0x00005586602dfc9f in virtio_queue_host_notifier_aio_poll
-> >>>   > #17 0x00005586607885da in run_poll_handlers_once
-> >>>   > #18 0x000055866078880e in try_poll_mode
-> >>>   > #19 0x00005586607888eb in aio_poll
-> >>>   > #20 0x0000558660784561 in aio_wait_bh_oneshot
-> >>>   > #21 0x00005586602b9582 in virtio_scsi_dataplane_stop
-> >>>   > #22 0x00005586605a7110 in virtio_bus_stop_ioeventfd
-> >>>   > #23 0x00005586605a9426 in virtio_pci_stop_ioeventfd
-> >>>   > #24 0x00005586605ab808 in virtio_pci_common_write
-> >>>   > #25 0x0000558660242396 in memory_region_write_accessor
-> >>>   > #26 0x00005586602425ab in access_with_adjusted_size
-> >>>   > #27 0x0000558660245281 in memory_region_dispatch_write
-> >>>   > #28 0x00005586601e008e in flatview_write_continue
-> >>>   > #29 0x00005586601e01d8 in flatview_write
-> >>>   > #30 0x00005586601e04de in address_space_write
-> >>>   > #31 0x00005586601e052f in address_space_rw
-> >>>   > #32 0x00005586602607f2 in kvm_cpu_exec
-> >>>   > #33 0x0000558660227148 in qemu_kvm_cpu_thread_fn
-> >>>   > #34 0x000055866078bde7 in qemu_thread_start
-> >>>   > #35 0x00007f5784906594 in start_thread
-> >>>   > #36 0x00007f5784639e6f in clone
-> >>>
-> >>> Avoid it with the aio_disable_external/aio_enable_external pair, so that
-> >>> no vq poll handlers can be called in aio_wait_bh_oneshot.
-> >>
-> >> I don't understand.  We are in the vCPU thread, so not in the
-> >> AioContext's home thread.  Why is aio_wait_bh_oneshot polling rather
-> >> than going through the aio_wait_bh path?
-> > 
-> > What do you mean by 'aio_wait_bh path'? Here is aio_wait_bh_oneshot:
-> 
-> Sorry, I meant the "atomic_inc(&wait_->num_waiters);" path.  But if this
-> backtrace is obtained without dataplane, that's the answer I was seeking.
-> 
-> > void aio_wait_bh_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
-> > {
-> >     AioWaitBHData data = {
-> >         .cb = cb,
-> >         .opaque = opaque,
-> >     };
-> > 
-> >     assert(qemu_get_current_aio_context() == qemu_get_aio_context());
-> > 
-> >     aio_bh_schedule_oneshot(ctx, aio_wait_bh, &data);
-> >     AIO_WAIT_WHILE(&data.wait, ctx, !data.done);
-> > }
-> > 
-> > ctx is qemu_aio_context here, so there's no interaction with IOThread.
-> 
-> In this case, it should be okay to have the reentrancy, what is the bug
-> that this patch is fixing?
+as title, I know there're two snapshots in qemu, but I don't know when to
+use them well.
 
-The same symptom as in the previous patch: virtio_scsi_handle_cmd_vq hangs. The
-reason it hangs is fixed by the previous patch, but I don't think it should be
-invoked as we're in the middle of virtio_scsi_dataplane_stop(). Applying either
-one of the two patches avoids the problem, but this one is more superficial.
-What do you think?
+What I know is internal snapshot will save the info of L1 and L2 table in
+the end of image but external snapshot won't because external snapshot
+create new file to save cow data.
 
-Fam
+So when to use internal snapshot or external snapshot?
+
+thanks to everyone.
