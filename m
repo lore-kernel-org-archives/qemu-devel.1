@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g03kV-00040f-SO
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:56:03 -0400
+	(envelope-from <kraxel@redhat.com>) id 1g03kx-0004Qm-3b
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g03fI-00066f-60
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:50:36 -0400
-Date: Wed, 12 Sep 2018 19:50:20 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180912115020.GH2526@lemon.usersys.redhat.com>
-References: <20180910145616.8598-1-famz@redhat.com>
-	<20180910145616.8598-3-famz@redhat.com>
-	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
-	<20180911141245.GQ19292@lemon.usersys.redhat.com>
-	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
-	<20180912013134.GA2526@lemon.usersys.redhat.com>
-	<3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
- handlers when stopping vq handler
+	(envelope-from <kraxel@redhat.com>) id 1g03Y7-0003nc-T4
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:43:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44478)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g03Y5-0003YO-A5
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:43:10 -0400
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
+	[10.5.11.24])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9597730842AE
+	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 11:43:08 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 12 Sep 2018 13:43:00 +0200
+Message-Id: <20180912114300.6976-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] sdl2: show console #0 unconditionally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Wed, 09/12 13:11, Paolo Bonzini wrote:
-> On 12/09/2018 03:31, Fam Zheng wrote:
-> >>>
-> >>> ctx is qemu_aio_context here, so there's no interaction with IOThread.
-> >> In this case, it should be okay to have the reentrancy, what is the bug
-> >> that this patch is fixing?
-> > The same symptom as in the previous patch: virtio_scsi_handle_cmd_vq hangs. The
-> > reason it hangs is fixed by the previous patch, but I don't think it should be
-> > invoked as we're in the middle of virtio_scsi_dataplane_stop(). Applying either
-> > one of the two patches avoids the problem, but this one is more superficial.
-> > What do you think?
-> 
-> I think it's okay if it is invoked.  The sequence is first you stop the
-> vq, then you drain the BlockBackends, then you switch AioContext.  All
-> that matters is the outcome when virtio_scsi_dataplane_stop returns.
+Otherwise sdl2 will show no window in case no graphical
+display device is present.
 
-Yes, but together with vIOMMU, it also effectively leads to a virtio_error(),
-which is not clean. QEMU stderr when this call happens (with patch 1 but not
-this patch):
+Reproducer: qemu -nodefaults -display sdl -serial vc
 
-2018-09-12T11:48:10.193023Z qemu-system-x86_64: vtd_iommu_translate: detected translation failure (dev=02:00:00, iova=0x0)
-2018-09-12T11:48:10.193044Z qemu-system-x86_64: New fault is not recorded due to compression of faults
-2018-09-12T11:48:10.193061Z qemu-system-x86_64: virtio: zero sized buffers are not allowed
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/sdl2.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Fam
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 0a9a18a964..2696b95c79 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -806,7 +806,8 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+     for (i = 0; i < sdl2_num_outputs; i++) {
+         QemuConsole *con = qemu_console_lookup_by_index(i);
+         assert(con != NULL);
+-        if (!qemu_console_is_graphic(con)) {
++        if (!qemu_console_is_graphic(con) &&
++            qemu_console_get_index(con) != 0) {
+             sdl2_console[i].hidden = true;
+         }
+         sdl2_console[i].idx = i;
+-- 
+2.9.3
