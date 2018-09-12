@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1g0ApE-0003ei-Pj
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:29:24 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1g0ApP-0003fs-EB
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1g0AlL-0006A6-NR
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:25:23 -0400
-Received: from mail-co1nam05on060c.outbound.protection.outlook.com
-	([2a01:111:f400:fe50::60c]:17882
-	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1g0AlL-00069S-Dj
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:25:19 -0400
-References: <1536684589-11718-1-git-send-email-brijesh.singh@amd.com>
-	<1536684589-11718-5-git-send-email-brijesh.singh@amd.com>
-	<20180912183510.1fe2c3b8@redhat.com>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <88997184-3509-4a6d-4fca-cd3fa64d1858@amd.com>
-Date: Wed, 12 Sep 2018 14:24:52 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1g0Ajv-0005Ij-6v
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 15:23:52 -0400
+References: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <ebdf2af9-e1fe-e570-9b8a-b806f96b023b@reactos.org>
+Date: Wed, 12 Sep 2018 21:23:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180912183510.1fe2c3b8@redhat.com>
+In-Reply-To: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/6] i386: acpi: add IVHD device entry for
- IOAPIC
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] 40p: fix PCI interrupt routing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: brijesh.singh@amd.com, qemu-devel@nongnu.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, Richard Henderson <rth@twiddle.net>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, david@gibson.dropbear.id.au, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-
-
-On 09/12/2018 11:35 AM, Igor Mammedov wrote:
-...
-
->>   
->> +    /*
->> +     * When interrupt remapping is enabled, Linux IOMMU driver also checks
->> +     * for special IVHD device (type IO-APIC), which is typically presented
->> +     * as PCI device 14:00.0.
-> Probably it shouldn't be a 'typically' device from somewhere but rather address
-> fetched from corresponding device model QEMU implements.
+Le 10/09/2018 à 22:46, Mark Cave-Ayland a écrit :
+> According to the PReP specification section 6.1.6 "System Interrupt
+> Assignments", all PCI interrupts are routed via IRQ 15.
+> 
+> In the case of the 40p machine this isn't quite true in that it has a routing
+> quirk: the LSI SCSI device is always routed to IRQ 13. At least Linux and
+> NetBSD compare the model name presented by the firmware to "IBM PPS Model
+> 6015", and if it matches will active this quirk.
+> 
+> In order for guest OSs to make use of the fixed IRQ routing, the model name
+> in the residual data must be changed in OpenBIOS using the diff below:
+> 
+> diff --git a/arch/ppc/qemu/context.c b/arch/ppc/qemu/context.c
+> index 06e0122..5815895 100644
+> --- a/arch/ppc/qemu/context.c
+> +++ b/arch/ppc/qemu/context.c
+> @@ -111,7 +111,7 @@ static void *
+>   residual_build(uint32_t memsize, uint32_t load_base, uint32_t load_size)
+>   {
+>       residual_t *res;
+> -    const unsigned char model[] = "Qemu\0PPC\0";
+> +    const unsigned char model[] = "IBM PPS Model 6015\0";
+>       int i;
+>   
+>       res = malloc(sizeof(residual_t));
+> 
+> With the above OpenBIOS patch applied as well as this patchset, it is now
+> possible to boot the sandalfoot zImage all the way through to a working
+> userspace when using OpenBIOS.
+> 
+> (Note: this patchset requires the changes in my previous patchset "scsi:
+> replace lsi53c895a_create() and lsi53c810_create() functions)
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Based-on: <20180907125653.5010-1-mark.cave-ayland@ilande.co.uk>
+> 
+> v3:
+> - Add external IRQ to LSI SCSI device instead of hacking the PCI interrupt
+>    routing as suggested by David
+> - Rebase onto the patches from v2 already applied to ppc-for-3.1
+> 
+> v2:
+> - Add OR gate as recommended by Zoltan and implement routing quirk by hacking
+>    the raven PCI interrupt routing
+> 
+> 
+> Mark Cave-Ayland (2):
+>    lsi53c895a: add optional external IRQ via qdev
+>    40p: add fixed IRQ routing for LSI SCSI device
+> 
+>   hw/ppc/prep.c        | 11 ++++++-----
+>   hw/scsi/lsi53c895a.c | 16 ++++++++++++++--
+>   2 files changed, 20 insertions(+), 7 deletions(-)
 > 
 
-IOAPIC is not presented as a true PCI device to guest OS. When IOMMU is
-enabled a pseudo address space to added under root PCI bus. PCI 14:0.0
-presents to this pseudo device.
-
-> 
->> +     */
->> +    if (s->intr_enabled) {
->> +        build_append_int_noprefix(table_data, 0x0100a00000000048, 8);
->                                                   ^^ this is incomprehensible,
-> where does this magic number comes from and how was it calculated?
-> 
-
-In order to provide interrupt remap support, a special IVHD device need
-to be added,  the magic number uses the format defined in Table 95 (IVHD
-device entry type codes).
-
-0x01 00a0 00 00 0000 48
-
-Byte 0: 0x48 (special device)
-Byte 1 & 2: must be zero
-Byte 3: 0 (dte setting)
-Byte 4: 0 (handle)
-Byte 5 & 6: IOAPIC devfn (14:0.0)
-Byte 7: 0x1 (IOAPIC) - See Table 97 in spec
-
-
->> +    }
->> +
->>       build_header(linker, table_data, (void *)(table_data->data + iommu_start),
->>                    "IVRS", table_data->len - iommu_start, 1, NULL, NULL);
->>   }
-> 
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Tested-by: Hervé Poussineau <hpoussin@reactos.org>
