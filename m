@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g00DZ-0004cz-0G
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:09:49 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1g00I0-0007ef-PX
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:14:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fzzzT-00057f-98
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 03:55:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49358 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fzzzT-000573-22
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 03:55:11 -0400
-Date: Wed, 12 Sep 2018 15:55:08 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180912075508.GD2526@lemon.usersys.redhat.com>
-References: <20180907133902.28462-1-fli@suse.com>
-	<20180907133902.28462-2-fli@suse.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1g00Hv-0004xW-Nw
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:14:20 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:55268)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1g00Hv-0004xH-EH
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:14:15 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180907133902.28462-2-fli@suse.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] Fix segmentation fault when
- qemu_signal_init fails
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Wed, 12 Sep 2018 11:14:13 +0300
+From: dovgaluk <dovgaluk@ispras.ru>
+In-Reply-To: <CAFXrp_dgDh+YG2_3rF9sqWr4Tr15Mc7yip=0rQzAYGTcOeyMOw@mail.gmail.com>
+References: <20180725121311.12867.21729.stgit@pasha-VirtualBox>
+	<CAFXrp_dgDh+YG2_3rF9sqWr4Tr15Mc7yip=0rQzAYGTcOeyMOw@mail.gmail.com>
+Message-ID: <0dd4092203876a1e5bf586e837bf760e@ispras.ru>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 00/24] Fixing record/replay and adding
+ reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,151 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, armbru@redhat.com, eblake@redhat.com
+To: Ciro Santilli <ciro.santilli@gmail.com>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Fri, 09/07 21:38, Fei Li wrote:
-> Currently, when qemu_signal_init() fails it only returns a non-zero
-> value but without propagating any Error. But its callers need a
-> non-null err when runs error_report_err(err), or else 0->msg occurs.
-> 
-> To avoid such segmentation fault, add a new Error parameter to make
-> the call trace to propagate the err to the final caller.
-> 
-> This patch also adds the omitted error handling when creating signalfd
-> pipe fails in qemu_signalfd_compat().
-> 
-> Signed-off-by: Fei Li <fli@suse.com>
-> ---
->  include/qemu/osdep.h |  2 +-
->  util/compatfd.c      |  9 ++++++---
->  util/main-loop.c     | 10 +++++-----
->  3 files changed, 12 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index a91068df0e..09ed85fcb8 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
->                               additional fields in the future) */
->  };
->  
-> -int qemu_signalfd(const sigset_t *mask);
-> +int qemu_signalfd(const sigset_t *mask, Error **errp);
->  void sigaction_invoke(struct sigaction *action,
->                        struct qemu_signalfd_siginfo *info);
->  #endif
-> diff --git a/util/compatfd.c b/util/compatfd.c
-> index 980bd33e52..d3ed890405 100644
-> --- a/util/compatfd.c
-> +++ b/util/compatfd.c
-> @@ -16,6 +16,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
->  #include "qemu/thread.h"
-> +#include "qapi/error.h"
->  
->  #include <sys/syscall.h>
->  
-> @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
->      }
->  }
->  
-> -static int qemu_signalfd_compat(const sigset_t *mask)
-> +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
->  {
->      struct sigfd_compat_info *info;
->      QemuThread thread;
-> @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *mask)
->  
->      info = malloc(sizeof(*info));
->      if (info == NULL) {
-> +        error_setg(errp, "Failed to allocate signalfd memory");
->          errno = ENOMEM;
->          return -1;
->      }
->  
->      if (pipe(fds) == -1) {
-> +        error_setg(errp, "Failed to create signalfd pipe");
->          free(info);
->          return -1;
->      }
-> @@ -94,7 +97,7 @@ static int qemu_signalfd_compat(const sigset_t *mask)
->      return fds[0];
->  }
->  
-> -int qemu_signalfd(const sigset_t *mask)
-> +int qemu_signalfd(const sigset_t *mask, Error **errp)
->  {
->  #if defined(CONFIG_SIGNALFD)
->      int ret;
+Hi, Ciro!
 
-Extend the context:
+I found several issues in your command lines.
 
-       ret = syscall(SYS_signalfd, -1, mask, _NSIG / 8);
-       if (ret != -1) {
-           qemu_set_cloexec(ret);
-           return ret;
-       }
+Ciro Santilli =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-08-08 02:13:
+> OK, finally got some time to try it out, I'm using
+> c42634d8e3428cfa60672c3ba89cabefc720cde9 from rr-180725.
+>=20
+> Replay works well as far as I can tell, so I moved to the reverse
+> debugging:
+>=20
+> /home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/build=
+/host-qemu-custom.rr/x86_64-softmmu/qemu-system-x86_64
+> \
+> -M pc \
+> -append 'root=3D/dev/sda nopat console_msg_format=3Dsyslog nokaslr
+> norandmaps printk.devkmsg=3Don printk.time=3Dy console=3DttyS0 -
+> lkmc_eval_base64=3D"L3JhbmRfY2hlY2sub3V0Oy9wb3dlcm9mZi5vdXQ7"' \
+> -kernel
+> '/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/buil=
+d/linux-custom.default/arch/x86/boot/bzImage'
+> \
+> -m '256M' \
+> -monitor 'telnet::45454,server,nowait' \
+> -nographic \
+> -serial mon:stdio \
+> -smp '1' \
+> \
+> -drive
+> 'file=3D/home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildro=
+ot/images/rootfs.ext2.qcow2,format=3Dqcow2,if=3Dnone,id=3Dimg-direct'
 
-This error path need error_setg() as well.
+You'll probably need an overlay, it you want this file to be unchanged=20
+by VM.
 
-> @@ -106,5 +109,5 @@ int qemu_signalfd(const sigset_t *mask)
->      }
->  #endif
->  
-> -    return qemu_signalfd_compat(mask);
-> +    return qemu_signalfd_compat(mask, errp);
->  }
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index affe0403c5..22aa2b1007 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
->      }
->  }
->  
-> -static int qemu_signal_init(void)
-> +static int qemu_signal_init(Error **errp)
->  {
->      int sigfd;
->      sigset_t set;
-> @@ -94,10 +94,10 @@ static int qemu_signal_init(void)
->      pthread_sigmask(SIG_BLOCK, &set, NULL);
->  
->      sigdelset(&set, SIG_IPI);
-> -    sigfd = qemu_signalfd(&set);
-> +    sigfd = qemu_signalfd(&set, errp);
->      if (sigfd == -1) {
->          fprintf(stderr, "failed to create signalfd\n");
+Can you also provide this file for testing? I found only bzImage.
 
-This fprintf is not needed any more.
+> \
+> -drive driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkrepl=
+ay \
+> -device ide-hd,drive=3Dimg-blkreplay \
+> \
+> -object filter-replay,id=3Dreplay,netdev=3Dnet0 \
+> -device rtl8139,netdev=3Dnet0 \
+> -netdev
+> 'user,hostfwd=3Dtcp::45455-:45455,hostfwd=3Dtcp::45456-:22,id=3Dnet0' \
+> \
+> -icount
+> 'shift=3D7,rr=3Drecord,rrfile=3D/home/ciro/bak/git/linux-kernel-module-=
+cheat/out/x86_64/qemu/0/rrfile'
 
-> -        return -errno;
-> +        return -1;
->      }
->  
->      fcntl_setfl(sigfd, O_NONBLOCK);
-> @@ -109,7 +109,7 @@ static int qemu_signal_init(void)
->  
->  #else /* _WIN32 */
->  
-> -static int qemu_signal_init(void)
-> +static int qemu_signal_init(Error **errp)
->  {
->      return 0;
->  }
-> @@ -148,7 +148,7 @@ int qemu_init_main_loop(Error **errp)
->  
->      init_clocks(qemu_timer_notify_cb);
->  
-> -    ret = qemu_signal_init();
-> +    ret = qemu_signal_init(errp);
->      if (ret) {
->          return ret;
->      }
-> -- 
-> 2.13.7
-> 
+You need to specify rrsnapshot=3D<name> option for creating the initial V=
+M=20
+snapshot.
+This option creates snapshot at record and loads it at replay. GDB can=20
+also use this snapshot for reverse execution.
 
-Fam
+> \
+>=20
+> and replay with:
+>=20
+> -icount
+> 'shift=3D7,rr=3Dreplay,rrfile=3D/home/ciro/bak/git/linux-kernel-module-=
+cheat/out/x86_64/qemu/0/rrfile'
+> \
+> -gdb 'tcp::45457' \
+> -S \
+>=20
+> Then, I do
+>=20
+> /home/ciro/bak/git/linux-kernel-module-cheat/out/x86_64/buildroot/host/=
+usr/bin/x86_64-linux-gdb
+> \
+>  -q \
+> -ex 'add-auto-load-safe-path
+> /home/ciro/bak/git/linux-kernel-module-cheat' \
+> -ex 'file vmlinux' \
+> -ex 'target remote localhost:45457' \
+> -ex 'break start_kernel' \
+>   -ex continue \
+> -ex 'lx-symbols ../kernel_module-1.0/' \
+>=20
+> Then in GDB:
+>=20
+> n
+> n
+> n
+> n
+> reverse-continue
+>=20
+> expecting it to return me to start_kernel, but instead it left me in
+> the same place that I'm at.
+
+Right, because there were no checkpoints. The initial one must be=20
+created at recording phase.
+
+
+
+Pavel Dovgalyuk
