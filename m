@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g07aT-00071k-AB
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:54 -0400
+	(envelope-from <liq3ea@163.com>) id 1g07aW-00074N-C3
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g07aS-0003dc-Lj
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:53 -0400
-Received: from m12-15.163.com ([220.181.12.15]:51598)
+	(envelope-from <liq3ea@163.com>) id 1g07aV-0003eb-HG
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:56 -0400
+Received: from m12-15.163.com ([220.181.12.15]:52585)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g07aR-0003ax-RU
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:52 -0400
+	(envelope-from <liq3ea@163.com>) id 1g07aU-0003dN-RQ
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:01:55 -0400
 From: Li Qiang <liq3ea@163.com>
-Date: Wed, 12 Sep 2018 09:01:11 -0700
-Message-Id: <20180912160118.21158-2-liq3ea@163.com>
+Date: Wed, 12 Sep 2018 09:01:14 -0700
+Message-Id: <20180912160118.21158-5-liq3ea@163.com>
 In-Reply-To: <20180912160118.21158-1-liq3ea@163.com>
 References: <20180912160118.21158-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH 1/8] fw_cfg_mem: add read memory region callback
+Subject: [Qemu-devel] [PATCH 4/8] hw: pc-testdev: add read memory region
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +29,64 @@ Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
 
 From: Li Qiang <liq3ea@gmail.com>
 
+Also change the write callback name.
+
 Signed-off-by: Li Qiang <liq3ea@gmail.com>
 ---
- hw/nvram/fw_cfg.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/misc/pc-testdev.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index d79a568f54..6de7809f1a 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -434,6 +434,11 @@ static bool fw_cfg_data_mem_valid(void *opaque, hwaddr addr,
-     return addr == 0;
- }
+diff --git a/hw/misc/pc-testdev.c b/hw/misc/pc-testdev.c
+index b81d820084..697eb88c97 100644
+--- a/hw/misc/pc-testdev.c
++++ b/hw/misc/pc-testdev.c
+@@ -58,7 +58,12 @@ typedef struct PCTestdev {
+ #define TESTDEV(obj) \
+      OBJECT_CHECK(PCTestdev, (obj), TYPE_TESTDEV)
  
-+static uint64_t fw_cfg_ctl_mem_read(void *opaque, hwaddr addr, unsigned size)
+-static void test_irq_line(void *opaque, hwaddr addr, uint64_t data,
++static uint64_t test_irq_line_read(void *opaque, hwaddr addr, unsigned size)
 +{
 +    return 0;
 +}
 +
- static void fw_cfg_ctl_mem_write(void *opaque, hwaddr addr,
-                                  uint64_t value, unsigned size)
++static void test_irq_line_write(void *opaque, hwaddr addr, uint64_t data,
+                           unsigned len)
  {
-@@ -468,6 +473,7 @@ static bool fw_cfg_comb_valid(void *opaque, hwaddr addr,
+     PCTestdev *dev = opaque;
+@@ -68,7 +73,8 @@ static void test_irq_line(void *opaque, hwaddr addr, uint64_t data,
  }
  
- static const MemoryRegionOps fw_cfg_ctl_mem_ops = {
-+    .read = fw_cfg_ctl_mem_read,
-     .write = fw_cfg_ctl_mem_write,
-     .endianness = DEVICE_BIG_ENDIAN,
-     .valid.accepts = fw_cfg_ctl_mem_valid,
+ static const MemoryRegionOps test_irq_ops = {
+-    .write = test_irq_line,
++    .read = test_irq_line_read,
++    .write = test_irq_line_write,
+     .valid.min_access_size = 1,
+     .valid.max_access_size = 1,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+@@ -110,7 +116,12 @@ static const MemoryRegionOps test_ioport_byte_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+-static void test_flush_page(void *opaque, hwaddr addr, uint64_t data,
++static uint64_t test_flush_page_read(void *opaque, hwaddr addr, unsigned size)
++{
++    return 0;
++}
++
++static void test_flush_page_write(void *opaque, hwaddr addr, uint64_t data,
+                             unsigned len)
+ {
+     hwaddr page = 4096;
+@@ -126,7 +137,8 @@ static void test_flush_page(void *opaque, hwaddr addr, uint64_t data,
+ }
+ 
+ static const MemoryRegionOps test_flush_ops = {
+-    .write = test_flush_page,
++    .read = test_flush_page_read,
++    .write = test_flush_page_write,
+     .valid.min_access_size = 4,
+     .valid.max_access_size = 4,
+     .endianness = DEVICE_LITTLE_ENDIAN,
 -- 
 2.17.1
