@@ -1,16 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1g0538-0008Eg-0H
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 09:19:22 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g05qV-0003w4-Qm
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 10:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1g052x-00035T-Do
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 09:19:16 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 12 Sep 2018 09:18:51 -0400
-Message-Id: <20180912131853.1249324-3-jcody@redhat.com>
-In-Reply-To: <20180912131853.1249324-1-jcody@redhat.com>
-References: <20180912131853.1249324-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] block/rbd: Attempt to parse legacy filenames
+	(envelope-from <pbonzini@redhat.com>) id 1g05qP-0000Ob-OL
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 10:10:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41232 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g05qP-0000NF-G7
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 10:10:13 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 12 Sep 2018 16:10:09 +0200
+Message-Id: <20180912141009.19477-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] serial: fix DLL writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,105 +21,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: linux@roeck-us.net
 
-When we converted rbd to get rid of the older key/value-centric
-encoding format, we broke compatibility with image files with backing
-file strings encoded in the old format.
+Commit 0147883450fe84bb8de2d4a58381881f4262ce9b tries to handle
+word-sized writes to DLL/DLH, but due to a typo,
+this patch is causing tracebacks in all Linux kernels running the PXA
+serial driver, due to an unexpected DLL register value. Here is the
+surrounding code from drivers/tty/serial/pxa.c:
 
-This leaves a bit of an ugly conundrum, and a hacky solution.
+	serial_out(up, UART_DLL, quot & 0xff);		/* LS of divisor */
 
-If the initial attempt to parse the "proper" options fails, it assumes
-that we may have an older key/value encoded filename.  Fall back to
-attempting to parse the filename, and extract the required options from
-it.  If that fails, pass along the original error message.
+	/*
+	 * work around Errata #75 according to Intel(R) PXA27x
+	 * Processor Family Specification Update (Nov 2005)
+	 */
+	dll = serial_in(up, UART_DLL);
+	WARN_ON(dll != (quot & 0xff));	// <-- warning
 
-We do not support mixed modern usage alongside legacy keyvalue pair
-usage.
-
-A deprecation warning has been added, although care should be taken
-when actually deprecating since the impact is not limited to
-commandline or qapi usage, but also opening existing images.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
-Message-id: 15b332e5432ad069441f7275a46080f465d789a0.1536704901.git.jcody@redhat.com
-Signed-off-by: Jeff Cody <jcody@redhat.com>
+Reported-by: Guenter Roeck <linux@roeck-us.net>
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+Fixes: 0147883450fe84bb8de2d4a58381881f4262ce9b
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/rbd.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 51 insertions(+), 2 deletions(-)
+ hw/char/serial.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index b199450f9f..5090e4f662 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -678,6 +678,33 @@ static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
-     return 0;
- }
- 
-+static int qemu_rbd_attempt_legacy_options(QDict *options,
-+                                           BlockdevOptionsRbd **opts,
-+                                           char **keypairs)
-+{
-+    char *filename;
-+    int r;
-+
-+    filename = g_strdup(qdict_get_try_str(options, "filename"));
-+    if (!filename) {
-+        return -EINVAL;
-+    }
-+    qdict_del(options, "filename");
-+
-+    qemu_rbd_parse_filename(filename, options, NULL);
-+
-+    /* keypairs freed by caller */
-+    *keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
-+    if (*keypairs) {
-+        qdict_del(options, "=keyvalue-pairs");
-+    }
-+
-+    r = qemu_rbd_convert_options(options, opts, NULL);
-+
-+    g_free(filename);
-+    return r;
-+}
-+
- static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
- {
-@@ -700,8 +727,30 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     r = qemu_rbd_convert_options(options, &opts, &local_err);
-     if (local_err) {
--        error_propagate(errp, local_err);
--        goto out;
-+        /* If keypairs are present, that means some options are present in
-+         * the modern option format.  Don't attempt to parse legacy option
-+         * formats, as we won't support mixed usage. */
-+        if (keypairs) {
-+            error_propagate(errp, local_err);
-+            goto out;
-+        }
-+
-+        /* If the initial attempt to convert and process the options failed,
-+         * we may be attempting to open an image file that has the rbd options
-+         * specified in the older format consisting of all key/value pairs
-+         * encoded in the filename.  Go ahead and attempt to parse the
-+         * filename, and see if we can pull out the required options. */
-+        r = qemu_rbd_attempt_legacy_options(options, &opts, &keypairs);
-+        if (r < 0) {
-+            error_propagate(errp, local_err);
-+            goto out;
-+        }
-+        /* Take care whenever deciding to actually deprecate; once this ability
-+         * is removed, we will not be able to open any images with legacy-styled
-+         * backing image strings. */
-+        error_report("RBD options encoded in the filename as keyvalue pairs "
-+                     "is deprecated.  Future versions may cease to parse "
-+                     "these options in the future.");
-     }
- 
-     /* Remove the processed options from the QDict (the visitor processes
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 251f40fdac..02463e3388 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -345,9 +345,9 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+     default:
+     case 0:
+         if (s->lcr & UART_LCR_DLAB) {
+-            if (size == 2) {
++            if (size == 1) {
+                 s->divider = (s->divider & 0xff00) | val;
+-            } else if (size == 4) {
++            } else {
+                 s->divider = val;
+             }
+             serial_update_parameters(s);
 -- 
 2.17.1
