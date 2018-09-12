@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g04dy-0005jW-5u
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:53:18 -0400
+	(envelope-from <jcody@redhat.com>) id 1g04eT-00061N-QS
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:53:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g04du-0005ns-Gs
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:53:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58864 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g04du-0005kl-CD
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:53:14 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 12 Sep 2018 16:53:03 +0400
-Message-Id: <20180912125303.29158-1-marcandre.lureau@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1g04eR-00065D-WD
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 08:53:49 -0400
+Date: Wed, 12 Sep 2018 08:53:36 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180912125336.GV22117@localhost.localdomain>
+References: <cover.1536704901.git.jcody@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] qom/object: add some interface asserts
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1536704901.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] block/rbd: enable filename parsing
+ on open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +24,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
+Cc: qemu-block@nongnu.org, qemu-stable@nongnu.org, jsnow@redhat.com, eblake@redhat.com, libvir-list@redhat.com, mreitz@redhat.com, kwolf@redhat.com
 
-An interface can't have any instance size or callback, or itself
-implement other interfaces (this is unsupported).
+On Tue, Sep 11, 2018 at 06:32:29PM -0400, Jeff Cody wrote:
+> Changes from v3:
+> ================
+> 
+> Patch 4: Typo fixed [Eric]
+>          Added examples [Eric]
+> 
+> Changes from v2:
+> =================
+> 
+> Patch 4: New, document deprecation. [Eric]
+> Patch 3,2: Add r-b's
+> 
+> 
+> Changes from v1:
+> =================
+> 
+> Patch 1: Don't pass unused BlockDriverState to helper function
+> 
+> Patch 2: Do not allow mixed usage; fail if keyvalue is present [Eric]
+>          Add deprecation warning [John]
+>          Pull legacy parsing code into function [John]
+>          Fixed filename leak
+> 
+> Patch 3: New; iotest 231. [Eric]
+> 
+> 
+> iotest failure on current master:
+> 
+>  QA output created by 231
+> -qemu-img: RBD options encoded in the filename as keyvalue pairs is deprecated.  Future versions may cease to parse these options in the future.
+> -unable to get monitor info from DNS SRV with service name: ceph-mon
+> -no monitors specified to connect to.
+> -qemu-img: Could not open 'json:{'file.driver':'rbd','file.filename':'rbd:rbd/bogus:conf=BOGUS_CONF'}': error connecting: No such file or directory
+> +qemu-img: Could not open 'json:{'file.driver':'rbd','file.filename':'rbd:rbd/bogus:conf=BOGUS_CONF'}': Parameter 'pool' is missing
+>  unable to get monitor info from DNS SRV with service name: ceph-mon
+>  no monitors specified to connect to.
+>  qemu-img: Could not open 'json:{'file.driver':'rbd','file.pool':'rbd','file.image':'bogus','file.conf':'BOGUS_CONF'}': error connecting: No such file or directory
+> Failures: 231
+> Failed 1 of 1 tests
+> 
+> Jeff Cody (4):
+>   block/rbd: pull out qemu_rbd_convert_options
+>   block/rbd: Attempt to parse legacy filenames
+>   block/rbd: add iotest for rbd legacy keyvalue filename parsing
+>   block/rbd: add deprecation documentation for filename keyvalue pairs
+> 
+>  block/rbd.c                | 89 ++++++++++++++++++++++++++++++++------
+>  qemu-deprecated.texi       | 15 +++++++
+>  tests/qemu-iotests/231     | 62 ++++++++++++++++++++++++++
+>  tests/qemu-iotests/231.out |  9 ++++
+>  tests/qemu-iotests/group   |  1 +
+>  5 files changed, 162 insertions(+), 14 deletions(-)
+>  create mode 100755 tests/qemu-iotests/231
+>  create mode 100644 tests/qemu-iotests/231.out
+> 
+> -- 
+> 2.17.1
+> 
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- qom/object.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Thanks,
 
-diff --git a/qom/object.c b/qom/object.c
-index 75d1d48944..9222b23172 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -286,7 +286,14 @@ static void type_initialize(TypeImpl *ti)
-     if (ti->instance_size =3D=3D 0) {
-         ti->abstract =3D true;
-     }
--
-+    if (type_is_ancestor(ti, type_interface)) {
-+        assert(ti->instance_size =3D=3D 0);
-+        assert(ti->abstract);
-+        assert(!ti->instance_init);
-+        assert(!ti->instance_post_init);
-+        assert(!ti->instance_finalize);
-+        assert(!ti->num_interfaces);
-+    }
-     ti->class =3D g_malloc0(ti->class_size);
-=20
-     parent =3D type_get_parent(ti);
---=20
-2.19.0.rc1
+Applied to my block branch:
+
+git://github.com/codyprime/qemu-kvm-jtc block
+
+-Jeff
