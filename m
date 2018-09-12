@@ -1,16 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g08fH-0004Ts-Qe
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:10:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g08gh-0005ZV-Qe
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:12:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g08fG-0006rN-Jb
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:10:55 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 12 Sep 2018 19:10:39 +0200
-Message-Id: <20180912171040.1732-3-pbonzini@redhat.com>
-In-Reply-To: <20180912171040.1732-1-pbonzini@redhat.com>
-References: <20180912171040.1732-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] aio-posix: compute timeout before polling
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g08gh-0007NL-2B
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:12:23 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:40492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g08gg-0007Mx-OX
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 13:12:22 -0400
+Received: by mail-wm0-x241.google.com with SMTP id 207-v6so3235541wme.5
+	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 10:12:22 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180912160118.21158-1-liq3ea@163.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c8bfd44b-4d12-c2f6-7ac1-f8cda7178355@amsat.org>
+Date: Wed, 12 Sep 2018 18:13:07 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180912160118.21158-1-liq3ea@163.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/8] Add missed read callback for some
+ memory region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,167 +35,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com, kwolf@redhat.com, stefanha@redhat.com
+To: Li Qiang <liq3ea@163.com>, pbonzini@redhat.com, lersek@redhat.com, marcandre.lureau@gmail.com, ehabkost@redhat.com, mst@redhat.com, peter.maydell@linaro.org, ppandit@redhat.com
+Cc: Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org
 
-This is a preparation for the next patch, and also a very small
-optimization.  Compute the timeout only once, before invoking
-try_poll_mode, and adjust it in run_poll_handlers.  The adjustment
-is the polling time when polling fails, or zero (non-blocking) if
-polling succeeds.
+Hi Li,
 
-Fixes: 70232b5253a3c4e03ed1ac47ef9246a8ac66c6fa
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- util/aio-posix.c  | 59 +++++++++++++++++++++++++++--------------------
- util/trace-events |  4 ++--
- 2 files changed, 36 insertions(+), 27 deletions(-)
+On 9/12/18 6:01 PM, Li Qiang wrote:
+> From: Li Qiang <liq3ea@gmail.com>
+> 
+> This patch set try to add the missed read callback for memory region.
+> Without this patchset, when the guest reads the IO port/memory, it will
+> cause an NULL-dereference issue. For example, add 
+> "-device isa-debug-exit" to command, then read the 0x501 port, it causes a 
+> SIGSEGV.
+> 
+> The only exception is 'readonly_mem_ops' as its read is directly 
+> access the underlying host ram as the comments says.
+> 
+> These missed read callback is mostly pointed by Laszlo Ersek.
+> 
+> 
+> 
+> Li Qiang (8):
+>   fw_cfg_mem: add read memory region callback
+>   hw: debugexit: add read callback
+>   hw: hyperv_testdev: add read callback
+>   hw: pc-testdev: add read memory region callback
+>   hw: designware: add read memory region callback
+>   hw: pvrdma: add read memory region callback
+>   hw: sun4c: add read memory region callback
+>   exec: add read callback for notdirty memory region
 
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index 5c29380575..21d8987179 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -490,7 +490,7 @@ static void add_pollfd(AioHandler *node)
-     npfd++;
- }
- 
--static bool run_poll_handlers_once(AioContext *ctx)
-+static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
- {
-     bool progress = false;
-     AioHandler *node;
-@@ -500,6 +500,7 @@ static bool run_poll_handlers_once(AioContext *ctx)
-             aio_node_check(ctx, node->is_external) &&
-             node->io_poll(node->opaque) &&
-             node->opaque != &ctx->notifier) {
-+            *timeout = 0;
-             progress = true;
-         }
- 
-@@ -522,31 +523,38 @@ static bool run_poll_handlers_once(AioContext *ctx)
-  *
-  * Returns: true if progress was made, false otherwise
-  */
--static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
-+static bool run_poll_handlers(AioContext *ctx, int64_t max_ns, int64_t *timeout)
- {
-     bool progress;
--    int64_t end_time;
-+    int64_t start_time, elapsed_time;
- 
-     assert(ctx->notify_me);
-     assert(qemu_lockcnt_count(&ctx->list_lock) > 0);
- 
--    trace_run_poll_handlers_begin(ctx, max_ns);
--
--    end_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + max_ns;
-+    trace_run_poll_handlers_begin(ctx, max_ns, *timeout);
- 
-+    start_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-     do {
--        progress = run_poll_handlers_once(ctx);
--    } while (!progress && qemu_clock_get_ns(QEMU_CLOCK_REALTIME) < end_time
-+        progress = run_poll_handlers_once(ctx, timeout);
-+        elapsed_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time;
-+    } while (!progress && elapsed_time < max_ns
-              && !atomic_read(&ctx->poll_disable_cnt));
- 
--    trace_run_poll_handlers_end(ctx, progress);
-+    /* If time has passed with no successful polling, adjust *timeout to
-+     * keep the same ending time.
-+     */
-+    if (*timeout != -1) {
-+        *timeout -= MIN(*timeout, elapsed_time);
-+    }
- 
-+    trace_run_poll_handlers_end(ctx, progress, *timeout);
-     return progress;
- }
- 
- /* try_poll_mode:
-  * @ctx: the AioContext
-- * @blocking: busy polling is only attempted when blocking is true
-+ * @timeout: timeout for blocking wait, computed by the caller and updated if
-+ *    polling succeeds.
-  *
-  * ctx->notify_me must be non-zero so this function can detect aio_notify().
-  *
-@@ -554,19 +562,16 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
-  *
-  * Returns: true if progress was made, false otherwise
-  */
--static bool try_poll_mode(AioContext *ctx, bool blocking)
-+static bool try_poll_mode(AioContext *ctx, int64_t *timeout)
- {
--    if (blocking && ctx->poll_max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
--        /* See qemu_soonest_timeout() uint64_t hack */
--        int64_t max_ns = MIN((uint64_t)aio_compute_timeout(ctx),
--                             (uint64_t)ctx->poll_ns);
-+    /* See qemu_soonest_timeout() uint64_t hack */
-+    int64_t max_ns = MIN((uint64_t)*timeout, (uint64_t)ctx->poll_ns);
- 
--        if (max_ns) {
--            poll_set_started(ctx, true);
-+    if (max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
-+        poll_set_started(ctx, true);
- 
--            if (run_poll_handlers(ctx, max_ns)) {
--                return true;
--            }
-+        if (run_poll_handlers(ctx, max_ns, timeout)) {
-+            return true;
-         }
-     }
- 
-@@ -575,7 +580,7 @@ static bool try_poll_mode(AioContext *ctx, bool blocking)
-     /* Even if we don't run busy polling, try polling once in case it can make
-      * progress and the caller will be able to avoid ppoll(2)/epoll_wait(2).
-      */
--    return run_poll_handlers_once(ctx);
-+    return run_poll_handlers_once(ctx, timeout);
- }
- 
- bool aio_poll(AioContext *ctx, bool blocking)
-@@ -605,8 +610,14 @@ bool aio_poll(AioContext *ctx, bool blocking)
-         start = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-     }
- 
--    progress = try_poll_mode(ctx, blocking);
--    if (!progress) {
-+    timeout = blocking ? aio_compute_timeout(ctx) : 0;
-+    progress = try_poll_mode(ctx, &timeout);
-+    assert(!(timeout && progress));
-+
-+    /* If polling is allowed, non-blocking aio_poll does not need the
-+     * system call---a single round of run_poll_handlers_once suffices.
-+     */
-+    if (timeout || atomic_read(&ctx->poll_disable_cnt)) {
-         assert(npfd == 0);
- 
-         /* fill pollfds */
-@@ -620,8 +631,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
-             }
-         }
- 
--        timeout = blocking ? aio_compute_timeout(ctx) : 0;
--
-         /* wait until next event */
-         if (aio_epoll_check_poll(ctx, pollfds, npfd, timeout)) {
-             AioHandler epoll_handler;
-diff --git a/util/trace-events b/util/trace-events
-index 4822434c89..79569b7fdf 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -1,8 +1,8 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
- # util/aio-posix.c
--run_poll_handlers_begin(void *ctx, int64_t max_ns) "ctx %p max_ns %"PRId64
--run_poll_handlers_end(void *ctx, bool progress) "ctx %p progress %d"
-+run_poll_handlers_begin(void *ctx, int64_t max_ns, int64_t timeout) "ctx %p max_ns %"PRId64 " timeout %"PRId64
-+run_poll_handlers_end(void *ctx, bool progress, int64_t timeout) "ctx %p progress %d new timeout %"PRId64
- poll_shrink(void *ctx, int64_t old, int64_t new) "ctx %p old %"PRId64" new %"PRId64
- poll_grow(void *ctx, int64_t old, int64_t new) "ctx %p old %"PRId64" new %"PRId64
- 
--- 
-2.17.1
+Why not rather simply add a check in
+memory_region_oldmmio_read_accessor() instead?
+
+Eventually:
+
+{
+    uint64_t tmp;
+    int idx = ctz32(size);
+
+    if (unlikely(mr->ops->old_mmio.write[idx]
+                 && !mr->ops->old_mmio.read[idx])) {
+        tmp = 0; /* XXX is 0 the expected value??? */
+    } else {
+        tmp = mr->ops->old_mmio.read[idx](mr->opaque, addr);
+    }
+    ...
