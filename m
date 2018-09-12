@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1g07z6-0002F4-Lu
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:27:21 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1g086O-0005dD-VK
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:34:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1g07z2-00069G-2S
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:27:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34180 helo=mx1.redhat.com)
+	(envelope-from <alex.williamson@redhat.com>) id 1g086J-00031P-Un
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:34:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44654)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1g07z1-00068v-Sq
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:27:15 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 80E6A804B4DB
-	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 16:27:15 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 12 Sep 2018 18:19:14 +0200
-Message-Id: <1536769155-269737-2-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1536769155-269737-1-git-send-email-imammedo@redhat.com>
-References: <1536769155-269737-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 1/2] vl.c deprecate incorrect CPUs topology
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1g086J-00030l-O5
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:34:47 -0400
+Date: Wed, 12 Sep 2018 10:34:43 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180912103443.3dd703a6@t450s.home>
+In-Reply-To: <20180912121306-mutt-send-email-mst@kernel.org>
+References: <20180723045956.27521-1-tiwei.bie@intel.com>
+	<20180723045956.27521-4-tiwei.bie@intel.com>
+	<20180726144539.740acf4d@t450s.home>
+	<20180727015805.GA11247@debian>
+	<20180727140300.022d9872@t450s.home>
+	<20180730081003.GA10680@debian>
+	<20180730121704-mutt-send-email-mst@kernel.org>
+	<20180912080400.GA9173@fbsd1.sh.intel.com>
+	<20180912121306-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
+ group in master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, ehabkost@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Tiwei Bie <tiwei.bie@intel.com>, jasowang@redhat.com, qemu-devel@nongnu.org
 
--smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-so that total number of logical CPUs [sockets * cores * threads]
-would be equal to [maxcpus], however historically we didn't have
-such check in QEMU and it is possible to start VM with an invalid
-topology.
-Deprecate invalid options combination so we can make sure that
-the topology VM started with is always correct in the future.
-Users with an invalid sockets/cores/threads/maxcpus values should
-fix their CLI to make sure that
-   [sockets * cores * threads] == [maxcpus]
+On Wed, 12 Sep 2018 12:14:44 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
----
-v7:
-  - add corrections to deprication doc formulas/math/section title
-  - drop Note section
-      (Eduardo Habkost <ehabkost@redhat.com>)
-v6:
-  - s/socket/sockets/, the same for core, thread in subsection
-    (Andrew Jones <drjones@redhat.com>)
-v5:
-  - extend deprecation doc, adding that maxcpus should be multiple of
-    present on CLI [sockets/cores/threads] options
-    (Eduardo Habkost <ehabkost@redhat.com>)
-v4:
-  - missed dot comment, fix it with s/./,/ (Andrew Jones <drjones@redhat.com>)
-v3:
-  - more spelling fixes (Andrew Jones <drjones@redhat.com>)
-  - place deprecation check after (sockets * cores * threads > max_cpus) check
-    (Eduardo Habkost <ehabkost@redhat.com>)
-v2:
-  - spelling&&co fixes (Andrew Jones <drjones@redhat.com>)
----
- qemu-deprecated.texi | 13 +++++++++++++
- vl.c                 |  7 +++++++
- 2 files changed, 20 insertions(+)
+> On Wed, Sep 12, 2018 at 04:04:00PM +0800, Tiwei Bie wrote:
+> > On Mon, Jul 30, 2018 at 12:30:58PM +0300, Michael S. Tsirkin wrote:
+> > [...]  
+> > > 
+> > > I generally wonder how are restarts of the backend handled
+> > > with this approach: closing the VFIO device tends to reset
+> > > the whole device.  
+> > 
+> > Hi Michael,
+> > 
+> > I missed this comment previously.. This is a good point!
+> > In this RFC, before sending the VFIO group fd to QEMU,
+> > backend needs to close the VFIO device and unset the VFIO
+> > container first. Otherwise, QEMU won't be able to set the
+> > VFIO container for the VFIO group.
+> > 
+> > Another option is to share the container fd instead of
+> > the group fd to QEMU. In this case, backend won't need
+> > to close any fd. But there is one problem that, it's
+> > hard to unmap the old mappings, especially when QEMU
+> > crashes.  
+> 
+> What are these old mappings and who creates them?
+> If you want to just reset everything the way it was
+> on open, surely it would be easy to add such a reset ioctl.
+> 
+> > Do you have any suggestions? Thanks!
+> > 
+> > Best regards,
+> > Tiwei Bie  
+> 
+> Donnu. Alex, any thoughts? Which approach would you prefer?
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 1b9c007..31dc1b3 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -139,6 +139,19 @@ The 'file' driver for drives is no longer appropriate for character or host
- devices and will only accept regular files (S_IFREG). The correct driver
- for these file types is 'host_cdrom' or 'host_device' as appropriate.
- 
-+@subsection -smp (invalid topologies) (since 3.1)
-+
-+CPU topology properties should describe whole machine topology including
-+possible CPUs. In other words: @var{maxcpus} should be equal to
-+@math{@var{sockets} * @var{cores} * @var{threads}}.
-+
-+However, historically it was possible to start QEMU with an incorrect topology
-+where @math{@var{n} <= @var{sockets} * @var{cores} * @var{threads} < @var{maxcpus}},
-+which could lead to an incorrect topology enumeration by the guest.
-+Support for invalid topologies will be removed, the user must ensure
-+topologies described with -smp include all possible cpus, i.e.
-+  @math{@var{sockets} * @var{cores} * @var{threads} = @var{maxcpus}}.
-+
- @section QEMU Machine Protocol (QMP) commands
- 
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
-diff --git a/vl.c b/vl.c
-index 5ba06ad..7fd700e 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1246,6 +1246,13 @@ static void smp_parse(QemuOpts *opts)
-             exit(1);
-         }
- 
-+        if (sockets * cores * threads != max_cpus) {
-+            warn_report("Invalid CPU topology deprecated: "
-+                        "sockets (%u) * cores (%u) * threads (%u) "
-+                        "!= maxcpus (%u)",
-+                        sockets, cores, threads, max_cpus);
-+        }
-+
-         smp_cpus = cpus;
-         smp_cores = cores;
-         smp_threads = threads;
--- 
-2.7.4
+The existing UNMAP_DMA ioctl for the vfio type1 IOMMU only requires
+that an unmap does not bisect previous mappings, ie. a previous mapping
+cannot be partially unmapped.  Therefore you can already dump the
+entire IOVA space for a container with one UNMAP_DMA call, iova = 0,
+size = (u64)-1.  Thanks,
+
+Alex
