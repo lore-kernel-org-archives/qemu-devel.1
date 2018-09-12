@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00NX-0001kc-JU
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:20:04 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00NY-0001ls-V4
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:20:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00NS-000105-KQ
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:20:03 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:56158)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00NY-00011s-5V
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:20:04 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:56178)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00NS-0000zw-7m
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:19:58 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1g00NX-00011P-Sx
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:20:04 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 12 Sep 2018 11:19:56 +0300
-Message-ID: <20180912081956.3228.17903.stgit@pasha-VirtualBox>
+Date: Wed, 12 Sep 2018 11:20:02 +0300
+Message-ID: <20180912082002.3228.82417.stgit@pasha-VirtualBox>
 In-Reply-To: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
 References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v6 22/25] replay: add BH oneshot event for
- block layer
+Subject: [Qemu-devel] [PATCH v6 23/25] timer: introduce new virtual clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,161 +29,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-Replay is capable of recording normal BH events, but sometimes
-there are single use callbacks scheduled with aio_bh_schedule_oneshot
-function. This patch enables recording and replaying such callbacks.
-Block layer uses these events for calling the completion function.
-Replaying these calls makes the execution deterministic.
+Slirp and VNC modules use virtual clock for processing some events that
+are related to the guest execution speed.
+But virtual clock-related events are consideres to be deterministic and
+are recorded/replayed by icount mechanism. But slirp and VNC lie outside
+the recorded guest core (which includes CPU and peripherals).
+Therefore slirp and VNC are external for the guest, but should work at
+guest speed.
+This patch introduces new virtual clock which can be used for external
+subsystems for running timers that are synchronized with the guest.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-
---
-
-v6:
- - moved stub function to the separate file for fixing linux-user build
 ---
- block/block-backend.c    |    3 ++-
- include/sysemu/replay.h  |    3 +++
- replay/replay-events.c   |   16 ++++++++++++++++
- replay/replay-internal.h |    1 +
- replay/replay.c          |    2 +-
- stubs/Makefile.objs      |    1 +
- stubs/replay-user.c      |    9 +++++++++
- 7 files changed, 33 insertions(+), 2 deletions(-)
- create mode 100644 stubs/replay-user.c
+ include/qemu/timer.h |    9 +++++++++
+ util/qemu-timer.c    |    2 ++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index fa12063..712bafd 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -17,6 +17,7 @@
- #include "block/throttle-groups.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/replay.h"
- #include "qapi/error.h"
- #include "qapi/qapi-events-block.h"
- #include "qemu/id.h"
-@@ -1369,7 +1370,7 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
+diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+index 39ea907..a005ed2 100644
+--- a/include/qemu/timer.h
++++ b/include/qemu/timer.h
+@@ -42,6 +42,14 @@
+  * In icount mode, this clock counts nanoseconds while the virtual
+  * machine is running.  It is used to increase @QEMU_CLOCK_VIRTUAL
+  * while the CPUs are sleeping and thus not executing instructions.
++ *
++ * @QEMU_CLOCK_VIRTUAL_EXT: virtual clock for external subsystems
++ *
++ * The virtual clock only runs during the emulation. It stops
++ * when the virtual machine is stopped. The timers for this clock
++ * do not recorded in rr mode, therefore this clock could be used
++ * for the subsystems that operate outside the guest core.
++ *
+  */
  
-     acb->has_returned = true;
-     if (acb->rwco.ret != NOT_DONE) {
--        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
-+        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-                                 blk_aio_complete_bh, acb);
-     }
+ typedef enum {
+@@ -49,6 +57,7 @@ typedef enum {
+     QEMU_CLOCK_VIRTUAL = 1,
+     QEMU_CLOCK_HOST = 2,
+     QEMU_CLOCK_VIRTUAL_RT = 3,
++    QEMU_CLOCK_VIRTUAL_EXT = 4,
+     QEMU_CLOCK_MAX
+ } QEMUClockType;
  
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 3130e45..9da90e1 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -160,6 +160,9 @@ bool replay_events_enabled(void);
- void replay_flush_events(void);
- /*! Adds bottom half event to the queue */
- void replay_bh_schedule_event(QEMUBH *bh);
-+/*! Adds oneshot bottom half event to the queue */
-+void replay_bh_schedule_oneshot_event(AioContext *ctx,
-+    QEMUBHFunc *cb, void *opaque);
- /*! Adds input event to the queue */
- void replay_input_event(QemuConsole *src, InputEvent *evt);
- /*! Adds input sync event to the queue */
-diff --git a/replay/replay-events.c b/replay/replay-events.c
-index 0964a82..83a7d81 100644
---- a/replay/replay-events.c
-+++ b/replay/replay-events.c
-@@ -37,6 +37,9 @@ static void replay_run_event(Event *event)
-     case REPLAY_ASYNC_EVENT_BH:
-         aio_bh_call(event->opaque);
+diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+index 86bfe84..eb60d8f 100644
+--- a/util/qemu-timer.c
++++ b/util/qemu-timer.c
+@@ -496,6 +496,7 @@ bool timerlist_run_timers(QEMUTimerList *timer_list)
+ 
+     switch (timer_list->clock->type) {
+     case QEMU_CLOCK_REALTIME:
++    case QEMU_CLOCK_VIRTUAL_EXT:
          break;
-+    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-+        ((QEMUBHFunc*)event->opaque)(event->opaque2);
-+        break;
-     case REPLAY_ASYNC_EVENT_INPUT:
-         qemu_input_event_send_impl(NULL, (InputEvent *)event->opaque);
-         qapi_free_InputEvent((InputEvent *)event->opaque);
-@@ -132,6 +135,17 @@ void replay_bh_schedule_event(QEMUBH *bh)
-     }
- }
- 
-+void replay_bh_schedule_oneshot_event(AioContext *ctx,
-+    QEMUBHFunc *cb, void *opaque)
-+{
-+    if (events_enabled) {
-+        uint64_t id = replay_get_current_step();
-+        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, id);
-+    } else {
-+        aio_bh_schedule_oneshot(ctx, cb, opaque);
-+    }
-+}
-+
- void replay_add_input_event(struct InputEvent *event)
- {
-     replay_add_event(REPLAY_ASYNC_EVENT_INPUT, event, NULL, 0);
-@@ -162,6 +176,7 @@ static void replay_save_event(Event *event, int checkpoint)
-         /* save event-specific data */
-         switch (event->event_kind) {
-         case REPLAY_ASYNC_EVENT_BH:
-+        case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-             replay_put_qword(event->id);
-             break;
-         case REPLAY_ASYNC_EVENT_INPUT:
-@@ -216,6 +231,7 @@ static Event *replay_read_event(int checkpoint)
-     /* Events that has not to be in the queue */
-     switch (replay_state.read_event_kind) {
-     case REPLAY_ASYNC_EVENT_BH:
-+    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-         if (replay_state.read_event_id == -1) {
-             replay_state.read_event_id = replay_get_qword();
-         }
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index a857ca4..548d4d8 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -51,6 +51,7 @@ enum ReplayEvents {
- 
- enum ReplayAsyncEventKind {
-     REPLAY_ASYNC_EVENT_BH,
-+    REPLAY_ASYNC_EVENT_BH_ONESHOT,
-     REPLAY_ASYNC_EVENT_INPUT,
-     REPLAY_ASYNC_EVENT_INPUT_SYNC,
-     REPLAY_ASYNC_EVENT_CHAR_READ,
-diff --git a/replay/replay.c b/replay/replay.c
-index 2145686..355e5ae 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -22,7 +22,7 @@
- 
- /* Current version of the replay mechanism.
-    Increase it when file format changes. */
--#define REPLAY_VERSION              0xe02007
-+#define REPLAY_VERSION              0xe02008
- /* Size of replay log header */
- #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
- 
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 53d3f32..2acbac3 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -24,6 +24,7 @@ stub-obj-y += monitor.o
- stub-obj-y += notify-event.o
- stub-obj-y += qtest.o
- stub-obj-y += replay.o
-+stub-obj-y += replay-user.o
- stub-obj-y += runstate-check.o
- stub-obj-y += set-fd-handler.o
- stub-obj-y += slirp.o
-diff --git a/stubs/replay-user.c b/stubs/replay-user.c
-new file mode 100644
-index 0000000..2ad9e27
---- /dev/null
-+++ b/stubs/replay-user.c
-@@ -0,0 +1,9 @@
-+#include "qemu/osdep.h"
-+#include "sysemu/replay.h"
-+#include "sysemu/sysemu.h"
-+
-+void replay_bh_schedule_oneshot_event(AioContext *ctx,
-+    QEMUBHFunc *cb, void *opaque)
-+{
-+    aio_bh_schedule_oneshot(ctx, cb, opaque);
-+}
+     default:
+     case QEMU_CLOCK_VIRTUAL:
+@@ -597,6 +598,7 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
+         return get_clock();
+     default:
+     case QEMU_CLOCK_VIRTUAL:
++    case QEMU_CLOCK_VIRTUAL_EXT:
+         if (use_icount) {
+             return cpu_get_icount();
+         } else {
