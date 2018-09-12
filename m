@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1g00Pm-0003ek-4A
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:22:22 -0400
+	(envelope-from <lbloch@janustech.com>) id 1g00dj-0007G7-AS
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1g00Ph-0001lA-6z
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:22:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47430 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1g00Ph-0001l0-1c
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:22:17 -0400
-References: <905c68e0-531a-d915-4033-474bda42a643@gliwa.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <36edb90f-3ea0-e9d4-1f4c-6ea459fdbd57@redhat.com>
-Date: Wed, 12 Sep 2018 16:22:08 +0800
+	(envelope-from <lbloch@janustech.com>) id 1g00di-00005z-BP
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 04:36:47 -0400
+References: <20180813010729.4844-1-lbloch@janustech.com>
+	<20180910143323.GI4901@dhcp-200-186.str.redhat.com>
+From: Leonid Bloch <lbloch@janustech.com>
+Message-ID: <4b33a4ad-13e9-5f27-6af2-b3599e340487@janustech.com>
+Date: Wed, 12 Sep 2018 11:36:06 +0300
 MIME-Version: 1.0
-In-Reply-To: <905c68e0-531a-d915-4033-474bda42a643@gliwa.com>
+In-Reply-To: <20180910143323.GI4901@dhcp-200-186.str.redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] virtio-net sporadic error with QNX 7.0 guest:
- virtio-net ctrl missing headers
+Content-Language: en-GB-large
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 0/8] Take the image size into account
+ when allocating the L2 cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Claudio <claudio.fontana@gliwa.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>
 
+Hi Kevin & All,
 
+Sorry it took so long to send a new version! I had some very urgent 
+things popping up on several fronts. I will send the new version over 
+this weekend.
 
-On 2018=E5=B9=B409=E6=9C=8812=E6=97=A5 16:01, Claudio wrote:
-> Hello Michael, Jason and all,
->
-> I am currently using latest mainline QEMU on x86_64 to run a QNX 7 gues=
-t.
->
-> QNX 7 is not free software anymore unfortunately, with the
-> the last open source versions in the 6.x range.
->
-> I am using the official virtio-net guest driver from QNX 7.
->
-> During initialization I sporadically get this error message:
->
-> $ qemu-system-x86_64 -machine pc,accel=3Dkvm,kernel_irqchip=3Don -smp 2=
- -m 2048 -display none -nodefconfig -nodefaults -chardev stdio,mux=3Don,i=
-d=3Dchar0 -serial chardev:char0 -monitor none -mon chardev=3Dchar0,mode=3D=
-readline -netdev user,id=3Duser0,hostfwd=3Dudp::9004-:9004 -device virtio=
--net,netdev=3Duser0 qnx.img
->
-> virtio-net ctrl missing headers
->
-> and following that my host->guest UDP port forwarding does not work, th=
-at is,
-> the qemu process shows up as listening on the interface, but no packets=
- appear in the guest.
->
-> This error during initialization does not appear every time I launch QE=
-MU.
-> It appears to be more or less random.
->
-> Whenever the error does not appear, the interface works as expected, an=
-d port forwarding works.
->
-> Latest commit is
->
-> 19b599f7664b ("Merge remote-tracking branch 'remotes/armbru/tags/pull-e=
-rror-2018-08-27-v2'")
->
-> Thanks a lot for any advice!
->
-> Ciao,
->
-> Claudio
->
+Thanks for the reminder, and sorry again.
 
-Hi:
+Leonid.
+___
 
-Please try some early qemu version to make sure it's not a regression of=20
-qemu. And if 6.X works, it could be bug of guest driver.
-
-Thanks
+On 9/10/18 5:33 PM, Kevin Wolf wrote:
+> Hi Leonid,
+> 
+> Am 13.08.2018 um 03:07 hat Leonid Bloch geschrieben:
+>> This series makes the qcow2 L2 cache assignment aware of the image size,
+>> with the intention for it to cover the entire image. The importance of
+>> this change is in noticeable performance improvement, especially with
+>> heavy random I/O. The memory overhead is not big in most cases, as only
+>> 1 MB of cache for every 8 GB of image size is used. For cases with very
+>> large images and/or small cluster sizes, or systems with limited RAM
+>> resources, there is an upper limit on the default L2 cache: 32 MB. To
+>> modify this limit one can use the already existing 'l2-cache-size' and
+>> 'cache-size' options. Moreover, this fixes the behavior of 'l2-cache-size',
+>> as it was documented as the *maximum* L2 cache size, but in practice
+>> behaved as the absolute size.
+>>
+>> To compensate the memory overhead which may be increased following this
+>> behavior, the default cache-clean-interval is set to 10 minutes by default
+>> (was disabled by default before).
+>>
+>> The L2 cache is also resized accordingly, by default, if the image is
+>> resized.
+> 
+> after digging through the most urgent part of my post-vacation backlog,
+> I saw this series again. It's been a while, but I don't think much is
+> missing, so let's get this finished now. :-)
+> 
+> We had some discussion in the v7 thread after you posted v8, and you
+> mentioned there that you'd do some changes in a v9 (at first sight, just
+> some test case stuff). Are you still planning to send that v9?
+> 
+> Kevin
+> 
