@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g02lr-0004dr-QV
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 06:53:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g03FI-00006H-KH
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:23:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g02Y7-00054g-Gx
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 06:39:08 -0400
-Date: Wed, 12 Sep 2018 12:38:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180912103856.GC5846@localhost.localdomain>
-References: <cover.1536642773.git.jcody@redhat.com>
-	<570e8585c94d6f1bd7406ce5d35f68a82b6ea28c.1536642773.git.jcody@redhat.com>
-	<10f55c86-32dc-957a-c050-32a58baaddbd@redhat.com>
-	<20180911183700.GQ22117@localhost.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1g033T-0007NF-1P
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 07:11:31 -0400
+References: <20180910145616.8598-1-famz@redhat.com>
+	<20180910145616.8598-3-famz@redhat.com>
+	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
+	<20180911141245.GQ19292@lemon.usersys.redhat.com>
+	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
+	<20180912013134.GA2526@lemon.usersys.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
+Date: Wed, 12 Sep 2018 13:11:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180911183700.GQ22117@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 2/2] block/rbd: Attempt to parse legacy
- filenames
+In-Reply-To: <20180912013134.GA2526@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
+ handlers when stopping vq handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 11.09.2018 um 20:37 hat Jeff Cody geschrieben:
-> On Tue, Sep 11, 2018 at 02:22:31PM -0400, John Snow wrote:
-> > Once we load the image, will the header get rewritten into a compliant
-> > format?
-> 
-> Hmm - I think in some code paths, but not all.  I don't think the answer is
-> 'yes' universally, alas.
+On 12/09/2018 03:31, Fam Zheng wrote:
+>>>
+>>> ctx is qemu_aio_context here, so there's no interaction with IOThread.
+>> In this case, it should be okay to have the reentrancy, what is the bug
+>> that this patch is fixing?
+> The same symptom as in the previous patch: virtio_scsi_handle_cmd_vq hangs. The
+> reason it hangs is fixed by the previous patch, but I don't think it should be
+> invoked as we're in the middle of virtio_scsi_dataplane_stop(). Applying either
+> one of the two patches avoids the problem, but this one is more superficial.
+> What do you think?
 
-Can't we explicitly call BdrvChildRole.update_filename() for all parents
-when we open a legacy filename? We'd just need to add the callback to
-child_file, which would propagate it to the parents of the format layer,
-and then just opening the image with a legacy backing file link once
-would fix the problem for this image.
+I think it's okay if it is invoked.  The sequence is first you stop the
+vq, then you drain the BlockBackends, then you switch AioContext.  All
+that matters is the outcome when virtio_scsi_dataplane_stop returns.
 
-Kevin
+Paolo
