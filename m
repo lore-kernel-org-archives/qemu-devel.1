@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g08F3-0002V0-50
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:43:49 -0400
+	(envelope-from <mst@redhat.com>) id 1g08Fa-0002rO-Kr
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:44:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g08Ez-0006KA-1b
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:43:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46104 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1g08FW-00073D-Jd
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:44:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34546 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g08Ey-0006Jw-Sx
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:43:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6FE6E40216EB
-	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 16:43:44 +0000 (UTC)
-References: <1536769155-269737-1-git-send-email-imammedo@redhat.com>
-	<1536769155-269737-3-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1d6727a7-8c84-95bf-ac5e-d65aa9f18296@redhat.com>
-Date: Wed, 12 Sep 2018 11:43:40 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1g08FW-00072r-DX
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 12:44:18 -0400
+Date: Wed, 12 Sep 2018 12:44:15 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180912124233-mutt-send-email-mst@kernel.org>
+References: <20180723045956.27521-1-tiwei.bie@intel.com>
+	<20180723045956.27521-4-tiwei.bie@intel.com>
+	<20180726144539.740acf4d@t450s.home>
+	<20180727015805.GA11247@debian>
+	<20180727140300.022d9872@t450s.home>
+	<20180730081003.GA10680@debian>
+	<20180730121704-mutt-send-email-mst@kernel.org>
+	<20180912080400.GA9173@fbsd1.sh.intel.com>
+	<20180912121306-mutt-send-email-mst@kernel.org>
+	<20180912103443.3dd703a6@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <1536769155-269737-3-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] [PATCH v7 2/2] vl:c: make sure that
- sockets are calculated correctly in '-smp X' case
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180912103443.3dd703a6@t450s.home>
+Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
+ group in master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,64 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, ehabkost@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Tiwei Bie <tiwei.bie@intel.com>, jasowang@redhat.com, qemu-devel@nongnu.org
 
-On 9/12/18 11:19 AM, Igor Mammedov wrote:
-> commit
->    (5cdc9b76e3 vl.c: Remove dead assignment)
-> removed sockets calculation when 'sockets' weren't provided on CLI
-> since there wasn't any users for it back then. Exiting checks
-> are neither reachable
->     } else if (sockets * cores * threads < cpus) {
-> or nor triggable
+On Wed, Sep 12, 2018 at 10:34:43AM -0600, Alex Williamson wrote:
+> On Wed, 12 Sep 2018 12:14:44 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Wed, Sep 12, 2018 at 04:04:00PM +0800, Tiwei Bie wrote:
+> > > On Mon, Jul 30, 2018 at 12:30:58PM +0300, Michael S. Tsirkin wrote:
+> > > [...]  
+> > > > 
+> > > > I generally wonder how are restarts of the backend handled
+> > > > with this approach: closing the VFIO device tends to reset
+> > > > the whole device.  
+> > > 
+> > > Hi Michael,
+> > > 
+> > > I missed this comment previously.. This is a good point!
+> > > In this RFC, before sending the VFIO group fd to QEMU,
+> > > backend needs to close the VFIO device and unset the VFIO
+> > > container first. Otherwise, QEMU won't be able to set the
+> > > VFIO container for the VFIO group.
+> > > 
+> > > Another option is to share the container fd instead of
+> > > the group fd to QEMU. In this case, backend won't need
+> > > to close any fd. But there is one problem that, it's
+> > > hard to unmap the old mappings, especially when QEMU
+> > > crashes.  
+> > 
+> > What are these old mappings and who creates them?
+> > If you want to just reset everything the way it was
+> > on open, surely it would be easy to add such a reset ioctl.
+> > 
+> > > Do you have any suggestions? Thanks!
+> > > 
+> > > Best regards,
+> > > Tiwei Bie  
+> > 
+> > Donnu. Alex, any thoughts? Which approach would you prefer?
+> 
+> The existing UNMAP_DMA ioctl for the vfio type1 IOMMU only requires
+> that an unmap does not bisect previous mappings, ie. a previous mapping
+> cannot be partially unmapped.  Therefore you can already dump the
+> entire IOVA space for a container with one UNMAP_DMA call, iova = 0,
+> size = (u64)-1.  Thanks,
+> 
+> Alex
 
-s/triggable/triggerable/
-
->     if (sockets * cores * threads > max_cpus)
-> so we weren't noticing wrong topology since then, since users
-> recalculate sockets adhoc on their own.
-> 
-> However with deprecation check it becomes noticable, for example
->    -smp 2
-> will start printing warning:
->    "warning: Invalid CPU topology deprecated: sockets (1) * cores (1) * threads (1) != maxcpus (2)"
-> calculating sockets if they weren't specified.
-> 
-> Fix it by returning back sockets calculation if it's omited on CLI.
-
-s/omited/omitted/
-
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> ---
->   vl.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index 7fd700e..9e56696 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1210,11 +1210,14 @@ static void smp_parse(QemuOpts *opts)
->   
->           /* compute missing values, prefer sockets over cores over threads */
->           if (cpus == 0 || sockets == 0) {
-> -            sockets = sockets > 0 ? sockets : 1;
->               cores = cores > 0 ? cores : 1;
->               threads = threads > 0 ? threads : 1;
->               if (cpus == 0) {
-> +                sockets = sockets > 0 ? sockets : 1;
->                   cpus = cores * threads * sockets;
-> +            } else {
-> +                max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
-> +                sockets = max_cpus / (cores * threads);
->               }
->           } else if (cores == 0) {
->               threads = threads > 0 ? threads : 1;
-> 
+Hmm this would exclude the last byte (address (u64)-1).
+VTD does not support such iova values for now but something
+to keep in mind e.g. for virtio-iommu with nested virt
+which does.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+MST
