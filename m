@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1g0IBf-0000dm-Dc
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 23:21:00 -0400
+	(envelope-from <pahome.chen@mirlab.org>) id 1g0INt-0003RK-V6
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 23:33:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1g0IBc-0001Pe-AG
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 23:20:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49972 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1g0IBc-0001PK-4J
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 23:20:56 -0400
-Date: Thu, 13 Sep 2018 11:20:47 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180913032047.GD10763@xz-x1>
-References: <1536684589-11718-1-git-send-email-brijesh.singh@amd.com>
-	<1536684589-11718-5-git-send-email-brijesh.singh@amd.com>
-	<20180912043539.GD3829@xz-x1>
-	<4aae9c00-9db6-83a5-4f47-01141dc6d115@amd.com>
+	(envelope-from <pahome.chen@mirlab.org>) id 1g0INs-0004jC-8t
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 23:33:37 -0400
+Received: from mail-ua1-x92a.google.com ([2607:f8b0:4864:20::92a]:40874)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pahome.chen@mirlab.org>)
+	id 1g0INs-0004ix-0M
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 23:33:36 -0400
+Received: by mail-ua1-x92a.google.com with SMTP id 101-v6so3573528uav.7
+	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 20:33:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4aae9c00-9db6-83a5-4f47-01141dc6d115@amd.com>
-Subject: Re: [Qemu-devel] [PATCH 4/6] i386: acpi: add IVHD device entry for
- IOAPIC
+From: lampahome <pahome.chen@mirlab.org>
+Date: Thu, 13 Sep 2018 11:33:34 +0800
+Message-ID: <CAB3eZfsvnyyo0C4nU=Mucg51krnN9Q9ExKA0t4AEEA3DiOd2aA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Can I only commit from active image to corresponding
+ range of its backing file by qemu cmd?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,99 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, Richard Henderson <rth@twiddle.net>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Sep 12, 2018 at 02:11:10PM -0500, Brijesh Singh wrote:
-> 
-> 
-> On 09/11/2018 11:35 PM, Peter Xu wrote:
-> > On Tue, Sep 11, 2018 at 11:49:47AM -0500, Brijesh Singh wrote:
-> > > When interrupt remapping is enabled, add a special IVHD device
-> > > (type IOAPIC) -- which is typically PCI device 14:0.0. Linux IOMMU driver
-> > > checks for this special device.
-> > > 
-> > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Richard Henderson <rth@twiddle.net>
-> > > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > > Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-> > > Cc: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-> > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > > ---
-> > >   hw/i386/acpi-build.c | 20 +++++++++++++++++++-
-> > >   1 file changed, 19 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > index e1ee8ae..5c2c638 100644
-> > > --- a/hw/i386/acpi-build.c
-> > > +++ b/hw/i386/acpi-build.c
-> > > @@ -2519,6 +2519,7 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
-> > >   static void
-> > >   build_amd_iommu(GArray *table_data, BIOSLinker *linker)
-> > >   {
-> > > +    int ivhd_table_len = 28;
-> > >       int iommu_start = table_data->len;
-> > >       AMDVIState *s = AMD_IOMMU_DEVICE(x86_iommu_get_default());
-> > > @@ -2540,8 +2541,16 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
-> > >                                (1UL << 6) | /* PrefSup      */
-> > >                                (1UL << 7),  /* PPRSup       */
-> > >                                1);
-> > > +
-> > > +    /*
-> > > +     * When interrupt remapping is enabled, we add a special IVHD device
-> > > +     * for type IO-APIC.
-> > > +     */
-> > > +    if (s->intr_enabled) {
-> > > +        ivhd_table_len += 8;
-> > > +    }
-> > >       /* IVHD length */
-> > > -    build_append_int_noprefix(table_data, 28, 2);
-> > > +    build_append_int_noprefix(table_data, ivhd_table_len, 2);
-> > >       /* DeviceID */
-> > >       build_append_int_noprefix(table_data, s->devid, 2);
-> > >       /* Capability offset */
-> > > @@ -2565,6 +2574,15 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
-> > >        */
-> > >       build_append_int_noprefix(table_data, 0x0000001, 4);
-> > > +    /*
-> > > +     * When interrupt remapping is enabled, Linux IOMMU driver also checks
-> > > +     * for special IVHD device (type IO-APIC), which is typically presented
-> > > +     * as PCI device 14:00.0.
-> > > +     */
-> > > +    if (s->intr_enabled) {
-> > > +        build_append_int_noprefix(table_data, 0x0100a00000000048, 8);
-> > 
-> > Some comments on the bit definition would be nicer, or "please refer
-> > to Table 95 of AMD-Vi spec".
-> > 
-> > Could I ask how come the 14:00.0?  Is that in the spec somewhere?
-> > 
-> > And since you explicitly mentioned Linux, then... would it work for
-> > Windows too?
-> > 
-> 
-> The PCI 14:00.0 is SouthBridge IOAPIC device. On bare metal the timer
-> subsystem is connected to the SB IOAPIC. The IVRS table must contains
-> the entry of SB IOAPIC otherwise Linux will not enable the IR mapping
-> while parsing the IVRS.
-> 
-> On bare meta system, IVRS will always have entry for SB IOAPIC. As per
-> Windows is concerned, I am not sure if Windows support interrupt remap.
-> If it does, adding the SB IOAPIC devid should not cause any problem
-> to it because its always available on bare metal system.
-> 
-> Here is linux commit
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c2ff5cf5294bcbd7fa50f7d860e90a66db7e5059
+I split data to 3 chunks and save it in 3 independent backing files like
+below:
+img.000 <-- img.001 <-- img.002
+img.000 is the backing file of img.001 and 001 is the backing file of 002.
+img.000 saves the 1st chunk of data and img.001 saves the 2nd chunk of
+data, and img.002 saves the 3rd chunk of data.
 
-Thanks for these information.  Please feel free to add some of the
-information into the comment, that might explain itself better.  When
-referring to commits, I would suggest just use "Please refer to Linux
-commit xxx (xxx)" rather than the link though.
+Now I have img.003 stores cow data of 1st chunk and img.002 is the backing
+file of img.003.
+The backing chain is like this:
+  img.000 <-- img.001 <-- img.002 <-- img.003
 
-Regards,
+So that means the data of img.003 saves the same range with img.000 but
+different data.
 
--- 
-Peter Xu
+I know I can use *`qemu-img commit'* but it only commit the data from
+img.003 to img.002.
+
+If I use *`qemu-img rebase -b img.000 img.003`*, the data of img.001 and
+img.002 will merge into img.003.
+
+What I want is only commit the data in img.003 into img.000 because the
+data of the two image are the same range(1st chunk)
+
+Is there anyway to commit(or merge) data of active image into corresponding
+backing file?
+
+thx
