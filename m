@@ -1,22 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0Uyb-0000MU-QK
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:00:27 -0400
+	(envelope-from <akrowiak@linux.ibm.com>) id 1g0V13-0001ht-L4
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0UyW-0008Hv-6C
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:00:21 -0400
-Date: Thu, 13 Sep 2018 18:59:54 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180913165954.GB5172@localhost.localdomain>
-References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-12-kwolf@redhat.com>
-	<908e08a4-a58a-e4e1-5eb7-fe9d17adfbe3@redhat.com>
+	(envelope-from <akrowiak@linux.ibm.com>) id 1g0V10-0001vF-Dt
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:02:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49940
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1g0V10-0001ur-6M
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:02:50 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w8DGwq2T015158
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 13:02:49 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2mfs7dqwbw-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 13:02:48 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Thu, 13 Sep 2018 11:02:47 -0600
+References: <1536782900-17656-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1536782900-17656-5-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<49de34fa-253f-a306-0cad-519961c2c183@redhat.com>
+	<b89ad0b9-8d4c-21a2-c706-5df93a51887c@de.ibm.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Thu, 13 Sep 2018 13:02:35 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <908e08a4-a58a-e4e1-5eb7-fe9d17adfbe3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 11/17] block-backend: Decrease in_flight
- only after callback
+In-Reply-To: <b89ad0b9-8d4c-21a2-c706-5df93a51887c@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <21bb71bb-e80c-152b-3018-8cac3926d2ea@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 4/6] s390x/ap: base Adjunct
+ Processor (AP) object model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +46,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
 
-Am 13.09.2018 um 17:10 hat Paolo Bonzini geschrieben:
-> On 13/09/2018 14:52, Kevin Wolf wrote:
-> > + if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
-> > + /* If we are in the main thread, the callback is allowed to unref
-> > + * the BlockBackend, so we have to hold an additional reference */
-> > + blk_ref(acb->rwco.blk);
-> > + }
-> > acb->common.cb(acb->common.opaque, acb->rwco.ret);
-> > + blk_dec_in_flight(acb->rwco.blk);
-> > + if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
-> > + blk_unref(acb->rwco.blk);
-> > + }
-> 
-> Is this something that happens only for some specific callers?  That is,
-> which callers are sure that the callback is invoked from the main thread?
+On 09/13/2018 02:29 AM, Christian Borntraeger wrote:
+>
+> On 09/13/2018 07:48 AM, Thomas Huth wrote:
+>> On 2018-09-12 22:08, Tony Krowiak wrote:
+>>> From: Tony Krowiak <akrowiak@linux.ibm.com>
+>>>
+>>> Introduces the base object model for virtualizing AP devices.
+>>>
+>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> ---
+>> [...]
+>>> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
+>>> new file mode 100644
+>>> index 0000000..4f10425
+>>> --- /dev/null
+>>> +++ b/hw/s390x/ap-bridge.c
+>> [...]
+>>> +void s390_init_ap(void)
+>>> +{
+>>> +    DeviceState *dev;
+>>> +
+>>> +    /* Create bridge device */
+>>> +    dev = qdev_create(NULL, TYPE_AP_BRIDGE);
+>>> +    object_property_add_child(qdev_get_machine(), TYPE_AP_BRIDGE,
+>>> +                              OBJECT(dev), NULL);
+>>> +    qdev_init_nofail(dev);
+>>> +
+>>> +    /* Create bus on bridge device */
+>>> +    qbus_create(TYPE_VFIO_AP_BUS, dev, TYPE_VFIO_AP_BUS);
+>>> + }
+>> [...]
+>>> +type_init(ap_device_register)
+>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>>> index f0f7fdc..3c100c2 100644
+>>> --- a/hw/s390x/s390-virtio-ccw.c
+>>> +++ b/hw/s390x/s390-virtio-ccw.c
+>>> @@ -32,6 +32,7 @@
+>>>   #include "ipl.h"
+>>>   #include "hw/s390x/s390-virtio-ccw.h"
+>>>   #include "hw/s390x/css-bridge.h"
+>>> +#include "hw/s390x/ap-bridge.h"
+>>>   #include "migration/register.h"
+>>>   #include "cpu_models.h"
+>>>   #include "hw/nmi.h"
+>>> @@ -263,6 +264,9 @@ static void ccw_init(MachineState *machine)
+>>>       /* init the SIGP facility */
+>>>       s390_init_sigp();
+>>>   
+>>> +    /* create AP bridge and bus(es) */
+>>> +    s390_init_ap();
+>>> +
+>> Not sure since there is no explicit migration state involved here, but I
+>> think you cannot simply create the ap-bridge device always
+>> unconditionally, can you? Did you check whether you can ping-pong
+>> migrate an guest that runs on an older version of QEMU to a QEMU that
+>> contains this patch and back? If it does not work, it might be necessary
+>> to restrict this ap-bridge device for new machine types only, I think.
+> We have already the cpu features at this point in time. So simply doing
+> s390_has_feat(S390_FEAT_AP) in s390_init_ap ?
 
-I can't seem to reproduce the problem I saw any more even when reverting
-the bdrv_ref/unref pair. If I remember correctly it was actually a
-nested aio_poll() that was running a block job completion or something
-like that - which would obviously only happen on the main thread because
-the job intentionally defers to the main thread.
-
-The only reason I made this conditional is that I think bdrv_unref()
-still isn't safe outside the main thread, is it?
-
-Kevin
+This seems like a reasonable solution to me. If the S390_FEAT_AP is not 
+switched
+on for the guest, then the vfio-ap device will not be realized; therefore,
+there is no need for a bridge device. I will fix the s390_init_ap() 
+function such
+that the AP bridge device is created only if the S390_FEAT_AP is 
+switched on for
+the guest. That ought to solve the migration issue David pointed out. 
+Thanks
+David.
