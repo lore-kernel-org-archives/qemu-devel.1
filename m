@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0R7G-0002MT-4y
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:02 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0R7K-0002PE-F3
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0R7F-0001uD-Br
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:02 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0R7J-0001xZ-Jb
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:06 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 13 Sep 2018 14:52:07 +0200
-Message-Id: <20180913125217.23173-8-kwolf@redhat.com>
+Date: Thu, 13 Sep 2018 14:52:10 +0200
+Message-Id: <20180913125217.23173-11-kwolf@redhat.com>
 In-Reply-To: <20180913125217.23173-1-kwolf@redhat.com>
 References: <20180913125217.23173-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 07/17] test-bdrv-drain: Test
- AIO_WAIT_WHILE() in completion callback
+Subject: [Qemu-devel] [PATCH v2 10/17] block-backend: Fix potential double
+ blk_delete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +23,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
-This is a regression test for a deadlock that occurred in block job
-completion callbacks (via job_defer_to_main_loop) because the AioContext
-lock was taken twice: once in job_finish_sync() and then again in
-job_defer_to_main_loop_bh(). This would cause AIO_WAIT_WHILE() to hang.
+blk_unref() first decreases the refcount of the BlockBackend and calls
+blk_delete() if the refcount reaches zero. Requests can still be in
+flight at this point, they are only drained during blk_delete():
+
+At this point, arbitrary callbacks can run. If any callback takes a
+temporary BlockBackend reference, it will first increase the refcount to
+1 and then decrease it to 0 again, triggering another blk_delete(). This
+will cause a use-after-free crash in the outer blk_delete().
+
+Fix it by draining the BlockBackend before decreasing to refcount to 0.
+Assert in blk_ref() that it never takes the first refcount (which would
+mean that the BlockBackend is already being deleted).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- tests/test-bdrv-drain.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ block/block-backend.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 57da22a096..c3c17b9ff7 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -774,6 +774,15 @@ typedef struct TestBlockJob {
-     bool should_complete;
- } TestBlockJob;
- 
-+static int test_job_prepare(Job *job)
-+{
-+    TestBlockJob *s = container_of(job, TestBlockJob, common.job);
-+
-+    /* Provoke an AIO_WAIT_WHILE() call to verify there is no deadlock */
-+    blk_flush(s->common.blk);
-+    return 0;
-+}
-+
- static int coroutine_fn test_job_run(Job *job, Error **errp)
+diff --git a/block/block-backend.c b/block/block-backend.c
+index efa8d8011c..1b2d7a6ff5 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -435,6 +435,7 @@ int blk_get_refcnt(BlockBackend *blk)
+  */
+ void blk_ref(BlockBackend *blk)
  {
-     TestBlockJob *s = container_of(job, TestBlockJob, common.job);
-@@ -804,6 +813,7 @@ BlockJobDriver test_job_driver = {
-         .drain          = block_job_drain,
-         .run            = test_job_run,
-         .complete       = test_job_complete,
-+        .prepare        = test_job_prepare,
-     },
- };
++    assert(blk->refcnt > 0);
+     blk->refcnt++;
+ }
  
+@@ -447,7 +448,11 @@ void blk_unref(BlockBackend *blk)
+ {
+     if (blk) {
+         assert(blk->refcnt > 0);
+-        if (!--blk->refcnt) {
++        if (blk->refcnt > 1) {
++            blk->refcnt--;
++        } else {
++            blk_drain(blk);
++            blk->refcnt = 0;
+             blk_delete(blk);
+         }
+     }
 -- 
 2.13.6
