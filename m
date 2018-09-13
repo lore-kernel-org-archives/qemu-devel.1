@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g0LX7-0006HS-Lz
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:55:22 -0400
+	(envelope-from <famz@redhat.com>) id 1g0LYX-0006sq-Hd
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:56:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g0LX4-0007em-Gq
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:55:21 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:49382)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g0LX4-0007eK-4n
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:55:18 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<152819517756.30857.1862569750260837574.stgit@pasha-ThinkPad-T60>
-	<87tvn1zaxn.fsf@linaro.org>
-In-Reply-To: <87tvn1zaxn.fsf@linaro.org>
-Date: Thu, 13 Sep 2018 09:55:13 +0300
-Message-ID: <000701d44b2e$b8c5da20$2a518e60$@ru>
+	(envelope-from <famz@redhat.com>) id 1g0LYW-0000Kd-Jq
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:56:49 -0400
+Date: Thu, 13 Sep 2018 14:56:39 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180913065639.GL2526@lemon.usersys.redhat.com>
+References: <20180912171040.1732-1-pbonzini@redhat.com>
+	<20180912171040.1732-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v2 4/7] tcg: add instrumenting module
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180912171040.1732-2-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] aio-posix: fix concurrent access to
+ poll_disable_cnt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,175 +24,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu, 'Richard Henderson' <richard.henderson@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, stefanha@redhat.com
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru> writes:
->=20
-> > From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-> >
-> > This is a samples of the instrumenting interface and implementation
-> > of some instruction tracing tasks.
-> >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > ---
-> >  accel/tcg/translator.c    |    5 +++++
-> >  include/qemu/instrument.h |    7 +++++++
-> >  plugins/helper.h          |    1 +
-> >  plugins/plugins.c         |   41 =
-+++++++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 54 insertions(+)
-> >  create mode 100644 include/qemu/instrument.h
-> >  create mode 100644 plugins/helper.h
-> >
-> > diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-> > index 0f9dca9..48773ac 100644
-> > --- a/accel/tcg/translator.c
-> > +++ b/accel/tcg/translator.c
-> > @@ -17,6 +17,7 @@
-> >  #include "exec/gen-icount.h"
-> >  #include "exec/log.h"
-> >  #include "exec/translator.h"
-> > +#include "qemu/instrument.h"
-> >
-> >  /* Pairs with tcg_clear_temp_count.
-> >     To be called by #TranslatorOps.{translate_insn,tb_stop} if
-> > @@ -89,6 +90,10 @@ void translator_loop(const TranslatorOps *ops, =
-DisasContextBase *db,
-> >              }
-> >          }
-> >
-> > +        if (plugins_need_before_insn(db->pc_next, cpu)) {
-> > +            plugins_instrument_before_insn(db->pc_next, cpu);
-> > +        }
-> > +
->=20
-> I don't really see the need for a plugin_need_foo call here. Can't we
-> just iterate over all plugins that provide a before_insn binding and
-> leave it at that?
->=20
-> If the plugin decides it doesn't want to do anything with this
-> particular instruction it can always bail early.
->=20
-> >          /* Disassemble one instruction.  The translate_insn hook =
-should
-> >             update db->pc_next and db->is_jmp to indicate what =
-should be
-> >             done next -- either exiting this loop or locate the =
-start of
-> > diff --git a/include/qemu/instrument.h b/include/qemu/instrument.h
-> > new file mode 100644
-> > index 0000000..e8f279f
-> > --- /dev/null
-> > +++ b/include/qemu/instrument.h
-> > @@ -0,0 +1,7 @@
-> > +#ifndef INSTRUMENT_H
-> > +#define INSTRUMENT_H
-> > +
-> > +bool plugins_need_before_insn(target_ulong pc, CPUState *cpu);
-> > +void plugins_instrument_before_insn(target_ulong pc, CPUState =
-*cpu);
->=20
-> Need empty inline cases for #ifndef CONFIG_PLUGINS
->=20
-> > +
-> > +#endif /* INSTRUMENT_H */
-> > diff --git a/plugins/helper.h b/plugins/helper.h
-> > new file mode 100644
-> > index 0000000..007b395
-> > --- /dev/null
-> > +++ b/plugins/helper.h
-> > @@ -0,0 +1 @@
-> > +DEF_HELPER_2(before_insn, void, tl, ptr)
->=20
-> I wonder if we should have an explicit DEF_HELPER_FLAGS_2. Looking at
-> the flags though:
->=20
->   /* call flags */
->   /* Helper does not read globals (either directly or through an =
-exception). It
->      implies TCG_CALL_NO_WRITE_GLOBALS. */
->   #define TCG_CALL_NO_READ_GLOBALS    0x0010
->   /* Helper does not write globals */
->   #define TCG_CALL_NO_WRITE_GLOBALS   0x0020
->   /* Helper can be safely suppressed if the return value is not used. =
-*/
->   #define TCG_CALL_NO_SIDE_EFFECTS    0x0040
->=20
->   /* convenience version of most used call flags */
->   #define TCG_CALL_NO_RWG         TCG_CALL_NO_READ_GLOBALS
->   #define TCG_CALL_NO_WG          TCG_CALL_NO_WRITE_GLOBALS
->   #define TCG_CALL_NO_SE          TCG_CALL_NO_SIDE_EFFECTS
->   #define TCG_CALL_NO_RWG_SE      (TCG_CALL_NO_RWG | TCG_CALL_NO_SE)
->   #define TCG_CALL_NO_WG_SE       (TCG_CALL_NO_WG | TCG_CALL_NO_SE)
->=20
-> I guess no flags means machine state is fully consistent before we =
-make
-> the helper call?
->=20
-> > diff --git a/plugins/plugins.c b/plugins/plugins.c
-> > index eabc931..5a08e71 100644
-> > --- a/plugins/plugins.c
-> > +++ b/plugins/plugins.c
-> > @@ -1,8 +1,13 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qemu-common.h"
-> > +#include "cpu.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/plugins.h"
-> > +#include "qemu/instrument.h"
-> > +#include "tcg/tcg.h"
-> > +#include "tcg/tcg-op.h"
-> >  #include "qemu/queue.h"
-> > +#include "qemu/option.h"
-> >  #include <gmodule.h>
-> >
-> >  typedef bool (*PluginInitFunc)(const char *);
-> > @@ -80,6 +85,40 @@ void qemu_plugin_load(const char *filename, const =
-char *args)
-> >      return;
-> >  }
-> >
-> > +bool plugins_need_before_insn(target_ulong pc, CPUState *cpu)
-> > +{
-> > +    QemuPluginInfo *info;
-> > +    QLIST_FOREACH(info, &qemu_plugins, next) {
-> > +        if (info->needs_before_insn && info->needs_before_insn(pc, =
-cpu)) {
-> > +            return true;
-> > +        }
-> > +    }
-> > +
-> > +    return false;
-> > +}
-> > +
-> > +void plugins_instrument_before_insn(target_ulong pc, CPUState *cpu)
-> > +{
-> > +    TCGv t_pc =3D tcg_const_tl(pc);
-> > +    TCGv_ptr t_cpu =3D tcg_const_ptr(cpu);
-> > +    /* We will dispatch plugins' callbacks in our own helper below =
-*/
-> > +    gen_helper_before_insn(t_pc, t_cpu);
-> > +    tcg_temp_free(t_pc);
-> > +    tcg_temp_free_ptr(t_cpu);
-> > +}
->=20
-> OK I see what is happening here - but I worry about pushing off all
-> plugins into a single helper call with a fairly fixed amount of
-> information.
->=20
-> Would it be better to expose the generate helper API and maybe a few =
-TCG
-> constants to the plugin function itself. It could then either emit
-> additional TCG operations or call to the helper - and deal with the
-> logic about if it should or shouldn't in a single call rather than =
-doing
-> the need_foo call first.
+On Wed, 09/12 19:10, Paolo Bonzini wrote:
+> It is valid for an aio_set_fd_handler to happen concurrently with
+> aio_poll.  In that case, poll_disable_cnt can change under the heels
+> of aio_poll, and the assertion on poll_disable_cnt can fail in
+> run_poll_handlers.
+> 
+> Therefore, this patch simply checks the counter on every polling
+> iteration.  There are no particular needs for ordering, since the
+> polling loop is terminated anyway by aio_notify at the end of
+> aio_set_fd_handler.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  util/aio-posix.c | 26 +++++++++++++++-----------
+>  1 file changed, 15 insertions(+), 11 deletions(-)
+> 
+> diff --git a/util/aio-posix.c b/util/aio-posix.c
+> index 131ba6b4a8..5c29380575 100644
+> --- a/util/aio-posix.c
+> +++ b/util/aio-posix.c
+> @@ -211,6 +211,7 @@ void aio_set_fd_handler(AioContext *ctx,
+>      AioHandler *node;
+>      bool is_new = false;
+>      bool deleted = false;
+> +    int poll_disable_change;
+>  
+>      qemu_lockcnt_lock(&ctx->list_lock);
+>  
+> @@ -244,11 +245,9 @@ void aio_set_fd_handler(AioContext *ctx,
+>              QLIST_REMOVE(node, node);
+>              deleted = true;
+>          }
+> -
+> -        if (!node->io_poll) {
+> -            ctx->poll_disable_cnt--;
+> -        }
+> +        poll_disable_change = -!node->io_poll;
+>      } else {
+> +        poll_disable_change = !io_poll - (node && !node->io_poll);
+>          if (node == NULL) {
+>              /* Alloc and insert if it's not already there */
+>              node = g_new0(AioHandler, 1);
+> @@ -257,10 +256,6 @@ void aio_set_fd_handler(AioContext *ctx,
+>  
+>              g_source_add_poll(&ctx->source, &node->pfd);
+>              is_new = true;
+> -
+> -            ctx->poll_disable_cnt += !io_poll;
+> -        } else {
+> -            ctx->poll_disable_cnt += !io_poll - !node->io_poll;
+>          }
+>  
+>          /* Update handler with latest information */
+> @@ -274,6 +269,15 @@ void aio_set_fd_handler(AioContext *ctx,
+>          node->pfd.events |= (io_write ? G_IO_OUT | G_IO_ERR : 0);
+>      }
+>  
+> +    /* No need to order poll_disable_cnt writes against other updates;
+> +     * the counter is only used to avoid wasting time and latency on
+> +     * iterated polling when the system call will be ultimately necessary.
+> +     * Changing handlers is a rare event, and a little wasted polling until
+> +     * the aio_notify below is not an issue.
+> +     */
+> +    atomic_set(&ctx->poll_disable_cnt,
+> +               atomic_read(&ctx->poll_disable_cnt) + poll_disable_change);
 
-The idea is to avoid TCG dependency.
-We even can use an interpreter without changing the API of the plugins.
-Therefore the helpers is the only way to do instrumentation.
+Why not atomic_add?
 
+> +
+>      aio_epoll_update(ctx, node, is_new);
+>      qemu_lockcnt_unlock(&ctx->list_lock);
+>      aio_notify(ctx);
+> @@ -525,7 +529,6 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
+>  
+>      assert(ctx->notify_me);
+>      assert(qemu_lockcnt_count(&ctx->list_lock) > 0);
+> -    assert(ctx->poll_disable_cnt == 0);
+>  
+>      trace_run_poll_handlers_begin(ctx, max_ns);
+>  
+> @@ -533,7 +536,8 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
+>  
+>      do {
+>          progress = run_poll_handlers_once(ctx);
+> -    } while (!progress && qemu_clock_get_ns(QEMU_CLOCK_REALTIME) < end_time);
+> +    } while (!progress && qemu_clock_get_ns(QEMU_CLOCK_REALTIME) < end_time
+> +             && !atomic_read(&ctx->poll_disable_cnt));
+>  
+>      trace_run_poll_handlers_end(ctx, progress);
+>  
+> @@ -552,7 +556,7 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
+>   */
+>  static bool try_poll_mode(AioContext *ctx, bool blocking)
+>  {
+> -    if (blocking && ctx->poll_max_ns && ctx->poll_disable_cnt == 0) {
+> +    if (blocking && ctx->poll_max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
+>          /* See qemu_soonest_timeout() uint64_t hack */
+>          int64_t max_ns = MIN((uint64_t)aio_compute_timeout(ctx),
+>                               (uint64_t)ctx->poll_ns);
+> -- 
+> 2.17.1
+> 
+> 
 
-Pavel Dovgalyuk
+Reviewed-by: Fam Zheng <famz@redhat.com>
