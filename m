@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0THT-0003Hq-C0
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:11:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0TI1-0003bi-JK
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0THS-0001lm-MH
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:11:43 -0400
-References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-4-kwolf@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1g0THx-000210-Fc
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:12:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60388)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0THx-000202-7e
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:12:13 -0400
+References: <20180912160118.21158-1-liq3ea@163.com>
+	<20180912160118.21158-6-liq3ea@163.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0d3a1209-9770-bcf7-aa47-4baa95fd88e9@redhat.com>
-Date: Thu, 13 Sep 2018 17:11:30 +0200
+Message-ID: <256edc89-6f54-da5d-10e1-a57ffb4ca613@redhat.com>
+Date: Thu, 13 Sep 2018 17:12:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180913125217.23173-4-kwolf@redhat.com>
+In-Reply-To: <20180912160118.21158-6-liq3ea@163.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 03/17] aio-wait: Increase num_waiters
- even in home thread
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/8] hw: designware: add read memory region
+ callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, famz@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+To: Li Qiang <liq3ea@163.com>, lersek@redhat.com, marcandre.lureau@gmail.com, ehabkost@redhat.com, mst@redhat.com, peter.maydell@linaro.org, ppandit@redhat.com
+Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
 
-On 13/09/2018 14:52, Kevin Wolf wrote:
-> Even if AIO_WAIT_WHILE() is called in the home context of the
-> AioContext, we still want to allow the condition to change depending on
-> other threads as long as they kick the AioWait. Specfically block jobs
-> can be running in an I/O thread and should then be able to kick a drain
-> in the main loop context.
+On 12/09/2018 18:01, Li Qiang wrote:
+> From: Li Qiang <liq3ea@gmail.com>
+>=20
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> ---
+>  hw/pci-host/designware.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/hw/pci-host/designware.c b/hw/pci-host/designware.c
+> index 29ea313798..f5641b5c8c 100644
+> --- a/hw/pci-host/designware.c
+> +++ b/hw/pci-host/designware.c
+> @@ -57,6 +57,12 @@ designware_pcie_root_to_host(DesignwarePCIERoot *roo=
+t)
+>      return DESIGNWARE_PCIE_HOST(bus->parent);
+>  }
+> =20
+> +static uint64_t designware_pcie_root_msi_read(void *opaque, hwaddr add=
+r,
+> +                                              unsigned size)
+> +{
+> +    return 0;
+> +}
+> +
+>  static void designware_pcie_root_msi_write(void *opaque, hwaddr addr,
+>                                             uint64_t val, unsigned len)
+>  {
+> @@ -71,6 +77,7 @@ static void designware_pcie_root_msi_write(void *opaq=
+ue, hwaddr addr,
+>  }
+> =20
+>  static const MemoryRegionOps designware_pci_host_msi_ops =3D {
+> +    .read =3D designware_pcie_root_msi_read,
+>      .write =3D designware_pcie_root_msi_write,
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+>      .valid =3D {
+>=20
 
-I don't understand the scenario very well.  Why hasn't the main loop's
-drain incremented num_waiters?
+This probably needs to generate an unassigned access too, because the
+datasheet says that the device basically traps memory writes.
 
-Note I'm not against the patch---though I would hoist the
-atomic_inc/atomic_dec outside the if, since it's done in both branches.
+Generating an unassigned access is probably a good idea for the memory
+core; devices can then override the behavior to return zero.  I'm
+queuing patches 1-4, with slightly expanded commit messages.
 
 Paolo
