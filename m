@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1g0Jcr-0005uu-3U
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 00:53:10 -0400
+	(envelope-from <clg@kaod.org>) id 1g0JzN-00018t-Ec
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:16:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1g0Jcm-0004fM-Hq
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 00:53:09 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:32886)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1g0Jcm-0004eD-9d
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 00:53:04 -0400
-Received: by mail-pl1-x641.google.com with SMTP id b30-v6so2048493pla.0
-	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 21:53:04 -0700 (PDT)
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Thu, 13 Sep 2018 04:52:50 +0000
-Message-Id: <1536814370-12997-1-git-send-email-zhangckid@gmail.com>
-Subject: [Qemu-devel] [PATCH V12-fix 01/19] filter-rewriter: Add TCP state
- machine and fix memory leak in connection_track_table
+	(envelope-from <clg@kaod.org>) id 1g0JzK-0004rJ-77
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:16:25 -0400
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:41737)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g0JzJ-0004qL-Vi
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:16:22 -0400
+Received: from player746.ha.ovh.net (unknown [10.109.143.209])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 276E52657C
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 07:16:20 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 13 Sep 2018 07:16:05 +0200
+Message-Id: <20180913051605.26408-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] spapr_pci: add an extra 'nr_msis' argument to
+ spapr_populate_pci_dt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,260 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <chen.zhang@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-We add almost full TCP state machine in filter-rewriter, except
-TCPS_LISTEN and some simplify in VM active close FIN states.
-The reason for this simplify job is because guest kernel will track
-the TCP status and wait 2MSL time too, if client resend the FIN packet,
-guest will resend the last ACK, so we needn't wait 2MSL time in filter-rewriter.
+So that we don't have to call qdev_get_machine() to get the machine
+class and the sPAPRIrq backend holding the number of MSIs.
 
-After a net connection is closed, we didn't clear its releated resources
-in connection_track_table, which will lead to memory leak.
-
-Let't track the state of net connection, if it is closed, its related
-resources will be cleared up.
-
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- net/colo.c            |   2 +-
- net/colo.h            |   9 ++--
- net/filter-rewriter.c | 109 ++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 104 insertions(+), 16 deletions(-)
+ include/hw/pci-host/spapr.h | 5 ++---
+ hw/ppc/spapr.c              | 2 +-
+ hw/ppc/spapr_pci.c          | 9 +++------
+ 3 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/net/colo.c b/net/colo.c
-index 6dda4ed66e..97c8fc928f 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -137,7 +137,7 @@ Connection *connection_new(ConnectionKey *key)
-     conn->ip_proto = key->ip_proto;
-     conn->processing = false;
-     conn->offset = 0;
--    conn->syn_flag = 0;
-+    conn->tcp_state = TCPS_CLOSED;
-     conn->pack = 0;
-     conn->sack = 0;
-     g_queue_init(&conn->primary_list);
-diff --git a/net/colo.h b/net/colo.h
-index da6c36dcf7..0277e0e9ba 100644
---- a/net/colo.h
-+++ b/net/colo.h
-@@ -18,6 +18,7 @@
- #include "slirp/slirp.h"
- #include "qemu/jhash.h"
- #include "qemu/timer.h"
-+#include "slirp/tcp.h"
- 
- #define HASHTABLE_MAX_SIZE 16384
- 
-@@ -81,11 +82,9 @@ typedef struct Connection {
-     uint32_t sack;
-     /* offset = secondary_seq - primary_seq */
-     tcp_seq  offset;
--    /*
--     * we use this flag update offset func
--     * run once in independent tcp connection
--     */
--    int syn_flag;
-+
-+    int tcp_state; /* TCP FSM state */
-+    tcp_seq fin_ack_seq; /* the seq of 'fin=1,ack=1' */
- } Connection;
- 
- uint32_t connection_key_hash(const void *opaque);
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index f584e4eba4..dd323faf61 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -59,9 +59,9 @@ static int is_tcp_packet(Packet *pkt)
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 0fae4fc6a4e5..7c66c3872f96 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -113,9 +113,8 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAP=
+RPHBState *phb, int pin)
+=20
+ PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index);
+=20
+-int spapr_populate_pci_dt(sPAPRPHBState *phb,
+-                          uint32_t xics_phandle,
+-                          void *fdt);
++int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, voi=
+d *fdt,
++                          uint32_t nr_msis);
+=20
+ void spapr_pci_rtas_init(void);
+=20
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index eba7d60a30a7..98868d893ad8 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1267,7 +1267,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
+pr,
+     }
+=20
+     QLIST_FOREACH(phb, &spapr->phbs, list) {
+-        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt);
++        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt, smc->irq->=
+nr_msis);
+         if (ret < 0) {
+             error_report("couldn't setup PCI devices in fdt");
+             exit(1);
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index bb736177e76c..c2271e6ed462 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2069,9 +2069,8 @@ static void spapr_phb_pci_enumerate(sPAPRPHBState *=
+phb)
+=20
  }
- 
- /* handle tcp packet from primary guest */
--static int handle_primary_tcp_pkt(NetFilterState *nf,
-+static int handle_primary_tcp_pkt(RewriterState *rf,
-                                   Connection *conn,
--                                  Packet *pkt)
-+                                  Packet *pkt, ConnectionKey *key)
+=20
+-int spapr_populate_pci_dt(sPAPRPHBState *phb,
+-                          uint32_t xics_phandle,
+-                          void *fdt)
++int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, voi=
+d *fdt,
++                          uint32_t nr_msis)
  {
-     struct tcphdr *tcp_pkt;
- 
-@@ -74,23 +74,28 @@ static int handle_primary_tcp_pkt(NetFilterState *nf,
-         trace_colo_filter_rewriter_conn_offset(conn->offset);
-     }
- 
-+    if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == (TH_ACK | TH_SYN)) &&
-+        conn->tcp_state == TCPS_SYN_SENT) {
-+        conn->tcp_state = TCPS_ESTABLISHED;
-+    }
-+
-     if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_SYN)) {
-         /*
-          * we use this flag update offset func
-          * run once in independent tcp connection
-          */
--        conn->syn_flag = 1;
-+        conn->tcp_state = TCPS_SYN_RECEIVED;
-     }
- 
-     if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_ACK)) {
--        if (conn->syn_flag) {
-+        if (conn->tcp_state == TCPS_SYN_RECEIVED) {
-             /*
-              * offset = secondary_seq - primary seq
-              * ack packet sent by guest from primary node,
-              * so we use th_ack - 1 get primary_seq
-              */
-             conn->offset -= (ntohl(tcp_pkt->th_ack) - 1);
--            conn->syn_flag = 0;
-+            conn->tcp_state = TCPS_ESTABLISHED;
-         }
-         if (conn->offset) {
-             /* handle packets to the secondary from the primary */
-@@ -99,15 +104,66 @@ static int handle_primary_tcp_pkt(NetFilterState *nf,
-             net_checksum_calculate((uint8_t *)pkt->data + pkt->vnet_hdr_len,
-                                    pkt->size - pkt->vnet_hdr_len);
-         }
-+
-+        /*
-+         * Passive close step 3
-+         */
-+        if ((conn->tcp_state == TCPS_LAST_ACK) &&
-+            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
-+            conn->tcp_state = TCPS_CLOSED;
-+            g_hash_table_remove(rf->connection_track_table, key);
-+        }
-+    }
-+
-+    if ((tcp_pkt->th_flags & TH_FIN) == TH_FIN) {
-+        /*
-+         * Passive close.
-+         * Step 1:
-+         * The *server* side of this connect is VM, *client* tries to close
-+         * the connection. We will into CLOSE_WAIT status.
-+         *
-+         * Step 2:
-+         * In this step we will into LAST_ACK status.
-+         *
-+         * We got 'fin=1, ack=1' packet from server side, we need to
-+         * record the seq of 'fin=1, ack=1' packet.
-+         *
-+         * Step 3:
-+         * We got 'ack=1' packets from client side, it acks 'fin=1, ack=1'
-+         * packet from server side. From this point, we can ensure that there
-+         * will be no packets in the connection, except that, some errors
-+         * happen between the path of 'filter object' and vNIC, if this rare
-+         * case really happen, we can still create a new connection,
-+         * So it is safe to remove the connection from connection_track_table.
-+         *
-+         */
-+        if (conn->tcp_state == TCPS_ESTABLISHED) {
-+            conn->tcp_state = TCPS_CLOSE_WAIT;
-+        }
-+
-+        /*
-+         * Active close step 2.
-+         */
-+        if (conn->tcp_state == TCPS_FIN_WAIT_1) {
-+            conn->tcp_state = TCPS_TIME_WAIT;
-+            /*
-+             * For simplify implementation, we needn't wait 2MSL time
-+             * in filter rewriter. Because guest kernel will track the
-+             * TCP status and wait 2MSL time, if client resend the FIN
-+             * packet, guest will apply the last ACK too.
-+             */
-+            conn->tcp_state = TCPS_CLOSED;
-+            g_hash_table_remove(rf->connection_track_table, key);
-+        }
-     }
- 
-     return 0;
- }
- 
- /* handle tcp packet from secondary guest */
--static int handle_secondary_tcp_pkt(NetFilterState *nf,
-+static int handle_secondary_tcp_pkt(RewriterState *rf,
-                                     Connection *conn,
--                                    Packet *pkt)
-+                                    Packet *pkt, ConnectionKey *key)
- {
-     struct tcphdr *tcp_pkt;
- 
-@@ -121,7 +177,8 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
-         trace_colo_filter_rewriter_conn_offset(conn->offset);
-     }
- 
--    if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == (TH_ACK | TH_SYN))) {
-+    if (conn->tcp_state == TCPS_SYN_RECEIVED &&
-+        ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == (TH_ACK | TH_SYN))) {
-         /*
-          * save offset = secondary_seq and then
-          * in handle_primary_tcp_pkt make offset
-@@ -130,6 +187,12 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
-         conn->offset = ntohl(tcp_pkt->th_seq);
-     }
- 
-+    /* VM active connect */
-+    if (conn->tcp_state == TCPS_CLOSED &&
-+        ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_SYN)) {
-+        conn->tcp_state = TCPS_SYN_SENT;
-+    }
-+
-     if ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) == TH_ACK) {
-         /* Only need to adjust seq while offset is Non-zero */
-         if (conn->offset) {
-@@ -141,6 +204,32 @@ static int handle_secondary_tcp_pkt(NetFilterState *nf,
-         }
-     }
- 
-+    /*
-+     * Passive close step 2:
-+     */
-+    if (conn->tcp_state == TCPS_CLOSE_WAIT &&
-+        (tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
-+        conn->fin_ack_seq = ntohl(tcp_pkt->th_seq);
-+        conn->tcp_state = TCPS_LAST_ACK;
-+    }
-+
-+    /*
-+     * Active close
-+     *
-+     * Step 1:
-+     * The *server* side of this connect is VM, *server* tries to close
-+     * the connection.
-+     *
-+     * Step 2:
-+     * We will into CLOSE_WAIT status.
-+     * We simplify the TCPS_FIN_WAIT_2, TCPS_TIME_WAIT and
-+     * CLOSING status.
-+     */
-+    if (conn->tcp_state == TCPS_ESTABLISHED &&
-+        (tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == TH_FIN) {
-+        conn->tcp_state = TCPS_FIN_WAIT_1;
-+    }
-+
-     return 0;
- }
- 
-@@ -190,7 +279,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
- 
-         if (sender == nf->netdev) {
-             /* NET_FILTER_DIRECTION_TX */
--            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
-+            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
-                 qemu_net_queue_send(s->incoming_queue, sender, 0,
-                 (const uint8_t *)pkt->data, pkt->size, NULL);
-                 packet_destroy(pkt, NULL);
-@@ -203,7 +292,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
-             }
-         } else {
-             /* NET_FILTER_DIRECTION_RX */
--            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
-+            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
-                 qemu_net_queue_send(s->incoming_queue, sender, 0,
-                 (const uint8_t *)pkt->data, pkt->size, NULL);
-                 packet_destroy(pkt, NULL);
--- 
-2.17.GIT
+     int bus_off, i, j, ret;
+     gchar *nodename;
+@@ -2121,7 +2120,6 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+     sPAPRTCETable *tcet;
+     PCIBus *bus =3D PCI_HOST_BRIDGE(phb)->bus;
+     sPAPRFDT s_fdt;
+-    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(qdev_get_machine(=
+));
+=20
+     /* Start populating the FDT */
+     nodename =3D g_strdup_printf("pci@%" PRIx64, phb->buid);
+@@ -2139,8 +2137,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+     _FDT(fdt_setprop(fdt, bus_off, "ranges", &ranges, sizeof_ranges));
+     _FDT(fdt_setprop(fdt, bus_off, "reg", &bus_reg, sizeof(bus_reg)));
+     _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pci-config-space-type", 0x1=
+));
+-    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi",
+-                          smc->irq->nr_msis));
++    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", nr_msis));
+=20
+     /* Dynamic DMA window */
+     if (phb->ddw_enabled) {
+--=20
+2.17.1
