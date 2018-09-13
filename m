@@ -1,19 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1g0OOB-0005cF-QL
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 05:58:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0OUU-0007TH-6Z
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lizhijian@cn.fujitsu.com>) id 1g0OO9-0004DC-0m
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 05:58:19 -0400
-Received: from mga12.intel.com ([192.55.52.136]:24638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lizhijian@cn.fujitsu.com>)
-	id 1g0OO8-0003iU-Md
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 05:58:16 -0400
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
-Date: Thu, 13 Sep 2018 18:07:13 +0800
-Message-Id: <1536833233-14121-1-git-send-email-lizhijian@cn.fujitsu.com>
-Subject: [Qemu-devel] [PATCH v2] change get_image_size return type to int64_t
+	(envelope-from <pbonzini@redhat.com>) id 1g0OUP-0000N0-3J
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:04:49 -0400
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:35051)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0OUO-0000JF-KJ
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:04:44 -0400
+Received: by mail-wm0-f65.google.com with SMTP id o18-v6so5575968wmc.0
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 03:04:44 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+References: <20180910145616.8598-1-famz@redhat.com>
+	<20180910145616.8598-3-famz@redhat.com>
+	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
+	<20180911141245.GQ19292@lemon.usersys.redhat.com>
+	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
+	<20180912013134.GA2526@lemon.usersys.redhat.com>
+	<3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
+	<20180912115020.GH2526@lemon.usersys.redhat.com>
+	<ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
+	<20180913060351.GK2526@lemon.usersys.redhat.com>
+	<44c472ba-a9ff-7c64-6406-f528a7e0f463@redhat.com>
+Message-ID: <bcae773c-195d-32ff-da1e-23629ed65c06@redhat.com>
+Date: Thu, 13 Sep 2018 12:04:34 +0200
+MIME-Version: 1.0
+In-Reply-To: <44c472ba-a9ff-7c64-6406-f528a7e0f463@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] virtio-scsi/virtio-blk:
+ Disable poll handlers when stopping vq handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,190 +40,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net, mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, ehabkost@redhat.com, amarkovic@wavecomp.com, aurelien@aurel32.net, green@moxielogic.com, qemu-devel@nongnu.org
-Cc: philip.li@intel.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Previously, if the size of initrd >=2G, qemu exits with error:
-root@haswell-OptiPlex-9020:/home/lizj# /home/lizhijian/lkp/qemu-colo/x86_64-softmmu/qemu-system-x86_64 -kernel ./vmlinuz-4.16.0-rc4 -initrd large.cgz -nographic
-qemu: error reading initrd large.cgz: No such file or directory
-root@haswell-OptiPlex-9020:/home/lizj# du -sh large.cgz
-2.5G	large.cgz
+On 13/09/2018 11:11, Paolo Bonzini wrote:
+> On 13/09/2018 08:03, Fam Zheng wrote:
+>> On Wed, 09/12 14:42, Paolo Bonzini wrote:
+>>> On 12/09/2018 13:50, Fam Zheng wrote:
+>>>>> I think it's okay if it is invoked.  The sequence is first you stop the
+>>>>> vq, then you drain the BlockBackends, then you switch AioContext.  All
+>>>>> that matters is the outcome when virtio_scsi_dataplane_stop returns.
+>>>> Yes, but together with vIOMMU, it also effectively leads to a virtio_error(),
+>>>> which is not clean. QEMU stderr when this call happens (with patch 1 but not
+>>>> this patch):
+>>>>
+>>>> 2018-09-12T11:48:10.193023Z qemu-system-x86_64: vtd_iommu_translate: detected translation failure (dev=02:00:00, iova=0x0)
+>>>> 2018-09-12T11:48:10.193044Z qemu-system-x86_64: New fault is not recorded due to compression of faults
+>>>> 2018-09-12T11:48:10.193061Z qemu-system-x86_64: virtio: zero sized buffers are not allowed
+>>>
+>>> But with iothread, virtio_scsi_dataplane_stop runs in another thread
+>>> than the iothread; in that case you still have a race where the iothread
+>>> can process the vq before aio_disable_external and print the error.
+>>>
+>>> IIUC the guest has cleared the IOMMU page tables _before_ clearing the
+>>> DRIVER_OK bit in the status field.  Could this be a guest bug?
+>>
+>> I'm not sure if it is a bug or not. I think what happens is the device is left
+>> enabled by Seabios, and then reset by kernel.
+> 
+> That makes sense, though I'm not sure why QEMU needs to process a
+> request long after SeaBIOS has left control to Linux.  Maybe it's just
+> that the messages should not go on QEMU stderr, and rather trace-point
+> should be enough.
 
-this patch changes the caller side that use this function to calculate
-size of initrd file as well.
+Aha, it's not that QEMU needs to poll, it's just that polling mode is
+enabled, and it decides to do one last iteration.  In general the virtio
+spec allows the hardware to poll whenever it wants, hence:
 
-v2: update error message and int64_t printing format
+1) I'm not sure that translation failures should mark the device as
+broken---definitely not when doing polling, possibly not even in
+response to the guest "kicking" the virtqueue.  Alex, does the PCI spec
+say anything about this?
 
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
----
- hw/alpha/dp264.c        | 3 ++-
- hw/core/loader.c        | 5 +++--
- hw/hppa/machine.c       | 2 +-
- hw/i386/pc.c            | 7 ++++++-
- hw/mips/mips_fulong2e.c | 4 ++--
- hw/mips/mips_malta.c    | 4 ++--
- hw/mips/mips_mipssim.c  | 3 +--
- hw/mips/mips_r4k.c      | 4 ++--
- hw/moxie/moxiesim.c     | 2 +-
- include/hw/loader.h     | 2 +-
- 10 files changed, 21 insertions(+), 15 deletions(-)
+2) translation faliures should definitely not print messages to stderr.
 
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 80b987f..dd62f2a 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -150,7 +150,8 @@ static void clipper_init(MachineState *machine)
-         }
- 
-         if (initrd_filename) {
--            long initrd_base, initrd_size;
-+            long initrd_base;
-+            int64_t initrd_size;
- 
-             initrd_size = get_image_size(initrd_filename);
-             if (initrd_size < 0) {
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 390987a..aa0b3fc 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -61,9 +61,10 @@
- static int roms_loaded;
- 
- /* return the size or -1 if error */
--int get_image_size(const char *filename)
-+int64_t get_image_size(const char *filename)
- {
--    int fd, size;
-+    int fd;
-+    int64_t size;
-     fd = open(filename, O_RDONLY | O_BINARY);
-     if (fd < 0)
-         return -1;
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index cf7c61c..3277626 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -189,7 +189,7 @@ static void machine_hppa_init(MachineState *machine)
- 
-         if (initrd_filename) {
-             ram_addr_t initrd_base;
--            long initrd_size;
-+            int64_t initrd_size;
- 
-             initrd_size = get_image_size(initrd_filename);
-             if (initrd_size < 0) {
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 0314845..cd5029c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -838,7 +838,8 @@ static void load_linux(PCMachineState *pcms,
-                        FWCfgState *fw_cfg)
- {
-     uint16_t protocol;
--    int setup_size, kernel_size, initrd_size = 0, cmdline_size;
-+    int setup_size, kernel_size, cmdline_size;
-+    int64_t initrd_size = 0;
-     int dtb_size, setup_data_offset;
-     uint32_t initrd_max;
-     uint8_t header[8192], *setup, *kernel, *initrd_data;
-@@ -974,6 +975,10 @@ static void load_linux(PCMachineState *pcms,
-             fprintf(stderr, "qemu: error reading initrd %s: %s\n",
-                     initrd_filename, strerror(errno));
-             exit(1);
-+        } else if (initrd_size >= initrd_max) {
-+            fprintf(stderr, "qemu: initrd is too large, cannot support."
-+                    "(max: %"PRIu32", need %"PRId64")\n", initrd_max, initrd_size);
-+            exit(1);
-         }
- 
-         initrd_addr = (initrd_max-initrd_size) & ~4095;
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index c1694c8..ca88d28 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -104,9 +104,9 @@ static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
- 
- static int64_t load_kernel (CPUMIPSState *env)
- {
--    int64_t kernel_entry, kernel_low, kernel_high;
-+    int64_t kernel_entry, kernel_low, kernel_highi, initrd_size;
-     int index = 0;
--    long kernel_size, initrd_size;
-+    long kernel_size;
-     ram_addr_t initrd_offset;
-     uint32_t *prom_buf;
-     long prom_size;
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 40041d5..64ab5d1 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -995,8 +995,8 @@ static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
- /* Kernel */
- static int64_t load_kernel (void)
- {
--    int64_t kernel_entry, kernel_high;
--    long kernel_size, initrd_size;
-+    int64_t kernel_entry, kernel_high, initrd_size;
-+    long kernel_size;
-     ram_addr_t initrd_offset;
-     int big_endian;
-     uint32_t *prom_buf;
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 241faa1..f665752 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -58,9 +58,8 @@ typedef struct ResetData {
- 
- static int64_t load_kernel(void)
- {
--    int64_t entry, kernel_high;
-+    int64_t entry, kernel_high, initrd_size;
-     long kernel_size;
--    long initrd_size;
-     ram_addr_t initrd_offset;
-     int big_endian;
- 
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index d5725d0..ef6b810 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -81,8 +81,8 @@ typedef struct ResetData {
- static int64_t load_kernel(void)
- {
-     const size_t params_size = 264;
--    int64_t entry, kernel_high;
--    long kernel_size, initrd_size;
-+    int64_t entry, kernel_high, initrd_size;
-+    long kernel_size;
-     ram_addr_t initrd_offset;
-     uint32_t *params_buf;
-     int big_endian;
-diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-index d41247d..4b0ce09 100644
---- a/hw/moxie/moxiesim.c
-+++ b/hw/moxie/moxiesim.c
-@@ -54,8 +54,8 @@ typedef struct {
- static void load_kernel(MoxieCPU *cpu, LoaderParams *loader_params)
- {
-     uint64_t entry, kernel_low, kernel_high;
-+    int64_t initrd_size;
-     long kernel_size;
--    long initrd_size;
-     ram_addr_t initrd_offset;
- 
-     kernel_size = load_elf(loader_params->kernel_filename,  NULL, NULL,
-diff --git a/include/hw/loader.h b/include/hw/loader.h
-index 3c11297..67a0af8 100644
---- a/include/hw/loader.h
-+++ b/include/hw/loader.h
-@@ -10,7 +10,7 @@
-  * Returns the size of the image file on success, -1 otherwise.
-  * On error, errno is also set as appropriate.
-  */
--int get_image_size(const char *filename);
-+int64_t get_image_size(const char *filename);
- int load_image(const char *filename, uint8_t *addr); /* deprecated */
- ssize_t load_image_size(const char *filename, void *addr, size_t size);
- 
--- 
-2.7.4
+Thanks,
+
+Paolo
