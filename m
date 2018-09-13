@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1g0GeG-00007l-3K
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 21:42:25 -0400
+	(envelope-from <yuchenlin@synology.com>) id 1g0GnU-0002om-6I
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 21:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1g0GeE-0000k5-4V
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 21:42:23 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:38864)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1g0Ge8-0000Zd-DR
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 21:42:18 -0400
-Received: by mail-qt0-x242.google.com with SMTP id x7-v6so3943172qtk.5
-	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 18:42:11 -0700 (PDT)
+	(envelope-from <yuchenlin@synology.com>) id 1g0GnT-0002s8-Ek
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 21:51:56 -0400
 MIME-Version: 1.0
-References: <20180912160118.21158-1-liq3ea@163.com>
-	<c8bfd44b-4d12-c2f6-7ac1-f8cda7178355@amsat.org>
-In-Reply-To: <c8bfd44b-4d12-c2f6-7ac1-f8cda7178355@amsat.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 13 Sep 2018 09:41:33 +0800
-Message-ID: <CAKXe6SL7zAsE78qL4-iJkTLrX2Lg+gv4WhwwneTJCNdPxeBXCQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/8] Add missed read callback for some
- memory region
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Thu, 13 Sep 2018 09:51:43 +0800
+From: yuchenlin <yuchenlin@synology.com>
+In-Reply-To: <20180912115421.GJ2526@lemon.usersys.redhat.com>
+References: <20180828031751.29507-1-yuchenlin@synology.com>
+	<20180912115421.GJ2526@lemon.usersys.redhat.com>
+Message-ID: <7ab961d4c1879d319236e6c7a60fdc38@synology.com>
+Subject: Re: [Qemu-devel] [PATCH] vmdk: align end of file to a sector
+ boundary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +25,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: f4bug@amsat.org, Eric Blake <eblake@redhat.com>, atar4qemu@gmail.com
-Cc: =?UTF-8?B?5p2O5by6?= <liq3ea@163.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, ehabkost@redhat.com, mst@redhat.com, Peter Maydell <peter.maydell@linaro.org>, P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =E4=BA=8E2018=E5=B9=B49=E6=9C=
-=8813=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=881:12=E5=86=99=E9=81=93=
-=EF=BC=9A
+On 2018-09-12 19:54, Fam Zheng wrote:
+> On Tue, 08/28 11:17, yuchenlin@synology.com wrote:
+>> From: yuchenlin <yuchenlin@synology.com>
+>> 
+>> There is a rare case which the size of last compressed cluster
+>> is larger than the cluster size, which will cause the file is
+>> not aligned at the sector boundary.
+>> 
+>> Signed-off-by: yuchenlin <yuchenlin@synology.com>
+>> ---
+>>  block/vmdk.c | 18 ++++++++++++++++++
+>>  1 file changed, 18 insertions(+)
+>> 
+>> diff --git a/block/vmdk.c b/block/vmdk.c
+>> index a9d0084e36..a8ae7c65d2 100644
+>> --- a/block/vmdk.c
+>> +++ b/block/vmdk.c
+>> @@ -1698,6 +1698,24 @@ static int coroutine_fn
+>>  vmdk_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+>>                             uint64_t bytes, QEMUIOVector *qiov)
+>>  {
+>> +    if (bytes == 0) {
+>> +        /* align end of file to a sector boundary. */
+>> +        BDRVVmdkState *s = bs->opaque;
+>> +        int i, ret;
+>> +        int64_t length;
+>> +
+>> +        for (i = 0; i < s->num_extents; i++) {
+>> +            length = bdrv_getlength(s->extents[i].file->bs);
+>> +            if (length < 0) {
+>> +                return length;
+>> +            }
+> 
+> Could you add "length = QEMU_ALIGN_UP(length, BDRV_SECTOR_SIZE);" to 
+> show the
+> intention more clearly?
+> 
+> Fam
+> 
 
-> Hi Li,
->
-> On 9/12/18 6:01 PM, Li Qiang wrote:
-> > From: Li Qiang <liq3ea@gmail.com>
-> >
-> > This patch set try to add the missed read callback for memory region.
-> > Without this patchset, when the guest reads the IO port/memory, it will
-> > cause an NULL-dereference issue. For example, add
-> > "-device isa-debug-exit" to command, then read the 0x501 port, it cause=
-s
-> a
-> > SIGSEGV.
-> >
-> > The only exception is 'readonly_mem_ops' as its read is directly
-> > access the underlying host ram as the comments says.
-> >
-> > These missed read callback is mostly pointed by Laszlo Ersek.
-> >
-> >
-> >
-> > Li Qiang (8):
-> >   fw_cfg_mem: add read memory region callback
-> >   hw: debugexit: add read callback
-> >   hw: hyperv_testdev: add read callback
-> >   hw: pc-testdev: add read memory region callback
-> >   hw: designware: add read memory region callback
-> >   hw: pvrdma: add read memory region callback
-> >   hw: sun4c: add read memory region callback
-> >   exec: add read callback for notdirty memory region
->
-> Why not rather simply add a check in
-> memory_region_oldmmio_read_accessor() instead?
->
-> Eventually:
->
-> {
->     uint64_t tmp;
->     int idx =3D ctz32(size);
->
->     if (unlikely(mr->ops->old_mmio.write[idx]
->                  && !mr->ops->old_mmio.read[idx])) {
->         tmp =3D 0; /* XXX is 0 the expected value??? */
->     } else {
->         tmp =3D mr->ops->old_mmio.read[idx](mr->opaque, addr);
->     }
->     ...
->
+Thank you for your effort, I will do it.
 
-Hi, I have sent this patch. But...
+yuchenlin
 
-
-We have discussed in another thread:
--->https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg01391.html
-
-Thanks,
-Li Qiang
+>> +            ret = bdrv_truncate(s->extents[i].file, length, 
+>> PREALLOC_MODE_OFF, NULL);
+>> +            if (ret < 0) {
+>> +                return ret;
+>> +            }
+>> +        }
+>> +        return 0;
+>> +    }
+>>      return vmdk_co_pwritev(bs, offset, bytes, qiov, 0);
+>>  }
+>> 
+>> --
+>> 2.17.0
+>> 
