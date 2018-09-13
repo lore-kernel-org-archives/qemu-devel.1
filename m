@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0R8G-0003Cb-5B
+	(envelope-from <quintela@redhat.com>) id 1g0R8G-0003D7-Qo
 	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0R8B-0002pk-L1
+	(envelope-from <quintela@redhat.com>) id 1g0R8F-0002w1-FY
 	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35642)
+Received: from mx1.redhat.com ([209.132.183.28]:44038)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0R8B-0002ow-CJ
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:59 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4DC793082120
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 12:53:58 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0R8F-0002u2-7U
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:03 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 13 Sep 2018 14:53:31 +0200
-Message-Id: <20180913125343.10912-1-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/12] Migration queue
+Date: Thu, 13 Sep 2018 14:53:33 +0200
+Message-Id: <20180913125343.10912-3-quintela@redhat.com>
+In-Reply-To: <20180913125343.10912-1-quintela@redhat.com>
+References: <20180913125343.10912-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 02/12] migration: fix calculating
+ xbzrle_counters.cache_miss_rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +25,101 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-The following changes since commit 19b599f7664b2ebfd0f405fb79c14dd2415574=
-52:
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-error-2018-08-27=
--v2' into staging (2018-08-27 16:44:20 +0100)
+As Peter pointed out:
+| - xbzrle_counters.cache_miss is done in save_xbzrle_page(), so it's
+|   per-guest-page granularity
+|
+| - RAMState.iterations is done for each ram_find_and_save_block(), so
+|   it's per-host-page granularity
+|
+| An example is that when we migrate a 2M huge page in the guest, we
+| will only increase the RAMState.iterations by 1 (since
+| ram_find_and_save_block() will be called once), but we might increase
+| xbzrle_counters.cache_miss for 2M/4K=512 times (we'll call
+| save_xbzrle_page() that many times) if all the pages got cache miss.
+| Then IMHO the cache miss rate will be 512/1=51200% (while it should
+| actually be just 100% cache miss).
 
-are available in the Git repository at:
+And he also suggested as xbzrle_counters.cache_miss_rate is the only
+user of rs->iterations we can adapt it to count target guest page
+numbers
 
-  git://github.com/juanquintela/qemu.git tags/migration/20180913
+After that, rename 'iterations' to 'target_page_count' to better reflect
+its meaning
 
-for you to fetch changes up to 418fe4f69648b4f3f0afd2588926deafac81cfe8:
+Suggested-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+Message-Id: <20180903092644.25812-3-xiaoguangrong@tencent.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/ram.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-  tests/migration: Enable the migration test on s390x, too (2018-09-13 14=
-:06:26 +0200)
-
-----------------------------------------------------------------
-migration/next for 20180913
-
-Hi this patchset has all pending migration queue that I have (It
-superceedes the previous one).
-
-- fix rdma_return_path (david)
-
-- s390 migration-test (thomas)
-  I ported it to the nema Makefile architecuter
-  Please thomas, confirm that you agree with my changes
-
-- aarch64 migration-test (wei)
-- lots of compression fixes (xiao)
-
-Please, apply.
-
-----------------------------------------------------------------
-Dr. David Alan Gilbert (1):
-      migration/rdma: Fix uninitialised rdma_return_path
-
-Jose Ricardo Ziviani (1):
-      Add a hint message to loadvm and exits on failure
-
-Thomas Huth (1):
-      tests/migration: Enable the migration test on s390x, too
-
-Wei Huang (4):
-      tests/migration: Convert x86 boot block compilation script into Mak=
-efile
-      tests/migration: Support cross compilation in generating boot heade=
-r file
-      tests/migration: Add migration-test header file
-      tests: Add migration test for aarch64
-
-Xiao Guangrong (5):
-      migration: fix calculating xbzrle_counters.cache_miss_rate
-      migration: handle the error condition properly
-      migration: do not flush_compressed_data at the end of iteration
-      migration: show the statistics of compression
-      migration: use save_page_use_compression in flush_compressed_data
-
- hmp.c                                              |  13 +
- migration/migration.c                              |  12 +
- migration/ram.c                                    | 103 +++--
- migration/ram.h                                    |   1 +
- migration/rdma.c                                   |   2 +-
- migration/savevm.c                                 |   4 +-
- qapi/migration.json                                |  26 +-
- tests/Makefile.include                             |   2 +
- tests/migration-test.c                             |  83 +++-
- tests/migration/Makefile                           |  35 ++
- tests/migration/aarch64/Makefile                   |  20 +
- tests/migration/aarch64/a-b-kernel.S               |  75 ++++
- tests/migration/aarch64/a-b-kernel.h               |  19 +
- tests/migration/i386/Makefile                      |  22 ++
- .../{x86-a-b-bootblock.s =3D> i386/a-b-bootblock.S}  |   4 -
- .../{x86-a-b-bootblock.h =3D> i386/a-b-bootblock.h}  |   8 +-
- tests/migration/migration-test.h                   |  34 ++
- tests/migration/rebuild-x86-bootblock.sh           |  33 --
- tests/migration/s390x/Makefile                     |  22 ++
- tests/migration/s390x/a-b-bios.c                   |  35 ++
- tests/migration/s390x/a-b-bios.h                   | 427 +++++++++++++++=
-++++++
- vl.c                                               |   1 +
- 22 files changed, 899 insertions(+), 82 deletions(-)
- create mode 100644 tests/migration/Makefile
- create mode 100644 tests/migration/aarch64/Makefile
- create mode 100644 tests/migration/aarch64/a-b-kernel.S
- create mode 100644 tests/migration/aarch64/a-b-kernel.h
- create mode 100644 tests/migration/i386/Makefile
- rename tests/migration/{x86-a-b-bootblock.s =3D> i386/a-b-bootblock.S} (=
-93%)
- rename tests/migration/{x86-a-b-bootblock.h =3D> i386/a-b-bootblock.h} (=
-92%)
- create mode 100644 tests/migration/migration-test.h
- delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
- create mode 100644 tests/migration/s390x/Makefile
- create mode 100644 tests/migration/s390x/a-b-bios.c
- create mode 100644 tests/migration/s390x/a-b-bios.h
+diff --git a/migration/ram.c b/migration/ram.c
+index 79c89425a3..5a54836c28 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -301,10 +301,10 @@ struct RAMState {
+     uint64_t num_dirty_pages_period;
+     /* xbzrle misses since the beginning of the period */
+     uint64_t xbzrle_cache_miss_prev;
+-    /* number of iterations at the beginning of period */
+-    uint64_t iterations_prev;
+-    /* Iterations since start */
+-    uint64_t iterations;
++    /* total handled target pages at the beginning of period */
++    uint64_t target_page_count_prev;
++    /* total handled target pages since start */
++    uint64_t target_page_count;
+     /* number of dirty bits in the bitmap */
+     uint64_t migration_dirty_pages;
+     /* protects modification of the bitmap */
+@@ -1592,19 +1592,19 @@ uint64_t ram_pagesize_summary(void)
+ 
+ static void migration_update_rates(RAMState *rs, int64_t end_time)
+ {
+-    uint64_t iter_count = rs->iterations - rs->iterations_prev;
++    uint64_t page_count = rs->target_page_count - rs->target_page_count_prev;
+ 
+     /* calculate period counters */
+     ram_counters.dirty_pages_rate = rs->num_dirty_pages_period * 1000
+                 / (end_time - rs->time_last_bitmap_sync);
+ 
+-    if (!iter_count) {
++    if (!page_count) {
+         return;
+     }
+ 
+     if (migrate_use_xbzrle()) {
+         xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
+-            rs->xbzrle_cache_miss_prev) / iter_count;
++            rs->xbzrle_cache_miss_prev) / page_count;
+         rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+     }
+ }
+@@ -1662,7 +1662,7 @@ static void migration_bitmap_sync(RAMState *rs)
+ 
+         migration_update_rates(rs, end_time);
+ 
+-        rs->iterations_prev = rs->iterations;
++        rs->target_page_count_prev = rs->target_page_count;
+ 
+         /* reset period counters */
+         rs->time_last_bitmap_sync = end_time;
+@@ -3196,7 +3196,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+             done = 1;
+             break;
+         }
+-        rs->iterations++;
++        rs->target_page_count += pages;
+ 
+         /* we want to check in the 1st loop, just in case it was the 1st time
+            and we had to sync the dirty bitmap.
+-- 
+2.17.1
