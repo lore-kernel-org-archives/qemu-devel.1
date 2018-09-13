@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1g0N0u-0007Fg-6l
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:30:13 -0400
+	(envelope-from <peterx@redhat.com>) id 1g0N4A-0000J3-Fj
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:33:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1g0N0t-00082D-C7
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:30:12 -0400
-From: yuchenlin@synology.com
-Date: Thu, 13 Sep 2018 16:29:52 +0800
-Message-Id: <20180913082952.3675-1-yuchenlin@synology.com>
-Subject: [Qemu-devel] [PATCH v3] vmdk: align end of file to a sector boundary
+	(envelope-from <peterx@redhat.com>) id 1g0N46-0006hz-GO
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:33:34 -0400
+Date: Thu, 13 Sep 2018 16:33:17 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180913083317.GG10763@xz-x1>
+References: <20180913075517.11140-1-peterx@redhat.com>
+	<2ad9db94-3d74-2879-e0a5-a0c4369d3a7f@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2ad9db94-3d74-2879-e0a5-a0c4369d3a7f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: handle invalid ce for shadow
+ sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,64 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org, yuchenlin <yuchenlin@synology.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: qemu-devel@nongnu.org, Pei Zhang <pezhang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>
 
-From: yuchenlin <yuchenlin@synology.com>
+On Thu, Sep 13, 2018 at 10:16:20AM +0200, Maxime Coquelin wrote:
+> Hi Peter,
+> 
+> On 09/13/2018 09:55 AM, Peter Xu wrote:
+> > There are two callers for vtd_sync_shadow_page_table_range(), one
+> > provided a valid context entry and one not.  Move that fetching
+> > operation into the caller vtd_sync_shadow_page_table() where we need to
+> > fetch the context entry.
+> > 
+> > Meanwhile, we should handle VTD_FR_CONTEXT_ENTRY_P properly when
+> > synchronizing shadow page tables.  Having invalid context entry there is
+> > perfectly valid when we move a device out of an existing domain.  When
+> > that happens, instead of posting an error we invalidate the whole region.
+> > 
+> > Without this patch, QEMU will crash if we do these steps:
+> > 
+> > (1) start QEMU with VT-d IOMMU and two 10G NICs (ixgbe)
+> > (2) bind the NICs with vfio-pci in the guest
+> > (3) start testpmd with the NICs applied
+> > (4) stop testpmd
+> > (5) rebind the NIC back to ixgbe kernel driver
+> > 
+> > The patch should fix it.
+> > 
+> > Reported-by: Pei Zhang<pezhang@redhat.com>
+> > Tested-by: Pei Zhang<pezhang@redhat.com>
+> > CC: Pei Zhang<pezhang@redhat.com>
+> > CC: Alex Williamson<alex.williamson@redhat.com>
+> > CC: Jason Wang<jasowang@redhat.com>
+> > CC: Maxime Coquelin<maxime.coquelin@redhat.com>
+> > CC: Michael S. Tsirkin<mst@redhat.com>
+> > CC: QEMU Stable<qemu-stable@nongnu.org>
+> > Fixes:https://bugzilla.redhat.com/show_bug.cgi?id=1627272
+> 
+> It seems like a regression as it wasn't reported earlier, isn't it?
+> If it is, do you know what is the faulty commit?
 
-There is a rare case which the size of last compressed cluster
-is larger than the cluster size, which will cause the file is
-not aligned at the sector boundary.
+I think it should be 63b88968f1 ("intel-iommu: rework the page walk
+logic", 2018-05-23).  The old code would possibly unmap all (using the
+old replay logic) before we introduce the shadow page sync helpers and
+I must have overlooked on that point.
 
-There are three reasons to do it. First, if vmdk doesn't align at
-the sector boundary, there may be many undefined behaviors,
-such as, in vbox it will show VMDK: Compressed image is corrupted
-'syno-vm-disk1.vmdk' (VERR_ZIP_CORRUPTED) when we try to import an
-ova with unaligned vmdk. Second, all the cluster_sector is aligned
-to sector, the last one should be like this, too. Third, it ease
-reading with sector based I/Os.
+> 
+> > Signed-off-by: Peter Xu<peterx@redhat.com>
+> > ---
+> >   hw/i386/intel_iommu.c | 54 ++++++++++++++++++++++++++-----------------
+> >   1 file changed, 33 insertions(+), 21 deletions(-)
+> 
+> Other than that, the patch looks good to me.
+> FWIW:
+> Acked-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Signed-off-by: yuchenlin <yuchenlin@synology.com>
----
-v2 -> v3:
-* Update commit message
+Thanks,
 
-thanks
-
- block/vmdk.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/block/vmdk.c b/block/vmdk.c
-index a9d0084e36..2c9e86d98f 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1698,6 +1698,27 @@ static int coroutine_fn
- vmdk_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
-                            uint64_t bytes, QEMUIOVector *qiov)
- {
-+    if (bytes == 0) {
-+        /* The caller will write bytes 0 to signal EOF.
-+         * When receive it, we align EOF to a sector boundary. */
-+        BDRVVmdkState *s = bs->opaque;
-+        int i, ret;
-+        int64_t length;
-+
-+        for (i = 0; i < s->num_extents; i++) {
-+            length = bdrv_getlength(s->extents[i].file->bs);
-+            if (length < 0) {
-+                return length;
-+            }
-+            length = QEMU_ALIGN_UP(length, BDRV_SECTOR_SIZE);
-+            ret = bdrv_truncate(s->extents[i].file, length,
-+                                PREALLOC_MODE_OFF, NULL);
-+            if (ret < 0) {
-+                return ret;
-+            }
-+        }
-+        return 0;
-+    }
-     return vmdk_co_pwritev(bs, offset, bytes, qiov, 0);
- }
- 
 -- 
-2.18.0
+Peter Xu
