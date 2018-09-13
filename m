@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0YZq-00057W-VI
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 16:51:03 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g0Yf8-0006YQ-Gq
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 16:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0YZq-00036D-64
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 16:51:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g0Yf7-0002Tq-NE
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 16:56:30 -0400
 References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-12-kwolf@redhat.com>
+	<20180913125217.23173-13-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ee850259-544d-5593-0b1e-ceadeb49f928@redhat.com>
-Date: Thu, 13 Sep 2018 22:50:27 +0200
+Message-ID: <9f51d49d-0159-3382-b561-1f33335a2dfd@redhat.com>
+Date: Thu, 13 Sep 2018 22:55:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180913125217.23173-12-kwolf@redhat.com>
+In-Reply-To: <20180913125217.23173-13-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="8ESbOVQrx8wjg10lYRqgpv9jeflCLrLF5"
-Subject: Re: [Qemu-devel] [PATCH v2 11/17] block-backend: Decrease in_flight
- only after callback
+	boundary="aO2nLOvo5x3dkFV4NhqBS0OSFjoipdaDC"
+Subject: Re: [Qemu-devel] [PATCH v2 12/17] mirror: Fix potential
+ use-after-free in active commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +29,58 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8ESbOVQrx8wjg10lYRqgpv9jeflCLrLF5
+--aO2nLOvo5x3dkFV4NhqBS0OSFjoipdaDC
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com,
  qemu-devel@nongnu.org
-Message-ID: <ee850259-544d-5593-0b1e-ceadeb49f928@redhat.com>
-Subject: Re: [PATCH v2 11/17] block-backend: Decrease in_flight only after
- callback
+Message-ID: <9f51d49d-0159-3382-b561-1f33335a2dfd@redhat.com>
+Subject: Re: [PATCH v2 12/17] mirror: Fix potential use-after-free in active
+ commit
 References: <20180913125217.23173-1-kwolf@redhat.com>
- <20180913125217.23173-12-kwolf@redhat.com>
-In-Reply-To: <20180913125217.23173-12-kwolf@redhat.com>
+ <20180913125217.23173-13-kwolf@redhat.com>
+In-Reply-To: <20180913125217.23173-13-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 13.09.18 14:52, Kevin Wolf wrote:
-> Request callbacks can do pretty much anything, including operations tha=
-t
-> will yield from the coroutine (such as draining the backend). In that
-> case, a decreased in_flight would be visible to other code and could
-> lead to a drain completing while the callback hasn't actually completed=
+> When starting an active commit job, other callbacks can run before
+> mirror_start_job() calls bdrv_ref() where needed and cause the nodes to=
 
-> yet.
+> go away. Add another pair of bdrv_ref/unref() around it to protect
+> against this case.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
 > ---
->  block/block-backend.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+>  block/mirror.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
+But...  How?
 
---8ESbOVQrx8wjg10lYRqgpv9jeflCLrLF5
+Like...  You mirror to some target (in an iothread), then you give that
+target a backing file, then you cancel the mirror and immediately commit
+the target?
+
+Max
+
+
+--aO2nLOvo5x3dkFV4NhqBS0OSFjoipdaDC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluazZMACgkQ9AfbAGHV
-z0DfGQgAwYchWAboL+wgd9fkzVc+je9iHs2JqJIp2P+NVatfgs4eZDkCFNjWmTxV
-xDYCugssyP26De+6CldxWLM4hk3sbgwb2rAnrCaU7d4h3LzoPDOzHyznHGuZ1kRZ
-pw6nSt6z8RhtA37OW2rXHgCNhn4qw8W7dzcJ6VBXIbFxzgNLu869YBZMHvUUstre
-wuH94d9CmzzqOV1CyMaqS8OCNM6++SRnWSZF0X7tcJyn7IZwMASIbJWoOls6gBLC
-TWuZkE28WsoZwlb+oQKXckq8cmPdlSP2R665bmKefSJhfTmeszVst/nV/6BJwN9w
-A/f9ZIqB7yJy+Z+dJQmzsmQYIHyJjQ==
-=L8Vk
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluaztoACgkQ9AfbAGHV
+z0BZdgf/cnvfFwgeKnGlDKrxzn5b8cFwJy+BuYo6o0gM8Oijw6w62E+Y/laCFE2Z
++6+9KKbRxAW/B6vZpZORcj88UW2eM6IfhiWWFfTlaxbfTfW0J2wwkUUFwrk+MEby
+dvBckrt/8VNAqze9R+DhYq5YX5vpfw8jYG1e/0iu2Q4HrqpfdrTUZEeEUK1hFL68
+mxNicFbWYqLTdeIsZnYoaBf3ZOyg4KtmTe5RV+0ckM9uEo2pHceRNlECg/s5fICI
+bx4WU8O47F5JY4Fd6hbljoT7q6iTyVXnn36dQcLTfAo1GKoeaya2D/cUSviN2I5V
+vjCb3A8fTDYbeQe51wfnhayWWwdQtw==
+=GqOK
 -----END PGP SIGNATURE-----
 
---8ESbOVQrx8wjg10lYRqgpv9jeflCLrLF5--
+--aO2nLOvo5x3dkFV4NhqBS0OSFjoipdaDC--
