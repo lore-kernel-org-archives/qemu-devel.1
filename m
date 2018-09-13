@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0LuS-0005kO-VZ
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:29 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1g0MJj-00033r-WF
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:45:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0LuR-0008G4-4o
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:28 -0400
-Date: Thu, 13 Sep 2018 15:19:17 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180913071917.GN2526@lemon.usersys.redhat.com>
-References: <20180912171040.1732-1-pbonzini@redhat.com>
-	<20180912171040.1732-4-pbonzini@redhat.com>
+	(envelope-from <guangrong.xiao@gmail.com>) id 1g0MJf-0004PO-Ca
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:45:35 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:36863)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1g0MJf-0004Nl-51
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:45:31 -0400
+Received: by mail-pg1-x543.google.com with SMTP id d1-v6so2358947pgo.3
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 00:45:30 -0700 (PDT)
+References: <20180906070101.27280-1-xiaoguangrong@tencent.com>
+	<87k1ny51nf.fsf@trasno.org>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <575ca9d8-ed64-abdf-4c88-e25da4f17b22@gmail.com>
+Date: Thu, 13 Sep 2018 15:45:20 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180912171040.1732-4-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] aio-posix: do skip system call if
- ctx->notifier polling succeeds
+In-Reply-To: <87k1ny51nf.fsf@trasno.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] migration: compression optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, stefanha@redhat.com
+To: quintela@redhat.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Wed, 09/12 19:10, Paolo Bonzini wrote:
-> Commit 70232b5253 ("aio-posix: Don't count ctx->notifier as progress when
-> 2018-08-15), by not reporting progress, causes aio_poll to execute the
-> system call when polling succeeds because of ctx->notifier.  This introduces
-> latency before the call to aio_bh_poll() and negates the advantages of
-> polling, unfortunately.
+
+
+On 09/06/2018 07:03 PM, Juan Quintela wrote:
+> guangrong.xiao@gmail.com wrote:
+>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>
+>> Changelog in v6:
+>>
+>> Thanks to Juan's review, in this version we
+>> 1) move flush compressed data to find_dirty_block() where it hits the end
+>>     of memblock
+>> 2) use save_page_use_compression instead of migrate_use_compression in
+>>     flush_compressed_data
+>>
+>> Xiao Guangrong (3):
+>>    migration: do not flush_compressed_data at the end of iteration
+>>    migration: show the statistics of compression
+>>    migration: use save_page_use_compression in flush_compressed_data
+>>
+>>   hmp.c                 | 13 +++++++++++
+>>   migration/migration.c | 12 ++++++++++
+>>   migration/ram.c       | 63 +++++++++++++++++++++++++++++++++++++++++++--------
+>>   migration/ram.h       |  1 +
+>>   qapi/migration.json   | 26 ++++++++++++++++++++-
+>>   5 files changed, 105 insertions(+), 10 deletions(-)
 > 
-> The fix builds on the previous patch, separating the effect of polling on
-> the timeout from the progress reported to aio_poll().  ctx->notifier
-> does zero the timeout, causing the caller to skip the system call,
-> but it does not report progress, so that the bug fix of commit 70232b5253
-> still stands.
-> 
-> Fixes: 70232b5253a3c4e03ed1ac47ef9246a8ac66c6fa
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  util/aio-posix.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/util/aio-posix.c b/util/aio-posix.c
-> index 21d8987179..efa79b9e62 100644
-> --- a/util/aio-posix.c
-> +++ b/util/aio-posix.c
-> @@ -498,10 +498,11 @@ static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
->      QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
->          if (!node->deleted && node->io_poll &&
->              aio_node_check(ctx, node->is_external) &&
-> -            node->io_poll(node->opaque) &&
-> -            node->opaque != &ctx->notifier) {
-> +            node->io_poll(node->opaque)) {
->              *timeout = 0;
-> -            progress = true;
-> +            if (node->opaque != &ctx->notifier) {
-> +                progress = true;
-> +            }
->          }
->  
->          /* Caller handles freeing deleted nodes.  Don't do it here. */
-> -- 
-> 2.17.1
+> queued
 > 
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Hi Juan,
+
+Could i ask where is the place you queued these patches, i did not found
+them on your git tree at
+    https://github.com/juanquintela/qemu migration/next or migration.next
+
+I am working on the next part of migration, it's more convenient to let
+it be based on your place. :)
+
+Thanks!
