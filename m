@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g0Vbg-0005Hi-OE
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:40:48 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0Vev-0006sR-M5
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g0VbX-0001Nf-S7
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:40:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0Vel-0003Ni-5b
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:43:59 -0400
+Date: Thu, 13 Sep 2018 19:39:26 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180913173926.GE5172@localhost.localdomain>
 References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-2-kwolf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b76eaa5f-2e72-d9a3-e02f-84b2d583b2ed@redhat.com>
-Date: Thu, 13 Sep 2018 13:38:47 -0400
+	<20180913125217.23173-7-kwolf@redhat.com>
+	<387dce30-0a62-ad0a-e955-56ca714323b4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180913125217.23173-2-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/17] job: Fix missing locking due to
- mismerge
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <387dce30-0a62-ad0a-e955-56ca714323b4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 06/17] job: Use AIO_WAIT_WHILE() in
+ job_finish_sync()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, slp@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
+Am 13.09.2018 um 17:15 hat Paolo Bonzini geschrieben:
+> On 13/09/2018 14:52, Kevin Wolf wrote:
+> > Also, job_drain() without aio_poll() isn't necessarily enough to make
+> > progress on a job, it could depend on bottom halves to be executed.
+> 
+> This is not changed by the patch though; AIO_WAIT_WHILE does not do the
+> bottom halves part anymore, bdrv_drain_poll_top_level does it instead.
+> 
+> What is it that needs bottom halves to be executed?  Could it delay
+> switching the job state until after that?
 
+AIO_WAIT_WHILE() does still execute bottom halves if the condition is
+true, which is all that is needed to make progress. It only doesn't
+execute them unconditionally any more.
 
-On 09/13/2018 08:52 AM, Kevin Wolf wrote:
-> job_completed() had a problem with double locking that was recently
-> fixed independently by two different commits:
-> 
-> "job: Fix nested aio_poll() hanging in job_txn_apply"
-> "jobs: add exit shim"
-> 
-> One fix removed the first aio_context_acquire(), the other fix removed
-> the other one. Now we have a bug again and the code is run without any
-> locking.
-> 
-> Add it back in one of the places.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  job.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/job.c b/job.c
-> index 82b46929bd..5c4e84f007 100644
-> --- a/job.c
-> +++ b/job.c
-> @@ -847,7 +847,11 @@ static void job_completed(Job *job)
->  static void job_exit(void *opaque)
->  {
->      Job *job = (Job *)opaque;
-> +    AioContext *ctx = job->aio_context;
-> +
-> +    aio_context_acquire(ctx);
->      job_completed(job);
-> +    aio_context_release(ctx);
->  }
->  
->  /**
-> 
-
-OK =]
-Reviewed-by: John Snow <jsnow@redhat.com>
+Kevin
