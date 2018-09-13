@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0N7X-0001zW-4f
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:37:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0NFM-000428-KL
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:45:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0N7T-0003j0-0t
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:37:03 -0400
-Received: from mail-eopbgr700067.outbound.protection.outlook.com
-	([40.107.70.67]:35872
-	helo=NAM04-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Suravee.Suthikulpanit@amd.com>)
-	id 1g0N7R-0003gh-LI
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:36:58 -0400
-References: <1536684589-11718-1-git-send-email-brijesh.singh@amd.com>
-	<1536684589-11718-7-git-send-email-brijesh.singh@amd.com>
-	<20180912045233.GE3829@xz-x1>
-	<60537599-37af-9a2b-9ddf-f6155624259f@amd.com>
-From: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Message-ID: <8ba3b14e-7045-2a05-da02-d6b704ddd19a@amd.com>
-Date: Thu, 13 Sep 2018 15:36:28 +0700
+	(envelope-from <kwolf@redhat.com>) id 1g0NFL-0001M8-KH
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:45:08 -0400
+Date: Thu, 13 Sep 2018 10:44:50 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180913084450.GA5172@localhost.localdomain>
+References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
+	<20180629124052.331406-3-dplotnikov@virtuozzo.com>
+	<20180910124136.GF4901@dhcp-200-186.str.redhat.com>
+	<81346e2a-5ce2-50d3-791e-3cab5e2464d9@virtuozzo.com>
+	<20180912131503.GD5846@localhost.localdomain>
+	<5706f9f2-386f-aca9-4b7d-9fb924c68a7e@openvz.org>
 MIME-Version: 1.0
-In-Reply-To: <60537599-37af-9a2b-9ddf-f6155624259f@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <5706f9f2-386f-aca9-4b7d-9fb924c68a7e@openvz.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/6] x86_iommu/amd: Enable Guest virtual
- APIC support
+Subject: Re: [Qemu-devel] [PATCH v0 2/2] block: postpone the coroutine
+ executing if the BDS's is drained
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,108 +29,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>, mreitz@redhat.com, stefanha@redhat.com, vsementsov@virtuozzo.com, famz@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Brijesh/Peter,
+Am 12.09.2018 um 19:03 hat Denis V. Lunev geschrieben:
+> On 09/12/2018 04:15 PM, Kevin Wolf wrote:
+> > Am 12.09.2018 um 14:03 hat Denis Plotnikov geschrieben:
+> >> On 10.09.2018 15:41, Kevin Wolf wrote:
+> >>> Am 29.06.2018 um 14:40 hat Denis Plotnikov geschrieben:
+> >>>> Fixes the problem of ide request appearing when the BDS is in
+> >>>> the "drained section".
+> >>>>
+> >>>> Without the patch the request can come and be processed by the mai=
+n
+> >>>> event loop, as the ide requests are processed by the main event lo=
+op
+> >>>> and the main event loop doesn't stop when its context is in the
+> >>>> "drained section".
+> >>>> The request execution is postponed until the end of "drained secti=
+on".
+> >>>>
+> >>>> The patch doesn't modify ide specific code, as well as any other
+> >>>> device code. Instead, it modifies the infrastructure of asynchrono=
+us
+> >>>> Block Backend requests, in favor of postponing the requests arisen
+> >>>> when in "drained section" to remove the possibility of request app=
+earing
+> >>>> for all the infrastructure clients.
+> >>>>
+> >>>> This approach doesn't make vCPU processing the request wait untill
+> >>>> the end of request processing.
+> >>>>
+> >>>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> >>> I generally agree with the idea that requests should be queued duri=
+ng a
+> >>> drained section. However, I think there are a few fundamental probl=
+ems
+> >>> with the implementation in this series:
+> >>>
+> >>> 1) aio_disable_external() is already a layering violation and we'd =
+like
+> >>>     to get rid of it (by replacing it with a BlockDevOps callback f=
+rom
+> >>>     BlockBackend to the devices), so adding more functionality ther=
+e
+> >>>     feels like a step in the wrong direction.
+> >>>
+> >>> 2) Only blk_aio_* are fixed, while we also have synchronous public
+> >>>     interfaces (blk_pread/pwrite) as well as coroutine-based ones
+> >>>     (blk_co_*). They need to be postponed as well.
+> >> Good point! Thanks!
+>=20
+> Should we really prohibit all public interfaces, as they are reused
+> inside block level?
 
-On 9/13/18 4:14 AM, Brijesh Singh wrote:
->=20
->=20
-> On 09/11/2018 11:52 PM, Peter Xu wrote:
-> ...
->=20
->>>
->>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->>> index 5c2c638..1cbc8ba 100644
->>> --- a/hw/i386/acpi-build.c
->>> +++ b/hw/i386/acpi-build.c
->>> @@ -2565,7 +2565,8 @@ build_amd_iommu(GArray *table_data, BIOSLinker *l=
-inker)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 build_append_int_noprefix(table_data,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (48UL << 30) | /* HATS=C2=A0=C2=A0 */
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (48UL << 28) | /* GATS=C2=A0=C2=A0 */
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 (1UL << 2),=C2=A0=C2=A0=C2=A0 /* GTSup=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 (1UL << 2)=C2=A0=C2=A0 | /* GTSup=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 (1UL << 6),=C2=A0=C2=A0=C2=A0 /* GASup=C2=A0 */
->>
->> Sorry if I misunderstood - is this for nested?
->>
->> I'm a bit confused here... IIUC in your previous patches you didn't
->> really implement guest_mode=3D=3D1 case in IRTEs.=C2=A0 So if you have t=
-his set
->> then the guest should be able to setup IRTEs with guest_mode=3D=3D1?=C2=
-=A0 How
->> did it work?
->>
->=20
-> Yes, sometime spec can be confusing ;) let me see if I can explain it.
->=20
-> Suravee, please correct me if I misunderstood something
->=20
-> - A legacy interrupt remap support is available on all IOMMU versions.
->=20
->  =C2=A0 Guest OS makes the decision whether to use the feature. Guest OS
->  =C2=A0 sets the IV bit in DTE to indicate when there is a valid interrup=
-t
->  =C2=A0 map (See Table 7 DTE definition).
->=20
->  =C2=A0 In this mode, IRTE is 32-bit. The field details are available
->  =C2=A0 in Table 20 - Section 2.2.5.2. The third patch in this series
->  =C2=A0 implements the support for this case.
+We need to fix that. blk_*() should never be called from inside the BDS
+layer.
 
-This is correct.
+> There is also a problem which is not stated in the clear words yet.
+> We have potential deadlock in the code under the following
+> conditions, which should be also taken into the consideration.
+>=20
+> <path from the controller>
+> bdrv_co_pwritev
+> =A0=A0=A0 bdrv_inc_in_flight
+> =A0=A0=A0 bdrv_aligned_pwritev
+> =A0=A0=A0=A0=A0=A0=A0 notifier_list_with_return_notify
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 backup_before_write_notify
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 backup_do_cow
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 backup_cow=
+_with_bounce_buffer
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+ blk_co_preadv
+>=20
+> Here blk_co_preadv() must finish its work before we will release the
+> notifier and finish request initiated from the controller and which
+> has incremented in-fligh counter.
 
->=20
-> - When AVIC is used in the guest, the intr remap logic is different.
->=20
->  =C2=A0 Based on the guest_mode, IOMMU and AVIC may need to work together
->  =C2=A0 to remap the interrupts (IOMMU spec refers this as Guest Virtual =
-APIC
->  =C2=A0 Enabled -- Section 2.2.5.3).
->=20
->  =C2=A0 The GASup bit in extended feature register and IVHD IOMMU feature
->  =C2=A0 reporting field in IVRS are used to tell whether the IOMMU suppor=
-ts
->  =C2=A0 intr remap when AVIC is enabled in the guest.
->=20
->  =C2=A0 In this mode, the IRTE is 128-bit.
+Yes, before_write notifiers are evil. I've objected to them since the
+day they were introduced and I'm surprised it's becoming a problem only
+now.
 
-GASup is a prereq for GAMSup and several other features in the future.
+We should probably change the backup job to insert a job node rather
+sooner than later. Then it doesn't need to call blk_*() any more.
 
->=20
->  =C2=A0 To make things interesting, there is a GAMSup bit in extended
->  =C2=A0 feature register. It is used by IOMMU to tell the AVIC supported
->  =C2=A0 modes:
->=20
->  =C2=A0 a) 0 =3D intr_remap only (i.e IOMMU can remap the interrupt on it=
-s own)
->  =C2=A0 b) 1 =3D Both guest AVIC and IOMMU will work together to remap th=
-e intr
->=20
->  =C2=A0 The patch 5 in the series implements the intr_remap (#a)
->=20
->  =C2=A0 I have not implemented the mode=3D1. I am not sure if its worth
->  =C2=A0 implementing this mode for the emulated IOMMU case.
->=20
->  =C2=A0 See Table 21 for control knobs from IOMMU. This patch series
->  =C2=A0 implements the first three rows.
+> Thus we should differentiate requests initiated at the controller
+> level and requests initiated in the block layer.  This is sad but
+> true.
 
-GAMSup is guest virtual APIC mode (aka AVIC), and for vIOMMU case,
-would be used for nested VM. This is not currently supported for vIOMMU,
+The difference is supposed to be whether a request goes through a
+BlockBackend or not.
 
-Regards,
-Suravee
-
->=20
-> -Brijesh
+Kevin
