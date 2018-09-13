@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0ReM-0002ug-7a
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:27:15 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g0Rk3-0005LB-K9
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:33:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0ReI-0000iJ-9W
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:27:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0ReI-0000fr-1k
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:27:10 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <575ca9d8-ed64-abdf-4c88-e25da4f17b22@gmail.com> (Xiao
-	Guangrong's message of "Thu, 13 Sep 2018 15:45:20 +0800")
-References: <20180906070101.27280-1-xiaoguangrong@tencent.com>
-	<87k1ny51nf.fsf@trasno.org>
-	<575ca9d8-ed64-abdf-4c88-e25da4f17b22@gmail.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 13 Sep 2018 15:26:56 +0200
-Message-ID: <877ejpr0in.fsf@trasno.org>
+	(envelope-from <mreitz@redhat.com>) id 1g0Rk2-00075u-SQ
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:33:07 -0400
+References: <cover.1536226505.git.berto@igalia.com>
+	<4e73b26693677b6067545590708adcba66da1c06.1536226505.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <468c987f-b5b3-da16-b722-8481afc5bb9b@redhat.com>
+Date: Thu, 13 Sep 2018 15:32:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] migration: compression optimization
+In-Reply-To: <4e73b26693677b6067545590708adcba66da1c06.1536226505.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="h4be1g1eQLjc7SUkMuRl5Kr2l9H53MG88"
+Subject: Re: [Qemu-devel] [PATCH v3 08/10] block: Allow changing 'discard'
+ on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xiao Guangrong <guangrong.xiao@gmail.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, wei.w.wang@intel.com, jiang.biao2@zte.com.cn, eblake@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Xiao Guangrong <guangrong.xiao@gmail.com> wrote:
-> On 09/06/2018 07:03 PM, Juan Quintela wrote:
->> guangrong.xiao@gmail.com wrote:
->>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->>>
->>> Changelog in v6:
->>>
->>> Thanks to Juan's review, in this version we
->>> 1) move flush compressed data to find_dirty_block() where it hits the end
->>>     of memblock
->>> 2) use save_page_use_compression instead of migrate_use_compression in
->>>     flush_compressed_data
->>>
->>> Xiao Guangrong (3):
->>>    migration: do not flush_compressed_data at the end of iteration
->>>    migration: show the statistics of compression
->>>    migration: use save_page_use_compression in flush_compressed_data
->>>
->>>   hmp.c                 | 13 +++++++++++
->>>   migration/migration.c | 12 ++++++++++
->>>   migration/ram.c       | 63 +++++++++++++++++++++++++++++++++++++++++++--------
->>>   migration/ram.h       |  1 +
->>>   qapi/migration.json   | 26 ++++++++++++++++++++-
->>>   5 files changed, 105 insertions(+), 10 deletions(-)
->>
->> queued
->>
->
-> Hi Juan,
->
-> Could i ask where is the place you queued these patches, i did not found
-> them on your git tree at
->    https://github.com/juanquintela/qemu migration/next or migration.next
->
-> I am working on the next part of migration, it's more convenient to let
-> it be based on your place. :)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--h4be1g1eQLjc7SUkMuRl5Kr2l9H53MG88
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <468c987f-b5b3-da16-b722-8481afc5bb9b@redhat.com>
+Subject: Re: [PATCH v3 08/10] block: Allow changing 'discard' on reopen
+References: <cover.1536226505.git.berto@igalia.com>
+ <4e73b26693677b6067545590708adcba66da1c06.1536226505.git.berto@igalia.com>
+In-Reply-To: <4e73b26693677b6067545590708adcba66da1c06.1536226505.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-They are there now, I send the pull request already.  I am going to be
-on vacation for the following four weeks.  Migration issues will be
-handled by David.
+On 06.09.18 11:37, Alberto Garcia wrote:
+> 'discard' is one of the basic BlockdevOptions available for all
+> drivers, but it's not handled by bdrv_reopen_prepare() so any attempt
+> to change it results in an error:
+>=20
+>    (qemu) qemu-io virtio0 "reopen -o discard=3Don"
+>    Cannot change the option 'discard'
+>=20
+> Since there's no reason why we shouldn't allow changing it and the
+> implementation is simple let's just do it.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 
-Thanks, Juan.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--h4be1g1eQLjc7SUkMuRl5Kr2l9H53MG88
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluaZwUACgkQ9AfbAGHV
+z0BsxAf/VL1uWOYjMENAeHteXhg/MNcENlfCLKTrHdBWL2shkzErYgkOrw7zEaq8
+oGmllyah9OU+gR0eFMker74xO/RqDVr0PfgGu1BgfFc1JIZ5zOgmU580VcQ97mza
+YkpcEV43Mqcn2o9g4eFRzNYBBN6LjXEl+6V1GocDxkUd3C/+dV4rlcYHVz6VzMKy
+Y22tEnUC5JXuaC9oP9bt6KwVt1ShNzCI0kssXz+deMvRIW714OiL96ot2OY5Ck6p
+twoVvqsmdvfD5kfUUbiVSH2Hu9F5IdfaNxkzPcGzF7bE7zz/4WPqZJOpT3Z1JL7s
+NXnhTjfYVoM4eifP9A5wMOMn/NO0Pg==
+=vOqW
+-----END PGP SIGNATURE-----
+
+--h4be1g1eQLjc7SUkMuRl5Kr2l9H53MG88--
