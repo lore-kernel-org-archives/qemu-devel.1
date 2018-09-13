@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1g0FTs-0007yn-3Y
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 20:27:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g0FY0-0000nT-4K
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 20:31:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1g0FTo-0001Wx-Ur
-	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 20:27:36 -0400
-Date: Thu, 13 Sep 2018 10:24:57 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180913002457.GN7978@umbus.fritz.box>
-References: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
-	<20180910204631.24106-3-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <peter.maydell@linaro.org>) id 1g0FXy-0005Qx-UJ
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 20:31:52 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g0FXy-0005PZ-JE
+	for qemu-devel@nongnu.org; Wed, 12 Sep 2018 20:31:50 -0400
+Received: by mail-oi0-x242.google.com with SMTP id 8-v6so7482540oip.0
+	for <qemu-devel@nongnu.org>; Wed, 12 Sep 2018 17:31:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="uWbmMdDzzl2TXAgx"
-Content-Disposition: inline
-In-Reply-To: <20180910204631.24106-3-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] 40p: add fixed IRQ routing for LSI
- SCSI device
+In-Reply-To: <9b7e968f-b683-c431-b524-4df7de36b806@redhat.com>
+References: <1536755529-2709-1-git-send-email-liq3ea@gmail.com>
+	<CAFEAcA-gybpeAucvWuUW3QAyvwjMVcxL_5xxrcaaekJS51vT4Q@mail.gmail.com>
+	<9b7e968f-b683-c431-b524-4df7de36b806@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 13 Sep 2018 01:31:29 +0100
+Message-ID: <CAFEAcA_50n98m=9a9hiLvV5_iQyXicf70WT1CFAYyV_mfhJnrg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] memory region: check the old.mmio.read
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: hpoussin@reactos.org, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Li Qiang <liq3ea@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 12 September 2018 at 18:43, Laszlo Ersek <lersek@redhat.com> wrote:
+> On 09/12/18 14:54, Peter Maydell wrote:
+>> There's patches on-list which drop the old_mmio field from the MemoryRegion
+>> struct entirely, so I think this patch as it stands is obsolete.
+>>
+>> Currently our semantics are "you must provide both read and write, even
+>> if one of them just always returns 0 / does nothing / returns an error".
+>
+> That's new to me. Has this always been the case?
 
---uWbmMdDzzl2TXAgx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Pretty sure it has, yes, because the code assumes that if you can
+get a guest read then your MemoryRegion provides an accessor for it.
+If your guest never actually tries to do a read then of course we'll
+never notice...
 
-On Mon, Sep 10, 2018 at 09:46:31PM +0100, Mark Cave-Ayland wrote:
-> Whilst the PReP specification describes how all PCI IRQs are routed via I=
-RQ
-> 15 on the interrupt controller, the real 40p machine has a routing quirk =
-in
-> that the LSI SCSI device is routed directly to IRQ 13.
->=20
-> Enable the external IRQ for the LSI SCSI device by wiring up the IRQ with
-> qdev to the relevant interrupt controller gpio.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> There are several
+> static MemoryRegionOps structures that don't conform. (See the end of my
+> other email:
+> <http://mid.mail-archive.com/84da6f02-1f60-4bc7-92da-6a7f74deded3@redhat.com>.)
+> Beyond the one that Li Qiang reported directly ("fw_cfg_ctl_mem_read").
+>
+> Are all of those ops guest-triggerable QEMU crashers?
 
-This doesn't apply clean to ppc-for-3.1 for me.
+Some of them are special cases like the notdirty-memory one where
+reads always go to host RAM rather than taking the slow path via
+the io accessor. But others are probably guest crashers.
 
-> ---
->  hw/ppc/prep.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 615865e46c..94fc36b7ef 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -621,7 +621,7 @@ static void ibm_40p_init(MachineState *machine)
->      CPUPPCState *env =3D NULL;
->      uint16_t cmos_checksum;
->      PowerPCCPU *cpu;
-> -    DeviceState *dev;
-> +    DeviceState *dev, *i82378_dev;
->      SysBusDevice *pcihost, *s;
->      Nvram *m48t59 =3D NULL;
->      PCIBus *pci_bus;
-> @@ -666,11 +666,11 @@ static void ibm_40p_init(MachineState *machine)
->      }
-> =20
->      /* PCI -> ISA bridge */
-> -    dev =3D DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"=
-));
-> -    qdev_connect_gpio_out(dev, 0,
-> +    i82378_dev =3D DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "=
-i82378"));
-> +    qdev_connect_gpio_out(i82378_dev, 0,
->                            cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
-> -    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
-> -    isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
-> +    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(i82378_dev, 15));
-> +    isa_bus =3D ISA_BUS(qdev_get_child_bus(i82378_dev, "isa.0"));
-> =20
->      /* Memory controller */
->      dev =3D DEVICE(isa_create(isa_bus, "rs6000-mc"));
-> @@ -703,6 +703,7 @@ static void ibm_40p_init(MachineState *machine)
->          dev =3D DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
->                                         "lsi53c810"));
->          lsi53c8xx_handle_legacy_cmdline(dev);
-> +        qdev_connect_gpio_out(dev, 0, qdev_get_gpio_in(i82378_dev, 13));
-> =20
->          /* XXX: s3-trio at PCI_DEVFN(2, 0) */
->          pci_vga_init(pci_bus);
+>> We could probably reasonably assert this at the point when the
+>> MemoryRegionOps is registered.
+>
+> Apparently, we should have...
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Yeah. Or we could define a default for if there's no read function,
+which I guess should be the same as what we do if
+memory_region_access_valid() fails. If we want that then the
+simplest thing is for memory_region_access_valid() itself to
+check that at least one of the accessor functions exists and
+return false if none do. (But as I mention above we should get
+all the "old_mmio is going away" patches in first and base the
+change on that, or there'll be a conflict.)
 
---uWbmMdDzzl2TXAgx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluZrlkACgkQbDjKyiDZ
-s5LP9A//SfkA2g9/UEj8SrceLy9xBD/JuKzqlH0qfFYmmFHwshyGN/dZs1E9IpOk
-yACleZgEjwcq26GRddMXogRURwLTQEUX0/XgyJ3ctakCr35BQG2aQ8irTpAjlkmO
-0LlVqjhK/gVd/YvgtLQGSEE8QDO4Bqm6FWg70UAyX/V966mS38Dd4e65Xzkf8uUs
-wRbVYBY/C/QanSNGrFwbQCkjonmc1KCEF6JB1PfE2zNk8Pkf1sWBgvzRQce0BPZ7
-4E3FN9s79MLl8EBM7ui+oRtaR8sxfsqJnQOdekw8Kkk1vCwHWfh+PhnsxV1mQ/be
-qr4jHd1hYoGbsafXyJT33/xs/ReTAH9MXiW5rSkRlHTrvlbu9vtRogSlmpabuZLF
-lHif0fx4o8LjWz9IQ9IKmip9FHLd6fCOKIs1qoCAT7fHQr15XP9qVjbE4EnIlxVJ
-h/A/jdKI2Omxqwy2i4msk6dhQuPobDL0rdzBPYT+qLlGO7I3v0VsK+fphWOhSHaf
-bFOBMULqIdNHIpMYyV3vuVs6D53/dSsVgV0Bs+F9mQAyfyFrc3sUhlbhOONniJPu
-rCpHpE0QDeFYZ8FCVNr8I+8Vtc3EGUWXT6XpAP8KyhhMayMbLCIclgDjemBpKxM3
-A/IANfnjETbfZPwT0JqSsWJQ/I/RABsCDU1UwbGpLON2O/qSysg=
-=Ik2q
------END PGP SIGNATURE-----
-
---uWbmMdDzzl2TXAgx--
+thanks
+-- PMM
