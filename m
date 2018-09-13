@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g0KlR-0002BZ-JK
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:06:08 -0400
+	(envelope-from <thuth@redhat.com>) id 1g0KmJ-0002Z0-Cc
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g0KlM-0004aF-AT
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:06:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60112)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g0KlM-0004Zh-41
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:06:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g0KlL-0006U9-08
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 06:05:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EFA1A2E8019
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 06:05:58 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1g0KmG-0005O8-9k
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:06:59 -0400
+References: <1536782900-17656-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1536782900-17656-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <386188b7-d6ae-b317-23b9-40c2779386bf@redhat.com>
+Date: Thu, 13 Sep 2018 08:06:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1536782900-17656-7-git-send-email-akrowiak@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 13 Sep 2018 05:55:11 -0000
-From: Thomas Huth <588691@bugs.launchpad.net>
-Reply-To: Bug 588691 <588691@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100602124923.430.9797.malonedeb@wampee.canonical.com>
-Message-Id: <153681811121.31735.17526308871746872894.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 588691] Re: QEMU is not correctly detecting host
- CDs
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 6/6] s390: doc: detailed
+ specifications for AP virtualization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
 
-OK, thanks for the confirmation, John, so seems like this bug has been
-fixed in the past and we can close it now.
+On 2018-09-12 22:08, Tony Krowiak wrote:
+> This patch provides documentation describing the AP architecture and
+> design concepts behind the virtualization of AP devices. It also
+> includes an example of how to configure AP devices for exclusive
+> use of KVM guests.
+>=20
+> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+> ---
+[...]
+> +   To assign an AP adapter to the mediated matrix device, its APID is =
+written
+> +   to the 'assign_adapter' file. This may be done multiple times to as=
+sign more
+> +   than one adapter. The APID may be specified using conventional sema=
+ntics
+> +   as a decimal, hexidecimal, or octal number. For example, to assign =
+adapters
+> +   4, 5 and 16 to a mediated matrix device in decimal, hexidecimal and=
+ octal
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+s/hexidecimal/hexadecimal/g ?
 
--- =
+While some websites say that hexi is an alternative spelling, I have to
+admit that I've never seen it before, and there are also not that much
+hits on google when you search for it...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/588691
+[...]
+> +* Live guest migration is not supported for guests using AP devices.
+> \ No newline at end of file
+>=20
 
-Title:
-  QEMU is not correctly detecting host CDs
+Please add a newline at the end of the file.
 
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  QEMU's block layer contains code for detecting and using ioctls when
-  real CD-ROM host devices are attached.
-
-  This detection is not working in some host OSes while bad implemented
-  on anothers.
-
-  E.g., in Linux host qemu -cdrom /dev/sr0 is not detecting it as a CD-ROM
-  E.g., in Mac OS X host qemu asks the kernel to enumerate optical devices =
-and the compares it to the constant string "/dev/cdrom". This is useless, t=
-hat enumeration is just enough, and "/dev/cdrom" will NEVER exist in Mac OS=
- X unless manually created by the user.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/588691/+subscriptions
+ Thomas
