@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1g0K9A-0003hN-J5
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:26:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1g0KBC-00054s-DZ
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1g0K97-00040d-Cw
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:26:32 -0400
-Received: from mga09.intel.com ([134.134.136.24]:57804)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1g0K97-000404-3u
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:26:29 -0400
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Thu, 13 Sep 2018 05:26:20 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D1913014EF@SHSMSX101.ccr.corp.intel.com>
-References: <20180726144539.740acf4d@t450s.home>
-	<20180727015805.GA11247@debian>	<20180727140300.022d9872@t450s.home>
-	<20180730081003.GA10680@debian>
-	<20180730121704-mutt-send-email-mst@kernel.org>
-	<20180912080400.GA9173@fbsd1.sh.intel.com>
-	<20180912121306-mutt-send-email-mst@kernel.org>
-	<20180912103443.3dd703a6@t450s.home>
-	<20180912124233-mutt-send-email-mst@kernel.org>
-	<20180912111532.5bfd1766@t450s.home>
-	<20180912132714-mutt-send-email-mst@kernel.org>
-	<20180912120951.124e12db@t450s.home>
-In-Reply-To: <20180912120951.124e12db@t450s.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <thuth@redhat.com>) id 1g0KB7-00053Q-BV
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:28:38 -0400
+References: <1536782900-17656-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1536782900-17656-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <15669236-8b87-4e6d-69be-ae2975aa7bb2@redhat.com>
+Date: Thu, 13 Sep 2018 07:28:11 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC 3/3] vhost-user: support programming VFIO
- group in master
+In-Reply-To: <1536782900-17656-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 3/6] s390x/kvm:
+ enable/disable AP instruction interpretation for guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,91 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "jasowang@redhat.com" <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Bie, Tiwei" <tiwei.bie@intel.com>
+To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
 
-> From: Alex Williamson
-> Sent: Thursday, September 13, 2018 2:10 AM
->=20
-> On Wed, 12 Sep 2018 13:29:33 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->=20
-> > On Wed, Sep 12, 2018 at 11:15:32AM -0600, Alex Williamson wrote:
-> > > On Wed, 12 Sep 2018 12:44:15 -0400
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >
-> > > > On Wed, Sep 12, 2018 at 10:34:43AM -0600, Alex Williamson wrote:
-> > > > > On Wed, 12 Sep 2018 12:14:44 -0400
-> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > >
-> > > > > > On Wed, Sep 12, 2018 at 04:04:00PM +0800, Tiwei Bie wrote:
-> > > > > > > On Mon, Jul 30, 2018 at 12:30:58PM +0300, Michael S. Tsirkin
-> wrote:
-> > > > > > > [...]
-> > > > > > > >
-> > > > > > > > I generally wonder how are restarts of the backend handled
-> > > > > > > > with this approach: closing the VFIO device tends to reset
-> > > > > > > > the whole device.
-> > > > > > >
-> > > > > > > Hi Michael,
-> > > > > > >
-> > > > > > > I missed this comment previously.. This is a good point!
-> > > > > > > In this RFC, before sending the VFIO group fd to QEMU,
-> > > > > > > backend needs to close the VFIO device and unset the VFIO
-> > > > > > > container first. Otherwise, QEMU won't be able to set the
-> > > > > > > VFIO container for the VFIO group.
-> > > > > > >
-> > > > > > > Another option is to share the container fd instead of
-> > > > > > > the group fd to QEMU. In this case, backend won't need
-> > > > > > > to close any fd. But there is one problem that, it's
-> > > > > > > hard to unmap the old mappings, especially when QEMU
-> > > > > > > crashes.
-> > > > > >
-> > > > > > What are these old mappings and who creates them?
-> > > > > > If you want to just reset everything the way it was
-> > > > > > on open, surely it would be easy to add such a reset ioctl.
-> > > > > >
-> > > > > > > Do you have any suggestions? Thanks!
-> > > > > > >
-> > > > > > > Best regards,
-> > > > > > > Tiwei Bie
-> > > > > >
-> > > > > > Donnu. Alex, any thoughts? Which approach would you prefer?
-> > > > >
-> > > > > The existing UNMAP_DMA ioctl for the vfio type1 IOMMU only
-> requires
-> > > > > that an unmap does not bisect previous mappings, ie. a previous
-> mapping
-> > > > > cannot be partially unmapped.  Therefore you can already dump the
-> > > > > entire IOVA space for a container with one UNMAP_DMA call, iova =
-=3D
-> 0,
-> > > > > size =3D (u64)-1.  Thanks,
-> > > > >
-> > > > > Alex
-> > > >
-> > > > Hmm this would exclude the last byte (address (u64)-1).
-> > > > VTD does not support such iova values for now but something
-> > > > to keep in mind e.g. for virtio-iommu with nested virt
-> > > > which does.
-> > >
-> > > Yes, technically you'd need another ioctl to get the last byte,
-> >
-> > It will violate the requirement of not unmapping part of a region,
-> > won't it? So it won't work.
->=20
-> Yes, in theory it's more complicated, but in practice it's not because
-> Intel only supports up to 48-bits of IOVA space (modulo round down by
-> a page, not a byte).  It would also be deterministic if we could ever
-> get past the RMRR issues with IGD to implement an IOVA list as every
-> IOMMU (AFAIK) has some reserved ranges that cannot be mapped and
-> would
-> bisect the IOVA space somewhere.
->=20
+On 2018-09-12 22:08, Tony Krowiak wrote:
+> From: Tony Krowiak <akrowiak@linux.ibm.com>
+> 
+> Let's use the KVM_SET_DEVICE_ATTR ioctl to enable or disable
+> hardware interpretation of AP instructions executed on the guest.
+> If the S390_FEAT_AP feature is installed, AP instructions will
+> be interpreted by default; otherwise, they will be intercepted.
+> This attribute setting may be overridden by a device. For example,
+> a device may want to provide AP instructions to the guest (i.e.,
+> S390_FEAT_AP turned on), but it may want to emulate them. In this
+> case, the AP instructions executed on the guest must be
+> intercepted; so when the device is realized, it must disable
+> interpretation.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  target/s390x/kvm.c |   16 ++++++++++++++++
+>  1 files changed, 16 insertions(+), 0 deletions(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index c4bd84d..28a3900 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -2297,6 +2297,19 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>                 S390_FEAT_MAX);
+>  }
+>  
+> +static void kvm_s390_configure_apie(int interpret)
 
-One correction - Intel VT-d supports 5-level paging now, which gives
-57-bits IOVA space. though this comment doesn't affect your
-discussion... :-)
+In case you respin, maybe use "bool interpret" instead of "int interpret"?
 
-Thanks
-Kevin
+ Thomas
+
+> +{
+> +    uint64_t attr = KVM_S390_VM_CRYPTO_DISABLE_APIE;
+> +
+> +    if (interpret) {
+> +        attr = KVM_S390_VM_CRYPTO_ENABLE_APIE;
+> +    }
+> +
+> +    if (kvm_vm_check_attr(kvm_state, KVM_S390_VM_CRYPTO, attr)) {
+> +            kvm_s390_set_attr(attr);
+> +    }
+> +}
+> +
+>  void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
+>  {
+>      struct kvm_s390_vm_cpu_processor prop  = {
+> @@ -2346,6 +2359,9 @@ void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
+>      if (test_bit(S390_FEAT_CMM, model->features)) {
+>          kvm_s390_enable_cmma();
+>      }
+> +
+> +    /* configure hardware interpretation of AP instructions */
+> +    kvm_s390_configure_apie(test_bit(S390_FEAT_AP, model->features));
+>  }
+>  
+>  void kvm_s390_restart_interrupt(S390CPU *cpu)
+> 
