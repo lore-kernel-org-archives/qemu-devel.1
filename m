@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0ZoD-0001PX-DO
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 18:10:02 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1g0ZzQ-00045q-Qq
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 18:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0Zny-00076D-R8
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 18:09:47 -0400
-References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-18-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b37355fc-855e-cc6c-a2e7-170f9fee6a07@redhat.com>
-Date: Fri, 14 Sep 2018 00:05:48 +0200
+	(envelope-from <brijesh.singh@amd.com>) id 1g0ZzJ-0002Mj-He
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 18:21:30 -0400
+Received: from mail-by2nam05on0617.outbound.protection.outlook.com
+	([2a01:111:f400:fe52::617]:36740
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1g0ZzI-00029k-Qe
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 18:21:25 -0400
+References: <1536684589-11718-1-git-send-email-brijesh.singh@amd.com>
+	<1536684589-11718-5-git-send-email-brijesh.singh@amd.com>
+	<20180912183510.1fe2c3b8@redhat.com>
+	<88997184-3509-4a6d-4fca-cd3fa64d1858@amd.com>
+	<20180913141145-mutt-send-email-mst@kernel.org>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <b93d9448-360a-97de-b814-6f638570d6dc@amd.com>
+Date: Thu, 13 Sep 2018 17:20:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180913125217.23173-18-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="neEaYCIYR4xnAcl5mx9CejrEJXZAEnyMT"
-Subject: Re: [Qemu-devel] [PATCH v2 17/17] test-bdrv-drain: AIO_WAIT_WHILE()
- in job .commit/.abort
+In-Reply-To: <20180913141145-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/6] i386: acpi: add IVHD device entry for
+ IOAPIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +35,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---neEaYCIYR4xnAcl5mx9CejrEJXZAEnyMT
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <b37355fc-855e-cc6c-a2e7-170f9fee6a07@redhat.com>
-Subject: Re: [PATCH v2 17/17] test-bdrv-drain: AIO_WAIT_WHILE() in job
- .commit/.abort
-References: <20180913125217.23173-1-kwolf@redhat.com>
- <20180913125217.23173-18-kwolf@redhat.com>
-In-Reply-To: <20180913125217.23173-18-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 13.09.18 14:52, Kevin Wolf wrote:
-> This adds tests for calling AIO_WAIT_WHILE() in the .commit and .abort
-> callbacks. Both reasons why .abort could be called for a single job are=
-
-> tested: Either .run or .prepare could return an error.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/test-bdrv-drain.c | 116 ++++++++++++++++++++++++++++++++++++++++=
-+++-----
->  1 file changed, 104 insertions(+), 12 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: brijesh.singh@amd.com, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>, Richard Henderson <rth@twiddle.net>
 
 
---neEaYCIYR4xnAcl5mx9CejrEJXZAEnyMT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+On 09/13/2018 01:18 PM, Michael S. Tsirkin wrote:
+...>>
+>> 0x01 00a0 00 00 0000 48
+>>
+>> Byte 0: 0x48 (special device)
+>> Byte 1 & 2: must be zero
+>> Byte 3: 0 (dte setting)
+>> Byte 4: 0 (handle)
+>> Byte 5 & 6: IOAPIC devfn (14:0.0)
+> 
+> Do you mean *bus* devfn? devfn is 0.0.
+> 
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlua3zwACgkQ9AfbAGHV
-z0A0owf/en0B+XBRKmVQZ9zvCi5aKyqwUK1wwzvQZiZBVT4jQypmachYO8IC40t7
-pLnCpatNzCL76QMdwpKS2sG3JKpg1nwTtSM5v3892Y70XbXHZ07qNxlCHCKKxrL9
-z/howeeHxdun/71vhfJ6JvyMHOvoot5l+EDZTOEsHt3sb3wZsNOiarSfg5JNK1rN
-RmEr3qWyrRXvMgyo9TX1/soJ4mfuNsTVpOI8Z+1N2nrvVZnJE/GyPdiTLagIGOZ6
-EFzXf+ISjc7UYgrYciP8Y7Iw9vGFJWJB8CwtKUkpoBPEanj+OTarumrF2jSzjcg1
-AU4Y4wofeaLNnCqG06dKS4ngpMdDMQ==
-=ts64
------END PGP SIGNATURE-----
+Sorry my bad, I was meaning to write devid and not devfn.
 
---neEaYCIYR4xnAcl5mx9CejrEJXZAEnyMT--
+See, 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/iommu/amd_iommu_init.c#n2343
+
+/* SB IOAPIC is always on this device in AMD systems */
+#define IOAPIC_SB_DEVID		((0x00 << 8) | PCI_DEVFN(0x14, 0))
+
+
+>> Byte 7: 0x1 (IOAPIC) - See Table 97 in spec
+> 
+> 
+> Above should go into code comment, along with
+> first (oldest) version of spec that has this table.
+> Additionally the number is IMHO more readable as:
+> 	(0x1ull << 56) | (PCI_BUILD_BDF(14, 0) << 40) | 0x48
+> 
+> (assuming I got what it should be).
+> 
