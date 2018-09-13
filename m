@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0NFM-000428-KL
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:45:09 -0400
+	(envelope-from <fli@suse.com>) id 1g0NGo-0004ta-Cw
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0NFL-0001M8-KH
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:45:08 -0400
-Date: Thu, 13 Sep 2018 10:44:50 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180913084450.GA5172@localhost.localdomain>
-References: <20180629124052.331406-1-dplotnikov@virtuozzo.com>
-	<20180629124052.331406-3-dplotnikov@virtuozzo.com>
-	<20180910124136.GF4901@dhcp-200-186.str.redhat.com>
-	<81346e2a-5ce2-50d3-791e-3cab5e2464d9@virtuozzo.com>
-	<20180912131503.GD5846@localhost.localdomain>
-	<5706f9f2-386f-aca9-4b7d-9fb924c68a7e@openvz.org>
+	(envelope-from <fli@suse.com>) id 1g0NGl-0002q7-3j
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:46:38 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45922 helo=mx1.suse.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1g0NGk-0002op-PX
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:46:35 -0400
+References: <20180907133902.28462-1-fli@suse.com>
+	<20180907133902.28462-2-fli@suse.com>
+	<20180912075508.GD2526@lemon.usersys.redhat.com>
+From: Fei Li <fli@suse.com>
+Message-ID: <442ff5f2-b1fb-e871-4a4c-e7346f4f273d@suse.com>
+Date: Thu, 13 Sep 2018 16:46:26 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <5706f9f2-386f-aca9-4b7d-9fb924c68a7e@openvz.org>
+In-Reply-To: <20180912075508.GD2526@lemon.usersys.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v0 2/2] block: postpone the coroutine
- executing if the BDS's is drained
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] Fix segmentation fault when
+ qemu_signal_init fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +30,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Denis V. Lunev" <den@openvz.org>
-Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>, mreitz@redhat.com, stefanha@redhat.com, vsementsov@virtuozzo.com, famz@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, armbru@redhat.com, eblake@redhat.com
 
-Am 12.09.2018 um 19:03 hat Denis V. Lunev geschrieben:
-> On 09/12/2018 04:15 PM, Kevin Wolf wrote:
-> > Am 12.09.2018 um 14:03 hat Denis Plotnikov geschrieben:
-> >> On 10.09.2018 15:41, Kevin Wolf wrote:
-> >>> Am 29.06.2018 um 14:40 hat Denis Plotnikov geschrieben:
-> >>>> Fixes the problem of ide request appearing when the BDS is in
-> >>>> the "drained section".
-> >>>>
-> >>>> Without the patch the request can come and be processed by the mai=
-n
-> >>>> event loop, as the ide requests are processed by the main event lo=
-op
-> >>>> and the main event loop doesn't stop when its context is in the
-> >>>> "drained section".
-> >>>> The request execution is postponed until the end of "drained secti=
-on".
-> >>>>
-> >>>> The patch doesn't modify ide specific code, as well as any other
-> >>>> device code. Instead, it modifies the infrastructure of asynchrono=
-us
-> >>>> Block Backend requests, in favor of postponing the requests arisen
-> >>>> when in "drained section" to remove the possibility of request app=
-earing
-> >>>> for all the infrastructure clients.
-> >>>>
-> >>>> This approach doesn't make vCPU processing the request wait untill
-> >>>> the end of request processing.
-> >>>>
-> >>>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> >>> I generally agree with the idea that requests should be queued duri=
-ng a
-> >>> drained section. However, I think there are a few fundamental probl=
-ems
-> >>> with the implementation in this series:
-> >>>
-> >>> 1) aio_disable_external() is already a layering violation and we'd =
-like
-> >>>     to get rid of it (by replacing it with a BlockDevOps callback f=
-rom
-> >>>     BlockBackend to the devices), so adding more functionality ther=
-e
-> >>>     feels like a step in the wrong direction.
-> >>>
-> >>> 2) Only blk_aio_* are fixed, while we also have synchronous public
-> >>>     interfaces (blk_pread/pwrite) as well as coroutine-based ones
-> >>>     (blk_co_*). They need to be postponed as well.
-> >> Good point! Thanks!
->=20
-> Should we really prohibit all public interfaces, as they are reused
-> inside block level?
 
-We need to fix that. blk_*() should never be called from inside the BDS
-layer.
 
-> There is also a problem which is not stated in the clear words yet.
-> We have potential deadlock in the code under the following
-> conditions, which should be also taken into the consideration.
->=20
-> <path from the controller>
-> bdrv_co_pwritev
-> =A0=A0=A0 bdrv_inc_in_flight
-> =A0=A0=A0 bdrv_aligned_pwritev
-> =A0=A0=A0=A0=A0=A0=A0 notifier_list_with_return_notify
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 backup_before_write_notify
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 backup_do_cow
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 backup_cow=
-_with_bounce_buffer
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
- blk_co_preadv
->=20
-> Here blk_co_preadv() must finish its work before we will release the
-> notifier and finish request initiated from the controller and which
-> has incremented in-fligh counter.
+On 09/12/2018 03:55 PM, Fam Zheng wrote:
+> On Fri, 09/07 21:38, Fei Li wrote:
+>> Currently, when qemu_signal_init() fails it only returns a non-zero
+>> value but without propagating any Error. But its callers need a
+>> non-null err when runs error_report_err(err), or else 0->msg occurs.
+>>
+>> To avoid such segmentation fault, add a new Error parameter to make
+>> the call trace to propagate the err to the final caller.
+>>
+>> This patch also adds the omitted error handling when creating signalfd
+>> pipe fails in qemu_signalfd_compat().
+>>
+>> Signed-off-by: Fei Li <fli@suse.com>
+>> ---
+>>   include/qemu/osdep.h |  2 +-
+>>   util/compatfd.c      |  9 ++++++---
+>>   util/main-loop.c     | 10 +++++-----
+>>   3 files changed, 12 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+>> index a91068df0e..09ed85fcb8 100644
+>> --- a/include/qemu/osdep.h
+>> +++ b/include/qemu/osdep.h
+>> @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
+>>                                additional fields in the future) */
+>>   };
+>>  =20
+>> -int qemu_signalfd(const sigset_t *mask);
+>> +int qemu_signalfd(const sigset_t *mask, Error **errp);
+>>   void sigaction_invoke(struct sigaction *action,
+>>                         struct qemu_signalfd_siginfo *info);
+>>   #endif
+>> diff --git a/util/compatfd.c b/util/compatfd.c
+>> index 980bd33e52..d3ed890405 100644
+>> --- a/util/compatfd.c
+>> +++ b/util/compatfd.c
+>> @@ -16,6 +16,7 @@
+>>   #include "qemu/osdep.h"
+>>   #include "qemu-common.h"
+>>   #include "qemu/thread.h"
+>> +#include "qapi/error.h"
+>>  =20
+>>   #include <sys/syscall.h>
+>>  =20
+>> @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
+>>       }
+>>   }
+>>  =20
+>> -static int qemu_signalfd_compat(const sigset_t *mask)
+>> +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
+>>   {
+>>       struct sigfd_compat_info *info;
+>>       QemuThread thread;
+>> @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *ma=
+sk)
+>>  =20
+>>       info =3D malloc(sizeof(*info));
+>>       if (info =3D=3D NULL) {
+>> +        error_setg(errp, "Failed to allocate signalfd memory");
+>>           errno =3D ENOMEM;
+>>           return -1;
+>>       }
+>>  =20
+>>       if (pipe(fds) =3D=3D -1) {
+>> +        error_setg(errp, "Failed to create signalfd pipe");
+>>           free(info);
+>>           return -1;
+>>       }
+>> @@ -94,7 +97,7 @@ static int qemu_signalfd_compat(const sigset_t *mask=
+)
+>>       return fds[0];
+>>   }
+>>  =20
+>> -int qemu_signalfd(const sigset_t *mask)
+>> +int qemu_signalfd(const sigset_t *mask, Error **errp)
+>>   {
+>>   #if defined(CONFIG_SIGNALFD)
+>>       int ret;
+> Extend the context:
+>
+>         ret =3D syscall(SYS_signalfd, -1, mask, _NSIG / 8);
+>         if (ret !=3D -1) {
+>             qemu_set_cloexec(ret);
+>             return ret;
+>         }
+>
+> This error path need error_setg() as well.
+Thanks for the comment. :)
+Like adding as below?
 
-Yes, before_write notifiers are evil. I've objected to them since the
-day they were introduced and I'm surprised it's becoming a problem only
-now.
+ =C2=A0=C2=A0=C2=A0=C2=A0 if (ret !=3D -1) {
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_set_cloexec(ret);
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
++=C2=A0=C2=A0=C2=A0 } else {
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "syscall SYS=
+_signalfd failed: %s",=20
+strerror(errno));
+ =C2=A0=C2=A0=C2=A0=C2=A0 }
+ =C2=A0#endif
 
-We should probably change the backup job to insert a job node rather
-sooner than later. Then it doesn't need to call blk_*() any more.
+ =C2=A0=C2=A0=C2=A0 return qemu_signalfd_compat(mask, errp);
 
-> Thus we should differentiate requests initiated at the controller
-> level and requests initiated in the block layer.  This is sad but
-> true.
 
-The difference is supposed to be whether a request goes through a
-BlockBackend or not.
+If yes, I'd like to confirm the logic:
 
-Kevin
+- 1.1 if the syscall() succeeds, return its value which is not -1: none=20
+error;
+-=C2=A0 if fails[1], continue to run the below "qemu_signalfd_compat(mask=
+,=20
+errp);"
+ =C2=A0 =3D2.1 if qemu_signalfd_compat() succeeds, the error msg of [1] w=
+ill be=20
+kept in
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 **errp, although the return val=
+ue indicates a success;
+ =C2=A0 =3D2.2 if qemu_signalfd_compat() fails, the error msg[1] is repla=
+ced by=20
+another
+ =C2=A0=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 error[2] in the failing function=
+ which indicates a failure.
+
+Do you mean for the above 2.1, we still need keep the error message?
+>
+>> @@ -106,5 +109,5 @@ int qemu_signalfd(const sigset_t *mask)
+>>       }
+>>   #endif
+>>  =20
+>> -    return qemu_signalfd_compat(mask);
+>> +    return qemu_signalfd_compat(mask, errp);
+>>   }
+>> diff --git a/util/main-loop.c b/util/main-loop.c
+>> index affe0403c5..22aa2b1007 100644
+>> --- a/util/main-loop.c
+>> +++ b/util/main-loop.c
+>> @@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
+>>       }
+>>   }
+>>  =20
+>> -static int qemu_signal_init(void)
+>> +static int qemu_signal_init(Error **errp)
+>>   {
+>>       int sigfd;
+>>       sigset_t set;
+>> @@ -94,10 +94,10 @@ static int qemu_signal_init(void)
+>>       pthread_sigmask(SIG_BLOCK, &set, NULL);
+>>  =20
+>>       sigdelset(&set, SIG_IPI);
+>> -    sigfd =3D qemu_signalfd(&set);
+>> +    sigfd =3D qemu_signalfd(&set, errp);
+>>       if (sigfd =3D=3D -1) {
+>>           fprintf(stderr, "failed to create signalfd\n");
+> This fprintf is not needed any more.
+Ok.
+
+Have a nice day
+Fei
+>
+>> -        return -errno;
+>> +        return -1;
+>>       }
+>>  =20
+>>       fcntl_setfl(sigfd, O_NONBLOCK);
+>> @@ -109,7 +109,7 @@ static int qemu_signal_init(void)
+>>  =20
+>>   #else /* _WIN32 */
+>>  =20
+>> -static int qemu_signal_init(void)
+>> +static int qemu_signal_init(Error **errp)
+>>   {
+>>       return 0;
+>>   }
+>> @@ -148,7 +148,7 @@ int qemu_init_main_loop(Error **errp)
+>>  =20
+>>       init_clocks(qemu_timer_notify_cb);
+>>  =20
+>> -    ret =3D qemu_signal_init();
+>> +    ret =3D qemu_signal_init(errp);
+>>       if (ret) {
+>>           return ret;
+>>       }
+>> --=20
+>> 2.13.7
+>>
+> Fam
+>
+>
