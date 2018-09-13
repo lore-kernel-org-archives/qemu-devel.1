@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0R7G-0002Mh-6x
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:03 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0R7G-0002Mx-FA
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0R7F-0001uP-F7
+	(envelope-from <kwolf@redhat.com>) id 1g0R7F-0001uU-Hs
 	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:02 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 13 Sep 2018 14:52:09 +0200
-Message-Id: <20180913125217.23173-10-kwolf@redhat.com>
+Date: Thu, 13 Sep 2018 14:52:08 +0200
+Message-Id: <20180913125217.23173-9-kwolf@redhat.com>
 In-Reply-To: <20180913125217.23173-1-kwolf@redhat.com>
 References: <20180913125217.23173-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 09/17] block-backend: Add .drained_poll
- callback
+Subject: [Qemu-devel] [PATCH v2 08/17] block: Add missing locking in
+ bdrv_co_drain_bh_cb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +23,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
-A bdrv_drain operation must ensure that all parents are quiesced, this
-includes BlockBackends. Otherwise, callbacks called by requests that are
-completed on the BDS layer, but not quite yet on the BlockBackend layer
-could still create new requests.
+bdrv_do_drained_begin/end() assume that they are called with the
+AioContext lock of bs held. If we call drain functions from a coroutine
+with the AioContext lock held, we yield and schedule a BH to move out of
+coroutine context. This means that the lock for the home context of the
+coroutine is released and must be re-acquired in the bottom half.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- block/block-backend.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ include/qemu/coroutine.h |  5 +++++
+ block/io.c               | 15 +++++++++++++++
+ util/qemu-coroutine.c    |  5 +++++
+ 3 files changed, 25 insertions(+)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index fa120630be..efa8d8011c 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -121,6 +121,7 @@ static void blk_root_inherit_options(int *child_flags, QDict *child_options,
-     abort();
- }
- static void blk_root_drained_begin(BdrvChild *child);
-+static bool blk_root_drained_poll(BdrvChild *child);
- static void blk_root_drained_end(BdrvChild *child);
+diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
+index 6f8a487041..9801e7f5a4 100644
+--- a/include/qemu/coroutine.h
++++ b/include/qemu/coroutine.h
+@@ -90,6 +90,11 @@ void qemu_aio_coroutine_enter(AioContext *ctx, Coroutine *co);
+ void coroutine_fn qemu_coroutine_yield(void);
  
- static void blk_root_change_media(BdrvChild *child, bool load);
-@@ -294,6 +295,7 @@ static const BdrvChildRole child_root = {
-     .get_parent_desc    = blk_root_get_parent_desc,
- 
-     .drained_begin      = blk_root_drained_begin,
-+    .drained_poll       = blk_root_drained_poll,
-     .drained_end        = blk_root_drained_end,
- 
-     .activate           = blk_root_activate,
-@@ -2191,6 +2193,13 @@ static void blk_root_drained_begin(BdrvChild *child)
-     }
- }
- 
-+static bool blk_root_drained_poll(BdrvChild *child)
-+{
-+    BlockBackend *blk = child->opaque;
-+    assert(blk->quiesce_counter);
-+    return !!blk->in_flight;
-+}
+ /**
++ * Get the AioContext of the given coroutine
++ */
++AioContext *coroutine_fn qemu_coroutine_get_aio_context(Coroutine *co);
 +
- static void blk_root_drained_end(BdrvChild *child)
++/**
+  * Get the currently executing coroutine
+  */
+ Coroutine *coroutine_fn qemu_coroutine_self(void);
+diff --git a/block/io.c b/block/io.c
+index 7100344c7b..914ba78f1a 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -288,6 +288,18 @@ static void bdrv_co_drain_bh_cb(void *opaque)
+     BlockDriverState *bs = data->bs;
+ 
+     if (bs) {
++        AioContext *ctx = bdrv_get_aio_context(bs);
++        AioContext *co_ctx = qemu_coroutine_get_aio_context(co);
++
++        /*
++         * When the coroutine yielded, the lock for its home context was
++         * released, so we need to re-acquire it here. If it explicitly
++         * acquired a different context, the lock is still held and we don't
++         * want to lock it a second time (or AIO_WAIT_WHILE() would hang).
++         */
++        if (ctx == co_ctx) {
++            aio_context_acquire(ctx);
++        }
+         bdrv_dec_in_flight(bs);
+         if (data->begin) {
+             bdrv_do_drained_begin(bs, data->recursive, data->parent,
+@@ -296,6 +308,9 @@ static void bdrv_co_drain_bh_cb(void *opaque)
+             bdrv_do_drained_end(bs, data->recursive, data->parent,
+                                 data->ignore_bds_parents);
+         }
++        if (ctx == co_ctx) {
++            aio_context_release(ctx);
++        }
+     } else {
+         assert(data->begin);
+         bdrv_drain_all_begin();
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index 1ba4191b84..2295928d33 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -198,3 +198,8 @@ bool qemu_coroutine_entered(Coroutine *co)
  {
-     BlockBackend *blk = child->opaque;
+     return co->caller;
+ }
++
++AioContext *coroutine_fn qemu_coroutine_get_aio_context(Coroutine *co)
++{
++    return co->ctx;
++}
 -- 
 2.13.6
