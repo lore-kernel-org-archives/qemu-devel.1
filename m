@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0R7U-0002Wg-56
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:16 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0R7a-0002cR-2L
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0R7R-00026L-BV
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0R7U-00029A-VH
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:21 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 13 Sep 2018 14:52:11 +0200
-Message-Id: <20180913125217.23173-12-kwolf@redhat.com>
+Date: Thu, 13 Sep 2018 14:52:12 +0200
+Message-Id: <20180913125217.23173-13-kwolf@redhat.com>
 In-Reply-To: <20180913125217.23173-1-kwolf@redhat.com>
 References: <20180913125217.23173-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/17] block-backend: Decrease in_flight
- only after callback
+Subject: [Qemu-devel] [PATCH v2 12/17] mirror: Fix potential use-after-free
+ in active commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +23,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
-Request callbacks can do pretty much anything, including operations that
-will yield from the coroutine (such as draining the backend). In that
-case, a decreased in_flight would be visible to other code and could
-lead to a drain completing while the callback hasn't actually completed
-yet.
+When starting an active commit job, other callbacks can run before
+mirror_start_job() calls bdrv_ref() where needed and cause the nodes to
+go away. Add another pair of bdrv_ref/unref() around it to protect
+against this case.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- block/block-backend.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ block/mirror.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 1b2d7a6ff5..2efaf0c968 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1338,8 +1338,16 @@ static const AIOCBInfo blk_aio_em_aiocb_info = {
- static void blk_aio_complete(BlkAioEmAIOCB *acb)
- {
-     if (acb->has_returned) {
--        blk_dec_in_flight(acb->rwco.blk);
-+        if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
-+            /* If we are in the main thread, the callback is allowed to unref
-+             * the BlockBackend, so we have to hold an additional reference */
-+            blk_ref(acb->rwco.blk);
-+        }
-         acb->common.cb(acb->common.opaque, acb->rwco.ret);
-+        blk_dec_in_flight(acb->rwco.blk);
-+        if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
-+            blk_unref(acb->rwco.blk);
-+        }
-         qemu_aio_unref(acb);
+diff --git a/block/mirror.c b/block/mirror.c
+index 56d9ef7474..c8657991cf 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1697,7 +1697,14 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
+ 
+     orig_base_flags = bdrv_get_flags(base);
+ 
++    /* bdrv_reopen() drains, which might make the BDSes go away before a
++     * reference is taken in mirror_start_job(). */
++    bdrv_ref(bs);
++    bdrv_ref(base);
++
+     if (bdrv_reopen(base, bs->open_flags, errp)) {
++        bdrv_unref(bs);
++        bdrv_unref(base);
+         return;
      }
- }
+ 
+@@ -1707,6 +1714,10 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
+                      &commit_active_job_driver, false, base, auto_complete,
+                      filter_node_name, false, MIRROR_COPY_MODE_BACKGROUND,
+                      &local_err);
++
++    bdrv_unref(bs);
++    bdrv_unref(base);
++
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto error_restore_flags;
 -- 
 2.13.6
