@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0R8L-0003F0-Ji
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:10 -0400
+	(envelope-from <quintela@redhat.com>) id 1g0R8X-0003Qr-PA
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0R8K-000337-QH
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39714)
+	(envelope-from <quintela@redhat.com>) id 1g0R8W-0003IQ-P4
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57324)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0R8K-00031j-7Y
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:08 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0R8W-0003HC-Hm
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:20 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 13 Sep 2018 14:53:34 +0200
-Message-Id: <20180913125343.10912-4-quintela@redhat.com>
+Date: Thu, 13 Sep 2018 14:53:38 +0200
+Message-Id: <20180913125343.10912-8-quintela@redhat.com>
 In-Reply-To: <20180913125343.10912-1-quintela@redhat.com>
 References: <20180913125343.10912-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 03/12] migration: handle the error condition
- properly
+Subject: [Qemu-devel] [PULL 07/12] migration: use save_page_use_compression
+ in flush_compressed_data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +29,35 @@ Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Xiao Guangrong <
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-ram_find_and_save_block() can return negative if any error hanppens,
-however, it is completely ignored in current code
+It avoids to touch compression locks if xbzrle and compression
+are both enabled
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <20180903092644.25812-5-xiaoguangrong@tencent.com>
+Message-Id: <20180906070101.27280-4-xiaoguangrong@tencent.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ migration/ram.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 5a54836c28..2add09174d 100644
+index 65a563993d..747dd9208b 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -2372,7 +2372,8 @@ static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
-  *
-  * Called within an RCU critical section.
-  *
-- * Returns the number of pages written where zero means no dirty pages
-+ * Returns the number of pages written where zero means no dirty pages,
-+ * or negative on error
-  *
-  * @rs: current RAM state
-  * @last_stage: if we are at the completion stage
-@@ -3196,6 +3197,12 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-             done = 1;
-             break;
-         }
-+
-+        if (pages < 0) {
-+            qemu_file_set_error(f, pages);
-+            break;
-+        }
-+
-         rs->target_page_count += pages;
- 
-         /* we want to check in the 1st loop, just in case it was the 1st time
-@@ -3238,7 +3245,7 @@ out:
- /**
-  * ram_save_complete: function called to send the remaining amount of ram
-  *
-- * Returns zero to indicate success
-+ * Returns zero to indicate success or negative on error
-  *
-  * Called with iothread lock
-  *
-@@ -3249,6 +3256,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
- {
-     RAMState **temp = opaque;
-     RAMState *rs = *temp;
-+    int ret = 0;
- 
-     rcu_read_lock();
- 
-@@ -3269,6 +3277,10 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
-         if (pages == 0) {
-             break;
-         }
-+        if (pages < 0) {
-+            ret = pages;
-+            break;
-+        }
-     }
- 
-     flush_compressed_data(rs);
-@@ -3280,7 +3292,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-     qemu_fflush(f);
- 
--    return 0;
-+    return ret;
+@@ -1932,11 +1932,13 @@ update_compress_thread_counts(const CompressParam *param, int bytes_xmit)
+     compression_counters.pages++;
  }
  
- static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
++static bool save_page_use_compression(RAMState *rs);
++
+ static void flush_compressed_data(RAMState *rs)
+ {
+     int idx, len, thread_count;
+ 
+-    if (!migrate_use_compression()) {
++    if (!save_page_use_compression(rs)) {
+         return;
+     }
+     thread_count = migrate_compress_threads();
 -- 
 2.17.1
