@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0N4y-0000fk-F3
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:34:28 -0400
+	(envelope-from <famz@redhat.com>) id 1g0N5U-0000sg-P3
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:34:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0N4s-0000PO-K8
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:34:21 -0400
-Date: Thu, 13 Sep 2018 16:34:05 +0800
+	(envelope-from <famz@redhat.com>) id 1g0N5U-0001mq-0t
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:34:56 -0400
+Date: Thu, 13 Sep 2018 16:34:49 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180913083405.GP2526@lemon.usersys.redhat.com>
-References: <20180912171040.1732-1-pbonzini@redhat.com>
-	<20180912171040.1732-2-pbonzini@redhat.com>
-	<20180913065639.GL2526@lemon.usersys.redhat.com>
-	<a4190f46-474b-38fb-5028-703754f598a6@redhat.com>
+Message-ID: <20180913083449.GQ2526@lemon.usersys.redhat.com>
+References: <20180913082952.3675-1-yuchenlin@synology.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a4190f46-474b-38fb-5028-703754f598a6@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/3] aio-posix: fix concurrent
- access to poll_disable_cnt
+In-Reply-To: <20180913082952.3675-1-yuchenlin@synology.com>
+Subject: Re: [Qemu-devel] [PATCH v3] vmdk: align end of file to a sector
+ boundary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +23,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: yuchenlin@synology.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Thu, 09/13 10:29, Paolo Bonzini wrote:
-> On 13/09/2018 08:56, Fam Zheng wrote:
-> >> +    /* No need to order poll_disable_cnt writes against other updates;
-> >> +     * the counter is only used to avoid wasting time and latency on
-> >> +     * iterated polling when the system call will be ultimately necessary.
-> >> +     * Changing handlers is a rare event, and a little wasted polling until
-> >> +     * the aio_notify below is not an issue.
-> >> +     */
-> >> +    atomic_set(&ctx->poll_disable_cnt,
-> >> +               atomic_read(&ctx->poll_disable_cnt) + poll_disable_change);
-> >
-> > Why not atomic_add?
+On Thu, 09/13 16:29, yuchenlin@synology.com wrote:
+> From: yuchenlin <yuchenlin@synology.com>
 > 
-> This is not lockless, it's protected by list_lock, so there's no race
-> condition involved.  I'm just mimicking what is done for other similar
-> cases, for example involving seqlocks.
-
-Yeah, no doubt about the correctness. Just curious about the preference since
-atomic_add is less typing and one less atomic_* op.
-
-Fam
-
+> There is a rare case which the size of last compressed cluster
+> is larger than the cluster size, which will cause the file is
+> not aligned at the sector boundary.
 > 
-> The alternative would be to add a full set of
-> atomic_{add,sub,...}_relaxed atomics.
+> There are three reasons to do it. First, if vmdk doesn't align at
+> the sector boundary, there may be many undefined behaviors,
+> such as, in vbox it will show VMDK: Compressed image is corrupted
+> 'syno-vm-disk1.vmdk' (VERR_ZIP_CORRUPTED) when we try to import an
+> ova with unaligned vmdk. Second, all the cluster_sector is aligned
+> to sector, the last one should be like this, too. Third, it ease
+> reading with sector based I/Os.
 > 
-> Paolo
+> Signed-off-by: yuchenlin <yuchenlin@synology.com>
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
