@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1g0Mno-0003kx-G7
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:16:41 -0400
+	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0Moy-0004Z6-5R
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:17:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1g0Mnj-0000W2-JF
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:16:40 -0400
-References: <20180913075517.11140-1-peterx@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <2ad9db94-3d74-2879-e0a5-a0c4369d3a7f@redhat.com>
-Date: Thu, 13 Sep 2018 10:16:20 +0200
+	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0Mot-0001ej-5Z
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:17:52 -0400
+Received: from mail-by2nam05on0618.outbound.protection.outlook.com
+	([2a01:111:f400:fe52::618]:13088
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Suravee.Suthikulpanit@amd.com>)
+	id 1g0Mos-0001cc-HP
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:17:47 -0400
+References: <1536684589-11718-1-git-send-email-brijesh.singh@amd.com>
+	<1536684589-11718-3-git-send-email-brijesh.singh@amd.com>
+	<20180912035214.GC3829@xz-x1>
+	<9ecccc2d-9274-36c1-c0a5-56a24836d075@amd.com>
+	<20180913031503.GC10763@xz-x1>
+From: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Message-ID: <c6d1e6be-18ba-a078-3464-2f7f539dc626@amd.com>
+Date: Thu, 13 Sep 2018 15:15:27 +0700
 MIME-Version: 1.0
-In-Reply-To: <20180913075517.11140-1-peterx@redhat.com>
+In-Reply-To: <20180913031503.GC10763@xz-x1>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: handle invalid ce for shadow
- sync
+Subject: Re: [Qemu-devel] [PATCH 2/6] x86_iommu/amd: Prepare for interrupt
+ remap support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +35,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Pei Zhang <pezhang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>
+To: Peter Xu <peterx@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>
+Cc: qemu-devel@nongnu.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Peter,
+Brijesh / Peter,
 
-On 09/13/2018 09:55 AM, Peter Xu wrote:
-> There are two callers for vtd_sync_shadow_page_table_range(), one
-> provided a valid context entry and one not.  Move that fetching
-> operation into the caller vtd_sync_shadow_page_table() where we need to
-> fetch the context entry.
+On 9/13/18 10:15 AM, Peter Xu wrote:
+> On Wed, Sep 12, 2018 at 01:59:06PM -0500, Brijesh Singh wrote:
 > 
-> Meanwhile, we should handle VTD_FR_CONTEXT_ENTRY_P properly when
-> synchronizing shadow page tables.  Having invalid context entry there is
-> perfectly valid when we move a device out of an existing domain.  When
-> that happens, instead of posting an error we invalidate the whole region.
+> [...]
 > 
-> Without this patch, QEMU will crash if we do these steps:
+>>>>        }
+>>>>        return &iommu_as[devfn]->as;
+>>>>    }
+>>>> @@ -1172,6 +1274,10 @@ static void amdvi_realize(DeviceState *dev, Error **err)
+>>>>            return;
+>>>>        }
+>>>> +    /* Pseudo address space under root PCI bus. */
+>>>> +    pcms->ioapic_as = amdvi_host_dma_iommu(bus, s, AMDVI_SB_IOAPIC_ID);
+>>>> +    s->intr_enabled = x86_iommu->intr_supported;
+>>>
+>>> So does this mean that AMD IR cannot be disabled if declared support?
+>>> For VT-d, IR needs to be explicitly enabled otherwise disabled (even
+>>> supported).
+>>>
+>>
+>>
+>> Yes, once its declared as supported then it can not disabled. Its
+>> upto the guest OS to decide whether it want to use the intr remapping
+>> feature by parsing the IVRS. This also brings question, should we
+>> just enable it by default because its guest OS decision whether it
+>> wants to use it or not.
 > 
-> (1) start QEMU with VT-d IOMMU and two 10G NICs (ixgbe)
-> (2) bind the NICs with vfio-pci in the guest
-> (3) start testpmd with the NICs applied
-> (4) stop testpmd
-> (5) rebind the NIC back to ixgbe kernel driver
+> It's by default off?  I mean:
 > 
-> The patch should fix it.
+>      DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, false),
 > 
-> Reported-by: Pei Zhang<pezhang@redhat.com>
-> Tested-by: Pei Zhang<pezhang@redhat.com>
-> CC: Pei Zhang<pezhang@redhat.com>
-> CC: Alex Williamson<alex.williamson@redhat.com>
-> CC: Jason Wang<jasowang@redhat.com>
-> CC: Maxime Coquelin<maxime.coquelin@redhat.com>
-> CC: Michael S. Tsirkin<mst@redhat.com>
-> CC: QEMU Stable<qemu-stable@nongnu.org>
-> Fixes:https://bugzilla.redhat.com/show_bug.cgi?id=1627272
+> Then it's good to me, thanks.  You could add a comment there
+> explicitly mentioning that "IR will be enabled as long as declared
+> support for AMD" since it might confuse some of the people like me...
+> but it's optional.
+> 
+> Regards,
+> 
 
-It seems like a regression as it wasn't reported earlier, isn't it?
-If it is, do you know what is the faulty commit?
+Actually, there are two separate knobs here:
 
-> Signed-off-by: Peter Xu<peterx@redhat.com>
-> ---
->   hw/i386/intel_iommu.c | 54 ++++++++++++++++++++++++++-----------------
->   1 file changed, 33 insertions(+), 21 deletions(-)
+* This option basically means the interrupt remapping support is available/unavailable,
+   which should default to available unless specified to unavailable at the QEMU command line.
+   For example, the AMD IOMMU v1 does not have interrupt remapping support, which means
+   the interrupt remapping bit fields in DTE (e.g. IV, IntCtl, EIntPass, INITPass, NMIPass,
+   Lint0Pass, Lint1Pass) are ignored.
 
-Other than that, the patch looks good to me.
-FWIW:
-Acked-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+* If interrupt remapping support is available, the guest OS can decide to enable or disable the feature
+   using DTE bit fileds (e.g. Linux option intremap=off would disable interrupt remapping
+   by not setting DTE[IV] bit). For Linux AMD IOMMU driver, the default is to enable the interrupt remapping.
 
-Thanks,
-Maxime
+In facts, we should not need this option. However, if you prefer to keep this option,
+we probably should rename this to "intremap_sup", in which if the default value should be 1.
+
+Regards,
+Suravee
