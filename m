@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0Rx1-00030T-Od
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:46:32 -0400
+	(envelope-from <akrowiak@linux.ibm.com>) id 1g0S6Z-0006jR-Um
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:56:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0Rx1-0006Iv-3H
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:46:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0Rx0-0006IJ-R0
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:46:31 -0400
-References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
-	<f6586d6f-54b3-ae20-e9fd-aa0fd5cb4309@redhat.com>
-	<000a01d44b67$46df48e0$d49ddaa0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ea318fbd-a036-a153-66fb-692815b3bdf1@redhat.com>
-Date: Thu, 13 Sep 2018 15:46:14 +0200
+	(envelope-from <akrowiak@linux.ibm.com>) id 1g0S6W-0008Vj-9M
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:56:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1g0S6R-0007p3-Ae
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 09:56:16 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w8DDt9Ia062994
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 09:55:50 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2mfpn0f0y5-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 09:55:49 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Thu, 13 Sep 2018 09:55:44 -0400
+References: <1536782900-17656-1-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<1536782900-17656-4-git-send-email-akrowiak@linux.vnet.ibm.com>
+	<15669236-8b87-4e6d-69be-ae2975aa7bb2@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Thu, 13 Sep 2018 09:55:35 -0400
 MIME-Version: 1.0
-In-Reply-To: <000a01d44b67$46df48e0$d49ddaa0$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <15669236-8b87-4e6d-69be-ae2975aa7bb2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 00/25] Fixing record/replay and adding
- reverse debugging
+Content-Language: en-US
+Message-Id: <c33114ec-9033-5f77-0655-edd9879fd7aa@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 3/6] s390x/kvm:
+ enable/disable AP instruction interpretation for guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,13 +44,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net, John Snow <jsnow@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
 
-On 13/09/2018 15:40, Pavel Dovgalyuk wrote:
->> For now I'm queuing 12, 14, 19, 20 (pending question to you) and 23-25.
-> What about patch 21?
+On 09/13/2018 01:28 AM, Thomas Huth wrote:
+> On 2018-09-12 22:08, Tony Krowiak wrote:
+>> From: Tony Krowiak <akrowiak@linux.ibm.com>
+>>
+>> Let's use the KVM_SET_DEVICE_ATTR ioctl to enable or disable
+>> hardware interpretation of AP instructions executed on the guest.
+>> If the S390_FEAT_AP feature is installed, AP instructions will
+>> be interpreted by default; otherwise, they will be intercepted.
+>> This attribute setting may be overridden by a device. For example,
+>> a device may want to provide AP instructions to the guest (i.e.,
+>> S390_FEAT_AP turned on), but it may want to emulate them. In this
+>> case, the AP instructions executed on the guest must be
+>> intercepted; so when the device is realized, it must disable
+>> interpretation.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   target/s390x/kvm.c |   16 ++++++++++++++++
+>>   1 files changed, 16 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index c4bd84d..28a3900 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -2297,6 +2297,19 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>>                  S390_FEAT_MAX);
+>>   }
+>>   
+>> +static void kvm_s390_configure_apie(int interpret)
+> In case you respin, maybe use "bool interpret" instead of "int interpret"?
+>
+>   Thomas
 
-I'd want an ACK from the IDE maintainer.  Let's add him to Cc.
+Will do
 
-Paolo
+>
+>> +{
+>> +    uint64_t attr = KVM_S390_VM_CRYPTO_DISABLE_APIE;
+>> +
+>> +    if (interpret) {
+>> +        attr = KVM_S390_VM_CRYPTO_ENABLE_APIE;
+>> +    }
+>> +
+>> +    if (kvm_vm_check_attr(kvm_state, KVM_S390_VM_CRYPTO, attr)) {
+>> +            kvm_s390_set_attr(attr);
+>> +    }
+>> +}
+>> +
+>>   void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
+>>   {
+>>       struct kvm_s390_vm_cpu_processor prop  = {
+>> @@ -2346,6 +2359,9 @@ void kvm_s390_apply_cpu_model(const S390CPUModel *model, Error **errp)
+>>       if (test_bit(S390_FEAT_CMM, model->features)) {
+>>           kvm_s390_enable_cmma();
+>>       }
+>> +
+>> +    /* configure hardware interpretation of AP instructions */
+>> +    kvm_s390_configure_apie(test_bit(S390_FEAT_AP, model->features));
+>>   }
+>>   
+>>   void kvm_s390_restart_interrupt(S390CPU *cpu)
+>>
