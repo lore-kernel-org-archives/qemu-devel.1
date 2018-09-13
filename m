@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0XdZ-0000HI-Lu
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 15:50:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g0Xil-0001Vf-FI
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 15:56:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0XdX-0000Wz-Mp
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 15:50:48 -0400
-References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-11-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <14983d02-bde3-809f-e8e3-e28e6ec7ccb1@redhat.com>
-Date: Thu, 13 Sep 2018 21:50:08 +0200
+	(envelope-from <jsnow@redhat.com>) id 1g0Xia-0005B3-4b
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 15:56:07 -0400
+References: <20180830211605.13683-1-jsnow@redhat.com>
+	<20180830211605.13683-2-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ba2c310a-49ea-5d61-852f-4fc3234dc4f5@redhat.com>
+Date: Thu, 13 Sep 2018 15:52:50 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180913125217.23173-11-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hPbUkN2dYAFCkFDcbJ0TTWUKXXjWSAbaP"
-Subject: Re: [Qemu-devel] [PATCH v2 10/17] block-backend: Fix potential
- double blk_delete()
+In-Reply-To: <20180830211605.13683-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] blockdev-backup: add bitmap argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +24,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hPbUkN2dYAFCkFDcbJ0TTWUKXXjWSAbaP
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <14983d02-bde3-809f-e8e3-e28e6ec7ccb1@redhat.com>
-Subject: Re: [PATCH v2 10/17] block-backend: Fix potential double blk_delete()
-References: <20180913125217.23173-1-kwolf@redhat.com>
- <20180913125217.23173-11-kwolf@redhat.com>
-In-Reply-To: <20180913125217.23173-11-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 13.09.18 14:52, Kevin Wolf wrote:
-> blk_unref() first decreases the refcount of the BlockBackend and calls
-> blk_delete() if the refcount reaches zero. Requests can still be in
-> flight at this point, they are only drained during blk_delete():
->=20
-> At this point, arbitrary callbacks can run. If any callback takes a
-> temporary BlockBackend reference, it will first increase the refcount t=
-o
-> 1 and then decrease it to 0 again, triggering another blk_delete(). Thi=
-s
-> will cause a use-after-free crash in the outer blk_delete().
->=20
-> Fix it by draining the BlockBackend before decreasing to refcount to 0.=
 
-> Assert in blk_ref() that it never takes the first refcount (which would=
-
-> mean that the BlockBackend is already being deleted).
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
+On 08/30/2018 05:16 PM, John Snow wrote:
+> It is only an oversight that we don't allow incremental backup with
+> blockdev-backup. Add the bitmap argument which enables this.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  block/block-backend.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  blockdev.c           | 16 +++++++++++++++-
+>  qapi/block-core.json |  7 ++++++-
+>  2 files changed, 21 insertions(+), 2 deletions(-)
+> 
+> diff --git a/blockdev.c b/blockdev.c
+> index 72f5347df5..b9f19afacc 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3491,6 +3491,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+>      BlockDriverState *bs;
+>      BlockDriverState *target_bs;
+>      Error *local_err = NULL;
+> +    BdrvDirtyBitmap *bmap = NULL;
+>      AioContext *aio_context;
+>      BlockJob *job = NULL;
+>      int job_flags = JOB_DEFAULT;
+> @@ -3541,6 +3542,19 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+>              goto out;
+>          }
+>      }
+> +    if (backup->has_bitmap) {
+> +        bmap = bdrv_find_dirty_bitmap(bs, backup->bitmap);
+> +        if (!bmap) {
+> +            error_setg(errp, "Bitmap '%s' could not be found", backup->bitmap);
+> +            goto out;
+> +        }
+> +        if (bdrv_dirty_bitmap_qmp_locked(bmap)) {
+> +            error_setg(errp,
+> +                       "Bitmap '%s' is currently locked and cannot be used for "
+> +                       "backup", backup->bitmap);
+> +            goto out;
+> +        }
+> +    }
+>      if (!backup->auto_finalize) {
+>          job_flags |= JOB_MANUAL_FINALIZE;
+>      }
+> @@ -3548,7 +3562,7 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+>          job_flags |= JOB_MANUAL_DISMISS;
+>      }
+>      job = backup_job_create(backup->job_id, bs, target_bs, backup->speed,
+> -                            backup->sync, NULL, backup->compress,
+> +                            backup->sync, bmap, backup->compress,
+>                              backup->on_source_error, backup->on_target_error,
+>                              job_flags, NULL, NULL, txn, &local_err);
+>      if (local_err != NULL) {
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 4c7a37afdc..d3ea281039 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1315,6 +1315,10 @@
+>  # @speed: the maximum speed, in bytes per second. The default is 0,
+>  #         for unlimited.
+>  #
+> +# @bitmap: the name of dirty bitmap if sync is "incremental".
+> +#          Must be present if sync is "incremental", must NOT be present
+> +#          otherwise. (Since 3.1)
+> +#
+>  # @compress: true to compress data, if the target format supports it.
+>  #            (default: false) (since 2.8)
+>  #
+> @@ -1346,7 +1350,8 @@
+>  ##
+>  { 'struct': 'BlockdevBackup',
+>    'data': { '*job-id': 'str', 'device': 'str', 'target': 'str',
+> -            'sync': 'MirrorSyncMode', '*speed': 'int', '*compress': 'bool',
+> +            'sync': 'MirrorSyncMode', '*speed': 'int',
+> +            '*bitmap': 'str', '*compress': 'bool',
+>              '*on-source-error': 'BlockdevOnError',
+>              '*on-target-error': 'BlockdevOnError',
+>              '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
+> 
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+I'll be staging this patch (and not the hack that follows it), if there
+are no objections.
 
+Thanks, applied to my bitmaps tree:
 
---hPbUkN2dYAFCkFDcbJ0TTWUKXXjWSAbaP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+https://github.com/jnsnow/qemu/commits/bitmaps
+https://github.com/jnsnow/qemu.git
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluav3AACgkQ9AfbAGHV
-z0DIzAgAqouyO1MYX/Wt+zOd4pIS/DKXxP0Qt0p5LWsg4Hh8NrbpoXDy0hH44278
-9Zpp6lKmSpz0pL6RsU2tFLh3H0ai/ddxGAvl5kyse/UQzwt3nxEG0aIu9BhrqkY9
-2tiV+/oC4HH76Si2vHo4uE9hZi93nv5ShiqzD6nlkvrYiUQawvNX+T3zT/OwKIk/
-0/09mEDQcTgzxMqEp319h7gYrMLCb/sbsohGSq7uVlUbX+Q6hN7uEvil5mk/IbJY
-FOYU8UbOAth8ZGgGcIXstEk2QNOUAuOPseRnCxGiH3RcaW5cQkLJFAa/J2XJvRAa
-pS6cSqb9PC1enrk0Tnt49a3/hIz9sw==
-=7YYe
------END PGP SIGNATURE-----
-
---hPbUkN2dYAFCkFDcbJ0TTWUKXXjWSAbaP--
+--js
