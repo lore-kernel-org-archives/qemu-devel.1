@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g0V3x-0003Bm-7W
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:05:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1g0V51-0003s1-KO
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g0V3u-0003hO-2g
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:05:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34246)
+	(envelope-from <eblake@redhat.com>) id 1g0V4x-0004Hk-Lh
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:06:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44986)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1g0V3t-0003gp-QE
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:05:49 -0400
-References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
-	<20180912081950.3228.68987.stgit@pasha-VirtualBox>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <f7b7533c-a9db-d660-4981-678ae5143950@redhat.com>
-Date: Thu, 13 Sep 2018 13:05:37 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g0V4v-0004GV-Ro
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 13:06:55 -0400
+Received: from smtp.corp.redhat.com (int-mx12.intmail.prod.int.phx2.redhat.com
+	[10.5.11.27])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1AFFB308404C
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 17:06:53 +0000 (UTC)
+References: <20180913132313.11370-1-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cb804ba8-5fb7-a5f9-0c56-cb7f6c299a95@redhat.com>
+Date: Thu, 13 Sep 2018 12:06:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180912081950.3228.68987.stgit@pasha-VirtualBox>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180913132313.11370-1-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 21/25] replay: replay BH for IDE trim
- operation
+Subject: Re: [Qemu-devel] [PATCH] migration-test: Only generate a single
+ target architecture
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, dovgaluk@ispras.ru, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
+On 9/13/18 8:23 AM, Juan Quintela wrote:
+> Several changes:
+> - We only allow generate header "inside" the tree.  Why?  Because we
+>    need to connit the result, so it makes no sense to generate them on
 
+s/connit/commit/
 
-On 09/12/2018 04:19 AM, Pavel Dovgalyuk wrote:
-> This patch makes IDE trim BH deterministic, because it affects
-> the device state. Therefore its invocation should be replayed
-> instead of running at the random moment.
+>    the build dir.
+> - We only generate a single target each time.  Getting all the
+>    cross-compilers correctly is an impossible task.  So know you do:
+
+s/know/now/
+
+>       make -C tests/migration $target (native)
+>       make CROSS_PREFIX=foo- -C tests/migratiion $target (cross)
+>    And you are done.
 > 
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> - If we are building out of tree, we have no data about if we are
+>    cross-compile or whatever.  So instead of guess what is happening,
+>    just do what I pointed on previous point.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  hw/ide/core.c |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index 2c62efc..04e22e7 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -35,6 +35,7 @@
->  #include "sysemu/block-backend.h"
->  #include "qapi/error.h"
->  #include "qemu/cutils.h"
-> +#include "sysemu/replay.h"
->  
->  #include "hw/ide/internal.h"
->  #include "trace.h"
-> @@ -479,7 +480,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
->  done:
->      iocb->aiocb = NULL;
->      if (iocb->bh) {
-> -        qemu_bh_schedule(iocb->bh);
-> +        replay_bh_schedule_event(iocb->bh);
->      }
->  }
->  
-> 
+>   tests/migration/Makefile | 23 ++++++++++++++---------
+>   1 file changed, 14 insertions(+), 9 deletions(-)
 > 
 
-Just passing by: Why do we need to change this call, but nothing else in
-IDE?
-
-I don't mind conceptually, but it's odd to me that of all the calls I
-make in this emulator that change state somewhere that this is the only
-one you need to hijack for the replay feature.
-
-Is this a necessarily complete change?
-
---js
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
