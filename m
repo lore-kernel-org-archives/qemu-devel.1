@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g0T4j-0006Jt-HO
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:58:34 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g0T4u-0006RO-7k
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g0T4g-0002lz-Rx
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:58:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g0T4g-0002ld-MF
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:58:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E66792D1D5
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 14:58:29 +0000 (UTC)
-References: <1536836762-273036-1-git-send-email-imammedo@redhat.com>
-	<1536836762-273036-2-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a8915923-3c91-b12e-e907-a29ae3bcc9f6@redhat.com>
-Date: Thu, 13 Sep 2018 09:58:28 -0500
+	(envelope-from <mreitz@redhat.com>) id 1g0T4t-0002qI-JX
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:58:44 -0400
+References: <20180913125217.23173-1-kwolf@redhat.com>
+	<20180913125217.23173-9-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <b8f722c6-3a6a-2593-f0de-50fb545293fa@redhat.com>
+Date: Thu, 13 Sep 2018 16:58:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <1536836762-273036-2-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] vl.c deprecate incorrect CPUs
- topology
+In-Reply-To: <20180913125217.23173-9-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="zTFlGkCMUmbQm7fF1854l4QAAgAkiylyK"
+Subject: Re: [Qemu-devel] [PATCH v2 08/17] block: Add missing locking in
+ bdrv_co_drain_bh_cb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,29 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
-On 9/13/18 6:06 AM, Igor Mammedov wrote:
-> -smp [cpus],sockets/cores/threads[,maxcpus] should describe topology
-> so that total number of logical CPUs [sockets * cores * threads]
-> would be equal to [maxcpus], however historically we didn't have
-> such check in QEMU and it is possible to start VM with an invalid
-> topology.
-> Deprecate invalid options combination so we can make sure that
-> the topology VM started with is always correct in the future.
-> Users with an invalid sockets/cores/threads/maxcpus values should
-> fix their CLI to make sure that
->     [sockets * cores * threads] == [maxcpus]
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zTFlGkCMUmbQm7fF1854l4QAAgAkiylyK
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <b8f722c6-3a6a-2593-f0de-50fb545293fa@redhat.com>
+Subject: Re: [PATCH v2 08/17] block: Add missing locking in
+ bdrv_co_drain_bh_cb()
+References: <20180913125217.23173-1-kwolf@redhat.com>
+ <20180913125217.23173-9-kwolf@redhat.com>
+In-Reply-To: <20180913125217.23173-9-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 13.09.18 14:52, Kevin Wolf wrote:
+> bdrv_do_drained_begin/end() assume that they are called with the
+> AioContext lock of bs held. If we call drain functions from a coroutine=
+
+> with the AioContext lock held, we yield and schedule a BH to move out o=
+f
+> coroutine context. This means that the lock for the home context of the=
+
+> coroutine is released and must be re-acquired in the bottom half.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
+>  include/qemu/coroutine.h |  5 +++++
+>  block/io.c               | 15 +++++++++++++++
+>  util/qemu-coroutine.c    |  5 +++++
+>  3 files changed, 25 insertions(+)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I suppose the coroutine lock you mean is the one aio_co_enter() takes?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+If so:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+(Sorry, I still really don't have much understanding of how coroutines,
+bottom halves, and all nice things like them work.)
+
+
+--zTFlGkCMUmbQm7fF1854l4QAAgAkiylyK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluaexMACgkQ9AfbAGHV
+z0CshAf9EJP/EI8tP2nDYbfrs/U9nLWsPEca28MpK4jlFAPqJBM875RLeci6DOGp
+iGBrARsTwVWIZCIabY2T34fJZF4O5XRy23ztkCELgmePD6ADsZYBQj8WYsZC9rHB
+QOLy7LsZvrUBl5OSr32phpM6WSSdVASPCIYvroSp0g2HIOgYcWAllWTHRpxt83DB
+DNMnyIzmI1TdiT5ILQMgzeJV+g4Dpx53jtkRtJA2OsKtcjyFfLvBQNciedwcra/9
+PecA8WmRTuETN9cFRRz+oyQTdKvmX0kriU6FD88wa0nEPHTqSq51d/EYXkhsl0Aj
+7kA7nwDmZ5KG1YmPpYrwOeyQSsinEw==
+=mZ+Y
+-----END PGP SIGNATURE-----
+
+--zTFlGkCMUmbQm7fF1854l4QAAgAkiylyK--
