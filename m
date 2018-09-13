@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0KjV-0001R1-G3
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:04:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1g0KlR-0002BZ-JK
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:06:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0KjU-0001H2-Qr
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:04:05 -0400
-Date: Thu, 13 Sep 2018 14:03:51 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180913060351.GK2526@lemon.usersys.redhat.com>
-References: <20180910145616.8598-1-famz@redhat.com>
-	<20180910145616.8598-3-famz@redhat.com>
-	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
-	<20180911141245.GQ19292@lemon.usersys.redhat.com>
-	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
-	<20180912013134.GA2526@lemon.usersys.redhat.com>
-	<3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
-	<20180912115020.GH2526@lemon.usersys.redhat.com>
-	<ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1g0KlM-0004aF-AT
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:06:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60112)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1g0KlM-0004Zh-41
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:06:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1g0KlL-0006U9-08
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 06:05:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EFA1A2E8019
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 06:05:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
- handlers when stopping vq handler
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 13 Sep 2018 05:55:11 -0000
+From: Thomas Huth <588691@bugs.launchpad.net>
+Reply-To: Bug 588691 <588691@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100602124923.430.9797.malonedeb@wampee.canonical.com>
+Message-Id: <153681811121.31735.17526308871746872894.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 588691] Re: QEMU is not correctly detecting host
+ CDs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, 09/12 14:42, Paolo Bonzini wrote:
-> On 12/09/2018 13:50, Fam Zheng wrote:
-> >> I think it's okay if it is invoked.  The sequence is first you stop the
-> >> vq, then you drain the BlockBackends, then you switch AioContext.  All
-> >> that matters is the outcome when virtio_scsi_dataplane_stop returns.
-> > Yes, but together with vIOMMU, it also effectively leads to a virtio_error(),
-> > which is not clean. QEMU stderr when this call happens (with patch 1 but not
-> > this patch):
-> > 
-> > 2018-09-12T11:48:10.193023Z qemu-system-x86_64: vtd_iommu_translate: detected translation failure (dev=02:00:00, iova=0x0)
-> > 2018-09-12T11:48:10.193044Z qemu-system-x86_64: New fault is not recorded due to compression of faults
-> > 2018-09-12T11:48:10.193061Z qemu-system-x86_64: virtio: zero sized buffers are not allowed
-> 
-> But with iothread, virtio_scsi_dataplane_stop runs in another thread
-> than the iothread; in that case you still have a race where the iothread
-> can process the vq before aio_disable_external and print the error.
-> 
-> IIUC the guest has cleared the IOMMU page tables _before_ clearing the
-> DRIVER_OK bit in the status field.  Could this be a guest bug?
-> 
+OK, thanks for the confirmation, John, so seems like this bug has been
+fixed in the past and we can close it now.
 
-I'm not sure if it is a bug or not. I think what happens is the device is left
-enabled by Seabios, and then reset by kernel.
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-Fam
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/588691
+
+Title:
+  QEMU is not correctly detecting host CDs
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  QEMU's block layer contains code for detecting and using ioctls when
+  real CD-ROM host devices are attached.
+
+  This detection is not working in some host OSes while bad implemented
+  on anothers.
+
+  E.g., in Linux host qemu -cdrom /dev/sr0 is not detecting it as a CD-ROM
+  E.g., in Mac OS X host qemu asks the kernel to enumerate optical devices =
+and the compares it to the constant string "/dev/cdrom". This is useless, t=
+hat enumeration is just enough, and "/dev/cdrom" will NEVER exist in Mac OS=
+ X unless manually created by the user.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/588691/+subscriptions
