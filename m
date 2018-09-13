@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g0KUX-0007ra-Oo
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:48:38 -0400
+	(envelope-from <famz@redhat.com>) id 1g0KjV-0001R1-G3
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:04:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g0KUS-0003iN-Nc
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 01:48:37 -0400
-References: <1536782900-17656-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1536782900-17656-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <49de34fa-253f-a306-0cad-519961c2c183@redhat.com>
-Date: Thu, 13 Sep 2018 07:48:20 +0200
+	(envelope-from <famz@redhat.com>) id 1g0KjU-0001H2-Qr
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:04:05 -0400
+Date: Thu, 13 Sep 2018 14:03:51 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180913060351.GK2526@lemon.usersys.redhat.com>
+References: <20180910145616.8598-1-famz@redhat.com>
+	<20180910145616.8598-3-famz@redhat.com>
+	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
+	<20180911141245.GQ19292@lemon.usersys.redhat.com>
+	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
+	<20180912013134.GA2526@lemon.usersys.redhat.com>
+	<3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
+	<20180912115020.GH2526@lemon.usersys.redhat.com>
+	<ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1536782900-17656-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 4/6] s390x/ap: base Adjunct
- Processor (AP) object model
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
+ handlers when stopping vq handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 2018-09-12 22:08, Tony Krowiak wrote:
-> From: Tony Krowiak <akrowiak@linux.ibm.com>
->=20
-> Introduces the base object model for virtualizing AP devices.
->=20
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
-[...]
-> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
-> new file mode 100644
-> index 0000000..4f10425
-> --- /dev/null
-> +++ b/hw/s390x/ap-bridge.c
-[...]
-> +void s390_init_ap(void)
-> +{
-> +    DeviceState *dev;
-> +
-> +    /* Create bridge device */
-> +    dev =3D qdev_create(NULL, TYPE_AP_BRIDGE);
-> +    object_property_add_child(qdev_get_machine(), TYPE_AP_BRIDGE,
-> +                              OBJECT(dev), NULL);
-> +    qdev_init_nofail(dev);
-> +
-> +    /* Create bus on bridge device */
-> +    qbus_create(TYPE_VFIO_AP_BUS, dev, TYPE_VFIO_AP_BUS);
-> + }
-[...]
-> +type_init(ap_device_register)
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index f0f7fdc..3c100c2 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -32,6 +32,7 @@
->  #include "ipl.h"
->  #include "hw/s390x/s390-virtio-ccw.h"
->  #include "hw/s390x/css-bridge.h"
-> +#include "hw/s390x/ap-bridge.h"
->  #include "migration/register.h"
->  #include "cpu_models.h"
->  #include "hw/nmi.h"
-> @@ -263,6 +264,9 @@ static void ccw_init(MachineState *machine)
->      /* init the SIGP facility */
->      s390_init_sigp();
-> =20
-> +    /* create AP bridge and bus(es) */
-> +    s390_init_ap();
-> +
+On Wed, 09/12 14:42, Paolo Bonzini wrote:
+> On 12/09/2018 13:50, Fam Zheng wrote:
+> >> I think it's okay if it is invoked.  The sequence is first you stop the
+> >> vq, then you drain the BlockBackends, then you switch AioContext.  All
+> >> that matters is the outcome when virtio_scsi_dataplane_stop returns.
+> > Yes, but together with vIOMMU, it also effectively leads to a virtio_error(),
+> > which is not clean. QEMU stderr when this call happens (with patch 1 but not
+> > this patch):
+> > 
+> > 2018-09-12T11:48:10.193023Z qemu-system-x86_64: vtd_iommu_translate: detected translation failure (dev=02:00:00, iova=0x0)
+> > 2018-09-12T11:48:10.193044Z qemu-system-x86_64: New fault is not recorded due to compression of faults
+> > 2018-09-12T11:48:10.193061Z qemu-system-x86_64: virtio: zero sized buffers are not allowed
+> 
+> But with iothread, virtio_scsi_dataplane_stop runs in another thread
+> than the iothread; in that case you still have a race where the iothread
+> can process the vq before aio_disable_external and print the error.
+> 
+> IIUC the guest has cleared the IOMMU page tables _before_ clearing the
+> DRIVER_OK bit in the status field.  Could this be a guest bug?
+> 
 
-Not sure since there is no explicit migration state involved here, but I
-think you cannot simply create the ap-bridge device always
-unconditionally, can you? Did you check whether you can ping-pong
-migrate an guest that runs on an older version of QEMU to a QEMU that
-contains this patch and back? If it does not work, it might be necessary
-to restrict this ap-bridge device for new machine types only, I think.
+I'm not sure if it is a bug or not. I think what happens is the device is left
+enabled by Seabios, and then reset by kernel.
 
- Thomas
+Fam
