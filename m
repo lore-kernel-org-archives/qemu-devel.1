@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0R7b-0002dg-Tc
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1g0R7e-0002eq-KB
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0R7b-0002Ex-1A
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:23 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 13 Sep 2018 14:52:14 +0200
-Message-Id: <20180913125217.23173-15-kwolf@redhat.com>
-In-Reply-To: <20180913125217.23173-1-kwolf@redhat.com>
-References: <20180913125217.23173-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 14/17] block: Remove aio_poll() in
- bdrv_drain_poll variants
+	(envelope-from <imammedo@redhat.com>) id 1g0R7d-0002H6-QZ
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1g0R7d-0002Gp-K4
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:53:25 -0400
+Date: Thu, 13 Sep 2018 14:53:14 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180913145314.2b4fa0aa@redhat.com>
+In-Reply-To: <20180829153624.12299-7-david@redhat.com>
+References: <20180829153624.12299-1-david@redhat.com>
+	<20180829153624.12299-7-david@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 06/20] memory-device: document
+ MemoryDeviceClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,51 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>
 
-bdrv_drain_poll_top_level() was buggy because it didn't release the
-AioContext lock of the node to be drained before calling aio_poll().
-This way, callbacks called by aio_poll() would possibly take the lock a
-second time and run into a deadlock with a nested AIO_WAIT_WHILE() call.
+On Wed, 29 Aug 2018 17:36:10 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-However, it turns out that the aio_poll() call isn't actually needed any
-more. It was introduced in commit 91af091f923, which is effectively
-reverted by this patch. The cases it was supposed to fix are now covered
-by bdrv_drain_poll(), which waits for block jobs to reach a quiescent
-state.
+> Document the functions and when to not expect errors.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  include/hw/mem/memory-device.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+> index 852fd8f98a..d353564faf 100644
+> --- a/include/hw/mem/memory-device.h
+> +++ b/include/hw/mem/memory-device.h
+> @@ -29,9 +29,22 @@ typedef struct MemoryDeviceState {
+>      Object parent_obj;
+>  } MemoryDeviceState;
+>  
+> +/**
+> + * MemoryDeviceClass:
+> + * @get_addr: The address of the @md in guest physical memory. "0" means that
+> + * no address has been specified by the user and that no address has been
+> + * assigned yet.
+> + * @get_plugged_size: The amount of memory provided by this @md currently
+> + * usable ("plugged") by the guest. Will not fail after the device was realized.
+I'd drop 'Will not fail after the device was realized'
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
----
- block/io.c | 8 --------
- 1 file changed, 8 deletions(-)
+> + * @get_memory_region: The memory region of the @md to mapped in guest
+s/to mapped/that's mapped/
 
-diff --git a/block/io.c b/block/io.c
-index 914ba78f1a..8b81ff3913 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -268,10 +268,6 @@ bool bdrv_drain_poll(BlockDriverState *bs, bool recursive,
- static bool bdrv_drain_poll_top_level(BlockDriverState *bs, bool recursive,
-                                       BdrvChild *ignore_parent)
- {
--    /* Execute pending BHs first and check everything else only after the BHs
--     * have executed. */
--    while (aio_poll(bs->aio_context, false));
--
-     return bdrv_drain_poll(bs, recursive, ignore_parent, false);
- }
- 
-@@ -511,10 +507,6 @@ static bool bdrv_drain_all_poll(void)
-     BlockDriverState *bs = NULL;
-     bool result = false;
- 
--    /* Execute pending BHs first (may modify the graph) and check everything
--     * else only after the BHs have executed. */
--    while (aio_poll(qemu_get_aio_context(), false));
--
-     /* bdrv_drain_poll() can't make changes to the graph and we are holding the
-      * main AioContext lock, so iterating bdrv_next_all_states() is safe. */
-     while ((bs = bdrv_next_all_states(bs))) {
--- 
-2.13.6
+> + * physical memory at @get_addr. Will not fail after the device was realized.
+the same
+
+> + * @fill_device_info: Fill out #MemoryDeviceInfo with @md specific information.
+maybe:
+translate current @md state into #MemoryDeviceInfo
+
+
+> + */
+>  typedef struct MemoryDeviceClass {
+> +    /* private */
+>      InterfaceClass parent_class;
+>  
+> +    /* public */
+>      uint64_t (*get_addr)(const MemoryDeviceState *md);
+>      uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
+>      MemoryRegion *(*get_memory_region)(MemoryDeviceState *md, Error **errp);
