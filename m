@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1g0LuP-0005hd-Ee
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:26 -0400
+	(envelope-from <famz@redhat.com>) id 1g0LuS-0005kO-VZ
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1g0LuL-0008CT-Jc
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37310)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g0LuJ-0008AY-S7
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:20 -0400
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
-	[10.5.11.24])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E313381107
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 07:19:17 +0000 (UTC)
-Date: Thu, 13 Sep 2018 09:19:13 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180913071913.vqyy6jf42ylwe24b@sirius.home.kraxel.org>
-References: <20180912123700.7708-1-kraxel@redhat.com>
-	<20180912123700.7708-3-kraxel@redhat.com>
-	<efd77dd1-0402-c68e-7ee9-e8b240c4abd9@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1g0LuR-0008G4-4o
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:28 -0400
+Date: Thu, 13 Sep 2018 15:19:17 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180913071917.GN2526@lemon.usersys.redhat.com>
+References: <20180912171040.1732-1-pbonzini@redhat.com>
+	<20180912171040.1732-4-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <efd77dd1-0402-c68e-7ee9-e8b240c4abd9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] display/stdvga: add edid support.
+In-Reply-To: <20180912171040.1732-4-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] aio-posix: do skip system call if
+ ctx->notifier polling succeeds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, stefanha@redhat.com
 
-> > --- a/docs/specs/standard-vga.txt
-> > +++ b/docs/specs/standard-vga.txt
-> > @@ -61,7 +61,7 @@ MMIO area spec
-> >   Likewise applies to the pci variant only for obvious reasons.
-> > -0000 - 03ff : reserved, for possible virtio extension.
-> > +0000 - 03ff : edid data blob.
+On Wed, 09/12 19:10, Paolo Bonzini wrote:
+> Commit 70232b5253 ("aio-posix: Don't count ctx->notifier as progress when
+> 2018-08-15), by not reporting progress, causes aio_poll to execute the
+> system call when polling succeeds because of ctx->notifier.  This introduces
+> latency before the call to aio_bh_poll() and negates the advantages of
+> polling, unfortunately.
 > 
+> The fix builds on the previous patch, separating the effect of polling on
+> the timeout from the progress reported to aio_poll().  ctx->notifier
+> does zero the timeout, causing the caller to skip the system call,
+> but it does not report progress, so that the bug fix of commit 70232b5253
+> still stands.
 > 
-> > +    if (edid) {
-> > +        qemu_edid_info info = {
-> > +            .prefx = d->xres,
-> > +            .prefy = d->yres,
-> > +        };
-> > +        qemu_edid_generate(d->edid, sizeof(d->edid), &info);
-> > +        qemu_edid_region_io(&subs[3], owner, d->edid, sizeof(d->edid));
-> > +        memory_region_add_subregion(parent, 0, &subs[3]);
+> Fixes: 70232b5253a3c4e03ed1ac47ef9246a8ac66c6fa
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  util/aio-posix.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 > 
-> Is there ever a risk that this could overflow?  Or, if the blob is always
-> smaller than 0x3ff, should we still leave reserved bytes?
+> diff --git a/util/aio-posix.c b/util/aio-posix.c
+> index 21d8987179..efa79b9e62 100644
+> --- a/util/aio-posix.c
+> +++ b/util/aio-posix.c
+> @@ -498,10 +498,11 @@ static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
+>      QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
+>          if (!node->deleted && node->io_poll &&
+>              aio_node_check(ctx, node->is_external) &&
+> -            node->io_poll(node->opaque) &&
+> -            node->opaque != &ctx->notifier) {
+> +            node->io_poll(node->opaque)) {
+>              *timeout = 0;
+> -            progress = true;
+> +            if (node->opaque != &ctx->notifier) {
+> +                progress = true;
+> +            }
+>          }
+>  
+>          /* Caller handles freeing deleted nodes.  Don't do it here. */
+> -- 
+> 2.17.1
+> 
 
-It's 128 bytes long.  There can be (multiple) extensions, each 128 bytes
-long too.  Current generator doesn't create any extensions.  So, only a
-fraction of the space is actually used right now.
-
-I'd leave the room reserved for edid nevertheless.  There is still
-plenty of unused address space should we need something at some point in
-the future.  The mmio bar is one page (4k), with more than 2k at the end
-being not used (from info mtree):
-
-  00000000febf0000-00000000febf0fff (prio 1, i/o): vga.mmio
-    00000000febf0000-00000000febf007f (prio 0, i/o): edid
-    00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
-    00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
-    00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
-
-cheers,
-  Gerd
+Reviewed-by: Fam Zheng <famz@redhat.com>
