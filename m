@@ -1,37 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0OUU-0007TH-6Z
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:04:51 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0OcI-0001Cz-4T
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0OUP-0000N0-3J
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:04:49 -0400
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:35051)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0OUO-0000JF-KJ
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:04:44 -0400
-Received: by mail-wm0-f65.google.com with SMTP id o18-v6so5575968wmc.0
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 03:04:44 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1g0OcD-0004nA-W3
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:12:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51988)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0OcD-0004is-M5
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 06:12:49 -0400
+References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
+	<20180912081945.3228.19776.stgit@pasha-VirtualBox>
 From: Paolo Bonzini <pbonzini@redhat.com>
-References: <20180910145616.8598-1-famz@redhat.com>
-	<20180910145616.8598-3-famz@redhat.com>
-	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
-	<20180911141245.GQ19292@lemon.usersys.redhat.com>
-	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
-	<20180912013134.GA2526@lemon.usersys.redhat.com>
-	<3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
-	<20180912115020.GH2526@lemon.usersys.redhat.com>
-	<ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
-	<20180913060351.GK2526@lemon.usersys.redhat.com>
-	<44c472ba-a9ff-7c64-6406-f528a7e0f463@redhat.com>
-Message-ID: <bcae773c-195d-32ff-da1e-23629ed65c06@redhat.com>
-Date: Thu, 13 Sep 2018 12:04:34 +0200
+Message-ID: <add3b71c-018b-3aae-1a98-53cd756e1b77@redhat.com>
+Date: Thu, 13 Sep 2018 12:12:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <44c472ba-a9ff-7c64-6406-f528a7e0f463@redhat.com>
+In-Reply-To: <20180912081945.3228.19776.stgit@pasha-VirtualBox>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] virtio-scsi/virtio-blk:
- Disable poll handlers when stopping vq handler
+Subject: Re: [Qemu-devel] [PATCH v6 20/25] replay: wake up vCPU when
+ replaying
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,49 +29,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-On 13/09/2018 11:11, Paolo Bonzini wrote:
-> On 13/09/2018 08:03, Fam Zheng wrote:
->> On Wed, 09/12 14:42, Paolo Bonzini wrote:
->>> On 12/09/2018 13:50, Fam Zheng wrote:
->>>>> I think it's okay if it is invoked.  The sequence is first you stop the
->>>>> vq, then you drain the BlockBackends, then you switch AioContext.  All
->>>>> that matters is the outcome when virtio_scsi_dataplane_stop returns.
->>>> Yes, but together with vIOMMU, it also effectively leads to a virtio_error(),
->>>> which is not clean. QEMU stderr when this call happens (with patch 1 but not
->>>> this patch):
->>>>
->>>> 2018-09-12T11:48:10.193023Z qemu-system-x86_64: vtd_iommu_translate: detected translation failure (dev=02:00:00, iova=0x0)
->>>> 2018-09-12T11:48:10.193044Z qemu-system-x86_64: New fault is not recorded due to compression of faults
->>>> 2018-09-12T11:48:10.193061Z qemu-system-x86_64: virtio: zero sized buffers are not allowed
->>>
->>> But with iothread, virtio_scsi_dataplane_stop runs in another thread
->>> than the iothread; in that case you still have a race where the iothread
->>> can process the vq before aio_disable_external and print the error.
->>>
->>> IIUC the guest has cleared the IOMMU page tables _before_ clearing the
->>> DRIVER_OK bit in the status field.  Could this be a guest bug?
->>
->> I'm not sure if it is a bug or not. I think what happens is the device is left
->> enabled by Seabios, and then reset by kernel.
-> 
-> That makes sense, though I'm not sure why QEMU needs to process a
-> request long after SeaBIOS has left control to Linux.  Maybe it's just
-> that the messages should not go on QEMU stderr, and rather trace-point
-> should be enough.
+On 12/09/2018 10:19, Pavel Dovgalyuk wrote:
+> This patch tries to wake up the vCPU when it sleeps and the icount warp
+> checkpoint isn't met. It means that vCPU has something to do, because
+> there are no other reasons of non-matching warp checkpoint.
 
-Aha, it's not that QEMU needs to poll, it's just that polling mode is
-enabled, and it decides to do one last iteration.  In general the virtio
-spec allows the hardware to poll whenever it wants, hence:
-
-1) I'm not sure that translation failures should mark the device as
-broken---definitely not when doing polling, possibly not even in
-response to the guest "kicking" the virtqueue.  Alex, does the PCI spec
-say anything about this?
-
-2) translation faliures should definitely not print messages to stderr.
+What happens if !replay_has_checkpoint()?  Should that be an assertion?
 
 Thanks,
 
