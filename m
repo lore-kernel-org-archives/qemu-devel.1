@@ -1,44 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1g0WIK-00082Q-TV
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 14:24:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g0WUT-0001tR-Ba
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 14:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1g0WIE-0007yB-I8
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 14:24:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56970
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1g0WI8-0007oy-La
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 14:24:38 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w8DIOFDx131836
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 14:24:27 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2mfw2888ej-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 14:24:26 -0400
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Thu, 13 Sep 2018 19:24:24 +0100
-References: <1536782900-17656-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1536782900-17656-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<49de34fa-253f-a306-0cad-519961c2c183@redhat.com>
-	<b89ad0b9-8d4c-21a2-c706-5df93a51887c@de.ibm.com>
-	<21bb71bb-e80c-152b-3018-8cac3926d2ea@linux.ibm.com>
-	<81da8612-fe80-9a45-a4c4-80dc86b604c2@linux.ibm.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Thu, 13 Sep 2018 20:24:18 +0200
+	(envelope-from <mreitz@redhat.com>) id 1g0WUR-0000GT-BH
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 14:37:21 -0400
+References: <CAB3eZfsvnyyo0C4nU=Mucg51krnN9Q9ExKA0t4AEEA3DiOd2aA@mail.gmail.com>
+	<ce6e31f1-0190-89ea-3aae-90ccdf81c585@redhat.com>
+	<f7c8ab1d-c752-29ce-bcd1-64a5598a41b4@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <56133002-7a79-bf6a-8835-fba043638224@redhat.com>
+Date: Thu, 13 Sep 2018 20:37:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <81da8612-fe80-9a45-a4c4-80dc86b604c2@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <2fc80ba3-d14b-bf0b-f5d0-56eba3f549e8@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 4/6] s390x/ap: base Adjunct
- Processor (AP) object model
+In-Reply-To: <f7c8ab1d-c752-29ce-bcd1-64a5598a41b4@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="w5hVXA2t9sW02lthO8b8rlYt6n0GnaSiI"
+Subject: Re: [Qemu-devel] Can I only commit from active image to
+ corresponding range of its backing file by qemu cmd?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,111 +26,496 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, pasic@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, qemu-s390x@nongnu.org, heiko.carstens@de.ibm.com, cohuck@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, eric.auger@redhat.com, alex.williamson@redhat.com, jjherne@linux.vnet.ibm.com, pbonzini@redhat.com, schwidefsky@de.ibm.com, mimu@linux.ibm.com, david@redhat.com, alifm@linux.vnet.ibm.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>, lampahome <pahome.chen@mirlab.org>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--w5hVXA2t9sW02lthO8b8rlYt6n0GnaSiI
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, lampahome <pahome.chen@mirlab.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <56133002-7a79-bf6a-8835-fba043638224@redhat.com>
+Subject: Re: [Qemu-devel] Can I only commit from active image to corresponding
+ range of its backing file by qemu cmd?
+References: <CAB3eZfsvnyyo0C4nU=Mucg51krnN9Q9ExKA0t4AEEA3DiOd2aA@mail.gmail.com>
+ <ce6e31f1-0190-89ea-3aae-90ccdf81c585@redhat.com>
+ <f7c8ab1d-c752-29ce-bcd1-64a5598a41b4@redhat.com>
+In-Reply-To: <f7c8ab1d-c752-29ce-bcd1-64a5598a41b4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 13.09.18 19:05, Eric Blake wrote:
+> [adding Markus, because of an interesting observation about --image-opt=
+s
+> vs. JSON null - search for [1] below]
+>=20
+> On 9/13/18 8:22 AM, Max Reitz wrote:
+>> On 13.09.18 05:33, lampahome wrote:
+>>> I split data to 3 chunks and save it in 3 independent backing files l=
+ike
+>>> below:
+>>> img.000 <-- img.001 <-- img.002
+>>> img.000 is the backing file of img.001 and 001 is the backing file of=
 
-On 09/13/2018 07:15 PM, Tony Krowiak wrote:
-> On 09/13/2018 01:02 PM, Tony Krowiak wrote:
->> On 09/13/2018 02:29 AM, Christian Borntraeger wrote:
+>>> 002.
+>>> img.000 saves the 1st chunk of data and img.001 saves the 2nd chunk o=
+f
+>>> data, and img.002 saves the 3rd chunk of data.
+>=20
+> How have you ensured that these three files are visiting different
+> ranges of guest data?
+
+He did say "independent".
+
+> It sounds like you are trying to keep the sizes of .000, .001, and .002=
+
+> constant, but updating their respective contents.=C2=A0 Rather unusual,=
+ but
+> not necessarily a bad idea.
+>=20
 >>>
->>> On 09/13/2018 07:48 AM, Thomas Huth wrote:
->>>> On 2018-09-12 22:08, Tony Krowiak wrote:
->>>>> From: Tony Krowiak <akrowiak@linux.ibm.com>
->>>>>
->>>>> Introduces the base object model for virtualizing AP devices.
->>>>>
->>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->>>>> ---
->>>> [...]
->>>>> diff --git a/hw/s390x/ap-bridge.c b/hw/s390x/ap-bridge.c
->>>>> new file mode 100644
->>>>> index 0000000..4f10425
->>>>> --- /dev/null
->>>>> +++ b/hw/s390x/ap-bridge.c
->>>> [...]
->>>>> +void s390_init_ap(void)
->>>>> +{
->>>>> +=C2=A0=C2=A0=C2=A0 DeviceState *dev;
->>>>> +
->>>>> +=C2=A0=C2=A0=C2=A0 /* Create bridge device */
->>>>> +=C2=A0=C2=A0=C2=A0 dev =3D qdev_create(NULL, TYPE_AP_BRIDGE);
->>>>> +=C2=A0=C2=A0=C2=A0 object_property_add_child(qdev_get_machine(), T=
-YPE_AP_BRIDGE,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 OBJECT(dev), NULL);
->>>>> +=C2=A0=C2=A0=C2=A0 qdev_init_nofail(dev);
->>>>> +
->>>>> +=C2=A0=C2=A0=C2=A0 /* Create bus on bridge device */
->>>>> +=C2=A0=C2=A0=C2=A0 qbus_create(TYPE_VFIO_AP_BUS, dev, TYPE_VFIO_AP=
-_BUS);
->>>>> + }
->>>> [...]
->>>>> +type_init(ap_device_register)
->>>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.=
-c
->>>>> index f0f7fdc..3c100c2 100644
->>>>> --- a/hw/s390x/s390-virtio-ccw.c
->>>>> +++ b/hw/s390x/s390-virtio-ccw.c
->>>>> @@ -32,6 +32,7 @@
->>>>> =C2=A0 #include "ipl.h"
->>>>> =C2=A0 #include "hw/s390x/s390-virtio-ccw.h"
->>>>> =C2=A0 #include "hw/s390x/css-bridge.h"
->>>>> +#include "hw/s390x/ap-bridge.h"
->>>>> =C2=A0 #include "migration/register.h"
->>>>> =C2=A0 #include "cpu_models.h"
->>>>> =C2=A0 #include "hw/nmi.h"
->>>>> @@ -263,6 +264,9 @@ static void ccw_init(MachineState *machine)
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* init the SIGP facility */
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s390_init_sigp();
->>>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 /* create AP bridge and bus(es) */
->>>>> +=C2=A0=C2=A0=C2=A0 s390_init_ap();
->>>>> +
->>>> Not sure since there is no explicit migration state involved here, b=
-ut I
->>>> think you cannot simply create the ap-bridge device always
->>>> unconditionally, can you? Did you check whether you can ping-pong
->>>> migrate an guest that runs on an older version of QEMU to a QEMU tha=
-t
->>>> contains this patch and back? If it does not work, it might be neces=
-sary
->>>> to restrict this ap-bridge device for new machine types only, I thin=
-k.
+>>> Now I have img.003 stores cow data of 1st chunk and img.002 is the
+>>> backing
+>>> file of img.003.
+>>> The backing chain is like this:
+>>> =C2=A0=C2=A0 img.000 <-- img.001 <-- img.002 <-- img.003
+>>>
+>>> So that means the data of img.003 saves the same range with img.000 b=
+ut
+>>> different data.
+>>>
+>>> I know I can use *`qemu-img commit'* but it only commit the data from=
 
-@Thomas
-I re-checked the back and forth migration using libvirt's save/restore. I=
-t
-works, because as you said, there in no migration state. So there are no
-missing/unexpected subsections in the migration stream/file.
+>>> img.003 to img.002.
+>=20
+> Which, if the guest range covered by .000 and .002 are originally
+> distinct, makes .002 grow in size for any changes that .003 has made
+> relative to .000 or .001, rather than writing to the respective backing=
 
->>> We have already the cpu features at this point in time. So simply doi=
-ng
->>> s390_has_feat(S390_FEAT_AP) in s390_init_ap ?
+> file.
+>=20
+>>>
+>>> If I use *`qemu-img rebase -b img.000 img.003`*, the data of img.001 =
+and
+>>> img.002 will merge into img.003.
+>=20
+> Which makes .000 grow in size, because you didn't limit how much of .00=
+3
+> gets committed.
+
+I probably shouldn't interpret intentions here, but he did say "img.003
+stores cow data of 1st chunk".  Which to me sounded like .003 does not
+have any changes relative to .001 or .002, so .000 should not grow in siz=
+e.
+
+> But maybe it's possible to use the 'offset' and 'size'
+> parameters to the raw format driver to make qemu-img see only a subset
+> of img.003, at which point committing just that subset is easier.
+
+No, because raw is not marked a filter driver, so you cannot commit
+through it.
+
+(In fact, you cannot even commit through filter drivers now.)
+
+And this is probably correct, because exactly that offset and size make
+it so that the filter BDS presents different data than its child.  So it
+isn't a filter.
+
+> Hmm -
+> it might work for img.000, but not so easily for img.001 or img.002,
+> because we don't have a clean way to copy from one source offset to a
+> different destination offset.=C2=A0 Last month, I proposed a patch to e=
+nhance
+> 'qemu-img dd' to do that - but the argument was that 'qemu-img convert'=
+
+> should also be able to do it, with 'qemu-img dd' being a thin veneer
+> over convert rather than doing everything itself, so there's still work=
+
+> to be done.
+>=20
+>>>
+>>> What I want is only commit the data in img.003 into img.000 because t=
+he
+>>> data of the two image are the same range(1st chunk)
+>>>
+>>> Is there anyway to commit(or merge) data of active image into
+>>> corresponding
+>>> backing file?
 >>
->> This seems like a reasonable solution to me. If the S390_FEAT_AP is no=
-t switched
->> on for the guest, then the vfio-ap device will not be realized; theref=
-ore,
->> there is no need for a bridge device. I will fix the s390_init_ap() fu=
-nction such
->> that the AP bridge device is created only if the S390_FEAT_AP is switc=
-hed on for
->> the guest. That ought to solve the migration issue David pointed out. =
-Thanks
->> David.
+>> So img.000, img.001, and img.002 all contain data at completely
+>> different areas, and img.003 only contains data where img.000 contains=
 
-With that said, creating the ap-bridge only under the condition
-s390_has_feat(S390_FEAT_AP) could still be the better option. We
-could probably drop the check in vfio_ap_realize(). I'm not sure, so
-I'm fine either way.
+>> data as well?
+>>
+>> Say like so:
+>>
+>> $ qemu-img create -f qcow2 img.000 3M
+>> $ qemu-img create -f qcow2 -b img.000 img.001
+>> $ qemu-img create -f qcow2 -b img.001 img.002
+>> $ qemu-img create -f qcow2 -b img.002 img.003
+>=20
+> Missing -F qcow2 in those last three lines (you should always specify
+> the backing format in the qcow2 metadata, otherwise you are setting
+> yourself up for failures because probing is unsafe)
 
-Regards,
-Halil
+Is it really unsafe for non-raw images?
 
+>> $ qemu-io -c 'write -P 1 0M 1M' img.000
+>> $ qemu-io -c 'write -P 2 1M 1M' img.001
+>> $ qemu-io -c 'write -P 3 2M 1M' img.002
+>> $ qemu-io -c 'write -P 4 0M 1M' img.003
+>=20
+> I'd modify this example to use:
+> =C2=A0qemu-io -c 'write -P 4 0M 512k' -c 'write -P 4 1m 512k' \
+> =C2=A0=C2=A0 -c 'write -P 4 2m 512k' img.003
+>=20
+> so that it becomes easier to see if we are ever committing more than
+> desired.
+
+Well, I interpreted the problem in a way that .003 does not shadow any
+data from .001 or .002.
 
 >>
+>> (img.000 contains 1s from 0M to 1M;
+>> =C2=A0 img.001 contains 2s from 1M to 2M;
+>> =C2=A0 img.002 contains 3s from 2M to 3M;
+>> =C2=A0 img.003 contains 4s from 0M to 1M (the range of img.000))
+>=20
+> Or, visually, with my tweak to img.003,
+>=20
+> img.000=C2=A0=C2=A0=C2=A0=C2=A0 11----
+> img.001=C2=A0=C2=A0=C2=A0=C2=A0 --22--
+> img.002=C2=A0=C2=A0=C2=A0=C2=A0 ----33
+> img.003=C2=A0=C2=A0=C2=A0=C2=A0 4-4-4-
+> guest sees=C2=A0 414243
+>=20
+> and your goal, if I'm understanding, is to do range-based commits so
+> that you end up with:
+>=20
+> img.000=C2=A0=C2=A0=C2=A0=C2=A0 41----
+> img.001=C2=A0=C2=A0=C2=A0=C2=A0 --42--
+> img.002=C2=A0=C2=A0=C2=A0=C2=A0 ----43
+> img.003=C2=A0=C2=A0=C2=A0=C2=A0 ------
+> guest sees=C2=A0 414243
+>=20
 >>
+>> In that case, rebase -u might be what you want, so the following shoul=
+d
+>> work (although it can easily corrupt your data if it isn't the case[1]=
+):
+>>
+>> $ qemu-img rebase -u -b img.000 img.003
+>> $ qemu-img commit img.003
+>=20
+> No, that still copies anything that img.003 has changed from .001 or
+> .002 into .000, making .000 grow in size (that is, your approach change=
+d
+> img.000 to read 41-4-4-).
+
+Well, I definitely misunderstood the issue if .003 changed anything from
+=2E001 or .002, because I didn't read that from the description.  To me,
+it sounded like .003 only changed data that's in .000.
+
+> If you can view just a subset of img.003,
+> then you CAN commit just that subset into img.000 (but not into .001 or=
+
+> .002, because we don't yet have 'qemu-img commit --target-image-opts' t=
+o
+> specify the 'offset=3D' argument to the raw driver).=C2=A0 So here's wh=
+at I tried:
+>=20
+> $ qemu-io -c 'r -P 4 0 512k' -c 'r -P 1 512k 512k' -c map --image-opts
+> driver=3Draw,size=3D1m,file.driver=3Dqcow2,file.file.driver=3Dfile,file=
+=2Efile.filename=3Dimg.003
+>=20
+> read 524288/524288 bytes at offset 0
+> 512 KiB, 1 ops; 0.0002 sec (1.719 GiB/sec and 3521.1268 ops/sec)
+> read 524288/524288 bytes at offset 524288
+> 512 KiB, 1 ops; 0.0004 sec (1.218 GiB/sec and 2493.7656 ops/sec)
+> 512 KiB (0x80000) bytes=C2=A0=C2=A0=C2=A0=C2=A0 allocated at offset 0 b=
+ytes (0x0)
+> 512 KiB (0x80000) bytes not allocated at offset 512 KiB (0x80000)
+>=20
+> Yep - that fancy --image-opts syntax let us use a raw wrapper around
+> qcow2 to see just the first 1M of image.003.=C2=A0 Now:
+>=20
+> $ qemu-img commit --image-opts -b img.000
+> driver=3Draw,size=3D1m,file.driver=3Dqcow2,file.file.driver=3Dfile,file=
+=2Efile.filename=3Dimg.003
+>=20
+> qemu-img: Did not find 'img.000' in the backing chain of
+> 'driver=3Draw,size=3D1m,file.driver=3Dqcow2,file.file.driver=3Dfile,fil=
+e.file.filename=3Dimg.003'
 >=20
 >=20
+> Alas, since 'raw' does not have backing files on its own, qemu-img
+> commit refuses to do anything (it will only commit into a known backing=
+
+> chain).=C2=A0 I know Max has a proposed series to make filters behave m=
+ore
+> sanely (so that the backing file of an original node is also seen to be=
+
+> the backing file of a filter node), but I don't know if that would
+> completely help here (the fact that the raw format node is being used
+> more as a filter is a bit different from normally using it as a format
+> driver - maybe we want size/offset limitations to be an actual filter
+> node, separate from the raw format driver?).
+
+As I said, that isn't a filter.  A filter does not change what data is
+visible, and that's very important.
+
+Because for instance, for committing, you need to be able to go
+backwards.  So you read something at offset X from the filter, and you
+want to commit it down the chain -- of course, you write it to offset X
+in the target backing file.  But if you use a raw node with an offset,
+that changes, so we'd need to be able to translate it back.
+
+(More generally, if you change the data that's visible, the "data
+filter" node would need to provide a way to translate the data.  Well,
+the way is clearly there, it's the write function it provides, but we'd
+need to do some funky stuff to employ it.)
+
+> But I'm not giving up just yet - we can use qemu-img convert to create =
+a
+> temporary file that contains only the data we want committed:
+>=20
+> $ qemu-img convert -O qcow2 -B img.000 --image-opts
+> driver=3Draw,size=3D1m,file.driver=3Dqcow2,file.file.driver=3Dfile,file=
+=2Efile.filename=3Dimg.003
+> img.004
+>=20
+> achieving:
+>=20
+> img.000=C2=A0=C2=A0=C2=A0=C2=A0 11----
+> img.001=C2=A0=C2=A0=C2=A0=C2=A0 --22--
+> img.002=C2=A0=C2=A0=C2=A0=C2=A0 ----33
+> img.003=C2=A0=C2=A0=C2=A0=C2=A0 4-4-4-
+> guest sees=C2=A0 414243
+> img.004=C2=A0=C2=A0=C2=A0=C2=A0 4-
+>=20
+> and now commit that:
+>=20
+> $ qemu-img commit img.004
+>=20
+> and double-check what img.000 now contains:
+>=20
+> $ qemu-io -c 'r -P 4 0 512k' -c 'r -P 1 512k 512k' img.000
+> read 524288/524288 bytes at offset 0
+> 512 KiB, 1 ops; 0.0001 sec (2.872 GiB/sec and 5882.3529 ops/sec)
+> read 524288/524288 bytes at offset 524288
+> 512 KiB, 1 ops; 0.0002 sec (2.078 GiB/sec and 4255.3191 ops/sec)
+>=20
+> so now we have achieved:
+>=20
+> img.000=C2=A0=C2=A0=C2=A0=C2=A0 41----
+> img.001=C2=A0=C2=A0=C2=A0=C2=A0 --22--
+> img.002=C2=A0=C2=A0=C2=A0=C2=A0 ----33
+> img.003=C2=A0=C2=A0=C2=A0=C2=A0 4-4-4-
+> guest sees=C2=A0 414243
+> img.004=C2=A0=C2=A0=C2=A0=C2=A0 --
+>=20
+> Which is not quite our end goal - we have not yet freed the storage in
+> img.003, AND img.004 is still wasting storage space. We can delete
+> img.004 now, but I know of no way to force img.003 to deallocate those
+> clusters.=C2=A0 Attempting:
+>=20
+> [1]
+> $ qemu-io -c 'discard 0 1m' --image-opts
+> driver=3Dqcow2,backing=3D,file.driver=3Dfile,file.filename=3Dimg.003
+> warning: Use of "backing": "" is deprecated; use "backing": null instea=
+d
+> discard 1048576/1048576 bytes at offset 0
+> 1 MiB, 1 ops; 0.0002 sec (4.399 GiB/sec and 4504.5045 ops/sec)
+>=20
+> doesn't work, as 'discard' causes img.003 to now make things read as
+> zero rather than deferring to the backing chain,
+
+Which is intentional because making data re-appear from the backing
+chain can be a security issue, as far as I remember.
+
+> even though I
+> specifically told qemu to operate as if img.003 has no backing image
+
+discard just says "I don't care what data appears there".  For qcow2 v3
+the simplest way is to make it a zero cluster.
+
+> (although it DOES reduce the disk space occupied by img.003, although
+> not the file size - compare 'ls -l' and 'du' output before and after th=
+e
+> attempt - which means the 'discard' DID end up punching a hole in the
+> host file).
+>=20
+> Also, that warning message is annoying.  We can't spell 'backing=3Dnull=
+'> because that tries to find a node named "null"; to avoid it, we'd have=
+
+> to support using --image-opts with JSON on the command line instead of
+> dotted names, as in:
+>=20
+> $ qemu-io -c 'discard 0 1m' --image-opts '{"driver":"qcow2",
+> "backing":null, "file":{"driver":"file", "filename":"img.003"}}'
+>=20
+> except THAT doesn't work yet (we haven't converted all our command line=
+
+> arguments to taking JSON yet). (end [1])
+
+I hate json:{}, but we have it, so why not use it?
+
+$ qemu-io -c 'discard 0 1m' \
+    "json:{'driver':'qcow2','backing':null,
+           'file':{'driver':'file','filename':'img.003'}}"
+discard 1048576/1048576 bytes at offset 0
+1 MiB, 1 ops; 0.0000 sec (10.389 GiB/sec and 10638.2979 ops/sec)
+
+> I guess I can avoid the warning message by using multiple steps for
+> temporarily having no backing file:
+>=20
+> $ qemu-img rebase -u -b '' img.003
+> $ qemu-io -c 'discard 0 1m' img.003
+> discard 1048576/1048576 bytes at offset 0
+> 1 MiB, 1 ops; 0.0002 sec (4.811 GiB/sec and 4926.1084 ops/sec)
+> $ qemu-img rebase -u -F qcow2 -b img.002 img.003
+>=20
+> But whether I use the one-liner with --image-opts or the multi-step wit=
+h
+> explicit 'rebase -u'=C2=A0 I've botched things, because now I have:
+>=20
+> img.000=C2=A0=C2=A0=C2=A0=C2=A0 41----
+> img.001=C2=A0=C2=A0=C2=A0=C2=A0 --22--
+> img.002=C2=A0=C2=A0=C2=A0=C2=A0 ----33
+> img.003=C2=A0=C2=A0=C2=A0=C2=A0 z-4-4-
+> guest sees=C2=A0 014243
+>=20
+> To restore things back for further playing around, do
+> $ qemu-io -c 'w -P 4 0 512k' img.003
+>=20
+> Hmm, another idea:
+> $ qemu-img rebase -f qcow2 -b img.002 -F qcow2 img.003
+>=20
+> Nope, doesn't work - it doesn't do deduplication by removing clusters i=
+n
+> img.003 that are identical to the clusters in the underlying backing
+> chain (img.003 still contains '4-4-4-' instead of the desired '--4-4-')=
+=2E
+> So that sounds like yet another missing feature to add later.
+>=20
+>>
+>> (And then maybe
+>> $ qemu-img rebase -u -b img.002 img.003
+>> to return to the previous backing chain.)
+>>
+>> Max
+>>
+>>
+>> [1] It will corrupt your data if img.001 or img.002 contain any data
+>> where img.003 also contains data; because then that data of img.003 wi=
+ll
+>> be hidden when viewed through img.001 and img.002.
+>=20
+> Sorry - for all my experimenting, I could NOT find a reliable way to
+> remove duplicated clusters out of img.003 once they were committed to
+> img.000,
+
+I'm not sure whether your experiments really concern what the reporter
+needs in his exact case, but just for fun:
+
+Basically, there is only one way to reliably make an image pass through
+data from its backing files again.  Well, two, actually.  One is
+qemu-img commit, which (for compatibility, mainly) makes the image empty
+after the commit.  The other is just throwing the image away and
+re-creating it from scratch.
+
+So in any case, you cannot reliably do that for just a part of the image.=
+
+
+First, split .003 into the part we want to commit and the part we don't
+want to commit.  This is a bit tricky without qemu-img dd @seek (or a
+corresponding convert parameter), so we'll have to make do with
+backing=3Dnull so we don't copy anything into the output from img.003's
+backing chain.
+
+Or, we would have to use backing=3Dnull, but for some reason that doesn't=
+
+work.  I'll have to investigate.
+
+So rebase will need to do:
+
+$ qemu-img rebase -u -b '' img.003
+
+$ qemu-img convert -O qcow2 \
+    "json:{'driver':'raw','offset':0,'size':1048576,\
+           'file':{'driver':'qcow2',\
+                   'file':{'driver':'file','filename':'img.003'}}}" \
+    "json:{'driver':'null-co','size':2097152}" \
+    img.003.commit.000
+
+$ qemu-img convert -O qcow2 \
+    "json:{'driver':'null-co','size':1048576}" \
+    "json:{'driver':'raw','offset':1048576,'size':2097152,\
+           'file':{'driver':'qcow2',\
+                   'file':{'driver':'file','filename':'img.003'}}}" \
+    img.003.nocommit
+
+Now let's set the backing files.  img.003.commit.000 has only data that
+goes into img.000, so that goes there, and img.003.nocommit is going to
+replace our old img.003, so that goes where that was:
+
+$ qemu-img rebase -u -b img.000 img.003.commit.000
+$ qemu-img rebase -u -b img.002 img.003.nocommit
+
+And now let's commit:
+
+$ qemu-img commit img.003.commit.000
+
+And let's clean up:
+
+$ rm img.003.commit.000
+$ mv img.003.nocommit img.003
+
+Done.
+
+(If you want to commit all three parts of img.003 into the three
+different base images, you would create img.003.commit.001 and
+img.003.commit.002 similarly as above, and then commit those into the
+respective base images.  Then you'd just rm img.003* and you're back to
+the original state.)
+
+Max
+
+> nor a clean way to commit data from a subset of img.003 to the
+> proper img.001 or img.002.=C2=A0 It is possible to manually use qemu-im=
+g map
+> to learn which portions of img.003 should be copied, then use qemu-nbd
+> to map both img.001 and img.003 to NBD devices, and use a series of dd
+> commands to copy just those portions of the guest-visible data - but
+> again, while that commits to the proper backing file, it does not
+> discard the clusters from img.003.=C2=A0 Commit with "mode":"incrementa=
+l"
+> could be used to direct which portions of a file to commit, if you had
+> an easy way to inject a bitmap describing that portion of the file, but=
+
+> we really don't have decent offline bitmap management via qemu-img yet.=
+
+>=20
+> So, while this thread has sparked some ideas for future improvements,
+> the takeaway message for now is no, you really can't commit just a
+> portion of one qcow2 image into another.
+
+
+--w5hVXA2t9sW02lthO8b8rlYt6n0GnaSiI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluarlIACgkQ9AfbAGHV
+z0DL8wgAvZOSjZQxnecMGmqs/ajmosoGnzPReL+Q3mRcUPeQ9t3AoxLoIwuuz5eG
+43sHLvMo5lT1th2w77Ehcqtal5UtATvJu9zW2yHZ+CB9r/94rAPM0tHHzOrhng+R
+ly131+P9QxP1/j1Ctue/oQEvsUrBigp3DfdUIzGW2g+XKLATmDDX1UPUKtsJO4N2
+31uzHnMU2WvW+7V6jr4LbR7eoYlwJDDUD8LytEk5Vrl3hc/XFjon9N5QTBPBxYRC
+3V47gqrgEjw+tKACR+JSG8sXkGWf+7Oh7tNkh+9tQbc7I8mSh31Kr+9poq1U1EDc
+e/ezytsjqIn8VyVGrYcVT8L6UA52Ig==
+=/9q4
+-----END PGP SIGNATURE-----
+
+--w5hVXA2t9sW02lthO8b8rlYt6n0GnaSiI--
