@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1g0SV6-0006xy-4R
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:21:49 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g0SVK-00076n-O2
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1g0SV5-0006G8-0x
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:21:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g0SVG-0006Zd-LM
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:21:58 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:38490)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g0SVG-0006Vw-82
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:21:54 -0400
+Received: by mail-wr1-x431.google.com with SMTP id w11-v6so5877023wrc.5
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 07:21:53 -0700 (PDT)
+References: <20180911202823.21657-1-cota@braap.org>
+	<20180911202823.21657-2-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180911202823.21657-2-cota@braap.org>
+Date: Thu, 13 Sep 2018 15:21:50 +0100
+Message-ID: <87efdxbhq9.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20180908090820.15591-1-mark.cave-ayland@ilande.co.uk>
-	<20180908090820.15591-4-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180908090820.15591-4-mark.cave-ayland@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Thu, 13 Sep 2018 16:21:30 +0200
-Message-ID: <CACXAS8Bc=1DrjUoyYBc5u4FYiYagXHZUGmSfAJ_Np0Ns9hwjJw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] 40p: add fixed IRQ routing for LSI
- SCSI device
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/13] target/i386: move cpu_cc_srcT to
+ DisasContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,146 +31,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel <qemu-devel@nongnu.org>, "open list:PReP" <qemu-ppc@nongnu.org>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Sat, Sep 8, 2018 at 11:11 AM Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
->
-> Whilst the PReP specification describes how all PCI IRQs are routed via IRQ
-> 15 on the interrupt controller, the real 40p machine has routing quirk in
-> that the LSI SCSI device is routed to IRQ 13.
 
-Is it a routing quirk or does 40p use both 15 and 13?
-I used both in my AIX experiments and AIX seemed to be happy about it.
-But maybe AIX simply doesn't care as long as the residual data is correct.
+Emilio G. Cota <cota@braap.org> writes:
 
-Artyom
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-> This is implemented using a little hack: the existing IRQ routing code uses
-> (irq_num + (pci_dev->devfn >> 3)) & 1 to give the PCI interrupt pin, where
-> the "& 1" ensures that the only pins A and B (0 and 1) will ever be used.
->
-> Rather than fix the mask to "& 3" we leave the existing routing above as-is
-> and then force the LSI SCSI device to use pin C (2). This enables us to
-> route pin 2 permanantly to IRQ 13 since the LSI SCSI device will be its
-> only user.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  hw/pci-host/prep.c | 35 +++++++++++++++++++++++++++++++++--
->  hw/ppc/prep.c      | 10 +++++++---
->  2 files changed, 40 insertions(+), 5 deletions(-)
+>  target/i386/translate.c | 32 ++++++++++++++++++--------------
+>  1 file changed, 18 insertions(+), 14 deletions(-)
 >
-> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-> index b1b6b16bad..87270605b5 100644
-> --- a/hw/pci-host/prep.c
-> +++ b/hw/pci-host/prep.c
-> @@ -58,6 +58,7 @@ typedef struct PRePPCIState {
+> diff --git a/target/i386/translate.c b/target/i386/translate.c
+> index 1f9d1d9b24..e9f512472e 100644
+> --- a/target/i386/translate.c
+> +++ b/target/i386/translate.c
+> @@ -73,7 +73,7 @@
 >
->      qemu_or_irq *or_irq;
->      qemu_irq pci_irqs[PCI_NUM_PINS];
-> +    qemu_irq scsi_irq;
->      PCIBus pci_bus;
->      AddressSpace pci_io_as;
->      MemoryRegion pci_io;
-> @@ -192,14 +193,41 @@ static const MemoryRegionOps raven_io_ops = {
->
->  static int raven_map_irq(PCIDevice *pci_dev, int irq_num)
->  {
-> -    return (irq_num + (pci_dev->devfn >> 3)) & 1;
-> +    switch (pci_dev->devfn) {
-> +    case PCI_DEVFN(1, 0):
-> +        /* Whilst legacy PReP machine exists we need to make
-> +         * sure that this fixed interrupt routing is 40p only */
-> +        if (strcmp(object_get_typename(OBJECT(pci_dev)),
-> +                                       "lsi53c810") == 0) {
-> +            /* LSI SCSI */
-> +            return 2;
-> +        } else {
-> +            /* Normal PCI IRQ mapping */
-> +            return (irq_num + (pci_dev->devfn >> 3)) & 1;
-> +        }
-> +    default:
-> +        /* Normal PCI IRQ mapping */
-> +        return (irq_num + (pci_dev->devfn >> 3)) & 1;
-> +    }
->  }
->
->  static void raven_set_irq(void *opaque, int irq_num, int level)
->  {
->      PREPPCIState *s = opaque;
->
-> -    qemu_set_irq(s->pci_irqs[irq_num], level);
-> +    if (s->is_legacy_prep) {
-> +        qemu_set_irq(s->pci_irqs[irq_num], level);
-> +    } else {
-> +        switch (irq_num) {
-> +        case 2:
-> +            /* LSI SCSI */
-> +            qemu_set_irq(s->scsi_irq, level);
-> +            break;
-> +        default:
-> +            /* Normal PCI IRQ mapping */
-> +            qemu_set_irq(s->pci_irqs[irq_num], level);
-> +        }
-> +    }
->  }
->
->  static AddressSpace *raven_pcihost_set_iommu(PCIBus *bus, void *opaque,
-> @@ -242,6 +270,9 @@ static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
->          for (i = 0; i < PCI_NUM_PINS; i++) {
->              s->pci_irqs[i] = qdev_get_gpio_in(DEVICE(s->or_irq), i);
->          }
+>  /* global register indexes */
+>  static TCGv cpu_A0;
+> -static TCGv cpu_cc_dst, cpu_cc_src, cpu_cc_src2, cpu_cc_srcT;
+> +static TCGv cpu_cc_dst, cpu_cc_src, cpu_cc_src2;
+>  static TCGv_i32 cpu_cc_op;
+>  static TCGv cpu_regs[CPU_NB_REGS];
+>  static TCGv cpu_seg_base[6];
+> @@ -135,6 +135,10 @@ typedef struct DisasContext {
+>      int cpuid_ext3_features;
+>      int cpuid_7_0_ebx_features;
+>      int cpuid_xsave_features;
 > +
-> +        /* 40p LSI SCSI has fixed routing via IRQ 13 */
-> +        sysbus_init_irq(dev, &s->scsi_irq);
+> +    /* TCG local temps */
+> +    TCGv cc_srcT;
+> +
+>      sigjmp_buf jmpbuf;
+>  } DisasContext;
+>
+> @@ -244,7 +248,7 @@ static void set_cc_op(DisasContext *s, CCOp op)
+>          tcg_gen_discard_tl(cpu_cc_src2);
+>      }
+>      if (dead & USES_CC_SRCT) {
+> -        tcg_gen_discard_tl(cpu_cc_srcT);
+> +        tcg_gen_discard_tl(s->cc_srcT);
 >      }
 >
->      qdev_init_gpio_in(d, raven_change_gpio, 1);
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index 615865e46c..0412a56d98 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -626,6 +626,7 @@ static void ibm_40p_init(MachineState *machine)
->      Nvram *m48t59 = NULL;
->      PCIBus *pci_bus;
->      ISABus *isa_bus;
-> +    PCIDevice *pci;
->      void *fw_cfg;
->      int i;
->      uint32_t kernel_base = 0, initrd_base = 0;
-> @@ -670,6 +671,7 @@ static void ibm_40p_init(MachineState *machine)
->      qdev_connect_gpio_out(dev, 0,
->                            cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
->      sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
-> +    sysbus_connect_irq(pcihost, 1, qdev_get_gpio_in(dev, 13));
->      isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+>      if (op =3D=3D CC_OP_DYNAMIC) {
+> @@ -667,11 +671,11 @@ static inline void gen_op_testl_T0_T1_cc(void)
+>      tcg_gen_and_tl(cpu_cc_dst, cpu_T0, cpu_T1);
+>  }
 >
->      /* Memory controller */
-> @@ -700,9 +702,11 @@ static void ibm_40p_init(MachineState *machine)
->          qdev_prop_set_uint32(dev, "equipment", 0xc0);
->          qdev_init_nofail(dev);
+> -static void gen_op_update_neg_cc(void)
+> +static void gen_op_update_neg_cc(DisasContext *s)
+>  {
+>      tcg_gen_mov_tl(cpu_cc_dst, cpu_T0);
+>      tcg_gen_neg_tl(cpu_cc_src, cpu_T0);
+> -    tcg_gen_movi_tl(cpu_cc_srcT, 0);
+> +    tcg_gen_movi_tl(s->cc_srcT, 0);
+>  }
 >
-> -        dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
-> -                                       "lsi53c810"));
-> -        lsi53c8xx_handle_legacy_cmdline(dev);
-> +        pci = PCI_DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
-> +                                           "lsi53c810"));
-> +        /* Interrupt pin C for fixed LSI SCSI IRQ routing */
-> +        pci->config[PCI_INTERRUPT_PIN] = 0x3;
-> +        lsi53c8xx_handle_legacy_cmdline(DEVICE(pci));
+>  /* compute all eflags to cc_src */
+> @@ -742,7 +746,7 @@ static CCPrepare gen_prepare_eflags_c(DisasContext *s=
+, TCGv reg)
+>          t1 =3D gen_ext_tl(cpu_tmp0, cpu_cc_src, size, false);
+>          /* If no temporary was used, be careful not to alias t1 and t0. =
+ */
+>          t0 =3D t1 =3D=3D cpu_cc_src ? cpu_tmp0 : reg;
+> -        tcg_gen_mov_tl(t0, cpu_cc_srcT);
+> +        tcg_gen_mov_tl(t0, s->cc_srcT);
+>          gen_extu(size, t0);
+>          goto add_sub;
 >
->          /* XXX: s3-trio at PCI_DEVFN(2, 0) */
->          pci_vga_init(pci_bus);
-> --
-> 2.11.0
+> @@ -899,7 +903,7 @@ static CCPrepare gen_prepare_cc(DisasContext *s, int =
+b, TCGv reg)
+>          size =3D s->cc_op - CC_OP_SUBB;
+>          switch (jcc_op) {
+>          case JCC_BE:
+> -            tcg_gen_mov_tl(cpu_tmp4, cpu_cc_srcT);
+> +            tcg_gen_mov_tl(cpu_tmp4, s->cc_srcT);
+>              gen_extu(size, cpu_tmp4);
+>              t0 =3D gen_ext_tl(cpu_tmp0, cpu_cc_src, size, false);
+>              cc =3D (CCPrepare) { .cond =3D TCG_COND_LEU, .reg =3D cpu_tm=
+p4,
+> @@ -912,7 +916,7 @@ static CCPrepare gen_prepare_cc(DisasContext *s, int =
+b, TCGv reg)
+>          case JCC_LE:
+>              cond =3D TCG_COND_LE;
+>          fast_jcc_l:
+> -            tcg_gen_mov_tl(cpu_tmp4, cpu_cc_srcT);
+> +            tcg_gen_mov_tl(cpu_tmp4, s->cc_srcT);
+>              gen_exts(size, cpu_tmp4);
+>              t0 =3D gen_ext_tl(cpu_tmp0, cpu_cc_src, size, true);
+>              cc =3D (CCPrepare) { .cond =3D cond, .reg =3D cpu_tmp4,
+> @@ -1309,11 +1313,11 @@ static void gen_op(DisasContext *s1, int op, TCGM=
+emOp ot, int d)
+>      case OP_SUBL:
+>          if (s1->prefix & PREFIX_LOCK) {
+>              tcg_gen_neg_tl(cpu_T0, cpu_T1);
+> -            tcg_gen_atomic_fetch_add_tl(cpu_cc_srcT, cpu_A0, cpu_T0,
+> +            tcg_gen_atomic_fetch_add_tl(s1->cc_srcT, cpu_A0, cpu_T0,
+>                                          s1->mem_index, ot | MO_LE);
+> -            tcg_gen_sub_tl(cpu_T0, cpu_cc_srcT, cpu_T1);
+> +            tcg_gen_sub_tl(cpu_T0, s1->cc_srcT, cpu_T1);
+>          } else {
+> -            tcg_gen_mov_tl(cpu_cc_srcT, cpu_T0);
+> +            tcg_gen_mov_tl(s1->cc_srcT, cpu_T0);
+>              tcg_gen_sub_tl(cpu_T0, cpu_T0, cpu_T1);
+>              gen_op_st_rm_T0_A0(s1, ot, d);
+>          }
+> @@ -1356,7 +1360,7 @@ static void gen_op(DisasContext *s1, int op, TCGMem=
+Op ot, int d)
+>          break;
+>      case OP_CMPL:
+>          tcg_gen_mov_tl(cpu_cc_src, cpu_T1);
+> -        tcg_gen_mov_tl(cpu_cc_srcT, cpu_T0);
+> +        tcg_gen_mov_tl(s1->cc_srcT, cpu_T0);
+>          tcg_gen_sub_tl(cpu_cc_dst, cpu_T0, cpu_T1);
+>          set_cc_op(s1, CC_OP_SUBB + ot);
+>          break;
+> @@ -4823,7 +4827,7 @@ static target_ulong disas_insn(DisasContext *s, CPU=
+State *cpu)
+>                      gen_op_mov_reg_v(ot, rm, cpu_T0);
+>                  }
+>              }
+> -            gen_op_update_neg_cc();
+> +            gen_op_update_neg_cc(s);
+>              set_cc_op(s, CC_OP_SUBB + ot);
+>              break;
+>          case 4: /* mul */
+> @@ -5283,7 +5287,7 @@ static target_ulong disas_insn(DisasContext *s, CPU=
+State *cpu)
+>                  }
+>              }
+>              tcg_gen_mov_tl(cpu_cc_src, oldv);
+> -            tcg_gen_mov_tl(cpu_cc_srcT, cmpv);
+> +            tcg_gen_mov_tl(s->cc_srcT, cmpv);
+>              tcg_gen_sub_tl(cpu_cc_dst, cmpv, oldv);
+>              set_cc_op(s, CC_OP_SUBB + ot);
+>              tcg_temp_free(oldv);
+> @@ -8463,7 +8467,7 @@ static void i386_tr_init_disas_context(DisasContext=
+Base *dcbase, CPUState *cpu)
+>      cpu_tmp4 =3D tcg_temp_new();
+>      cpu_ptr0 =3D tcg_temp_new_ptr();
+>      cpu_ptr1 =3D tcg_temp_new_ptr();
+> -    cpu_cc_srcT =3D tcg_temp_local_new();
+> +    dc->cc_srcT =3D tcg_temp_local_new();
+>  }
 >
->
+>  static void i386_tr_tb_start(DisasContextBase *db, CPUState *cpu)
 
 
--- 
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+--
+Alex Benn=C3=A9e
