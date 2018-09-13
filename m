@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1g0To3-00079I-90
+	(envelope-from <geert@linux-m68k.org>) id 1g0To3-00079K-LZ
 	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:45:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geert@linux-m68k.org>) id 1g0To2-0002w4-3a
+	(envelope-from <geert@linux-m68k.org>) id 1g0To2-0002wa-AF
 	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:45:23 -0400
-Received: from laurent.telenet-ops.be ([2a02:1800:110:4::f00:19]:41002)
+Received: from michel.telenet-ops.be ([2a02:1800:110:4::f00:18]:50194)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <geert@linux-m68k.org>)
-	id 1g0To1-0002ji-Au
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:45:21 -0400
+	id 1g0To2-0002jk-1E
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:45:22 -0400
 From: Geert Uytterhoeven <geert+renesas@glider.be>
-Date: Thu, 13 Sep 2018 17:44:55 +0200
-Message-Id: <20180913154458.23939-1-geert+renesas@glider.be>
-Subject: [Qemu-devel] [PATCH v4 0/3] vfio/sysbus-fdt: Prepare for Generic DT
- Pass-Through
+Date: Thu, 13 Sep 2018 17:44:56 +0200
+Message-Id: <20180913154458.23939-2-geert+renesas@glider.be>
+In-Reply-To: <20180913154458.23939-1-geert+renesas@glider.be>
+References: <20180913154458.23939-1-geert+renesas@glider.be>
+Subject: [Qemu-devel] [PATCH v4 1/3] vfio/platform: Make the vfio-platform
+ device non-abstract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +28,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>
 Cc: Auger Eric <eric.auger@redhat.com>, Magnus Damm <damm+renesas@opensource.se>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, linux-renesas-soc@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
 
-	Hi all,
+From: Auger Eric <eric.auger@redhat.com>
 
-This patch series prepares for exporting generic devices in DT using
-vfio-platform, providing direct access from a QEMU+KVM guest to the
-exported devices.
+Up to now the vfio-platform device has been abstract and could not be
+instantiated.  The integration of a new vfio platform device required
+creating a dummy derived device which only set the compatible string.
 
-  - Patches 1-2 (submitted before by Eric Auger) make the vfio-platform
-    device non-abstract, incl. matching using a compatible string.
-  - Patch 3 allows dynamic vfio-platform devices again, without needing to
-    create device-specific vfio types for each and every new device.
+Following the few vfio-platform device integrations we have seen the
+actual requested adaptation happens on device tree node creation
+(sysbus-fdt).
 
-This will avoid having to write device-specific instantation methods for
-each and every "simple" device using only a set of generic properties.
-Devices that need more specialized handling will still be able provide
-their own instantation methods.
+Hence remove the abstract setting, and read the list of compatible
+values from sysfs if not set by a derived device.
 
-Note that this series no longer contains "[PATCH 4/4] hw/arm/sysbus-fdt:
-Add support for instantiating generic devices", following advice from Eric
-Auger, as that patch needs more safeguards.  Hence this series now contains
-only preparative work.
+Update the amd-xgbe and calxeda-xgmac drivers to fill in the number of
+compatible values, as there can now be more than one.
 
-Changes compared to v4 ("hw/arm/sysbus-fdt: Generic DT Pass-Through"),
-http://lists.nongnu.org/archive/html/qemu-devel/2018-07/msg05006.html):
+Note that sysbus-fdt does not support the instantiation of the
+vfio-platform device yet.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+[geert: Rebase, set user_creatable=true, use compatible values in sysfs
+	instead of user-supplied manufacturer/model options, reword]
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+v4:
   - Propagate g_file_get_contents() errors through errp,
-  - Add Tested-by (with amd-xgbe),
-  - s/From now on/Soon/ in patch description,
-  - s/sysbus/vfio-platform/ in patch description,
-  - Postpone "[PATCH 4/4] hw/arm/sysbus-fdt: Add support for instantiating
-    generic devices".
 
-Changes compared to v2 (not submitted to the mailing list):
-  - Use the compatible values from sysfs instead of user-supplied
+v3:
+  - Read all compatible values from sysfs instead of using user-supplied
     manufacturer and model options,
-  - Replace "hw/arm/sysbus-fdt: Enable rcar-gen3-gpio dynamic
-    instatiation" by generic "hw/arm/sysbus-fdt: Add support for
-    instantiating generic devices",
-  - Reword patch descriptions,
+  - Reword patch description,
   - Drop RFC state,
-  - Drop "vfio: No-IOMMU mode support".
 
-Changes compared to v1 ("R-Car Gen3 GPIO Pass-Through Prototype (QEMU)",
-https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg02716.html):
-  - Restrict dynamic sysbus devices to TYPE_VFIO_PLATFORM, as suggested
-    by Eric Auger.
+v2:
+  - No changes,
 
-Thanks!
+v1:
+  - Rebase, Set user_creatable=true,
 
-For testing, this patch series, and the postponed "hw/arm/sysbus-fdt: Add
-support for instantiating generic devices" are available in the
-topic/rcar3-virt-gpio-passthrough-v4 branch of my git repository at
-https://github.com/geertu/qemu.git.
-
-This has been tested on a Renesas Salvator-XS board with R-Car H3 ES2.0
-with SATA:
-
-    -device vfio-platform,host=ee300000.sata
-
-and GPIO (needs VFIO No-IOMMU support):
-
-    -device vfio-platform,host=e6055400.gpio
-
-Thanks for applying!
-
-Auger Eric (2):
-  vfio/platform: Make the vfio-platform device non-abstract
-  hw/arm/sysbus-fdt: Allow device matching with DT compatible value
-
-Geert Uytterhoeven (1):
-  hw/arm/virt: Allow dynamic vfio-platform devices again
-
- hw/arm/sysbus-fdt.c             | 61 +++++++++++++++++++++++++--------
- hw/arm/virt.c                   |  1 +
+v0:
+  - Original version from Eric.
+---
  hw/vfio/amd-xgbe.c              |  1 +
  hw/vfio/calxeda-xgmac.c         |  1 +
- hw/vfio/platform.c              | 24 ++++++++++++-
- include/hw/vfio/vfio-platform.h |  3 +-
- 6 files changed, 75 insertions(+), 16 deletions(-)
+ hw/vfio/platform.c              | 24 +++++++++++++++++++++++-
+ include/hw/vfio/vfio-platform.h |  3 ++-
+ 4 files changed, 27 insertions(+), 2 deletions(-)
 
+diff --git a/hw/vfio/amd-xgbe.c b/hw/vfio/amd-xgbe.c
+index 0c4ec4ba25170366..ee64a3b4a2e45bf5 100644
+--- a/hw/vfio/amd-xgbe.c
++++ b/hw/vfio/amd-xgbe.c
+@@ -20,6 +20,7 @@ static void amd_xgbe_realize(DeviceState *dev, Error **errp)
+     VFIOAmdXgbeDeviceClass *k = VFIO_AMD_XGBE_DEVICE_GET_CLASS(dev);
+ 
+     vdev->compat = g_strdup("amd,xgbe-seattle-v1a");
++    vdev->num_compat = 1;
+ 
+     k->parent_realize(dev, errp);
+ }
+diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
+index 24cee6d06512c1b6..e7767c4b021be566 100644
+--- a/hw/vfio/calxeda-xgmac.c
++++ b/hw/vfio/calxeda-xgmac.c
+@@ -20,6 +20,7 @@ static void calxeda_xgmac_realize(DeviceState *dev, Error **errp)
+     VFIOCalxedaXgmacDeviceClass *k = VFIO_CALXEDA_XGMAC_DEVICE_GET_CLASS(dev);
+ 
+     vdev->compat = g_strdup("calxeda,hb-xgmac");
++    vdev->num_compat = 1;
+ 
+     k->parent_realize(dev, errp);
+ }
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 57c4a0ee2b58da70..894333c602eb6fd2 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -655,6 +655,27 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
+         goto out;
+     }
+ 
++    if (!vdev->compat) {
++        GError *gerr = NULL;
++        gchar *contents;
++        gsize length;
++        char *path;
++
++        path = g_strdup_printf("%s/of_node/compatible", vbasedev->sysfsdev);
++        if (!g_file_get_contents(path, &contents, &length, &gerr)) {
++            error_setg(errp, "%s", gerr->message);
++            g_error_free(gerr);
++            return;
++        }
++        g_free(path);
++        vdev->compat = contents;
++        for (vdev->num_compat = 0; length; vdev->num_compat++) {
++            size_t skip = strlen(contents) + 1;
++            contents += skip;
++            length -= skip;
++        }
++    }
++
+     for (i = 0; i < vbasedev->num_regions; i++) {
+         if (vfio_region_mmap(vdev->regions[i])) {
+             error_report("%s mmap unsupported. Performance may be slow",
+@@ -700,6 +721,8 @@ static void vfio_platform_class_init(ObjectClass *klass, void *data)
+     dc->desc = "VFIO-based platform device assignment";
+     sbc->connect_irq_notifier = vfio_start_irqfd_injection;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    /* Supported by TYPE_VIRT_MACHINE */
++    dc->user_creatable = true;
+ }
+ 
+ static const TypeInfo vfio_platform_dev_info = {
+@@ -708,7 +731,6 @@ static const TypeInfo vfio_platform_dev_info = {
+     .instance_size = sizeof(VFIOPlatformDevice),
+     .class_init = vfio_platform_class_init,
+     .class_size = sizeof(VFIOPlatformDeviceClass),
+-    .abstract   = true,
+ };
+ 
+ static void register_vfio_platform_dev_type(void)
+diff --git a/include/hw/vfio/vfio-platform.h b/include/hw/vfio/vfio-platform.h
+index 9baaa2db09b84f3e..0ee10b1d71ed2503 100644
+--- a/include/hw/vfio/vfio-platform.h
++++ b/include/hw/vfio/vfio-platform.h
+@@ -54,7 +54,8 @@ typedef struct VFIOPlatformDevice {
+     QLIST_HEAD(, VFIOINTp) intp_list; /* list of IRQs */
+     /* queue of pending IRQs */
+     QSIMPLEQ_HEAD(pending_intp_queue, VFIOINTp) pending_intp_queue;
+-    char *compat; /* compatibility string */
++    char *compat; /* DT compatible values, separated by NUL */
++    unsigned int num_compat; /* number of compatible values */
+     uint32_t mmap_timeout; /* delay to re-enable mmaps after interrupt */
+     QEMUTimer *mmap_timer; /* allows fast-path resume after IRQ hit */
+     QemuMutex intp_mutex; /* protect the intp_list IRQ state */
 -- 
 2.17.1
-
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
