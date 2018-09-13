@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0Moy-0004Z6-5R
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:17:52 -0400
+	(envelope-from <famz@redhat.com>) id 1g0Mrh-0005Vd-UX
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0Mot-0001ej-5Z
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:17:52 -0400
-Received: from mail-by2nam05on0618.outbound.protection.outlook.com
-	([2a01:111:f400:fe52::618]:13088
-	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Suravee.Suthikulpanit@amd.com>)
-	id 1g0Mos-0001cc-HP
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:17:47 -0400
-References: <1536684589-11718-1-git-send-email-brijesh.singh@amd.com>
-	<1536684589-11718-3-git-send-email-brijesh.singh@amd.com>
-	<20180912035214.GC3829@xz-x1>
-	<9ecccc2d-9274-36c1-c0a5-56a24836d075@amd.com>
-	<20180913031503.GC10763@xz-x1>
-From: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Message-ID: <c6d1e6be-18ba-a078-3464-2f7f539dc626@amd.com>
-Date: Thu, 13 Sep 2018 15:15:27 +0700
+	(envelope-from <famz@redhat.com>) id 1g0Mrg-0005Ge-LH
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 04:20:41 -0400
+Date: Thu, 13 Sep 2018 16:20:29 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180913082029.GO2526@lemon.usersys.redhat.com>
+References: <20180913023134.3853-1-yuchenlin@synology.com>
+	<20180913025413.GA22356@lemon.usersys.redhat.com>
+	<bb2481b8c9855a818c1228136102a518@synology.com>
 MIME-Version: 1.0
-In-Reply-To: <20180913031503.GC10763@xz-x1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] x86_iommu/amd: Prepare for interrupt
- remap support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bb2481b8c9855a818c1228136102a518@synology.com>
+Subject: Re: [Qemu-devel] [PATCH v2] vmdk: align end of file to a sector
+ boundary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,64 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, Tom Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: yuchenlin <yuchenlin@synology.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Brijesh / Peter,
+On Thu, 09/13 15:47, yuchenlin wrote:
+> On 2018-09-13 10:54, Fam Zheng wrote:
+> > On Thu, 09/13 10:31, yuchenlin@synology.com wrote:
+> > > From: yuchenlin <yuchenlin@synology.com>
+> > > 
+> > > There is a rare case which the size of last compressed cluster
+> > > is larger than the cluster size, which will cause the file is
+> > > not aligned at the sector boundary.
+> > 
+> > The code looks good to me. Can you also explain why it is important to
+> > align
+> > file size to sector boundary in the comment?
+> > 
+> > Fam
+> > 
+> 
+> In my opinion, there are three reasons to do it. First, if vmdk doesn't
+> align at the sector boundary, there may be many undefined behaviors, such as
+> in vbox it will show VMDK: Compressed image is corrupted '88-disk1.vmdk'
+> (VERR_ZIP_CORRUPTED) when we try to import an ova with unaligned vmdk.
+> Second, all the cluster_sector is aligned
+> to sector, the last one should be like this, too. Third, it ease reading
+> with sector based I/Os.
+> 
+> What do you think?
 
-On 9/13/18 10:15 AM, Peter Xu wrote:
-> On Wed, Sep 12, 2018 at 01:59:06PM -0500, Brijesh Singh wrote:
-> 
-> [...]
-> 
->>>>        }
->>>>        return &iommu_as[devfn]->as;
->>>>    }
->>>> @@ -1172,6 +1274,10 @@ static void amdvi_realize(DeviceState *dev, Error **err)
->>>>            return;
->>>>        }
->>>> +    /* Pseudo address space under root PCI bus. */
->>>> +    pcms->ioapic_as = amdvi_host_dma_iommu(bus, s, AMDVI_SB_IOAPIC_ID);
->>>> +    s->intr_enabled = x86_iommu->intr_supported;
->>>
->>> So does this mean that AMD IR cannot be disabled if declared support?
->>> For VT-d, IR needs to be explicitly enabled otherwise disabled (even
->>> supported).
->>>
->>
->>
->> Yes, once its declared as supported then it can not disabled. Its
->> upto the guest OS to decide whether it want to use the intr remapping
->> feature by parsing the IVRS. This also brings question, should we
->> just enable it by default because its guest OS decision whether it
->> wants to use it or not.
-> 
-> It's by default off?  I mean:
-> 
->      DEFINE_PROP_BOOL("intremap", X86IOMMUState, intr_supported, false),
-> 
-> Then it's good to me, thanks.  You could add a comment there
-> explicitly mentioning that "IR will be enabled as long as declared
-> support for AMD" since it might confuse some of the people like me...
-> but it's optional.
-> 
-> Regards,
-> 
+Yes, it would be nice if you could add this information to the commit message or
+the code comment.
 
-Actually, there are two separate knobs here:
+Fam
 
-* This option basically means the interrupt remapping support is available/unavailable,
-   which should default to available unless specified to unavailable at the QEMU command line.
-   For example, the AMD IOMMU v1 does not have interrupt remapping support, which means
-   the interrupt remapping bit fields in DTE (e.g. IV, IntCtl, EIntPass, INITPass, NMIPass,
-   Lint0Pass, Lint1Pass) are ignored.
-
-* If interrupt remapping support is available, the guest OS can decide to enable or disable the feature
-   using DTE bit fileds (e.g. Linux option intremap=off would disable interrupt remapping
-   by not setting DTE[IV] bit). For Linux AMD IOMMU driver, the default is to enable the interrupt remapping.
-
-In facts, we should not need this option. However, if you prefer to keep this option,
-we probably should rename this to "intremap_sup", in which if the default value should be 1.
-
-Regards,
-Suravee
+> 
+> yuchenlin
+> 
+> > > 
+> > > Signed-off-by: yuchenlin <yuchenlin@synology.com>
+> > > ---
+> > > v1 -> v2:
+> > > * Add more detail comment.
+> > > * Add QEMU_ALIGN_UP to show the intention more clearly.
+> > > * Add newline in the end of bdrv_truncate.
+> > > 
+> > > thanks
+> > > 
+> > >  block/vmdk.c | 21 +++++++++++++++++++++
+> > >  1 file changed, 21 insertions(+)
+> > > 
+> > > diff --git a/block/vmdk.c b/block/vmdk.c
+> > > index a9d0084e36..2c9e86d98f 100644
+> > > --- a/block/vmdk.c
+> > > +++ b/block/vmdk.c
+> > > @@ -1698,6 +1698,27 @@ static int coroutine_fn
+> > >  vmdk_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+> > >                             uint64_t bytes, QEMUIOVector *qiov)
+> > >  {
+> > > +    if (bytes == 0) {
+> > > +        /* The caller will write bytes 0 to signal EOF.
+> > > +         * When receive it, we align EOF to a sector boundary. */
+> > > +        BDRVVmdkState *s = bs->opaque;
+> > > +        int i, ret;
+> > > +        int64_t length;
+> > > +
+> > > +        for (i = 0; i < s->num_extents; i++) {
+> > > +            length = bdrv_getlength(s->extents[i].file->bs);
+> > > +            if (length < 0) {
+> > > +                return length;
+> > > +            }
+> > > +            length = QEMU_ALIGN_UP(length, BDRV_SECTOR_SIZE);
+> > > +            ret = bdrv_truncate(s->extents[i].file, length,
+> > > +                                PREALLOC_MODE_OFF, NULL);
+> > > +            if (ret < 0) {
+> > > +                return ret;
+> > > +            }
+> > > +        }
+> > > +        return 0;
+> > > +    }
+> > >      return vmdk_co_pwritev(bs, offset, bytes, qiov, 0);
+> > >  }
+> > > 
+> > > --
+> > > 2.18.0
+> > > 
+> 
