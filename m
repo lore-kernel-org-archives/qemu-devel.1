@@ -1,22 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0SeZ-00044E-Sz
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:31:32 -0400
+	(envelope-from <jjherne@linux.ibm.com>) id 1g0Smm-0007QD-Ja
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:40:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0SeZ-0005bf-5r
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:31:31 -0400
-References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-3-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <f3020321-0cf3-07c1-30e2-e3f302e0ba97@redhat.com>
-Date: Thu, 13 Sep 2018 16:31:10 +0200
+	(envelope-from <jjherne@linux.ibm.com>) id 1g0Smj-0003RQ-9w
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:40:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+	id 1g0Smj-0003R2-1y
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:39:57 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w8DEdoST014367
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 10:39:55 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2mfppygsvt-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 10:39:51 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <jjherne@linux.ibm.com>;
+	Thu, 13 Sep 2018 08:39:32 -0600
+Reply-To: jjherne@linux.ibm.com
+References: <1530811543-6881-1-git-send-email-jjherne@linux.ibm.com>
+	<1530811543-6881-9-git-send-email-jjherne@linux.ibm.com>
+	<7e74ef35-e925-30d9-b81d-33fa5a9ce468@redhat.com>
+	<74536138-61d8-3003-c5cc-360e9ecc9d67@linux.ibm.com>
+	<ce0d3b85-91ab-81ed-2469-866d97b58a99@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Date: Thu, 13 Sep 2018 10:39:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180913125217.23173-3-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AL80XG6JUcbRgxaAmcwmNauTMoEsnTuPg"
-Subject: Re: [Qemu-devel] [PATCH v2 02/17] blockjob: Wake up BDS when job
- becomes idle
+In-Reply-To: <ce0d3b85-91ab-81ed-2469-866d97b58a99@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <cb5aa71d-0fa6-1450-0a75-dec18dc42065@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [RFC 08/15] s390-bios: Map low core
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +47,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, pasic@linux.ibm.com, bjsdjshi@linux.ibm.com, borntraeger@de.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AL80XG6JUcbRgxaAmcwmNauTMoEsnTuPg
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <f3020321-0cf3-07c1-30e2-e3f302e0ba97@redhat.com>
-Subject: Re: [PATCH v2 02/17] blockjob: Wake up BDS when job becomes idle
-References: <20180913125217.23173-1-kwolf@redhat.com>
- <20180913125217.23173-3-kwolf@redhat.com>
-In-Reply-To: <20180913125217.23173-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/13/2018 01:25 AM, Thomas Huth wrote:
+> On 2018-09-10 16:17, Jason J. Herne wrote:
+>> On 07/17/2018 02:10 PM, Thomas Huth wrote:
+>>> On 05.07.2018 19:25, Jason J. Herne wrote:
+>>>> From: "Jason J. Herne" <jjherne@linux.vnet.ibm.com>
+...
+>>>
+>>> The names of the fields look exactly the same as in the Linux kernel ...
+>>> maybe credit them at least in the patch description?
+>>
+>> Due to some internal issues and bug hunting this has been on the back
+>> burner for a while. Getting back into it now...
+>>
+>> I took lowcore from Qemu code, not the kernel. target/s390x/internal.h.
+> 
+> Ok, fair, then never mind.
+> 
+> Just another thought: We've got a couple of structs and defines already
+> that we share between the s390-ccw bios and the "normal" QEMU code ...
+> maybe we should define a common set of headers that could be used by
+> both parts? And put these in includes/hw/s390x/ and let the s390-ccw
+> bios code include headers from that folder, too? Or would that be too
+> confusing and we better should keep everything separated (and duplicated)?
+> 
+>   Thomas
+> 
+> 
 
-On 13.09.18 14:52, Kevin Wolf wrote:
-> In the context of draining a BDS, the .drained_poll callback of block
-> jobs is called. If this returns true (i.e. there is still some activity=
+I originally thought the same thing. But the issue is that we already 
+duplicate a fair amount code and headers from Qemu for the bios. SCLP, 
+most i/o routines, some basic machine level stuff, etc. I'd like to see 
+a cleanup effort to consolidate this code, but I feel like it would be 
+far too much for this patch set.
 
-> pending), the drain operation may call aio_poll() with blocking=3Dtrue =
-to
-> wait for completion.
->=20
-> As soon as the pending activity is completed and the job finally arrive=
-s
-> in a quiescent state (i.e. its coroutine either yields with busy=3Dfals=
-e
-> or terminates), the block job must notify the aio_poll() loop to wake
-> up, otherwise we get a deadlock if both are running in different
-> threads.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> ---
->  include/block/blockjob.h | 13 +++++++++++++
->  include/qemu/job.h       |  3 +++
->  blockjob.c               | 18 ++++++++++++++++++
->  job.c                    |  7 +++++++
->  4 files changed, 41 insertions(+)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---AL80XG6JUcbRgxaAmcwmNauTMoEsnTuPg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluadK4ACgkQ9AfbAGHV
-z0A8JAf/RbhUhmPlv/yCt8If6Xd/3HmGwd3nR/s8CzndBy9NyxpY8IE0v8/j6+UK
-xYGDJMY/t8DlNEE5CNNfXbAztxDir8E/42fxmBAQtGeO8mUjvaq1OHwJ/6h3Gj4j
-mUc4XCIv9PftDLkUWTsBJo6TMJepMj/orPT0PSzD1D8ykdjyb0P3ewU+XXoULIuX
-hRA8fk17bFutXhoxoSzfdFsGMavcsM1CizZ9HmwXxJa9SBeyZWyZCSV4NRDm9xAF
-YPalt7ekCc89oVrud0TDKfqEg31MKolcpTvtwT7748BOscOQjWcEnEXwh0xVXHeg
-iswESYHGW+E4WL63xaaIQkXGcSHqCQ==
-=B01A
------END PGP SIGNATURE-----
-
---AL80XG6JUcbRgxaAmcwmNauTMoEsnTuPg--
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
