@@ -1,42 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1g0SDR-0000gr-LH
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:03:30 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1g0SV6-0006xy-4R
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.ibm.com>) id 1g0SDN-0001Pz-3d
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:03:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57035
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
-	id 1g0SDM-0001PG-SJ
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:03:25 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w8DE2jAM009791
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 10:03:23 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2mfs7dgbjm-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 10:03:22 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
-	Thu, 13 Sep 2018 10:03:17 -0400
-References: <1536782900-17656-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1536782900-17656-7-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<386188b7-d6ae-b317-23b9-40c2779386bf@redhat.com>
-From: Tony Krowiak <akrowiak@linux.ibm.com>
-Date: Thu, 13 Sep 2018 10:03:08 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1g0SV5-0006G8-0x
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 10:21:44 -0400
 MIME-Version: 1.0
-In-Reply-To: <386188b7-d6ae-b317-23b9-40c2779386bf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <bc7d07f9-2898-d02d-5452-a8aceff55da9@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v8 6/6] s390: doc: detailed
- specifications for AP virtualization
+References: <20180908090820.15591-1-mark.cave-ayland@ilande.co.uk>
+	<20180908090820.15591-4-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180908090820.15591-4-mark.cave-ayland@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Thu, 13 Sep 2018 16:21:30 +0200
+Message-ID: <CACXAS8Bc=1DrjUoyYBc5u4FYiYagXHZUGmSfAJ_Np0Ns9hwjJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] 40p: add fixed IRQ routing for LSI
+ SCSI device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,38 +23,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel <qemu-devel@nongnu.org>, "open list:PReP" <qemu-ppc@nongnu.org>
 
-On 09/13/2018 02:06 AM, Thomas Huth wrote:
-> On 2018-09-12 22:08, Tony Krowiak wrote:
->> This patch provides documentation describing the AP architecture and
->> design concepts behind the virtualization of AP devices. It also
->> includes an example of how to configure AP devices for exclusive
->> use of KVM guests.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
->> ---
-> [...]
->> +   To assign an AP adapter to the mediated matrix device, its APID is written
->> +   to the 'assign_adapter' file. This may be done multiple times to assign more
->> +   than one adapter. The APID may be specified using conventional semantics
->> +   as a decimal, hexidecimal, or octal number. For example, to assign adapters
->> +   4, 5 and 16 to a mediated matrix device in decimal, hexidecimal and octal
-> s/hexidecimal/hexadecimal/g ?
+On Sat, Sep 8, 2018 at 11:11 AM Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
 >
-> While some websites say that hexi is an alternative spelling, I have to
-> admit that I've never seen it before, and there are also not that much
-> hits on google when you search for it...
->
-> [...]
->> +* Live guest migration is not supported for guests using AP devices.
->> \ No newline at end of file
->>
-> Please add a newline at the end of the file.
->
->   Thomas
+> Whilst the PReP specification describes how all PCI IRQs are routed via IRQ
+> 15 on the interrupt controller, the real 40p machine has routing quirk in
+> that the LSI SCSI device is routed to IRQ 13.
 
-Okay
+Is it a routing quirk or does 40p use both 15 and 13?
+I used both in my AIX experiments and AIX seemed to be happy about it.
+But maybe AIX simply doesn't care as long as the residual data is correct.
 
+Artyom
+
+> This is implemented using a little hack: the existing IRQ routing code uses
+> (irq_num + (pci_dev->devfn >> 3)) & 1 to give the PCI interrupt pin, where
+> the "& 1" ensures that the only pins A and B (0 and 1) will ever be used.
 >
+> Rather than fix the mask to "& 3" we leave the existing routing above as-is
+> and then force the LSI SCSI device to use pin C (2). This enables us to
+> route pin 2 permanantly to IRQ 13 since the LSI SCSI device will be its
+> only user.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/pci-host/prep.c | 35 +++++++++++++++++++++++++++++++++--
+>  hw/ppc/prep.c      | 10 +++++++---
+>  2 files changed, 40 insertions(+), 5 deletions(-)
+>
+> diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+> index b1b6b16bad..87270605b5 100644
+> --- a/hw/pci-host/prep.c
+> +++ b/hw/pci-host/prep.c
+> @@ -58,6 +58,7 @@ typedef struct PRePPCIState {
+>
+>      qemu_or_irq *or_irq;
+>      qemu_irq pci_irqs[PCI_NUM_PINS];
+> +    qemu_irq scsi_irq;
+>      PCIBus pci_bus;
+>      AddressSpace pci_io_as;
+>      MemoryRegion pci_io;
+> @@ -192,14 +193,41 @@ static const MemoryRegionOps raven_io_ops = {
+>
+>  static int raven_map_irq(PCIDevice *pci_dev, int irq_num)
+>  {
+> -    return (irq_num + (pci_dev->devfn >> 3)) & 1;
+> +    switch (pci_dev->devfn) {
+> +    case PCI_DEVFN(1, 0):
+> +        /* Whilst legacy PReP machine exists we need to make
+> +         * sure that this fixed interrupt routing is 40p only */
+> +        if (strcmp(object_get_typename(OBJECT(pci_dev)),
+> +                                       "lsi53c810") == 0) {
+> +            /* LSI SCSI */
+> +            return 2;
+> +        } else {
+> +            /* Normal PCI IRQ mapping */
+> +            return (irq_num + (pci_dev->devfn >> 3)) & 1;
+> +        }
+> +    default:
+> +        /* Normal PCI IRQ mapping */
+> +        return (irq_num + (pci_dev->devfn >> 3)) & 1;
+> +    }
+>  }
+>
+>  static void raven_set_irq(void *opaque, int irq_num, int level)
+>  {
+>      PREPPCIState *s = opaque;
+>
+> -    qemu_set_irq(s->pci_irqs[irq_num], level);
+> +    if (s->is_legacy_prep) {
+> +        qemu_set_irq(s->pci_irqs[irq_num], level);
+> +    } else {
+> +        switch (irq_num) {
+> +        case 2:
+> +            /* LSI SCSI */
+> +            qemu_set_irq(s->scsi_irq, level);
+> +            break;
+> +        default:
+> +            /* Normal PCI IRQ mapping */
+> +            qemu_set_irq(s->pci_irqs[irq_num], level);
+> +        }
+> +    }
+>  }
+>
+>  static AddressSpace *raven_pcihost_set_iommu(PCIBus *bus, void *opaque,
+> @@ -242,6 +270,9 @@ static void raven_pcihost_realizefn(DeviceState *d, Error **errp)
+>          for (i = 0; i < PCI_NUM_PINS; i++) {
+>              s->pci_irqs[i] = qdev_get_gpio_in(DEVICE(s->or_irq), i);
+>          }
+> +
+> +        /* 40p LSI SCSI has fixed routing via IRQ 13 */
+> +        sysbus_init_irq(dev, &s->scsi_irq);
+>      }
+>
+>      qdev_init_gpio_in(d, raven_change_gpio, 1);
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 615865e46c..0412a56d98 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -626,6 +626,7 @@ static void ibm_40p_init(MachineState *machine)
+>      Nvram *m48t59 = NULL;
+>      PCIBus *pci_bus;
+>      ISABus *isa_bus;
+> +    PCIDevice *pci;
+>      void *fw_cfg;
+>      int i;
+>      uint32_t kernel_base = 0, initrd_base = 0;
+> @@ -670,6 +671,7 @@ static void ibm_40p_init(MachineState *machine)
+>      qdev_connect_gpio_out(dev, 0,
+>                            cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
+>      sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
+> +    sysbus_connect_irq(pcihost, 1, qdev_get_gpio_in(dev, 13));
+>      isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+>
+>      /* Memory controller */
+> @@ -700,9 +702,11 @@ static void ibm_40p_init(MachineState *machine)
+>          qdev_prop_set_uint32(dev, "equipment", 0xc0);
+>          qdev_init_nofail(dev);
+>
+> -        dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
+> -                                       "lsi53c810"));
+> -        lsi53c8xx_handle_legacy_cmdline(dev);
+> +        pci = PCI_DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
+> +                                           "lsi53c810"));
+> +        /* Interrupt pin C for fixed LSI SCSI IRQ routing */
+> +        pci->config[PCI_INTERRUPT_PIN] = 0x3;
+> +        lsi53c8xx_handle_legacy_cmdline(DEVICE(pci));
+>
+>          /* XXX: s3-trio at PCI_DEVFN(2, 0) */
+>          pci_vga_init(pci_bus);
+> --
+> 2.11.0
+>
+>
+
+
+-- 
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
