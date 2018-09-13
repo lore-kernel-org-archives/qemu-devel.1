@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0Nft-0004L4-4j
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 05:12:34 -0400
+	(envelope-from <clg@kaod.org>) id 1g0Nx4-0007O5-S0
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 05:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0Nfs-0006Qf-59
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 05:12:33 -0400
-References: <20180910145616.8598-1-famz@redhat.com>
-	<20180910145616.8598-3-famz@redhat.com>
-	<9f4907a3-e96e-131c-a032-1669d0c09bc8@redhat.com>
-	<20180911141245.GQ19292@lemon.usersys.redhat.com>
-	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
-	<20180912013134.GA2526@lemon.usersys.redhat.com>
-	<3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
-	<20180912115020.GH2526@lemon.usersys.redhat.com>
-	<ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
-	<20180913060351.GK2526@lemon.usersys.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <44c472ba-a9ff-7c64-6406-f528a7e0f463@redhat.com>
-Date: Thu, 13 Sep 2018 11:11:57 +0200
+	(envelope-from <clg@kaod.org>) id 1g0Nx1-0006Hw-Ja
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 05:30:18 -0400
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:44837)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g0Nx1-0006DF-D4
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 05:30:15 -0400
+Received: from player760.ha.ovh.net (unknown [10.109.159.62])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id D52AEF4AA0
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 11:30:06 +0200 (CEST)
+References: <20180911055503.2303-1-clg@kaod.org>
+	<20180911055503.2303-3-clg@kaod.org>
+	<20180913022534.GU7978@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <40d86635-fe58-f642-336d-c1df91344073@kaod.org>
+Date: Thu, 13 Sep 2018 11:30:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180913060351.GK2526@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180913022534.GU7978@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] virtio-scsi/virtio-blk: Disable poll
- handlers when stopping vq handler
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] spapr: increase the size of the IRQ
+ number space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,36 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, peterx@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
-On 13/09/2018 08:03, Fam Zheng wrote:
-> On Wed, 09/12 14:42, Paolo Bonzini wrote:
->> On 12/09/2018 13:50, Fam Zheng wrote:
->>>> I think it's okay if it is invoked.  The sequence is first you stop the
->>>> vq, then you drain the BlockBackends, then you switch AioContext.  All
->>>> that matters is the outcome when virtio_scsi_dataplane_stop returns.
->>> Yes, but together with vIOMMU, it also effectively leads to a virtio_error(),
->>> which is not clean. QEMU stderr when this call happens (with patch 1 but not
->>> this patch):
->>>
->>> 2018-09-12T11:48:10.193023Z qemu-system-x86_64: vtd_iommu_translate: detected translation failure (dev=02:00:00, iova=0x0)
->>> 2018-09-12T11:48:10.193044Z qemu-system-x86_64: New fault is not recorded due to compression of faults
->>> 2018-09-12T11:48:10.193061Z qemu-system-x86_64: virtio: zero sized buffers are not allowed
+On 09/13/2018 04:25 AM, David Gibson wrote:
+> On Tue, Sep 11, 2018 at 07:55:03AM +0200, C=E9dric Le Goater wrote:
+>> The new layout using static IRQ number does not leave much space to
+>> the dynamic MSI range, only 0x100 IRQ numbers. Increase the total
+>> number of IRQS for newer machines and introduce a legacy XICS backend
+>> for pre-3.1 machines to maintain compatibility.
 >>
->> But with iothread, virtio_scsi_dataplane_stop runs in another thread
->> than the iothread; in that case you still have a race where the iothread
->> can process the vq before aio_disable_external and print the error.
+>> For the old backend, provide a 'nr_msis' value covering the full IRQ
+>> number space as it does not use the bitmap allocator to allocate MSI
+>> interrupt numbers.
 >>
->> IIUC the guest has cleared the IOMMU page tables _before_ clearing the
->> DRIVER_OK bit in the status field.  Could this be a guest bug?
-> 
-> I'm not sure if it is a bug or not. I think what happens is the device is left
-> enabled by Seabios, and then reset by kernel.
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> Applied to ppc-for-3.1, thanks.
 
-That makes sense, though I'm not sure why QEMU needs to process a
-request long after SeaBIOS has left control to Linux.  Maybe it's just
-that the messages should not go on QEMU stderr, and rather trace-point
-should be enough.
+I think we are ready for Xive now ?
 
-Paolo
+The patchset is organized as below. The patches tagged v4 have not change=
+d but the others have and a resend will be needed.=20
+
+* Device models for Source, Router, EQs, Presenter, Controller :
+
+  ppc/xive: introduce a XIVE interrupt source model (v4)
+  ppc/xive: add support for the LSI interrupt sources (v4)
+  ppc/xive: introduce the XiveFabric interface (v4)
+  ppc/xive: introduce the XiveRouter model (v4)
+  ppc/xive: introduce the XIVE Event Queues (v4)
+  ppc/xive: add support for the EQ Event State buffers (v4)
+  ppc/xive: introduce the XIVE interrupt thread context (v4)
+  ppc/xive: introduce a simplified XIVE presenter (v4)
+  ppc/xive: notify the CPU when the interrupt priority is more privileged=
+ (v4)
+  spapr/xive: introduce a XIVE interrupt controller (v4)
+  spapr/xive: use the VCPU id as a VP identifier (v5)
+
+* Integration in the sPAPR machine (we can add pnv also)
+
+  spapr: initialize VSMT before initializing the IRQ backend  (v5)
+  spapr: introdude a new machine IRQ backend for XIVE  (v5)
+  spapr: add hcalls support for the XIVE exploitation interrupt mode  (v5=
+)
+  spapr: add device tree support for the XIVE exploitation mode  (v5)
+  spapr: allocate the interrupt thread context under the CPU core  (v5)
+  spapr: add a 'pseries-3.1-xive' machine type (v5)
+
+
+* KVM support (KVM XIVE device interfaces)
+
+  spapr: add classes for the XIVE models (v5+)
+  target/ppc/kvm: add Linux KVM definitions for XIVE (v5+)
+  spapr/xive: add models for KVM support (v5+)
+ =20
+* KVM migration (more KVM XIVE device interfaces)
+
+  spapr/xive: add migration support for KVM (v5+)
+  spapr: fix XICS migration  (v5+)
+
+
+Greg is giving it some tests on TCG and now KVM as XIVE is a building=20
+block for the OpenCAPI passthrough.=20
+
+Thanks,
+
+C.
