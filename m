@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0LrV-0004Fr-S4
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:16:26 -0400
+	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0Lrp-0004Oj-N6
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:16:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0LrU-0005AY-QJ
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:16:25 -0400
-Date: Thu, 13 Sep 2018 15:16:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180913071615.GM2526@lemon.usersys.redhat.com>
-References: <20180912171040.1732-1-pbonzini@redhat.com>
-	<20180912171040.1732-3-pbonzini@redhat.com>
+	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0Lrl-0005IB-3O
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:16:45 -0400
+Received: from mail-bn3nam01on0075.outbound.protection.outlook.com
+	([104.47.33.75]:43952
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Suravee.Suthikulpanit@amd.com>)
+	id 1g0Lrk-0005HW-JS
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:16:40 -0400
+References: <1536684589-11718-1-git-send-email-brijesh.singh@amd.com>
+	<1536684589-11718-6-git-send-email-brijesh.singh@amd.com>
+From: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Message-ID: <89321021-de13-0074-8791-988afb5dd21e@amd.com>
+Date: Thu, 13 Sep 2018 14:16:11 +0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180912171040.1732-3-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] aio-posix: compute timeout before
- polling
+In-Reply-To: <1536684589-11718-6-git-send-email-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/6] x86_iommu/amd: Add interrupt remap
+ support when VAPIC is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,172 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, stefanha@redhat.com
+To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tom Lendacky <Thomas.Lendacky@amd.com>
 
-On Wed, 09/12 19:10, Paolo Bonzini wrote:
-> This is a preparation for the next patch, and also a very small
-> optimization.  Compute the timeout only once, before invoking
-> try_poll_mode, and adjust it in run_poll_handlers.  The adjustment
-> is the polling time when polling fails, or zero (non-blocking) if
-> polling succeeds.
+Brijesh,
+
+On 9/11/18 11:49 PM, Brijesh Singh wrote:
+> Emulate the interrupt remapping support when guest virtual APIC is
+> enabled.
 > 
-> Fixes: 70232b5253a3c4e03ed1ac47ef9246a8ac66c6fa
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> See IOMMU spec:https://support.amd.com/TechDocs/48882_IOMMU.pdf
+> (section 2.2.5.2) for details information.
+> 
+> When VAPIC is enabled, it uses interrupt remapping as defined in
+> Table 22 and Figure 17 from IOMMU spec.
+> 
+> Cc: "Michael S. Tsirkin"<mst@redhat.com>
+> Cc: Paolo Bonzini<pbonzini@redhat.com>
+> Cc: Richard Henderson<rth@twiddle.net>
+> Cc: Eduardo Habkost<ehabkost@redhat.com>
+> Cc: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+> Cc: Tom Lendacky<Thomas.Lendacky@amd.com>
+> Cc: Suravee Suthikulpanit<Suravee.Suthikulpanit@amd.com>
+> Signed-off-by: Brijesh Singh<brijesh.singh@amd.com>
 > ---
->  util/aio-posix.c  | 59 +++++++++++++++++++++++++++--------------------
->  util/trace-events |  4 ++--
->  2 files changed, 36 insertions(+), 27 deletions(-)
-> 
-> diff --git a/util/aio-posix.c b/util/aio-posix.c
-> index 5c29380575..21d8987179 100644
-> --- a/util/aio-posix.c
-> +++ b/util/aio-posix.c
-> @@ -490,7 +490,7 @@ static void add_pollfd(AioHandler *node)
->      npfd++;
->  }
->  
-> -static bool run_poll_handlers_once(AioContext *ctx)
-> +static bool run_poll_handlers_once(AioContext *ctx, int64_t *timeout)
->  {
->      bool progress = false;
->      AioHandler *node;
-> @@ -500,6 +500,7 @@ static bool run_poll_handlers_once(AioContext *ctx)
->              aio_node_check(ctx, node->is_external) &&
->              node->io_poll(node->opaque) &&
->              node->opaque != &ctx->notifier) {
-> +            *timeout = 0;
->              progress = true;
->          }
->  
-> @@ -522,31 +523,38 @@ static bool run_poll_handlers_once(AioContext *ctx)
->   *
->   * Returns: true if progress was made, false otherwise
->   */
-> -static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
-> +static bool run_poll_handlers(AioContext *ctx, int64_t max_ns, int64_t *timeout)
->  {
->      bool progress;
-> -    int64_t end_time;
-> +    int64_t start_time, elapsed_time;
->  
->      assert(ctx->notify_me);
->      assert(qemu_lockcnt_count(&ctx->list_lock) > 0);
->  
-> -    trace_run_poll_handlers_begin(ctx, max_ns);
-> -
-> -    end_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + max_ns;
-> +    trace_run_poll_handlers_begin(ctx, max_ns, *timeout);
->  
-> +    start_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->      do {
-> -        progress = run_poll_handlers_once(ctx);
-> -    } while (!progress && qemu_clock_get_ns(QEMU_CLOCK_REALTIME) < end_time
-> +        progress = run_poll_handlers_once(ctx, timeout);
-> +        elapsed_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time;
-> +    } while (!progress && elapsed_time < max_ns
->               && !atomic_read(&ctx->poll_disable_cnt));
->  
-> -    trace_run_poll_handlers_end(ctx, progress);
-> +    /* If time has passed with no successful polling, adjust *timeout to
-> +     * keep the same ending time.
-> +     */
-> +    if (*timeout != -1) {
-> +        *timeout -= MIN(*timeout, elapsed_time);
-> +    }
->  
-> +    trace_run_poll_handlers_end(ctx, progress, *timeout);
->      return progress;
->  }
->  
->  /* try_poll_mode:
->   * @ctx: the AioContext
-> - * @blocking: busy polling is only attempted when blocking is true
-> + * @timeout: timeout for blocking wait, computed by the caller and updated if
-> + *    polling succeeds.
->   *
->   * ctx->notify_me must be non-zero so this function can detect aio_notify().
->   *
-> @@ -554,19 +562,16 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
->   *
->   * Returns: true if progress was made, false otherwise
->   */
-> -static bool try_poll_mode(AioContext *ctx, bool blocking)
-> +static bool try_poll_mode(AioContext *ctx, int64_t *timeout)
->  {
-> -    if (blocking && ctx->poll_max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
-> -        /* See qemu_soonest_timeout() uint64_t hack */
-> -        int64_t max_ns = MIN((uint64_t)aio_compute_timeout(ctx),
-> -                             (uint64_t)ctx->poll_ns);
-> +    /* See qemu_soonest_timeout() uint64_t hack */
-> +    int64_t max_ns = MIN((uint64_t)*timeout, (uint64_t)ctx->poll_ns);
->  
-> -        if (max_ns) {
-> -            poll_set_started(ctx, true);
-> +    if (max_ns && !atomic_read(&ctx->poll_disable_cnt)) {
-> +        poll_set_started(ctx, true);
->  
-> -            if (run_poll_handlers(ctx, max_ns)) {
-> -                return true;
-> -            }
-> +        if (run_poll_handlers(ctx, max_ns, timeout)) {
-> +            return true;
->          }
->      }
->  
-> @@ -575,7 +580,7 @@ static bool try_poll_mode(AioContext *ctx, bool blocking)
->      /* Even if we don't run busy polling, try polling once in case it can make
->       * progress and the caller will be able to avoid ppoll(2)/epoll_wait(2).
->       */
-> -    return run_poll_handlers_once(ctx);
-> +    return run_poll_handlers_once(ctx, timeout);
->  }
->  
->  bool aio_poll(AioContext *ctx, bool blocking)
-> @@ -605,8 +610,14 @@ bool aio_poll(AioContext *ctx, bool blocking)
->          start = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
->      }
->  
-> -    progress = try_poll_mode(ctx, blocking);
-> -    if (!progress) {
-> +    timeout = blocking ? aio_compute_timeout(ctx) : 0;
-> +    progress = try_poll_mode(ctx, &timeout);
-> +    assert(!(timeout && progress));
-> +
-> +    /* If polling is allowed, non-blocking aio_poll does not need the
-> +     * system call---a single round of run_poll_handlers_once suffices.
-> +     */
-> +    if (timeout || atomic_read(&ctx->poll_disable_cnt)) {
->          assert(npfd == 0);
->  
->          /* fill pollfds */
-> @@ -620,8 +631,6 @@ bool aio_poll(AioContext *ctx, bool blocking)
->              }
->          }
->  
-> -        timeout = blocking ? aio_compute_timeout(ctx) : 0;
-> -
->          /* wait until next event */
->          if (aio_epoll_check_poll(ctx, pollfds, npfd, timeout)) {
->              AioHandler epoll_handler;
-> diff --git a/util/trace-events b/util/trace-events
-> index 4822434c89..79569b7fdf 100644
-> --- a/util/trace-events
-> +++ b/util/trace-events
-> @@ -1,8 +1,8 @@
->  # See docs/devel/tracing.txt for syntax documentation.
->  
->  # util/aio-posix.c
-> -run_poll_handlers_begin(void *ctx, int64_t max_ns) "ctx %p max_ns %"PRId64
-> -run_poll_handlers_end(void *ctx, bool progress) "ctx %p progress %d"
-> +run_poll_handlers_begin(void *ctx, int64_t max_ns, int64_t timeout) "ctx %p max_ns %"PRId64 " timeout %"PRId64
-> +run_poll_handlers_end(void *ctx, bool progress, int64_t timeout) "ctx %p progress %d new timeout %"PRId64
->  poll_shrink(void *ctx, int64_t old, int64_t new) "ctx %p old %"PRId64" new %"PRId64
->  poll_grow(void *ctx, int64_t old, int64_t new) "ctx %p old %"PRId64" new %"PRId64
->  
-> -- 
-> 2.17.1
-> 
-> 
+>   hw/i386/amd_iommu.c  | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>   hw/i386/amd_iommu.h  | 38 +++++++++++++++++++++++++++++
+>   hw/i386/trace-events |  2 ++
+>   3 files changed, 107 insertions(+), 1 deletion(-)
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+The commit message here is incorrect and/or misleading.
+The GASup bit is essentially allow 128-bit IRTE format.
+The guest virtual APIC support is really GAMSup bit.
+
+Thanks,
+Suravee
