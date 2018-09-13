@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0Yf8-0006YQ-Gq
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 16:56:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g0Yfz-0007Cn-IZ
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 16:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g0Yf7-0002Tq-NE
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 16:56:30 -0400
-References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-13-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9f51d49d-0159-3382-b561-1f33335a2dfd@redhat.com>
-Date: Thu, 13 Sep 2018 22:55:54 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g0Yfy-0003N1-H2
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 16:57:23 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180910204631.24106-1-mark.cave-ayland@ilande.co.uk>
+	<20180910204631.24106-3-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b4eb8a31-7373-ea28-3ee8-9f8b20e03161@amsat.org>
+Date: Thu, 13 Sep 2018 22:56:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180913125217.23173-13-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aO2nLOvo5x3dkFV4NhqBS0OSFjoipdaDC"
-Subject: Re: [Qemu-devel] [PATCH v2 12/17] mirror: Fix potential
- use-after-free in active commit
+In-Reply-To: <20180910204631.24106-3-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] 40p: add fixed IRQ routing for LSI
+ SCSI device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, hpoussin@reactos.org, david@gibson.dropbear.id.au, pbonzini@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aO2nLOvo5x3dkFV4NhqBS0OSFjoipdaDC
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <9f51d49d-0159-3382-b561-1f33335a2dfd@redhat.com>
-Subject: Re: [PATCH v2 12/17] mirror: Fix potential use-after-free in active
- commit
-References: <20180913125217.23173-1-kwolf@redhat.com>
- <20180913125217.23173-13-kwolf@redhat.com>
-In-Reply-To: <20180913125217.23173-13-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 9/10/18 10:46 PM, Mark Cave-Ayland wrote:
+> Whilst the PReP specification describes how all PCI IRQs are routed via IRQ
+> 15 on the interrupt controller, the real 40p machine has a routing quirk in
+> that the LSI SCSI device is routed directly to IRQ 13.
+> 
+> Enable the external IRQ for the LSI SCSI device by wiring up the IRQ with
+> qdev to the relevant interrupt controller gpio.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 13.09.18 14:52, Kevin Wolf wrote:
-> When starting an active commit job, other callbacks can run before
-> mirror_start_job() calls bdrv_ref() where needed and cause the nodes to=
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> go away. Add another pair of bdrv_ref/unref() around it to protect
-> against this case.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/mirror.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-But...  How?
-
-Like...  You mirror to some target (in an iothread), then you give that
-target a backing file, then you cancel the mirror and immediately commit
-the target?
-
-Max
-
-
---aO2nLOvo5x3dkFV4NhqBS0OSFjoipdaDC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluaztoACgkQ9AfbAGHV
-z0BZdgf/cnvfFwgeKnGlDKrxzn5b8cFwJy+BuYo6o0gM8Oijw6w62E+Y/laCFE2Z
-+6+9KKbRxAW/B6vZpZORcj88UW2eM6IfhiWWFfTlaxbfTfW0J2wwkUUFwrk+MEby
-dvBckrt/8VNAqze9R+DhYq5YX5vpfw8jYG1e/0iu2Q4HrqpfdrTUZEeEUK1hFL68
-mxNicFbWYqLTdeIsZnYoaBf3ZOyg4KtmTe5RV+0ckM9uEo2pHceRNlECg/s5fICI
-bx4WU8O47F5JY4Fd6hbljoT7q6iTyVXnn36dQcLTfAo1GKoeaya2D/cUSviN2I5V
-vjCb3A8fTDYbeQe51wfnhayWWwdQtw==
-=GqOK
------END PGP SIGNATURE-----
-
---aO2nLOvo5x3dkFV4NhqBS0OSFjoipdaDC--
+>  hw/ppc/prep.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 615865e46c..94fc36b7ef 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -621,7 +621,7 @@ static void ibm_40p_init(MachineState *machine)
+>      CPUPPCState *env = NULL;
+>      uint16_t cmos_checksum;
+>      PowerPCCPU *cpu;
+> -    DeviceState *dev;
+> +    DeviceState *dev, *i82378_dev;
+>      SysBusDevice *pcihost, *s;
+>      Nvram *m48t59 = NULL;
+>      PCIBus *pci_bus;
+> @@ -666,11 +666,11 @@ static void ibm_40p_init(MachineState *machine)
+>      }
+>  
+>      /* PCI -> ISA bridge */
+> -    dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"));
+> -    qdev_connect_gpio_out(dev, 0,
+> +    i82378_dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"));
+> +    qdev_connect_gpio_out(i82378_dev, 0,
+>                            cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
+> -    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
+> -    isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+> +    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(i82378_dev, 15));
+> +    isa_bus = ISA_BUS(qdev_get_child_bus(i82378_dev, "isa.0"));
+>  
+>      /* Memory controller */
+>      dev = DEVICE(isa_create(isa_bus, "rs6000-mc"));
+> @@ -703,6 +703,7 @@ static void ibm_40p_init(MachineState *machine)
+>          dev = DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(1, 0),
+>                                         "lsi53c810"));
+>          lsi53c8xx_handle_legacy_cmdline(dev);
+> +        qdev_connect_gpio_out(dev, 0, qdev_get_gpio_in(i82378_dev, 13));
+>  
+>          /* XXX: s3-trio at PCI_DEVFN(2, 0) */
+>          pci_vga_init(pci_bus);
+> 
