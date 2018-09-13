@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1g0LP6-0003pC-3t
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:47:05 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1g0LP4-0000ik-VT
+	(envelope-from <dgibson@ozlabs.org>) id 1g0LP6-0003pB-3q
 	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:47:04 -0400
-Date: Thu, 13 Sep 2018 16:11:42 +1000
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1g0LP4-0000ie-Up
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 02:47:04 -0400
+Date: Thu, 13 Sep 2018 16:05:01 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180913061142.GW7978@umbus.fritz.box>
-References: <20180910110222.8162-1-clg@kaod.org>
-	<20180910110222.8162-2-clg@kaod.org>
-	<20180911014821.GE7978@umbus.fritz.box>
-	<e8f02b91-6e8f-9215-18c8-401049be5416@kaod.org>
+Message-ID: <20180913060501.GV7978@umbus.fritz.box>
+References: <20180913051605.26408-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bOC9TN0n4iVUZoxs"
+	protocol="application/pgp-signature"; boundary="KxKI/R+N9hudrWbn"
 Content-Disposition: inline
-In-Reply-To: <e8f02b91-6e8f-9215-18c8-401049be5416@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 1/3] spapr: introduce a spapr_irq class
- 'nr_msis' attribute
+In-Reply-To: <20180913051605.26408-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] spapr_pci: add an extra 'nr_msis' argument
+ to spapr_populate_pci_dt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +28,96 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 
 
---bOC9TN0n4iVUZoxs
+--KxKI/R+N9hudrWbn
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 11, 2018 at 06:41:24AM +0200, C=E9dric Le Goater wrote:
-> On 09/11/2018 03:48 AM, David Gibson wrote:
-> > On Mon, Sep 10, 2018 at 01:02:20PM +0200, C=E9dric Le Goater wrote:
-> > 11;rgb:ffff/ffff/ffff> The number of MSI interrupts a sPAPR machine can=
- allocate is in direct
-> >> relation with the number of interrupts of the sPAPRIrq backend. Define
-> >> statically this value at the sPAPRIrq class level.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  include/hw/ppc/spapr_irq.h | 1 +
-> >>  hw/ppc/spapr_irq.c         | 9 +++++++--
-> >>  2 files changed, 8 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> >> index 0e98c4474bb2..650f810ad2aa 100644
-> >> --- a/include/hw/ppc/spapr_irq.h
-> >> +++ b/include/hw/ppc/spapr_irq.h
-> >> @@ -31,6 +31,7 @@ void spapr_irq_msi_reset(sPAPRMachineState *spapr);
-> >> =20
-> >>  typedef struct sPAPRIrq {
-> >>      uint32_t    nr_irqs;
-> >> +    uint32_t    nr_msis;
-> >> =20
-> >>      void (*init)(sPAPRMachineState *spapr, Error **errp);
-> >>      int (*claim)(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
-> >> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> >> index 0cbb5dd39368..d369ac96f5cd 100644
-> >> --- a/hw/ppc/spapr_irq.c
-> >> +++ b/hw/ppc/spapr_irq.c
-> >> @@ -99,7 +99,7 @@ static void spapr_irq_init_xics(sPAPRMachineState *s=
-papr, Error **errp)
-> >> =20
-> >>      /* Initialize the MSI IRQ allocator. */
-> >>      if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> >> -        spapr_irq_msi_init(spapr, XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ=
-_MSI);
-> >> +        spapr_irq_msi_init(spapr, smc->irq->nr_msis);
-> >>      }
-> >> =20
-> >>      if (kvm_enabled()) {
-> >> @@ -195,8 +195,13 @@ static void spapr_irq_print_info_xics(sPAPRMachin=
-eState *spapr, Monitor *mon)
-> >>      ics_pic_print_info(spapr->ics, mon);
-> >>  }
-> >> =20
-> >> +#define SPAPR_IRQ_XICS_NR_IRQS     XICS_IRQS_SPAPR
-> >> +#define SPAPR_IRQ_XICS_NR_MSIS     \
-> >> +    (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-> >=20
-> > Uh.. I'm not quite understanding how XICS_IRQ_BASE gets into this.
+On Thu, Sep 13, 2018 at 07:16:05AM +0200, C=E9dric Le Goater wrote:
+> So that we don't have to call qdev_get_machine() to get the machine
+> class and the sPAPRIrq backend holding the number of MSIs.
 >=20
-> because the IRQ ranges of the new static IRQ number space start at=20
-> the sPAPR IRQ number offset.
->=20
-> XICS_IRQ_BASE		0x1000
-> SPAPR_IRQ_XICS_NR_IRQS	0x400
->=20
-> SPAPR_IRQ_MSI		0x1300
->=20
-> 0x1000 + 0x400 - 0x1300 =3D 0x100
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Duh, sorry, that's kind of obvious.  Apparently my brain wasn't
-working the other day.
+Applied, thanks.
 
-> we could use SPAPR_IRQ_EPOW instead or some other value defining=20
-> the IRQ0 number.
-
-No, it's fine.
+> ---
+>  include/hw/pci-host/spapr.h | 5 ++---
+>  hw/ppc/spapr.c              | 2 +-
+>  hw/ppc/spapr_pci.c          | 9 +++------
+>  3 files changed, 6 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+> index 0fae4fc6a4e5..7c66c3872f96 100644
+> --- a/include/hw/pci-host/spapr.h
+> +++ b/include/hw/pci-host/spapr.h
+> @@ -113,9 +113,8 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct sPAP=
+RPHBState *phb, int pin)
+> =20
+>  PCIHostState *spapr_create_phb(sPAPRMachineState *spapr, int index);
+> =20
+> -int spapr_populate_pci_dt(sPAPRPHBState *phb,
+> -                          uint32_t xics_phandle,
+> -                          void *fdt);
+> +int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, voi=
+d *fdt,
+> +                          uint32_t nr_msis);
+> =20
+>  void spapr_pci_rtas_init(void);
+> =20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index eba7d60a30a7..98868d893ad8 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1267,7 +1267,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spa=
+pr,
+>      }
+> =20
+>      QLIST_FOREACH(phb, &spapr->phbs, list) {
+> -        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt);
+> +        ret =3D spapr_populate_pci_dt(phb, PHANDLE_XICP, fdt, smc->irq->=
+nr_msis);
+>          if (ret < 0) {
+>              error_report("couldn't setup PCI devices in fdt");
+>              exit(1);
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index bb736177e76c..c2271e6ed462 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -2069,9 +2069,8 @@ static void spapr_phb_pci_enumerate(sPAPRPHBState *=
+phb)
+> =20
+>  }
+> =20
+> -int spapr_populate_pci_dt(sPAPRPHBState *phb,
+> -                          uint32_t xics_phandle,
+> -                          void *fdt)
+> +int spapr_populate_pci_dt(sPAPRPHBState *phb, uint32_t xics_phandle, voi=
+d *fdt,
+> +                          uint32_t nr_msis)
+>  {
+>      int bus_off, i, j, ret;
+>      gchar *nodename;
+> @@ -2121,7 +2120,6 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+>      sPAPRTCETable *tcet;
+>      PCIBus *bus =3D PCI_HOST_BRIDGE(phb)->bus;
+>      sPAPRFDT s_fdt;
+> -    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(qdev_get_machine(=
+));
+> =20
+>      /* Start populating the FDT */
+>      nodename =3D g_strdup_printf("pci@%" PRIx64, phb->buid);
+> @@ -2139,8 +2137,7 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+>      _FDT(fdt_setprop(fdt, bus_off, "ranges", &ranges, sizeof_ranges));
+>      _FDT(fdt_setprop(fdt, bus_off, "reg", &bus_reg, sizeof(bus_reg)));
+>      _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pci-config-space-type", 0x1=
+));
+> -    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi",
+> -                          smc->irq->nr_msis));
+> +    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", nr_msis));
+> =20
+>      /* Dynamic DMA window */
+>      if (phb->ddw_enabled) {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -113,24 +125,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---bOC9TN0n4iVUZoxs
+--KxKI/R+N9hudrWbn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluZ/50ACgkQbDjKyiDZ
-s5IntQ//aXALcgZqksYpiiJTSmr8/XR5DryI60D4z34GwYFiRc4QlMV3s053czc2
-vZ8g8io78EZxOIG/JoEoUri/Kmr7Y+1eLBidjPnjv/1GBHjvCQxsShsh4EYcTJcj
-IPQcAJLhcN0oWxWKpImI1g7gsUnBE7Vb6zv4yRzcZbTH5ftbHI7NYOTj8Hf2tlu6
-TspGSfkHBqFUOwNsClfv2hnDQ8hK6mymGg6ap94F7v0f0rrdj3s9r+DLl7vhr+cg
-OW9VQ4Su81NWl28pUsOxYBGBDXZvKAxo8WTxZpDsdhyfPyHVzfHKa1xugIKrjwoH
-o4bCMdr/XR8WJOylcUiaLhLByRiyGDOpKXkeXpX/8c2TB0UH1XIH16Esi+hFyHnC
-K4puAbItP2ZJbJCCVWL8JQ7zzxSj6ri4zbdTmhjNIaurleGg6592z/12P1zzyVg4
-cRvuIU0BUBAUCQLeTzkPEaW6FYhUJGG9ymKnRvsL5YlGzFnBydPmBbh5EmIjM4k7
-+ol3QD8hdYZwkilRCG1qIr0ZWshvaDJxpkuVxdULtFqtVeYvUTM7MLiIDHJudDQz
-zKFAxCUoqKqkyQzDvH0qqsmNh1i+GqZkPBOYiqEBL6xBWRkUkF9b/VUlPwFkxHku
-Nt9wtYvbnq0S9km/+0jSX0vOG1Tx17qMUWlA+FtnZRXpmluMVLs=
-=7v4I
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluZ/gsACgkQbDjKyiDZ
+s5If3hAAkZHZJreavrpCJlu6o3Pcha/4429QWtlyuSOCF/hEVn4zhyM2JkVpXSQe
+lQNqbxDZ/hTYEyz62qNEW+FsOs5xZM87O0/aj7h0TA4Oy9KHj+TPxB5A8yN8Ej8H
+YlBq1wWHs+NBkgJ6eTnhrNVUisW1PfLUZq5Ok+UsSRJ0esYwSPWmYRCMlrBE9Abw
+9/PZbJzXZwCguVHlLlQ0x0cwgIuhfCzCd7Ic+LfGJy/OD1xDS7KyOZeOJUL+tojG
+AUD16cY6NgbBbr4QVJ1NTg3oHRyfAiufr8SluaGZdhIgnLEeIaAnx/l4gpg7Jd3O
+q+VV+UiKls/4cQ4kYYonHhdRW59nHDw6jbquSURG5gSr0Va27KkCmP36CX3Aq/tI
+WwHra/EFEYyDzXLeMsEeCTsNXQ44egZCEHQTTcrbH4hC3+Wf8TYETejXjwjczYVp
+HR6EwowhmhwIG1ZcpWlrzhyP5zVWXdAz55BdSJCGGmyWC1uT0uCF0lhqIwPcQ1aA
+HL+s+HmdCySvwg4PM4uZZFzC1uukZ8mugAlOGEV383fG7MeQ9A0nbIGP6PtRGdD4
+/JPiVtTJDmBTZjne1dmgc9zhKDmLFbK8ZY2HxIT1tdUiamiljNwrPQNhaLasfIId
+t+c0fslWvtSWGH5JNUB6Zz3V60Ac+Px6J8/zKaQbaw4ZITTZUuo=
+=yWHp
 -----END PGP SIGNATURE-----
 
---bOC9TN0n4iVUZoxs--
+--KxKI/R+N9hudrWbn--
