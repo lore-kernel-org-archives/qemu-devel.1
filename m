@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0TPV-00085D-R1
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:20:06 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0TSM-0000nT-5c
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:22:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0TPV-0006YK-4y
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:20:01 -0400
-References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-11-kwolf@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1g0TSI-0007vP-Q4
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:22:58 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:35152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0TSI-0007v2-Gf
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 11:22:54 -0400
+Received: by mail-wr1-f65.google.com with SMTP id j26-v6so6345271wre.2
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 08:22:54 -0700 (PDT)
+References: <20180905112334.26911-1-slp@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d2973246-b3e2-3daf-f44c-9c15ac9f20d6@redhat.com>
-Date: Thu, 13 Sep 2018 17:19:52 +0200
+Message-ID: <2d1767bb-9e4b-5ae8-49c1-81dffbefe0d7@redhat.com>
+Date: Thu, 13 Sep 2018 17:22:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180913125217.23173-11-kwolf@redhat.com>
+In-Reply-To: <20180905112334.26911-1-slp@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/17] block-backend: Fix potential
- double blk_delete()
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/linux-aio: acquire
+ AioContext before qemu_laio_process_completions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, famz@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+To: Sergio Lopez <slp@redhat.com>, kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On 13/09/2018 14:52, Kevin Wolf wrote:
-> blk_unref() first decreases the refcount of the BlockBackend and calls
-> blk_delete() if the refcount reaches zero. Requests can still be in
-> flight at this point, they are only drained during blk_delete():
-> 
-> At this point, arbitrary callbacks can run. If any callback takes a
-> temporary BlockBackend reference, it will first increase the refcount to
-> 1 and then decrease it to 0 again, triggering another blk_delete(). This
-> will cause a use-after-free crash in the outer blk_delete().
-> 
-> Fix it by draining the BlockBackend before decreasing to refcount to 0.
-> Assert in blk_ref() that it never takes the first refcount (which would
-> mean that the BlockBackend is already being deleted).
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/block-backend.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index efa8d8011c..1b2d7a6ff5 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -435,6 +435,7 @@ int blk_get_refcnt(BlockBackend *blk)
->   */
->  void blk_ref(BlockBackend *blk)
->  {
-> +    assert(blk->refcnt > 0);
->      blk->refcnt++;
->  }
+On 05/09/2018 13:23, Sergio Lopez wrote:
+> diff --git a/block/linux-aio.c b/block/linux-aio.c
+> index 19eb922fdd..217ce60138 100644
+> --- a/block/linux-aio.c
+> +++ b/block/linux-aio.c
+> @@ -234,9 +234,9 @@ static void qemu_laio_process_completions(LinuxAioState *s)
 >  
-> @@ -447,7 +448,11 @@ void blk_unref(BlockBackend *blk)
+>  static void qemu_laio_process_completions_and_submit(LinuxAioState *s)
 >  {
->      if (blk) {
->          assert(blk->refcnt > 0);
-> -        if (!--blk->refcnt) {
-> +        if (blk->refcnt > 1) {
-> +            blk->refcnt--;
-> +        } else {
-> +            blk_drain(blk);
+> +    aio_context_acquire(s->aio_context);
+>      qemu_laio_process_completions(s);
+>  
+> -    aio_context_acquire(s->aio_context);
+>      if (!s->io_q.plugged && !QSIMPLEQ_EMPTY(&s->io_q.pending)) {
+>          ioq_submit(s);
+>      }
+> 
 
-Maybe "assert(blk->refcnt == 1);" here to ensure that blk_drain() cannot
-resurrect the block device, or alternatively
+The patch is correct, but I think it's papering over the real issue; as
+Kevin pointed out recently, the sticking issue is calling aio_poll from
+other threads---which right now we're only doing in bdrv_set_aio_context
+and bdrv_drain_poll_top_level.
 
-+    if (blk->refcnt == 1) {
-+        blk_drain(blk);
-+        assert(blk->refcnt == 1);
-+    }
-     if (!--blk->refcnt) {
-         blk_delete(blk);
-     }
+As to the call in bdrv_drain(), Kevin has just posted the series to
+remove it.
+
+For the other one, I think we can replace it with AIO_WAIT_WHILE or
+BDRV_POLL_WHILE and do the aio_poll in the BlockDriverState's home iothread.
+
+That said, I have nothing against applying it since all it does is move
+a function call, that can be removed completely once the underlying root
+cause is fixed (the AioContext lock will disappear).
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Thanks,
 
 Paolo
