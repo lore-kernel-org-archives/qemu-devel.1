@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0R8G-0003D6-Q5
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:07 -0400
+	(envelope-from <quintela@redhat.com>) id 1g0R8L-0003F0-Ji
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0R8D-0002rC-3H
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49478)
+	(envelope-from <quintela@redhat.com>) id 1g0R8K-000337-QH
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0R8C-0002qX-S1
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1C1395D68D
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 12:54:00 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0R8K-00031j-7Y
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:08 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 13 Sep 2018 14:53:32 +0200
-Message-Id: <20180913125343.10912-2-quintela@redhat.com>
+Date: Thu, 13 Sep 2018 14:53:34 +0200
+Message-Id: <20180913125343.10912-4-quintela@redhat.com>
 In-Reply-To: <20180913125343.10912-1-quintela@redhat.com>
 References: <20180913125343.10912-1-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 01/12] migration/rdma: Fix uninitialised
- rdma_return_path
+Subject: [Qemu-devel] [PULL 03/12] migration: handle the error condition
+ properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +25,84 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Clang correctly errors out moaning that rdma_return_path
-is used uninitialised in the earlier error paths.
-Make it NULL so that the error path ignores it.
+ram_find_and_save_block() can return negative if any error hanppens,
+however, it is completely ignored in current code
 
-Fixes: 55cc1b5937a8e709e4c102e74b206281073aab82
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reported-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20180830173657.22939-1-dgilbert@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <20180903092644.25812-5-xiaoguangrong@tencent.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/rdma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ migration/ram.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index ae07515e83..9b2e7e10aa 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -4012,7 +4012,7 @@ static void rdma_accept_incoming_migration(void *op=
-aque)
- void rdma_start_incoming_migration(const char *host_port, Error **errp)
+diff --git a/migration/ram.c b/migration/ram.c
+index 5a54836c28..2add09174d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2372,7 +2372,8 @@ static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
+  *
+  * Called within an RCU critical section.
+  *
+- * Returns the number of pages written where zero means no dirty pages
++ * Returns the number of pages written where zero means no dirty pages,
++ * or negative on error
+  *
+  * @rs: current RAM state
+  * @last_stage: if we are at the completion stage
+@@ -3196,6 +3197,12 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+             done = 1;
+             break;
+         }
++
++        if (pages < 0) {
++            qemu_file_set_error(f, pages);
++            break;
++        }
++
+         rs->target_page_count += pages;
+ 
+         /* we want to check in the 1st loop, just in case it was the 1st time
+@@ -3238,7 +3245,7 @@ out:
+ /**
+  * ram_save_complete: function called to send the remaining amount of ram
+  *
+- * Returns zero to indicate success
++ * Returns zero to indicate success or negative on error
+  *
+  * Called with iothread lock
+  *
+@@ -3249,6 +3256,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
  {
-     int ret;
--    RDMAContext *rdma, *rdma_return_path;
-+    RDMAContext *rdma, *rdma_return_path =3D NULL;
-     Error *local_err =3D NULL;
-=20
-     trace_rdma_start_incoming_migration();
---=20
+     RAMState **temp = opaque;
+     RAMState *rs = *temp;
++    int ret = 0;
+ 
+     rcu_read_lock();
+ 
+@@ -3269,6 +3277,10 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+         if (pages == 0) {
+             break;
+         }
++        if (pages < 0) {
++            ret = pages;
++            break;
++        }
+     }
+ 
+     flush_compressed_data(rs);
+@@ -3280,7 +3292,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
+     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+     qemu_fflush(f);
+ 
+-    return 0;
++    return ret;
+ }
+ 
+ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+-- 
 2.17.1
