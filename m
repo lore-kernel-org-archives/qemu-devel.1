@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0Lrp-0004Oj-N6
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:16:46 -0400
+	(envelope-from <kraxel@redhat.com>) id 1g0LuP-0005hd-Ee
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Suravee.Suthikulpanit@amd.com>) id 1g0Lrl-0005IB-3O
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:16:45 -0400
-Received: from mail-bn3nam01on0075.outbound.protection.outlook.com
-	([104.47.33.75]:43952
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Suravee.Suthikulpanit@amd.com>)
-	id 1g0Lrk-0005HW-JS
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:16:40 -0400
-References: <1536684589-11718-1-git-send-email-brijesh.singh@amd.com>
-	<1536684589-11718-6-git-send-email-brijesh.singh@amd.com>
-From: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Message-ID: <89321021-de13-0074-8791-988afb5dd21e@amd.com>
-Date: Thu, 13 Sep 2018 14:16:11 +0700
+	(envelope-from <kraxel@redhat.com>) id 1g0LuL-0008CT-Jc
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g0LuJ-0008AY-S7
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 03:19:20 -0400
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
+	[10.5.11.24])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E313381107
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 07:19:17 +0000 (UTC)
+Date: Thu, 13 Sep 2018 09:19:13 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180913071913.vqyy6jf42ylwe24b@sirius.home.kraxel.org>
+References: <20180912123700.7708-1-kraxel@redhat.com>
+	<20180912123700.7708-3-kraxel@redhat.com>
+	<efd77dd1-0402-c68e-7ee9-e8b240c4abd9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1536684589-11718-6-git-send-email-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/6] x86_iommu/amd: Add interrupt remap
- support when VAPIC is enabled
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <efd77dd1-0402-c68e-7ee9-e8b240c4abd9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] display/stdvga: add edid support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Tom Lendacky <Thomas.Lendacky@amd.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Brijesh,
-
-On 9/11/18 11:49 PM, Brijesh Singh wrote:
-> Emulate the interrupt remapping support when guest virtual APIC is
-> enabled.
+> > --- a/docs/specs/standard-vga.txt
+> > +++ b/docs/specs/standard-vga.txt
+> > @@ -61,7 +61,7 @@ MMIO area spec
+> >   Likewise applies to the pci variant only for obvious reasons.
+> > -0000 - 03ff : reserved, for possible virtio extension.
+> > +0000 - 03ff : edid data blob.
 > 
-> See IOMMU spec:https://support.amd.com/TechDocs/48882_IOMMU.pdf
-> (section 2.2.5.2) for details information.
 > 
-> When VAPIC is enabled, it uses interrupt remapping as defined in
-> Table 22 and Figure 17 from IOMMU spec.
+> > +    if (edid) {
+> > +        qemu_edid_info info = {
+> > +            .prefx = d->xres,
+> > +            .prefy = d->yres,
+> > +        };
+> > +        qemu_edid_generate(d->edid, sizeof(d->edid), &info);
+> > +        qemu_edid_region_io(&subs[3], owner, d->edid, sizeof(d->edid));
+> > +        memory_region_add_subregion(parent, 0, &subs[3]);
 > 
-> Cc: "Michael S. Tsirkin"<mst@redhat.com>
-> Cc: Paolo Bonzini<pbonzini@redhat.com>
-> Cc: Richard Henderson<rth@twiddle.net>
-> Cc: Eduardo Habkost<ehabkost@redhat.com>
-> Cc: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
-> Cc: Tom Lendacky<Thomas.Lendacky@amd.com>
-> Cc: Suravee Suthikulpanit<Suravee.Suthikulpanit@amd.com>
-> Signed-off-by: Brijesh Singh<brijesh.singh@amd.com>
-> ---
->   hw/i386/amd_iommu.c  | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->   hw/i386/amd_iommu.h  | 38 +++++++++++++++++++++++++++++
->   hw/i386/trace-events |  2 ++
->   3 files changed, 107 insertions(+), 1 deletion(-)
+> Is there ever a risk that this could overflow?  Or, if the blob is always
+> smaller than 0x3ff, should we still leave reserved bytes?
 
-The commit message here is incorrect and/or misleading.
-The GASup bit is essentially allow 128-bit IRTE format.
-The guest virtual APIC support is really GAMSup bit.
+It's 128 bytes long.  There can be (multiple) extensions, each 128 bytes
+long too.  Current generator doesn't create any extensions.  So, only a
+fraction of the space is actually used right now.
 
-Thanks,
-Suravee
+I'd leave the room reserved for edid nevertheless.  There is still
+plenty of unused address space should we need something at some point in
+the future.  The mmio bar is one page (4k), with more than 2k at the end
+being not used (from info mtree):
+
+  00000000febf0000-00000000febf0fff (prio 1, i/o): vga.mmio
+    00000000febf0000-00000000febf007f (prio 0, i/o): edid
+    00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
+    00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
+    00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
+
+cheers,
+  Gerd
