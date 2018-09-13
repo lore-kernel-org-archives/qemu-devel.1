@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0R8X-0003Qs-PN
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:22 -0400
+	(envelope-from <quintela@redhat.com>) id 1g0R8b-0003Uf-3m
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1g0R8U-0003GT-HB
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44280)
+	(envelope-from <quintela@redhat.com>) id 1g0R8a-0003LU-5K
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0R8T-0003Dw-Bs
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:18 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1g0R8Z-0003L0-Rl
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 08:54:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 32CC65F72C
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 12:54:23 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 13 Sep 2018 14:53:36 +0200
-Message-Id: <20180913125343.10912-6-quintela@redhat.com>
+Date: Thu, 13 Sep 2018 14:53:39 +0200
+Message-Id: <20180913125343.10912-9-quintela@redhat.com>
 In-Reply-To: <20180913125343.10912-1-quintela@redhat.com>
 References: <20180913125343.10912-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 05/12] migration: do not flush_compressed_data
- at the end of iteration
+Subject: [Qemu-devel] [PULL 08/12] tests/migration: Convert x86 boot block
+ compilation script into Makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +31,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Wei Huang <wei@redhat.com>
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+From: Wei Huang <wei@redhat.com>
 
-flush_compressed_data() needs to wait all compression threads to
-finish their work, after that all threads are free until the
-migration feeds new request to them, reducing its call can improve
-the throughput and use CPU resource more effectively
+The x86 boot block header currently is generated with a shell script.
+To better support other CPUs (e.g. aarch64), we convert the script
+into Makefile. This allows us to 1) support cross-compilation easily,
+and 2) avoid creating a script file for every architecture.
 
-We do not need to flush all threads at the end of iteration, the
-data can be kept locally until the memory block is changed or
-memory migration starts over in that case we will meet a dirtied
-page which may still exists in compression threads's ring
+Note that, in the new design, the cross compiler prefix can be specified by
+setting the CROSS_PREFIX in "make" command. Also to allow gcc pre-processor
+to include the C-style file correctly, it also renames the
+x86-a-b-bootblock.s file extension from .s to .S.
 
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <20180906070101.27280-2-xiaoguangrong@tencent.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Wei Huang <wei@redhat.com>
+Message-Id: <1536174934-26022-2-git-send-email-wei@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ tests/migration/Makefile                      | 31 +++++++++++++++++
+ tests/migration/rebuild-x86-bootblock.sh      | 33 -------------------
+ ...86-a-b-bootblock.s => x86-a-b-bootblock.S} |  0
+ 3 files changed, 31 insertions(+), 33 deletions(-)
+ create mode 100644 tests/migration/Makefile
+ delete mode 100755 tests/migration/rebuild-x86-bootblock.sh
+ rename tests/migration/{x86-a-b-bootblock.s => x86-a-b-bootblock.S} (100%)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 2add09174d..e152831254 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1996,17 +1996,22 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
-         pss->page = 0;
-         pss->block = QLIST_NEXT_RCU(pss->block, next);
-         if (!pss->block) {
-+            /*
-+             * If memory migration starts over, we will meet a dirtied page
-+             * which may still exists in compression threads's ring, so we
-+             * should flush the compressed data to make sure the new page
-+             * is not overwritten by the old one in the destination.
-+             *
-+             * Also If xbzrle is on, stop using the data compression at this
-+             * point. In theory, xbzrle can do better than compression.
-+             */
-+            flush_compressed_data(rs);
+diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+new file mode 100644
+index 0000000000..c0824b4fbe
+--- /dev/null
++++ b/tests/migration/Makefile
+@@ -0,0 +1,31 @@
++# To specify cross compiler prefix, use CROSS_PREFIX=
++#   $ make CROSS_PREFIX=x86_64-linux-gnu-
 +
-             /* Hit the end of the list */
-             pss->block = QLIST_FIRST_RCU(&ram_list.blocks);
-             /* Flag that we've looped */
-             pss->complete_round = true;
-             rs->ram_bulk_stage = false;
--            if (migrate_use_xbzrle()) {
--                /* If xbzrle is on, stop using the data compression at this
--                 * point. In theory, xbzrle can do better than compression.
--                 */
--                flush_compressed_data(rs);
--            }
-         }
-         /* Didn't find anything this time, but try again on the new block */
-         *again = true;
-@@ -3219,7 +3224,6 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-         }
-         i++;
-     }
--    flush_compressed_data(rs);
-     rcu_read_unlock();
- 
-     /*
++override define __note
++/* This file is automatically generated from
++ * tests/migration/x86-a-b-bootblock.S, edit that and then run
++ * tests/migration/rebuild-x86-bootblock.sh to update,
++ * and then remember to send both in your patch submission.
++ */
++endef
++export __note
++
++.PHONY: all clean
++all: x86-a-b-bootblock.h
++
++x86-a-b-bootblock.h: x86.bootsect
++	echo "$$__note" > header.tmp
++	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
++	mv header.tmp $@
++
++x86.bootsect: x86.boot
++	dd if=$< of=$@ bs=256 count=2 skip=124
++
++x86.boot: x86.o
++	$(CROSS_PREFIX)objcopy -O binary $< $@
++
++x86.o: x86-a-b-bootblock.S
++	$(CROSS_PREFIX)gcc -m32 -march=i486 -c $< -o $@
++
++clean:
++	@rm -rf *.boot *.o *.bootsect
+diff --git a/tests/migration/rebuild-x86-bootblock.sh b/tests/migration/rebuild-x86-bootblock.sh
+deleted file mode 100755
+index 86cec5d284..0000000000
+--- a/tests/migration/rebuild-x86-bootblock.sh
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#!/bin/sh
+-# Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
+-# This work is licensed under the terms of the GNU GPL, version 2 or later.
+-# See the COPYING file in the top-level directory.
+-#
+-# Author: dgilbert@redhat.com
+-
+-ASMFILE=$PWD/tests/migration/x86-a-b-bootblock.s
+-HEADER=$PWD/tests/migration/x86-a-b-bootblock.h
+-
+-if [ ! -e "$ASMFILE" ]
+-then
+-  echo "Couldn't find $ASMFILE" >&2
+-  exit 1
+-fi
+-
+-ASM_WORK_DIR=$(mktemp -d --tmpdir X86BB.XXXXXX)
+-cd "$ASM_WORK_DIR" &&
+-as --32 -march=i486 "$ASMFILE" -o x86.o &&
+-objcopy -O binary x86.o x86.boot &&
+-dd if=x86.boot of=x86.bootsect bs=256 count=2 skip=124 &&
+-xxd -i x86.bootsect |
+-sed -e 's/.*int.*//' > x86.hex &&
+-cat - x86.hex <<HERE > "$HEADER"
+-/* This file is automatically generated from
+- * tests/migration/x86-a-b-bootblock.s, edit that and then run
+- * tests/migration/rebuild-x86-bootblock.sh to update,
+- * and then remember to send both in your patch submission.
+- */
+-HERE
+-
+-rm x86.hex x86.bootsect x86.boot x86.o
+-cd .. && rmdir "$ASM_WORK_DIR"
+diff --git a/tests/migration/x86-a-b-bootblock.s b/tests/migration/x86-a-b-bootblock.S
+similarity index 100%
+rename from tests/migration/x86-a-b-bootblock.s
+rename to tests/migration/x86-a-b-bootblock.S
 -- 
 2.17.1
