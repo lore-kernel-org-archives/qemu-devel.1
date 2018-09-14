@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g0qrv-0001HZ-B2
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 12:22:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g0qug-0002AK-2b
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 12:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g0qrs-0005eP-4e
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 12:22:55 -0400
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-5-vsementsov@virtuozzo.com>
-	<899fcefc-84f1-7238-c77b-9c925c9872c5@redhat.com>
-	<37e9fc1c-9c65-2121-12c9-4b648fea3947@virtuozzo.com>
-	<d297899a-5019-4d14-37fd-6d35b932d0d8@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f83cf27d-aaf0-ed10-4924-b1253557bb4a@virtuozzo.com>
-Date: Fri, 14 Sep 2018 19:22:45 +0300
+	(envelope-from <kwolf@redhat.com>) id 1g0quf-0000sG-1h
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 12:25:46 -0400
+Date: Fri, 14 Sep 2018 18:25:26 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180914162526.GC4991@localhost.localdomain>
+References: <20180913125217.23173-1-kwolf@redhat.com>
+	<20180913125217.23173-13-kwolf@redhat.com>
+	<9f51d49d-0159-3382-b561-1f33335a2dfd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d297899a-5019-4d14-37fd-6d35b932d0d8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] nbd/server: implement dirty bitmap
- export
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="J2SCkAp4GZ/dPZZf"
+Content-Disposition: inline
+In-Reply-To: <9f51d49d-0159-3382-b561-1f33335a2dfd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 12/17] mirror: Fix potential
+ use-after-free in active commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,388 +26,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-
-20.06.2018 21:09, Eric Blake wrote:
-> On 06/20/2018 12:04 PM, Vladimir Sementsov-Ogievskiy wrote:
->> 20.06.2018 19:27, Eric Blake wrote:
->>> On 06/09/2018 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Handle new NBD meta namespace: "qemu", and corresponding queries:
->>>> "qemu:dirty-bitmap:<export bitmap name>".
->>>>
->>>> With new metadata context negotiated, BLOCK_STATUS query will reply
->>>> with dirty-bitmap data, converted to extents. New public function
->>>> nbd_export_bitmap selects bitmap to export. For now, only one bitmap
->>>> may be exported.
->>>>
->
->>> =C2=A0static int nbd_co_send_extents(NBDClient *client, uint64_t handle=
-,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDExtent *extents, unsigned=20
->>> nb_extents,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDExtent *extents, unsigned int=20
->>> nb_extents,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t length, bool last,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t context_id, Error **err=
-p)
->>> =C2=A0{
->>> =C2=A0=C2=A0=C2=A0=C2=A0 NBDStructuredMeta chunk;
->>> @@ -1890,7 +1897,9 @@ static int nbd_co_send_extents(NBDClient=20
->>> *client, uint64_t handle,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {.iov_base =3D extents=
-, .iov_len =3D nb_extents *=20
->>> sizeof(extents[0])}
->>> =C2=A0=C2=A0=C2=A0=C2=A0 };
->>>
->>> -=C2=A0=C2=A0=C2=A0 set_be_chunk(&chunk.h, 0, NBD_REPLY_TYPE_BLOCK_STAT=
-US,
->>> +=C2=A0=C2=A0=C2=A0 trace_nbd_co_send_extents(handle, nb_extents, conte=
-xt_id,=20
->>> length, last);
->>
->> hm, length variable added only to be traced.. Ok, but a bit strange.
->
-> Yes. It doesn't affect what goes over the wire, but when it comes to=20
-> tracing, knowing the sum of the extents can be quite helpful=20
-> (especially knowing if the server's reply is shorter or longer than=20
-> the client's request, and the fact that when two or more contexts are=20
-> negotiated by the client, the different contexts can have different=20
-> length replies)
->
->
->>> +static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap,=20
->>> uint64_t offset,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 uint64_t *length, NBDExtent=20
->>> *extents,
->>
->> length - in-out? worth comment?
->
-> Sure.
->
->>
->>> + unsigned int nb_extents,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 bool dont_fragment)
->>> =C2=A0{
->>> =C2=A0=C2=A0=C2=A0=C2=A0 uint64_t begin =3D offset, end;
->>> -=C2=A0=C2=A0=C2=A0 uint64_t overall_end =3D offset + length;
->>> -=C2=A0=C2=A0=C2=A0 unsigned i =3D 0;
->>> +=C2=A0=C2=A0=C2=A0 uint64_t overall_end =3D offset + *length;
->>> +=C2=A0=C2=A0=C2=A0 unsigned int i =3D 0;
->>> =C2=A0=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmapIter *it;
->>> =C2=A0=C2=A0=C2=A0=C2=A0 bool dirty;
->>>
->>> @@ -1983,23 +1994,25 @@ static unsigned=20
->>> bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
->>>
->>> =C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_unlock(bitmap);
->>>
->>> +=C2=A0=C2=A0=C2=A0 *length =3D end - begin;
->>
->> hm, it will always be zero, as at the end of the previous loop we=20
->> have "begin =3D end;"
->
-> Ah, then it should be end - offset. Thanks for the careful review.
->
-> In fact, since ONLY the final extent can be larger than 2G (all=20
-> earlier extents were short of the overall_end, and the incoming length=20
-> is 32-bit), but the NBD protocol says that at most one extent can go=20
-> beyond the original request, we do NOT want to split a >2G extent into=20
-> multiple extents, but rather cap it to just shy of 4G at the=20
-> granularity offered by the bitmap itself.=C2=A0 At which point=20
-> add_extents() never returns more than 1, and can just be inlined.
->
->>
->>> return i;
->>> =C2=A0}
->>>
->>> =C2=A0static int nbd_co_send_bitmap(NBDClient *client, uint64_t handle,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *bitmap, uint64_t=20
->>> offset,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t length, bool dont_fragment,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t length, bool dont_fragment,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t context_id, Error **errp)
->>> =C2=A0{
->>> =C2=A0=C2=A0=C2=A0=C2=A0 int ret;
->>> -=C2=A0=C2=A0=C2=A0 unsigned nb_extents =3D dont_fragment ? 1 : NBD_MAX=
-_BITMAP_EXTENTS;
->>> +=C2=A0=C2=A0=C2=A0 unsigned int nb_extents =3D dont_fragment ? 1 :=20
->>> NBD_MAX_BITMAP_EXTENTS;
->>> =C2=A0=C2=A0=C2=A0=C2=A0 NBDExtent *extents =3D g_new(NBDExtent, nb_ext=
-ents);
->>> +=C2=A0=C2=A0=C2=A0 uint64_t final_length =3D length;
->>>
->>> -=C2=A0=C2=A0=C2=A0 nb_extents =3D bitmap_to_extents(bitmap, offset, le=
-ngth, extents,=20
->>> nb_extents,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dont_fragment)=
-;
->>> +=C2=A0=C2=A0=C2=A0 nb_extents =3D bitmap_to_extents(bitmap, offset, &f=
-inal_length,=20
->>> extents,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nb_extents, do=
-nt_fragment);
->>>
->>> -=C2=A0=C2=A0=C2=A0 ret =3D nbd_co_send_extents(client, handle, extents=
-, nb_extents,=20
->>> context_id,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 errp);
->>> +=C2=A0=C2=A0=C2=A0 ret =3D nbd_co_send_extents(client, handle, extents=
-, nb_extents,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 final_length, true, context_id, errp);
->>
->> hmm in-out pointer field only to trace final_length? may be just=20
->> trace it in bitmap_to_extents?
->
-> No, because base:allocation also benefits from tracing final_length.
->
->>
->> also, it's not trivial, that the function now sends FLAG_DONE. I=20
->> think, worth add a comment, or
->> a parameter like for nbd_co_send_block_status. It will simplify=20
->> introducing new contexts in future.
->
-> Do we anticipate adding any in the near future? But adding a parameter=20
-> that is always true so that the callsite becomes more obvious on when=20
-> to pass the done flag may indeed make future additions easier to spot=20
-> in one place.
->
-> So here's what else I'll squash in:
->
-> diff --git i/nbd/server.c w/nbd/server.c
-> index e84aea6cf03..7a96b296839 100644
-> --- i/nbd/server.c
-> +++ w/nbd/server.c
-> @@ -1881,9 +1881,10 @@ static int=20
-> blockstatus_to_extent_be(BlockDriverState *bs, uint64_t offset,
->
-> =C2=A0/* nbd_co_send_extents
-> =C2=A0 *
-> - * @last controls whether NBD_REPLY_FLAG_DONE is sent.
-> - *
-> - * @extents should already be in big-endian format.
-> + * @length is only for tracing purposes (and may be smaller or larger
-> + * than the client's original request). @last controls whether
-> + * NBD_REPLY_FLAG_DONE is sent. @extents should already be in
-> + * big-endian format.
-> =C2=A0 */
-> =C2=A0static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDExtent *extents, unsigned int=20
-> nb_extents,
-> @@ -1925,33 +1926,12 @@ static int nbd_co_send_block_status(NBDClient=20
-> *client, uint64_t handle,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 context_id, errp);
-> =C2=A0}
->
-> -/* Set several extents, describing region of given @length with given=20
-> @flags.
-> - * Do not set more than @nb_extents, return number of set extents.
-> +/*
-> + * Populate @extents from a dirty bitmap. Unless @dont_fragment, the
-> + * final extent may exceed the original @length. Store in @length the
-> + * byte length encoded (which may be smaller or larger than the
-> + * original), and return the number of extents used.
-> =C2=A0 */
-> -static unsigned int add_extents(NBDExtent *extents, unsigned nb_extents,
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t length, uint32_t flags)
-> -{
-> -=C2=A0=C2=A0=C2=A0 unsigned int i =3D 0;
-> -=C2=A0=C2=A0=C2=A0 uint32_t max_extent =3D 0x80000000U;
-> -=C2=A0=C2=A0=C2=A0 uint32_t max_extent_be =3D cpu_to_be32(max_extent);
-> -=C2=A0=C2=A0=C2=A0 uint32_t flags_be =3D cpu_to_be32(flags);
-> -
-> -=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < nb_extents && length > max_extent;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i++, length -=3D max_ex=
-tent)
-> -=C2=A0=C2=A0=C2=A0 {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 extents[i].length =3D max_ext=
-ent_be;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 extents[i].flags =3D flags_be=
-;
-> -=C2=A0=C2=A0=C2=A0 }
-> -
-> -=C2=A0=C2=A0=C2=A0 if (length > 0 && i < nb_extents) {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 extents[i].length =3D cpu_to_=
-be32(length);
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 extents[i].flags =3D flags_be=
-;
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i++;
-> -=C2=A0=C2=A0=C2=A0 }
-> -
-> -=C2=A0=C2=A0=C2=A0 return i;
-> -}
-> -
-> =C2=A0static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap,=20
-> uint64_t offset,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 uint64_t *length, NBDExtent=20
-> *extents,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 unsigned int nb_extents,
-> @@ -1976,16 +1956,18 @@ static unsigned int=20
-> bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-end =3D bdrv_dirty_iter_next(it);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (end =3D=3D -1) {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 end =
-=3D bdrv_dirty_bitmap_size(bitmap);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Ca=
-p to an aligned value < 4G beyond begin. */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 end =
-=3D MIN(bdrv_dirty_bitmap_size(bitmap),
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 begin + 0x100000000U=
-LL -
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_gr=
-anularity(bitmap));
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dont_fragment && end=
- > overall_end) {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* We=
- MUST not exceed requested region if=20
-> NBD_CMD_FLAG_REQ_ONE flag
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- * is set */
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-end =3D overall_end;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i +=3D add_extents(extents + =
-i, nb_extents - i, end - begin,
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 di=
-rty ? NBD_STATE_DIRTY : 0);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 extents[i].length =3D cpu_to_=
-be32(end - begin);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 extents[i].flags =3D cpu_to_b=
-e32(dirty ? NBD_STATE_DIRTY : 0);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i++;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 begin =3D end;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dirty =3D !dirty;
-
-hmm, suddenly I understand that it's wrong. My version switched=20
-dirty=3D!dirty every iteration, processing all sequential zeroes or ones=20
-in one iteration. After the change, we can process dirty bits in several=20
-sequential iterations. I'll make a patch soon.
-
-If I understand correctly, current code will produce zero-length extents=20
-in the chain, between correct extents.
-
-> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> @@ -1994,13 +1976,13 @@ static unsigned int=20
-> bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
->
-> =C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_unlock(bitmap);
->
-> -=C2=A0=C2=A0=C2=A0 *length =3D end - begin;
-> +=C2=A0=C2=A0=C2=A0 *length =3D end - offset;
-> =C2=A0=C2=A0=C2=A0=C2=A0 return i;
-> =C2=A0}
->
-> =C2=A0static int nbd_co_send_bitmap(NBDClient *client, uint64_t handle,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *bitmap, uint64_t offset,
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t length, bool dont_fragment,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t length, bool dont_fragment,=20
-> bool last,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t context_id, Error **errp)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0 int ret;
-> @@ -2012,7 +1994,7 @@ static int nbd_co_send_bitmap(NBDClient *client,=20
-> uint64_t handle,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nb_extents,=
- dont_fragment);
->
-> =C2=A0=C2=A0=C2=A0=C2=A0 ret =3D nbd_co_send_extents(client, handle, exte=
-nts, nb_extents,
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 final_length, true, context_id, errp);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 final_length, last, context_id, errp);
->
-> =C2=A0=C2=A0=C2=A0=C2=A0 g_free(extents);
->
-> @@ -2253,7 +2235,7 @@ static coroutine_fn int=20
-> nbd_handle_request(NBDClient *client,
-> client->exp->export_bitmap,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 request->from, request->len,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 request->flags &=20
-> NBD_CMD_FLAG_REQ_ONE,
-> - NBD_META_ID_DIRTY_BITMAP, errp);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 true,=20
-> NBD_META_ID_DIRTY_BITMAP, errp);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 }
->
->
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, famz@redhat.com, pbonzini@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
 
---=20
-Best regards,
-Vladimir
+--J2SCkAp4GZ/dPZZf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 13.09.2018 um 22:55 hat Max Reitz geschrieben:
+> On 13.09.18 14:52, Kevin Wolf wrote:
+> > When starting an active commit job, other callbacks can run before
+> > mirror_start_job() calls bdrv_ref() where needed and cause the nodes to
+> > go away. Add another pair of bdrv_ref/unref() around it to protect
+> > against this case.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  block/mirror.c | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+>=20
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>=20
+> But...  How?
+
+Tried to reproduce the other bug Paolo was concerned about (good there
+is something like 'git reflog'!) and dug up this one instead.
+
+So the scenario seems to be test_stream_commit_1 in qemu-iotests 030.
+
+The backtrace when the BDS is deleted is the following:
+
+(rr) bt
+#0  0x00007faeaf6145ec in __memset_sse2_unaligned_erms () at /lib64/libc.so=
+=2E6
+#1  0x00007faeaf60414e in _int_free () at /lib64/libc.so.6
+#2  0x00007faeaf6093be in free () at /lib64/libc.so.6
+#3  0x00007faecaea6b4e in g_free () at /lib64/libglib-2.0.so.0
+#4  0x000055c0c94f9d6c in bdrv_delete (bs=3D0x55c0cbe69240) at block.c:3590
+#5  0x000055c0c94fbe82 in bdrv_unref (bs=3D0x55c0cbe69240) at block.c:4638
+#6  0x000055c0c94f6761 in bdrv_root_unref_child (child=3D0x55c0cbe57af0) at=
+ block.c:2188
+#7  0x000055c0c94fe239 in block_job_remove_all_bdrv (job=3D0x55c0ccf9e220) =
+at blockjob.c:200
+#8  0x000055c0c94fdf1f in block_job_free (job=3D0x55c0ccf9e220) at blockjob=
+=2Ec:94
+#9  0x000055c0c94ffe0d in job_unref (job=3D0x55c0ccf9e220) at job.c:368
+#10 0x000055c0c95007cd in job_do_dismiss (job=3D0x55c0ccf9e220) at job.c:641
+#11 0x000055c0c95008d9 in job_conclude (job=3D0x55c0ccf9e220) at job.c:667
+#12 0x000055c0c9500b66 in job_finalize_single (job=3D0x55c0ccf9e220) at job=
+=2Ec:735
+#13 0x000055c0c94ff4fa in job_txn_apply (txn=3D0x55c0cbe19eb0, fn=3D0x55c0c=
+9500a62 <job_finalize_single>, lock=3Dtrue) at job.c:151
+#14 0x000055c0c9500e92 in job_do_finalize (job=3D0x55c0ccf9e220) at job.c:8=
+22
+#15 0x000055c0c9501040 in job_completed_txn_success (job=3D0x55c0ccf9e220) =
+at job.c:872
+#16 0x000055c0c950115c in job_completed (job=3D0x55c0ccf9e220, ret=3D0, err=
+or=3D0x0) at job.c:892
+#17 0x000055c0c92b572c in stream_complete (job=3D0x55c0ccf9e220, opaque=3D0=
+x55c0cc050bc0) at block/stream.c:96
+#18 0x000055c0c950142b in job_defer_to_main_loop_bh (opaque=3D0x55c0cbe38a5=
+0) at job.c:981
+#19 0x000055c0c96171fc in aio_bh_call (bh=3D0x55c0cbe19f20) at util/async.c=
+:90
+#20 0x000055c0c9617294 in aio_bh_poll (ctx=3D0x55c0cbd7b8d0) at util/async.=
+c:118
+#21 0x000055c0c961c150 in aio_poll (ctx=3D0x55c0cbd7b8d0, blocking=3Dtrue) =
+at util/aio-posix.c:690
+#22 0x000055c0c957246c in bdrv_flush (bs=3D0x55c0cbe4b250) at block/io.c:26=
+93
+#23 0x000055c0c94f8e46 in bdrv_reopen_prepare (reopen_state=3D0x55c0cbef4d6=
+8, queue=3D0x55c0cbeab9f0, errp=3D0x7ffd65617050) at block.c:3206
+#24 0x000055c0c94f883a in bdrv_reopen_multiple (ctx=3D0x55c0cbd7b8d0, bs_qu=
+eue=3D0x55c0cbeab9f0, errp=3D0x7ffd656170c8) at block.c:3032
+#25 0x000055c0c94f8a00 in bdrv_reopen (bs=3D0x55c0cbe2c250, bdrv_flags=3D81=
+94, errp=3D0x7ffd65617220) at block.c:3075
+#26 0x000055c0c956a23f in commit_active_start (job_id=3D0x0, bs=3D0x55c0cbd=
+905b0, base=3D0x55c0cbe2c250, creation_flags=3D0, speed=3D0, on_error=3DBLO=
+CKDEV_ON_ERROR_REPORT, filter_node_name=3D0x0, cb=3D0x0, opaque=3D0x0, auto=
+_complete=3Dfalse, errp=3D0x7ffd65617220) at block/mirror.c:1687
+#27 0x000055c0c927437c in qmp_block_commit (has_job_id=3Dfalse, job_id=3D0x=
+0, device=3D0x55c0cbef4d20 "drive0", has_base_node=3Dfalse, base_node=3D0x0=
+, has_base=3Dtrue, base=3D0x55c0cbe38a00 "/home/kwolf/source/qemu/tests/qem=
+u-iotests/scratch/img-3.img", has_top_node=3Dfalse, top_node=3D0x0, has_top=
+=3Dfalse, top=3D0x0, has_backing_file=3Dfalse, backing_file=3D0x0, has_spee=
+d=3Dfalse, speed=3D0, has_filter_node_name=3Dfalse, filter_node_name=3D0x0,=
+ errp=3D0x7ffd656172d8) at blockdev.c:3325
+#28 0x000055c0c928bb08 in qmp_marshal_block_commit (args=3D<optimized out>,=
+ ret=3D<optimized out>, errp=3D0x7ffd656173b8) at qapi/qapi-commands-block-=
+core.c:409
+#29 0x000055c0c960beef in do_qmp_dispatch (errp=3D0x7ffd656173b0, allow_oob=
+=3Dfalse, request=3D<optimized out>, cmds=3D0x55c0c9f56f80 <qmp_commands>) =
+at qapi/qmp-dispatch.c:129
+#30 0x000055c0c960beef in qmp_dispatch (cmds=3D0x55c0c9f56f80 <qmp_commands=
+>, request=3D<optimized out>, allow_oob=3D<optimized out>) at qapi/qmp-disp=
+atch.c:171
+#31 0x000055c0c9111623 in monitor_qmp_dispatch (mon=3D0x55c0cbdbb930, req=
+=3D0x55c0ccf90e00, id=3D0x0) at /home/kwolf/source/qemu/monitor.c:4168
+#32 0x000055c0c911191f in monitor_qmp_bh_dispatcher (data=3D0x0) at /home/k=
+wolf/source/qemu/monitor.c:4237
+#33 0x000055c0c96171fc in aio_bh_call (bh=3D0x55c0cbccc840) at util/async.c=
+:90
+#34 0x000055c0c9617294 in aio_bh_poll (ctx=3D0x55c0cbccc550) at util/async.=
+c:118
+#35 0x000055c0c961b723 in aio_dispatch (ctx=3D0x55c0cbccc550) at util/aio-p=
+osix.c:436
+#36 0x000055c0c961762f in aio_ctx_dispatch (source=3D0x55c0cbccc550, callba=
+ck=3D0x0, user_data=3D0x0) at util/async.c:261
+#37 0x00007faecaea1257 in g_main_context_dispatch () at /lib64/libglib-2.0.=
+so.0
+#38 0x000055c0c961a2aa in glib_pollfds_poll () at util/main-loop.c:215
+#39 0x000055c0c961a2aa in os_host_main_loop_wait (timeout=3D0) at util/main=
+-loop.c:238
+#40 0x000055c0c961a2aa in main_loop_wait (nonblocking=3D<optimized out>) at=
+ util/main-loop.c:497
+#41 0x000055c0c92805e1 in main_loop () at vl.c:1866
+#42 0x000055c0c9287eca in main (argc=3D18, argv=3D0x7ffd65617958, envp=3D0x=
+7ffd656179f0) at vl.c:4647
+(rr) p bs.node_name=20
+$17 =3D "node1", '\000' <repeats 26 times>
+
+Obviously, this exact backtrace shouldn't even be possible like this
+because job_defer_to_main_loop_bh() shouldn't be called inside
+bdrv_flush(), but when draining the subtree in bdrv_reopen(). This is
+only fixed in "blockjob: Lie better in child_job_drained_poll()".
+
+It probably doesn't make a difference, though, where exactly during
+bdrv_reopen() the node is deleted. We'll crash anyway if we don't hold
+the extra reference.
+
+Kevin
+
+--J2SCkAp4GZ/dPZZf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJbm+D1AAoJEH8JsnLIjy/WG74P/A/9odOCXegeSaeBjwLXOzTi
+GMVE+lZsjIDU0V58u4oeFpaC3tIpXwYl02V9XTcMQRC0n0VOF2JJka0fzcmTAt27
+HgKuKomhwPXu5HDvx6U3StoSLABkhJTd4w31l2Ejvdw5ODM1iSb6sTCRHLVCUeEb
+TygZeXJYrNEvQAyMfC8yYkx4fS0ixkbT9726FUscFPMlseNdOUbETKfTPxXw1Gtt
+4Z7vWVAQOdd1iCV2NkAAltjpa6vCIO7VijwOJFss5djxJ8DlsR1WRp5RIYxMP2Uz
+d0rTpTbloEzVePI6Il4UzomWzd519qA3S2n1x+FWaVe9ycLmk1ioJCh9bRQLczxP
+dXu/7/vQt1jCAzkqXEJrDrbf/HK4g4bIoCElC/vmzlvbGiPc/I/bUqVlojFE5N66
+Vyf6RXXsejBlTDZnV/5v0U3btvHBsWRqtaMHH61t9DMclfIxdUo5vL4rYW7O708t
+Ca/RVX3YDX6YURLoTojqKAaKX+1zIxxHU1srqg31PIp8ajNAUkktethYvfvFzbD8
+KQW8yWpJmeBkqxokcT0KLwivUHpUHJShSUFfw4/qbxVeiALRBwfoL99BXp4J+u8J
+efdlxrrsbKEPIaRq2XfZlbKQvDU/p4FCvj3AC7WRfZ/c0oVJwDDFt7cIhxgbdqOC
+5LB/YOCZ7WhBR2lNIkJV
+=7085
+-----END PGP SIGNATURE-----
+
+--J2SCkAp4GZ/dPZZf--
