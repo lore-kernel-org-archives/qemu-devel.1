@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g0i5z-0001S1-UN
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:00:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0iL2-0005wk-4F
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:16:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g0i5w-0000Cw-GP
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:00:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54990)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g0i5w-0000BA-7Z
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:00:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g0i5u-0005V0-Hx
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 07:00:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 834E82E8023
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 07:00:46 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1g0iKx-0001fw-Dq
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:16:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55446)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0iKx-0001eI-2O
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:16:19 -0400
+References: <20180914003827.124570-1-liran.alon@oracle.com>
+	<20180914003827.124570-3-liran.alon@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4e7316db-c24a-6dd5-9e62-1ccc93bf1ee1@redhat.com>
+Date: Fri, 14 Sep 2018 09:16:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 14 Sep 2018 06:54:26 -0000
-From: Marshall Porter <1792523@bugs.launchpad.net>
-Reply-To: Bug 1792523 <1792523@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <153690806645.16635.9456702675801152758.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1792523] [NEW] usb passthrough not resetting on
- host after vm shutdown if started with -daemonize
+In-Reply-To: <20180914003827.124570-3-liran.alon@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] KVM: i386: Add support for save and
+ restore nested state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,156 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com
+Cc: mtosatti@redhat.com, kvm@vger.kernel.org, jmattson@google.com, idan.brown@oracle.com
 
-Public bug reported:
+On 14/09/2018 02:38, Liran Alon wrote:
+> Kernel commit 8fcc4b5923af ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
+> introduced new IOCTLs to extract and restore KVM internal state used to
+> run a VM that is in VMX operation.
+> 
+> Utilize these IOCTLs to add support of migration of VMs which are
+> running nested hypervisors.
+> 
+> Reviewed-by: Nikita Leshchenko <nikita.leshchenko@oracle.com>
+> Reviewed-by: Patrick Colp <patrick.colp@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
 
-Below is the full Qemu command used to launch the VM. Have been using
-this same setup since Qemu 2.12, plus a couple of cherry picked patch
-commits fixing ide-hd and e1000e in Windows guests. Both sets of patches
-have now been merged to 3.0, so decided to update to 3.0.
+Heh, I was going to send a similar patch.  However, things are a bit
+more complex for two reason.
 
-The VM launches and runs fine, but after shutting down, the usb devices
-that are passed through from the host (keyboard, mouse) do not work
-until unplugged and plugged in again. Have narrowed this down to the
--daemonize -pidfile arguments.. if those lines are removed, usb devices
-work in the host again right away after VM shutdown.
+First, I'd prefer to reuse the hflags and hflags2 fields that we already
+have, and only store the VMCS blob in the subsection.  For example,
+HF_SVMI_MASK is really the same as HF_GUEST_MASK in KVM source code and
+KVM_STATE_NESTED_GUEST_MODE in the nested virt state.
 
-CPU: Intel(R) Core(TM) i5-6600K CPU @ 3.50GHz
-OS: Linux dev 4.18.6-arch1-1-ARCH #1 SMP PREEMPT Wed Sep 5 11:54:09 UTC 201=
-8 x86_64 GNU/Linux
+More important, this:
 
-Thank you for looking into this!
+>   
+> +static int nested_state_post_load(void *opaque, int version_id) 
+> +{ 
+> +    X86CPU *cpu = opaque; 
+> +    CPUX86State *env = &cpu->env; 
+> + 
+> +    /* 
+> +     * Verify that the size specified in given struct is set 
+> +     * to no more than the size that our kernel support 
+> +     */ 
+> +    if (env->nested_state->size > env->nested_state_len) { 
+> +        return -EINVAL; 
+> +    } 
+> + 
+> +    return 0; 
+> +} 
+> + 
+> +static bool nested_state_needed(void *opaque) 
 
+doesn't work if nested_state_len differs between source and destination,
+and could overflow the nested_state buffer if nested_state_len is larger
+on the source.
 
-#!/usr/bin/env bash
+I'll send my version today or next Monday.
 
-echo vfio-pci > /sys/bus/pci/devices/0000:04:00.0/driver_override
-echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
-echo 0000:04:00.0 > /sys/bus/pci/drivers/vfio-pci/bind
-echo > /sys/bus/pci/devices/0000:04:00.0/driver_override
+Thanks,
 
-/usr/bin/qemu-system-x86_64 \
--name winnt \
--daemonize \
--pidfile /run/vms/qemu/winnt.pid \
--boot menu=3Don \
--drive if=3Dpflash,format=3Draw,readonly,file=3D/opt/vms/qemu/machines/ovmf=
-_code_patched.fd \
--drive if=3Dpflash,format=3Draw,file=3D/opt/vms/qemu/machines/winnt/ovmf_va=
-rs_patched.fd \
--machine pc-q35-3.0,accel=3Dkvm \
--nodefaults \
--cpu host,kvm=3Doff,hv_vendor_id=3DRedHat,hv_time,hv_relaxed,hv_vapic,hv_sp=
-inlocks=3D0x1fff \
--accel kvm \
--smp 4,sockets=3D1,cores=3D4,threads=3D1 \
--m 16G \
--nic bridge,br=3Dbr0,mac=3D52:54:00:12:34:77,model=3De1000e \
--device vfio-pci,host=3D01:00.0,multifunction=3Don \
--device vfio-pci,host=3D01:00.1 \
--vga none \
--display none \
--monitor none \
--blockdev raw,node-name=3Dide-hd.0,cache.direct=3Don,discard=3Dunmap,file.d=
-river=3Dhost_device,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata-W=
-DC_WDS500G2B0A-00SM50_181265803048 \
--device ide-hd,drive=3Dide-hd.0,bus=3Dide.0,rotation_rate=3D1 \
--blockdev raw,node-name=3Dide-hd.1,cache.direct=3Don,file.driver=3Dhost_dev=
-ice,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata-TOSHIBA_HDWE160_X=
-746K8ZTF56D-part1 \
--device ide-hd,drive=3Dide-hd.1,bus=3Dide.1 \
--device vfio-pci,host=3D04:00.0 \
--device qemu-xhci \
--device usb-host,vendorid=3D0x04d9,productid=3D0x0171 \
--device usb-host,vendorid=3D0x1532,productid=3D0x005c \
--device usb-host,vendorid=3D0x1b1c,productid=3D0x0c09
-
-echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
-echo 0000:04:00.0 > /sys/bus/pci/drivers_probe
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1792523
-
-Title:
-  usb passthrough not resetting on host after vm shutdown if started
-  with -daemonize
-
-Status in QEMU:
-  New
-
-Bug description:
-  Below is the full Qemu command used to launch the VM. Have been using
-  this same setup since Qemu 2.12, plus a couple of cherry picked patch
-  commits fixing ide-hd and e1000e in Windows guests. Both sets of
-  patches have now been merged to 3.0, so decided to update to 3.0.
-
-  The VM launches and runs fine, but after shutting down, the usb
-  devices that are passed through from the host (keyboard, mouse) do not
-  work until unplugged and plugged in again. Have narrowed this down to
-  the -daemonize -pidfile arguments.. if those lines are removed, usb
-  devices work in the host again right away after VM shutdown.
-
-  CPU: Intel(R) Core(TM) i5-6600K CPU @ 3.50GHz
-  OS: Linux dev 4.18.6-arch1-1-ARCH #1 SMP PREEMPT Wed Sep 5 11:54:09 UTC 2=
-018 x86_64 GNU/Linux
-
-  Thank you for looking into this!
-
-  =
-
-  #!/usr/bin/env bash
-
-  echo vfio-pci > /sys/bus/pci/devices/0000:04:00.0/driver_override
-  echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
-  echo 0000:04:00.0 > /sys/bus/pci/drivers/vfio-pci/bind
-  echo > /sys/bus/pci/devices/0000:04:00.0/driver_override
-
-  /usr/bin/qemu-system-x86_64 \
-  -name winnt \
-  -daemonize \
-  -pidfile /run/vms/qemu/winnt.pid \
-  -boot menu=3Don \
-  -drive if=3Dpflash,format=3Draw,readonly,file=3D/opt/vms/qemu/machines/ov=
-mf_code_patched.fd \
-  -drive if=3Dpflash,format=3Draw,file=3D/opt/vms/qemu/machines/winnt/ovmf_=
-vars_patched.fd \
-  -machine pc-q35-3.0,accel=3Dkvm \
-  -nodefaults \
-  -cpu host,kvm=3Doff,hv_vendor_id=3DRedHat,hv_time,hv_relaxed,hv_vapic,hv_=
-spinlocks=3D0x1fff \
-  -accel kvm \
-  -smp 4,sockets=3D1,cores=3D4,threads=3D1 \
-  -m 16G \
-  -nic bridge,br=3Dbr0,mac=3D52:54:00:12:34:77,model=3De1000e \
-  -device vfio-pci,host=3D01:00.0,multifunction=3Don \
-  -device vfio-pci,host=3D01:00.1 \
-  -vga none \
-  -display none \
-  -monitor none \
-  -blockdev raw,node-name=3Dide-hd.0,cache.direct=3Don,discard=3Dunmap,file=
-.driver=3Dhost_device,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata=
--WDC_WDS500G2B0A-00SM50_181265803048 \
-  -device ide-hd,drive=3Dide-hd.0,bus=3Dide.0,rotation_rate=3D1 \
-  -blockdev raw,node-name=3Dide-hd.1,cache.direct=3Don,file.driver=3Dhost_d=
-evice,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata-TOSHIBA_HDWE160=
-_X746K8ZTF56D-part1 \
-  -device ide-hd,drive=3Dide-hd.1,bus=3Dide.1 \
-  -device vfio-pci,host=3D04:00.0 \
-  -device qemu-xhci \
-  -device usb-host,vendorid=3D0x04d9,productid=3D0x0171 \
-  -device usb-host,vendorid=3D0x1532,productid=3D0x005c \
-  -device usb-host,vendorid=3D0x1b1c,productid=3D0x0c09
-
-  echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
-  echo 0000:04:00.0 > /sys/bus/pci/drivers_probe
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1792523/+subscriptions
+Paolo
