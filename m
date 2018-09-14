@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0rg9-0004NC-IZ
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:14:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g0rhB-0004z9-Pr
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:15:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g0rg8-0002Cp-Pk
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:14:49 -0400
-Date: Fri, 14 Sep 2018 19:14:33 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180914171433.GD4991@localhost.localdomain>
-References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-12-kwolf@redhat.com>
-	<908e08a4-a58a-e4e1-5eb7-fe9d17adfbe3@redhat.com>
-	<20180913165954.GB5172@localhost.localdomain>
-	<bf0ed459-0c81-82ba-a60d-736170469501@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1g0rhB-0003WB-05
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:15:53 -0400
+References: <20180914151515.21242-1-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a9ca19ec-826a-e8c0-0fe5-7e46c084c4c6@redhat.com>
+Date: Fri, 14 Sep 2018 13:15:44 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bf0ed459-0c81-82ba-a60d-736170469501@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 11/17] block-backend: Decrease in_flight
- only after callback
+In-Reply-To: <20180914151515.21242-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] transaction support for bitmap merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 
-Am 14.09.2018 um 17:12 hat Paolo Bonzini geschrieben:
-> On 13/09/2018 18:59, Kevin Wolf wrote:
-> > Am 13.09.2018 um 17:10 hat Paolo Bonzini geschrieben:
-> >> On 13/09/2018 14:52, Kevin Wolf wrote:
-> >>> + if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
-> >>> + /* If we are in the main thread, the callback is allowed to unref
-> >>> + * the BlockBackend, so we have to hold an additional reference */
-> >>> + blk_ref(acb->rwco.blk);
-> >>> + }
-> >>> acb->common.cb(acb->common.opaque, acb->rwco.ret);
-> >>> + blk_dec_in_flight(acb->rwco.blk);
-> >>> + if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
-> >>> + blk_unref(acb->rwco.blk);
-> >>> + }
-> >>
-> >> Is this something that happens only for some specific callers?  That is,
-> >> which callers are sure that the callback is invoked from the main thread?
-> > 
-> > I can't seem to reproduce the problem I saw any more even when reverting
-> > the bdrv_ref/unref pair. If I remember correctly it was actually a
-> > nested aio_poll() that was running a block job completion or something
-> > like that - which would obviously only happen on the main thread because
-> > the job intentionally defers to the main thread.
-> > 
-> > The only reason I made this conditional is that I think bdrv_unref()
-> > still isn't safe outside the main thread, is it?
+
+
+On 09/14/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> This is a last brick, necessary to play with nbd bitmap export in
+> conjunction with image fleecing.
 > 
-> Yes, making it conditional is correct, but it is quite fishy even with
-> the conditional.
+> v3:
+> 01: fix type in commit message, add John's r-b
+> 02: splitted refactoring
+> 03: improve commit message, split some refactoring to 02
+> 04: add John's r-b
+> 05: drop extra state variable, make it local instead. John's r-b.
 > 
-> As you mention, you could have a nested aio_poll() in the main thread,
-> for example invoked from a bottom half, but in that case I'd rather
-> track the caller that is creating the bottom half and see if it lacks a
-> bdrv_ref/bdrv_unref (or perhaps it's even higher in the tree that is
-> missing).
+> 
+> v2: don't compare with v1, it is changed a lot, to do the whole thing
+>     in .prepare instead of .commit. It is needed to be compatible with
+>     backup block job transaction actions [John]
+> 
+> Vladimir Sementsov-Ogievskiy (5):
+>   dirty-bitmap: switch assert-fails to errors in bdrv_merge_dirty_bitmap
+>   dirty-bitmap: rename bdrv_undo_clear_dirty_bitmap
+>   dirty-bitmap: make it possible to restore bitmap after merge
+>   blockdev: rename block-dirty-bitmap-clear transaction handlers
+>   qapi: add transaction support for x-block-dirty-bitmap-merge
+> 
+>  qapi/transaction.json        |  2 ++
+>  include/block/block_int.h    |  2 +-
+>  include/block/dirty-bitmap.h |  2 +-
+>  include/qemu/hbitmap.h       | 25 +++++++++------
+>  block/dirty-bitmap.c         | 36 +++++++++++++++++-----
+>  blockdev.c                   | 59 +++++++++++++++++++++++++-----------
+>  util/hbitmap.c               | 11 +++++--
+>  7 files changed, 99 insertions(+), 38 deletions(-)
+> 
 
-I went back to the commit where I first added the patch (it already
-contained the ref/unref pair) and tried if I could reproduce a bug with
-the pair removed. I couldn't.
-
-I'm starting to think that maybe I was just overly cautious with the
-ref/unref. I may have confused the nested aio_poll() crash with a
-different situation. I've dealt with so many crashes and hangs while
-working on this series that it's quite possible.
-
-Kevin
+Reviewed-by: John Snow <jsnow@redhat.com>
