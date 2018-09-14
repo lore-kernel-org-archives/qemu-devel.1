@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g0otG-0006W2-7f
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:16:16 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g0ouP-00079t-6x
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g0otE-0000Gw-0h
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:16:09 -0400
-References: <20180706113630.25222-1-vsementsov@virtuozzo.com>
-	<20180706113630.25222-5-vsementsov@virtuozzo.com>
-	<a606cb87-a4f5-53ed-6048-ef8fb8c798bc@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ea2170d9-a972-5017-acc3-2f4cc0930dcf@virtuozzo.com>
-Date: Fri, 14 Sep 2018 17:15:53 +0300
+	(envelope-from <jsnow@redhat.com>) id 1g0ouM-0001F1-Gx
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:17:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41956)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1g0ouK-0001Bg-El
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:17:17 -0400
+References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
+	<20180912081950.3228.68987.stgit@pasha-VirtualBox>
+	<f7b7533c-a9db-d660-4981-678ae5143950@redhat.com>
+	<002101d44bee$9edf9720$dc9ec560$@ru>
+	<002301d44bfc$603513c0$209f3b40$@ru>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <1b1d35c1-31e4-767d-b687-5df11895c26b@redhat.com>
+Date: Fri, 14 Sep 2018 10:17:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <a606cb87-a4f5-53ed-6048-ef8fb8c798bc@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <002301d44bfc$603513c0$209f3b40$@ru>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] qapi: add transaction support for
- x-block-dirty-bitmap-merge
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 21/25] replay: replay BH for IDE trim
+ operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,116 +32,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-11.09.2018 22:45, John Snow wrote:
->
-> On 07/06/2018 07:36 AM, Vladimir Sementsov-Ogievskiy wrote:
->> New action is like clean action: do the whole thing in .prepare and
->> undo in .abort. This behavior for bitmap-changing actions is needed
->> because backup job actions use bitmap in .prepare.
+
+
+On 09/14/2018 03:27 AM, Pavel Dovgalyuk wrote:
+>> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
+>>> From: John Snow [mailto:jsnow@redhat.com]
+>>> On 09/12/2018 04:19 AM, Pavel Dovgalyuk wrote:
+>>>> This patch makes IDE trim BH deterministic, because it affects
+>>>> the device state. Therefore its invocation should be replayed
+>>>> instead of running at the random moment.
+>>>>
+>>>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>>>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>>>> ---
+>>>>  hw/ide/core.c |    3 ++-
+>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>>>> index 2c62efc..04e22e7 100644
+>>>> --- a/hw/ide/core.c
+>>>> +++ b/hw/ide/core.c
+>>>> @@ -35,6 +35,7 @@
+>>>>  #include "sysemu/block-backend.h"
+>>>>  #include "qapi/error.h"
+>>>>  #include "qemu/cutils.h"
+>>>> +#include "sysemu/replay.h"
+>>>>
+>>>>  #include "hw/ide/internal.h"
+>>>>  #include "trace.h"
+>>>> @@ -479,7 +480,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+>>>>  done:
+>>>>      iocb->aiocb = NULL;
+>>>>      if (iocb->bh) {
+>>>> -        qemu_bh_schedule(iocb->bh);
+>>>> +        replay_bh_schedule_event(iocb->bh);
+>>>>      }
+>>>>  }
+>>>>
+>>> Just passing by: Why do we need to change this call, but nothing else in
+>>> IDE?
 >>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   qapi/transaction.json |  2 ++
->>   blockdev.c            | 38 +++++++++++++++++++++++++++++++++++++-
->>   2 files changed, 39 insertions(+), 1 deletion(-)
+>> This call is responsible for a bug that was reproducible.
 >>
->> diff --git a/qapi/transaction.json b/qapi/transaction.json
->> index d7e4274550..5875cdb16c 100644
->> --- a/qapi/transaction.json
->> +++ b/qapi/transaction.json
->> @@ -48,6 +48,7 @@
->>   # - @block-dirty-bitmap-clear: since 2.5
->>   # - @x-block-dirty-bitmap-enable: since 3.0
->>   # - @x-block-dirty-bitmap-disable: since 3.0
->> +# - @x-block-dirty-bitmap-merge: since 3.1
->>   # - @blockdev-backup: since 2.3
->>   # - @blockdev-snapshot: since 2.5
->>   # - @blockdev-snapshot-internal-sync: since 1.7
->> @@ -63,6 +64,7 @@
->>          'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
->>          'x-block-dirty-bitmap-enable': 'BlockDirtyBitmap',
->>          'x-block-dirty-bitmap-disable': 'BlockDirtyBitmap',
->> +       'x-block-dirty-bitmap-merge': 'BlockDirtyBitmapMerge',
->>          'blockdev-backup': 'BlockdevBackup',
->>          'blockdev-snapshot': 'BlockdevSnapshot',
->>          'blockdev-snapshot-internal-sync': 'BlockdevSnapshotInternal',
->> diff --git a/blockdev.c b/blockdev.c
->> index 5348e8ba9b..feebbb9a9a 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -1940,6 +1940,7 @@ static void blockdev_backup_clean(BlkActionState *common)
->>   typedef struct BlockDirtyBitmapState {
->>       BlkActionState common;
->>       BdrvDirtyBitmap *bitmap;
->> +    BdrvDirtyBitmap *merge_source;
-> Is this necessary?
+>>> I don't mind conceptually, but it's odd to me that of all the calls I
+>>> make in this emulator that change state somewhere that this is the only
+>>> one you need to hijack for the replay feature.
+>>>
+>>> Is this a necessarily complete change?
+> 
+> 
+> I found one more BH in ide/core:
+> 
+> static void ide_restart_cb(void *opaque, int running, RunState state)
+> {
+>     IDEBus *bus = opaque;
+> 
+>     if (!running)
+>         return;
+> 
+>     if (!bus->bh) {
+>         bus->bh = qemu_bh_new(ide_restart_bh, bus);
+>         qemu_bh_schedule(bus->bh);
+>     }
+> }
+> 
+> void ide_register_restart_cb(IDEBus *bus)
+> {
+>     if (bus->dma->ops->restart_dma) {
+>         bus->vmstate = qemu_add_vm_change_state_handler(ide_restart_cb, bus);
+>     }
+> }
+> 
+> As I understand, it is called when VM start/stop event happen.
+> These events are not related to the guest state.
+> 
+> Does this BH change the guest state somehow?
+> 
+> Pavel Dovgalyuk
+> 
+> 
 
-looks like it isn't, will drop it.
+Shouldn't change guest state all by itself.
 
->
->>       BlockDriverState *bs;
->>       HBitmap *backup;
->>       bool prepared;
->> @@ -2112,6 +2113,35 @@ static void block_dirty_bitmap_disable_abort(BlkActionState *common)
->>       }
->>   }
->>   
->> +static void block_dirty_bitmap_merge_prepare(BlkActionState *common,
->> +                                             Error **errp)
->> +{
->> +    BlockDirtyBitmapMerge *action;
->> +    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
->> +                                             common, common);
->> +
->> +    if (action_check_completion_mode(common, errp) < 0) {
->> +        return;
->> +    }
->> +
->> +    action = common->action->u.x_block_dirty_bitmap_merge.data;
->> +    state->bitmap = block_dirty_bitmap_lookup(action->node,
->> +                                              action->dst_name,
->> +                                              &state->bs,
->> +                                              errp);
->> +    if (!state->bitmap) {
->> +        return;
->> +    }
->> +
->> +    state->merge_source = bdrv_find_dirty_bitmap(state->bs, action->src_name);
->> +    if (!state->merge_source) {
->> +        return;
->> +    }
->> +
->> +    bdrv_merge_dirty_bitmap(state->bitmap, state->merge_source, &state->backup,
->> +                            errp);
->> +}
->> +
->>   static void abort_prepare(BlkActionState *common, Error **errp)
->>   {
->>       error_setg(errp, "Transaction aborted using Abort action");
->> @@ -2182,7 +2212,13 @@ static const BlkActionOps actions[] = {
->>           .instance_size = sizeof(BlockDirtyBitmapState),
->>           .prepare = block_dirty_bitmap_disable_prepare,
->>           .abort = block_dirty_bitmap_disable_abort,
->> -     }
->> +    },
->> +    [TRANSACTION_ACTION_KIND_X_BLOCK_DIRTY_BITMAP_MERGE] = {
->> +        .instance_size = sizeof(BlockDirtyBitmapState),
->> +        .prepare = block_dirty_bitmap_merge_prepare,
->> +        .commit = block_dirty_bitmap_free_backup,
->> +        .abort = block_dirty_bitmap_restore,
->> +    }
->>   };
->>   
->>   /**
->>
-> If the new state is not necessary and you remove it:
->
-> Reviewed-by: John Snow <jsnow@redhat.com>
+ide_restart_bh does, though. (Changes device registers, can cause block
+IO to occur, etc.)
 
-
--- 
-Best regards,
-Vladimir
+--js
