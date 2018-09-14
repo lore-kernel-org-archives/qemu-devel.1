@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1g0p8T-00043n-Sd
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:31:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1g0pBa-0005w1-9v
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:35:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1g0p8P-0002ZV-NY
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:31:53 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:49716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1g0p8P-0002Z7-Cu
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:31:49 -0400
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-From: Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <3122370e-7f41-5aed-b26e-2aba32ce3889@redhat.com>
-Date: Fri, 14 Sep 2018 17:31:37 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B8ABB04A-A6F5-4409-8E05-9E8D7CE124F5@oracle.com>
-References: <CF1FBDB7-62D3-4743-8FE8-0F0CB78938C6@oracle.com>
-	<3122370e-7f41-5aed-b26e-2aba32ce3889@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] KVM: i386: Add support for save and
- restore nested state
+	(envelope-from <imammedo@redhat.com>) id 1g0pBW-0007Jg-JU
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:35:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:17099)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1g0pBW-0007GC-9x
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:35:02 -0400
+Date: Fri, 14 Sep 2018 16:34:47 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180914163447.367cb2d3@redhat.com>
+In-Reply-To: <20180913142025.55af60ae@redhat.com>
+References: <20180829153624.12299-1-david@redhat.com>
+	<20180829153624.12299-6-david@redhat.com>
+	<20180913142025.55af60ae@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/20] memory-device: convert
+ get_region_size() to get_memory_region()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,137 +29,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, kvm list <kvm@vger.kernel.org>, Jim Mattson <jmattson@google.com>, Idan Brown <idan.brown@oracle.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan
+	Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Richard Henderson <rth@twiddle.net>
+
+On Thu, 13 Sep 2018 14:20:25 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Wed, 29 Aug 2018 17:36:09 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+> > To factor out plugging and unplugging of memory device we need access to
+> > the memory region. So let's replace get_region_size() by
+> > get_memory_region().
+this part isn't clear and doesn't really answer "why" patch's been written
+and how it will really help.
+
+> > 
+> > If any memory device will in the future have multiple memory regions
+> > that make up the total region size, it can simply use a wrapping memory
+> > region to embed the other ones.
+It might be better to document expectation as part of get_memory_region() doc comment.
 
 
-> On 14 Sep 2018, at 13:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On 14/09/2018 11:54, Liran Alon wrote:
->>> On 14/09/2018 09:16, Paolo Bonzini wrote:
->>> Heh, I was going to send a similar patch.  However, things are a bit
->>> more complex for two reason.
->>>=20
->>> First, I'd prefer to reuse the hflags and hflags2 fields that we =
-already
->>> have, and only store the VMCS blob in the subsection.  For example,
->>> HF_SVMI_MASK is really the same as HF_GUEST_MASK in KVM source code =
-and
->>> KVM_STATE_NESTED_GUEST_MODE in the nested virt state.
->>>=20
->>=20
->> Do you mean you intend to only save/restore the =E2=80=9Cvmx=E2=80=9D =
-field in struct kvm_nested_state?
->> (That is, struct kvm_vmx_nested_state)
->> If yes, that is problematic as kvm_nested_state.flags also hold other =
-flags besides KVM_STATE_NESTED_GUEST_MODE.
->> How do you expect to save/restore for example the =
-vmx->nested.nested_run_pending flag that is specified in =
-KVM_STATE_NESTED_RUN_PENDING?
->=20
-> By defining more HF flags.  I'd rather avoid having multiple ways to
-> store the same thing, in case for example in the future HVF implements
-> nested virt.
+I'm not really getting reasoning behind this patch.
+ * Why get_region_size() doesn't work for you?
+   benefits I see is that's one less get_foo_size() callback,
+   so it becomes less confusing
 
-I agree it is possible to define more hflags and to translate =
-kvm_nested_flags->flags to flags in hflags and vice-versa.
-However, I am not sure I understand the extra value provided by doing =
-so.
-I think it makes more sense to rename struct kvm_nested_state to struct =
-nested_state and
-use this as a generic interface to get/set nested_state for all =
-hypervisors.
-If a given hypervisor, such as HVF, needs to store different blob than =
-KVM VMX, it can just add another struct field to
-the union-part of struct kvm_nested_state.
-This way, the code that handles the save/restore of nested_state can =
-remain generic for all hypervisors.
+ * I get we might need access to memory region at MemoryDeviceClass level,
+   but why are you keeping PCDIMMDeviceClass::get_memory_region()?
+   I'd expect the later being generalized (moved) to MemoryDeviceClass
+   so we would end up with one level indirection that we have now.
 
->=20
->> In addition, why is it important to avoid save/restore the entire =
-kvm_nested_state struct?
->> It seems to simplify things to just save/restore the entire struct.
->=20
-> It is indeed simpler, but it adds unnecessary KVM specificities.
-
-I=E2=80=99m not sure I understand this argument.
-
->=20
->>>> +static int nested_state_post_load(void *opaque, int version_id)
->>>> +{
->>>> +    X86CPU *cpu =3D opaque;
->>>> +    CPUX86State *env =3D &cpu->env;
->>>> +
->>>> +    /*
->>>> +     * Verify that the size specified in given struct is set
->>>> +     * to no more than the size that our kernel support
->>>> +     */
->>>> +    if (env->nested_state->size > env->nested_state_len) {
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>> +    return 0;
->>>> +}
->>>> +
->>>> +static bool nested_state_needed(void *opaque)
->>>=20
->>> doesn't work if nested_state_len differs between source and =
-destination,
->>> and could overflow the nested_state buffer if nested_state_len is =
-larger
->>> on the source.
->>=20
->> This is not accurate.
->> I have actually given a lot of thought to this aspect in the patch.
->>=20
->> The above post_load() method actually prevents an overflow to happen =
-on dest.
->> Note that env->nested_state_len is not passed as part of migration =
-stream.
->> It is only set by local kernel KVM_CAP_NESTED_STATE.
->>=20
->> Therefore, we allow the following migrations to execute successfully:
->> 1) Migration from a source with smaller KVM_CAP_NESTED_STATE to dest =
-with a bigger one.
->> The above post_load() check will succeed as size specified in =
-migrated nested_state->size
->> is smaller than dest KVM_CAP_NESTED_STATE (stored in =
-env->nested_state_len).
->> 2) Migration from source to dest when they both have same =
-KVM_CAP_NESTED_STATE size.
->> Obvious.
->> 3) Migration from source to dest when source have a bigger =
-KVM_CAP_NESTED_STATE than dest.
->> This will only succeed in case size specified in nested_state->size =
-is smaller than dest KVM_CAP_NESTED_STATE.
->=20
-> You're right (I got confused with my implementation).
->=20
-> There is still a problem, however, in that the same input stream would
-> be parsed differently depending on the kernel version.  In particular,
-> if in the future the maximum nested state size grows, you break all
-> existing save files.
-
-I=E2=80=99m not sure I agree with this.
-1) Newer kernels should change struct only by utilizing unused fields in =
-current struct
-or enlarging it with extra fields. It should not change the meaning of =
-existing fields.
-2) Newer kernel need to be able to parse and generate structs of sizes =
-of older kernels.
-Otherwise, you won=E2=80=99t be able to migrate from older kernels to =
-newer kernels and vice-versa.
-3) The thing that is really missing here in my patch is: Source don=E2=80=99=
-t know which version
-of the struct it should ask kernel to generate in order for dest to be =
-able to parse it.
-For that, there is a need that source will somehow know what is the dest =
-max compatible struct size
-and request kernel to generate a struct of that size.
-Is there any mechanism in QEMU which I can use to utilize to do such =
-logic?
-
--Liran
-
->=20
-> Paolo
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  hw/mem/memory-device.c         | 10 ++++++----
+> >  hw/mem/pc-dimm.c               | 19 ++++++++++++++-----
+> >  include/hw/mem/memory-device.h |  2 +-
+> >  3 files changed, 21 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> > index d87599c280..3bd30d98bb 100644
+> > --- a/hw/mem/memory-device.c
+> > +++ b/hw/mem/memory-device.c
+> > @@ -56,11 +56,13 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
+> >  
+> >      if (object_dynamic_cast(obj, TYPE_MEMORY_DEVICE)) {
+> >          const DeviceState *dev = DEVICE(obj);
+> > -        const MemoryDeviceState *md = MEMORY_DEVICE(obj);
+> > +        MemoryDeviceState *md = MEMORY_DEVICE(obj);  
+> it's a getter, why do we loose 'const' here?
+> 
+> >          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
+> >  
+> >          if (dev->realized) {
+> > -            *size += mdc->get_region_size(md, &error_abort);
+> > +            MemoryRegion *mr = mdc->get_memory_region(md, &error_abort);
+> > +
+> > +            *size += memory_region_size(mr);
+> >          }
+> >      }
+> >  
+> > @@ -162,12 +164,12 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+> >      /* find address range that will fit new memory device */
+> >      object_child_foreach(OBJECT(ms), memory_device_build_list, &list);
+> >      for (item = list; item; item = g_slist_next(item)) {
+> > -        const MemoryDeviceState *md = item->data;
+> > +        MemoryDeviceState *md = item->data;  
+> ditto
+> 
+> >          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
+> >          uint64_t md_size, md_addr;
+> >  
+> >          md_addr = mdc->get_addr(md);
+> > -        md_size = mdc->get_region_size(md, &error_abort);
+> > +        md_size = memory_region_size(mdc->get_memory_region(md, &error_abort));
+> >          if (*errp) {
+> >              goto out;
+> >          }
+> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > index 4bf1a0acc9..a208b17c64 100644
+> > --- a/hw/mem/pc-dimm.c
+> > +++ b/hw/mem/pc-dimm.c
+> > @@ -236,8 +236,8 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+> >      return dimm->addr;
+> >  }
+> >  
+> > -static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
+> > -                                           Error **errp)
+> > +static uint64_t pc_dimm_md_get_plugged_size(const MemoryDeviceState *md,
+> > +                                            Error **errp)
+> >  {
+> >      /* dropping const here is fine as we don't touch the memory region */
+> >      PCDIMMDevice *dimm = PC_DIMM(md);
+> > @@ -249,9 +249,19 @@ static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
+> >          return 0;
+> >      }
+> >  
+> > +    /* for a dimm plugged_size == region_size */
+> >      return memory_region_size(mr);
+> >  }
+> >  
+> > +static MemoryRegion *pc_dimm_md_get_memory_region(MemoryDeviceState *md,
+> > +                                                  Error **errp)
+> > +{
+> > +    PCDIMMDevice *dimm = PC_DIMM(md);
+> > +    const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
+> > +
+> > +    return ddc->get_memory_region(dimm, errp);
+> > +}
+> > +
+> >  static void pc_dimm_md_fill_device_info(const MemoryDeviceState *md,
+> >                                          MemoryDeviceInfo *info)
+> >  {
+> > @@ -297,9 +307,8 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+> >      ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
+> >  
+> >      mdc->get_addr = pc_dimm_md_get_addr;
+> > -    /* for a dimm plugged_size == region_size */
+> > -    mdc->get_plugged_size = pc_dimm_md_get_region_size;
+> > -    mdc->get_region_size = pc_dimm_md_get_region_size;
+> > +    mdc->get_plugged_size = pc_dimm_md_get_plugged_size;
+> > +    mdc->get_memory_region = pc_dimm_md_get_memory_region;
+> >      mdc->fill_device_info = pc_dimm_md_fill_device_info;
+> >  }
+> >  
+> > diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+> > index f02b229837..852fd8f98a 100644
+> > --- a/include/hw/mem/memory-device.h
+> > +++ b/include/hw/mem/memory-device.h
+> > @@ -34,7 +34,7 @@ typedef struct MemoryDeviceClass {
+> >  
+> >      uint64_t (*get_addr)(const MemoryDeviceState *md);
+> >      uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
+> > -    uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
+> > +    MemoryRegion *(*get_memory_region)(MemoryDeviceState *md, Error **errp);
+> >      void (*fill_device_info)(const MemoryDeviceState *md,
+> >                               MemoryDeviceInfo *info);
+> >  } MemoryDeviceClass;  
+> 
+> 
