@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g0hhj-0003Uy-4f
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:35:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1g0i5z-0001S1-UN
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g0hhf-00045M-Uo
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:35:47 -0400
-Received: from 20.mo7.mail-out.ovh.net ([46.105.49.208]:60099)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g0hhf-00043r-Jf
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:35:43 -0400
-Received: from player759.ha.ovh.net (unknown [10.109.146.5])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 57607D834B
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 08:35:42 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 14 Sep 2018 08:35:06 +0200
-Message-Id: <20180914063506.20815-4-clg@kaod.org>
-In-Reply-To: <20180914063506.20815-1-clg@kaod.org>
-References: <20180914063506.20815-1-clg@kaod.org>
+	(envelope-from <bounces@canonical.com>) id 1g0i5w-0000Cw-GP
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:00:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1g0i5w-0000BA-7Z
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:00:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1g0i5u-0005V0-Hx
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 07:00:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 834E82E8023
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 07:00:46 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] aspeed/i2c: Fix receive done interrupt
- handling
+Date: Fri, 14 Sep 2018 06:54:26 -0000
+From: Marshall Porter <1792523@bugs.launchpad.net>
+Reply-To: Bug 1792523 <1792523@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153690806645.16635.9456702675801152758.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1792523] [NEW] usb passthrough not resetting on
+ host after vm shutdown if started with -daemonize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +37,155 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Guenter Roeck <linux@roeck-us.net>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-From: Guenter Roeck <linux@roeck-us.net>
+Public bug reported:
 
-The AST2500 datasheet says:
+Below is the full Qemu command used to launch the VM. Have been using
+this same setup since Qemu 2.12, plus a couple of cherry picked patch
+commits fixing ide-hd and e1000e in Windows guests. Both sets of patches
+have now been merged to 3.0, so decided to update to 3.0.
 
-I2CD10 Interrupt Status Register
-       bit 2 Receive Done Interrupt status
-             S/W needs to clear this status bit to allow next data receiv=
-ing
+The VM launches and runs fine, but after shutting down, the usb devices
+that are passed through from the host (keyboard, mouse) do not work
+until unplugged and plugged in again. Have narrowed this down to the
+-daemonize -pidfile arguments.. if those lines are removed, usb devices
+work in the host again right away after VM shutdown.
 
-The Rx interrrupt done interrupt status bit needs to be cleared
-explicitly before the next byte can be received, and must therefore
-not be auto-cleared. Also, receiving the next byte must be delayed
-until the bit has been cleared.
+CPU: Intel(R) Core(TM) i5-6600K CPU @ 3.50GHz
+OS: Linux dev 4.18.6-arch1-1-ARCH #1 SMP PREEMPT Wed Sep 5 11:54:09 UTC 201=
+8 x86_64 GNU/Linux
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/i2c/aspeed_i2c.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Thank you for looking into this!
 
-diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
-index d81f86587af7..7ae99bc8baec 100644
---- a/hw/i2c/aspeed_i2c.c
-+++ b/hw/i2c/aspeed_i2c.c
-@@ -257,7 +257,8 @@ static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus *b=
-us, uint64_t value)
-         aspeed_i2c_set_state(bus, I2CD_MACTIVE);
-     }
-=20
--    if (bus->cmd & (I2CD_M_RX_CMD | I2CD_M_S_RX_CMD_LAST)) {
-+    if ((bus->cmd & (I2CD_M_RX_CMD | I2CD_M_S_RX_CMD_LAST)) &&
-+        !(bus->intr_status & I2CD_INTR_RX_DONE)) {
-         aspeed_i2c_handle_rx_cmd(bus);
-     }
-=20
-@@ -279,6 +280,7 @@ static void aspeed_i2c_bus_write(void *opaque, hwaddr=
- offset,
-                                  uint64_t value, unsigned size)
- {
-     AspeedI2CBus *bus =3D opaque;
-+    bool handle_rx;
-=20
-     switch (offset) {
-     case I2CD_FUN_CTRL_REG:
-@@ -299,11 +301,17 @@ static void aspeed_i2c_bus_write(void *opaque, hwad=
-dr offset,
-         bus->intr_ctrl =3D value & 0x7FFF;
-         break;
-     case I2CD_INTR_STS_REG:
-+        handle_rx =3D (bus->intr_status & I2CD_INTR_RX_DONE) &&
-+                (value & I2CD_INTR_RX_DONE);
-         bus->intr_status &=3D ~(value & 0x7FFF);
-         if (!bus->intr_status) {
-             bus->controller->intr_status &=3D ~(1 << bus->id);
-             qemu_irq_lower(bus->controller->irq);
-         }
-+        if (handle_rx && (bus->cmd & (I2CD_M_RX_CMD | I2CD_M_S_RX_CMD_LA=
-ST))) {
-+            aspeed_i2c_handle_rx_cmd(bus);
-+            aspeed_i2c_bus_raise_interrupt(bus);
-+        }
-         break;
-     case I2CD_DEV_ADDR_REG:
-         qemu_log_mask(LOG_UNIMP, "%s: slave mode not implemented\n",
---=20
-2.17.1
+
+#!/usr/bin/env bash
+
+echo vfio-pci > /sys/bus/pci/devices/0000:04:00.0/driver_override
+echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
+echo 0000:04:00.0 > /sys/bus/pci/drivers/vfio-pci/bind
+echo > /sys/bus/pci/devices/0000:04:00.0/driver_override
+
+/usr/bin/qemu-system-x86_64 \
+-name winnt \
+-daemonize \
+-pidfile /run/vms/qemu/winnt.pid \
+-boot menu=3Don \
+-drive if=3Dpflash,format=3Draw,readonly,file=3D/opt/vms/qemu/machines/ovmf=
+_code_patched.fd \
+-drive if=3Dpflash,format=3Draw,file=3D/opt/vms/qemu/machines/winnt/ovmf_va=
+rs_patched.fd \
+-machine pc-q35-3.0,accel=3Dkvm \
+-nodefaults \
+-cpu host,kvm=3Doff,hv_vendor_id=3DRedHat,hv_time,hv_relaxed,hv_vapic,hv_sp=
+inlocks=3D0x1fff \
+-accel kvm \
+-smp 4,sockets=3D1,cores=3D4,threads=3D1 \
+-m 16G \
+-nic bridge,br=3Dbr0,mac=3D52:54:00:12:34:77,model=3De1000e \
+-device vfio-pci,host=3D01:00.0,multifunction=3Don \
+-device vfio-pci,host=3D01:00.1 \
+-vga none \
+-display none \
+-monitor none \
+-blockdev raw,node-name=3Dide-hd.0,cache.direct=3Don,discard=3Dunmap,file.d=
+river=3Dhost_device,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata-W=
+DC_WDS500G2B0A-00SM50_181265803048 \
+-device ide-hd,drive=3Dide-hd.0,bus=3Dide.0,rotation_rate=3D1 \
+-blockdev raw,node-name=3Dide-hd.1,cache.direct=3Don,file.driver=3Dhost_dev=
+ice,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata-TOSHIBA_HDWE160_X=
+746K8ZTF56D-part1 \
+-device ide-hd,drive=3Dide-hd.1,bus=3Dide.1 \
+-device vfio-pci,host=3D04:00.0 \
+-device qemu-xhci \
+-device usb-host,vendorid=3D0x04d9,productid=3D0x0171 \
+-device usb-host,vendorid=3D0x1532,productid=3D0x005c \
+-device usb-host,vendorid=3D0x1b1c,productid=3D0x0c09
+
+echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
+echo 0000:04:00.0 > /sys/bus/pci/drivers_probe
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1792523
+
+Title:
+  usb passthrough not resetting on host after vm shutdown if started
+  with -daemonize
+
+Status in QEMU:
+  New
+
+Bug description:
+  Below is the full Qemu command used to launch the VM. Have been using
+  this same setup since Qemu 2.12, plus a couple of cherry picked patch
+  commits fixing ide-hd and e1000e in Windows guests. Both sets of
+  patches have now been merged to 3.0, so decided to update to 3.0.
+
+  The VM launches and runs fine, but after shutting down, the usb
+  devices that are passed through from the host (keyboard, mouse) do not
+  work until unplugged and plugged in again. Have narrowed this down to
+  the -daemonize -pidfile arguments.. if those lines are removed, usb
+  devices work in the host again right away after VM shutdown.
+
+  CPU: Intel(R) Core(TM) i5-6600K CPU @ 3.50GHz
+  OS: Linux dev 4.18.6-arch1-1-ARCH #1 SMP PREEMPT Wed Sep 5 11:54:09 UTC 2=
+018 x86_64 GNU/Linux
+
+  Thank you for looking into this!
+
+  =
+
+  #!/usr/bin/env bash
+
+  echo vfio-pci > /sys/bus/pci/devices/0000:04:00.0/driver_override
+  echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
+  echo 0000:04:00.0 > /sys/bus/pci/drivers/vfio-pci/bind
+  echo > /sys/bus/pci/devices/0000:04:00.0/driver_override
+
+  /usr/bin/qemu-system-x86_64 \
+  -name winnt \
+  -daemonize \
+  -pidfile /run/vms/qemu/winnt.pid \
+  -boot menu=3Don \
+  -drive if=3Dpflash,format=3Draw,readonly,file=3D/opt/vms/qemu/machines/ov=
+mf_code_patched.fd \
+  -drive if=3Dpflash,format=3Draw,file=3D/opt/vms/qemu/machines/winnt/ovmf_=
+vars_patched.fd \
+  -machine pc-q35-3.0,accel=3Dkvm \
+  -nodefaults \
+  -cpu host,kvm=3Doff,hv_vendor_id=3DRedHat,hv_time,hv_relaxed,hv_vapic,hv_=
+spinlocks=3D0x1fff \
+  -accel kvm \
+  -smp 4,sockets=3D1,cores=3D4,threads=3D1 \
+  -m 16G \
+  -nic bridge,br=3Dbr0,mac=3D52:54:00:12:34:77,model=3De1000e \
+  -device vfio-pci,host=3D01:00.0,multifunction=3Don \
+  -device vfio-pci,host=3D01:00.1 \
+  -vga none \
+  -display none \
+  -monitor none \
+  -blockdev raw,node-name=3Dide-hd.0,cache.direct=3Don,discard=3Dunmap,file=
+.driver=3Dhost_device,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata=
+-WDC_WDS500G2B0A-00SM50_181265803048 \
+  -device ide-hd,drive=3Dide-hd.0,bus=3Dide.0,rotation_rate=3D1 \
+  -blockdev raw,node-name=3Dide-hd.1,cache.direct=3Don,file.driver=3Dhost_d=
+evice,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata-TOSHIBA_HDWE160=
+_X746K8ZTF56D-part1 \
+  -device ide-hd,drive=3Dide-hd.1,bus=3Dide.1 \
+  -device vfio-pci,host=3D04:00.0 \
+  -device qemu-xhci \
+  -device usb-host,vendorid=3D0x04d9,productid=3D0x0171 \
+  -device usb-host,vendorid=3D0x1532,productid=3D0x005c \
+  -device usb-host,vendorid=3D0x1b1c,productid=3D0x0c09
+
+  echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
+  echo 0000:04:00.0 > /sys/bus/pci/drivers_probe
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1792523/+subscriptions
