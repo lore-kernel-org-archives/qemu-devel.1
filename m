@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1g0hge-0002wn-0X
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:34:41 -0400
+	(envelope-from <clg@kaod.org>) id 1g0hhV-0003Me-81
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1g0hga-0002NY-FQ
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:34:38 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1g0hgW-0002Cr-Nl
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:34:34 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a108-v6so9090188wrc.13
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 23:34:29 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1g0hhS-0003lR-0l
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:35:33 -0400
+Received: from 10.mo1.mail-out.ovh.net ([178.32.96.102]:38915)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g0hhR-0003aU-JP
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:35:29 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.143.145])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id B6D8912D39C
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 08:35:20 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Fri, 14 Sep 2018 08:35:03 +0200
+Message-Id: <20180914063506.20815-1-clg@kaod.org>
 MIME-Version: 1.0
-References: <1536163920-2443-1-git-send-email-zhangckid@gmail.com>
-In-Reply-To: <1536163920-2443-1-git-send-email-zhangckid@gmail.com>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Fri, 14 Sep 2018 14:32:48 +0800
-Message-ID: <CAK3tnvK6T8fxdAmtFuB9o7Gc8oyFYuDEsCn_mv-+V7uyf3cQFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] docs/block-replication.txt: Add more
- detail about replication_do_checkpoint_all
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/3] aspeed/i2c: fix receive done interrupt
+ model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Guenter Roeck <linux@roeck-us.net>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hi All,
+Hello,
 
-No news update?
-Ping...
+The interrupt model of the Aspeed I2C controller does handle correctly
+the RX_DONE bit. As indicated in the AST2500 datasheet, the RX_DONE
+bit needs to be cleared to allow mode data to be received. This series
+fixes the behavior and delays the data reception until the bit has
+been cleared.
 
-Thanks
-Zhang Chen
+Revealed by :
 
-On Thu, Sep 6, 2018 at 12:12 AM Zhang Chen <zhangckid@gmail.com> wrote:
+  [PATCH i2c-next v6] i2c: aspeed: Handle master/slave combined irq event=
+s
+  https://lkml.org/lkml/2018/8/23/1366
 
-> Add more detail description for COLO checkpoint use case.
-> Suggested by Dr. David Alan Gilbert <dgilbert@redhat.com>
->
-> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> ---
->  docs/block-replication.txt | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/docs/block-replication.txt b/docs/block-replication.txt
-> index 6bde6737fb..b6c5e94764 100644
-> --- a/docs/block-replication.txt
-> +++ b/docs/block-replication.txt
-> @@ -131,9 +131,10 @@ a. replication_start_all()
->     thread.
->  b. replication_do_checkpoint_all()
->     This interface is called after all VM state is transferred to
-> -   Secondary QEMU. The Disk buffer will be dropped in this interface.
-> -   The caller must hold the I/O mutex lock if it is in
-> migration/checkpoint
-> -   thread.
-> +   secondary node, and in primary node this interface no need to
-> +   called after synchronizing all the states. The Disk buffer will be
-> dropped
-> +   in this interface. The caller must hold the I/O mutex lock if it is
-> +   in migration/checkpoint thread.
->  c. replication_get_error_all()
->     This interface is called to check if error happened in replication.
->     The caller must hold the I/O mutex lock if it is in
-> migration/checkpoint
-> --
-> 2.17.GIT
->
->
+which fixes irq handling in Linux at high bus frequencies.
+
+Thanks,
+
+C.
+
+C=C3=A9dric Le Goater (1):
+  aspeed/i2c: interrupts should be cleared by software only
+
+Guenter Roeck (2):
+  aspeed/i2c: Handle receive command in separate function
+  aspeed/i2c: Fix receive done interrupt handling
+
+ hw/i2c/aspeed_i2c.c | 68 +++++++++++++++++++++++++++++++--------------
+ 1 file changed, 47 insertions(+), 21 deletions(-)
+
+--=20
+2.17.1
