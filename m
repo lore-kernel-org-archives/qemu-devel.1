@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g0s0U-0000sb-Hv
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:35:51 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g0s0p-00016M-Oe
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:36:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g0s0R-00050P-Bp
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:35:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46340)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g0s0R-0004yJ-5L
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:35:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g0s0P-0000Oo-7j
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 17:35:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C8A352E80E6
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 17:35:41 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1g0s0o-0005Fv-TX
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:36:11 -0400
+References: <20180914151515.21242-1-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ffc45199-3e98-1560-08d9-2f1f187b8bb9@redhat.com>
+Date: Fri, 14 Sep 2018 13:36:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 14 Sep 2018 17:27:07 -0000
-From: George Amanakis <1788665@bugs.launchpad.net>
-Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
-Message-Id: <153694602737.8757.6234546283129959796.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
- Windows 10 (1803) VGA passthrough VM using "Spectre" protection
+In-Reply-To: <20180914151515.21242-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] transaction support for bitmap merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-I did a git-bisect between 4.14.18(bad) and 4.14.10(good).
-Unsurprisingly, this is the first "bad" commit:
-
-  KVM/VMX: Allow direct access to MSR_IA32_SPEC_CTRL
-
-  commit d28b387fb74da95d69d2615732f50cceb38e9a4d
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 
 
-George
 
--- =
+On 09/14/2018 11:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> This is a last brick, necessary to play with nbd bitmap export in
+> conjunction with image fleecing.
+> 
+> v3:
+> 01: fix type in commit message, add John's r-b
+> 02: splitted refactoring
+> 03: improve commit message, split some refactoring to 02
+> 04: add John's r-b
+> 05: drop extra state variable, make it local instead. John's r-b.
+> 
+> 
+> v2: don't compare with v1, it is changed a lot, to do the whole thing
+>     in .prepare instead of .commit. It is needed to be compatible with
+>     backup block job transaction actions [John]
+> 
+> Vladimir Sementsov-Ogievskiy (5):
+>   dirty-bitmap: switch assert-fails to errors in bdrv_merge_dirty_bitmap
+>   dirty-bitmap: rename bdrv_undo_clear_dirty_bitmap
+>   dirty-bitmap: make it possible to restore bitmap after merge
+>   blockdev: rename block-dirty-bitmap-clear transaction handlers
+>   qapi: add transaction support for x-block-dirty-bitmap-merge
+> 
+>  qapi/transaction.json        |  2 ++
+>  include/block/block_int.h    |  2 +-
+>  include/block/dirty-bitmap.h |  2 +-
+>  include/qemu/hbitmap.h       | 25 +++++++++------
+>  block/dirty-bitmap.c         | 36 +++++++++++++++++-----
+>  blockdev.c                   | 59 +++++++++++++++++++++++++-----------
+>  util/hbitmap.c               | 11 +++++--
+>  7 files changed, 99 insertions(+), 38 deletions(-)
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1788665
+Thanks, applied to my bitmaps tree:
 
-Title:
-  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
-  using "Spectre" protection
+https://github.com/jnsnow/qemu/commits/bitmaps
+https://github.com/jnsnow/qemu.git
 
-Status in QEMU:
-  New
-
-Bug description:
-  Windows 10 (1803) VM using VGA passthrough via qemu script.
-
-  After upgrading Windows 10 Pro VM to version 1803, or possibly after
-  applying the March/April security updates from Microsoft, the VM would
-  show low 2D graphics performance (sluggishness in 2D applications and
-  low Passmark results).
-
-  Turning off Spectre vulnerability protection in Windows remedies the
-  issue.
-
-  Expected behavior:
-  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
- see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
--2017-5715-and-hyper-v-vms
-
-  Background:
-
-  Starting in March or April Microsoft began to push driver updates in
-  their updates / security updates. See https://support.microsoft.com
-  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
-  meltdown
-
-  One update concerns the Intel microcode - see
-  https://support.microsoft.com/en-us/help/4100347. It is activated by
-  default within Windows.
-
-  Once the updates are applied within the Windows guest, 2D graphics
-  performance drops significantly. Other performance benchmarks are not
-  affected.
-
-  A bare metal Windows installation does not display a performance loss
-  after the update. See https://heiko-sieger.info/low-2d-graphics-
-  benchmark-with-windows-10-1803-kvm-vm/
-
-  Similar reports can be found here:
-  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
-performance_on_windows/
-
-  Hardware:
-
-  6 core Intel Core i7-3930K (-MT-MCP-)
-
-  Host OS:
-  Linux Mint 19/Ubuntu 18.04
-  Kernel: 4.15.0-32-generic x86_64
-  Qemu: QEMU emulator version 2.11.1
-  Intel microcode (host): 0x714
-  dmesg | grep microcode
-  [    0.000000] microcode: microcode updated early to revision 0x714, date=
- =3D 2018-05-08
-  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
-  [    2.813340] microcode: Microcode Update Driver: v2.2.
-
-  Note: I manually updated the Intel microcode on the host from 0x713 to
-  0x714. However, both microcode versions produce the same result in the
-  Windows guest.
-
-  Guest OS:
-  Windows 10 Pro 64 bit, release 1803
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
+--js
