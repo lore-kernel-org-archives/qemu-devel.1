@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1g0nbt-0006YR-Vv
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:54:10 -0400
+	(envelope-from <otubo@redhat.com>) id 1g0noP-0000gi-0N
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1g0nbq-0003Co-0K
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:54:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59206)
+	(envelope-from <otubo@redhat.com>) id 1g0noM-0006xa-LU
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:07:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46294)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g0nbp-0003B6-Qh
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:54:05 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6E32C307D90F
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 12:54:04 +0000 (UTC)
-Date: Fri, 14 Sep 2018 14:54:00 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180914125400.nvq5t3pjh326pvr4@sirius.home.kraxel.org>
-References: <20180914104835.26019-1-kraxel@redhat.com>
-	<20180914113407.GB3081@work-vm>
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1g0noM-0006MT-9U
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:07:02 -0400
+From: Eduardo Otubo <otubo@redhat.com>
+Date: Fri, 14 Sep 2018 15:06:44 +0200
+Message-Id: <20180914130644.15292-2-otubo@redhat.com>
+In-Reply-To: <20180914130644.15292-1-otubo@redhat.com>
+References: <20180914130644.15292-1-otubo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180914113407.GB3081@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v2] usb: assign unique serial numbers to
- hid devices
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/1] seccomp: check TSYNC host capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com
 
-  Hi,
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> OK, so now I've found the bit about the magic 42; commit 7b074a22 of
-> yours; recommended checking for 42 for knowing we had autosuspend;
-> what's actually in the current fedora hid rules is serial!=1 - I wonder
-> what others have.
+Remove -sandbox option if the host is not capable of TSYNC, since the
+sandbox will fail at setup time otherwise. This will help libvirt, for
+ex, to figure out if -sandbox will work.
 
-Whatever upstream systemd/udev has I guess ...
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Eduardo Otubo <otubo@redhat.com>
+---
+ qemu-seccomp.c | 19 ++++++++++++++++++-
+ vl.c           |  4 ++--
+ 2 files changed, 20 insertions(+), 3 deletions(-)
 
-A bit of history ...
-
- * First there was nothing.
- * Then I added a rule to udev checking for serial == 42
-   (this is in rhel-6).
- * Then systemd + udev merged.
- * Then I changed the rule to check for serial != 1 instead, so we can
-   use any serial but "1" which is the one the old broken devices had
-   (this is in rhel-7).  March 2014 in upstream systemd.
- * Then all usb power management rules where dropped from systemd (June
-   2015).  Which I figured today, after wondering that the rules are
-   gone in fedora 28.
-
-So, three years ago the serial number check was dropped upstream, yet I
-hav't seen a single report about autosuspend issues (or cpu usage for
-usb emulation going up, which is the typical symtom).
-
-So I figured I can stop worring that changing the serial number will
-break things and just do it.
-
-And even if it turns out autosuspend is still an issue:  I think
-meanwhile we can really stop worrying about guests running in old qemu
-versions with broken usb suspend (fixed in 0.13 !).  If needed we can
-enable autosuspend unconditionally in guests.
-
-cheers,
-  Gerd
+diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+index 4729eb107f..1baa5c69ed 100644
+--- a/qemu-seccomp.c
++++ b/qemu-seccomp.c
+@@ -282,7 +282,24 @@ static QemuOptsList qemu_sandbox_opts =3D {
+=20
+ static void seccomp_register(void)
+ {
+-    qemu_add_opts(&qemu_sandbox_opts);
++    bool add =3D false;
++
++    /* FIXME: use seccomp_api_get() >=3D 2 check when released */
++
++#if defined(SECCOMP_FILTER_FLAG_TSYNC)
++    int check;
++
++    /* check host TSYNC capability, it returns errno =3D=3D ENOSYS if un=
+available */
++    check =3D qemu_seccomp(SECCOMP_SET_MODE_FILTER,
++                         SECCOMP_FILTER_FLAG_TSYNC, NULL);
++    if (check < 0 && errno =3D=3D EFAULT) {
++        add =3D true;
++    }
++#endif
++
++    if (add) {
++        qemu_add_opts(&qemu_sandbox_opts);
++    }
+ }
+ opts_init(seccomp_register);
+ #endif
+diff --git a/vl.c b/vl.c
+index 5ba06adf78..380ae7ba2b 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4007,8 +4007,8 @@ int main(int argc, char **argv, char **envp)
+     }
+=20
+ #ifdef CONFIG_SECCOMP
+-    if (qemu_opts_foreach(qemu_find_opts("sandbox"),
+-                          parse_sandbox, NULL, NULL)) {
++    olist =3D qemu_find_opts_err("sandbox", NULL);
++    if (olist && qemu_opts_foreach(olist, parse_sandbox, NULL, NULL)) {
+         exit(1);
+     }
+ #endif
+--=20
+2.17.1
