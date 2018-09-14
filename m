@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1g0koT-0007Hm-6Q
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 05:54:57 -0400
+	(envelope-from <rjones@redhat.com>) id 1g0kq6-00085Y-M2
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 05:56:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liran.alon@oracle.com>) id 1g0koP-0003xx-6P
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 05:54:57 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:41610)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
-	id 1g0koO-0003wi-Sb
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 05:54:53 -0400
-From: Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain;
-	charset=utf-8
+	(envelope-from <rjones@redhat.com>) id 1g0kq5-0005eu-NF
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 05:56:38 -0400
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Fri, 14 Sep 2018 10:56:22 +0100
+Message-Id: <20180914095622.19698-1-rjones@redhat.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Message-Id: <CF1FBDB7-62D3-4743-8FE8-0F0CB78938C6@oracle.com>
-Date: Fri, 14 Sep 2018 12:54:41 +0300
-Subject: Re: [Qemu-devel] [PATCH 2/2] KVM: i386: Add support for save and
- restore nested state
+Subject: [Qemu-devel] [PATCH] curl: Make sslverify=off disable host as well
+ as peer verification.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +20,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, kvm list <kvm@vger.kernel.org>, Jim Mattson <jmattson@google.com>, Idan Brown <idan.brown@oracle.com>
+To: jcody@redhat.com
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
->On 14/09/2018 09:16, Paolo Bonzini wrote:
->Heh, I was going to send a similar patch.  However, things are a bit
->more complex for two reason.
->
->First, I'd prefer to reuse the hflags and hflags2 fields that we =
-already
->have, and only store the VMCS blob in the subsection.  For example,
->HF_SVMI_MASK is really the same as HF_GUEST_MASK in KVM source code and
->KVM_STATE_NESTED_GUEST_MODE in the nested virt state.
->
+The sslverify setting is supposed to turn off all TLS certificate
+checks in libcurl.  However because of the way we use it, it only
+turns off peer certificate authenticity checks
+(CURLOPT_SSL_VERIFYPEER).  This patch makes it also turn off the check
+that the server name in the certificate is the same as the server
+you're connecting to (CURLOPT_SSL_VERIFYHOST).
 
-Do you mean you intend to only save/restore the =E2=80=9Cvmx=E2=80=9D =
-field in struct kvm_nested_state?
-(That is, struct kvm_vmx_nested_state)
-If yes, that is problematic as kvm_nested_state.flags also hold other =
-flags besides KVM_STATE_NESTED_GUEST_MODE.
-How do you expect to save/restore for example the =
-vmx->nested.nested_run_pending flag that is specified in =
-KVM_STATE_NESTED_RUN_PENDING?
+We can use Google's server at 8.8.8.8 which happens to have a bad TLS
+certificate to demonstrate this:
 
-In addition, why is it important to avoid save/restore the entire =
-kvm_nested_state struct?
-It seems to simplify things to just save/restore the entire struct.
+$ ./qemu-img create -q -f qcow2 -b 'json: { "file.sslverify": "off", "fil=
+e.driver": "https", "file.url": "https://8.8.8.8/foo" }' /var/tmp/file.qc=
+ow2
+qemu-img: /var/tmp/file.qcow2: CURL: Error opening file: SSL: no alternat=
+ive certificate subject name matches target host name '8.8.8.8'
+Could not open backing image to determine size.
 
->More important, this:
->
->>
->> +static int nested_state_post_load(void *opaque, int version_id)
->> +{
->> +    X86CPU *cpu =3D opaque;
->> +    CPUX86State *env =3D &cpu->env;
->> +
->> +    /*
->> +     * Verify that the size specified in given struct is set
->> +     * to no more than the size that our kernel support
->> +     */
->> +    if (env->nested_state->size > env->nested_state_len) {
->> +        return -EINVAL;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static bool nested_state_needed(void *opaque)
->
->doesn't work if nested_state_len differs between source and =
-destination,
->and could overflow the nested_state buffer if nested_state_len is =
-larger
->on the source.
+With this patch applied, qemu-img connects to the server regardless of
+the bad certificate:
 
-This is not accurate.
-I have actually given a lot of thought to this aspect in the patch.
+$ ./qemu-img create -q -f qcow2 -b 'json: { "file.sslverify": "off", "fil=
+e.driver": "https", "file.url": "https://8.8.8.8/foo" }' /var/tmp/file.qc=
+ow2
+qemu-img: /var/tmp/file.qcow2: CURL: Error opening file: The requested UR=
+L returned error: 404 Not Found
 
-The above post_load() method actually prevents an overflow to happen on =
-dest.
-Note that env->nested_state_len is not passed as part of migration =
-stream.
-It is only set by local kernel KVM_CAP_NESTED_STATE.
+(The 404 error is expected because 8.8.8.8 is not actually serving a
+file called "/foo".)
 
-Therefore, we allow the following migrations to execute successfully:
-1) Migration from a source with smaller KVM_CAP_NESTED_STATE to dest =
-with a bigger one.
-The above post_load() check will succeed as size specified in migrated =
-nested_state->size
-is smaller than dest KVM_CAP_NESTED_STATE (stored in =
-env->nested_state_len).
-2) Migration from source to dest when they both have same =
-KVM_CAP_NESTED_STATE size.
-Obvious.
-3) Migration from source to dest when source have a bigger =
-KVM_CAP_NESTED_STATE than dest.
-This will only succeed in case size specified in nested_state->size is =
-smaller than dest KVM_CAP_NESTED_STATE.
+Of course the default (without sslverify=3Doff) remains to always check
+the certificate:
 
--Liran
+$ ./qemu-img create -q -f qcow2 -b 'json: { "file.driver": "https", "file=
+.url": "https://8.8.8.8/foo" }' /var/tmp/file.qcow2
+qemu-img: /var/tmp/file.qcow2: CURL: Error opening file: SSL: no alternat=
+ive certificate subject name matches target host name '8.8.8.8'
+Could not open backing image to determine size.
 
->
->I'll send my version today or next Monday.
->
->Thanks,
->
->Paolo
->
+Further information about the two settings is available here:
+
+https://curl.haxx.se/libcurl/c/CURLOPT_SSL_VERIFYPEER.html
+https://curl.haxx.se/libcurl/c/CURLOPT_SSL_VERIFYHOST.html
+
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ block/curl.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/curl.c b/block/curl.c
+index 229bb84a27..fabb2b4da7 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -483,6 +483,8 @@ static int curl_init_state(BDRVCURLState *s, CURLStat=
+e *state)
+         curl_easy_setopt(state->curl, CURLOPT_URL, s->url);
+         curl_easy_setopt(state->curl, CURLOPT_SSL_VERIFYPEER,
+                          (long) s->sslverify);
++        curl_easy_setopt(state->curl, CURLOPT_SSL_VERIFYHOST,
++                         s->sslverify ? 2L : 0L);
+         if (s->cookie) {
+             curl_easy_setopt(state->curl, CURLOPT_COOKIE, s->cookie);
+         }
+--=20
+2.19.0.rc0
