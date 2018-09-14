@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=7883262b0=anthony.perard@citrix.com>)
-	id 1g0m7S-00014v-28
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:18:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1g0mMd-0005zf-M9
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=7883262b0=anthony.perard@citrix.com>)
-	id 1g0m7P-0001wQ-Cc
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:18:37 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:40306)
+	(envelope-from <dgilbert@redhat.com>) id 1g0mMY-0003aH-OZ
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:34:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=7883262b0=anthony.perard@citrix.com>)
-	id 1g0m7P-0001sf-0N
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:18:35 -0400
-From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Fri, 14 Sep 2018 12:18:29 +0100
-Message-ID: <20180914111830.28466-2-anthony.perard@citrix.com>
-In-Reply-To: <20180914111830.28466-1-anthony.perard@citrix.com>
-References: <20180914111830.28466-1-anthony.perard@citrix.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1g0mMY-0003a0-GM
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:34:14 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B8CB787637
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 11:34:13 +0000 (UTC)
+Date: Fri, 14 Sep 2018 12:34:08 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180914113407.GB3081@work-vm>
+References: <20180914104835.26019-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/2] Remove broken Xen PV domain builder
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180914104835.26019-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] usb: assign unique serial numbers to
+ hid devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,541 +33,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-It is broken since Xen 4.9 [1] and it will not build in Xen 4.12. Also,
-it is not built by default since QEMU 2.6.
+* Gerd Hoffmann (kraxel@redhat.com) wrote:
+> Windows guests have trouble dealing with usb devices having identical
+> serial numbers.  So, assign unique serial numbers to usb hid devices.
+> All other usb devices have this already.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/hw/compat.h | 14 +++++++++++++-
+>  hw/usb/dev-hid.c    | 24 +++++++++++++-----------
+>  2 files changed, 26 insertions(+), 12 deletions(-)
+> 
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 6f4d5fc647..c059459394 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -2,7 +2,19 @@
+>  #define HW_COMPAT_H
+>  
+>  #define HW_COMPAT_3_0 \
+> -    /* empty */
+> +    {\
+> +        .driver   = "usb-kbd",\
+> +        .property = "serial",\
+> +        .value    = "42",\
+> +    },{\
+> +        .driver   = "usb-mouse",\
+> +        .property = "serial",\
+> +        .value    = "42",\
+> +    },{\
+> +        .driver   = "usb-tablet",\
+> +        .property = "serial",\
+> +        .value    = "42",\
+> +    },
+>  #define HW_COMPAT_2_12 \
+>      {\
+> diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
+> index 62d18290dc..7ad6fb33a9 100644
+> --- a/hw/usb/dev-hid.c
+> +++ b/hw/usb/dev-hid.c
+> @@ -61,7 +61,9 @@ enum {
+>      STR_PRODUCT_MOUSE,
+>      STR_PRODUCT_TABLET,
+>      STR_PRODUCT_KEYBOARD,
+> -    STR_SERIALNUMBER,
+> +    STR_SERIAL_MOUSE,
+> +    STR_SERIAL_TABLET,
+> +    STR_SERIAL_KEYBOARD,
+>      STR_CONFIG_MOUSE,
+>      STR_CONFIG_TABLET,
+>      STR_CONFIG_KEYBOARD,
+> @@ -72,7 +74,9 @@ static const USBDescStrings desc_strings = {
+>      [STR_PRODUCT_MOUSE]    = "QEMU USB Mouse",
+>      [STR_PRODUCT_TABLET]   = "QEMU USB Tablet",
+>      [STR_PRODUCT_KEYBOARD] = "QEMU USB Keyboard",
+> -    [STR_SERIALNUMBER]     = "42", /* == remote wakeup works */
+> +    [STR_SERIAL_MOUSE]     = "89126",
+> +    [STR_SERIAL_TABLET]    = "28754",
+> +    [STR_SERIAL_KEYBOARD]  = "68284",
 
-[1] https://lists.xenproject.org/archives/html/xen-devel/2018-09/msg00313.html
+OK, so now I've found the bit about the magic 42; commit 7b074a22 of
+yours; recommended checking for 42 for knowing we had autosuspend;
+what's actually in the current fedora hid rules is serial!=1 - I wonder
+what others have.
+It's a shame these are random numbers rather than 2,3,4; but still.
 
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
- configure                   |  17 --
- hw/xenpv/Makefile.objs      |   2 -
- hw/xenpv/xen_domainbuild.c  | 299 ------------------------------------
- hw/xenpv/xen_domainbuild.h  |  13 --
- hw/xenpv/xen_machine_pv.c   |  14 --
- include/hw/xen/xen.h        |   1 -
- include/hw/xen/xen_common.h |  18 ---
- qemu-options.hx             |   8 -
- vl.c                        |   7 -
- 9 files changed, 379 deletions(-)
- delete mode 100644 hw/xenpv/xen_domainbuild.c
- delete mode 100644 hw/xenpv/xen_domainbuild.h
+>      [STR_CONFIG_MOUSE]     = "HID Mouse",
+>      [STR_CONFIG_TABLET]    = "HID Tablet",
+>      [STR_CONFIG_KEYBOARD]  = "HID Keyboard",
+> @@ -375,7 +379,7 @@ static const USBDesc desc_mouse = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_MOUSE,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_MOUSE,
+>      },
+>      .full = &desc_device_mouse,
+>      .str  = desc_strings,
+> @@ -389,7 +393,7 @@ static const USBDesc desc_mouse2 = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_MOUSE,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_MOUSE,
+>      },
+>      .full = &desc_device_mouse,
+>      .high = &desc_device_mouse2,
+> @@ -404,7 +408,7 @@ static const USBDesc desc_tablet = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_TABLET,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_TABLET,
+>      },
+>      .full = &desc_device_tablet,
+>      .str  = desc_strings,
+> @@ -418,7 +422,7 @@ static const USBDesc desc_tablet2 = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_TABLET,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_TABLET,
+>      },
+>      .full = &desc_device_tablet,
+>      .high = &desc_device_tablet2,
+> @@ -433,7 +437,7 @@ static const USBDesc desc_keyboard = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_KEYBOARD,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_TABLET,
+>      },
+>      .full = &desc_device_keyboard,
+>      .str  = desc_strings,
+> @@ -447,7 +451,7 @@ static const USBDesc desc_keyboard2 = {
+>          .bcdDevice         = 0,
+>          .iManufacturer     = STR_MANUFACTURER,
+>          .iProduct          = STR_PRODUCT_KEYBOARD,
+> -        .iSerialNumber     = STR_SERIALNUMBER,
+> +        .iSerialNumber     = STR_SERIAL_TABLET,
+>      },
+>      .full = &desc_device_keyboard,
+>      .high = &desc_device_keyboard2,
+> @@ -718,9 +722,7 @@ static void usb_hid_initfn(USBDevice *dev, int kind,
+>          return;
+>      }
+>  
+> -    if (dev->serial) {
+> -        usb_desc_set_string(dev, STR_SERIALNUMBER, dev->serial);
+> -    }
+> +    usb_desc_create_serial(dev);
 
-diff --git a/configure b/configure
-index 58862d2ae8..c844b72e36 100755
---- a/configure
-+++ b/configure
-@@ -356,7 +356,6 @@ vnc_png=""
- xkbcommon=""
- xen=""
- xen_ctrl_version=""
--xen_pv_domain_build="no"
- xen_pci_passthrough=""
- linux_aio=""
- cap_ng=""
-@@ -1107,10 +1106,6 @@ for opt do
-   ;;
-   --enable-xen-pci-passthrough) xen_pci_passthrough="yes"
-   ;;
--  --disable-xen-pv-domain-build) xen_pv_domain_build="no"
--  ;;
--  --enable-xen-pv-domain-build) xen_pv_domain_build="yes"
--  ;;
-   --disable-brlapi) brlapi="no"
-   ;;
-   --enable-brlapi) brlapi="yes"
-@@ -1631,8 +1626,6 @@ Advanced options (experts only):
-   --tls-priority           default TLS protocol/cipher priority string
-   --enable-gprof           QEMU profiling with gprof
-   --enable-profiler        profiler support
--  --enable-xen-pv-domain-build
--                           xen pv domain builder
-   --enable-debug-stack-usage
-                            track the maximum stack usage of stacks created by qemu_alloc_stack
- 
-@@ -2601,12 +2594,6 @@ if test "$xen_pci_passthrough" != "no"; then
-   fi
- fi
- 
--if test "$xen_pv_domain_build" = "yes" &&
--   test "$xen" != "yes"; then
--    error_exit "User requested Xen PV domain builder support" \
--	       "which requires Xen support."
--fi
--
- ##########################################
- # Windows Hypervisor Platform accelerator (WHPX) check
- if test "$whpx" != "no" ; then
-@@ -6018,7 +6005,6 @@ fi
- echo "xen support       $xen"
- if test "$xen" = "yes" ; then
-   echo "xen ctrl version  $xen_ctrl_version"
--  echo "pv dom build      $xen_pv_domain_build"
- fi
- echo "brlapi support    $brlapi"
- echo "bluez  support    $bluez"
-@@ -6490,9 +6476,6 @@ fi
- if test "$xen" = "yes" ; then
-   echo "CONFIG_XEN_BACKEND=y" >> $config_host_mak
-   echo "CONFIG_XEN_CTRL_INTERFACE_VERSION=$xen_ctrl_version" >> $config_host_mak
--  if test "$xen_pv_domain_build" = "yes" ; then
--    echo "CONFIG_XEN_PV_DOMAIN_BUILD=y" >> $config_host_mak
--  fi
- fi
- if test "$linux_aio" = "yes" ; then
-   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
-diff --git a/hw/xenpv/Makefile.objs b/hw/xenpv/Makefile.objs
-index bbf5873fd1..8bfa4586ab 100644
---- a/hw/xenpv/Makefile.objs
-+++ b/hw/xenpv/Makefile.objs
-@@ -1,4 +1,2 @@
- # Xen PV machine support
- obj-$(CONFIG_XEN) += xen_machine_pv.o
--# Xen PV machine builder support
--obj-$(CONFIG_XEN_PV_DOMAIN_BUILD) += xen_domainbuild.o
-diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
-deleted file mode 100644
-index 188acaca16..0000000000
---- a/hw/xenpv/xen_domainbuild.c
-+++ /dev/null
-@@ -1,299 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu/units.h"
--#include "hw/xen/xen_backend.h"
--#include "xen_domainbuild.h"
--#include "qemu/timer.h"
--#include "qemu/log.h"
--
--#include <xenguest.h>
--
--static int xenstore_domain_mkdir(char *path)
--{
--    struct xs_permissions perms_ro[] = {{
--            .id    = 0, /* set owner: dom0 */
--        },{
--            .id    = xen_domid,
--            .perms = XS_PERM_READ,
--        }};
--    struct xs_permissions perms_rw[] = {{
--            .id    = 0, /* set owner: dom0 */
--        },{
--            .id    = xen_domid,
--            .perms = XS_PERM_READ | XS_PERM_WRITE,
--        }};
--    const char *writable[] = { "device", "control", "error", NULL };
--    char subpath[256];
--    int i;
--
--    if (!xs_mkdir(xenstore, 0, path)) {
--        fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, path);
--	return -1;
--    }
--    if (!xs_set_permissions(xenstore, 0, path, perms_ro, 2)) {
--        fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
--	return -1;
--    }
--
--    for (i = 0; writable[i]; i++) {
--        snprintf(subpath, sizeof(subpath), "%s/%s", path, writable[i]);
--        if (!xs_mkdir(xenstore, 0, subpath)) {
--            fprintf(stderr, "%s: xs_mkdir %s: failed\n", __func__, subpath);
--            return -1;
--        }
--        if (!xs_set_permissions(xenstore, 0, subpath, perms_rw, 2)) {
--            fprintf(stderr, "%s: xs_set_permissions failed\n", __func__);
--            return -1;
--        }
--    }
--    return 0;
--}
--
--int xenstore_domain_init1(const char *kernel, const char *ramdisk,
--                          const char *cmdline)
--{
--    char *dom, uuid_string[42], vm[256], path[256];
--    int i;
--
--    qemu_uuid_unparse(&qemu_uuid, uuid_string);
--    dom = xs_get_domain_path(xenstore, xen_domid);
--    snprintf(vm,  sizeof(vm),  "/vm/%s", uuid_string);
--
--    xenstore_domain_mkdir(dom);
--
--    xenstore_write_str(vm, "image/ostype",  "linux");
--    if (kernel)
--        xenstore_write_str(vm, "image/kernel",  kernel);
--    if (ramdisk)
--        xenstore_write_str(vm, "image/ramdisk", ramdisk);
--    if (cmdline)
--        xenstore_write_str(vm, "image/cmdline", cmdline);
--
--    /* name + id */
--    xenstore_write_str(vm,  "name",   qemu_name ? qemu_name : "no-name");
--    xenstore_write_str(vm,  "uuid",   uuid_string);
--    xenstore_write_str(dom, "name",   qemu_name ? qemu_name : "no-name");
--    xenstore_write_int(dom, "domid",  xen_domid);
--    xenstore_write_str(dom, "vm",     vm);
--
--    /* memory */
--    xenstore_write_int(dom, "memory/target", ram_size / KiB);
--    xenstore_write_int(vm, "memory",         ram_size / MiB);
--    xenstore_write_int(vm, "maxmem",         ram_size / MiB);
--
--    /* cpus */
--    for (i = 0; i < smp_cpus; i++) {
--	snprintf(path, sizeof(path), "cpu/%d/availability",i);
--	xenstore_write_str(dom, path, "online");
--    }
--    xenstore_write_int(vm, "vcpu_avail",  smp_cpus);
--    xenstore_write_int(vm, "vcpus",       smp_cpus);
--
--    /* vnc password */
--    xenstore_write_str(vm, "vncpassword", "" /* FIXME */);
--
--    free(dom);
--    return 0;
--}
--
--int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
--                          int console_port, int console_mfn)
--{
--    char *dom;
--
--    dom = xs_get_domain_path(xenstore, xen_domid);
--
--    /* signal new domain */
--    xs_introduce_domain(xenstore,
--                        xen_domid,
--                        xenstore_mfn,
--                        xenstore_port);
--
--    /* xenstore */
--    xenstore_write_int(dom, "store/ring-ref",   xenstore_mfn);
--    xenstore_write_int(dom, "store/port",       xenstore_port);
--
--    /* console */
--    xenstore_write_str(dom, "console/type",     "ioemu");
--    xenstore_write_int(dom, "console/limit",    128 * KiB);
--    xenstore_write_int(dom, "console/ring-ref", console_mfn);
--    xenstore_write_int(dom, "console/port",     console_port);
--    xen_config_dev_console(0);
--
--    free(dom);
--    return 0;
--}
--
--/* ------------------------------------------------------------- */
--
--static QEMUTimer *xen_poll;
--
--/* check domain state once per second */
--static void xen_domain_poll(void *opaque)
--{
--    struct xc_dominfo info;
--    int rc;
--
--    rc = xc_domain_getinfo(xen_xc, xen_domid, 1, &info);
--    if ((rc != 1) || (info.domid != xen_domid)) {
--        qemu_log("xen: domain %d is gone\n", xen_domid);
--        goto quit;
--    }
--    if (info.dying) {
--        qemu_log("xen: domain %d is dying (%s%s)\n", xen_domid,
--                 info.crashed  ? "crashed"  : "",
--                 info.shutdown ? "shutdown" : "");
--        goto quit;
--    }
--
--    timer_mod(xen_poll, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 1000);
--    return;
--
--quit:
--    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
--}
--
--static int xen_domain_watcher(void)
--{
--    int qemu_running = 1;
--    int fd[2], i, n, rc;
--    char byte;
--
--    if (pipe(fd) != 0) {
--        qemu_log("%s: Huh? pipe error: %s\n", __func__, strerror(errno));
--        return -1;
--    }
--    if (fork() != 0)
--        return 0; /* not child */
--
--    /* close all file handles, except stdio/out/err,
--     * our watch pipe and the xen interface handle */
--    n = getdtablesize();
--    for (i = 3; i < n; i++) {
--        if (i == fd[0])
--            continue;
--        close(i);
--    }
--
--    /*
--     * Reopen xc interface, since the original is unsafe after fork
--     * and was closed above.
--     */
--    xen_xc = xc_interface_open(0, 0, 0);
--
--    /* ignore term signals */
--    signal(SIGINT,  SIG_IGN);
--    signal(SIGTERM, SIG_IGN);
--
--    /* wait for qemu exiting */
--    while (qemu_running) {
--        rc = read(fd[0], &byte, 1);
--        switch (rc) {
--        case -1:
--            if (errno == EINTR)
--                continue;
--            qemu_log("%s: Huh? read error: %s\n", __func__, strerror(errno));
--            qemu_running = 0;
--            break;
--        case 0:
--            /* EOF -> qemu exited */
--            qemu_running = 0;
--            break;
--        default:
--            qemu_log("%s: Huh? data on the watch pipe?\n", __func__);
--            break;
--        }
--    }
--
--    /* cleanup */
--    qemu_log("%s: destroy domain %d\n", __func__, xen_domid);
--    xc_domain_destroy(xen_xc, xen_domid);
--    _exit(0);
--}
--
--/* normal cleanup */
--static void xen_domain_cleanup(void)
--{
--    char *dom;
--
--    dom = xs_get_domain_path(xenstore, xen_domid);
--    if (dom) {
--        xs_rm(xenstore, 0, dom);
--        free(dom);
--    }
--    xs_release_domain(xenstore, xen_domid);
--}
--
--int xen_domain_build_pv(const char *kernel, const char *ramdisk,
--                        const char *cmdline)
--{
--    uint32_t ssidref = 0;
--    uint32_t flags = 0;
--    xen_domain_handle_t uuid;
--    unsigned int xenstore_port = 0, console_port = 0;
--    unsigned long xenstore_mfn = 0, console_mfn = 0;
--    int rc;
--
--    memcpy(uuid, &qemu_uuid, sizeof(uuid));
--    rc = xen_domain_create(xen_xc, ssidref, uuid, flags, &xen_domid);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_create() failed\n");
--        goto err;
--    }
--    qemu_log("xen: created domain %d\n", xen_domid);
--    atexit(xen_domain_cleanup);
--    if (xen_domain_watcher() == -1) {
--        goto err;
--    }
--
--    xenstore_domain_init1(kernel, ramdisk, cmdline);
--
--    rc = xc_domain_max_vcpus(xen_xc, xen_domid, smp_cpus);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_max_vcpus() failed\n");
--        goto err;
--    }
--
--#if 0
--    rc = xc_domain_setcpuweight(xen_xc, xen_domid, 256);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_setcpuweight() failed\n");
--        goto err;
--    }
--#endif
--
--    rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size / KiB);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_setmaxmem() failed\n");
--        goto err;
--    }
--
--    xenstore_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
--    console_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
--
--    rc = xc_linux_build(xen_xc, xen_domid, ram_size / MiB,
--                        kernel, ramdisk, cmdline,
--                        0, flags,
--                        xenstore_port, &xenstore_mfn,
--                        console_port, &console_mfn);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_linux_build() failed\n");
--        goto err;
--    }
--
--    xenstore_domain_init2(xenstore_port, xenstore_mfn,
--                          console_port, console_mfn);
--
--    qemu_log("xen: unpausing domain %d\n", xen_domid);
--    rc = xc_domain_unpause(xen_xc, xen_domid);
--    if (rc < 0) {
--        fprintf(stderr, "xen: xc_domain_unpause() failed\n");
--        goto err;
--    }
--
--    xen_poll = timer_new_ms(QEMU_CLOCK_REALTIME, xen_domain_poll, NULL);
--    timer_mod(xen_poll, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 1000);
--    return 0;
--
--err:
--    return -1;
--}
-diff --git a/hw/xenpv/xen_domainbuild.h b/hw/xenpv/xen_domainbuild.h
-deleted file mode 100644
-index 652d9b410f..0000000000
---- a/hw/xenpv/xen_domainbuild.h
-+++ /dev/null
-@@ -1,13 +0,0 @@
--#ifndef QEMU_HW_XEN_DOMAINBUILD_H
--#define QEMU_HW_XEN_DOMAINBUILD_H
--
--#include "hw/xen/xen_common.h"
--
--int xenstore_domain_init1(const char *kernel, const char *ramdisk,
--                          const char *cmdline);
--int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
--                          int console_port, int console_mfn);
--int xen_domain_build_pv(const char *kernel, const char *ramdisk,
--                        const char *cmdline);
--
--#endif /* QEMU_HW_XEN_DOMAINBUILD_H */
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 44d67b87c4..4d03aa59cb 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -27,7 +27,6 @@
- #include "hw/hw.h"
- #include "hw/boards.h"
- #include "hw/xen/xen_backend.h"
--#include "xen_domainbuild.h"
- #include "sysemu/block-backend.h"
- 
- static void xen_init_pv(MachineState *machine)
-@@ -45,19 +44,6 @@ static void xen_init_pv(MachineState *machine)
-     case XEN_ATTACH:
-         /* nothing to do, xend handles everything */
-         break;
--#ifdef CONFIG_XEN_PV_DOMAIN_BUILD
--    case XEN_CREATE: {
--        const char *kernel_filename = machine->kernel_filename;
--        const char *kernel_cmdline = machine->kernel_cmdline;
--        const char *initrd_filename = machine->initrd_filename;
--        if (xen_domain_build_pv(kernel_filename, initrd_filename,
--                                kernel_cmdline) < 0) {
--            error_report("xen pv domain creation failed");
--            exit(1);
--        }
--        break;
--    }
--#endif
-     case XEN_EMULATE:
-         error_report("xen emulation not implemented (yet)");
-         exit(1);
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 7efcdaa8fe..978aaa31fb 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -15,7 +15,6 @@
- /* xen-machine.c */
- enum xen_mode {
-     XEN_EMULATE = 0,  // xen emulation, using xenner (default)
--    XEN_CREATE,       // create xen domain
-     XEN_ATTACH        // attach to xen domain created by xend
- };
- 
-diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-index 93f631e5bf..2b91d199a1 100644
---- a/include/hw/xen/xen_common.h
-+++ b/include/hw/xen/xen_common.h
-@@ -661,24 +661,6 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
- 
- #endif
- 
--#ifdef CONFIG_XEN_PV_DOMAIN_BUILD
--#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40700
--static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
--                                    xen_domain_handle_t handle, uint32_t flags,
--                                    uint32_t *pdomid)
--{
--    return xc_domain_create(xc, ssidref, handle, flags, pdomid);
--}
--#else
--static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
--                                    xen_domain_handle_t handle, uint32_t flags,
--                                    uint32_t *pdomid)
--{
--    return xc_domain_create(xc, ssidref, handle, flags, pdomid, NULL);
--}
--#endif
--#endif
--
- /* Xen before 4.8 */
- 
- #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40800
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 654ef484d9..d14a50805a 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3398,10 +3398,6 @@ ETEXI
- 
- DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
-     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
--DEF("xen-create", 0, QEMU_OPTION_xen_create,
--    "-xen-create     create domain using xen hypercalls, bypassing xend\n"
--    "                warning: should not be used when xend is in use\n",
--    QEMU_ARCH_ALL)
- DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
-     "-xen-attach     attach to existing xen domain\n"
-     "                xend will use this when starting QEMU\n",
-@@ -3415,10 +3411,6 @@ STEXI
- @item -xen-domid @var{id}
- @findex -xen-domid
- Specify xen guest domain @var{id} (XEN only).
--@item -xen-create
--@findex -xen-create
--Create domain using xen hypercalls, bypassing xend.
--Warning: should not be used when xend is in use (XEN only).
- @item -xen-attach
- @findex -xen-attach
- Attach to existing xen domain.
-diff --git a/vl.c b/vl.c
-index 5ba06adf78..acd34f7f94 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3814,13 +3814,6 @@ int main(int argc, char **argv, char **envp)
-                 }
-                 xen_domid = atoi(optarg);
-                 break;
--            case QEMU_OPTION_xen_create:
--                if (!(xen_available())) {
--                    error_report("Option not supported for this target");
--                    exit(1);
--                }
--                xen_mode = XEN_CREATE;
--                break;
-             case QEMU_OPTION_xen_attach:
-                 if (!(xen_available())) {
-                     error_report("Option not supported for this target");
--- 
-Anthony PERARD
+In the cases where I've not passed serial= on the command line, who
+wins, does this mean create_serial uses the path or does it use the
+magic constants you set above?
+
+Dave
+
+>      usb_desc_init(dev);
+>      us->intr = usb_ep_get(dev, USB_TOKEN_IN, 1);
+>      hid_init(&us->hid, kind, usb_hid_changed);
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
