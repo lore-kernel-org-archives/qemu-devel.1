@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g0t7o-0000dN-EG
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 14:47:29 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g0uJj-0003Jl-Jd
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 16:03:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g0t7n-0000fL-Jm
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 14:47:28 -0400
-References: <20180628190723.276458-1-eblake@redhat.com>
-	<20180628190723.276458-4-eblake@redhat.com>
-	<20180629084444.GC15588@localhost.localdomain>
-	<41be61a0-9048-c08f-1a9a-1c213f5103ef@redhat.com>
-	<20180629154308.GH15588@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4923ebdf-17a3-1b6b-ad72-2835d18ce101@redhat.com>
-Date: Fri, 14 Sep 2018 13:47:16 -0500
+	(envelope-from <jsnow@redhat.com>) id 1g0uJi-0000t0-Nc
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 16:03:51 -0400
+References: <20180814121443.33114-1-vsementsov@virtuozzo.com>
+	<20180814121443.33114-2-vsementsov@virtuozzo.com>
+	<954db07e-d338-9cd4-341f-d8916470b89b@redhat.com>
+	<443e612e-399b-7bf9-9379-cfa6ea516dfb@virtuozzo.com>
+	<f50d72a0-7fa7-d2b9-3010-2e9ad10a574b@redhat.com>
+	<0f8ecd93-3320-99aa-44aa-c8b11717c784@virtuozzo.com>
+	<4f44be05-0756-9966-9f2c-83a8e0f644a8@redhat.com>
+	<9c32d9a3-e171-0173-f6be-e1b10fb2c439@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <33ae4d31-6b43-cea9-9442-cf41c0f14aec@redhat.com>
+Date: Fri, 14 Sep 2018 16:03:33 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180629154308.GH15588@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <9c32d9a3-e171-0173-f6be-e1b10fb2c439@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 3/6] qcow2: Reduce REFT_OFFSET_MASK
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] dirty-bitmap: improve
+ bdrv_dirty_bitmap_next_zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, qemu-block@nongnu.org, berto@igalia.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, jcody@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-[revisiting this thread]
 
-On 6/29/18 10:43 AM, Kevin Wolf wrote:
-> Am 29.06.2018 um 17:22 hat Eric Blake geschrieben:
->> On 06/29/2018 03:44 AM, Kevin Wolf wrote:
->>> Am 28.06.2018 um 21:07 hat Eric Blake geschrieben:
->>>> Match our code to the spec change in the previous patch - there's
->>>> no reason for the refcount table to allow larger offsets than the
->>>> L1/L2 tables.
+
+On 09/14/2018 01:51 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 14.09.2018 20:39, John Snow wrote:
+>>
+>> On 09/10/2018 01:00 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 10.09.2018 19:55, Eric Blake wrote:
+>>>> On 9/10/18 11:49 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>
+>>>>>>> -int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start);
+>>>>>>> +int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start,
+>>>>>>> int64_t end);
+>>>>>> The interface looks weird because we can define a 'start' that's
+>>>>>> beyond
+>>>>>> the 'end'.
+>>>>>>
+>>>>>> I realize that you need a signed integer for 'end' to signify EOF.=
+..
+>>>>>> should we do a 'bytes' parameter instead? (Did you already do that
+>>>>>> in an
+>>>>>> earlier version and we changed it?)
+>>>>>>
+>>>>>> Well, it's not a big deal to me personally.
+>>>>> interface with constant end parameter is more comfortable for loop:
+>>>>> we don't need to update 'bytes' parameter on each iteration
+>>>> But there's still the question of WHO should be calculating end. You=
+r
+>>>> interface argues for the caller:
+>>>>
+>>>> hbitmap_next_zero(start, start + bytes)
+>>>>
+>>>> int64_t hbitmap_next_zero(...)
+>>>> {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 while (offset !=3D end) ...
+>>>> }
+>>>>
+>>>> while we're asking about a consistent interface for the caller (if
+>>>> most callers already have a 'bytes' rather than an 'end' computed):
+>>>>
+>>>> hbitmap_next_zero(start, bytes)
+>>>>
+>>>> int64_t hbitmap_next_zero(...)
+>>>> {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 int64_t end =3D start + bytes;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 while (offset !=3D end) ...
+>>>> }
+>>>>
+>>> Yes, that's an issue. Ok, if you are not comfortable with start,end, =
+I
+>>> can switch to start,bytes.
 >>>
->>> What about internal snapshots? And anyway, because of the metadata
->>> overhead, the physical image size of a fully allocated image is always
->>> going to be at least minimally larger than the virtual disk size.
->>>
->>> I'm not necessarily opposed to making the change if there is a good
->>> reason to make it, but I don't see a real need for it and the
->>> justification used here and also in the previous patch is incorrect.
+>> The series looks pretty close, I can merge the next version if you thi=
+nk
+>> it's worth changing the interface.
 >>
->> The fact that ext4 cannot hold an image this large is already an indication
->> that setting this limit on the refcount table is NOT going to bite real
->> users.
->>
->> Yes, you can argue that with lots of metadata, including internal snapshots,
->> and on a capable file system (such as tmpfs) that can even hold files this
->> large to begin with, then yes, allowing the refcount to exceed this limit
->> will allow slightly more metadata to be crammed into a single image.  But
->> will it actually help anyone?
->>
->> Do I need to respin the series to split patch 2 into the obvious changes
->> (stuff unrelated to capping refcount size) vs. the controversial stuff
->> (refcount cap and this code change)?
->>
->>>
->>> Kevin
->>>
->>>> In practice, no image has more than 64PB of
->>>> allocated clusters anyways, as anything beyond that can't be
->>>> expressed via L2 mappings to host offsets.
->>
->> If you're opposed to an exact 56-bit limit on the grounds that 56-bit guest
->> data plus minimal metadata should still be expressable, would it be better
->> to cap refcount at 57-bits?
-> 
-> You're arguing that the patch doesn't hurt in practice, but what I'm
-> really looking for is what do we gain from it?
+>> --js
+>=20
+> I've started to change interface and found a bug in bitmap_to_extents
+> (patch sent
+> https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg01804.html).
+> So, next version will be based on this patch, which will go through
+> Eric's tree..
+>=20
 
-I guess one thing to be gained by having qemu's implementation of qcow2 
-pull a hard-stop at 56 bits is that it becomes easier to detect errant 
-refcount entries beyond the end of the file as being errant, and not 
-attempt to expand the file during 'qemu-img check' just because a 
-refcount pointed out that far.  But that's still a pretty weak argument 
-(we've already mentioned that qemu-img check should do a better job of 
-handling/flagging refcount entries that point way beyond the end of the 
-image - but that's true regardless of what limits may be placed on the 
-host image size)
+OK, I spoke with Eric and if you resend and I R-B & ACK the patches,
+he'll stage them through NBD.
 
-> 
-> We generally don't apply patches just because they don't hurt, but
-> because they are helpful for something. In the simple, fully compatible
-> cases "helpful" could just mean "we like the code better".
-> 
-> This is a slightly different category: "it's technically incompatible,
-> but we don't think anyone uses this". We have done such changes before
-> when they allowed us to improve something substantially, but I think the
-> requirements for this are at least a little higher than just "because we
-> like it better". And I'm not even sure yet if I like it better because
-> it seems like an arbitrary restriction.
-> 
-> So apart from not hurting in practice, what does the restriction buy us?
-
-As I'm not coming up with a solid reason for tightening the bounds, I 
-will (eventually) respin the series without the spec change.  At this 
-point, it's probably easier for me to wait until after the pull request 
-queue has started flushing again.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+--js
