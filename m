@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g0s05-0000hC-UT
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:35:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1g0s0U-0000sb-Hv
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g0s01-0004eN-S4
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:35:24 -0400
-References: <20180914165116.23182-1-vsementsov@virtuozzo.com>
-	<05b6e954-744f-d52c-1f5e-51d52062e195@redhat.com>
-	<ce8e83a8-40c1-1fa9-3d83-c5f84796d514@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3d127a88-58e9-dd74-e9ea-d13542aff92d@redhat.com>
-Date: Fri, 14 Sep 2018 12:35:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1g0s0R-00050P-Bp
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:35:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46340)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1g0s0R-0004yJ-5L
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:35:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1g0s0P-0000Oo-7j
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 17:35:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C8A352E80E6
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 17:35:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <ce8e83a8-40c1-1fa9-3d83-c5f84796d514@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: fix bitmap export
+Date: Fri, 14 Sep 2018 17:27:07 -0000
+From: George Amanakis <1788665@bugs.launchpad.net>
+Reply-To: Bug 1788665 <1788665@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153504502595.30588.13203676939349086206.malonedeb@soybean.canonical.com>
+Message-Id: <153694602737.8757.6234546283129959796.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1788665] Re: Low 2D graphics performance with
+ Windows 10 (1803) VGA passthrough VM using "Spectre" protection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +37,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 9/14/18 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
+I did a git-bisect between 4.14.18(bad) and 4.14.10(good).
+Unsurprisingly, this is the first "bad" commit:
 
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (begin < overall_end && i < nb_e=
-xtents) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool next_dirty =3D !dirt=
-y;
->>> +
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dirty) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 end =3D bdrv_dirty_bitmap_next_zero(bitmap, begin);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>> @@ -1962,6 +1964,7 @@ static unsigned int=20
->>> bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 end =3D MIN(bdrv_dirty_bitmap_size(bitmap),
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 beg=
-in + UINT32_MAX + 1 -
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdr=
-v_dirty_bitmap_granularity(bitmap));
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 n=
-ext_dirty =3D dirty;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>
->> Rather than introducing next_dirty, couldn't you just make this:
->>
->> if (end =3D=3D -1 || end - begin > UINT32_MAX) {
->> =C2=A0=C2=A0=C2=A0 /* Cap ... */
->> =C2=A0=C2=A0=C2=A0 end =3D MIN(...);
->> } else {
->> =C2=A0=C2=A0=C2=A0 dirty =3D !dirty;
->> }
->=20
-> no, dirty variable is used after it, we can't change it here.
+  KVM/VMX: Allow direct access to MSR_IA32_SPEC_CTRL
 
-Ah, right. But we could also hoist the extents[i].flags =3D=20
-cpu_to_be32(dirty ? NBD_STATEE_DIRTY : 0) line to occur prior to the=20
-'if' doing the end capping calculation.  However, splitting the two=20
-assignments into extents[i].* to no longer be consecutive statements,=20
-just to avoid the use of a temporary variable, starts to get less=20
-aesthetically pleasing.
+  commit d28b387fb74da95d69d2615732f50cceb38e9a4d
 
-Thus, I'm fine with your version (with commit message improved), unless=20
-you want to send a v2.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+George
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1788665
+
+Title:
+  Low 2D graphics performance with Windows 10 (1803) VGA passthrough VM
+  using "Spectre" protection
+
+Status in QEMU:
+  New
+
+Bug description:
+  Windows 10 (1803) VM using VGA passthrough via qemu script.
+
+  After upgrading Windows 10 Pro VM to version 1803, or possibly after
+  applying the March/April security updates from Microsoft, the VM would
+  show low 2D graphics performance (sluggishness in 2D applications and
+  low Passmark results).
+
+  Turning off Spectre vulnerability protection in Windows remedies the
+  issue.
+
+  Expected behavior:
+  qemu/kvm hypervisor to expose firmware capabilities of host to guest OS -=
+ see https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/CVE=
+-2017-5715-and-hyper-v-vms
+
+  Background:
+
+  Starting in March or April Microsoft began to push driver updates in
+  their updates / security updates. See https://support.microsoft.com
+  /en-us/help/4073757/protect-your-windows-devices-against-spectre-
+  meltdown
+
+  One update concerns the Intel microcode - see
+  https://support.microsoft.com/en-us/help/4100347. It is activated by
+  default within Windows.
+
+  Once the updates are applied within the Windows guest, 2D graphics
+  performance drops significantly. Other performance benchmarks are not
+  affected.
+
+  A bare metal Windows installation does not display a performance loss
+  after the update. See https://heiko-sieger.info/low-2d-graphics-
+  benchmark-with-windows-10-1803-kvm-vm/
+
+  Similar reports can be found here:
+  https://www.reddit.com/r/VFIO/comments/97unx4/passmark_lousy_2d_graphics_=
+performance_on_windows/
+
+  Hardware:
+
+  6 core Intel Core i7-3930K (-MT-MCP-)
+
+  Host OS:
+  Linux Mint 19/Ubuntu 18.04
+  Kernel: 4.15.0-32-generic x86_64
+  Qemu: QEMU emulator version 2.11.1
+  Intel microcode (host): 0x714
+  dmesg | grep microcode
+  [    0.000000] microcode: microcode updated early to revision 0x714, date=
+ =3D 2018-05-08
+  [    2.810683] microcode: sig=3D0x206d7, pf=3D0x4, revision=3D0x714
+  [    2.813340] microcode: Microcode Update Driver: v2.2.
+
+  Note: I manually updated the Intel microcode on the host from 0x713 to
+  0x714. However, both microcode versions produce the same result in the
+  Windows guest.
+
+  Guest OS:
+  Windows 10 Pro 64 bit, release 1803
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1788665/+subscriptions
