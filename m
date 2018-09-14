@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1g0pBa-0005w1-9v
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:35:08 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1g0pMY-0001Hc-5p
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:46:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1g0pBW-0007Jg-JU
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:35:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:17099)
+	(envelope-from <dgilbert@redhat.com>) id 1g0pMU-0002jF-PU
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:46:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1g0pBW-0007GC-9x
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:35:02 -0400
-Date: Fri, 14 Sep 2018 16:34:47 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180914163447.367cb2d3@redhat.com>
-In-Reply-To: <20180913142025.55af60ae@redhat.com>
-References: <20180829153624.12299-1-david@redhat.com>
-	<20180829153624.12299-6-david@redhat.com>
-	<20180913142025.55af60ae@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1g0pMU-0002hl-II
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:46:22 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A89E300273D
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 14:46:21 +0000 (UTC)
+Date: Fri, 14 Sep 2018 15:46:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180914144614.GC3081@work-vm>
+References: <20180914104835.26019-1-kraxel@redhat.com>
+	<20180914113407.GB3081@work-vm>
+	<20180914125400.nvq5t3pjh326pvr4@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/20] memory-device: convert
- get_region_size() to get_memory_region()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180914125400.nvq5t3pjh326pvr4@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [PATCH v2] usb: assign unique serial numbers to
+ hid devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,144 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr . David Alan
-	Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Thu, 13 Sep 2018 14:20:25 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
-
-> On Wed, 29 Aug 2018 17:36:09 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+* Gerd Hoffmann (kraxel@redhat.com) wrote:
+>   Hi,
 > 
-> > To factor out plugging and unplugging of memory device we need access to
-> > the memory region. So let's replace get_region_size() by
-> > get_memory_region().
-this part isn't clear and doesn't really answer "why" patch's been written
-and how it will really help.
-
-> > 
-> > If any memory device will in the future have multiple memory regions
-> > that make up the total region size, it can simply use a wrapping memory
-> > region to embed the other ones.
-It might be better to document expectation as part of get_memory_region() doc comment.
-
-
-I'm not really getting reasoning behind this patch.
- * Why get_region_size() doesn't work for you?
-   benefits I see is that's one less get_foo_size() callback,
-   so it becomes less confusing
-
- * I get we might need access to memory region at MemoryDeviceClass level,
-   but why are you keeping PCDIMMDeviceClass::get_memory_region()?
-   I'd expect the later being generalized (moved) to MemoryDeviceClass
-   so we would end up with one level indirection that we have now.
-
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> > ---
-> >  hw/mem/memory-device.c         | 10 ++++++----
-> >  hw/mem/pc-dimm.c               | 19 ++++++++++++++-----
-> >  include/hw/mem/memory-device.h |  2 +-
-> >  3 files changed, 21 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> > index d87599c280..3bd30d98bb 100644
-> > --- a/hw/mem/memory-device.c
-> > +++ b/hw/mem/memory-device.c
-> > @@ -56,11 +56,13 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
-> >  
-> >      if (object_dynamic_cast(obj, TYPE_MEMORY_DEVICE)) {
-> >          const DeviceState *dev = DEVICE(obj);
-> > -        const MemoryDeviceState *md = MEMORY_DEVICE(obj);
-> > +        MemoryDeviceState *md = MEMORY_DEVICE(obj);  
-> it's a getter, why do we loose 'const' here?
+> > OK, so now I've found the bit about the magic 42; commit 7b074a22 of
+> > yours; recommended checking for 42 for knowing we had autosuspend;
+> > what's actually in the current fedora hid rules is serial!=1 - I wonder
+> > what others have.
 > 
-> >          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(obj);
-> >  
-> >          if (dev->realized) {
-> > -            *size += mdc->get_region_size(md, &error_abort);
-> > +            MemoryRegion *mr = mdc->get_memory_region(md, &error_abort);
-> > +
-> > +            *size += memory_region_size(mr);
-> >          }
-> >      }
-> >  
-> > @@ -162,12 +164,12 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
-> >      /* find address range that will fit new memory device */
-> >      object_child_foreach(OBJECT(ms), memory_device_build_list, &list);
-> >      for (item = list; item; item = g_slist_next(item)) {
-> > -        const MemoryDeviceState *md = item->data;
-> > +        MemoryDeviceState *md = item->data;  
-> ditto
+> Whatever upstream systemd/udev has I guess ...
 > 
-> >          const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(OBJECT(md));
-> >          uint64_t md_size, md_addr;
-> >  
-> >          md_addr = mdc->get_addr(md);
-> > -        md_size = mdc->get_region_size(md, &error_abort);
-> > +        md_size = memory_region_size(mdc->get_memory_region(md, &error_abort));
-> >          if (*errp) {
-> >              goto out;
-> >          }
-> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > index 4bf1a0acc9..a208b17c64 100644
-> > --- a/hw/mem/pc-dimm.c
-> > +++ b/hw/mem/pc-dimm.c
-> > @@ -236,8 +236,8 @@ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
-> >      return dimm->addr;
-> >  }
-> >  
-> > -static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
-> > -                                           Error **errp)
-> > +static uint64_t pc_dimm_md_get_plugged_size(const MemoryDeviceState *md,
-> > +                                            Error **errp)
-> >  {
-> >      /* dropping const here is fine as we don't touch the memory region */
-> >      PCDIMMDevice *dimm = PC_DIMM(md);
-> > @@ -249,9 +249,19 @@ static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md,
-> >          return 0;
-> >      }
-> >  
-> > +    /* for a dimm plugged_size == region_size */
-> >      return memory_region_size(mr);
-> >  }
-> >  
-> > +static MemoryRegion *pc_dimm_md_get_memory_region(MemoryDeviceState *md,
-> > +                                                  Error **errp)
-> > +{
-> > +    PCDIMMDevice *dimm = PC_DIMM(md);
-> > +    const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
-> > +
-> > +    return ddc->get_memory_region(dimm, errp);
-> > +}
-> > +
-> >  static void pc_dimm_md_fill_device_info(const MemoryDeviceState *md,
-> >                                          MemoryDeviceInfo *info)
-> >  {
-> > @@ -297,9 +307,8 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
-> >      ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
-> >  
-> >      mdc->get_addr = pc_dimm_md_get_addr;
-> > -    /* for a dimm plugged_size == region_size */
-> > -    mdc->get_plugged_size = pc_dimm_md_get_region_size;
-> > -    mdc->get_region_size = pc_dimm_md_get_region_size;
-> > +    mdc->get_plugged_size = pc_dimm_md_get_plugged_size;
-> > +    mdc->get_memory_region = pc_dimm_md_get_memory_region;
-> >      mdc->fill_device_info = pc_dimm_md_fill_device_info;
-> >  }
-> >  
-> > diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-> > index f02b229837..852fd8f98a 100644
-> > --- a/include/hw/mem/memory-device.h
-> > +++ b/include/hw/mem/memory-device.h
-> > @@ -34,7 +34,7 @@ typedef struct MemoryDeviceClass {
-> >  
-> >      uint64_t (*get_addr)(const MemoryDeviceState *md);
-> >      uint64_t (*get_plugged_size)(const MemoryDeviceState *md, Error **errp);
-> > -    uint64_t (*get_region_size)(const MemoryDeviceState *md, Error **errp);
-> > +    MemoryRegion *(*get_memory_region)(MemoryDeviceState *md, Error **errp);
-> >      void (*fill_device_info)(const MemoryDeviceState *md,
-> >                               MemoryDeviceInfo *info);
-> >  } MemoryDeviceClass;  
+> A bit of history ...
 > 
+>  * First there was nothing.
+>  * Then I added a rule to udev checking for serial == 42
+>    (this is in rhel-6).
+>  * Then systemd + udev merged.
+>  * Then I changed the rule to check for serial != 1 instead, so we can
+>    use any serial but "1" which is the one the old broken devices had
+>    (this is in rhel-7).  March 2014 in upstream systemd.
+>  * Then all usb power management rules where dropped from systemd (June
+>    2015).  Which I figured today, after wondering that the rules are
+>    gone in fedora 28.
 > 
+> So, three years ago the serial number check was dropped upstream, yet I
+> hav't seen a single report about autosuspend issues (or cpu usage for
+> usb emulation going up, which is the typical symtom).
+> 
+> So I figured I can stop worring that changing the serial number will
+> break things and just do it.
+> 
+> And even if it turns out autosuspend is still an issue:  I think
+> meanwhile we can really stop worrying about guests running in old qemu
+> versions with broken usb suspend (fixed in 0.13 !).  If needed we can
+> enable autosuspend unconditionally in guests.
+
+OK, so what about the other question - which serial number do we end up
+with after this patch; do we get the 89126/28754/68284 or do we get the
+path based one from your change that calls usb_desc_create_serial?
+
+Dave
+
+> cheers,
+>   Gerd
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
