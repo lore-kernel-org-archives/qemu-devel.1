@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1g0nSu-0004r9-W9
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:44:53 -0400
+	(envelope-from <kraxel@redhat.com>) id 1g0nbt-0006YR-Vv
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1g0nSq-0002OW-73
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:44:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60876)
+	(envelope-from <kraxel@redhat.com>) id 1g0nbq-0003Co-0K
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:54:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1g0nSq-0002Mf-0i
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:44:48 -0400
-References: <20180908130448.24516-1-liujunjie23@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <eda4b55d-5401-3a85-147e-d83742897343@redhat.com>
-Date: Fri, 14 Sep 2018 20:44:30 +0800
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g0nbp-0003B6-Qh
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 08:54:05 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6E32C307D90F
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 12:54:04 +0000 (UTC)
+Date: Fri, 14 Sep 2018 14:54:00 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180914125400.nvq5t3pjh326pvr4@sirius.home.kraxel.org>
+References: <20180914104835.26019-1-kraxel@redhat.com>
+	<20180914113407.GB3081@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20180908130448.24516-1-liujunjie23@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] clean up callback when del virtqueue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180914113407.GB3081@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2] usb: assign unique serial numbers to
+ hid devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: liujunjie <liujunjie23@huawei.com>, mst@redhat.com
-Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com, jianjay.zhou@huawei.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+  Hi,
 
+> OK, so now I've found the bit about the magic 42; commit 7b074a22 of
+> yours; recommended checking for 42 for knowing we had autosuspend;
+> what's actually in the current fedora hid rules is serial!=1 - I wonder
+> what others have.
 
-On 2018=E5=B9=B409=E6=9C=8808=E6=97=A5 21:04, liujunjie wrote:
-> Before, we did not clear callback like handle_output when delete
-> the virtqueue which may result be segmentfault.
-> The scene is as follows:
-> 1. Start a vm with multiqueue vhost-net,
-> 2. then we write VIRTIO_PCI_GUEST_FEATURES in PCI configuration to
-> triger multiqueue disable in this vm which will delete the virtqueue.
-> In this step, the tx_bh is deleted but the callback virtio_net_handle_t=
-x_bh
-> still exist.
-> 3. Finally, we write VIRTIO_PCI_QUEUE_NOTIFY in PCI configuration to
-> notify the deleted virtqueue. In this way, virtio_net_handle_tx_bh
-> will be called and qemu will be crashed.
+Whatever upstream systemd/udev has I guess ...
 
-Good catch.
+A bit of history ...
 
->
-> Although the way described above is uncommon, we had better reinforce i=
-t.
->
-> Signed-off-by: liujunjie <liujunjie23@huawei.com>
-> ---
->   hw/net/virtio-net.c | 4 +++-
->   hw/virtio/virtio.c  | 3 +++
->   2 files changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index f154756..9bb20e3 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -1467,7 +1467,9 @@ static void virtio_net_handle_tx_bh(VirtIODevice =
-*vdev, VirtQueue *vq)
->           return;
->       }
->       virtio_queue_set_notification(vq, 0);
-> -    qemu_bh_schedule(q->tx_bh);
-> +    if (q->tx_bh) {
-> +        qemu_bh_schedule(q->tx_bh);
-> +    }
+ * First there was nothing.
+ * Then I added a rule to udev checking for serial == 42
+   (this is in rhel-6).
+ * Then systemd + udev merged.
+ * Then I changed the rule to check for serial != 1 instead, so we can
+   use any serial but "1" which is the one the old broken devices had
+   (this is in rhel-7).  March 2014 in upstream systemd.
+ * Then all usb power management rules where dropped from systemd (June
+   2015).  Which I figured today, after wondering that the rules are
+   gone in fedora 28.
 
-I believe this is not necessary since handle_output is NULL now?
+So, three years ago the serial number check was dropped upstream, yet I
+hav't seen a single report about autosuspend issues (or cpu usage for
+usb emulation going up, which is the typical symtom).
 
->   }
->  =20
->   static void virtio_net_tx_timer(void *opaque)
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index d4e4d98..7577518 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -1604,6 +1604,9 @@ void virtio_del_queue(VirtIODevice *vdev, int n)
->  =20
->       vdev->vq[n].vring.num =3D 0;
->       vdev->vq[n].vring.num_default =3D 0;
-> +    vdev->vq[n].vring.align =3D 0;
+So I figured I can stop worring that changing the serial number will
+break things and just do it.
 
-Is this related or fix for another bug?
+And even if it turns out autosuspend is still an issue:  I think
+meanwhile we can really stop worrying about guests running in old qemu
+versions with broken usb suspend (fixed in 0.13 !).  If needed we can
+enable autosuspend unconditionally in guests.
 
-Thanks
-
-> +    vdev->vq[n].handle_output =3D NULL;
-> +    vdev->vq[n].handle_aio_output =3D NULL;
->   }
->  =20
->   static void virtio_set_isr(VirtIODevice *vdev, int value)
+cheers,
+  Gerd
