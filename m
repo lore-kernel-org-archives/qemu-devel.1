@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g0hPq-0000Zm-Tm
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:17:23 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1g0hge-0002wn-0X
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:34:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g0hPn-0001hX-2Y
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:17:18 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:43248)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g0hPm-0001dX-Ov
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:17:14 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
-	<20180912081956.3228.17903.stgit@pasha-VirtualBox>
-	<b0deae03-cfdf-85c0-4262-884a1e07e5a3@redhat.com>
-	<000901d44b52$c1bdcd30$45396790$@ru>
-	<988eaaac-f2cc-69a7-c4c4-cdf63afd65e8@redhat.com>
-In-Reply-To: <988eaaac-f2cc-69a7-c4c4-cdf63afd65e8@redhat.com>
-Date: Fri, 14 Sep 2018 09:17:09 +0300
-Message-ID: <002201d44bf2$92077c80$b6167580$@ru>
+	(envelope-from <zhangckid@gmail.com>) id 1g0hga-0002NY-FQ
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:34:38 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46379)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1g0hgW-0002Cr-Nl
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 02:34:34 -0400
+Received: by mail-wr1-x444.google.com with SMTP id a108-v6so9090188wrc.13
+	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 23:34:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v6 22/25] replay: add BH oneshot event for
- block layer
+References: <1536163920-2443-1-git-send-email-zhangckid@gmail.com>
+In-Reply-To: <1536163920-2443-1-git-send-email-zhangckid@gmail.com>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Fri, 14 Sep 2018 14:32:48 +0800
+Message-ID: <CAK3tnvK6T8fxdAmtFuB9o7Gc8oyFYuDEsCn_mv-+V7uyf3cQFw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] docs/block-replication.txt: Add more
+ detail about replication_do_checkpoint_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: qemu-devel@nongnu.org, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 13/09/2018 13:13, Pavel Dovgalyuk wrote:
-> >> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> >> On 12/09/2018 10:19, Pavel Dovgalyuk wrote:
-> >>> + uint64_t id = replay_get_current_step();
-> >>> + replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, id);
-> >>
-> >> Why does it need an id, while REPLAY_ASYNC_EVENT_BH does not?
-> >
-> > Because _oneshot() function takes only context and callback,
-> > and BH object is created inside that function.
-> > Therefore to use the normal bh scheduling events we have to refactor
-> > block code - add bh creation, scheduling, and freeing.
-> 
-> No, I'm asking only why the id is 0 for REPLAY_ASYNC_EVENT_BH and
-> replay_get_current_step() for REPLAY_ASYNC_EVENT_BH_ONESHOT.
-> 
-> Thanks,
-> 
-> Paolo
+Hi All,
 
-Sorry, I missed your point.
-Maybe you looked at the wrong function, because both of these events have an id:
+No news update?
+Ping...
 
-void replay_bh_schedule_event(QEMUBH *bh)
-{
-    if (events_enabled) {
-        uint64_t id = replay_get_current_step();
-        replay_add_event(REPLAY_ASYNC_EVENT_BH, bh, NULL, id);
-    } else {
-        qemu_bh_schedule(bh);
-    }
-}
+Thanks
+Zhang Chen
 
-void replay_bh_schedule_oneshot_event(AioContext *ctx,
-    QEMUBHFunc *cb, void *opaque)
-{
-    if (events_enabled) {
-        uint64_t id = replay_get_current_step();
-        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, id);
-    } else {
-        aio_bh_schedule_oneshot(ctx, cb, opaque);
-    }
-}
+On Thu, Sep 6, 2018 at 12:12 AM Zhang Chen <zhangckid@gmail.com> wrote:
 
-Pavel Dovgalyuk
+> Add more detail description for COLO checkpoint use case.
+> Suggested by Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> ---
+>  docs/block-replication.txt | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/docs/block-replication.txt b/docs/block-replication.txt
+> index 6bde6737fb..b6c5e94764 100644
+> --- a/docs/block-replication.txt
+> +++ b/docs/block-replication.txt
+> @@ -131,9 +131,10 @@ a. replication_start_all()
+>     thread.
+>  b. replication_do_checkpoint_all()
+>     This interface is called after all VM state is transferred to
+> -   Secondary QEMU. The Disk buffer will be dropped in this interface.
+> -   The caller must hold the I/O mutex lock if it is in
+> migration/checkpoint
+> -   thread.
+> +   secondary node, and in primary node this interface no need to
+> +   called after synchronizing all the states. The Disk buffer will be
+> dropped
+> +   in this interface. The caller must hold the I/O mutex lock if it is
+> +   in migration/checkpoint thread.
+>  c. replication_get_error_all()
+>     This interface is called to check if error happened in replication.
+>     The caller must hold the I/O mutex lock if it is in
+> migration/checkpoint
+> --
+> 2.17.GIT
+>
+>
