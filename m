@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liujunjie23@huawei.com>) id 1g0nw3-0003Pm-1O
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:14:59 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g0oX0-0000aY-AK
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:53:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liujunjie23@huawei.com>) id 1g0nvz-0001LL-R2
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:14:59 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2407 helo=huawei.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g0oWw-0000xy-Um
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:53:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liujunjie23@huawei.com>)
-	id 1g0nvy-0001EU-Tx
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:14:55 -0400
-From: "liujunjie (A)" <liujunjie23@huawei.com>
-Date: Fri, 14 Sep 2018 13:14:42 +0000
-Message-ID: <B526101FCAB4654DB0892B650DEFC5550870FE7E@DGGEMM501-MBX.china.huawei.com>
-References: <20180908130448.24516-1-liujunjie23@huawei.com>
-	<eda4b55d-5401-3a85-147e-d83742897343@redhat.com>
-In-Reply-To: <eda4b55d-5401-3a85-147e-d83742897343@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1g0oWw-0000sF-MM
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 09:53:06 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 14 Sep 2018 17:52:30 +0400
+Message-Id: <20180914135230.15178-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] clean up callback when del virtqueue
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] vhost-user: define conventions for
+ vhost-user backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +26,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "mst@redhat.com" <mst@redhat.com>
-Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, Gonglei <arei.gonglei@huawei.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyBbbWFp
-bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+IFNlbnQ6IEZyaWRheSwgU2VwdGVtYmVyIDE0LCAy
-MDE4IDg6NDUgUE0NCj4gVG86IGxpdWp1bmppZSAoQSkgPGxpdWp1bmppZTIzQGh1YXdlaS5jb20+
-OyBtc3RAcmVkaGF0LmNvbQ0KPiBDYzogSHVhbmd3ZWlkb25nIChDKSA8d2VpZG9uZy5odWFuZ0Bo
-dWF3ZWkuY29tPjsgd2FuZ3hpbiAoVSkNCj4gPHdhbmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPjsg
-cWVtdS1kZXZlbEBub25nbnUub3JnOyBHb25nbGVpIChBcmVpKQ0KPiA8YXJlaS5nb25nbGVpQGh1
-YXdlaS5jb20+OyBaaG91amlhbiAoamF5KSA8amlhbmpheS56aG91QGh1YXdlaS5jb20+DQo+IFN1
-YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1BBVENIXSBjbGVhbiB1cCBjYWxsYmFjayB3aGVuIGRl
-bCB2aXJ0cXVldWUNCj4gDQo+IA0KPiANCj4gT24gMjAxOOW5tDA55pyIMDjml6UgMjE6MDQsIGxp
-dWp1bmppZSB3cm90ZToNCj4gPiBCZWZvcmUsIHdlIGRpZCBub3QgY2xlYXIgY2FsbGJhY2sgbGlr
-ZSBoYW5kbGVfb3V0cHV0IHdoZW4gZGVsZXRlIHRoZQ0KPiA+IHZpcnRxdWV1ZSB3aGljaCBtYXkg
-cmVzdWx0IGJlIHNlZ21lbnRmYXVsdC4NCj4gPiBUaGUgc2NlbmUgaXMgYXMgZm9sbG93czoNCj4g
-PiAxLiBTdGFydCBhIHZtIHdpdGggbXVsdGlxdWV1ZSB2aG9zdC1uZXQsIDIuIHRoZW4gd2Ugd3Jp
-dGUNCj4gPiBWSVJUSU9fUENJX0dVRVNUX0ZFQVRVUkVTIGluIFBDSSBjb25maWd1cmF0aW9uIHRv
-IHRyaWdlciBtdWx0aXF1ZXVlDQo+ID4gZGlzYWJsZSBpbiB0aGlzIHZtIHdoaWNoIHdpbGwgZGVs
-ZXRlIHRoZSB2aXJ0cXVldWUuDQo+ID4gSW4gdGhpcyBzdGVwLCB0aGUgdHhfYmggaXMgZGVsZXRl
-ZCBidXQgdGhlIGNhbGxiYWNrDQo+ID4gdmlydGlvX25ldF9oYW5kbGVfdHhfYmggc3RpbGwgZXhp
-c3QuDQo+ID4gMy4gRmluYWxseSwgd2Ugd3JpdGUgVklSVElPX1BDSV9RVUVVRV9OT1RJRlkgaW4g
-UENJIGNvbmZpZ3VyYXRpb24gdG8NCj4gPiBub3RpZnkgdGhlIGRlbGV0ZWQgdmlydHF1ZXVlLiBJ
-biB0aGlzIHdheSwgdmlydGlvX25ldF9oYW5kbGVfdHhfYmgNCj4gPiB3aWxsIGJlIGNhbGxlZCBh
-bmQgcWVtdSB3aWxsIGJlIGNyYXNoZWQuDQo+IA0KPiBHb29kIGNhdGNoLg0KPiANCj4gPg0KPiA+
-IEFsdGhvdWdoIHRoZSB3YXkgZGVzY3JpYmVkIGFib3ZlIGlzIHVuY29tbW9uLCB3ZSBoYWQgYmV0
-dGVyIHJlaW5mb3JjZSBpdC4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IGxpdWp1bmppZSA8bGl1
-anVuamllMjNAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiAgIGh3L25ldC92aXJ0aW8tbmV0LmMg
-fCA0ICsrKy0NCj4gPiAgIGh3L3ZpcnRpby92aXJ0aW8uYyAgfCAzICsrKw0KPiA+ICAgMiBmaWxl
-cyBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gPg0KPiA+IGRpZmYg
-LS1naXQgYS9ody9uZXQvdmlydGlvLW5ldC5jIGIvaHcvbmV0L3ZpcnRpby1uZXQuYyBpbmRleA0K
-PiA+IGYxNTQ3NTYuLjliYjIwZTMgMTAwNjQ0DQo+ID4gLS0tIGEvaHcvbmV0L3ZpcnRpby1uZXQu
-Yw0KPiA+ICsrKyBiL2h3L25ldC92aXJ0aW8tbmV0LmMNCj4gPiBAQCAtMTQ2Nyw3ICsxNDY3LDkg
-QEAgc3RhdGljIHZvaWQgdmlydGlvX25ldF9oYW5kbGVfdHhfYmgoVmlydElPRGV2aWNlDQo+ICp2
-ZGV2LCBWaXJ0UXVldWUgKnZxKQ0KPiA+ICAgICAgICAgICByZXR1cm47DQo+ID4gICAgICAgfQ0K
-PiA+ICAgICAgIHZpcnRpb19xdWV1ZV9zZXRfbm90aWZpY2F0aW9uKHZxLCAwKTsNCj4gPiAtICAg
-IHFlbXVfYmhfc2NoZWR1bGUocS0+dHhfYmgpOw0KPiA+ICsgICAgaWYgKHEtPnR4X2JoKSB7DQo+
-ID4gKyAgICAgICAgcWVtdV9iaF9zY2hlZHVsZShxLT50eF9iaCk7DQo+ID4gKyAgICB9DQo+IA0K
-PiBJIGJlbGlldmUgdGhpcyBpcyBub3QgbmVjZXNzYXJ5IHNpbmNlIGhhbmRsZV9vdXRwdXQgaXMg
-TlVMTCBub3c/DQoNClllcywgaXQgaXMgbm90IG5lY2Vzc2FyeS4NCg0KPiANCj4gPiAgIH0NCj4g
-Pg0KPiA+ICAgc3RhdGljIHZvaWQgdmlydGlvX25ldF90eF90aW1lcih2b2lkICpvcGFxdWUpIGRp
-ZmYgLS1naXQNCj4gPiBhL2h3L3ZpcnRpby92aXJ0aW8uYyBiL2h3L3ZpcnRpby92aXJ0aW8uYyBp
-bmRleCBkNGU0ZDk4Li43NTc3NTE4DQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvaHcvdmlydGlvL3Zp
-cnRpby5jDQo+ID4gKysrIGIvaHcvdmlydGlvL3ZpcnRpby5jDQo+ID4gQEAgLTE2MDQsNiArMTYw
-NCw5IEBAIHZvaWQgdmlydGlvX2RlbF9xdWV1ZShWaXJ0SU9EZXZpY2UgKnZkZXYsIGludCBuKQ0K
-PiA+DQo+ID4gICAgICAgdmRldi0+dnFbbl0udnJpbmcubnVtID0gMDsNCj4gPiAgICAgICB2ZGV2
-LT52cVtuXS52cmluZy5udW1fZGVmYXVsdCA9IDA7DQo+ID4gKyAgICB2ZGV2LT52cVtuXS52cmlu
-Zy5hbGlnbiA9IDA7DQo+IA0KPiBJcyB0aGlzIHJlbGF0ZWQgb3IgZml4IGZvciBhbm90aGVyIGJ1
-Zz8NCg0KSXQncyBub3QgcmVsYXRlZCBmb3IgYW5vdGhlciBidWcuIFNvIGl0IGlzIGFsc28gdW5u
-ZWNlc3NhcnkgdG8gYWRkIHRoaXMsIHRvby4NClRoZSByZWFzb24gd2h5IGFkZCBpdCBpcyBvbmx5
-IHRyeWluZyB0byBjb3JyZXNwb25kIHRvIHRoZSBmdW5jdGlvbiA8dmlydGlvX2FkZF9xdWV1ZT4g
-aW4gdGhlIHNhbWUgZmlsZS4NCg0KPiANCj4gVGhhbmtzDQo+IA0KPiA+ICsgICAgdmRldi0+dnFb
-bl0uaGFuZGxlX291dHB1dCA9IE5VTEw7DQo+ID4gKyAgICB2ZGV2LT52cVtuXS5oYW5kbGVfYWlv
-X291dHB1dCA9IE5VTEw7DQo+ID4gICB9DQo+ID4NCj4gPiAgIHN0YXRpYyB2b2lkIHZpcnRpb19z
-ZXRfaXNyKFZpcnRJT0RldmljZSAqdmRldiwgaW50IHZhbHVlKQ0KDQo=
+As discussed during "[PATCH v4 00/29] vhost-user for input & GPU"
+review, let's define a common set of backend conventions to help with
+management layer implementation, and interoperability.
+
+v2:
+ - drop --pidfile
+ - add some notes about daemonizing & stdin/out/err
+
+Cc: libvir-list@redhat.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Cc: Changpeng Liu <changpeng.liu@intel.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Felipe Franciosi <felipe@nutanix.com>
+Cc: Gonglei <arei.gonglei@huawei.com>
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Victor Kaplansky <victork@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ docs/interop/vhost-user.txt | 109 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 107 insertions(+), 2 deletions(-)
+
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index ba5e37d714..339b335e9c 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -17,8 +17,13 @@ The protocol defines 2 sides of the communication, mas=
+ter and slave. Master is
+ the application that shares its virtqueues, in our case QEMU. Slave is t=
+he
+ consumer of the virtqueues.
+=20
+-In the current implementation QEMU is the Master, and the Slave is inten=
+ded to
+-be a software Ethernet switch running in user space, such as Snabbswitch=
+.
++In the current implementation QEMU is the Master, and the Slave is the
++external process consuming the virtio queues, for example a software
++Ethernet switch running in user space, such as Snabbswitch, or a block
++device backend processing read & write to a virtual disk. In order to
++facilitate interoperability between various backend implementations,
++it is recommended to follow the "Backend program conventions"
++described in this document.
+=20
+ Master and slave can be either a client (i.e. connecting) or server (lis=
+tening)
+ in the socket communication.
+@@ -859,3 +864,103 @@ resilient for selective requests.
+ For the message types that already solicit a reply from the client, the
+ presence of VHOST_USER_PROTOCOL_F_REPLY_ACK or need_reply bit being set =
+brings
+ no behavioural change. (See the 'Communication' section for details.)
++
++Backend program conventions
++---------------------------
++
++vhost-user backends provide various services and they may need to be
++configured manually depending on the use case. However, it is a good
++idea to follow the conventions listed here when possible. Users, QEMU
++or libvirt, can then rely on some common behaviour to avoid
++heterogenous configuration and management of the backend program and
++facilitate interoperability.
++
++In order to be discoverable, default vhost-user backends should be
++located under "/usr/libexec", and be named "vhost-user-$device" where
++"$device" is the device name in lower-case following the name listed
++in the Linux virtio_ids.h header (ex: the VIRTIO_ID_RPROC_SERIAL
++backend would be named "vhost-user-rproc-serial").
++
++Mechanisms to list, and to select among alternatives implementations
++or modify the default backend are not described at this point (a
++distribution may use update-alternatives, for example, to list and to
++pick a different default backend).
++
++The backend program must not daemonize itself, but it may be
++daemonized by the management layer. It may also have a restricted
++access to the system.
++
++File descriptors 0, 1 and 2 will exist, and have regular
++stdin/stdout/stderr usage (they may be redirected to /dev/null by the
++management layer, or to a log handler).
++
++The backend program must end (as quickly and cleanly as possible) when
++the SIGTERM signal is received. Eventually, it may be SIGKILL by the
++management layer after a few seconds.
++
++The following command line options have an expected behaviour. They
++are mandatory, unless explicitly said differently:
++
++* --socket-path=3DPATH
++
++This option specify the location of the vhost-user Unix domain socket.
++It is incompatible with --fd.
++
++* --fd=3DFDNUM
++
++When this argument is given, the backend program is started with the
++vhost-user socket as file descriptor FDNUM. It is incompatible with
++--socket-path.
++
++* --print-capabilities
++
++Output to stdout a line-seperated list of backend capabilities, and
++then exit successfully. Other options and arguments should be ignored,
++and the backend program should not perform its normal function.
++
++At the time of writing, there are no common capabilities. Some
++device-specific capabilities are listed in the respective sections. By
++convention, device-specific capabilities are prefixed by their device
++name.
++
++vhost-user-input program conventions
++------------------------------------
++
++Capabilities:
++
++input-evdev-path
++
++    The --evdev-path command line option is supported.
++
++input-no-grab
++
++    The --no-grab command line option is supported.
++
++* --evdev-path=3DPATH (optional)
++
++Specify the linux input device.
++
++* --no-grab (optional)
++
++Do no request exclusive access to the input device.
++
++vhost-user-gpu program conventions
++----------------------------------
++
++Capabilities:
++
++gpu-render-node
++
++    The --render-node command line option is supported.
++
++gpu-virgl
++
++    The --virgl command line option is supported.
++
++* --render-node=3DPATH (optional)
++
++Specify the GPU DRM render node.
++
++* --virgl (optional)
++
++Enable virgl rendering support.
+--=20
+2.19.0
