@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1g0owS-00005M-F9
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:19:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1g0ozN-0000wi-O9
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1g0owO-0002z8-BC
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:19:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54144)
+	(envelope-from <eblake@redhat.com>) id 1g0ozJ-00060z-CE
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:22:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1g0owN-0002xH-8P
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:19:24 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F398C31649B7
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 14:19:20 +0000 (UTC)
-Date: Fri, 14 Sep 2018 16:19:07 +0200
-From: Erik Skultety <eskultet@redhat.com>
-Message-ID: <20180914141907.GB13956@beluga.usersys.redhat.com>
-References: <20180910064340.30745-1-kraxel@redhat.com>
-	<20180910064340.30745-3-kraxel@redhat.com>
-	<20180910125409.2b49be3b@t450s.home>
-	<20180911043843.egzz6pqe5ouzju3g@sirius.home.kraxel.org>
-	<20180912111354.4163d9ce@t450s.home>
-	<20180914105009.uemha46ml2m74civ@sirius.home.kraxel.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g0ozJ-0005zf-3c
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:22:25 -0400
+References: <CAB3eZfv6QFAABhzxCKjVY_36j9th_3sbcbzaOQTGkm0mhJ-BoQ@mail.gmail.com>
+	<314d0a84-c0b5-3bbb-168d-360f5027a913@redhat.com>
+	<CAB3eZfsXekOx=rE_8dj59MUc9Qf5+37_iPzPq7wWHsCpuSjTNQ@mail.gmail.com>
+	<cd6350f4-d8b9-217e-fcb6-19b84f4ad7c9@redhat.com>
+	<CAB3eZfubzAKOnuJKOvBFHb7qvTau7iOKfMZa83xirV50itDCtQ@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <54a315e2-4216-2929-e65b-18a62f6fddee@redhat.com>
+Date: Fri, 14 Sep 2018 09:22:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180914105009.uemha46ml2m74civ@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH 2/2] hw/vfio/display: add ramfb
- support
+In-Reply-To: <CAB3eZfubzAKOnuJKOvBFHb7qvTau7iOKfMZa83xirV50itDCtQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] What kind of situation to use internal or external
+ snapshot?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,59 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: lampahome <pahome.chen@mirlab.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Sep 14, 2018 at 12:50:09PM +0200, Gerd Hoffmann wrote:
->   Hi,
->
-> > > Also libvirt manages hotpluggability per device *class*, not per device
-> > > *instance*.  So a device being hotpluggable or not depending on some
-> > > device property is a problem for libvirt ...
-> > >
-> > > I'm open to suggestions how to handle this better, as long as the
-> > > libvirt people are on board with the approach.
-> >
-> > Ok, so we need a new class to handle making a device non-hotpluggable,
-> > but I'm still not sure whether we should make:
-> >
-> >  -device vfio-pci-ramfb
-> >
-> > or
-> >
-> >  -device vfio-pci-nohotplug,ramfb=on
-> >
-> > Where ramfb would be a property only available on the nohotplug class
-> > variant.
->
-> I'm fine with the latter.
->
-> > The latter seems to provide a lot more flexibility, but which
-> > is more practical for libvirt?
->
-> Any comment from the libvirt camp?
+On 9/13/18 10:58 PM, lampahome wrote:
+> In general case, what's difference between internal and external snapshot?
 
-We had a discussion about this a few months ago [1] where we spoke about
--device vfio-pci-ramfb. However, as Alex has pointed out, the latter proposal
-gives us more flexibility in terms of introduction of other device properties
-which are unrelated to ramfb but still might require non-hotpluggable device.
-Either way, libvirt needs a capability to test whether we should favour this
-new device over plain vfio-pci if an mdev with display='on' is required.
-What about new device properties (specifically mdev)? In the discussion below,
-Gerd noted that apart from the ramfb stuff and the fact that one can be
-hotplugged while the latter can not, these are identical (option-wise), is that
-to stay, IOW are we going to keep these two device classes in sync when
-introducing new vfio-pci device options or are these going to divert more? Is
-it even possible? What I mean by that is that I'd like to avoid is a situation
-where there are 2 disjunct sets of options which could potentially lead to
-problems in decision making in libvirt and we don't like making decisions.
+You may find my KVM forum presentation from 2015 useful:
+http://events17.linuxfoundation.org/sites/events/files/slides/2015-qcow2-expanded.pdf
 
-Anyhow, I don't feel like any of the proposals has a strong
-advantage/disadvantage in usage for libvirt, both will require a capability and
-both would be special cased in our cmdline code depending on the 'display'
-attribute. Luckily, we don't have mdev migration yet, so it's good we don't
-have to worry about that at this point yet.
+Internal snapshots use reference counting to share clusters between the 
+snapshot and the live image; reads are always from a cluster in the 
+current image, and writing to a shared cluster decreases the refcount on 
+the existing cluster and writes the new data to a new cluster (using 
+copy-on-write to widen any short writes up to cluster boundaries with 
+the rest of the cluster populated from the shared cluster).  External 
+snapshots use sparse allocation, where writes always go to the current 
+image (using copy-on-write to widen any short writes up to cluster 
+boundaries with the rest of the cluster populated from the backing 
+file), and reads defer to the backing image if the cluster is not 
+present in the current image.  There are slight differences in the 
+amount of overall qcow2 metadata stored for the two approaches, but in 
+general, if your original image has 1G data allocated, then you create 
+the snapshot (either internally or externally), then the guest writes 
+512M more all to regions of the storage that were used prior to the 
+snapshot, then the overall storage used by either approach is 
+approximately 1.5G.  Reverting to an internal snapshot is a matter of 
+switching which L1/L2 tables are active.  Reverting to an external 
+snapshot is going back to the file that became the backing file at the 
+time you created the new overlay.
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg03430.html
+> I mean in some user situation.
 
-Erik
+There a pros and cons to both approaches, but my personal take is that 
+there are more benefits for using external snapshots, especially if you 
+want quick answers from the list in supporting particular issues you 
+might encounter.
+
+> 
+> Ex: If I want to all snapshots in only one qcow2, I should use internal
+> snapshot.
+
+If your file is big enough for that, then yes, that's one reason to use 
+internal snapshots. But in your other email, you're already mentioning 
+that you are already having issues with trying to host a 32T guest image 
+in a single file - if you add internal snapshots to that file, the host 
+storage consumption by that file can easily exceed the amount of storage 
+visible to the guest through any one of those snapshots.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
