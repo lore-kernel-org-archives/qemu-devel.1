@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g0ouP-00079t-6x
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:17:24 -0400
+	(envelope-from <eskultet@redhat.com>) id 1g0owS-00005M-F9
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g0ouM-0001F1-Gx
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:17:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41956)
+	(envelope-from <eskultet@redhat.com>) id 1g0owO-0002z8-BC
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:19:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1g0ouK-0001Bg-El
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:17:17 -0400
-References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
-	<20180912081950.3228.68987.stgit@pasha-VirtualBox>
-	<f7b7533c-a9db-d660-4981-678ae5143950@redhat.com>
-	<002101d44bee$9edf9720$dc9ec560$@ru>
-	<002301d44bfc$603513c0$209f3b40$@ru>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <1b1d35c1-31e4-767d-b687-5df11895c26b@redhat.com>
-Date: Fri, 14 Sep 2018 10:17:05 -0400
+	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1g0owN-0002xH-8P
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 10:19:24 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F398C31649B7
+	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 14:19:20 +0000 (UTC)
+Date: Fri, 14 Sep 2018 16:19:07 +0200
+From: Erik Skultety <eskultet@redhat.com>
+Message-ID: <20180914141907.GB13956@beluga.usersys.redhat.com>
+References: <20180910064340.30745-1-kraxel@redhat.com>
+	<20180910064340.30745-3-kraxel@redhat.com>
+	<20180910125409.2b49be3b@t450s.home>
+	<20180911043843.egzz6pqe5ouzju3g@sirius.home.kraxel.org>
+	<20180912111354.4163d9ce@t450s.home>
+	<20180914105009.uemha46ml2m74civ@sirius.home.kraxel.org>
 MIME-Version: 1.0
-In-Reply-To: <002301d44bfc$603513c0$209f3b40$@ru>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 21/25] replay: replay BH for IDE trim
- operation
+Content-Disposition: inline
+In-Reply-To: <20180914105009.uemha46ml2m74civ@sirius.home.kraxel.org>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH 2/2] hw/vfio/display: add ramfb
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +38,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
+On Fri, Sep 14, 2018 at 12:50:09PM +0200, Gerd Hoffmann wrote:
+>   Hi,
+>
+> > > Also libvirt manages hotpluggability per device *class*, not per device
+> > > *instance*.  So a device being hotpluggable or not depending on some
+> > > device property is a problem for libvirt ...
+> > >
+> > > I'm open to suggestions how to handle this better, as long as the
+> > > libvirt people are on board with the approach.
+> >
+> > Ok, so we need a new class to handle making a device non-hotpluggable,
+> > but I'm still not sure whether we should make:
+> >
+> >  -device vfio-pci-ramfb
+> >
+> > or
+> >
+> >  -device vfio-pci-nohotplug,ramfb=on
+> >
+> > Where ramfb would be a property only available on the nohotplug class
+> > variant.
+>
+> I'm fine with the latter.
+>
+> > The latter seems to provide a lot more flexibility, but which
+> > is more practical for libvirt?
+>
+> Any comment from the libvirt camp?
 
+We had a discussion about this a few months ago [1] where we spoke about
+-device vfio-pci-ramfb. However, as Alex has pointed out, the latter proposal
+gives us more flexibility in terms of introduction of other device properties
+which are unrelated to ramfb but still might require non-hotpluggable device.
+Either way, libvirt needs a capability to test whether we should favour this
+new device over plain vfio-pci if an mdev with display='on' is required.
+What about new device properties (specifically mdev)? In the discussion below,
+Gerd noted that apart from the ramfb stuff and the fact that one can be
+hotplugged while the latter can not, these are identical (option-wise), is that
+to stay, IOW are we going to keep these two device classes in sync when
+introducing new vfio-pci device options or are these going to divert more? Is
+it even possible? What I mean by that is that I'd like to avoid is a situation
+where there are 2 disjunct sets of options which could potentially lead to
+problems in decision making in libvirt and we don't like making decisions.
 
-On 09/14/2018 03:27 AM, Pavel Dovgalyuk wrote:
->> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
->>> From: John Snow [mailto:jsnow@redhat.com]
->>> On 09/12/2018 04:19 AM, Pavel Dovgalyuk wrote:
->>>> This patch makes IDE trim BH deterministic, because it affects
->>>> the device state. Therefore its invocation should be replayed
->>>> instead of running at the random moment.
->>>>
->>>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->>>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->>>> ---
->>>>  hw/ide/core.c |    3 ++-
->>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/ide/core.c b/hw/ide/core.c
->>>> index 2c62efc..04e22e7 100644
->>>> --- a/hw/ide/core.c
->>>> +++ b/hw/ide/core.c
->>>> @@ -35,6 +35,7 @@
->>>>  #include "sysemu/block-backend.h"
->>>>  #include "qapi/error.h"
->>>>  #include "qemu/cutils.h"
->>>> +#include "sysemu/replay.h"
->>>>
->>>>  #include "hw/ide/internal.h"
->>>>  #include "trace.h"
->>>> @@ -479,7 +480,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
->>>>  done:
->>>>      iocb->aiocb = NULL;
->>>>      if (iocb->bh) {
->>>> -        qemu_bh_schedule(iocb->bh);
->>>> +        replay_bh_schedule_event(iocb->bh);
->>>>      }
->>>>  }
->>>>
->>> Just passing by: Why do we need to change this call, but nothing else in
->>> IDE?
->>
->> This call is responsible for a bug that was reproducible.
->>
->>> I don't mind conceptually, but it's odd to me that of all the calls I
->>> make in this emulator that change state somewhere that this is the only
->>> one you need to hijack for the replay feature.
->>>
->>> Is this a necessarily complete change?
-> 
-> 
-> I found one more BH in ide/core:
-> 
-> static void ide_restart_cb(void *opaque, int running, RunState state)
-> {
->     IDEBus *bus = opaque;
-> 
->     if (!running)
->         return;
-> 
->     if (!bus->bh) {
->         bus->bh = qemu_bh_new(ide_restart_bh, bus);
->         qemu_bh_schedule(bus->bh);
->     }
-> }
-> 
-> void ide_register_restart_cb(IDEBus *bus)
-> {
->     if (bus->dma->ops->restart_dma) {
->         bus->vmstate = qemu_add_vm_change_state_handler(ide_restart_cb, bus);
->     }
-> }
-> 
-> As I understand, it is called when VM start/stop event happen.
-> These events are not related to the guest state.
-> 
-> Does this BH change the guest state somehow?
-> 
-> Pavel Dovgalyuk
-> 
-> 
+Anyhow, I don't feel like any of the proposals has a strong
+advantage/disadvantage in usage for libvirt, both will require a capability and
+both would be special cased in our cmdline code depending on the 'display'
+attribute. Luckily, we don't have mdev migration yet, so it's good we don't
+have to worry about that at this point yet.
 
-Shouldn't change guest state all by itself.
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg03430.html
 
-ide_restart_bh does, though. (Changes device registers, can cause block
-IO to occur, etc.)
-
---js
+Erik
