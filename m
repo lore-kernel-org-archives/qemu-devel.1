@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0iUr-0007qy-3X
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:26:36 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1g0iVr-00009K-Iu
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1g0iUo-0000TN-RT
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:26:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1g0iUm-0000M3-Jm
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:26:30 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri, 14 Sep 2018 15:26:16 +0800
-Message-Id: <20180914072616.17771-3-famz@redhat.com>
-In-Reply-To: <20180914072616.17771-1-famz@redhat.com>
-References: <20180914072616.17771-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] slirp: Implement RFC2132 TFTP server
- name
+	(envelope-from <dovgaluk@ispras.ru>) id 1g0iVn-00024n-30
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:27:35 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:48036)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1g0iVm-00020R-KV
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 03:27:30 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180912081747.3228.21861.stgit@pasha-VirtualBox>
+	<20180912081950.3228.68987.stgit@pasha-VirtualBox>
+	<f7b7533c-a9db-d660-4981-678ae5143950@redhat.com>
+	<002101d44bee$9edf9720$dc9ec560$@ru>
+In-Reply-To: <002101d44bee$9edf9720$dc9ec560$@ru>
+Date: Fri, 14 Sep 2018 10:27:21 +0300
+Message-ID: <002301d44bfc$603513c0$209f3b40$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v6 21/25] replay: replay BH for IDE trim
+ operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,198 +32,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, 'John Snow' <jsnow@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-This new usernet option can be used to add data for option 66 (tftp
-server name) in the BOOTP reply, which is useful in PXE based automatic
-OS install such as OpenBSD.
+> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
+> > From: John Snow [mailto:jsnow@redhat.com]
+> > On 09/12/2018 04:19 AM, Pavel Dovgalyuk wrote:
+> > > This patch makes IDE trim BH deterministic, because it affects
+> > > the device state. Therefore its invocation should be replayed
+> > > instead of running at the random moment.
+> > >
+> > > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > ---
+> > >  hw/ide/core.c |    3 ++-
+> > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/hw/ide/core.c b/hw/ide/core.c
+> > > index 2c62efc..04e22e7 100644
+> > > --- a/hw/ide/core.c
+> > > +++ b/hw/ide/core.c
+> > > @@ -35,6 +35,7 @@
+> > >  #include "sysemu/block-backend.h"
+> > >  #include "qapi/error.h"
+> > >  #include "qemu/cutils.h"
+> > > +#include "sysemu/replay.h"
+> > >
+> > >  #include "hw/ide/internal.h"
+> > >  #include "trace.h"
+> > > @@ -479,7 +480,7 @@ static void ide_issue_trim_cb(void *opaque, int ret)
+> > >  done:
+> > >      iocb->aiocb = NULL;
+> > >      if (iocb->bh) {
+> > > -        qemu_bh_schedule(iocb->bh);
+> > > +        replay_bh_schedule_event(iocb->bh);
+> > >      }
+> > >  }
+> > >
+> > Just passing by: Why do we need to change this call, but nothing else in
+> > IDE?
+> 
+> This call is responsible for a bug that was reproducible.
+> 
+> > I don't mind conceptually, but it's odd to me that of all the calls I
+> > make in this emulator that change state somewhere that this is the only
+> > one you need to hijack for the replay feature.
+> >
+> > Is this a necessarily complete change?
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Gerd Hoffmann <kraxel@redhat.com>
----
- net/slirp.c      | 12 ++++++++++--
- qapi/net.json    |  5 ++++-
- qemu-options.hx  |  7 ++++++-
- slirp/bootp.c    | 13 +++++++++++++
- slirp/bootp.h    |  1 +
- slirp/libslirp.h |  1 +
- slirp/slirp.c    |  2 ++
- slirp/slirp.h    |  1 +
- 8 files changed, 38 insertions(+), 4 deletions(-)
 
-diff --git a/net/slirp.c b/net/slirp.c
-index fd21dc728c..53f7b89696 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -158,6 +158,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-                           const char *vnameserver, const char *vnameserver6,
-                           const char *smb_export, const char *vsmbserver,
-                           const char **dnssearch, const char *vdomainname,
-+                          const char *tftp_server_name,
-                           Error **errp)
- {
-     /* default settings according to historic slirp */
-@@ -375,6 +376,11 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-         return -1;
-     }
- 
-+    if (tftp_server_name && strlen(tftp_server_name) > 255) {
-+        error_setg(errp, "'tftp-server-name' parameter cannot exceed 255 bytes");
-+        return -1;
-+    }
-+
-     nc = qemu_new_net_client(&net_slirp_info, peer, model, name);
- 
-     snprintf(nc->info_str, sizeof(nc->info_str),
-@@ -385,7 +391,8 @@ static int net_slirp_init(NetClientState *peer, const char *model,
- 
-     s->slirp = slirp_init(restricted, ipv4, net, mask, host,
-                           ipv6, ip6_prefix, vprefix6_len, ip6_host,
--                          vhostname, tftp_export, bootfile, dhcp,
-+                          vhostname, tftp_server_name,
-+                          tftp_export, bootfile, dhcp,
-                           dns, ip6_dns, dnssearch, vdomainname, s);
-     QTAILQ_INSERT_TAIL(&slirp_stacks, s, entry);
- 
-@@ -975,7 +982,8 @@ int net_init_slirp(const Netdev *netdev, const char *name,
-                          user->ipv6_host, user->hostname, user->tftp,
-                          user->bootfile, user->dhcpstart,
-                          user->dns, user->ipv6_dns, user->smb,
--                         user->smbserver, dnssearch, user->domainname, errp);
-+                         user->smbserver, dnssearch, user->domainname,
-+                         user->tftp_server_name, errp);
- 
-     while (slirp_configs) {
-         config = slirp_configs;
-diff --git a/qapi/net.json b/qapi/net.json
-index c86f351161..8f99fd911d 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -174,6 +174,8 @@
- #
- # @guestfwd: forward guest TCP connections
- #
-+# @tftp-server-name: RFC2132 "TFTP server name" string (Since 3.1)
-+#
- # Since: 1.2
- ##
- { 'struct': 'NetdevUserOptions',
-@@ -198,7 +200,8 @@
-     '*smb':       'str',
-     '*smbserver': 'str',
-     '*hostfwd':   ['String'],
--    '*guestfwd':  ['String'] } }
-+    '*guestfwd':  ['String'],
-+    '*tftp-server-name': 'str' } }
- 
- ##
- # @NetdevTapOptions:
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 654ef484d9..2c2acbb14b 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1842,7 +1842,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
-     "         [,ipv6[=on|off]][,ipv6-net=addr[/int]][,ipv6-host=addr]\n"
-     "         [,restrict=on|off][,hostname=host][,dhcpstart=addr]\n"
-     "         [,dns=addr][,ipv6-dns=addr][,dnssearch=domain][,domainname=domain]\n"
--    "         [,tftp=dir][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
-+    "         [,tftp=dir][,tftp-server-name=name][,bootfile=f][,hostfwd=rule][,guestfwd=rule]"
- #ifndef _WIN32
-                                              "[,smb=dir[,smbserver=addr]]\n"
- #endif
-@@ -2079,6 +2079,11 @@ server. The files in @var{dir} will be exposed as the root of a TFTP server.
- The TFTP client on the guest must be configured in binary mode (use the command
- @code{bin} of the Unix TFTP client).
- 
-+@item tftp-server-name=@var{name}
-+In BOOTP reply, broadcast @var{name} as the "TFTP server name" (RFC2132 option
-+66). This can be used to advise the guest to load boot files or configurations
-+from a different server than the host address.
-+
- @item bootfile=@var{file}
- When using the user mode network stack, broadcast @var{file} as the BOOTP
- filename. In conjunction with @option{tftp}, this can be used to network boot
-diff --git a/slirp/bootp.c b/slirp/bootp.c
-index 1e8185f0ec..7b1af73c95 100644
---- a/slirp/bootp.c
-+++ b/slirp/bootp.c
-@@ -318,6 +318,19 @@ static void bootp_reply(Slirp *slirp, const struct bootp_t *bp)
-             }
-         }
- 
-+        if (slirp->tftp_server_name) {
-+            val = strlen(slirp->tftp_server_name);
-+            if (q + val + 2 >= end) {
-+                g_warning("DHCP packet size exceeded, "
-+                    "omitting tftp-server-name option.");
-+            } else {
-+                *q++ = RFC2132_TFTP_SERVER_NAME;
-+                *q++ = val;
-+                memcpy(q, slirp->tftp_server_name, val);
-+                q += val;
-+            }
-+        }
-+
-         if (slirp->vdnssearch) {
-             val = slirp->vdnssearch_len;
-             if (q + val >= end) {
-diff --git a/slirp/bootp.h b/slirp/bootp.h
-index 394525733e..4043489835 100644
---- a/slirp/bootp.h
-+++ b/slirp/bootp.h
-@@ -70,6 +70,7 @@
- #define RFC2132_MAX_SIZE	57
- #define RFC2132_RENEWAL_TIME    58
- #define RFC2132_REBIND_TIME     59
-+#define RFC2132_TFTP_SERVER_NAME 66
- 
- #define DHCPDISCOVER		1
- #define DHCPOFFER		2
-diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-index 740408a96e..42e42e9a2a 100644
---- a/slirp/libslirp.h
-+++ b/slirp/libslirp.h
-@@ -13,6 +13,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   bool in6_enabled,
-                   struct in6_addr vprefix_addr6, uint8_t vprefix_len,
-                   struct in6_addr vhost6, const char *vhostname,
-+                  const char *tftp_server_name,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 5c3bd6163f..51de41fc02 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -283,6 +283,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-                   bool in6_enabled,
-                   struct in6_addr vprefix_addr6, uint8_t vprefix_len,
-                   struct in6_addr vhost6, const char *vhostname,
-+                  const char *tftp_server_name,
-                   const char *tftp_path, const char *bootfile,
-                   struct in_addr vdhcp_start, struct in_addr vnameserver,
-                   struct in6_addr vnameserver6, const char **vdnssearch,
-@@ -321,6 +322,7 @@ Slirp *slirp_init(int restricted, bool in_enabled, struct in_addr vnetwork,
-     slirp->vdhcp_startaddr = vdhcp_start;
-     slirp->vnameserver_addr = vnameserver;
-     slirp->vnameserver_addr6 = vnameserver6;
-+    slirp->tftp_server_name = g_strdup(tftp_server_name);
- 
-     if (vdnssearch) {
-         translate_dnssearch(slirp, vdnssearch);
-diff --git a/slirp/slirp.h b/slirp/slirp.h
-index 10b410898a..b80725a0d6 100644
---- a/slirp/slirp.h
-+++ b/slirp/slirp.h
-@@ -212,6 +212,7 @@ struct Slirp {
-     /* tftp states */
-     char *tftp_prefix;
-     struct tftp_session tftp_sessions[TFTP_SESSIONS_MAX];
-+    char *tftp_server_name;
- 
-     ArpTable arp_table;
-     NdpTable ndp_table;
--- 
-2.17.1
+I found one more BH in ide/core:
+
+static void ide_restart_cb(void *opaque, int running, RunState state)
+{
+    IDEBus *bus = opaque;
+
+    if (!running)
+        return;
+
+    if (!bus->bh) {
+        bus->bh = qemu_bh_new(ide_restart_bh, bus);
+        qemu_bh_schedule(bus->bh);
+    }
+}
+
+void ide_register_restart_cb(IDEBus *bus)
+{
+    if (bus->dma->ops->restart_dma) {
+        bus->vmstate = qemu_add_vm_change_state_handler(ide_restart_cb, bus);
+    }
+}
+
+As I understand, it is called when VM start/stop event happen.
+These events are not related to the guest state.
+
+Does this BH change the guest state somehow?
+
+Pavel Dovgalyuk
