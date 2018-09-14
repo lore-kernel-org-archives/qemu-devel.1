@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g0s3Y-0002n8-3z
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:39:01 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0s3i-0002wk-7a
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:39:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g0s3U-0007JO-VK
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:39:00 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180914165116.23182-1-vsementsov@virtuozzo.com>
-	<05b6e954-744f-d52c-1f5e-51d52062e195@redhat.com>
-	<ce8e83a8-40c1-1fa9-3d83-c5f84796d514@virtuozzo.com>
-Message-ID: <ca33aca6-2b50-19c2-4085-00999ecbd2ab@virtuozzo.com>
-Date: Fri, 14 Sep 2018 20:38:40 +0300
+	(envelope-from <pbonzini@redhat.com>) id 1g0s3h-0007Px-Jb
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:39:10 -0400
+References: <20180913125217.23173-1-kwolf@redhat.com>
+	<20180913125217.23173-12-kwolf@redhat.com>
+	<908e08a4-a58a-e4e1-5eb7-fe9d17adfbe3@redhat.com>
+	<20180913165954.GB5172@localhost.localdomain>
+	<bf0ed459-0c81-82ba-a60d-736170469501@redhat.com>
+	<20180914171433.GD4991@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7cd9c3cf-3b94-8620-a00d-6ba8a6e6fe25@redhat.com>
+Date: Fri, 14 Sep 2018 19:38:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <ce8e83a8-40c1-1fa9-3d83-c5f84796d514@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180914171433.GD4991@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: fix bitmap export
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 11/17] block-backend: Decrease in_flight
+ only after callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,143 +29,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
-Cc: pbonzini@redhat.com, den@openvz.org, John Snow <jsnow@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
-14.09.2018 20:30, Vladimir Sementsov-Ogievskiy wrote:
-> 14.09.2018 20:24, Eric Blake wrote:
->> On 9/14/18 11:51 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> bitmap_to_extents function is broken: it switches dirty variable after
->>> every iteration, however it can process only part of dirty (or zero)
->>> area during one iteration in case when this area is too large for one
->>> extent.
->>>
->>> Fortunately, the bug don't produce wrong extents: it just inserts
->>> zero-length extents between sequential extents representing large dirty
->>> (or zero) area. However, zero-length extents are abandoned by NBD
->>
->> s/abandoned by/forbidden by the/
->>
->>> protocol. So, careful client should consider such replay as server
->>
->> s/replay/reply/
->>
->>> fault and not-careful will likely ignore zero-length extents.
->>
->> Which camp is qemu 3.0 as client in? Does it tolerate the zero-length=20
->> extent, and still manage to see correct information overall, or does=20
->> it crash?
->>
->> Hmm - I think we're "safe" with qemu as client - right now, the only=20
->> way qemu 3.0 accesses the qemu dirty bitmap over NBD is with my=20
->> x-dirty-bitmap hack (commit 216ee3657), which uses=20
->> block/nbd-client.c:nbd_client_co_block_status() to read the bitmap,=20
->> and that always passes NBD_CMD_FLAG_REQ_ONE.=C2=A0 qemu will assert() if=
-=20
->> nbd_client_co_block_status() doesn't make any progress, but from what=20
->> I'm reading of your bug report, qemu as client never permits the=20
->> server to answer with more than one extent, and the bug of a=20
->> zero-length extent is triggered only after the first extent has been=20
->> sent.
->>
->> Thus, the primary reason to accept this patch is not because of qemu=20
->> 3.0 as client, but for interoperability with other clients. I'm=20
->> planning on updating the commit message to add these additional details.
->>
->>>
->>> Fix this by more careful handling of dirty variable.
->>>
->>> Bug was introduced in 3d068aff16
->>> =C2=A0 "nbd/server: implement dirty bitmap export", with the whole func=
-tion.
->>> and presents in v3.0.0 release.
->>
->> s/presents/present/
->>
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> CC: qemu-stable@nongnu.org
->>
->>> ---
->>> =C2=A0 nbd/server.c | 5 ++++-
->>> =C2=A0 1 file changed, 4 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/nbd/server.c b/nbd/server.c
->>> index ea5fe0eb33..12f721482d 100644
->>> --- a/nbd/server.c
->>> +++ b/nbd/server.c
->>> @@ -1951,6 +1951,8 @@ static unsigned int=20
->>> bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(begin < overall_end && nb_=
-extents);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (begin < overall_end && i < nb_ext=
-ents) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool next_dirty =3D !dirty;
->>> +
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dirty) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 end =3D bdrv_dirty_bitmap_next_zero(bitmap, begin);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>> @@ -1962,6 +1964,7 @@ static unsigned int=20
->>> bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 end =3D MIN(bdrv_dirty_bitmap_size(bitmap),
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 begin=
- + UINT32_MAX + 1 -
->>> bdrv_dirty_bitmap_granularity(bitmap));
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nex=
-t_dirty =3D dirty;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>
->> Rather than introducing next_dirty, couldn't you just make this:
->>
->> if (end =3D=3D -1 || end - begin > UINT32_MAX) {
->> =C2=A0=C2=A0=C2=A0 /* Cap ... */
->> =C2=A0=C2=A0=C2=A0 end =3D MIN(...);
->> } else {
->> =C2=A0=C2=A0=C2=A0 dirty =3D !dirty;
->> }
->
-> no, dirty variable is used after it, we can't change it here.
+On 14/09/2018 19:14, Kevin Wolf wrote:
+>> As you mention, you could have a nested aio_poll() in the main thread,
+>> for example invoked from a bottom half, but in that case I'd rather
+>> track the caller that is creating the bottom half and see if it lacks a
+>> bdrv_ref/bdrv_unref (or perhaps it's even higher in the tree that is
+>> missing).
+> I went back to the commit where I first added the patch (it already
+> contained the ref/unref pair) and tried if I could reproduce a bug with
+> the pair removed. I couldn't.
+> 
+> I'm starting to think that maybe I was just overly cautious with the
+> ref/unref. I may have confused the nested aio_poll() crash with a
+> different situation. I've dealt with so many crashes and hangs while
+> working on this series that it's quite possible.
 
-however, it can be done if we move
+Are you going to drop the patch hen?
 
-extents[i].flags =3D cpu_to_be32(dirty ? NBD_STATE_DIRTY : 0);
+Thanks,
 
-to be the first line of the loop body, so, with this movement, I'm ok=20
-with your changes and turning it into a pull.
-
->
->>
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dont_fragmen=
-t && end > overall_end) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 end =3D overall_end;
->>> @@ -1971,7 +1974,7 @@ static unsigned int=20
->>> bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 extents[i].flags=
- =3D cpu_to_be32(dirty ? NBD_STATE_DIRTY : 0);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i++;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 begin =3D end;
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dirty =3D !dirty;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dirty =3D next_dirty;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>
->> and then you merely delete the assignment to 'dirty' here.
->>
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_iter_free(it);
->>>
->>
->> At any rate, the fix makes sense to me.=C2=A0 Should I go ahead and=20
->> incorporate the changes I've suggested and turn it into a pull=20
->> request through my NBD tree, or would you like to send a v2?
->>
->
->
-
-
---=20
-Best regards,
-Vladimir
+Paolo
