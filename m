@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g0swH-0004sN-Ct
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 14:35:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1g0t7o-0000dN-EG
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 14:47:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g0swE-0001DP-7J
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 14:35:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38340)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g0swE-0001Ch-0U
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 14:35:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g0swC-0002Ad-T7
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 18:35:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AE9EA2E8078
-	for <qemu-devel@nongnu.org>; Fri, 14 Sep 2018 18:35:28 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1g0t7n-0000fL-Jm
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 14:47:28 -0400
+References: <20180628190723.276458-1-eblake@redhat.com>
+	<20180628190723.276458-4-eblake@redhat.com>
+	<20180629084444.GC15588@localhost.localdomain>
+	<41be61a0-9048-c08f-1a9a-1c213f5103ef@redhat.com>
+	<20180629154308.GH15588@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4923ebdf-17a3-1b6b-ad72-2835d18ce101@redhat.com>
+Date: Fri, 14 Sep 2018 13:47:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 14 Sep 2018 18:26:21 -0000
-From: Marshall Porter <1792523@bugs.launchpad.net>
-Reply-To: Bug 1792523 <1792523@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153690806645.16635.9456702675801152758.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153694958174.19439.16867622431010349229.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1792523] Re: usb passthrough not resetting on
- host after vm shutdown if started with -daemonize
+In-Reply-To: <20180629154308.GH15588@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 3/6] qcow2: Reduce REFT_OFFSET_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,107 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, qemu-block@nongnu.org, berto@igalia.com
 
-The usb-host devices have the problem.
+[revisiting this thread]
 
-It does not seem to matter if 1 or all 3 are specified.. I had thought
-maybe only one of them was causing the issue.. but all of them are
-affected if '-daemonize' is specified at startup.
+On 6/29/18 10:43 AM, Kevin Wolf wrote:
+> Am 29.06.2018 um 17:22 hat Eric Blake geschrieben:
+>> On 06/29/2018 03:44 AM, Kevin Wolf wrote:
+>>> Am 28.06.2018 um 21:07 hat Eric Blake geschrieben:
+>>>> Match our code to the spec change in the previous patch - there's
+>>>> no reason for the refcount table to allow larger offsets than the
+>>>> L1/L2 tables.
+>>>
+>>> What about internal snapshots? And anyway, because of the metadata
+>>> overhead, the physical image size of a fully allocated image is always
+>>> going to be at least minimally larger than the virtual disk size.
+>>>
+>>> I'm not necessarily opposed to making the change if there is a good
+>>> reason to make it, but I don't see a real need for it and the
+>>> justification used here and also in the previous patch is incorrect.
+>>
+>> The fact that ext4 cannot hold an image this large is already an indication
+>> that setting this limit on the refcount table is NOT going to bite real
+>> users.
+>>
+>> Yes, you can argue that with lots of metadata, including internal snapshots,
+>> and on a capable file system (such as tmpfs) that can even hold files this
+>> large to begin with, then yes, allowing the refcount to exceed this limit
+>> will allow slightly more metadata to be crammed into a single image.  But
+>> will it actually help anyone?
+>>
+>> Do I need to respin the series to split patch 2 into the obvious changes
+>> (stuff unrelated to capping refcount size) vs. the controversial stuff
+>> (refcount cap and this code change)?
+>>
+>>>
+>>> Kevin
+>>>
+>>>> In practice, no image has more than 64PB of
+>>>> allocated clusters anyways, as anything beyond that can't be
+>>>> expressed via L2 mappings to host offsets.
+>>
+>> If you're opposed to an exact 56-bit limit on the grounds that 56-bit guest
+>> data plus minimal metadata should still be expressable, would it be better
+>> to cap refcount at 57-bits?
+> 
+> You're arguing that the patch doesn't hurt in practice, but what I'm
+> really looking for is what do we gain from it?
 
-Correct, the vfio-pci device 1:00.x is an Nvidia GPU+audio, and 4:00.0
-is an Asmedia USB controller.
+I guess one thing to be gained by having qemu's implementation of qcow2 
+pull a hard-stop at 56 bits is that it becomes easier to detect errant 
+refcount entries beyond the end of the file as being errant, and not 
+attempt to expand the file during 'qemu-img check' just because a 
+refcount pointed out that far.  But that's still a pretty weak argument 
+(we've already mentioned that qemu-img check should do a better job of 
+handling/flagging refcount entries that point way beyond the end of the 
+image - but that's true regardless of what limits may be placed on the 
+host image size)
 
-But all of the vfio arguments and binding parts of this script can be
-removed, and replaced with '-vga std -display gtk' arguments, and the
-host has the same behavior of not regaining control of the usb-host
-devices until they are unplugged and plugged back in after the VM shuts
-down.
+> 
+> We generally don't apply patches just because they don't hurt, but
+> because they are helpful for something. In the simple, fully compatible
+> cases "helpful" could just mean "we like the code better".
+> 
+> This is a slightly different category: "it's technically incompatible,
+> but we don't think anyone uses this". We have done such changes before
+> when they allowed us to improve something substantially, but I think the
+> requirements for this are at least a little higher than just "because we
+> like it better". And I'm not even sure yet if I like it better because
+> it seems like an arbitrary restriction.
+> 
+> So apart from not hurting in practice, what does the restriction buy us?
 
-No messages appear in dmesg or any stdout from Qemu related to errors or
-USB that stand out to me as a problem.. I am happy to try any
-suggestions to further narrow down the cause.
+As I'm not coming up with a solid reason for tightening the bounds, I 
+will (eventually) respin the series without the spec change.  At this 
+point, it's probably easier for me to wait until after the pull request 
+queue has started flushing again.
 
-Thanks for replying!
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1792523
-
-Title:
-  usb passthrough not resetting on host after vm shutdown if started
-  with -daemonize
-
-Status in QEMU:
-  New
-
-Bug description:
-  Below is the full Qemu command used to launch the VM. Have been using
-  this same setup since Qemu 2.12, plus a couple of cherry picked patch
-  commits fixing ide-hd and e1000e in Windows guests. Both sets of
-  patches have now been merged to 3.0, so decided to update to 3.0.
-
-  The VM launches and runs fine, but after shutting down, the usb
-  devices that are passed through from the host (keyboard, mouse) do not
-  work until unplugged and plugged in again. Have narrowed this down to
-  the -daemonize -pidfile arguments.. if those lines are removed, usb
-  devices work in the host again right away after VM shutdown.
-
-  CPU: Intel(R) Core(TM) i5-6600K CPU @ 3.50GHz
-  OS: Linux dev 4.18.6-arch1-1-ARCH #1 SMP PREEMPT Wed Sep 5 11:54:09 UTC 2=
-018 x86_64 GNU/Linux
-
-  Thank you for looking into this!
-
-  =
-
-  #!/usr/bin/env bash
-
-  echo vfio-pci > /sys/bus/pci/devices/0000:04:00.0/driver_override
-  echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
-  echo 0000:04:00.0 > /sys/bus/pci/drivers/vfio-pci/bind
-  echo > /sys/bus/pci/devices/0000:04:00.0/driver_override
-
-  /usr/bin/qemu-system-x86_64 \
-  -name winnt \
-  -daemonize \
-  -pidfile /run/vms/qemu/winnt.pid \
-  -boot menu=3Don \
-  -drive if=3Dpflash,format=3Draw,readonly,file=3D/opt/vms/qemu/machines/ov=
-mf_code_patched.fd \
-  -drive if=3Dpflash,format=3Draw,file=3D/opt/vms/qemu/machines/winnt/ovmf_=
-vars_patched.fd \
-  -machine pc-q35-3.0,accel=3Dkvm \
-  -nodefaults \
-  -cpu host,kvm=3Doff,hv_vendor_id=3DRedHat,hv_time,hv_relaxed,hv_vapic,hv_=
-spinlocks=3D0x1fff \
-  -accel kvm \
-  -smp 4,sockets=3D1,cores=3D4,threads=3D1 \
-  -m 16G \
-  -nic bridge,br=3Dbr0,mac=3D52:54:00:12:34:77,model=3De1000e \
-  -device vfio-pci,host=3D01:00.0,multifunction=3Don \
-  -device vfio-pci,host=3D01:00.1 \
-  -vga none \
-  -display none \
-  -monitor none \
-  -blockdev raw,node-name=3Dide-hd.0,cache.direct=3Don,discard=3Dunmap,file=
-.driver=3Dhost_device,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata=
--WDC_WDS500G2B0A-00SM50_181265803048 \
-  -device ide-hd,drive=3Dide-hd.0,bus=3Dide.0,rotation_rate=3D1 \
-  -blockdev raw,node-name=3Dide-hd.1,cache.direct=3Don,file.driver=3Dhost_d=
-evice,file.aio=3Dnative,file.filename=3D/dev/disk/by-id/ata-TOSHIBA_HDWE160=
-_X746K8ZTF56D-part1 \
-  -device ide-hd,drive=3Dide-hd.1,bus=3Dide.1 \
-  -device vfio-pci,host=3D04:00.0 \
-  -device qemu-xhci \
-  -device usb-host,vendorid=3D0x04d9,productid=3D0x0171 \
-  -device usb-host,vendorid=3D0x1532,productid=3D0x005c \
-  -device usb-host,vendorid=3D0x1b1c,productid=3D0x0c09
-
-  echo 0000:04:00.0 > /sys/bus/pci/devices/0000:04:00.0/driver/unbind
-  echo 0000:04:00.0 > /sys/bus/pci/drivers_probe
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1792523/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
