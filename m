@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0s5E-0003sL-1T
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:40:44 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g0sBd-0006Xr-Br
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:47:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0s58-0008FQ-1g
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:40:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60936)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0s4z-0008BE-P1
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:40:33 -0400
-References: <5aae1837-f6b9-a48b-7401-3aa623a084b2@adacore.com>
-	<MWHPR21MB0189D5FC1EA87DBDB0F040409E1A0@MWHPR21MB0189.namprd21.prod.outlook.com>
-	<526ea449-6a67-605f-70c5-b90f2bacd280@adacore.com>
-	<53a9113b-62a0-a7fe-7c08-3edab38cfebc@adacore.com>
-	<MWHPR21MB018954067574FC9D27C535389E190@MWHPR21MB0189.namprd21.prod.outlook.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4f546599-0da1-f674-38c3-6ceb0a5b096f@redhat.com>
-Date: Fri, 14 Sep 2018 19:40:23 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g0sBc-00066Q-La
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 13:47:21 -0400
+References: <20180914165116.23182-1-vsementsov@virtuozzo.com>
+	<05b6e954-744f-d52c-1f5e-51d52062e195@redhat.com>
+	<ce8e83a8-40c1-1fa9-3d83-c5f84796d514@virtuozzo.com>
+	<3d127a88-58e9-dd74-e9ea-d13542aff92d@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <6c0ae484-bc12-419b-7873-b7791a2c0eaf@virtuozzo.com>
+Date: Fri, 14 Sep 2018 20:47:08 +0300
 MIME-Version: 1.0
-In-Reply-To: <MWHPR21MB018954067574FC9D27C535389E190@MWHPR21MB0189.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+In-Reply-To: <3d127a88-58e9-dd74-e9ea-d13542aff92d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] crashes with win2008 host
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: fix bitmap export
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>, KONRAD Frederic <frederic.konrad@adacore.com>, Andrey Shedel <ashedel@microsoft.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
+Cc: pbonzini@redhat.com, den@openvz.org, John Snow <jsnow@redhat.com>
 
-On 14/09/2018 18:54, Andrew Baumann wrote:
-> On the other hand, since these OSes are a decade old (mainstream suppor=
-t
-> ended; will drop out of extended support in just over a year from now),
-> and you are the first person to report a problem in 1.5 years since the
-> patch went in, I wonder if we could =93fix=94 the problem by updating t=
-he
-> required OS versions for QEMU on Windows to Windows 7 / Server 2008 R2.=
-..
+14.09.2018 20:35, Eric Blake wrote:
+> On 9/14/18 12:30 PM, Vladimir Sementsov-Ogievskiy wrote:
+>
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (begin < overall_end && i < nb_ex=
+tents) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool next_dirty =3D !dirty=
+;
+>>>> +
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dirty) {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 end =3D bdrv_dirty_bitmap_next_zero(bitmap, begin);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>>>> @@ -1962,6 +1964,7 @@ static unsigned int=20
+>>>> bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 end =3D MIN(bdrv_dirty_bitmap_size(bitmap),
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 begin=
+ + UINT32_MAX + 1 -
+>>>> bdrv_dirty_bitmap_granularity(bitmap));
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ne=
+xt_dirty =3D dirty;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>
+>>> Rather than introducing next_dirty, couldn't you just make this:
+>>>
+>>> if (end =3D=3D -1 || end - begin > UINT32_MAX) {
+>>> =C2=A0=C2=A0=C2=A0 /* Cap ... */
+>>> =C2=A0=C2=A0=C2=A0 end =3D MIN(...);
+>>> } else {
+>>> =C2=A0=C2=A0=C2=A0 dirty =3D !dirty;
+>>> }
+>>
+>> no, dirty variable is used after it, we can't change it here.
+>
+> Ah, right. But we could also hoist the extents[i].flags =3D=20
+> cpu_to_be32(dirty ? NBD_STATEE_DIRTY : 0) line to occur prior to the=20
+> 'if' doing the end capping calculation.=C2=A0 However, splitting the two=
+=20
+> assignments into extents[i].* to no longer be consecutive statements,=20
+> just to avoid the use of a temporary variable, starts to get less=20
+> aesthetically pleasing.
+>
+> Thus, I'm fine with your version (with commit message improved),=20
+> unless you want to send a v2.
 
-I agree.
+Ok, I don't want:) Be free to update commit message and pull it.
 
-> Paolo, do you have any opinion? Note that backing out the patch isn=92t=
- a
-> great idea either =96 it fixed a deadlock.
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
 
-No way we're going to back it out. :)  SRWLocks are great.
 
-Paolo
+--=20
+Best regards,
+Vladimir
