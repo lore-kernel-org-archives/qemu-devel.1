@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47660)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=7883262b0=anthony.perard@citrix.com>)
-	id 1g0m7S-00014t-23
+	id 1g0m7S-00014u-27
 	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=7883262b0=anthony.perard@citrix.com>)
-	id 1g0m7Q-0001zC-Rj
+	id 1g0m7O-0001vH-QE
 	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:18:37 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:40309)
+Received: from smtp03.citrix.com ([162.221.156.55]:40306)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71)
 	(envelope-from <prvs=7883262b0=anthony.perard@citrix.com>)
-	id 1g0m7Q-0001u7-Jm
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:18:36 -0400
+	id 1g0m7O-0001sf-GU
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 07:18:34 -0400
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Fri, 14 Sep 2018 12:18:30 +0100
-Message-ID: <20180914111830.28466-3-anthony.perard@citrix.com>
-In-Reply-To: <20180914111830.28466-1-anthony.perard@citrix.com>
-References: <20180914111830.28466-1-anthony.perard@citrix.com>
+Date: Fri, 14 Sep 2018 12:18:28 +0100
+Message-ID: <20180914111830.28466-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/2] xen: Replace few mentions of xend by libxl
+Subject: [Qemu-devel] [PATCH 0/2] Remove Xen PV domain creation in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +30,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org
 
-xend have been replaced by libxenlight (libxl) for many Xen releases
-now.
+See first patch description.
 
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
- hw/xenpv/xen_machine_pv.c | 2 +-
- include/hw/xen/xen.h      | 2 +-
- qemu-options.hx           | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+Anthony PERARD (2):
+  Remove broken Xen PV domain builder
+  xen: Replace few mentions of xend by libxl
 
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 4d03aa59cb..de89b0ee1d 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -42,7 +42,7 @@ static void xen_init_pv(MachineState *machine)
- 
-     switch (xen_mode) {
-     case XEN_ATTACH:
--        /* nothing to do, xend handles everything */
-+        /* nothing to do, libxl handles everything */
-         break;
-     case XEN_EMULATE:
-         error_report("xen emulation not implemented (yet)");
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 978aaa31fb..ba039c146d 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -15,7 +15,7 @@
- /* xen-machine.c */
- enum xen_mode {
-     XEN_EMULATE = 0,  // xen emulation, using xenner (default)
--    XEN_ATTACH        // attach to xen domain created by xend
-+    XEN_ATTACH        // attach to xen domain created by libxl
- };
- 
- extern uint32_t xen_domid;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index d14a50805a..327bc8c897 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3400,7 +3400,7 @@ DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
-     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
- DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
-     "-xen-attach     attach to existing xen domain\n"
--    "                xend will use this when starting QEMU\n",
-+    "                libxl will use this when starting QEMU\n",
-     QEMU_ARCH_ALL)
- DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
-     "-xen-domid-restrict     restrict set of available xen operations\n"
-@@ -3414,7 +3414,7 @@ Specify xen guest domain @var{id} (XEN only).
- @item -xen-attach
- @findex -xen-attach
- Attach to existing xen domain.
--xend will use this when starting QEMU (XEN only).
-+libxl will use this when starting QEMU (XEN only).
- @findex -xen-domid-restrict
- Restrict set of available xen operations to specified domain id (XEN only).
- ETEXI
+ configure                   |  17 --
+ hw/xenpv/Makefile.objs      |   2 -
+ hw/xenpv/xen_domainbuild.c  | 299 ------------------------------------
+ hw/xenpv/xen_domainbuild.h  |  13 --
+ hw/xenpv/xen_machine_pv.c   |  16 +-
+ include/hw/xen/xen.h        |   3 +-
+ include/hw/xen/xen_common.h |  18 ---
+ qemu-options.hx             |  12 +-
+ vl.c                        |   7 -
+ 9 files changed, 4 insertions(+), 383 deletions(-)
+ delete mode 100644 hw/xenpv/xen_domainbuild.c
+ delete mode 100644 hw/xenpv/xen_domainbuild.h
+
 -- 
 Anthony PERARD
