@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0pmA-0003di-5R
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:12:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0po5-0004Mr-C2
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0pm9-0006ne-C5
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:12:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0po4-0000oR-LU
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:14:53 -0400
 References: <20180913125217.23173-1-kwolf@redhat.com>
-	<20180913125217.23173-12-kwolf@redhat.com>
-	<908e08a4-a58a-e4e1-5eb7-fe9d17adfbe3@redhat.com>
-	<20180913165954.GB5172@localhost.localdomain>
+	<20180913125217.23173-4-kwolf@redhat.com>
+	<0d3a1209-9770-bcf7-aa47-4baa95fd88e9@redhat.com>
+	<20180913172143.GC5172@localhost.localdomain>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bf0ed459-0c81-82ba-a60d-736170469501@redhat.com>
-Date: Fri, 14 Sep 2018 17:12:26 +0200
+Message-ID: <cefbbcfb-e89b-b6eb-6555-8a713b214183@redhat.com>
+Date: Fri, 14 Sep 2018 17:14:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180913165954.GB5172@localhost.localdomain>
+In-Reply-To: <20180913172143.GC5172@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/17] block-backend: Decrease in_flight
- only after callback
+Subject: Re: [Qemu-devel] [PATCH v2 03/17] aio-wait: Increase num_waiters
+ even in home thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +30,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
-On 13/09/2018 18:59, Kevin Wolf wrote:
-> Am 13.09.2018 um 17:10 hat Paolo Bonzini geschrieben:
+On 13/09/2018 19:21, Kevin Wolf wrote:
+> Am 13.09.2018 um 17:11 hat Paolo Bonzini geschrieben:
 >> On 13/09/2018 14:52, Kevin Wolf wrote:
->>> + if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
->>> + /* If we are in the main thread, the callback is allowed to unref
->>> + * the BlockBackend, so we have to hold an additional reference */
->>> + blk_ref(acb->rwco.blk);
->>> + }
->>> acb->common.cb(acb->common.opaque, acb->rwco.ret);
->>> + blk_dec_in_flight(acb->rwco.blk);
->>> + if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
->>> + blk_unref(acb->rwco.blk);
->>> + }
+>>> Even if AIO_WAIT_WHILE() is called in the home context of the
+>>> AioContext, we still want to allow the condition to change depending on
+>>> other threads as long as they kick the AioWait. Specfically block jobs
+>>> can be running in an I/O thread and should then be able to kick a drain
+>>> in the main loop context.
 >>
->> Is this something that happens only for some specific callers?  That is,
->> which callers are sure that the callback is invoked from the main thread?
+>> I don't understand the scenario very well.  Why hasn't the main loop's
+>> drain incremented num_waiters?
 > 
-> I can't seem to reproduce the problem I saw any more even when reverting
-> the bdrv_ref/unref pair. If I remember correctly it was actually a
-> nested aio_poll() that was running a block job completion or something
-> like that - which would obviously only happen on the main thread because
-> the job intentionally defers to the main thread.
-> 
-> The only reason I made this conditional is that I think bdrv_unref()
-> still isn't safe outside the main thread, is it?
+> We are in this path (that didn't increase num_waiters before this patch)
+> because drain, and therefore AIO_WAIT_WHILE(), was called from the main
+> thread. But draining depends on a job in a different thread, so we need
+> to be able to be kicked when that job finally is quiesced.
 
-Yes, making it conditional is correct, but it is quite fishy even with
-the conditional.
-
-As you mention, you could have a nested aio_poll() in the main thread,
-for example invoked from a bottom half, but in that case I'd rather
-track the caller that is creating the bottom half and see if it lacks a
-bdrv_ref/bdrv_unref (or perhaps it's even higher in the tree that is
-missing).
+Ah, because AIO_WAIT_WHILE() is invoked with ctx ==
+qemu_get_aio_context(), but the condition is triggered *outside* the
+main context?  Tricky, but seems correct.  AIO_WAIT_WHILE() anyway is
+not a fast path.
 
 Paolo
+
+> If I revert this, the test /bdrv-drain/blockjob/iothread/drain hangs.
+> This is a block job that works on two nodes in two different contexts.
+> 
+> (I think I saw this with mirror, which doesn't take additional locks
+> when it issues a request, so maybe there's a bit more wrong there... We
+> clearly need more testing with iothreads, this series probably only
+> scratches the surface.)
+> 
+>> Note I'm not against the patch---though I would hoist the
+>> atomic_inc/atomic_dec outside the if, since it's done in both branches.
+> 
+> Ok.
+> 
+> Kevin
+> 
