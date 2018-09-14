@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pahome.chen@mirlab.org>) id 1g0dhZ-0006pY-NO
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 22:19:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1g0e7Z-00027C-K9
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 22:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pahome.chen@mirlab.org>) id 1g0dhU-0003zq-NO
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 22:19:18 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:43506)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pahome.chen@mirlab.org>)
-	id 1g0dhP-0003be-86
-	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 22:19:11 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id v14-v6so2610vsv.10
-	for <qemu-devel@nongnu.org>; Thu, 13 Sep 2018 19:19:02 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1g0e7Y-0006od-MJ
+	for qemu-devel@nongnu.org; Thu, 13 Sep 2018 22:46:13 -0400
+Date: Fri, 14 Sep 2018 10:45:53 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180914024553.GJ10763@xz-x1>
+References: <20180911141245.GQ19292@lemon.usersys.redhat.com>
+	<271b24b6-c8eb-1425-3e73-e0ec734bafc6@redhat.com>
+	<20180912013134.GA2526@lemon.usersys.redhat.com>
+	<3266e1a2-d4af-e8b3-1239-21778396718e@redhat.com>
+	<20180912115020.GH2526@lemon.usersys.redhat.com>
+	<ea9cb5ce-823b-a40f-701e-bce6d4cb2eeb@redhat.com>
+	<20180913060351.GK2526@lemon.usersys.redhat.com>
+	<44c472ba-a9ff-7c64-6406-f528a7e0f463@redhat.com>
+	<bcae773c-195d-32ff-da1e-23629ed65c06@redhat.com>
+	<20180913100043.3a9fa0e3@t450s.home>
 MIME-Version: 1.0
-In-Reply-To: <9af35c5f-1d84-c336-a565-c2e1acb8704e@redhat.com>
-References: <CAB3eZfsvnyyo0C4nU=Mucg51krnN9Q9ExKA0t4AEEA3DiOd2aA@mail.gmail.com>
-	<ce6e31f1-0190-89ea-3aae-90ccdf81c585@redhat.com>
-	<f7c8ab1d-c752-29ce-bcd1-64a5598a41b4@redhat.com>
-	<56133002-7a79-bf6a-8835-fba043638224@redhat.com>
-	<31456c31-7a74-7df2-40d3-2a5841f39996@redhat.com>
-	<9af35c5f-1d84-c336-a565-c2e1acb8704e@redhat.com>
-From: lampahome <pahome.chen@mirlab.org>
-Date: Fri, 14 Sep 2018 10:19:01 +0800
-Message-ID: <CAB3eZfu6gM-ikoW7C=Ce82kMVO1OFdU_RXaUxpKm0bqYAL=o-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Can I only commit from active image to
- corresponding range of its backing file by qemu cmd?
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180913100043.3a9fa0e3@t450s.home>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] virtio-scsi/virtio-blk:
+ Disable poll handlers when stopping vq handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,51 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Sorry, I need to explain what case I want to do
+On Thu, Sep 13, 2018 at 10:00:43AM -0600, Alex Williamson wrote:
+> On Thu, 13 Sep 2018 12:04:34 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> > On 13/09/2018 11:11, Paolo Bonzini wrote:
+> > > On 13/09/2018 08:03, Fam Zheng wrote:  
+> > >> On Wed, 09/12 14:42, Paolo Bonzini wrote:  
+> > >>> On 12/09/2018 13:50, Fam Zheng wrote:  
+> > >>>>> I think it's okay if it is invoked.  The sequence is first you stop the
+> > >>>>> vq, then you drain the BlockBackends, then you switch AioContext.  All
+> > >>>>> that matters is the outcome when virtio_scsi_dataplane_stop returns.  
+> > >>>> Yes, but together with vIOMMU, it also effectively leads to a virtio_error(),
+> > >>>> which is not clean. QEMU stderr when this call happens (with patch 1 but not
+> > >>>> this patch):
+> > >>>>
+> > >>>> 2018-09-12T11:48:10.193023Z qemu-system-x86_64: vtd_iommu_translate: detected translation failure (dev=02:00:00, iova=0x0)
+> > >>>> 2018-09-12T11:48:10.193044Z qemu-system-x86_64: New fault is not recorded due to compression of faults
+> > >>>> 2018-09-12T11:48:10.193061Z qemu-system-x86_64: virtio: zero sized buffers are not allowed  
+> > >>>
+> > >>> But with iothread, virtio_scsi_dataplane_stop runs in another thread
+> > >>> than the iothread; in that case you still have a race where the iothread
+> > >>> can process the vq before aio_disable_external and print the error.
+> > >>>
+> > >>> IIUC the guest has cleared the IOMMU page tables _before_ clearing the
+> > >>> DRIVER_OK bit in the status field.  Could this be a guest bug?  
+> > >>
+> > >> I'm not sure if it is a bug or not. I think what happens is the device is left
+> > >> enabled by Seabios, and then reset by kernel.  
+> > > 
+> > > That makes sense, though I'm not sure why QEMU needs to process a
+> > > request long after SeaBIOS has left control to Linux.  Maybe it's just
+> > > that the messages should not go on QEMU stderr, and rather trace-point
+> > > should be enough.  
+> > 
+> > Aha, it's not that QEMU needs to poll, it's just that polling mode is
+> > enabled, and it decides to do one last iteration.  In general the virtio
+> > spec allows the hardware to poll whenever it wants, hence:
+> > 
+> > 1) I'm not sure that translation failures should mark the device as
+> > broken---definitely not when doing polling, possibly not even in
+> > response to the guest "kicking" the virtqueue.  Alex, does the PCI spec
+> > say anything about this?
+> 
+> AFAIK the PCI spec doesn't define anything about the IOMMU or response
+> to translation failures.  Depending on whether it's a read or write,
+> the device might see an unsupported request or not even be aware of the
+> error.  It's really a platform RAS question whether to have any more
+> significant response, most don't, but at least one tends to consider
+> IOMMU faults to be a data integrity issue worth bring the system down.
+> We've struggled with handling ongoing DMA generating IOMMU faults
+> during kexec for a long time, so any sort of marking a device broken
+> for a fault should be thoroughly considered, especially when a device
+> could be assigned to a user who can trivially trigger a fault.
+>  
+> > 2) translation faliures should definitely not print messages to stderr.
+> 
+> Yep, easy DoS vector for a malicious guest, or malicious userspace
+> driver within the guest.  Thanks,
 
-Todo: I want to *backup a block device into qcow2 format image.*
-I met a problem which is the *file size limit of filesystem* ex: Max is
-16TB for any file in ext4, but the block device maybe 32TB or more.
+Note that it's using error_report_once() upstream so it'll only print
+once for the whole lifecycle of QEMU process, and it's still a
+tracepoint downstream so no error will be dumped by default.  So AFAIU
+it's not a DoS target for either.
 
-I figure out one way is to *divide data of device into 1TB chunk* and save
-every chunk into qcow2 image cuz I don't change filesystem, and  connect
-with backing chain.
-*(That's what I said range is different)*
-Ex: 1st chunk of device will save into image.000
-2nd chunk of device will save into image.001
-Nth chunk of device will save into image.(N-1)
-...etc
+I would consider it a good hint for strange bugs since AFAIU DMA error
+should never exist on well-behaved guests.  However I'll be fine too
+to post a patch to make it an explicit tracepoint again if any of us
+would still like it to go away.
 
-I can see all block device data when I mount image.(N-1) by qemu-nbd cuz
-the chunk doesn't overlap and all chunks connect by backing chain.
+Thanks,
 
-Now I want to do next thing: *Incremental backup*
-When I modify data of 1st chunk, what I thought is to write new 1st chunk
-to new image *image.N* and let *imgae.(N-1)* be the backing file of
-*image.N* .
-That's cuz I want to store the data before modified to roll back anytime.
-
-So now I have two *version of block device(like concept of snapshot)*:
-One is image.000 to image.(N-1). I can access the data before modify by
-mount image.(N-1) through qemu-nbd
-The other one is image.000 to image.N.  I can access the data after modify
-by mount image.N through qemu-nbd(cuz the visible 1st chunk are in the
-image.N)
-
-Consider about the situation:
-000   A - - - - - - - -  <<<<<---  store the 1st chunk of block device
-001   - B - - - - - - -
-002   - - C - - - - - - (1st state of block device)
-003   A' - - - - - - - - <<<<<--- store the 1st chunk of block device, but
-data is different
-004   - - - D - - - - - (2nd state of block device)
-005   - - - - E - - - -  (3rd state of block device)
-
-The original problem is If I want to remove the 2nd state(003 and 004) but
-I need to keep the data of 003 and 004.
-If I just commit 003, the A' of 003 must be committed into 002 cuz 002 is
-the backing file of 003.
-I try to figure out some way to let it only commit from 003 into 000.
+-- 
+Peter Xu
