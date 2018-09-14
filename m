@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0pik-00026I-MK
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:09:24 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g0pmA-0003di-5R
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g0pig-0003zo-Fq
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:09:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47278)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g0pig-0003zF-7j
-	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:09:18 -0400
-References: <1536901871-2729-1-git-send-email-liq3ea@gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1g0pm9-0006ne-C5
+	for qemu-devel@nongnu.org; Fri, 14 Sep 2018 11:12:54 -0400
+References: <20180913125217.23173-1-kwolf@redhat.com>
+	<20180913125217.23173-12-kwolf@redhat.com>
+	<908e08a4-a58a-e4e1-5eb7-fe9d17adfbe3@redhat.com>
+	<20180913165954.GB5172@localhost.localdomain>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ecb463a8-fa41-be60-0b28-2814e50333ea@redhat.com>
-Date: Fri, 14 Sep 2018 17:09:15 +0200
+Message-ID: <bf0ed459-0c81-82ba-a60d-736170469501@redhat.com>
+Date: Fri, 14 Sep 2018 17:12:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <1536901871-2729-1-git-send-email-liq3ea@gmail.com>
+In-Reply-To: <20180913165954.GB5172@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw: edu: replace device name with macro
+Subject: Re: [Qemu-devel] [PATCH v2 11/17] block-backend: Decrease in_flight
+ only after callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, jslaby@suse.cz
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, famz@redhat.com, slp@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
 
-On 14/09/2018 07:11, Li Qiang wrote:
-> Just as other devices do.
+On 13/09/2018 18:59, Kevin Wolf wrote:
+> Am 13.09.2018 um 17:10 hat Paolo Bonzini geschrieben:
+>> On 13/09/2018 14:52, Kevin Wolf wrote:
+>>> + if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
+>>> + /* If we are in the main thread, the callback is allowed to unref
+>>> + * the BlockBackend, so we have to hold an additional reference */
+>>> + blk_ref(acb->rwco.blk);
+>>> + }
+>>> acb->common.cb(acb->common.opaque, acb->rwco.ret);
+>>> + blk_dec_in_flight(acb->rwco.blk);
+>>> + if (qemu_get_current_aio_context() == qemu_get_aio_context()) {
+>>> + blk_unref(acb->rwco.blk);
+>>> + }
+>>
+>> Is this something that happens only for some specific callers?  That is,
+>> which callers are sure that the callback is invoked from the main thread?
 > 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> ---
->  hw/misc/edu.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> I can't seem to reproduce the problem I saw any more even when reverting
+> the bdrv_ref/unref pair. If I remember correctly it was actually a
+> nested aio_poll() that was running a block job completion or something
+> like that - which would obviously only happen on the main thread because
+> the job intentionally defers to the main thread.
 > 
-> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-> index df26a4d046..0687ffd343 100644
-> --- a/hw/misc/edu.c
-> +++ b/hw/misc/edu.c
-> @@ -30,7 +30,8 @@
->  #include "qemu/main-loop.h" /* iothread mutex */
->  #include "qapi/visitor.h"
->  
-> -#define EDU(obj)        OBJECT_CHECK(EduState, obj, "edu")
-> +#define TYPE_PCI_EDU_DEVICE "edu"
-> +#define EDU(obj)        OBJECT_CHECK(EduState, obj, TYPE_PCI_EDU_DEVICE)
->  
->  #define FACT_IRQ        0x00000001
->  #define DMA_IRQ         0x00000100
-> @@ -414,7 +415,7 @@ static void pci_edu_register_types(void)
->          { },
->      };
->      static const TypeInfo edu_info = {
-> -        .name          = "edu",
-> +        .name          = TYPE_PCI_EDU_DEVICE,
->          .parent        = TYPE_PCI_DEVICE,
->          .instance_size = sizeof(EduState),
->          .instance_init = edu_instance_init,
-> 
+> The only reason I made this conditional is that I think bdrv_unref()
+> still isn't safe outside the main thread, is it?
 
-Queued, thanks.
+Yes, making it conditional is correct, but it is quite fishy even with
+the conditional.
+
+As you mention, you could have a nested aio_poll() in the main thread,
+for example invoked from a bottom half, but in that case I'd rather
+track the caller that is creating the bottom half and see if it lacks a
+bdrv_ref/bdrv_unref (or perhaps it's even higher in the tree that is
+missing).
 
 Paolo
