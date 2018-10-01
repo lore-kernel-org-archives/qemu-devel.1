@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g6u8e-0003qN-Mt
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:05:14 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g6uGL-0000fJ-51
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:13:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g6u8a-0007mX-88
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:05:12 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33400)
+	(envelope-from <peter.maydell@linaro.org>) id 1g6uGG-0004k0-4D
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:13:08 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:38958)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g6u8Z-0007lz-Ot
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:05:08 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f10-v6so13018448wrs.0
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 02:05:07 -0700 (PDT)
-References: <20180911140631.18481-1-alex.bennee@linaro.org>
-	<20180911140631.18481-3-alex.bennee@linaro.org>
-	<6ef6c4bb-7f29-efef-f8b9-478880c78c8f@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <6ef6c4bb-7f29-efef-f8b9-478880c78c8f@amsat.org>
-Date: Mon, 01 Oct 2018 10:05:05 +0100
-Message-ID: <87murykpfi.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g6uGF-0004YR-DX
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:13:03 -0400
+Received: by mail-ot1-x335.google.com with SMTP id c20-v6so5737849otl.6
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 02:12:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a5cba9d8-1004-626e-b9c3-5e975f07ca54@amsat.org>
+References: <CAFEAcA_gCh-uSbMMbtbH9DsOLgzHhUgMABBSnLOYy7avW7DXxg@mail.gmail.com>
+	<a5cba9d8-1004-626e-b9c3-5e975f07ca54@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Oct 2018 10:12:28 +0100
+Message-ID: <CAFEAcA8-PmAX4xoC=+gSqFVLTU41dZh-d5GCLHiGBZaHCGF4UQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 2/4] docker: add buildroot-nios2-cross
- image
+Subject: Re: [Qemu-devel] finishing the transition away from SysBus init
+ methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, 1791796@bugs.launchpad.net, thuth@redhat.com, Fam Zheng <famz@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 1 October 2018 at 09:52, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
+rote:
+> On 9/27/18 10:11 AM, Peter Maydell wrote:
+>> I had a look at how many devices are still using the SysBus init
+>> method (rather than the instance-init/realize pair), and it turns out
+>> to be only 41, which I think is reasonably tractable for doing some
+>> more conversions and completing this API transation.
+>
+> Next would be convert qemu_register_reset() calls from hw/ to use
+> DeviceClass::reset().
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+Yes, where there is a device around. Many of the qemu_register_reset
+calls though I think are either devices that haven't been converted
+to QOM at all yet, or for parts of the system that aren't devices
+at all.
 
-> Hi Alex,
->
-> On 9/11/18 4:06 PM, Alex Benn=C3=A9e wrote:
->> Build a buildroot toolchain for the nios2 target.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  tests/docker/Makefile.include                         |  4 ++++
->>  tests/docker/dockerfiles/buildroot-nios2-cross.docker | 10 ++++++++++
->>  2 files changed, 14 insertions(+)
->>  create mode 100644 tests/docker/dockerfiles/buildroot-nios2-cross.docker
->>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.inclu=
-de
->> index 74a82de48a..a8dfde8ed5 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -120,6 +120,10 @@ docker-image-debian-riscv64-cross: docker-image-deb=
-ian-sid
->>  docker-image-debian-powerpc-cross: docker-image-debian-sid
->>  docker-image-travis: NOUSER=3D1
->>
->> +# Buildroot base images
->> +# These involve building the toolchains and can take some time
->> +docker-image-buildroot-nios2-cross: docker-image-debian-buildroot-base
->> +
->>  # Specialist build images, sometimes very limited tools
->>  docker-image-tricore-cross: docker-image-debian9
->>
->> diff --git a/tests/docker/dockerfiles/buildroot-nios2-cross.docker b/tes=
-ts/docker/dockerfiles/buildroot-nios2-cross.docker
->> new file mode 100644
->> index 0000000000..e573f0fa55
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/buildroot-nios2-cross.docker
->> @@ -0,0 +1,10 @@
->> +#
->> +# NIOS II toolchain
->> +#
->> +FROM qemu:debian-buildroot-base
->> +
->> +RUN cd /opt/buildroot-${BUILDROOT_VERSION} && make qemu_nios2_10m50_def=
-config
->
-> Simply:
->
->   RUN make -C /opt/buildroot-${BUILDROOT_VERSION} qemu_nios2_10m50_defcon=
-fig
->
->> +RUN cd /opt/buildroot-${BUILDROOT_VERSION} && make toolchain
->
->    RUN make -C /opt/buildroot-${BUILDROOT_VERSION} toolchain
->
->> +# The toolchain is in /opt/buildroot-${BUILDROOT_VERSION}/output/host/b=
-in/nios2-*
->> +RUN ln -s /opt/buildroot-${BUILDROOT_VERSION}/output/host/bin/nios2-* /=
-usr/bin
->
-> Similarly:
->
->    ENV PATH $PATH:/opt/buildroot-${BUILDROOT_VERSION}/output/host/bin
->
-> Once build this image takes a bit more than 3GB (this took me 30min to
-> build).
->
-> With changes:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Apparently multi-stage builds are meant to help:
-
-  https://docs.docker.com/develop/develop-images/multistage-build/#name-you=
-r-build-stages
-
-It's still a little sub-optimal compared to binary builds but it will do
-if we care about supporting every guest architecture with tests. I only
-picked nios2 as a random example.
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
