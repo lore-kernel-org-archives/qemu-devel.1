@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g6wcw-0006Sa-P6
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:44:39 -0400
+	(envelope-from <clg@kaod.org>) id 1g6wd2-0006Vo-25
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g6wcr-000449-HY
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:44:38 -0400
-Received: from 18.mo6.mail-out.ovh.net ([46.105.73.110]:53143)
+	(envelope-from <clg@kaod.org>) id 1g6wcw-000495-VS
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:44:43 -0400
+Received: from 18.mo1.mail-out.ovh.net ([46.105.35.72]:50900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g6wcr-00043A-A9
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:44:33 -0400
-Received: from player791.ha.ovh.net (unknown [10.109.146.143])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 22DF2186275
-	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 13:44:32 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g6wcw-00047b-LB
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:44:38 -0400
+Received: from player791.ha.ovh.net (unknown [10.109.160.251])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 3B5001371BE
+	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 13:44:37 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon,  1 Oct 2018 13:44:19 +0200
-Message-Id: <20181001114421.1377-1-clg@kaod.org>
+Date: Mon,  1 Oct 2018 13:44:20 +0200
+Message-Id: <20181001114421.1377-2-clg@kaod.org>
+In-Reply-To: <20181001114421.1377-1-clg@kaod.org>
+References: <20181001114421.1377-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/2] ppc: convert SysBus init method to a
- realize method
+Subject: [Qemu-devel] [PATCH 1/2] ppc440_pcix: convert SysBus init method to
+ a realize method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +33,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
-
-Here are a couple of patches converting the SysBus init method to a
-realize method. make check tested only.
-
-Thanks,
-
-C.
-
-
-C=C3=A9dric Le Goater (2):
-  ppc440_pcix: convert SysBus init method to a realize method
-  ppc4xx_pci: convert SysBus init method to a realize method
-
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
  hw/ppc/ppc440_pcix.c | 14 ++++++--------
- hw/ppc/ppc4xx_pci.c  | 14 ++++++--------
- 2 files changed, 12 insertions(+), 16 deletions(-)
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
+diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
+index 64ed07afa658..42ef76b6f58a 100644
+--- a/hw/ppc/ppc440_pcix.c
++++ b/hw/ppc/ppc440_pcix.c
+@@ -466,17 +466,18 @@ const MemoryRegionOps ppc440_pcix_host_data_ops =3D=
+ {
+     .endianness =3D DEVICE_LITTLE_ENDIAN,
+ };
+=20
+-static int ppc440_pcix_initfn(SysBusDevice *dev)
++static void ppc440_pcix_realize(DeviceState *dev, Error **errp)
+ {
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     PPC440PCIXState *s;
+     PCIHostState *h;
+=20
+     h =3D PCI_HOST_BRIDGE(dev);
+     s =3D PPC440_PCIX_HOST_BRIDGE(dev);
+=20
+-    sysbus_init_irq(dev, &s->irq);
++    sysbus_init_irq(sbd, &s->irq);
+     memory_region_init(&s->busmem, OBJECT(dev), "pci bus memory", UINT64=
+_MAX);
+-    h->bus =3D pci_register_root_bus(DEVICE(dev), NULL, ppc440_pcix_set_=
+irq,
++    h->bus =3D pci_register_root_bus(dev, NULL, ppc440_pcix_set_irq,
+                          ppc440_pcix_map_irq, &s->irq, &s->busmem,
+                          get_system_io(), PCI_DEVFN(0, 0), 1, TYPE_PCI_B=
+US);
+=20
+@@ -497,17 +498,14 @@ static int ppc440_pcix_initfn(SysBusDevice *dev)
+     memory_region_add_subregion(&s->container, PCIC0_CFGADDR, &h->conf_m=
+em);
+     memory_region_add_subregion(&s->container, PCIC0_CFGDATA, &h->data_m=
+em);
+     memory_region_add_subregion(&s->container, PPC440_REG_BASE, &s->iome=
+m);
+-    sysbus_init_mmio(dev, &s->container);
+-
+-    return 0;
++    sysbus_init_mmio(sbd, &s->container);
+ }
+=20
+ static void ppc440_pcix_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+-    k->init =3D ppc440_pcix_initfn;
++    dc->realize =3D ppc440_pcix_realize;
+     dc->reset =3D ppc440_pcix_reset;
+ }
+=20
 --=20
 2.17.1
