@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g70JI-0008P6-Tv
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 11:40:41 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g70Lt-0001ti-Vt
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 11:43:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g70JH-0005jP-VX
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 11:40:36 -0400
-References: <20181001143218.17069-1-kwolf@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9a0e30f2-90d0-11ba-b5db-3e2df18590cc@redhat.com>
-Date: Mon, 1 Oct 2018 17:40:21 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g70Ls-0007AO-P1
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 11:43:17 -0400
+References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
+	<20180807174311.32454-6-vsementsov@virtuozzo.com>
+	<5c871ce7-2cab-f897-0b06-cbc05b9ffe97@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20249828-f5fd-e2d8-6253-e4a0a48800ff@virtuozzo.com>
+Date: Mon, 1 Oct 2018 18:43:03 +0300
 MIME-Version: 1.0
-In-Reply-To: <20181001143218.17069-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <5c871ce7-2cab-f897-0b06-cbc05b9ffe97@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] test-replication: Lock AioContext around
- blk_unref()
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 5/7] qcow2: refactor qcow2_co_pwritev:
+ split out qcow2_co_do_pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +26,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
-On 01/10/2018 16:32, Kevin Wolf wrote:
-> Recently, the test case has started failing because some job related
-> functions want to drop the AioContext lock even though it hasn't been
-> taken:
-> 
->     (gdb) bt
->     #0  0x00007f51c067c9fb in raise () from /lib64/libc.so.6
->     #1  0x00007f51c067e77d in abort () from /lib64/libc.so.6
->     #2  0x0000558c9d5dde7b in error_exit (err=<optimized out>, msg=msg@entry=0x558c9d6fe120 <__func__.18373> "qemu_mutex_unlock_impl") at util/qemu-thread-posix.c:36
->     #3  0x0000558c9d6b5263 in qemu_mutex_unlock_impl (mutex=mutex@entry=0x558c9f3999a0, file=file@entry=0x558c9d6fd36f "util/async.c", line=line@entry=516) at util/qemu-thread-posix.c:96
->     #4  0x0000558c9d6b0565 in aio_context_release (ctx=ctx@entry=0x558c9f399940) at util/async.c:516
->     #5  0x0000558c9d5eb3da in job_completed_txn_abort (job=0x558c9f68e640) at job.c:738
->     #6  0x0000558c9d5eb227 in job_finish_sync (job=0x558c9f68e640, finish=finish@entry=0x558c9d5eb8d0 <job_cancel_err>, errp=errp@entry=0x0) at job.c:986
->     #7  0x0000558c9d5eb8ee in job_cancel_sync (job=<optimized out>) at job.c:941
->     #8  0x0000558c9d64d853 in replication_close (bs=<optimized out>) at block/replication.c:148
->     #9  0x0000558c9d5e5c9f in bdrv_close (bs=0x558c9f41b020) at block.c:3420
->     #10 bdrv_delete (bs=0x558c9f41b020) at block.c:3629
->     #11 bdrv_unref (bs=0x558c9f41b020) at block.c:4685
->     #12 0x0000558c9d62a3f3 in blk_remove_bs (blk=blk@entry=0x558c9f42a7c0) at block/block-backend.c:783
->     #13 0x0000558c9d62a667 in blk_delete (blk=0x558c9f42a7c0) at block/block-backend.c:402
->     #14 blk_unref (blk=0x558c9f42a7c0) at block/block-backend.c:457
->     #15 0x0000558c9d5dfcea in test_secondary_stop () at tests/test-replication.c:478
->     #16 0x00007f51c1f13178 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
->     #17 0x00007f51c1f1337b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
->     #18 0x00007f51c1f1337b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
->     #19 0x00007f51c1f13552 in g_test_run_suite () from /lib64/libglib-2.0.so.0
->     #20 0x00007f51c1f13571 in g_test_run () from /lib64/libglib-2.0.so.0
->     #21 0x0000558c9d5de31f in main (argc=<optimized out>, argv=<optimized out>) at tests/test-replication.c:581
-> 
-> It is yet unclear whether this should really be considered a bug in the
-> test case or whether blk_unref() should work for callers that haven't
-> taken the AioContext lock, but in order to fix the build tests quickly,
-> just take the AioContext lock around blk_unref().
+28.09.2018 17:23, Max Reitz wrote:
+> On 07.08.18 19:43, Vladimir Sementsov-Ogievskiy wrote:
+>> Split out block which will be reused in async scheme.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/qcow2.c | 138 ++++++++++++++++++++++++++++++++++++----------------------
+>>   1 file changed, 86 insertions(+), 52 deletions(-)
+>>
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index a0df8d4e50..4d669432d1 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -2210,6 +2210,85 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
+>>       return false;
+>>   }
+>>   
+>> +/* qcow2_co_do_pwritev
+>> + * Called without s->lock unlocked
+>> + * hd_qiov - temp qiov for any use. It is initialized so it is empty and
+>> + *           support adding up to qiov->niov + 2 elements
+>> + * l2meta  - if not NULL, qcow2_co_do_pwritev() will consume it. Caller must not
+>> + *           use it somehow after qcow2_co_do_pwritev() call
+>> + */
+>> +static coroutine_fn int qcow2_co_do_pwritev(BlockDriverState *bs,
+>> +                                            uint64_t file_cluster_offset,
+>> +                                            uint64_t offset,
+>> +                                            uint64_t bytes,
+>> +                                            QEMUIOVector *qiov,
+>> +                                            uint64_t qiov_offset,
+>> +                                            QCowL2Meta *l2meta)
+>> +{
+>> +    int ret;
+>> +    BDRVQcow2State *s = bs->opaque;
+>> +    void *crypt_buf = NULL;
+>> +    QEMUIOVector hd_qiov;
+>> +    int offset_in_cluster = offset_into_cluster(s, offset);
+>> +
+>> +    qemu_iovec_reset(&hd_qiov);
+> This shouldn't be here.
+>
+>> +    qemu_iovec_init(&hd_qiov, qiov->niov);
+>> +
+>> +    if (bs->encrypted) {
+>> +        assert(s->crypto);
+>> +        assert(bytes <= QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
+>> +        crypt_buf = qemu_try_blockalign(bs->file->bs, bytes);
+>> +        qemu_iovec_to_buf(qiov, qiov_offset, crypt_buf, bytes);
+>> +
+>> +        if (qcrypto_block_encrypt(s->crypto,
+>> +                                  (s->crypt_physical_offset ?
+>> +                                   file_cluster_offset + offset_in_cluster :
+>> +                                   offset),
+>> +                                  crypt_buf,
+>> +                                  bytes, NULL) < 0) {
+> Same question as in the read case: Can't we make do without the bounce
+> buffer?
 
-Given the backtrace, I think bdrv_close should be taking the AioContext
-lock instead of blockdev_close_all_bdrv_states.
+I think, we should not modify guest buffers..
 
-Paolo
+>
+>> +            ret = -EIO;
+>> +            goto fail;
+>> +        }
+>> +
+>> +        qemu_iovec_add(&hd_qiov, crypt_buf, bytes);
+>> +    } else {
+>> +        qemu_iovec_concat(&hd_qiov, qiov, qiov_offset, bytes);
+>> +    }
+>> +
+>> +    /* If we need to do COW, check if it's possible to merge the
+>> +     * writing of the guest data together with that of the COW regions.
+>> +     * If it's not possible (or not necessary) then write the
+>> +     * guest data now. */
+>> +    if (!merge_cow(offset, bytes, &hd_qiov, l2meta)) {
+>> +        BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+>> +        trace_qcow2_writev_data(qemu_coroutine_self(),
+>> +                                file_cluster_offset + offset_in_cluster);
+>> +        ret = bdrv_co_pwritev(bs->file,
+>> +                              file_cluster_offset + offset_in_cluster,
+>> +                              bytes, &hd_qiov, 0);
+>> +        if (ret < 0) {
+>> +            qemu_co_mutex_lock(&s->lock);
+>> +            goto fail;
+>> +        }
+>> +    }
+>> +
+>> +    qemu_co_mutex_lock(&s->lock);
+> It looks a bit weird to only do some of the lock handling in this
+> function.  I don't quite like it, but as long as you keep it around the
+> qcow2_handle_l2meta(), I won't object.
+>
+> A problem is that currently you don't keep it around
+> qcow2_handle_l2meta().  Before going to the fail label, one has to
+> manually lock the mutex (which you don't do in one of the above error
+> paths, but that's fallout from patch 2).  Maybe it would be nicer with a
+> separate label that does the lock.
+>
+> Like:
+>
+>      ...
+>      ret = qcow2_handle_l2meta(bs, &l2meta, true);
+>      goto done_locked;
+>
+> fail_unlocked:
+>      qemu_co_mutex_lock(&s->lock)
+> done_locked:
+>      qcow2_handle_l2meta(bs, &l2meta, false);
+>      ...
+
+ok
+
+>
+>> +
+>> +    ret = qcow2_handle_l2meta(bs, &l2meta, true);
+>> +    if (ret) {
+>> +        goto fail;
+>> +    }
+>> +
+>> +fail:
+>> +    qcow2_handle_l2meta(bs, &l2meta, false);
+>> +    qemu_co_mutex_unlock(&s->lock);
+>> +
+>> +    qemu_vfree(crypt_buf);
+>> +    qemu_iovec_destroy(&hd_qiov);
+>> +
+>> +    return ret;
+>> +}
+>> +
+>>   static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>>                                            uint64_t bytes, QEMUIOVector *qiov,
+>>                                            int flags)
+>> @@ -2262,63 +2341,16 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>>   
+>>           qemu_co_mutex_unlock(&s->lock);
+>>   
+>> -        qemu_iovec_reset(&hd_qiov);
+>> -        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, cur_bytes);
+>>   
+>> -        if (bs->encrypted) {
+>> -            assert(s->crypto);
+>> -            if (!cluster_data) {
+>> -                cluster_data = qemu_try_blockalign(bs->file->bs,
+>> -                                                   QCOW_MAX_CRYPT_CLUSTERS
+>> -                                                   * s->cluster_size);
+>> -                if (cluster_data == NULL) {
+>> -                    ret = -ENOMEM;
+>> -                    goto fail;
+>> -                }
+>> -            }
+>> -
+>> -            assert(hd_qiov.size <=
+>> -                   QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
+>> -            qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
+>> -
+>> -            if (qcrypto_block_encrypt(s->crypto,
+>> -                                      (s->crypt_physical_offset ?
+>> -                                       cluster_offset + offset_in_cluster :
+>> -                                       offset),
+>> -                                      cluster_data,
+>> -                                      cur_bytes, NULL) < 0) {
+>> -                ret = -EIO;
+>> -                goto fail;
+>> -            }
+>> -
+>> -            qemu_iovec_reset(&hd_qiov);
+>> -            qemu_iovec_add(&hd_qiov, cluster_data, cur_bytes);
+>> -        }
+>> -
+>> -        /* If we need to do COW, check if it's possible to merge the
+>> -         * writing of the guest data together with that of the COW regions.
+>> -         * If it's not possible (or not necessary) then write the
+>> -         * guest data now. */
+>> -        if (!merge_cow(offset, cur_bytes, &hd_qiov, l2meta)) {
+>> -            BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+>> -            trace_qcow2_writev_data(qemu_coroutine_self(),
+>> -                                    cluster_offset + offset_in_cluster);
+>> -            ret = bdrv_co_pwritev(bs->file,
+>> -                                  cluster_offset + offset_in_cluster,
+>> -                                  cur_bytes, &hd_qiov, 0);
+>> -            if (ret < 0) {
+>> -                qemu_co_mutex_lock(&s->lock);
+>> -                goto fail;
+>> -            }
+>> +        ret = qcow2_co_do_pwritev(bs, cluster_offset, offset, cur_bytes,
+>> +                                  qiov, bytes_done, l2meta);
+>> +        l2meta = NULL; /* l2meta is consumed by qcow2_co_do_pwritev() */
+>> +        if (ret < 0) {
+>> +            goto fail_nometa;
+>>           }
+>>   
+>>           qemu_co_mutex_lock(&s->lock);
+>>   
+>> -        ret = qcow2_handle_l2meta(bs, &l2meta, true);
+>> -        if (ret) {
+>> -            goto fail;
+>> -        }
+>> -
+>>           bytes -= cur_bytes;
+>>           offset += cur_bytes;
+>>           bytes_done += cur_bytes;
+>> @@ -2331,6 +2363,8 @@ fail:
+>>   
+>>       qemu_co_mutex_unlock(&s->lock);
+>>   
+>> +fail_nometa:
+>> +
+> I'd remove the blank line (because we usually don't have blank lines
+> below labels).
+>
+>>       qemu_iovec_destroy(&hd_qiov);
+>>       qemu_vfree(cluster_data);
+> cluster_data and hd_qiov are unused now.
+>
+> Max
+>
+>>       trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
+>>
+>
+
+
+-- 
+Best regards,
+Vladimir
