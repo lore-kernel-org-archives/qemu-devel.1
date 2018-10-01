@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g71K9-0003Pj-UN
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:45:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g71Y5-0005xv-Ce
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:59:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g71K4-00050I-Td
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:45:33 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37550)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g71K4-000508-MJ
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:45:28 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 185-v6so3996594wmt.2
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 09:45:28 -0700 (PDT)
-References: <20181001115704.701-1-luc.michel@greensocs.com>
-	<20181001115704.701-12-luc.michel@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <285be5d2-8bb1-8fc4-9a8e-03078f59dd73@redhat.com>
-Date: Mon, 1 Oct 2018 18:45:25 +0200
+	(envelope-from <kwolf@redhat.com>) id 1g71Y4-00067B-OV
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:59:57 -0400
+Date: Mon, 1 Oct 2018 18:59:45 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181001165945.GD4445@localhost.localdomain>
+References: <20180929095454.32066-1-lbloch@janustech.com>
+	<dd15dbb9-6aaa-ab5a-9105-8cf49e76cc27@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181001115704.701-12-luc.michel@greensocs.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/15] gdbstub: add support for vAttach
- packets
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dd15dbb9-6aaa-ab5a-9105-8cf49e76cc27@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Fix cache-clean-interval
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Hi Luc,
-
-On 01/10/2018 13:57, Luc Michel wrote:
-> Add support for the vAttach packets. In multiprocess mode, GDB sends
-> them to attach to additional processes.
+Am 01.10.2018 um 16:35 hat Eric Blake geschrieben:
+> On 9/29/18 4:54 AM, Leonid Bloch wrote:
+> > Fixing cache-clean-interval documentation following the recent change to
+> > a default of 600 seconds on supported plarforms (only Linux currently).
+> > 
+> > Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+> > ---
+> >   docs/qcow2-cache.txt | 19 +++++++++----------
+> >   qapi/block-core.json |  3 ++-
+> >   qemu-options.hx      |  3 ++-
+> >   3 files changed, 13 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+> > index 59358b816f..1778312e09 100644
+> > --- a/docs/qcow2-cache.txt
+> > +++ b/docs/qcow2-cache.txt
+> > @@ -202,18 +202,17 @@ Reducing the memory usage
+> >   It is possible to clean unused cache entries in order to reduce the
+> >   memory usage during periods of low I/O activity.
+> > -The parameter "cache-clean-interval" defines an interval (in seconds).
+> > -All cache entries that haven't been accessed during that interval are
+> > -removed from memory.
+> > +The parameter "cache-clean-interval" defines an interval (in seconds),
+> > +affer which all the cache entries that haven't been accessed during it
 > 
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> ---
->  gdbstub.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
+> s/affer/after/
 > 
-> diff --git a/gdbstub.c b/gdbstub.c
-> index d372972dd3..b6de821025 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -1326,10 +1326,42 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
->                      break;
->                  }
->                  goto unknown_command;
->              }
->              break;
-> +        } else if (strncmp(p, "Attach", 6) == 0) {
+> Maybe s/during it/during the interval/
 
-Shouldn't this be strncmp("Attach;", 7)?
+Thanks, made these fixes and applied it to the block branch.
 
-> +            unsigned long pid;
-> +
-> +            p += 7;
-> +
-> +            qemu_strtoul(p, &p, 16, &pid);
-
-You should check for EINVAL/ERANGE here.
-
-Rest of the patch is OK.
-
-> +
-> +            process = gdb_get_process(s, pid);
-> +
-> +            if (process == NULL) {
-> +                put_packet(s, "E22");
-> +                break;
-> +            }
-> +
-> +            cpu = get_first_cpu_in_process(s, process);
-> +
-> +            if (cpu == NULL) {
-> +                /* Refuse to attach an empty process */
-> +                put_packet(s, "E22");
-> +                break;
-> +            }
-> +
-> +            process->attached = true;
-> +
-> +            s->g_cpu = cpu;
-> +            s->c_cpu = cpu;
-> +
-> +            snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
-> +                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id)));
-> +
-> +            put_packet(s, buf);
-> +            break;
->          } else {
->              goto unknown_command;
->          }
->      case 'k':
->          /* Kill the target */
-> 
+Kevin
