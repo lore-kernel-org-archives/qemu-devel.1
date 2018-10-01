@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g71rG-0002cL-Bz
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:47 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g72gY-0002CF-Lr
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:12:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g71rF-0007ON-06
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:46 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  1 Oct 2018 19:18:53 +0200
-Message-Id: <20181001171901.11004-16-kwolf@redhat.com>
-In-Reply-To: <20181001171901.11004-1-kwolf@redhat.com>
-References: <20181001171901.11004-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/23] qcow2: Assign the L2 cache relatively to
- the image size
+	(envelope-from <alex.bennee@linaro.org>) id 1g72gT-0004In-N2
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:12:46 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:37075)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g72gT-0004Hg-8x
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:12:41 -0400
+Received: by mail-wm1-x331.google.com with SMTP id 185-v6so4243124wmt.2
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 11:12:41 -0700 (PDT)
+References: <CAFEAcA-T7-PcKLwPr0VO0wrwW3x+w2WbdEjTjN2YfWOmZXyfUg@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA-T7-PcKLwPr0VO0wrwW3x+w2WbdEjTjN2YfWOmZXyfUg@mail.gmail.com>
+Date: Mon, 01 Oct 2018 19:12:38 +0100
+Message-ID: <87lg7hlend.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] racing between pause_all_vcpus() and
+ qemu_cpu_stop()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,219 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>
 
-From: Leonid Bloch <lbloch@janustech.com>
 
-Sufficient L2 cache can noticeably improve the performance when using
-large images with frequent I/O.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Previously, unless 'cache-size' was specified and was large enough, the
-L2 cache was set to a certain size without taking the virtual image size
-into account.
+> I've been investigating a race condition where sometimes when my
+> guest writes to a device register which triggers a
+> qemu_system_reset_request(), it doesn't actually cause a clean reset,
+> but instead the guest CPU continues to execute instructions.
+> I managed to repro it under 'rr', which let me walk through enough
+> of what was going on to determine the following:
+>
+> When a guest CPU thread calls qemu_system_reset_request(), this
+> results in a call to qemu_cpu_stop(current_cpu, true), to
+> make the CPU come back out to the main loop. We also set the
+> reset_requested flag, to get the IO thread to actually do the
+> reset.
+>
+> The main loop thread runs main_loop_should_exit(). If there is a
+> pending reset, it calls pause_all_vcpus(), with the intention
+> that this quiesces all the guest CPUs before it starts messing
+> with reset actions.
+>
+> pause_all_vcpus() just waits for every cpu to have cpu->stopped set.
+> However, if the running cpu has just called qemu_cpu_stop() on
+> itself then it will have set cpu->stopped true but not actually
+> made it out to the main loop yet. (In the case I'm looking at,
+> what happens is that as soon as the CPU thread unlocks the
+> iothread mutex in io_writex() after the device write, the
+> main thread runs and does all the reset operations.)
+>
+> The reset code in the iothread then proceeds to start calling
+> various reset functions while the CPU thread is still inside
+> the exec loop, running generated code and so on. This doesn't
+> seem like what ought to happen. In particular it includes
+> calling cpu_common_reset(), which clears all kinds of flags
+> relevant to the still-executing CPU...
 
-Now, the L2 cache assignment is aware of the virtual size of the image,
-and will cover the entire image, unless the cache size needed for that is
-larger than a certain maximum. This maximum is set to 1 MB by default
-(enough to cover an 8 GB image with the default cluster size) but can
-be increased or decreased using the 'l2-cache-size' option. This option
-was previously documented as the *maximum* L2 cache size, and this patch
-makes it behave as such, instead of as a constant size. Also, the
-existing option 'cache-size' can limit the sum of both L2 and refcount
-caches, as previously.
+I would have thought the reset code should be scheduled via safe async
+work to run in the vCPU context. Why should the main loop get involved
+at all here?
 
-Signed-off-by: Leonid Bloch <lbloch@janustech.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- docs/qcow2-cache.txt       | 15 ++++++++++-----
- block/qcow2.h              |  4 +---
- block/qcow2.c              | 21 +++++++++------------
- qemu-options.hx            |  6 +++---
- tests/qemu-iotests/137     |  8 +++++++-
- tests/qemu-iotests/137.out |  4 +++-
- 6 files changed, 33 insertions(+), 25 deletions(-)
+>
+> Any suggestions for how we should fix this?
+>
+> thanks
+> -- PMM
 
-diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-index 7e28b41bd3..750447ea4f 100644
---- a/docs/qcow2-cache.txt
-+++ b/docs/qcow2-cache.txt
-@@ -125,8 +125,12 @@ There are a few things that need to be taken into account:
-  - Both caches must have a size that is a multiple of the cluster size
-    (or the cache entry size: see "Using smaller cache sizes" below).
- 
-- - The default L2 cache size is 8 clusters or 1MB (whichever is more),
--   and the minimum is 2 clusters (or 2 cache entries, see below).
-+ - The maximum L2 cache size is 1 MB by default (enough for full coverage
-+   of 8 GB images, with the default cluster size). This value can be
-+   modified using the "l2-cache-size" option. QEMU will not use more memory
-+   than needed to hold all of the image's L2 tables, regardless of this max.
-+   value. The minimal L2 cache size is 2 clusters (or 2 cache entries, see
-+   below).
- 
-  - The default (and minimum) refcount cache size is 4 clusters.
- 
-@@ -184,9 +188,10 @@ Some things to take into account:
-    always uses the cluster size as the entry size.
- 
-  - If the L2 cache is big enough to hold all of the image's L2 tables
--   (as explained in the "Choosing the right cache sizes" section
--   earlier in this document) then none of this is necessary and you
--   can omit the "l2-cache-entry-size" parameter altogether.
-+   (as explained in the "Choosing the right cache sizes" and "How to
-+   configure the cache sizes" sections in this document) then none of
-+   this is necessary and you can omit the "l2-cache-entry-size"
-+   parameter altogether.
- 
- 
- Reducing the memory usage
-diff --git a/block/qcow2.h b/block/qcow2.h
-index a8d6f757b1..2f8c1fd15c 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -74,9 +74,7 @@
- /* Must be at least 4 to cover all cases of refcount table growth */
- #define MIN_REFCOUNT_CACHE_SIZE 4 /* clusters */
- 
--/* Whichever is more */
--#define DEFAULT_L2_CACHE_CLUSTERS 8 /* clusters */
--#define DEFAULT_L2_CACHE_SIZE S_1MiB
-+#define DEFAULT_L2_CACHE_MAX_SIZE S_1MiB
- 
- #define DEFAULT_CLUSTER_SIZE S_64KiB
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index cd0053b6ee..589f6c1b1c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -777,29 +777,35 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-                              uint64_t *refcount_cache_size, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t combined_cache_size;
-+    uint64_t combined_cache_size, l2_cache_max_setting;
-     bool l2_cache_size_set, refcount_cache_size_set, combined_cache_size_set;
-     int min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
-+    uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-+    uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
- 
-     combined_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE);
-     l2_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_SIZE);
-     refcount_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_REFCOUNT_CACHE_SIZE);
- 
-     combined_cache_size = qemu_opt_get_size(opts, QCOW2_OPT_CACHE_SIZE, 0);
--    *l2_cache_size = qemu_opt_get_size(opts, QCOW2_OPT_L2_CACHE_SIZE, 0);
-+    l2_cache_max_setting = qemu_opt_get_size(opts, QCOW2_OPT_L2_CACHE_SIZE,
-+                                             DEFAULT_L2_CACHE_MAX_SIZE);
-     *refcount_cache_size = qemu_opt_get_size(opts,
-                                              QCOW2_OPT_REFCOUNT_CACHE_SIZE, 0);
- 
-     *l2_cache_entry_size = qemu_opt_get_size(
-         opts, QCOW2_OPT_L2_CACHE_ENTRY_SIZE, s->cluster_size);
- 
-+    *l2_cache_size = MIN(max_l2_cache, l2_cache_max_setting);
-+
-     if (combined_cache_size_set) {
-         if (l2_cache_size_set && refcount_cache_size_set) {
-             error_setg(errp, QCOW2_OPT_CACHE_SIZE ", " QCOW2_OPT_L2_CACHE_SIZE
-                        " and " QCOW2_OPT_REFCOUNT_CACHE_SIZE " may not be set "
-                        "at the same time");
-             return;
--        } else if (*l2_cache_size > combined_cache_size) {
-+        } else if (l2_cache_size_set &&
-+                   (l2_cache_max_setting > combined_cache_size)) {
-             error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " may not exceed "
-                        QCOW2_OPT_CACHE_SIZE);
-             return;
-@@ -814,9 +820,6 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-         } else if (refcount_cache_size_set) {
-             *l2_cache_size = combined_cache_size - *refcount_cache_size;
-         } else {
--            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
--            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
--
-             /* Assign as much memory as possible to the L2 cache, and
-              * use the remainder for the refcount cache */
-             if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
-@@ -828,12 +831,6 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-                 *l2_cache_size = combined_cache_size - *refcount_cache_size;
-             }
-         }
--    } else {
--        if (!l2_cache_size_set) {
--            *l2_cache_size = MAX(DEFAULT_L2_CACHE_SIZE,
--                                 (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
--                                 * s->cluster_size);
--        }
-     }
-     /* l2_cache_size and refcount_cache_size are ensured to have at least
-      * their minimum values in qcow2_update_options_prepare() */
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 2db6247eff..6eef0f5651 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -736,9 +736,9 @@ The maximum total size of the L2 table and refcount block caches in bytes
- 
- @item l2-cache-size
- The maximum size of the L2 table cache in bytes
--(default: if cache-size is not defined - 1048576 bytes or 8 clusters, whichever
--is larger; otherwise, as large as possible or needed within the cache-size,
--while permitting the requested or the minimal refcount cache size)
-+(default: if cache-size is not specified - 1M; otherwise, as large as possible
-+within the cache-size, while permitting the requested or the minimal refcount
-+cache size)
- 
- @item refcount-cache-size
- The maximum size of the refcount block cache in bytes
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 87965625d8..19e8597306 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -109,7 +109,6 @@ $QEMU_IO \
-     -c "reopen -o cache-size=1M,l2-cache-size=64k,refcount-cache-size=64k" \
-     -c "reopen -o cache-size=1M,l2-cache-size=2M" \
-     -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
--    -c "reopen -o l2-cache-size=256T" \
-     -c "reopen -o l2-cache-entry-size=33k" \
-     -c "reopen -o l2-cache-entry-size=128k" \
-     -c "reopen -o refcount-cache-size=256T" \
-@@ -119,6 +118,13 @@ $QEMU_IO \
-     -c "reopen -o cache-clean-interval=-1" \
-     "$TEST_IMG" | _filter_qemu_io
- 
-+IMGOPTS="cluster_size=256k" _make_test_img 32P
-+$QEMU_IO \
-+    -c "reopen -o l2-cache-entry-size=512,l2-cache-size=1T" \
-+    "$TEST_IMG" | _filter_qemu_io
-+
-+_make_test_img 64M
-+
- echo
- echo === Test transaction semantics ===
- echo
-diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
-index 6a2ffc71fd..2c080b72f3 100644
---- a/tests/qemu-iotests/137.out
-+++ b/tests/qemu-iotests/137.out
-@@ -19,7 +19,6 @@ Parameter 'lazy-refcounts' expects 'on' or 'off'
- cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
- l2-cache-size may not exceed cache-size
- refcount-cache-size may not exceed cache-size
--L2 cache size too big
- L2 cache entry size must be a power of two between 512 and the cluster size (65536)
- L2 cache entry size must be a power of two between 512 and the cluster size (65536)
- Refcount cache size too big
-@@ -27,6 +26,9 @@ Conflicting values for qcow2 options 'overlap-check' ('constant') and 'overlap-c
- Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
- Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
- Cache clean interval too big
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=36028797018963968
-+L2 cache size too big
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- 
- === Test transaction semantics ===
- 
--- 
-2.13.6
+
+--
+Alex Benn=C3=A9e
