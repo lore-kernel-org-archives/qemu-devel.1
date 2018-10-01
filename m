@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1g73Pm-0001nL-9W
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:59:30 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g73fN-0004bY-Qx
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:15:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1g73Pj-000329-3F
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:59:30 -0400
-Date: Mon, 1 Oct 2018 19:59:08 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181001185907.GE24231@work-vm>
-References: <20180926094219.20322-1-david@redhat.com>
-	<20180926094219.20322-23-david@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1g73fN-0004uR-7V
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:15:37 -0400
+References: <20180823154655.40188-1-vsementsov@virtuozzo.com>
+	<20180823154655.40188-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8e9acf48-7eed-1cdd-d870-d1f3daead591@redhat.com>
+Date: Mon, 1 Oct 2018 21:15:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180926094219.20322-23-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 22/24] numa: handle virtio-pmem in NUMA
- stats
+In-Reply-To: <20180823154655.40188-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hdSRdtU3fRXvyJv1SkWpyx1f504PJ1qdh"
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] scripts: add render_block_graph
+ function for QEMUMachine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: crosa@redhat.com, ehabkost@redhat.com, eblake@redhat.com, armbru@redhat.com, kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-* David Hildenbrand (david@redhat.com) wrote:
-> Account the memory to node 0 for now. Once (if ever) virtio-pmem
-> supports NUMA, we can account it to the right node.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hdSRdtU3fRXvyJv1SkWpyx1f504PJ1qdh
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: crosa@redhat.com, ehabkost@redhat.com, eblake@redhat.com,
+ armbru@redhat.com, kwolf@redhat.com, den@openvz.org, jsnow@redhat.com,
+ famz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <8e9acf48-7eed-1cdd-d870-d1f3daead591@redhat.com>
+Subject: Re: [PATCH v3 2/3] scripts: add render_block_graph function for
+ QEMUMachine
+References: <20180823154655.40188-1-vsementsov@virtuozzo.com>
+ <20180823154655.40188-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20180823154655.40188-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+On 23.08.18 17:46, Vladimir Sementsov-Ogievskiy wrote:
+> Render block nodes graph with help of graphviz. This new function is
+> for debugging, so there is no sense to put it into qemu.py as a method
+> of QEMUMachine. Let's instead put it separately.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  numa.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
-> 
-> diff --git a/numa.c b/numa.c
-> index 81542d4ebb..1ff1418c1e 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -545,6 +545,7 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
->      MemoryDeviceInfoList *info_list = qmp_memory_device_list();
->      MemoryDeviceInfoList *info;
->      PCDIMMDeviceInfo     *pcdimm_info;
-> +    VirtioPMemDeviceInfo *vpi;
->  
->      for (info = info_list; info; info = info->next) {
->          MemoryDeviceInfo *value = info->value;
-> @@ -552,22 +553,21 @@ static void numa_stat_memory_devices(NumaNodeMem node_mem[])
->          if (value) {
->              switch (value->type) {
->              case MEMORY_DEVICE_INFO_KIND_DIMM:
-> -                pcdimm_info = value->u.dimm.data;
-> -                break;
-> -
->              case MEMORY_DEVICE_INFO_KIND_NVDIMM:
-> -                pcdimm_info = value->u.nvdimm.data;
-> -                break;
-> -
-> -            default:
-> -                pcdimm_info = NULL;
-> -                break;
-> -            }
-> -
-> -            if (pcdimm_info) {
-> +                pcdimm_info = (value->type == MEMORY_DEVICE_INFO_KIND_DIMM) ?
-> +                              value->u.dimm.data : value->u.nvdimm.data;
->                  node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
->                  node_mem[pcdimm_info->node].node_plugged_mem +=
->                      pcdimm_info->size;
-> +                break;
-> +            case MEMORY_DEVICE_INFO_KIND_VIRTIO_PMEM:
-> +                vpi = value->u.virtio_pmem.data;
-> +                /* TODO: once we support numa, assign to right node */
-> +                node_mem[0].node_mem += vpi->size;
-> +                node_mem[0].node_plugged_mem += vpi->size;
-> +                break;
-> +            default:
-> +                g_assert_not_reached();
->              }
->          }
->      }
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  scripts/render_block_graph.py | 120 ++++++++++++++++++++++++++++++++++=
+
+>  1 file changed, 120 insertions(+)
+>  create mode 100755 scripts/render_block_graph.py
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--hdSRdtU3fRXvyJv1SkWpyx1f504PJ1qdh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluyckcACgkQ9AfbAGHV
+z0BkdQf9FSm59arjwBP0SBPgwVnIxDHCuFt/qNjvBLjCq0VixGR1ZlX8j8+X4nj+
+zwt843GzhbluQEl1gUKFxFIQJZlJ0UkyW/emwUJ7VVYfYLD3+Lx4EWewp1LBixrg
+MU3aTqKAQv2I2gCEzJg3UXyyTBodfdJKQ8JCVQneEag6ZqBTlzkMiJUkPfDhjY9t
+oAtgZZWMI1+TzodRgekxaEz5V0BX/aAsv9lfyyv/Zj/h2VNF4czxqsk5VxvLCeqF
+wiRgs6jUYq2xCKYi3kh8SYPfg1ayqL9yZBDE5Lwq5ufqsN65Hx4TvHWhOXf5Gflt
+HkOFyHOepsBH57X8fy+VA1tZ+ofB8g==
+=JIou
+-----END PGP SIGNATURE-----
+
+--hdSRdtU3fRXvyJv1SkWpyx1f504PJ1qdh--
