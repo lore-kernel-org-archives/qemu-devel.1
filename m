@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g72gY-0002CF-Lr
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:12:47 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1g72mv-0003OL-E4
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g72gT-0004In-N2
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:12:46 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:37075)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1g72mu-0006L9-NB
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:19:21 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:35683)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g72gT-0004Hg-8x
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:12:41 -0400
-Received: by mail-wm1-x331.google.com with SMTP id 185-v6so4243124wmt.2
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 11:12:41 -0700 (PDT)
-References: <CAFEAcA-T7-PcKLwPr0VO0wrwW3x+w2WbdEjTjN2YfWOmZXyfUg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA-T7-PcKLwPr0VO0wrwW3x+w2WbdEjTjN2YfWOmZXyfUg@mail.gmail.com>
-Date: Mon, 01 Oct 2018 19:12:38 +0100
-Message-ID: <87lg7hlend.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] racing between pause_all_vcpus() and
- qemu_cpu_stop()
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1g72mu-0006BE-Ec
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 14:19:20 -0400
+Received: by mail-lf1-x142.google.com with SMTP id r191-v6so10636152lff.2
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 11:19:20 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon,  1 Oct 2018 11:18:58 -0700
+Message-Id: <20181001181858.21086-1-jcmvbkbc@gmail.com>
+Subject: [Qemu-devel] [PULL 00/15] target/xtensa: preparation for FLIX
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Max Filippov <jcmvbkbc@gmail.com>
 
+Hi Peter,
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+please pull the following series that rearranges target/xtensa code in
+preparation for FLIX support.
+The following changes since commit c5e4e49258e9b89cb34c085a419dd9f862935c48:
 
-> I've been investigating a race condition where sometimes when my
-> guest writes to a device register which triggers a
-> qemu_system_reset_request(), it doesn't actually cause a clean reset,
-> but instead the guest CPU continues to execute instructions.
-> I managed to repro it under 'rr', which let me walk through enough
-> of what was going on to determine the following:
->
-> When a guest CPU thread calls qemu_system_reset_request(), this
-> results in a call to qemu_cpu_stop(current_cpu, true), to
-> make the CPU come back out to the main loop. We also set the
-> reset_requested flag, to get the IO thread to actually do the
-> reset.
->
-> The main loop thread runs main_loop_should_exit(). If there is a
-> pending reset, it calls pause_all_vcpus(), with the intention
-> that this quiesces all the guest CPUs before it starts messing
-> with reset actions.
->
-> pause_all_vcpus() just waits for every cpu to have cpu->stopped set.
-> However, if the running cpu has just called qemu_cpu_stop() on
-> itself then it will have set cpu->stopped true but not actually
-> made it out to the main loop yet. (In the case I'm looking at,
-> what happens is that as soon as the CPU thread unlocks the
-> iothread mutex in io_writex() after the device write, the
-> main thread runs and does all the reset operations.)
->
-> The reset code in the iothread then proceeds to start calling
-> various reset functions while the CPU thread is still inside
-> the exec loop, running generated code and so on. This doesn't
-> seem like what ought to happen. In particular it includes
-> calling cpu_common_reset(), which clears all kinds of flags
-> relevant to the still-executing CPU...
+  Merge remote-tracking branch 'remotes/xanclic/tags/pull-block-2018-09-25' into staging (2018-09-25 16:47:35 +0100)
 
-I would have thought the reset code should be scheduled via safe async
-work to run in the vCPU context. Why should the main loop get involved
-at all here?
+are available in the git repository at:
 
->
-> Any suggestions for how we should fix this?
->
-> thanks
-> -- PMM
+  git://github.com/OSLL/qemu-xtensa.git tags/20181001-xtensa
 
+for you to fetch changes up to d74624e59a6087ccf233843b936aedc9f8a8050a:
 
---
-Alex Benn=C3=A9e
+  target/xtensa: extract gen_check_interrupts call (2018-10-01 11:08:36 -0700)
+
+----------------------------------------------------------------
+target/xtensa: preparation for FLIX support
+
+Separate generation of per-instruction code (such as raising exceptions
+and terminating TB) from per-opcode code.
+
+----------------------------------------------------------------
+Max Filippov (15):
+      target/xtensa: extract test for an illegal instruction
+      target/xtensa: extract test for privileged instruction
+      target/xtensa: extract test for syscall instruction
+      target/xtensa: extract test for debug exception
+      target/xtensa: extract test for window overflow exception
+      target/xtensa: extract test for window underflow exception
+      target/xtensa: extract test for alloca exception
+      target/xtensa: extract test for cpdisabled exception
+      target/xtensa: extract test for division by zero
+      target/xtensa: extract unconditional TB termination
+      target/xtensa: change SR number checks to assertions
+      target/xtensa: always end TB on CCOUNT access/CCOMPARE write
+      target/xtensa: extract unconditional TB termination via slot 0
+      target/xtensa: make rsr/wsr helpers return void
+      target/xtensa: extract gen_check_interrupts call
+
+ target/xtensa/cpu.h       |   37 +-
+ target/xtensa/helper.c    |    6 +
+ target/xtensa/helper.h    |    2 +
+ target/xtensa/op_helper.c |   73 +-
+ target/xtensa/translate.c | 2673 +++++++++++++++++++++++++++++----------------
+ 5 files changed, 1817 insertions(+), 974 deletions(-)
+
+Thanks.
+-- Max
