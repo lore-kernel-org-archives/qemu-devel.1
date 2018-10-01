@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g6tgr-0006gc-Q9
+	(envelope-from <david@redhat.com>) id 1g6tgr-0006gT-Km
 	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g6tgp-0007JT-GJ
+	(envelope-from <david@redhat.com>) id 1g6tgm-0007Cn-RF
 	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:36:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g6tgp-0007Hs-8K
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:36:27 -0400
-References: <1538295197-23704-1-git-send-email-pbonzini@redhat.com>
-	<572f8674-1712-686a-278e-9eae5947a233@amsat.org>
-	<5a4400ff-5eed-6deb-9986-a63abca495b6@redhat.com>
-	<22b1d8c9-50fb-6317-eff7-1bd9376be851@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1c391f19-9396-8b0a-2205-b5c1d1ff60c5@redhat.com>
-Date: Mon, 1 Oct 2018 10:36:24 +0200
+References: <20180926094219.20322-1-david@redhat.com>
+	<20180926094219.20322-18-david@redhat.com>
+	<9be6d517-615d-34ef-f6f4-4d478ef21944@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <4dbec139-f71e-ad41-e336-6621ffd6e4ac@redhat.com>
+Date: Mon, 1 Oct 2018 10:36:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <22b1d8c9-50fb-6317-eff7-1bd9376be851@amsat.org>
+In-Reply-To: <9be6d517-615d-34ef-f6f4-4d478ef21944@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/79] Misc QEMU patches for 2018-09-30
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 17/24] memory-device: add class function
+ get_device_id()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +26,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, qemu-devel@nongnu.org
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 01/10/2018 10:25, Philippe Mathieu-Daud=C3=A9 wrote:
->> I'll fix it.  In the meanwhile, I'll note that we're also improving
->> Patchew so that it is much better at applying patches via three-way
->> merge (basically the adding of *-by tags moves from "patchew apply" to
->> the web stuff) and that should make these UTF-8 issues a thing of the =
-past.
-> I noticed my patches are missing C=C3=A9dric's R-b tags, is it a patche=
-w
-> restriction?
+On 30/09/2018 18:19, Auger Eric wrote:
+> Hi David,
+> 
+> On 9/26/18 11:42 AM, David Hildenbrand wrote:
+>> When reporting the id of virtio-based memory devices, we always have to
+>> take the one of the proxy device (parent), not the one of the memory
+>> device directly.
+>>
+>> Let's generalize this by allowing memory devices to specify an optional
+>> "get_device_id" function. This id can then be used to report errors to the
+>> user from memory-device.c code, without having to special case e.g.
+>> virtio devices. Provide a default function that can be overridden.
+>>
+>> While at it, properly treat id == NULL and report "(unnamed)" instead.
+>>
+>> Details:
+>>
+>> When the user creates a virtio device (e.g.  virtio-balloon-pci), two
+>> devices are actually created.
+>>
+>> 1. Virtio proxy device (e.g. TYPE_VIRTIO_BALLOON_PCI)
+>> 2. The "real" virtio device (e.g. TYPE_VIRTIO_BALLOON).
+>>
+>> 1. aliases all properties of 2, so 2. can be properly configured using 1.
+>> 1. gets the device ID set specified by the user. 2. gets no ID set.
+> s/set// ?
+>>
+>> If we want to make 2. a MemoryDevice but report errors/information to the
+> to be reworded?
+>> user, we always have to report the id of 1. (because that's the device the
+>> user instantiated and configured).
 
-No, it's just that sometimes I apply patches before I get the R-b (maybe
-I'm not connected to the VPN and haven't downloaded all the messages).
+Both parts slightly reworded.
 
-Basically:
+>>
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/mem/memory-device.c         | 19 +++++++++++++++++--
+>>  include/hw/mem/memory-device.h |  5 +++++
+>>  2 files changed, 22 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+>> index cf85199a72..6dc40e8764 100644
+>> --- a/hw/mem/memory-device.c
+>> +++ b/hw/mem/memory-device.c
+>> @@ -174,8 +174,10 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>>  
+>>          if (ranges_overlap(md_addr, md_size, new_addr, size)) {
+>>              if (hint) {
+>> -                const DeviceState *d = DEVICE(md);
+>> -                error_setg(errp, "address range conflicts with '%s'", d->id);
+>> +                const char *id = mdc->get_device_id(md);
+>> +
+>> +                error_setg(errp, "address range conflicts with '%s'",
+> address range conflicts with memory device id='%s"?
 
-- if I apply with Patchew, all tags are correct but I can only do that
-if there are no conflicts
+Yes, I can do that.
 
-- if I apply by hand, there may be missing tags and (because
-Thunderbird's "view source" stupidly defaults to Latin-1) incorrect UTF-8=
-.
+Thanks!
 
-Paolo
+
+-- 
+
+Thanks,
+
+David / dhildenb
