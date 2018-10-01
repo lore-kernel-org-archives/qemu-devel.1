@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g70dW-0000g4-Kj
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:01:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g70fz-0002FP-Q7
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g70dJ-0003Yn-Bc
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:01:26 -0400
-References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
-	<20180807174311.32454-4-vsementsov@virtuozzo.com>
-	<6e19aaeb-8acc-beb9-5ece-9ae6101637a9@redhat.com>
-	<9e53e78b-a0ef-9486-1036-3737ba8cad11@virtuozzo.com>
-	<cb8d01ad-0ef9-a11e-1706-f32d505de1b9@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <519cc1dd-1a2f-eb83-b682-c412fcfe6867@virtuozzo.com>
-Date: Mon, 1 Oct 2018 19:00:53 +0300
+	(envelope-from <kwolf@redhat.com>) id 1g70fy-0005no-5A
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:04:03 -0400
+Date: Mon, 1 Oct 2018 18:03:48 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181001160348.GB4445@localhost.localdomain>
+References: <20181001143218.17069-1-kwolf@redhat.com>
+	<9a0e30f2-90d0-11ba-b5db-3e2df18590cc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cb8d01ad-0ef9-a11e-1706-f32d505de1b9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH 3/7] qcow2: split out reading normal
- clusters from qcow2_co_preadv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9a0e30f2-90d0-11ba-b5db-3e2df18590cc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] test-replication: Lock AioContext around
+ blk_unref()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,123 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-01.10.2018 18:39, Max Reitz wrote:
-> On 01.10.18 17:14, Vladimir Sementsov-Ogievskiy wrote:
->> 27.09.2018 20:35, Max Reitz wrote:
->>> On 07.08.18 19:43, Vladimir Sementsov-Ogievskiy wrote:
->>>> Memory allocation may become less efficient for encrypted case. It's a
->>>> payment for further asynchronous scheme.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>   block/qcow2.c | 114 ++++++++++++++++++++++++++++++++--------------------------
->>>>   1 file changed, 64 insertions(+), 50 deletions(-)
->>>>
->>>> diff --git a/block/qcow2.c b/block/qcow2.c
->>>> index 65e3ca00e2..5e7f2ee318 100644
->>>> --- a/block/qcow2.c
->>>> +++ b/block/qcow2.c
->>>> @@ -1808,6 +1808,67 @@ out:
->>>>       return ret;
->>>>   }
->>>>   
->>>> +static coroutine_fn int qcow2_co_preadv_normal(BlockDriverState *bs,
->>>> +                                               uint64_t file_cluster_offset,
->>>> +                                               uint64_t offset,
->>>> +                                               uint64_t bytes,
->>>> +                                               QEMUIOVector *qiov,
->>>> +                                               uint64_t qiov_offset)
->>>> +{
->>>> +    int ret;
->>>> +    BDRVQcow2State *s = bs->opaque;
->>>> +    void *crypt_buf = NULL;
->>>> +    QEMUIOVector hd_qiov;
->>>> +    int offset_in_cluster = offset_into_cluster(s, offset);
->>>> +
->>>> +    if ((file_cluster_offset & 511) != 0) {
->>>> +        return -EIO;
->>>> +    }
->>>> +
->>>> +    qemu_iovec_init(&hd_qiov, qiov->niov);
->>> So you're not just re-allocating the bounce buffer for every single
->>> call, but also this I/O vector.  Hm.
->>>
->>>> +    if (bs->encrypted) {
->>>> +        assert(s->crypto);
->>>> +        assert(bytes <= QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
->>>> +
->>>> +        crypt_buf = qemu_try_blockalign(bs->file->bs, bytes);
->>> 1. Why did you remove the comment?
->>>
->>> 2. The check for whether crypt_buf was successfully allocated is missing.
->>>
->>> 3. Do you have any benchmarks for encrypted images?  Having to allocate
->>> the bounce buffer for potentially every single cluster sounds rather bad
->>> to me.
->> Hmm, no excuses. 1- Will fix, 2 - will fix, 3 - will fix or at least
->> test the performance.
->>
->>>> +        qemu_iovec_add(&hd_qiov, crypt_buf, bytes);
->>>> +    } else {
->>>> +        qemu_iovec_concat(&hd_qiov, qiov, qiov_offset, bytes);
->>> qcow2_co_preadv() continues to do this as well.  That's superfluous now.
->> hd_qiov is local here.. or what do you mean?
-> qcow2_co_preadv() continues to have its own hd_qiov and appends qiov to
-> it (just like here), but it's unused for normal clusters.  So it doesn't
-> have to do that for normal clusters.
+Am 01.10.2018 um 17:40 hat Paolo Bonzini geschrieben:
+> On 01/10/2018 16:32, Kevin Wolf wrote:
+> > Recently, the test case has started failing because some job related
+> > functions want to drop the AioContext lock even though it hasn't been
+> > taken:
+> > 
+> >     (gdb) bt
+> >     #0  0x00007f51c067c9fb in raise () from /lib64/libc.so.6
+> >     #1  0x00007f51c067e77d in abort () from /lib64/libc.so.6
+> >     #2  0x0000558c9d5dde7b in error_exit (err=<optimized out>, msg=msg@entry=0x558c9d6fe120 <__func__.18373> "qemu_mutex_unlock_impl") at util/qemu-thread-posix.c:36
+> >     #3  0x0000558c9d6b5263 in qemu_mutex_unlock_impl (mutex=mutex@entry=0x558c9f3999a0, file=file@entry=0x558c9d6fd36f "util/async.c", line=line@entry=516) at util/qemu-thread-posix.c:96
+> >     #4  0x0000558c9d6b0565 in aio_context_release (ctx=ctx@entry=0x558c9f399940) at util/async.c:516
+> >     #5  0x0000558c9d5eb3da in job_completed_txn_abort (job=0x558c9f68e640) at job.c:738
+> >     #6  0x0000558c9d5eb227 in job_finish_sync (job=0x558c9f68e640, finish=finish@entry=0x558c9d5eb8d0 <job_cancel_err>, errp=errp@entry=0x0) at job.c:986
+> >     #7  0x0000558c9d5eb8ee in job_cancel_sync (job=<optimized out>) at job.c:941
+> >     #8  0x0000558c9d64d853 in replication_close (bs=<optimized out>) at block/replication.c:148
+> >     #9  0x0000558c9d5e5c9f in bdrv_close (bs=0x558c9f41b020) at block.c:3420
+> >     #10 bdrv_delete (bs=0x558c9f41b020) at block.c:3629
+> >     #11 bdrv_unref (bs=0x558c9f41b020) at block.c:4685
+> >     #12 0x0000558c9d62a3f3 in blk_remove_bs (blk=blk@entry=0x558c9f42a7c0) at block/block-backend.c:783
+> >     #13 0x0000558c9d62a667 in blk_delete (blk=0x558c9f42a7c0) at block/block-backend.c:402
+> >     #14 blk_unref (blk=0x558c9f42a7c0) at block/block-backend.c:457
+> >     #15 0x0000558c9d5dfcea in test_secondary_stop () at tests/test-replication.c:478
+> >     #16 0x00007f51c1f13178 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+> >     #17 0x00007f51c1f1337b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+> >     #18 0x00007f51c1f1337b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+> >     #19 0x00007f51c1f13552 in g_test_run_suite () from /lib64/libglib-2.0.so.0
+> >     #20 0x00007f51c1f13571 in g_test_run () from /lib64/libglib-2.0.so.0
+> >     #21 0x0000558c9d5de31f in main (argc=<optimized out>, argv=<optimized out>) at tests/test-replication.c:581
+> > 
+> > It is yet unclear whether this should really be considered a bug in the
+> > test case or whether blk_unref() should work for callers that haven't
+> > taken the AioContext lock, but in order to fix the build tests quickly,
+> > just take the AioContext lock around blk_unref().
+> 
+> Given the backtrace, I think bdrv_close should be taking the AioContext
+> lock instead of blockdev_close_all_bdrv_states.
 
-ah, yes, understand. Will think how to properly handle it.
+Conversely, that would mean that calling bdrv_unref() with the
+AioContext lock held is a bug (because close callbacks can involve
+AIO_WAIT_WHILE()). I'm not sure if that's very practical.
 
->
->>>> +    }
->>>> +
->>>> +    BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
->>>> +    ret = bdrv_co_preadv(bs->file,
->>>> +                         file_cluster_offset + offset_in_cluster,
->>>> +                         bytes, &hd_qiov, 0);
->>>> +    if (ret < 0) {
->>>> +        goto out;
->>>> +    }
->>>> +
->>>> +    if (bs->encrypted) {
->>>> +        assert(s->crypto);
->>>> +        assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
->>>> +        assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
->>>> +        if (qcrypto_block_decrypt(s->crypto,
->>>> +                                  (s->crypt_physical_offset ?
->>>> +                                   file_cluster_offset + offset_in_cluster :
->>>> +                                   offset),
->>>> +                                  crypt_buf,
->>>> +                                  bytes,
->>>> +                                  NULL) < 0) {
->>> What's the reason against decrypting this in-place in qiov so we could
->>> save the bounce buffer?  We allow offsets in clusters, so why can't we
->>> just call this function once per involved I/O vector entry?
->> Isn't it unsafe to do decryption in guest buffers?
-> I don't know.  Why would it be?  Because...
->
->>> Max
->>>
->>>> +            ret = -EIO;
->>>> +            goto out;
->>>> +        }
->>>> +        qemu_iovec_from_buf(qiov, qiov_offset, crypt_buf, bytes);
-> ...we're putting the decrypted content there anyway.
->
-> The only issue I see is that the guest may see encrypted content for a
-> short duration.  Hm.  Maybe we don't want that.  In which case it
-> probably has to stay as it is.
+Of course, there will probably be a lot of callers to fix either way
+after we define whether to hold the lock for bdrv_unref() or not. Either
+you need to add locking to the places where it's missing or you need to
+drop the locks in all other places.
 
-Yes, I mean exactly this thing.
+I was leaning towards requiring the lock for bdrv_unref() (and
+therefore blk_unref()).
 
->
-> Max
->
-
-
--- 
-Best regards,
-Vladimir
+Kevin
