@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g71r2-0002NB-US
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g71r6-0002Pj-Nd
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g71qz-00075N-3L
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g71r2-00078B-U5
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:34 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  1 Oct 2018 19:18:44 +0200
-Message-Id: <20181001171901.11004-7-kwolf@redhat.com>
+Date: Mon,  1 Oct 2018 19:18:45 +0200
+Message-Id: <20181001171901.11004-8-kwolf@redhat.com>
 In-Reply-To: <20181001171901.11004-1-kwolf@redhat.com>
 References: <20181001171901.11004-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 06/23] block: Allow child references on reopen
+Subject: [Qemu-devel] [PULL 07/23] block: Forbid trying to change
+ unsupported options during reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +25,98 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-In the previous patches we removed all child references from
-bs->{options,explicit_options} because keeping them is useless and
-wrong.
+The bdrv_reopen_prepare() function checks all options passed to each
+BlockDriverState (in the reopen_state->options QDict) and makes all
+necessary preparations to apply the option changes requested by the
+user.
 
-Because of this, any attempt to reopen a BlockDriverState using a
-child reference as one of its options would result in a failure,
-because bdrv_reopen_prepare() would detect that there's a new option
-(the child reference) that wasn't present in bs->options.
+Options are removed from the QDict as they are processed, so at the
+end of bdrv_reopen_prepare() only the options that can't be changed
+are left. Then a loop goes over all remaining options and verifies
+that the old and new values are identical, returning an error if
+they're not.
 
-But passing child references on reopen can be useful. It's a way to
-specify a BDS's child without having to pass recursively all of the
-child's options, and if the reference points to a different BDS then
-this can allow us to replace the child.
+The problem is that at the moment there are options that are removed
+from the QDict although they can't be changed. The consequence of this
+is any modification to any of those options is silently ignored:
 
-However, replacing the child is something that needs to be implemented
-case by case and only when it makes sense. For now, this patch allows
-passing a child reference as long as it points to the current child of
-the BlockDriverState.
+   (qemu) qemu-io virtio0 "reopen -o discard=on"
 
-It's also important to remember that, as a consequence of the
-previous patches, this child reference will be removed from
-bs->{options,explicit_options} after the reopening has been completed.
+This happens when all options from bdrv_runtime_opts are removed
+from the QDict but then only a few of them are processed. Since
+it's especially important that "node-name" and "driver" are not
+changed, the code puts them back into the QDict so they are checked
+at the end of the function. Instead of putting only those two options
+back into the QDict, this patch puts all unprocessed options using
+qemu_opts_to_qdict().
+
+update_flags_from_options() also needs to be modified to prevent
+BDRV_OPT_CACHE_NO_FLUSH, BDRV_OPT_CACHE_DIRECT and BDRV_OPT_READ_ONLY
+from going back to the QDict.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ block.c | 22 +++++++---------------
+ 1 file changed, 7 insertions(+), 15 deletions(-)
 
 diff --git a/block.c b/block.c
-index 98aca56785..ff1aded4b8 100644
+index ff1aded4b8..e36ae3e8d1 100644
 --- a/block.c
 +++ b/block.c
-@@ -3242,6 +3242,24 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
-             QObject *new = entry->value;
-             QObject *old = qdict_get(reopen_state->bs->options, entry->key);
+@@ -1094,19 +1094,19 @@ static void update_flags_from_options(int *flags, QemuOpts *opts)
+     *flags &= ~BDRV_O_CACHE_MASK;
  
-+            /* Allow child references (child_name=node_name) as long as they
-+             * point to the current child (i.e. everything stays the same). */
-+            if (qobject_type(new) == QTYPE_QSTRING) {
-+                BdrvChild *child;
-+                QLIST_FOREACH(child, &reopen_state->bs->children, next) {
-+                    if (!strcmp(child->name, entry->key)) {
-+                        break;
-+                    }
-+                }
-+
-+                if (child) {
-+                    const char *str = qobject_get_try_str(new);
-+                    if (!strcmp(child->bs->node_name, str)) {
-+                        continue; /* Found child with this name, skip option */
-+                    }
-+                }
-+            }
-+
-             /*
-              * TODO: When using -drive to specify blockdev options, all values
-              * will be strings; however, when using -blockdev, blockdev-add or
+     assert(qemu_opt_find(opts, BDRV_OPT_CACHE_NO_FLUSH));
+-    if (qemu_opt_get_bool(opts, BDRV_OPT_CACHE_NO_FLUSH, false)) {
++    if (qemu_opt_get_bool_del(opts, BDRV_OPT_CACHE_NO_FLUSH, false)) {
+         *flags |= BDRV_O_NO_FLUSH;
+     }
+ 
+     assert(qemu_opt_find(opts, BDRV_OPT_CACHE_DIRECT));
+-    if (qemu_opt_get_bool(opts, BDRV_OPT_CACHE_DIRECT, false)) {
++    if (qemu_opt_get_bool_del(opts, BDRV_OPT_CACHE_DIRECT, false)) {
+         *flags |= BDRV_O_NOCACHE;
+     }
+ 
+     *flags &= ~BDRV_O_RDWR;
+ 
+     assert(qemu_opt_find(opts, BDRV_OPT_READ_ONLY));
+-    if (!qemu_opt_get_bool(opts, BDRV_OPT_READ_ONLY, false)) {
++    if (!qemu_opt_get_bool_del(opts, BDRV_OPT_READ_ONLY, false)) {
+         *flags |= BDRV_O_RDWR;
+     }
+ 
+@@ -3156,7 +3156,6 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+     BlockDriver *drv;
+     QemuOpts *opts;
+     QDict *orig_reopen_opts;
+-    const char *value;
+     bool read_only;
+ 
+     assert(reopen_state != NULL);
+@@ -3179,17 +3178,10 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+ 
+     update_flags_from_options(&reopen_state->flags, opts);
+ 
+-    /* node-name and driver must be unchanged. Put them back into the QDict, so
+-     * that they are checked at the end of this function. */
+-    value = qemu_opt_get(opts, "node-name");
+-    if (value) {
+-        qdict_put_str(reopen_state->options, "node-name", value);
+-    }
+-
+-    value = qemu_opt_get(opts, "driver");
+-    if (value) {
+-        qdict_put_str(reopen_state->options, "driver", value);
+-    }
++    /* All other options (including node-name and driver) must be unchanged.
++     * Put them back into the QDict, so that they are checked at the end
++     * of this function. */
++    qemu_opts_to_qdict(opts, reopen_state->options);
+ 
+     /* If we are to stay read-only, do not allow permission change
+      * to r/w. Attempting to set to r/w may fail if either BDRV_O_ALLOW_RDWR is
 -- 
 2.13.6
