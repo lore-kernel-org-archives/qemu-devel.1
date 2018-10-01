@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g6zIG-0007Jr-Uj
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:35:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1g6zK3-0007xv-4s
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g6zIF-00041d-Sp
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:35:28 -0400
-References: <20180929095454.32066-1-lbloch@janustech.com>
+	(envelope-from <eblake@redhat.com>) id 1g6zJz-0004QO-B6
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:37:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g6zJy-0004Q9-Dt
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:37:15 -0400
+References: <20180930195655.24684-1-f4bug@amsat.org>
+	<20180930195655.24684-5-f4bug@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <dd15dbb9-6aaa-ab5a-9105-8cf49e76cc27@redhat.com>
-Date: Mon, 1 Oct 2018 09:35:10 -0500
+Message-ID: <6112c155-4036-0f80-8ebf-b6ddef32d0b9@redhat.com>
+Date: Mon, 1 Oct 2018 09:37:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180929095454.32066-1-lbloch@janustech.com>
+In-Reply-To: <20180930195655.24684-5-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Fix cache-clean-interval
- documentation
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] MAINTAINERS: Voluntary to review
+ hobbyist MIPS contributions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leonid Bloch <lbloch@janustech.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: qemu-devel@nongnu.org
 
-On 9/29/18 4:54 AM, Leonid Bloch wrote:
-> Fixing cache-clean-interval documentation following the recent change to
-> a default of 600 seconds on supported plarforms (only Linux currently).
-> 
-> Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+On 9/30/18 2:56 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+In the subject line,
+s/Voluntary/Volunteer/
+
 > ---
->   docs/qcow2-cache.txt | 19 +++++++++----------
->   qapi/block-core.json |  3 ++-
->   qemu-options.hx      |  3 ++-
->   3 files changed, 13 insertions(+), 12 deletions(-)
-> 
-> diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
-> index 59358b816f..1778312e09 100644
-> --- a/docs/qcow2-cache.txt
-> +++ b/docs/qcow2-cache.txt
-> @@ -202,18 +202,17 @@ Reducing the memory usage
->   It is possible to clean unused cache entries in order to reduce the
->   memory usage during periods of low I/O activity.
->   
-> -The parameter "cache-clean-interval" defines an interval (in seconds).
-> -All cache entries that haven't been accessed during that interval are
-> -removed from memory.
-> +The parameter "cache-clean-interval" defines an interval (in seconds),
-> +affer which all the cache entries that haven't been accessed during it
+>   MAINTAINERS | 2 ++
+>   1 file changed, 2 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ce7c351afa..2708745bf7 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -188,6 +188,7 @@ F: disas/microblaze.c
+>   MIPS
+>   M: Aurelien Jarno <aurelien@aurel32.net>
+>   M: Aleksandar Markovic <amarkovic@wavecomp.com>
+> +R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>   S: Maintained
+>   F: target/mips/
+>   F: hw/mips/
+> @@ -1948,6 +1949,7 @@ F: disas/i386.c
+>  =20
+>   MIPS target
+>   M: Aurelien Jarno <aurelien@aurel32.net>
+> +R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>   S: Maintained
+>   F: tcg/mips/
+>   F: disas/mips.c
+>=20
 
-s/affer/after/
-
-Maybe s/during it/during the interval/
-
-
-> +are removed from memory. Setting this parameter to 0 disables this feature.
->   
-> -This example removes all unused cache entries every 15 minutes:
-> +The following example removes all unused cache entries every 15 minutes:
->   
->      -drive file=hd.qcow2,cache-clean-interval=900
->   
-> -If unset, the default value for this parameter is 600. Setting it to 0
-> -disables this feature.
-> +If unset, the default value for this parameter is 600 on platforms which
-> +support this functionality, and is 0 (disabled) on other platforms.
->   
-> -Note that this functionality currently relies on the MADV_DONTNEED
-> -argument for madvise() to actually free the memory. This is a
-> -Linux-specific feature, so cache-clean-interval is not supported in
-> -other systems.
-> +This functionality currently relies on the MADV_DONTNEED argument for
-> +madvise() to actually free the memory. This is a Linux-specific feature,
-> +so cache-clean-interval is not supported on other systems.
-
-Otherwise looks good.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
+--=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
