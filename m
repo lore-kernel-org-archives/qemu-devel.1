@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g70fz-0002FP-Q7
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:04:10 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g70lY-0005dZ-3c
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:09:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g70fy-0005no-5A
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:04:03 -0400
-Date: Mon, 1 Oct 2018 18:03:48 +0200
+	(envelope-from <kwolf@redhat.com>) id 1g70lX-0001tJ-6J
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:09:48 -0400
+Date: Mon, 1 Oct 2018 18:09:37 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181001160348.GB4445@localhost.localdomain>
-References: <20181001143218.17069-1-kwolf@redhat.com>
-	<9a0e30f2-90d0-11ba-b5db-3e2df18590cc@redhat.com>
+Message-ID: <20181001160937.GC4445@localhost.localdomain>
+References: <20180925151541.18932-1-mreitz@redhat.com>
+	<CAFEAcA-3bf02knEbNgq5ouFVnJDL6a9HqAvCo3Z4vaWYu-8yUw@mail.gmail.com>
+	<CAFEAcA9cKPNKs_eR638eEqbAVW9sLxwHdnKVb-P-6hXJ3Kwyig@mail.gmail.com>
+	<CAFEAcA95G4Nc4+Av0JNeh2NHa5NZR1wyos28V9xhQZn4v0WAWA@mail.gmail.com>
+	<20181001141430.GA4445@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9a0e30f2-90d0-11ba-b5db-3e2df18590cc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] test-replication: Lock AioContext around
- blk_unref()
+In-Reply-To: <20181001141430.GA4445@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PULL 00/42] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com
 
-Am 01.10.2018 um 17:40 hat Paolo Bonzini geschrieben:
-> On 01/10/2018 16:32, Kevin Wolf wrote:
-> > Recently, the test case has started failing because some job related
-> > functions want to drop the AioContext lock even though it hasn't been
-> > taken:
+Am 01.10.2018 um 16:14 hat Kevin Wolf geschrieben:
+> Am 01.10.2018 um 15:03 hat Peter Maydell geschrieben:
+> > On 28 September 2018 at 15:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > I'm finding that test-bdrv-drain hangs intermittently on my OSX host.
 > > 
-> >     (gdb) bt
-> >     #0  0x00007f51c067c9fb in raise () from /lib64/libc.so.6
-> >     #1  0x00007f51c067e77d in abort () from /lib64/libc.so.6
-> >     #2  0x0000558c9d5dde7b in error_exit (err=<optimized out>, msg=msg@entry=0x558c9d6fe120 <__func__.18373> "qemu_mutex_unlock_impl") at util/qemu-thread-posix.c:36
-> >     #3  0x0000558c9d6b5263 in qemu_mutex_unlock_impl (mutex=mutex@entry=0x558c9f3999a0, file=file@entry=0x558c9d6fd36f "util/async.c", line=line@entry=516) at util/qemu-thread-posix.c:96
-> >     #4  0x0000558c9d6b0565 in aio_context_release (ctx=ctx@entry=0x558c9f399940) at util/async.c:516
-> >     #5  0x0000558c9d5eb3da in job_completed_txn_abort (job=0x558c9f68e640) at job.c:738
-> >     #6  0x0000558c9d5eb227 in job_finish_sync (job=0x558c9f68e640, finish=finish@entry=0x558c9d5eb8d0 <job_cancel_err>, errp=errp@entry=0x0) at job.c:986
-> >     #7  0x0000558c9d5eb8ee in job_cancel_sync (job=<optimized out>) at job.c:941
-> >     #8  0x0000558c9d64d853 in replication_close (bs=<optimized out>) at block/replication.c:148
-> >     #9  0x0000558c9d5e5c9f in bdrv_close (bs=0x558c9f41b020) at block.c:3420
-> >     #10 bdrv_delete (bs=0x558c9f41b020) at block.c:3629
-> >     #11 bdrv_unref (bs=0x558c9f41b020) at block.c:4685
-> >     #12 0x0000558c9d62a3f3 in blk_remove_bs (blk=blk@entry=0x558c9f42a7c0) at block/block-backend.c:783
-> >     #13 0x0000558c9d62a667 in blk_delete (blk=0x558c9f42a7c0) at block/block-backend.c:402
-> >     #14 blk_unref (blk=0x558c9f42a7c0) at block/block-backend.c:457
-> >     #15 0x0000558c9d5dfcea in test_secondary_stop () at tests/test-replication.c:478
-> >     #16 0x00007f51c1f13178 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-> >     #17 0x00007f51c1f1337b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-> >     #18 0x00007f51c1f1337b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-> >     #19 0x00007f51c1f13552 in g_test_run_suite () from /lib64/libglib-2.0.so.0
-> >     #20 0x00007f51c1f13571 in g_test_run () from /lib64/libglib-2.0.so.0
-> >     #21 0x0000558c9d5de31f in main (argc=<optimized out>, argv=<optimized out>) at tests/test-replication.c:581
-> > 
-> > It is yet unclear whether this should really be considered a bug in the
-> > test case or whether blk_unref() should work for callers that haven't
-> > taken the AioContext lock, but in order to fix the build tests quickly,
-> > just take the AioContext lock around blk_unref().
+> > Ping? Between this and test-replication I'm finding that my
+> > parallel build tests for merges are failing about 50% of the
+> > time :-(
 > 
-> Given the backtrace, I think bdrv_close should be taking the AioContext
-> lock instead of blockdev_close_all_bdrv_states.
+> Sorry, there wasn't much more than a weekend between your report and
+> now.
+> 
+> For the replication one, I think we can just take the AioContext lock in
+> the test case while we decide how the API should really be used. I'll
+> prepare a fix for that (and hopefully I'll be able to reproduce the
+> problem reliably enough to verify the fix).
+> 
+> Max said he could reproduce some hang in test-bdrv-drain (though we
+> don't know if this has anything to do with your OS X hang, which looked
+> rather odd) and would look into it, but I don't think we know the
+> problem yet. I'll try to reproduce that one after fixing the replication
+> test.
 
-Conversely, that would mean that calling bdrv_unref() with the
-AioContext lock held is a bug (because close callbacks can involve
-AIO_WAIT_WHILE()). I'm not sure if that's very practical.
+So I sent two patches for the two test cases that should fix the bugs
+that made the tests fail relatively frequently. I can still reproduce
+another hang, which is a bit mysterious to me:
 
-Of course, there will probably be a lot of callers to fix either way
-after we define whether to hold the lock for bdrv_unref() or not. Either
-you need to add locking to the places where it's missing or you need to
-drop the locks in all other places.
+Thread 2 (Thread 3321.3818):
+#0  0x00007f2ebbdcc4e9 in syscall () from /lib64/libc.so.6
+#1  0x00005594d095690b in qemu_futex_wait (val=<optimized out>, f=<optimized out>) at /home/kwolf/source/qemu/include/qemu/futex.h:29
+#2  qemu_event_wait (ev=ev@entry=0x5594d0bff228 <rcu_call_ready_event>) at util/qemu-thread-posix.c:442
+#3  0x00005594d0965f58 in call_rcu_thread (opaque=<optimized out>) at util/rcu.c:261
+#4  0x00007f2ebc09d36d in start_thread () from /lib64/libpthread.so.0
+#5  0x00007f2ebbdd1b4f in clone () from /lib64/libc.so.6
 
-I was leaning towards requiring the lock for bdrv_unref() (and
-therefore blk_unref()).
+Thread 1 (Thread 3321.3321):
+#0  0x00007f2ebc09e89d in pthread_join () from /lib64/libpthread.so.0
+#1  0x00005594d0956b6f in qemu_thread_join (thread=thread@entry=0x5594d16bd0b8) at util/qemu-thread-posix.c:565
+#2  0x00005594d091f4d9 in iothread_join (iothread=0x5594d16bd0b0) at tests/iothread.c:62
+#3  0x00005594d08806cc in test_iothread_common (drain_type=BDRV_DRAIN_ALL, drain_thread=<optimized out>) at tests/test-bdrv-drain.c:763
+#4  0x00007f2ebd58e178 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+#5  0x00007f2ebd58e37b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+#6  0x00007f2ebd58e37b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
+#7  0x00007f2ebd58e51b in g_test_run_suite () from /lib64/libglib-2.0.so.0
+#8  0x00007f2ebd58e571 in g_test_run () from /lib64/libglib-2.0.so.0
+#9  0x00005594d087a534 in main (argc=<optimized out>, argv=<optimized out>) at tests/test-bdrv-drain.c:1606
+
+This pthread_join() is waiting for a thread that doesn't even exist any
+more. I caught the bug in rr and am clearly seeing how the iothread is
+notified and terminates. But pthread_join() just doesn't return.
 
 Kevin
