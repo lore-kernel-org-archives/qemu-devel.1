@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1g6vdE-0004ln-BS
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 06:40:53 -0400
+	(envelope-from <kraxel@redhat.com>) id 1g6vew-00069a-Sn
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 06:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1g6vdB-00081B-7J
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 06:40:52 -0400
-References: <20180926094219.20322-1-david@redhat.com>
-	<20180926094219.20322-9-david@redhat.com>
-	<df729c85-6fa1-93d7-c91e-7d3738fbf38f@redhat.com>
-	<83585994-587f-8281-3540-efa77ea8df2c@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <87c04fe9-7942-9153-d193-d3c968d42aa6@redhat.com>
-Date: Mon, 1 Oct 2018 12:40:39 +0200
+	(envelope-from <kraxel@redhat.com>) id 1g6vet-0000hF-KJ
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 06:42:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55672)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g6vet-0000gs-EI
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 06:42:35 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BD7BF307C719
+	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 10:42:34 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon,  1 Oct 2018 12:42:27 +0200
+Message-Id: <20181001104230.17779-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <83585994-587f-8281-3540-efa77ea8df2c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 08/24] memory-device: document
- MemoryDeviceClass
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/3] Ui 20181001 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Pankaj Gupta <pagupta@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi David,
+The following changes since commit 07f426c35eddd79388a23d11cb278600d7e383=
+1d:
 
-On 10/1/18 10:13 AM, David Hildenbrand wrote:
-> On 30/09/2018 16:43, Auger Eric wrote:
->> Hi David,
->>
->> On 9/26/18 11:42 AM, David Hildenbrand wrote:
->>> Document the functions and when to not expect errors.
->>>
->>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>
->>> ---
->>>  include/hw/mem/memory-device.h | 16 ++++++++++++++++
->>>  1 file changed, 16 insertions(+)
->>>
->>> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
->>> index f02b229837..1d15cfc357 100644
->>> --- a/include/hw/mem/memory-device.h
->>> +++ b/include/hw/mem/memory-device.h
->>> @@ -29,9 +29,25 @@ typedef struct MemoryDeviceState {
->>>      Object parent_obj;
->>>  } MemoryDeviceState;
->>>  
->>> +/**> + * MemoryDeviceClass:
->>> + * @get_addr: The address of the @md in guest physical memory. "0" means that
->>> + * no address has been specified by the user and that no address has been
->>> + * assigned yet.
->>> + * @get_plugged_size: The amount of memory provided by this @md currently
->>> + * usable ("plugged") by the guest. This is helpful for devices that
->>> + * dynamically manage the amount of memory accessible by the guest via
->>> + * the reserved memory region. For most devices, this corresponds to the
->>> + * size of the memory region.
->>> + * @get_region_size: The size of the memory region of the @md that's mapped
->>> + * in guest physical memory at @get_addr.
->>> + * @fill_device_info: Translate current @md state into #MemoryDeviceInfo.
->> I think it may be relevant to document whether all those functions are
->> mandated or if any are optional.
-> 
-> All are mandatory if not otherwise specified (right now none) ....
-> 
->>
->> With respect to the form, you could get inspired of
->> include/exec/memory.h (see for instance IOMMUMemoryRegionClass doc)
->>
-> 
-> ... which seems to be the same approach used in IOMMUMemoryRegionClass.
-> 
-> While I am a friend of documentation,  I prefer to keep it short where
-> possible. (e.g. obvious things like "@md: the MemoryDeviceState", I
-> don't consider useful)
-agreed ;-)
-> 
-> I am using right now a similar style as in include/hw/mem/pc-dimm.h and
-> include/exec/memory.h.
-> 
-> BTW, is there a coding style about such things? (where, how to document
-> classes, structs, fuucntions and parameters)
-I am not aware of any. IOMMUMemoryRegionClass doc was written latterly
-by Peter so I would be tempted to think this is a good model ;-)
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180926' into =
+staging (2018-09-28 18:56:09 +0100)
 
-Thanks
+are available in the git repository at:
 
-Eric
-> 
-> Thanks!
-> 
-> 
+  git://git.kraxel.org/qemu tags/ui-20181001-pull-request
+
+for you to fetch changes up to e8b1386ea1719525a1a92df03377764703fe8c64:
+
+  gtk: add zoom-to-fit to gtk options. (2018-10-01 11:29:03 +0200)
+
+----------------------------------------------------------------
+ui: some small fixes/improvements.
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (2):
+  sdl2: show console #0 unconditionally
+  gtk: add zoom-to-fit to gtk options.
+
+Marc-Andr=C3=A9 Lureau (1):
+  vnc: call sasl_server_init() only when required
+
+ ui/gtk.c     |  8 ++++++++
+ ui/sdl2.c    |  3 ++-
+ ui/vnc.c     | 15 ++++++++-------
+ qapi/ui.json | 10 +++++++++-
+ 4 files changed, 27 insertions(+), 9 deletions(-)
+
+--=20
+2.9.3
