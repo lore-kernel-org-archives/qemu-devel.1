@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g70rY-0002Ze-7b
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:16:01 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g70ty-0003ji-Iu
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g70rV-0003aK-0S
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:16:00 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42541)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g70rU-0003YF-PK
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:15:56 -0400
-Received: by mail-wr1-f67.google.com with SMTP id b11-v6so14620576wru.9
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 09:15:56 -0700 (PDT)
-References: <20181001115704.701-1-luc.michel@greensocs.com>
-	<20181001115704.701-2-luc.michel@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <df7a7355-e15e-3681-d093-60412b54737b@redhat.com>
-Date: Mon, 1 Oct 2018 18:15:53 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g70tu-0007yW-QV
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 12:18:29 -0400
+References: <20180807174311.32454-1-vsementsov@virtuozzo.com>
+	<20180807174311.32454-5-vsementsov@virtuozzo.com>
+	<08a610aa-9c78-1c83-5e48-b93080aac87b@redhat.com>
+	<cc4cd44f-5628-9a02-0b97-2bf46fa72d58@virtuozzo.com>
+	<a2dc0710-093e-f6ee-8525-c015262eb692@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <7c98541b-c4f7-c678-4e92-45db9f19b259@virtuozzo.com>
+Date: Mon, 1 Oct 2018 19:17:55 +0300
 MIME-Version: 1.0
-In-Reply-To: <20181001115704.701-2-luc.michel@greensocs.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a2dc0710-093e-f6ee-8525-c015262eb692@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/15] gdbstub: introduce GDB processes
+Subject: Re: [Qemu-devel] [PATCH 4/7] qcow2: async scheme for qcow2_co_preadv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,203 +27,355 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org
 
-Hi Luc,
+01.10.2018 18:49, Max Reitz wrote:
+> On 01.10.18 17:33, Vladimir Sementsov-Ogievskiy wrote:
+>> 27.09.2018 21:35, Max Reitz wrote:
+>>> On 07.08.18 19:43, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Start several async requests instead of read chunk by chunk.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
+>>>>  =C2=A0 block/qcow2.c | 208
+>>>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>>>  =C2=A0 1 file changed, 204 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>>> index 5e7f2ee318..a0df8d4e50 100644
+>>>> --- a/block/qcow2.c
+>>>> +++ b/block/qcow2.c
+>>>> @@ -1869,6 +1869,197 @@ out:
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
+>>>>  =C2=A0 }
+>>>>  =C2=A0 +typedef struct Qcow2WorkerTask {
+>>>> +=C2=A0=C2=A0=C2=A0 uint64_t file_cluster_offset;
+>>>> +=C2=A0=C2=A0=C2=A0 uint64_t offset;
+>>>> +=C2=A0=C2=A0=C2=A0 uint64_t bytes;
+>>>> +=C2=A0=C2=A0=C2=A0 uint64_t bytes_done;
+>>>> +} Qcow2WorkerTask;
+>>> Why don't you make this a union of request-specific structs?
+>> ok, will try
+>>
+>>>> +
+>>>> +typedef int (*Qcow2DoWorkFunc)(BlockDriverState *bs, QEMUIOVector
+>>>> *qiov,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Qcow2WorkerTask *task);
+>>>> +
+>>>> +typedef struct Qcow2RWState {
+>>>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *bs;
+>>>> +=C2=A0=C2=A0=C2=A0 QEMUIOVector *qiov;
+>>>> +=C2=A0=C2=A0=C2=A0 uint64_t bytes;
+>>> Maybe make it total_bytes so it doesn't conflict with the value in
+>>> Qcow2WorkerTask?
+>> ok
+>>
+>>>> +=C2=A0=C2=A0=C2=A0 int ret;
+>>>> +=C2=A0=C2=A0=C2=A0 bool waiting_one;
+>>>> +=C2=A0=C2=A0=C2=A0 bool waiting_all;
+>>>> +=C2=A0=C2=A0=C2=A0 bool finalize;
+>>>> +=C2=A0=C2=A0=C2=A0 Coroutine *co;
+>>>> +=C2=A0=C2=A0=C2=A0 QSIMPLEQ_HEAD(, Qcow2Worker) free_workers;
+>>>> +=C2=A0=C2=A0=C2=A0 QSIMPLEQ_HEAD(, Qcow2Worker) busy_workers;
+>>>> +=C2=A0=C2=A0=C2=A0 int online_workers;
+>>>> +=C2=A0=C2=A0=C2=A0 Qcow2DoWorkFunc do_work_func;
+>>>> +} Qcow2RWState;
+>>>> +
+>>>> +typedef struct Qcow2Worker {
+>>>> +=C2=A0=C2=A0=C2=A0 Qcow2RWState *rws;
+>>>> +=C2=A0=C2=A0=C2=A0 Coroutine *co;
+>>>> +=C2=A0=C2=A0=C2=A0 Qcow2WorkerTask task;
+>>>> +=C2=A0=C2=A0=C2=A0 bool busy;
+>>>> +=C2=A0=C2=A0=C2=A0 QSIMPLEQ_ENTRY(Qcow2Worker) entry;
+>>>> +} Qcow2Worker;
+>>>> +#define QCOW2_MAX_WORKERS 64
+>>> That's really a bit hidden here.=C2=A0 I think it should go into the he=
+ader.
+>>>
+>>> Also I'm not quite sure about the number.=C2=A0 In other places we've a=
+lways
+>>> used 16.
+>>>
+>>> (With the encryption code always allocating a new bounce buffer, this
+>>> can mean quite a bit of memory usage.)
+>> No doubts.
+>>
+>>>> +
+>>>> +static coroutine_fn void qcow2_rw_worker(void *opaque);
+>>>> +static Qcow2Worker *qcow2_new_worker(Qcow2RWState *rws)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 Qcow2Worker *w =3D g_new0(Qcow2Worker, 1);
+>>>> +=C2=A0=C2=A0=C2=A0 w->rws =3D rws;
+>>>> +=C2=A0=C2=A0=C2=A0 w->co =3D qemu_coroutine_create(qcow2_rw_worker, w=
+);
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 return w;
+>>>> +}
+>>>> +
+>>>> +static void qcow2_free_worker(Qcow2Worker *w)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 g_free(w);
+>>>> +}
+>>>> +
+>>>> +static coroutine_fn void qcow2_rw_worker(void *opaque)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 Qcow2Worker *w =3D opaque;
+>>>> +=C2=A0=C2=A0=C2=A0 Qcow2RWState *rws =3D w->rws;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 rws->online_workers++;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 while (!rws->finalize) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D rws->do_work_f=
+unc(rws->bs, rws->qiov, &w->task);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0 && rws->ret =
+=3D=3D 0) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rw=
+s->ret =3D ret;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (rws->waiting_all || rw=
+s->ret < 0) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 br=
+eak;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 w->busy =3D false;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_REMOVE(&rws->busy=
+_workers, w, Qcow2Worker, entry);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_INSERT_TAIL(&rws-=
+>free_workers, w, entry);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (rws->waiting_one) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rw=
+s->waiting_one =3D false;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
+ we must unset it here, to prevent queuing rws->co in
+>>>> several
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 * workers (it may happen if other worker already waits
+>>>> us on mutex,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 * so it will be entered after our yield and before
+>>>> rws->co enter)
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 *
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 * TODO: rethink this comment, as here (and in other
+>>>> places in the
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 * file) we moved from qemu_coroutine_add_next to
+>>>> aio_co_wake.
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 */
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ai=
+o_co_wake(rws->co);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_coroutine_yield();
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 if (w->busy) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 w->busy =3D false;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_REMOVE(&rws->busy=
+_workers, w, Qcow2Worker, entry);
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +=C2=A0=C2=A0=C2=A0 qcow2_free_worker(w);
+>>>> +=C2=A0=C2=A0=C2=A0 rws->online_workers--;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 if (rws->waiting_all && rws->online_workers =3D=3D=
+ 0) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aio_co_wake(rws->co);
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +}
+>>>> +
+>>>> +static coroutine_fn void qcow2_rws_add_task(Qcow2RWState *rws,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t
+>>>> file_cluster_offset,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t offset,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t bytes,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t bytes_done)
+>>> I'd propose just taking a const Qcow2WorkerTask * here.=C2=A0 (Makes ev=
+en
+>>> more sense if you make it a union.)
+>> ok, I'll try this way
+>>
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 Qcow2Worker *w;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 assert(rws->co =3D=3D qemu_coroutine_self());
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 if (bytes_done =3D=3D 0 && bytes =3D=3D rws->bytes=
+) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Qcow2WorkerTask task =3D {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .f=
+ile_cluster_offset =3D file_cluster_offset,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .o=
+ffset =3D offset,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .b=
+ytes =3D bytes,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .b=
+ytes_done =3D bytes_done
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rws->ret =3D rws->do_work_=
+func(rws->bs, rws->qiov, &task);
+>>> (If so, you'd just pass the pointer along here)
+>>>
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>> I like this fast path, but I think it deserves a small comment.=C2=A0 (=
+That
+>>> is a fast path and bypasses the whole worker infrastructure.)
+>>>
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 if (!QSIMPLEQ_EMPTY(&rws->free_workers)) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 w =3D QSIMPLEQ_FIRST(&rws-=
+>free_workers);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_REMOVE_HEAD(&rws-=
+>free_workers, entry);
+>>>> +=C2=A0=C2=A0=C2=A0 } else if (rws->online_workers < QCOW2_MAX_WORKERS=
+) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 w =3D qcow2_new_worker(rws=
+);
+>>>> +=C2=A0=C2=A0=C2=A0 } else {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rws->waiting_one =3D true;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_coroutine_yield();
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(!rws->waiting_one);=
+ /* already unset by worker */
+>>> Sometimes I hate coroutines.=C2=A0 OK.=C2=A0 So, how does the yield ens=
+ure that
+>>> any worker is scheduled?=C2=A0 Doesn't yield just give control to the p=
+arent?
+>> hm. I don't follow. All workers are busy - we sure, because there no
+>> free workers,
+>> and we can't create one more, second condition isn't satisfied too.
+>> So, we give control to the parent. And only worker can wake us up.
+> Ah, I see.  And then something at the bottom just continues to ppoll()
+> or whatever.
+>
+>>> Right now I think it would be clearer to me if you'd just wake all busy
+>>> coroutines (looping over them) until one has settled.
+>> but all workers are busy, we should not touch them (they may be yielded
+>> in io operation)..
+> I would have assumed that if they are yielded in an I/O operation, they
+> could handle spurious wakeups.  But I'm very likely wrong.
 
-On 01/10/2018 13:56, Luc Michel wrote:
-> Add a structure GDBProcess that represent processes from the GDB
-> semantic point of view.
-> 
-> CPUs can be split into different processes, by grouping them under a QOM
-> container named after the GDB_CPU_GROUP_NAME macro (`gdb-group[*]').
-> Each occurrence of such a container implies the existence of the
-> corresponding process in the GDB stub. The gdb_cpu_group_container_get()
-> function can be used to create a new container.
-> 
-> When no such container are found, all the CPUs are put in a unique GDB
-> process (create_unique_process()). This is also the case when compiled
-> in user mode, where multi-processes do not make much sense for now.
-> 
-> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-> ---
->  include/exec/gdbstub.h |  8 +++++
->  gdbstub.c              | 67 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 75 insertions(+)
-> 
-> diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-> index 08363969c1..a3e4159bf4 100644
-> --- a/include/exec/gdbstub.h
-> +++ b/include/exec/gdbstub.h
-> @@ -1,8 +1,10 @@
->  #ifndef GDBSTUB_H
->  #define GDBSTUB_H
->  
-> +#include "qom/object.h"
-> +
->  #define DEFAULT_GDBSTUB_PORT "1234"
->  
->  /* GDB breakpoint/watchpoint types */
->  #define GDB_BREAKPOINT_SW        0
->  #define GDB_BREAKPOINT_HW        1
-> @@ -129,6 +131,12 @@ void gdbserver_cleanup(void);
->  extern bool gdb_has_xml;
->  
->  /* in gdbstub-xml.c, generated by scripts/feature_to_c.sh */
->  extern const char *const xml_builtin[][2];
->  
-> +#define GDB_CPU_GROUP_NAME  "gdb-group"
-> +
-> +static inline Object *gdb_cpu_group_container_get(Object *parent)
-> +{
-> +    return container_get(parent, "/" GDB_CPU_GROUP_NAME "[*]");
-> +}
->  #endif
-> diff --git a/gdbstub.c b/gdbstub.c
-> index d6ab95006c..5c86218f49 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -295,10 +295,17 @@ typedef struct GDBRegisterState {
->      gdb_reg_cb set_reg;
->      const char *xml;
->      struct GDBRegisterState *next;
->  } GDBRegisterState;
->  
-> +typedef struct GDBProcess {
-> +    uint32_t pid;
-> +    bool attached;
-> +
-> +    char target_xml[1024];
+Hm, as I understand they don't. At least laio_co_submit (and therefore=20
+file-posix _co_ rw operations) don't support this, they'll just return=20
+EINPROGRESS, and at some point, real aio operation will complete and=20
+enter the same coroutine which may be already finished or yield at=20
+another point.
 
-I'd add this field in the patch #7 "support to Xfer:features:read:"
-where you start using it.
+I know only co_aio_sleep_ns(), who support third-party enters, it just=20
+removes timer on wake up after yield.
 
-> +} GDBProcess;
-> +
->  enum RSState {
->      RS_INACTIVE,
->      RS_IDLE,
->      RS_GETLINE,
->      RS_GETLINE_ESC,
-> @@ -323,10 +330,13 @@ typedef struct GDBState {
->      int running_state;
->  #else
->      CharBackend chr;
->      Chardev *mon_chr;
->  #endif
-> +    bool multiprocess;
-> +    GDBProcess *processes;
-> +    int process_num;
->      char syscall_buf[256];
->      gdb_syscall_complete_cb current_syscall_cb;
->  } GDBState;
->  
->  /* By default use no IRQs and no timers while single stepping so as to
-> @@ -1750,10 +1760,24 @@ void gdb_exit(CPUArchState *env, int code)
->  #ifndef CONFIG_USER_ONLY
->    qemu_chr_fe_deinit(&s->chr, true);
->  #endif
->  }
->  
-> +/*
-> + * Create a unique process containing all the CPUs.
-> + */
-> +static void create_unique_process(GDBState *s)
-> +{
-> +    GDBProcess *process;
-> +
-> +    s->processes = g_malloc0(sizeof(GDBProcess));
-> +    s->process_num = 1;
-> +    process = &s->processes[0];
-> +
-> +    process->pid = 1;
-> +}
-> +
->  #ifdef CONFIG_USER_ONLY
->  int
->  gdb_handlesig(CPUState *cpu, int sig)
->  {
->      GDBState *s;
-> @@ -1847,10 +1871,11 @@ static bool gdb_accept(void)
->      }
->  
->      s = g_malloc0(sizeof(GDBState));
->      s->c_cpu = first_cpu;
->      s->g_cpu = first_cpu;
-> +    create_unique_process(s);
->      s->fd = fd;
->      gdb_has_xml = false;
->  
->      gdbserver_state = s;
->      return true;
-> @@ -2003,10 +2028,48 @@ static const TypeInfo char_gdb_type_info = {
->      .name = TYPE_CHARDEV_GDB,
->      .parent = TYPE_CHARDEV,
->      .class_init = char_gdb_class_init,
->  };
->  
-> +static void create_processes(GDBState *s)
-> +{
-> +    Object *container;
-> +    int i = 0;
-> +    char process_str[16];
-> +
-> +    container = object_resolve_path(GDB_CPU_GROUP_NAME "[0]", NULL);
-> +
-> +    while (container) {
-> +        s->processes = g_renew(GDBProcess, s->processes, i + 1);
-> +
-> +        GDBProcess *process = &s->processes[i];
-> +
-> +        /* GDB process IDs -1 and 0 are reserved */
-> +        process->pid = i + 1;
-> +        process->attached = false;
-> +        process->target_xml[0] = '\0';
-> +
-> +        i++;
-> +        snprintf(process_str, sizeof(process_str), GDB_CPU_GROUP_NAME "[%d]", i);
-> +        container = object_resolve_path(process_str, NULL);
-> +    }
-> +
-> +    if (!s->processes) {
-> +        /* No CPU group specified by the machine */
-> +        create_unique_process(s);
-> +    } else {
-> +        s->process_num = i;
-> +    }
-> +}
-> +
-> +static void cleanup_processes(GDBState *s)
-> +{
-> +    g_free(s->processes);
-> +    s->process_num = 0;
-> +    s->processes = NULL;
-> +}
-> +
->  int gdbserver_start(const char *device)
->  {
->      trace_gdbstub_op_start(device);
->  
->      GDBState *s;
-> @@ -2055,15 +2118,19 @@ int gdbserver_start(const char *device)
->                                     NULL, &error_abort);
->          monitor_init(mon_chr, 0);
->      } else {
->          qemu_chr_fe_deinit(&s->chr, true);
->          mon_chr = s->mon_chr;
-> +        cleanup_processes(s);
->          memset(s, 0, sizeof(GDBState));
->          s->mon_chr = mon_chr;
->      }
->      s->c_cpu = first_cpu;
->      s->g_cpu = first_cpu;
-> +
-> +    create_processes(s);
-> +
->      if (chr) {
->          qemu_chr_fe_init(&s->chr, chr, &error_abort);
->          qemu_chr_fe_set_handlers(&s->chr, gdb_chr_can_receive, gdb_chr_receive,
->                                   gdb_chr_event, NULL, NULL, NULL, true);
->      }
-> 
+>
+>>> This would also save you the aio_co_wake() in the worker itself, as
+>>> they'd just have to yield in all cases.
+>>>
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 w =3D QSIMPLEQ_FIRST(&rws-=
+>free_workers);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_REMOVE_HEAD(&rws-=
+>free_workers, entry);
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +=C2=A0=C2=A0=C2=A0 w->busy =3D true;
+>>>> +=C2=A0=C2=A0=C2=A0 QSIMPLEQ_INSERT_TAIL(&rws->busy_workers, w, entry)=
+;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 w->task.file_cluster_offset =3D file_cluster_offse=
+t;
+>>>> +=C2=A0=C2=A0=C2=A0 w->task.offset =3D offset;
+>>>> +=C2=A0=C2=A0=C2=A0 w->task.bytes =3D bytes;
+>>>> +=C2=A0=C2=A0=C2=A0 w->task.bytes_done =3D bytes_done;
+>>> (And you'd copy it with w->task =3D *task here)
+>>>
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 qemu_coroutine_enter(w->co);
+>>>> +}
+>>>> +
+>>>> +static void qcow2_init_rws(Qcow2RWState *rws, BlockDriverState *bs,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 QEMUIOVector *qiov, uint64_t bytes,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 Qcow2DoWorkFunc do_work_func)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 memset(rws, 0, sizeof(*rws));
+>>>> +=C2=A0=C2=A0=C2=A0 rws->bs =3D bs;
+>>>> +=C2=A0=C2=A0=C2=A0 rws->qiov =3D qiov;
+>>>> +=C2=A0=C2=A0=C2=A0 rws->bytes =3D bytes;
+>>>> +=C2=A0=C2=A0=C2=A0 rws->co =3D qemu_coroutine_self();
+>>>> +=C2=A0=C2=A0=C2=A0 rws->do_work_func =3D do_work_func;
+>>> Maybe you'd like to use
+>>>
+>>> *rws =3D (Qcow2RWState) {
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 .bs =3D bs,
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 ...
+>>> };
+>>>
+>>> Then you could save yourself the memset().
+>> ok
+>>
+>>>> +=C2=A0=C2=A0=C2=A0 QSIMPLEQ_INIT(&rws->free_workers);
+>>>> +=C2=A0=C2=A0=C2=A0 QSIMPLEQ_INIT(&rws->busy_workers);
+>>>> +}
+>>>> +
+>>>> +static void qcow2_finalize_rws(Qcow2RWState *rws)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 assert(rws->co =3D=3D qemu_coroutine_self());
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 /* kill waiting workers */
+>>>> +=C2=A0=C2=A0=C2=A0 rws->finalize =3D true;
+>>>> +=C2=A0=C2=A0=C2=A0 while (!QSIMPLEQ_EMPTY(&rws->free_workers)) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Qcow2Worker *w =3D QSIMPLE=
+Q_FIRST(&rws->free_workers);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_REMOVE_HEAD(&rws-=
+>free_workers, entry);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_coroutine_enter(w->co=
+);
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 /* wait others */
+>>>> +=C2=A0=C2=A0=C2=A0 if (rws->online_workers > 0) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rws->waiting_all =3D true;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_coroutine_yield();
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rws->waiting_all =3D false=
+;
+>>> Why don't you enter the busy workers here?=C2=A0 (And keep doing so unt=
+il
+>>> online_workers is 0.)=C2=A0 That way, you could save yourself the other
+>>> aio_co_wake() in qcow2_rw_worker().
+>> We shouldn't enter busy workers, as they may yielded on io operation.
+>> The operation should complete.
+> Yes.
+>
+> I think my misunderstanding was that I like to assume that everything
+> that yields checks whether I/O is done by itself, whereas in reality
+> that's probably usually done with some central polling and those
+> yielding coroutines assume they only wake up when that polling assures
+> them the I/O is done.
+>
+> So I have no objections to the control flow now.
+>
+> Max
+>
+
+
+--=20
+Best regards,
+Vladimir
