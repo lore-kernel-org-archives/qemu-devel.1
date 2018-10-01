@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g6vwZ-0002e3-Kl
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:00:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g6wS8-0002k9-Bm
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:33:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g6vwU-00039Z-KI
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:00:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41986)
+	(envelope-from <peter.maydell@linaro.org>) id 1g6wS7-000505-Lt
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:33:28 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:39884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g6vwU-00038j-Cv
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:00:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g6vwT-00043a-BS
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 11:00:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 54FB72E808D
-	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 11:00:45 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g6wS7-0004zS-AY
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 07:33:27 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id c20-v6so6105130otl.6
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 04:33:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 01 Oct 2018 10:52:46 -0000
-From: Artem Pisarenko <1795369@bugs.launchpad.net>
-Reply-To: Bug 1795369 <1795369@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153839106192.31215.12352296438682774073.malonedeb@chaenomeles.canonical.com>
-Message-Id: <153839116606.31328.6748008372676820732.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1795369] Re: Record/replay (icount rr) causes
- emulation hang or exit with error about missing events in log
+In-Reply-To: <20180927071247.25725-1-kraxel@redhat.com>
+References: <20180927071247.25725-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Oct 2018 12:33:05 +0100
+Message-ID: <CAFEAcA8fPP2ESsqTrh1cFHXVhbLwz0vKLx1TwgPRfkZbpoxnng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] Vga 20180927 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,85 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Applying recent patches from http://lists.nongnu.org/archive/html/qemu-
-devel/2018-09/msg04038.html doesn't fix any of issues.
+On 27 September 2018 at 08:12, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit c5e4e49258e9b89cb34c085a419dd9f862935c48:
+>
+>   Merge remote-tracking branch 'remotes/xanclic/tags/pull-block-2018-09-25' into staging (2018-09-25 16:47:35 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/vga-20180927-pull-request
+>
+> for you to fetch changes up to 36ffc122dcd69ab66db4afab3a13cfca46bfc323:
+>
+>   qxl: support mono cursors with inverted colors (2018-09-27 08:10:07 +0200)
+>
+> ----------------------------------------------------------------
+> vga: add edid support, qxl bugfixes.
+>
+> ----------------------------------------------------------------
 
--- =
+Applied, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1795369
-
-Title:
-  Record/replay (icount rr) causes emulation hang or exit with error
-  about missing events in log
-
-Status in QEMU:
-  New
-
-Bug description:
-  Test case description:
-
-  Guest image is Linux, which just powers off after kernel boots (instead o=
-f proceeding to user-space /init or /sbin/init).
-  Base cmdline:
-    qemu-system-x86_64 \
-      -nodefaults -nographic -machine pc,accel=3Dtcg -m 2048 -cpu qemu64 \
-      -kernel bzImage -initrd rootfs -append 'nokaslr console=3DttyS0 rdini=
-t=3D/init_poweroff' \
-      -serial SERIAL_VALUE \
-      -rtc clock=3Dvm,base=3D2000-01-01T00:00:00 \
-      -icount 1,sleep=3Doff,rr=3DRR_VALUE,rrfile=3Dicount_rr_capture.bin
-
-  Test 1.
-  When SERIAL_VALUE=3Dnone
-  Running with RR_VALUE=3Drecord completes successfully.
-  Running with RR_VALUE=3Dreplay doesn't completes. qemu process just eatin=
-g ~100% cpu and memory usage doesn't grow after some moment. I don't see wh=
-at happens because of problem no.2 (see below).
-
-  Test 2.
-  When SERIAL_VALUE=3Dstdio
-  Running with RR_VALUE=3Drecord completes successfully.
-  Running with RR_VALUE=3Dreplay causes exit with error:
-  "qemu-system-x86_64: Missing character write event in the replay log"
-
-  Tests 3,4,5...
-  SERIAL_VALUE=3Dstdio. Playing with "-rtc" clock and base suboptions, "-ic=
-ount" sleep suboptions produces non-repeatable results.
-  In most cases running with RR_VALUE=3Drecord completes successfully (but =
-may hang at very begining).
-  Running with RR_VALUE=3Dreplay with combinations of removing "-rtc base=
-=3D..." and "-icount sleep=3D..." goes better, but at different places of b=
-oot process it may either hang (as in test 1) or exit with error (as in tes=
-t 2).
-  When qemu "hangs", it may also happen differently: either it can be stopp=
-ed by Ctrl-C, or have to be killed.
-
-  =
-
-  Guest image uploaded here: https://drive.google.com/open?id=3D1SHG4HyBdcP=
-utc5Au4pyhN8z9w52et51A
-
-  QEMU built from master (commit 042938f46e1c477419d1931381fdadffaa49d45e) =
-with:
-  <SRC_ROOT>/configure --prefix=3D<INSTALL_ROOT> --target-list=3Dx86_64-sof=
-tmmu --enable-debug --disable-pie --enable-tcg --disable-tcg-interpreter --=
-enable-virtfs --disable-docs --disable-guest-agent --disable-modules --disa=
-ble-gnutls --disable-nettle --disable-gcrypt --disable-sdl --disable-curses=
- --disable-vnc --disable-vnc-sasl --disable-vnc-jpeg --disable-vnc-png --di=
-sable-cocoa --disable-xen --disable-xen-pci-passthrough --disable-brlapi --=
-disable-curl --disable-fdt --disable-bluez --disable-kvm --disable-hax --di=
-sable-hvf --disable-whpx --disable-rdma --disable-vde --disable-netmap --di=
-sable-cap-ng --disable-spice --disable-rbd --disable-libiscsi --disable-lib=
-nfs --disable-smartcard --disable-libusb --disable-live-block-migration --d=
-isable-usb-redir --disable-glusterfs --disable-tpm --disable-libssh2 --disa=
-ble-numa --disable-libxml2 --disable-opengl --disable-virglrenderer --disab=
-le-qom-cast-debug --disable-tools --disable-vxhs --disable-crypto-afalg --d=
-isable-capstone --disable-replication --disable-xfsctl --disable-seccomp --=
-disable-pvrdma --disable-libpmem
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1795369/+subscriptions
+-- PMM
