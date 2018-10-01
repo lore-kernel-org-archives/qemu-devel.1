@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g73v8-00072N-Dz
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:31:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g743e-0000bR-Fn
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:40:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g73v5-0006y2-5J
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:31:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51506)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g73v4-0006xR-Jg
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:31:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g73v0-0005Kn-P5
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 19:31:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 440652E8297
-	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 19:31:37 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1g743c-0003CE-3O
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:40:40 -0400
+References: <20180821005843.5146-1-famz@redhat.com>
+	<20180821005843.5146-2-famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <390bde1b-dc91-0189-2dde-cf4765667143@redhat.com>
+Date: Mon, 1 Oct 2018 21:40:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 01 Oct 2018 19:23:32 -0000
-From: Andreas Hasenack <andreas@canonical.com>
-Reply-To: Bug 1701449 <1701449@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149880297386.6544.11962739093038956076.malonedeb@gac.canonical.com>
-Message-Id: <153842181284.2441.3286573715200048814.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701449] Re: high memory usage when using rbd
- with client caching
+In-Reply-To: <20180821005843.5146-2-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Aghbc2xsbx34vWO4u7ShSZKZYLE83lJw3"
+Subject: Re: [Qemu-devel] [PATCH v4 1/3] file-posix: Skip effectiveless OFD
+ lock operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,95 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-Any reason we are keeping this bug and #1674481 separate? We are not
-sure?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Aghbc2xsbx34vWO4u7ShSZKZYLE83lJw3
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <390bde1b-dc91-0189-2dde-cf4765667143@redhat.com>
+Subject: Re: [PATCH v4 1/3] file-posix: Skip effectiveless OFD lock operations
+References: <20180821005843.5146-1-famz@redhat.com>
+ <20180821005843.5146-2-famz@redhat.com>
+In-Reply-To: <20180821005843.5146-2-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 21.08.18 02:58, Fam Zheng wrote:
+> If we know we've already locked the bytes, don't do it again; similarly=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701449
+> don't unlock a byte if we haven't locked it. This doesn't change the
+> behavior, but fixes a corner case explained below.
+>=20
+> Libvirt had an error handling bug that an image can get its (ownership,=
 
-Title:
-  high memory usage when using rbd with client caching
+> file mode, SELinux) permissions changed (RHBZ 1584982) by mistake behin=
+d
+> QEMU. Specifically, an image in use by Libvirt VM has:
+>=20
+>     $ ls -lhZ b.img
+>     -rw-r--r--. qemu qemu system_u:object_r:svirt_image_t:s0:c600,c690 =
+b.img
+>=20
+> Trying to attach it a second time won't work because of image locking.
+> And after the error, it becomes:
+>=20
+>     $ ls -lhZ b.img
+>     -rw-r--r--. root root system_u:object_r:virt_image_t:s0 b.img
+>=20
+> Then, we won't be able to do OFD lock operations with the existing fd.
+> In other words, the code such as in blk_detach_dev:
+>=20
+>     blk_set_perm(blk, 0, BLK_PERM_ALL, &error_abort);
+>=20
+> can abort() QEMU, out of environmental changes.
+>=20
+> This patch is an easy fix to this and the change is regardlessly
+> reasonable, so do it.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+>=20
+> ---
+>=20
+> v3: Don't misuse s->perm and s->shared_perm.
+> v2: For s =3D=3D NULL, unlock all bits. [Kevin]
+> ---
+>  block/file-posix.c | 54 +++++++++++++++++++++++++++++++++++++---------=
 
-Status in QEMU:
-  New
+>  1 file changed, 44 insertions(+), 10 deletions(-)
 
-Bug description:
-  Hi,
-  we are experiencing a quite high memory usage of a single qemu (used with=
- KVM) process when using RBD with client caching as a disk backend. We are =
-testing with 3GB memory qemu virtual machines and 128MB RBD client cache. W=
-hen running 'fio' in the virtual machine you can see that after some time t=
-he machine uses a lot more memory (RSS) on the hypervisor than she should. =
-We have seen values (in real production machines, no artificially fio tests=
-) of 250% memory overhead. I reproduced this with qemu version 2.9 as well.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-  Here the contents of our ceph.conf on the hypervisor:
-  """
-  [client]
-  rbd cache writethrough until flush =3D False
-  rbd cache max dirty =3D 100663296
-  rbd cache size =3D 134217728
-  rbd cache target dirty =3D 50331648
-  """
 
-  How to reproduce:
-  * create a virtual machine with a RBD backed disk (100GB or so)
-  * install a linux distribution on it (we are using Ubuntu)
-  * install fio (apt-get install fio)
-  * run fio multiple times with (e.g.) the following test file:
-  """
-  # This job file tries to mimic the Intel IOMeter File Server Access Patte=
-rn
-  [global]
-  description=3DEmulation of Intel IOmeter File Server Access Pattern
-  randrepeat=3D0
-  filename=3D/root/test.dat
-  # IOMeter defines the server loads as the following:
-  # iodepth=3D1     Linear
-  # iodepth=3D4     Very Light
-  # iodepth=3D8     Light
-  # iodepth=3D64    Moderate
-  # iodepth=3D256   Heavy
-  iodepth=3D8
-  size=3D80g
-  direct=3D0
-  ioengine=3Dlibaio
+--Aghbc2xsbx34vWO4u7ShSZKZYLE83lJw3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  [iometer]
-  stonewall
-  bs=3D4M
-  rw=3Drandrw
+-----BEGIN PGP SIGNATURE-----
 
-  [iometer_just_write]
-  stonewall
-  bs=3D4M
-  rw=3Dwrite
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluyeCgACgkQ9AfbAGHV
+z0CkvwgAkHeslaxzxGUYMdyE6mAFQ7DBeS5UfiI1Zsm7kZDsLWVC6dQTYvFJNHJA
+AqlEJATSRwOPVGFF4+pJ4B9O+v1k2JFAZSg4YVNk38gMWfPfC3x/ToAzZWG5jQMc
+7a7EEaRsnoN514PF24MwIZAjAaE/W9ZfYGDW+g3On21kVWUTRqpz8OgYFpbVHxwi
+PVhNCTzr/drfjIS9RauU6hhbr2e2XIJGIlmmjvBYeMR2gILjgdW9mGMXpWvJwEM9
++9tKB4xkCoVGONH18p1B3tobItn4ZLiSFLOwpyjyZB7vnMV1SpFqxvvKdmwV3fHi
+IWX77TbFdvp8IaGmbSi654QE8uU4MA==
+=wBxZ
+-----END PGP SIGNATURE-----
 
-  [iometer_just_read]
-  stonewall
-  bs=3D4M
-  rw=3Dread
-  """
-
-  You can measure the virtual machine RSS usage on the hypervisor with:
-    virsh dommemstat <machine name> | grep rss
-  or if you are not using libvirt:
-    grep RSS /proc/<PID of qemu process>/status
-
-  When switching off the RBD client cache, all is ok again, as the
-  process does not use so much memory anymore.
-
-  There is already a ticket on the ceph bug tracker for this ([1]).
-  However I can reproduce that memory behaviour only when using qemu
-  (maybe it is using librbd in a special way?). Running directly 'fio'
-  with the rbd engine does not result in that high memory usage.
-
-  [1] http://tracker.ceph.com/issues/20054
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701449/+subscriptions
+--Aghbc2xsbx34vWO4u7ShSZKZYLE83lJw3--
