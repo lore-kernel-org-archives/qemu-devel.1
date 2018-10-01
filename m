@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g6uTq-0003aY-8E
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:27:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1g6uVM-0004Pj-Fi
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:28:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g6uTm-0007ye-Oa
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:27:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41740)
+	(envelope-from <thuth@redhat.com>) id 1g6uVC-0000Fq-PC
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:28:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g6uTm-0007yO-C3
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:27:02 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1g6uV8-0000Ap-Qj
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 05:28:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B994B5F792
-	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 09:27:01 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-117-216.ams2.redhat.com
-	[10.36.117.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 92BCB2937F
-	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 09:27:00 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  1 Oct 2018 11:26:59 +0200
-Message-Id: <20181001092659.19418-1-pbonzini@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id F1AA530014C2
+	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 09:28:19 +0000 (UTC)
+References: <20180925160248.30801-1-kchamart@redhat.com>
+	<20180925160248.30801-2-kchamart@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <07ccc2c0-10e2-3456-3124-5aa2d87158f0@redhat.com>
+Date: Mon, 1 Oct 2018 11:28:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/79] Misc patches for 2018-09-30
+In-Reply-To: <20180925160248.30801-2-kchamart@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Deprecate QMP `cpu-add`
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,283 +34,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, armbru@redhat.com, ehabkost@redhat.com
 
-The following changes since commit 042938f46e1c477419d1931381fdadffaa49d4=
-5e:
+On 2018-09-25 18:02, Kashyap Chamarthy wrote:
+> The intended functionality of QMP `cpu-add` is replaced with
+> `device_add` (and `query-hotpluggable-cpus`).  So let's deprecate
+> `cpu-add`.
+> 
+> A complete example of vCPU hotplug with the recommended way (using
+> `device_add`) is provided as part of a seperate docs patch.
+> 
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> ---
+> ---
+>  qapi/misc.json       | 8 +++++++-
+>  qemu-deprecated.texi | 5 +++++
+>  2 files changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index d450cfef21..6479b8f8a6 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1104,7 +1104,11 @@
+>  ##
+>  # @cpu-add:
+>  #
+> -# Adds CPU with specified ID
+> +# Adds CPU with specified ID.
+> +#
+> +# Notes: This command is deprecated.  The `device_add` command should be
 
-  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2018=
-0926a' into staging (2018-09-28 17:07:23 +0100)
+s/Notes/Note/ ?
 
-are available in the Git repository at:
+> +#        used instead.  See the `query-hotpluggable-cpus` command for
+> +#        details.
+>  #
+>  # @id: ID of CPU to be created, valid values [0..max_cpus)
+>  #
+> @@ -3213,6 +3217,8 @@
+>  ##
+>  # @query-hotpluggable-cpus:
+>  #
+> +# TODO: Better documentation; currently there is none.
+> +#
+>  # Returns: a list of HotpluggableCPU objects.
+>  #
+>  # Since: 2.7
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 1b9c007f12..c86924ad9a 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -155,6 +155,11 @@ The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
+>  The ``arch'' output member of the ``query-cpus-fast'' command is
+>  replaced by the ``target'' output member.
+>  
+> +@subsection cpu-add (since 3.1)
+> +
+> +Use ``device_add'' for hotplugging vCPUs instead of ``cpu-add''.  See
+> +documentation of ``query-hotpluggable-cpus'' for additional details.
+> +
+>  @section System emulator devices
+>  
+>  @subsection ivshmem (since 2.6.0)
+> 
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+Do you plan to keep the "cpu-add" HMP command? hmp_cpu_add() currently
+is only a wrapper for qmp_cpu_add(), so if you plan to get rid of the
+QMP command, it might make sense to deprecate the HMP command in the
+same breath, too.
 
-for you to fetch changes up to 9e909b84144c79672b0847808358e8a4d134ced0:
-
-  hw/scsi/mptendian: Avoid taking address of fields in packed structs (20=
-18-10-01 11:25:42 +0200)
-
-----------------------------------------------------------------
-* configure fix for environment variables (Daniel)
-* fix memory leaks (Alex)
-* x86_64 MTTCG fixes (Emilio)
-* introduce atomic64 (Emilio)
-* Fix for virtio hang (Fam, myself)
-* SH serial port fix (Geert)
-* Deprecate rotation_rate for scsi-block (Fam)
-* Extend memory-backend-file availability to all POSIX hosts (Hikaru)
-* Memory API cleanups and fixes (Igor, Li Qiang, Peter, Philippe)
-* MSI/IOMMU fix (Jan)
-* Socket reconnection fixes (Marc-Andr=C3=A9)
-* icount fixes (Emilio, myself)
-* QSP fixes for Coverity (myself)
-* Some record/replay improovements (Pavel)
-* Packed struct fixes (Peter)
-* Windows dump fixes and elf2dmp (Viktor)
-* kvmclock fix (Yongji)
-
-----------------------------------------------------------------
-Now without UTF-8 mojibake.
-
-Alex Benn=C3=A9e (1):
-      cpus: fix TCG kick timer leak
-
-Daniel P. Berrang=C3=A9 (1):
-      configure: preserve various environment variables in config.status
-
-Emilio G. Cota (22):
-      atomic: fix comment s/x64_64/x86_64/
-      cpus: initialize timers_state.vm_clock_lock
-      cacheinfo: add i/d cache_linesize_log
-      util: add atomic64
-      tests: add atomic64-bench
-      qsp: use atomic64 accessors
-      test-rcu-list: access n_reclaims and n_nodes_removed with atomic64
-      cpus: access .qemu_icount with atomic64
-      cpus: access .qemu_icount_bias with atomic64
-      target/i386: move cpu_cc_srcT to DisasContext
-      target/i386: move cpu_A0 to DisasContext
-      target/i386: move cpu_T0 to DisasContext
-      target/i386: move cpu_T1 to DisasContext
-      target/i386: move cpu_tmp0 to DisasContext
-      target/i386: move cpu_tmp4 to DisasContext
-      target/i386: move cpu_ptr0 to DisasContext
-      target/i386: move cpu_ptr1 to DisasContext
-      target/i386: move cpu_tmp2_i32 to DisasContext
-      target/i386: move cpu_tmp3_i32 to DisasContext
-      target/i386: move cpu_tmp1_i64 to DisasContext
-      target/i386: move x86_64_hregs to DisasContext
-      configure: enable mttcg for i386 and x86_64
-
-Fam Zheng (2):
-      virtio: Return true from virtio_queue_empty if broken
-      scsi-block: Deprecate rotation_rate
-
-Geert Uytterhoeven (1):
-      hw/char/sh_serial: Add timeout handling to unbreak serial input
-
-Hikaru Nishida (1):
-      hostmem-file: make available memory-backend-file on POSIX-based hos=
-ts
-
-Igor Mammedov (1):
-      memory: cleanup side effects of memory_region_init_foo() on failure
-
-Jan Kiszka (1):
-      kvm: x86: Fix kvm_arch_fixup_msi_route for remap-less case
-
-Li Qiang (5):
-      fw_cfg_mem: add read memory region callback
-      hw: debugexit: add read callback
-      hw: pc-testdev: add read memory region callback
-      hw: hyperv_testdev: add read callback
-      hw: edu: replace device name with macro
-
-Li Zhijian (1):
-      change get_image_size return type to int64_t
-
-Liran Alon (1):
-      i386: Compile CPUX86State xsave_buf only when support KVM or HVF
-
-Marc-Andr=C3=A9 Lureau (9):
-      hostmem-memfd: add checks before adding hostmem-memfd & properties
-      util: add qemu_write_pidfile()
-      util: use fcntl() for qemu_write_pidfile() locking
-      Delete PID file on exit
-      Revert "chardev: tcp: postpone TLS work until machine done"
-      Revert "chardev: tcp: postpone async connection setup"
-      char-socket: update all ioc handlers when changing context
-      test-char: add socket reconnect test
-      qom/object: add some interface asserts
-
-Mark Cave-Ayland (1):
-      lsi53c895a: convert to trace-events
-
-Paolo Bonzini (9):
-      qsp: hide indirect function calls from Coverity
-      es1370: fix ADC_FRAMEADR and ADC_FRAMECNT
-      cpus: take seqlock across qemu_icount updates
-      serial: fix DLL writes
-      char-pty: remove unnecessary #ifdef
-      target/i386: unify masking of interrupts
-      target/i386: rename HF_SVMI_MASK to HF_GUEST_MASK
-      hvf: drop unused variable
-      virtio: do not take address of packed members
-
-Pavel Dovgalyuk (10):
-      ps2: prevent changing irq state on save and load
-      replay: wake up vCPU when replaying
-      replay: flush events when exiting
-      translator: fix breakpoint processing
-      replay: allow loading any snapshots before recording
-      timer: introduce new virtual clock
-      slirp: fix ipv6 timers
-      ui: fix virtual timers
-      target/i386: fix translation for icount mode
-      replay: replay BH for IDE trim operation
-
-Peter Maydell (4):
-      memory: Remove old_mmio accessors
-      hw/nvram/fw_cfg: Use memberwise copy of MemoryRegionOps struct
-      docs/devel/memory.txt: Document _with_attrs accessors
-      hw/scsi/mptendian: Avoid taking address of fields in packed structs
-
-Philippe Mathieu-Daud=C3=A9 (3):
-      memory: Use MAKE_64BIT_MASK()
-      memory: Refactor common shifting code from accessors
-      memory: Fix access_with_adjusted_size(small size) on big-endian mem=
-ory regions
-
-Thomas Huth (1):
-      accel/tcg: Remove dead code
-
-Viktor Prutyanov (4):
-      dump: fix Windows dump memory run mapping
-      dump: move Windows dump structures definitions
-      contrib: add elf2dmp tool
-      MAINTAINERS: add myself as elf2dmp maintainer
-
-Yongji Xie (1):
-      kvmclock: run KVM_KVMCLOCK_CTRL ioctl in vcpu thread
-
- MAINTAINERS                   |    5 +
- Makefile                      |    5 +
- Makefile.objs                 |    1 +
- accel/tcg/translate-all.c     |    9 -
- accel/tcg/translator.c        |    8 +-
- backends/Makefile.objs        |    2 +-
- backends/hostmem-file.c       |    2 +-
- backends/hostmem-memfd.c      |   32 +-
- chardev/char-pty.c            |    6 -
- chardev/char-socket.c         |   86 +-
- configure                     |   45 +
- contrib/elf2dmp/Makefile.objs |    1 +
- contrib/elf2dmp/addrspace.c   |  233 ++++
- contrib/elf2dmp/addrspace.h   |   44 +
- contrib/elf2dmp/download.c    |   47 +
- contrib/elf2dmp/download.h    |   13 +
- contrib/elf2dmp/err.h         |   13 +
- contrib/elf2dmp/kdbg.h        |  194 ++++
- contrib/elf2dmp/main.c        |  589 ++++++++++
- contrib/elf2dmp/pdb.c         |  322 ++++++
- contrib/elf2dmp/pdb.h         |  241 ++++
- contrib/elf2dmp/pe.h          |  121 ++
- contrib/elf2dmp/qemu_elf.c    |  164 +++
- contrib/elf2dmp/qemu_elf.h    |   51 +
- cpus.c                        |   84 +-
- docs/devel/memory.txt         |   13 +-
- exec.c                        |    4 +-
- hw/alpha/dp264.c              |    3 +-
- hw/audio/es1370.c             |   10 +-
- hw/char/serial.c              |    4 +-
- hw/char/sh_serial.c           |   20 +
- hw/char/virtio-serial-bus.c   |    6 +-
- hw/core/loader.c              |    5 +-
- hw/hppa/machine.c             |    2 +-
- hw/i386/kvm/clock.c           |   17 +-
- hw/i386/pc.c                  |    7 +-
- hw/ide/core.c                 |    3 +-
- hw/input/ps2.c                |    8 +-
- hw/mips/mips_fulong2e.c       |    4 +-
- hw/mips/mips_malta.c          |    4 +-
- hw/mips/mips_mipssim.c        |    3 +-
- hw/mips/mips_r4k.c            |    4 +-
- hw/misc/debugexit.c           |    6 +
- hw/misc/edu.c                 |    5 +-
- hw/misc/hyperv_testdev.c      |   10 +-
- hw/misc/pc-testdev.c          |   20 +-
- hw/moxie/moxiesim.c           |    2 +-
- hw/nvram/fw_cfg.c             |   13 +-
- hw/scsi/lsi53c895a.c          |  214 ++--
- hw/scsi/mptendian.c           |  163 +--
- hw/scsi/scsi-disk.c           |    6 +
- hw/scsi/trace-events          |   62 ++
- hw/virtio/virtio.c            |    8 +
- include/exec/memory.h         |    7 +-
- include/hw/loader.h           |    2 +-
- include/qemu/atomic.h         |   36 +-
- include/qemu/memfd.h          |   18 +-
- include/qemu/osdep.h          |    5 +-
- include/qemu/thread.h         |   17 +
- include/qemu/timer.h          |    9 +
- include/qemu/win_dump_defs.h  |  179 +++
- include/sysemu/replay.h       |    3 +
- memory.c                      |  163 +--
- os-posix.c                    |   24 -
- os-win32.c                    |   25 -
- qga/main.c                    |   54 +-
- qom/object.c                  |    9 +-
- replay/replay-events.c        |   14 +-
- replay/replay-internal.h      |    2 -
- replay/replay-snapshot.c      |   17 +-
- replay/replay.c               |   12 +
- scsi/qemu-pr-helper.c         |   40 +-
- slirp/ip6_icmp.c              |    7 +-
- target/i386/cpu.c             |   51 +-
- target/i386/cpu.h             |    9 +-
- target/i386/excp_helper.c     |    2 +-
- target/i386/hvf/README.md     |    2 +-
- target/i386/hvf/hvf.c         |    3 +-
- target/i386/hvf/x86hvf.c      |    4 +-
- target/i386/kvm.c             |   10 +-
- target/i386/seg_helper.c      |  112 +-
- target/i386/svm_helper.c      |    6 +-
- target/i386/translate.c       | 2474 +++++++++++++++++++++--------------=
-------
- tests/Makefile.include        |    3 +-
- tests/atomic64-bench.c        |  171 +++
- tests/test-char.c             |   18 +-
- tests/test-rcu-list.c         |   20 +-
- tests/vhost-user-test.c       |    6 +-
- ui/input.c                    |    8 +-
- util/Makefile.objs            |    1 +
- util/atomic64.c               |   83 ++
- util/cacheinfo.c              |   11 +
- util/memfd.c                  |   35 +-
- util/oslib-posix.c            |   73 ++
- util/oslib-win32.c            |   27 +
- util/qemu-timer.c             |    2 +
- util/qsp.c                    |   49 +-
- vl.c                          |   25 +-
- win_dump.c                    |   40 +-
- win_dump.h                    |  166 +--
- 100 files changed, 4814 insertions(+), 2184 deletions(-)
- create mode 100644 contrib/elf2dmp/Makefile.objs
- create mode 100644 contrib/elf2dmp/addrspace.c
- create mode 100644 contrib/elf2dmp/addrspace.h
- create mode 100644 contrib/elf2dmp/download.c
- create mode 100644 contrib/elf2dmp/download.h
- create mode 100644 contrib/elf2dmp/err.h
- create mode 100644 contrib/elf2dmp/kdbg.h
- create mode 100644 contrib/elf2dmp/main.c
- create mode 100644 contrib/elf2dmp/pdb.c
- create mode 100644 contrib/elf2dmp/pdb.h
- create mode 100644 contrib/elf2dmp/pe.h
- create mode 100644 contrib/elf2dmp/qemu_elf.c
- create mode 100644 contrib/elf2dmp/qemu_elf.h
- create mode 100644 include/qemu/win_dump_defs.h
- create mode 100644 tests/atomic64-bench.c
- create mode 100644 util/atomic64.c
---=20
-2.17.1
+ Thomas
