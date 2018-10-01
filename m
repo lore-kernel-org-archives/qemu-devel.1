@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g6rrM-0001LU-KU
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 02:39:16 -0400
+	(envelope-from <clg@kaod.org>) id 1g6rrS-0001Qb-DO
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 02:39:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g6rrH-0006Rn-OG
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 02:39:12 -0400
-Received: from 18.mo1.mail-out.ovh.net ([46.105.35.72]:41663)
+	(envelope-from <clg@kaod.org>) id 1g6rrO-0006Yb-40
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 02:39:18 -0400
+Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:51269)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g6rrH-0006QE-GZ
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 02:39:07 -0400
-Received: from player699.ha.ovh.net (unknown [10.109.160.239])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 685C2138DD8
-	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 08:39:06 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g6rrN-0006XT-SG
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 02:39:13 -0400
+Received: from player699.ha.ovh.net (unknown [10.109.160.62])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id B7EE61843CB
+	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 08:39:12 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon,  1 Oct 2018 08:38:01 +0200
-Message-Id: <20181001063803.22330-10-clg@kaod.org>
+Date: Mon,  1 Oct 2018 08:38:02 +0200
+Message-Id: <20181001063803.22330-11-clg@kaod.org>
 In-Reply-To: <20181001063803.22330-1-clg@kaod.org>
 References: <20181001063803.22330-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 09/11] net: stellaris_enet: convert SysBus
- init method to a realize method
+Subject: [Qemu-devel] [PATCH v2 10/11] net: stellaris_enet: add a reset
+ method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,41 +39,43 @@ Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/net/stellaris_enet.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ hw/net/stellaris_enet.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/hw/net/stellaris_enet.c b/hw/net/stellaris_enet.c
-index 165562d7886a..3ee1e0f8a43f 100644
+index 3ee1e0f8a43f..b3375ebb459c 100644
 --- a/hw/net/stellaris_enet.c
 +++ b/hw/net/stellaris_enet.c
-@@ -473,9 +473,9 @@ static NetClientInfo net_stellaris_enet_info =3D {
-     .receive =3D stellaris_enet_receive,
+@@ -457,8 +457,10 @@ static const MemoryRegionOps stellaris_enet_ops =3D =
+{
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
  };
 =20
--static int stellaris_enet_init(SysBusDevice *sbd)
-+static void stellaris_enet_realize(DeviceState *dev, Error **errp)
+-static void stellaris_enet_reset(stellaris_enet_state *s)
++static void stellaris_enet_reset(DeviceState *dev)
  {
--    DeviceState *dev =3D DEVICE(sbd);
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     stellaris_enet_state *s =3D STELLARIS_ENET(dev);
-=20
-     memory_region_init_io(&s->mmio, OBJECT(s), &stellaris_enet_ops, s,
-@@ -489,7 +489,6 @@ static int stellaris_enet_init(SysBusDevice *sbd)
++    stellaris_enet_state *s =3D  STELLARIS_ENET(dev);
++
+     s->mdv =3D 0x80;
+     s->rctl =3D SE_RCTL_BADCRC;
+     s->im =3D SE_INT_PHY | SE_INT_MD | SE_INT_RXER | SE_INT_FOV | SE_INT=
+_TXEMP
+@@ -487,8 +489,6 @@ static void stellaris_enet_realize(DeviceState *dev, =
+Error **errp)
+     s->nic =3D qemu_new_nic(&net_stellaris_enet_info, &s->conf,
+                           object_get_typename(OBJECT(dev)), dev->id, s);
      qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
-=20
-     stellaris_enet_reset(s);
--    return 0;
+-
+-    stellaris_enet_reset(s);
  }
 =20
  static Property stellaris_enet_properties[] =3D {
-@@ -500,9 +499,8 @@ static Property stellaris_enet_properties[] =3D {
- static void stellaris_enet_class_init(ObjectClass *klass, void *data)
- {
+@@ -501,6 +501,7 @@ static void stellaris_enet_class_init(ObjectClass *kl=
+ass, void *data)
      DeviceClass *dc =3D DEVICE_CLASS(klass);
--    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
 =20
--    k->init =3D stellaris_enet_init;
-+    dc->realize =3D stellaris_enet_realize;
+     dc->realize =3D stellaris_enet_realize;
++    dc->reset =3D stellaris_enet_reset;
      dc->props =3D stellaris_enet_properties;
      dc->vmsd =3D &vmstate_stellaris_enet;
  }
