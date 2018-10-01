@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g74DS-0007UQ-KV
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:50:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g74ER-00089Y-Jh
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:51:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g74DR-0008Pj-BW
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:50:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55478)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g74DR-0008PK-5I
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:50:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g74DO-0000el-ER
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 19:50:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 72E912E80DD
-	for <qemu-devel@nongnu.org>; Mon,  1 Oct 2018 19:50:45 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1g74EQ-0000bo-C2
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 15:51:51 -0400
+References: <20180821005843.5146-1-famz@redhat.com>
+	<20180821005843.5146-4-famz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ddc55ba4-a0e0-d2e3-e469-c5dfcceb6975@redhat.com>
+Date: Mon, 1 Oct 2018 21:51:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 01 Oct 2018 19:44:37 -0000
-From: Jason Dillaman <dillaman@redhat.com>
-Reply-To: Bug 1701449 <1701449@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149880297386.6544.11962739093038956076.malonedeb@gac.canonical.com>
-Message-Id: <153842307795.2557.15891416982810791845.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701449] Re: high memory usage when using rbd
- with client caching
+In-Reply-To: <20180821005843.5146-4-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="U4aM1ovEHGV0w72oqzDes6xZ8p4hhxc8L"
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] tests: Add unit tests for image
+ locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,97 +25,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-@Nick: if you can recreate the librbd memory growth, any chance you can
-help test a potential fix [1]?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--U4aM1ovEHGV0w72oqzDes6xZ8p4hhxc8L
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Message-ID: <ddc55ba4-a0e0-d2e3-e469-c5dfcceb6975@redhat.com>
+Subject: Re: [PATCH v4 3/3] tests: Add unit tests for image locking
+References: <20180821005843.5146-1-famz@redhat.com>
+ <20180821005843.5146-4-famz@redhat.com>
+In-Reply-To: <20180821005843.5146-4-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-[1] https://github.com/ceph/ceph/pull/24297
+On 21.08.18 02:58, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/Makefile.include     |   2 +
+>  tests/test-image-locking.c | 154 +++++++++++++++++++++++++++++++++++++=
 
--- =
+>  2 files changed, 156 insertions(+)
+>  create mode 100644 tests/test-image-locking.c
+>=20
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 760a0f18b6..8cc0595b39 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -95,6 +95,7 @@ check-unit-y +=3D tests/test-bdrv-drain$(EXESUF)
+>  check-unit-y +=3D tests/test-blockjob$(EXESUF)
+>  check-unit-y +=3D tests/test-blockjob-txn$(EXESUF)
+>  check-unit-y +=3D tests/test-block-backend$(EXESUF)
+> +check-unit-y +=3D tests/test-image-locking$(EXESUF)
+>  check-unit-y +=3D tests/test-x86-cpuid$(EXESUF)
+>  # all code tested by test-x86-cpuid is inside topology.h
+>  gcov-files-test-x86-cpuid-y =3D
+> @@ -640,6 +641,7 @@ tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-dra=
+in.o $(test-block-obj-y) $(te
+>  tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y=
+) $(test-util-obj-y)
+>  tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-blo=
+ck-obj-y) $(test-util-obj-y)
+>  tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-b=
+lock-obj-y) $(test-util-obj-y)
+> +tests/test-image-locking$(EXESUF): tests/test-image-locking.o $(test-b=
+lock-obj-y) $(test-util-obj-y)
+>  tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block=
+-obj-y)
+>  tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+>  tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $=
+(test-crypto-obj-y)
+> diff --git a/tests/test-image-locking.c b/tests/test-image-locking.c
+> new file mode 100644
+> index 0000000000..ac1a5fd4ca
+> --- /dev/null
+> +++ b/tests/test-image-locking.c
+> @@ -0,0 +1,154 @@
+> +/*
+> + * Image locking tests
+> + *
+> + * Copyright (c) 2018 Red Hat Inc.
+> + *
+> + * Author: Fam Zheng <famz@redhat.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaini=
+ng a copy
+> + * of this software and associated documentation files (the "Software"=
+), to deal
+> + * in the Software without restriction, including without limitation t=
+he rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
+r sell
+> + * copies of the Software, and to permit persons to whom the Software =
+is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be incl=
+uded in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXP=
+RESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABI=
+LITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT S=
+HALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
+R OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARI=
+SING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
+NGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "block/block.h"
+> +#include "sysemu/block-backend.h"
+> +#include "qapi/error.h"
+> +#include "qapi/qmp/qdict.h"
+> +
+> +static BlockBackend *open_image(const char *path,
+> +                                uint64_t perm, uint64_t shared_perm,
+> +                                Error **errp)
+> +{
+> +    Error *local_err =3D NULL;
+> +    BlockBackend *blk;
+> +    QDict *options =3D qdict_new();
+> +
+> +    qdict_put_str(options, "driver", "raw");
+> +    blk =3D blk_new_open(path, NULL, options, BDRV_O_RDWR, &local_err)=
+;
+> +    if (blk) {
+> +        g_assert_null(local_err);
+> +        if (blk_set_perm(blk, perm, shared_perm, errp)) {
+> +            blk_unref(blk);
+> +            blk =3D NULL;
+> +        }
+> +    } else {
+> +        error_propagate(errp, local_err);
+> +    }
+> +    return blk;
+> +}
+> +
+> +static void check_locked_bytes(int fd, uint64_t perm_locks,
+> +                               uint64_t shared_perm_locks)
+> +{
+> +    int i;
+> +
+> +    if (!perm_locks && !shared_perm_locks) {
+> +        g_assert(!qemu_lock_fd_test(fd, 0, 0, true));
+> +        return;
+> +    }
+> +    for (i =3D 0; (1ULL << i) <=3D BLK_PERM_ALL; i++) {
+> +        uint64_t bit =3D (1ULL << i);
+> +        bool perm_expected =3D !!(bit & perm_locks);
+> +        bool shared_perm_expected =3D !!(bit & shared_perm_locks);
+> +        g_assert_cmpint(perm_expected, =3D=3D,
+> +                        !!qemu_lock_fd_test(fd, 100 + i, 1, true));
+> +        g_assert_cmpint(shared_perm_expected, =3D=3D,
+> +                        !!qemu_lock_fd_test(fd, 200 + i, 1, true));
+> +    }
+> +}
+> +
+> +static void test_image_locking_basic(void)
+> +{
+> +    BlockBackend *blk1, *blk2, *blk3;
+> +    char img_path[] =3D "/tmp/qtest.XXXXXX";
+> +    uint64_t perm, shared_perm;
+> +
+> +    int fd =3D mkstemp(img_path);
+> +    assert(fd >=3D 0);
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701449
+Don't you want to remove these temporary files after the test?
 
-Title:
-  high memory usage when using rbd with client caching
+> +
+> +    perm =3D BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
+> +    shared_perm =3D BLK_PERM_ALL;
+> +    blk1 =3D open_image(img_path, perm, shared_perm, &error_abort);
+> +    g_assert(blk1);
+> +
+> +    check_locked_bytes(fd, perm, ~shared_perm);
+> +
+> +    /* compatible perm between blk1 and blk2 */
+> +    blk2 =3D open_image(img_path, perm | BLK_PERM_RESIZE, shared_perm,=
+ NULL);
+> +    g_assert(blk2);
+> +    check_locked_bytes(fd, perm | BLK_PERM_RESIZE, ~shared_perm);
+> +
+> +    /* incompatible perm with already open blk1 and blk2 */
+> +    blk3 =3D open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, NULL=
+);
+> +    g_assert_null(blk3);
+> +
+> +    blk_unref(blk2);
+> +
+> +    /* Check that extra bytes in blk2 are correctly unlocked */
+> +    check_locked_bytes(fd, perm, ~shared_perm);
+> +
+> +    blk_unref(blk1);
+> +
+> +    /* Image is unused, no lock there */
+> +    check_locked_bytes(fd, 0, 0);
+> +    blk3 =3D open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, &err=
+or_abort);
+> +    g_assert(blk3);
+> +    blk_unref(blk3);
+> +    close(fd);
+> +}
+> +
+> +static void test_set_perm_abort(void)
+> +{
+> +    BlockBackend *blk1, *blk2;
+> +    char img_path[] =3D "/tmp/qtest.XXXXXX";
+> +    uint64_t perm, shared_perm;
+> +    int r;
+> +    int fd =3D mkstemp(img_path);
+> +    assert(fd >=3D 0);
+> +
+> +    perm =3D BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
+> +    shared_perm =3D BLK_PERM_ALL;
+> +    blk1 =3D open_image(img_path, perm, shared_perm, &error_abort);
+> +    g_assert(blk1);
+> +
+> +    blk2 =3D open_image(img_path, perm, shared_perm, &error_abort);
+> +    g_assert(blk2);
+> +
+> +    check_locked_bytes(fd, perm, ~shared_perm);
+> +
+> +    /* A failed blk_set_perm mustn't change perm status (locked bytes)=
+ */
+> +    r =3D blk_set_perm(blk2, perm | BLK_PERM_RESIZE, BLK_PERM_WRITE_UN=
+CHANGED,
+> +                     NULL);
+> +    g_assert_cmpint(r, !=3D, 0);
+> +    check_locked_bytes(fd, perm, ~shared_perm);
 
-Status in QEMU:
-  New
+And I think this test should close close bl1k and blk2.
 
-Bug description:
-  Hi,
-  we are experiencing a quite high memory usage of a single qemu (used with=
- KVM) process when using RBD with client caching as a disk backend. We are =
-testing with 3GB memory qemu virtual machines and 128MB RBD client cache. W=
-hen running 'fio' in the virtual machine you can see that after some time t=
-he machine uses a lot more memory (RSS) on the hypervisor than she should. =
-We have seen values (in real production machines, no artificially fio tests=
-) of 250% memory overhead. I reproduced this with qemu version 2.9 as well.
+Max
 
-  Here the contents of our ceph.conf on the hypervisor:
-  """
-  [client]
-  rbd cache writethrough until flush =3D False
-  rbd cache max dirty =3D 100663296
-  rbd cache size =3D 134217728
-  rbd cache target dirty =3D 50331648
-  """
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +    bdrv_init();
+> +    qemu_init_main_loop(&error_abort);
+> +
+> +    g_test_init(&argc, &argv, NULL);
+> +
+> +    if (qemu_has_ofd_lock()) {
+> +        g_test_add_func("/image-locking/basic", test_image_locking_bas=
+ic);
+> +        g_test_add_func("/image-locking/set-perm-abort", test_set_perm=
+_abort);
+> +    }
+> +
+> +    return g_test_run();
+> +}
+>=20
 
-  How to reproduce:
-  * create a virtual machine with a RBD backed disk (100GB or so)
-  * install a linux distribution on it (we are using Ubuntu)
-  * install fio (apt-get install fio)
-  * run fio multiple times with (e.g.) the following test file:
-  """
-  # This job file tries to mimic the Intel IOMeter File Server Access Patte=
-rn
-  [global]
-  description=3DEmulation of Intel IOmeter File Server Access Pattern
-  randrepeat=3D0
-  filename=3D/root/test.dat
-  # IOMeter defines the server loads as the following:
-  # iodepth=3D1     Linear
-  # iodepth=3D4     Very Light
-  # iodepth=3D8     Light
-  # iodepth=3D64    Moderate
-  # iodepth=3D256   Heavy
-  iodepth=3D8
-  size=3D80g
-  direct=3D0
-  ioengine=3Dlibaio
 
-  [iometer]
-  stonewall
-  bs=3D4M
-  rw=3Drandrw
 
-  [iometer_just_write]
-  stonewall
-  bs=3D4M
-  rw=3Dwrite
+--U4aM1ovEHGV0w72oqzDes6xZ8p4hhxc8L
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  [iometer_just_read]
-  stonewall
-  bs=3D4M
-  rw=3Dread
-  """
+-----BEGIN PGP SIGNATURE-----
 
-  You can measure the virtual machine RSS usage on the hypervisor with:
-    virsh dommemstat <machine name> | grep rss
-  or if you are not using libvirt:
-    grep RSS /proc/<PID of qemu process>/status
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAluyesUACgkQ9AfbAGHV
+z0AUpgf+OoUlKOS2LshUzNnYBUUOBPiAa543hPA6FXA+1m4nmtpLmBYYJr6JFyDz
+7WlfKab+JLbEpmEeeOAV2NG1zFIPHj8q7IG9+De4M75L7K+b9aqet02iCfHtdKkN
+MFKIwM2jztRdy18tlSWCkvQBlvKjJxjmmWKpJbBHSBpT815kdmt0OLUPwPDkwQR4
+saMdk+cP9zys773h5hrE9U8ALUNXmmbjIByzFV5ZXnSW/JAFXAAbnsBiFe7+eusp
+eS//2Yeos4FqzmKJXih6A8UoZ8oTd0/Tjs/W0DFvZVY/9kjKzz1wraeJAm2BXFdZ
+gIyPHBxuHv2j+lsmKKPjI46aRaOXUg==
+=xdDy
+-----END PGP SIGNATURE-----
 
-  When switching off the RBD client cache, all is ok again, as the
-  process does not use so much memory anymore.
-
-  There is already a ticket on the ceph bug tracker for this ([1]).
-  However I can reproduce that memory behaviour only when using qemu
-  (maybe it is using librbd in a special way?). Running directly 'fio'
-  with the rbd engine does not result in that high memory usage.
-
-  [1] http://tracker.ceph.com/issues/20054
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701449/+subscriptions
+--U4aM1ovEHGV0w72oqzDes6xZ8p4hhxc8L--
