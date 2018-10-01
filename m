@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35142)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g76XU-00041Z-GD
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:19:41 -0400
+	id 1g76XU-00041R-93
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g76OH-0007Kg-8V
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:10:11 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33292)
+	id 1g76OP-0007Nv-87
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:10:22 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g76OH-0007I1-03
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:10:09 -0400
-Received: by mail-wm1-x342.google.com with SMTP id y140-v6so3547842wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 15:10:08 -0700 (PDT)
+	id 1g76ON-0007Lu-9k
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:10:16 -0400
+Received: by mail-wm1-x344.google.com with SMTP id s12-v6so302381wmc.0
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 15:10:11 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue,  2 Oct 2018 00:09:32 +0200
-Message-Id: <20181001220942.2382-6-f4bug@amsat.org>
+Date: Tue,  2 Oct 2018 00:09:34 +0200
+Message-Id: <20181001220942.2382-8-f4bug@amsat.org>
 In-Reply-To: <20181001220942.2382-1-f4bug@amsat.org>
 References: <20181001220942.2382-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 05/15] hw/sh4/sh_pci: Use DeviceState::realize
- rather than SysBusDevice::init
+Subject: [Qemu-devel] [PATCH 07/15] hw/mips/gt64xxx_pci: Convert
+ gt64120_reset() function into Device reset method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,68 +35,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Move from the legacy SysBusDevice::init method to using DeviceState::realize.
+Convert the gt64120_reset() function into a proper Device reset method.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sh4/sh_pci.c | 20 +++++++++-----------
- 1 file changed, 9 insertions(+), 11 deletions(-)
+ hw/mips/gt64xxx_pci.c | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
 
-diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
-index 4ec2e35500..84c52df067 100644
---- a/hw/sh4/sh_pci.c
-+++ b/hw/sh4/sh_pci.c
-@@ -120,16 +120,15 @@ static void sh_pci_set_irq(void *opaque, int irq_num, int level)
-     qemu_set_irq(pic[irq_num], level);
+diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+index 24ad0ad024..dcd1a66329 100644
+--- a/hw/mips/gt64xxx_pci.c
++++ b/hw/mips/gt64xxx_pci.c
+@@ -992,9 +992,9 @@ static void gt64120_pci_set_irq(void *opaque, int irq_num, int level)
  }
  
--static int sh_pci_device_init(SysBusDevice *dev)
-+static void sh_pci_device_realize(PCIDevice *dev, Error **errp)
+ 
+-static void gt64120_reset(void *opaque)
++static void gt64120_reset(DeviceState *dev)
  {
--    PCIHostState *phb;
--    SHPCIState *s;
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    SHPCIState *s = SH_PCI_HOST_BRIDGE(dev);
-+    PCIHostState *phb = PCI_HOST_BRIDGE(s);
-     int i;
+-    GT64120State *s = opaque;
++    GT64120State *s = GT64120_PCI_HOST_BRIDGE(dev);
  
--    s = SH_PCI_HOST_BRIDGE(dev);
--    phb = PCI_HOST_BRIDGE(s);
-     for (i = 0; i < 4; i++) {
--        sysbus_init_irq(dev, &s->irq[i]);
-+        sysbus_init_irq(sbd, &s->irq[i]);
-     }
-     phb->bus = pci_register_root_bus(DEVICE(dev), "pci",
-                                      sh_pci_set_irq, sh_pci_map_irq,
-@@ -143,13 +142,12 @@ static int sh_pci_device_init(SysBusDevice *dev)
-                              &s->memconfig_p4, 0, 0x224);
-     memory_region_init_alias(&s->isa, OBJECT(s), "sh_pci.isa",
-                              get_system_io(), 0, 0x40000);
--    sysbus_init_mmio(dev, &s->memconfig_p4);
--    sysbus_init_mmio(dev, &s->memconfig_a7);
-+    sysbus_init_mmio(sbd, &s->memconfig_p4);
-+    sysbus_init_mmio(sbd, &s->memconfig_a7);
-     s->iobr = 0xfe240000;
-     memory_region_add_subregion(get_system_memory(), s->iobr, &s->isa);
+     /* FIXME: Malta specific hw assumptions ahead */
  
-     s->dev = pci_create_simple(phb->bus, PCI_DEVFN(0, 0), "sh_pci_host");
+@@ -1184,16 +1184,6 @@ PCIBus *gt64120_register(qemu_irq *pic)
+     return phb->bus;
+ }
+ 
+-static int gt64120_init(SysBusDevice *dev)
+-{
+-    GT64120State *s;
+-
+-    s = GT64120_PCI_HOST_BRIDGE(dev);
+-
+-    qemu_register_reset(gt64120_reset, s);
 -    return 0;
- }
- 
- static void sh_pci_host_realize(PCIDevice *d, Error **errp)
-@@ -187,9 +185,9 @@ static const TypeInfo sh_pci_host_info = {
- 
- static void sh_pci_device_class_init(ObjectClass *klass, void *data)
+-}
+-
+ static void gt64120_pci_realize(PCIDevice *d, Error **errp)
  {
+     /* FIXME: Malta specific hw assumptions ahead */
+@@ -1241,9 +1231,8 @@ static const TypeInfo gt64120_pci_info = {
+ static void gt64120_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
 -    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
  
--    sdc->init = sh_pci_device_init;
-+    k->realize = sh_pci_device_realize;
+-    sdc->init = gt64120_init;
++    dc->reset = gt64120_reset;
+     dc->vmsd = &vmstate_gt64120;
  }
  
- static const TypeInfo sh_pci_device_info = {
 -- 
 2.19.0
