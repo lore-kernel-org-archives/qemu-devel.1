@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g6tPV-0007j1-6Y
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:18:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g6tPg-0007oF-KW
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:18:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g6tPS-0000WU-2m
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:18:33 -0400
-From: David Hildenbrand <david@redhat.com>
-References: <20180926094219.20322-1-david@redhat.com>
-	<20180926094219.20322-15-david@redhat.com>
-	<99ab8baf-37c9-2df1-7292-8e0ac4f31137@redhat.com>
-	<500af147-f496-7fb4-47f8-183bd45f4cb4@redhat.com>
-Message-ID: <e4318388-9f2d-584e-c486-296394ba53ec@redhat.com>
-Date: Mon, 1 Oct 2018 10:18:20 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1g6tPf-0000dG-T5
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:18:44 -0400
+Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:43286)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g6tPf-0000cp-Gr
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:18:43 -0400
+Received: by mail-oi1-x233.google.com with SMTP id s69-v6so10411172oie.10
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 01:18:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <500af147-f496-7fb4-47f8-183bd45f4cb4@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 14/24] memory-device: complete factoring
- out plug handling
+In-Reply-To: <20180926183709.21293-1-richard.henderson@linaro.org>
+References: <20180926183709.21293-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 1 Oct 2018 09:18:22 +0100
+Message-ID: <CAFEAcA-GWZ6y1yL667VKf1C0Ynr-82PANy30Qc2+nehTS9qthg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/13] tcg-next patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,69 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, qemu-devel@nongnu.org
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 01/10/2018 10:15, David Hildenbrand wrote:
-> On 30/09/2018 17:55, Auger Eric wrote:
->> Hi David,
->>
->> On 9/26/18 11:42 AM, David Hildenbrand wrote:
->>> With the new memory device functions in place, we can factor out
->>> plugging of memory devices completely.
->>>
->>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  hw/mem/memory-device.c         | 13 ++++++++++---
->>>  hw/mem/pc-dimm.c               |  9 +--------
->>>  include/hw/mem/memory-device.h |  3 +--
->>>  3 files changed, 12 insertions(+), 13 deletions(-)
->>>
->>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
->>> index 54e3f23b15..3914e2fe6f 100644
->>> --- a/hw/mem/memory-device.c
->>> +++ b/hw/mem/memory-device.c
->>> @@ -275,10 +275,17 @@ out:
->>>      error_propagate(errp, local_err);
->>>  }
->>>  
->>> -void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
->>> -                               uint64_t addr)
->>> +void memory_device_plug(MemoryDeviceState *md, MachineState *ms)
->>>  {
->>> -    /* we expect a previous call to memory_device_get_free_addr() */
->>> +    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
->>> +    const uint64_t addr = mdc->get_addr(md);
->>> +    MemoryRegion *mr;
->>> +
->>> +    /*
->>> +     * We expect a previous call to memory_device_pre_plug() succeeded so
->>> +     * it and can't fail at this point.
->> comment to be reworded
->>
-> 
-> Igor requested that rewording. I can turn that into "We expect that a
-> previous call ... succeeded, so " ..
-> 
+On 26 September 2018 at 19:36, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> The following changes since commit c5e4e49258e9b89cb34c085a419dd9f862935c48:
+>
+>   Merge remote-tracking branch 'remotes/xanclic/tags/pull-block-2018-09-25' into staging (2018-09-25 16:47:35 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20180926
+>
+> for you to fetch changes up to 93bf9a42733321fb632bcb9eafd049ef0e3d9417:
+>
+>   tcg/i386: fix vector operations on 32-bit hosts (2018-09-26 09:02:51 -0700)
+>
+> ----------------------------------------------------------------
+> Queued tcg patches
+>
+> ----------------------------------------------------------------
 
-"We expect that a previous call to memory_device_pre_plug() succeeded,
-so it can't fail at this point."
+Applied, thanks.
 
-to be precise :)
-
->> Reviewed-by: Eric Auger <eric.auger@redhat.com>
->>
->> Thanks
->>
->> Eric
-> 
-> 
-
-
--- 
-
-Thanks,
-
-David / dhildenb
+-- PMM
