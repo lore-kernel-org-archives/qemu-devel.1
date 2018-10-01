@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g6yx1-0000uY-JK
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:13:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g6yy9-0002M1-EQ
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:14:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g6ywv-0004Zf-Kc
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:13:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44494)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1g6ywo-0004N4-Dz
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:13:22 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Mon,  1 Oct 2018 16:13:10 +0200
-Message-Id: <1538403190-27146-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] scripts/device-crash-test: Remove entries for
- serial devices
+	(envelope-from <kwolf@redhat.com>) id 1g6yy8-0006Ho-M1
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:14:41 -0400
+Date: Mon, 1 Oct 2018 16:14:30 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181001141430.GA4445@localhost.localdomain>
+References: <20180925151541.18932-1-mreitz@redhat.com>
+	<CAFEAcA-3bf02knEbNgq5ouFVnJDL6a9HqAvCo3Z4vaWYu-8yUw@mail.gmail.com>
+	<CAFEAcA9cKPNKs_eR638eEqbAVW9sLxwHdnKVb-P-6hXJ3Kwyig@mail.gmail.com>
+	<CAFEAcA95G4Nc4+Av0JNeh2NHa5NZR1wyos28V9xhQZn4v0WAWA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA95G4Nc4+Av0JNeh2NHa5NZR1wyos28V9xhQZn4v0WAWA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/42] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-The problem with the various serial devices has been fixed a while
-ago in commit 47c4f85a0c27888e12af827471cfef87deb49821 ("hw/char/serial:
-Allow disconnected chardevs") already, so we can remove these entries
-from the "ignore" list in the device-crash-test script now.
+Am 01.10.2018 um 15:03 hat Peter Maydell geschrieben:
+> On 28 September 2018 at 15:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > I'm finding that test-bdrv-drain hangs intermittently on my OSX host.
+> 
+> Ping? Between this and test-replication I'm finding that my
+> parallel build tests for merges are failing about 50% of the
+> time :-(
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- scripts/device-crash-test | 5 -----
- 1 file changed, 5 deletions(-)
+Sorry, there wasn't much more than a weekend between your report and
+now.
 
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index e6c233e..3422475 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -99,7 +99,6 @@ ERROR_WHITELIST = [
-     {'device':'isa-ipmi-bt', 'expected':True},             # IPMI device requires a bmc attribute to be set
-     {'device':'isa-ipmi-kcs', 'expected':True},            # IPMI device requires a bmc attribute to be set
-     {'device':'isa-parallel', 'expected':True},            # Can't create serial device, empty char device
--    {'device':'isa-serial', 'expected':True},              # Can't create serial device, empty char device
-     {'device':'ivshmem', 'expected':True},                 # You must specify either 'shm' or 'chardev'
-     {'device':'ivshmem-doorbell', 'expected':True},        # You must specify a 'chardev'
-     {'device':'ivshmem-plain', 'expected':True},           # You must specify a 'memdev'
-@@ -110,9 +109,6 @@ ERROR_WHITELIST = [
-     {'device':'pc-dimm', 'expected':True},                 # 'memdev' property is not set
-     {'device':'pci-bridge', 'expected':True},              # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
-     {'device':'pci-bridge-seat', 'expected':True},         # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
--    {'device':'pci-serial', 'expected':True},              # Can't create serial device, empty char device
--    {'device':'pci-serial-2x', 'expected':True},           # Can't create serial device, empty char device
--    {'device':'pci-serial-4x', 'expected':True},           # Can't create serial device, empty char device
-     {'device':'pxa2xx-dma', 'expected':True},              # channels value invalid
-     {'device':'pxb', 'expected':True},                     # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
-     {'device':'scsi-block', 'expected':True},              # drive property not set
-@@ -218,7 +214,6 @@ ERROR_WHITELIST = [
-     {'exitcode':-6, 'log':r"Object .* is not an instance of type generic-pc-machine", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.ERROR},
-     {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.ERROR},
--    {'exitcode':-11, 'device':'isa-serial', 'loglevel':logging.ERROR, 'expected':True},
- 
-     # everything else (including SIGABRT and SIGSEGV) will be a fatal error:
-     {'exitcode':None, 'fatal':True, 'loglevel':logging.FATAL},
--- 
-1.8.3.1
+For the replication one, I think we can just take the AioContext lock in
+the test case while we decide how the API should really be used. I'll
+prepare a fix for that (and hopefully I'll be able to reproduce the
+problem reliably enough to verify the fix).
+
+Max said he could reproduce some hang in test-bdrv-drain (though we
+don't know if this has anything to do with your OS X hang, which looked
+rather odd) and would look into it, but I don't think we know the
+problem yet. I'll try to reproduce that one after fixing the replication
+test.
+
+> If there's no immediate sign of a fix, could we disable these tests?
+
+I hope we don't have to, though it depends on your definition of
+immediate. :-)
+
+Kevin
