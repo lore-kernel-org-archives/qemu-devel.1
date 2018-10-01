@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35160)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g76XU-00041R-93
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:19:40 -0400
+	id 1g76XV-00041Z-EA
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:19:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g76OP-0007Nv-87
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:10:22 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50387)
+	id 1g76OE-0007HR-F7
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:10:08 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36961)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g76ON-0007Lu-9k
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:10:16 -0400
-Received: by mail-wm1-x344.google.com with SMTP id s12-v6so302381wmc.0
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 15:10:11 -0700 (PDT)
+	id 1g76OE-0007HK-8d
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 18:10:06 -0400
+Received: by mail-wr1-x441.google.com with SMTP id u12-v6so15632854wrr.4
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 15:10:06 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue,  2 Oct 2018 00:09:34 +0200
-Message-Id: <20181001220942.2382-8-f4bug@amsat.org>
+Date: Tue,  2 Oct 2018 00:09:30 +0200
+Message-Id: <20181001220942.2382-4-f4bug@amsat.org>
 In-Reply-To: <20181001220942.2382-1-f4bug@amsat.org>
 References: <20181001220942.2382-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 07/15] hw/mips/gt64xxx_pci: Convert
- gt64120_reset() function into Device reset method
+Subject: [Qemu-devel] [PATCH 03/15] hw/timer/sun4v-rtc: Use
+ DeviceState::realize rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +35,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Convert the gt64120_reset() function into a proper Device reset method.
+Move from the legacy SysBusDevice::init method to using DeviceState::realize.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/mips/gt64xxx_pci.c | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
+ hw/timer/sun4v-rtc.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-index 24ad0ad024..dcd1a66329 100644
---- a/hw/mips/gt64xxx_pci.c
-+++ b/hw/mips/gt64xxx_pci.c
-@@ -992,9 +992,9 @@ static void gt64120_pci_set_irq(void *opaque, int irq_num, int level)
+diff --git a/hw/timer/sun4v-rtc.c b/hw/timer/sun4v-rtc.c
+index 13be94f8da..4e7f6a1eff 100644
+--- a/hw/timer/sun4v-rtc.c
++++ b/hw/timer/sun4v-rtc.c
+@@ -63,21 +63,21 @@ void sun4v_rtc_init(hwaddr addr)
+     sysbus_mmio_map(s, 0, addr);
  }
  
- 
--static void gt64120_reset(void *opaque)
-+static void gt64120_reset(DeviceState *dev)
+-static int sun4v_rtc_init1(SysBusDevice *dev)
++static void sun4v_rtc_realize(DeviceState *dev, Error **errp)
  {
--    GT64120State *s = opaque;
-+    GT64120State *s = GT64120_PCI_HOST_BRIDGE(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     Sun4vRtc *s = SUN4V_RTC(dev);
  
-     /* FIXME: Malta specific hw assumptions ahead */
- 
-@@ -1184,16 +1184,6 @@ PCIBus *gt64120_register(qemu_irq *pic)
-     return phb->bus;
- }
- 
--static int gt64120_init(SysBusDevice *dev)
--{
--    GT64120State *s;
--
--    s = GT64120_PCI_HOST_BRIDGE(dev);
--
--    qemu_register_reset(gt64120_reset, s);
+     memory_region_init_io(&s->iomem, OBJECT(s), &sun4v_rtc_ops, s,
+                           "sun4v-rtc", 0x08ULL);
+-    sysbus_init_mmio(dev, &s->iomem);
 -    return 0;
--}
--
- static void gt64120_pci_realize(PCIDevice *d, Error **errp)
- {
-     /* FIXME: Malta specific hw assumptions ahead */
-@@ -1241,9 +1231,8 @@ static const TypeInfo gt64120_pci_info = {
- static void gt64120_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *sdc = SYS_BUS_DEVICE_CLASS(klass);
- 
--    sdc->init = gt64120_init;
-+    dc->reset = gt64120_reset;
-     dc->vmsd = &vmstate_gt64120;
++    sysbus_init_mmio(sbd, &s->iomem);
  }
  
+ static void sun4v_rtc_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+-    k->init = sun4v_rtc_init1;
++    dc->realize = sun4v_rtc_realize;
+ }
+ 
+ static const TypeInfo sun4v_rtc_info = {
 -- 
 2.19.0
