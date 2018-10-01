@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g71rG-0002c6-Ab
+	(envelope-from <kwolf@redhat.com>) id 1g71rG-0002cL-Bz
 	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g71rD-0007MD-91
+	(envelope-from <kwolf@redhat.com>) id 1g71rF-0007ON-06
 	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:46 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  1 Oct 2018 19:19:00 +0200
-Message-Id: <20181001171901.11004-23-kwolf@redhat.com>
+Date: Mon,  1 Oct 2018 19:18:53 +0200
+Message-Id: <20181001171901.11004-16-kwolf@redhat.com>
 In-Reply-To: <20181001171901.11004-1-kwolf@redhat.com>
 References: <20181001171901.11004-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 22/23] test-replication: Lock AioContext around
- blk_unref()
+Subject: [Qemu-devel] [PULL 15/23] qcow2: Assign the L2 cache relatively to
+ the image size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +23,216 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Recently, the test case has started failing because some job related
-functions want to drop the AioContext lock even though it hasn't been
-taken:
+From: Leonid Bloch <lbloch@janustech.com>
 
-    (gdb) bt
-    #0  0x00007f51c067c9fb in raise () from /lib64/libc.so.6
-    #1  0x00007f51c067e77d in abort () from /lib64/libc.so.6
-    #2  0x0000558c9d5dde7b in error_exit (err=<optimized out>, msg=msg@entry=0x558c9d6fe120 <__func__.18373> "qemu_mutex_unlock_impl") at util/qemu-thread-posix.c:36
-    #3  0x0000558c9d6b5263 in qemu_mutex_unlock_impl (mutex=mutex@entry=0x558c9f3999a0, file=file@entry=0x558c9d6fd36f "util/async.c", line=line@entry=516) at util/qemu-thread-posix.c:96
-    #4  0x0000558c9d6b0565 in aio_context_release (ctx=ctx@entry=0x558c9f399940) at util/async.c:516
-    #5  0x0000558c9d5eb3da in job_completed_txn_abort (job=0x558c9f68e640) at job.c:738
-    #6  0x0000558c9d5eb227 in job_finish_sync (job=0x558c9f68e640, finish=finish@entry=0x558c9d5eb8d0 <job_cancel_err>, errp=errp@entry=0x0) at job.c:986
-    #7  0x0000558c9d5eb8ee in job_cancel_sync (job=<optimized out>) at job.c:941
-    #8  0x0000558c9d64d853 in replication_close (bs=<optimized out>) at block/replication.c:148
-    #9  0x0000558c9d5e5c9f in bdrv_close (bs=0x558c9f41b020) at block.c:3420
-    #10 bdrv_delete (bs=0x558c9f41b020) at block.c:3629
-    #11 bdrv_unref (bs=0x558c9f41b020) at block.c:4685
-    #12 0x0000558c9d62a3f3 in blk_remove_bs (blk=blk@entry=0x558c9f42a7c0) at block/block-backend.c:783
-    #13 0x0000558c9d62a667 in blk_delete (blk=0x558c9f42a7c0) at block/block-backend.c:402
-    #14 blk_unref (blk=0x558c9f42a7c0) at block/block-backend.c:457
-    #15 0x0000558c9d5dfcea in test_secondary_stop () at tests/test-replication.c:478
-    #16 0x00007f51c1f13178 in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-    #17 0x00007f51c1f1337b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-    #18 0x00007f51c1f1337b in g_test_run_suite_internal () from /lib64/libglib-2.0.so.0
-    #19 0x00007f51c1f13552 in g_test_run_suite () from /lib64/libglib-2.0.so.0
-    #20 0x00007f51c1f13571 in g_test_run () from /lib64/libglib-2.0.so.0
-    #21 0x0000558c9d5de31f in main (argc=<optimized out>, argv=<optimized out>) at tests/test-replication.c:581
+Sufficient L2 cache can noticeably improve the performance when using
+large images with frequent I/O.
 
-It is yet unclear whether this should really be considered a bug in the
-test case or whether blk_unref() should work for callers that haven't
-taken the AioContext lock, but in order to fix the build tests quickly,
-just take the AioContext lock around blk_unref().
+Previously, unless 'cache-size' was specified and was large enough, the
+L2 cache was set to a certain size without taking the virtual image size
+into account.
 
+Now, the L2 cache assignment is aware of the virtual size of the image,
+and will cover the entire image, unless the cache size needed for that is
+larger than a certain maximum. This maximum is set to 1 MB by default
+(enough to cover an 8 GB image with the default cluster size) but can
+be increased or decreased using the 'l2-cache-size' option. This option
+was previously documented as the *maximum* L2 cache size, and this patch
+makes it behave as such, instead of as a constant size. Also, the
+existing option 'cache-size' can limit the sum of both L2 and refcount
+caches, as previously.
+
+Signed-off-by: Leonid Bloch <lbloch@janustech.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-replication.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ docs/qcow2-cache.txt       | 15 ++++++++++-----
+ block/qcow2.h              |  4 +---
+ block/qcow2.c              | 21 +++++++++------------
+ qemu-options.hx            |  6 +++---
+ tests/qemu-iotests/137     |  8 +++++++-
+ tests/qemu-iotests/137.out |  4 +++-
+ 6 files changed, 33 insertions(+), 25 deletions(-)
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index c8165ae954..f085d1993a 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -207,13 +207,17 @@ static BlockBackend *start_primary(void)
- static void teardown_primary(void)
+diff --git a/docs/qcow2-cache.txt b/docs/qcow2-cache.txt
+index 7e28b41bd3..750447ea4f 100644
+--- a/docs/qcow2-cache.txt
++++ b/docs/qcow2-cache.txt
+@@ -125,8 +125,12 @@ There are a few things that need to be taken into account:
+  - Both caches must have a size that is a multiple of the cluster size
+    (or the cache entry size: see "Using smaller cache sizes" below).
+ 
+- - The default L2 cache size is 8 clusters or 1MB (whichever is more),
+-   and the minimum is 2 clusters (or 2 cache entries, see below).
++ - The maximum L2 cache size is 1 MB by default (enough for full coverage
++   of 8 GB images, with the default cluster size). This value can be
++   modified using the "l2-cache-size" option. QEMU will not use more memory
++   than needed to hold all of the image's L2 tables, regardless of this max.
++   value. The minimal L2 cache size is 2 clusters (or 2 cache entries, see
++   below).
+ 
+  - The default (and minimum) refcount cache size is 4 clusters.
+ 
+@@ -184,9 +188,10 @@ Some things to take into account:
+    always uses the cluster size as the entry size.
+ 
+  - If the L2 cache is big enough to hold all of the image's L2 tables
+-   (as explained in the "Choosing the right cache sizes" section
+-   earlier in this document) then none of this is necessary and you
+-   can omit the "l2-cache-entry-size" parameter altogether.
++   (as explained in the "Choosing the right cache sizes" and "How to
++   configure the cache sizes" sections in this document) then none of
++   this is necessary and you can omit the "l2-cache-entry-size"
++   parameter altogether.
+ 
+ 
+ Reducing the memory usage
+diff --git a/block/qcow2.h b/block/qcow2.h
+index a8d6f757b1..2f8c1fd15c 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -74,9 +74,7 @@
+ /* Must be at least 4 to cover all cases of refcount table growth */
+ #define MIN_REFCOUNT_CACHE_SIZE 4 /* clusters */
+ 
+-/* Whichever is more */
+-#define DEFAULT_L2_CACHE_CLUSTERS 8 /* clusters */
+-#define DEFAULT_L2_CACHE_SIZE S_1MiB
++#define DEFAULT_L2_CACHE_MAX_SIZE S_1MiB
+ 
+ #define DEFAULT_CLUSTER_SIZE S_64KiB
+ 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index cd0053b6ee..589f6c1b1c 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -777,29 +777,35 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+                              uint64_t *refcount_cache_size, Error **errp)
  {
-     BlockBackend *blk;
-+    AioContext *ctx;
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t combined_cache_size;
++    uint64_t combined_cache_size, l2_cache_max_setting;
+     bool l2_cache_size_set, refcount_cache_size_set, combined_cache_size_set;
+     int min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
++    uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
++    uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
  
-     /* remove P_ID */
-     blk = blk_by_name(P_ID);
-     assert(blk);
+     combined_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE);
+     l2_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_SIZE);
+     refcount_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_REFCOUNT_CACHE_SIZE);
  
-+    ctx = blk_get_aio_context(blk);
-+    aio_context_acquire(ctx);
-     monitor_remove_blk(blk);
-     blk_unref(blk);
-+    aio_context_release(ctx);
- }
+     combined_cache_size = qemu_opt_get_size(opts, QCOW2_OPT_CACHE_SIZE, 0);
+-    *l2_cache_size = qemu_opt_get_size(opts, QCOW2_OPT_L2_CACHE_SIZE, 0);
++    l2_cache_max_setting = qemu_opt_get_size(opts, QCOW2_OPT_L2_CACHE_SIZE,
++                                             DEFAULT_L2_CACHE_MAX_SIZE);
+     *refcount_cache_size = qemu_opt_get_size(opts,
+                                              QCOW2_OPT_REFCOUNT_CACHE_SIZE, 0);
  
- static void test_primary_read(void)
-@@ -365,20 +369,27 @@ static void teardown_secondary(void)
- {
-     /* only need to destroy two BBs */
-     BlockBackend *blk;
-+    AioContext *ctx;
+     *l2_cache_entry_size = qemu_opt_get_size(
+         opts, QCOW2_OPT_L2_CACHE_ENTRY_SIZE, s->cluster_size);
  
-     /* remove S_LOCAL_DISK_ID */
-     blk = blk_by_name(S_LOCAL_DISK_ID);
-     assert(blk);
++    *l2_cache_size = MIN(max_l2_cache, l2_cache_max_setting);
++
+     if (combined_cache_size_set) {
+         if (l2_cache_size_set && refcount_cache_size_set) {
+             error_setg(errp, QCOW2_OPT_CACHE_SIZE ", " QCOW2_OPT_L2_CACHE_SIZE
+                        " and " QCOW2_OPT_REFCOUNT_CACHE_SIZE " may not be set "
+                        "at the same time");
+             return;
+-        } else if (*l2_cache_size > combined_cache_size) {
++        } else if (l2_cache_size_set &&
++                   (l2_cache_max_setting > combined_cache_size)) {
+             error_setg(errp, QCOW2_OPT_L2_CACHE_SIZE " may not exceed "
+                        QCOW2_OPT_CACHE_SIZE);
+             return;
+@@ -814,9 +820,6 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+         } else if (refcount_cache_size_set) {
+             *l2_cache_size = combined_cache_size - *refcount_cache_size;
+         } else {
+-            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+-            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
+-
+             /* Assign as much memory as possible to the L2 cache, and
+              * use the remainder for the refcount cache */
+             if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
+@@ -828,12 +831,6 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+                 *l2_cache_size = combined_cache_size - *refcount_cache_size;
+             }
+         }
+-    } else {
+-        if (!l2_cache_size_set) {
+-            *l2_cache_size = MAX(DEFAULT_L2_CACHE_SIZE,
+-                                 (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
+-                                 * s->cluster_size);
+-        }
+     }
+     /* l2_cache_size and refcount_cache_size are ensured to have at least
+      * their minimum values in qcow2_update_options_prepare() */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 2db6247eff..6eef0f5651 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -736,9 +736,9 @@ The maximum total size of the L2 table and refcount block caches in bytes
  
-+    ctx = blk_get_aio_context(blk);
-+    aio_context_acquire(ctx);
-     monitor_remove_blk(blk);
-     blk_unref(blk);
-+    aio_context_release(ctx);
+ @item l2-cache-size
+ The maximum size of the L2 table cache in bytes
+-(default: if cache-size is not defined - 1048576 bytes or 8 clusters, whichever
+-is larger; otherwise, as large as possible or needed within the cache-size,
+-while permitting the requested or the minimal refcount cache size)
++(default: if cache-size is not specified - 1M; otherwise, as large as possible
++within the cache-size, while permitting the requested or the minimal refcount
++cache size)
  
-     /* remove S_ID */
-     blk = blk_by_name(S_ID);
-     assert(blk);
+ @item refcount-cache-size
+ The maximum size of the refcount block cache in bytes
+diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+index 87965625d8..19e8597306 100755
+--- a/tests/qemu-iotests/137
++++ b/tests/qemu-iotests/137
+@@ -109,7 +109,6 @@ $QEMU_IO \
+     -c "reopen -o cache-size=1M,l2-cache-size=64k,refcount-cache-size=64k" \
+     -c "reopen -o cache-size=1M,l2-cache-size=2M" \
+     -c "reopen -o cache-size=1M,refcount-cache-size=2M" \
+-    -c "reopen -o l2-cache-size=256T" \
+     -c "reopen -o l2-cache-entry-size=33k" \
+     -c "reopen -o l2-cache-entry-size=128k" \
+     -c "reopen -o refcount-cache-size=256T" \
+@@ -119,6 +118,13 @@ $QEMU_IO \
+     -c "reopen -o cache-clean-interval=-1" \
+     "$TEST_IMG" | _filter_qemu_io
  
-+    ctx = blk_get_aio_context(blk);
-+    aio_context_acquire(ctx);
-     monitor_remove_blk(blk);
-     blk_unref(blk);
-+    aio_context_release(ctx);
- }
++IMGOPTS="cluster_size=256k" _make_test_img 32P
++$QEMU_IO \
++    -c "reopen -o l2-cache-entry-size=512,l2-cache-size=1T" \
++    "$TEST_IMG" | _filter_qemu_io
++
++_make_test_img 64M
++
+ echo
+ echo === Test transaction semantics ===
+ echo
+diff --git a/tests/qemu-iotests/137.out b/tests/qemu-iotests/137.out
+index 6a2ffc71fd..2c080b72f3 100644
+--- a/tests/qemu-iotests/137.out
++++ b/tests/qemu-iotests/137.out
+@@ -19,7 +19,6 @@ Parameter 'lazy-refcounts' expects 'on' or 'off'
+ cache-size, l2-cache-size and refcount-cache-size may not be set at the same time
+ l2-cache-size may not exceed cache-size
+ refcount-cache-size may not exceed cache-size
+-L2 cache size too big
+ L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+ L2 cache entry size must be a power of two between 512 and the cluster size (65536)
+ Refcount cache size too big
+@@ -27,6 +26,9 @@ Conflicting values for qcow2 options 'overlap-check' ('constant') and 'overlap-c
+ Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
+ Unsupported value 'blubb' for qcow2 option 'overlap-check'. Allowed are any of the following: none, constant, cached, all
+ Cache clean interval too big
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=36028797018963968
++L2 cache size too big
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
  
- static void test_secondary_read(void)
+ === Test transaction semantics ===
+ 
 -- 
 2.13.6
