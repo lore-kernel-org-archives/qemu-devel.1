@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g6tIV-0003Uh-UF
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:11:20 -0400
+	(envelope-from <david@redhat.com>) id 1g6tKh-00058J-RU
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:13:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g6tIS-0005uR-Jg
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:11:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36196)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g6tIS-0005tv-Bz
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:11:16 -0400
-References: <1538295197-23704-1-git-send-email-pbonzini@redhat.com>
-	<572f8674-1712-686a-278e-9eae5947a233@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5a4400ff-5eed-6deb-9986-a63abca495b6@redhat.com>
-Date: Mon, 1 Oct 2018 10:11:10 +0200
+	(envelope-from <david@redhat.com>) id 1g6tKe-0006sV-MU
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:13:35 -0400
+References: <20180926094219.20322-1-david@redhat.com>
+	<20180926094219.20322-9-david@redhat.com>
+	<df729c85-6fa1-93d7-c91e-7d3738fbf38f@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <83585994-587f-8281-3540-efa77ea8df2c@redhat.com>
+Date: Mon, 1 Oct 2018 10:13:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <572f8674-1712-686a-278e-9eae5947a233@amsat.org>
+In-Reply-To: <df729c85-6fa1-93d7-c91e-7d3738fbf38f@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/79] Misc QEMU patches for 2018-09-30
+Subject: Re: [Qemu-devel] [PATCH v4 08/24] memory-device: document
+ MemoryDeviceClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, qemu-devel@nongnu.org
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 30/09/2018 16:54, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Paolo, Peter.
+On 30/09/2018 16:43, Auger Eric wrote:
+> Hi David,
 >=20
-> On 9/30/18 10:11 AM, Paolo Bonzini wrote:
->> The following changes since commit 042938f46e1c477419d1931381fdadffaa4=
-9d45e:
+> On 9/26/18 11:42 AM, David Hildenbrand wrote:
+>> Document the functions and when to not expect errors.
 >>
->>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2=
-0180926a' into staging (2018-09-28 17:07:23 +0100)
->>
->> are available in the git repository at:
->>
->>
->>   git://github.com/bonzini/qemu.git tags/for-upstream
->>
->> for you to fetch changes up to 54b570779677ff8620a79ed81ddf0906b1d23f4=
-e:
->>
->>   hw/scsi/mptendian: Avoid taking address of fields in packed structs =
-(2018-09-30 10:08:28 +0200)
->>
->> ----------------------------------------------------------------
->> * configure fix for environment variables (Daniel)
->> * fix memory leaks (Alex)
->> * x86_64 MTTCG (Emilio)
->> * introduce atomic64 (Emilio)
->> * Fix for virtio hang (Fam, myself)
->> * SH serial port fix (Geert)
->> * Deprecate rotation_rate for scsi-block (Fam)
->> * Extend memory-backend-file availability to all POSIX hosts (Hikaru)
->> * Memory API cleanups and fixes (Igor, Li Qiang, Peter, Philippe)
->> * MSI/IOMMU fix (Jan)
->> * Socket reconnection fixes (Marc-Andr=C3=A9)
->> * icount fixes (Emilio, myself)
->> * QSP fixes for Coverity (myself)
->> * Some record/replay improovements (Pavel)
->> * Packed struct fixes (Peter)
->> * Windows dump fixes and elf2dmp (Viktor)
->> * kbmclock fix (Yongji)
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
 >=20
-> Paolo, thanks for queuing all of this, however I note some UTF-8 issues=
-.
->=20
-> Alex got lucky:
->=20
->  Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
-> But Marc-Andr=C3=A9 and myself have:
->=20
->  Signed-off-by: Philippe Mathieu-Daud=C3=83=C2=A9 <f4bug@amsat.org>
->  Signed-off-by: Marc-Andr=C3=83=C2=A9 Lureau <marcandre.lureau@redhat.c=
-om>
+>> ---
+>>  include/hw/mem/memory-device.h | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>>
+>> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-de=
+vice.h
+>> index f02b229837..1d15cfc357 100644
+>> --- a/include/hw/mem/memory-device.h
+>> +++ b/include/hw/mem/memory-device.h
+>> @@ -29,9 +29,25 @@ typedef struct MemoryDeviceState {
+>>      Object parent_obj;
+>>  } MemoryDeviceState;
+>> =20
+>> +/**> + * MemoryDeviceClass:
+>> + * @get_addr: The address of the @md in guest physical memory. "0" me=
+ans that
+>> + * no address has been specified by the user and that no address has =
+been
+>> + * assigned yet.
+>> + * @get_plugged_size: The amount of memory provided by this @md curre=
+ntly
+>> + * usable ("plugged") by the guest. This is helpful for devices that
+>> + * dynamically manage the amount of memory accessible by the guest vi=
+a
+>> + * the reserved memory region. For most devices, this corresponds to =
+the
+>> + * size of the memory region.
+>> + * @get_region_size: The size of the memory region of the @md that's =
+mapped
+>> + * in guest physical memory at @get_addr.
+>> + * @fill_device_info: Translate current @md state into #MemoryDeviceI=
+nfo.
+> I think it may be relevant to document whether all those functions are
+> mandated or if any are optional.
 
-I'll fix it.  In the meanwhile, I'll note that we're also improving
-Patchew so that it is much better at applying patches via three-way
-merge (basically the adding of *-by tags moves from "patchew apply" to
-the web stuff) and that should make these UTF-8 issues a thing of the pas=
-t.
+All are mandatory if not otherwise specified (right now none) ....
 
-Paolo
+>=20
+> With respect to the form, you could get inspired of
+> include/exec/memory.h (see for instance IOMMUMemoryRegionClass doc)
+>=20
+
+... which seems to be the same approach used in IOMMUMemoryRegionClass.
+
+While I am a friend of documentation,  I prefer to keep it short where
+possible. (e.g. obvious things like "@md: the MemoryDeviceState", I
+don't consider useful)
+
+I am using right now a similar style as in include/hw/mem/pc-dimm.h and
+include/exec/memory.h.
+
+BTW, is there a coding style about such things? (where, how to document
+classes, structs, fuucntions and parameters)
+
+Thanks!
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
