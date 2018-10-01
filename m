@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g71bt-0005d1-HH
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:03:54 -0400
+	(envelope-from <philmd@redhat.com>) id 1g71fn-0007RM-LL
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:07:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g71bs-0001Ql-H6
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:03:53 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:38497)
+	(envelope-from <philmd@redhat.com>) id 1g71fj-0006Ir-Mr
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:07:55 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:40584)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g71bs-0001Pn-4O
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:03:52 -0400
-Received: by mail-ot1-x333.google.com with SMTP id h15-v6so13843152otj.5
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 10:03:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g71fj-0006IS-G6
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:07:51 -0400
+Received: by mail-wr1-f68.google.com with SMTP id y8-v6so14823247wrh.7
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 10:07:51 -0700 (PDT)
+References: <20181001115704.701-1-luc.michel@greensocs.com>
+	<20181001115704.701-4-luc.michel@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d46c39b0-6d56-6a4c-b56f-78447244a1f0@redhat.com>
+Date: Mon, 1 Oct 2018 19:07:48 +0200
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 1 Oct 2018 18:03:30 +0100
-Message-ID: <CAFEAcA-T7-PcKLwPr0VO0wrwW3x+w2WbdEjTjN2YfWOmZXyfUg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] racing between pause_all_vcpus() and qemu_cpu_stop()
+In-Reply-To: <20181001115704.701-4-luc.michel@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/15] gdbstub: add multiprocess support
+ to 'H' and 'T' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +31,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
+To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, alistair@alistair23.me, mark.burton@greensocs.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org
 
-I've been investigating a race condition where sometimes when my
-guest writes to a device register which triggers a
-qemu_system_reset_request(), it doesn't actually cause a clean reset,
-but instead the guest CPU continues to execute instructions.
-I managed to repro it under 'rr', which let me walk through enough
-of what was going on to determine the following:
+On 01/10/2018 13:56, Luc Michel wrote:
+> Add a couple of helper functions to cope with GDB threads and processes.
+> 
+> The gdb_get_process() function looks for a process given a pid.
+> 
+> The gdb_get_cpu() function returns the CPU corresponding to the (pid,
+> tid) pair given as parameters.
+> 
+> The read_thread_id() function parses the thread-id sent by the peer.
+> This function supports the multiprocess extension thread-id syntax.  The
+> return value specifies if the parsing failed, or if a special case was
+> encountered (all processes or all threads).
+> 
+> Use them in 'H' and 'T' packets handling to support the multiprocess
+> extension.
+> 
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> ---
+>  gdbstub.c | 149 +++++++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 131 insertions(+), 18 deletions(-)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index ac9d540fda..a21ce3ca18 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -667,10 +667,74 @@ static uint32_t gdb_get_cpu_pid(const GDBState *s, CPUState *cpu)
+>      }
+>  
+>      return pid + 1;
+>  }
+>  
+> +static GDBProcess *gdb_get_process(const GDBState *s, uint32_t pid)
+> +{
+> +    uint32_t process_idx;
+> +
+> +    if (!pid) {
+> +        /* 0 means any process, we take the first one */
+> +        pid = 1;
+> +    }
+> +
+> +    /* GDB PIDs are in the range [1;n] */
+> +    process_idx = pid - 1;
+> +
+> +    if (process_idx >= s->process_num) {
+> +        return NULL;
+> +    }
+> +
+> +    return &s->processes[process_idx];
+> +}
+> +
+> +static GDBProcess *gdb_get_cpu_process(const GDBState *s, CPUState *cpu)
+> +{
+> +    return gdb_get_process(s, gdb_get_cpu_pid(s, cpu));
+> +}
+> +
+> +static CPUState *find_cpu(uint32_t thread_id)
+> +{
+> +    CPUState *cpu;
+> +
+> +    CPU_FOREACH(cpu) {
+> +        if (cpu_gdb_index(cpu) == thread_id) {
+> +            return cpu;
+> +        }
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +static CPUState *gdb_get_cpu(const GDBState *s, uint32_t pid, uint32_t tid)
+> +{
+> +    GDBProcess *process;
+> +    CPUState *cpu = find_cpu(tid);
+> +
+> +    if (!tid) {
+> +        /* 0 means any thread, we take the first one */
+> +        tid = 1;
+> +    }
+> +
+> +    if (cpu == NULL) {
+> +        return NULL;
+> +    }
+> +
+> +    process = gdb_get_cpu_process(s, cpu);
+> +
+> +    if (process->pid != pid) {
+> +        return NULL;
+> +    }
+> +
+> +    if (!process->attached) {
+> +        return NULL;
+> +    }
+> +
+> +    return cpu;
+> +}
+> +
+>  static const char *get_feature_xml(const char *p, const char **newp,
+>                                     CPUClass *cc)
+>  {
+>      size_t len;
+>      int i;
+> @@ -923,23 +987,10 @@ static void gdb_set_cpu_pc(GDBState *s, target_ulong pc)
+>  
+>      cpu_synchronize_state(cpu);
+>      cpu_set_pc(cpu, pc);
+>  }
+>  
+> -static CPUState *find_cpu(uint32_t thread_id)
+> -{
+> -    CPUState *cpu;
+> -
+> -    CPU_FOREACH(cpu) {
+> -        if (cpu_gdb_index(cpu) == thread_id) {
+> -            return cpu;
+> -        }
+> -    }
+> -
+> -    return NULL;
+> -}
+> -
+>  static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
+>                             char *buf, size_t buf_size)
+>  {
+>      if (s->multiprocess) {
+>          snprintf(buf, buf_size, "p%02x.%02x",
+> @@ -949,10 +1000,64 @@ static char *gdb_fmt_thread_id(const GDBState *s, CPUState *cpu,
+>      }
+>  
+>      return buf;
+>  }
+>  
+> +typedef enum GDBThreadIdKind {
+> +    GDB_ONE_THREAD = 0,
+> +    GDB_ALL_THREADS,     /* One process, all threads */
+> +    GDB_ALL_PROCESSES,
+> +    GDB_READ_THREAD_ERR
+> +} GDBThreadIdKind;
+> +
+> +static GDBThreadIdKind read_thread_id(const char *buf, const char **end_buf,
+> +                                      uint32_t *pid, uint32_t *tid)
+> +{
+> +    unsigned long p, t;
+> +    int ret;
+> +
+> +    if (*buf == 'p') {
+> +        buf++;
+> +        ret = qemu_strtoul(buf, &buf, 16, &p);
+> +
+> +        if (ret) {
+> +            return GDB_READ_THREAD_ERR;
+> +        }
+> +
+> +        /* Skip '.' */
+> +        buf++;
+> +    } else {
+> +        p = 1;
+> +    }
+> +
+> +    ret = qemu_strtoul(buf, &buf, 16, &t);
+> +
+> +    if (ret) {
+> +        return GDB_READ_THREAD_ERR;
+> +    }
+> +
+> +    *end_buf = buf;
+> +
+> +    if (p == -1) {
+> +        return GDB_ALL_PROCESSES;
+> +    }
+> +
+> +    if (pid) {
+> +        *pid = p;
+> +    }
+> +
+> +    if (t == -1) {
+> +        return GDB_ALL_THREADS;
+> +    }
+> +
+> +    if (tid) {
+> +        *tid = t;
+> +    }
+> +
+> +    return GDB_ONE_THREAD;
+> +}
+> +
+>  static int is_query_packet(const char *p, const char *query, char separator)
+>  {
+>      unsigned int query_len = strlen(query);
+>  
+>      return strncmp(p, query, query_len) == 0 &&
+> @@ -1057,16 +1162,18 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>  {
+>      CPUState *cpu;
+>      CPUClass *cc;
+>      const char *p;
+>      uint32_t thread;
+> +    uint32_t pid, tid;
+>      int ch, reg_size, type, res;
+>      uint8_t mem_buf[MAX_PACKET_LENGTH];
+>      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+>      char thread_id[16];
+>      uint8_t *registers;
+>      target_ulong addr, len;
+> +    GDBThreadIdKind thread_kind;
+>  
+>      trace_gdbstub_io_command(line_buf);
+>  
+>      p = line_buf;
+>      ch = *p++;
+> @@ -1270,16 +1377,22 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>          else
+>              put_packet(s, "E22");
+>          break;
+>      case 'H':
+>          type = *p++;
+> -        thread = strtoull(p, (char **)&p, 16);
+> -        if (thread == -1 || thread == 0) {
+> +
+> +        thread_kind = read_thread_id(p, &p, &pid, &tid);
+> +        if (thread_kind == GDB_READ_THREAD_ERR) {
+> +            put_packet(s, "E22");
+> +            break;
+> +        }
+> +
+> +        if (thread_kind != GDB_ONE_THREAD) {
+>              put_packet(s, "OK");
+>              break;
+>          }
+> -        cpu = find_cpu(thread);
+> +        cpu = gdb_get_cpu(s, pid, tid);
+>          if (cpu == NULL) {
+>              put_packet(s, "E22");
+>              break;
+>          }
+>          switch (type) {
+> @@ -1295,12 +1408,12 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>               put_packet(s, "E22");
+>               break;
+>          }
+>          break;
+>      case 'T':
+> -        thread = strtoull(p, (char **)&p, 16);
+> -        cpu = find_cpu(thread);
+> +        read_thread_id(p, &p, &pid, &tid);
 
-When a guest CPU thread calls qemu_system_reset_request(), this
-results in a call to qemu_cpu_stop(current_cpu, true), to
-make the CPU come back out to the main loop. We also set the
-reset_requested flag, to get the IO thread to actually do the
-reset.
+This part can now be safer too:
 
-The main loop thread runs main_loop_should_exit(). If there is a
-pending reset, it calls pause_all_vcpus(), with the intention
-that this quiesces all the guest CPUs before it starts messing
-with reset actions.
+           thread_kind = read_thread_id(p, &p, &pid, &tid);
+           if (thread_kind == GDB_READ_THREAD_ERR) {
+               put_packet(s, "E22");
+               break;
+           }
 
-pause_all_vcpus() just waits for every cpu to have cpu->stopped set.
-However, if the running cpu has just called qemu_cpu_stop() on
-itself then it will have set cpu->stopped true but not actually
-made it out to the main loop yet. (In the case I'm looking at,
-what happens is that as soon as the CPU thread unlocks the
-iothread mutex in io_writex() after the device write, the
-main thread runs and does all the reset operations.)
+With this change:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The reset code in the iothread then proceeds to start calling
-various reset functions while the CPU thread is still inside
-the exec loop, running generated code and so on. This doesn't
-seem like what ought to happen. In particular it includes
-calling cpu_common_reset(), which clears all kinds of flags
-relevant to the still-executing CPU...
-
-Any suggestions for how we should fix this?
-
-thanks
--- PMM
+> +        cpu = gdb_get_cpu(s, pid, tid);
+>  
+>          if (cpu != NULL) {
+>              put_packet(s, "OK");
+>          } else {
+>              put_packet(s, "E22");
+> 
