@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g6ynZ-0002LH-Dv
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:03:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1g6yx1-0000uY-JK
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:13:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g6ynT-0001p7-OW
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:03:45 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43097)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g6ynT-0001o0-Bb
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:03:39 -0400
-Received: by mail-ot1-x341.google.com with SMTP id e21-v6so13130601otk.10
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 07:03:38 -0700 (PDT)
-References: <1538118095-7003-1-git-send-email-thuth@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ee55802f-fb09-fb6d-5650-33c94cf9a0ef@linaro.org>
-Date: Mon, 1 Oct 2018 09:03:34 -0500
-MIME-Version: 1.0
-In-Reply-To: <1538118095-7003-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: Replace
- countLeadingZeros32/64 with clz32/64
+	(envelope-from <thuth@redhat.com>) id 1g6ywv-0004Zf-Kc
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:13:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1g6ywo-0004N4-Dz
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 10:13:22 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  1 Oct 2018 16:13:10 +0200
+Message-Id: <1538403190-27146-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] scripts/device-crash-test: Remove entries for
+ serial devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +22,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On 9/28/18 2:01 AM, Thomas Huth wrote:
-> Our minimum required compiler for compiling QEMU is GCC 4.1 these days,
-> so we can drop the support for compilers which do not provide the
-> __builtin_clz*() functions yet. Since the countLeadingZeros32/64 are
-> then identical to the clz32/64 functions, and we do not have to sync
-> the softloat 2 codebase with upstream anymore (softloat 3 is a complete
-> rewrite) we can simply replace the functions with our QEMU versions.
-> 
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  fpu/softfloat.c                | 26 ++++++-------
->  include/fpu/softfloat-macros.h | 87 ------------------------------------------
->  2 files changed, 13 insertions(+), 100 deletions(-)
+The problem with the various serial devices has been fixed a while
+ago in commit 47c4f85a0c27888e12af827471cfef87deb49821 ("hw/char/serial:
+Allow disconnected chardevs") already, so we can remove these entries
+from the "ignore" list in the device-crash-test script now.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ scripts/device-crash-test | 5 -----
+ 1 file changed, 5 deletions(-)
 
-
-r~
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index e6c233e..3422475 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -99,7 +99,6 @@ ERROR_WHITELIST = [
+     {'device':'isa-ipmi-bt', 'expected':True},             # IPMI device requires a bmc attribute to be set
+     {'device':'isa-ipmi-kcs', 'expected':True},            # IPMI device requires a bmc attribute to be set
+     {'device':'isa-parallel', 'expected':True},            # Can't create serial device, empty char device
+-    {'device':'isa-serial', 'expected':True},              # Can't create serial device, empty char device
+     {'device':'ivshmem', 'expected':True},                 # You must specify either 'shm' or 'chardev'
+     {'device':'ivshmem-doorbell', 'expected':True},        # You must specify a 'chardev'
+     {'device':'ivshmem-plain', 'expected':True},           # You must specify a 'memdev'
+@@ -110,9 +109,6 @@ ERROR_WHITELIST = [
+     {'device':'pc-dimm', 'expected':True},                 # 'memdev' property is not set
+     {'device':'pci-bridge', 'expected':True},              # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
+     {'device':'pci-bridge-seat', 'expected':True},         # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
+-    {'device':'pci-serial', 'expected':True},              # Can't create serial device, empty char device
+-    {'device':'pci-serial-2x', 'expected':True},           # Can't create serial device, empty char device
+-    {'device':'pci-serial-4x', 'expected':True},           # Can't create serial device, empty char device
+     {'device':'pxa2xx-dma', 'expected':True},              # channels value invalid
+     {'device':'pxb', 'expected':True},                     # Bridge chassis not specified. Each bridge is required to be assigned a unique chassis id > 0.
+     {'device':'scsi-block', 'expected':True},              # drive property not set
+@@ -218,7 +214,6 @@ ERROR_WHITELIST = [
+     {'exitcode':-6, 'log':r"Object .* is not an instance of type generic-pc-machine", 'loglevel':logging.ERROR},
+     {'exitcode':-6, 'log':r"Object .* is not an instance of type e500-ccsr", 'loglevel':logging.ERROR},
+     {'exitcode':-6, 'log':r"vmstate_register_with_alias_id: Assertion `!se->compat \|\| se->instance_id == 0' failed", 'loglevel':logging.ERROR},
+-    {'exitcode':-11, 'device':'isa-serial', 'loglevel':logging.ERROR, 'expected':True},
+ 
+     # everything else (including SIGABRT and SIGSEGV) will be a fatal error:
+     {'exitcode':None, 'fatal':True, 'loglevel':logging.FATAL},
+-- 
+1.8.3.1
