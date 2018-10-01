@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g71r2-0002ND-Uh
+	(envelope-from <kwolf@redhat.com>) id 1g71r2-0002NB-US
 	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g71qz-00075L-3J
+	(envelope-from <kwolf@redhat.com>) id 1g71qz-00075N-3L
 	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 13:19:31 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  1 Oct 2018 19:18:42 +0200
-Message-Id: <20181001171901.11004-5-kwolf@redhat.com>
+Date: Mon,  1 Oct 2018 19:18:44 +0200
+Message-Id: <20181001171901.11004-7-kwolf@redhat.com>
 In-Reply-To: <20181001171901.11004-1-kwolf@redhat.com>
 References: <20181001171901.11004-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 04/23] block: Remove child references from
- bs->{options, explicit_options}
+Subject: [Qemu-devel] [PULL 06/23] block: Allow child references on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +24,64 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 From: Alberto Garcia <berto@igalia.com>
 
-Block drivers allow opening their children using a reference to an
-existing BlockDriverState. These references remain stored in the
-'options' and 'explicit_options' QDicts, but we don't need to keep
-them once everything is open.
+In the previous patches we removed all child references from
+bs->{options,explicit_options} because keeping them is useless and
+wrong.
 
-What is more important, these values can become wrong if the children
-change:
+Because of this, any attempt to reopen a BlockDriverState using a
+child reference as one of its options would result in a failure,
+because bdrv_reopen_prepare() would detect that there's a new option
+(the child reference) that wasn't present in bs->options.
 
-    $ qemu-img create -f qcow2 hd0.qcow2 10M
-    $ qemu-img create -f qcow2 hd1.qcow2 10M
-    $ qemu-img create -f qcow2 hd2.qcow2 10M
-    $ $QEMU -drive if=none,file=hd0.qcow2,node-name=hd0 \
-            -drive if=none,file=hd1.qcow2,node-name=hd1,backing=hd0 \
-            -drive file=hd2.qcow2,node-name=hd2,backing=hd1
+But passing child references on reopen can be useful. It's a way to
+specify a BDS's child without having to pass recursively all of the
+child's options, and if the reference points to a different BDS then
+this can allow us to replace the child.
 
-After this hd2 has hd1 as its backing file. Now let's remove it using
-block_stream:
+However, replacing the child is something that needs to be implemented
+case by case and only when it makes sense. For now, this patch allows
+passing a child reference as long as it points to the current child of
+the BlockDriverState.
 
-    (qemu) block_stream hd2 0 hd0.qcow2
-
-Now hd0 is the backing file of hd2, but hd2's options QDicts still
-contain backing=hd1.
+It's also important to remember that, as a consequence of the
+previous patches, this child reference will be removed from
+bs->{options,explicit_options} after the reopening has been completed.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ block.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/block.c b/block.c
-index c298ca6a19..db71ea5b9a 100644
+index 98aca56785..ff1aded4b8 100644
 --- a/block.c
 +++ b/block.c
-@@ -2763,12 +2763,15 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
-         }
-     }
+@@ -3242,6 +3242,24 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+             QObject *new = entry->value;
+             QObject *old = qdict_get(reopen_state->bs->options, entry->key);
  
--    /* Remove all children options from bs->options and bs->explicit_options */
-+    /* Remove all children options and references
-+     * from bs->options and bs->explicit_options */
-     QLIST_FOREACH(child, &bs->children, next) {
-         char *child_key_dot;
-         child_key_dot = g_strdup_printf("%s.", child->name);
-         qdict_extract_subqdict(bs->explicit_options, NULL, child_key_dot);
-         qdict_extract_subqdict(bs->options, NULL, child_key_dot);
-+        qdict_del(bs->explicit_options, child->name);
-+        qdict_del(bs->options, child->name);
-         g_free(child_key_dot);
-     }
- 
-@@ -3290,6 +3293,7 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
- {
-     BlockDriver *drv;
-     BlockDriverState *bs;
-+    BdrvChild *child;
-     bool old_can_write, new_can_write;
- 
-     assert(reopen_state != NULL);
-@@ -3314,6 +3318,13 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
-     bs->open_flags         = reopen_state->flags;
-     bs->read_only = !(reopen_state->flags & BDRV_O_RDWR);
- 
-+    /* Remove child references from bs->options and bs->explicit_options.
-+     * Child options were already removed in bdrv_reopen_queue_child() */
-+    QLIST_FOREACH(child, &bs->children, next) {
-+        qdict_del(bs->explicit_options, child->name);
-+        qdict_del(bs->options, child->name);
-+    }
++            /* Allow child references (child_name=node_name) as long as they
++             * point to the current child (i.e. everything stays the same). */
++            if (qobject_type(new) == QTYPE_QSTRING) {
++                BdrvChild *child;
++                QLIST_FOREACH(child, &reopen_state->bs->children, next) {
++                    if (!strcmp(child->name, entry->key)) {
++                        break;
++                    }
++                }
 +
-     bdrv_refresh_limits(bs, NULL);
- 
-     bdrv_set_perm(reopen_state->bs, reopen_state->perm,
++                if (child) {
++                    const char *str = qobject_get_try_str(new);
++                    if (!strcmp(child->bs->node_name, str)) {
++                        continue; /* Found child with this name, skip option */
++                    }
++                }
++            }
++
+             /*
+              * TODO: When using -drive to specify blockdev options, all values
+              * will be strings; however, when using -blockdev, blockdev-add or
 -- 
 2.13.6
