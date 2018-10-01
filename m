@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g6t9I-0007Zi-LY
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:01:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g6tIV-0003Uh-UF
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:11:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g6t9F-00083s-GU
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:01:48 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g6t9F-00082b-8G
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:01:45 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 185-v6so2188019wmt.2
-	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 01:01:45 -0700 (PDT)
-References: <20181001063803.22330-1-clg@kaod.org>
-	<20181001063803.22330-9-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <dc0c6ebd-f860-dd99-73b4-ad089ce259d5@redhat.com>
-Date: Mon, 1 Oct 2018 10:01:43 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1g6tIS-0005uR-Jg
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:11:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36196)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g6tIS-0005tv-Bz
+	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 04:11:16 -0400
+References: <1538295197-23704-1-git-send-email-pbonzini@redhat.com>
+	<572f8674-1712-686a-278e-9eae5947a233@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5a4400ff-5eed-6deb-9986-a63abca495b6@redhat.com>
+Date: Mon, 1 Oct 2018 10:11:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181001063803.22330-9-clg@kaod.org>
+In-Reply-To: <572f8674-1712-686a-278e-9eae5947a233@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/11] net: smc91c111: convert SysBus
- init method to a realize method
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/79] Misc QEMU patches for 2018-09-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On 10/1/18 8:38 AM, Cédric Le Goater wrote:
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+On 30/09/2018 16:54, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Paolo, Peter.
+>=20
+> On 9/30/18 10:11 AM, Paolo Bonzini wrote:
+>> The following changes since commit 042938f46e1c477419d1931381fdadffaa4=
+9d45e:
+>>
+>>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2=
+0180926a' into staging (2018-09-28 17:07:23 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>
+>>   git://github.com/bonzini/qemu.git tags/for-upstream
+>>
+>> for you to fetch changes up to 54b570779677ff8620a79ed81ddf0906b1d23f4=
+e:
+>>
+>>   hw/scsi/mptendian: Avoid taking address of fields in packed structs =
+(2018-09-30 10:08:28 +0200)
+>>
+>> ----------------------------------------------------------------
+>> * configure fix for environment variables (Daniel)
+>> * fix memory leaks (Alex)
+>> * x86_64 MTTCG (Emilio)
+>> * introduce atomic64 (Emilio)
+>> * Fix for virtio hang (Fam, myself)
+>> * SH serial port fix (Geert)
+>> * Deprecate rotation_rate for scsi-block (Fam)
+>> * Extend memory-backend-file availability to all POSIX hosts (Hikaru)
+>> * Memory API cleanups and fixes (Igor, Li Qiang, Peter, Philippe)
+>> * MSI/IOMMU fix (Jan)
+>> * Socket reconnection fixes (Marc-Andr=C3=A9)
+>> * icount fixes (Emilio, myself)
+>> * QSP fixes for Coverity (myself)
+>> * Some record/replay improovements (Pavel)
+>> * Packed struct fixes (Peter)
+>> * Windows dump fixes and elf2dmp (Viktor)
+>> * kbmclock fix (Yongji)
+>=20
+> Paolo, thanks for queuing all of this, however I note some UTF-8 issues=
+.
+>=20
+> Alex got lucky:
+>=20
+>  Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>=20
+> But Marc-Andr=C3=A9 and myself have:
+>=20
+>  Signed-off-by: Philippe Mathieu-Daud=C3=83=C2=A9 <f4bug@amsat.org>
+>  Signed-off-by: Marc-Andr=C3=83=C2=A9 Lureau <marcandre.lureau@redhat.c=
+om>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I'll fix it.  In the meanwhile, I'll note that we're also improving
+Patchew so that it is much better at applying patches via three-way
+merge (basically the adding of *-by tags moves from "patchew apply" to
+the web stuff) and that should make these UTF-8 issues a thing of the pas=
+t.
 
-> ---
->  hw/net/smc91c111.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
-> index d2fd2040e81c..99da2d92973e 100644
-> --- a/hw/net/smc91c111.c
-> +++ b/hw/net/smc91c111.c
-> @@ -766,9 +766,9 @@ static NetClientInfo net_smc91c111_info = {
->      .receive = smc91c111_receive,
->  };
->  
-> -static int smc91c111_init1(SysBusDevice *sbd)
-> +static void smc91c111_realize(DeviceState *dev, Error **errp)
->  {
-> -    DeviceState *dev = DEVICE(sbd);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
->      smc91c111_state *s = SMC91C111(dev);
->  
->      memory_region_init_io(&s->mmio, OBJECT(s), &smc91c111_mem_ops, s,
-> @@ -780,7 +780,6 @@ static int smc91c111_init1(SysBusDevice *sbd)
->                            object_get_typename(OBJECT(dev)), dev->id, s);
->      qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
->      /* ??? Save/restore.  */
-> -    return 0;
->  }
->  
->  static Property smc91c111_properties[] = {
-> @@ -791,9 +790,8 @@ static Property smc91c111_properties[] = {
->  static void smc91c111_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
->  
-> -    k->init = smc91c111_init1;
-> +    dc->realize = smc91c111_realize;
->      dc->reset = smc91c111_reset;
->      dc->vmsd = &vmstate_smc91c111;
->      dc->props = smc91c111_properties;
-> 
+Paolo
