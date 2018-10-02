@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g7Mvm-0004WP-4B
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:50 -0400
+	(envelope-from <clg@kaod.org>) id 1g7Mvm-0004Wb-Bq
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g7Mvf-0007Go-Ue
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:48 -0400
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:36569)
+	(envelope-from <clg@kaod.org>) id 1g7Mvi-0007HS-A7
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:50 -0400
+Received: from 10.mo7.mail-out.ovh.net ([178.33.250.56]:52902)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g7Mve-0007D9-DG
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:42 -0400
-Received: from player734.ha.ovh.net (unknown [10.109.146.76])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id DEDEB2E1F2
-	for <qemu-devel@nongnu.org>; Tue,  2 Oct 2018 17:49:26 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g7Mvg-0007Fq-AA
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:45 -0400
+Received: from player797.ha.ovh.net (unknown [10.109.159.62])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id A2423DFEE6
+	for <qemu-devel@nongnu.org>; Tue,  2 Oct 2018 17:49:39 +0200 (CEST)
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 References: <20181001220942.2382-1-f4bug@amsat.org>
-	<20181001220942.2382-4-f4bug@amsat.org>
-Message-ID: <9ac76827-9630-24f6-69a3-2bf981b9116b@kaod.org>
-Date: Tue, 2 Oct 2018 17:49:21 +0200
+	<20181001220942.2382-2-f4bug@amsat.org>
+Message-ID: <d58c1c4c-11ef-ad23-85e5-9d3ac99b1ea5@kaod.org>
+Date: Tue, 2 Oct 2018 17:49:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181001220942.2382-4-f4bug@amsat.org>
+In-Reply-To: <20181001220942.2382-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/15] hw/timer/sun4v-rtc: Use
- DeviceState::realize rather than SysBusDevice::init
+Subject: Re: [Qemu-devel] [PATCH 01/15] trace-events: Fix copy/paste typo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,11 +32,10 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
 On 10/2/18 12:09 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Move from the legacy SysBusDevice::init method to using DeviceState::re=
-alize.
+> Missed while reviewing 5dd85b4b486.
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -49,38 +47,24 @@ Thanks,
 C.
 
 > ---
->  hw/timer/sun4v-rtc.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+>  hw/timer/trace-events | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/hw/timer/sun4v-rtc.c b/hw/timer/sun4v-rtc.c
-> index 13be94f8da..4e7f6a1eff 100644
-> --- a/hw/timer/sun4v-rtc.c
-> +++ b/hw/timer/sun4v-rtc.c
-> @@ -63,21 +63,21 @@ void sun4v_rtc_init(hwaddr addr)
->      sysbus_mmio_map(s, 0, addr);
->  }
+> diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+> index fa4213df5b..ca9ad6321a 100644
+> --- a/hw/timer/trace-events
+> +++ b/hw/timer/trace-events
+> @@ -56,7 +56,7 @@ systick_timer_tick(void) "systick reload"
+>  systick_read(uint64_t addr, uint32_t value, unsigned size) "systick re=
+ad addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+>  systick_write(uint64_t addr, uint32_t value, unsigned size) "systick w=
+rite addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
 > =20
-> -static int sun4v_rtc_init1(SysBusDevice *dev)
-> +static void sun4v_rtc_realize(DeviceState *dev, Error **errp)
->  {
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      Sun4vRtc *s =3D SUN4V_RTC(dev);
-> =20
->      memory_region_init_io(&s->iomem, OBJECT(s), &sun4v_rtc_ops, s,
->                            "sun4v-rtc", 0x08ULL);
-> -    sysbus_init_mmio(dev, &s->iomem);
-> -    return 0;
-> +    sysbus_init_mmio(sbd, &s->iomem);
->  }
-> =20
->  static void sun4v_rtc_class_init(ObjectClass *klass, void *data)
->  {
-> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> =20
-> -    k->init =3D sun4v_rtc_init1;
-> +    dc->realize =3D sun4v_rtc_realize;
->  }
-> =20
->  static const TypeInfo sun4v_rtc_info =3D {
+> -# hw/char/cmsdk_apb_timer.c
+> +# hw/timer/cmsdk_apb_timer.c
+>  cmsdk_apb_timer_read(uint64_t offset, uint64_t data, unsigned size) "C=
+MSDK APB timer read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+>  cmsdk_apb_timer_write(uint64_t offset, uint64_t data, unsigned size) "=
+CMSDK APB timer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+>  cmsdk_apb_timer_reset(void) "CMSDK APB timer: reset"
 >=20
