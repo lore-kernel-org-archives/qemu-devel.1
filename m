@@ -1,19 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1g7L8x-0000zb-E5
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:55:21 -0400
+	(envelope-from <akrowiak@linux.ibm.com>) id 1g7LJ7-0004yU-GK
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 10:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1g7L8r-0004u1-J8
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:55:19 -0400
-Received: from relay.sw.ru ([185.231.240.75]:41294)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1g7L8o-0004t7-UT
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:55:11 -0400
-From: "Denis V. Lunev" <den@openvz.org>
-Date: Tue,  2 Oct 2018 16:55:38 +0300
-Message-Id: <20181002135538.12113-1-den@openvz.org>
-Subject: [Qemu-devel] [PATCH 1/1] qmp,
- hmp: make subsystem/system-vendor identities optional
+	(envelope-from <akrowiak@linux.ibm.com>) id 1g7LJ2-0003rF-Fv
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 10:05:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58707
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1g7LJ2-0003qc-AD
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 10:05:44 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w92Dws73135107
+	for <qemu-devel@nongnu.org>; Tue, 2 Oct 2018 10:05:43 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2mv82qwbda-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 10:05:42 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Tue, 2 Oct 2018 08:05:41 -0600
+References: <20180926225440.6204-1-akrowiak@linux.vnet.ibm.com>
+	<20180927112852.71782355.cohuck@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Tue, 2 Oct 2018 10:05:30 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180927112852.71782355.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <1b1126bc-ca9a-ff38-bce9-c9330320d8ef@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v9 0/6] s390x: vfio-ap: guest dedicated
+ crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,92 +44,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: den@openvz.org
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, fiuczy@linux.ibm.com, mimu@linux.ibm.com
 
-According to PCI specification subsystem id and subsystem vendor id are
-optinal and could be abscent in Type1 header and can be found on
-different offsets within Type0 and Type2 headers.
+On 09/27/2018 05:28 AM, Cornelia Huck wrote:
+> On Wed, 26 Sep 2018 18:54:34 -0400
+> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
+> 
+>> From: Tony Krowiak <akrowiak@linux.ibm.com>
+>>
+>> This patch series is the QEMU counterpart to the KVM/kernel support for
+>> guest dedicated crypto adapters. The KVM/kernel model is built on the
+>> VFIO mediated device framework and provides the infrastructure for
+>> granting exclusive guest access to crypto devices installed on the linux
+>> host. This patch series introduces a new QEMU command line option, QEMU
+>> object model and CPU model features to exploit the KVM/kernel model.
+>>
+>> See the detailed specifications for AP virtualization provided by this
+>> patch set in docs/vfio-ap.txt for a more complete discussion of the
+>> design introduced by this patch series.
+> 
+> This seems to look sane in general. However, before I merge this:
+> 
+> - This needs to wait for a proper headers sync, which can only be done
+>    after the Linux code hits upstream. Shouldn't be long, I guess (I can
+>    queue on a staging branch while waiting.)
+> - As I don't have the hardware, I cannot run more than some generic
+>    "verify it does not break anything" testing. So, I'd like to see a
+>    Tested-by by someone who actually does have access to the hardware.
+> - I'd like to see some more review/acks from others. If other (minor)
+>    things crop up, I'd prefer a respin (I don't want to juggle too many
+>    "minor changes"...)
 
-Thus we should make this data optional in struct PciDeviceId and skip
-reporting them via HMP if the information is not available.
+I am planning on a v10 series to address issues raised by Thomas, David
+and you.
 
-Additional (wrong information) about PCI bridges (Type1 devices) has been
-added in 5383a705 and fortunately not released. This patch fixes that
-problem. The problem was spotted by Markus.
-
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
-CC: Markus Armbruster <armbru@redhat.com>
----
- hmp.c          |  6 ++++--
- hw/pci/pci.c   | 13 ++++++++++---
- qapi/misc.json |  4 ++--
- 3 files changed, 16 insertions(+), 7 deletions(-)
-
-diff --git a/hmp.c b/hmp.c
-index 3a9f797677..55633d29a3 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -824,8 +824,10 @@ static void hmp_info_pci_device(Monitor *mon, const PciDeviceInfo *dev)
- 
-     monitor_printf(mon, ": PCI device %04" PRIx64 ":%04" PRIx64 "\n",
-                    dev->id->vendor, dev->id->device);
--    monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
--                   dev->id->subsystem_vendor, dev->id->subsystem);
-+    if (dev->id->has_subsystem_vendor && dev->id->has_subsystem) {
-+        monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
-+                       dev->id->subsystem_vendor, dev->id->subsystem);
-+    }
- 
-     if (dev->has_irq) {
-         monitor_printf(mon, "      IRQ %" PRId64 ".\n", dev->irq);
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 51d0dec466..b937f0dc0a 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1737,9 +1737,6 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
-     info->id = g_new0(PciDeviceId, 1);
-     info->id->vendor = pci_get_word(dev->config + PCI_VENDOR_ID);
-     info->id->device = pci_get_word(dev->config + PCI_DEVICE_ID);
--    info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
--    info->id->subsystem_vendor =
--        pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
-     info->regions = qmp_query_pci_regions(dev);
-     info->qdev_id = g_strdup(dev->qdev.id ? dev->qdev.id : "");
- 
-@@ -1752,6 +1749,16 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
-     if (type == PCI_HEADER_TYPE_BRIDGE) {
-         info->has_pci_bridge = true;
-         info->pci_bridge = qmp_query_pci_bridge(dev, bus, bus_num);
-+    } else if (type == PCI_HEADER_TYPE_NORMAL) {
-+        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
-+        info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
-+        info->id->subsystem_vendor =
-+            pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
-+    } else if (type == PCI_HEADER_TYPE_CARDBUS) {
-+        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
-+        info->id->subsystem = pci_get_word(dev->config + PCI_CB_SUBSYSTEM_ID);
-+        info->id->subsystem_vendor =
-+            pci_get_word(dev->config + PCI_CB_SUBSYSTEM_VENDOR_ID);
-     }
- 
-     return info;
-diff --git a/qapi/misc.json b/qapi/misc.json
-index ada9af5add..95a6ed022d 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -839,8 +839,8 @@
- # Since: 2.4
- ##
- { 'struct': 'PciDeviceId',
--  'data': {'device': 'int', 'vendor': 'int', 'subsystem': 'int',
--            'subsystem-vendor': 'int'} }
-+  'data': {'device': 'int', 'vendor': 'int', '*subsystem': 'int',
-+            '*subsystem-vendor': 'int'} }
- 
- ##
- # @PciDeviceInfo:
--- 
-2.17.1
+> 
