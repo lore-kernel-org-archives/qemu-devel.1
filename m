@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7HQQ-0005Y8-QS
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:57:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g7HSQ-0007tF-Sf
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:59:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7HQQ-0008CA-04
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:57:06 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41954)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g7HQP-0008Bs-Pq
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:57:05 -0400
-Received: by mail-ot1-x343.google.com with SMTP id e18-v6so1272626oti.8
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 02:57:05 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1g7HSL-00018r-QZ
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:59:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46538)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7HSL-00018P-F2
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:59:05 -0400
+References: <CAFEAcA-T7-PcKLwPr0VO0wrwW3x+w2WbdEjTjN2YfWOmZXyfUg@mail.gmail.com>
+	<87lg7hlend.fsf@linaro.org>
+	<CAFEAcA8ZW_rDyUg0G+agmBfNc8dNVc7r1pdu-Tyb6cvLXdvzHw@mail.gmail.com>
+	<021f3f1e-e767-8d84-0189-fbfa7ca5f143@redhat.com>
+	<CAFEAcA-M_x8oC_1Z5A9Lv3DQ1Z+_vVdyUnaHoBMv4nkJepcBhA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <59e637ee-2a5a-6256-461a-7c8037e81558@redhat.com>
+Date: Tue, 2 Oct 2018 11:59:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180926112048.17778-4-alex.bennee@linaro.org>
-References: <20180926112048.17778-1-alex.bennee@linaro.org>
-	<20180926112048.17778-4-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Oct 2018 10:56:44 +0100
-Message-ID: <CAFEAcA9DaiY-fu_P4FkswyxHgPO50W7XvkKWXpV5wLbLyCL2bw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAFEAcA-M_x8oC_1Z5A9Lv3DQ1Z+_vVdyUnaHoBMv4nkJepcBhA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 3/4] target/arm64: kvm debug set
- target_el when passing exception to guest
+Subject: Re: [Qemu-devel] racing between pause_all_vcpus() and
+ qemu_cpu_stop()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Omair Javaid <omair.javaid@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>
 
-On 26 September 2018 at 12:20, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
-> When we are debugging the guest all exception come our way but might
+On 02/10/2018 11:04, Peter Maydell wrote:
+> On 2 October 2018 at 09:58, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> First, the reset code should indeed use run_on_cpu (it need not be saf=
+e
+>> i.e. stop-the-world; just run it in the vCPU thread).  It certainly
+>> doesn't do this right now.
+>=20
+> I don't understand this part. We're resetting the entire world:
+> surely we need to stop the entire world first ?
 
-"exceptions"
+Most of the world is stopped because it only runs with BQL taken.  vCPU
+isn't, so we ensure it is stopped by: 1) using run_on_cpu to synchronize
+with the executed TBs (or KVM_RUN) 2) ensuring the execution loop is
+paused after reset, which is the cpu_can_run part that you snipped.
 
-> be for the guests own debug exceptions. We use the ->do_interrupt()
+"Safe" CPU work items on the other hand ensure that _no_ vCPU is in the
+execution loop, which is overkill here.
 
-"guest's"
+Paolo
 
-> infrastructure to do this however we are missing a full setup of the
-
-"to inject the exception into the guest. However, "
-
-> exception structure causing an assert later down the line.
-
-"structure, "
-
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  target/arm/kvm64.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index 346e1f1a73..9ceff1884c 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -984,6 +984,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_de=
-bug_exit_arch *debug_exit)
->      cs->exception_index =3D EXCP_BKPT;
->      env->exception.syndrome =3D debug_exit->hsr;
->      env->exception.vaddress =3D debug_exit->far;
-> +    env->exception.target_el =3D 1;
->      qemu_mutex_lock_iothread();
->      cc->do_interrupt(cs);
->      qemu_mutex_unlock_iothread();
-> --
-> 2.17.1
->
-
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+> (Also, other things use pause_all_vcpus() and hit this race
+> condition, like VM suspend and shutdown.)
+>=20
+> thanks
+> -- PMM
+>=20
