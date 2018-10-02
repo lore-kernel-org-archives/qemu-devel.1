@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7Qjz-0000nI-Lb
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:53:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7Qp9-0002sg-V5
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:59:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7Qjw-0005bt-3X
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:53:55 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43217)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7Qp4-0000CN-NI
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:59:15 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43113)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g7Qjv-0005bF-Qx
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:53:51 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e21-v6so3157719otk.10
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 12:53:51 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue,  2 Oct 2018 14:53:47 -0500
-Message-Id: <20181002195347.26712-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] softfloat: Fix division
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7Qp4-0000Bm-3f
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:59:10 -0400
+Received: by mail-wr1-x441.google.com with SMTP id n1-v6so3585575wrt.10
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 12:59:09 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20181001220942.2382-1-f4bug@amsat.org>
+	<20181001220942.2382-6-f4bug@amsat.org>
+	<CAFEAcA-ZQ4nj6x1Uc7TaKRQr-6bH+q0gp6RK6v2b=XYWFsxouA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b7a53ef4-ee8e-de31-d0c7-2a03ab16aa4b@amsat.org>
+Date: Tue, 2 Oct 2018 21:59:03 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-ZQ4nj6x1Uc7TaKRQr-6bH+q0gp6RK6v2b=XYWFsxouA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 05/15] hw/sh4/sh_pci: Use
+ DeviceState::realize rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,169 +37,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, cota@braap.org
+To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-The __udiv_qrnnd primitive that we nicked from gmp requires its
-inputs to be normalized.  We were not doing that.  Because the
-inputs are nearly normalized already, finishing that is trivial.
-Inline div128to64 into its one user, because it is no longer a
-general-purpose routine.
+On 10/2/18 3:13 PM, Peter Maydell wrote:
+> On 1 October 2018 at 23:09, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Move from the legacy SysBusDevice::init method to using DeviceState::realize.
+> 
+> Comment says DeviceState::realize but the code is using
+> PCIDevice::realize ?
+> 
+> I didn't realize pci devices had their own realize method:
+> what's the difference between it and plain old DeviceState::realize,
+> which they also have, since PCIDeviceClass inherits from DeviceClass ?
 
-Fixes: cf07323d494
-Fixes: https://bugs.launchpad.net/qemu/+bug/1793119
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/fpu/softfloat-macros.h | 48 -----------------------
- fpu/softfloat.c                | 72 ++++++++++++++++++++++++++++++----
- 2 files changed, 64 insertions(+), 56 deletions(-)
-
-diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-index 35e1603a5e..f29426ac46 100644
---- a/include/fpu/softfloat-macros.h
-+++ b/include/fpu/softfloat-macros.h
-@@ -625,54 +625,6 @@ static inline uint64_t estimateDiv128To64(uint64_t a0, uint64_t a1, uint64_t b)
- 
- }
- 
--/* From the GNU Multi Precision Library - longlong.h __udiv_qrnnd
-- * (https://gmplib.org/repo/gmp/file/tip/longlong.h)
-- *
-- * Licensed under the GPLv2/LGPLv3
-- */
--static inline uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
--{
--    uint64_t d0, d1, q0, q1, r1, r0, m;
--
--    d0 = (uint32_t)d;
--    d1 = d >> 32;
--
--    r1 = n1 % d1;
--    q1 = n1 / d1;
--    m = q1 * d0;
--    r1 = (r1 << 32) | (n0 >> 32);
--    if (r1 < m) {
--        q1 -= 1;
--        r1 += d;
--        if (r1 >= d) {
--            if (r1 < m) {
--                q1 -= 1;
--                r1 += d;
--            }
--        }
--    }
--    r1 -= m;
--
--    r0 = r1 % d1;
--    q0 = r1 / d1;
--    m = q0 * d0;
--    r0 = (r0 << 32) | (uint32_t)n0;
--    if (r0 < m) {
--        q0 -= 1;
--        r0 += d;
--        if (r0 >= d) {
--            if (r0 < m) {
--                q0 -= 1;
--                r0 += d;
--            }
--        }
--    }
--    r0 -= m;
--
--    /* Return remainder in LSB */
--    return (q1 << 32) | q0 | (r0 != 0);
--}
--
- /*----------------------------------------------------------------------------
- | Returns an approximation to the square root of the 32-bit significand given
- | by `a'.  Considered as an integer, `a' must be at least 2^31.  If bit 0 of
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 9405f12a03..93edc06996 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1112,19 +1112,75 @@ static FloatParts div_floats(FloatParts a, FloatParts b, float_status *s)
-     bool sign = a.sign ^ b.sign;
- 
-     if (a.cls == float_class_normal && b.cls == float_class_normal) {
--        uint64_t temp_lo, temp_hi;
-+        uint64_t n0, n1, d0, d1, q0, q1, r1, r0, m, d;
-         int exp = a.exp - b.exp;
-+
-+        /*
-+         * We want the 2*N / N-bit division to produce exactly an N-bit
-+         * result, so that we do not have to renormalize afterward.
-+         * If A < B, then division would produce an (N-1)-bit result;
-+         * shift A left by one to produce the an N-bit result, and
-+         * decrement the exponent to match.
-+         *
-+         * The udiv_qrnnd algorithm that we're using requires normalization,
-+         * i.e. the msb of the denominator must be set.  Since we know that
-+         * DECOMPOSED_BINARY_POINT is msb-1, everything must be shifted left
-+         * by one more.
-+         */
-         if (a.frac < b.frac) {
-             exp -= 1;
--            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT + 1,
--                              &temp_hi, &temp_lo);
-+            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT + 2, &n1, &n0);
-         } else {
--            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT,
--                              &temp_hi, &temp_lo);
-+            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT + 1, &n1, &n0);
-         }
--        /* LSB of quot is set if inexact which roundandpack will use
--         * to set flags. Yet again we re-use a for the result */
--        a.frac = div128To64(temp_lo, temp_hi, b.frac);
-+        d = b.frac << 1;
-+
-+        /*
-+         * From the GNU Multi Precision Library - longlong.h __udiv_qrnnd
-+         * (https://gmplib.org/repo/gmp/file/tip/longlong.h)
-+         * Licensed under the GPLv2/LGPLv3.
-+         */
-+        d0 = (uint32_t)d;
-+        d1 = d >> 32;
-+
-+        r1 = n1 % d1;
-+        q1 = n1 / d1;
-+        m = q1 * d0;
-+        r1 = (r1 << 32) | (n0 >> 32);
-+        if (r1 < m) {
-+            q1 -= 1;
-+            r1 += d;
-+            if (r1 >= d) {
-+                if (r1 < m) {
-+                    q1 -= 1;
-+                    r1 += d;
-+                }
-+            }
-+        }
-+        r1 -= m;
-+
-+        r0 = r1 % d1;
-+        q0 = r1 / d1;
-+        m = q0 * d0;
-+        r0 = (r0 << 32) | (uint32_t)n0;
-+        if (r0 < m) {
-+            q0 -= 1;
-+            r0 += d;
-+            if (r0 >= d) {
-+                if (r0 < m) {
-+                    q0 -= 1;
-+                    r0 += d;
-+                }
-+            }
-+        }
-+        r0 -= m;
-+        /* End of __udiv_qrnnd.  */
-+
-+        /* Adjust remainder for normalization step.  */
-+        r0 >>= 1;
-+
-+        /* Set lsb if there is a remainder, to set inexact.  */
-+        a.frac = (q1 << 32) | q0 | (r0 != 0);
-         a.sign = sign;
-         a.exp = exp;
-         return a;
--- 
-2.17.1
+Cc'ing Michael and Marcel.
