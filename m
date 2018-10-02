@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g7G9e-0000Tq-8G
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:35:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1g7GAG-0000qt-A9
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:36:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g7G9b-0002DZ-3u
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:35:42 -0400
+	(envelope-from <thuth@redhat.com>) id 1g7GAA-0002Ok-Jx
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:36:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55929)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1g7GAA-0002OF-7f
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:36:14 -0400
 References: <20181001220942.2382-1-f4bug@amsat.org>
-	<20181001220942.2382-15-f4bug@amsat.org>
+	<20181001220942.2382-16-f4bug@amsat.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ba9e6666-fe49-5bed-2b67-b8672314d5d9@redhat.com>
-Date: Tue, 2 Oct 2018 10:35:35 +0200
+Message-ID: <c10f8c0e-39ea-e89e-b569-9ea276f5d598@redhat.com>
+Date: Tue, 2 Oct 2018 10:36:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181001220942.2382-15-f4bug@amsat.org>
+In-Reply-To: <20181001220942.2382-16-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 14/15] hw/hppa/dino: Remove unuseful
+Subject: Re: [Qemu-devel] [RFC PATCH 15/15] hw/mips/malta: Remove unuseful
  code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,34 +30,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
 On 2018-10-02 00:09, Philippe Mathieu-Daud=C3=A9 wrote:
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/hppa/dino.c | 7 -------
->  1 file changed, 7 deletions(-)
+>  hw/mips/mips_malta.c | 13 -------------
+>  1 file changed, 13 deletions(-)
 >=20
-> diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-> index 564b938e3a..31e09942b5 100644
-> --- a/hw/hppa/dino.c
-> +++ b/hw/hppa/dino.c
-> @@ -488,17 +488,10 @@ PCIBus *dino_init(MemoryRegion *addr_space,
->      return b;
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 4ccfa87c35..b6633fa141 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1422,23 +1422,10 @@ void mips_malta_init(MachineState *machine)
+>      pci_vga_init(pci_bus);
 >  }
 > =20
-> -static int dino_pcihost_init(SysBusDevice *dev)
+> -static int mips_malta_sysbus_device_init(SysBusDevice *sysbusdev)
 > -{
 > -    return 0;
 > -}
 > -
->  static void dino_pcihost_class_init(ObjectClass *klass, void *data)
->  {
+> -static void mips_malta_class_init(ObjectClass *klass, void *data)
+> -{
 > -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -
+> -    k->init =3D mips_malta_sysbus_device_init;
+> -}
+> -
+>  static const TypeInfo mips_malta_device =3D {
+>      .name          =3D TYPE_MIPS_MALTA,
+>      .parent        =3D TYPE_SYS_BUS_DEVICE,
+>      .instance_size =3D sizeof(MaltaState),
+> -    .class_init    =3D mips_malta_class_init,
+>  };
 > =20
-> -    k->init =3D dino_pcihost_init;
->      dc->vmsd =3D &vmstate_dino;
->  }
+>  static void mips_malta_machine_init(MachineClass *mc)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
