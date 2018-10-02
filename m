@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g7Mvi-0004RE-Bc
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:48 -0400
+	(envelope-from <clg@kaod.org>) id 1g7Mvg-0004OG-6v
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g7Mvc-0007Fz-Nf
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:46 -0400
-Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:34664)
+	(envelope-from <clg@kaod.org>) id 1g7Mva-0007Fb-Mz
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:43 -0400
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:45581)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g7Mva-0007F6-Ma
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:40 -0400
-Received: from player729.ha.ovh.net (unknown [10.109.143.223])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 5E6AA1012F4
-	for <qemu-devel@nongnu.org>; Tue,  2 Oct 2018 17:49:37 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g7MvZ-0007E2-Sc
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 11:49:38 -0400
+Received: from player796.ha.ovh.net (unknown [10.109.160.251])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id DB549163E51
+	for <qemu-devel@nongnu.org>; Tue,  2 Oct 2018 17:49:31 +0200 (CEST)
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 References: <20181001220942.2382-1-f4bug@amsat.org>
-	<20181001220942.2382-6-f4bug@amsat.org>
-Message-ID: <93f7d571-5c2e-f654-3c02-b733caf6b718@kaod.org>
-Date: Tue, 2 Oct 2018 17:49:30 +0200
+	<20181001220942.2382-5-f4bug@amsat.org>
+Message-ID: <7258b206-f906-472e-f974-beaccafcaeb6@kaod.org>
+Date: Tue, 2 Oct 2018 17:49:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181001220942.2382-6-f4bug@amsat.org>
+In-Reply-To: <20181001220942.2382-5-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/15] hw/sh4/sh_pci: Use
+Subject: Re: [Qemu-devel] [PATCH 04/15] hw/ssi/xilinx_spi: Use
  DeviceState::realize rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,7 +33,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
 On 10/2/18 12:09 AM, Philippe Mathieu-Daud=C3=A9 wrote:
 > Move from the legacy SysBusDevice::init method to using DeviceState::re=
@@ -41,7 +41,7 @@ alize.
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-one question below,
+
 
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
@@ -50,67 +50,43 @@ Thanks,
 C.
 
 > ---
->  hw/sh4/sh_pci.c | 20 +++++++++-----------
->  1 file changed, 9 insertions(+), 11 deletions(-)
+>  hw/ssi/xilinx_spi.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
-> index 4ec2e35500..84c52df067 100644
-> --- a/hw/sh4/sh_pci.c
-> +++ b/hw/sh4/sh_pci.c
-> @@ -120,16 +120,15 @@ static void sh_pci_set_irq(void *opaque, int irq_=
-num, int level)
->      qemu_set_irq(pic[irq_num], level);
->  }
+> diff --git a/hw/ssi/xilinx_spi.c b/hw/ssi/xilinx_spi.c
+> index 83585bc8b2..3dae303d5b 100644
+> --- a/hw/ssi/xilinx_spi.c
+> +++ b/hw/ssi/xilinx_spi.c
+> @@ -319,9 +319,9 @@ static const MemoryRegionOps spi_ops =3D {
+>      }
+>  };
 > =20
-> -static int sh_pci_device_init(SysBusDevice *dev)
-> +static void sh_pci_device_realize(PCIDevice *dev, Error **errp)
+> -static int xilinx_spi_init(SysBusDevice *sbd)
+> +static void xilinx_spi_realize(DeviceState *dev, Error **errp)
 >  {
-> -    PCIHostState *phb;
-> -    SHPCIState *s;
+> -    DeviceState *dev =3D DEVICE(sbd);
 > +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> +    SHPCIState *s =3D SH_PCI_HOST_BRIDGE(dev);
-> +    PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
+>      XilinxSPI *s =3D XILINX_SPI(dev);
 >      int i;
 > =20
-> -    s =3D SH_PCI_HOST_BRIDGE(dev);
-> -    phb =3D PCI_HOST_BRIDGE(s);
->      for (i =3D 0; i < 4; i++) {
-
-is that  PCI_NUM_PINS ?=20
-
-> -        sysbus_init_irq(dev, &s->irq[i]);
-> +        sysbus_init_irq(sbd, &s->irq[i]);
->      }
->      phb->bus =3D pci_register_root_bus(DEVICE(dev), "pci",
->                                       sh_pci_set_irq, sh_pci_map_irq,
-> @@ -143,13 +142,12 @@ static int sh_pci_device_init(SysBusDevice *dev)
->                               &s->memconfig_p4, 0, 0x224);
->      memory_region_init_alias(&s->isa, OBJECT(s), "sh_pci.isa",
->                               get_system_io(), 0, 0x40000);
-> -    sysbus_init_mmio(dev, &s->memconfig_p4);
-> -    sysbus_init_mmio(dev, &s->memconfig_a7);
-> +    sysbus_init_mmio(sbd, &s->memconfig_p4);
-> +    sysbus_init_mmio(sbd, &s->memconfig_a7);
->      s->iobr =3D 0xfe240000;
->      memory_region_add_subregion(get_system_memory(), s->iobr, &s->isa)=
-;
+> @@ -344,8 +344,6 @@ static int xilinx_spi_init(SysBusDevice *sbd)
 > =20
->      s->dev =3D pci_create_simple(phb->bus, PCI_DEVFN(0, 0), "sh_pci_ho=
-st");
+>      fifo8_create(&s->tx_fifo, FIFO_CAPACITY);
+>      fifo8_create(&s->rx_fifo, FIFO_CAPACITY);
+> -
 > -    return 0;
 >  }
 > =20
->  static void sh_pci_host_realize(PCIDevice *d, Error **errp)
-> @@ -187,9 +185,9 @@ static const TypeInfo sh_pci_host_info =3D {
-> =20
->  static void sh_pci_device_class_init(ObjectClass *klass, void *data)
+>  static const VMStateDescription vmstate_xilinx_spi =3D {
+> @@ -368,9 +366,8 @@ static Property xilinx_spi_properties[] =3D {
+>  static void xilinx_spi_class_init(ObjectClass *klass, void *data)
 >  {
-> -    SysBusDeviceClass *sdc =3D SYS_BUS_DEVICE_CLASS(klass);
-> +    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
 > =20
-> -    sdc->init =3D sh_pci_device_init;
-> +    k->realize =3D sh_pci_device_realize;
->  }
-> =20
->  static const TypeInfo sh_pci_device_info =3D {
+> -    k->init =3D xilinx_spi_init;
+> +    dc->realize =3D xilinx_spi_realize;
+>      dc->reset =3D xlx_spi_reset;
+>      dc->props =3D xilinx_spi_properties;
+>      dc->vmsd =3D &vmstate_xilinx_spi;
 >=20
