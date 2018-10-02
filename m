@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7Fhc-0007Nh-8V
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:06:45 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1g7Fpl-0002ys-FE
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:15:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7FhX-0004w4-GG
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:06:44 -0400
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:40559)
+	(envelope-from <atar4qemu@gmail.com>) id 1g7Fph-0001wH-Q4
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:15:09 -0400
+Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:35362)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g7FhX-0004vf-0y
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:06:39 -0400
-Received: by mail-ot1-x332.google.com with SMTP id w67so1011938ota.7
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 01:06:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1g7Fph-0001w3-KZ
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 04:15:05 -0400
+Received: by mail-it1-x142.google.com with SMTP id p64-v6so2504367itp.0
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 01:15:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181001171901.11004-1-kwolf@redhat.com>
-References: <20181001171901.11004-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Oct 2018 09:06:17 +0100
-Message-ID: <CAFEAcA_4JYnEP9P01zSCX+4i-aqJpCfEDjN1GEkO6wNDp7D7PQ@mail.gmail.com>
+References: <20181001220942.2382-1-f4bug@amsat.org>
+	<20181001220942.2382-12-f4bug@amsat.org>
+In-Reply-To: <20181001220942.2382-12-f4bug@amsat.org>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Tue, 2 Oct 2018 10:14:54 +0200
+Message-ID: <CACXAS8CcEu89HkP3HtT0snp_H8hc9HmEhX9-iK4e4W-035v-kQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/23] Block layer patches
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 11/15] hw/sparc/sun4m: Replace 'empty_slot'
+ by 'unimplemented_device'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +30,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, clg@kaod.org, qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 1 October 2018 at 18:18, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit 07f426c35eddd79388a23d11cb278600d7e3831d:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20180926' into staging (2018-09-28 18:56:09 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to dd353157942a59c21da07da5ac8749a871f7c3ed:
->
->   tests/test-bdrv-drain: Fix too late qemu_event_reset() (2018-10-01 19:13:55 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - qcow2 cache option default changes (Linux: 32 MB maximum, limited by
->   whatever cache size can be made use of with the specific image;
->   default cache-clean-interval of 10 minutes)
-> - reopen: Allow specifying unchanged child node references, and changing
->   a few generic options (discard, detect-zeroes)
-> - Fix werror/rerror defaults for -device drive=<node-name>
-> - Test case fixes
+Hi Philippe,
 
-I still got a hang on OSX on test-bdrv-drain, but I've applied
-this anyway, since hopefully it fixes the other intermittent
-failure and may reduce the likelihood with the test-bdrv-drain.
+On Tue, Oct 2, 2018 at 12:10 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> The TYPE_EMPTY_SLOT and TYPE_UNIMPLEMENTED_DEVICE are identical devices,
+> however the later use more recent APIs and is more widely used.
+>
+> Replace 'empty_slot' by 'unimplemented_device' to simplify devices code
+> maintenance.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  default-configs/sparc-softmmu.mak |  1 -
+>  hw/sparc/sun4m.c                  | 24 ++++++++++++++----------
+>  2 files changed, 14 insertions(+), 11 deletions(-)
+>
+> diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-so=
+ftmmu.mak
+> index 12f97eeb20..7369b54467 100644
+> --- a/default-configs/sparc-softmmu.mak
+> +++ b/default-configs/sparc-softmmu.mak
+> @@ -8,7 +8,6 @@ CONFIG_ESCC=3Dy
+>  CONFIG_M48T59=3Dy
+>  CONFIG_PTIMER=3Dy
+>  CONFIG_FDC=3Dy
+> -CONFIG_EMPTY_SLOT=3Dy
+>  CONFIG_PCNET_COMMON=3Dy
+>  CONFIG_LANCE=3Dy
+>  CONFIG_TCX=3Dy
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 3c29b68e67..ca37acf7af 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -42,7 +42,7 @@
+>  #include "hw/nvram/chrp_nvram.h"
+>  #include "hw/nvram/fw_cfg.h"
+>  #include "hw/char/escc.h"
+> -#include "hw/empty_slot.h"
+> +#include "hw/misc/unimp.h"
+>  #include "hw/loader.h"
+>  #include "elf.h"
+>  #include "trace.h"
+> @@ -863,7 +863,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
+wdef,
+>      ram_init(0, machine->ram_size, hwdef->max_mem);
+>      /* models without ECC don't trap when missing ram is accessed */
+>      if (!hwdef->ecc_base) {
+> -        empty_slot_init(machine->ram_size, hwdef->max_mem - machine->ram=
+_size);
+> +        create_unimplemented_device("ecc", machine->ram_size,
+> +                                    hwdef->max_mem - machine->ram_size);
 
-thanks
--- PMM
+In this particular case of find the name UNIMPLEMENTED_DEVICE a bit
+misleading: there is nothing to implement for non-installed memory
+SIMMs. It's rather an unconnected device. And the name "ecc" is
+misleading too. These machines are not supposed to have any ECC.
+Maybe "unconnected-ram", "empty-ram-slot" or "empty-slot"?
+
+Regards,
+Artyom
+
+>      }
+>
+>      prom_init(hwdef->slavio_base, bios_name);
+> @@ -892,9 +893,10 @@ static void sun4m_hw_init(const struct sun4m_hwdef *=
+hwdef,
+>      if (hwdef->iommu_pad_base) {
+>          /* On the real hardware (SS-5, LX) the MMU is not padded, but al=
+iased.
+>             Software shouldn't use aliased addresses, neither should it c=
+rash
+> -           when does. Using empty_slot instead of aliasing can help with
+> -           debugging such accesses */
+> -        empty_slot_init(hwdef->iommu_pad_base,hwdef->iommu_pad_len);
+> +           when does. Using the 'unimplemented device' instead of aliasi=
+ng can
+> +           help with debugging such accesses */
+> +        create_unimplemented_device("iommu.alias", hwdef->iommu_pad_base=
+,
+> +                                    hwdef->iommu_pad_len);
+>      }
+>
+>      sparc32_dma_init(hwdef->dma_base,
+> @@ -944,12 +946,13 @@ static void sun4m_hw_init(const struct sun4m_hwdef =
+*hwdef,
+>      for (i =3D num_vsimms; i < MAX_VSIMMS; i++) {
+>          /* vsimm registers probed by OBP */
+>          if (hwdef->vsimm[i].reg_base) {
+> -            empty_slot_init(hwdef->vsimm[i].reg_base, 0x2000);
+> +            create_unimplemented_device("vsimm", hwdef->vsimm[i].reg_bas=
+e,
+> +                                        0x2000);
+>          }
+>      }
+>
+>      if (hwdef->sx_base) {
+> -        empty_slot_init(hwdef->sx_base, 0x2000);
+> +        create_unimplemented_device("sx", hwdef->sx_base, 0x2000);
+>      }
+>
+>      nvram =3D m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1=
+968, 8);
+> @@ -1012,14 +1015,15 @@ static void sun4m_hw_init(const struct sun4m_hwde=
+f *hwdef,
+>      if (hwdef->dbri_base) {
+>          /* ISDN chip with attached CS4215 audio codec */
+>          /* prom space */
+> -        empty_slot_init(hwdef->dbri_base+0x1000, 0x30);
+> +        create_unimplemented_device("dbri.prom", hwdef->dbri_base + 0x10=
+00,
+> +                                    0x30);
+>          /* reg space */
+> -        empty_slot_init(hwdef->dbri_base+0x10000, 0x100);
+> +        create_unimplemented_device("dbri", hwdef->dbri_base + 0x10000, =
+0x100);
+>      }
+>
+>      if (hwdef->bpp_base) {
+>          /* parallel port */
+> -        empty_slot_init(hwdef->bpp_base, 0x20);
+> +        create_unimplemented_device("bpp", hwdef->bpp_base, 0x20);
+>      }
+>
+>      kernel_size =3D sun4m_load_kernel(machine->kernel_filename,
+> --
+> 2.19.0
+>
+
+
+--=20
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
+emu
