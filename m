@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7KWP-0003xO-ME
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:15:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g7KXs-0004Zy-Ot
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7KWM-0003Yi-L4
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:15:29 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39504)
+	(envelope-from <peter.maydell@linaro.org>) id 1g7KXs-00049t-2H
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:17:00 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37979)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g7KWM-0003YO-GM
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:15:26 -0400
-Received: by mail-oi1-x244.google.com with SMTP id y81-v6so1440944oia.6
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 06:15:25 -0700 (PDT)
+	id 1g7KXr-00049k-Ti
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 09:16:59 -0400
+Received: by mail-ot1-x342.google.com with SMTP id h15-v6so1807898otj.5
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 06:16:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181001220942.2382-8-f4bug@amsat.org>
+In-Reply-To: <20181001220942.2382-9-f4bug@amsat.org>
 References: <20181001220942.2382-1-f4bug@amsat.org>
-	<20181001220942.2382-8-f4bug@amsat.org>
+	<20181001220942.2382-9-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Oct 2018 14:15:04 +0100
-Message-ID: <CAFEAcA97wzFUqhU075cPF8-jmwV7LvV3iqBpX671XnMfg3x2aA@mail.gmail.com>
+Date: Tue, 2 Oct 2018 14:16:38 +0100
+Message-ID: <CAFEAcA--vgw9sMbd1LgWbmbYpkexdEtfRDEJysD-E5DmPjMCtg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/15] hw/mips/gt64xxx_pci: Convert
- gt64120_reset() function into Device reset method
+Subject: Re: [Qemu-devel] [PATCH 08/15] hw/mips/gt64xxx_pci: Mark as bridge
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,14 +36,18 @@ Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-deve
 
 On 1 October 2018 at 23:09, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
 rote:
-> Convert the gt64120_reset() function into a proper Device reset method.
+> The gt64120 is currently listed as uncategorized device.
+> Mark it as bridge device.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/mips/gt64xxx_pci.c | 17 +++--------------
->  1 file changed, 3 insertions(+), 14 deletions(-)
+>  hw/mips/gt64xxx_pci.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+Should this device be in hw/pci-host/ with the other PCI
+host controller models ?
 
 thanks
 -- PMM
