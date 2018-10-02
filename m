@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1g7Lmw-0005M2-6a
+	(envelope-from <damien.hedde@greensocs.com>) id 1g7Lmw-0005Hu-65
 	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 10:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1g7LdC-0004QG-Jl
+	(envelope-from <damien.hedde@greensocs.com>) id 1g7LdC-0004Q6-Ho
 	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 10:26:36 -0400
 From: Damien Hedde <damien.hedde@greensocs.com>
-Date: Tue,  2 Oct 2018 16:24:41 +0200
-Message-Id: <20181002142443.30976-8-damien.hedde@greensocs.com>
+Date: Tue,  2 Oct 2018 16:24:35 +0200
+Message-Id: <20181002142443.30976-2-damien.hedde@greensocs.com>
 In-Reply-To: <20181002142443.30976-1-damien.hedde@greensocs.com>
 References: <20181002142443.30976-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 7/9] hw/misc/zynq_slcr: add clock generation
- for uarts
+Subject: [Qemu-devel] [PATCH v5 1/9] hw/core/clock-port: introduce clock
+ port objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,230 +25,378 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org, alistair@alistair23.me, saipava@xilinx.com, mark.burton@greensocs.com, luc.michel@greensocs.com, konrad@adacore.com, edgar.iglesias@xilinx.com, Damien Hedde <damien.hedde@greensocs.com>
 
-Add 2 clock outputs for each uart (uart0 & 1):
-+ the reference clock
-+ the bus interface clock
+Introduce clock port objects: ClockIn and ClockOut.
 
-The clock frequencies are computed using the internal pll & uart configur=
-ation
-registers.
+Theses ports may be used to distribute a clock from a object to several
+other objects. The ClockIn object contains the current state of the
+clock: the frequency.
 
-All clocks depend on the main input clock (ps_clk), which is hard-coded
-to 33.33MHz (zcu102 evaluation board frequency and frequency specified
-in Xilinx's device tree file)
+A ClockIn may be connected to a ClockOut so that it receives update,
+through the callback, whenever the Clockout is updated using the
+ClockOut's set function.
+
+This is based on the original work of Frederic Konrad.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/misc/zynq_slcr.c | 125 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 125 insertions(+)
+ Makefile.objs           |   1 +
+ include/hw/clock-port.h | 136 ++++++++++++++++++++++++++++++++++
+ hw/core/clock-port.c    | 159 ++++++++++++++++++++++++++++++++++++++++
+ hw/core/Makefile.objs   |   1 +
+ hw/core/trace-events    |   7 ++
+ 5 files changed, 304 insertions(+)
+ create mode 100644 include/hw/clock-port.h
+ create mode 100644 hw/core/clock-port.c
+ create mode 100644 hw/core/trace-events
 
-diff --git a/hw/misc/zynq_slcr.c b/hw/misc/zynq_slcr.c
-index baa13d1316..0b599ebd97 100644
---- a/hw/misc/zynq_slcr.c
-+++ b/hw/misc/zynq_slcr.c
-@@ -33,6 +33,8 @@
-         } \
-     } while (0)
-=20
-+#define INPUT_PS_REF_CLK_FREQUENCY (33333333)
+diff --git a/Makefile.objs b/Makefile.objs
+index ce9c79235e..b29747075f 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -210,6 +210,7 @@ trace-events-subdirs +=3D hw/audio
+ trace-events-subdirs +=3D hw/block
+ trace-events-subdirs +=3D hw/block/dataplane
+ trace-events-subdirs +=3D hw/char
++trace-events-subdirs +=3D hw/core
+ trace-events-subdirs +=3D hw/display
+ trace-events-subdirs +=3D hw/dma
+ trace-events-subdirs +=3D hw/hppa
+diff --git a/include/hw/clock-port.h b/include/hw/clock-port.h
+new file mode 100644
+index 0000000000..8266549350
+--- /dev/null
++++ b/include/hw/clock-port.h
+@@ -0,0 +1,136 @@
++#ifndef CLOCK_PORT_H
++#define CLOCK_PORT_H
 +
- #define XILINX_LOCK_KEY 0x767b
- #define XILINX_UNLOCK_KEY 0xdf0d
-=20
-@@ -44,15 +46,27 @@ REG32(LOCKSTA, 0x00c)
- REG32(ARM_PLL_CTRL, 0x100)
- REG32(DDR_PLL_CTRL, 0x104)
- REG32(IO_PLL_CTRL, 0x108)
-+/* fields for [ARM|DDR|IO_PLL]_CTRL registers */
-+    FIELD(xxx_PLL_CTRL, PLL_RESET, 0, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_PWRDWN, 1, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_BYPASS_QUAL, 3, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_BYPASS_FORCE, 4, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_FPDIV, 12, 7)
- REG32(PLL_STATUS, 0x10c)
- REG32(ARM_PLL_CFG, 0x110)
- REG32(DDR_PLL_CFG, 0x114)
- REG32(IO_PLL_CFG, 0x118)
-=20
- REG32(ARM_CLK_CTRL, 0x120)
-+    FIELD(ARM_CLK_CTRL, SRCSEL,  4, 2)
-+    FIELD(ARM_CLK_CTRL, DIVISOR, 8, 6)
-+    FIELD(ARM_CLK_CTRL, CPU_1XCLKACT, 27, 1)
-+    FIELD(ARM_CLK_CTRL, CPU_PERI_CLKACT, 28, 1)
- REG32(DDR_CLK_CTRL, 0x124)
- REG32(DCI_CLK_CTRL, 0x128)
- REG32(APER_CLK_CTRL, 0x12c)
-+    FIELD(APER_CLK_CTRL, UART0_CPU1XCLKACT, 20, 1)
-+    FIELD(APER_CLK_CTRL, UART1_CPU1XCLKACT, 21, 1)
- REG32(USB0_CLK_CTRL, 0x130)
- REG32(USB1_CLK_CTRL, 0x134)
- REG32(GEM0_RCLK_CTRL, 0x138)
-@@ -63,12 +77,19 @@ REG32(SMC_CLK_CTRL, 0x148)
- REG32(LQSPI_CLK_CTRL, 0x14c)
- REG32(SDIO_CLK_CTRL, 0x150)
- REG32(UART_CLK_CTRL, 0x154)
-+    FIELD(UART_CLK_CTRL, CLKACT0, 0, 1)
-+    FIELD(UART_CLK_CTRL, CLKACT1, 1, 1)
-+    FIELD(UART_CLK_CTRL, SRCSEL,  4, 2)
-+    FIELD(UART_CLK_CTRL, DIVISOR, 8, 6)
- REG32(SPI_CLK_CTRL, 0x158)
- REG32(CAN_CLK_CTRL, 0x15c)
- REG32(CAN_MIOCLK_CTRL, 0x160)
- REG32(DBG_CLK_CTRL, 0x164)
- REG32(PCAP_CLK_CTRL, 0x168)
- REG32(TOPSW_CLK_CTRL, 0x16c)
-+/* common fields to lots of *_CLK_CTRL registers */
-+    FIELD(xxx_CLK_CTRL, SRCSEL,  4, 2)
-+    FIELD(xxx_CLK_CTRL, DIVISOR, 8, 6)
-=20
- #define FPGA_CTRL_REGS(n, start) \
-     REG32(FPGA ## n ## _CLK_CTRL, (start)) \
-@@ -178,8 +199,92 @@ typedef struct ZynqSLCRState {
-     MemoryRegion iomem;
-=20
-     uint32_t regs[ZYNQ_SLCR_NUM_REGS];
++#include "qom/object.h"
++#include "hw/qdev-core.h"
++#include "qemu/queue.h"
++#include "migration/vmstate.h"
 +
-+    ClockOut *uart0_amba_clk;
-+    ClockOut *uart1_amba_clk;
-+    ClockOut *uart0_ref_clk;
-+    ClockOut *uart1_ref_clk;
- } ZynqSLCRState;
-=20
-+/*
-+ * return the output frequency of ARM/DDR/IO pll
-+ * using input frequency and PLL_CTRL register
-+ */
-+static uint64_t zynq_slcr_compute_pll(uint64_t input, uint32_t ctrl_reg)
-+{
-+    uint32_t mult =3D ((ctrl_reg & R_xxx_PLL_CTRL_PLL_FPDIV_MASK) >>
-+            R_xxx_PLL_CTRL_PLL_FPDIV_SHIFT);
++#define TYPE_CLOCK_IN "clock-in"
++#define CLOCK_IN(obj) OBJECT_CHECK(ClockIn, (obj), TYPE_CLOCK_IN)
++#define TYPE_CLOCK_OUT "clock-out"
++#define CLOCK_OUT(obj) OBJECT_CHECK(ClockOut, (obj), TYPE_CLOCK_OUT)
 +
-+    /* first, check if pll is bypassed */
-+    if (ctrl_reg & R_xxx_PLL_CTRL_PLL_BYPASS_FORCE_MASK) {
-+        return input;
-+    }
++typedef void ClockCallback(void *opaque);
 +
-+    /* is pll disabled ? */
-+    if (ctrl_reg & (R_xxx_PLL_CTRL_PLL_RESET_MASK |
-+                    R_xxx_PLL_CTRL_PLL_PWRDWN_MASK)) {
-+        return 0;
-+    }
++typedef struct ClockOut ClockOut;
++typedef struct ClockIn ClockIn;
 +
-+    return input * mult;
-+}
-+
-+/*
-+ * return the output frequency of a clock given:
-+ * + the pll's frequencies in an array corresponding to mux's indexes
-+ * + the register xxx_CLK_CTRL value
-+ * + enable bit index in ctrl register
-+ *
-+ * This function make the assumption that ctrl_reg value is organized as=
- follow:
-+ * + bits[13:8] clock divisor
-+ * + bits[5:4]  clock mux selector (index in array)
-+ * + bits[index] clock enable
-+ */
-+static uint64_t zynq_slcr_compute_clock(const uint64_t plls[],
-+                                        uint32_t ctrl_reg,
-+                                        unsigned index)
-+{
-+    uint32_t divisor =3D FIELD_EX32(ctrl_reg, xxx_CLK_CTRL, DIVISOR);
-+    uint32_t srcsel =3D FIELD_EX32(ctrl_reg, xxx_CLK_CTRL, SRCSEL);
-+
-+    if ((ctrl_reg & (1u << index)) =3D=3D 0) {
-+        return 0;
-+    }
-+
-+    return plls[srcsel] / (divisor ? divisor : 1u);
-+}
-+
-+#define ZYNQ_CLOCK(_state, _plls, _reg, _enable_field) \
-+    zynq_slcr_compute_clock((_plls), (_state)->regs[R_ ## _reg], \
-+            R_ ## _reg ## _ ## _enable_field ## _SHIFT)
-+#define ZYNQ_GATE(_state, _clk, _reg, _field) \
-+    (ARRAY_FIELD_EX32((_state)->regs, _reg, _field) ? (_clk) : 0)
-+
-+static void zynq_slcr_compute_clocks(ZynqSLCRState *s)
-+{
-+    uint64_t ps_clk =3D INPUT_PS_REF_CLK_FREQUENCY;
-+    uint64_t io_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_IO_PLL_C=
-TRL]);
-+    uint64_t arm_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_ARM_PLL=
-_CTRL]);
-+    uint64_t ddr_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_DDR_PLL=
-_CTRL]);
-+    uint64_t cpu_mux[4] =3D {arm_pll, arm_pll, ddr_pll, io_pll};
-+    uint64_t uart_mux[4] =3D {io_pll, io_pll, arm_pll, ddr_pll};
-+    uint64_t cpu1x_clk;
-+
-+    /* compute uartX amba clocks */
-+    cpu1x_clk =3D ZYNQ_CLOCK(s, cpu_mux, ARM_CLK_CTRL, CPU_PERI_CLKACT);
-+    cpu1x_clk =3D ZYNQ_GATE(s, cpu1x_clk, ARM_CLK_CTRL, CPU_1XCLKACT);
-+    clock_set_frequency(s->uart0_amba_clk,
-+            ZYNQ_GATE(s, cpu1x_clk, APER_CLK_CTRL, UART0_CPU1XCLKACT));
-+    clock_set_frequency(s->uart1_amba_clk,
-+            ZYNQ_GATE(s, cpu1x_clk, APER_CLK_CTRL, UART1_CPU1XCLKACT));
-+
-+    /* compute uartX ref clocks */
-+    clock_set_frequency(s->uart0_ref_clk,
-+            ZYNQ_CLOCK(s, uart_mux, UART_CLK_CTRL, CLKACT0));
-+    clock_set_frequency(s->uart1_ref_clk,
-+            ZYNQ_CLOCK(s, uart_mux, UART_CLK_CTRL, CLKACT1));
-+}
-+
- static void zynq_slcr_reset(DeviceState *d)
- {
-     ZynqSLCRState *s =3D ZYNQ_SLCR(d);
-@@ -274,6 +379,8 @@ static void zynq_slcr_reset(DeviceState *d)
-     s->regs[R_DDRIOB + 4] =3D s->regs[R_DDRIOB + 5] =3D s->regs[R_DDRIOB=
- + 6]
-                           =3D 0x00000e00;
-     s->regs[R_DDRIOB + 12] =3D 0x00000021;
-+
-+    zynq_slcr_compute_clocks(s);
- }
-=20
-=20
-@@ -408,6 +515,14 @@ static void zynq_slcr_write(void *opaque, hwaddr off=
-set,
-             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-         }
-         break;
-+    case R_IO_PLL_CTRL:
-+    case R_ARM_PLL_CTRL:
-+    case R_DDR_PLL_CTRL:
-+    case R_ARM_CLK_CTRL:
-+    case R_APER_CLK_CTRL:
-+    case R_UART_CLK_CTRL:
-+        zynq_slcr_compute_clocks(s);
-+        break;
-     }
- }
-=20
-@@ -417,6 +532,14 @@ static const MemoryRegionOps slcr_ops =3D {
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
- };
-=20
-+static const ClockPortInitArray zynq_slcr_clocks =3D {
-+    QDEV_CLOCK_OUT(ZynqSLCRState, uart0_amba_clk),
-+    QDEV_CLOCK_OUT(ZynqSLCRState, uart1_amba_clk),
-+    QDEV_CLOCK_OUT(ZynqSLCRState, uart0_ref_clk),
-+    QDEV_CLOCK_OUT(ZynqSLCRState, uart1_ref_clk),
-+    QDEV_CLOCK_END,
++struct ClockIn {
++    /*< private >*/
++    Object parent_obj;
++    /*< private >*/
++    uint64_t frequency;
++    char *canonical_path; /* clock path cache */
++    ClockOut *driver; /* clock output controlling this clock */
++    ClockCallback *callback; /* local callback */
++    void *callback_opaque; /* opaque argument for the callback */
++    QLIST_ENTRY(ClockIn) sibling;  /* entry in a followers list */
 +};
 +
- static void zynq_slcr_init(Object *obj)
- {
-     ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-@@ -424,6 +547,8 @@ static void zynq_slcr_init(Object *obj)
-     memory_region_init_io(&s->iomem, obj, &slcr_ops, s, "slcr",
-                           ZYNQ_SLCR_MMIO_SIZE);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
++struct ClockOut {
++    /*< private >*/
++    Object parent_obj;
++    /*< private >*/
++    char *canonical_path; /* clock path cache */
++    QLIST_HEAD(, ClockIn) followers; /* list of registered clocks */
++};
 +
-+    qdev_init_clocks(DEVICE(obj), zynq_slcr_clocks);
- }
++extern const VMStateDescription vmstate_clockin;
++
++/*
++ * vmstate description entry to be added in device vmsd.
++ */
++#define VMSTATE_CLOCKIN(_field, _state) \
++    VMSTATE_CLOCKIN_V(_field, _state, 0)
++#define VMSTATE_CLOCKIN_V(_field, _state, _version) \
++    VMSTATE_STRUCT_POINTER_V(_field, _state, _version, vmstate_clockin, =
+ClockIn)
++
++/**
++ * clock_out_setup_canonical_path:
++ * @clk: clock
++ *
++ * compute the canonical path of the clock (used by log messages)
++ */
++void clock_out_setup_canonical_path(ClockOut *clk);
++
++/**
++ * clock_in_setup_canonical_path:
++ * @clk: clock
++ *
++ * compute the canonical path of the clock (used by log messages)
++ */
++void clock_in_setup_canonical_path(ClockIn *clk);
++
++/**
++ * clock_add_callback:
++ * @clk: the clock to register the callback into
++ * @cb: the callback function
++ * @opaque: the argument to the callback
++ *
++ * Register a callback called on every clock update.
++ */
++void clock_set_callback(ClockIn *clk, ClockCallback *cb, void *opaque);
++
++/**
++ * clock_clear_callback:
++ * @clk: the clock to delete the callback from
++ *
++ * Unregister the callback registered with clock_set_callback.
++ */
++void clock_clear_callback(ClockIn *clk);
++
++/**
++ * clock_init_frequency:
++ * @clk: the clock to initialize.
++ * @freq: the clock's frequency in Hz or 0 if unclocked.
++ *
++ * Initialize the local cached frequency value of @clk to @freq.
++ * Note: this function must only be called during device inititializatio=
+n
++ * or migration.
++ */
++void clock_init_frequency(ClockIn *clk, uint64_t freq);
++
++/**
++ * clock_connect:
++ * @clkin: the drived clock.
++ * @clkout: the driving clock.
++ *
++ * Setup @clkout to drive @clkin: Any @clkout update will be propagated
++ * to @clkin.
++ */
++void clock_connect(ClockIn *clkin, ClockOut *clkout);
++
++/**
++ * clock_set_frequency:
++ * @clk: the clock to update.
++ * @freq: the new clock's frequency in Hz or 0 if unclocked.
++ *
++ * Update the @clk to the new @freq.
++ * This change will be propagated through registered clock inputs.
++ */
++void clock_set_frequency(ClockOut *clk, uint64_t freq);
++
++/**
++ * clock_get_frequency:
++ * @clk: the clk to fetch the clock
++ *
++ * @return: the current frequency of @clk in Hz. If @clk is NULL, return=
+ 0.
++ */
++static inline uint64_t clock_get_frequency(const ClockIn *clk)
++{
++    return clk ? clk->frequency : 0;
++}
++
++/**
++ * clock_is_enabled:
++ * @clk: a clock state
++ *
++ * @return: true if the clock is running. If @clk is NULL return false.
++ */
++static inline bool clock_is_enabled(const ClockIn *clk)
++{
++    return clock_get_frequency(clk) !=3D 0;
++}
++
++#endif /* CLOCK_PORT_H */
+diff --git a/hw/core/clock-port.c b/hw/core/clock-port.c
+new file mode 100644
+index 0000000000..25bab0fbed
+--- /dev/null
++++ b/hw/core/clock-port.c
+@@ -0,0 +1,159 @@
++/*
++ * Clock inputs and outputs
++ *
++ * Copyright GreenSocs 2016-2018
++ *
++ * Authors:
++ *  Frederic Konrad <fred.konrad@greensocs.com>
++ *  Damien Hedde <damien.hedde@greensocs.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/module.h"
++#include "hw/clock-port.h"
++#include "hw/qdev-core.h"
++#include "migration/vmstate.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "trace.h"
++
++const VMStateDescription vmstate_clockin =3D {
++    .name =3D "clockin",
++    .version_id =3D 0,
++    .minimum_version_id =3D 0,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT64(frequency, ClockIn),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++#define CLOCK_PATH(_clk) (_clk->canonical_path)
++
++void clock_out_setup_canonical_path(ClockOut *clk)
++{
++    g_free(clk->canonical_path);
++    clk->canonical_path =3D object_get_canonical_path(OBJECT(clk));
++}
++
++void clock_in_setup_canonical_path(ClockIn *clk)
++{
++    g_free(clk->canonical_path);
++    clk->canonical_path =3D object_get_canonical_path(OBJECT(clk));
++}
++
++void clock_set_callback(ClockIn *clk, ClockCallback *cb, void *opaque)
++{
++    assert(clk);
++
++    clk->callback =3D cb;
++    clk->callback_opaque =3D opaque;
++}
++
++void clock_init_frequency(ClockIn *clk, uint64_t freq)
++{
++    assert(clk);
++
++    clk->frequency =3D freq;
++}
++
++void clock_clear_callback(ClockIn *clk)
++{
++    clock_set_callback(clk, NULL, NULL);
++}
++
++void clock_connect(ClockIn *clkin, ClockOut *clkout)
++{
++    assert(clkin && clkin->driver =3D=3D NULL);
++    assert(clkout);
++
++    trace_clock_connect(CLOCK_PATH(clkin), CLOCK_PATH(clkout));
++
++    QLIST_INSERT_HEAD(&clkout->followers, clkin, sibling);
++    clkin->driver =3D clkout;
++}
++
++static void clock_disconnect(ClockIn *clk)
++{
++    if (clk->driver =3D=3D NULL) {
++        return;
++    }
++
++    trace_clock_disconnect(CLOCK_PATH(clk));
++
++    clk->driver =3D NULL;
++    QLIST_REMOVE(clk, sibling);
++}
++
++void clock_set_frequency(ClockOut *clk, uint64_t freq)
++{
++    ClockIn *follower;
++    trace_clock_update(CLOCK_PATH(clk), freq);
++
++    QLIST_FOREACH(follower, &clk->followers, sibling) {
++        trace_clock_propagate(CLOCK_PATH(clk), CLOCK_PATH(follower));
++        if (follower->frequency !=3D freq) {
++            follower->frequency =3D freq;
++            if (follower->callback) {
++                follower->callback(follower->callback_opaque);
++            }
++        }
++    }
++}
++
++static void clock_out_initfn(Object *obj)
++{
++    ClockOut *clk =3D CLOCK_OUT(obj);
++
++    QLIST_INIT(&clk->followers);
++}
++
++static void clock_out_finalizefn(Object *obj)
++{
++    ClockOut *clk =3D CLOCK_OUT(obj);
++    ClockIn *follower, *next;
++
++    /* clear our list of followers */
++    QLIST_FOREACH_SAFE(follower, &clk->followers, sibling, next) {
++        clock_disconnect(follower);
++    }
++
++    g_free(clk->canonical_path);
++    clk->canonical_path =3D NULL;
++}
++
++static void clock_in_finalizefn(Object *obj)
++{
++    ClockIn *clk =3D CLOCK_IN(obj);
++
++    /* remove us from driver's followers list */
++    clock_disconnect(clk);
++
++    g_free(clk->canonical_path);
++    clk->canonical_path =3D NULL;
++}
++
++static const TypeInfo clock_out_info =3D {
++    .name              =3D TYPE_CLOCK_OUT,
++    .parent            =3D TYPE_OBJECT,
++    .instance_size     =3D sizeof(ClockOut),
++    .instance_init     =3D clock_out_initfn,
++    .instance_finalize =3D clock_out_finalizefn,
++};
++
++static const TypeInfo clock_in_info =3D {
++    .name              =3D TYPE_CLOCK_IN,
++    .parent            =3D TYPE_OBJECT,
++    .instance_size     =3D sizeof(ClockIn),
++    .instance_finalize =3D clock_in_finalizefn,
++};
++
++static void clock_register_types(void)
++{
++    type_register_static(&clock_in_info);
++    type_register_static(&clock_out_info);
++}
++
++type_init(clock_register_types)
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index eb88ca979e..f7102121f4 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -6,6 +6,7 @@ common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
+ # irq.o needed for qdev GPIO handling:
+ common-obj-y +=3D irq.o
+ common-obj-y +=3D hotplug.o
++common-obj-y +=3D clock-port.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D nmi.o
 =20
- static const VMStateDescription vmstate_zynq_slcr =3D {
+ common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
+diff --git a/hw/core/trace-events b/hw/core/trace-events
+new file mode 100644
+index 0000000000..d4880ec138
+--- /dev/null
++++ b/hw/core/trace-events
+@@ -0,0 +1,7 @@
++# See docs/devel/tracing.txt for syntax documentation.
++
++# hw/core/clock-port.c
++clock_connect(const char *clk, const char *driver) "'%s' drived-by '%s'"
++clock_disconnect(const char *clk) "'%s'"
++clock_update(const char *clk, uint64_t freq) "'%s' frequency %" PRIu64 "=
+Hz"
++clock_propagate(const char *clko, const char *clki) "'%s' =3D> '%s'"
 --=20
 2.19.0
