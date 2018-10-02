@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g7Rrh-0000ih-5P
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:05:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7Rv8-0003mT-9q
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:09:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g7RiY-0001nc-KW
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 16:56:31 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:35108)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g7RiW-0001ls-0k
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 16:56:28 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id w5-v6so3757495wrt.2
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 13:56:24 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1g7Rv7-0000wV-Hx
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:09:30 -0400
+References: <20180925153949.1577-1-programmingkidx@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4d079c68-8789-7956-67e5-e88de5b025bc@redhat.com>
+Date: Tue, 2 Oct 2018 16:09:17 -0500
 MIME-Version: 1.0
-References: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20180706105753.26700-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 3 Oct 2018 00:56:11 +0400
-Message-ID: <CAJ+F1C+LBKs5RRzLJOZuwOaWUyGyMdUNnGir1u2eJyGybH-Vug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/27] qapi: add #if pre-processor
- conditions to generated code (part 2)
+In-Reply-To: <20180925153949.1577-1-programmingkidx@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] qemu-img.c: add help for each command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,196 +23,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>
+To: John Arbuckle <programmingkidx@gmail.com>, mreitz@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, muriloo@linux.ibm.com, qemu-devel@nongnu.org
 
-Hi
+On 9/25/18 10:39 AM, John Arbuckle wrote:
+> Add the ability for the user to display help for a certain command.
+> Example: qemu-img create --help
+> 
+> What is printed is all the options available to this command and an example.
+> 
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+> v3 changes:
+> Fixed a bug that caused qemu-img to crash when running a command without
+> options.
 
-On Fri, Jul 6, 2018 at 2:59 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Hi,
->
-> This is the second part of the "add #if pre-processor conditions to
-> generated code" series, adding schema member conditions (roughly
-> 16-38/49).
->
-> Members can be exploded as dictionnary with 'type'/'if' keys:
->
-> { 'struct': 'TestIfStruct', 'data':
->   { 'foo': 'int',
->     'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} } }
->
-> Enum values can be exploded as dictionnary with 'type'/'if' keys:
->
-> { 'enum': 'TestIfEnum', 'data':
->   [ 'foo',
->     { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ] }
->
-> v6:
-> - subset of v5 series: add schema member conditions
-> - split "qapi: factor out check_known_keys()", error report improvements
-> - add a patch to "qapi: include osdep.h in type headers" to avoid
->   potential build configuration change issues
-> - rebased, on top of Markus's qapi-next branch (first 4 patches,
->   included for patchew testing)
->
-> Marc-Andr=C3=A9 Lureau (26):
->   qmp-shell: learn to send commands with quoted arguments
->   json: remove useless return value from lexer/parser
->   tests: change /0.15/* tests to /qmp/*
->   qapi: include osdep.h in type headers
->   qapi: do not define enumeration value explicitly
->   qapi: rename QAPISchemaEnumType.values to .members
->   qapi: change enum visitor and gen_enum* to take QAPISchemaMember
->   tests: print enum type members more like object type members
->   qapi: factor out checking for keys
->   qapi: improve reporting of unknown or missing keys
->   qapi: add a dictionnary form with 'name' key for enum members
->   qapi: add 'if' to enum members
->   qapi-event: add 'if' condition to implicit event enum
->   qapi: rename allow_dict to allow_implicit
->   qapi: add a dictionary form with 'type' key for members
->   qapi: add 'if' to implicit struct members
->   qapi: add an error in case a discriminator is conditionnal
->   qapi: add 'if' on union members
->   qapi: add 'if' to alternate members
->   qapi: add #if conditions to generated code members
->   docs: document schema configuration
->   qapi: add 'If:' condition to enum values documentation
->   qapi: add 'If:' condition to struct members documentation
->   qapi: add condition to variants documentation
->   qapi: add more conditions to SPICE
->   qapi: add conditions to REPLICATION type/commands on the schema
->
-> Markus Armbruster (1):
->   qapi: Fix some pycodestyle-3 complaints
+Hmm, I just reviewed v2 without noticing that you had posted v3.
 
-Rebased series updated on github branch:
-https://github.com/elmarco/qemu/commits/qapi-if
+> 
+> v2 changes:
+> Removed block of string comparison code for each command.
+> Added a help_func field to the img_cmd_t struct.
+> Made strings longer than 80 characters wide.
+> 
+>   qemu-img.c | 660 +++++++++++++++++++++++++++++++++++++++++++++++++++----------
+>   1 file changed, 559 insertions(+), 101 deletions(-)
 
-(mostly unchanged, except patch "add #if conditions to generated code
-members" which had to accommodate with Eric's introspection comment
-patch)
+My v2 comment about splitting this into more reviewable portions still 
+applies.
 
-thanks
+> +++ b/qemu-img.c
+> @@ -52,6 +52,7 @@
+>   typedef struct img_cmd_t {
+>       const char *name;
+>       int (*handler)(int argc, char **argv);
+> +    void (*help_func)(void);
+>   } img_cmd_t;
 
+As does my complaint that you want to track the command synopses here in 
+this struct for reuse in multiple contexts later, rather than...
 
->  qapi/block-core.json                          |  13 +-
->  qapi/char.json                                |  16 +-
->  qapi/migration.json                           |  12 +-
->  scripts/qapi/common.py                        | 256 ++++++++++++------
->  scripts/qapi/doc.py                           |  16 +-
->  scripts/qapi/events.py                        |   2 +-
->  scripts/qapi/introspect.py                    |  16 +-
->  scripts/qapi/types.py                         |  11 +-
->  scripts/qapi/visit.py                         |  10 +-
->  include/qapi/qmp/json-lexer.h                 |   4 +-
->  include/qapi/qmp/json-streamer.h              |   4 +-
->  migration/colo.c                              |  16 +-
->  monitor.c                                     |   5 -
->  qobject/json-lexer.c                          |  23 +-
->  qobject/json-streamer.c                       |   8 +-
->  tests/test-qmp-cmds.c                         |  10 +-
->  docs/devel/qapi-code-gen.txt                  |  19 ++
->  scripts/qmp/qmp-shell                         |   3 +-
->  tests/Makefile.include                        |   8 +-
->  tests/qapi-schema/alternate-base.err          |   1 +
->  tests/qapi-schema/alternate-invalid-dict.err  |   1 +
->  ...ember.exit =3D> alternate-invalid-dict.exit} |   0
->  tests/qapi-schema/alternate-invalid-dict.json |   4 +
->  ...-member.out =3D> alternate-invalid-dict.out} |   0
->  tests/qapi-schema/comments.out                |  14 +-
->  tests/qapi-schema/doc-bad-section.out         |  13 +-
->  tests/qapi-schema/doc-good.json               |  11 +-
->  tests/qapi-schema/doc-good.out                |  22 +-
->  tests/qapi-schema/doc-good.texi               |   8 +-
->  tests/qapi-schema/double-type.err             |   1 +
->  tests/qapi-schema/empty.out                   |   9 +-
->  tests/qapi-schema/enum-bad-member.err         |   1 +
->  tests/qapi-schema/enum-bad-member.exit        |   1 +
->  tests/qapi-schema/enum-bad-member.json        |   2 +
->  tests/qapi-schema/enum-bad-member.out         |   0
->  .../qapi-schema/enum-dict-member-unknown.err  |   2 +
->  .../qapi-schema/enum-dict-member-unknown.exit |   1 +
->  .../qapi-schema/enum-dict-member-unknown.json |   2 +
->  .../qapi-schema/enum-dict-member-unknown.out  |   0
->  tests/qapi-schema/enum-dict-member.err        |   1 -
->  tests/qapi-schema/enum-dict-member.json       |   2 -
->  tests/qapi-schema/enum-if-invalid.err         |   1 +
->  tests/qapi-schema/enum-if-invalid.exit        |   1 +
->  tests/qapi-schema/enum-if-invalid.json        |   3 +
->  tests/qapi-schema/enum-if-invalid.out         |   0
->  tests/qapi-schema/enum-missing-data.err       |   2 +-
->  tests/qapi-schema/event-case.out              |   9 +-
->  tests/qapi-schema/event-nest-struct.err       |   2 +-
->  tests/qapi-schema/flat-union-inline.err       |   2 +-
->  .../flat-union-invalid-if-discriminator.err   |   1 +
->  .../flat-union-invalid-if-discriminator.exit  |   1 +
->  .../flat-union-invalid-if-discriminator.json  |  17 ++
->  .../flat-union-invalid-if-discriminator.out   |   0
->  tests/qapi-schema/ident-with-escape.out       |   9 +-
->  tests/qapi-schema/include-relpath.out         |  14 +-
->  tests/qapi-schema/include-repetition.out      |  14 +-
->  tests/qapi-schema/include-simple.out          |  14 +-
->  tests/qapi-schema/indented-expr.out           |   9 +-
->  tests/qapi-schema/nested-struct-data.err      |   2 +-
->  tests/qapi-schema/qapi-schema-test.json       |  38 ++-
->  tests/qapi-schema/qapi-schema-test.out        |  76 +++++-
->  .../struct-member-invalid-dict.err            |   1 +
->  .../struct-member-invalid-dict.exit           |   1 +
->  .../struct-member-invalid-dict.json           |   3 +
->  .../struct-member-invalid-dict.out            |   0
->  tests/qapi-schema/test-qapi.py                |  22 +-
->  .../qapi-schema/union-branch-invalid-dict.err |   1 +
->  .../union-branch-invalid-dict.exit            |   1 +
->  .../union-branch-invalid-dict.json            |   4 +
->  .../qapi-schema/union-branch-invalid-dict.out |   0
->  tests/qapi-schema/unknown-expr-key.err        |   3 +-
->  tests/qapi-schema/unknown-expr-key.json       |   2 +-
->  72 files changed, 574 insertions(+), 227 deletions(-)
->  create mode 100644 tests/qapi-schema/alternate-invalid-dict.err
->  rename tests/qapi-schema/{enum-dict-member.exit =3D> alternate-invalid-d=
-ict.exit} (100%)
->  create mode 100644 tests/qapi-schema/alternate-invalid-dict.json
->  rename tests/qapi-schema/{enum-dict-member.out =3D> alternate-invalid-di=
-ct.out} (100%)
->  create mode 100644 tests/qapi-schema/enum-bad-member.err
->  create mode 100644 tests/qapi-schema/enum-bad-member.exit
->  create mode 100644 tests/qapi-schema/enum-bad-member.json
->  create mode 100644 tests/qapi-schema/enum-bad-member.out
->  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.err
->  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.exit
->  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.json
->  create mode 100644 tests/qapi-schema/enum-dict-member-unknown.out
->  delete mode 100644 tests/qapi-schema/enum-dict-member.err
->  delete mode 100644 tests/qapi-schema/enum-dict-member.json
->  create mode 100644 tests/qapi-schema/enum-if-invalid.err
->  create mode 100644 tests/qapi-schema/enum-if-invalid.exit
->  create mode 100644 tests/qapi-schema/enum-if-invalid.json
->  create mode 100644 tests/qapi-schema/enum-if-invalid.out
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.err
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.exit
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.json
->  create mode 100644 tests/qapi-schema/flat-union-invalid-if-discriminator=
-.out
->  create mode 100644 tests/qapi-schema/struct-member-invalid-dict.err
->  create mode 100644 tests/qapi-schema/struct-member-invalid-dict.exit
->  create mode 100644 tests/qapi-schema/struct-member-invalid-dict.json
->  create mode 100644 tests/qapi-schema/struct-member-invalid-dict.out
->  create mode 100644 tests/qapi-schema/union-branch-invalid-dict.err
->  create mode 100644 tests/qapi-schema/union-branch-invalid-dict.exit
->  create mode 100644 tests/qapi-schema/union-branch-invalid-dict.json
->  create mode 100644 tests/qapi-schema/union-branch-invalid-dict.out
->
-> --
-> 2.18.0.rc1
->
->
+> +static void help_amend(void)
+> +{
+> +    const char *msg =
+> +    "\n"
+> +    "usage: qemu-img amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt]\n"
+> +    "[-t cache] -o options filename\n"
 
+repeating things that are in qemu-img-cmds.h and risking them getting 
+out of sync.
 
---=20
-Marc-Andr=C3=A9 Lureau
+>   
+> -static const img_cmd_t img_cmds[] = {
+> +static img_cmd_t img_cmds[] = {
+>   #define DEF(option, callback, arg_string)        \
+>       { option, callback },
+>   #include "qemu-img-cmds.h"
+> @@ -4894,6 +5334,12 @@ static const img_cmd_t img_cmds[] = {
+>       { NULL, NULL, },
+>   };
+>   
+> +/* These functions will be added to the img_cmds array */
+> +void (*help_functions[])(void) = {help_amend, help_bench, help_check,\
+> +    help_commit, help_compare, help_convert, help_create, help_dd, help_info,\
+> +    help_map, help_measure, help_snapshot, help_rebase, help_resize};
+
+And my biggest gripe, that this approach to initialization is dead 
+wrong, is still applicable.
+
+Overall, I like the end result that you are trying to reach. (I'm not 
+always a fan of having to run 'command --help' followed by 'command 
+subcommand --help' to learn everything, but it sure beats a wall of 
+text, and we have at least 'git' and 'cvs' as examples of programs that 
+have used that approach, so we are not inventing something new).  But 
+you'll need a v4, and preferably broken up into something easier to 
+review (one patch per command, rather than a wholesale rewrite in go), 
+if you want to get it in.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
