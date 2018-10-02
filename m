@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7GbZ-0003jK-Pp
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:04:37 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g7GkI-0006QT-8a
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:13:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7GbZ-0007Dz-1Y
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:04:33 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:34689)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g7GkH-0003fR-0d
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:13:34 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g7GbY-0007DB-HA
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:04:32 -0400
-Received: by mail-ot1-x333.google.com with SMTP id i12-v6so1178619otl.1
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 02:04:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g7GkG-0003dD-4C
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 05:13:32 -0400
+Received: by mail-wr1-x442.google.com with SMTP id w5-v6so1305621wrt.2
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 02:13:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <021f3f1e-e767-8d84-0189-fbfa7ca5f143@redhat.com>
-References: <CAFEAcA-T7-PcKLwPr0VO0wrwW3x+w2WbdEjTjN2YfWOmZXyfUg@mail.gmail.com>
-	<87lg7hlend.fsf@linaro.org>
-	<CAFEAcA8ZW_rDyUg0G+agmBfNc8dNVc7r1pdu-Tyb6cvLXdvzHw@mail.gmail.com>
-	<021f3f1e-e767-8d84-0189-fbfa7ca5f143@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Oct 2018 10:04:10 +0100
-Message-ID: <CAFEAcA-M_x8oC_1Z5A9Lv3DQ1Z+_vVdyUnaHoBMv4nkJepcBhA@mail.gmail.com>
+References: <20180905062313.4059-1-peterx@redhat.com>
+	<20180905062313.4059-3-peterx@redhat.com>
+	<CAJ+F1CJJB2ZyTQ3OBJ+c49bqZMWSKqfp7UOoM7QBEhH6Exnsbg@mail.gmail.com>
+	<20180929040529.GQ9560@xz-x1>
+In-Reply-To: <20180929040529.GQ9560@xz-x1>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 2 Oct 2018 13:13:10 +0400
+Message-ID: <CAJ+F1CJhXJEwkcrOqDGXjBG+m9NJG8HK0+C0vMxpQmqxWF0MYQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] racing between pause_all_vcpus() and
- qemu_cpu_stop()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 2/6] monitor: resume the monitor earlier
+ if needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,20 +33,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, "Emilio G. Cota" <cota@braap.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 2 October 2018 at 09:58, Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hi Peter
+
+On Sat, Sep 29, 2018 at 8:05 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> First, the reset code should indeed use run_on_cpu (it need not be safe
-> i.e. stop-the-world; just run it in the vCPU thread).  It certainly
-> doesn't do this right now.
+> On Fri, Sep 28, 2018 at 04:06:30PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Wed, Sep 5, 2018 at 10:24 AM Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > Currently when QMP request queue full we won't resume the monitor unt=
+il
+> > > we have completely handled the current command.  It's not necessary
+> > > since even before it's handled the queue is already non-full.  Moving
+> > > the resume logic earlier before the command execution, hence drop the
+> > > need_resume local variable.
+> > >
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  monitor.c | 12 +++++-------
+> > >  1 file changed, 5 insertions(+), 7 deletions(-)
+> > >
+> > > diff --git a/monitor.c b/monitor.c
+> > > index a89bb86599..c2c9853f75 100644
+> > > --- a/monitor.c
+> > > +++ b/monitor.c
+> > > @@ -4130,7 +4130,6 @@ static void monitor_qmp_bh_dispatcher(void *dat=
+a)
+> > >  {
+> > >      QMPRequest *req_obj =3D monitor_qmp_requests_pop_any_with_lock()=
+;
+> > >      QDict *rsp;
+> > > -    bool need_resume;
+> > >      Monitor *mon;
+> > >
+> > >      if (!req_obj) {
+> > > @@ -4139,8 +4138,11 @@ static void monitor_qmp_bh_dispatcher(void *da=
+ta)
+> > >
+> > >      mon =3D req_obj->mon;
+> > >      /*  qmp_oob_enabled() might change after "qmp_capabilities" */
+> > > -    need_resume =3D !qmp_oob_enabled(mon) ||
+> > > -        mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX -=
+ 1;
+> > > +    if (!qmp_oob_enabled(mon) ||
+> > > +        mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX -=
+ 1) {
+> > > +        /* Pairs with the monitor_suspend() in handle_qmp_command() =
+*/
+> > > +        monitor_resume(mon);
+> > > +    }
+> >
+> > With spice chardev, this may result in a synchronous write.
+> > If I read it right, this may re-enter handle_qmp_command and dead-lock
+> > on qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+> >
+> > So at least I would release the lock before resuming :)
+>
+> For sure this I can do. :) Though I'd like to know more context too.
+>
+> I just noticed that we added the qemu_chr_fe_accept_input() call into
+> monitor_resume() a month ago which I completely unaware of... then the
+> resuming could be a heavy-weighted function now.  I'm a bit worried on
+> whether this would affect the oob thing since noting that we're still
+> in the monitor iothread (which should not block for long).  Especially
+> if you mentioned that we'll handle commands again, then could we
+> potentially run non-oob command handlers in oob context here simply
+> due to the call to monitor_resume()?
 
-I don't understand this part. We're resetting the entire world:
-surely we need to stop the entire world first ?
+monitor_resume() is only called from main thread, afaict.
 
-(Also, other things use pause_all_vcpus() and hit this race
-condition, like VM suspend and shutdown.)
+So I think the problem is rather that qemu_chr_fe_accept_input() is
+not thread safe (if the same charfe is used in a different thread,
+like mon_iothread).
 
-thanks
--- PMM
+So instead of simply kicking the mon_iothread, we should probably
+schedule a BH to call accept input.
+
+>
+> I'm thinking whether we should use a QEMU bottom half or things alike
+> to handle the qemu_chr_fe_accept_input(), and keep the resume and the
+> stack simple.  As we seem to be facing more dead locks recently, I'm
+> thinking simplifying the stack might be a nice thing to have.
+
+Sure, if that can help :)
+
+--=20
+Marc-Andr=C3=A9 Lureau
