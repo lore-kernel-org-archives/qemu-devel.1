@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1g7Ehr-0003RS-AI
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 03:02:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1g7FQ2-0000cH-9j
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 03:48:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1g7Ehp-0006eV-Pq
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 03:02:55 -0400
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:41391)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1g7Ehp-0006eO-If
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 03:02:53 -0400
-Received: by mail-ot1-x336.google.com with SMTP id e18-v6so869809oti.8
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 00:02:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <CANzW0mvSX5nWuinDU68W2yJzgoQSGAHPqpz0G36A6NKwRsz_4A@mail.gmail.com>
-	<d45bff6c4e472811f01452b5f730c1b6@ispras.ru>
-	<CANzW0mthuW0a7LR7DhpvTPnZ5n5DxtYyfYQf756vtyb9g0O7QQ@mail.gmail.com>
-In-Reply-To: <CANzW0mthuW0a7LR7DhpvTPnZ5n5DxtYyfYQf756vtyb9g0O7QQ@mail.gmail.com>
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Tue, 2 Oct 2018 13:02:41 +0600
-Message-ID: <CANzW0muZaNRtOP6OjXJ11HXL_q2MDOhCxY2dXZc2DzHr5BxqLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/25] Fixing record/replay and adding
- reverse debugging
+	(envelope-from <thuth@redhat.com>) id 1g7FPy-0003A4-VL
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 03:48:34 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  2 Oct 2018 09:48:11 +0200
+Message-Id: <1538466491-2073-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/s390x/s390-pci-bus: Convert sysbus init
+ function to realize function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,133 +18,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dovgaluk <dovgaluk@ispras.ru>
-Cc: Pavel.Dovgaluk@ispras.ru, qemu-devel@nongnu.org
+To: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Yi Min Zhao <zyimin@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Pierre Morel <pmorel@linux.ibm.com>
 
-I've added "-monitor stdio" option to command line of Test 1 and repeated
-entering command during execution:
+The SysBusDeviceClass->init() interface is considered as a legacy interface
+and there are currently some efforts going on to get rid of it. Thus let's
+convert the init function in the s390x code to realize() instead.
 
-  QEMU 3.0.50 monitor - type 'help' for more information
-  (qemu) info replay
-  Replaying execution 'icount_rr_capture.bin': current step =3D 311736195
-  (qemu) info replay
-  Replaying execution 'icount_rr_capture.bin': current step =3D 318198367
-  (qemu) info replay
-  Replaying execution 'icount_rr_capture.bin': current step =3D 324737211
-  (qemu) info replay
-  Replaying execution 'icount_rr_capture.bin': current step =3D 329890795
-  (qemu) info replay
-  Replaying execution 'icount_rr_capture.bin': current step =3D 607069789
-  (qemu) info replay
-  Replaying execution 'icount_rr_capture.bin': current step =3D 607069789
-  (qemu) info replay
-  Replaying execution 'icount_rr_capture.bin': current step =3D 607069789
-  ...
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/s390x/s390-pci-bus.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
-Some notes on value of step it stucks on:
-- mostly it's same (even across different record-replay pairs);
-- stressing host during replay may cause it to change even for same
-record-replay pair (i.e. different replay executions for same file
-recorded).
-
-This specific case seems to be stable to reproduce.
-
-=D0=B2=D1=82, 2 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 0:22, Artem Pisaren=
-ko <artem.k.pisarenko@gmail.com>:
-
-> I've posted bug report with extended tests (incl. case without sleep=3Dof=
-f).
-> You may find guest image (kernel) in bug description.
-> https://bugs.launchpad.net/qemu/+bug/1795369
->
-> The most annoying thing is that some issues are almost not reproducible.
-> There are definitely race conditions somewhere in qemu code. Running
-> 'stress-ng' utility with CPU and I/O stressors in parallel with qemu
-> execution greatly minimizes amount of attempts when I'm trying to trigger
-> some of issues I encounter.
->
-> I'll try 'info monitor' command tomorrow, but no guarantees that I'll be
-> able to reproduce issue again.
->
-> Speaking about '-nographic' and SDL... I've noted that UI greatly
-> minimizes possibility of hanging (but not avoids it completely) when usin=
-g
-> icount in general, so this effect isn't rr-specific. I've already reporte=
-d
-> this bug too.
->
->
-> =D0=BF=D0=BD, 1 =D0=BE=D0=BA=D1=82. 2018 =D0=B3., 20:14 dovgaluk <dovgalu=
-k@ispras.ru>:
->
->> Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-09-30 14:01:
->> > Feature still broken :(
->>
->> Thanks for testing.
->>
->> >
->> > Brief description of my tests.
->> >
->> > Guest image is Linux, which just powers off after kernel boots
->> > (instead of proceeding to user-space /init or /sbin/init).
->> > Base cmdline:
->> > qemu-system-x86_64 -nodefaults -machine pc,accel=3Dtcg -m 2048 -cpu
->> > qemu64 -rtc clock=3Dvm,base=3D2000-01-01T00:00:00 -kernel bzImage -ini=
-trd
->> > rootfs -append 'nokaslr console=3DttyS0 rdinit=3D/init_poweroff'
->> > -nographic -serial SERIAL_VALUE -icount
->> > 1,sleep=3Doff,rr=3DRR_VALUE,rrfile=3Dicount_rr_capture.bin
->>
->> I've never tried it with sleep=3Doff. Can you remove it and try again?
->>
->> We also seen a problem with '-nographic'. When we remove this option and
->> QEMU runs with SDL
->> window, everything is ok. There is some problem with main loop which may
->> sleep when there
->> is no GUI to update, or something like that. We couldn't fix it yet.
->>
->> >
->> > Test 1. When SERIAL_VALUE=3Dnone
->> > Running with RR_VALUE=3Drecord completes successfully.
->> > Running with RR_VALUE=3Dreplay doesn't completes. qemu process just
->> > eating ~100% cpu and memory usage doesn't grow after some moment. I
->> > don't see what happens because of problem no.2 (see below).
->>
->> Try 'info replay' monitor command. Does instruction counter increases?
->>
->> >
->> > Test 2. When SERIAL_VALUE=3Dstdio
->> > Running with RR_VALUE=3Drecord completes successfully.
->> >
->> > Running with RR_VALUE=3Dreplay caues exit with error:
->> >
->> > "qemu-system-x86_64: Missing character write event in the replay log"
->> >
->> > These problems are same with qemu 2.12 (both vanilla and with previous
->> > versions of these patches applied). Furthemore, I consider whole
->> > icount mode broken and determinism isn't achievable.
->> > The irony is that I actually don't need record/replay feature. I've
->> > tried to use it only as instrument to debug failing determinism in
->> > qemu code. But since replay/record feature itself relies on
->> > determinism, which is broken, it's no wonder why it fails also (I just
->> > hoped to bypass it).
->> >
->> > Contact me if you need more details. I just tired a lot trying to get
->> > all these things working... Hope is leaving me...
->>
->> Can you share the kernel in case the icount still broken?
->>
->>
->> Pavel Dovgalyuk
->>
->> --
->
-> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
->   =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
-=BD=D0=BA=D0=BE
->
---=20
-
-=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-  =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=BD=
-=D0=BA=D0=BE
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index e3e0ebb..e42e1b8 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -692,27 +692,35 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
+     object_unref(OBJECT(iommu));
+ }
+ 
+-static int s390_pcihost_init(SysBusDevice *dev)
++static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+ {
+     PCIBus *b;
+     BusState *bus;
+     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
+     S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
++    Error *local_err = NULL;
+ 
+     DPRINTF("host_init\n");
+ 
+-    b = pci_register_root_bus(DEVICE(dev), NULL,
+-                              s390_pci_set_irq, s390_pci_map_irq, NULL,
+-                              get_system_memory(), get_system_io(), 0, 64,
+-                              TYPE_PCI_BUS);
++    b = pci_register_root_bus(dev, NULL, s390_pci_set_irq, s390_pci_map_irq,
++                              NULL, get_system_memory(), get_system_io(), 0,
++                              64, TYPE_PCI_BUS);
+     pci_setup_iommu(b, s390_pci_dma_iommu, s);
+ 
+     bus = BUS(b);
+-    qbus_set_hotplug_handler(bus, DEVICE(dev), NULL);
++    qbus_set_hotplug_handler(bus, dev, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+     phb->bus = b;
+ 
+-    s->bus = S390_PCI_BUS(qbus_create(TYPE_S390_PCI_BUS, DEVICE(s), NULL));
+-    qbus_set_hotplug_handler(BUS(s->bus), DEVICE(s), NULL);
++    s->bus = S390_PCI_BUS(qbus_create(TYPE_S390_PCI_BUS, dev, NULL));
++    qbus_set_hotplug_handler(BUS(s->bus), dev, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ 
+     s->iommu_table = g_hash_table_new_full(g_int64_hash, g_int64_equal,
+                                            NULL, g_free);
+@@ -722,9 +730,10 @@ static int s390_pcihost_init(SysBusDevice *dev)
+     QTAILQ_INIT(&s->zpci_devs);
+ 
+     css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
+-                             S390_ADAPTER_SUPPRESSIBLE, &error_abort);
+-
+-    return 0;
++                             S390_ADAPTER_SUPPRESSIBLE, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++    }
+ }
+ 
+ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+@@ -1018,12 +1027,11 @@ static void s390_pcihost_reset(DeviceState *dev)
+ 
+ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+ {
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+ 
+     dc->reset = s390_pcihost_reset;
+-    k->init = s390_pcihost_init;
++    dc->realize = s390_pcihost_realize;
+     hc->plug = s390_pcihost_hot_plug;
+     hc->unplug = s390_pcihost_hot_unplug;
+     msi_nonbroken = true;
+-- 
+1.8.3.1
