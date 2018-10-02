@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g7P7K-00087n-M9
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 14:09:55 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g7PyV-0005qX-3w
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:04:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g7P7H-0006Cv-Ej
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 14:09:54 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:40977)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g7P7H-0006Cp-7v
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 14:09:51 -0400
-Date: Tue, 2 Oct 2018 14:09:48 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181002180948.GA19889@flamenco>
-References: <20180919175423.GA25553@flamenco> <87va71uijc.fsf@linaro.org>
-	<20181001183423.GA27555@flamenco> <87k1n0lu8b.fsf@linaro.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g7PyU-0006X5-50
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:04:51 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42773)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g7PyT-0006WY-TA
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:04:50 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g15-v6so814124wru.9
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 12:04:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87k1n0lu8b.fsf@linaro.org>
-Subject: Re: [Qemu-devel] ideas for improving TLB performance (help with TCG
- backend wanted)
+References: <20180829134043.31706-1-marcandre.lureau@redhat.com>
+	<20180829134043.31706-10-marcandre.lureau@redhat.com>
+	<87mut42c0c.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mut42c0c.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 2 Oct 2018 23:04:36 +0400
+Message-ID: <CAJ+F1C+WiGAd02PC=s50=kb4TT8kLmrHnYEhgyyvdGAQUbbVSw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 09/10] qga: process_event()
+ simplification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
-On Tue, Oct 02, 2018 at 07:48:20 +0100, Alex Bennée wrote:
-> 
-> Emilio G. Cota <cota@braap.org> writes:
-> 
-> > On Thu, Sep 20, 2018 at 01:19:51 +0100, Alex Bennée wrote:
-> >> If we are going to have an indirection then we can also drop the
-> >> requirement to scale the TLB according to the number of MMU indexes we
-> >> have to support. It's fairly wasteful when a bunch of them are almost
-> >> never used unless you are running stuff that uses them.
+Hi
+On Thu, Aug 30, 2018 at 6:03 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > Simplify the code around qmp_dispatch():
+> > - rely on qmp_dispatch/check_obj() for message checking
+> > - have a single send_response() point
+> > - constify send_response() argument
 > >
-> > So with dynamic TLB sizing, what you're suggesting here is to resize
-> > each MMU array independently (depending on their use rate) instead
-> > of using a single "TLB size" for all MMU indexes. Am I understanding
-> > your point correctly?
-> 
-> Not quite - I think it would overly complicate the lookup to have a
-> differently sized TLB lookup for each mmu index - even if their usage
-> patterns are different.
+> > It changes a couple of error messages:
+> >
+> > * When @req isn't a dictionary, from
+> >     Invalid JSON syntax
+> >   to
+> >     QMP input must be a JSON object
+> >
+> > * When @req lacks member "execute", from
+> >     this feature or command is not currently supported
+> >   to
+> >     QMP input lacks member 'execute'
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>
 
-It just adds a load to get the mask, which will most likely be
-in the L1. The value is not used after 3 instructions later, when
-the L1 read will have completed.
+Can someone take the patch? thanks
 
-> I just meant that if we already have the cost of an indirection we don't
-> have to ensure:
-> 
->     CPUTLBEntry tlb_table[NB_MMU_MODES][CPU_TLB_SIZE];
->     CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];
-> 
-> restrict their sizes so any entry in the 2D array can be indexed
-> directly from env. Currently CPU_TLB_SIZE/CPU_TLB_BITS is restricted by
-> the number of NB_MMU_MODES we have to support. But if each can be
-> flushed and managed separately we can have:
-> 
->     CPUTLBEntry *tlb_table[NB_MMU_MODES];
-> 
-> And size CPU_TLB_SIZE for the maximum offset we can mange in the lookup
-> code. This is mainly driven by the varying
-> TCG_TARGET_TLB_DISPLACEMENT_BITS each backend has available to it.
-
-What I implemented is what you suggest, but with dynamic resizing based
-on usage. I'm keeping the current CPU_TLB_SIZE as the minimum size, and
-took Pranith's TCG_TARGET_TLB_MAX_INDEX_BITS definitions (from 2017)
-to limit the max tlb size per mmu.
-
-I'll prepare an RFC.
-
-Thanks,
-
-		Emilio
+--=20
+Marc-Andr=C3=A9 Lureau
