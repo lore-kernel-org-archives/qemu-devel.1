@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7IMu-0006z3-Uq
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g7IMu-0006O4-Pr
 	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 06:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g7IMu-0006Hx-42
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 06:57:32 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43667)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g7IKg-0005cW-FQ
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 06:55:16 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46830)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g7IMt-0006Hq-Sf
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 06:57:31 -0400
-Received: by mail-ot1-x341.google.com with SMTP id e21-v6so1403622otk.10
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 03:57:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g7IKf-0005bc-Ui
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 06:55:14 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z3-v6so1633692wrr.13
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 03:55:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <539cfb28-e4bc-f7d4-6ed9-881bc0cab8bc@kaod.org>
-References: <20180921161939.822-1-clg@kaod.org>
-	<CAFEAcA_Nm7qX1w16spsW-VgsMOebW=tNo9VT0paws7+9YH+zZQ@mail.gmail.com>
-	<539cfb28-e4bc-f7d4-6ed9-881bc0cab8bc@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 2 Oct 2018 11:57:10 +0100
-Message-ID: <CAFEAcA-X7QdyjU9_aM9RAm-GZZWezyx-toEdT5vf-1P=XkdX-Q@mail.gmail.com>
+References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
+	<120d75f8-24f7-641a-9b30-4a1ebfbca34d@redhat.com>
+In-Reply-To: <120d75f8-24f7-641a-9b30-4a1ebfbca34d@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 2 Oct 2018 14:54:59 +0400
+Message-ID: <CAJ+F1CKjf6APRYSJVmRCf04vVHDyLSjHxsKr+KGFL+jcLEN68Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] aspeed: misc fixes and
- enhancements (SMC)
+Subject: Re: [Qemu-devel] [PATCH v2 00/12] Various qemu command line options
+ help improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Eric Blake <eblake@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 25 September 2018 at 15:10, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> On 9/25/18 2:20 PM, Peter Maydell wrote:
->> On 21 September 2018 at 17:19, C=C3=A9dric Le Goater <clg@kaod.org> wrot=
-e:
->>> Hello,
->>>
->>> This series adds a couple of cleanups and two main features to the
->>> SMC controller of the Aspeed machines :
->>>
->>>  - a 'execute-in-place' property to boot directly from a memory region
->>>    alias of the FMC flash module using MMIO execution. This is not
->>>    activated by default because boot time needs to be improved on
->>>    recent firmwares. It also breaks migration compatibility.
->>>
->>>  - support for DMA to access the flash modules. Our primary need is
->>>    the checksum calculation which is used to evaluate the best clock
->>>    settings for reads.
->>
->> I've picked out the easy parts of this series and added
->> them to target-arm.next:
->>
->>>   aspeed/timer: fix compile breakage with clang 3.4.2
->>>   hw/arm/aspeed: change the FMC flash model of the AST2500 evb
->>>   hw/arm/aspeed: Add an Aspeed machine class
->>>   aspeed/smc: fix some alignment issues
->>
->> and left the rest for the moment (I've still got this series
->> on my to-review list).
+Hi
+
+On Tue, Sep 11, 2018 at 5:17 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> I will wait for your comments on the DMA part before resending.
+> On 07/09/2018 09:59, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi,
+> >
+> > This is a compilation of patches I have to improve command line help
+> > support. The "qemu-option" patches have already been sent earlier, I
+> > modified the first to fix an issue reported by Markus. The other
+> > patches add support for -object help. A few related patches for QOM,
+> > to fix/improve some minor issues.
+> >
+> > v2: after Eric Blake review
+> > - add "qdev-monitor: print help to stdout"
+> > - add "cutils: add qemu_pstrcmp"
+> > - use consistently "arg=3Dtype - desc" help format
+>
+> Feel free to send a pull request yourself with the minor fixes requested
+> during review.
 
-I've now commented on that patch. I think I'm done with review on
-this version, unless there's something specific you want more
-input on ?
+It would be nice to get some more review before :)
+
+Andreas, as QOM maintainer, do you have time to take a look?
+
+Anybody else interested to improve the CLI?
 
 thanks
--- PMM
+
+> Paolo
+>
+> > Marc-Andr=C3=A9 Lureau (12):
+> >   qdev-monitor: print help to stdout
+> >   cutils: add qemu_pstrcmp
+> >   qemu-option: add help fallback to print the list of options
+> >   qemu-option: improve qemu_opts_print_help() output
+> >   qom/object: fix iterating properties over a class
+> >   qom/object: register 'type' property as class property
+> >   tests/qom-proplist: check duplicate "bv" property registration failed
+> >   tests/qom-proplist: check properties are not listed multiple times
+> >   tests/qom-proplist: check class properties iterator
+> >   vl: handle -object help
+> >   hostmem: add some properties description
+> >   vl: list user creatable properties when 'help' is argument
+> >
+> >  include/monitor/monitor.h  |  2 ++
+> >  include/qemu/cutils.h      | 12 +++++++
+> >  backends/hostmem-memfd.c   |  9 +++++
+> >  backends/hostmem.c         | 14 ++++++++
+> >  monitor.c                  | 16 +++++++--
+> >  qdev-monitor.c             | 32 ++++++++++-------
+> >  qom/object.c               |  9 ++---
+> >  qom/object_interfaces.c    |  6 ++--
+> >  tests/check-qom-proplist.c | 58 ++++++++++++++++++++-----------
+> >  util/cutils.c              |  5 +++
+> >  util/qemu-option.c         | 71 +++++++++++++++++++++++++++++++-------
+> >  vl.c                       | 53 ++++++++++++++++++++++++++--
+> >  12 files changed, 227 insertions(+), 60 deletions(-)
+> >
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
