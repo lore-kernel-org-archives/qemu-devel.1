@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g7Nef-0006hx-3F
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:13 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g7Neg-0006jd-7C
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g7Nee-00058I-5G
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:12 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g7Nef-00059B-AE
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:14 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  2 Oct 2018 17:35:50 +0100
-Message-Id: <20181002163556.10279-8-peter.maydell@linaro.org>
+Date: Tue,  2 Oct 2018 17:35:51 +0100
+Message-Id: <20181002163556.10279-9-peter.maydell@linaro.org>
 In-Reply-To: <20181002163556.10279-1-peter.maydell@linaro.org>
 References: <20181002163556.10279-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 07/13] target/arm: Add v8M stack limit checks
- on NS function calls
+Subject: [Qemu-devel] [PATCH 08/13] target/arm: Add v8M stack checks for
+ LDRD/STRD (imm)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +25,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Check the v8M stack limits when pushing the frame for a
-non-secure function call via BLXNS.
+Add the v8M stack checks for:
+ * LDRD (immediate)
+ * STRD (immediate)
 
-In order to be able to generate the exception we need to
-promote raise_exception() from being local to op_helper.c
-so we can call it from helper.c.
+Loads and stores are more complicated than ADD/SUB/MOV, because we
+must ensure that memory accesses below the stack limit are not
+performed, so we can't simply do the check when we actually update
+SP.
+
+For these instructions, if the stack limit check triggers
+we must not:
+ * perform any memory access below the SP limit
+ * update PC, SP or the load/store base register
+but it is IMPDEF whether we:
+ * perform any accesses above or equal to the SP limit
+ * update destination registers for loads
+
+For QEMU we choose to always check the limit before doing any other
+part of the load or store, so we won't update any registers or
+perform any memory accesses.
+
+It is UNKNOWN whether the limit check triggers for a load or store
+where the initial SP value is below the limit and one of the stores
+would be below the limit, but the writeback moves SP to above the
+limit.  For QEMU we choose to trigger the check in this situation.
+
+Note that limit checks happen only for loads and stores which update
+SP via writeback; they do not happen for loads and stores which
+simply use SP as a base register.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/internals.h | 9 +++++++++
- target/arm/helper.c    | 4 ++++
- target/arm/op_helper.c | 4 ++--
- 3 files changed, 15 insertions(+), 2 deletions(-)
+ target/arm/translate.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 966a8131623..aa124a06a9d 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -94,6 +94,15 @@ FIELD(V7M_EXCRET, RES1, 7, 25) /* including the must-be-1 prefix */
- #define M_FAKE_FSR_NSC_EXEC 0xf /* NS executing in S&NSC memory */
- #define M_FAKE_FSR_SFAULT 0xe /* SecureFault INVTRAN, INVEP or AUVIOL */
- 
-+/**
-+ * raise_exception: Raise the specified exception.
-+ * Raise a guest exception with the specified value, syndrome register
-+ * and target exception level. This should be called from helper functions,
-+ * and never returns because we will longjump back up to the CPU main loop.
-+ */
-+void QEMU_NORETURN raise_exception(CPUARMState *env, uint32_t excp,
-+                                   uint32_t syndrome, uint32_t target_el);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index fcb33b8a503..c16d6075d94 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -10278,6 +10278,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                  * 0b1111_1001_x11x_xxxx_xxxx_xxxx_xxxx_xxxx
+                  *  - load/store dual (pre-indexed)
+                  */
++                bool wback = extract32(insn, 21, 1);
 +
- /*
-  * For AArch64, map a given EL to an index in the banked_spsr array.
-  * Note that this mapping and the AArch32 mapping defined in bank_number()
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index a10dff01a90..074f7616272 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6710,6 +6710,10 @@ void HELPER(v7m_blxns)(CPUARMState *env, uint32_t dest)
-                       "BLXNS with misaligned SP is UNPREDICTABLE\n");
-     }
- 
-+    if (sp < v7m_sp_limit(env)) {
-+        raise_exception(env, EXCP_STKOF, 0, 1);
-+    }
+                 if (rn == 15) {
+                     if (insn & (1 << 21)) {
+                         /* UNPREDICTABLE */
+@@ -10289,8 +10291,29 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     addr = load_reg(s, rn);
+                 }
+                 offset = (insn & 0xff) * 4;
+-                if ((insn & (1 << 23)) == 0)
++                if ((insn & (1 << 23)) == 0) {
+                     offset = -offset;
++                }
 +
-     saved_psr = env->v7m.exception;
-     if (env->v7m.control[M_REG_S] & R_V7M_CONTROL_SFPA_MASK) {
-         saved_psr |= XPSR_SFPA;
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 38f885b290f..de0d3984ea4 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -28,8 +28,8 @@
- #define SIGNBIT (uint32_t)0x80000000
- #define SIGNBIT64 ((uint64_t)1 << 63)
- 
--static void raise_exception(CPUARMState *env, uint32_t excp,
--                            uint32_t syndrome, uint32_t target_el)
-+void raise_exception(CPUARMState *env, uint32_t excp,
-+                     uint32_t syndrome, uint32_t target_el)
- {
-     CPUState *cs = CPU(arm_env_get_cpu(env));
- 
++                if (s->v8m_stackcheck && rn == 13 && wback) {
++                    /*
++                     * Here 'addr' is the current SP; if offset is +ve we're
++                     * moving SP up, else down. It is UNKNOWN whether the limit
++                     * check triggers when SP starts below the limit and ends
++                     * up above it; check whichever of the current and final
++                     * SP is lower, so QEMU will trigger in that situation.
++                     */
++                    if ((int32_t)offset < 0) {
++                        TCGv_i32 newsp = tcg_temp_new_i32();
++
++                        tcg_gen_addi_i32(newsp, addr, offset);
++                        gen_helper_v8m_stackcheck(cpu_env, newsp);
++                        tcg_temp_free_i32(newsp);
++                    } else {
++                        gen_helper_v8m_stackcheck(cpu_env, addr);
++                    }
++                }
++
+                 if (insn & (1 << 24)) {
+                     tcg_gen_addi_i32(addr, addr, offset);
+                     offset = 0;
+@@ -10314,7 +10337,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     gen_aa32_st32(s, tmp, addr, get_mem_index(s));
+                     tcg_temp_free_i32(tmp);
+                 }
+-                if (insn & (1 << 21)) {
++                if (wback) {
+                     /* Base writeback.  */
+                     tcg_gen_addi_i32(addr, addr, offset - 4);
+                     store_reg(s, rn, addr);
 -- 
 2.19.0
