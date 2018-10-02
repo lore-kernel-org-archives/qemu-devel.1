@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1g7ONr-0006fa-K4
+	(envelope-from <paolo.bonzini@gmail.com>) id 1g7ONr-0006fb-KC
 	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 13:22:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1g7ONo-0006IT-T3
+	(envelope-from <paolo.bonzini@gmail.com>) id 1g7ONo-0006IF-Bq
 	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 13:22:55 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37479)
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:52663)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1g7ONo-0006I9-LJ
+	id 1g7ONo-0006I2-2H
 	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 13:22:52 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 185-v6so2997808wmt.2
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 10:22:52 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 189-v6so3077479wmw.2
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 10:22:51 -0700 (PDT)
+Received: from 640k.lan (94-36-187-248.adsl-ull.clienti.tiscali.it.
+	[94.36.187.248]) by smtp.gmail.com with ESMTPSA id
+	t2-v6sm16987812wre.96.2018.10.02.10.22.49 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 02 Oct 2018 10:22:49 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  2 Oct 2018 19:22:45 +0200
-Message-Id: <1538500966-5506-2-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1538500966-5506-1-git-send-email-pbonzini@redhat.com>
-References: <1538500966-5506-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 24/80] change get_image_size return type to
- int64_t
+Date: Tue,  2 Oct 2018 19:22:44 +0200
+Message-Id: <1538500966-5506-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v4 00/80] Misc patches for 2018-09-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,220 +34,276 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
 
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
+The following changes since commit 3892f1f1a963e59dfe012cd9d461d33b2986fa3b:
 
-Previously, if the size of initrd >=2G, qemu exits with error:
-root@haswell-OptiPlex-9020:/home/lizj# /home/lizhijian/lkp/qemu-colo/x86_64-softmmu/qemu-system-x86_64 -kernel ./vmlinuz-4.16.0-rc4 -initrd large.cgz -nographic
-qemu: error reading initrd large.cgz: No such file or directory
-root@haswell-OptiPlex-9020:/home/lizj# du -sh large.cgz
-2.5G	large.cgz
+  Merge remote-tracking branch 'remotes/dgibson/tags/libfdt-20181002' into staging (2018-10-02 09:54:44 +0100)
 
-this patch changes the caller side that use this function to calculate
-size of initrd file as well.
+are available in the git repository at:
 
-v2: update error message and int64_t printing format
 
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-Id: <1536833233-14121-1-git-send-email-lizhijian@cn.fujitsu.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/alpha/dp264.c        | 3 ++-
- hw/core/loader.c        | 5 +++--
- hw/hppa/machine.c       | 2 +-
- hw/i386/pc.c            | 7 ++++++-
- hw/mips/mips_fulong2e.c | 6 +++---
- hw/mips/mips_malta.c    | 6 +++---
- hw/mips/mips_mipssim.c  | 3 +--
- hw/mips/mips_r4k.c      | 6 +++---
- hw/moxie/moxiesim.c     | 2 +-
- include/hw/loader.h     | 2 +-
- 10 files changed, 24 insertions(+), 18 deletions(-)
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 80b987f..dd62f2a 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -150,7 +150,8 @@ static void clipper_init(MachineState *machine)
-         }
- 
-         if (initrd_filename) {
--            long initrd_base, initrd_size;
-+            long initrd_base;
-+            int64_t initrd_size;
- 
-             initrd_size = get_image_size(initrd_filename);
-             if (initrd_size < 0) {
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 390987a..aa0b3fc 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -61,9 +61,10 @@
- static int roms_loaded;
- 
- /* return the size or -1 if error */
--int get_image_size(const char *filename)
-+int64_t get_image_size(const char *filename)
- {
--    int fd, size;
-+    int fd;
-+    int64_t size;
-     fd = open(filename, O_RDONLY | O_BINARY);
-     if (fd < 0)
-         return -1;
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 0fb8fb8..ac6dd7f 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -191,7 +191,7 @@ static void machine_hppa_init(MachineState *machine)
- 
-         if (initrd_filename) {
-             ram_addr_t initrd_base;
--            long initrd_size;
-+            int64_t initrd_size;
- 
-             initrd_size = get_image_size(initrd_filename);
-             if (initrd_size < 0) {
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 0314845..cd5029c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -838,7 +838,8 @@ static void load_linux(PCMachineState *pcms,
-                        FWCfgState *fw_cfg)
- {
-     uint16_t protocol;
--    int setup_size, kernel_size, initrd_size = 0, cmdline_size;
-+    int setup_size, kernel_size, cmdline_size;
-+    int64_t initrd_size = 0;
-     int dtb_size, setup_data_offset;
-     uint32_t initrd_max;
-     uint8_t header[8192], *setup, *kernel, *initrd_data;
-@@ -974,6 +975,10 @@ static void load_linux(PCMachineState *pcms,
-             fprintf(stderr, "qemu: error reading initrd %s: %s\n",
-                     initrd_filename, strerror(errno));
-             exit(1);
-+        } else if (initrd_size >= initrd_max) {
-+            fprintf(stderr, "qemu: initrd is too large, cannot support."
-+                    "(max: %"PRIu32", need %"PRId64")\n", initrd_max, initrd_size);
-+            exit(1);
-         }
- 
-         initrd_addr = (initrd_max-initrd_size) & ~4095;
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index c1694c8..2fbba32 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -104,9 +104,9 @@ static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
- 
- static int64_t load_kernel (CPUMIPSState *env)
- {
--    int64_t kernel_entry, kernel_low, kernel_high;
-+    int64_t kernel_entry, kernel_low, kernel_high, initrd_size;
-     int index = 0;
--    long kernel_size, initrd_size;
-+    long kernel_size;
-     ram_addr_t initrd_offset;
-     uint32_t *prom_buf;
-     long prom_size;
-@@ -150,7 +150,7 @@ static int64_t load_kernel (CPUMIPSState *env)
- 
-     prom_set(prom_buf, index++, "%s", loaderparams.kernel_filename);
-     if (initrd_size > 0) {
--        prom_set(prom_buf, index++, "rd_start=0x%" PRIx64 " rd_size=%li %s",
-+        prom_set(prom_buf, index++, "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
-                  cpu_mips_phys_to_kseg0(NULL, initrd_offset), initrd_size,
-                  loaderparams.kernel_cmdline);
-     } else {
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 40041d5..29b90ba 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -995,8 +995,8 @@ static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
- /* Kernel */
- static int64_t load_kernel (void)
- {
--    int64_t kernel_entry, kernel_high;
--    long kernel_size, initrd_size;
-+    int64_t kernel_entry, kernel_high, initrd_size;
-+    long kernel_size;
-     ram_addr_t initrd_offset;
-     int big_endian;
-     uint32_t *prom_buf;
-@@ -1070,7 +1070,7 @@ static int64_t load_kernel (void)
- 
-     prom_set(prom_buf, prom_index++, "%s", loaderparams.kernel_filename);
-     if (initrd_size > 0) {
--        prom_set(prom_buf, prom_index++, "rd_start=0x%" PRIx64 " rd_size=%li %s",
-+        prom_set(prom_buf, prom_index++, "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
-                  xlate_to_kseg0(NULL, initrd_offset), initrd_size,
-                  loaderparams.kernel_cmdline);
-     } else {
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 241faa1..f665752 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -58,9 +58,8 @@ typedef struct ResetData {
- 
- static int64_t load_kernel(void)
- {
--    int64_t entry, kernel_high;
-+    int64_t entry, kernel_high, initrd_size;
-     long kernel_size;
--    long initrd_size;
-     ram_addr_t initrd_offset;
-     int big_endian;
- 
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index d5725d0..3e852e9 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -81,8 +81,8 @@ typedef struct ResetData {
- static int64_t load_kernel(void)
- {
-     const size_t params_size = 264;
--    int64_t entry, kernel_high;
--    long kernel_size, initrd_size;
-+    int64_t entry, kernel_high, initrd_size;
-+    long kernel_size;
-     ram_addr_t initrd_offset;
-     uint32_t *params_buf;
-     int big_endian;
-@@ -136,7 +136,7 @@ static int64_t load_kernel(void)
-     params_buf[1] = tswap32(0x12345678);
- 
-     if (initrd_size > 0) {
--        snprintf((char *)params_buf + 8, 256, "rd_start=0x%" PRIx64 " rd_size=%li %s",
-+        snprintf((char *)params_buf + 8, 256, "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
-                  cpu_mips_phys_to_kseg0(NULL, initrd_offset),
-                  initrd_size, loaderparams.kernel_cmdline);
-     } else {
-diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-index d41247d..4b0ce09 100644
---- a/hw/moxie/moxiesim.c
-+++ b/hw/moxie/moxiesim.c
-@@ -54,8 +54,8 @@ typedef struct {
- static void load_kernel(MoxieCPU *cpu, LoaderParams *loader_params)
- {
-     uint64_t entry, kernel_low, kernel_high;
-+    int64_t initrd_size;
-     long kernel_size;
--    long initrd_size;
-     ram_addr_t initrd_offset;
- 
-     kernel_size = load_elf(loader_params->kernel_filename,  NULL, NULL,
-diff --git a/include/hw/loader.h b/include/hw/loader.h
-index 3c11297..67a0af8 100644
---- a/include/hw/loader.h
-+++ b/include/hw/loader.h
-@@ -10,7 +10,7 @@
-  * Returns the size of the image file on success, -1 otherwise.
-  * On error, errno is also set as appropriate.
-  */
--int get_image_size(const char *filename);
-+int64_t get_image_size(const char *filename);
- int load_image(const char *filename, uint8_t *addr); /* deprecated */
- ssize_t load_image_size(const char *filename, void *addr, size_t size);
- 
+for you to fetch changes up to 97866508669c4a75f531bfa94f8267900fcbb5dc:
+
+  hw/scsi/mptendian: Avoid taking address of fields in packed structs (2018-10-02 19:09:14 +0200)
+
+----------------------------------------------------------------
+* configure fix for environment variables (Daniel)
+* fix memory leaks (Alex)
+* x86_64 MTTCG fixes (Emilio)
+* introduce atomic64 (Emilio)
+* Fix for virtio hang (Fam, myself)
+* SH serial port fix (Geert)
+* Deprecate rotation_rate for scsi-block (Fam)
+* Extend memory-backend-file availability to all POSIX hosts (Hikaru)
+* Memory API cleanups and fixes (Igor, Li Qiang, Peter, Philippe)
+* MSI/IOMMU fix (Jan)
+* Socket reconnection fixes (Marc-André)
+* icount fixes (Emilio, myself)
+* QSP fixes for Coverity (myself)
+* Some record/replay improovements (Pavel)
+* Packed struct fixes (Peter)
+* Windows dump fixes and elf2dmp (Viktor)
+* kbmclock fix (Yongji)
+
+----------------------------------------------------------------
+Alex Bennée (1):
+      cpus: fix TCG kick timer leak
+
+Daniel P. Berrangé (1):
+      configure: preserve various environment variables in config.status
+
+Emilio G. Cota (22):
+      atomic: fix comment s/x64_64/x86_64/
+      cpus: initialize timers_state.vm_clock_lock
+      cacheinfo: add i/d cache_linesize_log
+      util: add atomic64
+      tests: add atomic64-bench
+      qsp: use atomic64 accessors
+      test-rcu-list: access n_reclaims and n_nodes_removed with atomic64
+      cpus: access .qemu_icount with atomic64
+      cpus: access .qemu_icount_bias with atomic64
+      target/i386: move cpu_cc_srcT to DisasContext
+      target/i386: move cpu_A0 to DisasContext
+      target/i386: move cpu_T0 to DisasContext
+      target/i386: move cpu_T1 to DisasContext
+      target/i386: move cpu_tmp0 to DisasContext
+      target/i386: move cpu_tmp4 to DisasContext
+      target/i386: move cpu_ptr0 to DisasContext
+      target/i386: move cpu_ptr1 to DisasContext
+      target/i386: move cpu_tmp2_i32 to DisasContext
+      target/i386: move cpu_tmp3_i32 to DisasContext
+      target/i386: move cpu_tmp1_i64 to DisasContext
+      target/i386: move x86_64_hregs to DisasContext
+      configure: enable mttcg for i386 and x86_64
+
+Fam Zheng (2):
+      virtio: Return true from virtio_queue_empty if broken
+      scsi-block: Deprecate rotation_rate
+
+Geert Uytterhoeven (1):
+      hw/char/sh_serial: Add timeout handling to unbreak serial input
+
+Hikaru Nishida (1):
+      hostmem-file: make available memory-backend-file on POSIX-based hosts
+
+Igor Mammedov (1):
+      memory: cleanup side effects of memory_region_init_foo() on failure
+
+Jan Kiszka (1):
+      kvm: x86: Fix kvm_arch_fixup_msi_route for remap-less case
+
+Li Qiang (5):
+      fw_cfg_mem: add read memory region callback
+      hw: debugexit: add read callback
+      hw: pc-testdev: add read memory region callback
+      hw: hyperv_testdev: add read callback
+      hw: edu: replace device name with macro
+
+Li Zhijian (1):
+      change get_image_size return type to int64_t
+
+Liran Alon (1):
+      i386: Compile CPUX86State xsave_buf only when support KVM or HVF
+
+Marc-André Lureau (10):
+      hostmem-memfd: add checks before adding hostmem-memfd & properties
+      util: add qemu_write_pidfile()
+      util: use fcntl() for qemu_write_pidfile() locking
+      Delete PID file on exit
+      Revert "chardev: tcp: postpone TLS work until machine done"
+      Revert "chardev: tcp: postpone async connection setup"
+      char-socket: update all ioc handlers when changing context
+      test-char: fix random socket test failure
+      test-char: add socket reconnect test
+      qom/object: add some interface asserts
+
+Mark Cave-Ayland (1):
+      lsi53c895a: convert to trace-events
+
+Paolo Bonzini (9):
+      qsp: hide indirect function calls from Coverity
+      es1370: fix ADC_FRAMEADR and ADC_FRAMECNT
+      cpus: take seqlock across qemu_icount updates
+      serial: fix DLL writes
+      char-pty: remove unnecessary #ifdef
+      target/i386: unify masking of interrupts
+      target/i386: rename HF_SVMI_MASK to HF_GUEST_MASK
+      hvf: drop unused variable
+      virtio: do not take address of packed members
+
+Pavel Dovgalyuk (10):
+      ps2: prevent changing irq state on save and load
+      replay: wake up vCPU when replaying
+      replay: flush events when exiting
+      translator: fix breakpoint processing
+      replay: allow loading any snapshots before recording
+      timer: introduce new virtual clock
+      slirp: fix ipv6 timers
+      ui: fix virtual timers
+      target/i386: fix translation for icount mode
+      replay: replay BH for IDE trim operation
+
+Peter Maydell (4):
+      memory: Remove old_mmio accessors
+      hw/nvram/fw_cfg: Use memberwise copy of MemoryRegionOps struct
+      docs/devel/memory.txt: Document _with_attrs accessors
+      hw/scsi/mptendian: Avoid taking address of fields in packed structs
+
+Philippe Mathieu-Daudé (3):
+      memory: Use MAKE_64BIT_MASK()
+      memory: Refactor common shifting code from accessors
+      memory: Fix access_with_adjusted_size(small size) on big-endian memory regions
+
+Thomas Huth (1):
+      accel/tcg: Remove dead code
+
+Viktor Prutyanov (4):
+      dump: fix Windows dump memory run mapping
+      dump: move Windows dump structures definitions
+      contrib: add elf2dmp tool
+      MAINTAINERS: add myself as elf2dmp maintainer
+
+Yongji Xie (1):
+      kvmclock: run KVM_KVMCLOCK_CTRL ioctl in vcpu thread
+
+ MAINTAINERS                   |    5 +
+ Makefile                      |    5 +
+ Makefile.objs                 |    1 +
+ accel/tcg/translate-all.c     |    9 -
+ accel/tcg/translator.c        |    8 +-
+ backends/Makefile.objs        |    2 +-
+ backends/hostmem-file.c       |    2 +-
+ backends/hostmem-memfd.c      |   32 +-
+ chardev/char-pty.c            |    6 -
+ chardev/char-socket.c         |   86 +-
+ configure                     |   45 +
+ contrib/elf2dmp/Makefile.objs |    1 +
+ contrib/elf2dmp/addrspace.c   |  233 ++++
+ contrib/elf2dmp/addrspace.h   |   44 +
+ contrib/elf2dmp/download.c    |   47 +
+ contrib/elf2dmp/download.h    |   13 +
+ contrib/elf2dmp/err.h         |   13 +
+ contrib/elf2dmp/kdbg.h        |  194 ++++
+ contrib/elf2dmp/main.c        |  589 ++++++++++
+ contrib/elf2dmp/pdb.c         |  322 ++++++
+ contrib/elf2dmp/pdb.h         |  241 ++++
+ contrib/elf2dmp/pe.h          |  121 ++
+ contrib/elf2dmp/qemu_elf.c    |  164 +++
+ contrib/elf2dmp/qemu_elf.h    |   51 +
+ cpus.c                        |   84 +-
+ docs/devel/memory.txt         |   13 +-
+ exec.c                        |    4 +-
+ hw/alpha/dp264.c              |    3 +-
+ hw/audio/es1370.c             |   10 +-
+ hw/char/serial.c              |    4 +-
+ hw/char/sh_serial.c           |   20 +
+ hw/char/virtio-serial-bus.c   |    6 +-
+ hw/core/loader.c              |    5 +-
+ hw/hppa/machine.c             |    2 +-
+ hw/i386/kvm/clock.c           |   17 +-
+ hw/i386/pc.c                  |    7 +-
+ hw/ide/core.c                 |    3 +-
+ hw/input/ps2.c                |    8 +-
+ hw/mips/mips_fulong2e.c       |    6 +-
+ hw/mips/mips_malta.c          |    6 +-
+ hw/mips/mips_mipssim.c        |    3 +-
+ hw/mips/mips_r4k.c            |    6 +-
+ hw/misc/debugexit.c           |    6 +
+ hw/misc/edu.c                 |    5 +-
+ hw/misc/hyperv_testdev.c      |   10 +-
+ hw/misc/pc-testdev.c          |   20 +-
+ hw/moxie/moxiesim.c           |    2 +-
+ hw/nvram/fw_cfg.c             |   13 +-
+ hw/scsi/lsi53c895a.c          |  214 ++--
+ hw/scsi/mptendian.c           |  163 +--
+ hw/scsi/scsi-disk.c           |    6 +
+ hw/scsi/trace-events          |   62 ++
+ hw/virtio/virtio.c            |    8 +
+ include/exec/memory.h         |    7 +-
+ include/hw/loader.h           |    2 +-
+ include/qemu/atomic.h         |   36 +-
+ include/qemu/memfd.h          |   18 +-
+ include/qemu/osdep.h          |    5 +-
+ include/qemu/thread.h         |   17 +
+ include/qemu/timer.h          |    9 +
+ include/qemu/win_dump_defs.h  |  179 +++
+ include/sysemu/replay.h       |    3 +
+ memory.c                      |  163 +--
+ os-posix.c                    |   24 -
+ os-win32.c                    |   25 -
+ qga/main.c                    |   54 +-
+ qom/object.c                  |    9 +-
+ replay/replay-events.c        |   14 +-
+ replay/replay-internal.h      |    2 -
+ replay/replay-snapshot.c      |   17 +-
+ replay/replay.c               |   12 +
+ scsi/qemu-pr-helper.c         |   40 +-
+ slirp/ip6_icmp.c              |    7 +-
+ target/i386/cpu.c             |   51 +-
+ target/i386/cpu.h             |    9 +-
+ target/i386/excp_helper.c     |    2 +-
+ target/i386/hvf/README.md     |    2 +-
+ target/i386/hvf/hvf.c         |    3 +-
+ target/i386/hvf/x86hvf.c      |    4 +-
+ target/i386/kvm.c             |   10 +-
+ target/i386/seg_helper.c      |  112 +-
+ target/i386/svm_helper.c      |    6 +-
+ target/i386/translate.c       | 2474 +++++++++++++++++++++--------------------
+ tests/Makefile.include        |    3 +-
+ tests/atomic64-bench.c        |  171 +++
+ tests/test-char.c             |   25 +-
+ tests/test-rcu-list.c         |   20 +-
+ tests/vhost-user-test.c       |    6 +-
+ ui/input.c                    |    8 +-
+ util/Makefile.objs            |    1 +
+ util/atomic64.c               |   83 ++
+ util/cacheinfo.c              |   11 +
+ util/memfd.c                  |   35 +-
+ util/oslib-posix.c            |   73 ++
+ util/oslib-win32.c            |   27 +
+ util/qemu-timer.c             |    2 +
+ util/qsp.c                    |   49 +-
+ vl.c                          |   25 +-
+ win_dump.c                    |   40 +-
+ win_dump.h                    |  166 +--
+ 100 files changed, 4824 insertions(+), 2187 deletions(-)
+ create mode 100644 contrib/elf2dmp/Makefile.objs
+ create mode 100644 contrib/elf2dmp/addrspace.c
+ create mode 100644 contrib/elf2dmp/addrspace.h
+ create mode 100644 contrib/elf2dmp/download.c
+ create mode 100644 contrib/elf2dmp/download.h
+ create mode 100644 contrib/elf2dmp/err.h
+ create mode 100644 contrib/elf2dmp/kdbg.h
+ create mode 100644 contrib/elf2dmp/main.c
+ create mode 100644 contrib/elf2dmp/pdb.c
+ create mode 100644 contrib/elf2dmp/pdb.h
+ create mode 100644 contrib/elf2dmp/pe.h
+ create mode 100644 contrib/elf2dmp/qemu_elf.c
+ create mode 100644 contrib/elf2dmp/qemu_elf.h
+ create mode 100644 include/qemu/win_dump_defs.h
+ create mode 100644 tests/atomic64-bench.c
+ create mode 100644 util/atomic64.c
 -- 
 1.8.3.1
