@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7Rv8-0003mT-9q
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:09:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7S9X-0002AK-9m
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:24:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7Rv7-0000wV-Hx
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:09:30 -0400
-References: <20180925153949.1577-1-programmingkidx@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4d079c68-8789-7956-67e5-e88de5b025bc@redhat.com>
-Date: Tue, 2 Oct 2018 16:09:17 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7S9S-0006fS-Bk
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:24:23 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40910)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7S9R-0006f3-EB
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:24:18 -0400
+Received: by mail-wm1-x344.google.com with SMTP id z204-v6so2741096wmc.5
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 14:24:17 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20181001220942.2382-1-f4bug@amsat.org>
+	<20181001220942.2382-7-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8dc26fdf-eedf-4ca5-e4b4-80148e78da6e@amsat.org>
+Date: Tue, 2 Oct 2018 23:24:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180925153949.1577-1-programmingkidx@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181001220942.2382-7-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] qemu-img.c: add help for each command
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 06/15] hw/pci-host/bonito: Use
+ DeviceState::realize rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +36,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>, mreitz@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, muriloo@linux.ibm.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goate?= =?UTF-8?Q?r?= <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
-On 9/25/18 10:39 AM, John Arbuckle wrote:
-> Add the ability for the user to display help for a certain command.
-> Example: qemu-img create --help
+On 10/2/18 12:09 AM, Philippe Mathieu-Daudé wrote:
+> Move from the legacy SysBusDevice::init method to using DeviceState::realize.
 > 
-> What is printed is all the options available to this command and an example.
-> 
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
-> v3 changes:
-> Fixed a bug that caused qemu-img to crash when running a command without
-> options.
-
-Hmm, I just reviewed v2 without noticing that you had posted v3.
-
+>  hw/pci-host/bonito.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
 > 
-> v2 changes:
-> Removed block of string comparison code for each command.
-> Added a help_func field to the img_cmd_t struct.
-> Made strings longer than 80 characters wide.
+> diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+> index 9868e2eccc..03d1ec33e3 100644
+> --- a/hw/pci-host/bonito.c
+> +++ b/hw/pci-host/bonito.c
+> @@ -595,7 +595,7 @@ static const VMStateDescription vmstate_bonito = {
+>      }
+>  };
+>  
+> -static int bonito_pcihost_initfn(SysBusDevice *dev)
+> +static void bonito_pcihost_realize(PCIDevice *dev, Error **errp)
+
+This patch is incorrect, see:
+https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00378.html
+
+>  {
+>      PCIHostState *phb = PCI_HOST_BRIDGE(dev);
+>  
+> @@ -603,8 +603,6 @@ static int bonito_pcihost_initfn(SysBusDevice *dev)
+>                                       pci_bonito_set_irq, pci_bonito_map_irq,
+>                                       dev, get_system_memory(), get_system_io(),
+>                                       0x28, 32, TYPE_PCI_BUS);
+> -
+> -    return 0;
+>  }
+>  
+>  static void bonito_realize(PCIDevice *dev, Error **errp)
+> @@ -684,7 +682,6 @@ PCIBus *bonito_init(qemu_irq *pic)
+>      pcihost->pic = pic;
+>      qdev_init_nofail(dev);
+>  
+> -    /* set the pcihost pointer before bonito_initfn is called */
+>      d = pci_create(phb->bus, PCI_DEVFN(0, 0), TYPE_PCI_BONITO);
+>      s = PCI_BONITO(d);
+>      s->pcihost = pcihost;
+> @@ -726,9 +723,9 @@ static const TypeInfo bonito_info = {
+>  
+>  static void bonito_pcihost_class_init(ObjectClass *klass, void *data)
+>  {
+> -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>  
+> -    k->init = bonito_pcihost_initfn;
+> +    k->realize = bonito_pcihost_realize;
+>  }
+>  
+>  static const TypeInfo bonito_pcihost_info = {
 > 
->   qemu-img.c | 660 +++++++++++++++++++++++++++++++++++++++++++++++++++----------
->   1 file changed, 559 insertions(+), 101 deletions(-)
-
-My v2 comment about splitting this into more reviewable portions still 
-applies.
-
-> +++ b/qemu-img.c
-> @@ -52,6 +52,7 @@
->   typedef struct img_cmd_t {
->       const char *name;
->       int (*handler)(int argc, char **argv);
-> +    void (*help_func)(void);
->   } img_cmd_t;
-
-As does my complaint that you want to track the command synopses here in 
-this struct for reuse in multiple contexts later, rather than...
-
-> +static void help_amend(void)
-> +{
-> +    const char *msg =
-> +    "\n"
-> +    "usage: qemu-img amend [--object objectdef] [--image-opts] [-p] [-q] [-f fmt]\n"
-> +    "[-t cache] -o options filename\n"
-
-repeating things that are in qemu-img-cmds.h and risking them getting 
-out of sync.
-
->   
-> -static const img_cmd_t img_cmds[] = {
-> +static img_cmd_t img_cmds[] = {
->   #define DEF(option, callback, arg_string)        \
->       { option, callback },
->   #include "qemu-img-cmds.h"
-> @@ -4894,6 +5334,12 @@ static const img_cmd_t img_cmds[] = {
->       { NULL, NULL, },
->   };
->   
-> +/* These functions will be added to the img_cmds array */
-> +void (*help_functions[])(void) = {help_amend, help_bench, help_check,\
-> +    help_commit, help_compare, help_convert, help_create, help_dd, help_info,\
-> +    help_map, help_measure, help_snapshot, help_rebase, help_resize};
-
-And my biggest gripe, that this approach to initialization is dead 
-wrong, is still applicable.
-
-Overall, I like the end result that you are trying to reach. (I'm not 
-always a fan of having to run 'command --help' followed by 'command 
-subcommand --help' to learn everything, but it sure beats a wall of 
-text, and we have at least 'git' and 'cvs' as examples of programs that 
-have used that approach, so we are not inventing something new).  But 
-you'll need a v4, and preferably broken up into something easier to 
-review (one patch per command, rather than a wholesale rewrite in go), 
-if you want to get it in.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
