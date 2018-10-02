@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g7NVv-0001WM-H9
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:27:12 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g7NeZ-0006b0-EK
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g7NVn-0000Gx-S5
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:27:09 -0400
-Received: from m12-16.163.com ([220.181.12.16]:44467)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g7NVl-0000E1-JU
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:27:02 -0400
-From: Li Qiang <liq3ea@163.com>
-Date: Tue,  2 Oct 2018 09:26:52 -0700
-Message-Id: <20181002162652.19377-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH] tests: check-qjson: fix a memory leak
+	(envelope-from <pm215@archaic.org.uk>) id 1g7NeY-00051w-C5
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:07 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  2 Oct 2018 17:35:43 +0100
+Message-Id: <20181002163556.10279-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 00/13] target/arm: Implement v8M stack limit
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,49 +20,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Spotted by ASAN.
+This patchset implements the v8M stack limit checking
+feature, which is the last missing piece of the v8M
+architectural support.
 
-=================================================================
-==17531==ERROR: LeakSanitizer: detected memory leaks
+Note that the stack limit triggers when the SP value
+is changed to something below the limit, not when
+a load or store is performed below the limit. It's
+also done only for certain instructions that update
+SP, not for every possible way to change SP. For
+loads and stores which do writeback to SP there are
+also some rules about what parts of the load/store
+are permitted to happen if the check triggers -- we
+keep things simple by taking the approach of doing
+the check first so that no accesses are done.
 
-Direct leak of 1120 byte(s) in 28 object(s) allocated from:
-    #0 0x7f9fb85eeb50 in __interceptor_malloc (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xdeb50)
-    #1 0x7f9fb824b8d8 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x518d8)
-    #2 0x5654ae94f073 in qstring_from_str qobject/qstring.c:66
-    #3 0x5654ae94ede7 in qstring_new qobject/qstring.c:23
-    #4 0x5654ae953b6b in parse_string qobject/json-parser.c:143
-    #5 0x5654ae955e3e in parse_literal qobject/json-parser.c:484
-    #6 0x5654ae956227 in parse_value qobject/json-parser.c:547
-    #7 0x5654ae9565c7 in json_parser_parse qobject/json-parser.c:573
-    #8 0x5654ae952d5d in json_message_process_token qobject/json-streamer.c:92
-    #9 0x5654ae9608fa in json_lexer_feed_char qobject/json-lexer.c:313
-    #10 0x5654ae960ea5 in json_lexer_feed qobject/json-lexer.c:350
-    #11 0x5654ae9530de in json_message_parser_feed qobject/json-streamer.c:121
-    #12 0x5654ae950b6e in qobject_from_jsonv qobject/qjson.c:69
-    #13 0x5654ae950d30 in qobject_from_json qobject/qjson.c:83
-    #14 0x5654ae9449af in from_json_str tests/check-qjson.c:30
-    #15 0x5654ae946399 in utf8_string tests/check-qjson.c:781
-    #16 0x7f9fb826cc39  (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x72c39)
+We take a straightforward approach to implementing
+the checks: generating a call to a helper function
+which does the comparison and might raise an exception.
+This obviously imposes some overhead for the common
+case where the limit isn't being breached, but
+generating code for a compare-and-conditionally-call
+seemed too tricky to insert into the existing code...
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- tests/check-qjson.c | 1 +
- 1 file changed, 1 insertion(+)
+thanks
+-- PMM
 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index cc13f3d41e..d876a7a96e 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -780,6 +780,7 @@ static void utf8_string(void)
-             if (!strstr(json_out, "\\uFFFD")) {
-                 str = from_json_str(json_out, j, &error_abort);
-                 g_assert_cmpstr(qstring_get_try_str(str), ==, utf8_in);
-+                qobject_unref(str);
-             }
-         }
-     }
+Peter Maydell (13):
+  target/arm: Define new TBFLAG for v8M stack checking
+  target/arm: Define new EXCP type for v8M stack overflows
+  target/arm: Move v7m_using_psp() to internals.h
+  target/arm: Add v8M stack checks on ADD/SUB/MOV of SP
+  target/arm: Add some comments in Thumb decode
+  target/arm: Add v8M stack checks on exception entry
+  target/arm: Add v8M stack limit checks on NS function calls
+  target/arm: Add v8M stack checks for LDRD/STRD (imm)
+  target/arm: Add v8M stack checks for Thumb2 LDM/STM
+  target/arm: Add v8M stack checks for T32 load/store single
+  target/arm: Add v8M stack checks for Thumb push/pop
+  target/arm: Add v8M stack checks for VLDM/VSTM
+  target/arm: Add v8M stack checks for MSR to SP_NS
+
+ target/arm/cpu.h       |   9 ++
+ target/arm/helper.h    |   2 +
+ target/arm/internals.h |  38 ++++++++
+ target/arm/translate.h |   1 +
+ target/arm/helper.c    |  99 ++++++++++++++++-----
+ target/arm/op_helper.c |  23 ++++-
+ target/arm/translate.c | 198 +++++++++++++++++++++++++++++++++++++----
+ 7 files changed, 330 insertions(+), 40 deletions(-)
+
 -- 
-2.17.1
+2.19.0
