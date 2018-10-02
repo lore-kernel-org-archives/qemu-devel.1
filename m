@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g7Q02-0006Wi-3A
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:06:26 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1g7Q1b-0008LZ-MO
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g7Q00-0006x5-HG
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:06:26 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37958)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g7Q00-0006ww-As
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:06:24 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 193-v6so3245746wme.3
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 12:06:24 -0700 (PDT)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1g7Q1Y-0008Ab-Kg
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:08:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1g7Q1Y-00089R-Dw
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:08:00 -0400
+References: <CGME20181002140746eucas1p14d822ee1600d78687a73d6bf9a44e36b@eucas1p1.samsung.com>
+	<20181002140947.4107-1-i.maximets@samsung.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <cda10fda-8543-7200-adf5-de1671ea988e@redhat.com>
+Date: Tue, 2 Oct 2018 21:07:41 +0200
 MIME-Version: 1.0
-References: <20180829134043.31706-1-marcandre.lureau@redhat.com>
-	<20180829134043.31706-11-marcandre.lureau@redhat.com>
-	<87o9dhiiuj.fsf@dusky.pond.sub.org>
-	<CAMxuvazFSTzR_2fZpLCVciHnBcJKTAmnUto81Z7Tup+m6T_CHg@mail.gmail.com>
-In-Reply-To: <CAMxuvazFSTzR_2fZpLCVciHnBcJKTAmnUto81Z7Tup+m6T_CHg@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 2 Oct 2018 23:06:11 +0400
-Message-ID: <CAJ+F1CJU=APrieMmfXLw02BjEX6hiWXpzwFghp1uDJKtREBE3A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 10/10] qmp: common 'id' handling & make
- QGA conform to QMP spec
+In-Reply-To: <20181002140947.4107-1-i.maximets@samsung.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: Don't ask for reply on
+ postcopy mem table set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Ilya Maximets <i.maximets@samsung.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Hi
 
-On Sat, Sep 1, 2018 at 4:06 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> On Sat, Sep 1, 2018 at 12:59 PM, Markus Armbruster <armbru@redhat.com> wr=
-ote:
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-> >
-> >> Let qmp_dispatch() copy the 'id' field. That way any qmp client will
-> >> conform to the specification, including QGA. Furthermore, it
-> >> simplifies the work for qemu monitor.
-> >>
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> >> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> >> ---
-> >>  monitor.c           | 33 ++++++++++++---------------------
-> >>  qapi/qmp-dispatch.c | 10 ++++++++--
-> >>  tests/test-qga.c    | 13 +++++--------
-> >>  3 files changed, 25 insertions(+), 31 deletions(-)
-> >
-> > Let's squash in
-> >
-> > diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
-> > index 8f7da0245d..5fdfb2a4d0 100644
-> > --- a/docs/interop/qmp-spec.txt
-> > +++ b/docs/interop/qmp-spec.txt
-> > @@ -109,6 +109,7 @@ or
-> >    command execution, it is optional and will be part of the response
-> >    if provided.  The "id" member can be any json-value.  A json-number
-> >    incremented for each successive command works fine.
-> > +- Older versions of the QEMU Guest agent do not support "id".
->
-> Good idea. Are you taking and updating the patch, or Michael?
->
 
-any of you taking the patch?
+On 10/02/2018 04:09 PM, Ilya Maximets wrote:
+> According to documentation, NEED_REPLY_MASK should not be set
+> for VHOST_USER_SET_MEM_TABLE request in postcopy mode.
+> This restriction was mistakenly applied to 'reply_supported'
+> variable, which is local and used only for non-postcopy case.
+> 
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Fixes: 9bb38019942c ("vhost+postcopy: Send address back to qemu")
+> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+> ---
+>   hw/virtio/vhost-user.c | 13 +------------
+>   1 file changed, 1 insertion(+), 12 deletions(-)
+> 
 
-thanks
+Reviewed-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 
---=20
-Marc-Andr=C3=A9 Lureau
+Thanks,
+Maxime
