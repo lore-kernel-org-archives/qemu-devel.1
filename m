@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g7Nf8-00078L-BL
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:42 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g7Nf9-00079R-9Z
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g7Nf7-0005JO-IM
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:42 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g7Nf8-0005Jq-Ge
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 12:36:43 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  2 Oct 2018 17:35:56 +0100
-Message-Id: <20181002163556.10279-14-peter.maydell@linaro.org>
+Date: Tue,  2 Oct 2018 17:35:55 +0100
+Message-Id: <20181002163556.10279-13-peter.maydell@linaro.org>
 In-Reply-To: <20181002163556.10279-1-peter.maydell@linaro.org>
 References: <20181002163556.10279-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 13/13] target/arm: Add v8M stack checks for MSR
- to SP_NS
+Subject: [Qemu-devel] [PATCH 12/13] target/arm: Add v8M stack checks for
+ VLDM/VSTM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +25,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Updating the NS stack pointer via MSR to SP_NS should include
-a check whether the new SP value is below the stack limit.
-No other kinds of update to the various stack pointer and
-limit registers via MSR should perform a check.
+Add the v8M stack checks for the VLDM/VSTM
+(aka VPUSH/VPOP) instructions. This code is currently
+unreachable because we haven't yet implemented M profile
+floating point support, but since the change is simple,
+we add it now because otherwise we're likely to forget to
+do it later.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ target/arm/translate.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 074f7616272..712828674fa 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10963,11 +10963,23 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-              * currently in handler mode or not, using the NS CONTROL.SPSEL.
-              */
-             bool spsel = env->v7m.control[M_REG_NS] & R_V7M_CONTROL_SPSEL_MASK;
-+            bool is_psp = !arm_v7m_is_handler_mode(env) && spsel;
-+            uint32_t limit;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index ef64d2559de..2d3a1be518b 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4229,6 +4229,18 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                 if (insn & (1 << 24)) /* pre-decrement */
+                     tcg_gen_addi_i32(addr, addr, -((insn & 0xff) << 2));
  
-             if (!env->v7m.secure) {
-                 return;
-             }
--            if (!arm_v7m_is_handler_mode(env) && spsel) {
++                if (rn == 13 && w && s->v8m_stackcheck) {
++                    /*
++                     * Here 'addr' is the lowest address we will store to,
++                     * and is either the old SP (if post-increment) or
++                     * the new SP (if pre-decrement). For post-increment
++                     * where the old value is below the limit and the new
++                     * value is above, it is UNKNOWN whether the limit check
++                     * triggers; we choose to trigger.
++                     */
++                    gen_helper_v8m_stackcheck(cpu_env, addr);
++                }
 +
-+            limit = is_psp ? env->v7m.psplim[false] : env->v7m.msplim[false];
-+
-+            if (val < limit) {
-+                CPUState *cs = CPU(arm_env_get_cpu(env));
-+
-+                cpu_restore_state(cs, GETPC(), true);
-+                raise_exception(env, EXCP_STKOF, 0, 1);
-+            }
-+
-+            if (is_psp) {
-                 env->v7m.other_ss_psp = val;
-             } else {
-                 env->v7m.other_ss_msp = val;
+                 if (dp)
+                     offset = 8;
+                 else
 -- 
 2.19.0
