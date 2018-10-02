@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g7SEo-0007fx-Ux
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:29:52 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7SHb-0001y7-Ky
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:32:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g7SEj-0001Mx-RQ
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:29:50 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:58639)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g7SEj-0001LR-Kw
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:29:45 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue,  2 Oct 2018 17:29:20 -0400
-Message-Id: <20181002212921.30982-3-cota@braap.org>
-In-Reply-To: <20181002212921.30982-1-cota@braap.org>
-References: <20181002212921.30982-1-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 2/3] cputlb: serialize tlb updates with
- env->tlb_lock
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7SHX-0003Wo-Hf
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:32:43 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38595)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7SHX-0003Wc-8L
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 17:32:39 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 193-v6so3579505wme.3
+	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 14:32:39 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20181001220942.2382-1-f4bug@amsat.org>
+	<20181001220942.2382-12-f4bug@amsat.org>
+	<CACXAS8CcEu89HkP3HtT0snp_H8hc9HmEhX9-iK4e4W-035v-kQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c2ed96ae-0e94-c93a-5555-d661b59f9bb8@amsat.org>
+Date: Tue, 2 Oct 2018 23:32:36 +0200
+MIME-Version: 1.0
+In-Reply-To: <CACXAS8CcEu89HkP3HtT0snp_H8hc9HmEhX9-iK4e4W-035v-kQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 11/15] hw/sparc/sun4m: Replace 'empty_slot'
+ by 'unimplemented_device'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,258 +37,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, clg@kaod.org, qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Currently we rely on atomic operations for cross-CPU invalidations.
-There are two cases that these atomics miss: cross-CPU invalidations
-can race with either (1) vCPU threads flushing their TLB, which
-happens via memset, or (2) vCPUs calling tlb_reset_dirty on their TLB,
-which updates .addr_write with a regular store. This results in
-undefined behaviour, since we're mixing regular and atomic ops
-on concurrent accesses.
+Hi Artyom,
 
-Fix it by using tlb_lock, a per-vCPU lock. All updaters of tlb_table
-and the corresponding victim cache now hold the lock.
-The readers that do not hold tlb_lock must use atomic reads when
-reading .addr_write, since this field can be updated by other threads;
-the conversion to atomic reads is done in the next patch.
+On 10/2/18 10:14 AM, Artyom Tarasenko wrote:
+> Hi Philippe,
+> 
+> On Tue, Oct 2, 2018 at 12:10 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> The TYPE_EMPTY_SLOT and TYPE_UNIMPLEMENTED_DEVICE are identical devices,
+>> however the later use more recent APIs and is more widely used.
+>>
+>> Replace 'empty_slot' by 'unimplemented_device' to simplify devices code
+>> maintenance.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  default-configs/sparc-softmmu.mak |  1 -
+>>  hw/sparc/sun4m.c                  | 24 ++++++++++++++----------
+>>  2 files changed, 14 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+>> index 12f97eeb20..7369b54467 100644
+>> --- a/default-configs/sparc-softmmu.mak
+>> +++ b/default-configs/sparc-softmmu.mak
+>> @@ -8,7 +8,6 @@ CONFIG_ESCC=y
+>>  CONFIG_M48T59=y
+>>  CONFIG_PTIMER=y
+>>  CONFIG_FDC=y
+>> -CONFIG_EMPTY_SLOT=y
+>>  CONFIG_PCNET_COMMON=y
+>>  CONFIG_LANCE=y
+>>  CONFIG_TCX=y
+>> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+>> index 3c29b68e67..ca37acf7af 100644
+>> --- a/hw/sparc/sun4m.c
+>> +++ b/hw/sparc/sun4m.c
+>> @@ -42,7 +42,7 @@
+>>  #include "hw/nvram/chrp_nvram.h"
+>>  #include "hw/nvram/fw_cfg.h"
+>>  #include "hw/char/escc.h"
+>> -#include "hw/empty_slot.h"
+>> +#include "hw/misc/unimp.h"
+>>  #include "hw/loader.h"
+>>  #include "elf.h"
+>>  #include "trace.h"
+>> @@ -863,7 +863,8 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>>      ram_init(0, machine->ram_size, hwdef->max_mem);
+>>      /* models without ECC don't trap when missing ram is accessed */
+>>      if (!hwdef->ecc_base) {
+>> -        empty_slot_init(machine->ram_size, hwdef->max_mem - machine->ram_size);
+>> +        create_unimplemented_device("ecc", machine->ram_size,
+>> +                                    hwdef->max_mem - machine->ram_size);
+> 
+> In this particular case of find the name UNIMPLEMENTED_DEVICE a bit
+> misleading: there is nothing to implement for non-installed memory
+> SIMMs. It's rather an unconnected device. And the name "ecc" is
+> misleading too. These machines are not supposed to have any ECC.
+> Maybe "unconnected-ram", "empty-ram-slot" or "empty-slot"?
 
-Note that an alternative fix would be to expand the use of atomic ops.
-However, in the case of TLB flushes this would have a huge performance
-impact, since (1) TLB flushes can happen very frequently and (2) we
-currently use a full memory barrier to flush each TLB entry, and a TLB
-has many entries. Instead, acquiring the lock is barely slower than a
-full memory barrier since it is uncontended, and with a single lock
-acquisition we can flush the entire TLB.
+OK. I'll rework on this patch later and resend in another series.
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- include/exec/cpu-defs.h |   2 +
- accel/tcg/cputlb.c      | 108 ++++++++++++++++++----------------------
- 2 files changed, 50 insertions(+), 60 deletions(-)
+Thanks for your review!
 
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index a171ffc1a4..bcc40c8ef5 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -142,6 +142,8 @@ typedef struct CPUIOTLBEntry {
- 
- #define CPU_COMMON_TLB \
-     /* The meaning of the MMU modes is defined in the target code. */   \
-+    /* tlb_lock serializes updates to tlb_table and tlb_v_table */      \
-+    QemuMutex tlb_lock;                                                 \
-     CPUTLBEntry tlb_table[NB_MMU_MODES][CPU_TLB_SIZE];                  \
-     CPUTLBEntry tlb_v_table[NB_MMU_MODES][CPU_VTLB_SIZE];               \
-     CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];                    \
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 502eea2850..01b33f9d28 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -75,6 +75,9 @@ QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
- 
- void tlb_init(CPUState *cpu)
- {
-+    CPUArchState *env = cpu->env_ptr;
-+
-+    qemu_mutex_init(&env->tlb_lock);
- }
- 
- /* flush_all_helper: run fn across all cpus
-@@ -129,8 +132,11 @@ static void tlb_flush_nocheck(CPUState *cpu)
-     atomic_set(&env->tlb_flush_count, env->tlb_flush_count + 1);
-     tlb_debug("(count: %zu)\n", tlb_flush_count());
- 
-+    qemu_mutex_lock(&env->tlb_lock);
-     memset(env->tlb_table, -1, sizeof(env->tlb_table));
-     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
-+    qemu_mutex_unlock(&env->tlb_lock);
-+
-     cpu_tb_jmp_cache_clear(cpu);
- 
-     env->vtlb_index = 0;
-@@ -454,72 +460,48 @@ void tlb_unprotect_code(ram_addr_t ram_addr)
-  * most usual is detecting writes to code regions which may invalidate
-  * generated code.
-  *
-- * Because we want other vCPUs to respond to changes straight away we
-- * update the te->addr_write field atomically. If the TLB entry has
-- * been changed by the vCPU in the mean time we skip the update.
-+ * Other vCPUs might be reading their TLBs during guest execution, so we update
-+ * te->addr_write with atomic_set. We don't need to worry about this for
-+ * oversized guests as MTTCG is disabled for them.
-  *
-- * As this function uses atomic accesses we also need to ensure
-- * updates to tlb_entries follow the same access rules. We don't need
-- * to worry about this for oversized guests as MTTCG is disabled for
-- * them.
-+ * Called with tlb_lock held.
-  */
--
--static void tlb_reset_dirty_range(CPUTLBEntry *tlb_entry, uintptr_t start,
--                           uintptr_t length)
-+static void tlb_reset_dirty_range_locked(CPUTLBEntry *tlb_entry,
-+                                         uintptr_t start, uintptr_t length)
- {
--#if TCG_OVERSIZED_GUEST
-     uintptr_t addr = tlb_entry->addr_write;
- 
-     if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
-         addr &= TARGET_PAGE_MASK;
-         addr += tlb_entry->addend;
-         if ((addr - start) < length) {
-+#if TCG_OVERSIZED_GUEST
-             tlb_entry->addr_write |= TLB_NOTDIRTY;
--        }
--    }
- #else
--    /* paired with atomic_mb_set in tlb_set_page_with_attrs */
--    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
--    uintptr_t addr = orig_addr;
--
--    if ((addr & (TLB_INVALID_MASK | TLB_MMIO | TLB_NOTDIRTY)) == 0) {
--        addr &= TARGET_PAGE_MASK;
--        addr += atomic_read(&tlb_entry->addend);
--        if ((addr - start) < length) {
--            uintptr_t notdirty_addr = orig_addr | TLB_NOTDIRTY;
--            atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, notdirty_addr);
-+            atomic_set(&tlb_entry->addr_write,
-+                       tlb_entry->addr_write | TLB_NOTDIRTY);
-+#endif
-         }
-     }
--#endif
- }
- 
--/* For atomic correctness when running MTTCG we need to use the right
-- * primitives when copying entries */
--static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
--                                   bool atomic_set)
-+/* Called with tlb_lock held */
-+static void copy_tlb_helper_locked(CPUTLBEntry *d, const CPUTLBEntry *s)
- {
--#if TCG_OVERSIZED_GUEST
-     *d = *s;
--#else
--    if (atomic_set) {
--        d->addr_read = s->addr_read;
--        d->addr_code = s->addr_code;
--        atomic_set(&d->addend, atomic_read(&s->addend));
--        /* Pairs with flag setting in tlb_reset_dirty_range */
--        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
--    } else {
--        d->addr_read = s->addr_read;
--        d->addr_write = atomic_read(&s->addr_write);
--        d->addr_code = s->addr_code;
--        d->addend = atomic_read(&s->addend);
--    }
--#endif
-+}
-+
-+static void copy_tlb_helper(CPUArchState *env, CPUTLBEntry *d, CPUTLBEntry *s)
-+{
-+    qemu_mutex_lock(&env->tlb_lock);
-+    copy_tlb_helper_locked(d, s);
-+    qemu_mutex_unlock(&env->tlb_lock);
- }
- 
- /* This is a cross vCPU call (i.e. another vCPU resetting the flags of
-- * the target vCPU). As such care needs to be taken that we don't
-- * dangerously race with another vCPU update. The only thing actually
-- * updated is the target TLB entry ->addr_write flags.
-+ * the target vCPU).
-+ * We must take tlb_lock to avoid racing with another vCPU update. The only
-+ * thing actually updated is the target TLB entry ->addr_write flags.
-  */
- void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
- {
-@@ -528,22 +510,26 @@ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
-     int mmu_idx;
- 
-     env = cpu->env_ptr;
-+    qemu_mutex_lock(&env->tlb_lock);
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-         unsigned int i;
- 
-         for (i = 0; i < CPU_TLB_SIZE; i++) {
--            tlb_reset_dirty_range(&env->tlb_table[mmu_idx][i],
--                                  start1, length);
-+            tlb_reset_dirty_range_locked(&env->tlb_table[mmu_idx][i], start1,
-+                                         length);
-         }
- 
-         for (i = 0; i < CPU_VTLB_SIZE; i++) {
--            tlb_reset_dirty_range(&env->tlb_v_table[mmu_idx][i],
--                                  start1, length);
-+            tlb_reset_dirty_range_locked(&env->tlb_v_table[mmu_idx][i], start1,
-+                                         length);
-         }
-     }
-+    qemu_mutex_unlock(&env->tlb_lock);
- }
- 
--static inline void tlb_set_dirty1(CPUTLBEntry *tlb_entry, target_ulong vaddr)
-+/* Called with tlb_lock held */
-+static inline void tlb_set_dirty1_locked(CPUTLBEntry *tlb_entry,
-+                                         target_ulong vaddr)
- {
-     if (tlb_entry->addr_write == (vaddr | TLB_NOTDIRTY)) {
-         tlb_entry->addr_write = vaddr;
-@@ -562,16 +548,18 @@ void tlb_set_dirty(CPUState *cpu, target_ulong vaddr)
- 
-     vaddr &= TARGET_PAGE_MASK;
-     i = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-+    qemu_mutex_lock(&env->tlb_lock);
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
--        tlb_set_dirty1(&env->tlb_table[mmu_idx][i], vaddr);
-+        tlb_set_dirty1_locked(&env->tlb_table[mmu_idx][i], vaddr);
-     }
- 
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-         int k;
-         for (k = 0; k < CPU_VTLB_SIZE; k++) {
--            tlb_set_dirty1(&env->tlb_v_table[mmu_idx][k], vaddr);
-+            tlb_set_dirty1_locked(&env->tlb_v_table[mmu_idx][k], vaddr);
-         }
-     }
-+    qemu_mutex_unlock(&env->tlb_lock);
- }
- 
- /* Our TLB does not support large pages, so remember the area covered by
-@@ -677,7 +665,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
-         CPUTLBEntry *tv = &env->tlb_v_table[mmu_idx][vidx];
- 
-         /* Evict the old entry into the victim tlb.  */
--        copy_tlb_helper(tv, te, true);
-+        copy_tlb_helper(env, tv, te);
-         env->iotlb_v[mmu_idx][vidx] = env->iotlb[mmu_idx][index];
-     }
- 
-@@ -729,9 +717,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
-         }
-     }
- 
--    /* Pairs with flag setting in tlb_reset_dirty_range */
--    copy_tlb_helper(te, &tn, true);
--    /* atomic_mb_set(&te->addr_write, write_address); */
-+    copy_tlb_helper(env, te, &tn);
- }
- 
- /* Add a new TLB entry, but without specifying the memory
-@@ -903,9 +889,11 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-             /* Found entry in victim tlb, swap tlb and iotlb.  */
-             CPUTLBEntry tmptlb, *tlb = &env->tlb_table[mmu_idx][index];
- 
--            copy_tlb_helper(&tmptlb, tlb, false);
--            copy_tlb_helper(tlb, vtlb, true);
--            copy_tlb_helper(vtlb, &tmptlb, true);
-+            qemu_mutex_lock(&env->tlb_lock);
-+            copy_tlb_helper_locked(&tmptlb, tlb);
-+            copy_tlb_helper_locked(tlb, vtlb);
-+            copy_tlb_helper_locked(vtlb, &tmptlb);
-+            qemu_mutex_unlock(&env->tlb_lock);
- 
-             CPUIOTLBEntry tmpio, *io = &env->iotlb[mmu_idx][index];
-             CPUIOTLBEntry *vio = &env->iotlb_v[mmu_idx][vidx];
--- 
-2.17.1
+Phil.
+
+> Regards,
+> Artyom
+> 
+>>      }
+>>
+>>      prom_init(hwdef->slavio_base, bios_name);
+>> @@ -892,9 +893,10 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>>      if (hwdef->iommu_pad_base) {
+>>          /* On the real hardware (SS-5, LX) the MMU is not padded, but aliased.
+>>             Software shouldn't use aliased addresses, neither should it crash
+>> -           when does. Using empty_slot instead of aliasing can help with
+>> -           debugging such accesses */
+>> -        empty_slot_init(hwdef->iommu_pad_base,hwdef->iommu_pad_len);
+>> +           when does. Using the 'unimplemented device' instead of aliasing can
+>> +           help with debugging such accesses */
+>> +        create_unimplemented_device("iommu.alias", hwdef->iommu_pad_base,
+>> +                                    hwdef->iommu_pad_len);
+>>      }
+>>
+>>      sparc32_dma_init(hwdef->dma_base,
+>> @@ -944,12 +946,13 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>>      for (i = num_vsimms; i < MAX_VSIMMS; i++) {
+>>          /* vsimm registers probed by OBP */
+>>          if (hwdef->vsimm[i].reg_base) {
+>> -            empty_slot_init(hwdef->vsimm[i].reg_base, 0x2000);
+>> +            create_unimplemented_device("vsimm", hwdef->vsimm[i].reg_base,
+>> +                                        0x2000);
+>>          }
+>>      }
+>>
+>>      if (hwdef->sx_base) {
+>> -        empty_slot_init(hwdef->sx_base, 0x2000);
+>> +        create_unimplemented_device("sx", hwdef->sx_base, 0x2000);
+>>      }
+>>
+>>      nvram = m48t59_init(slavio_irq[0], hwdef->nvram_base, 0, 0x2000, 1968, 8);
+>> @@ -1012,14 +1015,15 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
+>>      if (hwdef->dbri_base) {
+>>          /* ISDN chip with attached CS4215 audio codec */
+>>          /* prom space */
+>> -        empty_slot_init(hwdef->dbri_base+0x1000, 0x30);
+>> +        create_unimplemented_device("dbri.prom", hwdef->dbri_base + 0x1000,
+>> +                                    0x30);
+>>          /* reg space */
+>> -        empty_slot_init(hwdef->dbri_base+0x10000, 0x100);
+>> +        create_unimplemented_device("dbri", hwdef->dbri_base + 0x10000, 0x100);
+>>      }
+>>
+>>      if (hwdef->bpp_base) {
+>>          /* parallel port */
+>> -        empty_slot_init(hwdef->bpp_base, 0x20);
+>> +        create_unimplemented_device("bpp", hwdef->bpp_base, 0x20);
+>>      }
+>>
+>>      kernel_size = sun4m_load_kernel(machine->kernel_filename,
+>> --
+>> 2.19.0
+>>
+> 
+> 
