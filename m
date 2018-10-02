@@ -1,21 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1g7BU5-000439-OR
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 23:36:30 -0400
+	(envelope-from <jl4312@columbia.edu>) id 1g7CQv-0003Bi-VS
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 00:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1g7BU1-0005VJ-Mh
-	for qemu-devel@nongnu.org; Mon, 01 Oct 2018 23:36:29 -0400
-Date: Tue, 2 Oct 2018 11:20:25 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181002012025.GB1886@umbus.fritz.box>
-References: <20181001150413.12955-1-clg@kaod.org>
+	(envelope-from <jl4312@columbia.edu>) id 1g7COm-0003Mf-8h
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 00:35:07 -0400
+Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:59746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1g7COm-0003Ju-3q
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 00:35:04 -0400
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w924VFFN025713
+	for <qemu-devel@nongnu.org>; Tue, 2 Oct 2018 00:34:58 -0400
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id 49D0F7E
+	for <qemu-devel@nongnu.org>; Tue,  2 Oct 2018 00:34:58 -0400 (EDT)
+Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu
+	[128.59.72.16]) by hazelnut (Postfix) with ESMTP id 25C157E
+	for <qemu-devel@nongnu.org>; Tue,  2 Oct 2018 00:34:58 -0400 (EDT)
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+	[209.85.208.71])
+	by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w924Yv69023361
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 2 Oct 2018 00:34:57 -0400
+Received: by mail-ed1-f71.google.com with SMTP id x24-v6so577424edm.13
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 21:34:57 -0700 (PDT)
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com.
+	[209.85.221.50]) by smtp.gmail.com with ESMTPSA id
+	b9-v6sm5768093edk.62.2018.10.01.21.34.53 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 01 Oct 2018 21:34:54 -0700 (PDT)
+Received: by mail-wr1-f50.google.com with SMTP id b11-v6so503760wru.9
+	for <qemu-devel@nongnu.org>; Mon, 01 Oct 2018 21:34:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="R3G7APHDIzY6R/pk"
-Content-Disposition: inline
-In-Reply-To: <20181001150413.12955-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH] PPC: e500: convert SysBus init method to a
- realize method
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Tue, 2 Oct 2018 00:34:48 -0400
+Message-ID: <CAHyh4xhtVzxZgwhTCw=aedGgKHDNzqyOZLTL-qnAqAVWMBb6jQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Have multiple virtio-net devices,
+ but only one of them receives all traffic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,111 +49,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: QEMU Devel Mailing List <qemu-devel@nongnu.org>, virtio-dev@lists.oasis-open.org
 
+Hi,
 
---R3G7APHDIzY6R/pk
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm using QEMU 3.0.0 and Linux kernel 4.15.0 on x86 machines. I'm
+observing pretty weird behavior when I have multiple virtio-net
+devices. My KVM VM has two virtio-net devices (vhost=off) and I'm
+using a Linux bridge in the host. The two devices have different
+MAC/IP addresses.
 
-On Mon, Oct 01, 2018 at 05:04:13PM +0200, C=E9dric Le Goater wrote:
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+When I tried to access the VM using two different IP addresses (e.g
+ping or ssh), I found that only one device in VM gets all incoming
+network traffic while I expected that two devices get traffic for
+their own IP addresses.
 
-Applied to ppc-for-3.1, thanks.
+I checked it in the several ways.
 
-> ---
->  hw/pci-host/ppce500.c | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
->=20
-> diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
-> index eb75e080fc10..b8f8c112e662 100644
-> --- a/hw/pci-host/ppce500.c
-> +++ b/hw/pci-host/ppce500.c
-> @@ -436,8 +436,9 @@ static AddressSpace *e500_pcihost_set_iommu(PCIBus *b=
-us, void *opaque,
->      return &s->bm_as;
->  }
-> =20
-> -static int e500_pcihost_initfn(SysBusDevice *dev)
-> +static void e500_pcihost_realize(DeviceState *dev, Error **errp)
->  {
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      PCIHostState *h;
->      PPCE500PCIState *s;
->      PCIBus *b;
-> @@ -447,7 +448,7 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
->      s =3D PPC_E500_PCI_HOST_BRIDGE(dev);
-> =20
->      for (i =3D 0; i < ARRAY_SIZE(s->irq); i++) {
-> -        sysbus_init_irq(dev, &s->irq[i]);
-> +        sysbus_init_irq(sbd, &s->irq[i]);
->      }
-> =20
->      for (i =3D 0; i < PCI_NUM_PINS; i++) {
-> @@ -460,7 +461,7 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
->      /* PIO lives at the bottom of our bus space */
->      memory_region_add_subregion_overlap(&s->busmem, 0, &s->pio, -2);
-> =20
-> -    b =3D pci_register_root_bus(DEVICE(dev), NULL, mpc85xx_pci_set_irq,
-> +    b =3D pci_register_root_bus(dev, NULL, mpc85xx_pci_set_irq,
->                                mpc85xx_pci_map_irq, s, &s->busmem, &s->pi=
-o,
->                                PCI_DEVFN(s->first_slot, 0), 4, TYPE_PCI_B=
-US);
->      h->bus =3D b;
-> @@ -483,10 +484,8 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
->      memory_region_add_subregion(&s->container, PCIE500_CFGADDR, &h->conf=
-_mem);
->      memory_region_add_subregion(&s->container, PCIE500_CFGDATA, &h->data=
-_mem);
->      memory_region_add_subregion(&s->container, PCIE500_REG_BASE, &s->iom=
-em);
-> -    sysbus_init_mmio(dev, &s->container);
-> +    sysbus_init_mmio(sbd, &s->container);
->      pci_bus_set_route_irq_fn(b, e500_route_intx_pin_to_irq);
-> -
-> -    return 0;
->  }
-> =20
->  static void e500_host_bridge_class_init(ObjectClass *klass, void *data)
-> @@ -526,9 +525,8 @@ static Property pcihost_properties[] =3D {
->  static void e500_pcihost_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
-> =20
-> -    k->init =3D e500_pcihost_initfn;
-> +    dc->realize =3D e500_pcihost_realize;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->      dc->props =3D pcihost_properties;
->      dc->vmsd =3D &vmstate_ppce500_pci;
+1) I did ping with two IP addresses from the host/other physical
+machines in the same subnet, and only one device's interrupt count is
+increased.
+2) I checked the ARP table from the ping sources, and two different IP
+addresses have the same MAC address. In fact, I dumped ARP messages
+using tcpdump, and the VM (or the bridge?) replied with the same MAC
+address for two different IP addresses as attached below.
+3) I monitored the host bridge (# bridge monitor) and found that only
+one device's MAC address is registered.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+It looks like one device's IP/MAC address is not advertised properly,
+but I'm not really sure. When I turned off the device getting all the
+traffic, then the other device starts getting incoming packets; the
+device's MAC address is registered in the host bridge. The active
+device only gets traffic for its own IP address, of course.
 
---R3G7APHDIzY6R/pk
-Content-Type: application/pgp-signature; name="signature.asc"
+Here's the tcpdump result. IP 10.10.1.100 and 10.10.1.221 are VM's IP
+addresses. IP 10.10.1.221 is assigned to a device having
+52:54:00:12:34:58, but the log shows it is advertised as having
+...:57.
 
------BEGIN PGP SIGNATURE-----
+23:24:10.983700 ARP, Ethernet (len 6), IPv4 (len 4), Request who-has
+10.10.1.100 tell kvm-dest-link-1, length 46
+23:24:10.983771 ARP, Ethernet (len 6), IPv4 (len 4), Reply 10.10.1.100
+is-at 52:54:00:12:34:57 (oui Unknown), length 28
+23:24:17.794811 ARP, Ethernet (len 6), IPv4 (len 4), Request who-has
+10.10.1.211 tell kvm-dest-link-1, length 46
+23:24:17.794869 ARP, Ethernet (len 6), IPv4 (len 4), Reply 10.10.1.211
+is-at 52:54:00:12:34:57 (oui Unknown), length 28
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAluyx9kACgkQbDjKyiDZ
-s5J/3Q/8DUNGTew6VMKCMkBPdBVKznith9phpLVAM1muMy5Ffayg5rQVYjghMLJU
-Tln/psFEwGPkXIiSjAm579mZlNlpSWRPgnshHTvEg4Iz72gCKUeb9hbnMmT/obk0
-Y5Rx8kVaFB81br3Nuk2OnRC9eJ5WdjMJ7JInBVTtoVXJRO+9RdWgkwdGSbtjo02m
-+rK/Ebi3GH+xcFRdZQJGQuNj0cNIxBzkiPy5zj9S1IBXP/EJOhgZNt7AuilDhsIQ
-lBuy9hodhXN3hax2nNNJI0+ZrC1gxfn4ZzX24gPxsCvZ7lwEAYg/AS2WQk/0r1ac
-Hv2Jyi1TvsCDGchcdqGHgQtb2Gn0O5+TAzEoGLfx1dY/8E80ztJ46OaOpdddXKKU
-MHtid+bXbpYkOtJ6dulomv7++SexViVZ83BGx7fCyzy/rlHxjOzHJRjp6Q0Nv9fH
-evvUFvPp1dmbt+M1WGDlmRTIimNvu40pynjvLfM59hNz4caUMHQ6B4MlALdq+zv5
-rRAw61Bxdf4YrP4j7IwCzAPB/EvRCw6h6F8SyJbZqiT072908+Zitv4vQIPjmNEz
-lcIALzhgq1HThGFF3XH+1kHO3T+chRhSdRksJcYGA3amBnQUdS47y+mZjqdoMdL7
-hYtgfkFQ7qce62wKMZH3dbUgAbrOUdAXHzZqmwiwSUS0howSNNY=
-=YTLz
------END PGP SIGNATURE-----
+I would appreciate any help!
 
---R3G7APHDIzY6R/pk--
+Thanks,
+Jintack
