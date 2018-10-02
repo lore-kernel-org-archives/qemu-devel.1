@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g7Qp9-0002sg-V5
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:59:16 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g7R1J-0006PG-P6
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 16:11:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g7Qp4-0000CN-NI
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:59:15 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43113)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1g7Qp4-0000Bm-3f
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 15:59:10 -0400
-Received: by mail-wr1-x441.google.com with SMTP id n1-v6so3585575wrt.10
-	for <qemu-devel@nongnu.org>; Tue, 02 Oct 2018 12:59:09 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20181001220942.2382-1-f4bug@amsat.org>
-	<20181001220942.2382-6-f4bug@amsat.org>
-	<CAFEAcA-ZQ4nj6x1Uc7TaKRQr-6bH+q0gp6RK6v2b=XYWFsxouA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b7a53ef4-ee8e-de31-d0c7-2a03ab16aa4b@amsat.org>
-Date: Tue, 2 Oct 2018 21:59:03 +0200
+	(envelope-from <jsnow@redhat.com>) id 1g7R1E-0006MW-1g
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 16:11:47 -0400
+References: <20181001132036.7919-1-peter.maydell@linaro.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c1365d28-d78b-40d3-95dc-a1f507c46948@redhat.com>
+Date: Tue, 2 Oct 2018 16:11:31 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-ZQ4nj6x1Uc7TaKRQr-6bH+q0gp6RK6v2b=XYWFsxouA@mail.gmail.com>
+In-Reply-To: <20181001132036.7919-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 05/15] hw/sh4/sh_pci: Use
- DeviceState::realize rather than SysBusDevice::init
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] tests: Disable
+ test-bdrv-drain and test-replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,18 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, patches@linaro.org, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>, Max Reitz <mreitz@redhat.com>
 
-On 10/2/18 3:13 PM, Peter Maydell wrote:
-> On 1 October 2018 at 23:09, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Move from the legacy SysBusDevice::init method to using DeviceState::realize.
-> 
-> Comment says DeviceState::realize but the code is using
-> PCIDevice::realize ?
-> 
-> I didn't realize pci devices had their own realize method:
-> what's the difference between it and plain old DeviceState::realize,
-> which they also have, since PCIDeviceClass inherits from DeviceClass ?
 
-Cc'ing Michael and Marcel.
+
+On 10/01/2018 09:20 AM, Peter Maydell wrote:
+> The test-bdrv-drain and test-replication tests have
+> intermittent errors which make my build testing process
+> fail way too often. Disable them both for the moment.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I'm having trouble making forward progress with applying
+> merges because of these flaky tests :-(
+> 
+>  tests/Makefile.include | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index d0c0a92e67d..1cb1e1a1da7 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -91,7 +91,7 @@ gcov-files-test-thread-pool-y = thread-pool.c
+>  gcov-files-test-hbitmap-y = util/hbitmap.c
+>  check-unit-y += tests/test-hbitmap$(EXESUF)
+>  gcov-files-test-hbitmap-y = blockjob.c
+> -check-unit-y += tests/test-bdrv-drain$(EXESUF)
+> +#check-unit-y += tests/test-bdrv-drain$(EXESUF)
+>  check-unit-y += tests/test-blockjob$(EXESUF)
+>  check-unit-y += tests/test-blockjob-txn$(EXESUF)
+>  check-unit-y += tests/test-block-backend$(EXESUF)
+> @@ -167,7 +167,7 @@ check-unit-y += tests/test-crypto-xts$(EXESUF)
+>  check-unit-y += tests/test-crypto-block$(EXESUF)
+>  check-unit-y += tests/test-logging$(EXESUF)
+>  gcov-files-test-logging-y = util/log.c
+> -check-unit-$(CONFIG_REPLICATION) += tests/test-replication$(EXESUF)
+> +#check-unit-$(CONFIG_REPLICATION) += tests/test-replication$(EXESUF)
+>  check-unit-y += tests/test-bufferiszero$(EXESUF)
+>  gcov-files-check-bufferiszero-y = util/bufferiszero.c
+>  check-unit-y += tests/test-uuid$(EXESUF)
+> 
+
+Should we leave some kind of breadcrumb to remind ourselves to fix or
+re-enable these for the 3.1 RC window?
+
+--js
