@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1g7Lmw-0005Hu-65
+	(envelope-from <damien.hedde@greensocs.com>) id 1g7Lmw-0005Jj-5D
 	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 10:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1g7LdC-0004Q6-Ho
+	(envelope-from <damien.hedde@greensocs.com>) id 1g7LdC-0004QQ-Le
 	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 10:26:36 -0400
 From: Damien Hedde <damien.hedde@greensocs.com>
-Date: Tue,  2 Oct 2018 16:24:35 +0200
-Message-Id: <20181002142443.30976-2-damien.hedde@greensocs.com>
-In-Reply-To: <20181002142443.30976-1-damien.hedde@greensocs.com>
-References: <20181002142443.30976-1-damien.hedde@greensocs.com>
+Date: Tue,  2 Oct 2018 16:24:34 +0200
+Message-Id: <20181002142443.30976-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 1/9] hw/core/clock-port: introduce clock
- port objects
+Subject: [Qemu-devel] [PATCH v5 0/9] Clock framework API.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,378 +23,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org, alistair@alistair23.me, saipava@xilinx.com, mark.burton@greensocs.com, luc.michel@greensocs.com, konrad@adacore.com, edgar.iglesias@xilinx.com, Damien Hedde <damien.hedde@greensocs.com>
 
-Introduce clock port objects: ClockIn and ClockOut.
+This series aims to add a way to model clocks in qemu between devices.
+This allows to model the clock tree of a platform allowing us to inspect =
+clock
+configuration and detect problems such as disabled clock or bad configure=
+d
+pll.
 
-Theses ports may be used to distribute a clock from a object to several
-other objects. The ClockIn object contains the current state of the
-clock: the frequency.
+This series is a reroll of the v4 sent recently without the reset feature=
+ as
+requested by Peter. I also took into account the reviews about migration =
+and
+other suggestions.
 
-A ClockIn may be connected to a ClockOut so that it receives update,
-through the callback, whenever the Clockout is updated using the
-ClockOut's set function.
+This framework was originally discussed in 2017, here:
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg07218.html
 
-This is based on the original work of Frederic Konrad.
+For the user, the framework is now very similar to the device's gpio API.
+Clocks inputs and outputs can be added in devices during initialization p=
+hase.
+Then an input can be connected to an output: it means every time the outp=
+ut
+clock changes, a callback in the input is triggered allowing any action t=
+o be
+taken. A difference with gpios is that several inputs can be connected to=
+ a
+single output without doing any glue.
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
----
- Makefile.objs           |   1 +
- include/hw/clock-port.h | 136 ++++++++++++++++++++++++++++++++++
- hw/core/clock-port.c    | 159 ++++++++++++++++++++++++++++++++++++++++
- hw/core/Makefile.objs   |   1 +
- hw/core/trace-events    |   7 ++
- 5 files changed, 304 insertions(+)
+Behind the scene, there is 2 objects: a clock input which is a placeholde=
+r for
+a callback, and a clock output which is a list of inputs. The value trans=
+ferred
+between an output and an input is an integer representing the clock frequ=
+ency.
+The input clock callback is called every time the clock frequency changes=
+.
+The input side holds a cached value of the frequency (the output does not=
+ need
+one). This allows a device to fetch its input clock frequency at any time
+without caching it itself.
+
+This internal state is added to handle migration in order not to update a=
+nd
+propagate clocks during it (it adds cross-device and order-specific effec=
+ts).
+Each device handles its input clock migration by adding the clock frequen=
+cy in
+its own vmstate description.
+
+Regarding the migration strategy, discussion started in the v4 patches.
+The problem is that we add some kind of wire between different devices an=
+d=20
+we face propagation issue.
+The chosen solution allows migration compatibility from a platform versio=
+n
+with no implemented clocks to a platform with clocks. A migrated device t=
+hat
+have a new input clock is responsible to initialize its frequency during
+migration. Each input clock having its own state, such initialization wil=
+l not
+have any side-effect on other input clock connected to the same output.
+Output clocks, having no state, are not set during migration: If a clock =
+output
+frequency changes due to migration (eg: clock computation bug-fix), the e=
+ffects
+will be delayed. Eventually the clock output will be updated after migrat=
+ion if
+some (software) event trigger a clock update, but it can not be guarantee=
+d.
+
+There is also the problem of initialization which is very much like the
+migration. Currently, in the zynq example, clocks outputs are initialized=
+ in
+the clock controller device_reset. According to Peter, outputs should not=
+ be
+set in device_reset, so we need a better way.
+
+It is not simple, since we can have complicated cases with several propag=
+ation
+step.
+We can't initialize outputs (without propagating) during device init and =
+uses
+inputs value in device_reset to complete the initialization.
+Consider the case where we have a device generating a frequency, another =
+device
+doing a clock division, then a device using this clock.
+[DevClockGenerator] -> clk1 -> [DevClockDiv] -> clk2 -> [Dev]
+I don't see how we can handle such initialization without doing some
+propagation phase at some point.
+
+Regarding clock gating. The 0 frequency value means the clock is gated.
+If need be, a gate device can be built taking an input gpio and clock and
+generating an output clock.
+
+I've tested this patchset running Xilinx's Linux on the xilinx-zynq-a9 ma=
+chine.
+Clocks are correctly updated and we ends up with a configured baudrate of=
+ 115601
+on the console uart (for a theoretical 115200) which is nice. "cadence_ua=
+rt*" and
+"clock*" traces can be enabled to see what's going on in this platform.
+
+We are considering switching to a generic payload evolution of this API.
+For example by specifying the qom carried type when adding an input/outpu=
+t to
+a device. This would allow us, for example, to add a power input port to =
+handle
+power gating or others ports without modifying the device state structure=
+.
+
+Any comments and suggestion are welcomed.
+
+The patches are organised as follows:
++ Patches 1 to 4 adds the clock support in qemu.
++ Patch 5 add some documentation in docs/devel
++ Patches 6 to 9 adds the uart's clocks to the xilinx_zynq platform as an
+example for this framework. It updates the zynq's slcr clock controller, =
+the=20
+cadence_uart device, and the zynq toplevel platform.
+
+Compared to v4, the changes are:
+  - no more reset flag, we are talking frequency only here
+  - name changes to better match gpio api
+  - migration strategy change
+  - sysbus patch removed (was becoming complicated due too migration chan=
+ges)
+
+Compared to v3, the following notable changes happen:
+  - Bindings are now fixed during machine realisation,
+  - Input clock objects have been removed from the point of view of the
+user, i.e. nothing need to be added in the device state. A device can
+now declare a input clock by calling qdev_init_clock_in() (similarly of
+what is done for GPIOs),
+  - Callbacks called on clock change now return void. The input owner is
+responsible of making necessary updates accordingly (e.g. update another
+clock output, or modify its internal state) (again, mostly like GPIOs).
+
+Thanks to the Xilinx QEMU team who sponsored this development.
+
+
+Damien Hedde (9):
+  hw/core/clock-port: introduce clock port objects
+  qdev: add clock input&output support to devices.
+  qdev-monitor: print the device's clock with info qtree
+  qdev-clock: introduce an init array to ease the device construction
+  docs/clocks: add device's clock documentation
+  hw/misc/zynq_slcr: use standard register definition
+  hw/misc/zynq_slcr: add clock generation for uarts
+  hw/char/cadence_uart: add clock support
+  hw/arm/xilinx_zynq: connect uart clocks to slcr
+
+ docs/devel/clock.txt           | 163 +++++++++
+ Makefile.objs                  |   1 +
+ include/hw/char/cadence_uart.h |   3 +
+ include/hw/clock-port.h        | 136 ++++++++
+ include/hw/qdev-clock.h        | 129 +++++++
+ include/hw/qdev-core.h         |  14 +
+ include/hw/qdev.h              |   1 +
+ hw/arm/xilinx_zynq.c           |  17 +-
+ hw/char/cadence_uart.c         |  92 ++++-
+ hw/core/clock-port.c           | 159 +++++++++
+ hw/core/qdev-clock.c           | 166 +++++++++
+ hw/core/qdev.c                 |  29 ++
+ hw/misc/zynq_slcr.c            | 607 ++++++++++++++++++++-------------
+ qdev-monitor.c                 |  12 +
+ hw/char/trace-events           |   3 +
+ hw/core/Makefile.objs          |   3 +-
+ hw/core/trace-events           |   7 +
+ 17 files changed, 1289 insertions(+), 253 deletions(-)
+ create mode 100644 docs/devel/clock.txt
  create mode 100644 include/hw/clock-port.h
+ create mode 100644 include/hw/qdev-clock.h
  create mode 100644 hw/core/clock-port.c
+ create mode 100644 hw/core/qdev-clock.c
  create mode 100644 hw/core/trace-events
 
-diff --git a/Makefile.objs b/Makefile.objs
-index ce9c79235e..b29747075f 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -210,6 +210,7 @@ trace-events-subdirs +=3D hw/audio
- trace-events-subdirs +=3D hw/block
- trace-events-subdirs +=3D hw/block/dataplane
- trace-events-subdirs +=3D hw/char
-+trace-events-subdirs +=3D hw/core
- trace-events-subdirs +=3D hw/display
- trace-events-subdirs +=3D hw/dma
- trace-events-subdirs +=3D hw/hppa
-diff --git a/include/hw/clock-port.h b/include/hw/clock-port.h
-new file mode 100644
-index 0000000000..8266549350
---- /dev/null
-+++ b/include/hw/clock-port.h
-@@ -0,0 +1,136 @@
-+#ifndef CLOCK_PORT_H
-+#define CLOCK_PORT_H
-+
-+#include "qom/object.h"
-+#include "hw/qdev-core.h"
-+#include "qemu/queue.h"
-+#include "migration/vmstate.h"
-+
-+#define TYPE_CLOCK_IN "clock-in"
-+#define CLOCK_IN(obj) OBJECT_CHECK(ClockIn, (obj), TYPE_CLOCK_IN)
-+#define TYPE_CLOCK_OUT "clock-out"
-+#define CLOCK_OUT(obj) OBJECT_CHECK(ClockOut, (obj), TYPE_CLOCK_OUT)
-+
-+typedef void ClockCallback(void *opaque);
-+
-+typedef struct ClockOut ClockOut;
-+typedef struct ClockIn ClockIn;
-+
-+struct ClockIn {
-+    /*< private >*/
-+    Object parent_obj;
-+    /*< private >*/
-+    uint64_t frequency;
-+    char *canonical_path; /* clock path cache */
-+    ClockOut *driver; /* clock output controlling this clock */
-+    ClockCallback *callback; /* local callback */
-+    void *callback_opaque; /* opaque argument for the callback */
-+    QLIST_ENTRY(ClockIn) sibling;  /* entry in a followers list */
-+};
-+
-+struct ClockOut {
-+    /*< private >*/
-+    Object parent_obj;
-+    /*< private >*/
-+    char *canonical_path; /* clock path cache */
-+    QLIST_HEAD(, ClockIn) followers; /* list of registered clocks */
-+};
-+
-+extern const VMStateDescription vmstate_clockin;
-+
-+/*
-+ * vmstate description entry to be added in device vmsd.
-+ */
-+#define VMSTATE_CLOCKIN(_field, _state) \
-+    VMSTATE_CLOCKIN_V(_field, _state, 0)
-+#define VMSTATE_CLOCKIN_V(_field, _state, _version) \
-+    VMSTATE_STRUCT_POINTER_V(_field, _state, _version, vmstate_clockin, =
-ClockIn)
-+
-+/**
-+ * clock_out_setup_canonical_path:
-+ * @clk: clock
-+ *
-+ * compute the canonical path of the clock (used by log messages)
-+ */
-+void clock_out_setup_canonical_path(ClockOut *clk);
-+
-+/**
-+ * clock_in_setup_canonical_path:
-+ * @clk: clock
-+ *
-+ * compute the canonical path of the clock (used by log messages)
-+ */
-+void clock_in_setup_canonical_path(ClockIn *clk);
-+
-+/**
-+ * clock_add_callback:
-+ * @clk: the clock to register the callback into
-+ * @cb: the callback function
-+ * @opaque: the argument to the callback
-+ *
-+ * Register a callback called on every clock update.
-+ */
-+void clock_set_callback(ClockIn *clk, ClockCallback *cb, void *opaque);
-+
-+/**
-+ * clock_clear_callback:
-+ * @clk: the clock to delete the callback from
-+ *
-+ * Unregister the callback registered with clock_set_callback.
-+ */
-+void clock_clear_callback(ClockIn *clk);
-+
-+/**
-+ * clock_init_frequency:
-+ * @clk: the clock to initialize.
-+ * @freq: the clock's frequency in Hz or 0 if unclocked.
-+ *
-+ * Initialize the local cached frequency value of @clk to @freq.
-+ * Note: this function must only be called during device inititializatio=
-n
-+ * or migration.
-+ */
-+void clock_init_frequency(ClockIn *clk, uint64_t freq);
-+
-+/**
-+ * clock_connect:
-+ * @clkin: the drived clock.
-+ * @clkout: the driving clock.
-+ *
-+ * Setup @clkout to drive @clkin: Any @clkout update will be propagated
-+ * to @clkin.
-+ */
-+void clock_connect(ClockIn *clkin, ClockOut *clkout);
-+
-+/**
-+ * clock_set_frequency:
-+ * @clk: the clock to update.
-+ * @freq: the new clock's frequency in Hz or 0 if unclocked.
-+ *
-+ * Update the @clk to the new @freq.
-+ * This change will be propagated through registered clock inputs.
-+ */
-+void clock_set_frequency(ClockOut *clk, uint64_t freq);
-+
-+/**
-+ * clock_get_frequency:
-+ * @clk: the clk to fetch the clock
-+ *
-+ * @return: the current frequency of @clk in Hz. If @clk is NULL, return=
- 0.
-+ */
-+static inline uint64_t clock_get_frequency(const ClockIn *clk)
-+{
-+    return clk ? clk->frequency : 0;
-+}
-+
-+/**
-+ * clock_is_enabled:
-+ * @clk: a clock state
-+ *
-+ * @return: true if the clock is running. If @clk is NULL return false.
-+ */
-+static inline bool clock_is_enabled(const ClockIn *clk)
-+{
-+    return clock_get_frequency(clk) !=3D 0;
-+}
-+
-+#endif /* CLOCK_PORT_H */
-diff --git a/hw/core/clock-port.c b/hw/core/clock-port.c
-new file mode 100644
-index 0000000000..25bab0fbed
---- /dev/null
-+++ b/hw/core/clock-port.c
-@@ -0,0 +1,159 @@
-+/*
-+ * Clock inputs and outputs
-+ *
-+ * Copyright GreenSocs 2016-2018
-+ *
-+ * Authors:
-+ *  Frederic Konrad <fred.konrad@greensocs.com>
-+ *  Damien Hedde <damien.hedde@greensocs.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "hw/clock-port.h"
-+#include "hw/qdev-core.h"
-+#include "migration/vmstate.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "trace.h"
-+
-+const VMStateDescription vmstate_clockin =3D {
-+    .name =3D "clockin",
-+    .version_id =3D 0,
-+    .minimum_version_id =3D 0,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT64(frequency, ClockIn),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+#define CLOCK_PATH(_clk) (_clk->canonical_path)
-+
-+void clock_out_setup_canonical_path(ClockOut *clk)
-+{
-+    g_free(clk->canonical_path);
-+    clk->canonical_path =3D object_get_canonical_path(OBJECT(clk));
-+}
-+
-+void clock_in_setup_canonical_path(ClockIn *clk)
-+{
-+    g_free(clk->canonical_path);
-+    clk->canonical_path =3D object_get_canonical_path(OBJECT(clk));
-+}
-+
-+void clock_set_callback(ClockIn *clk, ClockCallback *cb, void *opaque)
-+{
-+    assert(clk);
-+
-+    clk->callback =3D cb;
-+    clk->callback_opaque =3D opaque;
-+}
-+
-+void clock_init_frequency(ClockIn *clk, uint64_t freq)
-+{
-+    assert(clk);
-+
-+    clk->frequency =3D freq;
-+}
-+
-+void clock_clear_callback(ClockIn *clk)
-+{
-+    clock_set_callback(clk, NULL, NULL);
-+}
-+
-+void clock_connect(ClockIn *clkin, ClockOut *clkout)
-+{
-+    assert(clkin && clkin->driver =3D=3D NULL);
-+    assert(clkout);
-+
-+    trace_clock_connect(CLOCK_PATH(clkin), CLOCK_PATH(clkout));
-+
-+    QLIST_INSERT_HEAD(&clkout->followers, clkin, sibling);
-+    clkin->driver =3D clkout;
-+}
-+
-+static void clock_disconnect(ClockIn *clk)
-+{
-+    if (clk->driver =3D=3D NULL) {
-+        return;
-+    }
-+
-+    trace_clock_disconnect(CLOCK_PATH(clk));
-+
-+    clk->driver =3D NULL;
-+    QLIST_REMOVE(clk, sibling);
-+}
-+
-+void clock_set_frequency(ClockOut *clk, uint64_t freq)
-+{
-+    ClockIn *follower;
-+    trace_clock_update(CLOCK_PATH(clk), freq);
-+
-+    QLIST_FOREACH(follower, &clk->followers, sibling) {
-+        trace_clock_propagate(CLOCK_PATH(clk), CLOCK_PATH(follower));
-+        if (follower->frequency !=3D freq) {
-+            follower->frequency =3D freq;
-+            if (follower->callback) {
-+                follower->callback(follower->callback_opaque);
-+            }
-+        }
-+    }
-+}
-+
-+static void clock_out_initfn(Object *obj)
-+{
-+    ClockOut *clk =3D CLOCK_OUT(obj);
-+
-+    QLIST_INIT(&clk->followers);
-+}
-+
-+static void clock_out_finalizefn(Object *obj)
-+{
-+    ClockOut *clk =3D CLOCK_OUT(obj);
-+    ClockIn *follower, *next;
-+
-+    /* clear our list of followers */
-+    QLIST_FOREACH_SAFE(follower, &clk->followers, sibling, next) {
-+        clock_disconnect(follower);
-+    }
-+
-+    g_free(clk->canonical_path);
-+    clk->canonical_path =3D NULL;
-+}
-+
-+static void clock_in_finalizefn(Object *obj)
-+{
-+    ClockIn *clk =3D CLOCK_IN(obj);
-+
-+    /* remove us from driver's followers list */
-+    clock_disconnect(clk);
-+
-+    g_free(clk->canonical_path);
-+    clk->canonical_path =3D NULL;
-+}
-+
-+static const TypeInfo clock_out_info =3D {
-+    .name              =3D TYPE_CLOCK_OUT,
-+    .parent            =3D TYPE_OBJECT,
-+    .instance_size     =3D sizeof(ClockOut),
-+    .instance_init     =3D clock_out_initfn,
-+    .instance_finalize =3D clock_out_finalizefn,
-+};
-+
-+static const TypeInfo clock_in_info =3D {
-+    .name              =3D TYPE_CLOCK_IN,
-+    .parent            =3D TYPE_OBJECT,
-+    .instance_size     =3D sizeof(ClockIn),
-+    .instance_finalize =3D clock_in_finalizefn,
-+};
-+
-+static void clock_register_types(void)
-+{
-+    type_register_static(&clock_in_info);
-+    type_register_static(&clock_out_info);
-+}
-+
-+type_init(clock_register_types)
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index eb88ca979e..f7102121f4 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
- # irq.o needed for qdev GPIO handling:
- common-obj-y +=3D irq.o
- common-obj-y +=3D hotplug.o
-+common-obj-y +=3D clock-port.o
- common-obj-$(CONFIG_SOFTMMU) +=3D nmi.o
-=20
- common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
-diff --git a/hw/core/trace-events b/hw/core/trace-events
-new file mode 100644
-index 0000000000..d4880ec138
---- /dev/null
-+++ b/hw/core/trace-events
-@@ -0,0 +1,7 @@
-+# See docs/devel/tracing.txt for syntax documentation.
-+
-+# hw/core/clock-port.c
-+clock_connect(const char *clk, const char *driver) "'%s' drived-by '%s'"
-+clock_disconnect(const char *clk) "'%s'"
-+clock_update(const char *clk, uint64_t freq) "'%s' frequency %" PRIu64 "=
-Hz"
-+clock_propagate(const char *clko, const char *clki) "'%s' =3D> '%s'"
 --=20
 2.19.0
