@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7lYf-0002f4-VF
+	(envelope-from <richard.henderson@linaro.org>) id 1g7lYg-0002f8-0j
 	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7lYb-0005AR-P0
+	(envelope-from <richard.henderson@linaro.org>) id 1g7lYb-0005AM-OU
 	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:37 -0400
-Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:32976)
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35531)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g7lYa-00042u-7A
+	id 1g7lYb-0003z2-CT
 	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:33 -0400
-Received: by mail-ot1-x32a.google.com with SMTP id q50so2343837otd.0
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 11:07:18 -0700 (PDT)
+Received: by mail-oi1-x241.google.com with SMTP id 22-v6so4321046oiz.2
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 11:07:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  3 Oct 2018 13:07:08 -0500
-Message-Id: <20181003180711.19335-2-richard.henderson@linaro.org>
-In-Reply-To: <20181003180711.19335-1-richard.henderson@linaro.org>
-References: <20181003180711.19335-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 1/4] softfloat: Fix division
+Date: Wed,  3 Oct 2018 13:07:07 -0500
+Message-Id: <20181003180711.19335-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 0/4] softfloat: Fix division
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +27,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alex.bennee@linaro.org, cota@braap.org
 
-The __udiv_qrnnd primitive that we nicked from gmp requires its
-inputs to be normalized.  We were not doing that.  Because the
-inputs are nearly normalized already, finishing that is trivial.
+Changes from v1:
+  * Preserve udiv_qrnnd as a separate division primitive that
+    could be used as a building block for float128 division.
+  * Include asm fragments for x86_64, s390x, and ppc64.
 
-Replace div128to64 with a "proper" udiv_qrnnd, so that this
-remains a reusable primitive.
 
-Fixes: cf07323d494
-Fixes: https://bugs.launchpad.net/qemu/+bug/1793119
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/fpu/softfloat-macros.h |  7 ++++---
+r~
+
+
+Richard Henderson (4):
+  softfloat: Fix division
+  softfloat: Specialize udiv_qrnnd for x86_64
+  softfloat: Specialize udiv_qrnnd for s390x
+  softfloat: Specialize udiv_qrnnd for ppc64
+
+ include/fpu/softfloat-macros.h | 35 +++++++++++++++++++++++++++++++---
  fpu/softfloat.c                | 35 ++++++++++++++++++++++++++--------
- 2 files changed, 31 insertions(+), 11 deletions(-)
+ 2 files changed, 59 insertions(+), 11 deletions(-)
 
-diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
-index edc682139e..03312471b2 100644
---- a/include/fpu/softfloat-macros.h
-+++ b/include/fpu/softfloat-macros.h
-@@ -619,7 +619,8 @@ static inline uint64_t estimateDiv128To64(uint64_t a0, uint64_t a1, uint64_t b)
-  *
-  * Licensed under the GPLv2/LGPLv3
-  */
--static inline uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
-+static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
-+                                  uint64_t n0, uint64_t d)
- {
-     uint64_t d0, d1, q0, q1, r1, r0, m;
- 
-@@ -658,8 +659,8 @@ static inline uint64_t div128To64(uint64_t n0, uint64_t n1, uint64_t d)
-     }
-     r0 -= m;
- 
--    /* Return remainder in LSB */
--    return (q1 << 32) | q0 | (r0 != 0);
-+    *r = r0;
-+    return (q1 << 32) | q0;
- }
- 
- /*----------------------------------------------------------------------------
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index a06b6ef7e4..97ef66d570 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1112,19 +1112,38 @@ static FloatParts div_floats(FloatParts a, FloatParts b, float_status *s)
-     bool sign = a.sign ^ b.sign;
- 
-     if (a.cls == float_class_normal && b.cls == float_class_normal) {
--        uint64_t temp_lo, temp_hi;
-+        uint64_t n0, n1, q, r;
-         int exp = a.exp - b.exp;
-+
-+        /*
-+         * We want a 2*N / N-bit division to produce exactly an N-bit
-+         * result, so that we do not lose any precision and so that we
-+         * do not have to renormalize afterward.  If A.frac < B.frac,
-+         * then division would produce an (N-1)-bit result; shift A left
-+         * by one to produce the an N-bit result, and decrement the
-+         * exponent to match.
-+         *
-+         * The udiv_qrnnd algorithm that we're using requires normalization,
-+         * i.e. the msb of the denominator must be set.  Since we know that
-+         * DECOMPOSED_BINARY_POINT is msb-1, the inputs must be shifted left
-+         * by one (more), and the remainder must be shifted right by one.
-+         */
-         if (a.frac < b.frac) {
-             exp -= 1;
--            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT + 1,
--                              &temp_hi, &temp_lo);
-+            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT + 2, &n1, &n0);
-         } else {
--            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT,
--                              &temp_hi, &temp_lo);
-+            shortShift128Left(0, a.frac, DECOMPOSED_BINARY_POINT + 1, &n1, &n0);
-         }
--        /* LSB of quot is set if inexact which roundandpack will use
--         * to set flags. Yet again we re-use a for the result */
--        a.frac = div128To64(temp_lo, temp_hi, b.frac);
-+        q = udiv_qrnnd(&r, n1, n0, b.frac << 1);
-+
-+        /*
-+         * Set lsb if there is a remainder, to set inexact.
-+         * As mentioned above, to find the actual value of the remainder we
-+         * would need to shift right, but (1) we are only concerned about
-+         * non-zero-ness, and (2) the remainder will always be even because
-+         * both inputs to the division primitive are even.
-+         */
-+        a.frac = q | (r != 0);
-         a.sign = sign;
-         a.exp = exp;
-         return a;
 -- 
 2.17.1
