@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7dzF-0005BA-GZ
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:02:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g7e0b-0006Cb-QK
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:03:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7dz9-0005Aa-V2
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:02:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58220)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7dz9-0005A0-4Z
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:02:27 -0400
-References: <20181002212921.30982-1-cota@braap.org>
-	<20181002212921.30982-3-cota@braap.org> <87h8i3l75j.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a01a9547-d182-daaf-724a-5a836dd9ff02@redhat.com>
-Date: Wed, 3 Oct 2018 12:02:19 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1g7e0a-0005Y0-Sa
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:03:57 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37677)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g7e0a-0005XT-Bp
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:03:56 -0400
+Received: by mail-ot1-x342.google.com with SMTP id o13-v6so4955125otl.4
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 03:03:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87h8i3l75j.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <1538500966-5506-1-git-send-email-pbonzini@redhat.com>
+References: <1538500966-5506-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 3 Oct 2018 11:03:34 +0100
+Message-ID: <CAFEAcA_7RQvuxkqx-QwpfjVGX3XFOX51qQb7yauHt3Tw_QWnVw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] cputlb: serialize tlb updates with
- env->tlb_lock
+Subject: Re: [Qemu-devel] [PULL v4 00/80] Misc patches for 2018-09-30
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 03/10/2018 11:19, Alex Benn=C3=A9e wrote:
->> Fix it by using tlb_lock, a per-vCPU lock. All updaters of tlb_table
->> and the corresponding victim cache now hold the lock.
->> The readers that do not hold tlb_lock must use atomic reads when
->> reading .addr_write, since this field can be updated by other threads;
->> the conversion to atomic reads is done in the next patch.
-> What about the inline TLB lookup code? The original purpose of the
-> cmpxchg was to ensure the inline code would either see a valid entry or
-> and invalid one, not a potentially torn read.
->=20
+On 2 October 2018 at 18:22, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 3892f1f1a963e59dfe012cd9d461d33b2986fa=
+3b:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/libfdt-20181002' int=
+o staging (2018-10-02 09:54:44 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 97866508669c4a75f531bfa94f8267900fcbb5dc:
+>
+>   hw/scsi/mptendian: Avoid taking address of fields in packed structs (20=
+18-10-02 19:09:14 +0200)
+>
+> ----------------------------------------------------------------
+> * configure fix for environment variables (Daniel)
+> * fix memory leaks (Alex)
+> * x86_64 MTTCG fixes (Emilio)
+> * introduce atomic64 (Emilio)
+> * Fix for virtio hang (Fam, myself)
+> * SH serial port fix (Geert)
+> * Deprecate rotation_rate for scsi-block (Fam)
+> * Extend memory-backend-file availability to all POSIX hosts (Hikaru)
+> * Memory API cleanups and fixes (Igor, Li Qiang, Peter, Philippe)
+> * MSI/IOMMU fix (Jan)
+> * Socket reconnection fixes (Marc-Andr=C3=A9)
+> * icount fixes (Emilio, myself)
+> * QSP fixes for Coverity (myself)
+> * Some record/replay improovements (Pavel)
+> * Packed struct fixes (Peter)
+> * Windows dump fixes and elf2dmp (Viktor)
+> * kbmclock fix (Yongji)
 
-atomic_set also ensures that there are no torn reads.  However, here:
+Applied, thanks.
 
-static void copy_tlb_helper_locked(CPUTLBEntry *d, const CPUTLBEntry *s)
-{
-#if TCG_OVERSIZED_GUEST
-    *d =3D *s;
-#else
-    if (atomic_set) {
-        d->addr_read =3D s->addr_read;
-        d->addr_code =3D s->addr_code;
-        atomic_set(&d->addend, atomic_read(&s->addend));
-        /* Pairs with flag setting in tlb_reset_dirty_range */
-        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
-    } else {
-        d->addr_read =3D s->addr_read;
-        d->addr_write =3D atomic_read(&s->addr_write);
-        d->addr_code =3D s->addr_code;
-        d->addend =3D atomic_read(&s->addend);
-    }
-#endif
-}
-
-it's probably best to do all atomic_set instead of just the memberwise co=
-py.
-
-Paolo
+-- PMM
