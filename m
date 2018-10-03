@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g7nyM-000744-0S
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:42:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7nyR-0007Uf-21
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:42:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g7nlF-0003Rq-DN
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:28:46 -0400
-References: <20181002230218.13949-1-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5ed59cbe-cf23-ec69-27a8-b1898ed2deb9@redhat.com>
-Date: Wed, 3 Oct 2018 16:28:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7nyQ-000612-3v
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:42:22 -0400
+References: <20181003180426.602765-1-eblake@redhat.com>
+	<a6439e4c-a5ac-ed0a-0d6f-2dac91c0f93f@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <58c7e658-a835-b31b-1445-346e2361edec@redhat.com>
+Date: Wed, 3 Oct 2018 15:42:03 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181002230218.13949-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a6439e4c-a5ac-ed0a-0d6f-2dac91c0f93f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] dirty-bitmaps: fix QMP command
- permissions
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-nbd: Document --tls-creds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +24,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, berrange@redhat.com, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-
-
-On 10/02/2018 07:02 PM, John Snow wrote:
-> based on: jsnow/bitmaps staging branch
+On 10/3/18 3:35 PM, John Snow wrote:
 > 
-> This series builds on a previous standalone patch and adjusts
-> the permission for all (or most) of the QMP bitmap commands.
 > 
-> V4:
->  - Replace "in-use" with "in use"
->  - Replace "user_modifiable" version with "user_locked"
->  - Remove more usages of frozen-and-or-locked in NBD.
-> 
-> John Snow (6):
->   block/dirty-bitmaps: add user_locked status checker
->   block/dirty-bitmaps: fix merge permissions
->   block/dirty-bitmaps: allow clear on disabled bitmaps
->   block/dirty-bitmaps: prohibit enable/disable on locked/frozen bitmaps
->   block/backup: prohibit backup from using in use bitmaps
->   nbd: forbid use of frozen bitmaps
-> 
->  block/dirty-bitmap.c           | 13 +++++---
->  blockdev.c                     | 75 +++++++++++++++++++-----------------------
->  include/block/dirty-bitmap.h   |  1 +
->  migration/block-dirty-bitmap.c | 10 ++----
->  nbd/server.c                   |  4 +--
->  5 files changed, 48 insertions(+), 55 deletions(-)
-> 
+> On 10/03/2018 02:04 PM, Eric Blake wrote:
+>> Commit 145614a1 introduced --tls-creds, but forgot to document
+>> it in 'qemu-nbd --help'.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
 
-Thanks, applied to my bitmaps tree: [with edits suggested by Vladimir];
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> 
+> Do we have a manpage/texi that needs to update, too?
 
-https://github.com/jnsnow/qemu/commits/bitmaps
-https://github.com/jnsnow/qemu.git
+No; commit 145614a1 already covered that in qemu-nbd.texi.  It's just 
+the --help output that needs it. I can tweak the commit message to 
+mention that, if it helps.
 
---js
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
