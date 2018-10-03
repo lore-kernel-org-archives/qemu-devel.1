@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7gZN-0007yI-9K
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:48:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g7gk3-0003na-LR
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7gZJ-0006n6-Rl
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:48:01 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 3 Oct 2018 12:47:54 +0000
-Message-ID: <f803d9c8-90e0-56c7-320d-0c19d8b5b284@virtuozzo.com>
-References: <20181002230218.13949-1-jsnow@redhat.com>
-	<20181002230218.13949-2-jsnow@redhat.com>
-In-Reply-To: <20181002230218.13949-2-jsnow@redhat.com>
-Content-Language: en-US
+	(envelope-from <pbonzini@redhat.com>) id 1g7gk0-0007UQ-9E
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:59:03 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38379)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7gk0-0007To-2W
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:59:00 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 193-v6so5532601wme.3
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 05:59:00 -0700 (PDT)
+References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
+	<20180907075948.26917-6-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <299fffa7-e7af-d672-d4b9-356b950abc30@redhat.com>
+Date: Wed, 3 Oct 2018 14:58:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] block/dirty-bitmaps: add
- user_locked status checker
+In-Reply-To: <20180907075948.26917-6-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/12] qom/object: fix iterating
+ properties over a class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-MDMuMTAuMjAxOCAwMjowMiwgSm9obiBTbm93IHdyb3RlOg0KDQpJbnN0ZWFkIG9mIGJvdGggZnJv
-emVuIGFuZCBxbXBfbG9ja2VkIGNoZWNrcywgd3JhcCBpdCBpbnRvIG9uZSBjaGVjay4NCmZyb3pl
-biBpbXBsaWVzIHRoZSBiaXRtYXAgaXMgc3BsaXQgaW4gdHdvIChmb3IgYmFja3VwKSwgYW5kIHNo
-b3VsZG4ndA0KYmUgbW9kaWZpZWQuIHFtcF9sb2NrZWQgaW1wbGllcyBpdCdzIGJlaW5nIHVzZWQg
-YnkgYW5vdGhlciBvcGVyYXRpb24sDQpsaWtlIGJlaW5nIGV4cG9ydGVkIG92ZXIgTkJELiBJbiBi
-b3RoIGNhc2VzIGl0IG1lYW5zIHdlIHNob3VsZG4ndCBhbGxvdw0KdGhlIHVzZXIgdG8gbW9kaWZ5
-IGl0IGluIGFueSBtZWFuaW5nZnVsIHdheS4NCg0KUmVwbGFjZSBhbnkgdXNhZ2VzIHdoZXJlIHdl
-IGNoZWNrIGJvdGggZnJvemVuIGFuZCBxbXBfbG9ja2VkIHdpdGggdGhlDQpuZXcgY2hlY2suDQoN
-ClNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT48bWFpbHRvOmpzbm93
-QHJlZGhhdC5jb20+DQotLS0NCiBibG9jay9kaXJ0eS1iaXRtYXAuYyAgICAgICAgICAgfCAgNiAr
-KysrKysNCiBibG9ja2Rldi5jICAgICAgICAgICAgICAgICAgICAgfCAyOSArKysrKysrKy0tLS0t
-LS0tLS0tLS0tLS0tLS0tLQ0KIGluY2x1ZGUvYmxvY2svZGlydHktYml0bWFwLmggICB8ICAxICsN
-CiBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFwLmMgfCAxMCArKy0tLS0tLS0tDQogNCBmaWxl
-cyBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspLCAyOSBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdp
-dCBhL2Jsb2NrL2RpcnR5LWJpdG1hcC5jIGIvYmxvY2svZGlydHktYml0bWFwLmMNCmluZGV4IDhh
-YzkzM2NmMWMuLjg1YmM2NjhmNmEgMTAwNjQ0DQotLS0gYS9ibG9jay9kaXJ0eS1iaXRtYXAuYw0K
-KysrIGIvYmxvY2svZGlydHktYml0bWFwLmMNCkBAIC0xNzYsNiArMTc2LDEyIEBAIGJvb2wgYmRy
-dl9kaXJ0eV9iaXRtYXBfZnJvemVuKEJkcnZEaXJ0eUJpdG1hcCAqYml0bWFwKQ0KICAgICByZXR1
-cm4gYml0bWFwLT5zdWNjZXNzb3I7DQogfQ0KDQorLyogQm90aCBjb25kaXRpb25zIGRpc2FsbG93
-IHVzZXItbW9kaWZpY2F0aW9uIHZpYSBRTVAuICovDQorYm9vbCBiZHJ2X2RpcnR5X2JpdG1hcF91
-c2VyX2xvY2tlZChCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCkgew0KKyAgICByZXR1cm4gKGJkcnZf
-ZGlydHlfYml0bWFwX2Zyb3plbihiaXRtYXApIHx8DQorICAgICAgICAgICAgYmRydl9kaXJ0eV9i
-aXRtYXBfcW1wX2xvY2tlZChiaXRtYXApKTsNCg0KaG1tLCBleHRyYSBwYXJlbnRoZXNlcw0KDQoN
-Cg0KK30NCisNCiB2b2lkIGJkcnZfZGlydHlfYml0bWFwX3NldF9xbXBfbG9ja2VkKEJkcnZEaXJ0
-eUJpdG1hcCAqYml0bWFwLCBib29sIHFtcF9sb2NrZWQpDQogew0KICAgICBxZW11X211dGV4X2xv
-Y2soYml0bWFwLT5tdXRleCk7DQoNCg0KWy4uLl0NCg0KDQoNCi0tLSBhL21pZ3JhdGlvbi9ibG9j
-ay1kaXJ0eS1iaXRtYXAuYw0KKysrIGIvbWlncmF0aW9uL2Jsb2NrLWRpcnR5LWJpdG1hcC5jDQpA
-QCAtMzAxLDE0ICszMDEsOCBAQCBzdGF0aWMgaW50IGluaXRfZGlydHlfYml0bWFwX21pZ3JhdGlv
-bih2b2lkKQ0KICAgICAgICAgICAgICAgICBnb3RvIGZhaWw7DQogICAgICAgICAgICAgfQ0KDQot
-ICAgICAgICAgICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX2Zyb3plbihiaXRtYXApKSB7DQotICAg
-ICAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiQ2FuJ3QgbWlncmF0ZSBmcm96ZW4gZGlydHkgYml0
-bWFwOiAnJXMiLA0KLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYmRydl9kaXJ0eV9iaXRt
-YXBfbmFtZShiaXRtYXApKTsNCi0gICAgICAgICAgICAgICAgZ290byBmYWlsOw0KLSAgICAgICAg
-ICAgIH0NCi0NCi0gICAgICAgICAgICBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfcW1wX2xvY2tlZChi
-aXRtYXApKSB7DQotICAgICAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiQ2FuJ3QgbWlncmF0ZSBs
-b2NrZWQgZGlydHkgYml0bWFwOiAnJXMiLA0KKyAgICAgICAgICAgIGlmIChiZHJ2X2RpcnR5X2Jp
-dG1hcF91c2VyX2xvY2tlZChiaXRtYXApKSB7DQorICAgICAgICAgICAgICAgIGVycm9yX3JlcG9y
-dCgiQ2FuJ3QgbWlncmF0ZSBhIGJpdG1hcCB0aGF0IGlzIGluIHVzZTogJyVzJyIsDQoNCiJieSBh
-bm90aGVyIG9wZXJhdGlvbiIgbGlrZSBpbiBvdGhlciBjYXNlcz8NCg0KDQoNCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGJkcnZfZGlydHlfYml0bWFwX25hbWUoYml0bWFwKSk7DQogICAg
-ICAgICAgICAgICAgIGdvdG8gZmFpbDsNCiAgICAgICAgICAgICB9DQoNCg0KYW55d2F5LA0KUmV2
-aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVv
-enpvLmNvbT48bWFpbHRvOnZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KDQotLQ0KQmVzdCBy
-ZWdhcmRzLA0KVmxhZGltaXINCg==
+On 07/09/2018 09:59, Marc-André Lureau wrote:
+> object_class_property_iter_init() starts from the given class, so the
+> next class should continue with the parent class.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qom/object.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/qom/object.c b/qom/object.c
+> index 75d1d48944..d8666de3f2 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -1108,7 +1108,7 @@ void object_class_property_iter_init(ObjectPropertyIterator *iter,
+>                                       ObjectClass *klass)
+>  {
+>      g_hash_table_iter_init(&iter->iter, klass->properties);
+> -    iter->nextclass = klass;
+> +    iter->nextclass = object_class_get_parent(klass);
+>  }
+>  
+>  ObjectProperty *object_class_property_find(ObjectClass *klass, const char *name,
+> 
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
