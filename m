@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7hlL-0006E4-50
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:04:27 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7hnH-0007C2-GC
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7hlF-0007xI-CH
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:04:27 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7hnD-0000Hu-Bs
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:06:27 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 3 Oct 2018 14:04:11 +0000
-Message-ID: <7dbf566b-8090-82cf-9a9b-d969e9e0a60f@virtuozzo.com>
+Date: Wed, 3 Oct 2018 14:06:18 +0000
+Message-ID: <5fce74b0-a693-83b3-d71d-2d301cdf346a@virtuozzo.com>
 References: <20181002230218.13949-1-jsnow@redhat.com>
-	<20181002230218.13949-6-jsnow@redhat.com>
-In-Reply-To: <20181002230218.13949-6-jsnow@redhat.com>
+	<20181002230218.13949-7-jsnow@redhat.com>
+In-Reply-To: <20181002230218.13949-7-jsnow@redhat.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <5B3C3A373FF2034B87F8B7EBB8F1CDD9@eurprd08.prod.outlook.com>
+Content-ID: <F94B97CB9066164E89774BA836A0302F@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 5/6] block/backup: prohibit backup from
- using in use bitmaps
+Subject: Re: [Qemu-devel] [PATCH v4 6/6] nbd: forbid use of frozen bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +28,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-MDMuMTAuMjAxOCAwMjowMiwgSm9obiBTbm93IHdyb3RlOg0KPiBJZiB0aGUgYml0bWFwIGlzIGZy
-b3plbiwgd2Ugc2hvdWxkbid0IHRvdWNoIGl0Lg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNu
-b3cgPGpzbm93QHJlZGhhdC5jb20+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3Yt
-T2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCj4gLS0tDQo+ICAgYmxvY2tk
-ZXYuYyB8IDEyICsrKysrKy0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMo
-KyksIDYgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9ibG9ja2Rldi5jIGIvYmxvY2tk
-ZXYuYw0KPiBpbmRleCBkMGZlYmZjYTc5Li4wOThkNGMzMzdmIDEwMDY0NA0KPiAtLS0gYS9ibG9j
-a2Rldi5jDQo+ICsrKyBiL2Jsb2NrZGV2LmMNCj4gQEAgLTM1MTIsMTAgKzM1MTIsMTAgQEAgc3Rh
-dGljIEJsb2NrSm9iICpkb19kcml2ZV9iYWNrdXAoRHJpdmVCYWNrdXAgKmJhY2t1cCwgSm9iVHhu
-ICp0eG4sDQo+ICAgICAgICAgICAgICAgYmRydl91bnJlZih0YXJnZXRfYnMpOw0KPiAgICAgICAg
-ICAgICAgIGdvdG8gb3V0Ow0KPiAgICAgICAgICAgfQ0KPiAtICAgICAgICBpZiAoYmRydl9kaXJ0
-eV9iaXRtYXBfcW1wX2xvY2tlZChibWFwKSkgew0KPiArICAgICAgICBpZiAoYmRydl9kaXJ0eV9i
-aXRtYXBfdXNlcl9sb2NrZWQoYm1hcCkpIHsNCj4gICAgICAgICAgICAgICBlcnJvcl9zZXRnKGVy
-cnAsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICJCaXRtYXAgJyVzJyBpcyBjdXJyZW50bHkg
-bG9ja2VkIGFuZCBjYW5ub3QgYmUgdXNlZCBmb3IgIg0KPiAtICAgICAgICAgICAgICAgICAgICAg
-ICAiYmFja3VwIiwgYmFja3VwLT5iaXRtYXApOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAi
-Qml0bWFwICclcycgaXMgY3VycmVudGx5IGluIHVzZSBieSBhbm90aGVyIG9wZXJhdGlvbiINCj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgIiBhbmQgY2Fubm90IGJlIHVzZWQgZm9yIGJhY2t1cCIs
-IGJhY2t1cC0+Yml0bWFwKTsNCj4gICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAgICAg
-IH0NCj4gICAgICAgfQ0KPiBAQCAtMzYyMCwxMCArMzYyMCwxMCBAQCBCbG9ja0pvYiAqZG9fYmxv
-Y2tkZXZfYmFja3VwKEJsb2NrZGV2QmFja3VwICpiYWNrdXAsIEpvYlR4biAqdHhuLA0KPiAgICAg
-ICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkJpdG1hcCAnJXMnIGNvdWxkIG5vdCBiZSBmb3Vu
-ZCIsIGJhY2t1cC0+Yml0bWFwKTsNCj4gICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAg
-ICAgIH0NCj4gLSAgICAgICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX3FtcF9sb2NrZWQoYm1hcCkp
-IHsNCj4gKyAgICAgICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX3VzZXJfbG9ja2VkKGJtYXApKSB7
-DQo+ICAgICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLA0KPiAtICAgICAgICAgICAgICAgICAg
-ICAgICAiQml0bWFwICclcycgaXMgY3VycmVudGx5IGxvY2tlZCBhbmQgY2Fubm90IGJlIHVzZWQg
-Zm9yICINCj4gLSAgICAgICAgICAgICAgICAgICAgICAgImJhY2t1cCIsIGJhY2t1cC0+Yml0bWFw
-KTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIkJpdG1hcCAnJXMnIGlzIGN1cnJlbnRseSBp
-biB1c2UgYnkgYW5vdGhlciBvcGVyYXRpb24iDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICIg
-YW5kIGNhbm5vdCBiZSB1c2VkIGZvciBiYWNrdXAiLCBiYWNrdXAtPmJpdG1hcCk7DQo+ICAgICAg
-ICAgICAgICAgZ290byBvdXQ7DQo+ICAgICAgICAgICB9DQo+ICAgICAgIH0NCg0KDQotLSANCkJl
-c3QgcmVnYXJkcywNClZsYWRpbWlyDQoNCg==
+UmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmly
+dHVvenpvLmNvbT4NCg0KMDMuMTAuMjAxOCAwMjowMiwgSm9obiBTbm93IHdyb3RlOg0KPiBXaGV0
+aGVyIGl0J3MgImxvY2tlZCIgb3IgImZyb3plbiIsIGl0J3MgaW4gdXNlIGFuZCBzaG91bGQNCj4g
+bm90IGJlIGFsbG93ZWQgZm9yIHRoZSBwdXJwb3NlcyBvZiB0aGlzIG9wZXJhdGlvbi4NCj4NCj4g
+U2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBu
+YmQvc2VydmVyLmMgfCA0ICsrLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
+LCAyIGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvbmJkL3NlcnZlci5jIGIvbmJkL3Nl
+cnZlci5jDQo+IGluZGV4IGMzZGQ0MDJiNDUuLjk0MGI3YWEwY2QgMTAwNjQ0DQo+IC0tLSBhL25i
+ZC9zZXJ2ZXIuYw0KPiArKysgYi9uYmQvc2VydmVyLmMNCj4gQEAgLTI0NzgsOCArMjQ3OCw4IEBA
+IHZvaWQgbmJkX2V4cG9ydF9iaXRtYXAoTkJERXhwb3J0ICpleHAsIGNvbnN0IGNoYXIgKmJpdG1h
+cCwNCj4gICAgICAgICAgIHJldHVybjsNCj4gICAgICAgfQ0KPiAgIA0KPiAtICAgIGlmIChiZHJ2
+X2RpcnR5X2JpdG1hcF9xbXBfbG9ja2VkKGJtKSkgew0KPiAtICAgICAgICBlcnJvcl9zZXRnKGVy
+cnAsICJCaXRtYXAgJyVzJyBpcyBsb2NrZWQiLCBiaXRtYXApOw0KPiArICAgIGlmIChiZHJ2X2Rp
+cnR5X2JpdG1hcF91c2VyX2xvY2tlZChibSkpIHsNCj4gKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJw
+LCAiQml0bWFwICclcycgaXMgaW4gdXNlIiwgYml0bWFwKTsNCj4gICAgICAgICAgIHJldHVybjsN
+Cj4gICAgICAgfQ0KPiAgIA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
