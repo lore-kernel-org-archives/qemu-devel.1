@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7gng-000695-Gd
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:02:55 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g7goI-0006ro-B2
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:03:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7gna-00012U-FL
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:02:48 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 3 Oct 2018 13:02:34 +0000
-Message-ID: <af7783c7-10a0-f8da-11f7-801b5456bb9e@virtuozzo.com>
-References: <20181002230218.13949-1-jsnow@redhat.com>
-	<20181002230218.13949-4-jsnow@redhat.com>
-In-Reply-To: <20181002230218.13949-4-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EF5B8CD11C3A9746BEC047FD8A4D75C6@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <pbonzini@redhat.com>) id 1g7goB-0001NH-Jr
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:03:26 -0400
+Received: from mail-wm1-f48.google.com ([209.85.128.48]:40959)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7go2-0001Go-LG
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:03:14 -0400
+Received: by mail-wm1-f48.google.com with SMTP id z204-v6so4735339wmc.5
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 06:03:08 -0700 (PDT)
+References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
+	<20180907075948.26917-13-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d34ae93a-da1b-02ec-f55c-6a68865a4345@redhat.com>
+Date: Wed, 3 Oct 2018 15:02:51 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 3/6] block/dirty-bitmaps: allow clear on
- disabled bitmaps
+In-Reply-To: <20180907075948.26917-13-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 12/12] vl: list user creatable
+ properties when 'help' is argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,47 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-MDMuMTAuMjAxOCAwMjowMiwgSm9obiBTbm93IHdyb3RlOg0KPiBTaW1pbGFybHkgdG8gbWVyZ2Us
-IGl0J3MgT0sgdG8gYWxsb3cgY2xlYXIgb3BlcmF0aW9ucyBvbiBkaXNhYmxlZA0KPiBiaXRtYXBz
-LCBhcyB0aGlzIGNvbmRpdGlvbiBvbmx5IG1lYW5zIHRoYXQgdGhleSBhcmUgbm90IHJlY29yZGlu
-Zw0KPiBuZXcgd3JpdGVzLiBXZSBhcmUgZnJlZSB0byBjbGVhciBpdCBpZiB0aGUgdXNlciByZXF1
-ZXN0cyBpdC4NCj4NCj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29t
-Pg0KDQpSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNv
-dkB2aXJ0dW96em8uY29tPg0KDQo+IC0tLQ0KPiAgIGJsb2NrL2RpcnR5LWJpdG1hcC5jIHwgMSAt
-DQo+ICAgYmxvY2tkZXYuYyAgICAgICAgICAgfCA4IC0tLS0tLS0tDQo+ICAgMiBmaWxlcyBjaGFu
-Z2VkLCA5IGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svZGlydHktYml0bWFw
-LmMgYi9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPiBpbmRleCA4YTZlMDc5MzBmLi4wMzVmOTdlNWMy
-IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9kaXJ0eS1iaXRtYXAuYw0KPiArKysgYi9ibG9jay9kaXJ0
-eS1iaXRtYXAuYw0KPiBAQCAtNjI1LDcgKzYyNSw2IEBAIHZvaWQgYmRydl9yZXNldF9kaXJ0eV9i
-aXRtYXAoQmRydkRpcnR5Qml0bWFwICpiaXRtYXAsDQo+ICAgDQo+ICAgdm9pZCBiZHJ2X2NsZWFy
-X2RpcnR5X2JpdG1hcChCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcCwgSEJpdG1hcCAqKm91dCkNCj4g
-ICB7DQo+IC0gICAgYXNzZXJ0KGJkcnZfZGlydHlfYml0bWFwX2VuYWJsZWQoYml0bWFwKSk7DQo+
-ICAgICAgIGFzc2VydCghYmRydl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHkoYml0bWFwKSk7DQo+ICAg
-ICAgIGJkcnZfZGlydHlfYml0bWFwX2xvY2soYml0bWFwKTsNCj4gICAgICAgaWYgKCFvdXQpIHsN
-Cj4gZGlmZiAtLWdpdCBhL2Jsb2NrZGV2LmMgYi9ibG9ja2Rldi5jDQo+IGluZGV4IGQ3NzVmMjI4
-ZmUuLmNjY2QzNmI1ZTcgMTAwNjQ0DQo+IC0tLSBhL2Jsb2NrZGV2LmMNCj4gKysrIGIvYmxvY2tk
-ZXYuYw0KPiBAQCAtMjAxMiw5ICsyMDEyLDYgQEAgc3RhdGljIHZvaWQgYmxvY2tfZGlydHlfYml0
-bWFwX2NsZWFyX3ByZXBhcmUoQmxrQWN0aW9uU3RhdGUgKmNvbW1vbiwNCj4gICAgICAgaWYgKGJk
-cnZfZGlydHlfYml0bWFwX3VzZXJfbG9ja2VkKHN0YXRlLT5iaXRtYXApKSB7DQo+ICAgICAgICAg
-ICBlcnJvcl9zZXRnKGVycnAsICJDYW5ub3QgbW9kaWZ5IGEgYml0bWFwIGluIHVzZSBieSBhbm90
-aGVyIG9wZXJhdGlvbiIpOw0KPiAgICAgICAgICAgcmV0dXJuOw0KPiAtICAgIH0gZWxzZSBpZiAo
-IWJkcnZfZGlydHlfYml0bWFwX2VuYWJsZWQoc3RhdGUtPmJpdG1hcCkpIHsNCj4gLSAgICAgICAg
-ZXJyb3Jfc2V0ZyhlcnJwLCAiQ2Fubm90IGNsZWFyIGEgZGlzYWJsZWQgYml0bWFwIik7DQo+IC0g
-ICAgICAgIHJldHVybjsNCj4gICAgICAgfSBlbHNlIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF9yZWFk
-b25seShzdGF0ZS0+Yml0bWFwKSkgew0KPiAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQ2Fu
-bm90IGNsZWFyIGEgcmVhZG9ubHkgYml0bWFwIik7DQo+ICAgICAgICAgICByZXR1cm47DQo+IEBA
-IC0yOTE3LDExICsyOTE0LDYgQEAgdm9pZCBxbXBfYmxvY2tfZGlydHlfYml0bWFwX2NsZWFyKGNv
-bnN0IGNoYXIgKm5vZGUsIGNvbnN0IGNoYXIgKm5hbWUsDQo+ICAgICAgICAgICAgICAgICAgICAg
-ICJCaXRtYXAgJyVzJyBpcyBjdXJyZW50bHkgaW4gdXNlIGJ5IGFub3RoZXIgb3BlcmF0aW9uIg0K
-PiAgICAgICAgICAgICAgICAgICAgICAiIGFuZCBjYW5ub3QgYmUgY2xlYXJlZCIsIG5hbWUpOw0K
-PiAgICAgICAgICAgcmV0dXJuOw0KPiAtICAgIH0gZWxzZSBpZiAoIWJkcnZfZGlydHlfYml0bWFw
-X2VuYWJsZWQoYml0bWFwKSkgew0KPiAtICAgICAgICBlcnJvcl9zZXRnKGVycnAsDQo+IC0gICAg
-ICAgICAgICAgICAgICAgIkJpdG1hcCAnJXMnIGlzIGN1cnJlbnRseSBkaXNhYmxlZCBhbmQgY2Fu
-bm90IGJlIGNsZWFyZWQiLA0KPiAtICAgICAgICAgICAgICAgICAgIG5hbWUpOw0KPiAtICAgICAg
-ICByZXR1cm47DQo+ICAgICAgIH0gZWxzZSBpZiAoYmRydl9kaXJ0eV9iaXRtYXBfcmVhZG9ubHko
-Yml0bWFwKSkgew0KPiAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQml0bWFwICclcycgaXMg
-cmVhZG9ubHkgYW5kIGNhbm5vdCBiZSBjbGVhcmVkIiwgbmFtZSk7DQo+ICAgICAgICAgICByZXR1
-cm47DQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0KDQo=
+On 07/09/2018 09:59, Marc-André Lureau wrote:
+> Iterate over the writable class properties, sort and print them out
+> with the description if available.
+> 
+> Ex: qemu -object memory-backend-file,help
+> memory-backend-file.align=int
+> memory-backend-file.discard-data=bool
+> memory-backend-file.dump=bool - Set to 'off' to exclude from core dump
+> memory-backend-file.host-nodes=int - Binds memory to the list of NUMA host nodes
+> memory-backend-file.mem-path=string
+> memory-backend-file.merge=bool - Mark memory as mergeable
+> memory-backend-file.pmem=bool
+> memory-backend-file.policy=HostMemPolicy - Set the NUMA policy
+> memory-backend-file.prealloc=bool - Preallocate memory
+> memory-backend-file.share=bool - Mark the memory as private to QEMU or shared
+> memory-backend-file.size=int - Size of the memory region (ex: 500M)
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qom/object_interfaces.c |  6 +++---
+>  vl.c                    | 40 +++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 40 insertions(+), 6 deletions(-)
+> 
+> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+> index 72b97a8bed..941fd63afd 100644
+> --- a/qom/object_interfaces.c
+> +++ b/qom/object_interfaces.c
+> @@ -141,14 +141,14 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+>  
+>  int user_creatable_add_opts_foreach(void *opaque, QemuOpts *opts, Error **errp)
+>  {
+> -    bool (*type_predicate)(const char *) = opaque;
+> +    bool (*type_opt_predicate)(const char *, QemuOpts *) = opaque;
+>      Object *obj = NULL;
+>      Error *err = NULL;
+>      const char *type;
+>  
+>      type = qemu_opt_get(opts, "qom-type");
+> -    if (type && type_predicate &&
+> -        !type_predicate(type)) {
+> +    if (type && type_opt_predicate &&
+> +        !type_opt_predicate(type, opts)) {
+>          return 0;
+>      }
+>  
+> diff --git a/vl.c b/vl.c
+> index 71765a2982..880676ecc1 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2729,8 +2729,10 @@ static int machine_set_property(void *opaque,
+>   * cannot be created here, as it depends on the chardev
+>   * already existing.
+>   */
+> -static bool object_create_initial(const char *type)
+> +static bool object_create_initial(const char *type, QemuOpts *opts)
+>  {
+> +    ObjectClass *klass;
+> +
+>      if (is_help_option(type)) {
+>          GSList *l, *list;
+>  
+> @@ -2744,6 +2746,38 @@ static bool object_create_initial(const char *type)
+>          exit(0);
+>      }
+>  
+> +    klass = object_class_by_name(type);
+> +    if (klass && qemu_opt_has_help_opt(opts)) {
+> +        ObjectPropertyIterator iter;
+> +        ObjectProperty *prop;
+> +        GPtrArray *array = g_ptr_array_new();
+> +        int i;
+> +
+> +        object_class_property_iter_init(&iter, klass);
+> +        while ((prop = object_property_iter_next(&iter))) {
+> +            GString *str;
+> +
+> +            if (!prop->set) {
+> +                continue;
+> +            }
+> +
+> +            str = g_string_new(NULL);
+> +            g_string_append_printf(str, "%s.%s=%s", type,
+> +                                   prop->name, prop->type);
+> +            if (prop->description) {
+> +                g_string_append_printf(str, " - %s", prop->description);
+> +            }
+> +            g_ptr_array_add(array, g_string_free(str, false));
+> +        }
+> +        g_ptr_array_sort(array, (GCompareFunc)qemu_pstrcmp);
+> +        for (i = 0; i < array->len; i++) {
+> +            printf("%s\n", (char *)array->pdata[i]);
+> +        }
+> +        g_ptr_array_set_free_func(array, g_free);
+> +        g_ptr_array_free(array, true);
+> +        exit(0);
+> +    }
+> +
+>      if (g_str_equal(type, "rng-egd") ||
+>          g_str_has_prefix(type, "pr-manager-")) {
+>          return false;
+> @@ -2790,9 +2824,9 @@ static bool object_create_initial(const char *type)
+>   * The remainder of object creation happens after the
+>   * creation of chardev, fsdev, net clients and device data types.
+>   */
+> -static bool object_create_delayed(const char *type)
+> +static bool object_create_delayed(const char *type, QemuOpts *opts)
+>  {
+> -    return !object_create_initial(type);
+> +    return !object_create_initial(type, opts);
+>  }
+>  
+>  
+> 
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
