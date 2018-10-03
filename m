@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1g7ip5-0000CG-UF
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:12:24 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1g7ipc-0001gA-NA
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:12:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1g7ip2-00066M-06
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:12:23 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1g7ipa-0006KF-Ns
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:12:56 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed,  3 Oct 2018 22:07:41 +0700
-Message-Id: <1538579266-8389-8-git-send-email-edgar.iglesias@gmail.com>
+Date: Wed,  3 Oct 2018 22:07:42 +0700
+Message-Id: <1538579266-8389-9-git-send-email-edgar.iglesias@gmail.com>
 In-Reply-To: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
 References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 07/12] net: cadence_gem: Implement support
- for 64bit descriptor addresses
+Subject: [Qemu-devel] [PATCH v1 08/12] net: cadence_gem: Announce 64bit
+ addressing support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +25,33 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Implement support for 64bit descriptor addresses.
+Announce 64bit addressing support.
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/net/cadence_gem.c | 47 +++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 39 insertions(+), 8 deletions(-)
+ hw/net/cadence_gem.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index ab02515..f93cd8e 100644
+index f93cd8e..fc81fb5 100644
 --- a/hw/net/cadence_gem.c
 +++ b/hw/net/cadence_gem.c
-@@ -153,6 +153,9 @@
- #define GEM_RECEIVE_Q1_PTR              (0x00000480 / 4)
- #define GEM_RECEIVE_Q7_PTR              (GEM_RECEIVE_Q1_PTR + 6)
+@@ -142,6 +142,7 @@
+ #define GEM_DESCONF4      (0x0000028C/4)
+ #define GEM_DESCONF5      (0x00000290/4)
+ #define GEM_DESCONF6      (0x00000294/4)
++#define GEM_DESCONF6_64B_MASK (1U << 23)
+ #define GEM_DESCONF7      (0x00000298/4)
  
-+#define GEM_TBQPH                       (0x000004C8 / 4)
-+#define GEM_RBQPH                       (0x000004D4 / 4)
-+
- #define GEM_INT_Q1_ENABLE               (0x00000600 / 4)
- #define GEM_INT_Q7_ENABLE               (GEM_INT_Q1_ENABLE + 6)
+ #define GEM_INT_Q1_STATUS               (0x00000400 / 4)
+@@ -1300,7 +1301,7 @@ static void gem_reset(DeviceState *d)
+     s->regs[GEM_DESCONF] = 0x02500111;
+     s->regs[GEM_DESCONF2] = 0x2ab13fff;
+     s->regs[GEM_DESCONF5] = 0x002f2045;
+-    s->regs[GEM_DESCONF6] = 0x0;
++    s->regs[GEM_DESCONF6] = GEM_DESCONF6_64B_MASK;
  
-@@ -832,18 +835,42 @@ static int get_queue_from_screen(CadenceGEMState *s, uint8_t *rxbuf_ptr,
-     return 0;
- }
- 
-+static hwaddr gem_get_desc_addr(CadenceGEMState *s, bool tx, int q)
-+{
-+    hwaddr desc_addr = 0;
-+
-+    if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
-+        desc_addr = s->regs[tx ? GEM_TBQPH : GEM_RBQPH];
-+    }
-+    desc_addr <<= 32;
-+    desc_addr |= tx ? s->tx_desc_addr[q] : s->rx_desc_addr[q];
-+    return desc_addr;
-+}
-+
-+static hwaddr gem_get_tx_desc_addr(CadenceGEMState *s, int q)
-+{
-+    return gem_get_desc_addr(s, true, q);
-+}
-+
-+static hwaddr gem_get_rx_desc_addr(CadenceGEMState *s, int q)
-+{
-+    return gem_get_desc_addr(s, false, q);
-+}
-+
- static void gem_get_rx_desc(CadenceGEMState *s, int q)
- {
--    DB_PRINT("read descriptor 0x%x\n", (unsigned)s->rx_desc_addr[q]);
-+    hwaddr desc_addr = gem_get_rx_desc_addr(s, q);
-+
-+    DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", desc_addr);
-+
-     /* read current descriptor */
--    address_space_read(s->dma_as, s->rx_desc_addr[q], MEMTXATTRS_UNSPECIFIED,
-+    address_space_read(s->dma_as, desc_addr, MEMTXATTRS_UNSPECIFIED,
-                        (uint8_t *)s->rx_desc[q],
-                        sizeof(uint32_t) * gem_get_desc_len(s, true));
- 
-     /* Descriptor owned by software ? */
-     if (rx_desc_get_ownership(s->rx_desc[q]) == 1) {
--        DB_PRINT("descriptor 0x%x owned by sw.\n",
--                 (unsigned)s->rx_desc_addr[q]);
-+        DB_PRINT("descriptor 0x%" HWADDR_PRIx " owned by sw.\n", desc_addr);
-         s->regs[GEM_RXSTATUS] |= GEM_RXSTATUS_NOBUF;
-         s->regs[GEM_ISR] |= GEM_INT_RXUSED & ~(s->regs[GEM_IMR]);
-         /* Handle interrupt consequences */
-@@ -947,6 +974,8 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-     q = get_queue_from_screen(s, rxbuf_ptr, rxbufsize);
- 
-     while (bytes_to_copy) {
-+        hwaddr desc_addr;
-+
-         /* Do nothing if receive is not enabled. */
-         if (!gem_can_receive(nc)) {
-             assert(!first_desc);
-@@ -994,7 +1023,8 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-         }
- 
-         /* Descriptor write-back.  */
--        address_space_write(s->dma_as, s->rx_desc_addr[q],
-+        desc_addr = gem_get_rx_desc_addr(s, q);
-+        address_space_write(s->dma_as, desc_addr,
-                             MEMTXATTRS_UNSPECIFIED,
-                             (uint8_t *)s->rx_desc[q],
-                             sizeof(uint32_t) * gem_get_desc_len(s, true));
-@@ -1098,7 +1128,7 @@ static void gem_transmit(CadenceGEMState *s)
- 
-     for (q = s->num_priority_queues - 1; q >= 0; q--) {
-         /* read current descriptor */
--        packet_desc_addr = s->tx_desc_addr[q];
-+        packet_desc_addr = gem_get_tx_desc_addr(s, q);
- 
-         DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
-         address_space_read(s->dma_as, packet_desc_addr,
-@@ -1144,16 +1174,17 @@ static void gem_transmit(CadenceGEMState *s)
-             /* Last descriptor for this packet; hand the whole thing off */
-             if (tx_desc_get_last(desc)) {
-                 uint32_t desc_first[DESC_MAX_NUM_WORDS];
-+                hwaddr desc_addr = gem_get_tx_desc_addr(s, q);
- 
-                 /* Modify the 1st descriptor of this packet to be owned by
-                  * the processor.
-                  */
--                address_space_read(s->dma_as, s->tx_desc_addr[q],
-+                address_space_read(s->dma_as, desc_addr,
-                                    MEMTXATTRS_UNSPECIFIED,
-                                    (uint8_t *)desc_first,
-                                    sizeof(desc_first));
-                 tx_desc_set_used(desc_first);
--                address_space_write(s->dma_as, s->tx_desc_addr[q],
-+                address_space_write(s->dma_as, desc_addr,
-                                   MEMTXATTRS_UNSPECIFIED,
-                                   (uint8_t *)desc_first,
-                                    sizeof(desc_first));
+     queues_mask = MAKE_64BIT_MASK(1, s->num_priority_queues - 1);
+     s->regs[GEM_DESCONF6] |= queues_mask;
 -- 
 2.7.4
