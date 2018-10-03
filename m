@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7ero-0000fc-Ff
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:58:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g7eus-0002un-0q
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7ern-0002w3-MO
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:58:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58514)
+	(envelope-from <pbonzini@redhat.com>) id 1g7euq-0004Rr-3a
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:02:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52526)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g7ern-0002va-DD
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:58:55 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  3 Oct 2018 14:57:55 +0400
-Message-Id: <20181003105755.10862-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20181003105755.10862-1-marcandre.lureau@redhat.com>
-References: <20181003105755.10862-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7euo-0004QP-5F
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:02:02 -0400
+References: <20180921082041.29380-1-rkagan@virtuozzo.com>
+	<20180921082041.29380-5-rkagan@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <17d3d8f7-2e34-9ab0-a862-a2f5daccf9a0@redhat.com>
+Date: Wed, 3 Oct 2018 13:01:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 6/6] chardev: use a child source for qio input
- source
+In-Reply-To: <20180921082041.29380-5-rkagan@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] default-configs: collect
+ CONFIG_HYPERV* in hyperv.mak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +29,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>
 
-GLib child source were added with version 2.28. We can use them now
-that we bumped our requirement to 2.40.
+On 21/09/2018 10:20, Roman Kagan wrote:
+> diff --git a/default-configs/hyperv.mak b/default-configs/hyperv.mak
+> new file mode 100644
+> index 0000000000..3d45e28403
+> --- /dev/null
+> +++ b/default-configs/hyperv.mak
+> @@ -0,0 +1,2 @@
+> +CONFIG_HYPERV=$(CONFIG_KVM)
+> +CONFIG_HYPERV_TESTDEV=$(CONFIG_HYPERV)
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- chardev/char-io.c | 48 +++++------------------------------------------
- 1 file changed, 5 insertions(+), 43 deletions(-)
+By moving the test device to hy/hyperv, this can be just
+CONFIG_HYPERV_TESTDEV=y.
 
-diff --git a/chardev/char-io.c b/chardev/char-io.c
-index f81052481a..8ced184160 100644
---- a/chardev/char-io.c
-+++ b/chardev/char-io.c
-@@ -33,7 +33,6 @@ typedef struct IOWatchPoll {
-     IOCanReadHandler *fd_can_read;
-     GSourceFunc fd_read;
-     void *opaque;
--    GMainContext *context;
- } IOWatchPoll;
-=20
- static IOWatchPoll *io_watch_poll_from_source(GSource *source)
-@@ -55,47 +54,24 @@ static gboolean io_watch_poll_prepare(GSource *source=
-,
-         iwp->src =3D qio_channel_create_watch(
-             iwp->ioc, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL);
-         g_source_set_callback(iwp->src, iwp->fd_read, iwp->opaque, NULL)=
-;
--        g_source_attach(iwp->src, iwp->context);
--    } else {
--        g_source_destroy(iwp->src);
-+        g_source_add_child_source(source, iwp->src);
-         g_source_unref(iwp->src);
-+    } else {
-+        g_source_remove_child_source(source, iwp->src);
-         iwp->src =3D NULL;
-     }
-     return FALSE;
- }
-=20
--static gboolean io_watch_poll_check(GSource *source)
--{
--    return FALSE;
--}
--
- static gboolean io_watch_poll_dispatch(GSource *source, GSourceFunc call=
-back,
-                                        gpointer user_data)
- {
--    abort();
--}
--
--static void io_watch_poll_finalize(GSource *source)
--{
--    /* Due to a glib bug, removing the last reference to a source
--     * inside a finalize callback causes recursive locking (and a
--     * deadlock).  This is not a problem inside other callbacks,
--     * including dispatch callbacks, so we call io_remove_watch_poll
--     * to remove this source.  At this point, iwp->src must
--     * be NULL, or we would leak it.
--     *
--     * This would be solved much more elegantly by child sources,
--     * but we support older glib versions that do not have them.
--     */
--    IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
--    assert(iwp->src =3D=3D NULL);
-+    return G_SOURCE_CONTINUE;
- }
-=20
- static GSourceFuncs io_watch_poll_funcs =3D {
-     .prepare =3D io_watch_poll_prepare,
--    .check =3D io_watch_poll_check,
-     .dispatch =3D io_watch_poll_dispatch,
--    .finalize =3D io_watch_poll_finalize,
- };
-=20
- GSource *io_add_watch_poll(Chardev *chr,
-@@ -115,7 +91,6 @@ GSource *io_add_watch_poll(Chardev *chr,
-     iwp->ioc =3D ioc;
-     iwp->fd_read =3D (GSourceFunc) fd_read;
-     iwp->src =3D NULL;
--    iwp->context =3D context;
-=20
-     name =3D g_strdup_printf("chardev-iowatch-%s", chr->label);
-     g_source_set_name((GSource *)iwp, name);
-@@ -126,23 +101,10 @@ GSource *io_add_watch_poll(Chardev *chr,
-     return (GSource *)iwp;
- }
-=20
--static void io_remove_watch_poll(GSource *source)
--{
--    IOWatchPoll *iwp;
--
--    iwp =3D io_watch_poll_from_source(source);
--    if (iwp->src) {
--        g_source_destroy(iwp->src);
--        g_source_unref(iwp->src);
--        iwp->src =3D NULL;
--    }
--    g_source_destroy(&iwp->parent);
--}
--
- void remove_fd_in_watch(Chardev *chr)
- {
-     if (chr->gsource) {
--        io_remove_watch_poll(chr->gsource);
-+        g_source_destroy(chr->gsource);
-         chr->gsource =3D NULL;
-     }
- }
---=20
-2.19.0.271.gfe8321ec05
+Paolo
