@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g7m1b-0006Zd-5d
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:37:35 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7m1h-0006wj-42
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:37:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g7lso-0007tV-0l
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:28:26 -0400
-References: <20181002230218.13949-1-jsnow@redhat.com>
-	<20181002230218.13949-2-jsnow@redhat.com>
-	<f803d9c8-90e0-56c7-320d-0c19d8b5b284@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <435f5820-c7fd-e1b0-b1d5-26e2a5de9c61@redhat.com>
-Date: Wed, 3 Oct 2018 14:28:05 -0400
-MIME-Version: 1.0
-In-Reply-To: <f803d9c8-90e0-56c7-320d-0c19d8b5b284@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7lmP-0002a5-Tq
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:21:53 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 3 Oct 2018 18:21:46 +0000
+Message-ID: <f71300db-5fe8-3473-2378-b438e2cdbd4e@virtuozzo.com>
+References: <20181003175524.597407-1-eblake@redhat.com>
+In-Reply-To: <20181003175524.597407-1-eblake@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] block/dirty-bitmaps: add
- user_locked status checker
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v2] nbd: Flip qemu-nbd to prefer newstyle;
+ add -O for old behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +24,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "rjones@redhat.com" <rjones@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open
+	list:Network Block Dev..." <qemu-block@nongnu.org>
 
-
-
-On 10/03/2018 08:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 03.10.2018 02:02, John Snow wrote:
->> Instead of both frozen and qmp_locked checks, wrap it into one check.
->> frozen implies the bitmap is split in two (for backup), and shouldn't
->> be modified. qmp_locked implies it's being used by another operation,
->> like being exported over NBD. In both cases it means we shouldn't allow
->> the user to modify it in any meaningful way.
->>
->> Replace any usages where we check both frozen and qmp_locked with the
->> new check.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/dirty-bitmap.c           |  6 ++++++
->>  blockdev.c                     | 29 ++++++++---------------------
->>  include/block/dirty-bitmap.h   |  1 +
->>  migration/block-dirty-bitmap.c | 10 ++--------
->>  4 files changed, 17 insertions(+), 29 deletions(-)
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 8ac933cf1c..85bc668f6a 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -176,6 +176,12 @@ bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap)
->>      return bitmap->successor;
->>  }
->>  
->> +/* Both conditions disallow user-modification via QMP. */
->> +bool bdrv_dirty_bitmap_user_locked(BdrvDirtyBitmap *bitmap) {
->> +    return (bdrv_dirty_bitmap_frozen(bitmap) ||
->> +            bdrv_dirty_bitmap_qmp_locked(bitmap));
-> 
-> hmm, extra parentheses
-
-I'm fond of them, but I'll take them out.
-
-> 
->> +}
->> +
->>  void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked)
->>  {
->>      qemu_mutex_lock(bitmap->mutex);
-> 
-> [...]
-> 
->> --- a/migration/block-dirty-bitmap.c
->> +++ b/migration/block-dirty-bitmap.c
->> @@ -301,14 +301,8 @@ static int init_dirty_bitmap_migration(void)
->>                  goto fail;
->>              }
->>  
->> -            if (bdrv_dirty_bitmap_frozen(bitmap)) {
->> -                error_report("Can't migrate frozen dirty bitmap: '%s",
->> -                             bdrv_dirty_bitmap_name(bitmap));
->> -                goto fail;
->> -            }
->> -
->> -            if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
->> -                error_report("Can't migrate locked dirty bitmap: '%s",
->> +            if (bdrv_dirty_bitmap_user_locked(bitmap)) {
->> +                error_report("Can't migrate a bitmap that is in use: '%s'",
-> 
-> "by another operation" like in other cases?
-> 
-
-Oh, sure. Can't hurt.
-
->>                               bdrv_dirty_bitmap_name(bitmap));
->>                  goto fail;
->>              }
-> 
-> anyway,
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> -- 
-> Best regards,
-> Vladimir
-> 
-
-Thanks, I'll just make these edits and trust that Eric is fine with it
-as well.
-
---js
+MDMuMTAuMjAxOCAyMDo1NSwgRXJpYyBCbGFrZSB3cm90ZToNCg0KT2xkc3R5bGUgTkJEIG5lZ290
+aWF0aW9uIGNhbm5vdCBwZXJmb3JtIGFueSBvZiB0aGUgZXh0ZW5zaW9ucyB0aGF0DQp3ZSBoYXZl
+IHJlY2VudGx5IGJlZW4gcmVseWluZyBvbi4gIFdoaWxlIHlvdSBjYW4gYWx3YXlzIHBhc3MgLXgg
+IiINCnRvIGdldCBuZXdzdHlsZSBuZWdvdGlhdGlvbiwgdGhlc2UgZGF5cywgaXQgaXMgYmV0dGVy
+IHRvIGp1c3QgZGVmYXVsdA0KdG8gbmV3c3R5bGUgKHdpdGggYW4gZW1wdHkgZXhwb3J0IG5hbWUp
+IGFuZCBmYWxsIGJhY2sgdG8gb2xkc3R5bGUNCm9ubHkgb24gYW4gZXhwbGljaXQgcmVxdWVzdC4N
+Cg0KcWVtdSBhcyBjbGllbnQgY2FuIG1hbmFnZSBlaXRoZXIgc3R5bGUgc2luY2UgMi42LjAsIGNv
+bW1pdCA2OWI0OTUwMmQ4DQoNCkZvciBjb21wYXJpc29uOg0KDQpuYmRraXQgMS4zIHN3aXRjaGVk
+IGl0cyBkZWZhdWx0IHRvIG5ld3N0eWxlIChKYW4gMjAxOCk6DQpodHRwczovL2dpdGh1Yi5jb20v
+bGliZ3Vlc3Rmcy9uYmRraXQvY29tbWl0L2IyYThhZWNjDQpodHRwczovL2dpdGh1Yi5jb20vbGli
+Z3Vlc3Rmcy9uYmRraXQvY29tbWl0LzgxNThlNzczDQoNCm5iZCAzLjEwIGRyb3BwZWQgb2xkc3R5
+bGUgbG9uZyBhZ28gKE1hciAyMDE1KToNCmh0dHBzOi8vZ2l0aHViLmNvbS9OZXR3b3JrQmxvY2tE
+ZXZpY2UvbmJkL2NvbW1pdC8zNjk0MDE5Mw0KDQpTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxl
+Ymxha2VAcmVkaGF0LmNvbT48bWFpbHRvOmVibGFrZUByZWRoYXQuY29tPg0KLS0tDQp2MjogaW1w
+cm92ZSAncWVtdS1uYmQgLS1oZWxwJywgZHJvcCByZWR1bmRhbnQgdmFyaWFibGUgJ25ld3Byb3Rv
+Jw0KLS0tDQogcWVtdS1uYmQuYyB8IDM3ICsrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0t
+LS0tLS0NCiAxIGZpbGUgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKSwgMTQgZGVsZXRpb25zKC0p
+DQoNCmRpZmYgLS1naXQgYS9xZW11LW5iZC5jIGIvcWVtdS1uYmQuYw0KaW5kZXggNTFiOWQzOGM3
+MjcuLmUzNWM5N2U3Y2E0IDEwMDY0NA0KLS0tIGEvcWVtdS1uYmQuYw0KKysrIGIvcWVtdS1uYmQu
+Yw0KQEAgLTU2LDcgKzU2LDcgQEANCiAjZGVmaW5lIE1CUl9TSVpFIDUxMg0KDQogc3RhdGljIE5C
+REV4cG9ydCAqZXhwOw0KLXN0YXRpYyBib29sIG5ld3Byb3RvOw0KK3N0YXRpYyBib29sIG9sZHN0
+eWxlOw0KIHN0YXRpYyBpbnQgdmVyYm9zZTsNCiBzdGF0aWMgY2hhciAqc3JjcGF0aDsNCiBzdGF0
+aWMgU29ja2V0QWRkcmVzcyAqc2FkZHI7DQpAQCAtODQsOCArODQsOSBAQCBzdGF0aWMgdm9pZCB1
+c2FnZShjb25zdCBjaGFyICpuYW1lKQ0KICIgIC1lLCAtLXNoYXJlZD1OVU0gICAgICAgICAgZGV2
+aWNlIGNhbiBiZSBzaGFyZWQgYnkgTlVNIGNsaWVudHMgKGRlZmF1bHQgJzEnKVxuIg0KICIgIC10
+LCAtLXBlcnNpc3RlbnQgICAgICAgICAgZG9uJ3QgZXhpdCBvbiB0aGUgbGFzdCBjb25uZWN0aW9u
+XG4iDQogIiAgLXYsIC0tdmVyYm9zZSAgICAgICAgICAgICBkaXNwbGF5IGV4dHJhIGRlYnVnZ2lu
+ZyBpbmZvcm1hdGlvblxuIg0KLSIgIC14LCAtLWV4cG9ydC1uYW1lPU5BTUUgICAgZXhwb3NlIGV4
+cG9ydCBieSBuYW1lXG4iDQotIiAgLUQsIC0tZGVzY3JpcHRpb249VEVYVCAgICB3aXRoIC14LCBh
+bHNvIGV4cG9ydCBhIGh1bWFuLXJlYWRhYmxlIGRlc2NyaXB0aW9uXG4iDQorIiAgLXgsIC0tZXhw
+b3J0LW5hbWU9TkFNRSAgICBleHBvc2UgZXhwb3J0IGJ5IG5hbWUgKGRlZmF1bHQgIiIpXG4iDQor
+IiAgLUQsIC0tZGVzY3JpcHRpb249VEVYVCAgICBleHBvc2UgYSBodW1hbi1yZWFkYWJsZSBkZXNj
+cmlwdGlvbiBvZiBleHBvcnRcbiINCisiICAtTywgLS1vbGRzdHlsZSAgICAgICAgICAgIGZvcmNl
+IG9sZHN0eWxlIChub3Qgd2l0aCAteCwgLUQsIG9yIC0tdGxzLWNyZWRzKVxuIg0KICJcbiINCiAi
+RXhwb3NpbmcgcGFydCBvZiB0aGUgaW1hZ2U6XG4iDQogIiAgLW8sIC0tb2Zmc2V0PU9GRlNFVCAg
+ICAgICBvZmZzZXQgaW50byB0aGUgaW1hZ2VcbiINCkBAIC0zNTQsNyArMzU1LDcgQEAgc3RhdGlj
+IHZvaWQgbmJkX2FjY2VwdChRSU9OZXRMaXN0ZW5lciAqbGlzdGVuZXIsIFFJT0NoYW5uZWxTb2Nr
+ZXQgKmNpb2MsDQoNCiAgICAgbmJfZmRzKys7DQogICAgIG5iZF91cGRhdGVfc2VydmVyX3dhdGNo
+KCk7DQotICAgIG5iZF9jbGllbnRfbmV3KG5ld3Byb3RvID8gTlVMTCA6IGV4cCwgY2lvYywNCisg
+ICAgbmJkX2NsaWVudF9uZXcob2xkc3R5bGUgPyBleHAgOiBOVUxMLCBjaW9jLA0KICAgICAgICAg
+ICAgICAgICAgICB0bHNjcmVkcywgTlVMTCwgbmJkX2NsaWVudF9jbG9zZWQpOw0KIH0NCg0KQEAg
+LTUwMiw3ICs1MDMsNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQogICAgIG9m
+Zl90IGZkX3NpemU7DQogICAgIFFlbXVPcHRzICpzbl9vcHRzID0gTlVMTDsNCiAgICAgY29uc3Qg
+Y2hhciAqc25faWRfb3JfbmFtZSA9IE5VTEw7DQotICAgIGNvbnN0IGNoYXIgKnNvcHQgPSAiaFZi
+Om86cDpyc25QOmM6ZHZrOmU6Zjp0bDp4OlQ6RDoiOw0KKyAgICBjb25zdCBjaGFyICpzb3B0ID0g
+ImhWYjpvOnA6cnNuUDpjOmR2azplOmY6dGw6eDpUOkQ6TyI7DQogICAgIHN0cnVjdCBvcHRpb24g
+bG9wdFtdID0gew0KICAgICAgICAgeyAiaGVscCIsIG5vX2FyZ3VtZW50LCBOVUxMLCAnaCcgfSwN
+CiAgICAgICAgIHsgInZlcnNpb24iLCBub19hcmd1bWVudCwgTlVMTCwgJ1YnIH0sDQpAQCAtNTI5
+LDYgKzUzMCw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCiAgICAgICAgIHsg
+Im9iamVjdCIsIHJlcXVpcmVkX2FyZ3VtZW50LCBOVUxMLCBRRU1VX05CRF9PUFRfT0JKRUNUIH0s
+DQogICAgICAgICB7ICJleHBvcnQtbmFtZSIsIHJlcXVpcmVkX2FyZ3VtZW50LCBOVUxMLCAneCcg
+fSwNCiAgICAgICAgIHsgImRlc2NyaXB0aW9uIiwgcmVxdWlyZWRfYXJndW1lbnQsIE5VTEwsICdE
+JyB9LA0KKyAgICAgICAgeyAib2xkc3R5bGUiLCBub19hcmd1bWVudCwgTlVMTCwgJ08nIH0sDQog
+ICAgICAgICB7ICJ0bHMtY3JlZHMiLCByZXF1aXJlZF9hcmd1bWVudCwgTlVMTCwgUUVNVV9OQkRf
+T1BUX1RMU0NSRURTIH0sDQogICAgICAgICB7ICJpbWFnZS1vcHRzIiwgbm9fYXJndW1lbnQsIE5V
+TEwsIFFFTVVfTkJEX09QVF9JTUFHRV9PUFRTIH0sDQogICAgICAgICB7ICJ0cmFjZSIsIHJlcXVp
+cmVkX2FyZ3VtZW50LCBOVUxMLCAnVCcgfSwNCkBAIC03MjMsNiArNzI1LDkgQEAgaW50IG1haW4o
+aW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KICAgICAgICAgY2FzZSAnRCc6DQogICAgICAgICAgICAg
+ZXhwb3J0X2Rlc2NyaXB0aW9uID0gb3B0YXJnOw0KICAgICAgICAgICAgIGJyZWFrOw0KKyAgICAg
+ICAgY2FzZSAnTyc6DQorICAgICAgICAgICAgb2xkc3R5bGUgPSB0cnVlOw0KKyAgICAgICAgICAg
+IGJyZWFrOw0KICAgICAgICAgY2FzZSAndic6DQogICAgICAgICAgICAgdmVyYm9zZSA9IDE7DQog
+ICAgICAgICAgICAgYnJlYWs7DQpAQCAtNzk5LDcgKzgwNCwxNiBAQCBpbnQgbWFpbihpbnQgYXJn
+YywgY2hhciAqKmFyZ3YpDQogICAgICAgICB9DQogICAgIH0NCg0KKyAgICBpZiAoIW9sZHN0eWxl
+ICYmICFleHBvcnRfbmFtZSkgew0KKyAgICAgICAgLyogU2V0IHRoZSBkZWZhdWx0IE5CRCBwcm90
+b2NvbCBleHBvcnQgbmFtZSwgdG8gZmF2b3IgbmV3IHN0eWxlLiAqLw0KKyAgICAgICAgZXhwb3J0
+X25hbWUgPSAiIjsNCisgICAgfQ0KDQp0aGlzDQoNCg0KDQoNCisNCiAgICAgaWYgKHRsc2NyZWRz
+aWQpIHsNCisgICAgICAgIGlmIChvbGRzdHlsZSkgew0KKyAgICAgICAgICAgIGVycm9yX3JlcG9y
+dCgiVExTIGlzIGluY29tcGF0aWJsZSB3aXRoIG9sZHN0eWxlIik7DQorICAgICAgICAgICAgZXhp
+dChFWElUX0ZBSUxVUkUpOw0KKyAgICAgICAgfQ0KICAgICAgICAgaWYgKHNvY2twYXRoKSB7DQog
+ICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJUTFMgaXMgb25seSBzdXBwb3J0ZWQgd2l0aCBJUHY0
+L0lQdjYiKTsNCiAgICAgICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQpAQCAtODA4LDExICs4
+MjIsNiBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQogICAgICAgICAgICAgZXJy
+b3JfcmVwb3J0KCJUTFMgaXMgbm90IHN1cHBvcnRlZCB3aXRoIGEgaG9zdCBkZXZpY2UiKTsNCiAg
+ICAgICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQogICAgICAgICB9DQotICAgICAgICBpZiAo
+IWV4cG9ydF9uYW1lKSB7DQotICAgICAgICAgICAgLyogU2V0IHRoZSBkZWZhdWx0IE5CRCBwcm90
+b2NvbCBleHBvcnQgbmFtZSwgc2luY2UNCi0gICAgICAgICAgICAgKiB3ZSAqbXVzdCogdXNlIG5l
+dyBzdHlsZSBwcm90b2NvbCBmb3IgVExTICovDQotICAgICAgICAgICAgZXhwb3J0X25hbWUgPSAi
+IjsNCi0gICAgICAgIH0NCiAgICAgICAgIHRsc2NyZWRzID0gbmJkX2dldF90bHNfY3JlZHModGxz
+Y3JlZHNpZCwgJmxvY2FsX2Vycik7DQogICAgICAgICBpZiAobG9jYWxfZXJyKSB7DQogICAgICAg
+ICAgICAgZXJyb3JfcmVwb3J0KCJGYWlsZWQgdG8gZ2V0IFRMUyBjcmVkcyAlcyIsDQpAQCAtMTAx
+MywxMyArMTAyMiwxMyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQogICAgICAg
+ICBlcnJvcl9yZXBvcnRfZXJyKGxvY2FsX2Vycik7DQogICAgICAgICBleGl0KEVYSVRfRkFJTFVS
+RSk7DQogICAgIH0NCisgICAgaWYgKG9sZHN0eWxlICYmIChleHBvcnRfbmFtZSB8fCBleHBvcnRf
+ZGVzY3JpcHRpb24pKSB7DQorICAgICAgICBlcnJvcl9yZXBvcnQoIm9sZHN0eWxlIG5lZ290aWF0
+aW9uIGNhbm5vdCBzZXQgZXhwb3J0IGRldGFpbHMiKTsNCisgICAgICAgIGV4aXQoRVhJVF9GQUlM
+VVJFKTsNCisgICAgfQ0KDQphbmQgdGhpcyBhcmUgdmVyeSBzaW1wbGUgb3B0aW9uIGNoZWNrcywg
+c28sIGl0IGlzIGJldHRlciB0byBwbGFjZSB0aGVtIHRvZ2V0aGVyIGFuZCBhZnRlciBnZXRvcHQg
+bG9vcCwgYmVmb3JlIHRoZSBvdGhlciBtb3JlIGRpZmZpY3VsdCBsb2dpYy4NCg0KYnV0IGl0J3Mg
+YSBuaXQtcGlja2luZywgc28sIHdpdGggb3Igd2l0aG91dDoNClJldmlld2VkLWJ5OiBWbGFkaW1p
+ciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+PG1haWx0bzp2
+c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KDQogICAgIGlmIChleHBvcnRfbmFtZSkgew0K
+ICAgICAgICAgbmJkX2V4cG9ydF9zZXRfbmFtZShleHAsIGV4cG9ydF9uYW1lKTsNCiAgICAgICAg
+IG5iZF9leHBvcnRfc2V0X2Rlc2NyaXB0aW9uKGV4cCwgZXhwb3J0X2Rlc2NyaXB0aW9uKTsNCi0g
+ICAgICAgIG5ld3Byb3RvID0gdHJ1ZTsNCi0gICAgfSBlbHNlIGlmIChleHBvcnRfZGVzY3JpcHRp
+b24pIHsNCi0gICAgICAgIGVycm9yX3JlcG9ydCgiRXhwb3J0IGRlc2NyaXB0aW9uIHJlcXVpcmVz
+IGFuIGV4cG9ydCBuYW1lIik7DQotICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQogICAgIH0N
+Cg0KICAgICBpZiAoZGV2aWNlKSB7DQoNCg0KDQoNCi0tDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1p
+cg0K
