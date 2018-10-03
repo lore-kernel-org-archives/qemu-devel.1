@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7gke-00044w-Cl
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:59:41 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1g7gmK-0004v8-4o
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7gkb-0007j8-6A
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:59:40 -0400
-Received: from mail-wm1-f54.google.com ([209.85.128.54]:55900)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7gka-0007iw-WA
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:59:37 -0400
-Received: by mail-wm1-f54.google.com with SMTP id 206-v6so5636150wmb.5
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 05:59:36 -0700 (PDT)
-References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
-	<20180907075948.26917-7-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ec937f8d-a243-98b5-e95e-5c23a07894a4@redhat.com>
-Date: Wed, 3 Oct 2018 14:59:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180907075948.26917-7-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <rkagan@virtuozzo.com>) id 1g7gmE-00009v-BI
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:01:24 -0400
+Received: from mail-ve1eur01hn0318.outbound.protection.outlook.com
+	([2a01:111:f400:fe1f::318]:19232
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1g7gmE-00009E-1T
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:01:18 -0400
+From: Roman Kagan <rkagan@virtuozzo.com>
+Date: Wed, 3 Oct 2018 13:01:07 +0000
+Message-ID: <20181003130101.GB24354@rkaganb.sw.ru>
+References: <20180921082217.29481-1-rkagan@virtuozzo.com>
+	<20180921082217.29481-6-rkagan@virtuozzo.com>
+	<47ed971a-71c8-4a95-c1e0-697c68a7a82c@redhat.com>
+In-Reply-To: <47ed971a-71c8-4a95-c1e0-697c68a7a82c@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/12] qom/object: register 'type'
- property as class property
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9238C2ECD771FF41956DD025BCA27D38@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 05/10] hyperv: add synic message delivery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>
 
-On 07/09/2018 09:59, Marc-André Lureau wrote:
-> Let's save a few byte in each object instance.
-> 
-> (Is this property really used anywhere? Only qom-get could read it)
+On Wed, Oct 03, 2018 at 01:06:58PM +0200, Paolo Bonzini wrote:
+> On 21/09/2018 10:22, Roman Kagan wrote:
+> > +typedef struct HvSintStagedMesage {
+> > +    /* message content staged by hyperv_post_msg */
+> > +    struct hyperv_message msg;
+> > +    /* callback + data (r/o) to complete the processing in a BH */
+> > +    HvSintMsgCb cb;
+> > +    void *cb_data;
+> > +    /* message posting status filled by cpu_post_msg */
+> > +    int status;
+> > +    /* passing the buck: */
+> > +    enum {
+> > +        /* initial state */
+> > +        HV_STAGED_MSG_FREE,
+> > +        /*
+> > +         * hyperv_post_msg (e.g. in main loop) grabs the staged area (=
+FREE ->
+> > +         * BUSY), copies msg, and schedules cpu_post_msg on the assign=
+ed cpu
+> > +         */
+> > +        HV_STAGED_MSG_BUSY,
+> > +        /*
+> > +         * cpu_post_msg (vcpu thread) tries to copy staged msg to msg =
+slot,
+> > +         * notify the guest, records the status, marks the posting don=
+e (BUSY
+> > +         * -> POSTED), and schedules sint_msg_bh BH
+> > +         */
+> > +        HV_STAGED_MSG_POSTED,
+> > +        /*
+> > +         * sint_msg_bh (BH) verifies that the posting is done, runs th=
+e
+> > +         * callback, and starts over (POSTED -> FREE)
+> > +         */
+> > +    } state;
+> > +} HvSintStagedMesage;
+>=20
+> s/Mesage/Message/
 
-Well, it's not really used but it's part of the external API.
+:facepalm:
 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  qom/object.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/qom/object.c b/qom/object.c
-> index d8666de3f2..185d1dd9f8 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -2423,9 +2423,10 @@ void object_class_property_set_description(ObjectClass *klass,
->      op->description = g_strdup(description);
->  }
->  
-> -static void object_instance_init(Object *obj)
-> +static void object_class_init(ObjectClass *klass, void *data)
->  {
-> -    object_property_add_str(obj, "type", qdev_get_type, NULL, NULL);
-> +    object_class_property_add_str(klass, "type", qdev_get_type,
-> +                                  NULL, &error_abort);
->  }
->  
->  static void register_types(void)
-> @@ -2439,7 +2440,7 @@ static void register_types(void)
->      static TypeInfo object_info = {
->          .name = TYPE_OBJECT,
->          .instance_size = sizeof(Object),
-> -        .instance_init = object_instance_init,
-> +        .class_init = object_class_init,
->          .abstract = true,
->      };
->  
-> 
+> > +    if (atomic_read(&staged_msg->state) !=3D HV_STAGED_MSG_POSTED) {
+> > +        /* status nor ready yet (spurious ack from guest?), ignore */
+> > +        return;
+> > +    }
+> > +
+>=20
+> Can this actually happen?  It seems scary...
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+I don't see off-hand what can stop the guest from wrmsr HV_X64_MSR_EOM
+at an arbitrary moment, which AFAICS will result in this eventfd being
+signaled.  I haven't seen this codepath being taken in real life but
+I think it provides enough protection for the internal state from being
+screwed up by such an unexpected signal.
+
+Thanks,
+Roman.
