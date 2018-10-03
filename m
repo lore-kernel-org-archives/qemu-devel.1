@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7h5H-00012F-Mj
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:21:01 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7h60-0001La-4k
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:21:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7h5D-0006A9-Q0
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:20:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55732)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g7h5D-00069b-Ip
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:20:55 -0400
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
-	[10.5.11.24])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D5C174E33A
-	for <qemu-devel@nongnu.org>; Wed,  3 Oct 2018 13:20:54 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  3 Oct 2018 17:20:41 +0400
-Message-Id: <20181003132041.10075-1-marcandre.lureau@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7h5w-0006aV-7C
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:21:44 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 3 Oct 2018 13:21:37 +0000
+Message-ID: <6e081066-4a5f-36ee-54fc-36702c830f49@virtuozzo.com>
+References: <20181002230218.13949-1-jsnow@redhat.com>
+	<20181002230218.13949-6-jsnow@redhat.com>
+	<46167222-a029-6c2d-c5f3-5383b7f4f4f4@redhat.com>
+In-Reply-To: <46167222-a029-6c2d-c5f3-5383b7f4f4f4@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <391B93039B108848ABA7F043A0531987@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] configure: remove glib_subprocess check
+Subject: Re: [Qemu-devel] [PATCH v4 5/6] block/backup: prohibit backup from
+ using in use bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This should have been removed as part of commit
-692fbdf9f4c6f6bafd0b3a4d4f94973effd3bbae.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- configure | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/configure b/configure
-index a7368044cc..4f6d6e03b1 100755
---- a/configure
-+++ b/configure
-@@ -3557,12 +3557,6 @@ if ! compile_prog "$CFLAGS" "$LIBS" ; then
- 	       "build target"
- fi
-=20
--# g_test_trap_subprocess added in 2.38. Used by some tests.
--glib_subprocess=3Dyes
--if ! $pkg_config --atleast-version=3D2.38 glib-2.0; then
--    glib_subprocess=3Dno
--fi
--
- # Silence clang 3.5.0 warnings about glib attribute __alloc_size__ usage
- cat > $TMPC << EOF
- #include <glib.h>
---=20
-2.19.0.271.gfe8321ec05
+MDMuMTAuMjAxOCAxNToyOCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTAvMi8xOCA2OjAyIFBN
+LCBKb2huIFNub3cgd3JvdGU6DQo+PiBJZiB0aGUgYml0bWFwIGlzIGZyb3plbiwgd2Ugc2hvdWxk
+bid0IHRvdWNoIGl0Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVk
+aGF0LmNvbT4NCj4+IC0tLQ0KPj4gwqAgYmxvY2tkZXYuYyB8IDEyICsrKysrKy0tLS0tLQ0KPj4g
+wqAgMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkNCj4+DQo+
+PiBkaWZmIC0tZ2l0IGEvYmxvY2tkZXYuYyBiL2Jsb2NrZGV2LmMNCj4+IGluZGV4IGQwZmViZmNh
+NzkuLjA5OGQ0YzMzN2YgMTAwNjQ0DQo+PiAtLS0gYS9ibG9ja2Rldi5jDQo+PiArKysgYi9ibG9j
+a2Rldi5jDQo+PiBAQCAtMzUxMiwxMCArMzUxMiwxMCBAQCBzdGF0aWMgQmxvY2tKb2IgKmRvX2Ry
+aXZlX2JhY2t1cChEcml2ZUJhY2t1cCANCj4+ICpiYWNrdXAsIEpvYlR4biAqdHhuLA0KPj4gwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYmRydl91bnJlZih0YXJnZXRfYnMpOw0KPj4gwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgZ290byBvdXQ7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqAgfQ0K
+Pj4gLcKgwqDCoMKgwqDCoMKgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF9xbXBfbG9ja2VkKGJtYXAp
+KSB7DQo+PiArwqDCoMKgwqDCoMKgwqAgaWYgKGJkcnZfZGlydHlfYml0bWFwX3VzZXJfbG9ja2Vk
+KGJtYXApKSB7DQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9zZXRnKGVycnAs
+DQo+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgIkJpdG1h
+cCAnJXMnIGlzIGN1cnJlbnRseSBsb2NrZWQgYW5kIGNhbm5vdCANCj4+IGJlIHVzZWQgZm9yICIN
+Cj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAiYmFja3Vw
+IiwgYmFja3VwLT5iaXRtYXApOw0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgICJCaXRtYXAgJyVzJyBpcyBjdXJyZW50bHkgaW4gdXNlIGJ5IGFub3RoZXIg
+DQo+PiBvcGVyYXRpb24iDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgIiBhbmQgY2Fubm90IGJlIHVzZWQgZm9yIGJhY2t1cCIsIA0KPj4gYmFja3VwLT5i
+aXRtYXApOw0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZ290byBvdXQ7DQo+DQo+IElz
+IHRoaXMgcmlnaHQ/wqAgV2h5IGNhbiB3ZSBub3QgaGF2ZSB0d28gcGFyYWxsZWwgYmFja3VwcyB1
+dGlsaXppbmcgdGhlIA0KPiBzYW1lIHVuY2hhbmdpbmcgbG9ja2VkIGJpdG1hcCBhcyBpdHMgc291
+cmNlP8KgIE9mIGNvdXJzZSwgdG8gZG8gdGhhdCwgDQo+IHdlJ2QgbmVlZCB0aGUgY29uZGl0aW9u
+IG9mIGJlaW5nIGxvY2tlZCB0byBiZSBhIHJlZi1jb3VudGVyIChpbmNyZW1lbnQgDQo+IGZvciBl
+YWNoIGJhY2t1cCB0aGF0IHJldXNlcyB0aGUgYml0bWFwLCBkZWNyZW1lbnQgd2hlbiB0aGUgYmFj
+a3VwIA0KPiBmaW5pc2hlcywgYW5kIGl0IGlzIHVubG9ja2VkIHdoZW4gdGhlIGNvdW50ZXIgaXMg
+MCkgcmF0aGVyIHRoYW4gYSANCj4gYm9vbC4gU28sIHdpdGhvdXQgdGhhdCBsYXJnZXIgcmVmYWN0
+b3JpbmcsIHRoaXMgaXMgYSBjb25zZXJ2YXRpdmUgDQo+IGFwcHJvYWNoIHRoYXQgaXMgYSBsaXR0
+bGUgdG9vIHN0cmljdCwgYnV0IGFsbG93cyBmb3IgYSBzaW1wbGVyIA0KPiBpbXBsZW1lbnRhdGlv
+bi4gQW5kIHRoZSB1c2VyIGNhbiBhbHdheXMgd29yayBhcm91bmQgdGhlIGxpbWl0YXRpb24gYnkg
+DQo+IGNsb25pbmcgdGhlIGxvY2tlZCBiaXRtYXAgaW50byBhbm90aGVyIHRlbXBvcmFyeSBiaXRt
+YXAsIGFuZCBzdGFydGluZyANCj4gdGhlIHNlY29uZCBwYXJhbGxlbCBiYWNrdXAgd2l0aCB0aGUg
+c2Vjb25kIGJhY2t1cCBpbnN0ZWFkIG9mIHRoZSANCj4gb3JpZ2luYWwuDQoNCmhtLCBmaXJzdGx5
+LCB3ZSBjYW4gaGF2ZSBvbmx5IG9uZSBqb2IgcGVyIGJkcyAob25seSBvbmUgYmFja3VwIHdpdGgg
+dGhpcyANCnNvdXJjZSksIGFuZCBub3cgd2UgZG9uJ3Qgc2VhcmNoIGZvciBiYWNrdXAgYml0bWFw
+IGFueXdoZXJlIGVsc2UgdGhhbiANCnNvdXJjZSBiZHMsIHNvIGJpdG1hcCBzaGFyaW5nIGlzIGlt
+cG9zc2libGUuIFNlY29uZGx5LCB3aGVuIHdlIHN1cHBvcnQgDQpzZXZlcmFsIGpvYnMgcGVyIGJk
+cywgb3IgYWxsb3cgdXNpbmcgYml0bWFwcyBvZiBzb3VyY2UgYmFja2luZyBjaGFpbiANCihmb3Ig
+ZXhhbXBsZSksIEknbSBhZnJhaWQgdGhhdCBpdCBpcyBzdGlsbCBhIGJhZCBpZGVhIHRvIHNoYXJl
+IHRoZSANCmJpdG1hcCwgYmVjYXVzZSBiYWNrdXAgc2hvdWxkIHRvIGFiZGljYXRlL3JlY2xhaW0g
+dGhlIGJpdG1hcCBhdCBpdHMgDQpmaW5pc2gsIHdoaWNoIGRlZmluaXRlbHkgYWZmZWN0IHRoZSBz
+ZWNvbmQgYmFja3VwLg0KDQpNYXliZSB3ZSdsbCBmaW5hbGx5IGNvbWUgdG8gbm90IGRvaW5nIHJl
+Y2xhaW0vYWJkaWNhdGUgYXV0b21hdGljYWxseSBpbiANCmJhY2t1cCBhbmQgdXNlciB3aWxsIGp1
+c3QgZW5hYmxlL2Rpc2FibGUvbWVyZ2UgYml0bWFwcyBieSBoYW5kIGFzIGhlIA0Kd2FudHMuIEl0
+IGlzIG5lYXIgdG8gYmUgcG9zc2libGUgbm93LCB3ZSBqdXN0IG5lZWQgYSBmbGFnIGZvciBzdWNo
+IA0KYmVoYXZpb3IsIGFzIGJhY2t1cCBub3cgdXNlIHN5bmMgYml0bWFwIG9ubHkgb24gaW5pdGlh
+bGl6YXRpb24gcGhhc2UsIHRvIA0KaW5pdGlhbGl6ZSBjb3B5X2JpdG1hcC4gU28sIGJhY2t1cCBp
+dHNlbGYgZG9uJ3QgbmVlZCBkaXNhYmxpbmcgb3IgDQpsb2NraW5nIG9mIHRoZSBiaXRtYXAgYW5k
+IGZyZWV6ZS9hYmRpY2F0ZS9yZWNsYWltIGlzIGFuIGFkZGl0aW9uYWwgbG9naWMuDQoNCj4NCj4g
+V2VhayBSZXZpZXdlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+DQoNCg0K
+LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0KDQo=
