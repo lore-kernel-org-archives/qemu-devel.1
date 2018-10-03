@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7l6l-0003zA-5m
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:38:50 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7lDK-0007sZ-25
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7l6g-0006xQ-Mi
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:38:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7lDJ-0003n7-7G
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:45:33 -0400
 References: <20181003171947.588103-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <07bf9075-8534-ca7b-87f5-e9f0e6442668@virtuozzo.com>
-Date: Wed, 3 Oct 2018 20:38:06 +0300
+	<07bf9075-8534-ca7b-87f5-e9f0e6442668@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <baf45cbc-5710-bb6a-8d8b-e1fd1bb14654@redhat.com>
+Date: Wed, 3 Oct 2018 12:45:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181003171947.588103-1-eblake@redhat.com>
+In-Reply-To: <07bf9075-8534-ca7b-87f5-e9f0e6442668@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] nbd: Flip qemu-nbd to prefer newstyle;
  add -O for old behavior
 List-Id: <qemu-devel.nongnu.org>
@@ -24,125 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-03.10.2018 20:19, Eric Blake wrote:
-> Oldstyle NBD negotiation cannot perform any of the extensions that
-> we have recently been relying on.  While you can always pass -x ""
-> to get newstyle negotiation, these days, it is better to just default
-> to newstyle (with an empty export name) and fall back to oldstyle
-> only on an explicit request.
->
-> For comparison:
->
-> nbdkit 1.3 switched its default to newstyle (Jan 2018):
-> https://github.com/libguestfs/nbdkit/commit/b2a8aecc
-> https://github.com/libguestfs/nbdkit/commit/8158e773
->
-> nbd 3.10 dropped oldstyle long ago (Mar 2015):
-> https://github.com/NetworkBlockDevice/nbd/commit/36940193
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->   qemu-nbd.c | 27 +++++++++++++++++++--------
->   1 file changed, 19 insertions(+), 8 deletions(-)
->
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index 51b9d38c727..8571a4f93d8 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -86,6 +86,7 @@ static void usage(const char *name)
->   "  -v, --verbose             display extra debugging information\n"
->   "  -x, --export-name=NAME    expose export by name\n"
->   "  -D, --description=TEXT    with -x, also export a human-readable description\n"
+On 10/3/18 12:38 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 03.10.2018 20:19, Eric Blake wrote:
+>> Oldstyle NBD negotiation cannot perform any of the extensions that
+>> we have recently been relying on.=C2=A0 While you can always pass -x "=
+"
+>> to get newstyle negotiation, these days, it is better to just default
+>> to newstyle (with an empty export name) and fall back to oldstyle
+>> only on an explicit request.
+>>
 
-If we prefer this way, -x and -D descriptions should be updated a bit, 
-like in my patch
+>> +=C2=A0=C2=A0=C2=A0 if (oldstyle && (export_name || export_description=
+)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("oldstyle neg=
+otiation cannot set export details");
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(EXIT_FAILURE);
+>> +=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (export_name) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nbd_export_set_=
+name(exp, export_name);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nbd_export_set_=
+description(exp, export_description);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 newproto =3D tr=
+ue;
+>=20
+> a bit strange, to have both newproto and oldstyle variables which are=20
+> opposite by value.
 
-> +"  -O, --oldstyle            force oldstyle negotiation\n"
->   "\n"
->   "Exposing part of the image:\n"
->   "  -o, --offset=OFFSET       offset into the image\n"
-> @@ -529,6 +530,7 @@ int main(int argc, char **argv)
->           { "object", required_argument, NULL, QEMU_NBD_OPT_OBJECT },
->           { "export-name", required_argument, NULL, 'x' },
->           { "description", required_argument, NULL, 'D' },
-> +        { "oldstyle", no_argument, NULL, 'O' },
->           { "tls-creds", required_argument, NULL, QEMU_NBD_OPT_TLSCREDS },
->           { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },
->           { "trace", required_argument, NULL, 'T' },
-> @@ -551,6 +553,7 @@ int main(int argc, char **argv)
->       QDict *options = NULL;
->       const char *export_name = NULL;
->       const char *export_description = NULL;
-> +    bool oldstyle = false;
->       const char *tlscredsid = NULL;
->       bool imageOpts = false;
->       bool writethrough = true;
-> @@ -723,6 +726,9 @@ int main(int argc, char **argv)
->           case 'D':
->               export_description = optarg;
->               break;
-> +        case 'O':
-> +            oldstyle = true;
-> +            break;
->           case 'v':
->               verbose = 1;
->               break;
-> @@ -799,7 +805,16 @@ int main(int argc, char **argv)
->           }
->       }
->
-> +    if (!oldstyle && !export_name) {
-> +        /* Set the default NBD protocol export name, to favor new style. */
-> +        export_name = "";
-> +    }
-> +
->       if (tlscredsid) {
-> +        if (oldstyle) {
-> +            error_report("TLS is incompatible with oldstyle");
-> +            exit(EXIT_FAILURE);
-> +        }
->           if (sockpath) {
->               error_report("TLS is only supported with IPv4/IPv6");
->               exit(EXIT_FAILURE);
-> @@ -808,11 +823,6 @@ int main(int argc, char **argv)
->               error_report("TLS is not supported with a host device");
->               exit(EXIT_FAILURE);
->           }
-> -        if (!export_name) {
-> -            /* Set the default NBD protocol export name, since
-> -             * we *must* use new style protocol for TLS */
-> -            export_name = "";
-> -        }
->           tlscreds = nbd_get_tls_creds(tlscredsid, &local_err);
->           if (local_err) {
->               error_report("Failed to get TLS creds %s",
-> @@ -1013,13 +1023,14 @@ int main(int argc, char **argv)
->           error_report_err(local_err);
->           exit(EXIT_FAILURE);
->       }
-> +    if (oldstyle && (export_name || export_description)) {
-> +        error_report("oldstyle negotiation cannot set export details");
-> +        exit(EXIT_FAILURE);
-> +    }
->       if (export_name) {
->           nbd_export_set_name(exp, export_name);
->           nbd_export_set_description(exp, export_description);
->           newproto = true;
+Yeah. I added a function-local 'oldstyle' before noticing that there was=20
+a file static 'newproto'. We could squash this in:
 
-a bit strange, to have both newproto and oldstyle variables which are 
-opposite by value.
+diff --git i/qemu-nbd.c w/qemu-nbd.c
+index 8571a4f93d8..2b0f7de86d0 100644
+--- i/qemu-nbd.c
++++ w/qemu-nbd.c
+@@ -56,7 +56,7 @@
+  #define MBR_SIZE 512
 
-> -    } else if (export_description) {
-> -        error_report("Export description requires an export name");
-> -        exit(EXIT_FAILURE);
->       }
->
->       if (device) {
+  static NBDExport *exp;
+-static bool newproto;
++static bool oldstyle;
+  static int verbose;
+  static char *srcpath;
+  static SocketAddress *saddr;
+@@ -355,7 +355,7 @@ static void nbd_accept(QIONetListener *listener,=20
+QIOChannelSocket *cioc,
+
+      nb_fds++;
+      nbd_update_server_watch();
+-    nbd_client_new(newproto ? NULL : exp, cioc,
++    nbd_client_new(oldstyle ? exp : NULL, cioc,
+                     tlscreds, NULL, nbd_client_closed);
+  }
+
+@@ -553,7 +553,6 @@ int main(int argc, char **argv)
+      QDict *options =3D NULL;
+      const char *export_name =3D NULL;
+      const char *export_description =3D NULL;
+-    bool oldstyle =3D false;
+      const char *tlscredsid =3D NULL;
+      bool imageOpts =3D false;
+      bool writethrough =3D true;
+@@ -1030,7 +1029,6 @@ int main(int argc, char **argv)
+      if (export_name) {
+          nbd_export_set_name(exp, export_name);
+          nbd_export_set_description(exp, export_description);
+-        newproto =3D true;
+      }
+
+      if (device) {
 
 
--- 
-Best regards,
-Vladimir
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
