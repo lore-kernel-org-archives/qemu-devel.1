@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7la2-0003m5-60
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:09:03 -0400
+	(envelope-from <philmd@redhat.com>) id 1g7m12-0006eL-7q
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7la1-0000fv-3a
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:09:02 -0400
-References: <20181003170228.95973-1-vsementsov@virtuozzo.com>
-	<bccd1e94-431f-c7cf-4a0c-599dcf345e73@redhat.com>
-	<a6a5cfb4-bfad-a4f5-fb86-e9329da851b6@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e4459a14-298e-1cd7-0805-e7ec30c3fb01@redhat.com>
-Date: Wed, 3 Oct 2018 13:08:51 -0500
+	(envelope-from <philmd@redhat.com>) id 1g7lvg-0000tx-4b
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:31:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48902)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7lve-0000mU-7K
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:31:23 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3B53E85550
+	for <qemu-devel@nongnu.org>; Wed,  3 Oct 2018 18:31:04 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Wed,  3 Oct 2018 20:30:35 +0200
+Message-Id: <20181003183036.6716-3-philmd@redhat.com>
+In-Reply-To: <20181003183036.6716-1-philmd@redhat.com>
+References: <20181003183036.6716-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a6a5cfb4-bfad-a4f5-fb86-e9329da851b6@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] nbd server: drop old-style negotiation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH v2 2/3] acceptance tests: Add EDK2 OVMF
+ boot and debug console checking test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +33,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "rjones@redhat.com" <rjones@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-On 10/3/18 12:59 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 03.10.2018 20:32, Eric Blake wrote:
-> On 10/3/18 12:02 PM, Vladimir Sementsov-Ogievskiy wrote:
-> It's unexpected behavior that without -x option qemu-nbd do old-style
-> negotiation. Let's use "" as a default name instead (as it is already
-> done if tls is used) and therefore, drop old-style negotiation from
-> Qemu NBD server.
+This test boots OVMF and check the debug console (I/O port on the ISA bus=
+)
+report enough information on the initialized devices.
 
-Hmm, your email quoting style changed from prior emails that used to 
-prepend '>' when quoting, making it harder to tell where the text you 
-are quoting ends,...
+$ avocado --show=3Dapp,debugcon run tests/acceptance/boot_firmware.py
+ (1/1) tests/acceptance/boot_firmware.py:BootFirmware.test_ovmf_pc:
+debugcon: SecCoreStartupWithStack(0xFFFCC000, 0x820000)
+debugcon: SEC: Normal boot
+...
+debugcon: [Bds]Booting EFI Internal Shell
+PASS (5.27 s)
+JOB TIME   : 5.60 s
 
-> 
-> Oddly enough, I wrote a similar patch in parallel, and am only now just seeing your mail. Yours is a bit stronger than mine (I added 'qemu-nbd -O' to allow explicit fallback to oldstyle, while you ripped it out altogether).  The client can negotiate either style, so we don't need an option on the client side; rather, this is all about what the server should do by default.
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00568.html
-> 
-> Does anyone have a preference between the two? Here's the last time it was discussed:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg03252.html
-> 
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ tests/acceptance/boot_firmware.py | 49 +++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-and your reply begins.
-
-> Hm, I think everyone who like new-style should answer that he don't care (except stricter way is a bit better: don't have options and code which we don't need).
-> But if there is someone who has client which support only old-style negotiation his unhappiness (in case of strict way) will outweigh all our "bits":)
-> 
-> I'm from the first group). But let's chose your patch
-
-My argument in favor of your patch over mine: nbdkit is a GREAT testbed 
-for forcing all sorts of integration testing scenarios, including 
-oldstyle servers.  Also, it includes a plugin for translating between 
-new and oldstyle at will.  That is, if we ever legitimately encounter a 
-client that can only talk oldstyle, but qemu only talks newstyle, we 
-just tell the user to connect:
-
-old client => nbdkit -o nbd => newstyle qemu
-
-and then qemu doesn't have to worry about oldstyle because nbdkit does 
-instead.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/tests/acceptance/boot_firmware.py b/tests/acceptance/boot_fi=
+rmware.py
+index 669e4849f6..2053b1a4b6 100644
+--- a/tests/acceptance/boot_firmware.py
++++ b/tests/acceptance/boot_firmware.py
+@@ -72,3 +72,52 @@ class BootFirmware(Test):
+                 debugcon_logger.debug(line.strip())
+             for exp in expected:
+                 self.assertIn(exp + '\n', content)
++
++    def test_ovmf_pc(self):
++        """
++        Boots OVMF on the default PC machine, checks the debug console
++
++        :avocado: tags=3Darch:x86_64
++        :avocado: tags=3Dmaxtime:10s
++        """
++        debugcon_path =3D os.path.join(self.workdir, 'debugconsole.log')
++        serial_logger =3D logging.getLogger('serial')
++        debugcon_logger =3D logging.getLogger('debugcon')
++
++        self.vm.set_machine('pc')
++        self.vm.set_console()
++        self.vm.add_args('-nographic',
++                         '-net', 'none',
++                         '-global', 'isa-debugcon.iobase=3D0x402',
++                         '-debugcon', 'file:%s' % debugcon_path,
++                         '--bios', '/usr/share/OVMF/OVMF_CODE.fd')
++        self.vm.launch()
++        console =3D self.vm.console_socket.makefile()
++
++        # serial console checks
++        if not wait_for(read_console_for_string, timeout=3D10, step=3D0,
++                        args=3D(console, 'EDK II', serial_logger)):
++            self.fail("OVMF failed to boot")
++
++        # debug console checks
++        expected =3D [
++            'SEC: Normal boot',
++            'S3 support was detected on QEMU',
++            'Platform PEI Firmware Volume Initialization',
++            'DXE IPL Entry',
++            'Installing FVB for EMU Variable support',
++            'SmbiosCreateTable: Initialize 32-bit entry point structure'=
+,
++            'PlatformBootManagerBeforeConsole',
++            'OnRootBridgesConnected: root bridges have been connected, '
++                'installing ACPI tables',
++            'Found LPC Bridge device',
++            'PlatformBootManagerAfterConsole',
++            'EfiBootManagerConnectAll',
++            '[Bds]Booting EFI Internal Shell',
++        ]
++        with open(debugcon_path) as debugcon:
++            content =3D debugcon.readlines()
++            for line in content: # TODO use FDDrainer
++                debugcon_logger.debug(line.strip())
++            for exp in expected:
++                self.assertIn(exp + '\r\n', content)
+--=20
+2.17.1
