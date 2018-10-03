@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7ezu-000793-AS
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:07:20 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g7f3w-0001se-A1
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:11:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7ezr-0007bZ-4f
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:07:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51142)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7ezq-0007at-Sz
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:07:15 -0400
-References: <20180921082217.29481-1-rkagan@virtuozzo.com>
-	<20180921082217.29481-6-rkagan@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <47ed971a-71c8-4a95-c1e0-697c68a7a82c@redhat.com>
-Date: Wed, 3 Oct 2018 13:06:58 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g7f3v-0001xg-JI
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:11:28 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38525)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g7f3u-0001xF-UU
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:11:27 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a13-v6so5649432wrt.5
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 04:11:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180921082217.29481-6-rkagan@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 05/10] hyperv: add synic message delivery
+References: <20181003104605.8477-1-kchamart@redhat.com>
+In-Reply-To: <20181003104605.8477-1-kchamart@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 3 Oct 2018 15:11:13 +0400
+Message-ID: <CAJ+F1CKauAv6YCdszfR=L3b10vVeK+Vn=XpVmU9ravqNOyubHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qapi/misc.json: Remove superfluous words
+ in CpuModelExpansionType
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 21/09/2018 10:22, Roman Kagan wrote:
-> +typedef struct HvSintStagedMesage {
-> +    /* message content staged by hyperv_post_msg */
-> +    struct hyperv_message msg;
-> +    /* callback + data (r/o) to complete the processing in a BH */
-> +    HvSintMsgCb cb;
-> +    void *cb_data;
-> +    /* message posting status filled by cpu_post_msg */
-> +    int status;
-> +    /* passing the buck: */
-> +    enum {
-> +        /* initial state */
-> +        HV_STAGED_MSG_FREE,
-> +        /*
-> +         * hyperv_post_msg (e.g. in main loop) grabs the staged area (FREE ->
-> +         * BUSY), copies msg, and schedules cpu_post_msg on the assigned cpu
-> +         */
-> +        HV_STAGED_MSG_BUSY,
-> +        /*
-> +         * cpu_post_msg (vcpu thread) tries to copy staged msg to msg slot,
-> +         * notify the guest, records the status, marks the posting done (BUSY
-> +         * -> POSTED), and schedules sint_msg_bh BH
-> +         */
-> +        HV_STAGED_MSG_POSTED,
-> +        /*
-> +         * sint_msg_bh (BH) verifies that the posting is done, runs the
-> +         * callback, and starts over (POSTED -> FREE)
-> +         */
-> +    } state;
-> +} HvSintStagedMesage;
+Hi
 
-s/Mesage/Message/
+On Wed, Oct 3, 2018 at 3:02 PM Kashyap Chamarthy <kchamart@redhat.com> wrot=
+e:
+>
+> While at it, s/QMU/QEMU in @CpuDefinitionInfo.
+>
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
 
-> +    if (atomic_read(&staged_msg->state) != HV_STAGED_MSG_POSTED) {
-> +        /* status nor ready yet (spurious ack from guest?), ignore */
-> +        return;
-> +    }
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+> ---
+>  qapi/misc.json | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index ada9af5add..f98de3a58c 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -2017,7 +2017,7 @@
+>  #
+>  # @migration-safe: whether a CPU definition can be safely used for
+>  #                  migration in combination with a QEMU compatibility ma=
+chine
+> -#                  when migrating between different QMU versions and bet=
+ween
+> +#                  when migrating between different QEMU versions and be=
+tween
+>  #                  hosts with different sets of (hardware or software)
+>  #                  capabilities. If not provided, information is not ava=
+ilable
+>  #                  and callers should not assume the CPU definition to b=
+e
+> @@ -2126,11 +2126,11 @@
+>  # @static: Expand to a static CPU model, a combination of a static base
+>  #          model name and property delta changes. As the static base mod=
+el will
+>  #          never change, the expanded CPU model will be the same, indepe=
+ndent of
+> -#          independent of QEMU version, machine type, machine options, a=
+nd
+> -#          accelerator options. Therefore, the resulting model can be us=
+ed by
+> -#          tooling without having to specify a compatibility machine - e=
+.g. when
+> -#          displaying the "host" model. static CPU models are migration-=
+safe.
+> -#
+> +#          QEMU version, machine type, machine options, and accelerator =
+options.
+> +#          Therefore, the resulting model can be used by tooling without=
+ having
+> +#          to specify a compatibility machine - e.g. when displaying the=
+ "host"
+> +#          model. The @static CPU models are migration-safe.
 > +
+>  # @full: Expand all properties. The produced model is not guaranteed to =
+be
+>  #        migration-safe, but allows tooling to get an insight and work w=
+ith
+>  #        model details.
+> --
+> 2.17.1
+>
+>
 
-Can this actually happen?  It seems scary...
 
-Paolo
+--=20
+Marc-Andr=C3=A9 Lureau
