@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7kzm-00070i-CO
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:31:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7l0q-0008WM-N7
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7kzk-00026w-Vs
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:31:34 -0400
-References: <20181003170228.95973-1-vsementsov@virtuozzo.com>
-	<20181003170228.95973-2-vsementsov@virtuozzo.com>
+	(envelope-from <eblake@redhat.com>) id 1g7l0p-0002xP-S0
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:32:40 -0400
+References: <20181003171947.588103-1-eblake@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <75bd09f2-2e18-9c82-d918-0fc99d5279f5@redhat.com>
-Date: Wed, 3 Oct 2018 12:31:11 -0500
+Message-ID: <3d9490dd-972f-ad50-2a7d-4024415a4ec8@redhat.com>
+Date: Wed, 3 Oct 2018 12:32:32 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181003170228.95973-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20181003171947.588103-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-nbd: drop old-style negotiation
+Subject: Re: [Qemu-devel] [PATCH] nbd: Flip qemu-nbd to prefer newstyle;
+ add -O for old behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@virtuozzo.com, rjones@redhat.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
 
-On 10/3/18 12:02 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Use new-style negotiation always, with default "" (empty) export name
-> if it is not specified with '-x' option.
+On 10/3/18 12:19 PM, Eric Blake wrote:
+> Oldstyle NBD negotiation cannot perform any of the extensions that
+> we have recently been relying on.  While you can always pass -x ""
+> to get newstyle negotiation, these days, it is better to just default
+> to newstyle (with an empty export name) and fall back to oldstyle
+> only on an explicit request.
+> 
+> For comparison:
+> 
+> nbdkit 1.3 switched its default to newstyle (Jan 2018):
+> https://github.com/libguestfs/nbdkit/commit/b2a8aecc
+> https://github.com/libguestfs/nbdkit/commit/8158e773
+> 
+> nbd 3.10 dropped oldstyle long ago (Mar 2015):
+> https://github.com/NetworkBlockDevice/nbd/commit/36940193
 
-If we like this approach (over mine of keeping oldstyle, but via an 
-explicit -O option), then this commit message should add the following:
+Oh, I should also add:
 
 qemu as client can manage either style since 2.6.0, commit 69b49502d8
 
-For comparison:
+> +++ b/qemu-nbd.c
+> @@ -86,6 +86,7 @@ static void usage(const char *name)
+>   "  -v, --verbose             display extra debugging information\n"
+>   "  -x, --export-name=NAME    expose export by name\n"
+>   "  -D, --description=TEXT    with -x, also export a human-readable description\n"
+> +"  -O, --oldstyle            force oldstyle negotiation\n"
 
-nbdkit 1.3 switched its default to newstyle (Jan 2018):
-https://github.com/libguestfs/nbdkit/commit/b2a8aecc
-https://github.com/libguestfs/nbdkit/commit/8158e773
-
-nbd 3.10 dropped oldstyle long ago (Mar 2015):
-https://github.com/NetworkBlockDevice/nbd/commit/36940193
-
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   qemu-nbd.c | 25 ++++++-------------------
->   1 file changed, 6 insertions(+), 19 deletions(-)
-> 
-
-If we like your patch over mine,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+and maybe I should touch up the -x and -D wording, to at least mention 
+that -x defaults to "" without -O.
 
 -- 
 Eric Blake, Principal Software Engineer
