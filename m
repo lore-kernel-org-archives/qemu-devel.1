@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7kqg-0001Po-Vr
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:22:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7kzm-00070i-CO
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7kqc-0002tL-WF
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:22:10 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46744)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g7kqc-0002sj-IH
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:22:06 -0400
-Received: by mail-oi1-x242.google.com with SMTP id k64-v6so5165768oia.13
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 10:22:06 -0700 (PDT)
-References: <1538118095-7003-1-git-send-email-thuth@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <567fd724-ee48-41f5-b36b-c879b55fe160@linaro.org>
-Date: Wed, 3 Oct 2018 12:22:02 -0500
+	(envelope-from <eblake@redhat.com>) id 1g7kzk-00026w-Vs
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:31:34 -0400
+References: <20181003170228.95973-1-vsementsov@virtuozzo.com>
+	<20181003170228.95973-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <75bd09f2-2e18-9c82-d918-0fc99d5279f5@redhat.com>
+Date: Wed, 3 Oct 2018 12:31:11 -0500
 MIME-Version: 1.0
-In-Reply-To: <1538118095-7003-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181003170228.95973-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: Replace
- countLeadingZeros32/64 with clz32/64
+Subject: Re: [Qemu-devel] [PATCH 1/2] qemu-nbd: drop old-style negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@virtuozzo.com, rjones@redhat.com, berrange@redhat.com
 
-On 9/28/18 2:01 AM, Thomas Huth wrote:
-> Our minimum required compiler for compiling QEMU is GCC 4.1 these days,
-> so we can drop the support for compilers which do not provide the
-> __builtin_clz*() functions yet. Since the countLeadingZeros32/64 are
-> then identical to the clz32/64 functions, and we do not have to sync
-> the softloat 2 codebase with upstream anymore (softloat 3 is a complete
-> rewrite) we can simply replace the functions with our QEMU versions.
+On 10/3/18 12:02 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Use new-style negotiation always, with default "" (empty) export name
+> if it is not specified with '-x' option.
+
+If we like this approach (over mine of keeping oldstyle, but via an 
+explicit -O option), then this commit message should add the following:
+
+qemu as client can manage either style since 2.6.0, commit 69b49502d8
+
+For comparison:
+
+nbdkit 1.3 switched its default to newstyle (Jan 2018):
+https://github.com/libguestfs/nbdkit/commit/b2a8aecc
+https://github.com/libguestfs/nbdkit/commit/8158e773
+
+nbd 3.10 dropped oldstyle long ago (Mar 2015):
+https://github.com/NetworkBlockDevice/nbd/commit/36940193
+
 > 
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  fpu/softfloat.c                | 26 ++++++-------
->  include/fpu/softfloat-macros.h | 87 ------------------------------------------
->  2 files changed, 13 insertions(+), 100 deletions(-)
+>   qemu-nbd.c | 25 ++++++-------------------
+>   1 file changed, 6 insertions(+), 19 deletions(-)
+> 
 
-Queued, thanks.
+If we like your patch over mine,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-
-r~
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
