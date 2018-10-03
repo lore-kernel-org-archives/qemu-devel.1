@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7i0r-0006JM-Sc
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:20:31 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1g7i1Z-0006rY-AK
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7i0o-0006AB-PL
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:20:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g7i0o-00063R-Ey
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:20:26 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  3 Oct 2018 18:18:33 +0400
-Message-Id: <20181003141833.21493-13-marcandre.lureau@redhat.com>
-In-Reply-To: <20181003141833.21493-1-marcandre.lureau@redhat.com>
-References: <20181003141833.21493-1-marcandre.lureau@redhat.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1g7i1V-0007Xz-9B
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:21:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41034)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1g7i1U-0007WM-U2
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:21:09 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w93EF5DV124034
+	for <qemu-devel@nongnu.org>; Wed, 3 Oct 2018 10:21:07 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2mvwvj4d9k-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 10:21:06 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 3 Oct 2018 08:21:06 -0600
+References: <20181003132129.11210-1-marcandre.lureau@redhat.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 3 Oct 2018 10:21:02 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20181003132129.11210-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <b37baca4-cab1-f6f1-f35f-70b867ec07a1@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/12] vl: list user creatable properties when
- 'help' is argument
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/tpm: fix
+ tpm_util_swtpm_has_tpm2()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +42,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-Iterate over the writable class properties, sort and print them out
-with the description if available.
+On 10/3/18 9:21 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Using g_spawn_async_with_pipes() is more complicated than running the
+> sync version. The async version returns a file descriptor for stdout, w=
+hich may
+> not be fully read. Sometime "--tpm2" will failed to be read, and will
+> cause the related test to be silently skipped.
+>
+> Use g_spawn_sync() instead, simplifying the code and fixing the race.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>   tests/tpm-util.c | 46 ++++++++++++++++++++--------------------------
+>   1 file changed, 20 insertions(+), 26 deletions(-)
+>
+> diff --git a/tests/tpm-util.c b/tests/tpm-util.c
+> index 9f3f156e42..ae4aaf35ca 100644
+> --- a/tests/tpm-util.c
+> +++ b/tests/tpm-util.c
+> @@ -145,39 +145,33 @@ void tpm_util_pcrread(QTestState *s, tx_func *tx,
+>       g_assert_cmpmem(buffer, exp_resp_size, exp_resp, exp_resp_size);
+>   }
+>
+> -static gboolean tpm_util_swtpm_has_tpm2(void)
+> +static bool tpm_util_swtpm_has_tpm2(void)
+>   {
+> -    gint mystdout;
+> -    gboolean succ;
+> -    unsigned i;
+> -    char buffer[10240];
+> -    ssize_t n;
+> -    gchar *swtpm_argv[] =3D {
+> -        g_strdup("swtpm"), g_strdup("socket"), g_strdup("--help"), NUL=
+L
+> +    bool has_tpm2 =3D false;
+> +    char *out =3D NULL;
+> +    static const char *argv[] =3D {
+> +        "swtpm", "socket", "--help", NULL
+>       };
+>
+> -    succ =3D g_spawn_async_with_pipes(NULL, swtpm_argv, NULL,
+> -                                    G_SPAWN_SEARCH_PATH, NULL, NULL, N=
+ULL,
+> -                                    NULL, &mystdout, NULL, NULL);
+> -    if (!succ) {
+> -        goto cleanup;
+> +    if (!g_spawn_sync(NULL /* working_dir */,
+> +                      (char **)argv,
+> +                      NULL /* envp */,
+> +                      G_SPAWN_SEARCH_PATH,
+> +                      NULL /* child_setup */,
+> +                      NULL /* user_data */,
+> +                      &out,
+> +                      NULL /* err */,
+> +                      NULL /* exit_status */,
+> +                      NULL)) {
+> +        return false;
+>       }
+>
+> -    n =3D read(mystdout, buffer, sizeof(buffer) - 1);
+> -    if (n < 0) {
+> -        goto cleanup;
+> -    }
+> -    buffer[n] =3D 0;
+> -    if (!strstr(buffer, "--tpm2")) {
+> -        succ =3D false;
+> -    }
+> -
+> - cleanup:
+> -    for (i =3D 0; swtpm_argv[i]; i++) {
+> -        g_free(swtpm_argv[i]);
+> +    if (strstr(out, "--tpm2")) {
+> +        has_tpm2 =3D true;
+>       }
+>
+> -    return succ;
+> +    g_free(out);
+> +    return has_tpm2;
+>   }
+>
+>   gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
 
-Ex: qemu -object memory-backend-file,help
-memory-backend-file.align=3Dint
-memory-backend-file.discard-data=3Dbool
-memory-backend-file.dump=3Dbool - Set to 'off' to exclude from core dump
-memory-backend-file.host-nodes=3Dint - Binds memory to the list of NUMA h=
-ost nodes
-memory-backend-file.mem-path=3Dstring
-memory-backend-file.merge=3Dbool - Mark memory as mergeable
-memory-backend-file.pmem=3Dbool
-memory-backend-file.policy=3DHostMemPolicy - Set the NUMA policy
-memory-backend-file.prealloc=3Dbool - Preallocate memory
-memory-backend-file.share=3Dbool - Mark the memory as private to QEMU or =
-shared
-memory-backend-file.size=3Dint - Size of the memory region (ex: 500M)
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
----
- qom/object_interfaces.c |  6 +++---
- vl.c                    | 40 +++++++++++++++++++++++++++++++++++++---
- 2 files changed, 40 insertions(+), 6 deletions(-)
-
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 72b97a8bed..941fd63afd 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -141,14 +141,14 @@ Object *user_creatable_add_opts(QemuOpts *opts, Err=
-or **errp)
-=20
- int user_creatable_add_opts_foreach(void *opaque, QemuOpts *opts, Error =
-**errp)
- {
--    bool (*type_predicate)(const char *) =3D opaque;
-+    bool (*type_opt_predicate)(const char *, QemuOpts *) =3D opaque;
-     Object *obj =3D NULL;
-     Error *err =3D NULL;
-     const char *type;
-=20
-     type =3D qemu_opt_get(opts, "qom-type");
--    if (type && type_predicate &&
--        !type_predicate(type)) {
-+    if (type && type_opt_predicate &&
-+        !type_opt_predicate(type, opts)) {
-         return 0;
-     }
-=20
-diff --git a/vl.c b/vl.c
-index aab1452d1a..e3d6f51eb8 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2696,8 +2696,10 @@ static int machine_set_property(void *opaque,
-  * cannot be created here, as it depends on the chardev
-  * already existing.
-  */
--static bool object_create_initial(const char *type)
-+static bool object_create_initial(const char *type, QemuOpts *opts)
- {
-+    ObjectClass *klass;
-+
-     if (is_help_option(type)) {
-         GSList *l, *list;
-=20
-@@ -2711,6 +2713,38 @@ static bool object_create_initial(const char *type=
-)
-         exit(0);
-     }
-=20
-+    klass =3D object_class_by_name(type);
-+    if (klass && qemu_opt_has_help_opt(opts)) {
-+        ObjectPropertyIterator iter;
-+        ObjectProperty *prop;
-+        GPtrArray *array =3D g_ptr_array_new();
-+        int i;
-+
-+        object_class_property_iter_init(&iter, klass);
-+        while ((prop =3D object_property_iter_next(&iter))) {
-+            GString *str;
-+
-+            if (!prop->set) {
-+                continue;
-+            }
-+
-+            str =3D g_string_new(NULL);
-+            g_string_append_printf(str, "%s.%s=3D%s", type,
-+                                   prop->name, prop->type);
-+            if (prop->description) {
-+                g_string_append_printf(str, " - %s", prop->description);
-+            }
-+            g_ptr_array_add(array, g_string_free(str, false));
-+        }
-+        g_ptr_array_sort(array, (GCompareFunc)qemu_pstrcmp0);
-+        for (i =3D 0; i < array->len; i++) {
-+            printf("%s\n", (char *)array->pdata[i]);
-+        }
-+        g_ptr_array_set_free_func(array, g_free);
-+        g_ptr_array_free(array, true);
-+        exit(0);
-+    }
-+
-     if (g_str_equal(type, "rng-egd") ||
-         g_str_has_prefix(type, "pr-manager-")) {
-         return false;
-@@ -2757,9 +2791,9 @@ static bool object_create_initial(const char *type)
-  * The remainder of object creation happens after the
-  * creation of chardev, fsdev, net clients and device data types.
-  */
--static bool object_create_delayed(const char *type)
-+static bool object_create_delayed(const char *type, QemuOpts *opts)
- {
--    return !object_create_initial(type);
-+    return !object_create_initial(type, opts);
- }
-=20
-=20
---=20
-2.19.0.271.gfe8321ec05
+Reviewed-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
