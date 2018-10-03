@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1g7jmA-0002U9-Dv
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 12:13:27 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g7kFt-000341-D5
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 12:44:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1g7jm4-0005WJ-93
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 12:13:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38382)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g7jm0-0005Tn-Ki
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 12:13:18 -0400
-References: <20180928003058.12786-1-philmd@redhat.com>
-	<61123eb6-4263-4847-cb43-8160c99adb45@redhat.com>
-	<3a670f0b-069e-5713-da7a-dea46959ff8d@redhat.com>
-	<a259468f-d11c-ea18-1708-a349b6014e71@redhat.com>
-	<7ee997c5-e200-6238-b1d9-b4930c153592@redhat.com>
-	<9225135b-b5da-7e55-fd1f-7afbed166f56@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <2313a481-b740-fa31-e8b0-900cc1e67c17@redhat.com>
-Date: Wed, 3 Oct 2018 12:13:02 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g7kFm-0006Lw-Gu
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 12:44:08 -0400
+References: <20181002230218.13949-1-jsnow@redhat.com>
+	<20181002230218.13949-6-jsnow@redhat.com>
+	<46167222-a029-6c2d-c5f3-5383b7f4f4f4@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <be1e6ca3-a94e-eb4d-920c-5f5813a79b33@redhat.com>
+Date: Wed, 3 Oct 2018 12:43:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <9225135b-b5da-7e55-fd1f-7afbed166f56@redhat.com>
+In-Reply-To: <46167222-a029-6c2d-c5f3-5383b7f4f4f4@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] acceptance tests: Test firmware
- checking debug console output
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 5/6] block/backup: prohibit backup from
+ using in use bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Kashyap Chamarthy <kchamart@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
 
-On 10/3/18 11:59 AM, Laszlo Ersek wrote:
-> On 10/03/18 17:20, Cleber Rosa wrote:
->> On 10/3/18 3:13 AM, Laszlo Ersek wrote:
->>> On 10/03/18 02:23, Cleber Rosa wrote:
->>>> On 9/28/18 6:51 AM, Laszlo Ersek wrote:
->>>
->>>>>   I'm not sure if Avocado provides disk image preparation utilities, but
->>>>>   perhaps (a) we could use the vvfat driver (*shudder*) or (b) we could
->>>>>   preformat a small image, and track it as a binary file in git.
->>>>>
->>>>
->>>> So far we've added support for generating ISO images (with pure Python).
->>>> I'm not sure if that's useful here.  We can think about trying to add
->>>> the same thing for vvfat.
->>>
->>> The ability to generate ISO images (natively at that!) seems useful.
->>> UEFI-readable ISO images need an extension on top: the ISO9660
->>> filesystem has to get the ElTorito extension, and the ElTorito boot
->>> image should be a FAT filesystem. Under UEFI, what's visible isn't the
->>> ISO9660 filesystem itself, but the contents of the embedded ElTorito
->>> boot image.
->>>
->>> In terms of shell utilities, this usually involves:
->>>
->>> - creating and populating the FAT filesystem image (with guestfish, or
->>>   with mkdosfs+mtools),
->>>
+On 10/03/2018 08:28 AM, Eric Blake wrote:
+> On 10/2/18 6:02 PM, John Snow wrote:
+>> If the bitmap is frozen, we shouldn't touch it.
 >>
->> Is FAT12 an option here?  The reason I ask is that there may be code
->> FAT12 capable code ready to be incorporated:
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>> =C2=A0 blockdev.c | 12 ++++++------
+>> =C2=A0 1 file changed, 6 insertions(+), 6 deletions(-)
 >>
->> https://github.com/clalancette/pyfat
-> 
-> Theoretically, I should answer "yes". For two reasons:
-> 
-> (1) In "13.3 File System Format", the UEFI-2.7 spec writes,
-> 
-> "[...] EFI encompasses the use of FAT32 for a system partition, and
-> FAT12 or FAT16 for removable media. [...]"
-> 
-> (2) When invoking mkdosfs without the "-F" option, mkdosfs chooses the
-> smallest FAT filesystem variant that can accommodate the requested size.
-> We successfully format UEFI-readable ISO images that don't exceed e.g.
-> 3MB in final size. This implies (and I have now actually checked, with
-> "dosfsck -v") that their embedded ElTorito image is FAT12. edk2 has no
-> trouble reading that.
-> 
-> 
-> However... the maximum volume size for FAT12 appears to be 32 MB,
-> according to wikipedia:
-> 
->   https://en.wikipedia.org/wiki/File_Allocation_Table#FAT12
-> 
-> It doesn't look good for the long term. For example, I can imagine a
-> test case where you place a kernel executable (containing a UEFI stub)
-> and an initial ramdisk on the UEFI-readable ISO. Using the RHEL-7.5
-> kernel and the matching initrd from my laptop as an example: that's
-> already 6.2MB + 25MB.
-> 
-> So, technically, FAT12 should be fine; in practice, it could prove limiting.
-> 
+>> diff --git a/blockdev.c b/blockdev.c
+>> index d0febfca79..098d4c337f 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -3512,10 +3512,10 @@ static BlockJob *do_drive_backup(DriveBackup
+>> *backup, JobTxn *txn,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 bdrv_unref(target_bs);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 goto out;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_qmp_=
+locked(bmap)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_user=
+_locked(bmap)) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 error_setg(errp,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Bitmap '=
+%s' is currently locked and cannot be
+>> used for "
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "backup",=
+ backup->bitmap);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Bitmap '=
+%s' is currently in use by another
+>> operation"
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 " and can=
+not be used for backup",
+>> backup->bitmap);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 goto out;
+>=20
+> Is this right?=C2=A0 Why can we not have two parallel backups utilizing=
+ the
+> same unchanging locked bitmap as its source?=C2=A0 Of course, to do tha=
+t,
+> we'd need the condition of being locked to be a ref-counter (increment
+> for each backup that reuses the bitmap, decrement when the backup
+> finishes, and it is unlocked when the counter is 0) rather than a bool.
+> So, without that larger refactoring, this is a conservative approach
+> that is a little too strict, but allows for a simpler implementation.
+> And the user can always work around the limitation by cloning the locke=
+d
+> bitmap into another temporary bitmap, and starting the second parallel
+> backup with the second backup instead of the original.
+>=20
+> Weak Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
-Nice, thanks for the detailed info.  I think it's safe to start with
-that, and improve the original project with FAT16/32 support.
+Vladimir gave a good recounting of the reasons. My principal
+justification here is that:
 
-Regards,
-- Cleber.
+- FROZEN implies that the bitmap has been split; which means there is a
+pending operating to re-suture them into one bitmap which may occur at
+an indeterminate time in the future that we cannot account for in the
+following job code, and
 
-> [...]
-> 
-> Thanks!
-> Laszlo
-> 
+- QMP_LOCKED only implies that the bitmap is in use by, say, the NBD
+fleecing operation with no further pending actions.
 
--- 
-Cleber Rosa
-[ Sr Software Engineer - Virtualization Team - Red Hat ]
-[ Avocado Test Framework - avocado-framework.github.io ]
-[  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
+Here, in do_drive_backup, we check only that we are not qmp_locked, but
+I argue we ought to check against frozen as well. It's likely to fail
+because the BDS is already in use by another job, but this check is
+strictly more correct.
+
+In the opposite case, we don't want to split a bitmap that is being used
+by someone else -- we're about to fork this bitmap (which means that the
+bitmap referenced by this named handle will be CLEARED) which can alter
+what the NBD process is doing, which is also bad.
+
+For now, this is correct.
+
+--js
