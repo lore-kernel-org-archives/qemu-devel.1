@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1g7Uu2-0004Vx-Di
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 20:20:35 -0400
+	(envelope-from <crosa@redhat.com>) id 1g7UxG-0006BU-US
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 20:23:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1g7Uty-0001SB-8c
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 20:20:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56314)
+	(envelope-from <crosa@redhat.com>) id 1g7UxD-0003Lo-H3
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 20:23:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g7Uty-0001RG-09
-	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 20:20:30 -0400
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g7UxD-0003K5-3v
+	for qemu-devel@nongnu.org; Tue, 02 Oct 2018 20:23:51 -0400
 References: <20180928003058.12786-1-philmd@redhat.com>
-	<20180928003058.12786-4-philmd@redhat.com>
+	<61123eb6-4263-4847-cb43-8160c99adb45@redhat.com>
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <c71fe8c8-9cfb-251b-cd7f-f8a339c443f8@redhat.com>
-Date: Tue, 2 Oct 2018 20:20:17 -0400
+Message-ID: <3a670f0b-069e-5713-da7a-dea46959ff8d@redhat.com>
+Date: Tue, 2 Oct 2018 20:23:42 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180928003058.12786-4-philmd@redhat.com>
+In-Reply-To: <61123eb6-4263-4847-cb43-8160c99adb45@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 3/3] acceptance tests: Add EDK2 AAVMF
- boot and console checking test
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] acceptance tests: Test firmware
+ checking debug console output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,139 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Kashyap Chamarthy <kchamart@redhat.com>
 
 
 
-On 9/27/18 8:30 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> This test boots EDK2 AAVMF and check the debug console (PL011) reports =
-enough
-> information on the initialized devices.
+On 9/28/18 6:51 AM, Laszlo Ersek wrote:
+> Hi Phil,
 >=20
-> Example:
+> (+Daniel, +Kashyap)
 >=20
->     $ avocado --show=3Dconsole run tests/acceptance/boot_firmware.py --=
-cit-parameter-file aarch64.cit
+> On 09/28/18 02:30, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Hi,
+>>
+>> This RFC series add simple acceptance tests which boot SeaBIOS and
+>> EDK2 on Q35 and virt/aarch64.
+>>
+>> It is more of a proof of concept (to motivate the Avocado team ;) ).
+>>
+>> Regards,
+>>
+>> Phil.
+>>
+>> Philippe Mathieu-Daud=C3=A9 (3):
+>>   acceptance tests: Add SeaBIOS boot and debug console checking test
+>>   acceptance tests: Add EDK2 OVMF boot and debug console checking test
+>>   acceptance tests: Add EDK2 AAVMF boot and console checking test
+>>
+>>  tests/acceptance/boot_firmware.py | 167 +++++++++++++++++++++++++++++=
++
+>>  1 file changed, 167 insertions(+)
+>>  create mode 100644 tests/acceptance/boot_firmware.py
+>>
 >=20
-> having aarch64.cit:
+> I'm not experienced with Avocado, so I'm basically reading the patches
+> as a "story". My comments are made at that level too. :)
 >=20
-> [parameters]
-> qemu_bin: aarch64-softmmu/qemu-system-aarch64
+> * In the blurb, you say "Q35". But the first two patches have
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> - requires (even for single parameter):
->   $ pip install avocado-framework-plugin-varianter-cit
+>   vm.set_machine('pc')
 >=20
-
-Avocado 65.0 now features a core parameter passing option (one that
-doesn't depend on the varianter).  Command line option is documented as:
-
-  -p NAME_VALUE, --test-parameter NAME_VALUE
-                Parameter name and value to pass to all tests. This is
-                only applicable when not using a varianter plugin.
-                This option format must be given in the NAME=3DVALUE
-                format, and may be given any number of times, or per
-                parameter.
-
-> - use gzip kludge (avocado only support tarballs)
+> * Please don't call the edk2 ArmVirtQemu platform AAVMF in upstream
+>   patches :) Call it ArmVirtQemu pls.
 >=20
-
-I'll finish the work to get that into the avocado.utils.archive module.
-
-> - can not set $arch param since pick_default_qemu_bin() forces to host =
-os.uname()[4]
-
-This is definitely a common requirement, and something to be addressed
-ASAP.  I have a patch on my tree (pretty simple change) that I'll be
-sending shortly.
-
-> ---
->  tests/acceptance/boot_firmware.py | 43 +++++++++++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
+> * Finding the right way to launch  OVMF and/or ArmVirtQemu firmware
+>   images is complicated. (The right way is definitely not "-bios"!)
 >=20
-> diff --git a/tests/acceptance/boot_firmware.py b/tests/acceptance/boot_=
-firmware.py
-> index 05f6728212..4f5554c0ad 100644
-> --- a/tests/acceptance/boot_firmware.py
-> +++ b/tests/acceptance/boot_firmware.py
-> @@ -10,6 +10,7 @@
->  # SPDX-License-Identifier: GPL-2.0-or-later
-> =20
->  import os
-> +import gzip
->  import time
->  import shutil
->  import logging
-> @@ -122,3 +123,45 @@ class BootFirmwareX86(Test):
->              if line + '\r\n' not in lines:
->                  self.fail('missing: %s' % line)
->          shutil.rmtree(tmpdirname, ignore_errors=3DTrue)
-> +
-> +
-> +class BootFirmwareAarch64(Test):
-> +    """
-> +    Boots the EDK2 firmware on a default virt machine and checks the c=
-onsole is
-> +    operational
-> +
-> +    :avocado: enable
-> +    :avocado: tags=3Darch:aarch64
-
-Yay, I like where you're going here.  This matches what I said before
-about having some standardization on the tags.
-
-On a related topic, sometimes tests can be written in an abstract way
-that parameters only will allow the same test to be reused in different
-arches, but, sometimes we may need to explicit include/exclude some
-tests on some executions - then tags could be a foundation for that.
-
-> +    :avocado: tags=3Daarch64,quick
-> +    """
-> +
-> +    timeout =3D 15
-> +
-> +    def test_aavmf(self):
-> +        tmpdirname =3D tempfile.mkdtemp()
-> +        image_url =3D ('http://snapshots.linaro.org/components/kernel/=
-'
-> +                    'leg-virt-tianocore-edk2-upstream/latest/'
-> +                    'QEMU-AARCH64/DEBUG_GCC5/QEMU_EFI.img.gz')
-> +        image_path_gz =3D self.fetch_asset(image_url)
-> +        image_path =3D os.path.join(tmpdirname, 'flash.img')
-> +        with gzip.open(image_path_gz) as gz, open(image_path, 'wb') as=
- img:
-> +            shutil.copyfileobj(gz, img)
-> +
-> +        self.vm.set_machine('virt')
-> +        self.vm.set_console()
-> +        self.vm.add_args('-nographic',
-> +                         '-cpu', 'cortex-a57',
-> +                         '-m', '1G',
-
-Is there a reason for defining this exact amount of memory?  My question
-has to do with the idea of setting some "sane" hardware defaults at the
-base test level (to avoid boiler plate code).
-
-> +                         '-pflash', image_path)
-> +        self.vm.launch()
-> +        console =3D self.vm.console_socket.makefile()
-> +        serial_logger =3D logging.getLogger('serial')
-> +
-> +        # serial console checks
-> +        while True:
-> +            msg =3D console.readline()
-> +            if not '\x1b' in msg: # ignore ANSI sequences
-> +                serial_logger.debug(msg.strip())
-> +            if 'Start PXE over IPv4InstallProtocolInterface:' in msg:
-> +                break
-> +        shutil.rmtree(tmpdirname, ignore_errors=3DTrue)
+>   The general idea is that you need three files (and two pflash chips);
+>   (a) a firmware executable mapped read-only, and (b) a variable store
+>   file, mapped read-write, that was first copied from (c) a read-only
+>   variable store *template* that is never itself mapped. And, this is
+>   not the whole story.
+>=20
+>   Figuring out the options is complicated enough (for management tools
+>   as well) that Daniel made us define a metadata schema for describing
+>   firmware packages. Please see:
+>=20
+>   docs/interop/firmware.json
+>=20
+>   I'm not necessarily suggesting that Avocado be able to parse the
+>   firmware descriptor metafiles that conform to this schema. I'm just
+>   pointing out that the QEMU command line will depend on the exact buil=
+d
+>   of the firmware image under test. The pathname
+>   "/usr/share/OVMF/OVMF_CODE.fd" and the URL
+>   "https://snapshots.linaro.org/.../QEMU_EFI.img.gz" don't give us
+>   enough information.
+>=20
+>   Therefore, if we want to keep the test case simple (=3D hard-wire the
+>   command lines), then we'll have to refer to OVMF and ArmVirtQemu
+>   images with precisely known build configs.
+>=20
+> * Looking for debug console messages as "vital signs" is brittle. For
+>   example, the line "DetectSmbiosVersion: SMBIOS version from QEMU:
+>   0x0208" will change if QEMU changes the SMBIOS version number in the
+>   SMBIOS anchor that it generates. It's likely better to make the
+>   firmware "do" something.
+>=20
+>   The simplest I can imagine is: prepare a virtual disk with a
+>   "startup.nsh" UEFI shell script on it. The script can print a known
+>   fixed string, and then power down the VM. (See the UEFI Shell
+>   Specification for commands; <http://uefi.org/specifications>.)
+>=20
+>   I'm not sure if Avocado provides disk image preparation utilities, bu=
+t
+>   perhaps (a) we could use the vvfat driver (*shudder*) or (b) we could
+>   preformat a small image, and track it as a binary file in git.
 >=20
 
-Again, seems like a candidate for the ideas presented on the previous
-patches.
-
-Thanks for sending those, lots of interesting opportunities.
+So far we've added support for generating ISO images (with pure Python).
+ I'm not sure if that's useful here.  We can think about trying to add
+the same thing for vvfat.
 
 - Cleber.
