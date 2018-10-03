@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7kb2-0003ui-8x
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:06:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7koc-00008b-1W
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7kax-0002v7-8w
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:06:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7kax-0002uv-0P
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:05:55 -0400
-References: <20181002212921.30982-1-cota@braap.org>
-	<20181002212921.30982-3-cota@braap.org> <87h8i3l75j.fsf@linaro.org>
-	<a01a9547-d182-daaf-724a-5a836dd9ff02@redhat.com>
-	<20181003154844.GA27366@flamenco>
-	<91494a20-1090-3e3f-e099-ed06bd6e0e51@redhat.com>
-	<20181003170219.GA9925@flamenco>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d966f99b-4a37-4a00-0267-50adabb3675f@redhat.com>
-Date: Wed, 3 Oct 2018 19:05:51 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181003170219.GA9925@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] cputlb: serialize tlb updates with
- env->tlb_lock
+	(envelope-from <eblake@redhat.com>) id 1g7koa-0001Vo-WB
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 13:20:02 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Wed,  3 Oct 2018 12:19:47 -0500
+Message-Id: <20181003171947.588103-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] nbd: Flip qemu-nbd to prefer newstyle;
+ add -O for old behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +18,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-On 03/10/2018 19:02, Emilio G. Cota wrote:
->> For reads I agree, but you may actually get a torn read if the writer
->> doesn't use atomic_set.
->
-> But you cannot get a torn read if all reads that don't hold the lock
-> are coming from the same thread that performed the write.
+Oldstyle NBD negotiation cannot perform any of the extensions that
+we have recently been relying on.  While you can always pass -x ""
+to get newstyle negotiation, these days, it is better to just default
+to newstyle (with an empty export name) and fall back to oldstyle
+only on an explicit request.
 
-Ah, so you are relying on copy_tlb_helper(_locked) being invoked only
-from the vCPU thread (as opposed to someone else doing tlb_flush)?
-Maybe it's worth adding a comment if that's what I missed.
+For comparison:
 
-Paolo
+nbdkit 1.3 switched its default to newstyle (Jan 2018):
+https://github.com/libguestfs/nbdkit/commit/b2a8aecc
+https://github.com/libguestfs/nbdkit/commit/8158e773
+
+nbd 3.10 dropped oldstyle long ago (Mar 2015):
+https://github.com/NetworkBlockDevice/nbd/commit/36940193
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qemu-nbd.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 51b9d38c727..8571a4f93d8 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -86,6 +86,7 @@ static void usage(const char *name)
+ "  -v, --verbose             display extra debugging information\n"
+ "  -x, --export-name=NAME    expose export by name\n"
+ "  -D, --description=TEXT    with -x, also export a human-readable description\n"
++"  -O, --oldstyle            force oldstyle negotiation\n"
+ "\n"
+ "Exposing part of the image:\n"
+ "  -o, --offset=OFFSET       offset into the image\n"
+@@ -529,6 +530,7 @@ int main(int argc, char **argv)
+         { "object", required_argument, NULL, QEMU_NBD_OPT_OBJECT },
+         { "export-name", required_argument, NULL, 'x' },
+         { "description", required_argument, NULL, 'D' },
++        { "oldstyle", no_argument, NULL, 'O' },
+         { "tls-creds", required_argument, NULL, QEMU_NBD_OPT_TLSCREDS },
+         { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },
+         { "trace", required_argument, NULL, 'T' },
+@@ -551,6 +553,7 @@ int main(int argc, char **argv)
+     QDict *options = NULL;
+     const char *export_name = NULL;
+     const char *export_description = NULL;
++    bool oldstyle = false;
+     const char *tlscredsid = NULL;
+     bool imageOpts = false;
+     bool writethrough = true;
+@@ -723,6 +726,9 @@ int main(int argc, char **argv)
+         case 'D':
+             export_description = optarg;
+             break;
++        case 'O':
++            oldstyle = true;
++            break;
+         case 'v':
+             verbose = 1;
+             break;
+@@ -799,7 +805,16 @@ int main(int argc, char **argv)
+         }
+     }
+
++    if (!oldstyle && !export_name) {
++        /* Set the default NBD protocol export name, to favor new style. */
++        export_name = "";
++    }
++
+     if (tlscredsid) {
++        if (oldstyle) {
++            error_report("TLS is incompatible with oldstyle");
++            exit(EXIT_FAILURE);
++        }
+         if (sockpath) {
+             error_report("TLS is only supported with IPv4/IPv6");
+             exit(EXIT_FAILURE);
+@@ -808,11 +823,6 @@ int main(int argc, char **argv)
+             error_report("TLS is not supported with a host device");
+             exit(EXIT_FAILURE);
+         }
+-        if (!export_name) {
+-            /* Set the default NBD protocol export name, since
+-             * we *must* use new style protocol for TLS */
+-            export_name = "";
+-        }
+         tlscreds = nbd_get_tls_creds(tlscredsid, &local_err);
+         if (local_err) {
+             error_report("Failed to get TLS creds %s",
+@@ -1013,13 +1023,14 @@ int main(int argc, char **argv)
+         error_report_err(local_err);
+         exit(EXIT_FAILURE);
+     }
++    if (oldstyle && (export_name || export_description)) {
++        error_report("oldstyle negotiation cannot set export details");
++        exit(EXIT_FAILURE);
++    }
+     if (export_name) {
+         nbd_export_set_name(exp, export_name);
+         nbd_export_set_description(exp, export_description);
+         newproto = true;
+-    } else if (export_description) {
+-        error_report("Export description requires an export name");
+-        exit(EXIT_FAILURE);
+     }
+
+     if (device) {
+-- 
+2.17.1
