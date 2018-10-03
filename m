@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7i6p-0003cE-Fe
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:26:41 -0400
+	(envelope-from <philmd@redhat.com>) id 1g7i9p-00074I-P4
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:29:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7i6m-00038S-4X
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:26:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59394)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g7i6l-00036q-Qo
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:26:36 -0400
-Received: from smtp.corp.redhat.com (int-mx12.intmail.prod.int.phx2.redhat.com
-	[10.5.11.27])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AE248C049E3A
-	for <qemu-devel@nongnu.org>; Wed,  3 Oct 2018 14:26:33 +0000 (UTC)
-References: <20181003104605.8477-1-kchamart@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <71d08ec7-cf39-1fd8-141d-ea1eb7175cdb@redhat.com>
-Date: Wed, 3 Oct 2018 09:26:26 -0500
+	(envelope-from <philmd@redhat.com>) id 1g7i9m-0004rV-F3
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:29:45 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34290)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7i9m-0004r5-8Q
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:29:42 -0400
+Received: by mail-wm1-f65.google.com with SMTP id z25-v6so7806682wmf.1
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 07:29:42 -0700 (PDT)
+References: <20181003132041.10075-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <9cf30eb2-8430-8507-d31e-370504287afd@redhat.com>
+Date: Wed, 3 Oct 2018 16:29:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181003104605.8477-1-kchamart@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181003132041.10075-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qapi/misc.json: Remove superfluous words
- in CpuModelExpansionType
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] configure: remove glib_subprocess check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, ehabkost@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 
-On 10/3/18 5:46 AM, Kashyap Chamarthy wrote:
-> While at it, s/QMU/QEMU in @CpuDefinitionInfo.
-
-Could mention that it was a repetition of 'independent of'.
-
+On 03/10/2018 15:20, Marc-André Lureau wrote:
+> This should have been removed as part of commit
+> 692fbdf9f4c6f6bafd0b3a4d4f94973effd3bbae.
 > 
-> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->   qapi/misc.json | 12 ++++++------
->   1 file changed, 6 insertions(+), 6 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+>  configure | 6 ------
+>  1 file changed, 6 deletions(-)
 > 
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index ada9af5add..f98de3a58c 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -2017,7 +2017,7 @@
->   #
->   # @migration-safe: whether a CPU definition can be safely used for
->   #                  migration in combination with a QEMU compatibility machine
-> -#                  when migrating between different QMU versions and between
-> +#                  when migrating between different QEMU versions and between
->   #                  hosts with different sets of (hardware or software)
->   #                  capabilities. If not provided, information is not available
->   #                  and callers should not assume the CPU definition to be
-> @@ -2126,11 +2126,11 @@
->   # @static: Expand to a static CPU model, a combination of a static base
->   #          model name and property delta changes. As the static base model will
->   #          never change, the expanded CPU model will be the same, independent of
-> -#          independent of QEMU version, machine type, machine options, and
-> -#          accelerator options. Therefore, the resulting model can be used by
-> -#          tooling without having to specify a compatibility machine - e.g. when
-> -#          displaying the "host" model. static CPU models are migration-safe.
-> -#
-> +#          QEMU version, machine type, machine options, and accelerator options.
-> +#          Therefore, the resulting model can be used by tooling without having
-> +#          to specify a compatibility machine - e.g. when displaying the "host"
-> +#          model. The @static CPU models are migration-safe.
-> +
->   # @full: Expand all properties. The produced model is not guaranteed to be
->   #        migration-safe, but allows tooling to get an insight and work with
->   #        model details.
+> diff --git a/configure b/configure
+> index a7368044cc..4f6d6e03b1 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3557,12 +3557,6 @@ if ! compile_prog "$CFLAGS" "$LIBS" ; then
+>  	       "build target"
+>  fi
+>  
+> -# g_test_trap_subprocess added in 2.38. Used by some tests.
+> -glib_subprocess=yes
+> -if ! $pkg_config --atleast-version=2.38 glib-2.0; then
+> -    glib_subprocess=no
+> -fi
+> -
+>  # Silence clang 3.5.0 warnings about glib attribute __alloc_size__ usage
+>  cat > $TMPC << EOF
+>  #include <glib.h>
 > 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
