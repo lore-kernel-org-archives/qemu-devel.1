@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7dsU-0001FO-S7
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 05:55:35 -0400
+	(envelope-from <philmd@redhat.com>) id 1g7dsq-0001SK-UJ
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 05:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7dsQ-0001cY-S7
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 05:55:34 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 3 Oct 2018 09:55:26 +0000
-Message-ID: <d3a6f785-de59-ff00-1114-2e91aee04b66@virtuozzo.com>
-References: <20181001102928.20533-1-vsementsov@virtuozzo.com>
-	<c5771011-3a69-65c1-bcaf-83cddfb24edf@redhat.com>
-In-Reply-To: <c5771011-3a69-65c1-bcaf-83cddfb24edf@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <56BE5ED7F3DE5F4F82D4249AAC7AA5C0@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1g7dsm-0001hA-UY
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 05:55:56 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51263)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7dsm-0001gw-NP
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 05:55:52 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 143-v6so5055479wmf.1
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 02:55:52 -0700 (PDT)
+References: <20181002163556.10279-1-peter.maydell@linaro.org>
+	<20181002163556.10279-13-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <35235ad8-c104-05a9-3f9e-677a743b73e2@redhat.com>
+Date: Wed, 3 Oct 2018 11:55:49 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 00/18] fleecing-hook driver for backup
+In-Reply-To: <20181002163556.10279-13-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 12/13] target/arm: Add v8M stack checks for
+ VLDM/VSTM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>, "wencongyang2@huawei.com" <wencongyang2@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-MDIuMTAuMjAxOCAyMzoxOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTAvMS8xOCA1OjI5IEFN
-LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gdjIgd2FzICJbUkZDIHYy
-XSBuZXcsIG5vZGUtZ3JhcGgtYmFzZWQgZmxlZWNpbmcgYW5kIGJhY2t1cCINCj4+DQo+PiBIaSBh
-bGwhDQo+Pg0KPj4gVGhlc2Ugc2VyaWVzIGludHJvZHVjZSBmbGVlY2luZy1ob29rIGRyaXZlci4g
-SXQncyBhIGZpbHRlci1ub2RlLCB3aGljaA0KPj4gZG8gY29weS1iZWZvcmUtd3JpdGUgb3BlcmF0
-aW9uLiBNaXJyb3IgdXNlcyBmaWx0ZXItbm9kZSBmb3IgaGFuZGxpbmcNCj4+IGd1ZXN0IHdyaXRl
-cywgbGV0J3MgbW92ZSB0byBmaWx0ZXItbm9kZSAoZnJvbSB3cml0ZS1ub3RpZmllcnMpIGZvcg0K
-Pj4gYmFja3VwIHRvbyAocGF0Y2ggMTgpDQo+Pg0KPj4gUHJvcG9zZWQgZmlsdGVyIGRyaXZlciBp
-cyBjb21wbGV0ZSBhbmQgc2VwYXJhdGU6IGl0IGNhbiBiZSB1c2VkDQo+PiBzdGFuZGFsb25lLCBh
-cyBmbGVlY2luZyBwcm92aWRlciAoaW5zdGVhZCBvZiBiYWNrdXAoc3luYz1ub25lKSkuDQo+PiAo
-b2xkLXN0eWxlIGZsZWVjaW5nIGJhc2VkIG9uIGJhY2t1cChzeW5jPW5vbmUpIGlzIHN1cHBvcnRl
-ZCB0b28pLA0KPj4gbG9vayBhdCBwYXRjaCAxNi4NCj4NCj4gSSBoYXZlbid0IGhhZCB0aW1lIHRv
-IGxvb2sgYXQgdGhpcyBzZXJpZXMgaW4gYW55IHNvcnQgb2YgZGVwdGggeWV0LCANCj4gYnV0IGl0
-IHJlbWluZHMgbWUgb2YgYSBxdWVzdGlvbiBJIGp1c3QgcmFuIGludG8gd2l0aCBteSBsaWJ2aXJ0
-IGNvZGU6DQo+DQo+IFdoYXQgaGFwcGVucyBpZiB3ZSB3YW50IHRvIGhhdmUgdHdvIHBhcmFsbGVs
-IGNsaWVudHMgYm90aCByZWFkaW5nIG9mZiANCj4gZGlmZmVyZW50IGJhY2t1cC9mbGVlY2Ugbm9k
-ZXMgYXQgb25jZT/CoCBSaWdodCBub3csICduYmQtc2VydmVyLXN0YXJ0JyANCj4gaXMgaGFyZC1j
-b2RlZCB0byBhdCBtb3N0IG9uZSBOQkQgc2VydmVyLCBhbmQgJ25iZC1zZXJ2ZXItYWRkJyBpcyAN
-Cj4gaGFyZGNvZGVkIHRvIGFkZGluZyBhbiBleHBvcnQgdG8gdGhlIG9uZS1hbmQtb25seSBOQkQg
-c2VydmVyLsKgIEJ1dCBpdCANCj4gd291bGQgYmUgYSBsb3QgbmljZXIgaWYgeW91IGNvdWxkIHBp
-Y2sgZGlmZmVyZW50IHBvcnRzIGZvciBkaWZmZXJlbnQgDQo+IGNsaWVudHMgKG9yIGV2ZW4gbWl4
-IFRDUCBhbmQgVW5peCBzb2NrZXRzKSwgc28gdGhhdCBpbmRlcGVuZGVudCBiYWNrdXAgDQo+IGpv
-YnMgY2FuIGJvdGggb3BlcmF0ZSBpbiBwYXJhbGxlbCB2aWEgZGlmZmVyZW50IE5CRCBzZXJ2ZXJz
-IGJvdGggdW5kZXIgDQo+IGNvbnRyb2wgb2YgdGhlIHNhbWUgcWVtdSBwcm9jZXNzLCBpbnN0ZWFk
-IG9mIHRoZSBzZWNvbmQgY2xpZW50IGhhdmluZyANCj4gdG8gd2FpdCBmb3IgdGhlIGZpcnN0IGNs
-aWVudCB0byBkaXNjb25uZWN0IHNvIHRoYXQgdGhlIGZpcnN0IE5CRCANCj4gc2VydmVyIGNhbiBz
-dG9wLiBJbiB0aGUgbWVhbnRpbWUsIHlvdSBjYW4gYmUgc29tZXdoYXQgY2FyZWZ1bCBieSANCj4g
-Y29udHJvbGxpbmcgd2hpY2ggZXhwb3J0IG5hbWVzIGFyZSBleHBvc2VkIG92ZXIgTkJELCBidXQg
-ZXZlbiB3aXRoIA0KPiBuYmQtc2VydmVyLXN0YXJ0IHVzaW5nICJ0bHMtY3JlZHMiLCBhbGwgY2xp
-ZW50cyBjYW4gc2VlIG9uZSBhbm90aGVyJ3MgDQo+IGV4cG9ydHMgdmlhIE5CRF9PUFRfTElTVCwg
-YW5kIHlvdSBhcmUgcmVseWluZyBvbiB0aGUgY2xpZW50cyBiZWluZyANCj4gd2VsbC1iZWhhdmVk
-LCB2cy4gdGhlIG5pY2VyIGFiaWxpdHkgdG8gc3Bhd24gbXVsdGlwbGUgTkJEIHNlcnZlcnMsIA0K
-PiB0aGVuIGNvbnRyb2wgd2hpY2ggZXhwb3J0cyBhcmUgZXhwb3NlZCBvdmVyIHdoaWNoIHNlcnZl
-cnMsIGFuZCB3aGVyZSANCj4gZGlzdGluY3Qgc2VydmVycyBjb3VsZCBldmVuIGhhdmUgZGlmZmVy
-ZW50IHRscy1jcmVkcy4NCj4NCj4gVG8gZ2V0IHRvIHRoYXQgcG9pbnQsIHdlJ2QgbmVlZCB0byBl
-bmhhbmNlIG5iZC1zZXJ2ZXItc3RhcnQgdG8gcmV0dXJuIA0KPiBhIHNlcnZlciBpZCwgYW5kIGFs
-bG93IG5iZC1zZXJ2ZXItYWRkIGFuZCBmcmllbmRzIHRvIHRha2UgYW4gb3B0aW9uYWwgDQo+IHBh
-cmFtZXRlciBvZiBhIHNlcnZlciBpZCAoZm9yIGJhY2stY29tcGF0LCBpZiB0aGUgc2VydmVyIGlk
-IGlzIG5vdCANCj4gcHJvdmlkZWQsIGl0IG9wZXJhdGVzIG9uIHRoZSBmaXJzdCBvbmUpLg0KPg0K
-DQpHb29kIHRoaW5nLg0KRG9uJ3Qgc2VlIGFueSBwcm9ibGVtcyBmcm9tIGJsb2NrIGxheWVyOiBp
-ZiB3ZSB3YW50IHRvIGV4cG9ydCB0aGUgc2FtZSANCmZsZWVjaW5nIHRocm91Z2ggc2V2ZXJhbCBk
-aWZmZXJlbnQgc2VydmVycywgdGhleSBhbGwgY2FuIHNoYXJlIHRoZSBzYW1lIA0KZmxlZWNpbmcg
-bm9kZS4NCg0KSG93ZXZlciwgd2l0aCBuZXcgYXBwcm9hY2gsIHdlIGV2ZW4gY2FuIHNldHVwIHNl
-dmVyYWwgZmxlZWNpbmcgbm9kZXMgZm9yIA0Kb25lIGFjdGl2ZSBkaXNrLi4gYW55IGJlbmVmaXRz
-PyBGb3IgZXhhbXBsZSB3ZSBjYW4gc3RhcnQgc2Vjb25kIGV4dGVybmFsIA0KYmFja3VwIG9uIHRo
-ZSBzYW1lIGRpc2ssIHdoZW4gdGhlIGZpcnN0IG9uZSBpcyBzdGlsbCBpbiBwcm9ncmVzcy4uIERv
-bid0IA0Kc3VyZSB0aGF0J3MgYSByZWFsIGNhc2UuDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
-ZGltaXINCg0K
+On 02/10/2018 18:35, Peter Maydell wrote:
+> Add the v8M stack checks for the VLDM/VSTM
+> (aka VPUSH/VPOP) instructions. This code is currently
+> unreachable because we haven't yet implemented M profile
+> floating point support, but since the change is simple,
+> we add it now because otherwise we're likely to forget to
+> do it later.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/translate.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index ef64d2559de..2d3a1be518b 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -4229,6 +4229,18 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+>                  if (insn & (1 << 24)) /* pre-decrement */
+>                      tcg_gen_addi_i32(addr, addr, -((insn & 0xff) << 2));
+>  
+> +                if (rn == 13 && w && s->v8m_stackcheck) {
+
+Following previous patches style:
+
+                   if (s->v8m_stackcheck && rn == 13 && w) {
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> +                    /*
+> +                     * Here 'addr' is the lowest address we will store to,
+> +                     * and is either the old SP (if post-increment) or
+> +                     * the new SP (if pre-decrement). For post-increment
+> +                     * where the old value is below the limit and the new
+> +                     * value is above, it is UNKNOWN whether the limit check
+> +                     * triggers; we choose to trigger.
+> +                     */
+> +                    gen_helper_v8m_stackcheck(cpu_env, addr);
+> +                }
+> +
+>                  if (dp)
+>                      offset = 8;
+>                  else
+> 
