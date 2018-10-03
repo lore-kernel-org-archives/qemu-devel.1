@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7goP-000704-SZ
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:03:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7gqR-0000CS-9V
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7goG-0001PJ-8a
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:03:33 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:52291)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7goE-0001Nf-LM
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:03:24 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 189-v6so5664226wmw.2
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 06:03:21 -0700 (PDT)
-References: <20180907075948.26917-1-marcandre.lureau@redhat.com>
-	<120d75f8-24f7-641a-9b30-4a1ebfbca34d@redhat.com>
-	<CAJ+F1CKjf6APRYSJVmRCf04vVHDyLSjHxsKr+KGFL+jcLEN68Q@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <69790989-5568-f307-ce58-602cadd90903@redhat.com>
-Date: Wed, 3 Oct 2018 15:03:19 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CKjf6APRYSJVmRCf04vVHDyLSjHxsKr+KGFL+jcLEN68Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7gqL-0002WF-HF
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:05:39 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 3 Oct 2018 13:05:27 +0000
+Message-ID: <fffded94-347f-ca88-199f-e95c0731e374@virtuozzo.com>
+References: <20181002230218.13949-1-jsnow@redhat.com>
+	<20181002230218.13949-5-jsnow@redhat.com>
+In-Reply-To: <20181002230218.13949-5-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] Various qemu command line options
- help improvements
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3B760CB387F41745A0BC3EFAF2E45FF9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 4/6] block/dirty-bitmaps: prohibit
+ enable/disable on locked/frozen bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +26,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Eric Blake <eblake@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 02/10/2018 12:54, Marc-André Lureau wrote:
->>>
->>> This is a compilation of patches I have to improve command line help
->>> support. The "qemu-option" patches have already been sent earlier, I
->>> modified the first to fix an issue reported by Markus. The other
->>> patches add support for -object help. A few related patches for QOM,
->>> to fix/improve some minor issues.
->>>
->>> v2: after Eric Blake review
->>> - add "qdev-monitor: print help to stdout"
->>> - add "cutils: add qemu_pstrcmp"
->>> - use consistently "arg=type - desc" help format
->> Feel free to send a pull request yourself with the minor fixes requested
->> during review.
-> It would be nice to get some more review before :)
-
-There you have it. :)
-
-Paolo
-
-> Andreas, as QOM maintainer, do you have time to take a look?
-> 
-> Anybody else interested to improve the CLI?
+MDMuMTAuMjAxOCAwMjowMiwgSm9obiBTbm93IHdyb3RlOg0KPiBXZSdyZSBub3QgYmVpbmcgY29u
+c2lzdGVudCBhYm91dCB0aGlzLiBJZiBpdCdzIGluIHVzZSBieSBhbiBvcGVyYXRpb24sDQo+IHRo
+ZSB1c2VyIHNob3VsZCBub3QgYmUgYWJsZSB0byBjaGFuZ2UgdGhlIGJlaGF2aW9yIG9mIHRoYXQg
+Yml0bWFwLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNub3cgPGpzbm93QHJlZGhhdC5jb20+
+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
+QHZpcnR1b3p6by5jb20+DQoNCj4gLS0tDQo+ICAgYmxvY2tkZXYuYyB8IDI2ICsrKysrKysrKysr
+KysrKysrKysrLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIwIGluc2VydGlvbnMoKyksIDYg
+ZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9ibG9ja2Rldi5jIGIvYmxvY2tkZXYuYw0K
+PiBpbmRleCBjY2NkMzZiNWU3Li5kMGZlYmZjYTc5IDEwMDY0NA0KPiAtLS0gYS9ibG9ja2Rldi5j
+DQo+ICsrKyBiL2Jsb2NrZGV2LmMNCj4gQEAgLTIwNTgsNiArMjA1OCwxMyBAQCBzdGF0aWMgdm9p
+ZCBibG9ja19kaXJ0eV9iaXRtYXBfZW5hYmxlX3ByZXBhcmUoQmxrQWN0aW9uU3RhdGUgKmNvbW1v
+biwNCj4gICAgICAgICAgIHJldHVybjsNCj4gICAgICAgfQ0KPiAgIA0KPiArICAgIGlmIChiZHJ2
+X2RpcnR5X2JpdG1hcF91c2VyX2xvY2tlZChzdGF0ZS0+Yml0bWFwKSkgew0KPiArICAgICAgICBl
+cnJvcl9zZXRnKGVycnAsDQo+ICsgICAgICAgICAgICAgICAgICAgIkJpdG1hcCAnJXMnIGlzIGN1
+cnJlbnRseSBpbiB1c2UgYnkgYW5vdGhlciBvcGVyYXRpb24iDQo+ICsgICAgICAgICAgICAgICAg
+ICAgIiBhbmQgY2Fubm90IGJlIGVuYWJsZWQiLCBhY3Rpb24tPm5hbWUpOw0KPiArICAgICAgICBy
+ZXR1cm47DQo+ICsgICAgfQ0KPiArDQo+ICAgICAgIHN0YXRlLT53YXNfZW5hYmxlZCA9IGJkcnZf
+ZGlydHlfYml0bWFwX2VuYWJsZWQoc3RhdGUtPmJpdG1hcCk7DQo+ICAgICAgIGJkcnZfZW5hYmxl
+X2RpcnR5X2JpdG1hcChzdGF0ZS0+Yml0bWFwKTsNCj4gICB9DQo+IEBAIC0yMDkyLDYgKzIwOTks
+MTMgQEAgc3RhdGljIHZvaWQgYmxvY2tfZGlydHlfYml0bWFwX2Rpc2FibGVfcHJlcGFyZShCbGtB
+Y3Rpb25TdGF0ZSAqY29tbW9uLA0KPiAgICAgICAgICAgcmV0dXJuOw0KPiAgICAgICB9DQo+ICAg
+DQo+ICsgICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX3VzZXJfbG9ja2VkKHN0YXRlLT5iaXRtYXAp
+KSB7DQo+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwNCj4gKyAgICAgICAgICAgICAgICAgICAi
+Qml0bWFwICclcycgaXMgY3VycmVudGx5IGluIHVzZSBieSBhbm90aGVyIG9wZXJhdGlvbiINCj4g
+KyAgICAgICAgICAgICAgICAgICAiIGFuZCBjYW5ub3QgYmUgZGlzYWJsZWQiLCBhY3Rpb24tPm5h
+bWUpOw0KPiArICAgICAgICByZXR1cm47DQo+ICsgICAgfQ0KPiArDQo+ICAgICAgIHN0YXRlLT53
+YXNfZW5hYmxlZCA9IGJkcnZfZGlydHlfYml0bWFwX2VuYWJsZWQoc3RhdGUtPmJpdG1hcCk7DQo+
+ICAgICAgIGJkcnZfZGlzYWJsZV9kaXJ0eV9iaXRtYXAoc3RhdGUtPmJpdG1hcCk7DQo+ICAgfQ0K
+PiBAQCAtMjkzMywxMCArMjk0NywxMCBAQCB2b2lkIHFtcF94X2Jsb2NrX2RpcnR5X2JpdG1hcF9l
+bmFibGUoY29uc3QgY2hhciAqbm9kZSwgY29uc3QgY2hhciAqbmFtZSwNCj4gICAgICAgICAgIHJl
+dHVybjsNCj4gICAgICAgfQ0KPiAgIA0KPiAtICAgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF9mcm96
+ZW4oYml0bWFwKSkgew0KPiArICAgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF91c2VyX2xvY2tlZChi
+aXRtYXApKSB7DQo+ICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsDQo+IC0gICAgICAgICAgICAg
+ICAgICAgIkJpdG1hcCAnJXMnIGlzIGN1cnJlbnRseSBmcm96ZW4gYW5kIGNhbm5vdCBiZSBlbmFi
+bGVkIiwNCj4gLSAgICAgICAgICAgICAgICAgICBuYW1lKTsNCj4gKyAgICAgICAgICAgICAgICAg
+ICAiQml0bWFwICclcycgaXMgY3VycmVudGx5IGluIHVzZSBieSBhbm90aGVyIG9wZXJhdGlvbiIN
+Cj4gKyAgICAgICAgICAgICAgICAgICAiIGFuZCBjYW5ub3QgYmUgZW5hYmxlZCIsIG5hbWUpOw0K
+PiAgICAgICAgICAgcmV0dXJuOw0KPiAgICAgICB9DQo+ICAgDQo+IEBAIC0yOTU0LDEwICsyOTY4
+LDEwIEBAIHZvaWQgcW1wX3hfYmxvY2tfZGlydHlfYml0bWFwX2Rpc2FibGUoY29uc3QgY2hhciAq
+bm9kZSwgY29uc3QgY2hhciAqbmFtZSwNCj4gICAgICAgICAgIHJldHVybjsNCj4gICAgICAgfQ0K
+PiAgIA0KPiAtICAgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF9mcm96ZW4oYml0bWFwKSkgew0KPiAr
+ICAgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF91c2VyX2xvY2tlZChiaXRtYXApKSB7DQo+ICAgICAg
+ICAgICBlcnJvcl9zZXRnKGVycnAsDQo+IC0gICAgICAgICAgICAgICAgICAgIkJpdG1hcCAnJXMn
+IGlzIGN1cnJlbnRseSBmcm96ZW4gYW5kIGNhbm5vdCBiZSBkaXNhYmxlZCIsDQo+IC0gICAgICAg
+ICAgICAgICAgICAgbmFtZSk7DQo+ICsgICAgICAgICAgICAgICAgICAgIkJpdG1hcCAnJXMnIGlz
+IGN1cnJlbnRseSBpbiB1c2UgYnkgYW5vdGhlciBvcGVyYXRpb24iDQo+ICsgICAgICAgICAgICAg
+ICAgICAgIiBhbmQgY2Fubm90IGJlIGRpc2FibGVkIiwgbmFtZSk7DQo+ICAgICAgICAgICByZXR1
+cm47DQo+ICAgICAgIH0NCj4gICANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoN
+Cg==
