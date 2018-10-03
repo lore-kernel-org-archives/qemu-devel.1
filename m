@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1g7hbt-00015g-OW
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:54:42 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7hlL-0006E4-50
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:04:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1g7hbo-0003SB-OI
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:54:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22919)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1g7hbo-0003Rc-IW
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 09:54:36 -0400
-References: <20181003114454.5662-1-marcandre.lureau@redhat.com>
-	<20181003114454.5662-4-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9fa8a684-8d5d-1644-3aee-86a196d31f8d@redhat.com>
-Date: Wed, 3 Oct 2018 15:54:26 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181003114454.5662-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g7hlF-0007xI-CH
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:04:27 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 3 Oct 2018 14:04:11 +0000
+Message-ID: <7dbf566b-8090-82cf-9a9b-d969e9e0a60f@virtuozzo.com>
+References: <20181002230218.13949-1-jsnow@redhat.com>
+	<20181002230218.13949-6-jsnow@redhat.com>
+In-Reply-To: <20181002230218.13949-6-jsnow@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] memory-mapping: skip non-volatile
- memory regions in GuestPhysBlockList
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5B3C3A373FF2034B87F8B7EBB8F1CDD9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 5/6] block/backup: prohibit backup from
+ using in use bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +26,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 10/03/18 13:44, Marc-Andr=C3=A9 Lureau wrote:
-> GuestPhysBlockList is currently used to produce dumps. Given the size
-> and the typical usage of NVDIMM for storage, they are not a good idea
-> to have in the dumps. We may want to have an extra dump option to
-> include them. For now, skip non-volatile regions.
->=20
-> The TCG memory clear function is going to use the GuestPhysBlockList
-> as well, and will thus skip NVDIMM for similar reasons.
->=20
-> Cc: lersek@redhat.com
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  memory_mapping.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/memory_mapping.c b/memory_mapping.c
-> index 775466f3a8..724dd0b417 100644
-> --- a/memory_mapping.c
-> +++ b/memory_mapping.c
-> @@ -206,7 +206,8 @@ static void guest_phys_blocks_region_add(MemoryList=
-ener *listener,
-> =20
->      /* we only care about RAM */
->      if (!memory_region_is_ram(section->mr) ||
-> -        memory_region_is_ram_device(section->mr)) {
-> +        memory_region_is_ram_device(section->mr) ||
-> +        memory_region_is_nonvolatile(section->mr)) {
->          return;
->      }
-> =20
->=20
-
-I've peeked at the first two patches as well. Seems OK to me. (Famous
-last words?)
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+MDMuMTAuMjAxOCAwMjowMiwgSm9obiBTbm93IHdyb3RlOg0KPiBJZiB0aGUgYml0bWFwIGlzIGZy
+b3plbiwgd2Ugc2hvdWxkbid0IHRvdWNoIGl0Lg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBKb2huIFNu
+b3cgPGpzbm93QHJlZGhhdC5jb20+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3Yt
+T2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCj4gLS0tDQo+ICAgYmxvY2tk
+ZXYuYyB8IDEyICsrKysrKy0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMo
+KyksIDYgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9ibG9ja2Rldi5jIGIvYmxvY2tk
+ZXYuYw0KPiBpbmRleCBkMGZlYmZjYTc5Li4wOThkNGMzMzdmIDEwMDY0NA0KPiAtLS0gYS9ibG9j
+a2Rldi5jDQo+ICsrKyBiL2Jsb2NrZGV2LmMNCj4gQEAgLTM1MTIsMTAgKzM1MTIsMTAgQEAgc3Rh
+dGljIEJsb2NrSm9iICpkb19kcml2ZV9iYWNrdXAoRHJpdmVCYWNrdXAgKmJhY2t1cCwgSm9iVHhu
+ICp0eG4sDQo+ICAgICAgICAgICAgICAgYmRydl91bnJlZih0YXJnZXRfYnMpOw0KPiAgICAgICAg
+ICAgICAgIGdvdG8gb3V0Ow0KPiAgICAgICAgICAgfQ0KPiAtICAgICAgICBpZiAoYmRydl9kaXJ0
+eV9iaXRtYXBfcW1wX2xvY2tlZChibWFwKSkgew0KPiArICAgICAgICBpZiAoYmRydl9kaXJ0eV9i
+aXRtYXBfdXNlcl9sb2NrZWQoYm1hcCkpIHsNCj4gICAgICAgICAgICAgICBlcnJvcl9zZXRnKGVy
+cnAsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICJCaXRtYXAgJyVzJyBpcyBjdXJyZW50bHkg
+bG9ja2VkIGFuZCBjYW5ub3QgYmUgdXNlZCBmb3IgIg0KPiAtICAgICAgICAgICAgICAgICAgICAg
+ICAiYmFja3VwIiwgYmFja3VwLT5iaXRtYXApOw0KPiArICAgICAgICAgICAgICAgICAgICAgICAi
+Qml0bWFwICclcycgaXMgY3VycmVudGx5IGluIHVzZSBieSBhbm90aGVyIG9wZXJhdGlvbiINCj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgIiBhbmQgY2Fubm90IGJlIHVzZWQgZm9yIGJhY2t1cCIs
+IGJhY2t1cC0+Yml0bWFwKTsNCj4gICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAgICAg
+IH0NCj4gICAgICAgfQ0KPiBAQCAtMzYyMCwxMCArMzYyMCwxMCBAQCBCbG9ja0pvYiAqZG9fYmxv
+Y2tkZXZfYmFja3VwKEJsb2NrZGV2QmFja3VwICpiYWNrdXAsIEpvYlR4biAqdHhuLA0KPiAgICAg
+ICAgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkJpdG1hcCAnJXMnIGNvdWxkIG5vdCBiZSBmb3Vu
+ZCIsIGJhY2t1cC0+Yml0bWFwKTsNCj4gICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAg
+ICAgIH0NCj4gLSAgICAgICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX3FtcF9sb2NrZWQoYm1hcCkp
+IHsNCj4gKyAgICAgICAgaWYgKGJkcnZfZGlydHlfYml0bWFwX3VzZXJfbG9ja2VkKGJtYXApKSB7
+DQo+ICAgICAgICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLA0KPiAtICAgICAgICAgICAgICAgICAg
+ICAgICAiQml0bWFwICclcycgaXMgY3VycmVudGx5IGxvY2tlZCBhbmQgY2Fubm90IGJlIHVzZWQg
+Zm9yICINCj4gLSAgICAgICAgICAgICAgICAgICAgICAgImJhY2t1cCIsIGJhY2t1cC0+Yml0bWFw
+KTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIkJpdG1hcCAnJXMnIGlzIGN1cnJlbnRseSBp
+biB1c2UgYnkgYW5vdGhlciBvcGVyYXRpb24iDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICIg
+YW5kIGNhbm5vdCBiZSB1c2VkIGZvciBiYWNrdXAiLCBiYWNrdXAtPmJpdG1hcCk7DQo+ICAgICAg
+ICAgICAgICAgZ290byBvdXQ7DQo+ICAgICAgICAgICB9DQo+ICAgICAgIH0NCg0KDQotLSANCkJl
+c3QgcmVnYXJkcywNClZsYWRpbWlyDQoNCg==
