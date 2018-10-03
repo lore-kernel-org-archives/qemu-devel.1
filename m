@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7neJ-0007Pg-Lg
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:21:36 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g7nfP-0000Zq-VO
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7neI-0007h8-Pg
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:21:35 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46697)
+	(envelope-from <richard.henderson@linaro.org>) id 1g7nfO-0008PP-38
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:22:43 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41848)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g7neI-0007ew-Ft
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:21:34 -0400
-Received: by mail-oi1-x242.google.com with SMTP id k64-v6so5620000oia.13
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 13:21:31 -0700 (PDT)
+	id 1g7nfN-0008IO-JY
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:22:41 -0400
+Received: by mail-ot1-x343.google.com with SMTP id e18-v6so6906824oti.8
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 13:22:33 -0700 (PDT)
 References: <20181002163556.10279-1-peter.maydell@linaro.org>
-	<20181002163556.10279-13-peter.maydell@linaro.org>
+	<20181002163556.10279-14-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2b521540-984b-7931-8e71-600e504f7d78@linaro.org>
-Date: Wed, 3 Oct 2018 15:21:28 -0500
+Message-ID: <17fe3940-f083-86d6-80b0-24be651be902@linaro.org>
+Date: Wed, 3 Oct 2018 15:22:29 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181002163556.10279-13-peter.maydell@linaro.org>
+In-Reply-To: <20181002163556.10279-14-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/13] target/arm: Add v8M stack checks for
- VLDM/VSTM
+Subject: Re: [Qemu-devel] [PATCH 13/13] target/arm: Add v8M stack checks for
+ MSR to SP_NS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,17 +36,15 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 10/2/18 11:35 AM, Peter Maydell wrote:
-> Add the v8M stack checks for the VLDM/VSTM
-> (aka VPUSH/VPOP) instructions. This code is currently
-> unreachable because we haven't yet implemented M profile
-> floating point support, but since the change is simple,
-> we add it now because otherwise we're likely to forget to
-> do it later.
+> Updating the NS stack pointer via MSR to SP_NS should include
+> a check whether the new SP value is below the stack limit.
+> No other kinds of update to the various stack pointer and
+> limit registers via MSR should perform a check.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/translate.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  target/arm/helper.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
