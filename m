@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g7nHC-0006ho-By
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 15:57:46 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g7nK6-0008Hf-JJ
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:00:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g7nH7-0002pj-Ic
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 15:57:39 -0400
-References: <20181002233314.30159-1-jsnow@redhat.com>
-	<79b55f31-00a9-273f-e004-6c097a2f1542@virtuozzo.com>
-	<ee24dc7f-7685-aaae-3315-60d66284bb23@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a0d3a14f-610f-c326-004b-336f49c98f39@redhat.com>
-Date: Wed, 3 Oct 2018 15:57:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g7nK1-0004LA-DB
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:00:42 -0400
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:39518)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g7nK0-0004CR-C5
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:00:36 -0400
+Received: by mail-it1-x141.google.com with SMTP id w200-v6so10750785itc.4
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 13:00:12 -0700 (PDT)
+References: <20181002163556.10279-1-peter.maydell@linaro.org>
+	<20181002163556.10279-5-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e70755b0-b09b-f324-45fd-e64663bc9aae@linaro.org>
+Date: Wed, 3 Oct 2018 15:00:06 -0500
 MIME-Version: 1.0
-In-Reply-To: <ee24dc7f-7685-aaae-3315-60d66284bb23@redhat.com>
+In-Reply-To: <20181002163556.10279-5-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] bitmap: Update count after a merge
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/13] target/arm: Add v8M stack checks on
+ ADD/SUB/MOV of SP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
+On 10/2/18 11:35 AM, Peter Maydell wrote:
+> Add code to insert calls to a helper function to do the stack
+> limit checking when we handle these forms of instruction
+> that write to SP:
+>  * ADD (SP plus immediate)
+>  * ADD (SP plus register)
+>  * SUB (SP minus immediate)
+>  * SUB (SP minus register)
+>  * MOV (register)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.h    |  2 ++
+>  target/arm/internals.h | 14 ++++++++
+>  target/arm/op_helper.c | 19 ++++++++++
+>  target/arm/translate.c | 80 +++++++++++++++++++++++++++++++++++++-----
+>  4 files changed, 106 insertions(+), 9 deletions(-)
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-On 10/03/2018 10:49 AM, Eric Blake wrote:
-> On 10/3/18 9:32 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 03.10.2018 02:33, John Snow wrote:
->>> From: Eric Blake <eblake@redhat.com>
->>>
->>> We need an accurate count of the number of bits set in a bitmap
->>> after a merge. In particular, since the merge operation short-circuit=
-s
->>> a merge from an empty source, if you have bitmaps A, B, and C where
->>> B started empty, then merge C into B, and B into A, an inaccurate
->>> count meant that A did not get the contents of C.
->>>
->>> In the worst case, we may falsely regard the bitmap as empty when
->>> it has had new writes merged into it.
->>>
->>> Fixes: be58721db
->>> CC: qemu-stable@nongnu.org
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> Hm, I rememberd:
->> commit 3260cdfffbf00f33923f5f9f6bef45932d7ac28b
->> Author: Liang Li <liliangleo@didichuxing.com>
->> Date:=C2=A0=C2=A0 Wed Feb 7 11:35:49 2018 -0500
->>
->> =C2=A0 =C2=A0=C2=A0=C2=A0 hbitmap: fix missing restore count when fini=
-sh deserialization
->>
->> =C2=A0 =C2=A0=C2=A0=C2=A0 The .count of HBitmap is forgot to set in fu=
-nction
->> =C2=A0 =C2=A0=C2=A0=C2=A0 hbitmap_deserialize_finish, let's set it to =
-the right value.
->>
->>
->> =C2=A0 =C2=A0- I always forget to update this field.. We definitely sh=
-ould add some
->> generic check on it somewhere, at least in tests.
->=20
-> My suggestion (in another thread) was to enhance
-> x-debug-block-dirty-bitmap-sha256 to include 'count' alongside the
-> checksum, to make it easier to write such tests.
->=20
-
-I suppose this is in preference to query-block? It would make it easier.
-
---js
+r~
