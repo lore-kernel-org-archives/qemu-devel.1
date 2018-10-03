@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7hzy-0005WQ-GE
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:19:35 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g7i08-0005d5-Pe
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:19:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7hzx-0003qe-IT
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:19:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34907)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g7i05-00045c-Ej
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:19:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37094)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g7hzx-0003gC-8w
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:19:33 -0400
+	id 1g7i05-00044i-7k
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:19:41 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  3 Oct 2018 18:18:26 +0400
-Message-Id: <20181003141833.21493-6-marcandre.lureau@redhat.com>
+Date: Wed,  3 Oct 2018 18:18:28 +0400
+Message-Id: <20181003141833.21493-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20181003141833.21493-1-marcandre.lureau@redhat.com>
 References: <20181003141833.21493-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/12] qom/object: fix iterating properties over
- a class
+Subject: [Qemu-devel] [PULL 07/12] tests/qom-proplist: check duplicate "bv"
+ property registration failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +31,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-object_class_property_iter_init() starts from the given class, so the
-next class should continue with the parent class.
+"bv" is already a class property.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qom/object.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/check-qom-proplist.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index 9222b23172..9eaf08a53c 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1115,7 +1115,7 @@ void object_class_property_iter_init(ObjectProperty=
-Iterator *iter,
-                                      ObjectClass *klass)
+diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+index 92898e1520..0f6d9c1ce3 100644
+--- a/tests/check-qom-proplist.c
++++ b/tests/check-qom-proplist.c
+@@ -125,10 +125,13 @@ static char *dummy_get_sv(Object *obj,
+=20
+ static void dummy_init(Object *obj)
  {
-     g_hash_table_iter_init(&iter->iter, klass->properties);
--    iter->nextclass =3D klass;
-+    iter->nextclass =3D object_class_get_parent(klass);
++    Error *err =3D NULL;
++
+     object_property_add_bool(obj, "bv",
+                              dummy_get_bv,
+                              dummy_set_bv,
+-                             NULL);
++                             &err);
++    error_free_or_abort(&err);
  }
 =20
- ObjectProperty *object_class_property_find(ObjectClass *klass, const cha=
-r *name,
+=20
 --=20
 2.19.0.271.gfe8321ec05
