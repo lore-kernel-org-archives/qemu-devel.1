@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1g7iln-00046W-41
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:09:02 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1g7imL-0004ZU-Mq
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1g7ilk-000400-1U
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:08:59 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1g7imI-0004Ql-K5
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:09:33 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed,  3 Oct 2018 22:07:35 +0700
-Message-Id: <1538579266-8389-2-git-send-email-edgar.iglesias@gmail.com>
+Date: Wed,  3 Oct 2018 22:07:36 +0700
+Message-Id: <1538579266-8389-3-git-send-email-edgar.iglesias@gmail.com>
 In-Reply-To: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
 References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 01/12] net: cadence_gem: Disable TSU feature
- bit
+Subject: [Qemu-devel] [PATCH v1 02/12] net: cadence_gem: Announce
+ availability of priority queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +25,38 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Disable the Timestamping Unit feature bit since QEMU does not
-yet support it. This allows guest SW to correctly probe for
-its existance.
+Announce the availability of the various priority queues.
+This fixes an issue where guest kernels would miss to
+configure secondary queues due to inproper feature bits.
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/net/cadence_gem.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/net/cadence_gem.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 0fa4b0d..e560b7a 100644
+index e560b7a..901c173 100644
 --- a/hw/net/cadence_gem.c
 +++ b/hw/net/cadence_gem.c
-@@ -1228,7 +1228,7 @@ static void gem_reset(DeviceState *d)
-     s->regs[GEM_MODID] = s->revision;
+@@ -1213,6 +1213,7 @@ static void gem_reset(DeviceState *d)
+     int i;
+     CadenceGEMState *s = CADENCE_GEM(d);
+     const uint8_t *a;
++    uint32_t queues_mask;
+ 
+     DB_PRINT("\n");
+ 
+@@ -1229,7 +1230,10 @@ static void gem_reset(DeviceState *d)
      s->regs[GEM_DESCONF] = 0x02500111;
      s->regs[GEM_DESCONF2] = 0x2ab13fff;
--    s->regs[GEM_DESCONF5] = 0x002f2145;
-+    s->regs[GEM_DESCONF5] = 0x002f2045;
-     s->regs[GEM_DESCONF6] = 0x00000200;
+     s->regs[GEM_DESCONF5] = 0x002f2045;
+-    s->regs[GEM_DESCONF6] = 0x00000200;
++    s->regs[GEM_DESCONF6] = 0x0;
++
++    queues_mask = MAKE_64BIT_MASK(1, s->num_priority_queues - 1);
++    s->regs[GEM_DESCONF6] |= queues_mask;
  
      /* Set MAC address */
+     a = &s->conf.macaddr.a[0];
 -- 
 2.7.4
