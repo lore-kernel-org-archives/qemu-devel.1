@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7iDG-0001zL-2b
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:33:21 -0400
+	(envelope-from <stefanha@redhat.com>) id 1g7iEq-00033W-9o
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:35:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7iD6-0006cu-Fn
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:33:18 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 3 Oct 2018 14:32:44 +0000
-Message-ID: <79b55f31-00a9-273f-e004-6c097a2f1542@virtuozzo.com>
-References: <20181002233314.30159-1-jsnow@redhat.com>
-In-Reply-To: <20181002233314.30159-1-jsnow@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D471780547E7574E83389A419E39B51B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <stefanha@redhat.com>) id 1g7iEn-0007kw-IH
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:34:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58394)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1g7iEn-0007jp-8O
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 10:34:53 -0400
+Date: Wed, 3 Oct 2018 15:34:46 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20181003143446.GA3012@stefanha-x1.localdomain>
+References: <20180827184103.32190-1-jusual@mail.ru>
+	<20180827184103.32190-2-jusual@mail.ru>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] bitmap: Update count after a merge
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
+Content-Disposition: inline
+In-Reply-To: <20180827184103.32190-2-jusual@mail.ru>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] chardev: Add websocket support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel@nongnu.org, Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>
 
-MDMuMTAuMjAxOCAwMjozMywgSm9obiBTbm93IHdyb3RlOg0KPiBGcm9tOiBFcmljIEJsYWtlIDxl
-Ymxha2VAcmVkaGF0LmNvbT4NCj4NCj4gV2UgbmVlZCBhbiBhY2N1cmF0ZSBjb3VudCBvZiB0aGUg
-bnVtYmVyIG9mIGJpdHMgc2V0IGluIGEgYml0bWFwDQo+IGFmdGVyIGEgbWVyZ2UuIEluIHBhcnRp
-Y3VsYXIsIHNpbmNlIHRoZSBtZXJnZSBvcGVyYXRpb24gc2hvcnQtY2lyY3VpdHMNCj4gYSBtZXJn
-ZSBmcm9tIGFuIGVtcHR5IHNvdXJjZSwgaWYgeW91IGhhdmUgYml0bWFwcyBBLCBCLCBhbmQgQyB3
-aGVyZQ0KPiBCIHN0YXJ0ZWQgZW1wdHksIHRoZW4gbWVyZ2UgQyBpbnRvIEIsIGFuZCBCIGludG8g
-QSwgYW4gaW5hY2N1cmF0ZQ0KPiBjb3VudCBtZWFudCB0aGF0IEEgZGlkIG5vdCBnZXQgdGhlIGNv
-bnRlbnRzIG9mIEMuDQo+DQo+IEluIHRoZSB3b3JzdCBjYXNlLCB3ZSBtYXkgZmFsc2VseSByZWdh
-cmQgdGhlIGJpdG1hcCBhcyBlbXB0eSB3aGVuDQo+IGl0IGhhcyBoYWQgbmV3IHdyaXRlcyBtZXJn
-ZWQgaW50byBpdC4NCj4NCj4gRml4ZXM6IGJlNTg3MjFkYg0KPiBDQzogcWVtdS1zdGFibGVAbm9u
-Z251Lm9yZw0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4N
-Cj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KDQpSZXZpZXdl
-ZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
-Y29tPg0KDQpIbSwgSSByZW1lbWJlcmQ6DQpjb21taXQgMzI2MGNkZmZmYmYwMGYzMzkyM2Y1Zjlm
-NmJlZjQ1OTMyZDdhYzI4Yg0KQXV0aG9yOiBMaWFuZyBMaSA8bGlsaWFuZ2xlb0BkaWRpY2h1eGlu
-Zy5jb20+DQpEYXRlOsKgwqAgV2VkIEZlYiA3IDExOjM1OjQ5IDIwMTggLTA1MDANCg0KIMKgwqDC
-oCBoYml0bWFwOiBmaXggbWlzc2luZyByZXN0b3JlIGNvdW50IHdoZW4gZmluaXNoIGRlc2VyaWFs
-aXphdGlvbg0KDQogwqDCoMKgIFRoZSAuY291bnQgb2YgSEJpdG1hcCBpcyBmb3Jnb3QgdG8gc2V0
-IGluIGZ1bmN0aW9uDQogwqDCoMKgIGhiaXRtYXBfZGVzZXJpYWxpemVfZmluaXNoLCBsZXQncyBz
-ZXQgaXQgdG8gdGhlIHJpZ2h0IHZhbHVlLg0KDQoNCiDCoC0gSSBhbHdheXMgZm9yZ2V0IHRvIHVw
-ZGF0ZSB0aGlzIGZpZWxkLi4gV2UgZGVmaW5pdGVseSBzaG91bGQgYWRkIHNvbWUgDQpnZW5lcmlj
-IGNoZWNrIG9uIGl0IHNvbWV3aGVyZSwgYXQgbGVhc3QgaW4gdGVzdHMuDQoNCj4gLS0tDQo+DQo+
-IHYyOiBiYXNlZCBvZmYgb2YgRXJpYydzIGNvdmVyIGxldHRlciwgbm93IHJlYmFzZWQgcHJvcGVy
-bHkNCj4gICAgICBvbiB0b3Agb2YgdGhlIGpzbm93L2JpdG1hcHMgc3RhZ2luZyBicmFuY2ggdG8g
-dXNlIHRoZQ0KPiAgICAgIGNvcnJlY3QgYml0bWFwIHRhcmdldCAocmVzdWx0KS4NCj4NCj4NCj4g
-ICB1dGlsL2hiaXRtYXAuYyB8IDMgKysrDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9u
-cygrKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvdXRpbC9oYml0bWFwLmMgYi91dGlsL2hiaXRtYXAuYw0K
-PiBpbmRleCBkNWFjYTUxNTlmLi44ZDQwMmM1OWQ5IDEwMDY0NA0KPiAtLS0gYS91dGlsL2hiaXRt
-YXAuYw0KPiArKysgYi91dGlsL2hiaXRtYXAuYw0KPiBAQCAtNzU5LDYgKzc1OSw5IEBAIGJvb2wg
-aGJpdG1hcF9tZXJnZShjb25zdCBIQml0bWFwICphLCBjb25zdCBIQml0bWFwICpiLCBIQml0bWFw
-ICpyZXN1bHQpDQo+ICAgICAgICAgICB9DQo+ICAgICAgIH0NCj4gICANCj4gKyAgICAvKiBSZWNv
-bXB1dGUgdGhlIGRpcnR5IGNvdW50ICovDQo+ICsgICAgcmVzdWx0LT5jb3VudCA9IGhiX2NvdW50
-X2JldHdlZW4ocmVzdWx0LCAwLCByZXN1bHQtPnNpemUgLSAxKTsNCj4gKw0KPiAgICAgICByZXR1
-cm4gdHJ1ZTsNCj4gICB9DQo+ICAgDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
-DQo=
+
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Mon, Aug 27, 2018 at 09:41:02PM +0300, Julia Suvorova wrote:
+> New option "websock" added to allow using websocket protocol for
+> chardev socket backend.
+> Example:
+>     -chardev socket,websock,id=...
+
+Please make user-facing interfaces use the name "websocket" instead of
+"websock" for consistency.  The official protocol name is WebSocket and
+QEMU already exposes "websocket" to the user in qapi/ui.json and
+qemu-options.hx documentation.
+
+--BOKacYhQ+x31HxR3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbtNOFAAoJEJykq7OBq3PIwnAIAKIzKoN5gZymI++BoB6yPUry
+g2TnubehIkFuY8zB26vB0t7SUeppbkaB9yLOtuHJoFlU8BAVMh6OB4HIDV/JWbIm
+rZZ7BU0Kae8uF4+K9fG8crwfRp8OCsDCr2Tlchd7VEHGakkvozMYgg4yY//FfyXQ
+vym7Iw0cPGb4bYYhqtWLExJV9bnG2xmWKRgTR2TuPvxvTsMeoCqp9qS3HkonFY5k
+DWTLLuygkIEwj6Xg4QZj8TKFj/EWK0Fxyd7U5JPubKErf1DI6aKpoez6Xklx9dv7
+HRKlllsUy0DFRiH+jLvuc0iTaSEYHwN+OJslfdspKGJ/Ab/KRJ3NyNVm92arM4s=
+=wcBx
+-----END PGP SIGNATURE-----
+
+--BOKacYhQ+x31HxR3--
