@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7erW-0000RV-At
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g7erW-0000RT-Ai
 	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g7erS-0002iU-8S
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g7erS-0002iz-FC
 	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:58:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51028)
+Received: from mx1.redhat.com ([209.132.183.28]:54780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g7erR-0002Sg-Oe
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:58:33 -0400
+	id 1g7erS-0002Zp-35
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:58:34 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  3 Oct 2018 14:57:50 +0400
-Message-Id: <20181003105755.10862-2-marcandre.lureau@redhat.com>
+Date: Wed,  3 Oct 2018 14:57:51 +0400
+Message-Id: <20181003105755.10862-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20181003105755.10862-1-marcandre.lureau@redhat.com>
 References: <20181003105755.10862-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/6] chardev: avoid crash if no associated
- address
+Subject: [Qemu-devel] [PULL 2/6] chardev: remove qemu_chr_fe_read_all()
+ counter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +31,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-A socket chardev may not have associated address (when adding client
-fd manually for example). But on disconnect, updating socket filename
-expects an address and may lead to this crash:
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  0x0000555555d8c70c in SocketAddress_to_str (prefix=3D0x555556043062 "di=
-sconnected:", addr=3D0x0, is_listen=3Dfalse, is_telnet=3Dfalse) at /home/=
-elmarco/src/qq/chardev/char-socket.c:388
-  388	    switch (addr->type) {
-  (gdb) bt
-  #0  0x0000555555d8c70c in SocketAddress_to_str (prefix=3D0x555556043062=
- "disconnected:", addr=3D0x0, is_listen=3Dfalse, is_telnet=3Dfalse) at /h=
-ome/elmarco/src/qq/chardev/char-socket.c:388
-  #1  0x0000555555d8c8aa in update_disconnected_filename (s=3D0x555556b1e=
-d00) at /home/elmarco/src/qq/chardev/char-socket.c:419
-  #2  0x0000555555d8c959 in tcp_chr_disconnect (chr=3D0x555556b1ed00) at =
-/home/elmarco/src/qq/chardev/char-socket.c:438
-  #3  0x0000555555d8cba1 in tcp_chr_hup (channel=3D0x555556b75690, cond=3D=
-G_IO_HUP, opaque=3D0x555556b1ed00) at /home/elmarco/src/qq/chardev/char-s=
-ocket.c:482
-  #4  0x0000555555da596e in qio_channel_fd_source_dispatch (source=3D0x55=
-5556bb68b0, callback=3D0x555555d8cb58 <tcp_chr_hup>, user_data=3D0x555556=
-b1ed00) at /home/elmarco/src/qq/io/channel-watch.c:84
-
-Replace filename with a generic "disconnected:socket" in this case.
+There is no obvious reason to have a loop counter. This limits from
+reading several megabytes large buffers in one go, since socket
+read/write usually have a limit.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- chardev/char-socket.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ chardev/char-fe.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 7cd0ae2824..a75b46d9fe 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -423,8 +423,12 @@ static void update_disconnected_filename(SocketChard=
-ev *s)
-     Chardev *chr =3D CHARDEV(s);
+diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+index b1f228e8b5..f158f158f8 100644
+--- a/chardev/char-fe.c
++++ b/chardev/char-fe.c
+@@ -56,7 +56,7 @@ int qemu_chr_fe_write_all(CharBackend *be, const uint8_=
+t *buf, int len)
+ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
+ {
+     Chardev *s =3D be->chr;
+-    int offset =3D 0, counter =3D 10;
++    int offset =3D 0;
+     int res;
 =20
-     g_free(chr->filename);
--    chr->filename =3D SocketAddress_to_str("disconnected:", s->addr,
--                                         s->is_listen, s->is_telnet);
-+    if (s->addr) {
-+        chr->filename =3D SocketAddress_to_str("disconnected:", s->addr,
-+                                             s->is_listen, s->is_telnet)=
-;
-+    } else {
-+        chr->filename =3D g_strdup("disconnected:socket");
-+    }
- }
+     if (!s || !CHARDEV_GET_CLASS(s)->chr_sync_read) {
+@@ -88,10 +88,6 @@ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf=
+, int len)
+         }
 =20
- /* NB may be called even if tcp_chr_connect has not been
+         offset +=3D res;
+-
+-        if (!counter--) {
+-            break;
+-        }
+     }
+=20
+     if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_RECORD) {
 --=20
 2.19.0.271.gfe8321ec05
