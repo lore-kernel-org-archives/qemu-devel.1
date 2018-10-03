@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1g7nyA-000747-S6
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:42:10 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g7nyM-000744-0S
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:42:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1g7nna-0005EI-EJ
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:31:11 -0400
-Date: Wed, 3 Oct 2018 21:30:49 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181003203049.GS27120@redhat.com>
-References: <20181003170228.95973-1-vsementsov@virtuozzo.com>
-	<bccd1e94-431f-c7cf-4a0c-599dcf345e73@redhat.com>
-	<a6a5cfb4-bfad-a4f5-fb86-e9329da851b6@virtuozzo.com>
-	<e4459a14-298e-1cd7-0805-e7ec30c3fb01@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1g7nlF-0003Rq-DN
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:28:46 -0400
+References: <20181002230218.13949-1-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <5ed59cbe-cf23-ec69-27a8-b1898ed2deb9@redhat.com>
+Date: Wed, 3 Oct 2018 16:28:32 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4459a14-298e-1cd7-0805-e7ec30c3fb01@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] nbd server: drop old-style negotiation
+In-Reply-To: <20181002230218.13949-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/6] dirty-bitmaps: fix QMP command
+ permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,17 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berrange@redhat.com" <berrange@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
-FWIW I don't have anything to add - agree with what's been said already.
 
-Rich.
+On 10/02/2018 07:02 PM, John Snow wrote:
+> based on: jsnow/bitmaps staging branch
+> 
+> This series builds on a previous standalone patch and adjusts
+> the permission for all (or most) of the QMP bitmap commands.
+> 
+> V4:
+>  - Replace "in-use" with "in use"
+>  - Replace "user_modifiable" version with "user_locked"
+>  - Remove more usages of frozen-and-or-locked in NBD.
+> 
+> John Snow (6):
+>   block/dirty-bitmaps: add user_locked status checker
+>   block/dirty-bitmaps: fix merge permissions
+>   block/dirty-bitmaps: allow clear on disabled bitmaps
+>   block/dirty-bitmaps: prohibit enable/disable on locked/frozen bitmaps
+>   block/backup: prohibit backup from using in use bitmaps
+>   nbd: forbid use of frozen bitmaps
+> 
+>  block/dirty-bitmap.c           | 13 +++++---
+>  blockdev.c                     | 75 +++++++++++++++++++-----------------------
+>  include/block/dirty-bitmap.h   |  1 +
+>  migration/block-dirty-bitmap.c | 10 ++----
+>  nbd/server.c                   |  4 +--
+>  5 files changed, 48 insertions(+), 55 deletions(-)
+> 
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+Thanks, applied to my bitmaps tree: [with edits suggested by Vladimir];
+
+https://github.com/jnsnow/qemu/commits/bitmaps
+https://github.com/jnsnow/qemu.git
+
+--js
