@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g7Zsm-000139-MH
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 01:39:37 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1g7awc-00045I-Sv
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 02:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1g7Zsh-00070B-8i
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 01:39:36 -0400
-Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:59875)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1g7Zsh-0006zo-1s
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 01:39:31 -0400
-Received: from player692.ha.ovh.net (unknown [10.109.159.62])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 9A56034AF5
-	for <qemu-devel@nongnu.org>; Wed,  3 Oct 2018 07:39:29 +0200 (CEST)
-References: <20181002215315.16851-1-f4bug@amsat.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a6d996ce-0ff6-7ff3-f54a-1be747061ff9@kaod.org>
-Date: Wed, 3 Oct 2018 07:39:18 +0200
+	(envelope-from <dovgaluk@ispras.ru>) id 1g7awZ-0002CD-M7
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 02:47:38 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:45500)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1g7awZ-0002Bh-A4
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 02:47:35 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181002215315.16851-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Wed, 03 Oct 2018 09:47:31 +0300
+From: dovgaluk <dovgaluk@ispras.ru>
+In-Reply-To: <CANzW0muZaNRtOP6OjXJ11HXL_q2MDOhCxY2dXZc2DzHr5BxqLw@mail.gmail.com>
+References: <CANzW0mvSX5nWuinDU68W2yJzgoQSGAHPqpz0G36A6NKwRsz_4A@mail.gmail.com>
+	<d45bff6c4e472811f01452b5f730c1b6@ispras.ru>
+	<CANzW0mthuW0a7LR7DhpvTPnZ5n5DxtYyfYQf756vtyb9g0O7QQ@mail.gmail.com>
+	<CANzW0muZaNRtOP6OjXJ11HXL_q2MDOhCxY2dXZc2DzHr5BxqLw@mail.gmail.com>
+Message-ID: <1930792321d9a0b16576359c7cec9f51@ispras.ru>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-host/ppce500: Use
- DeviceState::realize rather than SysBusDevice::init
+Subject: Re: [Qemu-devel] [PATCH v6 00/25] Fixing record/replay and adding
+ reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +31,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, "open list:ppce500" <qemu-ppc@nongnu.org>
+To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Cc: Pavel.Dovgaluk@ispras.ru, qemu-devel@nongnu.org
 
-On 10/2/18 11:53 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Move from the legacy SysBusDevice::init method to using DeviceState::re=
-alize.
+Can you try applying this patch?
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg563798.html
+
+I also encountered the problems with x86_64 replaying and found the=20
+misprint in
+the code which was fixed later, than sending the series to the mailing=20
+list.
+
+Pavel Dovgalyuk
+
+
+Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-10-02 10:02:
+> I've added "-monitor stdio" option to command line of Test 1 and
+> repeated entering command during execution:
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-That patch was already reviewed by you and merged by David :)
-
-C.
-
-> ---
->  hw/pci-host/ppce500.c | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
+>   QEMU 3.0.50 monitor - type 'help' for more information
+>   (qemu) info replay
+>   Replaying execution 'icount_rr_capture.bin': current step =3D
+> 311736195
+>   (qemu) info replay
+>   Replaying execution 'icount_rr_capture.bin': current step =3D
+> 318198367
+>   (qemu) info replay
+>   Replaying execution 'icount_rr_capture.bin': current step =3D
+> 324737211
+>   (qemu) info replay
+>   Replaying execution 'icount_rr_capture.bin': current step =3D
+> 329890795
+>   (qemu) info replay
+>   Replaying execution 'icount_rr_capture.bin': current step =3D
+> 607069789
+>   (qemu) info replay
+>   Replaying execution 'icount_rr_capture.bin': current step =3D
+> 607069789
+>   (qemu) info replay
+>   Replaying execution 'icount_rr_capture.bin': current step =3D
+> 607069789
+>   ...
 >=20
-> diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
-> index eb75e080fc..b8f8c112e6 100644
-> --- a/hw/pci-host/ppce500.c
-> +++ b/hw/pci-host/ppce500.c
-> @@ -436,8 +436,9 @@ static AddressSpace *e500_pcihost_set_iommu(PCIBus =
-*bus, void *opaque,
->      return &s->bm_as;
->  }
-> =20
-> -static int e500_pcihost_initfn(SysBusDevice *dev)
-> +static void e500_pcihost_realize(DeviceState *dev, Error **errp)
->  {
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      PCIHostState *h;
->      PPCE500PCIState *s;
->      PCIBus *b;
-> @@ -447,7 +448,7 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
->      s =3D PPC_E500_PCI_HOST_BRIDGE(dev);
-> =20
->      for (i =3D 0; i < ARRAY_SIZE(s->irq); i++) {
-> -        sysbus_init_irq(dev, &s->irq[i]);
-> +        sysbus_init_irq(sbd, &s->irq[i]);
->      }
-> =20
->      for (i =3D 0; i < PCI_NUM_PINS; i++) {
-> @@ -460,7 +461,7 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
->      /* PIO lives at the bottom of our bus space */
->      memory_region_add_subregion_overlap(&s->busmem, 0, &s->pio, -2);
-> =20
-> -    b =3D pci_register_root_bus(DEVICE(dev), NULL, mpc85xx_pci_set_irq=
-,
-> +    b =3D pci_register_root_bus(dev, NULL, mpc85xx_pci_set_irq,
->                                mpc85xx_pci_map_irq, s, &s->busmem, &s->=
-pio,
->                                PCI_DEVFN(s->first_slot, 0), 4, TYPE_PCI=
-_BUS);
->      h->bus =3D b;
-> @@ -483,10 +484,8 @@ static int e500_pcihost_initfn(SysBusDevice *dev)
->      memory_region_add_subregion(&s->container, PCIE500_CFGADDR, &h->co=
-nf_mem);
->      memory_region_add_subregion(&s->container, PCIE500_CFGDATA, &h->da=
-ta_mem);
->      memory_region_add_subregion(&s->container, PCIE500_REG_BASE, &s->i=
-omem);
-> -    sysbus_init_mmio(dev, &s->container);
-> +    sysbus_init_mmio(sbd, &s->container);
->      pci_bus_set_route_irq_fn(b, e500_route_intx_pin_to_irq);
-> -
-> -    return 0;
->  }
-> =20
->  static void e500_host_bridge_class_init(ObjectClass *klass, void *data=
-)
-> @@ -526,9 +525,8 @@ static Property pcihost_properties[] =3D {
->  static void e500_pcihost_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
-> =20
-> -    k->init =3D e500_pcihost_initfn;
-> +    dc->realize =3D e500_pcihost_realize;
->      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
->      dc->props =3D pcihost_properties;
->      dc->vmsd =3D &vmstate_ppce500_pci;
+> Some notes on value of step it stucks on:
+> - mostly it's same (even across different record-replay pairs);
+> - stressing host during replay may cause it to change even for same
+> record-replay pair (i.e. different replay executions for same file
+> recorded).
 >=20
+> This specific case seems to be stable to reproduce.
+>=20
+> =D0=B2=D1=82, 2 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 0:22, Artem Pis=
+arenko
+> <artem.k.pisarenko@gmail.com>:
+>=20
+>> I've posted bug report with extended tests (incl. case without
+>> sleep=3Doff). You may find guest image (kernel) in bug description.
+>> https://bugs.launchpad.net/qemu/+bug/1795369 [1]
+>>=20
+>> The most annoying thing is that some issues are almost not
+>> reproducible. There are definitely race conditions somewhere in qemu
+>> code. Running 'stress-ng' utility with CPU and I/O stressors in
+>> parallel with qemu execution greatly minimizes amount of attempts
+>> when I'm trying to trigger some of issues I encounter.
+>>=20
+>> I'll try 'info monitor' command tomorrow, but no guarantees that
+>> I'll be able to reproduce issue again.
+>>=20
+>> Speaking about '-nographic' and SDL... I've noted that UI greatly
+>> minimizes possibility of hanging (but not avoids it completely) when
+>> using icount in general, so this effect isn't rr-specific. I've
+>> already reported this bug too.
+>>=20
+>> =D0=BF=D0=BD, 1 =D0=BE=D0=BA=D1=82. 2018 =D0=B3., 20:14 dovgaluk <dovg=
+aluk@ispras.ru>:
+>>=20
+>>> Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-09-30 14:01:
+>>>> Feature still broken :(
+>>>=20
+>>> Thanks for testing.
+>>>=20
+>>>>=20
+>>>> Brief description of my tests.
+>>>>=20
+>>>> Guest image is Linux, which just powers off after kernel boots
+>>>> (instead of proceeding to user-space /init or /sbin/init).
+>>>> Base cmdline:
+>>>> qemu-system-x86_64 -nodefaults -machine pc,accel=3Dtcg -m 2048
+>>> -cpu
+>>>> qemu64 -rtc clock=3Dvm,base=3D2000-01-01T00:00:00 -kernel bzImage
+>>> -initrd
+>>>> rootfs -append 'nokaslr console=3DttyS0 rdinit=3D/init_poweroff'
+>>>> -nographic -serial SERIAL_VALUE -icount
+>>>> 1,sleep=3Doff,rr=3DRR_VALUE,rrfile=3Dicount_rr_capture.bin
+>>>=20
+>>> I've never tried it with sleep=3Doff. Can you remove it and try
+>>> again?
+>>>=20
+>>> We also seen a problem with '-nographic'. When we remove this
+>>> option and
+>>> QEMU runs with SDL
+>>> window, everything is ok. There is some problem with main loop
+>>> which may
+>>> sleep when there
+>>> is no GUI to update, or something like that. We couldn't fix it
+>>> yet.
+>>>=20
+>>>>=20
+>>>> Test 1. When SERIAL_VALUE=3Dnone
+>>>> Running with RR_VALUE=3Drecord completes successfully.
+>>>> Running with RR_VALUE=3Dreplay doesn't completes. qemu process
+>>> just
+>>>> eating ~100% cpu and memory usage doesn't grow after some
+>>> moment. I
+>>>> don't see what happens because of problem no.2 (see below).
+>>>=20
+>>> Try 'info replay' monitor command. Does instruction counter
+>>> increases?
+>>>=20
+>>>>=20
+>>>> Test 2. When SERIAL_VALUE=3Dstdio
+>>>> Running with RR_VALUE=3Drecord completes successfully.
+>>>>=20
+>>>> Running with RR_VALUE=3Dreplay caues exit with error:
+>>>>=20
+>>>> "qemu-system-x86_64: Missing character write event in the replay
+>>> log"
+>>>>=20
+>>>> These problems are same with qemu 2.12 (both vanilla and with
+>>> previous
+>>>> versions of these patches applied). Furthemore, I consider whole
+>>>> icount mode broken and determinism isn't achievable.
+>>>> The irony is that I actually don't need record/replay feature.
+>>> I've
+>>>> tried to use it only as instrument to debug failing determinism
+>>> in
+>>>> qemu code. But since replay/record feature itself relies on
+>>>> determinism, which is broken, it's no wonder why it fails also
+>>> (I just
+>>>> hoped to bypass it).
+>>>>=20
+>>>> Contact me if you need more details. I just tired a lot trying
+>>> to get
+>>>> all these things working... Hope is leaving me...
+>>>=20
+>>> Can you share the kernel in case the icount still broken?
+>>>=20
+>>> Pavel Dovgalyuk
+>> --
+>>=20
+>> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
+>> =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
+=BD=D0=BA=D0=BE
+>  --
+>=20
+> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
+>   =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
+=BD=D0=BA=D0=BE
+>=20
+> Links:
+> ------
+> [1] https://bugs.launchpad.net/qemu/+bug/1795369
