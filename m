@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g7o4z-0004oE-NO
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:49:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7obK-0001Wv-4q
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 17:22:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g7o4q-0002SP-6I
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:49:05 -0400
-References: <20181002233314.30159-1-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2ef8c12c-9044-4ea4-c5ec-69a6e98d9f69@redhat.com>
-Date: Wed, 3 Oct 2018 16:48:37 -0400
-MIME-Version: 1.0
-In-Reply-To: <20181002233314.30159-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] bitmap: Update count after a merge
+	(envelope-from <eblake@redhat.com>) id 1g7obG-0000ur-BH
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 17:22:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49510)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g7obG-0000pn-0F
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 17:22:30 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0118D36887
+	for <qemu-devel@nongnu.org>; Wed,  3 Oct 2018 21:22:16 +0000 (UTC)
+Received: from red.redhat.com (ovpn-126-73.rdu2.redhat.com [10.10.126.73])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8A0AC60F97
+	for <qemu-devel@nongnu.org>; Wed,  3 Oct 2018 21:22:15 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Wed,  3 Oct 2018 16:22:06 -0500
+Message-Id: <20181003212211.812374-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 0/5] NBD patches through 2018-10-03
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-stable@nongnu.org
-Cc: vsementsov@virtuozzo.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+The following changes since commit dafd95053611aa14dda40266857608d12ddce658:
 
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-02 18:27:18 +0100)
 
-On 10/02/2018 07:33 PM, John Snow wrote:
-> From: Eric Blake <eblake@redhat.com>
-> 
-> We need an accurate count of the number of bits set in a bitmap
-> after a merge. In particular, since the merge operation short-circuits
-> a merge from an empty source, if you have bitmaps A, B, and C where
-> B started empty, then merge C into B, and B into A, an inaccurate
-> count meant that A did not get the contents of C.
-> 
-> In the worst case, we may falsely regard the bitmap as empty when
-> it has had new writes merged into it.
-> 
-> Fixes: be58721db
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
-> 
-> v2: based off of Eric's cover letter, now rebased properly
->     on top of the jsnow/bitmaps staging branch to use the
->     correct bitmap target (result).
-> 
-> 
->  util/hbitmap.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/util/hbitmap.c b/util/hbitmap.c
-> index d5aca5159f..8d402c59d9 100644
-> --- a/util/hbitmap.c
-> +++ b/util/hbitmap.c
-> @@ -759,6 +759,9 @@ bool hbitmap_merge(const HBitmap *a, const HBitmap *b, HBitmap *result)
->          }
->      }
->  
-> +    /* Recompute the dirty count */
-> +    result->count = hb_count_between(result, 0, result->size - 1);
-> +
->      return true;
->  }
->  
-> 
+are available in the Git repository at:
 
-Tests on the way, but for now...
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-10-03
 
-Thanks, applied to my bitmaps tree:
+for you to fetch changes up to 7f7dfe2a53446072c136d349e3150c84d322b2bc:
 
-https://github.com/jnsnow/qemu/commits/bitmaps
-https://github.com/jnsnow/qemu.git
+  nbd/server: drop old-style negotiation (2018-10-03 15:52:32 -0500)
 
---js
+----------------------------------------------------------------
+nbd patches for 2018-10-03
+
+Fix bug in NBD_CMD_CACHE, drop support for oldstyle NBD server,
+minor build and doc fixes
+
+- Vladimir Sementsov-Ogievskiy: 0/2 server: drop old-style negotiation
+- Eric Blake: qemu-nbd: Document --tls-creds
+- Vladimir Sementsov-Ogievskiy: nbd/server: fix NBD_CMD_CACHE
+- Peter Maydell: nbd: Don't take address of fields in packed structs
+
+----------------------------------------------------------------
+Eric Blake (1):
+      qemu-nbd: Document --tls-creds
+
+Peter Maydell (1):
+      nbd: Don't take address of fields in packed structs
+
+Vladimir Sementsov-Ogievskiy (3):
+      nbd/server: fix NBD_CMD_CACHE
+      qemu-nbd: drop old-style negotiation
+      nbd/server: drop old-style negotiation
+
+ include/block/nbd.h |  3 +-
+ blockdev-nbd.c      |  3 +-
+ nbd/client.c        | 44 ++++++++++++++---------------
+ nbd/server.c        | 80 +++++++++++++++++++----------------------------------
+ qemu-nbd.c          | 26 +++++------------
+ 5 files changed, 60 insertions(+), 96 deletions(-)
+
+-- 
+2.17.1
