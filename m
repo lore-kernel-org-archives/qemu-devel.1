@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7m1h-0006wj-42
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:37:40 -0400
+	(envelope-from <mst@redhat.com>) id 1g7m1r-0007fA-Ph
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:37:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7lmP-0002a5-Tq
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:21:53 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 3 Oct 2018 18:21:46 +0000
-Message-ID: <f71300db-5fe8-3473-2378-b438e2cdbd4e@virtuozzo.com>
-References: <20181003175524.597407-1-eblake@redhat.com>
-In-Reply-To: <20181003175524.597407-1-eblake@redhat.com>
-Content-Language: en-US
+	(envelope-from <mst@redhat.com>) id 1g7m1o-0005K7-Ug
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:37:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1g7m1o-0005J0-Oe
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:37:44 -0400
+Date: Wed, 3 Oct 2018 14:37:42 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20181003143448-mutt-send-email-mst@kernel.org>
+References: <CAEJ3UntstF2hsn11MrcoMqb7_JMOxs9GRiALF==S6o2aMpAAeg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v2] nbd: Flip qemu-nbd to prefer newstyle;
- add -O for old behavior
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEJ3UntstF2hsn11MrcoMqb7_JMOxs9GRiALF==S6o2aMpAAeg@mail.gmail.com>
+Subject: Re: [Qemu-devel] ACPI PCI hotplug table updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,105 +26,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "rjones@redhat.com" <rjones@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open
-	list:Network Block Dev..." <qemu-block@nongnu.org>
+To: open sorcerer <0p3n.s0rc3r3r@gmail.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com
 
-MDMuMTAuMjAxOCAyMDo1NSwgRXJpYyBCbGFrZSB3cm90ZToNCg0KT2xkc3R5bGUgTkJEIG5lZ290
-aWF0aW9uIGNhbm5vdCBwZXJmb3JtIGFueSBvZiB0aGUgZXh0ZW5zaW9ucyB0aGF0DQp3ZSBoYXZl
-IHJlY2VudGx5IGJlZW4gcmVseWluZyBvbi4gIFdoaWxlIHlvdSBjYW4gYWx3YXlzIHBhc3MgLXgg
-IiINCnRvIGdldCBuZXdzdHlsZSBuZWdvdGlhdGlvbiwgdGhlc2UgZGF5cywgaXQgaXMgYmV0dGVy
-IHRvIGp1c3QgZGVmYXVsdA0KdG8gbmV3c3R5bGUgKHdpdGggYW4gZW1wdHkgZXhwb3J0IG5hbWUp
-IGFuZCBmYWxsIGJhY2sgdG8gb2xkc3R5bGUNCm9ubHkgb24gYW4gZXhwbGljaXQgcmVxdWVzdC4N
-Cg0KcWVtdSBhcyBjbGllbnQgY2FuIG1hbmFnZSBlaXRoZXIgc3R5bGUgc2luY2UgMi42LjAsIGNv
-bW1pdCA2OWI0OTUwMmQ4DQoNCkZvciBjb21wYXJpc29uOg0KDQpuYmRraXQgMS4zIHN3aXRjaGVk
-IGl0cyBkZWZhdWx0IHRvIG5ld3N0eWxlIChKYW4gMjAxOCk6DQpodHRwczovL2dpdGh1Yi5jb20v
-bGliZ3Vlc3Rmcy9uYmRraXQvY29tbWl0L2IyYThhZWNjDQpodHRwczovL2dpdGh1Yi5jb20vbGli
-Z3Vlc3Rmcy9uYmRraXQvY29tbWl0LzgxNThlNzczDQoNCm5iZCAzLjEwIGRyb3BwZWQgb2xkc3R5
-bGUgbG9uZyBhZ28gKE1hciAyMDE1KToNCmh0dHBzOi8vZ2l0aHViLmNvbS9OZXR3b3JrQmxvY2tE
-ZXZpY2UvbmJkL2NvbW1pdC8zNjk0MDE5Mw0KDQpTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxl
-Ymxha2VAcmVkaGF0LmNvbT48bWFpbHRvOmVibGFrZUByZWRoYXQuY29tPg0KLS0tDQp2MjogaW1w
-cm92ZSAncWVtdS1uYmQgLS1oZWxwJywgZHJvcCByZWR1bmRhbnQgdmFyaWFibGUgJ25ld3Byb3Rv
-Jw0KLS0tDQogcWVtdS1uYmQuYyB8IDM3ICsrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0t
-LS0tLS0NCiAxIGZpbGUgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKSwgMTQgZGVsZXRpb25zKC0p
-DQoNCmRpZmYgLS1naXQgYS9xZW11LW5iZC5jIGIvcWVtdS1uYmQuYw0KaW5kZXggNTFiOWQzOGM3
-MjcuLmUzNWM5N2U3Y2E0IDEwMDY0NA0KLS0tIGEvcWVtdS1uYmQuYw0KKysrIGIvcWVtdS1uYmQu
-Yw0KQEAgLTU2LDcgKzU2LDcgQEANCiAjZGVmaW5lIE1CUl9TSVpFIDUxMg0KDQogc3RhdGljIE5C
-REV4cG9ydCAqZXhwOw0KLXN0YXRpYyBib29sIG5ld3Byb3RvOw0KK3N0YXRpYyBib29sIG9sZHN0
-eWxlOw0KIHN0YXRpYyBpbnQgdmVyYm9zZTsNCiBzdGF0aWMgY2hhciAqc3JjcGF0aDsNCiBzdGF0
-aWMgU29ja2V0QWRkcmVzcyAqc2FkZHI7DQpAQCAtODQsOCArODQsOSBAQCBzdGF0aWMgdm9pZCB1
-c2FnZShjb25zdCBjaGFyICpuYW1lKQ0KICIgIC1lLCAtLXNoYXJlZD1OVU0gICAgICAgICAgZGV2
-aWNlIGNhbiBiZSBzaGFyZWQgYnkgTlVNIGNsaWVudHMgKGRlZmF1bHQgJzEnKVxuIg0KICIgIC10
-LCAtLXBlcnNpc3RlbnQgICAgICAgICAgZG9uJ3QgZXhpdCBvbiB0aGUgbGFzdCBjb25uZWN0aW9u
-XG4iDQogIiAgLXYsIC0tdmVyYm9zZSAgICAgICAgICAgICBkaXNwbGF5IGV4dHJhIGRlYnVnZ2lu
-ZyBpbmZvcm1hdGlvblxuIg0KLSIgIC14LCAtLWV4cG9ydC1uYW1lPU5BTUUgICAgZXhwb3NlIGV4
-cG9ydCBieSBuYW1lXG4iDQotIiAgLUQsIC0tZGVzY3JpcHRpb249VEVYVCAgICB3aXRoIC14LCBh
-bHNvIGV4cG9ydCBhIGh1bWFuLXJlYWRhYmxlIGRlc2NyaXB0aW9uXG4iDQorIiAgLXgsIC0tZXhw
-b3J0LW5hbWU9TkFNRSAgICBleHBvc2UgZXhwb3J0IGJ5IG5hbWUgKGRlZmF1bHQgIiIpXG4iDQor
-IiAgLUQsIC0tZGVzY3JpcHRpb249VEVYVCAgICBleHBvc2UgYSBodW1hbi1yZWFkYWJsZSBkZXNj
-cmlwdGlvbiBvZiBleHBvcnRcbiINCisiICAtTywgLS1vbGRzdHlsZSAgICAgICAgICAgIGZvcmNl
-IG9sZHN0eWxlIChub3Qgd2l0aCAteCwgLUQsIG9yIC0tdGxzLWNyZWRzKVxuIg0KICJcbiINCiAi
-RXhwb3NpbmcgcGFydCBvZiB0aGUgaW1hZ2U6XG4iDQogIiAgLW8sIC0tb2Zmc2V0PU9GRlNFVCAg
-ICAgICBvZmZzZXQgaW50byB0aGUgaW1hZ2VcbiINCkBAIC0zNTQsNyArMzU1LDcgQEAgc3RhdGlj
-IHZvaWQgbmJkX2FjY2VwdChRSU9OZXRMaXN0ZW5lciAqbGlzdGVuZXIsIFFJT0NoYW5uZWxTb2Nr
-ZXQgKmNpb2MsDQoNCiAgICAgbmJfZmRzKys7DQogICAgIG5iZF91cGRhdGVfc2VydmVyX3dhdGNo
-KCk7DQotICAgIG5iZF9jbGllbnRfbmV3KG5ld3Byb3RvID8gTlVMTCA6IGV4cCwgY2lvYywNCisg
-ICAgbmJkX2NsaWVudF9uZXcob2xkc3R5bGUgPyBleHAgOiBOVUxMLCBjaW9jLA0KICAgICAgICAg
-ICAgICAgICAgICB0bHNjcmVkcywgTlVMTCwgbmJkX2NsaWVudF9jbG9zZWQpOw0KIH0NCg0KQEAg
-LTUwMiw3ICs1MDMsNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQogICAgIG9m
-Zl90IGZkX3NpemU7DQogICAgIFFlbXVPcHRzICpzbl9vcHRzID0gTlVMTDsNCiAgICAgY29uc3Qg
-Y2hhciAqc25faWRfb3JfbmFtZSA9IE5VTEw7DQotICAgIGNvbnN0IGNoYXIgKnNvcHQgPSAiaFZi
-Om86cDpyc25QOmM6ZHZrOmU6Zjp0bDp4OlQ6RDoiOw0KKyAgICBjb25zdCBjaGFyICpzb3B0ID0g
-ImhWYjpvOnA6cnNuUDpjOmR2azplOmY6dGw6eDpUOkQ6TyI7DQogICAgIHN0cnVjdCBvcHRpb24g
-bG9wdFtdID0gew0KICAgICAgICAgeyAiaGVscCIsIG5vX2FyZ3VtZW50LCBOVUxMLCAnaCcgfSwN
-CiAgICAgICAgIHsgInZlcnNpb24iLCBub19hcmd1bWVudCwgTlVMTCwgJ1YnIH0sDQpAQCAtNTI5
-LDYgKzUzMCw3IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCiAgICAgICAgIHsg
-Im9iamVjdCIsIHJlcXVpcmVkX2FyZ3VtZW50LCBOVUxMLCBRRU1VX05CRF9PUFRfT0JKRUNUIH0s
-DQogICAgICAgICB7ICJleHBvcnQtbmFtZSIsIHJlcXVpcmVkX2FyZ3VtZW50LCBOVUxMLCAneCcg
-fSwNCiAgICAgICAgIHsgImRlc2NyaXB0aW9uIiwgcmVxdWlyZWRfYXJndW1lbnQsIE5VTEwsICdE
-JyB9LA0KKyAgICAgICAgeyAib2xkc3R5bGUiLCBub19hcmd1bWVudCwgTlVMTCwgJ08nIH0sDQog
-ICAgICAgICB7ICJ0bHMtY3JlZHMiLCByZXF1aXJlZF9hcmd1bWVudCwgTlVMTCwgUUVNVV9OQkRf
-T1BUX1RMU0NSRURTIH0sDQogICAgICAgICB7ICJpbWFnZS1vcHRzIiwgbm9fYXJndW1lbnQsIE5V
-TEwsIFFFTVVfTkJEX09QVF9JTUFHRV9PUFRTIH0sDQogICAgICAgICB7ICJ0cmFjZSIsIHJlcXVp
-cmVkX2FyZ3VtZW50LCBOVUxMLCAnVCcgfSwNCkBAIC03MjMsNiArNzI1LDkgQEAgaW50IG1haW4o
-aW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KICAgICAgICAgY2FzZSAnRCc6DQogICAgICAgICAgICAg
-ZXhwb3J0X2Rlc2NyaXB0aW9uID0gb3B0YXJnOw0KICAgICAgICAgICAgIGJyZWFrOw0KKyAgICAg
-ICAgY2FzZSAnTyc6DQorICAgICAgICAgICAgb2xkc3R5bGUgPSB0cnVlOw0KKyAgICAgICAgICAg
-IGJyZWFrOw0KICAgICAgICAgY2FzZSAndic6DQogICAgICAgICAgICAgdmVyYm9zZSA9IDE7DQog
-ICAgICAgICAgICAgYnJlYWs7DQpAQCAtNzk5LDcgKzgwNCwxNiBAQCBpbnQgbWFpbihpbnQgYXJn
-YywgY2hhciAqKmFyZ3YpDQogICAgICAgICB9DQogICAgIH0NCg0KKyAgICBpZiAoIW9sZHN0eWxl
-ICYmICFleHBvcnRfbmFtZSkgew0KKyAgICAgICAgLyogU2V0IHRoZSBkZWZhdWx0IE5CRCBwcm90
-b2NvbCBleHBvcnQgbmFtZSwgdG8gZmF2b3IgbmV3IHN0eWxlLiAqLw0KKyAgICAgICAgZXhwb3J0
-X25hbWUgPSAiIjsNCisgICAgfQ0KDQp0aGlzDQoNCg0KDQoNCisNCiAgICAgaWYgKHRsc2NyZWRz
-aWQpIHsNCisgICAgICAgIGlmIChvbGRzdHlsZSkgew0KKyAgICAgICAgICAgIGVycm9yX3JlcG9y
-dCgiVExTIGlzIGluY29tcGF0aWJsZSB3aXRoIG9sZHN0eWxlIik7DQorICAgICAgICAgICAgZXhp
-dChFWElUX0ZBSUxVUkUpOw0KKyAgICAgICAgfQ0KICAgICAgICAgaWYgKHNvY2twYXRoKSB7DQog
-ICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJUTFMgaXMgb25seSBzdXBwb3J0ZWQgd2l0aCBJUHY0
-L0lQdjYiKTsNCiAgICAgICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQpAQCAtODA4LDExICs4
-MjIsNiBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQogICAgICAgICAgICAgZXJy
-b3JfcmVwb3J0KCJUTFMgaXMgbm90IHN1cHBvcnRlZCB3aXRoIGEgaG9zdCBkZXZpY2UiKTsNCiAg
-ICAgICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQogICAgICAgICB9DQotICAgICAgICBpZiAo
-IWV4cG9ydF9uYW1lKSB7DQotICAgICAgICAgICAgLyogU2V0IHRoZSBkZWZhdWx0IE5CRCBwcm90
-b2NvbCBleHBvcnQgbmFtZSwgc2luY2UNCi0gICAgICAgICAgICAgKiB3ZSAqbXVzdCogdXNlIG5l
-dyBzdHlsZSBwcm90b2NvbCBmb3IgVExTICovDQotICAgICAgICAgICAgZXhwb3J0X25hbWUgPSAi
-IjsNCi0gICAgICAgIH0NCiAgICAgICAgIHRsc2NyZWRzID0gbmJkX2dldF90bHNfY3JlZHModGxz
-Y3JlZHNpZCwgJmxvY2FsX2Vycik7DQogICAgICAgICBpZiAobG9jYWxfZXJyKSB7DQogICAgICAg
-ICAgICAgZXJyb3JfcmVwb3J0KCJGYWlsZWQgdG8gZ2V0IFRMUyBjcmVkcyAlcyIsDQpAQCAtMTAx
-MywxMyArMTAyMiwxMyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQogICAgICAg
-ICBlcnJvcl9yZXBvcnRfZXJyKGxvY2FsX2Vycik7DQogICAgICAgICBleGl0KEVYSVRfRkFJTFVS
-RSk7DQogICAgIH0NCisgICAgaWYgKG9sZHN0eWxlICYmIChleHBvcnRfbmFtZSB8fCBleHBvcnRf
-ZGVzY3JpcHRpb24pKSB7DQorICAgICAgICBlcnJvcl9yZXBvcnQoIm9sZHN0eWxlIG5lZ290aWF0
-aW9uIGNhbm5vdCBzZXQgZXhwb3J0IGRldGFpbHMiKTsNCisgICAgICAgIGV4aXQoRVhJVF9GQUlM
-VVJFKTsNCisgICAgfQ0KDQphbmQgdGhpcyBhcmUgdmVyeSBzaW1wbGUgb3B0aW9uIGNoZWNrcywg
-c28sIGl0IGlzIGJldHRlciB0byBwbGFjZSB0aGVtIHRvZ2V0aGVyIGFuZCBhZnRlciBnZXRvcHQg
-bG9vcCwgYmVmb3JlIHRoZSBvdGhlciBtb3JlIGRpZmZpY3VsdCBsb2dpYy4NCg0KYnV0IGl0J3Mg
-YSBuaXQtcGlja2luZywgc28sIHdpdGggb3Igd2l0aG91dDoNClJldmlld2VkLWJ5OiBWbGFkaW1p
-ciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+PG1haWx0bzp2
-c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KDQogICAgIGlmIChleHBvcnRfbmFtZSkgew0K
-ICAgICAgICAgbmJkX2V4cG9ydF9zZXRfbmFtZShleHAsIGV4cG9ydF9uYW1lKTsNCiAgICAgICAg
-IG5iZF9leHBvcnRfc2V0X2Rlc2NyaXB0aW9uKGV4cCwgZXhwb3J0X2Rlc2NyaXB0aW9uKTsNCi0g
-ICAgICAgIG5ld3Byb3RvID0gdHJ1ZTsNCi0gICAgfSBlbHNlIGlmIChleHBvcnRfZGVzY3JpcHRp
-b24pIHsNCi0gICAgICAgIGVycm9yX3JlcG9ydCgiRXhwb3J0IGRlc2NyaXB0aW9uIHJlcXVpcmVz
-IGFuIGV4cG9ydCBuYW1lIik7DQotICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7DQogICAgIH0N
-Cg0KICAgICBpZiAoZGV2aWNlKSB7DQoNCg0KDQoNCi0tDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1p
-cg0K
+On Wed, Oct 03, 2018 at 10:44:20AM -0700, open sorcerer wrote:
+> Hi,
+> 
+> I am digging into an issue where qmp_device_del does not actually delete
+> devices when a guest OS is in prelaunch.
+
+What exactly is meant by prelaunch? E.g. is it prelaunch while bios is
+doing the pci bus scan?
+
+> This seems to be due to the guest OS
+> not handling ACPI events because it is not currently running. If I assume
+> correctly, qmp should allow you to add/remove devices while the host is down,
+> or if not possible, publish an error message.
+> 
+> I think fixing this issue is as simple as making sure that the VM is in a safe
+> state to ignore the hotplug ACPI dance but eject the disk, something like:
+> 
+> prelaunch, preconfig, shutdown: ignore acpi and deal with cleaning devices
+> other non-running: bubble up error
+> running: default behavior
+> 
+> I was trying to validate that this change would be safe (keep in mind I am
+> learning ACPI in little pieces while digging) using GDB, and code inspection.
+> While stepping through with GDB i noticed that the PCI slots are controlled by
+> memory region and the opaque acpi pci hp state object. I was unable this far to
+> find any code executed that modifies the ACPI tables beyond just the pci
+> hotplug state.
+> 
+> I also tried to test using "while true; do acpidump | md5; sleep 1; done" in
+> the guest OS and then add/remove a virtio-blk-pci device (which exercised the
+> ACPI callbacks via piix4 callbacks). The output of the acpidump -> md5 was
+> consistent during each phase of the data collection which I believe implied
+> that the acpi tables were not modified by the PCI hotplug.
+> 
+> Can someone help me understand:
+> 
+> 1. Are the ACPI tables not modified when doing PCI hotplug?
+
+Yes.
+
+> 2. Do the general changes proposed seem safe?
+> 3. Are there resources or documentation I can read to help me understand this
+> problem further? I have skimmed through alot of different documents and watched
+> some youtube videos, but the ACPI documentation is hard to read and sift
+> through and the youtube videos are generally too high level.
+> 
+> Thanks.
+> 
+
+We are generally trying to move away from ACPI hotplug to native
+PCIE hotplug. You can read up on that in the pci express spec.
+
+-- 
+MST
