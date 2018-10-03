@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g7eSJ-0000mt-Vz
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:32:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g7eqR-0007NC-0p
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g7eSG-00040V-9l
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:32:35 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7eSE-0003yf-5i
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:32:30 -0400
-Received: by mail-wr1-f68.google.com with SMTP id x12-v6so5518302wru.8
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 03:32:30 -0700 (PDT)
-References: <20181002163556.10279-1-peter.maydell@linaro.org>
-	<20181002163556.10279-6-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e9753178-49e9-884d-7ce9-faec4e43fee2@redhat.com>
-Date: Wed, 3 Oct 2018 12:32:27 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1g7epM-0000mr-B8
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:56:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54292)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7epL-0000lc-BQ
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:56:24 -0400
+References: <20180921082041.29380-1-rkagan@virtuozzo.com>
+	<20180921082041.29380-4-rkagan@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eac406e9-13d0-31e3-9b80-15d1fa46e165@redhat.com>
+Date: Wed, 3 Oct 2018 12:56:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181002163556.10279-6-peter.maydell@linaro.org>
+In-Reply-To: <20180921082041.29380-4-rkagan@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 05/13] target/arm: Add some comments in
- Thumb decode
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/5] hyperv: factor out arch-independent
+ API into hw/hyperv
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,91 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Roman Kagan <rkagan@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>
 
-On 02/10/2018 18:35, Peter Maydell wrote:
-> Add some comments to the Thumb decoder indicating what bits
-> of the instruction have been decoded at various points in
-> the code.
+On 21/09/2018 10:20, Roman Kagan wrote:
+> A significant part of hyperv.c is not actually tied to x86, and can
+> be moved to hw/.
 > 
-> This is not an exhaustive set of comments; we're gradually
-> adding comments as we work with particular bits of the code.
+> This will allow to maintain most of Hyper-V and VMBus
+> target-independent, and to avoid conflicts with inclusion of
+> arch-specific headers down the road in VMBus implementation.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Specifically, I figured these out as I was going through looking
-> for the insns which write SP. These comments turn out not to
-> be relevant to those instructions, but I don't want to throw
-> them away.
-> ---
->  target/arm/translate.c | 20 +++++++++++++++++---
->  1 file changed, 17 insertions(+), 3 deletions(-)
+> Also this stuff can now be opt-out with CONFIG_HYPERV.
 > 
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 25a8fe672f5..fcb33b8a503 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -10623,6 +10623,10 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
->              tmp2 = load_reg(s, rm);
->              if ((insn & 0x70) != 0)
->                  goto illegal_op;
-> +            /*
-> +             * 0b1111_1010_0xxx_xxxx_1111_xxxx_0000_xxxx:
-> +             *  - MOV, MOVS (register-shifted register), flagsetting
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
 
-T2, OK
+We can squash this in too:
 
-> +             */
->              op = (insn >> 21) & 3;
->              logic_cc = (insn & (1 << 20)) != 0;
->              gen_arm_shift_reg(tmp, op, tmp2, logic_cc);
-> @@ -11674,7 +11678,11 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
->          rd = insn & 7;
->          op = (insn >> 11) & 3;
->          if (op == 3) {
-> -            /* add/subtract */
-> +            /*
-> +             * 0b0001_1xxx_xxxx_xxxx
-> +             *  - Add, subtract (three low registers)
-> +             *  - Add, subtract (two low registers and immediate)
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index b8f4675219..30722ccf98 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -9,7 +9,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += cpu/
+ devices-dirs-$(CONFIG_SOFTMMU) += display/
+ devices-dirs-$(CONFIG_SOFTMMU) += dma/
+ devices-dirs-$(CONFIG_SOFTMMU) += gpio/
+-devices-dirs-$(CONFIG_SOFTMMU) += hyperv/
++devices-dirs-$(CONFIG_HYPERV) += hyperv/
+ devices-dirs-$(CONFIG_SOFTMMU) += i2c/
+ devices-dirs-$(CONFIG_SOFTMMU) += ide/
+ devices-dirs-$(CONFIG_SOFTMMU) += input/
+diff --git a/hw/hyperv/Makefile.objs b/hw/hyperv/Makefile.objs
+index 19928b726e..edaca2f763 100644
+--- a/hw/hyperv/Makefile.objs
++++ b/hw/hyperv/Makefile.objs
+@@ -1 +1,2 @@
+-obj-$(CONFIG_HYPERV) += hyperv.o
++obj-y += hyperv.o
++obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+diff --git a/hw/misc/hyperv_testdev.c b/hw/hyperv/hyperv_testdev.c
+similarity index 100%
+rename from hw/misc/hyperv_testdev.c
+rename to hw/hyperv/hyperv_testdev.c
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 6d50b03cfd..680350b3c3 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -71,7 +71,6 @@ obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
+ obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
 
-T1, OK
+ obj-$(CONFIG_PVPANIC) += pvpanic.o
+-obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+ obj-$(CONFIG_AUX) += auxbus.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+ obj-$(CONFIG_MSF2) += msf2-sysreg.o
 
-> +             */
->              rn = (insn >> 3) & 7;
->              tmp = load_reg(s, rn);
->              if (insn & (1 << 10)) {
-> @@ -11711,7 +11719,10 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
->          }
->          break;
->      case 2: case 3:
-> -        /* arithmetic large immediate */
-> +        /*
-> +         * 0b001x_xxxx_xxxx_xxxx
-> +         *  - Add, subtract, compare, move (one low register and immediate)
 
-T2, OK
-
-> +         */
->          op = (insn >> 11) & 3;
->          rd = (insn >> 8) & 0x7;
->          if (op == 0) { /* mov */
-> @@ -11848,7 +11859,10 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
->              break;
->          }
->  
-> -        /* data processing register */
-> +        /*
-> +         * 0b0100_00xx_xxxx_xxxx
-> +         *  - Data-processing (two low registers)
-
-T1, OK
-
-> +         */
->          rd = insn & 7;
->          rm = (insn >> 3) & 7;
->          op = (insn >> 6) & 0xf;
-> 
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Paolo
