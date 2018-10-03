@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1g7fQZ-0008ES-2U
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:34:55 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g7faZ-0004qb-2Q
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:45:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1g7fQU-0006XB-VK
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:34:51 -0400
-Received: from mail-bgr052101131073.outbound.protection.outlook.com
-	([52.101.131.73]:6441
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1g7fQU-0006W8-Cm
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:34:46 -0400
-From: Roman Kagan <rkagan@virtuozzo.com>
-Date: Wed, 3 Oct 2018 11:34:34 +0000
-Message-ID: <20181003113428.GA24354@rkaganb.sw.ru>
-References: <20180921082041.29380-1-rkagan@virtuozzo.com>
-	<20180921082041.29380-4-rkagan@virtuozzo.com>
-	<eac406e9-13d0-31e3-9b80-15d1fa46e165@redhat.com>
-In-Reply-To: <eac406e9-13d0-31e3-9b80-15d1fa46e165@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <DD986D15DA704F419D7201CC74A0F05B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g7faV-0007iY-0c
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:45:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52140)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1g7faU-0007i3-NM
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 07:45:06 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Wed,  3 Oct 2018 15:44:51 +0400
+Message-Id: <20181003114454.5662-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/5] hyperv: factor out arch-independent
- API into hw/hyperv
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/3] Mark non-volatile memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,61 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Vijayabhaskar Balakrishna <vijay.balakrishna@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, Liran Alon <liran.alon@oracle.com>, Igor Mammedov <imammedo@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Karl Heubaum <karl.heubaum@oracle.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Wed, Oct 03, 2018 at 12:56:00PM +0200, Paolo Bonzini wrote:
-> On 21/09/2018 10:20, Roman Kagan wrote:
-> > A significant part of hyperv.c is not actually tied to x86, and can
-> > be moved to hw/.
-> >=20
-> > This will allow to maintain most of Hyper-V and VMBus
-> > target-independent, and to avoid conflicts with inclusion of
-> > arch-specific headers down the road in VMBus implementation.
-> >=20
-> > Also this stuff can now be opt-out with CONFIG_HYPERV.
-> >=20
-> > Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
->=20
-> We can squash this in too:
->=20
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index b8f4675219..30722ccf98 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-...
-> -devices-dirs-$(CONFIG_SOFTMMU) +=3D hyperv/
-> +devices-dirs-$(CONFIG_HYPERV) +=3D hyperv/
-...
-> --- a/hw/hyperv/Makefile.objs
-> +++ b/hw/hyperv/Makefile.objs
-...
-> -obj-$(CONFIG_HYPERV) +=3D hyperv.o
-> +obj-y +=3D hyperv.o
+Hi,
 
-Actually I did it this way at first, but then decided to follow the
-pattern of virtio/, xen/, and most other subdirectories there just for
-consistency.  Is there any preference for this?
+As discussed in the "[PATCH v10 6/6] tpm: add ACPI memory clear
+interface" thread, and proposed in the "[PATCH] RFC: mark non-volatile
+memory region", here is a small series to mark non-volvatile memory
+regions and skip them on dump. Upcoming TCG "Platform Reset Attack
+Mitigation" will also use this information to eventually skip
+non-volatile memory.
 
-> +obj-$(CONFIG_HYPERV_TESTDEV) +=3D hyperv_testdev.o
-> diff --git a/hw/misc/hyperv_testdev.c b/hw/hyperv/hyperv_testdev.c
-> similarity index 100%
-> rename from hw/misc/hyperv_testdev.c
-> rename to hw/hyperv/hyperv_testdev.c
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index 6d50b03cfd..680350b3c3 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -71,7 +71,6 @@ obj-$(CONFIG_IOTKIT_SYSCTL) +=3D iotkit-sysctl.o
->  obj-$(CONFIG_IOTKIT_SYSINFO) +=3D iotkit-sysinfo.o
->=20
->  obj-$(CONFIG_PVPANIC) +=3D pvpanic.o
-> -obj-$(CONFIG_HYPERV_TESTDEV) +=3D hyperv_testdev.o
->  obj-$(CONFIG_AUX) +=3D auxbus.o
->  obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
->  obj-$(CONFIG_MSF2) +=3D msf2-sysreg.o
+Thanks
 
-Fine by me.
+Marc-Andr=C3=A9 Lureau (3):
+  memory: learn about non-volatile memory region
+  nvdimm: set non-volatile on the memory region
+  memory-mapping: skip non-volatile memory regions in GuestPhysBlockList
 
-Thanks,
-Roman.
+ include/exec/memory.h    | 25 ++++++++++++++++++++++
+ hw/mem/nvdimm.c          |  1 +
+ memory.c                 | 45 +++++++++++++++++++++++++++++++---------
+ memory_mapping.c         |  3 ++-
+ docs/devel/migration.rst |  1 +
+ 5 files changed, 64 insertions(+), 11 deletions(-)
+
+--=20
+2.19.0.271.gfe8321ec05
