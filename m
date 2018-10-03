@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7g0I-0007RB-7M
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:11:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7g8L-0002Cx-Fx
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g7g0F-0002Ti-Ip
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:11:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7g0F-0002TE-Cf
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:11:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 91F693002958
-	for <qemu-devel@nongnu.org>; Wed,  3 Oct 2018 12:11:42 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  3 Oct 2018 14:11:38 +0200
-Message-Id: <20181003121138.22037-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] gtk: fix uninitialized variable
+	(envelope-from <eblake@redhat.com>) id 1g7g8K-0003it-Pv
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 08:20:05 -0400
+References: <20181002230218.13949-1-jsnow@redhat.com>
+	<20181002230218.13949-2-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f1b82811-2c44-1fdd-9b72-6c6c6eb359a7@redhat.com>
+Date: Wed, 3 Oct 2018 07:19:38 -0500
+MIME-Version: 1.0
+In-Reply-To: <20181002230218.13949-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] block/dirty-bitmaps: add
+ user_locked status checker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Juan Quintela <quintela@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, vsementsov@virtuozzo.com, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-zoom_to_fit is never initialized to false, Coverity complains
-(not sure why GCC does not).
+On 10/2/18 6:02 PM, John Snow wrote:
+> Instead of both frozen and qmp_locked checks, wrap it into one check.
+> frozen implies the bitmap is split in two (for backup), and shouldn't
+> be modified. qmp_locked implies it's being used by another operation,
+> like being exported over NBD. In both cases it means we shouldn't allow
+> the user to modify it in any meaningful way.
+> 
+> Replace any usages where we check both frozen and qmp_locked with the
+> new check.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   block/dirty-bitmap.c           |  6 ++++++
+>   blockdev.c                     | 29 ++++++++---------------------
+>   include/block/dirty-bitmap.h   |  1 +
+>   migration/block-dirty-bitmap.c | 10 ++--------
+>   4 files changed, 17 insertions(+), 29 deletions(-)
+> 
 
-Fixes: e8b1386ea1719525a1a92df03377764703fe8c64
-Cc: kraxel@redhat.com
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- ui/gtk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 3ddb5fe162..ec935fff90 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -2136,7 +2136,7 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
-                               QemuConsole *con, int idx,
-                               GSList *group, GtkWidget *view_menu)
- {
--    bool zoom_to_fit;
-+    bool zoom_to_fit = false;
- 
-     vc->label = qemu_console_get_label(con);
-     vc->s = s;
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
