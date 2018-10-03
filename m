@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7lYg-0002f8-0j
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:39 -0400
+	(envelope-from <cota@braap.org>) id 1g7lYi-0002g3-5S
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7lYb-0005AM-OU
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:37 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35531)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g7lYb-0003z2-CT
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:33 -0400
-Received: by mail-oi1-x241.google.com with SMTP id 22-v6so4321046oiz.2
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 11:07:16 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  3 Oct 2018 13:07:07 -0500
-Message-Id: <20181003180711.19335-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 0/4] softfloat: Fix division
+	(envelope-from <cota@braap.org>) id 1g7lYd-0005Hg-Pu
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:40 -0400
+Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:50355)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g7lYd-0005Ea-DO
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:07:35 -0400
+Date: Wed, 3 Oct 2018 14:07:31 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181003180731.GA26376@flamenco>
+References: <20181002212921.30982-1-cota@braap.org>
+	<20181002212921.30982-3-cota@braap.org> <87h8i3l75j.fsf@linaro.org>
+	<a01a9547-d182-daaf-724a-5a836dd9ff02@redhat.com>
+	<20181003154844.GA27366@flamenco>
+	<91494a20-1090-3e3f-e099-ed06bd6e0e51@redhat.com>
+	<20181003170219.GA9925@flamenco>
+	<d966f99b-4a37-4a00-0267-50adabb3675f@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d966f99b-4a37-4a00-0267-50adabb3675f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] cputlb: serialize tlb updates with
+ env->tlb_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,27 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, cota@braap.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Changes from v1:
-  * Preserve udiv_qrnnd as a separate division primitive that
-    could be used as a building block for float128 division.
-  * Include asm fragments for x86_64, s390x, and ppc64.
+On Wed, Oct 03, 2018 at 19:05:51 +0200, Paolo Bonzini wrote:
+> On 03/10/2018 19:02, Emilio G. Cota wrote:
+> >> For reads I agree, but you may actually get a torn read if the writer
+> >> doesn't use atomic_set.
+> >
+> > But you cannot get a torn read if all reads that don't hold the lock
+> > are coming from the same thread that performed the write.
+> 
+> Ah, so you are relying on copy_tlb_helper(_locked) being invoked only
+> from the vCPU thread (as opposed to someone else doing tlb_flush)?
 
+Yes. tlb_flush_nocheck is always run by the owner thread--tlb_flush
+checks for this, and if !qemu_cpu_is_self(cpu) then it schedules
+async work on the owner thread.
 
-r~
+> Maybe it's worth adding a comment if that's what I missed.
 
+I'll send a v2 with an updated comment and a debug-only assert
+in the copy helper.
 
-Richard Henderson (4):
-  softfloat: Fix division
-  softfloat: Specialize udiv_qrnnd for x86_64
-  softfloat: Specialize udiv_qrnnd for s390x
-  softfloat: Specialize udiv_qrnnd for ppc64
+Thanks,
 
- include/fpu/softfloat-macros.h | 35 +++++++++++++++++++++++++++++++---
- fpu/softfloat.c                | 35 ++++++++++++++++++++++++++--------
- 2 files changed, 59 insertions(+), 11 deletions(-)
-
--- 
-2.17.1
+		E.
