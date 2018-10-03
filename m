@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1g7c1U-0007lj-Ks
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 03:56:45 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7cHJ-0004rI-7x
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 04:13:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1g7c1O-0000DR-LK
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 03:56:43 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43940)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1g7c1M-0000Bn-2W
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 03:56:36 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n1-v6so4964171wrt.10
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 00:56:34 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20181002212921.30982-1-cota@braap.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9fd72593-6aeb-9ca5-1621-07a832cc3f8d@redhat.com>
-Date: Wed, 3 Oct 2018 09:56:31 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g7cHF-0003M5-Tv
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 04:13:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181002212921.30982-1-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] per-TLB lock
+References: <20181002215315.16851-1-f4bug@amsat.org>
+	<a6d996ce-0ff6-7ff3-f54a-1be747061ff9@kaod.org>
+In-Reply-To: <a6d996ce-0ff6-7ff3-f54a-1be747061ff9@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 3 Oct 2018 10:12:49 +0200
+Message-ID: <CAAdtpL7oyoGRn1Cx8SZ8r=Nx0sC-wyWQUfZV+kf3q0=wqE5KBg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-host/ppce500: Use
+ DeviceState::realize rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +26,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: Greg Kurz <groug@kaod.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>
 
-On 02/10/2018 23:29, Emilio G. Cota wrote:
-> This series introduces a per-TLB lock. This removes existing UB
-> (e.g. memset racing with cmpxchg on another thread while flushing),
-> and in my opinion makes the TLB code simpler to understand.
-> 
-> I had a bit of trouble finding the best place to initialize the
-> mutex, since it has to be called before tlb_flush, and tlb_flush
-> is called quite early during cpu initialization. I settled on
-> cpu_exec_realizefn, since then cpu->env_ptr has been set
-> but tlb_flush hasn't yet been called.
-> 
-> Perf-wise this change does have a small impact (~2% slowdown for
-> the aarch64 bootup+shutdown test; 1.2% comes from using atomic_read
-> consistently), but I think this is a fair price for avoiding UB.
+On Wed, Oct 3, 2018 at 7:39 AM C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> On 10/2/18 11:53 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > Move from the legacy SysBusDevice::init method to using DeviceState::re=
+alize.
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> That patch was already reviewed by you and merged by David :)
 
-The UB is unlikely to be an issue in practice, but I like the
-simplicity.  In retrospect it was premature optimization.
-
-Paolo
+Memory failure :/ This sounded somehow familiar although...
