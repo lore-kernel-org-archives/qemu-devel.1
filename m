@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7obN-0001eg-DZ
+	(envelope-from <eblake@redhat.com>) id 1g7obN-0001e9-3U
 	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 17:22:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7obM-00010r-2D
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 17:22:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1g7obL-00010V-NB
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 17:22:36 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  3 Oct 2018 16:22:10 -0500
-Message-Id: <20181003212211.812374-5-eblake@redhat.com>
+Date: Wed,  3 Oct 2018 16:22:11 -0500
+Message-Id: <20181003212211.812374-6-eblake@redhat.com>
 In-Reply-To: <20181003212211.812374-1-eblake@redhat.com>
 References: <20181003212211.812374-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 4/5] qemu-nbd: drop old-style negotiation
+Subject: [Qemu-devel] [PULL 5/5] nbd/server: drop old-style negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,107 +20,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Use new-style negotiation always, with default "" (empty) export name
-if it is not specified with '-x' option.
-
-qemu as client can manage either style since 2.6.0, commit 69b49502d8
-
-For comparison:
-
-nbd 3.10 dropped oldstyle long ago (Mar 2015):
-https://github.com/NetworkBlockDevice/nbd/commit/36940193
-
-nbdkit 1.3 switched its default to newstyle (Jan 2018):
-https://github.com/libguestfs/nbdkit/commit/b2a8aecc
-https://github.com/libguestfs/nbdkit/commit/8158e773
-
-Furthermore, if a client that only speaks oldstyle still needs to
-communicate to qemu, nbdkit remains available to perform the
-translation between the two protocols.
+After the previous commit, nbd_client_new's first parameter is always
+NULL. Let's drop it with all corresponding old-style negotiation code
+path which is unreachable now.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20181003170228.95973-2-vsementsov@virtuozzo.com>
+Message-Id: <20181003170228.95973-3-vsementsov@virtuozzo.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: enhance commit message]
+[eblake: re-wrap short line]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-nbd.c | 25 ++++++-------------------
- 1 file changed, 6 insertions(+), 19 deletions(-)
+ include/block/nbd.h |  3 +--
+ blockdev-nbd.c      |  3 +--
+ nbd/server.c        | 53 +++++++++++++--------------------------------
+ qemu-nbd.c          |  2 +-
+ 4 files changed, 18 insertions(+), 43 deletions(-)
 
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 4638c839f51..0129d1a4b46 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -308,8 +308,7 @@ void nbd_export_set_name(NBDExport *exp, const char *name);
+ void nbd_export_set_description(NBDExport *exp, const char *description);
+ void nbd_export_close_all(void);
+
+-void nbd_client_new(NBDExport *exp,
+-                    QIOChannelSocket *sioc,
++void nbd_client_new(QIOChannelSocket *sioc,
+                     QCryptoTLSCreds *tlscreds,
+                     const char *tlsaclname,
+                     void (*close_fn)(NBDClient *, bool));
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 1ef11041a73..1d170c80b82 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -36,8 +36,7 @@ static void nbd_accept(QIONetListener *listener, QIOChannelSocket *cioc,
+                        gpointer opaque)
+ {
+     qio_channel_set_name(QIO_CHANNEL(cioc), "nbd-server");
+-    nbd_client_new(NULL, cioc,
+-                   nbd_server->tlscreds, NULL,
++    nbd_client_new(cioc, nbd_server->tlscreds, NULL,
+                    nbd_blockdev_client_closed);
+ }
+
+diff --git a/nbd/server.c b/nbd/server.c
+index 4fb247b1166..a1eda0114fa 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1253,7 +1253,6 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
+                               NBD_FLAG_SEND_FLUSH | NBD_FLAG_SEND_FUA |
+                               NBD_FLAG_SEND_WRITE_ZEROES | NBD_FLAG_SEND_CACHE);
+-    bool oldStyle;
+
+     /* Old style negotiation header, no room for options
+         [ 0 ..   7]   passwd       ("NBDMAGIC")
+@@ -1274,33 +1273,19 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+     trace_nbd_negotiate_begin();
+     memcpy(buf, "NBDMAGIC", 8);
+
+-    oldStyle = client->exp != NULL && !client->tlscreds;
+-    if (oldStyle) {
+-        trace_nbd_negotiate_old_style(client->exp->size,
+-                                      client->exp->nbdflags | myflags);
+-        stq_be_p(buf + 8, NBD_CLIENT_MAGIC);
+-        stq_be_p(buf + 16, client->exp->size);
+-        stl_be_p(buf + 24, client->exp->nbdflags | myflags);
++    stq_be_p(buf + 8, NBD_OPTS_MAGIC);
++    stw_be_p(buf + 16, NBD_FLAG_FIXED_NEWSTYLE | NBD_FLAG_NO_ZEROES);
+
+-        if (nbd_write(client->ioc, buf, sizeof(buf), errp) < 0) {
+-            error_prepend(errp, "write failed: ");
+-            return -EINVAL;
+-        }
+-    } else {
+-        stq_be_p(buf + 8, NBD_OPTS_MAGIC);
+-        stw_be_p(buf + 16, NBD_FLAG_FIXED_NEWSTYLE | NBD_FLAG_NO_ZEROES);
+-
+-        if (nbd_write(client->ioc, buf, 18, errp) < 0) {
+-            error_prepend(errp, "write failed: ");
+-            return -EINVAL;
+-        }
+-        ret = nbd_negotiate_options(client, myflags, errp);
+-        if (ret != 0) {
+-            if (ret < 0) {
+-                error_prepend(errp, "option negotiation failed: ");
+-            }
+-            return ret;
++    if (nbd_write(client->ioc, buf, 18, errp) < 0) {
++        error_prepend(errp, "write failed: ");
++        return -EINVAL;
++    }
++    ret = nbd_negotiate_options(client, myflags, errp);
++    if (ret != 0) {
++        if (ret < 0) {
++            error_prepend(errp, "option negotiation failed: ");
+         }
++        return ret;
+     }
+
+     assert(!client->optlen);
+@@ -2396,13 +2381,8 @@ static void nbd_client_receive_next_request(NBDClient *client)
+ static coroutine_fn void nbd_co_client_start(void *opaque)
+ {
+     NBDClient *client = opaque;
+-    NBDExport *exp = client->exp;
+     Error *local_err = NULL;
+
+-    if (exp) {
+-        nbd_export_get(exp);
+-        QTAILQ_INSERT_TAIL(&exp->clients, client, next);
+-    }
+     qemu_co_mutex_init(&client->send_lock);
+
+     if (nbd_negotiate(client, &local_err)) {
+@@ -2417,13 +2397,11 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
+ }
+
+ /*
+- * Create a new client listener on the given export @exp, using the
+- * given channel @sioc.  Begin servicing it in a coroutine.  When the
+- * connection closes, call @close_fn with an indication of whether the
+- * client completed negotiation.
++ * Create a new client listener using the given channel @sioc.
++ * Begin servicing it in a coroutine.  When the connection closes, call
++ * @close_fn with an indication of whether the client completed negotiation.
+  */
+-void nbd_client_new(NBDExport *exp,
+-                    QIOChannelSocket *sioc,
++void nbd_client_new(QIOChannelSocket *sioc,
+                     QCryptoTLSCreds *tlscreds,
+                     const char *tlsaclname,
+                     void (*close_fn)(NBDClient *, bool))
+@@ -2433,7 +2411,6 @@ void nbd_client_new(NBDExport *exp,
+
+     client = g_new0(NBDClient, 1);
+     client->refcount = 1;
+-    client->exp = exp;
+     client->tlscreds = tlscreds;
+     if (tlscreds) {
+         object_ref(OBJECT(client->tlscreds));
 diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 66e023f7fa4..6aaebe7d938 100644
+index 6aaebe7d938..e76fe3082ab 100644
 --- a/qemu-nbd.c
 +++ b/qemu-nbd.c
-@@ -56,7 +56,6 @@
- #define MBR_SIZE 512
-
- static NBDExport *exp;
--static bool newproto;
- static int verbose;
- static char *srcpath;
- static SocketAddress *saddr;
-@@ -84,8 +83,8 @@ static void usage(const char *name)
- "  -e, --shared=NUM          device can be shared by NUM clients (default '1')\n"
- "  -t, --persistent          don't exit on the last connection\n"
- "  -v, --verbose             display extra debugging information\n"
--"  -x, --export-name=NAME    expose export by name\n"
--"  -D, --description=TEXT    with -x, also export a human-readable description\n"
-+"  -x, --export-name=NAME    expose export by name (default is empty string)\n"
-+"  -D, --description=TEXT    export a human-readable description\n"
- "\n"
- "Exposing part of the image:\n"
- "  -o, --offset=OFFSET       offset into the image\n"
-@@ -355,8 +354,7 @@ static void nbd_accept(QIONetListener *listener, QIOChannelSocket *cioc,
+@@ -354,7 +354,7 @@ static void nbd_accept(QIONetListener *listener, QIOChannelSocket *cioc,
 
      nb_fds++;
      nbd_update_server_watch();
--    nbd_client_new(newproto ? NULL : exp, cioc,
--                   tlscreds, NULL, nbd_client_closed);
-+    nbd_client_new(NULL, cioc, tlscreds, NULL, nbd_client_closed);
+-    nbd_client_new(NULL, cioc, tlscreds, NULL, nbd_client_closed);
++    nbd_client_new(cioc, tlscreds, NULL, nbd_client_closed);
  }
 
  static void nbd_update_server_watch(void)
-@@ -550,7 +548,7 @@ int main(int argc, char **argv)
-     Error *local_err = NULL;
-     BlockdevDetectZeroesOptions detect_zeroes = BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF;
-     QDict *options = NULL;
--    const char *export_name = NULL;
-+    const char *export_name = ""; /* Default export name */
-     const char *export_description = NULL;
-     const char *tlscredsid = NULL;
-     bool imageOpts = false;
-@@ -809,11 +807,6 @@ int main(int argc, char **argv)
-             error_report("TLS is not supported with a host device");
-             exit(EXIT_FAILURE);
-         }
--        if (!export_name) {
--            /* Set the default NBD protocol export name, since
--             * we *must* use new style protocol for TLS */
--            export_name = "";
--        }
-         tlscreds = nbd_get_tls_creds(tlscredsid, &local_err);
-         if (local_err) {
-             error_report("Failed to get TLS creds %s",
-@@ -1014,14 +1007,8 @@ int main(int argc, char **argv)
-         error_report_err(local_err);
-         exit(EXIT_FAILURE);
-     }
--    if (export_name) {
--        nbd_export_set_name(exp, export_name);
--        nbd_export_set_description(exp, export_description);
--        newproto = true;
--    } else if (export_description) {
--        error_report("Export description requires an export name");
--        exit(EXIT_FAILURE);
--    }
-+    nbd_export_set_name(exp, export_name);
-+    nbd_export_set_description(exp, export_description);
-
-     if (device) {
-         int ret;
 -- 
 2.17.1
