@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g7ctl-0008PS-Fy
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 04:52:50 -0400
+	(envelope-from <philmd@redhat.com>) id 1g7czp-0002r5-78
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 04:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g7cti-0001uG-71
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 04:52:49 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53881)
+	(envelope-from <philmd@redhat.com>) id 1g7czl-00045v-VM
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 04:59:05 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45302)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7cti-0001tp-04
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 04:52:46 -0400
-Received: by mail-wm1-f66.google.com with SMTP id b19-v6so4872530wme.3
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 01:52:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7czl-00045X-Nb
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 04:59:01 -0400
+Received: by mail-wr1-f65.google.com with SMTP id q5-v6so5161408wrw.12
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 01:59:01 -0700 (PDT)
 References: <20181002163556.10279-1-peter.maydell@linaro.org>
-	<20181002163556.10279-4-peter.maydell@linaro.org>
+	<20181002163556.10279-7-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d0d615cc-188e-ebfb-c67d-92dea9f357d0@redhat.com>
-Date: Wed, 3 Oct 2018 10:52:43 +0200
+Message-ID: <d5e8f2bd-1bed-d628-38d7-732d6d48caf4@redhat.com>
+Date: Wed, 3 Oct 2018 10:58:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181002163556.10279-4-peter.maydell@linaro.org>
+In-Reply-To: <20181002163556.10279-7-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/13] target/arm: Move v7m_using_psp() to
- internals.h
+Subject: Re: [Qemu-devel] [PATCH 06/13] target/arm: Add v8M stack checks on
+ exception entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,63 +35,119 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 02/10/2018 18:35, Peter Maydell wrote:
-> We're going to want v7m_using_psp() in op_helper.c in the
-> next patch, so move it from helper.c to internals.h.
+> Add checks for breaches of the v8M stack limit when the
+> stack pointer is decremented to push the exception frame
+> for exception entry.
+> 
+> Note that the exception-entry case is unique in that the
+> stack pointer is updated to be the limit value if the limit
+> is hit (per rule R_ZLZG).
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  target/arm/internals.h | 15 +++++++++++++++
->  target/arm/helper.c    | 12 ------------
->  2 files changed, 15 insertions(+), 12 deletions(-)
+>  target/arm/helper.c | 54 ++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 46 insertions(+), 8 deletions(-)
 > 
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index dc9357766c9..bc4c01ccd92 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -796,4 +796,19 @@ static inline uint32_t arm_debug_exception_fsr(CPUARMState *env)
->      }
->  }
->  
-> +/**
-> + * v7m_using_psp: Return true if using process stack pointer
-> + * Return true if the CPU is currently using the process stack
-> + * pointer, or false if it is using the main stack pointer.
-> + */
-> +static inline bool v7m_using_psp(CPUARMState *env)
-> +{
-> +    /* Handler mode always uses the main stack; for thread mode
-> +     * the CONTROL.SPSEL bit determines the answer.
-> +     * Note that in v7M it is not possible to be in Handler mode with
-> +     * CONTROL.SPSEL non-zero, but in v8M it is, so we must check both.
-> +     */
-> +    return !arm_v7m_is_handler_mode(env) &&
-> +        env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK;
-> +}
->  #endif
 > diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index c303dc453f1..ef8c244fb84 100644
+> index ef8c244fb84..a10dff01a90 100644
 > --- a/target/arm/helper.c
 > +++ b/target/arm/helper.c
-> @@ -6554,18 +6554,6 @@ pend_fault:
->      return false;
->  }
+> @@ -6839,6 +6839,8 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+>      uint32_t frameptr;
+>      ARMMMUIdx mmu_idx;
+>      bool stacked_ok;
+> +    uint32_t limit;
+> +    bool want_psp;
 >  
-> -/* Return true if we're using the process stack pointer (not the MSP) */
-> -static bool v7m_using_psp(CPUARMState *env)
-> -{
-> -    /* Handler mode always uses the main stack; for thread mode
-> -     * the CONTROL.SPSEL bit determines the answer.
-> -     * Note that in v7M it is not possible to be in Handler mode with
-> -     * CONTROL.SPSEL non-zero, but in v8M it is, so we must check both.
+>      if (dotailchain) {
+>          bool mode = lr & R_V7M_EXCRET_MODE_MASK;
+> @@ -6848,12 +6850,34 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+>          mmu_idx = arm_v7m_mmu_idx_for_secstate_and_priv(env, M_REG_S, priv);
+>          frame_sp_p = get_v7m_sp_ptr(env, M_REG_S, mode,
+>                                      lr & R_V7M_EXCRET_SPSEL_MASK);
+> +        want_psp = mode && (lr & R_V7M_EXCRET_SPSEL_MASK);
+> +        if (want_psp) {
+> +            limit = env->v7m.psplim[M_REG_S];
+> +        } else {
+> +            limit = env->v7m.msplim[M_REG_S];
+> +        }
+>      } else {
+>          mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
+>          frame_sp_p = &env->regs[13];
+> +        limit = v7m_sp_limit(env);
+>      }
+>  
+>      frameptr = *frame_sp_p - 0x28;
+> +    if (frameptr < limit) {
+> +        /*
+> +         * Stack limit failure: set SP to the limit value, and generate
+> +         * STKOF UsageFault. Stack pushes below the limit must not be
+> +         * performed. It is IMPDEF whether pushes above the limit are
+> +         * performed; we choose not to.
+> +         */
+> +        qemu_log_mask(CPU_LOG_INT,
+> +                      "...STKOF during callee-saves register stacking\n");
+> +        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_STKOF_MASK;
+> +        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
+> +                                env->v7m.secure);
+> +        *frame_sp_p = limit;
+> +        return true;
+> +    }
+>  
+>      /* Write as much of the stack frame as we can. A write failure may
+>       * cause us to pend a derived exception.
+> @@ -6877,10 +6901,7 @@ static bool v7m_push_callee_stack(ARMCPU *cpu, uint32_t lr, bool dotailchain,
+>          v7m_stack_write(cpu, frameptr + 0x24, env->regs[11], mmu_idx,
+>                          ignore_faults);
+>  
+> -    /* Update SP regardless of whether any of the stack accesses failed.
+> -     * When we implement v8M stack limit checking then this attempt to
+> -     * update SP might also fail and result in a derived exception.
 > -     */
-> -    return !arm_v7m_is_handler_mode(env) &&
-> -        env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK;
-> -}
-> -
->  /* Write to v7M CONTROL.SPSEL bit for the specified security bank.
->   * This may change the current stack pointer between Main and Process
->   * stack pointers if it is done for the CONTROL register for the current
+> +    /* Update SP regardless of whether any of the stack accesses failed. */
+>      *frame_sp_p = frameptr;
+>  
+>      return !stacked_ok;
+> @@ -7028,6 +7049,26 @@ static bool v7m_push_stack(ARMCPU *cpu)
+>  
+>      frameptr -= 0x20;
+>  
+> +    if (arm_feature(env, ARM_FEATURE_V8)) {
+> +        uint32_t limit = v7m_sp_limit(env);
+> +
+> +        if (frameptr < limit) {
+> +            /*
+> +             * Stack limit failure: set SP to the limit value, and generate
+> +             * STKOF UsageFault. Stack pushes below the limit must not be
+> +             * performed. It is IMPDEF whether pushes above the limit are
+> +             * performed; we choose not to.
+> +             */
+> +            qemu_log_mask(CPU_LOG_INT,
+> +                          "...STKOF during stacking\n");
+> +            env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_STKOF_MASK;
+> +            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE,
+> +                                    env->v7m.secure);
+> +            env->regs[13] = limit;
+> +            return true;
+> +        }
+> +    }
+> +
+>      /* Write as much of the stack frame as we can. If we fail a stack
+>       * write this will result in a derived exception being pended
+>       * (which may be taken in preference to the one we started with
+> @@ -7043,10 +7084,7 @@ static bool v7m_push_stack(ARMCPU *cpu)
+>          v7m_stack_write(cpu, frameptr + 24, env->regs[15], mmu_idx, false) &&
+>          v7m_stack_write(cpu, frameptr + 28, xpsr, mmu_idx, false);
+>  
+> -    /* Update SP regardless of whether any of the stack accesses failed.
+> -     * When we implement v8M stack limit checking then this attempt to
+> -     * update SP might also fail and result in a derived exception.
+> -     */
+> +    /* Update SP regardless of whether any of the stack accesses failed. */
+>      env->regs[13] = frameptr;
+>  
+>      return !stacked_ok;
 > 
