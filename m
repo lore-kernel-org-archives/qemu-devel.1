@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7m10-0006Zl-0F
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:36:59 -0400
+	(envelope-from <philmd@redhat.com>) id 1g7m16-0006oB-I8
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:37:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g7lwh-00020X-Mf
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:32:30 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 3 Oct 2018 18:32:21 +0000
-Message-ID: <0566a0d6-83c1-0072-4f41-62e0e7ceba85@virtuozzo.com>
-References: <20181003175524.597407-1-eblake@redhat.com>
-In-Reply-To: <20181003175524.597407-1-eblake@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7A6FB92E8232C7418462D7562D79D86A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1g7lvG-0000kg-NT
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:31:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7lvG-0000jz-FA
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 14:30:58 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA9E983F3D
+	for <qemu-devel@nongnu.org>; Wed,  3 Oct 2018 18:30:57 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Date: Wed,  3 Oct 2018 20:30:33 +0200
+Message-Id: <20181003183036.6716-1-philmd@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2] nbd: Flip qemu-nbd to prefer newstyle;
- add -O for old behavior
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC PATCH v2 0/3] acceptance tests: Test firmware
+ checking debug console output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,108 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "rjones@redhat.com" <rjones@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open
-	list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-MDMuMTAuMjAxOCAyMDo1NSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT2xkc3R5bGUgTkJEIG5lZ290
-aWF0aW9uIGNhbm5vdCBwZXJmb3JtIGFueSBvZiB0aGUgZXh0ZW5zaW9ucyB0aGF0DQo+IHdlIGhh
-dmUgcmVjZW50bHkgYmVlbiByZWx5aW5nIG9uLiAgV2hpbGUgeW91IGNhbiBhbHdheXMgcGFzcyAt
-eCAiIg0KPiB0byBnZXQgbmV3c3R5bGUgbmVnb3RpYXRpb24sIHRoZXNlIGRheXMsIGl0IGlzIGJl
-dHRlciB0byBqdXN0IGRlZmF1bHQNCj4gdG8gbmV3c3R5bGUgKHdpdGggYW4gZW1wdHkgZXhwb3J0
-IG5hbWUpIGFuZCBmYWxsIGJhY2sgdG8gb2xkc3R5bGUNCj4gb25seSBvbiBhbiBleHBsaWNpdCBy
-ZXF1ZXN0Lg0KPg0KPiBxZW11IGFzIGNsaWVudCBjYW4gbWFuYWdlIGVpdGhlciBzdHlsZSBzaW5j
-ZSAyLjYuMCwgY29tbWl0IDY5YjQ5NTAyZDgNCj4NCj4gRm9yIGNvbXBhcmlzb246DQo+DQo+IG5i
-ZGtpdCAxLjMgc3dpdGNoZWQgaXRzIGRlZmF1bHQgdG8gbmV3c3R5bGUgKEphbiAyMDE4KToNCj4g
-aHR0cHM6Ly9naXRodWIuY29tL2xpYmd1ZXN0ZnMvbmJka2l0L2NvbW1pdC9iMmE4YWVjYw0KPiBo
-dHRwczovL2dpdGh1Yi5jb20vbGliZ3Vlc3Rmcy9uYmRraXQvY29tbWl0LzgxNThlNzczDQo+DQo+
-IG5iZCAzLjEwIGRyb3BwZWQgb2xkc3R5bGUgbG9uZyBhZ28gKE1hciAyMDE1KToNCj4gaHR0cHM6
-Ly9naXRodWIuY29tL05ldHdvcmtCbG9ja0RldmljZS9uYmQvY29tbWl0LzM2OTQwMTkzDQo+DQo+
-IFNpZ25lZC1vZmYtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPiAtLS0NCj4g
-djI6IGltcHJvdmUgJ3FlbXUtbmJkIC0taGVscCcsIGRyb3AgcmVkdW5kYW50IHZhcmlhYmxlICdu
-ZXdwcm90bycNCj4gLS0tDQo+ICAgcWVtdS1uYmQuYyB8IDM3ICsrKysrKysrKysrKysrKysrKysr
-KysrLS0tLS0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKSwg
-MTQgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9xZW11LW5iZC5jIGIvcWVtdS1uYmQu
-Yw0KPiBpbmRleCA1MWI5ZDM4YzcyNy4uZTM1Yzk3ZTdjYTQgMTAwNjQ0DQo+IC0tLSBhL3FlbXUt
-bmJkLmMNCj4gKysrIGIvcWVtdS1uYmQuYw0KPiBAQCAtNTYsNyArNTYsNyBAQA0KPiAgICNkZWZp
-bmUgTUJSX1NJWkUgNTEyDQo+DQo+ICAgc3RhdGljIE5CREV4cG9ydCAqZXhwOw0KPiAtc3RhdGlj
-IGJvb2wgbmV3cHJvdG87DQo+ICtzdGF0aWMgYm9vbCBvbGRzdHlsZTsNCj4gICBzdGF0aWMgaW50
-IHZlcmJvc2U7DQo+ICAgc3RhdGljIGNoYXIgKnNyY3BhdGg7DQo+ICAgc3RhdGljIFNvY2tldEFk
-ZHJlc3MgKnNhZGRyOw0KPiBAQCAtODQsOCArODQsOSBAQCBzdGF0aWMgdm9pZCB1c2FnZShjb25z
-dCBjaGFyICpuYW1lKQ0KPiAgICIgIC1lLCAtLXNoYXJlZD1OVU0gICAgICAgICAgZGV2aWNlIGNh
-biBiZSBzaGFyZWQgYnkgTlVNIGNsaWVudHMgKGRlZmF1bHQgJzEnKVxuIg0KPiAgICIgIC10LCAt
-LXBlcnNpc3RlbnQgICAgICAgICAgZG9uJ3QgZXhpdCBvbiB0aGUgbGFzdCBjb25uZWN0aW9uXG4i
-DQo+ICAgIiAgLXYsIC0tdmVyYm9zZSAgICAgICAgICAgICBkaXNwbGF5IGV4dHJhIGRlYnVnZ2lu
-ZyBpbmZvcm1hdGlvblxuIg0KPiAtIiAgLXgsIC0tZXhwb3J0LW5hbWU9TkFNRSAgICBleHBvc2Ug
-ZXhwb3J0IGJ5IG5hbWVcbiINCj4gLSIgIC1ELCAtLWRlc2NyaXB0aW9uPVRFWFQgICAgd2l0aCAt
-eCwgYWxzbyBleHBvcnQgYSBodW1hbi1yZWFkYWJsZSBkZXNjcmlwdGlvblxuIg0KPiArIiAgLXgs
-IC0tZXhwb3J0LW5hbWU9TkFNRSAgICBleHBvc2UgZXhwb3J0IGJ5IG5hbWUgKGRlZmF1bHQgIiIp
-XG4iDQo+ICsiICAtRCwgLS1kZXNjcmlwdGlvbj1URVhUICAgIGV4cG9zZSBhIGh1bWFuLXJlYWRh
-YmxlIGRlc2NyaXB0aW9uIG9mIGV4cG9ydFxuIg0KPiArIiAgLU8sIC0tb2xkc3R5bGUgICAgICAg
-ICAgICBmb3JjZSBvbGRzdHlsZSAobm90IHdpdGggLXgsIC1ELCBvciAtLXRscy1jcmVkcylcbiIN
-Cj4gICAiXG4iDQo+ICAgIkV4cG9zaW5nIHBhcnQgb2YgdGhlIGltYWdlOlxuIg0KPiAgICIgIC1v
-LCAtLW9mZnNldD1PRkZTRVQgICAgICAgb2Zmc2V0IGludG8gdGhlIGltYWdlXG4iDQo+IEBAIC0z
-NTQsNyArMzU1LDcgQEAgc3RhdGljIHZvaWQgbmJkX2FjY2VwdChRSU9OZXRMaXN0ZW5lciAqbGlz
-dGVuZXIsIFFJT0NoYW5uZWxTb2NrZXQgKmNpb2MsDQo+DQo+ICAgICAgIG5iX2ZkcysrOw0KPiAg
-ICAgICBuYmRfdXBkYXRlX3NlcnZlcl93YXRjaCgpOw0KPiAtICAgIG5iZF9jbGllbnRfbmV3KG5l
-d3Byb3RvID8gTlVMTCA6IGV4cCwgY2lvYywNCj4gKyAgICBuYmRfY2xpZW50X25ldyhvbGRzdHls
-ZSA/IGV4cCA6IE5VTEwsIGNpb2MsDQo+ICAgICAgICAgICAgICAgICAgICAgIHRsc2NyZWRzLCBO
-VUxMLCBuYmRfY2xpZW50X2Nsb3NlZCk7DQo+ICAgfQ0KPg0KPiBAQCAtNTAyLDcgKzUwMyw3IEBA
-IGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4gICAgICAgb2ZmX3QgZmRfc2l6ZTsN
-Cj4gICAgICAgUWVtdU9wdHMgKnNuX29wdHMgPSBOVUxMOw0KPiAgICAgICBjb25zdCBjaGFyICpz
-bl9pZF9vcl9uYW1lID0gTlVMTDsNCj4gLSAgICBjb25zdCBjaGFyICpzb3B0ID0gImhWYjpvOnA6
-cnNuUDpjOmR2azplOmY6dGw6eDpUOkQ6IjsNCj4gKyAgICBjb25zdCBjaGFyICpzb3B0ID0gImhW
-YjpvOnA6cnNuUDpjOmR2azplOmY6dGw6eDpUOkQ6TyI7DQo+ICAgICAgIHN0cnVjdCBvcHRpb24g
-bG9wdFtdID0gew0KPiAgICAgICAgICAgeyAiaGVscCIsIG5vX2FyZ3VtZW50LCBOVUxMLCAnaCcg
-fSwNCj4gICAgICAgICAgIHsgInZlcnNpb24iLCBub19hcmd1bWVudCwgTlVMTCwgJ1YnIH0sDQo+
-IEBAIC01MjksNiArNTMwLDcgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiAg
-ICAgICAgICAgeyAib2JqZWN0IiwgcmVxdWlyZWRfYXJndW1lbnQsIE5VTEwsIFFFTVVfTkJEX09Q
-VF9PQkpFQ1QgfSwNCj4gICAgICAgICAgIHsgImV4cG9ydC1uYW1lIiwgcmVxdWlyZWRfYXJndW1l
-bnQsIE5VTEwsICd4JyB9LA0KPiAgICAgICAgICAgeyAiZGVzY3JpcHRpb24iLCByZXF1aXJlZF9h
-cmd1bWVudCwgTlVMTCwgJ0QnIH0sDQo+ICsgICAgICAgIHsgIm9sZHN0eWxlIiwgbm9fYXJndW1l
-bnQsIE5VTEwsICdPJyB9LA0KPiAgICAgICAgICAgeyAidGxzLWNyZWRzIiwgcmVxdWlyZWRfYXJn
-dW1lbnQsIE5VTEwsIFFFTVVfTkJEX09QVF9UTFNDUkVEUyB9LA0KPiAgICAgICAgICAgeyAiaW1h
-Z2Utb3B0cyIsIG5vX2FyZ3VtZW50LCBOVUxMLCBRRU1VX05CRF9PUFRfSU1BR0VfT1BUUyB9LA0K
-PiAgICAgICAgICAgeyAidHJhY2UiLCByZXF1aXJlZF9hcmd1bWVudCwgTlVMTCwgJ1QnIH0sDQo+
-IEBAIC03MjMsNiArNzI1LDkgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KQ0KPiAg
-ICAgICAgICAgY2FzZSAnRCc6DQo+ICAgICAgICAgICAgICAgZXhwb3J0X2Rlc2NyaXB0aW9uID0g
-b3B0YXJnOw0KPiAgICAgICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICBjYXNlICdPJzoNCj4g
-KyAgICAgICAgICAgIG9sZHN0eWxlID0gdHJ1ZTsNCj4gKyAgICAgICAgICAgIGJyZWFrOw0KPiAg
-ICAgICAgICAgY2FzZSAndic6DQo+ICAgICAgICAgICAgICAgdmVyYm9zZSA9IDE7DQo+ICAgICAg
-ICAgICAgICAgYnJlYWs7DQo+IEBAIC03OTksNyArODA0LDE2IEBAIGludCBtYWluKGludCBhcmdj
-LCBjaGFyICoqYXJndikNCj4gICAgICAgICAgIH0NCj4gICAgICAgfQ0KPg0KPiArICAgIGlmICgh
-b2xkc3R5bGUgJiYgIWV4cG9ydF9uYW1lKSB7DQo+ICsgICAgICAgIC8qIFNldCB0aGUgZGVmYXVs
-dCBOQkQgcHJvdG9jb2wgZXhwb3J0IG5hbWUsIHRvIGZhdm9yIG5ldyBzdHlsZS4gKi8NCj4gKyAg
-ICAgICAgZXhwb3J0X25hbWUgPSAiIjsNCj4gKyAgICB9DQp0aGlzDQoNCg0KPiArDQo+ICAgICAg
-IGlmICh0bHNjcmVkc2lkKSB7DQo+ICsgICAgICAgIGlmIChvbGRzdHlsZSkgew0KPiArICAgICAg
-ICAgICAgZXJyb3JfcmVwb3J0KCJUTFMgaXMgaW5jb21wYXRpYmxlIHdpdGggb2xkc3R5bGUiKTsN
-Cj4gKyAgICAgICAgICAgIGV4aXQoRVhJVF9GQUlMVVJFKTsNCj4gKyAgICAgICAgfQ0KPiAgICAg
-ICAgICAgaWYgKHNvY2twYXRoKSB7DQo+ICAgICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJUTFMg
-aXMgb25seSBzdXBwb3J0ZWQgd2l0aCBJUHY0L0lQdjYiKTsNCj4gICAgICAgICAgICAgICBleGl0
-KEVYSVRfRkFJTFVSRSk7DQo+IEBAIC04MDgsMTEgKzgyMiw2IEBAIGludCBtYWluKGludCBhcmdj
-LCBjaGFyICoqYXJndikNCj4gICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIlRMUyBpcyBub3Qg
-c3VwcG9ydGVkIHdpdGggYSBob3N0IGRldmljZSIpOw0KPiAgICAgICAgICAgICAgIGV4aXQoRVhJ
-VF9GQUlMVVJFKTsNCj4gICAgICAgICAgIH0NCj4gLSAgICAgICAgaWYgKCFleHBvcnRfbmFtZSkg
-ew0KPiAtICAgICAgICAgICAgLyogU2V0IHRoZSBkZWZhdWx0IE5CRCBwcm90b2NvbCBleHBvcnQg
-bmFtZSwgc2luY2UNCj4gLSAgICAgICAgICAgICAqIHdlICptdXN0KiB1c2UgbmV3IHN0eWxlIHBy
-b3RvY29sIGZvciBUTFMgKi8NCj4gLSAgICAgICAgICAgIGV4cG9ydF9uYW1lID0gIiI7DQo+IC0g
-ICAgICAgIH0NCj4gICAgICAgICAgIHRsc2NyZWRzID0gbmJkX2dldF90bHNfY3JlZHModGxzY3Jl
-ZHNpZCwgJmxvY2FsX2Vycik7DQo+ICAgICAgICAgICBpZiAobG9jYWxfZXJyKSB7DQo+ICAgICAg
-ICAgICAgICAgZXJyb3JfcmVwb3J0KCJGYWlsZWQgdG8gZ2V0IFRMUyBjcmVkcyAlcyIsDQo+IEBA
-IC0xMDEzLDEzICsxMDIyLDEzIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4g
-ICAgICAgICAgIGVycm9yX3JlcG9ydF9lcnIobG9jYWxfZXJyKTsNCj4gICAgICAgICAgIGV4aXQo
-RVhJVF9GQUlMVVJFKTsNCj4gICAgICAgfQ0KPiArICAgIGlmIChvbGRzdHlsZSAmJiAoZXhwb3J0
-X25hbWUgfHwgZXhwb3J0X2Rlc2NyaXB0aW9uKSkgew0KPiArICAgICAgICBlcnJvcl9yZXBvcnQo
-Im9sZHN0eWxlIG5lZ290aWF0aW9uIGNhbm5vdCBzZXQgZXhwb3J0IGRldGFpbHMiKTsNCj4gKyAg
-ICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOw0KPiArICAgIH0NCg0KYW5kIHRoaXMgYXJlIHNpbXBs
-ZSBvcHRpb24gY2hlY2tzLCBzaG91bGRuJ3QgaXQgYmUgYmV0dGVyIHRvIGtlZXAgdGhlbSANCmJl
-Zm9yZSBtb3JlIGRpZmZpY3VsdCBsb2dpYywgaW1tZWRpYXRlbHkgYWZ0ZXIgZ2V0b3B0IGxvb3A/
-DQp3aXRoIG9yIHdpdGhvdXQgdGhpczoNCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNv
-di1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAgICAgICBpZiAoZXhw
-b3J0X25hbWUpIHsNCj4gICAgICAgICAgIG5iZF9leHBvcnRfc2V0X25hbWUoZXhwLCBleHBvcnRf
-bmFtZSk7DQo+ICAgICAgICAgICBuYmRfZXhwb3J0X3NldF9kZXNjcmlwdGlvbihleHAsIGV4cG9y
-dF9kZXNjcmlwdGlvbik7DQo+IC0gICAgICAgIG5ld3Byb3RvID0gdHJ1ZTsNCj4gLSAgICB9IGVs
-c2UgaWYgKGV4cG9ydF9kZXNjcmlwdGlvbikgew0KPiAtICAgICAgICBlcnJvcl9yZXBvcnQoIkV4
-cG9ydCBkZXNjcmlwdGlvbiByZXF1aXJlcyBhbiBleHBvcnQgbmFtZSIpOw0KPiAtICAgICAgICBl
-eGl0KEVYSVRfRkFJTFVSRSk7DQo+ICAgICAgIH0NCj4NCj4gICAgICAgaWYgKGRldmljZSkgew0K
-DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
+Hi,
+
+This RFC series add simple acceptance tests which boot SeaBIOS and EDK2 o=
+n
+the pc and virt/aarch64 default machines
+
+Still PoC but can be useful for the Avocado team to test the multi-arch t=
+argets.
+
+Since v1: https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg03780.=
+html
+- more Pythonic context managers (Cleber)
+- use wait_for (Cleber)
+- use workdir (Cleber)
+- use Avocado 65.0 "-p" option for aarch64 (Cleber)
+- fixed Q35 incorrect description in cover (Laszlo)
+- use ArmVirtQemu name (Laszlo)
+
+Next:
+- address Laszlo comments about correct QEMU options and flash images
+- use FDDrainer
+- refactor common code in setUp()
+- use new avocado.utils.archive gzip features (Cleber)
+- test x86_64/aarch64 'arch' tags (Cleber)
+- build EDK2 flash images (Laszlo)
+- include variable store flash image (Laszlo)
+- use virtual disk with UEFI shell script (Laszlo)
+- improve OVMF binary selection (releases / snapshots) (Laszlo)
+- check ISO images (Laszlo -> Cleber)
+- add aexpect tests (Cleber?)
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daud=C3=A9 (3):
+  acceptance tests: Add SeaBIOS boot and debug console checking test
+  acceptance tests: Add EDK2 OVMF boot and debug console checking test
+  acceptance tests: Add EDK2 ArmVirtQemu boot and console checking test
+
+ tests/acceptance/boot_firmware.py | 159 ++++++++++++++++++++++++++++++
+ 1 file changed, 159 insertions(+)
+ create mode 100644 tests/acceptance/boot_firmware.py
+
+--=20
+2.17.1
