@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1g7ipc-0001gA-NA
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:12:57 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1g7iqC-0002A4-29
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:13:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1g7ipa-0006KF-Ns
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:12:56 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1g7iq9-0006UC-4V
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 11:13:32 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed,  3 Oct 2018 22:07:42 +0700
-Message-Id: <1538579266-8389-9-git-send-email-edgar.iglesias@gmail.com>
+Date: Wed,  3 Oct 2018 22:07:43 +0700
+Message-Id: <1538579266-8389-10-git-send-email-edgar.iglesias@gmail.com>
 In-Reply-To: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
 References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v1 08/12] net: cadence_gem: Announce 64bit
- addressing support
+Subject: [Qemu-devel] [PATCH v1 09/12] target-arm: powerctl: Enable HVC when
+ starting CPUs to EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +25,43 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Announce 64bit addressing support.
+When QEMU provides the equivalent of the EL3 firmware, we
+need to enable HVCs in scr_el3 when turning on CPUs that
+target EL2.
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/net/cadence_gem.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/arm/arm-powerctl.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index f93cd8e..fc81fb5 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -142,6 +142,7 @@
- #define GEM_DESCONF4      (0x0000028C/4)
- #define GEM_DESCONF5      (0x00000290/4)
- #define GEM_DESCONF6      (0x00000294/4)
-+#define GEM_DESCONF6_64B_MASK (1U << 23)
- #define GEM_DESCONF7      (0x00000298/4)
+diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+index ce55eeb..54f2974 100644
+--- a/target/arm/arm-powerctl.c
++++ b/target/arm/arm-powerctl.c
+@@ -63,6 +63,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
+     struct CpuOnInfo *info = (struct CpuOnInfo *) data.host_ptr;
  
- #define GEM_INT_Q1_STATUS               (0x00000400 / 4)
-@@ -1300,7 +1301,7 @@ static void gem_reset(DeviceState *d)
-     s->regs[GEM_DESCONF] = 0x02500111;
-     s->regs[GEM_DESCONF2] = 0x2ab13fff;
-     s->regs[GEM_DESCONF5] = 0x002f2045;
--    s->regs[GEM_DESCONF6] = 0x0;
-+    s->regs[GEM_DESCONF6] = GEM_DESCONF6_64B_MASK;
+     /* Initialize the cpu we are turning on */
++    qemu_log("CPU%d reset\n", target_cpu_state->cpu_index);
+     cpu_reset(target_cpu_state);
+     target_cpu_state->halted = 0;
  
-     queues_mask = MAKE_64BIT_MASK(1, s->num_priority_queues - 1);
-     s->regs[GEM_DESCONF6] |= queues_mask;
+@@ -103,6 +104,16 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
+     } else {
+         /* Processor is not in secure mode */
+         target_cpu->env.cp15.scr_el3 |= SCR_NS;
++
++        /*
++         * If QEMU is providing the equivalent of EL3 firmware, then we need
++         * to make sure a CPU targeting EL2 comes out of reset with a
++         * functional HVC insn.
++         */
++        if (arm_feature(&target_cpu->env, ARM_FEATURE_EL3)
++            && info->target_el == 2) {
++            target_cpu->env.cp15.scr_el3 |= SCR_HCE;
++        }
+     }
+ 
+     /* We check if the started CPU is now at the correct level */
 -- 
 2.7.4
