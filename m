@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g7dsq-0001SK-UJ
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 05:55:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g7dzF-0005BA-GZ
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:02:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g7dsm-0001hA-UY
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 05:55:56 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51263)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7dsm-0001gw-NP
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 05:55:52 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 143-v6so5055479wmf.1
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 02:55:52 -0700 (PDT)
-References: <20181002163556.10279-1-peter.maydell@linaro.org>
-	<20181002163556.10279-13-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <35235ad8-c104-05a9-3f9e-677a743b73e2@redhat.com>
-Date: Wed, 3 Oct 2018 11:55:49 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1g7dz9-0005Aa-V2
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:02:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g7dz9-0005A0-4Z
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:02:27 -0400
+References: <20181002212921.30982-1-cota@braap.org>
+	<20181002212921.30982-3-cota@braap.org> <87h8i3l75j.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a01a9547-d182-daaf-724a-5a836dd9ff02@redhat.com>
+Date: Wed, 3 Oct 2018 12:02:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181002163556.10279-13-peter.maydell@linaro.org>
+In-Reply-To: <87h8i3l75j.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 12/13] target/arm: Add v8M stack checks for
- VLDM/VSTM
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] cputlb: serialize tlb updates with
+ env->tlb_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 02/10/2018 18:35, Peter Maydell wrote:
-> Add the v8M stack checks for the VLDM/VSTM
-> (aka VPUSH/VPOP) instructions. This code is currently
-> unreachable because we haven't yet implemented M profile
-> floating point support, but since the change is simple,
-> we add it now because otherwise we're likely to forget to
-> do it later.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/translate.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index ef64d2559de..2d3a1be518b 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -4229,6 +4229,18 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
->                  if (insn & (1 << 24)) /* pre-decrement */
->                      tcg_gen_addi_i32(addr, addr, -((insn & 0xff) << 2));
->  
-> +                if (rn == 13 && w && s->v8m_stackcheck) {
+On 03/10/2018 11:19, Alex Benn=C3=A9e wrote:
+>> Fix it by using tlb_lock, a per-vCPU lock. All updaters of tlb_table
+>> and the corresponding victim cache now hold the lock.
+>> The readers that do not hold tlb_lock must use atomic reads when
+>> reading .addr_write, since this field can be updated by other threads;
+>> the conversion to atomic reads is done in the next patch.
+> What about the inline TLB lookup code? The original purpose of the
+> cmpxchg was to ensure the inline code would either see a valid entry or
+> and invalid one, not a potentially torn read.
+>=20
 
-Following previous patches style:
+atomic_set also ensures that there are no torn reads.  However, here:
 
-                   if (s->v8m_stackcheck && rn == 13 && w) {
+static void copy_tlb_helper_locked(CPUTLBEntry *d, const CPUTLBEntry *s)
+{
+#if TCG_OVERSIZED_GUEST
+    *d =3D *s;
+#else
+    if (atomic_set) {
+        d->addr_read =3D s->addr_read;
+        d->addr_code =3D s->addr_code;
+        atomic_set(&d->addend, atomic_read(&s->addend));
+        /* Pairs with flag setting in tlb_reset_dirty_range */
+        atomic_mb_set(&d->addr_write, atomic_read(&s->addr_write));
+    } else {
+        d->addr_read =3D s->addr_read;
+        d->addr_write =3D atomic_read(&s->addr_write);
+        d->addr_code =3D s->addr_code;
+        d->addend =3D atomic_read(&s->addend);
+    }
+#endif
+}
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+it's probably best to do all atomic_set instead of just the memberwise co=
+py.
 
-> +                    /*
-> +                     * Here 'addr' is the lowest address we will store to,
-> +                     * and is either the old SP (if post-increment) or
-> +                     * the new SP (if pre-decrement). For post-increment
-> +                     * where the old value is below the limit and the new
-> +                     * value is above, it is UNKNOWN whether the limit check
-> +                     * triggers; we choose to trigger.
-> +                     */
-> +                    gen_helper_v8m_stackcheck(cpu_env, addr);
-> +                }
-> +
->                  if (dp)
->                      offset = 8;
->                  else
-> 
+Paolo
