@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g7awc-00045I-Sv
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 02:47:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1g7b7r-0007uy-Va
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 02:59:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g7awZ-0002CD-M7
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 02:47:38 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45500)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g7awZ-0002Bh-A4
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 02:47:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1g7b7r-0000rP-1G
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 02:59:15 -0400
+Date: Wed, 3 Oct 2018 16:29:49 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181003062949.GZ1886@umbus.fritz.box>
+References: <20180926094219.20322-1-david@redhat.com>
+	<20180926094219.20322-19-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Wed, 03 Oct 2018 09:47:31 +0300
-From: dovgaluk <dovgaluk@ispras.ru>
-In-Reply-To: <CANzW0muZaNRtOP6OjXJ11HXL_q2MDOhCxY2dXZc2DzHr5BxqLw@mail.gmail.com>
-References: <CANzW0mvSX5nWuinDU68W2yJzgoQSGAHPqpz0G36A6NKwRsz_4A@mail.gmail.com>
-	<d45bff6c4e472811f01452b5f730c1b6@ispras.ru>
-	<CANzW0mthuW0a7LR7DhpvTPnZ5n5DxtYyfYQf756vtyb9g0O7QQ@mail.gmail.com>
-	<CANzW0muZaNRtOP6OjXJ11HXL_q2MDOhCxY2dXZc2DzHr5BxqLw@mail.gmail.com>
-Message-ID: <1930792321d9a0b16576359c7cec9f51@ispras.ru>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/25] Fixing record/replay and adding
- reverse debugging
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="YG0IFkGWIt6MbjRk"
+Content-Disposition: inline
+In-Reply-To: <20180926094219.20322-19-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,164 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Cc: Pavel.Dovgaluk@ispras.ru, qemu-devel@nongnu.org
-
-Can you try applying this patch?
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg563798.html
-
-I also encountered the problems with x86_64 replaying and found the=20
-misprint in
-the code which was fixed later, than sending the series to the mailing=20
-list.
-
-Pavel Dovgalyuk
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>
 
 
-Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-10-02 10:02:
-> I've added "-monitor stdio" option to command line of Test 1 and
-> repeated entering command during execution:
+--YG0IFkGWIt6MbjRk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Sep 26, 2018 at 11:42:13AM +0200, David Hildenbrand wrote:
+> The unplug and unplug_request handlers are special: They are not
+> executed when unrealizing a device, but rather trigger the removal of a
+> device from device_del() via object_unparent() - to effectively
+> unrealize a device.
 >=20
->   QEMU 3.0.50 monitor - type 'help' for more information
->   (qemu) info replay
->   Replaying execution 'icount_rr_capture.bin': current step =3D
-> 311736195
->   (qemu) info replay
->   Replaying execution 'icount_rr_capture.bin': current step =3D
-> 318198367
->   (qemu) info replay
->   Replaying execution 'icount_rr_capture.bin': current step =3D
-> 324737211
->   (qemu) info replay
->   Replaying execution 'icount_rr_capture.bin': current step =3D
-> 329890795
->   (qemu) info replay
->   Replaying execution 'icount_rr_capture.bin': current step =3D
-> 607069789
->   (qemu) info replay
->   Replaying execution 'icount_rr_capture.bin': current step =3D
-> 607069789
->   (qemu) info replay
->   Replaying execution 'icount_rr_capture.bin': current step =3D
-> 607069789
->   ...
+> If such a device has a child bus and another device attached to
+> that bus (e.g. how virtio devices are created with their proxy device),
+> we will not get a call to the unplug handler. As we want to support
+> hotplug handlers (and especially also some unplug logic to undo resource
+> assignment) for such devices, we cannot simply call the unplug handler
+> when unrealizing - it has a different semantic ("trigger removal").
 >=20
-> Some notes on value of step it stucks on:
-> - mostly it's same (even across different record-replay pairs);
-> - stressing host during replay may cause it to change even for same
-> record-replay pair (i.e. different replay executions for same file
-> recorded).
+> To handle this scenario, we need a do_unplug handler, that will be
+> executed for all devices with a hotplug handler.
 >=20
-> This specific case seems to be stable to reproduce.
+> While at it, introduce hotplug_fn_nofail and fix a spelling mistake in
+> a comment.
 >=20
-> =D0=B2=D1=82, 2 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 0:22, Artem Pis=
-arenko
-> <artem.k.pisarenko@gmail.com>:
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/core/hotplug.c    | 10 ++++++++++
+>  hw/core/qdev.c       |  6 ++++++
+>  include/hw/hotplug.h | 26 ++++++++++++++++++++++++--
+>  3 files changed, 40 insertions(+), 2 deletions(-)
 >=20
->> I've posted bug report with extended tests (incl. case without
->> sleep=3Doff). You may find guest image (kernel) in bug description.
->> https://bugs.launchpad.net/qemu/+bug/1795369 [1]
->>=20
->> The most annoying thing is that some issues are almost not
->> reproducible. There are definitely race conditions somewhere in qemu
->> code. Running 'stress-ng' utility with CPU and I/O stressors in
->> parallel with qemu execution greatly minimizes amount of attempts
->> when I'm trying to trigger some of issues I encounter.
->>=20
->> I'll try 'info monitor' command tomorrow, but no guarantees that
->> I'll be able to reproduce issue again.
->>=20
->> Speaking about '-nographic' and SDL... I've noted that UI greatly
->> minimizes possibility of hanging (but not avoids it completely) when
->> using icount in general, so this effect isn't rr-specific. I've
->> already reported this bug too.
->>=20
->> =D0=BF=D0=BD, 1 =D0=BE=D0=BA=D1=82. 2018 =D0=B3., 20:14 dovgaluk <dovg=
-aluk@ispras.ru>:
->>=20
->>> Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-09-30 14:01:
->>>> Feature still broken :(
->>>=20
->>> Thanks for testing.
->>>=20
->>>>=20
->>>> Brief description of my tests.
->>>>=20
->>>> Guest image is Linux, which just powers off after kernel boots
->>>> (instead of proceeding to user-space /init or /sbin/init).
->>>> Base cmdline:
->>>> qemu-system-x86_64 -nodefaults -machine pc,accel=3Dtcg -m 2048
->>> -cpu
->>>> qemu64 -rtc clock=3Dvm,base=3D2000-01-01T00:00:00 -kernel bzImage
->>> -initrd
->>>> rootfs -append 'nokaslr console=3DttyS0 rdinit=3D/init_poweroff'
->>>> -nographic -serial SERIAL_VALUE -icount
->>>> 1,sleep=3Doff,rr=3DRR_VALUE,rrfile=3Dicount_rr_capture.bin
->>>=20
->>> I've never tried it with sleep=3Doff. Can you remove it and try
->>> again?
->>>=20
->>> We also seen a problem with '-nographic'. When we remove this
->>> option and
->>> QEMU runs with SDL
->>> window, everything is ok. There is some problem with main loop
->>> which may
->>> sleep when there
->>> is no GUI to update, or something like that. We couldn't fix it
->>> yet.
->>>=20
->>>>=20
->>>> Test 1. When SERIAL_VALUE=3Dnone
->>>> Running with RR_VALUE=3Drecord completes successfully.
->>>> Running with RR_VALUE=3Dreplay doesn't completes. qemu process
->>> just
->>>> eating ~100% cpu and memory usage doesn't grow after some
->>> moment. I
->>>> don't see what happens because of problem no.2 (see below).
->>>=20
->>> Try 'info replay' monitor command. Does instruction counter
->>> increases?
->>>=20
->>>>=20
->>>> Test 2. When SERIAL_VALUE=3Dstdio
->>>> Running with RR_VALUE=3Drecord completes successfully.
->>>>=20
->>>> Running with RR_VALUE=3Dreplay caues exit with error:
->>>>=20
->>>> "qemu-system-x86_64: Missing character write event in the replay
->>> log"
->>>>=20
->>>> These problems are same with qemu 2.12 (both vanilla and with
->>> previous
->>>> versions of these patches applied). Furthemore, I consider whole
->>>> icount mode broken and determinism isn't achievable.
->>>> The irony is that I actually don't need record/replay feature.
->>> I've
->>>> tried to use it only as instrument to debug failing determinism
->>> in
->>>> qemu code. But since replay/record feature itself relies on
->>>> determinism, which is broken, it's no wonder why it fails also
->>> (I just
->>>> hoped to bypass it).
->>>>=20
->>>> Contact me if you need more details. I just tired a lot trying
->>> to get
->>>> all these things working... Hope is leaving me...
->>>=20
->>> Can you share the kernel in case the icount still broken?
->>>=20
->>> Pavel Dovgalyuk
->> --
->>=20
->> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
->> =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
-=BD=D0=BA=D0=BE
->  --
->=20
-> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
->   =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
-=BD=D0=BA=D0=BE
->=20
-> Links:
-> ------
-> [1] https://bugs.launchpad.net/qemu/+bug/1795369
+> diff --git a/hw/core/hotplug.c b/hw/core/hotplug.c
+> index 2253072d0e..e7a68d5160 100644
+> --- a/hw/core/hotplug.c
+> +++ b/hw/core/hotplug.c
+> @@ -45,6 +45,16 @@ void hotplug_handler_post_plug(HotplugHandler *plug_ha=
+ndler,
+>      }
+>  }
+> =20
+> +void hotplug_handler_do_unplug(HotplugHandler *plug_handler,
+> +                                 DeviceState *plugged_dev)
+
+Hrm.  I really dislike things named "do_X".  The "do" rarely adds any
+useful meaning.  And when there's also something called just plain
+"X", it's *always* unclear how they relate to each other.
+
+That's doubly true when it's a general interface like this, rather
+than just some local functions.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--YG0IFkGWIt6MbjRk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlu0YdwACgkQbDjKyiDZ
+s5Lx6Q//fg4PQ2r85/wafUdlxkDN3K2H4p0fsEA/ZtgFDqx268c8s7SfWXAINlhQ
+l30nbNwuijnlrB66OIXZ+mD0pzraAnGdRe8C/q6gWXvBQXQLUT2WEz6nW4HxJTZD
+3Os5R0PiIcmO8GxbeeJM2mE/x5zzRjtDFPvqi2UySe5bXINtfSu4NOkDoirSvE/Q
+2FNf0NGPlnwpiX4Z3Pd1l3iiZNLjM5WAnlrrfTqO7Uet4ut+hX1Casqn2R3sihtG
+dDqOzsBqyw/e5VQri6tPIMGA1wNdNFbOm1Fd9WHE7w0CKss5D91WOXoGtbeTDwCe
+nQHXfPItsFzSMF80K3eaevjHAG3v2ZQsF71QVW3s7Mfioegta5AvrhhLvbbzqc1z
+QC2BbEiSrxNqSZYVfA7a3aQ5hsHhOoi0VrNY1OniK8yCsZArXcrd2PUezLJGQ7Zp
+2j0oM39G9sIof91/8bI9PEBwXWmWMqaVhuX3LIT8+a+Tj53AMAIVtk8hb9wFdwgq
+78jdJlCciIGTTEhtuZroC7o0aR75ob2aBAKf+mMYv9aBDj/2iyq29unRR5sQRTOU
+KRsitigseegtM4ai6s4uG0io6RAIzF7I0neXLDRNP3R2YXp20Nu0Udue05dal3zi
+LIdDDDrbLF8OKqyP9t806bF8wDXo2K4/+iWYlIJ6moKDfHe6QaQ=
+=Sphh
+-----END PGP SIGNATURE-----
+
+--YG0IFkGWIt6MbjRk--
