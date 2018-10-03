@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7ndM-0006R1-5T
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:20:41 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g7neJ-0007Pg-Lg
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g7ndG-00073E-K3
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:20:34 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40812)
+	(envelope-from <richard.henderson@linaro.org>) id 1g7neI-0007h8-Pg
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:21:35 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46697)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g7ndF-0006pv-SP
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:20:30 -0400
-Received: by mail-oi1-x241.google.com with SMTP id j68-v6so5631510oib.7
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 13:20:08 -0700 (PDT)
+	id 1g7neI-0007ew-Ft
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 16:21:34 -0400
+Received: by mail-oi1-x242.google.com with SMTP id k64-v6so5620000oia.13
+	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 13:21:31 -0700 (PDT)
 References: <20181002163556.10279-1-peter.maydell@linaro.org>
 	<20181002163556.10279-13-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <69209684-a544-8d67-1c37-cf5e3a1ef159@linaro.org>
-Date: Wed, 3 Oct 2018 15:20:04 -0500
+Message-ID: <2b521540-984b-7931-8e71-600e504f7d78@linaro.org>
+Date: Wed, 3 Oct 2018 15:21:28 -0500
 MIME-Version: 1.0
 In-Reply-To: <20181002163556.10279-13-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
