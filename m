@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g7eEb-00047i-AV
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:18:28 -0400
+	(envelope-from <berto@igalia.com>) id 1g7eK9-0006Qz-7b
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:24:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g7eEX-0003qe-9n
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:18:25 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46697)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g7eEX-0003po-3N
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:18:21 -0400
-Received: by mail-wr1-f67.google.com with SMTP id z3-v6so5446300wrr.13
-	for <qemu-devel@nongnu.org>; Wed, 03 Oct 2018 03:18:19 -0700 (PDT)
-References: <20181002163556.10279-1-peter.maydell@linaro.org>
-	<20181002163556.10279-14-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6516f5a5-449c-1d49-a4f0-241f49f16b61@redhat.com>
-Date: Wed, 3 Oct 2018 12:18:17 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181002163556.10279-14-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 13/13] target/arm: Add v8M stack checks for
- MSR to SP_NS
+	(envelope-from <berto@igalia.com>) id 1g7eK6-0006n1-3l
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 06:24:09 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed,  3 Oct 2018 13:23:13 +0300
+Message-Id: <20181003102313.3953-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] block: replace "discard" literal with
+ BDRV_OPT_DISCARD macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +18,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 02/10/2018 18:35, Peter Maydell wrote:
-> Updating the NS stack pointer via MSR to SP_NS should include
-> a check whether the new SP value is below the stack limit.
-> No other kinds of update to the various stack pointer and
-> limit registers via MSR should perform a check.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  target/arm/helper.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 074f7616272..712828674fa 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -10963,11 +10963,23 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
->               * currently in handler mode or not, using the NS CONTROL.SPSEL.
->               */
->              bool spsel = env->v7m.control[M_REG_NS] & R_V7M_CONTROL_SPSEL_MASK;
-> +            bool is_psp = !arm_v7m_is_handler_mode(env) && spsel;
-> +            uint32_t limit;
->  
->              if (!env->v7m.secure) {
->                  return;
->              }
-> -            if (!arm_v7m_is_handler_mode(env) && spsel) {
-> +
-> +            limit = is_psp ? env->v7m.psplim[false] : env->v7m.msplim[false];
-> +
-> +            if (val < limit) {
-> +                CPUState *cs = CPU(arm_env_get_cpu(env));
-> +
-> +                cpu_restore_state(cs, GETPC(), true);
-> +                raise_exception(env, EXCP_STKOF, 0, 1);
-> +            }
-> +
-> +            if (is_psp) {
->                  env->v7m.other_ss_psp = val;
->              } else {
->                  env->v7m.other_ss_msp = val;
-> 
+diff --git a/block.c b/block.c
+index 7710b399a3..0d6e5f1a76 100644
+--- a/block.c
++++ b/block.c
+@@ -1327,7 +1327,7 @@ QemuOptsList bdrv_runtime_opts = {
+             .help = "try to optimize zero writes (off, on, unmap)",
+         },
+         {
+-            .name = "discard",
++            .name = BDRV_OPT_DISCARD,
+             .type = QEMU_OPT_STRING,
+             .help = "discard operation (ignore/off, unmap/on)",
+         },
+@@ -1432,7 +1432,7 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+         }
+     }
+ 
+-    discard = qemu_opt_get(opts, "discard");
++    discard = qemu_opt_get(opts, BDRV_OPT_DISCARD);
+     if (discard != NULL) {
+         if (bdrv_parse_discard_flags(discard, &bs->open_flags) != 0) {
+             error_setg(errp, "Invalid discard option");
+@@ -3186,7 +3186,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+ 
+     update_flags_from_options(&reopen_state->flags, opts);
+ 
+-    discard = qemu_opt_get_del(opts, "discard");
++    discard = qemu_opt_get_del(opts, BDRV_OPT_DISCARD);
+     if (discard != NULL) {
+         if (bdrv_parse_discard_flags(discard, &reopen_state->flags) != 0) {
+             error_setg(errp, "Invalid discard option");
+-- 
+2.11.0
