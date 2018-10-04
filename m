@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1g83Gz-0002MS-OS
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:02:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g83HA-0002Re-Ud
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1g83Gw-0005wy-9Q
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:02:33 -0400
-From: Denis V.Lunev <den@openvz.org>
-Date: Thu, 4 Oct 2018 13:02:23 +0000
-Message-ID: <e8df6302-0f4d-a00a-7f7a-b71f20d1a285@openvz.org>
-References: <20181004100313.4253-1-den@openvz.org>
-In-Reply-To: <20181004100313.4253-1-den@openvz.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E9EA9E5C093B7044A21E212DF62FC397@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <kwolf@redhat.com>) id 1g83H5-00068N-E6
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:02:44 -0400
+Date: Thu, 4 Oct 2018 15:02:25 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181004130225.GE6009@localhost.localdomain>
+References: <20181003144738.70670-1-vsementsov@virtuozzo.com>
+	<121a81ed-7932-b96c-cc84-60b82725d8e1@redhat.com>
+	<eb157eaa-b55d-3044-3c25-46a7d8e998f9@virtuozzo.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: fix NBD_CMD_CACHE negitiation
- according to the NBD specification
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eb157eaa-b55d-3044-3c25-46a7d8e998f9@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nbd/server: fix NBD_CMD_CACHE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Valery Vdovin <valery.vdovin@acronis.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>, qemu-stable <qemu-stable@nongnu.org>
 
-cy9uZWdpdGlhdGlvbi9uZWdvdGlhdGlvbi8NCg0KT24gMTAvMDQvMjAxOCAwMTowMyBQTSwgRGVu
-aXMgVi4gTHVuZXYgd3JvdGU6DQo+IENvbW1pdCBiYzM3YjA2YTUgd2FzIG1hZGUgdmVyeSBiYWQg
-dGhpbmcsIGl0IGhhcyBiZWVuIGFkZGVkDQo+IE5CRF9GTEFHX1NFTkRfQ0FDSEUgZmxhZyBmb3Ig
-bmVnb3RpYXRpb24uIFRoZSBwcm9ibGVtIGlzIHRoYXQgdGhlIHZhbHVlDQo+IG9mIHRoZSBmbGFn
-IHdhcyB0YWtlbiB3cm9uZyBhbmQgZGlyZWN0bHkgdmlvbGF0ZXMgTkJEIHNwZWNpZmljYXRpb24u
-DQo+IFRoaXMgdmFsdWUgKGJpdCA4KSBpcyB1c2VkIGF0IGxlYXN0IGluIHRoZSBMaW51eCBrZXJu
-ZWwgYXMgYSBwYXJ0IG9mDQo+IHN0YWJsZSB1c2Vyc3BhY2Uta2VybmVsIEFQSSBzaW5jZSA0LjEw
-IGFzIE5CRF9GTEFHX0NBTl9NVUxUSV9DT05ODQo+IGFzIGRlZmluZWQgaW4gdGhlIHNwZWNpZmlj
-YXRpb246DQo+DQo+ICJiaXQgOCwgTkJEX0ZMQUdfQ0FOX01VTFRJX0NPTk46IEluZGljYXRlcyB0
-aGF0IHRoZSBzZXJ2ZXIgb3BlcmF0ZXMNCj4gZW50aXJlbHkgd2l0aG91dCBjYWNoZSwgb3IgdGhh
-dCB0aGUgY2FjaGUgaXQgdXNlcyBpcyBzaGFyZWQgYW1vbmcgYWxsDQo+IGNvbm5lY3Rpb25zIHRv
-IHRoZSBnaXZlbiBkZXZpY2UuIEluIHBhcnRpY3VsYXIsIGlmIHRoaXMgZmxhZyBpcw0KPiBwcmVz
-ZW50LCB0aGVuIHRoZSBlZmZlY3RzIG9mIE5CRF9DTURfRkxVU0ggYW5kIE5CRF9DTURfRkxBR19G
-VUENCj4gTVVTVCBiZSB2aXNpYmxlIGFjcm9zcyBhbGwgY29ubmVjdGlvbnMgd2hlbiB0aGUgc2Vy
-dmVyIHNlbmRzIGl0cyByZXBseQ0KPiB0byB0aGF0IGNvbW1hbmQgdG8gdGhlIGNsaWVudC4gSW4g
-dGhlIGFic2Vuc2Ugb2YgdGhpcyBmbGFnLCBjbGllbnRzDQo+IFNIT1VMRCBOT1QgbXVsdGlwbGV4
-IHRoZWlyIGNvbW1hbmRzIG92ZXIgbW9yZSB0aGFuIG9uZSBjb25uZWN0aW9uIHRvDQo+IHRoZSBl
-eHBvcnQuDQo+IC4uLg0KPiBiaXQgMTAsIE5CRF9GTEFHX1NFTkRfQ0FDSEU6IGRvY3VtZW50cyB0
-aGF0IHRoZSBzZXJ2ZXIgdW5kZXJzdGFuZHMNCj4gTkJEX0NNRF9DQUNIRTsgaG93ZXZlciwgbm90
-ZSB0aGF0IHNlcnZlciBpbXBsZW1lbnRhdGlvbnMgZXhpc3QNCj4gd2hpY2ggc3VwcG9ydCB0aGUg
-Y29tbWFuZCB3aXRob3V0IGFkdmVydGlzaW5nIHRoaXMgYml0LCBhbmQNCj4gY29udmVyc2VseSB0
-aGF0IHRoaXMgYml0IGRvZXMgbm90IGd1YXJhbnRlZSB0aGF0IHRoZSBjb21tYW5kIHdpbGwNCj4g
-c3VjY2VlZCBvciBoYXZlIGFuIGltcGFjdC4iDQo+DQo+IFBlcnNvbmFsbHkgSSBkbyBub3Qgc2Vl
-IGFueSBvcHRpb24gdGhhdCB3ZSB3aWxsIGJlIGFsbG93ZWQgdG8gZml4IHRoZQ0KPiBzcGVjaWZp
-Y2F0aW9uIGluIGZhdm9yIG9mIFFFTVUgYW5kIGFwcGx5IHRoZSBmaXggdG8gdGhlIGtlcm5lbC4g
-VGhpcw0KPiBpcyBhIGJpZy1iaWcgcHJvYmxlbS4gTGV0IHVzIGZpeCB0aGlzIGluIFFFTVUgYXMg
-c29vbiBhcyBwb3NzaWJsZS4NCj4NCj4gVGh1cyB0aGUgY29tbWl0IGZpeGVzIG5lZ290aWF0aW9u
-IGZsYWcgaW4gUUVNVSBhY2NvcmluZyB0byB0aGUNCj4gc3BlY2lmaWNhdGlvbi4gRm9ydHVuYXRl
-bHkgZW5vdWdoIHRoZSBiaXQgaGFzIGJlZW4gYWRkZWQgYnkgVmlydHVvenpvDQo+IGFuZCB0aGVy
-ZSBhcmUgbm8gcmVsZWFzZWQgcHJvZHVjdHMgaW4gdGhlIGZpZWxkIHdpdGggdGhpcyBiaXQgdXNl
-ZA0KPiBzbyBmYXIuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IERlbmlzIFYuIEx1bmV2IDxkZW5Ab3Bl
-bnZ6Lm9yZz4NCj4gQ0M6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZA
-dmlydHVvenpvLmNvbT4NCj4gQ0M6IFZhbGVyeSBWZG92aW4gPHZhbGVyeS52ZG92aW5AYWNyb25p
-cy5jb20+DQo+IENDOiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4gQ0M6IFBhb2xv
-IEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+DQo+IC0tLQ0KPiAgaW5jbHVkZS9ibG9jay9u
-YmQuaCB8IDIgKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlv
-bigtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ibG9jay9uYmQuaCBiL2luY2x1ZGUvYmxv
-Y2svbmJkLmgNCj4gaW5kZXggNDYzOGM4MzlmNS4uNDM3N2ZhNTAyYyAxMDA2NDQNCj4gLS0tIGEv
-aW5jbHVkZS9ibG9jay9uYmQuaA0KPiArKysgYi9pbmNsdWRlL2Jsb2NrL25iZC5oDQo+IEBAIC0x
-MzUsNyArMTM1LDcgQEAgdHlwZWRlZiBzdHJ1Y3QgTkJERXh0ZW50IHsNCj4gICNkZWZpbmUgTkJE
-X0ZMQUdfU0VORF9UUklNICAgICAgICAgKDEgPDwgNSkgLyogU2VuZCBUUklNIChkaXNjYXJkKSAq
-Lw0KPiAgI2RlZmluZSBOQkRfRkxBR19TRU5EX1dSSVRFX1pFUk9FUyAoMSA8PCA2KSAvKiBTZW5k
-IFdSSVRFX1pFUk9FUyAqLw0KPiAgI2RlZmluZSBOQkRfRkxBR19TRU5EX0RGICAgICAgICAgICAo
-MSA8PCA3KSAvKiBTZW5kIERGIChEbyBub3QgRnJhZ21lbnQpICovDQo+IC0jZGVmaW5lIE5CRF9G
-TEFHX1NFTkRfQ0FDSEUgICAgICAgICgxIDw8IDgpIC8qIFNlbmQgQ0FDSEUgKHByZWZldGNoKSAq
-Lw0KPiArI2RlZmluZSBOQkRfRkxBR19TRU5EX0NBQ0hFICAgICAgICAoMSA8PCAxMCkgLyogU2Vu
-ZCBDQUNIRSAocHJlZmV0Y2gpICovDQo+ICANCj4gIC8qIE5ldy1zdHlsZSBoYW5kc2hha2UgKGds
-b2JhbCkgZmxhZ3MsIHNlbnQgZnJvbSBzZXJ2ZXIgdG8gY2xpZW50LCBhbmQNCj4gICAgIGNvbnRy
-b2wgd2hhdCB3aWxsIGhhcHBlbiBkdXJpbmcgaGFuZHNoYWtlIHBoYXNlLiAqLw0KDQo=
+Am 03.10.2018 um 17:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 03.10.2018 17:57, Eric Blake wrote:
+> > On 10/3/18 9:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> >> We should not go to structured-read branch on CACHE command, fix that.
+> >>
+> >> Bug intoroduced in bc37b06a5cde24 "nbd/server: introduce NBD_CMD_CACHE"
+> >
+> > s/intoroduced/introduced/
+> >
+> >> with the whole feature and affects 3.0.0 release.
+> >
+> > Ouch. It's because I don't have an NBD client that can issue the 
+> > command, so the server side got released without sufficient testing. 
+> > Is there some way we could enhance qemu-io as NBD client to issue such 
+> > a command?
+> 
+> may be, just add qemu-io command, like x-debug-nbd-cmd, which will just 
+> send any nbd command? and prints all server replies? Then we'll be able 
+> to write any unit tests on nbd-server. It's not the first time the 
+> problem arise..
+
+Shouldn't it be easy to write a simple NBD client in Python and then use
+that for test cases? I don't see why this needs to be in qemu-io, and
+testing illegal requests is certainly easier with a custom client.
+
+Kevin
