@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g85I3-0003wa-6G
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:11:48 -0400
+	(envelope-from <crosa@redhat.com>) id 1g85Kp-0005vl-8l
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:14:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g85Hz-0002Or-7F
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:11:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34960)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g85Hy-0002NL-Ue
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:11:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g85Hw-0001S3-6p
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 15:11:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5462F2E818A
-	for <qemu-devel@nongnu.org>; Thu,  4 Oct 2018 15:11:37 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 04 Oct 2018 15:00:45 -0000
-From: "Emilio G. Cota" <1735049@bugs.launchpad.net>
-Reply-To: Bug 1735049 <1735049@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <151192504398.10243.14437635177032457733.malonedeb@wampee.canonical.com>
-Message-Id: <153866524609.7684.12675137914899619548.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1735049] Re: Need MTTCG support for x86 guests
+	(envelope-from <crosa@redhat.com>) id 1g85Km-0006Bf-5W
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:14:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54254)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g85Kl-0006BD-VZ
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:14:36 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Date: Thu,  4 Oct 2018 11:14:23 -0400
+Message-Id: <20181004151429.7232-2-crosa@redhat.com>
+In-Reply-To: <20181004151429.7232-1-crosa@redhat.com>
+References: <20181004151429.7232-1-crosa@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/7] Acceptance Tests: improve docstring on
+ pick_default_qemu_bin()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +25,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Caio Carrara <ccarrara@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+Making it clear what is returned by this utility function.
 
--- =
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ tests/acceptance/avocado_qemu/__init__.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1735049
-
-Title:
-  Need MTTCG support for x86 guests
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  MTTCG support is notably absent for x86_64 guests.  The last Wiki
-  update on MTTCG was back in 2015, and I am having some difficulty
-  determining the current status of the underlying requirements to
-  enable this feature on x86 hosts.
-
-  For instance, has support for strong-on-weak memory consistency been
-  added into QEMU GIT at this point?
-
-  Thanks!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1735049/+subscriptions
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+index 1e54fd5932..d8d5b48dac 100644
+--- a/tests/acceptance/avocado_qemu/__init__.py
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -27,6 +27,10 @@ def pick_default_qemu_bin():
+     """
+     Picks the path of a QEMU binary, starting either in the current working
+     directory or in the source tree root directory.
++
++    :returns: the path to the default QEMU binary or None if one could not
++              be found
++    :rtype: str or None
+     """
+     arch = os.uname()[4]
+     qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
+-- 
+2.17.1
