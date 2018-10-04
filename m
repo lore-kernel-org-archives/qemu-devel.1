@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1g85Xj-0006oW-SH
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:28:01 -0400
+	(envelope-from <cohuck@redhat.com>) id 1g85Z5-0007rs-64
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:29:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1g85Xg-0001c2-MY
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:27:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38718)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1g85Xg-0001b6-GU
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:27:56 -0400
-References: <1538164055-23719-1-git-send-email-wei@redhat.com>
-	<81006285-7644-c03e-a2a8-7458cfd064b8@redhat.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <bb1a3136-c381-52c6-4ef3-d56ff4320226@redhat.com>
-Date: Thu, 4 Oct 2018 10:27:45 -0500
+	(envelope-from <cohuck@redhat.com>) id 1g85Z1-0004jz-CM
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:29:22 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Thu,  4 Oct 2018 17:28:42 +0200
+Message-Id: <20181004152857.14525-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <81006285-7644-c03e-a2a8-7458cfd064b8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] tests: Add migration test for aarch64
+Subject: [Qemu-devel] [PULL 00/15] s390x updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +20,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, drjones@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
+The following changes since commit dafd95053611aa14dda40266857608d12ddce6=
+58:
 
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2018-10-02 18:27:18 +0100)
 
-On 10/04/2018 10:07 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 28/09/2018 21:47, Wei Huang wrote:
-> [...]> +++ b/tests/migration/aarch64/Makefile
->> @@ -0,0 +1,20 @@
->> +# To specify cross compiler prefix, use CROSS_PREFIX=3D
->> +#   $ make CROSS_PREFIX=3Daarch64-linux-gnu-
->> +
->> +.PHONY: all clean
->> +all: a-b-kernel.h
->> +
->> +a-b-kernel.h: aarch64.kernel
->> +	echo "$$__note" > header.tmp
->=20
-> This won't work on a read-only fs.
+are available in the Git repository at:
 
-Under which setting? If tmp file can't be generated on a read-only fs,
-wouldn't $@ have the same problem?
+  git://github.com/cohuck/qemu tags/s390x-20181004
 
->=20
-> Why don't you use $@ directly?
->=20
->> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
->=20
-> Please use:
->=20
-> xxd -g4 ...
+for you to fetch changes up to b576d582ea2b03f4eada186fff59308d22b40a6a:
 
-This option doesn't work with -i (the include file style output) which
-is what we want. From xxd manual:
+  hw/s390x/s390-pci-bus: Convert sysbus init function to realize function=
+ (2018-10-04 12:10:40 +0200)
 
-"-g bytes | -groupsize bytes
-    separate the output of every <bytes> bytes (two hex characters or
-    eight bit-digits each) by a whitespace. Specify -g 0 to suppress
-    grouping.  <Bytes> defaults to 2 in normal mode and 1 in bits
-    mode. Grouping does not apply to postscript or include style."
+----------------------------------------------------------------
+Various s390x updates:
+- fix several struct definitions so that sparc hosts do not trip over
+  unaligned accesses
+- fence enabling huge pages for pre-3.1 machines
+- sysbus init -> realize conversion
+- fixes and improvements in tcg (instruction flags and AFP registers)
 
+----------------------------------------------------------------
 
->=20
-> xxd might not be installed on the host.
+David Hildenbrand (9):
+  s390x: move tcg_s390_program_interrupt() into TCG code and mark it
+    noreturn
+  s390x/tcg: factor out and fix DATA exception injection
+  s390x/tcg: store in the TB flags if AFP is enabled
+  s390x/tcg: support flags for instructions
+  s390x/tcg: add instruction flags for floating point instructions
+  s390x/tcg: check for AFP-register, BFP and DFP data exceptions
+  s390x/tcg: handle privileged instructions via flags
+  s390x/tcg: fix FP register pair checks
+  s390x/tcg: refactor specification checking
 
-xxd is provided by vim packages. So it should be available in most distro=
-s.
+Janosch Frank (1):
+  s390x: Fence huge pages prior to 3.1
 
->=20
-> That said we should however install it on the docker cross images.
+Pavel Zbitskiy (1):
+  target/s390x: exception on non-aligned LPSW(E)
 
-Agreed.
+Thomas Huth (4):
+  hw/s390x/ipl: Fix alignment problems of S390IPLState members
+  hw/s390x/css: Remove QEMU_PACKED from struct SenseId
+  hw/s390x/ioinst: Fix alignment problem in struct SubchDev
+  hw/s390x/s390-pci-bus: Convert sysbus init function to realize
+    function
 
->=20
->> +	mv header.tmp $@
->> +
->> +aarch64.kernel: aarch64.elf
->> +	$(CROSS_PREFIX)objcopy -O binary $< $@
->> +
->> +aarch64.elf: a-b-kernel.S
->> +	$(CROSS_PREFIX)gcc -o $@ -nostdlib -Wl,--build-id=3Dnone $<
->> +
->> +clean:
->> +	@rm -rf *.kernel *.elf
->=20
+ hw/s390x/css.c                     |  38 ++--
+ hw/s390x/ipl.h                     |   5 +-
+ hw/s390x/s390-pci-bus.c            |  34 ++--
+ hw/s390x/s390-virtio-ccw.c         |  10 +
+ include/hw/s390x/css.h             |   6 +-
+ include/hw/s390x/ioinst.h          |  21 +-
+ include/hw/s390x/s390-virtio-ccw.h |   3 +
+ target/s390x/cpu.h                 |   9 +
+ target/s390x/excp_helper.c         |  36 ++++
+ target/s390x/fpu_helper.c          |  13 +-
+ target/s390x/helper.h              |   1 +
+ target/s390x/insn-data.def         | 395 +++++++++++++++++++------------=
+------
+ target/s390x/interrupt.c           |  15 +-
+ target/s390x/kvm.c                 |  10 +-
+ target/s390x/tcg-stub.c            |  10 +
+ target/s390x/tcg_s390x.h           |   4 +
+ target/s390x/translate.c           | 203 ++++++++-----------
+ 17 files changed, 430 insertions(+), 383 deletions(-)
+
+--=20
+2.14.4
