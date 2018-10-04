@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g86Cl-0007Xc-T6
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 12:10:28 -0400
+	(envelope-from <imammedo@redhat.com>) id 1g86D0-0007VB-MQ
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 12:10:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g864q-0000z2-7Q
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 12:02:19 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g864p-0000uj-3y
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 12:02:11 -0400
-Received: by mail-wr1-f68.google.com with SMTP id n1-v6so10516505wrt.10
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 09:02:10 -0700 (PDT)
-References: <20181002163556.10279-1-peter.maydell@linaro.org>
-	<20181002163556.10279-2-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e7fe0552-904c-724a-4107-8b3f30a251b7@redhat.com>
-Date: Thu, 4 Oct 2018 18:02:07 +0200
+	(envelope-from <imammedo@redhat.com>) id 1g862G-0006Li-RY
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:59:36 -0400
+Date: Thu, 4 Oct 2018 17:59:15 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181004175915.5f366e67@redhat.com>
+In-Reply-To: <cb8dd5d6-bb8c-f4a1-85c3-6b7ba53ad828@redhat.com>
+References: <20180926094219.20322-1-david@redhat.com>
+	<20180926094219.20322-19-david@redhat.com>
+	<20181003062949.GZ1886@umbus.fritz.box>
+	<cb8dd5d6-bb8c-f4a1-85c3-6b7ba53ad828@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181002163556.10279-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 01/13] target/arm: Define new TBFLAG for
- v8M stack checking
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +26,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <richard.henderson@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>
 
-Hi Peter,
+On Wed, 3 Oct 2018 19:21:25 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 02/10/2018 18:35, Peter Maydell wrote:
-> The Arm v8M architecture includes hardware stack limit checking.
-> When certain instructions update the stack pointer, if the new
-> value of SP is below the limit set in the associated limit register
-> then an exception is taken. Add a TB flag that tracks whether
-> the limit-checking code needs to be emitted.
+> On 03/10/2018 08:29, David Gibson wrote:
+> > On Wed, Sep 26, 2018 at 11:42:13AM +0200, David Hildenbrand wrote:  
+> >> The unplug and unplug_request handlers are special: They are not
+> >> executed when unrealizing a device, but rather trigger the removal of a
+> >> device from device_del() via object_unparent() - to effectively
+> >> unrealize a device.
+> >>
+> >> If such a device has a child bus and another device attached to
+> >> that bus (e.g. how virtio devices are created with their proxy device),
+> >> we will not get a call to the unplug handler. As we want to support
+> >> hotplug handlers (and especially also some unplug logic to undo resource
+> >> assignment) for such devices, we cannot simply call the unplug handler
+> >> when unrealizing - it has a different semantic ("trigger removal").
+> >>
+> >> To handle this scenario, we need a do_unplug handler, that will be
+> >> executed for all devices with a hotplug handler.
+> >>
+> >> While at it, introduce hotplug_fn_nofail and fix a spelling mistake in
+> >> a comment.
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hw/core/hotplug.c    | 10 ++++++++++
+> >>  hw/core/qdev.c       |  6 ++++++
+> >>  include/hw/hotplug.h | 26 ++++++++++++++++++++++++--
+> >>  3 files changed, 40 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/hw/core/hotplug.c b/hw/core/hotplug.c
+> >> index 2253072d0e..e7a68d5160 100644
+> >> --- a/hw/core/hotplug.c
+> >> +++ b/hw/core/hotplug.c
+> >> @@ -45,6 +45,16 @@ void hotplug_handler_post_plug(HotplugHandler *plug_handler,
+> >>      }
+> >>  }
+> >>  
+> >> +void hotplug_handler_do_unplug(HotplugHandler *plug_handler,
+> >> +                                 DeviceState *plugged_dev)  
+> > 
+> > Hrm.  I really dislike things named "do_X".  The "do" rarely adds any
+> > useful meaning.  And when there's also something called just plain
+> > "X", it's *always* unclear how they relate to each other.
+> > 
+> > That's doubly true when it's a general interface like this, rather
+> > than just some local functions.
+> >   
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/cpu.h       |  7 +++++++
->  target/arm/translate.h |  1 +
->  target/arm/helper.c    | 10 ++++++++++
->  target/arm/translate.c |  1 +
->  4 files changed, 19 insertions(+)
+> Yes, the naming is not the best, but I didn't want to rename all unplug
+> handlers before we have an agreement on how to proceed. My concept would
+> be that
 > 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 65c0fa0a659..d2c1d005ed7 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1336,8 +1336,10 @@ FIELD(V7M_CCR, UNALIGN_TRP, 3, 1)
->  FIELD(V7M_CCR, DIV_0_TRP, 4, 1)
->  FIELD(V7M_CCR, BFHFNMIGN, 8, 1)
->  FIELD(V7M_CCR, STKALIGN, 9, 1)
-> +FIELD(V7M_CCR, STKOFHFNMIGN, 10, 1)
->  FIELD(V7M_CCR, DC, 16, 1)
->  FIELD(V7M_CCR, IC, 17, 1)
-> +FIELD(V7M_CCR, BP, 18, 1)
->  
->  /* V7M SCR bits */
->  FIELD(V7M_SCR, SLEEPONEXIT, 1, 1)
-> @@ -2842,6 +2844,9 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
->  /* For M profile only, Handler (ie not Thread) mode */
->  #define ARM_TBFLAG_HANDLER_SHIFT    21
->  #define ARM_TBFLAG_HANDLER_MASK     (1 << ARM_TBFLAG_HANDLER_SHIFT)
-> +/* For M profile only, whether we should generate stack-limit checks */
-> +#define ARM_TBFLAG_STACKCHECK_SHIFT 22
-> +#define ARM_TBFLAG_STACKCHECK_MASK  (1 << ARM_TBFLAG_STACKCHECK_SHIFT)
->  
->  /* Bit usage when in AArch64 state */
->  #define ARM_TBFLAG_TBI0_SHIFT 0        /* TBI0 for EL0/1 or TBI for EL2/3 */
-> @@ -2884,6 +2889,8 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
->      (((F) & ARM_TBFLAG_BE_DATA_MASK) >> ARM_TBFLAG_BE_DATA_SHIFT)
->  #define ARM_TBFLAG_HANDLER(F) \
->      (((F) & ARM_TBFLAG_HANDLER_MASK) >> ARM_TBFLAG_HANDLER_SHIFT)
-> +#define ARM_TBFLAG_STACKCHECK(F) \
-> +    (((F) & ARM_TBFLAG_STACKCHECK_MASK) >> ARM_TBFLAG_STACKCHECK_SHIFT)
->  #define ARM_TBFLAG_TBI0(F) \
->      (((F) & ARM_TBFLAG_TBI0_MASK) >> ARM_TBFLAG_TBI0_SHIFT)
->  #define ARM_TBFLAG_TBI1(F) \
-> diff --git a/target/arm/translate.h b/target/arm/translate.h
-> index 45f04244be8..c1b65f3efb0 100644
-> --- a/target/arm/translate.h
-> +++ b/target/arm/translate.h
-> @@ -38,6 +38,7 @@ typedef struct DisasContext {
->      int vec_stride;
->      bool v7m_handler_mode;
->      bool v8m_secure; /* true if v8M and we're in Secure mode */
-> +    bool v8m_stackcheck; /* true if we need to perform v8M stack limit checks */
+> 1. unplug() is renamed to trigger_unplug(). unplug_request() remains.
+> 2. do_unplug() is renamed to pre_unplug() (just like pre_plug())
+> 3. we might have in addition unplug() after realize(false) - just like
+> plug()
+> 
+> trigger_unplug() would perform checks and result in object_unparent().
+> From there, all cleanup/unplugging would be performed via the unrealize
+> chain, just like we have for realize() now. That would allow to properly
+> unplug complete device hierarchies.
+> 
+> But Igor rather wants one hotplug handler chain, and no dedicated
+> hotplug handlers for other devices in the device hierarchy.
 
-OK
+Because what we are dealing here with (virtio-pmem) is not separate
+devices hierarchy, it's one complex device and if we are to avoid
+layering violation, we should operate internal devices via that outer
+device which would orchestrate given to it resources internally as it
+sees it fit.
 
->      /* Immediate value in AArch32 SVC insn; must be set if is_jmp == DISAS_SWI
->       * so that top level loop can generate correct syndrome information.
->       */
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 5e721a65272..6ed8631dbee 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -12667,6 +12667,16 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->          flags |= ARM_TBFLAG_HANDLER_MASK;
->      }
->  
-> +    /* v8M always applies stack limit checks unless CCR.STKOFHFNMIGN is
-> +     * suppressing them because the requested execution priority is less than 0.
-> +     */
-> +    if (arm_feature(env, ARM_FEATURE_V8) &&
-> +        arm_feature(env, ARM_FEATURE_M) &&
-> +        !((mmu_idx  & ARM_MMU_IDX_M_NEGPRI) &&
-> +          (env->v7m.ccr[env->v7m.secure] & R_V7M_CCR_STKOFHFNMIGN_MASK))) {
+It's similar with be spapr cpu core, where internal threads do
+not have their own handlers they are plugged as the integral part
+of the core.
 
-Specs:
+What I'm strongly opposed is using separate hotplug handlers for
+internal devices of a composite one.
+I'm more lenient in cases of where the hotplug handler of a composite
+device access it's internals directly if creating interfaces to
+manage internal devices is big over-engineering, since all
+hotplug flow is explicitly described within one handler and
+I don't need to hunt around to figure out how device is wired up.
 
-    CCR.STKOFHFNMIGN controls whether stack limit violations
-    are IGNORED while executing at a requested execution priority
-    that is negative.
+It's still not right wrt not violating abstraction layers and
+might break if internal details change, but usually hotplug
+handler is target unique and tightly coupled code of manged
+and managing pieces (like the case of spapr cpu core) so it
+works so far. For some generic handler I'd vote for following
+all the rules.
 
-    The possible values of this bit are:
-    0 Stack limit faults not ignored.
-    1 Stack limit faults at requested priorities of less than 0 ignored.
+In this series approach, handlers are used if they are separate
+devices without explicit connection which I find totally broken
+(and tried to explain in this thread, probably not well enough).
 
-OK, the '!((' notation was hard to read, hopefully the 2 indent spaces
-in the 2nd line helped...
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> +        flags |= ARM_TBFLAG_STACKCHECK_MASK;
-> +    }
-> +
->      *pflags = flags;
->      *cs_base = 0;
->  }
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index c6a5d2ac444..751d5811cee 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -12451,6 +12451,7 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->      dc->v7m_handler_mode = ARM_TBFLAG_HANDLER(dc->base.tb->flags);
->      dc->v8m_secure = arm_feature(env, ARM_FEATURE_M_SECURITY) &&
->          regime_is_secure(env, dc->mmu_idx);
-> +    dc->v8m_stackcheck = ARM_TBFLAG_STACKCHECK(dc->base.tb->flags);
->      dc->cp_regs = cpu->cp_regs;
->      dc->features = env->features;
->  
+> As long as
+> there are no other opinions I guess I will have to go into the direction
+> Igor proposes to get virtio-pmem and friends upstream.
 > 
