@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1g8Bib-0004YC-Ar
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:03:37 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1g8BkP-0005ZH-LB
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:05:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1g8Bia-0006Zl-JL
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:03:37 -0400
-Received: from mail-yw1-xc2f.google.com ([2607:f8b0:4864:20::c2f]:33689)
+	(envelope-from <jcmvbkbc@gmail.com>) id 1g8BkN-00018k-Kl
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:05:29 -0400
+Received: from mail-yb1-xb2b.google.com ([2607:f8b0:4864:20::b2b]:45414)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1g8Bia-0006T1-A4
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:03:36 -0400
-Received: by mail-yw1-xc2f.google.com with SMTP id m127-v6so4459265ywb.0
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 15:03:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1g8BkN-000153-3Y
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:05:27 -0400
+Received: by mail-yb1-xb2b.google.com with SMTP id d9-v6so4588884ybr.12
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 15:05:26 -0700 (PDT)
 MIME-Version: 1.0
 References: <20181004010505.26184-1-jcmvbkbc@gmail.com>
 	<CAMo8BfJ==eV4g7L3nSuYa=o2RNw98nUg_0VJeBD6V8Q54m0wkg@mail.gmail.com>
 	<39db072a-4ed9-834e-a77f-bb06df42a9f1@linaro.org>
-In-Reply-To: <39db072a-4ed9-834e-a77f-bb06df42a9f1@linaro.org>
+	<CAMo8BfKJCYqFT31aL6ESD-N2zHKR2jv30RYxDPGYSbSpKQacvw@mail.gmail.com>
+In-Reply-To: <CAMo8BfKJCYqFT31aL6ESD-N2zHKR2jv30RYxDPGYSbSpKQacvw@mail.gmail.com>
 From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Thu, 4 Oct 2018 15:03:04 -0700
-Message-ID: <CAMo8BfKJCYqFT31aL6ESD-N2zHKR2jv30RYxDPGYSbSpKQacvw@mail.gmail.com>
+Date: Thu, 4 Oct 2018 15:05:05 -0700
+Message-ID: <CAMo8BfKVSo2JLtVKDa9hqzqeNOh-oNRqqX1SHtacoBfAWAKt-w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [RFC] target/xtensa: rework zero overhead loops
  implementation
@@ -33,36 +34,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Richard Henderson <richard.henderson@linaro.org>
 Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Hi Richard,
+On Thu, Oct 4, 2018 at 3:03 PM Max Filippov <jcmvbkbc@gmail.com> wrote:
+> But I guess always storing low 13 bits of LEND - PC should work?
 
-thank you for taking a look.
-
-On Thu, Oct 4, 2018 at 2:13 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Think first about how, if PC >= LEND or LEND - PC > PAGE_SIZE, that all of the
-> loop stuff is irrelevant because we won't hit LEND within this TB.
->
-> Think second about how to represent the common case -- how LOOP sets LBEG and
-> LEND together.  That is, LEND - LBEG <= 256.  So, usually, we can also have an
-> exact representation of LBEG and have a direct link rather than an indirect
-> link.
-
-I tried similar thing as a followup to my original patch, recording entire LBEG
-in the cs_base -- surprisingly to me it made no measurable difference on my
-tests.
-
->  But I presume that one can play games with special registers to create
-> ranges that LOOP won't.  So we need some setting that will indicate that.
->
-> Consider CS_BASE fields:
->
->   [12: 0]  EDIF = LEND - PC, if PC < LEND && LEND - PC < 2*PAGE_SIZE, or 0.
-
-That has the same issue as my original patch: two TBs with PC > LEND
-in both may be linked together, and then LEND may change, so that
-PC1 > LEND and PC2 < LEND.
-But I guess always storing low 13 bits of LEND - PC should work?
-I'll play with it...
+...when they're within two pages from each other...
 
 -- 
 Thanks.
