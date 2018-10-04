@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1g8BZL-0000Vi-Ve
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 17:54:04 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1g8Bib-0004YC-Ar
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1g8BZL-0005CE-80
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 17:54:03 -0400
-Date: Thu, 4 Oct 2018 18:53:52 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181004215352.GW5738@habkost.net>
-References: <20181001115704.701-1-luc.michel@greensocs.com>
-	<20181001115704.701-16-luc.michel@greensocs.com>
-	<35ffbd68-f783-b6f4-18a2-dd995819c046@redhat.com>
-	<CAFEAcA9vHi=qrV-Aj5ptgBQntafLGwL6VezxnmOuuR=6=Pr8cA@mail.gmail.com>
-	<33c3ea72-652a-53b2-4865-830f3d7f2c3a@greensocs.com>
-	<3d459f14-b701-02b6-d231-fc48c509640f@redhat.com>
-	<20181004195225.GV5738@habkost.net>
-	<CAFEAcA9tT5iFAo5DG=3dyBYNjBVN9u2qEK6Bo9Rf2MAPMBC6bg@mail.gmail.com>
+	(envelope-from <jcmvbkbc@gmail.com>) id 1g8Bia-0006Zl-JL
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:03:37 -0400
+Received: from mail-yw1-xc2f.google.com ([2607:f8b0:4864:20::c2f]:33689)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1g8Bia-0006T1-A4
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 18:03:36 -0400
+Received: by mail-yw1-xc2f.google.com with SMTP id m127-v6so4459265ywb.0
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 15:03:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9tT5iFAo5DG=3dyBYNjBVN9u2qEK6Bo9Rf2MAPMBC6bg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 15/15] arm/xlnx-zynqmp: put APUs and
- RPUs in separate GDB groups
+References: <20181004010505.26184-1-jcmvbkbc@gmail.com>
+	<CAMo8BfJ==eV4g7L3nSuYa=o2RNw98nUg_0VJeBD6V8Q54m0wkg@mail.gmail.com>
+	<39db072a-4ed9-834e-a77f-bb06df42a9f1@linaro.org>
+In-Reply-To: <39db072a-4ed9-834e-a77f-bb06df42a9f1@linaro.org>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 4 Oct 2018 15:03:04 -0700
+Message-ID: <CAMo8BfKJCYqFT31aL6ESD-N2zHKR2jv30RYxDPGYSbSpKQacvw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC] target/xtensa: rework zero overhead loops
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, Luc Michel <luc.michel@greensocs.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, Oct 04, 2018 at 09:01:09PM +0100, Peter Maydell wrote:
-> On 4 October 2018 at 20:52, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > Changing the object hierarchy based on GDB groups doesn't seem
-> > right, but I don't think it would be a big deal if we have the
-> > board code explicitly telling the GDB code how to group the CPUs.
-> >
-> > If you really want to do it implicitly, would it work if you
-> > simply group the CPUs based on object_get_canonical_path()?
-> >
-> > If a more explicit GDB grouping API is acceptable, what about
-> > just adding a INTERFACE_GDB_GROUP interface name to (existing)
-> > container objects that we expect to become GDB groups?
-> >
-> > I'm not sure which way is better. I'm a bit worried that making
-> > things too implicit could easily break (e.g. if somebody changes
-> > the CPU QOM hierarchy in the future for unrelated reasons).
-> 
-> I don't want things implicit. I just don't want the explicitness
-> to be "this is all about GDB", because it isn't. I want us
-> to explicitly say "these 4 CPUs are in one cluster" (or
-> whatever term we use), because that affects more than merely GDB.
+Hi Richard,
 
-We already have a way to say "these 4 CPUs are in one cluster",
-don't we?  That's the QOM hierarchy.
+thank you for taking a look.
 
-My question is if "the CPUs are in one cluster" should implicitly
-mean "the CPUs are in one GDB group".
+On Thu, Oct 4, 2018 at 2:13 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Think first about how, if PC >= LEND or LEND - PC > PAGE_SIZE, that all of the
+> loop stuff is irrelevant because we won't hit LEND within this TB.
+>
+> Think second about how to represent the common case -- how LOOP sets LBEG and
+> LEND together.  That is, LEND - LBEG <= 256.  So, usually, we can also have an
+> exact representation of LBEG and have a direct link rather than an indirect
+> link.
+
+I tried similar thing as a followup to my original patch, recording entire LBEG
+in the cs_base -- surprisingly to me it made no measurable difference on my
+tests.
+
+>  But I presume that one can play games with special registers to create
+> ranges that LOOP won't.  So we need some setting that will indicate that.
+>
+> Consider CS_BASE fields:
+>
+>   [12: 0]  EDIF = LEND - PC, if PC < LEND && LEND - PC < 2*PAGE_SIZE, or 0.
+
+That has the same issue as my original patch: two TBs with PC > LEND
+in both may be linked together, and then LEND may change, so that
+PC1 > LEND and PC2 < LEND.
+But I guess always storing low 13 bits of LEND - PC should work?
+I'll play with it...
 
 -- 
-Eduardo
+Thanks.
+-- Max
