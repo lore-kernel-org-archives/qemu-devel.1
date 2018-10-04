@@ -1,41 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1g7zbt-0001jm-Ih
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 05:07:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g7zhr-0003Iz-8X
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 05:14:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1g7zbm-0003xi-SJ
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 05:07:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56080)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1g7zbm-0003wY-Eo
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 05:07:46 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9494CNV138731
-	for <qemu-devel@nongnu.org>; Thu, 4 Oct 2018 05:07:44 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2mwds7d95s-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 05:07:44 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Thu, 4 Oct 2018 10:07:42 +0100
-Reply-To: pmorel@linux.ibm.com
-References: <20180926225440.6204-1-akrowiak@linux.vnet.ibm.com>
-	<20180926225440.6204-6-akrowiak@linux.vnet.ibm.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Thu, 4 Oct 2018 11:07:35 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1g7zho-0001Iw-0P
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 05:14:03 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g7zhn-0001Ex-3e
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 05:13:59 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 193-v6so8195771wme.3
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 02:13:58 -0700 (PDT)
+References: <20181003180711.19335-1-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181003180711.19335-1-richard.henderson@linaro.org>
+Date: Thu, 04 Oct 2018 10:13:55 +0100
+Message-ID: <871s96rs4s.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180926225440.6204-6-akrowiak@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <02837613-c197-78c1-4d75-6a5945b0b340@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 5/6] s390x/vfio: ap: Introduce VFIO AP
- device
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] softfloat: Fix division
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,295 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
-
-On 27/09/2018 00:54, Tony Krowiak wrote:
-> Introduces a VFIO based AP device. The device is defined via
-> the QEMU command line by specifying:
->=20
->      -device vfio-ap,sysfsdev=3D<path-to-mediated-matrix-device>
->=20
-> There may be only one vfio-ap device configured for a guest.
->=20
-> The mediated matrix device is created by the VFIO AP device
-> driver by writing a UUID to a sysfs attribute file (see
-> docs/vfio-ap.txt). The mediated matrix device will be named
-> after the UUID. Symbolic links to the $uuid are created in
-> many places, so the path to the mediated matrix device $uuid
-> can be specified in any of the following ways:
->=20
-> /sys/devices/vfio_ap/matrix/$uuid
-> /sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/de=
-vices/$uuid
-> /sys/bus/mdev/devices/$uuid
-> /sys/bus/mdev/drivers/vfio_mdev/$uuid
->=20
-> When the vfio-ap device is realized, it acquires and opens the
-> VFIO iommu group to which the mediated matrix device is
-> bound. This causes a VFIO group notification event to be
-> signaled. The vfio_ap device driver's group notification
-> handler will get called at which time the device driver
-> will configure the the AP devices to which the guest will
-> be granted access.
->=20
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->   MAINTAINERS                       |   1 +
->   default-configs/s390x-softmmu.mak |   1 +
->   hw/vfio/Makefile.objs             |   1 +
->   hw/vfio/ap.c                      | 181 +++++++++++++++++++++++++++++=
-+
->   include/hw/vfio/vfio-common.h     |   1 +
->   5 files changed, 185 insertions(+)
->   create mode 100644 hw/vfio/ap.c
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 97e8ed808bc0..29041da69237 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1209,6 +1209,7 @@ F: hw/s390x/ap-device.c
->   F: hw/s390x/ap-bridge.c
->   F: include/hw/s390x/ap-device.h
->   F: include/hw/s390x/ap-bridge.h
-> +F: hw/vfio/ap.c
->   L: qemu-s390x@nongnu.org
->=20
->   vhost
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-=
-softmmu.mak
-> index d6b67d50f0e4..5eef37592451 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -7,3 +7,4 @@ CONFIG_S390_FLIC=3Dy
->   CONFIG_S390_FLIC_KVM=3D$(CONFIG_KVM)
->   CONFIG_VFIO_CCW=3D$(CONFIG_LINUX)
->   CONFIG_WDT_DIAG288=3Dy
-> +CONFIG_VFIO_AP=3D$(CONFIG_LINUX)
-> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-> index a2e7a0a7cf02..8b3f664d85f7 100644
-> --- a/hw/vfio/Makefile.objs
-> +++ b/hw/vfio/Makefile.objs
-> @@ -6,4 +6,5 @@ obj-$(CONFIG_SOFTMMU) +=3D platform.o
->   obj-$(CONFIG_VFIO_XGMAC) +=3D calxeda-xgmac.o
->   obj-$(CONFIG_VFIO_AMD_XGBE) +=3D amd-xgbe.o
->   obj-$(CONFIG_SOFTMMU) +=3D spapr.o
-> +obj-$(CONFIG_VFIO_AP) +=3D ap.o
->   endif
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> new file mode 100644
-> index 000000000000..429988f23f98
-> --- /dev/null
-> +++ b/hw/vfio/ap.c
-> @@ -0,0 +1,181 @@
-> +/*
-> + * VFIO based AP matrix device assignment
-> + *
-> + * Copyright 2018 IBM Corp.
-> + * Author(s): Tony Krowiak <akrowiak@linux.ibm.com>
-> + *            Halil Pasic <pasic@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-(at
-> + * your option) any later version. See the COPYING file in the top-lev=
-el
-> + * directory.
-> + */
-> +
-> +#include <linux/vfio.h>
-> +#include <sys/ioctl.h>
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/vfio/vfio.h"
-> +#include "hw/vfio/vfio-common.h"
-> +#include "hw/s390x/ap-device.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/queue.h"
-> +#include "qemu/option.h"
-> +#include "qemu/config-file.h"
-> +#include "cpu.h"
-> +#include "kvm_s390x.h"
-> +#include "sysemu/sysemu.h"
-> +#include "hw/s390x/ap-bridge.h"
-> +#include "exec/address-spaces.h"
-> +
-> +#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
-> +
-> +typedef struct VFIOAPDevice {
-> +    APDevice apdev;
-> +    VFIODevice vdev;
-> +} VFIOAPDevice;
-> +
-> +static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
-> +{
-> +    vdev->needs_reset =3D false;
-> +}
-> +
-> +/*
-> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
-> + * vfio-ap device now.
-> + */
-> +struct VFIODeviceOps vfio_ap_ops =3D {
-> +    .vfio_compute_needs_reset =3D vfio_ap_compute_needs_reset,
-> +};
-> +
-> +static void vfio_ap_put_device(VFIOAPDevice *vapdev)
-> +{
-> +    g_free(vapdev->vdev.name);
-> +    vfio_put_base_device(&vapdev->vdev);
-> +}
-> +
-> +static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp=
-)
-> +{
-> +    char *tmp, group_path[PATH_MAX];
-> +    ssize_t len;
-> +    int groupid;
-> +
-> +    tmp =3D g_strdup_printf("%s/iommu_group", vapdev->vdev.sysfsdev);
-> +    len =3D readlink(tmp, group_path, sizeof(group_path));
-> +    g_free(tmp);
-> +
-> +    if (len <=3D 0 || len >=3D sizeof(group_path)) {
-> +        error_setg(errp, "%s: no iommu_group found for %s",
-> +                   VFIO_AP_DEVICE_TYPE, vapdev->vdev.sysfsdev);
-> +        return NULL;
-> +    }
-> +
-> +    group_path[len] =3D 0;
-> +
-> +    if (sscanf(basename(group_path), "%d", &groupid) !=3D 1) {
-> +        error_setg(errp, "vfio: failed to read %s", group_path);
-> +        return NULL;
-> +    }
-> +
-> +    return vfio_get_group(groupid, &address_space_memory, errp);
-> +}
-> +
-> +static void vfio_ap_realize(DeviceState *dev, Error **errp)
-> +{
-> +    int ret;
-> +    char *mdevid;
-> +    Error *local_err =3D NULL;
-> +    VFIOGroup *vfio_group;
-> +    APDevice *apdev =3D DO_UPCAST(APDevice, parent_obj, dev);
-> +    VFIOAPDevice *vapdev =3D DO_UPCAST(VFIOAPDevice, apdev, apdev);
-> +
-> +    vapdev =3D DO_UPCAST(VFIOAPDevice, apdev, apdev);
-> +
-> +    vfio_group =3D vfio_ap_get_group(vapdev, &local_err);
-> +    if (!vfio_group) {
-> +        goto out_err;
-> +    }
-> +
-> +    vapdev->vdev.ops =3D &vfio_ap_ops;
-> +    vapdev->vdev.type =3D VFIO_DEVICE_TYPE_AP;
-> +    mdevid =3D basename(vapdev->vdev.sysfsdev);
-> +    vapdev->vdev.name =3D g_strdup_printf("%s", mdevid);
-> +    vapdev->vdev.dev =3D dev;
-> +
-> +    ret =3D vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_=
-err);
-> +    if (ret) {
-> +        goto out_get_dev_err;
-> +    }
-> +
-> +    /* Enable hardware to intepret AP instructions executed on the gue=
-st */
-> +    object_property_set_bool(OBJECT(qdev_get_machine()), true, "apie",=
- NULL);
-> +
-> +    return;
-> +
-> +out_get_dev_err:
-> +    vfio_ap_put_device(vapdev);
-> +    vfio_put_group(vfio_group);
-> +out_err:
-> +    error_propagate(errp, local_err);
-> +}
-> +
-> +static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
-> +{
-> +    APDevice *apdev =3D DO_UPCAST(APDevice, parent_obj, dev);
-> +    VFIOAPDevice *vapdev =3D DO_UPCAST(VFIOAPDevice, apdev, apdev);
-> +    VFIOGroup *group =3D vapdev->vdev.group;
-> +
-> +    vfio_ap_put_device(vapdev);
-> +    vfio_put_group(group);
-> +}
-> +
-> +static Property vfio_ap_properties[] =3D {
-> +    DEFINE_PROP_STRING("sysfsdev", VFIOAPDevice, vdev.sysfsdev),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void vfio_ap_reset(DeviceState *dev)
-> +{
-> +    int ret;
-> +    APDevice *apdev =3D DO_UPCAST(APDevice, parent_obj, dev);
-> +    VFIOAPDevice *vapdev =3D DO_UPCAST(VFIOAPDevice, apdev, apdev);
-> +
-> +    ret =3D ioctl(vapdev->vdev.fd, VFIO_DEVICE_RESET);
-> +    if (ret) {
-> +        error_report("%s: failed to reset %s device: %s", __func__,
-> +                     vapdev->vdev.name, strerror(ret));
-> +    }
-> +}
-> +
-> +static const VMStateDescription vfio_ap_vmstate =3D {
-> +    .name =3D VFIO_AP_DEVICE_TYPE,
-> +    .unmigratable =3D 1,
-> +};
-> +
-> +static void vfio_ap_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->props =3D vfio_ap_properties;
-> +    dc->vmsd =3D &vfio_ap_vmstate;
-> +    dc->desc =3D "VFIO-based AP device assignment";
-> +    dc->realize =3D vfio_ap_realize;
-> +    dc->unrealize =3D vfio_ap_unrealize;
-> +    dc->hotpluggable =3D false;
-> +    dc->reset =3D vfio_ap_reset;
-> +    dc->bus_type =3D TYPE_AP_BUS;
-> +}
-> +
-> +static const TypeInfo vfio_ap_info =3D {
-> +    .name =3D VFIO_AP_DEVICE_TYPE,
-> +    .parent =3D AP_DEVICE_TYPE,
-> +    .instance_size =3D sizeof(VFIOAPDevice),
-> +    .class_init =3D vfio_ap_class_init,
-> +};
-> +
-> +static void vfio_ap_type_init(void)
-> +{
-> +    type_register_static(&vfio_ap_info);
-> +}
-> +
-> +type_init(vfio_ap_type_init)
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-commo=
-n.h
-> index 821def05658f..6be9a93f611b 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -37,6 +37,7 @@ enum {
->       VFIO_DEVICE_TYPE_PCI =3D 0,
->       VFIO_DEVICE_TYPE_PLATFORM =3D 1,
->       VFIO_DEVICE_TYPE_CCW =3D 2,
-> +    VFIO_DEVICE_TYPE_AP =3D 3,
->   };
->=20
->   typedef struct VFIOMmap {
->=20
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, cota@braap.org
 
 
-It works as expected.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+> Changes from v1:
+>   * Preserve udiv_qrnnd as a separate division primitive that
+>     could be used as a building block for float128 division.
+>   * Include asm fragments for x86_64, s390x, and ppc64.
 
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+It passes my fops fdiv_double test but Emilio's test is reporting:
+
+  Errors found in f64_div, rounding near_even:
+  +252.7FFFFFFFFFF80  +001.FFFFFFFFFFFFE
+          =3D> +64F.7FFFFFFFFFF82 ....x  expected +64F.7FFFFFFFFFF81 ....x
+  +000.FFFFFFFFFFFFF  +3FE.FFFFFFFFFFFFF
+          =3D> +001.0000000000000 ...ux  expected +000.FFFFFFFFFFFFF ...ux
+  +000.FFFFFFFFFFFFF  -3FE.FFFFFFFFFFFFF
+          =3D> -001.0000000000000 ...ux  expected -000.FFFFFFFFFFFFF ...ux
+  +000.FFFFFFFFFFFFE  +3FE.FFFFFFFFFFFFF
+          =3D> +000.FFFFFFFFFFFFF ...ux  expected +000.FFFFFFFFFFFFE ...ux
+  +000.FFFFFFFFFFFFE  +3FF.FFFFFFFFFFFFE
+          =3D> +000.8000000000000 ...ux  expected +000.7FFFFFFFFFFFF ...ux
+  +000.FFFFFFFFFFFFE  -3FE.FFFFFFFFFFFFF
+          =3D> -000.FFFFFFFFFFFFF ...ux  expected -000.FFFFFFFFFFFFE ...ux
+  +000.FFFFFFFFFFFFE  -3FF.FFFFFFFFFFFFE
+          =3D> -000.8000000000000 ...ux  expected -000.7FFFFFFFFFFFF ...ux
+  -401.E7D66F623CB4C  +787.FEFF7FFFFFFFE
+          =3D> -078.E8CB4F3CAEDB8 ....x  expected -078.E8CB4F3CAEDB7 ....x
+  +3FC.0000000007FEF  +198.0000002000007
+          =3D> +662.FFFFFFC00FFD1 ....x  expected +662.FFFFFFC00FFD0 ....x
+  -400.FFFFF8000001F  -41C.FFFFFFBFFFFDF
+          =3D> +3E2.FFFFF84000031 ....x  expected +3E2.FFFFF84000030 ....x
+  -7FE.7FFFFFFFBFFFF  +3FE.FFFFFFFFFFFFE
+          =3D> -7FE.7FFFFFFFC0001 ....x  expected -7FE.7FFFFFFFC0000 ....x
+  +001.FFFFFFFFFFFFE  +3FF.FFFFFFFFFFFFF
+          =3D> +001.0000000000000 ...ux  expected +000.FFFFFFFFFFFFF ...ux
+  +001.FFFFFFFFFFFFE  -3FF.FFFFFFFFFFFFF
+          =3D> -001.0000000000000 ...ux  expected -000.FFFFFFFFFFFFF ...ux
+  +3CA.0000000000000  +4CF.FFFFFE000001F
+          =3D> +2F9.0000010000001 ....x  expected +2F9.0000010000000 ....x
+  +3FD.0000000000000  -400.000003DFFFFFF
+          =3D> -3FB.FFFFF840001E3 ....x  expected -3FB.FFFFF840001E2 ....x
+  +2C6.00000000003EF  -400.0000400400000
+          =3D> -2C4.FFFF7FF82081E ....x  expected -2C4.FFFF7FF82081D ....x
+  +3FD.0000000000001  -3CA.FFFFFF0001FFF
+          =3D> -431.0000007FFF006 ....x  expected -431.0000007FFF005 ....x
+  -002.FFFFFFFFFFFDE  -400.FFFFFFFFFFFFF
+          =3D> +000.FFFFFFFFFFFF0 ...ux  expected +000.FFFFFFFFFFFEF ...ux
+  +3FE.0000000000001  -3FF.0000001FFFFFF
+          =3D> -3FD.FFFFFFC000005 ....x  expected -3FD.FFFFFFC000004 ....x
+  +3FF.0000000000000  -47E.FFFFFC00000FF
+          =3D> -37F.000001FFFFFC1 ....x  expected -37F.000001FFFFFC0 ....x
+
+>
+> r~
+>
+>
+> Richard Henderson (4):
+>   softfloat: Fix division
+>   softfloat: Specialize udiv_qrnnd for x86_64
+>   softfloat: Specialize udiv_qrnnd for s390x
+>   softfloat: Specialize udiv_qrnnd for ppc64
+>
+>  include/fpu/softfloat-macros.h | 35 +++++++++++++++++++++++++++++++---
+>  fpu/softfloat.c                | 35 ++++++++++++++++++++++++++--------
+>  2 files changed, 59 insertions(+), 11 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
