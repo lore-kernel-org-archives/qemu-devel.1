@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g82s0-0005Ht-8P
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:36:45 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g82s3-0005KE-Tw
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g82rx-0007ZF-Jb
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:36:44 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35469 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g82s3-0007pB-9n
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:36:47 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:35545 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1g82rx-0006DT-40
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:36:41 -0400
+	id 1g82s3-0006Ki-0Z
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:36:47 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu,  4 Oct 2018 14:34:49 +0200
-Message-Id: <1538656491-22950-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  4 Oct 2018 14:34:50 +0200
+Message-Id: <1538656491-22950-4-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1538656491-22950-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1538656491-22950-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH 2/4] target/mips: Add availability control for
- DSP R3 ASE
+Subject: [Qemu-devel] [PATCH 3/4] target/mips: Add opcodes for nanoMIPS EVA
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +28,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, dnikolic@wavecomp.com, pjovanovic@wavecomp.com
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Dimitrije Nikolic <dnikolic@wavecomp.com>
 
-Add infrastructure for availability control for DSP R3 ASE MIPS
-instructions. Only BPOSGE32C currently belongs to DSP R3 ASE, but
-this is likely to be changed in near future.
+Add opcodes for nanoMIPS EVA instructions: CACHEE, LBE, LBUE, LHE,
+LHUE, LLE, LLWPE, LWE, PREFE, SBE, SCE, SCWPE, SHE, SWE.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/internal.h           | 11 ++++++++---
- target/mips/translate.c          | 13 ++++++++++++-
- target/mips/translate_init.inc.c |  3 ++-
- 3 files changed, 22 insertions(+), 5 deletions(-)
+ target/mips/translate.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index e41051f..3c5867e 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -307,8 +307,8 @@ static inline void compute_hflags(CPUMIPSState *env)
-     env->hflags &= ~(MIPS_HFLAG_COP1X | MIPS_HFLAG_64 | MIPS_HFLAG_CP0 |
-                      MIPS_HFLAG_F64 | MIPS_HFLAG_FPU | MIPS_HFLAG_KSU |
-                      MIPS_HFLAG_AWRAP | MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
--                     MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA | MIPS_HFLAG_FRE |
--                     MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
-+                     MIPS_HFLAG_DSPR3 | MIPS_HFLAG_SBRI | MIPS_HFLAG_MSA |
-+                     MIPS_HFLAG_FRE | MIPS_HFLAG_ELPA | MIPS_HFLAG_ERL);
-     if (env->CP0_Status & (1 << CP0St_ERL)) {
-         env->hflags |= MIPS_HFLAG_ERL;
-     }
-@@ -355,7 +355,12 @@ static inline void compute_hflags(CPUMIPSState *env)
-         (env->CP0_Config5 & (1 << CP0C5_SBRI))) {
-         env->hflags |= MIPS_HFLAG_SBRI;
-     }
--    if (env->insn_flags & ASE_DSPR2) {
-+    if (env->insn_flags & ASE_DSPR3) {
-+        if (env->CP0_Status & (1 << CP0St_MX)) {
-+            env->hflags |= MIPS_HFLAG_DSP | MIPS_HFLAG_DSPR2 |
-+                           MIPS_HFLAG_DSPR3;
-+        }
-+    } else if (env->insn_flags & ASE_DSPR2) {
-         /* Enables access MIPS DSP resources, now our cpu is DSP ASER2,
-            so enable to access DSPR2 resources. */
-         if (env->CP0_Status & (1 << CP0St_MX)) {
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ab16cdb..d64a1da 100644
+index d64a1da..b0b2f40 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1868,6 +1868,17 @@ static inline void check_dspr2(DisasContext *ctx)
-     }
- }
+@@ -16499,6 +16499,22 @@ enum {
+     NM_P_SC      = 0x0b,
+ };
  
-+static inline void check_dspr3(DisasContext *ctx)
-+{
-+    if (unlikely(!(ctx->hflags & MIPS_HFLAG_DSPR3))) {
-+        if (ctx->insn_flags & ASE_DSP) {
-+            generate_exception_end(ctx, EXCP_DSPDIS);
-+        } else {
-+            generate_exception_end(ctx, EXCP_RI);
-+        }
-+    }
-+}
++/* P.LS.E0 instruction pool */
++enum {
++    NM_LBE      = 0x00,
++    NM_SBE      = 0x01,
++    NM_LBUE     = 0x02,
++    NM_P_PREFE  = 0x03,
++    NM_LHE      = 0x04,
++    NM_SHE      = 0x05,
++    NM_LHUE     = 0x06,
++    NM_CACHEE   = 0x07,
++    NM_LWE      = 0x08,
++    NM_SWE      = 0x09,
++    NM_P_LLE    = 0x0a,
++    NM_P_SCE    = 0x0b,
++};
 +
- /* This code generates a "reserved instruction" exception if the
-    CPU does not support the instruction set corresponding to flags. */
- static inline void check_insn(DisasContext *ctx, int flags)
-@@ -20098,7 +20109,7 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
-                     gen_compute_branch_cp1_nm(ctx, OPC_BC1NEZ, rt, s);
-                     break;
-                 case NM_BPOSGE32C:
--                    check_dspr2(ctx);
-+                    check_dspr3(ctx);
-                     {
-                         int32_t imm = extract32(ctx->opcode, 1, 13) |
-                                       extract32(ctx->opcode, 0, 1) << 13;
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index b3320b9..d7cd4ee 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -485,7 +485,8 @@ const mips_def_t mips_defs[] =
-         .CP1_fcr31 = (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
-         .SEGBITS = 32,
-         .PABITS = 32,
--        .insn_flags = CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_MT,
-+        .insn_flags = CPU_NANOMIPS32 | ASE_DSP | ASE_DSPR2 | ASE_DSPR3 |
-+                      ASE_MT,
-         .mmu_type = MMU_TYPE_R4000,
-     },
- #if defined(TARGET_MIPS64)
+ /* P.LS.WM instruction pool */
+ enum {
+     NM_LWM       = 0x00,
 -- 
 2.7.4
