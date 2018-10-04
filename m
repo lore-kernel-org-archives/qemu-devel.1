@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g82SY-0002qA-Fw
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:10:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1g82mG-0000jE-W2
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g82ST-0000oQ-DG
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:10:26 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 4 Oct 2018 12:10:17 +0000
-Message-ID: <79d591fa-d839-d5ba-c3e8-6c33ce4ecc0d@virtuozzo.com>
-References: <20181003170228.95973-1-vsementsov@virtuozzo.com>
-	<bccd1e94-431f-c7cf-4a0c-599dcf345e73@redhat.com>
-	<a6a5cfb4-bfad-a4f5-fb86-e9329da851b6@virtuozzo.com>
-	<e4459a14-298e-1cd7-0805-e7ec30c3fb01@redhat.com>
-In-Reply-To: <e4459a14-298e-1cd7-0805-e7ec30c3fb01@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <50C825A41DC1B74E932368A6E33416E2@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1g82jJ-0007gq-BB
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:27:47 -0400
+References: <20181004100313.4253-1-den@openvz.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <df8c34a4-fef5-a5b5-1e7d-41c638588b5e@redhat.com>
+Date: Thu, 4 Oct 2018 07:27:38 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 0/2] nbd server: drop old-style negotiation
+In-Reply-To: <20181004100313.4253-1-den@openvz.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: fix NBD_CMD_CACHE negitiation
+ according to the NBD specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "rjones@redhat.com" <rjones@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Valery Vdovin <valery.vdovin@acronis.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MDMuMTAuMjAxOCAyMTowOCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTAvMy8xOCAxMjo1OSBQ
-TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDAzLjEwLjIwMTggMjA6
-MzIsIEVyaWMgQmxha2Ugd3JvdGU6DQo+PiBPbiAxMC8zLzE4IDEyOjAyIFBNLCBWbGFkaW1pciBT
-ZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gSXQncyB1bmV4cGVjdGVkIGJlaGF2aW9yIHRo
-YXQgd2l0aG91dCAteCBvcHRpb24gcWVtdS1uYmQgZG8gb2xkLXN0eWxlDQo+PiBuZWdvdGlhdGlv
-bi4gTGV0J3MgdXNlICIiIGFzIGEgZGVmYXVsdCBuYW1lIGluc3RlYWQgKGFzIGl0IGlzIGFscmVh
-ZHkNCj4+IGRvbmUgaWYgdGxzIGlzIHVzZWQpIGFuZCB0aGVyZWZvcmUsIGRyb3Agb2xkLXN0eWxl
-IG5lZ290aWF0aW9uIGZyb20NCj4+IFFlbXUgTkJEIHNlcnZlci4NCj4NCj4gSG1tLCB5b3VyIGVt
-YWlsIHF1b3Rpbmcgc3R5bGUgY2hhbmdlZCBmcm9tIHByaW9yIGVtYWlscyB0aGF0IHVzZWQgdG8g
-DQo+IHByZXBlbmQgJz4nIHdoZW4gcXVvdGluZywgbWFraW5nIGl0IGhhcmRlciB0byB0ZWxsIHdo
-ZXJlIHRoZSB0ZXh0IHlvdSANCj4gYXJlIHF1b3RpbmcgZW5kcywuLi4NCg0KSSBkaWRuJ3QgY2hh
-bmdlIGFueXRoaW5nLi4uDQoNCj4NCj4+DQo+PiBPZGRseSBlbm91Z2gsIEkgd3JvdGUgYSBzaW1p
-bGFyIHBhdGNoIGluIHBhcmFsbGVsLCBhbmQgYW0gb25seSBub3cgDQo+PiBqdXN0IHNlZWluZyB5
-b3VyIG1haWwuIFlvdXJzIGlzIGEgYml0IHN0cm9uZ2VyIHRoYW4gbWluZSAoSSBhZGRlZCANCj4+
-ICdxZW11LW5iZCAtTycgdG8gYWxsb3cgZXhwbGljaXQgZmFsbGJhY2sgdG8gb2xkc3R5bGUsIHdo
-aWxlIHlvdSANCj4+IHJpcHBlZCBpdCBvdXQgYWx0b2dldGhlcikuwqAgVGhlIGNsaWVudCBjYW4g
-bmVnb3RpYXRlIGVpdGhlciBzdHlsZSwgc28gDQo+PiB3ZSBkb24ndCBuZWVkIGFuIG9wdGlvbiBv
-biB0aGUgY2xpZW50IHNpZGU7IHJhdGhlciwgdGhpcyBpcyBhbGwgYWJvdXQgDQo+PiB3aGF0IHRo
-ZSBzZXJ2ZXIgc2hvdWxkIGRvIGJ5IGRlZmF1bHQuDQo+Pg0KPj4gaHR0cHM6Ly9saXN0cy5nbnUu
-b3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMTAvbXNnMDA1NjguaHRtbA0KPj4NCj4+
-IERvZXMgYW55b25lIGhhdmUgYSBwcmVmZXJlbmNlIGJldHdlZW4gdGhlIHR3bz8gSGVyZSdzIHRo
-ZSBsYXN0IHRpbWUgDQo+PiBpdCB3YXMgZGlzY3Vzc2VkOg0KPj4NCj4+IGh0dHBzOi8vbGlzdHMu
-Z251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTA4L21zZzAzMjUyLmh0bWwNCj4+
-DQo+DQo+IGFuZCB5b3VyIHJlcGx5IGJlZ2lucy4NCj4NCj4+IEhtLCBJIHRoaW5rIGV2ZXJ5b25l
-IHdobyBsaWtlIG5ldy1zdHlsZSBzaG91bGQgYW5zd2VyIHRoYXQgaGUgZG9uJ3QgDQo+PiBjYXJl
-IChleGNlcHQgc3RyaWN0ZXIgd2F5IGlzIGEgYml0IGJldHRlcjogZG9uJ3QgaGF2ZSBvcHRpb25z
-IGFuZCANCj4+IGNvZGUgd2hpY2ggd2UgZG9uJ3QgbmVlZCkuDQo+PiBCdXQgaWYgdGhlcmUgaXMg
-c29tZW9uZSB3aG8gaGFzIGNsaWVudCB3aGljaCBzdXBwb3J0IG9ubHkgb2xkLXN0eWxlIA0KPj4g
-bmVnb3RpYXRpb24gaGlzIHVuaGFwcGluZXNzIChpbiBjYXNlIG9mIHN0cmljdCB3YXkpIHdpbGwg
-b3V0d2VpZ2ggYWxsIA0KPj4gb3VyICJiaXRzIjopDQo+Pg0KPj4gSSdtIGZyb20gdGhlIGZpcnN0
-IGdyb3VwKS4gQnV0IGxldCdzIGNob3NlIHlvdXIgcGF0Y2gNCj4NCj4gTXkgYXJndW1lbnQgaW4g
-ZmF2b3Igb2YgeW91ciBwYXRjaCBvdmVyIG1pbmU6IG5iZGtpdCBpcyBhIEdSRUFUIA0KPiB0ZXN0
-YmVkIGZvciBmb3JjaW5nIGFsbCBzb3J0cyBvZiBpbnRlZ3JhdGlvbiB0ZXN0aW5nIHNjZW5hcmlv
-cywgDQo+IGluY2x1ZGluZyBvbGRzdHlsZSBzZXJ2ZXJzLsKgIEFsc28sIGl0IGluY2x1ZGVzIGEg
-cGx1Z2luIGZvciANCj4gdHJhbnNsYXRpbmcgYmV0d2VlbiBuZXcgYW5kIG9sZHN0eWxlIGF0IHdp
-bGwuwqAgVGhhdCBpcywgaWYgd2UgZXZlciANCj4gbGVnaXRpbWF0ZWx5IGVuY291bnRlciBhIGNs
-aWVudCB0aGF0IGNhbiBvbmx5IHRhbGsgb2xkc3R5bGUsIGJ1dCBxZW11IA0KPiBvbmx5IHRhbGtz
-IG5ld3N0eWxlLCB3ZSBqdXN0IHRlbGwgdGhlIHVzZXIgdG8gY29ubmVjdDoNCj4NCj4gb2xkIGNs
-aWVudCA9PiBuYmRraXQgLW8gbmJkID0+IG5ld3N0eWxlIHFlbXUNCj4NCj4gYW5kIHRoZW4gcWVt
-dSBkb2Vzbid0IGhhdmUgdG8gd29ycnkgYWJvdXQgb2xkc3R5bGUgYmVjYXVzZSBuYmRraXQgZG9l
-cyANCj4gaW5zdGVhZC4NCj4NCg0KdGhpcyBpcyBhIGJpdCBtb3JlIGRpZmZpY3VsdCBhbmQgbW9y
-ZSBvdmVyaGVhZCB0aGFuIG9wdGlvbiBpbiBRZW11Li4gQnV0IA0KSSBkb24ndCBzdXJlIHdlIHNo
-b3VsZCBjYXJlIGFib3V0DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
+On 10/4/18 5:03 AM, Denis V. Lunev wrote:
+> Commit bc37b06a5 was made very bad thing, it has been added
+> NBD_FLAG_SEND_CACHE flag for negotiation.
+
+Oof. Probably my fault for not doing a careful review against the 
+upstream spec.
+
+> The problem is that the value
+> of the flag was taken wrong and directly violates NBD specification.
+> This value (bit 8) is used at least in the Linux kernel as a part of
+> stable userspace-kernel API since 4.10 as NBD_FLAG_CAN_MULTI_CONN
+> as defined in the specification:
+
+And a kernel that honors that bit can cause qemu to misbehave. Yeah, 
+that's definitely undesirable.
+
+> 
+> "bit 8, NBD_FLAG_CAN_MULTI_CONN: Indicates that the server operates
+> entirely without cache, or that the cache it uses is shared among all
+> connections to the given device. In particular, if this flag is
+> present, then the effects of NBD_CMD_FLUSH and NBD_CMD_FLAG_FUA
+> MUST be visible across all connections when the server sends its reply
+> to that command to the client. In the absense of this flag, clients
+
+Oh fun - a typo in the NBD spec (should be absence). I'll fix that 
+separately.
+
+> SHOULD NOT multiplex their commands over more than one connection to
+> the export.
+> ...
+> bit 10, NBD_FLAG_SEND_CACHE: documents that the server understands
+> NBD_CMD_CACHE; however, note that server implementations exist
+> which support the command without advertising this bit, and
+> conversely that this bit does not guarantee that the command will
+> succeed or have an impact."
+> 
+> Personally I do not see any option that we will be allowed to fix the
+> specification in favor of QEMU and apply the fix to the kernel. This
+> is a big-big problem. Let us fix this in QEMU as soon as possible.
+
+Correct. Since the kernel is already one client that supports 
+CAN_MULTI_CONN, qemu 3.0 was wrong for declaring the wrong bit value.
+
+> 
+> Thus the commit fixes negotiation flag in QEMU accoring to the
+
+s/according/according/
+
+> specification. Fortunately enough the bit has been added by Virtuozzo
+> and there are no released products in the field with this bit used
+> so far.
+> 
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> CC: Valery Vdovin <valery.vdovin@acronis.com>
+> CC: Eric Blake <eblake@redhat.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   include/block/nbd.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/block/nbd.h b/include/block/nbd.h
+> index 4638c839f5..4377fa502c 100644
+> --- a/include/block/nbd.h
+> +++ b/include/block/nbd.h
+> @@ -135,7 +135,7 @@ typedef struct NBDExtent {
+>   #define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
+>   #define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
+>   #define NBD_FLAG_SEND_DF           (1 << 7) /* Send DF (Do not Fragment) */
+> -#define NBD_FLAG_SEND_CACHE        (1 << 8) /* Send CACHE (prefetch) */
+> +#define NBD_FLAG_SEND_CACHE        (1 << 10) /* Send CACHE (prefetch) */
+
+I'll probably amend this to list all NBD_FLAG_ values in the spec (even 
+if qemu doesn't implement them yet), just to make it easier to avoid 
+making this mistake in the future.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Will queue through my NBD tree.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
