@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1g81tH-000411-2Z
+	(envelope-from <tgolembi@redhat.com>) id 1g81tH-000415-0g
 	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1g81iM-0003Sb-Oe
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:22:46 -0400
-Received: from mail-wm1-f51.google.com ([209.85.128.51]:38518)
+	(envelope-from <tgolembi@redhat.com>) id 1g81iP-0003Ua-Ar
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:22:49 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:41243)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1g81iM-0003SI-I0
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:22:42 -0400
-Received: by mail-wm1-f51.google.com with SMTP id 193-v6so8597921wme.3
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 04:22:42 -0700 (PDT)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1g81iP-0003TH-3x
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:22:45 -0400
+Received: by mail-wr1-f65.google.com with SMTP id x12-v6so9483158wru.8
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 04:22:45 -0700 (PDT)
 From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
-Date: Thu,  4 Oct 2018 13:22:28 +0200
-Message-Id: <0ad2a56e767a04f8fd2c8cb32ed6c1bc0f1c2497.1538652143.git.tgolembi@redhat.com>
+Date: Thu,  4 Oct 2018 13:22:30 +0200
+Message-Id: <73a25549dfd4206b53f5fd8e98f789b20ac861a4.1538652143.git.tgolembi@redhat.com>
 In-Reply-To: <cover.1538652143.git.tgolembi@redhat.com>
 References: <cover.1538652143.git.tgolembi@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 01/11] qga-win: fix crashes when PCI info
- cannot be retrived
+Subject: [Qemu-devel] [PATCH v4 03/11] build: rename CONFIG_QGA_NTDDDISK to
+ CONFIG_QGA_NTDDSCSI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +32,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Sameeh Jubran <sjubran@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Olga Krishtal <okrishtal@virtuozzo.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-The guest-get-fsinfo command collects also information about PCI
-controller where the disk is attached. When this fails for some reasons
-it tries to return just the partial information. However in certain
-cases the pointer to the structure was not initialized and was set to
-NULL. This breaks the serializer and leads to a crash of the guest agent.
+There was inconsistency between commits:
+
+  50cbebb9a3 configure: add configure check for ntdddisk.h
+  a3ef3b2272 qga: added bus type and disk location path
+
+The first commit added #define CONFIG_QGA_NTDDDISK but the second commit
+expected the name to be CONFIG_QGA_NTDDSCSI. As a result the code in
+second patch was never used.
+
+Renaming the option to CONFIG_QGA_NTDDSCSI to match the name of header
+file that is being checked for.
 
 Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
 ---
- qga/commands-win32.c | 27 ++++++++++++++++++++++-----
- 1 file changed, 22 insertions(+), 5 deletions(-)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 98d9735389..9c959122d9 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -633,15 +633,32 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-          * https://technet.microsoft.com/en-us/library/ee851589(v=ws.10).aspx */
-         if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi_ad,
-                             sizeof(SCSI_ADDRESS), &len, NULL)) {
-+            Error *local_err = NULL;
-             disk->unit = addr.Lun;
-             disk->target = addr.TargetId;
-             disk->bus = addr.PathId;
--            disk->pci_controller = get_pci_info(name, errp);
-+            g_debug("unit=%lld target=%lld bus=%lld",
-+                disk->unit, disk->target, disk->bus);
-+            disk->pci_controller = get_pci_info(name, &local_err);
-+
-+            if (local_err) {
-+                g_debug("failed to get PCI controller info: %s",
-+                    error_get_pretty(local_err));
-+                error_free(local_err);
-+            } else if (disk->pci_controller != NULL) {
-+                g_debug("pci: domain=%lld bus=%lld slot=%lld function=%lld",
-+                    disk->pci_controller->domain,
-+                    disk->pci_controller->bus,
-+                    disk->pci_controller->slot,
-+                    disk->pci_controller->function);
-+            }
-         }
--        /* We do not set error in this case, because we still have enough
--         * information about volume. */
--    } else {
--         disk->pci_controller = NULL;
-+    }
-+    /* We do not set error in case pci_controller is NULL, because we still
-+     * have enough information about volume. */
-+    if (disk->pci_controller == NULL) {
-+        g_debug("no PCI controller info");
-+        disk->pci_controller = g_malloc0(sizeof(GuestPCIAddress));
-     }
- 
-     list = g_malloc0(sizeof(*list));
+diff --git a/configure b/configure
+index 58862d2ae8..0f168607e8 100755
+--- a/configure
++++ b/configure
+@@ -6201,7 +6201,7 @@ if test "$mingw32" = "yes" ; then
+     echo "WIN_SDK=\"$win_sdk\"" >> $config_host_mak
+   fi
+   if test "$guest_agent_ntddscsi" = "yes" ; then
+-    echo "CONFIG_QGA_NTDDDISK=y" >> $config_host_mak
++    echo "CONFIG_QGA_NTDDSCSI=y" >> $config_host_mak
+   fi
+   if test "$guest_agent_msi" = "yes"; then
+     echo "QEMU_GA_MSI_ENABLED=yes" >> $config_host_mak
 -- 
 2.19.0
