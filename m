@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g84AB-00023c-Ib
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:59:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1g84EL-0003OX-4H
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 10:03:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g84A8-0007Fw-73
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:59:35 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 4 Oct 2018 13:59:14 +0000
-Message-ID: <d691c927-e37a-1178-8180-9893278aa02c@virtuozzo.com>
-References: <20181001102928.20533-1-vsementsov@virtuozzo.com>
-	<20181001102928.20533-14-vsementsov@virtuozzo.com>
-	<20181004124421.GC6009@localhost.localdomain>
-In-Reply-To: <20181004124421.GC6009@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0D93DA14FCE09E48932485B07B2EEB85@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1g84EF-00020m-A1
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 10:03:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5544)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g84EE-0001zX-VV
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 10:03:47 -0400
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
+	[10.5.11.24])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F41F630014DC
+	for <qemu-devel@nongnu.org>; Thu,  4 Oct 2018 14:03:45 +0000 (UTC)
+References: <20180925075646.25114-1-kraxel@redhat.com>
+	<20180925075646.25114-2-kraxel@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <947ea402-204c-a81e-8392-f499e762197f@redhat.com>
+Date: Thu, 4 Oct 2018 09:03:38 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 13/18] block: introduce new filter
- driver: fleecing-hook
+In-Reply-To: <20180925075646.25114-2-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] display/edid: add edid generator to
+ qemu.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>, "wencongyang2@huawei.com" <wencongyang2@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-MDQuMTAuMjAxOCAxNTo0NCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDEuMTAuMjAxOCB1bSAx
-MjoyOSBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IEZs
-ZWVjaW5nLWhvb2sgZmlsdGVyIGRvZXMgY29weS1iZWZvcmUtd3JpdGUgb3BlcmF0aW9uLiBJdCBz
-aG91bGQgYmUNCj4+IGluc2VydGVkIGFib3ZlIGFjdGl2ZSBkaXNrIGFuZCBoYXMgYSB0YXJnZXQg
-bm9kZSBmb3IgQ0JXLCBsaWtlIHRoZQ0KPj4gZm9sbG93aW5nOg0KPj4NCj4+ICAgICAgKy0tLS0t
-LS0rDQo+PiAgICAgIHwgR3Vlc3QgfA0KPj4gICAgICArLS0tKy0tLSsNCj4+ICAgICAgICAgIHxy
-LHcNCj4+ICAgICAgICAgIHYNCj4+ICAgICAgKy0tLSstLS0tLS0tLS0tLSsgIHRhcmdldCAgICst
-LS0tLS0tLS0tLS0tLS0rDQo+PiAgICAgIHwgRmxlZWNpbmcgaG9vayB8LS0tLS0tLS0tLT58IHRh
-cmdldChxY293MikgfA0KPj4gICAgICArLS0tKy0tLS0tLS0tLS0tKyAgIENCVyAgICAgKy0tLSst
-LS0tLS0tLS0tLSsNCj4+ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICB8DQo+
-PiBiYWNraW5nIHxyLHcgICAgICAgICAgICAgICAgICAgICAgICB8DQo+PiAgICAgICAgICB2ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgfA0KPj4gICAgICArLS0tKy0tLS0tLS0tLSsgICAgICBi
-YWNraW5nICAgIHwNCj4+ICAgICAgfCBBY3RpdmUgZGlzayB8PC0tLS0tLS0tLS0tLS0tLS0rDQo+
-PiAgICAgICstLS0tLS0tLS0tLS0tKyAgICAgICAgcg0KPj4NCj4+IFRhcmdldCdzIGJhY2tpbmcg
-bWF5IHBvaW50IHRvIGFjdGl2ZSBkaXNrIChzaG91bGQgYmUgc2V0IHVwDQo+PiBzZXBhcmF0ZWx5
-KSwgd2hpY2ggZ2l2ZXMgZmxlZWNpbmctc2NoZW1lLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZs
-YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4g
-VGhpcyBsYWNrcyBhbiBleHBsYW5hdGlvbiB3aHkgd2UgbmVlZCBhIHNwZWNpYWxpc2VkIGZsZWVj
-aW5nIGhvb2sgZHJpdmVyDQo+IHJhdGhlciB0aGFuIGp1c3QgYSBnZW5lcmljIGJkcnZfYmFja3Vw
-X3RvcCBibG9jayBkcml2ZXIgaW4gYW5hbG9neSB0bw0KPiB3aGF0IGNvbW1pdCBhbmQgbWlycm9y
-IGFyZSBhbHJlYWR5IGRvaW5nLg0KPg0KPiBJbiBmYWN0LCBpZiBJJ20gcmVhZGluZyB0aGUgbGFz
-dCBwYXRjaCBvZiB0aGUgc2VyaWVzIHJpZ2h0LCBiYWNrdXANCj4gZG9lc24ndCBldmVuIHJlc3Ry
-aWN0IHRoZSB1c2Ugb2YgdGhlIGZsZWVjaW5nLWhvb2sgZHJpdmVyIHRvIGFjdHVhbA0KPiBmbGVl
-Y2luZyBzY2VuYXJpb3MuDQo+DQo+IE1heWJlIHdoYXQgZG9lc24ndCBmZWVsIHJpZ2h0IHRvIG1l
-IGlzIGp1c3QgdGhhdCBpdCdzIGEgbWlzbm9tZXIsIGFuZCBpZg0KPiB5b3UgcmVuYW1lIGl0IGlu
-dG8gYmRydl9iYWNrdXBfdG9wIChhbmQgbWFrZSBpdCBpbnRlcm5hbCB0byB0aGUgYmxvY2sNCj4g
-am9iKSwgaXQgaXMgdmVyeSBjbG9zZSB0byB3aGF0IEkgYWN0dWFsbHkgaGF2ZSBpbiBtaW5kPw0K
-Pg0KPiBLZXZpbg0KDQpIbS4NCjEuIGFzc3VtZSB3ZSBtb3ZlIHRvIGludGVybmFsIGJkcnZfYmFj
-a3VwX3RvcA0KMi4gYmFja3VwKG1vZGU9bm9uZSkgYmVjb21lcyBqdXN0IGEgd3JhcHBlciBmb3Ig
-YXBwZW5kL2Ryb3Agb2YgdGhlIA0KYmRydl9iYWNrdXBfdG9wIG5vZGUNCjMuIGxvb2tzIGludGVy
-ZXN0aW5nIHRvIGdldCByaWQgb2YgZW1wdHkgKGRvaW5nIG5vdGhpbmcpIGpvYiBhbmQgdXNlIA0K
-YmRydl9iYWNrdXBfdG9wIGRpcmVjdGx5Lg0KDQpJIHdhbnQgdG8gZmluYWxseSBjcmVhdGUgZGlm
-ZmVyZW50IGJhY2t1cCBzY2hlbWVzLCBiYXNlZCBvbiBmbGVlY2luZyANCmhvb2ssIGZvciBleGFt
-cGxlOg0KDQogwqDCoMKgICstLS0tLS0tKw0KIMKgwqDCoCB8IEd1ZXN0IHwNCiDCoMKgwqAgKy0t
-LS0tLS0rDQogwqDCoMKgwqDCoMKgwqAgfHIsdw0KIMKgwqDCoMKgwqDCoMKgIHYNCiDCoMKgwqAg
-Ky0tLSstLS0tLS0tLS0tLSvCoCB0YXJnZXTCoMKgICstLS0tLS0tLS0tLS0tLS0rICstLS0tLS0t
-LSsNCiDCoMKgwqAgfCBGbGVlY2luZyBob29rICstLS0tLS0tLS0tPisgZmxlZWNpbmctbm9kZSAr
-LS0tLS0tLS0tLT4rIHRhcmdldCB8DQogwqDCoMKgICstLS0rLS0tLS0tLS0tLS0rwqDCoCBDQlfC
-oMKgwqDCoCArLS0tKy0tLS0tLS0tLS0tKyBiYWNrdXAgKy0tLS0tLS0tKw0KIMKgwqDCoMKgwqDC
-oMKgIHzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKG5vIGhvb2spDQpiYWNraW5nIHxyLHfCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCiDCoMKgwqDCoMKgwqDC
-oCB2IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwN
-CiDCoMKgwqAgKy0tLSstLS0tLS0tLS0rwqDCoMKgwqDCoCBiYWNraW5nwqDCoMKgIHwNCiDCoMKg
-wqAgfCBBY3RpdmUgZGlzayArPC0tLS0tLS0tLS0tLS0tLS0rDQogwqDCoMKgICstLS0tLS0tLS0t
-LS0tK8KgwqDCoMKgwqDCoMKgIHINCg0KDQpUaGlzIGlzIG5lZWRlZCBmb3Igc2xvdyBuYmQgdGFy
-Z2V0LCBpZiB3ZSBkb24ndCBuZWVkIHRvIHNsb3cgZG93biBndWVzdCANCndyaXRlcy4NCkhlcmUg
-YmFja3VwKG5vIGhvb2spIGlzIGEgYmFja3VwIGpvYiB3aXRob3V0IGhvb2sgLyB3cml0ZSBub3Rp
-ZmllcnMsIGFzIA0KaXQgYWN0dWFsbHkNCmRvIGNvcHkgZnJvbSBzdGF0aWMgc291cmNlLg0KDQpP
-ciwgd2UgY2FuIHVzZSBtaXJyb3IgaW5zdGVhZCBvZiBiYWNrdXAsIGFzIG1pcnJvciBpcyBhc3lu
-Y2hyb25vdXMgYW5kIA0KaXMgZmFzdGVyIHRoYW4gYmFja3VwLiBXZSBjYW4gZXZlbiB1c2UgbWly
-cm9yIHdpdGggd3JpdGUtYmxvY2tpbmcgbW9kZSANCihwcm9wb3NlZCBieSBNYXgpIGFuZCB1c2Ug
-c29tZXRoaW5nIGxpa2UgbnVsbCBiZHMgKGJ1dCB3aXRoIGJhY2tpbmcpIA0KaW5zdGVhZCBvZiBx
-Y293MiBmbGVlY2luZy1ub2RlIC0gdGhpcyB3aWxsIGltaXRhdGUgY3VycmVudCBiYWNrdXAgDQph
-cHByb2FjaCwgYnV0IHdpdGggbWlycm9yIGluc3RlYWQgb2YgYmFja3VwLg0KDQpPZiBjb3Vyc2Us
-IHdlIGNhbiB1c2Ugb2xkIGJhY2t1cChzeW5jPW5vbmUpIGZvciBhbGwgc3VjaCBzY2hlbWVzLCBJ
-IGp1c3QgDQp0aGluayB0aGF0IGFyY2hpdGVjdHVyZSB3aXRoIGZpbHRlciBub2RlIGlzIG1vcmUg
-Y2xlYW4sIHRoYW4gd2l0aCBiYWNrdXAgDQpqb2IsIHdoaWNoIGxvb2tzIHRoZSBzYW1lIGJ1dCB3
-aXRoIGFkZGl0aW9uYWwgam9iOg0KIMKgwqDCoCArLS0tLS0tLSsNCiDCoMKgwqAgfCBHdWVzdCB8
-DQogwqDCoMKgICstLS0tLS0tKw0KIMKgwqDCoMKgwqDCoMKgIHxyLHcNCiDCoMKgwqDCoMKgwqDC
-oCB2DQogwqDCoMKgICstLS0tLS0tLS0tLS0tLS0rwqAgdGFyZ2V0wqDCoCArLS0tLS0tLS0tLS0t
-LS0tKyArLS0tLS0tLS0rDQogwqDCoMKgIHxiZHJ2X2JhY2t1cF90b3ArLS0tLS0tLS0tLT4rIGZs
-ZWVjaW5nLW5vZGUgKy0tLS0tLS0tLS0+KyB0YXJnZXQgfA0KIMKgwqDCoCArLS0tLS0tLS0tLS0t
-LS0tK8KgwqAgQ0JXwqDCoMKgwqAgKy0tLSstLS0tLS0tLS0tKysgYmFja3VwICstLS0tLS0tLSsN
-CiDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIF7CoCAobm8gaG9vaykNCmJhY2tpbmcg
-fHIsd8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDC
-oMKgwqDCoMKgwqDCoCB8DQogwqDCoMKgwqDCoMKgwqAgdiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIHwNCiDCoMKg
-wqAgKy0tLSstLS0tLS0tLS0rwqDCoMKgwqDCoCBiYWNraW5nwqDCoMKgIHzCoMKgwqDCoMKgwqDC
-oMKgwqAgfA0KIMKgwqDCoCB8IEFjdGl2ZSBkaXNrICs8LS0tLS0tLS0tLS0tLS0tLSvCoMKgwqDC
-oMKgwqDCoMKgwqAgfA0KIMKgwqDCoCArLS0tLS0tLS0tLSstLSvCoMKgwqDCoMKgwqDCoCBywqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgfA0KIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGJhY2t1cChzeW5jPW5vbmUpwqDCoCB8DQogwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCArLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsNCg0KDQoNCkZpbmFs
-bHksIHRoZSBmaXJzdCBwaWN0dXJlIGxvb2tzIG5pY2VyIGFuZCBoYXMgbGVzcyBlbnRpdGllcyAo
-YW5kIEkgDQpkaWRuJ3QgZHJhdyB0YXJnZXQgYmxrIHdoaWNoIGJhY2t1cCBjcmVhdGVzIGFuZCBh
-bGwgdGhlIHBlcm1pc3Npb25zKS4gDQpIbW0sIGl0IGFsc28gbWF5IGJlIG1vcmUgZGlmZmljdWx0
-IHRvIHNldHVwIHBlcm1pc3Npb25zIGluIHRoZSBzZWNvbmQgDQpzY2hlbWUsIGJ1dCBJIGRpZG4n
-dCBkaXZlIGludG8uIFdlIGp1c3QgYWdyZWVkIHdpdGggTWF4IHRoYXQgc2VwYXJhdGUgDQpidWls
-ZGluZyBicmljayB3aGljaCBtYXkgYmUgcmV1c2VkIGluIGRpZmZlcmVudCBzY2hlbWVzIGlzIGJl
-dHRlciB0aGFuIA0KaW50ZXJuYWwgdGhpbmcgaW4gYmFja3VwLCBzbywgSSB3ZW50IHRoaXMgd2F5
-LiBIb3dldmVyLCBpZiB5b3UgYXJlIA0KYWdhaW5zdCwgaXQgaXNuJ3QgZGlmZmljdWx0IHRvIG1v
-dmUgaXQgYWxsIGludG8gYmFja3VwLg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoN
-Cg==
+On 9/25/18 2:56 AM, Gerd Hoffmann wrote:
+> EDID is a metadata format to describe monitors.  On physical hardware
+> the monitor has an eeprom with that data block which can be read over
+> i2c bus.
+> 
+
+> +++ b/Makefile
+> @@ -543,6 +543,8 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+>   
+>   qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
+>   
+> +qemu-edid$(EXESUF): qemu-edid.o hw/display/edid-generate.o $(COMMON_LDADDS)
+
+For an in-tree build, this forgot to add qemu-edid to .gitignore.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
