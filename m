@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g836Q-0006Bk-9O
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:51:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g83D4-0001RG-UF
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g836M-0003pN-4R
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:51:38 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 4 Oct 2018 12:51:21 +0000
-Message-ID: <558261af-914a-1ea4-ef21-c7654a50284e@virtuozzo.com>
-References: <20181004100313.4253-1-den@openvz.org>
-	<df8c34a4-fef5-a5b5-1e7d-41c638588b5e@redhat.com>
-In-Reply-To: <df8c34a4-fef5-a5b5-1e7d-41c638588b5e@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C4BCE7BE028DB94688B990E29EACD4FC@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1g83D1-0006su-4h
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:58:30 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:40800)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g83Cx-0006cM-CU
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:58:25 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id z204-v6so8120594wmc.5
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 05:58:22 -0700 (PDT)
+References: <20181003183036.6716-1-philmd@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181003183036.6716-1-philmd@redhat.com>
+Date: Thu, 04 Oct 2018 13:58:18 +0100
+Message-ID: <87va6hrhqt.fsf@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/1] nbd: fix NBD_CMD_CACHE negitiation
- according to the NBD specification
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/3] acceptance tests: Test firmware
+ checking debug console output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>, Valery Vdovin <valery.vdovin@acronis.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-MDQuMTAuMjAxOCAxNToyNywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTAvNC8xOCA1OjAzIEFN
-LCBEZW5pcyBWLiBMdW5ldiB3cm90ZToNCj4+IENvbW1pdCBiYzM3YjA2YTUgd2FzIG1hZGUgdmVy
-eSBiYWQgdGhpbmcsIGl0IGhhcyBiZWVuIGFkZGVkDQo+PiBOQkRfRkxBR19TRU5EX0NBQ0hFIGZs
-YWcgZm9yIG5lZ290aWF0aW9uLg0KPg0KPiBPb2YuIFByb2JhYmx5IG15IGZhdWx0IGZvciBub3Qg
-ZG9pbmcgYSBjYXJlZnVsIHJldmlldyBhZ2FpbnN0IHRoZSANCj4gdXBzdHJlYW0gc3BlYy4NCg0K
-bW9zdGx5IG15LCB0byBpbnRyb2R1Y2UgdGhpcyA9KC4gcmVhbGx5IHRvbyBiYWQNCg0KPg0KPj4g
-VGhlIHByb2JsZW0gaXMgdGhhdCB0aGUgdmFsdWUNCj4+IG9mIHRoZSBmbGFnIHdhcyB0YWtlbiB3
-cm9uZyBhbmQgZGlyZWN0bHkgdmlvbGF0ZXMgTkJEIHNwZWNpZmljYXRpb24uDQo+PiBUaGlzIHZh
-bHVlIChiaXQgOCkgaXMgdXNlZCBhdCBsZWFzdCBpbiB0aGUgTGludXgga2VybmVsIGFzIGEgcGFy
-dCBvZg0KPj4gc3RhYmxlIHVzZXJzcGFjZS1rZXJuZWwgQVBJIHNpbmNlIDQuMTAgYXMgTkJEX0ZM
-QUdfQ0FOX01VTFRJX0NPTk4NCj4+IGFzIGRlZmluZWQgaW4gdGhlIHNwZWNpZmljYXRpb246DQo+
-DQo+IEFuZCBhIGtlcm5lbCB0aGF0IGhvbm9ycyB0aGF0IGJpdCBjYW4gY2F1c2UgcWVtdSB0byBt
-aXNiZWhhdmUuIFllYWgsIA0KPiB0aGF0J3MgZGVmaW5pdGVseSB1bmRlc2lyYWJsZS4NCg0KQXMg
-SSB1bmRlcnN0YW5kIG9wcG9zaXRlOiBrZXJuZWwgY2xpZW50IHdpbGwgYXNzdW1lIHN1cHBvcnQg
-Zm9yIA0KbXVsdGlfY29ubiBmZWF0dXJlIHdoaWNoIGRlY2xhcmVzIHNvbWUgZ3VhcmFudGVlcyBh
-Ym91dCBGTFVTSCwgYnV0IHFlbXUgDQpkb24ndCBnaXZlIHRoZXNlIGd1YXJhbnRlZXMuDQoNCj4N
-Cj4+DQo+PiAiYml0IDgsIE5CRF9GTEFHX0NBTl9NVUxUSV9DT05OOiBJbmRpY2F0ZXMgdGhhdCB0
-aGUgc2VydmVyIG9wZXJhdGVzDQo+PiBlbnRpcmVseSB3aXRob3V0IGNhY2hlLCBvciB0aGF0IHRo
-ZSBjYWNoZSBpdCB1c2VzIGlzIHNoYXJlZCBhbW9uZyBhbGwNCj4+IGNvbm5lY3Rpb25zIHRvIHRo
-ZSBnaXZlbiBkZXZpY2UuIEluIHBhcnRpY3VsYXIsIGlmIHRoaXMgZmxhZyBpcw0KPj4gcHJlc2Vu
-dCwgdGhlbiB0aGUgZWZmZWN0cyBvZiBOQkRfQ01EX0ZMVVNIIGFuZCBOQkRfQ01EX0ZMQUdfRlVB
-DQo+PiBNVVNUIGJlIHZpc2libGUgYWNyb3NzIGFsbCBjb25uZWN0aW9ucyB3aGVuIHRoZSBzZXJ2
-ZXIgc2VuZHMgaXRzIHJlcGx5DQo+PiB0byB0aGF0IGNvbW1hbmQgdG8gdGhlIGNsaWVudC4gSW4g
-dGhlIGFic2Vuc2Ugb2YgdGhpcyBmbGFnLCBjbGllbnRzDQo+DQo+IE9oIGZ1biAtIGEgdHlwbyBp
-biB0aGUgTkJEIHNwZWMgKHNob3VsZCBiZSBhYnNlbmNlKS4gSSdsbCBmaXggdGhhdCANCj4gc2Vw
-YXJhdGVseS4NCj4NCj4+IFNIT1VMRCBOT1QgbXVsdGlwbGV4IHRoZWlyIGNvbW1hbmRzIG92ZXIg
-bW9yZSB0aGFuIG9uZSBjb25uZWN0aW9uIHRvDQo+PiB0aGUgZXhwb3J0Lg0KPj4gLi4uDQo+PiBi
-aXQgMTAsIE5CRF9GTEFHX1NFTkRfQ0FDSEU6IGRvY3VtZW50cyB0aGF0IHRoZSBzZXJ2ZXIgdW5k
-ZXJzdGFuZHMNCj4+IE5CRF9DTURfQ0FDSEU7IGhvd2V2ZXIsIG5vdGUgdGhhdCBzZXJ2ZXIgaW1w
-bGVtZW50YXRpb25zIGV4aXN0DQo+PiB3aGljaCBzdXBwb3J0IHRoZSBjb21tYW5kIHdpdGhvdXQg
-YWR2ZXJ0aXNpbmcgdGhpcyBiaXQsIGFuZA0KPj4gY29udmVyc2VseSB0aGF0IHRoaXMgYml0IGRv
-ZXMgbm90IGd1YXJhbnRlZSB0aGF0IHRoZSBjb21tYW5kIHdpbGwNCj4+IHN1Y2NlZWQgb3IgaGF2
-ZSBhbiBpbXBhY3QuIg0KPj4NCj4+IFBlcnNvbmFsbHkgSSBkbyBub3Qgc2VlIGFueSBvcHRpb24g
-dGhhdCB3ZSB3aWxsIGJlIGFsbG93ZWQgdG8gZml4IHRoZQ0KPj4gc3BlY2lmaWNhdGlvbiBpbiBm
-YXZvciBvZiBRRU1VIGFuZCBhcHBseSB0aGUgZml4IHRvIHRoZSBrZXJuZWwuIFRoaXMNCj4+IGlz
-IGEgYmlnLWJpZyBwcm9ibGVtLiBMZXQgdXMgZml4IHRoaXMgaW4gUUVNVSBhcyBzb29uIGFzIHBv
-c3NpYmxlLg0KPg0KPiBDb3JyZWN0LiBTaW5jZSB0aGUga2VybmVsIGlzIGFscmVhZHkgb25lIGNs
-aWVudCB0aGF0IHN1cHBvcnRzIA0KPiBDQU5fTVVMVElfQ09OTiwgcWVtdSAzLjAgd2FzIHdyb25n
-IGZvciBkZWNsYXJpbmcgdGhlIHdyb25nIGJpdCB2YWx1ZS4NCj4NCj4+DQo+PiBUaHVzIHRoZSBj
-b21taXQgZml4ZXMgbmVnb3RpYXRpb24gZmxhZyBpbiBRRU1VIGFjY29yaW5nIHRvIHRoZQ0KPg0K
-PiBzL2FjY29yZGluZy9hY2NvcmRpbmcvDQo+DQo+PiBzcGVjaWZpY2F0aW9uLiBGb3J0dW5hdGVs
-eSBlbm91Z2ggdGhlIGJpdCBoYXMgYmVlbiBhZGRlZCBieSBWaXJ0dW96em8NCj4+IGFuZCB0aGVy
-ZSBhcmUgbm8gcmVsZWFzZWQgcHJvZHVjdHMgaW4gdGhlIGZpZWxkIHdpdGggdGhpcyBiaXQgdXNl
-ZA0KPj4gc28gZmFyLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IERlbmlzIFYuIEx1bmV2IDxkZW5A
-b3BlbnZ6Lm9yZz4NCj4+IENDOiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50
-c292QHZpcnR1b3p6by5jb20+DQo+PiBDQzogVmFsZXJ5IFZkb3ZpbiA8dmFsZXJ5LnZkb3ZpbkBh
-Y3JvbmlzLmNvbT4NCj4+IENDOiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4+IEND
-OiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPj4gLS0tDQo+PiDCoCBpbmNs
-dWRlL2Jsb2NrL25iZC5oIHwgMiArLQ0KPj4gwqAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9u
-KCspLCAxIGRlbGV0aW9uKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvYmxvY2svbmJk
-LmggYi9pbmNsdWRlL2Jsb2NrL25iZC5oDQo+PiBpbmRleCA0NjM4YzgzOWY1Li40Mzc3ZmE1MDJj
-IDEwMDY0NA0KPj4gLS0tIGEvaW5jbHVkZS9ibG9jay9uYmQuaA0KPj4gKysrIGIvaW5jbHVkZS9i
-bG9jay9uYmQuaA0KPj4gQEAgLTEzNSw3ICsxMzUsNyBAQCB0eXBlZGVmIHN0cnVjdCBOQkRFeHRl
-bnQgew0KPj4gwqAgI2RlZmluZSBOQkRfRkxBR19TRU5EX1RSSU3CoMKgwqDCoMKgwqDCoMKgICgx
-IDw8IDUpIC8qIFNlbmQgVFJJTSAoZGlzY2FyZCkgKi8NCj4+IMKgICNkZWZpbmUgTkJEX0ZMQUdf
-U0VORF9XUklURV9aRVJPRVMgKDEgPDwgNikgLyogU2VuZCBXUklURV9aRVJPRVMgKi8NCj4+IMKg
-ICNkZWZpbmUgTkJEX0ZMQUdfU0VORF9ERsKgwqDCoMKgwqDCoMKgwqDCoMKgICgxIDw8IDcpIC8q
-IFNlbmQgREYgKERvIG5vdCANCj4+IEZyYWdtZW50KSAqLw0KPj4gLSNkZWZpbmUgTkJEX0ZMQUdf
-U0VORF9DQUNIRcKgwqDCoMKgwqDCoMKgICgxIDw8IDgpIC8qIFNlbmQgQ0FDSEUgKHByZWZldGNo
-KSAqLw0KPj4gKyNkZWZpbmUgTkJEX0ZMQUdfU0VORF9DQUNIRcKgwqDCoMKgwqDCoMKgICgxIDw8
-IDEwKSAvKiBTZW5kIENBQ0hFIA0KPj4gKHByZWZldGNoKSAqLw0KPg0KPiBJJ2xsIHByb2JhYmx5
-IGFtZW5kIHRoaXMgdG8gbGlzdCBhbGwgTkJEX0ZMQUdfIHZhbHVlcyBpbiB0aGUgc3BlYyANCj4g
-KGV2ZW4gaWYgcWVtdSBkb2Vzbid0IGltcGxlbWVudCB0aGVtIHlldCksIGp1c3QgdG8gbWFrZSBp
-dCBlYXNpZXIgdG8gDQo+IGF2b2lkIG1ha2luZyB0aGlzIG1pc3Rha2UgaW4gdGhlIGZ1dHVyZS4N
-Cj4NCj4gUmV2aWV3ZWQtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPg0KPiBX
-aWxsIHF1ZXVlIHRocm91Z2ggbXkgTkJEIHRyZWUuDQo+DQoNCkkgdm90ZSBmb3IgYWRkaW5nIGFs
-bCB2YWx1ZXMgYXQgbGVhc3QgYXMgYSBjb21tZW50DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBT
-ZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCg0KLS0gDQpC
-ZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0KDQo=
+
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> Hi,
+>
+> This RFC series add simple acceptance tests which boot SeaBIOS and EDK2 on
+> the pc and virt/aarch64 default machines
+>
+> Still PoC but can be useful for the Avocado team to test the
+> multi-arch targets.
+
+I couldn't get this to work on qemu-test (aarch64):
+
+  12:52:56 [alex@qemu-test:~/l/qemu.git] review/acceptance-rfc-v2 + avocado=
+ run tests/acceptance
+  JOB ID     : b6377b8d4196903846c7d57e2b234c523d6c6ba1
+  JOB LOG    : /home/alex/avocado/job-results/job-2018-10-04T12.53-b6377b8/=
+job.log
+   (1/9) tests/acceptance/boot_firmware.py:BootFirmware.test_seabios: ERROR=
+: timed out (15.14 s)
+   (2/9) tests/acceptance/boot_firmware.py:BootFirmware.test_ovmf_pc: ERROR=
+: timed out (15.14 s)
+   (3/9) tests/acceptance/boot_firmware.py:BootFirmware.test_ovmf_virt: FAI=
+L: OVMF failed to boot (17.97 s)
+   (4/9) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test: ERRO=
+R: timed out (17.36 s)
+   (5/9) tests/acceptance/version.py:Version.test_qmp_human_info_version: E=
+RROR: timed out (15.14 s)
+   (6/9) tests/acceptance/vnc.py:Vnc.test_no_vnc: ERROR: timed out (15.14 s)
+   (7/9) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password: ERROR: ti=
+med out (15.14 s)
+   (8/9) tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_pa=
+ssword: ERROR: timed out (15.14 s)
+   (9/9) tests/acceptance/vnc.py:Vnc.test_vnc_change_password: ERROR: timed=
+ out (15.14 s)
+  RESULTS    : PASS 0 | ERROR 8 | FAIL 1 | SKIP 0 | WARN 0 | INTERRUPT 0 | =
+CANCEL 0
+  JOB TIME   : 142.37 s
+
+The error log: https://transfer.sh/lK71v/avocado-errors.log
+
+>
+> Since v1: https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg03780.=
+html
+> - more Pythonic context managers (Cleber)
+> - use wait_for (Cleber)
+> - use workdir (Cleber)
+> - use Avocado 65.0 "-p" option for aarch64 (Cleber)
+> - fixed Q35 incorrect description in cover (Laszlo)
+> - use ArmVirtQemu name (Laszlo)
+>
+> Next:
+> - address Laszlo comments about correct QEMU options and flash images
+> - use FDDrainer
+> - refactor common code in setUp()
+> - use new avocado.utils.archive gzip features (Cleber)
+> - test x86_64/aarch64 'arch' tags (Cleber)
+> - build EDK2 flash images (Laszlo)
+> - include variable store flash image (Laszlo)
+> - use virtual disk with UEFI shell script (Laszlo)
+> - improve OVMF binary selection (releases / snapshots) (Laszlo)
+> - check ISO images (Laszlo -> Cleber)
+> - add aexpect tests (Cleber?)
+>
+> Regards,
+>
+> Phil.
+>
+> Philippe Mathieu-Daud=C3=A9 (3):
+>   acceptance tests: Add SeaBIOS boot and debug console checking test
+>   acceptance tests: Add EDK2 OVMF boot and debug console checking test
+>   acceptance tests: Add EDK2 ArmVirtQemu boot and console checking test
+>
+>  tests/acceptance/boot_firmware.py | 159 ++++++++++++++++++++++++++++++
+>  1 file changed, 159 insertions(+)
+>  create mode 100644 tests/acceptance/boot_firmware.py
+
+
+--
+Alex Benn=C3=A9e
