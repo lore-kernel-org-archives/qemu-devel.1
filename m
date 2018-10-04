@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g83aj-0002jq-5J
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:22:58 -0400
+	(envelope-from <berrange@redhat.com>) id 1g83i9-0002LP-H7
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:30:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g83LX-0003ra-Ca
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:07:22 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36472)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g83LW-0003ii-LU
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:07:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g83LR-0000uc-VL
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 13:07:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9330A2E8081
-	for <qemu-devel@nongnu.org>; Thu,  4 Oct 2018 13:07:04 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1g83i6-0000ZH-4E
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:30:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1g83i5-0000Tm-OI
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:30:34 -0400
+Date: Thu, 4 Oct 2018 14:30:27 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20181004133027.GP3667@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180830142708.14311-1-sameeh@daynix.com>
+	<20180830142708.14311-7-sameeh@daynix.com>
+	<20180903115406.GA14377@redhat.com>
+	<ee81457c-5df4-974f-29fa-7fdcc6649ea7@redhat.com>
+	<20180904081423.GA22349@redhat.com>
+	<b78484df-00a2-3759-baad-ddb3825aae6a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b78484df-00a2-3759-baad-ddb3825aae6a@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 04 Oct 2018 12:35:30 -0000
-From: Thomas Huth <1786343@bugs.launchpad.net>
-Reply-To: Bug 1786343 <1786343@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153384533733.1481.3173989120968287826.malonedeb@gac.canonical.com>
-Message-Id: <153865653040.21921.11594827672772273731.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1786343] Re: QEMU v3.0.0-rc4 configure fails with
- --enable-mpath on CentOS 7.5
+Subject: Re: [Qemu-devel] [RFC 6/6] virtio-net: rss: Add bpf filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +33,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: Yan Vugenfirer <yan@daynix.com>, Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
 
-Fixed here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D1b0578f5c455d5a95384
+On Thu, Sep 06, 2018 at 01:26:01PM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2018=E5=B9=B409=E6=9C=8804=E6=97=A5 16:14, Daniel P. Berrang=C3=A9 w=
+rote:
+> > On Tue, Sep 04, 2018 at 11:07:38AM +0800, Jason Wang wrote:
+> > > On 2018=E5=B9=B409=E6=9C=8803=E6=97=A5 19:54, Daniel P. Berrang=C3=A9=
+ wrote:
+> > > > > + *
+> > > > > + * This work is licensed under the terms of the GNU GPL, versi=
+on 2 or later.
+> > > > > + * See the COPYING file in the top-level directory.
+> > > > > + *
+> > > > > + */
+> > > > > +
+> > > > > +#include <linux/bpf.h>
+> > > > > +
+> > > > > +#ifndef BPF_RSS_INSNS
+> > > > > +#define BPF_RSS_INSNS
+> > > > > +
+> > > > > +/* bpf_insn array matching l3_l4 section. see tap_bpf_program.=
+c file */
+> > > > > +struct bpf_insn l3_l4_hash_insns[] =3D {
+> > > > > +{0xbf , 0x6 , 0x1 , 0x0000 , 0x00000000},
+> > > > > +{0x28 , 0x0 , 0x0 , 0x0000 , 0x0000000c},
+> > > > > +{0xbf , 0x8 , 0x0 , 0x0000 , 0x00000000},
+> > > > [snip]
+> > > >=20
+> > > > > +};
+> > > > This massive array is presumably an auto-generated content.
+> > > >=20
+> > > > We shouldn't be storing this in GIT. We need to store the
+> > > > original preferred source format, and providing makefile
+> > > > rules to generate it.
+> > > >=20
+> > > >=20
+> > > This is possible. But it depends on eBPF toolchain (e.g recent vers=
+ion of
+> > > LLVM) to work which is inflexible or impossible to make it work on =
+some
+> > > distributions. Providing compiled bytecode does not have such limit=
+ation.
+> > Those distros can fix their toolchain if they wish to have the BPF fe=
+ature
+> > enabled when building QEMU, just like they would for any other depend=
+ancy
+> > that is needed by QEMU.
+> >=20
+> > Regards,
+>=20
+> Well, since bytecode is architecture independent, it needs either emula=
+tor
+> or JIT to work. So having eBPF toolchain looks unnecessary since we're =
+sure
+> it will generate exactly the same bytecodes everywhere. I think we can =
+just
+> treat it like some kind of virtio-net firmware and ship with bytecodes.
 
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Committed
+I don't find this rational very compelling. Lots of our generated files
+are architecture independant and so would have the same output everywhere=
+.
+We still aim to generate them all at build from the master source using
+the relevant toolchain(s).
 
--- =
+The main exception where we bundle pre-generated stuff is the various
+architecture dependant ROMs, since those need many cross-compilers.
+Most of the distro vendors will drop these pre-built ROMs and build
+them from source again for license compliance purposes.=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1786343
+So I still believe we should be building BPF code from the master
+source, not bundling any pre-generated content.
 
-Title:
-  QEMU v3.0.0-rc4 configure fails with --enable-mpath on CentOS 7.5
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  QEMU v3.0.0-rc4 configure fails with --enable-mpath on CentOS 7.5.
-
-  After commit b3f1c8c413bc83e4a2cc7a63e4eddf9fe6449052 "qemu-pr-helper: us=
-e new
-  libmultipath API", QEMU started using new libmultipath API, which is not
-  available on CentOS 7.5.  Reverting this commit, configure passes.
-
-  Steps to reproduce (fails on x86_64 and ppc64le architectures):
-
-    $ git clone git://git.qemu.org/qemu.git
-    $ mkdir -p qemu/build && cd qemu/build
-    $ ../configure --enable-mpath
-    ERROR: Multipath requires libmpathpersist devel
-
-    $ rpm -qa | grep device-mapper | sort
-    device-mapper-1.02.146-4.el7.ppc64le
-    device-mapper-devel-1.02.146-4.el7.ppc64le
-    device-mapper-libs-1.02.146-4.el7.ppc64le
-    device-mapper-multipath-0.4.9-119.el7.ppc64le
-    device-mapper-multipath-devel-0.4.9-119.el7.ppc64le
-    device-mapper-multipath-libs-0.4.9-119.el7.ppc64le
-
-  Snippet from config.log:
-
-    funcs: do_compiler do_cc compile_prog main
-    lines: 92 125 3580 0
-    cc -pthread -I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include -m64 =
--D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototy=
-pes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -f=
-no-strict-aliasing -fno-common -fwrapv -Wendif-labels -Wno-missing-include-=
-dirs -Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-se=
-lf -Wignored-qualifiers -Wold-style-declaration -Wold-style-definition -Wty=
-pe-limits -fstack-protector-strong -Wno-missing-braces -I/usr/include/p11-k=
-it-1 -I/usr/include/libpng15 -o config-temp/qemu-conf.exe config-temp/qemu-=
-conf.c -m64 -g -ludev -lmultipath -lmpathpersist
-    config-temp/qemu-conf.c: In function =E2=80=98main=E2=80=99:
-    config-temp/qemu-conf.c:15:5: error: too few arguments to function =E2=
-=80=98mpath_lib_init=E2=80=99
-         multipath_conf =3D mpath_lib_init();
-         ^
-    In file included from config-temp/qemu-conf.c:2:0:
-    /usr/include/mpath_persist.h:179:12: note: declared here
-     extern int mpath_lib_init (struct udev *udev);
-                ^
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1786343/+subscriptions
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
