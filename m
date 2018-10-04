@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54087)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1g87Rp-00086H-Ij
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 13:30:02 -0400
+	(envelope-from <alistair23@gmail.com>) id 1g87Vq-0001ZD-5C
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 13:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1g87Ro-0005GS-PV
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 13:30:01 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1g87Rl-0005EF-1L
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 13:29:58 -0400
-Received: by mail-lj1-x244.google.com with SMTP id v7-v6so8681153ljg.5
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 10:29:55 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1g87Vp-0001lz-7U
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 13:34:10 -0400
 MIME-Version: 1.0
-References: <20181001220942.2382-1-f4bug@amsat.org>
-	<20181001220942.2382-5-f4bug@amsat.org>
-In-Reply-To: <20181001220942.2382-5-f4bug@amsat.org>
+References: <20181001115704.701-1-luc.michel@greensocs.com>
+	<20181001115704.701-6-luc.michel@greensocs.com>
+In-Reply-To: <20181001115704.701-6-luc.michel@greensocs.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 4 Oct 2018 10:29:26 -0700
-Message-ID: <CAKmqyKMCBBKOoB3fC9P=UBfNhFexAsqH=4DUjrg63wmq0XoCqg@mail.gmail.com>
+Date: Thu, 4 Oct 2018 10:33:40 -0700
+Message-ID: <CAKmqyKPbBMWvpGm1L6nCPDpHqB2hW_iHfuXO7HjVRdWPD5tuGg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/15] hw/ssi/xilinx_spi: Use
- DeviceState::realize rather than SysBusDevice::init
+Subject: Re: [Qemu-devel] [PATCH v2 05/15] gdbstub: add multiprocess support
+ to 'sC' packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Eduardo Habkost <ehabkost@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Luc Michel <luc.michel@greensocs.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On Mon, Oct 1, 2018 at 3:32 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
+On Mon, Oct 1, 2018 at 4:57 AM Luc Michel <luc.michel@greensocs.com> wrote:
 >
-> Move from the legacy SysBusDevice::init method to using DeviceState::real=
-ize.
+> Change the sC packet handling to support the multiprocess extension.
+> Instead of returning the first thread, we return the first thread of the
+> current process.
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  hw/ssi/xilinx_spi.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+>  gdbstub.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 >
-> diff --git a/hw/ssi/xilinx_spi.c b/hw/ssi/xilinx_spi.c
-> index 83585bc8b2..3dae303d5b 100644
-> --- a/hw/ssi/xilinx_spi.c
-> +++ b/hw/ssi/xilinx_spi.c
-> @@ -319,9 +319,9 @@ static const MemoryRegionOps spi_ops =3D {
->      }
->  };
->
-> -static int xilinx_spi_init(SysBusDevice *sbd)
-> +static void xilinx_spi_realize(DeviceState *dev, Error **errp)
->  {
-> -    DeviceState *dev =3D DEVICE(sbd);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      XilinxSPI *s =3D XILINX_SPI(dev);
->      int i;
->
-> @@ -344,8 +344,6 @@ static int xilinx_spi_init(SysBusDevice *sbd)
->
->      fifo8_create(&s->tx_fifo, FIFO_CAPACITY);
->      fifo8_create(&s->rx_fifo, FIFO_CAPACITY);
-> -
-> -    return 0;
->  }
->
->  static const VMStateDescription vmstate_xilinx_spi =3D {
-> @@ -368,9 +366,8 @@ static Property xilinx_spi_properties[] =3D {
->  static void xilinx_spi_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
->
-> -    k->init =3D xilinx_spi_init;
-> +    dc->realize =3D xilinx_spi_realize;
->      dc->reset =3D xlx_spi_reset;
->      dc->props =3D xilinx_spi_properties;
->      dc->vmsd =3D &vmstate_xilinx_spi;
+> diff --git a/gdbstub.c b/gdbstub.c
+> index 779cc8b241..3242f0d261 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1530,13 +1530,18 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+>              type =3D strtoul(p, (char **)&p, 16);
+>              sstep_flags =3D type;
+>              put_packet(s, "OK");
+>              break;
+>          } else if (strcmp(p,"C") =3D=3D 0) {
+> -            /* "Current thread" remains vague in the spec, so always ret=
+urn
+> -             *  the first CPU (gdb returns the first thread). */
+> -            put_packet(s, "QC1");
+> +            /* "Current thread" remains vague in the spec, so always ret=
+urn the
+> +             * first thread of the current process (gdb returns the firs=
+t
+> +             * thread).
+> +             */
+> +            cpu =3D get_first_cpu_in_process(s, gdb_get_cpu_process(s, s=
+->g_cpu));
+> +            snprintf(buf, sizeof(buf), "QC%s",
+> +                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_=
+id)));
+> +            put_packet(s, buf);
+>              break;
+>          } else if (strcmp(p,"fThreadInfo") =3D=3D 0) {
+>              s->query_cpu =3D first_cpu;
+>              goto report_cpuinfo;
+>          } else if (strcmp(p,"sThreadInfo") =3D=3D 0) {
 > --
 > 2.19.0
 >
