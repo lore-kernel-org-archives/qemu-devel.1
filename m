@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1g83aM-0002Ca-CQ
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:22:39 -0400
+	(envelope-from <mlureau@redhat.com>) id 1g83aR-0002W5-E7
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1g83ZF-00006a-Nx
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:29 -0400
-Received: from mail-it1-f195.google.com ([209.85.166.195]:56100)
+	(envelope-from <mlureau@redhat.com>) id 1g83Z5-0008OS-Ow
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:19 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:36528)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1g83ZF-00005W-ID
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:25 -0400
-Received: by mail-it1-f195.google.com with SMTP id c23-v6so13001671itd.5
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 06:21:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1g83Z2-0008I3-Vq
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:14 -0400
+Received: by mail-it1-f193.google.com with SMTP id c85-v6so13949781itd.1
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 06:21:11 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1538652143.git.tgolembi@redhat.com>
-	<2510f7c260bd2cbdf1b6089c2a021e6434cb0d38.1538652143.git.tgolembi@redhat.com>
-In-Reply-To: <2510f7c260bd2cbdf1b6089c2a021e6434cb0d38.1538652143.git.tgolembi@redhat.com>
+	<fe8e4352f962e5f4b720338b2742a01c29674ee7.1538652143.git.tgolembi@redhat.com>
+In-Reply-To: <fe8e4352f962e5f4b720338b2742a01c29674ee7.1538652143.git.tgolembi@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 4 Oct 2018 17:21:11 +0400
-Message-ID: <CAMxuvayJMM2G2b2USz6HLithrXNbqGyc3-CeQ5=067-6oqMz_Q@mail.gmail.com>
+Date: Thu, 4 Oct 2018 17:20:59 +0400
+Message-ID: <CAMxuvax8wGLwRSD3sE1JeB-pdd4ecqVJJXJ9iBwecdK9X3-8Ng@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 06/11] configure: add test for libudev
+Subject: Re: [Qemu-devel] [PATCH v4 10/11] qga: return disk device in
+ guest-get-fsinfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +33,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Tomas Golembiovsky <tgolembi@redhat.com>
 Cc: qemu-devel <qemu-devel@nongnu.org>, "Blake, Eric" <eblake@redhat.com>, sjubran@redhat.com, okrishtal@virtuozzo.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
+Hi
+
 On Thu, Oct 4, 2018 at 3:22 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@=
 redhat.com> wrote:
 >
+> Report device node of the disk. It is implemented for Linux (needs
+> libudev) and Windows. The node is reported e.g. as "/dev/sda2" on Linux
+> and as "\\.\PhysicalDriveX" on Windows.
+>
 > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
 > ---
->  configure | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
+>  qga/commands-posix.c |  7 ++++++-
+>  qga/commands-win32.c | 21 +++++++++++----------
+>  qga/qapi-schema.json |  3 ++-
+>  3 files changed, 19 insertions(+), 12 deletions(-)
 >
-> diff --git a/configure b/configure
-> index 0f168607e8..ac24cb3975 100755
-> --- a/configure
-> +++ b/configure
-> @@ -477,6 +477,7 @@ libxml2=3D""
->  docker=3D"no"
->  debug_mutex=3D"no"
->  libpmem=3D""
-> +libudev=3D"no"
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 4d324178f2..31952b07f4 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -950,7 +950,12 @@ static void build_guest_fsinfo_for_real_device(char =
+const *syspath,
+>      if (udev =3D=3D NULL || udevice =3D=3D NULL) {
+>          g_debug("failed to query udev");
+>      } else {
+> -        const char *serial;
+> +        const char *devnode, *serial;
+> +        devnode =3D udev_device_get_devnode(udevice);
+> +        if (devnode !=3D NULL) {
+> +            disk->dev =3D g_strdup(devnode);
+> +            disk->has_dev =3D true;
+> +        }
+
+ack the posix/linux part.
+
+You may want to split the Windows part..
+
+>          serial =3D udev_device_get_property_value(udevice, "ID_SERIAL");
+>          if (serial !=3D NULL && *serial !=3D 0) {
+>              disk->serial =3D g_strdup(serial);
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index a591d8221d..d0d969d0ce 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -649,8 +649,7 @@ out_free:
+>      return;
+>  }
 >
->  # cross compilers defaults, can be overridden with --cross-cc-ARCH
->  cross_cc_aarch64=3D"aarch64-linux-gnu-gcc"
-> @@ -873,6 +874,7 @@ Linux)
->    vhost_vsock=3D"yes"
->    QEMU_INCLUDES=3D"-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $=
-QEMU_INCLUDES"
->    supported_os=3D"yes"
-> +  libudev=3D"yes"
->  ;;
->  esac
+> -static void get_single_disk_info(char *name, GuestDiskAddress *disk,
+> -    Error **errp)
+> +static void get_single_disk_info(GuestDiskAddress *disk, Error **errp)
+>  {
+>      SCSI_ADDRESS addr, *scsi_ad;
+>      DWORD len;
+> @@ -659,8 +658,8 @@ static void get_single_disk_info(char *name, GuestDis=
+kAddress *disk,
 >
-> @@ -5676,6 +5678,20 @@ if test "$libnfs" !=3D "no" ; then
->    fi
->  fi
+>      scsi_ad =3D &addr;
 >
-> +##########################################
-> +# Do we have libudev
-> +if test "$libudev" !=3D "no" ; then
-> +  if $pkg_config libudev; then
-> +    libudev=3D"yes"
-> +    libudev_libs=3D$($pkg_config --libs libudev)
-> +  else
-> +    if test "$libudev" =3D "yes" ; then
-> +      feature_not_found "libudev" "Install systemd development files"
-> +    fi
-> +    libudev=3D"no"
-> +  fi
-> +fi
+> -    g_debug("getting disk info for: %s", name);
+> -    disk_h =3D CreateFile(name, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+> +    g_debug("getting disk info for: %s", disk->dev);
+> +    disk_h =3D CreateFile(disk->dev, 0, FILE_SHARE_READ, NULL, OPEN_EXIS=
+TING,
+>                         0, NULL);
+>      if (disk_h =3D=3D INVALID_HANDLE_VALUE) {
+>          error_setg_win32(errp, GetLastError(), "failed to open disk");
+> @@ -692,7 +691,7 @@ static void get_single_disk_info(char *name, GuestDis=
+kAddress *disk,
+>              disk->bus =3D addr.PathId;
+>              g_debug("unit=3D%lld target=3D%lld bus=3D%lld",
+>                  disk->unit, disk->target, disk->bus);
+> -            disk->pci_controller =3D get_pci_info(name, &local_err);
+> +            disk->pci_controller =3D get_pci_info(disk->dev, &local_err)=
+;
+>
+>              if (local_err) {
+>                  g_debug("failed to get PCI controller info: %s",
+> @@ -771,7 +770,9 @@ static GuestDiskAddressList *build_guest_disk_info(ch=
+ar *guid, Error **errp)
+>              /* Possibly CD-ROM or a shared drive. Try to pass the volume=
+ */
+>              g_debug("volume not on disk");
+>              disk =3D g_malloc0(sizeof(GuestDiskAddress));
+> -            get_single_disk_info(name, disk, &local_err);
+> +            disk->has_dev =3D true;
+> +            disk->dev =3D g_strdup(name);
+> +            get_single_disk_info(disk, &local_err);
+>              if (local_err) {
+>                  g_debug("failed to get disk info, ignoring error: %s",
+>                      error_get_pretty(local_err));
+> @@ -793,7 +794,6 @@ static GuestDiskAddressList *build_guest_disk_info(ch=
+ar *guid, Error **errp)
+>
+>      /* Go through each extent */
+>      for (i =3D 0; i < extents->NumberOfDiskExtents; i++) {
+> -        char *disk_name =3D NULL;
+>          disk =3D g_malloc0(sizeof(GuestDiskAddress));
+>
+>          /* Disk numbers directly correspond to numbers used in UNCs
+> @@ -804,10 +804,11 @@ static GuestDiskAddressList *build_guest_disk_info(=
+char *guid, Error **errp)
+>           * See also Naming Files, Paths and Namespaces:
+>           * https://docs.microsoft.com/en-us/windows/desktop/FileIO/namin=
+g-a-file#win32-device-namespaces
+>           */
+> -        disk_name =3D g_strdup_printf("\\\\.\\PhysicalDrive%lu",
+> +        disk->has_dev =3D true;
+> +        disk->dev =3D g_strdup_printf("\\\\.\\PhysicalDrive%lu",
+>              extents->Extents[i].DiskNumber);
+> -        get_single_disk_info(disk_name, disk, &local_err);
+> -        g_free(disk_name);
 > +
->  # Now we've finished running tests it's OK to add -Werror to the compile=
-r flags
->  if test "$werror" =3D "yes"; then
->      QEMU_CFLAGS=3D"-Werror $QEMU_CFLAGS"
-> @@ -6100,6 +6116,7 @@ echo "VxHS block device $vxhs"
->  echo "capstone          $capstone"
->  echo "docker            $docker"
->  echo "libpmem support   $libpmem"
-> +echo "libudev           $libudev"
+> +        get_single_disk_info(disk, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+>              goto out;
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index 3bcda6257e..c6725b3ec8 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -835,6 +835,7 @@
+>  # @target: target id
+>  # @unit: unit id
+>  # @serial: serial number (since: 3.1)
+> +# @dev: device node (POSIX) or device UNC (Windows) (since: 3.1)
+>  #
+>  # Since: 2.2
+>  ##
+> @@ -842,7 +843,7 @@
+>    'data': {'pci-controller': 'GuestPCIAddress',
+>             'bus-type': 'GuestDiskBusType',
+>             'bus': 'int', 'target': 'int', 'unit': 'int',
+> -           '*serial': 'str'} }
+> +           '*serial': 'str', '*dev': 'str'} }
 >
->  if test "$sdl_too_old" =3D "yes"; then
->  echo "-> Your SDL version is too old - please upgrade to have SDL suppor=
-t"
-> @@ -6944,6 +6961,11 @@ if test "$docker" !=3D "no"; then
->      echo "HAVE_USER_DOCKER=3Dy" >> $config_host_mak
->  fi
->
-> +if test "$libudev" !=3D "no"; then
-> +    echo "CONFIG_LIBUDEV=3Dy" >> $config_host_mak
-> +    echo "LIBUDEV_LIBS=3D$libudev_libs" >> $config_host_mak
-> +fi
-> +
->  # use included Linux headers
->  if test "$linux" =3D "yes" ; then
->    mkdir -p linux-headers
+>  ##
+>  # @GuestFilesystemInfo:
 > --
 > 2.19.0
 >
