@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7obN-0001e9-3U
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 17:22:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1g7rM9-0006uU-Mk
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 20:19:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g7obL-00010V-NB
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 17:22:36 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Wed,  3 Oct 2018 16:22:11 -0500
-Message-Id: <20181003212211.812374-6-eblake@redhat.com>
-In-Reply-To: <20181003212211.812374-1-eblake@redhat.com>
-References: <20181003212211.812374-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 5/5] nbd/server: drop old-style negotiation
+	(envelope-from <dgibson@ozlabs.org>) id 1g7rM8-0004UB-Cz
+	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 20:19:05 -0400
+Date: Thu, 4 Oct 2018 10:18:48 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181004001847.GC7004@umbus.fritz.box>
+References: <20181003180711.19335-1-richard.henderson@linaro.org>
+	<20181003180711.19335-5-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="jousvV0MzM2p6OtC"
+Content-Disposition: inline
+In-Reply-To: <20181003180711.19335-5-richard.henderson@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] softfloat: Specialize udiv_qrnnd
+ for ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,164 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, cota@braap.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-After the previous commit, nbd_client_new's first parameter is always
-NULL. Let's drop it with all corresponding old-style negotiation code
-path which is unreachable now.
+--jousvV0MzM2p6OtC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20181003170228.95973-3-vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: re-wrap short line]
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/block/nbd.h |  3 +--
- blockdev-nbd.c      |  3 +--
- nbd/server.c        | 53 +++++++++++++--------------------------------
- qemu-nbd.c          |  2 +-
- 4 files changed, 18 insertions(+), 43 deletions(-)
+On Wed, Oct 03, 2018 at 01:07:11PM -0500, Richard Henderson wrote:
+> The ISA has a 128/64-bit division instruction, though it assumes the
+> low 64-bits of the numerator are 0, and so requires a bit more fixup
+> than a full 128-bit division insn.
+>=20
+> Cc: qemu-ppc@nongnu.org
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 4638c839f51..0129d1a4b46 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -308,8 +308,7 @@ void nbd_export_set_name(NBDExport *exp, const char *name);
- void nbd_export_set_description(NBDExport *exp, const char *description);
- void nbd_export_close_all(void);
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
--void nbd_client_new(NBDExport *exp,
--                    QIOChannelSocket *sioc,
-+void nbd_client_new(QIOChannelSocket *sioc,
-                     QCryptoTLSCreds *tlscreds,
-                     const char *tlsaclname,
-                     void (*close_fn)(NBDClient *, bool));
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 1ef11041a73..1d170c80b82 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -36,8 +36,7 @@ static void nbd_accept(QIONetListener *listener, QIOChannelSocket *cioc,
-                        gpointer opaque)
- {
-     qio_channel_set_name(QIO_CHANNEL(cioc), "nbd-server");
--    nbd_client_new(NULL, cioc,
--                   nbd_server->tlscreds, NULL,
-+    nbd_client_new(cioc, nbd_server->tlscreds, NULL,
-                    nbd_blockdev_client_closed);
- }
+> ---
+>  include/fpu/softfloat-macros.h | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>=20
+> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macro=
+s.h
+> index e702607b43..001bf4f23c 100644
+> --- a/include/fpu/softfloat-macros.h
+> +++ b/include/fpu/softfloat-macros.h
+> @@ -632,6 +632,22 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint6=
+4_t n1,
+>      asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+>      *r =3D n >> 64;
+>      return n;
+> +#elif defined(_ARCH_PPC64)
+> +    /* From Power ISA 3.0B, programming note for divdeu.  */
+> +    uint64_t q1, q2, Q, r1, r2, R;
+> +    asm("divdeu %0,%2,%4; divdu %1,%3,%4"
+> +        : "=3D&r"(q1), "=3Dr"(q2)
+> +        : "r"(n1), "r"(n0), "r"(d));
+> +    r1 =3D -(q1 * d);         /* low part of (n1<<64) - (q1 * d) */
+> +    r2 =3D n0 - (q2 * d);
+> +    Q =3D q1 + q2;
+> +    R =3D r2 + r1;
+> +    if (R < r2 || R >=3D d) { /* overflow implies R > d */
+> +        Q +=3D 1;
+> +        R -=3D d;
+> +    }
+> +    *r =3D R;
+> +    return Q;
+>  #else
+>      uint64_t d0, d1, q0, q1, r1, r0, m;
+> =20
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 4fb247b1166..a1eda0114fa 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1253,7 +1253,6 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
-     const uint16_t myflags = (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_TRIM |
-                               NBD_FLAG_SEND_FLUSH | NBD_FLAG_SEND_FUA |
-                               NBD_FLAG_SEND_WRITE_ZEROES | NBD_FLAG_SEND_CACHE);
--    bool oldStyle;
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-     /* Old style negotiation header, no room for options
-         [ 0 ..   7]   passwd       ("NBDMAGIC")
-@@ -1274,33 +1273,19 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
-     trace_nbd_negotiate_begin();
-     memcpy(buf, "NBDMAGIC", 8);
+--jousvV0MzM2p6OtC
+Content-Type: application/pgp-signature; name="signature.asc"
 
--    oldStyle = client->exp != NULL && !client->tlscreds;
--    if (oldStyle) {
--        trace_nbd_negotiate_old_style(client->exp->size,
--                                      client->exp->nbdflags | myflags);
--        stq_be_p(buf + 8, NBD_CLIENT_MAGIC);
--        stq_be_p(buf + 16, client->exp->size);
--        stl_be_p(buf + 24, client->exp->nbdflags | myflags);
-+    stq_be_p(buf + 8, NBD_OPTS_MAGIC);
-+    stw_be_p(buf + 16, NBD_FLAG_FIXED_NEWSTYLE | NBD_FLAG_NO_ZEROES);
+-----BEGIN PGP SIGNATURE-----
 
--        if (nbd_write(client->ioc, buf, sizeof(buf), errp) < 0) {
--            error_prepend(errp, "write failed: ");
--            return -EINVAL;
--        }
--    } else {
--        stq_be_p(buf + 8, NBD_OPTS_MAGIC);
--        stw_be_p(buf + 16, NBD_FLAG_FIXED_NEWSTYLE | NBD_FLAG_NO_ZEROES);
--
--        if (nbd_write(client->ioc, buf, 18, errp) < 0) {
--            error_prepend(errp, "write failed: ");
--            return -EINVAL;
--        }
--        ret = nbd_negotiate_options(client, myflags, errp);
--        if (ret != 0) {
--            if (ret < 0) {
--                error_prepend(errp, "option negotiation failed: ");
--            }
--            return ret;
-+    if (nbd_write(client->ioc, buf, 18, errp) < 0) {
-+        error_prepend(errp, "write failed: ");
-+        return -EINVAL;
-+    }
-+    ret = nbd_negotiate_options(client, myflags, errp);
-+    if (ret != 0) {
-+        if (ret < 0) {
-+            error_prepend(errp, "option negotiation failed: ");
-         }
-+        return ret;
-     }
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlu1XGIACgkQbDjKyiDZ
+s5JAqw//RyatfCwmSIvaGOxiXkAzZ6v7O/6D8QYaFXuXESctYiiJFp58BYLDoz+8
+HkOc5S5ErqYo80VzA5JJGLxvZbtfdOc+rAPmlkMMJdM+JP5eYETcWSzgTJz+EtNd
+F+UJunaKVnM3zNeJn2QWhUSjqLSQ9Pyo97y9cyA03OA+EJz6v0PMce3nmoCkKZQP
+/PgVCSYByacdzAQ3ZJ38jqFN38gr6ODbZl1ANLnNXDPv3s+bkXN4fl9EbAFyvGXD
+wAufstg8YJArm1xQT4TS4MuhcwB5Tzj0+UUnki/ftroaA/XZU7Usgw1PxHsazsrm
+KpKFtSdvwzfQ2HDpYQX1s9kkv4m32k/1xNf03UvaioB40uCIlXV0YbFb1YMZy5aI
+aDe9rh+r/M33DKd64t6NYb/lDO35db9VaF0IA3NI4+bO0yFOJGpjmwttJkvg3Q05
+ZcOfT/Ev7YODf7SrcQXFxx5i8wcTgrZpMAix9zcI0vO/Gs0fbomyhMQ234jdBd2R
+tIXxEk3X9bwM/HgNwcI1zU7OymTshSiE4oQkhFkpMXMkDX1ZO6Gfs/vFUl+Z/G1Q
+wrFcgMqbfCly49XNUKZGxoeSQW/qiXzpypOwfBx3jdx8J3NyGPx8/HhWeGWDN8oB
++VPByItLGqaiI2/sp51U8fHf286g30CwSqB8m5ALNT558BeqiY8=
+=0vej
+-----END PGP SIGNATURE-----
 
-     assert(!client->optlen);
-@@ -2396,13 +2381,8 @@ static void nbd_client_receive_next_request(NBDClient *client)
- static coroutine_fn void nbd_co_client_start(void *opaque)
- {
-     NBDClient *client = opaque;
--    NBDExport *exp = client->exp;
-     Error *local_err = NULL;
-
--    if (exp) {
--        nbd_export_get(exp);
--        QTAILQ_INSERT_TAIL(&exp->clients, client, next);
--    }
-     qemu_co_mutex_init(&client->send_lock);
-
-     if (nbd_negotiate(client, &local_err)) {
-@@ -2417,13 +2397,11 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
- }
-
- /*
-- * Create a new client listener on the given export @exp, using the
-- * given channel @sioc.  Begin servicing it in a coroutine.  When the
-- * connection closes, call @close_fn with an indication of whether the
-- * client completed negotiation.
-+ * Create a new client listener using the given channel @sioc.
-+ * Begin servicing it in a coroutine.  When the connection closes, call
-+ * @close_fn with an indication of whether the client completed negotiation.
-  */
--void nbd_client_new(NBDExport *exp,
--                    QIOChannelSocket *sioc,
-+void nbd_client_new(QIOChannelSocket *sioc,
-                     QCryptoTLSCreds *tlscreds,
-                     const char *tlsaclname,
-                     void (*close_fn)(NBDClient *, bool))
-@@ -2433,7 +2411,6 @@ void nbd_client_new(NBDExport *exp,
-
-     client = g_new0(NBDClient, 1);
-     client->refcount = 1;
--    client->exp = exp;
-     client->tlscreds = tlscreds;
-     if (tlscreds) {
-         object_ref(OBJECT(client->tlscreds));
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 6aaebe7d938..e76fe3082ab 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -354,7 +354,7 @@ static void nbd_accept(QIONetListener *listener, QIOChannelSocket *cioc,
-
-     nb_fds++;
-     nbd_update_server_watch();
--    nbd_client_new(NULL, cioc, tlscreds, NULL, nbd_client_closed);
-+    nbd_client_new(cioc, tlscreds, NULL, nbd_client_closed);
- }
-
- static void nbd_update_server_watch(void)
--- 
-2.17.1
+--jousvV0MzM2p6OtC--
