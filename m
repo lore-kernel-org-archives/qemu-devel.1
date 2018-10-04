@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g7yum-0001Is-Mq
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 04:23:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1g7yut-0001PK-BS
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 04:23:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g7ynD-0007Xr-Mr
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 04:15:36 -0400
-References: <20181003132041.10075-1-marcandre.lureau@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1g7yjx-0004XN-BF
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 04:12:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1g7yjs-0004QT-Lz
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 04:12:06 -0400
+References: <20181003091344.24496-1-d.csapak@proxmox.com>
+	<20181003091344.24496-2-d.csapak@proxmox.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aee68960-248e-6930-2375-2fbc767f1d5f@redhat.com>
-Date: Thu, 4 Oct 2018 10:15:24 +0200
+Message-ID: <27e32199-a81f-f693-351e-6c5dda5bf308@redhat.com>
+Date: Thu, 4 Oct 2018 10:11:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181003132041.10075-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20181003091344.24496-2-d.csapak@proxmox.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: remove glib_subprocess check
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] vl.c: call optional script when exiting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Dominik Csapak <d.csapak@proxmox.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-On 2018-10-03 15:20, Marc-Andr=C3=A9 Lureau wrote:
-> This should have been removed as part of commit
-> 692fbdf9f4c6f6bafd0b3a4d4f94973effd3bbae.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 2018-10-03 11:13, Dominik Csapak wrote:
+> some users might want to call a script when qemu exits, without listening
+> to a qmp monitor for events when running with --daemonize
+> 
+> this can be used for things like external cleanups
+> 
+> Signed-off-by: Dominik Csapak <d.csapak@proxmox.com>
 > ---
->  configure | 6 ------
->  1 file changed, 6 deletions(-)
->=20
-> diff --git a/configure b/configure
-> index a7368044cc..4f6d6e03b1 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3557,12 +3557,6 @@ if ! compile_prog "$CFLAGS" "$LIBS" ; then
->  	       "build target"
->  fi
-> =20
-> -# g_test_trap_subprocess added in 2.38. Used by some tests.
-> -glib_subprocess=3Dyes
-> -if ! $pkg_config --atleast-version=3D2.38 glib-2.0; then
-> -    glib_subprocess=3Dno
-> -fi
-> -
->  # Silence clang 3.5.0 warnings about glib attribute __alloc_size__ usa=
-ge
->  cat > $TMPC << EOF
->  #include <glib.h>
->=20
+>  qemu-options.hx | 18 ++++++++++++++++++
+>  vl.c            | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 63 insertions(+)
+[...]
+> @@ -4577,5 +4586,41 @@ int main(int argc, char **argv, char **envp)
+>      migration_object_finalize();
+>      /* TODO: unref root container, check all devices are ok */
+>  
+> +    if (exit_script) {
+> +        int pid, status;
+> +        char *args[5];
+> +
+> +        /* try to launch network script */
+> +        pid = fork();
+> +        if (pid < 0) {
+> +            error_report("could not launch exit script '%s'", exit_script);
+> +            exit(1);
+> +        }
+> +        if (pid == 0) {
+> +            int open_max = sysconf(_SC_OPEN_MAX), i;
+> +
+> +            for (i = 3; i < open_max; i++) {
+> +                close(i);
+> +            }
+> +            args[0] = (char *)exit_script;
+> +            args[1] = g_strdup_printf("%d", shutdown_reason);
+> +            args[2] = g_strdup_printf("%d", shutdown_was_reset);
+> +            args[3] = qemu_get_vm_name();
+> +            args[4] = NULL;
+> +            execv(exit_script, args);
+> +            _exit(1);
+> +        } else {
+> +            while (waitpid(pid, &status, 0) != pid) {
+> +                /* loop */
+> +            }
+> +
+> +            if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+> +                error_report("exit script '%s' failed with status %d",
+> +                             exit_script, status);
+> +                exit(1);
+> +            }
+> +        }
+> +    }
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Our main() function is already huge, so please put this into a separate
+function instead (or even better, refactor the launch_script function as
+you've mentioned it in the cover letter).
+
+ Thanks,
+  Thomas
