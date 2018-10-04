@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=8083a5a2a=Alistair.Francis@wdc.com>)
-	id 1g89tr-000053-F7
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 16:07:08 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1g8A1d-00044F-2Q
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 16:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=8083a5a2a=Alistair.Francis@wdc.com>)
-	id 1g89tn-00088z-BQ
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 16:07:07 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:51852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=8083a5a2a=Alistair.Francis@wdc.com>)
-	id 1g89tn-00087d-2T
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 16:07:03 -0400
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 4 Oct 2018 20:06:59 +0000
-Message-ID: <4ae3539e9e432912819b41aefbfdde237a27057d.1538683492.git.alistair.francis@wdc.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1538683492.git.alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <jcmvbkbc@gmail.com>) id 1g8A1Z-0006uQ-G1
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 16:15:08 -0400
+Received: from mail-yw1-xc29.google.com ([2607:f8b0:4864:20::c29]:37845)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1g8A1Z-0006tU-7k
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 16:15:05 -0400
+Received: by mail-yw1-xc29.google.com with SMTP id y14-v6so4319939ywa.4
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 13:15:05 -0700 (PDT)
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v5 5/5] hw/riscv/virt: Connect a VirtIO net
- PCIe device
+References: <20181004010505.26184-1-jcmvbkbc@gmail.com>
+In-Reply-To: <20181004010505.26184-1-jcmvbkbc@gmail.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Thu, 4 Oct 2018 13:14:45 -0700
+Message-ID: <CAMo8BfJ==eV4g7L3nSuYa=o2RNw98nUg_0VJeBD6V8Q54m0wkg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC] target/xtensa: rework zero overhead loops
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "stephen@eideticom.com" <stephen@eideticom.com>, "palmer@sifive.com" <palmer@sifive.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- default-configs/riscv32-softmmu.mak |  1 +
- default-configs/riscv64-softmmu.mak |  1 +
- hw/riscv/virt.c                     | 20 +++++++++++++++++---
- 3 files changed, 19 insertions(+), 3 deletions(-)
+On Wed, Oct 3, 2018 at 6:05 PM Max Filippov <jcmvbkbc@gmail.com> wrote:
+>
+> Don't invalidate TB with the end of zero overhead loop when LBEG or LEND
+> change. Instead encode the distance from the TB start to the LEND in the
+> TB flags and generate loopback code when offset of the next PC from the
+> TB start equals that distance. Distance not greater than the maximal
+> instruction length is encoded literally, greater distances are capped at
+> the target page size and encoded as the maximal instruction length plus
+> the greatest power of 2 that is not bigger than the distance.
+>
+> Although this change adds dynamic TB search at the end of each zero
+> overhead loop the resulting emulation speed is about 10% higher in
+> uClibc-ng and LTP tests.
 
-diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-=
-softmmu.mak
-index 05fae82f1b..bb3dd34606 100644
---- a/default-configs/riscv32-softmmu.mak
-+++ b/default-configs/riscv32-softmmu.mak
-@@ -9,6 +9,7 @@ CONFIG_CADENCE=3Dy
-=20
- CONFIG_PCI_GENERIC=3Dy
- CONFIG_PCI_XILINX=3Dy
-+CONFIG_VIRTIO_PCI=3Dy
-=20
- CONFIG_VGA=3Dy
- CONFIG_VGA_PCI=3Dy
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-=
-softmmu.mak
-index 05fae82f1b..bb3dd34606 100644
---- a/default-configs/riscv64-softmmu.mak
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -9,6 +9,7 @@ CONFIG_CADENCE=3Dy
-=20
- CONFIG_PCI_GENERIC=3Dy
- CONFIG_PCI_XILINX=3Dy
-+CONFIG_VIRTIO_PCI=3Dy
-=20
- CONFIG_VGA=3Dy
- CONFIG_VGA_PCI=3Dy
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 62a953aa2b..6d91810bcf 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -36,6 +36,7 @@
- #include "hw/riscv/sifive_test.h"
- #include "hw/riscv/virt.h"
- #include "chardev/char.h"
-+#include "net/net.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/device_tree.h"
- #include "exec/address-spaces.h"
-@@ -322,6 +323,8 @@ static void riscv_virt_board_init(MachineState *machine=
-)
-     MemoryRegion *system_memory =3D get_system_memory();
-     MemoryRegion *main_mem =3D g_new(MemoryRegion, 1);
-     MemoryRegion *mask_rom =3D g_new(MemoryRegion, 1);
-+    DeviceState *dev;
-+    PCIBus *pci_bus;
-     char *plic_hart_config;
-     size_t plic_hart_config_len;
-     int i;
-@@ -436,9 +439,20 @@ static void riscv_virt_board_init(MachineState *machin=
-e)
-             qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
-     }
-=20
--    gpex_pcie_init(system_memory, 0, memmap[VIRT_PCIE].base,
--                   memmap[VIRT_PCIE].size, 0x40000000, 0x20000000,
--                   qdev_get_gpio_in(DEVICE(s->plic), PCIE_IRQ), true);
-+    dev =3D gpex_pcie_init(system_memory, 0, memmap[VIRT_PCIE].base,
-+                         memmap[VIRT_PCIE].size, 0x40000000, 0x20000000,
-+                         qdev_get_gpio_in(DEVICE(s->plic), PCIE_IRQ), true=
-);
-+    pci_bus =3D PCI_HOST_BRIDGE(dev)->bus;
-+
-+    for (i =3D 0; i < nb_nics; i++) {
-+        NICInfo *nd =3D &nd_table[i];
-+
-+        if (!nd->model) {
-+            nd->model =3D g_strdup("virtio");
-+        }
-+
-+        pci_nic_init_nofail(nd, pci_bus, nd->model, NULL);
-+    }
-=20
-     serial_mm_init(system_memory, memmap[VIRT_UART0].base,
-         0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
---=20
-2.17.1
+I thought about it some more and it looks like this is not going to work
+in general case in the presence of TB linking: a block with a big (and thus
+not precise) LEND distance may be linked to a block with a small (and
+thus precise) LEND distance. Then LEND may change so that next time
+it still goes to the first TB. In that case it shouldn't go from the first TB
+to the second, but with this scheme it will.
+
+-- 
+Thanks.
+-- Max
