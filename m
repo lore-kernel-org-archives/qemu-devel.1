@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g80HY-0005w8-Le
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 05:50:57 -0400
+	(envelope-from <den@openvz.org>) id 1g80T9-0001Wp-Gj
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 06:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g80HU-0001Iw-Da
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 05:50:56 -0400
-References: <1538466491-2073-1-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <2b7c7da7-2b33-78b8-3a3d-f77159e4ec9e@redhat.com>
-Date: Thu, 4 Oct 2018 11:50:43 +0200
-MIME-Version: 1.0
-In-Reply-To: <1538466491-2073-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x/s390-pci-bus: Convert sysbus init
- function to realize function
+	(envelope-from <den@openvz.org>) id 1g80T6-0007Pa-6C
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 06:02:55 -0400
+From: "Denis V. Lunev" <den@openvz.org>
+Date: Thu,  4 Oct 2018 13:03:13 +0300
+Message-Id: <20181004100313.4253-1-den@openvz.org>
+Subject: [Qemu-devel] [PATCH 1/1] nbd: fix NBD_CMD_CACHE negitiation
+ according to the NBD specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +18,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Yi Min Zhao <zyimin@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Pierre Morel <pmorel@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, den@openvz.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Valery Vdovin <valery.vdovin@acronis.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 02/10/2018 09:48, Thomas Huth wrote:
-> The SysBusDeviceClass->init() interface is considered as a legacy interface
-> and there are currently some efforts going on to get rid of it. Thus let's
-> convert the init function in the s390x code to realize() instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 34 +++++++++++++++++++++-------------
->  1 file changed, 21 insertions(+), 13 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index e3e0ebb..e42e1b8 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -692,27 +692,35 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
->      object_unref(OBJECT(iommu));
->  }
->  
-> -static int s390_pcihost_init(SysBusDevice *dev)
-> +static void s390_pcihost_realize(DeviceState *dev, Error **errp)
->  {
->      PCIBus *b;
->      BusState *bus;
->      PCIHostState *phb = PCI_HOST_BRIDGE(dev);
->      S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
-> +    Error *local_err = NULL;
->  
->      DPRINTF("host_init\n");
->  
-> -    b = pci_register_root_bus(DEVICE(dev), NULL,
-> -                              s390_pci_set_irq, s390_pci_map_irq, NULL,
-> -                              get_system_memory(), get_system_io(), 0, 64,
-> -                              TYPE_PCI_BUS);
-> +    b = pci_register_root_bus(dev, NULL, s390_pci_set_irq, s390_pci_map_irq,
-> +                              NULL, get_system_memory(), get_system_io(), 0,
-> +                              64, TYPE_PCI_BUS);
->      pci_setup_iommu(b, s390_pci_dma_iommu, s);
->  
->      bus = BUS(b);
-> -    qbus_set_hotplug_handler(bus, DEVICE(dev), NULL);
-> +    qbus_set_hotplug_handler(bus, dev, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->      phb->bus = b;
->  
-> -    s->bus = S390_PCI_BUS(qbus_create(TYPE_S390_PCI_BUS, DEVICE(s), NULL));
-> -    qbus_set_hotplug_handler(BUS(s->bus), DEVICE(s), NULL);
-> +    s->bus = S390_PCI_BUS(qbus_create(TYPE_S390_PCI_BUS, dev, NULL));
-> +    qbus_set_hotplug_handler(BUS(s->bus), dev, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->  
->      s->iommu_table = g_hash_table_new_full(g_int64_hash, g_int64_equal,
->                                             NULL, g_free);
-> @@ -722,9 +730,10 @@ static int s390_pcihost_init(SysBusDevice *dev)
->      QTAILQ_INIT(&s->zpci_devs);
->  
->      css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
-> -                             S390_ADAPTER_SUPPRESSIBLE, &error_abort);
-> -
-> -    return 0;
-> +                             S390_ADAPTER_SUPPRESSIBLE, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +    }
->  }
->  
->  static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
-> @@ -1018,12 +1027,11 @@ static void s390_pcihost_reset(DeviceState *dev)
->  
->  static void s390_pcihost_class_init(ObjectClass *klass, void *data)
->  {
-> -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
->  
->      dc->reset = s390_pcihost_reset;
-> -    k->init = s390_pcihost_init;
-> +    dc->realize = s390_pcihost_realize;
->      hc->plug = s390_pcihost_hot_plug;
->      hc->unplug = s390_pcihost_hot_unplug;
->      msi_nonbroken = true;
-> 
+Commit bc37b06a5 was made very bad thing, it has been added
+NBD_FLAG_SEND_CACHE flag for negotiation. The problem is that the value
+of the flag was taken wrong and directly violates NBD specification.
+This value (bit 8) is used at least in the Linux kernel as a part of
+stable userspace-kernel API since 4.10 as NBD_FLAG_CAN_MULTI_CONN
+as defined in the specification:
 
-So we really only overwrite sysbus_realize() here, which only does an
-init call.
+"bit 8, NBD_FLAG_CAN_MULTI_CONN: Indicates that the server operates
+entirely without cache, or that the cache it uses is shared among all
+connections to the given device. In particular, if this flag is
+present, then the effects of NBD_CMD_FLUSH and NBD_CMD_FLAG_FUA
+MUST be visible across all connections when the server sends its reply
+to that command to the client. In the absense of this flag, clients
+SHOULD NOT multiplex their commands over more than one connection to
+the export.
+...
+bit 10, NBD_FLAG_SEND_CACHE: documents that the server understands
+NBD_CMD_CACHE; however, note that server implementations exist
+which support the command without advertising this bit, and
+conversely that this bit does not guarantee that the command will
+succeed or have an impact."
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Personally I do not see any option that we will be allowed to fix the
+specification in favor of QEMU and apply the fix to the kernel. This
+is a big-big problem. Let us fix this in QEMU as soon as possible.
 
+Thus the commit fixes negotiation flag in QEMU accoring to the
+specification. Fortunately enough the bit has been added by Virtuozzo
+and there are no released products in the field with this bit used
+so far.
+
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+CC: Valery Vdovin <valery.vdovin@acronis.com>
+CC: Eric Blake <eblake@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/block/nbd.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 4638c839f5..4377fa502c 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -135,7 +135,7 @@ typedef struct NBDExtent {
+ #define NBD_FLAG_SEND_TRIM         (1 << 5) /* Send TRIM (discard) */
+ #define NBD_FLAG_SEND_WRITE_ZEROES (1 << 6) /* Send WRITE_ZEROES */
+ #define NBD_FLAG_SEND_DF           (1 << 7) /* Send DF (Do not Fragment) */
+-#define NBD_FLAG_SEND_CACHE        (1 << 8) /* Send CACHE (prefetch) */
++#define NBD_FLAG_SEND_CACHE        (1 << 10) /* Send CACHE (prefetch) */
+ 
+ /* New-style handshake (global) flags, sent from server to client, and
+    control what will happen during handshake phase. */
 -- 
-
-Thanks,
-
-David / dhildenb
+2.17.1
