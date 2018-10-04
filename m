@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1g85ZN-00086Y-1B
+	(envelope-from <cohuck@redhat.com>) id 1g85ZM-00085g-D1
 	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:29:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1g85ZK-0004zJ-Cm
+	(envelope-from <cohuck@redhat.com>) id 1g85ZJ-0004yf-Sb
 	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:29:40 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Thu,  4 Oct 2018 17:28:46 +0200
-Message-Id: <20181004152857.14525-5-cohuck@redhat.com>
+Date: Thu,  4 Oct 2018 17:28:48 +0200
+Message-Id: <20181004152857.14525-7-cohuck@redhat.com>
 In-Reply-To: <20181004152857.14525-1-cohuck@redhat.com>
 References: <20181004152857.14525-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 04/15] s390x: Fence huge pages prior to 3.1
+Subject: [Qemu-devel] [PULL 06/15] s390x: move tcg_s390_program_interrupt()
+ into TCG code and mark it noreturn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,99 +21,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-From: Janosch Frank <frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
 
-As the kernel has no way of disallowing the start of a huge page
-backed VM, we can migrate a running huge backed VM to a host that has
-no huge page KVM support.
+Move it into TCG-only code and provide a stub. Turn it into noreturn.
 
-Let's glue huge page support support to the 3.1 machine, so we do not
-migrate to a destination host that doesn't have QEMU huge page support
-and can stop migration if KVM doesn't indicate support.
+As Richard noted, we currently don't log the psw.addr before restoring
+the state, fix that by moving (duplicating) the qemu_log_mask in the
+tcg/kvm handlers.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <20180928093435.198573-1-frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20180927130303.12236-2-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c         | 10 ++++++++++
- include/hw/s390x/s390-virtio-ccw.h |  3 +++
- target/s390x/kvm.c                 |  6 ++++++
- 3 files changed, 19 insertions(+)
+ target/s390x/excp_helper.c | 13 +++++++++++++
+ target/s390x/interrupt.c   | 15 +--------------
+ target/s390x/kvm.c         |  4 +++-
+ target/s390x/tcg-stub.c    |  5 +++++
+ target/s390x/tcg_s390x.h   |  2 ++
+ 5 files changed, 24 insertions(+), 15 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index f0f7fdcadd..53fd7c975f 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -456,6 +456,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-     s390mc->ri_allowed = true;
-     s390mc->cpu_model_allowed = true;
-     s390mc->css_migration_enabled = true;
-+    s390mc->hpage_1m_allowed = true;
-     mc->init = ccw_init;
-     mc->reset = s390_machine_reset;
-     mc->hot_add_cpu = s390_hot_add_cpu;
-@@ -535,6 +536,12 @@ bool cpu_model_allowed(void)
-     return get_machine_class()->cpu_model_allowed;
- }
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index f0ce60cff2..5dab3387c3 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -26,6 +26,7 @@
+ #include "exec/cpu_ldst.h"
+ #include "hw/s390x/ioinst.h"
+ #include "exec/address-spaces.h"
++#include "tcg_s390x.h"
+ #ifndef CONFIG_USER_ONLY
+ #include "sysemu/sysemu.h"
+ #include "hw/s390x/s390_flic.h"
+@@ -48,6 +49,18 @@
+     do { } while (0)
+ #endif
  
-+bool hpage_1m_allowed(void)
++void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
++                                              int ilen, uintptr_t ra)
 +{
-+    /* for "none" machine this results in true */
-+    return get_machine_class()->hpage_1m_allowed;
++    CPUState *cs = CPU(s390_env_get_cpu(env));
++
++    cpu_restore_state(cs, ra, true);
++    qemu_log_mask(CPU_LOG_INT, "program interrupt at %#" PRIx64 "\n",
++                  env->psw.addr);
++    trigger_pgm_exception(env, code, ilen);
++    cpu_loop_exit(cs);
 +}
 +
- static char *machine_get_loadparm(Object *obj, Error **errp)
- {
-     S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-@@ -747,6 +754,9 @@ static void ccw_machine_3_0_instance_options(MachineState *machine)
+ #if defined(CONFIG_USER_ONLY)
  
- static void ccw_machine_3_0_class_options(MachineClass *mc)
- {
-+    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
-+
-+    s390mc->hpage_1m_allowed = false;
-     ccw_machine_3_1_class_options(mc);
-     SET_MACHINE_COMPAT(mc, CCW_COMPAT_3_0);
+ void s390_cpu_do_interrupt(CPUState *cs)
+diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
+index 25cfb3eef8..a17eff5ebc 100644
+--- a/target/s390x/interrupt.c
++++ b/target/s390x/interrupt.c
+@@ -15,6 +15,7 @@
+ #include "exec/exec-all.h"
+ #include "sysemu/kvm.h"
+ #include "hw/s390x/ioinst.h"
++#include "tcg_s390x.h"
+ #if !defined(CONFIG_USER_ONLY)
+ #include "hw/s390x/s390_flic.h"
+ #endif
+@@ -29,25 +30,11 @@ void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
+     env->int_pgm_ilen = ilen;
  }
-diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-index e9c4f4182b..8aa27199c9 100644
---- a/include/hw/s390x/s390-virtio-ccw.h
-+++ b/include/hw/s390x/s390-virtio-ccw.h
-@@ -39,12 +39,15 @@ typedef struct S390CcwMachineClass {
-     bool ri_allowed;
-     bool cpu_model_allowed;
-     bool css_migration_enabled;
-+    bool hpage_1m_allowed;
- } S390CcwMachineClass;
  
- /* runtime-instrumentation allowed by the machine */
- bool ri_allowed(void);
- /* cpu model allowed by the machine */
- bool cpu_model_allowed(void);
-+/* 1M huge page mappings allowed by the machine */
-+bool hpage_1m_allowed(void);
+-static void tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+-                                       int ilen, uintptr_t ra)
+-{
+-#ifdef CONFIG_TCG
+-    trigger_pgm_exception(env, code, ilen);
+-    cpu_loop_exit_restore(CPU(s390_env_get_cpu(env)), ra);
+-#else
+-    g_assert_not_reached();
+-#endif
+-}
+-
+ void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
+                             uintptr_t ra)
+ {
+     S390CPU *cpu = s390_env_get_cpu(env);
  
- /**
-  * Returns true if (vmstate based) migration of the channel subsystem
+-    qemu_log_mask(CPU_LOG_INT, "program interrupt at %#" PRIx64 "\n",
+-                  env->psw.addr);
+-
+     if (kvm_enabled()) {
+         kvm_s390_program_interrupt(cpu, code);
+     } else if (tcg_enabled()) {
 diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 348e8cc546..323cb00e6a 100644
+index 323cb00e6a..78d39b34d0 100644
 --- a/target/s390x/kvm.c
 +++ b/target/s390x/kvm.c
-@@ -292,6 +292,12 @@ static int kvm_s390_configure_mempath_backing(KVMState *s)
-         return 0;
-     }
+@@ -36,6 +36,7 @@
+ #include "qemu/timer.h"
+ #include "qemu/units.h"
+ #include "qemu/mmap-alloc.h"
++#include "qemu/log.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/hw_accel.h"
+ #include "hw/hw.h"
+@@ -1115,7 +1116,8 @@ void kvm_s390_program_interrupt(S390CPU *cpu, uint16_t code)
+         .type = KVM_S390_PROGRAM_INT,
+         .u.pgm.code = code,
+     };
+-
++    qemu_log_mask(CPU_LOG_INT, "program interrupt at %#" PRIx64 "\n",
++                  cpu->env.psw.addr);
+     kvm_s390_vcpu_interrupt(cpu, &irq);
+ }
  
-+    if (!hpage_1m_allowed()) {
-+        error_report("This QEMU machine does not support huge page "
-+                     "mappings");
-+        return -EINVAL;
-+    }
-+
-     if (path_psize != 1 * MiB) {
-         error_report("Memory backing with 2G pages was specified, "
-                      "but KVM does not support this memory backing");
+diff --git a/target/s390x/tcg-stub.c b/target/s390x/tcg-stub.c
+index c93501db0b..dc444fc867 100644
+--- a/target/s390x/tcg-stub.c
++++ b/target/s390x/tcg-stub.c
+@@ -18,3 +18,8 @@
+ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
+ {
+ }
++void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
++                                              int ilen, uintptr_t ra)
++{
++    g_assert_not_reached();
++}
+diff --git a/target/s390x/tcg_s390x.h b/target/s390x/tcg_s390x.h
+index 4e308aa0ce..d1fe01ef7e 100644
+--- a/target/s390x/tcg_s390x.h
++++ b/target/s390x/tcg_s390x.h
+@@ -14,5 +14,7 @@
+ #define TCG_S390X_H
+ 
+ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque);
++void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
++                                              int ilen, uintptr_t ra);
+ 
+ #endif /* TCG_S390X_H */
 -- 
 2.14.4
