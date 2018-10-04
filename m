@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1g83aM-0002W5-6K
+	(envelope-from <mlureau@redhat.com>) id 1g83aM-0002Ca-CQ
 	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:22:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1g83ZL-0000As-60
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:34 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:42359)
+	(envelope-from <mlureau@redhat.com>) id 1g83ZF-00006a-Nx
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:29 -0400
+Received: from mail-it1-f195.google.com ([209.85.166.195]:56100)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1g83ZJ-000071-Ux
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:30 -0400
-Received: by mail-io1-f65.google.com with SMTP id n18-v6so7843959ioa.9
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 06:21:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1g83ZF-00005W-ID
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:25 -0400
+Received: by mail-it1-f195.google.com with SMTP id c23-v6so13001671itd.5
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 06:21:23 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1538652143.git.tgolembi@redhat.com>
-	<f52540791edaf07805d9acaa8b5e795e847904a7.1538652143.git.tgolembi@redhat.com>
-In-Reply-To: <f52540791edaf07805d9acaa8b5e795e847904a7.1538652143.git.tgolembi@redhat.com>
+	<2510f7c260bd2cbdf1b6089c2a021e6434cb0d38.1538652143.git.tgolembi@redhat.com>
+In-Reply-To: <2510f7c260bd2cbdf1b6089c2a021e6434cb0d38.1538652143.git.tgolembi@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 4 Oct 2018 17:21:15 +0400
-Message-ID: <CAMxuvawNdyBjCBbWhF2kN_A+A310Hw0Q0e1ofUSL7HTGRRQcmw@mail.gmail.com>
+Date: Thu, 4 Oct 2018 17:21:11 +0400
+Message-ID: <CAMxuvayJMM2G2b2USz6HLithrXNbqGyc3-CeQ5=067-6oqMz_Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 05/11] qga-win: refactor disk properties
- (bus)
+Subject: Re: [Qemu-devel] [PATCH v4 06/11] configure: add test for libudev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,133 +32,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Tomas Golembiovsky <tgolembi@redhat.com>
 Cc: qemu-devel <qemu-devel@nongnu.org>, "Blake, Eric" <eblake@redhat.com>, sjubran@redhat.com, okrishtal@virtuozzo.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi
-
 On Thu, Oct 4, 2018 at 3:22 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@=
 redhat.com> wrote:
 >
-> Refactor code that queries bus type to be more generic. The function
-> get_disk_bus_type() has been renamed to build_guest_disk_info().
-> Following commit(s) will extend this function.
->
 > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
->  qga/commands-win32.c | 46 +++++++++++++++++++++++++++-----------------
->  1 file changed, 28 insertions(+), 18 deletions(-)
+>  configure | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 >
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 2a7a3af614..d7864fc65a 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -583,25 +583,29 @@ out:
->      return pci;
->  }
+> diff --git a/configure b/configure
+> index 0f168607e8..ac24cb3975 100755
+> --- a/configure
+> +++ b/configure
+> @@ -477,6 +477,7 @@ libxml2=3D""
+>  docker=3D"no"
+>  debug_mutex=3D"no"
+>  libpmem=3D""
+> +libudev=3D"no"
 >
-> -static int get_disk_bus_type(HANDLE vol_h, Error **errp)
-> +static void get_disk_properties(HANDLE vol_h, GuestDiskAddress *disk,
-> +    Error **errp)
->  {
->      STORAGE_PROPERTY_QUERY query;
->      STORAGE_DEVICE_DESCRIPTOR *dev_desc, buf;
->      DWORD received;
-> +    ULONG size =3D sizeof(buf);
+>  # cross compilers defaults, can be overridden with --cross-cc-ARCH
+>  cross_cc_aarch64=3D"aarch64-linux-gnu-gcc"
+> @@ -873,6 +874,7 @@ Linux)
+>    vhost_vsock=3D"yes"
+>    QEMU_INCLUDES=3D"-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $=
+QEMU_INCLUDES"
+>    supported_os=3D"yes"
+> +  libudev=3D"yes"
+>  ;;
+>  esac
 >
->      dev_desc =3D &buf;
-> -    dev_desc->Size =3D sizeof(buf);
->      query.PropertyId =3D StorageDeviceProperty;
->      query.QueryType =3D PropertyStandardQuery;
+> @@ -5676,6 +5678,20 @@ if test "$libnfs" !=3D "no" ; then
+>    fi
+>  fi
 >
->      if (!DeviceIoControl(vol_h, IOCTL_STORAGE_QUERY_PROPERTY, &query,
->                           sizeof(STORAGE_PROPERTY_QUERY), dev_desc,
-> -                         dev_desc->Size, &received, NULL)) {
-> +                         size, &received, NULL)) {
->          error_setg_win32(errp, GetLastError(), "failed to get bus type")=
-;
-> -        return -1;
-> +        return;
->      }
-> +    disk->bus_type =3D find_bus_type(dev_desc->BusType);
-> +    g_debug("bus type %d", disk->bus_type);
-> +    g_free(dev_desc);
-
-bad free(), dev_desc =3D &buf.
-
-looks good otherwise
-
->
-> -    return dev_desc->BusType;
-> +    return;
->  }
->
->  /* VSS provider works with volumes, thus there is no difference if
-> @@ -613,8 +617,8 @@ static GuestDiskAddressList *build_guest_disk_info(ch=
-ar *guid, Error **errp)
->      GuestDiskAddress *disk;
->      SCSI_ADDRESS addr, *scsi_ad;
->      DWORD len;
-> -    int bus;
->      HANDLE vol_h;
-> +    Error *local_err =3D NULL;
->
->      scsi_ad =3D &addr;
->      char *name =3D g_strndup(guid, strlen(guid)-1);
-> @@ -624,22 +628,22 @@ static GuestDiskAddressList *build_guest_disk_info(=
-char *guid, Error **errp)
->                         0, NULL);
->      if (vol_h =3D=3D INVALID_HANDLE_VALUE) {
->          error_setg_win32(errp, GetLastError(), "failed to open volume");
-> -        goto out_free;
-> +        goto err;
->      }
->
-> -    g_debug("getting bus type");
-> -    bus =3D get_disk_bus_type(vol_h, errp);
-> -    if (bus < 0) {
-> -        goto out_close;
-> +    disk =3D g_malloc0(sizeof(*disk));
-> +    get_disk_properties(vol_h, disk, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        goto err_close;
->      }
->
-> -    disk =3D g_malloc0(sizeof(*disk));
-> -    disk->bus_type =3D find_bus_type(bus);
-> -    g_debug("bus type %d", disk->bus_type);
-> -    if (bus =3D=3D BusTypeScsi || bus =3D=3D BusTypeAta || bus =3D=3D Bu=
-sTypeRAID
-> +    if (disk->bus_type =3D=3D GUEST_DISK_BUS_TYPE_SCSI
-> +            || disk->bus_type =3D=3D GUEST_DISK_BUS_TYPE_IDE
-> +            || disk->bus_type =3D=3D GUEST_DISK_BUS_TYPE_RAID
->  #if (_WIN32_WINNT >=3D 0x0600)
->              /* This bus type is not supported before Windows Server 2003=
- SP1 */
-> -            || bus =3D=3D BusTypeSas
-> +            || disk->bus_type =3D=3D GUEST_DISK_BUS_TYPE_SAS
->  #endif
->          ) {
->          /* We are able to use the same ioctls for different bus types
-> @@ -679,11 +683,17 @@ static GuestDiskAddressList *build_guest_disk_info(=
-char *guid, Error **errp)
->      list =3D g_malloc0(sizeof(*list));
->      list->value =3D disk;
->      list->next =3D NULL;
-> -out_close:
->      CloseHandle(vol_h);
-> -out_free:
->      g_free(name);
->      return list;
+> +##########################################
+> +# Do we have libudev
+> +if test "$libudev" !=3D "no" ; then
+> +  if $pkg_config libudev; then
+> +    libudev=3D"yes"
+> +    libudev_libs=3D$($pkg_config --libs libudev)
+> +  else
+> +    if test "$libudev" =3D "yes" ; then
+> +      feature_not_found "libudev" "Install systemd development files"
+> +    fi
+> +    libudev=3D"no"
+> +  fi
+> +fi
 > +
-> +err_close:
-> +    g_free(disk);
-> +    CloseHandle(vol_h);
-> +err:
-> +    g_free(name);
-> +
-> +    return NULL;
->  }
+>  # Now we've finished running tests it's OK to add -Werror to the compile=
+r flags
+>  if test "$werror" =3D "yes"; then
+>      QEMU_CFLAGS=3D"-Werror $QEMU_CFLAGS"
+> @@ -6100,6 +6116,7 @@ echo "VxHS block device $vxhs"
+>  echo "capstone          $capstone"
+>  echo "docker            $docker"
+>  echo "libpmem support   $libpmem"
+> +echo "libudev           $libudev"
 >
->  #else
+>  if test "$sdl_too_old" =3D "yes"; then
+>  echo "-> Your SDL version is too old - please upgrade to have SDL suppor=
+t"
+> @@ -6944,6 +6961,11 @@ if test "$docker" !=3D "no"; then
+>      echo "HAVE_USER_DOCKER=3Dy" >> $config_host_mak
+>  fi
+>
+> +if test "$libudev" !=3D "no"; then
+> +    echo "CONFIG_LIBUDEV=3Dy" >> $config_host_mak
+> +    echo "LIBUDEV_LIBS=3D$libudev_libs" >> $config_host_mak
+> +fi
+> +
+>  # use included Linux headers
+>  if test "$linux" =3D "yes" ; then
+>    mkdir -p linux-headers
 > --
 > 2.19.0
 >
