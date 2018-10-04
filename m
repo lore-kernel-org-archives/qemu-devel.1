@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g822f-0004km-8Z
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:43:42 -0400
+	(envelope-from <imammedo@redhat.com>) id 1g82G2-0004uW-7G
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g822a-00065B-6R
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:43:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60664)
+	(envelope-from <imammedo@redhat.com>) id 1g82Fx-00031B-V1
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:57:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g822Z-000637-Q7
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:43:36 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8FA24308124B
-	for <qemu-devel@nongnu.org>; Thu,  4 Oct 2018 11:43:33 +0000 (UTC)
-References: <1538650419-7995-1-git-send-email-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <548e06b9-dac6-812d-9347-fc600ac4f559@redhat.com>
-Date: Thu, 4 Oct 2018 13:43:29 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1g82Fw-0002yv-H3
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 07:57:24 -0400
+Date: Thu, 4 Oct 2018 13:57:21 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20181004135721.0223f3dc@redhat.com>
+In-Reply-To: <CAEJ3UntstF2hsn11MrcoMqb7_JMOxs9GRiALF==S6o2aMpAAeg@mail.gmail.com>
+References: <CAEJ3UntstF2hsn11MrcoMqb7_JMOxs9GRiALF==S6o2aMpAAeg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1538650419-7995-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] MAINTAINERS: Add an entry for
- qemu-options* files in main directory
+Subject: Re: [Qemu-devel] ACPI PCI hotplug table updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>
+To: open sorcerer <0p3n.s0rc3r3r@gmail.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-On 04/10/2018 12:53, Thomas Huth wrote:
-> The file "qemu-options.h", "qemu-options.hx" and "qemu-options-wrapper.h"
-> in the main directory are currently without maintainer according to our
-> get_maintainers.pl script. Considering that the command line options are
-> a public interface and thus quite important, this is quite a bad state.
-> Add an entry for these files which is maintained by Paolo, since the
-> option handling is tightly coupled with the code in vl.c (that Paolo
-> already handles via the "Main loop" entry).
-> 
-> And since I'm interested in the command line interface of QEMU, add
-> myself (and also Markus) as reviewer here.
+On Wed, 3 Oct 2018 10:44:20 -0700
+open sorcerer <0p3n.s0rc3r3r@gmail.com> wrote:
 
-Sometimes, a file is really only touched as part of changes to other
-files.  Command line options can be changed by block device patches,
-vl.c patches, or something else.  I think changes to qemu-options* alone
-are quite rare, and I'd rather not have more stuff added to my misc tree
-(and my inbox)...
+> Hi,
+> 
+> I am digging into an issue where qmp_device_del does not actually delete
+> devices when a guest OS is in prelaunch. This seems to be due to the guest
+> OS not handling ACPI events because it is not currently running. If I
+> assume correctly, qmp should allow you to add/remove devices while the host
+> is down, or if not possible, publish an error message.
+may I ask why one would delete a device at -S pause point, isn't it easier
+to start QEMU without it, to begin with?
 
-Paolo
+> I think fixing this issue is as simple as making sure that the VM is in a
+> safe state to ignore the hotplug ACPI dance but eject the disk, something
+> like:
+in prelaunch runstate where '-S' option pauses VM, it is practically paused
+at the first instruction to be executed. So device_add at that point is
+considered as hotplug with all actions already executed on hardware level
+(interrupts sent, devices responsible for hotplug handling has changed state).
+So if one wished to delete device at that point, one would have to rollback
+related state changes.
+If one would additionally use -incoming CLI option, it becomes more complicated
+as we might endup in prelaunch runstate with VM in running state
+(see possible transitions in runstate_transitions_def[])
+I'd say prelauch runstate can't be used for removing devices that do not
+support surprise removal (in our case PCI isn't).
 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: Create a separate entry
+> prelaunch, preconfig, shutdown: ignore acpi and deal with cleaning devices
+> other non-running: bubble up error
+> running: default behavior
 > 
->  MAINTAINERS | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> I was trying to validate that this change would be safe (keep in mind I am
+> learning ACPI in little pieces while digging) using GDB, and code
+> inspection. While stepping through with GDB i noticed that the PCI slots
+> are controlled by memory region and the opaque acpi pci hp state object. I
+> was unable this far to find any code executed that modifies the ACPI tables
+> beyond just the pci hotplug state.
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 3275cc6..66c13f2 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1522,6 +1522,14 @@ F: tests/test-qemu-opts.c
->  F: util/keyval.c
->  F: util/qemu-option.c
->  
-> +Generic command line options
-> +M: Paolo Bonzini <pbonzini@redhat.com>
-> +R: Markus Armbruster <armbru@redhat.com>
-> +R: Thomas Huth <thuth@redhat.com>
-> +S: Maintained
-> +F: qemu-options*
-> +F: vl.c
-> +
->  Coverity model
->  M: Markus Armbruster <armbru@redhat.com>
->  S: Supported
+> I also tried to test using "while true; do acpidump | md5; sleep 1; done"
+> in the guest OS and then add/remove a virtio-blk-pci device (which
+> exercised the ACPI callbacks via piix4 callbacks). The output of the
+> acpidump -> md5 was consistent during each phase of the data collection
+> which I believe implied that the acpi tables were not modified by the PCI
+> hotplug.
 > 
+> Can someone help me understand:
+> 
+> 1. Are the ACPI tables not modified when doing PCI hotplug?
+> 2. Do the general changes proposed seem safe?
+> 3. Are there resources or documentation I can read to help me understand
+> this problem further? I have skimmed through alot of different documents
+> and watched some youtube videos, but the ACPI documentation is hard to read
+> and sift through and the youtube videos are generally too high level.
+Regarding ACPI based PCI hotplug you can look at
+  docs/specs/acpi_pci_hotplug.txt
+  hw/acpi/pcihp.c
+  ACPI AML part in build_append_pci_bus_devices()
+
+> 
+> Thanks.
