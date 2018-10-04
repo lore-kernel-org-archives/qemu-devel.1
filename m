@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g85Wx-0006BJ-66
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:27:14 -0400
+	(envelope-from <wei@redhat.com>) id 1g85Xj-0006oW-SH
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g85Ww-00016B-F3
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:27:11 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43351)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g85Wv-000146-UD
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:27:10 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e21-v6so9556925otk.10
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 08:27:09 -0700 (PDT)
+	(envelope-from <wei@redhat.com>) id 1g85Xg-0001c2-MY
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:27:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38718)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1g85Xg-0001b6-GU
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:27:56 -0400
+References: <1538164055-23719-1-git-send-email-wei@redhat.com>
+	<81006285-7644-c03e-a2a8-7458cfd064b8@redhat.com>
+From: Wei Huang <wei@redhat.com>
+Message-ID: <bb1a3136-c381-52c6-4ef3-d56ff4320226@redhat.com>
+Date: Thu, 4 Oct 2018 10:27:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <20181004150522.sr2woe74vdlpo52k@kamzik.brq.redhat.com>
-References: <cover.1537868529.git.manish.jaggi@cavium.com>
-	<CAFEAcA-_5MzdykGKja1sJggx2QVOUXT69NF-Ya2sE8RZFu53fA@mail.gmail.com>
-	<20181004150522.sr2woe74vdlpo52k@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 4 Oct 2018 16:26:47 +0100
-Message-ID: <CAFEAcA_JfsuFknwTs=Mq1=A+WoSJSdYnC3NUZxQiuS=jdg0FfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC] [PATCH 0/3] qemu: arm: Migration between
- machines with different MIDR values
+In-Reply-To: <81006285-7644-c03e-a2a8-7458cfd064b8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/1] tests: Add migration test for aarch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: mjaggi@caviumnetworks.com, "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>, "quintela@redhat.com" <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "Jaggi,
-	Manish" <Manish.Jaggi@cavium.com>, "Nowicki, Tomasz" <Tomasz.Nowicki@cavium.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, drjones@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On 4 October 2018 at 16:05, Andrew Jones <drjones@redhat.com> wrote:
-> On Tue, Oct 02, 2018 at 02:07:38PM +0100, Peter Maydell wrote:
->> Hi; thanks for this patch. The issue I see with this patch
->> is that the KVM/ARM QEMU approach to system registers so far
->> has been "the kernel knows about these and it is in control".
->> So we ask the kernel for the list of registers, and just save
->> and restore those. That would suggest that if there are sysregs
->> where it's OK in fact to ignore a difference between two constant
->> register values, it should be the kernel doing the "actually, this
->> mismatch is OK" behaviour...
->
-> I don't think the kernel should have to maintain all that logic. If a user
-> wants to load guest registers, then the kernel should do it, as long as
-> it's safe from the host's integrity/security PoV, and the hardware would
-> actually support it. Anything that can only break the guest, but not the
-> host, should be allowed. The KVM userspace can certainly ask the kernel
-> what it recommends first (i.e. read the invariant registers first, before
-> deciding what to write), but the decision of what to write should be left
-> up to the user.
 
-I can see the logic of that approach. But right now QEMU
-userspace knows basically nothing about the system registers
-when we're using KVM: all that knowledge is in the kernel.
-So we don't have a place really to put policy info (and
-not really anywhere to put policy info that depends on the
-host CPU type when mostly we let the kernel care about that).
 
->> For instance, it's probably OK to ignore a MIDR_EL1 difference
->> that just indicates a minor revision bump; but not to ignore
->> one that indicates you just tried to migrate a Cortex-A53
->> over to a Cavium CPU.
->
-> If the user does that, then the guest will break - oh well. That's not the
-> host kernel's problem.
+On 10/04/2018 10:07 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 28/09/2018 21:47, Wei Huang wrote:
+> [...]> +++ b/tests/migration/aarch64/Makefile
+>> @@ -0,0 +1,20 @@
+>> +# To specify cross compiler prefix, use CROSS_PREFIX=3D
+>> +#   $ make CROSS_PREFIX=3Daarch64-linux-gnu-
+>> +
+>> +.PHONY: all clean
+>> +all: a-b-kernel.h
+>> +
+>> +a-b-kernel.h: aarch64.kernel
+>> +	echo "$$__note" > header.tmp
+>=20
+> This won't work on a read-only fs.
 
-Patching QEMU to ignore all attempts to write wrong values
-to read-only registers would be easy. It just wouldn't
-be very helpful to the user...
+Under which setting? If tmp file can't be generated on a read-only fs,
+wouldn't $@ have the same problem?
 
-thanks
--- PMM
+>=20
+> Why don't you use $@ directly?
+>=20
+>> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
+>=20
+> Please use:
+>=20
+> xxd -g4 ...
+
+This option doesn't work with -i (the include file style output) which
+is what we want. From xxd manual:
+
+"-g bytes | -groupsize bytes
+    separate the output of every <bytes> bytes (two hex characters or
+    eight bit-digits each) by a whitespace. Specify -g 0 to suppress
+    grouping.  <Bytes> defaults to 2 in normal mode and 1 in bits
+    mode. Grouping does not apply to postscript or include style."
+
+
+>=20
+> xxd might not be installed on the host.
+
+xxd is provided by vim packages. So it should be available in most distro=
+s.
+
+>=20
+> That said we should however install it on the docker cross images.
+
+Agreed.
+
+>=20
+>> +	mv header.tmp $@
+>> +
+>> +aarch64.kernel: aarch64.elf
+>> +	$(CROSS_PREFIX)objcopy -O binary $< $@
+>> +
+>> +aarch64.elf: a-b-kernel.S
+>> +	$(CROSS_PREFIX)gcc -o $@ -nostdlib -Wl,--build-id=3Dnone $<
+>> +
+>> +clean:
+>> +	@rm -rf *.kernel *.elf
+>=20
