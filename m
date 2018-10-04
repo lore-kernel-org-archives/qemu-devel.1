@@ -1,14 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g84G7-0004eX-Md
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 10:05:45 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g84K8-0007C2-5c
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 10:10:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g84G6-0003v4-Oq
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 10:05:43 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Thu,  4 Oct 2018 09:05:22 -0500
-Message-Id: <20181004140522.945682-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] edid: Ignore built binary
+	(envelope-from <alex.bennee@linaro.org>) id 1g84Jy-00079a-4Z
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 10:09:52 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g84Jw-00076C-BR
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 10:09:42 -0400
+Received: by mail-wr1-x442.google.com with SMTP id q5-v6so10072911wrw.12
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 07:09:40 -0700 (PDT)
+References: <1538118095-7003-1-git-send-email-thuth@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1538118095-7003-1-git-send-email-thuth@redhat.com>
+Date: Thu, 04 Oct 2018 15:09:37 +0100
+Message-ID: <87sh1lrefy.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] fpu/softfloat: Replace
+ countLeadingZeros32/64 with clz32/64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,27 +30,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, qemu-trivial@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Added in commit 72d277a7.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- .gitignore | 1 +
- 1 file changed, 1 insertion(+)
+Thomas Huth <thuth@redhat.com> writes:
 
-diff --git a/.gitignore b/.gitignore
-index 5668d027824..64efdfd9292 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -107,6 +107,7 @@
- /qemu-doc.html
- /qemu-doc.info
- /qemu-doc.txt
-+/qemu-edid
- /qemu-img
- /qemu-nbd
- /qemu-options.def
--- 
-2.17.1
+> Our minimum required compiler for compiling QEMU is GCC 4.1 these days,
+> so we can drop the support for compilers which do not provide the
+> __builtin_clz*() functions yet. Since the countLeadingZeros32/64 are
+> then identical to the clz32/64 functions, and we do not have to sync
+> the softloat 2 codebase with upstream anymore (softloat 3 is a complete
+> rewrite) we can simply replace the functions with our QEMU versions.
+>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  fpu/softfloat.c                | 26 ++++++-------
+>  include/fpu/softfloat-macros.h | 87 ------------------------------------=
+------
+>  2 files changed, 13 insertions(+), 100 deletions(-)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 8b91cd6..25a8dd9 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -2681,7 +2681,7 @@ static void
+>  {
+>      int8_t shiftCount;
+>
+> -    shiftCount =3D countLeadingZeros32( aSig ) - 8;
+> +    shiftCount =3D clz32(aSig) - 8;
+>      *zSigPtr =3D aSig<<shiftCount;
+>      *zExpPtr =3D 1 - shiftCount;
+>
+> @@ -2789,7 +2789,7 @@ static float32
+>  {
+>      int8_t shiftCount;
+>
+> -    shiftCount =3D countLeadingZeros32( zSig ) - 1;
+> +    shiftCount =3D clz32(zSig) - 1;
+>      return roundAndPackFloat32(zSign, zExp - shiftCount, zSig<<shiftCoun=
+t,
+>                                 status);
+>
+> @@ -2822,7 +2822,7 @@ static void
+>  {
+>      int8_t shiftCount;
+>
+> -    shiftCount =3D countLeadingZeros64( aSig ) - 11;
+> +    shiftCount =3D clz64(aSig) - 11;
+>      *zSigPtr =3D aSig<<shiftCount;
+>      *zExpPtr =3D 1 - shiftCount;
+>
+> @@ -2960,7 +2960,7 @@ static float64
+>  {
+>      int8_t shiftCount;
+>
+> -    shiftCount =3D countLeadingZeros64( zSig ) - 1;
+> +    shiftCount =3D clz64(zSig) - 1;
+>      return roundAndPackFloat64(zSign, zExp - shiftCount, zSig<<shiftCoun=
+t,
+>                                 status);
+>
+> @@ -2978,7 +2978,7 @@ void normalizeFloatx80Subnormal(uint64_t aSig, int3=
+2_t *zExpPtr,
+>  {
+>      int8_t shiftCount;
+>
+> -    shiftCount =3D countLeadingZeros64( aSig );
+> +    shiftCount =3D clz64(aSig);
+>      *zSigPtr =3D aSig<<shiftCount;
+>      *zExpPtr =3D 1 - shiftCount;
+>  }
+> @@ -3217,7 +3217,7 @@ floatx80 normalizeRoundAndPackFloatx80(int8_t round=
+ingPrecision,
+>          zSig1 =3D 0;
+>          zExp -=3D 64;
+>      }
+> -    shiftCount =3D countLeadingZeros64( zSig0 );
+> +    shiftCount =3D clz64(zSig0);
+>      shortShift128Left( zSig0, zSig1, shiftCount, &zSig0, &zSig1 );
+>      zExp -=3D shiftCount;
+>      return roundAndPackFloatx80(roundingPrecision, zSign, zExp,
+> @@ -3294,7 +3294,7 @@ static void
+>      int8_t shiftCount;
+>
+>      if ( aSig0 =3D=3D 0 ) {
+> -        shiftCount =3D countLeadingZeros64( aSig1 ) - 15;
+> +        shiftCount =3D clz64(aSig1) - 15;
+>          if ( shiftCount < 0 ) {
+>              *zSig0Ptr =3D aSig1>>( - shiftCount );
+>              *zSig1Ptr =3D aSig1<<( shiftCount & 63 );
+> @@ -3306,7 +3306,7 @@ static void
+>          *zExpPtr =3D - shiftCount - 63;
+>      }
+>      else {
+> -        shiftCount =3D countLeadingZeros64( aSig0 ) - 15;
+> +        shiftCount =3D clz64(aSig0) - 15;
+>          shortShift128Left( aSig0, aSig1, shiftCount, zSig0Ptr, zSig1Ptr =
+);
+>          *zExpPtr =3D 1 - shiftCount;
+>      }
+> @@ -3495,7 +3495,7 @@ static float128 normalizeRoundAndPackFloat128(flag =
+zSign, int32_t zExp,
+>          zSig1 =3D 0;
+>          zExp -=3D 64;
+>      }
+> -    shiftCount =3D countLeadingZeros64( zSig0 ) - 15;
+> +    shiftCount =3D clz64(zSig0) - 15;
+>      if ( 0 <=3D shiftCount ) {
+>          zSig2 =3D 0;
+>          shortShift128Left( zSig0, zSig1, shiftCount, &zSig0, &zSig1 );
+> @@ -3527,7 +3527,7 @@ floatx80 int32_to_floatx80(int32_t a, float_status =
+*status)
+>      if ( a =3D=3D 0 ) return packFloatx80( 0, 0, 0 );
+>      zSign =3D ( a < 0 );
+>      absA =3D zSign ? - a : a;
+> -    shiftCount =3D countLeadingZeros32( absA ) + 32;
+> +    shiftCount =3D clz32(absA) + 32;
+>      zSig =3D absA;
+>      return packFloatx80( zSign, 0x403E - shiftCount, zSig<<shiftCount );
+>
+> @@ -3549,7 +3549,7 @@ float128 int32_to_float128(int32_t a, float_status =
+*status)
+>      if ( a =3D=3D 0 ) return packFloat128( 0, 0, 0, 0 );
+>      zSign =3D ( a < 0 );
+>      absA =3D zSign ? - a : a;
+> -    shiftCount =3D countLeadingZeros32( absA ) + 17;
+> +    shiftCount =3D clz32(absA) + 17;
+>      zSig0 =3D absA;
+>      return packFloat128( zSign, 0x402E - shiftCount, zSig0<<shiftCount, =
+0 );
+>
+> @@ -3571,7 +3571,7 @@ floatx80 int64_to_floatx80(int64_t a, float_status =
+*status)
+>      if ( a =3D=3D 0 ) return packFloatx80( 0, 0, 0 );
+>      zSign =3D ( a < 0 );
+>      absA =3D zSign ? - a : a;
+> -    shiftCount =3D countLeadingZeros64( absA );
+> +    shiftCount =3D clz64(absA);
+>      return packFloatx80( zSign, 0x403E - shiftCount, absA<<shiftCount );
+>
+>  }
+> @@ -3593,7 +3593,7 @@ float128 int64_to_float128(int64_t a, float_status =
+*status)
+>      if ( a =3D=3D 0 ) return packFloat128( 0, 0, 0, 0 );
+>      zSign =3D ( a < 0 );
+>      absA =3D zSign ? - a : a;
+> -    shiftCount =3D countLeadingZeros64( absA ) + 49;
+> +    shiftCount =3D clz64(absA) + 49;
+>      zExp =3D 0x406E - shiftCount;
+>      if ( 64 <=3D shiftCount ) {
+>          zSig1 =3D 0;
+> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macro=
+s.h
+> index 35e1603..edc6821 100644
+> --- a/include/fpu/softfloat-macros.h
+> +++ b/include/fpu/softfloat-macros.h
+> @@ -80,17 +80,6 @@ this code that are retained.
+>   */
+>
+>  /*----------------------------------------------------------------------=
+------
+> -| This macro tests for minimum version of the GNU C compiler.
+> -*-----------------------------------------------------------------------=
+-----*/
+> -#if defined(__GNUC__) && defined(__GNUC_MINOR__)
+> -# define SOFTFLOAT_GNUC_PREREQ(maj, min) \
+> -         ((__GNUC__ << 16) + __GNUC_MINOR__ >=3D ((maj) << 16) + (min))
+> -#else
+> -# define SOFTFLOAT_GNUC_PREREQ(maj, min) 0
+> -#endif
+> -
+> -
+> -/*----------------------------------------------------------------------=
+------
+>  | Shifts `a' right by the number of bits given in `count'.  If any nonze=
+ro
+>  | bits are shifted off, they are ``jammed'' into the least significant b=
+it of
+>  | the result by setting the least significant bit to 1.  The value of `c=
+ount'
+> @@ -713,82 +702,6 @@ static inline uint32_t estimateSqrt32(int aExp, uint=
+32_t a)
+>  }
+>
+>  /*----------------------------------------------------------------------=
+------
+> -| Returns the number of leading 0 bits before the most-significant 1 bit=
+ of
+> -| `a'.  If `a' is zero, 32 is returned.
+> -*-----------------------------------------------------------------------=
+-----*/
+> -
+> -static inline int8_t countLeadingZeros32(uint32_t a)
+> -{
+> -#if SOFTFLOAT_GNUC_PREREQ(3, 4)
+> -    if (a) {
+> -        return __builtin_clz(a);
+> -    } else {
+> -        return 32;
+> -    }
+> -#else
+> -    static const int8_t countLeadingZerosHigh[] =3D {
+> -        8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
+> -        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+> -        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+> -        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+> -        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+> -        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+> -        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+> -        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+> -        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+> -        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+> -        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+> -        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+> -        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+> -        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+> -        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+> -        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+> -    };
+> -    int8_t shiftCount;
+> -
+> -    shiftCount =3D 0;
+> -    if ( a < 0x10000 ) {
+> -        shiftCount +=3D 16;
+> -        a <<=3D 16;
+> -    }
+> -    if ( a < 0x1000000 ) {
+> -        shiftCount +=3D 8;
+> -        a <<=3D 8;
+> -    }
+> -    shiftCount +=3D countLeadingZerosHigh[ a>>24 ];
+> -    return shiftCount;
+> -#endif
+> -}
+> -
+> -/*----------------------------------------------------------------------=
+------
+> -| Returns the number of leading 0 bits before the most-significant 1 bit=
+ of
+> -| `a'.  If `a' is zero, 64 is returned.
+> -*-----------------------------------------------------------------------=
+-----*/
+> -
+> -static inline int8_t countLeadingZeros64(uint64_t a)
+> -{
+> -#if SOFTFLOAT_GNUC_PREREQ(3, 4)
+> -    if (a) {
+> -        return __builtin_clzll(a);
+> -    } else {
+> -        return 64;
+> -    }
+> -#else
+> -    int8_t shiftCount;
+> -
+> -    shiftCount =3D 0;
+> -    if ( a < ( (uint64_t) 1 )<<32 ) {
+> -        shiftCount +=3D 32;
+> -    }
+> -    else {
+> -        a >>=3D 32;
+> -    }
+> -    shiftCount +=3D countLeadingZeros32( a );
+> -    return shiftCount;
+> -#endif
+> -}
+> -
+> -/*----------------------------------------------------------------------=
+------
+>  | Returns 1 if the 128-bit value formed by concatenating `a0' and `a1'
+>  | is equal to the 128-bit value formed by concatenating `b0' and `b1'.
+>  | Otherwise, returns 0.
+
+
+--
+Alex Benn=C3=A9e
