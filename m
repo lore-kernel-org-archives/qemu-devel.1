@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1g82QQ-0001E7-FY
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:08:15 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g82SY-0002qA-Fw
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:10:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1g82QN-00053O-7b
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:08:14 -0400
-References: <1530602398-16127-1-git-send-email-eric.auger@redhat.com>
-	<43a03645-fa17-3274-9a66-502acc27b2ee@redhat.com>
-	<20181004131150.3de8174a@redhat.com>
-	<b673ca5c-f38e-b4a5-7abd-debfa8382e22@redhat.com>
-	<3ee4a49b-77fa-da05-262a-ab75ef1ade84@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <c31b2bee-457f-b262-7173-9fe262f0a332@redhat.com>
-Date: Thu, 4 Oct 2018 14:07:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <3ee4a49b-77fa-da05-262a-ab75ef1ade84@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g82ST-0000oQ-DG
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 08:10:26 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 4 Oct 2018 12:10:17 +0000
+Message-ID: <79d591fa-d839-d5ba-c3e8-6c33ce4ecc0d@virtuozzo.com>
+References: <20181003170228.95973-1-vsementsov@virtuozzo.com>
+	<bccd1e94-431f-c7cf-4a0c-599dcf345e73@redhat.com>
+	<a6a5cfb4-bfad-a4f5-fb86-e9329da851b6@virtuozzo.com>
+	<e4459a14-298e-1cd7-0805-e7ec30c3fb01@redhat.com>
+In-Reply-To: <e4459a14-298e-1cd7-0805-e7ec30c3fb01@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 00/15] ARM virt: PCDIMM/NVDIMM at 2TB
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <50C825A41DC1B74E932368A6E33416E2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/2] nbd server: drop old-style negotiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, shameerali.kolothum.thodi@huawei.com, wei@redhat.com, drjones@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, agraf@suse.de, Laszlo Ersek <lersek@redhat.com>, david@gibson.dropbear.id.au
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>, "rjones@redhat.com" <rjones@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>
 
-Hi David,
-
-On 10/4/18 2:02 PM, David Hildenbrand wrote:
->>>> Alternative to have a split model is having a floating RAM base for a
->>>> contiguous initial + device memory (contiguity actually depends on
->>>> initial RAM size alignment too). This requires significant changes in FW
->>>> and also potentially impacts the legacy virt address map as we need to
->>>> pass the RAM floating base address in some way (using an SRAM at 1GB) or
->>>> using fw_cfg. Is it worth the effort? Also, Peter/Laszlo mentioned their
->>>> reluctance to move the RAM earlier
->>> Drew is working on it, lets see outcome first.
->>>
->>> We actually may try implement single region that uses pc-dimm for
->>> all memory (including initial) and be still compatible with legacy layout
->>> as far as legacy mode sticks to the current RAM limit and device memory
->>> region is put at the current RAM base.
->>> When flexible RAM base is available, we will move that region to
->>> non legacy layout at 2TB (or wherever).
->>
->> Oh I did not understand you wanted to also replace the initial memory by
->> device memory. So we would switch from a pure static initial RAM setup
->> to a pure dynamic device memory setup. Looks quite drastic a change to
->> me. As mentionned I am concerned about complexifying the qemu cmd line
->> and I asked livirt guys about the induced pain.
-> 
-> One idea was to create internal memory devices (e.g. "memory chip") that
-> get created and placed automatically in guest physical address space.
-> These devices would not require a change on the cmdline, they would be
-> created automatically from the existing parameters.
-> 
-> The machine device memory region would than be one big region for both,
-> internal memory devices and external ("plugged") memory devices a.k.a.
-> dimms.
-> 
-> I guess that will require more work to be done.
-
-OK interesting. Yes this adds some more work on the pile ...
-
-Thanks
-
-Eric
-> 
->>
->> Thank you for your feedbacks
->>
->> Eric
-> 
-> 
+MDMuMTAuMjAxOCAyMTowOCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTAvMy8xOCAxMjo1OSBQ
+TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDAzLjEwLjIwMTggMjA6
+MzIsIEVyaWMgQmxha2Ugd3JvdGU6DQo+PiBPbiAxMC8zLzE4IDEyOjAyIFBNLCBWbGFkaW1pciBT
+ZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gSXQncyB1bmV4cGVjdGVkIGJlaGF2aW9yIHRo
+YXQgd2l0aG91dCAteCBvcHRpb24gcWVtdS1uYmQgZG8gb2xkLXN0eWxlDQo+PiBuZWdvdGlhdGlv
+bi4gTGV0J3MgdXNlICIiIGFzIGEgZGVmYXVsdCBuYW1lIGluc3RlYWQgKGFzIGl0IGlzIGFscmVh
+ZHkNCj4+IGRvbmUgaWYgdGxzIGlzIHVzZWQpIGFuZCB0aGVyZWZvcmUsIGRyb3Agb2xkLXN0eWxl
+IG5lZ290aWF0aW9uIGZyb20NCj4+IFFlbXUgTkJEIHNlcnZlci4NCj4NCj4gSG1tLCB5b3VyIGVt
+YWlsIHF1b3Rpbmcgc3R5bGUgY2hhbmdlZCBmcm9tIHByaW9yIGVtYWlscyB0aGF0IHVzZWQgdG8g
+DQo+IHByZXBlbmQgJz4nIHdoZW4gcXVvdGluZywgbWFraW5nIGl0IGhhcmRlciB0byB0ZWxsIHdo
+ZXJlIHRoZSB0ZXh0IHlvdSANCj4gYXJlIHF1b3RpbmcgZW5kcywuLi4NCg0KSSBkaWRuJ3QgY2hh
+bmdlIGFueXRoaW5nLi4uDQoNCj4NCj4+DQo+PiBPZGRseSBlbm91Z2gsIEkgd3JvdGUgYSBzaW1p
+bGFyIHBhdGNoIGluIHBhcmFsbGVsLCBhbmQgYW0gb25seSBub3cgDQo+PiBqdXN0IHNlZWluZyB5
+b3VyIG1haWwuIFlvdXJzIGlzIGEgYml0IHN0cm9uZ2VyIHRoYW4gbWluZSAoSSBhZGRlZCANCj4+
+ICdxZW11LW5iZCAtTycgdG8gYWxsb3cgZXhwbGljaXQgZmFsbGJhY2sgdG8gb2xkc3R5bGUsIHdo
+aWxlIHlvdSANCj4+IHJpcHBlZCBpdCBvdXQgYWx0b2dldGhlcikuwqAgVGhlIGNsaWVudCBjYW4g
+bmVnb3RpYXRlIGVpdGhlciBzdHlsZSwgc28gDQo+PiB3ZSBkb24ndCBuZWVkIGFuIG9wdGlvbiBv
+biB0aGUgY2xpZW50IHNpZGU7IHJhdGhlciwgdGhpcyBpcyBhbGwgYWJvdXQgDQo+PiB3aGF0IHRo
+ZSBzZXJ2ZXIgc2hvdWxkIGRvIGJ5IGRlZmF1bHQuDQo+Pg0KPj4gaHR0cHM6Ly9saXN0cy5nbnUu
+b3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMTAvbXNnMDA1NjguaHRtbA0KPj4NCj4+
+IERvZXMgYW55b25lIGhhdmUgYSBwcmVmZXJlbmNlIGJldHdlZW4gdGhlIHR3bz8gSGVyZSdzIHRo
+ZSBsYXN0IHRpbWUgDQo+PiBpdCB3YXMgZGlzY3Vzc2VkOg0KPj4NCj4+IGh0dHBzOi8vbGlzdHMu
+Z251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTA4L21zZzAzMjUyLmh0bWwNCj4+
+DQo+DQo+IGFuZCB5b3VyIHJlcGx5IGJlZ2lucy4NCj4NCj4+IEhtLCBJIHRoaW5rIGV2ZXJ5b25l
+IHdobyBsaWtlIG5ldy1zdHlsZSBzaG91bGQgYW5zd2VyIHRoYXQgaGUgZG9uJ3QgDQo+PiBjYXJl
+IChleGNlcHQgc3RyaWN0ZXIgd2F5IGlzIGEgYml0IGJldHRlcjogZG9uJ3QgaGF2ZSBvcHRpb25z
+IGFuZCANCj4+IGNvZGUgd2hpY2ggd2UgZG9uJ3QgbmVlZCkuDQo+PiBCdXQgaWYgdGhlcmUgaXMg
+c29tZW9uZSB3aG8gaGFzIGNsaWVudCB3aGljaCBzdXBwb3J0IG9ubHkgb2xkLXN0eWxlIA0KPj4g
+bmVnb3RpYXRpb24gaGlzIHVuaGFwcGluZXNzIChpbiBjYXNlIG9mIHN0cmljdCB3YXkpIHdpbGwg
+b3V0d2VpZ2ggYWxsIA0KPj4gb3VyICJiaXRzIjopDQo+Pg0KPj4gSSdtIGZyb20gdGhlIGZpcnN0
+IGdyb3VwKS4gQnV0IGxldCdzIGNob3NlIHlvdXIgcGF0Y2gNCj4NCj4gTXkgYXJndW1lbnQgaW4g
+ZmF2b3Igb2YgeW91ciBwYXRjaCBvdmVyIG1pbmU6IG5iZGtpdCBpcyBhIEdSRUFUIA0KPiB0ZXN0
+YmVkIGZvciBmb3JjaW5nIGFsbCBzb3J0cyBvZiBpbnRlZ3JhdGlvbiB0ZXN0aW5nIHNjZW5hcmlv
+cywgDQo+IGluY2x1ZGluZyBvbGRzdHlsZSBzZXJ2ZXJzLsKgIEFsc28sIGl0IGluY2x1ZGVzIGEg
+cGx1Z2luIGZvciANCj4gdHJhbnNsYXRpbmcgYmV0d2VlbiBuZXcgYW5kIG9sZHN0eWxlIGF0IHdp
+bGwuwqAgVGhhdCBpcywgaWYgd2UgZXZlciANCj4gbGVnaXRpbWF0ZWx5IGVuY291bnRlciBhIGNs
+aWVudCB0aGF0IGNhbiBvbmx5IHRhbGsgb2xkc3R5bGUsIGJ1dCBxZW11IA0KPiBvbmx5IHRhbGtz
+IG5ld3N0eWxlLCB3ZSBqdXN0IHRlbGwgdGhlIHVzZXIgdG8gY29ubmVjdDoNCj4NCj4gb2xkIGNs
+aWVudCA9PiBuYmRraXQgLW8gbmJkID0+IG5ld3N0eWxlIHFlbXUNCj4NCj4gYW5kIHRoZW4gcWVt
+dSBkb2Vzbid0IGhhdmUgdG8gd29ycnkgYWJvdXQgb2xkc3R5bGUgYmVjYXVzZSBuYmRraXQgZG9l
+cyANCj4gaW5zdGVhZC4NCj4NCg0KdGhpcyBpcyBhIGJpdCBtb3JlIGRpZmZpY3VsdCBhbmQgbW9y
+ZSBvdmVyaGVhZCB0aGFuIG9wdGlvbiBpbiBRZW11Li4gQnV0IA0KSSBkb24ndCBzdXJlIHdlIHNo
+b3VsZCBjYXJlIGFib3V0DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
