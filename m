@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g85mx-0007cj-39
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:43:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g85qm-00025P-UD
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:47:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g85ms-0003Np-Ju
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:43:43 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43068)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g85mo-0003BN-QB
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:43:37 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n1-v6so10452148wrt.10
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 08:43:25 -0700 (PDT)
-References: <20181003180711.19335-1-richard.henderson@linaro.org>
-	<871s96rs4s.fsf@linaro.org> <20181004145525.GA9715@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181004145525.GA9715@flamenco>
-Date: Thu, 04 Oct 2018 16:43:23 +0100
-Message-ID: <87pnwpra3o.fsf@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1g85qm-0006zz-7g
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:47:40 -0400
+Date: Thu, 4 Oct 2018 17:47:23 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181004154723.GI6009@localhost.localdomain>
+References: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1534844779-118784-7-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] softfloat: Fix division
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1534844779-118784-7-git-send-email-anton.nefedov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v4 6/8] scsi: account unmap operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, famz@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com
 
+Am 21.08.2018 um 11:46 hat Anton Nefedov geschrieben:
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  hw/scsi/scsi-disk.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 9d10daf..0aac137 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -1664,6 +1664,10 @@ static void scsi_unmap_complete_noio(UnmapCBData *data, int ret)
+>              goto done;
+>          }
+>  
+> +        block_acct_start(blk_get_stats(s->qdev.conf.blk), &r->acct,
+> +                         r->sector_count * s->qdev.blocksize,
+> +                         BLOCK_ACCT_UNMAP);
 
-Emilio G. Cota <cota@braap.org> writes:
+If the check just above this (check_lba_range) fails, we should account
+for an invalid request.
 
-> On Thu, Oct 04, 2018 at 10:13:55 +0100, Alex Benn=C3=A9e wrote:
->>
->> Richard Henderson <richard.henderson@linaro.org> writes:
->>
->> > Changes from v1:
->> >   * Preserve udiv_qrnnd as a separate division primitive that
->> >     could be used as a building block for float128 division.
->> >   * Include asm fragments for x86_64, s390x, and ppc64.
->>
->> It passes my fops fdiv_double test but Emilio's test is reporting:
->>
->>   Errors found in f64_div, rounding near_even:
->>   +252.7FFFFFFFFFF80  +001.FFFFFFFFFFFFE
->>           =3D> +64F.7FFFFFFFFFF82 ....x  expected +64F.7FFFFFFFFFF81 ...=
-.x
->
-> Did you rebuild the test program? v2 passes all f64_div tests for me.
->
-> Tested-by: Emilio G. Cota <cota@braap.org>
-> for patches 1 and 2.
+>          r->req.aiocb = blk_aio_pdiscard(s->qdev.conf.blk,
+>                                          r->sector * s->qdev.blocksize,
+>                                          r->sector_count * s->qdev.blocksize,
+> @@ -1690,10 +1694,11 @@ static void scsi_unmap_complete(void *opaque, int ret)
+>      r->req.aiocb = NULL;
+>  
+>      aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
+> -    if (scsi_disk_req_check_error(r, ret, false)) {
+> +    if (scsi_disk_req_check_error(r, ret, true)) {
+>          scsi_req_unref(&r->req);
+>          g_free(data);
+>      } else {
+> +        block_acct_done(blk_get_stats(s->qdev.conf.blk), &r->acct);
+>          scsi_unmap_complete_noio(data, ret);
+>      }
+>      aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
+> @@ -1740,10 +1745,12 @@ static void scsi_disk_emulate_unmap(SCSIDiskReq *r, uint8_t *inbuf)
+>      return;
+>  
+>  invalid_param_len:
+> +    block_acct_invalid(blk_get_stats(s->qdev.conf.blk), BLOCK_ACCT_UNMAP);
+>      scsi_check_condition(r, SENSE_CODE(INVALID_PARAM_LEN));
+>      return;
+>  
+>  invalid_field:
+> +    block_acct_invalid(blk_get_stats(s->qdev.conf.blk), BLOCK_ACCT_UNMAP);
+>      scsi_check_condition(r, SENSE_CODE(INVALID_FIELD));
+>  }
 
-Hmm I did:
+What about the blk_is_read_only() case which directly returns without
+jumping to one of the error labels?
 
-  make clean
-  make
-
-in the tests/fp dir multiple times while going through before/after fix
-scenarios. And now of course it works....
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-
->
-> Thanks,
->
-> 		E.
-
-
---
-Alex Benn=C3=A9e
+Kevin
