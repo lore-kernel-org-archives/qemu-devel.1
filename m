@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1g85te-00045B-PK
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:50:39 -0400
+	(envelope-from <philmd@redhat.com>) id 1g85tl-000477-DW
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1g85td-0003wa-70
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:50:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1g85tc-0003vC-TC
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:50:37 -0400
-References: <1538164055-23719-1-git-send-email-wei@redhat.com>
-	<81006285-7644-c03e-a2a8-7458cfd064b8@redhat.com>
-	<bb1a3136-c381-52c6-4ef3-d56ff4320226@redhat.com>
-	<989263ca-b990-ca5d-1ffa-231e848c4da9@redhat.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <74cf547c-0dbe-b76e-377a-2f0f3a3e235b@redhat.com>
-Date: Thu, 4 Oct 2018 10:50:04 -0500
+	(envelope-from <philmd@redhat.com>) id 1g85tg-00045M-B5
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:50:45 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38060)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g85tg-00043N-1j
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 11:50:40 -0400
+Received: by mail-wr1-f66.google.com with SMTP id a13-v6so10469623wrt.5
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 08:50:39 -0700 (PDT)
+References: <1538656491-22950-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1538656491-22950-2-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e4b5917b-2d47-378f-ce78-d8fa9051b053@redhat.com>
+Date: Thu, 4 Oct 2018 17:50:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <989263ca-b990-ca5d-1ffa-231e848c4da9@redhat.com>
+In-Reply-To: <1538656491-22950-2-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] tests: Add migration test for aarch64
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] target/mips: Add bit definitions for
+ DSP R3 ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, drjones@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org, Stefan Markovic <smarkovic@wavecomp.com>
+Cc: dnikolic@wavecomp.com, richard.henderson@linaro.org, amarkovic@wavecomp.com, pjovanovic@wavecomp.com, aurelien@aurel32.net
 
+Hi Aleksandar and Stefan,
 
+On 04/10/2018 14:34, Aleksandar Markovic wrote:
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+> 
+> Add DSP R3 ASE related bit definition for insn_flags and hflags.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  target/mips/cpu.h       | 1 +
+>  target/mips/mips-defs.h | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 28af4d1..4160699 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -598,6 +598,7 @@ struct CPUMIPSState {
+>      /* MIPS DSP resources access. */
+>  #define MIPS_HFLAG_DSP   0x080000  /* Enable access to MIPS DSP resources. */
+>  #define MIPS_HFLAG_DSPR2 0x100000  /* Enable access to MIPS DSPR2 resources. */
+> +#define MIPS_HFLAG_DSPR3 0x20000000 /* Enable access to MIPS DSPR3 resources.*/
 
-On 10/04/2018 10:30 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 04/10/2018 17:27, Wei Huang wrote:
->> On 10/04/2018 10:07 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 28/09/2018 21:47, Wei Huang wrote:
->>> [...]> +++ b/tests/migration/aarch64/Makefile
->>>> @@ -0,0 +1,20 @@
->>>> +# To specify cross compiler prefix, use CROSS_PREFIX=3D
->>>> +#   $ make CROSS_PREFIX=3Daarch64-linux-gnu-
->>>> +
->>>> +.PHONY: all clean
->>>> +all: a-b-kernel.h
->>>> +
->>>> +a-b-kernel.h: aarch64.kernel
->>>> +	echo "$$__note" > header.tmp
->>>
->>> This won't work on a read-only fs.
->>
->> Under which setting? If tmp file can't be generated on a read-only fs,
->> wouldn't $@ have the same problem?
->=20
-> Yes you are right :)
->=20
->>>
->>> Why don't you use $@ directly?
->=20
-> What about this?
+I find it confusing to add this in the middle (rather that at the end)
+of this list. It looks also bug prone, if someone add another definition
+at the end of the list he might use the same value.
 
-Yes, I can address it with the following, along with $(RM) as Drew
-pointed it out.
+>      /* Extra flag about HWREna register. */
+>  #define MIPS_HFLAG_HWRENA_ULR 0x200000 /* ULR bit from HWREna is set. */
+>  #define MIPS_HFLAG_SBRI  0x400000 /* R6 SDBBP causes RI excpt. in user mode */
+> diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
+> index c8e9979..b27b7ae 100644
+> --- a/target/mips/mips-defs.h
+> +++ b/target/mips/mips-defs.h
+> @@ -47,6 +47,7 @@
+>  #define   ASE_MDMX      0x00040000
+>  #define   ASE_DSP       0x00080000
+>  #define   ASE_DSPR2     0x00100000
+> +#define   ASE_DSPR3     0x02000000
 
-a-b-kernel.h: aarch64.kernel
-       echo "$$__note" > $@
-       xxd -i $< | sed -e 's/.*int.*//' >> $@
+Ditto.
 
+>  #define   ASE_MT        0x00200000
+>  #define   ASE_SMARTMIPS 0x00400000
+>  #define   ASE_MICROMIPS 0x00800000
 
->=20
->>>
->>>> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
->>>
->>> Please use:
->>>
->>> xxd -g4 ...
->>
->> This option doesn't work with -i (the include file style output) which
->> is what we want. From xxd manual:
->>
->> "-g bytes | -groupsize bytes
->>     separate the output of every <bytes> bytes (two hex characters or
->>     eight bit-digits each) by a whitespace. Specify -g 0 to suppress
->>     grouping.  <Bytes> defaults to 2 in normal mode and 1 in bits
->>     mode. Grouping does not apply to postscript or include style."
->=20
-> Indeed, too bad.
->=20
->>>
->>> xxd might not be installed on the host.
->>
->> xxd is provided by vim packages. So it should be available in most dis=
-tros.
->>
->>>
->>> That said we should however install it on the docker cross images.
->>
->> Agreed.
->>
->>>
->>>> +	mv header.tmp $@
->>>> +
->>>> +aarch64.kernel: aarch64.elf
->>>> +	$(CROSS_PREFIX)objcopy -O binary $< $@
->>>> +
->>>> +aarch64.elf: a-b-kernel.S
->>>> +	$(CROSS_PREFIX)gcc -o $@ -nostdlib -Wl,--build-id=3Dnone $<
->>>> +
->>>> +clean:
->>>> +	@rm -rf *.kernel *.elf
->>>
+What about adding this patch on top of the "mips: Clean the 'insn_flags'
+namespace" patch which use your suggestion and let available space for
+this ASE flag?
+
+https://lists.gnu.org/archive/html/qemu-devel/2018-09/msg04070.html
+
+Thanks,
+
+Phil.
