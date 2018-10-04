@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1g7tFe-00044o-Dk
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 22:20:33 -0400
+	(envelope-from <cota@braap.org>) id 1g7uq0-0004r0-Jp
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 00:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1g7tFS-0004oq-Nt
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 22:20:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50654)
+	(envelope-from <cota@braap.org>) id 1g7upl-0006OL-AP
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 00:02:00 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:49951)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1g7tFI-00048f-CX
-	for qemu-devel@nongnu.org; Wed, 03 Oct 2018 22:20:12 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed,  3 Oct 2018 23:19:39 -0300
-Message-Id: <20181004021943.22724-1-ehabkost@redhat.com>
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g7upk-0006L3-VW
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 00:01:53 -0400
+Date: Thu, 4 Oct 2018 00:01:47 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181004040147.GA22844@flamenco>
+References: <20181003200454.18384-1-cota@braap.org>
+	<20181003200454.18384-5-cota@braap.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/4] Python queue, 2018-10-03
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181003200454.18384-5-cota@braap.org>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] cputlb: read CPUTLBEntry.addr_write
+ atomically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-The following changes since commit dafd95053611aa14dda40266857608d12ddce6=
-58:
+On Wed, Oct 03, 2018 at 16:04:54 -0400, Emilio G. Cota wrote:
+> Updates can come from other threads, so readers that do not
+> take tlb_lock must use atomic_read to avoid undefined
+> behaviour (UB).
+> 
+> This and the previous commit result in a small performance decrease,
+> but this is a fair price for removing UB.
+(snip)
+> That is, a ~2% slowdown for the aarch64 bootup+shutdown test.
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
-taging (2018-10-02 18:27:18 +0100)
+I've run more tests. This slowdown is much more pronounced on
+memory-heavy workloads. These are the numbers for SPEC06int:
 
-are available in the Git repository at:
+                                Speedup over master
 
-  git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+  1.05 +-+--+----+----+----+----+----+----+---+----+----+----+----+----+--+-+
+       |                                 +++  ||      +++                   |
+       |tlb-lock-noatomic      +++        |  **|       |+++                 |
+       |          +atomic       |  ++++   |  **##      | |                  |
+     1 +-+..+++...............++##.***#...|..**|#......**|................+-+
+       |    ###     ***++     ***# *+*# +++  **+#  +++ **##                 |
+       |    # #     *+*#      *|*# *+*#  ||  ** # **## **|#                 |
+       |    # #     * *#+     *+*# * *#  ||  ** # **+#+**|#     +**  ++###  |
+  0.95 +-+..#.#.....*.*#......*.*#.*.*#.***#.**.#.**.#.**|#......**##***+#+-+
+       |    # #     * *#      * *# * *# *|*# ** # ** # **+#      **+#* * #  |
+       |    # #     * *#      * *# * *# *|*# ** # ** # ** #+++++ ** #* * #  |
+   0.9 +-+***.#..+++*.*#......*.*#.*.*#.*+*#.**.#.**.#.**.#+**|..**.#*.*.#+-+
+       |  * * #***##* *#      * *# * *# * *# ** # ** # ** # **## ** #* * #  |
+       |  * * #* *+#* *#   +++* *# * *# * *# ** # ** # ** # **|# ** #* * #  |
+       |  * * #* * #* *# ***# * *# * *# *+*# ** # ** # ** # **+# ** #* * #  |
+  0.85 +-+*.*.#*.*.#*.*#.*.*#+*.*#.*.*#.*.*#.**.#.**.#.**.#.**.#.**.#*.*.#+-+
+       |  * * #* * #* *# * *# * *# * *# * *# ** # ** # ** # ** # ** #* * #  |
+       |  * * #* * #* *# * *# * *# * *# * *# ** # ** # ** # ** # ** #* * #  |
+       |  * * #* * #* *# * *# * *# * *# * *# ** # ** # ** # ** # ** #* * #  |
+   0.8 +-+***##***##***#-***#-***#-***#-***#-**##-**##-**##-**##-**##***##+-+
+        401.bzi403.g429445.g456.462.libq464.h471.omn4483.xalancbgeomean
 
-for you to fetch changes up to cd0c3da730bc8369f0b6c1c6bf81babd9851060d:
+That is, a 5% average slowdown, with a max slowdown of ~14% for
+mcf :-(
 
-  scripts/device-crash-test: Remove entries for serial devices (2018-10-0=
-3 23:08:51 -0300)
+I'll profile tomorrow and see where the slowdown comes from.
+If the lock is the issue, we might be better off shifting
+all the work to the cross-vCPU call (e.g. doing a round of
+synchronous cross-vCPU calls via run_on_cpu), if the assumption
+that those calls are very rare is correct.
 
-----------------------------------------------------------------
-Python queue, 2018-10-03
-
-* Remove fixed serial device errors from device-crash-test
-* Remove unnecessary Python 2.6 compatibility code
-
-----------------------------------------------------------------
-
-Eduardo Habkost (3):
-  device-crash-test: No need for sys.path hack
-  Revert "docker.py: Python 2.6 argparse compatibility"
-  Revert "tests: migration/guestperf Python 2.6 argparse compatibility"
-
-Thomas Huth (1):
-  scripts/device-crash-test: Remove entries for serial devices
-
- scripts/device-crash-test          | 6 ------
- tests/docker/docker.py             | 4 +---
- tests/migration/guestperf/shell.py | 8 +++-----
- 3 files changed, 4 insertions(+), 14 deletions(-)
-
---=20
-2.18.0.rc1.1.g3f1ff2140
+		Emilio
