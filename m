@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1g8491-00014g-4W
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:58:24 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g84AB-00023c-Ib
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1g848x-0006LD-Ni
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:58:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1g848x-0006Js-E9
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:58:19 -0400
-References: <1538164055-23719-1-git-send-email-wei@redhat.com>
-	<20181004134834.bvvovxyjvyjitkrk@kamzik.brq.redhat.com>
-From: Wei Huang <wei@redhat.com>
-Message-ID: <7f5b7066-80c4-1950-b8ed-2c6118bf4cdb@redhat.com>
-Date: Thu, 4 Oct 2018 08:58:14 -0500
-MIME-Version: 1.0
-In-Reply-To: <20181004134834.bvvovxyjvyjitkrk@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g84A8-0007Fw-73
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:59:35 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 4 Oct 2018 13:59:14 +0000
+Message-ID: <d691c927-e37a-1178-8180-9893278aa02c@virtuozzo.com>
+References: <20181001102928.20533-1-vsementsov@virtuozzo.com>
+	<20181001102928.20533-14-vsementsov@virtuozzo.com>
+	<20181004124421.GC6009@localhost.localdomain>
+In-Reply-To: <20181004124421.GC6009@localhost.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] tests: Add migration test for aarch64
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0D93DA14FCE09E48932485B07B2EEB85@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3 13/18] block: introduce new filter
+ driver: fleecing-hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,300 +27,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, quintela@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>, "wencongyang2@huawei.com" <wencongyang2@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-
-
-On 10/04/2018 08:48 AM, Andrew Jones wrote:
-> On Fri, Sep 28, 2018 at 03:47:35PM -0400, Wei Huang wrote:
->> This patch adds migration test support for aarch64. The test code, which
->> implements the same functionality as x86, is booted as a kernel in qemu.
->> Here are the design choices we make for aarch64:
->>
->>  * We choose this -kernel approach because aarch64 QEMU doesn't provide a
->>    built-in fw like x86 does. So instead of relying on a boot loader, we
->>    use -kernel approach for aarch64.
->>  * The serial output is sent to PL011 directly.
->>  * The physical memory base for mach-virt machine is 0x40000000. We change
->>    the start_address and end_address for aarch64.
->>
->> In addition to providing the binary, this patch also includes the source
->> code and the build script in tests/migration/aarch64. So users can change
->> the source and/or re-compile the binary as they wish.
->>
->> Reviewed-by: Juan Quintela <quintela@redhat.com>
->> Signed-off-by: Wei Huang <wei@redhat.com>
-> 
-> As many times as I've looked at this patch, I feel like I should already
-> have some tag here...
-
-Sorry, Drew. You have provided lots of comments on this patch and
-Reviewed-by name should be in this patch. The last revision was a bigger
-one in other patches (but not this one). So I removed most names in
-order to get more attention.
-
-> 
->> ---
->>  tests/Makefile.include               |  1 +
->>  tests/migration-test.c               | 27 +++++++++++--
->>  tests/migration/Makefile             |  2 +-
->>  tests/migration/aarch64/Makefile     | 20 ++++++++++
->>  tests/migration/aarch64/a-b-kernel.S | 75 ++++++++++++++++++++++++++++++++++++
->>  tests/migration/aarch64/a-b-kernel.h | 19 +++++++++
->>  tests/migration/migration-test.h     |  9 +++++
->>  7 files changed, 148 insertions(+), 5 deletions(-)
->>  create mode 100644 tests/migration/aarch64/Makefile
->>  create mode 100644 tests/migration/aarch64/a-b-kernel.S
->>  create mode 100644 tests/migration/aarch64/a-b-kernel.h
->>
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index d0c0a92..c16e3d1 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -402,6 +402,7 @@ check-qtest-arm-y += tests/hexloader-test$(EXESUF)
->>  check-qtest-aarch64-y = tests/numa-test$(EXESUF)
->>  check-qtest-aarch64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
->>  check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
->> +check-qtest-aarch64-y += tests/migration-test$(EXESUF)
->>  
->>  check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
->>  
->> diff --git a/tests/migration-test.c b/tests/migration-test.c
->> index 20f38f1..5bdc0bd 100644
->> --- a/tests/migration-test.c
->> +++ b/tests/migration-test.c
->> @@ -86,12 +86,13 @@ static const char *tmpfs;
->>   * repeatedly. It outputs a 'B' at a fixed rate while it's still running.
->>   */
->>  #include "tests/migration/i386/a-b-bootblock.h"
->> +#include "tests/migration/aarch64/a-b-kernel.h"
->>  
->> -static void init_bootfile_x86(const char *bootpath)
->> +static void init_bootfile(const char *bootpath, void *content)
->>  {
->>      FILE *bootfile = fopen(bootpath, "wb");
->>  
->> -    g_assert_cmpint(fwrite(x86_bootsect, 512, 1, bootfile), ==, 1);
->> +    g_assert_cmpint(fwrite(content, 512, 1, bootfile), ==, 1);
->>      fclose(bootfile);
->>  }
->>  
->> @@ -428,7 +429,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
->>      got_stop = false;
->>  
->>      if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->> -        init_bootfile_x86(bootpath);
->> +        init_bootfile(bootpath, x86_bootsect);
->>          cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
->>                                    " -name source,debug-threads=on"
->>                                    " -serial file:%s/src_serial"
->> @@ -459,6 +460,24 @@ static int test_migrate_start(QTestState **from, QTestState **to,
->>  
->>          start_address = PPC_TEST_MEM_START;
->>          end_address = PPC_TEST_MEM_END;
->> +    } else if (strcmp(arch, "aarch64") == 0) {
->> +        init_bootfile(bootpath, aarch64_kernel);
->> +        cmd_src = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
->> +                                  "-name vmsource,debug-threads=on -cpu max "
->> +                                  "-m 150M -serial file:%s/src_serial "
->> +                                  "-kernel %s ",
->> +                                  accel, tmpfs, bootpath);
->> +        cmd_dst = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
->> +                                  "-name vmdest,debug-threads=on -cpu max "
->> +                                  "-m 150M -serial file:%s/dest_serial "
->> +                                  "-kernel %s "
->> +                                  "-incoming %s ",
->> +                                  accel, tmpfs, bootpath, uri);
->> +
->> +        start_address = ARM_TEST_MEM_START;
->> +        end_address = ARM_TEST_MEM_END;
->> +
->> +        g_assert(sizeof(aarch64_kernel) <= ARM_TEST_MAX_KERNEL_SIZE);
->>      } else {
->>          g_assert_not_reached();
->>      }
->> @@ -545,7 +564,7 @@ static void test_deprecated(void)
->>  {
->>      QTestState *from;
->>  
->> -    from = qtest_start("");
->> +    from = qtest_start("-machine none");
->>  
->>      deprecated_set_downtime(from, 0.12345);
->>      deprecated_set_speed(from, 12345);
->> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
->> index dc3b551..91237a8 100644
->> --- a/tests/migration/Makefile
->> +++ b/tests/migration/Makefile
->> @@ -5,7 +5,7 @@
->>  # See the COPYING file in the top-level directory.
->>  #
->>  
->> -TARGET_LIST = i386
->> +TARGET_LIST = i386 aarch64
->>  
->>  SRC_PATH = ../..
->>  
->> diff --git a/tests/migration/aarch64/Makefile b/tests/migration/aarch64/Makefile
->> new file mode 100644
->> index 0000000..d440fa8
->> --- /dev/null
->> +++ b/tests/migration/aarch64/Makefile
->> @@ -0,0 +1,20 @@
->> +# To specify cross compiler prefix, use CROSS_PREFIX=
->> +#   $ make CROSS_PREFIX=aarch64-linux-gnu-
->> +
->> +.PHONY: all clean
->> +all: a-b-kernel.h
->> +
->> +a-b-kernel.h: aarch64.kernel
->> +	echo "$$__note" > header.tmp
->> +	xxd -i $< | sed -e 's/.*int.*//' >> header.tmp
->> +	mv header.tmp $@
->> +
->> +aarch64.kernel: aarch64.elf
->> +	$(CROSS_PREFIX)objcopy -O binary $< $@
->> +
->> +aarch64.elf: a-b-kernel.S
->> +	$(CROSS_PREFIX)gcc -o $@ -nostdlib -Wl,--build-id=none $<
->> +
->> +clean:
->> +	@rm -rf *.kernel *.elf
-> 
-> I don't think we need/want '-f'. Why not use $(RM)?
-> 
->> +
->> diff --git a/tests/migration/aarch64/a-b-kernel.S b/tests/migration/aarch64/a-b-kernel.S
->> new file mode 100644
->> index 0000000..0225945
->> --- /dev/null
->> +++ b/tests/migration/aarch64/a-b-kernel.S
->> @@ -0,0 +1,75 @@
->> +#
->> +# Copyright (c) 2018 Red Hat, Inc. and/or its affiliates
->> +#
->> +# Author:
->> +#   Wei Huang <wei@redhat.com>
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2 or later.
->> +# See the COPYING file in the top-level directory.
->> +#
->> +# Note: Please make sure the compiler compiles the assembly code below with
->> +# pc-relative address. Also the branch instructions should use relative
->> +# addresses only.
->> +
->> +#include "../migration-test.h"
->> +
->> +.section .text
->> +
->> +        .globl  _start
->> +
->> +_start:
->> +        /* disable MMU to use phys mem address */
->> +        mrs     x0, sctlr_el1
->> +        bic     x0, x0, #(1<<0)
->> +        msr     sctlr_el1, x0
->> +        isb
->> +
->> +        /* traverse test memory region */
->> +        mov     x0, #ARM_TEST_MEM_START
->> +        mov     x1, #ARM_TEST_MEM_END
->> +
->> +        /* output char 'A' to PL011 */
->> +        mov     w3, 'A'
->> +        mov     x2, #ARM_MACH_VIRT_UART
->> +        strb    w3, [x2]
->> +
->> +        /* clean up memory */
->> +        mov     w3, #0
->> +        mov     x4, x0
->> +clean:
->> +        strb    w3, [x4]
->> +        add     x4, x4, #TEST_MEM_PAGE_SIZE
->> +        cmp     x4, x1
->> +        ble     clean
->> +
->> +        /* w5 keeps a counter so we can limit the output speed */
->> +        mov     w5, #0
->> +
->> +        /* main body */
->> +mainloop:
->> +        mov     x4, x0
->> +
->> +innerloop:
->> +        /* increment the first byte of each page by 1 */
->> +        ldrb    w3, [x4]
->> +        add     w3, w3, #1
->> +        and     w3, w3, #0xff
->> +        strb    w3, [x4]
->> +
->> +        /* make sure QEMU user space can see consistent data as MMU is off */
->> +        dc      civac, x4
->> +
->> +        add     x4, x4, #TEST_MEM_PAGE_SIZE
->> +        cmp     x4, x1
->> +        blt     innerloop
->> +
->> +        add     w5, w5, #1
->> +        and     w5, w5, #0xff
->> +        cmp     w5, #0
->> +        bne     mainloop
->> +
->> +        /* output char 'B' to PL011 */
->> +        mov     w3, 'B'
->> +        strb    w3, [x2]
->> +
->> +        b       mainloop
->> diff --git a/tests/migration/aarch64/a-b-kernel.h b/tests/migration/aarch64/a-b-kernel.h
->> new file mode 100644
->> index 0000000..b1bb375
->> --- /dev/null
->> +++ b/tests/migration/aarch64/a-b-kernel.h
->> @@ -0,0 +1,19 @@
->> +/* This file is automatically generated from the assembly file in
->> + * tests/migration/aarch64. Edit that file and then run "make all"
->> + * inside tests/migration to update, and then remember to send both
->> + * the header and the assembler differences in your patch submission.
->> + */
->> +unsigned char aarch64_kernel[] = {
->> +  0x00, 0x10, 0x38, 0xd5, 0x00, 0xf8, 0x7f, 0x92, 0x00, 0x10, 0x18, 0xd5,
->> +  0xdf, 0x3f, 0x03, 0xd5, 0x00, 0x02, 0xa8, 0xd2, 0x01, 0xc8, 0xa8, 0xd2,
->> +  0x23, 0x08, 0x80, 0x52, 0x02, 0x20, 0xa1, 0xd2, 0x43, 0x00, 0x00, 0x39,
->> +  0x03, 0x00, 0x80, 0x52, 0xe4, 0x03, 0x00, 0xaa, 0x83, 0x00, 0x00, 0x39,
->> +  0x84, 0x04, 0x40, 0x91, 0x9f, 0x00, 0x01, 0xeb, 0xad, 0xff, 0xff, 0x54,
->> +  0x05, 0x00, 0x80, 0x52, 0xe4, 0x03, 0x00, 0xaa, 0x83, 0x00, 0x40, 0x39,
->> +  0x63, 0x04, 0x00, 0x11, 0x63, 0x1c, 0x00, 0x12, 0x83, 0x00, 0x00, 0x39,
->> +  0x24, 0x7e, 0x0b, 0xd5, 0x84, 0x04, 0x40, 0x91, 0x9f, 0x00, 0x01, 0xeb,
->> +  0x2b, 0xff, 0xff, 0x54, 0xa5, 0x04, 0x00, 0x11, 0xa5, 0x1c, 0x00, 0x12,
->> +  0xbf, 0x00, 0x00, 0x71, 0x81, 0xfe, 0xff, 0x54, 0x43, 0x08, 0x80, 0x52,
->> +  0x43, 0x00, 0x00, 0x39, 0xf1, 0xff, 0xff, 0x17
->> +};
->> +
->> diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
->> index c4c0c52..6939a13 100644
->> --- a/tests/migration/migration-test.h
->> +++ b/tests/migration/migration-test.h
->> @@ -18,4 +18,13 @@
->>  #define PPC_TEST_MEM_START (1 * 1024 * 1024)
->>  #define PPC_TEST_MEM_END   (100 * 1024 * 1024)
->>  
->> +/* ARM */
->> +#define ARM_TEST_MEM_START (0x40000000 + 1 * 1024 * 1024)
->> +#define ARM_TEST_MEM_END   (0x40000000 + 100 * 1024 * 1024)
->> +#define ARM_MACH_VIRT_UART 0x09000000
->> +/* AArch64 kernel load address is 0x40080000, and the test memory starts at
->> + * 0x40100000. So the maximum allowable kernel size is 512KB.
->> + */
->> +#define ARM_TEST_MAX_KERNEL_SIZE (512 * 1024)
->> +
->>  #endif /* _TEST_MIGRATION_H_ */
->> -- 
->> 1.8.3.1
->>
->>
-> 
-> Despite the 'rm -f',
-> 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> 
+MDQuMTAuMjAxOCAxNTo0NCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDEuMTAuMjAxOCB1bSAx
+MjoyOSBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IEZs
+ZWVjaW5nLWhvb2sgZmlsdGVyIGRvZXMgY29weS1iZWZvcmUtd3JpdGUgb3BlcmF0aW9uLiBJdCBz
+aG91bGQgYmUNCj4+IGluc2VydGVkIGFib3ZlIGFjdGl2ZSBkaXNrIGFuZCBoYXMgYSB0YXJnZXQg
+bm9kZSBmb3IgQ0JXLCBsaWtlIHRoZQ0KPj4gZm9sbG93aW5nOg0KPj4NCj4+ICAgICAgKy0tLS0t
+LS0rDQo+PiAgICAgIHwgR3Vlc3QgfA0KPj4gICAgICArLS0tKy0tLSsNCj4+ICAgICAgICAgIHxy
+LHcNCj4+ICAgICAgICAgIHYNCj4+ICAgICAgKy0tLSstLS0tLS0tLS0tLSsgIHRhcmdldCAgICst
+LS0tLS0tLS0tLS0tLS0rDQo+PiAgICAgIHwgRmxlZWNpbmcgaG9vayB8LS0tLS0tLS0tLT58IHRh
+cmdldChxY293MikgfA0KPj4gICAgICArLS0tKy0tLS0tLS0tLS0tKyAgIENCVyAgICAgKy0tLSst
+LS0tLS0tLS0tLSsNCj4+ICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICB8DQo+
+PiBiYWNraW5nIHxyLHcgICAgICAgICAgICAgICAgICAgICAgICB8DQo+PiAgICAgICAgICB2ICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgfA0KPj4gICAgICArLS0tKy0tLS0tLS0tLSsgICAgICBi
+YWNraW5nICAgIHwNCj4+ICAgICAgfCBBY3RpdmUgZGlzayB8PC0tLS0tLS0tLS0tLS0tLS0rDQo+
+PiAgICAgICstLS0tLS0tLS0tLS0tKyAgICAgICAgcg0KPj4NCj4+IFRhcmdldCdzIGJhY2tpbmcg
+bWF5IHBvaW50IHRvIGFjdGl2ZSBkaXNrIChzaG91bGQgYmUgc2V0IHVwDQo+PiBzZXBhcmF0ZWx5
+KSwgd2hpY2ggZ2l2ZXMgZmxlZWNpbmctc2NoZW1lLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFZs
+YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4g
+VGhpcyBsYWNrcyBhbiBleHBsYW5hdGlvbiB3aHkgd2UgbmVlZCBhIHNwZWNpYWxpc2VkIGZsZWVj
+aW5nIGhvb2sgZHJpdmVyDQo+IHJhdGhlciB0aGFuIGp1c3QgYSBnZW5lcmljIGJkcnZfYmFja3Vw
+X3RvcCBibG9jayBkcml2ZXIgaW4gYW5hbG9neSB0bw0KPiB3aGF0IGNvbW1pdCBhbmQgbWlycm9y
+IGFyZSBhbHJlYWR5IGRvaW5nLg0KPg0KPiBJbiBmYWN0LCBpZiBJJ20gcmVhZGluZyB0aGUgbGFz
+dCBwYXRjaCBvZiB0aGUgc2VyaWVzIHJpZ2h0LCBiYWNrdXANCj4gZG9lc24ndCBldmVuIHJlc3Ry
+aWN0IHRoZSB1c2Ugb2YgdGhlIGZsZWVjaW5nLWhvb2sgZHJpdmVyIHRvIGFjdHVhbA0KPiBmbGVl
+Y2luZyBzY2VuYXJpb3MuDQo+DQo+IE1heWJlIHdoYXQgZG9lc24ndCBmZWVsIHJpZ2h0IHRvIG1l
+IGlzIGp1c3QgdGhhdCBpdCdzIGEgbWlzbm9tZXIsIGFuZCBpZg0KPiB5b3UgcmVuYW1lIGl0IGlu
+dG8gYmRydl9iYWNrdXBfdG9wIChhbmQgbWFrZSBpdCBpbnRlcm5hbCB0byB0aGUgYmxvY2sNCj4g
+am9iKSwgaXQgaXMgdmVyeSBjbG9zZSB0byB3aGF0IEkgYWN0dWFsbHkgaGF2ZSBpbiBtaW5kPw0K
+Pg0KPiBLZXZpbg0KDQpIbS4NCjEuIGFzc3VtZSB3ZSBtb3ZlIHRvIGludGVybmFsIGJkcnZfYmFj
+a3VwX3RvcA0KMi4gYmFja3VwKG1vZGU9bm9uZSkgYmVjb21lcyBqdXN0IGEgd3JhcHBlciBmb3Ig
+YXBwZW5kL2Ryb3Agb2YgdGhlIA0KYmRydl9iYWNrdXBfdG9wIG5vZGUNCjMuIGxvb2tzIGludGVy
+ZXN0aW5nIHRvIGdldCByaWQgb2YgZW1wdHkgKGRvaW5nIG5vdGhpbmcpIGpvYiBhbmQgdXNlIA0K
+YmRydl9iYWNrdXBfdG9wIGRpcmVjdGx5Lg0KDQpJIHdhbnQgdG8gZmluYWxseSBjcmVhdGUgZGlm
+ZmVyZW50IGJhY2t1cCBzY2hlbWVzLCBiYXNlZCBvbiBmbGVlY2luZyANCmhvb2ssIGZvciBleGFt
+cGxlOg0KDQogwqDCoMKgICstLS0tLS0tKw0KIMKgwqDCoCB8IEd1ZXN0IHwNCiDCoMKgwqAgKy0t
+LS0tLS0rDQogwqDCoMKgwqDCoMKgwqAgfHIsdw0KIMKgwqDCoMKgwqDCoMKgIHYNCiDCoMKgwqAg
+Ky0tLSstLS0tLS0tLS0tLSvCoCB0YXJnZXTCoMKgICstLS0tLS0tLS0tLS0tLS0rICstLS0tLS0t
+LSsNCiDCoMKgwqAgfCBGbGVlY2luZyBob29rICstLS0tLS0tLS0tPisgZmxlZWNpbmctbm9kZSAr
+LS0tLS0tLS0tLT4rIHRhcmdldCB8DQogwqDCoMKgICstLS0rLS0tLS0tLS0tLS0rwqDCoCBDQlfC
+oMKgwqDCoCArLS0tKy0tLS0tLS0tLS0tKyBiYWNrdXAgKy0tLS0tLS0tKw0KIMKgwqDCoMKgwqDC
+oMKgIHzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKG5vIGhvb2spDQpiYWNraW5nIHxyLHfCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCiDCoMKgwqDCoMKgwqDC
+oCB2IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwN
+CiDCoMKgwqAgKy0tLSstLS0tLS0tLS0rwqDCoMKgwqDCoCBiYWNraW5nwqDCoMKgIHwNCiDCoMKg
+wqAgfCBBY3RpdmUgZGlzayArPC0tLS0tLS0tLS0tLS0tLS0rDQogwqDCoMKgICstLS0tLS0tLS0t
+LS0tK8KgwqDCoMKgwqDCoMKgIHINCg0KDQpUaGlzIGlzIG5lZWRlZCBmb3Igc2xvdyBuYmQgdGFy
+Z2V0LCBpZiB3ZSBkb24ndCBuZWVkIHRvIHNsb3cgZG93biBndWVzdCANCndyaXRlcy4NCkhlcmUg
+YmFja3VwKG5vIGhvb2spIGlzIGEgYmFja3VwIGpvYiB3aXRob3V0IGhvb2sgLyB3cml0ZSBub3Rp
+ZmllcnMsIGFzIA0KaXQgYWN0dWFsbHkNCmRvIGNvcHkgZnJvbSBzdGF0aWMgc291cmNlLg0KDQpP
+ciwgd2UgY2FuIHVzZSBtaXJyb3IgaW5zdGVhZCBvZiBiYWNrdXAsIGFzIG1pcnJvciBpcyBhc3lu
+Y2hyb25vdXMgYW5kIA0KaXMgZmFzdGVyIHRoYW4gYmFja3VwLiBXZSBjYW4gZXZlbiB1c2UgbWly
+cm9yIHdpdGggd3JpdGUtYmxvY2tpbmcgbW9kZSANCihwcm9wb3NlZCBieSBNYXgpIGFuZCB1c2Ug
+c29tZXRoaW5nIGxpa2UgbnVsbCBiZHMgKGJ1dCB3aXRoIGJhY2tpbmcpIA0KaW5zdGVhZCBvZiBx
+Y293MiBmbGVlY2luZy1ub2RlIC0gdGhpcyB3aWxsIGltaXRhdGUgY3VycmVudCBiYWNrdXAgDQph
+cHByb2FjaCwgYnV0IHdpdGggbWlycm9yIGluc3RlYWQgb2YgYmFja3VwLg0KDQpPZiBjb3Vyc2Us
+IHdlIGNhbiB1c2Ugb2xkIGJhY2t1cChzeW5jPW5vbmUpIGZvciBhbGwgc3VjaCBzY2hlbWVzLCBJ
+IGp1c3QgDQp0aGluayB0aGF0IGFyY2hpdGVjdHVyZSB3aXRoIGZpbHRlciBub2RlIGlzIG1vcmUg
+Y2xlYW4sIHRoYW4gd2l0aCBiYWNrdXAgDQpqb2IsIHdoaWNoIGxvb2tzIHRoZSBzYW1lIGJ1dCB3
+aXRoIGFkZGl0aW9uYWwgam9iOg0KIMKgwqDCoCArLS0tLS0tLSsNCiDCoMKgwqAgfCBHdWVzdCB8
+DQogwqDCoMKgICstLS0tLS0tKw0KIMKgwqDCoMKgwqDCoMKgIHxyLHcNCiDCoMKgwqDCoMKgwqDC
+oCB2DQogwqDCoMKgICstLS0tLS0tLS0tLS0tLS0rwqAgdGFyZ2V0wqDCoCArLS0tLS0tLS0tLS0t
+LS0tKyArLS0tLS0tLS0rDQogwqDCoMKgIHxiZHJ2X2JhY2t1cF90b3ArLS0tLS0tLS0tLT4rIGZs
+ZWVjaW5nLW5vZGUgKy0tLS0tLS0tLS0+KyB0YXJnZXQgfA0KIMKgwqDCoCArLS0tLS0tLS0tLS0t
+LS0tK8KgwqAgQ0JXwqDCoMKgwqAgKy0tLSstLS0tLS0tLS0tKysgYmFja3VwICstLS0tLS0tLSsN
+CiDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIF7CoCAobm8gaG9vaykNCmJhY2tpbmcg
+fHIsd8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDC
+oMKgwqDCoMKgwqDCoCB8DQogwqDCoMKgwqDCoMKgwqAgdiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIHwNCiDCoMKg
+wqAgKy0tLSstLS0tLS0tLS0rwqDCoMKgwqDCoCBiYWNraW5nwqDCoMKgIHzCoMKgwqDCoMKgwqDC
+oMKgwqAgfA0KIMKgwqDCoCB8IEFjdGl2ZSBkaXNrICs8LS0tLS0tLS0tLS0tLS0tLSvCoMKgwqDC
+oMKgwqDCoMKgwqAgfA0KIMKgwqDCoCArLS0tLS0tLS0tLSstLSvCoMKgwqDCoMKgwqDCoCBywqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCiDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgfA0KIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIGJhY2t1cChzeW5jPW5vbmUpwqDCoCB8DQogwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCArLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsNCg0KDQoNCkZpbmFs
+bHksIHRoZSBmaXJzdCBwaWN0dXJlIGxvb2tzIG5pY2VyIGFuZCBoYXMgbGVzcyBlbnRpdGllcyAo
+YW5kIEkgDQpkaWRuJ3QgZHJhdyB0YXJnZXQgYmxrIHdoaWNoIGJhY2t1cCBjcmVhdGVzIGFuZCBh
+bGwgdGhlIHBlcm1pc3Npb25zKS4gDQpIbW0sIGl0IGFsc28gbWF5IGJlIG1vcmUgZGlmZmljdWx0
+IHRvIHNldHVwIHBlcm1pc3Npb25zIGluIHRoZSBzZWNvbmQgDQpzY2hlbWUsIGJ1dCBJIGRpZG4n
+dCBkaXZlIGludG8uIFdlIGp1c3QgYWdyZWVkIHdpdGggTWF4IHRoYXQgc2VwYXJhdGUgDQpidWls
+ZGluZyBicmljayB3aGljaCBtYXkgYmUgcmV1c2VkIGluIGRpZmZlcmVudCBzY2hlbWVzIGlzIGJl
+dHRlciB0aGFuIA0KaW50ZXJuYWwgdGhpbmcgaW4gYmFja3VwLCBzbywgSSB3ZW50IHRoaXMgd2F5
+LiBIb3dldmVyLCBpZiB5b3UgYXJlIA0KYWdhaW5zdCwgaXQgaXNuJ3QgZGlmZmljdWx0IHRvIG1v
+dmUgaXQgYWxsIGludG8gYmFja3VwLg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoN
+Cg==
