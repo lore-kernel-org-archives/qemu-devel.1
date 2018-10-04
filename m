@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1g83a8-00022W-Ra
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:22:22 -0400
+	(envelope-from <mlureau@redhat.com>) id 1g83aD-00021E-Mz
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1g83Tu-00081i-Ev
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:15:56 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:41324)
+	(envelope-from <mlureau@redhat.com>) id 1g83ZY-0000R7-FG
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:47 -0400
+Received: from mail-it1-f194.google.com ([209.85.166.194]:51755)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1g83Tt-0007xP-4J
-	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:15:54 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id e18-v6so9090941oti.8
-	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 06:15:51 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1g83ZY-0000Qr-A5
+	for qemu-devel@nongnu.org; Thu, 04 Oct 2018 09:21:44 -0400
+Received: by mail-it1-f194.google.com with SMTP id 74-v6so13030521itw.1
+	for <qemu-devel@nongnu.org>; Thu, 04 Oct 2018 06:21:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <CANzW0mvSX5nWuinDU68W2yJzgoQSGAHPqpz0G36A6NKwRsz_4A@mail.gmail.com>
-	<d45bff6c4e472811f01452b5f730c1b6@ispras.ru>
-	<CANzW0mthuW0a7LR7DhpvTPnZ5n5DxtYyfYQf756vtyb9g0O7QQ@mail.gmail.com>
-	<CANzW0muZaNRtOP6OjXJ11HXL_q2MDOhCxY2dXZc2DzHr5BxqLw@mail.gmail.com>
-	<1930792321d9a0b16576359c7cec9f51@ispras.ru>
-In-Reply-To: <1930792321d9a0b16576359c7cec9f51@ispras.ru>
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Thu, 4 Oct 2018 19:15:39 +0600
-Message-ID: <CANzW0mta+dqVQUEPoXMuhwn+QY0+vBoOjBAj7BPmRL=z72Wxjw@mail.gmail.com>
+References: <cover.1538652143.git.tgolembi@redhat.com>
+	<0ad2a56e767a04f8fd2c8cb32ed6c1bc0f1c2497.1538652143.git.tgolembi@redhat.com>
+In-Reply-To: <0ad2a56e767a04f8fd2c8cb32ed6c1bc0f1c2497.1538652143.git.tgolembi@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 4 Oct 2018 17:21:32 +0400
+Message-ID: <CAMxuvay-g7rokzGhjZqk0mrithEAHD-g2pBTHrAouuEXzgt6rQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/25] Fixing record/replay and adding
- reverse debugging
+Subject: Re: [Qemu-devel] [PATCH v4 01/11] qga-win: fix crashes when PCI
+ info cannot be retrived
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,182 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dovgaluk <dovgaluk@ispras.ru>
-Cc: Pavel.Dovgaluk@ispras.ru, qemu-devel@nongnu.org
+To: Tomas Golembiovsky <tgolembi@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Blake, Eric" <eblake@redhat.com>, sjubran@redhat.com, okrishtal@virtuozzo.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-No, it didn't changed test results, at least for
-https://github.com/ispras/qemu/tree/rr-180911 . Even step values it stucks
-on are same for most runs.
-Playing with master and my own branch gives different results for tests
-without sleep=3Doff and -rtc base. It seems that patch you mentioned didn't
-changed them very much.
-The only thing can be said for sure, is that this patch does not fix issues
-completely. But MAY fix them partially or in some other specific cases...
+Hi
+On Thu, Oct 4, 2018 at 3:22 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@=
+redhat.com> wrote:
+>
+> The guest-get-fsinfo command collects also information about PCI
+> controller where the disk is attached. When this fails for some reasons
+> it tries to return just the partial information. However in certain
+> cases the pointer to the structure was not initialized and was set to
+> NULL. This breaks the serializer and leads to a crash of the guest agent.
+>
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> ---
+>  qga/commands-win32.c | 27 ++++++++++++++++++++++-----
+>  1 file changed, 22 insertions(+), 5 deletions(-)
+>
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 98d9735389..9c959122d9 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -633,15 +633,32 @@ static GuestDiskAddressList *build_guest_disk_info(=
+char *guid, Error **errp)
+>           * https://technet.microsoft.com/en-us/library/ee851589(v=3Dws.1=
+0).aspx */
+>          if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi=
+_ad,
+>                              sizeof(SCSI_ADDRESS), &len, NULL)) {
+> +            Error *local_err =3D NULL;
+>              disk->unit =3D addr.Lun;
+>              disk->target =3D addr.TargetId;
+>              disk->bus =3D addr.PathId;
+> -            disk->pci_controller =3D get_pci_info(name, errp);
+> +            g_debug("unit=3D%lld target=3D%lld bus=3D%lld",
+> +                disk->unit, disk->target, disk->bus);
+> +            disk->pci_controller =3D get_pci_info(name, &local_err);
+> +
+> +            if (local_err) {
+> +                g_debug("failed to get PCI controller info: %s",
+> +                    error_get_pretty(local_err));
+> +                error_free(local_err);
+> +            } else if (disk->pci_controller !=3D NULL) {
+> +                g_debug("pci: domain=3D%lld bus=3D%lld slot=3D%lld funct=
+ion=3D%lld",
+> +                    disk->pci_controller->domain,
+> +                    disk->pci_controller->bus,
+> +                    disk->pci_controller->slot,
+> +                    disk->pci_controller->function);
+> +            }
+>          }
+> -        /* We do not set error in this case, because we still have enoug=
+h
+> -         * information about volume. */
+> -    } else {
+> -         disk->pci_controller =3D NULL;
+> +    }
+> +    /* We do not set error in case pci_controller is NULL, because we st=
+ill
+> +     * have enough information about volume. */
+> +    if (disk->pci_controller =3D=3D NULL) {
+> +        g_debug("no PCI controller info");
+> +        disk->pci_controller =3D g_malloc0(sizeof(GuestPCIAddress));
+>      }
 
-=D1=81=D1=80, 3 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 12:47, dovgaluk <do=
-vgaluk@ispras.ru>:
+Shouldn't pci-controller be made optional in the schema instead?
 
-> Can you try applying this patch?
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg563798.html
 >
-> I also encountered the problems with x86_64 replaying and found the
-> misprint in
-> the code which was fixed later, than sending the series to the mailing
-> list.
->
-> Pavel Dovgalyuk
->
->
-> Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-10-02 10:02:
-> > I've added "-monitor stdio" option to command line of Test 1 and
-> > repeated entering command during execution:
-> >
-> >   QEMU 3.0.50 monitor - type 'help' for more information
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 311736195
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 318198367
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 324737211
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 329890795
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 607069789
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 607069789
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 607069789
-> >   ...
-> >
-> > Some notes on value of step it stucks on:
-> > - mostly it's same (even across different record-replay pairs);
-> > - stressing host during replay may cause it to change even for same
-> > record-replay pair (i.e. different replay executions for same file
-> > recorded).
-> >
-> > This specific case seems to be stable to reproduce.
-> >
-> > =D0=B2=D1=82, 2 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 0:22, Artem Pis=
-arenko
-> > <artem.k.pisarenko@gmail.com>:
-> >
-> >> I've posted bug report with extended tests (incl. case without
-> >> sleep=3Doff). You may find guest image (kernel) in bug description.
-> >> https://bugs.launchpad.net/qemu/+bug/1795369 [1]
-> >>
-> >> The most annoying thing is that some issues are almost not
-> >> reproducible. There are definitely race conditions somewhere in qemu
-> >> code. Running 'stress-ng' utility with CPU and I/O stressors in
-> >> parallel with qemu execution greatly minimizes amount of attempts
-> >> when I'm trying to trigger some of issues I encounter.
-> >>
-> >> I'll try 'info monitor' command tomorrow, but no guarantees that
-> >> I'll be able to reproduce issue again.
-> >>
-> >> Speaking about '-nographic' and SDL... I've noted that UI greatly
-> >> minimizes possibility of hanging (but not avoids it completely) when
-> >> using icount in general, so this effect isn't rr-specific. I've
-> >> already reported this bug too.
-> >>
-> >> =D0=BF=D0=BD, 1 =D0=BE=D0=BA=D1=82. 2018 =D0=B3., 20:14 dovgaluk <dovg=
-aluk@ispras.ru>:
-> >>
-> >>> Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-09-30 14:01:
-> >>>> Feature still broken :(
-> >>>
-> >>> Thanks for testing.
-> >>>
-> >>>>
-> >>>> Brief description of my tests.
-> >>>>
-> >>>> Guest image is Linux, which just powers off after kernel boots
-> >>>> (instead of proceeding to user-space /init or /sbin/init).
-> >>>> Base cmdline:
-> >>>> qemu-system-x86_64 -nodefaults -machine pc,accel=3Dtcg -m 2048
-> >>> -cpu
-> >>>> qemu64 -rtc clock=3Dvm,base=3D2000-01-01T00:00:00 -kernel bzImage
-> >>> -initrd
-> >>>> rootfs -append 'nokaslr console=3DttyS0 rdinit=3D/init_poweroff'
-> >>>> -nographic -serial SERIAL_VALUE -icount
-> >>>> 1,sleep=3Doff,rr=3DRR_VALUE,rrfile=3Dicount_rr_capture.bin
-> >>>
-> >>> I've never tried it with sleep=3Doff. Can you remove it and try
-> >>> again?
-> >>>
-> >>> We also seen a problem with '-nographic'. When we remove this
-> >>> option and
-> >>> QEMU runs with SDL
-> >>> window, everything is ok. There is some problem with main loop
-> >>> which may
-> >>> sleep when there
-> >>> is no GUI to update, or something like that. We couldn't fix it
-> >>> yet.
-> >>>
-> >>>>
-> >>>> Test 1. When SERIAL_VALUE=3Dnone
-> >>>> Running with RR_VALUE=3Drecord completes successfully.
-> >>>> Running with RR_VALUE=3Dreplay doesn't completes. qemu process
-> >>> just
-> >>>> eating ~100% cpu and memory usage doesn't grow after some
-> >>> moment. I
-> >>>> don't see what happens because of problem no.2 (see below).
-> >>>
-> >>> Try 'info replay' monitor command. Does instruction counter
-> >>> increases?
-> >>>
-> >>>>
-> >>>> Test 2. When SERIAL_VALUE=3Dstdio
-> >>>> Running with RR_VALUE=3Drecord completes successfully.
-> >>>>
-> >>>> Running with RR_VALUE=3Dreplay caues exit with error:
-> >>>>
-> >>>> "qemu-system-x86_64: Missing character write event in the replay
-> >>> log"
-> >>>>
-> >>>> These problems are same with qemu 2.12 (both vanilla and with
-> >>> previous
-> >>>> versions of these patches applied). Furthemore, I consider whole
-> >>>> icount mode broken and determinism isn't achievable.
-> >>>> The irony is that I actually don't need record/replay feature.
-> >>> I've
-> >>>> tried to use it only as instrument to debug failing determinism
-> >>> in
-> >>>> qemu code. But since replay/record feature itself relies on
-> >>>> determinism, which is broken, it's no wonder why it fails also
-> >>> (I just
-> >>>> hoped to bypass it).
-> >>>>
-> >>>> Contact me if you need more details. I just tired a lot trying
-> >>> to get
-> >>>> all these things working... Hope is leaving me...
-> >>>
-> >>> Can you share the kernel in case the icount still broken?
-> >>>
-> >>> Pavel Dovgalyuk
-> >> --
-> >>
-> >> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-> >> =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
-=BD=D0=BA=D0=BE
-> >  --
-> >
-> > =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-> >   =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=
-=D0=BD=D0=BA=D0=BE
-> >
-> > Links:
-> > ------
-> > [1] https://bugs.launchpad.net/qemu/+bug/1795369
->
+>      list =3D g_malloc0(sizeof(*list));
 > --
-
-=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-  =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=BD=
-=D0=BA=D0=BE
+> 2.19.0
+>
