@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g8SMA-0006aj-Q7
+	(envelope-from <alex.bennee@linaro.org>) id 1g8SMA-0006ai-LT
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g8SM8-0006D1-Qf
+	(envelope-from <alex.bennee@linaro.org>) id 1g8SM8-0006Cm-MT
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:34 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:38979)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:32859)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g8SM8-00068q-B9
+	id 1g8SM8-000655-7V
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:32 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id 61-v6so13303655wrb.6
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 08:49:29 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id e4-v6so14082628wrs.0
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 08:49:22 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  5 Oct 2018 16:49:07 +0100
-Message-Id: <20181005154910.3099-19-alex.bennee@linaro.org>
+Date: Fri,  5 Oct 2018 16:48:59 +0100
+Message-Id: <20181005154910.3099-11-alex.bennee@linaro.org>
 In-Reply-To: <20181005154910.3099-1-alex.bennee@linaro.org>
 References: <20181005154910.3099-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 18/21] linux-user: allow dumping of plugin
- status at end of run
+Subject: [Qemu-devel] [RFC PATCH 10/21] qom/cpu: add a cpu_exit trace event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +30,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-As we don't have a monitor in linux-user mode we need some way of
-exporting our data to the world. We introduce a new -d option (plugin)
-which turns on the existing LOG_TRACE flag which qemu_plugin_status()
-will dump output to before we finally exit.
+This is useful for tracing cpu_exit events where we signal the CPU to
+come back to the main loop.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- linux-user/exit.c | 12 ++++++++++++
- util/log.c        |  2 ++
- 2 files changed, 14 insertions(+)
+ qom/cpu.c        | 3 +++
+ qom/trace-events | 4 ++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-index 14e94e28fa..2f9e016207 100644
---- a/linux-user/exit.c
-+++ b/linux-user/exit.c
-@@ -17,12 +17,23 @@
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 92599f3541..5a77ff6acd 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -19,6 +19,7 @@
   */
+ 
  #include "qemu/osdep.h"
-+#include "qemu/plugins.h"
- #include "qemu.h"
++#include "trace.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qom/cpu.h"
+@@ -111,6 +112,8 @@ void cpu_reset_interrupt(CPUState *cpu, int mask)
  
- #ifdef CONFIG_GCOV
- extern void __gcov_dump(void);
- #endif
- 
-+static void plugin_report(void)
-+{
-+#ifdef CONFIG_TRACE_PLUGIN
-+    GString *plugin_report = qemu_plugin_status("");
-+    qemu_log_mask(LOG_TRACE, "%s", plugin_report->str);
-+    g_string_free(plugin_report, true);
-+#endif
-+}
-+
-+
- void preexit_cleanup(CPUArchState *env, int code)
+ void cpu_exit(CPUState *cpu)
  {
- #ifdef TARGET_GPROF
-@@ -31,5 +42,6 @@ void preexit_cleanup(CPUArchState *env, int code)
- #ifdef CONFIG_GCOV
-         __gcov_dump();
- #endif
-+        plugin_report();
-         gdb_exit(env, code);
- }
-diff --git a/util/log.c b/util/log.c
-index 5759bf571f..d4423277e0 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -288,6 +288,8 @@ const QEMULogItem qemu_log_items[] = {
-     { CPU_LOG_TB_NOCHAIN, "nochain",
-       "do not chain compiled TBs so that \"exec\" and \"cpu\" show\n"
-       "complete traces" },
-+    { LOG_TRACE, "plugin",
-+      "show summary plugin information at end of run." },
-     { 0, NULL, NULL },
- };
++    trace_cpu_exit(cpu, cpu->cpu_index);
++
+     atomic_set(&cpu->exit_request, 1);
+     /* Ensure cpu_exec will see the exit request after TCG has exited.  */
+     smp_wmb();
+diff --git a/qom/trace-events b/qom/trace-events
+index 5d86fbf019..1162dd86fe 100644
+--- a/qom/trace-events
++++ b/qom/trace-events
+@@ -1,5 +1,9 @@
+ # See docs/devel/tracing.txt for syntax documentation.
  
++# qom/cpu.c
++# cpu_exit events
++cpu_exit(void *cpu, int id) "cpu:%p id:%d"
++
+ # qom/object.c
+ object_dynamic_cast_assert(const char *type, const char *target, const char *file, int line, const char *func) "%s->%s (%s:%d:%s)"
+ object_class_dynamic_cast_assert(const char *type, const char *target, const char *file, int line, const char *func) "%s->%s (%s:%d:%s)"
 -- 
 2.17.1
