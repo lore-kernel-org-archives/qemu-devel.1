@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8SF3-0003bG-D0
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:42:16 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g8SM5-0006XM-AM
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8SEx-0000ki-Fx
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:42:13 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:34457)
+	(envelope-from <alex.bennee@linaro.org>) id 1g8SLz-00065T-FU
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:28 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:41147)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g8SEx-0000hx-6c
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:42:07 -0400
-Received: by mail-wm1-f67.google.com with SMTP id z25-v6so4022575wmf.1
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 08:42:07 -0700 (PDT)
-References: <20181004151429.7232-1-crosa@redhat.com>
-	<20181004151429.7232-6-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <acc4179c-13f3-0a55-7731-86b90b20ec0c@redhat.com>
-Date: Fri, 5 Oct 2018 17:42:04 +0200
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g8SLs-0005zF-9v
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:19 -0400
+Received: by mail-wr1-x433.google.com with SMTP id x12-v6so14040562wru.8
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 08:49:13 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri,  5 Oct 2018 16:48:49 +0100
+Message-Id: <20181005154910.3099-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20181004151429.7232-6-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/7] Acceptance Tests: set machine type
+Subject: [Qemu-devel] [RFC PATCH  00/21] Trace updates and plugin RFC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +27,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Caio Carrara <ccarrara@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 04/10/2018 17:14, Cleber Rosa wrote:
-> By setting the machine type, even if it's the one that will be picked
-> based on the arch, it's possible to run the same tests with targets
-> that require a machine type (in addition to those that don't).
-> 
-> Given that only boot_linux_console.py contains code specific to x86_64
-> (an explicit reference to the kernel image that will be used) the
-> other tests can be used to test different targets:
-> 
->   $ avocado run -p arch=aarch64 --filter-by-tags='-x86_64' -- tests/acceptance/
-> 
-> Eventually, to reduce boiler plate code, the idea is to concentrate
-> the basic configuration (arch, machine, console) in either another
-> utility method, or make that happen by default.  This is of course the
-> subject of a future discussion.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  tests/acceptance/boot_linux_console.py | 3 ++-
->  tests/acceptance/version.py            | 2 ++
->  tests/acceptance/vnc.py                | 5 +++++
->  3 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> index 98324f7591..58032f971c 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -30,7 +30,8 @@ class BootLinuxConsole(Test):
->          kernel_hash = '238e083e114c48200f80d889f7e32eeb2793e02a'
->          kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
->  
-> -        self.vm.set_machine('pc')
-> +        self.vm.set_arch(self.arch)
-> +        self.vm.set_machine()
->          self.vm.set_console()
->          kernel_command_line = 'console=ttyS0'
->          self.vm.add_args('-kernel', kernel_path,
-> diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
-> index 13b0a7440d..7a3a20945f 100644
-> --- a/tests/acceptance/version.py
-> +++ b/tests/acceptance/version.py
-> @@ -18,6 +18,8 @@ class Version(Test):
->      :avocado: tags=quick
->      """
->      def test_qmp_human_info_version(self):
-> +        self.vm.set_arch(self.arch)
-> +        self.vm.set_machine()
->          self.vm.launch()
->          res = self.vm.command('human-monitor-command',
->                                command_line='info version')
-> diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
-> index b1ef9d71b1..4a8a83025f 100644
-> --- a/tests/acceptance/vnc.py
-> +++ b/tests/acceptance/vnc.py
-> @@ -16,6 +16,11 @@ class Vnc(Test):
->      :avocado: enable
->      :avocado: tags=vnc,quick
->      """
-> +    def setUp(self):
-> +        super(Vnc, self).setUp()
-> +        self.vm.set_arch(self.arch)
-> +        self.vm.set_machine()
-> +
->      def test_no_vnc(self):
->          self.vm.add_args('-nodefaults', '-S')
->          self.vm.launch()
-> 
+Hi,
 
-$ uname -m
-aarch64
-$ avocado --show=app run
---json-variants-load=tests/acceptance/variants/arch.json
-tests/acceptance/vnc.py
-JOB ID     : 06f38999b7386afbd66023e7c1daee84d7991060
-JOB LOG    :
-/home/phil/avocado/job-results/job-2018-10-05T15.40-06f3899/job.log
- (01/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;aarch64: PASS (0.34 s)
- (02/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;ppc: PASS (0.31 s)
- (03/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;ppc64: PASS (0.35 s)
- (04/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;s390x: PASS (0.24 s)
- (05/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;x86_64: PASS (0.34 s)
- (06/20)
-tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;aarch64: PASS
-(0.34 s)
- (07/20) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;ppc:
-PASS (0.27 s)
- (08/20) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;ppc64:
-PASS (0.34 s)
- (09/20) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;s390x:
-PASS (0.24 s)
- (10/20) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;x86_64:
-PASS (0.35 s)
- (11/20)
-tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_password;aarch64:
-PASS (0.33 s)
- (12/20)
-tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_password;ppc:
-PASS (0.28 s)
- (13/20)
-tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_password;ppc64:
-PASS (0.38 s)
- (14/20)
-tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_password;s390x:
-PASS (0.26 s)
- (15/20)
-tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_password;x86_64:
-PASS (0.35 s)
- (16/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;aarch64:
-PASS (0.35 s)
- (17/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;ppc: PASS
-(0.28 s)
- (18/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;ppc64:
-PASS (0.36 s)
- (19/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;s390x:
-PASS (0.26 s)
- (20/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;x86_64:
-PASS (0.34 s)
-RESULTS    : PASS 20 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0
-| CANCEL 0
-JOB TIME   : 8.30 s
+This series is a combination of general clean-ups to logging and
+tracing and a RFC for extending the tracepoint API by the addition of
+plugins. An example usage would be:
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+  ./aarch64-linux-user/qemu-aarch64 -d plugin,nochain -plugin file=trace/plugins/hotblocks.so,args=5 ./aarch64-linux-user/tests/sha1
+  SHA1=15dd99a1991e0b3826fede3deffc1feba42278e6
+  trace/plugins/hotblocks.so: collected 858d entries in the hash table
+    pc: 0x00000000400260 (64004 hits) 4257 ns between returns
+    pc: 0x00000000419280 (64004 hits) 4256 ns between returns
+    pc: 0x00000000419290 (64003 hits) 4063 ns between returns
+    pc: 0x000000004192d4 (64002 hits) 4063 ns between returns
+    pc: 0x000000004192f0 (64002 hits) 4062 ns between returns
+
+After reviewing Pavel's series I wondered if we could re-use the
+trace-point API as potential hooks for a plugin API. Trace points
+already exist as a series of interesting places in QEMU exposing
+information that can be used for analysis. By re-using them we avoid
+potential duplication of concerns. Adding new hook points becomes a
+simple case of adding a new trace point.
+
+This also allows us to simplify some of the facilities provided to the
+plugins. I currently envision two types of plugin:
+
+  Filter plugins
+
+  These are plugins that sit at a trace point and return true/false to
+  the trace code. This would short-circuit the trace from continuing,
+  essentially filtering out unwanted information. The final data is still
+  exported the usual way using trace APIs many output modes.
+
+  Analysis plugins
+
+  These are plugins that aggregate data in real-time to provide some
+  sort of analysis as they go. They may or may not pass on the trace
+  events to the other trace sub-systems. The example hotblocks plugin
+  is such and example.
+
+While the first set up plugins can re-use the existing trace
+infrastructure to output information the second type needs a
+reporting mechanism. As a result I have added a plugin_status()
+function which can either report on the monitor or in linux-user be
+called on program exit. In both cases the function simply returns a
+string and leaves the details of where it gets output to QEMU itself.
+
+=Further Work=
+
+==Known Limitations==
+
+Currently there is only one hook allowed per trace event. We could
+make this more flexible or simply just error out if two plugins try
+and hook to the same point. What are the expectations of running
+multiple plugins hooking into the same point in QEMU?
+
+==TCG Hooks==
+
+Thanks to Lluís' work the trace API already splits up TCG events into
+translation time and exec time events and provides the machinery for
+hooking a trace helper into the translation stream. Currently that
+helper is unconditionally added although perhaps we could expand the
+call convention a little for TCG events to allow the translation time
+event to filter out planting the execution time helper?
+
+Any serious analysis tool should allow for us to track all memory
+accesses so I think the guest_mem_before trace point should probably
+be split into guest_mem_before_store and guest_mem_after_load. We
+could go the whole hog and add potential trace points for start/end of
+all memory operations.
+
+I did start down this road but the code quickly got ugly when dealing
+with our macrofied access functions. I plan to fish out the
+de-macrofication of softmmu series I posted earlier this year:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03403.html
+
+And see if that can be applied to all our access functions.
+
+===Instruction Tracing===
+
+Pavel's series had a specific hook for instrumenting individual
+instructions. I have not yet added it to this series but I think it be
+done in a slightly cleaner way now we have the ability to insert TCG
+ops into the instruction stream. If we add a tracepoint for post
+instruction generation which passes a buffer with the instruction
+translated and method to insert a helper before or after the
+instruction. This would avoid exposing the cpu_ldst macros to the
+plugins.
+
+So what do people think? Could this be a viable way to extend QEMU
+with plugins?
+
+Alex.
+
+
+Aaron Lindsay (1):
+  trace: add linux-user plugin support
+
+Alex Bennée (19):
+  util/log: allow -dfilter to stack
+  util/log: add qemu_dfilter_append_range()
+  linux-user: add -dfilter progtext shortcut
+  trace: enable the exec_tb trace events
+  trace: keep a count of trace-point hits
+  trace: show trace point counts in the monitor
+  accel/tcg/cputlb: convert tlb_flush debugging into trace events
+  accel/tcg/cputlb: convert remaining tlb_debug() to trace events
+  trace: suppress log output of trace points
+  qom/cpu: add a cpu_exit trace event
+  trace: expose a plugin fn pointer in TraceEvent
+  configure: expose a plugin to the trace-backends
+  tracetool: generate plugin snippets
+  trace: add infrastructure for building plugins
+  hmp: expose status of plugins to the monitor
+  linux-user: allow dumping of plugin status at end of run
+  plugins: add an example hotblocks plugin
+  plugins: add hotness summary to hotblocks
+  plugin: add tlbflush stats plugin
+
+Pavel Dovgalyuk (1):
+  trace: add support for plugin infrastructure
+
+ Makefile                            |   5 +-
+ accel/tcg/cputlb.c                  |  99 +++++-----
+ accel/tcg/trace-events              |  30 ++-
+ configure                           |   6 +
+ hmp-commands-info.hx                |  17 ++
+ include/plugins/plugins.h           |  14 ++
+ include/qemu/log.h                  |   2 +
+ include/qemu/plugins.h              |  19 ++
+ linux-user/exit.c                   |  12 ++
+ linux-user/main.c                   |  31 ++-
+ monitor.c                           |  19 +-
+ qapi/trace.json                     |   3 +-
+ qemu-options.hx                     |  10 +
+ qom/cpu.c                           |   3 +
+ qom/trace-events                    |   4 +
+ scripts/tracetool/backend/plugin.py |  79 ++++++++
+ scripts/tracetool/backend/simple.py |   2 +
+ tests/test-logging.c                |  14 ++
+ trace/Makefile.objs                 |  25 +++
+ trace/control-internal.h            |   6 +
+ trace/event-internal.h              |   4 +
+ trace/plugins.c                     | 154 +++++++++++++++
+ trace/plugins/Makefile.plugins      |  32 ++++
+ trace/plugins/hotblocks/hotblocks.c | 100 ++++++++++
+ trace/plugins/tlbflush/tlbflush.c   | 283 ++++++++++++++++++++++++++++
+ trace/qmp.c                         |   1 +
+ util/log.c                          |  34 +++-
+ vl.c                                |  26 ++-
+ 28 files changed, 962 insertions(+), 72 deletions(-)
+ create mode 100644 include/plugins/plugins.h
+ create mode 100644 include/qemu/plugins.h
+ create mode 100644 scripts/tracetool/backend/plugin.py
+ create mode 100644 trace/plugins.c
+ create mode 100644 trace/plugins/Makefile.plugins
+ create mode 100644 trace/plugins/hotblocks/hotblocks.c
+ create mode 100644 trace/plugins/tlbflush/tlbflush.c
+
+-- 
+2.17.1
