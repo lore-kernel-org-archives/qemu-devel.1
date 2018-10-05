@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g8Ziu-0003ba-Of
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:34 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g8Zj0-0003j0-CG
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g8Zit-0000YJ-Sf
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:32 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g8Ziw-0000bH-GR
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:36 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat,  6 Oct 2018 01:40:17 +0200
-Message-Id: <20181005234023.8104-26-mreitz@redhat.com>
+Date: Sat,  6 Oct 2018 01:40:18 +0200
+Message-Id: <20181005234023.8104-27-mreitz@redhat.com>
 In-Reply-To: <20181005234023.8104-1-mreitz@redhat.com>
 References: <20181005234023.8104-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 25/31] block: Do not copy exact_filename
- from format file
+Subject: [Qemu-devel] [PATCH v11 26/31] block/nvme: Fix
+ bdrv_refresh_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +23,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-If a format BDS's file BDS is in turn a format BDS, we cannot simply use
-the same filename, because when opening a BDS tree based on a filename
-alone, qemu will create only one format node on top of one protocol node
-(disregarding a potential backing file).
+Currently, nvme's bdrv_refresh_filename() is an exact copy of null's
+implementation.  However, for null, "null-co://" and "null-aio://" are
+indeed valid filenames -- for nvme, they are not, as a device address is
+still required.
+
+The correct implementation should generate a filename of the form
+"nvme://[PCI address]/[namespace]" (as the comment above
+nvme_parse_filename() describes).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ block/nvme.c | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
-diff --git a/block.c b/block.c
-index c919093a04..041adb90d1 100644
---- a/block.c
-+++ b/block.c
-@@ -5419,9 +5419,21 @@ void bdrv_refresh_filename(BlockDriverState *bs)
+diff --git a/block/nvme.c b/block/nvme.c
+index 0df7cb30fb..860a3d7113 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -111,6 +111,9 @@ typedef struct {
  
-         bs->exact_filename[0] = '\0';
+     /* Total size of mapped qiov, accessed under dma_map_lock */
+     int dma_map_count;
++
++    /* PCI address (required for nvme_refresh_filename()) */
++    char *device;
+ } BDRVNVMeState;
  
--        /* If no specific options have been given for this BDS, the filename of
--         * the underlying file should suffice for this one as well */
--        if (bs->file->bs->exact_filename[0] && !generate_json_filename) {
-+        /*
-+         * We can use the underlying file's filename if:
-+         * - it has a filename,
-+         * - the file is a protocol BDS, and
-+         * - opening that file (as this BDS's format) will automatically create
-+         *   the BDS tree we have right now, that is:
-+         *   - the user did not significantly change this BDS's behavior with
-+         *     some explicit (strong) options
-+         *   - no non-file child of this BDS has been overridden by the user
-+         *   Both of these conditions are represented by generate_json_filename.
-+         */
-+        if (bs->file->bs->exact_filename[0] &&
-+            bs->file->bs->drv->bdrv_file_open &&
-+            !generate_json_filename)
-+        {
-             strcpy(bs->exact_filename, bs->file->bs->exact_filename);
-         }
-     }
+ #define NVME_BLOCK_OPT_DEVICE "device"
+@@ -558,6 +561,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+ 
+     qemu_co_mutex_init(&s->dma_map_lock);
+     qemu_co_queue_init(&s->dma_flush_queue);
++    s->device = g_strdup(device);
+     s->nsid = namespace;
+     s->aio_context = bdrv_get_aio_context(bs);
+     ret = event_notifier_init(&s->irq_notifier, 0);
+@@ -730,6 +734,8 @@ static void nvme_close(BlockDriverState *bs)
+     event_notifier_cleanup(&s->irq_notifier);
+     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+     qemu_vfio_close(s->vfio);
++
++    g_free(s->device);
+ }
+ 
+ static int nvme_file_open(BlockDriverState *bs, QDict *options, int flags,
+@@ -1060,21 +1066,10 @@ static int nvme_reopen_prepare(BDRVReopenState *reopen_state,
+ 
+ static void nvme_refresh_filename(BlockDriverState *bs)
+ {
+-    const QDictEntry *e;
+-
+-    for (e = qdict_first(bs->full_open_options); e;
+-         e = qdict_next(bs->full_open_options, e))
+-    {
+-        /* These options can be ignored */
+-        if (strcmp(qdict_entry_key(e), "filename") &&
+-            strcmp(qdict_entry_key(e), "driver"))
+-        {
+-            return;
+-        }
+-    }
++    BDRVNVMeState *s = bs->opaque;
+ 
+-    snprintf(bs->exact_filename, sizeof(bs->exact_filename), "%s://",
+-             bs->drv->format_name);
++    snprintf(bs->exact_filename, sizeof(bs->exact_filename), "nvme://%s/%i",
++             s->device, s->nsid);
+ }
+ 
+ static void nvme_refresh_limits(BlockDriverState *bs, Error **errp)
 -- 
 2.17.1
