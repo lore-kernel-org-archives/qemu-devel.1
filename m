@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52575)
+Received: from eggs.gnu.org ([208.118.235.92]:33911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1g8TWe-0003Dk-64
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:04:28 -0400
+	(envelope-from <crosa@redhat.com>) id 1g8TZn-00050X-KQ
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1g8TWZ-0002Oo-B3
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:04:27 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1g8TWY-0002OP-GU
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:04:22 -0400
-Received: by mail-pg1-x544.google.com with SMTP id a5-v6so4973516pgv.13
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 10:04:22 -0700 (PDT)
-References: <20181005160147.892-1-kraxel@redhat.com>
-	<20181005160147.892-2-kraxel@redhat.com>
-	<CAKmqyKNY+Yziwq_82Oz4yueAvYAzrOev5=0taNm6qpUFcGZcnA@mail.gmail.com>
-	<20181005164800.klw6siygbyk2ipbx@sirius.home.kraxel.org>
-From: Alistair <alistair23@gmail.com>
-Message-ID: <c91440d4-f8ef-7701-f280-995dd63a0988@gmail.com>
-Date: Fri, 5 Oct 2018 10:04:18 -0700
+	(envelope-from <crosa@redhat.com>) id 1g8TZk-0004VM-Dt
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:07:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47360)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g8TZk-0004Ut-4v
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:07:40 -0400
+References: <20181004151429.7232-1-crosa@redhat.com>
+	<20181004151429.7232-7-crosa@redhat.com>
+	<d81c7840-efd9-336c-9538-b032d6c54bdb@redhat.com>
+	<0abf928c-2bca-1303-118d-e53be021168f@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <c67eb021-c094-4d5f-e0a0-572ecabdc0ee@redhat.com>
+Date: Fri, 5 Oct 2018 13:07:29 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181005164800.klw6siygbyk2ipbx@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <0abf928c-2bca-1303-118d-e53be021168f@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] display: add separate config option
- for bochs-display
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 6/7] Acceptance Tests: add variants
+ definition for architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 10/05/2018 09:48 AM, Gerd Hoffmann wrote:
-> On Fri, Oct 05, 2018 at 09:22:29AM -0700, Alistair Francis wrote:
->> On Fri, Oct 5, 2018 at 9:13 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->>>
->>> This allows modern architectures which don't care about vga
->>> compatibility (risc-v for example) build bochs-display without
->>> including all vga emulation too.
+
+
+On 10/5/18 12:32 PM, Eric Blake wrote:
+> On 10/5/18 11:24 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Hi Cleber,
 >>
->> For RISC-V we end up including pci.mak anyway for other things such as
->> NVMe drives. So we don't really need this, but it still seems useful.
-> 
-> Hmm, maybe we should split pci.mak into pci-legacy.mak and pci-express.mak
-> then?
+>> On 04/10/2018 17:14, Cleber Rosa wrote:
+>>> One of the Avocado features relevant to virtualization testing is the
+>>> ability to reuse tests in different scenarios, known as variants.
+>>> This adds a JSON based variants file, that can be used to run most
+>>> tests in a number of different architectures.=C2=A0 It can be run wit=
+h:
+>>>
+>>> =C2=A0=C2=A0=C2=A0 $ avocado run \
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --json-variants-load=3Dtests/acceptanc=
+e/variants/arch.json \
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --filter-by-tags=3D'-x86_64' -- tests/=
+acceptance/
+>=20
+>>> +++ b/tests/acceptance/variants/arch.json
+>>> @@ -0,0 +1 @@
+>>> +[{"paths":["/run/*"],"variant":[["/run/aarch64",[["/run/aarch64",
+>>> "arch", "aarch64"]]]],"variant_id":
+>>> "aarch64"},{"paths":["/run/*"],"variant":[["/run/ppc",[["/run/ppc",
+>>> "arch", "ppc"]]]],"variant_id":
+>>> "ppc"},{"paths":["/run/*"],"variant":[["/run/ppc64",[["/run/ppc64",
+>>> "arch", "ppc64"]]]],"variant_id":
+>>> "ppc64"},{"paths":["/run/*"],"variant":[["/run/s390x",[["/run/s390x",
+>>> "arch", "s390x"]]]],"variant_id":
+>>> "s390x"},{"paths":["/run/*"],"variant":[["/run/x86_64",[["/run/x86_64=
+",
+>>> "arch", "x86_64"]]]],"variant_id": "x86_64"}]
+>>>
+>>
+>> Is this generated? (thinking about the other archs supported).
+>>
 
-That sounds like a good idea.
+It's generated and kept on every job result (jobdata/variants.json).
+Basically, you'd use any varianter plugin on a job, and then you can
+reuse the JSON generated on other jobs.
 
-Alistair
+TBH, I tweaked this one a bit.
 
-> 
-> cheers,
->    Gerd
-> 
+>> You should use some linter ;)
+
+I missed your point here... do you mean the style is not ideal?
+
+>=20
+> Also, that's a long line, which will probably get longer as more suppor=
+t
+> is added. Beyond 990 bytes, it starts risking problems with corruption
+> over email. It's also hard to view what changes incrementally if the
+> single line changes. Is there a way to pretty-print things across
+> multiple lines, for shorter lines and easier reading of future diffs?
+>=20
+
+Yes, good point.  I'll pretty print it.
+
+Just a disclaimer: I've chosen to use a JSON variants because it's a
+core Avocado feature (doesn't require any external plugin), and the
+results are 100% reproducible (the variants are static).  In the future,
+we may consider also shipping (and depending) on other variants.
+
+One idea that is being maturing (and prototype) is a native QEMU
+varianter.  There's some info here:
+
+https://trello.com/c/qW4kMw50/32-guest-abi-machine-type-cpu-model-test-ca=
+ses
+
+Regards,
+- Cleber.
