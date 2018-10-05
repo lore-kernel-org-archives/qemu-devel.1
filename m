@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1g8O1e-00036l-Lj
+	(envelope-from <kraxel@redhat.com>) id 1g8O1e-00036i-Kb
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 07:12:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1g8O1b-0003qd-NY
+	(envelope-from <kraxel@redhat.com>) id 1g8O1a-0003pJ-Fi
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 07:12:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45652)
+Received: from mx1.redhat.com ([209.132.183.28]:40558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g8O1b-0003po-Eq
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 07:12:03 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g8O1a-0003oT-9g
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 07:12:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9095F86674
+	for <qemu-devel@nongnu.org>; Fri,  5 Oct 2018 11:12:01 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  5 Oct 2018 13:11:55 +0200
-Message-Id: <20181005111157.12801-3-kraxel@redhat.com>
-In-Reply-To: <20181005111157.12801-1-kraxel@redhat.com>
-References: <20181005111157.12801-1-kraxel@redhat.com>
+Date: Fri,  5 Oct 2018 13:11:53 +0200
+Message-Id: <20181005111157.12801-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/4] hw/display/qxl: Suppress clang-7 warning
- about misaligned atomic operation
+Subject: [Qemu-devel] [PULL 0/4] Vga 20181005 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +31,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+The following changes since commit dafd95053611aa14dda40266857608d12ddce6=
+58:
 
-If QEMU is compiled with clang-7 it results in the warning:
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2018-10-02 18:27:18 +0100)
 
-hw/display/qxl.c:1884:19: error: misaligned or large atomic operation
-may incur significant performance penalty [-Werror,-Watomic-alignment]
-    old_pending =3D atomic_fetch_or(&d->ram->int_pending, le_events);
-                  ^
+are available in the git repository at:
 
-This is because the Spice headers forgot to define the QXLRam struct
-with the '__aligned__(4)' attribute.  clang 7 and newer will thus
-warn that the access here to int_pending might not be 4-aligned
-(because the QXLRam object d->ram points at might start at a
-misaligned address).  In fact we set up d->ram in init_qxl_ram() so
-it always starts at a 4K boundary, so we know the atomic access here
-is OK.
+  git://git.kraxel.org/qemu tags/vga-20181005-pull-request
 
-Newer Spice versions (with Spice commit
-beda5ec7a6848be20c0cac2a9a8ef2a41e8069c1) will fix the bug;
-for older Spice versions, work around it by telling the compiler
-explicitly that the alignment is OK using __builtin_assume_aligned().
+for you to fetch changes up to edbc4b24bbb179fa9562d4e5313470f10569433c:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 20180927155538.699-1-peter.maydell@linaro.org
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/qemu/compiler.h |  9 +++++++++
- hw/display/qxl.c        | 26 +++++++++++++++++++++++++-
- 2 files changed, 34 insertions(+), 1 deletion(-)
+  edid: fix vendor default (2018-10-05 11:26:56 +0200)
 
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 5843812710..bf47e7bee4 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -122,6 +122,15 @@
- #ifndef __has_feature
- #define __has_feature(x) 0 /* compatibility with non-clang compilers */
- #endif
-+
-+#ifndef __has_builtin
-+#define __has_builtin(x) 0 /* compatibility with non-clang compilers */
-+#endif
-+
-+#if __has_builtin(__builtin_assume_aligned) || QEMU_GNUC_PREREQ(4, 7)
-+#define HAS_ASSUME_ALIGNED
-+#endif
-+
- /* Implement C11 _Generic via GCC builtins.  Example:
-  *
-  *    QEMU_GENERIC(x, (float, sinf), (long double, sinl), sin) (x)
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index 747986478f..e628cf1286 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -1893,7 +1893,31 @@ static void qxl_send_events(PCIQXLDevice *d, uint3=
-2_t events)
-         trace_qxl_send_events_vm_stopped(d->id, events);
-         return;
-     }
--    old_pending =3D atomic_fetch_or(&d->ram->int_pending, le_events);
-+    /*
-+     * Older versions of Spice forgot to define the QXLRam struct
-+     * with the '__aligned__(4)' attribute. clang 7 and newer will
-+     * thus warn that atomic_fetch_or(&d->ram->int_pending, ...)
-+     * might be a misaligned atomic access, and will generate an
-+     * out-of-line call for it, which results in a link error since
-+     * we don't currently link against libatomic.
-+     *
-+     * In fact we set up d->ram in init_qxl_ram() so it always starts
-+     * at a 4K boundary, so we know that &d->ram->int_pending is
-+     * naturally aligned for a uint32_t. Newer Spice versions
-+     * (with Spice commit beda5ec7a6848be20c0cac2a9a8ef2a41e8069c1)
-+     * will fix the bug directly. To deal with older versions,
-+     * we tell the compiler to assume the address really is aligned.
-+     * Any compiler which cares about the misalignment will have
-+     * __builtin_assume_aligned.
-+     */
-+#ifdef HAS_ASSUME_ALIGNED
-+#define ALIGNED_UINT32_PTR(P) ((uint32_t *)__builtin_assume_aligned(P, 4=
-))
-+#else
-+#define ALIGNED_UINT32_PTR(P) ((uint32_t *)P)
-+#endif
-+
-+    old_pending =3D atomic_fetch_or(ALIGNED_UINT32_PTR(&d->ram->int_pend=
-ing),
-+                                  le_events);
-     if ((old_pending & le_events) =3D=3D le_events) {
-         return;
-     }
+----------------------------------------------------------------
+vga: edid fixes, qxl clang workaround, vga mmio subregion fix.
+
+----------------------------------------------------------------
+
+Eric Blake (1):
+  edid: Ignore built binary
+
+Gerd Hoffmann (1):
+  edid: fix vendor default
+
+Peter Maydell (1):
+  hw/display/qxl: Suppress clang-7 warning about misaligned atomic
+    operation
+
+remy.noel (1):
+  secondary-vga: delete mmio subregions upon exit
+
+ include/hw/display/edid.h  |  2 +-
+ include/qemu/compiler.h    |  9 +++++++++
+ hw/display/edid-generate.c |  2 +-
+ hw/display/qxl.c           | 26 +++++++++++++++++++++++++-
+ hw/display/vga-pci.c       |  8 ++++++++
+ .gitignore                 |  1 +
+ 6 files changed, 45 insertions(+), 3 deletions(-)
+
 --=20
 2.9.3
