@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g8XRc-0003gl-6T
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 17:15:37 -0400
+	(envelope-from <mlureau@redhat.com>) id 1g8Yeb-0003Uf-Bn
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 18:33:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g8XRR-0000lQ-6e
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 17:15:28 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:44649)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g8XR9-0000b7-Em
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 17:15:15 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Fri,  5 Oct 2018 17:14:47 -0400
-Message-Id: <20181005211450.847-2-cota@braap.org>
-In-Reply-To: <20181005211450.847-1-cota@braap.org>
-References: <20181005211450.847-1-cota@braap.org>
+	(envelope-from <mlureau@redhat.com>) id 1g8YeY-0002Yi-8I
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 18:33:01 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:41422)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1g8YeY-0002Yb-3q
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 18:32:58 -0400
+Received: by mail-io1-f68.google.com with SMTP id q4-v6so11847785iob.8
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 15:32:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 1/4] exec: introduce tlb_init
+References: <20180914135230.15178-1-marcandre.lureau@redhat.com>
+	<20181005135052.GA4113@lpt>
+	<CAMxuvawF+5=GyP70FNzS3zWfoe7Ca667hMKqmjWkhCe_bNCCMg@mail.gmail.com>
+	<20181005155850.vci6pt27rumdlq6t@sirius.home.kraxel.org>
+In-Reply-To: <20181005155850.vci6pt27rumdlq6t@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Sat, 6 Oct 2018 02:32:45 +0400
+Message-ID: <CAMxuvazsSRvwRpDH=MR4kEnQCJgcv3FOb+hn-rdfKO3Gtpy4sw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: define conventions for
+ vhost-user backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Hoffmann, Gerd" <kraxel@redhat.com>
+Cc: =?UTF-8?Q?J=C3=A1n_Tomko?= <jtomko@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Kaplansky,
+	Victor" <victork@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, libvir-list <libvir-list@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Coquelin,
+	Maxime" <maxime.coquelin@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Felipe Franciosi <felipe@nutanix.com>, "Liu, Changpeng" <changpeng.liu@intel.com>
 
-Paves the way for the addition of a per-TLB lock.
+Hi
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- include/exec/exec-all.h | 8 ++++++++
- accel/tcg/cputlb.c      | 4 ++++
- exec.c                  | 1 +
- 3 files changed, 13 insertions(+)
+On Fri, Oct 5, 2018 at 7:59 PM Hoffmann, Gerd <kraxel@redhat.com> wrote:
+>
+>   Hi,
+>
+> > For example, "virgl" support may not be implemented. This
+> > --print-capabilities is a simple way to check what the backend
+> > implements.
+>
+> What is the expected behavior in case virgl is implemented by the
+> backend, but not available (due to lack of 3d hardware in the host for
+> example) ?
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 5f78125582..815e5b1e83 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -99,6 +99,11 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
- 
- #if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
- /* cputlb.c */
-+/**
-+ * tlb_init - initialize a CPU's TLB
-+ * @cpu: CPU whose TLB should be initialized
-+ */
-+void tlb_init(CPUState *cpu);
- /**
-  * tlb_flush_page:
-  * @cpu: CPU whose TLB should be flushed
-@@ -258,6 +263,9 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
- void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
-                  uintptr_t retaddr);
- #else
-+static inline void tlb_init(CPUState *cpu)
-+{
-+}
- static inline void tlb_flush_page(CPUState *cpu, target_ulong addr)
- {
- }
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index f4702ce91f..502eea2850 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -73,6 +73,10 @@ QEMU_BUILD_BUG_ON(sizeof(target_ulong) > sizeof(run_on_cpu_data));
- QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
- #define ALL_MMUIDX_BITS ((1 << NB_MMU_MODES) - 1)
- 
-+void tlb_init(CPUState *cpu)
-+{
-+}
-+
- /* flush_all_helper: run fn across all cpus
-  *
-  * If the wait flag is set then the src cpu's helper will be queued as
-diff --git a/exec.c b/exec.c
-index d0821e69aa..4fd831ef06 100644
---- a/exec.c
-+++ b/exec.c
-@@ -965,6 +965,7 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
-         tcg_target_initialized = true;
-         cc->tcg_initialize();
-     }
-+    tlb_init(cpu);
- 
- #ifndef CONFIG_USER_ONLY
-     if (qdev_get_vmsd(DEVICE(cpu)) == NULL) {
--- 
-2.17.1
+I would say either it fails at runtime, or the backend doesn't announce it.
+
+Would you want something else?
