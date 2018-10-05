@@ -1,27 +1,30 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:37194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8RBK-0001vz-2J
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:34:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1g8RBP-0001vz-Hc
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8R8R-0004xr-1z
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:31:23 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g8R8Q-0004vu-Qv
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:31:18 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n1-v6so13779968wrt.10
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 07:31:18 -0700 (PDT)
-References: <1538656491-22950-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <25cc757f-f73e-807f-3209-3fbd981e7a46@redhat.com>
-Date: Fri, 5 Oct 2018 16:31:16 +0200
+	(envelope-from <cohuck@redhat.com>) id 1g8R7c-0001uo-Ou
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:30:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37280)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1g8R7c-0001ea-Hp
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:30:28 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 47E9180F8F
+	for <qemu-devel@nongnu.org>; Fri,  5 Oct 2018 14:30:20 +0000 (UTC)
+Date: Fri, 5 Oct 2018 16:30:12 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181005163012.01bb7e73.cohuck@redhat.com>
+In-Reply-To: <1538748792-19444-1-git-send-email-thuth@redhat.com>
+References: <1538748792-19444-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1538656491-22950-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/4] Misc MIPS fixes and improvements for
- October 2018
+Subject: Re: [Qemu-devel] [PATCH] accel: Improve selection of the default
+ accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: dnikolic@wavecomp.com, smarkovic@wavecomp.com, richard.henderson@linaro.org, amarkovic@wavecomp.com, pjovanovic@wavecomp.com, aurelien@aurel32.net
+To: Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-Hi Aleksandar,
+On Fri,  5 Oct 2018 16:13:12 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-On 04/10/2018 14:34, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> When compiling with "--disable-tcg", we currently still use "tcg"
+> as default accelerator. "kvm" should be used in this case instead.
+> Also, some downstream distros provide QEMU binaries which have "kvm"
+> in their names (e.g. "qemu-kvm" on RHEL or "kvm" on Ubuntu) that use
+> KVM by default - and some users might want to do something similar
+> with upstream binaries, too. Accomodate them by using "kvm:tcg" as
+> default when we detect such a binary name.
+
+Heh, we haven't had that discussion for some time ;)
+
 > 
-> This series contains support for DSP R3 availability control and
-> emulation of nanoMIPS EVA instructions.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  accel/accel.c          | 18 +++++++++++++++---
+>  include/sysemu/accel.h |  2 +-
+>  vl.c                   |  2 +-
+>  3 files changed, 17 insertions(+), 5 deletions(-)
 > 
-> Dimitrije Nikolic (2):
->   target/mips: Add opcodes for nanoMIPS EVA instructions
->   target/mips: Implement emulation of nanoMIPS EVA instructions
-> 
-> Stefan Markovic (2):
->   target/mips: Add bit definitions for DSP R3 ASE
->   target/mips: Add availability control for DSP R3 ASE
+> diff --git a/accel/accel.c b/accel/accel.c
+> index 966b2d8..9be195c 100644
+> --- a/accel/accel.c
+> +++ b/accel/accel.c
+> @@ -68,7 +68,7 @@ static int accel_init_machine(AccelClass *acc, MachineState *ms)
+>      return ret;
+>  }
+>  
+> -void configure_accelerator(MachineState *ms)
+> +void configure_accelerator(MachineState *ms, const char *progname)
+>  {
+>      const char *accel;
+>      char **accel_list, **tmp;
+> @@ -79,8 +79,20 @@ void configure_accelerator(MachineState *ms)
+>  
+>      accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
+>      if (accel == NULL) {
+> -        /* Use the default "accelerator", tcg */
+> -        accel = "tcg";
+> +        /* Select the default accelerator */
+> +        int pnlen = strlen(progname);
+> +        if (pnlen >= 3 && g_str_equal(&progname[pnlen - 3], "kvm")) {
+> +            /* If the program name ends with "kvm", we prefer KVM */
+> +            accel = "kvm:tcg";
 
-It seems all these patches miss their author Signed-off-by tag.
+Ends, or also starts?
 
-Regards,
+(In general, that approach probably makes more sense than the current
+default.)
 
-Phil.
+> +        } else {
+> +#if defined(CONFIG_TCG)
+> +            accel = "tcg";
+> +#elif defined(CONFIG_KVM)
+> +            accel = "kvm";
+> +#else
+> +#error "No default accelerator available"
+
+So, we can't configure a qemu with neither tcg nor kvm, but for example
+with hax or xen? (Is that possible today?)
+
+> +#endif
+> +        }
+>      }
+>  
+>      accel_list = g_strsplit(accel, ":", 0);
+
+ISTR that we had a suggestion last time that we should provide
+qemu-kvm, qemu-tcg, etc. binaries...
