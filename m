@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8QUc-0005pB-QA
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:50:11 -0400
+	(envelope-from <jtomko@redhat.com>) id 1g8QW2-0000d4-5o
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8QUX-00033j-0M
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:50:10 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:46643)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g8QUW-000339-P7
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:50:04 -0400
-Received: by mail-wr1-f66.google.com with SMTP id a2-v6so6570006wrc.13
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 06:50:04 -0700 (PDT)
-References: <20181001115704.701-1-luc.michel@greensocs.com>
-	<20181001115704.701-16-luc.michel@greensocs.com>
-	<35ffbd68-f783-b6f4-18a2-dd995819c046@redhat.com>
-	<CAFEAcA9vHi=qrV-Aj5ptgBQntafLGwL6VezxnmOuuR=6=Pr8cA@mail.gmail.com>
-	<33c3ea72-652a-53b2-4865-830f3d7f2c3a@greensocs.com>
-	<3d459f14-b701-02b6-d231-fc48c509640f@redhat.com>
-	<20181004195225.GV5738@habkost.net>
-	<CAFEAcA9tT5iFAo5DG=3dyBYNjBVN9u2qEK6Bo9Rf2MAPMBC6bg@mail.gmail.com>
-	<20181004215352.GW5738@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e4724ba3-4dbc-7b79-b520-96b69be1a73c@redhat.com>
-Date: Fri, 5 Oct 2018 15:50:01 +0200
+	(envelope-from <jtomko@redhat.com>) id 1g8QVt-0004pm-9s
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:51:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55812)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1g8QVn-0004i5-NE
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:51:24 -0400
+Date: Fri, 5 Oct 2018 15:50:52 +0200
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+Message-ID: <20181005135052.GA4113@lpt>
+References: <20180914135230.15178-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181004215352.GW5738@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 15/15] arm/xlnx-zynqmp: put APUs and
- RPUs in separate GDB groups
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="fdj2RfSjLxBAspz7"
+Content-Disposition: inline
+In-Reply-To: <20180914135230.15178-1-marcandre.lureau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: define conventions for
+ vhost-user backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,40 +28,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Luc Michel <luc.michel@greensocs.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair@alistair23.me>, Mark Burton <mark.burton@greensocs.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Victor Kaplansky <victork@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, Changpeng Liu <changpeng.liu@intel.com>
 
-On 04/10/2018 23:53, Eduardo Habkost wrote:
-> On Thu, Oct 04, 2018 at 09:01:09PM +0100, Peter Maydell wrote:
->> On 4 October 2018 at 20:52, Eduardo Habkost <ehabkost@redhat.com> wrote:
->>> Changing the object hierarchy based on GDB groups doesn't seem
->>> right, but I don't think it would be a big deal if we have the
->>> board code explicitly telling the GDB code how to group the CPUs.
->>>
->>> If you really want to do it implicitly, would it work if you
->>> simply group the CPUs based on object_get_canonical_path()?
->>>
->>> If a more explicit GDB grouping API is acceptable, what about
->>> just adding a INTERFACE_GDB_GROUP interface name to (existing)
->>> container objects that we expect to become GDB groups?
->>>
->>> I'm not sure which way is better. I'm a bit worried that making
->>> things too implicit could easily break (e.g. if somebody changes
->>> the CPU QOM hierarchy in the future for unrelated reasons).
->>
->> I don't want things implicit. I just don't want the explicitness
->> to be "this is all about GDB", because it isn't. I want us
->> to explicitly say "these 4 CPUs are in one cluster" (or
->> whatever term we use), because that affects more than merely GDB.
-> 
-> We already have a way to say "these 4 CPUs are in one cluster",
-> don't we?  That's the QOM hierarchy.
-> 
-> My question is if "the CPUs are in one cluster" should implicitly
-> mean "the CPUs are in one GDB group".
-> 
 
-What about having the container implement INTERFACE_CPU_CLUSTER?
+--fdj2RfSjLxBAspz7
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Or even cleaner, add a TYPE_CPU_CLUSTER which is just a container for
-TYPE_CPU[*]?
+On Fri, Sep 14, 2018 at 05:52:30PM +0400, Marc-Andr=E9 Lureau wrote:
+>As discussed during "[PATCH v4 00/29] vhost-user for input & GPU"
+>review, let's define a common set of backend conventions to help with
+>management layer implementation, and interoperability.
+>
+>v2:
+> - drop --pidfile
+> - add some notes about daemonizing & stdin/out/err
+>
+>Cc: libvir-list@redhat.com
+>Cc: Gerd Hoffmann <kraxel@redhat.com>
+>Cc: Daniel P. Berrang=E9 <berrange@redhat.com>
+>Cc: Changpeng Liu <changpeng.liu@intel.com>
+>Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>Cc: Felipe Franciosi <felipe@nutanix.com>
+>Cc: Gonglei <arei.gonglei@huawei.com>
+>Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
+>Cc: Michael S. Tsirkin <mst@redhat.com>
+>Cc: Victor Kaplansky <victork@redhat.com>
+>Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+>---
+> docs/interop/vhost-user.txt | 109 +++++++++++++++++++++++++++++++++++-
+> 1 file changed, 107 insertions(+), 2 deletions(-)
+>
+>diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+>index ba5e37d714..339b335e9c 100644
+>--- a/docs/interop/vhost-user.txt
+>+++ b/docs/interop/vhost-user.txt
+>@@ -17,8 +17,13 @@ The protocol defines 2 sides of the communication, mast=
+er and slave. Master is
+> the application that shares its virtqueues, in our case QEMU. Slave is the
+> consumer of the virtqueues.
+>
+>-In the current implementation QEMU is the Master, and the Slave is intend=
+ed to
+>-be a software Ethernet switch running in user space, such as Snabbswitch.
+>+In the current implementation QEMU is the Master, and the Slave is the
+>+external process consuming the virtio queues, for example a software
+>+Ethernet switch running in user space, such as Snabbswitch, or a block
+>+device backend processing read & write to a virtual disk. In order to
+>+facilitate interoperability between various backend implementations,
+>+it is recommended to follow the "Backend program conventions"
+>+described in this document.
+>
+> Master and slave can be either a client (i.e. connecting) or server (list=
+ening)
+> in the socket communication.
+>@@ -859,3 +864,103 @@ resilient for selective requests.
+> For the message types that already solicit a reply from the client, the
+> presence of VHOST_USER_PROTOCOL_F_REPLY_ACK or need_reply bit being set b=
+rings
+> no behavioural change. (See the 'Communication' section for details.)
+>+
+>+Backend program conventions
+>+---------------------------
+>+
+>+vhost-user backends provide various services and they may need to be
+>+configured manually depending on the use case. However, it is a good
+>+idea to follow the conventions listed here when possible. Users, QEMU
+>+or libvirt, can then rely on some common behaviour to avoid
+>+heterogenous configuration and management of the backend program and
+>+facilitate interoperability.
+>+
+>+In order to be discoverable, default vhost-user backends should be
+>+located under "/usr/libexec", and be named "vhost-user-$device" where
+>+"$device" is the device name in lower-case following the name listed
+>+in the Linux virtio_ids.h header (ex: the VIRTIO_ID_RPROC_SERIAL
+>+backend would be named "vhost-user-rproc-serial").
+>+
+>+Mechanisms to list, and to select among alternatives implementations
+>+or modify the default backend are not described at this point (a
+>+distribution may use update-alternatives, for example, to list and to
+>+pick a different default backend).
+>+
+>+The backend program must not daemonize itself, but it may be
+>+daemonized by the management layer. It may also have a restricted
+>+access to the system.
+>+
+>+File descriptors 0, 1 and 2 will exist, and have regular
+>+stdin/stdout/stderr usage (they may be redirected to /dev/null by the
+>+management layer, or to a log handler).
+>+
+>+The backend program must end (as quickly and cleanly as possible) when
+>+the SIGTERM signal is received. Eventually, it may be SIGKILL by the
+>+management layer after a few seconds.
+>+
+>+The following command line options have an expected behaviour. They
+>+are mandatory, unless explicitly said differently:
+>+
+>+* --socket-path=3DPATH
+>+
+>+This option specify the location of the vhost-user Unix domain socket.
+
+Will the backend program listen on this socket or connect to it?
+
+>+It is incompatible with --fd.
+>+
+>+* --fd=3DFDNUM
+>+
+>+When this argument is given, the backend program is started with the
+>+vhost-user socket as file descriptor FDNUM. It is incompatible with
+>+--socket-path.
+>+
+>+* --print-capabilities
+>+
+>+Output to stdout a line-seperated list of backend capabilities, and
+>+then exit successfully. Other options and arguments should be ignored,
+>+and the backend program should not perform its normal function.
+>+
+>+At the time of writing, there are no common capabilities. Some
+>+device-specific capabilities are listed in the respective sections. By
+>+convention, device-specific capabilities are prefixed by their device
+>+name.
+
+Ideally, this would not be needed by libvirt.
+QEMU capability probing is nice to have when we need to provide a
+helpful error message (and avoid the lengthy preparation and cleanup
+in case it fails), but absolutely necessary if we need to supply
+different command line arguments to maintain the same functionality.
+
+I was really happy to be able to delete qemu-img help parsing when
+we dropped support for QEMU < 1.5.0 in upstream libvirt,
+see commit e5261d8fe382483a85b86bfad7ba1d28dc939687
+
+So unless the helper's command line arguments get new meaning in new
+versions, libvirt can just pass on all the options requested in domain
+XML and expect the helper to fail if it cannot satisfy them.
+
+Jano
+
+--fdj2RfSjLxBAspz7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAlu3bDQACgkQ+YPwO/Ma
+t52kZAf+Jjs6VTcLBN89hYs+q2D3KsBQ/wYtijpTrBrDbM1Lmk3x4oWH4aOu9l+s
+AAVN+XlQDT3oR25F/1Uq8PCRZQUVVwJL6z3h1vK6Nh62E0F8apCJ42p9F7oXYZTw
+zFDyf/K2dK4q/zrg9PuZJhZqCA17qu0VAh3JGg14lxNnf0sG8cye7hEzqVE35000
+W/c4duz+NjHtvgsVsmTe2hjvuBsWeChreHU3fLkV1sFeaBlHtLA1gH8TpLJSP8WF
+1AxUBnaRpmWHPAdmkLFMC4uXTvfILXVRxbcat1mlfN+yB9PRt2crIc89IjEDTy52
+udR/+c+vuNFebYBcmUQk95iqT2aNXg==
+=A9Sf
+-----END PGP SIGNATURE-----
+
+--fdj2RfSjLxBAspz7--
