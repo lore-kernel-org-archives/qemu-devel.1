@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g8UIf-00013U-R6
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g8UIl-00017J-Hx
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g8UIf-0003Hi-0Y
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:05 -0400
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:34944)
+	(envelope-from <richard.henderson@linaro.org>) id 1g8UIk-0003Kg-77
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:11 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37995)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g8UIe-0003HF-Qk
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:04 -0400
-Received: by mail-oi1-x232.google.com with SMTP id 22-v6so10096508oiz.2
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 10:54:04 -0700 (PDT)
+	id 1g8UIj-0003KQ-Us
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:10 -0400
+Received: by mail-oi1-x244.google.com with SMTP id u197-v6so11093596oif.5
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 10:54:09 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  5 Oct 2018 12:53:40 -0500
-Message-Id: <20181005175350.30752-6-richard.henderson@linaro.org>
+Date: Fri,  5 Oct 2018 12:53:43 -0500
+Message-Id: <20181005175350.30752-9-richard.henderson@linaro.org>
 In-Reply-To: <20181005175350.30752-1-richard.henderson@linaro.org>
 References: <20181005175350.30752-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 05/15] target/arm: Adjust
- aarch64_cpu_dump_state for system mode SVE
+Subject: [Qemu-devel] [PATCH v3 08/15] target/arm: Rewrite
+ helper_sve_ld[234]*_r
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +30,250 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Use the existing helpers to determine if (1) the fpu is enabled,
-(2) sve state is enabled, and (3) the current sve vector length.
+Use the same *_tlb primitives as we use for ld1.
 
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+For linux-user, this hoists the set of helper_retaddr.  For softmmu,
+hoists the computation of the current mmu_idx outside the loop,
+fixes the endianness problem, and moves the main loop out of a
+macro and into an inlined function.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h           | 4 ++++
- target/arm/helper.c        | 6 +++---
- target/arm/translate-a64.c | 8 ++++++--
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ target/arm/sve_helper.c | 210 ++++++++++++++++++++++------------------
+ 1 file changed, 117 insertions(+), 93 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a4ee83dc77..da4d3888ea 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -920,6 +920,10 @@ target_ulong do_arm_semihosting(CPUARMState *env);
- void aarch64_sync_32_to_64(CPUARMState *env);
- void aarch64_sync_64_to_32(CPUARMState *env);
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index d628978431..f712b382f8 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -4285,109 +4285,133 @@ DO_LD1_2(ld1dd,  3, 3)
+ #undef DO_LD1_1
+ #undef DO_LD1_2
  
-+int fp_exception_el(CPUARMState *env, int cur_el);
-+int sve_exception_el(CPUARMState *env, int cur_el);
-+uint32_t sve_zcr_len_for_el(CPUARMState *env, int el);
+-#define DO_LD2(NAME, FN, TYPEE, TYPEM, H)                  \
+-void HELPER(NAME)(CPUARMState *env, void *vg,              \
+-                  target_ulong addr, uint32_t desc)        \
+-{                                                          \
+-    intptr_t i, oprsz = simd_oprsz(desc);                  \
+-    intptr_t ra = GETPC();                                 \
+-    unsigned rd = simd_data(desc);                         \
+-    void *d1 = &env->vfp.zregs[rd];                        \
+-    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
+-    for (i = 0; i < oprsz; ) {                             \
+-        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
+-        do {                                               \
+-            TYPEM m1 = 0, m2 = 0;                          \
+-            if (pg & 1) {                                  \
+-                m1 = FN(env, addr, ra);                    \
+-                m2 = FN(env, addr + sizeof(TYPEM), ra);    \
+-            }                                              \
+-            *(TYPEE *)(d1 + H(i)) = m1;                    \
+-            *(TYPEE *)(d2 + H(i)) = m2;                    \
+-            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
+-            addr += 2 * sizeof(TYPEM);                     \
+-        } while (i & 15);                                  \
+-    }                                                      \
++/*
++ * Common helpers for all contiguous 2,3,4-register predicated loads.
++ */
++static void sve_ld2_r(CPUARMState *env, void *vg, target_ulong addr,
++                      uint32_t desc, int size, uintptr_t ra,
++                      sve_ld1_tlb_fn *tlb_fn)
++{
++    const int mmu_idx = cpu_mmu_index(env, false);
++    intptr_t i, oprsz = simd_oprsz(desc);
++    unsigned rd = simd_data(desc);
++    ARMVectorReg scratch[2] = { };
 +
- static inline bool is_a64(CPUARMState *env)
- {
-     return env->aarch64;
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 3b8d838dbc..a3a3b9672c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4406,7 +4406,7 @@ static const ARMCPRegInfo debug_lpae_cp_reginfo[] = {
-  * take care of raising that exception.
-  * C.f. the ARM pseudocode function CheckSVEEnabled.
-  */
--static int sve_exception_el(CPUARMState *env, int el)
-+int sve_exception_el(CPUARMState *env, int el)
- {
- #ifndef CONFIG_USER_ONLY
-     if (el <= 1) {
-@@ -4464,7 +4464,7 @@ static int sve_exception_el(CPUARMState *env, int el)
- /*
-  * Given that SVE is enabled, return the vector length for EL.
-  */
--static uint32_t sve_zcr_len_for_el(CPUARMState *env, int el)
-+uint32_t sve_zcr_len_for_el(CPUARMState *env, int el)
- {
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     uint32_t zcr_len = cpu->sve_max_vq - 1;
-@@ -12547,7 +12547,7 @@ uint32_t HELPER(crc32c)(uint32_t acc, uint32_t val, uint32_t bytes)
- /* Return the exception level to which FP-disabled exceptions should
-  * be taken, or 0 if FP is enabled.
-  */
--static int fp_exception_el(CPUARMState *env, int cur_el)
-+int fp_exception_el(CPUARMState *env, int cur_el)
- {
- #ifndef CONFIG_USER_ONLY
-     int fpen;
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 8ca3876707..8a24278d79 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -166,11 +166,15 @@ void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
-         cpu_fprintf(f, "\n");
-         return;
-     }
-+    if (fp_exception_el(env, el) != 0) {
-+        cpu_fprintf(f, "    FPU disabled\n");
-+        return;
++    set_helper_retaddr(ra);
++    for (i = 0; i < oprsz; ) {
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
++        do {
++            if (pg & 1) {
++                tlb_fn(env, &scratch[0], i, addr, mmu_idx, ra);
++                tlb_fn(env, &scratch[1], i, addr + size, mmu_idx, ra);
++            }
++            i += size, pg >>= size;
++            addr += 2 * size;
++        } while (i & 15);
 +    }
-     cpu_fprintf(f, "     FPCR=%08x FPSR=%08x\n",
-                 vfp_get_fpcr(env), vfp_get_fpsr(env));
++    set_helper_retaddr(0);
++
++    /* Wait until all exceptions have been raised to write back.  */
++    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
++    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
+ }
  
--    if (arm_feature(env, ARM_FEATURE_SVE)) {
--        int j, zcr_len = env->vfp.zcr_el[1] & 0xf; /* fix for system mode */
-+    if (arm_feature(env, ARM_FEATURE_SVE) && sve_exception_el(env, el) == 0) {
-+        int j, zcr_len = sve_zcr_len_for_el(env, el);
+-#define DO_LD3(NAME, FN, TYPEE, TYPEM, H)                  \
+-void HELPER(NAME)(CPUARMState *env, void *vg,              \
+-                  target_ulong addr, uint32_t desc)        \
+-{                                                          \
+-    intptr_t i, oprsz = simd_oprsz(desc);                  \
+-    intptr_t ra = GETPC();                                 \
+-    unsigned rd = simd_data(desc);                         \
+-    void *d1 = &env->vfp.zregs[rd];                        \
+-    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
+-    void *d3 = &env->vfp.zregs[(rd + 2) & 31];             \
+-    for (i = 0; i < oprsz; ) {                             \
+-        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
+-        do {                                               \
+-            TYPEM m1 = 0, m2 = 0, m3 = 0;                  \
+-            if (pg & 1) {                                  \
+-                m1 = FN(env, addr, ra);                    \
+-                m2 = FN(env, addr + sizeof(TYPEM), ra);    \
+-                m3 = FN(env, addr + 2 * sizeof(TYPEM), ra); \
+-            }                                              \
+-            *(TYPEE *)(d1 + H(i)) = m1;                    \
+-            *(TYPEE *)(d2 + H(i)) = m2;                    \
+-            *(TYPEE *)(d3 + H(i)) = m3;                    \
+-            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
+-            addr += 3 * sizeof(TYPEM);                     \
+-        } while (i & 15);                                  \
+-    }                                                      \
++static void sve_ld3_r(CPUARMState *env, void *vg, target_ulong addr,
++                      uint32_t desc, int size, uintptr_t ra,
++                      sve_ld1_tlb_fn *tlb_fn)
++{
++    const int mmu_idx = cpu_mmu_index(env, false);
++    intptr_t i, oprsz = simd_oprsz(desc);
++    unsigned rd = simd_data(desc);
++    ARMVectorReg scratch[3] = { };
++
++    set_helper_retaddr(ra);
++    for (i = 0; i < oprsz; ) {
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
++        do {
++            if (pg & 1) {
++                tlb_fn(env, &scratch[0], i, addr, mmu_idx, ra);
++                tlb_fn(env, &scratch[1], i, addr + size, mmu_idx, ra);
++                tlb_fn(env, &scratch[2], i, addr + 2 * size, mmu_idx, ra);
++            }
++            i += size, pg >>= size;
++            addr += 3 * size;
++        } while (i & 15);
++    }
++    set_helper_retaddr(0);
++
++    /* Wait until all exceptions have been raised to write back.  */
++    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
++    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
++    memcpy(&env->vfp.zregs[(rd + 2) & 31], &scratch[2], oprsz);
+ }
  
-         for (i = 0; i <= FFR_PRED_NUM; i++) {
-             bool eol;
+-#define DO_LD4(NAME, FN, TYPEE, TYPEM, H)                  \
+-void HELPER(NAME)(CPUARMState *env, void *vg,              \
+-                  target_ulong addr, uint32_t desc)        \
+-{                                                          \
+-    intptr_t i, oprsz = simd_oprsz(desc);                  \
+-    intptr_t ra = GETPC();                                 \
+-    unsigned rd = simd_data(desc);                         \
+-    void *d1 = &env->vfp.zregs[rd];                        \
+-    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
+-    void *d3 = &env->vfp.zregs[(rd + 2) & 31];             \
+-    void *d4 = &env->vfp.zregs[(rd + 3) & 31];             \
+-    for (i = 0; i < oprsz; ) {                             \
+-        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
+-        do {                                               \
+-            TYPEM m1 = 0, m2 = 0, m3 = 0, m4 = 0;          \
+-            if (pg & 1) {                                  \
+-                m1 = FN(env, addr, ra);                    \
+-                m2 = FN(env, addr + sizeof(TYPEM), ra);    \
+-                m3 = FN(env, addr + 2 * sizeof(TYPEM), ra); \
+-                m4 = FN(env, addr + 3 * sizeof(TYPEM), ra); \
+-            }                                              \
+-            *(TYPEE *)(d1 + H(i)) = m1;                    \
+-            *(TYPEE *)(d2 + H(i)) = m2;                    \
+-            *(TYPEE *)(d3 + H(i)) = m3;                    \
+-            *(TYPEE *)(d4 + H(i)) = m4;                    \
+-            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
+-            addr += 4 * sizeof(TYPEM);                     \
+-        } while (i & 15);                                  \
+-    }                                                      \
++static void sve_ld4_r(CPUARMState *env, void *vg, target_ulong addr,
++                      uint32_t desc, int size, uintptr_t ra,
++                      sve_ld1_tlb_fn *tlb_fn)
++{
++    const int mmu_idx = cpu_mmu_index(env, false);
++    intptr_t i, oprsz = simd_oprsz(desc);
++    unsigned rd = simd_data(desc);
++    ARMVectorReg scratch[4] = { };
++
++    set_helper_retaddr(ra);
++    for (i = 0; i < oprsz; ) {
++        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
++        do {
++            if (pg & 1) {
++                tlb_fn(env, &scratch[0], i, addr, mmu_idx, ra);
++                tlb_fn(env, &scratch[1], i, addr + size, mmu_idx, ra);
++                tlb_fn(env, &scratch[2], i, addr + 2 * size, mmu_idx, ra);
++                tlb_fn(env, &scratch[3], i, addr + 3 * size, mmu_idx, ra);
++            }
++            i += size, pg >>= size;
++            addr += 4 * size;
++        } while (i & 15);
++    }
++    set_helper_retaddr(0);
++
++    /* Wait until all exceptions have been raised to write back.  */
++    memcpy(&env->vfp.zregs[rd], &scratch[0], oprsz);
++    memcpy(&env->vfp.zregs[(rd + 1) & 31], &scratch[1], oprsz);
++    memcpy(&env->vfp.zregs[(rd + 2) & 31], &scratch[2], oprsz);
++    memcpy(&env->vfp.zregs[(rd + 3) & 31], &scratch[3], oprsz);
+ }
+ 
+-DO_LD2(sve_ld2bb_r, cpu_ldub_data_ra, uint8_t, uint8_t, H1)
+-DO_LD3(sve_ld3bb_r, cpu_ldub_data_ra, uint8_t, uint8_t, H1)
+-DO_LD4(sve_ld4bb_r, cpu_ldub_data_ra, uint8_t, uint8_t, H1)
++#define DO_LDN_1(N) \
++void __attribute__((flatten)) HELPER(sve_ld##N##bb_r)               \
++    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
++{                                                                   \
++    sve_ld##N##_r(env, vg, addr, desc, 1, GETPC(), sve_ld1bb_tlb);  \
++}
+ 
+-DO_LD2(sve_ld2hh_r, cpu_lduw_data_ra, uint16_t, uint16_t, H1_2)
+-DO_LD3(sve_ld3hh_r, cpu_lduw_data_ra, uint16_t, uint16_t, H1_2)
+-DO_LD4(sve_ld4hh_r, cpu_lduw_data_ra, uint16_t, uint16_t, H1_2)
++#define DO_LDN_2(N, SUFF, SIZE)                                       \
++void __attribute__((flatten)) HELPER(sve_ld##N##SUFF##_r)             \
++    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
++{                                                                     \
++    sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
++                  arm_cpu_data_is_big_endian(env)                     \
++                  ? sve_ld1##SUFF##_be_tlb : sve_ld1##SUFF##_le_tlb); \
++}
+ 
+-DO_LD2(sve_ld2ss_r, cpu_ldl_data_ra, uint32_t, uint32_t, H1_4)
+-DO_LD3(sve_ld3ss_r, cpu_ldl_data_ra, uint32_t, uint32_t, H1_4)
+-DO_LD4(sve_ld4ss_r, cpu_ldl_data_ra, uint32_t, uint32_t, H1_4)
++DO_LDN_1(2)
++DO_LDN_1(3)
++DO_LDN_1(4)
+ 
+-DO_LD2(sve_ld2dd_r, cpu_ldq_data_ra, uint64_t, uint64_t, )
+-DO_LD3(sve_ld3dd_r, cpu_ldq_data_ra, uint64_t, uint64_t, )
+-DO_LD4(sve_ld4dd_r, cpu_ldq_data_ra, uint64_t, uint64_t, )
++DO_LDN_2(2, hh, 2)
++DO_LDN_2(3, hh, 2)
++DO_LDN_2(4, hh, 2)
+ 
+-#undef DO_LD2
+-#undef DO_LD3
+-#undef DO_LD4
++DO_LDN_2(2, ss, 4)
++DO_LDN_2(3, ss, 4)
++DO_LDN_2(4, ss, 4)
++
++DO_LDN_2(2, dd, 8)
++DO_LDN_2(3, dd, 8)
++DO_LDN_2(4, dd, 8)
++
++#undef DO_LDN_1
++#undef DO_LDN_2
+ 
+ /*
+  * Load contiguous data, first-fault and no-fault.
 -- 
 2.17.1
