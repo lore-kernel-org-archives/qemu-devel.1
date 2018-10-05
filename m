@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1g8Q25-0006em-Pj
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:20:42 -0400
+	(envelope-from <philmd@redhat.com>) id 1g8Q3w-0007RI-SC
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1g8Q22-0004PG-HD
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:20:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34686)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1g8Q22-0004O5-6e
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:20:38 -0400
-References: <1538744508-17108-1-git-send-email-thuth@redhat.com>
-	<1538744508-17108-2-git-send-email-thuth@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <7e8077c8-9ee8-b06d-2c2b-ea788c5f9e69@redhat.com>
-Date: Fri, 5 Oct 2018 15:20:30 +0200
+	(envelope-from <philmd@redhat.com>) id 1g8Q3t-0006Xy-I3
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:22:36 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g8Q3t-0006Tm-Ao
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:22:33 -0400
+Received: by mail-wr1-f66.google.com with SMTP id z4-v6so13552591wrb.1
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 06:22:33 -0700 (PDT)
+References: <20181005091934.12143-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <37422acb-9fb7-5794-c9d7-183dc8de5ca3@redhat.com>
+Date: Fri, 5 Oct 2018 15:22:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <1538744508-17108-2-git-send-email-thuth@redhat.com>
+In-Reply-To: <20181005091934.12143-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] cpu: Provide a proper prototype for
- target_words_bigendian() in a header
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] edid: fix vendor default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Alistair Francis <alistair@alistair23.me>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-On 10/05/18 15:01, Thomas Huth wrote:
-> We've got three places already that provide a prototype for this
-> function in a .c file - that's ugly. Let's provide a proper prototype
-> in a header instead, with a proper description why this function should
-> not be used in most cases.
+On 05/10/2018 11:19, Gerd Hoffmann wrote:
+> "EMU" actually is "Emulex Corporation", so not a good idea to use that
+> by default.  Lets use the Red Hat vendor id instead, which is in line
+> with the pci ids which are allocated from Red Hat vendor ids too.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Vendor list is available from http://www.uefi.org/pnp_id_list
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->  NB: I've tried to replace the "utterly broken" comment with something
->  better, as suggested by Laszlo... not sure whether I've really got the
->  message right here, so feel free to provide some better wording if you
->  like!
+>  include/hw/display/edid.h  | 2 +-
+>  hw/display/edid-generate.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
->  exec.c             |  5 -----
->  hw/virtio/virtio.c |  1 -
->  include/qom/cpu.h  | 11 +++++++++++
->  qom/cpu.c          |  1 -
->  4 files changed, 11 insertions(+), 7 deletions(-)
+> diff --git a/include/hw/display/edid.h b/include/hw/display/edid.h
+> index bd51d26916..bacf170889 100644
+> --- a/include/hw/display/edid.h
+> +++ b/include/hw/display/edid.h
+> @@ -4,7 +4,7 @@
+>  #include "hw/hw.h"
+>  
+>  typedef struct qemu_edid_info {
+> -    const char *vendor;
+> +    const char *vendor; /* http://www.uefi.org/pnp_id_list */
+>      const char *name;
+>      const char *serial;
+>      uint32_t    dpi;
+> diff --git a/hw/display/edid-generate.c b/hw/display/edid-generate.c
+> index c80397ea96..37e60fe42a 100644
+> --- a/hw/display/edid-generate.c
+> +++ b/hw/display/edid-generate.c
+> @@ -301,7 +301,7 @@ void qemu_edid_generate(uint8_t *edid, size_t size,
+>      /* =============== set defaults  =============== */
+>  
+>      if (!info->vendor || strlen(info->vendor) != 3) {
+> -        info->vendor = "EMU";
+> +        info->vendor = "RHT";
+>      }
+>      if (!info->name) {
+>          info->name = "QEMU Monitor";
 > 
-> diff --git a/exec.c b/exec.c
-> index d0821e6..5d99ef5 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -3906,11 +3906,6 @@ int qemu_target_page_bits_min(void)
->  }
->  #endif
->  
-> -/*
-> - * A helper function for the _utterly broken_ virtio device model to find out if
-> - * it's running on a big endian machine. Don't do this at home kids!
-> - */
-> -bool target_words_bigendian(void);
->  bool target_words_bigendian(void)
->  {
->  #if defined(TARGET_WORDS_BIGENDIAN)
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 94f5c8e..4e61944 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -1169,7 +1169,6 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t val)
->      return 0;
->  }
->  
-> -bool target_words_bigendian(void);
->  static enum virtio_device_endian virtio_default_endian(void)
->  {
->      if (target_words_bigendian()) {
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index dc130cd..6d35c37 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -1085,6 +1085,17 @@ void cpu_exec_initfn(CPUState *cpu);
->  void cpu_exec_realizefn(CPUState *cpu, Error **errp);
->  void cpu_exec_unrealizefn(CPUState *cpu);
->  
-> +/**
-> + * target_words_bigendian:
-> + * Returns true if the (default) endianness of the target is big endian,
-> + * false otherwise. Note that in target-specifc code, you can use
-> + * TARGET_WORDS_BIGENDIAN directly instead. On the other hand, common
-> + * code should normally never need to know about the endianness of the
-> + * target, so please do *not* use this function unless you know very well
-> + * what you are doing!
-> + */
-> +bool target_words_bigendian(void);
-> +
->  #ifdef NEED_CPU_H
->  
->  #ifdef CONFIG_SOFTMMU
-> diff --git a/qom/cpu.c b/qom/cpu.c
-> index 92599f3..f774654 100644
-> --- a/qom/cpu.c
-> +++ b/qom/cpu.c
-> @@ -194,7 +194,6 @@ static bool cpu_common_debug_check_watchpoint(CPUState *cpu, CPUWatchpoint *wp)
->      return true;
->  }
->  
-> -bool target_words_bigendian(void);
->  static bool cpu_common_virtio_is_big_endian(CPUState *cpu)
->  {
->      return target_words_bigendian();
-> 
-
-This makes sense to me. First I wasn't convinced, because I didn't
-immediately get "target-specifc code". However, after looking at the 2nd
-patch, I think I understand better (= the obj-XXX vs. common-obj-XXX
-distinction). I also think that distinction is clear to any practicing
-QEMU developers.
-
-So, for what it's worth (which is admittedly not too much), for the series:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks
-Laszlo
