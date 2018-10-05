@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g8Zii-0003R4-Ic
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g8Zid-0003Lm-Ag
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g8Zih-00007v-J3
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:20 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g8ZiZ-0008P2-EQ
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:14 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat,  6 Oct 2018 01:40:08 +0200
-Message-Id: <20181005234023.8104-17-mreitz@redhat.com>
+Date: Sat,  6 Oct 2018 01:40:05 +0200
+Message-Id: <20181005234023.8104-14-mreitz@redhat.com>
 In-Reply-To: <20181005234023.8104-1-mreitz@redhat.com>
 References: <20181005234023.8104-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 16/31] quorum: Make bdrv_dirname() return
- NULL
+Subject: [Qemu-devel] [PATCH v11 13/31] block: Fix bdrv_find_backing_image()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +22,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-While the common implementation for bdrv_dirname() should return NULL
-for quorum BDSs already (because they do not have a file node and their
-exact_filename field should be empty), there is no reason not to make
-that explicit.
+bdrv_find_backing_image() should use bdrv_get_full_backing_filename() or
+bdrv_make_absolute_filename() instead of trying to do what those
+functions do by itself.
+
+path_combine_deprecated() can now be dropped, so let's do that.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/quorum.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block.c | 33 ++++++++++-----------------------
+ 1 file changed, 10 insertions(+), 23 deletions(-)
 
-diff --git a/block/quorum.c b/block/quorum.c
-index b14e9c6ec6..f831f84fd1 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1101,6 +1101,16 @@ static void quorum_refresh_filename(BlockDriverState *bs, QDict *options)
-     bs->full_open_options = opts;
+diff --git a/block.c b/block.c
+index 6a346f6e5e..45acdfa2bb 100644
+--- a/block.c
++++ b/block.c
+@@ -201,15 +201,6 @@ char *path_combine(const char *base_path, const char *filename)
+     return result;
  }
  
-+static char *quorum_dirname(BlockDriverState *bs, Error **errp)
-+{
-+    /* In general, there are multiple BDSs with different dirnames below this
-+     * one; so there is no unique dirname we could return (unless all are equal
-+     * by chance, or there is only one). Therefore, to be consistent, just
-+     * always return NULL. */
-+    error_setg(errp, "Cannot generate a base directory for quorum nodes");
-+    return NULL;
-+}
-+
- static BlockDriver bdrv_quorum = {
-     .format_name                        = "quorum",
+-static void path_combine_deprecated(char *dest, int dest_size,
+-                                    const char *base_path,
+-                                    const char *filename)
+-{
+-    char *combined = path_combine(base_path, filename);
+-    pstrcpy(dest, dest_size, combined);
+-    g_free(combined);
+-}
+-
+ /*
+  * Helper function for bdrv_parse_filename() implementations to remove optional
+  * protocol prefixes (especially "file:") from a filename and for putting the
+@@ -4370,13 +4361,9 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
  
-@@ -1109,6 +1119,7 @@ static BlockDriver bdrv_quorum = {
-     .bdrv_open                          = quorum_open,
-     .bdrv_close                         = quorum_close,
-     .bdrv_refresh_filename              = quorum_refresh_filename,
-+    .bdrv_dirname                       = quorum_dirname,
+     filename_full     = g_malloc(PATH_MAX);
+     backing_file_full = g_malloc(PATH_MAX);
+-    filename_tmp      = g_malloc(PATH_MAX);
  
-     .bdrv_co_flush_to_disk              = quorum_co_flush,
+     is_protocol = path_has_protocol(backing_file);
+ 
+-    /* This will recursively refresh everything in the backing chain */
+-    bdrv_refresh_filename(bs);
+-
+     for (curr_bs = bs; curr_bs->backing; curr_bs = curr_bs->backing->bs) {
+ 
+         /* If either of the filename paths is actually a protocol, then
+@@ -4402,22 +4389,23 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+         } else {
+             /* If not an absolute filename path, make it relative to the current
+              * image's filename path */
+-            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
+-                                    backing_file);
+-
+-            /* We are going to compare absolute pathnames */
+-            if (!realpath(filename_tmp, filename_full)) {
++            filename_tmp = bdrv_make_absolute_filename(curr_bs, backing_file,
++                                                       NULL);
++            /* We are going to compare canonicalized absolute pathnames */
++            if (!filename_tmp || !realpath(filename_tmp, filename_full)) {
++                g_free(filename_tmp);
+                 continue;
+             }
++            g_free(filename_tmp);
+ 
+             /* We need to make sure the backing filename we are comparing against
+              * is relative to the current image filename (or absolute) */
+-            path_combine_deprecated(filename_tmp, PATH_MAX, curr_bs->filename,
+-                                    curr_bs->backing_file);
+-
+-            if (!realpath(filename_tmp, backing_file_full)) {
++            filename_tmp = bdrv_get_full_backing_filename(curr_bs, NULL);
++            if (!filename_tmp || !realpath(filename_tmp, backing_file_full)) {
++                g_free(filename_tmp);
+                 continue;
+             }
++            g_free(filename_tmp);
+ 
+             if (strcmp(backing_file_full, filename_full) == 0) {
+                 retval = curr_bs->backing->bs;
+@@ -4428,7 +4416,6 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+ 
+     g_free(filename_full);
+     g_free(backing_file_full);
+-    g_free(filename_tmp);
+     return retval;
+ }
  
 -- 
 2.17.1
