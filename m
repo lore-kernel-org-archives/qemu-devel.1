@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g8Zik-0003Su-54
+	(envelope-from <mreitz@redhat.com>) id 1g8Zik-0003Sq-53
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g8Zii-0000AP-Nd
+	(envelope-from <mreitz@redhat.com>) id 1g8Zii-0000AY-OU
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:21 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat,  6 Oct 2018 01:40:12 +0200
-Message-Id: <20181005234023.8104-21-mreitz@redhat.com>
+Date: Sat,  6 Oct 2018 01:40:10 +0200
+Message-Id: <20181005234023.8104-19-mreitz@redhat.com>
 In-Reply-To: <20181005234023.8104-1-mreitz@redhat.com>
 References: <20181005234023.8104-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 20/31] iotests: Add quorum case to test 110
+Subject: [Qemu-devel] [PATCH v11 18/31] block/nfs: Implement bdrv_dirname()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +22,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Test 110 tests relative backing filenames for complex BDS trees.  Now
-that the originally supposedly failing test passes, let us add a new
-failing test: Quorum can never work automatically (without detecting
-whether all child nodes have the same base directory, but that would be
-rather inconsistent behavior).
+While the basic idea is obvious and could be handled by the default
+bdrv_dirname() implementation, we cannot generate a directory name if
+the gid or uid are set, so we have to explicitly return NULL in those
+cases.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- tests/qemu-iotests/110     | 26 ++++++++++++++++++++++++++
- tests/qemu-iotests/110.out |  7 +++++++
- 2 files changed, 33 insertions(+)
+ block/nfs.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index ba1b3c6c7d..08976c8a61 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -30,6 +30,7 @@ status=1	# failure is the default!
- _cleanup()
- {
- 	_cleanup_test_img
-+        rm -f "$TEST_IMG.copy"
+diff --git a/block/nfs.c b/block/nfs.c
+index eab1a2c408..19ee07c321 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -855,6 +855,20 @@ static void nfs_refresh_filename(BlockDriverState *bs, QDict *options)
+     bs->full_open_options = opts;
  }
- trap "_cleanup; exit \$status" 0 1 2 3 15
  
-@@ -87,6 +88,31 @@ echo
- # omit the image size; it should work anyway
- _make_test_img -b "$TEST_IMG_REL.base"
- 
-+echo
-+echo '=== Nodes without a common directory ==='
-+echo
++static char *nfs_dirname(BlockDriverState *bs, Error **errp)
++{
++    NFSClient *client = bs->opaque;
 +
-+cp "$TEST_IMG" "$TEST_IMG.copy"
-+
-+# Should inform us that the actual path of the backing file cannot be determined
-+TEST_IMG="json:{
-+    'driver': '$IMGFMT',
-+    'file': {
-+        'driver': 'quorum',
-+        'vote-threshold': 1,
-+        'children': [
-+            {
-+                'driver': 'file',
-+                'filename': '$TEST_IMG'
-+            },
-+            {
-+                'driver': 'file',
-+                'filename': '$TEST_IMG.copy'
-+            }
-+        ]
++    if (client->uid || client->gid) {
++        bdrv_refresh_filename(bs);
++        error_setg(errp, "Cannot generate a base directory for NFS node '%s'",
++                   bs->filename);
++        return NULL;
 +    }
-+}" _img_info | _filter_img_info
 +
++    return g_strdup_printf("nfs://%s%s/", client->server->host, client->path);
++}
++
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+ static void coroutine_fn nfs_co_invalidate_cache(BlockDriverState *bs,
+                                                  Error **errp)
+@@ -889,6 +903,7 @@ static BlockDriver bdrv_nfs = {
+     .bdrv_detach_aio_context        = nfs_detach_aio_context,
+     .bdrv_attach_aio_context        = nfs_attach_aio_context,
+     .bdrv_refresh_filename          = nfs_refresh_filename,
++    .bdrv_dirname                   = nfs_dirname,
  
- # success, all done
- echo '*** done'
-diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
-index 5370bc1d26..1d0b2475cc 100644
---- a/tests/qemu-iotests/110.out
-+++ b/tests/qemu-iotests/110.out
-@@ -19,4 +19,11 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
- === Backing name is always relative to the backed image ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=t.IMGFMT.base
-+
-+=== Nodes without a common directory ===
-+
-+image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "blkverify": false, "rewrite-corrupted": false, "vote-threshold": 1}}
-+file format: IMGFMT
-+virtual size: 64M (67108864 bytes)
-+backing file: t.IMGFMT.base (cannot determine actual path)
- *** done
+ #ifdef LIBNFS_FEATURE_PAGECACHE
+     .bdrv_co_invalidate_cache       = nfs_co_invalidate_cache,
 -- 
 2.17.1
