@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8QCy-0002XL-7i
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:31:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g8QDy-0003Im-GM
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:32:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8QCv-00061f-3h
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:31:56 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44962)
+	(envelope-from <peter.maydell@linaro.org>) id 1g8QDx-0008AF-LW
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:32:58 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45939)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g8QCu-0005wx-S1
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:31:53 -0400
-Received: by mail-wr1-f66.google.com with SMTP id 63-v6so13554325wra.11
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 06:31:52 -0700 (PDT)
-References: <20181004161852.11673-1-crosa@redhat.com>
-	<20181004161852.11673-2-crosa@redhat.com>
-	<5616e4d4-938c-4e5f-6fe0-64e52d2fe6a7@redhat.com>
-	<0a405ae6-d69a-8e04-e3dc-3b7883447248@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e5944b57-0778-b8ae-6805-0678970a12fa@redhat.com>
-Date: Fri, 5 Oct 2018 15:31:49 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g8QDx-00087z-9H
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:32:57 -0400
+Received: by mail-oi1-x243.google.com with SMTP id e17-v6so10365380oig.12
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 06:32:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0a405ae6-d69a-8e04-e3dc-3b7883447248@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 01/10] qemu-img.c: comment typo fix
+In-Reply-To: <7e8077c8-9ee8-b06d-2c2b-ea788c5f9e69@redhat.com>
+References: <1538744508-17108-1-git-send-email-thuth@redhat.com>
+	<1538744508-17108-2-git-send-email-thuth@redhat.com>
+	<7e8077c8-9ee8-b06d-2c2b-ea788c5f9e69@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 5 Oct 2018 14:32:35 +0100
+Message-ID: <CAFEAcA8i6TkP-nig+XrN2GQNOMmA+O=16EL523XsFT1N2VA=NQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] cpu: Provide a proper prototype for
+ target_words_bigendian() in a header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair@alistair23.me>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 04/10/2018 18:53, Cleber Rosa wrote:> On 10/4/18 12:48 PM, Eric Blake
-wrote:
->> On 10/4/18 11:18 AM, Cleber Rosa wrote:
->>> A trivial comment typo fix.
->>>
->>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>> ---
->>>   qemu-img.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/qemu-img.c b/qemu-img.c
->>> index b12f4cd19b..a96b76c187 100644
->>> --- a/qemu-img.c
->>> +++ b/qemu-img.c
->>> @@ -1085,7 +1085,7 @@ static int64_t find_nonzero(const uint8_t *buf,
->>> int64_t n)
->>>   }
->>>     /*
->>> - * Returns true iff the first sector pointed to by 'buf' contains at
->>> least
->>> + * Returns true if the first sector pointed to by 'buf' contains at
->>> least
+On 5 October 2018 at 14:20, Laszlo Ersek <lersek@redhat.com> wrote:
+> On 10/05/18 15:01, Thomas Huth wrote:
+>> We've got three places already that provide a prototype for this
+>> function in a .c file - that's ugly. Let's provide a proper prototype
+>> in a header instead, with a proper description why this function should
+>> not be used in most cases.
 >>
->> NACK.  You're not the first person to propose this change.  However,
->> "iff" is an English word (albeit archaic) which is shorthand for "if and
->> only if", which has a distinct logical meaning separate from the weaker
->> "if".  Spelling it out in longhand instead of calling it a typo is
->> probably acceptable, though.
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+
+>> +/**
+>> + * target_words_bigendian:
+>> + * Returns true if the (default) endianness of the target is big endian,
+>> + * false otherwise. Note that in target-specifc code, you can use
+
+"specific"
+
+>> + * TARGET_WORDS_BIGENDIAN directly instead. On the other hand, common
+>> + * code should normally never need to know about the endianness of the
+>> + * target, so please do *not* use this function unless you know very well
+>> + * what you are doing!
+>> + */
+>> +bool target_words_bigendian(void);
+>> +
+>>  #ifdef NEED_CPU_H
 >>
-> 
-> Wow, thanks for the explanation.  I agree that spelling it out is a good
-> option, as it'll probably prevent other people from falling into the
-> same "language trap" as I did.
+>>  #ifdef CONFIG_SOFTMMU
+>> diff --git a/qom/cpu.c b/qom/cpu.c
+>> index 92599f3..f774654 100644
+>> --- a/qom/cpu.c
+>> +++ b/qom/cpu.c
+>> @@ -194,7 +194,6 @@ static bool cpu_common_debug_check_watchpoint(CPUState *cpu, CPUWatchpoint *wp)
+>>      return true;
+>>  }
+>>
+>> -bool target_words_bigendian(void);
+>>  static bool cpu_common_virtio_is_big_endian(CPUState *cpu)
+>>  {
+>>      return target_words_bigendian();
+>>
+>
+> This makes sense to me. First I wasn't convinced, because I didn't
+> immediately get "target-specifc code". However, after looking at the 2nd
+> patch, I think I understand better (= the obj-XXX vs. common-obj-XXX
+> distinction). I also think that distinction is clear to any practicing
+> QEMU developers.
 
-https://lists.gnu.org/archive/html/qemu-devel/2011-06/msg01269.html
+Yes; target-specific code is compiled for each qemu-system-*
+executable (and has access to #defines and so on that relate
+specifically to that target); common code is built just once
+and the same .o linked into each executable.
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04200.html
-
-;)
+thanks
+-- PMM
