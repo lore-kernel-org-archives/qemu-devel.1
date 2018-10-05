@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8Py9-0004s7-VE
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:16:38 -0400
+	(envelope-from <lersek@redhat.com>) id 1g8Q25-0006em-Pj
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g8Py5-0005Rb-Hb
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:16:37 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40388)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g8Py3-0005MZ-MP
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:16:31 -0400
-Received: by mail-wr1-f68.google.com with SMTP id d2-v6so9087640wro.7
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 06:16:29 -0700 (PDT)
+	(envelope-from <lersek@redhat.com>) id 1g8Q22-0004PG-HD
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:20:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1g8Q22-0004O5-6e
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:20:38 -0400
 References: <1538744508-17108-1-git-send-email-thuth@redhat.com>
-	<1538744508-17108-3-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <aed366d1-b2b1-d46e-980a-ef1cd6adf14a@redhat.com>
-Date: Fri, 5 Oct 2018 15:16:26 +0200
+	<1538744508-17108-2-git-send-email-thuth@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <7e8077c8-9ee8-b06d-2c2b-ea788c5f9e69@redhat.com>
+Date: Fri, 5 Oct 2018 15:20:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <1538744508-17108-3-git-send-email-thuth@redhat.com>
+In-Reply-To: <1538744508-17108-2-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/core/generic-loader: Compile
- only once, not for each target
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] cpu: Provide a proper prototype for
+ target_words_bigendian() in a header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +30,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Alistair Francis <alistair@alistair23.me>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 05/10/2018 15:01, Thomas Huth wrote:
-> The generic-loader is currently compiled target specific due to one
-> single "#ifdef TARGET_WORDS_BIGENDIAN" in the file. We have already a
-> function called target_words_bigendian() for this instead, so we can
-> put the generic-loader into common-obj to save some compilation time.
+On 10/05/18 15:01, Thomas Huth wrote:
+> We've got three places already that provide a prototype for this
+> function in a .c file - that's ugly. Let's provide a proper prototype
+> in a header instead, with a proper description why this function should
+> not be used in most cases.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
 > ---
->  hw/core/Makefile.objs    | 2 +-
->  hw/core/generic-loader.c | 6 +-----
->  2 files changed, 2 insertions(+), 6 deletions(-)
+>  NB: I've tried to replace the "utterly broken" comment with something
+>  better, as suggested by Laszlo... not sure whether I've really got the
+>  message right here, so feel free to provide some better wording if you
+>  like!
 > 
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index eb88ca9..b736ce2 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -20,6 +20,6 @@ common-obj-$(CONFIG_SOFTMMU) += register.o
->  common-obj-$(CONFIG_SOFTMMU) += or-irq.o
->  common-obj-$(CONFIG_SOFTMMU) += split-irq.o
->  common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
-> +common-obj-$(CONFIG_SOFTMMU) += generic-loader.o
->  
-> -obj-$(CONFIG_SOFTMMU) += generic-loader.o
->  obj-$(CONFIG_SOFTMMU) += null-machine.o
-> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
-> index be29ae1..fbae05f 100644
-> --- a/hw/core/generic-loader.c
-> +++ b/hw/core/generic-loader.c
-> @@ -130,11 +130,7 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
->          s->cpu = first_cpu;
->      }
->  
-> -#ifdef TARGET_WORDS_BIGENDIAN
-> -    big_endian = 1;
-> -#else
-> -    big_endian = 0;
-> -#endif
-> +    big_endian = target_words_bigendian();
->  
->      if (s->file) {
->          AddressSpace *as = s->cpu ? s->cpu->as :  NULL;
+>  exec.c             |  5 -----
+>  hw/virtio/virtio.c |  1 -
+>  include/qom/cpu.h  | 11 +++++++++++
+>  qom/cpu.c          |  1 -
+>  4 files changed, 11 insertions(+), 7 deletions(-)
 > 
+> diff --git a/exec.c b/exec.c
+> index d0821e6..5d99ef5 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -3906,11 +3906,6 @@ int qemu_target_page_bits_min(void)
+>  }
+>  #endif
+>  
+> -/*
+> - * A helper function for the _utterly broken_ virtio device model to find out if
+> - * it's running on a big endian machine. Don't do this at home kids!
+> - */
+> -bool target_words_bigendian(void);
+>  bool target_words_bigendian(void)
+>  {
+>  #if defined(TARGET_WORDS_BIGENDIAN)
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 94f5c8e..4e61944 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -1169,7 +1169,6 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t val)
+>      return 0;
+>  }
+>  
+> -bool target_words_bigendian(void);
+>  static enum virtio_device_endian virtio_default_endian(void)
+>  {
+>      if (target_words_bigendian()) {
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index dc130cd..6d35c37 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -1085,6 +1085,17 @@ void cpu_exec_initfn(CPUState *cpu);
+>  void cpu_exec_realizefn(CPUState *cpu, Error **errp);
+>  void cpu_exec_unrealizefn(CPUState *cpu);
+>  
+> +/**
+> + * target_words_bigendian:
+> + * Returns true if the (default) endianness of the target is big endian,
+> + * false otherwise. Note that in target-specifc code, you can use
+> + * TARGET_WORDS_BIGENDIAN directly instead. On the other hand, common
+> + * code should normally never need to know about the endianness of the
+> + * target, so please do *not* use this function unless you know very well
+> + * what you are doing!
+> + */
+> +bool target_words_bigendian(void);
+> +
+>  #ifdef NEED_CPU_H
+>  
+>  #ifdef CONFIG_SOFTMMU
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index 92599f3..f774654 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -194,7 +194,6 @@ static bool cpu_common_debug_check_watchpoint(CPUState *cpu, CPUWatchpoint *wp)
+>      return true;
+>  }
+>  
+> -bool target_words_bigendian(void);
+>  static bool cpu_common_virtio_is_big_endian(CPUState *cpu)
+>  {
+>      return target_words_bigendian();
+> 
+
+This makes sense to me. First I wasn't convinced, because I didn't
+immediately get "target-specifc code". However, after looking at the 2nd
+patch, I think I understand better (= the obj-XXX vs. common-obj-XXX
+distinction). I also think that distinction is clear to any practicing
+QEMU developers.
+
+So, for what it's worth (which is admittedly not too much), for the series:
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks
+Laszlo
