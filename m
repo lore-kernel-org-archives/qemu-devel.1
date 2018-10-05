@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g8SMF-0006fK-Es
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g8SQ8-0003Z0-RO
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:53:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g8SM9-0006FS-RH
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:39 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:36456)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g8SM9-00062Q-C4
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:49:33 -0400
-Received: by mail-wr1-x435.google.com with SMTP id y16so14055736wrw.3
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 08:49:18 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  5 Oct 2018 16:48:55 +0100
-Message-Id: <20181005154910.3099-7-alex.bennee@linaro.org>
-In-Reply-To: <20181005154910.3099-1-alex.bennee@linaro.org>
-References: <20181005154910.3099-1-alex.bennee@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1g8SQ8-0003An-4T
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:53:40 -0400
+Date: Fri, 5 Oct 2018 17:52:13 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181005155213.GB4606@localhost.localdomain>
+References: <20181001102928.20533-1-vsementsov@virtuozzo.com>
+	<20181001102928.20533-14-vsementsov@virtuozzo.com>
+	<20181004124421.GC6009@localhost.localdomain>
+	<d691c927-e37a-1178-8180-9893278aa02c@virtuozzo.com>
+	<20181004145241.GG6009@localhost.localdomain>
+	<19e42ee8-fdbe-e637-6728-bfc10b137f63@virtuozzo.com>
+	<46e224bd-8c1f-4565-944e-52440e85e2f0@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 06/21] trace: show trace point counts in
- the monitor
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <46e224bd-8c1f-4565-944e-52440e85e2f0@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v3 13/18] block: introduce new filter
+ driver: fleecing-hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>, "wencongyang2@huawei.com" <wencongyang2@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-Now we have counts for each trace point we can expose them in the
-monitor when the user queries what trace points are available.
+Hi Vladimir,
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- monitor.c       | 5 +++--
- qapi/trace.json | 3 ++-
- trace/qmp.c     | 1 +
- 3 files changed, 6 insertions(+), 3 deletions(-)
+can you please check your mailer settings? The plain text version of the
+emails is hardly legible because it mixes quotes text and replies. I
+had to manually open the HTML part to figure out what you really wrote.
 
-diff --git a/monitor.c b/monitor.c
-index c4677b502b..d8229cd2b0 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1421,9 +1421,10 @@ static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
-     }
- 
-     for (elem = events; elem != NULL; elem = elem->next) {
--        monitor_printf(mon, "%s : state %u\n",
-+        monitor_printf(mon, "%s : state %u count %" PRIu64 "\n",
-                        elem->value->name,
--                       elem->value->state == TRACE_EVENT_STATE_ENABLED ? 1 : 0);
-+                       elem->value->state == TRACE_EVENT_STATE_ENABLED ? 1 : 0,
-+                       elem->value->count);
-     }
-     qapi_free_TraceEventInfoList(events);
- }
-diff --git a/qapi/trace.json b/qapi/trace.json
-index 799b254a18..b9184b0d18 100644
---- a/qapi/trace.json
-+++ b/qapi/trace.json
-@@ -33,6 +33,7 @@
- # @name: Event name.
- # @state: Tracing state.
- # @vcpu: Whether this is a per-vCPU event (since 2.7).
-+# @count: Current hits on trace-point (since 3.1).
- #
- # An event is per-vCPU if it has the "vcpu" property in the "trace-events"
- # files.
-@@ -40,7 +41,7 @@
- # Since: 2.2
- ##
- { 'struct': 'TraceEventInfo',
--  'data': {'name': 'str', 'state': 'TraceEventState', 'vcpu': 'bool'} }
-+  'data': {'name': 'str', 'state': 'TraceEventState', 'vcpu': 'bool', 'count': 'int' } }
- 
- ##
- # @trace-event-get-state:
-diff --git a/trace/qmp.c b/trace/qmp.c
-index ea99b00956..cce8198091 100644
---- a/trace/qmp.c
-+++ b/trace/qmp.c
-@@ -102,6 +102,7 @@ TraceEventInfoList *qmp_trace_event_get_state(const char *name,
-         elem->value = g_new(TraceEventInfo, 1);
-         elem->value->vcpu = is_vcpu;
-         elem->value->name = g_strdup(trace_event_get_name(ev));
-+        elem->value->count = ev->count;
- 
-         if (!trace_event_get_state_static(ev)) {
-             elem->value->state = TRACE_EVENT_STATE_UNAVAILABLE;
--- 
-2.17.1
+Am 05.10.2018 um 17:00 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Hmm, how to share children?
+> 
+> backup job has two source BdrvChild'ren - child_job and child_root of
+> job blk and two target BdrvChild'ren - again, child_job and
+> child_root.
+> 
+> backup_top has source child - child_backing and second - child_file
+> (named "target")..
+
+Right, these are six BdrvChild instances in total. I think we can ignore
+the child_job ones, they are internal to the block job infrastructure,
+so we have four of them left.
+
+> Which BdrvChild'ren you suggest to remove? They are all different.
+
+Now that you introduced backup_top, I think we don't need any
+BlockBackends any more. So I suggest to remove the child_root ones and
+to do all I/O through the child_backing and child_file ones of
+backup_top.
+
+> I don't know, why job needs both unnamed blk's and child_job's, and I
+> don't know is it necessary for backup to use blk's not BdrvChild'ren..
+
+I think we had a case recently where it turned out that it is strictly
+speaking even wrong for jobs to use BlockBackends in a function that
+intercepts a request on the BDS level (like the copy-before-write of
+backup).
+
+So getting rid of the BlockBackends isn't only okay, but actually a good
+thing by itself.
+
+> And with internal way in none-mode we'll have two unused blk's  and
+> four unused BdrvChild'ren.. Or we want to rewrite backup to use
+> BdrvChild'ren for io operations and drop child_job BdrvChild'ren? So
+> I'm lost. What did you mean?
+
+child_job isn't actually unused, even though you never use them to make
+requests. The child_job BdrvChild is important because of the
+BdrvChildRole callbacks it provides to the block job infrastructure.
+
+Kevin
