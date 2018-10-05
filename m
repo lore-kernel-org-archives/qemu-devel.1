@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g8SSH-0005zs-86
+	(envelope-from <alex.bennee@linaro.org>) id 1g8SSH-0005zk-7S
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:55:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g8SSE-0004fY-BW
+	(envelope-from <alex.bennee@linaro.org>) id 1g8SSD-0004f2-Ji
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:55:53 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:34059)
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:52773)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g8SSE-0004er-4c
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:55:50 -0400
-Received: by mail-wr1-x435.google.com with SMTP id z4-v6so14074890wrb.1
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 08:55:50 -0700 (PDT)
+	id 1g8SSD-0004ef-Cv
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:55:49 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id 189-v6so2331470wmw.2
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 08:55:49 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  5 Oct 2018 16:49:09 +0100
-Message-Id: <20181005154910.3099-21-alex.bennee@linaro.org>
+Date: Fri,  5 Oct 2018 16:49:06 +0100
+Message-Id: <20181005154910.3099-18-alex.bennee@linaro.org>
 In-Reply-To: <20181005154910.3099-1-alex.bennee@linaro.org>
 References: <20181005154910.3099-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 20/21] plugins: add hotness summary to
- hotblocks
+Subject: [Qemu-devel] [RFC PATCH 17/21] hmp: expose status of plugins to the
+ monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,81 +31,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- trace/plugins/hotblocks/hotblocks.c | 33 ++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ hmp-commands-info.hx   | 17 +++++++++++++++++
+ include/qemu/plugins.h |  1 +
+ monitor.c              | 14 ++++++++++++++
+ trace/plugins.c        | 15 +++++++++++++++
+ 4 files changed, 47 insertions(+)
 
-diff --git a/trace/plugins/hotblocks/hotblocks.c b/trace/plugins/hotblocks/hotblocks.c
-index e9166ad1a5..d2333ad866 100644
---- a/trace/plugins/hotblocks/hotblocks.c
-+++ b/trace/plugins/hotblocks/hotblocks.c
-@@ -11,11 +11,13 @@
- #include <stdio.h>
- #include <glib.h>
- #include <time.h>
-+#include <inttypes.h>
- #include "plugins.h"
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index cbee8b944d..e245a852ae 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -683,6 +683,23 @@ STEXI
+ Show available trace-events & their state.
+ ETEXI
  
- /* Plugins need to take care of their own locking */
- GMutex lock;
- GHashTable *hotblocks;
-+guint64 limit = 20;
- 
- typedef struct {
-     uintptr_t pc;
-@@ -24,20 +26,49 @@ typedef struct {
-     unsigned long total_time;
- } ExecCount;
- 
-+static gint cmp_hits(gconstpointer a, gconstpointer b)
-+{
-+    ExecCount *ea = (ExecCount *) a;
-+    ExecCount *eb = (ExecCount *) b;
-+    return ea->hits > eb->hits ? -1 : 1;
-+}
++#if defined(CONFIG_TRACE_PLUGIN)
++    {
++        .name       = "trace-plugins",
++        .args_type  = "name:s?",
++        .params     = "[name]",
++        .help       = "show available plugins and any extra info "
++                      "(name: plugin name pattern)",
++        .cmd = hmp_info_trace_plugins,
++    },
 +
- bool plugin_init(const char *args)
- {
-+    guint64 count = g_ascii_strtoull(args, NULL, 10);
-+    if (count > 0) {
-+        limit = count;
-+    }
++STEXI
++@item info trace-plugins
++@findex info trace-plugins
++Show available trace-plugins & their state.
++ETEXI
++#endif
 +
-     hotblocks = g_hash_table_new(NULL, g_direct_equal);
-     return true;
+     {
+         .name       = "tpm",
+         .args_type  = "",
+diff --git a/include/qemu/plugins.h b/include/qemu/plugins.h
+index c86bb7ae67..44f2ec8c98 100644
+--- a/include/qemu/plugins.h
++++ b/include/qemu/plugins.h
+@@ -6,6 +6,7 @@
+ void qemu_plugin_parse_cmd_args(const char *optarg);
+ void qemu_plugin_load(const char *filename, const char *args);
+ void qemu_plugins_init(void);
++GString *qemu_plugin_status(const char *name);
+ 
+ #else
+ 
+diff --git a/monitor.c b/monitor.c
+index d8229cd2b0..0d0de9ece7 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -67,6 +67,9 @@
+ #ifdef CONFIG_TRACE_SIMPLE
+ #include "trace/simple.h"
+ #endif
++#ifdef CONFIG_TRACE_PLUGIN
++#include "qemu/plugins.h"
++#endif
+ #include "exec/memory.h"
+ #include "exec/exec-all.h"
+ #include "qemu/log.h"
+@@ -1429,6 +1432,17 @@ static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+     qapi_free_TraceEventInfoList(events);
  }
  
- char *plugin_status(void)
- {
--    GString *report = g_string_new("We have ");
-+    GString *report = g_string_new("collected ");
-+    GList *counts, *it;
-     char *r;
-+    int i;
++#ifdef CONFIG_TRACE_PLUGIN
++static void hmp_info_trace_plugins(Monitor *mon, const QDict *qdict)
++{
++    const char *name = qdict_get_try_str(qdict, "name");
++    GString *status = qemu_plugin_status(name);
 +
-     g_mutex_lock(&lock);
-     g_string_append_printf(report, "%ud entries in the hash table\n",
-                            g_hash_table_size(hotblocks));
-+    counts = g_hash_table_get_values(hotblocks);
-+    it = g_list_sort(counts, cmp_hits);
++    monitor_printf(mon, "%s", status->str);
++    g_string_free(status, true);
++}
++#endif
 +
-+    for (i = 0; i < limit && it->next; i++, it = it->next) {
-+        ExecCount *rec = (ExecCount *) it->data;
-+        g_string_append_printf(report,
-+                               "  pc: %#016" PRIxPTR
-+                               " (%d hits)"
-+                               " %lu ns between returns\n",
-+                               rec->pc, rec->hits,
-+                               rec->total_time / rec->hits);
+ void qmp_client_migrate_info(const char *protocol, const char *hostname,
+                              bool has_port, int64_t port,
+                              bool has_tls_port, int64_t tls_port,
+diff --git a/trace/plugins.c b/trace/plugins.c
+index 25aec2ff70..05630b02e6 100644
+--- a/trace/plugins.c
++++ b/trace/plugins.c
+@@ -58,6 +58,21 @@ void qemu_plugin_parse_cmd_args(const char *optarg)
+                      qemu_opt_get(opts, "args"));
+ }
+ 
++GString *qemu_plugin_status(const char *name)
++{
++    QemuPluginInfo *info;
++    GString *status = g_string_new("");
++
++    QLIST_FOREACH(info, &qemu_plugins, next) {
++        if (info->status) {
++            char *pstatus = info->status();
++            g_string_append_printf(status, "%s: %s\n", info->filename, pstatus);
++            g_free(pstatus);
++        }
 +    }
++    return status;
++}
 +
-     g_mutex_unlock(&lock);
-+    g_list_free(it);
-     r = report->str;
-     g_string_free(report, FALSE);
-     return r;
+ static int bind_to_tracepoints(GModule *g_module, GPtrArray *events)
+ {
+     int count = 0;
 -- 
 2.17.1
