@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1g8Mou-00081U-Ez
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:54:53 -0400
+	(envelope-from <david@redhat.com>) id 1g8MqK-0000kU-CO
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:56:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1g8Mot-0000sh-Jn
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:54:52 -0400
-Date: Fri, 5 Oct 2018 11:54:46 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181005115446.339e5759.cohuck@redhat.com>
-In-Reply-To: <1538732546-2284-1-git-send-email-thuth@redhat.com>
-References: <1538732546-2284-1-git-send-email-thuth@redhat.com>
+	(envelope-from <david@redhat.com>) id 1g8MqG-0002TZ-BF
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:56:20 -0400
+References: <20181003180711.19335-1-richard.henderson@linaro.org>
+	<20181003180711.19335-4-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c71e6c84-538f-4697-dccc-871047df0ff7@redhat.com>
+Date: Fri, 5 Oct 2018 11:56:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20181003180711.19335-4-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Set a category for
- the generic-loader device
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] softfloat: Specialize udiv_qrnnd
+ for s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,32 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Alistair Francis <alistair@alistair23.me>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, cota@braap.org, qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-On Fri,  5 Oct 2018 11:42:26 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> Each device that is instantiatable by the users should be marked with
-> a category. Since the generic-loader does not fit anywhere else, put
-> it into the MISC category.
+On 03/10/2018 20:07, Richard Henderson wrote:
+> The ISA has a 128/64-bit division instruction.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Cc: qemu-s390x@nongnu.org
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  hw/core/generic-loader.c | 1 +
->  1 file changed, 1 insertion(+)
+>  include/fpu/softfloat-macros.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
-> index fde32cb..be29ae1 100644
-> --- a/hw/core/generic-loader.c
-> +++ b/hw/core/generic-loader.c
-> @@ -204,6 +204,7 @@ static void generic_loader_class_init(ObjectClass *klass, void *data)
->      dc->unrealize = generic_loader_unrealize;
->      dc->props = generic_loader_props;
->      dc->desc = "Generic Loader";
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->  }
+> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
+> index 6d58615709..e702607b43 100644
+> --- a/include/fpu/softfloat-macros.h
+> +++ b/include/fpu/softfloat-macros.h
+> @@ -626,6 +626,12 @@ static inline uint64_t udiv_qrnnd(uint64_t *r, uint64_t n1,
+>      uint64_t q;
+>      asm("divq %4" : "=a"(q), "=d"(*r) : "0"(n0), "1"(n1), "rm"(d));
+>      return q;
+> +#elif defined(__s390x__)
+> +    /* Need to use a TImode type to get an even register pair for DLGR.  */
+> +    unsigned __int128 n = (unsigned __int128)n1 << 64 | n0;
+> +    asm("dlgr %0, %1" : "+r"(n) : "r"(d));
+> +    *r = n >> 64;
+> +    return n;
+>  #else
+>      uint64_t d0, d1, q0, q1, r1, r0, m;
 >  
->  static TypeInfo generic_loader_info = {
+> 
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David / dhildenb
