@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g8Zic-0003Kt-Ca
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:19 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g8Zii-0003RM-NK
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g8ZiT-0008Jy-1J
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:08 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g8Zih-00007U-Hj
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:41:20 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Sat,  6 Oct 2018 01:40:03 +0200
-Message-Id: <20181005234023.8104-12-mreitz@redhat.com>
+Date: Sat,  6 Oct 2018 01:40:06 +0200
+Message-Id: <20181005234023.8104-15-mreitz@redhat.com>
 In-Reply-To: <20181005234023.8104-1-mreitz@redhat.com>
 References: <20181005234023.8104-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v11 11/31] block:
- bdrv_get_full_backing_filename's ret. val.
+Subject: [Qemu-devel] [PATCH v11 14/31] block: Add bdrv_dirname()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,170 +22,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Make bdrv_get_full_backing_filename() return an allocated string instead
-of placing the result in a caller-provided buffer.
+This function may be implemented by block drivers to derive a directory
+name from a BDS. Concatenating this g_free()-able string with a relative
+filename must result in a valid (not necessarily existing) filename, so
+this is a function that should generally be not implemented by format
+drivers, because this is protocol-specific.
+
+If a BDS's driver does not implement this function, bdrv_dirname() will
+fall through to the BDS's file if it exists. If it does not, the
+exact_filename field will be used to generate a directory name.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- include/block/block.h |  3 +--
- block.c               | 48 +++++++++++++++----------------------------
- block/qapi.c          | 12 ++---------
- 3 files changed, 20 insertions(+), 43 deletions(-)
+ include/block/block.h     |  1 +
+ include/block/block_int.h |  7 +++++++
+ block.c                   | 27 +++++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
 
 diff --git a/include/block/block.h b/include/block/block.h
-index bb238488c4..ac149abca4 100644
+index ac149abca4..c6ac72e778 100644
 --- a/include/block/block.h
 +++ b/include/block/block.h
-@@ -482,8 +482,7 @@ void bdrv_round_to_clusters(BlockDriverState *bs,
- 
- void bdrv_get_backing_filename(BlockDriverState *bs,
-                                char *filename, int filename_size);
--void bdrv_get_full_backing_filename(BlockDriverState *bs,
--                                    char *dest, size_t sz, Error **errp);
-+char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp);
+@@ -486,6 +486,7 @@ char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp);
  char *bdrv_get_full_backing_filename_from_filename(const char *backed,
                                                     const char *backing,
                                                     Error **errp);
++char *bdrv_dirname(BlockDriverState *bs, Error **errp);
+ 
+ int path_has_protocol(const char *path);
+ int path_is_absolute(const char *path);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 385070f373..f448b90ee7 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -141,6 +141,13 @@ struct BlockDriver {
+ 
+     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
+ 
++    /*
++     * Returns an allocated string which is the directory name of this BDS: It
++     * will be used to make relative filenames absolute by prepending this
++     * function's return value to them.
++     */
++    char *(*bdrv_dirname)(BlockDriverState *bs, Error **errp);
++
+     /* aio */
+     BlockAIOCB *(*bdrv_aio_preadv)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
 diff --git a/block.c b/block.c
-index d31c759091..3b5896083c 100644
+index 45acdfa2bb..0e5edccd15 100644
 --- a/block.c
 +++ b/block.c
-@@ -319,28 +319,16 @@ char *bdrv_get_full_backing_filename_from_filename(const char *backed,
+@@ -5403,6 +5403,33 @@ void bdrv_refresh_filename(BlockDriverState *bs)
      }
  }
  
--void bdrv_get_full_backing_filename(BlockDriverState *bs, char *dest, size_t sz,
--                                    Error **errp)
-+char *bdrv_get_full_backing_filename(BlockDriverState *bs, Error **errp)
- {
-     char *backed;
--    char *full_name;
--    Error *local_error = NULL;
- 
-     bdrv_refresh_filename(bs);
- 
-     backed = bs->exact_filename[0] ? bs->exact_filename : bs->filename;
--
--    full_name = bdrv_get_full_backing_filename_from_filename(backed,
--                                                             bs->backing_file,
--                                                             &local_error);
--    if (full_name) {
--        pstrcpy(dest, sz, full_name);
--        g_free(full_name);
--    } else if (local_error) {
--        error_propagate(errp, local_error);
--    } else if (sz > 0) {
--        *dest = '\0';
--    }
-+    return bdrv_get_full_backing_filename_from_filename(backed,
-+                                                        bs->backing_file,
-+                                                        errp);
- }
- 
- void bdrv_register(BlockDriver *bdrv)
-@@ -2307,7 +2295,7 @@ out:
- int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-                            const char *bdref_key, Error **errp)
- {
--    char *backing_filename = g_malloc0(PATH_MAX);
-+    char *backing_filename = NULL;
-     char *bdref_key_dot;
-     const char *reference = NULL;
-     int ret = 0;
-@@ -2342,7 +2330,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-      */
-     reference = qdict_get_try_str(parent_options, bdref_key);
-     if (reference || qdict_haskey(options, "file.filename")) {
--        backing_filename[0] = '\0';
-+        /* keep backing_filename NULL */
-     } else if (bs->backing_file[0] == '\0' && qdict_size(options) == 0) {
-         qobject_unref(options);
-         goto free_exit;
-@@ -2357,8 +2345,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-             implicit_backing = !strcmp(bs->auto_backing_file, bs->backing_file);
-         }
- 
--        bdrv_get_full_backing_filename(bs, backing_filename, PATH_MAX,
--                                       &local_err);
-+        backing_filename = bdrv_get_full_backing_filename(bs, &local_err);
-         if (local_err) {
-             ret = -EINVAL;
-             error_propagate(errp, local_err);
-@@ -2379,9 +2366,8 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-         qdict_put_str(options, "driver", bs->backing_format);
-     }
- 
--    backing_hd = bdrv_open_inherit(*backing_filename ? backing_filename : NULL,
--                                   reference, options, 0, bs, &child_backing,
--                                   errp);
-+    backing_hd = bdrv_open_inherit(backing_filename, reference, options, 0, bs,
-+                                   &child_backing, errp);
-     if (!backing_hd) {
-         bs->open_flags |= BDRV_O_NO_BACKING;
-         error_prepend(errp, "Could not open backing file: ");
-@@ -4364,7 +4350,6 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
-     int is_protocol = 0;
-     BlockDriverState *curr_bs = NULL;
-     BlockDriverState *retval = NULL;
--    Error *local_error = NULL;
- 
-     if (!bs || !bs->drv || !backing_file) {
-         return NULL;
-@@ -4384,21 +4369,22 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
-         /* If either of the filename paths is actually a protocol, then
-          * compare unmodified paths; otherwise make paths relative */
-         if (is_protocol || path_has_protocol(curr_bs->backing_file)) {
-+            char *backing_file_full_ret;
++char *bdrv_dirname(BlockDriverState *bs, Error **errp)
++{
++    BlockDriver *drv = bs->drv;
 +
-             if (strcmp(backing_file, curr_bs->backing_file) == 0) {
-                 retval = curr_bs->backing->bs;
-                 break;
-             }
-             /* Also check against the full backing filename for the image */
--            bdrv_get_full_backing_filename(curr_bs, backing_file_full, PATH_MAX,
--                                           &local_error);
--            if (local_error == NULL) {
--                if (strcmp(backing_file, backing_file_full) == 0) {
-+            backing_file_full_ret = bdrv_get_full_backing_filename(curr_bs,
-+                                                                   NULL);
-+            if (backing_file_full_ret) {
-+                bool equal = strcmp(backing_file, backing_file_full_ret) == 0;
-+                g_free(backing_file_full_ret);
-+                if (equal) {
-                     retval = curr_bs->backing->bs;
-                     break;
-                 }
--            } else {
--                error_free(local_error);
--                local_error = NULL;
-             }
-         } else {
-             /* If not an absolute filename path, make it relative to the current
-diff --git a/block/qapi.c b/block/qapi.c
-index 743136b84e..287e38e9de 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -291,18 +291,10 @@ void bdrv_query_image_info(BlockDriverState *bs,
- 
-     backing_filename = bs->backing_file;
-     if (backing_filename[0] != '\0') {
--        char *backing_filename2 = g_malloc0(PATH_MAX);
-+        char *backing_filename2;
-         info->backing_filename = g_strdup(backing_filename);
-         info->has_backing_filename = true;
--        bdrv_get_full_backing_filename(bs, backing_filename2, PATH_MAX, &err);
--        if (err) {
--            /* Can't reconstruct the full backing filename, so we must omit
--             * this field and apply a Best Effort to this query. */
--            g_free(backing_filename2);
--            backing_filename2 = NULL;
--            error_free(err);
--            err = NULL;
--        }
-+        backing_filename2 = bdrv_get_full_backing_filename(bs, NULL);
- 
-         /* Always report the full_backing_filename if present, even if it's the
-          * same as backing_filename. That they are same is useful info. */
++    if (!drv) {
++        error_setg(errp, "Node '%s' is ejected", bs->node_name);
++        return NULL;
++    }
++
++    if (drv->bdrv_dirname) {
++        return drv->bdrv_dirname(bs, errp);
++    }
++
++    if (bs->file) {
++        return bdrv_dirname(bs->file->bs, errp);
++    }
++
++    bdrv_refresh_filename(bs);
++    if (bs->exact_filename[0] != '\0') {
++        return path_combine(bs->exact_filename, "");
++    }
++
++    error_setg(errp, "Cannot generate a base directory for %s nodes",
++               drv->format_name);
++    return NULL;
++}
++
+ /*
+  * Hot add/remove a BDS's child. So the user can take a child offline when
+  * it is broken and take a new child online
 -- 
 2.17.1
