@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8PC3-0005Cf-DR
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:26:56 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g8PER-0007u8-6n
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8OyN-0001Ep-Qj
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:12:48 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37587)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g8OyN-0001D6-FP
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:12:47 -0400
-Received: by mail-ot1-x344.google.com with SMTP id o13-v6so12464106otl.4
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 05:12:47 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1g8PEN-0005OG-VR
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:29:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1g8PEN-0005Lq-NS
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:29:19 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri,  5 Oct 2018 16:28:58 +0400
+Message-Id: <20181005122910.11745-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181002212522.23303-6-f4bug@amsat.org>
-References: <20181002212522.23303-1-f4bug@amsat.org>
-	<20181002212522.23303-6-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 5 Oct 2018 13:12:26 +0100
-Message-ID: <CAFEAcA-Z=7ufWJ5bsDYL9f+Ek4NsUSA2Dt8C42DCGE9d0MhpOg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 05/12] hw/sh4/sh_pci: Use
- DeviceState::realize rather than SysBusDevice::init
+Subject: [Qemu-devel] [PULL v2 00/12] Option patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 2 October 2018 at 22:25, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
-rote:
-> Move from the legacy SysBusDevice::init method to using DeviceState::real=
-ize.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/sh4/sh_pci.c | 20 +++++++++-----------
->  1 file changed, 9 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
-> index 4ec2e35500..379d0685ed 100644
-> --- a/hw/sh4/sh_pci.c
-> +++ b/hw/sh4/sh_pci.c
-> @@ -120,16 +120,15 @@ static void sh_pci_set_irq(void *opaque, int irq_nu=
-m, int level)
->      qemu_set_irq(pic[irq_num], level);
->  }
->
-> -static int sh_pci_device_init(SysBusDevice *dev)
-> +static void sh_pci_device_realize(DeviceState *dev, Error **errp)
->  {
-> -    PCIHostState *phb;
-> -    SHPCIState *s;
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-> +    SHPCIState *s =3D SH_PCI_HOST_BRIDGE(dev);
-> +    PCIHostState *phb =3D PCI_HOST_BRIDGE(s);
->      int i;
->
-> -    s =3D SH_PCI_HOST_BRIDGE(dev);
-> -    phb =3D PCI_HOST_BRIDGE(s);
->      for (i =3D 0; i < 4; i++) {
-> -        sysbus_init_irq(dev, &s->irq[i]);
-> +        sysbus_init_irq(sbd, &s->irq[i]);
->      }
->      phb->bus =3D pci_register_root_bus(DEVICE(dev), "pci",
->                                       sh_pci_set_irq, sh_pci_map_irq,
-> @@ -143,13 +142,12 @@ static int sh_pci_device_init(SysBusDevice *dev)
->                               &s->memconfig_p4, 0, 0x224);
->      memory_region_init_alias(&s->isa, OBJECT(s), "sh_pci.isa",
->                               get_system_io(), 0, 0x40000);
-> -    sysbus_init_mmio(dev, &s->memconfig_p4);
-> -    sysbus_init_mmio(dev, &s->memconfig_a7);
-> +    sysbus_init_mmio(sbd, &s->memconfig_p4);
-> +    sysbus_init_mmio(sbd, &s->memconfig_a7);
->      s->iobr =3D 0xfe240000;
->      memory_region_add_subregion(get_system_memory(), s->iobr, &s->isa);
->
->      s->dev =3D pci_create_simple(phb->bus, PCI_DEVFN(0, 0), "sh_pci_host=
-");
-> -    return 0;
->  }
->
->  static void sh_pci_host_realize(PCIDevice *d, Error **errp)
-> @@ -187,9 +185,9 @@ static const TypeInfo sh_pci_host_info =3D {
->
->  static void sh_pci_device_class_init(ObjectClass *klass, void *data)
->  {
-> -    SysBusDeviceClass *sdc =3D SYS_BUS_DEVICE_CLASS(klass);
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->
-> -    sdc->init =3D sh_pci_device_init;
-> +    dc->realize =3D sh_pci_device_realize;
->  }
->
->  static const TypeInfo sh_pci_device_info =3D {
-> --
+The following changes since commit b8e5671a8cd196e7262802ca895bf87d504169=
+89:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+  Merge remote-tracking branch 'remotes/elmarco/tags/chardev-pull-request=
+' into staging (2018-10-03 14:07:49 +0100)
 
-thanks
--- PMM
+are available in the Git repository at:
+
+  https://github.com/elmarco/qemu.git tags/option-pull-request
+
+for you to fetch changes up to 1195fa2b08d98ab503155c5cee8831d1ef91aac5:
+
+  vl: list user creatable properties when 'help' is argument (2018-10-05 =
+16:27:09 +0400)
+
+----------------------------------------------------------------
+CLI help improvements
+
+PULLv2:
+ - fix uninitialized "seentype" variable in qom-test
+
+----------------------------------------------------------------
+
+Marc-Andr=C3=A9 Lureau (12):
+  qdev-monitor: print help to stdout
+  cutils: add qemu_pstrcmp0()
+  qemu-option: add help fallback to print the list of options
+  qemu-option: improve qemu_opts_print_help() output
+  qom/object: fix iterating properties over a class
+  qom/object: register 'type' property as class property
+  tests/qom-proplist: check duplicate "bv" property registration failed
+  tests/qom-proplist: check properties are not listed multiple times
+  tests/qom-proplist: check class properties iterator
+  vl: handle -object help
+  hostmem: add some properties description
+  vl: list user creatable properties when 'help' is argument
+
+ include/monitor/monitor.h  |  3 ++
+ include/qemu/cutils.h      | 12 +++++++
+ backends/hostmem-memfd.c   |  9 +++++
+ backends/hostmem.c         | 14 ++++++++
+ monitor.c                  | 16 +++++++--
+ qdev-monitor.c             | 32 ++++++++++-------
+ qom/object.c               |  9 ++---
+ qom/object_interfaces.c    |  6 ++--
+ tests/check-qom-proplist.c | 58 ++++++++++++++++++++-----------
+ util/cutils.c              |  5 +++
+ util/qemu-option.c         | 71 +++++++++++++++++++++++++++++++-------
+ vl.c                       | 53 ++++++++++++++++++++++++++--
+ 12 files changed, 228 insertions(+), 60 deletions(-)
+
+--=20
+2.19.0.271.gfe8321ec05
