@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8QXH-000223-IT
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:52:56 -0400
+	(envelope-from <philmd@redhat.com>) id 1g8Qb6-0005MP-2T
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:56:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8QXF-00067Q-W1
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:52:55 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:46234)
+	(envelope-from <philmd@redhat.com>) id 1g8Qaz-0000dO-J6
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:56:51 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:32833)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g8QXF-00066s-Ep
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:52:53 -0400
-Received: by mail-oi1-x229.google.com with SMTP id k64-v6so10422646oia.13
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 06:52:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g8Qaz-0000d4-CD
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 09:56:45 -0400
+Received: by mail-wr1-f66.google.com with SMTP id e4-v6so13698365wrs.0
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 06:56:45 -0700 (PDT)
+References: <20181005134608.1251-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <cdd4c07b-f53b-9353-55d7-b329d5331268@redhat.com>
+Date: Fri, 5 Oct 2018 15:56:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181004021943.22724-1-ehabkost@redhat.com>
-References: <20181004021943.22724-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 5 Oct 2018 14:52:32 +0100
-Message-ID: <CAFEAcA_uXAGWfMtcpVKyiaWF9DgjwrV2DqKtALicUZ4aeP3wXw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/4] Python queue, 2018-10-03
+In-Reply-To: <20181005134608.1251-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] qxl: check qxl_phys2virt return value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 4 October 2018 at 03:19, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit dafd95053611aa14dda40266857608d12ddce658:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-02 18:27:18 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to cd0c3da730bc8369f0b6c1c6bf81babd9851060d:
->
->   scripts/device-crash-test: Remove entries for serial devices (2018-10-03 23:08:51 -0300)
->
-> ----------------------------------------------------------------
-> Python queue, 2018-10-03
->
-> * Remove fixed serial device errors from device-crash-test
-> * Remove unnecessary Python 2.6 compatibility code
->
-> ----------------------------------------------------------------
+On 05/10/2018 15:46, Gerd Hoffmann wrote:
+> Fixes: CID 1395986
 
-Applied, thanks.
+Thomas suggested yesterday [*] to use the 'Buglink:' tag, however I
+can't find direct link to Coverity IDs.
 
--- PMM
+[*]
+https://wiki.qemu.org/Contribute/SubmitAPatch#Write_a_meaningful_commit_message
+
+If your patch fixes a commit that is already in the repository, please
+add a line with "Fixes: <full-SHA-commit-id>" below the patch
+description / before your "Signed-off-by:" line in the commit message.
+If your patch addresses a bug in a public bug tracker, please add a line
+with "Buglink: <URL-of-the-bug>" there, too.
+
+> Fixes: 979f7ef8966bc4495a710ed9e4af42098f92ee79> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> ---
+>  hw/display/qxl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> index 747986478f..bbf14fb42f 100644
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -290,7 +290,7 @@ static void qxl_spice_monitors_config_async(PCIQXLDevice *qxl, int replay)
+>      }
+>  
+>      cfg = qxl_phys2virt(qxl, qxl->guest_monitors_config, MEMSLOT_GROUP_GUEST);
+> -    if (cfg->count == 1) {
+> +    if (cfg != NULL && cfg->count == 1) {
+>          qxl->guest_primary.resized = 1;
+>          qxl->guest_head0_width  = cfg->heads[0].width;
+>          qxl->guest_head0_height = cfg->heads[0].height;
+> 
