@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g8ZVX-00009O-Je
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:27:44 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g8Zi4-0002sO-Lu
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g8ZVU-0000ZI-C0
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:27:43 -0400
-References: <20181005133012.26490-1-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <66552e20-08c2-a0e2-bb28-e7669c548fe7@redhat.com>
-Date: Sat, 6 Oct 2018 01:22:31 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181005133012.26490-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/display/bcm2835_fb: Silence Coverity
- warning about multiply overflow
+	(envelope-from <mreitz@redhat.com>) id 1g8Zi2-0007rP-R1
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 19:40:40 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Sat,  6 Oct 2018 01:39:53 +0200
+Message-Id: <20181005234023.8104-2-mreitz@redhat.com>
+In-Reply-To: <20181005234023.8104-1-mreitz@redhat.com>
+References: <20181005234023.8104-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH v11 01/31] block: Use bdrv_refresh_filename()
+ to pull
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +20,331 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On 05/10/2018 15:30, Peter Maydell wrote:
-> Coverity complains (CID 1395628) that the multiply in the calculation
-> of the framebuffer base is performed as 32x32 but then used in a
-> context that takes a 64-bit hwaddr. This can't actually ever
-> overflow the 32-bit result, because of the constraints placed on
-> the s->config values in bcm2835_fb_validate_config(). But we
-> can placate Coverity anyway, by explicitly casting one of the
-> inputs to a hwaddr, so the whole expression is calculated with
-> 64-bit arithmetic.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> This is one of those cases where I was 50/50 about whether to just
-> mark the coverity issue as a false-positive.
+Before this patch, bdrv_refresh_filename() is used in a pushing manner:
+Whenever the BDS graph is modified, the parents of the modified edges
+are supposed to be updated (recursively upwards).  However, that is
+nonviable, considering that we want child changes not to concern
+parents.
 
-Agreed, but in the end it's not too much noise, so
+Also, in the long run we want a pull model anyway: Here, we would have a
+bdrv_filename() function which returns a BDS's filename, freshly
+constructed.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+This patch is an intermediate step.  It adds bdrv_refresh_filename()
+calls before every place a BDS.filename value is used.  The only
+exceptions are protocol drivers that use their own filename, which
+clearly would not profit from refreshing that filename before.
 
-Thanks,
+Also, bdrv_get_encrypted_filename() is removed along the way (as a user
+of BDS.filename), since it is completely unused.
 
-Paolo
+In turn, all of the calls to bdrv_refresh_filename() before this patch
+are removed, because we no longer have to call this function on graph
+changes.
 
->  hw/display/bcm2835_fb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
-> index d534d00a65f..599863e4e17 100644
-> --- a/hw/display/bcm2835_fb.c
-> +++ b/hw/display/bcm2835_fb.c
-> @@ -190,7 +190,7 @@ static void fb_update_display(void *opaque)
->      }
->  
->      if (s->invalidate) {
-> -        hwaddr base = s->config.base + xoff + yoff * src_width;
-> +        hwaddr base = s->config.base + xoff + (hwaddr)yoff * src_width;
->          framebuffer_update_memory_section(&s->fbsection, s->dma_mr,
->                                            base,
->                                            s->config.yres, src_width);
-> 
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ include/block/block.h |  1 -
+ block.c               | 31 +++++++++++++++----------------
+ block/qapi.c          |  4 ++++
+ block/raw-format.c    |  1 +
+ block/replication.c   |  2 --
+ block/vhdx-log.c      |  1 +
+ block/vmdk.c          |  6 ++++++
+ block/vpc.c           |  4 +++-
+ blockdev.c            |  8 ++++++++
+ 9 files changed, 38 insertions(+), 20 deletions(-)
+
+diff --git a/include/block/block.h b/include/block/block.h
+index b189cf422e..47a9448d44 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -480,7 +480,6 @@ void bdrv_round_to_clusters(BlockDriverState *bs,
+                             int64_t *cluster_offset,
+                             int64_t *cluster_bytes);
+ 
+-const char *bdrv_get_encrypted_filename(BlockDriverState *bs);
+ void bdrv_get_backing_filename(BlockDriverState *bs,
+                                char *filename, int filename_size);
+ void bdrv_get_full_backing_filename(BlockDriverState *bs,
+diff --git a/block.c b/block.c
+index 0d6e5f1a76..8a7bc9308a 100644
+--- a/block.c
++++ b/block.c
+@@ -304,8 +304,11 @@ void bdrv_get_full_backing_filename_from_filename(const char *backed,
+ void bdrv_get_full_backing_filename(BlockDriverState *bs, char *dest, size_t sz,
+                                     Error **errp)
+ {
+-    char *backed = bs->exact_filename[0] ? bs->exact_filename : bs->filename;
++    char *backed;
+ 
++    bdrv_refresh_filename(bs);
++
++    backed = bs->exact_filename[0] ? bs->exact_filename : bs->filename;
+     bdrv_get_full_backing_filename_from_filename(backed, bs->backing_file,
+                                                  dest, sz, errp);
+ }
+@@ -984,6 +987,8 @@ static void bdrv_backing_attach(BdrvChild *c)
+                "node is used as backing hd of '%s'",
+                bdrv_get_device_or_node_name(parent));
+ 
++    bdrv_refresh_filename(backing_hd);
++
+     parent->open_flags &= ~BDRV_O_NO_BACKING;
+     pstrcpy(parent->backing_file, sizeof(parent->backing_file),
+             backing_hd->filename);
+@@ -1385,6 +1390,7 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     }
+ 
+     if (file != NULL) {
++        bdrv_refresh_filename(blk_bs(file));
+         filename = blk_bs(file)->filename;
+     } else {
+         /*
+@@ -2254,8 +2260,6 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
+         bdrv_unref(backing_hd);
+     }
+ 
+-    bdrv_refresh_filename(bs);
+-
+ out:
+     bdrv_refresh_limits(bs, NULL);
+ }
+@@ -2782,8 +2786,6 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+         g_free(child_key_dot);
+     }
+ 
+-    bdrv_refresh_filename(bs);
+-
+     /* Check if any unknown options were used */
+     if (qdict_size(options) != 0) {
+         const QDictEntry *entry = qdict_first(options);
+@@ -3234,6 +3236,7 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+             if (local_err != NULL) {
+                 error_propagate(errp, local_err);
+             } else {
++                bdrv_refresh_filename(reopen_state->bs);
+                 error_setg(errp, "failed while preparing to reopen image '%s'",
+                            reopen_state->bs->filename);
+             }
+@@ -3806,7 +3809,10 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
+     /* success - we can delete the intermediate states, and link top->base */
+     /* TODO Check graph modification op blockers (BLK_PERM_GRAPH_MOD) once
+      * we've figured out how they should work. */
+-    backing_file_str = backing_file_str ? backing_file_str : base->filename;
++    if (!backing_file_str) {
++        bdrv_refresh_filename(base);
++        backing_file_str = base->filename;
++    }
+ 
+     QLIST_FOREACH_SAFE(c, &top->parents, next_parent, next) {
+         /* Check whether we are allowed to switch c from top to base */
+@@ -4202,16 +4208,6 @@ bool bdrv_can_write_zeroes_with_unmap(BlockDriverState *bs)
+     return bs->supported_zero_flags & BDRV_REQ_MAY_UNMAP;
+ }
+ 
+-const char *bdrv_get_encrypted_filename(BlockDriverState *bs)
+-{
+-    if (bs->backing && bs->backing->bs->encrypted)
+-        return bs->backing_file;
+-    else if (bs->encrypted)
+-        return bs->filename;
+-    else
+-        return NULL;
+-}
+-
+ void bdrv_get_backing_filename(BlockDriverState *bs,
+                                char *filename, int filename_size)
+ {
+@@ -4331,6 +4327,9 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+ 
+     is_protocol = path_has_protocol(backing_file);
+ 
++    /* This will recursively refresh everything in the backing chain */
++    bdrv_refresh_filename(bs);
++
+     for (curr_bs = bs; curr_bs->backing; curr_bs = curr_bs->backing->bs) {
+ 
+         /* If either of the filename paths is actually a protocol, then
+diff --git a/block/qapi.c b/block/qapi.c
+index c66f949db8..743136b84e 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -51,6 +51,8 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+         return NULL;
+     }
+ 
++    bdrv_refresh_filename(bs);
++
+     info = g_malloc0(sizeof(*info));
+     info->file                   = g_strdup(bs->filename);
+     info->ro                     = bs->read_only;
+@@ -264,6 +266,8 @@ void bdrv_query_image_info(BlockDriverState *bs,
+         goto out;
+     }
+ 
++    bdrv_refresh_filename(bs);
++
+     info = g_new0(ImageInfo, 1);
+     info->filename        = g_strdup(bs->filename);
+     info->format          = g_strdup(bdrv_get_format_name(bs));
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 6f6dc99b2c..d07bcdae62 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -436,6 +436,7 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+             bs->file->bs->supported_zero_flags);
+ 
+     if (bs->probed && !bdrv_is_read_only(bs)) {
++        bdrv_refresh_filename(bs->file->bs);
+         fprintf(stderr,
+                 "WARNING: Image format was not specified for '%s' and probing "
+                 "guessed raw.\n"
+diff --git a/block/replication.c b/block/replication.c
+index 6349d6958e..d5e39be5eb 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -643,8 +643,6 @@ static void replication_done(void *opaque, int ret)
+     if (ret == 0) {
+         s->stage = BLOCK_REPLICATION_DONE;
+ 
+-        /* refresh top bs's filename */
+-        bdrv_refresh_filename(bs);
+         s->active_disk = NULL;
+         s->secondary_disk = NULL;
+         s->hidden_disk = NULL;
+diff --git a/block/vhdx-log.c b/block/vhdx-log.c
+index d2f1b98199..3f4c11c932 100644
+--- a/block/vhdx-log.c
++++ b/block/vhdx-log.c
+@@ -803,6 +803,7 @@ int vhdx_parse_log(BlockDriverState *bs, BDRVVHDXState *s, bool *flushed,
+ 
+     if (logs.valid) {
+         if (bs->read_only) {
++            bdrv_refresh_filename(bs);
+             ret = -EPERM;
+             error_setg(errp,
+                        "VHDX image file '%s' opened read-only, but "
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 2c9e86d98f..bb6033d409 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -479,6 +479,7 @@ static int vmdk_init_tables(BlockDriverState *bs, VmdkExtent *extent,
+                      extent->l1_table,
+                      l1_size);
+     if (ret < 0) {
++        bdrv_refresh_filename(extent->file->bs);
+         error_setg_errno(errp, -ret,
+                          "Could not read l1 table from extent '%s'",
+                          extent->file->bs->filename);
+@@ -499,6 +500,7 @@ static int vmdk_init_tables(BlockDriverState *bs, VmdkExtent *extent,
+                          extent->l1_backup_table,
+                          l1_size);
+         if (ret < 0) {
++            bdrv_refresh_filename(extent->file->bs);
+             error_setg_errno(errp, -ret,
+                              "Could not read l1 backup table from extent '%s'",
+                              extent->file->bs->filename);
+@@ -530,6 +532,7 @@ static int vmdk_open_vmfs_sparse(BlockDriverState *bs,
+ 
+     ret = bdrv_pread(file, sizeof(magic), &header, sizeof(header));
+     if (ret < 0) {
++        bdrv_refresh_filename(file->bs);
+         error_setg_errno(errp, -ret,
+                          "Could not read header from file '%s'",
+                          file->bs->filename);
+@@ -607,6 +610,7 @@ static int vmdk_open_vmdk4(BlockDriverState *bs,
+ 
+     ret = bdrv_pread(file, sizeof(magic), &header, sizeof(header));
+     if (ret < 0) {
++        bdrv_refresh_filename(file->bs);
+         error_setg_errno(errp, -ret,
+                          "Could not read header from file '%s'",
+                          file->bs->filename);
+@@ -861,6 +865,7 @@ static int vmdk_parse_extents(const char *desc, BlockDriverState *bs,
+         if (!path_is_absolute(fname) && !path_has_protocol(fname) &&
+             !desc_file_path[0])
+         {
++            bdrv_refresh_filename(bs->file->bs);
+             error_setg(errp, "Cannot use relative extent paths with VMDK "
+                        "descriptor file '%s'", bs->file->bs->filename);
+             return -EINVAL;
+@@ -2241,6 +2246,7 @@ static ImageInfo *vmdk_get_extent_info(VmdkExtent *extent)
+ {
+     ImageInfo *info = g_new0(ImageInfo, 1);
+ 
++    bdrv_refresh_filename(extent->file->bs);
+     *info = (ImageInfo){
+         .filename         = g_strdup(extent->file->bs->filename),
+         .format           = g_strdup(extent->type),
+diff --git a/block/vpc.c b/block/vpc.c
+index bf294abfa7..717809cc24 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -284,9 +284,11 @@ static int vpc_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     checksum = be32_to_cpu(footer->checksum);
+     footer->checksum = 0;
+-    if (vpc_checksum(s->footer_buf, HEADER_SIZE) != checksum)
++    if (vpc_checksum(s->footer_buf, HEADER_SIZE) != checksum) {
++        bdrv_refresh_filename(bs);
+         fprintf(stderr, "block-vpc: The header checksum of '%s' is "
+             "incorrect.\n", bs->filename);
++    }
+ 
+     /* Write 'checksum' back to footer, or else will leave it with zero. */
+     footer->checksum = cpu_to_be32(checksum);
+diff --git a/blockdev.c b/blockdev.c
+index a8755bd908..95a85c8cad 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1627,6 +1627,7 @@ static void external_snapshot_prepare(BlkActionState *common,
+                 error_setg_errno(errp, -size, "bdrv_getlength failed");
+                 goto out;
+             }
++            bdrv_refresh_filename(state->old_bs);
+             bdrv_img_create(new_image_file, format,
+                             state->old_bs->filename,
+                             state->old_bs->drv->format_name,
+@@ -3172,6 +3173,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+             goto out;
+         }
+         assert(bdrv_get_aio_context(base_bs) == aio_context);
++        bdrv_refresh_filename(base_bs);
+         base_name = base_bs->filename;
+     }
+ 
+@@ -3291,6 +3293,10 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+             goto out;
+         }
+     } else if (has_top && top) {
++        /* This strcmp() is just a shortcut, there is no need to
++         * refresh @bs's filename.  If it mismatches,
++         * bdrv_find_backing_image() will do the refresh and may still
++         * return @bs. */
+         if (strcmp(bs->filename, top) != 0) {
+             top_bs = bdrv_find_backing_image(bs, top);
+         }
+@@ -3451,6 +3457,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+     if (backup->mode != NEW_IMAGE_MODE_EXISTING) {
+         assert(backup->format);
+         if (source) {
++            bdrv_refresh_filename(source);
+             bdrv_img_create(backup->target, backup->format, source->filename,
+                             source->drv->format_name, NULL,
+                             size, flags, false, &local_err);
+@@ -3810,6 +3817,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+             break;
+         case NEW_IMAGE_MODE_ABSOLUTE_PATHS:
+             /* create new image with backing file */
++            bdrv_refresh_filename(source);
+             bdrv_img_create(arg->target, format,
+                             source->filename,
+                             source->drv->format_name,
+-- 
+2.17.1
