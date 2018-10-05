@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g8Ruz-0008AC-Sy
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g8Ruz-0008AD-TR
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g8Ruk-0006Cz-Oz
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g8Ruo-0006Dx-L7
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:21:21 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40415 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:43508 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1g8Ruk-0005TY-HT
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:21:14 -0400
+	id 1g8Run-0006D3-93
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:21:17 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Fri,  5 Oct 2018 17:19:46 +0200
-Message-Id: <1538752793-6875-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v2 0/7] Misc MIPS fixes and improvements for
- October 2018
+Date: Fri,  5 Oct 2018 17:19:52 +0200
+Message-Id: <1538752793-6875-7-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1538752793-6875-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1538752793-6875-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v2 6/7] target/mips: Add opcodes for nanoMIPS
+ EVA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +28,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, laurent@vivier.eu, riku.voipio@iki.fi
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Dimitrije Nikolic <dnikolic@wavecomp.com>
 
-This series contains support for MIPS ABI flags in elf.h, DSP R3
-availability control, and emulation of nanoMIPS EVA instructions.
-MIPS ABI flags will be used in near future for linux user mode
-support for certain MIPS-specific parts of prctl() system call.
+Add opcodes for nanoMIPS EVA instructions: CACHEE, LBE, LBUE, LHE,
+LHUE, LLE, LLWPE, LWE, PREFE, SBE, SCE, SCWPE, SHE, SWE.
 
-All patches were developed a while ago, but were not submitted to
-this list for various reasons.
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/translate.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Dimitrije Nikolic (2):
-  target/mips: Add opcodes for nanoMIPS EVA instructions
-  target/mips: Implement emulation of nanoMIPS EVA instructions
-
-Stefan Markovic (5):
-  elf: Fix PT_MIPS_XXX constants
-  elf: Add MIPS_ABI_FP_XXX constants
-  elf: Add Mips_elf_abiflags_v0 structure
-  target/mips: Add bit definitions for DSP R3 ASE
-  target/mips: Add availability control for DSP R3 ASE
-
- include/elf.h                    |  30 ++++++++++-
- target/mips/cpu.h                |   1 +
- target/mips/internal.h           |  11 ++--
- target/mips/mips-defs.h          |   1 +
- target/mips/translate.c          | 108 ++++++++++++++++++++++++++++++++++++++-
- target/mips/translate_init.inc.c |   3 +-
- 6 files changed, 147 insertions(+), 7 deletions(-)
-
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index d64a1da..b0b2f40 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -16499,6 +16499,22 @@ enum {
+     NM_P_SC      = 0x0b,
+ };
+ 
++/* P.LS.E0 instruction pool */
++enum {
++    NM_LBE      = 0x00,
++    NM_SBE      = 0x01,
++    NM_LBUE     = 0x02,
++    NM_P_PREFE  = 0x03,
++    NM_LHE      = 0x04,
++    NM_SHE      = 0x05,
++    NM_LHUE     = 0x06,
++    NM_CACHEE   = 0x07,
++    NM_LWE      = 0x08,
++    NM_SWE      = 0x09,
++    NM_P_LLE    = 0x0a,
++    NM_P_SCE    = 0x0b,
++};
++
+ /* P.LS.WM instruction pool */
+ enum {
+     NM_LWM       = 0x00,
 -- 
 2.7.4
