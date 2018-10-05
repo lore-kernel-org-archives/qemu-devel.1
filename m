@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1g8SVU-0001Kd-7U
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:59:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g8SVh-0001Wu-Fk
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:59:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1g8SVQ-0007SR-8w
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:59:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53328)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g8SVQ-0007SB-26
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:59:08 -0400
-Date: Fri, 5 Oct 2018 17:58:50 +0200
-From: "Hoffmann, Gerd" <kraxel@redhat.com>
-Message-ID: <20181005155850.vci6pt27rumdlq6t@sirius.home.kraxel.org>
-References: <20180914135230.15178-1-marcandre.lureau@redhat.com>
-	<20181005135052.GA4113@lpt>
-	<CAMxuvawF+5=GyP70FNzS3zWfoe7Ca667hMKqmjWkhCe_bNCCMg@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1g8SVb-0007X2-JY
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:59:23 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g8SVb-0007WA-3m
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 11:59:19 -0400
+Received: by mail-wm1-x342.google.com with SMTP id s12-v6so2350851wmc.0
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 08:59:18 -0700 (PDT)
+References: <20181004175700.20847-1-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181004175700.20847-1-richard.henderson@linaro.org>
+Date: Fri, 05 Oct 2018 16:59:16 +0100
+Message-ID: <87lg7cqt9n.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMxuvawF+5=GyP70FNzS3zWfoe7Ca667hMKqmjWkhCe_bNCCMg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: define conventions for
- vhost-user backends
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] softfloat: Fix division
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: =?utf-8?Q?J=C3=A1n?= Tomko <jtomko@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Kaplansky, Victor" <victork@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, libvir-list <libvir-list@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Coquelin, Maxime" <maxime.coquelin@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Felipe Franciosi <felipe@nutanix.com>, "Liu, Changpeng" <changpeng.liu@intel.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, cota@braap.org
 
-  Hi,
 
-> For example, "virgl" support may not be implemented. This
-> --print-capabilities is a simple way to check what the backend
-> implements.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-What is the expected behavior in case virgl is implemented by the
-backend, but not available (due to lack of 3d hardware in the host for
-example) ?
+> Changes from v2:
+>   * Add shift128Left.  I had been using shortShift128Left,
+>     with a shift of 64, which lead to undefined behaviour.
+>     Which I suspect is exactly the Heisenbug Alex saw.
 
-cheers,
-  Gerd
+No weirdness this time around
+
+>
+>     I did keep the R-b tags I had already applied.
+
+You already have mine but this version also:
+
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+>
+>
+> r~
+>
+>
+> Richard Henderson (4):
+>   softfloat: Fix division
+>   softfloat: Specialize udiv_qrnnd for x86_64
+>   softfloat: Specialize udiv_qrnnd for s390x
+>   softfloat: Specialize udiv_qrnnd for ppc64
+>
+>  include/fpu/softfloat-macros.h | 62 +++++++++++++++++++++++++++++-----
+>  fpu/softfloat.c                | 35 ++++++++++++++-----
+>  2 files changed, 80 insertions(+), 17 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
