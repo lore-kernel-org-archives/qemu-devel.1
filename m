@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g8UQS-0000IC-SF
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:09 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g8UQU-0000Jj-Da
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g8UQR-0003bk-SS
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:08 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33027)
+	(envelope-from <richard.henderson@linaro.org>) id 1g8UQT-0003ix-CD
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:10 -0400
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:43586)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g8UQR-0003XK-LA
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:07 -0400
-Received: by mail-ot1-x342.google.com with SMTP id q50so9392405otd.0
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 11:02:07 -0700 (PDT)
+	id 1g8UQT-0003ex-2a
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:09 -0400
+Received: by mail-ot1-x32d.google.com with SMTP id e21-v6so13542196otk.10
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 11:02:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  5 Oct 2018 13:01:53 -0500
-Message-Id: <20181005180201.11387-1-richard.henderson@linaro.org>
+Date: Fri,  5 Oct 2018 13:01:54 -0500
+Message-Id: <20181005180201.11387-2-richard.henderson@linaro.org>
+In-Reply-To: <20181005180201.11387-1-richard.henderson@linaro.org>
+References: <20181005180201.11387-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/8] softfloat queue
+Subject: [Qemu-devel] [PULL 1/8] softfloat: remove float64_trunc_to_int
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +30,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
-The following changes since commit ae7a4c0a4604bcfed40170db6cca576c44d872a2:
+From: "Emilio G. Cota" <cota@braap.org>
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20181004' into staging (2018-10-05 16:05:06 +0100)
+It has not had users since f83311e476 ("target-m68k: use floatx80
+internally", 2017-06-21).
 
-are available in the Git repository at:
+Note that no other bit-width has floatX_trunc_to_int.
 
-  https://github.com/rth7680/qemu.git tags/pull-fpu-20181005
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/fpu/softfloat.h | 1 -
+ fpu/softfloat.c         | 7 -------
+ 2 files changed, 8 deletions(-)
 
-for you to fetch changes up to 27ae5109a2ba8b6b679cce3e03e16570a34390a0:
-
-  softfloat: Specialize udiv_qrnnd for ppc64 (2018-10-05 12:57:41 -0500)
-
-----------------------------------------------------------------
-Testing infrastructure for softfpu (not run by default).
-Drop countLeadingZeros.
-Fix div_floats.
-Add udiv_qrnnd specializations for x86_64, s390x, ppc64 hosts.
-
-----------------------------------------------------------------
-Emilio G. Cota (3):
-      softfloat: remove float64_trunc_to_int
-      gitmodules: add berkeley's softfloat + testfloat version 3
-      tests/fp/fp-test: add floating point tests
-
-Richard Henderson (4):
-      softfloat: Fix division
-      softfloat: Specialize udiv_qrnnd for x86_64
-      softfloat: Specialize udiv_qrnnd for s390x
-      softfloat: Specialize udiv_qrnnd for ppc64
-
-Thomas Huth (1):
-      softfloat: Replace countLeadingZeros32/64 with clz32/64
-
- include/fpu/softfloat-macros.h | 149 +++----
- include/fpu/softfloat.h        |   1 -
- tests/fp/platform.h            |  41 ++
- fpu/softfloat.c                |  68 +--
- tests/fp/fp-test.c             | 992 +++++++++++++++++++++++++++++++++++++++++
- tests/fp/wrap.inc.c            | 653 +++++++++++++++++++++++++++
- .gitmodules                    |   6 +
- configure                      |   4 +
- tests/Makefile.include         |   3 +
- tests/fp/.gitignore            |   1 +
- tests/fp/Makefile              | 597 +++++++++++++++++++++++++
- tests/fp/berkeley-softfloat-3  |   1 +
- tests/fp/berkeley-testfloat-3  |   1 +
- 13 files changed, 2392 insertions(+), 125 deletions(-)
- create mode 100644 tests/fp/platform.h
- create mode 100644 tests/fp/fp-test.c
- create mode 100644 tests/fp/wrap.inc.c
- create mode 100644 tests/fp/.gitignore
- create mode 100644 tests/fp/Makefile
- create mode 160000 tests/fp/berkeley-softfloat-3
- create mode 160000 tests/fp/berkeley-testfloat-3
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index cc1b58b029..8fd9f9bbae 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -535,7 +535,6 @@ float128 float64_to_float128(float64, float_status *status);
+ | Software IEC/IEEE double-precision operations.
+ *----------------------------------------------------------------------------*/
+ float64 float64_round_to_int(float64, float_status *status);
+-float64 float64_trunc_to_int(float64, float_status *status);
+ float64 float64_add(float64, float64, float_status *status);
+ float64 float64_sub(float64, float64, float_status *status);
+ float64 float64_mul(float64, float64, float_status *status);
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 59ca356d0e..9405f12a03 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1409,13 +1409,6 @@ float64 float64_round_to_int(float64 a, float_status *s)
+     return float64_round_pack_canonical(pr, s);
+ }
+ 
+-float64 float64_trunc_to_int(float64 a, float_status *s)
+-{
+-    FloatParts pa = float64_unpack_canonical(a, s);
+-    FloatParts pr = round_to_int(pa, float_round_to_zero, 0, s);
+-    return float64_round_pack_canonical(pr, s);
+-}
+-
+ /*
+  * Returns the result of converting the floating-point value `a' to
+  * the two's complement integer format. The conversion is performed
+-- 
+2.17.1
