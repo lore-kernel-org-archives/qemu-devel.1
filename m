@@ -1,14 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g8MRr-0001nM-O5
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:31:09 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g8MS0-0001qa-AS
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:31:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g8MHy-0005ah-0N
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:20:53 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Fri,  5 Oct 2018 11:20:08 +0200
-Message-Id: <20181005092024.14344-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 00/16] memory-device: complete refactoring
+	(envelope-from <peter.maydell@linaro.org>) id 1g8MFP-0003EB-9I
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:18:12 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44501)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g8MFP-0003Dw-4p
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:18:11 -0400
+Received: by mail-ot1-x341.google.com with SMTP id p23so391032otf.11
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 02:18:11 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20181005084835.GB2285@work-vm>
+References: <cover.1537868529.git.manish.jaggi@cavium.com>
+	<CAFEAcA-_5MzdykGKja1sJggx2QVOUXT69NF-Ya2sE8RZFu53fA@mail.gmail.com>
+	<20181004150522.sr2woe74vdlpo52k@kamzik.brq.redhat.com>
+	<CAFEAcA_JfsuFknwTs=Mq1=A+WoSJSdYnC3NUZxQiuS=jdg0FfA@mail.gmail.com>
+	<20181005084835.GB2285@work-vm>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 5 Oct 2018 10:17:50 +0100
+Message-ID: <CAFEAcA-FuXeqp7LvuzSArh7TXYHm8WR18QOPD8VsubpnWP=+1w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC] [PATCH 0/3] qemu: arm: Migration between
+ machines with different MIDR values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,116 +33,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Auger Eric <eric.auger@redhat.com>, David Hildenbrand <david@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, mjaggi@caviumnetworks.com, "Nair, Jayachandran" <Jayachandran.Nair@cavium.com>, "quintela@redhat.com" <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "eric.auger@redhat.com" <eric.auger@redhat.com>, "Jaggi, Manish" <Manish.Jaggi@cavium.com>, "Nowicki,
+	Tomasz" <Tomasz.Nowicki@cavium.com>
 
-This series completes refactoring of pre_plug, plug and unplug logic of
-memory devices. With this as a basis, we can built e.g. virtio
-based memory devices or internal "RAM chip" devices.
+On 5 October 2018 at 09:48, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>> On 4 October 2018 at 16:05, Andrew Jones <drjones@redhat.com> wrote:
+>> > On Tue, Oct 02, 2018 at 02:07:38PM +0100, Peter Maydell wrote:
+>> >> Hi; thanks for this patch. The issue I see with this patch
+>> >> is that the KVM/ARM QEMU approach to system registers so far
+>> >> has been "the kernel knows about these and it is in control".
+>> >> So we ask the kernel for the list of registers, and just save
+>> >> and restore those. That would suggest that if there are sysregs
+>> >> where it's OK in fact to ignore a difference between two constant
+>> >> register values, it should be the kernel doing the "actually, this
+>> >> mismatch is OK" behaviour...
+>> >
+>> > I don't think the kernel should have to maintain all that logic. If a user
+>> > wants to load guest registers, then the kernel should do it, as long as
+>> > it's safe from the host's integrity/security PoV, and the hardware would
+>> > actually support it. Anything that can only break the guest, but not the
+>> > host, should be allowed. The KVM userspace can certainly ask the kernel
+>> > what it recommends first (i.e. read the invariant registers first, before
+>> > deciding what to write), but the decision of what to write should be left
+>> > up to the user.
+>>
+>> I can see the logic of that approach. But right now QEMU
+>> userspace knows basically nothing about the system registers
+>> when we're using KVM: all that knowledge is in the kernel.
+>> So we don't have a place really to put policy info (and
+>> not really anywhere to put policy info that depends on the
+>> host CPU type when mostly we let the kernel care about that).
+>
+> It would seem wrong to put this logic in the kernel because the
+> priviliged code should be as small as possible.
 
-I dropped the virtio-pmem prototype for now, I will look into plugging
-it differently next. But this part in this series here is independent of
-hotplug handler changes required to make it work for virtio devices.
+Agreed. But if we want to move to "QEMU knows about all the
+possible host CPUs" that's a fair-sized design change and
+needs more than the minimalist approach this patch has.
 
-v4 -> v5:
-- Added a bunch of RB's
-- Minor spelling fixed
-- Dropped "memory-device: add class function get_device_id()"
-- Added   "memory-device: improve "range conflicts" error message
-- Dropped "memory-device: handle integer overflows properly"
--- Will require more changes. But I am able to reproduce some overflows.
-- "memory-device: document MemoryDeviceClass"
--- Changed documentation format as requested by Auger
-- "memory-device: trace when pre_plugging/plugging/unplugging"
--- Include device ID and rename tracepoints.
-
-v3 -> v4:
-- Minor comment and subject fixes
-- Added "memory-device: fix alignment error message"
-- Added "pc-dimm: pass PCDIMMDevice to pc_dimm_.*plug"
-- Dropped "hw/acpi-build: only indicate nvdimm and pc-dimm"
-- "memory-device: document MemoryDeviceClass"
--- add more details about get_plugged_size
-- "memory-device: add and use memory_device_get_region_size()"
--- fixed "local_err" usage
--- due to "pc-dimm: pass PCDIMMDevice to pc_dimm_.*plug", keep PC_DIMM cast
-- "memory-device: add class function get_device_id()"
--- provide default handler
-- "hmp: handle virtio-pmem when printing memory device infos"
--- avoid fall-through switch case
--- add g_assert_not_reached()
-- "numa: handle virtio-pmem in NUMA stats"
--- avoid fall-through switch case
--- add g_assert_not_reached()
-- Added "qdev: hotplug: provide do_unplug handler"
--- unplug/unplug_request are not called for devices inside a device hierarchy
-   This new handler is always called when unrealizing and doesn't trigger
-   the unrealize (in contrast to unplug/unplug_request)
-- "pc: support for virtio-pmem" and "virtio-pmem: hotplug support functions"
--- use do_unplug handler
-- Tested "device_del vp1". It works, and I can see in the traces the
-  address getting unassigned. QEMU crashes when shutting down, that most
-  most likely is a result of virtio-pmem not properly unrealizing and
-  cleaning up virtqueues. (@Pankaj if you read this  )
-
-v2 -> v3:
-- Rephrased some patch subjects/descriptions
-- Added "memory-device: handle integer overflows properly"
-- "memory-device: forward errors in get_region_size()/get_plugged_size()"
--- drop superfluous error check
-- "memory-device: document MemoryDeviceClass"
--- some rewording
-- replaced "memory-device: convert get_region_size() to get_memory_region()"
-        by "memory-device: add and use memory_device_get_region_size()"
-       and "memory-device: factor out get_memory_region() from pc-dimm"
-       and "memory-device: drop get_region_size()"
-- squashed "memory-device: add device class function set_addr()"
-       and "pc-dimm: implement memory device class function set_addr()"
-- replaced "memory-device: ids of virtio based devices are special"
-        by "memory-device: add optional function get_device_id()"
-- fixed up the virtio-pmem prototype
-
-v1 -> v2:
-- Include virtio-pmem prototype
-- Add "memory-device: fix error message when hinted address is too small"
-- Add "memory-device: use memory device terminology in error messages"
-- Add "hw/acpi-build: only indicate nvdimm and pc-dimm"
-- Add "memory-device: ids of virtio based devices are special"
-- Add "memory-device: ids of virtio based devices are special"
-- Minor changes/fixes for other patches
-
-David Hildenbrand (16):
-  memory-device: fix alignment error message
-  memory-device: fix error message when hinted address is too small
-  memory-device: improve "range conflicts" error message
-  pc-dimm: pass PCDIMMDevice to pc_dimm_.*plug
-  memory-device: use memory device terminology in error messages
-  memory-device: introduce separate config option
-  memory-device: forward errors in get_region_size()/get_plugged_size()
-  memory-device: document MemoryDeviceClass
-  memory-device: add and use memory_device_get_region_size()
-  memory-device: factor out get_memory_region() from pc-dimm
-  memory-device: drop get_region_size()
-  memory-device: add device class function set_addr()
-  memory-device: complete factoring out pre_plug handling
-  memory-device: complete factoring out plug handling
-  memory-device: complete factoring out unplug handling
-  memory-device: trace when pre_plugging/plugging/unplugging
-
- default-configs/i386-softmmu.mak  |   3 +-
- default-configs/ppc64-softmmu.mak |   3 +-
- hw/Makefile.objs                  |   2 +-
- hw/i386/pc.c                      |   6 +-
- hw/mem/Makefile.objs              |   4 +-
- hw/mem/memory-device.c            | 103 ++++++++++++++++++++++++------
- hw/mem/nvdimm.c                   |   9 ++-
- hw/mem/pc-dimm.c                  |  84 ++++++++----------------
- hw/mem/trace-events               |   5 +-
- hw/ppc/spapr.c                    |  29 ++++-----
- include/hw/mem/memory-device.h    |  74 ++++++++++++++++++---
- include/hw/mem/pc-dimm.h          |  10 +--
- qapi/misc.json                    |   2 +-
- 13 files changed, 210 insertions(+), 124 deletions(-)
-
--- 
-2.17.1
+thanks
+-- PMM
