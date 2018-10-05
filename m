@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g8PGD-0001dK-Iy
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:31:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g8PQm-0001yZ-U2
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:42:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1g8PGC-00070o-9S
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:31:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1g8PGC-0006z1-1m
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:31:12 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  5 Oct 2018 16:29:10 +0400
-Message-Id: <20181005122910.11745-13-marcandre.lureau@redhat.com>
-In-Reply-To: <20181005122910.11745-1-marcandre.lureau@redhat.com>
-References: <20181005122910.11745-1-marcandre.lureau@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1g8PQm-0004tO-2Y
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:42:08 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g8PQl-0004sm-KF
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:42:07 -0400
+Received: by mail-oi1-x242.google.com with SMTP id a203-v6so10289341oib.0
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 05:42:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <a90da631-1b38-7cc3-8200-521128199264@redhat.com>
+References: <1538734535-7483-1-git-send-email-thuth@redhat.com>
+	<7381a5a1-07f5-f79a-177d-cd39bce5a52e@redhat.com>
+	<a90da631-1b38-7cc3-8200-521128199264@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 5 Oct 2018 13:41:45 +0100
+Message-ID: <CAFEAcA_7usyn6Ysox4as_f=sxeh53XUCkYfXVd0kb7N4FCsf_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 12/12] vl: list user creatable properties
- when 'help' is argument
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Compile only once,
+ not for each target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,126 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair@alistair23.me>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Iterate over the writable class properties, sort and print them out
-with the description if available.
+On 5 October 2018 at 13:17, Laszlo Ersek <lersek@redhat.com> wrote:
+> On 10/05/18 12:49, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Is the comment added in 8e4a424b305 still valid?
+>>
+>> /*
+>>  * A helper function for the _utterly broken_ virtio device model to
+>> find out if
+>>  * it's running on a big endian machine. Don't do this at home kids!
+>>  */
+>> bool target_words_bigendian(void);
+>
+> Yeah, that comment irks me too.
+>
+> Not that it isn't valid, necessarily. "hw/virtio/virtio.c" still
+> features an embedded declaration of this function. Just above
+> virtio_default_endian(), which calls it. And the latter function is
+> called in several places (mostly from commit 616a655219a92).
+>
+> So I can't really tell what's "utterly broken" here -- the device model
+> (i.e., the virtio implementation in QEMU), or the legacy *spec* that
+> required QEMU to jump through such hoops?
 
-Ex: qemu -object memory-backend-file,help
-memory-backend-file.align=3Dint
-memory-backend-file.discard-data=3Dbool
-memory-backend-file.dump=3Dbool - Set to 'off' to exclude from core dump
-memory-backend-file.host-nodes=3Dint - Binds memory to the list of NUMA h=
-ost nodes
-memory-backend-file.mem-path=3Dstring
-memory-backend-file.merge=3Dbool - Mark memory as mergeable
-memory-backend-file.pmem=3Dbool
-memory-backend-file.policy=3DHostMemPolicy - Set the NUMA policy
-memory-backend-file.prealloc=3Dbool - Preallocate memory
-memory-backend-file.share=3Dbool - Mark the memory as private to QEMU or =
-shared
-memory-backend-file.size=3Dint - Size of the memory region (ex: 500M)
+AIUI, the brokenness here is that the virtio specification
+requires that a device knows the endianness of the CPU,
+which is an awkward layering violation [*]. The point of the
+comment is really to say "virtio needs this, but that is
+a special weird case, think twice or three times before
+using this function anywhere else" (which I suspect is also
+why the declaration is not in a header file, to make it less
+easily accessible).
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
----
- qom/object_interfaces.c |  6 +++---
- vl.c                    | 40 +++++++++++++++++++++++++++++++++++++---
- 2 files changed, 40 insertions(+), 6 deletions(-)
+[*] Actually it's not even the endianness of the CPU, because
+bi-endian CPUs like Arm can be in big-endian mode even though
+TARGET_WORDS_BIGENDIAN is false...
 
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 72b97a8bed..941fd63afd 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -141,14 +141,14 @@ Object *user_creatable_add_opts(QemuOpts *opts, Err=
-or **errp)
-=20
- int user_creatable_add_opts_foreach(void *opaque, QemuOpts *opts, Error =
-**errp)
- {
--    bool (*type_predicate)(const char *) =3D opaque;
-+    bool (*type_opt_predicate)(const char *, QemuOpts *) =3D opaque;
-     Object *obj =3D NULL;
-     Error *err =3D NULL;
-     const char *type;
-=20
-     type =3D qemu_opt_get(opts, "qom-type");
--    if (type && type_predicate &&
--        !type_predicate(type)) {
-+    if (type && type_opt_predicate &&
-+        !type_opt_predicate(type, opts)) {
-         return 0;
-     }
-=20
-diff --git a/vl.c b/vl.c
-index f254b99bdb..4e25c78bff 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2696,8 +2696,10 @@ static int machine_set_property(void *opaque,
-  * cannot be created here, as it depends on the chardev
-  * already existing.
-  */
--static bool object_create_initial(const char *type)
-+static bool object_create_initial(const char *type, QemuOpts *opts)
- {
-+    ObjectClass *klass;
-+
-     if (is_help_option(type)) {
-         GSList *l, *list;
-=20
-@@ -2711,6 +2713,38 @@ static bool object_create_initial(const char *type=
-)
-         exit(0);
-     }
-=20
-+    klass =3D object_class_by_name(type);
-+    if (klass && qemu_opt_has_help_opt(opts)) {
-+        ObjectPropertyIterator iter;
-+        ObjectProperty *prop;
-+        GPtrArray *array =3D g_ptr_array_new();
-+        int i;
-+
-+        object_class_property_iter_init(&iter, klass);
-+        while ((prop =3D object_property_iter_next(&iter))) {
-+            GString *str;
-+
-+            if (!prop->set) {
-+                continue;
-+            }
-+
-+            str =3D g_string_new(NULL);
-+            g_string_append_printf(str, "%s.%s=3D%s", type,
-+                                   prop->name, prop->type);
-+            if (prop->description) {
-+                g_string_append_printf(str, " - %s", prop->description);
-+            }
-+            g_ptr_array_add(array, g_string_free(str, false));
-+        }
-+        g_ptr_array_sort(array, (GCompareFunc)qemu_pstrcmp0);
-+        for (i =3D 0; i < array->len; i++) {
-+            printf("%s\n", (char *)array->pdata[i]);
-+        }
-+        g_ptr_array_set_free_func(array, g_free);
-+        g_ptr_array_free(array, true);
-+        exit(0);
-+    }
-+
-     if (g_str_equal(type, "rng-egd") ||
-         g_str_has_prefix(type, "pr-manager-")) {
-         return false;
-@@ -2757,9 +2791,9 @@ static bool object_create_initial(const char *type)
-  * The remainder of object creation happens after the
-  * creation of chardev, fsdev, net clients and device data types.
-  */
--static bool object_create_delayed(const char *type)
-+static bool object_create_delayed(const char *type, QemuOpts *opts)
- {
--    return !object_create_initial(type);
-+    return !object_create_initial(type, opts);
- }
-=20
-=20
---=20
-2.19.0.271.gfe8321ec05
+I entirely agree that we should clean up the comment to be
+clearer about what it's trying to say.
+
+> BTW, I don't think angry comments are useful in *code*. They look & feel
+> great for about a week. In a year, they just look unprofessional. (NB,
+> this is not about "political correctness"; it's just that, when someone
+> reads such a comment, they receive the anger *before* they understand,
+> or recall, the underlying problem.
+
+Agreed 100%.
+
+thanks
+-- PMM
