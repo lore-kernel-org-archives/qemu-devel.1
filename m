@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g8Qre-0002E9-6U
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:13:58 -0400
+	(envelope-from <philmd@redhat.com>) id 1g8RB1-0001uX-78
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:33:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g8Qra-0006Ch-VJ
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:13:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g8Qra-0006C5-Nj
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:13:54 -0400
-References: <20180927155538.699-1-peter.maydell@linaro.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <68699579-01dd-f281-c04b-86bd82f35db8@redhat.com>
-Date: Fri, 5 Oct 2018 09:13:46 -0500
+	(envelope-from <philmd@redhat.com>) id 1g8RAw-0000Q1-0l
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:33:59 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g8RAv-0000PE-O4
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 10:33:53 -0400
+Received: by mail-wr1-f65.google.com with SMTP id g15-v6so11171328wru.9
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 07:33:53 -0700 (PDT)
+References: <20181004140522.945682-1-eblake@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e454e2ea-6ee6-4605-50ad-16112ef6f5cc@redhat.com>
+Date: Fri, 5 Oct 2018 16:33:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180927155538.699-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20181004140522.945682-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/display/qxl: Suppress clang-7 warning
- about misaligned atomic operation
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] edid: Ignore built binary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>, patches@linaro.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, kraxel@redhat.com
 
-On 9/27/18 10:55 AM, Peter Maydell wrote:
-
-> Newer Spice versions (with Spice commit
-> beda5ec7a6848be20c0cac2a9a8ef2a41e8069c1) will fix the bug;
-> for older Spice versions, work around it by telling the compiler
-> explicitly that the alignment is OK using __builtin_assume_aligned().
+On 04/10/2018 16:05, Eric Blake wrote:
+> Added in commit 72d277a7.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > ---
->   include/qemu/compiler.h |  9 +++++++++
->   hw/display/qxl.c        | 26 +++++++++++++++++++++++++-
->   2 files changed, 34 insertions(+), 1 deletion(-)
+>  .gitignore | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-
-> +#ifdef HAS_ASSUME_ALIGNED
-> +#define ALIGNED_UINT32_PTR(P) ((uint32_t *)__builtin_assume_aligned(P, 4))
-> +#else
-> +#define ALIGNED_UINT32_PTR(P) ((uint32_t *)P)
-> +#endif
-> +
-> +    old_pending = atomic_fetch_or(ALIGNED_UINT32_PTR(&d->ram->int_pending),
-
-The only client of your macro is not impacted, but if you want to be 
-technically robust against all future uses of the macro, the fallback is 
-underparenthesized, and would be safer as:
-
-#define ALIGNED_UINT32_PTR(P) ((uint32_t *)(P))
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> diff --git a/.gitignore b/.gitignore
+> index 5668d027824..64efdfd9292 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -107,6 +107,7 @@
+>  /qemu-doc.html
+>  /qemu-doc.info
+>  /qemu-doc.txt
+> +/qemu-edid
+>  /qemu-img
+>  /qemu-nbd
+>  /qemu-options.def
+> 
