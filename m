@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8M8i-0003Gy-WA
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:11:17 -0400
+	(envelope-from <jerome.forissier@linaro.org>) id 1g8MRT-0001nL-E9
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8M8h-0006sh-Fs
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:11:16 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:47001)
+	(envelope-from <jerome.forissier@linaro.org>) id 1g8MNt-0001gR-Dr
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:27:03 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53595)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g8M8g-0006qZ-4r
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:11:15 -0400
-Received: by mail-ot1-x344.google.com with SMTP id o21so11731753otb.13
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 02:11:12 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jerome.forissier@linaro.org>)
+	id 1g8MNr-0001be-Jl
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 05:26:56 -0400
+Received: by mail-wm1-x341.google.com with SMTP id b19-v6so1195113wme.3
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 02:26:54 -0700 (PDT)
+References: <20181005080729.6480-1-jerome.forissier@linaro.org>
+	<CAFEAcA9h7_vaKk7GuGVWv2_hFeR=xC4ZgJzLuD+iSqCdwa1PSw@mail.gmail.com>
+From: Jerome Forissier <jerome.forissier@linaro.org>
+Message-ID: <d52c8388-5482-633b-bd9d-5eaf0eeb3eec@linaro.org>
+Date: Fri, 5 Oct 2018 11:26:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <eee0054a-4d73-53a2-ca52-dbce4f1996e5@vivier.eu>
-References: <20180928142533.8451-1-peter.maydell@linaro.org>
-	<52177933-047f-d99b-e7d7-2a85e4c8d59c@vivier.eu>
-	<eee0054a-4d73-53a2-ca52-dbce4f1996e5@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 5 Oct 2018 10:10:50 +0100
-Message-ID: <CAFEAcA_3o3FSScwUcrDX2aFoj-RvNjo=F_Em2HaP=pK5o4=Bng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Suppress
- address-of-packed-member warnings in __get/put_user_e
+In-Reply-To: <CAFEAcA9h7_vaKk7GuGVWv2_hFeR=xC4ZgJzLuD+iSqCdwa1PSw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: add DT property
+ /secure-chosen/sdtout-path being secure UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>, "patches@linaro.org" <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Etienne Carriere <etienne.carriere@linaro.org>, tee-dev@lists.linaro.org, Rob Herring <robh+dt@kernel.org>
 
-On 5 October 2018 at 01:28, Laurent Vivier <laurent@vivier.eu> wrote:
-> I have the following error when building on Fedora 28 and gcc (GCC)
-> 8.1.1 20180712 (Red Hat 8.1.1-5)
->
->   CC      aarch64_be-linux-user/target/arm/arm-semi.o
-> .../target/arm/arm-semi.c: In function =E2=80=98do_arm_semihosting=E2=80=
-=99:
-> .../target/arm/arm-semi.c:270:1: error: unknown option after =E2=80=98#pr=
-agma
-> GCC diagnostic=E2=80=99 kind [-Werror=3Dpragmas]
->
-> Perhaps you should use a "#if defined(__clang__)" to apply your fix only
-> to clang?
++CC: Rob Herring
 
-I did test on gcc, but not that version. The point of the
-   _Pragma("GCC diagnostic ignored \"-Wpragmas\"");
-line is to suppress that error (which it does on my gcc 5)
-so I don't know why your gcc is complaining :-(
+On 10/05/2018 11:16 AM, Peter Maydell wrote:
+> On 5 October 2018 at 09:07, Jerome Forissier
+> <jerome.forissier@linaro.org> wrote:
+>> Bindings for /secure-chosen and /secure-chosen/stdout-path have been
+>> proposed 1.5 years ago [1] and implemented in OP-TEE at the same time [2].
+>>
+>> This patch creates the property when the machine is secure.
+>>
+>> [1] https://patchwork.kernel.org/patch/9602401/
+>> [2] https://github.com/OP-TEE/optee_os/commit/4dc31c52544a
+>>
+>> Signed-off-by: Jerome Forissier <jerome.forissier@linaro.org>
+> 
+> The patch seems OK, but it looks like the DT bindings are
+> not upstream yet? [*]
 
-If you add an extra diagnostic push, so:
+No, they're not.
 
-+        _Pragma("GCC diagnostic push");                                   =
-  \
-+        _Pragma("GCC diagnostic ignored \"-Wpragmas\"");                  =
-  \
-+        _Pragma("GCC diagnostic push");                                   =
-  \
-+        _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\""); =
-  \
+ I wouldn't want QEMU to start creating
+> bindings until the spec is definitely final.
 
-and then a balancing extra
+I understand, but I think we may have a chicken-and-egg problem, because
+Rob said he'd like to see more usage of DT in secure world before
+merging the bindings ;-)
 
-+        _Pragma("GCC diagnostic pop");                                    =
-  \
+That being said, I can certainly re-submit the binding to the LKML. Rob,
+what do you say?
 
-at the end, I don't suppose that helps?
+> 
+> [*] they're not in
+> https://www.kernel.org/doc/Documentation/devicetree/bindings/arm/secure.txt
+> anyway; is that the wrong place to look?
+> 
+> thanks
+> -- PMM
+> 
 
-(I generally prefer to avoid marking things as clang- or gcc-
-specific where I can.)
-
-thanks
--- PMM
+Thanks,
+-- 
+Jerome
