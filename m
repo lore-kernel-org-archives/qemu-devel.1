@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g8UIo-0001AJ-3M
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g8UIz-0001L8-8X
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g8UIm-0003Mo-5p
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:13 -0400
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:39617)
+	(envelope-from <richard.henderson@linaro.org>) id 1g8UIo-0003Rp-3t
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:17 -0400
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:38120)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g8UIl-0003MC-UP
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:12 -0400
-Received: by mail-oi1-x22a.google.com with SMTP id y81-v6so11086273oia.6
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 10:54:11 -0700 (PDT)
+	id 1g8UIn-0003OA-PR
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 13:54:13 -0400
+Received: by mail-ot1-x331.google.com with SMTP id l1so194359otj.5
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 10:54:13 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  5 Oct 2018 12:53:44 -0500
-Message-Id: <20181005175350.30752-10-richard.henderson@linaro.org>
+Date: Fri,  5 Oct 2018 12:53:45 -0500
+Message-Id: <20181005175350.30752-11-richard.henderson@linaro.org>
 In-Reply-To: <20181005175350.30752-1-richard.henderson@linaro.org>
 References: <20181005175350.30752-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 09/15] target/arm: Rewrite
- helper_sve_st[1234]*_r
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 10/15] target/arm: Split contiguous loads
+ for endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,413 +33,532 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-This fixes the endianness problem for softmmu, and moves the
-main loop out of a macro and into an inlined function.
+We can choose the endianness at translation time, rather than
+re-computing it at execution time.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/sve_helper.c | 351 ++++++++++++++++++++--------------------
- 1 file changed, 172 insertions(+), 179 deletions(-)
+ target/arm/helper-sve.h    | 117 +++++++++++++++-------
+ target/arm/sve_helper.c    |  70 ++++++-------
+ target/arm/translate-sve.c | 196 +++++++++++++++++++++++++------------
+ 3 files changed, 252 insertions(+), 131 deletions(-)
 
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index 023952a9a4..526caec8da 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -1128,20 +1128,35 @@ DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld4bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ld1hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld2hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld3hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld4hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hh_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2hh_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3hh_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4hh_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ld1ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld2ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld3ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld4ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hh_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2hh_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3hh_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4hh_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ld1dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld2dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld3dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld4dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1ss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2ss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3ss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4ss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1ss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2ss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3ss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4ss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1dd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2dd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3dd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4dd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1dd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld2dd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld3dd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld4dd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+ DEF_HELPER_FLAGS_4(sve_ld1bhu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld1bsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+@@ -1150,13 +1165,21 @@ DEF_HELPER_FLAGS_4(sve_ld1bhs_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld1bss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld1bds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ld1hsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld1hdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld1hss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld1hds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hsu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hdu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hds_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ld1sdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ld1sds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hsu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hdu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1hds_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1sdu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1sds_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ld1sdu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ld1sds_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+ DEF_HELPER_FLAGS_4(sve_ldff1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ldff1bhu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+@@ -1166,17 +1189,28 @@ DEF_HELPER_FLAGS_4(sve_ldff1bhs_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ldff1bss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ldff1bds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ldff1hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldff1hsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldff1hdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldff1hss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldff1hds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hh_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hsu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hdu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hds_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ldff1ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldff1sdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldff1sds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hh_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hsu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hdu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1hds_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ldff1dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1ss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1sdu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1sds_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldff1ss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1sdu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1sds_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldff1dd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldff1dd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+ DEF_HELPER_FLAGS_4(sve_ldnf1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ldnf1bhu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+@@ -1186,17 +1220,28 @@ DEF_HELPER_FLAGS_4(sve_ldnf1bhs_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ldnf1bss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ldnf1bds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ldnf1hh_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldnf1hsu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldnf1hdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldnf1hss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldnf1hds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hh_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hsu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hdu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hds_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ldnf1ss_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldnf1sdu_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+-DEF_HELPER_FLAGS_4(sve_ldnf1sds_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hh_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hsu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hdu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1hds_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+-DEF_HELPER_FLAGS_4(sve_ldnf1dd_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1ss_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1sdu_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1sds_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldnf1ss_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1sdu_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1sds_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_ldnf1dd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_ldnf1dd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
+ DEF_HELPER_FLAGS_4(sve_st1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_st2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index f712b382f8..0b1e06823b 100644
+index 0b1e06823b..d31988b46a 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -3991,6 +3991,7 @@ typedef intptr_t sve_ld1_host_fn(void *vd, void *vg, void *host,
-  */
- typedef void sve_ld1_tlb_fn(CPUARMState *env, void *vd, intptr_t reg_off,
-                             target_ulong vaddr, int mmu_idx, uintptr_t ra);
-+typedef sve_ld1_tlb_fn sve_st1_tlb_fn;
- 
- /*
-  * Generate the above primitives.
-@@ -4668,214 +4669,206 @@ DO_LDFF1_LDNF1_2(dd,  3, 3)
- /*
-  * Store contiguous data, protected by a governing predicate.
-  */
--#define DO_ST1(NAME, FN, TYPEE, TYPEM, H)                  \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc);                  \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    void *vd = &env->vfp.zregs[rd];                        \
--    for (i = 0; i < oprsz; ) {                             \
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
--        do {                                               \
--            if (pg & 1) {                                  \
--                TYPEM m = *(TYPEE *)(vd + H(i));           \
--                FN(env, addr, m, ra);                      \
--            }                                              \
--            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
--            addr += sizeof(TYPEM);                         \
--        } while (i & 15);                                  \
--    }                                                      \
-+
-+#ifdef CONFIG_SOFTMMU
-+#define DO_ST_TLB(NAME, H, TYPEM, HOST, MOEND, TLB) \
-+static void sve_##NAME##_tlb(CPUARMState *env, void *vd, intptr_t reg_off,  \
-+                             target_ulong addr, int mmu_idx, uintptr_t ra)  \
-+{                                                                           \
-+    TCGMemOpIdx oi = make_memop_idx(ctz32(sizeof(TYPEM)) | MOEND, mmu_idx); \
-+    TLB(env, addr, *(TYPEM *)(vd + H(reg_off)), oi, ra);                    \
- }
--
--#define DO_ST1_D(NAME, FN, TYPEM)                          \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;              \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    uint64_t *d = &env->vfp.zregs[rd].d[0];                \
--    uint8_t *pg = vg;                                      \
--    for (i = 0; i < oprsz; i += 1) {                       \
--        if (pg[H1(i)] & 1) {                               \
--            FN(env, addr, d[i], ra);                       \
--        }                                                  \
--        addr += sizeof(TYPEM);                             \
--    }                                                      \
-+#else
-+#define DO_ST_TLB(NAME, H, TYPEM, HOST, MOEND, TLB) \
-+static void sve_##NAME##_tlb(CPUARMState *env, void *vd, intptr_t reg_off,  \
-+                             target_ulong addr, int mmu_idx, uintptr_t ra)  \
-+{                                                                           \
-+    HOST(g2h(addr), *(TYPEM *)(vd + H(reg_off)));                           \
- }
-+#endif
- 
--#define DO_ST2(NAME, FN, TYPEE, TYPEM, H)                  \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc);                  \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    void *d1 = &env->vfp.zregs[rd];                        \
--    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
--    for (i = 0; i < oprsz; ) {                             \
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
--        do {                                               \
--            if (pg & 1) {                                  \
--                TYPEM m1 = *(TYPEE *)(d1 + H(i));          \
--                TYPEM m2 = *(TYPEE *)(d2 + H(i));          \
--                FN(env, addr, m1, ra);                     \
--                FN(env, addr + sizeof(TYPEM), m2, ra);     \
--            }                                              \
--            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
--            addr += 2 * sizeof(TYPEM);                     \
--        } while (i & 15);                                  \
--    }                                                      \
--}
-+DO_ST_TLB(st1bb,   H1,  uint8_t, stb_p, 0, helper_ret_stb_mmu)
-+DO_ST_TLB(st1bh, H1_2, uint16_t, stb_p, 0, helper_ret_stb_mmu)
-+DO_ST_TLB(st1bs, H1_4, uint32_t, stb_p, 0, helper_ret_stb_mmu)
-+DO_ST_TLB(st1bd,     , uint64_t, stb_p, 0, helper_ret_stb_mmu)
- 
--#define DO_ST3(NAME, FN, TYPEE, TYPEM, H)                  \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc);                  \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    void *d1 = &env->vfp.zregs[rd];                        \
--    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
--    void *d3 = &env->vfp.zregs[(rd + 2) & 31];             \
--    for (i = 0; i < oprsz; ) {                             \
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
--        do {                                               \
--            if (pg & 1) {                                  \
--                TYPEM m1 = *(TYPEE *)(d1 + H(i));          \
--                TYPEM m2 = *(TYPEE *)(d2 + H(i));          \
--                TYPEM m3 = *(TYPEE *)(d3 + H(i));          \
--                FN(env, addr, m1, ra);                     \
--                FN(env, addr + sizeof(TYPEM), m2, ra);     \
--                FN(env, addr + 2 * sizeof(TYPEM), m3, ra); \
--            }                                              \
--            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
--            addr += 3 * sizeof(TYPEM);                     \
--        } while (i & 15);                                  \
--    }                                                      \
--}
-+DO_ST_TLB(st1hh_le, H1_2, uint16_t, stw_le_p, MO_LE, helper_le_stw_mmu)
-+DO_ST_TLB(st1hs_le, H1_4, uint32_t, stw_le_p, MO_LE, helper_le_stw_mmu)
-+DO_ST_TLB(st1hd_le,     , uint64_t, stw_le_p, MO_LE, helper_le_stw_mmu)
- 
--#define DO_ST4(NAME, FN, TYPEE, TYPEM, H)                  \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc);                  \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    void *d1 = &env->vfp.zregs[rd];                        \
--    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
--    void *d3 = &env->vfp.zregs[(rd + 2) & 31];             \
--    void *d4 = &env->vfp.zregs[(rd + 3) & 31];             \
--    for (i = 0; i < oprsz; ) {                             \
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
--        do {                                               \
--            if (pg & 1) {                                  \
--                TYPEM m1 = *(TYPEE *)(d1 + H(i));          \
--                TYPEM m2 = *(TYPEE *)(d2 + H(i));          \
--                TYPEM m3 = *(TYPEE *)(d3 + H(i));          \
--                TYPEM m4 = *(TYPEE *)(d4 + H(i));          \
--                FN(env, addr, m1, ra);                     \
--                FN(env, addr + sizeof(TYPEM), m2, ra);     \
--                FN(env, addr + 2 * sizeof(TYPEM), m3, ra); \
--                FN(env, addr + 3 * sizeof(TYPEM), m4, ra); \
--            }                                              \
--            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
--            addr += 4 * sizeof(TYPEM);                     \
--        } while (i & 15);                                  \
--    }                                                      \
--}
-+DO_ST_TLB(st1ss_le, H1_4, uint32_t, stl_le_p, MO_LE, helper_le_stl_mmu)
-+DO_ST_TLB(st1sd_le,     , uint64_t, stl_le_p, MO_LE, helper_le_stl_mmu)
- 
--DO_ST1(sve_st1bh_r, cpu_stb_data_ra, uint16_t, uint8_t, H1_2)
--DO_ST1(sve_st1bs_r, cpu_stb_data_ra, uint32_t, uint8_t, H1_4)
--DO_ST1_D(sve_st1bd_r, cpu_stb_data_ra, uint8_t)
-+DO_ST_TLB(st1dd_le,     , uint64_t, stq_le_p, MO_LE, helper_le_stq_mmu)
- 
--DO_ST1(sve_st1hs_r, cpu_stw_data_ra, uint32_t, uint16_t, H1_4)
--DO_ST1_D(sve_st1hd_r, cpu_stw_data_ra, uint16_t)
-+DO_ST_TLB(st1hh_be, H1_2, uint16_t, stw_be_p, MO_BE, helper_be_stw_mmu)
-+DO_ST_TLB(st1hs_be, H1_4, uint32_t, stw_be_p, MO_BE, helper_be_stw_mmu)
-+DO_ST_TLB(st1hd_be,     , uint64_t, stw_be_p, MO_BE, helper_be_stw_mmu)
- 
--DO_ST1_D(sve_st1sd_r, cpu_stl_data_ra, uint32_t)
-+DO_ST_TLB(st1ss_be, H1_4, uint32_t, stl_be_p, MO_BE, helper_be_stl_mmu)
-+DO_ST_TLB(st1sd_be,     , uint64_t, stl_be_p, MO_BE, helper_be_stl_mmu)
- 
--DO_ST1(sve_st1bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
--DO_ST2(sve_st2bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
--DO_ST3(sve_st3bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
--DO_ST4(sve_st4bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
-+DO_ST_TLB(st1dd_be,     , uint64_t, stq_be_p, MO_BE, helper_be_stq_mmu)
- 
--DO_ST1(sve_st1hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
--DO_ST2(sve_st2hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
--DO_ST3(sve_st3hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
--DO_ST4(sve_st4hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
-+#undef DO_ST_TLB
- 
--DO_ST1(sve_st1ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
--DO_ST2(sve_st2ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
--DO_ST3(sve_st3ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
--DO_ST4(sve_st4ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
--
--DO_ST1_D(sve_st1dd_r, cpu_stq_data_ra, uint64_t)
--
--void HELPER(sve_st2dd_r)(CPUARMState *env, void *vg,
--                         target_ulong addr, uint32_t desc)
-+/*
-+ * Common helpers for all contiguous 1,2,3,4-register predicated stores.
-+ */
-+static void sve_st1_r(CPUARMState *env, void *vg, target_ulong addr,
-+                      uint32_t desc, const uintptr_t ra,
-+                      const int esize, const int msize,
-+                      sve_st1_tlb_fn *tlb_fn)
- {
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;
--    intptr_t ra = GETPC();
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-     unsigned rd = simd_data(desc);
--    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
--    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
--    uint8_t *pg = vg;
-+    void *vd = &env->vfp.zregs[rd];
- 
--    for (i = 0; i < oprsz; i += 1) {
--        if (pg[H1(i)] & 1) {
--            cpu_stq_data_ra(env, addr, d1[i], ra);
--            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
--        }
--        addr += 2 * 8;
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                tlb_fn(env, vd, i, addr, mmu_idx, ra);
-+            }
-+            i += esize, pg >>= esize;
-+            addr += msize;
-+        } while (i & 15);
-     }
-+    set_helper_retaddr(0);
+@@ -4249,18 +4249,18 @@ void HELPER(sve_##NAME##_r)(CPUARMState *env, void *vg,        \
+               sve_##NAME##_host, sve_##NAME##_tlb);            \
  }
  
--void HELPER(sve_st3dd_r)(CPUARMState *env, void *vg,
--                         target_ulong addr, uint32_t desc)
-+static void sve_st2_r(CPUARMState *env, void *vg, target_ulong addr,
-+                      uint32_t desc, const uintptr_t ra,
-+                      const int esize, const int msize,
-+                      sve_st1_tlb_fn *tlb_fn)
- {
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;
--    intptr_t ra = GETPC();
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-     unsigned rd = simd_data(desc);
--    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
--    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
--    uint64_t *d3 = &env->vfp.zregs[(rd + 2) & 31].d[0];
--    uint8_t *pg = vg;
-+    void *d1 = &env->vfp.zregs[rd];
-+    void *d2 = &env->vfp.zregs[(rd + 1) & 31];
- 
--    for (i = 0; i < oprsz; i += 1) {
--        if (pg[H1(i)] & 1) {
--            cpu_stq_data_ra(env, addr, d1[i], ra);
--            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
--            cpu_stq_data_ra(env, addr + 16, d3[i], ra);
--        }
--        addr += 3 * 8;
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                tlb_fn(env, d1, i, addr, mmu_idx, ra);
-+                tlb_fn(env, d2, i, addr + msize, mmu_idx, ra);
-+            }
-+            i += esize, pg >>= esize;
-+            addr += 2 * msize;
-+        } while (i & 15);
-     }
-+    set_helper_retaddr(0);
+-/* TODO: Propagate the endian check back to the translator.  */
+ #define DO_LD1_2(NAME, ESZ, MSZ) \
+-void HELPER(sve_##NAME##_r)(CPUARMState *env, void *vg,        \
+-                            target_ulong addr, uint32_t desc)  \
+-{                                                              \
+-    if (arm_cpu_data_is_big_endian(env)) {                     \
+-        sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,      \
+-                  sve_##NAME##_be_host, sve_##NAME##_be_tlb);  \
+-    } else {                                                   \
+-        sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,      \
+-                  sve_##NAME##_le_host, sve_##NAME##_le_tlb);  \
+-    }                                                          \
++void HELPER(sve_##NAME##_le_r)(CPUARMState *env, void *vg,        \
++                               target_ulong addr, uint32_t desc)  \
++{                                                                 \
++    sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,             \
++              sve_##NAME##_le_host, sve_##NAME##_le_tlb);         \
++}                                                                 \
++void HELPER(sve_##NAME##_be_r)(CPUARMState *env, void *vg,        \
++                               target_ulong addr, uint32_t desc)  \
++{                                                                 \
++    sve_ld1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,             \
++              sve_##NAME##_be_host, sve_##NAME##_be_tlb);         \
  }
  
--void HELPER(sve_st4dd_r)(CPUARMState *env, void *vg,
--                         target_ulong addr, uint32_t desc)
-+static void sve_st3_r(CPUARMState *env, void *vg, target_ulong addr,
-+                      uint32_t desc, const uintptr_t ra,
-+                      const int esize, const int msize,
-+                      sve_st1_tlb_fn *tlb_fn)
- {
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;
--    intptr_t ra = GETPC();
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-     unsigned rd = simd_data(desc);
--    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
--    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
--    uint64_t *d3 = &env->vfp.zregs[(rd + 2) & 31].d[0];
--    uint64_t *d4 = &env->vfp.zregs[(rd + 3) & 31].d[0];
--    uint8_t *pg = vg;
-+    void *d1 = &env->vfp.zregs[rd];
-+    void *d2 = &env->vfp.zregs[(rd + 1) & 31];
-+    void *d3 = &env->vfp.zregs[(rd + 2) & 31];
- 
--    for (i = 0; i < oprsz; i += 1) {
--        if (pg[H1(i)] & 1) {
--            cpu_stq_data_ra(env, addr, d1[i], ra);
--            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
--            cpu_stq_data_ra(env, addr + 16, d3[i], ra);
--            cpu_stq_data_ra(env, addr + 24, d4[i], ra);
--        }
--        addr += 4 * 8;
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                tlb_fn(env, d1, i, addr, mmu_idx, ra);
-+                tlb_fn(env, d2, i, addr + msize, mmu_idx, ra);
-+                tlb_fn(env, d3, i, addr + 2 * msize, mmu_idx, ra);
-+            }
-+            i += esize, pg >>= esize;
-+            addr += 3 * msize;
-+        } while (i & 15);
-     }
-+    set_helper_retaddr(0);
+ DO_LD1_1(ld1bb,  0)
+@@ -4387,12 +4387,17 @@ void __attribute__((flatten)) HELPER(sve_ld##N##bb_r)               \
  }
  
-+static void sve_st4_r(CPUARMState *env, void *vg, target_ulong addr,
-+                      uint32_t desc, const uintptr_t ra,
-+                      const int esize, const int msize,
-+                      sve_st1_tlb_fn *tlb_fn)
-+{
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+    unsigned rd = simd_data(desc);
-+    void *d1 = &env->vfp.zregs[rd];
-+    void *d2 = &env->vfp.zregs[(rd + 1) & 31];
-+    void *d3 = &env->vfp.zregs[(rd + 2) & 31];
-+    void *d4 = &env->vfp.zregs[(rd + 3) & 31];
-+
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                tlb_fn(env, d1, i, addr, mmu_idx, ra);
-+                tlb_fn(env, d2, i, addr + msize, mmu_idx, ra);
-+                tlb_fn(env, d3, i, addr + 2 * msize, mmu_idx, ra);
-+                tlb_fn(env, d4, i, addr + 3 * msize, mmu_idx, ra);
-+            }
-+            i += esize, pg >>= esize;
-+            addr += 4 * msize;
-+        } while (i & 15);
-+    }
-+    set_helper_retaddr(0);
-+}
-+
-+#define DO_STN_1(N, NAME, ESIZE) \
-+void __attribute__((flatten)) HELPER(sve_st##N##NAME##_r)           \
-+    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
-+{                                                                   \
-+    sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, 1,           \
-+                  sve_st1##NAME##_tlb);                             \
-+}
-+
-+#define DO_STN_2(N, NAME, ESIZE, MSIZE) \
-+void __attribute__((flatten)) HELPER(sve_st##N##NAME##_r)             \
+ #define DO_LDN_2(N, SUFF, SIZE)                                       \
+-void __attribute__((flatten)) HELPER(sve_ld##N##SUFF##_r)             \
++void __attribute__((flatten)) HELPER(sve_ld##N##SUFF##_le_r)          \
+     (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
+ {                                                                     \
+     sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
+-                  arm_cpu_data_is_big_endian(env)                     \
+-                  ? sve_ld1##SUFF##_be_tlb : sve_ld1##SUFF##_le_tlb); \
++                  sve_ld1##SUFF##_le_tlb);                            \
++}                                                                     \
++void __attribute__((flatten)) HELPER(sve_ld##N##SUFF##_be_r)          \
 +    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
 +{                                                                     \
-+    sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, MSIZE,         \
-+                  arm_cpu_data_is_big_endian(env)                     \
-+                  ? sve_st1##NAME##_be_tlb : sve_st1##NAME##_le_tlb); \
-+}
-+
-+DO_STN_1(1, bb, 1)
-+DO_STN_1(1, bh, 2)
-+DO_STN_1(1, bs, 4)
-+DO_STN_1(1, bd, 8)
-+DO_STN_1(2, bb, 1)
-+DO_STN_1(3, bb, 1)
-+DO_STN_1(4, bb, 1)
-+
-+DO_STN_2(1, hh, 2, 2)
-+DO_STN_2(1, hs, 4, 2)
-+DO_STN_2(1, hd, 8, 2)
-+DO_STN_2(2, hh, 2, 2)
-+DO_STN_2(3, hh, 2, 2)
-+DO_STN_2(4, hh, 2, 2)
-+
-+DO_STN_2(1, ss, 4, 4)
-+DO_STN_2(1, sd, 8, 4)
-+DO_STN_2(2, ss, 4, 4)
-+DO_STN_2(3, ss, 4, 4)
-+DO_STN_2(4, ss, 4, 4)
-+
-+DO_STN_2(1, dd, 8, 8)
-+DO_STN_2(2, dd, 8, 8)
-+DO_STN_2(3, dd, 8, 8)
-+DO_STN_2(4, dd, 8, 8)
-+
-+#undef DO_STN_1
-+#undef DO_STN_2
-+
- /* Loads with a vector index.  */
++    sve_ld##N##_r(env, vg, addr, desc, SIZE, GETPC(),                 \
++                  sve_ld1##SUFF##_be_tlb);                            \
+ }
  
- #define DO_LD1_ZPZ_S(NAME, TYPEI, TYPEM, FN)                            \
+ DO_LDN_1(2)
+@@ -4618,29 +4623,28 @@ void HELPER(sve_ldnf1##PART##_r)(CPUARMState *env, void *vg,            \
+     sve_ldnf1_r(env, vg, addr, desc, ESZ, 0, sve_ld1##PART##_host);     \
+ }
+ 
+-/* TODO: Propagate the endian check back to the translator.  */
+ #define DO_LDFF1_LDNF1_2(PART, ESZ, MSZ) \
+-void HELPER(sve_ldff1##PART##_r)(CPUARMState *env, void *vg,            \
+-                                 target_ulong addr, uint32_t desc)      \
++void HELPER(sve_ldff1##PART##_le_r)(CPUARMState *env, void *vg,         \
++                                    target_ulong addr, uint32_t desc)   \
+ {                                                                       \
+-    if (arm_cpu_data_is_big_endian(env)) {                              \
+-        sve_ldff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,             \
+-                    sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb);   \
+-    } else {                                                            \
+-        sve_ldff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,             \
+-                    sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb);   \
+-    }                                                                   \
++    sve_ldff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,                 \
++                sve_ld1##PART##_le_host, sve_ld1##PART##_le_tlb);       \
+ }                                                                       \
+-void HELPER(sve_ldnf1##PART##_r)(CPUARMState *env, void *vg,            \
+-                                 target_ulong addr, uint32_t desc)      \
++void HELPER(sve_ldnf1##PART##_le_r)(CPUARMState *env, void *vg,         \
++                                    target_ulong addr, uint32_t desc)   \
+ {                                                                       \
+-    if (arm_cpu_data_is_big_endian(env)) {                              \
+-        sve_ldnf1_r(env, vg, addr, desc, ESZ, MSZ,                      \
+-                    sve_ld1##PART##_be_host);                           \
+-    } else {                                                            \
+-        sve_ldnf1_r(env, vg, addr, desc, ESZ, MSZ,                      \
+-                    sve_ld1##PART##_le_host);                           \
+-    }                                                                   \
++    sve_ldnf1_r(env, vg, addr, desc, ESZ, MSZ, sve_ld1##PART##_le_host); \
++}                                                                       \
++void HELPER(sve_ldff1##PART##_be_r)(CPUARMState *env, void *vg,         \
++                                    target_ulong addr, uint32_t desc)   \
++{                                                                       \
++    sve_ldff1_r(env, vg, addr, desc, GETPC(), ESZ, MSZ,                 \
++                sve_ld1##PART##_be_host, sve_ld1##PART##_be_tlb);       \
++}                                                                       \
++void HELPER(sve_ldnf1##PART##_be_r)(CPUARMState *env, void *vg,         \
++                                    target_ulong addr, uint32_t desc)   \
++{                                                                       \
++    sve_ldnf1_r(env, vg, addr, desc, ESZ, MSZ, sve_ld1##PART##_be_host); \
+ }
+ 
+ DO_LDFF1_LDNF1_1(bb,  0)
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 4ee3bbca29..8d191df7d8 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -4624,32 +4624,58 @@ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+ static void do_ld_zpa(DisasContext *s, int zt, int pg,
+                       TCGv_i64 addr, int dtype, int nreg)
+ {
+-    static gen_helper_gvec_mem * const fns[16][4] = {
+-        { gen_helper_sve_ld1bb_r, gen_helper_sve_ld2bb_r,
+-          gen_helper_sve_ld3bb_r, gen_helper_sve_ld4bb_r },
+-        { gen_helper_sve_ld1bhu_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1bsu_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1bdu_r, NULL, NULL, NULL },
++    static gen_helper_gvec_mem * const fns[2][16][4] = {
++        /* Little-endian */
++        { { gen_helper_sve_ld1bb_r, gen_helper_sve_ld2bb_r,
++            gen_helper_sve_ld3bb_r, gen_helper_sve_ld4bb_r },
++          { gen_helper_sve_ld1bhu_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1bsu_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1bdu_r, NULL, NULL, NULL },
+ 
+-        { gen_helper_sve_ld1sds_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1hh_r, gen_helper_sve_ld2hh_r,
+-          gen_helper_sve_ld3hh_r, gen_helper_sve_ld4hh_r },
+-        { gen_helper_sve_ld1hsu_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1hdu_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1sds_le_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1hh_le_r, gen_helper_sve_ld2hh_le_r,
++            gen_helper_sve_ld3hh_le_r, gen_helper_sve_ld4hh_le_r },
++          { gen_helper_sve_ld1hsu_le_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1hdu_le_r, NULL, NULL, NULL },
+ 
+-        { gen_helper_sve_ld1hds_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1hss_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1ss_r, gen_helper_sve_ld2ss_r,
+-          gen_helper_sve_ld3ss_r, gen_helper_sve_ld4ss_r },
+-        { gen_helper_sve_ld1sdu_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1hds_le_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1hss_le_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1ss_le_r, gen_helper_sve_ld2ss_le_r,
++            gen_helper_sve_ld3ss_le_r, gen_helper_sve_ld4ss_le_r },
++          { gen_helper_sve_ld1sdu_le_r, NULL, NULL, NULL },
+ 
+-        { gen_helper_sve_ld1bds_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1bss_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1bhs_r, NULL, NULL, NULL },
+-        { gen_helper_sve_ld1dd_r, gen_helper_sve_ld2dd_r,
+-          gen_helper_sve_ld3dd_r, gen_helper_sve_ld4dd_r },
++          { gen_helper_sve_ld1bds_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1bss_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1bhs_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1dd_le_r, gen_helper_sve_ld2dd_le_r,
++            gen_helper_sve_ld3dd_le_r, gen_helper_sve_ld4dd_le_r } },
++
++        /* Big-endian */
++        { { gen_helper_sve_ld1bb_r, gen_helper_sve_ld2bb_r,
++            gen_helper_sve_ld3bb_r, gen_helper_sve_ld4bb_r },
++          { gen_helper_sve_ld1bhu_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1bsu_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1bdu_r, NULL, NULL, NULL },
++
++          { gen_helper_sve_ld1sds_be_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1hh_be_r, gen_helper_sve_ld2hh_be_r,
++            gen_helper_sve_ld3hh_be_r, gen_helper_sve_ld4hh_be_r },
++          { gen_helper_sve_ld1hsu_be_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1hdu_be_r, NULL, NULL, NULL },
++
++          { gen_helper_sve_ld1hds_be_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1hss_be_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1ss_be_r, gen_helper_sve_ld2ss_be_r,
++            gen_helper_sve_ld3ss_be_r, gen_helper_sve_ld4ss_be_r },
++          { gen_helper_sve_ld1sdu_be_r, NULL, NULL, NULL },
++
++          { gen_helper_sve_ld1bds_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1bss_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1bhs_r, NULL, NULL, NULL },
++          { gen_helper_sve_ld1dd_be_r, gen_helper_sve_ld2dd_be_r,
++            gen_helper_sve_ld3dd_be_r, gen_helper_sve_ld4dd_be_r } }
+     };
+-    gen_helper_gvec_mem *fn = fns[dtype][nreg];
++    gen_helper_gvec_mem *fn = fns[s->be_data == MO_BE][dtype][nreg];
+ 
+     /* While there are holes in the table, they are not
+      * accessible via the instruction encoding.
+@@ -4689,59 +4715,103 @@ static bool trans_LD_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
+ 
+ static bool trans_LDFF1_zprr(DisasContext *s, arg_rprr_load *a, uint32_t insn)
+ {
+-    static gen_helper_gvec_mem * const fns[16] = {
+-        gen_helper_sve_ldff1bb_r,
+-        gen_helper_sve_ldff1bhu_r,
+-        gen_helper_sve_ldff1bsu_r,
+-        gen_helper_sve_ldff1bdu_r,
++    static gen_helper_gvec_mem * const fns[2][16] = {
++        /* Little-endian */
++        { gen_helper_sve_ldff1bb_r,
++          gen_helper_sve_ldff1bhu_r,
++          gen_helper_sve_ldff1bsu_r,
++          gen_helper_sve_ldff1bdu_r,
+ 
+-        gen_helper_sve_ldff1sds_r,
+-        gen_helper_sve_ldff1hh_r,
+-        gen_helper_sve_ldff1hsu_r,
+-        gen_helper_sve_ldff1hdu_r,
++          gen_helper_sve_ldff1sds_le_r,
++          gen_helper_sve_ldff1hh_le_r,
++          gen_helper_sve_ldff1hsu_le_r,
++          gen_helper_sve_ldff1hdu_le_r,
+ 
+-        gen_helper_sve_ldff1hds_r,
+-        gen_helper_sve_ldff1hss_r,
+-        gen_helper_sve_ldff1ss_r,
+-        gen_helper_sve_ldff1sdu_r,
++          gen_helper_sve_ldff1hds_le_r,
++          gen_helper_sve_ldff1hss_le_r,
++          gen_helper_sve_ldff1ss_le_r,
++          gen_helper_sve_ldff1sdu_le_r,
+ 
+-        gen_helper_sve_ldff1bds_r,
+-        gen_helper_sve_ldff1bss_r,
+-        gen_helper_sve_ldff1bhs_r,
+-        gen_helper_sve_ldff1dd_r,
++          gen_helper_sve_ldff1bds_r,
++          gen_helper_sve_ldff1bss_r,
++          gen_helper_sve_ldff1bhs_r,
++          gen_helper_sve_ldff1dd_le_r },
++
++        /* Big-endian */
++        { gen_helper_sve_ldff1bb_r,
++          gen_helper_sve_ldff1bhu_r,
++          gen_helper_sve_ldff1bsu_r,
++          gen_helper_sve_ldff1bdu_r,
++
++          gen_helper_sve_ldff1sds_be_r,
++          gen_helper_sve_ldff1hh_be_r,
++          gen_helper_sve_ldff1hsu_be_r,
++          gen_helper_sve_ldff1hdu_be_r,
++
++          gen_helper_sve_ldff1hds_be_r,
++          gen_helper_sve_ldff1hss_be_r,
++          gen_helper_sve_ldff1ss_be_r,
++          gen_helper_sve_ldff1sdu_be_r,
++
++          gen_helper_sve_ldff1bds_r,
++          gen_helper_sve_ldff1bss_r,
++          gen_helper_sve_ldff1bhs_r,
++          gen_helper_sve_ldff1dd_be_r },
+     };
+ 
+     if (sve_access_check(s)) {
+         TCGv_i64 addr = new_tmp_a64(s);
+         tcg_gen_shli_i64(addr, cpu_reg(s, a->rm), dtype_msz(a->dtype));
+         tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, a->rn));
+-        do_mem_zpa(s, a->rd, a->pg, addr, fns[a->dtype]);
++        do_mem_zpa(s, a->rd, a->pg, addr, fns[s->be_data == MO_BE][a->dtype]);
+     }
+     return true;
+ }
+ 
+ static bool trans_LDNF1_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
+ {
+-    static gen_helper_gvec_mem * const fns[16] = {
+-        gen_helper_sve_ldnf1bb_r,
+-        gen_helper_sve_ldnf1bhu_r,
+-        gen_helper_sve_ldnf1bsu_r,
+-        gen_helper_sve_ldnf1bdu_r,
++    static gen_helper_gvec_mem * const fns[2][16] = {
++        /* Little-endian */
++        { gen_helper_sve_ldnf1bb_r,
++          gen_helper_sve_ldnf1bhu_r,
++          gen_helper_sve_ldnf1bsu_r,
++          gen_helper_sve_ldnf1bdu_r,
+ 
+-        gen_helper_sve_ldnf1sds_r,
+-        gen_helper_sve_ldnf1hh_r,
+-        gen_helper_sve_ldnf1hsu_r,
+-        gen_helper_sve_ldnf1hdu_r,
++          gen_helper_sve_ldnf1sds_le_r,
++          gen_helper_sve_ldnf1hh_le_r,
++          gen_helper_sve_ldnf1hsu_le_r,
++          gen_helper_sve_ldnf1hdu_le_r,
+ 
+-        gen_helper_sve_ldnf1hds_r,
+-        gen_helper_sve_ldnf1hss_r,
+-        gen_helper_sve_ldnf1ss_r,
+-        gen_helper_sve_ldnf1sdu_r,
++          gen_helper_sve_ldnf1hds_le_r,
++          gen_helper_sve_ldnf1hss_le_r,
++          gen_helper_sve_ldnf1ss_le_r,
++          gen_helper_sve_ldnf1sdu_le_r,
+ 
+-        gen_helper_sve_ldnf1bds_r,
+-        gen_helper_sve_ldnf1bss_r,
+-        gen_helper_sve_ldnf1bhs_r,
+-        gen_helper_sve_ldnf1dd_r,
++          gen_helper_sve_ldnf1bds_r,
++          gen_helper_sve_ldnf1bss_r,
++          gen_helper_sve_ldnf1bhs_r,
++          gen_helper_sve_ldnf1dd_le_r },
++
++        /* Big-endian */
++        { gen_helper_sve_ldnf1bb_r,
++          gen_helper_sve_ldnf1bhu_r,
++          gen_helper_sve_ldnf1bsu_r,
++          gen_helper_sve_ldnf1bdu_r,
++
++          gen_helper_sve_ldnf1sds_be_r,
++          gen_helper_sve_ldnf1hh_be_r,
++          gen_helper_sve_ldnf1hsu_be_r,
++          gen_helper_sve_ldnf1hdu_be_r,
++
++          gen_helper_sve_ldnf1hds_be_r,
++          gen_helper_sve_ldnf1hss_be_r,
++          gen_helper_sve_ldnf1ss_be_r,
++          gen_helper_sve_ldnf1sdu_be_r,
++
++          gen_helper_sve_ldnf1bds_r,
++          gen_helper_sve_ldnf1bss_r,
++          gen_helper_sve_ldnf1bhs_r,
++          gen_helper_sve_ldnf1dd_be_r },
+     };
+ 
+     if (sve_access_check(s)) {
+@@ -4751,16 +4821,18 @@ static bool trans_LDNF1_zpri(DisasContext *s, arg_rpri_load *a, uint32_t insn)
+         TCGv_i64 addr = new_tmp_a64(s);
+ 
+         tcg_gen_addi_i64(addr, cpu_reg_sp(s, a->rn), off);
+-        do_mem_zpa(s, a->rd, a->pg, addr, fns[a->dtype]);
++        do_mem_zpa(s, a->rd, a->pg, addr, fns[s->be_data == MO_BE][a->dtype]);
+     }
+     return true;
+ }
+ 
+ static void do_ldrq(DisasContext *s, int zt, int pg, TCGv_i64 addr, int msz)
+ {
+-    static gen_helper_gvec_mem * const fns[4] = {
+-        gen_helper_sve_ld1bb_r, gen_helper_sve_ld1hh_r,
+-        gen_helper_sve_ld1ss_r, gen_helper_sve_ld1dd_r,
++    static gen_helper_gvec_mem * const fns[2][4] = {
++        { gen_helper_sve_ld1bb_r,    gen_helper_sve_ld1hh_le_r,
++          gen_helper_sve_ld1ss_le_r, gen_helper_sve_ld1dd_le_r },
++        { gen_helper_sve_ld1bb_r,    gen_helper_sve_ld1hh_be_r,
++          gen_helper_sve_ld1ss_be_r, gen_helper_sve_ld1dd_be_r },
+     };
+     unsigned vsz = vec_full_reg_size(s);
+     TCGv_ptr t_pg;
+@@ -4792,7 +4864,7 @@ static void do_ldrq(DisasContext *s, int zt, int pg, TCGv_i64 addr, int msz)
+     t_pg = tcg_temp_new_ptr();
+     tcg_gen_addi_ptr(t_pg, cpu_env, poff);
+ 
+-    fns[msz](cpu_env, t_pg, addr, desc);
++    fns[s->be_data == MO_BE][msz](cpu_env, t_pg, addr, desc);
+ 
+     tcg_temp_free_ptr(t_pg);
+     tcg_temp_free_i32(desc);
 -- 
 2.17.1
