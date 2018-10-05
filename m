@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g8Lno-0000G2-V8
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 04:49:42 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1g8Lpx-0002mO-5a
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 04:51:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g8Ld4-00071N-5G
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 04:38:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22388)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1g8Ld3-0006zy-SH
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 04:38:34 -0400
-Date: Fri, 5 Oct 2018 09:38:27 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181005083827.GE778@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181003091344.24496-1-d.csapak@proxmox.com>
-	<20181004135110.GQ3667@redhat.com>
-	<3672933a-18c4-8283-1318-c7b57fdf08d7@proxmox.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3672933a-18c4-8283-1318-c7b57fdf08d7@proxmox.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/1] add exit-script option to qemu
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1g8Lpt-0007w9-Vc
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 04:51:53 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:48576
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1g8Lpt-0007pV-NS
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 04:51:49 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri,  5 Oct 2018 09:51:31 +0100
+Message-Id: <20181005085132.26394-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PULL 0/1] qemu-openbios.for-upstream queue 20181005
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dominik Csapak <d.csapak@proxmox.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Fri, Oct 05, 2018 at 08:56:27AM +0200, Dominik Csapak wrote:
-> On 10/4/18 3:51 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Oct 03, 2018 at 11:13:43AM +0200, Dominik Csapak wrote:
-> > > this patch aims to execute a script when qemu exits
-> > > so that one can do cleanups when using --daemonize without
-> > > having to use the qmp monitor
-> >=20
-> > IMHO the idea of cleanup scripts run by QEMU itself is flawed.
-> > QEMU will inevitably crash before cleanup scripts can be run,
-> > so whatever mgmt app is using QEMU needs to be able to do
-> > cleanup without QEMU's help.
-> >=20
-> > I think this can be done more reliably with a wrapper script,
-> > that spawns QEMU, waits for it to exit and then calls the
-> > cleanup script. On Linux at least you can use prctl() with
-> > PR_SET_CHILD_SUBREAPER so you can detect exit'ing of QEMU
-> > even after it has daemonized.
-> >=20
-> > Perhaps we could have such a wrapper script put in the
-> > contrib directory
-> >=20
-> > Regards,
-> > Daniel
-> >=20
-> Hi,
->=20
-> for cleaning up after qemu crashes, you are completely right,
-> (ignoring that the downscript for tap devices also never gets executed
-> then), but this series has another use.
->=20
-> With it, a user can determine the reason of a graceful shutdown
-> (e.g., if it was by a signal, qmp or from inside) of qemu,
-> especially when using -no-reboot without using qmp
->=20
-> and using qmp for that is not very practical for everyone,
-> or is there another way for that which i am missing?
+The following changes since commit dafd95053611aa14dda40266857608d12ddce658:
 
-Honestly QMP *is* the right answer. We've put alot of effort into QMP
-and I don't think it is sensible to start adding new mechanisms to
-provide the same information in an adhoc manner.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-02 18:27:18 +0100)
 
-What makes you think QMP isn't practical to use ?  We have client
-impls that talk to QMP in scripts/qmp that are just a few 100 lines
-of pretty simple python code.
+are available in the git repository at:
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+  git://github.com/mcayland/qemu.git tags/qemu-openbios.for-upstream-20181005
+
+for you to fetch changes up to 422d33b8c847fe1264099f93ec8ddb2e56772d4d:
+
+  Update OpenBIOS images to 441a84d3 built from submodule. (2018-10-05 09:25:14 +0100)
+
+----------------------------------------------------------------
+qemu-openbios.for-upstream queue
+
+----------------------------------------------------------------
+Mark Cave-Ayland (1):
+      Update OpenBIOS images to 441a84d3 built from submodule.
+
+ pc-bios/openbios-ppc     | Bin 767224 -> 767224 bytes
+ pc-bios/openbios-sparc32 | Bin 382048 -> 382048 bytes
+ pc-bios/openbios-sparc64 | Bin 1593408 -> 1593408 bytes
+ roms/openbios            |   2 +-
+ 4 files changed, 1 insertion(+), 1 deletion(-)
