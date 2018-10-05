@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8Ogr-00021x-8b
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 07:54:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g8PB9-0004aC-EC
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:26:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8OXs-0005qx-Pf
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 07:45:27 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:38828)
+	(envelope-from <peter.maydell@linaro.org>) id 1g8P7p-0001Hb-5W
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:22:33 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43207)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g8OXi-0005U5-2c
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 07:45:19 -0400
-Received: by mail-ot1-x329.google.com with SMTP id h15-v6so12389517otj.5
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 04:45:11 -0700 (PDT)
+	id 1g8P7p-0001HN-0C
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 08:22:33 -0400
+Received: by mail-oi1-x243.google.com with SMTP id s69-v6so10198200oie.10
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 05:22:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181003141833.21493-1-marcandre.lureau@redhat.com>
-References: <20181003141833.21493-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20181002212522.23303-7-f4bug@amsat.org>
+References: <20181002212522.23303-1-f4bug@amsat.org>
+	<20181002212522.23303-7-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 5 Oct 2018 12:44:50 +0100
-Message-ID: <CAFEAcA-KwDYpybZWsQstxR0i1SD5L=nn=khyRJ_cXLMHEWR_MA@mail.gmail.com>
+Date: Fri, 5 Oct 2018 13:22:11 +0100
+Message-ID: <CAFEAcA9pkncFUWfMmjLOYnPp09xFR+eaZc7i9roa+vCGM93V1w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/12] Option patches
+Subject: Re: [Qemu-devel] [PATCH v2 06/12] hw/pci-host/bonito: Use
+ DeviceState::realize rather than SysBusDevice::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 3 October 2018 at 15:18, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> The following changes since commit dafd95053611aa14dda40266857608d12ddce6=
-58:
+On 2 October 2018 at 22:25, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
+rote:
+> Move from the legacy SysBusDevice::init method to using DeviceState::real=
+ize.
 >
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
-taging (2018-10-02 18:27:18 +0100)
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/pci-host/bonito.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
 >
-> are available in the Git repository at:
+> diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+> index 9868e2eccc..9f33582706 100644
+> --- a/hw/pci-host/bonito.c
+> +++ b/hw/pci-host/bonito.c
+> @@ -595,7 +595,7 @@ static const VMStateDescription vmstate_bonito =3D {
+>      }
+>  };
 >
->   https://github.com/elmarco/qemu.git tags/option-pull-request
+> -static int bonito_pcihost_initfn(SysBusDevice *dev)
+> +static void bonito_pcihost_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIHostState *phb =3D PCI_HOST_BRIDGE(dev);
 >
-> for you to fetch changes up to 9066f2c2b6494206839835c9d37482425e1983d9:
+> @@ -603,8 +603,6 @@ static int bonito_pcihost_initfn(SysBusDevice *dev)
+>                                       pci_bonito_set_irq, pci_bonito_map_=
+irq,
+>                                       dev, get_system_memory(), get_syste=
+m_io(),
+>                                       0x28, 32, TYPE_PCI_BUS);
+> -
+> -    return 0;
+>  }
 >
->   vl: list user creatable properties when 'help' is argument (2018-10-03 =
-18:03:17 +0400)
+>  static void bonito_realize(PCIDevice *dev, Error **errp)
+> @@ -684,7 +682,6 @@ PCIBus *bonito_init(qemu_irq *pic)
+>      pcihost->pic =3D pic;
+>      qdev_init_nofail(dev);
 >
-> ----------------------------------------------------------------
-> CLI help improvements
+> -    /* set the pcihost pointer before bonito_initfn is called */
+>      d =3D pci_create(phb->bus, PCI_DEVFN(0, 0), TYPE_PCI_BONITO);
+>      s =3D PCI_BONITO(d);
+>      s->pcihost =3D pcihost;
+> @@ -726,9 +723,9 @@ static const TypeInfo bonito_info =3D {
 >
-> ----------------------------------------------------------------
+>  static void bonito_pcihost_class_init(ObjectClass *klass, void *data)
+>  {
+> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>
+> -    k->init =3D bonito_pcihost_initfn;
+> +    dc->realize =3D bonito_pcihost_realize;
+>  }
+>
+>  static const TypeInfo bonito_pcihost_info =3D {
+> --
 
-Hi. This seems to fail "make check" on all platforms:
-
-
-MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-gtester -k --verbose -m=3Dquick t
-ests/check-qom-proplist
-TEST: tests/check-qom-proplist... (pid=3D21624)
-  /qom/proplist/createlist:                                            OK
-  /qom/proplist/createv:                                               OK
-  /qom/proplist/createcmdline:                                         OK
-  /qom/proplist/badenum:                                               OK
-  /qom/proplist/getenum:                                               OK
-Found prop 'type'
-  /qom/proplist/iterator:                                              **
-ERROR:/home/petmay01/linaro/qemu-for-merges/tests/check-qom-proplist.c:540:=
-test_dummy_prop_itera
-tor: code should not be reached
-FAIL
-GTester: last random seed: R02S55ffa6110c89eb6405f845acf4ca5558
-(pid=3D21627)
-  /qom/proplist/class_iterator:
-Found prop 'type'
-**
-ERROR:/home/petmay01/linaro/qemu-for-merges/tests/check-qom-proplist.c:540:=
-test_dummy_prop_itera
-tor: code should not be reached
-FAIL
-GTester: last random seed: R02Scdce3ab505045deea3b5df4d6b7e75c8
-(pid=3D21629)
-  /qom/proplist/delchild:                                              OK
-  /qom/resolve/partial:                                                OK
-FAIL: tests/check-qom-proplist
-/home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:925:
-recipe for target 'check-tests
-/check-qom-proplist' failed
-
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
