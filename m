@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g8SnZ-0001rN-7v
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:17:53 -0400
+	(envelope-from <alistair23@gmail.com>) id 1g8SsV-0005ym-5z
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g8SnY-0003gr-8s
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:17:53 -0400
-Date: Fri, 5 Oct 2018 18:17:39 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181005161739.GC4606@localhost.localdomain>
-References: <20181005143802.18412-1-peter.maydell@linaro.org>
-	<CAFEAcA8-FvVG7XBLrd7NQfRcKrvo6GtPEjfqJzkjd68iP9=TeQ@mail.gmail.com>
+	(envelope-from <alistair23@gmail.com>) id 1g8SsU-0000uP-CT
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:22:59 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38695)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1g8SsU-0000sU-1s
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:22:58 -0400
+Received: by mail-lj1-x244.google.com with SMTP id v7-v6so11673106ljg.5
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 09:22:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8-FvVG7XBLrd7NQfRcKrvo6GtPEjfqJzkjd68iP9=TeQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] tests: Disable test-bdrv-drain
+References: <20181005160147.892-1-kraxel@redhat.com>
+	<20181005160147.892-2-kraxel@redhat.com>
+In-Reply-To: <20181005160147.892-2-kraxel@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 5 Oct 2018 09:22:29 -0700
+Message-ID: <CAKmqyKNY+Yziwq_82Oz4yueAvYAzrOev5=0taNm6qpUFcGZcnA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/2] display: add separate config option
+ for bochs-display
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Am 05.10.2018 um 16:41 hat Peter Maydell geschrieben:
-> On 5 October 2018 at 15:38, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > The test-bdrv-drain test fails at least 50% of the time
-> > on my OS build system. Disable the test until we can figure
-> 
-> This is a typo: I meant "OSX build system".
-> 
-> > out what's going on, as this makes pull request processing
-> > very difficult.
-> >
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Fri, Oct 5, 2018 at 9:13 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> This allows modern architectures which don't care about vga
+> compatibility (risc-v for example) build bochs-display without
+> including all vga emulation too.
 
-Can we disable it conditionally only on OS X instead?
+For RISC-V we end up including pci.mak anyway for other things such as
+NVMe drives. So we don't really need this, but it still seems useful.
 
-I'd hate to lose this test case, and without OS X I can't really do
-anything to fix the problem (or to even find out if it's a test case
-problem or a bug that the test case reveals).
+>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Kevin
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
+> ---
+>  default-configs/pci.mak  | 1 +
+>  hw/display/Makefile.objs | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+> index de53d20ac6..6c7be12779 100644
+> --- a/default-configs/pci.mak
+> +++ b/default-configs/pci.mak
+> @@ -44,5 +44,6 @@ CONFIG_SDHCI=y
+>  CONFIG_EDU=y
+>  CONFIG_VGA=y
+>  CONFIG_VGA_PCI=y
+> +CONFIG_BOCHS_DISPLAY=y
+>  CONFIG_IVSHMEM_DEVICE=$(CONFIG_IVSHMEM)
+>  CONFIG_ROCKER=y
+> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+> index 780a76b9f0..2a0de16a55 100644
+> --- a/hw/display/Makefile.objs
+> +++ b/hw/display/Makefile.objs
+> @@ -14,11 +14,11 @@ common-obj-$(CONFIG_SSD0323) += ssd0323.o
+>  common-obj-$(CONFIG_XEN) += xenfb.o
+>
+>  common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
+> -common-obj-$(CONFIG_VGA_PCI) += bochs-display.o
+>  common-obj-$(CONFIG_VGA_PCI) += edid-region.o
+>  common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
+>  common-obj-$(CONFIG_VGA_ISA_MM) += vga-isa-mm.o
+>  common-obj-$(CONFIG_VMWARE_VGA) += vmware_vga.o
+> +common-obj-$(CONFIG_BOCHS_DISPLAY) += bochs-display.o
+>
+>  common-obj-$(CONFIG_BLIZZARD) += blizzard.o
+>  common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
+> --
+> 2.9.3
+>
+>
