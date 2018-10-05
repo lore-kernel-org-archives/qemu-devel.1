@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g8UQU-0000Jj-Da
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g8UQX-0000NC-Q1
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g8UQT-0003ix-CD
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:10 -0400
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:43586)
+	(envelope-from <richard.henderson@linaro.org>) id 1g8UQU-0003oU-Pn
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:13 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44190)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g8UQT-0003ex-2a
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:09 -0400
-Received: by mail-ot1-x32d.google.com with SMTP id e21-v6so13542196otk.10
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 11:02:08 -0700 (PDT)
+	id 1g8UQU-0003lh-Ij
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 14:02:10 -0400
+Received: by mail-ot1-x342.google.com with SMTP id p23so1882901otf.11
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 11:02:10 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  5 Oct 2018 13:01:54 -0500
-Message-Id: <20181005180201.11387-2-richard.henderson@linaro.org>
+Date: Fri,  5 Oct 2018 13:01:55 -0500
+Message-Id: <20181005180201.11387-3-richard.henderson@linaro.org>
 In-Reply-To: <20181005180201.11387-1-richard.henderson@linaro.org>
 References: <20181005180201.11387-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/8] softfloat: remove float64_trunc_to_int
+Subject: [Qemu-devel] [PULL 2/8] gitmodules: add berkeley's softfloat +
+ testfloat version 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,48 +32,45 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-It has not had users since f83311e476 ("target-m68k: use floatx80
-internally", 2017-06-21).
+These are BSD-licensed so we can add them as submodules.
 
-Note that no other bit-width has floatX_trunc_to_int.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/fpu/softfloat.h | 1 -
- fpu/softfloat.c         | 7 -------
- 2 files changed, 8 deletions(-)
+ .gitmodules                   | 6 ++++++
+ tests/fp/berkeley-softfloat-3 | 1 +
+ tests/fp/berkeley-testfloat-3 | 1 +
+ 3 files changed, 8 insertions(+)
+ create mode 160000 tests/fp/berkeley-softfloat-3
+ create mode 160000 tests/fp/berkeley-testfloat-3
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index cc1b58b029..8fd9f9bbae 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -535,7 +535,6 @@ float128 float64_to_float128(float64, float_status *status);
- | Software IEC/IEEE double-precision operations.
- *----------------------------------------------------------------------------*/
- float64 float64_round_to_int(float64, float_status *status);
--float64 float64_trunc_to_int(float64, float_status *status);
- float64 float64_add(float64, float64, float_status *status);
- float64 float64_sub(float64, float64, float_status *status);
- float64 float64_mul(float64, float64, float_status *status);
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 59ca356d0e..9405f12a03 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1409,13 +1409,6 @@ float64 float64_round_to_int(float64 a, float_status *s)
-     return float64_round_pack_canonical(pr, s);
- }
- 
--float64 float64_trunc_to_int(float64 a, float_status *s)
--{
--    FloatParts pa = float64_unpack_canonical(a, s);
--    FloatParts pr = round_to_int(pa, float_round_to_zero, 0, s);
--    return float64_round_pack_canonical(pr, s);
--}
--
- /*
-  * Returns the result of converting the floating-point value `a' to
-  * the two's complement integer format. The conversion is performed
+diff --git a/.gitmodules b/.gitmodules
+index d108478e0a..a48d2a764c 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -43,3 +43,9 @@
+ [submodule "roms/u-boot-sam460ex"]
+ 	path = roms/u-boot-sam460ex
+ 	url = git://git.qemu.org/u-boot-sam460ex.git
++[submodule "tests/fp/berkeley-testfloat-3"]
++	path = tests/fp/berkeley-testfloat-3
++	url = git://github.com/cota/berkeley-testfloat-3
++[submodule "tests/fp/berkeley-softfloat-3"]
++	path = tests/fp/berkeley-softfloat-3
++	url = git://github.com/cota/berkeley-softfloat-3
+diff --git a/tests/fp/berkeley-softfloat-3 b/tests/fp/berkeley-softfloat-3
+new file mode 160000
+index 0000000000..b64af41c32
+--- /dev/null
++++ b/tests/fp/berkeley-softfloat-3
+@@ -0,0 +1 @@
++Subproject commit b64af41c3276f97f0e181920400ee056b9c88037
+diff --git a/tests/fp/berkeley-testfloat-3 b/tests/fp/berkeley-testfloat-3
+new file mode 160000
+index 0000000000..ca9fa2ba05
+--- /dev/null
++++ b/tests/fp/berkeley-testfloat-3
+@@ -0,0 +1 @@
++Subproject commit ca9fa2ba05625ba929958f163b01747e07dd39cc
 -- 
 2.17.1
