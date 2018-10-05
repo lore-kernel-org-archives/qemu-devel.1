@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8TPe-0007HJ-KK
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:57:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g8TQ3-0007RP-QW
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:57:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g8TNb-0003tI-C3
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:55:08 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36608)
+	(envelope-from <peter.maydell@linaro.org>) id 1g8TN2-0003da-Sk
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:54:33 -0400
+Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:46283)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g8TNb-0003sx-4N
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:55:07 -0400
-Received: by mail-oi1-x244.google.com with SMTP id p125-v6so10947272oic.3
-	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 09:55:07 -0700 (PDT)
+	id 1g8TMz-0003Si-4I
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:54:30 -0400
+Received: by mail-oi1-x22a.google.com with SMTP id k64-v6so10919214oia.13
+	for <qemu-devel@nongnu.org>; Fri, 05 Oct 2018 09:54:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181005161739.GC4606@localhost.localdomain>
-References: <20181005143802.18412-1-peter.maydell@linaro.org>
-	<CAFEAcA8-FvVG7XBLrd7NQfRcKrvo6GtPEjfqJzkjd68iP9=TeQ@mail.gmail.com>
-	<20181005161739.GC4606@localhost.localdomain>
+In-Reply-To: <20181004152857.14525-1-cohuck@redhat.com>
+References: <20181004152857.14525-1-cohuck@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 5 Oct 2018 17:54:45 +0100
-Message-ID: <CAFEAcA-SWRHwnwsa+QiHXfdBRB6u2u0paV9HsEqfjR6nZvAHSg@mail.gmail.com>
+Date: Fri, 5 Oct 2018 17:53:57 +0100
+Message-ID: <CAFEAcA87E1F5vbmU8-xv=jtoezpOcp-oyPQjE0gAVga_9YufXw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tests: Disable test-bdrv-drain
+Subject: Re: [Qemu-devel] [PULL 00/15] s390x updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 5 October 2018 at 17:17, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 05.10.2018 um 16:41 hat Peter Maydell geschrieben:
->> On 5 October 2018 at 15:38, Peter Maydell <peter.maydell@linaro.org> wrote:
->> > The test-bdrv-drain test fails at least 50% of the time
->> > on my OS build system. Disable the test until we can figure
->>
->> This is a typo: I meant "OSX build system".
->>
->> > out what's going on, as this makes pull request processing
->> > very difficult.
->> >
->> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 4 October 2018 at 16:28, Cornelia Huck <cohuck@redhat.com> wrote:
+> The following changes since commit dafd95053611aa14dda40266857608d12ddce658:
 >
-> Can we disable it conditionally only on OS X instead?
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-02 18:27:18 +0100)
 >
-> I'd hate to lose this test case, and without OS X I can't really do
-> anything to fix the problem (or to even find out if it's a test case
-> problem or a bug that the test case reveals).
+> are available in the Git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20181004
+>
+> for you to fetch changes up to b576d582ea2b03f4eada186fff59308d22b40a6a:
+>
+>   hw/s390x/s390-pci-bus: Convert sysbus init function to realize function (2018-10-04 12:10:40 +0200)
+>
+> ----------------------------------------------------------------
+> Various s390x updates:
+> - fix several struct definitions so that sparc hosts do not trip over
+>   unaligned accesses
+> - fence enabling huge pages for pre-3.1 machines
+> - sysbus init -> realize conversion
+> - fixes and improvements in tcg (instruction flags and AFP registers)
 
-If we disable it for OSX only then nobody has any incentive
-to investigate and fix it...
+Applied, thanks.
 
-thanks
 -- PMM
