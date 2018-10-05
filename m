@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g8TQI-0007hT-N2
+	(envelope-from <kraxel@redhat.com>) id 1g8TQH-0007fk-7b
 	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1g8TGI-0007lB-OZ
-	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:47:35 -0400
-References: <20181001102928.20533-1-vsementsov@virtuozzo.com>
-	<20181001102928.20533-14-vsementsov@virtuozzo.com>
-	<20181004124421.GC6009@localhost.localdomain>
-	<d691c927-e37a-1178-8180-9893278aa02c@virtuozzo.com>
-	<20181004145241.GG6009@localhost.localdomain>
-	<19e42ee8-fdbe-e637-6728-bfc10b137f63@virtuozzo.com>
-	<46e224bd-8c1f-4565-944e-52440e85e2f0@virtuozzo.com>
-	<20181005155213.GB4606@localhost.localdomain>
-	<05adf79a-4ae1-0ba1-aa7f-7696aa043594@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ac7c795b-127f-8f2e-4953-95b74f57ffee@redhat.com>
-Date: Fri, 5 Oct 2018 11:47:17 -0500
+	(envelope-from <kraxel@redhat.com>) id 1g8TGm-0007y7-TG
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:48:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35728)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1g8TGm-0007xa-Mb
+	for qemu-devel@nongnu.org; Fri, 05 Oct 2018 12:48:04 -0400
+Date: Fri, 5 Oct 2018 18:48:00 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181005164800.klw6siygbyk2ipbx@sirius.home.kraxel.org>
+References: <20181005160147.892-1-kraxel@redhat.com>
+	<20181005160147.892-2-kraxel@redhat.com>
+	<CAKmqyKNY+Yziwq_82Oz4yueAvYAzrOev5=0taNm6qpUFcGZcnA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <05adf79a-4ae1-0ba1-aa7f-7696aa043594@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 13/18] block: introduce new filter
- driver: fleecing-hook
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKmqyKNY+Yziwq_82Oz4yueAvYAzrOev5=0taNm6qpUFcGZcnA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] display: add separate config option
+ for bochs-display
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "armbru@redhat.com" <armbru@redhat.com>, "xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>, "wencongyang2@huawei.com" <wencongyang2@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 10/5/18 11:40 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 05.10.2018 18:52, Kevin Wolf wrote:
->> Hi Vladimir,
->>
->> can you please check your mailer settings? The plain text version of the
->> emails is hardly legible because it mixes quotes text and replies. I
->> had to manually open the HTML part to figure out what you really wrote.
+On Fri, Oct 05, 2018 at 09:22:29AM -0700, Alistair Francis wrote:
+> On Fri, Oct 5, 2018 at 9:13 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >
+> > This allows modern architectures which don't care about vga
+> > compatibility (risc-v for example) build bochs-display without
+> > including all vga emulation too.
 > 
-> I've sent it from other thunderbird instance from home, I hope
-> thunderbird at work (where I'm composing now) is ok..
+> For RISC-V we end up including pci.mak anyway for other things such as
+> NVMe drives. So we don't really need this, but it still seems useful.
 
-Comparing the two:
+Hmm, maybe we should split pci.mak into pci-legacy.mak and pci-express.mak
+then?
 
-Home:
-Message-ID: <46e224bd-8c1f-4565-944e-52440e85e2f0@virtuozzo.com>
-...
-Content-Type: multipart/alternative;
-	boundary="_000_46e224bd8c1f4565944e52440e85e2f0virtuozzocom_"
-
-Work:
-Message-ID: <05adf79a-4ae1-0ba1-aa7f-7696aa043594@virtuozzo.com>
-...
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DF06DD561001084699A8EB982D66721B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-
-So, the difference is that at home, you haven't told thunderbird to send 
-plain-text only emails to specific recipients (setting up the list as 
-one of those recipients that wants plain-text only), and something else 
-in your local configurations then results in a multipart email where the 
-html portion looks fine but the plain-text portion has horrendous 
-quoting. But at work, you are configured for plain-text-only output, 
-html is not even available, and the quoting is decent from the start.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+cheers,
+  Gerd
