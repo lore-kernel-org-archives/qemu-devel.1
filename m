@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ndragazis@outlook.com.gr>) id 1g8snT-0001XD-9E
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 16:03:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1g8uEX-0006HK-Lz
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 17:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ndragazis@outlook.com.gr>) id 1g8snO-0004SL-Cq
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 16:03:31 -0400
-Received: from mail-db5eur01lp0179.outbound.protection.outlook.com
-	([213.199.154.179]:30792
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ndragazis@outlook.com.gr>)
-	id 1g8snM-0004Pl-Ni
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 16:03:26 -0400
-From: Nikos Dragazis <ndragazis@outlook.com.gr>
-Date: Sat, 6 Oct 2018 20:03:22 +0000
-Message-ID: <DB7PR07MB3867468812F702134BC2BCAC98E40@DB7PR07MB3867.eurprd07.prod.outlook.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3DA9C3338CF5994283386AC6FFFEF6AB@eurprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1g8uEU-00058F-HL
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 17:35:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1g8uEU-00057x-BE
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 17:35:30 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1g8uES-0008WU-Kn
+	for <qemu-devel@nongnu.org>; Sat, 06 Oct 2018 21:35:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9A8CF2E8010
+	for <qemu-devel@nongnu.org>; Sat,  6 Oct 2018 21:35:28 +0000 (UTC)
 MIME-Version: 1.0
-Subject: [Qemu-devel] vhost: add virtio-vhost-user transport
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 06 Oct 2018 21:26:48 -0000
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Reply-To: Bug 1796520 <1796520@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <153886120838.22456.12836438866392888832.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1796520] [NEW] autogen crashes on qemu-sh4-user
+ after 61dedf2af7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +36,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "spdk@lists.01.org" <spdk@lists.01.org>
-Cc: Vangelis Koukis <vkoukis@arrikto.com>, Stefan Hajnoczi <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-SGkgZXZlcnlvbmUsDQoNCkluIHJlc3BvbnNlIHRvIGEgcHJldmlvdXMgZW1haWwgb2YgbWluZSBo
-ZXJlOg0KDQpodHRwczovL2xpc3RzLjAxLm9yZy9waXBlcm1haWwvc3Bkay8yMDE4LVNlcHRlbWJl
-ci8wMDI0ODguaHRtbA0KDQpJIHdvdWxkIGxpa2UgdG8gc2hhcmUgdGhhdCBJIGhhdmUgYWRkZWQg
-c3VwcG9ydCBmb3IgYSBuZXcNCnZpcnRpby12aG9zdC11c2VyIHRyYW5zcG9ydCB0byBTUERLLiBh
-bmQgaGF2ZSBhIHdvcmtpbmcgZGVtbyBvZiB0aGUgU1BESw0Kdmhvc3Qtc2NzaSB0YXJnZXQgb3Zl
-ciB0aGlzIHRyYW5zcG9ydC4gSSBoYXZlIHRlc3RlZCBpdCBzdWNjZXNzZnVsbHkNCndpdGggTWFs
-bG9jIGJkZXYsIE5WTWUgYmRldiBhbmQgdmlydGlvLXNjc2kgYmRldi4NCg0KTXkgY29kZSBjdXJy
-ZW50bHkgbGl2ZXMgaGVyZToNCg0KaHR0cHM6Ly9naXRodWIuY29tL25kcmFnYXppcy9zcGRrDQoN
-CkknZCBsb3ZlIHRvIGdldCB5b3VyIGZlZWRiYWNrIGFuZCBoYXZlIGl0IG1lcmdlZCBldmVudHVh
-bGx5LiBJIHNlZSB0aGVyZQ0KaXMgYSByZWxldmFudCBjb252ZXJzYXRpb24gb24gdGhpcyB0b3Bp
-YyBoZXJlOg0KDQpodHRwczovL2xpc3RzLjAxLm9yZy9waXBlcm1haWwvc3Bkay8yMDE4LU1hcmNo
-LzAwMTU1Ny5odG1sDQoNCklzIHRoZXJlIGFueW9uZSBpbiB0aGlzIGNvbW11bml0eSBjdXJyZW50
-bHkgd29ya2luZyBvbiB0aGlzPyBXaGF0IHdvdWxkDQpteSBuZXh0IHN0ZXAgaW4gY29udHJpYnV0
-aW5nIHRoaXMgYmU/DQoNCkxvb2tpbmcgZm9yd2FyZCB0byB5b3VyIGZlZWRiYWNrLA0KTmlrb3MN
-Cg0KLS0NCk5pa29zIERyYWdhemlzDQpVbmRlcmdyYWR1YXRlIFN0dWRlbnQNClNjaG9vbCBvZiBF
-bGVjdHJpY2FsIGFuZCBDb21wdXRlciBFbmdpbmVlcmluZw0KTmF0aW9uYWwgVGVjaG5pY2FsIFVu
-aXZlcnNpdHkgb2YgQXRoZW5zDQoNCg==
+Public bug reported:
+
+Running "autogen --help" crashes on qemu-sh4-user with:
+
+(sid-sh4-sbuild)root@nofan:/# autogen --help
+Unhandled trap: 0x180
+pc=3D0xf64dd2de sr=3D0x00000000 pr=3D0xf63b9c74 fpscr=3D0x00080000
+spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf61102a8 vbr=3D0x00000000
+sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf64dd2a0 fpul=3D0x00000003
+r0=3D0xf6fc1320 r1=3D0x00000000 r2=3D0xffff5dc4 r3=3D0xf67bfb50
+r4=3D0xf6fc1230 r5=3D0xf6fc141c r6=3D0x000003ff r7=3D0x00000000
+r8=3D0x00000004 r9=3D0xf63e20bc r10=3D0xf6fc141c r11=3D0xf63e28f0
+r12=3D0xf63e2258 r13=3D0xf63eae1c r14=3D0x00000804 r15=3D0xf6fc1220
+r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+(sid-sh4-sbuild)root@nofan:/#
+
+Bi-secting found this commit to be the culprit:
+
+61dedf2af79fb5866dc7a0f972093682f2185e17 is the first bad commit
+commit 61dedf2af79fb5866dc7a0f972093682f2185e17
+Author: Richard Henderson <rth@twiddle.net>
+Date:   Tue Jul 18 10:02:50 2017 -1000
+
+    target/sh4: Add missing FPSCR.PR =3D=3D 0 checks
+    =
+
+    Both frchg and fschg require PR =3D=3D 0, otherwise undefined_operation.
+    =
+
+    Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+    Signed-off-by: Richard Henderson <rth@twiddle.net>
+    Message-Id: <20170718200255.31647-26-rth@twiddle.net>
+    Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+
+:040000 040000 980d79b69ae712f23a1e4c56983e97a843153b4a
+1024c109f506c7ad57367c63bc8bbbc8a7a36cd7 M      target
+
+Reverting 61dedf2af79fb5866dc7a0f972093682f2185e17 fixes the problem for
+me.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1796520
+
+Title:
+  autogen crashes on qemu-sh4-user after 61dedf2af7
+
+Status in QEMU:
+  New
+
+Bug description:
+  Running "autogen --help" crashes on qemu-sh4-user with:
+
+  (sid-sh4-sbuild)root@nofan:/# autogen --help
+  Unhandled trap: 0x180
+  pc=3D0xf64dd2de sr=3D0x00000000 pr=3D0xf63b9c74 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf61102a8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf64dd2a0 fpul=3D0x000000=
+03
+  r0=3D0xf6fc1320 r1=3D0x00000000 r2=3D0xffff5dc4 r3=3D0xf67bfb50
+  r4=3D0xf6fc1230 r5=3D0xf6fc141c r6=3D0x000003ff r7=3D0x00000000
+  r8=3D0x00000004 r9=3D0xf63e20bc r10=3D0xf6fc141c r11=3D0xf63e28f0
+  r12=3D0xf63e2258 r13=3D0xf63eae1c r14=3D0x00000804 r15=3D0xf6fc1220
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  (sid-sh4-sbuild)root@nofan:/#
+
+  Bi-secting found this commit to be the culprit:
+
+  61dedf2af79fb5866dc7a0f972093682f2185e17 is the first bad commit
+  commit 61dedf2af79fb5866dc7a0f972093682f2185e17
+  Author: Richard Henderson <rth@twiddle.net>
+  Date:   Tue Jul 18 10:02:50 2017 -1000
+
+      target/sh4: Add missing FPSCR.PR =3D=3D 0 checks
+      =
+
+      Both frchg and fschg require PR =3D=3D 0, otherwise undefined_operati=
+on.
+      =
+
+      Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+      Signed-off-by: Richard Henderson <rth@twiddle.net>
+      Message-Id: <20170718200255.31647-26-rth@twiddle.net>
+      Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+
+  :040000 040000 980d79b69ae712f23a1e4c56983e97a843153b4a
+  1024c109f506c7ad57367c63bc8bbbc8a7a36cd7 M      target
+
+  Reverting 61dedf2af79fb5866dc7a0f972093682f2185e17 fixes the problem
+  for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1796520/+subscriptions
