@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g8irQ-00013N-Kf
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 05:27:02 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g8ptH-000721-Df
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 12:57:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g8ijO-0006VB-9a
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 05:18:43 -0400
-Received: from m50-132.163.com ([123.125.50.132]:43422)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@163.com>) id 1g8ijN-0006Rg-Ib
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 05:18:38 -0400
-From: Li Qiang <liq3ea@163.com>
-Date: Sat,  6 Oct 2018 02:18:16 -0700
-Message-Id: <20181006091816.7659-1-liq3ea@163.com>
-Subject: [Qemu-devel] [PATCH] target/i386: kvm: just return after
- migrate_add_blocker failed
+	(envelope-from <richard.henderson@linaro.org>) id 1g8ptB-0001de-V7
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 12:57:19 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34452)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g8ptA-0001ZI-Ax
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 12:57:13 -0400
+Received: by mail-pg1-x541.google.com with SMTP id g12-v6so6066976pgs.1
+	for <qemu-devel@nongnu.org>; Sat, 06 Oct 2018 09:57:11 -0700 (PDT)
+References: <20181005154910.3099-1-alex.bennee@linaro.org>
+	<20181005154910.3099-2-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1857b002-97fb-20a3-706a-77703229b841@linaro.org>
+Date: Sat, 6 Oct 2018 09:57:06 -0700
+MIME-Version: 1.0
+In-Reply-To: <20181005154910.3099-2-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 01/21] util/log: allow -dfilter to stack
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,29 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, dgilbert@redhat.com
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: cota@braap.org, vilanova@ac.upc.edu, Pavel.Dovgaluk@ispras.ru
 
-When migrate_add_blocker failed, the invtsc_mig_blocker is not
-appended so no need to remove. This can save several instructions.
+On 10/5/18 8:48 AM, Alex Bennée wrote:
+> The original dfilter was patched to avoid a leak in the case of
+> multiple -dfilter ranges. There is no reason not to allow the user to
+> stack several dfilter options rather than push them all into one mega
+> line. We avoid the leak by simply only allocating the first time
+> around. As we are using a g_array it will automatically re-size as
+> needed.
+> 
+> The allocation is pushed to a helper as future patches will offer
+> additional ways to add to the dfilter.
+> 
+> We also add a helper qemu_reset_dfilter_ranges() so we can be explicit
+> in our unit tests.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  include/qemu/log.h   |  1 +
+>  tests/test-logging.c | 14 ++++++++++++++
+>  util/log.c           | 23 +++++++++++++++++------
+>  3 files changed, 32 insertions(+), 6 deletions(-)
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- target/i386/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 0b2a07d3a4..6ba84a39f3 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1153,7 +1153,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             if (local_err) {
-                 error_report_err(local_err);
-                 error_free(invtsc_mig_blocker);
--                goto fail;
-+                return r;
-             }
-             /* for savevm */
-             vmstate_x86_cpu.unmigratable = 1;
--- 
-2.17.1
+
+r~
