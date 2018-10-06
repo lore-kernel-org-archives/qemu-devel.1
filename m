@@ -1,14 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1g8rUJ-0000uu-Sr
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 14:39:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g8rfu-0003Cv-M1
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 14:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefan@weilnetz.de>) id 1g8rUG-0004bu-C2
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 14:39:38 -0400
-From: Stefan Weil <sw@weilnetz.de>
-Date: Sat,  6 Oct 2018 20:38:51 +0200
-Message-Id: <20181006183851.3797-1-sw@weilnetz.de>
-Subject: [Qemu-devel] [PATCH] qemu-io-cmds: Fix two format strings
+	(envelope-from <richard.henderson@linaro.org>) id 1g8rfr-00077v-H6
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 14:51:38 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g8rfr-00077f-B5
+	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 14:51:35 -0400
+Received: by mail-pf1-x444.google.com with SMTP id l17-v6so2184147pff.2
+	for <qemu-devel@nongnu.org>; Sat, 06 Oct 2018 11:51:35 -0700 (PDT)
+References: <20181005154910.3099-1-alex.bennee@linaro.org>
+	<20181005154910.3099-11-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <87503b42-1a74-4a19-6e8e-012b903ab791@linaro.org>
+Date: Sat, 6 Oct 2018 11:51:31 -0700
+MIME-Version: 1.0
+In-Reply-To: <20181005154910.3099-11-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 10/21] qom/cpu: add a cpu_exit trace
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,41 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developer <qemu-devel@nongnu.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: cota@braap.org, vilanova@ac.upc.edu, Pavel.Dovgaluk@ispras.ru, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-Use %zu instead of %zd for unsigned numbers.
+On 10/5/18 8:48 AM, Alex Bennée wrote:
+> This is useful for tracing cpu_exit events where we signal the CPU to
+> come back to the main loop.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  qom/cpu.c        | 3 +++
+>  qom/trace-events | 4 ++++
+>  2 files changed, 7 insertions(+)
 
-This fixes two error messages from the LSTM static code analyzer:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-This argument should be of type 'ssize_t' but is of type 'unsigned long'
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
----
- qemu-io-cmds.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index db0b3ee5ef..5363482213 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -907,7 +907,7 @@ static int readv_f(BlockBackend *blk, int argc, char **argv)
-         memset(cmp_buf, pattern, qiov.size);
-         if (memcmp(buf, cmp_buf, qiov.size)) {
-             printf("Pattern verification failed at offset %"
--                   PRId64 ", %zd bytes\n", offset, qiov.size);
-+                   PRId64 ", %zu bytes\n", offset, qiov.size);
-             ret = -EINVAL;
-         }
-         g_free(cmp_buf);
-@@ -1294,7 +1294,7 @@ static void aio_read_done(void *opaque, int ret)
-         memset(cmp_buf, ctx->pattern, ctx->qiov.size);
-         if (memcmp(ctx->buf, cmp_buf, ctx->qiov.size)) {
-             printf("Pattern verification failed at offset %"
--                   PRId64 ", %zd bytes\n", ctx->offset, ctx->qiov.size);
-+                   PRId64 ", %zu bytes\n", ctx->offset, ctx->qiov.size);
-         }
-         g_free(cmp_buf);
-     }
--- 
-2.11.0
+r~
