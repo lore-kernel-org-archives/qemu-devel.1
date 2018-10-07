@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bishara@daynix.com>) id 1g95PS-0007BT-39
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 05:31:36 -0400
+	(envelope-from <bishara@daynix.com>) id 1g95gJ-00016m-Ih
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 05:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bishara@daynix.com>) id 1g95PQ-00026l-7N
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 05:31:34 -0400
-Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:36141)
+	(envelope-from <bishara@daynix.com>) id 1g95XK-0008NC-V3
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 05:39:43 -0400
+Received: from mail-it1-x12e.google.com ([2607:f8b0:4864:20::12e]:35063)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bishara@daynix.com>) id 1g95PQ-00026C-0U
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 05:31:32 -0400
-Received: by mail-it1-x144.google.com with SMTP id c85-v6so8236804itd.1
-	for <qemu-devel@nongnu.org>; Sun, 07 Oct 2018 02:31:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bishara@daynix.com>) id 1g95XK-0008MD-Np
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 05:39:42 -0400
+Received: by mail-it1-x12e.google.com with SMTP id p64-v6so8242418itp.0
+	for <qemu-devel@nongnu.org>; Sun, 07 Oct 2018 02:39:42 -0700 (PDT)
 MIME-Version: 1.0
 References: <20180927073624.17163-1-bishara@daynix.com>
-	<20180927073624.17163-8-bishara@daynix.com>
-	<CAJ+F1C+cUb-h0jSYem899WbQQiNCm97=VpmOaXao5Q+b6pUEHQ@mail.gmail.com>
-In-Reply-To: <CAJ+F1C+cUb-h0jSYem899WbQQiNCm97=VpmOaXao5Q+b6pUEHQ@mail.gmail.com>
+	<20180927073624.17163-4-bishara@daynix.com>
+	<CAJ+F1C+AROSNmnX6OWJ+dF5LozLQ8Afz6YB+Gq9y+epKmjB+Wg@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+AROSNmnX6OWJ+dF5LozLQ8Afz6YB+Gq9y+epKmjB+Wg@mail.gmail.com>
 From: Bishara AbuHattoum <bishara@daynix.com>
-Date: Sun, 7 Oct 2018 12:31:22 +0300
-Message-ID: <CADyT_0VxmVGJddyBHh+=xng4HxvQB2GTHzN-OFKCZgy=KjQYhA@mail.gmail.com>
+Date: Sun, 7 Oct 2018 12:39:36 +0300
+Message-ID: <CADyT_0VWhyf_3OJkA8NrO4D_=oFbMcZgvLwmShwr3CGEHpu7dQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 7/7] qga-win: changing --retry-path option
- behavior
+Subject: Re: [Qemu-devel] [PATCH 3/7] qga: move w32 service handling out of
+ run_agent()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,264 +34,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Yan Vugenfirer <yan@daynix.com>
 
-Your advice was taken and implemented, sending changes in the next version.
+As I already clarified in the cover letter, I will fix the typo in the
+commit message and drop the message ID from all the patches, changes will
+be in the next version.
 
-On Thu, Sep 27, 2018 at 2:48 PM Marc-Andr=C3=A9 Lureau <
+On Thu, Sep 27, 2018 at 2:45 PM Marc-Andr=C3=A9 Lureau <
 marcandre.lureau@gmail.com> wrote:
 
 > Hi
 >
-> On Thu, Sep 27, 2018 at 11:41 AM Bishara AbuHattoum <bishara@daynix.com>
+> On Thu, Sep 27, 2018 at 11:39 AM Bishara AbuHattoum <bishara@daynix.com>
 > wrote:
 > >
-> > Currently whenever the qemu-ga's service doesn't find the virtio-serial
-> > the run_agent() loops in a QGA_RETRY_INTERVAL (default 5 seconds)
-> > intervals and try to restart the qemu-ga which causes a synchronous loo=
-p.
-> > Changed to wait and listen for the serial events by registering for
-> > notifications a proper serial event handler that deals with events:
-> >   DBT_DEVICEARRIVAL        indicates that the device has been inserted
-> and
-> >                            is available
-> >   DBT_DEVICEREMOVECOMPLETE indicates that the devive has been removed
-> > Which allow us to determine when the channel path is available for the
-> > qemu-ga to restart.
+> > From: Michael Roth <mdroth@linux.vnet.ibm.com>
 > >
-> > Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
-> > Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+> > Eventually we want a w32 service to be able to restart the qga main
+> > loop from within service_main(). To allow for this we move service
+> > handling out of run_agent() such that service_main() calls
+> > run_agent() instead of the reverse.
+> >
+> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > Message-Id: <20171026233054.21133-4-mdroth@linux.vnet.ibm.com>
 >
-> looks good overall,
+> Same remark about message-id
 >
 > > ---
-> >  qga/main.c          | 101 +++++++++++++++++++++++++++++++++++++++++++-
-> >  qga/service-win32.h |   4 ++
-> >  2 files changed, 104 insertions(+), 1 deletion(-)
+> >  qga/main.c | 25 ++++++++++++++-----------
+> >  1 file changed, 14 insertions(+), 11 deletions(-)
 > >
 > > diff --git a/qga/main.c b/qga/main.c
-> > index 6a152eb3a7..215dcb36f1 100644
+> > index 7381053a0f..d9888bff5f 100644
 > > --- a/qga/main.c
 > > +++ b/qga/main.c
-> > @@ -34,6 +34,7 @@
-> >  #include "qemu/systemd.h"
-> >  #include "qemu-version.h"
-> >  #ifdef _WIN32
-> > +#include <dbt.h>
-> >  #include "qga/service-win32.h"
-> >  #include "qga/vss-win32.h"
-> >  #endif
-> > @@ -101,6 +102,8 @@ struct GAState {
-> >      bool logging_enabled;
-> >  #ifdef _WIN32
-> >      GAService service;
-> > +    HANDLE channel_available_event;
-> > +    HANDLE stop_event;
-> >  #endif
-> >      bool delimit_response;
-> >      bool frozen;
-> > @@ -137,6 +140,7 @@ static const char *ga_freeze_whitelist[] =3D {
-> >  #ifdef _WIN32
-> >  DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+> > @@ -136,6 +136,7 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD
+> type, LPVOID data,
 > >                                    LPVOID ctx);
-> > +DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data);
 > >  VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
 > >  #endif
-> >  static int run_agent(GAState *s);
-> > @@ -729,6 +733,36 @@ static gboolean channel_init(GAState *s, const
-> gchar *method, const gchar *path,
-> >  }
+> > +static int run_agent(GAState *s);
 > >
-> >  #ifdef _WIN32
-> > +DWORD WINAPI handle_serial_device_events(DWORD type, LPVOID data)
-> > +{
-> > +    DWORD ret =3D NO_ERROR;
-> > +    PDEV_BROADCAST_HDR broadcast_header =3D (PDEV_BROADCAST_HDR)data;
-> > +
-> > +    if (broadcast_header->dbch_devicetype =3D=3D
-> DBT_DEVTYP_DEVICEINTERFACE) {
-> > +        switch (type) {
-> > +            /* Device inserted */
-> > +        case DBT_DEVICEARRIVAL:
-> > +            /* Start QEMU-ga's service */
-> > +            if (!SetEvent(ga_state->channel_available_event)) {
-> > +                ret =3D GetLastError();
-> > +            }
-> > +            break;
-> > +            /* Device removed */
-> > +        case DBT_DEVICEQUERYREMOVE:
-> > +        case DBT_DEVICEREMOVEPENDING:
-> > +        case DBT_DEVICEREMOVECOMPLETE:
-> > +            /* Stop QEMU-ga's service */
-> > +            if (!ResetEvent(ga_state->channel_available_event)) {
-> > +                ret =3D GetLastError();
-> > +            }
-> > +            break;
-> > +        default:
-> > +            ret =3D ERROR_CALL_NOT_IMPLEMENTED;
-> > +        }
-> > +    }
-> > +    return ret;
-> > +}
-> > +
-> >  DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
-> >                                    LPVOID ctx)
-> >  {
-> > @@ -740,9 +774,13 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWOR=
-D
-> type, LPVOID data,
-> >          case SERVICE_CONTROL_STOP:
-> >          case SERVICE_CONTROL_SHUTDOWN:
-> >              quit_handler(SIGTERM);
-> > +            SetEvent(ga_state->stop_event);
-> >              service->status.dwCurrentState =3D SERVICE_STOP_PENDING;
-> >              SetServiceStatus(service->status_handle, &service->status)=
-;
-> >              break;
-> > +        case SERVICE_CONTROL_DEVICEEVENT:
-> > +            handle_serial_device_events(type, data);
-> > +            break;
-> >
-> >          default:
-> >              ret =3D ERROR_CALL_NOT_IMPLEMENTED;
-> > @@ -769,10 +807,25 @@ VOID WINAPI service_main(DWORD argc, TCHAR *argv[=
-])
-> >      service->status.dwServiceSpecificExitCode =3D NO_ERROR;
-> >      service->status.dwCheckPoint =3D 0;
+> >  static void
+> >  init_dfl_pathnames(void)
+> > @@ -763,7 +764,7 @@ VOID WINAPI service_main(DWORD argc, TCHAR *argv[])
 > >      service->status.dwWaitHint =3D 0;
-> > +    DEV_BROADCAST_DEVICEINTERFACE notification_filter;
-> > +    ZeroMemory(&notification_filter, sizeof(notification_filter));
-> > +    notification_filter.dbcc_devicetype =3D DBT_DEVTYP_DEVICEINTERFACE=
-;
-> > +    notification_filter.dbcc_size =3D
-> sizeof(DEV_BROADCAST_DEVICEINTERFACE);
-> > +    notification_filter.dbcc_classguid =3D GUID_VIOSERIAL_PORT;
-> > +
-> > +    service->device_notification_handle =3D
-> > +        RegisterDeviceNotification(service->status_handle,
-> > +            &notification_filter, DEVICE_NOTIFY_SERVICE_HANDLE);
-> > +    if (!service->device_notification_handle) {
-> > +        g_critical("Failed to register device notification handle!\n")=
-;
-> > +        return;
-> > +    }
 > >      SetServiceStatus(service->status_handle, &service->status);
-> > +    ResetEvent(ga_state->stop_event);
 > >
-> >      run_agent(ga_state);
+> > -    g_main_loop_run(ga_state->main_loop);
+> > +    run_agent(ga_state);
 > >
-> > +    UnregisterDeviceNotification(service->device_notification_handle);
 > >      service->status.dwCurrentState =3D SERVICE_STOPPED;
 > >      SetServiceStatus(service->status_handle, &service->status);
-> >  }
-> > @@ -1360,12 +1413,32 @@ static GAState *initialize_agent(GAConfig
-> *config, int socket_activation)
+> > @@ -1372,17 +1373,8 @@ static int run_agent(GAState *s)
+> >          g_critical("failed to initialize guest agent channel");
+> >          return EXIT_FAILURE;
+> >      }
+> > -#ifndef _WIN32
+> > +
+> >      g_main_loop_run(ga_state->main_loop);
+> > -#else
+> > -    if (config->daemonize) {
+> > -        SERVICE_TABLE_ENTRY service_table[] =3D {
+> > -            { (char *)QGA_SERVICE_NAME, service_main }, { NULL, NULL }
+> };
+> > -        StartServiceCtrlDispatcher(service_table);
+> > -    } else {
+> > -        g_main_loop_run(ga_state->main_loop);
+> > -    }
+> > -#endif
 > >
-> >      s->config =3D config;
-> >      s->socket_activation =3D socket_activation;
-> > +
-> > +#ifdef _WIN32
-> > +    s->channel_available_event =3D CreateEvent(NULL, TRUE, FALSE,
-> > +
->  TEXT("ChannelAvailableEvent"));
-> > +    if (s->channel_available_event =3D=3D NULL) {
-> > +        g_critical("CreateEvent failed");
-> > +        return NULL;
-> > +    }
-> > +    s->stop_event =3D CreateEvent(NULL, TRUE, FALSE,
-> > +                                TEXT("StopEvent"));
-> > +    if (s->stop_event =3D=3D NULL) {
-> > +        g_critical("CreateEvent failed");
-> > +        return NULL;
-> > +    }
-> > +#endif
-> > +
-> >      ga_state =3D s;
-> >      return s;
-> >  }
-> >
-> >  static void cleanup_agent(GAState *s)
-> >  {
-> > +#ifdef _WIN32
-> > +    CloseHandle(s->channel_available_event);
-> > +    CloseHandle(s->stop_event);
-> > +#endif
-> >      if (s->command_state) {
-> >          ga_command_state_cleanup_all(s->command_state);
-> >          ga_command_state_free(s->command_state);
-> > @@ -1397,6 +1470,32 @@ static int run_agent_once(GAState *s)
 > >      return EXIT_SUCCESS;
 > >  }
-> >
-> > +static void wait_for_channel_availability(GAState *s)
-> > +{
-> > +    g_warning("waiting for channel path...");
-> > +#ifndef _WIN32
-> > +    sleep(QGA_RETRY_INTERVAL);
-> > +#else
-> > +    DWORD dwWaitResult;
+> > @@ -1468,7 +1460,18 @@ int main(int argc, char **argv)
+> >          g_critical("error initializing guest agent");
+> >          goto end;
+> >      }
 > > +
-> > +    HANDLE lpHandles[2] =3D { s->channel_available_event, s->stop_even=
-t };
-> > +
-> > +    dwWaitResult =3D WaitForMultipleObjects(2, lpHandles, false,
-> INFINITE);
-> > +
-> > +    switch (dwWaitResult) {
-> > +    case WAIT_OBJECT_0:
-> > +        break;
-> > +    case (WAIT_OBJECT_0 + 1):
-> > +        g_warning("service stopped");
-> > +        break;
->
-> Given that both events do basically the same thing, you could use one
-> called generically "wakeup".
->
-> Alternatively, you could wait on the main_loop (manual iteration), and
-> call g_main_context_wakeup() to avoid the extra events altogether (I
-> think).
->
->
->
-> > +    case WAIT_TIMEOUT:
-> > +        break;
-> > +    default:
-> > +        g_critical("WaitForMultipleObjects failed");
+> > +#ifdef _WIN32
+> > +    if (config->daemonize) {
+> > +        SERVICE_TABLE_ENTRY service_table[] =3D {
+> > +            { (char *)QGA_SERVICE_NAME, service_main }, { NULL, NULL }
+> };
+> > +        StartServiceCtrlDispatcher(service_table);
+> > +    } else {
+> > +        ret =3D run_agent(s);
 > > +    }
 > > +#endif
-> > +}
+> >      ret =3D run_agent(s);
+>
+> run_agent() is called twice.
+>
 > > +
-> >  static int run_agent(GAState *s)
-> >  {
-> >      int ret =3D EXIT_SUCCESS;
-> > @@ -1407,7 +1506,7 @@ static int run_agent(GAState *s)
-> >          ret =3D run_agent_once(s);
-> >          if (s->config->retry_path && !s->force_exit) {
-> >              g_warning("agent stopped unexpectedly, restarting...");
-> > -            sleep(QGA_RETRY_INTERVAL);
-> > +            wait_for_channel_availability(s);
-> >          }
-> >      } while (s->config->retry_path && !s->force_exit);
+> >      cleanup_agent(s);
 > >
-> > diff --git a/qga/service-win32.h b/qga/service-win32.h
-> > index 89e99dfede..7b16d69b57 100644
-> > --- a/qga/service-win32.h
-> > +++ b/qga/service-win32.h
-> > @@ -20,9 +20,13 @@
-> >  #define QGA_SERVICE_NAME         "qemu-ga"
-> >  #define QGA_SERVICE_DESCRIPTION  "Enables integration with QEMU machin=
-e
-> emulator and virtualizer."
-> >
-> > +static const GUID GUID_VIOSERIAL_PORT =3D { 0x6fde7521, 0x1b65, 0x48ae=
-,
-> > +{ 0xb6, 0x28, 0x80, 0xbe, 0x62, 0x1, 0x60, 0x26 } };
-> > +
-> >  typedef struct GAService {
-> >      SERVICE_STATUS status;
-> >      SERVICE_STATUS_HANDLE status_handle;
-> > +    HDEVNOTIFY device_notification_handle;
-> >  } GAService;
-> >
-> >  int ga_install_service(const char *path, const char *logfile,
+> >  end:
 > > --
 > > 2.17.0
 > >
