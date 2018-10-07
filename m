@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1g9DQp-0008VL-8z
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 14:05:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g9Fw1-0004nK-In
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 16:45:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1g9DQo-00017i-8a
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 14:05:31 -0400
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:54644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1g9DQn-0000wv-Lo
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 14:05:29 -0400
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sun,  7 Oct 2018 20:05:17 +0200
-Message-Id: <20181007180518.5212-3-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20181007180518.5212-1-samuel.thibault@ens-lyon.org>
-References: <20181007180518.5212-1-samuel.thibault@ens-lyon.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/3] slirp: fix ICMP handling on macOS hosts
+	(envelope-from <richard.henderson@linaro.org>) id 1g9FiV-0007ta-Ui
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 16:31:59 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:47028)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g9FiV-0007rb-Fj
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 16:31:55 -0400
+Received: by mail-pg1-x542.google.com with SMTP id a5-v6so6861900pgv.13
+	for <qemu-devel@nongnu.org>; Sun, 07 Oct 2018 13:31:55 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Sun,  7 Oct 2018 13:31:50 -0700
+Message-Id: <20181007203150.23550-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] tcg: Implement CPU_LOG_TB_NOCHAIN during
+ expansion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: Andrew Oates <aoates@google.com>, stefanha@redhat.com, jan.kiszka@siemens.com, Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org
 
-From: Andrew Oates <aoates@google.com>
+Rather than test NOCHAIN before linking, do not emit the
+goto_tb opcode at all.  We already do this for goto_ptr.
 
-On Linux, SOCK_DGRAM+IPPROTO_ICMP sockets give only the ICMP packet when
-read from.  On macOS, however, the socket acts like a SOCK_RAW socket
-and includes the IP header as well.
+Previously, nochain seemed more or less a hack to debug code gen.
+But there's a real use case when it comes to tracing, so spend a
+little more effort on what we produce.
 
-This change strips the extra IP header from the received packet on macOS
-before sending it to the guest.  SOCK_DGRAM ICMP sockets aren't
-supported on other BSDs, but we enable this behavior for them as well to
-treat the sockets the same as raw sockets.
-
-Signed-off-by: Andrew Oates <aoates@google.com>
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- slirp/ip_icmp.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+ accel/tcg/cpu-exec.c | 2 +-
+ tcg/tcg-op.c         | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/slirp/ip_icmp.c b/slirp/ip_icmp.c
-index 0b667a429a..da100d1f55 100644
---- a/slirp/ip_icmp.c
-+++ b/slirp/ip_icmp.c
-@@ -420,7 +420,32 @@ void icmp_receive(struct socket *so)
-     icp =3D mtod(m, struct icmp *);
-=20
-     id =3D icp->icmp_id;
--    len =3D qemu_recv(so->s, icp, m->m_len, 0);
-+    len =3D qemu_recv(so->s, icp, M_ROOM(m), 0);
-+    /*
-+     * The behavior of reading SOCK_DGRAM+IPPROTO_ICMP sockets is incons=
-istent
-+     * between host OSes.  On Linux, only the ICMP header and payload is
-+     * included.  On macOS/Darwin, the socket acts like a raw socket and
-+     * includes the IP header as well.  On other BSDs, SOCK_DGRAM+IPPROT=
-O_ICMP
-+     * sockets aren't supported at all, so we treat them like raw socket=
-s.  It
-+     * isn't possible to detect this difference at runtime, so we must u=
-se an
-+     * #ifdef to determine if we need to remove the IP header.
-+     */
-+#ifdef CONFIG_BSD
-+    if (len >=3D sizeof(struct ip)) {
-+        struct ip *inner_ip =3D mtod(m, struct ip *);
-+        int inner_hlen =3D inner_ip->ip_hl << 2;
-+        if (inner_hlen > len) {
-+            len =3D -1;
-+            errno =3D -EINVAL;
-+        } else {
-+            len -=3D inner_hlen;
-+            memmove(icp, (unsigned char *)icp + inner_hlen, len);
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 6bcb6d99bd..870027d435 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -416,7 +416,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+     }
+ #endif
+     /* See if we can patch the calling TB. */
+-    if (last_tb && !qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
++    if (last_tb) {
+         tb_add_jump(last_tb, tb_exit, tb);
+     }
+     return tb;
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index daa416a143..7a8015c5a9 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2586,6 +2586,10 @@ void tcg_gen_exit_tb(TranslationBlock *tb, unsigned idx)
+            seen this numbered exit before, via tcg_gen_goto_tb.  */
+         tcg_debug_assert(tcg_ctx->goto_tb_issue_mask & (1 << idx));
+ #endif
++        /* When not chaining, exit without indicating a link.  */
++        if (qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
++            val = 0;
 +        }
-+    } else {
-+      len =3D -1;
-+      errno =3D -EINVAL;
+     } else {
+         /* This is an exit via the exitreq label.  */
+         tcg_debug_assert(idx == TB_EXIT_REQUESTED);
+@@ -2603,7 +2607,10 @@ void tcg_gen_goto_tb(unsigned idx)
+     tcg_debug_assert((tcg_ctx->goto_tb_issue_mask & (1 << idx)) == 0);
+     tcg_ctx->goto_tb_issue_mask |= 1 << idx;
+ #endif
+-    tcg_gen_op1i(INDEX_op_goto_tb, idx);
++    /* When not chaining, we simply fall through to the "fallback" exit.  */
++    if (!qemu_loglevel_mask(CPU_LOG_TB_NOCHAIN)) {
++        tcg_gen_op1i(INDEX_op_goto_tb, idx);
 +    }
-+#endif
-     icp->icmp_id =3D id;
-=20
-     m->m_data -=3D hlen;
---=20
-2.19.0
+ }
+ 
+ void tcg_gen_lookup_and_goto_ptr(void)
+-- 
+2.17.1
