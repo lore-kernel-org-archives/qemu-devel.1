@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bishara@daynix.com>) id 1g96pW-00052x-3m
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 07:02:35 -0400
+	(envelope-from <bishara@daynix.com>) id 1g96pY-00053k-A8
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 07:02:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bishara@daynix.com>) id 1g96pT-0007OB-8N
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 07:02:33 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40444)
+	(envelope-from <bishara@daynix.com>) id 1g96pW-0007PL-Bb
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 07:02:35 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:35114)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bishara@daynix.com>) id 1g96pT-0007N5-1f
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 07:02:31 -0400
-Received: by mail-wr1-x429.google.com with SMTP id d2-v6so13293486wro.7
-	for <qemu-devel@nongnu.org>; Sun, 07 Oct 2018 04:02:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bishara@daynix.com>) id 1g96pW-0007Oc-31
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 07:02:34 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id w5-v6so17745658wrt.2
+	for <qemu-devel@nongnu.org>; Sun, 07 Oct 2018 04:02:33 -0700 (PDT)
 From: Bishara AbuHattoum <bishara@daynix.com>
-Date: Sun,  7 Oct 2018 14:02:17 +0300
-Message-Id: <20181007110223.129692-2-bishara@daynix.com>
+Date: Sun,  7 Oct 2018 14:02:19 +0300
+Message-Id: <20181007110223.129692-4-bishara@daynix.com>
 In-Reply-To: <20181007110223.129692-1-bishara@daynix.com>
 References: <20181007110223.129692-1-bishara@daynix.com>
-Subject: [Qemu-devel] [PATCH v2 1/7] qga: group agent init/cleanup init
- separate routines
+Subject: [Qemu-devel] [PATCH v2 3/7] qga: move w32 service handling out of
+ run_agent()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,170 +31,76 @@ Cc: Yan Vugenfirer <yan@daynix.com>, Sameeh Jubran <sameeh@daynix.com>
 
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This patch better separates the init/cleanup routines out into
-separate functions to make the start-up procedure a bit easier to
-follow. This will be useful when we eventually break out the actual
-start/stop of the agent's main loop into separates routines that
-can be called multiple times after the init phase.
+Eventually we want a w32 service to be able to restart the qga main
+loop from within service_main(). To allow for this we move service
+handling out of run_agent() such that service_main() calls
+run_agent() instead of the reverse.
 
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
 ---
- qga/main.c | 82 +++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 50 insertions(+), 32 deletions(-)
+ qga/main.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
 diff --git a/qga/main.c b/qga/main.c
-index c399320d3c..fd02086bfc 100644
+index 9f4dc0b2c5..23a0a46b84 100644
 --- a/qga/main.c
 +++ b/qga/main.c
-@@ -1211,9 +1211,21 @@ static bool check_is_frozen(GAState *s)
-     return false;
- }
- 
--static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-+static GAState *initialize_agent(GAConfig *config)
- {
--    ga_state = s;
-+    GAState *s = g_new0(GAState, 1);
-+
-+    g_assert(ga_state == NULL);
-+
-+    s->log_level = config->log_level;
-+    s->log_file = stderr;
-+#ifdef CONFIG_FSFREEZE
-+    s->fsfreeze_hook = config->fsfreeze_hook;
-+#endif
-+    s->pstate_filepath = g_strdup_printf("%s/qga.state", config->state_dir);
-+    s->state_filepath_isfrozen = g_strdup_printf("%s/qga.state.isfrozen",
-+                                                 config->state_dir);
-+    s->frozen = check_is_frozen(s);
- 
-     g_log_set_default_handler(ga_log, s);
-     g_log_set_fatal_mask(NULL, G_LOG_LEVEL_ERROR);
-@@ -1229,7 +1241,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-     if (g_mkdir_with_parents(config->state_dir, S_IRWXU) == -1) {
-         g_critical("unable to create (an ancestor of) the state directory"
-                    " '%s': %s", config->state_dir, strerror(errno));
--        return EXIT_FAILURE;
-+        return NULL;
-     }
+@@ -136,6 +136,7 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
+                                   LPVOID ctx);
+ VOID WINAPI service_main(DWORD argc, TCHAR *argv[]);
  #endif
++static int run_agent(GAState *s);
  
-@@ -1254,7 +1266,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-             if (!log_file) {
-                 g_critical("unable to open specified log file: %s",
-                            strerror(errno));
--                return EXIT_FAILURE;
-+                return NULL;
-             }
-             s->log_file = log_file;
-         }
-@@ -1265,7 +1277,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-                                s->pstate_filepath,
-                                ga_is_frozen(s))) {
-         g_critical("failed to load persistent state");
--        return EXIT_FAILURE;
-+        return NULL;
-     }
+ static void
+ init_dfl_pathnames(void)
+@@ -729,7 +730,7 @@ VOID WINAPI service_main(DWORD argc, TCHAR *argv[])
+     service->status.dwWaitHint = 0;
+     SetServiceStatus(service->status_handle, &service->status);
  
-     config->blacklist = ga_command_blacklist_init(config->blacklist);
-@@ -1286,12 +1298,37 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
- #ifndef _WIN32
-     if (!register_signal_handlers()) {
-         g_critical("failed to register signal handlers");
--        return EXIT_FAILURE;
-+        return NULL;
-     }
- #endif
+-    g_main_loop_run(ga_state->main_loop);
++    run_agent(ga_state);
  
-     s->main_loop = g_main_loop_new(NULL, false);
- 
-+    ga_state = s;
-+    return s;
-+}
-+
-+static void cleanup_agent(GAState *s)
-+{
-+    if (s->command_state) {
-+        ga_command_state_cleanup_all(s->command_state);
-+        ga_command_state_free(s->command_state);
-+        json_message_parser_destroy(&s->parser);
-+    }
-+    if (s->channel) {
-+        ga_channel_free(s->channel);
-+    }
-+    g_free(s->pstate_filepath);
-+    g_free(s->state_filepath_isfrozen);
-+    if (s->main_loop) {
-+        g_main_loop_unref(s->main_loop);
-+    }
-+    g_free(s);
-+    ga_state = NULL;
-+}
-+
-+static int run_agent(GAState *s, GAConfig *config, int socket_activation)
-+{
-     if (!channel_init(ga_state, config->method, config->channel_path,
-                       socket_activation ? FIRST_SOCKET_ACTIVATION_FD : -1)) {
+     service->status.dwCurrentState = SERVICE_STOPPED;
+     SetServiceStatus(service->status_handle, &service->status);
+@@ -1338,17 +1339,8 @@ static int run_agent(GAState *s)
          g_critical("failed to initialize guest agent channel");
-@@ -1315,7 +1352,7 @@ static int run_agent(GAState *s, GAConfig *config, int socket_activation)
- int main(int argc, char **argv)
- {
-     int ret = EXIT_SUCCESS;
--    GAState *s = g_new0(GAState, 1);
-+    GAState *s;
-     GAConfig *config = g_new0(GAConfig, 1);
-     int socket_activation;
- 
-@@ -1383,44 +1420,25 @@ int main(int argc, char **argv)
-         }
+         return EXIT_FAILURE;
      }
- 
--    s->log_level = config->log_level;
--    s->log_file = stderr;
--#ifdef CONFIG_FSFREEZE
--    s->fsfreeze_hook = config->fsfreeze_hook;
+-#ifndef _WIN32
++
+     g_main_loop_run(ga_state->main_loop);
+-#else
+-    if (config->daemonize) {
+-        SERVICE_TABLE_ENTRY service_table[] = {
+-            { (char *)QGA_SERVICE_NAME, service_main }, { NULL, NULL } };
+-        StartServiceCtrlDispatcher(service_table);
+-    } else {
+-        g_main_loop_run(ga_state->main_loop);
+-    }
 -#endif
--    s->pstate_filepath = g_strdup_printf("%s/qga.state", config->state_dir);
--    s->state_filepath_isfrozen = g_strdup_printf("%s/qga.state.isfrozen",
--                                                 config->state_dir);
--    s->frozen = check_is_frozen(s);
--
-     if (config->dumpconf) {
-         config_dump(config);
+ 
+     return EXIT_SUCCESS;
+ }
+@@ -1434,7 +1426,19 @@ int main(int argc, char **argv)
+         g_critical("error initializing guest agent");
          goto end;
      }
- 
-+    s = initialize_agent(config);
-+    if (!s) {
-+        g_critical("error initializing guest agent");
-+        goto end;
++
++#ifdef _WIN32
++    if (config->daemonize) {
++        SERVICE_TABLE_ENTRY service_table[] = {
++            { (char *)QGA_SERVICE_NAME, service_main }, { NULL, NULL } };
++        StartServiceCtrlDispatcher(service_table);
++    } else {
++        ret = run_agent(s);
 +    }
-     ret = run_agent(s, config, socket_activation);
-+    cleanup_agent(s);
++#else
+     ret = run_agent(s);
++#endif
++
+     cleanup_agent(s);
  
  end:
--    if (s->command_state) {
--        ga_command_state_cleanup_all(s->command_state);
--        ga_command_state_free(s->command_state);
--        json_message_parser_destroy(&s->parser);
--    }
--    if (s->channel) {
--        ga_channel_free(s->channel);
--    }
--    g_free(s->pstate_filepath);
--    g_free(s->state_filepath_isfrozen);
--
-     if (config->daemonize) {
-         unlink(config->pid_filepath);
-     }
- 
-     config_free(config);
--    if (s->main_loop) {
--        g_main_loop_unref(s->main_loop);
--    }
--    g_free(s);
- 
-     return ret;
- }
 -- 
 2.17.0
