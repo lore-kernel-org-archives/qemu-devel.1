@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g8yKN-0005SX-Nv
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 21:57:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1g90hx-0007VU-MM
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 00:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g8y5L-00070b-CD
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 21:42:24 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:35835)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g8y5L-00070T-5s
-	for qemu-devel@nongnu.org; Sat, 06 Oct 2018 21:42:19 -0400
-Date: Sat, 6 Oct 2018 21:42:16 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181007014216.GC23787@flamenco>
-References: <20181005154910.3099-1-alex.bennee@linaro.org>
-	<20181005154910.3099-5-alex.bennee@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1g90hu-0005D9-IL
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 00:30:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1g90hs-000576-Qm
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 00:30:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1g90hr-0007vX-51
+	for <qemu-devel@nongnu.org>; Sun, 07 Oct 2018 04:30:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 239222E80C8
+	for <qemu-devel@nongnu.org>; Sun,  7 Oct 2018 04:30:15 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181005154910.3099-5-alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 04/21] trace: enable the exec_tb trace
- events
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 07 Oct 2018 04:17:40 -0000
+From: Launchpad Bug Tracker <1483070@bugs.launchpad.net>
+Reply-To: Bug 1483070 <1483070@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150810001525.6231.66973.malonedeb@gac.canonical.com>
+Message-Id: <153888586104.11197.10800553753481619485.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1483070] Re: VIRTIO Sequential Write IOPS limits
+ not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +37,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On Fri, Oct 05, 2018 at 16:48:53 +0100, Alex Bennée wrote:
-> Our performance isn't so critical that we can't spare a simple flag
-> check when we exec a TB considering everything else we check in the
-> outer loop.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-[I know this is just done to illustrate how function names
-in plugins can bind to tracing calls, but someone might
-get confused by expecting more from "exec_tb" than it
-actually does.]
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-This flag check costs nothing because "exec_tb" is
-almost never called. The way it works right now, we
-need -d nochain for "exec_tb" to actually generate
-an event every time a TB executes.
+-- =
 
-IMO an eventual plugin API should let plugins decide whether
-to subscribe to the execution of a particular TB, when
-said TB is being translated, instead of providing
-an all-or-nothing switch.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1483070
 
-Thanks,
+Title:
+  VIRTIO Sequential Write IOPS limits not working
 
-		E.
+Status in QEMU:
+  Expired
+
+Bug description:
+  Root Problem:
+  IOPS limit does not work for VIRTIO devices if the disk workload is a seq=
+uential write.
+
+  To confirm:
+  IDE disk devices - the IOPS limit works fine. Disk transfer speed limit w=
+orks fine.
+  VIRTIO disk devices - the IOPS limit works fine for random IO (write/read=
+) and sequential read, but not for sequential write. Disk transfer speed li=
+mits work fine.
+
+  Tested on Windows 7,10 and 2k12 (Fedora drivers used and here is the twis=
+t):
+  virtio-win-0.1.96 (stable) or older won't limit write IO if workload is s=
+equential.
+  virtio-win-0.1.105 (latest) or newer will limit but I have had two test m=
+achines crash when under high workload using IOPS limit.
+
+  For Linux:
+  The issue is also apparent, tested on Ubuntu 14.04
+
+  On the hypervisor (using KVM) machine I have tried with Qemu 2.1.2
+  (3.16.0-4-amd64 - Debian 8) and Qemu 2.3.0 (3.19.8-1-pve - Proxmox 3.4
+  and 4) using multiple machines but all are 64bit intel.
+
+  Even though the latest VIRTIO guest drivers fix the problem, the guest
+  drivers shouldn't be able to ignore the limits the host puts in place
+  or am I missing something??
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1483070/+subscriptions
