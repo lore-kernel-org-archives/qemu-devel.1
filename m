@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1g9B7s-0003C0-Mx
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 11:37:49 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g9Crl-0000Q3-Qo
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 13:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brad@comstyle.com>) id 1g9B7r-0004Ff-V6
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 11:37:48 -0400
-Received: from speedy.comstyle.com ([2001:470:1d:8c::2]:27889
-	helo=mail.comstyle.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brad@comstyle.com>) id 1g9B7r-0004Bt-N7
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 11:37:47 -0400
-Received: from mail.comstyle.com (localhost [127.0.0.1])
-	by mail.comstyle.com (Postfix) with ESMTP id 920059843A
-	for <qemu-devel@nongnu.org>; Sun,  7 Oct 2018 11:37:24 -0400 (EDT)
-Received: from humpty.home.comstyle.com (unknown
-	[IPv6:2001:470:c454:100:13af:4407:2bbf:771f])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested) (Authenticated sender: brad)
-	by mail.comstyle.com (Postfix) with ESMTPSA id 73E0D98439
-	for <qemu-devel@nongnu.org>; Sun,  7 Oct 2018 11:37:24 -0400 (EDT)
-Date: Sun, 7 Oct 2018 11:37:31 -0400
-From: Brad Smith <brad@comstyle.com>
-Message-ID: <20181007153731.GA32288@humpty.home.comstyle.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g9Crg-0000da-Ot
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 13:29:14 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20181006183851.3797-1-sw@weilnetz.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <eddc100f-944d-7661-77c0-bb1c90ed315a@amsat.org>
+Date: Sun, 7 Oct 2018 19:29:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] oslib-posix: Use MAP_STACK in
- qemu_alloc_stack() on OpenBSD
+In-Reply-To: <20181006183851.3797-1-sw@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] qemu-io-cmds: Fix two
+ format strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>, QEMU Developer <qemu-devel@nongnu.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Use MAP_STACK in qemu_alloc_stack() on OpenBSD.
+On 10/6/18 8:38 PM, Stefan Weil wrote:
+> Use %zu instead of %zd for unsigned numbers.
+> 
+> This fixes two error messages from the LSTM static code analyzer:
+> 
+> This argument should be of type 'ssize_t' but is of type 'unsigned long'
 
-Added to -current and will be in our soon to be 6.4 release.
+Eventually prepend some spaces to have the difference between your
+statement and the analyzer output.
 
-MAP_STACK      Indicate that the mapping is used as a stack.  This
-               flag must be used in combination with MAP_ANON and
-               MAP_PRIVATE.
+> 
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
 
-Implement MAP_STACK option for mmap().  Synchronous faults (pagefault and
-syscall) confirm the stack register points at MAP_STACK memory, otherwise
-SIGSEGV is delivered. sigaltstack() and pthread_attr_setstack() are modified
-to create a MAP_STACK sub-region which satisfies alignment requirements.
-Observe that MAP_STACK can only be set/cleared by mmap(), which zeroes the
-contents of the region -- there is no mprotect() equivalent operation, so
-there is no MAP_STACK-adding gadget.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-
-Signed-off-by: Brad Smith <brad@comstyle.com>
-
-
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index fbd0dc8c57..51e9a012c2 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -611,7 +611,11 @@ void *qemu_alloc_stack(size_t *sz)
-     *sz += pagesz;
- 
-     ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE,
--               MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+               MAP_PRIVATE | MAP_ANONYMOUS
-+#ifdef MAP_STACK
-+               | MAP_STACK
-+#endif
-+               , -1, 0);
-     if (ptr == MAP_FAILED) {
-         perror("failed to allocate memory for stack");
-         abort();
+> ---
+>  qemu-io-cmds.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+> index db0b3ee5ef..5363482213 100644
+> --- a/qemu-io-cmds.c
+> +++ b/qemu-io-cmds.c
+> @@ -907,7 +907,7 @@ static int readv_f(BlockBackend *blk, int argc, char **argv)
+>          memset(cmp_buf, pattern, qiov.size);
+>          if (memcmp(buf, cmp_buf, qiov.size)) {
+>              printf("Pattern verification failed at offset %"
+> -                   PRId64 ", %zd bytes\n", offset, qiov.size);
+> +                   PRId64 ", %zu bytes\n", offset, qiov.size);
+>              ret = -EINVAL;
+>          }
+>          g_free(cmp_buf);
+> @@ -1294,7 +1294,7 @@ static void aio_read_done(void *opaque, int ret)
+>          memset(cmp_buf, ctx->pattern, ctx->qiov.size);
+>          if (memcmp(ctx->buf, cmp_buf, ctx->qiov.size)) {
+>              printf("Pattern verification failed at offset %"
+> -                   PRId64 ", %zd bytes\n", ctx->offset, ctx->qiov.size);
+> +                   PRId64 ", %zu bytes\n", ctx->offset, ctx->qiov.size);
+>          }
+>          g_free(cmp_buf);
+>      }
+> 
