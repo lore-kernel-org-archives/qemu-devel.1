@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g9V1F-0005tF-7I
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1g9V1X-0006L7-Lw
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g9UrH-0000DJ-1g
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:42:02 -0400
-References: <20180926094219.20322-1-david@redhat.com>
-	<20180926094219.20322-19-david@redhat.com>
-	<20180927150141.60a6488a@redhat.com>
-	<dc5d7b2d-5b51-2c0b-aac7-ebf04a4e7859@redhat.com>
-	<20181001152443.2cca5c5e@redhat.com>
-	<85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
-	<20181008141904.17b601d3@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <aa176072-87b1-9e13-6770-97dfc354a1ed@redhat.com>
-Date: Mon, 8 Oct 2018 14:41:50 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181008141904.17b601d3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
- handler
+	(envelope-from <thuth@redhat.com>) id 1g9UpF-0007O9-9M
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:39:57 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon,  8 Oct 2018 14:39:42 +0200
+Message-Id: <1539002382-3764-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] hw/ppc/spapr_rng: Introduce
+ CONFIG_SPAPR_RNG switch for spapr_rng.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +18,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On 08/10/2018 14:19, Igor Mammedov wrote:
-> On Mon, 8 Oct 2018 13:47:53 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->>> That way using [2] and [1 - modulo it should match only concrete type]
->>> machine would be able to override hotplug handlers for TYPE_VIRTIO_PMEM_PCI
->>> and explicitly call machine + pci hotplug handlers in necessary order.
->>>
->>> flow would look like:
->>>   [acpi|shcp|native pci-e eject]->  
->>>        hotplug_ctrl = qdev_get_hotplug_handler(dev);
->>>        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err); ->
->>>             machine_unplug()
->>>                machine_virtio_pci_pmem_cb(): 
->>>                   // we now that's device has 2 stage hotplug handlers,
->>>                   // so we can arrange hotplug sequence in necessary order
->>>                   hotplug_ctrl2 = qdev_get_bus_hotplug_handler(dev);
->>>
->>>                   //then do unplug in whatever order that's correct,
->>>                   // I'd assume tear down/stop PCI device first, flushing
->>>                   // command virtio command queues and that unplug memory itself.
->>>                   hotplug_handler_unplug(hotplug_ctrl2, dev, &local_err);
->>>                   memory_device_unplug()
->>>   
->>
->> Looking into the details, this order is not possible. The unplug will
->> essentially do a device_unparent() leading to the whole hierarchy
->> getting destroyed. The memory_device part always has to come first.
-> 
-> Question here is if there are anything that should be handled first on
-> virtio level before memory_device/pmem part is called?
-> If there isn't it might be fine to swap the order of unplug sequence.
-> 
+The spapr-rng device is suboptimal when compared to virtio-rng, so
+users might want to disable it in their builds. Thus let's introduce
+a proper CONFIG switch to allow us to compile QEMU without this device.
+The function spapr_rng_populate_dt is required for linking, so move it
+to a different location.
 
-Was asking myself the same thing, but as we are effectively holding the
-iothread lock and the guest triggered the unplug, I guess it is fine to
-unregister the memory region at this point.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Put spapr_rng_populate_dt() into spapr.c instead of a header
 
+ default-configs/ppc64-softmmu.mak |  1 +
+ hw/ppc/Makefile.objs              |  3 ++-
+ hw/ppc/spapr.c                    | 23 +++++++++++++++++++++++
+ hw/ppc/spapr_rng.c                | 23 -----------------------
+ include/hw/ppc/spapr.h            |  2 --
+ 5 files changed, 26 insertions(+), 26 deletions(-)
+
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index b94af6c..24d4717 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -17,3 +17,4 @@ CONFIG_XICS=$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+ CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+ CONFIG_MEM_HOTPLUG=y
++CONFIG_SPAPR_RNG=y
+diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+index 4ab5564..4e0c1c0 100644
+--- a/hw/ppc/Makefile.objs
++++ b/hw/ppc/Makefile.objs
+@@ -3,8 +3,9 @@ obj-y += ppc.o ppc_booke.o fdt.o
+ # IBM pSeries (sPAPR)
+ obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
+ obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
+-obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng.o
++obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o
+ obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o spapr_irq.o
++obj-$(CONFIG_SPAPR_RNG) +=  spapr_rng.o
+ # IBM PowerNV
+ obj-$(CONFIG_POWERNV) += pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_psi.o pnv_occ.o pnv_bmc.o
+ ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 98868d8..e666872 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -610,6 +610,29 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+     g_free(rev);
+ }
+ 
++static int spapr_rng_populate_dt(void *fdt)
++{
++    int node;
++    int ret;
++
++    node = qemu_fdt_add_subnode(fdt, "/ibm,platform-facilities");
++    if (node <= 0) {
++        return -1;
++    }
++    ret = fdt_setprop_string(fdt, node, "device_type",
++                             "ibm,platform-facilities");
++    ret |= fdt_setprop_cell(fdt, node, "#address-cells", 0x1);
++    ret |= fdt_setprop_cell(fdt, node, "#size-cells", 0x0);
++
++    node = fdt_add_subnode(fdt, node, "ibm,random-v1");
++    if (node <= 0) {
++        return -1;
++    }
++    ret |= fdt_setprop_string(fdt, node, "compatible", "ibm,random");
++
++    return ret ? -1 : 0;
++}
++
+ static uint32_t spapr_pc_dimm_node(MemoryDeviceInfoList *list, ram_addr_t addr)
+ {
+     MemoryDeviceInfoList *info;
+diff --git a/hw/ppc/spapr_rng.c b/hw/ppc/spapr_rng.c
+index d2acd61..644bac9 100644
+--- a/hw/ppc/spapr_rng.c
++++ b/hw/ppc/spapr_rng.c
+@@ -132,29 +132,6 @@ static void spapr_rng_realize(DeviceState *dev, Error **errp)
+     }
+ }
+ 
+-int spapr_rng_populate_dt(void *fdt)
+-{
+-    int node;
+-    int ret;
+-
+-    node = qemu_fdt_add_subnode(fdt, "/ibm,platform-facilities");
+-    if (node <= 0) {
+-        return -1;
+-    }
+-    ret = fdt_setprop_string(fdt, node, "device_type",
+-                             "ibm,platform-facilities");
+-    ret |= fdt_setprop_cell(fdt, node, "#address-cells", 0x1);
+-    ret |= fdt_setprop_cell(fdt, node, "#size-cells", 0x0);
+-
+-    node = fdt_add_subnode(fdt, node, "ibm,random-v1");
+-    if (node <= 0) {
+-        return -1;
+-    }
+-    ret |= fdt_setprop_string(fdt, node, "compatible", "ibm,random");
+-
+-    return ret ? -1 : 0;
+-}
+-
+ static Property spapr_rng_properties[] = {
+     DEFINE_PROP_BOOL("use-kvm", sPAPRRngState, use_kvm, false),
+     DEFINE_PROP_LINK("rng", sPAPRRngState, backend, TYPE_RNG_BACKEND,
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index ad4d7cf..0805ad8 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -745,8 +745,6 @@ int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+ 
+ #define TYPE_SPAPR_RNG "spapr-rng"
+ 
+-int spapr_rng_populate_dt(void *fdt);
+-
+ #define SPAPR_MEMORY_BLOCK_SIZE (1 << 28) /* 256MB */
+ 
+ /*
 -- 
-
-Thanks,
-
-David / dhildenb
+1.8.3.1
