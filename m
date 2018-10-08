@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9cVE-00085u-RR
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:51:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g9clP-00030Q-9k
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9cVE-0004U8-0i
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:51:44 -0400
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
-	<20180817122219.16206-8-vsementsov@virtuozzo.com>
+	(envelope-from <mreitz@redhat.com>) id 1g9clH-0003Og-ER
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:08:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47586)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1g9clH-0003NY-3Q
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:08:19 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9ABA73E2CE
+	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 21:08:14 +0000 (UTC)
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-30-armbru@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d78f37ac-343d-20bf-a2ce-16ff2fa12677@redhat.com>
-Date: Mon, 8 Oct 2018 22:51:33 +0200
+Message-ID: <7bbcf317-e1a5-fc8f-b4e2-0caedbe4e00b@redhat.com>
+Date: Mon, 8 Oct 2018 23:08:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180817122219.16206-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20181008173125.19678-30-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Zt2aOac1k5es2WdaNVprOCwDKRbxGEroG"
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/qcow2-refcount: fix
- out-of-file L2 entries to be read-as-zero
+	boundary="88GKptdQRCQvFKPZzu2iRTD5qp3umOZXb"
+Subject: Re: [Qemu-devel] [PATCH 29/31] vl: Assert drive_new() does not fail
+ in default_drive()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,119 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Zt2aOac1k5es2WdaNVprOCwDKRbxGEroG
+--88GKptdQRCQvFKPZzu2iRTD5qp3umOZXb
 From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org
-Message-ID: <d78f37ac-343d-20bf-a2ce-16ff2fa12677@redhat.com>
-Subject: Re: [PATCH v2 7/7] block/qcow2-refcount: fix out-of-file L2 entries
- to be read-as-zero
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
- <20180817122219.16206-8-vsementsov@virtuozzo.com>
-In-Reply-To: <20180817122219.16206-8-vsementsov@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <7bbcf317-e1a5-fc8f-b4e2-0caedbe4e00b@redhat.com>
+Subject: Re: [PATCH 29/31] vl: Assert drive_new() does not fail in
+ default_drive()
+References: <20181008173125.19678-1-armbru@redhat.com>
+ <20181008173125.19678-30-armbru@redhat.com>
+In-Reply-To: <20181008173125.19678-30-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 17.08.18 14:22, Vladimir Sementsov-Ogievskiy wrote:
-> Rewrite corrupted L2 table entry, which reference space out of
-> underlying file.
+On 08.10.18 19:31, Markus Armbruster wrote:
+> If creating (empty) default drives fails, it's a bug.  Therefore,
+> assert() is more appropriate than exit(1).
 >=20
-> Make this L2 table entry read-as-all-zeros without any allocation.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  block/qcow2-refcount.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
->=20
-> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-> index 3c004e5bfe..3de3768a3c 100644
-> --- a/block/qcow2-refcount.c
-> +++ b/block/qcow2-refcount.c
-> @@ -1720,8 +1720,30 @@ static int check_refcounts_l2(BlockDriverState *=
-bs, BdrvCheckResult *res,
->              /* Mark cluster as used */
->              csize =3D (((l2_entry >> s->csize_shift) & s->csize_mask) =
-+ 1) *
->                      BDRV_SECTOR_SIZE;
-> +            if (csize > s->cluster_size) {
-> +                ret =3D fix_l2_entry_to_zero(
-> +                        bs, res, fix, l2_offset, i, active,
-> +                        "compressed cluster larger than cluster: size =
-0x%"
-> +                        PRIx64, csize);
-> +                if (ret < 0) {
-> +                    goto fail;
-> +                }
-> +                continue;
-> +            }
-> +
+>  vl.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
-This seems recoverable, isn't it?  Can we not try to just limit the
-csize, or decompress the cluster with the given csize from the given
-offset, disregarding the cluster limit?
-
->              coffset =3D l2_entry & s->cluster_offset_mask &
->                        ~(BDRV_SECTOR_SIZE - 1);
-> +            if (coffset >=3D bdrv_getlength(bs->file->bs)) {
-> +                ret =3D fix_l2_entry_to_zero(
-> +                        bs, res, fix, l2_offset, i, active,
-> +                        "compressed cluster out of file: offset 0x%" P=
-RIx64,
-> +                        coffset);
-> +                if (ret < 0) {
-> +                    goto fail;
-> +                }
-> +                continue;
-> +            }
-> +
->              ret =3D qcow2_inc_refcounts_imrt(bs, res,
->                                             refcount_table, refcount_ta=
-ble_size,
->                                             coffset, csize);
-> @@ -1748,6 +1770,16 @@ static int check_refcounts_l2(BlockDriverState *=
-bs, BdrvCheckResult *res,
->          {
->              uint64_t offset =3D l2_entry & L2E_OFFSET_MASK;
-> =20
-> +            if (offset >=3D bdrv_getlength(bs->file->bs)) {
-> +                ret =3D fix_l2_entry_to_zero(
-> +                        bs, res, fix, l2_offset, i, active,
-> +                        "cluster out of file: offset 0x%" PRIx64, offs=
-et);
-> +                if (ret < 0) {
-> +                    goto fail;
-> +                }
-> +                continue;
-> +            }
-> +
-
-These other two look OK, but they have another issue:  If this is a v2
-image, you cannot create zero clusters; so you'll have to unallocate the
-cluster in that case.
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---Zt2aOac1k5es2WdaNVprOCwDKRbxGEroG
+--88GKptdQRCQvFKPZzu2iRTD5qp3umOZXb
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu7w1UACgkQ9AfbAGHV
-z0DWTQf/ZQLgzOpAIhGo8yjjFVA+pHMKEefREgpR7D+4ODsl2f4ZcSR3BjQAYV16
-P+PdcVQ2KEwyZKiVx5RBEpX1JGWc3NJD+HSPLjuVKpPgHbsIIiiRLKpzxdyJFmET
-te4MUaKkmWWS+AYgn5q6IBFes6bwIqUhNk6HQ18FGV9ivgTiYqLeMvO8EmkhssAd
-SoTN3lJPQzMjVu/EC8/lxpSjyDhgC9ODcnwwOx1C4DXpSKbyQ8p/MXbtZ7ce6kJ8
-QNmnjupItII+XAU9SHeXNobKABV6CdrivuWsvvsPnPCLq+wZ5MysIKHLWQxj3YbO
-KyeJbVgTroe9B7eVU2UA1tpLKlqjWA==
-=tF5/
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu7xzwACgkQ9AfbAGHV
+z0BULQf/VZpe1aXOYd1PpYtjAOGAMFqqGeqRfBWOjKBkkQbDQolaCP3ayNKnTb1H
+uDL9iR9HsJ+9hj1kxN6tLV6velzJVV/IOL1h/Y52MG1hPvSxiykJJBYkDItZGtun
+Q0htSTZX/U2djkoaXtDKOWT8vwCmO95WBgN2STNsknMwcPCafvsI86f0tSnuVs/r
+ce8yaBGCAbr2FbcCIWG37JnA2IEuutni7LMJFNwE/mRV4o2aRDkYp/Ab+6j0cXab
+KflcLm7GVoZnZn1lpjxjckmKgzzjjsLWmwOjKRTFVz2qy786CXFevZ0SagR/iw3X
+EcGYUhoCWy3Q0yg8iDSi9c+W+YS3fw==
+=iHjj
 -----END PGP SIGNATURE-----
 
---Zt2aOac1k5es2WdaNVprOCwDKRbxGEroG--
+--88GKptdQRCQvFKPZzu2iRTD5qp3umOZXb--
