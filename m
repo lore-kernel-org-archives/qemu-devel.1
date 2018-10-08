@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1g9beK-00032Y-6m
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:57:04 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g9beR-00036i-Kt
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1g9beJ-00026w-42
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:57:04 -0400
-Date: Mon, 8 Oct 2018 21:56:33 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20181008195633.GC4229@toto>
-References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
-	<1538579266-8389-10-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA88T=VWXq5aSY2srgbo8PF7tLFJn-28nNpt3=ZGh5xM1g@mail.gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1g9beQ-0002AV-Ut
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:57:11 -0400
+References: <20181005234023.8104-1-mreitz@redhat.com>
+	<20181005234023.8104-8-mreitz@redhat.com>
+	<d3f8da86-f071-1ce0-462a-0b378f5214a9@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <de892465-6f19-defc-c726-6e1bcf2ccbba@redhat.com>
+Date: Mon, 8 Oct 2018 21:57:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA88T=VWXq5aSY2srgbo8PF7tLFJn-28nNpt3=ZGh5xM1g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v1 09/12] target-arm: powerctl: Enable HVC
- when starting CPUs to EL2
+In-Reply-To: <d3f8da86-f071-1ce0-462a-0b378f5214a9@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="yEvFJYjwxGFME4TXbooHMn52Or634aZN0"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v11 07/31] iotests.py: Add
+ node_info()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +26,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Oct 08, 2018 at 01:41:36PM +0100, Peter Maydell wrote:
-> On 3 October 2018 at 16:07, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> >
-> > When QEMU provides the equivalent of the EL3 firmware, we
-> > need to enable HVCs in scr_el3 when turning on CPUs that
-> > target EL2.
-> >
-> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> > ---
-> >  target/arm/arm-powerctl.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >
-> > diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-> > index ce55eeb..54f2974 100644
-> > --- a/target/arm/arm-powerctl.c
-> > +++ b/target/arm/arm-powerctl.c
-> > @@ -63,6 +63,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
-> >      struct CpuOnInfo *info = (struct CpuOnInfo *) data.host_ptr;
-> >
-> >      /* Initialize the cpu we are turning on */
-> > +    qemu_log("CPU%d reset\n", target_cpu_state->cpu_index);
-> 
-> qemu_log logging should always be masked to a particular
-> log kind (either via qemu_log_mask() or by explicit check on
-> the log level). If this was accidentally left-in debug, you could
-> just drop it :-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--yEvFJYjwxGFME4TXbooHMn52Or634aZN0
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <de892465-6f19-defc-c726-6e1bcf2ccbba@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v11 07/31] iotests.py: Add node_info()
+References: <20181005234023.8104-1-mreitz@redhat.com>
+ <20181005234023.8104-8-mreitz@redhat.com>
+ <d3f8da86-f071-1ce0-462a-0b378f5214a9@redhat.com>
+In-Reply-To: <d3f8da86-f071-1ce0-462a-0b378f5214a9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hah, yes this is an accidental leftover...
+On 08.10.18 21:34, John Snow wrote:
+>=20
+>=20
+> On 10/05/2018 07:39 PM, Max Reitz wrote:
+>> This function queries a node; since we cannot do that right now, it
+>> executes query-named-block-nodes and returns the matching node's objec=
+t.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  tests/qemu-iotests/iotests.py | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+>> index 5c45788dac..604f200600 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -465,6 +465,13 @@ class VM(qtest.QEMUQtestMachine):
+>>                  else:
+>>                      iotests.log(ev)
+>> =20
+>> +    def node_info(self, node_name):
+>> +        nodes =3D self.qmp('query-named-block-nodes')
+>> +        for x in nodes['return']:
+>> +            if x['node-name'] =3D=3D node_name:
+>> +                return x
+>> +        return None
+>> +
+>> =20
+>>  index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
+>> =20
+>>
+>=20
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>=20
+> Do we ever want to revisit the idea that our API should not do any
+> pre-filtering and that it's always up to the client to do so?
+
+I mean we certainly want to revisit the idea that we should have a
+proper query API.
+
+But what exactly do you mean by pre-filtering?
+
+Max
 
 
-> 
-> >      cpu_reset(target_cpu_state);
-> >      target_cpu_state->halted = 0;
-> >
-> > @@ -103,6 +104,16 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
-> >      } else {
-> >          /* Processor is not in secure mode */
-> >          target_cpu->env.cp15.scr_el3 |= SCR_NS;
-> > +
-> > +        /*
-> > +         * If QEMU is providing the equivalent of EL3 firmware, then we need
-> > +         * to make sure a CPU targeting EL2 comes out of reset with a
-> > +         * functional HVC insn.
-> > +         */
-> > +        if (arm_feature(&target_cpu->env, ARM_FEATURE_EL3)
-> > +            && info->target_el == 2) {
-> > +            target_cpu->env.cp15.scr_el3 |= SCR_HCE;
-> > +        }
-> >      }
-> 
-> Otherwise
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> This is definitely required for PSCI and I think it makes sense
-> in other cases that end up in this powerctl code with EL3 set.
+--yEvFJYjwxGFME4TXbooHMn52Or634aZN0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
-Edgar
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu7towACgkQ9AfbAGHV
+z0BVOwgAwbxXeIEG7MOBHKqhJ0XLXTEWgZcBiHPtE2/RN5Vq39/k4O44n32erKe2
++RwthNJ9IqIDGmZW56lpBeCNSa2LXjzeYlLnUT+C4p2jZYo4lHshkwjMgmsW6z3X
+FLJ8km8K5d9YNDWkqSUV+nW2025F0j9xywvJKCKfTkmlcQ9TprnUPLkEzqbGHF2R
+NL9oFmvIiIeyCBz4RR7SimXaQS0BsmaNVKSD6Gry5gJ8M1ka6toPuIWq9Y3AbEUv
+kub9JCa1FiAKQV4pokSkoA4yTYVK/T8+lVAGlbjBn7uYU3mj5doXCDNxXEQhhEfv
+TFpySgKP6INh7FiNbx9OvluEPbv8fQ==
+=V1NP
+-----END PGP SIGNATURE-----
+
+--yEvFJYjwxGFME4TXbooHMn52Or634aZN0--
