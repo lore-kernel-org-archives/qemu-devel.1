@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9V1D-0006UJ-Ik
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g9V1F-0005tG-8r
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9V10-0005RL-NV
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9V10-0005Pv-Cm
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:02 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181005154910.3099-1-alex.bennee@linaro.org>
-	<20181005154910.3099-7-alex.bennee@linaro.org>
-Date: Mon, 08 Oct 2018 14:51:56 +0200
-In-Reply-To: <20181005154910.3099-7-alex.bennee@linaro.org> ("Alex
-	=?utf-8?Q?Benn=C3=A9e=22's?=
-	message of "Fri, 5 Oct 2018 16:48:55 +0100")
-Message-ID: <87efd04n4j.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1g9UrG-0000Ca-8G
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:41:59 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40883)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g9UrF-0000C1-Tt
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:41:58 -0400
+Received: by mail-ot1-x343.google.com with SMTP id w67so19428205ota.7
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 05:41:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 06/21] trace: show trace point counts
- in the monitor
+In-Reply-To: <1538579266-8389-10-git-send-email-edgar.iglesias@gmail.com>
+References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
+	<1538579266-8389-10-git-send-email-edgar.iglesias@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Oct 2018 13:41:36 +0100
+Message-ID: <CAFEAcA88T=VWXq5aSY2srgbo8PF7tLFJn-28nNpt3=ZGh5xM1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 09/12] target-arm: powerctl: Enable HVC
+ when starting CPUs to EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +30,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, cota@braap.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
-
-> Now we have counts for each trace point we can expose them in the
-> monitor when the user queries what trace points are available.
+On 3 October 2018 at 16:07, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> When QEMU provides the equivalent of the EL3 firmware, we
+> need to enable HVCs in scr_el3 when turning on CPUs that
+> target EL2.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > ---
->  monitor.c       | 5 +++--
->  qapi/trace.json | 3 ++-
->  trace/qmp.c     | 1 +
->  3 files changed, 6 insertions(+), 3 deletions(-)
+>  target/arm/arm-powerctl.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >
-> diff --git a/monitor.c b/monitor.c
-> index c4677b502b..d8229cd2b0 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1421,9 +1421,10 @@ static void hmp_info_trace_events(Monitor *mon, co=
-nst QDict *qdict)
+> diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+> index ce55eeb..54f2974 100644
+> --- a/target/arm/arm-powerctl.c
+> +++ b/target/arm/arm-powerctl.c
+> @@ -63,6 +63,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
+>      struct CpuOnInfo *info = (struct CpuOnInfo *) data.host_ptr;
+>
+>      /* Initialize the cpu we are turning on */
+> +    qemu_log("CPU%d reset\n", target_cpu_state->cpu_index);
+
+qemu_log logging should always be masked to a particular
+log kind (either via qemu_log_mask() or by explicit check on
+the log level). If this was accidentally left-in debug, you could
+just drop it :-)
+
+>      cpu_reset(target_cpu_state);
+>      target_cpu_state->halted = 0;
+>
+> @@ -103,6 +104,16 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
+>      } else {
+>          /* Processor is not in secure mode */
+>          target_cpu->env.cp15.scr_el3 |= SCR_NS;
+> +
+> +        /*
+> +         * If QEMU is providing the equivalent of EL3 firmware, then we need
+> +         * to make sure a CPU targeting EL2 comes out of reset with a
+> +         * functional HVC insn.
+> +         */
+> +        if (arm_feature(&target_cpu->env, ARM_FEATURE_EL3)
+> +            && info->target_el == 2) {
+> +            target_cpu->env.cp15.scr_el3 |= SCR_HCE;
+> +        }
 >      }
->=20=20
->      for (elem =3D events; elem !=3D NULL; elem =3D elem->next) {
-> -        monitor_printf(mon, "%s : state %u\n",
-> +        monitor_printf(mon, "%s : state %u count %" PRIu64 "\n",
->                         elem->value->name,
-> -                       elem->value->state =3D=3D TRACE_EVENT_STATE_ENABL=
-ED ? 1 : 0);
-> +                       elem->value->state =3D=3D TRACE_EVENT_STATE_ENABL=
-ED ? 1 : 0,
-> +                       elem->value->count);
->      }
->      qapi_free_TraceEventInfoList(events);
->  }
-> diff --git a/qapi/trace.json b/qapi/trace.json
-> index 799b254a18..b9184b0d18 100644
-> --- a/qapi/trace.json
-> +++ b/qapi/trace.json
-> @@ -33,6 +33,7 @@
->  # @name: Event name.
->  # @state: Tracing state.
->  # @vcpu: Whether this is a per-vCPU event (since 2.7).
-> +# @count: Current hits on trace-point (since 3.1).
 
-Suggest something like "Number of hits".
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This is definitely required for PSCI and I think it makes sense
+in other cases that end up in this powerctl code with EL3 set.
 
->  #
->  # An event is per-vCPU if it has the "vcpu" property in the "trace-event=
-s"
->  # files.
-> @@ -40,7 +41,7 @@
->  # Since: 2.2
->  ##
->  { 'struct': 'TraceEventInfo',
-> -  'data': {'name': 'str', 'state': 'TraceEventState', 'vcpu': 'bool'} }
-> +  'data': {'name': 'str', 'state': 'TraceEventState', 'vcpu': 'bool', 'c=
-ount': 'int' } }
->=20=20
->  ##
->  # @trace-event-get-state:
-> diff --git a/trace/qmp.c b/trace/qmp.c
-> index ea99b00956..cce8198091 100644
-> --- a/trace/qmp.c
-> +++ b/trace/qmp.c
-> @@ -102,6 +102,7 @@ TraceEventInfoList *qmp_trace_event_get_state(const c=
-har *name,
->          elem->value =3D g_new(TraceEventInfo, 1);
->          elem->value->vcpu =3D is_vcpu;
->          elem->value->name =3D g_strdup(trace_event_get_name(ev));
-> +        elem->value->count =3D ev->count;
-
-I suspect this converts from uint64_t to int64_t.  Change the type to
-'uint64' in the QAPI schema?
-
->=20=20
->          if (!trace_event_get_state_static(ev)) {
->              elem->value->state =3D TRACE_EVENT_STATE_UNAVAILABLE;
+thanks
+-- PMM
