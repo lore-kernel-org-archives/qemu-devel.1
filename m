@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9Kcz-0003j1-9P
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:46:34 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g9Kdt-0004Ch-Hw
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:47:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9Kcy-0000tK-Br
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:46:33 -0400
-References: <cover.1537367701.git.berto@igalia.com>
-	<32c99e47940fcee5e83c780147e34a8f3840f7e4.1537367701.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <5466eec0-4cc6-5717-945d-6e252e30c32d@redhat.com>
-Date: Mon, 8 Oct 2018 03:46:13 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1g9Kdq-0001bt-2w
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:47:29 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37369)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g9Kdp-0001Zs-8a
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:47:25 -0400
+Received: by mail-pg1-x541.google.com with SMTP id c10-v6so7088178pgq.4
+	for <qemu-devel@nongnu.org>; Sun, 07 Oct 2018 18:47:24 -0700 (PDT)
+References: <20181006214508.5331-1-cota@braap.org>
+	<20181006214508.5331-2-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7f7ef8fd-a6dd-88d9-6219-1aabdadd8582@linaro.org>
+Date: Sun, 7 Oct 2018 18:47:20 -0700
 MIME-Version: 1.0
-In-Reply-To: <32c99e47940fcee5e83c780147e34a8f3840f7e4.1537367701.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fXPAH72CwCFdyguswzUcfkP0yIw96HJGN"
-Subject: Re: [Qemu-devel] [PATCH 09/14] block: Use
- bdrv_reopen_set_read_only() in the mirror driver
+In-Reply-To: <20181006214508.5331-2-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 1/6] (XXX) cputlb: separate MMU allocation +
+ run-time sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fXPAH72CwCFdyguswzUcfkP0yIw96HJGN
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Jeff Cody <jcody@redhat.com>
-Message-ID: <5466eec0-4cc6-5717-945d-6e252e30c32d@redhat.com>
-Subject: Re: [PATCH 09/14] block: Use bdrv_reopen_set_read_only() in the
- mirror driver
-References: <cover.1537367701.git.berto@igalia.com>
- <32c99e47940fcee5e83c780147e34a8f3840f7e4.1537367701.git.berto@igalia.com>
-In-Reply-To: <32c99e47940fcee5e83c780147e34a8f3840f7e4.1537367701.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 10/6/18 2:45 PM, Emilio G. Cota wrote:
+> -#define CPU_COMMON_TLB \
+> +typedef struct CPUTLBDesc {
+> +    size_t size;
+> +    size_t mask; /* (.size - 1) << CPU_TLB_ENTRY_BITS for TLB fast path */
+> +} CPUTLBDesc;
 
-On 19.09.18 16:47, Alberto Garcia wrote:
-> The 'block-commit' QMP command is implemented internally using two
-> different drivers. If the source image is the active layer then the
-> mirror driver is used (commit_active_start()), otherwise the commit
-> driver is used (commit_start()).
->=20
-> In both cases the destination image must be put temporarily in
-> read-write mode. This is done correctly in the latter case, but what
-> commit_active_start() does is copy all flags instead.
-
-Well, not only commit_active_start().  mirror_exit() does exactly the
-same.  It does seem on purpose to let the target have exactly the same
-flags as the source eventually.
-
-Then again, none of the other flags seem to make any sense to me here.
-Therefore, I tend to agree that it is a bug fix, even though I wouldn't
-say it was an oversight.
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-=2E..eagerly awaiting rebase on 737efc1eda2.
-
-> This patch replaces the bdrv_reopen() calls in that function with
-> bdrv_reopen_set_read_only() so that only the read-only status is
-> changed.
->=20
-> A similar change is made in mirror_exit(), which is also used by the
-> 'drive-mirror' and 'blockdev-mirror' commands.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/mirror.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
+I think you don't need both size and mask.  Size is (or ought to be) used
+infrequently enough that I think it can be computed on demand.  But on a
+related note, if you remember the out-of-line tlb changes, it'll be easier for
+x86 if you index an array of scalars.
 
 
---fXPAH72CwCFdyguswzUcfkP0yIw96HJGN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> -    int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+> +    int index = (addr >> TARGET_PAGE_BITS) & (env->tlb_desc[mmu_idx].size - 1);
 
------BEGIN PGP SIGNATURE-----
+I just posted a patch to functionalize this.  But I imagine
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu6tuUACgkQ9AfbAGHV
-z0CGQwf/RRwwamPcLD1BgHXvYq083i/z44XeomcCZ8OMyVS9LjKk42jS7Vbau7Cf
-TgCcMknxQzD9L5+gq4r/CNWfYhRgQX1lYSI9YIda1nMD8onOUduE5Cgm3wYpjJEE
-jArPtoSfagkM9l4oFWpDBPsMpfaq19tKVAiYBSmxO/2Dw+E8hp96JYKdzXpLF8Q7
-aphaMnRCrWdEWu1wnp+2NXbuxsV3uE6KPKRcM4xWIB4+u33wvpMhgy+CHKkU6G9D
-n5H/BXDNjEa0dDRI/9TQBaKeFZ7sW1cidxrRDlDR206OtD8w3NgXaqGo6xMciyTh
-jdWfCzMJHv/W0FkJtn9PBY4MODxNYg==
-=3IcL
------END PGP SIGNATURE-----
+static inline uintptr_t tlb_index(CPUArchState *env, uintptr_t mmu_idx,
+                                  target_ulong addr)
+{
+    uintptr_t ofs = (addr >> TARGET_PAGE_BITS) & env->tlb_mask[mmu_idx];
+    return ofs >> CPU_TLB_BITS;
+}
 
---fXPAH72CwCFdyguswzUcfkP0yIw96HJGN--
+static inline CPUTLBEntry *tlb_entry(CPUArchState *env, uintptr_t mmu_idx,
+                                     target_ulong addr)
+{
+    uintptr_t ofs = (addr >> TARGET_PAGE_BITS) & env->tlb_mask[mmu_idx];
+    return (void *)&env->tlb_table[mmu_idx][0] + ofs;
+}
+
+In the few places where we use both of these functions, the compiler ought to
+be able to pull out the common sub-expression.
+
+
+> @@ -139,7 +149,10 @@ static void tlb_flush_nocheck(CPUState *cpu)
+>       * that do not hold the lock are performed by the same owner thread.
+>       */
+>      qemu_spin_lock(&env->tlb_lock);
+> -    memset(env->tlb_table, -1, sizeof(env->tlb_table));
+> +    for (i = 0; i < NB_MMU_MODES; i++) {
+> +        memset(env->tlb_table[i], -1,
+> +               env->tlb_desc[i].size * sizeof(CPUTLBEntry));
+
+Here we can use something like
+
+static inline uintptr_t sizeof_tlb(CPUArchState *env, uintptr_t mmu_idx)
+{
+    return env->tlb_mask[mmu_idx] + (1 << CPU_TLB_BITS);
+}
+
+memset(env->tlb_table[i], -1, sizeof_tlb(env, i));
+
+> -        for (i = 0; i < CPU_TLB_SIZE; i++) {
+> +        for (i = 0; i < env->tlb_desc[mmu_idx].size; i++) {
+
+This seems to be one of the few places where you need the number of entries
+rather than the size.  Perhaps
+
+   for (i = sizeof_tlb(env, mmu_idx) >> CPU_TLB_BITS; i-- > 0; ) {
+
+Or if you can think of a name for the function of the same effect...
+
+
+r~
