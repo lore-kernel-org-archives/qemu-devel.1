@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57740)
+Received: from eggs.gnu.org ([208.118.235.92]:42886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g9RBl-0002CG-GF
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 04:46:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g9RRg-0005G1-7h
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 05:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g9RBh-0007ep-7I
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 04:46:53 -0400
-References: <1538751601-7433-1-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <d4ed125a-4862-65a1-816e-19ff76d55d8b@redhat.com>
-Date: Mon, 8 Oct 2018 10:46:44 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1g9RRd-0007gg-EN
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 05:03:19 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:45571)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g9RRc-0007fl-MS
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 05:03:17 -0400
+Received: by mail-ot1-x335.google.com with SMTP id u22so18843855ota.12
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 02:03:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1538751601-7433-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x/excp_helper: Remove DPRINTF()
- macro
+In-Reply-To: <20181005111157.12801-1-kraxel@redhat.com>
+References: <20181005111157.12801-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Oct 2018 10:02:54 +0100
+Message-ID: <CAFEAcA_Tg-c8f-Uqw+geqXiRQKVqYxX6CeBjWdOz+YiP5WiPjQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] Vga 20181005 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,144 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 05/10/2018 17:00, Thomas Huth wrote:
-> Debug macros that are disabled by default should be avoided (since the
-> code bit-rots quite easily). Thus turn these debug prints into proper
-> qemu_log_mask(CPU_LOG_xxx, ...) statements instead. The DPRINTF statements
-> in do_[ext|io|mchk]_interrupt can even be removed completely since we can
-> log the information in a central place, s390_cpu_do_interrupt, instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  target/s390x/excp_helper.c | 48 +++++++++++-----------------------------------
->  1 file changed, 11 insertions(+), 37 deletions(-)
-> 
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index f0ce60c..b803e04 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -31,23 +31,6 @@
->  #include "hw/s390x/s390_flic.h"
->  #endif
->  
-> -/* #define DEBUG_S390 */
-> -/* #define DEBUG_S390_STDOUT */
-> -
-> -#ifdef DEBUG_S390
-> -#ifdef DEBUG_S390_STDOUT
-> -#define DPRINTF(fmt, ...) \
-> -    do { fprintf(stderr, fmt, ## __VA_ARGS__); \
-> -         if (qemu_log_separate()) { qemu_log(fmt, ##__VA_ARGS__); } } while (0)
-> -#else
-> -#define DPRINTF(fmt, ...) \
-> -    do { qemu_log(fmt, ## __VA_ARGS__); } while (0)
-> -#endif
-> -#else
-> -#define DPRINTF(fmt, ...) \
-> -    do { } while (0)
-> -#endif
-> -
->  #if defined(CONFIG_USER_ONLY)
->  
->  void s390_cpu_do_interrupt(CPUState *cs)
-> @@ -92,8 +75,8 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
->      uint64_t asc;
->      int prot;
->  
-> -    DPRINTF("%s: address 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
-> -            __func__, orig_vaddr, rw, mmu_idx);
-> +    qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
-> +                  __func__, orig_vaddr, rw, mmu_idx);
->  
->      vaddr = orig_vaddr;
->  
-> @@ -122,8 +105,9 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
->      if (!address_space_access_valid(&address_space_memory, raddr,
->                                      TARGET_PAGE_SIZE, rw,
->                                      MEMTXATTRS_UNSPECIFIED)) {
-> -        DPRINTF("%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n", __func__,
-> -                (uint64_t)raddr, (uint64_t)ram_size);
-> +        qemu_log_mask(CPU_LOG_MMU,
-> +                      "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
-> +                      __func__, (uint64_t)raddr, (uint64_t)ram_size);
->          trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
->          return 1;
->      }
-> @@ -181,8 +165,10 @@ static void do_program_interrupt(CPUS390XState *env)
->          break;
->      }
->  
-> -    qemu_log_mask(CPU_LOG_INT, "%s: code=0x%x ilen=%d\n",
-> -                  __func__, env->int_pgm_code, ilen);
-> +    qemu_log_mask(CPU_LOG_INT,
-> +                  "%s: code=0x%x ilen=%d psw: %" PRIx64 " %" PRIx64 "\n",
-> +                  __func__, env->int_pgm_code, ilen, env->psw.mask,
-> +                  env->psw.addr);
->  
->      lowcore = cpu_map_lowcore(env);
->  
-> @@ -204,10 +190,6 @@ static void do_program_interrupt(CPUS390XState *env)
->  
->      cpu_unmap_lowcore(lowcore);
->  
-> -    DPRINTF("%s: %x %x %" PRIx64 " %" PRIx64 "\n", __func__,
-> -            env->int_pgm_code, ilen, env->psw.mask,
-> -            env->psw.addr);
-> -
->      load_psw(env, mask, addr);
->  }
->  
-> @@ -298,9 +280,6 @@ static void do_ext_interrupt(CPUS390XState *env)
->  
->      cpu_unmap_lowcore(lowcore);
->  
-> -    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__,
-> -            env->psw.mask, env->psw.addr);
-> -
->      load_psw(env, mask, addr);
->  }
->  
-> @@ -329,8 +308,6 @@ static void do_io_interrupt(CPUS390XState *env)
->      cpu_unmap_lowcore(lowcore);
->      g_free(io);
->  
-> -    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__, env->psw.mask,
-> -            env->psw.addr);
->      load_psw(env, mask, addr);
->  }
->  
-> @@ -372,9 +349,6 @@ static void do_mchk_interrupt(CPUS390XState *env)
->  
->      cpu_unmap_lowcore(lowcore);
->  
-> -    DPRINTF("%s: %" PRIx64 " %" PRIx64 "\n", __func__,
-> -            env->psw.mask, env->psw.addr);
-> -
->      load_psw(env, mask, addr);
->  }
->  
-> @@ -385,8 +359,8 @@ void s390_cpu_do_interrupt(CPUState *cs)
->      CPUS390XState *env = &cpu->env;
->      bool stopped = false;
->  
-> -    qemu_log_mask(CPU_LOG_INT, "%s: %d at pc=%" PRIx64 "\n",
-> -                  __func__, cs->exception_index, env->psw.addr);
-> +    qemu_log_mask(CPU_LOG_INT, "%s: %d at psw=%" PRIx64 ":%" PRIx64 "\n",
-> +                  __func__, cs->exception_index, env->psw.mask, env->psw.addr);
->  
->  try_deliver:
->      /* handle machine checks */
-> 
+On 5 October 2018 at 12:11, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit dafd95053611aa14dda40266857608d12ddce658:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2018-10-02 18:27:18 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/vga-20181005-pull-request
+>
+> for you to fetch changes up to edbc4b24bbb179fa9562d4e5313470f10569433c:
+>
+>   edid: fix vendor default (2018-10-05 11:26:56 +0200)
+>
+> ----------------------------------------------------------------
+> vga: edid fixes, qxl clang workaround, vga mmio subregion fix.
+>
+> ----------------------------------------------------------------
+Applied, thanks.
 
-Looks good to me!
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-
-Thanks,
-
-David / dhildenb
+-- PMM
