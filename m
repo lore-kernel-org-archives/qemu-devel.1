@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9d4P-000505-AF
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:28:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g9d4S-0005Fr-1M
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9cyy-0008Cf-MG
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:22:30 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:44388)
+	(envelope-from <richard.henderson@linaro.org>) id 1g9cyq-0008AK-Vy
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:22:24 -0400
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:36558)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g9cyu-0008Am-QP
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:22:26 -0400
-Received: by mail-pf1-x441.google.com with SMTP id r9-v6so8786869pff.11
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 14:22:22 -0700 (PDT)
+	id 1g9cyq-00088s-MD
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:22:20 -0400
+Received: by mail-pl1-x62d.google.com with SMTP id y11-v6so7463538plt.3
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 14:22:18 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon,  8 Oct 2018 14:22:04 -0700
-Message-Id: <20181008212205.17752-10-richard.henderson@linaro.org>
+Date: Mon,  8 Oct 2018 14:22:01 -0700
+Message-Id: <20181008212205.17752-7-richard.henderson@linaro.org>
 In-Reply-To: <20181008212205.17752-1-richard.henderson@linaro.org>
 References: <20181008212205.17752-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 09/10] target/arm: Convert sve from feature
- bit to aa64pfr0 test
+Subject: [Qemu-devel] [PATCH v3 06/10] target/arm: Convert division from
+ feature bits to isar0 tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,237 +33,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+Both arm and thumb2 division are controlled by the same ISAR field,
+which takes care of the arm implies thumb case.  Having M imply
+thumb2 division was wrong for cortex-m0, which is v6m and does not
+have thumb2 at all, much less thumb2 division.
+
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h            | 16 +++++++++++++++-
- target/arm/translate-a64.h  |  1 +
- linux-user/aarch64/signal.c |  4 ++--
- linux-user/elfload.c        |  2 +-
- linux-user/syscall.c        | 10 ++++++----
- target/arm/cpu64.c          |  5 ++++-
- target/arm/helper.c         |  9 ++++++---
- target/arm/machine.c        |  3 +--
- target/arm/translate-a64.c  |  4 ++--
- 9 files changed, 38 insertions(+), 16 deletions(-)
+ target/arm/cpu.h       | 12 ++++++++++--
+ target/arm/translate.h |  2 ++
+ linux-user/elfload.c   |  4 ++--
+ target/arm/cpu.c       | 10 +---------
+ target/arm/translate.c |  4 ++--
+ 5 files changed, 17 insertions(+), 15 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index d8cb9633d2..a97b471fff 100644
+index 66eaa40ed9..2af971e823 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -1531,6 +1531,16 @@ FIELD(ID_AA64ISAR1, FRINTTS, 32, 4)
- FIELD(ID_AA64ISAR1, SB, 36, 4)
- FIELD(ID_AA64ISAR1, SPECRES, 40, 4)
- 
-+FIELD(ID_AA64PFR0, EL0, 0, 4)
-+FIELD(ID_AA64PFR0, EL1, 4, 4)
-+FIELD(ID_AA64PFR0, EL2, 8, 4)
-+FIELD(ID_AA64PFR0, EL3, 12, 4)
-+FIELD(ID_AA64PFR0, FP, 16, 4)
-+FIELD(ID_AA64PFR0, ADVSIMD, 20, 4)
-+FIELD(ID_AA64PFR0, GIC, 24, 4)
-+FIELD(ID_AA64PFR0, RAS, 28, 4)
-+FIELD(ID_AA64PFR0, SVE, 32, 4)
-+
- QEMU_BUILD_BUG_ON(ARRAY_SIZE(((ARMCPU *)0)->ccsidr) <= R_V7M_CSSELR_INDEX_MASK);
- 
- /* If adding a feature bit which corresponds to a Linux ELF
-@@ -1579,7 +1589,6 @@ enum arm_features {
-     ARM_FEATURE_PMU, /* has PMU support */
-     ARM_FEATURE_VBAR, /* has cp15 VBAR */
-     ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
--    ARM_FEATURE_SVE, /* has Scalable Vector Extension */
-     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
-     ARM_FEATURE_M_MAIN, /* M profile Main Extension */
- };
-@@ -3263,4 +3272,9 @@ static inline bool aa64_feature_fcma(ARMCPU *cpu)
-     return FIELD_EX64(cpu->id_aa64isar1, ID_AA64ISAR1, FCMA) != 0;
- }
- 
-+static inline bool aa64_feature_sve(ARMCPU *cpu)
+@@ -1550,7 +1550,6 @@ enum arm_features {
+     ARM_FEATURE_VFP3,
+     ARM_FEATURE_VFP_FP16,
+     ARM_FEATURE_NEON,
+-    ARM_FEATURE_THUMB_DIV, /* divide supported in Thumb encoding */
+     ARM_FEATURE_M, /* Microcontroller profile.  */
+     ARM_FEATURE_OMAPCP, /* OMAP specific CP15 ops handling.  */
+     ARM_FEATURE_THUMB2EE,
+@@ -1560,7 +1559,6 @@ enum arm_features {
+     ARM_FEATURE_V5,
+     ARM_FEATURE_STRONGARM,
+     ARM_FEATURE_VAPA, /* cp15 VA to PA lookups */
+-    ARM_FEATURE_ARM_DIV, /* divide supported in ARM encoding */
+     ARM_FEATURE_VFP4, /* VFPv4 (implies that NEON is v2) */
+     ARM_FEATURE_GENERIC_TIMER,
+     ARM_FEATURE_MVFR, /* Media and VFP Feature Registers 0 and 1 */
+@@ -3139,6 +3137,16 @@ extern const uint64_t pred_esz_masks[4];
+ /*
+  * 32-bit feature tests via id registers.
+  */
++static inline bool aa32_feature_thumb_div(ARMCPU *cpu)
 +{
-+    return FIELD_EX64(cpu->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
++    return FIELD_EX32(cpu->id_isar0, ID_ISAR0, DIVIDE) != 0;
 +}
 +
- #endif
-diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
-index b4ef9eb024..636f3fded3 100644
---- a/target/arm/translate-a64.h
-+++ b/target/arm/translate-a64.h
-@@ -140,6 +140,7 @@ FORWARD_FEATURE(sm3)
- FORWARD_FEATURE(sm4)
- FORWARD_FEATURE(dp)
- FORWARD_FEATURE(fcma)
-+FORWARD_FEATURE(sve)
++static inline bool aa32_feature_arm_div(ARMCPU *cpu)
++{
++    return FIELD_EX32(cpu->id_isar0, ID_ISAR0, DIVIDE) > 1;
++}
++
+ static inline bool aa32_feature_aes(ARMCPU *cpu)
+ {
+     return FIELD_EX32(cpu->id_isar5, ID_ISAR5, AES) != 0;
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 1d60569583..8279465d1d 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -195,6 +195,8 @@ static inline TCGv_i32 get_ahp_flag(void)
+     static inline bool aa32_dc_feature_##NAME(DisasContext *dc) \
+     { return aa32_feature_##NAME(dc->cpu); }
  
- #undef FORWARD_FEATURE
- 
-diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
-index 07fedfc33c..65272fb7a9 100644
---- a/linux-user/aarch64/signal.c
-+++ b/linux-user/aarch64/signal.c
-@@ -314,7 +314,7 @@ static int target_restore_sigframe(CPUARMState *env,
-             break;
- 
-         case TARGET_SVE_MAGIC:
--            if (arm_feature(env, ARM_FEATURE_SVE)) {
-+            if (aa64_feature_sve(arm_env_get_cpu(env))) {
-                 vq = (env->vfp.zcr_el[1] & 0xf) + 1;
-                 sve_size = QEMU_ALIGN_UP(TARGET_SVE_SIG_CONTEXT_SIZE(vq), 16);
-                 if (!sve && size == sve_size) {
-@@ -433,7 +433,7 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
-                                       &layout);
- 
-     /* SVE state needs saving only if it exists.  */
--    if (arm_feature(env, ARM_FEATURE_SVE)) {
-+    if (aa64_feature_sve(arm_env_get_cpu(env))) {
-         vq = (env->vfp.zcr_el[1] & 0xf) + 1;
-         sve_size = QEMU_ALIGN_UP(TARGET_SVE_SIG_CONTEXT_SIZE(vq), 16);
-         sve_ofs = alloc_sigframe_space(sve_size, &layout);
++FORWARD_FEATURE(thumb_div)
++FORWARD_FEATURE(arm_div)
+ FORWARD_FEATURE(aes)
+ FORWARD_FEATURE(pmull)
+ FORWARD_FEATURE(sha1)
 diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 3061d703b2..e3585f4cb6 100644
+index 571beca8fd..9b00e977d8 100644
 --- a/linux-user/elfload.c
 +++ b/linux-user/elfload.c
-@@ -593,7 +593,7 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE_ID(rdm, ARM_HWCAP_A64_ASIMDRDM);
-     GET_FEATURE_ID(dp, ARM_HWCAP_A64_ASIMDDP);
-     GET_FEATURE_ID(fcma, ARM_HWCAP_A64_FCMA);
--    GET_FEATURE(ARM_FEATURE_SVE, ARM_HWCAP_A64_SVE);
-+    GET_FEATURE_ID(sve, ARM_HWCAP_A64_SVE);
- 
- #undef GET_FEATURE
- #undef GET_FEATURE_ID
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index ae3c0dfef7..37f315ad4a 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -9356,7 +9356,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-              * even though the current architectural maximum is VQ=16.
-              */
-             ret = -TARGET_EINVAL;
--            if (arm_feature(cpu_env, ARM_FEATURE_SVE)
-+            if (aa64_feature_sve(arm_env_get_cpu(cpu_env))
-                 && arg2 >= 0 && arg2 <= 512 * 16 && !(arg2 & 15)) {
-                 CPUARMState *env = cpu_env;
-                 ARMCPU *cpu = arm_env_get_cpu(env);
-@@ -9375,9 +9375,11 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             return ret;
-         case TARGET_PR_SVE_GET_VL:
-             ret = -TARGET_EINVAL;
--            if (arm_feature(cpu_env, ARM_FEATURE_SVE)) {
--                CPUARMState *env = cpu_env;
--                ret = ((env->vfp.zcr_el[1] & 0xf) + 1) * 16;
-+            {
-+                ARMCPU *cpu = arm_env_get_cpu(cpu_env);
-+                if (aa64_feature_sve(cpu)) {
-+                    ret = ((cpu->env.vfp.zcr_el[1] & 0xf) + 1) * 16;
-+                }
-             }
-             return ret;
- #endif /* AARCH64 */
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index a0cc29d356..ee2c04a627 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -264,6 +264,10 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
-         cpu->id_aa64isar1 = t;
- 
-+        t = cpu->id_aa64pfr0;
-+        t = FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
-+        cpu->id_aa64pfr0 = t;
-+
-         /* Replicate the same data to the 32-bit id registers.  */
-         u = cpu->id_isar5;
-         u = FIELD_DP32(u, ID_ISAR5, AES, 2); /* AES + PMULL */
-@@ -286,7 +290,6 @@ static void aarch64_max_initfn(Object *obj)
-          * present in either.
+@@ -471,8 +471,8 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE(ARM_FEATURE_VFP3, ARM_HWCAP_ARM_VFPv3);
+     GET_FEATURE(ARM_FEATURE_V6K, ARM_HWCAP_ARM_TLS);
+     GET_FEATURE(ARM_FEATURE_VFP4, ARM_HWCAP_ARM_VFPv4);
+-    GET_FEATURE(ARM_FEATURE_ARM_DIV, ARM_HWCAP_ARM_IDIVA);
+-    GET_FEATURE(ARM_FEATURE_THUMB_DIV, ARM_HWCAP_ARM_IDIVT);
++    GET_FEATURE_ID(arm_div, ARM_HWCAP_ARM_IDIVA);
++    GET_FEATURE_ID(thumb_div, ARM_HWCAP_ARM_IDIVT);
+     /* All QEMU's VFPv3 CPUs have 32 registers, see VFP_DREG in translate.c.
+      * Note that the ARM_HWCAP_ARM_VFPv3D16 bit is always the inverse of
+      * ARM_HWCAP_ARM_VFPD32 (and so always clear for QEMU); it is unrelated
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 83a6cb535f..f068b4c476 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -825,7 +825,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+          * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+          * Security Extensions is ARM_FEATURE_EL3.
           */
-         set_feature(&cpu->env, ARM_FEATURE_V8_FP16);
--        set_feature(&cpu->env, ARM_FEATURE_SVE);
-         /* For usermode -cpu max we can use a larger and more efficient DCZ
-          * blocksize since we don't have to follow what the hardware does.
-          */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 0da13175be..2b981a09e4 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5615,7 +5615,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         define_one_arm_cp_reg(cpu, &sctlr);
+-        set_feature(env, ARM_FEATURE_ARM_DIV);
++        assert(aa32_feature_arm_div(cpu));
+         set_feature(env, ARM_FEATURE_LPAE);
+         set_feature(env, ARM_FEATURE_V7);
      }
- 
--    if (arm_feature(env, ARM_FEATURE_SVE)) {
-+    if (aa64_feature_sve(cpu)) {
-         define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
-         if (arm_feature(env, ARM_FEATURE_EL2)) {
-             define_one_arm_cp_reg(cpu, &zcr_el2_reginfo);
-@@ -12668,13 +12668,15 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-     uint32_t flags;
- 
-     if (is_a64(env)) {
-+        ARMCPU *cpu = arm_env_get_cpu(env);
-+
-         *pc = env->pc;
-         flags = ARM_TBFLAG_AARCH64_STATE_MASK;
-         /* Get control bits for tagged addresses */
-         flags |= (arm_regime_tbi0(env, mmu_idx) << ARM_TBFLAG_TBI0_SHIFT);
-         flags |= (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SHIFT);
- 
--        if (arm_feature(env, ARM_FEATURE_SVE)) {
-+        if (aa64_feature_sve(cpu)) {
-             int sve_el = sve_exception_el(env, current_el);
-             uint32_t zcr_len;
- 
-@@ -12798,11 +12800,12 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq)
- void aarch64_sve_change_el(CPUARMState *env, int old_el,
-                            int new_el, bool el0_a64)
- {
-+    ARMCPU *cpu = arm_env_get_cpu(env);
-     int old_len, new_len;
-     bool old_a64, new_a64;
- 
-     /* Nothing to do if no SVE.  */
--    if (!arm_feature(env, ARM_FEATURE_SVE)) {
-+    if (!aa64_feature_sve(cpu)) {
-         return;
+@@ -858,12 +858,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     if (arm_feature(env, ARM_FEATURE_V5)) {
+         set_feature(env, ARM_FEATURE_V4T);
      }
+-    if (arm_feature(env, ARM_FEATURE_M)) {
+-        set_feature(env, ARM_FEATURE_THUMB_DIV);
+-    }
+-    if (arm_feature(env, ARM_FEATURE_ARM_DIV)) {
+-        set_feature(env, ARM_FEATURE_THUMB_DIV);
+-    }
+     if (arm_feature(env, ARM_FEATURE_VFP4)) {
+         set_feature(env, ARM_FEATURE_VFP3);
+         set_feature(env, ARM_FEATURE_VFP_FP16);
+@@ -1384,8 +1378,6 @@ static void cortex_r5_initfn(Object *obj)
+     ARMCPU *cpu = ARM_CPU(obj);
  
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index d44e891533..8b3ba96889 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -131,9 +131,8 @@ static const VMStateDescription vmstate_iwmmxt = {
- static bool sve_needed(void *opaque)
- {
-     ARMCPU *cpu = opaque;
--    CPUARMState *env = &cpu->env;
- 
--    return arm_feature(env, ARM_FEATURE_SVE);
-+    return aa64_feature_sve(cpu);
- }
- 
- /* The first two words of each Zreg is stored in VFP state.  */
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 55a050dc50..448723fbe4 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -173,7 +173,7 @@ void aarch64_cpu_dump_state(CPUState *cs, FILE *f,
-     cpu_fprintf(f, "     FPCR=%08x FPSR=%08x\n",
-                 vfp_get_fpcr(env), vfp_get_fpsr(env));
- 
--    if (arm_feature(env, ARM_FEATURE_SVE) && sve_exception_el(env, el) == 0) {
-+    if (aa64_feature_sve(cpu) && sve_exception_el(env, el) == 0) {
-         int j, zcr_len = sve_zcr_len_for_el(env, el);
- 
-         for (i = 0; i <= FFR_PRED_NUM; i++) {
-@@ -13790,7 +13790,7 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
-         unallocated_encoding(s);
-         break;
-     case 0x2:
--        if (!arm_dc_feature(s, ARM_FEATURE_SVE) || !disas_sve(s, insn)) {
-+        if (!aa64_dc_feature_sve(s) || !disas_sve(s, insn)) {
-             unallocated_encoding(s);
-         }
-         break;
+     set_feature(&cpu->env, ARM_FEATURE_V7);
+-    set_feature(&cpu->env, ARM_FEATURE_THUMB_DIV);
+-    set_feature(&cpu->env, ARM_FEATURE_ARM_DIV);
+     set_feature(&cpu->env, ARM_FEATURE_V7MP);
+     set_feature(&cpu->env, ARM_FEATURE_PMSA);
+     cpu->midr = 0x411fc153; /* r1p3 */
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index ea8545c43b..b1ee6533cc 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -9755,7 +9755,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                     case 1:
+                     case 3:
+                         /* SDIV, UDIV */
+-                        if (!arm_dc_feature(s, ARM_FEATURE_ARM_DIV)) {
++                        if (!aa32_dc_feature_arm_div(s)) {
+                             goto illegal_op;
+                         }
+                         if (((insn >> 5) & 7) || (rd != 15)) {
+@@ -10963,7 +10963,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             tmp2 = load_reg(s, rm);
+             if ((op & 0x50) == 0x10) {
+                 /* sdiv, udiv */
+-                if (!arm_dc_feature(s, ARM_FEATURE_THUMB_DIV)) {
++                if (!aa32_dc_feature_thumb_div(s)) {
+                     goto illegal_op;
+                 }
+                 if (op & 0x20)
 -- 
 2.17.1
