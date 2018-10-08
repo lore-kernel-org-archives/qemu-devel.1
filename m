@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g9dQF-0006tN-CB
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:50:40 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9dbq-00015d-Od
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:02:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g9dQC-0000Py-4y
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:50:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56542)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g9dQB-0000Pf-Ta
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:50:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g9dQA-0006zT-Rv
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 21:50:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AE55F2E80C9
-	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 21:50:34 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9dbn-00067O-3S
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:02:38 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 8 Oct 2018 22:02:22 +0000
+Message-ID: <a02a1caf-53f5-e20a-93a4-67233032d76e@virtuozzo.com>
+References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
+	<20180817122219.16206-8-vsementsov@virtuozzo.com>
+	<d78f37ac-343d-20bf-a2ce-16ff2fa12677@redhat.com>
+In-Reply-To: <d78f37ac-343d-20bf-a2ce-16ff2fa12677@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Oct 2018 21:43:17 -0000
-From: Ke Liu <1796754@bugs.launchpad.net>
-Reply-To: Bug 1796754 <1796754@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153902784309.8245.8166003544722634075.malonedeb@soybean.canonical.com>
-Message-Id: <153903499788.12323.5168552902265405655.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1796754] Re: ioctl SIOCGIFCONF causes
- qemu-aarch64-static to crash with "received signal outside vCPU context"
+Content-ID: <0864B0EA173FF74DB3B9652F37C054E9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/qcow2-refcount: fix
+ out-of-file L2 entries to be read-as-zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,61 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-I was hit by this issue when I tried to run some Java program. And it
-turns out jdk sets the buf to NULL:
-http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/887e525597f8/src/solaris/nati=
-ve/java/net/NetworkInterface.c#l1042
-
-Setting to NULL is valid according to http://man7.org/linux/man-
-pages/man7/netdevice.7.html
-
-But qemu doesn=E2=80=99t handle the case:
-https://github.com/qemu/qemu/blob/aa8e26de9617756febcbf794dda965df307fdaaa
-/linux-user/syscall.c#L4105
-
-I guess qemu developers didn=E2=80=99t handle the case because the Linux ke=
-rnel
-changed and they were based on behavior of old version:
-https://linux.die.net/man/7/netdevice
-
-Please add the support for it otherwise a wide range of network related
-Java programs won=E2=80=99t run.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1796754
-
-Title:
-  ioctl SIOCGIFCONF causes qemu-aarch64-static to crash with "received
-  signal outside vCPU context"
-
-Status in QEMU:
-  New
-
-Bug description:
-  To reproduce it, compile the attached crash.c under aarch64 to a.out and =
-execute on x86_64
-  qemu-aarch64-static ./a.out
-
-  It will print the following and crash:
-
-  socket=3D3
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6003=
-8cd6
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6000=
-157a
-
-  The version of qemu-aarch64-static is
-
-  qemu-aarch64 version 3.0.0 (qemu-3.0.0-1.fc29)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  But it did also happen in previous versions so it is not a regression
-  but a bug existed ever since.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1796754/+subscriptions
+DQoNCk9uIDEwLzA4LzIwMTggMTE6NTEgUE0sIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMTcuMDgu
+MTggMTQ6MjIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBSZXdyaXRl
+IGNvcnJ1cHRlZCBMMiB0YWJsZSBlbnRyeSwgd2hpY2ggcmVmZXJlbmNlIHNwYWNlIG91dCBvZg0K
+Pj4gdW5kZXJseWluZyBmaWxlLg0KPj4NCj4+IE1ha2UgdGhpcyBMMiB0YWJsZSBlbnRyeSByZWFk
+LWFzLWFsbC16ZXJvcyB3aXRob3V0IGFueSBhbGxvY2F0aW9uLg0KPj4NCj4+IFNpZ25lZC1vZmYt
+Ynk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNv
+bT4NCj4+IC0tLQ0KPj4gICBibG9jay9xY293Mi1yZWZjb3VudC5jIHwgMzIgKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysNCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDMyIGluc2VydGlvbnMo
+KykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItcmVmY291bnQuYyBiL2Jsb2NrL3Fj
+b3cyLXJlZmNvdW50LmMNCj4+IGluZGV4IDNjMDA0ZTViZmUuLjNkZTM3NjhhM2MgMTAwNjQ0DQo+
+PiAtLS0gYS9ibG9jay9xY293Mi1yZWZjb3VudC5jDQo+PiArKysgYi9ibG9jay9xY293Mi1yZWZj
+b3VudC5jDQo+PiBAQCAtMTcyMCw4ICsxNzIwLDMwIEBAIHN0YXRpYyBpbnQgY2hlY2tfcmVmY291
+bnRzX2wyKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBCZHJ2Q2hlY2tSZXN1bHQgKnJlcywNCj4+ICAg
+ICAgICAgICAgICAgLyogTWFyayBjbHVzdGVyIGFzIHVzZWQgKi8NCj4+ICAgICAgICAgICAgICAg
+Y3NpemUgPSAoKChsMl9lbnRyeSA+PiBzLT5jc2l6ZV9zaGlmdCkgJiBzLT5jc2l6ZV9tYXNrKSAr
+IDEpICoNCj4+ICAgICAgICAgICAgICAgICAgICAgICBCRFJWX1NFQ1RPUl9TSVpFOw0KPj4gKyAg
+ICAgICAgICAgIGlmIChjc2l6ZSA+IHMtPmNsdXN0ZXJfc2l6ZSkgew0KPj4gKyAgICAgICAgICAg
+ICAgICByZXQgPSBmaXhfbDJfZW50cnlfdG9femVybygNCj4+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICBicywgcmVzLCBmaXgsIGwyX29mZnNldCwgaSwgYWN0aXZlLA0KPj4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgICJjb21wcmVzc2VkIGNsdXN0ZXIgbGFyZ2VyIHRoYW4gY2x1c3Rlcjogc2l6
+ZSAweCUiDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgUFJJeDY0LCBjc2l6ZSk7DQo+PiAr
+ICAgICAgICAgICAgICAgIGlmIChyZXQgPCAwKSB7DQo+PiArICAgICAgICAgICAgICAgICAgICBn
+b3RvIGZhaWw7DQo+PiArICAgICAgICAgICAgICAgIH0NCj4+ICsgICAgICAgICAgICAgICAgY29u
+dGludWU7DQo+PiArICAgICAgICAgICAgfQ0KPj4gKw0KPiANCj4gVGhpcyBzZWVtcyByZWNvdmVy
+YWJsZSwgaXNuJ3QgaXQ/ICBDYW4gd2Ugbm90IHRyeSB0byBqdXN0IGxpbWl0IHRoZQ0KPiBjc2l6
+ZSwgb3IgZGVjb21wcmVzcyB0aGUgY2x1c3RlciB3aXRoIHRoZSBnaXZlbiBjc2l6ZSBmcm9tIHRo
+ZSBnaXZlbg0KPiBvZmZzZXQsIGRpc3JlZ2FyZGluZyB0aGUgY2x1c3RlciBsaW1pdD8NCg0KSG0s
+IHlvdSB3YW50IHRvIGFzc3VtZSB0aGF0IGNzaXplIGlzIGNvcnJ1cHRlZCBidXQgY29mZnNldCBt
+YXkgYmUgDQpjb3JyZWN0PyBVbmxpa2VseSwgSSB0aGluay4NCg0KU28sIHRvIGNhcmVmdWxseSBy
+ZXBhaXIgY3NpemUsIHdlIHNob3VsZCBkZWNvbXByZXNzIG9uZSBjbHVzdGVyIChvciBvbmUgDQpj
+bHVzdGVyIC0gMSBieXRlKSBvZiBkYXRhLCB0cnlpbmcgdG8gZ2V0IG9uZSBjbHVzdGVyIG9mIGRl
+Y29tcHJlc3NlZCANCmRhdGEuIElmIHdlIHN1Y2NlZWQsIHdlIGtub3cgY3NpemUsIG9yIHdlIGNh
+biBzYWZlbHkgc2V0IGl0IHRvIG9uZSBjbHVzdGVyLg0KDQpPciB3ZSBjYW4ganVzdCBzZXQgY3Np
+emUgPSAxIGNsdXN0ZXIsIGlmIGl0IGlzIGxhcmdlci4gQW5kIGxlYXZlIA0KcHJvYmxlbXMgdG8g
+cmVhbCBleGVjdXRpb24gd2hpY2ggd2lsbCBsZWFkIHRvIEVJTyBpbiB3b3JzdCBjYXNlLg0KDQo+
+IA0KPj4gICAgICAgICAgICAgICBjb2Zmc2V0ID0gbDJfZW50cnkgJiBzLT5jbHVzdGVyX29mZnNl
+dF9tYXNrICYNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgIH4oQkRSVl9TRUNUT1JfU0laRSAt
+IDEpOw0KPj4gKyAgICAgICAgICAgIGlmIChjb2Zmc2V0ID49IGJkcnZfZ2V0bGVuZ3RoKGJzLT5m
+aWxlLT5icykpIHsNCj4+ICsgICAgICAgICAgICAgICAgcmV0ID0gZml4X2wyX2VudHJ5X3RvX3pl
+cm8oDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgYnMsIHJlcywgZml4LCBsMl9vZmZzZXQs
+IGksIGFjdGl2ZSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAiY29tcHJlc3NlZCBjbHVz
+dGVyIG91dCBvZiBmaWxlOiBvZmZzZXQgMHglIiBQUkl4NjQsDQo+PiArICAgICAgICAgICAgICAg
+ICAgICAgICAgY29mZnNldCk7DQo+PiArICAgICAgICAgICAgICAgIGlmIChyZXQgPCAwKSB7DQo+
+PiArICAgICAgICAgICAgICAgICAgICBnb3RvIGZhaWw7DQo+PiArICAgICAgICAgICAgICAgIH0N
+Cj4+ICsgICAgICAgICAgICAgICAgY29udGludWU7DQo+PiArICAgICAgICAgICAgfQ0KPj4gKw0K
+Pj4gICAgICAgICAgICAgICByZXQgPSBxY293Ml9pbmNfcmVmY291bnRzX2ltcnQoYnMsIHJlcywN
+Cj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlZmNvdW50
+X3RhYmxlLCByZWZjb3VudF90YWJsZV9zaXplLA0KPj4gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgY29mZnNldCwgY3NpemUpOw0KPj4gQEAgLTE3NDgsNiArMTc3
+MCwxNiBAQCBzdGF0aWMgaW50IGNoZWNrX3JlZmNvdW50c19sMihCbG9ja0RyaXZlclN0YXRlICpi
+cywgQmRydkNoZWNrUmVzdWx0ICpyZXMsDQo+PiAgICAgICAgICAgew0KPj4gICAgICAgICAgICAg
+ICB1aW50NjRfdCBvZmZzZXQgPSBsMl9lbnRyeSAmIEwyRV9PRkZTRVRfTUFTSzsNCj4+ICAgDQo+
+PiArICAgICAgICAgICAgaWYgKG9mZnNldCA+PSBiZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMp
+KSB7DQo+PiArICAgICAgICAgICAgICAgIHJldCA9IGZpeF9sMl9lbnRyeV90b196ZXJvKA0KPj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgIGJzLCByZXMsIGZpeCwgbDJfb2Zmc2V0LCBpLCBhY3Rp
+dmUsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgImNsdXN0ZXIgb3V0IG9mIGZpbGU6IG9m
+ZnNldCAweCUiIFBSSXg2NCwgb2Zmc2V0KTsNCj4+ICsgICAgICAgICAgICAgICAgaWYgKHJldCA8
+IDApIHsNCj4+ICsgICAgICAgICAgICAgICAgICAgIGdvdG8gZmFpbDsNCj4+ICsgICAgICAgICAg
+ICAgICAgfQ0KPj4gKyAgICAgICAgICAgICAgICBjb250aW51ZTsNCj4+ICsgICAgICAgICAgICB9
+DQo+PiArDQo+IA0KPiBUaGVzZSBvdGhlciB0d28gbG9vayBPSywgYnV0IHRoZXkgaGF2ZSBhbm90
+aGVyIGlzc3VlOiAgSWYgdGhpcyBpcyBhIHYyDQo+IGltYWdlLCB5b3UgY2Fubm90IGNyZWF0ZSB6
+ZXJvIGNsdXN0ZXJzOyBzbyB5b3UnbGwgaGF2ZSB0byB1bmFsbG9jYXRlIHRoZQ0KPiBjbHVzdGVy
+IGluIHRoYXQgY2FzZS4NCg0KDQpPaG8sIGl0J3MgYSBwcm9ibGVtLiBJdCBtYXkgYmUgdW5zYWZl
+IHRvIGRpc2NhcmQgY2x1c3RlcnMsIG1ha2luZyANCmJhY2tpbmcgaW1hZ2UgYXZhaWxhYmxlIHRo
+cm91Z2ggdGhlIGhvbGVzLiBXaGF0IGRpc2NhcmQgZG8gb24gdjI/IA0KWmVyb2luZyBvciBob2xl
+cz8NCg0KDQo+IA0KPiBNYXgNCj4gDQo=
