@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g9X2V-0006jV-9U
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:01:45 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9X3O-0007Pg-JB
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:02:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g9X2M-0007gH-Md
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:01:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:48956 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1g9X2L-0007Ph-3V
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:01:34 -0400
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  8 Oct 2018 16:56:36 +0200
-Message-Id: <1539010596-30858-13-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1539010596-30858-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1539010596-30858-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 12/12] target/mips: Add I6500 core
- configuration
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9X3I-0001A3-AN
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:02:38 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 8 Oct 2018 15:02:21 +0000
+Message-ID: <c319a070-453c-203a-899d-da9218948a56@virtuozzo.com>
+References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20180817122219.16206-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <338E81232CFB50459ECF5487AFF995D2@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/7] qcow2 check improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, laurent@vivier.eu, riku.voipio@iki.fi
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-From: Yongbok Kim <yongbok.kim@mips.com>
-
-Add I6500 core configuration. Note that this configuration is
-supported only by best-effort due to lack of certain features
-in QEMU.
-
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- target/mips/translate_init.inc.c | 43 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
-
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index d7cd4ee..68a5c6b 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -722,6 +722,49 @@ const mips_def_t mips_defs[] =
-         .mmu_type = MMU_TYPE_R4000,
-     },
-     {
-+        .name = "I6500",
-+        .CP0_PRid = 0x1B000,
-+        .CP0_Config0 = MIPS_CONFIG0 | (0x2 << CP0C0_AR) | (0x2 << CP0C0_AT) |
-+                       (MMU_TYPE_R4000 << CP0C0_MT),
-+        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (15 << CP0C1_MMU) |
-+                       (2 << CP0C1_IS) | (5 << CP0C1_IL) | (3 << CP0C1_IA) |
-+                       (2 << CP0C1_DS) | (5 << CP0C1_DL) | (3 << CP0C1_DA) |
-+                       (0 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
-+        .CP0_Config2 = MIPS_CONFIG2,
-+        .CP0_Config3 = MIPS_CONFIG3 | (1U << CP0C3_M) |
-+                       (1 << CP0C3_CMGCR) | (1 << CP0C3_MSAP) |
-+                       (1 << CP0C3_BP) | (1 << CP0C3_BI) | (1 << CP0C3_ULRI) |
-+                       (1 << CP0C3_RXI) | (1 << CP0C3_LPA) | (1 << CP0C3_VInt),
-+        .CP0_Config4 = MIPS_CONFIG4 | (1U << CP0C4_M) | (3 << CP0C4_IE) |
-+                       (1 << CP0C4_AE) | (0xfc << CP0C4_KScrExist),
-+        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_ULS) | (1 << CP0C5_CRCP) |
-+                       (3 << CP0C5_GI) | (0 << CP0C5_XNP) | (1 << CP0C5_VP) |
-+                       (1 << CP0C5_MVH) | (1 << CP0C5_LLB) | (1 << CP0C5_MRP),
-+        .CP0_Config5_rw_bitmask = (1 << CP0C5_MSAEn) | (1 << CP0C5_MI) |
-+                                  (1 << CP0C5_SBRI) | (1 << CP0C5_FRE) |
-+                                  (1 << CP0C5_UFE),
-+        .CP0_LLAddr_rw_bitmask = 0,
-+        .CP0_LLAddr_shift = 0,
-+        .SYNCI_Step = 64,
-+        .CCRes = 2,
-+        .CP0_Status_rw_bitmask = 0x30D8FFFF,
-+        .CP0_PageGrain = (1 << CP0PG_IEC) | (1 << CP0PG_XIE) |
-+                         (1U << CP0PG_RIE),
-+        .CP0_PageGrain_rw_bitmask = (1 << CP0PG_ELPA),
-+        .CP1_fcr0 = (1 << FCR0_FREP) | (1 << FCR0_HAS2008) | (1 << FCR0_F64) |
-+                    (1 << FCR0_L) | (1 << FCR0_W) | (1 << FCR0_D) |
-+                    (1 << FCR0_S) | (0x03 << FCR0_PRID) | (0x0 << FCR0_REV),
-+        .CP1_fcr31 = (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
-+        .CP1_fcr31_rw_bitmask = 0x0103FFFF,
-+        .MSAIR = 0x03 << MSAIR_ProcID,
-+        .SEGBITS = 48,
-+        .PABITS = 48,
-+        .insn_flags = CPU_MIPS64R6 | ASE_MSA,
-+        .mmu_type = MMU_TYPE_R4000,
-+        .SAARP = 1,
-+        .DSPRAMP = 1,
-+    },
-+    {
-         .name = "Loongson-2E",
-         .CP0_PRid = 0x6302,
-         /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
--- 
-2.7.4
+cGluZw0KDQpIaSwgd2hhdCBhYm91dCB0aGlzPw0KDQoxNy4wOC4yMDE4IDE1OjIyLCBWbGFkaW1p
+ciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPiBIaSBhbGwhDQo+DQo+IHYyOg0KPiAwMiwg
+MDY6IGNoZWNrIGJkcnZfZ2V0bGVuZ3RoIGVycm9yIHJldHVybiBjb2RlDQo+DQo+IHYxOg0KPg0K
+PiBXZSd2ZSBmYWNlZCB0aGUgZm9sbG93aW5nIHByb2JsZW06IGFmdGVyIGhvc3QgZnMgY29ycnVw
+dGlvbiwgdm0gaW1hZ2VzDQo+IGJlY29tZXMgaW52YWxpZC4gQW5kIHdoaWNoIGlzIGludGVyZXN0
+aW5nLCBzdGFydGluZyBxZW11LWltZyBjaGVjayBvbg0KPiB0aGVtIGxlZCB0byBhbGxvY2F0aW5n
+IG9mIHRoZSB3aG9sZSBSQU0gYW5kIHRoZW4ga2lsbGluZyBxZW11LWltZyBieQ0KPiBPT00gS2ls
+bGVyLg0KPg0KPiBUaGlzIHdhcyBkdWUgdG8gY29ycnVwdGVkIGwyIGVudHJpZXMsIHdoaWNoIHJl
+ZmVyZW5jZWQgY2x1c3RlcnMgZmFyLWZhcg0KPiBiZXlvbmQgdGhlIGVuZCBvZiB0aGUgcWNvdzIg
+ZmlsZS4NCj4gMDIgaXMgYSBnZW5lcmljIGZpeCBmb3IgdGhlIGJ1ZywgMDEgaXMgdW5yZWxhdGVk
+IGltcHJvdmVtZW50LCAwMy0wNyBhcmUNCj4gYWRkaXRpb25hbCBpbmZvIGFuZCBmaXhpbmcgZm9y
+IHN1Y2ggY29ycnVwdGVkIHRhYmxlIGVudHJpZXMuDQo+DQo+IFF1ZXN0aW9ucyBvbiAwMiwgMDYg
+YW5kIDA3Og0KPiAxLiBTaG91bGQgcmVzdHJpY3Rpb25zIGJlIG1vcmUgb3IgbGVzcyBzdHJpY3Q/
+DQo+IDIuIEFyZSB0aGVyZSB2YWxpZCBjYXNlcywgd2hlbiBzdWNoIGVudHJpZXMgc2hvdWxkIG5v
+dCBiZSBjb25zaWRlcmVkIGFzDQo+ICAgICBjb3JydXB0ZWQ/DQo+DQo+IFZsYWRpbWlyIFNlbWVu
+dHNvdi1PZ2lldnNraXkgKDcpOg0KPiAgICBibG9jay9xY293Mi1yZWZjb3VudDogZml4IGNoZWNr
+X29mbGFnX2NvcGllZA0KPiAgICBibG9jay9xY293Mi1yZWZjb3VudDogYXZvaWQgZWF0aW5nIFJB
+TQ0KPiAgICBibG9jay9xY293Mi1yZWZjb3VudDogY2hlY2tfcmVmY291bnRzX2wyOiByZWZhY3Rv
+ciBjb21wcmVzc2VkIGNhc2UNCj4gICAgYmxvY2svcWNvdzItcmVmY291bnQ6IGNoZWNrX3JlZmNv
+dW50c19sMjogcmVkdWNlIGlnbm9yZWQgb3ZlcmxhcHMNCj4gICAgYmxvY2svcWNvdzItcmVmY291
+bnQ6IGNoZWNrX3JlZmNvdW50c19sMjogc3BsaXQgZml4X2wyX2VudHJ5X3RvX3plcm8NCj4gICAg
+YmxvY2svcWNvdzItcmVmY291bnQ6IGZpeCBvdXQtb2YtZmlsZSBMMSBlbnRyaWVzIHRvIGJlIHpl
+cm8NCj4gICAgYmxvY2svcWNvdzItcmVmY291bnQ6IGZpeCBvdXQtb2YtZmlsZSBMMiBlbnRyaWVz
+IHRvIGJlIHJlYWQtYXMtemVybw0KPg0KPiAgIGJsb2NrL3Fjb3cyLXJlZmNvdW50LmMgfCAyNzAg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQ0KPiAgIDEg
+ZmlsZSBjaGFuZ2VkLCAyMTkgaW5zZXJ0aW9ucygrKSwgNTEgZGVsZXRpb25zKC0pDQo+DQoNCg0K
+LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0KDQo=
