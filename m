@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9ZNd-0005AO-Ll
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:46 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9ZNd-0005AE-47
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9ZNZ-0005m7-Il
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57280)
+	(envelope-from <armbru@redhat.com>) id 1g9ZNZ-0005lD-9V
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59692)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9ZNY-0005iw-UZ
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9ZNY-0005j2-No
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:37 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C53F31F3F7
-	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 17:31:31 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  8 Oct 2018 19:31:02 +0200
-Message-Id: <20181008173125.19678-9-armbru@redhat.com>
+Date: Mon,  8 Oct 2018 19:31:20 +0200
+Message-Id: <20181008173125.19678-27-armbru@redhat.com>
 In-Reply-To: <20181008173125.19678-1-armbru@redhat.com>
 References: <20181008173125.19678-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/31] pc: Fix machine property
- nvdimm-persistence error handling
+Subject: [Qemu-devel] [PATCH 26/31] tpm: Clean up error reporting in
+ tpm_init_tpmdev()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +25,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  pc.c's pc_machine_set_nvdimm_persistence() does that,
-and then exit()s.  Wrong.  Attempting to set machine property
-nvdimm-persistence to a bad value instantly kills the VM:
+is suspicious.  tpm_init_tpmdev() does that, and then fails without
+setting an error.  Its caller main(), via tpm_init() and
+qemu_opts_foreach(), is fine with it, but clean it up anyway.
 
-    $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
-    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 3}, "package": "v3.0.0-837-gc5e4e49258"}, "capabilities": []}}
-    {"execute": "qmp_capabilities"}
-    {"return": {}}
-    {"execute": "qom-set", "arguments": {"path": "/machine", "property": "nvdimm-persistence", "value": "instadeath"}}
-    -machine nvdimm-persistence=instadeath: unsupported option
-    $ echo $?
-    1
-
-Broken when commit 11c39b5cd96 (v3.0.0) replaced error_propagate();
-return by error_report(); exit() instead of error_setg(); return.  Fix
-that.
-
-Fixes: 11c39b5cd966ddc067a1ca0c5392ec9b666c45b7
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/i386/pc.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ include/sysemu/tpm.h |  2 +-
+ stubs/tpm.c          |  3 +--
+ tpm.c                | 22 +++++++++-------------
+ vl.c                 |  4 +---
+ 4 files changed, 12 insertions(+), 19 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index cd5029c149..eab8572f2a 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2209,8 +2209,9 @@ static void pc_machine_set_nvdimm_persistence(Object *obj, const char *value,
-     else if (strcmp(value, "mem-ctrl") == 0)
-         nvdimm_state->persistence = 2;
-     else {
--        error_report("-machine nvdimm-persistence=%s: unsupported option", value);
--        exit(EXIT_FAILURE);
-+        error_setg(errp, "-machine nvdimm-persistence=%s: unsupported option",
-+                   value);
-+        return;
+diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+index 9ae1ab6da3..17a97ed77a 100644
+--- a/include/sysemu/tpm.h
++++ b/include/sysemu/tpm.h
+@@ -16,7 +16,7 @@
+ #include "qom/object.h"
+ 
+ int tpm_config_parse(QemuOptsList *opts_list, const char *optarg);
+-int tpm_init(void);
++void tpm_init(void);
+ void tpm_cleanup(void);
+ 
+ typedef enum TPMVersion {
+diff --git a/stubs/tpm.c b/stubs/tpm.c
+index 6729bc8517..80939cd3db 100644
+--- a/stubs/tpm.c
++++ b/stubs/tpm.c
+@@ -9,9 +9,8 @@
+ #include "qapi/qapi-commands-tpm.h"
+ #include "sysemu/tpm.h"
+ 
+-int tpm_init(void)
++void tpm_init(void)
+ {
+-    return 0;
+ }
+ 
+ void tpm_cleanup(void)
+diff --git a/tpm.c b/tpm.c
+index 93031723ad..9c9e20bbb7 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -89,19 +89,19 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+     int i;
+ 
+     if (!QLIST_EMPTY(&tpm_backends)) {
+-        error_report("Only one TPM is allowed.");
++        error_setg(errp, "Only one TPM is allowed.");
+         return 1;
      }
  
-     g_free(nvdimm_state->persistence_string);
+     id = qemu_opts_id(opts);
+     if (id == NULL) {
+-        error_report(QERR_MISSING_PARAMETER, "id");
++        error_setg(errp, QERR_MISSING_PARAMETER, "id");
+         return 1;
+     }
+ 
+     value = qemu_opt_get(opts, "type");
+     if (!value) {
+-        error_report(QERR_MISSING_PARAMETER, "type");
++        error_setg(errp, QERR_MISSING_PARAMETER, "type");
+         tpm_display_backend_drivers();
+         return 1;
+     }
+@@ -109,8 +109,8 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+     i = qapi_enum_parse(&TpmType_lookup, value, -1, NULL);
+     be = i >= 0 ? tpm_be_find_by_type(i) : NULL;
+     if (be == NULL) {
+-        error_report(QERR_INVALID_PARAMETER_VALUE,
+-                     "type", "a TPM backend type");
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
++                   "a TPM backend type");
+         tpm_display_backend_drivers();
+         return 1;
+     }
+@@ -118,7 +118,7 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+     /* validate backend specific opts */
+     qemu_opts_validate(opts, be->opts, &local_err);
+     if (local_err) {
+-        error_report_err(local_err);
++        error_propagate(errp, local_err);
+         return 1;
+     }
+ 
+@@ -151,14 +151,10 @@ void tpm_cleanup(void)
+  * Initialize the TPM. Process the tpmdev command line options describing the
+  * TPM backend.
+  */
+-int tpm_init(void)
++void tpm_init(void)
+ {
+-    if (qemu_opts_foreach(qemu_find_opts("tpmdev"),
+-                          tpm_init_tpmdev, NULL, NULL)) {
+-        return -1;
+-    }
+-
+-    return 0;
++    qemu_opts_foreach(qemu_find_opts("tpmdev"),
++                      tpm_init_tpmdev, NULL, &error_fatal);
+ }
+ 
+ /*
+diff --git a/vl.c b/vl.c
+index 5c159ca45c..b6f9212f09 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4312,9 +4312,7 @@ int main(int argc, char **argv, char **envp)
+                       user_creatable_add_opts_foreach,
+                       object_create_delayed, &error_fatal);
+ 
+-    if (tpm_init() < 0) {
+-        exit(1);
+-    }
++    tpm_init();
+ 
+     /* init the bluetooth world */
+     if (foreach_device_config(DEV_BT, bt_parse))
 -- 
 2.17.1
