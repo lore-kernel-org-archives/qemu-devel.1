@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9ZNf-0005AX-33
+	(envelope-from <armbru@redhat.com>) id 1g9ZNe-0005AS-LF
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9ZNa-0005n4-Cq
+	(envelope-from <armbru@redhat.com>) id 1g9ZNZ-0005li-IL
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57292)
+Received: from mx1.redhat.com ([209.132.183.28]:52824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9ZNZ-0005ja-UZ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:38 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9ZNY-0005hm-TW
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 908D331F40B
-	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 17:31:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6D2F8C0B020D
+	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 17:31:29 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  8 Oct 2018 19:31:21 +0200
-Message-Id: <20181008173125.19678-28-armbru@redhat.com>
+Date: Mon,  8 Oct 2018 19:31:04 +0200
+Message-Id: <20181008173125.19678-11-armbru@redhat.com>
 In-Reply-To: <20181008173125.19678-1-armbru@redhat.com>
 References: <20181008173125.19678-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 27/31] spice: Clean up error reporting in
- add_channel()
+Subject: [Qemu-devel] [PATCH 10/31] smbios: Clean up error handling in
+ smbios_add()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +31,211 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
 Calling error_report() in a function that takes an Error ** argument
-is suspicious.  add_channel() does that, and then exit()s.  Its caller
-main(), via qemu_opts_foreach(), is fine with it, but clean it up
-anyway.
+is suspicious.  smbios_entry_add() does that, and then exit()s.  It
+also passes &error_fatal to qemu_opts_validate().  Both wrong, but
+currently harmless, as its only caller passes &error_fatal.  Messed up
+in commit 1007a37e208.  Clean it up.
 
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- ui/spice-core.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ hw/smbios/smbios.c | 90 +++++++++++++++++++++++++++++++---------------
+ 1 file changed, 62 insertions(+), 28 deletions(-)
 
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index a4fbbc3898..ebaae24643 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -597,9 +597,9 @@ static int add_channel(void *opaque, const char *name, const char *value,
-     if (strcmp(name, "tls-channel") == 0) {
-         int *tls_port = opaque;
-         if (!*tls_port) {
--            error_report("spice: tried to setup tls-channel"
--                         " without specifying a TLS port");
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index a27e54b2fa..920939454e 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -950,6 +950,7 @@ static void save_opt_list(size_t *ndest, const char ***dest,
+ 
+ void smbios_entry_add(QemuOpts *opts, Error **errp)
+ {
++    Error *err = NULL;
+     const char *val;
+ 
+     assert(!smbios_immutable);
+@@ -960,12 +961,16 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+         int size;
+         struct smbios_table *table; /* legacy mode only */
+ 
+-        qemu_opts_validate(opts, qemu_smbios_file_opts, &error_fatal);
++        qemu_opts_validate(opts, qemu_smbios_file_opts, &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+ 
+         size = get_image_size(val);
+         if (size == -1 || size < sizeof(struct smbios_structure_header)) {
+-            error_report("Cannot read SMBIOS file %s", val);
 -            exit(1);
-+            error_setg(errp, "spice: tried to setup tls-channel"
-+                       " without specifying a TLS port");
-+            return -1;
++            error_setg(errp, "Cannot read SMBIOS file %s", val);
++            return;
          }
-         security = SPICE_CHANNEL_SECURITY_SSL;
+ 
+         /*
+@@ -978,14 +983,15 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+                                                     smbios_tables_len);
+ 
+         if (load_image(val, (uint8_t *)header) != size) {
+-            error_report("Failed to load SMBIOS file %s", val);
+-            exit(1);
++            error_setg(errp, "Failed to load SMBIOS file %s", val);
++            return;
+         }
+ 
+         if (test_bit(header->type, have_fields_bitmap)) {
+-            error_report("can't load type %d struct, fields already specified!",
+-                         header->type);
+-            exit(1);
++            error_setg(errp,
++                       "can't load type %d struct, fields already specified!",
++                       header->type);
++            return;
+         }
+         set_bit(header->type, have_binfile_bitmap);
+ 
+@@ -1030,19 +1036,23 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+         unsigned long type = strtoul(val, NULL, 0);
+ 
+         if (type > SMBIOS_MAX_TYPE) {
+-            error_report("out of range!");
+-            exit(1);
++            error_setg(errp, "out of range!");
++            return;
+         }
+ 
+         if (test_bit(type, have_binfile_bitmap)) {
+-            error_report("can't add fields, binary file already loaded!");
+-            exit(1);
++            error_setg(errp, "can't add fields, binary file already loaded!");
++            return;
+         }
+         set_bit(type, have_fields_bitmap);
+ 
+         switch (type) {
+         case 0:
+-            qemu_opts_validate(opts, qemu_smbios_type0_opts, &error_fatal);
++            qemu_opts_validate(opts, qemu_smbios_type0_opts, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
+             save_opt(&type0.vendor, opts, "vendor");
+             save_opt(&type0.version, opts, "version");
+             save_opt(&type0.date, opts, "date");
+@@ -1051,14 +1061,18 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+             val = qemu_opt_get(opts, "release");
+             if (val) {
+                 if (sscanf(val, "%hhu.%hhu", &type0.major, &type0.minor) != 2) {
+-                    error_report("Invalid release");
+-                    exit(1);
++                    error_setg(errp, "Invalid release");
++                    return;
+                 }
+                 type0.have_major_minor = true;
+             }
+             return;
+         case 1:
+-            qemu_opts_validate(opts, qemu_smbios_type1_opts, &error_fatal);
++            qemu_opts_validate(opts, qemu_smbios_type1_opts, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
+             save_opt(&type1.manufacturer, opts, "manufacturer");
+             save_opt(&type1.product, opts, "product");
+             save_opt(&type1.version, opts, "version");
+@@ -1069,14 +1083,18 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+             val = qemu_opt_get(opts, "uuid");
+             if (val) {
+                 if (qemu_uuid_parse(val, &qemu_uuid) != 0) {
+-                    error_report("Invalid UUID");
+-                    exit(1);
++                    error_setg(errp, "Invalid UUID");
++                    return;
+                 }
+                 qemu_uuid_set = true;
+             }
+             return;
+         case 2:
+-            qemu_opts_validate(opts, qemu_smbios_type2_opts, &error_fatal);
++            qemu_opts_validate(opts, qemu_smbios_type2_opts, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
+             save_opt(&type2.manufacturer, opts, "manufacturer");
+             save_opt(&type2.product, opts, "product");
+             save_opt(&type2.version, opts, "version");
+@@ -1085,7 +1103,11 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+             save_opt(&type2.location, opts, "location");
+             return;
+         case 3:
+-            qemu_opts_validate(opts, qemu_smbios_type3_opts, &error_fatal);
++            qemu_opts_validate(opts, qemu_smbios_type3_opts, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
+             save_opt(&type3.manufacturer, opts, "manufacturer");
+             save_opt(&type3.version, opts, "version");
+             save_opt(&type3.serial, opts, "serial");
+@@ -1093,7 +1115,11 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+             save_opt(&type3.sku, opts, "sku");
+             return;
+         case 4:
+-            qemu_opts_validate(opts, qemu_smbios_type4_opts, &error_fatal);
++            qemu_opts_validate(opts, qemu_smbios_type4_opts, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
+             save_opt(&type4.sock_pfx, opts, "sock_pfx");
+             save_opt(&type4.manufacturer, opts, "manufacturer");
+             save_opt(&type4.version, opts, "version");
+@@ -1102,11 +1128,19 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+             save_opt(&type4.part, opts, "part");
+             return;
+         case 11:
+-            qemu_opts_validate(opts, qemu_smbios_type11_opts, &error_fatal);
++            qemu_opts_validate(opts, qemu_smbios_type11_opts, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
+             save_opt_list(&type11.nvalues, &type11.values, opts, "value");
+             return;
+         case 17:
+-            qemu_opts_validate(opts, qemu_smbios_type17_opts, &error_fatal);
++            qemu_opts_validate(opts, qemu_smbios_type17_opts, &err);
++            if (err) {
++                error_propagate(errp, err);
++                return;
++            }
+             save_opt(&type17.loc_pfx, opts, "loc_pfx");
+             save_opt(&type17.bank, opts, "bank");
+             save_opt(&type17.manufacturer, opts, "manufacturer");
+@@ -1116,12 +1150,12 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
+             type17.speed = qemu_opt_get_number(opts, "speed", 0);
+             return;
+         default:
+-            error_report("Don't know how to build fields for SMBIOS type %ld",
+-                         type);
+-            exit(1);
++            error_setg(errp,
++                       "Don't know how to build fields for SMBIOS type %ld",
++                       type);
++            return;
+         }
      }
-@@ -615,8 +615,9 @@ static int add_channel(void *opaque, const char *name, const char *value,
-         rc = spice_server_set_channel_security(spice_server, value, security);
-     }
-     if (rc != 0) {
--        error_report("spice: failed to set channel security for %s", value);
--        exit(1);
-+        error_setg(errp, "spice: failed to set channel security for %s",
-+                   value);
-+        return -1;
-     }
-     return 0;
+ 
+-    error_report("Must specify type= or file=");
+-    exit(1);
++    error_setg(errp, "Must specify type= or file=");
  }
-@@ -787,7 +788,7 @@ void qemu_spice_init(void)
-     spice_server_set_playback_compression
-         (spice_server, qemu_opt_get_bool(opts, "playback-compression", 1));
- 
--    qemu_opt_foreach(opts, add_channel, &tls_port, NULL);
-+    qemu_opt_foreach(opts, add_channel, &tls_port, &error_fatal);
- 
-     spice_server_set_name(spice_server, qemu_name);
-     spice_server_set_uuid(spice_server, (unsigned char *)&qemu_uuid);
 -- 
 2.17.1
