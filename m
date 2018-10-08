@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1g9dAj-0001Yz-DL
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:34:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g9dPm-0006bV-KK
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:50:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1g9dAg-0006IV-33
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:34:37 -0400
-Date: Mon, 8 Oct 2018 23:34:07 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20181008213407.GF4229@toto>
-References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
-	<1538579266-8389-11-git-send-email-edgar.iglesias@gmail.com>
-	<CAFEAcA9b4O4HrMwNTgbZ7JYdO=S3dnzC8ayabBEpKY5=DyBMog@mail.gmail.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1g9dPj-0000Cy-Cj
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:50:10 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39929)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g9dPi-0000BD-VZ
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:50:07 -0400
+Received: by mail-pf1-x442.google.com with SMTP id c25-v6so8650917pfe.6
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 14:50:06 -0700 (PDT)
+References: <20181007205153.GA30270@ls3530.fritz.box>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <84760c9e-995b-8def-6a34-0e6e4ec39d95@linaro.org>
+Date: Mon, 8 Oct 2018 14:50:02 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9b4O4HrMwNTgbZ7JYdO=S3dnzC8ayabBEpKY5=DyBMog@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v1 10/12] target/arm: Add the Cortex-A72
+In-Reply-To: <20181007205153.GA30270@ls3530.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-system-hppa: Raise exception 26 on
+ emulated hardware
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>
 
-On Mon, Oct 08, 2018 at 02:10:29PM +0100, Peter Maydell wrote:
-> On 3 October 2018 at 16:07, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> >
-> > Add the ARM Cortex-A72.
-> >
-> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> > ---
-> >  target/arm/cpu64.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 59 insertions(+)
-> >
-> > diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> > index 800bff7..02e500b 100644
-> > --- a/target/arm/cpu64.c
-> > +++ b/target/arm/cpu64.c
-> > @@ -218,6 +218,64 @@ static void aarch64_a53_initfn(Object *obj)
-> >      define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
-> >  }
-> >
-> > +static void aarch64_a72_initfn(Object *obj)
-> > +{
-> > +    ARMCPU *cpu = ARM_CPU(obj);
-> > +
-> > +    cpu->dtb_compatible = "arm,cortex-a72";
-> > +    set_feature(&cpu->env, ARM_FEATURE_V8);
-> > +    set_feature(&cpu->env, ARM_FEATURE_VFP4);
-> > +    set_feature(&cpu->env, ARM_FEATURE_NEON);
-> > +    set_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER);
-> > +    set_feature(&cpu->env, ARM_FEATURE_AARCH64);
-> > +    set_feature(&cpu->env, ARM_FEATURE_CBAR_RO);
-> > +    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
-> > +    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
-> > +    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-> > +    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-> > +    set_feature(&cpu->env, ARM_FEATURE_CRC);
-> > +    set_feature(&cpu->env, ARM_FEATURE_EL2);
-> > +    set_feature(&cpu->env, ARM_FEATURE_EL3);
+On 10/7/18 1:51 PM, Helge Deller wrote:
+> On PCXS chips (PA7000, pa 1.1a), trap #18 is raised on memory faults,
+> while all later chips (>= PA7100) generate either trap #26, #27 or #28
+> (depending on the fault type).
 > 
-> No ARM_FEATURE_PMU ?
-
-Will add in v2.
-
-
+> Since the current qemu emulation emulates a B160L machine (with a
+> PA7300LC PCX-L2 chip, we should raise trap #26 (EXCP_DMAR) instead of
+> #18 (EXCP_DMP) on access faults by the Linux kernel to page zero.
 > 
-> > +    cpu->midr = 0x410fd083;
-> > +    cpu->revidr = 0x00000000;
-> > +    cpu->reset_fpsid = 0x41034080;
-> > +    cpu->mvfr0 = 0x10110222;
-> > +    cpu->mvfr1 = 0x12111111;
-> > +    cpu->mvfr2 = 0x00000043;
-> > +    cpu->ctr = 0x8444c004;
-> > +    cpu->reset_sctlr = 0x00c50838;
+> With the patch we now get the correct output (I tested against real
+> hardware):
+>  Kernel Fault: Code=26 (Data memory access rights trap) (Addr=00000004)
+> instead of:
+>  Kernel Fault: Code=18 (Data memory protection/unaligned access trap) (Addr=00000004)
 > 
-> Do you happen to have the hardware to hand to check what the
-> top 4 bits of the reset value of SCTLR_ELx are? I think they
-> should be 0x3 -- the Arm ARM says that [29:28] are RES1 (as
-> does the A72 TRM, though its top level summary table lists
-> 0x00c50838 as the reset value for some of the SCTLR_ELx.)
-> 
-> QEMU may have the wrong value for A53/A57 here too, I suspect.
+> Signed-off-by: Helge Deller <deller@gmx.de>
 
-I don't have access to the A72s at the moment but looking at logs
-it seems to be 0x00c50838 for both the A53 and A72.
-Looking at "Table 4-118 SCTLR bit assignments" in the A72 TRM,
-bits [30:28] seem to have been allocated. Bit 30 depends on
-configuration inputs to the core and [29:28] seem to be hard-coded
-to zero.
-
-On ZynqMP and Versal, bit 30 (CFGTE) seems to be  runtime configurable
-prior to releasing the A53s/A72s from reset. I haven't tried it though.
-
-I ran a test on the ZynqMP a53s and got the folloing right after reset,
-for EL1, EL2 and EL3:
-sctlr c52838 30c50838 c52838
-
-The 0x2000 mask is due to V-hivecs being set.
-SCLTR_EL2 seems to get the RES1 bits set to 1...
-
-Perhaps we should just leave it as is for now?
+Queued, thanks.
 
 
-> 
-> > +    cpu->id_pfr0 = 0x00000131;
-> > +    cpu->id_pfr1 = 0x00011011;
-> > +    cpu->id_dfr0 = 0x03010066;
-> > +    cpu->id_afr0 = 0x00000000;
-> > +    cpu->id_mmfr0 = 0x10201105;
-> > +    cpu->id_mmfr1 = 0x40000000;
-> > +    cpu->id_mmfr2 = 0x01260000;
-> > +    cpu->id_mmfr3 = 0x02102211;
-> > +    cpu->id_isar0 = 0x02101110;
-> > +    cpu->id_isar1 = 0x13112111;
-> > +    cpu->id_isar2 = 0x21232042;
-> > +    cpu->id_isar3 = 0x01112131;
-> > +    cpu->id_isar4 = 0x00011142;
-> > +    cpu->id_isar5 = 0x00011121;
-> > +    cpu->id_aa64pfr0 = 0x00002222;
-> > +    cpu->id_aa64dfr0 = 0x10305106;
-> > +    cpu->pmceid0 = 0x00000000;
-> > +    cpu->pmceid1 = 0x00000000;
-> > +    cpu->id_aa64isar0 = 0x00011120;
-> > +    cpu->id_aa64mmfr0 = 0x00001124;
-> > +    cpu->dbgdidr = 0x3516d000;
-> > +    cpu->clidr = 0x0a200023;
-> > +    cpu->ccsidr[0] = 0x701fe00a; /* 32KB L1 dcache */
-> > +    cpu->ccsidr[1] = 0x201fe012; /* 48KB L1 icache */
-> > +    cpu->ccsidr[2] = 0x707fe07a; /* 1MB L2 cache */
-> > +    cpu->dcz_blocksize = 4; /* 64 bytes */
-> > +    cpu->gic_num_lrs = 4;
-> > +    cpu->gic_vpribits = 5;
-> > +    cpu->gic_vprebits = 5;
-> > +    define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
-> 
-> The impdef registers do seem to be basically the same as
-> the A53/A57. The function name is now a bit inaccurate,
-> though, but I don't have a good idea for a better name.
-> 
-> Otherwise
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> thanks
-> -- PMM
+r~
