@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9c8x-0003rs-9H
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:28:47 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9c90-0003Z8-H8
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9c3T-0002Or-8t
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:23:07 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41343)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9c3T-0002OP-19
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:23:03 -0400
-Date: Mon, 8 Oct 2018 16:23:01 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181008202301.GA24543@flamenco>
-References: <20181006214508.5331-1-cota@braap.org>
-	<20181006214508.5331-3-cota@braap.org>
-	<4dc1591e-adc9-eaaa-deea-07fd7f3470a4@linaro.org>
-	<20181008144242.GC19899@flamenco>
-	<498f3a82-0852-df46-d905-9e752f2c6ec1@linaro.org>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9c3O-0002N3-CK
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:23:02 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 8 Oct 2018 20:22:55 +0000
+Message-ID: <c895f323-6986-9a48-95d4-b787b931edff@virtuozzo.com>
+References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
+	<20180817122219.16206-3-vsementsov@virtuozzo.com>
+	<baaab5d2-76f0-6f5c-c0f1-e1e06a239d40@redhat.com>
+In-Reply-To: <baaab5d2-76f0-6f5c-c0f1-e1e06a239d40@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0D9A04B085A9F34A88C27CBC445F6760@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <498f3a82-0852-df46-d905-9e752f2c6ec1@linaro.org>
-Subject: Re: [Qemu-devel] [RFC 2/6] cputlb: do not evict invalid entries to
- the vtlb
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] block/qcow2-refcount: avoid eating
+ RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Pranith Kumar <bobby.prani@gmail.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Mon, Oct 08, 2018 at 12:46:26 -0700, Richard Henderson wrote:
-> On 10/8/18 7:42 AM, Emilio G. Cota wrote:
-> > On Sun, Oct 07, 2018 at 19:09:01 -0700, Richard Henderson wrote:
-> >> On 10/6/18 2:45 PM, Emilio G. Cota wrote:
-> >>> Currently we evict an entry to the victim TLB when it doesn't match
-> >>> the current address. But it could be that there's no match because
-> >>> the current entry is invalid. Do not evict the entry to the vtlb
-> >>> in that case.
-> >>>
-> >>> This change will help us keep track of the TLB's use rate.
-> >>>
-> >>> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> >>> ---
-> >>>  include/exec/cpu-all.h | 14 ++++++++++++++
-> >>>  accel/tcg/cputlb.c     |  2 +-
-> >>>  2 files changed, 15 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> >>> index 117d2fbbca..d938dedafc 100644
-> >>> --- a/include/exec/cpu-all.h
-> >>> +++ b/include/exec/cpu-all.h
-> >>> @@ -362,6 +362,20 @@ static inline bool tlb_hit(target_ulong tlb_addr, target_ulong addr)
-> >>>      return tlb_hit_page(tlb_addr, addr & TARGET_PAGE_MASK);
-> >>>  }
-> >>>  
-> >>> +/**
-> >>> + * tlb_is_valid - return true if at least one of the addresses is valid
-> >>> + * @te: pointer to CPUTLBEntry
-> >>> + *
-> >>> + * This is useful when we don't have a particular address to compare against,
-> >>> + * and we just want to know whether any entry holds valid data.
-> >>> + */
-> >>> +static inline bool tlb_is_valid(const CPUTLBEntry *te)
-> >>> +{
-> >>> +    return !(te->addr_read & TLB_INVALID_MASK) ||
-> >>> +           !(te->addr_write & TLB_INVALID_MASK) ||
-> >>> +           !(te->addr_code & TLB_INVALID_MASK);
-> >>> +}
-> >>
-> >> No, I think you misunderstand.
-> >>
-> >> First, TLB_INVALID_MASK is only ever set for addr_write, in response to
-> >> PAGE_WRITE_INV.  Second, an entry that is invalid for write is still valid for
-> >> read+exec.  So there is benefit to swapping it out to the victim cache.
-> >>
-> >> This is used by the s390x target to make the "lowpage" read-only, which is a
-> >> special architected 512 byte range within pages 0 and 1.  This is done by
-> >> forcing writes, but not reads, back through tlb_fill.
-> > 
-> > Aah I see. The point is to avoid pushing to the victim cache
-> > an entry that is all invalid, not just partially invalid.
-> 
-> I've slightly misspoken here.  It is (ab)used for the s390 thing, but that bit
-> is also set by memset -1.  Perhaps you might check
-> 
-> static inline bool tlb_is_invalid(const CPUTLBEntry *te)
-> {
->     return te->addr_read & te->addr_write & te->addr_code & TLB_INVALID_MASK;
-> }
-> 
-> That is, all forms of access have the INVALID bit set.
-
-I see. I just ran a few tests and the below gives the best
-performance, so I'll go with it:
-
-static inline bool tlb_is_empty(const CPUTLBEntry *te)
-{
-    return te->addr_read == -1 && te->addr_write == -1 && te->addr_code == -1;
-}
-
-I renamed it from "invalid" to "empty" to avoid even thinking about
-the invalid flag.
-
-Thanks,
-
-		Emilio
+DQoNCk9uIDEwLzA4LzIwMTggMDY6MzEgUE0sIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMTcuMDgu
+MTggMTQ6MjIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBxY293Ml9p
+bmNfcmVmY291bnRzX2ltcnQoKSAodGhyb3VnaCByZWFsbG9jX3JlZmNvdW50X2FycmF5KCkpIGNh
+biBlYXQNCj4+IGFuIHVucHJlZGljdGFibGUgYW1vdW50IG9mIG1lbW9yeSBvbiBjb3JydXB0ZWQg
+dGFibGUgZW50cmllcywgd2hpY2ggYXJlDQo+PiByZWZlcmVuY2luZyByZWdpb25zIGZhciBiZXlv
+bmQgdGhlIGVuZCBvZiBmaWxlLg0KPj4NCj4+IFByZXZlbnQgdGhpcywgYnkgc2tpcHBpbmcgc3Vj
+aCByZWdpb25zIGZyb20gZnVydGhlciBwcm9jZXNzaW5nLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
+Cj4+IC0tLQ0KPj4gICBibG9jay9xY293Mi1yZWZjb3VudC5jIHwgMTQgKysrKysrKysrKysrKysN
+Cj4+ICAgMSBmaWxlIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0
+IGEvYmxvY2svcWNvdzItcmVmY291bnQuYyBiL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMNCj4+IGlu
+ZGV4IDYxNTg0N2ViMDkuLjU2NmMxOWZiZmEgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xY293Mi1y
+ZWZjb3VudC5jDQo+PiArKysgYi9ibG9jay9xY293Mi1yZWZjb3VudC5jDQo+PiBAQCAtMTQ5OSwx
+MiArMTQ5OSwyNiBAQCBpbnQgcWNvdzJfaW5jX3JlZmNvdW50c19pbXJ0KEJsb2NrRHJpdmVyU3Rh
+dGUgKmJzLCBCZHJ2Q2hlY2tSZXN1bHQgKnJlcywNCj4+ICAgew0KPj4gICAgICAgQkRSVlFjb3cy
+U3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gICAgICAgdWludDY0X3Qgc3RhcnQsIGxhc3QsIGNs
+dXN0ZXJfb2Zmc2V0LCBrLCByZWZjb3VudDsNCj4+ICsgICAgaW50NjRfdCBmaWxlX2xlbjsNCj4+
+ICAgICAgIGludCByZXQ7DQo+PiAgIA0KPj4gICAgICAgaWYgKHNpemUgPD0gMCkgew0KPj4gICAg
+ICAgICAgIHJldHVybiAwOw0KPj4gICAgICAgfQ0KPj4gICANCj4+ICsgICAgZmlsZV9sZW4gPSBi
+ZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMpOw0KPj4gKyAgICBpZiAoZmlsZV9sZW4gPCAwKSB7
+DQo+PiArICAgICAgICByZXR1cm4gZmlsZV9sZW47DQo+PiArICAgIH0NCj4gDQo+IERvZXNuJ3Qg
+dGhpcyBzbG93IHRoaW5ncyBkb3duPyAgQ2FuIHdlIG5vdCBjYWNoZSB0aGUgbGVuZ3RoIHNvbWV3
+aGVyZQ0KPiBhbmQgdXBkYXRlIGl0IHdoZW5ldmVyIHRoZSBpbWFnZSBpcyBtb2RpZmllZD8NCg0K
+DQpobW0uIGJkcnZfZ2V0bGVuZ3RoIGlzIHVzZWQgZXZlcnl3aGVyZSBpbiBRZW11LCBhbmQgSSBk
+b24ndCB0aGluayBpdCBpcyANCmdvb2QgaWRlYSB0byBpbXByb3ZlIGl0IGxvY2FsbHkgZm9yIHRo
+ZXNlIHNlcmllcy4gSWYgd2UgY2FuIGltcHJvdmUgaXQgDQpzb21laG93IHdpdGggYSBjYWNoZSBv
+ciBzb21ldGhpbmcgbGlrZSB0aGlzLCBpdCBzaG91bGQgYmUgZG9uZSBmb3IgYWxsIA0KdXNlcnMg
+YW5kIHRoZXJlZm9yZSBpdCBpcyBvdXRzaWRlIG9mIHRoZXNlIHNlcmllcy4uDQoNCj4gDQo+PiAr
+DQo+PiArICAgIGlmIChvZmZzZXQgKyBzaXplIC0gZmlsZV9sZW4gPiBzLT5jbHVzdGVyX3NpemUp
+IHsNCj4+ICsgICAgICAgIGZwcmludGYoc3RkZXJyLCAiRVJST1I6IGNvdW50aW5nIHJlZmVyZW5j
+ZSBmb3IgcmVnaW9uIGV4Y2VlZGluZyB0aGUgIg0KPj4gKyAgICAgICAgICAgICAgICAiZW5kIG9m
+IHRoZSBmaWxlIGJ5IG1vcmUgdGhhbiBvbmUgY2x1c3Rlcjogb2Zmc2V0IDB4JSIgUFJJeDY0DQo+
+PiArICAgICAgICAgICAgICAgICIgc2l6ZSAweCUiIFBSSXg2NCAiXG4iLCBvZmZzZXQsIHNpemUp
+Ow0KPiANCj4gV2h5IGlzIG9uZSBjbHVzdGVyIE9LPyAgSXMgdGhlcmUgYSBzcGVjaWZpYyBjYXNl
+IHlvdSdyZSB0cnlpbmcgdG8gY2F0Y2gNCj4gaGVyZT8NCg0KcmF3IGZpbGUgdW5kZXIgcWNvdzIg
+bWF5IGJlIG5vdCBhbGlnbmVkIGluIHJlYWwgc2l6ZSB0byBxY293MiBjbHVzdGVyLCANCmFzIEkg
+dW5kZXJzdGFuZCwgaXQncyBub3JtYWwgZm9yIHRoZSBsYXN0IGNsdXN0ZXIgdG8gYmUgc2VtaS1h
+bGxvY2F0ZWQNCg0KPiANCj4gTWF4DQo+IA0KPj4gKyAgICAgICAgcmVzLT5jb3JydXB0aW9ucysr
+Ow0KPj4gKyAgICAgICAgcmV0dXJuIDA7DQo+PiArICAgIH0NCj4+ICsNCj4+ICAgICAgIHN0YXJ0
+ID0gc3RhcnRfb2ZfY2x1c3RlcihzLCBvZmZzZXQpOw0KPj4gICAgICAgbGFzdCA9IHN0YXJ0X29m
+X2NsdXN0ZXIocywgb2Zmc2V0ICsgc2l6ZSAtIDEpOw0KPj4gICAgICAgZm9yKGNsdXN0ZXJfb2Zm
+c2V0ID0gc3RhcnQ7IGNsdXN0ZXJfb2Zmc2V0IDw9IGxhc3Q7DQo+Pg0KPiANCj4gDQo=
