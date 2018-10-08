@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g9Teg-0006ga-M9
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:24:55 -0400
+	(envelope-from <vkuznets@redhat.com>) id 1g9ThH-0007OO-T7
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1g9Teb-0003EF-Pa
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:24:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49098)
+	(envelope-from <vkuznets@redhat.com>) id 1g9ThE-0004vr-PN
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:27:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48508)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1g9Teb-0003Dg-Gv
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:24:49 -0400
-References: <20180820150903.1224-4-pbonzini@redhat.com>
-	<000001d43ea0$02146ed0$063d4c70$@ru>
-	<5b9a85eb-cefd-925c-b24b-95b93bbbfce8@redhat.com>
-	<000a01d448c8$4a55c0e0$df0142a0$@ru>
-	<ea5f162e-bd8a-001c-b78c-25378e3b2919@redhat.com>
-	<001e01d44994$d02acb80$70806280$@ru>
-	<f8014c4f-f581-bdf9-c853-9ea1b8855726@redhat.com>
-	<003b01d45ed5$d7fec4f0$87fc4ed0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f86a750e-faec-c98e-ca82-f6a043913bcc@redhat.com>
-Date: Mon, 8 Oct 2018 13:24:42 +0200
-MIME-Version: 1.0
-In-Reply-To: <003b01d45ed5$d7fec4f0$87fc4ed0$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [3/4] cpus: protect TimerState writes with a
- spinlock
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1g9ThE-0004vR-HO
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:27:32 -0400
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Mon,  8 Oct 2018 13:27:25 +0200
+Message-Id: <20181008112726.16140-2-vkuznets@redhat.com>
+In-Reply-To: <20181008112726.16140-1-vkuznets@redhat.com>
+References: <20181008112726.16140-1-vkuznets@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] linux-headers: update to pre-4.20
+ (kvm/queue)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: "'Emilio G . Cota'" <cota@braap.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-On 08/10/2018 09:09, Pavel Dovgalyuk wrote:
-> Paolo,
-> 
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 11/09/2018 08:00, Pavel Dovgalyuk wrote:
->>> Thanks, that works. Here is the updated diff (stubs were added).
->>> Will you apply it?
->>
->> Yes, thanks for the quick test!
-> 
-> Thanks for applying RR patches, but I think you forgot about this one.
-> 
-> Pavel Dovgalyuk
-> 
+This brings us three new defines: KVM_CAP_ARM_INJECT_SERROR_ESR,
+KVM_CAP_MSR_PLATFORM_INFO and KVM_CAP_HYPERV_SEND_IPI.
 
-Oops, yeah - it was because the patch you sent is a bit mangled
-(truncated to 80 columns) but I've fixed it up and queued it now.
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ linux-headers/linux/kvm.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Paolo
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 66790724f1..043f1e58b6 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -9,7 +9,7 @@
+  */
+ 
+ #include <linux/types.h>
+-
++#include <linux/compiler.h>
+ #include <linux/ioctl.h>
+ #include <asm/kvm.h>
+ 
+@@ -481,7 +481,7 @@ struct kvm_dirty_log {
+ 	__u32 slot;
+ 	__u32 padding1;
+ 	union {
+-		void *dirty_bitmap; /* one bit per page */
++		void __user *dirty_bitmap; /* one bit per page */
+ 		__u64 padding2;
+ 	};
+ };
+@@ -951,6 +951,9 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_HYPERV_TLBFLUSH 155
+ #define KVM_CAP_S390_HPAGE_1M 156
+ #define KVM_CAP_NESTED_STATE 157
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 158
++#define KVM_CAP_MSR_PLATFORM_INFO 159
++#define KVM_CAP_HYPERV_SEND_IPI 160
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.17.1
