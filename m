@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9Xa8-0002F6-Nb
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:36:29 -0400
+	(envelope-from <thuth@redhat.com>) id 1g9Xdb-000434-4J
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:40:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9Xa2-0001Fy-Pv
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:36:26 -0400
-Received: from mail-db3eur04on0704.outbound.protection.outlook.com
-	([2a01:111:f400:fe0c::704]:46547
-	helo=EUR04-DB3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1g9XZx-00011A-5D
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:36:21 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 8 Oct 2018 15:36:09 +0000
-Message-ID: <efb41cc7-031f-a0d7-b86f-64e163118316@virtuozzo.com>
-References: <20180609141457.6283-1-vsementsov@virtuozzo.com>
-	<20180615120649.GC2615@work-vm>
-	<f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
-	<20180625171447.GJ2390@work-vm> <20180625175039.GK2390@work-vm>
-	<bf52a2b9-ca6e-7034-5566-b67684aa52b3@virtuozzo.com>
-In-Reply-To: <bf52a2b9-ca6e-7034-5566-b67684aa52b3@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1F8FFE3EB86BE4409AF17FAF61018E58@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1g9XdX-0003tv-2p
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:40:03 -0400
+References: <20181008153204.18845-1-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <36a47adc-d64d-f74e-cacd-83ff9b5efa1a@redhat.com>
+Date: Mon, 8 Oct 2018 17:39:47 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] migration: invalidate cache before source
- start
+In-Reply-To: <20181008153204.18845-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] s390x/tcg: always enable AFP for linux-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,122 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-MjYuMDYuMjAxOCAxMTo0NCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MjUuMDYuMjAxOCAyMDo1MCwgRHIuIERhdmlkIEFsYW4gR2lsYmVydCB3cm90ZToNCj4+ICogRHIu
-IERhdmlkIEFsYW4gR2lsYmVydCAoZGdpbGJlcnRAcmVkaGF0LmNvbSkgd3JvdGU6DQo+Pj4gKiBW
-bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICh2c2VtZW50c292QHZpcnR1b3p6by5jb20pIHdy
-b3RlOg0KPj4+PiAxNS4wNi4yMDE4IDE1OjA2LCBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IHdyb3Rl
-Og0KPj4+Pj4gKiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICh2c2VtZW50c292QHZpcnR1
-b3p6by5jb20pIHdyb3RlOg0KPj4+Pj4+IEludmFsaWRhdGUgY2FjaGUgYmVmb3JlIHNvdXJjZSBz
-dGFydCBpbiBjYXNlIG9mIGZhaWxlZCBtaWdyYXRpb24uDQo+Pj4+Pj4NCj4+Pj4+PiBTaWduZWQt
-b2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IA0KPj4+Pj4+IDx2c2VtZW50c292
-QHZpcnR1b3p6by5jb20+DQo+Pj4+PiBXaHkgZG9lc24ndCB0aGUgY29kZSBhdCB0aGUgYm90dG9t
-IG9mIG1pZ3JhdGlvbl9jb21wbGV0aW9uLA0KPj4+Pj4gZmFpbF9pbnZhbGlkYXRlOsKgwqAgYW5k
-IHRoZSBjb2RlIGluIG1pZ3JhdGVfZmRfY2FuY2VsIGhhbmRsZSB0aGlzPw0KPj4+Pj4NCj4+Pj4+
-IFdoYXQgY2FzZSBkaWQgeW91IHNlZSBpdCBpbiB0aGF0IHRob3NlIGRpZG4ndCBoYW5kbGU/DQo+
-Pj4+PiAoQWxzbyBJIGd1ZXNzIGl0IHByb2JhYmx5IHNob3VsZCBzZXQgcy0+YmxvY2tfaW5hY3Rp
-dmUgPSBmYWxzZSkNCj4+Pj4gb24gc291cmNlIEkgc2VlOg0KPj4+Pg0KPj4+PiA4MTM5MkAxNTI5
-MDY1NzUwLjc2NjI4OTptaWdyYXRlX3NldF9zdGF0ZSBuZXcgc3RhdGUgNw0KPj4+PiA4MTM5MkAx
-NTI5MDY1NzUwLjc2NjMzMDptaWdyYXRpb25fdGhyZWFkX2ZpbGVfZXJyDQo+Pj4+IDgxMzkyQDE1
-MjkwNjU3NTAuNzY2MzMyOm1pZ3JhdGlvbl90aHJlYWRfYWZ0ZXJfbG9vcA0KPj4+Pg0KPj4+PiBz
-bywgd2UgYXJlIGxlYXZpbmcgbG9vcCBvbg0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgIGlmIChxZW11
-X2ZpbGVfZ2V0X2Vycm9yKHMtPnRvX2RzdF9maWxlKSkgew0KPj4+PiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgbWlncmF0ZV9zZXRfc3RhdGUoJnMtPnN0YXRlLCBjdXJyZW50X2FjdGl2ZV9zdGF0
-ZSwNCj4+Pj4gTUlHUkFUSU9OX1NUQVRVU19GQUlMRUQpOw0KPj4+PiB0cmFjZV9taWdyYXRpb25f
-dGhyZWFkX2ZpbGVfZXJyKCk7DQo+Pj4+IGJyZWFrOw0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgIH0N
-Cj4+Pj4NCj4+Pj4gYW5kIHNraXAgbWlncmF0aW9uX2NvbXBsZXRpb24oKQ0KPg0KPg0KPiBKb2hu
-IGlzIHJpZ2h0LCB0aGlzIGxzIGFuIHVucmVsYXRlZCBsb2csIGhlcmUgd2UgZmFpbCBiZWZvcmUg
-DQo+IGluYWN0aXZhdGlvbiBhbmQgdGhlcmUgYXJlIG5vIHByb2JsZW1zLg0KPg0KPiBBY3R1YWwg
-cHJvYmxlbSBpcyB3aGVuIHdlIGZhaWwgaW4gcG9zdGNvcHlfc3RhcnQsIGF0IHRoZSBlbmQuIEFu
-ZCANCj4gc291cmNlIGxvZyBsb29rcyBsaWtlOg0KPg0KPiA4NDI5N0AxNTMwMDAxNzk2LjI4NzM0
-NDptaWdyYXRlX3NldF9zdGF0ZSBuZXcgc3RhdGUgMQ0KPiA4NDI5N0AxNTMwMDAxNzk2LjI4NzM3
-NDptaWdyYXRpb25fZmRfb3V0Z29pbmcgZmQ9MTAxDQo+IDg0Mjk3QDE1MzAwMDE3OTYuMjg3Mzgz
-Om1pZ3JhdGlvbl9zZXRfb3V0Z29pbmdfY2hhbm5lbCANCj4gaW9jPTB4NTYzNjM0NTRkNjMwIGlv
-Y3R5cGU9cWlvLWNoYW5uZWwtc29ja2V0IGhvc3RuYW1lPShudWxsKQ0KPiA4NDI5N0AxNTMwMDAx
-Nzk2LjI5NDAzMjptaWdyYXRpb25fYml0bWFwX3N5bmNfc3RhcnQNCj4gODQyOTdAMTUzMDAwMTc5
-Ni4zMDA0ODM6bWlncmF0aW9uX2JpdG1hcF9zeW5jX2VuZCBkaXJ0eV9wYWdlcyA5MzINCj4gODQy
-OTdAMTUzMDAwMTc5Ni4zMDA1NjE6bWlncmF0ZV9zZXRfc3RhdGUgbmV3IHN0YXRlIDQNCj4gODQy
-OTdAMTUzMDAwMTc5Ni4zMDA1ODg6bWlncmF0aW9uX3RocmVhZF9zZXR1cF9jb21wbGV0ZQ0KPiA4
-NDI5N0AxNTMwMDAxNzk2LjMwMDU5MzptaWdyYXRlX3BlbmRpbmcgcGVuZGluZyBzaXplIDExMDc5
-NzYxOTIgbWF4IDAgDQo+IChwcmUgPSAwIGNvbXBhdD0xMTA3OTc2MTkyIHBvc3Q9MCkNCj4gODQy
-OTdAMTUzMDAwMTc5Ni4zMDA1OTU6bWlncmF0ZV9zZXRfc3RhdGUgbmV3IHN0YXRlIDUNCj4gVGFw
-IGZkIDMzIGRpc2FibGUsIHJldCAwDQo+IDg0Mjk3QDE1MzAwMDE3OTYuNDI2NDc3Om1pZ3JhdGlv
-bl9iaXRtYXBfc3luY19zdGFydA0KPiA4NDI5N0AxNTMwMDAxNzk2LjQzMzIyNzptaWdyYXRpb25f
-Yml0bWFwX3N5bmNfZW5kIGRpcnR5X3BhZ2VzIDEwOTENCj4gODQyOTdAMTUzMDAwMTc5Ni40Mzkw
-Nzc6bWlncmF0ZV9nbG9iYWxfc3RhdGVfcHJlX3NhdmUgc2F2ZWQgc3RhdGU6IA0KPiBydW5uaW5n
-DQo+IDIwMTgtMDYtMjZUMDg6Mjk6NTYuNDM5MTM0WiBxZW11LWt2bTogcG9zdGNvcHlfc3RhcnQ6
-IE1pZ3JhdGlvbiBzdHJlYW0gDQo+IGVycm9yZWQgLTUNCj4gODQyOTdAMTUzMDAwMTc5Ni40Mzkx
-NDE6bWlncmF0ZV9zZXRfc3RhdGUgbmV3IHN0YXRlIDcNCj4gODQyOTdAMTUzMDAwMTc5Ni40Mzkx
-ODE6bWlncmF0aW9uX3RocmVhZF9hZnRlcl9sb29wDQo+IFRhcCBmZCAzMyBlbmFibGUsIHJldCAw
-DQo+IDg0Mjk3QDE1MzAwMDE3OTYuNDUzNjM5Om1pZ3JhdGVfZmRfY2xlYW51cA0KPiBxZW11LWt2
-bTogYmxvY2svaW8uYzoxNjU1OiBiZHJ2X2NvX3B3cml0ZXY6IEFzc2VydGlvbiANCj4gYCEoYnMt
-Pm9wZW5fZmxhZ3MgJiAweDA4MDApJyBmYWlsZWQuDQo+IDIwMTgtMDYtMjYgMDg6Mjk6NTYuNjA1
-KzAwMDA6IHNodXR0aW5nIGRvd24sIHJlYXNvbj1jcmFzaGVkDQo+DQo+DQo+Pj4gWWVoLCBPSzsg
-SSdkIHNlZW4gc29lbXRoaW5nIGVsc2UgYSBmZXcgZGF5cyBhZ28sIHdoZXJlIGEgY2FuY2VsbGF0
-aW9uDQo+Pj4gdGVzdCB0aGF0IGhhZCBwcmV2aW91c2x5IGVuZGVkIHdpdGggYSAnY2FuY2VsbGVk
-JyBzdGF0ZSBoYXMgbm93IA0KPj4+IGVuZGVkIHVwDQo+Pj4gaW4gJ2ZhaWxlZCcgKHdoaWNoIGlz
-IHRoZSBzdGF0ZSA3IHlvdSBoYXZlIGFib3ZlKS4NCj4+PiBJIHN1c3BlY3QgdGhlcmUncyBzb21l
-dGhpbmcgZWxzZSBnb2luZyBvbiBhcyB3ZWxsOyBJIHRoaW5rIHdoYXQgaXMNCj4+PiBzdXBwb3Nl
-ZCB0byBoYXBwZW4gaW4gdGhlIGNhc2Ugb2YgJ2NhbmNlbCcgaXMgdGhhdCBpdCBzcGlucyBpbiAN
-Cj4+PiAnY2FuY2VsbGluZycgZm9yDQo+Pj4gYSB3aGlsZSBpbiBtaWdyYXRlX2ZkX2NhbmNlbCBh
-bmQgdGhlbiBhdCB0aGUgYm90dG9tIG9mIA0KPj4+IG1pZ3JhdGVfZmRfY2FuY2VsDQo+Pj4gaXQg
-ZG9lcyB0aGUgcmVjb3ZlcnksIGJ1dCBiZWNhdXNlIGl0J3MgZ29pbmcgdG8gZmFpbGVkIGluc3Rl
-YWQsIHRoZW4NCj4+PiBpdCdzIGp1bXBpbmcgb3ZlciB0aGF0IHJlY292ZXJ5Lg0KPj4gR29pbmcg
-YmFjayBhbmQgYWN0dWFsbHkgbG9va2luZyBhdCB0aGUgcGF0Y2ggYWdhaW47DQo+PiBjYW4gSSBh
-c2sgZm9yIDEgc21hbGwgY2hhbmdlOw0KPj4gwqDCoMKgIENhbiB5b3Ugc2V0IHMtPmJsb2NrX2lu
-YWN0aXZlID0gZmFsc2XCoMKgIGluIHRoZSBjYXNlIHdoZXJlIHlvdQ0KPj4gZG9uJ3QgZ2V0IHRo
-ZSBsb2NhbF9lcnIgKExpa2Ugd2UgZG8gYXQgdGhlIGJvdHRvbSBvZiBtaWdyYXRlX2ZkX2NhbmNl
-bCkNCj4+DQo+Pg0KPj4gRG9lcyB0aGF0IG1ha2Ugc2Vuc2U/DQo+DQo+IE9rLCBJJ2xsIHJlc2Vu
-ZC4NCj4NCj4gSG0sIGxvb2tzIGxpa2UgSSdtIGZpeGluZyBhbiBvdXRkYXRlZCB2ZXJzaW9uIChi
-YXNlZCBvbiB2Mi45LjApIEFuZCBteSANCj4gcmVwcm9kdWNlIGlzbid0IGFwcHJvcHJpYXRlIGZv
-ciB1cHN0cmVhbS4NCj4gQnV0IGxvb2tzIGxpa2UgY3VycmVudCBjb2RlIGhhdmUgYSBwb3NzaWJp
-bGl0eSBvZiB0aGUgc2FtZSBmYWlsOg0KPg0KPiBwb3N0Y29weV9zdGFydCgpDQo+IMKgwqDCoCAu
-Li4uDQo+IMKgwqDCoCByZXQgPSBxZW11X2ZpbGVfZ2V0X2Vycm9yKG1zLT50b19kc3RfZmlsZSk7
-DQo+IMKgwqDCoCBpZiAocmV0KSB7DQo+IMKgwqDCoMKgwqDCoMKgIGVycm9yX3JlcG9ydCgicG9z
-dGNvcHlfc3RhcnQ6IE1pZ3JhdGlvbiBzdHJlYW0gZXJyb3JlZCIpOw0KPg0KPiBsZWFkcyB0byAi
-cmV0dXJuIE1JR19JVEVSQVRFX1NLSVA7IiBpbiBtaWdyYXRpb25faXRlcmF0aW9uX3J1bg0KPg0K
-PiB0aGVuIHRoZSBsb29wIHNob3VsZCBmaW5pc2gsIGFzIHN0YXRlIHNob3VsZCBiZSANCj4gTUlH
-UkFUSU9OX1NUQVRVU19GQUlMRUQsIHNvIHdlIHdpbGwgbm90IGNhbGwgbWlncmF0aW9uX2NvbXBs
-ZXRpb24uDQo+DQo+IEhtLCBJIGhhdmUgcXVlc3Rpb25zIG5vdzoNCj4NCj4gMS4gc2hvdWxkIHdl
-IGNoZWNrIHMtPmJsb2NrX2luYWN0aXZlLCBhbmQgaWYgaXQgaXMgZmFsc2UsIGRvbid0IA0KPiBp
-bnZhbGlkYXRlPyBpdCBpcyBkb25lIGluIG1pZ3JhdGVfZmRfY2FuY2VsKCksIGJ1dCBub3QgZG9u
-IGluIA0KPiBtaWdyYXRpb25fY29tcGxldGlvbigpLg0KPiAyLiBzaG91bGQgd2UgY2FsbCBxZW11
-X211dGV4X2xvY2tfaW90aHJlYWQoKSBsaWtlIGluIA0KPiBtaWdyYXRpb25fY29tcGxldGlvbigp
-PyBXaHkgaXMgaXQgbmVlZGVkIGluIG1pZ3JhdGlvbl9jb21wbGV0aW9uKCksIA0KPiB3aGVuIHZt
-IGlzIG5vdCBydW5uaW5nPw0KDQoNCkhtLCBmb3Jnb3R0ZW4gdGhyZWFkLCBJIHNob3VsZCByZXNl
-bmQsIGJ1dCB3aGF0IGRvIHlvdSB0aGluayBhYm91dCB0aGVzZSANCnF1ZXN0aW9ucz8NCg0KPg0K
-Pj4NCj4+IFRoYW5rcywNCj4+DQo+PiBEYXZlDQo+Pg0KPj4+IERhdmUNCj4+Pg0KPj4+Pj4gRGF2
-ZQ0KPj4+Pj4NCj4+Pj4+PiAtLS0NCj4+Pj4+Pg0KPj4+Pj4+IMKgwqAgbWlncmF0aW9uL21pZ3Jh
-dGlvbi5jIHwgOSArKysrKysrKy0NCj4+Pj4+PiDCoMKgIDEgZmlsZSBjaGFuZ2VkLCA4IGluc2Vy
-dGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4+Pj4+Pg0KPj4+Pj4+IGRpZmYgLS1naXQgYS9taWdy
-YXRpb24vbWlncmF0aW9uLmMgYi9taWdyYXRpb24vbWlncmF0aW9uLmMNCj4+Pj4+PiBpbmRleCAx
-ZTk5ZWM5YjdlLi44ZjM5ZTBkYzAyIDEwMDY0NA0KPj4+Pj4+IC0tLSBhL21pZ3JhdGlvbi9taWdy
-YXRpb24uYw0KPj4+Pj4+ICsrKyBiL21pZ3JhdGlvbi9taWdyYXRpb24uYw0KPj4+Pj4+IEBAIC0y
-ODA2LDcgKzI4MDYsMTQgQEAgc3RhdGljIHZvaWQgDQo+Pj4+Pj4gbWlncmF0aW9uX2l0ZXJhdGlv
-bl9maW5pc2goTWlncmF0aW9uU3RhdGUgKnMpDQo+Pj4+Pj4gwqDCoMKgwqDCoMKgIGNhc2UgTUlH
-UkFUSU9OX1NUQVRVU19GQUlMRUQ6DQo+Pj4+Pj4gwqDCoMKgwqDCoMKgIGNhc2UgTUlHUkFUSU9O
-X1NUQVRVU19DQU5DRUxMRUQ6DQo+Pj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHMtPnZt
-X3dhc19ydW5uaW5nKSB7DQo+Pj4+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdm1fc3RhcnQo
-KTsNCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBFcnJvciAqbG9jYWxfZXJyID0gTlVM
-TDsNCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBiZHJ2X2ludmFsaWRhdGVfY2FjaGVf
-YWxsKCZsb2NhbF9lcnIpOw0KPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChsb2Nh
-bF9lcnIpIHsNCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGVycm9yX3Jl
-cG9ydGZfZXJyKGxvY2FsX2VyciwgIkNhbid0IGludmFsaWRhdGUgDQo+Pj4+Pj4gZGlza3MgYmVm
-b3JlICINCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICJzb3VyY2Ugdm0gc3RhcnQiKTsNCj4+Pj4+PiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCB9IGVsc2Ugew0KPj4+Pj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgdm1fc3RhcnQoKTsNCj4+Pj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9
-DQo+Pj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqAgfSBlbHNlIHsNCj4+Pj4+PiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIGlmIChydW5zdGF0ZV9jaGVjayhSVU5fU1RBVEVfRklOSVNIX01J
-R1JBVEUpKSB7DQo+Pj4+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJ1
-bnN0YXRlX3NldChSVU5fU1RBVEVfUE9TVE1JR1JBVEUpOw0KPj4+Pj4+IC0tIA0KPj4+Pj4+IDIu
-MTEuMQ0KPj4+Pj4+DQo+Pj4+PiAtLSANCj4+Pj4+IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQgLyBk
-Z2lsYmVydEByZWRoYXQuY29tIC8gTWFuY2hlc3RlciwgVUsNCj4+Pj4NCj4+Pj4gLS0gDQo+Pj4+
-IEJlc3QgcmVnYXJkcywNCj4+Pj4gVmxhZGltaXINCj4+Pj4NCj4+PiAtLSANCj4+PiBEci4gRGF2
-aWQgQWxhbiBHaWxiZXJ0IC8gZGdpbGJlcnRAcmVkaGF0LmNvbSAvIE1hbmNoZXN0ZXIsIFVLDQo+
-PiAtLSANCj4+IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQgLyBkZ2lsYmVydEByZWRoYXQuY29tIC8g
-TWFuY2hlc3RlciwgVUsNCj4NCj4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoN
-Cg==
+On 2018-10-08 17:32, David Hildenbrand wrote:
+> linux-user should always enable AFP, otherwise our emulated binary
+> might crash once it tries to make use of additional floating-point
+> registers or instructions.
+>=20
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Fixes: db0504154e ("s390x/tcg: check for AFP-register, BFP and DFP data=
+ exceptions")
+> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 8ed4823d6e..18ba7f85a5 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -145,6 +145,11 @@ static void s390_cpu_full_reset(CPUState *s)
+>      env->cregs[0] =3D CR0_RESET;
+>      env->cregs[14] =3D CR14_RESET;
+> =20
+> +#if defined(CONFIG_USER_ONLY)
+> +    /* user mode should always be allowed to use the full FPU */
+> +    env->cregs[0] |=3D CR0_AFP;
+> +#endif
+> +
+>      /* architectured initial value for Breaking-Event-Address register=
+ */
+>      env->gbea =3D 1;
+> =20
+>=20
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
