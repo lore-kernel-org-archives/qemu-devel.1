@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W5a-0001Gj-Rb
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1g9W5T-0000xo-Pu
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W5V-0007DJ-EP
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:50 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1g9W5U-00073I-UM
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:45 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W54-0003g9-70
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:18 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  8 Oct 2018 14:59:41 +0100
-Message-Id: <20181008140004.12612-11-peter.maydell@linaro.org>
-In-Reply-To: <20181008140004.12612-1-peter.maydell@linaro.org>
-References: <20181008140004.12612-1-peter.maydell@linaro.org>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1g9Vsb-0005pb-MQ
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:47:31 -0400
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Mon, 8 Oct 2018 13:47:13 +0000
+Message-ID: <76c2bb8e-c19c-9557-8067-b718c2d88d37@virtuozzo.com>
+References: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1534844779-118784-8-git-send-email-anton.nefedov@virtuozzo.com>
+	<20181004155200.GJ6009@localhost.localdomain>
+In-Reply-To: <20181004155200.GJ6009@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8CB039A7084B7B4AAEEF265CD5746EDE@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/33] target/arm: Clear unused predicate bits
- for LD1RQ
+Subject: Re: [Qemu-devel] [PATCH v4 7/8] file-posix: account discard
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-The 16-byte load only uses 16 predicate bits.  But while
-reusing the other load infrastructure, we find other bits
-that are set and trigger an assert.  To avoid this and
-retain the assert, zero-extend the predicate that we pass
-to the LD1 helper.
-
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181005175350.30752-7-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate-sve.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
-
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 667879564f8..4ee3bbca29d 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -4765,12 +4765,33 @@ static void do_ldrq(DisasContext *s, int zt, int pg, TCGv_i64 addr, int msz)
-     unsigned vsz = vec_full_reg_size(s);
-     TCGv_ptr t_pg;
-     TCGv_i32 desc;
-+    int poff;
- 
-     /* Load the first quadword using the normal predicated load helpers.  */
-     desc = tcg_const_i32(simd_desc(16, 16, zt));
--    t_pg = tcg_temp_new_ptr();
- 
--    tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
-+    poff = pred_full_reg_offset(s, pg);
-+    if (vsz > 16) {
-+        /*
-+         * Zero-extend the first 16 bits of the predicate into a temporary.
-+         * This avoids triggering an assert making sure we don't have bits
-+         * set within a predicate beyond VQ, but we have lowered VQ to 1
-+         * for this load operation.
-+         */
-+        TCGv_i64 tmp = tcg_temp_new_i64();
-+#ifdef HOST_WORDS_BIGENDIAN
-+        poff += 6;
-+#endif
-+        tcg_gen_ld16u_i64(tmp, cpu_env, poff);
-+
-+        poff = offsetof(CPUARMState, vfp.preg_tmp);
-+        tcg_gen_st_i64(tmp, cpu_env, poff);
-+        tcg_temp_free_i64(tmp);
-+    }
-+
-+    t_pg = tcg_temp_new_ptr();
-+    tcg_gen_addi_ptr(t_pg, cpu_env, poff);
-+
-     fns[msz](cpu_env, t_pg, addr, desc);
- 
-     tcg_temp_free_ptr(t_pg);
--- 
-2.19.0
+DQoNCk9uIDQvMTAvMjAxOCA2OjUyIFBNLCBLZXZpbiBXb2xmIHdyb3RlOg0KPiBBbSAyMS4wOC4y
+MDE4IHVtIDExOjQ2IGhhdCBBbnRvbiBOZWZlZG92IGdlc2NocmllYmVuOg0KPj4gVGhpcyB3aWxs
+IGhlbHAgdG8gaWRlbnRpZnkgaG93IG1hbnkgb2YgdGhlIHVzZXItaXNzdWVkIGRpc2NhcmQgb3Bl
+cmF0aW9ucw0KPj4gKGFjY291bnRlZCBvbiBhIGRldmljZSBsZXZlbCkgaGF2ZSBhY3R1YWxseSBz
+dWNlZWRlZCBkb3duIG9uIHRoZSBob3N0IGZpbGUNCj4+IChldmVuIHRob3VnaCB0aGUgbnVtYmVy
+cyB3aWxsIG5vdCBiZSBleGFjdGx5IHRoZSBzYW1lIGlmIG5vbi1yYXcgZm9ybWF0DQo+PiBkcml2
+ZXIgaXMgdXNlZCAoZS5nLiBxY293MiBzZW5kaW5nIG1ldGFkYXRhIGRpc2NhcmRzKSkuDQo+Pg0K
+Pj4gTm90ZSB0aGF0IHRoZXNlIG51bWJlcnMgd2lsbCBub3QgaW5jbHVkZSBkaXNjYXJkcyB0cmln
+Z2VyZWQgYnkNCj4+IHdyaXRlLXplcm9lcyArIE1BWV9VTk1BUCBjYWxscy4NCj4+DQo+PiBTaWdu
+ZWQtb2ZmLWJ5OiBBbnRvbiBOZWZlZG92IDxhbnRvbi5uZWZlZG92QHZpcnR1b3p6by5jb20+DQo+
+IA0KPiBXaHkgbm90IGltcGxlbWVudCBhY2NvdW50aW5nIGF0IHRoZSBCRFMgbGV2ZWwgZm9yIGFs
+bCBkcml2ZXJzPyBUaGVuIHdlDQo+IGNhbiBhbHNvIHJldXNlIHRoZSBleGlzdGluZyBCbG9ja1N0
+YXRzIGZpZWxkcyBpbnN0ZWFkIG9mIGR1cGxpY2F0aW5nDQo+IHRoZW0gaW50byBkcml2ZXItc3Bl
+Y2lmaWMgbmV3IG9uZXMuDQo+IA0KPiBLZXZpbg0KPiANCg0KSSBqdXN0IHdvbmRlciBob3cgdXNl
+ZnVsIGlzIHRoYXQ/DQpEaXNjYXJkcyBhcmUgaW50ZXJlc3RpbmcgdG8gc2VlIG9uIHRoZSBCRFMg
+bGV2ZWwgYXMgdGhleSBhcmUgb3B0aW9uYWwuDQpNYXliZSBvbmUgY2FuIGJlIGN1cmlvdXMgaG93
+IG11Y2ggZGF0YSBpcyBiZWluZyByZWFkIGZyb20gYmFja2luZw0KaW1hZ2VzLiBBbnl0aGluZyBl
+bHNlPw0KDQpJdCBmZWVscyBsaWtlIEJEUyBsZXZlbCBpcyBjb21wbGV4IGVub3VnaCBhcyBpdCBp
+cy4NCkFjY291bnRpbmcgbWVhbnMgd2Ugc2hvdWxkIGtlZXAgdGhhdCBpbiBtaW5kIGluIGFsbCB0
+aGUgZXJyb3IgcGF0aHMsDQp3aXRoIGEgcmlzayB0byBub3QgYWNjb3VudCBvciB0byBhY2NvdW50
+IHR3aWNlIChldmVuIG1vcmUgY29tcGxpY2F0ZWQNCndpdGggYm91bmNlIGJ1ZmZlciBmYWxsYmFj
+ayBwYXRocykuDQoNCldlIGNvdWxkIHByb2JhYmx5IGNob29zZSBzb21lIGFuY2hvciBwb2ludCB0
+byBiaW5kIHRvLCBsaWtlDQoNCiAgIC0gYWNjb3VudCBhdCB0aGUgdmVyeSBib3R0b20gb25seSwg
+aS5lLiByaWdodCBhZnRlciBkcnYtPmJkcnZfeCgpDQogICAgICAgKC0pIG1pc3NpbmcgdGhlIGNh
+c2VzIHdoZXJlIGVhcmxpZXIgc2FuaXR5IGNoZWNrcyBmaXJlZA0KICAgICAgICgtKSBlYXN5IHRv
+IGRvdWJsZS1hY2NvdW50IGZhbGxiYWNrIHNjZW5hcmlvcw0KDQogICAtIGFjY291bnQgYXQgdHJh
+Y2tlZF9yZXF1ZXN0X2JlZ2luL2VuZA0KICAgICAgICgtKSBtaXNzaW5nIHRoZSBjYXNlcyB3aGVy
+ZSBlYXJsaWVyIHNhbml0eSBjaGVja3MgZmlyZWQNCiAgICAgICAoLSkgYWNjb3VudGluZyBibGsg
+bGF5ZXIgcmVxdWVzdHMsIGFuZCBub3QgdGhlIG9uZXMgYWN0dWFsbHkNCiAgICAgICAgICAgcGFz
+c2VkIHRvIHRoZSBkcml2ZXIgKHdoaWNoIGNhbiBiZSBzbWFsbGVyIGluIHNpemUgZHVlIHRvDQog
+ICAgICAgICAgIEJsb2NrTGltaXRzIC0gYW5kIGNhbiBmYWlsIHBhcnRpYWxseSBpbiBkaXNjYXJk
+IGNhc2UpDQoNCk1heWJlIGFub3RoZXIgb3B0aW9uIHdvdWxkIGJlIHRvIGtlZXAgQmxvY2tTdGF0
+cyBvbiBCRFMgYnV0IHN0aWxsIGxldA0KdGhlIGRyaXZlcnMgdXBkYXRlIHRoZW0/DQoNCi9BbnRv
+bg0K
