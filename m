@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9XLW-00036D-Bu
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:21:27 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1g9XQC-0005ev-NR
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:26:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9XLH-0006pJ-VB
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:21:14 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:36509)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9XLH-0006oO-BT
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:21:07 -0400
-Received: by mail-wm1-x329.google.com with SMTP id a8-v6so8663434wmf.1
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 08:21:07 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  8 Oct 2018 16:20:58 +0100
-Message-Id: <20181008152059.17503-1-alex.bennee@linaro.org>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1g9XQ3-0001WJ-6g
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:26:10 -0400
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Mon, 8 Oct 2018 15:25:56 +0000
+Message-ID: <15568cd5-fa4e-8271-fcfb-b70b738a48e8@virtuozzo.com>
+References: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1534844779-118784-4-git-send-email-anton.nefedov@virtuozzo.com>
+	<20181004153359.GH6009@localhost.localdomain>
+	<956674d6-0cb9-f68c-15e2-89d39cfac049@virtuozzo.com>
+	<20181008150316.GB4604@localhost.localdomain>
+In-Reply-To: <20181008150316.GB4604@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FA39B78456A8B1429C8B23BE0111878F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] .travis.yml: split MacOSX builds and reduce
- target list
+Subject: Re: [Qemu-devel] [PATCH v4 3/8] ide: account UNMAP (TRIM) operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
 
-We have reached the point where the MacOSX build was regularly timing
-out. So as before I've reduced the target list to "major"
-architectures to try and bring the build time down. I've added an
-additional MacOSX build with the latest XCode with a minimal list of
-"most likely" targets on MacOS.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- .travis.yml | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index 95be6ec59f..13a09facd3 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -107,8 +107,14 @@ matrix:
-     - env: CONFIG="--disable-tcg"
-            TEST_CMD=""
-       compiler: gcc
--    - env: CONFIG=""
-+    # MacOSX builds
-+    - env: CONFIG="--target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
-       os: osx
-+      osx_image: xcode9.4
-+      compiler: clang
-+    - env: CONFIG="--target-list=i386-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,x86_64-softmmu"
-+      os: osx
-+      osx_image: xcode10
-       compiler: clang
-     # Python builds
-     - env: CONFIG="--target-list=x86_64-softmmu"
--- 
-2.17.1
+DQoNCk9uIDgvMTAvMjAxOCA2OjAzIFBNLCBLZXZpbiBXb2xmIHdyb3RlOg0KPiBBbSAwOC4xMC4y
+MDE4IHVtIDE2OjM4IGhhdCBBbnRvbiBOZWZlZG92IGdlc2NocmllYmVuOg0KPj4gT24gNC8xMC8y
+MDE4IDY6MzMgUE0sIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMjEuMDguMjAxOCB1bSAxMTo0
+NiBoYXQgQW50b24gTmVmZWRvdiBnZXNjaHJpZWJlbjoNCj4+Pj4gU2lnbmVkLW9mZi1ieTogQW50
+b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29tPg0KPj4+PiBSZXZpZXdlZC1i
+eTogQWxiZXJ0byBHYXJjaWEgPGJlcnRvQGlnYWxpYS5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgICBo
+dy9pZGUvY29yZS5jIHwgMTIgKysrKysrKysrKysrDQo+Pj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCAx
+MiBpbnNlcnRpb25zKCspDQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS9ody9pZGUvY29yZS5jIGIv
+aHcvaWRlL2NvcmUuYw0KPj4+PiBpbmRleCAyYzYyZWZjLi4zNTI0MjliIDEwMDY0NA0KPj4+PiAt
+LS0gYS9ody9pZGUvY29yZS5jDQo+Pj4+ICsrKyBiL2h3L2lkZS9jb3JlLmMNCj4+Pj4gQEAgLTQ0
+MCw2ICs0NDAsMTQgQEAgc3RhdGljIHZvaWQgaWRlX2lzc3VlX3RyaW1fY2Iodm9pZCAqb3BhcXVl
+LCBpbnQgcmV0KQ0KPj4+PiAgICAgICAgVHJpbUFJT0NCICppb2NiID0gb3BhcXVlOw0KPj4+PiAg
+ICAgICAgSURFU3RhdGUgKnMgPSBpb2NiLT5zOw0KPj4+PiAgICANCj4+Pj4gKyAgICBpZiAoaW9j
+Yi0+aSA+PSAwKSB7DQo+Pj4+ICsgICAgICAgIGlmIChyZXQgPj0gMCkgew0KPj4+PiArICAgICAg
+ICAgICAgYmxvY2tfYWNjdF9kb25lKGJsa19nZXRfc3RhdHMocy0+YmxrKSwgJnMtPmFjY3QpOw0K
+Pj4+PiArICAgICAgICB9IGVsc2Ugew0KPj4+PiArICAgICAgICAgICAgYmxvY2tfYWNjdF9mYWls
+ZWQoYmxrX2dldF9zdGF0cyhzLT5ibGspLCAmcy0+YWNjdCk7DQo+Pj4+ICsgICAgICAgIH0NCj4+
+Pj4gKyAgICB9DQo+Pj4+ICsNCj4+Pj4gICAgICAgIGlmIChyZXQgPj0gMCkgew0KPj4+PiAgICAg
+ICAgICAgIHdoaWxlIChpb2NiLT5qIDwgaW9jYi0+cWlvdi0+bmlvdikgew0KPj4+PiAgICAgICAg
+ICAgICAgICBpbnQgaiA9IGlvY2ItPmo7DQo+Pj4+IEBAIC00NjEsNiArNDY5LDkgQEAgc3RhdGlj
+IHZvaWQgaWRlX2lzc3VlX3RyaW1fY2Iodm9pZCAqb3BhcXVlLCBpbnQgcmV0KQ0KPj4+PiAgICAg
+ICAgICAgICAgICAgICAgICAgIGdvdG8gZG9uZTsNCj4+Pj4gICAgICAgICAgICAgICAgICAgIH0N
+Cj4+Pj4gICAgDQo+Pj4+ICsgICAgICAgICAgICAgICAgYmxvY2tfYWNjdF9zdGFydChibGtfZ2V0
+X3N0YXRzKHMtPmJsayksICZzLT5hY2N0LA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgY291bnQgPDwgQkRSVl9TRUNUT1JfQklUUywgQkxPQ0tfQUNDVF9VTk1BUCk7DQo+
+Pj4+ICsNCj4+Pj4gICAgICAgICAgICAgICAgICAgIC8qIEdvdCBhbiBlbnRyeSEgU3VibWl0IGFu
+ZCBleGl0LiAgKi8NCj4+Pj4gICAgICAgICAgICAgICAgICAgIGlvY2ItPmFpb2NiID0gYmxrX2Fp
+b19wZGlzY2FyZChzLT5ibGssDQo+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgc2VjdG9yIDw8IEJEUlZfU0VDVE9SX0JJVFMsDQo+Pj4+IEBAIC04
+NDUsNiArODU2LDcgQEAgc3RhdGljIHZvaWQgaWRlX2RtYV9jYih2b2lkICpvcGFxdWUsIGludCBy
+ZXQpDQo+Pj4+ICAgICAgICB9DQo+Pj4+ICAgIA0KPj4+PiAgICAgICAgaWYgKHJldCA9PSAtRUlO
+VkFMKSB7DQo+Pj4+ICsgICAgICAgIGJsb2NrX2FjY3RfaW52YWxpZChibGtfZ2V0X3N0YXRzKHMt
+PmJsayksIEJMT0NLX0FDQ1RfVU5NQVApOw0KPj4+DQo+Pj4gVGhpcyBsb29rcyB3cm9uZyB0byBt
+ZSwgaWRlX2RtYV9jYigpIGlzIG5vdCBvbmx5IGNhbGxlZCBmb3IgdW5tYXAsIGJ1dA0KPj4+IGFs
+c28gZm9yIHJlYWRzIGFuZCB3cml0ZXMsIGFuZCBlYWNoIG9mIHRoZW0gY291bGQgcmV0dXJuIC1F
+SU5WQUwuDQo+Pj4NCj4+DQo+PiBTdGF0aW5nIGhlcmUgQkxPQ0tfQUNDVF9VTk1BUCBpcyBkZWZp
+bml0ZWx5IGEgYmx1bmRlciA6KA0KPj4NCj4+PiBBbHNvLCAtRUlOVkFMIGRvZXNuJ3QgbmVjZXNz
+YXJpbHkgbWVhbiB0aGF0IHRoZSBndWVzdCBkcml2ZXIgZGlkDQo+Pj4gc29tZXRoaW5nIHdyb25n
+LCBpdCBjb3VsZCBhbHNvIGJlIHRoZSByZXN1bHQgb2YgYSBob3N0IHByb2JsZW0uDQo+Pj4gVGhl
+cmVmb3JlLCBpdCBpc24ndCByaWdodCB0byBjYWxsIGJsb2NrX2FjY3RfaW52YWxpZCgpIGhlcmUg
+LSBlc3BlY2lhbGx5DQo+Pj4gc2luY2UgdGhlIHJlcXVlc3QgbWF5IGFscmVhZHkgaGF2ZSBiZWVu
+IGFjY291bnRlZCBmb3IgYXMgZWl0aGVyIGRvbmUgb3INCj4+PiBmYWlsZWQgaW4gaWRlX2lzc3Vl
+X3RyaW1fY2IoKS4NCj4+Pg0KPj4NCj4+IENvdWxkbid0IGJlIGFjY291bnRlZCBkb25lIHdpdGgg
+c3VjaCByZXRjb2RlOw0KPj4gYW5kIGl0IHNlZW1zIEkgc2hvdWxkbnQgZG8gYmxvY2tfYWNjdF9m
+YWlsZWQoKSB0aGVyZSBhbnl3YXkgLSBvciBpdCdzDQo+PiBhY2NvdW50ZWQgdHdpY2U6IHRoZXJl
+IGFuZCBpbiBpZGVfZG1hX2NiKCktPmlkZV9oYW5kbGVfcndfZXJyb3IoKQ0KPj4NCj4+IEJ1dCBp
+ZiBFSU5WQUwgKGZyb20gZnVydGhlciBsYXllcnMpIHNob3VsZCBub3QgYmUgYWNjb3VudGVkIGFz
+IGFuDQo+PiBpbnZhbGlkIG9wLCB0aGVuIGl0IHNob3VsZCBiZSBhY2NvdW50ZWQgZmFpbGVkIGlu
+c3RlYWQsIHRoZSB0aGluZyB0aGF0DQo+PiBjdXJyZW50IGNvZGUgZG9lcyBub3QgZG8uDQo+PiAo
+YW5kIHdoaWNoIGJyaW5ncyB1cyBiYWNrIHRvIHBvc3NpYmxlIGRvdWJsZS1hY2NvdW50aW5nIGlm
+IHdlIGFjY291bnQNCj4+IGludmFsaWQgaW4gaWRlX2lzc3VlX3RyaW1fY2IoKSApDQo+IA0KPiBZ
+ZXMsIGNvbW1pdCBjYWVhZGJjOGJhNCB3YXMgYWxyZWFkeSB3cm9uZyBpbiBhc3N1bWluZyB0aGF0
+IHRoZXJlIGlzDQo+IG9ubHkgb25lIHBvc3NpYmxlIHNvdXJjZSBmb3IgLUVJTlZBTC4NCj4gDQo+
+Pj4gSW5zdGVhZCwgSSB0aGluayBpdCB3b3VsZCBiZSBiZXR0ZXIgdG8gaW1tZWRpYXRlbHkgYWNj
+b3VudCBmb3IgaW52YWxpZA0KPj4+IHJlcXVlc3RzIGluIGlkZV9pc3N1ZV90cmltX2NiKCkgd2hl
+cmUgaW9jYi0+cmV0ID0gLUVJTlZBTCBpcyBzZXQgYW5kIHdlDQo+Pj4ga25vdyBmb3Igc3VyZSB0
+aGF0IGluZGVlZCAhaWRlX3NlY3RfcmFuZ2Vfb2soKSBpcyB0aGUgY2F1c2UgZm9yIHRoZQ0KPj4+
+IC1FSU5WQUwgcmV0dXJuIGNvZGUuDQo+Pj4NCj4+IFNvIEkgZ3Vlc3MgeWVzLCBtb3ZlIGFjY3Rf
+aW52YWxpZCBpbiBpZGVfaXNzdWVfdHJpbV9jYigpIGFuZCBsZWF2ZQ0KPj4gYWNjdF9mYWlsZWQg
+dGhlcmUsIGFuZCBmaWx0ZXIgb2ZmIFRSSU0gY29tbWFuZHMgaW4gdGhlIGNvbW1vbg0KPj4gYWNj
+b3VudGluZy4NCj4gDQo+IGJsa19haW9fZGlzY2FyZCgpIGNhbiBmYWlsIHdpdGggLUVJTlZBTCwg
+dG9vLCBzbyBnZXR0aW5nIHRoaXMgZXJyb3IgY29kZQ0KPiBmcm9tIGEgVFJJTSBjb21tYW5kIGRv
+ZXNuJ3QgbWVhbiBhbnl0aGluZy4gSXQgY2FuIHN0aWxsIGhhdmUgbXVsdGlwbGUNCj4gcG9zc2li
+bGUgc291cmNlcy4NCj4gDQoNCkkgbWVhbnQgdGhhdCBjb21tb24gaWRlX2RtYV9jYigpIHNob3Vs
+ZCBhY2NvdW50IEVJTlZBTCAoYWxvbmcgd2l0aCBvdGhlcg0KZXJyb3JzKSBhcyBmYWlsZWQsIHVu
+bGVzcyBpdCdzIFRSSU0sIHdoaWNoIG1lYW5zIGl0J3MgYWxyZWFkeQ0KYWNjb3VudGVkIChlaXRo
+ZXIgaW52YWxpZCBvciBmYWlsZWQpDQoNCj4gTWF5YmUgd2UganVzdCBuZWVkIHRvIHJlbWVtYmVy
+IHNvbWV3aGVyZSB3aGV0aGVyIHdlIGFscmVhZHkgYWNjb3VudGVkDQo+IGZvciBhIHJlcXVlc3Qg
+KG1heWJlIGFuIGFkZGl0aW9uYWwgZmllbGQgaW4gQmxvY2tBY2N0Q29va2llPyBPciBjaGFuZ2UN
+Cj4gdGhlIHR5cGUgdG8gQkxPQ0tfQUNDVF9BTFJFQURZX0FDQ09VTlRFRD8pIGFuZCB0aGVuIG1h
+a2UgYW4gYWRkaXRpb25hbA0KPiBibG9ja19hY2NvdW50X29uZV9pbygpIGNhbGwgYSBuby1vcCBm
+b3Igc3VjaCByZXF1ZXN0cy4NCj4gID4gS2V2aW4NCj4gDQoNCk1heWJlIGV2ZW4gcmVzZXR0aW5n
+IHRvIEJMT0NLX0FDQ1RfTk9ORSA9PSAwLiBJdCBzaG91bGQgYWxzbyBwcm90ZWN0DQpmcm9tIGFj
+Y291bnRpbmcgdW5pbml0aWFsaXplZCBjb29raWUuDQoNCi9BbnRvbg0K
