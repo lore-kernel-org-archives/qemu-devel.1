@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9c9C-0003Z8-RO
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:29:02 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9c9H-00046p-DZ
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:29:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9bzK-0000bu-JC
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:18:47 -0400
-References: <20181005234023.8104-1-mreitz@redhat.com>
-	<20181005234023.8104-8-mreitz@redhat.com>
-	<d3f8da86-f071-1ce0-462a-0b378f5214a9@redhat.com>
-	<de892465-6f19-defc-c726-6e1bcf2ccbba@redhat.com>
-	<54cf31da-009e-c1b7-49f9-7bd5596d2142@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a7362a73-5a24-8152-cf67-6a761f697616@redhat.com>
-Date: Mon, 8 Oct 2018 22:18:35 +0200
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9byN-0000DP-SS
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:17:52 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 8 Oct 2018 20:17:43 +0000
+Message-ID: <108ca689-59ac-b442-7143-97e0708f0368@virtuozzo.com>
+References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
+	<20180817122219.16206-3-vsementsov@virtuozzo.com>
+	<baaab5d2-76f0-6f5c-c0f1-e1e06a239d40@redhat.com>
+In-Reply-To: <baaab5d2-76f0-6f5c-c0f1-e1e06a239d40@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C9085C1283417147874D3FCD3FAD061D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <54cf31da-009e-c1b7-49f9-7bd5596d2142@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="U0HMT7UNkbVdVxz8ulkzUuPLpqqrwbY96"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v11 07/31] iotests.py: Add
- node_info()
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] block/qcow2-refcount: avoid eating
+ RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---U0HMT7UNkbVdVxz8ulkzUuPLpqqrwbY96
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <a7362a73-5a24-8152-cf67-6a761f697616@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v11 07/31] iotests.py: Add node_info()
-References: <20181005234023.8104-1-mreitz@redhat.com>
- <20181005234023.8104-8-mreitz@redhat.com>
- <d3f8da86-f071-1ce0-462a-0b378f5214a9@redhat.com>
- <de892465-6f19-defc-c726-6e1bcf2ccbba@redhat.com>
- <54cf31da-009e-c1b7-49f9-7bd5596d2142@redhat.com>
-In-Reply-To: <54cf31da-009e-c1b7-49f9-7bd5596d2142@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08.10.18 21:59, John Snow wrote:
->=20
->=20
-> On 10/08/2018 03:57 PM, Max Reitz wrote:
->> On 08.10.18 21:34, John Snow wrote:
->>>
->>>
->>> On 10/05/2018 07:39 PM, Max Reitz wrote:
->>>> This function queries a node; since we cannot do that right now, it
->>>> executes query-named-block-nodes and returns the matching node's obj=
-ect.
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  tests/qemu-iotests/iotests.py | 7 +++++++
->>>>  1 file changed, 7 insertions(+)
->>>>
->>>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iote=
-sts.py
->>>> index 5c45788dac..604f200600 100644
->>>> --- a/tests/qemu-iotests/iotests.py
->>>> +++ b/tests/qemu-iotests/iotests.py
->>>> @@ -465,6 +465,13 @@ class VM(qtest.QEMUQtestMachine):
->>>>                  else:
->>>>                      iotests.log(ev)
->>>> =20
->>>> +    def node_info(self, node_name):
->>>> +        nodes =3D self.qmp('query-named-block-nodes')
->>>> +        for x in nodes['return']:
->>>> +            if x['node-name'] =3D=3D node_name:
->>>> +                return x
->>>> +        return None
->>>> +
->>>> =20
->>>>  index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
->>>> =20
->>>>
->>>
->>> Reviewed-by: John Snow <jsnow@redhat.com>
->>>
->>> Do we ever want to revisit the idea that our API should not do any
->>> pre-filtering and that it's always up to the client to do so?
->>
->> I mean we certainly want to revisit the idea that we should have a
->> proper query API.
->>
->> But what exactly do you mean by pre-filtering?
->>
->> Max
->>
->=20
-> i.e. applying selection criteria before responding to the query. e.g.,
-> by looking for matches on node-name.
->=20
-> (Did I use i.e. and e.g. right?)
-
-So you mean our API should do pre-filtering at the request of the client
-and the client shouldn't be fed all nodes and then have to do
-post-filtering?
-
-Well, I certainly think we want a query command that doesn't return all
-nodes.  I personally would prefer something that only returns a single
-node in the graph and its relationships, although I'm not sure whether
-that is very efficient.  Maybe something like inverse blockdev-add, were
-the user can specify a depth on how deep references should be expanded.
-
-Overall, I'm of the impression we want to have blockdev-reopen first so
-that we have a good idea of the type of information we want to report
-for a node; that being its node options, first and foremost.  Probably
-some stats as well, though.
-
-Max
-
-
-(The i.e. looks weird because you're not expanding a thought you've just
-given, but you're actually responding to my question.  It's like saying
-"I want feature A." -- "We can do that, do you have any other remarks?"
--- "And I want B, too."  So I would have started either with "e.g." (if
-you think there are other things that could be meant by pre-filtering),
-or by e.g. "I thought of".  Probably the latter, since that is how I
-interpreted your "i.e.".)
-
-((Did I use the semicolon correctly?))
-
-
---U0HMT7UNkbVdVxz8ulkzUuPLpqqrwbY96
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu7u5sACgkQ9AfbAGHV
-z0CU7Qf9H7Yj4JkLSlombkzhr/yYRxuM6D7ZvVh3+L0TKgxzwYqtx85ocHQWpLrt
-j6aUJAkG7aJhWtli600IA3aFlMIa23LBPenRAcudjr/EFdwAAyFz9+r3xW9VIkQR
-E7tkoz+QFfhSYg5tONfR7ckD80gGx6cRQpp44/ktWVZM3RqufOjOg+9VpjHk+0XG
-LNnaStIinRKGOI7Y5UaRYN5dAFS2aoyj1BxrnLhRDmuDa5BxJiQC1wsUUwk+2o5R
-hyjZTZpfmqIvxyA2oDNljux8elWHyRJa9CQ8/OkA+VJb5jsVi+wxokCX+lKxqKn6
-cIvJ5ExCyuihP8S1bEQA6nm3MYExaw==
-=KMFO
------END PGP SIGNATURE-----
-
---U0HMT7UNkbVdVxz8ulkzUuPLpqqrwbY96--
+DQoNCk9uIDEwLzA4LzIwMTggMDY6MzEgUE0sIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMTcuMDgu
+MTggMTQ6MjIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBxY293Ml9p
+bmNfcmVmY291bnRzX2ltcnQoKSAodGhyb3VnaCByZWFsbG9jX3JlZmNvdW50X2FycmF5KCkpIGNh
+biBlYXQNCj4+IGFuIHVucHJlZGljdGFibGUgYW1vdW50IG9mIG1lbW9yeSBvbiBjb3JydXB0ZWQg
+dGFibGUgZW50cmllcywgd2hpY2ggYXJlDQo+PiByZWZlcmVuY2luZyByZWdpb25zIGZhciBiZXlv
+bmQgdGhlIGVuZCBvZiBmaWxlLg0KPj4NCj4+IFByZXZlbnQgdGhpcywgYnkgc2tpcHBpbmcgc3Vj
+aCByZWdpb25zIGZyb20gZnVydGhlciBwcm9jZXNzaW5nLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
+Cj4+IC0tLQ0KPj4gICBibG9jay9xY293Mi1yZWZjb3VudC5jIHwgMTQgKysrKysrKysrKysrKysN
+Cj4+ICAgMSBmaWxlIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0
+IGEvYmxvY2svcWNvdzItcmVmY291bnQuYyBiL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMNCj4+IGlu
+ZGV4IDYxNTg0N2ViMDkuLjU2NmMxOWZiZmEgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xY293Mi1y
+ZWZjb3VudC5jDQo+PiArKysgYi9ibG9jay9xY293Mi1yZWZjb3VudC5jDQo+PiBAQCAtMTQ5OSwx
+MiArMTQ5OSwyNiBAQCBpbnQgcWNvdzJfaW5jX3JlZmNvdW50c19pbXJ0KEJsb2NrRHJpdmVyU3Rh
+dGUgKmJzLCBCZHJ2Q2hlY2tSZXN1bHQgKnJlcywNCj4+ICAgew0KPj4gICAgICAgQkRSVlFjb3cy
+U3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gICAgICAgdWludDY0X3Qgc3RhcnQsIGxhc3QsIGNs
+dXN0ZXJfb2Zmc2V0LCBrLCByZWZjb3VudDsNCj4+ICsgICAgaW50NjRfdCBmaWxlX2xlbjsNCj4+
+ICAgICAgIGludCByZXQ7DQo+PiAgIA0KPj4gICAgICAgaWYgKHNpemUgPD0gMCkgew0KPj4gICAg
+ICAgICAgIHJldHVybiAwOw0KPj4gICAgICAgfQ0KPj4gICANCj4+ICsgICAgZmlsZV9sZW4gPSBi
+ZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMpOw0KPj4gKyAgICBpZiAoZmlsZV9sZW4gPCAwKSB7
+DQo+PiArICAgICAgICByZXR1cm4gZmlsZV9sZW47DQo+PiArICAgIH0NCj4gDQo+IERvZXNuJ3Qg
+dGhpcyBzbG93IHRoaW5ncyBkb3duPyAgQ2FuIHdlIG5vdCBjYWNoZSB0aGUgbGVuZ3RoIHNvbWV3
+aGVyZQ0KPiBhbmQgdXBkYXRlIGl0IHdoZW5ldmVyIHRoZSBpbWFnZSBpcyBtb2RpZmllZD8NCg0K
+DQpobW0uIGJkcnZfZ2V0bGVuZ3RoIGlzIHVzZWQgZXZlcnl3aGVyZSBpbiBRZW11LCBhbmQgSSBk
+b24ndCB0aGluayBpdCBpcyANCmdvb2QgaWRlYSB0byBpbXByb3ZlIGl0IGxvY2FsbHkgZm9yIHRo
+ZXNlIHNlcmllcy4gSWYgd2UgY2FuIGltcHJvdmUgaXQgDQpzb21laG93IHdpdGggYSBjYWNoZSBv
+ciBzb21ldGhpbmcgbGlrZSB0aGlzLCBpdCBzaG91bGQgYmUgZG9uZSBmb3IgYWxsIA0KdXNlcnMg
+YW5kIHRoZXJlZm9yZSBpdCBpcyBvdXRzaWRlIG9mIHRoZXNlIHNlcmllcy4uDQoNCj4gDQo+PiAr
+DQo+PiArICAgIGlmIChvZmZzZXQgKyBzaXplIC0gZmlsZV9sZW4gPiBzLT5jbHVzdGVyX3NpemUp
+IHsNCj4+ICsgICAgICAgIGZwcmludGYoc3RkZXJyLCAiRVJST1I6IGNvdW50aW5nIHJlZmVyZW5j
+ZSBmb3IgcmVnaW9uIGV4Y2VlZGluZyB0aGUgIg0KPj4gKyAgICAgICAgICAgICAgICAiZW5kIG9m
+IHRoZSBmaWxlIGJ5IG1vcmUgdGhhbiBvbmUgY2x1c3Rlcjogb2Zmc2V0IDB4JSIgUFJJeDY0DQo+
+PiArICAgICAgICAgICAgICAgICIgc2l6ZSAweCUiIFBSSXg2NCAiXG4iLCBvZmZzZXQsIHNpemUp
+Ow0KPiANCj4gV2h5IGlzIG9uZSBjbHVzdGVyIE9LPyAgSXMgdGhlcmUgYSBzcGVjaWZpYyBjYXNl
+IHlvdSdyZSB0cnlpbmcgdG8gY2F0Y2gNCj4gaGVyZT8NCg0KcmF3IGZpbGUgdW5kZXIgcWNvdzIg
+bWF5IGJlIG5vdCBhbGlnbmVkIGluIHJlYWwgc2l6ZSB0byBxY293MiBjbHVzdGVyLCANCmFzIEkg
+dW5kZXJzdGFuZCwgaXQncyBub3JtYWwgZm9yIHRoZSBsYXN0IGNsdXN0ZXIgdG8gYmUgc2VtaS1h
+bGxvY2F0ZWQNCg0KPiANCj4gTWF4DQo+IA0KPj4gKyAgICAgICAgcmVzLT5jb3JydXB0aW9ucysr
+Ow0KPj4gKyAgICAgICAgcmV0dXJuIDA7DQo+PiArICAgIH0NCj4+ICsNCj4+ICAgICAgIHN0YXJ0
+ID0gc3RhcnRfb2ZfY2x1c3RlcihzLCBvZmZzZXQpOw0KPj4gICAgICAgbGFzdCA9IHN0YXJ0X29m
+X2NsdXN0ZXIocywgb2Zmc2V0ICsgc2l6ZSAtIDEpOw0KPj4gICAgICAgZm9yKGNsdXN0ZXJfb2Zm
+c2V0ID0gc3RhcnQ7IGNsdXN0ZXJfb2Zmc2V0IDw9IGxhc3Q7DQo+Pg0KPiANCj4gDQo=
