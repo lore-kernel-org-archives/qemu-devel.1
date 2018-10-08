@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9dhb-00039D-BJ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:08:36 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9dnW-0004Ne-JW
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:14:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9dha-00021p-Hj
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:08:35 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9dnT-0005jg-Fg
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:14:42 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 8 Oct 2018 22:14:34 +0000
+Message-ID: <04c11931-57be-d890-635a-178db8ab1468@virtuozzo.com>
 References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
 	<20180817122219.16206-8-vsementsov@virtuozzo.com>
 	<d78f37ac-343d-20bf-a2ce-16ff2fa12677@redhat.com>
 	<a02a1caf-53f5-e20a-93a4-67233032d76e@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b78b66f6-018d-0ec9-a33a-3b8263867b8b@redhat.com>
-Date: Tue, 9 Oct 2018 00:08:15 +0200
+	<b78b66f6-018d-0ec9-a33a-3b8263867b8b@redhat.com>
+In-Reply-To: <b78b66f6-018d-0ec9-a33a-3b8263867b8b@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6C336E79A205DB4BB683EFA3C14D2F11@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <a02a1caf-53f5-e20a-93a4-67233032d76e@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="oXWysTUyYo3106EXLoYq1OZ3vVR2XkPKH"
 Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/qcow2-refcount: fix
  out-of-file L2 entries to be read-as-zero
 List-Id: <qemu-devel.nongnu.org>
@@ -27,162 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oXWysTUyYo3106EXLoYq1OZ3vVR2XkPKH
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <b78b66f6-018d-0ec9-a33a-3b8263867b8b@redhat.com>
-Subject: Re: [PATCH v2 7/7] block/qcow2-refcount: fix out-of-file L2 entries
- to be read-as-zero
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
- <20180817122219.16206-8-vsementsov@virtuozzo.com>
- <d78f37ac-343d-20bf-a2ce-16ff2fa12677@redhat.com>
- <a02a1caf-53f5-e20a-93a4-67233032d76e@virtuozzo.com>
-In-Reply-To: <a02a1caf-53f5-e20a-93a4-67233032d76e@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09.10.18 00:02, Vladimir Sementsov-Ogievskiy wrote:
->=20
->=20
-> On 10/08/2018 11:51 PM, Max Reitz wrote:
->> On 17.08.18 14:22, Vladimir Sementsov-Ogievskiy wrote:
->>> Rewrite corrupted L2 table entry, which reference space out of
->>> underlying file.
->>>
->>> Make this L2 table entry read-as-all-zeros without any allocation.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->>>   block/qcow2-refcount.c | 32 ++++++++++++++++++++++++++++++++
->>>   1 file changed, 32 insertions(+)
->>>
->>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->>> index 3c004e5bfe..3de3768a3c 100644
->>> --- a/block/qcow2-refcount.c
->>> +++ b/block/qcow2-refcount.c
->>> @@ -1720,8 +1720,30 @@ static int check_refcounts_l2(BlockDriverState=
- *bs, BdrvCheckResult *res,
->>>               /* Mark cluster as used */
->>>               csize =3D (((l2_entry >> s->csize_shift) & s->csize_mas=
-k) + 1) *
->>>                       BDRV_SECTOR_SIZE;
->>> +            if (csize > s->cluster_size) {
->>> +                ret =3D fix_l2_entry_to_zero(
->>> +                        bs, res, fix, l2_offset, i, active,
->>> +                        "compressed cluster larger than cluster: siz=
-e 0x%"
->>> +                        PRIx64, csize);
->>> +                if (ret < 0) {
->>> +                    goto fail;
->>> +                }
->>> +                continue;
->>> +            }
->>> +
->>
->> This seems recoverable, isn't it?  Can we not try to just limit the
->> csize, or decompress the cluster with the given csize from the given
->> offset, disregarding the cluster limit?
->=20
-> Hm, you want to assume that csize is corrupted but coffset may be=20
-> correct? Unlikely, I think.
-
-Better to reconstruct probably garbage data than to definitely garbage
-data (all zeroes) is what I think.
-
-> So, to carefully repair csize, we should decompress one cluster (or one=
-=20
-> cluster - 1 byte) of data, trying to get one cluster of decompressed=20
-> data. If we succeed, we know csize, or we can safely set it to one clus=
-ter.
-
-Yes.
-
-> Or we can just set csize =3D 1 cluster, if it is larger. And leave=20
-> problems to real execution which will lead to EIO in worst case.
-
-Or this, yes.
-
->>>               coffset =3D l2_entry & s->cluster_offset_mask &
->>>                         ~(BDRV_SECTOR_SIZE - 1);
->>> +            if (coffset >=3D bdrv_getlength(bs->file->bs)) {
->>> +                ret =3D fix_l2_entry_to_zero(
->>> +                        bs, res, fix, l2_offset, i, active,
->>> +                        "compressed cluster out of file: offset 0x%"=
- PRIx64,
->>> +                        coffset);
->>> +                if (ret < 0) {
->>> +                    goto fail;
->>> +                }
->>> +                continue;
->>> +            }
->>> +
->>>               ret =3D qcow2_inc_refcounts_imrt(bs, res,
->>>                                              refcount_table, refcount=
-_table_size,
->>>                                              coffset, csize);
->>> @@ -1748,6 +1770,16 @@ static int check_refcounts_l2(BlockDriverState=
- *bs, BdrvCheckResult *res,
->>>           {
->>>               uint64_t offset =3D l2_entry & L2E_OFFSET_MASK;
->>>  =20
->>> +            if (offset >=3D bdrv_getlength(bs->file->bs)) {
->>> +                ret =3D fix_l2_entry_to_zero(
->>> +                        bs, res, fix, l2_offset, i, active,
->>> +                        "cluster out of file: offset 0x%" PRIx64, of=
-fset);
->>> +                if (ret < 0) {
->>> +                    goto fail;
->>> +                }
->>> +                continue;
->>> +            }
->>> +
->>
->> These other two look OK, but they have another issue:  If this is a v2=
-
->> image, you cannot create zero clusters; so you'll have to unallocate t=
-he
->> cluster in that case.
->=20
->=20
-> Oho, it's a problem. It may be unsafe to discard clusters, making=20
-> backing image available through the holes. What discard do on v2?=20
-> Zeroing or holes?
-
-Oh, right!  discard on v2 punches a hole.  So I see three ways:
-(1) You can do the same and point to that bit of code, or
-(2) You allocate a data cluster full of zeroes in case of v2, or
-(3) You just error out.
-
-(3) doesn't seem like the worst option.  Amending the image to be v3 is
-always possible and trivial.  Maybe point the user to that option.
-
-Max
-
-
---oXWysTUyYo3106EXLoYq1OZ3vVR2XkPKH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu71U8ACgkQ9AfbAGHV
-z0CxDgf9HubOfnEIqsIzvD2sp84logPxYeynD++rdIiZmozZPipBhYnLGRYckJZa
-h3BLGacORc5ilGSpcCMybV7feej5Ml0gu3bgpKUmZSySEwXgo6wfZyWVN+iw2gEz
-uhc2E1ktL8STd9lIpOPrN1CgyQZq+8VXVi5jombscl9bSNCQKu0teBlJJQcYhcQ0
-8g0LhLxInG5sXMGYb9MI7Ry7FmkeALoMeceQHnawLdAberMVtknqiuBRmVINr+Bu
-72UGaIK1WAkBQvhm7lDb7gUjrd4jiLIzRY5l1r2HR+IeFsdzqtlC2S8hsXRLPD+u
-fm3+PZ8Zr6Nb3VLTsHhO//tZVanI7A==
-=G0ah
------END PGP SIGNATURE-----
-
---oXWysTUyYo3106EXLoYq1OZ3vVR2XkPKH--
+DQoNCk9uIDEwLzA5LzIwMTggMDE6MDggQU0sIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMDkuMTAu
+MTggMDA6MDIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pg0KPj4NCj4+
+IE9uIDEwLzA4LzIwMTggMTE6NTEgUE0sIE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAxNy4wOC4x
+OCAxNDoyMiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gUmV3cml0
+ZSBjb3JydXB0ZWQgTDIgdGFibGUgZW50cnksIHdoaWNoIHJlZmVyZW5jZSBzcGFjZSBvdXQgb2YN
+Cj4+Pj4gdW5kZXJseWluZyBmaWxlLg0KPj4+Pg0KPj4+PiBNYWtlIHRoaXMgTDIgdGFibGUgZW50
+cnkgcmVhZC1hcy1hbGwtemVyb3Mgd2l0aG91dCBhbnkgYWxsb2NhdGlvbi4NCj4+Pj4NCj4+Pj4g
+U2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2
+aXJ0dW96em8uY29tPg0KPj4+PiAtLS0NCj4+Pj4gICAgYmxvY2svcWNvdzItcmVmY291bnQuYyB8
+IDMyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+Pj4+ICAgIDEgZmlsZSBjaGFu
+Z2VkLCAzMiBpbnNlcnRpb25zKCspDQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293
+Mi1yZWZjb3VudC5jIGIvYmxvY2svcWNvdzItcmVmY291bnQuYw0KPj4+PiBpbmRleCAzYzAwNGU1
+YmZlLi4zZGUzNzY4YTNjIDEwMDY0NA0KPj4+PiAtLS0gYS9ibG9jay9xY293Mi1yZWZjb3VudC5j
+DQo+Pj4+ICsrKyBiL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMNCj4+Pj4gQEAgLTE3MjAsOCArMTcy
+MCwzMCBAQCBzdGF0aWMgaW50IGNoZWNrX3JlZmNvdW50c19sMihCbG9ja0RyaXZlclN0YXRlICpi
+cywgQmRydkNoZWNrUmVzdWx0ICpyZXMsDQo+Pj4+ICAgICAgICAgICAgICAgIC8qIE1hcmsgY2x1
+c3RlciBhcyB1c2VkICovDQo+Pj4+ICAgICAgICAgICAgICAgIGNzaXplID0gKCgobDJfZW50cnkg
+Pj4gcy0+Y3NpemVfc2hpZnQpICYgcy0+Y3NpemVfbWFzaykgKyAxKSAqDQo+Pj4+ICAgICAgICAg
+ICAgICAgICAgICAgICAgQkRSVl9TRUNUT1JfU0laRTsNCj4+Pj4gKyAgICAgICAgICAgIGlmIChj
+c2l6ZSA+IHMtPmNsdXN0ZXJfc2l6ZSkgew0KPj4+PiArICAgICAgICAgICAgICAgIHJldCA9IGZp
+eF9sMl9lbnRyeV90b196ZXJvKA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgYnMsIHJl
+cywgZml4LCBsMl9vZmZzZXQsIGksIGFjdGl2ZSwNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAg
+ICAgICJjb21wcmVzc2VkIGNsdXN0ZXIgbGFyZ2VyIHRoYW4gY2x1c3Rlcjogc2l6ZSAweCUiDQo+
+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICBQUkl4NjQsIGNzaXplKTsNCj4+Pj4gKyAgICAg
+ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPj4+PiArICAgICAgICAgICAgICAgICAgICBnb3Rv
+IGZhaWw7DQo+Pj4+ICsgICAgICAgICAgICAgICAgfQ0KPj4+PiArICAgICAgICAgICAgICAgIGNv
+bnRpbnVlOw0KPj4+PiArICAgICAgICAgICAgfQ0KPj4+PiArDQo+Pj4NCj4+PiBUaGlzIHNlZW1z
+IHJlY292ZXJhYmxlLCBpc24ndCBpdD8gIENhbiB3ZSBub3QgdHJ5IHRvIGp1c3QgbGltaXQgdGhl
+DQo+Pj4gY3NpemUsIG9yIGRlY29tcHJlc3MgdGhlIGNsdXN0ZXIgd2l0aCB0aGUgZ2l2ZW4gY3Np
+emUgZnJvbSB0aGUgZ2l2ZW4NCj4+PiBvZmZzZXQsIGRpc3JlZ2FyZGluZyB0aGUgY2x1c3RlciBs
+aW1pdD8NCj4+DQo+PiBIbSwgeW91IHdhbnQgdG8gYXNzdW1lIHRoYXQgY3NpemUgaXMgY29ycnVw
+dGVkIGJ1dCBjb2Zmc2V0IG1heSBiZQ0KPj4gY29ycmVjdD8gVW5saWtlbHksIEkgdGhpbmsuDQo+
+IA0KPiBCZXR0ZXIgdG8gcmVjb25zdHJ1Y3QgcHJvYmFibHkgZ2FyYmFnZSBkYXRhIHRoYW4gdG8g
+ZGVmaW5pdGVseSBnYXJiYWdlDQo+IGRhdGEgKGFsbCB6ZXJvZXMpIGlzIHdoYXQgSSB0aGluay4N
+Cj4gDQo+PiBTbywgdG8gY2FyZWZ1bGx5IHJlcGFpciBjc2l6ZSwgd2Ugc2hvdWxkIGRlY29tcHJl
+c3Mgb25lIGNsdXN0ZXIgKG9yIG9uZQ0KPj4gY2x1c3RlciAtIDEgYnl0ZSkgb2YgZGF0YSwgdHJ5
+aW5nIHRvIGdldCBvbmUgY2x1c3RlciBvZiBkZWNvbXByZXNzZWQNCj4+IGRhdGEuIElmIHdlIHN1
+Y2NlZWQsIHdlIGtub3cgY3NpemUsIG9yIHdlIGNhbiBzYWZlbHkgc2V0IGl0IHRvIG9uZSBjbHVz
+dGVyLg0KPiANCj4gWWVzLg0KPiANCj4+IE9yIHdlIGNhbiBqdXN0IHNldCBjc2l6ZSA9IDEgY2x1
+c3RlciwgaWYgaXQgaXMgbGFyZ2VyLiBBbmQgbGVhdmUNCj4+IHByb2JsZW1zIHRvIHJlYWwgZXhl
+Y3V0aW9uIHdoaWNoIHdpbGwgbGVhZCB0byBFSU8gaW4gd29yc3QgY2FzZS4NCj4gDQo+IE9yIHRo
+aXMsIHllcy4NCj4gDQo+Pj4+ICAgICAgICAgICAgICAgIGNvZmZzZXQgPSBsMl9lbnRyeSAmIHMt
+PmNsdXN0ZXJfb2Zmc2V0X21hc2sgJg0KPj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgfihC
+RFJWX1NFQ1RPUl9TSVpFIC0gMSk7DQo+Pj4+ICsgICAgICAgICAgICBpZiAoY29mZnNldCA+PSBi
+ZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMpKSB7DQo+Pj4+ICsgICAgICAgICAgICAgICAgcmV0
+ID0gZml4X2wyX2VudHJ5X3RvX3plcm8oDQo+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICBi
+cywgcmVzLCBmaXgsIGwyX29mZnNldCwgaSwgYWN0aXZlLA0KPj4+PiArICAgICAgICAgICAgICAg
+ICAgICAgICAgImNvbXByZXNzZWQgY2x1c3RlciBvdXQgb2YgZmlsZTogb2Zmc2V0IDB4JSIgUFJJ
+eDY0LA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgY29mZnNldCk7DQo+Pj4+ICsgICAg
+ICAgICAgICAgICAgaWYgKHJldCA8IDApIHsNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgZ290
+byBmYWlsOw0KPj4+PiArICAgICAgICAgICAgICAgIH0NCj4+Pj4gKyAgICAgICAgICAgICAgICBj
+b250aW51ZTsNCj4+Pj4gKyAgICAgICAgICAgIH0NCj4+Pj4gKw0KPj4+PiAgICAgICAgICAgICAg
+ICByZXQgPSBxY293Ml9pbmNfcmVmY291bnRzX2ltcnQoYnMsIHJlcywNCj4+Pj4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlZmNvdW50X3RhYmxlLCByZWZj
+b3VudF90YWJsZV9zaXplLA0KPj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgY29mZnNldCwgY3NpemUpOw0KPj4+PiBAQCAtMTc0OCw2ICsxNzcwLDE2IEBA
+IHN0YXRpYyBpbnQgY2hlY2tfcmVmY291bnRzX2wyKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBCZHJ2
+Q2hlY2tSZXN1bHQgKnJlcywNCj4+Pj4gICAgICAgICAgICB7DQo+Pj4+ICAgICAgICAgICAgICAg
+IHVpbnQ2NF90IG9mZnNldCA9IGwyX2VudHJ5ICYgTDJFX09GRlNFVF9NQVNLOw0KPj4+PiAgICAN
+Cj4+Pj4gKyAgICAgICAgICAgIGlmIChvZmZzZXQgPj0gYmRydl9nZXRsZW5ndGgoYnMtPmZpbGUt
+PmJzKSkgew0KPj4+PiArICAgICAgICAgICAgICAgIHJldCA9IGZpeF9sMl9lbnRyeV90b196ZXJv
+KA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgYnMsIHJlcywgZml4LCBsMl9vZmZzZXQs
+IGksIGFjdGl2ZSwNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICJjbHVzdGVyIG91dCBv
+ZiBmaWxlOiBvZmZzZXQgMHglIiBQUkl4NjQsIG9mZnNldCk7DQo+Pj4+ICsgICAgICAgICAgICAg
+ICAgaWYgKHJldCA8IDApIHsNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsOw0K
+Pj4+PiArICAgICAgICAgICAgICAgIH0NCj4+Pj4gKyAgICAgICAgICAgICAgICBjb250aW51ZTsN
+Cj4+Pj4gKyAgICAgICAgICAgIH0NCj4+Pj4gKw0KPj4+DQo+Pj4gVGhlc2Ugb3RoZXIgdHdvIGxv
+b2sgT0ssIGJ1dCB0aGV5IGhhdmUgYW5vdGhlciBpc3N1ZTogIElmIHRoaXMgaXMgYSB2Mg0KPj4+
+IGltYWdlLCB5b3UgY2Fubm90IGNyZWF0ZSB6ZXJvIGNsdXN0ZXJzOyBzbyB5b3UnbGwgaGF2ZSB0
+byB1bmFsbG9jYXRlIHRoZQ0KPj4+IGNsdXN0ZXIgaW4gdGhhdCBjYXNlLg0KPj4NCj4+DQo+PiBP
+aG8sIGl0J3MgYSBwcm9ibGVtLiBJdCBtYXkgYmUgdW5zYWZlIHRvIGRpc2NhcmQgY2x1c3RlcnMs
+IG1ha2luZw0KPj4gYmFja2luZyBpbWFnZSBhdmFpbGFibGUgdGhyb3VnaCB0aGUgaG9sZXMuIFdo
+YXQgZGlzY2FyZCBkbyBvbiB2Mj8NCj4+IFplcm9pbmcgb3IgaG9sZXM/DQo+IA0KPiBPaCwgcmln
+aHQhICBkaXNjYXJkIG9uIHYyIHB1bmNoZXMgYSBob2xlLiAgU28gSSBzZWUgdGhyZWUgd2F5czoN
+Cj4gKDEpIFlvdSBjYW4gZG8gdGhlIHNhbWUgYW5kIHBvaW50IHRvIHRoYXQgYml0IG9mIGNvZGUs
+IG9yDQo+ICgyKSBZb3UgYWxsb2NhdGUgYSBkYXRhIGNsdXN0ZXIgZnVsbCBvZiB6ZXJvZXMgaW4g
+Y2FzZSBvZiB2Miwgb3INCj4gKDMpIFlvdSBqdXN0IGVycm9yIG91dC4NCj4gDQo+ICgzKSBkb2Vz
+bid0IHNlZW0gbGlrZSB0aGUgd29yc3Qgb3B0aW9uLiAgDQoNCj4gQW1lbmRpbmcgdGhlIGltYWdl
+IHRvIGJlIHYzIGlzDQo+IGFsd2F5cyBwb3NzaWJsZSBhbmQgdHJpdmlhbC4gDQoNCmhvdyB0byBk
+byBpdCBmb3IgY29ycnVwdGVkIGltYWdlPw0KDQo+IE1heWJlIHBvaW50IHRoZSB1c2VyIHRvIHRo
+YXQgb3B0aW9uLg0KPiANCj4gTWF4DQo+IA0K
