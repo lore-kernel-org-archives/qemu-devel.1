@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9UgM-0003g6-QA
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:30:43 -0400
+	(envelope-from <philmd@redhat.com>) id 1g9V12-0006Pa-2m
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9UgL-00078g-SH
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:30:42 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39490)
+	(envelope-from <philmd@redhat.com>) id 1g9V0v-0005LK-Ee
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:03 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36634)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g9UgL-00077I-Cs
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:30:41 -0400
-Received: by mail-ot1-x342.google.com with SMTP id l58so4532487otd.6
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 05:30:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9V0v-0005Ap-3f
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:51:57 -0400
+Received: by mail-wr1-f67.google.com with SMTP id y16so20708835wrw.3
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 05:51:46 -0700 (PDT)
+References: <20181005154910.3099-1-alex.bennee@linaro.org>
+	<20181007012337.GA23787@flamenco> <875zycohpl.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <458712aa-3608-0f10-33ce-1d65ecf58f16@redhat.com>
+Date: Mon, 8 Oct 2018 14:51:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <1538579266-8389-7-git-send-email-edgar.iglesias@gmail.com>
-References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
-	<1538579266-8389-7-git-send-email-edgar.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Oct 2018 13:30:20 +0100
-Message-ID: <CAFEAcA9_EOFV=5i-4S1GWVgewAa89hJDTegnf9Ot3w7rfkZWYA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 06/12] net: cadence_gem: Add support for
- selecting the DMA MemoryRegion
+In-Reply-To: <875zycohpl.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 00/21] Trace updates and plugin RFC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +30,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu
 
-On 3 October 2018 at 16:07, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Add support for selecting the Memory Region that the GEM
-> will do DMA to.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  hw/net/cadence_gem.c         | 63 ++++++++++++++++++++++++++++----------------
->  include/hw/net/cadence_gem.h |  2 ++
->  2 files changed, 43 insertions(+), 22 deletions(-)
->
-> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-> index 759c1d7..ab02515 100644
-> --- a/hw/net/cadence_gem.c
-> +++ b/hw/net/cadence_gem.c
-> @@ -28,6 +28,7 @@
->  #include "hw/net/cadence_gem.h"
->  #include "qapi/error.h"
->  #include "qemu/log.h"
-> +#include "sysemu/dma.h"
->  #include "net/checksum.h"
->
->  #ifdef CADENCE_GEM_ERR_DEBUG
-> @@ -835,9 +836,9 @@ static void gem_get_rx_desc(CadenceGEMState *s, int q)
->  {
->      DB_PRINT("read descriptor 0x%x\n", (unsigned)s->rx_desc_addr[q]);
->      /* read current descriptor */
-> -    cpu_physical_memory_read(s->rx_desc_addr[q],
-> -                             (uint8_t *)s->rx_desc[q],
-> -                             sizeof(uint32_t) * gem_get_desc_len(s, true));
-> +    address_space_read(s->dma_as, s->rx_desc_addr[q], MEMTXATTRS_UNSPECIFIED,
-> +                       (uint8_t *)s->rx_desc[q],
-> +                       sizeof(uint32_t) * gem_get_desc_len(s, true));
+Hi Alex,
 
-At some point you might want to add support for handling "descriptor
-read/write failed", incidentally: address_space_read/write return a
-MemTxResult which you can check for != MEMTX_OK.
+On 08/10/2018 12:28, Alex Bennée wrote:
+> 
+> Emilio G. Cota <cota@braap.org> writes:
+> 
+>> On Fri, Oct 05, 2018 at 16:48:49 +0100, Alex Bennée wrote:
+>> (snip)
+>>> ==Known Limitations==
+>>>
+>>> Currently there is only one hook allowed per trace event. We could
+>>> make this more flexible or simply just error out if two plugins try
+>>> and hook to the same point. What are the expectations of running
+>>> multiple plugins hooking into the same point in QEMU?
+>>
+>> It's very common. All popular instrumentation tools (e.g. PANDA,
+>> DynamoRIO, Pin) support multiple plugins.
+> 
+> Fair enough.
+> 
+>>
+>>> ==TCG Hooks==
+>>>
+>>> Thanks to Lluís' work the trace API already splits up TCG events into
+>>> translation time and exec time events and provides the machinery for
+>>> hooking a trace helper into the translation stream. Currently that
+>>> helper is unconditionally added although perhaps we could expand the
+>>> call convention a little for TCG events to allow the translation time
+>>> event to filter out planting the execution time helper?
+>>
+>> A TCG helper is suboptimal for these kind of events, e.g. instruction/TB/
+>> mem callbacks, because (1) these events happen *very* often, and
+>> (2) a helper then has to iterate over a list of callbacks (assuming
+>> we support multiple plugins). That is, one TCG helper call,
+>> plus cache misses for the callback pointers, plus function calls
+>> to call the callbacks. That adds up to 2x average slowdown
+>> for SPEC06int, instead of 1.5x slowdown when embedding the
+>> callbacks directly into the generated code. Yes, you have to
+>> flush the code when unsubscribing from the event, but that cost
+>> is amortized by the savings you get when the callbacks occur,
+>> which are way more frequent.
+> 
+> What would you want instead of a TCG helper? But certainly being able be
+> selective about which instances of each trace point are instrumented
+> will be valuable.
+> 
+>> Besides performance, to provide a pleasant plugin experience we need
+>> something better than the current tracing callbacks.
+> 
+> What I hope to avoid in re-using trace points is having a whole bunch of
+> a additional hook points just for plugins. However nothing stops us
+> adding more tracepoints at more useful places for instrumentation. We
+> could also do it on a whitelist basis similar to the way the tcg events
+> are marked.
+> 
+>>
+>>> ===Instruction Tracing===
+>>>
+>>> Pavel's series had a specific hook for instrumenting individual
+>>> instructions. I have not yet added it to this series but I think it be
+>>> done in a slightly cleaner way now we have the ability to insert TCG
+>>> ops into the instruction stream.
+>>
+>> I thought Peter explicitly disallowed TCG generation from plugins.
+>> Also, IIRC others also mentioned that exposing QEMU internals
+>> (e.g. "struct TranslationBlock", or "struct CPUState") to plugins
+>> was not on the table.
+> 
+> We definitely want to avoid plugin controlled code generation but the
+> tcg tracepoint mechanism is transparent to the plugin itself. I think
+> the pointers should really be treated as anonymous handles rather than
+> windows into QEMU's internals. Arguably some of the tracepoints should
+> be exporting more useful numbers (I used cpu->cpu_index in the TLB trace
+> points) but I don't know if we can change existing trace point
+> definitions to clean that up.
+> 
+> Again if we whitelist tracepoints for plugins we can be more careful
+> about the data exported.
+> 
+>>
+>>> If we add a tracepoint for post
+>>> instruction generation which passes a buffer with the instruction
+>>> translated and method to insert a helper before or after the
+>>> instruction. This would avoid exposing the cpu_ldst macros to the
+>>> plugins.
+>>
+>> Again, for performance you'd avoid the tracepoint (i.e. calling
+>> a helper to call another function) and embed directly the
+>> callback from TCG. Same thing applies to TB's.
+> 
+> OK I see what you mean. I think that is doable although it might take a
+> bit more tcg plumbing.
+> 
+>>
+>>> So what do people think? Could this be a viable way to extend QEMU
+>>> with plugins?
+>>
+>> For frequent events such as the ones mentioned above, I am
+>> not sure plugins can be efficiently implemented under
+>> tracing.
+> 
+> I assume some form of helper-per-instrumented-event/insn is still going
+> to be needed though? We are not considering some sort of EBF craziness?
+> 
+>> For others (e.g. cpu_init events), sure, they could.
+>> But still, differently from tracers, plugins can come and go
+>> anytime, so I am not convinced that merging the two features
+>> is a good idea.
+> 
+> I don't think we have to mirror tracepoints and plugin points but I'm in
+> favour of sharing the general mechanism and tooling rather than having a
+> whole separate set of hooks. We certainly don't want anything like:
+> 
+>           trace_exec_tb(tb, pc);
+>           plugin_exec_tb(tb, pc);
+> 
+> scattered throughout the code where the two do align.
 
-thanks
--- PMM
+What about turning the tracepoints into the default instrumentation
+plugin? (the first of Emilio's list of plugins).
+
+>>
+>> Thanks,
+>>
+>> 		Emilio
+> 
+> 
+> --
+> Alex Bennée
+> 
