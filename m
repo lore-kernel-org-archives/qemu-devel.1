@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g9c8W-0003Z8-El
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:28:20 -0400
+	(envelope-from <cota@braap.org>) id 1g9c8x-0003rs-9H
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:28:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g9c6Q-0003fK-BG
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:26:07 -0400
-References: <cover.1537984851.git.jcody@redhat.com>
-	<d56d7c6592e7d68aa72764e9616878394bffbc14.1537984851.git.jcody@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <f79aa27a-dac3-a333-f194-0cbf7b31175b@redhat.com>
-Date: Mon, 8 Oct 2018 16:25:57 -0400
+	(envelope-from <cota@braap.org>) id 1g9c3T-0002Or-8t
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:23:07 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41343)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9c3T-0002OP-19
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:23:03 -0400
+Date: Mon, 8 Oct 2018 16:23:01 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181008202301.GA24543@flamenco>
+References: <20181006214508.5331-1-cota@braap.org>
+	<20181006214508.5331-3-cota@braap.org>
+	<4dc1591e-adc9-eaaa-deea-07fd7f3470a4@linaro.org>
+	<20181008144242.GC19899@flamenco>
+	<498f3a82-0852-df46-d905-9e752f2c6ec1@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <d56d7c6592e7d68aa72764e9616878394bffbc14.1537984851.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] MAINTAINERS: Replace myself with
- John Snow for block jobs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <498f3a82-0852-df46-d905-9e752f2c6ec1@linaro.org>
+Subject: Re: [Qemu-devel] [RFC 2/6] cputlb: do not evict invalid entries to
+ the vtlb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +31,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jeff@codyprime.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, Pranith Kumar <bobby.prani@gmail.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-
-
-On 09/26/2018 02:05 PM, Jeff Cody wrote:
-> I'll not be involved with day-to-day qemu development, and John
-> Snow is a block jobs wizard.  Have him take over block job
-> maintainership duties.
+On Mon, Oct 08, 2018 at 12:46:26 -0700, Richard Henderson wrote:
+> On 10/8/18 7:42 AM, Emilio G. Cota wrote:
+> > On Sun, Oct 07, 2018 at 19:09:01 -0700, Richard Henderson wrote:
+> >> On 10/6/18 2:45 PM, Emilio G. Cota wrote:
+> >>> Currently we evict an entry to the victim TLB when it doesn't match
+> >>> the current address. But it could be that there's no match because
+> >>> the current entry is invalid. Do not evict the entry to the vtlb
+> >>> in that case.
+> >>>
+> >>> This change will help us keep track of the TLB's use rate.
+> >>>
+> >>> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> >>> ---
+> >>>  include/exec/cpu-all.h | 14 ++++++++++++++
+> >>>  accel/tcg/cputlb.c     |  2 +-
+> >>>  2 files changed, 15 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> >>> index 117d2fbbca..d938dedafc 100644
+> >>> --- a/include/exec/cpu-all.h
+> >>> +++ b/include/exec/cpu-all.h
+> >>> @@ -362,6 +362,20 @@ static inline bool tlb_hit(target_ulong tlb_addr, target_ulong addr)
+> >>>      return tlb_hit_page(tlb_addr, addr & TARGET_PAGE_MASK);
+> >>>  }
+> >>>  
+> >>> +/**
+> >>> + * tlb_is_valid - return true if at least one of the addresses is valid
+> >>> + * @te: pointer to CPUTLBEntry
+> >>> + *
+> >>> + * This is useful when we don't have a particular address to compare against,
+> >>> + * and we just want to know whether any entry holds valid data.
+> >>> + */
+> >>> +static inline bool tlb_is_valid(const CPUTLBEntry *te)
+> >>> +{
+> >>> +    return !(te->addr_read & TLB_INVALID_MASK) ||
+> >>> +           !(te->addr_write & TLB_INVALID_MASK) ||
+> >>> +           !(te->addr_code & TLB_INVALID_MASK);
+> >>> +}
+> >>
+> >> No, I think you misunderstand.
+> >>
+> >> First, TLB_INVALID_MASK is only ever set for addr_write, in response to
+> >> PAGE_WRITE_INV.  Second, an entry that is invalid for write is still valid for
+> >> read+exec.  So there is benefit to swapping it out to the victim cache.
+> >>
+> >> This is used by the s390x target to make the "lowpage" read-only, which is a
+> >> special architected 512 byte range within pages 0 and 1.  This is done by
+> >> forcing writes, but not reads, back through tlb_fill.
+> > 
+> > Aah I see. The point is to avoid pushing to the victim cache
+> > an entry that is all invalid, not just partially invalid.
 > 
-
-... I didn't realize he wrote it like this, and I am told I should
-accept compliments, ...
-
-Well, factually it's Kevin and I who have worked on them the most
-lately, and Kevin's already got enough stuff, so I think it's okay for
-me to take this unless someone disagrees.
-
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  MAINTAINERS | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> I've slightly misspoken here.  It is (ab)used for the s390 thing, but that bit
+> is also set by memset -1.  Perhaps you might check
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ce7c351afa..0e22b795e6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1455,7 +1455,7 @@ F: include/scsi/*
->  F: scsi/*
->  
->  Block Jobs
-> -M: Jeff Cody <jcody@redhat.com>
-> +M: John Snow <jsnow@redhat.com>
-
-Acked-by: John Snow <jsnow@redhat.com>
-
-`*~ pour one out for your homies ~*'
-
->  L: qemu-block@nongnu.org
->  S: Supported
->  F: blockjob.c
-> @@ -1468,7 +1468,7 @@ F: block/commit.c
->  F: block/stream.c
->  F: block/mirror.c
->  F: qapi/job.json
-> -T: git git://github.com/codyprime/qemu-kvm-jtc.git block
-> +T: git git://github.com/jnsnow/qemu.git jobs
->  
->  Block QAPI, monitor, command line
->  M: Markus Armbruster <armbru@redhat.com>
+> static inline bool tlb_is_invalid(const CPUTLBEntry *te)
+> {
+>     return te->addr_read & te->addr_write & te->addr_code & TLB_INVALID_MASK;
+> }
 > 
+> That is, all forms of access have the INVALID bit set.
+
+I see. I just ran a few tests and the below gives the best
+performance, so I'll go with it:
+
+static inline bool tlb_is_empty(const CPUTLBEntry *te)
+{
+    return te->addr_read == -1 && te->addr_write == -1 && te->addr_code == -1;
+}
+
+I renamed it from "invalid" to "empty" to avoid even thinking about
+the invalid flag.
+
+Thanks,
+
+		Emilio
