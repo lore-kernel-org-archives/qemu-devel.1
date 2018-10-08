@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52299)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<bounce+7309d1.7d7329-qemu-devel=nongnu.org@mg-relay.tolva.net>)
-	id 1g9YVQ-0005OF-3C
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:35:41 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52558)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g9YWP-000687-7C
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:36:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from
-	<bounce+7309d1.7d7329-qemu-devel=nongnu.org@mg-relay.tolva.net>)
-	id 1g9YVM-0002dQ-Td
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:35:40 -0400
-Received: from mail2.static.mailgun.info ([104.130.122.2]:20627)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g9YWM-0002yx-3w
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:36:41 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:43131)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from
-	<bounce+7309d1.7d7329-qemu-devel=nongnu.org@mg-relay.tolva.net>)
-	id 1g9YVJ-0002bI-D6
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:35:34 -0400
-Sender: cst=tolva.net@mg-relay.tolva.net
-From: =?UTF-8?q?Cortland=20T=C3=B6lva?= <cst@tolva.net>
-Date: Mon,  8 Oct 2018 09:35:21 -0700
-Message-Id: <20181008163521.17341-4-cst@tolva.net>
-In-Reply-To: <20181008163521.17341-1-cst@tolva.net>
-References: <20181008163521.17341-1-cst@tolva.net>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1g9YWL-0002yN-Ui
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:36:38 -0400
+Received: by mail-yw1-f68.google.com with SMTP id j75-v6so8311843ywj.10
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 09:36:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 3/3] linux-user: Implement special usbfs
- ioctls.
+References: <20181007043335.23631-1-liq3ea@163.com>
+	<be443eb3-742d-08c6-492c-058331ec14b0@amsat.org>
+In-Reply-To: <be443eb3-742d-08c6-492c-058331ec14b0@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 8 Oct 2018 18:36:25 +0200
+Message-ID: <CAAdtpL70LmVs=58J2zbG7qig7UMST6J9sCjb=i5AtJYG5zxpaw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vl.c: print error message if load fw_cfg
+ file failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,304 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Cortland=20T=C3=B6lva?= <cst@tolva.net>
+To: Li Qiang <liq3ea@163.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Userspace submits a USB Request Buffer to the kernel, optionally
-discards it, and finally reaps the URB.  Thunk buffers from target
-to host and back.
+Hi Li,
 
-Tested by running an i386 scanner driver on ARMv7 and by running
-the PowerPC lsusb utility on x86_64.  The discardurb ioctl is
-not exercised in these tests.
+On Sun, Oct 7, 2018 at 7:48 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+> On 10/7/18 6:33 AM, Li Qiang wrote:
+> > It makes sense to print the error message while reading
+> > file failed.
+> >
+> > Signed-off-by: Li Qiang <liq3ea@163.com>
+> > ---
+> >  vl.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/vl.c b/vl.c
+> > index cc55fe04a2..3db410e771 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -2207,8 +2207,9 @@ static int parse_fw_cfg(void *opaque, QemuOpts *o=
+pts, Error **errp)
+> >          size =3D strlen(str); /* NUL terminator NOT included in fw_cfg=
+ blob */
+> >          buf =3D g_memdup(str, size);
+> >      } else {
+> > -        if (!g_file_get_contents(file, &buf, &size, NULL)) {
+> > -            error_report("can't load %s", file);
+> > +        GError *error =3D NULL;
+> > +        if (!g_file_get_contents(file, &buf, &size, &error)) {
+> > +            error_report("can't load %s, %s", file, error->message);
 
-Signed-off-by: Cortland Tölva <cst@tolva.net>
----
-There are two alternatives for the strategy of holding lock_user on
-memory from submit until reap.  v3 of this series tries to determine
-the access permissions for user memory from endpoint direction, but
-the logic for this is complex.  The first alternative is to request
-write access.  If that fails, request read access.  If that fails, try
-to submit the ioctl with no buffer - perhaps the user code filled in
-fields the kernel will ignore.  The second alternative is to read user
-memory into an allocated buffer, pass it to the kernel, and write back
-to target memory only if the kernel indicates that writes occurred.
+You forgot:
 
-Changes from v1:
-  improve pointer cast to int compatibility
-  remove unimplemented types for usb streams
-  struct definitions moved to this patch where possible
+                    g_error_free(error);
 
-Changes from v2:
- organize urb thunk metadata in a struct
- hold lock_user from submit until discard
- fixes for 64-bit hosts
+With the free:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
- linux-user/ioctls.h        |   8 ++
- linux-user/syscall.c       | 177 +++++++++++++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h  |   4 +
- linux-user/syscall_types.h |  20 +++++
- 4 files changed, 209 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 92f6177f1d..ae8951625f 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -143,6 +143,14 @@
-   IOCTL(USBDEVFS_SETCONFIGURATION, IOC_W, MK_PTR(TYPE_INT))
-   IOCTL(USBDEVFS_GETDRIVER, IOC_R,
-         MK_PTR(MK_STRUCT(STRUCT_usbdevfs_getdriver)))
-+  IOCTL_SPECIAL(USBDEVFS_SUBMITURB, IOC_W, do_ioctl_usbdevfs_submiturb,
-+      MK_PTR(MK_STRUCT(STRUCT_usbdevfs_urb)))
-+  IOCTL_SPECIAL(USBDEVFS_DISCARDURB, IOC_RW, do_ioctl_usbdevfs_discardurb,
-+      MK_PTR(MK_STRUCT(STRUCT_usbdevfs_urb)))
-+  IOCTL_SPECIAL(USBDEVFS_REAPURB, IOC_R, do_ioctl_usbdevfs_reapurb,
-+      MK_PTR(TYPE_PTRVOID))
-+  IOCTL_SPECIAL(USBDEVFS_REAPURBNDELAY, IOC_R, do_ioctl_usbdevfs_reapurb,
-+      MK_PTR(TYPE_PTRVOID))
-   IOCTL(USBDEVFS_DISCSIGNAL, IOC_W,
-         MK_PTR(MK_STRUCT(STRUCT_usbdevfs_disconnectsignal)))
-   IOCTL(USBDEVFS_CLAIMINTERFACE, IOC_W, MK_PTR(TYPE_INT))
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 2641260186..9b7ea96cfb 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -96,6 +96,7 @@
- #include <linux/fb.h>
- #if defined(CONFIG_USBFS)
- #include <linux/usbdevice_fs.h>
-+#include <linux/usb/ch9.h>
- #endif
- #include <linux/vt.h>
- #include <linux/dm-ioctl.h>
-@@ -4199,6 +4200,182 @@ static abi_long do_ioctl_ifconf(const IOCTLEntry *ie, uint8_t *buf_temp,
-     return ret;
- }
- 
-+#if defined(CONFIG_USBFS)
-+#if HOST_LONG_BITS > 64
-+#error USBDEVFS thunks do not support >64 bit hosts yet.
-+#endif
-+struct live_urb {
-+    uint64_t target_urb_adr;
-+    uint64_t target_buf_adr;
-+    char *target_buf_ptr;
-+    struct usbdevfs_urb host_urb;
-+};
-+
-+static GHashTable *usbdevfs_urb_hashtable(void)
-+{
-+    static GHashTable *urb_hashtable;
-+
-+    if (!urb_hashtable) {
-+        urb_hashtable = g_hash_table_new(g_int64_hash, g_int64_equal);
-+    }
-+    return urb_hashtable;
-+}
-+
-+static void urb_hashtable_insert(struct live_urb *urb)
-+{
-+    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
-+    g_hash_table_insert(urb_hashtable, urb, urb);
-+}
-+
-+static struct live_urb *urb_hashtable_lookup(uint64_t target_urb_adr)
-+{
-+    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
-+    return g_hash_table_lookup(urb_hashtable, &target_urb_adr);
-+}
-+
-+static void urb_hashtable_remove(struct live_urb *urb)
-+{
-+    GHashTable *urb_hashtable = usbdevfs_urb_hashtable();
-+    g_hash_table_remove(urb_hashtable, urb);
-+}
-+
-+static abi_long
-+do_ioctl_usbdevfs_reapurb(const IOCTLEntry *ie, uint8_t *buf_temp,
-+                          int fd, int cmd, abi_long arg)
-+{
-+    const argtype usbfsurb_arg_type[] = { MK_STRUCT(STRUCT_usbdevfs_urb) };
-+    const argtype ptrvoid_arg_type[] = { TYPE_PTRVOID, 0, 0 };
-+    struct live_urb *lurb;
-+    void *argptr;
-+    uint64_t hurb;
-+    int target_size;
-+    uintptr_t target_urb_adr;
-+    abi_long ret;
-+
-+    target_size = thunk_type_size(usbfsurb_arg_type, THUNK_TARGET);
-+
-+    memset(buf_temp, 0, sizeof(uint64_t));
-+    ret = get_errno(safe_ioctl(fd, ie->host_cmd, buf_temp));
-+    if (is_error(ret)) {
-+        return ret;
-+    }
-+
-+    memcpy(&hurb, buf_temp, sizeof(uint64_t));
-+    lurb = (void *)((uintptr_t)hurb - offsetof(struct live_urb, host_urb));
-+    if (!lurb->target_urb_adr) {
-+        return -TARGET_EFAULT;
-+    }
-+    urb_hashtable_remove(lurb);
-+    unlock_user(lurb->target_buf_ptr, lurb->target_buf_adr,
-+        lurb->host_urb.buffer_length);
-+    lurb->target_buf_ptr = NULL;
-+
-+    /* restore the guest buffer pointer */
-+    lurb->host_urb.buffer = (void *)(uintptr_t)lurb->target_buf_adr;
-+
-+    /* update the guest urb struct */
-+    argptr = lock_user(VERIFY_WRITE, lurb->target_urb_adr, target_size, 0);
-+    if (!argptr) {
-+        g_free(lurb);
-+        return -TARGET_EFAULT;
-+    }
-+    thunk_convert(argptr, &lurb->host_urb, usbfsurb_arg_type, THUNK_TARGET);
-+    unlock_user(argptr, lurb->target_urb_adr, target_size);
-+
-+    target_size = thunk_type_size(ptrvoid_arg_type, THUNK_TARGET);
-+    /* write back the urb handle */
-+    argptr = lock_user(VERIFY_WRITE, arg, target_size, 0);
-+    if (!argptr) {
-+        g_free(lurb);
-+        return -TARGET_EFAULT;
-+    }
-+
-+    /* GHashTable uses 64-bit keys but thunk_convert expects uintptr_t */
-+    target_urb_adr = lurb->target_urb_adr;
-+    thunk_convert(argptr, &target_urb_adr, ptrvoid_arg_type, THUNK_TARGET);
-+    unlock_user(argptr, arg, target_size);
-+
-+    g_free(lurb);
-+    return ret;
-+}
-+
-+static abi_long
-+do_ioctl_usbdevfs_discardurb(const IOCTLEntry *ie,
-+                             uint8_t *buf_temp __attribute__((unused)),
-+                             int fd, int cmd, abi_long arg)
-+{
-+    struct live_urb *lurb;
-+
-+    /* map target address back to host URB with metadata. */
-+    lurb = urb_hashtable_lookup(arg);
-+    if (!lurb) {
-+        return -TARGET_EFAULT;
-+    }
-+    return get_errno(safe_ioctl(fd, ie->host_cmd, &lurb->host_urb));
-+}
-+
-+static abi_long
-+do_ioctl_usbdevfs_submiturb(const IOCTLEntry *ie, uint8_t *buf_temp,
-+                            int fd, int cmd, abi_long arg)
-+{
-+    const argtype *arg_type = ie->arg_type;
-+    int target_size;
-+    abi_long ret;
-+    void *argptr;
-+    int rw_dir;
-+    struct live_urb *lurb;
-+
-+    /*
-+     * each submitted URB needs to map to a unique ID for the
-+     * kernel, and that unique ID needs to be a pointer to
-+     * host memory.  hence, we need to malloc for each URB.
-+     * isochronous transfers have a variable length struct.
-+     */
-+    arg_type++;
-+    target_size = thunk_type_size(arg_type, THUNK_TARGET);
-+
-+    /* construct host copy of urb and metadata */
-+    lurb = g_try_malloc0(sizeof(struct live_urb));
-+    if (!lurb) {
-+        return -TARGET_ENOMEM;
-+    }
-+
-+    argptr = lock_user(VERIFY_READ, arg, target_size, 1);
-+    if (!argptr) {
-+        g_free(lurb);
-+        return -TARGET_EFAULT;
-+    }
-+    thunk_convert(&lurb->host_urb, argptr, arg_type, THUNK_HOST);
-+    unlock_user(argptr, arg, 0);
-+
-+    lurb->target_urb_adr = arg;
-+    lurb->target_buf_adr = (uintptr_t)lurb->host_urb.buffer;
-+
-+    /* buffer space used depends on endpoint type so lock the entire buffer */
-+    /* control type urbs should check the buffer contents for true direction */
-+    rw_dir = lurb->host_urb.endpoint & USB_DIR_IN ? VERIFY_WRITE : VERIFY_READ;
-+    lurb->target_buf_ptr = lock_user(rw_dir, lurb->target_buf_adr,
-+        lurb->host_urb.buffer_length, 1);
-+    if (lurb->target_buf_ptr == NULL) {
-+        g_free(lurb);
-+        return -TARGET_EFAULT;
-+    }
-+
-+    /* update buffer pointer in host copy */
-+    lurb->host_urb.buffer = lurb->target_buf_ptr;
-+
-+    ret = get_errno(safe_ioctl(fd, ie->host_cmd, &lurb->host_urb));
-+    if (is_error(ret)) {
-+        unlock_user(lurb->target_buf_ptr, lurb->target_buf_adr, 0);
-+        g_free(lurb);
-+    } else {
-+        urb_hashtable_insert(lurb);
-+    }
-+
-+    return ret;
-+}
-+#endif /* CONFIG_USBFS */
-+
- static abi_long do_ioctl_dm(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
-                             int cmd, abi_long arg)
- {
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 2daa5ebdcc..99bbce083c 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -870,6 +870,10 @@ struct target_pollfd {
- #define TARGET_USBDEVFS_SETINTERFACE TARGET_IORU('U', 4)
- #define TARGET_USBDEVFS_SETCONFIGURATION TARGET_IORU('U',  5)
- #define TARGET_USBDEVFS_GETDRIVER TARGET_IOWU('U', 8)
-+#define TARGET_USBDEVFS_SUBMITURB TARGET_IORU('U', 10)
-+#define TARGET_USBDEVFS_DISCARDURB TARGET_IO('U', 11)
-+#define TARGET_USBDEVFS_REAPURB TARGET_IOWU('U', 12)
-+#define TARGET_USBDEVFS_REAPURBNDELAY TARGET_IOWU('U', 13)
- #define TARGET_USBDEVFS_DISCSIGNAL TARGET_IORU('U', 14)
- #define TARGET_USBDEVFS_CLAIMINTERFACE TARGET_IORU('U', 15)
- #define TARGET_USBDEVFS_RELEASEINTERFACE TARGET_IORU('U', 16)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 6f64a8bdf7..b98a23b0f1 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -300,6 +300,26 @@ STRUCT(usbdevfs_connectinfo,
-         TYPE_INT, /* devnum */
-         TYPE_CHAR) /* slow */
- 
-+STRUCT(usbdevfs_iso_packet_desc,
-+        TYPE_INT, /* length */
-+        TYPE_INT, /* actual_length */
-+        TYPE_INT) /* status */
-+
-+STRUCT(usbdevfs_urb,
-+        TYPE_CHAR, /* type */
-+        TYPE_CHAR, /* endpoint */
-+        TYPE_INT, /* status */
-+        TYPE_INT, /* flags */
-+        TYPE_PTRVOID, /* buffer */
-+        TYPE_INT, /* buffer_length */
-+        TYPE_INT, /* actual_length */
-+        TYPE_INT, /* start_frame */
-+        TYPE_INT, /* union number_of_packets stream_id */
-+        TYPE_INT, /* error_count */
-+        TYPE_INT, /* signr */
-+        TYPE_PTRVOID, /* usercontext */
-+        MK_ARRAY(MK_STRUCT(STRUCT_usbdevfs_iso_packet_desc), 0)) /* desc */
-+
- STRUCT(usbdevfs_ioctl,
-         TYPE_INT, /* ifno */
-         TYPE_INT, /* ioctl_code */
--- 
-2.11.0
+>
+> >              return -1;
+> >          }
+> >      }
+> >
