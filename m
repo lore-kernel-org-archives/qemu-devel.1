@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9KW7-0000ZL-3x
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:39:31 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g9KWJ-0000ZM-DC
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9KOD-0000ck-EG
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:31:18 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g9KJc-0006Vi-4P
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:26:33 -0400
 References: <cover.1537367701.git.berto@igalia.com>
-	<8f8a151dae565027208268ed8d120e4612ef5f9f.1537367701.git.berto@igalia.com>
+	<f68a21f152eef2c51361539bdc6c8f5eefe6af61.1537367701.git.berto@igalia.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2e99d517-ae42-0692-fe6e-66de36f73c9d@redhat.com>
-Date: Mon, 8 Oct 2018 03:31:08 +0200
+Message-ID: <3e51a563-5793-8a07-f8d8-61eba631dd14@redhat.com>
+Date: Mon, 8 Oct 2018 03:26:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <8f8a151dae565027208268ed8d120e4612ef5f9f.1537367701.git.berto@igalia.com>
+In-Reply-To: <f68a21f152eef2c51361539bdc6c8f5eefe6af61.1537367701.git.berto@igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="8MLtdDq1JPcEB77Co6fEMJ3t8LTYT0Avx"
-Subject: Re: [Qemu-devel] [PATCH 08/14] block: Use
- bdrv_reopen_set_read_only() in external_snapshot_commit()
+	boundary="PpKiekmHoFETUiJdwK5tdfYZXu6v1OMNN"
+Subject: Re: [Qemu-devel] [PATCH 07/14] block: Use
+ bdrv_reopen_set_read_only() in qmp_change_backing_file()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +29,46 @@ To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8MLtdDq1JPcEB77Co6fEMJ3t8LTYT0Avx
+--PpKiekmHoFETUiJdwK5tdfYZXu6v1OMNN
 From: Max Reitz <mreitz@redhat.com>
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <2e99d517-ae42-0692-fe6e-66de36f73c9d@redhat.com>
-Subject: Re: [PATCH 08/14] block: Use bdrv_reopen_set_read_only() in
- external_snapshot_commit()
+Message-ID: <3e51a563-5793-8a07-f8d8-61eba631dd14@redhat.com>
+Subject: Re: [PATCH 07/14] block: Use bdrv_reopen_set_read_only() in
+ qmp_change_backing_file()
 References: <cover.1537367701.git.berto@igalia.com>
- <8f8a151dae565027208268ed8d120e4612ef5f9f.1537367701.git.berto@igalia.com>
-In-Reply-To: <8f8a151dae565027208268ed8d120e4612ef5f9f.1537367701.git.berto@igalia.com>
+ <f68a21f152eef2c51361539bdc6c8f5eefe6af61.1537367701.git.berto@igalia.com>
+In-Reply-To: <f68a21f152eef2c51361539bdc6c8f5eefe6af61.1537367701.git.berto@igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 19.09.18 16:47, Alberto Garcia wrote:
 > This patch replaces the bdrv_reopen() calls that set and remove the
 > BDRV_O_RDWR flag with the new bdrv_reopen_set_read_only() function.
-
-Ha!  Got you!  It's just one call this time, not "calls"! :-)
-
+>=20
 > Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  blockdev.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  blockdev.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---8MLtdDq1JPcEB77Co6fEMJ3t8LTYT0Avx
+--PpKiekmHoFETUiJdwK5tdfYZXu6v1OMNN
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu6s1wACgkQ9AfbAGHV
-z0BUXAgAxEkYjnEofd488cJ9W47imfX2X4Mvb0+25+TXci7Rvub9oiERHxqGYvYR
-Jtr8IqWM08CX/1zVUDHr0CWNuP3oPGsuc9DIINIMME2UQ4yBTmlmjt9kRMi28blu
-tCBRhtC7f1FoScgwt1+oz8COHN6UiXd/rf/I4yhRFBnPhcy0y8qE0IMeKEGGtzz8
-e3qeKoH2I3W4O6nhL84myFimvEdZQQrw8DzA1hrrIYVZzFYT23HD2Oi2rhMltUvt
-fuD9JCFpasEgOc1XahX5qJb45Q2T+VwbvQZLMO/qsI/2b909+dgHGTekXrO84u3f
-oLXHT1RHcGu07KH82aFRGEX9/Xh+9Q==
-=cQzU
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu6sjcACgkQ9AfbAGHV
+z0BSbQf+PL86DmH+kjk1nWq624RYT2FgcsG2vm9B4sUVrQKOC5B+9jGbf1Pcr8b3
+lEz9VdJr2thoKDzt2MzatD7uVWkDXPESsYYXXzA2ltpB6Yd8qMMkWleWBw7zxpvt
+kuwpy4D4me4wLilLJoIJyTKVdeWmzsYfu9FuauTl3wFRGu3UV3fatdRG1Ssx0Kji
+Ayl5AZYih3J5MndoEOaasRP1K7l8AOdxqStKLUvK0BduEQ3BNfVbft8Q/VWkCMNo
+XM9/koi1g5nNoG+392AU4dk4jbLdQukONOtgbACIFWv9T6X9Cz3e82N7UtQxrcOV
+BpvAbn5Zw2rNAinirEG66sj2ky7XBw==
+=paYl
 -----END PGP SIGNATURE-----
 
---8MLtdDq1JPcEB77Co6fEMJ3t8LTYT0Avx--
+--PpKiekmHoFETUiJdwK5tdfYZXu6v1OMNN--
