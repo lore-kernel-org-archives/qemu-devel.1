@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9Tsl-0001Zl-PL
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:39:28 -0400
+	(envelope-from <david@redhat.com>) id 1g9U17-00035p-Nf
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9Tsj-0002N5-VA
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:39:27 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46266)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g9Tsj-0002Mz-QV
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:39:25 -0400
-Received: by mail-ot1-x341.google.com with SMTP id o21so18978854otb.13
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 04:39:25 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1g9U14-0002Ml-Fe
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:48:05 -0400
+References: <20180926094219.20322-1-david@redhat.com>
+	<20180926094219.20322-19-david@redhat.com>
+	<20180927150141.60a6488a@redhat.com>
+	<dc5d7b2d-5b51-2c0b-aac7-ebf04a4e7859@redhat.com>
+	<20181001152443.2cca5c5e@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
+Date: Mon, 8 Oct 2018 13:47:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181007180518.5212-1-samuel.thibault@ens-lyon.org>
-References: <20181007180518.5212-1-samuel.thibault@ens-lyon.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Oct 2018 12:39:04 +0100
-Message-ID: <CAFEAcA8XSn_+8XorYCKQeiCidcgRDXwp0GH1OU0fJyr++gz1aA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] Slirp updates
+In-Reply-To: <20181001152443.2cca5c5e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-On 7 October 2018 at 19:05, Samuel Thibault
-<samuel.thibault@ens-lyon.org> wrote:
-> The following changes since commit 3c2d3042849686969add641bd38b08b9877b9e8f:
->
->   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios.for-upstream-20181005' into staging (2018-10-05 17:55:22 +0100)
->
-> are available in the Git repository at:
->
->   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
->
-> for you to fetch changes up to 93a972f8548571d35c718ca3a94d5ab1507b2443:
->
->   slirp: Propagate host TCP RST packet to the guest after socket disconnected (2018-10-07 19:50:48 +0200)
->
-> ----------------------------------------------------------------
-> slirp updates
->
-> Andrew Oates (1):
->   slirp: fix ICMP handling on macOS hosts
->
-> Gavin Grant (1):
->   slirp: Propagate host TCP RST packet to the guest after socket
->     disconnected
->
-> Peter Maydell (1):
->   slirp: document mbuf pointers and sizes
->
+> That way using [2] and [1 - modulo it should match only concrete type]
+> machine would be able to override hotplug handlers for TYPE_VIRTIO_PMEM_PCI
+> and explicitly call machine + pci hotplug handlers in necessary order.
+> 
+> flow would look like:
+>   [acpi|shcp|native pci-e eject]->  
+>        hotplug_ctrl = qdev_get_hotplug_handler(dev);
+>        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err); ->
+>             machine_unplug()
+>                machine_virtio_pci_pmem_cb(): 
+>                   // we now that's device has 2 stage hotplug handlers,
+>                   // so we can arrange hotplug sequence in necessary order
+>                   hotplug_ctrl2 = qdev_get_bus_hotplug_handler(dev);
+> 
+>                   //then do unplug in whatever order that's correct,
+>                   // I'd assume tear down/stop PCI device first, flushing
+>                   // command virtio command queues and that unplug memory itself.
+>                   hotplug_handler_unplug(hotplug_ctrl2, dev, &local_err);
+>                   memory_device_unplug()
+> 
 
-Applied, thanks.
+Looking into the details, this order is not possible. The unplug will
+essentially do a device_unparent() leading to the whole hierarchy
+getting destroyed. The memory_device part always has to come first.
 
--- PMM
+
+> Similar logic applies to device_add/device_del paths, with a difference that
+> origin point would be monitor/qmp.
+> 
+> Point is to have a single explicit callback chain that applies to a concrete
+> device type. That way if ever change an ordering of calling plug callbacks
+> in qdev core, the expected for a device callback sequence would still
+> remain in place ensuring that device (un)plugged as expected.
+> 
+> Also it should be easier to trace for a reader, than 2 disjoint callbacks of
+> composite device (which only know to author of that device and then only
+> till he/she remembers how that thing works).
+> 
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
