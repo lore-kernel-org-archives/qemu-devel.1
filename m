@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W5V-0001B8-9l
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:48 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W5R-00017T-0Q
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W5K-00076p-Qs
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:44 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W5J-00075I-Jq
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:40 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51692)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1g9W5K-0006uy-DE
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:34 -0400
+	id 1g9W5I-0006uy-PZ
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:33 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W5C-0003hv-J0
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:26 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W5D-0003i9-GT
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:27 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  8 Oct 2018 14:59:48 +0100
-Message-Id: <20181008140004.12612-18-peter.maydell@linaro.org>
+Date: Mon,  8 Oct 2018 14:59:49 +0100
+Message-Id: <20181008140004.12612-19-peter.maydell@linaro.org>
 In-Reply-To: <20181008140004.12612-1-peter.maydell@linaro.org>
 References: <20181008140004.12612-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/33] target/arm: Rewrite vector gather stores
+Subject: [Qemu-devel] [PULL 18/33] target/arm: Rewrite vector gather
+ first-fault loads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,377 +34,610 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-This fixes the endianness problem for softmmu, and moves
-the main loop out of a macro and into an inlined function.
+This implements the feature for softmmu, and moves the
+main loop out of a macro and into a function.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181005175350.30752-14-richard.henderson@linaro.org
+Message-id: 20181005175350.30752-15-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper-sve.h    |  52 ++++++++++----
- target/arm/sve_helper.c    | 139 ++++++++++++++++++++++++-------------
- target/arm/translate-sve.c |  74 +++++++++++++-------
- 3 files changed, 177 insertions(+), 88 deletions(-)
+ target/arm/helper-sve.h    |  84 ++++++++---
+ target/arm/sve_helper.c    | 290 +++++++++++++++++++++++++++----------
+ target/arm/translate-sve.c |  84 +++++------
+ 3 files changed, 321 insertions(+), 137 deletions(-)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 49d1c09e30c..6b9b93af45e 100644
+index 6b9b93af45e..9e79182ab46 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -1468,41 +1468,67 @@ DEF_HELPER_FLAGS_6(sve_ldffsds_zd, TCG_CALL_NO_WG,
+@@ -1401,69 +1401,111 @@ DEF_HELPER_FLAGS_6(sve_ldsds_be_zd, TCG_CALL_NO_WG,
+ 
+ DEF_HELPER_FLAGS_6(sve_ldffbsu_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhsu_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhsu_le_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffssu_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhsu_be_zsu, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffss_le_zsu, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffss_be_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ DEF_HELPER_FLAGS_6(sve_ldffbss_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhss_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhss_le_zsu, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffhss_be_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ 
+ DEF_HELPER_FLAGS_6(sve_ldffbsu_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhsu_zss, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhsu_le_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffssu_zss, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhsu_be_zss, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffss_le_zss, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffss_be_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ DEF_HELPER_FLAGS_6(sve_ldffbss_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhss_zss, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhss_le_zss, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffhss_be_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ 
+ DEF_HELPER_FLAGS_6(sve_ldffbdu_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhdu_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhdu_le_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffsdu_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhdu_be_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffddu_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffsdu_le_zsu, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsdu_be_zsu, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffdd_le_zsu, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffdd_be_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ DEF_HELPER_FLAGS_6(sve_ldffbds_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhds_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhds_le_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffsds_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhds_be_zsu, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsds_le_zsu, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsds_be_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ 
+ DEF_HELPER_FLAGS_6(sve_ldffbdu_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhdu_zss, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhdu_le_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffsdu_zss, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhdu_be_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffddu_zss, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffsdu_le_zss, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsdu_be_zss, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffdd_le_zss, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffdd_be_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ DEF_HELPER_FLAGS_6(sve_ldffbds_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhds_zss, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhds_le_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffsds_zss, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhds_be_zss, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsds_le_zss, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsds_be_zss, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ 
+ DEF_HELPER_FLAGS_6(sve_ldffbdu_zd, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhdu_zd, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhdu_le_zd, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffsdu_zd, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhdu_be_zd, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffddu_zd, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffsdu_le_zd, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsdu_be_zd, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffdd_le_zd, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffdd_be_zd, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ DEF_HELPER_FLAGS_6(sve_ldffbds_zd, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffhds_zd, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhds_le_zd, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+-DEF_HELPER_FLAGS_6(sve_ldffsds_zd, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_ldffhds_be_zd, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsds_le_zd, TCG_CALL_NO_WG,
++                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_ldffsds_be_zd, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
  
  DEF_HELPER_FLAGS_6(sve_stbs_zsu, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_sths_zsu, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sths_le_zsu, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_stss_zsu, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sths_be_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stss_le_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stss_be_zsu, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
- 
- DEF_HELPER_FLAGS_6(sve_stbs_zss, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_sths_zss, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sths_le_zss, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_stss_zss, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sths_be_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stss_le_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stss_be_zss, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
- 
- DEF_HELPER_FLAGS_6(sve_stbd_zsu, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_sthd_zsu, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sthd_le_zsu, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_stsd_zsu, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sthd_be_zsu, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_stdd_zsu, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_stsd_le_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stsd_be_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stdd_le_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stdd_be_zsu, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
- 
- DEF_HELPER_FLAGS_6(sve_stbd_zss, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_sthd_zss, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sthd_le_zss, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_stsd_zss, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sthd_be_zss, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_stdd_zss, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_stsd_le_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stsd_be_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stdd_le_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stdd_be_zss, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
- 
- DEF_HELPER_FLAGS_6(sve_stbd_zd, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_sthd_zd, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sthd_le_zd, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_stsd_zd, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_sthd_be_zd, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
--DEF_HELPER_FLAGS_6(sve_stdd_zd, TCG_CALL_NO_WG,
-+DEF_HELPER_FLAGS_6(sve_stsd_le_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stsd_be_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stdd_le_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_stdd_be_zd, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index c225cd04881..a95e445b226 100644
+index a95e445b226..7756c0b0989 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -5136,61 +5136,100 @@ DO_LDFF1_ZPZ_D(sve_ldffsds_zd, uint64_t, int32_t,  cpu_ldl_data_ra)
+@@ -5048,91 +5048,233 @@ DO_LD1_ZPZ_D(dd_be, zd)
  
- /* Stores with a vector index.  */
+ /* First fault loads with a vector index.  */
  
--#define DO_ST1_ZPZ_S(NAME, TYPEI, FN)                                   \
+-#ifdef CONFIG_USER_ONLY
++/* Load one element into VD+REG_OFF from (ENV,VADDR) without faulting.
++ * The controlling predicate is known to be true.  Return true if the
++ * load was successful.
++ */
++typedef bool sve_ld1_nf_fn(CPUARMState *env, void *vd, intptr_t reg_off,
++                           target_ulong vaddr, int mmu_idx);
+ 
+-#define DO_LDFF1_ZPZ(NAME, TYPEE, TYPEI, TYPEM, FN, H)                  \
 -void HELPER(NAME)(CPUARMState *env, void *vd, void *vg, void *vm,       \
 -                  target_ulong base, uint32_t desc)                     \
 -{                                                                       \
 -    intptr_t i, oprsz = simd_oprsz(desc);                               \
 -    unsigned scale = simd_data(desc);                                   \
 -    uintptr_t ra = GETPC();                                             \
+-    bool first = true;                                                  \
+-    mmap_lock();                                                        \
 -    for (i = 0; i < oprsz; ) {                                          \
 -        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));                 \
 -        do {                                                            \
--            if (likely(pg & 1)) {                                       \
--                target_ulong off = *(TYPEI *)(vm + H1_4(i));            \
--                uint32_t d = *(uint32_t *)(vd + H1_4(i));               \
--                FN(env, base + (off << scale), d, ra);                  \
+-            TYPEM m = 0;                                                \
+-            if (pg & 1) {                                               \
+-                target_ulong off = *(TYPEI *)(vm + H(i));               \
+-                target_ulong addr = base + (off << scale);              \
+-                if (!first &&                                           \
+-                    page_check_range(addr, sizeof(TYPEM), PAGE_READ)) { \
+-                    record_fault(env, i, oprsz);                        \
+-                    goto exit;                                          \
+-                }                                                       \
+-                m = FN(env, addr, ra);                                  \
+-                first = false;                                          \
 -            }                                                           \
--            i += sizeof(uint32_t), pg >>= sizeof(uint32_t);             \
+-            *(TYPEE *)(vd + H(i)) = m;                                  \
+-            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);                   \
 -        } while (i & 15);                                               \
 -    }                                                                   \
-+static void sve_st1_zs(CPUARMState *env, void *vd, void *vg, void *vm,
-+                       target_ulong base, uint32_t desc, uintptr_t ra,
-+                       zreg_off_fn *off_fn, sve_ld1_tlb_fn *tlb_fn)
-+{
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+    unsigned scale = simd_data(desc);
-+
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (likely(pg & 1)) {
-+                target_ulong off = off_fn(vm, i);
-+                tlb_fn(env, vd, i, base + (off << scale), mmu_idx, ra);
-+            }
-+            i += 4, pg >>= 4;
-+        } while (i & 15);
-+    }
-+    set_helper_retaddr(0);
+- exit:                                                                  \
+-    mmap_unlock();                                                      \
++#ifdef CONFIG_SOFTMMU
++#define DO_LD_NF(NAME, H, TYPEE, TYPEM, HOST) \
++static bool sve_ld##NAME##_nf(CPUARMState *env, void *vd, intptr_t reg_off, \
++                            target_ulong addr, int mmu_idx)                 \
++{                                                                           \
++    target_ulong next_page = -(addr | TARGET_PAGE_MASK);                    \
++    if (likely(next_page - addr >= sizeof(TYPEM))) {                        \
++        void *host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD, mmu_idx);  \
++        if (likely(host)) {                                                 \
++            TYPEM val = HOST(host);                                         \
++            *(TYPEE *)(vd + H(reg_off)) = val;                              \
++            return true;                                                    \
++        }                                                                   \
++    }                                                                       \
++    return false;                                                           \
  }
- 
--#define DO_ST1_ZPZ_D(NAME, TYPEI, FN)                                   \
+-
+ #else
+-
+-#define DO_LDFF1_ZPZ(NAME, TYPEE, TYPEI, TYPEM, FN, H)                  \
 -void HELPER(NAME)(CPUARMState *env, void *vd, void *vg, void *vm,       \
 -                  target_ulong base, uint32_t desc)                     \
 -{                                                                       \
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;                           \
--    unsigned scale = simd_data(desc);                                   \
--    uintptr_t ra = GETPC();                                             \
--    uint64_t *d = vd, *m = vm; uint8_t *pg = vg;                        \
--    for (i = 0; i < oprsz; i++) {                                       \
--        if (likely(pg[H1(i)] & 1)) {                                    \
--            target_ulong off = (target_ulong)(TYPEI)m[i] << scale;      \
--            FN(env, base + off, d[i], ra);                              \
--        }                                                               \
--    }                                                                   \
-+static void sve_st1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
-+                       target_ulong base, uint32_t desc, uintptr_t ra,
-+                       zreg_off_fn *off_fn, sve_ld1_tlb_fn *tlb_fn)
+-    g_assert_not_reached();                                             \
++#define DO_LD_NF(NAME, H, TYPEE, TYPEM, HOST) \
++static bool sve_ld##NAME##_nf(CPUARMState *env, void *vd, intptr_t reg_off, \
++                            target_ulong addr, int mmu_idx)                 \
++{                                                                           \
++    if (likely(page_check_range(addr, sizeof(TYPEM), PAGE_READ))) {         \
++        TYPEM val = HOST(g2h(addr));                                        \
++        *(TYPEE *)(vd + H(reg_off)) = val;                                  \
++        return true;                                                        \
++    }                                                                       \
++    return false;                                                           \
+ }
+-
+ #endif
+ 
+-#define DO_LDFF1_ZPZ_S(NAME, TYPEI, TYPEM, FN) \
+-    DO_LDFF1_ZPZ(NAME, uint32_t, TYPEI, TYPEM, FN, H1_4)
+-#define DO_LDFF1_ZPZ_D(NAME, TYPEI, TYPEM, FN) \
+-    DO_LDFF1_ZPZ(NAME, uint64_t, TYPEI, TYPEM, FN, )
++DO_LD_NF(bsu, H1_4, uint32_t, uint8_t, ldub_p)
++DO_LD_NF(bss, H1_4, uint32_t,  int8_t, ldsb_p)
++DO_LD_NF(bdu,     , uint64_t, uint8_t, ldub_p)
++DO_LD_NF(bds,     , uint64_t,  int8_t, ldsb_p)
+ 
+-DO_LDFF1_ZPZ_S(sve_ldffbsu_zsu, uint32_t, uint8_t,  cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_S(sve_ldffhsu_zsu, uint32_t, uint16_t, cpu_lduw_data_ra)
+-DO_LDFF1_ZPZ_S(sve_ldffssu_zsu, uint32_t, uint32_t, cpu_ldl_data_ra)
+-DO_LDFF1_ZPZ_S(sve_ldffbss_zsu, uint32_t, int8_t,   cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_S(sve_ldffhss_zsu, uint32_t, int16_t,  cpu_lduw_data_ra)
++DO_LD_NF(hsu_le, H1_4, uint32_t, uint16_t, lduw_le_p)
++DO_LD_NF(hss_le, H1_4, uint32_t,  int16_t, ldsw_le_p)
++DO_LD_NF(hsu_be, H1_4, uint32_t, uint16_t, lduw_be_p)
++DO_LD_NF(hss_be, H1_4, uint32_t,  int16_t, ldsw_be_p)
++DO_LD_NF(hdu_le,     , uint64_t, uint16_t, lduw_le_p)
++DO_LD_NF(hds_le,     , uint64_t,  int16_t, ldsw_le_p)
++DO_LD_NF(hdu_be,     , uint64_t, uint16_t, lduw_be_p)
++DO_LD_NF(hds_be,     , uint64_t,  int16_t, ldsw_be_p)
+ 
+-DO_LDFF1_ZPZ_S(sve_ldffbsu_zss, int32_t, uint8_t,  cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_S(sve_ldffhsu_zss, int32_t, uint16_t, cpu_lduw_data_ra)
+-DO_LDFF1_ZPZ_S(sve_ldffssu_zss, int32_t, uint32_t, cpu_ldl_data_ra)
+-DO_LDFF1_ZPZ_S(sve_ldffbss_zss, int32_t, int8_t,   cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_S(sve_ldffhss_zss, int32_t, int16_t,  cpu_lduw_data_ra)
++DO_LD_NF(ss_le,  H1_4, uint32_t, uint32_t, ldl_le_p)
++DO_LD_NF(ss_be,  H1_4, uint32_t, uint32_t, ldl_be_p)
++DO_LD_NF(sdu_le,     , uint64_t, uint32_t, ldl_le_p)
++DO_LD_NF(sds_le,     , uint64_t,  int32_t, ldl_le_p)
++DO_LD_NF(sdu_be,     , uint64_t, uint32_t, ldl_be_p)
++DO_LD_NF(sds_be,     , uint64_t,  int32_t, ldl_be_p)
+ 
+-DO_LDFF1_ZPZ_D(sve_ldffbdu_zsu, uint32_t, uint8_t,  cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffhdu_zsu, uint32_t, uint16_t, cpu_lduw_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffsdu_zsu, uint32_t, uint32_t, cpu_ldl_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffddu_zsu, uint32_t, uint64_t, cpu_ldq_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffbds_zsu, uint32_t, int8_t,   cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffhds_zsu, uint32_t, int16_t,  cpu_lduw_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffsds_zsu, uint32_t, int32_t,  cpu_ldl_data_ra)
++DO_LD_NF(dd_le,      , uint64_t, uint64_t, ldq_le_p)
++DO_LD_NF(dd_be,      , uint64_t, uint64_t, ldq_be_p)
+ 
+-DO_LDFF1_ZPZ_D(sve_ldffbdu_zss, int32_t, uint8_t,  cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffhdu_zss, int32_t, uint16_t, cpu_lduw_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffsdu_zss, int32_t, uint32_t, cpu_ldl_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffddu_zss, int32_t, uint64_t, cpu_ldq_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffbds_zss, int32_t, int8_t,   cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffhds_zss, int32_t, int16_t,  cpu_lduw_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffsds_zss, int32_t, int32_t,  cpu_ldl_data_ra)
++/*
++ * Common helper for all gather first-faulting loads.
++ */
++static inline void sve_ldff1_zs(CPUARMState *env, void *vd, void *vg, void *vm,
++                                target_ulong base, uint32_t desc, uintptr_t ra,
++                                zreg_off_fn *off_fn, sve_ld1_tlb_fn *tlb_fn,
++                                sve_ld1_nf_fn *nonfault_fn)
 +{
 +    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc) / 8;
++    intptr_t reg_off, reg_max = simd_oprsz(desc);
 +    unsigned scale = simd_data(desc);
++    target_ulong addr;
+ 
+-DO_LDFF1_ZPZ_D(sve_ldffbdu_zd, uint64_t, uint8_t,  cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffhdu_zd, uint64_t, uint16_t, cpu_lduw_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffsdu_zd, uint64_t, uint32_t, cpu_ldl_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffddu_zd, uint64_t, uint64_t, cpu_ldq_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffbds_zd, uint64_t, int8_t,   cpu_ldub_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffhds_zd, uint64_t, int16_t,  cpu_lduw_data_ra)
+-DO_LDFF1_ZPZ_D(sve_ldffsds_zd, uint64_t, int32_t,  cpu_ldl_data_ra)
++    /* Skip to the first true predicate.  */
++    reg_off = find_next_active(vg, 0, reg_max, MO_32);
++    if (likely(reg_off < reg_max)) {
++        /* Perform one normal read, which will fault or not.  */
++        set_helper_retaddr(ra);
++        addr = off_fn(vm, reg_off);
++        addr = base + (addr << scale);
++        tlb_fn(env, vd, reg_off, addr, mmu_idx, ra);
 +
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; i++) {
-+        uint8_t pg = *(uint8_t *)(vg + H1(i));
-+        if (likely(pg & 1)) {
-+            target_ulong off = off_fn(vm, i * 8);
-+            tlb_fn(env, vd, i * 8, base + (off << scale), mmu_idx, ra);
++        /* The rest of the reads will be non-faulting.  */
++        set_helper_retaddr(0);
++    }
++
++    /* After any fault, zero the leading predicated false elements.  */
++    swap_memzero(vd, reg_off);
++
++    while (likely((reg_off += 4) < reg_max)) {
++        uint64_t pg = *(uint64_t *)(vg + (reg_off >> 6) * 8);
++        if (likely((pg >> (reg_off & 63)) & 1)) {
++            addr = off_fn(vm, reg_off);
++            addr = base + (addr << scale);
++            if (!nonfault_fn(env, vd, reg_off, addr, mmu_idx)) {
++                record_fault(env, reg_off, reg_max);
++                break;
++            }
++        } else {
++            *(uint32_t *)(vd + H1_4(reg_off)) = 0;
 +        }
 +    }
-+    set_helper_retaddr(0);
- }
- 
--DO_ST1_ZPZ_S(sve_stbs_zsu, uint32_t, cpu_stb_data_ra)
--DO_ST1_ZPZ_S(sve_sths_zsu, uint32_t, cpu_stw_data_ra)
--DO_ST1_ZPZ_S(sve_stss_zsu, uint32_t, cpu_stl_data_ra)
-+#define DO_ST1_ZPZ_S(MEM, OFS) \
-+void __attribute__((flatten)) HELPER(sve_st##MEM##_##OFS)    \
-+    (CPUARMState *env, void *vd, void *vg, void *vm,         \
-+     target_ulong base, uint32_t desc)                       \
-+{                                                            \
-+    sve_st1_zs(env, vd, vg, vm, base, desc, GETPC(),         \
-+              off_##OFS##_s, sve_st1##MEM##_tlb);            \
 +}
- 
--DO_ST1_ZPZ_S(sve_stbs_zss, int32_t, cpu_stb_data_ra)
--DO_ST1_ZPZ_S(sve_sths_zss, int32_t, cpu_stw_data_ra)
--DO_ST1_ZPZ_S(sve_stss_zss, int32_t, cpu_stl_data_ra)
-+#define DO_ST1_ZPZ_D(MEM, OFS) \
-+void __attribute__((flatten)) HELPER(sve_st##MEM##_##OFS)    \
-+    (CPUARMState *env, void *vd, void *vg, void *vm,         \
-+     target_ulong base, uint32_t desc)                       \
-+{                                                            \
-+    sve_st1_zd(env, vd, vg, vm, base, desc, GETPC(),         \
-+               off_##OFS##_d, sve_st1##MEM##_tlb);           \
++
++static inline void sve_ldff1_zd(CPUARMState *env, void *vd, void *vg, void *vm,
++                                target_ulong base, uint32_t desc, uintptr_t ra,
++                                zreg_off_fn *off_fn, sve_ld1_tlb_fn *tlb_fn,
++                                sve_ld1_nf_fn *nonfault_fn)
++{
++    const int mmu_idx = cpu_mmu_index(env, false);
++    intptr_t reg_off, reg_max = simd_oprsz(desc);
++    unsigned scale = simd_data(desc);
++    target_ulong addr;
++
++    /* Skip to the first true predicate.  */
++    reg_off = find_next_active(vg, 0, reg_max, MO_64);
++    if (likely(reg_off < reg_max)) {
++        /* Perform one normal read, which will fault or not.  */
++        set_helper_retaddr(ra);
++        addr = off_fn(vm, reg_off);
++        addr = base + (addr << scale);
++        tlb_fn(env, vd, reg_off, addr, mmu_idx, ra);
++
++        /* The rest of the reads will be non-faulting.  */
++        set_helper_retaddr(0);
++    }
++
++    /* After any fault, zero the leading predicated false elements.  */
++    swap_memzero(vd, reg_off);
++
++    while (likely((reg_off += 8) < reg_max)) {
++        uint8_t pg = *(uint8_t *)(vg + H1(reg_off >> 3));
++        if (likely(pg & 1)) {
++            addr = off_fn(vm, reg_off);
++            addr = base + (addr << scale);
++            if (!nonfault_fn(env, vd, reg_off, addr, mmu_idx)) {
++                record_fault(env, reg_off, reg_max);
++                break;
++            }
++        } else {
++            *(uint64_t *)(vd + reg_off) = 0;
++        }
++    }
 +}
- 
--DO_ST1_ZPZ_D(sve_stbd_zsu, uint32_t, cpu_stb_data_ra)
--DO_ST1_ZPZ_D(sve_sthd_zsu, uint32_t, cpu_stw_data_ra)
--DO_ST1_ZPZ_D(sve_stsd_zsu, uint32_t, cpu_stl_data_ra)
--DO_ST1_ZPZ_D(sve_stdd_zsu, uint32_t, cpu_stq_data_ra)
-+DO_ST1_ZPZ_S(bs, zsu)
-+DO_ST1_ZPZ_S(hs_le, zsu)
-+DO_ST1_ZPZ_S(hs_be, zsu)
-+DO_ST1_ZPZ_S(ss_le, zsu)
-+DO_ST1_ZPZ_S(ss_be, zsu)
- 
--DO_ST1_ZPZ_D(sve_stbd_zss, int32_t, cpu_stb_data_ra)
--DO_ST1_ZPZ_D(sve_sthd_zss, int32_t, cpu_stw_data_ra)
--DO_ST1_ZPZ_D(sve_stsd_zss, int32_t, cpu_stl_data_ra)
--DO_ST1_ZPZ_D(sve_stdd_zss, int32_t, cpu_stq_data_ra)
-+DO_ST1_ZPZ_S(bs, zss)
-+DO_ST1_ZPZ_S(hs_le, zss)
-+DO_ST1_ZPZ_S(hs_be, zss)
-+DO_ST1_ZPZ_S(ss_le, zss)
-+DO_ST1_ZPZ_S(ss_be, zss)
- 
--DO_ST1_ZPZ_D(sve_stbd_zd, uint64_t, cpu_stb_data_ra)
--DO_ST1_ZPZ_D(sve_sthd_zd, uint64_t, cpu_stw_data_ra)
--DO_ST1_ZPZ_D(sve_stsd_zd, uint64_t, cpu_stl_data_ra)
--DO_ST1_ZPZ_D(sve_stdd_zd, uint64_t, cpu_stq_data_ra)
-+DO_ST1_ZPZ_D(bd, zsu)
-+DO_ST1_ZPZ_D(hd_le, zsu)
-+DO_ST1_ZPZ_D(hd_be, zsu)
-+DO_ST1_ZPZ_D(sd_le, zsu)
-+DO_ST1_ZPZ_D(sd_be, zsu)
-+DO_ST1_ZPZ_D(dd_le, zsu)
-+DO_ST1_ZPZ_D(dd_be, zsu)
 +
-+DO_ST1_ZPZ_D(bd, zss)
-+DO_ST1_ZPZ_D(hd_le, zss)
-+DO_ST1_ZPZ_D(hd_be, zss)
-+DO_ST1_ZPZ_D(sd_le, zss)
-+DO_ST1_ZPZ_D(sd_be, zss)
-+DO_ST1_ZPZ_D(dd_le, zss)
-+DO_ST1_ZPZ_D(dd_be, zss)
++#define DO_LDFF1_ZPZ_S(MEM, OFS) \
++void HELPER(sve_ldff##MEM##_##OFS)                                      \
++    (CPUARMState *env, void *vd, void *vg, void *vm,                    \
++     target_ulong base, uint32_t desc)                                  \
++{                                                                       \
++    sve_ldff1_zs(env, vd, vg, vm, base, desc, GETPC(),                  \
++                 off_##OFS##_s, sve_ld1##MEM##_tlb, sve_ld##MEM##_nf);  \
++}
 +
-+DO_ST1_ZPZ_D(bd, zd)
-+DO_ST1_ZPZ_D(hd_le, zd)
-+DO_ST1_ZPZ_D(hd_be, zd)
-+DO_ST1_ZPZ_D(sd_le, zd)
-+DO_ST1_ZPZ_D(sd_be, zd)
-+DO_ST1_ZPZ_D(dd_le, zd)
-+DO_ST1_ZPZ_D(dd_be, zd)
++#define DO_LDFF1_ZPZ_D(MEM, OFS) \
++void HELPER(sve_ldff##MEM##_##OFS)                                      \
++    (CPUARMState *env, void *vd, void *vg, void *vm,                    \
++     target_ulong base, uint32_t desc)                                  \
++{                                                                       \
++    sve_ldff1_zd(env, vd, vg, vm, base, desc, GETPC(),                  \
++                 off_##OFS##_d, sve_ld1##MEM##_tlb, sve_ld##MEM##_nf);  \
++}
 +
-+#undef DO_ST1_ZPZ_S
-+#undef DO_ST1_ZPZ_D
++DO_LDFF1_ZPZ_S(bsu, zsu)
++DO_LDFF1_ZPZ_S(bsu, zss)
++DO_LDFF1_ZPZ_D(bdu, zsu)
++DO_LDFF1_ZPZ_D(bdu, zss)
++DO_LDFF1_ZPZ_D(bdu, zd)
++
++DO_LDFF1_ZPZ_S(bss, zsu)
++DO_LDFF1_ZPZ_S(bss, zss)
++DO_LDFF1_ZPZ_D(bds, zsu)
++DO_LDFF1_ZPZ_D(bds, zss)
++DO_LDFF1_ZPZ_D(bds, zd)
++
++DO_LDFF1_ZPZ_S(hsu_le, zsu)
++DO_LDFF1_ZPZ_S(hsu_le, zss)
++DO_LDFF1_ZPZ_D(hdu_le, zsu)
++DO_LDFF1_ZPZ_D(hdu_le, zss)
++DO_LDFF1_ZPZ_D(hdu_le, zd)
++
++DO_LDFF1_ZPZ_S(hsu_be, zsu)
++DO_LDFF1_ZPZ_S(hsu_be, zss)
++DO_LDFF1_ZPZ_D(hdu_be, zsu)
++DO_LDFF1_ZPZ_D(hdu_be, zss)
++DO_LDFF1_ZPZ_D(hdu_be, zd)
++
++DO_LDFF1_ZPZ_S(hss_le, zsu)
++DO_LDFF1_ZPZ_S(hss_le, zss)
++DO_LDFF1_ZPZ_D(hds_le, zsu)
++DO_LDFF1_ZPZ_D(hds_le, zss)
++DO_LDFF1_ZPZ_D(hds_le, zd)
++
++DO_LDFF1_ZPZ_S(hss_be, zsu)
++DO_LDFF1_ZPZ_S(hss_be, zss)
++DO_LDFF1_ZPZ_D(hds_be, zsu)
++DO_LDFF1_ZPZ_D(hds_be, zss)
++DO_LDFF1_ZPZ_D(hds_be, zd)
++
++DO_LDFF1_ZPZ_S(ss_le,  zsu)
++DO_LDFF1_ZPZ_S(ss_le,  zss)
++DO_LDFF1_ZPZ_D(sdu_le, zsu)
++DO_LDFF1_ZPZ_D(sdu_le, zss)
++DO_LDFF1_ZPZ_D(sdu_le, zd)
++
++DO_LDFF1_ZPZ_S(ss_be,  zsu)
++DO_LDFF1_ZPZ_S(ss_be,  zss)
++DO_LDFF1_ZPZ_D(sdu_be, zsu)
++DO_LDFF1_ZPZ_D(sdu_be, zss)
++DO_LDFF1_ZPZ_D(sdu_be, zd)
++
++DO_LDFF1_ZPZ_D(sds_le, zsu)
++DO_LDFF1_ZPZ_D(sds_le, zss)
++DO_LDFF1_ZPZ_D(sds_le, zd)
++
++DO_LDFF1_ZPZ_D(sds_be, zsu)
++DO_LDFF1_ZPZ_D(sds_be, zss)
++DO_LDFF1_ZPZ_D(sds_be, zd)
++
++DO_LDFF1_ZPZ_D(dd_le, zsu)
++DO_LDFF1_ZPZ_D(dd_le, zss)
++DO_LDFF1_ZPZ_D(dd_le, zd)
++
++DO_LDFF1_ZPZ_D(dd_be, zsu)
++DO_LDFF1_ZPZ_D(dd_be, zss)
++DO_LDFF1_ZPZ_D(dd_be, zd)
+ 
+ /* Stores with a vector index.  */
+ 
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index f68b77c5163..86aeec1ca90 100644
+index 86aeec1ca90..888a968ddc5 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -5299,35 +5299,58 @@ static bool trans_LD1_zpiz(DisasContext *s, arg_LD1_zpiz *a, uint32_t insn)
-     return true;
- }
+@@ -5095,17 +5095,17 @@ static gen_helper_gvec_mem_scatter * const gather_load_fn32[2][2][2][2][3] = {
  
--/* Indexed by [xs][msz].  */
--static gen_helper_gvec_mem_scatter * const scatter_store_fn32[2][3] = {
--    { gen_helper_sve_stbs_zsu,
--      gen_helper_sve_sths_zsu,
--      gen_helper_sve_stss_zsu, },
--    { gen_helper_sve_stbs_zss,
--      gen_helper_sve_sths_zss,
--      gen_helper_sve_stss_zss, },
-+/* Indexed by [be][xs][msz].  */
-+static gen_helper_gvec_mem_scatter * const scatter_store_fn32[2][2][3] = {
-+    /* Little-endian */
-+    { { gen_helper_sve_stbs_zsu,
-+        gen_helper_sve_sths_le_zsu,
-+        gen_helper_sve_stss_le_zsu, },
-+      { gen_helper_sve_stbs_zss,
-+        gen_helper_sve_sths_le_zss,
-+        gen_helper_sve_stss_le_zss, } },
-+    /* Big-endian */
-+    { { gen_helper_sve_stbs_zsu,
-+        gen_helper_sve_sths_be_zsu,
-+        gen_helper_sve_stss_be_zsu, },
-+      { gen_helper_sve_stbs_zss,
-+        gen_helper_sve_sths_be_zss,
-+        gen_helper_sve_stss_be_zss, } },
+       /* First-fault */
+       { { { gen_helper_sve_ldffbss_zsu,
+-            gen_helper_sve_ldffhss_zsu,
++            gen_helper_sve_ldffhss_le_zsu,
+             NULL, },
+           { gen_helper_sve_ldffbsu_zsu,
+-            gen_helper_sve_ldffhsu_zsu,
+-            gen_helper_sve_ldffssu_zsu, } },
++            gen_helper_sve_ldffhsu_le_zsu,
++            gen_helper_sve_ldffss_le_zsu, } },
+         { { gen_helper_sve_ldffbss_zss,
+-            gen_helper_sve_ldffhss_zss,
++            gen_helper_sve_ldffhss_le_zss,
+             NULL, },
+           { gen_helper_sve_ldffbsu_zss,
+-            gen_helper_sve_ldffhsu_zss,
+-            gen_helper_sve_ldffssu_zss, } } } },
++            gen_helper_sve_ldffhsu_le_zss,
++            gen_helper_sve_ldffss_le_zss, } } } },
+ 
+     /* Big-endian */
+     { { { { gen_helper_sve_ldbss_zsu,
+@@ -5123,17 +5123,17 @@ static gen_helper_gvec_mem_scatter * const gather_load_fn32[2][2][2][2][3] = {
+ 
+       /* First-fault */
+       { { { gen_helper_sve_ldffbss_zsu,
+-            gen_helper_sve_ldffhss_zsu,
++            gen_helper_sve_ldffhss_be_zsu,
+             NULL, },
+           { gen_helper_sve_ldffbsu_zsu,
+-            gen_helper_sve_ldffhsu_zsu,
+-            gen_helper_sve_ldffssu_zsu, } },
++            gen_helper_sve_ldffhsu_be_zsu,
++            gen_helper_sve_ldffss_be_zsu, } },
+         { { gen_helper_sve_ldffbss_zss,
+-            gen_helper_sve_ldffhss_zss,
++            gen_helper_sve_ldffhss_be_zss,
+             NULL, },
+           { gen_helper_sve_ldffbsu_zss,
+-            gen_helper_sve_ldffhsu_zss,
+-            gen_helper_sve_ldffssu_zss, } } } },
++            gen_helper_sve_ldffhsu_be_zss,
++            gen_helper_sve_ldffss_be_zss, } } } },
  };
  
  /* Note that we overload xs=2 to indicate 64-bit offset.  */
--static gen_helper_gvec_mem_scatter * const scatter_store_fn64[3][4] = {
--    { gen_helper_sve_stbd_zsu,
--      gen_helper_sve_sthd_zsu,
--      gen_helper_sve_stsd_zsu,
--      gen_helper_sve_stdd_zsu, },
--    { gen_helper_sve_stbd_zss,
--      gen_helper_sve_sthd_zss,
--      gen_helper_sve_stsd_zss,
--      gen_helper_sve_stdd_zss, },
--    { gen_helper_sve_stbd_zd,
--      gen_helper_sve_sthd_zd,
--      gen_helper_sve_stsd_zd,
--      gen_helper_sve_stdd_zd, },
-+static gen_helper_gvec_mem_scatter * const scatter_store_fn64[2][3][4] = {
-+    /* Little-endian */
-+    { { gen_helper_sve_stbd_zsu,
-+        gen_helper_sve_sthd_le_zsu,
-+        gen_helper_sve_stsd_le_zsu,
-+        gen_helper_sve_stdd_le_zsu, },
-+      { gen_helper_sve_stbd_zss,
-+        gen_helper_sve_sthd_le_zss,
-+        gen_helper_sve_stsd_le_zss,
-+        gen_helper_sve_stdd_le_zss, },
-+      { gen_helper_sve_stbd_zd,
-+        gen_helper_sve_sthd_le_zd,
-+        gen_helper_sve_stsd_le_zd,
-+        gen_helper_sve_stdd_le_zd, } },
-+    /* Big-endian */
-+    { { gen_helper_sve_stbd_zsu,
-+        gen_helper_sve_sthd_be_zsu,
-+        gen_helper_sve_stsd_be_zsu,
-+        gen_helper_sve_stdd_be_zsu, },
-+      { gen_helper_sve_stbd_zss,
-+        gen_helper_sve_sthd_be_zss,
-+        gen_helper_sve_stsd_be_zss,
-+        gen_helper_sve_stdd_be_zss, },
-+      { gen_helper_sve_stbd_zd,
-+        gen_helper_sve_sthd_be_zd,
-+        gen_helper_sve_stsd_be_zd,
-+        gen_helper_sve_stdd_be_zd, } },
+@@ -5166,29 +5166,29 @@ static gen_helper_gvec_mem_scatter * const gather_load_fn64[2][2][3][2][4] = {
+ 
+       /* First-fault */
+       { { { gen_helper_sve_ldffbds_zsu,
+-            gen_helper_sve_ldffhds_zsu,
+-            gen_helper_sve_ldffsds_zsu,
++            gen_helper_sve_ldffhds_le_zsu,
++            gen_helper_sve_ldffsds_le_zsu,
+             NULL, },
+           { gen_helper_sve_ldffbdu_zsu,
+-            gen_helper_sve_ldffhdu_zsu,
+-            gen_helper_sve_ldffsdu_zsu,
+-            gen_helper_sve_ldffddu_zsu, } },
++            gen_helper_sve_ldffhdu_le_zsu,
++            gen_helper_sve_ldffsdu_le_zsu,
++            gen_helper_sve_ldffdd_le_zsu, } },
+         { { gen_helper_sve_ldffbds_zss,
+-            gen_helper_sve_ldffhds_zss,
+-            gen_helper_sve_ldffsds_zss,
++            gen_helper_sve_ldffhds_le_zss,
++            gen_helper_sve_ldffsds_le_zss,
+             NULL, },
+           { gen_helper_sve_ldffbdu_zss,
+-            gen_helper_sve_ldffhdu_zss,
+-            gen_helper_sve_ldffsdu_zss,
+-            gen_helper_sve_ldffddu_zss, } },
++            gen_helper_sve_ldffhdu_le_zss,
++            gen_helper_sve_ldffsdu_le_zss,
++            gen_helper_sve_ldffdd_le_zss, } },
+         { { gen_helper_sve_ldffbds_zd,
+-            gen_helper_sve_ldffhds_zd,
+-            gen_helper_sve_ldffsds_zd,
++            gen_helper_sve_ldffhds_le_zd,
++            gen_helper_sve_ldffsds_le_zd,
+             NULL, },
+           { gen_helper_sve_ldffbdu_zd,
+-            gen_helper_sve_ldffhdu_zd,
+-            gen_helper_sve_ldffsdu_zd,
+-            gen_helper_sve_ldffddu_zd, } } } },
++            gen_helper_sve_ldffhdu_le_zd,
++            gen_helper_sve_ldffsdu_le_zd,
++            gen_helper_sve_ldffdd_le_zd, } } } },
+ 
+     /* Big-endian */
+     { { { { gen_helper_sve_ldbds_zsu,
+@@ -5218,29 +5218,29 @@ static gen_helper_gvec_mem_scatter * const gather_load_fn64[2][2][3][2][4] = {
+ 
+       /* First-fault */
+       { { { gen_helper_sve_ldffbds_zsu,
+-            gen_helper_sve_ldffhds_zsu,
+-            gen_helper_sve_ldffsds_zsu,
++            gen_helper_sve_ldffhds_be_zsu,
++            gen_helper_sve_ldffsds_be_zsu,
+             NULL, },
+           { gen_helper_sve_ldffbdu_zsu,
+-            gen_helper_sve_ldffhdu_zsu,
+-            gen_helper_sve_ldffsdu_zsu,
+-            gen_helper_sve_ldffddu_zsu, } },
++            gen_helper_sve_ldffhdu_be_zsu,
++            gen_helper_sve_ldffsdu_be_zsu,
++            gen_helper_sve_ldffdd_be_zsu, } },
+         { { gen_helper_sve_ldffbds_zss,
+-            gen_helper_sve_ldffhds_zss,
+-            gen_helper_sve_ldffsds_zss,
++            gen_helper_sve_ldffhds_be_zss,
++            gen_helper_sve_ldffsds_be_zss,
+             NULL, },
+           { gen_helper_sve_ldffbdu_zss,
+-            gen_helper_sve_ldffhdu_zss,
+-            gen_helper_sve_ldffsdu_zss,
+-            gen_helper_sve_ldffddu_zss, } },
++            gen_helper_sve_ldffhdu_be_zss,
++            gen_helper_sve_ldffsdu_be_zss,
++            gen_helper_sve_ldffdd_be_zss, } },
+         { { gen_helper_sve_ldffbds_zd,
+-            gen_helper_sve_ldffhds_zd,
+-            gen_helper_sve_ldffsds_zd,
++            gen_helper_sve_ldffhds_be_zd,
++            gen_helper_sve_ldffsds_be_zd,
+             NULL, },
+           { gen_helper_sve_ldffbdu_zd,
+-            gen_helper_sve_ldffhdu_zd,
+-            gen_helper_sve_ldffsdu_zd,
+-            gen_helper_sve_ldffddu_zd, } } } },
++            gen_helper_sve_ldffhdu_be_zd,
++            gen_helper_sve_ldffsdu_be_zd,
++            gen_helper_sve_ldffdd_be_zd, } } } },
  };
  
- static bool trans_ST1_zprz(DisasContext *s, arg_ST1_zprz *a, uint32_t insn)
- {
-     gen_helper_gvec_mem_scatter *fn;
-+    int be = s->be_data == MO_BE;
- 
-     if (a->esz < a->msz || (a->msz == 0 && a->scale)) {
-         return false;
-@@ -5337,10 +5360,10 @@ static bool trans_ST1_zprz(DisasContext *s, arg_ST1_zprz *a, uint32_t insn)
-     }
-     switch (a->esz) {
-     case MO_32:
--        fn = scatter_store_fn32[a->xs][a->msz];
-+        fn = scatter_store_fn32[be][a->xs][a->msz];
-         break;
-     case MO_64:
--        fn = scatter_store_fn64[a->xs][a->msz];
-+        fn = scatter_store_fn64[be][a->xs][a->msz];
-         break;
-     default:
-         g_assert_not_reached();
-@@ -5353,6 +5376,7 @@ static bool trans_ST1_zprz(DisasContext *s, arg_ST1_zprz *a, uint32_t insn)
- static bool trans_ST1_zpiz(DisasContext *s, arg_ST1_zpiz *a, uint32_t insn)
- {
-     gen_helper_gvec_mem_scatter *fn = NULL;
-+    int be = s->be_data == MO_BE;
-     TCGv_i64 imm;
- 
-     if (a->esz < a->msz) {
-@@ -5364,10 +5388,10 @@ static bool trans_ST1_zpiz(DisasContext *s, arg_ST1_zpiz *a, uint32_t insn)
- 
-     switch (a->esz) {
-     case MO_32:
--        fn = scatter_store_fn32[0][a->msz];
-+        fn = scatter_store_fn32[be][0][a->msz];
-         break;
-     case MO_64:
--        fn = scatter_store_fn64[2][a->msz];
-+        fn = scatter_store_fn64[be][2][a->msz];
-         break;
-     }
-     assert(fn != NULL);
+ static bool trans_LD1_zprz(DisasContext *s, arg_LD1_zprz *a, uint32_t insn)
 -- 
 2.19.0
