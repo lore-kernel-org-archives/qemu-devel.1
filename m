@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g9Xjz-00011S-QI
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:46:40 -0400
+	(envelope-from <i.maximets@samsung.com>) id 1g9Y0H-0000Cn-NL
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:03:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g9Xjx-0008Nm-QY
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:46:39 -0400
-Date: Mon, 8 Oct 2018 17:46:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181008154617.GC4604@localhost.localdomain>
-References: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1534844779-118784-4-git-send-email-anton.nefedov@virtuozzo.com>
-	<20181004153359.GH6009@localhost.localdomain>
-	<956674d6-0cb9-f68c-15e2-89d39cfac049@virtuozzo.com>
-	<20181008150316.GB4604@localhost.localdomain>
-	<15568cd5-fa4e-8271-fcfb-b70b738a48e8@virtuozzo.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15568cd5-fa4e-8271-fcfb-b70b738a48e8@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/8] ide: account UNMAP (TRIM) operations
+	(envelope-from <i.maximets@samsung.com>) id 1g9Y0D-0007pI-7w
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:03:29 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:36151)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <i.maximets@samsung.com>)
+	id 1g9Y0C-0007ih-7e
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:03:25 -0400
+From: Ilya Maximets <i.maximets@samsung.com>
+Date: Mon, 08 Oct 2018 19:05:34 +0300
+Message-id: <20181008160536.6332-1-i.maximets@samsung.com>
+MIME-version: 1.0
+References: <CGME20181008160317eucas1p12156552c6876786bd3087d3922d49399@eucas1p1.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [RFC 0/2] vhost+postcopy fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,116 +25,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Ilya Maximets <i.maximets@samsung.com>
 
-Am 08.10.2018 um 17:25 hat Anton Nefedov geschrieben:
-> 
-> 
-> On 8/10/2018 6:03 PM, Kevin Wolf wrote:
-> > Am 08.10.2018 um 16:38 hat Anton Nefedov geschrieben:
-> >> On 4/10/2018 6:33 PM, Kevin Wolf wrote:
-> >>> Am 21.08.2018 um 11:46 hat Anton Nefedov geschrieben:
-> >>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> >>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> >>>> ---
-> >>>>    hw/ide/core.c | 12 ++++++++++++
-> >>>>    1 file changed, 12 insertions(+)
-> >>>>
-> >>>> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> >>>> index 2c62efc..352429b 100644
-> >>>> --- a/hw/ide/core.c
-> >>>> +++ b/hw/ide/core.c
-> >>>> @@ -440,6 +440,14 @@ static void ide_issue_trim_cb(void *opaque, int ret)
-> >>>>        TrimAIOCB *iocb = opaque;
-> >>>>        IDEState *s = iocb->s;
-> >>>>    
-> >>>> +    if (iocb->i >= 0) {
-> >>>> +        if (ret >= 0) {
-> >>>> +            block_acct_done(blk_get_stats(s->blk), &s->acct);
-> >>>> +        } else {
-> >>>> +            block_acct_failed(blk_get_stats(s->blk), &s->acct);
-> >>>> +        }
-> >>>> +    }
-> >>>> +
-> >>>>        if (ret >= 0) {
-> >>>>            while (iocb->j < iocb->qiov->niov) {
-> >>>>                int j = iocb->j;
-> >>>> @@ -461,6 +469,9 @@ static void ide_issue_trim_cb(void *opaque, int ret)
-> >>>>                        goto done;
-> >>>>                    }
-> >>>>    
-> >>>> +                block_acct_start(blk_get_stats(s->blk), &s->acct,
-> >>>> +                                 count << BDRV_SECTOR_BITS, BLOCK_ACCT_UNMAP);
-> >>>> +
-> >>>>                    /* Got an entry! Submit and exit.  */
-> >>>>                    iocb->aiocb = blk_aio_pdiscard(s->blk,
-> >>>>                                                   sector << BDRV_SECTOR_BITS,
-> >>>> @@ -845,6 +856,7 @@ static void ide_dma_cb(void *opaque, int ret)
-> >>>>        }
-> >>>>    
-> >>>>        if (ret == -EINVAL) {
-> >>>> +        block_acct_invalid(blk_get_stats(s->blk), BLOCK_ACCT_UNMAP);
-> >>>
-> >>> This looks wrong to me, ide_dma_cb() is not only called for unmap, but
-> >>> also for reads and writes, and each of them could return -EINVAL.
-> >>>
-> >>
-> >> Stating here BLOCK_ACCT_UNMAP is definitely a blunder :(
-> >>
-> >>> Also, -EINVAL doesn't necessarily mean that the guest driver did
-> >>> something wrong, it could also be the result of a host problem.
-> >>> Therefore, it isn't right to call block_acct_invalid() here - especially
-> >>> since the request may already have been accounted for as either done or
-> >>> failed in ide_issue_trim_cb().
-> >>>
-> >>
-> >> Couldn't be accounted done with such retcode;
-> >> and it seems I shouldnt do block_acct_failed() there anyway - or it's
-> >> accounted twice: there and in ide_dma_cb()->ide_handle_rw_error()
-> >>
-> >> But if EINVAL (from further layers) should not be accounted as an
-> >> invalid op, then it should be accounted failed instead, the thing that
-> >> current code does not do.
-> >> (and which brings us back to possible double-accounting if we account
-> >> invalid in ide_issue_trim_cb() )
-> > 
-> > Yes, commit caeadbc8ba4 was already wrong in assuming that there is
-> > only one possible source for -EINVAL.
-> > 
-> >>> Instead, I think it would be better to immediately account for invalid
-> >>> requests in ide_issue_trim_cb() where iocb->ret = -EINVAL is set and we
-> >>> know for sure that indeed !ide_sect_range_ok() is the cause for the
-> >>> -EINVAL return code.
-> >>>
-> >> So I guess yes, move acct_invalid in ide_issue_trim_cb() and leave
-> >> acct_failed there, and filter off TRIM commands in the common
-> >> accounting.
-> > 
-> > blk_aio_discard() can fail with -EINVAL, too, so getting this error code
-> > from a TRIM command doesn't mean anything. It can still have multiple
-> > possible sources.
-> > 
-> 
-> I meant that common ide_dma_cb() should account EINVAL (along with other
-> errors) as failed, unless it's TRIM, which means it's already
-> accounted (either invalid or failed)
+Sending as RFC because it's not fully tested yet.
 
-Oh, you would already account for failure in ide_issue_trim_cb(), too,
-but only if it's EINVAL? That feels like it would complicate the code
-quite a bit.
+Ilya Maximets (2):
+  migration: Stop postcopy fault thread before notifying
+  vhost-user: Fix userfaultfd leak
 
-And actually, didn't commit caeadbc8ba4 break werror=stop for requests
-returning -EINVAL because we don't call ide_handle_rw_error() any more?
+ hw/virtio/vhost-user.c   |  7 +++++++
+ migration/postcopy-ram.c | 11 ++++++-----
+ 2 files changed, 13 insertions(+), 5 deletions(-)
 
-> > Maybe we just need to remember somewhere whether we already accounted
-> > for a request (maybe an additional field in BlockAcctCookie? Or change
-> > the type to BLOCK_ACCT_ALREADY_ACCOUNTED?) and then make an additional
-> > block_account_one_io() call a no-op for such requests.
-> 
-> Maybe even resetting to BLOCK_ACCT_NONE == 0. It should also protect
-> from accounting uninitialized cookie.
-
-That sounds good to me.
-
-Kevin
+--=20
+2.17.1
