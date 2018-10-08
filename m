@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1g9ThH-0007ON-SG
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:27:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g9Tsl-0001Zl-PL
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:39:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1g9ThC-0004ur-SQ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:27:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1g9ThC-0004uW-M1
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:27:30 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Mon,  8 Oct 2018 13:27:24 +0200
-Message-Id: <20181008112726.16140-1-vkuznets@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/2] i386/kvm: enable Hyper-V PV IPI mechanism
+	(envelope-from <peter.maydell@linaro.org>) id 1g9Tsj-0002N5-VA
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:39:27 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46266)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g9Tsj-0002Mz-QV
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 07:39:25 -0400
+Received: by mail-ot1-x341.google.com with SMTP id o21so18978854otb.13
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 04:39:25 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20181007180518.5212-1-samuel.thibault@ens-lyon.org>
+References: <20181007180518.5212-1-samuel.thibault@ens-lyon.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Oct 2018 12:39:04 +0100
+Message-ID: <CAFEAcA8XSn_+8XorYCKQeiCidcgRDXwp0GH1OU0fJyr++gz1aA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/3] Slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,22 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-Hyper-V PV IPI enlightenment was merged to KVM (kvm/queue currently).
-Support the feature enablement in Qemu.
+On 7 October 2018 at 19:05, Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
+> The following changes since commit 3c2d3042849686969add641bd38b08b9877b9e8f:
+>
+>   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios.for-upstream-20181005' into staging (2018-10-05 17:55:22 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>
+> for you to fetch changes up to 93a972f8548571d35c718ca3a94d5ab1507b2443:
+>
+>   slirp: Propagate host TCP RST packet to the guest after socket disconnected (2018-10-07 19:50:48 +0200)
+>
+> ----------------------------------------------------------------
+> slirp updates
+>
+> Andrew Oates (1):
+>   slirp: fix ICMP handling on macOS hosts
+>
+> Gavin Grant (1):
+>   slirp: Propagate host TCP RST packet to the guest after socket
+>     disconnected
+>
+> Peter Maydell (1):
+>   slirp: document mbuf pointers and sizes
+>
 
-Vitaly Kuznetsov (2):
-  linux-headers: update to pre-4.20 (kvm/queue)
-  i386/kvm: add support for Hyper-V IPI send
+Applied, thanks.
 
- linux-headers/linux/kvm.h  |  7 +++++--
- target/i386/cpu.c          |  1 +
- target/i386/cpu.h          |  1 +
- target/i386/hyperv-proto.h |  1 +
- target/i386/kvm.c          | 14 +++++++++++++-
- 5 files changed, 21 insertions(+), 3 deletions(-)
-
--- 
-2.17.1
+-- PMM
