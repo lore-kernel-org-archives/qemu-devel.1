@@ -1,28 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9WJo-0004g2-3l
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:15:33 -0400
+	(envelope-from <akrowiak@linux.ibm.com>) id 1g9WPh-0000xR-Vg
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9WJj-0002xM-Cj
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:15:32 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:43706)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9WJi-0002wu-Pf
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:15:27 -0400
-Received: by mail-wr1-x429.google.com with SMTP id n1-v6so21021905wrt.10
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 07:15:26 -0700 (PDT)
-References: <20181005154910.3099-1-alex.bennee@linaro.org>
-	<20181007012337.GA23787@flamenco> <875zycohpl.fsf@linaro.org>
-	<20181008135953.GA19899@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181008135953.GA19899@flamenco>
-Date: Mon, 08 Oct 2018 15:15:23 +0100
-Message-ID: <87zhvomsn8.fsf@linaro.org>
+	(envelope-from <akrowiak@linux.ibm.com>) id 1g9WPe-0005aP-P3
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:21:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33178
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1g9WPe-0005aD-J5
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:21:34 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w98EKxMj113545
+	for <qemu-devel@nongnu.org>; Mon, 8 Oct 2018 10:21:33 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2n06w3npfn-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 10:21:01 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Mon, 8 Oct 2018 08:20:53 -0600
+References: <20180926225440.6204-1-akrowiak@linux.vnet.ibm.com>
+	<20180926225440.6204-5-akrowiak@linux.vnet.ibm.com>
+	<6ae10841-43af-f37f-450e-7dcb4cc75747@redhat.com>
+	<20180927145240.7f8aba31.cohuck@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Mon, 8 Oct 2018 10:20:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH  00/21] Trace updates and plugin RFC
+In-Reply-To: <20180927145240.7f8aba31.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <ee677383-b23c-61a0-f622-807532563650@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v9 4/6] s390x/ap: base Adjunct
+ Processor (AP) object model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +46,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu
+To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com
 
-
-Emilio G. Cota <cota@braap.org> writes:
-
-> On Mon, Oct 08, 2018 at 11:28:38 +0100, Alex Benn=C3=A9e wrote:
->> Emilio G. Cota <cota@braap.org> writes:
->> > Again, for performance you'd avoid the tracepoint (i.e. calling
->> > a helper to call another function) and embed directly the
->> > callback from TCG. Same thing applies to TB's.
+On 09/27/2018 08:52 AM, Cornelia Huck wrote:
+> On Thu, 27 Sep 2018 14:29:01 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> On 2018-09-27 00:54, Tony Krowiak wrote:
+>>> From: Tony Krowiak <akrowiak@linux.ibm.com>
+>>>
+>>> Introduces the base object model for virtualizing AP devices.
+>>>
+>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> ---
+> 
+>>> +typedef struct APBridge {
+>>> +    SysBusDevice sysbus_dev;
+>>> +    bool css_dev_path;
 >>
->> OK I see what you mean. I think that is doable although it might take a
->> bit more tcg plumbing.
->
-> I have patches to do it, it's not complicated.
-
-Right that would be useful.
-
->
->> >> So what do people think? Could this be a viable way to extend QEMU
->> >> with plugins?
->> >
->> > For frequent events such as the ones mentioned above, I am
->> > not sure plugins can be efficiently implemented under
->> > tracing.
+>> What is this css_dev_path variable good for? I don't see it used in any
+>> of the other patches?
+>> If you don't need it, I think you could get rid of this struct completely?
+> 
+> Huh, now I remember complaining about it before. Looks like a
+> copy-and-paste from the css bridge; that variable is used for compat
+> handling there (and should be ditched here).
+> 
 >>
->> I assume some form of helper-per-instrumented-event/insn is still going
->> to be needed though? We are not considering some sort of EBF craziness?
->
-> Helper, yes. But one that points directly to plugin code.
-
-It would be nice if the logic the inserts the trace helper vs a direct
-call could be shared. I guess I'd have to see the implementation to see
-how ugly it gets.
-
->
->> > For others (e.g. cpu_init events), sure, they could.
->> > But still, differently from tracers, plugins can come and go
->> > anytime, so I am not convinced that merging the two features
->> > is a good idea.
+>>> +} APBridge;
+>>> +
+>>> +#define TYPE_AP_BRIDGE "ap-bridge"
+>>> +#define AP_BRIDGE(obj) \
+>>> +    OBJECT_CHECK(APBridge, (obj), TYPE_AP_BRIDGE)
+>>> +
+>>> +typedef struct APBus {
+>>> +    BusState parent_obj;
+>>> +} APBus;
+>>> +
+>>> +#define TYPE_AP_BUS "ap-bus"
+>>> +#define AP_BUS(obj) \
+>>> +     OBJECT_CHECK(APBus, (obj), TYPE_AP_BUS)
 >>
->> I don't think we have to mirror tracepoints and plugin points but I'm in
->> favour of sharing the general mechanism and tooling rather than having a
->> whole separate set of hooks. We certainly don't want anything like:
+>> I think you could also get rid of AP_BRIDGE(), AP_BUS() and maybe even
+>> struct APBus.
+> 
+> If there's nothing interesting to put in these inherited structures,
+> probably yes.
+> 
 >>
->>           trace_exec_tb(tb, pc);
->>           plugin_exec_tb(tb, pc);
+>>> +void s390_init_ap(void);
+>>> +
+>>> +#endif
+>>> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+>>> new file mode 100644
+>>> index 000000000000..693df90cc041
+>>> --- /dev/null
+>>> +++ b/include/hw/s390x/ap-device.h
+>>> @@ -0,0 +1,38 @@
+>>> +/*
+>>> + * Adjunct Processor (AP) matrix device interfaces
+>>> + *
+>>> + * Copyright 2018 IBM Corp.
+>>> + * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+>>> + *
+>>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>>> + * your option) any later version. See the COPYING file in the top-level
+>>> + * directory.
+>>> + */
+>>> +#ifndef HW_S390X_AP_DEVICE_H
+>>> +#define HW_S390X_AP_DEVICE_H
+>>> +
+>>> +#define AP_DEVICE_TYPE       "ap-device"
+>>> +
+>>> +typedef struct APDevice {
+>>> +    DeviceState parent_obj;
+>>> +} APDevice;
+>>> +
+>>> +typedef struct APDeviceClass {
+>>> +    DeviceClass parent_class;
+>>> +} APDeviceClass;
+>>> +
+>>> +static inline APDevice *to_ap_dev(DeviceState *dev)
+>>> +{
+>>> +    return container_of(dev, APDevice, parent_obj);
+>>> +}
+>>> +
+>>> +#define AP_DEVICE(obj) \
+>>> +    OBJECT_CHECK(APDevice, (obj), AP_DEVICE_TYPE)
+>>> +
+>>> +#define AP_DEVICE_GET_CLASS(obj) \
+>>> +    OBJECT_GET_CLASS(APDeviceClass, (obj), AP_DEVICE_TYPE)
+>>> +
+>>> +#define AP_DEVICE_CLASS(klass) \
+>>> +    OBJECT_CLASS_CHECK(APDeviceClass, (klass), AP_DEVICE_TYPE)
 >>
->> scattered throughout the code where the two do align.
->
-> We could have something like
->
-> 	plugin_trace_exec_tb(tb, pc);
->
-> that would expand to the two lines above. Or similar.
->
-> So I agree with you that in some cases the "trace points"
-> for both tracing and plugin might be the same, perhaps
-> identical. But that doesn't necessarily mean that making
-> plugins a subset of tracing is a good idea.
+>> Do you really need any of these definitions except AP_DEVICE_TYPE ?
 
-But we can avoid having plugin-points and trace-events duplicating stuff
-as well? I guess you want to avoid having the generated code fragments
-for plugins?
+Yes, we need AP_DEVICE(obj) and struct APDevice; they are both used in
+patch 5/6. We can probably get rid of AP_DEVICE_GET_CLASS(obj) and
+AP_DEVICE_CLASS(klass), but aren't those typically included in all
+QOM definitions?
 
-The other nice property was avoiding re-duplicating output logic for
-"filter" style operations. However I didn't actually included such an
-example in the series. I was pondering a QEMU powered PLT/library call
-tracer to demonstrate that sort of thing.
-
-> I think sharing my plugin implementation will help the
-> discussion. I'll share it as soon as I can (my QEMU plate
-> is full already trying to merge a couple of other features
-> first).
-
-Sounds good.
-
->
-> Thanks,
->
-> 		Emilio
-
-
---
-Alex Benn=C3=A9e
+> 
+> Same here, I think.
+> 
