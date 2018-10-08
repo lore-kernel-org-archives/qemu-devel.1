@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W6Y-0001v7-5U
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:58 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W6m-00025i-17
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:02:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W6U-0007sf-Bn
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:50 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W6f-0008Bl-Kg
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:02:03 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51692)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1g9W6T-0006uy-R4
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:46 -0400
+	id 1g9W6f-0006uy-8w
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:57 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W51-0003fT-Dl
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:15 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W4v-0003eK-Pe
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:09 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  8 Oct 2018 14:59:38 +0100
-Message-Id: <20181008140004.12612-8-peter.maydell@linaro.org>
+Date: Mon,  8 Oct 2018 14:59:33 +0100
+Message-Id: <20181008140004.12612-3-peter.maydell@linaro.org>
 In-Reply-To: <20181008140004.12612-1-peter.maydell@linaro.org>
 References: <20181008140004.12612-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/33] target/arm: Pass in current_el to fp and
- sve_exception_el
+Subject: [Qemu-devel] [PULL 02/33] virt: Suppress external aborts on
+ virt-2.10 and earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,105 +33,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+In commit c79c0a314c43b78 we enabled emulation of external aborts
+when the guest attempts to access a physical address with no
+mapped device. In commit 4672cbd7bed88dc6 we suppress this for
+most legacy boards to prevent breakage of previously working
+guests, but we didn't suppress it in the 'virt' board, with
+the rationale "we know that guests won't try to prod devices
+that we don't describe in the device tree or ACPI tables". This
+is mostly true, but we've had a report of a Linux guest image
+that this did break. The problem seems to be that the guest
+is (incorrectly) configured with a DEBUG_UART_PHYS value that
+tells it there is a uart at 0x10009000 (which is true for
+vexpress but not for virt), so in early bootup the kernel
+probes this bogus address.
 
-We are going to want to determine whether sve is enabled
-for EL other than current.
+This is a misconfigured guest, so we don't need to worry
+about it too much, but we can arrange that guests that ran
+on QEMU v2.10 (before c79c0a314c43b78) will still run on
+the "virt-2.10" board model, by suppressing external aborts
+only for that version and earlier. This seems a reasonable
+compromise: "virt-2.10" is supposed to behave the same way
+that "virt" did in the 2.10 release, and making it do that
+provides a usable workaround for guests with bugs like this.
 
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181005175350.30752-4-richard.henderson@linaro.org
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20180925144127.31965-1-peter.maydell@linaro.org
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/arm/helper.c | 21 +++++++++------------
- 1 file changed, 9 insertions(+), 12 deletions(-)
+ hw/arm/virt.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 9bb81da2c7f..35458ad4a76 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4406,12 +4406,10 @@ static const ARMCPRegInfo debug_lpae_cp_reginfo[] = {
-  * take care of raising that exception.
-  * C.f. the ARM pseudocode function CheckSVEEnabled.
-  */
--static int sve_exception_el(CPUARMState *env)
-+static int sve_exception_el(CPUARMState *env, int el)
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 0b57f87abcb..a4725660748 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1926,6 +1926,8 @@ static void virt_machine_2_10_options(MachineClass *mc)
  {
- #ifndef CONFIG_USER_ONLY
--    unsigned current_el = arm_current_el(env);
--
--    if (current_el <= 1) {
-+    if (el <= 1) {
-         bool disabled = false;
+     virt_machine_2_11_options(mc);
+     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_10);
++    /* before 2.11 we never faulted accesses to bad addresses */
++    mc->ignore_memory_transaction_failures = true;
+ }
+ DEFINE_VIRT_MACHINE(2, 10)
  
-         /* The CPACR.ZEN controls traps to EL1:
-@@ -4422,7 +4420,7 @@ static int sve_exception_el(CPUARMState *env)
-         if (!extract32(env->cp15.cpacr_el1, 16, 1)) {
-             disabled = true;
-         } else if (!extract32(env->cp15.cpacr_el1, 17, 1)) {
--            disabled = current_el == 0;
-+            disabled = el == 0;
-         }
-         if (disabled) {
-             /* route_to_el2 */
-@@ -4435,7 +4433,7 @@ static int sve_exception_el(CPUARMState *env)
-         if (!extract32(env->cp15.cpacr_el1, 20, 1)) {
-             disabled = true;
-         } else if (!extract32(env->cp15.cpacr_el1, 21, 1)) {
--            disabled = current_el == 0;
-+            disabled = el == 0;
-         }
-         if (disabled) {
-             return 0;
-@@ -4445,7 +4443,7 @@ static int sve_exception_el(CPUARMState *env)
-     /* CPTR_EL2.  Since TZ and TFP are positive,
-      * they will be zero when EL2 is not present.
-      */
--    if (current_el <= 2 && !arm_is_secure_below_el3(env)) {
-+    if (el <= 2 && !arm_is_secure_below_el3(env)) {
-         if (env->cp15.cptr_el[2] & CPTR_TZ) {
-             return 2;
-         }
-@@ -12512,11 +12510,10 @@ uint32_t HELPER(crc32c)(uint32_t acc, uint32_t val, uint32_t bytes)
- /* Return the exception level to which FP-disabled exceptions should
-  * be taken, or 0 if FP is enabled.
-  */
--static inline int fp_exception_el(CPUARMState *env)
-+static int fp_exception_el(CPUARMState *env, int cur_el)
- {
- #ifndef CONFIG_USER_ONLY
-     int fpen;
--    int cur_el = arm_current_el(env);
- 
-     /* CPACR and the CPTR registers don't exist before v6, so FP is
-      * always accessible
-@@ -12579,7 +12576,8 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-                           target_ulong *cs_base, uint32_t *pflags)
- {
-     ARMMMUIdx mmu_idx = core_to_arm_mmu_idx(env, cpu_mmu_index(env, false));
--    int fp_el = fp_exception_el(env);
-+    int current_el = arm_current_el(env);
-+    int fp_el = fp_exception_el(env, current_el);
-     uint32_t flags;
- 
-     if (is_a64(env)) {
-@@ -12590,7 +12588,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-         flags |= (arm_regime_tbi1(env, mmu_idx) << ARM_TBFLAG_TBI1_SHIFT);
- 
-         if (arm_feature(env, ARM_FEATURE_SVE)) {
--            int sve_el = sve_exception_el(env);
-+            int sve_el = sve_exception_el(env, current_el);
-             uint32_t zcr_len;
- 
-             /* If SVE is disabled, but FP is enabled,
-@@ -12599,7 +12597,6 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
-             if (sve_el != 0 && fp_el == 0) {
-                 zcr_len = 0;
-             } else {
--                int current_el = arm_current_el(env);
-                 ARMCPU *cpu = arm_env_get_cpu(env);
- 
-                 zcr_len = cpu->sve_max_vq - 1;
 -- 
 2.19.0
