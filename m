@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9ZNf-0005Aa-5d
+	(envelope-from <armbru@redhat.com>) id 1g9ZNf-0005Ac-K2
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9ZNa-0005nN-J5
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37960)
+	(envelope-from <armbru@redhat.com>) id 1g9ZNa-0005nZ-Os
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9ZNa-0005iy-6U
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9ZNa-0005j6-B2
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 66DFC30B844E
-	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 17:31:32 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-50.ams2.redhat.com
-	[10.36.116.50])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3389717A67
+	by mx1.redhat.com (Postfix) with ESMTPS id 78356C0B2A35
 	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 17:31:32 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  8 Oct 2018 19:31:25 +0200
-Message-Id: <20181008173125.19678-32-armbru@redhat.com>
+Date: Mon,  8 Oct 2018 19:31:08 +0200
+Message-Id: <20181008173125.19678-15-armbru@redhat.com>
 In-Reply-To: <20181008173125.19678-1-armbru@redhat.com>
 References: <20181008173125.19678-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 31/31] vl: Simplify call of parse_name()
+Subject: [Qemu-devel] [PATCH 14/31] numa: Fix QMP command set-numa-node
+ error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +31,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>
 
-main() checks for parse_name() failure even though it can't actually
-fail.  That's okay.  Simplify it to check by passing &error_fatal,
-like the other users of qemu_opts_foreach().
+Calling error_report() in a function that takes an Error ** argument
+is suspicious.  parse_numa_node() does that, and then exit()s.  It
+also passes &error_fatal to machine_set_cpu_numa_node().  Both wrong.
+Attempting to configure numa when the machine doesn't support it kills
+the VM:
 
+    $ qemu-system-x86_64 -nodefaults -S -display none -M none -preconfig -qmp stdio
+    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 3}, "package": "v3.0.0-837-gc5e4e49258"}, "capabilities": []}}
+    {"execute": "qmp_capabilities"}
+    {"return": {}}
+    {"execute": "set-numa-node", "arguments": {"type": "node"}}
+    NUMA is not supported by this machine-type
+    $ echo $?
+    1
+
+Messed up when commit 64c2a8f6d3f and 7c88e65d9e9 (v2.10.0) added
+incorrect error handling right next to correct examples.  Latent bug
+until commit f3be67812c2 (v3.0.0) made it accessible via QMP.  Fairly
+harmless in practice, because it's limited to RUN_STATE_PRECONFIG.
+The fix is obvious: replace error_report(); exit() by error_setg();
+return.
+
+This affects parse_numa_node()'s other caller
+numa_complete_configuration(): since it ignores errors, the "NUMA is
+not supported by this machine-type" is now ignored, too.  But that
+error is as unexpected there as any other.  Change it to abort on
+error instead.
+
+Fixes: f3be67812c226162f86ce92634bd913714445420
+Cc: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- vl.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 101e0123d9..0a76c58943 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3926,10 +3926,8 @@ int main(int argc, char **argv, char **envp)
+fixup! numa: Fix QMP command set-numa-node error handling
+---
+ numa.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/numa.c b/numa.c
+index 81542d4ebb..1d7c49ad43 100644
+--- a/numa.c
++++ b/numa.c
+@@ -60,6 +60,7 @@ NodeInfo numa_info[MAX_NODES];
+ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+                             Error **errp)
+ {
++    Error *err = NULL;
+     uint16_t nodenr;
+     uint16List *cpus = NULL;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+@@ -82,8 +83,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
      }
- #endif
  
--    if (qemu_opts_foreach(qemu_find_opts("name"),
--                          parse_name, NULL, NULL)) {
+     if (!mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id) {
+-        error_report("NUMA is not supported by this machine-type");
 -        exit(1);
--    }
-+    qemu_opts_foreach(qemu_find_opts("name"),
-+                      parse_name, NULL, &error_fatal);
++        error_setg(errp, "NUMA is not supported by this machine-type");
++        return;
+     }
+     for (cpus = node->cpus; cpus; cpus = cpus->next) {
+         CpuInstanceProperties props;
+@@ -97,7 +98,11 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+         props = mc->cpu_index_to_instance_props(ms, cpus->value);
+         props.node_id = nodenr;
+         props.has_node_id = true;
+-        machine_set_cpu_numa_node(ms, &props, &error_fatal);
++        machine_set_cpu_numa_node(ms, &props, &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
+     }
  
- #ifndef _WIN32
-     qemu_opts_foreach(qemu_find_opts("add-fd"),
+     if (node->has_mem && node->has_memdev) {
+@@ -367,7 +372,7 @@ void numa_complete_configuration(MachineState *ms)
+     if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
+         mc->auto_enable_numa_with_memhp) {
+             NumaNodeOptions node = { };
+-            parse_numa_node(ms, &node, NULL);
++            parse_numa_node(ms, &node, &error_abort);
+     }
+ 
+     assert(max_numa_nodeid <= MAX_NODES);
 -- 
 2.17.1
