@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g9Pfi-0003fO-Pi
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 03:09:46 -0400
+	(envelope-from <pawelx.wodkowski@intel.com>) id 1g9PjA-0004km-GT
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 03:13:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g9PfU-0000xf-5y
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 03:09:34 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:57948)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1g9PfT-0000wY-DM
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 03:09:27 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180820150903.1224-4-pbonzini@redhat.com>
-	<000001d43ea0$02146ed0$063d4c70$@ru>
-	<5b9a85eb-cefd-925c-b24b-95b93bbbfce8@redhat.com>
-	<000a01d448c8$4a55c0e0$df0142a0$@ru>
-	<ea5f162e-bd8a-001c-b78c-25378e3b2919@redhat.com>
-	<001e01d44994$d02acb80$70806280$@ru>
-	<f8014c4f-f581-bdf9-c853-9ea1b8855726@redhat.com>
-In-Reply-To: <f8014c4f-f581-bdf9-c853-9ea1b8855726@redhat.com>
-Date: Mon, 8 Oct 2018 10:09:24 +0300
-Message-ID: <003b01d45ed5$d7fec4f0$87fc4ed0$@ru>
+	(envelope-from <pawelx.wodkowski@intel.com>) id 1g9Pj6-0002on-DF
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 03:13:16 -0400
+Received: from mga09.intel.com ([134.134.136.24]:3407)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pawelx.wodkowski@intel.com>)
+	id 1g9Pj5-0002lp-7P
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 03:13:12 -0400
+From: "Wodkowski, PawelX" <pawelx.wodkowski@intel.com>
+Date: Mon, 8 Oct 2018 07:13:00 +0000
+Message-ID: <F6F2A6264E145F47A18AB6DF8E87425D7035EF1E@IRSMSX102.ger.corp.intel.com>
+References: <DB7PR07MB3867468812F702134BC2BCAC98E40@DB7PR07MB3867.eurprd07.prod.outlook.com>
+In-Reply-To: <DB7PR07MB3867468812F702134BC2BCAC98E40@DB7PR07MB3867.eurprd07.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [3/4] cpus: protect TimerState writes with a
- spinlock
+Subject: Re: [Qemu-devel] vhost: add virtio-vhost-user transport
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,18 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: "'Emilio G . Cota'" <cota@braap.org>
+To: Storage Performance Development Kit <spdk@lists.01.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Paolo,
+Great to hear that.
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 11/09/2018 08:00, Pavel Dovgalyuk wrote:
-> > Thanks, that works. Here is the updated diff (stubs were added).
-> > Will you apply it?
-> 
-> Yes, thanks for the quick test!
+To get these patches merged you need to prepare a patch(es)
+and send them for review first. See https://spdk.io/development/ for=20
+information how to do that.
 
-Thanks for applying RR patches, but I think you forgot about this one.
+Pawel
 
-Pavel Dovgalyuk
+> -----Original Message-----
+> From: SPDK [mailto:spdk-bounces@lists.01.org] On Behalf Of Nikos Dragazis
+> Sent: Saturday, October 6, 2018 10:03 PM
+> To: spdk@lists.01.org
+> Cc: qemu-devel@nongnu.org; Stefan Hajnoczi <stefanha@redhat.com>
+> Subject: [SPDK] vhost: add virtio-vhost-user transport
+>=20
+> Hi everyone,
+>=20
+> In response to a previous email of mine here:
+>=20
+> https://lists.01.org/pipermail/spdk/2018-September/002488.html
+>=20
+> I would like to share that I have added support for a new
+> virtio-vhost-user transport to SPDK. and have a working demo of the SPDK
+> vhost-scsi target over this transport. I have tested it successfully
+> with Malloc bdev, NVMe bdev and virtio-scsi bdev.
+>=20
+> My code currently lives here:
+>=20
+> https://github.com/ndragazis/spdk
+>=20
+> I'd love to get your feedback and have it merged eventually. I see there
+> is a relevant conversation on this topic here:
+>=20
+> https://lists.01.org/pipermail/spdk/2018-March/001557.html
+>=20
+> Is there anyone in this community currently working on this? What would
+> my next step in contributing this be?
+>=20
+> Looking forward to your feedback,
+> Nikos
+>=20
+> --
+> Nikos Dragazis
+> Undergraduate Student
+> School of Electrical and Computer Engineering
+> National Technical University of Athens
+>=20
+> _______________________________________________
+> SPDK mailing list
+> SPDK@lists.01.org
+> https://lists.01.org/mailman/listinfo/spdk
