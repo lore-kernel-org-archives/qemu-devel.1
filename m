@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9SrE-0003dy-FS
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 06:33:51 -0400
+	(envelope-from <sameeh@daynix.com>) id 1g9T2C-00072y-DF
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 06:45:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9SmQ-0005Dg-IH
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 06:28:54 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44367)
+	(envelope-from <sameeh@daynix.com>) id 1g9T2B-0006BF-AS
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 06:45:08 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:41341)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9SmL-0005B2-0a
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 06:28:48 -0400
-Received: by mail-wr1-x443.google.com with SMTP id 63-v6so20177026wra.11
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 03:28:41 -0700 (PDT)
-References: <20181005154910.3099-1-alex.bennee@linaro.org>
-	<20181007012337.GA23787@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181007012337.GA23787@flamenco>
-Date: Mon, 08 Oct 2018 11:28:38 +0100
-Message-ID: <875zycohpl.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1g9T2A-00068k-Pm
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 06:45:07 -0400
+Received: by mail-ed1-x542.google.com with SMTP id x31-v6so2418133edd.8
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 03:45:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH  00/21] Trace updates and plugin RFC
+References: <CAKPgXcHEVrW7a5WqcoPn6X8=-j07K3yvXo4sjYJKNonYd2asQw@mail.gmail.com>
+	<20181004132026.39c002ab@redhat.com>
+	<CAKPgXcF575pf+dizFKjV1PrQo6tfbdwd+AA72a=kbcxdTcKCmA@mail.gmail.com>
+	<20181008102846.3ce9c912@redhat.com>
+In-Reply-To: <20181008102846.3ce9c912@redhat.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Mon, 8 Oct 2018 13:44:53 +0300
+Message-ID: <CAKPgXcFeXbHQnBxo2Z9C8xCRDhXoOb7FabF3F-RQsOg4d5t2EQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu
+To: imammedo@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
-Emilio G. Cota <cota@braap.org> writes:
-
-> On Fri, Oct 05, 2018 at 16:48:49 +0100, Alex Benn=C3=A9e wrote:
-> (snip)
->> =3D=3DKnown Limitations=3D=3D
->>
->> Currently there is only one hook allowed per trace event. We could
->> make this more flexible or simply just error out if two plugins try
->> and hook to the same point. What are the expectations of running
->> multiple plugins hooking into the same point in QEMU?
+Thanks for your help, turns out that the hotlpug is set by piix4 after
+the devices are realized.
+On Mon, Oct 8, 2018 at 11:28 AM Igor Mammedov <imammedo@redhat.com> wrote:
 >
-> It's very common. All popular instrumentation tools (e.g. PANDA,
-> DynamoRIO, Pin) support multiple plugins.
-
-Fair enough.
-
+> On Sun, 7 Oct 2018 12:52:11 +0300
+> Sameeh Jubran <sameeh@daynix.com> wrote:
 >
->> =3D=3DTCG Hooks=3D=3D
->>
->> Thanks to Llu=C3=ADs' work the trace API already splits up TCG events in=
-to
->> translation time and exec time events and provides the machinery for
->> hooking a trace helper into the translation stream. Currently that
->> helper is unconditionally added although perhaps we could expand the
->> call convention a little for TCG events to allow the translation time
->> event to filter out planting the execution time helper?
+> > This is the command line. All of the devices are wired to pci.0, there is
+> > no pci bridge.
+> >
+> > According to this,  Integrated Endpoints are not hot-pluggable. However I
+> > can still use device_del to delete a device and device_add to add e1000
+> > with no issues.
+> > https://github.com/qemu/qemu/blob/master/docs/pcie.txt#L37
+> Your CLI is using default 'pc' machine so it's conventional PCI (not PCI-E),
+> with that CLI for a device plugged into pci.0 bus you should get piix4_pm as
+> hotplug handler (ACPI is used on pci.0 as default).
+> To troubleshoot your issue, you might look at code that's
+> using following symbols:
 >
-> A TCG helper is suboptimal for these kind of events, e.g. instruction/TB/
-> mem callbacks, because (1) these events happen *very* often, and
-> (2) a helper then has to iterate over a list of callbacks (assuming
-> we support multiple plugins). That is, one TCG helper call,
-> plus cache misses for the callback pointers, plus function calls
-> to call the callbacks. That adds up to 2x average slowdown
-> for SPEC06int, instead of 1.5x slowdown when embedding the
-> callbacks directly into the generated code. Yes, you have to
-> flush the code when unsubscribing from the event, but that cost
-> is amortized by the savings you get when the callbacks occur,
-> which are way more frequent.
-
-What would you want instead of a TCG helper? But certainly being able be
-selective about which instances of each trace point are instrumented
-will be valuable.
-
-> Besides performance, to provide a pleasant plugin experience we need
-> something better than the current tracing callbacks.
-
-What I hope to avoid in re-using trace points is having a whole bunch of
-a additional hook points just for plugins. However nothing stops us
-adding more tracepoints at more useful places for instrumentation. We
-could also do it on a whitelist basis similar to the way the tcg events
-are marked.
-
+>   use_acpi_pci_hotplug
+>   piix4_update_bus_hotplug
+>   piix4_device_plug_cb
+>   piix4_device_unplug_request_cb
 >
->> =3D=3D=3DInstruction Tracing=3D=3D=3D
->>
->> Pavel's series had a specific hook for instrumenting individual
->> instructions. I have not yet added it to this series but I think it be
->> done in a slightly cleaner way now we have the ability to insert TCG
->> ops into the instruction stream.
+> >
+> > qemu-system-x86_64 \
+> > -device
+> > e1000,netdev=hostnet0,mac=56:cc:c1:01:cc:21,id=cc1_71,primary=cc1_72 \
+> > -netdev
+> > tap,vhost=on,id=hostnet1,script=world_bridge_standalone.sh,downscript=no,ifname=cc1_72,queues=4
+> > \
+> > -device
+> > virtio-net,host_mtu=1500,netdev=hostnet1,mac=56:cc:c1:04:2c:21,id=cc1_72,vectors=10,mq=on,standby=cc1_71
+> > \
+> > -netdev
+> > tap,id=hostnet0,script=world_bridge_standalone.sh,downscript=no,ifname=cc1_71
+> > \
+> > -enable-kvm \
+> > -name netkvm \
+> > -m 1000M \
+> > -snapshot \
+> > -smp 4 \
+> > -drive file=windows_10_enterprise_x64_netkvm_dev.qcow2,if=ide,id=drivex \
+> > -global PIIX4_PM.disable_s3=0 \
+> > -global PIIX4_PM.disable_s4=0 \
+> > -usbdevice tablet \
+> > -vga qxl \
+> > -spice port=6110,disable-ticketing \
+> > -device virtio-serial-pci,id=virtio-serial0,max_ports=16,bus=pci.0,addr=0x7
+> > \
+> > -chardev spicevmc,name=vdagent,id=vdagent \
+> > -device
+> > virtserialport,nr=1,bus=virtio-serial0.0,chardev=vdagent,name=com.redhat.spice.0
+> > \
+> > -chardev socket,path=/tmp/qga.sock,server,nowait,id=qga0 \
+> > -device virtio-serial \
+> > -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0 \
+> > -monitor stdio
+> >
+> >
+> > On Thu, Oct 4, 2018 at 2:20 PM Igor Mammedov <imammedo@redhat.com> wrote:
+> >
+> > > On Wed, 3 Oct 2018 19:50:58 +0300
+> > > Sameeh Jubran <sameeh@daynix.com> wrote:
+> > >
+> > > > Hi all,
+> > > >
+> > > > I am trying to get the hotplug handler of a pci device in Qemu using
+> > > > "qdev_get_hotplug_handler" function. This function simply tries to get
+> > > > the hotplug handler from the parent bus. For some reason it's always
+> > > > null. Why it is not initialized?
+> > > >
+> > > > Thanks!
+> > > >
+> > >
+> > > what's used qemu command line?
+> > >
+> >
+> >
 >
-> I thought Peter explicitly disallowed TCG generation from plugins.
-> Also, IIRC others also mentioned that exposing QEMU internals
-> (e.g. "struct TranslationBlock", or "struct CPUState") to plugins
-> was not on the table.
-
-We definitely want to avoid plugin controlled code generation but the
-tcg tracepoint mechanism is transparent to the plugin itself. I think
-the pointers should really be treated as anonymous handles rather than
-windows into QEMU's internals. Arguably some of the tracepoints should
-be exporting more useful numbers (I used cpu->cpu_index in the TLB trace
-points) but I don't know if we can change existing trace point
-definitions to clean that up.
-
-Again if we whitelist tracepoints for plugins we can be more careful
-about the data exported.
-
->
->> If we add a tracepoint for post
->> instruction generation which passes a buffer with the instruction
->> translated and method to insert a helper before or after the
->> instruction. This would avoid exposing the cpu_ldst macros to the
->> plugins.
->
-> Again, for performance you'd avoid the tracepoint (i.e. calling
-> a helper to call another function) and embed directly the
-> callback from TCG. Same thing applies to TB's.
-
-OK I see what you mean. I think that is doable although it might take a
-bit more tcg plumbing.
-
->
->> So what do people think? Could this be a viable way to extend QEMU
->> with plugins?
->
-> For frequent events such as the ones mentioned above, I am
-> not sure plugins can be efficiently implemented under
-> tracing.
-
-I assume some form of helper-per-instrumented-event/insn is still going
-to be needed though? We are not considering some sort of EBF craziness?
-
-> For others (e.g. cpu_init events), sure, they could.
-> But still, differently from tracers, plugins can come and go
-> anytime, so I am not convinced that merging the two features
-> is a good idea.
-
-I don't think we have to mirror tracepoints and plugin points but I'm in
-favour of sharing the general mechanism and tooling rather than having a
-whole separate set of hooks. We certainly don't want anything like:
-
-          trace_exec_tb(tb, pc);
-          plugin_exec_tb(tb, pc);
-
-scattered throughout the code where the two do align.
-
->
-> Thanks,
->
-> 		Emilio
 
 
---
-Alex Benn=C3=A9e
+-- 
+Respectfully,
+Sameeh Jubran
+Linkedin
+Software Engineer @ Daynix.
