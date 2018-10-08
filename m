@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1g9asH-0006wU-Jk
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:07:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g9asZ-00070X-Pc
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:07:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1g9apS-0000WO-IZ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:04:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35098)
+	(envelope-from <mreitz@redhat.com>) id 1g9aff-0004Pf-C9
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:54:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52644)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1g9apR-0000SC-Gy
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:04:29 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1g9afc-0004O6-5K
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:54:20 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8F90830820C0
-	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 19:04:28 +0000 (UTC)
-Date: Mon, 8 Oct 2018 13:04:27 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181008130427.16012dfe@w520.home>
-In-Reply-To: <20181008173125.19678-5-armbru@redhat.com>
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-5-armbru@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id C520661463
+	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 18:54:16 +0000 (UTC)
+References: <20181008185013.19371-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d3a7d12c-162a-8ba2-cfbe-767e0f261c29@redhat.com>
+Date: Mon, 8 Oct 2018 20:54:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/31] vfio: Use warn_report() & friends to
- report warnings
+In-Reply-To: <20181008185013.19371-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VK9jglZvIZrebWAwLoXByX2fhQ6K0iXUz"
+Subject: Re: [Qemu-devel] [PATCH] sdl2: Support all virtio-gpu formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +33,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon,  8 Oct 2018 19:30:58 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VK9jglZvIZrebWAwLoXByX2fhQ6K0iXUz
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <d3a7d12c-162a-8ba2-cfbe-767e0f261c29@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] sdl2: Support all virtio-gpu formats
+References: <20181008185013.19371-1-mreitz@redhat.com>
+In-Reply-To: <20181008185013.19371-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> The vfio code reports warnings like
-> 
->     error_report(WARN_PREFIX "Could not frobnicate", DEV-NAME);
-> 
-> where WARN_PREFIX is defined so the message comes out as
-> 
->     vfio warning: DEV-NAME: Could not frobnicate
-> 
-> This usage predates the introduction of warn_report() & friends in
-> commit 97f40301f1d.  It's time to convert to that interface.  Since
-> these functions already prefix the message with "warning: ", replace
-> WARN_PREFIX by VFIO_MSG_PREFIX, so the messages come out like
-> 
->     warning: vfio DEV-NAME: Could not frobnicate
-> 
-> The next commit will replace ERR_PREFIX.
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 08.10.18 20:50, Max Reitz wrote:
+> There are some 2D resource formats that can be used through virtio-gpu,=
+
+> but which are not supported by SDL2 when used for a scanout; these are
+> all alpha-channel formats and also XBGR (RGBX in non-BE pixman).
+
+Oops, it's the other way round.  The virtio-gpu format is RGBX, and the
+non-BE pixman (and SDL) constant is XBGR.
+
+Max
+
+> Add these formats in the switch converting pixman to SDL format
+> constants so a guest cannot crash the VM by triggering the
+> g_assert_not_reached() with an unsupported format.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  hw/vfio/pci.c                 | 14 +++++++-------
->  hw/vfio/platform.c            |  4 ++--
->  include/hw/vfio/vfio-common.h |  2 +-
->  3 files changed, 10 insertions(+), 10 deletions(-)
+>  ui/sdl2-2d.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/ui/sdl2-2d.c b/ui/sdl2-2d.c
+> index 85484407be..c9df72636a 100644
+> --- a/ui/sdl2-2d.c
+> +++ b/ui/sdl2-2d.c
+> @@ -101,15 +101,24 @@ void sdl2_2d_switch(DisplayChangeListener *dcl,
+>      case PIXMAN_r5g6b5:
+>          format =3D SDL_PIXELFORMAT_RGB565;
+>          break;
+> +    case PIXMAN_a8r8g8b8:
+>      case PIXMAN_x8r8g8b8:
+>          format =3D SDL_PIXELFORMAT_ARGB8888;
+>          break;
+> +    case PIXMAN_a8b8g8r8:
+> +    case PIXMAN_x8b8g8r8:
+> +        format =3D SDL_PIXELFORMAT_ABGR8888;
+> +        break;
+> +    case PIXMAN_r8g8b8a8:
+>      case PIXMAN_r8g8b8x8:
+>          format =3D SDL_PIXELFORMAT_RGBA8888;
+>          break;
+>      case PIXMAN_b8g8r8x8:
+>          format =3D SDL_PIXELFORMAT_BGRX8888;
+>          break;
+> +    case PIXMAN_b8g8r8a8:
+> +        format =3D SDL_PIXELFORMAT_BGRA8888;
+> +        break;
+>      default:
+>          g_assert_not_reached();
+>      }
+>=20
 
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
+
+
+--VK9jglZvIZrebWAwLoXByX2fhQ6K0iXUz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu7p9MACgkQ9AfbAGHV
+z0Bd7wf/Z4EythMOK6oP/yAkTU12cDQdx0stKCku0TekZI7NxfutNAPgXa4vBwH4
+eQJ1a9yPWtE7uY2AMRwdq9NypCcFZEsF0hIochgcJVx6SRcsNfU4nVNUOJo1Klg1
+emYQDUGAn/Ui7+Zz9iLj3yUnG5j3RwONAIu/kvhhu2VoSD940c9zgkUb9z4TtW6u
+rblaPlMKsZiOXZ98poRFUOva4P8O1BiD4CDT4CRjOevabmgLnsuCcDagJ2m+QWTN
+Mlwupara/zwR6xxQlAE0B6FTPfz7vjyyD0m1eTt0eRMWpCvtaEy1hMfGekduzA/8
+urCRDlnjLOxFLN2OidSByADG0XPz+g==
+=fd8D
+-----END PGP SIGNATURE-----
+
+--VK9jglZvIZrebWAwLoXByX2fhQ6K0iXUz--
