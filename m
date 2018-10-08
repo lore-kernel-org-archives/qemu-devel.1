@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1g9WHE-0002AQ-RM
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:12:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g9WJo-0004g2-3l
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:15:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1g9WH5-0001ea-64
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:12:49 -0400
-Date: Mon, 8 Oct 2018 16:12:29 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181008161229.5c6bce14@redhat.com>
-In-Reply-To: <aa176072-87b1-9e13-6770-97dfc354a1ed@redhat.com>
-References: <20180926094219.20322-1-david@redhat.com>
-	<20180926094219.20322-19-david@redhat.com>
-	<20180927150141.60a6488a@redhat.com>
-	<dc5d7b2d-5b51-2c0b-aac7-ebf04a4e7859@redhat.com>
-	<20181001152443.2cca5c5e@redhat.com>
-	<85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
-	<20181008141904.17b601d3@redhat.com>
-	<aa176072-87b1-9e13-6770-97dfc354a1ed@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1g9WJj-0002xM-Cj
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:15:32 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:43706)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g9WJi-0002wu-Pf
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:15:27 -0400
+Received: by mail-wr1-x429.google.com with SMTP id n1-v6so21021905wrt.10
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 07:15:26 -0700 (PDT)
+References: <20181005154910.3099-1-alex.bennee@linaro.org>
+	<20181007012337.GA23787@flamenco> <875zycohpl.fsf@linaro.org>
+	<20181008135953.GA19899@flamenco>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181008135953.GA19899@flamenco>
+Date: Mon, 08 Oct 2018 15:15:23 +0100
+Message-ID: <87zhvomsn8.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
- handler
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH  00/21] Trace updates and plugin RFC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +31,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-devel@nongnu.org, "Dr . David Alan
-	Gilbert" <dgilbert@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu
 
-On Mon, 8 Oct 2018 14:41:50 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> On 08/10/2018 14:19, Igor Mammedov wrote:
-> > On Mon, 8 Oct 2018 13:47:53 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >>> That way using [2] and [1 - modulo it should match only concrete type]
-> >>> machine would be able to override hotplug handlers for TYPE_VIRTIO_PMEM_PCI
-> >>> and explicitly call machine + pci hotplug handlers in necessary order.
-> >>>
-> >>> flow would look like:
-> >>>   [acpi|shcp|native pci-e eject]->  
-> >>>        hotplug_ctrl = qdev_get_hotplug_handler(dev);
-> >>>        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err); ->
-> >>>             machine_unplug()
-> >>>                machine_virtio_pci_pmem_cb(): 
-> >>>                   // we now that's device has 2 stage hotplug handlers,
-> >>>                   // so we can arrange hotplug sequence in necessary order
-> >>>                   hotplug_ctrl2 = qdev_get_bus_hotplug_handler(dev);
-> >>>
-> >>>                   //then do unplug in whatever order that's correct,
-> >>>                   // I'd assume tear down/stop PCI device first, flushing
-> >>>                   // command virtio command queues and that unplug memory itself.
-> >>>                   hotplug_handler_unplug(hotplug_ctrl2, dev, &local_err);
-> >>>                   memory_device_unplug()
-> >>>     
-> >>
-> >> Looking into the details, this order is not possible. The unplug will
-> >> essentially do a device_unparent() leading to the whole hierarchy
-> >> getting destroyed. The memory_device part always has to come first.  
-> > 
-> > Question here is if there are anything that should be handled first on
-> > virtio level before memory_device/pmem part is called?
-> > If there isn't it might be fine to swap the order of unplug sequence.
-> >   
-> 
-> Was asking myself the same thing, but as we are effectively holding the
-> iothread lock and the guest triggered the unplug, I guess it is fine to
-> unregister the memory region at this point.
-It looks the same to me but I'm not familiar with virtio or PCI.
-I'd ask Michael if it's safe thing to do.
+Emilio G. Cota <cota@braap.org> writes:
+
+> On Mon, Oct 08, 2018 at 11:28:38 +0100, Alex Benn=C3=A9e wrote:
+>> Emilio G. Cota <cota@braap.org> writes:
+>> > Again, for performance you'd avoid the tracepoint (i.e. calling
+>> > a helper to call another function) and embed directly the
+>> > callback from TCG. Same thing applies to TB's.
+>>
+>> OK I see what you mean. I think that is doable although it might take a
+>> bit more tcg plumbing.
+>
+> I have patches to do it, it's not complicated.
+
+Right that would be useful.
+
+>
+>> >> So what do people think? Could this be a viable way to extend QEMU
+>> >> with plugins?
+>> >
+>> > For frequent events such as the ones mentioned above, I am
+>> > not sure plugins can be efficiently implemented under
+>> > tracing.
+>>
+>> I assume some form of helper-per-instrumented-event/insn is still going
+>> to be needed though? We are not considering some sort of EBF craziness?
+>
+> Helper, yes. But one that points directly to plugin code.
+
+It would be nice if the logic the inserts the trace helper vs a direct
+call could be shared. I guess I'd have to see the implementation to see
+how ugly it gets.
+
+>
+>> > For others (e.g. cpu_init events), sure, they could.
+>> > But still, differently from tracers, plugins can come and go
+>> > anytime, so I am not convinced that merging the two features
+>> > is a good idea.
+>>
+>> I don't think we have to mirror tracepoints and plugin points but I'm in
+>> favour of sharing the general mechanism and tooling rather than having a
+>> whole separate set of hooks. We certainly don't want anything like:
+>>
+>>           trace_exec_tb(tb, pc);
+>>           plugin_exec_tb(tb, pc);
+>>
+>> scattered throughout the code where the two do align.
+>
+> We could have something like
+>
+> 	plugin_trace_exec_tb(tb, pc);
+>
+> that would expand to the two lines above. Or similar.
+>
+> So I agree with you that in some cases the "trace points"
+> for both tracing and plugin might be the same, perhaps
+> identical. But that doesn't necessarily mean that making
+> plugins a subset of tracing is a good idea.
+
+But we can avoid having plugin-points and trace-events duplicating stuff
+as well? I guess you want to avoid having the generated code fragments
+for plugins?
+
+The other nice property was avoiding re-duplicating output logic for
+"filter" style operations. However I didn't actually included such an
+example in the series. I was pondering a QEMU powered PLT/library call
+tracer to demonstrate that sort of thing.
+
+> I think sharing my plugin implementation will help the
+> discussion. I'll share it as soon as I can (my QEMU plate
+> is full already trying to merge a couple of other features
+> first).
+
+Sounds good.
+
+>
+> Thanks,
+>
+> 		Emilio
+
+
+--
+Alex Benn=C3=A9e
