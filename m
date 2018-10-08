@@ -1,27 +1,27 @@
 Received: from eggs.gnu.org ([2001:4830:134:3::10]:58225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9d4U-000559-38
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:28:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g9d4S-000559-Ht
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9cyj-00086Y-1Z
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:22:16 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37834)
+	(envelope-from <richard.henderson@linaro.org>) id 1g9cyr-0008AQ-1j
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:22:24 -0400
+Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:42529)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g9cyi-00085a-J5
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:22:12 -0400
-Received: by mail-pg1-x542.google.com with SMTP id c10-v6so8386823pgq.4
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 14:22:12 -0700 (PDT)
+	id 1g9cyq-00089L-Pd
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 17:22:20 -0400
+Received: by mail-pf1-x434.google.com with SMTP id f26-v6so8787748pfn.9
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 14:22:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon,  8 Oct 2018 14:21:57 -0700
-Message-Id: <20181008212205.17752-3-richard.henderson@linaro.org>
+Date: Mon,  8 Oct 2018 14:22:02 -0700
+Message-Id: <20181008212205.17752-8-richard.henderson@linaro.org>
 In-Reply-To: <20181008212205.17752-1-richard.henderson@linaro.org>
 References: <20181008212205.17752-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 02/10] target/arm: Define fields of ISAR
- registers
+Subject: [Qemu-devel] [PATCH v3 07/10] target/arm: Convert jazelle from
+ feature bit to isar1 test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,110 +33,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+Having V6 alone imply jazelle was wrong for cortex-m0.
+Change to an assertion for V6 & !M.
+
+This was harmless, because the only place we tested ARM_FEATURE_JAZELLE
+was for 'bxj' in disas_arm(), which is unreachable for M-profile cores.
+
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
+ target/arm/cpu.h       |  6 +++++-
+ target/arm/translate.h |  1 +
+ target/arm/cpu.c       | 17 ++++++++++++++---
+ target/arm/translate.c |  2 +-
+ 4 files changed, 21 insertions(+), 5 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 54362ddce8..f00c0444c4 100644
+index 2af971e823..557ef8daf9 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -1443,6 +1443,94 @@ FIELD(V7M_CSSELR, LEVEL, 1, 3)
-  */
- FIELD(V7M_CSSELR, INDEX, 0, 4)
+@@ -1580,7 +1580,6 @@ enum arm_features {
+     ARM_FEATURE_PMU, /* has PMU support */
+     ARM_FEATURE_VBAR, /* has cp15 VBAR */
+     ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
+-    ARM_FEATURE_JAZELLE, /* has (trivial) Jazelle implementation */
+     ARM_FEATURE_SVE, /* has Scalable Vector Extension */
+     ARM_FEATURE_V8_FP16, /* implements v8.2 half-precision float */
+     ARM_FEATURE_M_MAIN, /* M profile Main Extension */
+@@ -3147,6 +3146,11 @@ static inline bool aa32_feature_arm_div(ARMCPU *cpu)
+     return FIELD_EX32(cpu->id_isar0, ID_ISAR0, DIVIDE) > 1;
+ }
  
-+/*
-+ * System register ID fields.
-+ */
-+FIELD(ID_ISAR0, SWAP, 0, 4)
-+FIELD(ID_ISAR0, BITCOUNT, 4, 4)
-+FIELD(ID_ISAR0, BITFIELD, 8, 4)
-+FIELD(ID_ISAR0, CMPBRANCH, 12, 4)
-+FIELD(ID_ISAR0, COPROC, 16, 4)
-+FIELD(ID_ISAR0, DEBUG, 20, 4)
-+FIELD(ID_ISAR0, DIVIDE, 24, 4)
++static inline bool aa32_feature_jazelle(ARMCPU *cpu)
++{
++    return FIELD_EX32(cpu->id_isar1, ID_ISAR1, JAZELLE) != 0;
++}
 +
-+FIELD(ID_ISAR1, ENDIAN, 0, 4)
-+FIELD(ID_ISAR1, EXCEPT, 4, 4)
-+FIELD(ID_ISAR1, EXCEPT_AR, 8, 4)
-+FIELD(ID_ISAR1, EXTEND, 12, 4)
-+FIELD(ID_ISAR1, IFTHEN, 16, 4)
-+FIELD(ID_ISAR1, IMMEDIATE, 20, 4)
-+FIELD(ID_ISAR1, INTERWORK, 24, 4)
-+FIELD(ID_ISAR1, JAZELLE, 28, 4)
-+
-+FIELD(ID_ISAR2, LOADSTORE, 0, 4)
-+FIELD(ID_ISAR2, MEMHINT, 4, 4)
-+FIELD(ID_ISAR2, MULTIACCESSINT, 8, 4)
-+FIELD(ID_ISAR2, MULT, 12, 4)
-+FIELD(ID_ISAR2, MULTS, 16, 4)
-+FIELD(ID_ISAR2, MULTU, 20, 4)
-+FIELD(ID_ISAR2, PSR_AR, 24, 4)
-+FIELD(ID_ISAR2, REVERSAL, 28, 4)
-+
-+FIELD(ID_ISAR3, SATURATE, 0, 4)
-+FIELD(ID_ISAR3, SIMD, 4, 4)
-+FIELD(ID_ISAR3, SVC, 8, 4)
-+FIELD(ID_ISAR3, SYNCHPRIM, 12, 4)
-+FIELD(ID_ISAR3, TABBRANCH, 16, 4)
-+FIELD(ID_ISAR3, T32COPY, 20, 4)
-+FIELD(ID_ISAR3, TRUENOP, 24, 4)
-+FIELD(ID_ISAR3, T32EE, 28, 4)
-+
-+FIELD(ID_ISAR4, UNPRIV, 0, 4)
-+FIELD(ID_ISAR4, WITHSHIFTS, 4, 4)
-+FIELD(ID_ISAR4, WRITEBACK, 8, 4)
-+FIELD(ID_ISAR4, SMC, 12, 4)
-+FIELD(ID_ISAR4, BARRIER, 16, 4)
-+FIELD(ID_ISAR4, SYNCHPRIM_FRAC, 20, 4)
-+FIELD(ID_ISAR4, PSR_M, 24, 4)
-+FIELD(ID_ISAR4, SWP_FRAC, 28, 4)
-+
-+FIELD(ID_ISAR5, SEVL, 0, 4)
-+FIELD(ID_ISAR5, AES, 4, 4)
-+FIELD(ID_ISAR5, SHA1, 8, 4)
-+FIELD(ID_ISAR5, SHA2, 12, 4)
-+FIELD(ID_ISAR5, CRC32, 16, 4)
-+FIELD(ID_ISAR5, RDM, 24, 4)
-+FIELD(ID_ISAR5, VCMA, 28, 4)
-+
-+FIELD(ID_ISAR6, JSCVT, 0, 4)
-+FIELD(ID_ISAR6, DP, 4, 4)
-+FIELD(ID_ISAR6, FHM, 8, 4)
-+FIELD(ID_ISAR6, SB, 12, 4)
-+FIELD(ID_ISAR6, SPECRES, 16, 4)
-+
-+FIELD(ID_AA64ISAR0, AES, 4, 4)
-+FIELD(ID_AA64ISAR0, SHA1, 8, 4)
-+FIELD(ID_AA64ISAR0, SHA2, 12, 4)
-+FIELD(ID_AA64ISAR0, CRC32, 16, 4)
-+FIELD(ID_AA64ISAR0, ATOMIC, 20, 4)
-+FIELD(ID_AA64ISAR0, RDM, 28, 4)
-+FIELD(ID_AA64ISAR0, SHA3, 32, 4)
-+FIELD(ID_AA64ISAR0, SM3, 36, 4)
-+FIELD(ID_AA64ISAR0, SM4, 40, 4)
-+FIELD(ID_AA64ISAR0, DP, 44, 4)
-+FIELD(ID_AA64ISAR0, FHM, 48, 4)
-+FIELD(ID_AA64ISAR0, TS, 52, 4)
-+FIELD(ID_AA64ISAR0, TLB, 56, 4)
-+FIELD(ID_AA64ISAR0, RNDR, 60, 4)
-+
-+FIELD(ID_AA64ISAR1, DPB, 0, 4)
-+FIELD(ID_AA64ISAR1, APA, 4, 4)
-+FIELD(ID_AA64ISAR1, API, 8, 4)
-+FIELD(ID_AA64ISAR1, JSCVT, 12, 4)
-+FIELD(ID_AA64ISAR1, FCMA, 16, 4)
-+FIELD(ID_AA64ISAR1, LRCPC, 20, 4)
-+FIELD(ID_AA64ISAR1, GPA, 24, 4)
-+FIELD(ID_AA64ISAR1, GPI, 28, 4)
-+FIELD(ID_AA64ISAR1, FRINTTS, 32, 4)
-+FIELD(ID_AA64ISAR1, SB, 36, 4)
-+FIELD(ID_AA64ISAR1, SPECRES, 40, 4)
-+
- QEMU_BUILD_BUG_ON(ARRAY_SIZE(((ARMCPU *)0)->ccsidr) <= R_V7M_CSSELR_INDEX_MASK);
+ static inline bool aa32_feature_aes(ARMCPU *cpu)
+ {
+     return FIELD_EX32(cpu->id_isar5, ID_ISAR5, AES) != 0;
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 8279465d1d..bd394bdf69 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -197,6 +197,7 @@ static inline TCGv_i32 get_ahp_flag(void)
  
- /* If adding a feature bit which corresponds to a Linux ELF
+ FORWARD_FEATURE(thumb_div)
+ FORWARD_FEATURE(arm_div)
++FORWARD_FEATURE(jazelle)
+ FORWARD_FEATURE(aes)
+ FORWARD_FEATURE(pmull)
+ FORWARD_FEATURE(sha1)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index f068b4c476..4e2609aa7e 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -850,8 +850,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+     if (arm_feature(env, ARM_FEATURE_V6)) {
+         set_feature(env, ARM_FEATURE_V5);
+-        set_feature(env, ARM_FEATURE_JAZELLE);
+         if (!arm_feature(env, ARM_FEATURE_M)) {
++            assert(aa32_feature_jazelle(cpu));
+             set_feature(env, ARM_FEATURE_AUXCR);
+         }
+     }
+@@ -1078,11 +1078,16 @@ static void arm926_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_VFP);
+     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
+     set_feature(&cpu->env, ARM_FEATURE_CACHE_TEST_CLEAN);
+-    set_feature(&cpu->env, ARM_FEATURE_JAZELLE);
+     cpu->midr = 0x41069265;
+     cpu->reset_fpsid = 0x41011090;
+     cpu->ctr = 0x1dd20d2;
+     cpu->reset_sctlr = 0x00090078;
++
++    /*
++     * ARMv5 does not have the ID_ISAR registers, but we can still
++     * set the field to indicate Jazelle support within QEMU.
++     */
++    cpu->id_isar1 = FIELD_DP32(cpu->id_isar1, ID_ISAR1, JAZELLE, 1);
+ }
+ 
+ static void arm946_initfn(Object *obj)
+@@ -1108,12 +1113,18 @@ static void arm1026_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_AUXCR);
+     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
+     set_feature(&cpu->env, ARM_FEATURE_CACHE_TEST_CLEAN);
+-    set_feature(&cpu->env, ARM_FEATURE_JAZELLE);
+     cpu->midr = 0x4106a262;
+     cpu->reset_fpsid = 0x410110a0;
+     cpu->ctr = 0x1dd20d2;
+     cpu->reset_sctlr = 0x00090078;
+     cpu->reset_auxcr = 1;
++
++    /*
++     * ARMv5 does not have the ID_ISAR registers, but we can still
++     * set the field to indicate Jazelle support within QEMU.
++     */
++    cpu->id_isar1 = FIELD_DP32(cpu->id_isar1, ID_ISAR1, JAZELLE, 1);
++
+     {
+         /* The 1026 had an IFAR at c6,c0,0,1 rather than the ARMv6 c6,c0,0,2 */
+         ARMCPRegInfo ifar = {
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index b1ee6533cc..54ecf369cb 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -42,7 +42,7 @@
+ #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
+ /* currently all emulated v5 cores are also v5TE, so don't bother */
+ #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
+-#define ENABLE_ARCH_5J    arm_dc_feature(s, ARM_FEATURE_JAZELLE)
++#define ENABLE_ARCH_5J    aa32_dc_feature_jazelle(s)
+ #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
+ #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
+ #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
 -- 
 2.17.1
