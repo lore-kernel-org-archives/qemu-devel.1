@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W6O-0001oR-T5
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:54 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W6P-0001pD-Tz
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W6I-0007hQ-Ux
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:40 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51692)
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W6J-0007ir-W0
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:41 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1g9W6A-0006uy-2D
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:29 -0400
+	id 1g9W6I-0006iu-Tl
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:35 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W5O-0003kq-MF
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:38 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W5N-0003kc-OC
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:37 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  8 Oct 2018 14:59:59 +0100
-Message-Id: <20181008140004.12612-29-peter.maydell@linaro.org>
+Date: Mon,  8 Oct 2018 14:59:58 +0100
+Message-Id: <20181008140004.12612-28-peter.maydell@linaro.org>
 In-Reply-To: <20181008140004.12612-1-peter.maydell@linaro.org>
 References: <20181008140004.12612-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 28/33] target/arm: Add v8M stack checks for
- Thumb2 LDM/STM
+Subject: [Qemu-devel] [PULL 27/33] target/arm: Add v8M stack checks for
+ LDRD/STRD (imm)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,76 +34,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Add the v8M stack checks for:
- * LDM (T2 encoding)
- * STM (T2 encoding)
+ * LDRD (immediate)
+ * STRD (immediate)
 
-This includes the 32-bit encodings of the instructions listed
-in v8M ARM ARM rule R_YVWT as
- * LDM, LDMIA, LDMFD
- * LDMDB, LDMEA
- * POP (multiple registers)
- * PUSH (muliple registers)
- * STM, STMIA, STMEA
- * STMDB, STMFD
+Loads and stores are more complicated than ADD/SUB/MOV, because we
+must ensure that memory accesses below the stack limit are not
+performed, so we can't simply do the check when we actually update
+SP.
 
-We perform the stack limit before doing any other part
-of the load or store.
+For these instructions, if the stack limit check triggers
+we must not:
+ * perform any memory access below the SP limit
+ * update PC, SP or the load/store base register
+but it is IMPDEF whether we:
+ * perform any accesses above or equal to the SP limit
+ * update destination registers for loads
+
+For QEMU we choose to always check the limit before doing any other
+part of the load or store, so we won't update any registers or
+perform any memory accesses.
+
+It is UNKNOWN whether the limit check triggers for a load or store
+where the initial SP value is below the limit and one of the stores
+would be below the limit, but the writeback moves SP to above the
+limit.  For QEMU we choose to trigger the check in this situation.
+
+Note that limit checks happen only for loads and stores which update
+SP via writeback; they do not happen for loads and stores which
+simply use SP as a base register.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181002163556.10279-10-peter.maydell@linaro.org
+Message-id: 20181002163556.10279-9-peter.maydell@linaro.org
 ---
- target/arm/translate.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ target/arm/translate.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index c16d6075d94..3fb378a492d 100644
+index fcb33b8a503..c16d6075d94 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -10524,6 +10524,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-             } else {
-                 int i, loaded_base = 0;
-                 TCGv_i32 loaded_var;
+@@ -10278,6 +10278,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                  * 0b1111_1001_x11x_xxxx_xxxx_xxxx_xxxx_xxxx
+                  *  - load/store dual (pre-indexed)
+                  */
 +                bool wback = extract32(insn, 21, 1);
-                 /* Load/store multiple.  */
-                 addr = load_reg(s, rn);
-                 offset = 0;
-@@ -10531,10 +10532,26 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                     if (insn & (1 << i))
-                         offset += 4;
-                 }
 +
-                 if (insn & (1 << 24)) {
-                     tcg_gen_addi_i32(addr, addr, -offset);
+                 if (rn == 15) {
+                     if (insn & (1 << 21)) {
+                         /* UNPREDICTABLE */
+@@ -10289,8 +10291,29 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     addr = load_reg(s, rn);
                  }
- 
-+                if (s->v8m_stackcheck && rn == 13 && wback) {
-+                    /*
-+                     * If the writeback is incrementing SP rather than
-+                     * decrementing it, and the initial SP is below the
-+                     * stack limit but the final written-back SP would
-+                     * be above, then then we must not perform any memory
-+                     * accesses, but it is IMPDEF whether we generate
-+                     * an exception. We choose to do so in this case.
-+                     * At this point 'addr' is the lowest address, so
-+                     * either the original SP (if incrementing) or our
-+                     * final SP (if decrementing), so that's what we check.
-+                     */
-+                    gen_helper_v8m_stackcheck(cpu_env, addr);
+                 offset = (insn & 0xff) * 4;
+-                if ((insn & (1 << 23)) == 0)
++                if ((insn & (1 << 23)) == 0) {
+                     offset = -offset;
 +                }
 +
-                 loaded_var = NULL;
-                 for (i = 0; i < 16; i++) {
-                     if ((insn & (1 << i)) == 0)
-@@ -10562,7 +10579,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                 if (loaded_base) {
-                     store_reg(s, rn, loaded_var);
++                if (s->v8m_stackcheck && rn == 13 && wback) {
++                    /*
++                     * Here 'addr' is the current SP; if offset is +ve we're
++                     * moving SP up, else down. It is UNKNOWN whether the limit
++                     * check triggers when SP starts below the limit and ends
++                     * up above it; check whichever of the current and final
++                     * SP is lower, so QEMU will trigger in that situation.
++                     */
++                    if ((int32_t)offset < 0) {
++                        TCGv_i32 newsp = tcg_temp_new_i32();
++
++                        tcg_gen_addi_i32(newsp, addr, offset);
++                        gen_helper_v8m_stackcheck(cpu_env, newsp);
++                        tcg_temp_free_i32(newsp);
++                    } else {
++                        gen_helper_v8m_stackcheck(cpu_env, addr);
++                    }
++                }
++
+                 if (insn & (1 << 24)) {
+                     tcg_gen_addi_i32(addr, addr, offset);
+                     offset = 0;
+@@ -10314,7 +10337,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     gen_aa32_st32(s, tmp, addr, get_mem_index(s));
+                     tcg_temp_free_i32(tmp);
                  }
 -                if (insn & (1 << 21)) {
 +                if (wback) {
-                     /* Base register writeback.  */
-                     if (insn & (1 << 24)) {
-                         tcg_gen_addi_i32(addr, addr, -offset);
+                     /* Base writeback.  */
+                     tcg_gen_addi_i32(addr, addr, offset - 4);
+                     store_reg(s, rn, addr);
 -- 
 2.19.0
