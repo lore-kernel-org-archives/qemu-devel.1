@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1g9Lym-0006I8-A5
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:13:09 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1g9Lyp-0006N4-69
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1g9Lyl-0003xK-D6
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:13:08 -0400
-Date: Mon, 8 Oct 2018 13:05:59 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1g9Lyl-0003xE-8b
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:13:11 -0400
+Date: Mon, 8 Oct 2018 13:04:11 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20181008020559.GT7004@umbus.fritz.box>
-References: <20181005092024.14344-1-david@redhat.com>
-	<20181005092024.14344-4-david@redhat.com>
+Message-ID: <20181008020411.GS7004@umbus.fritz.box>
+References: <20180920103243.28474-1-david@redhat.com>
+	<20180920103243.28474-18-david@redhat.com>
+	<20180924054522.GY30868@umbus.fritz.box>
+	<bff1cdbc-8a7c-8d53-47ff-cf17120a4af5@redhat.com>
+	<1420151307.15516367.1537782494919.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gSSGYPGSs0dvYOj7"
+	protocol="application/pgp-signature"; boundary="HywJcj55HbA57jnN"
 Content-Disposition: inline
-In-Reply-To: <20181005092024.14344-4-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 03/16] memory-device: improve "range
- conflicts" error message
+In-Reply-To: <1420151307.15516367.1537782494919.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 17/22] virtio-pmem: prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, Auger Eric <eric.auger@redhat.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Richard Henderson <rth@twiddle.net>
 
 
---gSSGYPGSs0dvYOj7
+--HywJcj55HbA57jnN
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 05, 2018 at 11:20:11AM +0200, David Hildenbrand wrote:
-> Handle id=3D=3DNULL better and indicate that we are dealing with memory
-> devices.
+On Mon, Sep 24, 2018 at 05:48:14AM -0400, Pankaj Gupta wrote:
 >=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/mem/memory-device.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> > On 24/09/2018 07:45, David Gibson wrote:
+> > > On Thu, Sep 20, 2018 at 12:32:38PM +0200, David Hildenbrand wrote:
+> > >> From: Pankaj Gupta <pagupta@redhat.com>
+> > >>
+> > >> This is the current protoype of virtio-pmem. Support will require
+> > >> machine changes for the architectures that will support it, so it wi=
+ll
+> > >> not yet be compiled.
+> > >>
+> > >> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > >> [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memadd=
+r",
+> > >>   split up patches ]
+> > >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> > >=20
+> > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > >=20
+> > > Seems generally sane.  Is there a (craft?) virtio-pmem spec around to
+> > > see what this is actually trying to implement?
+> >=20
+> > I am not aware of any. The first goal is to get something implemented
+> > that works and doesn't break important concepts. E.g. hotplugging memory
+> > devices was one of these concepts that Igor saw as a potential problem
+> > for getting virtio-pmem upstream.
+> >=20
+> > But maybe Pankaj already has some draft version of a spec lying around.
 >=20
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index 7c706fadfc..0624184c40 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -175,7 +175,8 @@ uint64_t memory_device_get_free_addr(MachineState *ms=
-, const uint64_t *hint,
->          if (ranges_overlap(md_addr, md_size, new_addr, size)) {
->              if (hint) {
->                  const DeviceState *d =3D DEVICE(md);
-> -                error_setg(errp, "address range conflicts with '%s'", d-=
->id);
-> +                error_setg(errp, "address range conflicts with memory de=
-vice"
-> +                           " id=3D'%s'", d->id ? d->id : "(unnamed)");
->                  goto out;
->              }
->              new_addr =3D QEMU_ALIGN_UP(md_addr + md_size, align);
+> I have created document but no official spec. Project idea is shared here=
+ [1]=20
+> and kernel part of series [2]. I will create a spec and share.
+>=20
+> [1] https://www.spinics.net/lists/kvm/msg153095.html
+> [2] https://marc.info/?l=3Dkvm&m=3D153572224719212&w=3D2
+
+Ok.  Because this creates a new interface we could be working with for
+a while, I think we do need at least a semi-formal spec - and to get
+some review of that spec - before we merge.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -70,24 +82,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gSSGYPGSs0dvYOj7
+--HywJcj55HbA57jnN
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlu6u4cACgkQbDjKyiDZ
-s5L+kRAAvoPeQQiKn0OPw6fmGoub2Y5S3SiP7y96pESDlVxC/37lYYMgwv5DWhxj
-BLHWCVPlyHs5rXDmXqRfdz5UBKULJrZomyZwMMk8JdHK9DBBpuBNto3vxJPKreF7
-UAhR8YkKfy8ycR0lF3mpD1vG8pDJ3gfC9nvf+nV8iZmLRivU/bt47e7q2FLPgweW
-FqnebUiaDocRcxOhHc+kVEChptPeBwKpatO1MuCeWZYrt2jC6ZHXFv0BFRKp24hh
-nDUDLRQafqMfl7GXqzs2ZGXgX60+U93eP0aZclp/ZOq4P6Lwk0iyJ0wJNsreh9CD
-8iiyMe+m9Yn+UXg+/kjWl48Dznq3HWXA8hh6yHwhkM5eZWqIYj9lyUKEyQ2bXLGO
-BkdYnyGbLgA0FggR8GswnUiDO5JdZR6lcBVKeuFp7ROcO8cxFEdziirPs0IwcSFx
-Yu/MNiaDk9rjqsAdkaLABEv9yHGHx5oNv1HnkoqJF+MP7e3wkgJIO6SY/5mpCXI8
-3svs+A55Js7R7+Gd5Wv8yZFRcQukIPHMlZOw949U1vzXb62ZogAp2Z+tyKbm0SzE
-TEn0SBRzcZsF+bbiV28S8KEo2DMXaBl9NC0YhLzN7fSBFY31X8YbdVw3pQ02byR6
-5l1pcvgmJFlHWlkkyFA2qw0/xtuJrtnMKXBnVQfy9vgGHXHoByQ=
-=Je5Z
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlu6uxsACgkQbDjKyiDZ
+s5LF4BAAwDKiTt5LVeZeFAiAKSsUo4Zc9uRG9HJy9T34mbzngQJ5/7JBkd+5bytQ
+kqJG6manphpDMd1U0R5P+z0xegZicKkulcwjOqvu4NAX/ZyGIiUNk3PE2in12phx
+8pmqGu8MvXhnG0X9V+oH9irJQE/fATKFyVRru/VY4jsF5K9wJdYbARcPqdrY8/nN
+O2+p4wlgThZIL7aI8vZI2NxMXeXKqCO52gIWFEsUe7ouDCyA2EwvRmNiDZPAqLcg
+v6MLHMOCfmlGXMI6qq2lnZ1l8IFmHzh0bdTXAfj79eqdSBcxLyviD4iuPTGmxBIr
+RD0/1Ncykn/GGQPWy0GUozorBFzn+voLExbEqCnUDhh1hxcsj+gbO6MRvA//DiR8
+YrxvyGXFhehIjaljbYUTO0j9ZMRnxUOmdjstFOLAQbjNl13e3wVslt89a4d09l+S
+z6SUCw25QJdz34/mdJfRlAJQ6fX7D9yC/xYh4xnXzDdT8RKmc0Hl8bqp/oOzRwtz
+GBcs7tBiY5BRUP1PkTWRxoTKNUWWWaXEJWcMKM2fji3A/s+/dLPgKAXb5oV1pzQp
+pyq/IEAR3lZMO5AHMj8DiRPRO9yWH3yvs5Sdlv5jXcX5waJ0ffCpyEuZ/h7Gyebz
+pWv56Fxiqg+2w/8nzSS102/11L4EgD8/PXEbcEsY1Zf5nYGRCzc=
+=1lix
 -----END PGP SIGNATURE-----
 
---gSSGYPGSs0dvYOj7--
+--HywJcj55HbA57jnN--
