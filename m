@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35112)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=812b08464=Alistair.Francis@wdc.com>)
-	id 1g9aE3-0004my-CQ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:25:52 -0400
+	id 1g9aEI-0004wS-23
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:26:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=812b08464=Alistair.Francis@wdc.com>)
-	id 1g9aE0-0007sA-6w
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:25:51 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:49719)
+	id 1g9aED-00086G-Eg
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:26:04 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:54562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=812b08464=Alistair.Francis@wdc.com>)
-	id 1g9aDz-0007rB-TO
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:25:48 -0400
+	id 1g9aEA-00082C-Re
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:26:00 -0400
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Mon, 8 Oct 2018 18:25:45 +0000
-Message-ID: <1813e888a55667b7097df2a75fa626c98390240d.1539023064.git.alistair.francis@wdc.com>
+Date: Mon, 8 Oct 2018 18:25:56 +0000
+Message-ID: <17e897f16e0972da80a22d50b50293dc893731b0.1539023064.git.alistair.francis@wdc.com>
 References: <cover.1539023064.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1539023064.git.alistair.francis@wdc.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v1 4/5] RISC-V: Add missing free for
- plic_hart_config
+Subject: [Qemu-devel] [PATCH v1 5/5] RISC-V: Don't add NULL bootargs to
+ device-tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,28 +37,64 @@ Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistai
 From: Michael Clark <mjc@sifive.com>
 
 Cc: Palmer Dabbelt <palmer@sifive.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/virt.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/riscv/sifive_u.c | 4 +++-
+ hw/riscv/spike.c    | 6 ++++--
+ hw/riscv/virt.c     | 4 +++-
+ 3 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 005169eabc..6bd723dc3a 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -385,6 +385,8 @@ static void riscv_virt_board_init(MachineState *machine=
-)
-     serial_mm_init(system_memory, memmap[VIRT_UART0].base,
-         0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
-         serial_hd(0), DEVICE_LITTLE_ENDIAN);
-+
-+    g_free(plic_hart_config);
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 862f8ff5f7..ef07df2442 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -230,7 +230,9 @@ static void create_fdt(SiFiveUState *s, const struct Me=
+mmapEntry *memmap,
+=20
+     qemu_fdt_add_subnode(fdt, "/chosen");
+     qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
+-    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++    if (cmdline) {
++        qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++    }
+     g_free(nodename);
  }
 =20
- static void riscv_virt_board_machine_init(MachineClass *mc)
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index be5ef85e81..8a712ed490 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -156,8 +156,10 @@ static void create_fdt(SpikeState *s, const struct Mem=
+mapEntry *memmap,
+     g_free(cells);
+     g_free(nodename);
+=20
+-    qemu_fdt_add_subnode(fdt, "/chosen");
+-    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++    if (cmdline) {
++        qemu_fdt_add_subnode(fdt, "/chosen");
++        qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++    }
+  }
+=20
+ static void spike_v1_10_0_board_init(MachineState *machine)
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index 6bd723dc3a..4a137a503c 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -254,7 +254,9 @@ static void *create_fdt(RISCVVirtState *s, const struct=
+ MemmapEntry *memmap,
+=20
+     qemu_fdt_add_subnode(fdt, "/chosen");
+     qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
+-    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++    if (cmdline) {
++        qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
++    }
+     g_free(nodename);
+=20
+     return fdt;
 --=20
 2.17.1
