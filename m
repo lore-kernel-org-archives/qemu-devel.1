@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1g9P76-0002Mh-At
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 02:33:57 -0400
+	(envelope-from <thuth@redhat.com>) id 1g9PAI-0003Y2-7i
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 02:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1g9P73-0002QD-2T
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 02:33:56 -0400
-Date: Mon, 8 Oct 2018 14:33:41 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181008063341.GG18728@xz-x1>
-References: <20180913075517.11140-1-peterx@redhat.com>
-	<e7cc5dbe-d577-2b41-517d-0d32e9d6ebd7@redhat.com>
-	<20181008060620.GF18728@xz-x1>
+	(envelope-from <thuth@redhat.com>) id 1g9PAE-00068D-8I
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 02:37:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1g9PAE-00067p-0O
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 02:37:10 -0400
+References: <1538756242-54922-1-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c44ae171-cce9-851e-3495-7e4170c3244b@redhat.com>
+Date: Mon, 8 Oct 2018 08:37:05 +0200
 MIME-Version: 1.0
+In-Reply-To: <1538756242-54922-1-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181008060620.GF18728@xz-x1>
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: handle invalid ce for shadow
- sync
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: remove gcov-files- variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, Pei Zhang <pezhang@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Mon, Oct 08, 2018 at 02:06:20PM +0800, Peter Xu wrote:
-> > > -static int vtd_sync_shadow_page_table(VTDAddressSpace *vtd_as)
-> > > -{
-> > > -    return vtd_sync_shadow_page_table_range(vtd_as, NULL, 0, UINT64_MAX);
-> > > +    return vtd_sync_shadow_page_table_range(vtd_as, &ce, 0, UINT64_MAX);
-> > >   }
-> > 
-> > As has been discussed, this will left addr UINT64_MAX, it's better to have
-> > [start, end] instead of (start, range).
+On 2018-10-05 18:17, Paolo Bonzini wrote:
+> Commit 31d2dda ("build-system: remove per-test GCOV reporting", 2018-06-20)
+> removed users of the variables, since those uses can be replaced by a simple
+> overall report produced by gcovr.  However, the variables were never removed.
+> Do it now.
 > 
-> Hmm, this size is inclusive, so we should be fine.  Though I'll take
-> your advise to use start/end pair to be clearer.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  docs/devel/testing.rst |   4 +-
+>  tests/Makefile.include | 118 -------------------------------------------------
+>  2 files changed, 1 insertion(+), 121 deletions(-)
 
-Sorry it's not...
+Good idea, I think these variables were pretty much out of sync anyway.
 
-Actually vtd_page_walk() itself is not inclusive, so we will need to
-touch that up if we want to let the whole stack use the [start, end]
-inclusive way.  However I would try not to bother with it since after
-all page sync operation is per-small-page granularity, so imho missing
-the last addr UINT64_MAX is ok (as long as we're covering the last
-page, which is UINT64_MAX - PAGE_SIZE + 1).  I'm not sure whether
-it'll worth it then to change the whole stack into inclusive way... so
-I'll temporarily keep it as is.
-
-Regards,
-
--- 
-Peter Xu
+Acked-by: Thomas Huth <thuth@redhat.com>
