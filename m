@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9ejC-0006G6-7t
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:14:19 -0400
+	(envelope-from <cota@braap.org>) id 1g9ewV-0000fs-OQ
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9ej4-0007hq-Hs
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:14:17 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 8 Oct 2018 23:14:00 +0000
-Message-ID: <8dd2d90f-453b-aade-fbf3-ef8616a00ff8@virtuozzo.com>
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
-	<20180817122219.16206-8-vsementsov@virtuozzo.com>
-	<d78f37ac-343d-20bf-a2ce-16ff2fa12677@redhat.com>
-	<a02a1caf-53f5-e20a-93a4-67233032d76e@virtuozzo.com>
-	<b78b66f6-018d-0ec9-a33a-3b8263867b8b@redhat.com>
-	<04c11931-57be-d890-635a-178db8ab1468@virtuozzo.com>
-	<d1ccc5e0-03fb-32a6-d99f-3eea28b273ed@redhat.com>
-In-Reply-To: <d1ccc5e0-03fb-32a6-d99f-3eea28b273ed@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3CC91D533A8FD74A9535F724BFACE101@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/qcow2-refcount: fix
- out-of-file L2 entries to be read-as-zero
+	(envelope-from <cota@braap.org>) id 1g9ewS-0000Ux-BS
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:28:03 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44359)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9ewR-0000Ty-WD
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:28:00 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Mon,  8 Oct 2018 19:27:51 -0400
+Message-Id: <20181008232756.30704-1-cota@braap.org>
+Subject: [Qemu-devel] [RFC v2 0/5] Dynamic TLB sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +21,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-DQoNCk9uIDEwLzA5LzIwMTggMDE6MjEgQU0sIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMDkuMTAu
-MTggMDA6MTQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pg0KPj4NCj4+
-IE9uIDEwLzA5LzIwMTggMDE6MDggQU0sIE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAwOS4xMC4x
-OCAwMDowMiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4NCj4+Pj4N
-Cj4+Pj4gT24gMTAvMDgvMjAxOCAxMTo1MSBQTSwgTWF4IFJlaXR6IHdyb3RlOg0KPj4+Pj4gT24g
-MTcuMDguMTggMTQ6MjIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4+
-Pj4gUmV3cml0ZSBjb3JydXB0ZWQgTDIgdGFibGUgZW50cnksIHdoaWNoIHJlZmVyZW5jZSBzcGFj
-ZSBvdXQgb2YNCj4+Pj4+PiB1bmRlcmx5aW5nIGZpbGUuDQo+Pj4+Pj4NCj4+Pj4+PiBNYWtlIHRo
-aXMgTDIgdGFibGUgZW50cnkgcmVhZC1hcy1hbGwtemVyb3Mgd2l0aG91dCBhbnkgYWxsb2NhdGlv
-bi4NCj4+Pj4+Pg0KPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
-dnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+Pj4+PiAtLS0NCj4+Pj4+PiAgICAg
-YmxvY2svcWNvdzItcmVmY291bnQuYyB8IDMyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrDQo+Pj4+Pj4gICAgIDEgZmlsZSBjaGFuZ2VkLCAzMiBpbnNlcnRpb25zKCspDQo+Pj4+Pj4N
-Cj4+Pj4+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItcmVmY291bnQuYyBiL2Jsb2NrL3Fjb3cy
-LXJlZmNvdW50LmMNCj4+Pj4+PiBpbmRleCAzYzAwNGU1YmZlLi4zZGUzNzY4YTNjIDEwMDY0NA0K
-Pj4+Pj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMNCj4+Pj4+PiArKysgYi9ibG9jay9x
-Y293Mi1yZWZjb3VudC5jDQo+Pj4+Pj4gQEAgLTE3MjAsOCArMTcyMCwzMCBAQCBzdGF0aWMgaW50
-IGNoZWNrX3JlZmNvdW50c19sMihCbG9ja0RyaXZlclN0YXRlICpicywgQmRydkNoZWNrUmVzdWx0
-ICpyZXMsDQo+Pj4+Pj4gICAgICAgICAgICAgICAgIC8qIE1hcmsgY2x1c3RlciBhcyB1c2VkICov
-DQo+Pj4+Pj4gICAgICAgICAgICAgICAgIGNzaXplID0gKCgobDJfZW50cnkgPj4gcy0+Y3NpemVf
-c2hpZnQpICYgcy0+Y3NpemVfbWFzaykgKyAxKSAqDQo+Pj4+Pj4gICAgICAgICAgICAgICAgICAg
-ICAgICAgQkRSVl9TRUNUT1JfU0laRTsNCj4+Pj4+PiArICAgICAgICAgICAgaWYgKGNzaXplID4g
-cy0+Y2x1c3Rlcl9zaXplKSB7DQo+Pj4+Pj4gKyAgICAgICAgICAgICAgICByZXQgPSBmaXhfbDJf
-ZW50cnlfdG9femVybygNCj4+Pj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgYnMsIHJlcywg
-Zml4LCBsMl9vZmZzZXQsIGksIGFjdGl2ZSwNCj4+Pj4+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgImNvbXByZXNzZWQgY2x1c3RlciBsYXJnZXIgdGhhbiBjbHVzdGVyOiBzaXplIDB4JSINCj4+
-Pj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgUFJJeDY0LCBjc2l6ZSk7DQo+Pj4+Pj4gKyAg
-ICAgICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPj4+Pj4+ICsgICAgICAgICAgICAgICAgICAg
-IGdvdG8gZmFpbDsNCj4+Pj4+PiArICAgICAgICAgICAgICAgIH0NCj4+Pj4+PiArICAgICAgICAg
-ICAgICAgIGNvbnRpbnVlOw0KPj4+Pj4+ICsgICAgICAgICAgICB9DQo+Pj4+Pj4gKw0KPj4+Pj4N
-Cj4+Pj4+IFRoaXMgc2VlbXMgcmVjb3ZlcmFibGUsIGlzbid0IGl0PyAgQ2FuIHdlIG5vdCB0cnkg
-dG8ganVzdCBsaW1pdCB0aGUNCj4+Pj4+IGNzaXplLCBvciBkZWNvbXByZXNzIHRoZSBjbHVzdGVy
-IHdpdGggdGhlIGdpdmVuIGNzaXplIGZyb20gdGhlIGdpdmVuDQo+Pj4+PiBvZmZzZXQsIGRpc3Jl
-Z2FyZGluZyB0aGUgY2x1c3RlciBsaW1pdD8NCj4+Pj4NCj4+Pj4gSG0sIHlvdSB3YW50IHRvIGFz
-c3VtZSB0aGF0IGNzaXplIGlzIGNvcnJ1cHRlZCBidXQgY29mZnNldCBtYXkgYmUNCj4+Pj4gY29y
-cmVjdD8gVW5saWtlbHksIEkgdGhpbmsuDQo+Pj4NCj4+PiBCZXR0ZXIgdG8gcmVjb25zdHJ1Y3Qg
-cHJvYmFibHkgZ2FyYmFnZSBkYXRhIHRoYW4gdG8gZGVmaW5pdGVseSBnYXJiYWdlDQo+Pj4gZGF0
-YSAoYWxsIHplcm9lcykgaXMgd2hhdCBJIHRoaW5rLg0KPj4+DQo+Pj4+IFNvLCB0byBjYXJlZnVs
-bHkgcmVwYWlyIGNzaXplLCB3ZSBzaG91bGQgZGVjb21wcmVzcyBvbmUgY2x1c3RlciAob3Igb25l
-DQo+Pj4+IGNsdXN0ZXIgLSAxIGJ5dGUpIG9mIGRhdGEsIHRyeWluZyB0byBnZXQgb25lIGNsdXN0
-ZXIgb2YgZGVjb21wcmVzc2VkDQo+Pj4+IGRhdGEuIElmIHdlIHN1Y2NlZWQsIHdlIGtub3cgY3Np
-emUsIG9yIHdlIGNhbiBzYWZlbHkgc2V0IGl0IHRvIG9uZSBjbHVzdGVyLg0KPj4+DQo+Pj4gWWVz
-Lg0KPj4+DQo+Pj4+IE9yIHdlIGNhbiBqdXN0IHNldCBjc2l6ZSA9IDEgY2x1c3RlciwgaWYgaXQg
-aXMgbGFyZ2VyLiBBbmQgbGVhdmUNCj4+Pj4gcHJvYmxlbXMgdG8gcmVhbCBleGVjdXRpb24gd2hp
-Y2ggd2lsbCBsZWFkIHRvIEVJTyBpbiB3b3JzdCBjYXNlLg0KPj4+DQo+Pj4gT3IgdGhpcywgeWVz
-Lg0KPj4+DQo+Pj4+Pj4gICAgICAgICAgICAgICAgIGNvZmZzZXQgPSBsMl9lbnRyeSAmIHMtPmNs
-dXN0ZXJfb2Zmc2V0X21hc2sgJg0KPj4+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgfihC
-RFJWX1NFQ1RPUl9TSVpFIC0gMSk7DQo+Pj4+Pj4gKyAgICAgICAgICAgIGlmIChjb2Zmc2V0ID49
-IGJkcnZfZ2V0bGVuZ3RoKGJzLT5maWxlLT5icykpIHsNCj4+Pj4+PiArICAgICAgICAgICAgICAg
-IHJldCA9IGZpeF9sMl9lbnRyeV90b196ZXJvKA0KPj4+Pj4+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICBicywgcmVzLCBmaXgsIGwyX29mZnNldCwgaSwgYWN0aXZlLA0KPj4+Pj4+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAiY29tcHJlc3NlZCBjbHVzdGVyIG91dCBvZiBmaWxlOiBvZmZzZXQg
-MHglIiBQUkl4NjQsDQo+Pj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgIGNvZmZzZXQpOw0K
-Pj4+Pj4+ICsgICAgICAgICAgICAgICAgaWYgKHJldCA8IDApIHsNCj4+Pj4+PiArICAgICAgICAg
-ICAgICAgICAgICBnb3RvIGZhaWw7DQo+Pj4+Pj4gKyAgICAgICAgICAgICAgICB9DQo+Pj4+Pj4g
-KyAgICAgICAgICAgICAgICBjb250aW51ZTsNCj4+Pj4+PiArICAgICAgICAgICAgfQ0KPj4+Pj4+
-ICsNCj4+Pj4+PiAgICAgICAgICAgICAgICAgcmV0ID0gcWNvdzJfaW5jX3JlZmNvdW50c19pbXJ0
-KGJzLCByZXMsDQo+Pj4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICByZWZjb3VudF90YWJsZSwgcmVmY291bnRfdGFibGVfc2l6ZSwNCj4+Pj4+PiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvZmZzZXQsIGNzaXpl
-KTsNCj4+Pj4+PiBAQCAtMTc0OCw2ICsxNzcwLDE2IEBAIHN0YXRpYyBpbnQgY2hlY2tfcmVmY291
-bnRzX2wyKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBCZHJ2Q2hlY2tSZXN1bHQgKnJlcywNCj4+Pj4+
-PiAgICAgICAgICAgICB7DQo+Pj4+Pj4gICAgICAgICAgICAgICAgIHVpbnQ2NF90IG9mZnNldCA9
-IGwyX2VudHJ5ICYgTDJFX09GRlNFVF9NQVNLOw0KPj4+Pj4+ICAgICANCj4+Pj4+PiArICAgICAg
-ICAgICAgaWYgKG9mZnNldCA+PSBiZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMpKSB7DQo+Pj4+
-Pj4gKyAgICAgICAgICAgICAgICByZXQgPSBmaXhfbDJfZW50cnlfdG9femVybygNCj4+Pj4+PiAr
-ICAgICAgICAgICAgICAgICAgICAgICAgYnMsIHJlcywgZml4LCBsMl9vZmZzZXQsIGksIGFjdGl2
-ZSwNCj4+Pj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgImNsdXN0ZXIgb3V0IG9mIGZpbGU6
-IG9mZnNldCAweCUiIFBSSXg2NCwgb2Zmc2V0KTsNCj4+Pj4+PiArICAgICAgICAgICAgICAgIGlm
-IChyZXQgPCAwKSB7DQo+Pj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsOw0KPj4+
-Pj4+ICsgICAgICAgICAgICAgICAgfQ0KPj4+Pj4+ICsgICAgICAgICAgICAgICAgY29udGludWU7
-DQo+Pj4+Pj4gKyAgICAgICAgICAgIH0NCj4+Pj4+PiArDQo+Pj4+Pg0KPj4+Pj4gVGhlc2Ugb3Ro
-ZXIgdHdvIGxvb2sgT0ssIGJ1dCB0aGV5IGhhdmUgYW5vdGhlciBpc3N1ZTogIElmIHRoaXMgaXMg
-YSB2Mg0KPj4+Pj4gaW1hZ2UsIHlvdSBjYW5ub3QgY3JlYXRlIHplcm8gY2x1c3RlcnM7IHNvIHlv
-dSdsbCBoYXZlIHRvIHVuYWxsb2NhdGUgdGhlDQo+Pj4+PiBjbHVzdGVyIGluIHRoYXQgY2FzZS4N
-Cj4+Pj4NCj4+Pj4NCj4+Pj4gT2hvLCBpdCdzIGEgcHJvYmxlbS4gSXQgbWF5IGJlIHVuc2FmZSB0
-byBkaXNjYXJkIGNsdXN0ZXJzLCBtYWtpbmcNCj4+Pj4gYmFja2luZyBpbWFnZSBhdmFpbGFibGUg
-dGhyb3VnaCB0aGUgaG9sZXMuIFdoYXQgZGlzY2FyZCBkbyBvbiB2Mj8NCj4+Pj4gWmVyb2luZyBv
-ciBob2xlcz8NCj4+Pg0KPj4+IE9oLCByaWdodCEgIGRpc2NhcmQgb24gdjIgcHVuY2hlcyBhIGhv
-bGUuICBTbyBJIHNlZSB0aHJlZSB3YXlzOg0KPj4+ICgxKSBZb3UgY2FuIGRvIHRoZSBzYW1lIGFu
-ZCBwb2ludCB0byB0aGF0IGJpdCBvZiBjb2RlLCBvcg0KPj4+ICgyKSBZb3UgYWxsb2NhdGUgYSBk
-YXRhIGNsdXN0ZXIgZnVsbCBvZiB6ZXJvZXMgaW4gY2FzZSBvZiB2Miwgb3INCj4+PiAoMykgWW91
-IGp1c3QgZXJyb3Igb3V0Lg0KPj4+DQo+Pj4gKDMpIGRvZXNuJ3Qgc2VlbSBsaWtlIHRoZSB3b3Jz
-dCBvcHRpb24uDQo+Pg0KPj4+IEFtZW5kaW5nIHRoZSBpbWFnZSB0byBiZSB2MyBpcw0KPj4+IGFs
-d2F5cyBwb3NzaWJsZSBhbmQgdHJpdmlhbC4NCj4+DQo+PiBob3cgdG8gZG8gaXQgZm9yIGNvcnJ1
-cHRlZCBpbWFnZT8NCj4gDQo+IE9oLCB5ZWFoLCB5b3UgY2FuJ3Qgb3BlbiBhIGNvcnJ1cHRlZCBp
-bWFnZSwgY2FuIHlvdS4uLiAgSSBzdXBwb3NlIHdlDQo+IHdhbnQgYSB3YXkgdG8gZm9yY2UtY2xl
-YXIgdGhlIGZsYWcgYW55d2F5LiA6LSkNCg0KYW0sIHdoaWNoIGZsYWc/DQoNCj4gDQo+IE1heA0K
-PiANCg==
+v1: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01146.html
+
+Changes since v1:
+
+- Add tlb_index and tlb_entry helpers from Richard
+
+- Introduce sizeof_tlb() and tlb_n_entries()
+
+- Extract tlb_mask as its own array in CPUArchState, as
+  suggested by Richard. For the associated helpers (tlb_index etc)
+  I tried several approaches, and performance-wise they're all
+  the same, so went for the simplest implementation.
+
+- Use uintptr_t for tlb_mask, as done in Richard's patch
+  + tcg/i386: use hrexw when reading tlb_mask
+  + Define tlbtype and tlbrexw solely based on TARGET_PAGE_BITS
+
+- Rename tlb_is_invalid to tlb_entry_is_empty, comparing all
+  fields (except .addend) against -1.
+
+- Rename CPUTLBDesc.used to .n_used_entries.
+
+- Drop the MIN/MAX CPU_TLB_BITS patches, defining instead
+  some values for MIN/MAX as well as a default.
+
+- Use new_size and old_size consistently in the resizing function,
+  as suggested by Richard.
+
+- Add an additional chart to the last patch, where softmmu
+  performance is compared against user-mode:
+    https://imgur.com/a/eXkjMCE
+
+You can fetch this series from:
+  https://github.com/cota/qemu/tree/tlb-dyn-v2
+
+Note that it applies on top of my tlb-lock-v4 series:
+  https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01421.html
+
+Thanks,
+
+		Emilio
