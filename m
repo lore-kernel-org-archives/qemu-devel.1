@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9ZNe-0005AQ-0M
+	(envelope-from <armbru@redhat.com>) id 1g9ZNd-0005AP-MJ
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9ZNa-0005me-13
+	(envelope-from <armbru@redhat.com>) id 1g9ZNZ-0005ld-GR
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41782)
+Received: from mx1.redhat.com ([209.132.183.28]:41928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9ZNZ-0005iM-JM
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9ZNY-0005iG-S0
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:31:37 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
+	[10.5.11.24])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1E607AE88
+	by mx1.redhat.com (Postfix) with ESMTPS id 28E1E30610D6
 	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 17:31:30 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  8 Oct 2018 19:30:59 +0200
-Message-Id: <20181008173125.19678-6-armbru@redhat.com>
+Date: Mon,  8 Oct 2018 19:30:58 +0200
+Message-Id: <20181008173125.19678-5-armbru@redhat.com>
 In-Reply-To: <20181008173125.19678-1-armbru@redhat.com>
 References: <20181008173125.19678-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/31] vfio: Clean up error reporting after
- previous commit
+Subject: [Qemu-devel] [PATCH 04/31] vfio: Use warn_report() & friends to
+ report warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,121 +33,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alex Williamson <alex.williamson@redhat.com>
 
-The previous commit changed vfio's warning messages from
+The vfio code reports warnings like
+
+    error_report(WARN_PREFIX "Could not frobnicate", DEV-NAME);
+
+where WARN_PREFIX is defined so the message comes out as
 
     vfio warning: DEV-NAME: Could not frobnicate
 
-to
+This usage predates the introduction of warn_report() & friends in
+commit 97f40301f1d.  It's time to convert to that interface.  Since
+these functions already prefix the message with "warning: ", replace
+WARN_PREFIX by VFIO_MSG_PREFIX, so the messages come out like
 
     warning: vfio DEV-NAME: Could not frobnicate
 
-To match this change, change error messages from
-
-    vfio error: DEV-NAME: On fire
-
-to
-
-    vfio DEV-NAME: On fire
-
-Note the loss of "error".  If we think marking error messages that way
-is a good idea, we should mark *all* error messages, i.e. make
-error_report() print it.
+The next commit will replace ERR_PREFIX.
 
 Cc: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/vfio/pci-quirks.c          | 4 ++--
- hw/vfio/pci.c                 | 8 ++++----
- hw/vfio/platform.c            | 2 +-
- include/hw/vfio/vfio-common.h | 1 -
- 4 files changed, 7 insertions(+), 8 deletions(-)
+ hw/vfio/pci.c                 | 14 +++++++-------
+ hw/vfio/platform.c            |  4 ++--
+ include/hw/vfio/vfio-common.h |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 481fd08df7..eae31c74d6 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1670,7 +1670,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-      * but also no point in us enabling VGA if disabled in hardware.
-      */
-     if (!(gmch & 0x2) && !vdev->vga && vfio_populate_vga(vdev, &err)) {
--        error_reportf_err(err, ERR_PREFIX, vdev->vbasedev.name);
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-         error_report("IGD device %s failed to enable VGA access, "
-                      "legacy mode disabled", vdev->vbasedev.name);
-         goto out;
-@@ -1696,7 +1696,7 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     ret = vfio_pci_igd_opregion_init(vdev, opregion, &err);
-     if (ret) {
-         error_append_hint(&err, "IGD legacy mode disabled\n");
--        error_reportf_err(err, ERR_PREFIX, vdev->vbasedev.name);
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-         goto out;
-     }
- 
 diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 36f1182249..fedf81e386 100644
+index 866f0deeb7..36f1182249 100644
 --- a/hw/vfio/pci.c
 +++ b/hw/vfio/pci.c
-@@ -742,7 +742,7 @@ static void vfio_msi_disable_common(VFIOPCIDevice *vdev)
+@@ -249,7 +249,7 @@ static void vfio_intx_update(PCIDevice *pdev)
  
-     vfio_intx_enable(vdev, &err);
+     vfio_intx_enable_kvm(vdev, &err);
      if (err) {
--        error_reportf_err(err, ERR_PREFIX, vdev->vbasedev.name);
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+     }
+ 
+     /* Re-enable the interrupt in cased we missed an EOI */
+@@ -314,7 +314,7 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+ 
+     vfio_intx_enable_kvm(vdev, &err);
+     if (err) {
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+     }
+ 
+     vdev->interrupt = VFIO_INT_INTx;
+@@ -1555,7 +1555,7 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+                     &err);
+     if (ret < 0) {
+         if (ret == -ENOTSUP) {
+-            error_report_err(err);
++            warn_report_err(err);
+             return 0;
+         }
+ 
+@@ -2588,9 +2588,9 @@ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
+     } else if (irq_info.count == 1) {
+         vdev->pci_aer = true;
+     } else {
+-        error_report(WARN_PREFIX
+-                     "Could not enable error recovery for the device",
+-                     vbasedev->name);
++        warn_report(VFIO_MSG_PREFIX
++                    "Could not enable error recovery for the device",
++                    vbasedev->name);
      }
  }
  
-@@ -2194,7 +2194,7 @@ static void vfio_pci_post_reset(VFIOPCIDevice *vdev)
+@@ -2715,7 +2715,7 @@ static void vfio_req_notifier_handler(void *opaque)
  
-     vfio_intx_enable(vdev, &err);
+     qdev_unplug(&vdev->pdev.qdev, &err);
      if (err) {
--        error_reportf_err(err, ERR_PREFIX, vdev->vbasedev.name);
-+        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+-        error_reportf_err(err, WARN_PREFIX, vdev->vbasedev.name);
++        warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
      }
- 
-     for (nr = 0; nr < PCI_NUM_REGIONS - 1; ++nr) {
-@@ -2828,7 +2828,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
- 
-     if (stat(vdev->vbasedev.sysfsdev, &st) < 0) {
-         error_setg_errno(errp, errno, "no such host device");
--        error_prepend(errp, ERR_PREFIX, vdev->vbasedev.sysfsdev);
-+        error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.sysfsdev);
-         return;
-     }
- 
-@@ -3079,7 +3079,7 @@ out_teardown:
-     vfio_teardown_msi(vdev);
-     vfio_bars_exit(vdev);
- error:
--    error_prepend(errp, ERR_PREFIX, vdev->vbasedev.name);
-+    error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.name);
  }
  
- static void vfio_instance_finalize(Object *obj)
 diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index c1aecac43c..61852f711b 100644
+index 57c4a0ee2b..c1aecac43c 100644
 --- a/hw/vfio/platform.c
 +++ b/hw/vfio/platform.c
-@@ -668,7 +668,7 @@ out:
-     }
+@@ -657,8 +657,8 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
  
-     if (vdev->vbasedev.name) {
--        error_prepend(errp, ERR_PREFIX, vdev->vbasedev.name);
-+        error_prepend(errp, VFIO_MSG_PREFIX, vdev->vbasedev.name);
-     } else {
-         error_prepend(errp, "vfio error: ");
+     for (i = 0; i < vbasedev->num_regions; i++) {
+         if (vfio_region_mmap(vdev->regions[i])) {
+-            error_report("%s mmap unsupported. Performance may be slow",
+-                         memory_region_name(vdev->regions[i]->mem));
++            warn_report("%s mmap unsupported, performance may be slow",
++                        memory_region_name(vdev->regions[i]->mem));
+         }
+         sysbus_init_mmio(sbdev, vdev->regions[i]->mem);
      }
 diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index ad747aab7f..89ed6a5743 100644
+index 821def0565..ad747aab7f 100644
 --- a/include/hw/vfio/vfio-common.h
 +++ b/include/hw/vfio/vfio-common.h
-@@ -30,7 +30,6 @@
- #include <linux/vfio.h>
+@@ -31,7 +31,7 @@
  #endif
  
--#define ERR_PREFIX "vfio error: %s: "
- #define VFIO_MSG_PREFIX "vfio %s: "
+ #define ERR_PREFIX "vfio error: %s: "
+-#define WARN_PREFIX "vfio warning: %s: "
++#define VFIO_MSG_PREFIX "vfio %s: "
  
  enum {
+     VFIO_DEVICE_TYPE_PCI = 0,
 -- 
 2.17.1
