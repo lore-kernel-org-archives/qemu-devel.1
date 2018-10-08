@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9V1F-0005tG-8r
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:20 -0400
+	(envelope-from <david@redhat.com>) id 1g9V1F-0005tF-7I
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9UrG-0000Ca-8G
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:41:59 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40883)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g9UrF-0000C1-Tt
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:41:58 -0400
-Received: by mail-ot1-x343.google.com with SMTP id w67so19428205ota.7
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 05:41:57 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1g9UrH-0000DJ-1g
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:42:02 -0400
+References: <20180926094219.20322-1-david@redhat.com>
+	<20180926094219.20322-19-david@redhat.com>
+	<20180927150141.60a6488a@redhat.com>
+	<dc5d7b2d-5b51-2c0b-aac7-ebf04a4e7859@redhat.com>
+	<20181001152443.2cca5c5e@redhat.com>
+	<85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
+	<20181008141904.17b601d3@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <aa176072-87b1-9e13-6770-97dfc354a1ed@redhat.com>
+Date: Mon, 8 Oct 2018 14:41:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <1538579266-8389-10-git-send-email-edgar.iglesias@gmail.com>
-References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
-	<1538579266-8389-10-git-send-email-edgar.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Oct 2018 13:41:36 +0100
-Message-ID: <CAFEAcA88T=VWXq5aSY2srgbo8PF7tLFJn-28nNpt3=ZGh5xM1g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 09/12] target-arm: powerctl: Enable HVC
- when starting CPUs to EL2
+In-Reply-To: <20181008141904.17b601d3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-On 3 October 2018 at 16:07, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> When QEMU provides the equivalent of the EL3 firmware, we
-> need to enable HVCs in scr_el3 when turning on CPUs that
-> target EL2.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  target/arm/arm-powerctl.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-> index ce55eeb..54f2974 100644
-> --- a/target/arm/arm-powerctl.c
-> +++ b/target/arm/arm-powerctl.c
-> @@ -63,6 +63,7 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
->      struct CpuOnInfo *info = (struct CpuOnInfo *) data.host_ptr;
->
->      /* Initialize the cpu we are turning on */
-> +    qemu_log("CPU%d reset\n", target_cpu_state->cpu_index);
+On 08/10/2018 14:19, Igor Mammedov wrote:
+> On Mon, 8 Oct 2018 13:47:53 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>>> That way using [2] and [1 - modulo it should match only concrete type]
+>>> machine would be able to override hotplug handlers for TYPE_VIRTIO_PMEM_PCI
+>>> and explicitly call machine + pci hotplug handlers in necessary order.
+>>>
+>>> flow would look like:
+>>>   [acpi|shcp|native pci-e eject]->  
+>>>        hotplug_ctrl = qdev_get_hotplug_handler(dev);
+>>>        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err); ->
+>>>             machine_unplug()
+>>>                machine_virtio_pci_pmem_cb(): 
+>>>                   // we now that's device has 2 stage hotplug handlers,
+>>>                   // so we can arrange hotplug sequence in necessary order
+>>>                   hotplug_ctrl2 = qdev_get_bus_hotplug_handler(dev);
+>>>
+>>>                   //then do unplug in whatever order that's correct,
+>>>                   // I'd assume tear down/stop PCI device first, flushing
+>>>                   // command virtio command queues and that unplug memory itself.
+>>>                   hotplug_handler_unplug(hotplug_ctrl2, dev, &local_err);
+>>>                   memory_device_unplug()
+>>>   
+>>
+>> Looking into the details, this order is not possible. The unplug will
+>> essentially do a device_unparent() leading to the whole hierarchy
+>> getting destroyed. The memory_device part always has to come first.
+> 
+> Question here is if there are anything that should be handled first on
+> virtio level before memory_device/pmem part is called?
+> If there isn't it might be fine to swap the order of unplug sequence.
+> 
 
-qemu_log logging should always be masked to a particular
-log kind (either via qemu_log_mask() or by explicit check on
-the log level). If this was accidentally left-in debug, you could
-just drop it :-)
+Was asking myself the same thing, but as we are effectively holding the
+iothread lock and the guest triggered the unplug, I guess it is fine to
+unregister the memory region at this point.
 
->      cpu_reset(target_cpu_state);
->      target_cpu_state->halted = 0;
->
-> @@ -103,6 +104,16 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
->      } else {
->          /* Processor is not in secure mode */
->          target_cpu->env.cp15.scr_el3 |= SCR_NS;
-> +
-> +        /*
-> +         * If QEMU is providing the equivalent of EL3 firmware, then we need
-> +         * to make sure a CPU targeting EL2 comes out of reset with a
-> +         * functional HVC insn.
-> +         */
-> +        if (arm_feature(&target_cpu->env, ARM_FEATURE_EL3)
-> +            && info->target_el == 2) {
-> +            target_cpu->env.cp15.scr_el3 |= SCR_HCE;
-> +        }
->      }
+-- 
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-This is definitely required for PSCI and I think it makes sense
-in other cases that end up in this powerctl code with EL3 set.
+Thanks,
 
-thanks
--- PMM
+David / dhildenb
