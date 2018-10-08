@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1g9XQC-0005ev-NR
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:26:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g9XSG-0006Vl-Kc
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1g9XQ3-0001WJ-6g
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:26:10 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 8 Oct 2018 15:25:56 +0000
-Message-ID: <15568cd5-fa4e-8271-fcfb-b70b738a48e8@virtuozzo.com>
-References: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1534844779-118784-4-git-send-email-anton.nefedov@virtuozzo.com>
-	<20181004153359.GH6009@localhost.localdomain>
-	<956674d6-0cb9-f68c-15e2-89d39cfac049@virtuozzo.com>
-	<20181008150316.GB4604@localhost.localdomain>
-In-Reply-To: <20181008150316.GB4604@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FA39B78456A8B1429C8B23BE0111878F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <mreitz@redhat.com>) id 1g9XSC-0003Pw-C7
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:28:20 -0400
+References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
+	<20180817122219.16206-2-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d9a218c8-3115-8b67-0840-37ddce399136@redhat.com>
+Date: Mon, 8 Oct 2018 17:28:01 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 3/8] ide: account UNMAP (TRIM) operations
+In-Reply-To: <20180817122219.16206-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="f0n2vtJEhuMGOtGJ10gJFcW9ufXWUJWVr"
+Subject: Re: [Qemu-devel] [PATCH v2 1/7] block/qcow2-refcount: fix
+ check_oflag_copied
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org
 
-DQoNCk9uIDgvMTAvMjAxOCA2OjAzIFBNLCBLZXZpbiBXb2xmIHdyb3RlOg0KPiBBbSAwOC4xMC4y
-MDE4IHVtIDE2OjM4IGhhdCBBbnRvbiBOZWZlZG92IGdlc2NocmllYmVuOg0KPj4gT24gNC8xMC8y
-MDE4IDY6MzMgUE0sIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMjEuMDguMjAxOCB1bSAxMTo0
-NiBoYXQgQW50b24gTmVmZWRvdiBnZXNjaHJpZWJlbjoNCj4+Pj4gU2lnbmVkLW9mZi1ieTogQW50
-b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29tPg0KPj4+PiBSZXZpZXdlZC1i
-eTogQWxiZXJ0byBHYXJjaWEgPGJlcnRvQGlnYWxpYS5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgICBo
-dy9pZGUvY29yZS5jIHwgMTIgKysrKysrKysrKysrDQo+Pj4+ICAgIDEgZmlsZSBjaGFuZ2VkLCAx
-MiBpbnNlcnRpb25zKCspDQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS9ody9pZGUvY29yZS5jIGIv
-aHcvaWRlL2NvcmUuYw0KPj4+PiBpbmRleCAyYzYyZWZjLi4zNTI0MjliIDEwMDY0NA0KPj4+PiAt
-LS0gYS9ody9pZGUvY29yZS5jDQo+Pj4+ICsrKyBiL2h3L2lkZS9jb3JlLmMNCj4+Pj4gQEAgLTQ0
-MCw2ICs0NDAsMTQgQEAgc3RhdGljIHZvaWQgaWRlX2lzc3VlX3RyaW1fY2Iodm9pZCAqb3BhcXVl
-LCBpbnQgcmV0KQ0KPj4+PiAgICAgICAgVHJpbUFJT0NCICppb2NiID0gb3BhcXVlOw0KPj4+PiAg
-ICAgICAgSURFU3RhdGUgKnMgPSBpb2NiLT5zOw0KPj4+PiAgICANCj4+Pj4gKyAgICBpZiAoaW9j
-Yi0+aSA+PSAwKSB7DQo+Pj4+ICsgICAgICAgIGlmIChyZXQgPj0gMCkgew0KPj4+PiArICAgICAg
-ICAgICAgYmxvY2tfYWNjdF9kb25lKGJsa19nZXRfc3RhdHMocy0+YmxrKSwgJnMtPmFjY3QpOw0K
-Pj4+PiArICAgICAgICB9IGVsc2Ugew0KPj4+PiArICAgICAgICAgICAgYmxvY2tfYWNjdF9mYWls
-ZWQoYmxrX2dldF9zdGF0cyhzLT5ibGspLCAmcy0+YWNjdCk7DQo+Pj4+ICsgICAgICAgIH0NCj4+
-Pj4gKyAgICB9DQo+Pj4+ICsNCj4+Pj4gICAgICAgIGlmIChyZXQgPj0gMCkgew0KPj4+PiAgICAg
-ICAgICAgIHdoaWxlIChpb2NiLT5qIDwgaW9jYi0+cWlvdi0+bmlvdikgew0KPj4+PiAgICAgICAg
-ICAgICAgICBpbnQgaiA9IGlvY2ItPmo7DQo+Pj4+IEBAIC00NjEsNiArNDY5LDkgQEAgc3RhdGlj
-IHZvaWQgaWRlX2lzc3VlX3RyaW1fY2Iodm9pZCAqb3BhcXVlLCBpbnQgcmV0KQ0KPj4+PiAgICAg
-ICAgICAgICAgICAgICAgICAgIGdvdG8gZG9uZTsNCj4+Pj4gICAgICAgICAgICAgICAgICAgIH0N
-Cj4+Pj4gICAgDQo+Pj4+ICsgICAgICAgICAgICAgICAgYmxvY2tfYWNjdF9zdGFydChibGtfZ2V0
-X3N0YXRzKHMtPmJsayksICZzLT5hY2N0LA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgY291bnQgPDwgQkRSVl9TRUNUT1JfQklUUywgQkxPQ0tfQUNDVF9VTk1BUCk7DQo+
-Pj4+ICsNCj4+Pj4gICAgICAgICAgICAgICAgICAgIC8qIEdvdCBhbiBlbnRyeSEgU3VibWl0IGFu
-ZCBleGl0LiAgKi8NCj4+Pj4gICAgICAgICAgICAgICAgICAgIGlvY2ItPmFpb2NiID0gYmxrX2Fp
-b19wZGlzY2FyZChzLT5ibGssDQo+Pj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgc2VjdG9yIDw8IEJEUlZfU0VDVE9SX0JJVFMsDQo+Pj4+IEBAIC04
-NDUsNiArODU2LDcgQEAgc3RhdGljIHZvaWQgaWRlX2RtYV9jYih2b2lkICpvcGFxdWUsIGludCBy
-ZXQpDQo+Pj4+ICAgICAgICB9DQo+Pj4+ICAgIA0KPj4+PiAgICAgICAgaWYgKHJldCA9PSAtRUlO
-VkFMKSB7DQo+Pj4+ICsgICAgICAgIGJsb2NrX2FjY3RfaW52YWxpZChibGtfZ2V0X3N0YXRzKHMt
-PmJsayksIEJMT0NLX0FDQ1RfVU5NQVApOw0KPj4+DQo+Pj4gVGhpcyBsb29rcyB3cm9uZyB0byBt
-ZSwgaWRlX2RtYV9jYigpIGlzIG5vdCBvbmx5IGNhbGxlZCBmb3IgdW5tYXAsIGJ1dA0KPj4+IGFs
-c28gZm9yIHJlYWRzIGFuZCB3cml0ZXMsIGFuZCBlYWNoIG9mIHRoZW0gY291bGQgcmV0dXJuIC1F
-SU5WQUwuDQo+Pj4NCj4+DQo+PiBTdGF0aW5nIGhlcmUgQkxPQ0tfQUNDVF9VTk1BUCBpcyBkZWZp
-bml0ZWx5IGEgYmx1bmRlciA6KA0KPj4NCj4+PiBBbHNvLCAtRUlOVkFMIGRvZXNuJ3QgbmVjZXNz
-YXJpbHkgbWVhbiB0aGF0IHRoZSBndWVzdCBkcml2ZXIgZGlkDQo+Pj4gc29tZXRoaW5nIHdyb25n
-LCBpdCBjb3VsZCBhbHNvIGJlIHRoZSByZXN1bHQgb2YgYSBob3N0IHByb2JsZW0uDQo+Pj4gVGhl
-cmVmb3JlLCBpdCBpc24ndCByaWdodCB0byBjYWxsIGJsb2NrX2FjY3RfaW52YWxpZCgpIGhlcmUg
-LSBlc3BlY2lhbGx5DQo+Pj4gc2luY2UgdGhlIHJlcXVlc3QgbWF5IGFscmVhZHkgaGF2ZSBiZWVu
-IGFjY291bnRlZCBmb3IgYXMgZWl0aGVyIGRvbmUgb3INCj4+PiBmYWlsZWQgaW4gaWRlX2lzc3Vl
-X3RyaW1fY2IoKS4NCj4+Pg0KPj4NCj4+IENvdWxkbid0IGJlIGFjY291bnRlZCBkb25lIHdpdGgg
-c3VjaCByZXRjb2RlOw0KPj4gYW5kIGl0IHNlZW1zIEkgc2hvdWxkbnQgZG8gYmxvY2tfYWNjdF9m
-YWlsZWQoKSB0aGVyZSBhbnl3YXkgLSBvciBpdCdzDQo+PiBhY2NvdW50ZWQgdHdpY2U6IHRoZXJl
-IGFuZCBpbiBpZGVfZG1hX2NiKCktPmlkZV9oYW5kbGVfcndfZXJyb3IoKQ0KPj4NCj4+IEJ1dCBp
-ZiBFSU5WQUwgKGZyb20gZnVydGhlciBsYXllcnMpIHNob3VsZCBub3QgYmUgYWNjb3VudGVkIGFz
-IGFuDQo+PiBpbnZhbGlkIG9wLCB0aGVuIGl0IHNob3VsZCBiZSBhY2NvdW50ZWQgZmFpbGVkIGlu
-c3RlYWQsIHRoZSB0aGluZyB0aGF0DQo+PiBjdXJyZW50IGNvZGUgZG9lcyBub3QgZG8uDQo+PiAo
-YW5kIHdoaWNoIGJyaW5ncyB1cyBiYWNrIHRvIHBvc3NpYmxlIGRvdWJsZS1hY2NvdW50aW5nIGlm
-IHdlIGFjY291bnQNCj4+IGludmFsaWQgaW4gaWRlX2lzc3VlX3RyaW1fY2IoKSApDQo+IA0KPiBZ
-ZXMsIGNvbW1pdCBjYWVhZGJjOGJhNCB3YXMgYWxyZWFkeSB3cm9uZyBpbiBhc3N1bWluZyB0aGF0
-IHRoZXJlIGlzDQo+IG9ubHkgb25lIHBvc3NpYmxlIHNvdXJjZSBmb3IgLUVJTlZBTC4NCj4gDQo+
-Pj4gSW5zdGVhZCwgSSB0aGluayBpdCB3b3VsZCBiZSBiZXR0ZXIgdG8gaW1tZWRpYXRlbHkgYWNj
-b3VudCBmb3IgaW52YWxpZA0KPj4+IHJlcXVlc3RzIGluIGlkZV9pc3N1ZV90cmltX2NiKCkgd2hl
-cmUgaW9jYi0+cmV0ID0gLUVJTlZBTCBpcyBzZXQgYW5kIHdlDQo+Pj4ga25vdyBmb3Igc3VyZSB0
-aGF0IGluZGVlZCAhaWRlX3NlY3RfcmFuZ2Vfb2soKSBpcyB0aGUgY2F1c2UgZm9yIHRoZQ0KPj4+
-IC1FSU5WQUwgcmV0dXJuIGNvZGUuDQo+Pj4NCj4+IFNvIEkgZ3Vlc3MgeWVzLCBtb3ZlIGFjY3Rf
-aW52YWxpZCBpbiBpZGVfaXNzdWVfdHJpbV9jYigpIGFuZCBsZWF2ZQ0KPj4gYWNjdF9mYWlsZWQg
-dGhlcmUsIGFuZCBmaWx0ZXIgb2ZmIFRSSU0gY29tbWFuZHMgaW4gdGhlIGNvbW1vbg0KPj4gYWNj
-b3VudGluZy4NCj4gDQo+IGJsa19haW9fZGlzY2FyZCgpIGNhbiBmYWlsIHdpdGggLUVJTlZBTCwg
-dG9vLCBzbyBnZXR0aW5nIHRoaXMgZXJyb3IgY29kZQ0KPiBmcm9tIGEgVFJJTSBjb21tYW5kIGRv
-ZXNuJ3QgbWVhbiBhbnl0aGluZy4gSXQgY2FuIHN0aWxsIGhhdmUgbXVsdGlwbGUNCj4gcG9zc2li
-bGUgc291cmNlcy4NCj4gDQoNCkkgbWVhbnQgdGhhdCBjb21tb24gaWRlX2RtYV9jYigpIHNob3Vs
-ZCBhY2NvdW50IEVJTlZBTCAoYWxvbmcgd2l0aCBvdGhlcg0KZXJyb3JzKSBhcyBmYWlsZWQsIHVu
-bGVzcyBpdCdzIFRSSU0sIHdoaWNoIG1lYW5zIGl0J3MgYWxyZWFkeQ0KYWNjb3VudGVkIChlaXRo
-ZXIgaW52YWxpZCBvciBmYWlsZWQpDQoNCj4gTWF5YmUgd2UganVzdCBuZWVkIHRvIHJlbWVtYmVy
-IHNvbWV3aGVyZSB3aGV0aGVyIHdlIGFscmVhZHkgYWNjb3VudGVkDQo+IGZvciBhIHJlcXVlc3Qg
-KG1heWJlIGFuIGFkZGl0aW9uYWwgZmllbGQgaW4gQmxvY2tBY2N0Q29va2llPyBPciBjaGFuZ2UN
-Cj4gdGhlIHR5cGUgdG8gQkxPQ0tfQUNDVF9BTFJFQURZX0FDQ09VTlRFRD8pIGFuZCB0aGVuIG1h
-a2UgYW4gYWRkaXRpb25hbA0KPiBibG9ja19hY2NvdW50X29uZV9pbygpIGNhbGwgYSBuby1vcCBm
-b3Igc3VjaCByZXF1ZXN0cy4NCj4gID4gS2V2aW4NCj4gDQoNCk1heWJlIGV2ZW4gcmVzZXR0aW5n
-IHRvIEJMT0NLX0FDQ1RfTk9ORSA9PSAwLiBJdCBzaG91bGQgYWxzbyBwcm90ZWN0DQpmcm9tIGFj
-Y291bnRpbmcgdW5pbml0aWFsaXplZCBjb29raWUuDQoNCi9BbnRvbg0K
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--f0n2vtJEhuMGOtGJ10gJFcW9ufXWUJWVr
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org
+Message-ID: <d9a218c8-3115-8b67-0840-37ddce399136@redhat.com>
+Subject: Re: [PATCH v2 1/7] block/qcow2-refcount: fix check_oflag_copied
+References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
+ <20180817122219.16206-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20180817122219.16206-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 17.08.18 14:22, Vladimir Sementsov-Ogievskiy wrote:
+> Increase corruptions_fixed only after successful fix.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-refcount.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index 3c539f02e5..615847eb09 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -1816,7 +1816,7 @@ static int check_oflag_copied(BlockDriverState *b=
+s, BdrvCheckResult *res,
+>      for (i =3D 0; i < s->l1_size; i++) {
+>          uint64_t l1_entry =3D s->l1_table[i];
+>          uint64_t l2_offset =3D l1_entry & L1E_OFFSET_MASK;
+> -        bool l2_dirty =3D false;
+> +        int l2_fixed_entries =3D 0;
+
+I understand that this new variable kind of supersedes the other one,
+but I think for the sake of readability it would be better to keep l2_dir=
+ty.
+
+Max
+
+>          if (!l2_offset) {
+>              continue;
+> @@ -1878,8 +1878,7 @@ static int check_oflag_copied(BlockDriverState *b=
+s, BdrvCheckResult *res,
+>                          l2_table[j] =3D cpu_to_be64(refcount =3D=3D 1
+>                                      ? l2_entry |  QCOW_OFLAG_COPIED
+>                                      : l2_entry & ~QCOW_OFLAG_COPIED);
+> -                        l2_dirty =3D true;
+> -                        res->corruptions_fixed++;
+> +                        l2_fixed_entries++;
+>                      } else {
+>                          res->corruptions++;
+>                      }
+> @@ -1887,7 +1886,7 @@ static int check_oflag_copied(BlockDriverState *b=
+s, BdrvCheckResult *res,
+>              }
+>          }
+> =20
+> -        if (l2_dirty) {
+> +        if (l2_fixed_entries > 0) {
+>              ret =3D qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_=
+L2,
+>                                                  l2_offset, s->cluster_=
+size);
+>              if (ret < 0) {
+> @@ -1905,6 +1904,7 @@ static int check_oflag_copied(BlockDriverState *b=
+s, BdrvCheckResult *res,
+>                  res->check_errors++;
+>                  goto fail;
+>              }
+> +            res->corruptions_fixed +=3D l2_fixed_entries;
+>          }
+>      }
+> =20
+>=20
+
+
+
+--f0n2vtJEhuMGOtGJ10gJFcW9ufXWUJWVr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu7d4IACgkQ9AfbAGHV
+z0D6VAf+PL5p+RP13PIdfCwhnhwvtbyfTMwqLO1oYPOv0tnc/+QSBk7mrOl6v/ml
+eVigJjQxh3bIse4xs5nxPmo11tJMBuP6Ubo4yqn8kKyMo1y2koZ/p5ObrLtAW1gB
+4NGhuxmpebof7pcfTegIV8iSa9trNBXAi8uLG4pBwuO6ywKr2fdShjaGPEWxhioq
+IoxTxczZyMaYJ1zzjHOamuNcNLB1SRJgFBjshsAd2jGybb8rmmgoeSGXkycHpHAR
+coJ0iz78vJMJUUCMNlR3M0oeluzE56eO7iiTsAa6V1wFgX2F0emGMBVHBxMWm1oL
+4Upx2Ouzdp+cFiLoMvms3kNhGru46A==
+=iuwI
+-----END PGP SIGNATURE-----
+
+--f0n2vtJEhuMGOtGJ10gJFcW9ufXWUJWVr--
