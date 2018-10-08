@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([208.118.235.92]:47751)
+Received: from eggs.gnu.org ([208.118.235.92]:49304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1g9Wn3-0001c3-BQ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:45:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g9Wnn-0002sH-ID
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1g9Wg8-00010R-Fm
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:38:41 -0400
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Mon, 8 Oct 2018 14:38:32 +0000
-Message-ID: <956674d6-0cb9-f68c-15e2-89d39cfac049@virtuozzo.com>
-References: <1534844779-118784-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1534844779-118784-4-git-send-email-anton.nefedov@virtuozzo.com>
-	<20181004153359.GH6009@localhost.localdomain>
-In-Reply-To: <20181004153359.GH6009@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8396AC4C070EF44187B35346E7B485A4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1g9Wnj-0006G3-19
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:46:31 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:35826)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g9Wni-0006Dw-LH
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:46:26 -0400
+Received: by mail-ot1-x333.google.com with SMTP id j9-v6so19953987otl.2
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 07:46:26 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 3/8] ide: account UNMAP (TRIM) operations
+In-Reply-To: <20181008140004.12612-1-peter.maydell@linaro.org>
+References: <20181008140004.12612-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Oct 2018 15:46:04 +0100
+Message-ID: <CAFEAcA8-2sCjBe-vaF=7wkW81UzLLbTfp0MtT0sAp1gJtymzVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/33] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>, "berto@igalia.com" <berto@igalia.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-DQoNCk9uIDQvMTAvMjAxOCA2OjMzIFBNLCBLZXZpbiBXb2xmIHdyb3RlOg0KPiBBbSAyMS4wOC4y
-MDE4IHVtIDExOjQ2IGhhdCBBbnRvbiBOZWZlZG92IGdlc2NocmllYmVuOg0KPj4gU2lnbmVkLW9m
-Zi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2aXJ0dW96em8uY29tPg0KPj4gUmV2
-aWV3ZWQtYnk6IEFsYmVydG8gR2FyY2lhIDxiZXJ0b0BpZ2FsaWEuY29tPg0KPj4gLS0tDQo+PiAg
-IGh3L2lkZS9jb3JlLmMgfCAxMiArKysrKysrKysrKysNCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDEy
-IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaHcvaWRlL2NvcmUuYyBiL2h3L2lk
-ZS9jb3JlLmMNCj4+IGluZGV4IDJjNjJlZmMuLjM1MjQyOWIgMTAwNjQ0DQo+PiAtLS0gYS9ody9p
-ZGUvY29yZS5jDQo+PiArKysgYi9ody9pZGUvY29yZS5jDQo+PiBAQCAtNDQwLDYgKzQ0MCwxNCBA
-QCBzdGF0aWMgdm9pZCBpZGVfaXNzdWVfdHJpbV9jYih2b2lkICpvcGFxdWUsIGludCByZXQpDQo+
-PiAgICAgICBUcmltQUlPQ0IgKmlvY2IgPSBvcGFxdWU7DQo+PiAgICAgICBJREVTdGF0ZSAqcyA9
-IGlvY2ItPnM7DQo+PiAgIA0KPj4gKyAgICBpZiAoaW9jYi0+aSA+PSAwKSB7DQo+PiArICAgICAg
-ICBpZiAocmV0ID49IDApIHsNCj4+ICsgICAgICAgICAgICBibG9ja19hY2N0X2RvbmUoYmxrX2dl
-dF9zdGF0cyhzLT5ibGspLCAmcy0+YWNjdCk7DQo+PiArICAgICAgICB9IGVsc2Ugew0KPj4gKyAg
-ICAgICAgICAgIGJsb2NrX2FjY3RfZmFpbGVkKGJsa19nZXRfc3RhdHMocy0+YmxrKSwgJnMtPmFj
-Y3QpOw0KPj4gKyAgICAgICAgfQ0KPj4gKyAgICB9DQo+PiArDQo+PiAgICAgICBpZiAocmV0ID49
-IDApIHsNCj4+ICAgICAgICAgICB3aGlsZSAoaW9jYi0+aiA8IGlvY2ItPnFpb3YtPm5pb3YpIHsN
-Cj4+ICAgICAgICAgICAgICAgaW50IGogPSBpb2NiLT5qOw0KPj4gQEAgLTQ2MSw2ICs0NjksOSBA
-QCBzdGF0aWMgdm9pZCBpZGVfaXNzdWVfdHJpbV9jYih2b2lkICpvcGFxdWUsIGludCByZXQpDQo+
-PiAgICAgICAgICAgICAgICAgICAgICAgZ290byBkb25lOw0KPj4gICAgICAgICAgICAgICAgICAg
-fQ0KPj4gICANCj4+ICsgICAgICAgICAgICAgICAgYmxvY2tfYWNjdF9zdGFydChibGtfZ2V0X3N0
-YXRzKHMtPmJsayksICZzLT5hY2N0LA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGNvdW50IDw8IEJEUlZfU0VDVE9SX0JJVFMsIEJMT0NLX0FDQ1RfVU5NQVApOw0KPj4gKw0K
-Pj4gICAgICAgICAgICAgICAgICAgLyogR290IGFuIGVudHJ5ISBTdWJtaXQgYW5kIGV4aXQuICAq
-Lw0KPj4gICAgICAgICAgICAgICAgICAgaW9jYi0+YWlvY2IgPSBibGtfYWlvX3BkaXNjYXJkKHMt
-PmJsaywNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBzZWN0b3IgPDwgQkRSVl9TRUNUT1JfQklUUywNCj4+IEBAIC04NDUsNiArODU2LDcgQEAgc3Rh
-dGljIHZvaWQgaWRlX2RtYV9jYih2b2lkICpvcGFxdWUsIGludCByZXQpDQo+PiAgICAgICB9DQo+
-PiAgIA0KPj4gICAgICAgaWYgKHJldCA9PSAtRUlOVkFMKSB7DQo+PiArICAgICAgICBibG9ja19h
-Y2N0X2ludmFsaWQoYmxrX2dldF9zdGF0cyhzLT5ibGspLCBCTE9DS19BQ0NUX1VOTUFQKTsNCj4g
-DQo+IFRoaXMgbG9va3Mgd3JvbmcgdG8gbWUsIGlkZV9kbWFfY2IoKSBpcyBub3Qgb25seSBjYWxs
-ZWQgZm9yIHVubWFwLCBidXQNCj4gYWxzbyBmb3IgcmVhZHMgYW5kIHdyaXRlcywgYW5kIGVhY2gg
-b2YgdGhlbSBjb3VsZCByZXR1cm4gLUVJTlZBTC4NCj4gDQoNClN0YXRpbmcgaGVyZSBCTE9DS19B
-Q0NUX1VOTUFQIGlzIGRlZmluaXRlbHkgYSBibHVuZGVyIDooDQoNCj4gQWxzbywgLUVJTlZBTCBk
-b2Vzbid0IG5lY2Vzc2FyaWx5IG1lYW4gdGhhdCB0aGUgZ3Vlc3QgZHJpdmVyIGRpZA0KPiBzb21l
-dGhpbmcgd3JvbmcsIGl0IGNvdWxkIGFsc28gYmUgdGhlIHJlc3VsdCBvZiBhIGhvc3QgcHJvYmxl
-bS4NCj4gVGhlcmVmb3JlLCBpdCBpc24ndCByaWdodCB0byBjYWxsIGJsb2NrX2FjY3RfaW52YWxp
-ZCgpIGhlcmUgLSBlc3BlY2lhbGx5DQo+IHNpbmNlIHRoZSByZXF1ZXN0IG1heSBhbHJlYWR5IGhh
-dmUgYmVlbiBhY2NvdW50ZWQgZm9yIGFzIGVpdGhlciBkb25lIG9yDQo+IGZhaWxlZCBpbiBpZGVf
-aXNzdWVfdHJpbV9jYigpLg0KPiANCg0KQ291bGRuJ3QgYmUgYWNjb3VudGVkIGRvbmUgd2l0aCBz
-dWNoIHJldGNvZGU7DQphbmQgaXQgc2VlbXMgSSBzaG91bGRudCBkbyBibG9ja19hY2N0X2ZhaWxl
-ZCgpIHRoZXJlIGFueXdheSAtIG9yIGl0J3MNCmFjY291bnRlZCB0d2ljZTogdGhlcmUgYW5kIGlu
-IGlkZV9kbWFfY2IoKS0+aWRlX2hhbmRsZV9yd19lcnJvcigpDQoNCkJ1dCBpZiBFSU5WQUwgKGZy
-b20gZnVydGhlciBsYXllcnMpIHNob3VsZCBub3QgYmUgYWNjb3VudGVkIGFzIGFuDQppbnZhbGlk
-IG9wLCB0aGVuIGl0IHNob3VsZCBiZSBhY2NvdW50ZWQgZmFpbGVkIGluc3RlYWQsIHRoZSB0aGlu
-ZyB0aGF0DQpjdXJyZW50IGNvZGUgZG9lcyBub3QgZG8uDQooYW5kIHdoaWNoIGJyaW5ncyB1cyBi
-YWNrIHRvIHBvc3NpYmxlIGRvdWJsZS1hY2NvdW50aW5nIGlmIHdlIGFjY291bnQNCmludmFsaWQg
-aW4gaWRlX2lzc3VlX3RyaW1fY2IoKSApDQoNCj4gSW5zdGVhZCwgSSB0aGluayBpdCB3b3VsZCBi
-ZSBiZXR0ZXIgdG8gaW1tZWRpYXRlbHkgYWNjb3VudCBmb3IgaW52YWxpZA0KPiByZXF1ZXN0cyBp
-biBpZGVfaXNzdWVfdHJpbV9jYigpIHdoZXJlIGlvY2ItPnJldCA9IC1FSU5WQUwgaXMgc2V0IGFu
-ZCB3ZQ0KPiBrbm93IGZvciBzdXJlIHRoYXQgaW5kZWVkICFpZGVfc2VjdF9yYW5nZV9vaygpIGlz
-IHRoZSBjYXVzZSBmb3IgdGhlDQo+IC1FSU5WQUwgcmV0dXJuIGNvZGUuDQo+IA0KU28gSSBndWVz
-cyB5ZXMsIG1vdmUgYWNjdF9pbnZhbGlkIGluIGlkZV9pc3N1ZV90cmltX2NiKCkgYW5kIGxlYXZl
-DQphY2N0X2ZhaWxlZCB0aGVyZSwgYW5kIGZpbHRlciBvZmYgVFJJTSBjb21tYW5kcyBpbiB0aGUg
-Y29tbW9uDQphY2NvdW50aW5nLg0KDQovQW50b24NCg==
+On 8 October 2018 at 14:59, Peter Maydell <peter.maydell@linaro.org> wrote:
+> target-arm queue: the big things in here are SVE in system
+> emulation mode, and v8M stack limit checking; there are
+> also a handful of smaller fixes.
+>
+> thanks
+> -- PMM
+>
+> The following changes since commit 079911cb6e26898e16f5bb56ef4f9d33cf92d32d:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-fpu-20181005' into staging (2018-10-08 12:44:35 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20181008
+>
+> for you to fetch changes up to 74e2e59b8d0a68be0956310fc349179c89fd7be0:
+>
+>   hw/display/bcm2835_fb: Silence Coverity warning about multiply overflow (2018-10-08 14:55:05 +0100)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * target/arm: fix error in a code comment
+>  * virt: Suppress external aborts on virt-2.10 and earlier
+>  * target/arm: Correct condition for v8M callee stack push
+>  * target/arm: Don't read r4 from v8M exception stackframe twice
+>  * target/arm: Support SVE in system emulation mode
+>  * target/arm: Implement v8M hardware stack limit checking
+>  * hw/display/bcm2835_fb: Silence Coverity warning about multiply overflow
+
+Applied, thanks.
+
+-- PMM
