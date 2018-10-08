@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W5l-0001Pn-DL
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:07 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W5w-0001Wr-I3
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W5V-0007DZ-MG
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:52 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W5v-0007Ou-Hm
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:12 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1g9W5V-0006iu-46
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:00:45 -0400
+	id 1g9W5n-0006iu-AO
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:07 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W57-0003gs-1i
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:21 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W5S-0003lk-GA
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:42 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  8 Oct 2018 14:59:44 +0100
-Message-Id: <20181008140004.12612-14-peter.maydell@linaro.org>
+Date: Mon,  8 Oct 2018 15:00:03 +0100
+Message-Id: <20181008140004.12612-33-peter.maydell@linaro.org>
 In-Reply-To: <20181008140004.12612-1-peter.maydell@linaro.org>
 References: <20181008140004.12612-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/33] target/arm: Rewrite helper_sve_st[1234]*_r
+Subject: [Qemu-devel] [PULL 32/33] target/arm: Add v8M stack checks for MSR
+ to SP_NS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,417 +33,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Updating the NS stack pointer via MSR to SP_NS should include
+a check whether the new SP value is below the stack limit.
+No other kinds of update to the various stack pointer and
+limit registers via MSR should perform a check.
 
-This fixes the endianness problem for softmmu, and moves the
-main loop out of a macro and into an inlined function.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20181005175350.30752-10-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20181002163556.10279-14-peter.maydell@linaro.org
 ---
- target/arm/sve_helper.c | 351 ++++++++++++++++++++--------------------
- 1 file changed, 172 insertions(+), 179 deletions(-)
+ target/arm/helper.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index f712b382f8b..0b1e06823b6 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -3991,6 +3991,7 @@ typedef intptr_t sve_ld1_host_fn(void *vd, void *vg, void *host,
-  */
- typedef void sve_ld1_tlb_fn(CPUARMState *env, void *vd, intptr_t reg_off,
-                             target_ulong vaddr, int mmu_idx, uintptr_t ra);
-+typedef sve_ld1_tlb_fn sve_st1_tlb_fn;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 33c7e2f48e3..c83f7c1109c 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -10994,11 +10994,23 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+              * currently in handler mode or not, using the NS CONTROL.SPSEL.
+              */
+             bool spsel = env->v7m.control[M_REG_NS] & R_V7M_CONTROL_SPSEL_MASK;
++            bool is_psp = !arm_v7m_is_handler_mode(env) && spsel;
++            uint32_t limit;
  
- /*
-  * Generate the above primitives.
-@@ -4668,214 +4669,206 @@ DO_LDFF1_LDNF1_2(dd,  3, 3)
- /*
-  * Store contiguous data, protected by a governing predicate.
-  */
--#define DO_ST1(NAME, FN, TYPEE, TYPEM, H)                  \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc);                  \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    void *vd = &env->vfp.zregs[rd];                        \
--    for (i = 0; i < oprsz; ) {                             \
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
--        do {                                               \
--            if (pg & 1) {                                  \
--                TYPEM m = *(TYPEE *)(vd + H(i));           \
--                FN(env, addr, m, ra);                      \
--            }                                              \
--            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
--            addr += sizeof(TYPEM);                         \
--        } while (i & 15);                                  \
--    }                                                      \
+             if (!env->v7m.secure) {
+                 return;
+             }
+-            if (!arm_v7m_is_handler_mode(env) && spsel) {
 +
-+#ifdef CONFIG_SOFTMMU
-+#define DO_ST_TLB(NAME, H, TYPEM, HOST, MOEND, TLB) \
-+static void sve_##NAME##_tlb(CPUARMState *env, void *vd, intptr_t reg_off,  \
-+                             target_ulong addr, int mmu_idx, uintptr_t ra)  \
-+{                                                                           \
-+    TCGMemOpIdx oi = make_memop_idx(ctz32(sizeof(TYPEM)) | MOEND, mmu_idx); \
-+    TLB(env, addr, *(TYPEM *)(vd + H(reg_off)), oi, ra);                    \
- }
--
--#define DO_ST1_D(NAME, FN, TYPEM)                          \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;              \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    uint64_t *d = &env->vfp.zregs[rd].d[0];                \
--    uint8_t *pg = vg;                                      \
--    for (i = 0; i < oprsz; i += 1) {                       \
--        if (pg[H1(i)] & 1) {                               \
--            FN(env, addr, d[i], ra);                       \
--        }                                                  \
--        addr += sizeof(TYPEM);                             \
--    }                                                      \
-+#else
-+#define DO_ST_TLB(NAME, H, TYPEM, HOST, MOEND, TLB) \
-+static void sve_##NAME##_tlb(CPUARMState *env, void *vd, intptr_t reg_off,  \
-+                             target_ulong addr, int mmu_idx, uintptr_t ra)  \
-+{                                                                           \
-+    HOST(g2h(addr), *(TYPEM *)(vd + H(reg_off)));                           \
- }
-+#endif
- 
--#define DO_ST2(NAME, FN, TYPEE, TYPEM, H)                  \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc);                  \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    void *d1 = &env->vfp.zregs[rd];                        \
--    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
--    for (i = 0; i < oprsz; ) {                             \
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
--        do {                                               \
--            if (pg & 1) {                                  \
--                TYPEM m1 = *(TYPEE *)(d1 + H(i));          \
--                TYPEM m2 = *(TYPEE *)(d2 + H(i));          \
--                FN(env, addr, m1, ra);                     \
--                FN(env, addr + sizeof(TYPEM), m2, ra);     \
--            }                                              \
--            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
--            addr += 2 * sizeof(TYPEM);                     \
--        } while (i & 15);                                  \
--    }                                                      \
--}
-+DO_ST_TLB(st1bb,   H1,  uint8_t, stb_p, 0, helper_ret_stb_mmu)
-+DO_ST_TLB(st1bh, H1_2, uint16_t, stb_p, 0, helper_ret_stb_mmu)
-+DO_ST_TLB(st1bs, H1_4, uint32_t, stb_p, 0, helper_ret_stb_mmu)
-+DO_ST_TLB(st1bd,     , uint64_t, stb_p, 0, helper_ret_stb_mmu)
- 
--#define DO_ST3(NAME, FN, TYPEE, TYPEM, H)                  \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc);                  \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    void *d1 = &env->vfp.zregs[rd];                        \
--    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
--    void *d3 = &env->vfp.zregs[(rd + 2) & 31];             \
--    for (i = 0; i < oprsz; ) {                             \
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
--        do {                                               \
--            if (pg & 1) {                                  \
--                TYPEM m1 = *(TYPEE *)(d1 + H(i));          \
--                TYPEM m2 = *(TYPEE *)(d2 + H(i));          \
--                TYPEM m3 = *(TYPEE *)(d3 + H(i));          \
--                FN(env, addr, m1, ra);                     \
--                FN(env, addr + sizeof(TYPEM), m2, ra);     \
--                FN(env, addr + 2 * sizeof(TYPEM), m3, ra); \
--            }                                              \
--            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
--            addr += 3 * sizeof(TYPEM);                     \
--        } while (i & 15);                                  \
--    }                                                      \
--}
-+DO_ST_TLB(st1hh_le, H1_2, uint16_t, stw_le_p, MO_LE, helper_le_stw_mmu)
-+DO_ST_TLB(st1hs_le, H1_4, uint32_t, stw_le_p, MO_LE, helper_le_stw_mmu)
-+DO_ST_TLB(st1hd_le,     , uint64_t, stw_le_p, MO_LE, helper_le_stw_mmu)
- 
--#define DO_ST4(NAME, FN, TYPEE, TYPEM, H)                  \
--void HELPER(NAME)(CPUARMState *env, void *vg,              \
--                  target_ulong addr, uint32_t desc)        \
--{                                                          \
--    intptr_t i, oprsz = simd_oprsz(desc);                  \
--    intptr_t ra = GETPC();                                 \
--    unsigned rd = simd_data(desc);                         \
--    void *d1 = &env->vfp.zregs[rd];                        \
--    void *d2 = &env->vfp.zregs[(rd + 1) & 31];             \
--    void *d3 = &env->vfp.zregs[(rd + 2) & 31];             \
--    void *d4 = &env->vfp.zregs[(rd + 3) & 31];             \
--    for (i = 0; i < oprsz; ) {                             \
--        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));    \
--        do {                                               \
--            if (pg & 1) {                                  \
--                TYPEM m1 = *(TYPEE *)(d1 + H(i));          \
--                TYPEM m2 = *(TYPEE *)(d2 + H(i));          \
--                TYPEM m3 = *(TYPEE *)(d3 + H(i));          \
--                TYPEM m4 = *(TYPEE *)(d4 + H(i));          \
--                FN(env, addr, m1, ra);                     \
--                FN(env, addr + sizeof(TYPEM), m2, ra);     \
--                FN(env, addr + 2 * sizeof(TYPEM), m3, ra); \
--                FN(env, addr + 3 * sizeof(TYPEM), m4, ra); \
--            }                                              \
--            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);      \
--            addr += 4 * sizeof(TYPEM);                     \
--        } while (i & 15);                                  \
--    }                                                      \
--}
-+DO_ST_TLB(st1ss_le, H1_4, uint32_t, stl_le_p, MO_LE, helper_le_stl_mmu)
-+DO_ST_TLB(st1sd_le,     , uint64_t, stl_le_p, MO_LE, helper_le_stl_mmu)
- 
--DO_ST1(sve_st1bh_r, cpu_stb_data_ra, uint16_t, uint8_t, H1_2)
--DO_ST1(sve_st1bs_r, cpu_stb_data_ra, uint32_t, uint8_t, H1_4)
--DO_ST1_D(sve_st1bd_r, cpu_stb_data_ra, uint8_t)
-+DO_ST_TLB(st1dd_le,     , uint64_t, stq_le_p, MO_LE, helper_le_stq_mmu)
- 
--DO_ST1(sve_st1hs_r, cpu_stw_data_ra, uint32_t, uint16_t, H1_4)
--DO_ST1_D(sve_st1hd_r, cpu_stw_data_ra, uint16_t)
-+DO_ST_TLB(st1hh_be, H1_2, uint16_t, stw_be_p, MO_BE, helper_be_stw_mmu)
-+DO_ST_TLB(st1hs_be, H1_4, uint32_t, stw_be_p, MO_BE, helper_be_stw_mmu)
-+DO_ST_TLB(st1hd_be,     , uint64_t, stw_be_p, MO_BE, helper_be_stw_mmu)
- 
--DO_ST1_D(sve_st1sd_r, cpu_stl_data_ra, uint32_t)
-+DO_ST_TLB(st1ss_be, H1_4, uint32_t, stl_be_p, MO_BE, helper_be_stl_mmu)
-+DO_ST_TLB(st1sd_be,     , uint64_t, stl_be_p, MO_BE, helper_be_stl_mmu)
- 
--DO_ST1(sve_st1bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
--DO_ST2(sve_st2bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
--DO_ST3(sve_st3bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
--DO_ST4(sve_st4bb_r, cpu_stb_data_ra, uint8_t, uint8_t, H1)
-+DO_ST_TLB(st1dd_be,     , uint64_t, stq_be_p, MO_BE, helper_be_stq_mmu)
- 
--DO_ST1(sve_st1hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
--DO_ST2(sve_st2hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
--DO_ST3(sve_st3hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
--DO_ST4(sve_st4hh_r, cpu_stw_data_ra, uint16_t, uint16_t, H1_2)
-+#undef DO_ST_TLB
- 
--DO_ST1(sve_st1ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
--DO_ST2(sve_st2ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
--DO_ST3(sve_st3ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
--DO_ST4(sve_st4ss_r, cpu_stl_data_ra, uint32_t, uint32_t, H1_4)
--
--DO_ST1_D(sve_st1dd_r, cpu_stq_data_ra, uint64_t)
--
--void HELPER(sve_st2dd_r)(CPUARMState *env, void *vg,
--                         target_ulong addr, uint32_t desc)
-+/*
-+ * Common helpers for all contiguous 1,2,3,4-register predicated stores.
-+ */
-+static void sve_st1_r(CPUARMState *env, void *vg, target_ulong addr,
-+                      uint32_t desc, const uintptr_t ra,
-+                      const int esize, const int msize,
-+                      sve_st1_tlb_fn *tlb_fn)
- {
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;
--    intptr_t ra = GETPC();
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-     unsigned rd = simd_data(desc);
--    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
--    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
--    uint8_t *pg = vg;
-+    void *vd = &env->vfp.zregs[rd];
- 
--    for (i = 0; i < oprsz; i += 1) {
--        if (pg[H1(i)] & 1) {
--            cpu_stq_data_ra(env, addr, d1[i], ra);
--            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
--        }
--        addr += 2 * 8;
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                tlb_fn(env, vd, i, addr, mmu_idx, ra);
++            limit = is_psp ? env->v7m.psplim[false] : env->v7m.msplim[false];
++
++            if (val < limit) {
++                CPUState *cs = CPU(arm_env_get_cpu(env));
++
++                cpu_restore_state(cs, GETPC(), true);
++                raise_exception(env, EXCP_STKOF, 0, 1);
 +            }
-+            i += esize, pg >>= esize;
-+            addr += msize;
-+        } while (i & 15);
-     }
-+    set_helper_retaddr(0);
- }
- 
--void HELPER(sve_st3dd_r)(CPUARMState *env, void *vg,
--                         target_ulong addr, uint32_t desc)
-+static void sve_st2_r(CPUARMState *env, void *vg, target_ulong addr,
-+                      uint32_t desc, const uintptr_t ra,
-+                      const int esize, const int msize,
-+                      sve_st1_tlb_fn *tlb_fn)
- {
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;
--    intptr_t ra = GETPC();
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-     unsigned rd = simd_data(desc);
--    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
--    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
--    uint64_t *d3 = &env->vfp.zregs[(rd + 2) & 31].d[0];
--    uint8_t *pg = vg;
-+    void *d1 = &env->vfp.zregs[rd];
-+    void *d2 = &env->vfp.zregs[(rd + 1) & 31];
- 
--    for (i = 0; i < oprsz; i += 1) {
--        if (pg[H1(i)] & 1) {
--            cpu_stq_data_ra(env, addr, d1[i], ra);
--            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
--            cpu_stq_data_ra(env, addr + 16, d3[i], ra);
--        }
--        addr += 3 * 8;
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                tlb_fn(env, d1, i, addr, mmu_idx, ra);
-+                tlb_fn(env, d2, i, addr + msize, mmu_idx, ra);
-+            }
-+            i += esize, pg >>= esize;
-+            addr += 2 * msize;
-+        } while (i & 15);
-     }
-+    set_helper_retaddr(0);
- }
- 
--void HELPER(sve_st4dd_r)(CPUARMState *env, void *vg,
--                         target_ulong addr, uint32_t desc)
-+static void sve_st3_r(CPUARMState *env, void *vg, target_ulong addr,
-+                      uint32_t desc, const uintptr_t ra,
-+                      const int esize, const int msize,
-+                      sve_st1_tlb_fn *tlb_fn)
- {
--    intptr_t i, oprsz = simd_oprsz(desc) / 8;
--    intptr_t ra = GETPC();
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-     unsigned rd = simd_data(desc);
--    uint64_t *d1 = &env->vfp.zregs[rd].d[0];
--    uint64_t *d2 = &env->vfp.zregs[(rd + 1) & 31].d[0];
--    uint64_t *d3 = &env->vfp.zregs[(rd + 2) & 31].d[0];
--    uint64_t *d4 = &env->vfp.zregs[(rd + 3) & 31].d[0];
--    uint8_t *pg = vg;
-+    void *d1 = &env->vfp.zregs[rd];
-+    void *d2 = &env->vfp.zregs[(rd + 1) & 31];
-+    void *d3 = &env->vfp.zregs[(rd + 2) & 31];
- 
--    for (i = 0; i < oprsz; i += 1) {
--        if (pg[H1(i)] & 1) {
--            cpu_stq_data_ra(env, addr, d1[i], ra);
--            cpu_stq_data_ra(env, addr + 8, d2[i], ra);
--            cpu_stq_data_ra(env, addr + 16, d3[i], ra);
--            cpu_stq_data_ra(env, addr + 24, d4[i], ra);
--        }
--        addr += 4 * 8;
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                tlb_fn(env, d1, i, addr, mmu_idx, ra);
-+                tlb_fn(env, d2, i, addr + msize, mmu_idx, ra);
-+                tlb_fn(env, d3, i, addr + 2 * msize, mmu_idx, ra);
-+            }
-+            i += esize, pg >>= esize;
-+            addr += 3 * msize;
-+        } while (i & 15);
-     }
-+    set_helper_retaddr(0);
- }
- 
-+static void sve_st4_r(CPUARMState *env, void *vg, target_ulong addr,
-+                      uint32_t desc, const uintptr_t ra,
-+                      const int esize, const int msize,
-+                      sve_st1_tlb_fn *tlb_fn)
-+{
-+    const int mmu_idx = cpu_mmu_index(env, false);
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+    unsigned rd = simd_data(desc);
-+    void *d1 = &env->vfp.zregs[rd];
-+    void *d2 = &env->vfp.zregs[(rd + 1) & 31];
-+    void *d3 = &env->vfp.zregs[(rd + 2) & 31];
-+    void *d4 = &env->vfp.zregs[(rd + 3) & 31];
 +
-+    set_helper_retaddr(ra);
-+    for (i = 0; i < oprsz; ) {
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));
-+        do {
-+            if (pg & 1) {
-+                tlb_fn(env, d1, i, addr, mmu_idx, ra);
-+                tlb_fn(env, d2, i, addr + msize, mmu_idx, ra);
-+                tlb_fn(env, d3, i, addr + 2 * msize, mmu_idx, ra);
-+                tlb_fn(env, d4, i, addr + 3 * msize, mmu_idx, ra);
-+            }
-+            i += esize, pg >>= esize;
-+            addr += 4 * msize;
-+        } while (i & 15);
-+    }
-+    set_helper_retaddr(0);
-+}
-+
-+#define DO_STN_1(N, NAME, ESIZE) \
-+void __attribute__((flatten)) HELPER(sve_st##N##NAME##_r)           \
-+    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)  \
-+{                                                                   \
-+    sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, 1,           \
-+                  sve_st1##NAME##_tlb);                             \
-+}
-+
-+#define DO_STN_2(N, NAME, ESIZE, MSIZE) \
-+void __attribute__((flatten)) HELPER(sve_st##N##NAME##_r)             \
-+    (CPUARMState *env, void *vg, target_ulong addr, uint32_t desc)    \
-+{                                                                     \
-+    sve_st##N##_r(env, vg, addr, desc, GETPC(), ESIZE, MSIZE,         \
-+                  arm_cpu_data_is_big_endian(env)                     \
-+                  ? sve_st1##NAME##_be_tlb : sve_st1##NAME##_le_tlb); \
-+}
-+
-+DO_STN_1(1, bb, 1)
-+DO_STN_1(1, bh, 2)
-+DO_STN_1(1, bs, 4)
-+DO_STN_1(1, bd, 8)
-+DO_STN_1(2, bb, 1)
-+DO_STN_1(3, bb, 1)
-+DO_STN_1(4, bb, 1)
-+
-+DO_STN_2(1, hh, 2, 2)
-+DO_STN_2(1, hs, 4, 2)
-+DO_STN_2(1, hd, 8, 2)
-+DO_STN_2(2, hh, 2, 2)
-+DO_STN_2(3, hh, 2, 2)
-+DO_STN_2(4, hh, 2, 2)
-+
-+DO_STN_2(1, ss, 4, 4)
-+DO_STN_2(1, sd, 8, 4)
-+DO_STN_2(2, ss, 4, 4)
-+DO_STN_2(3, ss, 4, 4)
-+DO_STN_2(4, ss, 4, 4)
-+
-+DO_STN_2(1, dd, 8, 8)
-+DO_STN_2(2, dd, 8, 8)
-+DO_STN_2(3, dd, 8, 8)
-+DO_STN_2(4, dd, 8, 8)
-+
-+#undef DO_STN_1
-+#undef DO_STN_2
-+
- /* Loads with a vector index.  */
- 
- #define DO_LD1_ZPZ_S(NAME, TYPEI, TYPEM, FN)                            \
++            if (is_psp) {
+                 env->v7m.other_ss_psp = val;
+             } else {
+                 env->v7m.other_ss_msp = val;
 -- 
 2.19.0
