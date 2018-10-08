@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9c9H-00046p-DZ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:29:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1g9cDB-0006xA-VP
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9byN-0000DP-SS
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:17:52 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 8 Oct 2018 20:17:43 +0000
-Message-ID: <108ca689-59ac-b442-7143-97e0708f0368@virtuozzo.com>
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
-	<20180817122219.16206-3-vsementsov@virtuozzo.com>
-	<baaab5d2-76f0-6f5c-c0f1-e1e06a239d40@redhat.com>
-In-Reply-To: <baaab5d2-76f0-6f5c-c0f1-e1e06a239d40@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C9085C1283417147874D3FCD3FAD061D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1g9cD7-0007GR-2k
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:33:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g9cD6-0007Fr-Ck
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 16:33:01 -0400
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-2-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bcd7e170-8728-f691-f357-b0f8f6d811ed@redhat.com>
+Date: Mon, 8 Oct 2018 15:32:56 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] block/qcow2-refcount: avoid eating
- RAM
+In-Reply-To: <20181008173125.19678-2-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/31] Use error_fatal to simplify obvious
+ fatal errors (again)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
 
-DQoNCk9uIDEwLzA4LzIwMTggMDY6MzEgUE0sIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMTcuMDgu
-MTggMTQ6MjIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBxY293Ml9p
-bmNfcmVmY291bnRzX2ltcnQoKSAodGhyb3VnaCByZWFsbG9jX3JlZmNvdW50X2FycmF5KCkpIGNh
-biBlYXQNCj4+IGFuIHVucHJlZGljdGFibGUgYW1vdW50IG9mIG1lbW9yeSBvbiBjb3JydXB0ZWQg
-dGFibGUgZW50cmllcywgd2hpY2ggYXJlDQo+PiByZWZlcmVuY2luZyByZWdpb25zIGZhciBiZXlv
-bmQgdGhlIGVuZCBvZiBmaWxlLg0KPj4NCj4+IFByZXZlbnQgdGhpcywgYnkgc2tpcHBpbmcgc3Vj
-aCByZWdpb25zIGZyb20gZnVydGhlciBwcm9jZXNzaW5nLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6
-IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
-Cj4+IC0tLQ0KPj4gICBibG9jay9xY293Mi1yZWZjb3VudC5jIHwgMTQgKysrKysrKysrKysrKysN
-Cj4+ICAgMSBmaWxlIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0
-IGEvYmxvY2svcWNvdzItcmVmY291bnQuYyBiL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMNCj4+IGlu
-ZGV4IDYxNTg0N2ViMDkuLjU2NmMxOWZiZmEgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9xY293Mi1y
-ZWZjb3VudC5jDQo+PiArKysgYi9ibG9jay9xY293Mi1yZWZjb3VudC5jDQo+PiBAQCAtMTQ5OSwx
-MiArMTQ5OSwyNiBAQCBpbnQgcWNvdzJfaW5jX3JlZmNvdW50c19pbXJ0KEJsb2NrRHJpdmVyU3Rh
-dGUgKmJzLCBCZHJ2Q2hlY2tSZXN1bHQgKnJlcywNCj4+ICAgew0KPj4gICAgICAgQkRSVlFjb3cy
-U3RhdGUgKnMgPSBicy0+b3BhcXVlOw0KPj4gICAgICAgdWludDY0X3Qgc3RhcnQsIGxhc3QsIGNs
-dXN0ZXJfb2Zmc2V0LCBrLCByZWZjb3VudDsNCj4+ICsgICAgaW50NjRfdCBmaWxlX2xlbjsNCj4+
-ICAgICAgIGludCByZXQ7DQo+PiAgIA0KPj4gICAgICAgaWYgKHNpemUgPD0gMCkgew0KPj4gICAg
-ICAgICAgIHJldHVybiAwOw0KPj4gICAgICAgfQ0KPj4gICANCj4+ICsgICAgZmlsZV9sZW4gPSBi
-ZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMpOw0KPj4gKyAgICBpZiAoZmlsZV9sZW4gPCAwKSB7
-DQo+PiArICAgICAgICByZXR1cm4gZmlsZV9sZW47DQo+PiArICAgIH0NCj4gDQo+IERvZXNuJ3Qg
-dGhpcyBzbG93IHRoaW5ncyBkb3duPyAgQ2FuIHdlIG5vdCBjYWNoZSB0aGUgbGVuZ3RoIHNvbWV3
-aGVyZQ0KPiBhbmQgdXBkYXRlIGl0IHdoZW5ldmVyIHRoZSBpbWFnZSBpcyBtb2RpZmllZD8NCg0K
-DQpobW0uIGJkcnZfZ2V0bGVuZ3RoIGlzIHVzZWQgZXZlcnl3aGVyZSBpbiBRZW11LCBhbmQgSSBk
-b24ndCB0aGluayBpdCBpcyANCmdvb2QgaWRlYSB0byBpbXByb3ZlIGl0IGxvY2FsbHkgZm9yIHRo
-ZXNlIHNlcmllcy4gSWYgd2UgY2FuIGltcHJvdmUgaXQgDQpzb21laG93IHdpdGggYSBjYWNoZSBv
-ciBzb21ldGhpbmcgbGlrZSB0aGlzLCBpdCBzaG91bGQgYmUgZG9uZSBmb3IgYWxsIA0KdXNlcnMg
-YW5kIHRoZXJlZm9yZSBpdCBpcyBvdXRzaWRlIG9mIHRoZXNlIHNlcmllcy4uDQoNCj4gDQo+PiAr
-DQo+PiArICAgIGlmIChvZmZzZXQgKyBzaXplIC0gZmlsZV9sZW4gPiBzLT5jbHVzdGVyX3NpemUp
-IHsNCj4+ICsgICAgICAgIGZwcmludGYoc3RkZXJyLCAiRVJST1I6IGNvdW50aW5nIHJlZmVyZW5j
-ZSBmb3IgcmVnaW9uIGV4Y2VlZGluZyB0aGUgIg0KPj4gKyAgICAgICAgICAgICAgICAiZW5kIG9m
-IHRoZSBmaWxlIGJ5IG1vcmUgdGhhbiBvbmUgY2x1c3Rlcjogb2Zmc2V0IDB4JSIgUFJJeDY0DQo+
-PiArICAgICAgICAgICAgICAgICIgc2l6ZSAweCUiIFBSSXg2NCAiXG4iLCBvZmZzZXQsIHNpemUp
-Ow0KPiANCj4gV2h5IGlzIG9uZSBjbHVzdGVyIE9LPyAgSXMgdGhlcmUgYSBzcGVjaWZpYyBjYXNl
-IHlvdSdyZSB0cnlpbmcgdG8gY2F0Y2gNCj4gaGVyZT8NCg0KcmF3IGZpbGUgdW5kZXIgcWNvdzIg
-bWF5IGJlIG5vdCBhbGlnbmVkIGluIHJlYWwgc2l6ZSB0byBxY293MiBjbHVzdGVyLCANCmFzIEkg
-dW5kZXJzdGFuZCwgaXQncyBub3JtYWwgZm9yIHRoZSBsYXN0IGNsdXN0ZXIgdG8gYmUgc2VtaS1h
-bGxvY2F0ZWQNCg0KPiANCj4gTWF4DQo+IA0KPj4gKyAgICAgICAgcmVzLT5jb3JydXB0aW9ucysr
-Ow0KPj4gKyAgICAgICAgcmV0dXJuIDA7DQo+PiArICAgIH0NCj4+ICsNCj4+ICAgICAgIHN0YXJ0
-ID0gc3RhcnRfb2ZfY2x1c3RlcihzLCBvZmZzZXQpOw0KPj4gICAgICAgbGFzdCA9IHN0YXJ0X29m
-X2NsdXN0ZXIocywgb2Zmc2V0ICsgc2l6ZSAtIDEpOw0KPj4gICAgICAgZm9yKGNsdXN0ZXJfb2Zm
-c2V0ID0gc3RhcnQ7IGNsdXN0ZXJfb2Zmc2V0IDw9IGxhc3Q7DQo+Pg0KPiANCj4gDQo=
+On 10/8/18 12:30 PM, Markus Armbruster wrote:
+> Add a slight improvement of the Coccinelle semantic patch from commit
+> 07d04a0219b,
+
+which shares the same commit title, but does not actually have a 
+semantic patch, but rather defers to the even older 007b065.  But I'm 
+not too worried about either the duplicated commit title nor the chain 
+of references to follow - as this is a no-semantic-change patch rather 
+than a bugfix, it's less likely to cause confusion to any downstream 
+backport efforts.
+
+> and use it to clean up.  It leaves dead Error * variables
+> behind, cleaned up manually.
+
+Coccinelle can handle that too, if we want to make the .cocci file 
+longer (but off-hand, I don't remember the exact semantic patch formula 
+to express a variable that is initialized but then never used, as a 
+result of applying earlier semantic patches). So the manual cleanup for 
+now still seems tractable.
+
+> 
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   hw/intc/xics_kvm.c                       |  7 +------
+>   qemu-nbd.c                               |  6 +-----
+>   scripts/coccinelle/use-error_fatal.cocci | 20 ++++++++++++++++++++
+>   vl.c                                     |  7 +------
+>   4 files changed, 23 insertions(+), 17 deletions(-)
+>   create mode 100644 scripts/coccinelle/use-error_fatal.cocci
+> 
+
+> +++ b/scripts/coccinelle/use-error_fatal.cocci
+> @@ -0,0 +1,20 @@
+> +@@
+> +type T;
+> +identifier FUN, RET;
+> +expression list ARGS;
+> +expression ERR, EC, FAIL;
+
+The slight improvement from the original git commit log script is the 
+addition of FAIL,
+
+> +@@
+> +(
+> +-    T RET = FUN(ARGS, &ERR);
+> ++    T RET = FUN(ARGS, &error_fatal);
+> +|
+> +-    RET = FUN(ARGS, &ERR);
+> ++    RET = FUN(ARGS, &error_fatal);
+> +|
+> +-    FUN(ARGS, &ERR);
+> ++    FUN(ARGS, &error_fatal);
+> +)
+> +-    if (FAIL) {
+
+and a check for arbitrary condition FAIL rather than a more specific ERR 
+!= NULL.  Makes sense.
+
+> +-        error_report_err(ERR);
+> +-        exit(EC);
+> +-    }
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
