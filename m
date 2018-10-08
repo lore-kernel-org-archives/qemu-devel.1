@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g9Yim-0005k1-5V
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:49:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g9Z7H-0000zI-Cx
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:14:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1g9Yil-0001D7-5g
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 12:49:28 -0400
-References: <cover.1537984851.git.jcody@redhat.com>
-	<63e205cb84c8f0a10c1bc6d5d6856d72ceb56e41.1537984851.git.jcody@redhat.com>
-	<be63b6c3-6743-d152-07ad-18cfedc7f535@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e1bca984-8004-2e8e-2a6b-6eb4fd6c562d@redhat.com>
-Date: Mon, 8 Oct 2018 12:48:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g9Z0y-0003nM-3w
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:08:16 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g9Z0x-0003ml-FZ
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:08:16 -0400
+Received: by mail-oi1-x244.google.com with SMTP id u197-v6so16057679oif.5
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 10:08:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <be63b6c3-6743-d152-07ad-18cfedc7f535@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="dlAI0wlbPRulbltreMP3K2igXlvXVI0II"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] MAINTAINERS: Remove myself as block
- maintainer
+In-Reply-To: <20181008164026.GD4604@localhost.localdomain>
+References: <20181005143802.18412-1-peter.maydell@linaro.org>
+	<CAFEAcA8-FvVG7XBLrd7NQfRcKrvo6GtPEjfqJzkjd68iP9=TeQ@mail.gmail.com>
+	<20181005161739.GC4606@localhost.localdomain>
+	<CAFEAcA-SWRHwnwsa+QiHXfdBRB6u2u0paV9HsEqfjR6nZvAHSg@mail.gmail.com>
+	<20181005180901.GA32677@localhost.localdomain>
+	<CAFEAcA80cys-98QwJgAk_2LXfAeMHgCUS2L3Z+NgY4ZsCFhSPw@mail.gmail.com>
+	<CAFEAcA8gYwFZynMyiEHf+VPbaBerA9JTUPAHsipEvOqkBjHxMQ@mail.gmail.com>
+	<20181008164026.GD4604@localhost.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Oct 2018 18:07:52 +0100
+Message-ID: <CAFEAcA80vkufJ=hwr5s5i9xFzE1HxZKbfk7KVux2uEF-T9Gyug@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tests: Disable test-bdrv-drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +35,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-block@nongnu.org, kwolf@redhat.com, armbru@redhat.com, famz@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dlAI0wlbPRulbltreMP3K2igXlvXVI0II
-From: John Snow <jsnow@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>,
- qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-block@nongnu.org, kwolf@redhat.com,
- armbru@redhat.com, famz@redhat.com
-Message-ID: <e1bca984-8004-2e8e-2a6b-6eb4fd6c562d@redhat.com>
-Subject: Re: [PATCH v2 2/2] MAINTAINERS: Remove myself as block maintainer
-References: <cover.1537984851.git.jcody@redhat.com>
- <63e205cb84c8f0a10c1bc6d5d6856d72ceb56e41.1537984851.git.jcody@redhat.com>
- <be63b6c3-6743-d152-07ad-18cfedc7f535@redhat.com>
-In-Reply-To: <be63b6c3-6743-d152-07ad-18cfedc7f535@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 8 October 2018 at 17:40, Kevin Wolf <kwolf@redhat.com> wrote:
+> By the way, can you reproduce this with virtio-blk/scsi and an iothread
+> in a real QEMU or is it only the test case that fails? In theory, I
+> don't see what would prevent QEMU from hanging at shutdown.
 
+I haven't tested, but I suspect this is less likely to
+cause a problem, because in a real QEMU run we'll only
+kill these threads and cause the memory corruption at
+the end of the run when QEMU is exiting anyway. The problem
+in the test case is that we kill threads and corrupt memory,
+and then continue to use the same process for the next test
+in the set, which then crashes later as a result of the
+memory corruption.
 
-
-On 10/07/2018 07:51 PM, Max Reitz wrote:
-> On 26.09.18 20:05, Jeff Cody wrote:
->> I'll not be involved in day-to-day qemu development.  Remove myself as=
-
->> maintainer from the remainder of the network block drivers, and revert=
-
->> them to the general block layer maintainership.
->>
->> Move 'sheepdog' to the 'Odd Fixes' support level.
->>
->> For VHDX, added my personal email address as a maintainer, as I can
->> answer questions or send the occassional bug fix.  Leaving it as
->> 'Supported', instead of 'Odd Fixes', because I think the rest of the
->> block layer maintainers and developers will upkeep it as well, if
->> needed.
->>
->> Signed-off-by: Jeff Cody <jcody@redhat.com>
->> ---
->>  MAINTAINERS | 17 ++---------------
->>  1 file changed, 2 insertions(+), 15 deletions(-)
->=20
-> Not sure who's going to merge this (maybe me, but then I'd like an ACK
-> from John on patch 1), but:
->=20
-> Acked-by: Max Reitz <mreitz@redhat.com>
->=20
-
-I thought I did, but maybe I thought it would be rude to confirm myself
-before someone else did.
-
-
---dlAI0wlbPRulbltreMP3K2igXlvXVI0II
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE+ber27ys35W+dsvQfe+BBqr8OQ4FAlu7inYACgkQfe+BBqr8
-OQ72KA//ShagTUUD3rBmQBeXy9oVhKSMTOuMU/VJ68+oHuwpADFoWAd2JZFRTgPt
-forBKSKJYd34oWnJi/T7pLM1ofMfr+Z1bhH7Hr5EQFmEYExF3IdBJ0UFBve+3dL5
-lbq5jmUmgbHLTRmpKfsbddaC7H3Cl9qWXbicqK7KACyyxHbzQnMQAtQwGnZDsTv5
-UuesDQRznyYja1reP+U4iJIpNIuO4UvXR+rbK9SSZGLQNwjdED04LPJxCIfDpeaC
-7+nzgTFXM2AdwMyHjbl6ofdL5JCaqLgTsVuH3HGbNddtctX4AW1R2segpeofK7iW
-kqDXO4097MRikQd3hfuaSgyhIIMMQdjYubDYRH0hse6Ti9Uj5HvbrSZCmW86Nnoj
-JGSqmq5mAFNrmHd012gqP1G5YWP9bv7CWOG859/F3dAbvjVma9ye735jeJeEO+qp
-bx+QsjuCDPM0KdO10tO6gY/j75SI/AqA4PFU0bmbHoJTPSa4OmLVtFxjQza8iq3D
-Mt1u4r6kiyQpqUEMBzWC+qQqI5K6Od9c5FTt67jxLpMSEHIuH0c3pQYwZRU+roau
-1YJIwq8J9ktRKH7g0BBSGMlQceB3YMW8ipARUIQbqqKYn9d/27cyNgFcBfcG/Kmp
-4J4bFEbZhkh2Hlc9Az19sLZd08KgHfGIQAcCFwFap+CDMH9e0HQ=
-=QTw2
------END PGP SIGNATURE-----
-
---dlAI0wlbPRulbltreMP3K2igXlvXVI0II--
+thanks
+-- PMM
