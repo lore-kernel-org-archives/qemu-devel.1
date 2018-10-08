@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g9f9C-0005Ec-SF
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:41:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1g9gKP-0006nv-Az
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 20:56:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1g9f99-0001ar-Kz
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:41:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55802)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1g9f99-0001Xo-DH
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:41:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1g9f95-0007cH-GF
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 23:41:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 162F22E80D1
-	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 23:40:59 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1g9gKL-0003aS-82
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 20:56:49 -0400
+Received: from ozlabs.org ([203.11.71.1]:58827)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1g9gKK-0003Yr-6l
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 20:56:45 -0400
+Date: Tue, 9 Oct 2018 09:25:20 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181008222520.GY7004@umbus.fritz.box>
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-2-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 08 Oct 2018 23:35:37 -0000
-From: tlloss <1795527@bugs.launchpad.net>
-Reply-To: Bug 1795527 <1795527@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153843648798.30392.6657333416089253911.malonedeb@soybean.canonical.com>
-Message-Id: <153904173747.22262.292225091713279803.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1795527] Re: Malformed audio and video output
- stuttering after upgrade to QEMU 3.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="yYeq/WQYi/kuVVbm"
+Content-Disposition: inline
+In-Reply-To: <20181008173125.19678-2-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/31] Use error_fatal to simplify obvious
+ fatal errors (again)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,206 +29,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-UPDATE 2 (STUTTERING ELIMINATED, AUDIO ISSUES _STILL_ PRESENT)
-
-I think I've tracked down the source of the stuttering that affected my mac=
-hine, and it doesn't seem to be QEMU-related.
-I'm going to write something about it here anyway, waiting to report it to =
-other, more appropriate channels, hoping that it could help someone else ou=
-t there.
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
-QUICK FIX:
-toggle the `kvm=3Doff` flag off, perform a boot/shutdown cycle, toggle it b=
-ack on, boot again.
+--yYeq/WQYi/kuVVbm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Oct 08, 2018 at 07:30:55PM +0200, Markus Armbruster wrote:
+> Add a slight improvement of the Coccinelle semantic patch from commit
+> 07d04a0219b, and use it to clean up.  It leaves dead Error * variables
+> behind, cleaned up manually.
+>=20
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-POSSIBLE EXPLANATION:
-During the week of panicking trial&error troubleshooting between the discov=
-ery of the audio issue and this report's filling, I let Windows perform an =
-update.
+ppc part
 
-It downloaded and installed KB4100347.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Now, by the looks of things this update naively checks the MSR for hipervis=
-or signatures and, not finding any because of the KVM hidden state flag, it=
- carries on with its duties of putting in place whatever microcode-powered =
-mitigations for Spectre V2 it is instructed to set up.
-Being the CPU really a virtual one, the process, unsurprisingly, fails, and=
- the OS is left with some sort of software gimmick which tries to compensat=
-e for those unsupported functions.
+> ---
+>  hw/intc/xics_kvm.c                       |  7 +------
+>  qemu-nbd.c                               |  6 +-----
+>  scripts/coccinelle/use-error_fatal.cocci | 20 ++++++++++++++++++++
+>  vl.c                                     |  7 +------
+>  4 files changed, 23 insertions(+), 17 deletions(-)
+>  create mode 100644 scripts/coccinelle/use-error_fatal.cocci
+>=20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 30c3769a20..e8fa9a53ae 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -198,17 +198,12 @@ static void ics_get_kvm_state(ICSState *ics)
+>  {
+>      uint64_t state;
+>      int i;
+> -    Error *local_err =3D NULL;
+> =20
+>      for (i =3D 0; i < ics->nr_irqs; i++) {
+>          ICSIRQState *irq =3D &ics->irqs[i];
+> =20
+>          kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+> -                          i + ics->offset, &state, false, &local_err);
+> -        if (local_err) {
+> -            error_report_err(local_err);
+> -            exit(1);
+> -        }
+> +                          i + ics->offset, &state, false, &error_fatal);
+> =20
+>          irq->server =3D state & KVM_XICS_DESTINATION_MASK;
+>          irq->saved_priority =3D (state >> KVM_XICS_PRIORITY_SHIFT)
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index e76fe3082a..7874bc973c 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -1002,11 +1002,7 @@ int main(int argc, char **argv)
+>      }
+> =20
+>      exp =3D nbd_export_new(bs, dev_offset, fd_size, nbdflags, nbd_export=
+_closed,
+> -                         writethrough, NULL, &local_err);
+> -    if (!exp) {
+> -        error_report_err(local_err);
+> -        exit(EXIT_FAILURE);
+> -    }
+> +                         writethrough, NULL, &error_fatal);
+>      nbd_export_set_name(exp, export_name);
+>      nbd_export_set_description(exp, export_description);
+> =20
+> diff --git a/scripts/coccinelle/use-error_fatal.cocci b/scripts/coccinell=
+e/use-error_fatal.cocci
+> new file mode 100644
+> index 0000000000..10fff0aec4
+> --- /dev/null
+> +++ b/scripts/coccinelle/use-error_fatal.cocci
+> @@ -0,0 +1,20 @@
+> +@@
+> +type T;
+> +identifier FUN, RET;
+> +expression list ARGS;
+> +expression ERR, EC, FAIL;
+> +@@
+> +(
+> +-    T RET =3D FUN(ARGS, &ERR);
+> ++    T RET =3D FUN(ARGS, &error_fatal);
+> +|
+> +-    RET =3D FUN(ARGS, &ERR);
+> ++    RET =3D FUN(ARGS, &error_fatal);
+> +|
+> +-    FUN(ARGS, &ERR);
+> ++    FUN(ARGS, &error_fatal);
+> +)
+> +-    if (FAIL) {
+> +-        error_report_err(ERR);
+> +-        exit(EC);
+> +-    }
+> diff --git a/vl.c b/vl.c
+> index a867c9c4d9..9d2b38a31f 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2002,15 +2002,10 @@ static void select_vgahw(const char *p)
+> =20
+>  static void parse_display_qapi(const char *optarg)
+>  {
+> -    Error *err =3D NULL;
+>      DisplayOptions *opts;
+>      Visitor *v;
+> =20
+> -    v =3D qobject_input_visitor_new_str(optarg, "type", &err);
+> -    if (!v) {
+> -        error_report_err(err);
+> -        exit(1);
+> -    }
+> +    v =3D qobject_input_visitor_new_str(optarg, "type", &error_fatal);
+> =20
+>      visit_type_DisplayOptions(v, NULL, &opts, &error_fatal);
+>      QAPI_CLONE_MEMBERS(DisplayOptions, &dpy, opts);
 
-To my surprise, it seems that the MSR check is implemented as a
-persistent trigger and, as soon as it detects an hypervisor signature,
-it permanently removes the mitigation routines, leaving a smoothly
-running VM.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-I've performed 3 reboots since I toggled the flag off and on again, and
-the performance are consistent.
+--yYeq/WQYi/kuVVbm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Obviously, this explanation is just a wild guess, but I find it
-believable enough and in line with my experience.
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlu72U4ACgkQbDjKyiDZ
+s5IkbA/9Gg77/3a+2xuU04dTaJU8ukbj16gQBmirB2Sxxt6Nm8vkXMkHEPLWuz4U
+6SFQxdHjGxqc4kQ5+2qW19TzJzT/g1h7GuDRY9LVCigfH2Ejx+5DoQTeBSdTyvwR
+A7+VvlkOTQ8H2nBWHVEvqTDJHL2nJjvNm6EyfSnoyAAwCstyksd4HiRtrwOEoP+u
+HTIxaxbHPDSMyhUJ5kebuGy2upHg6oCfKesGOxCzo0Ldqhh0F1UIrVIwjLsVs+VD
+L34jCjooqsqEqLLcDJWbPzzVfJym4vkSekmV6/nt/EREfcCpgTBYftDvY9WWJ6SQ
+/5zw3Si+W02Dwhh8zK6GJQKp5Uqsczc871VUhSUHFQexX3d5mXmkkBRBffKVeNl2
+n0o8DhC/lZwZZJnYjPilo1O1ec572KjU5eE+2ZAptyE4ZGc6hXiRq8mmJn4YFGbg
+kUmICOMmX200jdCUm59KEySkIq0ObfGMc8GKeUt3/HihNz8/UxdHv0Q7/qivriDa
+IMNIHRA6Hj5wQv9Z6rJ1+dMhPsEbb8sPrrXv1HEq5N+1QnqH8KOK4/4F/cIxRAkj
+fpw9BnsKzepCJgwFHYzAi23kE5a73iakRSdkjIjwXX5E6m/HhSjuNqpsYgDoIqWP
+E0BxVd3EWrfFeKmYeS3JpxE0PLWykTEzEim6gc1wKZ5RK5g1F84=
+=6Ru6
+-----END PGP SIGNATURE-----
 
-As I stated in the title, though, *the audio corruption is still well
-present* under QEMU 3.0, and eliminating the stuttering didn't help,
-leaving me with the original and most important problem.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1795527
-
-Title:
-  Malformed audio and video output stuttering after upgrade to QEMU 3.0
-
-Status in QEMU:
-  New
-
-Bug description:
-  My host is an x86_64 Arch Linux OS with a recompiled 4.18.10 hardened
-  kernel, running a few KVM guests with varying OSes and configurations
-  managed through a Libvirt stack.
-
-  Among these guests I have two Windows 10 VMs with VGA passthrough and
-  PulseAudio-backed virtual audio devices.
-
-  After upgrading to QEMU 3.0.0, both of the Win10 guests started
-  showing corrupted audio output in the form of unnatural reproduction
-  speed and occasional but consistently misplaced audio fragments
-  originating from what seems to be a circular buffer wrapping over
-  itself (misbehaviour detected by starting some games with known OSTs
-  and dialogues: soundtracks sound accelerated and past dialogue lines
-  start replaying middle-sentence until the next line starts playing).
-
-  In addition, the video output of the malfunctioning VMs regularly
-  stutters roughly twice a second for a fraction of a second (sync'ed
-  with the suspected buffer wrapping and especially pronounced during
-  not-pre-rendered cutscenes), toghether with mouse freezes that look
-  like actual input misses more than simple lack of screen refreshes.
-
-  =
-
-  The issue was succesfully reproduced without the managing stack, directly=
- with the following command line, on the most capable Windows guest:
-
-   QEMU_AUDIO_DRV=3Dpa
-   QEMU_PA_SERVER=3D127.0.0.1
-   /usr/bin/qemu-system-x86_64 -name guest=3Dwin10_gms,debug-threads=3Don \
-   -machine pc-i440fx-3.0,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-cor=
-e=3Doff \                                                                  =
-                                                                         =
-
-   -cpu host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vendor_id=
-=3D123456789abc,kvm=3Doff \          =
-
-   -drive file=3D/usr/share/ovmf/x64/OVMF_CODE.fd,if=3Dpflash,format=3Draw,=
-unit=3D0,readonly=3Don \       =
-
-   -drive file=3D/var/lib/libvirt/qemu/nvram/win10_gms_VARS.fd,if=3Dpflash,=
-format=3Draw,unit=3D1 \
-   -m 5120 \                                                               =
-               =
-
-   -realtime mlock=3Doff \
-   -smp 3,sockets=3D1,cores=3D3,threads=3D1 \
-   -uuid 39b56ee2-6bae-4009-9108-7be26d5d63ac \
-   -display none \                             =
-
-   -no-user-config \
-   -nodefaults \    =
-
-   -rtc base=3Dlocaltime,driftfix=3Dslew \                                 =
-                                                                           =
-                                                                     =
-
-   -global kvm-pit.lost_tick_policy=3Ddelay \                              =
-                                    =
-
-   -no-hpet \                              =
-
-   -no-shutdown \
-   -global PIIX4_PM.disable_s3=3D1 \
-   -global PIIX4_PM.disable_s4=3D1 \
-   -boot strict=3Don \              =
-
-   -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x4.0x7 \
-   -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multi=
-function=3Don,addr=3D0x4 \
-   -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=
-=3D0x4.0x1 \             =
-
-   -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=
-=3D0x4.0x2 \
-   -device ahci,id=3Dsata0,bus=3Dpci.0,addr=3D0x9 \                        =
-         =
-
-   -drive file=3D/dev/vms/win10_gaming,format=3Draw,if=3Dnone,id=3Ddrive-vi=
-rtio-disk0,cache=3Dnone,aio=3Dnative \
-   -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-v=
-irtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
-   -drive file=3D/dev/sr0,format=3Draw,if=3Dnone,id=3Ddrive-sata0-0-0,media=
-=3Dcdrom,readonly=3Don \                                    =
-
-   -device ide-cd,bus=3Dsata0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 \   =
-                  =
-
-   -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x3 \                  =
-                                                                           =
-                                                                       =
-
-   -device hda-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 \          =
-                                   =
-
-   -device usb-host,hostbus=3D2,hostaddr=3D3,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1 \
-   -device vfio-pci,host=3D01:00.0,id=3Dhostdev1,bus=3Dpci.0,addr=3D0x6 \  =
-    =
-
-   -device vfio-pci,host=3D01:00.1,id=3Dhostdev2,bus=3Dpci.0,addr=3D0x7 \
-   -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 \   =
-
-   -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resour=
-cecontrol=3Ddeny \
-   -msg timestamp=3Don
-
-  =
-
-  By "purposedly misconfiguring" the codepaths and replacing "pc-i440fx-3.0=
-" with "pc-i440fx-2.11" (basically reverting the config changes I needed to=
- do in order to update the domain definitions), the stuttering seems to dis=
-appear (or at least becomes negligible) and the audio output, despite becom=
-ing incredibly distorted, is consistent in every other way, with in-order d=
-ialogues and (perceived) correct tempo.
-
-  =
-
-  In order to exclude eventual misconfigurations in the host's audio proces=
-sing pipeline, I proceeded to update the domain definition's codepath of an=
-other guest running Ubuntu 18.04 with a completely different hardware confi=
-guration (no video card passthrough and no PulseAudio backconnection, just =
-a plain emulated VirtIO display and Spice audio device).
-
-  The audio issue presented itself again in the form of slightly sped up au=
-dio playback from Internet videos interleaved with occasional "quenches" of=
- playing speed.
-  Stutters are difficult to detect because of the poor refresh rate of the =
-emulated VGA adapter, but I wouldn't be surprised to find them here too (ac=
-tually, I *think* I sensed them, but I'm not sure enough to assess their ex=
-istence).
-
-  Once again, by reverting to the old 2.11 directive everything is back
-  to normal.
-
-
-  Given the fact that no official upgrade directives regarding required sam=
-pling rate, period or sheduling adjustments were stated or handed-out to ad=
-ministrators, I decided to report this behaviour as a bug.
-  I hope this is the appropriate channel and that I didn't annoy anyone (th=
-is is my first proper bug report, please forgive me for any innaccuracy).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1795527/+subscriptions
+--yYeq/WQYi/kuVVbm--
