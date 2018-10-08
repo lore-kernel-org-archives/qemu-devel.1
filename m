@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9WYM-0008J1-Cb
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:30:36 -0400
+	(envelope-from <cohuck@redhat.com>) id 1g9WdL-0003XG-Dh
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:35:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9WYJ-0003Kd-87
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:30:34 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9WYJ-0003JY-12
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:30:31 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 206-v6so8369165wmb.5
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 07:30:30 -0700 (PDT)
-References: <20181005211450.847-1-cota@braap.org>
-	<20181005211450.847-4-cota@braap.org>
-	<8736tgo81t.fsf@linaro.org> <20181008141219.GB19899@flamenco>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181008141219.GB19899@flamenco>
-Date: Mon, 08 Oct 2018 15:30:28 +0100
-Message-ID: <87y3b8mry3.fsf@linaro.org>
+	(envelope-from <cohuck@redhat.com>) id 1g9Wd7-0007bB-DB
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:35:36 -0400
+Date: Mon, 8 Oct 2018 16:35:03 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181008163503.577c5653.cohuck@redhat.com>
+In-Reply-To: <635820eb-dcb2-9bf1-a3da-641c7e659e9b@redhat.com>
+References: <20180926225440.6204-1-akrowiak@linux.vnet.ibm.com>
+	<20180926225440.6204-5-akrowiak@linux.vnet.ibm.com>
+	<6ae10841-43af-f37f-450e-7dcb4cc75747@redhat.com>
+	<20180927145240.7f8aba31.cohuck@redhat.com>
+	<ee677383-b23c-61a0-f622-807532563650@linux.ibm.com>
+	<635820eb-dcb2-9bf1-a3da-641c7e659e9b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] cputlb: serialize tlb updates with
- env->tlb_lock
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v9 4/6] s390x/ap: base Adjunct
+ Processor (AP) object model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com
 
+On Mon, 8 Oct 2018 16:22:27 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Emilio G. Cota <cota@braap.org> writes:
+> On 08/10/2018 16:20, Tony Krowiak wrote:
+> > On 09/27/2018 08:52 AM, Cornelia Huck wrote:  
+> >> On Thu, 27 Sep 2018 14:29:01 +0200
+> >> Thomas Huth <thuth@redhat.com> wrote:
+> >>  
+> >>> On 2018-09-27 00:54, Tony Krowiak wrote:  
+> >>>> From: Tony Krowiak <akrowiak@linux.ibm.com>
+> >>>>
+> >>>> Introduces the base object model for virtualizing AP devices.
+> >>>>
+> >>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> >>>> ---  
+> >>  
+> >>>> +typedef struct APBridge {
+> >>>> +    SysBusDevice sysbus_dev;
+> >>>> +    bool css_dev_path;  
+> >>>
+> >>> What is this css_dev_path variable good for? I don't see it used in any
+> >>> of the other patches?
+> >>> If you don't need it, I think you could get rid of this struct completely?  
+> >>
+> >> Huh, now I remember complaining about it before. Looks like a
+> >> copy-and-paste from the css bridge; that variable is used for compat
+> >> handling there (and should be ditched here).
+> >>  
+> >>>  
+> >>>> +} APBridge;
+> >>>> +
+> >>>> +#define TYPE_AP_BRIDGE "ap-bridge"
+> >>>> +#define AP_BRIDGE(obj) \
+> >>>> +    OBJECT_CHECK(APBridge, (obj), TYPE_AP_BRIDGE)
+> >>>> +
+> >>>> +typedef struct APBus {
+> >>>> +    BusState parent_obj;
+> >>>> +} APBus;
+> >>>> +
+> >>>> +#define TYPE_AP_BUS "ap-bus"
+> >>>> +#define AP_BUS(obj) \
+> >>>> +     OBJECT_CHECK(APBus, (obj), TYPE_AP_BUS)  
+> >>>
+> >>> I think you could also get rid of AP_BRIDGE(), AP_BUS() and maybe even
+> >>> struct APBus.  
+> >>
+> >> If there's nothing interesting to put in these inherited structures,
+> >> probably yes.
+> >>  
+> >>>  
+> >>>> +void s390_init_ap(void);
+> >>>> +
+> >>>> +#endif
+> >>>> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+> >>>> new file mode 100644
+> >>>> index 000000000000..693df90cc041
+> >>>> --- /dev/null
+> >>>> +++ b/include/hw/s390x/ap-device.h
+> >>>> @@ -0,0 +1,38 @@
+> >>>> +/*
+> >>>> + * Adjunct Processor (AP) matrix device interfaces
+> >>>> + *
+> >>>> + * Copyright 2018 IBM Corp.
+> >>>> + * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>
+> >>>> + *
+> >>>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> >>>> + * your option) any later version. See the COPYING file in the top-level
+> >>>> + * directory.
+> >>>> + */
+> >>>> +#ifndef HW_S390X_AP_DEVICE_H
+> >>>> +#define HW_S390X_AP_DEVICE_H
+> >>>> +
+> >>>> +#define AP_DEVICE_TYPE       "ap-device"
+> >>>> +
+> >>>> +typedef struct APDevice {
+> >>>> +    DeviceState parent_obj;
+> >>>> +} APDevice;
+> >>>> +
+> >>>> +typedef struct APDeviceClass {
+> >>>> +    DeviceClass parent_class;
+> >>>> +} APDeviceClass;
+> >>>> +
+> >>>> +static inline APDevice *to_ap_dev(DeviceState *dev)
+> >>>> +{
+> >>>> +    return container_of(dev, APDevice, parent_obj);
+> >>>> +}
+> >>>> +
+> >>>> +#define AP_DEVICE(obj) \
+> >>>> +    OBJECT_CHECK(APDevice, (obj), AP_DEVICE_TYPE)
+> >>>> +
+> >>>> +#define AP_DEVICE_GET_CLASS(obj) \
+> >>>> +    OBJECT_GET_CLASS(APDeviceClass, (obj), AP_DEVICE_TYPE)
+> >>>> +
+> >>>> +#define AP_DEVICE_CLASS(klass) \
+> >>>> +    OBJECT_CLASS_CHECK(APDeviceClass, (klass), AP_DEVICE_TYPE)  
+> >>>
+> >>> Do you really need any of these definitions except AP_DEVICE_TYPE ?  
+> > 
+> > Yes, we need AP_DEVICE(obj) and struct APDevice; they are both used in
+> > patch 5/6. We can probably get rid of AP_DEVICE_GET_CLASS(obj) and
+> > AP_DEVICE_CLASS(klass), but aren't those typically included in all
+> > QOM definitions?  
+> 
+> Yes, we usually add all of them although only some might actually be
+> used. (adding a new device usually looks like filling out a template)
 
-> On Mon, Oct 08, 2018 at 14:57:18 +0100, Alex Benn=C3=A9e wrote:
->> Emilio G. Cota <cota@braap.org> writes:
->> > The readers that do not hold tlb_lock must use atomic reads when
->> > reading .addr_write, since this field can be updated by other threads;
->> > the conversion to atomic reads is done in the next patch.
->>
->> We don't enforce this for the TCG code - but rely on the backend ISA's
->> to avoid torn reads from updates from cputlb that could invalidate an
->> entry.
->
-> We do enforce it though; the TLB reads we emit in TCG backend
-> code are appropriately sized to guarantee atomic reads.
->
->> > -/* For atomic correctness when running MTTCG we need to use the right
->> > - * primitives when copying entries */
->> > -static inline void copy_tlb_helper(CPUTLBEntry *d, CPUTLBEntry *s,
->> > -                                   bool atomic_set)
->> > +/* Called with tlb_lock held */
->> > +static inline void copy_tlb_helper_locked(CPUTLBEntry *d, const CPUTL=
-BEntry *s)
->> >  {
->> > -#if TCG_OVERSIZED_GUEST
->> >      *d =3D *s;
->>
->> In general I'm happy with the patch set but what ensures that this
->> always DRT with respect to the TCG code reads that race with it?
->
-> copy_tlb_helper is only called by the "owner" CPU, so it cannot
-> race with TCG code (i.e. the owner thread cannot race with itself).
->
-> I wanted to add an assert_cpu_is_self(cpu) here, but that needs
-> a CPUState pointer. Maybe I should just get rid of the function?
-> All the callers have the assert, so that might make the code
-> clearer.
+Much of this seems to be boilerplate in this case, and I'm not sure how
+much sense it makes. On the plus side, however, it looks like
+everything else :)
 
-I'm happy keeping the function and just expanding the comment:
-
-/* Called with tlb_lock held and only ever from the vCPU context */
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
->
-> Thanks,
->
-> 		Emilio
-
-
---
-Alex Benn=C3=A9e
+So, I would merge both a complete version or a
+stripped-down-to-the-needed version, unless someone else has a strong
+argument.
