@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g9X0S-0005At-TU
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:59:40 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g9X0Y-0005FC-6h
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:59:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g9X0O-0006Hk-RE
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:59:36 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45699 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1g9X0X-0006N9-C7
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:59:42 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45945 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1g9X0O-0006Fb-Ho
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:59:32 -0400
+	id 1g9X0X-0006MK-0M
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:59:41 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon,  8 Oct 2018 16:56:30 +0200
-Message-Id: <1539010596-30858-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  8 Oct 2018 16:56:31 +0200
+Message-Id: <1539010596-30858-8-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539010596-30858-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539010596-30858-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v3 06/12] target/mips: Add opcodes for nanoMIPS
- EVA instructions
+Subject: [Qemu-devel] [PATCH v3 07/12] target/mips: Implement emulation of
+ nanoMIPS EVA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,111 @@ Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, 
 
 From: Dimitrije Nikolic <dnikolic@wavecomp.com>
 
-Add opcodes for nanoMIPS EVA instructions: CACHEE, LBE, LBUE, LHE,
-LHUE, LLE, LLWPE, LWE, PREFE, SBE, SCE, SCWPE, SHE, SWE.
+Implement emulation of nanoMIPS EVA instructions. They are all
+part of P.LS.E0 instruction pool, or one of its subpools.
 
 Signed-off-by: Dimitrije Nikolic <dnikolic@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/translate.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ target/mips/translate.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index d64a1da..7b1a6b1 100644
+index 7b1a6b1..d872fa7 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16499,6 +16499,40 @@ enum {
-     NM_P_SC      = 0x0b,
- };
+@@ -1979,6 +1979,17 @@ static inline void check_nms(DisasContext *ctx)
+     }
+ }
  
-+/* P.LS.E0 instruction pool */
-+enum {
-+    NM_LBE      = 0x00,
-+    NM_SBE      = 0x01,
-+    NM_LBUE     = 0x02,
-+    NM_P_PREFE  = 0x03,
-+    NM_LHE      = 0x04,
-+    NM_SHE      = 0x05,
-+    NM_LHUE     = 0x06,
-+    NM_CACHEE   = 0x07,
-+    NM_LWE      = 0x08,
-+    NM_SWE      = 0x09,
-+    NM_P_LLE    = 0x0a,
-+    NM_P_SCE    = 0x0b,
-+};
++/*
++ * This code generates a "reserved instruction" exception if the
++ * Config5 EVA bit is NOT set.
++ */
++static inline void check_eva(DisasContext *ctx)
++{
++    if (!unlikely(ctx->CP0_Config5 & (1 << CP0C5_EVA))) {
++        generate_exception_end(ctx, EXCP_RI);
++    }
++}
 +
-+/* P.PREFE instruction pool */
-+enum {
-+    NM_SYNCIE   = 0x00,
-+    NM_PREFE    = 0x01,
-+};
-+
-+/* P.LLE instruction pool */
-+enum {
-+    NM_LLE      = 0x00,
-+    NM_LLWPE    = 0x01,
-+};
-+
-+/* P.SCE instruction pool */
-+enum {
-+    NM_SCE      = 0x00,
-+    NM_SCWPE    = 0x01,
-+};
-+
- /* P.LS.WM instruction pool */
- enum {
-     NM_LWM       = 0x00,
+ 
+ /* Define small wrappers for gen_load_fpr* so that we have a uniform
+    calling interface for 32 and 64-bit FPRs.  No sense in changing
+@@ -20029,6 +20040,74 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+                     break;
+                 }
+                 break;
++            case NM_P_LS_E0:
++                check_eva(ctx);
++                switch (extract32(ctx->opcode, 11, 4)) {
++                case NM_LBE:
++                    gen_ld(ctx, OPC_LBE, rt, rs, s);
++                    break;
++                case NM_SBE:
++                    gen_st(ctx, OPC_SBE, rt, rs, s);
++                    break;
++                case NM_LBUE:
++                    gen_ld(ctx, OPC_LBUE, rt, rs, s);
++                    break;
++                case NM_P_PREFE:
++                    if (rt == 31) {
++                        /* SYNCIE */
++                        /* Break the TB to be able to sync copied instructions
++                           immediately */
++                        ctx->base.is_jmp = DISAS_STOP;
++                    } else {
++                        /* PREF */
++                        /* Treat as NOP. */
++                    }
++                    break;
++                case NM_LHE:
++                    gen_ld(ctx, OPC_LHE, rt, rs, s);
++                    break;
++                case NM_SHE:
++                    gen_st(ctx, OPC_SHE, rt, rs, s);
++                    break;
++                case NM_LHUE:
++                    gen_ld(ctx, OPC_LHUE, rt, rs, s);
++                    break;
++                case NM_CACHEE:
++                    /* Treat as no-op */
++                    if (ctx->hflags & MIPS_HFLAG_ITC_CACHE) {
++                        gen_cache_operation(ctx, rt, rs, s);
++                    }
++                    break;
++                case NM_LWE:
++                    gen_ld(ctx, OPC_LWE, rt, rs, s);
++                    break;
++                case NM_SWE:
++                    gen_st(ctx, OPC_SWE, rt, rs, s);
++                    break;
++                case NM_P_LLE:
++                    switch (extract32(ctx->opcode, 2, 2)) {
++                    case NM_LL:
++                        gen_ld(ctx, OPC_LLE, rt, rs, s);
++                        break;
++                    case NM_LLWP:
++                    default:
++                        generate_exception_end(ctx, EXCP_RI);
++                        break;
++                    }
++                    break;
++                case NM_P_SCE:
++                    switch (extract32(ctx->opcode, 2, 2)) {
++                    case NM_SC:
++                        gen_st_cond(ctx, OPC_SCE, rt, rs, s);
++                        break;
++                    case NM_SCWP:
++                    default:
++                        generate_exception_end(ctx, EXCP_RI);
++                        break;
++                    }
++                    break;
++                }
++                break;
+             case NM_P_LS_WM:
+             case NM_P_LS_UAWM:
+                 check_nms(ctx);
 -- 
 2.7.4
