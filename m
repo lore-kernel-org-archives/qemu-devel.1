@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g9V12-0006Pa-2m
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9V1D-0006UJ-Ik
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g9V0v-0005LK-Ee
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:03 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36634)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9V0v-0005Ap-3f
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:51:57 -0400
-Received: by mail-wr1-f67.google.com with SMTP id y16so20708835wrw.3
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 05:51:46 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1g9V10-0005RL-NV
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40144)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9V10-0005Pv-Cm
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:52:02 -0400
+From: Markus Armbruster <armbru@redhat.com>
 References: <20181005154910.3099-1-alex.bennee@linaro.org>
-	<20181007012337.GA23787@flamenco> <875zycohpl.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <458712aa-3608-0f10-33ce-1d65ecf58f16@redhat.com>
-Date: Mon, 8 Oct 2018 14:51:42 +0200
+	<20181005154910.3099-7-alex.bennee@linaro.org>
+Date: Mon, 08 Oct 2018 14:51:56 +0200
+In-Reply-To: <20181005154910.3099-7-alex.bennee@linaro.org> ("Alex
+	=?utf-8?Q?Benn=C3=A9e=22's?=
+	message of "Fri, 5 Oct 2018 16:48:55 +0100")
+Message-ID: <87efd04n4j.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <875zycohpl.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 00/21] Trace updates and plugin RFC
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 06/21] trace: show trace point counts
+ in the monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, cota@braap.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu
 
-Hi Alex,
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-On 08/10/2018 12:28, Alex Bennée wrote:
-> 
-> Emilio G. Cota <cota@braap.org> writes:
-> 
->> On Fri, Oct 05, 2018 at 16:48:49 +0100, Alex Bennée wrote:
->> (snip)
->>> ==Known Limitations==
->>>
->>> Currently there is only one hook allowed per trace event. We could
->>> make this more flexible or simply just error out if two plugins try
->>> and hook to the same point. What are the expectations of running
->>> multiple plugins hooking into the same point in QEMU?
->>
->> It's very common. All popular instrumentation tools (e.g. PANDA,
->> DynamoRIO, Pin) support multiple plugins.
-> 
-> Fair enough.
-> 
->>
->>> ==TCG Hooks==
->>>
->>> Thanks to Lluís' work the trace API already splits up TCG events into
->>> translation time and exec time events and provides the machinery for
->>> hooking a trace helper into the translation stream. Currently that
->>> helper is unconditionally added although perhaps we could expand the
->>> call convention a little for TCG events to allow the translation time
->>> event to filter out planting the execution time helper?
->>
->> A TCG helper is suboptimal for these kind of events, e.g. instruction/TB/
->> mem callbacks, because (1) these events happen *very* often, and
->> (2) a helper then has to iterate over a list of callbacks (assuming
->> we support multiple plugins). That is, one TCG helper call,
->> plus cache misses for the callback pointers, plus function calls
->> to call the callbacks. That adds up to 2x average slowdown
->> for SPEC06int, instead of 1.5x slowdown when embedding the
->> callbacks directly into the generated code. Yes, you have to
->> flush the code when unsubscribing from the event, but that cost
->> is amortized by the savings you get when the callbacks occur,
->> which are way more frequent.
-> 
-> What would you want instead of a TCG helper? But certainly being able be
-> selective about which instances of each trace point are instrumented
-> will be valuable.
-> 
->> Besides performance, to provide a pleasant plugin experience we need
->> something better than the current tracing callbacks.
-> 
-> What I hope to avoid in re-using trace points is having a whole bunch of
-> a additional hook points just for plugins. However nothing stops us
-> adding more tracepoints at more useful places for instrumentation. We
-> could also do it on a whitelist basis similar to the way the tcg events
-> are marked.
-> 
->>
->>> ===Instruction Tracing===
->>>
->>> Pavel's series had a specific hook for instrumenting individual
->>> instructions. I have not yet added it to this series but I think it be
->>> done in a slightly cleaner way now we have the ability to insert TCG
->>> ops into the instruction stream.
->>
->> I thought Peter explicitly disallowed TCG generation from plugins.
->> Also, IIRC others also mentioned that exposing QEMU internals
->> (e.g. "struct TranslationBlock", or "struct CPUState") to plugins
->> was not on the table.
-> 
-> We definitely want to avoid plugin controlled code generation but the
-> tcg tracepoint mechanism is transparent to the plugin itself. I think
-> the pointers should really be treated as anonymous handles rather than
-> windows into QEMU's internals. Arguably some of the tracepoints should
-> be exporting more useful numbers (I used cpu->cpu_index in the TLB trace
-> points) but I don't know if we can change existing trace point
-> definitions to clean that up.
-> 
-> Again if we whitelist tracepoints for plugins we can be more careful
-> about the data exported.
-> 
->>
->>> If we add a tracepoint for post
->>> instruction generation which passes a buffer with the instruction
->>> translated and method to insert a helper before or after the
->>> instruction. This would avoid exposing the cpu_ldst macros to the
->>> plugins.
->>
->> Again, for performance you'd avoid the tracepoint (i.e. calling
->> a helper to call another function) and embed directly the
->> callback from TCG. Same thing applies to TB's.
-> 
-> OK I see what you mean. I think that is doable although it might take a
-> bit more tcg plumbing.
-> 
->>
->>> So what do people think? Could this be a viable way to extend QEMU
->>> with plugins?
->>
->> For frequent events such as the ones mentioned above, I am
->> not sure plugins can be efficiently implemented under
->> tracing.
-> 
-> I assume some form of helper-per-instrumented-event/insn is still going
-> to be needed though? We are not considering some sort of EBF craziness?
-> 
->> For others (e.g. cpu_init events), sure, they could.
->> But still, differently from tracers, plugins can come and go
->> anytime, so I am not convinced that merging the two features
->> is a good idea.
-> 
-> I don't think we have to mirror tracepoints and plugin points but I'm in
-> favour of sharing the general mechanism and tooling rather than having a
-> whole separate set of hooks. We certainly don't want anything like:
-> 
->           trace_exec_tb(tb, pc);
->           plugin_exec_tb(tb, pc);
-> 
-> scattered throughout the code where the two do align.
+> Now we have counts for each trace point we can expose them in the
+> monitor when the user queries what trace points are available.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  monitor.c       | 5 +++--
+>  qapi/trace.json | 3 ++-
+>  trace/qmp.c     | 1 +
+>  3 files changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index c4677b502b..d8229cd2b0 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1421,9 +1421,10 @@ static void hmp_info_trace_events(Monitor *mon, co=
+nst QDict *qdict)
+>      }
+>=20=20
+>      for (elem =3D events; elem !=3D NULL; elem =3D elem->next) {
+> -        monitor_printf(mon, "%s : state %u\n",
+> +        monitor_printf(mon, "%s : state %u count %" PRIu64 "\n",
+>                         elem->value->name,
+> -                       elem->value->state =3D=3D TRACE_EVENT_STATE_ENABL=
+ED ? 1 : 0);
+> +                       elem->value->state =3D=3D TRACE_EVENT_STATE_ENABL=
+ED ? 1 : 0,
+> +                       elem->value->count);
+>      }
+>      qapi_free_TraceEventInfoList(events);
+>  }
+> diff --git a/qapi/trace.json b/qapi/trace.json
+> index 799b254a18..b9184b0d18 100644
+> --- a/qapi/trace.json
+> +++ b/qapi/trace.json
+> @@ -33,6 +33,7 @@
+>  # @name: Event name.
+>  # @state: Tracing state.
+>  # @vcpu: Whether this is a per-vCPU event (since 2.7).
+> +# @count: Current hits on trace-point (since 3.1).
 
-What about turning the tracepoints into the default instrumentation
-plugin? (the first of Emilio's list of plugins).
+Suggest something like "Number of hits".
 
->>
->> Thanks,
->>
->> 		Emilio
-> 
-> 
-> --
-> Alex Bennée
-> 
+>  #
+>  # An event is per-vCPU if it has the "vcpu" property in the "trace-event=
+s"
+>  # files.
+> @@ -40,7 +41,7 @@
+>  # Since: 2.2
+>  ##
+>  { 'struct': 'TraceEventInfo',
+> -  'data': {'name': 'str', 'state': 'TraceEventState', 'vcpu': 'bool'} }
+> +  'data': {'name': 'str', 'state': 'TraceEventState', 'vcpu': 'bool', 'c=
+ount': 'int' } }
+>=20=20
+>  ##
+>  # @trace-event-get-state:
+> diff --git a/trace/qmp.c b/trace/qmp.c
+> index ea99b00956..cce8198091 100644
+> --- a/trace/qmp.c
+> +++ b/trace/qmp.c
+> @@ -102,6 +102,7 @@ TraceEventInfoList *qmp_trace_event_get_state(const c=
+har *name,
+>          elem->value =3D g_new(TraceEventInfo, 1);
+>          elem->value->vcpu =3D is_vcpu;
+>          elem->value->name =3D g_strdup(trace_event_get_name(ev));
+> +        elem->value->count =3D ev->count;
+
+I suspect this converts from uint64_t to int64_t.  Change the type to
+'uint64' in the QAPI schema?
+
+>=20=20
+>          if (!trace_event_get_state_static(ev)) {
+>              elem->value->state =3D TRACE_EVENT_STATE_UNAVAILABLE;
