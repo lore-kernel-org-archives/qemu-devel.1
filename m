@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9aYd-0003p4-O2
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:47:08 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g9abz-00050T-Fo
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:50:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9aYc-0000py-RQ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:47:07 -0400
-References: <cover.1537367701.git.berto@igalia.com>
-	<ba0e2f728d7b2a0bbf5c0f44d907a4c7e3723501.1537367701.git.berto@igalia.com>
-	<204d1911-765b-bd4b-27b8-3f1a35a6b9d6@redhat.com>
-	<w517eis71cp.fsf@maestria.local.igalia.com>
+	(envelope-from <mreitz@redhat.com>) id 1g9abv-0002IJ-Eq
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:50:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1g9abp-0002Ea-S0
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:50:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E70FDDF2C
+	for <qemu-devel@nongnu.org>; Mon,  8 Oct 2018 18:50:18 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1b2e5d06-7b80-43d9-7b66-9b69b67445a5@redhat.com>
-Date: Mon, 8 Oct 2018 20:46:57 +0200
-MIME-Version: 1.0
-In-Reply-To: <w517eis71cp.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="uyHwCM98Zie4tVnLKM2w1XiPQVCxLKaJ6"
-Subject: Re: [Qemu-devel] [PATCH 14/14] block: Stop passing flags to
- bdrv_reopen_queue_child()
+Date: Mon,  8 Oct 2018 20:50:13 +0200
+Message-Id: <20181008185013.19371-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PATCH] sdl2: Support all virtio-gpu formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uyHwCM98Zie4tVnLKM2w1XiPQVCxLKaJ6
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <1b2e5d06-7b80-43d9-7b66-9b69b67445a5@redhat.com>
-Subject: Re: [PATCH 14/14] block: Stop passing flags to
- bdrv_reopen_queue_child()
-References: <cover.1537367701.git.berto@igalia.com>
- <ba0e2f728d7b2a0bbf5c0f44d907a4c7e3723501.1537367701.git.berto@igalia.com>
- <204d1911-765b-bd4b-27b8-3f1a35a6b9d6@redhat.com>
- <w517eis71cp.fsf@maestria.local.igalia.com>
-In-Reply-To: <w517eis71cp.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+There are some 2D resource formats that can be used through virtio-gpu,
+but which are not supported by SDL2 when used for a scanout; these are
+all alpha-channel formats and also XBGR (RGBX in non-BE pixman).
 
-On 08.10.18 20:13, Alberto Garcia wrote:
-> On Mon 08 Oct 2018 04:48:50 AM CEST, Max Reitz wrote:
->=20
->>> +    /* Old values are used for options that aren't set yet */
->>> +    old_options =3D qdict_clone_shallow(bs->options);
->>> +    bdrv_join_options(bs, options, old_options);
->>> +    qobject_unref(old_options);
->>> +
->>> +    /* We have the final set of options so let's update the flags */=
+Add these formats in the switch converting pixman to SDL format
+constants so a guest cannot crash the VM by triggering the
+g_assert_not_reached() with an unsupported format.
 
->>> +    {
->>> +        Error *local_err =3D NULL;
->>> +        QemuOpts *opts;
->>> +        QDict *options_copy =3D qdict_clone_shallow(options);
->>
->> I-I'm not sure this conforms to our coding style.
->>
->> While I applaud your effort to keep the patch size small, I know for
->> sure I don't want to read code like this.  (Unless it's necessary
->> because of some variables' lifetimes.)
->=20
-> I actually think it makes the code more readable if there are variables=
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ ui/sdl2-2d.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-> with a very limited scope (like in this case). But I can also rewrite i=
-t
-> using a more traditional style.
-
-I think it should be a function call then.
-
-Max
-
-
---uyHwCM98Zie4tVnLKM2w1XiPQVCxLKaJ6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu7piEACgkQ9AfbAGHV
-z0BtcAgAr4DnNEavwRX2sq4IuVkb5s2GVg0fG8ZC2B0HU9W3Gl5Zv1qNnYpz2xgy
-G3vTGifcO2qNNo0+jTMMnPOxNpHIWsK6gYYY8tPLAXsrz/t/nsbYFXcDam7ggN4f
-8Au5cUyik3i+Nt56wRsOKexSVYGStfafu/1XxU3OnUPwLnBMeM/i8oJqHuID1x3m
-aNnMD7cP+Mees9S97unZ5fPvnfev6xE3PQd4JojIzP2gKnCR7LuGET+yeP+k6fLr
-osTtvdwjVZVgol+GyA34u3qsF5K3Z8wHpZq5LFGdmqN1KoBv8PmDh/77CuYnCRs3
-uxTpGqIiCY5zy3lPxYlvFjLymW5t8A==
-=x5mK
------END PGP SIGNATURE-----
-
---uyHwCM98Zie4tVnLKM2w1XiPQVCxLKaJ6--
+diff --git a/ui/sdl2-2d.c b/ui/sdl2-2d.c
+index 85484407be..c9df72636a 100644
+--- a/ui/sdl2-2d.c
++++ b/ui/sdl2-2d.c
+@@ -101,15 +101,24 @@ void sdl2_2d_switch(DisplayChangeListener *dcl,
+     case PIXMAN_r5g6b5:
+         format = SDL_PIXELFORMAT_RGB565;
+         break;
++    case PIXMAN_a8r8g8b8:
+     case PIXMAN_x8r8g8b8:
+         format = SDL_PIXELFORMAT_ARGB8888;
+         break;
++    case PIXMAN_a8b8g8r8:
++    case PIXMAN_x8b8g8r8:
++        format = SDL_PIXELFORMAT_ABGR8888;
++        break;
++    case PIXMAN_r8g8b8a8:
+     case PIXMAN_r8g8b8x8:
+         format = SDL_PIXELFORMAT_RGBA8888;
+         break;
+     case PIXMAN_b8g8r8x8:
+         format = SDL_PIXELFORMAT_BGRX8888;
+         break;
++    case PIXMAN_b8g8r8a8:
++        format = SDL_PIXELFORMAT_BGRA8888;
++        break;
+     default:
+         g_assert_not_reached();
+     }
+-- 
+2.17.1
