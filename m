@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9Z7H-0000zI-Cx
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:14:48 -0400
+	(envelope-from <liran.alon@oracle.com>) id 1g9ZEH-0003iM-Rc
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9Z0y-0003nM-3w
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:08:16 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38258)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g9Z0x-0003ml-FZ
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:08:16 -0400
-Received: by mail-oi1-x244.google.com with SMTP id u197-v6so16057679oif.5
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 10:08:14 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20181008164026.GD4604@localhost.localdomain>
-References: <20181005143802.18412-1-peter.maydell@linaro.org>
-	<CAFEAcA8-FvVG7XBLrd7NQfRcKrvo6GtPEjfqJzkjd68iP9=TeQ@mail.gmail.com>
-	<20181005161739.GC4606@localhost.localdomain>
-	<CAFEAcA-SWRHwnwsa+QiHXfdBRB6u2u0paV9HsEqfjR6nZvAHSg@mail.gmail.com>
-	<20181005180901.GA32677@localhost.localdomain>
-	<CAFEAcA80cys-98QwJgAk_2LXfAeMHgCUS2L3Z+NgY4ZsCFhSPw@mail.gmail.com>
-	<CAFEAcA8gYwFZynMyiEHf+VPbaBerA9JTUPAHsipEvOqkBjHxMQ@mail.gmail.com>
-	<20181008164026.GD4604@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Oct 2018 18:07:52 +0100
-Message-ID: <CAFEAcA80vkufJ=hwr5s5i9xFzE1HxZKbfk7KVux2uEF-T9Gyug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tests: Disable test-bdrv-drain
+	(envelope-from <liran.alon@oracle.com>) id 1g9ZED-0000ef-V0
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:22:01 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:58048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1g9ZEC-0000d2-0V
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 13:21:57 -0400
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20180916124631.39016-1-liran.alon@oracle.com>
+Date: Mon, 8 Oct 2018 20:21:40 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <EFF8C049-EE78-4035-A38E-6A91EA219878@oracle.com>
+References: <20180916124631.39016-1-liran.alon@oracle.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v2 0/2]: KVM: i386: Add support for
+ save and restore nested state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,22 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org, jmattson@google.com
 
-On 8 October 2018 at 17:40, Kevin Wolf <kwolf@redhat.com> wrote:
-> By the way, can you reproduce this with virtio-blk/scsi and an iothread
-> in a real QEMU or is it only the test case that fails? In theory, I
-> don't see what would prevent QEMU from hanging at shutdown.
+Gentle ping on v2 of this series.
+(I noticed 1st patch of series was already applied)
 
-I haven't tested, but I suspect this is less likely to
-cause a problem, because in a real QEMU run we'll only
-kill these threads and cause the memory corruption at
-the end of the run when QEMU is exiting anyway. The problem
-in the test case is that we kill threads and corrupt memory,
-and then continue to use the same process for the next test
-in the set, which then crashes later as a result of the
-memory corruption.
+Thanks,
+-Liran
 
-thanks
--- PMM
+> On 16 Sep 2018, at 15:46, Liran Alon <liran.alon@oracle.com> wrote:
+>=20
+> Hi,
+>=20
+> This series aims to add support for QEMU to be able to migrate VMs =
+that
+> are running nested hypervisors. In order to do so, it utilizes the new
+> IOCTLs introduced in KVM commit 8fcc4b5923af ("kvm: nVMX: Introduce
+> KVM_CAP_NESTED_STATE") which were created for this purpose.
+>=20
+> 1st patch is not really related to the goal of the patch series. It =
+just
+> makes CPUX86State->xsave_buf to be compiled only when needed (When
+> compiling with KVM or HVF CPU accelerator).
+>=20
+> 2nd patch adds the support to migrate VMs that are running nested
+> hypervisors.
+>=20
+> Regards,
+> -Liran
+>=20
+> v1->v2 Changes:
+> * Renamed kvm_nested_state_length() to kvm_max_nested_state_length()
+> to better indicate it represents the max nested state size that can
+> be returned from kernel.
+> * Added error_report() calls to nested_state_post_load() to make
+> failures in migration easier to diagnose.
+> * Fixed support of migrating with various nested_state buffer sizes.
+> The following scenarios were tested:
+> (a) src and dest have same nested state size.
+> 	=3D=3D> Migration succeeds.
+> (b) src don't have nested state while dest do.
+> 	=3D=3D> Migration succeed and src don't send it's nested state.
+> (c) src have nested state while dest don't.
+> 	=3D=3D> Migration fails as it cannot restore nested state.
+> (d) dest have bigger max nested state size than src
+> 	=3D=3D> Migration succeeds.
+> (e) dest have smaller max nested state size than src but enough to =
+store it's saved nested state
+> 	=3D=3D> Migration succeeds
+> (f) dest have smaller max nested state size than src but not enough to =
+store it's saved nested state
+> 	=3D=3D> Migration fails
+>=20
