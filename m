@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52691)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g9XEy-0007Ta-05
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:14:37 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55033)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<bounce+7309d1.7d7329-qemu-devel=nongnu.org@mg-relay.tolva.net>)
+	id 1g9XKs-00024K-P1
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g9XEu-00022N-NW
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:14:35 -0400
-References: <20181004152857.14525-1-cohuck@redhat.com>
-	<CAFEAcA87E1F5vbmU8-xv=jtoezpOcp-oyPQjE0gAVga_9YufXw@mail.gmail.com>
-	<87woqsmqgi.fsf@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <674805a0-019d-7432-7a3c-6d2b708a19ae@redhat.com>
-Date: Mon, 8 Oct 2018 17:14:19 +0200
+	(envelope-from
+	<bounce+7309d1.7d7329-qemu-devel=nongnu.org@mg-relay.tolva.net>)
+	id 1g9XKn-0006b6-Kg
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:20:42 -0400
+Received: from mail2.static.mailgun.info ([104.130.122.2]:32847)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from
+	<bounce+7309d1.7d7329-qemu-devel=nongnu.org@mg-relay.tolva.net>)
+	id 1g9XKn-0006af-Eb
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 11:20:37 -0400
+Sender: cst=tolva.net@mg-relay.tolva.net
+Received: by mail-wm1-f48.google.com with SMTP id y144-v6so4211874wmd.4
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 08:20:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87woqsmqgi.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <20181008042747.10130-1-cst@tolva.net>
+	<b1b48975-36e3-baf6-c2b2-8cc1b7fa4986@vivier.eu>
+In-Reply-To: <b1b48975-36e3-baf6-c2b2-8cc1b7fa4986@vivier.eu>
+From: =?UTF-8?Q?Cortland_Setlow_T=C3=B6lva?= <cst@tolva.net>
+Date: Mon, 8 Oct 2018 08:20:22 -0700
+Message-ID: <CALQmfgMzO5gv80LYyaAwz_NOoLw52LVMcZHx0DDC9nzE16uH2w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/15] s390x updates
+Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: usbfs improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,138 +35,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?Q?Cortland_T=C3=B6lva?= <cst@tolva.net>, qemu-devel@nongnu.org
 
-On 08/10/2018 17:02, Alex Benn=C3=A9e wrote:
->=20
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
->> On 4 October 2018 at 16:28, Cornelia Huck <cohuck@redhat.com> wrote:
->>> The following changes since commit dafd95053611aa14dda40266857608d12d=
-dce658:
->>>
->>>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' in=
-to staging (2018-10-02 18:27:18 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>   git://github.com/cohuck/qemu tags/s390x-20181004
->>>
->>> for you to fetch changes up to b576d582ea2b03f4eada186fff59308d22b40a=
-6a:
->>>
->>>   hw/s390x/s390-pci-bus: Convert sysbus init function to realize func=
-tion (2018-10-04 12:10:40 +0200)
->>>
->>> ----------------------------------------------------------------
->>> Various s390x updates:
->>> - fix several struct definitions so that sparc hosts do not trip over
->>>   unaligned accesses
->>> - fence enabling huge pages for pre-3.1 machines
->>> - sysbus init -> realize conversion
->>> - fixes and improvements in tcg (instruction flags and AFP registers)
->>
->> Applied, thanks.
-> <snip>
->=20
-> This pull has broken s390x-linux-user tcg tests:
->=20
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/multiarch/Makefile.target:30:=
- recipe for target 'run-test-mmap' failed
->   make[2]: *** [run-test-mmap] Error 132
->   make[2]: *** Waiting for unfinished jobs....
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile:96: recipe for targe=
-t 'run-linux-test' failed
->   make[2]: *** [run-linux-test] Error 132
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile:96: recipe for targe=
-t 'run-hello-s390x' failed
->   make[2]: *** [run-hello-s390x] Error 132
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile:96: recipe for targe=
-t 'run-ipm' failed
->   make[2]: *** [run-ipm] Error 132
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile:96: recipe for targe=
-t 'run-exrl-trtr' failed
->   make[2]: *** [run-exrl-trtr] Error 132
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile:96: recipe for targe=
-t 'run-testthread' failed
->   make[2]: *** [run-testthread] Error 132
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile:96: recipe for targe=
-t 'run-exrl-trt' failed
->   make[2]: *** [run-exrl-trt] Error 132
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile:96: recipe for targe=
-t 'run-sha1' failed
->   make[2]: *** [run-sha1] Error 132
->   timeout: the monitored command dumped core
->   Illegal instruction
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile:96: recipe for targe=
-t 'run-csst' failed
->   make[2]: *** [run-csst] Error 132
->   /home/alex/lsrc/qemu/qemu.git/tests/tcg/Makefile.include:71: recipe f=
-or target 'run-guest-tests' failed
->   make[1]: *** [run-guest-tests] Error 2
->   /home/alex/lsrc/qemu/qemu.git/tests/Makefile.include:968: recipe for =
-target 'run-tcg-tests-s390x-linux-user' failed
->   make: *** [run-tcg-tests-s390x-linux-user] Error 2
->=20
-> which are now showing up on Travis (admitidly hidden by the usual Travi=
-s
-> noise). I have bisected the breakage:
->=20
->   git bisect start
->   git bisect bad b576d582ea2b03f4eada186fff59308d22b40a6a
->   b576d582ea bad hw/s390x/s390-pci-bus: Convert sysbus init function to=
- realize function
->   git bisect good dafd95053611aa14dda40266857608d12ddce658
->   dafd950536 good Merge remote-tracking branch 'remotes/bonzini/tags/fo=
-r-upstream' into staging
->   git bisect good bbf6ea3bd961970785a583117ac1c0b84a8ee736
->   bbf6ea3bd9 good s390x/tcg: factor out and fix DATA exception injectio=
-n
->   git bisect bad db0504154ef1feedd135f25f8ca6e9abb5d00bbb
->   db0504154e bad s390x/tcg: check for AFP-register, BFP and DFP data ex=
-ceptions
->   git bisect good 82d179336dd696d04495963ca007fa961496d924
->   82d179336d good s390x/tcg: support flags for instructions
->   git bisect good ca5f31a0f27d265f2220ad43913f70280e8753a2
->   ca5f31a0f2 good s390x/tcg: add instruction flags for floating point i=
-nstructions
->=20
-> Which is points at:
->=20
->   Bisect Rest (1)
->   db0504154e * bad @ s390x/tcg: check for AFP-register, BFP and DFP dat=
-a exceptions
->=20
+On Sun, Oct 7, 2018 at 11:59 PM Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> Le 08/10/2018 =C3=A0 06:27, Cortland T=C3=B6lva a =C3=A9crit :
+> > From: Cortland Setlow T=C3=B6lva <cst@tolva.net>
+> >
+> > This patch series enables programs running under QEMU Linux user mode
+> > emulation to implement user-space USB drivers via the USBFS ioctl()s.
+> > Support is limited to control, bulk, and possibly interrupt transfers.
+> >
+> > Usbfs ioctl codes were incorrect whenever host and target disagreed on
+> > struct size.  The submit, discard, and reap usbfs ioctls require specia=
+l
+> > memory buffer handling and the second commit implements this but not fo=
+r
+> > USB3 streams or isochronous transfers.
+> >
+> > Cortland T=C3=B6lva (2):
+> >   linux-user: Use calculated sizes for usbfs ioctls.
+> >   linux-user: Implement special usbfs ioctls.
+> >
+> >  linux-user/ioctls.h        |   8 ++
+> >  linux-user/syscall.c       | 177 +++++++++++++++++++++++++++++++++++++
+> >  linux-user/syscall_defs.h  |  42 ++++-----
+> >  linux-user/syscall_types.h |  20 +++++
+> >  4 files changed, 227 insertions(+), 20 deletions(-)
+> >
+>
+> As I didn't push the previous series, could you merge the both in one on
+> top of master?
 
-Thanks for reporting. We have to enable AFP as default in linux-user (in
-control register 0).
+Yes, I will do this as a v2 of this patch series.  The version here is
+based on your
+linux user tree as of last night.
 
-Will send a patch later this day.
-
-> --
-> Alex Benn=C3=A9e
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+>
+> I think it would be clearer.
+>
+> Thanks,
+> Laurent
