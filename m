@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9dnW-0004Ne-JW
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:14:43 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1g9dqE-0005Fa-QD
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:17:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9dnT-0005jg-Fg
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:14:42 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 8 Oct 2018 22:14:34 +0000
-Message-ID: <04c11931-57be-d890-635a-178db8ab1468@virtuozzo.com>
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
-	<20180817122219.16206-8-vsementsov@virtuozzo.com>
-	<d78f37ac-343d-20bf-a2ce-16ff2fa12677@redhat.com>
-	<a02a1caf-53f5-e20a-93a4-67233032d76e@virtuozzo.com>
-	<b78b66f6-018d-0ec9-a33a-3b8263867b8b@redhat.com>
-In-Reply-To: <b78b66f6-018d-0ec9-a33a-3b8263867b8b@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6C336E79A205DB4BB683EFA3C14D2F11@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <sstabellini@kernel.org>) id 1g9dq9-0006qu-RC
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:17:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34258)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1g9dq9-0006qg-Ky
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 18:17:25 -0400
+Date: Mon, 8 Oct 2018 15:17:20 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1810081505210.28877@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/qcow2-refcount: fix
- out-of-file L2 entries to be read-as-zero
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] possible BUG, ATS12NSOPW fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: peter.maydell@linaro.org
+Cc: sstabellini@kernel.org, qemu-devel@nongnu.org
 
-DQoNCk9uIDEwLzA5LzIwMTggMDE6MDggQU0sIE1heCBSZWl0eiB3cm90ZToNCj4gT24gMDkuMTAu
-MTggMDA6MDIsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pg0KPj4NCj4+
-IE9uIDEwLzA4LzIwMTggMTE6NTEgUE0sIE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAxNy4wOC4x
-OCAxNDoyMiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gUmV3cml0
-ZSBjb3JydXB0ZWQgTDIgdGFibGUgZW50cnksIHdoaWNoIHJlZmVyZW5jZSBzcGFjZSBvdXQgb2YN
-Cj4+Pj4gdW5kZXJseWluZyBmaWxlLg0KPj4+Pg0KPj4+PiBNYWtlIHRoaXMgTDIgdGFibGUgZW50
-cnkgcmVhZC1hcy1hbGwtemVyb3Mgd2l0aG91dCBhbnkgYWxsb2NhdGlvbi4NCj4+Pj4NCj4+Pj4g
-U2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2
-aXJ0dW96em8uY29tPg0KPj4+PiAtLS0NCj4+Pj4gICAgYmxvY2svcWNvdzItcmVmY291bnQuYyB8
-IDMyICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+Pj4+ICAgIDEgZmlsZSBjaGFu
-Z2VkLCAzMiBpbnNlcnRpb25zKCspDQo+Pj4+DQo+Pj4+IGRpZmYgLS1naXQgYS9ibG9jay9xY293
-Mi1yZWZjb3VudC5jIGIvYmxvY2svcWNvdzItcmVmY291bnQuYw0KPj4+PiBpbmRleCAzYzAwNGU1
-YmZlLi4zZGUzNzY4YTNjIDEwMDY0NA0KPj4+PiAtLS0gYS9ibG9jay9xY293Mi1yZWZjb3VudC5j
-DQo+Pj4+ICsrKyBiL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMNCj4+Pj4gQEAgLTE3MjAsOCArMTcy
-MCwzMCBAQCBzdGF0aWMgaW50IGNoZWNrX3JlZmNvdW50c19sMihCbG9ja0RyaXZlclN0YXRlICpi
-cywgQmRydkNoZWNrUmVzdWx0ICpyZXMsDQo+Pj4+ICAgICAgICAgICAgICAgIC8qIE1hcmsgY2x1
-c3RlciBhcyB1c2VkICovDQo+Pj4+ICAgICAgICAgICAgICAgIGNzaXplID0gKCgobDJfZW50cnkg
-Pj4gcy0+Y3NpemVfc2hpZnQpICYgcy0+Y3NpemVfbWFzaykgKyAxKSAqDQo+Pj4+ICAgICAgICAg
-ICAgICAgICAgICAgICAgQkRSVl9TRUNUT1JfU0laRTsNCj4+Pj4gKyAgICAgICAgICAgIGlmIChj
-c2l6ZSA+IHMtPmNsdXN0ZXJfc2l6ZSkgew0KPj4+PiArICAgICAgICAgICAgICAgIHJldCA9IGZp
-eF9sMl9lbnRyeV90b196ZXJvKA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgYnMsIHJl
-cywgZml4LCBsMl9vZmZzZXQsIGksIGFjdGl2ZSwNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgICJjb21wcmVzc2VkIGNsdXN0ZXIgbGFyZ2VyIHRoYW4gY2x1c3Rlcjogc2l6ZSAweCUiDQo+
-Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICBQUkl4NjQsIGNzaXplKTsNCj4+Pj4gKyAgICAg
-ICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPj4+PiArICAgICAgICAgICAgICAgICAgICBnb3Rv
-IGZhaWw7DQo+Pj4+ICsgICAgICAgICAgICAgICAgfQ0KPj4+PiArICAgICAgICAgICAgICAgIGNv
-bnRpbnVlOw0KPj4+PiArICAgICAgICAgICAgfQ0KPj4+PiArDQo+Pj4NCj4+PiBUaGlzIHNlZW1z
-IHJlY292ZXJhYmxlLCBpc24ndCBpdD8gIENhbiB3ZSBub3QgdHJ5IHRvIGp1c3QgbGltaXQgdGhl
-DQo+Pj4gY3NpemUsIG9yIGRlY29tcHJlc3MgdGhlIGNsdXN0ZXIgd2l0aCB0aGUgZ2l2ZW4gY3Np
-emUgZnJvbSB0aGUgZ2l2ZW4NCj4+PiBvZmZzZXQsIGRpc3JlZ2FyZGluZyB0aGUgY2x1c3RlciBs
-aW1pdD8NCj4+DQo+PiBIbSwgeW91IHdhbnQgdG8gYXNzdW1lIHRoYXQgY3NpemUgaXMgY29ycnVw
-dGVkIGJ1dCBjb2Zmc2V0IG1heSBiZQ0KPj4gY29ycmVjdD8gVW5saWtlbHksIEkgdGhpbmsuDQo+
-IA0KPiBCZXR0ZXIgdG8gcmVjb25zdHJ1Y3QgcHJvYmFibHkgZ2FyYmFnZSBkYXRhIHRoYW4gdG8g
-ZGVmaW5pdGVseSBnYXJiYWdlDQo+IGRhdGEgKGFsbCB6ZXJvZXMpIGlzIHdoYXQgSSB0aGluay4N
-Cj4gDQo+PiBTbywgdG8gY2FyZWZ1bGx5IHJlcGFpciBjc2l6ZSwgd2Ugc2hvdWxkIGRlY29tcHJl
-c3Mgb25lIGNsdXN0ZXIgKG9yIG9uZQ0KPj4gY2x1c3RlciAtIDEgYnl0ZSkgb2YgZGF0YSwgdHJ5
-aW5nIHRvIGdldCBvbmUgY2x1c3RlciBvZiBkZWNvbXByZXNzZWQNCj4+IGRhdGEuIElmIHdlIHN1
-Y2NlZWQsIHdlIGtub3cgY3NpemUsIG9yIHdlIGNhbiBzYWZlbHkgc2V0IGl0IHRvIG9uZSBjbHVz
-dGVyLg0KPiANCj4gWWVzLg0KPiANCj4+IE9yIHdlIGNhbiBqdXN0IHNldCBjc2l6ZSA9IDEgY2x1
-c3RlciwgaWYgaXQgaXMgbGFyZ2VyLiBBbmQgbGVhdmUNCj4+IHByb2JsZW1zIHRvIHJlYWwgZXhl
-Y3V0aW9uIHdoaWNoIHdpbGwgbGVhZCB0byBFSU8gaW4gd29yc3QgY2FzZS4NCj4gDQo+IE9yIHRo
-aXMsIHllcy4NCj4gDQo+Pj4+ICAgICAgICAgICAgICAgIGNvZmZzZXQgPSBsMl9lbnRyeSAmIHMt
-PmNsdXN0ZXJfb2Zmc2V0X21hc2sgJg0KPj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgfihC
-RFJWX1NFQ1RPUl9TSVpFIC0gMSk7DQo+Pj4+ICsgICAgICAgICAgICBpZiAoY29mZnNldCA+PSBi
-ZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMpKSB7DQo+Pj4+ICsgICAgICAgICAgICAgICAgcmV0
-ID0gZml4X2wyX2VudHJ5X3RvX3plcm8oDQo+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgICBi
-cywgcmVzLCBmaXgsIGwyX29mZnNldCwgaSwgYWN0aXZlLA0KPj4+PiArICAgICAgICAgICAgICAg
-ICAgICAgICAgImNvbXByZXNzZWQgY2x1c3RlciBvdXQgb2YgZmlsZTogb2Zmc2V0IDB4JSIgUFJJ
-eDY0LA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgY29mZnNldCk7DQo+Pj4+ICsgICAg
-ICAgICAgICAgICAgaWYgKHJldCA8IDApIHsNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgZ290
-byBmYWlsOw0KPj4+PiArICAgICAgICAgICAgICAgIH0NCj4+Pj4gKyAgICAgICAgICAgICAgICBj
-b250aW51ZTsNCj4+Pj4gKyAgICAgICAgICAgIH0NCj4+Pj4gKw0KPj4+PiAgICAgICAgICAgICAg
-ICByZXQgPSBxY293Ml9pbmNfcmVmY291bnRzX2ltcnQoYnMsIHJlcywNCj4+Pj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlZmNvdW50X3RhYmxlLCByZWZj
-b3VudF90YWJsZV9zaXplLA0KPj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgY29mZnNldCwgY3NpemUpOw0KPj4+PiBAQCAtMTc0OCw2ICsxNzcwLDE2IEBA
-IHN0YXRpYyBpbnQgY2hlY2tfcmVmY291bnRzX2wyKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBCZHJ2
-Q2hlY2tSZXN1bHQgKnJlcywNCj4+Pj4gICAgICAgICAgICB7DQo+Pj4+ICAgICAgICAgICAgICAg
-IHVpbnQ2NF90IG9mZnNldCA9IGwyX2VudHJ5ICYgTDJFX09GRlNFVF9NQVNLOw0KPj4+PiAgICAN
-Cj4+Pj4gKyAgICAgICAgICAgIGlmIChvZmZzZXQgPj0gYmRydl9nZXRsZW5ndGgoYnMtPmZpbGUt
-PmJzKSkgew0KPj4+PiArICAgICAgICAgICAgICAgIHJldCA9IGZpeF9sMl9lbnRyeV90b196ZXJv
-KA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgYnMsIHJlcywgZml4LCBsMl9vZmZzZXQs
-IGksIGFjdGl2ZSwNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICJjbHVzdGVyIG91dCBv
-ZiBmaWxlOiBvZmZzZXQgMHglIiBQUkl4NjQsIG9mZnNldCk7DQo+Pj4+ICsgICAgICAgICAgICAg
-ICAgaWYgKHJldCA8IDApIHsNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsOw0K
-Pj4+PiArICAgICAgICAgICAgICAgIH0NCj4+Pj4gKyAgICAgICAgICAgICAgICBjb250aW51ZTsN
-Cj4+Pj4gKyAgICAgICAgICAgIH0NCj4+Pj4gKw0KPj4+DQo+Pj4gVGhlc2Ugb3RoZXIgdHdvIGxv
-b2sgT0ssIGJ1dCB0aGV5IGhhdmUgYW5vdGhlciBpc3N1ZTogIElmIHRoaXMgaXMgYSB2Mg0KPj4+
-IGltYWdlLCB5b3UgY2Fubm90IGNyZWF0ZSB6ZXJvIGNsdXN0ZXJzOyBzbyB5b3UnbGwgaGF2ZSB0
-byB1bmFsbG9jYXRlIHRoZQ0KPj4+IGNsdXN0ZXIgaW4gdGhhdCBjYXNlLg0KPj4NCj4+DQo+PiBP
-aG8sIGl0J3MgYSBwcm9ibGVtLiBJdCBtYXkgYmUgdW5zYWZlIHRvIGRpc2NhcmQgY2x1c3RlcnMs
-IG1ha2luZw0KPj4gYmFja2luZyBpbWFnZSBhdmFpbGFibGUgdGhyb3VnaCB0aGUgaG9sZXMuIFdo
-YXQgZGlzY2FyZCBkbyBvbiB2Mj8NCj4+IFplcm9pbmcgb3IgaG9sZXM/DQo+IA0KPiBPaCwgcmln
-aHQhICBkaXNjYXJkIG9uIHYyIHB1bmNoZXMgYSBob2xlLiAgU28gSSBzZWUgdGhyZWUgd2F5czoN
-Cj4gKDEpIFlvdSBjYW4gZG8gdGhlIHNhbWUgYW5kIHBvaW50IHRvIHRoYXQgYml0IG9mIGNvZGUs
-IG9yDQo+ICgyKSBZb3UgYWxsb2NhdGUgYSBkYXRhIGNsdXN0ZXIgZnVsbCBvZiB6ZXJvZXMgaW4g
-Y2FzZSBvZiB2Miwgb3INCj4gKDMpIFlvdSBqdXN0IGVycm9yIG91dC4NCj4gDQo+ICgzKSBkb2Vz
-bid0IHNlZW0gbGlrZSB0aGUgd29yc3Qgb3B0aW9uLiAgDQoNCj4gQW1lbmRpbmcgdGhlIGltYWdl
-IHRvIGJlIHYzIGlzDQo+IGFsd2F5cyBwb3NzaWJsZSBhbmQgdHJpdmlhbC4gDQoNCmhvdyB0byBk
-byBpdCBmb3IgY29ycnVwdGVkIGltYWdlPw0KDQo+IE1heWJlIHBvaW50IHRoZSB1c2VyIHRvIHRo
-YXQgb3B0aW9uLg0KPiANCj4gTWF4DQo+IA0K
+Hi Peter,
+
+I am chasing an address translation error, and it looks like it might be
+a QEMU bug, because I cannot reproduce the problem on a physical board.
+
+The issue is that a requested ATS12NSOPW translation in Xen is reported
+as failing by QEMU, but actually the address is correct. The workflow is
+as follows:
+
+1) Linux as Dom0 registers a memory area with Xen at boot, see:
+drivers/xen/time.c:xen_setup_runstate_info in Linux
+
+2) Xen tries to update such region with new data every so often, see:
+xen/arch/arm/domain.c:update_runstate_area
+
+As you can see from the code, Xen uses __raw_copy_to_guest and
+__copy_to_guest to copy the new values to the guest. Both of them
+eventually call xen/arch/arm/guestcopy.c:copy_guest:
+
+copy_guest -> translate_get_page -> get_page_from_gva -> gvirt_to_maddr
+
+to do the translation because Xen only memorizes the guest virtual
+address as passed by xen_setup_runstate_info in Linux. gvirt_to_maddr
+uses ATS12NSOPW for the translation.
+
+I double-checked all the addresses and they are correct. For some reason
+after starting the guest, ATS12NSOPW starts to fail for
+ffffffc006f91628, which is the same virtual address corresponding to the
+same runstate region allocated in Linux.
+
+I added a couple of printf's to QEMU and Xen:
+
+(XEN) DEBUG do_vcpu_op 1458 area.v=ffffffc006f91628
+### This is the virtual address as passed by Linux
+[...]
+(QEMU) DEBUG do_ats_write 2256 ret=1 phys_addr=200 value=ffffffc006f91628
+(QEMU) DEBUG do_ats_write 2326 par64=80b
+### This is the output from QEMU, I added the printks to do_ats_write, line numbers 2256 and 2326
+(XEN) p2m.c:1426: d1v0: gvirt_to_maddr failed va=0xffffffc006f91628 flags=0x1 par=0x80b
+(XEN) DEBUG translate_get_page 42 addr=ffffffc006f91628 linear=1 write=1
+(XEN) DEBUG raw_copy_to_guest 120 caller=domain.c#update_runstate_area+0x78/0x10c
+(XEN) DEBUG update_runstate_area 294
+### This is Xen failing the copy_to_guest in update_runstate_area.
+
+
+Do you have any ideas on what's wrong? I am happy to run more tests
+with QEMU to get more data.
+
+Cheers,
+
+Stefano
