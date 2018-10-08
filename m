@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9VRc-00085V-W8
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:19:38 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9VWx-00021N-Qa
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:25:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9VRb-000320-JK
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:19:32 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35600)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g9VRb-00030E-6U
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:19:31 -0400
-Received: by mail-ot1-x341.google.com with SMTP id j9-v6so19576947otl.2
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 06:19:30 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1g9VWu-00007h-7c
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:25:03 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Mon, 8 Oct 2018 13:24:53 +0000
+Message-ID: <2728ba06-336b-5e64-b8d5-7c76346893b9@virtuozzo.com>
+References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
+	<20180116125427.18540-6-vsementsov@virtuozzo.com>
+	<66a8f977-9274-e77b-e795-21a50690c4eb@redhat.com>
+In-Reply-To: <66a8f977-9274-e77b-e795-21a50690c4eb@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <ACAD6DE6EEFC784AAAE76FBC795DEE2D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1538579266-8389-12-git-send-email-edgar.iglesias@gmail.com>
-References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
-	<1538579266-8389-12-git-send-email-edgar.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 8 Oct 2018 14:19:09 +0100
-Message-ID: <CAFEAcA8xARoCTPMWs_XA06gRgzZL+RGS8XwwKNmS45b9C7mmzA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 11/12] hw/arm: versal: Add a model of
- Xilinx Versal SoC
+Subject: Re: [Qemu-devel] [PATCH v2 5/6] qapi: add block-dirty-bitmap-merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,153 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>, Maxim Nestratov <mnestratov@virtuozzo.com>
 
-On 3 October 2018 at 16:07, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Add a model of Xilinx Versal SoC.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  default-configs/aarch64-softmmu.mak |   1 +
->  hw/arm/Makefile.objs                |   1 +
->  hw/arm/xlnx-versal.c                | 339 ++++++++++++++++++++++++++++++++++++
->  include/hw/arm/xlnx-versal.h        | 122 +++++++++++++
->  4 files changed, 463 insertions(+)
->  create mode 100644 hw/arm/xlnx-versal.c
->  create mode 100644 include/hw/arm/xlnx-versal.h
->
-
-
-> +#define XLNX_VERSAL_ACPU_TYPE "cortex-a72" "-" TYPE_ARM_CPU
-
-ARM_CPU_TYPE_NAME("cortex-a72") is preferable to hand-assembling
-the type name like this.
-
-> +#define GEM_REVISION        0x40070106
-> +
-
-> +    for (i = 0; i < nr_apu_cpus; i++) {
-> +        DeviceState *cpudev = DEVICE(s->fpd.apu.cpu[i]);
-> +        int ppibase = XLNX_VERSAL_NR_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
-> +        qemu_irq maint_irq;
-> +        int ti;
-> +        /* Mapping from the output timer irq lines from the CPU to the
-> +         * GIC PPI inputs we use for the virt board.
-> +         */
-
-This isn't the virt board :-) -- cut-n-pasted comment ?
-
-> +        const int timer_irq[] = {
-> +            [GTIMER_PHYS] = VERSAL_TIMER_NS_EL1_IRQ,
-> +            [GTIMER_VIRT] = VERSAL_TIMER_VIRT_IRQ,
-> +            [GTIMER_HYP]  = VERSAL_TIMER_NS_EL2_IRQ,
-> +            [GTIMER_SEC]  = VERSAL_TIMER_S_EL1_IRQ,
-> +        };
-> +
-> +        for (ti = 0; ti < ARRAY_SIZE(timer_irq); ti++) {
-> +            qdev_connect_gpio_out(cpudev, ti,
-> +                                  qdev_get_gpio_in(gicdev,
-> +                                                   ppibase + timer_irq[ti]));
-> +        }
-> +        maint_irq = qdev_get_gpio_in(gicdev,
-> +                                        ppibase + VERSAL_GIC_MAINT_IRQ);
-> +        qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt",
-> +                                    0, maint_irq);
-> +        sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
-> +        sysbus_connect_irq(gicbusdev, i + nr_apu_cpus,
-> +                           qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
-> +        sysbus_connect_irq(gicbusdev, i + 2 * nr_apu_cpus,
-> +                           qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
-> +        sysbus_connect_irq(gicbusdev, i + 3 * nr_apu_cpus,
-> +                           qdev_get_gpio_in(cpudev, ARM_CPU_VFIQ));
-> +    }
-> +
-> +    for (i = 0; i < XLNX_VERSAL_NR_IRQS; i++) {
-> +        pic[i] = qdev_get_gpio_in(gicdev, i);
-> +    }
-
-> +/* This takes the board allocated linear DDR memory and creates aliases
-> + * for each split DDR range/apperture on the Versal address map.
-
-"aperture"
-
-
-
-> +static void versal_realize(DeviceState *dev, Error **errp)
-> +{
-> +    Versal *s = XLNX_VERSAL(dev);
-> +    qemu_irq pic[XLNX_VERSAL_NR_IRQS];
-> +
-> +    versal_create_apu_cpus(s, errp);
-> +    versal_create_apu_gic(s, pic, errp);
-> +    versal_create_uarts(s, pic);
-> +    versal_create_gems(s, pic);
-> +    versal_map_ddr(s);
-> +    versal_unimp(s);
-> +
-> +    /* Create the OCM.  */
-> +    memory_region_init_ram(&s->lpd.mr_ocm, OBJECT(s), "ocm",
-> +                           MM_OCM_SIZE, &error_fatal);
-
-What's an OCM? Is it really memory, or is this a stub for something?
-
-> +
-> +    memory_region_add_subregion_overlap(&s->mr_ps, MM_OCM, &s->lpd.mr_ocm, 0);
-> +    memory_region_add_subregion_overlap(&s->fpd.apu.mr, 0, &s->mr_ps, 0);
-> +}
-> +
-> +static void versal_init(Object *obj)
-> +{
-> +    Versal *s = XLNX_VERSAL(obj);
-> +
-> +    memory_region_init(&s->fpd.apu.mr, obj, "mr-apu", UINT64_MAX);
-> +    memory_region_init(&s->mr_ps, obj, "mr-ps-switch", UINT64_MAX);
-> +}
-> +
-> +static const VMStateDescription versal_vmstate = {
-> +    .name = "xlnx-ve",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        /* FIXME.  */
-
-Stray FIXME comment -- I think the answer may be "the
-SoC object has no state of its own so needs neither a
-vmsd nor a reset method" ? (If so and if you drop them,
-do put a comment in the class init about why they're not
-provided. Some day we may have a mechanism for a device
-to explicitly say "I need no vmstate" so we can assert if
-none is provided.)
-
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static Property versal_properties[] = {
-> +    DEFINE_PROP_LINK("ddr", Versal, cfg.mr_ddr, TYPE_MEMORY_REGION,
-> +                     MemoryRegion *),
-> +    DEFINE_PROP_UINT32("psci-conduit", Versal, cfg.psci_conduit, 0),
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
-> +static void versal_reset(DeviceState *dev)
-> +{
-> +}
-> +
-> +static void versal_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->realize = versal_realize;
-> +    dc->vmsd = &versal_vmstate;
-> +    dc->props = versal_properties;
-> +    dc->reset = versal_reset;
-> +}
-
-Looks good otherwise.
-
-thanks
--- PMM
+MjAuMDkuMjAxOCAyMjo0MCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gW3Jldml2aW5nIGFuIG9sZCBw
+YXRjaF0NCj4NCj4gT24gMS8xNi8xOCA2OjU0IEFNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
+a2l5IHdyb3RlOg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tp
+eSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiDCoCBxYXBpL2Jsb2NrLWNv
+cmUuanNvbsKgwqDCoMKgwqDCoMKgwqAgfCAzOCANCj4+ICsrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrDQo+PiDCoCBpbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oIHzCoCAy
+ICsrDQo+PiDCoCBibG9jay9kaXJ0eS1iaXRtYXAuY8KgwqDCoMKgwqDCoMKgwqAgfCAxOCArKysr
+KysrKysrKysrKysrKysNCj4+IMKgIGJsb2NrZGV2LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgfCAzMCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+IMKgIDQg
+ZmlsZXMgY2hhbmdlZCwgODggaW5zZXJ0aW9ucygrKQ0KPj4NCj4NCj4gV2UndmUgYWxyZWFkeSBo
+aXQgYSBjb3VwbGUgaXNzdWVzIHdpdGggdGhpcyBwYXRjaCBtZW50aW9uZWQgaW4gb3RoZXIgDQo+
+IHRocmVhZHM6DQo+DQo+PiBkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBp
+L2Jsb2NrLWNvcmUuanNvbg0KPj4gaW5kZXggYjM4NTFlZTc2MC4uOWY5Y2ZhMGE0NCAxMDA2NDQN
+Cj4+IC0tLSBhL3FhcGkvYmxvY2stY29yZS5qc29uDQo+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUu
+anNvbg0KPj4gQEAgLTE2MDQsNiArMTYwNCwyMCBAQA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgJypwZXJzaXN0ZW50JzogJ2Jvb2wnLCAnKmF1dG9sb2FkJzogJ2Jvb2wnIH0gfQ0KPj4g
+wqAgwqAgIyMNCj4+ICsjIEBCbG9ja0RpcnR5Qml0bWFwTWVyZ2U6DQo+PiArIw0KPj4gKyMgQG5v
+ZGU6IG5hbWUgb2YgZGV2aWNlL25vZGUgd2hpY2ggdGhlIGJpdG1hcCBpcyB0cmFja2luZw0KPj4g
+KyMNCj4+ICsjIEBkc3RfbmFtZTogbmFtZSBvZiB0aGUgZGVzdGluYXRpb24gZGlydHkgYml0bWFw
+DQo+PiArIw0KPj4gKyMgQHNyY19uYW1lOiBuYW1lIG9mIHRoZSBzb3VyY2UgZGlydHkgYml0bWFw
+DQo+DQo+IE5hbWluZyBjaG9pY2UgKHByZWZlciAtIG92ZXIgXyk6DQo+IGh0dHBzOi8vbGlzdHMu
+Z251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTA5L21zZzAyMzUyLmh0bWwNCj4N
+Cj4+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+PiBAQCAtNjk5LDMgKzY5OSwyMSBAQCBj
+aGFyICpiZHJ2X2RpcnR5X2JpdG1hcF9zaGEyNTYoY29uc3QgDQo+PiBCZHJ2RGlydHlCaXRtYXAg
+KmJpdG1hcCwgRXJyb3IgKiplcnJwKQ0KPj4gwqAgew0KPj4gwqDCoMKgwqDCoCByZXR1cm4gaGJp
+dG1hcF9zaGEyNTYoYml0bWFwLT5iaXRtYXAsIGVycnApOw0KPj4gwqAgfQ0KPj4gKw0KPj4gK3Zv
+aWQgYmRydl9tZXJnZV9kaXJ0eV9iaXRtYXAoQmRydkRpcnR5Qml0bWFwICpkZXN0LCBjb25zdCAN
+Cj4+IEJkcnZEaXJ0eUJpdG1hcCAqc3JjLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEVycm9yICoqZXJycCkNCj4+ICt7DQo+PiAr
+wqDCoMKgIC8qIG9ubHkgYml0bWFwcyBmcm9tIG9uZSBiZHMgYXJlIHN1cHBvcnRlZCAqLw0KPj4g
+K8KgwqDCoCBhc3NlcnQoZGVzdC0+bXV0ZXggPT0gc3JjLT5tdXRleCk7DQo+PiArDQo+PiArwqDC
+oMKgIHFlbXVfbXV0ZXhfbG9jayhkZXN0LT5tdXRleCk7DQo+PiArDQo+PiArwqDCoMKgIGFzc2Vy
+dChiZHJ2X2RpcnR5X2JpdG1hcF9lbmFibGVkKGRlc3QpKTsNCj4NCj4gTWVyZ2luZyB0byBhIGRp
+c2FibGVkIGJpdG1hcCBpcyBkZXNpcmFibGU6DQo+IGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNo
+aXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTA5L21zZzAyMzU4Lmh0bWwNCj4NCj4+ICsgYXNzZXJ0
+KCFiZHJ2X2RpcnR5X2JpdG1hcF9yZWFkb25seShkZXN0KSk7DQo+PiArDQo+PiArwqDCoMKgIGlm
+ICghaGJpdG1hcF9tZXJnZShkZXN0LT5iaXRtYXAsIHNyYy0+Yml0bWFwKSkgew0KPg0KPiBBbmQg
+aGVyZSdzIGFub3RoZXIgb25lIEkgcmFuIGludG8uIGhiaXRtYXBfbWVyZ2UoKSBkb2VzIE5PVCBw
+cm9wZXJseSANCj4gdXBkYXRlIGhiaXRtYXBfY291bnQoKSwgd2hpY2ggbWVhbnMgc3RhdGlzdGlj
+cyBhYm91dCB0aGUgbnVtYmVyIG9mIA0KPiBiaXRzIHNldCBpbiB0aGUgYml0bWFwLCBhcyB2aXNp
+YmxlIHRocm91Z2ggUU1QICJxdWVyeS1ibG9jayIsIGFyZSANCj4gaW5hY2N1cmF0ZSBhZnRlciBh
+IG1lcmdlLg0KPg0KPiBDaGVjayBvdXQgaGJpdG1hcF9zZXQoKSBhbmQgaGJpdG1hcF9yZXNldCgp
+LCB3aGljaCBjYXJlZnVsbHkgcmVjb21wdXRlIA0KPiBoYi0+Y291bnQgdXNpbmcgaGJfY291bnRf
+YmV0d2VlbigpIGFzIHBhcnQgb2YgZmxpcHBpbmcgYml0cy4gQnV0IHNpbmNlIA0KPiBoYml0bWFw
+X21lcmdlKCkgZmFpbHMgdG8gcmVjb21wdXRlIGJpdHMsIHZhcmlvdXMgb3RoZXIgYXNwZWN0cyBv
+ZiB0aGUgDQo+IGNvZGUgZ28gaGF5d2lyZSAoZm9yIGV4YW1wbGUsIGNvZGUgdGhhdCB1c2VzIGhi
+aXRtYXBfZW1wdHkoKSBvciANCj4gaGJpdG1hcF9jb3VudCgpPT0wIHRvIHNob3J0LWNpcmN1aXQg
+b3BlcmF0aW9ucyBbYW5kIGhiaXRtYXBfbWVyZ2UoKSBpcyANCj4gb25lIHN1Y2ggY2FsbGVyXSBt
+YWtlcyB0aGUgd3JvbmcgY2hvaWNlIG9uIGEgYml0bWFwIHRoYXQgc3RhcnRlZCBsaWZlIA0KPiBl
+bXB0eSwgYW5kIGhhZCBhIG5vbi1lbXB0eSBiaXRtYXAgbWVyZ2VkIGluLCBiZWNhdXNlIGhiLT5j
+b3VudCBpcyANCj4gc3RpbGwgMCkuDQo+DQo+IEkgdGhpbmsgdGhhdCB4LWRlYnVnLWJsb2NrLWRp
+cnR5LWJpdG1hcC1zaGEyNTYgc2hvdWxkIGJlIGVuaGFuY2VkIHRvIA0KPiBvdXRwdXQgY291bnQg
+YXMgd2VsbCBhcyB0aGUgY2hlY2tzdW0gb2YgdGhlIGJpdG1hcCBjb250ZW50cywgYW5kIHRoZW4g
+DQo+IHRoYXQgd2UgbmVlZCBpb3Rlc3RzIGNvdmVyYWdlIG9mIHgtYmxvY2stZGlydHktYml0bWFw
+LW1lcmdlLCBjb21wbGV0ZSANCj4gd2l0aCBhIGNoZWNrIHRoYXQgdGhlIGNvdW50IGlzIHByb3Bl
+cmx5IHVwZGF0ZWQuIGlvdGVzdHMgMTY1LCAxNjksIA0KPiAxNzYsIDE5OSBhbGwgcGVyZm9ybSBi
+aXRtYXAgY2hlY2tzdW0gdmFsaWRhdGlvbnMsIGJ1dCBzbyBmYXIgbm9uZSBvZiANCj4gdGhlbSBw
+ZXJmb3JtIGEgYml0bWFwIG1lcmdlLsKgIEJlIGNhcmVmdWwgaW4gd3JpdGluZyBhbnkgc3VjaCB0
+ZXN0IHRoYXQgDQo+IHdlIGRvbid0IHJlLWludHJvZHVjZSBhbnkgc2Vuc2l0aXZpdGllcyBvbiAz
+Mi0gdnMuIDY0LWJpdCBvciANCj4gZW5kaWFubmVzcyBpbiBvdXIgY2hlY2tzdW0gY29tcHV0YXRp
+b24gKHNlZSBjb21taXQgMjgwNzc0NmYgZm9yIA0KPiBjb21wYXJpc29uKS4NCj4NCg0Kb3IgYXQg
+bGVhc3Qgd2Ugc2hvdWxkIGNoZWNrIGNvdW50IGluIHRlc3RzL3Rlc3QtaGJpdG1hcC4uDQoNCkFi
+b3V0IGJpdG1hcCBhcGk6IGNhbiB3ZSBub3cgc3dpdGNoIG5hbWluZyBzdHlsZSBmcm9tICdfJyB0
+byAnLScgYW5kIA0KZHJvcCB4LSBwcmVmaXhlcz8gT3Igd2UgYXJlIHdhaXRpbmcgZm9yIHlvdXIg
+bGlidmlydCBBUEkgcHJvcG9zYWwgDQphY2NlcHRhbmNlPw0KDQotLSANCkJlc3QgcmVnYXJkcywN
+ClZsYWRpbWlyDQoNCg==
