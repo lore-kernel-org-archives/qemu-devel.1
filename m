@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W6m-00025i-17
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:02:09 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W6q-00028x-1j
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:02:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W6f-0008Bl-Kg
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:02:03 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51692)
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W6g-0008CR-1q
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:02:07 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51694)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1g9W6f-0006uy-8w
+	id 1g9W6f-0006yM-P3
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:57 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W4v-0003eK-Pe
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:09 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1g9W4u-0003e6-SP
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:08 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  8 Oct 2018 14:59:33 +0100
-Message-Id: <20181008140004.12612-3-peter.maydell@linaro.org>
+Date: Mon,  8 Oct 2018 14:59:32 +0100
+Message-Id: <20181008140004.12612-2-peter.maydell@linaro.org>
 In-Reply-To: <20181008140004.12612-1-peter.maydell@linaro.org>
 References: <20181008140004.12612-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/33] virt: Suppress external aborts on
- virt-2.10 and earlier
+Subject: [Qemu-devel] [PULL 01/33] target/arm: fix code comments error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +31,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-In commit c79c0a314c43b78 we enabled emulation of external aborts
-when the guest attempts to access a physical address with no
-mapped device. In commit 4672cbd7bed88dc6 we suppress this for
-most legacy boards to prevent breakage of previously working
-guests, but we didn't suppress it in the 'virt' board, with
-the rationale "we know that guests won't try to prod devices
-that we don't describe in the device tree or ACPI tables". This
-is mostly true, but we've had a report of a Linux guest image
-that this did break. The problem seems to be that the guest
-is (incorrectly) configured with a DEBUG_UART_PHYS value that
-tells it there is a uart at 0x10009000 (which is true for
-vexpress but not for virt), so in early bootup the kernel
-probes this bogus address.
+From: Dongjiu Geng <gengdongjiu@huawei.com>
 
-This is a misconfigured guest, so we don't need to worry
-about it too much, but we can arrange that guests that ran
-on QEMU v2.10 (before c79c0a314c43b78) will still run on
-the "virt-2.10" board model, by suppressing external aborts
-only for that version and earlier. This seems a reasonable
-compromise: "virt-2.10" is supposed to behave the same way
-that "virt" did in the 2.10 release, and making it do that
-provides a usable workaround for guests with bugs like this.
+The parameter of kvm_arm_init_cpreg_list() is ARMCPU instead of
+CPUState, so correct the note to make it match the code.
 
-Cc: qemu-stable@nongnu.org
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Message-id: 1538069046-5757-1-git-send-email-gengdongjiu@huawei.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20180925144127.31965-1-peter.maydell@linaro.org
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/arm/virt.c | 2 ++
- 1 file changed, 2 insertions(+)
+ target/arm/kvm_arm.h | 4 ++--
+ target/arm/kvm.c     | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 0b57f87abcb..a4725660748 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1926,6 +1926,8 @@ static void virt_machine_2_10_options(MachineClass *mc)
- {
-     virt_machine_2_11_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_10);
-+    /* before 2.11 we never faulted accesses to bad addresses */
-+    mc->ignore_memory_transaction_failures = true;
- }
- DEFINE_VIRT_MACHINE(2, 10)
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 863f205822e..5948e8b5602 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -50,9 +50,9 @@ void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
  
+ /**
+  * kvm_arm_init_cpreg_list:
+- * @cs: CPUState
++ * @cpu: ARMCPU
+  *
+- * Initialize the CPUState's cpreg list according to the kernel's
++ * Initialize the ARMCPU cpreg list according to the kernel's
+  * definition of what CPU registers it knows about (and throw away
+  * the previous TCG-created cpreg list).
+  *
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 65f867d5692..54ef5f711b8 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -310,7 +310,7 @@ static int compare_u64(const void *a, const void *b)
+     return 0;
+ }
+ 
+-/* Initialize the CPUState's cpreg list according to the kernel's
++/* Initialize the ARMCPU cpreg list according to the kernel's
+  * definition of what CPU registers it knows about (and throw away
+  * the previous TCG-created cpreg list).
+  */
 -- 
 2.19.0
