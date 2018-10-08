@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9WAM-0004mk-TL
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:05:49 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1g9WAf-00050D-UK
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9WAJ-0002Hr-7p
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:05:46 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:38416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9WAG-0002DO-MY
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:05:42 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id a13-v6so20982577wrt.5
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 07:05:34 -0700 (PDT)
-References: <20181005154910.3099-1-alex.bennee@linaro.org>
-	<20181005154910.3099-20-alex.bennee@linaro.org>
-	<005c01d45f06$bbd7c6b0$33875410$@ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <005c01d45f06$bbd7c6b0$33875410$@ru>
-Date: Mon, 08 Oct 2018 15:05:31 +0100
-Message-ID: <871s90o7o4.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1g9WAa-0002QP-2o
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:06:05 -0400
+Received: from mail-sn1nam01on0138.outbound.protection.outlook.com
+	([104.47.32.138]:26051
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1g9WAZ-0002Pp-RY
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:05:59 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 8 Oct 2018 14:05:55 +0000
+Message-ID: <BN6PR2201MB12514961A2655922F25F8BBFC6E60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1538752793-6875-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1538752793-6875-6-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1538752793-6875-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 19/21] plugins: add an example
- hotblocks plugin
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 5/7] target/mips: Add availability
+ control for DSP R3 ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,131 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: qemu-devel@nongnu.org, Pavel.Dovgaluk@ispras.ru, vilanova@ac.upc.edu, cota@braap.org, 'Stefan Hajnoczi' <stefanha@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
 
 
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-
-> I guess this one is too tcg-dependent.
-> It count TB's, but breaking code into TBs may depend on many things,
-> like breakpoints, record/replay, ...
+> From: Stefan Markovic <smarkovic@wavecomp.com>
 >
-> I mean that this measuring approach may be used only in some specific
-> cases, and not ok as an example.
-
-You are right it involves a degree of knowledge of how the TCG works
-although it doesn't look inside the internals to do it - you do have to
-specify -d nochain to get useful numbers.
-
-I used this as an example in lieu of defining tracepoints in the main
-translation loop. They would be better there as it would be unambiguous
-what the behaviour would be. That said I think a translation block start
-as well as pre/post instruction translation points would be useful as
-block level granularity will be good enough for a number of use cases.
-
+> Add infrastructure for availability control for DSP R3 ASE MIPS
+instructions. Only BPOSGE32C currently belongs to DSP R3 ASE, but
+this is likely to be changed in near future.
 >
-> Pavel Dovgalyuk
->
->> -----Original Message-----
->> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
->> Sent: Friday, October 05, 2018 6:49 PM
->> To: qemu-devel@nongnu.org
->> Cc: Pavel.Dovgaluk@ispras.ru; vilanova@ac.upc.edu; cota@braap.org; Alex =
-Benn=C3=A9e; Stefan
->> Hajnoczi
->> Subject: [RFC PATCH 19/21] plugins: add an example hotblocks plugin
->>
->> This plugin attempts to track hotblocks by total execution count and
->> average time to return to block. It is intended to be lower impact
->> than saving a long log file and post-processing it.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  trace/plugins/hotblocks/hotblocks.c | 69 +++++++++++++++++++++++++++++
->>  1 file changed, 69 insertions(+)
->>  create mode 100644 trace/plugins/hotblocks/hotblocks.c
->>
->> diff --git a/trace/plugins/hotblocks/hotblocks.c b/trace/plugins/hotbloc=
-ks/hotblocks.c
->> new file mode 100644
->> index 0000000000..e9166ad1a5
->> --- /dev/null
->> +++ b/trace/plugins/hotblocks/hotblocks.c
->> @@ -0,0 +1,69 @@
->> +/*
->> + * Execution Hotblocks Plugin
->> + *
->> + * Copyright (c) 2018
->> + * Written by Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> + *
->> + * This code is licensed under the GNU GPL v2.
->> + */
->> +
->> +#include <stdint.h>
->> +#include <stdio.h>
->> +#include <glib.h>
->> +#include <time.h>
->> +#include "plugins.h"
->> +
->> +/* Plugins need to take care of their own locking */
->> +GMutex lock;
->> +GHashTable *hotblocks;
->> +
->> +typedef struct {
->> +    uintptr_t pc;
->> +    unsigned int hits;
->> +    struct timespec last;
->> +    unsigned long total_time;
->> +} ExecCount;
->> +
->> +bool plugin_init(const char *args)
->> +{
->> +    hotblocks =3D g_hash_table_new(NULL, g_direct_equal);
->> +    return true;
->> +}
->> +
->> +char *plugin_status(void)
->> +{
->> +    GString *report =3D g_string_new("We have ");
->> +    char *r;
->> +    g_mutex_lock(&lock);
->> +    g_string_append_printf(report, "%ud entries in the hash table\n",
->> +                           g_hash_table_size(hotblocks));
->> +    g_mutex_unlock(&lock);
->> +    r =3D report->str;
->> +    g_string_free(report, FALSE);
->> +    return r;
->> +}
->> +
->> +bool exec_tb(void *tb, uintptr_t pc)
->> +{
->> +    ExecCount *cnt;
->> +    struct timespec current;
->> +    clock_gettime(CLOCK_MONOTONIC, &current);
->> +
->> +    g_mutex_lock(&lock);
->> +    cnt =3D (ExecCount *) g_hash_table_lookup(hotblocks, (gconstpointer=
-) pc);
->> +    if (cnt) {
->> +        cnt->hits++;
->> +        cnt->total_time +=3D current.tv_nsec - cnt->last.tv_nsec;
->> +        cnt->last =3D current;
->> +    } else {
->> +        cnt =3D g_new0(ExecCount, 1);
->> +        cnt->pc =3D pc;
->> +        cnt->last =3D current;
->> +        cnt->hits =3D 1;
->> +        g_hash_table_insert(hotblocks, (gpointer) pc, (gpointer) cnt);
->> +    }
->> +    g_mutex_unlock(&lock);
->> +
->> +    /* As we are collecting up samples no reason to continue tracing */
->> +    return false;
->> +}
->> --
->> 2.17.1
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
+I think check_dspr3() should be check_dsp_r3(), but this will be then
+inconsistent with  check_dspr3(). Consider a separate patch for refactoring
+dsp r2/r3-related constant and function names. But that is beyond the scope
+of this patch, so:
 
---
-Alex Benn=C3=A9e
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
