@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9LbS-00018z-H1
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:49:03 -0400
+	(envelope-from <jasowang@redhat.com>) id 1g9Lvf-0003za-Fl
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:09:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9LbR-0006Ql-BG
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:49:02 -0400
-References: <cover.1537367701.git.berto@igalia.com>
-	<ba0e2f728d7b2a0bbf5c0f44d907a4c7e3723501.1537367701.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <204d1911-765b-bd4b-27b8-3f1a35a6b9d6@redhat.com>
-Date: Mon, 8 Oct 2018 04:48:50 +0200
+	(envelope-from <jasowang@redhat.com>) id 1g9Luc-0000xb-8U
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:08:54 -0400
+References: <20180913075517.11140-1-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <e7cc5dbe-d577-2b41-517d-0d32e9d6ebd7@redhat.com>
+Date: Mon, 8 Oct 2018 11:08:31 +0800
 MIME-Version: 1.0
-In-Reply-To: <ba0e2f728d7b2a0bbf5c0f44d907a4c7e3723501.1537367701.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SdBGfLJIM1CJl0PlYo4x8I7naUINr7Vs7"
-Subject: Re: [Qemu-devel] [PATCH 14/14] block: Stop passing flags to
- bdrv_reopen_queue_child()
+In-Reply-To: <20180913075517.11140-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: handle invalid ce for shadow
+ sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,209 +24,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, Pei Zhang <pezhang@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SdBGfLJIM1CJl0PlYo4x8I7naUINr7Vs7
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <204d1911-765b-bd4b-27b8-3f1a35a6b9d6@redhat.com>
-Subject: Re: [PATCH 14/14] block: Stop passing flags to
- bdrv_reopen_queue_child()
-References: <cover.1537367701.git.berto@igalia.com>
- <ba0e2f728d7b2a0bbf5c0f44d907a4c7e3723501.1537367701.git.berto@igalia.com>
-In-Reply-To: <ba0e2f728d7b2a0bbf5c0f44d907a4c7e3723501.1537367701.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 19.09.18 16:47, Alberto Garcia wrote:
-> Now that all callers are passing the new options using the QDict we no
-> longer need the 'flags' parameter.
->=20
-> This patch makes the following changes:
->=20
->    1) The update_options_from_flags() call is no longer necessary
->       so it can be removed.
->=20
->    2) The update_flags_from_options() call is now used in all cases,
->       and is moved down a few lines so it happens after the options
->       QDict contains the final set of values.
->=20
->    3) The flags parameter is removed. Now the flags are initialized
->       using the current value (for the top-level node) or the parent
->       flags (after inherit_options()). In both cases the initial
->       values are updated to reflect the new options in the QDict. This
->       happens in bdrv_reopen_queue_child() (as explained above) and in
->       bdrv_reopen_prepare().
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+
+On 2018=E5=B9=B409=E6=9C=8813=E6=97=A5 15:55, Peter Xu wrote:
+> There are two callers for vtd_sync_shadow_page_table_range(), one
+> provided a valid context entry and one not.  Move that fetching
+> operation into the caller vtd_sync_shadow_page_table() where we need to
+> fetch the context entry.
+>
+> Meanwhile, we should handle VTD_FR_CONTEXT_ENTRY_P properly when
+> synchronizing shadow page tables.  Having invalid context entry there i=
+s
+> perfectly valid when we move a device out of an existing domain.  When
+> that happens, instead of posting an error we invalidate the whole regio=
+n.
+>
+> Without this patch, QEMU will crash if we do these steps:
+>
+> (1) start QEMU with VT-d IOMMU and two 10G NICs (ixgbe)
+> (2) bind the NICs with vfio-pci in the guest
+> (3) start testpmd with the NICs applied
+> (4) stop testpmd
+> (5) rebind the NIC back to ixgbe kernel driver
+>
+> The patch should fix it.
+>
+> Reported-by: Pei Zhang <pezhang@redhat.com>
+> Tested-by: Pei Zhang <pezhang@redhat.com>
+> CC: Pei Zhang <pezhang@redhat.com>
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> CC: Jason Wang <jasowang@redhat.com>
+> CC: Maxime Coquelin <maxime.coquelin@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: QEMU Stable <qemu-stable@nongnu.org>
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1627272
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  block.c | 50 +++++++++++++++++++++-----------------------------
->  1 file changed, 21 insertions(+), 29 deletions(-)
->=20
-> diff --git a/block.c b/block.c
-> index fd27b204d9..26c6a4e58a 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2884,7 +2884,6 @@ BlockDriverState *bdrv_open(const char *filename,=
- const char *reference,
->  static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_=
-queue,
->                                                   BlockDriverState *bs,=
+>   hw/i386/intel_iommu.c | 54 ++++++++++++++++++++++++++----------------=
+-
+>   1 file changed, 33 insertions(+), 21 deletions(-)
 
->                                                   QDict *options,
-> -                                                 int flags,
->                                                   const BdrvChildRole *=
-role,
->                                                   QDict *parent_options=
-,
->                                                   int parent_flags)
-> @@ -2894,6 +2893,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(=
-BlockReopenQueue *bs_queue,
->      BlockReopenQueueEntry *bs_entry;
->      BdrvChild *child;
->      QDict *old_options, *explicit_options;
-> +    int flags;
-> =20
->      /* Make sure that the caller remembered to use a drained section. =
-This is
->       * important to avoid graph changes between the recursive queuing =
-here and
-> @@ -2919,22 +2919,11 @@ static BlockReopenQueue *bdrv_reopen_queue_chil=
-d(BlockReopenQueue *bs_queue,
->      /*
->       * Precedence of options:
->       * 1. Explicitly passed in options (highest)
-> -     * 2. Set in flags (only for top level)
-> -     * 3. Retained from explicitly set options of bs
-> -     * 4. Inherited from parent node
-> -     * 5. Retained from effective options of bs
-> +     * 2. Retained from explicitly set options of bs
-> +     * 3. Inherited from parent node
-> +     * 4. Retained from effective options of bs
->       */
-> =20
-> -    if (!parent_options) {
-> -        /*
-> -         * Any setting represented by flags is always updated. If the
-> -         * corresponding QDict option is set, it takes precedence. Oth=
-erwise
-> -         * the flag is translated into a QDict option. The old setting=
- of bs is
-> -         * not considered.
-> -         */
-> -        update_options_from_flags(options, flags);
-> -    }
-> -
->      /* Old explicitly set values (don't overwrite by inherited value) =
-*/
->      if (bs_entry) {
->          old_options =3D qdict_clone_shallow(bs_entry->state.explicit_o=
-ptions);
-> @@ -2948,12 +2937,22 @@ static BlockReopenQueue *bdrv_reopen_queue_chil=
-d(BlockReopenQueue *bs_queue,
-> =20
->      /* Inherit from parent node */
->      if (parent_options) {
-> -        QemuOpts *opts;
-> -        QDict *options_copy;
-> -        Error *local_err =3D NULL;
-> -        assert(!flags);
-> +        flags =3D 0;
->          role->inherit_options(&flags, options, parent_flags, parent_op=
-tions);
-> -        options_copy =3D qdict_clone_shallow(options);
-> +    } else {
-> +        flags =3D bdrv_get_flags(bs);
-> +    }
+Reviewed-by: Jason Wang <jasowang@redhat.com>
+
+Some nits, see below.
+
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 3dfada19a6..2509520d6f 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -37,6 +37,8 @@
+>   #include "kvm_i386.h"
+>   #include "trace.h"
+>  =20
+> +static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier=
+ *n);
 > +
-> +    /* Old values are used for options that aren't set yet */
-> +    old_options =3D qdict_clone_shallow(bs->options);
-> +    bdrv_join_options(bs, options, old_options);
-> +    qobject_unref(old_options);
+>   static void vtd_define_quad(IntelIOMMUState *s, hwaddr addr, uint64_t=
+ val,
+>                               uint64_t wmask, uint64_t w1cmask)
+>   {
+> @@ -1047,39 +1049,49 @@ static int vtd_sync_shadow_page_table_range(VTD=
+AddressSpace *vtd_as,
+>           .notify_unmap =3D true,
+>           .aw =3D s->aw_bits,
+>           .as =3D vtd_as,
+> +        .domain_id =3D VTD_CONTEXT_ENTRY_DID(ce->hi),
+>       };
+> -    VTDContextEntry ce_cache;
 > +
-> +    /* We have the final set of options so let's update the flags */
-> +    {
-> +        Error *local_err =3D NULL;
-> +        QemuOpts *opts;
-> +        QDict *options_copy =3D qdict_clone_shallow(options);
+> +    return vtd_page_walk(ce, addr, addr + size, &info);
+> +}
+> +
+> +static int vtd_sync_shadow_page_table(VTDAddressSpace *vtd_as)
+> +{
+>       int ret;
+> +    VTDContextEntry ce;
+> +    IOMMUNotifier *n;
+>  =20
+> -    if (ce) {
+> -        /* If the caller provided context entry, use it */
+> -        ce_cache =3D *ce;
+> -    } else {
+> -        /* If the caller didn't provide ce, try to fetch */
+> -        ret =3D vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+> -                                       vtd_as->devfn, &ce_cache);
+> -        if (ret) {
+> +    ret =3D vtd_dev_to_context_entry(vtd_as->iommu_state,
+> +                                   pci_bus_num(vtd_as->bus),
+> +                                   vtd_as->devfn, &ce);
+> +    if (ret) {
+> +        if (ret =3D=3D -VTD_FR_CONTEXT_ENTRY_P) {
+> +            /*
+> +             * It's a valid scenario to have a context entry that is
+> +             * not present.  For example, when a device is removed
+> +             * from an existing domain then the context entry will be
+> +             * zeroed by the guest before it was put into another
+> +             * domain.  When this happens, instead of synchronizing
+> +             * the shadow pages we should invalidate all existing
+> +             * mappings and notify the backends.
+> +             */
+> +            IOMMU_NOTIFIER_FOREACH(n, &vtd_as->iommu) {
+> +                vtd_address_space_unmap(vtd_as, n);
+> +            }
+> +        } else {
+>               /*
+>                * This should not really happen, but in case it happens,
+>                * we just skip the sync for this time.  After all we eve=
+n
+>                * don't have the root table pointer!
+>                */
 
-I-I'm not sure this conforms to our coding style.
+It looks to me the comment is not accurate, no root pointer is not the=20
+only reason for the failure of vtd_dev_to_context_entry().
 
-While I applaud your effort to keep the patch size small, I know for
-sure I don't want to read code like this.  (Unless it's necessary
-because of some variables' lifetimes.)
+>               error_report_once("%s: invalid context entry for bus 0x%x=
+"
+> -                              " devfn 0x%x",
+> -                              __func__, pci_bus_num(vtd_as->bus),
+> -                              vtd_as->devfn);
+> -            return 0;
 
-I agree with the changes, however.
+I'm not quite sure error_report_once() is really needed here since all=20
+failures has been traced.
 
-Max
-
->          opts =3D qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_=
-abort);
->          qemu_opts_absorb_qdict(opts, options_copy, &local_err);
->          /* Don't call update_flags_from_options() if the options are w=
-rong.
-> @@ -2967,11 +2966,6 @@ static BlockReopenQueue *bdrv_reopen_queue_child=
-(BlockReopenQueue *bs_queue,
->          qobject_unref(options_copy);
->      }
-> =20
-> -    /* Old values are used for options that aren't set yet */
-> -    old_options =3D qdict_clone_shallow(bs->options);
-> -    bdrv_join_options(bs, options, old_options);
-> -    qobject_unref(old_options);
+> +                              " devfn 0x%x", __func__,
+> +                              pci_bus_num(vtd_as->bus), vtd_as->devfn)=
+;
+>           }
+> +        return 0;
+>       }
+>  =20
+> -    info.domain_id =3D VTD_CONTEXT_ENTRY_DID(ce_cache.hi);
 > -
->      /* bdrv_open_inherit() sets and clears some additional flags inter=
-nally */
->      flags &=3D ~BDRV_O_PROTOCOL;
->      if (flags & BDRV_O_RDWR) {
-> @@ -3011,7 +3005,7 @@ static BlockReopenQueue *bdrv_reopen_queue_child(=
-BlockReopenQueue *bs_queue,
->          qdict_extract_subqdict(options, &new_child_options, child_key_=
-dot);
->          g_free(child_key_dot);
-> =20
-> -        bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options=
-, 0,
-> +        bdrv_reopen_queue_child(bs_queue, child->bs, new_child_options=
-,
->                                  child->role, options, flags);
->      }
-> =20
-> @@ -3022,9 +3016,7 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQu=
-eue *bs_queue,
->                                      BlockDriverState *bs,
->                                      QDict *options)
->  {
-> -    int flags =3D bdrv_get_flags(bs);
-> -    return bdrv_reopen_queue_child(bs_queue, bs, options, flags,
-> -                                   NULL, NULL, 0);
-> +    return bdrv_reopen_queue_child(bs_queue, bs, options, NULL, NULL, =
-0);
->  }
-> =20
->  /*
->=20
+> -    return vtd_page_walk(&ce_cache, addr, addr + size, &info);
+> -}
+> -
+> -static int vtd_sync_shadow_page_table(VTDAddressSpace *vtd_as)
+> -{
+> -    return vtd_sync_shadow_page_table_range(vtd_as, NULL, 0, UINT64_MA=
+X);
+> +    return vtd_sync_shadow_page_table_range(vtd_as, &ce, 0, UINT64_MAX=
+);
+>   }
 
+As has been discussed, this will left addr UINT64_MAX, it's better to=20
+have [start, end] instead of (start, range).
 
+Thanks
 
---SdBGfLJIM1CJl0PlYo4x8I7naUINr7Vs7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu6xZIACgkQ9AfbAGHV
-z0BccwgAkR11hLjKnZEG1H86kAg0Ki+C5A13jGxggVP277LiR25VdHmvH0AbOYkc
-WGthSffvfvF3XL1rEId14cA+wnNVS50eTKFE0gxQaWVU/j8ZiPNS4oeymyfzta96
-4p8r/K/qlr4OBKG0CAeBP4zGdawsghtTETq/IVwynyvdaCFBgvnEeWU6JqjdN/cL
-+sbFqCWOjC+PSEF4edxkBUj0/qgUQmLTYKBqJCq6RWv3ZdLtWZzU8XDy4RoihtJL
-bXCCBQUDZ81FyY7IH5mX45XdVZfB0ywoUSIgKpfGA/d8tDR6wYic+lGVXYOU5Z4U
-rp2IjMgkFi8HCezVdf9JnmN2GDHM7Q==
-=yRwu
------END PGP SIGNATURE-----
-
---SdBGfLJIM1CJl0PlYo4x8I7naUINr7Vs7--
+>  =20
+>   /*
