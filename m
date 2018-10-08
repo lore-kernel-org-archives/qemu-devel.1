@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1g9UVQ-0000DW-RS
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:19:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g9Ub7-0001nZ-Bm
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1g9UVN-0006lc-0x
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:19:24 -0400
-Date: Mon, 8 Oct 2018 14:19:04 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181008141904.17b601d3@redhat.com>
-In-Reply-To: <85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
-References: <20180926094219.20322-1-david@redhat.com>
-	<20180926094219.20322-19-david@redhat.com>
-	<20180927150141.60a6488a@redhat.com>
-	<dc5d7b2d-5b51-2c0b-aac7-ebf04a4e7859@redhat.com>
-	<20181001152443.2cca5c5e@redhat.com>
-	<85d59b49-25d7-6485-843c-838324cbc52e@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1g9Ub6-0001Ra-KI
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:25:17 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38287)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g9Ub2-0001Oi-U1
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 08:25:14 -0400
+Received: by mail-oi1-x244.google.com with SMTP id u197-v6so15593853oif.5
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 05:25:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 18/24] qdev: hotplug: provide do_unplug
- handler
+In-Reply-To: <1538579266-8389-7-git-send-email-edgar.iglesias@gmail.com>
+References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
+	<1538579266-8389-7-git-send-email-edgar.iglesias@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 8 Oct 2018 13:24:51 +0100
+Message-ID: <CAFEAcA-tC0wHgkh+CA2s+G015kvdd47h-R+VCbjCRRZVTsUghA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 06/12] net: cadence_gem: Add support for
+ selecting the DMA MemoryRegion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>
 
-On Mon, 8 Oct 2018 13:47:53 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> > That way using [2] and [1 - modulo it should match only concrete type]
-> > machine would be able to override hotplug handlers for TYPE_VIRTIO_PMEM_PCI
-> > and explicitly call machine + pci hotplug handlers in necessary order.
-> > 
-> > flow would look like:
-> >   [acpi|shcp|native pci-e eject]->  
-> >        hotplug_ctrl = qdev_get_hotplug_handler(dev);
-> >        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err); ->
-> >             machine_unplug()
-> >                machine_virtio_pci_pmem_cb(): 
-> >                   // we now that's device has 2 stage hotplug handlers,
-> >                   // so we can arrange hotplug sequence in necessary order
-> >                   hotplug_ctrl2 = qdev_get_bus_hotplug_handler(dev);
-> > 
-> >                   //then do unplug in whatever order that's correct,
-> >                   // I'd assume tear down/stop PCI device first, flushing
-> >                   // command virtio command queues and that unplug memory itself.
-> >                   hotplug_handler_unplug(hotplug_ctrl2, dev, &local_err);
-> >                   memory_device_unplug()
-> >   
-> 
-> Looking into the details, this order is not possible. The unplug will
-> essentially do a device_unparent() leading to the whole hierarchy
-> getting destroyed. The memory_device part always has to come first.
-
-Question here is if there are anything that should be handled first on
-virtio level before memory_device/pmem part is called?
-If there isn't it might be fine to swap the order of unplug sequence.
+On 3 October 2018 at 16:07, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Add support for selecting the Memory Region that the GEM
+> will do DMA to.
+>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
 
 
- 
-> > Similar logic applies to device_add/device_del paths, with a difference that
-> > origin point would be monitor/qmp.
-> > 
-> > Point is to have a single explicit callback chain that applies to a concrete
-> > device type. That way if ever change an ordering of calling plug callbacks
-> > in qdev core, the expected for a device callback sequence would still
-> > remain in place ensuring that device (un)plugged as expected.
-> > 
-> > Also it should be easier to trace for a reader, than 2 disjoint callbacks of
-> > composite device (which only know to author of that device and then only
-> > till he/she remembers how that thing works).
-> >   
-> 
-> 
+> @@ -1500,6 +1506,13 @@ static void gem_realize(DeviceState *dev, Error **errp)
+>      CadenceGEMState *s = CADENCE_GEM(dev);
+>      int i;
+>
+> +    if (s->dma_mr) {
+> +        s->dma_as = g_malloc0(sizeof(AddressSpace));
+> +        address_space_init(s->dma_as, s->dma_mr, NULL);
+
+Why not just have the CadenceGEMState embed the AddressSpace
+
+    AddressSpace dma_as;
+
+rather than doing a separate memory allocation here?
+
+> +    } else {
+> +        s->dma_as = &address_space_memory;
+> +    }
+
+thanks
+-- PMM
