@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1g9M14-0008J6-A7
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:15:33 -0400
+	(envelope-from <jasowang@redhat.com>) id 1g9MM0-0003Zg-QD
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuchenlin@synology.com>) id 1g9M11-0005Aa-SG
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:15:28 -0400
+	(envelope-from <jasowang@redhat.com>) id 1g9MDo-0000xJ-2q
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:28:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37896)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1g9MDn-0000x3-Td
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 23:28:40 -0400
+References: <20181004114312.27346-1-d.csapak@proxmox.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <d2ef3fb3-80ba-6edc-46fb-fa9d73542bc3@redhat.com>
+Date: Mon, 8 Oct 2018 11:28:31 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Mon, 08 Oct 2018 11:15:05 +0800
-From: yuchenlin <yuchenlin@synology.com>
-In-Reply-To: <20181008023523.GA13536@magic>
-References: <20180913082952.3675-1-yuchenlin@synology.com>
-	<20180913083449.GQ2526@lemon.usersys.redhat.com>
-	<4e0dfed2afdc5a551f37ecbcbf5f4ade@synology.com>
-	<20181008023523.GA13536@magic>
-Message-ID: <9920d0329ed9ab35fc4fe3b21609de0a@synology.com>
-Subject: Re: [Qemu-devel] [PATCH v3] vmdk: align end of file to a sector
- boundary
+In-Reply-To: <20181004114312.27346-1-d.csapak@proxmox.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] add exit-script option to qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Dominik Csapak <d.csapak@proxmox.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, philmd@redhat.com, thuth@redhat.com, sw@weilnetz.de
 
-On 2018-10-08 10:38, Fam Zheng wrote:
-> On Fri, 10/05 10:00, yuchenlin wrote:
->> Ping?
-> 
-> Hi,
-> 
-> This was merged as 51b3c6b73acae1e3fd3c7d441fc86dd17356695f.
-> 
-> Fam
-> 
 
-Hi,
 
-Thank you for your information.
+On 2018=E5=B9=B410=E6=9C=8804=E6=97=A5 19:43, Dominik Csapak wrote:
+> this patch series aims to execute a script when qemu exits
+> so that one can do cleanups when using --daemonize without
+> having to use the qmp monitor
 
-yuchenlin
+Hi:
 
->> 
->> On 2018-09-13 16:34, Fam Zheng wrote:
->> > On Thu, 09/13 16:29, yuchenlin@synology.com wrote:
->> > > From: yuchenlin <yuchenlin@synology.com>
->> > >
->> > > There is a rare case which the size of last compressed cluster
->> > > is larger than the cluster size, which will cause the file is
->> > > not aligned at the sector boundary.
->> > >
->> > > There are three reasons to do it. First, if vmdk doesn't align at
->> > > the sector boundary, there may be many undefined behaviors,
->> > > such as, in vbox it will show VMDK: Compressed image is corrupted
->> > > 'syno-vm-disk1.vmdk' (VERR_ZIP_CORRUPTED) when we try to import an
->> > > ova with unaligned vmdk. Second, all the cluster_sector is aligned
->> > > to sector, the last one should be like this, too. Third, it ease
->> > > reading with sector based I/Os.
->> > >
->> > > Signed-off-by: yuchenlin <yuchenlin@synology.com>
->> >
->> > Reviewed-by: Fam Zheng <famz@redhat.com>
->> 
+Can you give a example of why it must be done through this way? It looks=20
+to me that we can do this by monitor the pid and behave accordingly=20
+through bash.
+
+Thanks
+
+>
+> changes since v1:
+>
+> * refactored as qemu_launch_script, only for non-windows platforms
+> * updated net/tap.c to use qemu_launch_script instead of launch_script
+> * fixed a small error in the option description
+>
+> Dominik Csapak (3):
+>    osdep: add qemu_launch_script for executing scripts
+>    tap: use qemu_launch_script instead of launch_script
+>    vl.c: call optional script when exiting
+>
+>   include/qemu/osdep.h | 12 +++++++++++
+>   net/tap.c            | 56 ++++++++++---------------------------------=
+---------
+>   qemu-options.hx      | 20 +++++++++++++++++++
+>   util/oslib-posix.c   | 34 +++++++++++++++++++++++++++++++
+>   util/oslib-win32.c   |  8 ++++++++
+>   vl.c                 | 29 +++++++++++++++++++++++++++
+>   6 files changed, 113 insertions(+), 46 deletions(-)
+>
