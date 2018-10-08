@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9ewV-0000fu-Ol
+	(envelope-from <cota@braap.org>) id 1g9ewV-0000fq-Mz
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9ewS-0000Ul-B0
+	(envelope-from <cota@braap.org>) id 1g9ewS-0000VS-Rh
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:28:03 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:58899)
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:34671)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9ewR-0000U1-WB
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9ewS-0000Uk-Jo
 	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 19:28:00 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon,  8 Oct 2018 19:27:53 -0400
-Message-Id: <20181008232756.30704-3-cota@braap.org>
+Date: Mon,  8 Oct 2018 19:27:56 -0400
+Message-Id: <20181008232756.30704-6-cota@braap.org>
 In-Reply-To: <20181008232756.30704-1-cota@braap.org>
 References: <20181008232756.30704-1-cota@braap.org>
-Subject: [Qemu-devel] [RFC v2 2/5] (XXX) cputlb: introduce indirection for
- TLB size
+Subject: [Qemu-devel] [RFC v2 5/5] cputlb: dynamically resize TLBs based on
+ use rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,210 +27,284 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This paves the way for implementing dynamic TLB resizing.
+Perform the resizing only on flushes, otherwise we'd
+have to take a perf hit by either rehashing the array
+or unnecessarily flushing it.
 
-XXX: convert other TCG backends
+We grow the array aggressively, and reduce the size more
+slowly. This accommodates mixed workloads, where some
+processes might be memory-heavy while others are not.
+
+As the following experiments show, this a net perf gain,
+particularly for memory-heavy workloads. Experiments
+are run on an Intel i7-6700K CPU @ 4.00GHz.
+
+1. System boot + shudown, debian aarch64:
+
+- Before (tb-lock-v3):
+ Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
+
+       7469.363393      task-clock (msec)         #    0.998 CPUs utilized            ( +-  0.07% )
+    31,507,707,190      cycles                    #    4.218 GHz                      ( +-  0.07% )
+    57,101,577,452      instructions              #    1.81  insns per cycle          ( +-  0.08% )
+    10,265,531,804      branches                  # 1374.352 M/sec                    ( +-  0.07% )
+       173,020,681      branch-misses             #    1.69% of all branches          ( +-  0.10% )
+
+       7.483359063 seconds time elapsed                                          ( +-  0.08% )
+
+- After:
+ Performance counter stats for 'taskset -c 0 ../img/aarch64/die.sh' (10 runs):
+
+       7185.036730      task-clock (msec)         #    0.999 CPUs utilized            ( +-  0.11% )
+    30,303,501,143      cycles                    #    4.218 GHz                      ( +-  0.11% )
+    54,198,386,487      instructions              #    1.79  insns per cycle          ( +-  0.08% )
+     9,726,518,945      branches                  # 1353.719 M/sec                    ( +-  0.08% )
+       167,082,307      branch-misses             #    1.72% of all branches          ( +-  0.08% )
+
+       7.195597842 seconds time elapsed                                          ( +-  0.11% )
+
+That is, a 3.8% improvement.
+
+2. System boot + shutdown, ubuntu 18.04 x86_64:
+
+- Before (tb-lock-v3):
+Performance counter stats for 'taskset -c 0 ../img/x86_64/ubuntu-die.sh -nographic' (2 runs):
+
+      49971.036482      task-clock (msec)         #    0.999 CPUs utilized            ( +-  1.62% )
+   210,766,077,140      cycles                    #    4.218 GHz                      ( +-  1.63% )
+   428,829,830,790      instructions              #    2.03  insns per cycle          ( +-  0.75% )
+    77,313,384,038      branches                  # 1547.164 M/sec                    ( +-  0.54% )
+       835,610,706      branch-misses             #    1.08% of all branches          ( +-  2.97% )
+
+      50.003855102 seconds time elapsed                                          ( +-  1.61% )
+
+- After:
+ Performance counter stats for 'taskset -c 0 ../img/x86_64/ubuntu-die.sh -nographic' (2 runs):
+
+      50118.124477      task-clock (msec)         #    0.999 CPUs utilized            ( +-  4.30% )
+           132,396      context-switches          #    0.003 M/sec                    ( +-  1.20% )
+                 0      cpu-migrations            #    0.000 K/sec                    ( +-100.00% )
+           167,754      page-faults               #    0.003 M/sec                    ( +-  0.06% )
+   211,414,701,601      cycles                    #    4.218 GHz                      ( +-  4.30% )
+   <not supported>      stalled-cycles-frontend
+   <not supported>      stalled-cycles-backend
+   431,618,818,597      instructions              #    2.04  insns per cycle          ( +-  6.40% )
+    80,197,256,524      branches                  # 1600.165 M/sec                    ( +-  8.59% )
+       794,830,352      branch-misses             #    0.99% of all branches          ( +-  2.05% )
+
+      50.177077175 seconds time elapsed                                          ( +-  4.23% )
+
+No improvement (within noise range).
+
+3. x86_64 SPEC06int:
+                              SPEC06int (test set)
+                         [ Y axis: speedup over master ]
+  8 +-+--+----+----+-----+----+----+----+----+----+----+-----+----+----+--+-+
+    |                                                                       |
+    |                                                   tlb-lock-v3         |
+  7 +-+..................$$$...........................+indirection       +-+
+    |                    $ $                              +resizing         |
+    |                    $ $                                                |
+  6 +-+..................$.$..............................................+-+
+    |                    $ $                                                |
+    |                    $ $                                                |
+  5 +-+..................$.$..............................................+-+
+    |                    $ $                                                |
+    |                    $ $                                                |
+  4 +-+..................$.$..............................................+-+
+    |                    $ $                                                |
+    |          +++       $ $                                                |
+  3 +-+........$$+.......$.$..............................................+-+
+    |          $$        $ $                                                |
+    |          $$        $ $                                 $$$            |
+  2 +-+........$$........$.$.................................$.$..........+-+
+    |          $$        $ $                                 $ $       +$$  |
+    |          $$   $$+  $ $  $$$       +$$                  $ $  $$$   $$  |
+  1 +-+***#$***#$+**#$+**#+$**#+$**##$**##$***#$***#$+**#$+**#+$**#+$**##$+-+
+    |  * *#$* *#$ **#$ **# $**# $** #$** #$* *#$* *#$ **#$ **# $**# $** #$  |
+    |  * *#$* *#$ **#$ **# $**# $** #$** #$* *#$* *#$ **#$ **# $**# $** #$  |
+  0 +-+***#$***#$-**#$-**#$$**#$$**##$**##$***#$***#$-**#$-**#$$**#$$**##$+-+
+     401.bzi403.gc429445.g456.h462.libq464.h471.omne4483.xalancbgeomean
+png: https://imgur.com/a/b1wn3wc
+
+That is, a 1.53x average speedup over master, with a max speedup of 7.13x.
+
+Note that "indirection" (i.e. the first patch in this series) incurs
+no overhead, on average.
+
+To conclude, here is a different look at the SPEC06int results, using
+linux-user as the baseline and comparing master and this series ("tlb-dyn"):
+
+            Softmmu slowdown vs. linux-user for SPEC06int (test set)
+                    [ Y axis: slowdown over linux-user ]
+  14 +-+--+----+----+----+----+----+-----+----+----+----+----+----+----+--+-+
+     |                                                                      |
+     |                                                       master         |
+  12 +-+...............+**..................................tlb-dyn.......+-+
+     |                  **                                                  |
+     |                  **                                                  |
+     |                  **                                                  |
+  10 +-+................**................................................+-+
+     |                  **                                                  |
+     |                  **                                                  |
+   8 +-+................**................................................+-+
+     |                  **                                                  |
+     |                  **                                                  |
+     |                  **                                                  |
+   6 +-+................**................................................+-+
+     |       ***        **                                                  |
+     |       * *        **                                                  |
+   4 +-+.....*.*........**.................................***............+-+
+     |       * *        **                                 * *              |
+     |       * *  +++   **             ***            ***  * *  ***  ***    |
+     |       * *  +**++ **   **##      *+*#      ***  * *#+* *  * *##* *    |
+   2 +-+.....*.*##.**##.**##.**.#.**##.*+*#.***#.*+*#.*.*#.*.*#+*.*.#*.*##+-+
+     |++***##*+*+#+**+#+**+#+**+#+**+#+*+*#+*+*#+*+*#+*+*#+*+*#+*+*+#*+*+#++|
+     |  * * #* * # ** # ** # ** # ** # * *# * *# * *# * *# * *# * * #* * #  |
+   0 +-+***##***##-**##-**##-**##-**##-***#-***#-***#-***#-***#-***##***##+-+
+      401.bzi403.g429445.g456.hm462.libq464.h471.omn4483.xalancbgeomean
+
+png: https://imgur.com/a/eXkjMCE
+
+After this series, we bring down the average softmmu overhead
+from 2.77x to 1.80x, with a maximum slowdown of 2.48x (omnetpp).
 
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- include/exec/cpu-defs.h   | 10 ++++++----
- include/exec/cpu_ldst.h   | 14 +++++++++++++-
- accel/tcg/cputlb.c        | 18 +++++++++++++++---
- tcg/i386/tcg-target.inc.c | 28 ++++++++++++++--------------
- 4 files changed, 48 insertions(+), 22 deletions(-)
+ include/exec/cpu-defs.h | 39 +++++++++------------------------------
+ accel/tcg/cputlb.c      | 39 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 47 insertions(+), 31 deletions(-)
 
 diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 4ff62f32bf..87cd015f60 100644
+index 56f1887c7f..d4af0b2a2d 100644
 --- a/include/exec/cpu-defs.h
 +++ b/include/exec/cpu-defs.h
-@@ -141,13 +141,15 @@ typedef struct CPUIOTLBEntry {
-     MemTxAttrs attrs;
- } CPUIOTLBEntry;
+@@ -67,37 +67,15 @@ typedef uint64_t target_ulong;
+ #define CPU_TLB_ENTRY_BITS 5
+ #endif
  
--#define CPU_COMMON_TLB \
-+#define CPU_COMMON_TLB  \
-     /* The meaning of the MMU modes is defined in the target code. */   \
--    /* tlb_lock serializes updates to tlb_table and tlb_v_table */      \
-+    /* tlb_lock serializes updates to tlb_mask, tlb_table and tlb_v_table */ \
-     QemuSpin tlb_lock;                                                  \
--    CPUTLBEntry tlb_table[NB_MMU_MODES][CPU_TLB_SIZE];                  \
-+    /* tlb_mask[i] contains (n_entries - 1) << CPU_TLB_ENTRY_BITS */    \
-+    uintptr_t tlb_mask[NB_MMU_MODES];                                   \
-+    CPUTLBEntry *tlb_table[NB_MMU_MODES];                               \
-     CPUTLBEntry tlb_v_table[NB_MMU_MODES][CPU_VTLB_SIZE];               \
--    CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];                    \
-+    CPUIOTLBEntry *iotlb[NB_MMU_MODES];                                 \
-     CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];                 \
-     size_t tlb_flush_count;                                             \
-     target_ulong tlb_flush_addr;                                        \
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index e3d8d738aa..3ded1df9b7 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -130,7 +130,9 @@ extern __thread uintptr_t helper_retaddr;
- static inline uintptr_t tlb_index(CPUArchState *env, uintptr_t mmu_idx,
-                                   target_ulong addr)
- {
--    return (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-+    uintptr_t size_mask = env->tlb_mask[mmu_idx] >> CPU_TLB_ENTRY_BITS;
-+
-+    return (addr >> TARGET_PAGE_BITS) & size_mask;
- }
+-/* TCG_TARGET_TLB_DISPLACEMENT_BITS is used in CPU_TLB_BITS to ensure that
+- * the TLB is not unnecessarily small, but still small enough for the
+- * TLB lookup instruction sequence used by the TCG target.
+- *
+- * TCG will have to generate an operand as large as the distance between
+- * env and the tlb_table[NB_MMU_MODES - 1][0].addend.  For simplicity,
+- * the TCG targets just round everything up to the next power of two, and
+- * count bits.  This works because: 1) the size of each TLB is a largish
+- * power of two, 2) and because the limit of the displacement is really close
+- * to a power of two, 3) the offset of tlb_table[0][0] inside env is smaller
+- * than the size of a TLB.
+- *
+- * For example, the maximum displacement 0xFFF0 on PPC and MIPS, but TCG
+- * just says "the displacement is 16 bits".  TCG_TARGET_TLB_DISPLACEMENT_BITS
+- * then ensures that tlb_table at least 0x8000 bytes large ("not unnecessarily
+- * small": 2^15).  The operand then will come up smaller than 0xFFF0 without
+- * any particular care, because the TLB for a single MMU mode is larger than
+- * 0x10000-0xFFF0=16 bytes.  In the end, the maximum value of the operand
+- * could be something like 0xC000 (the offset of the last TLB table) plus
+- * 0x18 (the offset of the addend field in each TLB entry) plus the offset
+- * of tlb_table inside env (which is non-trivial but not huge).
++#define MIN_CPU_TLB_BITS 6
++#define DEFAULT_CPU_TLB_BITS 8
++/*
++ * Assuming TARGET_PAGE_BITS==12, with 2**22 entries we can cover 2**(22+12) ==
++ * 2**34 == 16G of address space. This is roughly what one would expect a
++ * TLB to cover in a modern (as of 2018) x86_64 CPU. For instance, Intel
++ * Skylake's Level-2 STLB has 16 1G entries.
+  */
+-#define CPU_TLB_BITS                                             \
+-    MIN(8,                                                       \
+-        TCG_TARGET_TLB_DISPLACEMENT_BITS - CPU_TLB_ENTRY_BITS -  \
+-        (NB_MMU_MODES <= 1 ? 0 :                                 \
+-         NB_MMU_MODES <= 2 ? 1 :                                 \
+-         NB_MMU_MODES <= 4 ? 2 :                                 \
+-         NB_MMU_MODES <= 8 ? 3 : 4))
+-
+-#define CPU_TLB_SIZE (1 << CPU_TLB_BITS)
++#define MAX_CPU_TLB_BITS 22
  
- /* Find the TLB entry corresponding to the mmu_idx + address pair.  */
-@@ -140,6 +142,16 @@ static inline CPUTLBEntry *tlb_entry(CPUArchState *env, uintptr_t mmu_idx,
-     return &env->tlb_table[mmu_idx][tlb_index(env, mmu_idx, addr)];
- }
+ typedef struct CPUTLBEntry {
+     /* bit TARGET_LONG_BITS to TARGET_PAGE_BITS : virtual address
+@@ -143,6 +121,7 @@ typedef struct CPUIOTLBEntry {
  
-+static inline size_t sizeof_tlb(CPUArchState *env, uintptr_t mmu_idx)
-+{
-+    return env->tlb_mask[mmu_idx] + (1 << CPU_TLB_ENTRY_BITS);
-+}
-+
-+static inline size_t tlb_n_entries(CPUArchState *env, uintptr_t mmu_idx)
-+{
-+    return (env->tlb_mask[mmu_idx] >> CPU_TLB_ENTRY_BITS) + 1;
-+}
-+
- #ifdef MMU_MODE0_SUFFIX
- #define CPU_MMU_INDEX 0
- #define MEMSUFFIX MMU_MODE0_SUFFIX
+ typedef struct CPUTLBDesc {
+     size_t n_used_entries;
++    size_t n_flushes_low_rate;
+ } CPUTLBDesc;
+ 
+ #define CPU_COMMON_TLB  \
 diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index a5972773de..80406f1033 100644
+index 11d6060eb0..5ebfa4fbb5 100644
 --- a/accel/tcg/cputlb.c
 +++ b/accel/tcg/cputlb.c
-@@ -76,8 +76,16 @@ QEMU_BUILD_BUG_ON(NB_MMU_MODES > 16);
- void tlb_init(CPUState *cpu)
- {
-     CPUArchState *env = cpu->env_ptr;
-+    int i;
+@@ -80,9 +80,10 @@ void tlb_init(CPUState *cpu)
  
      qemu_spin_init(&env->tlb_lock);
-+    for (i = 0; i < NB_MMU_MODES; i++) {
-+        size_t n_entries = CPU_TLB_SIZE;
-+
-+        env->tlb_mask[i] = (n_entries - 1) << CPU_TLB_ENTRY_BITS;
-+        env->tlb_table[i] = g_new(CPUTLBEntry, n_entries);
-+        env->iotlb[i] = g_new0(CPUIOTLBEntry, n_entries);
-+    }
+     for (i = 0; i < NB_MMU_MODES; i++) {
+-        size_t n_entries = CPU_TLB_SIZE;
++        size_t n_entries = 1 << DEFAULT_CPU_TLB_BITS;
+ 
+         env->tlb_desc[i].n_used_entries = 0;
++        env->tlb_desc[i].n_flushes_low_rate = 0;
+         env->tlb_mask[i] = (n_entries - 1) << CPU_TLB_ENTRY_BITS;
+         env->tlb_table[i] = g_new(CPUTLBEntry, n_entries);
+         env->iotlb[i] = g_new0(CPUIOTLBEntry, n_entries);
+@@ -121,6 +122,40 @@ size_t tlb_flush_count(void)
+     return count;
  }
  
- /* flush_all_helper: run fn across all cpus
-@@ -120,6 +128,7 @@ size_t tlb_flush_count(void)
- static void tlb_flush_nocheck(CPUState *cpu)
- {
-     CPUArchState *env = cpu->env_ptr;
-+    int i;
- 
-     /* The QOM tests will trigger tlb_flushes without setting up TCG
-      * so we bug out here in that case.
-@@ -139,7 +148,9 @@ static void tlb_flush_nocheck(CPUState *cpu)
-      * that do not hold the lock are performed by the same owner thread.
++/* Call with tlb_lock held */
++static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
++{
++    CPUTLBDesc *desc = &env->tlb_desc[mmu_idx];
++    size_t old_size = tlb_n_entries(env, mmu_idx);
++    size_t rate = desc->n_used_entries * 100 / old_size;
++    size_t new_size = old_size;
++
++    if (rate == 100) {
++        new_size = MIN(old_size << 2, 1 << MAX_CPU_TLB_BITS);
++    } else if (rate > 70) {
++        new_size = MIN(old_size << 1, 1 << MAX_CPU_TLB_BITS);
++    } else if (rate < 30) {
++        desc->n_flushes_low_rate++;
++        if (desc->n_flushes_low_rate == 100) {
++            new_size = MAX(old_size >> 1, 1 << MIN_CPU_TLB_BITS);
++            desc->n_flushes_low_rate = 0;
++        }
++    }
++
++    if (new_size == old_size) {
++        return;
++    }
++
++    g_free(env->tlb_table[mmu_idx]);
++    g_free(env->iotlb[mmu_idx]);
++
++    /* desc->n_used_entries is cleared by the caller */
++    desc->n_flushes_low_rate = 0;
++    env->tlb_mask[mmu_idx] = (new_size - 1) << CPU_TLB_ENTRY_BITS;
++    env->tlb_table[mmu_idx] = g_new(CPUTLBEntry, new_size);
++    env->iotlb[mmu_idx] = g_new0(CPUIOTLBEntry, new_size);
++}
++
+ /* This is OK because CPU architectures generally permit an
+  * implementation to drop entries from the TLB at any time, so
+  * flushing more entries than required is only an efficiency issue,
+@@ -150,6 +185,7 @@ static void tlb_flush_nocheck(CPUState *cpu)
       */
      qemu_spin_lock(&env->tlb_lock);
--    memset(env->tlb_table, -1, sizeof(env->tlb_table));
-+    for (i = 0; i < NB_MMU_MODES; i++) {
-+        memset(env->tlb_table[i], -1, sizeof_tlb(env, i));
-+    }
-     memset(env->tlb_v_table, -1, sizeof(env->tlb_v_table));
-     qemu_spin_unlock(&env->tlb_lock);
- 
-@@ -200,7 +211,7 @@ static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
+     for (i = 0; i < NB_MMU_MODES; i++) {
++        tlb_mmu_resize_locked(env, i);
+         memset(env->tlb_table[i], -1, sizeof_tlb(env, i));
+         env->tlb_desc[i].n_used_entries = 0;
+     }
+@@ -213,6 +249,7 @@ static void tlb_flush_by_mmuidx_async_work(CPUState *cpu, run_on_cpu_data data)
          if (test_bit(mmu_idx, &mmu_idx_bitmask)) {
              tlb_debug("%d\n", mmu_idx);
  
--            memset(env->tlb_table[mmu_idx], -1, sizeof(env->tlb_table[0]));
-+            memset(env->tlb_table[mmu_idx], -1, sizeof_tlb(env, mmu_idx));
++            tlb_mmu_resize_locked(env, mmu_idx);
+             memset(env->tlb_table[mmu_idx], -1, sizeof_tlb(env, mmu_idx));
              memset(env->tlb_v_table[mmu_idx], -1, sizeof(env->tlb_v_table[0]));
-         }
-     }
-@@ -523,8 +534,9 @@ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
-     qemu_spin_lock(&env->tlb_lock);
-     for (mmu_idx = 0; mmu_idx < NB_MMU_MODES; mmu_idx++) {
-         unsigned int i;
-+        unsigned int n = tlb_n_entries(env, mmu_idx);
- 
--        for (i = 0; i < CPU_TLB_SIZE; i++) {
-+        for (i = 0; i < n; i++) {
-             tlb_reset_dirty_range_locked(&env->tlb_table[mmu_idx][i], start1,
-                                          length);
-         }
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 436195894b..33de43305a 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -330,6 +330,7 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_ARITH_GvEv	(0x03)		/* ... plus (ARITH_FOO << 3) */
- #define OPC_ANDN        (0xf2 | P_EXT38)
- #define OPC_ADD_GvEv	(OPC_ARITH_GvEv | (ARITH_ADD << 3))
-+#define OPC_AND_GvEv    (OPC_ARITH_GvEv | (ARITH_AND << 3))
- #define OPC_BLENDPS     (0x0c | P_EXT3A | P_DATA16)
- #define OPC_BSF         (0xbc | P_EXT)
- #define OPC_BSR         (0xbd | P_EXT)
-@@ -1625,7 +1626,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         }
-         if (TCG_TYPE_PTR == TCG_TYPE_I64) {
-             hrexw = P_REXW;
--            if (TARGET_PAGE_BITS + CPU_TLB_BITS > 32) {
-+            if (TARGET_PAGE_BITS > 32) {
-                 tlbtype = TCG_TYPE_I64;
-                 tlbrexw = P_REXW;
-             }
-@@ -1633,6 +1634,15 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-     }
- 
-     tcg_out_mov(s, tlbtype, r0, addrlo);
-+    tcg_out_shifti(s, SHIFT_SHR + tlbrexw, r0,
-+                   TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
-+
-+    tcg_out_modrm_offset(s, OPC_AND_GvEv + hrexw, r0, TCG_AREG0,
-+                         offsetof(CPUArchState, tlb_mask[mem_index]));
-+
-+    tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r0, TCG_AREG0,
-+                         offsetof(CPUArchState, tlb_table[mem_index]));
-+
-     /* If the required alignment is at least as large as the access, simply
-        copy the address and mask.  For lesser alignments, check that we don't
-        cross pages for the complete access.  */
-@@ -1642,20 +1652,10 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-         tcg_out_modrm_offset(s, OPC_LEA + trexw, r1, addrlo, s_mask - a_mask);
-     }
-     tlb_mask = (target_ulong)TARGET_PAGE_MASK | a_mask;
--
--    tcg_out_shifti(s, SHIFT_SHR + tlbrexw, r0,
--                   TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS);
--
-     tgen_arithi(s, ARITH_AND + trexw, r1, tlb_mask, 0);
--    tgen_arithi(s, ARITH_AND + tlbrexw, r0,
--                (CPU_TLB_SIZE - 1) << CPU_TLB_ENTRY_BITS, 0);
--
--    tcg_out_modrm_sib_offset(s, OPC_LEA + hrexw, r0, TCG_AREG0, r0, 0,
--                             offsetof(CPUArchState, tlb_table[mem_index][0])
--                             + which);
- 
-     /* cmp 0(r0), r1 */
--    tcg_out_modrm_offset(s, OPC_CMP_GvEv + trexw, r1, r0, 0);
-+    tcg_out_modrm_offset(s, OPC_CMP_GvEv + trexw, r1, r0, which);
- 
-     /* Prepare for both the fast path add of the tlb addend, and the slow
-        path function argument setup.  There are two cases worth note:
-@@ -1672,7 +1672,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     if (TARGET_LONG_BITS > TCG_TARGET_REG_BITS) {
-         /* cmp 4(r0), addrhi */
--        tcg_out_modrm_offset(s, OPC_CMP_GvEv, addrhi, r0, 4);
-+        tcg_out_modrm_offset(s, OPC_CMP_GvEv, addrhi, r0, which + 4);
- 
-         /* jne slow_path */
-         tcg_out_opc(s, OPC_JCC_long + JCC_JNE, 0, 0, 0);
-@@ -1684,7 +1684,7 @@ static inline void tcg_out_tlb_load(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
- 
-     /* add addend(r0), r1 */
-     tcg_out_modrm_offset(s, OPC_ADD_GvEv + hrexw, r1, r0,
--                         offsetof(CPUTLBEntry, addend) - which);
-+                         offsetof(CPUTLBEntry, addend));
- }
- 
- /*
+             env->tlb_desc[mmu_idx].n_used_entries = 0;
 -- 
 2.17.1
