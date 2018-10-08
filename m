@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9Kf4-0004sj-AP
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:48:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1g9Kvd-0000bl-MF
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:05:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9Kf1-0002Qh-1V
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:48:42 -0400
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:53735)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9Kf0-0002P6-LN
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 21:48:38 -0400
-Date: Sun, 7 Oct 2018 21:48:34 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181008014834.GA21299@flamenco>
-References: <20181006214508.5331-1-cota@braap.org>
-	<20181006214508.5331-7-cota@braap.org>
-	<197b7649-0bc7-4a9a-021b-a308a1755cf1@amsat.org>
+	(envelope-from <mreitz@redhat.com>) id 1g9Kvc-0002O1-NK
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:05:49 -0400
+References: <cover.1537367701.git.berto@igalia.com>
+	<298f85a0b53dc90b1d6bea272c26983ab684619e.1537367701.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5aaf3b44-96a8-0bb4-5455-879c3a8452c2@redhat.com>
+Date: Mon, 8 Oct 2018 04:05:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <197b7649-0bc7-4a9a-021b-a308a1755cf1@amsat.org>
-Subject: Re: [Qemu-devel] [RFC 6/6] cputlb: dynamically resize TLBs based on
- use rate
+In-Reply-To: <298f85a0b53dc90b1d6bea272c26983ab684619e.1537367701.git.berto@igalia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="u6qO8kCczAZyaEucLtFo6Zkq4VtLu78LC"
+Subject: Re: [Qemu-devel] [PATCH 11/14] qemu-io: Put flag changes in the
+ options QDict in reopen_f()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +25,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Pranith Kumar <bobby.prani@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Sun, Oct 07, 2018 at 19:37:50 +0200, Philippe Mathieu-Daudé wrote:
-> On 10/6/18 11:45 PM, Emilio G. Cota wrote:
-> > 2. System boot + shutdown, ubuntu 18.04 x86_64:
-> 
-> You can also run the VM tests to build QEMU:
-> 
-> $ make vm-test
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--u6qO8kCczAZyaEucLtFo6Zkq4VtLu78LC
+From: Max Reitz <mreitz@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <5aaf3b44-96a8-0bb4-5455-879c3a8452c2@redhat.com>
+Subject: Re: [PATCH 11/14] qemu-io: Put flag changes in the options QDict in
+ reopen_f()
+References: <cover.1537367701.git.berto@igalia.com>
+ <298f85a0b53dc90b1d6bea272c26983ab684619e.1537367701.git.berto@igalia.com>
+In-Reply-To: <298f85a0b53dc90b1d6bea272c26983ab684619e.1537367701.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks, will give that a look.
+On 19.09.18 16:47, Alberto Garcia wrote:
+> When reopen_f() puts a block device in the reopen queue, some of the
+> new options are passed using a QDict, but others ("read-only" and the
+> cache options) are passed as flags.
+>=20
+> This patch puts those flags in the QDict. This way the flags parameter
+> becomes redundant and we'll be able to get rid of it in a subsequent
+> patch.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  qemu-io-cmds.c             | 27 ++++++++++++++++++++++++++-
+>  tests/qemu-iotests/133     |  9 +++++++++
+>  tests/qemu-iotests/133.out |  8 ++++++++
+>  3 files changed, 43 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+> index db0b3ee5ef..4ad5269abc 100644
+> --- a/qemu-io-cmds.c
+> +++ b/qemu-io-cmds.c
+> @@ -10,6 +10,7 @@
+> =20
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> +#include "qapi/qmp/qdict.h"
+>  #include "qemu-io.h"
+>  #include "sysemu/block-backend.h"
+>  #include "block/block.h"
+> @@ -1978,6 +1979,7 @@ static int reopen_f(BlockBackend *blk, int argc, =
+char **argv)
+>      int flags =3D bs->open_flags;
+>      bool writethrough =3D !blk_enable_write_cache(blk);
+>      bool has_rw_option =3D false;
+> +    bool has_cache_option =3D false;
+> =20
+>      BlockReopenQueue *brq;
+>      Error *local_err =3D NULL;
+> @@ -1989,6 +1991,7 @@ static int reopen_f(BlockBackend *blk, int argc, =
+char **argv)
+>                  error_report("Invalid cache option: %s", optarg);
+>                  return -EINVAL;
+>              }
+> +            has_cache_option =3D true;
+>              break;
+>          case 'o':
+>              if (!qemu_opts_parse_noisily(&reopen_opts, optarg, 0)) {
+> @@ -2046,9 +2049,31 @@ static int reopen_f(BlockBackend *blk, int argc,=
+ char **argv)
+>      }
+> =20
+>      qopts =3D qemu_opts_find(&reopen_opts, NULL);
+> -    opts =3D qopts ? qemu_opts_to_qdict(qopts, NULL) : NULL;
+> +    opts =3D qopts ? qemu_opts_to_qdict(qopts, NULL) : qdict_new();
+>      qemu_opts_reset(&reopen_opts);
+> =20
+> +    if (qdict_haskey(opts, BDRV_OPT_READ_ONLY)) {
+> +        if (has_rw_option) {
+> +            error_report("Can't set both -r/-w and '" BDRV_OPT_READ_ON=
+LY "'");
 
-> > +    if (rate == 100) {
-> > +        new_size = MIN(desc->size << 2, 1 << TCG_TARGET_TLB_MAX_INDEX_BITS);
-> > +    } else if (rate > 70) {
-> > +        new_size = MIN(desc->size << 1, 1 << TCG_TARGET_TLB_MAX_INDEX_BITS);
-> > +    } else if (rate < 30) {
-> 
-> I wonder if those thresholds might be per TCG_TARGET.
+I'm not a fan of elision ("can't") in user interfaces.  (In fact, I'm
+not a fan of elision anywhere in the code base or commit logs, but I
+don't put up a struggle there.)
 
-Do you mean to tune the growth rate based on each TCG target?
-(max and min are already determined by the TCG target).
-The optimal growth rate is mostly dependent on the guest
-workload, so I wouldn't expect the TCG target to matter
-much.
+> +            qobject_unref(opts);
+> +            return -EINVAL;
+> +        }
+> +    } else {
+> +        qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !(flags & BDRV_O_RDWR=
+));
+> +    }
+> +
+> +    if (qdict_haskey(opts, BDRV_OPT_CACHE_DIRECT) ||
+> +        qdict_haskey(opts, BDRV_OPT_CACHE_NO_FLUSH)) {
+> +        if (has_cache_option) {
+> +            error_report("Can't set both -c and the cache options");
+> +            qobject_unref(opts);
+> +            return -EINVAL;
+> +        }
+> +    } else {
+> +        qdict_put_bool(opts, BDRV_OPT_CACHE_DIRECT, flags & BDRV_O_NOC=
+ACHE);
+> +        qdict_put_bool(opts, BDRV_OPT_CACHE_NO_FLUSH, flags & BDRV_O_N=
+O_FLUSH);
+> +    }
+> +
+>      bdrv_subtree_drained_begin(bs);
+>      brq =3D bdrv_reopen_queue(NULL, bs, opts, flags);
+>      bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
+> diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
+> index b9f17c996f..a58130c5b4 100755
+> --- a/tests/qemu-iotests/133
+> +++ b/tests/qemu-iotests/133
+> @@ -98,6 +98,15 @@ echo
+> =20
+>  $QEMU_IO -c 'reopen -o read-only=3Dfoo' $TEST_IMG
+> =20
+> +echo
+> +echo "=3D=3D=3D Check that mixing -c/-r/-w and their equivalent option=
+s is forbidden =3D=3D=3D"
+> +echo
+> +
+> +$QEMU_IO -c 'reopen -r -o read-only=3Don' $TEST_IMG
+> +$QEMU_IO -c 'reopen -w -o read-only=3Don' $TEST_IMG
 
-That said, we could spend quite some time tweaking the
-TLB sizing algorithm. But with this RFC I wanted to see
-(a) whether this approach is a good idea at all, and (b) show
-what 'easy' speedups might look like (because converting
-all TCG targets is a pain, so it better be justified).
+The equivalent option however would be read-only=3Doff.
 
-> Btw the paper used 40% here, did you tried it too?
+> +$QEMU_IO -c 'reopen -c none -o cache.direct=3Don' $TEST_IMG
+> +$QEMU_IO -c 'reopen -c writeback -o cache.direct=3Don' $TEST_IMG
 
-Yes, I tried several alternatives including what the
-paper describes, i.e. (skipping the min/max checks
-for simplicity):
+But the equivalent option would be cache.direct=3Doff.
 
-	if (rate > 70) {
-		new_size = 2 * old_size;
-	} else if (rate < 40) {
-		new_size = old_size / 2;
-	}
+> +$QEMU_IO -c 'reopen -c directsync -o cache.no-flush=3Don' $TEST_IMG
 
-But that didn't give great speedups (see "resizing-paper"
-set):
-  https://imgur.com/a/w3AqHP7
+And cache.direct=3Don here.  Or rather, the equivalent -c value for
+cache.no-flush=3Don would be "unsafe".
 
-A few points stand out to me:
+It doesn't really matter, but if you don't care, it shouldn't say
+"equivalent options" but maybe "corresponding options".
 
-- We get very different speedups even if we implement
-  the algorithm they describe (not sure that's exactly
-  what they implemented though). But there are many
-  variables that could explain that, e.g. different guest
-  images (and therefore different TLB flush rates) and
-  different QEMU baselines (ours is faster than the paper's,
-  so getting speedups is harder).
+Overall, the patch looks good.
 
-- 70/40% use rate for growing/shrinking the TLB does not
-  seem a great choice, if one wants to avoid a pathological
-  case that can induce constant resizing. Imagine we got
-  exactly 70% use rate, and all TLB misses were compulsory
-  (i.e. a direct-mapped TLB would have not prevented a
-  single miss). We'd then double the TLB size:
-    size_new = 2*size_old
-  But then the use rate will halve:
-    use_new = 0.7/2 = 0.35
-  So we'd then end up in a grow-shrink loop!
-  Picking a "shrink threshold" below 0.70/2=0.35 avoids this.
+Max
 
-- Aggressively increasing the TLB size when usage is high
-  makes sense. However, reducing the size at the same
-  rate does not make much sense. Imagine the following
-  scenario with two processes being scheduled: one process
-  uses a lot of memory, and the other one uses little, but
-  both are CPU-intensive and therefore being assigned similar
-  time slices by the scheduler. Ideally you'd resize the TLB
-  to meet each process' memory demands. However, at flush
-  time we don't even know what process is running or about
-  to run, so we have to size the TLB exclusively based on
-  recent use rates. In this scenario you're probably close
-  to optimal if you size the TLB to meet the demands of the
-  most memory-hungry process. You'll lose some extra time
-  flushing the (now larger) TLB, but your net gain is likely
-  to be positive given the TLB fills you won't have to do
-  when the memory-heavy process is scheduled in.
+>  # success, all done
+>  echo "*** done"
+>  rm -f $seq.full
+> diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
+> index 570f623b6b..4d84401688 100644
+> --- a/tests/qemu-iotests/133.out
+> +++ b/tests/qemu-iotests/133.out
+> @@ -28,4 +28,12 @@ format name: null-co
+>  =3D=3D=3D Check that invalid options are handled correctly =3D=3D=3D
+> =20
+>  Parameter 'read-only' expects 'on' or 'off'
+> +
+> +=3D=3D=3D Check that mixing -c/-r/-w and their equivalent options is f=
+orbidden =3D=3D=3D
+> +
+> +Can't set both -r/-w and 'read-only'
+> +Can't set both -r/-w and 'read-only'
+> +Can't set both -c and the cache options
+> +Can't set both -c and the cache options
+> +Can't set both -c and the cache options
+>  *** done
+>=20
 
-So to me it's quite likely that in the paper they
-could have gotten even better results by reducing the
-shrink rate, like we did.
 
-Thanks,
 
-		Emilio
+--u6qO8kCczAZyaEucLtFo6Zkq4VtLu78LC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu6u3IACgkQ9AfbAGHV
+z0Do3Af6A8+Ym9CCuxcV5JoFS1eZp8Hqny29z2Ie69FC3Vm+sPJvDR8UFQuzlUdx
+G7tkNl3b0xhQ8hNCzMuqArGP+p/KGSPSYfyqbhs/0IGgR6l4ID9CcVnmvmgOBOmE
+o3iQv/DU7dAr8zpKrZ8tAc7QvmAWrYLJRLcR4t+bz+AFKTtgdPh48czx3+Q1zQ+n
+BrEduG+PUS25zAFXEsg7vBm6LBiZdBUZ40cr/5oIcLRUiXTbyiOf/uq5cA4/QJl/
+86YIW7gvyE8aZ7J+GI9SRvjwJpHs2vmDq1j4phpz5XKwuCTdXRoQ5ad3k3IFH+1J
+L9OGOVc4sXs7ZD2kEYV7OZB9rWJdlg==
+=0rzh
+-----END PGP SIGNATURE-----
+
+--u6qO8kCczAZyaEucLtFo6Zkq4VtLu78LC--
