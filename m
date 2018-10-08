@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9VWx-00021N-Qa
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:25:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9VX7-00025H-8i
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1g9VWu-00007h-7c
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:25:03 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 8 Oct 2018 13:24:53 +0000
-Message-ID: <2728ba06-336b-5e64-b8d5-7c76346893b9@virtuozzo.com>
-References: <20180116125427.18540-1-vsementsov@virtuozzo.com>
-	<20180116125427.18540-6-vsementsov@virtuozzo.com>
-	<66a8f977-9274-e77b-e795-21a50690c4eb@redhat.com>
-In-Reply-To: <66a8f977-9274-e77b-e795-21a50690c4eb@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ACAD6DE6EEFC784AAAE76FBC795DEE2D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <armbru@redhat.com>) id 1g9VX3-0000Cy-Ld
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:25:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37764)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9VX3-0000Ci-CL
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 09:25:09 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180829134043.31706-1-marcandre.lureau@redhat.com>
+	<20180829134043.31706-10-marcandre.lureau@redhat.com>
+	<87mut42c0c.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+WiGAd02PC=s50=kb4TT8kLmrHnYEhgyyvdGAQUbbVSw@mail.gmail.com>
+Date: Mon, 08 Oct 2018 15:25:01 +0200
+In-Reply-To: <CAJ+F1C+WiGAd02PC=s50=kb4TT8kLmrHnYEhgyyvdGAQUbbVSw@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 2 Oct 2018
+	23:04:36 +0400")
+Message-ID: <87pnwk370y.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 5/6] qapi: add block-dirty-bitmap-merge
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 09/10] qga: process_event()
+ simplification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, Denis Lunev <den@virtuozzo.com>, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>, Maxim Nestratov <mnestratov@virtuozzo.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-MjAuMDkuMjAxOCAyMjo0MCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gW3Jldml2aW5nIGFuIG9sZCBw
-YXRjaF0NCj4NCj4gT24gMS8xNi8xOCA2OjU0IEFNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
-a2l5IHdyb3RlOg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tp
-eSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiDCoCBxYXBpL2Jsb2NrLWNv
-cmUuanNvbsKgwqDCoMKgwqDCoMKgwqAgfCAzOCANCj4+ICsrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrDQo+PiDCoCBpbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1hcC5oIHzCoCAy
-ICsrDQo+PiDCoCBibG9jay9kaXJ0eS1iaXRtYXAuY8KgwqDCoMKgwqDCoMKgwqAgfCAxOCArKysr
-KysrKysrKysrKysrKysNCj4+IMKgIGJsb2NrZGV2LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgfCAzMCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+IMKgIDQg
-ZmlsZXMgY2hhbmdlZCwgODggaW5zZXJ0aW9ucygrKQ0KPj4NCj4NCj4gV2UndmUgYWxyZWFkeSBo
-aXQgYSBjb3VwbGUgaXNzdWVzIHdpdGggdGhpcyBwYXRjaCBtZW50aW9uZWQgaW4gb3RoZXIgDQo+
-IHRocmVhZHM6DQo+DQo+PiBkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBp
-L2Jsb2NrLWNvcmUuanNvbg0KPj4gaW5kZXggYjM4NTFlZTc2MC4uOWY5Y2ZhMGE0NCAxMDA2NDQN
-Cj4+IC0tLSBhL3FhcGkvYmxvY2stY29yZS5qc29uDQo+PiArKysgYi9xYXBpL2Jsb2NrLWNvcmUu
-anNvbg0KPj4gQEAgLTE2MDQsNiArMTYwNCwyMCBAQA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgJypwZXJzaXN0ZW50JzogJ2Jvb2wnLCAnKmF1dG9sb2FkJzogJ2Jvb2wnIH0gfQ0KPj4g
-wqAgwqAgIyMNCj4+ICsjIEBCbG9ja0RpcnR5Qml0bWFwTWVyZ2U6DQo+PiArIw0KPj4gKyMgQG5v
-ZGU6IG5hbWUgb2YgZGV2aWNlL25vZGUgd2hpY2ggdGhlIGJpdG1hcCBpcyB0cmFja2luZw0KPj4g
-KyMNCj4+ICsjIEBkc3RfbmFtZTogbmFtZSBvZiB0aGUgZGVzdGluYXRpb24gZGlydHkgYml0bWFw
-DQo+PiArIw0KPj4gKyMgQHNyY19uYW1lOiBuYW1lIG9mIHRoZSBzb3VyY2UgZGlydHkgYml0bWFw
-DQo+DQo+IE5hbWluZyBjaG9pY2UgKHByZWZlciAtIG92ZXIgXyk6DQo+IGh0dHBzOi8vbGlzdHMu
-Z251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTA5L21zZzAyMzUyLmh0bWwNCj4N
-Cj4+ICsrKyBiL2Jsb2NrL2RpcnR5LWJpdG1hcC5jDQo+PiBAQCAtNjk5LDMgKzY5OSwyMSBAQCBj
-aGFyICpiZHJ2X2RpcnR5X2JpdG1hcF9zaGEyNTYoY29uc3QgDQo+PiBCZHJ2RGlydHlCaXRtYXAg
-KmJpdG1hcCwgRXJyb3IgKiplcnJwKQ0KPj4gwqAgew0KPj4gwqDCoMKgwqDCoCByZXR1cm4gaGJp
-dG1hcF9zaGEyNTYoYml0bWFwLT5iaXRtYXAsIGVycnApOw0KPj4gwqAgfQ0KPj4gKw0KPj4gK3Zv
-aWQgYmRydl9tZXJnZV9kaXJ0eV9iaXRtYXAoQmRydkRpcnR5Qml0bWFwICpkZXN0LCBjb25zdCAN
-Cj4+IEJkcnZEaXJ0eUJpdG1hcCAqc3JjLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEVycm9yICoqZXJycCkNCj4+ICt7DQo+PiAr
-wqDCoMKgIC8qIG9ubHkgYml0bWFwcyBmcm9tIG9uZSBiZHMgYXJlIHN1cHBvcnRlZCAqLw0KPj4g
-K8KgwqDCoCBhc3NlcnQoZGVzdC0+bXV0ZXggPT0gc3JjLT5tdXRleCk7DQo+PiArDQo+PiArwqDC
-oMKgIHFlbXVfbXV0ZXhfbG9jayhkZXN0LT5tdXRleCk7DQo+PiArDQo+PiArwqDCoMKgIGFzc2Vy
-dChiZHJ2X2RpcnR5X2JpdG1hcF9lbmFibGVkKGRlc3QpKTsNCj4NCj4gTWVyZ2luZyB0byBhIGRp
-c2FibGVkIGJpdG1hcCBpcyBkZXNpcmFibGU6DQo+IGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNo
-aXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4LTA5L21zZzAyMzU4Lmh0bWwNCj4NCj4+ICsgYXNzZXJ0
-KCFiZHJ2X2RpcnR5X2JpdG1hcF9yZWFkb25seShkZXN0KSk7DQo+PiArDQo+PiArwqDCoMKgIGlm
-ICghaGJpdG1hcF9tZXJnZShkZXN0LT5iaXRtYXAsIHNyYy0+Yml0bWFwKSkgew0KPg0KPiBBbmQg
-aGVyZSdzIGFub3RoZXIgb25lIEkgcmFuIGludG8uIGhiaXRtYXBfbWVyZ2UoKSBkb2VzIE5PVCBw
-cm9wZXJseSANCj4gdXBkYXRlIGhiaXRtYXBfY291bnQoKSwgd2hpY2ggbWVhbnMgc3RhdGlzdGlj
-cyBhYm91dCB0aGUgbnVtYmVyIG9mIA0KPiBiaXRzIHNldCBpbiB0aGUgYml0bWFwLCBhcyB2aXNp
-YmxlIHRocm91Z2ggUU1QICJxdWVyeS1ibG9jayIsIGFyZSANCj4gaW5hY2N1cmF0ZSBhZnRlciBh
-IG1lcmdlLg0KPg0KPiBDaGVjayBvdXQgaGJpdG1hcF9zZXQoKSBhbmQgaGJpdG1hcF9yZXNldCgp
-LCB3aGljaCBjYXJlZnVsbHkgcmVjb21wdXRlIA0KPiBoYi0+Y291bnQgdXNpbmcgaGJfY291bnRf
-YmV0d2VlbigpIGFzIHBhcnQgb2YgZmxpcHBpbmcgYml0cy4gQnV0IHNpbmNlIA0KPiBoYml0bWFw
-X21lcmdlKCkgZmFpbHMgdG8gcmVjb21wdXRlIGJpdHMsIHZhcmlvdXMgb3RoZXIgYXNwZWN0cyBv
-ZiB0aGUgDQo+IGNvZGUgZ28gaGF5d2lyZSAoZm9yIGV4YW1wbGUsIGNvZGUgdGhhdCB1c2VzIGhi
-aXRtYXBfZW1wdHkoKSBvciANCj4gaGJpdG1hcF9jb3VudCgpPT0wIHRvIHNob3J0LWNpcmN1aXQg
-b3BlcmF0aW9ucyBbYW5kIGhiaXRtYXBfbWVyZ2UoKSBpcyANCj4gb25lIHN1Y2ggY2FsbGVyXSBt
-YWtlcyB0aGUgd3JvbmcgY2hvaWNlIG9uIGEgYml0bWFwIHRoYXQgc3RhcnRlZCBsaWZlIA0KPiBl
-bXB0eSwgYW5kIGhhZCBhIG5vbi1lbXB0eSBiaXRtYXAgbWVyZ2VkIGluLCBiZWNhdXNlIGhiLT5j
-b3VudCBpcyANCj4gc3RpbGwgMCkuDQo+DQo+IEkgdGhpbmsgdGhhdCB4LWRlYnVnLWJsb2NrLWRp
-cnR5LWJpdG1hcC1zaGEyNTYgc2hvdWxkIGJlIGVuaGFuY2VkIHRvIA0KPiBvdXRwdXQgY291bnQg
-YXMgd2VsbCBhcyB0aGUgY2hlY2tzdW0gb2YgdGhlIGJpdG1hcCBjb250ZW50cywgYW5kIHRoZW4g
-DQo+IHRoYXQgd2UgbmVlZCBpb3Rlc3RzIGNvdmVyYWdlIG9mIHgtYmxvY2stZGlydHktYml0bWFw
-LW1lcmdlLCBjb21wbGV0ZSANCj4gd2l0aCBhIGNoZWNrIHRoYXQgdGhlIGNvdW50IGlzIHByb3Bl
-cmx5IHVwZGF0ZWQuIGlvdGVzdHMgMTY1LCAxNjksIA0KPiAxNzYsIDE5OSBhbGwgcGVyZm9ybSBi
-aXRtYXAgY2hlY2tzdW0gdmFsaWRhdGlvbnMsIGJ1dCBzbyBmYXIgbm9uZSBvZiANCj4gdGhlbSBw
-ZXJmb3JtIGEgYml0bWFwIG1lcmdlLsKgIEJlIGNhcmVmdWwgaW4gd3JpdGluZyBhbnkgc3VjaCB0
-ZXN0IHRoYXQgDQo+IHdlIGRvbid0IHJlLWludHJvZHVjZSBhbnkgc2Vuc2l0aXZpdGllcyBvbiAz
-Mi0gdnMuIDY0LWJpdCBvciANCj4gZW5kaWFubmVzcyBpbiBvdXIgY2hlY2tzdW0gY29tcHV0YXRp
-b24gKHNlZSBjb21taXQgMjgwNzc0NmYgZm9yIA0KPiBjb21wYXJpc29uKS4NCj4NCg0Kb3IgYXQg
-bGVhc3Qgd2Ugc2hvdWxkIGNoZWNrIGNvdW50IGluIHRlc3RzL3Rlc3QtaGJpdG1hcC4uDQoNCkFi
-b3V0IGJpdG1hcCBhcGk6IGNhbiB3ZSBub3cgc3dpdGNoIG5hbWluZyBzdHlsZSBmcm9tICdfJyB0
-byAnLScgYW5kIA0KZHJvcCB4LSBwcmVmaXhlcz8gT3Igd2UgYXJlIHdhaXRpbmcgZm9yIHlvdXIg
-bGlidmlydCBBUEkgcHJvcG9zYWwgDQphY2NlcHRhbmNlPw0KDQotLSANCkJlc3QgcmVnYXJkcywN
-ClZsYWRpbWlyDQoNCg==
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+
+> Hi
+> On Thu, Aug 30, 2018 at 6:03 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>> > Simplify the code around qmp_dispatch():
+>> > - rely on qmp_dispatch/check_obj() for message checking
+>> > - have a single send_response() point
+>> > - constify send_response() argument
+>> >
+>> > It changes a couple of error messages:
+>> >
+>> > * When @req isn't a dictionary, from
+>> >     Invalid JSON syntax
+>> >   to
+>> >     QMP input must be a JSON object
+>> >
+>> > * When @req lacks member "execute", from
+>> >     this feature or command is not currently supported
+>> >   to
+>> >     QMP input lacks member 'execute'
+>> >
+>> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> > Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+>>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>
+>
+> Can someone take the patch? thanks
+
+Michael?
