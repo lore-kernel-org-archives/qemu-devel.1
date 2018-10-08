@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1g9a2e-0005br-E5
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:14:05 -0400
+	(envelope-from <prvs=812b08464=Alistair.Francis@wdc.com>)
+	id 1g9aDd-0004Sz-ML
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1g9a2a-0001h6-HK
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:14:04 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <204d1911-765b-bd4b-27b8-3f1a35a6b9d6@redhat.com>
-References: <cover.1537367701.git.berto@igalia.com>
-	<ba0e2f728d7b2a0bbf5c0f44d907a4c7e3723501.1537367701.git.berto@igalia.com>
-	<204d1911-765b-bd4b-27b8-3f1a35a6b9d6@redhat.com>
-Date: Mon, 08 Oct 2018 20:13:58 +0200
-Message-ID: <w517eis71cp.fsf@maestria.local.igalia.com>
+	(envelope-from <prvs=812b08464=Alistair.Francis@wdc.com>)
+	id 1g9aDU-0007IP-CZ
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:25:22 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:49673)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <prvs=812b08464=Alistair.Francis@wdc.com>)
+	id 1g9aDQ-0007EZ-Cs
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 14:25:13 -0400
+From: Alistair Francis <Alistair.Francis@wdc.com>
+Date: Mon, 8 Oct 2018 18:25:07 +0000
+Message-ID: <cover.1539023064.git.alistair.francis@wdc.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 14/14] block: Stop passing flags to
- bdrv_reopen_queue_child()
+Subject: [Qemu-devel] [PATCH v1 0/5]  Misc RISC-V patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, "alistair23@gmail.com" <alistair23@gmail.com>
 
-On Mon 08 Oct 2018 04:48:50 AM CEST, Max Reitz wrote:
+These are some patches that I have cherry picked from Michael's RISC-V
+tree that are ready to be applied.
+Unless anyone has any comments against these I'll send a PR later this
+week.
 
->> +    /* Old values are used for options that aren't set yet */
->> +    old_options = qdict_clone_shallow(bs->options);
->> +    bdrv_join_options(bs, options, old_options);
->> +    qobject_unref(old_options);
->> +
->> +    /* We have the final set of options so let's update the flags */
->> +    {
->> +        Error *local_err = NULL;
->> +        QemuOpts *opts;
->> +        QDict *options_copy = qdict_clone_shallow(options);
->
-> I-I'm not sure this conforms to our coding style.
->
-> While I applaud your effort to keep the patch size small, I know for
-> sure I don't want to read code like this.  (Unless it's necessary
-> because of some variables' lifetimes.)
+Michael Clark (5):
+  RISC-V: Allow setting and clearing multiple irqs
+  RISC-V: Move non-ops from op_helper to cpu_helper
+  RISC-V: Update CSR and interrupt definitions
+  RISC-V: Add missing free for plic_hart_config
+  RISC-V: Don't add NULL bootargs to device-tree
 
-I actually think it makes the code more readable if there are variables
-with a very limited scope (like in this case). But I can also rewrite it
-using a more traditional style.
+ hw/riscv/sifive_clint.c                 |   8 +-
+ hw/riscv/sifive_plic.c                  |   4 +-
+ hw/riscv/sifive_u.c                     |   4 +-
+ hw/riscv/spike.c                        |   6 +-
+ hw/riscv/virt.c                         |   6 +-
+ target/riscv/Makefile.objs              |   2 +-
+ target/riscv/cpu.c                      |   6 +-
+ target/riscv/cpu.h                      |  22 +-
+ target/riscv/cpu_bits.h                 | 683 +++++++++++++-----------
+ target/riscv/{helper.c =3D> cpu_helper.c} |  35 +-
+ target/riscv/op_helper.c                |  34 +-
+ 11 files changed, 438 insertions(+), 372 deletions(-)
+ rename target/riscv/{helper.c =3D> cpu_helper.c} (95%)
 
-Berto
+--=20
+2.17.1
