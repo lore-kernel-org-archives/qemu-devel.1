@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9Kvd-0000bl-MF
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:05:50 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g9Kys-0001T6-Cn
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1g9Kvc-0002O1-NK
-	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:05:49 -0400
-References: <cover.1537367701.git.berto@igalia.com>
-	<298f85a0b53dc90b1d6bea272c26983ab684619e.1537367701.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <5aaf3b44-96a8-0bb4-5455-879c3a8452c2@redhat.com>
-Date: Mon, 8 Oct 2018 04:05:38 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1g9Kyn-00049Z-ST
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:09:10 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35241)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g9Kyn-00049L-Lf
+	for qemu-devel@nongnu.org; Sun, 07 Oct 2018 22:09:05 -0400
+Received: by mail-pg1-x541.google.com with SMTP id v133-v6so7119699pgb.2
+	for <qemu-devel@nongnu.org>; Sun, 07 Oct 2018 19:09:05 -0700 (PDT)
+References: <20181006214508.5331-1-cota@braap.org>
+	<20181006214508.5331-3-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4dc1591e-adc9-eaaa-deea-07fd7f3470a4@linaro.org>
+Date: Sun, 7 Oct 2018 19:09:01 -0700
 MIME-Version: 1.0
-In-Reply-To: <298f85a0b53dc90b1d6bea272c26983ab684619e.1537367701.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="u6qO8kCczAZyaEucLtFo6Zkq4VtLu78LC"
-Subject: Re: [Qemu-devel] [PATCH 11/14] qemu-io: Put flag changes in the
- options QDict in reopen_f()
+In-Reply-To: <20181006214508.5331-3-cota@braap.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 2/6] cputlb: do not evict invalid entries to
+ the vtlb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,187 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: Pranith Kumar <bobby.prani@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u6qO8kCczAZyaEucLtFo6Zkq4VtLu78LC
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <5aaf3b44-96a8-0bb4-5455-879c3a8452c2@redhat.com>
-Subject: Re: [PATCH 11/14] qemu-io: Put flag changes in the options QDict in
- reopen_f()
-References: <cover.1537367701.git.berto@igalia.com>
- <298f85a0b53dc90b1d6bea272c26983ab684619e.1537367701.git.berto@igalia.com>
-In-Reply-To: <298f85a0b53dc90b1d6bea272c26983ab684619e.1537367701.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 19.09.18 16:47, Alberto Garcia wrote:
-> When reopen_f() puts a block device in the reopen queue, some of the
-> new options are passed using a QDict, but others ("read-only" and the
-> cache options) are passed as flags.
->=20
-> This patch puts those flags in the QDict. This way the flags parameter
-> becomes redundant and we'll be able to get rid of it in a subsequent
-> patch.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+On 10/6/18 2:45 PM, Emilio G. Cota wrote:
+> Currently we evict an entry to the victim TLB when it doesn't match
+> the current address. But it could be that there's no match because
+> the current entry is invalid. Do not evict the entry to the vtlb
+> in that case.
+> 
+> This change will help us keep track of the TLB's use rate.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 > ---
->  qemu-io-cmds.c             | 27 ++++++++++++++++++++++++++-
->  tests/qemu-iotests/133     |  9 +++++++++
->  tests/qemu-iotests/133.out |  8 ++++++++
->  3 files changed, 43 insertions(+), 1 deletion(-)
->=20
-> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-> index db0b3ee5ef..4ad5269abc 100644
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -10,6 +10,7 @@
-> =20
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> +#include "qapi/qmp/qdict.h"
->  #include "qemu-io.h"
->  #include "sysemu/block-backend.h"
->  #include "block/block.h"
-> @@ -1978,6 +1979,7 @@ static int reopen_f(BlockBackend *blk, int argc, =
-char **argv)
->      int flags =3D bs->open_flags;
->      bool writethrough =3D !blk_enable_write_cache(blk);
->      bool has_rw_option =3D false;
-> +    bool has_cache_option =3D false;
-> =20
->      BlockReopenQueue *brq;
->      Error *local_err =3D NULL;
-> @@ -1989,6 +1991,7 @@ static int reopen_f(BlockBackend *blk, int argc, =
-char **argv)
->                  error_report("Invalid cache option: %s", optarg);
->                  return -EINVAL;
->              }
-> +            has_cache_option =3D true;
->              break;
->          case 'o':
->              if (!qemu_opts_parse_noisily(&reopen_opts, optarg, 0)) {
-> @@ -2046,9 +2049,31 @@ static int reopen_f(BlockBackend *blk, int argc,=
- char **argv)
->      }
-> =20
->      qopts =3D qemu_opts_find(&reopen_opts, NULL);
-> -    opts =3D qopts ? qemu_opts_to_qdict(qopts, NULL) : NULL;
-> +    opts =3D qopts ? qemu_opts_to_qdict(qopts, NULL) : qdict_new();
->      qemu_opts_reset(&reopen_opts);
-> =20
-> +    if (qdict_haskey(opts, BDRV_OPT_READ_ONLY)) {
-> +        if (has_rw_option) {
-> +            error_report("Can't set both -r/-w and '" BDRV_OPT_READ_ON=
-LY "'");
+>  include/exec/cpu-all.h | 14 ++++++++++++++
+>  accel/tcg/cputlb.c     |  2 +-
+>  2 files changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index 117d2fbbca..d938dedafc 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+> @@ -362,6 +362,20 @@ static inline bool tlb_hit(target_ulong tlb_addr, target_ulong addr)
+>      return tlb_hit_page(tlb_addr, addr & TARGET_PAGE_MASK);
+>  }
+>  
+> +/**
+> + * tlb_is_valid - return true if at least one of the addresses is valid
+> + * @te: pointer to CPUTLBEntry
+> + *
+> + * This is useful when we don't have a particular address to compare against,
+> + * and we just want to know whether any entry holds valid data.
+> + */
+> +static inline bool tlb_is_valid(const CPUTLBEntry *te)
+> +{
+> +    return !(te->addr_read & TLB_INVALID_MASK) ||
+> +           !(te->addr_write & TLB_INVALID_MASK) ||
+> +           !(te->addr_code & TLB_INVALID_MASK);
+> +}
 
-I'm not a fan of elision ("can't") in user interfaces.  (In fact, I'm
-not a fan of elision anywhere in the code base or commit logs, but I
-don't put up a struggle there.)
+No, I think you misunderstand.
 
-> +            qobject_unref(opts);
-> +            return -EINVAL;
-> +        }
-> +    } else {
-> +        qdict_put_bool(opts, BDRV_OPT_READ_ONLY, !(flags & BDRV_O_RDWR=
-));
-> +    }
-> +
-> +    if (qdict_haskey(opts, BDRV_OPT_CACHE_DIRECT) ||
-> +        qdict_haskey(opts, BDRV_OPT_CACHE_NO_FLUSH)) {
-> +        if (has_cache_option) {
-> +            error_report("Can't set both -c and the cache options");
-> +            qobject_unref(opts);
-> +            return -EINVAL;
-> +        }
-> +    } else {
-> +        qdict_put_bool(opts, BDRV_OPT_CACHE_DIRECT, flags & BDRV_O_NOC=
-ACHE);
-> +        qdict_put_bool(opts, BDRV_OPT_CACHE_NO_FLUSH, flags & BDRV_O_N=
-O_FLUSH);
-> +    }
-> +
->      bdrv_subtree_drained_begin(bs);
->      brq =3D bdrv_reopen_queue(NULL, bs, opts, flags);
->      bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &local_err);
-> diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
-> index b9f17c996f..a58130c5b4 100755
-> --- a/tests/qemu-iotests/133
-> +++ b/tests/qemu-iotests/133
-> @@ -98,6 +98,15 @@ echo
-> =20
->  $QEMU_IO -c 'reopen -o read-only=3Dfoo' $TEST_IMG
-> =20
-> +echo
-> +echo "=3D=3D=3D Check that mixing -c/-r/-w and their equivalent option=
-s is forbidden =3D=3D=3D"
-> +echo
-> +
-> +$QEMU_IO -c 'reopen -r -o read-only=3Don' $TEST_IMG
-> +$QEMU_IO -c 'reopen -w -o read-only=3Don' $TEST_IMG
+First, TLB_INVALID_MASK is only ever set for addr_write, in response to
+PAGE_WRITE_INV.  Second, an entry that is invalid for write is still valid for
+read+exec.  So there is benefit to swapping it out to the victim cache.
 
-The equivalent option however would be read-only=3Doff.
-
-> +$QEMU_IO -c 'reopen -c none -o cache.direct=3Don' $TEST_IMG
-> +$QEMU_IO -c 'reopen -c writeback -o cache.direct=3Don' $TEST_IMG
-
-But the equivalent option would be cache.direct=3Doff.
-
-> +$QEMU_IO -c 'reopen -c directsync -o cache.no-flush=3Don' $TEST_IMG
-
-And cache.direct=3Don here.  Or rather, the equivalent -c value for
-cache.no-flush=3Don would be "unsafe".
-
-It doesn't really matter, but if you don't care, it shouldn't say
-"equivalent options" but maybe "corresponding options".
-
-Overall, the patch looks good.
-
-Max
-
->  # success, all done
->  echo "*** done"
->  rm -f $seq.full
-> diff --git a/tests/qemu-iotests/133.out b/tests/qemu-iotests/133.out
-> index 570f623b6b..4d84401688 100644
-> --- a/tests/qemu-iotests/133.out
-> +++ b/tests/qemu-iotests/133.out
-> @@ -28,4 +28,12 @@ format name: null-co
->  =3D=3D=3D Check that invalid options are handled correctly =3D=3D=3D
-> =20
->  Parameter 'read-only' expects 'on' or 'off'
-> +
-> +=3D=3D=3D Check that mixing -c/-r/-w and their equivalent options is f=
-orbidden =3D=3D=3D
-> +
-> +Can't set both -r/-w and 'read-only'
-> +Can't set both -r/-w and 'read-only'
-> +Can't set both -c and the cache options
-> +Can't set both -c and the cache options
-> +Can't set both -c and the cache options
->  *** done
->=20
+This is used by the s390x target to make the "lowpage" read-only, which is a
+special architected 512 byte range within pages 0 and 1.  This is done by
+forcing writes, but not reads, back through tlb_fill.
 
 
-
---u6qO8kCczAZyaEucLtFo6Zkq4VtLu78LC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu6u3IACgkQ9AfbAGHV
-z0Do3Af6A8+Ym9CCuxcV5JoFS1eZp8Hqny29z2Ie69FC3Vm+sPJvDR8UFQuzlUdx
-G7tkNl3b0xhQ8hNCzMuqArGP+p/KGSPSYfyqbhs/0IGgR6l4ID9CcVnmvmgOBOmE
-o3iQv/DU7dAr8zpKrZ8tAc7QvmAWrYLJRLcR4t+bz+AFKTtgdPh48czx3+Q1zQ+n
-BrEduG+PUS25zAFXEsg7vBm6LBiZdBUZ40cr/5oIcLRUiXTbyiOf/uq5cA4/QJl/
-86YIW7gvyE8aZ7J+GI9SRvjwJpHs2vmDq1j4phpz5XKwuCTdXRoQ5ad3k3IFH+1J
-L9OGOVc4sXs7ZD2kEYV7OZB9rWJdlg==
-=0rzh
------END PGP SIGNATURE-----
-
---u6qO8kCczAZyaEucLtFo6Zkq4VtLu78LC--
+r~
