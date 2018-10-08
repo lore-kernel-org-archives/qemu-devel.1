@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W6q-00028x-1j
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:02:13 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1g9W7w-0002yh-1c
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:03:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W6g-0008CR-1q
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:02:07 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51694)
+	(envelope-from <amarkovic@wavecomp.com>) id 1g9W7n-0000Sy-FA
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:03:14 -0400
+Received: from mail-eopbgr710112.outbound.protection.outlook.com
+	([40.107.71.112]:60747
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1g9W6f-0006yM-P3
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:01:57 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9W4u-0003e6-SP
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 15:00:08 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  8 Oct 2018 14:59:32 +0100
-Message-Id: <20181008140004.12612-2-peter.maydell@linaro.org>
-In-Reply-To: <20181008140004.12612-1-peter.maydell@linaro.org>
-References: <20181008140004.12612-1-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1g9W7n-0000R3-5Y
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 10:03:07 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Mon, 8 Oct 2018 14:03:02 +0000
+Message-ID: <BN6PR2201MB12511229AE9C933EDBC0D105C6E60@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1538752793-6875-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1538752793-6875-5-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1538752793-6875-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/33] target/arm: fix code comments error
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] target/mips: Add bit definitions
+ for DSP R3 ASE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
 
-From: Dongjiu Geng <gengdongjiu@huawei.com>
 
-The parameter of kvm_arm_init_cpreg_list() is ARMCPU instead of
-CPUState, so correct the note to make it match the code.
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>
+> Add DSP R3 ASE related bit definition for insn_flags and hflags.
+>=20
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Message-id: 1538069046-5757-1-git-send-email-gengdongjiu@huawei.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/kvm_arm.h | 4 ++--
- target/arm/kvm.c     | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+This should be integrated with other pending insn_flags cleanups.
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 863f205822e..5948e8b5602 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -50,9 +50,9 @@ void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
- 
- /**
-  * kvm_arm_init_cpreg_list:
-- * @cs: CPUState
-+ * @cpu: ARMCPU
-  *
-- * Initialize the CPUState's cpreg list according to the kernel's
-+ * Initialize the ARMCPU cpreg list according to the kernel's
-  * definition of what CPU registers it knows about (and throw away
-  * the previous TCG-created cpreg list).
-  *
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 65f867d5692..54ef5f711b8 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -310,7 +310,7 @@ static int compare_u64(const void *a, const void *b)
-     return 0;
- }
- 
--/* Initialize the CPUState's cpreg list according to the kernel's
-+/* Initialize the ARMCPU cpreg list according to the kernel's
-  * definition of what CPU registers it knows about (and throw away
-  * the previous TCG-created cpreg list).
-  */
--- 
-2.19.0
+hflags need cleaning too, but this is not planned this year. Any such
+cleanup should be beyond the scope of this patch. So:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>=
