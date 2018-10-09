@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9oIf-0006TR-2r
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:27:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1g9oLY-0007Td-It
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9oId-0001BT-5z
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:27:32 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41364)
+	(envelope-from <peter.maydell@linaro.org>) id 1g9oLW-0003OL-Hm
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:30:31 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43907)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g9oIc-00019b-SY
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:27:31 -0400
-Received: by mail-wr1-x443.google.com with SMTP id x12-v6so998627wru.8
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:27:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1g9oLS-0003JT-V5
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:30:27 -0400
+Received: by mail-ot1-x341.google.com with SMTP id k9so891725otl.10
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:30:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-12-armbru@redhat.com>
-In-Reply-To: <20181008173125.19678-12-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Oct 2018 13:27:16 +0400
-Message-ID: <CAJ+F1CJ9p9Vib50dQ-x9TJ3BBzqaSFXXWrF97mdaHaNj76PAmQ@mail.gmail.com>
+In-Reply-To: <20181008213407.GF4229@toto>
+References: <1538579266-8389-1-git-send-email-edgar.iglesias@gmail.com>
+	<1538579266-8389-11-git-send-email-edgar.iglesias@gmail.com>
+	<CAFEAcA9b4O4HrMwNTgbZ7JYdO=S3dnzC8ayabBEpKY5=DyBMog@mail.gmail.com>
+	<20181008213407.GF4229@toto>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 9 Oct 2018 10:30:01 +0100
+Message-ID: <CAFEAcA__7wJ-4mNe3rKe4T+gDUbdBH+rB-DHE+fddmjVzG2=Eg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 11/31] migration: Fix
- !replay_can_snapshot() error handling
+Subject: Re: [Qemu-devel] [PATCH v1 10/12] target/arm: Add the Cortex-A72
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>, KONRAD Frederic <frederic.konrad@adacore.com>, Alistair Francis <alistair@alistair23.me>, Francisco Iglesias <frasse.iglesias@gmail.com>, figlesia@xilinx.com, Stefano Stabellini <sstabellini@kernel.org>, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 
-Hi
-On Mon, Oct 8, 2018 at 9:33 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  save_snapshot() and load_snapshot() do that, and then
-> fail without setting an error.  Wrong.  The HMP commands survive this
-> unscathed, since hmp_handle_error() does nothing when no error has
-> been set.  Callers main() (on behalf of -loadvm) and
-> replay_vmstate_init() crash, but I'm not sure the error is possible
-> there.
->
-> Screwed up when commit 377b21ccea1 (v2.12.0) added incorrect error
-> handling right next to correct examples.  Fix by calling error_setg()
-> instead of error_report().
->
-> Fixes: 377b21ccea1755a8b0dae822c29567c58dda6939
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 8 October 2018 at 22:34, Edgar E. Iglesias <edgar.iglesias@xilinx.com> wrote:
+> On Mon, Oct 08, 2018 at 02:10:29PM +0100, Peter Maydell wrote:
+>> On 3 October 2018 at 16:07, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+>> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>> >
+>> > Add the ARM Cortex-A72.
+>> >
+>> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> > +    cpu->midr = 0x410fd083;
+>> > +    cpu->revidr = 0x00000000;
+>> > +    cpu->reset_fpsid = 0x41034080;
+>> > +    cpu->mvfr0 = 0x10110222;
+>> > +    cpu->mvfr1 = 0x12111111;
+>> > +    cpu->mvfr2 = 0x00000043;
+>> > +    cpu->ctr = 0x8444c004;
+>> > +    cpu->reset_sctlr = 0x00c50838;
+>>
+>> Do you happen to have the hardware to hand to check what the
+>> top 4 bits of the reset value of SCTLR_ELx are? I think they
+>> should be 0x3 -- the Arm ARM says that [29:28] are RES1 (as
+>> does the A72 TRM, though its top level summary table lists
+>> 0x00c50838 as the reset value for some of the SCTLR_ELx.)
+>>
+>> QEMU may have the wrong value for A53/A57 here too, I suspect.
+>
+> I don't have access to the A72s at the moment but looking at logs
+> it seems to be 0x00c50838 for both the A53 and A72.
+> Looking at "Table 4-118 SCTLR bit assignments" in the A72 TRM,
+> bits [30:28] seem to have been allocated. Bit 30 depends on
+> configuration inputs to the core and [29:28] seem to be hard-coded
+> to zero.
 
-> ---
->  migration/savevm.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 2d10e45582..5f8eb38676 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2414,8 +2414,8 @@ int save_snapshot(const char *name, Error **errp)
->      AioContext *aio_context;
->
->      if (!replay_can_snapshot()) {
-> -        error_report("Record/replay does not allow making snapshot "
-> -                     "right now. Try once more later.");
-> +        error_setg(errp, "Record/replay does not allow making snapshot "
-> +                   "right now. Try once more later.");
->          return ret;
->      }
->
-> @@ -2611,8 +2611,8 @@ int load_snapshot(const char *name, Error **errp)
->      MigrationIncomingState *mis =3D migration_incoming_get_current();
->
->      if (!replay_can_snapshot()) {
-> -        error_report("Record/replay does not allow loading snapshot "
-> -                     "right now. Try once more later.");
-> +        error_setg(errp, "Record/replay does not allow loading snapshot =
-"
-> +                   "right now. Try once more later.");
->          return -EINVAL;
->      }
->
-> --
-> 2.17.1
->
->
+Ah, this is a 32-bit view vs 64-bit view thing. In 32-bit,
+SCTLR[28] is TRE (TEX remap enable), and SCTLR[29] is AFE
+(access flag enable), and both are resets-to-zero.
+HSCTLR[28] and [29] are both reserved, RES1.
+In 64-bit, SCTLR_EL1[29:28] are RES1 in ARMv8.1 and v8.0, and
+have new meanings assigned in v8.2 and v8.3.
+SCTLR_EL2[29:28] and SCTLR_EL3[29:28] are reserved, RES1.
 
+For QEMU at the moment we don't deal with this, and so we
+have only the one reset value, cpu->reset_sctlr, which we use
+for both the SCTLR_EL1 and SCTLR_EL3 resets. Our HSCTLR/SCTLR_EL2
+resets to zero, and we don't allow for the 64-bit and 32-bit views
+not necessarily being the same value.
 
---=20
-Marc-Andr=C3=A9 Lureau
+thanks
+-- PMM
