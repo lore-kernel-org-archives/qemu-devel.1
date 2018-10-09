@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9wYi-0007eA-EG
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:16:42 -0400
+	(envelope-from <cota@braap.org>) id 1g9wcv-00025M-Uv
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9wYe-00017G-Iu
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:16:40 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:33667)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9wYe-000170-BR
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:16:36 -0400
-Received: by mail-wr1-x435.google.com with SMTP id e4-v6so2887319wrs.0
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 11:16:36 -0700 (PDT)
-References: <20181009041826.19462-1-crosa@redhat.com>
-	<20181009041826.19462-4-crosa@redhat.com>
-	<75560722-a9f5-5ec9-b851-d521960ed8eb@redhat.com>
-	<d56ed2c4-d310-5048-3c02-682cf2934f85@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <d56ed2c4-d310-5048-3c02-682cf2934f85@redhat.com>
-Date: Tue, 09 Oct 2018 19:16:33 +0100
-Message-ID: <874ldvm1dq.fsf@linaro.org>
+	(envelope-from <cota@braap.org>) id 1g9wcq-0004JU-BL
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:21:01 -0400
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:57761)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9wcp-0004IT-TN
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:20:56 -0400
+Date: Tue, 9 Oct 2018 14:20:53 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181009182053.GA28943@flamenco>
+References: <20181009174557.16125-1-cota@braap.org>
+	<20181009174557.16125-2-cota@braap.org>
+	<CAFEAcA8DyV6_BfRZT2_9K1PKNkPnLqw8e=55uJ3R1r5+ejkRFw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] Travis support for the acceptance
- tests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8DyV6_BfRZT2_9K1PKNkPnLqw8e=55uJ3R1r5+ejkRFw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] target/alpha: remove tlb_flush from
+ alpha_cpu_initfn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,172 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
 
+On Tue, Oct 09, 2018 at 18:55:30 +0100, Peter Maydell wrote:
+> On 9 October 2018 at 18:45, Emilio G. Cota <cota@braap.org> wrote:
+(snip)
+> > @@ -201,7 +201,6 @@ static void alpha_cpu_initfn(Object *obj)
+> >      CPUAlphaState *env = &cpu->env;
+> >
+> >      cs->env_ptr = env;
+> > -    tlb_flush(cs);
+> >
+> >      env->lock_addr = -1;
+> >  #if defined(CONFIG_USER_ONLY)
+> > --
+> > 2.17.1
+> 
+> Definitely agreed that we don't want to tlb_flush in the
+> target cpu initfn.
+> 
+> 
+> What's the codepath by which tlb_flush gets called on
+> cpu reset? I had a quick look but couldn't find it...
 
-Cleber Rosa <crosa@redhat.com> writes:
+>From cpu.c:
 
-> On 10/9/18 9:46 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi Cleber,
->>
->> On 09/10/2018 06:18, Cleber Rosa wrote:
->>> This enables the execution of the acceptance tests on Travis.
->>
->> Did you test this? =3D)
->>
->
-> I did have some jobs on Travis that looked promising.  But yeah, later I
-> found some issues. :/
->
->>>
->>> Because the Travis environment is based on Ubuntu Trusty, it requires
->>> the python3-pip.
->>>
->>> Note: while another supposedely required component on newer versions
->>> (such as on Bionic) split the Python 3 installation further on the
->>> python3-venv package.
->>>
->>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>> ---
->>>  .travis.yml | 6 ++++++
->>>  1 file changed, 6 insertions(+)
->>>
->>> diff --git a/.travis.yml b/.travis.yml
->>> index 95be6ec59f..db1a31ea51 100644
->>> --- a/.travis.yml
->>> +++ b/.travis.yml
->>> @@ -36,6 +36,7 @@ addons:
->>>        - liburcu-dev
->>>        - libusb-1.0-0-dev
->>>        - libvte-2.90-dev
->>> +      - python3-pip
->>>        - sparse
->>>        - uuid-dev
->>>        - gcovr
->>> @@ -117,6 +118,11 @@ matrix:
->>>      - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
->>>        python:
->>>          - "3.6"
->>> +    # Acceptance (Functional) tests
->>> +    - env: CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_6=
-4-softmmu"
->>> +           TEST_CMD=3D"make check-acceptance"
->>> +      python:
->>> +        - "3.6"
->>>      # Using newer GCC with sanitizers
->>>      - addons:
->>>          apt:
->>>
->>
->> Using the following patch:
->>
->> -- >8 --
->> diff --git a/.travis.yml b/.travis.yml
->> index 95be6ec59f..87e0c9a13f 100644
->> --- a/.travis.yml
->> +++ b/.travis.yml
->> @@ -118,4 +118,15 @@ matrix:
->>        python:
->>          - "3.6"
->> +    # Acceptance (Functional) tests
->> +    - env: CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64=
--softmmu"
->> +           TEST_CMD=3D"make check-acceptance"
->> +           # sudo rm /usr/local/bin/pip*
->> +      python:
->> +        - "3.6"
->> +      addons:
->> +        apt:
->> +          packages:
->> +            - python3-pip
->> +            - python3.4-venv
->
-> This patch revealed to me that, even though we're asking Travis for a
-> Python 3.6 stack, we're manually pointing to the primary Python (3.4)
-> installation.  This is in itself a source of problems.
->
-> Read on...
->
->>      # Using newer GCC with sanitizers
->>      - addons:
->> ---
->>
->> I got some improvements until:
->>
->>   VENV    /home/travis/build/philmd/qemu/tests/venv
->>   MKDIR   /home/travis/build/philmd/qemu/tests/results
->>   PIP     /home/travis/build/philmd/qemu/tests/venv-requirements.txt
->> Exception:
->> Traceback (most recent call last):
->>   File "/usr/lib/python3/dist-packages/pip/basecommand.py", line 122, in
->> main
->>     status =3D self.run(options, args)
->>   File "/usr/lib/python3/dist-packages/pip/commands/install.py", line
->> 283, in run
->>     requirement_set.install(install_options, global_options,
->> root=3Doptions.root_path)
->>   File "/usr/lib/python3/dist-packages/pip/req.py", line 1436, in install
->>     requirement.install(install_options, global_options, *args, **kwargs)
->>   File "/usr/lib/python3/dist-packages/pip/req.py", line 672, in install
->>     self.move_wheel_files(self.source_dir, root=3Droot)
->>   File "/usr/lib/python3/dist-packages/pip/req.py", line 902, in
->> move_wheel_files
->>     pycompile=3Dself.pycompile,
->>   File "/usr/lib/python3/dist-packages/pip/wheel.py", line 206, in
->> move_wheel_files
->>     clobber(source, lib_dir, True)
->>   File "/usr/lib/python3/dist-packages/pip/wheel.py", line 193, in clobb=
-er
->>     os.makedirs(destsubdir)
->>   File "/usr/lib/python3.4/os.py", line 237, in makedirs
->>     mkdir(name, mode)
->> PermissionError: [Errno 13] Permission denied:
->> '/usr/local/lib/python3.4/dist-packages/avocado'
->>
->
-> This looks to me like it's caused by the use of the system wide Python
-> 3.4 installation, as mentioned above.  That, and possibly the
-> "--system-wide-packages" flag to the venv.
->
-> So, in order to understand if, in those environments, we should let
-> "configure" pick up the right Python, I did the following experiment:
->
->  $ python3 -m venv /tmp/py3-build
->  $ . /tmp/py3-build/bin/activate
->  $ which python
->  /tmp/py3-build/bin/python
->  $ /tmp/py3-build/bin/python --version
->  Python 3.6.6
->
-> This shows that when a venv is activated, the "right" Python should be
-> available in the $PATH.  So, building QEMU without pointint to a
-> specific Python binary (when inside a venv) gives you:
->
->  $ mkdir -p /tmp/qemu-build
->  $ cd /tmp/qemu-build
->  $ ~/src/qemu/configure --target-list=3D"x86_64-softmmu"
->  $ make print-PYTHON
->  PYTHON=3Dpython -B
->  $ which python
->  /tmp/py3-build/bin/python
->
-> The whole question now is how/where Travis puts the requested Python
-> version (python: - "3.6").  Is it on a venv?  Is it on a specific
-> location? Is that reliable enough?
->
-> I'm going to look for those answers now.
+static void cpu_common_reset(CPUState *cpu)
+{
+    CPUClass *cc = CPU_GET_CLASS(cpu);
+...
+    if (tcg_enabled()) {
+        cpu_tb_jmp_cache_clear(cpu);
 
-You can experiment with the Travis environment on your own system using:
+        tcg_flush_softmmu_tlb(cpu);
+    }
+}
 
-  make docker-test-build@travis DEBUG=3D1
+tcg_flush_softmmu_tlb is defined in translate-all.c:
 
->
-> - Cleber.
->
->> See: https://travis-ci.org/philmd/qemu/jobs/439138706
->>
+/* This is a wrapper for common code that can not use CONFIG_SOFTMMU */
+void tcg_flush_softmmu_tlb(CPUState *cs)
+{
+#ifdef CONFIG_SOFTMMU
+    tlb_flush(cs);
+#endif
+}
 
+> (The other dubious-looking bit of flushing in the
+> target/alpha code is the code that generates calls
+> to tb_flush()... we have very few calls to tb_flush
+> outside the 'core' code and I suspect they could all
+> be avoided.)
 
---
-Alex Benn=C3=A9e
+If the comment below is accurate, seems fair enough.
+tb_flush is only called from target/alpha through a helper,
+generated by:
+
+        /* PALBR */
+        tcg_gen_st_i64(vb, cpu_env, offsetof(CPUAlphaState, palbr));
+        /* Changing the PAL base register implies un-chaining all of the TBs
+           that ended with a CALL_PAL.  Since the base register usually only
+           changes during boot, flushing everything works well.  */
+        gen_helper_tb_flush(cpu_env);
+        return DISAS_PC_STALE;
+
+Thanks,
+
+		Emilio
