@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1g9tcL-0005JC-2E
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:08:14 -0400
+	(envelope-from <berto@igalia.com>) id 1g9tiu-0001om-LH
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1g9tcG-0004Ez-IA
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:08:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38742)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1g9tcG-0004DZ-0l
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:08:08 -0400
-Date: Tue, 9 Oct 2018 09:08:01 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181009090801.6f53286d@w520.home>
-In-Reply-To: <9BD73EA91F8E404F851CF3F519B14AA80180A4A5@DGGEMI521-MBX.china.huawei.com>
-References: <9BD73EA91F8E404F851CF3F519B14AA80180A4A5@DGGEMI521-MBX.china.huawei.com>
+	(envelope-from <berto@igalia.com>) id 1g9tio-00012Q-3c
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:15:00 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:36284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1g9tin-00010i-HW
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:14:53 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181009145839.GJ22838@redhat.com>
+References: <20181009125541.24455-1-berrange@redhat.com>
+	<20181009125541.24455-4-berrange@redhat.com>
+	<w51k1mr8993.fsf@maestria.local.igalia.com>
+	<20181009145839.GJ22838@redhat.com>
+Date: Tue, 09 Oct 2018 17:14:51 +0200
+Message-ID: <w51efcz8844.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] The results of lspci are inconsistent between vfio
- reset pci devices and reset devices by sysfs interafce
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] crypto: introduce a xts_uint128 data
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,79 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wuzongyong (Euler Dept)" <cordius.wu@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Chenhaiwu (Euler)" <chenhaiwu1@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, 9 Oct 2018 12:11:29 +0000
-"Wuzongyong (Euler Dept)" <cordius.wu@huawei.com> wrote:
+On Tue 09 Oct 2018 04:58:39 PM CEST, Daniel P. Berrang=C3=A9 wrote:
+>> > @@ -85,7 +90,7 @@ void xts_decrypt(const void *datactx,
+>> >                   uint8_t *dst,
+>> >                   const uint8_t *src)
+>> >  {
+>> > -    uint8_t PP[XTS_BLOCK_SIZE], CC[XTS_BLOCK_SIZE], T[XTS_BLOCK_SIZE];
+>> > +    xts_uint128 PP, CC, T;
+>> >      unsigned long i, m, mo, lim;
+>>=20
+>>    [...]
+>>=20
+>> >          /* Pm =3D first length % XTS_BLOCK_SIZE bytes of PP */
+>> >          for (i =3D 0; i < mo; i++) {
+>> > -            CC[i] =3D src[XTS_BLOCK_SIZE + i];
+>> > -            dst[XTS_BLOCK_SIZE + i] =3D PP[i];
+>> > +            ((uint8_t *)&CC)[i] =3D src[XTS_BLOCK_SIZE + i];
+>> > +            dst[XTS_BLOCK_SIZE + i] =3D ((uint8_t *)&PP)[i];
+>> >          }
+>>=20
+>> On second thoughts, these casts are a bit cumbersome. I wonder if it
+>> isn't better to keep the array a uint8_t[] and only treat it as
+>> xts_uint128 in the places where you actually do 64-bit operations
+>> (xts_uint128_xor, xts_mult_x).
+>
+> I had done that originally, but it just shifts ugly casts from one
+> place to another place in the code.
 
-> Hi,
-> 
-> I start a virtual machine with commandline:
->     /usr/libexec/qemu-kvm --enable-kvm -smp 8 -m 8192 -device vfio-pci,host=0000:81:00.0
-> 
-> Then I pause the qemu process before executing the main_loop function by gdb.
-> At this moment, lspci shows the regions are disabled like below:
->     81:00.0 3D controller: NVIDIA Corporation GP100GL [Tesla P100 PCIe 16GB] (rev a1)
->         Subsystem: NVIDIA Corporation Device 118f
->         Physical Slot: 0-6
->         Control: I/O- Mem- BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx+
->         Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
->         Interrupt: pin A routed to IRQ 35
->         NUMA node: 1
->         Region 0: Memory at c8000000 (32-bit, non-prefetchable) [disabled] [size=16M]
->         Region 1: Memory at 27800000000 (64-bit, prefetchable) [disabled] [size=16G]
->         Region 3: Memory at 27c00000000 (64-bit, prefetchable) [disabled] [size=32M]
-> 
-> But after the command:
-> echo 1 > /sys/bus/pci/devices/0000:81:00.0/reset
-> lspci shows the regions are *not* disabled:
->     81:00.0 3D controller: NVIDIA Corporation GP100GL [Tesla P100 PCIe 16GB] (rev a1)
->         Subsystem: Huawei Technologies Co., Ltd. Device 2061
->         Physical Slot: 0-6
->         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr+ Stepping- SERR+ FastB2B- DisINTx-
->         Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
->         Latency: 0, Cache Line Size: 32 bytes
->         Interrupt: pin A routed to IRQ 7
->         NUMA node: 1
->         Region 0: Memory at c8000000 (32-bit, non-prefetchable) [size=16M]
->         Region 1: Memory at 27800000000 (64-bit, prefetchable) [size=16G]
->         Region 3: Memory at 27c00000000 (64-bit, prefetchable) [size=32M]
-> 
-> AFAIK, qemu performs vfio_pci_reset like the below callstack:
->     Qemu:
->         vfio_pci_reset
->             ioctl(vdev->vbasedev.fd, VFIO_DEVICE_RESET)
-> Kernel:
->     vfio_pci_ioctl
->         pci_try_reset_function
->             __pci_reset_function_locked
->                     pci_parent_bus_reset
->                         pci_reset_bridge_secondary_bus
-> 
-> and write 1 to the reset interface of sysfs go through the path:
-> Kernel:
->     reset_store
->         pci_reset_function
->             __pci_reset_function_locked
->                     pci_parent_bus_reset
->                         pci_reset_bridge_secondary_bus
-> 
-> So seem that these two methods are same actually, I am confused why the results are inconsistent.
+Does it really? There's a dozen casts to uint8_t * in different
+places. If you use uint_8[] you would only need something like this:
 
-Maybe there's a misunderstanding here, the kernel PCI reset functions
-save and restore config space around the reset.  The intention of the
-reset is to re-init the internal state of the device while preserving
-(via save+restore) the config space.  The BARs being disabled is simply
-a matter of the Memory bit in the Command register being unset (note
-Mem-).  Whether this is indicative of some issue depends on whether the
-state before reset matches the state after reset, not that the states
-after two different paths of triggering a reset are identical.
+static void xts_mult_x(uint8_t *I8)
+{
+    xts_uint128 *I =3D (xts_uint128 *) I8;
+    /* ... the rest of the function remains the same ... */
+}
 
-vfio-pci will hand off the device to the user (QEMU) disabled, so the
-states in the first example make sense to me.  In the second case, it's
-not clear what the starting state is for the device.  Was this reset
-performed from the starting point of the first case or is the device in
-some arbitrary, unknown state prior to reset?  Thanks,
+And something similar in xts_uint128_xor(), which could be an inline
+function instead of a macro.
 
-Alex
+Berto
