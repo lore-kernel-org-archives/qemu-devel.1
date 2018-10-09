@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9wcv-00025M-Uv
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:21:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1g9wf7-0003C6-1B
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9wcq-0004JU-BL
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:21:01 -0400
-Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:57761)
+	(envelope-from <eblake@redhat.com>) id 1g9wf0-0006Dm-Ep
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:23:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9wcp-0004IT-TN
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:20:56 -0400
-Date: Tue, 9 Oct 2018 14:20:53 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181009182053.GA28943@flamenco>
-References: <20181009174557.16125-1-cota@braap.org>
-	<20181009174557.16125-2-cota@braap.org>
-	<CAFEAcA8DyV6_BfRZT2_9K1PKNkPnLqw8e=55uJ3R1r5+ejkRFw@mail.gmail.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g9wf0-0006DR-7w
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:23:10 -0400
+References: <20181009181612.10633-1-peter.maydell@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a7f3a1b3-7c06-b82b-3201-4db1175ee8f0@redhat.com>
+Date: Tue, 9 Oct 2018 13:23:07 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8DyV6_BfRZT2_9K1PKNkPnLqw8e=55uJ3R1r5+ejkRFw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] target/alpha: remove tlb_flush from
- alpha_cpu_initfn
+In-Reply-To: <20181009181612.10633-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] coccinelle: new inplace-byteswaps.cocci to
+ remove inplace-byteswapping calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, patches@linaro.org
 
-On Tue, Oct 09, 2018 at 18:55:30 +0100, Peter Maydell wrote:
-> On 9 October 2018 at 18:45, Emilio G. Cota <cota@braap.org> wrote:
-(snip)
-> > @@ -201,7 +201,6 @@ static void alpha_cpu_initfn(Object *obj)
-> >      CPUAlphaState *env = &cpu->env;
-> >
-> >      cs->env_ptr = env;
-> > -    tlb_flush(cs);
-> >
-> >      env->lock_addr = -1;
-> >  #if defined(CONFIG_USER_ONLY)
-> > --
-> > 2.17.1
+On 10/9/18 1:16 PM, Peter Maydell wrote:
+> Add a new Coccinelle script which replaces uses of the inplace
+> byteswapping functions *_to_cpus() and cpu_to_*s() with their
+> not-in-place equivalents. This is useful for where the swapping
+> is done on members of a packed struct -- taking the address
+> of the member to pass it to an inplace function is undefined
+> behaviour in C.
 > 
-> Definitely agreed that we don't want to tlb_flush in the
-> target cpu initfn.
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Richard asked for a coccinelle script in the scripts/coccinelle
+> directory, so here's a patch to add it.
 > 
+>   scripts/coccinelle/inplace-byteswaps.cocci | 65 ++++++++++++++++++++++
+>   1 file changed, 65 insertions(+)
+>   create mode 100644 scripts/coccinelle/inplace-byteswaps.cocci
 > 
-> What's the codepath by which tlb_flush gets called on
-> cpu reset? I had a quick look but couldn't find it...
+> diff --git a/scripts/coccinelle/inplace-byteswaps.cocci b/scripts/coccinelle/inplace-byteswaps.cocci
+> new file mode 100644
+> index 00000000000..a869a90cbfd
+> --- /dev/null
+> +++ b/scripts/coccinelle/inplace-byteswaps.cocci
+> @@ -0,0 +1,65 @@
+> +// Replace uses of in-place byteswapping functions with calls to the
+> +// equivalent not-in-place functions.  This is necessary to avoid
+> +// undefined behaviour if the expression being swapped is a field in a
+> +// packed struct.
+> +
+> +@@
+> +expression E;
+> +@@
+> +-be16_to_cpus(&E);
+> ++E = be16_to_cpu(E);
+> +@@
+> +expression E;
+> +@@
+> +-be32_to_cpus(&E);
+> ++E = be32_to_cpu(E);
 
->From cpu.c:
+It's probably possible to shorten this as:
 
-static void cpu_common_reset(CPUState *cpu)
-{
-    CPUClass *cc = CPU_GET_CLASS(cpu);
+@@
+expression E;
+@@
+(
+-be16_to_cpus(&E);
++E = be16_to_cpu(E);
+|
+-be32_to_cpus(&E);
++E = be32_to_cpu(E);
 ...
-    if (tcg_enabled()) {
-        cpu_tb_jmp_cache_clear(cpu);
+)
 
-        tcg_flush_softmmu_tlb(cpu);
-    }
-}
+But I'm also okay if the long form gets checked in.
 
-tcg_flush_softmmu_tlb is defined in translate-all.c:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-/* This is a wrapper for common code that can not use CONFIG_SOFTMMU */
-void tcg_flush_softmmu_tlb(CPUState *cs)
-{
-#ifdef CONFIG_SOFTMMU
-    tlb_flush(cs);
-#endif
-}
-
-> (The other dubious-looking bit of flushing in the
-> target/alpha code is the code that generates calls
-> to tb_flush()... we have very few calls to tb_flush
-> outside the 'core' code and I suspect they could all
-> be avoided.)
-
-If the comment below is accurate, seems fair enough.
-tb_flush is only called from target/alpha through a helper,
-generated by:
-
-        /* PALBR */
-        tcg_gen_st_i64(vb, cpu_env, offsetof(CPUAlphaState, palbr));
-        /* Changing the PAL base register implies un-chaining all of the TBs
-           that ended with a CALL_PAL.  Since the base register usually only
-           changes during boot, flushing everything works well.  */
-        gen_helper_tb_flush(cpu_env);
-        return DISAS_PC_STALE;
-
-Thanks,
-
-		Emilio
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
