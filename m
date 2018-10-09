@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9uiK-0001gX-Jd
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:18:29 -0400
+	(envelope-from <philmd@redhat.com>) id 1g9uiR-0001jS-9n
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:18:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9uiI-0003xy-O5
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:18:28 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1g9uiI-0003sF-DA
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:18:26 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  9 Oct 2018 17:18:14 +0100
-Message-Id: <20181009161814.21257-1-peter.maydell@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1g9uiO-00042a-0X
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:18:35 -0400
+Received: from mail-wr1-f52.google.com ([209.85.221.52]:36296)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9uiN-00041q-NH
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:18:31 -0400
+Received: by mail-wr1-f52.google.com with SMTP id y16so2488069wrw.3
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 09:18:31 -0700 (PDT)
+References: <20181009041826.19462-1-crosa@redhat.com>
+	<20181009041826.19462-3-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2d9fea54-67ea-3cc5-6766-dd759710faab@redhat.com>
+Date: Tue, 9 Oct 2018 18:18:28 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] linux-user: Suppress
- address-of-packed-member warnings in __get/put_user_e
+In-Reply-To: <20181009041826.19462-3-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] Acceptance tests: add make rule for
+ running them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +31,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Our __get_user_e() and __put_user_e() macros cause newer versions
-of clang to generate false-positive -Waddress-of-packed-member
-warnings if they are passed the address of a member of a packed
-struct (see https://bugs.llvm.org/show_bug.cgi?id=39113).
-Suppress these using the _Pragma() operator. Unfortunately
-_Pragma() support in gcc is broken in some gcc versions and
-in some usage contexts, so we limit the pragma usage here to clang.
+On 09/10/2018 06:18, Cleber Rosa wrote:
+> The acceptance (aka functional, aka Avocado-based) tests are
+> Python files located in "tests/acceptance" that need to be run
+> with the Avocado libs and test runner.
+> 
+> Let's provide a convenient way for QEMU developers to run them,
+> by making use of the tests-venv with the required setup.
+> 
+> Also, while the Avocado test runner will take care of creating a
+> location to save test results to, it was understood that it's better
+> if the results are kept within the build tree.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  docs/devel/testing.rst      | 35 ++++++++++++++++++++++++++++++-----
+>  tests/Makefile.include      | 17 +++++++++++++++--
+>  tests/venv-requirements.txt |  1 +
+>  3 files changed, 46 insertions(+), 7 deletions(-)
+> 
+> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> index 727c4019b5..b992a2961d 100644
+> --- a/docs/devel/testing.rst
+> +++ b/docs/devel/testing.rst
+> @@ -545,10 +545,31 @@ Tests based on ``avocado_qemu.Test`` can easily:
+>     - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
+>     - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
+>  
+> -Installation
+> -------------
+> +Running tests
+> +-------------
+>  
+> -To install Avocado and its dependencies, run:
+> +You can run the acceptance tests simply by executing:
+> +
+> +.. code::
+> +
+> +  make check-acceptance
+> +
+> +This involves the automatic creation of Python virtual environment
+> +within the build tree (at ``tests/venv``) which will have all the
+> +right dependencies, and will save tests results also within the
+> +build tree (at ``tests/results``).
+> +
+> +Note: the build environment must be using a Python 3 stack, and have
+> +the ``venv`` and ``pip`` packages installed.  If necessary, make sure
+> +``configure`` is called with ``--python=`` and that those modules are
+> +available.  On Debian and Ubuntu based systems, depending on the
+> +specific version, they may be on packages named ``python3-venv`` and
+> +``python3-pip``.
+> +
+> +Manual Installation
+> +-------------------
+> +
+> +To manually install Avocado and its dependencies, run:
+>  
+>  .. code::
+>  
+> @@ -689,11 +710,15 @@ The exact QEMU binary to be used on QEMUMachine.
+>  Uninstalling Avocado
+>  --------------------
+>  
+> -If you've followed the installation instructions above, you can easily
+> -uninstall Avocado.  Start by listing the packages you have installed::
+> +If you've followed the manual installation instructions above, you can
+> +easily uninstall Avocado.  Start by listing the packages you have
+> +installed::
+>  
+>    pip list --user
+>  
+>  And remove any package you want with::
+>  
+>    pip uninstall <package_name>
+> +
+> +If you've used ``make check-acceptance``, the Python virtual environment where
+> +Avocado is installed will be cleaned up as part of ``make check-clean``.
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 68af79927d..00fdf9913e 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -11,6 +11,7 @@ check-help:
+>  	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+>  	@echo " $(MAKE) check-block          Run block tests"
+>  	@echo " $(MAKE) check-tcg            Run TCG tests"
+> +	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
+>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+>  	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+>  	@echo " $(MAKE) check-clean          Clean the tests"
+> @@ -1018,10 +1019,11 @@ check-decodetree:
+>  
+>  # Python venv for running tests
+>  
+> -.PHONY: check-venv
+> +.PHONY: check-venv check-acceptance
+>  
+>  TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+>  TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
+> +TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
+>  
+>  $(TESTS_VENV_DIR):
+>  	$(call quiet-command, \
+> @@ -1031,8 +1033,19 @@ $(TESTS_VENV_DIR):
+>              $(TESTS_VENV_DIR)/bin/pip -q install -r $(TESTS_VENV_REQ), \
+>              PIP, $(TESTS_VENV_REQ))
+>  
+> +$(TESTS_RESULTS_DIR):
+> +	$(call quiet-command, mkdir -p $@, \
+> +            MKDIR, $@)
+> +
+>  check-venv: $(TESTS_VENV_DIR)
+>  
+> +check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+> +	$(call quiet-command, \
+> +            $(TESTS_VENV_DIR)/bin/python -m avocado \
+> +            --show=none run --job-results-dir=$(TESTS_RESULTS_DIR) --failfast=on \
 
-To put in the pragmas we need to convert the macros from
-expressions to statements, but all the callsites effectively
-treat them as statements already so this is OK.
+Can we add an overwritable env var such AVOCADO_SHOW=none ?
+I'd use it for Travis, to see which test failed on the console output.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Changes v1->v2: _Pragma() in gcc appears to be a disaster area;
-limit the use of it to clang only, since it's just clang that
-emits the bogus warning in this case. Tested on clang-3.8.0,
-clang-7, gcc 5.4.0 and gcc 8.0.1.
-
- linux-user/qemu.h | 70 ++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 51 insertions(+), 19 deletions(-)
-
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index b4959e41c6e..1beb6a2cfc4 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -461,27 +461,59 @@ static inline int access_ok(int type, abi_ulong addr, abi_ulong size)
-    These are usually used to access struct data members once the struct has
-    been locked - usually with lock_user_struct.  */
- 
--/* Tricky points:
--   - Use __builtin_choose_expr to avoid type promotion from ?:,
--   - Invalid sizes result in a compile time error stemming from
--     the fact that abort has no parameters.
--   - It's easier to use the endian-specific unaligned load/store
--     functions than host-endian unaligned load/store plus tswapN.  */
-+/*
-+ * Tricky points:
-+ * - Use __builtin_choose_expr to avoid type promotion from ?:,
-+ * - Invalid sizes result in a compile time error stemming from
-+ *   the fact that abort has no parameters.
-+ * - It's easier to use the endian-specific unaligned load/store
-+ *   functions than host-endian unaligned load/store plus tswapN.
-+ * - The pragmas are necessary only to silence a clang false-positive
-+ *   warning: see https://bugs.llvm.org/show_bug.cgi?id=39113 .
-+ * - We have to disable -Wpragmas warnings to avoid a complaint about
-+ *   an unknown warning type from older compilers that don't know about
-+ *   -Waddress-of-packed-member.
-+ * - gcc has bugs in its _Pragma() support in some versions, eg
-+ *   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83256 -- so we only
-+ *   include the warning-suppression pragmas for clang
-+ */
-+#ifdef __clang__
-+#define PRAGMA_DISABLE_PACKED_WARNING                                   \
-+    _Pragma("GCC diagnostic push");                                     \
-+    _Pragma("GCC diagnostic ignored \"-Wpragmas\"");                    \
-+    _Pragma("GCC diagnostic ignored \"-Waddress-of-packed-member\"")
- 
--#define __put_user_e(x, hptr, e)                                        \
--  (__builtin_choose_expr(sizeof(*(hptr)) == 1, stb_p,                   \
--   __builtin_choose_expr(sizeof(*(hptr)) == 2, stw_##e##_p,             \
--   __builtin_choose_expr(sizeof(*(hptr)) == 4, stl_##e##_p,             \
--   __builtin_choose_expr(sizeof(*(hptr)) == 8, stq_##e##_p, abort))))   \
--     ((hptr), (x)), (void)0)
-+#define PRAGMA_REENABLE_PACKED_WARNING          \
-+    _Pragma("GCC diagnostic pop")
-+
-+#else
-+#define PRAGMA_DISABLE_PACKED_WARNING
-+#define PRAGMA_REENABLE_PACKED_WARNING
-+#endif
-+
-+#define __put_user_e(x, hptr, e)                                            \
-+    do {                                                                    \
-+        PRAGMA_DISABLE_PACKED_WARNING;                                      \
-+        (__builtin_choose_expr(sizeof(*(hptr)) == 1, stb_p,                 \
-+        __builtin_choose_expr(sizeof(*(hptr)) == 2, stw_##e##_p,            \
-+        __builtin_choose_expr(sizeof(*(hptr)) == 4, stl_##e##_p,            \
-+        __builtin_choose_expr(sizeof(*(hptr)) == 8, stq_##e##_p, abort))))  \
-+            ((hptr), (x)), (void)0);                                        \
-+        PRAGMA_REENABLE_PACKED_WARNING;                                     \
-+    } while (0)
-+
-+#define __get_user_e(x, hptr, e)                                            \
-+    do {                                                                    \
-+        PRAGMA_DISABLE_PACKED_WARNING;                                      \
-+        ((x) = (typeof(*hptr))(                                             \
-+        __builtin_choose_expr(sizeof(*(hptr)) == 1, ldub_p,                 \
-+        __builtin_choose_expr(sizeof(*(hptr)) == 2, lduw_##e##_p,           \
-+        __builtin_choose_expr(sizeof(*(hptr)) == 4, ldl_##e##_p,            \
-+        __builtin_choose_expr(sizeof(*(hptr)) == 8, ldq_##e##_p, abort))))  \
-+            (hptr)), (void)0);                                              \
-+        PRAGMA_REENABLE_PACKED_WARNING;                                     \
-+    } while (0)
- 
--#define __get_user_e(x, hptr, e)                                        \
--  ((x) = (typeof(*hptr))(                                               \
--   __builtin_choose_expr(sizeof(*(hptr)) == 1, ldub_p,                  \
--   __builtin_choose_expr(sizeof(*(hptr)) == 2, lduw_##e##_p,            \
--   __builtin_choose_expr(sizeof(*(hptr)) == 4, ldl_##e##_p,             \
--   __builtin_choose_expr(sizeof(*(hptr)) == 8, ldq_##e##_p, abort))))   \
--     (hptr)), (void)0)
- 
- #ifdef TARGET_WORDS_BIGENDIAN
- # define __put_user(x, hptr)  __put_user_e(x, hptr, be)
--- 
-2.19.0
+> +            $(SRC_PATH)/tests/acceptance, \
+> +            "AVOCADO", "tests/acceptance")
+> +
+>  # Consolidated targets
+>  
+>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+> @@ -1046,7 +1059,7 @@ check-clean:
+>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>  	rm -f tests/test-qapi-gen-timestamp
+> -	rm -rf $(TESTS_VENV_DIR)
+> +	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+>  
+>  clean: check-clean
+>  
+> diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
+> index d39f9d1576..64c6e27a94 100644
+> --- a/tests/venv-requirements.txt
+> +++ b/tests/venv-requirements.txt
+> @@ -1,3 +1,4 @@
+>  # Add Python module requirements, one per line, to be installed
+>  # in the tests/venv Python virtual environment. For more info,
+>  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> +avocado-framework==65.0
+> 
