@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g9slK-0002lc-J2
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:13:27 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1g9snX-0004E2-Pl
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:15:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g9slC-0000oq-VM
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:13:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1g9sl9-0000kl-DG
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:13:18 -0400
-Date: Tue, 9 Oct 2018 15:13:07 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181009141307.GG22838@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20181009125541.24455-1-berrange@redhat.com>
-	<CAJ+F1CKAZU+aHuzO8Y-aT20uX-rywZB3BK0=1hqecSrPkUEp1Q@mail.gmail.com>
+	(envelope-from <rkagan@virtuozzo.com>) id 1g9snQ-0001ub-PZ
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:15:43 -0400
+Received: from mail-bgr052101128081.outbound.protection.outlook.com
+	([52.101.128.81]:40384
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1g9snQ-0001u2-99
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:15:36 -0400
+From: Roman Kagan <rkagan@virtuozzo.com>
+Date: Tue, 9 Oct 2018 13:59:36 +0000
+Message-ID: <20181009135932.GF29982@rkaganb.sw.ru>
+References: <20181008112726.16140-1-vkuznets@redhat.com>
+	<20181008112726.16140-2-vkuznets@redhat.com>
+	<20181009122046.GC29982@rkaganb.sw.ru>
+	<87va6bqnon.fsf@vitty.brq.redhat.com>
+	<20181009131738.GE29982@rkaganb.sw.ru>
+	<87sh1fqlrw.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87sh1fqlrw.fsf@vitty.brq.redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3EE880C3FE999D47BD5AFE96DC638729@eurprd08.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CKAZU+aHuzO8Y-aT20uX-rywZB3BK0=1hqecSrPkUEp1Q@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] crypto: improve performance of XTS
- cipher mode
+Subject: Re: [Qemu-devel] [PATCH 1/2] linux-headers: update to pre-4.20
+ (kvm/queue)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-On Tue, Oct 09, 2018 at 05:59:46PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Tue, Oct 9, 2018 at 4:57 PM Daniel P. Berrang=C3=A9 <berrange@redhat=
-.com> wrote:
+On Tue, Oct 09, 2018 at 03:42:27PM +0200, Vitaly Kuznetsov wrote:
+> Roman Kagan <rkagan@virtuozzo.com> writes:
+> 
+> > On Tue, Oct 09, 2018 at 03:01:12PM +0200, Vitaly Kuznetsov wrote:
+> >> Roman Kagan <rkagan@virtuozzo.com> writes:
+> >> 
+> >> > On Mon, Oct 08, 2018 at 01:27:25PM +0200, Vitaly Kuznetsov wrote:
+> >> >> This brings us three new defines: KVM_CAP_ARM_INJECT_SERROR_ESR,
+> >> >> KVM_CAP_MSR_PLATFORM_INFO and KVM_CAP_HYPERV_SEND_IPI.
+> >> >> 
+> >> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >> >> ---
+> >> >>  linux-headers/linux/kvm.h | 7 +++++--
+> >> >>  1 file changed, 5 insertions(+), 2 deletions(-)
+> >> >> 
+> >> >> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> >> >> index 66790724f1..043f1e58b6 100644
+> >> >> --- a/linux-headers/linux/kvm.h
+> >> >> +++ b/linux-headers/linux/kvm.h
+> >> >> @@ -9,7 +9,7 @@
+> >> >>   */
+> >> >>  
+> >> >>  #include <linux/types.h>
+> >> >> -
+> >> >> +#include <linux/compiler.h>
+> >> >>  #include <linux/ioctl.h>
+> >> >>  #include <asm/kvm.h>
+> >> >>  
+> >> >> @@ -481,7 +481,7 @@ struct kvm_dirty_log {
+> >> >>  	__u32 slot;
+> >> >>  	__u32 padding1;
+> >> >>  	union {
+> >> >> -		void *dirty_bitmap; /* one bit per page */
+> >> >> +		void __user *dirty_bitmap; /* one bit per page */
+> >> >
+> >> > Hmm, I thought "__user" and friends are supposed to get stripped while
+> >> > "make headers_install".
+> >> 
+> >> ... and of course I forgot about this, will send v2, thanks!
 > >
-> > The XTS cipher mode is significantly slower than CBC mode. This serie=
-s
-> > approximately doubles the XTS performance which will improve the I/O
-> > rate for LUKS disks.
-> >
-> > Daniel P. Berrang=C3=A9 (6):
-> >   crypto: expand algorithm coverage for cipher benchmark
-> >   crypto: remove code duplication in tweak encrypt/decrypt
-> >   crypto: introduce a xts_uint128 data type
-> >   crypto: convert xts_tweak_encdec to use xts_uint128 type
-> >   crypto: convert xts_mult_x to use xts_uint128 type
-> >   crypto: annotate xts_tweak_encdec as inlineable
-> >
-> >  crypto/xts.c                    | 147 ++++++++++++++----------------=
--
-> >  tests/benchmark-crypto-cipher.c | 149 +++++++++++++++++++++++++++---=
---
-> >  2 files changed, 191 insertions(+), 105 deletions(-)
->=20
-> By using a constant amount of data to process, it's easier to measure
-> perfomance with perf stat:
+> > Are you trying to say you didn't follow the regular linux header
+> > harvesting process, which is to use scripts/update-linux-headers.sh
+> > (which does 'make headers_install' and then applies further sanitizing,
+> > so that problems like this wouldn't have popped up)?  I think you
+> > should, unless this is an interim patchset pending the merge of the
+> > corresponding KVM changes in the mainline kernel.
+> 
+> Honestly I didn't know about the standard process but looking at the
+> output:
+> 
+> $ scripts/update-linux-headers.sh PATH/TO/LINUX
+> ...
+> $ git diff --stat
+>  include/standard-headers/linux/input.h |  9 +++++----
+>  linux-headers/asm-arm/kvm.h            | 13 +++++++++++++
+>  linux-headers/asm-arm64/kvm.h          | 13 +++++++++++++
+>  linux-headers/asm-s390/kvm.h           |  2 ++
+>  linux-headers/asm-x86/kvm.h            |  1 +
+>  linux-headers/linux/kvm.h              |  3 +++
+>  linux-headers/linux/vfio.h             |  2 ++
+>  linux-headers/linux/vhost.h            |  2 +-
+>  8 files changed, 40 insertions(+), 5 deletions(-)
+> 
+> I'm not sure if it would make sense to do this instead: the definition I
+> need is currently in kvm/queue and I'm not exactly sure that updating
+> other headers from there (e.g. linux/input.h) makes any sense.
 
-The problem is that the different encryption modes have wildly
-different performance. eg while XTS gets 400 MB/s, ECB gets
-3000 MB/s. I want the test to run long enough to minimize the
-noise, and picking a data size large enough for best ECB
-perf while not being excessively large for XTS is hard. THus
-I prefer to have a fixed execution time for each test.
+Another possible problem is that constants may change on their way from
+kvm/queue to mainline, so people tend to avoid pulling headers from
+anything but Linus' tree.
 
+Anyway that's not my call.  Paolo, Eduardo, what's your take on this?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Roman.
