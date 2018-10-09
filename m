@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g9sGV-0001bz-Lg
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:42:00 -0400
+	(envelope-from <vkuznets@redhat.com>) id 1g9sHW-0002aT-7d
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g9sGD-0005wI-Cg
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:41:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53354)
+	(envelope-from <vkuznets@redhat.com>) id 1g9sHQ-0000O2-FK
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:42:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1g9sGD-0005sy-0b
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:41:17 -0400
-Date: Tue, 9 Oct 2018 14:41:12 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181009134112.GE22838@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1538748792-19444-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA8SJ8QBX9fHPm+DvtdpJYq_vwx0CGsH8Uyp_AV-KMqqDA@mail.gmail.com>
-	<875zybzdzm.fsf@dusky.pond.sub.org>
-	<87zhvntg6k.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1g9sHQ-0000H5-1p
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:42:32 -0400
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20181009131738.GE29982@rkaganb.sw.ru>
+References: <20181008112726.16140-1-vkuznets@redhat.com>
+	<20181008112726.16140-2-vkuznets@redhat.com>
+	<20181009122046.GC29982@rkaganb.sw.ru>
+	<87va6bqnon.fsf@vitty.brq.redhat.com>
+	<20181009131738.GE29982@rkaganb.sw.ru>
+Date: Tue, 09 Oct 2018 15:42:27 +0200
+Message-ID: <87sh1fqlrw.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87zhvntg6k.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] accel: Improve selection of the default
- accelerator
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] linux-headers: update to pre-4.20
+ (kvm/queue)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-On Tue, Oct 09, 2018 at 03:14:59PM +0200, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
-> 
-> > Peter Maydell <peter.maydell@linaro.org> writes:
-> >
-> >> On 5 October 2018 at 15:13, Thomas Huth <thuth@redhat.com> wrote:
-> >>> When compiling with "--disable-tcg", we currently still use "tcg"
-> >>> as default accelerator. "kvm" should be used in this case instead.
-> >>
-> >> This part is non-controversial and makes good sense.
-> >
-> > Agreed.
-> >
-> >>> Also, some downstream distros provide QEMU binaries which have "kvm"
-> >>> in their names (e.g. "qemu-kvm" on RHEL or "kvm" on Ubuntu) that use
-> >>> KVM by default - and some users might want to do something similar
-> >>> with upstream binaries, too. Accomodate them by using "kvm:tcg" as
-> >>> default when we detect such a binary name.
-> >>
-> >> This part is much riskier and less clearly a good plan --
-> >> do we really want our behaviour to vary based on the name
-> >> of the executable? Distros who want that sort of qemu-kvm
-> >> wrapper generally are providing it already (the Ubuntu one
-> >> is a 2-line shell script).
-> >
-> > I hate it when argv[0] affects behavior[*].  I hate shell wrappers less.
-> >
-> > If a system provides just one qemu executable, and its default
-> > accelerator should be something other than tcg:kvm, then there's a use
-> 
-> Correction: "other than tcg".  See configure_accelerator().
-> 
-> Remind me, why is "tcg" a good default?
+Roman Kagan <rkagan@virtuozzo.com> writes:
 
-Note that when libvirt is driving QEMU, the default is not used. Libvirt
-will always explicitly ask for either KVM or TCG. Libvirt reports whether
-each host supports TCG or KVM or both, and management applications will
-look at this and usually pick KVM, only use TCG if KVM isn't there.
+> On Tue, Oct 09, 2018 at 03:01:12PM +0200, Vitaly Kuznetsov wrote:
+>> Roman Kagan <rkagan@virtuozzo.com> writes:
+>> 
+>> > On Mon, Oct 08, 2018 at 01:27:25PM +0200, Vitaly Kuznetsov wrote:
+>> >> This brings us three new defines: KVM_CAP_ARM_INJECT_SERROR_ESR,
+>> >> KVM_CAP_MSR_PLATFORM_INFO and KVM_CAP_HYPERV_SEND_IPI.
+>> >> 
+>> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> >> ---
+>> >>  linux-headers/linux/kvm.h | 7 +++++--
+>> >>  1 file changed, 5 insertions(+), 2 deletions(-)
+>> >> 
+>> >> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+>> >> index 66790724f1..043f1e58b6 100644
+>> >> --- a/linux-headers/linux/kvm.h
+>> >> +++ b/linux-headers/linux/kvm.h
+>> >> @@ -9,7 +9,7 @@
+>> >>   */
+>> >>  
+>> >>  #include <linux/types.h>
+>> >> -
+>> >> +#include <linux/compiler.h>
+>> >>  #include <linux/ioctl.h>
+>> >>  #include <asm/kvm.h>
+>> >>  
+>> >> @@ -481,7 +481,7 @@ struct kvm_dirty_log {
+>> >>  	__u32 slot;
+>> >>  	__u32 padding1;
+>> >>  	union {
+>> >> -		void *dirty_bitmap; /* one bit per page */
+>> >> +		void __user *dirty_bitmap; /* one bit per page */
+>> >
+>> > Hmm, I thought "__user" and friends are supposed to get stripped while
+>> > "make headers_install".
+>> 
+>> ... and of course I forgot about this, will send v2, thanks!
+>
+> Are you trying to say you didn't follow the regular linux header
+> harvesting process, which is to use scripts/update-linux-headers.sh
+> (which does 'make headers_install' and then applies further sanitizing,
+> so that problems like this wouldn't have popped up)?  I think you
+> should, unless this is an interim patchset pending the merge of the
+> corresponding KVM changes in the mainline kernel.
 
-IOW, most users of libvirt have effectively had the behaviour of
-'-accel kvm:tcg' for years. Only direct users of QEMU have suffered
-from '-accel tcg:kvm'.
+Honestly I didn't know about the standard process but looking at the
+output:
 
-The only time we've had trouble with this is with buggy nested virt
-implementations, which expose /dev/kvm but then crash & burn when it
-is used. I don't think that's an argument against prioritizing
-KVM though. Its an argument for not exposing broken nested virt to VMs.
+$ scripts/update-linux-headers.sh PATH/TO/LINUX
+...
+$ git diff --stat
+ include/standard-headers/linux/input.h |  9 +++++----
+ linux-headers/asm-arm/kvm.h            | 13 +++++++++++++
+ linux-headers/asm-arm64/kvm.h          | 13 +++++++++++++
+ linux-headers/asm-s390/kvm.h           |  2 ++
+ linux-headers/asm-x86/kvm.h            |  1 +
+ linux-headers/linux/kvm.h              |  3 +++
+ linux-headers/linux/vfio.h             |  2 ++
+ linux-headers/linux/vhost.h            |  2 +-
+ 8 files changed, 40 insertions(+), 5 deletions(-)
 
-Regards,
-Daniel
+I'm not sure if it would make sense to do this instead: the definition I
+need is currently in kvm/queue and I'm not exactly sure that updating
+other headers from there (e.g. linux/input.h) makes any sense.
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Vitaly
