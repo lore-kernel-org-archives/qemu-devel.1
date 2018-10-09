@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9uTz-0003jc-Uq
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:03:40 -0400
+	(envelope-from <philmd@redhat.com>) id 1g9ue5-0008LJ-FP
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9uTt-0000Rw-3E
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:03:38 -0400
-Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:46209)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9uTp-0000PB-CS
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:03:31 -0400
-Date: Tue, 9 Oct 2018 12:03:25 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181009160325.GB7480@flamenco>
-References: <20181008232756.30704-1-cota@braap.org>
-	<20181008232756.30704-6-cota@braap.org> <87d0sjmaqq.fsf@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1g9ue2-00085d-7D
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:14:05 -0400
+Received: from mail-wr1-f52.google.com ([209.85.221.52]:35763)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9ue1-000852-Vm
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:14:02 -0400
+Received: by mail-wr1-f52.google.com with SMTP id w5-v6so2480020wrt.2
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 09:14:01 -0700 (PDT)
+References: <20181009041826.19462-1-crosa@redhat.com>
+	<20181009041826.19462-2-crosa@redhat.com>
+	<55a1c7a3-0381-f426-edca-d95c04180326@redhat.com>
+	<5c424a39-02b3-2f5d-57fe-eb322b550675@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <97c326c6-e096-427c-e38f-b31ba939bc3b@redhat.com>
+Date: Tue, 9 Oct 2018 18:13:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <5c424a39-02b3-2f5d-57fe-eb322b550675@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87d0sjmaqq.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [RFC v2 5/5] cputlb: dynamically resize TLBs based
- on use rate
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +32,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Tue, Oct 09, 2018 at 15:54:21 +0100, Alex Bennée wrote:
-> Emilio G. Cota <cota@braap.org> writes:
-> > +    if (new_size == old_size) {
-> > +        return;
-> > +    }
-> > +
-> > +    g_free(env->tlb_table[mmu_idx]);
-> > +    g_free(env->iotlb[mmu_idx]);
-> > +
-> > +    /* desc->n_used_entries is cleared by the caller */
-> > +    desc->n_flushes_low_rate = 0;
-> > +    env->tlb_mask[mmu_idx] = (new_size - 1) << CPU_TLB_ENTRY_BITS;
-> > +    env->tlb_table[mmu_idx] = g_new(CPUTLBEntry, new_size);
-> > +    env->iotlb[mmu_idx] = g_new0(CPUIOTLBEntry, new_size);
+On 09/10/2018 18:00, Cleber Rosa wrote:
+> 
+> 
+> On 10/9/18 9:25 AM, Philippe Mathieu-DaudÃ© wrote:
+>> Hi Cleber,
+>>
+>> On 09/10/2018 06:18, Cleber Rosa wrote:
+>>> A number of QEMU tests are written in Python, and may benefit
+>>> from an untainted Python venv.
+>>>
+>>> By using make rules, tests that depend on specific Python libs
+>>> can set that rule as a requiment, along with rules that require
+>>> the presence or installation of specific libraries.
+>>>
+>>> The tests/venv-requirements.txt is supposed to contain the
+>>> Python requirements that should be added to the venv created
+>>> by check-venv.
+>>>
+>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>> ---
+>>>  tests/Makefile.include      | 19 +++++++++++++++++++
+>>>  tests/venv-requirements.txt |  3 +++
+>>>  2 files changed, 22 insertions(+)
+>>>  create mode 100644 tests/venv-requirements.txt
+>>>
+>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>>> index 7a3059bf6c..68af79927d 100644
+>>> --- a/tests/Makefile.include
+>>> +++ b/tests/Makefile.include
+>>> @@ -12,6 +12,7 @@ check-help:
+>>>  	@echo " $(MAKE) check-block          Run block tests"
+>>>  	@echo " $(MAKE) check-tcg            Run TCG tests"
+>>>  	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+>>> +	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+>>>  	@echo " $(MAKE) check-clean          Clean the tests"
+>>>  	@echo
+>>>  	@echo "Please note that HTML reports do not regenerate if the unit tests"
+>>> @@ -1015,6 +1016,23 @@ check-decodetree:
+>>>            ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+>>>            TEST, decodetree.py)
+>>>  
+>>> +# Python venv for running tests
+>>> +
+>>> +.PHONY: check-venv
+>>> +
+>>> +TESTS_VENV_DIR=$(BUILD_DIR)/tests/venv
+>>> +TESTS_VENV_REQ=$(SRC_PATH)/tests/venv-requirements.txt
+>>> +
+>>> +$(TESTS_VENV_DIR):
+>>> +	$(call quiet-command, \
+>>> +            $(PYTHON) -m venv --system-site-packages $@, \
+>>
+>> Why do we want the '--system-site-packages' flag?
+>>
+> 
+> It allows the reuse of packages (with no additional downloads) in case
+> there's a package installed system wide providing the same package and
+> version.  If you have, say, an RPM or DEB (or even a pip) package
+> installed system wide, it'll be copied over to the venv.  This was based
+> on a suggestion by Eduardo.
 
-For the iotlb we can use g_new, right?
+Some system-site-packages are broken (or too old?).
 
-iotlb[foo][bar] is only checked after having checked tlb_table[foo][bar].
-Otherwise tlb_flush would also flush the iotlb.
+> 
+>>> +            VENV, $@)
+>>> +	$(call quiet-command, \
+>>> +            $(TESTS_VENV_DIR)/bin/pip -q install -r $(TESTS_VENV_REQ), \
+>>
+>> On Ubuntu I have to use (after installing python3-pip + python3.4-venv):
+>>
+>>                $(PYTHON) -m pip -q install -r $(TESTS_VENV_REQ), \
+>>
+> 
+> I don't think running $(PYTHON) is the right thing to do here because it
+> points to non-venv Python interpreter.  IMO it should be:
+> 
+>                 $(TESTS_VENV_DIR)/bin/python -m pip ...
 
-> I guess the allocation is a big enough stall there is no point either
-> pre-allocating or using RCU to clean-up the old data?
+Yes it worked: https://travis-ci.org/philmd/qemu/jobs/439216885
 
-I tried this. Turns out not to make a difference, because (1) we only
-resize on flushes, which do not happen that often, and (2) we
-size up aggressively, but the shrink rate is more conservative. So
-in the end, it's a drop in the ocean. For instance, bootup+shutdown
-requires 100 calls to g_new+g_free -- at ~300 cycles each, that's
-about 30us out of ~8s of execution time.
-
-> Given this is a new behaviour it would be nice to expose the occupancy
-> of the TLBs in "info jit" much like we do for TBs.
-
-The occupancy changes *very* quickly, so by the time the report is out,
-the info is stale. So I'm not sure that's very useful.
-
-The TLB size changes less often, but reporting on it is not obvious,
-since we have NB_MMU_MODES sizes per CPU. Say we have 20 CPUs, what should
-we report? A table with 20 * NB_MMU_MODES cells? I dunno.
-
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-Thanks!
-
-		Emilio
+> 
+>>> +            PIP, $(TESTS_VENV_REQ))
+>>> +
+>>> +check-venv: $(TESTS_VENV_DIR)
+>>
+>> Same problem from v1: if check-venv failed and the directory exists, the
+>> rule succeeds.
+>>
+> 
+> I really don't know how to make all the steps of this target "atomic",
+> unless I do an ugly "venv ... && touch ... && pip ...".  The best I
+> managed to think was to flag the requirement as fulfilled by touching
+> the venv directory after pip finishes.
+> 
+> - Cleber.
+> 
+>>> +
+>>>  # Consolidated targets
+>>>  
+>>>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+>>> @@ -1028,6 +1046,7 @@ check-clean:
+>>>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>>>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>>>  	rm -f tests/test-qapi-gen-timestamp
+>>> +	rm -rf $(TESTS_VENV_DIR)
+>>>  
+>>>  clean: check-clean
+>>>  
+>>> diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.txt
+>>> new file mode 100644
+>>> index 0000000000..d39f9d1576
+>>> --- /dev/null
+>>> +++ b/tests/venv-requirements.txt
+>>> @@ -0,0 +1,3 @@
+>>> +# Add Python module requirements, one per line, to be installed
+>>> +# in the tests/venv Python virtual environment. For more info,
+>>> +# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+>>>
