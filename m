@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9ocA-00030h-Mi
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:47:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1g9oda-0003cD-MN
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9oc9-0006Rq-RY
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:47:42 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43970)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g9oc9-0006RL-Kq
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:47:41 -0400
-Received: by mail-wr1-x442.google.com with SMTP id n1-v6so1069884wrt.10
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:47:41 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1g9odY-0007At-Is
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:49:10 -0400
+Date: Tue, 9 Oct 2018 11:48:51 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20181009094851.GA5407@localhost.localdomain>
+References: <20181005143802.18412-1-peter.maydell@linaro.org>
+	<CAFEAcA8-FvVG7XBLrd7NQfRcKrvo6GtPEjfqJzkjd68iP9=TeQ@mail.gmail.com>
+	<20181005161739.GC4606@localhost.localdomain>
+	<CAFEAcA-SWRHwnwsa+QiHXfdBRB6u2u0paV9HsEqfjR6nZvAHSg@mail.gmail.com>
+	<20181005180901.GA32677@localhost.localdomain>
+	<CAFEAcA80cys-98QwJgAk_2LXfAeMHgCUS2L3Z+NgY4ZsCFhSPw@mail.gmail.com>
+	<CAFEAcA8gYwFZynMyiEHf+VPbaBerA9JTUPAHsipEvOqkBjHxMQ@mail.gmail.com>
+	<20181008164026.GD4604@localhost.localdomain>
+	<12068340-1ce5-7cf1-afb2-94f3cd2fd109@redhat.com>
 MIME-Version: 1.0
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-14-armbru@redhat.com>
-In-Reply-To: <20181008173125.19678-14-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Oct 2018 13:47:28 +0400
-Message-ID: <CAJ+F1CJ_XUDJdXfRCBT0Oz48=8RZaWP5HJuUZhpxP+vBVq41Xw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 13/31] net/socket: Fix invalid socket type
- error handling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <12068340-1ce5-7cf1-afb2-94f3cd2fd109@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] tests: Disable test-bdrv-drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-Hi
-On Mon, Oct 8, 2018 at 9:45 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  net_socket_fd_init() does that, and then fails without
-> setting an error.  Wrong.  I didn't analyze how exactly this can
-> break.  A caller that reports the error on failure would crash.
->
-> Broken when commit c37f0bb1d0d (v2.11.0) converted the function to
-> Error.  Fix by calling error_setg() instead of error_report().
->
-> Fixes: c37f0bb1d0d24e3a6b5f4659bb305913dcb798a6
-> Cc: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Am 08.10.2018 um 21:53 hat Eric Blake geschrieben:
+> On 10/8/18 11:40 AM, Kevin Wolf wrote:
+> > Am 08.10.2018 um 17:43 hat Peter Maydell geschrieben:
+> > > Looking at the backtraces I'm wondering if this is the result of
+> > > an implicit reliance on the order in which per-thread destructors
+> > > are called (which is left unspecified by POSIX) -- the destructor
+> > > function qemu_thread_atexit_run() is called after some other
+> > > destructor, but accesses its memory.
+> > > 
+> > > Specifically, the memory it's trying to read looks like
+> > > the __thread local variable pollfds_cleanup_notifier in
+> > > util/aio-posix.c. So I think what is happening is:
+> > >   * util/aio-posix.c calls qemu_thread_atexit_add(), passing
+> > >     it a pointer to a thread-local variable pollfds_cleanup_notifier
+> > >   * qemu_thread_atexit_add() works by arranging to run the
+> > >     notifiers when its 'exit_key' variable's destructor is called
+> > >   * the destructor for pollfds_cleanup_notifier runs before that
+> > >     for exit_key, and so the qemu_thread_atexit_run() function
+> > >     ends up touching freed memory
+> > > 
+> > > I'm pretty confident this analysis of the problem is correct:
+> > > unfortunately I have no idea what the right way to fix it is...
+> > 
+> > Yes, I agree with your analysis. If __thread variables can be destructed
+> > before pthread_key_create() destructors are called (and in particular if
+> > the former are implemented in terms of the latter), this implies at
+> > least two rules:
+> > 
+> > 1. The Notfier itself can't be a TLS variable
+> > 
+> > 2. The notifier callback can't access any TLS variables
+> > 
+> > Of course, with these restrictions, qemu_thread_atexit_*() with its
+> > existing API is as useless as it could be.
+> > 
+> > The best I can think of at the moment would be to use a separate
+> > pthread_key_create() (and therefore a separate destructor) for
+> > registering each TLS variable, so that the destructor always gets a
+> > valid pointer. Maybe move all __thread variables of a file into a single
+> > malloced struct to make it more managable (we could then keep a __thread
+> > pointer to it for convenience, but only free the struct with the pointer
+> > passed by the pthread_key destructor so that we don't have to access
+> > __thread variables in the destructor).
+> 
+> pthread_key_create() says that a when a destructor is triggered, it sets the
+> value of the key to NULL; but that you can once again set the key back to a
+> non-NULL value, and that the implementation will loop at least
+> PTHREAD_DESTRUCTOR_ITERATIONS over all destructors or until it has convinced
+> the destructors to leave values at NULL.  Thus, while you cannot guarantee
+> ordering between destructors within a single iteration of the cleanup loop,
+> you CAN do some sort of witness locking or down-counter where a destructor
+> purposefully calls pthread_setspecific() to revive the value to survive into
+> the next iteration of destructor calls, for variables which are known to be
+> referenced by other destructors while the witness count is still high
+> enough, as a way of imposing order between loops.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Yes, everything that is explicitly managed with pthread_key_create() is
+fine. The point is that the destructors for __thread variables aren't
+controlled by QEMU, but by the system libraries, so their memory can go
+away earlier than other destructors are called.
 
-> ---
->  net/socket.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/socket.c b/net/socket.c
-> index 6917fbcbf5..90ef3517be 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -453,8 +453,8 @@ static NetSocketState *net_socket_fd_init(NetClientSt=
-ate *peer,
->      case SOCK_STREAM:
->          return net_socket_fd_init_stream(peer, model, name, fd, is_conne=
-cted);
->      default:
-> -        error_report("socket type=3D%d for fd=3D%d must be either"
-> -                     " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
-> +        error_setg(errp, "socket type=3D%d for fd=3D%d must be either"
-> +                   " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
->          closesocket(fd);
->      }
->      return NULL;
-> --
-> 2.17.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Kevin
