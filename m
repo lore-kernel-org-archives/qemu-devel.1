@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gA1JG-0001vh-RE
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:21:03 -0400
+	(envelope-from <crosa@redhat.com>) id 1gA1OW-0003N1-Gb
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gA1JD-0006Wo-Dt
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:21:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gA1JD-0006W7-7H
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:20:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gA1JA-000514-8W
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 23:20:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 204562E80D8
-	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 23:20:55 +0000 (UTC)
+	(envelope-from <crosa@redhat.com>) id 1gA1OV-0000ni-Im
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48276)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gA1OS-0000jc-2a
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:24 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Date: Tue,  9 Oct 2018 19:26:01 -0400
+Message-Id: <20181009232607.15521-2-crosa@redhat.com>
+In-Reply-To: <20181009232607.15521-1-crosa@redhat.com>
+References: <20181009232607.15521-1-crosa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Oct 2018 23:11:22 -0000
-From: Ke Liu <1796754@bugs.launchpad.net>
-Reply-To: Bug 1796754 <1796754@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153902784309.8245.8166003544722634075.malonedeb@soybean.canonical.com>
-Message-Id: <153912668257.3779.11063027894114428823.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1796754] Re: ioctl SIOCGIFCONF causes
- qemu-aarch64-static to crash with "received signal outside vCPU context"
+Subject: [Qemu-devel] [PATCH v2 1/7] Acceptance Tests: improve docstring on
+ pick_default_qemu_bin()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,46 +28,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-I sent out a patch: http://lists.nongnu.org/archive/html/qemu-devel/2018-10=
-/msg01657.html
-(Please ignore the other 2 identical patches. It was my first time sending =
-out patches and I didn't know it was moderated so I sent it out multiple ti=
-mes).
+Making it clear what is returned by this utility function.
 
--- =
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ tests/acceptance/avocado_qemu/__init__.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1796754
-
-Title:
-  ioctl SIOCGIFCONF causes qemu-aarch64-static to crash with "received
-  signal outside vCPU context"
-
-Status in QEMU:
-  New
-
-Bug description:
-  To reproduce it, compile the attached crash.c under aarch64 to a.out and =
-execute on x86_64
-  qemu-aarch64-static ./a.out
-
-  It will print the following and crash:
-
-  socket=3D3
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6003=
-8cd6
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6000=
-157a
-
-  The version of qemu-aarch64-static is
-
-  qemu-aarch64 version 3.0.0 (qemu-3.0.0-1.fc29)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  But it did also happen in previous versions so it is not a regression
-  but a bug existed ever since.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1796754/+subscriptions
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
+/avocado_qemu/__init__.py
+index 1e54fd5932..d8d5b48dac 100644
+--- a/tests/acceptance/avocado_qemu/__init__.py
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -27,6 +27,10 @@ def pick_default_qemu_bin():
+     """
+     Picks the path of a QEMU binary, starting either in the current work=
+ing
+     directory or in the source tree root directory.
++
++    :returns: the path to the default QEMU binary or None if one could n=
+ot
++              be found
++    :rtype: str or None
+     """
+     arch =3D os.uname()[4]
+     qemu_bin_relative_path =3D os.path.join("%s-softmmu" % arch,
+--=20
+2.17.1
