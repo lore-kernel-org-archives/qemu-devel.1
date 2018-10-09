@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <likan_999.student@sina.com>) id 1g9mSg-0005ZK-2p
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:29:46 -0400
+	(envelope-from <likan_999.student@sina.com>) id 1g9mit-0000w7-Lr
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <likan_999.student@sina.com>) id 1g9mSc-0000VV-JS
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:29:46 -0400
-Received: from mail7-212.sinamail.sina.com.cn ([202.108.7.212]:48990)
+	(envelope-from <likan_999.student@sina.com>) id 1g9mik-0000Fc-6U
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:29 -0400
+Received: from mail3-165.sinamail.sina.com.cn ([202.108.3.165]:44243)
 	by eggs.gnu.org with smtp (Exim 4.71)
-	(envelope-from <likan_999.student@sina.com>) id 1g9mSc-0000S4-8g
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:29:42 -0400
+	(envelope-from <likan_999.student@sina.com>) id 1g9mic-00009c-BI
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:17 -0400
 From: Kan Li <likan_999.student@sina.com>
-Date: Tue,  9 Oct 2018 07:29:23 +0000
-Message-Id: <20181009072923.871-1-likan_999.student@sina.com>
-Subject: [Qemu-devel] [PATCH] Fix linux-user crashes in ioctl(SIOCGIFCONF)
+Date: Tue,  9 Oct 2018 07:45:59 +0000
+Message-Id: <20181009074559.1041-1-likan_999.student@sina.com>
+Subject: [Qemu-devel] [PATCH] linux-user: Fix crashes in ioctl(SIOCGIFCONF)
  when ifc_buf is NULL.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
