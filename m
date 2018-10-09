@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1g9rdm-0004z5-4o
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:01:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9rgp-0007I5-Kk
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:04:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1g9rdg-0001My-Hn
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:01:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37546)
+	(envelope-from <armbru@redhat.com>) id 1g9rgi-0003Fw-LS
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:04:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1g9rde-0001Bd-4N
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:01:27 -0400
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-In-Reply-To: <20181009122046.GC29982@rkaganb.sw.ru>
-References: <20181008112726.16140-1-vkuznets@redhat.com>
-	<20181008112726.16140-2-vkuznets@redhat.com>
-	<20181009122046.GC29982@rkaganb.sw.ru>
-Date: Tue, 09 Oct 2018 15:01:12 +0200
-Message-ID: <87va6bqnon.fsf@vitty.brq.redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9rgf-00039n-Kj
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:04:36 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1539052760-11730-1-git-send-email-liq3ea@gmail.com>
+	<7a26945a-d94f-98db-7ae2-0d4c089ab975@redhat.com>
+	<CAKXe6SKqfm2qXuN4YNWQTOnrF9O2OFqg41vp6y-ANMgqLLXBLg@mail.gmail.com>
+Date: Tue, 09 Oct 2018 15:04:26 +0200
+In-Reply-To: <CAKXe6SKqfm2qXuN4YNWQTOnrF9O2OFqg41vp6y-ANMgqLLXBLg@mail.gmail.com>
+	(Li Qiang's message of "Tue, 9 Oct 2018 13:58:21 +0800")
+Message-ID: <87bm83uv8l.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] linux-headers: update to pre-4.20
- (kvm/queue)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] vl.c: print error message if load
+ fw_cfg file failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: philmd@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, f4bug@amsat.org, Qemu Developers <qemu-devel@nongnu.org>
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+Li Qiang <liq3ea@gmail.com> writes:
 
-> On Mon, Oct 08, 2018 at 01:27:25PM +0200, Vitaly Kuznetsov wrote:
->> This brings us three new defines: KVM_CAP_ARM_INJECT_SERROR_ESR,
->> KVM_CAP_MSR_PLATFORM_INFO and KVM_CAP_HYPERV_SEND_IPI.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  linux-headers/linux/kvm.h | 7 +++++--
->>  1 file changed, 5 insertions(+), 2 deletions(-)
->> 
->> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
->> index 66790724f1..043f1e58b6 100644
->> --- a/linux-headers/linux/kvm.h
->> +++ b/linux-headers/linux/kvm.h
->> @@ -9,7 +9,7 @@
->>   */
->>  
->>  #include <linux/types.h>
->> -
->> +#include <linux/compiler.h>
->>  #include <linux/ioctl.h>
->>  #include <asm/kvm.h>
->>  
->> @@ -481,7 +481,7 @@ struct kvm_dirty_log {
->>  	__u32 slot;
->>  	__u32 padding1;
->>  	union {
->> -		void *dirty_bitmap; /* one bit per page */
->> +		void __user *dirty_bitmap; /* one bit per page */
+> Hello  Philippe,
 >
-> Hmm, I thought "__user" and friends are supposed to get stripped while
-> "make headers_install".
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2018=E5=B9=B410=
+=E6=9C=889=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=881:52=E5=86=99=E9=81=
+=93=EF=BC=9A
+>
+>> Hi Li,
+>>
+>> On 09/10/2018 04:39, Li Qiang wrote:
+>> > It makes sense to print the error message while reading
+>> > file failed.
+[...]
+>> > diff --git a/vl.c b/vl.c
+>> > index 4e25c78..69fc77c 100644
+>> > --- a/vl.c
+>> > +++ b/vl.c
+>> > @@ -2207,8 +2207,10 @@ static int parse_fw_cfg(void *opaque, QemuOpts =
+*opts, Error **errp)
+>> >          size =3D strlen(str); /* NUL terminator NOT included in fw_cf=
+g blob */
+>> >          buf =3D g_memdup(str, size);
+>> >      } else {
+>> > -        if (!g_file_get_contents(file, &buf, &size, NULL)) {
+>> > -            error_report("can't load %s", file);
+>> > +        GError *error =3D NULL;
+>> > +        if (!g_file_get_contents(file, &buf, &size, &error)) {
+>> > +            error_report("can't load %s, %s", file, error->message);
+>>
+>> If you ever respin, you can help Markus [1] effort using:
+>>
+>>             error_setg(errp, "can't load %s, %s", file, error->message);
+>>
+>> Else your patch will clash with [2].
+>>
+>
+> OK, I will send out this patch based Markus' tree or later when his patch
+> goes to upstream.
 
-... and of course I forgot about this, will send v2, thanks!
-
->  Does it build like this?
-
-depends on what you've done to your build system)
-
--- 
-Vitaly
+Appreciated!
