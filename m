@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9q1u-0001Sm-JR
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:18:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g9q5I-0002kX-DM
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9q1t-0001tV-SF
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:18:22 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37257)
+	(envelope-from <alex.bennee@linaro.org>) id 1g9q5F-000448-9L
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:21:52 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:38318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g9q1t-0001sX-HR
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:18:21 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y11-v6so1383122wrd.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 04:18:21 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g9q5E-00043R-O5
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:21:49 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id a13-v6so1390056wrt.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 04:21:48 -0700 (PDT)
+References: <D5741445-7EFD-4AF1-8DB2-E4AFA93CBB1A@icloud.com>
+	<43AE448E-B7B2-490F-8ADB-DC1361512608@icloud.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <43AE448E-B7B2-490F-8ADB-DC1361512608@icloud.com>
+Date: Tue, 09 Oct 2018 12:21:45 +0100
+Message-ID: <87pnwjmkl2.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-21-armbru@redhat.com>
-In-Reply-To: <20181008173125.19678-21-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Oct 2018 15:18:08 +0400
-Message-ID: <CAJ+F1CKgbYGprmpy9Zx8ieCkDCj2Fxnxj9kGKx-zrOV1xz-BUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 20/31] vl: Clean up error reporting in
- machine_set_property()
+Subject: Re: [Qemu-devel] [PATCH] test-i386: Make x86 test program compile
+ on clang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +31,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
-
-Hi
-
-On Mon, Oct 8, 2018 at 9:47 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  machine_set_property() does that, and then fails without
-> setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-> with it, but clean it up anyway.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
->  vl.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index ecb70f87d8..3adc9dbe4f 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2676,7 +2676,7 @@ static int machine_set_property(void *opaque,
->      g_free(qom_name);
->
->      if (local_err) {
-> -        error_report_err(local_err);
-> +        error_propagate(errp, local_err);
->          return -1;
->      }
->
-> @@ -4201,11 +4201,8 @@ int main(int argc, char **argv, char **envp)
->      }
->
->      machine_opts =3D qemu_get_machine_opts();
-> -    if (qemu_opt_foreach(machine_opts, machine_set_property, current_mac=
-hine,
-> -                         NULL)) {
-> -        object_unref(OBJECT(current_machine));
-> -        exit(1);
-> -    }
-> +    qemu_opt_foreach(machine_opts, machine_set_property, current_machine=
-,
-> +                     &error_fatal);
->
->      configure_accelerator(current_machine);
->
-> --
-> 2.17.1
->
->
+To: Theodore Dubois <tblodt@icloud.com>
+Cc: qemu-devel@nongnu.org
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+Theodore Dubois <tblodt@icloud.com> writes:
+
+> ping http://patchwork.ozlabs.org/patch/786393/
+
+Applied to tct-tests/next with another patch to work around enterq.
+Sorry for the delay.
+
+>
+> ~Theodore
+>
+>> On Jul 10, 2017, at 1:57 PM, Theodore Dubois <tblodt@icloud.com> wrote:
+>>
+>> Clang's assembler is slightly incompatible with GCC's assembler, which
+>> caused the program to not compile on Clang for these reasons:
+>>
+>>  - The "q" constraint was specified for an argument to the set
+>>    instruction, which didn't work because Clang chose the esi register,
+>>    which has no 8-bit form on i386.
+>>  - Clang doesn't support size suffixes on the loop instructions.
+>>  - Clang requires a size suffix on the fist instruction.
+>>  - Clang doesn't support specifying segment prefixes before the
+>>    instruction, and requires specifying them on the address.
+>>  - The arguments to the bound instruction are in the wrong order on
+>>    Clang. https://bugs.llvm.org/show_bug.cgi?id=3D27653
+>>
+>> Signed-off-by: Theodore Dubois <tblodt@icloud.com>
+>> ---
+>> tests/tcg/test-i386.c | 20 ++++++++++++++++----
+>> 1 file changed, 16 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/tests/tcg/test-i386.c b/tests/tcg/test-i386.c
+>> index 0f7b943b0c..dcb8e4876e 100644
+>> --- a/tests/tcg/test-i386.c
+>> +++ b/tests/tcg/test-i386.c
+>> @@ -369,7 +369,7 @@ void test_lea(void)
+>>     asm("movl $0, %0\n\t"\
+>>         "cmpl %2, %1\n\t"\
+>>         "set" JCC " %b0\n\t"\
+>> -        : "=3Dr" (res)\
+>> +        : "=3Dq" (res)\
+>>         : "r" (v1), "r" (v2));\
+>>     printf("%-10s %d\n", "set" JCC, res);\
+>>  if (TEST_CMOV) {\
+>> @@ -491,15 +491,23 @@ void test_loop(void)
+>>
+>> #if !defined(__x86_64__)
+>>     TEST_LOOP("jcxz");
+>> +#if !defined(__clang__)
+>>     TEST_LOOP("loopw");
+>>     TEST_LOOP("loopzw");
+>>     TEST_LOOP("loopnzw");
+>> #endif
+>> +#endif
+>>
+>>     TEST_LOOP("jecxz");
+>> +#if !defined(__clang__)
+>>     TEST_LOOP("loopl");
+>>     TEST_LOOP("loopzl");
+>>     TEST_LOOP("loopnzl");
+>> +#else
+>> +    TEST_LOOP("loop");
+>> +    TEST_LOOP("loopz");
+>> +    TEST_LOOP("loopnz");
+>> +#endif
+>> }
+>>
+>> #undef CC_MASK
+>> @@ -867,7 +875,7 @@ void test_fcvt(double a)
+>>         uint16_t val16;
+>>         val16 =3D (fpuc & ~0x0c00) | (i << 10);
+>>         asm volatile ("fldcw %0" : : "m" (val16));
+>> -        asm volatile ("fist %0" : "=3Dm" (wa) : "t" (a));
+>> +        asm volatile ("fists %0" : "=3Dm" (wa) : "t" (a));
+>>         asm volatile ("fistl %0" : "=3Dm" (ia) : "t" (a));
+>>         asm volatile ("fistpll %0" : "=3Dm" (lla) : "t" (a) : "st");
+>>         asm volatile ("frndint ; fstl %0" : "=3Dm" (ra) : "t" (a));
+>> @@ -1318,12 +1326,12 @@ void test_segs(void)
+>>     seg_data1[1] =3D 0xaa;
+>>     seg_data2[1] =3D 0x55;
+>>
+>> -    asm volatile ("fs movzbl 0x1, %0" : "=3Dr" (res));
+>> +    asm volatile ("movzbl %%fs:0x1, %0" : "=3Dr" (res));
+>>     printf("FS[1] =3D %02x\n", res);
+>>
+>>     asm volatile ("pushl %%gs\n"
+>>                   "movl %1, %%gs\n"
+>> -                  "gs movzbl 0x1, %0\n"
+>> +                  "movzbl %%gs:0x1, %0\n"
+>>                   "popl %%gs\n"
+>>                   : "=3Dr" (res)
+>>                   : "r" (MK_SEL(2)));
+>> @@ -1764,7 +1772,11 @@ void test_exceptions(void)
+>>         /* bound exception */
+>>         tab[0] =3D 1;
+>>         tab[1] =3D 10;
+>> +#if defined(__clang__)
+>> +        asm volatile ("bound %1, %0" : : "r" (11), "m" (tab[0]));
+>> +#else
+>>         asm volatile ("bound %0, %1" : : "r" (11), "m" (tab[0]));
+>> +#endif
+>>     }
+>> #endif
+>>
+>> --
+>> 2.13.2
+>>
+>>
+>>
+>> ~Theodore
+>>
+>>
+
+
+--
+Alex Benn=C3=A9e
