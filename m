@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gA1OW-0003N0-GQ
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:29 -0400
+	(envelope-from <crosa@redhat.com>) id 1gA1OX-0003NC-Iz
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gA1OV-0000ne-Ib
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37748)
+	(envelope-from <crosa@redhat.com>) id 1gA1OW-0000or-9N
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gA1OS-0000kr-3M
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:24 -0400
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gA1OV-0000lO-Uz
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:28 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Date: Tue,  9 Oct 2018 19:26:03 -0400
-Message-Id: <20181009232607.15521-4-crosa@redhat.com>
+Date: Tue,  9 Oct 2018 19:26:04 -0400
+Message-Id: <20181009232607.15521-5-crosa@redhat.com>
 In-Reply-To: <20181009232607.15521-1-crosa@redhat.com>
 References: <20181009232607.15521-1-crosa@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/7] scripts/qemu.py: add method and private
- attribute for arch
+Subject: [Qemu-devel] [PATCH v2 4/7] scripts/qemu.py: set predefined machine
+ type based on arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +27,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-Because some sane defaults may require the knowledge of the arch,
-let's give the QEMUMachine the opportunity to hold that information.
+Some targets require a machine type to be set, as there's no default
+(aarch64 is one example).  To give a consistent interface to users of
+this API, this changes set_machine() so that a predefined default can
+be used, if one is not given.  The approach used is exactly the same
+with the console device type.
+
+Also, even when there's a default machine type, for some purposes,
+testing included, it's better if outside code is explicit about the
+machine type, instead of relying on whatever is set internally.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- scripts/qemu.py | 7 +++++++
- 1 file changed, 7 insertions(+)
+ scripts/qemu.py | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/qemu.py b/scripts/qemu.py
-index f099ce7278..d9e24a0c1a 100644
+index d9e24a0c1a..fca9b76990 100644
 --- a/scripts/qemu.py
 +++ b/scripts/qemu.py
-@@ -113,6 +113,7 @@ class QEMUMachine(object):
-         self._test_dir =3D test_dir
-         self._temp_dir =3D None
-         self._launched =3D False
-+        self._arch =3D None
-         self._machine =3D None
-         self._console_device_type =3D None
-         self._console_address =3D None
-@@ -406,6 +407,12 @@ class QEMUMachine(object):
-         '''
-         self._args.extend(args)
-=20
-+    def set_arch(self, arch):
-+        """
-+        Sets the architecture of this machine
-+        """
-+        self._arch =3D arch
+@@ -36,6 +36,15 @@ CONSOLE_DEV_TYPES = {
+     r'^s390-ccw-virtio.*': 'sclpconsole',
+     }
+ 
++#: Maps archictures to the preferred machine type
++MACHINE_TYPES = {
++    r'^aarch64$': 'virt',
++    r'^ppc$': 'g3beige',
++    r'^ppc64$': 'pseries',
++    r'^s390x$': 's390-ccw-virtio',
++    r'^x86_64$': 'q35',
++    }
 +
-     def set_machine(self, machine_type):
+ 
+ class QEMUMachineError(Exception):
+     """
+@@ -413,13 +422,24 @@ class QEMUMachine(object):
+         """
+         self._arch = arch
+ 
+-    def set_machine(self, machine_type):
++    def set_machine(self, machine_type=None):
          '''
          Sets the machine type
---=20
+ 
+         If set, the machine type will be added to the base arguments
+         of the resulting QEMU command line.
+         '''
++        if machine_type is None:
++            if self._arch is None:
++                raise QEMUMachineError("Can not set a default machine type: "
++                                       "QEMU instance without a defined arch")
++            for regex, machine in MACHINE_TYPES.items():
++                if re.match(regex, self._arch):
++                    machine_type = machine
++                    break
++            if machine_type is None:
++                raise QEMUMachineError("Can not set a machine type: no "
++                                       "matching machine type definition")
+         self._machine = machine_type
+ 
+     def set_console(self, device_type=None):
+-- 
 2.17.1
