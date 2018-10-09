@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1g9tiu-0001om-LH
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:15:01 -0400
+	(envelope-from <cota@braap.org>) id 1g9tnP-0004M2-Tr
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:19:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1g9tio-00012Q-3c
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:15:00 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:36284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1g9tin-00010i-HW
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:14:53 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20181009145839.GJ22838@redhat.com>
-References: <20181009125541.24455-1-berrange@redhat.com>
-	<20181009125541.24455-4-berrange@redhat.com>
-	<w51k1mr8993.fsf@maestria.local.igalia.com>
-	<20181009145839.GJ22838@redhat.com>
-Date: Tue, 09 Oct 2018 17:14:51 +0200
-Message-ID: <w51efcz8844.fsf@maestria.local.igalia.com>
+	(envelope-from <cota@braap.org>) id 1g9tnK-0000ON-4d
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:19:39 -0400
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:53287)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9tnI-0000Ii-2B
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:19:32 -0400
+Date: Tue, 9 Oct 2018 11:19:24 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20181009151924.GA7480@flamenco>
+References: <20181008232756.30704-1-cota@braap.org> <87murnmh7j.fsf@linaro.org>
+	<20181009143837.GA24820@flamenco> <87h8hvmb5b.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/6] crypto: introduce a xts_uint128 data
- type
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87h8hvmb5b.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [RFC v2 0/5] Dynamic TLB sizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
 
-On Tue 09 Oct 2018 04:58:39 PM CEST, Daniel P. Berrang=C3=A9 wrote:
->> > @@ -85,7 +90,7 @@ void xts_decrypt(const void *datactx,
->> >                   uint8_t *dst,
->> >                   const uint8_t *src)
->> >  {
->> > -    uint8_t PP[XTS_BLOCK_SIZE], CC[XTS_BLOCK_SIZE], T[XTS_BLOCK_SIZE];
->> > +    xts_uint128 PP, CC, T;
->> >      unsigned long i, m, mo, lim;
->>=20
->>    [...]
->>=20
->> >          /* Pm =3D first length % XTS_BLOCK_SIZE bytes of PP */
->> >          for (i =3D 0; i < mo; i++) {
->> > -            CC[i] =3D src[XTS_BLOCK_SIZE + i];
->> > -            dst[XTS_BLOCK_SIZE + i] =3D PP[i];
->> > +            ((uint8_t *)&CC)[i] =3D src[XTS_BLOCK_SIZE + i];
->> > +            dst[XTS_BLOCK_SIZE + i] =3D ((uint8_t *)&PP)[i];
->> >          }
->>=20
->> On second thoughts, these casts are a bit cumbersome. I wonder if it
->> isn't better to keep the array a uint8_t[] and only treat it as
->> xts_uint128 in the places where you actually do 64-bit operations
->> (xts_uint128_xor, xts_mult_x).
->
-> I had done that originally, but it just shifts ugly casts from one
-> place to another place in the code.
+On Tue, Oct 09, 2018 at 15:45:36 +0100, Alex Bennée wrote:
+> 
+> Emilio G. Cota <cota@braap.org> writes:
+> 
+> > On Tue, Oct 09, 2018 at 13:34:40 +0100, Alex Bennée wrote:
+> >>
+> >> Emilio G. Cota <cota@braap.org> writes:
+> >>
+> >> > v1: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01146.html
+> >> >
+> >> > Changes since v1:
+> >>
+> >> Hmm I'm seeing some qtest failures, for example:
+> >>
+> >>   $ make check-qtest-alpha V=1
+> >>   ...
+> >>   QTEST_QEMU_BINARY=alpha-softmmu/qemu-system-alpha QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gtester -k --verbose -m=quick test
+> >>   s/boot-serial-test tests/qmp-test tests/qmp-cmd-test tests/device-introspect-test tests/cdrom-test tests/machine-none-test tests/qom-test tests/test-hmp
+> >>   TEST: tests/boot-serial-test... (pid=31091)
+> >>     /alpha/boot-serial/clipper:                                          Broken pipe
+> >>   tests/libqtest.c:129: kill_qemu() detected QEMU death from signal 11 (Segmentation fault) (core dumped)
+> >>   FAIL
+> >>   GTester: last random seed: R02S948c4a5112fd7682934f4d96e1aff38e
+> >>   (pid=31099)
+> >>   FAIL: tests/boot-serial-test
+> >
+> > I'm pretty sure that the problem is that tlb_init is not being
+> > called at all. Note that this applies to the tlb-lock series
+> > as well, although there we're just calling qemu_spin_init,
+> > which is not really necessary because CPUArchState is 0-allocated.
+> >
+> > I'll take a look.
+> 
+> Yeah I hadn't tried to bisect it, but I'm on top of tlb-lock-v4 as
+> requested.
 
-Does it really? There's a dozen casts to uint8_t * in different
-places. If you use uint_8[] you would only need something like this:
+It's the tlb_flush in alpha_cpu_initfn:
 
-static void xts_mult_x(uint8_t *I8)
+static void alpha_cpu_initfn(Object *obj)
 {
-    xts_uint128 *I =3D (xts_uint128 *) I8;
-    /* ... the rest of the function remains the same ... */
-}
+    CPUState *cs = CPU(obj);
+    AlphaCPU *cpu = ALPHA_CPU(obj);
+    CPUAlphaState *env = &cpu->env;
 
-And something similar in xts_uint128_xor(), which could be an inline
-function instead of a macro.
+    cs->env_ptr = env;
+    tlb_flush(cs);
 
-Berto
+We call tlb_init later on at realize time.
+
+I think we can safely get rid of this tlb_flush. Unicore
+also has it. I'll add patches for both to the tlb-lock series.
+
+		Emilio
