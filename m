@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9uyZ-0006f0-V1
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:35:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9v4a-00007d-UU
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9uyX-0003fp-5r
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:35:14 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:39275)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9uyV-0003f3-Hl
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:35:12 -0400
-Received: by mail-wm1-x333.google.com with SMTP id y144-v6so2678856wmd.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 09:35:11 -0700 (PDT)
-References: <20181009145933.18925-1-alex.bennee@linaro.org>
-	<20181009145933.18925-4-alex.bennee@linaro.org>
-	<5bf2d666-d93b-1154-660c-3eab32350b8e@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <5bf2d666-d93b-1154-660c-3eab32350b8e@redhat.com>
-Date: Tue, 09 Oct 2018 17:35:08 +0100
-Message-ID: <878t37m62r.fsf@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1g9v4V-0000Sp-4x
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:41:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9v4T-0000HS-0F
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:41:22 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1535704738-8986-1-git-send-email-thuth@redhat.com>
+	<1535704738-8986-9-git-send-email-thuth@redhat.com>
+	<87efeerbcu.fsf@dusky.pond.sub.org>
+	<593af39a-cc9b-d4e8-7e6c-efdbbe169096@redhat.com>
+	<CAJ+F1CLX15g+QOCyjaBHJN1n0oLtQCH390RivRQkTcyptWf+cw@mail.gmail.com>
+	<5b4cef8c-084c-5a2b-1fb6-210388054d38@redhat.com>
+	<87va7qli3f.fsf@dusky.pond.sub.org>
+Date: Tue, 09 Oct 2018 18:41:16 +0200
+In-Reply-To: <87va7qli3f.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Fri, 31 Aug 2018 16:35:16 +0200")
+Message-ID: <87y3b7rs2b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] tests/tcg: disable enterN insn
- tests for test-i386 with clang
+Subject: Re: [Qemu-devel] [PULL 8/9] tests: add qmp/qom-set-without-value
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +34,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, f4bug@amsat.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
+Markus Armbruster <armbru@redhat.com> writes:
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 09/10/2018 16:59, Alex Benn=C3=A9e wrote:
->> The enter[qwl] instructions aren't supported by clang's inline
->> assembler. Apply the hammer to work around it when we re-use our
->> system compiler to build tcg tests.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Thomas Huth <thuth@redhat.com> writes:
 >
-> Do you have a bug for this in llvm?  It doesn't seem to be a good
-> idea.
-
-I thought I had an llvm bugzilla login but I can't find the details.
-I'll have to a wait until an admin can add me.
-
+>> On 2018-08-31 15:24, Marc-Andr=C3=A9 Lureau wrote:
+>>> Hi
+>>> On Fri, Aug 31, 2018 at 3:18 PM Thomas Huth <thuth@redhat.com> wrote:
+>>>>
+>>>> On 2018-08-31 14:04, Markus Armbruster wrote:
+>>>>> Thomas Huth <thuth@redhat.com> writes:
+>>>>>
+>>>>>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>>>>
+>>>>>> test_qom_set_without_value() is about a bug in infrastructure used by
+>>>>>> the QMP core, fixed in commit c489780203.  We covered the bug in
+>>>>>> infrastructure unit tests (commit bce3035a44).  I wrote that test
+>>>>>> earlier, to cover QMP level as well, the test could go into qmp-test.
+>>>>>>
+>>>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>>> ---
+>>>>>>  tests/qmp-test.c | 14 ++++++++++++++
+>>>>>>  1 file changed, 14 insertions(+)
+>>>>>>
+>>>>>> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+>>>>>> index b347228..2b923f0 100644
+>>>>>> --- a/tests/qmp-test.c
+>>>>>> +++ b/tests/qmp-test.c
+>>>>>> @@ -321,6 +321,19 @@ static void test_qmp_preconfig(void)
+>>>>>>      qtest_quit(qs);
+>>>>>>  }
+>>>>>>
+>>>>>> +static void test_qom_set_without_value(void)
+>>>>>> +{
+>>>>>> +    QTestState *qts;
+>>>>>> +    QDict *resp;
+>>>>>> +
+>>>>>> +    qts =3D qtest_init(common_args);
+>>>>>> +    resp =3D qtest_qmp(qts, "{'execute': 'qom-set', 'arguments':"
+>>>>>> +                     " { 'path': '/machine', 'property': 'rtc-time'=
+ } }");
+>>>>>> +    g_assert_nonnull(resp);
+>>>>>> +    qmp_assert_error_class(resp, "GenericError");
+>>>>>> +    qtest_quit(qts);
+>>>>>> +}
+>>>>>> +
+>>>>>>  int main(int argc, char *argv[])
+>>>>>>  {
+>>>>>>      g_test_init(&argc, &argv, NULL);
+>>>>>> @@ -328,6 +341,7 @@ int main(int argc, char *argv[])
+>>>>>>      qtest_add_func("qmp/protocol", test_qmp_protocol);
+>>>>>>      qtest_add_func("qmp/oob", test_qmp_oob);
+>>>>>>      qtest_add_func("qmp/preconfig", test_qmp_preconfig);
+>>>>>> +    qtest_add_func("qmp/qom-set-without-value", test_qom_set_withou=
+t_value);
+>>>>>>
+>>>>>>      return g_test_run();
+>>>>>>  }
+>>>>>
+>>>>> I'm afraid you missed my objection to naming:
+>>>>> Message-ID: <8736uvujxx.fsf@dusky.pond.sub.org>
+>>>>> https://lists.nongnu.org/archive/html/qemu-devel/2018-08/msg06368.html
+>>>>
+>>>> Sorry about that, I was not on CC: for that series. I used the patches
+>>>> from v5 where Marc-Andr=C3=A9 put me on CC:.
+>>>>
+>>>>> If you could work that into PULL v2, I'd be obliged.  If not, I'll ha=
+ve
+>>>>> to address it in a follow-up patch.
+>>>>
+>>>> IMHO the naming is not that bad ... OTOH, I think Peter might already =
+be
+>>>> away? ... so we've got plenty of time to sort this out anyway.
+>>>> Marc-Andr=C3=A9, could you send a new version of the patch?
+>>>=20
+>>> Tbh, I don't care so much about the naming of the test, but (for once)
+>>> I respectfully don't think Markus suggestion is better.
+>>>=20
+>>> The function checks "qom-set" without 'value' argument:
+>>> "qom-set-without-value", no brainer..
 >
-> Paolo
+> Nope, that's not what it tests.  It tests the visitor, the marshalling
+> code generator, and the QMP core handle a certain kind of invalid
+> arguments correctly.  It does not test qom-set.  I explained all that
+> already.
 >
->> ---
->>  tests/tcg/i386/test-i386.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
->> index c5f67000e4..da632c9b67 100644
->> --- a/tests/tcg/i386/test-i386.c
->> +++ b/tests/tcg/i386/test-i386.c
->> @@ -2098,6 +2098,7 @@ long enter_stack[4096];
->>
->>  static void test_enter(void)
->>  {
->> +#if !(defined __clang__)
->>  #if defined(__x86_64__)
->>      TEST_ENTER("q", uint64_t, 0);
->>      TEST_ENTER("q", uint64_t, 1);
->> @@ -2114,6 +2115,7 @@ static void test_enter(void)
->>      TEST_ENTER("w", uint16_t, 1);
->>      TEST_ENTER("w", uint16_t, 2);
->>      TEST_ENTER("w", uint16_t, 31);
->> +#endif
->>  }
->>
->>  #ifdef TEST_SSE
->>
+>>> Naming it "invalid-arg" is so generic that I wouldn't be able what it d=
+oes.
+>
+> I can accept "missing-any" or "missing-any-arg".  I object to any name
+> involving qom-set, because the test is not about qom-set at all.
+>
+> If it was, then putting it in qmp-test.c would be wrong.
+>
+>> Ok, then let's keep it this way. As I said, IMHO the current naming is
+>> not really bad, and I also don't have any suggestions for a perfect name
+>> right now.
+>
+> We don't need a perfect name.  We need one that's not actively
+> misleading.
 
-
---
-Alex Benn=C3=A9e
+Marc-Andr=C3=A9, would "qmp/missing-any-arg" and test_missing_any_arg() work
+for you?
