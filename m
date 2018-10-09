@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1g9m8J-000205-7b
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:08:43 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1g9mJu-0003kC-HI
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:20:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1g9m8F-0003K1-UO
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:08:43 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36781)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1g9m8F-0003Jo-OW
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:08:39 -0400
-Received: by mail-pf1-x442.google.com with SMTP id l81-v6so365488pfg.3
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 00:08:39 -0700 (PDT)
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue,  9 Oct 2018 00:08:33 -0700
-Message-Id: <1539068913-3796-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH] Rom: change Rom's 'isrom' to bool type
+	(envelope-from <eric.auger@redhat.com>) id 1g9mJr-0001Au-Ci
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:20:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1g9mJr-0001AR-2a
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:20:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 943FF30020AB
+	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 07:20:36 +0000 (UTC)
+References: <20181008064713.27349-1-peterx@redhat.com>
+	<20181008064713.27349-2-peterx@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3652c527-2b2e-23f0-99d3-82e0e289fb80@redhat.com>
+Date: Tue, 9 Oct 2018 09:20:24 +0200
+MIME-Version: 1.0
+In-Reply-To: <20181008064713.27349-2-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] intel_iommu: move ce fetching out
+ when sync shadow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +36,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Pei Zhang <pezhang@redhat.com>
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
----
- hw/core/loader.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Peter,
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index aa0b3fc867..910f9a97a9 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -837,7 +837,7 @@ struct Rom {
-     uint8_t *data;
-     MemoryRegion *mr;
-     AddressSpace *as;
--    int isrom;
-+    bool isrom;
-     char *fw_dir;
-     char *fw_file;
- 
--- 
-2.11.0
+On 10/8/18 8:47 AM, Peter Xu wrote:
+> There are two callers for vtd_sync_shadow_page_table_range(): one
+> provided a valid context entry and one not.  Move that fetching
+> operation into the caller vtd_sync_shadow_page_table() where we need to
+> fetch the context entry.
+> 
+> Meanwhile, remove the error_report_once() directly since we're already
+> tracing all the error cases in the previous call.  Instead, return error
+> number back to caller.  This will not change anything functional since
+> callers are dropping it after all.
+> 
+> We do this move majorly because we want to do something more later in
+> vtd_sync_shadow_page_table().
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+
+> ---
+>  dtc                   |  2 +-
+>  hw/i386/intel_iommu.c | 41 +++++++++++++----------------------------
+>  2 files changed, 14 insertions(+), 29 deletions(-)
+> 
+> diff --git a/dtc b/dtc
+> index 88f18909db..e54388015a 160000
+> --- a/dtc
+> +++ b/dtc
+> @@ -1 +1 @@
+> -Subproject commit 88f18909db731a627456f26d779445f84e449536
+> +Subproject commit e54388015af1fb4bf04d0bca99caba1074d9cc42
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 3dfada19a6..d6b4f8705d 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1035,7 +1035,6 @@ static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
+>      return 0;
+>  }
+>  
+> -/* If context entry is NULL, we'll try to fetch it on our own. */
+>  static int vtd_sync_shadow_page_table_range(VTDAddressSpace *vtd_as,
+>                                              VTDContextEntry *ce,
+>                                              hwaddr addr, hwaddr size)
+> @@ -1047,39 +1046,25 @@ static int vtd_sync_shadow_page_table_range(VTDAddressSpace *vtd_as,
+>          .notify_unmap = true,
+>          .aw = s->aw_bits,
+>          .as = vtd_as,
+> +        .domain_id = VTD_CONTEXT_ENTRY_DID(ce->hi),
+>      };
+> -    VTDContextEntry ce_cache;
+> -    int ret;
+> -
+> -    if (ce) {
+> -        /* If the caller provided context entry, use it */
+> -        ce_cache = *ce;
+> -    } else {
+> -        /* If the caller didn't provide ce, try to fetch */
+> -        ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+> -                                       vtd_as->devfn, &ce_cache);
+> -        if (ret) {
+> -            /*
+> -             * This should not really happen, but in case it happens,
+> -             * we just skip the sync for this time.  After all we even
+> -             * don't have the root table pointer!
+> -             */
+> -            error_report_once("%s: invalid context entry for bus 0x%x"
+> -                              " devfn 0x%x",
+> -                              __func__, pci_bus_num(vtd_as->bus),
+> -                              vtd_as->devfn);
+> -            return 0;
+> -        }
+> -    }
+>  
+> -    info.domain_id = VTD_CONTEXT_ENTRY_DID(ce_cache.hi);
+> -
+> -    return vtd_page_walk(&ce_cache, addr, addr + size, &info);
+> +    return vtd_page_walk(ce, addr, addr + size, &info);
+>  }
+>  
+>  static int vtd_sync_shadow_page_table(VTDAddressSpace *vtd_as)
+>  {
+> -    return vtd_sync_shadow_page_table_range(vtd_as, NULL, 0, UINT64_MAX);
+> +    int ret;
+> +    VTDContextEntry ce;
+> +
+> +    ret = vtd_dev_to_context_entry(vtd_as->iommu_state,
+> +                                   pci_bus_num(vtd_as->bus),
+> +                                   vtd_as->devfn, &ce);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    return vtd_sync_shadow_page_table_range(vtd_as, &ce, 0, UINT64_MAX);
+>  }
+>  
+>  /*
+> 
