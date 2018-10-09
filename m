@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9yvt-0002YS-E5
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:48:46 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g9ywM-0002mV-OZ
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:49:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9yvo-0005bh-Gs
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:48:45 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46003)
+	(envelope-from <richard.henderson@linaro.org>) id 1g9ywH-0005mg-WE
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:49:14 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40009)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g9yvo-0005aj-1I
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:48:40 -0400
-Received: by mail-pf1-x442.google.com with SMTP id u12-v6so1431510pfn.12
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 13:48:39 -0700 (PDT)
+	id 1g9ywH-0005lP-PG
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:49:09 -0400
+Received: by mail-pf1-x444.google.com with SMTP id s5-v6so1446559pfj.7
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 13:49:09 -0700 (PDT)
 References: <20181009174557.16125-1-cota@braap.org>
 	<20181009174557.16125-2-cota@braap.org>
-	<CAFEAcA8DyV6_BfRZT2_9K1PKNkPnLqw8e=55uJ3R1r5+ejkRFw@mail.gmail.com>
-	<20181009182053.GA28943@flamenco>
-	<CAFEAcA_2DfNTmhhs5p6zeQ6ZODuFryNK05-VnOV_NTZ1LOQQMA@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <87deab9a-4feb-b39d-12ff-c97dac223918@linaro.org>
-Date: Tue, 9 Oct 2018 13:48:35 -0700
+Message-ID: <755ba78d-415b-b9fe-93b2-d6b383f85857@linaro.org>
+Date: Tue, 9 Oct 2018 13:49:06 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_2DfNTmhhs5p6zeQ6ZODuFryNK05-VnOV_NTZ1LOQQMA@mail.gmail.com>
+In-Reply-To: <20181009174557.16125-2-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -35,25 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 10/9/18 11:25 AM, Peter Maydell wrote:
->>         /* PALBR */
->>         tcg_gen_st_i64(vb, cpu_env, offsetof(CPUAlphaState, palbr));
->>         /* Changing the PAL base register implies un-chaining all of the TBs
->>            that ended with a CALL_PAL.  Since the base register usually only
->>            changes during boot, flushing everything works well.  */
->>         gen_helper_tb_flush(cpu_env);
->>         return DISAS_PC_STALE;
+On 10/9/18 10:45 AM, Emilio G. Cota wrote:
+> As far as I can tell tlb_flush does not need to be called
+> this early. tlb_flush is eventually called after the CPU
+> has been realized.
 > 
-> Mmm, it works (though would it work if the CPU wasn't the
-> only one in the system?). I just have a reflexive dislike
-> of design approaches used by only one thing -- I tend to
-> like to smooth them out so there's more consistency...
+> This change paves the way to the introduction of tlb_init,
+> which will be called from cpu_exec_realizefn.
+> 
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> ---
+>  target/alpha/cpu.c | 1 -
+>  1 file changed, 1 deletion(-)
 
-It could be less important now that we have goto_ptr.
-If you really think I should get rid of it, I will.
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 r~
