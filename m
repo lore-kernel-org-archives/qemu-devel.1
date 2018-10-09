@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9pxg-00080i-52
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:14:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1g9q0W-0000ku-P9
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:16:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9pxf-0005zZ-HM
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:14:00 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42519)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g9pxf-0005yw-AT
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:13:59 -0400
-Received: by mail-wr1-x444.google.com with SMTP id g15-v6so1355641wru.9
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 04:13:59 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1g9q0V-00006h-CI
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:16:56 -0400
+References: <20181005143802.18412-1-peter.maydell@linaro.org>
+	<CAFEAcA8-FvVG7XBLrd7NQfRcKrvo6GtPEjfqJzkjd68iP9=TeQ@mail.gmail.com>
+	<20181005161739.GC4606@localhost.localdomain>
+	<CAFEAcA-SWRHwnwsa+QiHXfdBRB6u2u0paV9HsEqfjR6nZvAHSg@mail.gmail.com>
+	<20181005180901.GA32677@localhost.localdomain>
+	<CAFEAcA80cys-98QwJgAk_2LXfAeMHgCUS2L3Z+NgY4ZsCFhSPw@mail.gmail.com>
+	<CAFEAcA8gYwFZynMyiEHf+VPbaBerA9JTUPAHsipEvOqkBjHxMQ@mail.gmail.com>
+	<20181008164026.GD4604@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e2efa1f8-7ada-d5c4-9719-491d9b5f477b@redhat.com>
+Date: Tue, 9 Oct 2018 13:16:16 +0200
 MIME-Version: 1.0
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-20-armbru@redhat.com>
-In-Reply-To: <20181008173125.19678-20-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Oct 2018 15:13:46 +0400
-Message-ID: <CAJ+F1CLLM7nOAXPABTGRzddRNvryN9BFetv_g5Uo7mM6bGX2MQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 19/31] vl: Clean up error reporting in
- parse_add_fd()
+In-Reply-To: <20181008164026.GD4604@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: Disable test-bdrv-drain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-Hi
+On 08/10/2018 18:40, Kevin Wolf wrote:
+>>
+>> I'm pretty confident this analysis of the problem is correct:
+>> unfortunately I have no idea what the right way to fix it is...
+> Yes, I agree with your analysis. If __thread variables can be destructed
+> before pthread_key_create() destructors are called (and in particular if
+> the former are implemented in terms of the latter), this implies at
+> least two rules:
+> 
+> 1. The Notfier itself can't be a TLS variable
+> 
+> 2. The notifier callback can't access any TLS variables
+> 
+> Of course, with these restrictions, qemu_thread_atexit_*() with its
+> existing API is as useless as it could be.
 
-On Mon, Oct 8, 2018 at 9:51 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  chardev_init_func() does that, and then fails without
-> setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-> with it, but clean it up anyway.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Yup, we have to stop using pthread_key_create.  Luckily, these days
+there is always qemu_thread_start that wraps the thread, so we can call
+qemu_thread_atexit_run from there, and change exit_key to a thread-local
+NotifierList.
 
-commit title is wrong, apart from that:
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
->  vl.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index b8576f8f10..ecb70f87d8 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2239,7 +2239,7 @@ static int chardev_init_func(void *opaque, QemuOpts=
- *opts, Error **errp)
->
->      if (!qemu_chr_new_from_opts(opts, &local_err)) {
->          if (local_err) {
-> -            error_report_err(local_err);
-> +            error_propagate(errp, local_err);
->              return -1;
->          }
->          exit(0);
-> @@ -4185,10 +4185,8 @@ int main(int argc, char **argv, char **envp)
->                        user_creatable_add_opts_foreach,
->                        object_create_initial, &error_fatal);
->
-> -    if (qemu_opts_foreach(qemu_find_opts("chardev"),
-> -                          chardev_init_func, NULL, NULL)) {
-> -        exit(1);
-> -    }
-> +    qemu_opts_foreach(qemu_find_opts("chardev"),
-> +                      chardev_init_func, NULL, &error_fatal);
->
->  #ifdef CONFIG_VIRTFS
->      if (qemu_opts_foreach(qemu_find_opts("fsdev"),
-> --
-> 2.17.1
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Paolo
