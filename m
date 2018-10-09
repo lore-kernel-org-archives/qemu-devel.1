@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g9mrW-0004Sm-FH
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:55:27 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1g9mrb-0004Vh-NA
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:55:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g9mrS-0004tH-DG
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:55:26 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36609)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9mrS-0004t2-3A
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:55:22 -0400
-Received: by mail-wr1-f66.google.com with SMTP id y16so695768wrw.3
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 00:55:22 -0700 (PDT)
-References: <1539071180-2028-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f8c0f859-2d70-b53e-a39a-48c2bf253be6@redhat.com>
-Date: Tue, 9 Oct 2018 09:55:19 +0200
+	(envelope-from <eric.auger@redhat.com>) id 1g9mrX-0004v2-NA
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:55:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60218)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1g9mrX-0004uf-ET
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:55:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 90BBC36807
+	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 07:55:26 +0000 (UTC)
+References: <20181009074543.6013-1-peterx@redhat.com>
+	<20181009074543.6013-3-peterx@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <694eec8e-7c29-8072-2542-5d06f87dd208@redhat.com>
+Date: Tue, 9 Oct 2018 09:55:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <1539071180-2028-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <20181009074543.6013-3-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/cris/translate: Get rid of
- qemu_log_separate()
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] intel_iommu: handle invalid ce for
+ shadow sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +36,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: qemu-trivial@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Pei Zhang <pezhang@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-Hi Thomas,
+Hi Peter,
 
-On 09/10/2018 09:46, Thomas Huth wrote:
-> The gen_BUG() function calls already cpu_abort(), which prints the
-> information to stderr and the log already. So instead of additionally
-> printing the dc->pc via fprintf() and qemu_log here, too, we can
-> simply pass this information to cpu_abort() instead.
+On 10/9/18 9:45 AM, Peter Xu wrote:
+> We should handle VTD_FR_CONTEXT_ENTRY_P properly when synchronizing
+> shadow page tables.  Having invalid context entry there is perfectly
+> valid when we move a device out of an existing domain.  When that
+> happens, instead of posting an error we invalidate the whole region.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Without this patch, QEMU will crash if we do these steps:
+> 
+> (1) start QEMU with VT-d IOMMU and two 10G NICs (ixgbe)
+> (2) bind the NICs with vfio-pci in the guest
+> (3) start testpmd with the NICs applied
+> (4) stop testpmd
+> (5) rebind the NIC back to ixgbe kernel driver
+> 
+> The patch should fix it.
+> 
+> Reported-by: Pei Zhang <pezhang@redhat.com>
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1627272
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  target/cris/translate.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+>  hw/i386/intel_iommu.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
-> diff --git a/target/cris/translate.c b/target/cris/translate.c
-> index 4ae1c04..0ee2c5d 100644
-> --- a/target/cris/translate.c
-> +++ b/target/cris/translate.c
-> @@ -137,11 +137,7 @@ typedef struct DisasContext {
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index d6b4f8705d..6072f9a4e0 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -37,6 +37,8 @@
+>  #include "kvm_i386.h"
+>  #include "trace.h"
 >  
->  static void gen_BUG(DisasContext *dc, const char *file, int line)
+> +static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n);
+> +
+>  static void vtd_define_quad(IntelIOMMUState *s, hwaddr addr, uint64_t val,
+>                              uint64_t wmask, uint64_t w1cmask)
 >  {
-> -    fprintf(stderr, "BUG: pc=%x %s %d\n", dc->pc, file, line);
-> -    if (qemu_log_separate()) {
-> -        qemu_log("BUG: pc=%x %s %d\n", dc->pc, file, line);
-> -    }
-> -    cpu_abort(CPU(dc->cpu), "%s:%d\n", file, line);
-> +    cpu_abort(CPU(dc->cpu), "%s:%d dc->pc=%x\n", file, line, dc->pc);
-
-I'd use a simpler format (why display internal "dc->"?):
-
-       cpu_abort(CPU(dc->cpu), "%s:%d BUG: pc=%x\n", ...
-
-
->  }
+> @@ -1056,11 +1058,27 @@ static int vtd_sync_shadow_page_table(VTDAddressSpace *vtd_as)
+>  {
+>      int ret;
+>      VTDContextEntry ce;
+> +    IOMMUNotifier *n;
 >  
->  static const char *regnames_v32[] =
+>      ret = vtd_dev_to_context_entry(vtd_as->iommu_state,
+>                                     pci_bus_num(vtd_as->bus),
+>                                     vtd_as->devfn, &ce);
+>      if (ret) {
+> +        if (ret == -VTD_FR_CONTEXT_ENTRY_P) {
+> +            /*
+> +             * It's a valid scenario to have a context entry that is
+> +             * not present.  For example, when a device is removed
+> +             * from an existing domain then the context entry will be
+> +             * zeroed by the guest before it was put into another
+> +             * domain.  When this happens, instead of synchronizing
+> +             * the shadow pages we should invalidate all existing
+> +             * mappings and notify the backends.
+> +             */
+> +            IOMMU_NOTIFIER_FOREACH(n, &vtd_as->iommu) {
+> +                vtd_address_space_unmap(vtd_as, n);
+> +            }
+> +            ret = 0;
+> +        }
+>          return ret;
+>      }
+>  
 > 
+
+nit: in the future, you could consider making vtd_sync_shadow_page_table
+a void function as the returned value never is used.
+
+Besides
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
