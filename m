@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9wWk-0006Jp-L4
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:14:40 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1g9wYM-0007Qp-A3
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9wWj-0008IF-7O
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:14:38 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35878)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9wWi-0008H5-Q5
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:14:36 -0400
-Received: by mail-wm1-x344.google.com with SMTP id a8-v6so2996026wmf.1
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 11:14:36 -0700 (PDT)
-References: <20181009174557.16125-1-cota@braap.org>
-	<20181009174557.16125-3-cota@braap.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181009174557.16125-3-cota@braap.org>
-Date: Tue, 09 Oct 2018 19:14:34 +0100
-Message-ID: <875zybm1h1.fsf@linaro.org>
+	(envelope-from <pm215@archaic.org.uk>) id 1g9wYL-0000uq-Fj
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:16:18 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:51736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1g9wYL-0000u0-7F
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:16:17 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  9 Oct 2018 19:16:12 +0100
+Message-Id: <20181009181612.10633-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/6] target/unicore32: remove tlb_flush
- from uc32_init_fn
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] coccinelle: new inplace-byteswaps.cocci to
+ remove inplace-byteswapping calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <richard.henderson@linaro.org>
 
+Add a new Coccinelle script which replaces uses of the inplace
+byteswapping functions *_to_cpus() and cpu_to_*s() with their
+not-in-place equivalents. This is useful for where the swapping
+is done on members of a packed struct -- taking the address
+of the member to pass it to an inplace function is undefined
+behaviour in C.
 
-Emilio G. Cota <cota@braap.org> writes:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Richard asked for a coccinelle script in the scripts/coccinelle
+directory, so here's a patch to add it.
 
-> As far as I can tell tlb_flush does not need to be called
-> this early. tlb_flush is eventually called after the CPU
-> has been realized.
->
-> This change paves the way to the introduction of tlb_init,
-> which will be called from cpu_exec_realizefn.
->
-> Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/unicore32/cpu.c | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-> index 68f978d80b..2b49d1ca40 100644
-> --- a/target/unicore32/cpu.c
-> +++ b/target/unicore32/cpu.c
-> @@ -116,8 +116,6 @@ static void uc32_cpu_initfn(Object *obj)
->      env->uncached_asr =3D ASR_MODE_PRIV;
->      env->regs[31] =3D 0x03000000;
->  #endif
-> -
-> -    tlb_flush(cs);
->  }
->
->  static const VMStateDescription vmstate_uc32_cpu =3D {
+ scripts/coccinelle/inplace-byteswaps.cocci | 65 ++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+ create mode 100644 scripts/coccinelle/inplace-byteswaps.cocci
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---
-Alex Benn=C3=A9e
+diff --git a/scripts/coccinelle/inplace-byteswaps.cocci b/scripts/coccinelle/inplace-byteswaps.cocci
+new file mode 100644
+index 00000000000..a869a90cbfd
+--- /dev/null
++++ b/scripts/coccinelle/inplace-byteswaps.cocci
+@@ -0,0 +1,65 @@
++// Replace uses of in-place byteswapping functions with calls to the
++// equivalent not-in-place functions.  This is necessary to avoid
++// undefined behaviour if the expression being swapped is a field in a
++// packed struct.
++
++@@
++expression E;
++@@
++-be16_to_cpus(&E);
+++E = be16_to_cpu(E);
++@@
++expression E;
++@@
++-be32_to_cpus(&E);
+++E = be32_to_cpu(E);
++@@
++expression E;
++@@
++-be64_to_cpus(&E);
+++E = be64_to_cpu(E);
++@@
++expression E;
++@@
++-cpu_to_be16s(&E);
+++E = cpu_to_be16(E);
++@@
++expression E;
++@@
++-cpu_to_be32s(&E);
+++E = cpu_to_be32(E);
++@@
++expression E;
++@@
++-cpu_to_be64s(&E);
+++E = cpu_to_be64(E);
++@@
++expression E;
++@@
++-le16_to_cpus(&E);
+++E = le16_to_cpu(E);
++@@
++expression E;
++@@
++-le32_to_cpus(&E);
+++E = le32_to_cpu(E);
++@@
++expression E;
++@@
++-le64_to_cpus(&E);
+++E = le64_to_cpu(E);
++@@
++expression E;
++@@
++-cpu_to_le16s(&E);
+++E = cpu_to_le16(E);
++@@
++expression E;
++@@
++-cpu_to_le32s(&E);
+++E = cpu_to_le32(E);
++@@
++expression E;
++@@
++-cpu_to_le64s(&E);
+++E = cpu_to_le64(E);
+-- 
+2.19.0
