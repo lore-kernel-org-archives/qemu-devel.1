@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g9rYV-0000c1-7c
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:56:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9rYX-0000ds-7P
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g9rYP-0004GI-6C
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:56:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37834)
+	(envelope-from <armbru@redhat.com>) id 1g9rYV-0004Nu-6t
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:56:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1g9rYN-0004Dn-7U
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:55:59 -0400
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue,  9 Oct 2018 13:55:39 +0100
-Message-Id: <20181009125541.24455-5-berrange@redhat.com>
-In-Reply-To: <20181009125541.24455-1-berrange@redhat.com>
-References: <20181009125541.24455-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9rYR-0004Ek-9H
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:56:05 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181002135538.12113-1-den@openvz.org>
+Date: Tue, 09 Oct 2018 14:55:56 +0200
+In-Reply-To: <20181002135538.12113-1-den@openvz.org> (Denis V. Lunev's message
+	of "Tue, 2 Oct 2018 16:55:38 +0300")
+Message-ID: <875zybxorn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/6] crypto: convert xts_tweak_encdec to use
- xts_uint128 type
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/1] qmp,
+ hmp: make subsystem/system-vendor identities optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,146 +27,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: "Denis V. Lunev" <den@openvz.org>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Using 64-bit arithmetic increases the performance for xts-aes-128
-when built with gcrypt:
+"Denis V. Lunev" <den@openvz.org> writes:
 
-  Encrypt: 235 MB/s -> 320 MB/s
-  Decrypt: 245 MB/s -> 325 MB/s
+> According to PCI specification subsystem id and subsystem vendor id are
+> optinal and could be abscent in Type1 header and can be found on
+> different offsets within Type0 and Type2 headers.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- crypto/xts.c | 52 +++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 33 insertions(+), 19 deletions(-)
+Well, they *are* absent in Type1 headers.  Perhaps:
 
-diff --git a/crypto/xts.c b/crypto/xts.c
-index ded4365191..f109c8a3ee 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -31,6 +31,12 @@ typedef struct {
-     uint64_t b;
- } xts_uint128;
-=20
-+#define xts_uint128_xor(D, S1, S2)              \
-+    do {                                        \
-+        (D)->a =3D (S1)->a ^ (S2)->a;             \
-+        (D)->b =3D (S1)->b ^ (S2)->b;             \
-+    } while (0)
-+
- static void xts_mult_x(uint8_t *I)
- {
-     int x;
-@@ -59,25 +65,19 @@ static void xts_mult_x(uint8_t *I)
-  */
- static void xts_tweak_encdec(const void *ctx,
-                              xts_cipher_func *func,
--                             const uint8_t *src,
--                             uint8_t *dst,
--                             uint8_t *iv)
-+                             const xts_uint128 *src,
-+                             xts_uint128 *dst,
-+                             xts_uint128 *iv)
- {
--    unsigned long x;
--
-     /* tweak encrypt block i */
--    for (x =3D 0; x < XTS_BLOCK_SIZE; x++) {
--        dst[x] =3D src[x] ^ iv[x];
--    }
-+    xts_uint128_xor(dst, src, iv);
-=20
--    func(ctx, XTS_BLOCK_SIZE, dst, dst);
-+    func(ctx, XTS_BLOCK_SIZE, (uint8_t *)dst, (uint8_t *)dst);
-=20
--    for (x =3D 0; x < XTS_BLOCK_SIZE; x++) {
--        dst[x] =3D dst[x] ^ iv[x];
--    }
-+    xts_uint128_xor(dst, dst, iv);
-=20
-     /* LFSR the tweak */
--    xts_mult_x(iv);
-+    xts_mult_x((uint8_t *)iv);
- }
-=20
-=20
-@@ -110,7 +110,11 @@ void xts_decrypt(const void *datactx,
-     encfunc(tweakctx, XTS_BLOCK_SIZE, (uint8_t *)&T, iv);
-=20
-     for (i =3D 0; i < lim; i++) {
--        xts_tweak_encdec(datactx, decfunc, src, dst, (uint8_t *)&T);
-+        xts_uint128 S, D;
-+
-+        memcpy(&S, src, XTS_BLOCK_SIZE);
-+        xts_tweak_encdec(datactx, decfunc, &S, &D, &T);
-+        memcpy(dst, &D, XTS_BLOCK_SIZE);
-=20
-         src +=3D XTS_BLOCK_SIZE;
-         dst +=3D XTS_BLOCK_SIZE;
-@@ -118,11 +122,13 @@ void xts_decrypt(const void *datactx,
-=20
-     /* if length is not a multiple of XTS_BLOCK_SIZE then */
-     if (mo > 0) {
-+        xts_uint128 S, D;
-         memcpy(&CC, &T, XTS_BLOCK_SIZE);
-         xts_mult_x((uint8_t *)&CC);
-=20
-         /* PP =3D tweak decrypt block m-1 */
--        xts_tweak_encdec(datactx, decfunc, src, (uint8_t *)&PP, (uint8_t=
- *)&CC);
-+        memcpy(&S, src, XTS_BLOCK_SIZE);
-+        xts_tweak_encdec(datactx, decfunc, &S, &PP, &CC);
-=20
-         /* Pm =3D first length % XTS_BLOCK_SIZE bytes of PP */
-         for (i =3D 0; i < mo; i++) {
-@@ -134,7 +140,8 @@ void xts_decrypt(const void *datactx,
-         }
-=20
-         /* Pm-1 =3D Tweak uncrypt CC */
--        xts_tweak_encdec(datactx, decfunc, (uint8_t *)&CC, dst, (uint8_t=
- *)&T);
-+        xts_tweak_encdec(datactx, decfunc, &CC, &D, &T);
-+        memcpy(dst, &D, XTS_BLOCK_SIZE);
-     }
-=20
-     /* Decrypt the iv back */
-@@ -171,7 +178,11 @@ void xts_encrypt(const void *datactx,
-     encfunc(tweakctx, XTS_BLOCK_SIZE, (uint8_t *)&T, iv);
-=20
-     for (i =3D 0; i < lim; i++) {
--        xts_tweak_encdec(datactx, encfunc, src, dst, (uint8_t *)&T);
-+        xts_uint128 S, D;
-+
-+        memcpy(&S, src, XTS_BLOCK_SIZE);
-+        xts_tweak_encdec(datactx, encfunc, &S, &D, &T);
-+        memcpy(dst, &D, XTS_BLOCK_SIZE);
-=20
-         dst +=3D XTS_BLOCK_SIZE;
-         src +=3D XTS_BLOCK_SIZE;
-@@ -179,8 +190,10 @@ void xts_encrypt(const void *datactx,
-=20
-     /* if length is not a multiple of XTS_BLOCK_SIZE then */
-     if (mo > 0) {
-+        xts_uint128 S, D;
-         /* CC =3D tweak encrypt block m-1 */
--        xts_tweak_encdec(datactx, encfunc, src, (uint8_t *)&CC, (uint8_t=
- *)&T);
-+        memcpy(&S, src, XTS_BLOCK_SIZE);
-+        xts_tweak_encdec(datactx, encfunc, &S, &CC, &T);
-=20
-         /* Cm =3D first length % XTS_BLOCK_SIZE bytes of CC */
-         for (i =3D 0; i < mo; i++) {
-@@ -193,7 +206,8 @@ void xts_encrypt(const void *datactx,
-         }
-=20
-         /* Cm-1 =3D Tweak encrypt PP */
--        xts_tweak_encdec(datactx, encfunc, (uint8_t *)&PP, dst, (uint8_t=
- *)&T);
-+        xts_tweak_encdec(datactx, encfunc, &PP, &D, &T);
-+        memcpy(dst, &D, XTS_BLOCK_SIZE);
-     }
-=20
-     /* Decrypt the iv back */
---=20
-2.17.1
+  According to PCI specification, subsystem id and subsystem vendor id
+  are present only in type 0 and type 2 headers (at different offsets),
+  but not in type 1 headers.
+
+> Thus we should make this data optional in struct PciDeviceId and skip
+> reporting them via HMP if the information is not available.
+>
+> Additional (wrong information) about PCI bridges (Type1 devices) has been
+> added in 5383a705 and fortunately not released. This patch fixes that
+> problem. The problem was spotted by Markus.
+
+A machine-readable way to phrase the last sentence is
+Reported-by: Markus Armbruster <armbru@redhat.com>
+
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> CC: Eric Blake <eblake@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hmp.c          |  6 ++++--
+>  hw/pci/pci.c   | 13 ++++++++++---
+>  qapi/misc.json |  4 ++--
+>  3 files changed, 16 insertions(+), 7 deletions(-)
+>
+> diff --git a/hmp.c b/hmp.c
+> index 3a9f797677..55633d29a3 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -824,8 +824,10 @@ static void hmp_info_pci_device(Monitor *mon, const PciDeviceInfo *dev)
+>  
+>      monitor_printf(mon, ": PCI device %04" PRIx64 ":%04" PRIx64 "\n",
+>                     dev->id->vendor, dev->id->device);
+> -    monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
+> -                   dev->id->subsystem_vendor, dev->id->subsystem);
+> +    if (dev->id->has_subsystem_vendor && dev->id->has_subsystem) {
+> +        monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
+> +                       dev->id->subsystem_vendor, dev->id->subsystem);
+> +    }
+>  
+>      if (dev->has_irq) {
+>          monitor_printf(mon, "      IRQ %" PRId64 ".\n", dev->irq);
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 51d0dec466..b937f0dc0a 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1737,9 +1737,6 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
+>      info->id = g_new0(PciDeviceId, 1);
+>      info->id->vendor = pci_get_word(dev->config + PCI_VENDOR_ID);
+>      info->id->device = pci_get_word(dev->config + PCI_DEVICE_ID);
+> -    info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
+> -    info->id->subsystem_vendor =
+> -        pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
+>      info->regions = qmp_query_pci_regions(dev);
+>      info->qdev_id = g_strdup(dev->qdev.id ? dev->qdev.id : "");
+>  
+> @@ -1752,6 +1749,16 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
+>      if (type == PCI_HEADER_TYPE_BRIDGE) {
+>          info->has_pci_bridge = true;
+>          info->pci_bridge = qmp_query_pci_bridge(dev, bus, bus_num);
+> +    } else if (type == PCI_HEADER_TYPE_NORMAL) {
+> +        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
+> +        info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
+> +        info->id->subsystem_vendor =
+> +            pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
+> +    } else if (type == PCI_HEADER_TYPE_CARDBUS) {
+> +        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
+> +        info->id->subsystem = pci_get_word(dev->config + PCI_CB_SUBSYSTEM_ID);
+> +        info->id->subsystem_vendor =
+> +            pci_get_word(dev->config + PCI_CB_SUBSYSTEM_VENDOR_ID);
+>      }
+>  
+>      return info;
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index ada9af5add..95a6ed022d 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -839,8 +839,8 @@
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'PciDeviceId',
+> -  'data': {'device': 'int', 'vendor': 'int', 'subsystem': 'int',
+> -            'subsystem-vendor': 'int'} }
+> +  'data': {'device': 'int', 'vendor': 'int', '*subsystem': 'int',
+> +            '*subsystem-vendor': 'int'} }
+
+'uint16' would match PCI, but I since we didn't for @device and @vendor,
+we probably shouldn't for @subsystem and @subsystem-vendor.
+
+>  
+>  ##
+>  # @PciDeviceInfo:
+
+With Eric's spelling corrections or my rephrasing of the commit message:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+David, would you like to pick this up?
