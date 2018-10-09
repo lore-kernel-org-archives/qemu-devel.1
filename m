@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9o2H-0001u0-4G
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:10:37 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9o74-0002x6-L1
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9o2G-0002d7-9M
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:10:37 -0400
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:33981)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9o6u-0005Sq-7K
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:15:28 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44691)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g9o2F-0002YD-TT
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:10:36 -0400
-Received: by mail-oi1-x235.google.com with SMTP id v69-v6so660548oif.1
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:10:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g9o6r-0005NW-Oa
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:15:22 -0400
+Received: by mail-wr1-x444.google.com with SMTP id 63-v6so953649wra.11
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:15:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1810081505210.28877@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1810081505210.28877@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Oct 2018 10:10:08 +0100
-Message-ID: <CAFEAcA8=+c4ujHCfQcagbn_UYHLWu7Ec6EM8+6619Kp9bncOsQ@mail.gmail.com>
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-9-armbru@redhat.com>
+In-Reply-To: <20181008173125.19678-9-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 9 Oct 2018 13:15:05 +0400
+Message-ID: <CAJ+F1CJ2gTcYSuZygx4RqFvQkqxKBvdTbtiYWZEwfeiPkzWPow@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] possible BUG, ATS12NSOPW fails
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 08/31] pc: Fix machine property
+ nvdimm-persistence error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 8 October 2018 at 23:17, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> I double-checked all the addresses and they are correct. For some reason
-> after starting the guest, ATS12NSOPW starts to fail for
-> ffffffc006f91628, which is the same virtual address corresponding to the
-> same runstate region allocated in Linux.
+Hi
+On Mon, Oct 8, 2018 at 9:38 PM Markus Armbruster <armbru@redhat.com> wrote:
 >
-> I added a couple of printf's to QEMU and Xen:
+> Calling error_report() in a function that takes an Error ** argument
+> is suspicious.  pc.c's pc_machine_set_nvdimm_persistence() does that,
+> and then exit()s.  Wrong.  Attempting to set machine property
+> nvdimm-persistence to a bad value instantly kills the VM:
 >
-> (XEN) DEBUG do_vcpu_op 1458 area.v=ffffffc006f91628
-> ### This is the virtual address as passed by Linux
-> [...]
-> (QEMU) DEBUG do_ats_write 2256 ret=1 phys_addr=200 value=ffffffc006f91628
-> (QEMU) DEBUG do_ats_write 2326 par64=80b
-> ### This is the output from QEMU, I added the printks to do_ats_write, line numbers 2256 and 2326
-> (XEN) p2m.c:1426: d1v0: gvirt_to_maddr failed va=0xffffffc006f91628 flags=0x1 par=0x80b
-> (XEN) DEBUG translate_get_page 42 addr=ffffffc006f91628 linear=1 write=1
-> (XEN) DEBUG raw_copy_to_guest 120 caller=domain.c#update_runstate_area+0x78/0x10c
-> (XEN) DEBUG update_runstate_area 294
-> ### This is Xen failing the copy_to_guest in update_runstate_area.
+>     $ qemu-system-x86_64 -nodefaults -S -display none -qmp stdio
+>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 3}, "=
+package": "v3.0.0-837-gc5e4e49258"}, "capabilities": []}}
+>     {"execute": "qmp_capabilities"}
+>     {"return": {}}
+>     {"execute": "qom-set", "arguments": {"path": "/machine", "property": =
+"nvdimm-persistence", "value": "instadeath"}}
+>     -machine nvdimm-persistence=3Dinstadeath: unsupported option
+>     $ echo $?
+>     1
 >
+> Broken when commit 11c39b5cd96 (v3.0.0) replaced error_propagate();
+> return by error_report(); exit() instead of error_setg(); return.  Fix
+> that.
 >
-> Do you have any ideas on what's wrong? I am happy to run more tests
-> with QEMU to get more data.
+> Fixes: 11c39b5cd966ddc067a1ca0c5392ec9b666c45b7
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-We'd need to look at why do_ats_write is returning a failure:
-the simplest way to do that is just to step through it in
-a debugger watching as it does the page table walks, to see
-where it does something wrong...
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-(If you can repro the failure eg under 'rr' then you can use
-its reverse-debug to go backwards from "oops it failed" to
-find out why.)
+> ---
+>  hw/i386/pc.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index cd5029c149..eab8572f2a 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2209,8 +2209,9 @@ static void pc_machine_set_nvdimm_persistence(Objec=
+t *obj, const char *value,
+>      else if (strcmp(value, "mem-ctrl") =3D=3D 0)
+>          nvdimm_state->persistence =3D 2;
+>      else {
+> -        error_report("-machine nvdimm-persistence=3D%s: unsupported opti=
+on", value);
+> -        exit(EXIT_FAILURE);
+> +        error_setg(errp, "-machine nvdimm-persistence=3D%s: unsupported =
+option",
+> +                   value);
+> +        return;
+>      }
+>
+>      g_free(nvdimm_state->persistence_string);
+> --
+> 2.17.1
+>
+>
 
-thanks
--- PMM
+
+--=20
+Marc-Andr=C3=A9 Lureau
