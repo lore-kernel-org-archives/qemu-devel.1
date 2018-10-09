@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9tKm-000222-7z
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:50:05 -0400
+	(envelope-from <berto@igalia.com>) id 1g9tLC-0002JT-Tw
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:50:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9tKg-0006JI-VU
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:50:03 -0400
-Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:39612)
+	(envelope-from <berto@igalia.com>) id 1g9tL6-0006cT-8c
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:50:30 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:59525)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g9tKg-0006IK-Kv
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:49:58 -0400
-Received: by mail-pg1-x535.google.com with SMTP id r9-v6so931583pgv.6
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 07:49:58 -0700 (PDT)
-References: <20181008232756.30704-1-cota@braap.org>
-	<20181008232756.30704-4-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <cbd29475-5161-b1d6-41dd-c2ce4e66336e@linaro.org>
-Date: Tue, 9 Oct 2018 07:49:54 -0700
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1g9tL4-0006Uv-EQ
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 10:50:23 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20181009125541.24455-4-berrange@redhat.com>
+References: <20181009125541.24455-1-berrange@redhat.com>
+	<20181009125541.24455-4-berrange@redhat.com>
+Date: Tue, 09 Oct 2018 16:50:16 +0200
+Message-ID: <w51k1mr8993.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20181008232756.30704-4-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 3/5] cputlb: do not evict empty entries to
- the vtlb
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] crypto: introduce a xts_uint128 data
+ type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, qemu-devel@nongnu.org
 
-On 10/8/18 4:27 PM, Emilio G. Cota wrote:
-> Currently we evict an entry to the victim TLB when it doesn't match
-> the current address. But it could be that there's no match because
-> the current entry is empty (i.e. all -1's, for instance via tlb_flush).
-> Do not evict the entry to the vtlb in that case.
-> 
-> This change will help us keep track of the TLB's use rate.
-> 
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  include/exec/cpu-all.h | 9 +++++++++
->  accel/tcg/cputlb.c     | 2 +-
->  2 files changed, 10 insertions(+), 1 deletion(-)
+On Tue 09 Oct 2018 02:55:38 PM CEST, Daniel P. Berrang=C3=A9 wrote:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> @@ -85,7 +90,7 @@ void xts_decrypt(const void *datactx,
+>                   uint8_t *dst,
+>                   const uint8_t *src)
+>  {
+> -    uint8_t PP[XTS_BLOCK_SIZE], CC[XTS_BLOCK_SIZE], T[XTS_BLOCK_SIZE];
+> +    xts_uint128 PP, CC, T;
+>      unsigned long i, m, mo, lim;
 
+   [...]
 
-r~
+>          /* Pm =3D first length % XTS_BLOCK_SIZE bytes of PP */
+>          for (i =3D 0; i < mo; i++) {
+> -            CC[i] =3D src[XTS_BLOCK_SIZE + i];
+> -            dst[XTS_BLOCK_SIZE + i] =3D PP[i];
+> +            ((uint8_t *)&CC)[i] =3D src[XTS_BLOCK_SIZE + i];
+> +            dst[XTS_BLOCK_SIZE + i] =3D ((uint8_t *)&PP)[i];
+>          }
+
+On second thoughts, these casts are a bit cumbersome. I wonder if it
+isn't better to keep the array a uint8_t[] and only treat it as
+xts_uint128 in the places where you actually do 64-bit operations
+(xts_uint128_xor, xts_mult_x).
+
+Berto
