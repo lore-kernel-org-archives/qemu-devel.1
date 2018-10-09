@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g9rhh-00084z-3h
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:05:39 -0400
+	(envelope-from <berrange@redhat.com>) id 1g9rhi-00086W-Tb
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1g9rhf-00047O-0D
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:05:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44514)
+	(envelope-from <berrange@redhat.com>) id 1g9rhf-00048C-CB
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:05:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1g9rhd-0003sM-2A
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:05:33 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1g9rhf-000428-0U
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:05:35 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Tue,  9 Oct 2018 14:04:36 +0100
-Message-Id: <20181009130442.26296-6-berrange@redhat.com>
+Date: Tue,  9 Oct 2018 14:04:41 +0100
+Message-Id: <20181009130442.26296-11-berrange@redhat.com>
 In-Reply-To: <20181009130442.26296-1-berrange@redhat.com>
 References: <20181009130442.26296-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 05/11] hw/usb: switch MTP to use new inotify
- APIs
+Subject: [Qemu-devel] [PATCH v5 10/11] authz: add QAuthZPAM object type for
+ authorizing using PAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,461 +27,474 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-The internal inotify APIs allow alot of conditional statements to be
-cleared out, and provide a simpler callback for handling events.
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Add an authorization backend that talks to PAM to check whether the user
+identity is allowed. This only uses the PAM account validation facility,
+which is essentially just a check to see if the provided username is permitted
+access. It doesn't use the authentication or session parts of PAM, since
+that's dealt with by the relevant part of QEMU (eg VNC server).
+
+Consider starting QEMU with a VNC server and telling it to use TLS with
+x509 client certificates and configuring it to use an PAM to validate
+the x509 distinguished name. In this example we're telling it to use PAM
+for the QAuthZ impl with a service name of "qemu-vnc"
+
+ $ qemu-system-x86_64 \
+     -object tls-creds-x509,id=tls0,dir=/home/berrange/security/qemutls,\
+             endpoint=server,verify-peer=yes \
+     -object authz-pam,id=authz0,service=qemu-vnc \
+     -vnc :1,tls-creds=tls0,tls-authz=authz0
+
+This requires an /etc/pam/qemu-vnc file to be created with the auth
+rules. A very simple file based whitelist can be setup using
+
+  $ cat > /etc/pam/qemu-vnc <<EOF
+  account         requisite       pam_listfile.so item=user sense=allow file=/etc/qemu/vnc.allow
+  EOF
+
+The /etc/qemu/vnc.allow file simply contains one username per line. Any
+username not in the file is denied. The usernames in this example are
+the x509 distinguished name from the client's x509 cert.
+
+  $ cat > /etc/qemu/vnc.allow <<EOF
+  CN=laptop.berrange.com,O=Berrange Home,L=London,ST=London,C=GB
+  EOF
+
+More interesting would be to configure PAM to use an LDAP backend, so
+that the QEMU authorization check data can be centralized instead of
+requiring each compute host to have file maintained.
+
+The main limitation with this PAM module is that the rules apply to all
+QEMU instances on the host. Setting up different rules per VM, would
+require creating a separate PAM service name & config file for every
+guest. An alternative approach for the future might be to not pass in
+the plain username to PAM, but instead combine the VM name or UUID with
+the username. This requires further consideration though.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- hw/usb/dev-mtp.c    | 250 ++++++++++++++++----------------------------
- hw/usb/trace-events |   2 +-
- 2 files changed, 93 insertions(+), 159 deletions(-)
+ authz/Makefile.objs     |   3 +
+ authz/pamacct.c         | 149 ++++++++++++++++++++++++++++++++++++++++
+ authz/trace-events      |   3 +
+ configure               |  37 ++++++++++
+ include/authz/pamacct.h | 100 +++++++++++++++++++++++++++
+ qemu-options.hx         |  35 ++++++++++
+ 6 files changed, 327 insertions(+)
+ create mode 100644 authz/pamacct.c
+ create mode 100644 include/authz/pamacct.h
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index ccbe25820b..1a8d0f088d 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -15,13 +15,11 @@
- #include <dirent.h>
-=20
- #include <sys/statvfs.h>
--#ifdef CONFIG_INOTIFY1
--#include <sys/inotify.h>
--#include "qemu/main-loop.h"
--#endif
+diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+index 8351bf181d..ed7b273596 100644
+--- a/authz/Makefile.objs
++++ b/authz/Makefile.objs
+@@ -2,3 +2,6 @@ authz-obj-y += base.o
+ authz-obj-y += simple.o
+ authz-obj-y += list.o
+ authz-obj-y += listfile.o
++authz-obj-$(CONFIG_AUTH_PAM) += pamacct.o
 +
-=20
- #include "qemu-common.h"
- #include "qemu/iov.h"
-+#include "qemu/filemonitor.h"
- #include "trace.h"
- #include "hw/usb.h"
- #include "desc.h"
-@@ -124,7 +122,6 @@ enum {
-     EP_EVENT,
- };
-=20
--#ifdef CONFIG_INOTIFY1
- typedef struct MTPMonEntry MTPMonEntry;
-=20
- struct MTPMonEntry {
-@@ -133,7 +130,6 @@ struct MTPMonEntry {
-=20
-     QTAILQ_ENTRY(MTPMonEntry) next;
- };
--#endif
-=20
- struct MTPControl {
-     uint16_t     code;
-@@ -162,10 +158,8 @@ struct MTPObject {
-     char         *name;
-     char         *path;
-     struct stat  stat;
--#ifdef CONFIG_INOTIFY1
--    /* inotify watch cookie */
-+    /* file monitor watch cookie */
-     int          watchfd;
--#endif
-     MTPObject    *parent;
-     uint32_t     nchildren;
-     QLIST_HEAD(, MTPObject) children;
-@@ -188,11 +182,8 @@ struct MTPState {
-     bool         readonly;
-=20
-     QTAILQ_HEAD(, MTPObject) objects;
--#ifdef CONFIG_INOTIFY1
--    /* inotify descriptor */
--    int          inotifyfd;
-+    QFileMonitor *file_monitor;
-     QTAILQ_HEAD(events, MTPMonEntry) events;
--#endif
-     /* Responder is expecting a write operation */
-     bool write_pending;
-     struct {
-@@ -477,6 +468,10 @@ static MTPObject *usb_mtp_object_lookup_name(MTPObje=
-ct *parent,
- {
-     MTPObject *iter;
-=20
-+    if (len =3D=3D -1) {
-+        len =3D strlen(name);
++pamacct.o-libs = -lpam
+diff --git a/authz/pamacct.c b/authz/pamacct.c
+new file mode 100644
+index 0000000000..a070dda217
+--- /dev/null
++++ b/authz/pamacct.c
+@@ -0,0 +1,149 @@
++/*
++ * QEMU PAM authorization driver
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "authz/pamacct.h"
++#include "authz/trace.h"
++#include "qom/object_interfaces.h"
++
++#include <security/pam_appl.h>
++
++
++static bool qauthz_pam_is_allowed(QAuthZ *authz,
++                                  const char *identity,
++                                  Error **errp)
++{
++    QAuthZPam *pauthz = QAUTHZ_PAM(authz);
++    const struct pam_conv pam_conversation = { 0 };
++    pam_handle_t *pamh = NULL;
++    int ret;
++
++    trace_qauthz_pam_check(authz, identity, pauthz->service);
++    ret = pam_start(pauthz->service,
++                    identity,
++                    &pam_conversation,
++                    &pamh);
++    if (ret != PAM_SUCCESS) {
++        error_setg(errp, "Unable to start PAM transaction: %s",
++                   pam_strerror(NULL, ret));
++        return false;
 +    }
 +
-     QLIST_FOREACH(iter, &parent->children, list) {
-         if (strncmp(iter->name, name, len) =3D=3D 0) {
-             return iter;
-@@ -486,7 +481,6 @@ static MTPObject *usb_mtp_object_lookup_name(MTPObjec=
-t *parent,
-     return NULL;
- }
-=20
--#ifdef CONFIG_INOTIFY1
- static MTPObject *usb_mtp_object_lookup_wd(MTPState *s, int wd)
- {
-     MTPObject *iter;
-@@ -500,158 +494,98 @@ static MTPObject *usb_mtp_object_lookup_wd(MTPStat=
-e *s, int wd)
-     return NULL;
- }
-=20
--static void inotify_watchfn(void *arg)
-+static void file_monitor_event(int wd,
-+                               QFileMonitorEvent ev,
-+                               const char *name,
-+                               void *opaque)
- {
--    MTPState *s =3D arg;
--    ssize_t bytes;
--    /* From the man page: atleast one event can be read */
--    int pos;
--    char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
--
--    for (;;) {
--        bytes =3D read(s->inotifyfd, buf, sizeof(buf));
--        pos =3D 0;
--
--        if (bytes <=3D 0) {
--            /* Better luck next time */
-+    MTPState *s =3D opaque;
-+    int watchfd =3D 0;
-+    MTPObject *parent =3D usb_mtp_object_lookup_wd(s, wd);
-+    MTPMonEntry *entry =3D NULL;
-+    MTPObject *o;
-+
-+    if (!parent) {
-+        return;
++    ret = pam_acct_mgmt(pamh, PAM_SILENT);
++    if (ret != PAM_SUCCESS) {
++        error_setg(errp, "Unable to authorize user '%s': %s",
++                   identity, pam_strerror(pamh, ret));
++        goto cleanup;
 +    }
 +
-+    switch (ev) {
-+    case QFILE_MONITOR_EVENT_CREATED:
-+        if (usb_mtp_object_lookup_name(parent, name, -1)) {
-+            /* Duplicate create event */
-             return;
-         }
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D s->next_handle;
-+        entry->event =3D EVT_OBJ_ADDED;
-+        o =3D usb_mtp_add_child(s, parent, name);
-+        if (!o) {
-+            g_free(entry);
-+            return;
-+        }
-+        o->watchfd =3D watchfd;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, name, "Obj Added")=
-;
-+        break;
-=20
-+    case QFILE_MONITOR_EVENT_DELETED:
-         /*
--         * TODO: Ignore initiator initiated events.
--         * For now we are good because the store is RO
-+         * The kernel issues a IN_IGNORED event
-+         * when a dir containing a watchpoint is
-+         * deleted, so we don't have to delete the
-+         * watchpoint
-          */
--        while (bytes > 0) {
--            char *p =3D buf + pos;
--            struct inotify_event *event =3D (struct inotify_event *)p;
--            int watchfd =3D 0;
--            uint32_t mask =3D event->mask & (IN_CREATE | IN_DELETE |
--                                           IN_MODIFY | IN_IGNORED);
--            MTPObject *parent =3D usb_mtp_object_lookup_wd(s, event->wd)=
-;
--            MTPMonEntry *entry =3D NULL;
--            MTPObject *o;
--
--            pos =3D pos + sizeof(struct inotify_event) + event->len;
--            bytes =3D bytes - pos;
--
--            if (!parent) {
--                continue;
--            }
--
--            switch (mask) {
--            case IN_CREATE:
--                if (usb_mtp_object_lookup_name
--                    (parent, event->name, event->len)) {
--                    /* Duplicate create event */
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D s->next_handle;
--                entry->event =3D EVT_OBJ_ADDED;
--                o =3D usb_mtp_add_child(s, parent, event->name);
--                if (!o) {
--                    g_free(entry);
--                    continue;
--                }
--                o->watchfd =3D watchfd;
--                trace_usb_mtp_inotify_event(s->dev.addr, event->name,
--                                            event->mask, "Obj Added");
--                break;
--
--            case IN_DELETE:
--                /*
--                 * The kernel issues a IN_IGNORED event
--                 * when a dir containing a watchpoint is
--                 * deleted, so we don't have to delete the
--                 * watchpoint
--                 */
--                o =3D usb_mtp_object_lookup_name(parent, event->name, ev=
-ent->len);
--                if (!o) {
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D o->handle;
--                entry->event =3D EVT_OBJ_REMOVED;
--                trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                      event->mask, "Obj Deleted");
--                usb_mtp_object_free(s, o);
--                break;
--
--            case IN_MODIFY:
--                o =3D usb_mtp_object_lookup_name(parent, event->name, ev=
-ent->len);
--                if (!o) {
--                    continue;
--                }
--                entry =3D g_new0(MTPMonEntry, 1);
--                entry->handle =3D o->handle;
--                entry->event =3D EVT_OBJ_INFO_CHANGED;
--                trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                      event->mask, "Obj Modified");
--                break;
--
--            case IN_IGNORED:
--                trace_usb_mtp_inotify_event(s->dev.addr, parent->path,
--                                      event->mask, "Obj parent dir ignor=
-ed");
--                break;
--
--            default:
--                fprintf(stderr, "usb-mtp: failed to parse inotify event\=
-n");
--                continue;
--            }
-+        o =3D usb_mtp_object_lookup_name(parent, name, -1);
-+        if (!o) {
-+            return;
-+        }
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D o->handle;
-+        entry->event =3D EVT_OBJ_REMOVED;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path, "Obj Dele=
-ted");
-+        usb_mtp_object_free(s, o);
-+        break;
-=20
--            if (entry) {
--                QTAILQ_INSERT_HEAD(&s->events, entry, next);
--            }
-+    case QFILE_MONITOR_EVENT_MODIFIED:
-+        o =3D usb_mtp_object_lookup_name(parent, name, -1);
-+        if (!o) {
-+            return;
-         }
--    }
--}
-+        entry =3D g_new0(MTPMonEntry, 1);
-+        entry->handle =3D o->handle;
-+        entry->event =3D EVT_OBJ_INFO_CHANGED;
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path, "Obj Modi=
-fied");
-+        break;
-=20
--static int usb_mtp_inotify_init(MTPState *s)
--{
--    int fd;
-+    case QFILE_MONITOR_EVENT_IGNORED:
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, parent->path,
-+                                    "Obj parent dir ignored");
-+        break;
-=20
--    fd =3D inotify_init1(IN_NONBLOCK);
--    if (fd =3D=3D -1) {
--        return 1;
-+    default:
-+        g_assert_not_reached();
-     }
-=20
--    QTAILQ_INIT(&s->events);
--    s->inotifyfd =3D fd;
--
--    qemu_set_fd_handler(fd, inotify_watchfn, NULL, s);
--
--    return 0;
-+    if (entry) {
-+        QTAILQ_INSERT_HEAD(&s->events, entry, next);
++ cleanup:
++    pam_end(pamh, ret);
++    return ret == PAM_SUCCESS;
++}
++
++
++static void
++qauthz_pam_prop_set_service(Object *obj,
++                            const char *service,
++                            Error **errp G_GNUC_UNUSED)
++{
++    QAuthZPam *pauthz = QAUTHZ_PAM(obj);
++
++    g_free(pauthz->service);
++    pauthz->service = g_strdup(service);
++}
++
++
++static char *
++qauthz_pam_prop_get_service(Object *obj,
++                            Error **errp G_GNUC_UNUSED)
++{
++    QAuthZPam *pauthz = QAUTHZ_PAM(obj);
++
++    return g_strdup(pauthz->service);
++}
++
++
++static void
++qauthz_pam_complete(UserCreatable *uc, Error **errp)
++{
++}
++
++
++static void
++qauthz_pam_finalize(Object *obj)
++{
++    QAuthZPam *pauthz = QAUTHZ_PAM(obj);
++
++    g_free(pauthz->service);
++}
++
++
++static void
++qauthz_pam_class_init(ObjectClass *oc, void *data)
++{
++    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    QAuthZClass *authz = QAUTHZ_CLASS(oc);
++
++    ucc->complete = qauthz_pam_complete;
++    authz->is_allowed = qauthz_pam_is_allowed;
++
++    object_class_property_add_str(oc, "service",
++                                  qauthz_pam_prop_get_service,
++                                  qauthz_pam_prop_set_service,
++                                  NULL);
++}
++
++
++QAuthZPam *qauthz_pam_new(const char *id,
++                          const char *service,
++                          Error **errp)
++{
++    return QAUTHZ_PAM(
++        object_new_with_props(TYPE_QAUTHZ_PAM,
++                              object_get_objects_root(),
++                              id, errp,
++                              "service", service,
++                              NULL));
++}
++
++
++static const TypeInfo qauthz_pam_info = {
++    .parent = TYPE_QAUTHZ,
++    .name = TYPE_QAUTHZ_PAM,
++    .instance_size = sizeof(QAuthZPam),
++    .instance_finalize = qauthz_pam_finalize,
++    .class_size = sizeof(QAuthZPamClass),
++    .class_init = qauthz_pam_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
 +    }
- }
-=20
--static void usb_mtp_inotify_cleanup(MTPState *s)
-+static void usb_mtp_file_monitor_cleanup(MTPState *s)
- {
-     MTPMonEntry *e, *p;
-=20
--    if (!s->inotifyfd) {
--        return;
--    }
--
--    qemu_set_fd_handler(s->inotifyfd, NULL, NULL, s);
--    close(s->inotifyfd);
--
-     QTAILQ_FOREACH_SAFE(e, &s->events, next, p) {
-         QTAILQ_REMOVE(&s->events, e, next);
-         g_free(e);
-     }
- }
-=20
--static int usb_mtp_add_watch(int inotifyfd, const char *path)
--{
--    uint32_t mask =3D IN_CREATE | IN_DELETE | IN_MODIFY;
--
--    return inotify_add_watch(inotifyfd, path, mask);
--}
--#endif
-=20
- static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
- {
-     struct dirent *entry;
-     DIR *dir;
-+    Error *err =3D NULL;
-=20
-     if (o->have_children) {
-         return;
-@@ -662,16 +596,19 @@ static void usb_mtp_object_readdir(MTPState *s, MTP=
-Object *o)
-     if (!dir) {
-         return;
-     }
--#ifdef CONFIG_INOTIFY1
--    int watchfd =3D usb_mtp_add_watch(s->inotifyfd, o->path);
++};
 +
-+    int watchfd =3D qemu_file_monitor_add_watch(s->file_monitor, o->path=
-, NULL,
-+                                              file_monitor_event, s, &er=
-r);
-     if (watchfd =3D=3D -1) {
--        fprintf(stderr, "usb-mtp: failed to add watch for %s\n", o->path=
-);
-+        fprintf(stderr, "usb-mtp: failed to add watch for %s: %s\n", o->=
-path,
-+                error_get_pretty(err));
-+        error_free(err);
-     } else {
--        trace_usb_mtp_inotify_event(s->dev.addr, o->path,
--                                    0, "Watch Added");
-+        trace_usb_mtp_file_monitor_event(s->dev.addr, o->path,
-+                                         "Watch Added");
-         o->watchfd =3D watchfd;
-     }
--#endif
 +
-     while ((entry =3D readdir(dir)) !=3D NULL) {
-         usb_mtp_add_child(s, o, entry->d_name);
-     }
-@@ -1179,13 +1116,11 @@ enum {
- /* Assumes that children, if any, have been already freed */
- static void usb_mtp_object_free_one(MTPState *s, MTPObject *o)
- {
--#ifndef CONFIG_INOTIFY1
-     assert(o->nchildren =3D=3D 0);
-     QTAILQ_REMOVE(&s->objects, o, next);
-     g_free(o->name);
-     g_free(o->path);
-     g_free(o);
--#endif
- }
-=20
- static int usb_mtp_deletefn(MTPState *s, MTPObject *o, uint32_t trans)
-@@ -1284,6 +1219,7 @@ static void usb_mtp_command(MTPState *s, MTPControl=
- *c)
-     MTPData *data_in =3D NULL;
-     MTPObject *o =3D NULL;
-     uint32_t nres =3D 0, res0 =3D 0;
-+    Error *err =3D NULL;
-=20
-     /* sanity checks */
-     if (c->code >=3D CMD_CLOSE_SESSION && s->session =3D=3D 0) {
-@@ -1311,19 +1247,21 @@ static void usb_mtp_command(MTPState *s, MTPContr=
-ol *c)
-         trace_usb_mtp_op_open_session(s->dev.addr);
-         s->session =3D c->argv[0];
-         usb_mtp_object_alloc(s, s->next_handle++, NULL, s->root);
--#ifdef CONFIG_INOTIFY1
--        if (usb_mtp_inotify_init(s)) {
--            fprintf(stderr, "usb-mtp: file monitoring init failed\n");
++static void
++qauthz_pam_register_types(void)
++{
++    type_register_static(&qauthz_pam_info);
++}
 +
-+        s->file_monitor =3D qemu_file_monitor_get_instance(&err);
-+        if (err) {
-+            fprintf(stderr, "usb-mtp: file monitoring init failed: %s\n"=
-,
-+                    error_get_pretty(err));
-+            error_free(err);
-+        } else {
-+            QTAILQ_INIT(&s->events);
-         }
--#endif
-         break;
-     case CMD_CLOSE_SESSION:
-         trace_usb_mtp_op_close_session(s->dev.addr);
-         s->session =3D 0;
-         s->next_handle =3D 0;
--#ifdef CONFIG_INOTIFY1
--        usb_mtp_inotify_cleanup(s);
--#endif
-+        usb_mtp_file_monitor_cleanup(s);
-         usb_mtp_object_free(s, QTAILQ_FIRST(&s->objects));
-         assert(QTAILQ_EMPTY(&s->objects));
-         break;
-@@ -1536,9 +1474,7 @@ static void usb_mtp_handle_reset(USBDevice *dev)
-=20
-     trace_usb_mtp_reset(s->dev.addr);
-=20
--#ifdef CONFIG_INOTIFY1
--    usb_mtp_inotify_cleanup(s);
--#endif
-+    usb_mtp_file_monitor_cleanup(s);
-     usb_mtp_object_free(s, QTAILQ_FIRST(&s->objects));
-     s->session =3D 0;
-     usb_mtp_data_free(s->data_in);
-@@ -1967,7 +1903,6 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-         }
-         break;
-     case EP_EVENT:
--#ifdef CONFIG_INOTIFY1
-         if (!QTAILQ_EMPTY(&s->events)) {
-             struct MTPMonEntry *e =3D QTAILQ_LAST(&s->events, events);
-             uint32_t handle;
-@@ -1991,7 +1926,6 @@ static void usb_mtp_handle_data(USBDevice *dev, USB=
-Packet *p)
-             g_free(e);
-             return;
-         }
--#endif
-         p->status =3D USB_RET_NAK;
-         return;
-     default:
-diff --git a/hw/usb/trace-events b/hw/usb/trace-events
-index 2c18770ca5..99b1e8b8ce 100644
---- a/hw/usb/trace-events
-+++ b/hw/usb/trace-events
-@@ -237,7 +237,7 @@ usb_mtp_op_unknown(int dev, uint32_t code) "dev %d, c=
-ommand code 0x%x"
- usb_mtp_object_alloc(int dev, uint32_t handle, const char *path) "dev %d=
-, handle 0x%x, path %s"
- usb_mtp_object_free(int dev, uint32_t handle, const char *path) "dev %d,=
- handle 0x%x, path %s"
- usb_mtp_add_child(int dev, uint32_t handle, const char *path) "dev %d, h=
-andle 0x%x, path %s"
--usb_mtp_inotify_event(int dev, const char *path, uint32_t mask, const ch=
-ar *s) "dev %d, path %s mask 0x%x event %s"
-+usb_mtp_file_monitor_event(int dev, const char *path, const char *s) "de=
-v %d, path %s event %s"
-=20
- # hw/usb/host-libusb.c
- usb_host_open_started(int bus, int addr) "dev %d:%d"
---=20
++
++type_init(qauthz_pam_register_types);
+diff --git a/authz/trace-events b/authz/trace-events
+index fb65349a90..72c411927d 100644
+--- a/authz/trace-events
++++ b/authz/trace-events
+@@ -13,3 +13,6 @@ qauthz_list_default_policy(void *authz, const char *identity, int policy) "AuthZ
+ # auth/listfile.c
+ qauthz_list_file_load(void *authz, const char *filename) "AuthZ file %p load filename=%s"
+ qauthz_list_file_refresh(void *authz, const char *filename, int success) "AuthZ file %p load filename=%s success=%d"
++
++# auth/pam.c
++qauthz_pam_check(void *authz, const char *identity, const char *service) "AuthZ PAM %p identity=%s service=%s"
+diff --git a/configure b/configure
+index f89d293585..bca8fd1b49 100755
+--- a/configure
++++ b/configure
+@@ -464,6 +464,7 @@ nettle_kdf="no"
+ gcrypt=""
+ gcrypt_hmac="no"
+ gcrypt_kdf="no"
++auth_pam=""
+ vte=""
+ virglrenderer=""
+ tpm="yes"
+@@ -1362,6 +1363,10 @@ for opt do
+   ;;
+   --enable-gcrypt) gcrypt="yes"
+   ;;
++  --disable-auth-pam) auth_pam="no"
++  ;;
++  --enable-auth-pam) auth_pam="yes"
++  ;;
+   --enable-rdma) rdma="yes"
+   ;;
+   --disable-rdma) rdma="no"
+@@ -1656,6 +1661,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   gnutls          GNUTLS cryptography support
+   nettle          nettle cryptography support
+   gcrypt          libgcrypt cryptography support
++  auth-pam        PAM access control
+   sdl             SDL UI
+   --with-sdlabi     select preferred SDL ABI 1.2 or 2.0
+   gtk             gtk UI
+@@ -2895,6 +2901,33 @@ else
+ fi
+ 
+ 
++##########################################
++# PAM probe
++
++if test "x$auth_pam" != "no"; then
++    cat > $TMPC <<EOF
++#include <security/pam_appl.h>
++#include <stdio.h>
++int main(void) {
++   const char *service_name = "qemu";
++   const char *user = "frank";
++   const struct pam_conv *pam_conv = NULL;
++   pam_handle_t *pamh = NULL;
++   pam_start(service_name, user, pam_conv, &pamh);
++   return 0;
++}
++EOF
++    if compile_prog "" "-lpam" ; then
++	auth_pam=yes
++    else
++	if test "$auth_pam" = "yes"; then
++	    feature_not_found "PAM" "Install pam-devel"
++	else
++	    auth_pam=no
++	fi
++    fi
++fi
++
+ ##########################################
+ # getifaddrs (for tests/test-io-channel-socket )
+ 
+@@ -6001,6 +6034,7 @@ echo "libgcrypt kdf     $gcrypt_kdf"
+ echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
+ echo "nettle kdf        $nettle_kdf"
+ echo "libtasn1          $tasn1"
++echo "PAM               $auth_pam"
+ echo "curses support    $curses"
+ echo "virgl support     $virglrenderer $(echo_version $virglrenderer $virgl_version)"
+ echo "curl support      $curl"
+@@ -6464,6 +6498,9 @@ fi
+ if test "$tasn1" = "yes" ; then
+   echo "CONFIG_TASN1=y" >> $config_host_mak
+ fi
++if test "$auth_pam" = "yes" ; then
++    echo "CONFIG_AUTH_PAM=y" >> $config_host_mak
++fi
+ if test "$have_ifaddrs_h" = "yes" ; then
+     echo "HAVE_IFADDRS_H=y" >> $config_host_mak
+ fi
+diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
+new file mode 100644
+index 0000000000..d2c0149153
+--- /dev/null
++++ b/include/authz/pamacct.h
+@@ -0,0 +1,100 @@
++/*
++ * QEMU PAM authorization driver
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef QAUTHZ_PAM_H__
++#define QAUTHZ_PAM_H__
++
++#include "authz/base.h"
++
++
++#define TYPE_QAUTHZ_PAM "authz-pam"
++
++#define QAUTHZ_PAM_CLASS(klass) \
++     OBJECT_CLASS_CHECK(QAuthZPamClass, (klass), \
++                        TYPE_QAUTHZ_PAM)
++#define QAUTHZ_PAM_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(QAuthZPamClass, (obj), \
++                      TYPE_QAUTHZ_PAM)
++#define QAUTHZ_PAM(obj) \
++     INTERFACE_CHECK(QAuthZPam, (obj), \
++                     TYPE_QAUTHZ_PAM)
++
++typedef struct QAuthZPam QAuthZPam;
++typedef struct QAuthZPamClass QAuthZPamClass;
++
++
++/**
++ * QAuthZPam:
++ *
++ * This authorization driver provides a PAM mechanism
++ * for granting access by matching user names against a
++ * list of globs. Each match rule has an associated policy
++ * and a catch all policy applies if no rule matches
++ *
++ * To create an instance of this class via QMP:
++ *
++ *  {
++ *    "execute": "object-add",
++ *    "arguments": {
++ *      "qom-type": "authz-pam",
++ *      "id": "authz0",
++ *      "parameters": {
++ *        "service": "qemu-vnc-tls"
++ *      }
++ *    }
++ *  }
++ *
++ * The driver only uses the PAM "account" verification
++ * subsystem. The above config would require a config
++ * file /etc/pam.d/qemu-vnc-tls. For a simple file
++ * lookup it would contain
++ *
++ *   account requisite  pam_listfile.so item=user sense=allow \
++ *           file=/etc/qemu/vnc.allow
++ *
++ * The external file would then contain a list of usernames.
++ * If x509 cert was being used as the username, a suitable
++ * entry would match the distinguish name:
++ *
++ *  CN=laptop.berrange.com,O=Berrange Home,L=London,ST=London,C=GB
++ *
++ * On the command line it can be created using
++ *
++ *   -object authz-pam,id=authz0,service=qemu-vnc-tls
++ *
++ */
++struct QAuthZPam {
++    QAuthZ parent_obj;
++
++    char *service;
++};
++
++
++struct QAuthZPamClass {
++    QAuthZClass parent_class;
++};
++
++
++QAuthZPam *qauthz_pam_new(const char *id,
++                          const char *service,
++                          Error **errp);
++
++
++#endif /* QAUTHZ_PAM_H__ */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index fcf7d627fc..cc61512db7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4445,6 +4445,41 @@ would look like:
+      ...
+ @end example
+ 
++@item -object authz-pam,id=@var{id},service=@var{string}
++
++Create an authorization object that will control access to network services.
++
++The @option{service} parameter provides the name of a PAM service to use
++for authorization. It requires that a file @code{/etc/pam.d/@var{service}}
++exist to provide the configuration for the @code{account} subsystem.
++
++An example authorization object to validate a TLS x509 distinguished
++name would look like:
++
++@example
++ # $QEMU \
++     ...
++     -object authz-simple,id=auth0,service=qemu-vnc
++     ...
++@end example
++
++There would then be a corresponding config file for PAM at
++@code{/etc/pam.d/qemu-vnc} that contains:
++
++@example
++account requisite  pam_listfile.so item=user sense=allow \
++           file=/etc/qemu/vnc.allow
++@end example
++
++Finally the @code{/etc/qemu/vnc.allow} file would contain
++the list of x509 distingished names that are permitted
++access
++
++@example
++CN=laptop.example.com,O=Example Home,L=London,ST=London,C=GB
++@end example
++
++
+ @end table
+ 
+ ETEXI
+-- 
 2.17.1
