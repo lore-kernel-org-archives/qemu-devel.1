@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9vks-0004fr-85
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:25:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9vuI-0000HH-V6
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:34:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1g9vkr-00058r-5A
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:25:10 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  9 Oct 2018 18:24:59 +0100
-Message-Id: <20181009172501.17353-2-peter.maydell@linaro.org>
-In-Reply-To: <20181009172501.17353-1-peter.maydell@linaro.org>
-References: <20181009172501.17353-1-peter.maydell@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1g9vuD-0001TV-Pc
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:34:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9vuD-0001TJ-HO
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:34:49 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180906111107.30684-1-danielhb413@gmail.com>
+	<20180921122954.GD2842@work-vm>
+	<355a1147-c0d0-88fc-7b68-4391bab25c54@gmail.com>
+Date: Tue, 09 Oct 2018 19:34:43 +0200
+In-Reply-To: <355a1147-c0d0-88fc-7b68-4391bab25c54@gmail.com> (Daniel Henrique
+	Barboza's message of "Mon, 24 Sep 2018 17:48:41 -0300")
+Message-ID: <87zhvnqb0s.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/3] block/qcow2: Don't take address of fields
- in packed structs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] HMP/snapshot changes - do not use
+ ID anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,177 +30,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kwolf@redhat.com, muriloo@linux.ibm.com, qemu-devel@nongnu.org, mreitz@redhat.com, libvir-list@redhat.com
 
-Taking the address of a field in a packed struct is a bad idea, because
-it might not be actually aligned enough for that pointer type (and
-thus cause a crash on dereference on some host architectures). Newer
-versions of clang warn about this. Avoid the bug by not using the
-"modify in place" byte swapping functions.
+Cc: libvir-list for review of the compatibility argument below.
 
-There are a few places where the in-place swap function is
-used on something other than a packed struct field; we convert
-those anyway, for consistency.
+Daniel Henrique Barboza <danielhb413@gmail.com> writes:
 
-This patch was produced with the following spatch script
-(and hand-editing to fold a few resulting overlength lines):
+> Hey David,
+>
+> On 9/21/18 9:29 AM, Dr. David Alan Gilbert wrote:
+>> * Daniel Henrique Barboza (danielhb413@gmail.com) wrote:
+>>> changes in v2:
+>>> - removed the "RFC" marker;
+>>> - added a new patch (patch 2) that removes
+>>> bdrv_snapshot_delete_by_id_or_name from the code;
+>>> - made changes in patch 1 as suggested by Murilo;
+>>> - previous patch set link:
+>>> https://lists.gnu.org/archive/html/qemu-devel/2018-08/msg04658.html
+>>>
+>>>
+>>> It is not uncommon to see bugs being opened by testers that attempt to
+>>> create VM snapshots using HMP. It turns out that "0" and "1" are quite
+>>> common snapshot names and they trigger a lot of bugs. I gave an example
+>>> in the commit message of patch 1, but to sum up here: QEMU treats the
+>>> input of savevm/loadvm/delvm sometimes as 'ID', sometimes as 'name'. It
+>>> is documented as such, but this can lead to strange situations.
+>>>
+>>> Given that it is strange for an API to consider a parameter to be 2 fie=
+lds
+>>> at the same time, and inadvently treating them as one or the other, and
+>>> that removing the ID field is too drastic, my idea here is to keep the
+>>> ID field for internal control, but do not let the user set it.
+>>>
+>>> I guess there's room for discussion about considering this change an API
+>>> change or not. It doesn't affect users of HMP and it doesn't affect Lib=
+virt,
+>>> but simplifying the meaning of the parameters of savevm/loadvm/delvm.
+>> Can you clarify a couple of things:
+>>    a) What is it about libvirt's use that means it's OK ? Does it never
+>> use numeric tags?
+>
+> I am glad you asked because my understanding in how Libvirt was dealing
+> with snapshots was wrong, and I just looked into it further to answer your
+> question. Luckily, this series fixes the situation for Libvirt as well.
+>
+> I was misled by the fact that Libvirt does not show the same symptoms
+> we see in
+> QEMU of this problem, but the bug is there. Here's a quick test with
+> Libvirt with
+> "0" and "1" as snapshot names, considering a VM named with no snapshots,
+> using QEMU 2.12 and Libvirt 4.0.0:
+>
+> - create the "0" snapshot:
+>
+> $ sudo virsh snapshot-create-as --name 0 dhb
+> Domain snapshot 0 created
+>
+> $ sudo virsh snapshot-list dhb
+> Name Creation Time State
+> ------------------------------------------------------------
+> 0 2018-09-24 15:47:56 -0400 running
+>
+> $ sudo virsh qemu-monitor-command dhb --hmp info snapshots
+> List of snapshots present on all disks:
+> ID TAG VM SIZE DATE VM CLOCK
+> --=C2=A0=C2=A0=C2=A0 0=C2=A0 405M 2018-09-24 15:47:56 00:04:20.867
+>
+>
+> - created the "1" snapshot. Here, Libvirt shows both snapshots with
+> snapshot-list,
+> but the snapshot was erased inside QEMU:
+>
+> $ sudo virsh snapshot-create-as --name 1 dhb
+> Domain snapshot 1 created
+> $
+> $ sudo virsh snapshot-list dhb
+> Name Creation Time State
+> ------------------------------------------------------------
+> 0 2018-09-24 15:47:56 -0400 running
+> 1 2018-09-24 15:50:09 -0400 running
+>
+> $ sudo virsh qemu-monitor-command dhb --hmp info snapshots
+> List of snapshots present on all disks:
+> ID TAG VM SIZE DATE VM CLOCK
+> --=C2=A0=C2=A0=C2=A0 1=C2=A0 404M 2018-09-24 15:50:10 00:05:36.226
+>
+>
+> This is where I stopped checking out Libvirt at first, concluding
+> wrongly that it
+> was immune to the bug.
+>
+> Libvirt does not throw an error when trying to apply snapshot 0. In
+> fact, it acts
+> like everything went fine:
+>
+> $ sudo virsh snapshot-revert dhb 0
+>
+> $ echo $?
+> 0
 
-@@
-expression E;
-@@
--be16_to_cpus(&E);
-+E = be16_to_cpu(E);
-@@
-expression E;
-@@
--be32_to_cpus(&E);
-+E = be32_to_cpu(E);
-@@
-expression E;
-@@
--be64_to_cpus(&E);
-+E = be64_to_cpu(E);
-@@
-expression E;
-@@
--cpu_to_be16s(&E);
-+E = cpu_to_be16(E);
-@@
-expression E;
-@@
--cpu_to_be32s(&E);
-+E = cpu_to_be32(E);
-@@
-expression E;
-@@
--cpu_to_be64s(&E);
-+E = cpu_to_be64(E);
+Is that a libvirt bug?
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- block/qcow2.c | 64 +++++++++++++++++++++++++++------------------------
- 1 file changed, 34 insertions(+), 30 deletions(-)
+> Reverting back to snapshot "1" works as intended, restoring the VM
+> state when it
+> was created.
+>
+>
+> (perhaps this is something we should let Libvirt be aware of ...)
+>
+>
+>
+> This series fixes this behavior because the snapshot 0 isn't erased
+> from QEMU, allowing
+> Libvirt to successfully restore it.
+>
+>
+>>    b) After this series are you always guaranteed to be able to fix
+>> any existing oddly named snapshots?
+>
+> The oddly named snapshots that already exists can be affected by the
+> semantic
+> change in loadvm and delvm, in a way that the user can't load/del
+> using the snap
+> ID, just the tag. Aside from that, I don't see any side effects with
+> existing
+> snapshots and this patch series.
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 7277feda135..33e12bbe0fd 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -210,8 +210,8 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-                              "pread fail from offset %" PRIu64, offset);
-             return 1;
-         }
--        be32_to_cpus(&ext.magic);
--        be32_to_cpus(&ext.len);
-+        ext.magic = be32_to_cpu(ext.magic);
-+        ext.len = be32_to_cpu(ext.len);
-         offset += sizeof(ext);
- #ifdef DEBUG_EXT
-         printf("ext.magic = 0x%x\n", ext.magic);
-@@ -279,8 +279,8 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-                                  "Unable to read CRYPTO header extension");
-                 return ret;
-             }
--            be64_to_cpus(&s->crypto_header.offset);
--            be64_to_cpus(&s->crypto_header.length);
-+            s->crypto_header.offset = be64_to_cpu(s->crypto_header.offset);
-+            s->crypto_header.length = be64_to_cpu(s->crypto_header.length);
- 
-             if ((s->crypto_header.offset % s->cluster_size) != 0) {
-                 error_setg(errp, "Encryption header offset '%" PRIu64 "' is "
-@@ -342,9 +342,11 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-                 return -EINVAL;
-             }
- 
--            be32_to_cpus(&bitmaps_ext.nb_bitmaps);
--            be64_to_cpus(&bitmaps_ext.bitmap_directory_size);
--            be64_to_cpus(&bitmaps_ext.bitmap_directory_offset);
-+            bitmaps_ext.nb_bitmaps = be32_to_cpu(bitmaps_ext.nb_bitmaps);
-+            bitmaps_ext.bitmap_directory_size =
-+                be64_to_cpu(bitmaps_ext.bitmap_directory_size);
-+            bitmaps_ext.bitmap_directory_offset =
-+                be64_to_cpu(bitmaps_ext.bitmap_directory_offset);
- 
-             if (bitmaps_ext.nb_bitmaps > QCOW2_MAX_BITMAPS) {
-                 error_setg(errp,
-@@ -1160,19 +1162,20 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         error_setg_errno(errp, -ret, "Could not read qcow2 header");
-         goto fail;
-     }
--    be32_to_cpus(&header.magic);
--    be32_to_cpus(&header.version);
--    be64_to_cpus(&header.backing_file_offset);
--    be32_to_cpus(&header.backing_file_size);
--    be64_to_cpus(&header.size);
--    be32_to_cpus(&header.cluster_bits);
--    be32_to_cpus(&header.crypt_method);
--    be64_to_cpus(&header.l1_table_offset);
--    be32_to_cpus(&header.l1_size);
--    be64_to_cpus(&header.refcount_table_offset);
--    be32_to_cpus(&header.refcount_table_clusters);
--    be64_to_cpus(&header.snapshots_offset);
--    be32_to_cpus(&header.nb_snapshots);
-+    header.magic = be32_to_cpu(header.magic);
-+    header.version = be32_to_cpu(header.version);
-+    header.backing_file_offset = be64_to_cpu(header.backing_file_offset);
-+    header.backing_file_size = be32_to_cpu(header.backing_file_size);
-+    header.size = be64_to_cpu(header.size);
-+    header.cluster_bits = be32_to_cpu(header.cluster_bits);
-+    header.crypt_method = be32_to_cpu(header.crypt_method);
-+    header.l1_table_offset = be64_to_cpu(header.l1_table_offset);
-+    header.l1_size = be32_to_cpu(header.l1_size);
-+    header.refcount_table_offset = be64_to_cpu(header.refcount_table_offset);
-+    header.refcount_table_clusters =
-+        be32_to_cpu(header.refcount_table_clusters);
-+    header.snapshots_offset = be64_to_cpu(header.snapshots_offset);
-+    header.nb_snapshots = be32_to_cpu(header.nb_snapshots);
- 
-     if (header.magic != QCOW_MAGIC) {
-         error_setg(errp, "Image is not in qcow2 format");
-@@ -1208,11 +1211,12 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-         header.refcount_order           = 4;
-         header.header_length            = 72;
-     } else {
--        be64_to_cpus(&header.incompatible_features);
--        be64_to_cpus(&header.compatible_features);
--        be64_to_cpus(&header.autoclear_features);
--        be32_to_cpus(&header.refcount_order);
--        be32_to_cpus(&header.header_length);
-+        header.incompatible_features =
-+            be64_to_cpu(header.incompatible_features);
-+        header.compatible_features = be64_to_cpu(header.compatible_features);
-+        header.autoclear_features = be64_to_cpu(header.autoclear_features);
-+        header.refcount_order = be32_to_cpu(header.refcount_order);
-+        header.header_length = be32_to_cpu(header.header_length);
- 
-         if (header.header_length < 104) {
-             error_setg(errp, "qcow2 header too short");
-@@ -1401,7 +1405,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-             goto fail;
-         }
-         for(i = 0;i < s->l1_size; i++) {
--            be64_to_cpus(&s->l1_table[i]);
-+            s->l1_table[i] = be64_to_cpu(s->l1_table[i]);
-         }
-     }
- 
-@@ -2346,13 +2350,13 @@ int qcow2_update_header(BlockDriverState *bs)
- 
-     /* Full disk encryption header pointer extension */
-     if (s->crypto_header.offset != 0) {
--        cpu_to_be64s(&s->crypto_header.offset);
--        cpu_to_be64s(&s->crypto_header.length);
-+        s->crypto_header.offset = cpu_to_be64(s->crypto_header.offset);
-+        s->crypto_header.length = cpu_to_be64(s->crypto_header.length);
-         ret = header_ext_add(buf, QCOW2_EXT_MAGIC_CRYPTO_HEADER,
-                              &s->crypto_header, sizeof(s->crypto_header),
-                              buflen);
--        be64_to_cpus(&s->crypto_header.offset);
--        be64_to_cpus(&s->crypto_header.length);
-+        s->crypto_header.offset = be64_to_cpu(s->crypto_header.offset);
-+        s->crypto_header.length = be64_to_cpu(s->crypto_header.length);
-         if (ret < 0) {
-             goto fail;
-         }
--- 
-2.19.0
+Do all snapshots have a tag that is unique within their image?  Even
+snapshots created by old versions of QEMU?
