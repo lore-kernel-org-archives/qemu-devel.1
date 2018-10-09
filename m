@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1g9qAR-0005fv-Jm
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:27:12 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9qJA-00086D-DV
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1g9qAO-00021C-2I
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:27:11 -0400
-Received: from 3.mo177.mail-out.ovh.net ([46.105.36.172]:52999)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1g9qAM-0001z6-4k
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:27:06 -0400
-Received: from player699.ha.ovh.net (unknown [10.109.160.40])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id A7098CACC3
-	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 13:27:03 +0200 (CEST)
-Date: Tue, 9 Oct 2018 13:26:57 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181009132657.5b3662f3@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <1539002382-3764-1-git-send-email-thuth@redhat.com>
-References: <1539002382-3764-1-git-send-email-thuth@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9qJ9-0008Fi-JE
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:36:12 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:41261)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g9qJ7-0008Bi-Pm
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 07:36:11 -0400
+Received: by mail-wr1-x431.google.com with SMTP id x12-v6so1425271wru.8
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 04:36:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] hw/ppc/spapr_rng: Introduce
- CONFIG_SPAPR_RNG switch for spapr_rng.c
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-25-armbru@redhat.com>
+In-Reply-To: <20181008173125.19678-25-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 9 Oct 2018 15:35:54 +0400
+Message-ID: <CAJ+F1CLw=M609d9vEhQNmZ67Qn5FnD=bGSEWb57DP7i1whZuNA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 24/31] vl: Clean up error reporting in
+ vnc_init_func()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,134 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon,  8 Oct 2018 14:39:42 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Hi
 
-> The spapr-rng device is suboptimal when compared to virtio-rng, so
-> users might want to disable it in their builds. Thus let's introduce
-> a proper CONFIG switch to allow us to compile QEMU without this device.
-> The function spapr_rng_populate_dt is required for linking, so move it
-> to a different location.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Mon, Oct 8, 2018 at 9:38 PM Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Calling error_report() in a function that takes an Error ** argument
+> is suspicious.  vnc_init_func() does that, and then fails without
+> setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+> with it, but clean it up anyway.
+>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  v2: Put spapr_rng_populate_dt() into spapr.c instead of a header
-> 
->  default-configs/ppc64-softmmu.mak |  1 +
->  hw/ppc/Makefile.objs              |  3 ++-
->  hw/ppc/spapr.c                    | 23 +++++++++++++++++++++++
->  hw/ppc/spapr_rng.c                | 23 -----------------------
->  include/hw/ppc/spapr.h            |  2 --
->  5 files changed, 26 insertions(+), 26 deletions(-)
-> 
-> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-> index b94af6c..24d4717 100644
-> --- a/default-configs/ppc64-softmmu.mak
-> +++ b/default-configs/ppc64-softmmu.mak
-> @@ -17,3 +17,4 @@ CONFIG_XICS=$(CONFIG_PSERIES)
->  CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
->  CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
->  CONFIG_MEM_HOTPLUG=y
-> +CONFIG_SPAPR_RNG=y
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index 4ab5564..4e0c1c0 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -3,8 +3,9 @@ obj-y += ppc.o ppc_booke.o fdt.o
->  # IBM pSeries (sPAPR)
->  obj-$(CONFIG_PSERIES) += spapr.o spapr_caps.o spapr_vio.o spapr_events.o
->  obj-$(CONFIG_PSERIES) += spapr_hcall.o spapr_iommu.o spapr_rtas.o
-> -obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o spapr_rng.o
-> +obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o
->  obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o spapr_irq.o
-> +obj-$(CONFIG_SPAPR_RNG) +=  spapr_rng.o
->  # IBM PowerNV
->  obj-$(CONFIG_POWERNV) += pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_psi.o pnv_occ.o pnv_bmc.o
->  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 98868d8..e666872 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -610,6 +610,29 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
->      g_free(rev);
->  }
->  
-> +static int spapr_rng_populate_dt(void *fdt)
-> +{
-> +    int node;
-> +    int ret;
-> +
-> +    node = qemu_fdt_add_subnode(fdt, "/ibm,platform-facilities");
-> +    if (node <= 0) {
+>  ui/vnc.c | 5 +++--
+>  vl.c     | 2 +-
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index cf221c83cc..df6c84b802 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -4082,8 +4082,9 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Err=
+or **errp)
+>      vnc_display_init(id);
+>      vnc_display_open(id, &local_err);
+>      if (local_err !=3D NULL) {
+> -        error_reportf_err(local_err, "Failed to start VNC server: ");
+> -        exit(1);
+> +        error_propagate(errp, local_err);
+> +        error_prepend(errp, "Failed to start VNC server: ");
 > +        return -1;
-> +    }
-> +    ret = fdt_setprop_string(fdt, node, "device_type",
-> +                             "ibm,platform-facilities");
-> +    ret |= fdt_setprop_cell(fdt, node, "#address-cells", 0x1);
-> +    ret |= fdt_setprop_cell(fdt, node, "#size-cells", 0x0);
-> +
-> +    node = fdt_add_subnode(fdt, node, "ibm,random-v1");
-> +    if (node <= 0) {
-> +        return -1;
-> +    }
-> +    ret |= fdt_setprop_string(fdt, node, "compatible", "ibm,random");
-> +
-> +    return ret ? -1 : 0;
-> +}
-> +
->  static uint32_t spapr_pc_dimm_node(MemoryDeviceInfoList *list, ram_addr_t addr)
->  {
->      MemoryDeviceInfoList *info;
-> diff --git a/hw/ppc/spapr_rng.c b/hw/ppc/spapr_rng.c
-> index d2acd61..644bac9 100644
-> --- a/hw/ppc/spapr_rng.c
-> +++ b/hw/ppc/spapr_rng.c
-> @@ -132,29 +132,6 @@ static void spapr_rng_realize(DeviceState *dev, Error **errp)
 >      }
+>      return 0;
 >  }
->  
-> -int spapr_rng_populate_dt(void *fdt)
-> -{
-> -    int node;
-> -    int ret;
-> -
-> -    node = qemu_fdt_add_subnode(fdt, "/ibm,platform-facilities");
-> -    if (node <= 0) {
-> -        return -1;
-> -    }
-> -    ret = fdt_setprop_string(fdt, node, "device_type",
-> -                             "ibm,platform-facilities");
-> -    ret |= fdt_setprop_cell(fdt, node, "#address-cells", 0x1);
-> -    ret |= fdt_setprop_cell(fdt, node, "#size-cells", 0x0);
-> -
-> -    node = fdt_add_subnode(fdt, node, "ibm,random-v1");
-> -    if (node <= 0) {
-> -        return -1;
-> -    }
-> -    ret |= fdt_setprop_string(fdt, node, "compatible", "ibm,random");
-> -
-> -    return ret ? -1 : 0;
-> -}
-> -
->  static Property spapr_rng_properties[] = {
->      DEFINE_PROP_BOOL("use-kvm", sPAPRRngState, use_kvm, false),
->      DEFINE_PROP_LINK("rng", sPAPRRngState, backend, TYPE_RNG_BACKEND,
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index ad4d7cf..0805ad8 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -745,8 +745,6 @@ int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
->  
->  #define TYPE_SPAPR_RNG "spapr-rng"
->  
-> -int spapr_rng_populate_dt(void *fdt);
-> -
->  #define SPAPR_MEMORY_BLOCK_SIZE (1 << 28) /* 256MB */
->  
->  /*
+> diff --git a/vl.c b/vl.c
+> index 86eee4c798..5c159ca45c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4479,7 +4479,7 @@ int main(int argc, char **argv, char **envp)
+>      /* init remote displays */
+>  #ifdef CONFIG_VNC
+>      qemu_opts_foreach(qemu_find_opts("vnc"),
+> -                      vnc_init_func, NULL, NULL);
+> +                      vnc_init_func, NULL, &error_fatal);
+>  #endif
+>
+>      if (using_spice) {
+> --
+> 2.17.1
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
