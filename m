@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1g9miE-0000dG-N0
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:45:51 -0400
+	(envelope-from <peterx@redhat.com>) id 1g9miv-0000xE-Jm
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1g9mi9-0008P2-N6
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:45:50 -0400
-Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:33696)
+	(envelope-from <peterx@redhat.com>) id 1g9mio-0000HH-NY
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1g9mi9-0008OH-F3
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:45:45 -0400
-Received: from player774.ha.ovh.net (unknown [10.109.146.168])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id EBCD41DADEF
-	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 09:45:43 +0200 (CEST)
-Date: Tue, 9 Oct 2018 09:45:41 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20181009094541.7add48d7@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20181008173125.19678-29-armbru@redhat.com>
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-29-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 28/31] fsdev: Clean up error reporting in
- qemu_fsdev_add()
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1g9mii-0000CT-2L
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:24 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 19264C04B318
+	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 07:46:13 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Tue,  9 Oct 2018 15:45:41 +0800
+Message-Id: <20181009074543.6013-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/2] intel_iommu: handle invalid ce for
+ shadow sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,164 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Pei Zhang <pezhang@redhat.com>, Eric Auger <eric.auger@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-On Mon,  8 Oct 2018 19:31:22 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+v3:
+- pick r-b
+- return when -VTD_FR_CONTEXT_ENTRY_P is detected (v1 is correct here,
+  but I did wrong thing when splitting the patch in v2) [Eric]
 
-> Calling error_report() from within a a function that takes an Error **
-> argument is suspicious.  qemu_fsdev_add() does that, and its caller
-> fsdev_init_func() then fails without setting an error.  Its caller
-> main(), via qemu_opts_foreach(), is fine with it, but clean it up
-> anyway.
-> 
-> Cc: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+v2:
+- split patch into more, remove useless comment [Eric]
+- remove one error_report_once() when rework the code [Jason]
 
-Yeah, this was somewhere down in my TODO list. Thanks for the clean
-up Markus.
+This series fixes a QEMU crash reported here:
 
-Acked-by: Greg Kurz <groug@kaod.org>
+https://bugzilla.redhat.com/show_bug.cgi?id=1627272
 
->  fsdev/qemu-fsdev-dummy.c |  2 +-
->  fsdev/qemu-fsdev.c       | 12 +++++-------
->  fsdev/qemu-fsdev.h       |  2 +-
->  hw/9pfs/xen-9p-backend.c |  7 ++++++-
->  vl.c                     |  8 +++-----
->  5 files changed, 16 insertions(+), 15 deletions(-)
-> 
-> diff --git a/fsdev/qemu-fsdev-dummy.c b/fsdev/qemu-fsdev-dummy.c
-> index 6dc0fbc4c4..489cd29081 100644
-> --- a/fsdev/qemu-fsdev-dummy.c
-> +++ b/fsdev/qemu-fsdev-dummy.c
-> @@ -15,7 +15,7 @@
->  #include "qemu/config-file.h"
->  #include "qemu/module.h"
->  
-> -int qemu_fsdev_add(QemuOpts *opts)
-> +int qemu_fsdev_add(QemuOpts *opts, Error **errp)
->  {
->      return 0;
->  }
-> diff --git a/fsdev/qemu-fsdev.c b/fsdev/qemu-fsdev.c
-> index 8a4afbffbd..7a3b87cc9e 100644
-> --- a/fsdev/qemu-fsdev.c
-> +++ b/fsdev/qemu-fsdev.c
-> @@ -30,7 +30,7 @@ static FsDriverTable FsDrivers[] = {
->      { .name = "proxy", .ops = &proxy_ops},
->  };
->  
-> -int qemu_fsdev_add(QemuOpts *opts)
-> +int qemu_fsdev_add(QemuOpts *opts, Error **errp)
->  {
->      int i;
->      struct FsDriverListEntry *fsle;
-> @@ -38,10 +38,9 @@ int qemu_fsdev_add(QemuOpts *opts)
->      const char *fsdriver = qemu_opt_get(opts, "fsdriver");
->      const char *writeout = qemu_opt_get(opts, "writeout");
->      bool ro = qemu_opt_get_bool(opts, "readonly", 0);
-> -    Error *local_err = NULL;
->  
->      if (!fsdev_id) {
-> -        error_report("fsdev: No id specified");
-> +        error_setg(errp, "fsdev: No id specified");
->          return -1;
->      }
->  
-> @@ -53,11 +52,11 @@ int qemu_fsdev_add(QemuOpts *opts)
->          }
->  
->          if (i == ARRAY_SIZE(FsDrivers)) {
-> -            error_report("fsdev: fsdriver %s not found", fsdriver);
-> +            error_setg(errp, "fsdev: fsdriver %s not found", fsdriver);
->              return -1;
->          }
->      } else {
-> -        error_report("fsdev: No fsdriver specified");
-> +        error_setg(errp, "fsdev: No fsdriver specified");
->          return -1;
->      }
->  
-> @@ -76,8 +75,7 @@ int qemu_fsdev_add(QemuOpts *opts)
->      }
->  
->      if (fsle->fse.ops->parse_opts) {
-> -        if (fsle->fse.ops->parse_opts(opts, &fsle->fse, &local_err)) {
-> -            error_report_err(local_err);
-> +        if (fsle->fse.ops->parse_opts(opts, &fsle->fse, errp)) {
->              g_free(fsle->fse.fsdev_id);
->              g_free(fsle);
->              return -1;
-> diff --git a/fsdev/qemu-fsdev.h b/fsdev/qemu-fsdev.h
-> index 65e4b1cfab..d9716b4144 100644
-> --- a/fsdev/qemu-fsdev.h
-> +++ b/fsdev/qemu-fsdev.h
-> @@ -38,7 +38,7 @@ typedef struct FsDriverListEntry {
->      QTAILQ_ENTRY(FsDriverListEntry) next;
->  } FsDriverListEntry;
->  
-> -int qemu_fsdev_add(QemuOpts *opts);
-> +int qemu_fsdev_add(QemuOpts *opts, Error **errp);
->  FsDriverEntry *get_fsdev_fsentry(char *id);
->  extern FileOperations local_ops;
->  extern FileOperations handle_ops;
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> index 6026780f95..3f54a21c76 100644
-> --- a/hw/9pfs/xen-9p-backend.c
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -14,6 +14,7 @@
->  #include "hw/9pfs/9p.h"
->  #include "hw/xen/xen_backend.h"
->  #include "hw/9pfs/xen-9pfs.h"
-> +#include "qapi/error.h"
->  #include "qemu/config-file.h"
->  #include "qemu/option.h"
->  #include "fsdev/qemu-fsdev.h"
-> @@ -355,6 +356,7 @@ static int xen_9pfs_free(struct XenDevice *xendev)
->  
->  static int xen_9pfs_connect(struct XenDevice *xendev)
->  {
-> +    Error *err = NULL;
->      int i;
->      Xen9pfsDev *xen_9pdev = container_of(xendev, Xen9pfsDev, xendev);
->      V9fsState *s = &xen_9pdev->state;
-> @@ -452,7 +454,10 @@ static int xen_9pfs_connect(struct XenDevice *xendev)
->      qemu_opt_set(fsdev, "path", xen_9pdev->path, NULL);
->      qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
->      qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
-> -    qemu_fsdev_add(fsdev);
-> +    qemu_fsdev_add(fsdev, &err);
-> +    if (err) {
-> +        error_report_err(err);
-> +    }
->      v9fs_device_realize_common(s, &xen_9p_transport, NULL);
->  
->      return 0;
-> diff --git a/vl.c b/vl.c
-> index b6f9212f09..4aa976c4cc 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2249,7 +2249,7 @@ static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
->  #ifdef CONFIG_VIRTFS
->  static int fsdev_init_func(void *opaque, QemuOpts *opts, Error **errp)
->  {
-> -    return qemu_fsdev_add(opts);
-> +    return qemu_fsdev_add(opts, errp);
->  }
->  #endif
->  
-> @@ -4188,10 +4188,8 @@ int main(int argc, char **argv, char **envp)
->                        chardev_init_func, NULL, &error_fatal);
->  
->  #ifdef CONFIG_VIRTFS
-> -    if (qemu_opts_foreach(qemu_find_opts("fsdev"),
-> -                          fsdev_init_func, NULL, NULL)) {
-> -        exit(1);
-> -    }
-> +    qemu_opts_foreach(qemu_find_opts("fsdev"),
-> +                      fsdev_init_func, NULL, &error_fatal);
->  #endif
->  
->      if (qemu_opts_foreach(qemu_find_opts("device"),
+Please review, thanks.
+
+Peter Xu (2):
+  intel_iommu: move ce fetching out when sync shadow
+  intel_iommu: handle invalid ce for shadow sync
+
+ dtc                   |  2 +-
+ hw/i386/intel_iommu.c | 55 +++++++++++++++++++++++--------------------
+ 2 files changed, 30 insertions(+), 27 deletions(-)
+
+-- 
+2.17.1
