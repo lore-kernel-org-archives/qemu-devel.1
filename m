@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9oiD-0005ka-6N
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:53:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g9okh-0006SW-6m
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:56:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9oiC-0000zk-6i
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:53:57 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35445)
+	(envelope-from <alex.bennee@linaro.org>) id 1g9okb-0005M8-1E
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:56:30 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g9oiB-0000yn-UJ
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:53:56 -0400
-Received: by mail-wr1-x441.google.com with SMTP id w5-v6so1107543wrt.2
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:53:55 -0700 (PDT)
-MIME-Version: 1.0
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1g9okZ-00052J-5b
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:56:23 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 193-v6so1239872wme.3
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:56:16 -0700 (PDT)
 References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-17-armbru@redhat.com>
-In-Reply-To: <20181008173125.19678-17-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Oct 2018 13:53:42 +0400
-Message-ID: <CAJ+F1CLVB=MhDPv9mW5MBzoWXyD-GFbsRUk_5oFW=Nk0nh1d4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<20181008173125.19678-4-armbru@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20181008173125.19678-4-armbru@redhat.com>
+Date: Tue, 09 Oct 2018 10:56:13 +0100
+Message-ID: <87r2gzmojm.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 16/31] seccomp: Clean up error reporting in
- parse_sandbox()
+Subject: Re: [Qemu-devel] [PATCH 03/31] cpus hw target: Use warn_report() &
+ friends to report warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,131 +32,199 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Eduardo Otubo <otubo@redhat.com>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alex Williamson <alex.williamson@redhat.com>, Fam Zheng <famz@redhat.com>, Wei Huang <wei@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-Hi
 
-On Mon, Oct 8, 2018 at 9:50 PM Markus Armbruster <armbru@redhat.com> wrote:
->
+Markus Armbruster <armbru@redhat.com> writes:
+
 > Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  parse_sandbox() does that, and then fails without
-> setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-> with it, but clean it up anyway.
+> is suspicious.  Convert a few that are actually warnings to
+> warn_report().
 >
-> Cc: Eduardo Otubo <otubo@redhat.com>
+> While there, split a warning consisting of multiple sentences to
+> conform to conventions spelled out in warn_report()'s contract.
+>
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Fam Zheng <famz@redhat.com>
+> Cc: Wei Huang <wei@redhat.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  qemu-seccomp.c | 18 +++++++++---------
->  vl.c           |  4 ++--
->  2 files changed, 11 insertions(+), 11 deletions(-)
+>  cpus.c                          |  8 ++++----
+>  hw/display/cg3.c                |  2 +-
+>  hw/display/tcx.c                |  2 +-
+>  hw/misc/ivshmem.c               |  4 ++--
+>  hw/net/virtio-net.c             |  8 ++++----
+>  hw/virtio/virtio-pci.c          |  4 ++--
+>  target/i386/cpu.c               | 17 +++++++++--------
+>  target/ppc/translate_init.inc.c |  4 ++--
+>  8 files changed, 25 insertions(+), 24 deletions(-)
 >
-> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-> index 1baa5c69ed..6d27699409 100644
-> --- a/qemu-seccomp.c
-> +++ b/qemu-seccomp.c
-> @@ -12,11 +12,12 @@
->   * Contributions after 2012-01-13 are licensed under the terms of the
->   * GNU GPL, version 2 or (at your option) any later version.
->   */
-> +
->  #include "qemu/osdep.h"
-> +#include "qapi/error.h"
->  #include "qemu/config-file.h"
->  #include "qemu/option.h"
->  #include "qemu/module.h"
-> -#include "qemu/error-report.h"
->  #include <sys/prctl.h>
->  #include <seccomp.h>
->  #include "sysemu/seccomp.h"
-> @@ -190,7 +191,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
- **errp)
->                   * to provide a little bit of consistency for
->                   * the command line */
+> diff --git a/cpus.c b/cpus.c
+> index 361678e459..7804071872 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -211,12 +211,12 @@ void qemu_tcg_configure(QemuOpts *opts, Error **err=
+p)
+>                  error_setg(errp, "No MTTCG when icount is enabled");
 >              } else {
-> -                error_report("invalid argument for obsolete");
-> +                error_setg(errp, "invalid argument for obsolete");
->                  return -1;
->              }
->          }
-> @@ -205,14 +206,13 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
-or **errp)
->                  /* calling prctl directly because we're
->                   * not sure if host has CAP_SYS_ADMIN set*/
->                  if (prctl(PR_SET_NO_NEW_PRIVS, 1)) {
-> -                    error_report("failed to set no_new_privs "
-> -                                 "aborting");
-> +                    error_setg(errp, "failed to set no_new_privs " "abor=
-ting");
-
-Extra " "
-
->                      return -1;
->                  }
->              } else if (g_str_equal(value, "allow")) {
->                  /* default value */
->              } else {
-> -                error_report("invalid argument for elevateprivileges");
-> +                error_setg(errp, "invalid argument for elevateprivileges=
-");
->                  return -1;
->              }
->          }
-> @@ -224,7 +224,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
- **errp)
->              } else if (g_str_equal(value, "allow")) {
->                  /* default value */
->              } else {
-> -                error_report("invalid argument for spawn");
-> +                error_setg(errp, "invalid argument for spawn");
->                  return -1;
->              }
->          }
-> @@ -236,14 +236,14 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
-or **errp)
->              } else if (g_str_equal(value, "allow")) {
->                  /* default value */
->              } else {
-> -                error_report("invalid argument for resourcecontrol");
-> +                error_setg(errp, "invalid argument for resourcecontrol")=
-;
->                  return -1;
->              }
->          }
->
->          if (seccomp_start(seccomp_opts) < 0) {
-> -            error_report("failed to install seccomp syscall filter "
-> -                         "in the kernel");
-> +            error_setg(errp, "failed to install seccomp syscall filter "
-> +                       "in the kernel");
->              return -1;
->          }
->      }
-> diff --git a/vl.c b/vl.c
-> index 9d2b38a31f..485c3fc008 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3925,8 +3925,8 @@ int main(int argc, char **argv, char **envp)
->
->  #ifdef CONFIG_SECCOMP
->      olist =3D qemu_find_opts_err("sandbox", NULL);
-> -    if (olist && qemu_opts_foreach(olist, parse_sandbox, NULL, NULL)) {
-> -        exit(1);
-> +    if (olist) {
-> +        qemu_opts_foreach(olist, parse_sandbox, NULL, &error_fatal);
->      }
+>  #ifndef TARGET_SUPPORTS_MTTCG
+> -                error_report("Guest not yet converted to MTTCG - "
+> -                             "you may get unexpected results");
+> +                warn_report("Guest not yet converted to MTTCG - "
+> +                            "you may get unexpected results");
 >  #endif
+>                  if (!check_tcg_memory_orders_compatible()) {
+> -                    error_report("Guest expects a stronger memory orderi=
+ng "
+> -                                 "than the host provides");
+> +                    warn_report("Guest expects a stronger memory orderin=
+g "
+> +                                "than the host provides");
+>                      error_printf("This may cause strange/hard to debug e=
+rrors\n");
+>                  }
+>                  mttcg_enabled =3D true;
+> diff --git a/hw/display/cg3.c b/hw/display/cg3.c
+> index 1c199ab369..e50d97e48c 100644
+> --- a/hw/display/cg3.c
+> +++ b/hw/display/cg3.c
+> @@ -307,7 +307,7 @@ static void cg3_realizefn(DeviceState *dev, Error **e=
+rrp)
+>          ret =3D load_image_mr(fcode_filename, &s->rom);
+>          g_free(fcode_filename);
+>          if (ret < 0 || ret > FCODE_MAX_ROM_SIZE) {
+> -            error_report("cg3: could not load prom '%s'", CG3_ROM_FILE);
+> +            warn_report("cg3: could not load prom '%s'", CG3_ROM_FILE);
+>          }
+>      }
 >
-
-Other than that,
-
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> --
-> 2.17.1
+> diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+> index b2786ee8d0..66f2459226 100644
+> --- a/hw/display/tcx.c
+> +++ b/hw/display/tcx.c
+> @@ -823,7 +823,7 @@ static void tcx_realizefn(DeviceState *dev, Error **e=
+rrp)
+>          ret =3D load_image_mr(fcode_filename, &s->rom);
+>          g_free(fcode_filename);
+>          if (ret < 0 || ret > FCODE_MAX_ROM_SIZE) {
+> -            error_report("tcx: could not load prom '%s'", TCX_ROM_FILE);
+> +            warn_report("tcx: could not load prom '%s'", TCX_ROM_FILE);
+>          }
+>      }
 >
+> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+> index 6febbabcaa..4794518b2c 100644
+> --- a/hw/misc/ivshmem.c
+> +++ b/hw/misc/ivshmem.c
+> @@ -1292,8 +1292,8 @@ static void ivshmem_realize(PCIDevice *dev, Error *=
+*errp)
+>      IVShmemState *s =3D IVSHMEM_COMMON(dev);
 >
+>      if (!qtest_enabled()) {
+> -        error_report("ivshmem is deprecated, please use ivshmem-plain"
+> -                     " or ivshmem-doorbell instead");
+> +        warn_report("ivshmem is deprecated, please use ivshmem-plain"
+> +                    " or ivshmem-doorbell instead");
+>      }
+>
+>      if (qemu_chr_fe_backend_connected(&s->server_chr) + !!s->shmobj !=3D=
+ 1) {
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 4bdd5b8532..385b1a03e9 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -2020,10 +2020,10 @@ static void virtio_net_device_realize(DeviceState=
+ *dev, Error **errp)
+>
+>      if (n->net_conf.tx && strcmp(n->net_conf.tx, "timer")
+>                         && strcmp(n->net_conf.tx, "bh")) {
+> -        error_report("virtio-net: "
+> -                     "Unknown option tx=3D%s, valid options: \"timer\" \=
+"bh\"",
+> -                     n->net_conf.tx);
+> -        error_report("Defaulting to \"bh\"");
+> +        warn_report("virtio-net: "
+> +                    "Unknown option tx=3D%s, valid options: \"timer\" \"=
+bh\"",
+> +                    n->net_conf.tx);
+> +        error_printf("Defaulting to \"bh\"");
+>      }
+>
+>      n->net_conf.tx_queue_size =3D MIN(virtio_net_max_tx_queue_size(n),
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 3a01fe90f0..a954799267 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1683,8 +1683,8 @@ static void virtio_pci_device_plugged(DeviceState *=
+d, Error **errp)
+>          if (err) {
+>              /* Notice when a system that supports MSIx can't initialize =
+it */
+>              if (err !=3D -ENOTSUP) {
+> -                error_report("unable to init msix vectors to %" PRIu32,
+> -                             proxy->nvectors);
+> +                warn_report("unable to init msix vectors to %" PRIu32,
+> +                            proxy->nvectors);
+>              }
+>              proxy->nvectors =3D 0;
+>          }
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index c88876dfe3..9d4217afba 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5123,14 +5123,15 @@ static void x86_cpu_realizefn(DeviceState *dev, E=
+rror **errp)
+>       * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+>       * cs->nr_threads hasn't be populated yet and the checking is incorr=
+ect.
+>       */
+> -     if (IS_AMD_CPU(env) &&
+> -         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
+> -         cs->nr_threads > 1 && !ht_warned) {
+> -            error_report("This family of AMD CPU doesn't support "
+> -                         "hyperthreading(%d). Please configure -smp "
+> -                         "options properly or try enabling topoext featu=
+re.",
+> -                         cs->nr_threads);
+> -        ht_warned =3D true;
+> +    if (IS_AMD_CPU(env) &&
+> +        !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
+> +        cs->nr_threads > 1 && !ht_warned) {
+> +            warn_report("This family of AMD CPU doesn't support "
+> +                        "hyperthreading(%d)",
+> +                        cs->nr_threads);
+> +            error_printf("Please configure -smp options properly"
+> +                         " or try enabling topoext feature.\n");
+> +            ht_warned =3D true;
+>      }
+>
+>      x86_cpu_apic_realize(cpu, &local_err);
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 263e63cb03..ee9432eb15 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -8381,8 +8381,8 @@ static void getset_compat_deprecated(Object *obj, V=
+isitor *v, const char *name,
+>      QNull *null =3D NULL;
+>
+>      if (!qtest_enabled()) {
+> -        error_report("CPU 'compat' property is deprecated and has no eff=
+ect; "
+> -                     "use max-cpu-compat machine property instead");
+> +        warn_report("CPU 'compat' property is deprecated and has no effe=
+ct; "
+> +                    "use max-cpu-compat machine property instead");
+>      }
+>      visit_type_null(v, name, &null, NULL);
+>      qobject_unref(null);
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+--
+Alex Benn=C3=A9e
