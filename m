@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vicviq@gmail.com>) id 1g9wyH-00082V-Sr
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:43:07 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1g9yps-0001Mq-M3
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vicviq@gmail.com>) id 1g9wyF-0002pK-MU
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:43:05 -0400
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:35960)
+	(envelope-from <richard.henderson@linaro.org>) id 1g9ypn-0005Fu-PT
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:42:32 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36095)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vicviq@gmail.com>) id 1g9wyF-0002X1-Dn
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:43:03 -0400
-Received: by mail-ot1-x335.google.com with SMTP id x4so1335012otg.3
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 11:42:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1g9ypk-0005DQ-Av
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:42:26 -0400
+Received: by mail-pf1-x441.google.com with SMTP id l81-v6so1447871pfg.3
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 13:42:22 -0700 (PDT)
+References: <20181009184017.15675-1-peter.maydell@linaro.org>
+	<fd52a068-17f8-5436-1d87-dfe40cd23fe9@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4ab38a61-86b3-1fbb-f116-1aca0a901895@linaro.org>
+Date: Tue, 9 Oct 2018 13:42:17 -0700
 MIME-Version: 1.0
-From: viq <vicviq@gmail.com>
-Date: Tue, 9 Oct 2018 20:42:39 +0200
-Message-ID: <CALF8MVHZSWutrbc-X04OMLQA1WZ1rSznbrxS68Z7eRRxL8YPqg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] OpenBSD with VirtIO networking causes QEMU to crash
+In-Reply-To: <fd52a068-17f8-5436-1d87-dfe40cd23fe9@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user/sparc/signal.c: Remove
+ unnecessary comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,23 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, patches@linaro.org
 
-(please CC me as I'm not subscribed to the list)
-I verified the behaviour on two different machines, both running archlinux
-with QEMU 3.0.0 and reported it on https://bugs.archlinux.org/task/60141
-where it was suggested I bring it to the list.
+On 10/9/18 12:45 PM, Laurent Vivier wrote:
+> Le 09/10/2018 à 20:40, Peter Maydell a écrit :
+>> Remove a comment suggesting that we need to call tb_flush()
+>> after writing the SPARC signal frame trampoline insns.
+>> This isn't necessary in QEMU, because (even if the guest
+>> architecture requires explicit icache maintenance) we
+>> ensure that memory writes result in invalidation of
+>> translated code from that memory.
+> 
+> By curiosity, where/how is it done?
 
-So what happens: if you try to run OpenBSD with VirtIO networking enabled,
-the moment OpenBSD brings up network the QEMU process crashes. Easiest
-steps to reproduce:
-Download for example
-https://ftp.halifax.rwth-aachen.de/pub/OpenBSD/6.3/amd64/install63.iso
-Create new VM under libvirt as OpenBSD 6.3, create disk, "change options
-before installation", change disk and network types to virtio
-Proceed with installation (basically enter-enter-enter-...)
-Observe qemu crash when network is brought up.
+Guest pages that have had code translated from them are mprotect'd read-only.
+The host SIGSEGV handler notices writes to such pages, invalidates the
+translated code, and marks the page read-write again.  At which point the guest
+program continues.
 
-Sorry, I don't really know how to proceed further with that.
--- 
-viq
+
+r~
