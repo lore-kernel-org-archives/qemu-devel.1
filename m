@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1g9vBc-00022r-8u
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:48:45 -0400
+	(envelope-from <crosa@redhat.com>) id 1g9vHM-0003Ob-OK
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1g9vBX-0000i7-1Z
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:48:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54376)
+	(envelope-from <crosa@redhat.com>) id 1g9vHJ-0003Ht-Aa
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:54:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g9vBW-0000hr-Pg
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:48:38 -0400
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g9vHH-0003Al-4E
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:54:37 -0400
 References: <20181009041826.19462-1-crosa@redhat.com>
-	<20181009041826.19462-4-crosa@redhat.com>
-	<75560722-a9f5-5ec9-b851-d521960ed8eb@redhat.com>
+	<20181009041826.19462-2-crosa@redhat.com>
+	<55a1c7a3-0381-f426-edca-d95c04180326@redhat.com>
+	<5c424a39-02b3-2f5d-57fe-eb322b550675@redhat.com>
+	<97c326c6-e096-427c-e38f-b31ba939bc3b@redhat.com>
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <d56ed2c4-d310-5048-3c02-682cf2934f85@redhat.com>
-Date: Tue, 9 Oct 2018 12:48:29 -0400
+Message-ID: <724d9355-c9ae-b462-0e55-b061c640e650@redhat.com>
+Date: Tue, 9 Oct 2018 12:54:07 -0400
 MIME-Version: 1.0
-In-Reply-To: <75560722-a9f5-5ec9-b851-d521960ed8eb@redhat.com>
+In-Reply-To: <97c326c6-e096-427c-e38f-b31ba939bc3b@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] Travis support for the acceptance
- tests
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,166 +31,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
 
 
-On 10/9/18 9:46 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Cleber,
+On 10/9/18 12:13 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 09/10/2018 18:00, Cleber Rosa wrote:
+>>
+>>
+>> On 10/9/18 9:25 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Hi Cleber,
+>>>
+>>> On 09/10/2018 06:18, Cleber Rosa wrote:
+>>>> A number of QEMU tests are written in Python, and may benefit
+>>>> from an untainted Python venv.
+>>>>
+>>>> By using make rules, tests that depend on specific Python libs
+>>>> can set that rule as a requiment, along with rules that require
+>>>> the presence or installation of specific libraries.
+>>>>
+>>>> The tests/venv-requirements.txt is supposed to contain the
+>>>> Python requirements that should be added to the venv created
+>>>> by check-venv.
+>>>>
+>>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>>> ---
+>>>>  tests/Makefile.include      | 19 +++++++++++++++++++
+>>>>  tests/venv-requirements.txt |  3 +++
+>>>>  2 files changed, 22 insertions(+)
+>>>>  create mode 100644 tests/venv-requirements.txt
+>>>>
+>>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>>>> index 7a3059bf6c..68af79927d 100644
+>>>> --- a/tests/Makefile.include
+>>>> +++ b/tests/Makefile.include
+>>>> @@ -12,6 +12,7 @@ check-help:
+>>>>  	@echo " $(MAKE) check-block          Run block tests"
+>>>>  	@echo " $(MAKE) check-tcg            Run TCG tests"
+>>>>  	@echo " $(MAKE) check-report.html    Generates an HTML test report=
+"
+>>>> +	@echo " $(MAKE) check-venv           Creates a Python venv for tes=
+ts"
+>>>>  	@echo " $(MAKE) check-clean          Clean the tests"
+>>>>  	@echo
+>>>>  	@echo "Please note that HTML reports do not regenerate if the unit=
+ tests"
+>>>> @@ -1015,6 +1016,23 @@ check-decodetree:
+>>>>            ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py=
+", \
+>>>>            TEST, decodetree.py)
+>>>> =20
+>>>> +# Python venv for running tests
+>>>> +
+>>>> +.PHONY: check-venv
+>>>> +
+>>>> +TESTS_VENV_DIR=3D$(BUILD_DIR)/tests/venv
+>>>> +TESTS_VENV_REQ=3D$(SRC_PATH)/tests/venv-requirements.txt
+>>>> +
+>>>> +$(TESTS_VENV_DIR):
+>>>> +	$(call quiet-command, \
+>>>> +            $(PYTHON) -m venv --system-site-packages $@, \
+>>>
+>>> Why do we want the '--system-site-packages' flag?
+>>>
+>>
+>> It allows the reuse of packages (with no additional downloads) in case
+>> there's a package installed system wide providing the same package and
+>> version.  If you have, say, an RPM or DEB (or even a pip) package
+>> installed system wide, it'll be copied over to the venv.  This was bas=
+ed
+>> on a suggestion by Eduardo.
 >=20
-> On 09/10/2018 06:18, Cleber Rosa wrote:
->> This enables the execution of the acceptance tests on Travis.
->=20
-> Did you test this? =3D)
+> Some system-site-packages are broken (or too old?).
 >=20
 
-I did have some jobs on Travis that looked promising.  But yeah, later I
-found some issues. :/
+It could be, yes.  I'm starting to believe that this may bring more
+problems that it'd solve.
 
 >>
->> Because the Travis environment is based on Ubuntu Trusty, it requires
->> the python3-pip.
+>>>> +            VENV, $@)
+>>>> +	$(call quiet-command, \
+>>>> +            $(TESTS_VENV_DIR)/bin/pip -q install -r $(TESTS_VENV_RE=
+Q), \
+>>>
+>>> On Ubuntu I have to use (after installing python3-pip + python3.4-ven=
+v):
+>>>
+>>>                $(PYTHON) -m pip -q install -r $(TESTS_VENV_REQ), \
+>>>
 >>
->> Note: while another supposedely required component on newer versions
->> (such as on Bionic) split the Python 3 installation further on the
->> python3-venv package.
+>> I don't think running $(PYTHON) is the right thing to do here because =
+it
+>> points to non-venv Python interpreter.  IMO it should be:
 >>
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>  .travis.yml | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/.travis.yml b/.travis.yml
->> index 95be6ec59f..db1a31ea51 100644
->> --- a/.travis.yml
->> +++ b/.travis.yml
->> @@ -36,6 +36,7 @@ addons:
->>        - liburcu-dev
->>        - libusb-1.0-0-dev
->>        - libvte-2.90-dev
->> +      - python3-pip
->>        - sparse
->>        - uuid-dev
->>        - gcovr
->> @@ -117,6 +118,11 @@ matrix:
->>      - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
->>        python:
->>          - "3.6"
->> +    # Acceptance (Functional) tests
->> +    - env: CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_=
-64-softmmu"
->> +           TEST_CMD=3D"make check-acceptance"
->> +      python:
->> +        - "3.6"
->>      # Using newer GCC with sanitizers
->>      - addons:
->>          apt:
->>
+>>                 $(TESTS_VENV_DIR)/bin/python -m pip ...
 >=20
-> Using the following patch:
->=20
-> -- >8 --
-> diff --git a/.travis.yml b/.travis.yml
-> index 95be6ec59f..87e0c9a13f 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -118,4 +118,15 @@ matrix:
->        python:
->          - "3.6"
-> +    # Acceptance (Functional) tests
-> +    - env: CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_6=
-4-softmmu"
-> +           TEST_CMD=3D"make check-acceptance"
-> +           # sudo rm /usr/local/bin/pip*
-> +      python:
-> +        - "3.6"
-> +      addons:
-> +        apt:
-> +          packages:
-> +            - python3-pip
-> +            - python3.4-venv
-
-This patch revealed to me that, even though we're asking Travis for a
-Python 3.6 stack, we're manually pointing to the primary Python (3.4)
-installation.  This is in itself a source of problems.
-
-Read on...
-
->      # Using newer GCC with sanitizers
->      - addons:
-> ---
->=20
-> I got some improvements until:
->=20
->   VENV    /home/travis/build/philmd/qemu/tests/venv
->   MKDIR   /home/travis/build/philmd/qemu/tests/results
->   PIP     /home/travis/build/philmd/qemu/tests/venv-requirements.txt
-> Exception:
-> Traceback (most recent call last):
->   File "/usr/lib/python3/dist-packages/pip/basecommand.py", line 122, i=
-n
-> main
->     status =3D self.run(options, args)
->   File "/usr/lib/python3/dist-packages/pip/commands/install.py", line
-> 283, in run
->     requirement_set.install(install_options, global_options,
-> root=3Doptions.root_path)
->   File "/usr/lib/python3/dist-packages/pip/req.py", line 1436, in insta=
-ll
->     requirement.install(install_options, global_options, *args, **kwarg=
-s)
->   File "/usr/lib/python3/dist-packages/pip/req.py", line 672, in instal=
-l
->     self.move_wheel_files(self.source_dir, root=3Droot)
->   File "/usr/lib/python3/dist-packages/pip/req.py", line 902, in
-> move_wheel_files
->     pycompile=3Dself.pycompile,
->   File "/usr/lib/python3/dist-packages/pip/wheel.py", line 206, in
-> move_wheel_files
->     clobber(source, lib_dir, True)
->   File "/usr/lib/python3/dist-packages/pip/wheel.py", line 193, in clob=
-ber
->     os.makedirs(destsubdir)
->   File "/usr/lib/python3.4/os.py", line 237, in makedirs
->     mkdir(name, mode)
-> PermissionError: [Errno 13] Permission denied:
-> '/usr/local/lib/python3.4/dist-packages/avocado'
+> Yes it worked: https://travis-ci.org/philmd/qemu/jobs/439216885
 >=20
 
-This looks to me like it's caused by the use of the system wide Python
-3.4 installation, as mentioned above.  That, and possibly the
-"--system-wide-packages" flag to the venv.
+Nice! I'll take a picture of that and hang on my wall. :)
 
-So, in order to understand if, in those environments, we should let
-"configure" pick up the right Python, I did the following experiment:
-
- $ python3 -m venv /tmp/py3-build
- $ . /tmp/py3-build/bin/activate
- $ which python
- /tmp/py3-build/bin/python
- $ /tmp/py3-build/bin/python --version
- Python 3.6.6
-
-This shows that when a venv is activated, the "right" Python should be
-available in the $PATH.  So, building QEMU without pointint to a
-specific Python binary (when inside a venv) gives you:
-
- $ mkdir -p /tmp/qemu-build
- $ cd /tmp/qemu-build
- $ ~/src/qemu/configure --target-list=3D"x86_64-softmmu"
- $ make print-PYTHON
- PYTHON=3Dpython -B
- $ which python
- /tmp/py3-build/bin/python
-
-The whole question now is how/where Travis puts the requested Python
-version (python: - "3.6").  Is it on a venv?  Is it on a specific
-location? Is that reliable enough?
-
-I'm going to look for those answers now.
+Now, there's still one point: which Python version was used there? I'm
+guessing it was Python 3.4, and not the Travis "provided" 3.6, right?
 
 - Cleber.
 
-> See: https://travis-ci.org/philmd/qemu/jobs/439138706
->=20
+>>
+>>>> +            PIP, $(TESTS_VENV_REQ))
+>>>> +
+>>>> +check-venv: $(TESTS_VENV_DIR)
+>>>
+>>> Same problem from v1: if check-venv failed and the directory exists, =
+the
+>>> rule succeeds.
+>>>
+>>
+>> I really don't know how to make all the steps of this target "atomic",
+>> unless I do an ugly "venv ... && touch ... && pip ...".  The best I
+>> managed to think was to flag the requirement as fulfilled by touching
+>> the venv directory after pip finishes.
+>>
+>> - Cleber.
+>>
+>>>> +
+>>>>  # Consolidated targets
+>>>> =20
+>>>>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+>>>> @@ -1028,6 +1046,7 @@ check-clean:
+>>>>  	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>>>>  	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtes=
+t-$(target)-y)) $(check-qtest-generic-y))
+>>>>  	rm -f tests/test-qapi-gen-timestamp
+>>>> +	rm -rf $(TESTS_VENV_DIR)
+>>>> =20
+>>>>  clean: check-clean
+>>>> =20
+>>>> diff --git a/tests/venv-requirements.txt b/tests/venv-requirements.t=
+xt
+>>>> new file mode 100644
+>>>> index 0000000000..d39f9d1576
+>>>> --- /dev/null
+>>>> +++ b/tests/venv-requirements.txt
+>>>> @@ -0,0 +1,3 @@
+>>>> +# Add Python module requirements, one per line, to be installed
+>>>> +# in the tests/venv Python virtual environment. For more info,
+>>>> +# refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+>>>>
