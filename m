@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9lCJ-0003nD-9I
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:08:47 -0400
+	(envelope-from <philmd@redhat.com>) id 1g9lCw-0004Ef-V6
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:09:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9lCE-0004dI-9Z
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:08:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9lCD-0004cQ-VW
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:08:42 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  9 Oct 2018 08:08:35 +0200
-Message-Id: <20181009060835.4608-1-armbru@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1g9lCs-0004x9-2Y
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:09:26 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:34582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9lCr-0004wo-SY
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:09:22 -0400
+Received: by mail-wm1-f67.google.com with SMTP id z25-v6so10202027wmf.1
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 23:09:21 -0700 (PDT)
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-7-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <41903cf2-1a35-6978-a2ea-0370a2c29c0b@redhat.com>
+Date: Tue, 9 Oct 2018 08:09:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] ssi-sd: Make devices picking up backends
- unavailable with -device
+In-Reply-To: <20181008173125.19678-7-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 06/31] char: Use error_printf() to print
+ help and such
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com, philmd@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-Device models aren't supposed to go on fishing expeditions for
-backends.  They should expose suitable properties for the user to set.
-For onboard devices, board code sets them.
+On 08/10/2018 19:31, Markus Armbruster wrote:
+> Calling error_report() in a function that takes an Error ** argument
+> is suspicious.  Convert a few that are actually help and such to
+> error_printf().
+> 
+> Improves output of -chardev help from
+> 
+>     qemu-system-x86_64: -chardev help: Available chardev backend types:
+>     serial
+>     ...
+> 
+> to
+> 
+>     Available chardev backend types:
+>     serial
+>     ...
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Device ssi-sd picks up its block backend in its init() method with
-drive_get_next() instead.  This mistake is already marked FIXME since
-commit af9e40a.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Unset user_creatable to remove the mistake from our external
-interface.  Since the SSI bus doesn't support hotplug, only -device
-can be affected.  Only certain ARM machines have ssi-sd and provide an
-SSI bus for it; this patch breaks -device ssi-sd for these machines.
-No actual use of -device ssi-sd is known.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
-v2:
-* Rebase to master
-* Improve commit message
-
- hw/sd/ssi-sd.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-index 95a143bfba..623d0333e8 100644
---- a/hw/sd/ssi-sd.c
-+++ b/hw/sd/ssi-sd.c
-@@ -284,6 +284,8 @@ static void ssi_sd_class_init(ObjectClass *klass, voi=
-d *data)
-     k->cs_polarity =3D SSI_CS_LOW;
-     dc->vmsd =3D &vmstate_ssi_sd;
-     dc->reset =3D ssi_sd_reset;
-+    /* Reason: init() method uses drive_get_next() */
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo ssi_sd_info =3D {
---=20
-2.17.1
+> ---
+>  chardev/char-pty.c | 2 +-
+>  chardev/char.c     | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/chardev/char-pty.c b/chardev/char-pty.c
+> index e8d9a53476..f681d637c1 100644
+> --- a/chardev/char-pty.c
+> +++ b/chardev/char-pty.c
+> @@ -259,7 +259,7 @@ static void char_pty_open(Chardev *chr,
+>      qemu_set_nonblock(master_fd);
+>  
+>      chr->filename = g_strdup_printf("pty:%s", pty_name);
+> -    error_report("char device redirected to %s (label %s)",
+> +    error_printf("char device redirected to %s (label %s)\n",
+>                   pty_name, chr->label);
+>  
+>      s = PTY_CHARDEV(chr);
+> diff --git a/chardev/char.c b/chardev/char.c
+> index e115166995..7f07a1bfbd 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -634,7 +634,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, Error **errp)
+>  
+>          chardev_name_foreach(help_string_append, str);
+>  
+> -        error_report("Available chardev backend types: %s", str->str);
+> +        error_printf("Available chardev backend types: %s\n", str->str);
+>          g_string_free(str, true);
+>          return NULL;
+>      }
+> 
