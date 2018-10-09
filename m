@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9uxq-0006Le-VX
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:34:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1g9uyZ-0006f0-V1
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9uxn-0003G6-64
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:34:30 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:36692)
+	(envelope-from <alex.bennee@linaro.org>) id 1g9uyX-0003fp-5r
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:35:14 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:39275)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9uxl-0003C8-61
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:34:26 -0400
-Received: by mail-wm1-x330.google.com with SMTP id a8-v6so2685853wmf.1
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 09:34:22 -0700 (PDT)
-References: <20181008232756.30704-1-cota@braap.org>
-	<20181008232756.30704-6-cota@braap.org>
-	<87d0sjmaqq.fsf@linaro.org> <20181009160325.GB7480@flamenco>
+	id 1g9uyV-0003f3-Hl
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:35:12 -0400
+Received: by mail-wm1-x333.google.com with SMTP id y144-v6so2678856wmd.4
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 09:35:11 -0700 (PDT)
+References: <20181009145933.18925-1-alex.bennee@linaro.org>
+	<20181009145933.18925-4-alex.bennee@linaro.org>
+	<5bf2d666-d93b-1154-660c-3eab32350b8e@redhat.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20181009160325.GB7480@flamenco>
-Date: Tue, 09 Oct 2018 17:34:20 +0100
-Message-ID: <87a7nnm643.fsf@linaro.org>
+In-reply-to: <5bf2d666-d93b-1154-660c-3eab32350b8e@redhat.com>
+Date: Tue, 09 Oct 2018 17:35:08 +0100
+Message-ID: <878t37m62r.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 5/5] cputlb: dynamically resize TLBs based
- on use rate
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] tests/tcg: disable enterN insn
+ tests for test-i386 with clang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, f4bug@amsat.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
 
-Emilio G. Cota <cota@braap.org> writes:
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On Tue, Oct 09, 2018 at 15:54:21 +0100, Alex Benn=C3=A9e wrote:
->> Emilio G. Cota <cota@braap.org> writes:
->> > +    if (new_size =3D=3D old_size) {
->> > +        return;
->> > +    }
->> > +
->> > +    g_free(env->tlb_table[mmu_idx]);
->> > +    g_free(env->iotlb[mmu_idx]);
->> > +
->> > +    /* desc->n_used_entries is cleared by the caller */
->> > +    desc->n_flushes_low_rate =3D 0;
->> > +    env->tlb_mask[mmu_idx] =3D (new_size - 1) << CPU_TLB_ENTRY_BITS;
->> > +    env->tlb_table[mmu_idx] =3D g_new(CPUTLBEntry, new_size);
->> > +    env->iotlb[mmu_idx] =3D g_new0(CPUIOTLBEntry, new_size);
+> On 09/10/2018 16:59, Alex Benn=C3=A9e wrote:
+>> The enter[qwl] instructions aren't supported by clang's inline
+>> assembler. Apply the hammer to work around it when we re-use our
+>> system compiler to build tcg tests.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >
-> For the iotlb we can use g_new, right?
->
-> iotlb[foo][bar] is only checked after having checked tlb_table[foo][bar].
-> Otherwise tlb_flush would also flush the iotlb.
->
->> I guess the allocation is a big enough stall there is no point either
->> pre-allocating or using RCU to clean-up the old data?
->
-> I tried this. Turns out not to make a difference, because (1) we only
-> resize on flushes, which do not happen that often, and (2) we
-> size up aggressively, but the shrink rate is more conservative. So
-> in the end, it's a drop in the ocean. For instance, bootup+shutdown
-> requires 100 calls to g_new+g_free -- at ~300 cycles each, that's
-> about 30us out of ~8s of execution time.
->
->> Given this is a new behaviour it would be nice to expose the occupancy
->> of the TLBs in "info jit" much like we do for TBs.
->
-> The occupancy changes *very* quickly, so by the time the report is out,
-> the info is stale. So I'm not sure that's very useful.
+> Do you have a bug for this in llvm?  It doesn't seem to be a good
+> idea.
 
-Hmm do I mean occupancy or utilisation? I guess I want to get an idea of
-how much of the TLB has been used and how much is empty never to be used
-space. In theory as the TLB tends towards guest page size out TLB
-turnover should be of the order of the guests' TLB re-fill rate?
-
-> The TLB size changes less often, but reporting on it is not obvious,
-> since we have NB_MMU_MODES sizes per CPU. Say we have 20 CPUs, what should
-> we report? A table with 20 * NB_MMU_MODES cells? I dunno.
-
-I guess not. Although I suspect some MMU_MODES are more interesting than
-others. I'm hoping the usage of EL3 related modes is negligible if we
-haven't booted with a secure firmware for example.
+I thought I had an llvm bugzilla login but I can't find the details.
+I'll have to a wait until an admin can add me.
 
 >
->> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Paolo
 >
-> Thanks!
->
-> 		Emilio
+>> ---
+>>  tests/tcg/i386/test-i386.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
+>> index c5f67000e4..da632c9b67 100644
+>> --- a/tests/tcg/i386/test-i386.c
+>> +++ b/tests/tcg/i386/test-i386.c
+>> @@ -2098,6 +2098,7 @@ long enter_stack[4096];
+>>
+>>  static void test_enter(void)
+>>  {
+>> +#if !(defined __clang__)
+>>  #if defined(__x86_64__)
+>>      TEST_ENTER("q", uint64_t, 0);
+>>      TEST_ENTER("q", uint64_t, 1);
+>> @@ -2114,6 +2115,7 @@ static void test_enter(void)
+>>      TEST_ENTER("w", uint16_t, 1);
+>>      TEST_ENTER("w", uint16_t, 2);
+>>      TEST_ENTER("w", uint16_t, 31);
+>> +#endif
+>>  }
+>>
+>>  #ifdef TEST_SSE
+>>
 
 
 --
