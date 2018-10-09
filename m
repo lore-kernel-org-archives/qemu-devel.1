@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9tnP-0004M2-Tr
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:19:41 -0400
+	(envelope-from <lersek@redhat.com>) id 1g9tr8-0006Vi-PX
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1g9tnK-0000ON-4d
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:19:39 -0400
-Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:53287)
+	(envelope-from <lersek@redhat.com>) id 1g9tr5-0003Vl-Gq
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:23:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:4920)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9tnI-0000Ii-2B
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:19:32 -0400
-Date: Tue, 9 Oct 2018 11:19:24 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20181009151924.GA7480@flamenco>
-References: <20181008232756.30704-1-cota@braap.org> <87murnmh7j.fsf@linaro.org>
-	<20181009143837.GA24820@flamenco> <87h8hvmb5b.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1g9tr5-0003Sv-5O
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 11:23:27 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BA663084296
+	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 15:23:22 +0000 (UTC)
+References: <1539093025-101599-1-git-send-email-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f37ec4f5-0a8b-48df-37c0-6edbbdecb48b@redhat.com>
+Date: Tue, 9 Oct 2018 17:23:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87h8hvmb5b.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [RFC v2 0/5] Dynamic TLB sizing
+In-Reply-To: <1539093025-101599-1-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory: move MemoryRegion::size cleanup to
+ memory_region_finalize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +34,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-On Tue, Oct 09, 2018 at 15:45:36 +0100, Alex Bennée wrote:
+On 10/09/18 15:50, Igor Mammedov wrote:
+> It's not necessary to clean up MemoryRegion::size manually in multiple places
+> like it's been implemented in
+>  (1cd3d49262 "memory: cleanup side effects of  memory_region_init_foo() on failure")
+> since each memory_region_init_foo() now calls object_unparent(mr) on failure,
+> memory region destructor memory_region_finalize() will be called upon its
+> completion for each memory_region_init_foo().
+> It's sufficient to clean MemoryRegion::size only from memory_region_finalize(),
+> so do it.
 > 
-> Emilio G. Cota <cota@braap.org> writes:
+> Suggested-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> smoke tested with reproducer from 1cd3d49262, thing still works as expected
+> ---
+>  memory.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
 > 
-> > On Tue, Oct 09, 2018 at 13:34:40 +0100, Alex Bennée wrote:
-> >>
-> >> Emilio G. Cota <cota@braap.org> writes:
-> >>
-> >> > v1: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01146.html
-> >> >
-> >> > Changes since v1:
-> >>
-> >> Hmm I'm seeing some qtest failures, for example:
-> >>
-> >>   $ make check-qtest-alpha V=1
-> >>   ...
-> >>   QTEST_QEMU_BINARY=alpha-softmmu/qemu-system-alpha QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))} gtester -k --verbose -m=quick test
-> >>   s/boot-serial-test tests/qmp-test tests/qmp-cmd-test tests/device-introspect-test tests/cdrom-test tests/machine-none-test tests/qom-test tests/test-hmp
-> >>   TEST: tests/boot-serial-test... (pid=31091)
-> >>     /alpha/boot-serial/clipper:                                          Broken pipe
-> >>   tests/libqtest.c:129: kill_qemu() detected QEMU death from signal 11 (Segmentation fault) (core dumped)
-> >>   FAIL
-> >>   GTester: last random seed: R02S948c4a5112fd7682934f4d96e1aff38e
-> >>   (pid=31099)
-> >>   FAIL: tests/boot-serial-test
-> >
-> > I'm pretty sure that the problem is that tlb_init is not being
-> > called at all. Note that this applies to the tlb-lock series
-> > as well, although there we're just calling qemu_spin_init,
-> > which is not really necessary because CPUArchState is 0-allocated.
-> >
-> > I'll take a look.
+> diff --git a/memory.c b/memory.c
+> index d852f11..ad24b57 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1491,7 +1491,6 @@ void memory_region_init_ram_shared_nomigrate(MemoryRegion *mr,
+>      mr->ram_block = qemu_ram_alloc(size, share, mr, &err);
+>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>      if (err) {
+> -        mr->size = int128_zero();
+>          object_unparent(OBJECT(mr));
+>          error_propagate(errp, err);
+>      }
+> @@ -1516,7 +1515,6 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+>                                                mr, &err);
+>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>      if (err) {
+> -        mr->size = int128_zero();
+>          object_unparent(OBJECT(mr));
+>          error_propagate(errp, err);
+>      }
+> @@ -1541,7 +1539,6 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+>      mr->ram_block = qemu_ram_alloc_from_file(size, mr, ram_flags, path, &err);
+>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>      if (err) {
+> -        mr->size = int128_zero();
+>          object_unparent(OBJECT(mr));
+>          error_propagate(errp, err);
+>      }
+> @@ -1565,7 +1562,6 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+>                                             fd, &err);
+>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>      if (err) {
+> -        mr->size = int128_zero();
+>          object_unparent(OBJECT(mr));
+>          error_propagate(errp, err);
+>      }
+> @@ -1628,7 +1624,6 @@ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
+>      mr->ram_block = qemu_ram_alloc(size, false, mr, &err);
+>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>      if (err) {
+> -        mr->size = int128_zero();
+>          object_unparent(OBJECT(mr));
+>          error_propagate(errp, err);
+>      }
+> @@ -1652,7 +1647,6 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
+>      mr->destructor = memory_region_destructor_ram;
+>      mr->ram_block = qemu_ram_alloc(size, false,  mr, &err);
+>      if (err) {
+> -        mr->size = int128_zero();
+>          object_unparent(OBJECT(mr));
+>          error_propagate(errp, err);
+>      }
+> @@ -1701,6 +1695,7 @@ static void memory_region_finalize(Object *obj)
+>      memory_region_clear_coalescing(mr);
+>      g_free((char *)mr->name);
+>      g_free(mr->ioeventfds);
+> +    mr->size = int128_zero();
+>  }
+>  
+>  Object *memory_region_owner(MemoryRegion *mr)
 > 
-> Yeah I hadn't tried to bisect it, but I'm on top of tlb-lock-v4 as
-> requested.
 
-It's the tlb_flush in alpha_cpu_initfn:
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-static void alpha_cpu_initfn(Object *obj)
-{
-    CPUState *cs = CPU(obj);
-    AlphaCPU *cpu = ALPHA_CPU(obj);
-    CPUAlphaState *env = &cpu->env;
-
-    cs->env_ptr = env;
-    tlb_flush(cs);
-
-We call tlb_init later on at realize time.
-
-I think we can safely get rid of this tlb_flush. Unicore
-also has it. I'll add patches for both to the tlb-lock series.
-
-		Emilio
+Thanks!
+Laszlo
