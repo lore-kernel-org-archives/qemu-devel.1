@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9nn2-0006vV-Le
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 04:54:53 -0400
+	(envelope-from <maxime.coquelin@redhat.com>) id 1g9nrz-0007pV-9R
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 04:59:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9nn1-0005ty-RK
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 04:54:52 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40404)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g9nn1-0005tF-Im
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 04:54:51 -0400
-Received: by mail-wr1-x443.google.com with SMTP id d2-v6so887583wro.7
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 01:54:51 -0700 (PDT)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1g9nru-00013D-TS
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 04:59:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1g9nru-00011n-Jo
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 04:59:54 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B1CF685363
+	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 08:59:51 +0000 (UTC)
+References: <20181009074543.6013-1-peterx@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <e63bcfb8-aecc-13f1-b12c-f3b340effd32@redhat.com>
+Date: Tue, 9 Oct 2018 10:59:36 +0200
 MIME-Version: 1.0
-References: <20181009062718.1914-1-peterx@redhat.com>
-	<20181009062718.1914-3-peterx@redhat.com>
-In-Reply-To: <20181009062718.1914-3-peterx@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Oct 2018 12:54:37 +0400
-Message-ID: <CAJ+F1CJwK4cC5xXviefrOFiQCcrP7fsrDwx2E9mZSg_UtFPXrA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 2/6] monitor: resume the monitor earlier
- if needed
+In-Reply-To: <20181009074543.6013-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] intel_iommu: handle invalid ce for
+ shadow sync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +35,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
-
-Hi
-On Tue, Oct 9, 2018 at 10:28 AM Peter Xu <peterx@redhat.com> wrote:
->
-> Currently when QMP request queue full we won't resume the monitor until
-> we have completely handled the current command.  It's not necessary
-> since even before it's handled the queue is already non-full.  Moving
-> the resume logic earlier before the command execution.
->
-> Note that now monitor_resume() is heavy weighted after 8af6bb14a3a8 and
-> it's even possible (as pointed out by Marc-Andr=C3=A9) that the function
-> itself may try to take the monitor lock again, so let's do the resume
-> after the monitor lock is released to avoid possible dead lock.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/monitor.c b/monitor.c
-> index 1f83775fff..f5911399d8 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4149,6 +4149,12 @@ static void monitor_qmp_bh_dispatcher(void *data)
->      need_resume =3D !qmp_oob_enabled(mon) ||
->          mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
->      qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-> +
-> +    if (need_resume) {
-> +        /* Pairs with the monitor_suspend() in handle_qmp_command() */
-> +        monitor_resume(mon);
-> +    }
-
-"need_resume" is only set on non-oob enabled monitors.
-
-On monitor_resume(), monitor_qmp_read() may end up being called, which
-may call handle_qmp_command().
-
-With regular commands, a new command is queued. But if the command is
-"exec-oob", it will dispatch immediately, thus not following the QMP
-reply ordering constrain.
-
-Shouldn't it be an error to call exec-oob on non-oob enabled monitors?
-
-> +
->      if (req_obj->req) {
->          trace_monitor_qmp_cmd_in_band(qobject_get_try_str(req_obj->id) ?=
-: "");
->          monitor_qmp_dispatch(mon, req_obj->req, req_obj->id);
-> @@ -4160,10 +4166,6 @@ static void monitor_qmp_bh_dispatcher(void *data)
->          qobject_unref(rsp);
->      }
->
-> -    if (need_resume) {
-> -        /* Pairs with the monitor_suspend() in handle_qmp_command() */
-> -        monitor_resume(mon);
-> -    }
->      qmp_request_free(req_obj);
->
->      /* Reschedule instead of looping so the main loop stays responsive *=
-/
-> --
-> 2.17.1
->
->
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Pei Zhang <pezhang@redhat.com>, Eric Auger <eric.auger@redhat.com>, Jason Wang <jasowang@redhat.com>
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+
+On 10/09/2018 09:45 AM, Peter Xu wrote:
+> v3:
+> - pick r-b
+> - return when -VTD_FR_CONTEXT_ENTRY_P is detected (v1 is correct here,
+>    but I did wrong thing when splitting the patch in v2) [Eric]
+> 
+> v2:
+> - split patch into more, remove useless comment [Eric]
+> - remove one error_report_once() when rework the code [Jason]
+> 
+> This series fixes a QEMU crash reported here:
+> 
+> https://bugzilla.redhat.com/show_bug.cgi?id=1627272
+> 
+> Please review, thanks.
+> 
+> Peter Xu (2):
+>    intel_iommu: move ce fetching out when sync shadow
+>    intel_iommu: handle invalid ce for shadow sync
+> 
+>   dtc                   |  2 +-
+>   hw/i386/intel_iommu.c | 55 +++++++++++++++++++++++--------------------
+>   2 files changed, 30 insertions(+), 27 deletions(-)
+> 
+
+For the series:
+Reviewed-by: Maxime Coquelin <maxime.coquelin@redhat.com>
