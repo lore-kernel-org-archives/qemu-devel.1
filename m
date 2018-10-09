@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1g9i36-0000bT-RY
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 22:47:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1g9itR-0006IC-Tk
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 23:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1g9hvr-00073g-8o
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 22:39:38 -0400
-Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:38796)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1g9hvr-00072q-15
-	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 22:39:35 -0400
-Received: by mail-pg1-x52a.google.com with SMTP id f8-v6so47772pgq.5
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 19:39:33 -0700 (PDT)
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon,  8 Oct 2018 19:39:20 -0700
-Message-Id: <1539052760-11730-1-git-send-email-liq3ea@gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1g9idN-0006Lf-Tb
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 23:24:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59562)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1g9idN-0006E2-NP
+	for qemu-devel@nongnu.org; Mon, 08 Oct 2018 23:24:33 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 58084309178E
+	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 03:24:32 +0000 (UTC)
+Date: Tue, 9 Oct 2018 11:24:28 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181009032428.GJ18728@xz-x1>
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-10-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] vl.c: print error message if load fw_cfg
- file failed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181008173125.19678-10-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/31] ioapic: Fix error handling in
+ realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +34,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, f4bug@amsat.org
-Cc: qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-It makes sense to print the error message while reading
-file failed.
+On Mon, Oct 08, 2018 at 07:31:03PM +0200, Markus Armbruster wrote:
+> Calling error_report() in a function that takes an Error ** argument
+> is suspicious.  ioapic_realize() does that, and then exit()s.
+> Currently mostly harmless, as the device cannot be hot-plugged.
+> 
+> Fixes: 20fd4b7b6d9282fe0cb83601f1821f31bd257458
+> Cc: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Change since v1:
-free error
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- vl.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/vl.c b/vl.c
-index 4e25c78..69fc77c 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2207,8 +2207,10 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
-         size = strlen(str); /* NUL terminator NOT included in fw_cfg blob */
-         buf = g_memdup(str, size);
-     } else {
--        if (!g_file_get_contents(file, &buf, &size, NULL)) {
--            error_report("can't load %s", file);
-+        GError *error = NULL;
-+        if (!g_file_get_contents(file, &buf, &size, &error)) {
-+            error_report("can't load %s, %s", file, error->message);
-+            g_error_free(error);
-             return -1;
-         }
-     }
 -- 
-1.8.3.1
+Peter Xu
