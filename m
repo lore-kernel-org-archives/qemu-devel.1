@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9w1C-0001hj-7V
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:42:03 -0400
+	(envelope-from <cota@braap.org>) id 1g9w5c-00035u-07
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9w17-0003t3-Lf
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:42:02 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g9w17-0003sc-2d
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:41:57 -0400
-Received: by mail-pg1-x544.google.com with SMTP id v133-v6so1171417pgb.2
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 10:41:56 -0700 (PDT)
-References: <20181009161814.21257-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d2d9a0ed-dd13-f804-a394-e37843cdbfb0@linaro.org>
-Date: Tue, 9 Oct 2018 10:41:52 -0700
-MIME-Version: 1.0
-In-Reply-To: <20181009161814.21257-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Suppress
- address-of-packed-member warnings in __get/put_user_e
+	(envelope-from <cota@braap.org>) id 1g9w5X-0005nf-7P
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:46:35 -0400
+Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:41747)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1g9w5W-0005ge-UL
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:46:31 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Tue,  9 Oct 2018 13:45:52 -0400
+Message-Id: <20181009174557.16125-2-cota@braap.org>
+In-Reply-To: <20181009174557.16125-1-cota@braap.org>
+References: <20181009174557.16125-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH v5 1/6] target/alpha: remove tlb_flush from
+ alpha_cpu_initfn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +24,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 10/9/18 9:18 AM, Peter Maydell wrote:
-> Our __get_user_e() and __put_user_e() macros cause newer versions
-> of clang to generate false-positive -Waddress-of-packed-member
-> warnings if they are passed the address of a member of a packed
-> struct (see https://bugs.llvm.org/show_bug.cgi?id=39113).
-> Suppress these using the _Pragma() operator. Unfortunately
-> _Pragma() support in gcc is broken in some gcc versions and
-> in some usage contexts, so we limit the pragma usage here to clang.
-> 
-> To put in the pragmas we need to convert the macros from
-> expressions to statements, but all the callsites effectively
-> treat them as statements already so this is OK.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Changes v1->v2: _Pragma() in gcc appears to be a disaster area;
-> limit the use of it to clang only, since it's just clang that
-> emits the bogus warning in this case. Tested on clang-3.8.0,
-> clang-7, gcc 5.4.0 and gcc 8.0.1.
-> 
->  linux-user/qemu.h | 70 ++++++++++++++++++++++++++++++++++-------------
->  1 file changed, 51 insertions(+), 19 deletions(-)
+As far as I can tell tlb_flush does not need to be called
+this early. tlb_flush is eventually called after the CPU
+has been realized.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This change paves the way to the introduction of tlb_init,
+which will be called from cpu_exec_realizefn.
 
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ target/alpha/cpu.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-r~
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index b08078e7fc..a953897fcc 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -201,7 +201,6 @@ static void alpha_cpu_initfn(Object *obj)
+     CPUAlphaState *env = &cpu->env;
+ 
+     cs->env_ptr = env;
+-    tlb_flush(cs);
+ 
+     env->lock_addr = -1;
+ #if defined(CONFIG_USER_ONLY)
+-- 
+2.17.1
