@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1g9xT3-0004CL-5U
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:14:54 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g9xbl-00074E-Bf
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:23:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1g9xSz-0004bI-1Q
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:14:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1g9xSy-0004aM-Of
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:14:48 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w99JBNex112736
-	for <qemu-devel@nongnu.org>; Tue, 9 Oct 2018 15:14:47 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2n11vah4u1-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 15:14:47 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 9 Oct 2018 20:14:44 +0100
-References: <20181009175226.22138-1-akrowiak@linux.vnet.ibm.com>
-	<20181009175226.22138-3-akrowiak@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 9 Oct 2018 21:14:35 +0200
+	(envelope-from <jsnow@redhat.com>) id 1g9xbg-0007de-DS
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:23:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37174)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1g9xbg-0007d2-4K
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:23:48 -0400
+References: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com>
+	<1535739372-24454-5-git-send-email-Liam.Merwick@oracle.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <73457983-c541-81e1-044a-853df4abeb8e@redhat.com>
+Date: Tue, 9 Oct 2018 15:23:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <20181009175226.22138-3-akrowiak@linux.vnet.ibm.com>
-Content-Language: en-US
-Message-Id: <64e5b221-ad4d-059a-9647-57ddf7ab0d0d@de.ibm.com>
+In-Reply-To: <1535739372-24454-5-git-send-email-Liam.Merwick@oracle.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v10 2/6] s390x/cpumodel: Set up CPU model
- for AP device support
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] qemu-img: potential Null pointer
+ deref in img_commit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,136 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, fiuczy@linux.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>
+To: Liam Merwick <Liam.Merwick@oracle.com>, qemu-devel@nongnu.org
 
 
 
-On 10/09/2018 07:52 PM, Tony Krowiak wrote:
-> A new CPU model feature and two new CPU model facilities are
-> introduced to support AP devices for a KVM guest.
+On 08/31/2018 02:16 PM, Liam Merwick wrote:
+> The function block_job_get() may return NULL so before dereferencing
+> the 'job' pointer in img_commit() it should be checked.
 > 
-> CPU model features:
-> 
-> 1. The S390_FEAT_AP CPU model feature indicates whether AP
->    instructions are available to the guest. This feature will
->    be enabled only if the AP instructions are available on the
->    linux host as determined by the availability of the
->    KVM_S390_VM_CRYPTO_ENABLE_APIE VM attribute which is exposed
->    by KVM only if the AP instructions are available on the
->    host.
-> 
->    This feature must be turned on from userspace to execute AP
->    instructions on the KVM guest. The QEMU command line to turn
->    this feature on looks something like this:
-> 
-> 	qemu-system-s390x ... -cpu xxx,ap=on ...
-> 
->    This feature will be supported for zEC12 and newer CPU models.
->    The feature will not be supported for older models because
->    there are few older systems on which to test and the older
->    crypto cards will be going out of service in the relatively
->    near future.
-> 
-> CPU model facilities:
-> 
-> 1. The S390_FEAT_AP_QUERY_CONFIG_INFO feature indicates whether the
->    AP Query Configuration Information (QCI) facility is available
->    to the guest as determined by whether the facility is available
->    on the host. This feature will be exposed by KVM only if the
->    QCI facility is installed on the host.
-> 
-> 2. The S390_FEAT_AP_FACILITY_TEST feature indicates whether the AP
->    Facility Test (APFT) facility is available to the guest as
->    determined by whether the facility is available on the host.
->    This feature will be exposed by KVM only if APFT is installed
->    on the host.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+> Signed-off-by: Liam Merwick <Liam.Merwick@oracle.com>
+> Reviewed-by: Darren Kenny <Darren.Kenny@oracle.com>
+> Reviewed-by: Mark Kanda <Mark.Kanda@oracle.com>
 
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-and as you have moved the one hunk, Davids RB should still count.
 > ---
->  target/s390x/cpu_features.c     | 3 +++
->  target/s390x/cpu_features_def.h | 3 +++
->  target/s390x/cpu_models.c       | 2 ++
->  target/s390x/gen-features.c     | 3 +++
->  4 files changed, 11 insertions(+)
+>  qemu-img.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-> index 172fb18df718..60cfeba48f4e 100644
-> --- a/target/s390x/cpu_features.c
-> +++ b/target/s390x/cpu_features.c
-> @@ -39,8 +39,10 @@ static const S390FeatDef s390_features[] = {
->      FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status facility"),
->      FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE facility"),
->      FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, "Configuration-topology facility"),
-> +    FEAT_INIT("apqci", S390_FEAT_TYPE_STFL, 12, "Query AP Configuration Information facility"),
->      FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range facility"),
->      FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing key-setting facility"),
-> +    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "AP Facilities Test facility"),
->      FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, "Extended-translation facility 2"),
->      FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, "Message-security-assist facility (excluding subfunctions)"),
->      FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement facility"),
-> @@ -129,6 +131,7 @@ static const S390FeatDef s390_features[] = {
+> diff --git a/qemu-img.c b/qemu-img.c
+> index b12f4cd19b0a..51fe09bd08ed 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1029,6 +1029,9 @@ static int img_commit(int argc, char **argv)
+>      }
 >  
->      FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
->      FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
-> +    FEAT_INIT_MISC("ap", "AP instructions installed"),
->  
->      FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32 bit in general registers)"),
->      FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (64 bit in parameter list)"),
-> diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-> index ac2c947f30a8..5fc7e7bf0116 100644
-> --- a/target/s390x/cpu_features_def.h
-> +++ b/target/s390x/cpu_features_def.h
-> @@ -27,8 +27,10 @@ typedef enum {
->      S390_FEAT_SENSE_RUNNING_STATUS,
->      S390_FEAT_CONDITIONAL_SSKE,
->      S390_FEAT_CONFIGURATION_TOPOLOGY,
-> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
->      S390_FEAT_IPTE_RANGE,
->      S390_FEAT_NONQ_KEY_SETTING,
-> +    S390_FEAT_AP_FACILITIES_TEST,
->      S390_FEAT_EXTENDED_TRANSLATION_2,
->      S390_FEAT_MSA,
->      S390_FEAT_LONG_DISPLACEMENT,
-> @@ -119,6 +121,7 @@ typedef enum {
->      /* Misc */
->      S390_FEAT_DAT_ENH_2,
->      S390_FEAT_CMM,
-> +    S390_FEAT_AP,
->  
->      /* PLO */
->      S390_FEAT_PLO_CL,
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index 265d25c937bb..7c253ff308c5 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -786,6 +786,8 @@ static void check_consistency(const S390CPUModel *model)
->          { S390_FEAT_PRNO_TRNG_QRTCR, S390_FEAT_MSA_EXT_5 },
->          { S390_FEAT_PRNO_TRNG, S390_FEAT_MSA_EXT_5 },
->          { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
-> +        { S390_FEAT_AP_QUERY_CONFIG_INFO, S390_FEAT_AP },
-> +        { S390_FEAT_AP_FACILITIES_TEST, S390_FEAT_AP },
->      };
->      int i;
->  
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 384b61cd67b9..70015eaaf5df 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
->      S390_FEAT_ADAPTER_INT_SUPPRESSION,
->      S390_FEAT_EDAT_2,
->      S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
-> +    S390_FEAT_AP_QUERY_CONFIG_INFO,
-> +    S390_FEAT_AP_FACILITIES_TEST,
-> +    S390_FEAT_AP,
->  };
->  
->  static uint16_t full_GEN12_GA2[] = {
+>      job = block_job_get("commit");
+> +    if (job == NULL) {
+> +        goto unref_backing;
+> +    }
+>      run_block_job(job, &local_err);
+>      if (local_err) {
+>          goto unref_backing;
 > 
