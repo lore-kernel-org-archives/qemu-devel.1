@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1g9wGY-0003f6-4I
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:57:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1g9wOx-0001ds-Jr
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:06:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1g9wGX-0000z2-9c
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:57:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39794)
+	(envelope-from <eblake@redhat.com>) id 1g9wOu-0004rw-8u
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:06:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:23160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g9wGX-0000yh-0S
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:57:53 -0400
-From: Cleber Rosa <crosa@redhat.com>
-Date: Tue,  9 Oct 2018 13:57:40 -0400
-Message-Id: <20181009175740.13812-4-crosa@redhat.com>
-In-Reply-To: <20181009175740.13812-1-crosa@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1g9wOu-0004rI-01
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 14:06:32 -0400
 References: <20181009175740.13812-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] Travis support for the acceptance tests
+	<20181009175740.13812-2-crosa@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8d5b4735-ccbd-dc8e-7f64-3f85ed58183c@redhat.com>
+Date: Tue, 9 Oct 2018 13:06:22 -0500
+MIME-Version: 1.0
+In-Reply-To: <20181009175740.13812-2-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] Bootstrap Python venv for tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-This enables the execution of the acceptance tests on Travis.
+On 10/9/18 12:57 PM, Cleber Rosa wrote:
+> A number of QEMU tests are written in Python, and may benefit
+> from an untainted Python venv.
+> 
+> By using make rules, tests that depend on specific Python libs
+> can set that rule as a requiment, along with rules that require
 
-Because the Travis environment is based on Ubuntu Trusty, it requires
-the python3-pip.
+s/requiment/requirement/
 
-Note: while another supposedely required component on newer versions
-(such as on Bionic) split the Python 3 installation further on the
-python3-venv package.
+> the presence or installation of specific libraries.
+> 
+> The tests/venv-requirements.txt is supposed to contain the
+> Python requirements that should be added to the venv created
+> by check-venv.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- .travis.yml | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/.travis.yml b/.travis.yml
-index 95be6ec59f..f55f799c52 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -36,6 +36,8 @@ addons:
-       - liburcu-dev
-       - libusb-1.0-0-dev
-       - libvte-2.90-dev
-+      - python3-pip
-+      - python3.4-venv
-       - sparse
-       - uuid-dev
-       - gcovr
-@@ -117,6 +119,9 @@ matrix:
-     - env: CONFIG="--target-list=x86_64-softmmu"
-       python:
-         - "3.6"
-+    # Acceptance (Functional) tests
-+    - env: CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
-+           TEST_CMD="make AVOCADO_SHOW=app check-acceptance"
-     # Using newer GCC with sanitizers
-     - addons:
-         apt:
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
