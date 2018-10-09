@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1g9rnB-0004Hg-Ro
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:11:22 -0400
+	(envelope-from <philmd@redhat.com>) id 1g9sLl-00060C-Sa
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:47:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1g9rn0-0000VH-1o
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:11:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36472)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1g9rmz-0000Un-PV
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:11:05 -0400
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Tue,  9 Oct 2018 15:10:51 +0200
-Message-Id: <20181009131052.18500-2-lhrazky@redhat.com>
-In-Reply-To: <20181009131052.18500-1-lhrazky@redhat.com>
-References: <20181009131052.18500-1-lhrazky@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1g9sLh-0008Qf-74
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:47:01 -0400
+Received: from mail-wr1-f41.google.com ([209.85.221.41]:36976)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9sLg-0008Pe-UJ
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:46:57 -0400
+Received: by mail-wr1-f41.google.com with SMTP id y11-v6so1911836wrd.4
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 06:46:56 -0700 (PDT)
+References: <20181009041826.19462-1-crosa@redhat.com>
+	<20181009041826.19462-4-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <75560722-a9f5-5ec9-b851-d521960ed8eb@redhat.com>
+Date: Tue, 9 Oct 2018 15:46:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH spice 1/2] QXL interface: add functions to
- identify monitors in the guest
+In-Reply-To: <20181009041826.19462-4-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] Travis support for the acceptance
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,162 +31,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Adds two functions to let QEMU provide information to identify graphics
-devices and their monitors in the guest:
+Hi Cleber,
 
-* device path - The path identifying the device on the system (e.g. PCI
-  path):
-  spice_qxl_device_set_path(...)
+On 09/10/2018 06:18, Cleber Rosa wrote:
+> This enables the execution of the acceptance tests on Travis.
 
-* device display ID - The index of the monitor on the graphics device:
-  spice_qxl_device_monitor_add_display_id(...)
+Did you test this? =)
 
-Signed-off-by: Luk=C3=A1=C5=A1 Hr=C3=A1zk=C3=BD <lhrazky@redhat.com>
+> 
+> Because the Travis environment is based on Ubuntu Trusty, it requires
+> the python3-pip.
+> 
+> Note: while another supposedely required component on newer versions
+> (such as on Bionic) split the Python 3 installation further on the
+> python3-venv package.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  .travis.yml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index 95be6ec59f..db1a31ea51 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -36,6 +36,7 @@ addons:
+>        - liburcu-dev
+>        - libusb-1.0-0-dev
+>        - libvte-2.90-dev
+> +      - python3-pip
+>        - sparse
+>        - uuid-dev
+>        - gcovr
+> @@ -117,6 +118,11 @@ matrix:
+>      - env: CONFIG="--target-list=x86_64-softmmu"
+>        python:
+>          - "3.6"
+> +    # Acceptance (Functional) tests
+> +    - env: CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
+> +           TEST_CMD="make check-acceptance"
+> +      python:
+> +        - "3.6"
+>      # Using newer GCC with sanitizers
+>      - addons:
+>          apt:
+> 
+
+Using the following patch:
+
+-- >8 --
+diff --git a/.travis.yml b/.travis.yml
+index 95be6ec59f..87e0c9a13f 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -118,4 +118,15 @@ matrix:
+       python:
+         - "3.6"
++    # Acceptance (Functional) tests
++    - env: CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
++           TEST_CMD="make check-acceptance"
++           # sudo rm /usr/local/bin/pip*
++      python:
++        - "3.6"
++      addons:
++        apt:
++          packages:
++            - python3-pip
++            - python3.4-venv
+     # Using newer GCC with sanitizers
+     - addons:
 ---
- server/red-qxl.c         | 67 ++++++++++++++++++++++++++++++++++++++++
- server/spice-qxl.h       |  3 ++
- server/spice-server.syms |  6 ++++
- 3 files changed, 76 insertions(+)
 
-diff --git a/server/red-qxl.c b/server/red-qxl.c
-index 97940611..143228ca 100644
---- a/server/red-qxl.c
-+++ b/server/red-qxl.c
-@@ -41,6 +41,9 @@
- #include "red-qxl.h"
-=20
-=20
-+#define MAX_PATH_LEN 256
-+#define MAX_MONITORS_COUNT 16
-+
- struct QXLState {
-     QXLWorker qxl_worker;
-     QXLInstance *qxl;
-@@ -53,6 +56,9 @@ struct QXLState {
-     unsigned int max_monitors;
-     RedsState *reds;
-     RedWorker *worker;
-+    char device_path[MAX_PATH_LEN];
-+    uint32_t device_display_ids[MAX_MONITORS_COUNT];
-+    size_t monitors_count;  // length of ^^^
-=20
-     pthread_mutex_t scanout_mutex;
-     SpiceMsgDisplayGlScanoutUnix scanout;
-@@ -846,6 +852,67 @@ void red_qxl_gl_draw_async_complete(QXLInstance *qxl=
-)
-     red_qxl_async_complete(qxl, cookie);
- }
-=20
-+/**
-+ * spice_qxl_device_set_path:
-+ * @instance the QXL instance to set the path to
-+ * @device_path the path of the device this QXL instance belongs to
-+ *
-+ * Sets the hardware (e.g. PCI) path of the graphics device represented =
-by this QXL interface instance.
-+ *
-+ */
-+SPICE_GNUC_VISIBLE
-+void spice_qxl_device_set_path(QXLInstance *instance, const char *device=
-_path)
-+{
-+    g_return_if_fail(device_path !=3D NULL);
-+
-+    size_t dp_len =3D strnlen(device_path, MAX_PATH_LEN);
-+    if (dp_len >=3D MAX_PATH_LEN) {
-+        spice_error("PCI device path too long: %lu > %u", dp_len, MAX_PA=
-TH_LEN);
-+        return;
-+    }
-+
-+    strncpy(instance->st->device_path, device_path, MAX_PATH_LEN);
-+
-+    g_debug("QXL Instance %d setting device PCI path \"%s\"", instance->=
-id, device_path);
-+}
-+
-+/**
-+ * spice_qxl_device_monitor_add_display_id:
-+ * @instance the QXL instance to add the display ID to
-+ * @device_display_id the display ID to add to the QXL instance
-+ *
-+ * Adds a #device_display_id to this QXL interface instance. The
-+ * #device_display_id is an index (a sequence starting from 0) into the =
-list of
-+ * all the displays on the graphics device. This function should be call=
-ed in
-+ * sequence for all possible displays of the device. The ID of the first=
- call
-+ * will belong to #monitor_id 0, and so forth in the sequence.
-+ *
-+ * Since for some graphics devices (e.g. virtio-gpu) a QXL interface ins=
-tance
-+ * is created per each display of a single device, you can get e.g. the =
-single
-+ * following call on the third QXL interface instance for this device:
-+ *
-+ * spice_qxl_device_monitor_add_display_id(instance, 2);
-+ *
-+ * This tells you that the single monitor of this QXL interface actually
-+ * belongs to the 3rd display of the underlying device.
-+ *
-+ * Returns: The actual SPICE server monitor_id associated with the displ=
-ay
-+ */
-+SPICE_GNUC_VISIBLE
-+int spice_qxl_device_monitor_add_display_id(QXLInstance *instance, uint3=
-2_t device_display_id)
-+{
-+    if (instance->st->monitors_count >=3D MAX_MONITORS_COUNT) {
-+        spice_error("Cannot register more than %u monitors per QXL inter=
-face", MAX_MONITORS_COUNT);
-+        return -1;
-+    }
-+
-+    instance->st->device_display_ids[instance->st->monitors_count] =3D d=
-evice_display_id;
-+
-+    g_debug("QXL Instance %d adding device display ID %u", instance->id,=
- device_display_id);
-+
-+    return instance->st->monitors_count++;
-+}
-+
- void red_qxl_init(RedsState *reds, QXLInstance *qxl)
- {
-     QXLState *qxl_state;
-diff --git a/server/spice-qxl.h b/server/spice-qxl.h
-index 0c4e75fc..ae2d5975 100644
---- a/server/spice-qxl.h
-+++ b/server/spice-qxl.h
-@@ -114,6 +114,9 @@ void spice_qxl_gl_draw_async(QXLInstance *instance,
-                              uint32_t x, uint32_t y,
-                              uint32_t w, uint32_t h,
-                              uint64_t cookie);
-+/* since spice 0.14.2 */
-+void spice_qxl_device_set_path(QXLInstance *instance, const char *device=
-_path);
-+int spice_qxl_device_monitor_add_display_id(QXLInstance *instance, uint3=
-2_t device_display_id);
-=20
- typedef struct QXLDevInitInfo {
-     uint32_t num_memslots_groups;
-diff --git a/server/spice-server.syms b/server/spice-server.syms
-index edf04a42..fdeafd23 100644
---- a/server/spice-server.syms
-+++ b/server/spice-server.syms
-@@ -173,3 +173,9 @@ SPICE_SERVER_0.13.2 {
- global:
-     spice_server_set_video_codecs;
- } SPICE_SERVER_0.13.1;
-+
-+SPICE_SERVER_0.14.2 {
-+global:
-+    spice_qxl_device_set_path;
-+    spice_qxl_device_monitor_add_display_id;
-+} SPICE_SERVER_0.13.2;
---=20
-2.19.1
+I got some improvements until:
+
+  VENV    /home/travis/build/philmd/qemu/tests/venv
+  MKDIR   /home/travis/build/philmd/qemu/tests/results
+  PIP     /home/travis/build/philmd/qemu/tests/venv-requirements.txt
+Exception:
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/pip/basecommand.py", line 122, in
+main
+    status = self.run(options, args)
+  File "/usr/lib/python3/dist-packages/pip/commands/install.py", line
+283, in run
+    requirement_set.install(install_options, global_options,
+root=options.root_path)
+  File "/usr/lib/python3/dist-packages/pip/req.py", line 1436, in install
+    requirement.install(install_options, global_options, *args, **kwargs)
+  File "/usr/lib/python3/dist-packages/pip/req.py", line 672, in install
+    self.move_wheel_files(self.source_dir, root=root)
+  File "/usr/lib/python3/dist-packages/pip/req.py", line 902, in
+move_wheel_files
+    pycompile=self.pycompile,
+  File "/usr/lib/python3/dist-packages/pip/wheel.py", line 206, in
+move_wheel_files
+    clobber(source, lib_dir, True)
+  File "/usr/lib/python3/dist-packages/pip/wheel.py", line 193, in clobber
+    os.makedirs(destsubdir)
+  File "/usr/lib/python3.4/os.py", line 237, in makedirs
+    mkdir(name, mode)
+PermissionError: [Errno 13] Permission denied:
+'/usr/local/lib/python3.4/dist-packages/avocado'
+
+See: https://travis-ci.org/philmd/qemu/jobs/439138706
