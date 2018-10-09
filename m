@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g9xnG-0001fI-0G
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:35:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1g9xon-0002xJ-1S
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1g9xnD-0007K0-Ep
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:35:45 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  9 Oct 2018 21:35:24 +0200
-Message-Id: <20181009193524.19052-5-kwolf@redhat.com>
-In-Reply-To: <20181009193524.19052-1-kwolf@redhat.com>
-References: <20181009193524.19052-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/4] file-posix: Support auto-read-only option
+	(envelope-from <jsnow@redhat.com>) id 1g9xod-00087k-Fn
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 15:37:15 -0400
+References: <20180814062739.19640-1-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <46af1836-e70a-185e-7312-e26fa57d1e2a@redhat.com>
+Date: Tue, 9 Oct 2018 15:37:01 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180814062739.19640-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] nvme: correct locking
+ around completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,48 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org
 
-If read-only=off, but auto-read-only=on are given, open the file
-read-write if we have the permissions, but instead of erroring out for
-read-only files, just degrade to read-only.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/file-posix.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 2da3a76355..69b312a3a3 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -450,6 +450,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     int fd, ret;
-     struct stat st;
-     OnOffAuto locking;
-+    bool auto_readonly = bdrv_flags & BDRV_O_AUTO_RDONLY;
- 
-     opts = qemu_opts_create(&raw_runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-@@ -527,6 +528,18 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
- 
-     s->fd = -1;
-     fd = qemu_open(filename, s->open_flags, 0644);
-+
-+    if (auto_readonly && fd < 0 && (errno == EACCES || errno == EROFS)) {
-+        ret = bdrv_set_read_only(bs, true, errp);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+        bdrv_flags &= ~BDRV_O_RDWR;
-+        raw_parse_flags(bdrv_flags, &s->open_flags);
-+        assert(!(s->open_flags & O_CREAT));
-+        fd = qemu_open(filename, s->open_flags);
-+    }
-+
-     if (fd < 0) {
-         ret = -errno;
-         error_setg_errno(errp, errno, "Could not open '%s'", filename);
--- 
-2.13.6
+On 08/14/2018 02:27 AM, Paolo Bonzini wrote:
+> nvme_poll_queues is already protected by q->lock, and
+> AIO callbacks are invoked outside the AioContext lock.
+> So remove the acquire/release pair in nvme_handle_event.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block/nvme.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index 6f71122bf5..42116907ed 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -489,10 +489,8 @@ static void nvme_handle_event(EventNotifier *n)
+>      BDRVNVMeState *s = container_of(n, BDRVNVMeState, irq_notifier);
+>  
+>      trace_nvme_handle_event(s);
+> -    aio_context_acquire(s->aio_context);
+>      event_notifier_test_and_clear(n);
+>      nvme_poll_queues(s);
+> -    aio_context_release(s->aio_context);
+>  }
+>  
+>  static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
+> 
+
+This is over a month old (and seemingly didn't land); do we still want it?
