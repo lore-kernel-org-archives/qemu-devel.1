@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g9miy-0000z5-BR
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1g9mj4-000130-M8
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1g9miv-0000M0-Jq
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:35 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  9 Oct 2018 09:46:20 +0200
-Message-Id: <1539071180-2028-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] target/cris/translate: Get rid of
- qemu_log_separate()
+	(envelope-from <peterx@redhat.com>) id 1g9miz-0000Og-La
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19946)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1g9miy-0000JZ-AY
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 03:46:37 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DE100C05D3E5
+	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 07:46:31 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Tue,  9 Oct 2018 15:45:42 +0800
+Message-Id: <20181009074543.6013-2-peterx@redhat.com>
+In-Reply-To: <20181009074543.6013-1-peterx@redhat.com>
+References: <20181009074543.6013-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] intel_iommu: move ce fetching out when
+ sync shadow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,35 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: qemu-trivial@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Pei Zhang <pezhang@redhat.com>, Eric Auger <eric.auger@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-The gen_BUG() function calls already cpu_abort(), which prints the
-information to stderr and the log already. So instead of additionally
-printing the dc->pc via fprintf() and qemu_log here, too, we can
-simply pass this information to cpu_abort() instead.
+There are two callers for vtd_sync_shadow_page_table_range(): one
+provided a valid context entry and one not.  Move that fetching
+operation into the caller vtd_sync_shadow_page_table() where we need to
+fetch the context entry.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Meanwhile, remove the error_report_once() directly since we're already
+tracing all the error cases in the previous call.  Instead, return error
+number back to caller.  This will not change anything functional since
+callers are dropping it after all.
+
+We do this move majorly because we want to do something more later in
+vtd_sync_shadow_page_table().
+
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- target/cris/translate.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ dtc                   |  2 +-
+ hw/i386/intel_iommu.c | 41 +++++++++++++----------------------------
+ 2 files changed, 14 insertions(+), 29 deletions(-)
 
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index 4ae1c04..0ee2c5d 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -137,11 +137,7 @@ typedef struct DisasContext {
- 
- static void gen_BUG(DisasContext *dc, const char *file, int line)
- {
--    fprintf(stderr, "BUG: pc=%x %s %d\n", dc->pc, file, line);
--    if (qemu_log_separate()) {
--        qemu_log("BUG: pc=%x %s %d\n", dc->pc, file, line);
--    }
--    cpu_abort(CPU(dc->cpu), "%s:%d\n", file, line);
-+    cpu_abort(CPU(dc->cpu), "%s:%d dc->pc=%x\n", file, line, dc->pc);
+diff --git a/dtc b/dtc
+index 88f18909db..e54388015a 160000
+--- a/dtc
++++ b/dtc
+@@ -1 +1 @@
+-Subproject commit 88f18909db731a627456f26d779445f84e449536
++Subproject commit e54388015af1fb4bf04d0bca99caba1074d9cc42
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 3dfada19a6..d6b4f8705d 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -1035,7 +1035,6 @@ static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
+     return 0;
  }
  
- static const char *regnames_v32[] =
+-/* If context entry is NULL, we'll try to fetch it on our own. */
+ static int vtd_sync_shadow_page_table_range(VTDAddressSpace *vtd_as,
+                                             VTDContextEntry *ce,
+                                             hwaddr addr, hwaddr size)
+@@ -1047,39 +1046,25 @@ static int vtd_sync_shadow_page_table_range(VTDAddressSpace *vtd_as,
+         .notify_unmap = true,
+         .aw = s->aw_bits,
+         .as = vtd_as,
++        .domain_id = VTD_CONTEXT_ENTRY_DID(ce->hi),
+     };
+-    VTDContextEntry ce_cache;
+-    int ret;
+-
+-    if (ce) {
+-        /* If the caller provided context entry, use it */
+-        ce_cache = *ce;
+-    } else {
+-        /* If the caller didn't provide ce, try to fetch */
+-        ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+-                                       vtd_as->devfn, &ce_cache);
+-        if (ret) {
+-            /*
+-             * This should not really happen, but in case it happens,
+-             * we just skip the sync for this time.  After all we even
+-             * don't have the root table pointer!
+-             */
+-            error_report_once("%s: invalid context entry for bus 0x%x"
+-                              " devfn 0x%x",
+-                              __func__, pci_bus_num(vtd_as->bus),
+-                              vtd_as->devfn);
+-            return 0;
+-        }
+-    }
+ 
+-    info.domain_id = VTD_CONTEXT_ENTRY_DID(ce_cache.hi);
+-
+-    return vtd_page_walk(&ce_cache, addr, addr + size, &info);
++    return vtd_page_walk(ce, addr, addr + size, &info);
+ }
+ 
+ static int vtd_sync_shadow_page_table(VTDAddressSpace *vtd_as)
+ {
+-    return vtd_sync_shadow_page_table_range(vtd_as, NULL, 0, UINT64_MAX);
++    int ret;
++    VTDContextEntry ce;
++
++    ret = vtd_dev_to_context_entry(vtd_as->iommu_state,
++                                   pci_bus_num(vtd_as->bus),
++                                   vtd_as->devfn, &ce);
++    if (ret) {
++        return ret;
++    }
++
++    return vtd_sync_shadow_page_table_range(vtd_as, &ce, 0, UINT64_MAX);
+ }
+ 
+ /*
 -- 
-1.8.3.1
+2.17.1
