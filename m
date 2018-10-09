@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1g9rbk-0003QA-VA
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:59:31 -0400
+	(envelope-from <vkuznets@redhat.com>) id 1g9rdm-0004z5-4o
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <artem.k.pisarenko@gmail.com>) id 1g9rbY-0008GC-I9
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:59:22 -0400
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:37018)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <artem.k.pisarenko@gmail.com>)
-	id 1g9rbW-0008Eg-FI
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:59:14 -0400
-Received: by mail-oi1-x231.google.com with SMTP id e17-v6so1123551oib.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 05:59:13 -0700 (PDT)
+	(envelope-from <vkuznets@redhat.com>) id 1g9rdg-0001My-Hn
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:01:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1g9rde-0001Bd-4N
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:01:27 -0400
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20181009122046.GC29982@rkaganb.sw.ru>
+References: <20181008112726.16140-1-vkuznets@redhat.com>
+	<20181008112726.16140-2-vkuznets@redhat.com>
+	<20181009122046.GC29982@rkaganb.sw.ru>
+Date: Tue, 09 Oct 2018 15:01:12 +0200
+Message-ID: <87va6bqnon.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <CANzW0mvSX5nWuinDU68W2yJzgoQSGAHPqpz0G36A6NKwRsz_4A@mail.gmail.com>
-	<d45bff6c4e472811f01452b5f730c1b6@ispras.ru>
-	<CANzW0mthuW0a7LR7DhpvTPnZ5n5DxtYyfYQf756vtyb9g0O7QQ@mail.gmail.com>
-	<CANzW0muZaNRtOP6OjXJ11HXL_q2MDOhCxY2dXZc2DzHr5BxqLw@mail.gmail.com>
-	<1930792321d9a0b16576359c7cec9f51@ispras.ru>
-	<CANzW0mta+dqVQUEPoXMuhwn+QY0+vBoOjBAj7BPmRL=z72Wxjw@mail.gmail.com>
-	<002601d45faf$0d28a4f0$2779eed0$@ru>
-	<CANzW0muyArqfeY2xY92hZWFsHD6me75KJBowcu0OrqnvbFDy5Q@mail.gmail.com>
-	<003c01d45fc2$fa57cfe0$ef076fa0$@ru>
-In-Reply-To: <003c01d45fc2$fa57cfe0$ef076fa0$@ru>
-From: Artem Pisarenko <artem.k.pisarenko@gmail.com>
-Date: Tue, 9 Oct 2018 18:59:01 +0600
-Message-ID: <CANzW0mum3X2ahv8BMn_uPF=d4P2UEAamdoT3eXv0q0M8k=yigw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/25] Fixing record/replay and adding
- reverse debugging
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] linux-headers: update to pre-4.20
+ (kvm/queue)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,447 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Pavel.Dovgaluk@ispras.ru, qemu-devel@nongnu.org
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-It wasn't so easy to apply this patch due to problems in compilation of
-version you pointed to, and due to content distortions introduced by mail
-archive, but I got it worked finally :)
+Roman Kagan <rkagan@virtuozzo.com> writes:
 
-Applying this patch finally made all my tests succeed... almost :)
+> On Mon, Oct 08, 2018 at 01:27:25PM +0200, Vitaly Kuznetsov wrote:
+>> This brings us three new defines: KVM_CAP_ARM_INJECT_SERROR_ESR,
+>> KVM_CAP_MSR_PLATFORM_INFO and KVM_CAP_HYPERV_SEND_IPI.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  linux-headers/linux/kvm.h | 7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+>> index 66790724f1..043f1e58b6 100644
+>> --- a/linux-headers/linux/kvm.h
+>> +++ b/linux-headers/linux/kvm.h
+>> @@ -9,7 +9,7 @@
+>>   */
+>>  
+>>  #include <linux/types.h>
+>> -
+>> +#include <linux/compiler.h>
+>>  #include <linux/ioctl.h>
+>>  #include <asm/kvm.h>
+>>  
+>> @@ -481,7 +481,7 @@ struct kvm_dirty_log {
+>>  	__u32 slot;
+>>  	__u32 padding1;
+>>  	union {
+>> -		void *dirty_bitmap; /* one bit per page */
+>> +		void __user *dirty_bitmap; /* one bit per page */
+>
+> Hmm, I thought "__user" and friends are supposed to get stripped while
+> "make headers_install".
 
-Now qemu may hang in random moment of emulation, but not hard. Symptoms
-looks like I've already reported here:
-https://bugs.launchpad.net/qemu/+bug/1790460 . So, this isn't
-record/replay-specific. Although, without rr=3D option I wasn't able cause
-this issue to reveal itself, but it doesn't make much sense due to
-instability of issue's nature and its hard reproducibility.
+... and of course I forgot about this, will send v2, thanks!
 
-Commit I tested against (with patches
-applied): 53a19a9a5f9811a911e9b69ef36afb0d66b5d85c .
+>  Does it build like this?
 
+depends on what you've done to your build system)
 
-=D0=B2=D1=82, 9 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 17:26, Pavel Dovgal=
-yuk <dovgaluk@ispras.ru>:
-
-> Maybe this will help?
->
->
->
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg560780.html
->
->
->
-> Pavel Dovgalyuk
->
->
->
-> *From:* Artem Pisarenko [mailto:artem.k.pisarenko@gmail.com]
-> *Sent:* Tuesday, October 09, 2018 2:24 PM
-> *To:* Pavel Dovgalyuk
->
->
-> *Cc:* Pavel.Dovgaluk@ispras.ru; qemu-devel@nongnu.org
-> *Subject:* Re: [Qemu-devel] [PATCH v6 00/25] Fixing record/replay and
-> adding reverse debugging
->
->
->
-> (Since all previous patches are already merged to master, I'm running
-> tests against latest (almost) version from master branch. Following resul=
-ts
-> are based on master commit dafd95053611aa14dda40266857608d12ddce658 .)
->
->
->
-> Applying this patch made Tests 1 and 2 succeed (at least I wasn't able to
-> acheive failures with several attempts).
->
-> Also I've tried few tests without sleep=3Doff and/or rtc base options. Al=
-l
-> of them succeed too, except one case - removing sleep=3Doff (regardless o=
-f
-> -rtc option values or its presence at all) causes qemu to hang hard in
-> recording mode at very startup. Process needs to be killed.
->
->
->
-> Some info from debugger:
->
->     qemu-system-x86_64 [13231] [cores: 2,4,5,7]
->
->           Thread #1 [qemu-system-x86] 13231 [core: 2] (Suspended :
-> Container)
->
->                       __lll_lock_wait() at lowlevellock.S:135
-> 0x7f00b116626d
->
->                       __GI___pthread_mutex_lock() at
-> pthread_mutex_lock.c:80 0x7f00b115fdbd
->
->                       qemu_mutex_lock_impl() at qemu-thread-posix.c:66
-> 0x947ac4
->
->                       replay_mutex_lock() at replay-internal.c:206
-> 0x7f3dea
->
->                       os_host_main_loop_wait() at main-loop.c:235
-> 0x94335e
->
->                       main_loop_wait() at main-loop.c:497 0x943429
->
->                       main_loop() at vl.c:1,853 0x5be70f
->
->                       main() at vl.c:4,575 0x5c56e0
->
->           Thread #2 [qemu-system-x86] 13282 [core: 4] (Suspended :
-> Container)
->
->           Thread #3 [qemu-system-x86] 13283 [core: 5] (Suspended :
-> Container)
->
->           Thread #4 [qemu-system-x86] 13284 [core: 7] (Suspended : Step)
->
->                       cpu_get_icount_raw() at cpus.c:301 0x45a0a0
->
->                       replay_get_current_step() at replay.c:67 0x7f2f14
->
->                       replay_save_instructions() at replay-internal.c:225
-> 0x7f3ea0
->
->                       replay_save_clock() at replay-time.c:24 0x7f483d
->
->                       icount_warp_rt() at cpus.c:512 0x45a745
->
->                       qemu_account_warp_timer() at cpus.c:690
-> 0x45ad55
->
->                       qemu_tcg_rr_cpu_thread_fn() at cpus.c:1,498
-> 0x45c554
->
->                       qemu_thread_start() at qemu-thread-posix.c:504
-> 0x9485cf
->
->                       start_thread() at pthread_create.c:333
-> 0x7f00b115d6ba
->
->                       clone() at clone.S:109 0x7f00b0e9341d
->
->     gdb (7.11.1)
->
->
->
-> Threads #2,3 are just waiting in poll or similar. Nothing extraordinary.
->
->
->
-> Thread #4 cycles inside do {} while() loop of cpu_get_icount_raw()
-> function:
->
->     do {
->
->         start =3D seqlock_read_begin(&timers_state.vm_clock_seqlock);
->
->         icount =3D cpu_get_icount_raw_locked();
->
->     } while (seqlock_read_retry(&timers_state.vm_clock_seqlock, start));
->
->
->
-> Value of timers_state.vm_clock_seqlock.sequence is always 3.
->
->
->
-> =D0=B2=D1=82, 9 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 15:04, Pavel Dovg=
-alyuk <dovgaluk@ispras.ru>:
->
-> Please try the following patch.
->
-> There was a problem with rtc option in record/replay mode.
->
->
->
-> diff --git a/vl.c b/vl.c
->
-> index 40d5d0f..afe1c20 100644
->
-> --- a/vl.c
->
-> +++ b/vl.c
->
-> @@ -2885,6 +2885,7 @@ int main(int argc, char **argv, char **envp)
->
->      DisplayState *ds;
->
->      QemuOpts *opts, *machine_opts;
->
->      QemuOpts *icount_opts =3D NULL, *accel_opts =3D NULL;
->
-> +    QemuOpts *rtc_opts =3D NULL;
->
->      QemuOptsList *olist;
->
->      int optind;
->
->      const char *optarg;
->
-> @@ -3691,12 +3692,11 @@ int main(int argc, char **argv, char **envp)
->
->                  warn_report("This option is ignored and will be removed
-> soon");
->
->                  break;
->
->              case QEMU_OPTION_rtc:
->
-> -                opts =3D qemu_opts_parse_noisily(qemu_find_opts("rtc"),
-> optarg,
->
-> -                                               false);
->
-> -                if (!opts) {
->
-> +                rtc_opts =3D qemu_opts_parse_noisily(qemu_find_opts("rtc=
-"),
->
-> +                                                   optarg, false);
->
-> +                if (!rtc_opts) {
->
->                      exit(1);
->
->                  }
->
-> -                configure_rtc(opts);
->
->                  break;
->
->              case QEMU_OPTION_tb_size:
->
-> #ifndef CONFIG_TCG
->
-> @@ -3907,6 +3907,9 @@ int main(int argc, char **argv, char **envp)
->
->      loc_set_none();
->
->      replay_configure(icount_opts);
->
-> +    if (rtc_opts) {
->
-> +        configure_rtc(rtc_opts);
->
-> +    }
->
->      if (incoming && !preconfig_exit_requested) {
->
->          error_report("'preconfig' and 'incoming' options are "
->
->
->
-> Pavel Dovgalyuk
->
->
->
-> *From:* Artem Pisarenko [mailto:artem.k.pisarenko@gmail.com]
-> *Sent:* Thursday, October 04, 2018 4:16 PM
-> *To:* dovgaluk
-> *Cc:* Pavel.Dovgaluk@ispras.ru; qemu-devel@nongnu.org
-> *Subject:* Re: [Qemu-devel] [PATCH v6 00/25] Fixing record/replay and
-> adding reverse debugging
->
->
->
-> No, it didn't changed test results, at least for
-> https://github.com/ispras/qemu/tree/rr-180911 . Even step values it
-> stucks on are same for most runs.
->
-> Playing with master and my own branch gives different results for tests
-> without sleep=3Doff and -rtc base. It seems that patch you mentioned didn=
-'t
-> changed them very much.
->
-> The only thing can be said for sure, is that this patch does not fix
-> issues completely. But MAY fix them partially or in some other specific
-> cases...
->
->
->
-> =D1=81=D1=80, 3 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 12:47, dovgaluk <=
-dovgaluk@ispras.ru>:
->
-> Can you try applying this patch?
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg563798.html
->
-> I also encountered the problems with x86_64 replaying and found the
-> misprint in
-> the code which was fixed later, than sending the series to the mailing
-> list.
->
-> Pavel Dovgalyuk
->
->
-> Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-10-02 10:02:
-> > I've added "-monitor stdio" option to command line of Test 1 and
-> > repeated entering command during execution:
-> >
-> >   QEMU 3.0.50 monitor - type 'help' for more information
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 311736195
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 318198367
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 324737211
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 329890795
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 607069789
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 607069789
-> >   (qemu) info replay
-> >   Replaying execution 'icount_rr_capture.bin': current step =3D
-> > 607069789
-> >   ...
-> >
-> > Some notes on value of step it stucks on:
-> > - mostly it's same (even across different record-replay pairs);
-> > - stressing host during replay may cause it to change even for same
-> > record-replay pair (i.e. different replay executions for same file
-> > recorded).
-> >
-> > This specific case seems to be stable to reproduce.
-> >
-> > =D0=B2=D1=82, 2 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 0:22, Artem Pis=
-arenko
-> > <artem.k.pisarenko@gmail.com>:
-> >
-> >> I've posted bug report with extended tests (incl. case without
-> >> sleep=3Doff). You may find guest image (kernel) in bug description.
-> >> https://bugs.launchpad.net/qemu/+bug/1795369 [1]
-> >>
-> >> The most annoying thing is that some issues are almost not
-> >> reproducible. There are definitely race conditions somewhere in qemu
-> >> code. Running 'stress-ng' utility with CPU and I/O stressors in
-> >> parallel with qemu execution greatly minimizes amount of attempts
-> >> when I'm trying to trigger some of issues I encounter.
-> >>
-> >> I'll try 'info monitor' command tomorrow, but no guarantees that
-> >> I'll be able to reproduce issue again.
-> >>
-> >> Speaking about '-nographic' and SDL... I've noted that UI greatly
-> >> minimizes possibility of hanging (but not avoids it completely) when
-> >> using icount in general, so this effect isn't rr-specific. I've
-> >> already reported this bug too.
-> >>
-> >> =D0=BF=D0=BD, 1 =D0=BE=D0=BA=D1=82. 2018 =D0=B3., 20:14 dovgaluk <dovg=
-aluk@ispras.ru>:
-> >>
-> >>> Artem Pisarenko =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2018-09-30 14:01:
-> >>>> Feature still broken :(
-> >>>
-> >>> Thanks for testing.
-> >>>
-> >>>>
-> >>>> Brief description of my tests.
-> >>>>
-> >>>> Guest image is Linux, which just powers off after kernel boots
-> >>>> (instead of proceeding to user-space /init or /sbin/init).
-> >>>> Base cmdline:
-> >>>> qemu-system-x86_64 -nodefaults -machine pc,accel=3Dtcg -m 2048
-> >>> -cpu
-> >>>> qemu64 -rtc clock=3Dvm,base=3D2000-01-01T00:00:00 -kernel bzImage
-> >>> -initrd
-> >>>> rootfs -append 'nokaslr console=3DttyS0 rdinit=3D/init_poweroff'
-> >>>> -nographic -serial SERIAL_VALUE -icount
-> >>>> 1,sleep=3Doff,rr=3DRR_VALUE,rrfile=3Dicount_rr_capture.bin
-> >>>
-> >>> I've never tried it with sleep=3Doff. Can you remove it and try
-> >>> again?
-> >>>
-> >>> We also seen a problem with '-nographic'. When we remove this
-> >>> option and
-> >>> QEMU runs with SDL
-> >>> window, everything is ok. There is some problem with main loop
-> >>> which may
-> >>> sleep when there
-> >>> is no GUI to update, or something like that. We couldn't fix it
-> >>> yet.
-> >>>
-> >>>>
-> >>>> Test 1. When SERIAL_VALUE=3Dnone
-> >>>> Running with RR_VALUE=3Drecord completes successfully.
-> >>>> Running with RR_VALUE=3Dreplay doesn't completes. qemu process
-> >>> just
-> >>>> eating ~100% cpu and memory usage doesn't grow after some
-> >>> moment. I
-> >>>> don't see what happens because of problem no.2 (see below).
-> >>>
-> >>> Try 'info replay' monitor command. Does instruction counter
-> >>> increases?
-> >>>
-> >>>>
-> >>>> Test 2. When SERIAL_VALUE=3Dstdio
-> >>>> Running with RR_VALUE=3Drecord completes successfully.
-> >>>>
-> >>>> Running with RR_VALUE=3Dreplay caues exit with error:
-> >>>>
-> >>>> "qemu-system-x86_64: Missing character write event in the replay
-> >>> log"
-> >>>>
-> >>>> These problems are same with qemu 2.12 (both vanilla and with
-> >>> previous
-> >>>> versions of these patches applied). Furthemore, I consider whole
-> >>>> icount mode broken and determinism isn't achievable.
-> >>>> The irony is that I actually don't need record/replay feature.
-> >>> I've
-> >>>> tried to use it only as instrument to debug failing determinism
-> >>> in
-> >>>> qemu code. But since replay/record feature itself relies on
-> >>>> determinism, which is broken, it's no wonder why it fails also
-> >>> (I just
-> >>>> hoped to bypass it).
-> >>>>
-> >>>> Contact me if you need more details. I just tired a lot trying
-> >>> to get
-> >>>> all these things working... Hope is leaving me...
-> >>>
-> >>> Can you share the kernel in case the icount still broken?
-> >>>
-> >>> Pavel Dovgalyuk
-> >> --
-> >>
-> >> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-> >> =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
-=BD=D0=BA=D0=BE
-> >  --
-> >
-> > =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-> >   =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=
-=D0=BD=D0=BA=D0=BE
-> >
-> > Links:
-> > ------
-> > [1] https://bugs.launchpad.net/qemu/+bug/1795369
->
-> --
->
-> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
->   =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
-=BD=D0=BA=D0=BE
->
-> --
->
-> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
->   =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=
-=BD=D0=BA=D0=BE
->
---=20
-
-=D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
-  =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=D0=BD=
-=D0=BA=D0=BE
+-- 
+Vitaly
