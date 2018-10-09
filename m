@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9oAK-0003jz-PI
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:18:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9oCw-0004TY-RY
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1g9oAK-0007B3-2H
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:18:56 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41294)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1g9oAJ-0007Ae-Rh
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:18:55 -0400
-Received: by mail-wr1-x443.google.com with SMTP id x12-v6so967733wru.8
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:18:55 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1g9oCt-0000TQ-QR
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:21:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59296)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9oCt-0000Sk-IN
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:21:35 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C6706307D910
+	for <qemu-devel@nongnu.org>; Tue,  9 Oct 2018 09:21:34 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1538650419-7995-1-git-send-email-thuth@redhat.com>
+	<548e06b9-dac6-812d-9347-fc600ac4f559@redhat.com>
+Date: Tue, 09 Oct 2018 11:21:32 +0200
+In-Reply-To: <548e06b9-dac6-812d-9347-fc600ac4f559@redhat.com> (Paolo
+	Bonzini's message of "Thu, 4 Oct 2018 13:43:29 +0200")
+Message-ID: <871s8zzd9f.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-10-armbru@redhat.com>
-In-Reply-To: <20181008173125.19678-10-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 9 Oct 2018 13:18:41 +0400
-Message-ID: <CAJ+F1CKhy3jXb1w4nfY_QgWvqAKb3+1Bt3uq3yNOr+iH=8ihFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/31] ioapic: Fix error handling in
- realize()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] MAINTAINERS: Add an entry for
+ qemu-options* files in main directory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +34,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Oct 8, 2018 at 9:35 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  ioapic_realize() does that, and then exit()s.
-> Currently mostly harmless, as the device cannot be hot-plugged.
->
-> Fixes: 20fd4b7b6d9282fe0cb83601f1821f31bd257458
-> Cc: Peter Xu <peterx@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> On 04/10/2018 12:53, Thomas Huth wrote:
+>> The file "qemu-options.h", "qemu-options.hx" and "qemu-options-wrapper.h"
+>> in the main directory are currently without maintainer according to our
+>> get_maintainers.pl script. Considering that the command line options are
+>> a public interface and thus quite important, this is quite a bad state.
+>> Add an entry for these files which is maintained by Paolo, since the
+>> option handling is tightly coupled with the code in vl.c (that Paolo
+>> already handles via the "Main loop" entry).
+>> 
+>> And since I'm interested in the command line interface of QEMU, add
+>> myself (and also Markus) as reviewer here.
+>
+> Sometimes, a file is really only touched as part of changes to other
+> files.  Command line options can be changed by block device patches,
+> vl.c patches, or something else.  I think changes to qemu-options* alone
 
-> ---
->  hw/intc/ioapic.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-> index b6896ac4ce..4e529729b4 100644
-> --- a/hw/intc/ioapic.c
-> +++ b/hw/intc/ioapic.c
-> @@ -21,7 +21,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> -#include "qemu/error-report.h"
-> +#include "qapi/error.h"
->  #include "monitor/monitor.h"
->  #include "hw/hw.h"
->  #include "hw/i386/pc.h"
-> @@ -393,9 +393,9 @@ static void ioapic_realize(DeviceState *dev, Error **=
-errp)
->      IOAPICCommonState *s =3D IOAPIC_COMMON(dev);
->
->      if (s->version !=3D 0x11 && s->version !=3D 0x20) {
-> -        error_report("IOAPIC only supports version 0x11 or 0x20 "
-> -                     "(default: 0x%x).", IOAPIC_VER_DEF);
-> -        exit(1);
-> +        error_setg(errp, "IOAPIC only supports version 0x11 or 0x20 "
-> +                   "(default: 0x%x).", IOAPIC_VER_DEF);
-> +        return;
->      }
->
->      memory_region_init_io(&s->io_memory, OBJECT(s), &ioapic_io_ops, s,
-> --
-> 2.17.1
->
->
+Yes.  But when the file in question is an important interface, having
+someone in charge of interface design aspects makes sense all the same.
+Without that, consistency is left to chance.
 
+Of course, you might say that command line consistency is FUBAR anyway.
+You'd have a point.
 
---=20
-Marc-Andr=C3=A9 Lureau
+> are quite rare, and I'd rather not have more stuff added to my misc tree
+> (and my inbox)...
+
+Same here.
+
+I serve in such a role for the QAPI schema, together with Eric.  I feel
+like I'm pretty consistently failing at keeping up (pardon the pun).  I
+haven't thrown in the towel only because I also feel the guidance I
+manage to provide there is better than nothing.  But I'd rather not take
+on more.
+
+Note that once my project to QAPIfy the CLI (on hold due to other
+obligations) is complete, the CLI will be specified in the QAPI schema,
+effectively dumping it on the QAPI schema maintainers.  I guess I'm a
+sucker for punishment.  Just not right now, please.
