@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9ywe-00030r-Dv
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:49:36 -0400
+	(envelope-from <david@redhat.com>) id 1g9z3z-0005dh-GD
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:57:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1g9ywa-0005tC-0V
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:49:32 -0400
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:43297)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1g9ywZ-0005sk-Qq
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:49:27 -0400
-Received: by mail-pf1-x42a.google.com with SMTP id p24-v6so1440281pff.10
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 13:49:27 -0700 (PDT)
-References: <20181009174557.16125-1-cota@braap.org>
-	<20181009174557.16125-4-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8edd1d59-f617-9bba-9dff-eb6836ec8415@linaro.org>
-Date: Tue, 9 Oct 2018 13:49:24 -0700
-MIME-Version: 1.0
-In-Reply-To: <20181009174557.16125-4-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] exec: introduce tlb_init
+	(envelope-from <david@redhat.com>) id 1g9z3v-0002cP-Gd
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:57:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36050)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1g9z3v-0002c3-Ap
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 16:57:03 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Tue,  9 Oct 2018 22:56:45 +0200
+Message-Id: <20181009205652.10605-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 0/7] qapi/range/memory-device: fixes and
+ cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,20 +22,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On 10/9/18 10:45 AM, Emilio G. Cota wrote:
-> Paves the way for the addition of a per-TLB lock.
-> 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  include/exec/exec-all.h | 8 ++++++++
->  accel/tcg/cputlb.c      | 4 ++++
->  exec.c                  | 1 +
->  3 files changed, 13 insertions(+)
+While working on memory device code, I noticed that specifiying an uint64_t
+on command line does not work in all cases as we always parse an int64_t.
+So I fix that and also cleanup the old int64_t parser.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+To be able to fix some overflows in memory-device code in a clean way,
+I am reusing the range implementation of qemu, for which I need some
+more helpers.
 
-r~
+This series is based on
+    "[PATCH v5 00/16] memory-device: complete refactoring"
+which should get merged soon.
+
+David Hildenbrand (7):
+  qapi: correctly parse uint64_t values from strings
+  qapi: use qemu_strtoi64() in parse_str_int64
+  range: pass const pointer where possible
+  range: add some more functions
+  memory-device: use QEMU_IS_ALIGNED
+  memory-device: avoid overflows on very huge devices
+  memory-device: rewrite address assignment using ranges
+
+ hw/mem/memory-device.c      |  63 ++++++++++-------
+ include/qemu/range.h        |  86 ++++++++++++++++++++++-
+ qapi/string-input-visitor.c | 133 ++++++++++++++++++++++++++++++------
+ 3 files changed, 231 insertions(+), 51 deletions(-)
+
+-- 
+2.17.1
