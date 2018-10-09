@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gA02g-000137-1S
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 17:59:50 -0400
+	(envelope-from <crosa@redhat.com>) id 1gA17p-0000NO-Bv
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gA02a-00012A-2Z
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 17:59:48 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 9 Oct 2018 21:59:22 +0000
-Message-ID: <eb4bfb95-3d46-75f6-1d7e-e37cf4efbcaa@virtuozzo.com>
-References: <20180731173033.75467-1-vsementsov@virtuozzo.com>
-	<fc24ba9e-e325-6478-cb22-bc0a256c6e87@virtuozzo.com>
-	<8c656cc9-9543-5c70-7d78-de02a466319f@redhat.com>
-In-Reply-To: <8c656cc9-9543-5c70-7d78-de02a466319f@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9A40EABE7902264A95C40FE1734B3AB5@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <crosa@redhat.com>) id 1gA17k-0005EU-RI
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:09:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42570)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gA17k-0005E0-IF
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:09:08 -0400
+References: <20181004151429.7232-1-crosa@redhat.com>
+	<20181004151429.7232-6-crosa@redhat.com>
+	<acc4179c-13f3-0a55-7731-86b90b20ec0c@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <8673bb6c-a689-d69a-40cc-4189b0a78acb@redhat.com>
+Date: Tue, 9 Oct 2018 19:08:56 -0400
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v4 00/10] NBD reconnect
+In-Reply-To: <acc4179c-13f3-0a55-7731-86b90b20ec0c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/7] Acceptance Tests: set machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +29,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-DQoNCk9uIDEwLzA5LzIwMTggMTA6MzMgUE0sIEpvaG4gU25vdyB3cm90ZToNCj4gDQo+IA0KPiBP
-biAwOS8xNy8yMDE4IDExOjI2IEFNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
-Og0KPj4gcGluZw0KPj4NCj4gDQo+IElzIHRoaXMgc3RpbGwgcGVuZGluZyBvciBkaWQgSS93ZSBt
-aXNzIGEgdjU/DQoNCnN0aWxsIHBlbmRpbmcNCg0KPiANCj4+IDMxLjA3LjIwMTggMjA6MzAsIFZs
-YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gSGkgYWxsLg0KPj4+DQo+Pj4g
-SGVyZSBpcyBOQkQgcmVjb25uZWN0LiBQcmV2aW91c2x5LCBpZiBjb25uZWN0aW9uIGZhaWxlZCBh
-bGwgY3VycmVudA0KPj4+IGFuZCBmdXR1cmUgcmVxdWVzdHMgd2lsbCBmYWlsLiBBZnRlciB0aGUg
-c2VyaWVzLCBuYmQtY2xpZW50IGRyaXZlcg0KPj4+IHdpbGwgdHJ5IHRvIHJlY29ubmVjdCB1bmxp
-bWl0ZWQgdGltZXMuIER1cmluZyBmaXJzdCBAcmVjb25uZWN0LWRlbGF5DQo+Pj4gc2Vjb25kcyBv
-ZiByZWNvbm5lY3RpbmcgYWxsIHJlcXVlc3RzIHdpbGwgd2FpdCBmb3IgdGhlIGNvbm5lY3Rpb24s
-DQo+Pj4gYW5kIGlmIGl0IGlzIGVzdGFibGlzaGVkIHJlcXVlc3RzIHdpbGwgYmUgcmVzZW50LiBB
-ZnRlcg0KPj4+IEByZWNvbm5lY3QtZGVsYXkgcGVyaW9kIGFsbCByZXF1ZXN0cyB3aWxsIGJlIGZh
-aWxlZCAodW50aWwgc3VjY2Vzc2Z1bA0KPj4+IHJlY29ubmVjdCkuDQo+Pj4NCj4+PiB2NDogLSBh
-ZGQgRXJpYydzIHItYiB0byAwMS4NCj4+PiAgwqDCoMKgwqAgLSBkcm9wIENPTk5FQ1RJTkdfSU5J
-VCBtb2RlLCBkb24ndCByZWNvbm5lY3Qgb24gX29wZW4uDQo+Pj4gIMKgwqDCoMKgIC0gbmV3IGFw
-aTogb25seSBvbmUgcGFyYW1ldGVyIEByZWNvbm5lY3QtZGVsYXkNCj4+PiAgwqDCoMKgwqAgLSBu
-ZXcgaW50ZXJ2YWwgc2NoZW1lIGJldHdlZW4gcmVjb25uZWN0IGF0dGVtcHRzDQo+Pj4gIMKgwqDC
-oMKgwqDCoMKgwqAgKDEgLSAyIC0gNCAtIDggLSAxNiAtIDE2IC4uLiBzZWNvbmRzKQ0KPj4+ICDC
-oMKgwqDCoCAtIGZpeGVzIGFuZCByZWZhY3RvcmluZ3MgaW4gbWFpbiBwYXRjaCAoMDkpLCBpbmNs
-dWRpbmcgbWVyZ2Ugd2l0aA0KPj4+ICDCoMKgwqDCoMKgwqAgb2xkIDA4IHBhdGNoDQo+Pj4gICAg
-ICANCj4+PiB2MzoNCj4+PiAwNjogZml4IGJ1aWxkIGVycm9yIGluIGZ1bmN0aW9uICduYmRfY29f
-c2VuZF9yZXF1ZXN0JzoNCj4+PiAgwqDCoMKgwqDCoCBlcnJvcjogJ2knIG1heSBiZSB1c2VkIHVu
-aW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbg0KPj4+DQo+Pj4gdjIgbm90ZXM6DQo+Pj4gSGVy
-ZSBpcyB2MiBvZiBOQkQgcmVjb25uZWN0LCBidXQgaXQgaXMgdmVyeSB2ZXJ5IGRpZmZlcmVudCBm
-cm9tIHYxLCBzbywNCj4+PiBmb3JnZXQgYWJvdXQgdjEuDQo+Pj4gVGhlIHNlcmllcyBpbmNsdWRl
-cyBteSAiTkJEIHJlY29ubmVjdDogcHJlbGltaW5hcnkgcmVmYWN0b3JpbmciLCB3aXRoDQo+Pj4g
-Y2hhbmdlcyBpbiAwNTogbGVhdmUgYXNzZXJ0cyAoRXJpYykuDQo+Pj4NCj4+PiBWbGFkaW1pciBT
-ZW1lbnRzb3YtT2dpZXZza2l5ICgxMCk6DQo+Pj4gIMKgwqAgYmxvY2svbmJkLWNsaWVudDogc3Bs
-aXQgY2hhbm5lbCBlcnJvcnMgZnJvbSBleHBvcnQgZXJyb3JzDQo+Pj4gIMKgwqAgYmxvY2svbmJk
-OiBtb3ZlIGNvbm5lY3Rpb24gY29kZSBmcm9tIGJsb2NrL25iZCB0byBibG9jay9uYmQtY2xpZW50
-DQo+Pj4gIMKgwqAgYmxvY2svbmJkLWNsaWVudDogc3BsaXQgY29ubmVjdGlvbiBmcm9tIGluaXRp
-YWxpemF0aW9uDQo+Pj4gIMKgwqAgYmxvY2svbmJkLWNsaWVudDogZml4IG5iZF9yZXBseV9jaHVu
-a19pdGVyX3JlY2VpdmUNCj4+PiAgwqDCoCBibG9jay9uYmQtY2xpZW50OiBkb24ndCBjaGVjayBp
-b2MNCj4+PiAgwqDCoCBibG9jay9uYmQtY2xpZW50OiBtb3ZlIGZyb20gcXVpdCB0byBzdGF0ZQ0K
-Pj4+ICDCoMKgIGJsb2NrL25iZC1jbGllbnQ6IHJlbmFtZSByZWFkX3JlcGx5X2NvIHRvIGNvbm5l
-Y3Rpb25fY28NCj4+PiAgwqDCoCBibG9jay9uYmQ6IGFkZCBjbWRsaW5lIGFuZCBxYXBpIHBhcmFt
-ZXRlciByZWNvbm5lY3QtZGVsYXkNCj4+PiAgwqDCoCBibG9jay9uYmQtY2xpZW50OiBuYmQgcmVj
-b25uZWN0DQo+Pj4gIMKgwqAgaW90ZXN0czogdGVzdCBuYmQgcmVjb25uZWN0DQo+Pj4NCj4+PiAg
-wqAgcWFwaS9ibG9jay1jb3JlLmpzb27CoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDEyICstDQo+Pj4g
-IMKgIGJsb2NrL25iZC1jbGllbnQuaMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDIwICstDQo+
-Pj4gIMKgIGJsb2NrL25iZC1jbGllbnQuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCA1MTUNCj4+
-PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0NCj4+PiAgwqAgYmxv
-Y2svbmJkLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDU2ICsrLS0t
-DQo+Pj4gIMKgIHRlc3RzL3FlbXUtaW90ZXN0cy8yMjDCoMKgwqDCoMKgwqDCoCB8wqAgNjcgKysr
-KysrDQo+Pj4gIMKgIHRlc3RzL3FlbXUtaW90ZXN0cy8yMjAub3V0wqDCoMKgIHzCoMKgIDcgKw0K
-Pj4+ICDCoCB0ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXDCoMKgwqDCoMKgIHzCoMKgIDEgKw0KPj4+
-ICDCoCB0ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8wqDCoCA0ICsNCj4+PiAgwqAgOCBm
-aWxlcyBjaGFuZ2VkLCA1MTIgaW5zZXJ0aW9ucygrKSwgMTcwIGRlbGV0aW9ucygtKQ0KPj4+ICDC
-oCBjcmVhdGUgbW9kZSAxMDA3NTUgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMA0KPj4+ICDCoCBjcmVh
-dGUgbW9kZSAxMDA2NDQgdGVzdHMvcWVtdS1pb3Rlc3RzLzIyMC5vdXQNCj4+Pg0KPj4NCj4+DQo=
+
+
+On 10/5/18 11:42 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 04/10/2018 17:14, Cleber Rosa wrote:
+>> By setting the machine type, even if it's the one that will be picked
+>> based on the arch, it's possible to run the same tests with targets
+>> that require a machine type (in addition to those that don't).
+>>
+>> Given that only boot_linux_console.py contains code specific to x86_64
+>> (an explicit reference to the kernel image that will be used) the
+>> other tests can be used to test different targets:
+>>
+>>   $ avocado run -p arch=3Daarch64 --filter-by-tags=3D'-x86_64' -- test=
+s/acceptance/
+>>
+>> Eventually, to reduce boiler plate code, the idea is to concentrate
+>> the basic configuration (arch, machine, console) in either another
+>> utility method, or make that happen by default.  This is of course the
+>> subject of a future discussion.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  tests/acceptance/boot_linux_console.py | 3 ++-
+>>  tests/acceptance/version.py            | 2 ++
+>>  tests/acceptance/vnc.py                | 5 +++++
+>>  3 files changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance=
+/boot_linux_console.py
+>> index 98324f7591..58032f971c 100644
+>> --- a/tests/acceptance/boot_linux_console.py
+>> +++ b/tests/acceptance/boot_linux_console.py
+>> @@ -30,7 +30,8 @@ class BootLinuxConsole(Test):
+>>          kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
+>>          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dker=
+nel_hash)
+>> =20
+>> -        self.vm.set_machine('pc')
+>> +        self.vm.set_arch(self.arch)
+>> +        self.vm.set_machine()
+>>          self.vm.set_console()
+>>          kernel_command_line =3D 'console=3DttyS0'
+>>          self.vm.add_args('-kernel', kernel_path,
+>> diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
+>> index 13b0a7440d..7a3a20945f 100644
+>> --- a/tests/acceptance/version.py
+>> +++ b/tests/acceptance/version.py
+>> @@ -18,6 +18,8 @@ class Version(Test):
+>>      :avocado: tags=3Dquick
+>>      """
+>>      def test_qmp_human_info_version(self):
+>> +        self.vm.set_arch(self.arch)
+>> +        self.vm.set_machine()
+>>          self.vm.launch()
+>>          res =3D self.vm.command('human-monitor-command',
+>>                                command_line=3D'info version')
+>> diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
+>> index b1ef9d71b1..4a8a83025f 100644
+>> --- a/tests/acceptance/vnc.py
+>> +++ b/tests/acceptance/vnc.py
+>> @@ -16,6 +16,11 @@ class Vnc(Test):
+>>      :avocado: enable
+>>      :avocado: tags=3Dvnc,quick
+>>      """
+>> +    def setUp(self):
+>> +        super(Vnc, self).setUp()
+>> +        self.vm.set_arch(self.arch)
+>> +        self.vm.set_machine()
+>> +
+>>      def test_no_vnc(self):
+>>          self.vm.add_args('-nodefaults', '-S')
+>>          self.vm.launch()
+>>
+>=20
+> $ uname -m
+> aarch64
+> $ avocado --show=3Dapp run
+> --json-variants-load=3Dtests/acceptance/variants/arch.json
+> tests/acceptance/vnc.py
+> JOB ID     : 06f38999b7386afbd66023e7c1daee84d7991060
+> JOB LOG    :
+> /home/phil/avocado/job-results/job-2018-10-05T15.40-06f3899/job.log
+>  (01/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;aarch64: PASS (0.34 s)
+>  (02/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;ppc: PASS (0.31 s)
+>  (03/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;ppc64: PASS (0.35 s)
+>  (04/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;s390x: PASS (0.24 s)
+>  (05/20) tests/acceptance/vnc.py:Vnc.test_no_vnc;x86_64: PASS (0.34 s)
+>  (06/20)
+> tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;aarch64: PASS
+> (0.34 s)
+>  (07/20) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;ppc:
+> PASS (0.27 s)
+>  (08/20) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;ppc64:
+> PASS (0.34 s)
+>  (09/20) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;s390x:
+> PASS (0.24 s)
+>  (10/20) tests/acceptance/vnc.py:Vnc.test_no_vnc_change_password;x86_64=
+:
+> PASS (0.35 s)
+>  (11/20)
+> tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_passwor=
+d;aarch64:
+> PASS (0.33 s)
+>  (12/20)
+> tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_passwor=
+d;ppc:
+> PASS (0.28 s)
+>  (13/20)
+> tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_passwor=
+d;ppc64:
+> PASS (0.38 s)
+>  (14/20)
+> tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_passwor=
+d;s390x:
+> PASS (0.26 s)
+>  (15/20)
+> tests/acceptance/vnc.py:Vnc.test_vnc_change_password_requires_a_passwor=
+d;x86_64:
+> PASS (0.35 s)
+>  (16/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;aarch64:
+> PASS (0.35 s)
+>  (17/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;ppc: PASS
+> (0.28 s)
+>  (18/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;ppc64:
+> PASS (0.36 s)
+>  (19/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;s390x:
+> PASS (0.26 s)
+>  (20/20) tests/acceptance/vnc.py:Vnc.test_vnc_change_password;x86_64:
+> PASS (0.34 s)
+> RESULTS    : PASS 20 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0
+> | CANCEL 0
+> JOB TIME   : 8.30 s
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+
+I think this is a "tested by" for the next commit (the one that adds the
+JSON file), right?
+
+Thanks for testing it!
+- Cleber.
