@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9r3r-00021K-96
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:24:28 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9r5s-0002nu-Ci
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1g9r3l-00024f-Ni
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:24:25 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:35454)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9r5q-0004Kj-Eq
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:26:32 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56097)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1g9r3h-00020S-8N
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:24:19 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id w5-v6so1607113wrt.2
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 05:24:16 -0700 (PDT)
-References: <20181008152059.17503-1-alex.bennee@linaro.org>
-	<CAAdtpL7gSaza9RVY4f_e4NbXCC+J1YKiR0AS4TRExgiTauw0kQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAAdtpL7gSaza9RVY4f_e4NbXCC+J1YKiR0AS4TRExgiTauw0kQ@mail.gmail.com>
-Date: Tue, 09 Oct 2018 13:24:14 +0100
-Message-ID: <87o9c3mhox.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g9r5n-0004J6-CG
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:26:28 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 206-v6so1668621wmb.5
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 05:26:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20180905062313.4059-1-peterx@redhat.com>
+	<20180905062313.4059-3-peterx@redhat.com>
+	<CAJ+F1CJJB2ZyTQ3OBJ+c49bqZMWSKqfp7UOoM7QBEhH6Exnsbg@mail.gmail.com>
+	<20180929040529.GQ9560@xz-x1>
+	<CAJ+F1CJhXJEwkcrOqDGXjBG+m9NJG8HK0+C0vMxpQmqxWF0MYQ@mail.gmail.com>
+	<20181008071523.GI18728@xz-x1>
+In-Reply-To: <20181008071523.GI18728@xz-x1>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 9 Oct 2018 16:26:13 +0400
+Message-ID: <CAJ+F1CLk3Z70GC3AZQ5wZDTHL=QDa3j+aC+qfrZZGzhrTsLnzg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] .travis.yml: split MacOSX builds and
- reduce target list
+Subject: Re: [Qemu-devel] [PATCH v8 2/6] monitor: resume the monitor earlier
+ if needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +35,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+Hi
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> Hi Alex,
+On Mon, Oct 8, 2018 at 11:15 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Mon, Oct 8, 2018 at 5:21 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
->> We have reached the point where the MacOSX build was regularly timing
->> out. So as before I've reduced the target list to "major"
->> architectures to try and bring the build time down. I've added an
->> additional MacOSX build with the latest XCode with a minimal list of
->> "most likely" targets on MacOS.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  .travis.yml | 8 +++++++-
->>  1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/.travis.yml b/.travis.yml
->> index 95be6ec59f..13a09facd3 100644
->> --- a/.travis.yml
->> +++ b/.travis.yml
->> @@ -107,8 +107,14 @@ matrix:
->>      - env: CONFIG=3D"--disable-tcg"
->>             TEST_CMD=3D""
->>        compiler: gcc
->> -    - env: CONFIG=3D""
->> +    # MacOSX builds
->> +    - env: CONFIG=3D"--target-list=3Daarch64-softmmu,arm-softmmu,i386-s=
-oftmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-soft=
-mmu,x86_64-softmmu"
->>        os: osx
->> +      osx_image: xcode9.4
->> +      compiler: clang
->> +    - env: CONFIG=3D"--target-list=3Di386-softmmu,ppc-softmmu,ppc64-sof=
-tmmu,m68k-softmmu,x86_64-softmmu"
->> +      os: osx
->> +      osx_image: xcode10
+> On Tue, Oct 02, 2018 at 01:13:10PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi Peter
+> >
+> > On Sat, Sep 29, 2018 at 8:05 AM Peter Xu <peterx@redhat.com> wrote:
+> > >
+> > > On Fri, Sep 28, 2018 at 04:06:30PM +0400, Marc-Andr=C3=A9 Lureau wrot=
+e:
+> > > > Hi
+> > > >
+> > > > On Wed, Sep 5, 2018 at 10:24 AM Peter Xu <peterx@redhat.com> wrote:
+> > > > >
+> > > > > Currently when QMP request queue full we won't resume the monitor=
+ until
+> > > > > we have completely handled the current command.  It's not necessa=
+ry
+> > > > > since even before it's handled the queue is already non-full.  Mo=
+ving
+> > > > > the resume logic earlier before the command execution, hence drop=
+ the
+> > > > > need_resume local variable.
+> > > > >
+> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > ---
+> > > > >  monitor.c | 12 +++++-------
+> > > > >  1 file changed, 5 insertions(+), 7 deletions(-)
+> > > > >
+> > > > > diff --git a/monitor.c b/monitor.c
+> > > > > index a89bb86599..c2c9853f75 100644
+> > > > > --- a/monitor.c
+> > > > > +++ b/monitor.c
+> > > > > @@ -4130,7 +4130,6 @@ static void monitor_qmp_bh_dispatcher(void =
+*data)
+> > > > >  {
+> > > > >      QMPRequest *req_obj =3D monitor_qmp_requests_pop_any_with_lo=
+ck();
+> > > > >      QDict *rsp;
+> > > > > -    bool need_resume;
+> > > > >      Monitor *mon;
+> > > > >
+> > > > >      if (!req_obj) {
+> > > > > @@ -4139,8 +4138,11 @@ static void monitor_qmp_bh_dispatcher(void=
+ *data)
+> > > > >
+> > > > >      mon =3D req_obj->mon;
+> > > > >      /*  qmp_oob_enabled() might change after "qmp_capabilities" =
+*/
+> > > > > -    need_resume =3D !qmp_oob_enabled(mon) ||
+> > > > > -        mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_M=
+AX - 1;
+> > > > > +    if (!qmp_oob_enabled(mon) ||
+> > > > > +        mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_M=
+AX - 1) {
+> > > > > +        /* Pairs with the monitor_suspend() in handle_qmp_comman=
+d() */
+> > > > > +        monitor_resume(mon);
+> > > > > +    }
+> > > >
+> > > > With spice chardev, this may result in a synchronous write.
+> > > > If I read it right, this may re-enter handle_qmp_command and dead-l=
+ock
+> > > > on qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+> > > >
+> > > > So at least I would release the lock before resuming :)
+> > >
+> > > For sure this I can do. :) Though I'd like to know more context too.
+> > >
+> > > I just noticed that we added the qemu_chr_fe_accept_input() call into
+> > > monitor_resume() a month ago which I completely unaware of... then th=
+e
+> > > resuming could be a heavy-weighted function now.  I'm a bit worried o=
+n
+> > > whether this would affect the oob thing since noting that we're still
+> > > in the monitor iothread (which should not block for long).  Especiall=
+y
+> > > if you mentioned that we'll handle commands again, then could we
+> > > potentially run non-oob command handlers in oob context here simply
+> > > due to the call to monitor_resume()?
+> >
+> > monitor_resume() is only called from main thread, afaict.
 >
-> I'd also add another entry with --enable-user.
+> My fault on misreading on that; yes it's only called in main thread.
+>
+> >
+> > So I think the problem is rather that qemu_chr_fe_accept_input() is
+> > not thread safe (if the same charfe is used in a different thread,
+> > like mon_iothread).
+> >
+> > So instead of simply kicking the mon_iothread, we should probably
+> > schedule a BH to call accept input.
+>
+> Hmm, could you help explain why we need to make
+> qemu_chr_fe_accept_input() thread safe?  I see that's only called in
+> main thread as well (besides the call in monitor_resume, it's mostly
+> in memory region ops), or did I misread again?
 
-Ohh, does MacOSX use the bsd-user machinery?
+Yes, it's called from main thread. And that's not very safe for
+chardev to be called from different threads. Let's try to keep the
+chardev-related calls in the in mon_iothread (if it is used). I'll
+send a patch along with some other cleanups.
 
 >
->>        compiler: clang
->>      # Python builds
->>      - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
->> --
->> 2.17.1
->>
+> Regards,
+>
+> --
+> Peter Xu
 
 
---
-Alex Benn=C3=A9e
+
+--=20
+Marc-Andr=C3=A9 Lureau
