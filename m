@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gA1OX-0003ND-J7
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:30 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gA1OW-0000oy-AZ
+	(envelope-from <crosa@redhat.com>) id 1gA1OW-0003Mz-EK
 	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gA1OV-0000mO-U6
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <crosa@redhat.com>) id 1gA1OS-0000mR-T0
 	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41926)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gA1OR-0000j2-J5
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 19:26:24 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Date: Tue,  9 Oct 2018 19:26:05 -0400
-Message-Id: <20181009232607.15521-6-crosa@redhat.com>
-In-Reply-To: <20181009232607.15521-1-crosa@redhat.com>
-References: <20181009232607.15521-1-crosa@redhat.com>
+Date: Tue,  9 Oct 2018 19:26:00 -0400
+Message-Id: <20181009232607.15521-1-crosa@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 5/7] Acceptance Tests: set machine type
+Subject: [Qemu-devel] [PATCH v2 0/7] Acceptance Tests: basic architecture
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +28,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-By setting the machine type, even if it's the one that will be picked
-based on the arch, it's possible to run the same tests with targets
-that require a machine type (in addition to those that don't).
+The current version of the Acceptance Tests have been basically tested
+on x86_64.  Most of them should be valid tests on many different
+architectures.
 
-Given that only boot_linux_console.py contains code specific to x86_64
-(an explicit reference to the kernel image that will be used) the
-other tests can be used to test different targets:
+This introduces another standard test parameter, 'arch', and a public
+test attribute with the same name.  Then, because of the different
+behavior in different QEMU targets, it adds a more explicit
+configuration of the QEMUMachine machine type used on the tests (the
+self.vm attribute).
 
-  $ avocado run -p arch=3Daarch64 --filter-by-tags=3D'-x86_64' -- tests/a=
-cceptance/
+Finally, for tests that are known to be architecture specific, it
+changes the approach, from using tags to canceling the test.  The
+difference is that this reuses the same 'arch' parameter (so no need
+to pass tags for the same reason), and instead of completely excluding
+the test from the job, it just won't be executed on architectures that
+are not supported.  More details about this on the last commit.
 
-Eventually, to reduce boiler plate code, the idea is to concentrate
-the basic configuration (arch, machine, console) in either another
-utility method, or make that happen by default.  This is of course the
-subject of a future discussion.
+Changes from v1:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tests/acceptance/boot_linux_console.py | 3 ++-
- tests/acceptance/version.py            | 2 ++
- tests/acceptance/vnc.py                | 5 +++++
- 3 files changed, 9 insertions(+), 1 deletion(-)
+ * Fixed typo in docstring (s/param/type) (Murilo)
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-index 98324f7591..58032f971c 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -30,7 +30,8 @@ class BootLinuxConsole(Test):
-         kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
-         kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-=20
--        self.vm.set_machine('pc')
-+        self.vm.set_arch(self.arch)
-+        self.vm.set_machine()
-         self.vm.set_console()
-         kernel_command_line =3D 'console=3DttyS0'
-         self.vm.add_args('-kernel', kernel_path,
-diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
-index 13b0a7440d..7a3a20945f 100644
---- a/tests/acceptance/version.py
-+++ b/tests/acceptance/version.py
-@@ -18,6 +18,8 @@ class Version(Test):
-     :avocado: tags=3Dquick
-     """
-     def test_qmp_human_info_version(self):
-+        self.vm.set_arch(self.arch)
-+        self.vm.set_machine()
-         self.vm.launch()
-         res =3D self.vm.command('human-monitor-command',
-                               command_line=3D'info version')
-diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
-index b1ef9d71b1..4a8a83025f 100644
---- a/tests/acceptance/vnc.py
-+++ b/tests/acceptance/vnc.py
-@@ -16,6 +16,11 @@ class Vnc(Test):
-     :avocado: enable
-     :avocado: tags=3Dvnc,quick
-     """
-+    def setUp(self):
-+        super(Vnc, self).setUp()
-+        self.vm.set_arch(self.arch)
-+        self.vm.set_machine()
-+
-     def test_no_vnc(self):
-         self.vm.add_args('-nodefaults', '-S')
-         self.vm.launch()
+ * Pretty print the "arch.json" variants file, in order to make
+   editing easier and avoid hitting email line length limits (Eric,
+   Philippe)
+
+ * Distinguish between host and target arch when canceling tests
+   (Philippe)
+
+Cleber Rosa (7):
+  Acceptance Tests: improve docstring on pick_default_qemu_bin()
+  Acceptance Tests: introduce arch parameter and attribute
+  scripts/qemu.py: add method and private attribute for arch
+  scripts/qemu.py: set predefined machine type based on arch
+  Acceptance Tests: set machine type
+  Acceptance Tests: add variants definition for architectures
+  Acceptance Tests: change the handling of tests for specific archs
+
+ docs/devel/testing.rst                    | 18 +++++
+ scripts/qemu.py                           | 29 ++++++-
+ tests/acceptance/avocado_qemu/__init__.py | 17 ++++-
+ tests/acceptance/boot_linux_console.py    |  6 +-
+ tests/acceptance/variants/arch.json       | 92 +++++++++++++++++++++++
+ tests/acceptance/version.py               |  2 +
+ tests/acceptance/vnc.py                   |  5 ++
+ 7 files changed, 163 insertions(+), 6 deletions(-)
+ create mode 100644 tests/acceptance/variants/arch.json
+
 --=20
 2.17.1
