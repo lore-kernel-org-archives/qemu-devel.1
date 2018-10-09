@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9v8z-0001AP-5j
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:46:02 -0400
+	(envelope-from <crosa@redhat.com>) id 1g9vBc-00022r-8u
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1g9v8y-000565-79
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:46:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com>
-Date: Tue, 09 Oct 2018 18:45:47 +0200
-In-Reply-To: <1535739372-24454-1-git-send-email-Liam.Merwick@oracle.com> (Liam
-	Merwick's message of "Fri, 31 Aug 2018 19:16:04 +0100")
-Message-ID: <87r2gzrrus.fsf@dusky.pond.sub.org>
+	(envelope-from <crosa@redhat.com>) id 1g9vBX-0000i7-1Z
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:48:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54376)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g9vBW-0000hr-Pg
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 12:48:38 -0400
+References: <20181009041826.19462-1-crosa@redhat.com>
+	<20181009041826.19462-4-crosa@redhat.com>
+	<75560722-a9f5-5ec9-b851-d521960ed8eb@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <d56ed2c4-d310-5048-3c02-682cf2934f85@redhat.com>
+Date: Tue, 9 Oct 2018 12:48:29 -0400
 MIME-Version: 1.0
+In-Reply-To: <75560722-a9f5-5ec9-b851-d521960ed8eb@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] off-by-one and NULL pointer
- accesses detected by static analysis
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] Travis support for the acceptance
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +30,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liam Merwick <Liam.Merwick@oracle.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, =?utf-8?Q?Daniel_P=2E_Berrang?= =?utf-8?Q?=C3=A9?= <berrange@redhat.com>, John Snow <jsnow@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-I'm afraid this fell through the cracks, most likely because you
-neglected to cc: maintainers.  I'm doing that for you now.  Next time,
-feed your patches to scripts/get_maintainer.pl for suggestions on whom
-to copy.  Thanks!
 
-Liam Merwick <Liam.Merwick@oracle.com> writes:
 
-> Below are a number of fixes to some off-by-one, read outside array bounds=
-, and
-> NULL pointer accesses detected by an internal Oracle static analysis tool=
- (Parfait).
-> https://labs.oracle.com/pls/apex/f?p=3Dlabs:49:::::P49_PROJECT_ID:13
->
-> I have also included a patch to add a command-line option to configure to
-> select if AVX2 is used or not (keeping the existing behaviour by default).
-> My motivation was avoiding an issue with the static analysis tool but Net=
-Spectre
-> was announced as I was working on this and I felt it may have more genera=
-l uses.
->
-> v1 -> v2
-> Based on feedback from Eric Blake:
-> patch2: reworded commit message to clarify issue
-> patch6: Reverted common qlist routines and added assert to qlist_dump ins=
-tead
-> patch7: Fixed incorrect logic
-> patch8: Added QEMU_BUILD_BUG_ON to catch future =D1=96nstance at compile-=
-time
->
-> v2 -> v3
-> Based on feedback from Eric Blake:
-> patch6: removed double space from commit message
-> patch8: removed unnecessary comment and updated QEMU_BUILD_BUG_ON to use =
-ARRAY_SIZE
-> Added Eric's R-b to patches 6,7,8
->
-> Liam Merwick (8):
->   configure: Provide option to explicitly disable AVX2
->   job: Fix off-by-one assert checks for JobSTT and JobVerbTable
->   block: Null pointer dereference in blk_root_get_parent_desc()
->   qemu-img: potential Null pointer deref in img_commit()
->   block: Fix potential Null pointer dereferences in vvfat.c
->   block: dump_qlist() may dereference a Null pointer
->   io: potential unnecessary check in qio_channel_command_new_spawn()
->   qcow2: Read outside array bounds in qcow2_pre_write_overlap_check()
->
->  block/block-backend.c  |  2 +-
->  block/qapi.c           |  2 ++
->  block/qcow2-refcount.c | 18 ++++++++--------
->  block/vvfat.c          | 56 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  configure              | 11 ++++++++--
->  io/channel-command.c   |  3 +--
->  job.c                  |  4 ++--
->  qemu-img.c             |  3 +++
->  8 files changed, 84 insertions(+), 15 deletions(-)
+On 10/9/18 9:46 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Cleber,
+>=20
+> On 09/10/2018 06:18, Cleber Rosa wrote:
+>> This enables the execution of the acceptance tests on Travis.
+>=20
+> Did you test this? =3D)
+>=20
+
+I did have some jobs on Travis that looked promising.  But yeah, later I
+found some issues. :/
+
+>>
+>> Because the Travis environment is based on Ubuntu Trusty, it requires
+>> the python3-pip.
+>>
+>> Note: while another supposedely required component on newer versions
+>> (such as on Bionic) split the Python 3 installation further on the
+>> python3-venv package.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  .travis.yml | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/.travis.yml b/.travis.yml
+>> index 95be6ec59f..db1a31ea51 100644
+>> --- a/.travis.yml
+>> +++ b/.travis.yml
+>> @@ -36,6 +36,7 @@ addons:
+>>        - liburcu-dev
+>>        - libusb-1.0-0-dev
+>>        - libvte-2.90-dev
+>> +      - python3-pip
+>>        - sparse
+>>        - uuid-dev
+>>        - gcovr
+>> @@ -117,6 +118,11 @@ matrix:
+>>      - env: CONFIG=3D"--target-list=3Dx86_64-softmmu"
+>>        python:
+>>          - "3.6"
+>> +    # Acceptance (Functional) tests
+>> +    - env: CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_=
+64-softmmu"
+>> +           TEST_CMD=3D"make check-acceptance"
+>> +      python:
+>> +        - "3.6"
+>>      # Using newer GCC with sanitizers
+>>      - addons:
+>>          apt:
+>>
+>=20
+> Using the following patch:
+>=20
+> -- >8 --
+> diff --git a/.travis.yml b/.travis.yml
+> index 95be6ec59f..87e0c9a13f 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -118,4 +118,15 @@ matrix:
+>        python:
+>          - "3.6"
+> +    # Acceptance (Functional) tests
+> +    - env: CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_6=
+4-softmmu"
+> +           TEST_CMD=3D"make check-acceptance"
+> +           # sudo rm /usr/local/bin/pip*
+> +      python:
+> +        - "3.6"
+> +      addons:
+> +        apt:
+> +          packages:
+> +            - python3-pip
+> +            - python3.4-venv
+
+This patch revealed to me that, even though we're asking Travis for a
+Python 3.6 stack, we're manually pointing to the primary Python (3.4)
+installation.  This is in itself a source of problems.
+
+Read on...
+
+>      # Using newer GCC with sanitizers
+>      - addons:
+> ---
+>=20
+> I got some improvements until:
+>=20
+>   VENV    /home/travis/build/philmd/qemu/tests/venv
+>   MKDIR   /home/travis/build/philmd/qemu/tests/results
+>   PIP     /home/travis/build/philmd/qemu/tests/venv-requirements.txt
+> Exception:
+> Traceback (most recent call last):
+>   File "/usr/lib/python3/dist-packages/pip/basecommand.py", line 122, i=
+n
+> main
+>     status =3D self.run(options, args)
+>   File "/usr/lib/python3/dist-packages/pip/commands/install.py", line
+> 283, in run
+>     requirement_set.install(install_options, global_options,
+> root=3Doptions.root_path)
+>   File "/usr/lib/python3/dist-packages/pip/req.py", line 1436, in insta=
+ll
+>     requirement.install(install_options, global_options, *args, **kwarg=
+s)
+>   File "/usr/lib/python3/dist-packages/pip/req.py", line 672, in instal=
+l
+>     self.move_wheel_files(self.source_dir, root=3Droot)
+>   File "/usr/lib/python3/dist-packages/pip/req.py", line 902, in
+> move_wheel_files
+>     pycompile=3Dself.pycompile,
+>   File "/usr/lib/python3/dist-packages/pip/wheel.py", line 206, in
+> move_wheel_files
+>     clobber(source, lib_dir, True)
+>   File "/usr/lib/python3/dist-packages/pip/wheel.py", line 193, in clob=
+ber
+>     os.makedirs(destsubdir)
+>   File "/usr/lib/python3.4/os.py", line 237, in makedirs
+>     mkdir(name, mode)
+> PermissionError: [Errno 13] Permission denied:
+> '/usr/local/lib/python3.4/dist-packages/avocado'
+>=20
+
+This looks to me like it's caused by the use of the system wide Python
+3.4 installation, as mentioned above.  That, and possibly the
+"--system-wide-packages" flag to the venv.
+
+So, in order to understand if, in those environments, we should let
+"configure" pick up the right Python, I did the following experiment:
+
+ $ python3 -m venv /tmp/py3-build
+ $ . /tmp/py3-build/bin/activate
+ $ which python
+ /tmp/py3-build/bin/python
+ $ /tmp/py3-build/bin/python --version
+ Python 3.6.6
+
+This shows that when a venv is activated, the "right" Python should be
+available in the $PATH.  So, building QEMU without pointint to a
+specific Python binary (when inside a venv) gives you:
+
+ $ mkdir -p /tmp/qemu-build
+ $ cd /tmp/qemu-build
+ $ ~/src/qemu/configure --target-list=3D"x86_64-softmmu"
+ $ make print-PYTHON
+ PYTHON=3Dpython -B
+ $ which python
+ /tmp/py3-build/bin/python
+
+The whole question now is how/where Travis puts the requested Python
+version (python: - "3.6").  Is it on a venv?  Is it on a specific
+location? Is that reliable enough?
+
+I'm going to look for those answers now.
+
+- Cleber.
+
+> See: https://travis-ci.org/philmd/qemu/jobs/439138706
+>=20
