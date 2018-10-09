@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1g9l2q-0007jo-0B
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 01:59:00 -0400
+	(envelope-from <philmd@redhat.com>) id 1g9l6z-0000N4-4P
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:03:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1g9l2o-00045B-Sc
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 01:58:59 -0400
-Received: from mail-it1-x135.google.com ([2607:f8b0:4864:20::135]:33542)
+	(envelope-from <philmd@redhat.com>) id 1g9l6g-0007ZF-Lo
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:03:16 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53386)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1g9l2o-00044z-Lk
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 01:58:58 -0400
-Received: by mail-it1-x135.google.com with SMTP id h6-v6so12399491ith.0
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 22:58:58 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9l6g-0006Ue-0M
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:02:58 -0400
+Received: by mail-wm1-f66.google.com with SMTP id y11-v6so513768wma.3
+	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 23:02:12 -0700 (PDT)
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-21-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <bcbe4c36-d2df-fe41-60e2-cde3a1057771@redhat.com>
+Date: Tue, 9 Oct 2018 08:02:04 +0200
 MIME-Version: 1.0
-References: <1539052760-11730-1-git-send-email-liq3ea@gmail.com>
-	<7a26945a-d94f-98db-7ae2-0d4c089ab975@redhat.com>
-In-Reply-To: <7a26945a-d94f-98db-7ae2-0d4c089ab975@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 9 Oct 2018 13:58:21 +0800
-Message-ID: <CAKXe6SKqfm2qXuN4YNWQTOnrF9O2OFqg41vp6y-ANMgqLLXBLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] vl.c: print error message if load
- fw_cfg file failed
+In-Reply-To: <20181008173125.19678-21-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 20/31] vl: Clean up error reporting in
+ machine_set_property()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: philmd@redhat.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>, f4bug@amsat.org, Qemu Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-Hello  Philippe,
+On 08/10/2018 19:31, Markus Armbruster wrote:
+> Calling error_report() in a function that takes an Error ** argument
+> is suspicious.  machine_set_property() does that, and then fails without
+> setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+> with it, but clean it up anyway.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2018=E5=B9=B410=E6=
-=9C=889=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=881:52=E5=86=99=E9=81=93=
-=EF=BC=9A
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> Hi Li,
->
-> On 09/10/2018 04:39, Li Qiang wrote:
-> > It makes sense to print the error message while reading
-> > file failed.
->
-> OK
->
-> >
-> > Change since v1:
-> > free error
->
-> Changes are useful for reviewer, but not in the git history.
-> You can have them automatically stripped if you place them below the
-> next '---' separator.
->
->
-Thanks for your advice.
-
-
-> Hopefully the maintainer taking this patch can clean this up.
->
-> >
-> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
->
-> Here goes comment not worth to stay forever in git history:
->
->   Since v1: ...
->
-> >  vl.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/vl.c b/vl.c
-> > index 4e25c78..69fc77c 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -2207,8 +2207,10 @@ static int parse_fw_cfg(void *opaque, QemuOpts
-> *opts, Error **errp)
-> >          size =3D strlen(str); /* NUL terminator NOT included in fw_cfg
-> blob */
-> >          buf =3D g_memdup(str, size);
-> >      } else {
-> > -        if (!g_file_get_contents(file, &buf, &size, NULL)) {
-> > -            error_report("can't load %s", file);
-> > +        GError *error =3D NULL;
-> > +        if (!g_file_get_contents(file, &buf, &size, &error)) {
-> > +            error_report("can't load %s, %s", file, error->message);
->
-> If you ever respin, you can help Markus [1] effort using:
->
->             error_setg(errp, "can't load %s, %s", file, error->message);
->
-> Else your patch will clash with [2].
->
-
-OK, I will send out this patch based Markus' tree or later when his patch
-goes to upstream.
-
-Thanks,
-Li Qiang
-
-
->
-> > +            g_error_free(error);
-> >              return -1;
-> >          }
-> >      }
-> >
->
-> Regards,
->
-> Phil.
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01394.html
-> [2] https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg01406.html
->
+> ---
+>  vl.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index ecb70f87d8..3adc9dbe4f 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2676,7 +2676,7 @@ static int machine_set_property(void *opaque,
+>      g_free(qom_name);
+>  
+>      if (local_err) {
+> -        error_report_err(local_err);
+> +        error_propagate(errp, local_err);
+>          return -1;
+>      }
+>  
+> @@ -4201,11 +4201,8 @@ int main(int argc, char **argv, char **envp)
+>      }
+>  
+>      machine_opts = qemu_get_machine_opts();
+> -    if (qemu_opt_foreach(machine_opts, machine_set_property, current_machine,
+> -                         NULL)) {
+> -        object_unref(OBJECT(current_machine));
+> -        exit(1);
+> -    }
+> +    qemu_opt_foreach(machine_opts, machine_set_property, current_machine,
+> +                     &error_fatal);
+>  
+>      configure_accelerator(current_machine);
+>  
+> 
