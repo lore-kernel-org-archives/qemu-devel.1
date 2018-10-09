@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9wEf-00023J-HC
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:55:58 -0400
+	(envelope-from <crosa@redhat.com>) id 1g9wGW-0003dt-Qd
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:57:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1g9wEb-0007m2-My
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:55:55 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42247)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1g9wEZ-0007lF-JP
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:55:53 -0400
-Received: by mail-ot1-x342.google.com with SMTP id c23so787618otl.9
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 10:55:51 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20181009174557.16125-2-cota@braap.org>
-References: <20181009174557.16125-1-cota@braap.org>
-	<20181009174557.16125-2-cota@braap.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 9 Oct 2018 18:55:30 +0100
-Message-ID: <CAFEAcA8DyV6_BfRZT2_9K1PKNkPnLqw8e=55uJ3R1r5+ejkRFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] target/alpha: remove tlb_flush from
- alpha_cpu_initfn
+	(envelope-from <crosa@redhat.com>) id 1g9wGT-0000xc-KF
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:57:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1g9wGT-0000xM-C6
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 13:57:49 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Date: Tue,  9 Oct 2018 13:57:37 -0400
+Message-Id: <20181009175740.13812-1-crosa@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] Bootstrap Python venv and
+ acceptance/functional tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +22,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 9 October 2018 at 18:45, Emilio G. Cota <cota@braap.org> wrote:
-> As far as I can tell tlb_flush does not need to be called
-> this early. tlb_flush is eventually called after the CPU
-> has been realized.
->
-> This change paves the way to the introduction of tlb_init,
-> which will be called from cpu_exec_realizefn.
->
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  target/alpha/cpu.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-> index b08078e7fc..a953897fcc 100644
-> --- a/target/alpha/cpu.c
-> +++ b/target/alpha/cpu.c
-> @@ -201,7 +201,6 @@ static void alpha_cpu_initfn(Object *obj)
->      CPUAlphaState *env = &cpu->env;
->
->      cs->env_ptr = env;
-> -    tlb_flush(cs);
->
->      env->lock_addr = -1;
->  #if defined(CONFIG_USER_ONLY)
-> --
-> 2.17.1
+TL;DR
+=====
 
-Definitely agreed that we don't want to tlb_flush in the
-target cpu initfn.
+Allow acceptance tests to be run with `make check-acceptance`.
 
+Details
+=======
 
-What's the codepath by which tlb_flush gets called on
-cpu reset? I had a quick look but couldn't find it...
+This introduces a Python virtual environment that will be setup within
+the QEMU build directory, that will contain the exact environment that
+tests may require.
 
-(The other dubious-looking bit of flushing in the
-target/alpha code is the code that generates calls
-to tb_flush()... we have very few calls to tb_flush
-outside the 'core' code and I suspect they could all
-be avoided.)
+There's one current caveat: it requires Python 3, as it's based on the
+venv module.  This was based on some discussions and perception about
+standardizing on Python 3, but can easily be made to accommodate Python
+2 as well.
 
-thanks
--- PMM
+Changes from v2:
+================
+
+ * Make the $(TESTS_VENV_DIR) target depend on the
+   venv-requirements.txt file, and touch $(TESTS_VENV_DIR) after venv
+   runs.  With this, updates on the file are reflected on the
+   venv. (Philippe)
+
+ * Run pip with "python -m pip".  It may have been installed reusing
+   the system wide packages, and then the script may not be available
+   on the venv. (Philippe)
+
+ * Dropped Python version on Travis, and using the version supplied
+   by the distro (3.4). (Philippe)
+
+ * Added "python3.4-venv" package requirement on Travis. (Philippe)
+
+ * Travis jobs have been sucesfully executed with this approach:
+   https://travis-ci.org/philmd/qemu/jobs/439254826
+
+ * Added variable (AVOCADO_SHOW) with logging streams to be shown
+   while running the acceptance tests.  By default it's set to none,
+   the equivalent of the quiet mode used on previous versions.
+   (Philippe)
+
+ * On Travis, set the AVOCADO_SHOW variable to "app", so that the
+   individual test results can be easily seen.  (Philippe)
+
+Ideas discussed, but not implemented:
+
+  * Run pip with "$(PYTHON) -m pip -q install ..." because it points
+    to the system wide Python installation. (Philippe)
+
+  * Drop the "--system-site-packages" flag.  Waiting on another round
+    of tests to determine if they are really the cause of some package
+    installation problems.
+
+Changes from v1:
+================
+
+ * TESTS_VENV_REQ (the path of "venv-requirements.txt") now points to
+   the source path ($SRC_PATH instead of $BUILD_DIR)
+
+ * Create the venv with "--system-site-packages", which allows the
+   reuse of packages (and no additional downloads) in case there's a
+   package installed system wide providing the same package and
+   version.
+
+ * Run Avocado with "python -m avocado".  It may have been installed
+   reusing the system wide packages, and then the script may not
+   be available on the venv.
+
+ * Improved documentation describing the Python 3, venv and pip
+   requirements.
+
+ * Updated avocado-framework requirement to latest released version
+   (65.0)
+
+ * (New commit) Added support for running the acceptance tests on
+   Travis.
+
+Ideas discussed, but not implemented:
+
+ * Install external packages such as python3-pip on Debian based
+   systems, deemed too invasive on developer's systems.
+
+ * Allow the use of Python 2, and consequently the "virtualenv"
+   module.
+
+Cleber Rosa (3):
+  Bootstrap Python venv for tests
+  Acceptance tests: add make rule for running them
+  Travis support for the acceptance tests
+
+ .travis.yml                 |  5 +++++
+ docs/devel/testing.rst      | 35 ++++++++++++++++++++++++++++++-----
+ tests/Makefile.include      | 37 +++++++++++++++++++++++++++++++++++++
+ tests/venv-requirements.txt |  4 ++++
+ 4 files changed, 76 insertions(+), 5 deletions(-)
+ create mode 100644 tests/venv-requirements.txt
+
+-- 
+2.17.1
