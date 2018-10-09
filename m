@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g9oOf-00005x-PX
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:33:46 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9ocA-00030h-Mi
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:47:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1g9oOa-0004qU-OB
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:33:45 -0400
-References: <20181005092024.14344-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <bdae39b9-830e-decc-eaca-abf636578f70@redhat.com>
-Date: Tue, 9 Oct 2018 11:32:32 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9oc9-0006Rq-RY
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:47:42 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g9oc9-0006RL-Kq
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 05:47:41 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n1-v6so1069884wrt.10
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 02:47:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181005092024.14344-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 00/16] memory-device: complete
- refactoring
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-14-armbru@redhat.com>
+In-Reply-To: <20181008173125.19678-14-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 9 Oct 2018 13:47:28 +0400
+Message-ID: <CAJ+F1CJ_XUDJdXfRCBT0Oz48=8RZaWP5HJuUZhpxP+vBVq41Xw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 13/31] net/socket: Fix invalid socket type
+ error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-ppc@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitul@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Auger Eric <eric.auger@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 
-On 05/10/2018 11:20, David Hildenbrand wrote:
-> This series completes refactoring of pre_plug, plug and unplug logic of
-> memory devices. With this as a basis, we can built e.g. virtio
-> based memory devices or internal "RAM chip" devices.
-> 
-> I dropped the virtio-pmem prototype for now, I will look into plugging
-> it differently next. But this part in this series here is independent of
-> hotplug handler changes required to make it work for virtio devices.
-> 
-> v4 -> v5:
-> - Added a bunch of RB's
-> - Minor spelling fixed
-> - Dropped "memory-device: add class function get_device_id()"
-> - Added   "memory-device: improve "range conflicts" error message
-> - Dropped "memory-device: handle integer overflows properly"
-> -- Will require more changes. But I am able to reproduce some overflows.
-> - "memory-device: document MemoryDeviceClass"
-> -- Changed documentation format as requested by Auger
-> - "memory-device: trace when pre_plugging/plugging/unplugging"
-> -- Include device ID and rename tracepoints.
+Hi
+On Mon, Oct 8, 2018 at 9:45 PM Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Calling error_report() in a function that takes an Error ** argument
+> is suspicious.  net_socket_fd_init() does that, and then fails without
+> setting an error.  Wrong.  I didn't analyze how exactly this can
+> break.  A caller that reports the error on failure would crash.
+>
+> Broken when commit c37f0bb1d0d (v2.11.0) converted the function to
+> Error.  Fix by calling error_setg() instead of error_report().
+>
+> Fixes: c37f0bb1d0d24e3a6b5f4659bb305913dcb798a6
+> Cc: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-@Paolo, @Eduardo this seems to be ready to get picked up. Thanks!
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+> ---
+>  net/socket.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index 6917fbcbf5..90ef3517be 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -453,8 +453,8 @@ static NetSocketState *net_socket_fd_init(NetClientSt=
+ate *peer,
+>      case SOCK_STREAM:
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_conne=
+cted);
+>      default:
+> -        error_report("socket type=3D%d for fd=3D%d must be either"
+> -                     " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
+> +        error_setg(errp, "socket type=3D%d for fd=3D%d must be either"
+> +                   " SOCK_DGRAM or SOCK_STREAM", so_type, fd);
+>          closesocket(fd);
+>      }
+>      return NULL;
+> --
+> 2.17.1
+>
+>
 
 
--- 
-
-Thanks,
-
-David / dhildenb
+--=20
+Marc-Andr=C3=A9 Lureau
