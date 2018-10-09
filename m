@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1g9rVU-0007pU-2Y
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:53:00 -0400
+	(envelope-from <berrange@redhat.com>) id 1g9rYH-0000Ud-Kn
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1g9rVP-0007yc-4P
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:53:00 -0400
-Received: from mail-bgr052101131090.outbound.protection.outlook.com
-	([52.101.131.90]:20736
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1g9rVO-0007vz-SC
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:52:55 -0400
-Date: Tue, 9 Oct 2018 15:20:47 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20181009122046.GC29982@rkaganb.sw.ru>
-References: <20181008112726.16140-1-vkuznets@redhat.com>
-	<20181008112726.16140-2-vkuznets@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1g9rYC-00041q-KZ
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:55:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37718)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1g9rYC-00041L-FD
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 08:55:48 -0400
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Tue,  9 Oct 2018 13:55:35 +0100
+Message-Id: <20181009125541.24455-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181008112726.16140-2-vkuznets@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] linux-headers: update to pre-4.20
- (kvm/queue)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/6] crypto: improve performance of XTS cipher
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +25,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On Mon, Oct 08, 2018 at 01:27:25PM +0200, Vitaly Kuznetsov wrote:
-> This brings us three new defines: KVM_CAP_ARM_INJECT_SERROR_ESR,
-> KVM_CAP_MSR_PLATFORM_INFO and KVM_CAP_HYPERV_SEND_IPI.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  linux-headers/linux/kvm.h | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 66790724f1..043f1e58b6 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -9,7 +9,7 @@
->   */
->  
->  #include <linux/types.h>
-> -
-> +#include <linux/compiler.h>
->  #include <linux/ioctl.h>
->  #include <asm/kvm.h>
->  
-> @@ -481,7 +481,7 @@ struct kvm_dirty_log {
->  	__u32 slot;
->  	__u32 padding1;
->  	union {
-> -		void *dirty_bitmap; /* one bit per page */
-> +		void __user *dirty_bitmap; /* one bit per page */
+The XTS cipher mode is significantly slower than CBC mode. This series
+approximately doubles the XTS performance which will improve the I/O
+rate for LUKS disks.
 
-Hmm, I thought "__user" and friends are supposed to get stripped while
-"make headers_install".  Does it build like this?
+Daniel P. Berrang=C3=A9 (6):
+  crypto: expand algorithm coverage for cipher benchmark
+  crypto: remove code duplication in tweak encrypt/decrypt
+  crypto: introduce a xts_uint128 data type
+  crypto: convert xts_tweak_encdec to use xts_uint128 type
+  crypto: convert xts_mult_x to use xts_uint128 type
+  crypto: annotate xts_tweak_encdec as inlineable
 
-Roman.
+ crypto/xts.c                    | 147 ++++++++++++++-----------------
+ tests/benchmark-crypto-cipher.c | 149 +++++++++++++++++++++++++++-----
+ 2 files changed, 191 insertions(+), 105 deletions(-)
+
+--=20
+2.17.1
