@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g9sLl-00060C-Sa
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:47:02 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9sQB-0000lL-DD
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:51:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g9sLh-0008Qf-74
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:47:01 -0400
-Received: from mail-wr1-f41.google.com ([209.85.221.41]:36976)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1g9sQA-0006Az-5Y
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:51:35 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34278)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9sLg-0008Pe-UJ
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:46:57 -0400
-Received: by mail-wr1-f41.google.com with SMTP id y11-v6so1911836wrd.4
-	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 06:46:56 -0700 (PDT)
-References: <20181009041826.19462-1-crosa@redhat.com>
-	<20181009041826.19462-4-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <75560722-a9f5-5ec9-b851-d521960ed8eb@redhat.com>
-Date: Tue, 9 Oct 2018 15:46:53 +0200
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1g9sQ9-00069U-SY
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 09:51:34 -0400
+Received: by mail-wr1-x444.google.com with SMTP id l6-v6so1514656wrt.1
+	for <qemu-devel@nongnu.org>; Tue, 09 Oct 2018 06:51:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20181009041826.19462-4-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] Travis support for the acceptance
- tests
+References: <20181009125541.24455-1-berrange@redhat.com>
+	<20181009125541.24455-3-berrange@redhat.com>
+In-Reply-To: <20181009125541.24455-3-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 9 Oct 2018 17:51:20 +0400
+Message-ID: <CAJ+F1CJm=NVweKN2neKqJyLF+BhZudRYZuwsYq4GYt925c3a5g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/6] crypto: remove code duplication in
+ tweak encrypt/decrypt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +31,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>
 
-Hi Cleber,
+Hi
 
-On 09/10/2018 06:18, Cleber Rosa wrote:
-> This enables the execution of the acceptance tests on Travis.
+On Tue, Oct 9, 2018 at 4:56 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+> wrote:
+>
+> The tweak encrypt/decrypt functions are identical except for the
+> comments, so can be merged. Profiling data shows that the compiler is
+> in fact already merging the two merges in the object files.
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Did you test this? =)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> 
-> Because the Travis environment is based on Ubuntu Trusty, it requires
-> the python3-pip.
-> 
-> Note: while another supposedely required component on newer versions
-> (such as on Bionic) split the Python 3 installation further on the
-> python3-venv package.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  .travis.yml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 95be6ec59f..db1a31ea51 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -36,6 +36,7 @@ addons:
->        - liburcu-dev
->        - libusb-1.0-0-dev
->        - libvte-2.90-dev
-> +      - python3-pip
->        - sparse
->        - uuid-dev
->        - gcovr
-> @@ -117,6 +118,11 @@ matrix:
->      - env: CONFIG="--target-list=x86_64-softmmu"
->        python:
->          - "3.6"
-> +    # Acceptance (Functional) tests
-> +    - env: CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
-> +           TEST_CMD="make check-acceptance"
-> +      python:
-> +        - "3.6"
->      # Using newer GCC with sanitizers
->      - addons:
->          apt:
-> 
+>  crypto/xts.c | 64 ++++++++++++----------------------------------------
+>  1 file changed, 15 insertions(+), 49 deletions(-)
+>
+> diff --git a/crypto/xts.c b/crypto/xts.c
+> index 95212341f6..3c1a92f01d 100644
+> --- a/crypto/xts.c
+> +++ b/crypto/xts.c
+> @@ -43,20 +43,20 @@ static void xts_mult_x(uint8_t *I)
+>
+>
+>  /**
+> - * xts_tweak_uncrypt:
+> + * xts_tweak_encdec:
+>   * @param ctxt: the cipher context
+>   * @param func: the cipher function
+> - * @src: buffer providing the cipher text of XTS_BLOCK_SIZE bytes
+> - * @dst: buffer to output the plain text of XTS_BLOCK_SIZE bytes
+> + * @src: buffer providing the input text of XTS_BLOCK_SIZE bytes
+> + * @dst: buffer to output the output text of XTS_BLOCK_SIZE bytes
+>   * @iv: the initialization vector tweak of XTS_BLOCK_SIZE bytes
+>   *
+> - * Decrypt data with a tweak
+> + * Encrypt/decrypt data with a tweak
+>   */
+> -static void xts_tweak_decrypt(const void *ctx,
+> -                              xts_cipher_func *func,
+> -                              const uint8_t *src,
+> -                              uint8_t *dst,
+> -                              uint8_t *iv)
+> +static void xts_tweak_encdec(const void *ctx,
+> +                             xts_cipher_func *func,
+> +                             const uint8_t *src,
+> +                             uint8_t *dst,
+> +                             uint8_t *iv)
+>  {
+>      unsigned long x;
+>
+> @@ -105,7 +105,7 @@ void xts_decrypt(const void *datactx,
+>      encfunc(tweakctx, XTS_BLOCK_SIZE, T, iv);
+>
+>      for (i =3D 0; i < lim; i++) {
+> -        xts_tweak_decrypt(datactx, decfunc, src, dst, T);
+> +        xts_tweak_encdec(datactx, decfunc, src, dst, T);
+>
+>          src +=3D XTS_BLOCK_SIZE;
+>          dst +=3D XTS_BLOCK_SIZE;
+> @@ -117,7 +117,7 @@ void xts_decrypt(const void *datactx,
+>          xts_mult_x(CC);
+>
+>          /* PP =3D tweak decrypt block m-1 */
+> -        xts_tweak_decrypt(datactx, decfunc, src, PP, CC);
+> +        xts_tweak_encdec(datactx, decfunc, src, PP, CC);
+>
+>          /* Pm =3D first length % XTS_BLOCK_SIZE bytes of PP */
+>          for (i =3D 0; i < mo; i++) {
+> @@ -129,7 +129,7 @@ void xts_decrypt(const void *datactx,
+>          }
+>
+>          /* Pm-1 =3D Tweak uncrypt CC */
+> -        xts_tweak_decrypt(datactx, decfunc, CC, dst, T);
+> +        xts_tweak_encdec(datactx, decfunc, CC, dst, T);
+>      }
+>
+>      /* Decrypt the iv back */
+> @@ -137,40 +137,6 @@ void xts_decrypt(const void *datactx,
+>  }
+>
+>
+> -/**
+> - * xts_tweak_crypt:
+> - * @param ctxt: the cipher context
+> - * @param func: the cipher function
+> - * @src: buffer providing the plain text of XTS_BLOCK_SIZE bytes
+> - * @dst: buffer to output the cipher text of XTS_BLOCK_SIZE bytes
+> - * @iv: the initialization vector tweak of XTS_BLOCK_SIZE bytes
+> - *
+> - * Encrypt data with a tweak
+> - */
+> -static void xts_tweak_encrypt(const void *ctx,
+> -                              xts_cipher_func *func,
+> -                              const uint8_t *src,
+> -                              uint8_t *dst,
+> -                              uint8_t *iv)
+> -{
+> -    unsigned long x;
+> -
+> -    /* tweak encrypt block i */
+> -    for (x =3D 0; x < XTS_BLOCK_SIZE; x++) {
+> -        dst[x] =3D src[x] ^ iv[x];
+> -    }
+> -
+> -    func(ctx, XTS_BLOCK_SIZE, dst, dst);
+> -
+> -    for (x =3D 0; x < XTS_BLOCK_SIZE; x++) {
+> -        dst[x] =3D dst[x] ^ iv[x];
+> -    }
+> -
+> -    /* LFSR the tweak */
+> -    xts_mult_x(iv);
+> -}
+> -
+> -
+>  void xts_encrypt(const void *datactx,
+>                   const void *tweakctx,
+>                   xts_cipher_func *encfunc,
+> @@ -200,7 +166,7 @@ void xts_encrypt(const void *datactx,
+>      encfunc(tweakctx, XTS_BLOCK_SIZE, T, iv);
+>
+>      for (i =3D 0; i < lim; i++) {
+> -        xts_tweak_encrypt(datactx, encfunc, src, dst, T);
+> +        xts_tweak_encdec(datactx, encfunc, src, dst, T);
+>
+>          dst +=3D XTS_BLOCK_SIZE;
+>          src +=3D XTS_BLOCK_SIZE;
+> @@ -209,7 +175,7 @@ void xts_encrypt(const void *datactx,
+>      /* if length is not a multiple of XTS_BLOCK_SIZE then */
+>      if (mo > 0) {
+>          /* CC =3D tweak encrypt block m-1 */
+> -        xts_tweak_encrypt(datactx, encfunc, src, CC, T);
+> +        xts_tweak_encdec(datactx, encfunc, src, CC, T);
+>
+>          /* Cm =3D first length % XTS_BLOCK_SIZE bytes of CC */
+>          for (i =3D 0; i < mo; i++) {
+> @@ -222,7 +188,7 @@ void xts_encrypt(const void *datactx,
+>          }
+>
+>          /* Cm-1 =3D Tweak encrypt PP */
+> -        xts_tweak_encrypt(datactx, encfunc, PP, dst, T);
+> +        xts_tweak_encdec(datactx, encfunc, PP, dst, T);
+>      }
+>
+>      /* Decrypt the iv back */
+> --
+> 2.17.1
+>
+>
 
-Using the following patch:
 
--- >8 --
-diff --git a/.travis.yml b/.travis.yml
-index 95be6ec59f..87e0c9a13f 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -118,4 +118,15 @@ matrix:
-       python:
-         - "3.6"
-+    # Acceptance (Functional) tests
-+    - env: CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu"
-+           TEST_CMD="make check-acceptance"
-+           # sudo rm /usr/local/bin/pip*
-+      python:
-+        - "3.6"
-+      addons:
-+        apt:
-+          packages:
-+            - python3-pip
-+            - python3.4-venv
-     # Using newer GCC with sanitizers
-     - addons:
----
-
-I got some improvements until:
-
-  VENV    /home/travis/build/philmd/qemu/tests/venv
-  MKDIR   /home/travis/build/philmd/qemu/tests/results
-  PIP     /home/travis/build/philmd/qemu/tests/venv-requirements.txt
-Exception:
-Traceback (most recent call last):
-  File "/usr/lib/python3/dist-packages/pip/basecommand.py", line 122, in
-main
-    status = self.run(options, args)
-  File "/usr/lib/python3/dist-packages/pip/commands/install.py", line
-283, in run
-    requirement_set.install(install_options, global_options,
-root=options.root_path)
-  File "/usr/lib/python3/dist-packages/pip/req.py", line 1436, in install
-    requirement.install(install_options, global_options, *args, **kwargs)
-  File "/usr/lib/python3/dist-packages/pip/req.py", line 672, in install
-    self.move_wheel_files(self.source_dir, root=root)
-  File "/usr/lib/python3/dist-packages/pip/req.py", line 902, in
-move_wheel_files
-    pycompile=self.pycompile,
-  File "/usr/lib/python3/dist-packages/pip/wheel.py", line 206, in
-move_wheel_files
-    clobber(source, lib_dir, True)
-  File "/usr/lib/python3/dist-packages/pip/wheel.py", line 193, in clobber
-    os.makedirs(destsubdir)
-  File "/usr/lib/python3.4/os.py", line 237, in makedirs
-    mkdir(name, mode)
-PermissionError: [Errno 13] Permission denied:
-'/usr/local/lib/python3.4/dist-packages/avocado'
-
-See: https://travis-ci.org/philmd/qemu/jobs/439138706
+--
+Marc-Andr=C3=A9 Lureau
