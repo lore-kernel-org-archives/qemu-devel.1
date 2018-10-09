@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g9lB9-0002zh-La
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:07:36 -0400
+	(envelope-from <armbru@redhat.com>) id 1g9lCJ-0003nD-9I
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:08:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1g9lB4-00037L-Og
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:07:35 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36837)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1g9lB4-00036m-Ht
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:07:30 -0400
-Received: by mail-wm1-f67.google.com with SMTP id a8-v6so543912wmf.1
-	for <qemu-devel@nongnu.org>; Mon, 08 Oct 2018 23:07:30 -0700 (PDT)
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-20-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <22620f6c-86ae-ca8b-1c15-3d06f5209ab6@redhat.com>
-Date: Tue, 9 Oct 2018 08:07:27 +0200
+	(envelope-from <armbru@redhat.com>) id 1g9lCE-0004dI-9Z
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:08:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47104)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1g9lCD-0004cQ-VW
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 02:08:42 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue,  9 Oct 2018 08:08:35 +0200
+Message-Id: <20181009060835.4608-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181008173125.19678-20-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 19/31] vl: Clean up error reporting in
- parse_add_fd()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] ssi-sd: Make devices picking up backends
+ unavailable with -device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, thuth@redhat.com, philmd@redhat.com
 
-On 08/10/2018 19:31, Markus Armbruster wrote:
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  chardev_init_func() does that, and then fails without
-> setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-> with it, but clean it up anyway.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Device models aren't supposed to go on fishing expeditions for
+backends.  They should expose suitable properties for the user to set.
+For onboard devices, board code sets them.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Device ssi-sd picks up its block backend in its init() method with
+drive_get_next() instead.  This mistake is already marked FIXME since
+commit af9e40a.
 
-> ---
->  vl.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index b8576f8f10..ecb70f87d8 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2239,7 +2239,7 @@ static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
->  
->      if (!qemu_chr_new_from_opts(opts, &local_err)) {
->          if (local_err) {
-> -            error_report_err(local_err);
-> +            error_propagate(errp, local_err);
->              return -1;
->          }
->          exit(0);
-> @@ -4185,10 +4185,8 @@ int main(int argc, char **argv, char **envp)
->                        user_creatable_add_opts_foreach,
->                        object_create_initial, &error_fatal);
->  
-> -    if (qemu_opts_foreach(qemu_find_opts("chardev"),
-> -                          chardev_init_func, NULL, NULL)) {
-> -        exit(1);
-> -    }
-> +    qemu_opts_foreach(qemu_find_opts("chardev"),
-> +                      chardev_init_func, NULL, &error_fatal);
->  
->  #ifdef CONFIG_VIRTFS
->      if (qemu_opts_foreach(qemu_find_opts("fsdev"),
-> 
+Unset user_creatable to remove the mistake from our external
+interface.  Since the SSI bus doesn't support hotplug, only -device
+can be affected.  Only certain ARM machines have ssi-sd and provide an
+SSI bus for it; this patch breaks -device ssi-sd for these machines.
+No actual use of -device ssi-sd is known.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+v2:
+* Rebase to master
+* Improve commit message
+
+ hw/sd/ssi-sd.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index 95a143bfba..623d0333e8 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -284,6 +284,8 @@ static void ssi_sd_class_init(ObjectClass *klass, voi=
+d *data)
+     k->cs_polarity =3D SSI_CS_LOW;
+     dc->vmsd =3D &vmstate_ssi_sd;
+     dc->reset =3D ssi_sd_reset;
++    /* Reason: init() method uses drive_get_next() */
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo ssi_sd_info =3D {
+--=20
+2.17.1
