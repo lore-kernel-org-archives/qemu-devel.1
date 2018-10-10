@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gAElw-0002wd-Sv
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:43:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gAEpt-00062W-1d
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:47:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gAEls-00023N-Km
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:43:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19665)
+	(envelope-from <ehabkost@redhat.com>) id 1gAEpo-0004ud-QI
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:47:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gAElq-0001zg-Bo
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:43:27 -0400
-Message-ID: <a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Wed, 10 Oct 2018 15:43:19 +0200
-In-Reply-To: <3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gAEpj-0004qq-Dx
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:47:28 -0400
+Date: Wed, 10 Oct 2018 10:46:56 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181010134656.GE5738@habkost.net>
+References: <20181009232607.15521-1-crosa@redhat.com>
+	<20181009232607.15521-5-crosa@redhat.com>
+	<835fcb24-5832-9e6c-9f57-0364f0bf849a@redhat.com>
+	<95a8561c-0511-6a8a-a3eb-25d556029e7a@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <95a8561c-0511-6a8a-a3eb-25d556029e7a@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] scripts/qemu.py: set predefined
+ machine type based on arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stephen Bates <sbates@raithlin.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
-Cc: Keith Busch <keith.busch@intel.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard
-	W.M. Jones" <rjones@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-On Wed, 2018-10-10 at 13:11 +0000, Stephen  Bates wrote:
-> I also tried these out but I was interested in seeing if I could create NVMe models inside the new PCIe subsystem (for both the virt and sifive_u machines). The sifive_u machine did not work at all (so I'll leave that one for now). The virt machine successfully mapped in the NVMe devices and the OS driver was able to probe the nvme driver against them. However something seems to be broken with interrupts as I see messages like these in the OS dmesg:
-> 
-> [   62.852000] nvme nvme0: I/O 856 QID 1 timeout, completion polled
-> [   64.832000] nvme nvme1: I/O 819 QID 1 timeout, completion polled
-> [   64.836000] nvme nvme1: I/O 820 QID 1 timeout, completion polled
-> [   64.840000] nvme nvme1: I/O 821 QID 1 timeout, completion polled
-> [   64.844000] nvme nvme1: I/O 822 QID 1 timeout, completion polled
-> [   64.848000] nvme nvme0: I/O 856 QID 1 timeout, completion polled
-> [   64.852000] nvme nvme0: I/O 857 QID 1 timeout, completion polled
-> 
-> These imply the driver hit an admin queue timeout but when it reaped the NVMe admin completion queue it found commands were done but no interrupt was detected by the OS.
+On Wed, Oct 10, 2018 at 08:35:38AM -0400, Cleber Rosa wrote:
+>=20
+>=20
+> On 10/10/18 7:00 AM, Philippe Mathieu-Daud=E9 wrote:
+> > On 10/10/2018 01:26, Cleber Rosa wrote:
+> >> Some targets require a machine type to be set, as there's no default
+> >> (aarch64 is one example).  To give a consistent interface to users o=
+f
+> >> this API, this changes set_machine() so that a predefined default ca=
+n
+> >> be used, if one is not given.  The approach used is exactly the same
+> >> with the console device type.
+> >>
+> >> Also, even when there's a default machine type, for some purposes,
+> >> testing included, it's better if outside code is explicit about the
+> >> machine type, instead of relying on whatever is set internally.
+> >>
+> >> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> >> ---
+> >>  scripts/qemu.py | 22 +++++++++++++++++++++-
+> >>  1 file changed, 21 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> >> index d9e24a0c1a..fca9b76990 100644
+> >> --- a/scripts/qemu.py
+> >> +++ b/scripts/qemu.py
+> >> @@ -36,6 +36,15 @@ CONSOLE_DEV_TYPES =3D {
+> >>      r'^s390-ccw-virtio.*': 'sclpconsole',
+> >>      }
+> >> =20
+> >> +#: Maps archictures to the preferred machine type
+> >> +MACHINE_TYPES =3D {
+> >> +    r'^aarch64$': 'virt',
+> >> +    r'^ppc$': 'g3beige',
+> >> +    r'^ppc64$': 'pseries',
+> >> +    r'^s390x$': 's390-ccw-virtio',
+> >> +    r'^x86_64$': 'q35',
+> >=20
+> > Why choose Q35 rather than PC (the default)?
+> >=20
+> > I was wondering about how to generate variants/machines.json but this=
+ is
+> > definitively something we want to do via a QMP query.
+> >=20
+> > Eduardo what do you think?
+> >=20
+>=20
+> It was motivated by Eduardo's initiative to make q35 the default "acros=
+s
+> the board".  He can confirm and give more details.
 
-So it looks like you at least got to the point where the guest OS
-would find PCIe devices... Can you share the output of 'lspci' as
-well as the configuration you used when building your bbl?
+Making Q35 the default on applications using QEMU and libvirt is
+something I'd like to happen.  But I think the simplest way to do
+that is to change the QEMU default.  This way you won't need this
+table on qemu.py: you can just use the default provided by QEMU.
 
-> I plan to also try with a e1000 network interface model tomorrow and see how that behaves....
-
-Please do :)
-
--- 
-Andrea Bolognani / Red Hat / Virtualization
+--=20
+Eduardo
