@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gAC9K-00005o-Us
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:55:31 -0400
+	(envelope-from <philmd@redhat.com>) id 1gACD5-0000ug-8x
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:59:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gAC9K-0003As-7F
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:55:30 -0400
-Date: Wed, 10 Oct 2018 12:55:15 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181010105515.GA4134@localhost.localdomain>
-References: <20181009172501.17353-1-peter.maydell@linaro.org>
+	(envelope-from <philmd@redhat.com>) id 1gACCz-0007Yg-EO
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:59:21 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35484)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gACCy-0007Y7-Ck
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:59:17 -0400
+Received: by mail-wm1-f68.google.com with SMTP id e187-v6so5273526wmf.0
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 03:59:16 -0700 (PDT)
+References: <20181009232607.15521-1-crosa@redhat.com>
+	<20181009232607.15521-7-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <30d6b2fa-c529-6eb1-f9a0-476c390c5156@redhat.com>
+Date: Wed, 10 Oct 2018 12:59:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181009172501.17353-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 0/3] block/qcow*: Don't take address of
- fields in packed structs
+In-Reply-To: <20181009232607.15521-7-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] Acceptance Tests: add variants
+ definition for architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-Am 09.10.2018 um 19:24 hat Peter Maydell geschrieben:
-> Taking the address of a field in a packed struct is a bad idea, because
-> it might not be actually aligned enough for that pointer type (and
-> thus cause a crash on dereference on some host architectures). Newer
-> versions of clang warn about this. Avoid the bug by not using the
-> "modify in place" byte swapping functions.
+On 10/10/2018 01:26, Cleber Rosa wrote:
+> One of the Avocado features relevant to virtualization testing is the
+> ability to reuse tests in different scenarios, known as variants.
+> This adds a JSON based variants file, that can be used to run most
+> tests in a number of different architectures.  It can be run with:
 > 
-> There are a few places in the affected files where the in-place swap
-> function is used on something other than a packed struct field; we
-> convert those anyway, for consistency.
+>    $ avocado run \
+>      --json-variants-load=tests/acceptance/variants/arch.json \
+>      --filter-by-tags='-x86_64' -- tests/acceptance/
 > 
-> Patches produced mechanically using spatch; in one case I also
-> did a little hand-editing to wrap overlong lines that checkpatch
-> would otherwise complain about.
-> 
-> (clang also complains about other files in block: vdi.c, vpc.c,
-> vhdx.h, vhdx.c, vhdx-endian.c, vhdx-log.c -- I may produce patches
-> for those later if nobody else gets there first.)
-> 
-> thanks
-> -- PMM
-> 
-> Peter Maydell (3):
->   block/qcow2: Don't take address of fields in packed structs
->   block/qcow: Don't take address of fields in packed structs
->   block/qcow2-bitmap: Don't take address of fields in packed structs
+> Currently this covers 5 architectures, resulting in the execution
+> of 25 different combinations.
 
-Thanks, applied to the block branch.
+IMHO we should add this file with all supported archs, and CANCEL a job
+if there is no preferred machine in Qemu::MACHINE_TYPES.
 
-Kevin
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  tests/acceptance/variants/arch.json | 92 +++++++++++++++++++++++++++++
+>  1 file changed, 92 insertions(+)
+>  create mode 100644 tests/acceptance/variants/arch.json
