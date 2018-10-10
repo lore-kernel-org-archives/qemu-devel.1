@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gABRo-0000XB-GR
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:10:33 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gABrb-0003ko-I6
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:37:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gABRj-0001aO-DY
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:10:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50048)
+	(envelope-from <kraxel@redhat.com>) id 1gABrX-0005iv-JT
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:37:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gABRj-0001Yz-3q
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:10:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 220CB8666D
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 10:10:26 +0000 (UTC)
-Date: Wed, 10 Oct 2018 12:10:25 +0200
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gABrX-0005iV-CL
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 06:37:07 -0400
+Date: Wed, 10 Oct 2018 12:37:04 +0200
 From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20181010101025.kck5epmrqurpbeg6@sirius.home.kraxel.org>
-References: <20181008185013.19371-1-mreitz@redhat.com>
+Message-ID: <20181010103704.jqgfp3kiaiqu4hzt@sirius.home.kraxel.org>
+References: <20181009131052.18500-1-lhrazky@redhat.com>
+	<20181009131052.18500-2-lhrazky@redhat.com>
+	<1539113618.12871.122.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181008185013.19371-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] sdl2: Support all virtio-gpu formats
+In-Reply-To: <1539113618.12871.122.camel@redhat.com>
+Subject: Re: [Qemu-devel] [Spice-devel] [RFC PATCH spice 1/2] QXL interface:
+ add functions to identify monitors in the guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Jonathon Jongsma <jjongsma@redhat.com>
+Cc: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-On Mon, Oct 08, 2018 at 08:50:13PM +0200, Max Reitz wrote:
-> There are some 2D resource formats that can be used through virtio-gpu,
+  Hi,
 
-Ahem, not really.  XRGB is the only one which works in practice, and
-virtio-gpu kms driver will stop advertising anything else soon (patches
-should land upstream with the next merge window).
+> > + * Sets the hardware (e.g. PCI) path of the graphics device
+> > represented by this QXL interface instance.
+> 
+> So, this comment suggests that the caller might be able to provide a
+> path that is not a PCI path. But the implementation below (mostly the
+> debug output, I suppose...) assumes a PCI path. Do we need to support
+> non-PCI paths?
 
-> Add these formats in the switch converting pixman to SDL format
-> constants so a guest cannot crash the VM by triggering the
-> g_assert_not_reached() with an unsupported format.
+Certainly not for the initial revision, maybe never.
 
-Do you have a reproducer for that?
+But thanks to the "pci/" prefix we should be able to add support for
+other paths later in case it turns out we need it.
 
-There is sdl2_2d_check_format() which reports the supported formats.
-If we hit sdl2_2d_switch() with a format not whitelisted by
-sdl2_2d_check_format() we have a bug somewhere in qemu ...
+> > + * Returns: The actual SPICE server monitor_id associated with the
+> > display
+> 
+> So, if I remember correctly, Gerd recommended returning this value from
+> the function. But I think it needs more explanation here. What exactly
+> is a "monitor_id" supposed to represent? It is not used in your follow-
+> up qemu patch so it's hard to tell.
+
+IIRC the plan was to ditch the global monior_id idea and use the
+(channel_id, display_id) tuple everywhere ...
 
 cheers,
   Gerd
