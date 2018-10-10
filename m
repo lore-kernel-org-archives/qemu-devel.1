@@ -1,32 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gADjR-0002tn-U9
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:36:54 -0400
+	(envelope-from <pmorel@linux.ibm.com>) id 1gADkE-0003Oo-7D
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:37:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1gADjQ-0007Ne-Q7
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:36:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1gADjQ-0007Mz-Fh
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:36:52 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 74EDFA7EB
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 12:36:51 +0000 (UTC)
-Date: Wed, 10 Oct 2018 14:36:49 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20181010143649.37d0892c@redhat.com>
-In-Reply-To: <40220217-aa30-9436-22a8-9d1fca611d8e@redhat.com>
-References: <1539093025-101599-1-git-send-email-imammedo@redhat.com>
-	<9ccf4afa-3528-a336-3eb2-9fc516852e91@redhat.com>
-	<40220217-aa30-9436-22a8-9d1fca611d8e@redhat.com>
+	(envelope-from <pmorel@linux.ibm.com>) id 1gADk9-0007ln-1o
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:37:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50330)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1gADk8-0007l8-LK
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:37:36 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9ACUZHR017258
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 08:37:35 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2n1gugt2dy-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 08:37:34 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Wed, 10 Oct 2018 13:37:32 +0100
+Reply-To: pmorel@linux.ibm.com
+References: <20181009175226.22138-1-akrowiak@linux.vnet.ibm.com>
+	<20181009175226.22138-6-akrowiak@linux.vnet.ibm.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Wed, 10 Oct 2018 14:37:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] memory: move MemoryRegion::size cleanup to
- memory_region_finalize()
+In-Reply-To: <20181009175226.22138-6-akrowiak@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <b5b11801-256d-dc7b-2a16-ad4b25d9681b@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v10 5/6] s390x/vfio: ap: Introduce VFIO AP
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,128 +44,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
 
-On Tue, 9 Oct 2018 19:09:06 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+On 09/10/2018 19:52, Tony Krowiak wrote:
+> Introduces a VFIO based AP device. The device is defined via
+> the QEMU command line by specifying:
+>=20
+>      -device vfio-ap,sysfsdev=3D<path-to-mediated-matrix-device>
+>=20
+> There may be only one vfio-ap device configured for a guest.
+>=20
+> The mediated matrix device is created by the VFIO AP device
+> driver by writing a UUID to a sysfs attribute file (see
+> docs/vfio-ap.txt). The mediated matrix device will be named
+> after the UUID. Symbolic links to the $uuid are created in
+> many places, so the path to the mediated matrix device $uuid
+> can be specified in any of the following ways:
+>=20
+> /sys/devices/vfio_ap/matrix/$uuid
+> /sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/de=
+vices/$uuid
+> /sys/bus/mdev/devices/$uuid
+> /sys/bus/mdev/drivers/vfio_mdev/$uuid
+>=20
+> When the vfio-ap device is realized, it acquires and opens the
+> VFIO iommu group to which the mediated matrix device is
+> bound. This causes a VFIO group notification event to be
+> signaled. The vfio_ap device driver's group notification
+> handler will get called at which time the device driver
+> will configure the the AP devices to which the guest will
+> be granted access.
+>=20
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+> ---
+>   MAINTAINERS                       |   1 +
+>   default-configs/s390x-softmmu.mak |   1 +
+>   hw/vfio/Makefile.objs             |   1 +
+>   hw/vfio/ap.c                      | 180 +++++++++++++++++++++++++++++=
++
+>   include/hw/vfio/vfio-common.h     |   1 +
+>   5 files changed, 184 insertions(+)
+>   create mode 100644 hw/vfio/ap.c
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 97e8ed808bc0..29041da69237 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1209,6 +1209,7 @@ F: hw/s390x/ap-device.c
+>   F: hw/s390x/ap-bridge.c
+>   F: include/hw/s390x/ap-device.h
+>   F: include/hw/s390x/ap-bridge.h
+> +F: hw/vfio/ap.c
+>   L: qemu-s390x@nongnu.org
+>=20
+>   vhost
+> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-=
+softmmu.mak
+> index d6b67d50f0e4..5eef37592451 100644
+> --- a/default-configs/s390x-softmmu.mak
+> +++ b/default-configs/s390x-softmmu.mak
+> @@ -7,3 +7,4 @@ CONFIG_S390_FLIC=3Dy
+>   CONFIG_S390_FLIC_KVM=3D$(CONFIG_KVM)
+>   CONFIG_VFIO_CCW=3D$(CONFIG_LINUX)
+>   CONFIG_WDT_DIAG288=3Dy
+> +CONFIG_VFIO_AP=3D$(CONFIG_LINUX)
+> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+> index a2e7a0a7cf02..8b3f664d85f7 100644
+> --- a/hw/vfio/Makefile.objs
+> +++ b/hw/vfio/Makefile.objs
+> @@ -6,4 +6,5 @@ obj-$(CONFIG_SOFTMMU) +=3D platform.o
+>   obj-$(CONFIG_VFIO_XGMAC) +=3D calxeda-xgmac.o
+>   obj-$(CONFIG_VFIO_AMD_XGBE) +=3D amd-xgbe.o
+>   obj-$(CONFIG_SOFTMMU) +=3D spapr.o
+> +obj-$(CONFIG_VFIO_AP) +=3D ap.o
+>   endif
+> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+> new file mode 100644
+> index 000000000000..5543406afc58
+> --- /dev/null
+> +++ b/hw/vfio/ap.c
+> @@ -0,0 +1,180 @@
+> +/*
+> + * VFIO based AP matrix device assignment
+> + *
+> + * Copyright 2018 IBM Corp.
+> + * Author(s): Tony Krowiak <akrowiak@linux.ibm.com>
+> + *            Halil Pasic <pasic@linux.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or =
+(at
+> + * your option) any later version. See the COPYING file in the top-lev=
+el
+> + * directory.
+> + */
+> +
+> +#include <linux/vfio.h>
+> +#include <sys/ioctl.h>
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/vfio/vfio.h"
+> +#include "hw/vfio/vfio-common.h"
+> +#include "hw/s390x/ap-device.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/queue.h"
+> +#include "qemu/option.h"
+> +#include "qemu/config-file.h"
+> +#include "cpu.h"
+> +#include "kvm_s390x.h"
+> +#include "sysemu/sysemu.h"
+> +#include "hw/s390x/ap-bridge.h"
+> +#include "exec/address-spaces.h"
+> +
+> +#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
+> +
+> +typedef struct VFIOAPDevice {
+> +    APDevice apdev;
+> +    VFIODevice vdev;
+> +} VFIOAPDevice;
+> +
+> +#define VFIO_AP_DEVICE(obj) \
+> +        OBJECT_CHECK(VFIOAPDevice, (obj), VFIO_AP_DEVICE_TYPE)
+> +
+> +static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
+> +{
+> +    vdev->needs_reset =3D false;
+> +}
+> +
+> +/*
+> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
+> + * vfio-ap device now.
+> + */
+> +struct VFIODeviceOps vfio_ap_ops =3D {
+> +    .vfio_compute_needs_reset =3D vfio_ap_compute_needs_reset,
+> +};
+> +
+> +static void vfio_ap_put_device(VFIOAPDevice *vapdev)
+> +{
+> +    g_free(vapdev->vdev.name);
+> +    vfio_put_base_device(&vapdev->vdev);
+> +}
+> +
+> +static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp=
+)
+> +{
+> +    GError *gerror;
+> +    char *symlink, *group_path;
+> +    int groupid;
+> +
+> +    symlink =3D g_strdup_printf("%s/iommu_group", vapdev->vdev.sysfsde=
+v);
+> +    group_path =3D g_file_read_link(symlink, &gerror);
 
-> On 10/09/18 17:47, Paolo Bonzini wrote:
-> > On 09/10/2018 15:50, Igor Mammedov wrote:  
-> >> It's not necessary to clean up MemoryRegion::size manually in multiple places
-> >> like it's been implemented in
-> >>  (1cd3d49262 "memory: cleanup side effects of  memory_region_init_foo() on failure")
-> >> since each memory_region_init_foo() now calls object_unparent(mr) on failure,
-> >> memory region destructor memory_region_finalize() will be called upon its
-> >> completion for each memory_region_init_foo().
-> >> It's sufficient to clean MemoryRegion::size only from memory_region_finalize(),
-> >> so do it.  
-> > 
-> > Stupid question, why is it necessary to clear mr->size at all?...  
-> 
-> IIRC it is explained in the above-mentioned, earlier commit 1cd3d49262:
-> 
-> > if MemoryRegion intialization fails it's left in semi-initialized state,
-> > where it's size is not 0 and attached as child to owner object.
-> > And this leds to crash in following use-case:
-> >     (monitor) object_add memory-backend-file,id=mem1,size=99999G,mem-path=/tmp/foo,discard-data=yes
-> >     memory.c:2083: memory_region_get_ram_ptr: Assertion `mr->ram_block' failed
-> >     Aborted (core dumped)
-> > it happens due to assumption that memory region is intialized when
-> >    memory_region_size() != 0
-> > and therefore it's ok to access it in
-> >    file_backend_unparent()
-> >       if (memory_region_size() != 0)
-> >           memory_region_get_ram_ptr()
-> > 
-> > which happens when object_add fails and unparents failed backend making
-> > file_backend_unparent() access invalid memory region.  
-> 
-> I think it makes sense to zero out the size even if unparenting would, in itself, prevent the above crash. Because, in host_memory_backend_mr_inited(), we have:
-> 
->     /*
->      * NOTE: We forbid zero-length memory backend, so here zero means
->      * "we haven't inited the backend memory region yet".
->      */
-> 
-> I'm unsure how general that invariant is, but it can't hurt to honor it everywhere. (Especially if we can do the zeroing in one common place.)
-yep, we are (ab)using memory_region_size(MemoryRegion *mr) == 0
-as a check if memory pointed by 'mr' is valid memory region.
-In cases where MemoryRegion is not dynamically allocated,
-it allows us to avoid using an external validity flag.
 
-Even though unparenting solves 1cd3d49262 issue
-I'd prefer to leave clean state on failure if it doesn't
-incur a heavy penalty (performance|code complexity wise)
+hum I oversaw this change, it leads to segfault.
 
-> Anyway, I should defer to Igor on this! :)
-> 
-> Thanks,
-> Laszlo
-> 
-> >>  memory.c | 7 +------
-> >>  1 file changed, 1 insertion(+), 6 deletions(-)
-> >>
-> >> diff --git a/memory.c b/memory.c
-> >> index d852f11..ad24b57 100644
-> >> --- a/memory.c
-> >> +++ b/memory.c
-> >> @@ -1491,7 +1491,6 @@ void memory_region_init_ram_shared_nomigrate(MemoryRegion *mr,
-> >>      mr->ram_block = qemu_ram_alloc(size, share, mr, &err);
-> >>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-> >>      if (err) {
-> >> -        mr->size = int128_zero();
-> >>          object_unparent(OBJECT(mr));
-> >>          error_propagate(errp, err);
-> >>      }
-> >> @@ -1516,7 +1515,6 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
-> >>                                                mr, &err);
-> >>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-> >>      if (err) {
-> >> -        mr->size = int128_zero();
-> >>          object_unparent(OBJECT(mr));
-> >>          error_propagate(errp, err);
-> >>      }
-> >> @@ -1541,7 +1539,6 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
-> >>      mr->ram_block = qemu_ram_alloc_from_file(size, mr, ram_flags, path, &err);
-> >>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-> >>      if (err) {
-> >> -        mr->size = int128_zero();
-> >>          object_unparent(OBJECT(mr));
-> >>          error_propagate(errp, err);
-> >>      }
-> >> @@ -1565,7 +1562,6 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-> >>                                             fd, &err);
-> >>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-> >>      if (err) {
-> >> -        mr->size = int128_zero();
-> >>          object_unparent(OBJECT(mr));
-> >>          error_propagate(errp, err);
-> >>      }
-> >> @@ -1628,7 +1624,6 @@ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
-> >>      mr->ram_block = qemu_ram_alloc(size, false, mr, &err);
-> >>      mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-> >>      if (err) {
-> >> -        mr->size = int128_zero();
-> >>          object_unparent(OBJECT(mr));
-> >>          error_propagate(errp, err);
-> >>      }
-> >> @@ -1652,7 +1647,6 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
-> >>      mr->destructor = memory_region_destructor_ram;
-> >>      mr->ram_block = qemu_ram_alloc(size, false,  mr, &err);
-> >>      if (err) {
-> >> -        mr->size = int128_zero();
-> >>          object_unparent(OBJECT(mr));
-> >>          error_propagate(errp, err);
-> >>      }
-> >> @@ -1701,6 +1695,7 @@ static void memory_region_finalize(Object *obj)
-> >>      memory_region_clear_coalescing(mr);
-> >>      g_free((char *)mr->name);
-> >>      g_free(mr->ioeventfds);
-> >> +    mr->size = int128_zero();
-> >>  }
-> >>  
-> >>  Object *memory_region_owner(MemoryRegion *mr)
-> >>  
-> >   
-> 
+You must initialize gerror before use.
+The following patch avoid a segmentation fault:
+
+
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index 5543406afc..3b8e9ba6dc 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -59,7 +59,7 @@ static void vfio_ap_put_device(VFIOAPDevice *vapdev)
+
+  static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
+  {
+-    GError *gerror;
++    GError *gerror =3D NULL;
+      char *symlink, *group_path;
+      int groupid;
+
+
+
+Regards,
+Pierre
+
+
+
+
+With this:
+Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
