@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gADIr-00010q-FY
+	(envelope-from <fli@suse.com>) id 1gADIr-00010o-FG
 	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fli@suse.com>) id 1gADIk-0000VW-Bv
+	(envelope-from <fli@suse.com>) id 1gADIp-0000ZE-Tj
 	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:09:25 -0400
-Received: from smtp.nue.novell.com ([195.135.221.5]:55411)
+Received: from smtp.nue.novell.com ([195.135.221.5]:34814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gADIi-0000Tl-3r
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:09:17 -0400
+	(Exim 4.71) (envelope-from <fli@suse.com>) id 1gADIp-0000X8-Bb
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:09:23 -0400
 From: Fei Li <fli@suse.com>
-Date: Wed, 10 Oct 2018 20:08:35 +0800
-Message-Id: <20181010120841.13214-2-fli@suse.com>
+Date: Wed, 10 Oct 2018 20:08:36 +0800
+Message-Id: <20181010120841.13214-3-fli@suse.com>
 In-Reply-To: <20181010120841.13214-1-fli@suse.com>
 References: <20181010120841.13214-1-fli@suse.com>
-Subject: [Qemu-devel] [PATCH RFC v5 1/7] Fix segmentation fault when
- qemu_signal_init fails
+Subject: [Qemu-devel] [PATCH RFC v5 2/7] ui/vnc.c: polish vnc_init_func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,126 +26,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, peterx@redhat.com, armbru@redhat.com, berrange@redhat.com, quintela@redhat.com, dgilbert@redhat.com, eblake@redhat.com
 
-Currently, when qemu_signal_init() fails it only returns a non-zero
-value but without propagating any Error. But its callers need a
-non-null err when runs error_report_err(err), or else 0->msg occurs.
+Add a new Error parameter for vnc_display_init() to handle errors
+in its caller: vnc_init_func(), just like vnc_display_open() does.
+And let the call trace propagate the Error.
 
-To avoid such segmentation fault, add a new Error parameter to make
-the call trace to propagate the err to the final caller.
+Besides, make vnc_start_worker_thread() return a bool to indicate
+whether it succeeds instead of returning nothing.
 
 Signed-off-by: Fei Li <fli@suse.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 ---
- include/qemu/osdep.h | 2 +-
- util/compatfd.c      | 9 ++++++---
- util/main-loop.c     | 9 ++++-----
- 3 files changed, 11 insertions(+), 9 deletions(-)
+ include/ui/console.h |  2 +-
+ ui/vnc-jobs.c        |  9 ++++++---
+ ui/vnc-jobs.h        |  2 +-
+ ui/vnc.c             | 12 +++++++++---
+ 4 files changed, 17 insertions(+), 8 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 4f8559e550..f1f56763a0 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
-                              additional fields in the future) */
+diff --git a/include/ui/console.h b/include/ui/console.h
+index fb969caf70..c17803c530 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -453,7 +453,7 @@ void qemu_display_early_init(DisplayOptions *opts);
+ void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+ 
+ /* vnc.c */
+-void vnc_display_init(const char *id);
++void vnc_display_init(const char *id, Error **errp);
+ void vnc_display_open(const char *id, Error **errp);
+ void vnc_display_add_client(const char *id, int csock, bool skipauth);
+ int vnc_display_password(const char *id, const char *password);
+diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+index 929391f85d..8807d7217c 100644
+--- a/ui/vnc-jobs.c
++++ b/ui/vnc-jobs.c
+@@ -331,15 +331,18 @@ static bool vnc_worker_thread_running(void)
+     return queue; /* Check global queue */
+ }
+ 
+-void vnc_start_worker_thread(void)
++bool vnc_start_worker_thread(Error **errp)
+ {
+     VncJobQueue *q;
+ 
+-    if (vnc_worker_thread_running())
+-        return ;
++    if (vnc_worker_thread_running()) {
++        goto out;
++    }
+ 
+     q = vnc_queue_init();
+     qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread, q,
+                        QEMU_THREAD_DETACHED);
+     queue = q; /* Set global queue */
++out:
++    return true;
+ }
+diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
+index 59f66bcc35..14640593db 100644
+--- a/ui/vnc-jobs.h
++++ b/ui/vnc-jobs.h
+@@ -37,7 +37,7 @@ void vnc_job_push(VncJob *job);
+ void vnc_jobs_join(VncState *vs);
+ 
+ void vnc_jobs_consume_buffer(VncState *vs);
+-void vnc_start_worker_thread(void);
++bool vnc_start_worker_thread(Error **errp);
+ 
+ /* Locks */
+ static inline int vnc_trylock_display(VncDisplay *vd)
+diff --git a/ui/vnc.c b/ui/vnc.c
+index cf221c83cc..f3806e76db 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3205,7 +3205,7 @@ static const DisplayChangeListenerOps dcl_ops = {
+     .dpy_cursor_define    = vnc_dpy_cursor_define,
  };
  
--int qemu_signalfd(const sigset_t *mask);
-+int qemu_signalfd(const sigset_t *mask, Error **errp);
- void sigaction_invoke(struct sigaction *action,
-                       struct qemu_signalfd_siginfo *info);
- #endif
-diff --git a/util/compatfd.c b/util/compatfd.c
-index 980bd33e52..d3ed890405 100644
---- a/util/compatfd.c
-+++ b/util/compatfd.c
-@@ -16,6 +16,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qemu/thread.h"
-+#include "qapi/error.h"
- 
- #include <sys/syscall.h>
- 
-@@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
-     }
- }
- 
--static int qemu_signalfd_compat(const sigset_t *mask)
-+static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
+-void vnc_display_init(const char *id)
++void vnc_display_init(const char *id, Error **errp)
  {
-     struct sigfd_compat_info *info;
-     QemuThread thread;
-@@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *mask)
+     VncDisplay *vd;
  
-     info = malloc(sizeof(*info));
-     if (info == NULL) {
-+        error_setg(errp, "Failed to allocate signalfd memory");
-         errno = ENOMEM;
-         return -1;
-     }
+@@ -3235,7 +3235,9 @@ void vnc_display_init(const char *id)
+     vd->connections_limit = 32;
  
-     if (pipe(fds) == -1) {
-+        error_setg(errp, "Failed to create signalfd pipe");
-         free(info);
-         return -1;
-     }
-@@ -94,7 +97,7 @@ static int qemu_signalfd_compat(const sigset_t *mask)
-     return fds[0];
- }
+     qemu_mutex_init(&vd->mutex);
+-    vnc_start_worker_thread();
++    if (!vnc_start_worker_thread(errp)) {
++        return;
++    }
  
--int qemu_signalfd(const sigset_t *mask)
-+int qemu_signalfd(const sigset_t *mask, Error **errp)
- {
- #if defined(CONFIG_SIGNALFD)
-     int ret;
-@@ -106,5 +109,5 @@ int qemu_signalfd(const sigset_t *mask)
-     }
- #endif
+     vd->dcl.ops = &dcl_ops;
+     register_displaychangelistener(&vd->dcl);
+@@ -4079,7 +4081,11 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+     char *id = (char *)qemu_opts_id(opts);
  
--    return qemu_signalfd_compat(mask);
-+    return qemu_signalfd_compat(mask, errp);
- }
-diff --git a/util/main-loop.c b/util/main-loop.c
-index affe0403c5..9671b6d226 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
-     }
- }
- 
--static int qemu_signal_init(void)
-+static int qemu_signal_init(Error **errp)
- {
-     int sigfd;
-     sigset_t set;
-@@ -94,9 +94,8 @@ static int qemu_signal_init(void)
-     pthread_sigmask(SIG_BLOCK, &set, NULL);
- 
-     sigdelset(&set, SIG_IPI);
--    sigfd = qemu_signalfd(&set);
-+    sigfd = qemu_signalfd(&set, errp);
-     if (sigfd == -1) {
--        fprintf(stderr, "failed to create signalfd\n");
-         return -errno;
-     }
- 
-@@ -109,7 +108,7 @@ static int qemu_signal_init(void)
- 
- #else /* _WIN32 */
- 
--static int qemu_signal_init(void)
-+static int qemu_signal_init(Error **errp)
- {
-     return 0;
- }
-@@ -148,7 +147,7 @@ int qemu_init_main_loop(Error **errp)
- 
-     init_clocks(qemu_timer_notify_cb);
- 
--    ret = qemu_signal_init();
-+    ret = qemu_signal_init(errp);
-     if (ret) {
-         return ret;
-     }
+     assert(id);
+-    vnc_display_init(id);
++    vnc_display_init(id, &local_err);
++    if (local_err) {
++        error_reportf_err(local_err, "Failed to init VNC server: ");
++        exit(1);
++    }
+     vnc_display_open(id, &local_err);
+     if (local_err != NULL) {
+         error_reportf_err(local_err, "Failed to start VNC server: ");
 -- 
 2.13.7
