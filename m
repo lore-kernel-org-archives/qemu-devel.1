@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gA50n-0005Qc-HN
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:18:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1gA54d-0006ET-7m
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1gA50i-0005kq-TD
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:18:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50232)
+	(envelope-from <peterx@redhat.com>) id 1gA54Z-0001Ng-Rt
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:22:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58184)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1gA50i-0005jv-Ky
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:18:08 -0400
-Date: Tue, 9 Oct 2018 21:18:02 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20181009211802.531df951@t450s.home>
-In-Reply-To: <9BD73EA91F8E404F851CF3F519B14AA80180A6E0@DGGEMI521-MBX.china.huawei.com>
-References: <9BD73EA91F8E404F851CF3F519B14AA80180A4A5@DGGEMI521-MBX.china.huawei.com>
-	<20181009090801.6f53286d@w520.home>
-	<9BD73EA91F8E404F851CF3F519B14AA80180A6E0@DGGEMI521-MBX.china.huawei.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gA54Z-0001NM-K2
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:22:07 -0400
+Date: Wed, 10 Oct 2018 11:21:55 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20181010032154.GL18728@xz-x1>
+References: <20181009062718.1914-1-peterx@redhat.com>
+	<20181009062718.1914-3-peterx@redhat.com>
+	<CAJ+F1CJwK4cC5xXviefrOFiQCcrP7fsrDwx2E9mZSg_UtFPXrA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] The results of lspci are inconsistent between vfio
- reset pci devices and reset devices by sysfs interafce
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CJwK4cC5xXviefrOFiQCcrP7fsrDwx2E9mZSg_UtFPXrA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 2/6] monitor: resume the monitor earlier
+ if needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wuzongyong (Euler Dept)" <cordius.wu@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Chenhaiwu (Euler)" <chenhaiwu1@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, 10 Oct 2018 01:47:10 +0000
-"Wuzongyong (Euler Dept)" <cordius.wu@huawei.com> wrote:
-> 
-> You're right. The initial states are not identical.
-> I found the function vfio_pci_pre_reset in qemu.
->     /*
->      * Stop any ongoing DMA by disconecting I/O, MMIO, and bus master.
->      * Also put INTx Disable in known state.
->      */
->     cmd = vfio_pci_read_config(pdev, PCI_COMMAND, 2);
->     cmd &= ~(PCI_COMMAND_IO | PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER |
->              PCI_COMMAND_INTX_DISABLE);
->     vfio_pci_write_config(pdev, PCI_COMMAND, cmd, 2);
-> 
-> So the behaviors between the two reset are inconsistent.
-> 
-> Then I wonder whether the operation is necessary here?
-> Could I enable the Memory bit in the Command register in vfio_pci_post_reset,
-> because I want to write regions of PCI devices after reset.
+On Tue, Oct 09, 2018 at 12:54:37PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+> On Tue, Oct 9, 2018 at 10:28 AM Peter Xu <peterx@redhat.com> wrote:
+> >
+> > Currently when QMP request queue full we won't resume the monitor unt=
+il
+> > we have completely handled the current command.  It's not necessary
+> > since even before it's handled the queue is already non-full.  Moving
+> > the resume logic earlier before the command execution.
+> >
+> > Note that now monitor_resume() is heavy weighted after 8af6bb14a3a8 a=
+nd
+> > it's even possible (as pointed out by Marc-Andr=C3=A9) that the funct=
+ion
+> > itself may try to take the monitor lock again, so let's do the resume
+> > after the monitor lock is released to avoid possible dead lock.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  monitor.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/monitor.c b/monitor.c
+> > index 1f83775fff..f5911399d8 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -4149,6 +4149,12 @@ static void monitor_qmp_bh_dispatcher(void *da=
+ta)
+> >      need_resume =3D !qmp_oob_enabled(mon) ||
+> >          mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX -=
+ 1;
+> >      qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+> > +
+> > +    if (need_resume) {
+> > +        /* Pairs with the monitor_suspend() in handle_qmp_command() =
+*/
+> > +        monitor_resume(mon);
+> > +    }
+>=20
+> "need_resume" is only set on non-oob enabled monitors.
 
-One reset is done by the kernel to try to put the device into a known
-clean state before allowing the user access to it, the other is done by
-QEMU as part of the initial machine reset.  I suppose we could special
-case the initial machine reset, but it seems perhaps risky and
-unnecessary.
+... or on oob-enabled monitors when queue full?
 
-QEMU is the driver here, it can certainly enable MMIO on the device and
-there are some examples in the QEMU code where MMIO is enabled to
-interact with the device, see vfio_radeon_reset() for example.  The
-device driver in the guest or the VM firmware should be the one to
-enable the device for VM usage though, QEMU should provide the device
-to the VM in a power-on default state, or as close as we can reasonably
-get to that.  Thanks,
+>=20
+> On monitor_resume(), monitor_qmp_read() may end up being called, which
+> may call handle_qmp_command().
+>=20
+> With regular commands, a new command is queued. But if the command is
+> "exec-oob", it will dispatch immediately, thus not following the QMP
+> reply ordering constrain.
+>=20
+> Shouldn't it be an error to call exec-oob on non-oob enabled monitors?
 
-Alex
+Do you mean a "qmp_capabilities" command to enable oob, and a
+continuous "exec-oob" command?
+
+I can't say I fully understand the scenario you mentioned, but I think
+it does violate the rule if we resume the monitor before we finish
+executing the "qmp_capabilities" command since that command should
+still be run with "non-oob" context.  So in that case we should do the
+resume after dispatching.  For the other queue-full case we shouldn't
+need to, as Markus suggested.
+
+Instead of bothering with all these, how about I drop this patch?  We
+might resume the monitor a little bit later when queue full, but I
+don't think that's a big deal for now.
+
+Regards,
+
+--=20
+Peter Xu
