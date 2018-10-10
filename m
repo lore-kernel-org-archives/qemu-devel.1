@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gAIo0-0002tI-Rk
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:01:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1gAIs6-0003lV-KT
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1gAInx-0003hN-97
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:01:56 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41431)
+	(envelope-from <bounces@canonical.com>) id 1gAIs2-0006t9-Bi
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:06:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53940)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1gAInw-0003h0-W7
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:01:53 -0400
-Received: by mail-pf1-x442.google.com with SMTP id m77-v6so3010708pfi.8
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 11:01:52 -0700 (PDT)
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
-	<a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
-	<5A5F4A2B-2DAF-4D70-BF1D-7ABC8461FDC8@raithlin.com>
-From: Alistair <alistair23@gmail.com>
-Message-ID: <63b741e2-b3e5-283a-4dfc-9c1db757c575@gmail.com>
-Date: Wed, 10 Oct 2018 11:01:48 -0700
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gAIs1-0006s2-PZ
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:06:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gAIry-00010K-GL
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 18:06:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7A72A2E80CB
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 18:06:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <5A5F4A2B-2DAF-4D70-BF1D-7ABC8461FDC8@raithlin.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Oct 2018 17:59:44 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1795527 <1795527@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153843648798.30392.6657333416089253911.malonedeb@soybean.canonical.com>
+Message-Id: <153919438498.12496.4622029417917834646.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1795527] Re: Malformed audio and video output
+ stuttering after upgrade to QEMU 3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +37,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stephen Bates <sbates@raithlin.com>, Andrea Bolognani <abologna@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
-Cc: Keith Busch <keith.busch@intel.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 10/10/2018 10:32 AM, Stephen  Bates wrote:
->>> I plan to also try with a e1000 network interface model tomorrow and see how that behaves....
->>    
->>     Please do :)
->      
-> I added e1000 and e1000e support to my kernel and changed the QEMU command to:
-> 
-> $QEMU -nographic \
->        -machine virt \
->        -smp 1 -m 8G \
->        -append "console=hvc0 ro root=/dev/vda nvme.admin_timeout=1" \
->        -kernel $KERNEL \
->        -drive file=${ROOTFS},format=raw,id=hd0 \
->        -device virtio-blk-device,drive=hd0 \
->        -device virtio-net-device,netdev=net0 \
->        -netdev user,id=net0 \
->        -device e1000,netdev=net1 \
->        -netdev user,id=net1
+OK, so in that case you'll need to do a git bisect to figure out what the f=
+irst change was that broke it.
+If 3.0 is at one end and is bad, pick the last known good version (on the p=
+roblem that you can reliably repeat) and do the bisect between them - if we=
+'re lucky we'll land on something obviously audio, windows or timing relate=
+d.
 
-Why do you need two networking options?
+-- =
 
-> 
-> And the kernel ooops:
-> 
-> [    0.224000] e1000: Intel(R) PRO/1000 Network Driver - version 7.3.21-k8-NAPI
-> [    0.224000] e1000: Copyright (c) 1999-2006 Intel Corporation.
-> [    0.224000] e1000 0000:00:01.0: enabling device (0000 -> 0002)
-> [    0.244000] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
-> [    0.244000] Oops [#1]
-> [    0.244000] Modules linked in:
-> [    0.244000] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.19.0-rc6-eideticom-riscv-00038-gc2b45b2fe26a-dirty #41
-> [    0.244000] sepc: ffffffd20040cc18 ra : ffffffd20040e912 sp : ffffffd3f7a77b60
-> [    0.244000]  gp : ffffffd2007e5960 tp : ffffffd3f7ac0000 t0 : ffffffd3f754b4c0
-> [    0.244000]  t1 : 0000000000000000 t2 : 00000000000003af s0 : ffffffd3f7a77b70
-> [    0.244000]  s1 : ffffffd3f7554b20 a0 : ffffffd3f7554b20 a1 : 0000000000000000
-> [    0.244000]  a2 : 0000000000000000 a3 : 0000000000000001 a4 : 0000000000000002
-> [    0.244000]  a5 : 0000000000000002 a6 : 00000000eac0c6e6 a7 : 0000000000000000
-> [    0.244000]  s2 : 0000000004140240 s3 : 0000000000000000 s4 : ffffffd3f7554f08
-> [    0.244000]  s5 : ffffffd3f7554000 s6 : ffffffd2007e7794 s7 : ffffffd3f7555000
-> [    0.244000]  s8 : ffffffd3f75546c0 s9 : ffffffd3f7554b20 s10: 0000000000001000
-> [    0.244000]  s11: 0000000000000000 t3 : ffffffd20078e918 t4 : ffffffd20078e920
-> [    0.244000]  t5 : 0000000000000007 t6 : 0000000000000006
-> [    0.244000] sstatus: 0000000000000120 sbadaddr: 0000000000000000 scause: 000000000000000f
-> [    0.252000] ---[ end trace 371f7702831e633b ]---
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1795527
 
-Strange. Is there any reason you need to use the e1000? The VirtIO 
-networking device works for me.
+Title:
+  Malformed audio and video output stuttering after upgrade to QEMU 3.0
 
-Alistair
+Status in QEMU:
+  New
 
->      
-> 
+Bug description:
+  My host is an x86_64 Arch Linux OS with a recompiled 4.18.10 hardened
+  kernel, running a few KVM guests with varying OSes and configurations
+  managed through a Libvirt stack.
+
+  Among these guests I have two Windows 10 VMs with VGA passthrough and
+  PulseAudio-backed virtual audio devices.
+
+  After upgrading to QEMU 3.0.0, both of the Win10 guests started
+  showing corrupted audio output in the form of unnatural reproduction
+  speed and occasional but consistently misplaced audio fragments
+  originating from what seems to be a circular buffer wrapping over
+  itself (misbehaviour detected by starting some games with known OSTs
+  and dialogues: soundtracks sound accelerated and past dialogue lines
+  start replaying middle-sentence until the next line starts playing).
+
+  In addition, the video output of the malfunctioning VMs regularly
+  stutters roughly twice a second for a fraction of a second (sync'ed
+  with the suspected buffer wrapping and especially pronounced during
+  not-pre-rendered cutscenes), toghether with mouse freezes that look
+  like actual input misses more than simple lack of screen refreshes.
+
+  =
+
+  The issue was succesfully reproduced without the managing stack, directly=
+ with the following command line, on the most capable Windows guest:
+
+   QEMU_AUDIO_DRV=3Dpa
+   QEMU_PA_SERVER=3D127.0.0.1
+   /usr/bin/qemu-system-x86_64 -name guest=3Dwin10_gms,debug-threads=3Don \
+   -machine pc-i440fx-3.0,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-cor=
+e=3Doff \                                                                  =
+                                                                         =
+
+   -cpu host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vendor_id=
+=3D123456789abc,kvm=3Doff \          =
+
+   -drive file=3D/usr/share/ovmf/x64/OVMF_CODE.fd,if=3Dpflash,format=3Draw,=
+unit=3D0,readonly=3Don \       =
+
+   -drive file=3D/var/lib/libvirt/qemu/nvram/win10_gms_VARS.fd,if=3Dpflash,=
+format=3Draw,unit=3D1 \
+   -m 5120 \                                                               =
+               =
+
+   -realtime mlock=3Doff \
+   -smp 3,sockets=3D1,cores=3D3,threads=3D1 \
+   -uuid 39b56ee2-6bae-4009-9108-7be26d5d63ac \
+   -display none \                             =
+
+   -no-user-config \
+   -nodefaults \    =
+
+   -rtc base=3Dlocaltime,driftfix=3Dslew \                                 =
+                                                                           =
+                                                                     =
+
+   -global kvm-pit.lost_tick_policy=3Ddelay \                              =
+                                    =
+
+   -no-hpet \                              =
+
+   -no-shutdown \
+   -global PIIX4_PM.disable_s3=3D1 \
+   -global PIIX4_PM.disable_s4=3D1 \
+   -boot strict=3Don \              =
+
+   -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x4.0x7 \
+   -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multi=
+function=3Don,addr=3D0x4 \
+   -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=
+=3D0x4.0x1 \             =
+
+   -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=
+=3D0x4.0x2 \
+   -device ahci,id=3Dsata0,bus=3Dpci.0,addr=3D0x9 \                        =
+         =
+
+   -drive file=3D/dev/vms/win10_gaming,format=3Draw,if=3Dnone,id=3Ddrive-vi=
+rtio-disk0,cache=3Dnone,aio=3Dnative \
+   -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-v=
+irtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
+   -drive file=3D/dev/sr0,format=3Draw,if=3Dnone,id=3Ddrive-sata0-0-0,media=
+=3Dcdrom,readonly=3Don \                                    =
+
+   -device ide-cd,bus=3Dsata0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 \   =
+                  =
+
+   -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x3 \                  =
+                                                                           =
+                                                                       =
+
+   -device hda-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 \          =
+                                   =
+
+   -device usb-host,hostbus=3D2,hostaddr=3D3,id=3Dhostdev0,bus=3Dusb.0,port=
+=3D1 \
+   -device vfio-pci,host=3D01:00.0,id=3Dhostdev1,bus=3Dpci.0,addr=3D0x6 \  =
+    =
+
+   -device vfio-pci,host=3D01:00.1,id=3Dhostdev2,bus=3Dpci.0,addr=3D0x7 \
+   -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 \   =
+
+   -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resour=
+cecontrol=3Ddeny \
+   -msg timestamp=3Don
+
+  =
+
+  By "purposedly misconfiguring" the codepaths and replacing "pc-i440fx-3.0=
+" with "pc-i440fx-2.11" (basically reverting the config changes I needed to=
+ do in order to update the domain definitions), the stuttering seems to dis=
+appear (or at least becomes negligible) and the audio output, despite becom=
+ing incredibly distorted, is consistent in every other way, with in-order d=
+ialogues and (perceived) correct tempo.
+
+  =
+
+  In order to exclude eventual misconfigurations in the host's audio proces=
+sing pipeline, I proceeded to update the domain definition's codepath of an=
+other guest running Ubuntu 18.04 with a completely different hardware confi=
+guration (no video card passthrough and no PulseAudio backconnection, just =
+a plain emulated VirtIO display and Spice audio device).
+
+  The audio issue presented itself again in the form of slightly sped up au=
+dio playback from Internet videos interleaved with occasional "quenches" of=
+ playing speed.
+  Stutters are difficult to detect because of the poor refresh rate of the =
+emulated VGA adapter, but I wouldn't be surprised to find them here too (ac=
+tually, I *think* I sensed them, but I'm not sure enough to assess their ex=
+istence).
+
+  Once again, by reverting to the old 2.11 directive everything is back
+  to normal.
+
+
+  Given the fact that no official upgrade directives regarding required sam=
+pling rate, period or sheduling adjustments were stated or handed-out to ad=
+ministrators, I decided to report this behaviour as a bug.
+  I hope this is the appropriate channel and that I didn't annoy anyone (th=
+is is my first proper bug report, please forgive me for any innaccuracy).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1795527/+subscriptions
