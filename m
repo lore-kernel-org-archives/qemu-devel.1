@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAJsF-00034O-VS
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:10:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1gAK7m-0006DR-32
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAJsA-0005K8-95
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:10:23 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAJsA-0005Hk-1x
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:10:18 -0400
-Received: by mail-wr1-f67.google.com with SMTP id 61-v6so6947827wrb.6
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 12:10:17 -0700 (PDT)
-References: <cover.1539023064.git.alistair.francis@wdc.com>
-	<1813e888a55667b7097df2a75fa626c98390240d.1539023064.git.alistair.francis@wdc.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <103d900d-b0f6-3dab-f543-14fbc30cf519@redhat.com>
-Date: Wed, 10 Oct 2018 21:10:15 +0200
+	(envelope-from <eblake@redhat.com>) id 1gAK7h-0002zo-FG
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:26:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gAK7d-0002yf-DY
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:26:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CBB6E307D85A
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 19:26:14 +0000 (UTC)
+References: <20181009062718.1914-1-peterx@redhat.com>
+	<902c92e2-3454-771e-51ff-ab38b970e86e@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <049fc618-6e13-5030-4124-1c9f4315f7eb@redhat.com>
+Date: Wed, 10 Oct 2018 14:26:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <1813e888a55667b7097df2a75fa626c98390240d.1539023064.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <902c92e2-3454-771e-51ff-ab38b970e86e@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] RISC-V: Add missing free for
- plic_hart_config
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 0/6] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +34,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
-Cc: "alistair23@gmail.com" <alistair23@gmail.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 08/10/2018 20:25, Alistair Francis wrote:
-> From: Michael Clark <mjc@sifive.com>
+On 10/10/18 11:26 AM, Eric Blake wrote:
+> On 10/9/18 1:27 AM, Peter Xu wrote:
+>> Based-on: <20180828191048.29806-1-armbru@redhat.com>
+>> Based-on: <20180901111716.1675-1-armbru@redhat.com>
+>>
+>> (this series is based on Markus's monitor-next tree)
+>>
+>> v9:
+>> - add r-bs
+>> - release the qmp queue lock before resume [Marc-Andre]
 > 
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> I haven't reviewed closely, but did want to report that I tested that 
+> with your patches applied, there is no way to trigger OOB of the initial 
+> capability handshake (good). It's a bit odd that the initial error 
+> (input member unexpected) is different from the later error (does not 
+> support OOB), but not a show-stopper, so I don't think you need to worry 
+> about it:
+> 
+> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 3}, 
+> "package": "v3.0.0-1150-g7d932cd3d53"}, "capabilities": ["oob"]}}
+> {"exec-oob":"qmp_capabilities","arguments":{"enable":["oob"]}}
+> {"error": {"class": "GenericError", "desc": "QMP input member 'exec-oob' 
+> is unexpected"}}
+> {"execute":"qmp_capabilities","arguments":{"enable":["oob"]}}
+> {"return": {}}
+> {"exec-oob":"qmp_capabilities"}
+> {"error": {"class": "GenericError", "desc": "The command 
+> qmp_capabilities does not support OOB"}}
+> 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On the other hand, when I'm trying to use a qemu binary with these 
+patches applied, libvirt is hanging when trying to probe the 
+capabilities of the binary, waiting for a response to 
+"qmp_capabilities". I'll try and bisect which patch is causing the 
+problem, and figure out why it is happening for libvirt and not running 
+by hand (perhaps is it a tty vs. Unix socket thing?)
 
-> ---
->  hw/riscv/virt.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 005169eabc..6bd723dc3a 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -385,6 +385,8 @@ static void riscv_virt_board_init(MachineState *machine)
->      serial_mm_init(system_memory, memmap[VIRT_UART0].base,
->          0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
->          serial_hd(0), DEVICE_LITTLE_ENDIAN);
-> +
-> +    g_free(plic_hart_config);
->  }
->  
->  static void riscv_virt_board_machine_init(MachineClass *mc)
-> 
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
