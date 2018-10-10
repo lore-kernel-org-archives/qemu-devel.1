@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gACXM-00058s-5M
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 07:20:20 -0400
+	(envelope-from <berto@igalia.com>) id 1gACah-0005zS-CC
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 07:23:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gACXJ-0005Y4-1B
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 07:20:20 -0400
-References: <20180814062739.19640-1-pbonzini@redhat.com>
-	<46af1836-e70a-185e-7312-e26fa57d1e2a@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <da1cc131-0352-5fd8-8180-829d2f5d07ec@redhat.com>
-Date: Wed, 10 Oct 2018 13:19:56 +0200
+	(envelope-from <berto@igalia.com>) id 1gACac-0006t2-Hy
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 07:23:47 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <1fee9736-1e83-39bb-d0d6-7af09c6f73df@redhat.com>
+References: <cover.1537367701.git.berto@igalia.com>
+	<95addb261af316f49517069e1cce4d9c601d274b.1537367701.git.berto@igalia.com>
+	<1fee9736-1e83-39bb-d0d6-7af09c6f73df@redhat.com>
+Date: Wed, 10 Oct 2018 13:23:03 +0200
+Message-ID: <w51lg76nizs.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <46af1836-e70a-185e-7312-e26fa57d1e2a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] nvme: correct locking
- around completion
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 12/14] block: Clean up
+ reopen_backing_file() in block/replication.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>, Xie Changlong <xiechanglong.d@gmail.com>
 
-On 09/10/2018 21:37, John Snow wrote:
-> 
-> 
-> On 08/14/2018 02:27 AM, Paolo Bonzini wrote:
->> nvme_poll_queues is already protected by q->lock, and
->> AIO callbacks are invoked outside the AioContext lock.
->> So remove the acquire/release pair in nvme_handle_event.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  block/nvme.c | 2 --
->>  1 file changed, 2 deletions(-)
->>
->> diff --git a/block/nvme.c b/block/nvme.c
->> index 6f71122bf5..42116907ed 100644
->> --- a/block/nvme.c
->> +++ b/block/nvme.c
->> @@ -489,10 +489,8 @@ static void nvme_handle_event(EventNotifier *n)
->>      BDRVNVMeState *s = container_of(n, BDRVNVMeState, irq_notifier);
+On Mon 08 Oct 2018 04:34:24 AM CEST, Max Reitz wrote:
+>> This patch does the following changes:
+>> 
+>>   - Use an options QDict with the "read-only" option instead of
+>>     passing the changes as flags only.
+>> 
+>>   - Simplify the code (it was unnecessarily complicated and verbose).
+>> 
+>>   - Fix a bug due to which the secondary disk was not being put back
+>>     in read-only mode when writable=false (because in this case
+>>     orig_secondary_flags always had the BDRV_O_RDWR flag set).
+>> 
+>>   - Stop clearing the BDRV_O_INACTIVE flag.
+>
+> Why?  Sorry, but I don't know much about replication.  Do you know
+> this change is OK?  (Since the code deliberately clears it right now.)
+
+I don't think the current code is ok, the BDRV_O_INACTIVE flag should be
+cleared with bdrv_co_invalidate_cache() so I'm inclined to think that
+it's a bug.
+
+>> @@ -376,39 +377,32 @@ static void reopen_backing_file(BlockDriverState *bs, bool writable,
+>>  {
+>>      BDRVReplicationState *s = bs->opaque;
+>>      BlockReopenQueue *reopen_queue = NULL;
+>> -    int orig_hidden_flags, orig_secondary_flags;
+>> -    int new_hidden_flags, new_secondary_flags;
+>>      Error *local_err = NULL;
 >>  
->>      trace_nvme_handle_event(s);
->> -    aio_context_acquire(s->aio_context);
->>      event_notifier_test_and_clear(n);
->>      nvme_poll_queues(s);
->> -    aio_context_release(s->aio_context);
->>  }
->>  
->>  static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
->>
-> 
-> This is over a month old (and seemingly didn't land); do we still want it?
-> 
+>>      if (writable) {
+>
+> I'd like to request a comment that "writable" is true the first time
+> this function is called, and false the second time.  That'd make it
+> clear why this rewrite makes sense.
 
-Yes, we do.
+Yes, I think it's probably a good idea to do that.
 
-Paolo
+>> +        s->orig_hidden_read_only =
+>> +            !(bdrv_get_flags(s->hidden_disk->bs) & BDRV_O_RDWR);
+>> +        s->orig_secondary_read_only =
+>> +            !(bdrv_get_flags(s->secondary_disk->bs) & BDRV_O_RDWR);
+>
+> Why not use bdrv_is_read_only()?
+
+No reason, I overlooked this. I'll fix it.
+
+Berto
