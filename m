@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1gADmD-0004oN-EF
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:39:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1gADoA-00065A-IG
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1gADm8-0000Y8-Cb
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:39:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50018)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1gADm8-0000WD-3z
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:39:40 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EF7A630024DC
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 12:39:38 +0000 (UTC)
-Date: Wed, 10 Oct 2018 14:39:37 +0200
-From: Eduardo Otubo <otubo@redhat.com>
-Message-ID: <20181010123937.GC3661@vader>
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-17-armbru@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1gADo4-0001rp-Hg
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:41:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gADo4-0001nj-8D
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:41:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gADnx-0001KH-Da
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 12:41:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 651DF2E818C
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 12:41:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2iBwrppp/7QCDedR"
-Content-Disposition: inline
-In-Reply-To: <20181008173125.19678-17-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 16/31] seccomp: Clean up error reporting in
- parse_sandbox()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 10 Oct 2018 12:32:26 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1779017 <1779017@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153014968219.17704.367188786620032253.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153917474643.9297.15488302650413217729.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779017] Re: qemu-system-arm: crashes raspian
+ kernels with divide-by-zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,144 +37,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+Thanks for the followup. Yes, that sounds like the problem is indeed
+that we don't currently emulate enough of the clock-control in the
+raspi's SoC. There were a couple of patches on list a while back that
+were trying to provide at least a basic dummy emulation of that device;
+I'm not sure what happened to them.
 
---2iBwrppp/7QCDedR
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-On 08/10/2018 - 19:31:10, Markus Armbruster wrote:
-> Calling error_report() in a function that takes an Error ** argument
-> is suspicious.  parse_sandbox() does that, and then fails without
-> setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
-> with it, but clean it up anyway.
->=20
-> Cc: Eduardo Otubo <otubo@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  qemu-seccomp.c | 18 +++++++++---------
->  vl.c           |  4 ++--
->  2 files changed, 11 insertions(+), 11 deletions(-)
->=20
-> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-> index 1baa5c69ed..6d27699409 100644
-> --- a/qemu-seccomp.c
-> +++ b/qemu-seccomp.c
-> @@ -12,11 +12,12 @@
->   * Contributions after 2012-01-13 are licensed under the terms of the
->   * GNU GPL, version 2 or (at your option) any later version.
->   */
-> +
->  #include "qemu/osdep.h"
-> +#include "qapi/error.h"
->  #include "qemu/config-file.h"
->  #include "qemu/option.h"
->  #include "qemu/module.h"
-> -#include "qemu/error-report.h"
->  #include <sys/prctl.h>
->  #include <seccomp.h>
->  #include "sysemu/seccomp.h"
-> @@ -190,7 +191,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
- **errp)
->                   * to provide a little bit of consistency for
->                   * the command line */
->              } else {
-> -                error_report("invalid argument for obsolete");
-> +                error_setg(errp, "invalid argument for obsolete");
->                  return -1;
->              }
->          }
-> @@ -205,14 +206,13 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
-or **errp)
->                  /* calling prctl directly because we're
->                   * not sure if host has CAP_SYS_ADMIN set*/
->                  if (prctl(PR_SET_NO_NEW_PRIVS, 1)) {
-> -                    error_report("failed to set no_new_privs "
-> -                                 "aborting");
-> +                    error_setg(errp, "failed to set no_new_privs " "abor=
-ting");
->                      return -1;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779017
 
-Except for this " " all else is good.
+Title:
+  qemu-system-arm: crashes raspian kernels with divide-by-zero
 
-Acked-by: Eduardo Otubo <otubo@redhat.com>
+Status in QEMU:
+  New
 
->                  }
->              } else if (g_str_equal(value, "allow")) {
->                  /* default value */
->              } else {
-> -                error_report("invalid argument for elevateprivileges");
-> +                error_setg(errp, "invalid argument for elevateprivileges=
-");
->                  return -1;
->              }
->          }
-> @@ -224,7 +224,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
- **errp)
->              } else if (g_str_equal(value, "allow")) {
->                  /* default value */
->              } else {
-> -                error_report("invalid argument for spawn");
-> +                error_setg(errp, "invalid argument for spawn");
->                  return -1;
->              }
->          }
-> @@ -236,14 +236,14 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
-or **errp)
->              } else if (g_str_equal(value, "allow")) {
->                  /* default value */
->              } else {
-> -                error_report("invalid argument for resourcecontrol");
-> +                error_setg(errp, "invalid argument for resourcecontrol");
->                  return -1;
->              }
->          }
-> =20
->          if (seccomp_start(seccomp_opts) < 0) {
-> -            error_report("failed to install seccomp syscall filter "
-> -                         "in the kernel");
-> +            error_setg(errp, "failed to install seccomp syscall filter "
-> +                       "in the kernel");
->              return -1;
->          }
->      }
-> diff --git a/vl.c b/vl.c
-> index 9d2b38a31f..485c3fc008 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3925,8 +3925,8 @@ int main(int argc, char **argv, char **envp)
-> =20
->  #ifdef CONFIG_SECCOMP
->      olist =3D qemu_find_opts_err("sandbox", NULL);
-> -    if (olist && qemu_opts_foreach(olist, parse_sandbox, NULL, NULL)) {
-> -        exit(1);
-> +    if (olist) {
-> +        qemu_opts_foreach(olist, parse_sandbox, NULL, &error_fatal);
->      }
->  #endif
-> =20
-> --=20
-> 2.17.1
->=20
+Bug description:
+  While trying to boot a arm kernel for a raspi2 machine (kernel7-4.9.41-st=
+retch.img in my case, but applies to other versions, too) the kernel crash =
+with a division by zero. The output on the sreial console is:
+  [   10.022377] [<8011d344>] (__warn) from [<8011d42c>] (warn_slowpath_nul=
+l+0x30/0x38)
+  [   10.024726] [<8011d42c>] (warn_slowpath_null) from [<804da378>] (uart_=
+get_baud_rate+0xf8/0x160)
 
---=20
-Eduardo Otubo
+  ...
 
---2iBwrppp/7QCDedR
-Content-Type: application/pgp-signature; name="signature.asc"
+  [   10.094933] Hardware name: BCM2835
+  [   10.101507] [<8010fb3c>] (unwind_backtrace) from [<8010c058>] (show_st=
+ack+0x20/0x24)
+  [   10.105413] [<8010c058>] (show_stack) from [<80455f84>] (dump_stack+0x=
+d4/0x118)
+  [   10.140268] [<80455f84>] (dump_stack) from [<8010bed4>] (__div0+0x24/0=
+x28)
+  [   10.143065] [<8010bed4>] (__div0) from [<8045498c>] (Ldiv0+0x8/0x14)
+  [   10.145553] [<8045498c>] (Ldiv0) from [<804e5538>] (pl011_set_termios+=
+0x9c/0x37c)
+  [   10.148017] [<804e5538>] (pl011_set_termios) from [<804da954>] (uart_c=
+hange_speed+0x40/0xfc)
+  [   10.185887] [<804da954>] (uart_change_speed) from [<804ddedc>] (uart_s=
+tartup.part.3+0xa4/0x13c)
+  [   10.222187] [<804ddedc>] (uart_startup.part.3) from [<804ddfcc>] (uart=
+_port_activate+0x58/0x64)
+  [   10.226014] [<804ddfcc>] (uart_port_activate) from [<804c93b8>] (tty_p=
+ort_open+0xa0/0xe0)
+  [   10.228398] [<804c93b8>] (tty_port_open) from [<804dce64>] (uart_open+=
+0x40/0x48)
+  [   10.264254] [<804dce64>] (uart_open) from [<804c1d70>] (tty_open+0xc0/=
+0x678)
+  [   10.266697] [<804c1d70>] (tty_open) from [<802753f0>] (chrdev_open+0xe=
+0/0x1a0)
+  [   10.269049] [<802753f0>] (chrdev_open) from [<8026d964>] (do_dentry_op=
+en+0x1f4/0x314)
+  [   10.271620] [<8026d964>] (do_dentry_open) from [<8026ec00>] (vfs_open+=
+0x60/0x8c)
+  [   10.275245] [<8026ec00>] (vfs_open) from [<8027f39c>] (path_openat+0x2=
+bc/0x1040)
+  [   10.312827] [<8027f39c>] (path_openat) from [<80281040>] (do_filp_open=
++0x70/0xd4)
+  [   10.317860] [<80281040>] (do_filp_open) from [<8026efd8>] (do_sys_open=
++0x120/0x1d0)
+  [   10.320370] [<8026efd8>] (do_sys_open) from [<8026f0b4>] (SyS_open+0x2=
+c/0x30)
+  [   10.357033] [<8026f0b4>] (SyS_open) from [<801080c0>] (ret_fast_syscal=
+l+0x0/0x1c)
 
------BEGIN PGP SIGNATURE-----
+  Tracking that down in the linux kernel source, it looks like somehow
+  uart_get_baud_rate() returns 0.
 
-iQEcBAEBAgAGBQJbvfMJAAoJEN8y58Dw//miXa8H/0YTnULomZfPRD+eaCbL0Gsk
-OEMG81cZqq3ZmdZ3KOX7P4AtBhCE8C003Cjl53BJZaOms3Pq2HKNi7Q0E/2I2m+c
-3kXZ2Ztb30zVt/vrYyMXlYWOj7efe19ddFeFmCt0WEV2vKsfsAoTPtRsYslK7gfH
-Kj5CcXGSKUr5U5BJrzoT/A/V24FZeMvpRjeLVb1x6wB4zGtQGd/0Fl8sQlN0aUzj
-AW4k1ZIbjF+SXKC24UspVqHLHxCkmVyZajK5tw7/BLvWrlYv9tsRBV+CVwMnkL3r
-uv9en6pC6/ZH2vuKGRgMJOGxW2gEX8nUdPkMSkPzUifb30Lgq6Hedn6zXY0c3zQ=
-=YMZf
------END PGP SIGNATURE-----
+  The same kernel could be booted without problem with qemu version 2.11.
+  Trying to bisecting the issue revealed commit @d9f8bbd8eb4e95db97cf02bd03=
+af86a3d606f4f1 as the culprit.
 
---2iBwrppp/7QCDedR--
+  Commandline to run was:
+  qemu-system-arm -M raspi2 \
+  	-kernel "$KERNEL" \
+  	-m 1024 \
+  	-d guest_errors,unimp \
+  	-dtb bcm2709-rpi-2-b.dtb \
+  	-drive file=3D"$IMG,if=3Dsd,format=3Draw"
+
+  Distribution is SuSE tumbleweed (x86_64, kernel 4.17.2), but same
+  problem also happens with a freshly compiled qemu from git repository.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779017/+subscriptions
