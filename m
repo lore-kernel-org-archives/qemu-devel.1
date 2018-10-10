@@ -1,42 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gA9cQ-0000IK-PZ
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 04:13:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1gA9dd-0000wT-2L
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 04:14:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1gA9cL-0000SQ-On
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 04:13:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49778
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1gA9cL-0000Ro-DY
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 04:13:17 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9A89ghW005433
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 04:13:15 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2n1bxpchw9-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 04:13:15 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 10 Oct 2018 09:13:12 +0100
+	(envelope-from <thuth@redhat.com>) id 1gA9dY-0001Gt-56
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 04:14:37 -0400
 References: <20181009175226.22138-1-akrowiak@linux.vnet.ibm.com>
-	<20181009175226.22138-3-akrowiak@linux.vnet.ibm.com>
-	<20181010101129.409d6e48.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 10 Oct 2018 10:12:58 +0200
+	<20181009175226.22138-7-akrowiak@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ea0b09a9-dbbf-fc21-eabf-c0b943665f81@redhat.com>
+Date: Wed, 10 Oct 2018 10:14:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181010101129.409d6e48.cohuck@redhat.com>
-Content-Language: en-US
-Message-Id: <6fcd52a8-10db-d539-f723-5ada88a625ea@de.ibm.com>
+In-Reply-To: <20181009175226.22138-7-akrowiak@linux.vnet.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v10 2/6] s390x/cpumodel: Set
- up CPU model for AP device support
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v10 6/6] s390: doc: detailed
+ specifications for AP virtualization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,33 +25,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Cc: peter.maydell@linaro.org, fiuczy@linux.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, eskultet@redhat.com, agraf@suse.de, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
+To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
 
+On 2018-10-09 19:52, Tony Krowiak wrote:
+> This patch provides documentation describing the AP architecture and
+> design concepts behind the virtualization of AP devices. It also
+> includes an example of how to configure AP devices for exclusive
+> use of KVM guests.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+> ---
+>  MAINTAINERS      |   1 +
+>  docs/vfio-ap.txt | 825 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 826 insertions(+)
+>  create mode 100644 docs/vfio-ap.txt
+[...]
+> +      * Individual bits in the mask can be switched on and off by specifying
+> +        each bit number to be switched in a comma separated list. Each bit
+> +        number string must be prepended with a ('+') or minus ('-') to indicate
+> +        the corresponding bit is to be switched on ('+') or off ('-'). Some
+> +        valid values are: 
 
+Nit: My git complains about a superfluous white space after "are:"
 
-On 10/10/2018 10:11 AM, Cornelia Huck wrote:
-> On Tue,  9 Oct 2018 13:52:22 -0400
-> Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
-> 
-> (...)
-> 
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> 
-> This patch (and the others) have a mismatch between the author (address
-> with vnet), and the s-o-b (address without vnet). While these are
-> obviously the same person, the addresses really should match.
-> 
-> Should I fix up the author to use the vnet-less address?
+[...]
+> +assign_adapter
+> +   To assign an AP adapter to the mediated matrix device, its APID is written
+> +   to the 'assign_adapter' file. This may be done multiple times to assign more
+> +   than one adapter. The APID may be specified using conventional semantics
+> +   as a decimal, hexidecimal, or octal number. For example, to assign adapters
+> +   4, 5 and 16 to a mediated matrix device in decimal, hexidecimal and octal
+> +   respectively:
 
-yes please.
+In case you respin: I'd still prefer s/hexidecimal/hexadecimal/g in the
+whole document (but it's just a nit, so no need to respin just because
+of this)
 
-> 
->> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
->> ---
->>  target/s390x/cpu_features.c     | 3 +++
->>  target/s390x/cpu_features_def.h | 3 +++
->>  target/s390x/cpu_models.c       | 2 ++
->>  target/s390x/gen-features.c     | 3 +++
->>  4 files changed, 11 insertions(+)
-> 
+ Thomas
