@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAIs6-0003lV-KT
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:06:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1gAIts-0004S1-6m
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:08:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAIs2-0006t9-Bi
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:06:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53940)
+	(envelope-from <peter.maydell@linaro.org>) id 1gAItq-0007wu-7F
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:07:59 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39316)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gAIs1-0006s2-PZ
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:06:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gAIry-00010K-GL
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 18:06:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7A72A2E80CB
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 18:06:02 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1gAItp-0007rQ-1v
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:07:58 -0400
+Received: by mail-ot1-x341.google.com with SMTP id l58so6287272otd.6
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 11:07:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Oct 2018 17:59:44 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1795527 <1795527@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153843648798.30392.6657333416089253911.malonedeb@soybean.canonical.com>
-Message-Id: <153919438498.12496.4622029417917834646.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1795527] Re: Malformed audio and video output
- stuttering after upgrade to QEMU 3.0
+In-Reply-To: <00aa913d-a7e9-3c5d-34a8-fc9ff59091db@redhat.com>
+References: <20181009232607.15521-1-crosa@redhat.com>
+	<20181009232607.15521-5-crosa@redhat.com>
+	<835fcb24-5832-9e6c-9f57-0364f0bf849a@redhat.com>
+	<95a8561c-0511-6a8a-a3eb-25d556029e7a@redhat.com>
+	<20181010134656.GE5738@habkost.net>
+	<47f72e98-335f-b3c9-54c7-4c8a468d85d6@redhat.com>
+	<26fe2055-77c2-45fa-4e88-62101d70b88b@redhat.com>
+	<20181010142840.GH5738@habkost.net>
+	<118ed8f7-5947-12c6-f3f6-b10597f37aac@redhat.com>
+	<CAFEAcA9NBu+L4wHfkLTv93wy90wjnV05EZ12PT6PmLjdZ5h_YA@mail.gmail.com>
+	<00aa913d-a7e9-3c5d-34a8-fc9ff59091db@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 10 Oct 2018 19:07:33 +0100
+Message-ID: <CAFEAcA_fTb5uYaB3vxr3iPXLskaOmQQr1Yrd89h91noxPF1O5Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] scripts/qemu.py: set predefined
+ machine type based on arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,168 +39,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-OK, so in that case you'll need to do a git bisect to figure out what the f=
-irst change was that broke it.
-If 3.0 is at one end and is bad, pick the last known good version (on the p=
-roblem that you can reliably repeat) and do the bisect between them - if we=
-'re lucky we'll land on something obviously audio, windows or timing relate=
-d.
+On 10 October 2018 at 18:52, Cleber Rosa <crosa@redhat.com> wrote:
+>
+>
+> On 10/10/18 12:23 PM, Peter Maydell wrote:
+>> On 10 October 2018 at 16:47, Cleber Rosa <crosa@redhat.com> wrote:
+>>> To make sure we're on the same page, we're still going to have default
+>>> machine types, based on the arch, for those targets that don't provide
+>>> one (aarch64 is one example).  Right?
+>>
+>> Does it make sense to define a default? The reason arm
+>> doesn't specify a default machine type is because you
+>> can't just run any old guest on any old machine type.
+>> You need to know "this guest image will run on machine
+>> type X", and run it on machine type X. This is like
+>> knowing you need to run a test on x86 PC and not
+>> on PPC spapr.
+>>
+>
+> While requiring tests to specify every single aspect of the environment
+> that will be used may be OK for low level unit tests, it puts a lot of
+> burden on higher level tests (which is supposed to be the vast majority
+> under tests/acceptance).
+>
+> From a test writer perspective, working on these higher level tests, it
+> may want to make sure that feature "X", unrelated to the target arch,
+> machine type, etc, "just works".  You man want to look at the "vnc.py"
+> test for a real world example.
 
--- =
+OK, if it doesn't have a dependency on machine at all, it
+should state that somehow.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1795527
+> Eduardo has suggested that "make check-acceptance" runs all (possible)
+> tests on all target archs by default.
 
-Title:
-  Malformed audio and video output stuttering after upgrade to QEMU 3.0
+Yeah; or we have some mechanism for trimming down the
+matrix of what we run. But I think it's better coverage
+if we have 3 tests ABC that don't depend on machine
+and 3 machines XYZ to run AX BY CZ than AX BX CX by
+specifying X as an arbitrary "default".
 
-Status in QEMU:
-  New
+It looks like the 'vnc' test is just testing QEMU functionality,
+not anything that involves interacting with the guest or
+machine model? There's a good argument that that only really
+needs to be run once, not once per architecture.
 
-Bug description:
-  My host is an x86_64 Arch Linux OS with a recompiled 4.18.10 hardened
-  kernel, running a few KVM guests with varying OSes and configurations
-  managed through a Libvirt stack.
+You might also want to consider the "none" machine, which exists
+for bits of test infrastructure that aren't actually trying to
+run guests.
 
-  Among these guests I have two Windows 10 VMs with VGA passthrough and
-  PulseAudio-backed virtual audio devices.
+>> Would it make more sense for each test to specify
+>> which machine types it can work on?
+>>
+>
+> I think it does, but I believe in the black list approach, instead of
+> the white list.
+>
+> The reason for that is that I believe that majority of the tests under
+> "tests/acceptance" can be made to work on every target (which would be
+> the default).  So far, I've made sure tests behave correctly on the 5
+> arches included in the "archs.json" file in this series (x86_64, ppc64,
+> ppc, aarch64, s390x).
+>
+> To give a full disclosure, "boot_linux.py" (boots a linux kernel) is
+> x86_64 specific, and CANCELS when asked to be run on other archs.  But,
+> on the work I've done top of these series, it already works with ppc64
+> and aarch64.  Also, "boot_linux.py" sent in another series, (which boots
+> a full linux guest) is also being adapted to work on most of the target
+> archs.
 
-  After upgrading to QEMU 3.0.0, both of the Win10 guests started
-  showing corrupted audio output in the form of unnatural reproduction
-  speed and occasional but consistently misplaced audio fragments
-  originating from what seems to be a circular buffer wrapping over
-  itself (misbehaviour detected by starting some games with known OSTs
-  and dialogues: soundtracks sound accelerated and past dialogue lines
-  start replaying middle-sentence until the next line starts playing).
+Right, "boot Linux" is machine specific. The kernel/disk
+/etc that boots on aarch64 virt is probably not going to boot
+on the 64-bit xilinx board; and on 32-bit arm you definitely
+are going to want a different kernel in some places. This
+is likely to be true of most tests that actually try to run
+code in the guest.
 
-  In addition, the video output of the malfunctioning VMs regularly
-  stutters roughly twice a second for a fraction of a second (sync'ed
-  with the suspected buffer wrapping and especially pronounced during
-  not-pre-rendered cutscenes), toghether with mouse freezes that look
-  like actual input misses more than simple lack of screen refreshes.
+We should aim to test the machines we care about (regardless
+of what architectures they are), rather than thinking about it
+in terms of "testing architectures X, Y, Z", I think.
 
-  =
+I think you're going to need at least some whitelist functionality;
+otherwise half the tests are going to break every time we add
+a new machine (and "add every new machine to the blacklist for
+half the tests" doesn't scale very well).
 
-  The issue was succesfully reproduced without the managing stack, directly=
- with the following command line, on the most capable Windows guest:
-
-   QEMU_AUDIO_DRV=3Dpa
-   QEMU_PA_SERVER=3D127.0.0.1
-   /usr/bin/qemu-system-x86_64 -name guest=3Dwin10_gms,debug-threads=3Don \
-   -machine pc-i440fx-3.0,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-cor=
-e=3Doff \                                                                  =
-                                                                         =
-
-   -cpu host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vendor_id=
-=3D123456789abc,kvm=3Doff \          =
-
-   -drive file=3D/usr/share/ovmf/x64/OVMF_CODE.fd,if=3Dpflash,format=3Draw,=
-unit=3D0,readonly=3Don \       =
-
-   -drive file=3D/var/lib/libvirt/qemu/nvram/win10_gms_VARS.fd,if=3Dpflash,=
-format=3Draw,unit=3D1 \
-   -m 5120 \                                                               =
-               =
-
-   -realtime mlock=3Doff \
-   -smp 3,sockets=3D1,cores=3D3,threads=3D1 \
-   -uuid 39b56ee2-6bae-4009-9108-7be26d5d63ac \
-   -display none \                             =
-
-   -no-user-config \
-   -nodefaults \    =
-
-   -rtc base=3Dlocaltime,driftfix=3Dslew \                                 =
-                                                                           =
-                                                                     =
-
-   -global kvm-pit.lost_tick_policy=3Ddelay \                              =
-                                    =
-
-   -no-hpet \                              =
-
-   -no-shutdown \
-   -global PIIX4_PM.disable_s3=3D1 \
-   -global PIIX4_PM.disable_s4=3D1 \
-   -boot strict=3Don \              =
-
-   -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0x4.0x7 \
-   -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,multi=
-function=3Don,addr=3D0x4 \
-   -device ich9-usb-uhci2,masterbus=3Dusb.0,firstport=3D2,bus=3Dpci.0,addr=
-=3D0x4.0x1 \             =
-
-   -device ich9-usb-uhci3,masterbus=3Dusb.0,firstport=3D4,bus=3Dpci.0,addr=
-=3D0x4.0x2 \
-   -device ahci,id=3Dsata0,bus=3Dpci.0,addr=3D0x9 \                        =
-         =
-
-   -drive file=3D/dev/vms/win10_gaming,format=3Draw,if=3Dnone,id=3Ddrive-vi=
-rtio-disk0,cache=3Dnone,aio=3Dnative \
-   -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-v=
-irtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don \
-   -drive file=3D/dev/sr0,format=3Draw,if=3Dnone,id=3Ddrive-sata0-0-0,media=
-=3Dcdrom,readonly=3Don \                                    =
-
-   -device ide-cd,bus=3Dsata0.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 \   =
-                  =
-
-   -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x3 \                  =
-                                                                           =
-                                                                       =
-
-   -device hda-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 \          =
-                                   =
-
-   -device usb-host,hostbus=3D2,hostaddr=3D3,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1 \
-   -device vfio-pci,host=3D01:00.0,id=3Dhostdev1,bus=3Dpci.0,addr=3D0x6 \  =
-    =
-
-   -device vfio-pci,host=3D01:00.1,id=3Dhostdev2,bus=3Dpci.0,addr=3D0x7 \
-   -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 \   =
-
-   -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resour=
-cecontrol=3Ddeny \
-   -msg timestamp=3Don
-
-  =
-
-  By "purposedly misconfiguring" the codepaths and replacing "pc-i440fx-3.0=
-" with "pc-i440fx-2.11" (basically reverting the config changes I needed to=
- do in order to update the domain definitions), the stuttering seems to dis=
-appear (or at least becomes negligible) and the audio output, despite becom=
-ing incredibly distorted, is consistent in every other way, with in-order d=
-ialogues and (perceived) correct tempo.
-
-  =
-
-  In order to exclude eventual misconfigurations in the host's audio proces=
-sing pipeline, I proceeded to update the domain definition's codepath of an=
-other guest running Ubuntu 18.04 with a completely different hardware confi=
-guration (no video card passthrough and no PulseAudio backconnection, just =
-a plain emulated VirtIO display and Spice audio device).
-
-  The audio issue presented itself again in the form of slightly sped up au=
-dio playback from Internet videos interleaved with occasional "quenches" of=
- playing speed.
-  Stutters are difficult to detect because of the poor refresh rate of the =
-emulated VGA adapter, but I wouldn't be surprised to find them here too (ac=
-tually, I *think* I sensed them, but I'm not sure enough to assess their ex=
-istence).
-
-  Once again, by reverting to the old 2.11 directive everything is back
-  to normal.
-
-
-  Given the fact that no official upgrade directives regarding required sam=
-pling rate, period or sheduling adjustments were stated or handed-out to ad=
-ministrators, I decided to report this behaviour as a bug.
-  I hope this is the appropriate channel and that I didn't annoy anyone (th=
-is is my first proper bug report, please forgive me for any innaccuracy).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1795527/+subscriptions
+thanks
+-- PMM
