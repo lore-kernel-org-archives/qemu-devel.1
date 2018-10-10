@@ -1,28 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gAEpt-00062W-1d
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:47:37 -0400
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gAEsw-000852-7t
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1gAEpo-0004ud-QI
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:47:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gAEpj-0004qq-Dx
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:47:28 -0400
-Date: Wed, 10 Oct 2018 10:46:56 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20181010134656.GE5738@habkost.net>
-References: <20181009232607.15521-1-crosa@redhat.com>
-	<20181009232607.15521-5-crosa@redhat.com>
-	<835fcb24-5832-9e6c-9f57-0364f0bf849a@redhat.com>
-	<95a8561c-0511-6a8a-a3eb-25d556029e7a@redhat.com>
+	(envelope-from <akrowiak@linux.ibm.com>) id 1gAEss-0006Eo-4H
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:50:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51666)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akrowiak@linux.ibm.com>)
+	id 1gAEsr-0006EF-Rq
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:50:42 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9ADjwwt105249
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 09:50:40 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2n1fmy015m-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 09:50:40 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <akrowiak@linux.ibm.com>;
+	Wed, 10 Oct 2018 07:50:38 -0600
+References: <20181009175226.22138-1-akrowiak@linux.vnet.ibm.com>
+	<20181009175226.22138-3-akrowiak@linux.vnet.ibm.com>
+	<64e5b221-ad4d-059a-9647-57ddf7ab0d0d@de.ibm.com>
+	<4cc8ddc1-afc7-a1b8-b301-22c1e1528ca6@redhat.com>
+From: Tony Krowiak <akrowiak@linux.ibm.com>
+Date: Wed, 10 Oct 2018 09:50:26 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <95a8561c-0511-6a8a-a3eb-25d556029e7a@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] scripts/qemu.py: set predefined
- machine type based on arch
+In-Reply-To: <4cc8ddc1-afc7-a1b8-b301-22c1e1528ca6@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <67469392-a91b-aaa4-cecd-ee74552e6437@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v10 2/6] s390x/cpumodel: Set up CPU model
+ for AP device support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +45,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, fiuczy@linux.ibm.com, mimu@linux.ibm.com
 
-On Wed, Oct 10, 2018 at 08:35:38AM -0400, Cleber Rosa wrote:
->=20
->=20
-> On 10/10/18 7:00 AM, Philippe Mathieu-Daud=E9 wrote:
-> > On 10/10/2018 01:26, Cleber Rosa wrote:
-> >> Some targets require a machine type to be set, as there's no default
-> >> (aarch64 is one example).  To give a consistent interface to users o=
-f
-> >> this API, this changes set_machine() so that a predefined default ca=
-n
-> >> be used, if one is not given.  The approach used is exactly the same
-> >> with the console device type.
-> >>
-> >> Also, even when there's a default machine type, for some purposes,
-> >> testing included, it's better if outside code is explicit about the
-> >> machine type, instead of relying on whatever is set internally.
-> >>
-> >> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> >> ---
-> >>  scripts/qemu.py | 22 +++++++++++++++++++++-
-> >>  1 file changed, 21 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> >> index d9e24a0c1a..fca9b76990 100644
-> >> --- a/scripts/qemu.py
-> >> +++ b/scripts/qemu.py
-> >> @@ -36,6 +36,15 @@ CONSOLE_DEV_TYPES =3D {
-> >>      r'^s390-ccw-virtio.*': 'sclpconsole',
-> >>      }
-> >> =20
-> >> +#: Maps archictures to the preferred machine type
-> >> +MACHINE_TYPES =3D {
-> >> +    r'^aarch64$': 'virt',
-> >> +    r'^ppc$': 'g3beige',
-> >> +    r'^ppc64$': 'pseries',
-> >> +    r'^s390x$': 's390-ccw-virtio',
-> >> +    r'^x86_64$': 'q35',
-> >=20
-> > Why choose Q35 rather than PC (the default)?
-> >=20
-> > I was wondering about how to generate variants/machines.json but this=
- is
-> > definitively something we want to do via a QMP query.
-> >=20
-> > Eduardo what do you think?
-> >=20
->=20
-> It was motivated by Eduardo's initiative to make q35 the default "acros=
-s
-> the board".  He can confirm and give more details.
+On 10/09/2018 03:48 PM, David Hildenbrand wrote:
+> On 09/10/2018 21:14, Christian Borntraeger wrote:
+>>
+>>
+>> On 10/09/2018 07:52 PM, Tony Krowiak wrote:
+>>> A new CPU model feature and two new CPU model facilities are
+>>> introduced to support AP devices for a KVM guest.
+>>>
+>>> CPU model features:
+>>>
+>>> 1. The S390_FEAT_AP CPU model feature indicates whether AP
+>>>     instructions are available to the guest. This feature will
+>>>     be enabled only if the AP instructions are available on the
+>>>     linux host as determined by the availability of the
+>>>     KVM_S390_VM_CRYPTO_ENABLE_APIE VM attribute which is exposed
+>>>     by KVM only if the AP instructions are available on the
+>>>     host.
+>>>
+>>>     This feature must be turned on from userspace to execute AP
+>>>     instructions on the KVM guest. The QEMU command line to turn
+>>>     this feature on looks something like this:
+>>>
+>>> 	qemu-system-s390x ... -cpu xxx,ap=on ...
+>>>
+>>>     This feature will be supported for zEC12 and newer CPU models.
+>>>     The feature will not be supported for older models because
+>>>     there are few older systems on which to test and the older
+>>>     crypto cards will be going out of service in the relatively
+>>>     near future.
+>>>
+>>> CPU model facilities:
+>>>
+>>> 1. The S390_FEAT_AP_QUERY_CONFIG_INFO feature indicates whether the
+>>>     AP Query Configuration Information (QCI) facility is available
+>>>     to the guest as determined by whether the facility is available
+>>>     on the host. This feature will be exposed by KVM only if the
+>>>     QCI facility is installed on the host.
+>>>
+>>> 2. The S390_FEAT_AP_FACILITY_TEST feature indicates whether the AP
+>>>     Facility Test (APFT) facility is available to the guest as
+>>>     determined by whether the facility is available on the host.
+>>>     This feature will be exposed by KVM only if APFT is installed
+>>>     on the host.
+>>>
+>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+>>
+>>
+>> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>
+>> and as you have moved the one hunk, Davids RB should still count.
+> 
+> Indeed
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Making Q35 the default on applications using QEMU and libvirt is
-something I'd like to happen.  But I think the simplest way to do
-that is to change the QEMU default.  This way you won't need this
-table on qemu.py: you can just use the default provided by QEMU.
+Got it.
 
---=20
-Eduardo
+> 
+> 
