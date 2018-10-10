@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=814ff0a1f=anthony.perard@citrix.com>)
-	id 1gAEjs-0001BP-OF
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:41:30 -0400
+	(envelope-from <abologna@redhat.com>) id 1gAElw-0002wd-Sv
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:43:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=814ff0a1f=anthony.perard@citrix.com>)
-	id 1gAEjo-0000h7-Kv
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:41:24 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:48635)
+	(envelope-from <abologna@redhat.com>) id 1gAEls-00023N-Km
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:43:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19665)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=814ff0a1f=anthony.perard@citrix.com>)
-	id 1gAEjo-0000gj-CV
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:41:20 -0400
-Date: Wed, 10 Oct 2018 14:31:01 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20181010133101.GE1331@perard.uk.xensource.com>
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-16-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20181008173125.19678-16-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 15/31] xen/pt: Fix incomplete conversion to
- realize()
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gAElq-0001zg-Bo
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:43:27 -0400
+Message-ID: <a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Wed, 10 Oct 2018 15:43:19 +0200
+In-Reply-To: <3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>
+To: Stephen Bates <sbates@raithlin.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: Keith Busch <keith.busch@intel.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard
+	W.M. Jones" <rjones@redhat.com>
 
-On Mon, Oct 08, 2018 at 07:31:09PM +0200, Markus Armbruster wrote:
-> The conversion of "xen-pci-passthrough" to realize() (commit
-> 5a11d0f7549, v2.6.0) neglected to convert the xen_pt_config_init()
-> error path.  If xen_pt_config_init() fails, xen_pt_realize() reports
-> the error, then returns success without completing its job.  I don't
-> know the exact impact, but it can't be good.
+On Wed, 2018-10-10 at 13:11 +0000, Stephen  Bates wrote:
+> I also tried these out but I was interested in seeing if I could create NVMe models inside the new PCIe subsystem (for both the virt and sifive_u machines). The sifive_u machine did not work at all (so I'll leave that one for now). The virt machine successfully mapped in the NVMe devices and the OS driver was able to probe the nvme driver against them. However something seems to be broken with interrupts as I see messages like these in the OS dmesg:
 > 
-> Belatedly convert the error path.
+> [   62.852000] nvme nvme0: I/O 856 QID 1 timeout, completion polled
+> [   64.832000] nvme nvme1: I/O 819 QID 1 timeout, completion polled
+> [   64.836000] nvme nvme1: I/O 820 QID 1 timeout, completion polled
+> [   64.840000] nvme nvme1: I/O 821 QID 1 timeout, completion polled
+> [   64.844000] nvme nvme1: I/O 822 QID 1 timeout, completion polled
+> [   64.848000] nvme nvme0: I/O 856 QID 1 timeout, completion polled
+> [   64.852000] nvme nvme0: I/O 857 QID 1 timeout, completion polled
 > 
-> Fixes: 5a11d0f7549e24a10e178a9dc8ff5e698031d9a6
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> These imply the driver hit an admin queue timeout but when it reaped the NVMe admin completion queue it found commands were done but no interrupt was detected by the OS.
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+So it looks like you at least got to the point where the guest OS
+would find PCIe devices... Can you share the output of 'lspci' as
+well as the configuration you used when building your bbl?
 
-Thanks,
+> I plan to also try with a e1000 network interface model tomorrow and see how that behaves....
+
+Please do :)
 
 -- 
-Anthony PERARD
+Andrea Bolognani / Red Hat / Virtualization
