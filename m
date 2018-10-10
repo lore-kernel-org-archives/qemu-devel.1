@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cordius.wu@huawei.com>) id 1gA3b3-0005Bd-6g
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:47:34 -0400
+	(envelope-from <jingqi.liu@intel.com>) id 1gA3jU-0006JR-LX
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:56:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cordius.wu@huawei.com>) id 1gA3az-0005rI-5B
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:47:33 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2284 helo=huawei.com)
+	(envelope-from <jingqi.liu@intel.com>) id 1gA3jP-0000np-V7
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:56:16 -0400
+Received: from mga06.intel.com ([134.134.136.31]:52872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cordius.wu@huawei.com>)
-	id 1gA3aw-0005p6-4M
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:47:26 -0400
-From: "Wuzongyong (Euler Dept)" <cordius.wu@huawei.com>
-Date: Wed, 10 Oct 2018 01:47:10 +0000
-Message-ID: <9BD73EA91F8E404F851CF3F519B14AA80180A6E0@DGGEMI521-MBX.china.huawei.com>
-References: <9BD73EA91F8E404F851CF3F519B14AA80180A4A5@DGGEMI521-MBX.china.huawei.com>
-	<20181009090801.6f53286d@w520.home>
-Content-Language: zh-CN
+	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
+	id 1gA3jP-0000lw-Ff
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:56:11 -0400
+From: "Liu, Jingqi" <jingqi.liu@intel.com>
+Date: Wed, 10 Oct 2018 01:49:56 +0000
+Message-ID: <09D68D4CF52CAF489B702DEBDD12D3D3527FD330@SHSMSX103.ccr.corp.intel.com>
+References: <20180919031122.28487-1-tao3.xu@intel.com>
+	<20180919031122.28487-2-tao3.xu@intel.com>
+In-Reply-To: <20180919031122.28487-2-tao3.xu@intel.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] The results of lspci are inconsistent between vfio
- reset pci devices and reset devices by sysfs interafce
+Subject: Re: [Qemu-devel] [PATCH 1/1] i386: Add new model of
+ Cascadelake-Server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +30,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Chenhaiwu (Euler)" <chenhaiwu1@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>
+To: "Xu, Tao3" <tao3.xu@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-> > > Hi,
-> > >
-> > > I start a virtual machine with commandline:
-> > >     /usr/libexec/qemu-kvm --enable-kvm -smp 8 -m 8192 -device
-> > > vfio-pci,host=3D0000:81:00.0
-> > >
-> > > Then I pause the qemu process before executing the main_loop
-> > > function by
-> > gdb.
-> > > At this moment, lspci shows the regions are disabled like below:
-> > >     81:00.0 3D controller: NVIDIA Corporation GP100GL [Tesla P100
-> > > PCIe
-> > 16GB] (rev a1)
-> > >         Subsystem: NVIDIA Corporation Device 118f
-> > >         Physical Slot: 0-6
-> > >         Control: I/O- Mem- BusMaster- SpecCycle- MemWINV- VGASnoop-
-> > ParErr- Stepping- SERR- FastB2B- DisINTx+
-> > >         Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast
-> > > >TAbort-
-> > <TAbort- <MAbort- >SERR- <PERR- INTx-
-> > >         Interrupt: pin A routed to IRQ 35
-> > >         NUMA node: 1
-> > >         Region 0: Memory at c8000000 (32-bit, non-prefetchable)
-> > [disabled] [size=3D16M]
-> > >         Region 1: Memory at 27800000000 (64-bit, prefetchable)
-> > > [disabled]
-> > [size=3D16G]
-> > >         Region 3: Memory at 27c00000000 (64-bit, prefetchable)
-> > > [disabled] [size=3D32M]
-> > >
-> > > But after the command:
-> > > echo 1 > /sys/bus/pci/devices/0000:81:00.0/reset
-> > > lspci shows the regions are *not* disabled:
-> > >     81:00.0 3D controller: NVIDIA Corporation GP100GL [Tesla P100
-> > > PCIe
-> > 16GB] (rev a1)
-> > >         Subsystem: Huawei Technologies Co., Ltd. Device 2061
-> > >         Physical Slot: 0-6
-> > >         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop-
-> > ParErr+ Stepping- SERR+ FastB2B- DisINTx-
-> > >         Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast
-> > > >TAbort-
-> > <TAbort- <MAbort- >SERR- <PERR- INTx-
-> > >         Latency: 0, Cache Line Size: 32 bytes
-> > >         Interrupt: pin A routed to IRQ 7
-> > >         NUMA node: 1
-> > >         Region 0: Memory at c8000000 (32-bit, non-prefetchable)
-> > [size=3D16M]
-> > >         Region 1: Memory at 27800000000 (64-bit, prefetchable)
-> [size=3D16G]
-> > >         Region 3: Memory at 27c00000000 (64-bit, prefetchable)
-> > > [size=3D32M]
-> > >
-> > > AFAIK, qemu performs vfio_pci_reset like the below callstack:
-> > >     Qemu:
-> > >         vfio_pci_reset
-> > >             ioctl(vdev->vbasedev.fd, VFIO_DEVICE_RESET)
-> > > Kernel:
-> > >     vfio_pci_ioctl
-> > >         pci_try_reset_function
-> > >             __pci_reset_function_locked
-> > >                     pci_parent_bus_reset
-> > >                         pci_reset_bridge_secondary_bus
-> > >
-> > > and write 1 to the reset interface of sysfs go through the path:
-> > > Kernel:
-> > >     reset_store
-> > >         pci_reset_function
-> > >             __pci_reset_function_locked
-> > >                     pci_parent_bus_reset
-> > >                         pci_reset_bridge_secondary_bus
-> > >
-> > > So seem that these two methods are same actually, I am confused why
-> > > the
-> > results are inconsistent.
-> >
-> > Maybe there's a misunderstanding here, the kernel PCI reset functions
-> > save and restore config space around the reset.  The intention of the
-> > reset is to re-init the internal state of the device while preserving
-> > (via
-> > save+restore) the config space.  The BARs being disabled is simply a
-> > matter of the Memory bit in the Command register being unset (note Mem-=
-).
-> > Whether this is indicative of some issue depends on whether the state
-> > before reset matches the state after reset, not that the states after
-> > two different paths of triggering a reset are identical.
-> >
-> > vfio-pci will hand off the device to the user (QEMU) disabled, so the
-> > states in the first example make sense to me.  In the second case,
-> > it's not clear what the starting state is for the device.  Was this
-> > reset performed from the starting point of the first case or is the
-> > device in some arbitrary, unknown state prior to reset?  Thanks,
-> >
-> > Alex
-> In the second case, the reset was performed from the starting point of th=
-e
-> first case.
-> IOW, the states before the two cases are identical, I think. The only
-> difference I can think of is the qemu process will perform twice reset,
-> one occurs when vfio open the device' fd and the other one occurs as I
-> mentioned above.
+Hi Eduardo/Paolo,
+
+Do you have any comments about this patch ?
+
+Thanks
+Jingqi
+
+> -----Original Message-----
+> From: Xu, Tao3
+> Sent: Wednesday, September 19, 2018 11:11 AM
+> To: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com
+> Cc: qemu-devel@nongnu.org; Liu, Jingqi <jingqi.liu@intel.com>; Xu, Tao3
+> <tao3.xu@intel.com>
+> Subject: [PATCH 1/1] i386: Add new model of Cascadelake-Server
 >=20
-> Thanks,
-> Wu Zongyong
-
-You're right. The initial states are not identical.
-I found the function vfio_pci_pre_reset in qemu.
-    /*
-     * Stop any ongoing DMA by disconecting I/O, MMIO, and bus master.
-     * Also put INTx Disable in known state.
-     */
-    cmd =3D vfio_pci_read_config(pdev, PCI_COMMAND, 2);
-    cmd &=3D ~(PCI_COMMAND_IO | PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER |
-             PCI_COMMAND_INTX_DISABLE);
-    vfio_pci_write_config(pdev, PCI_COMMAND, cmd, 2);
-
-So the behaviors between the two reset are inconsistent.
-
-Then I wonder whether the operation is necessary here?
-Could I enable the Memory bit in the Command register in vfio_pci_post_rese=
-t,
-because I want to write regions of PCI devices after reset.
-
-Thanks,
-Wu Zongyong
+> New CPU models mostly inherit features from ancestor Skylake-Server, whil=
+e
+> addin new features: AVX512_VNNI, Intel PT.
+> SSBD support for speculative execution
+> side channel mitigations.
+>=20
+> Note:
+>=20
+> On Cascadelake, some capabilities (RDCL_NO, IBRS_ALL, RSBA,
+> SKIP_L1DFL_VMENTRY and SSB_NO) are enumerated by MSR.
+> These features rely on MSR based feature support patch.
+> Will be added later after that patch's in.
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg00074.html
+>=20
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+>  target/i386/cpu.c | 54
+> +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 54 insertions(+)
+>=20
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c index
+> f24295e6e4..670898f32d 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -2386,6 +2386,60 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+>          .xlevel =3D 0x80000008,
+>          .model_id =3D "Intel Xeon Processor (Skylake, IBRS)",
+>      },
+> +    {
+> +        .name =3D "Cascadelake-Server",
+> +        .level =3D 0xd,
+> +        .vendor =3D CPUID_VENDOR_INTEL,
+> +        .family =3D 6,
+> +        .model =3D 85,
+> +        .stepping =3D 5,
+> +        .features[FEAT_1_EDX] =3D
+> +            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
+|
+> +            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV |
+> CPUID_MCA |
+> +            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
+|
+> +            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+> +            CPUID_DE | CPUID_FP87,
+> +        .features[FEAT_1_ECX] =3D
+> +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+> +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+> +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+> +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+> +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+> CPUID_EXT_MOVBE |
+> +            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+> +        .features[FEAT_8000_0001_EDX] =3D
+> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+> +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+> +        .features[FEAT_8000_0001_ECX] =3D
+> +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM |
+> CPUID_EXT3_3DNOWPREFETCH,
+> +        .features[FEAT_7_0_EBX] =3D
+> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+> +            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP
+> |
+> +            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
+> CPUID_7_0_EBX_INVPCID |
+> +            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED |
+> CPUID_7_0_EBX_ADX |
+> +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX |
+> CPUID_7_0_EBX_CLWB |
+> +            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+> +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+> +            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
+> +            CPUID_7_0_EBX_INTEL_PT,
+> +        .features[FEAT_7_0_ECX] =3D
+> +            CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
+> +            CPUID_7_0_ECX_AVX512VNNI,
+> +        .features[FEAT_7_0_EDX] =3D
+> +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+> +        /* Missing: XSAVES (not supported by some Linux versions,
+> +                * including v4.1 to v4.12).
+> +                * KVM doesn't yet expose any XSAVES state save component=
+,
+> +                * and the only one defined in Skylake (processor tracing=
+)
+> +                * probably will block migration anyway.
+> +                */
+> +        .features[FEAT_XSAVE] =3D
+> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+> +            CPUID_XSAVE_XGETBV1,
+> +        .features[FEAT_6_EAX] =3D
+> +            CPUID_6_EAX_ARAT,
+> +        .xlevel =3D 0x80000008,
+> +        .model_id =3D "Intel Xeon Processor (Cascadelake)",
+> +    },
+>      {
+>          .name =3D "Icelake-Client",
+>          .level =3D 0xd,
+> --
+> 2.17.1
