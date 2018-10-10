@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gAI95-0001dW-2M
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:19:39 -0400
+	(envelope-from <sbates@raithlin.com>) id 1gAIDf-0002YE-Bq
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:24:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gAI90-0007pD-DA
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:19:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59338)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gAI8u-0007m4-37
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:19:30 -0400
-References: <cover.1538652143.git.tgolembi@redhat.com>
-	<b004cd17d0fa02ed169c5b101fdbbb7fa2b6b633.1538652143.git.tgolembi@redhat.com>
-	<CAMxuvayviBgZXJJRiXNTd9Z2=tJZtkSjL-8RJODRM9NAtUufgA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a7bff59d-6087-0517-b859-44be0681dfee@redhat.com>
-Date: Wed, 10 Oct 2018 12:19:20 -0500
-MIME-Version: 1.0
-In-Reply-To: <CAMxuvayviBgZXJJRiXNTd9Z2=tJZtkSjL-8RJODRM9NAtUufgA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <sbates@raithlin.com>) id 1gAIDa-0002pL-9V
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:24:23 -0400
+Received: from mail-eopbgr660110.outbound.protection.outlook.com
+	([40.107.66.110]:37395
+	helo=CAN01-QB1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbates@raithlin.com>) id 1gAIDX-0002oD-NQ
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:24:16 -0400
+From: "Stephen  Bates" <sbates@raithlin.com>
+Date: Wed, 10 Oct 2018 17:24:13 +0000
+Message-ID: <9E5E274E-114B-492B-AB4A-049470648993@raithlin.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
+	<a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
+In-Reply-To: <a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 11/11] qga-win: demystify namespace
- striping
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AA0B0280BF3D254E864B167695F61A15@CANPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +34,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Tomas Golembiovsky <tgolembi@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, sjubran@redhat.com, okrishtal@virtuozzo.com, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Andrea Bolognani <abologna@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: Keith Busch <keith.busch@intel.com>, "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard
+	W.M. Jones" <rjones@redhat.com>
 
-On 10/4/18 8:20 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Thu, Oct 4, 2018 at 3:22 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgole=
-mbi@redhat.com> wrote:
->>
->> It was not obvious what exactly the cryptic string copying does to the
->> GUID. This change makes the intent clearer.
-
-In the subject line, s/striping/stripping/ (this is about performing a=20
-'strip' operation on a prefix, but I read the subject as an instance of=20
-'stripe' as in drawing a line or fragmenting data in a RAID).
-
->> +++ b/qga/commands-win32.c
->> @@ -507,7 +507,14 @@ static GuestPCIAddress *get_pci_info(char *guid, =
-Error **errp)
->>       char dev_name[MAX_PATH];
->>       char *buffer =3D NULL;
->>       GuestPCIAddress *pci =3D NULL;
->> -    char *name =3D g_strdup(&guid[4]);
->> +    char *name =3D NULL;
->> +
->> +    if ((g_str_has_prefix(guid, "\\\\.\\") =3D=3D TRUE) ||
->> +        (g_str_has_prefix(guid, "\\\\?\\") =3D=3D TRUE)) {
-
-I find that 'cond =3D=3D true' is redundant to just writing 'cond'. And t=
-hat=20
-sentiment applies to both the <stdbool.h> 'bool' and to the glib=20
-abomination TRUE (why they had to invent their own boolean names, worse=20
-in every way compared to <stdbool.h>, is beyond me).
-
->> +        name =3D g_strdup(&guid[4]);
->=20
-> I find "guid + 4" easier to read though
-
-Concur.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+PiAgICBTbyBpdCBsb29rcyBsaWtlIHlvdSBhdCBsZWFzdCBnb3QgdG8gdGhlIHBvaW50IHdoZXJl
+IHRoZSBndWVzdCBPUw0KPiAgICB3b3VsZCBmaW5kIFBDSWUgZGV2aWNlcy4uLg0KDQpZZXMgYW5k
+IGluIGZhY3QgTlZNZSBJTyBhZ2FpbnN0IHRob3NlIGRldmljZXMgZG8gc3VjY2VlZCAoSSBjYW4g
+d3JpdGUgYW5kIHJlYWQgdGhlIE5WTWUgbmFtZXNwYWNlcykuIEl0IGlzIGp1c3Qgc2xvdyBiZWNh
+dXNlIHRoZSBpbnRlcnJ1cHRzIGFyZSBub3QgZ2V0dGluZyB0byB0aGUgT1MgYW5kIGhlbmNlIE5W
+TWUgdGltZW91dHMgYXJlIGhvdyB0aGUgY29tcGxldGlvbnMgYXJlIGRpc2NvdmVyZWQuDQoNCj4g
+IENhbiB5b3Ugc2hhcmUgdGhlIG91dHB1dCBvZiAnbHNwY2knIGFzIHdlbGwgYXMgdGhlIGNvbmZp
+Z3VyYXRpb24geW91IHVzZWQgd2hlbiBidWlsZGluZyB5b3VyIGJibD8NCg0KQmVsb3cgaXMgbHNw
+Y2kgLXZ2diBmb3IgdGhlIHFlbXUgY29tbWFuZCBJIHNlbnQgZWFybGllci4gVGhlIGtlcm5lbCBz
+b3VyY2UgaXMgaGVyZSBbMV0gYW5kIHRoZSAuY29uZmlnIGlzIGhlcmUgWzJdLg0KDQowMDowMC4w
+IEhvc3QgYnJpZGdlOiBSZWQgSGF0LCBJbmMuIFFFTVUgUENJZSBIb3N0IGJyaWRnZQ0KCVN1YnN5
+c3RlbTogUmVkIEhhdCwgSW5jIFFFTVUgUENJZSBIb3N0IGJyaWRnZQ0KCUNvbnRyb2w6IEkvTy0g
+TWVtLSBCdXNNYXN0ZXItIFNwZWNDeWNsZS0gTWVtV0lOVi0gVkdBU25vb3AtIFBhckVyci0gU3Rl
+cHBpbmctIFNFUlItIEZhc3RCMkItIERpc0lOVHgtDQoJU3RhdHVzOiBDYXAtIDY2TUh6LSBVREYt
+IEZhc3RCMkItIFBhckVyci0gREVWU0VMPWZhc3QgPlRBYm9ydC0gPFRBYm9ydC0gPE1BYm9ydC0g
+PlNFUlItIDxQRVJSLSBJTlR4LQ0KbHNwY2k6IFVuYWJsZSB0byBsb2FkIGxpYmttb2QgcmVzb3Vy
+Y2VzOiBlcnJvciAtMTIgPC0tW05vdGUgdGhpcyBpcyBhbiBlcnJvciBkdWUgdG8gcG9vciBrbW9k
+IHN1cHBvcnQgaW4gcmlzY3YgTGludXggYXQgdGhpcyB0aW1lXQ0KDQowMDowMS4wIE5vbi1Wb2xh
+dGlsZSBtZW1vcnkgY29udHJvbGxlcjogSW50ZWwgQ29ycG9yYXRpb24gUUVNVSBOVk0gRXhwcmVz
+cyBDb250cm9sbGVyIChyZXYgMDIpIChwcm9nLWlmIDAyIFtOVk0gRXhwcmVzc10pDQoJU3Vic3lz
+dGVtOiBSZWQgSGF0LCBJbmMgUUVNVSBWaXJ0dWFsIE1hY2hpbmUNCglDb250cm9sOiBJL08tIE1l
+bSsgQnVzTWFzdGVyKyBTcGVjQ3ljbGUtIE1lbVdJTlYtIFZHQVNub29wLSBQYXJFcnItIFN0ZXBw
+aW5nLSBTRVJSLSBGYXN0QjJCLSBEaXNJTlR4LQ0KCVN0YXR1czogQ2FwKyA2Nk1Iei0gVURGLSBG
+YXN0QjJCLSBQYXJFcnItIERFVlNFTD1mYXN0ID5UQWJvcnQtIDxUQWJvcnQtIDxNQWJvcnQtID5T
+RVJSLSA8UEVSUi0gSU5UeCsNCglMYXRlbmN5OiAwDQoJSW50ZXJydXB0OiBwaW4gQSByb3V0ZWQg
+dG8gSVJRIDENCglSZWdpb24gMDogTWVtb3J5IGF0IDQ1MDAwMDAwICg2NC1iaXQsIG5vbi1wcmVm
+ZXRjaGFibGUpIFtzaXplPThLXQ0KCVJlZ2lvbiAyOiBNZW1vcnkgYXQgNDQwMDAwMDAgKDY0LWJp
+dCwgcHJlZmV0Y2hhYmxlKSBbc2l6ZT0xNk1dDQoJQ2FwYWJpbGl0aWVzOiBbODBdIEV4cHJlc3Mg
+KHYyKSBSb290IENvbXBsZXggSW50ZWdyYXRlZCBFbmRwb2ludCwgTVNJIDAwDQoJCURldkNhcDoJ
+TWF4UGF5bG9hZCAxMjggYnl0ZXMsIFBoYW50RnVuYyAwDQoJCQlFeHRUYWctIFJCRSsNCgkJRGV2
+Q3RsOglSZXBvcnQgZXJyb3JzOiBDb3JyZWN0YWJsZS0gTm9uLUZhdGFsLSBGYXRhbC0gVW5zdXBw
+b3J0ZWQtDQoJCQlSbHhkT3JkLSBFeHRUYWctIFBoYW50RnVuYy0gQXV4UHdyLSBOb1Nub29wLQ0K
+CQkJTWF4UGF5bG9hZCAxMjggYnl0ZXMsIE1heFJlYWRSZXEgMTI4IGJ5dGVzDQoJCURldlN0YToJ
+Q29yckVyci0gVW5jb3JyRXJyLSBGYXRhbEVyci0gVW5zdXBwUmVxLSBBdXhQd3ItIFRyYW5zUGVu
+ZC0NCgkJRGV2Q2FwMjogQ29tcGxldGlvbiBUaW1lb3V0OiBOb3QgU3VwcG9ydGVkLCBUaW1lb3V0
+RGlzLSwgTFRSLSwgT0JGRiBOb3QgU3VwcG9ydGVkDQoJCURldkN0bDI6IENvbXBsZXRpb24gVGlt
+ZW91dDogNTB1cyB0byA1MG1zLCBUaW1lb3V0RGlzLSwgTFRSLSwgT0JGRiBEaXNhYmxlZA0KCUtl
+cm5lbCBkcml2ZXIgaW4gdXNlOiBudm1lDQoNCjAwOjAyLjAgTm9uLVZvbGF0aWxlIG1lbW9yeSBj
+b250cm9sbGVyOiBJbnRlbCBDb3Jwb3JhdGlvbiBRRU1VIE5WTSBFeHByZXNzIENvbnRyb2xsZXIg
+KHJldiAwMikgKHByb2ctaWYgMDIgW05WTSBFeHByZXNzXSkNCglTdWJzeXN0ZW06IFJlZCBIYXQs
+IEluYyBRRU1VIFZpcnR1YWwgTWFjaGluZQ0KCUNvbnRyb2w6IEkvTy0gTWVtKyBCdXNNYXN0ZXIr
+IFNwZWNDeWNsZS0gTWVtV0lOVi0gVkdBU25vb3AtIFBhckVyci0gU3RlcHBpbmctIFNFUlItIEZh
+c3RCMkItIERpc0lOVHgtDQoJU3RhdHVzOiBDYXArIDY2TUh6LSBVREYtIEZhc3RCMkItIFBhckVy
+ci0gREVWU0VMPWZhc3QgPlRBYm9ydC0gPFRBYm9ydC0gPE1BYm9ydC0gPlNFUlItIDxQRVJSLSBJ
+TlR4Kw0KCUxhdGVuY3k6IDANCglJbnRlcnJ1cHQ6IHBpbiBBIHJvdXRlZCB0byBJUlEgMQ0KCVJl
+Z2lvbiAwOiBNZW1vcnkgYXQgNDUwMDIwMDAgKDY0LWJpdCwgbm9uLXByZWZldGNoYWJsZSkgW3Np
+emU9OEtdDQoJUmVnaW9uIDI6IE1lbW9yeSBhdCA0MDAwMDAwMCAoNjQtYml0LCBwcmVmZXRjaGFi
+bGUpIFtzaXplPTY0TV0NCglDYXBhYmlsaXRpZXM6IFs4MF0gRXhwcmVzcyAodjIpIFJvb3QgQ29t
+cGxleCBJbnRlZ3JhdGVkIEVuZHBvaW50LCBNU0kgMDANCgkJRGV2Q2FwOglNYXhQYXlsb2FkIDEy
+OCBieXRlcywgUGhhbnRGdW5jIDANCgkJCUV4dFRhZy0gUkJFKw0KCQlEZXZDdGw6CVJlcG9ydCBl
+cnJvcnM6IENvcnJlY3RhYmxlLSBOb24tRmF0YWwtIEZhdGFsLSBVbnN1cHBvcnRlZC0NCgkJCVJs
+eGRPcmQtIEV4dFRhZy0gUGhhbnRGdW5jLSBBdXhQd3ItIE5vU25vb3AtDQoJCQlNYXhQYXlsb2Fk
+IDEyOCBieXRlcywgTWF4UmVhZFJlcSAxMjggYnl0ZXMNCgkJRGV2U3RhOglDb3JyRXJyLSBVbmNv
+cnJFcnItIEZhdGFsRXJyLSBVbnN1cHBSZXEtIEF1eFB3ci0gVHJhbnNQZW5kLQ0KCQlEZXZDYXAy
+OiBDb21wbGV0aW9uIFRpbWVvdXQ6IE5vdCBTdXBwb3J0ZWQsIFRpbWVvdXREaXMtLCBMVFItLCBP
+QkZGIE5vdCBTdXBwb3J0ZWQNCgkJRGV2Q3RsMjogQ29tcGxldGlvbiBUaW1lb3V0OiA1MHVzIHRv
+IDUwbXMsIFRpbWVvdXREaXMtLCBMVFItLCBPQkZGIERpc2FibGVkDQoJS2VybmVsIGRyaXZlciBp
+biB1c2U6IG52bWUNCg0KICAgIA0KU3RlcGhlbiANCg0KWzFdIGh0dHBzOi8vZ2l0aHViLmNvbS9z
+YmF0ZXMxMzAyNzIvbGludXgtcDJwbWVtL3RyZWUvcmlzY3YtcDJwLXNpZml2ZQ0KWzJdIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9FaWRldGljb20va2VybmVsLWNvbmZpZ3MvYmxvYi9tYXN0ZXIvcmlzY3Yt
+Z29vZC1jb25maWctdXBkYXRlZC1wMnBkbWENCiAgICANCiAgICANCg0K
