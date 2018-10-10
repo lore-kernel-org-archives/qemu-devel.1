@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gAHW4-0004eS-8e
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:39:21 -0400
+	(envelope-from <jsnow@redhat.com>) id 1gAHXQ-0005Nh-GY
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:40:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gAHVv-0000Xw-6n
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:39:17 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 10 Oct 2018 16:39:07 +0000
-Message-ID: <873684d4-5219-fa89-f393-2cea8b291dc6@virtuozzo.com>
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
-	<20180817122219.16206-8-vsementsov@virtuozzo.com>
-In-Reply-To: <20180817122219.16206-8-vsementsov@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D607E70FFE6D0A4EA963DB0BEDA9B74E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <jsnow@redhat.com>) id 1gAHXP-00017Q-Ot
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:40:44 -0400
+References: <1539145764-5730-1-git-send-email-liq3ea@gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <ea51c064-d7e8-5e97-e7be-e70b6f69b5ca@redhat.com>
+Date: Wed, 10 Oct 2018 12:40:35 -0400
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/qcow2-refcount: fix
- out-of-file L2 entries to be read-as-zero
+In-Reply-To: <1539145764-5730-1-git-send-email-liq3ea@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] ide: piix: convert constant device name to
+ MACRO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Li Qiang <liq3ea@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
 
-MTcuMDguMjAxOCAxNToyMiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-UmV3cml0ZSBjb3JydXB0ZWQgTDIgdGFibGUgZW50cnksIHdoaWNoIHJlZmVyZW5jZSBzcGFjZSBv
-dXQgb2YNCj4gdW5kZXJseWluZyBmaWxlLg0KPg0KPiBNYWtlIHRoaXMgTDIgdGFibGUgZW50cnkg
-cmVhZC1hcy1hbGwtemVyb3Mgd2l0aG91dCBhbnkgYWxsb2NhdGlvbi4NCj4NCj4gU2lnbmVkLW9m
-Zi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
-Y29tPg0KPiAtLS0NCj4gICBibG9jay9xY293Mi1yZWZjb3VudC5jIHwgMzIgKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysNCj4gICAxIGZpbGUgY2hhbmdlZCwgMzIgaW5zZXJ0aW9ucygr
-KQ0KPg0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItcmVmY291bnQuYyBiL2Jsb2NrL3Fjb3cy
-LXJlZmNvdW50LmMNCj4gaW5kZXggM2MwMDRlNWJmZS4uM2RlMzc2OGEzYyAxMDA2NDQNCj4gLS0t
-IGEvYmxvY2svcWNvdzItcmVmY291bnQuYw0KPiArKysgYi9ibG9jay9xY293Mi1yZWZjb3VudC5j
-DQo+IEBAIC0xNzIwLDggKzE3MjAsMzAgQEAgc3RhdGljIGludCBjaGVja19yZWZjb3VudHNfbDIo
-QmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEJkcnZDaGVja1Jlc3VsdCAqcmVzLA0KPiAgICAgICAgICAg
-ICAgIC8qIE1hcmsgY2x1c3RlciBhcyB1c2VkICovDQo+ICAgICAgICAgICAgICAgY3NpemUgPSAo
-KChsMl9lbnRyeSA+PiBzLT5jc2l6ZV9zaGlmdCkgJiBzLT5jc2l6ZV9tYXNrKSArIDEpICoNCj4g
-ICAgICAgICAgICAgICAgICAgICAgIEJEUlZfU0VDVE9SX1NJWkU7DQo+ICsgICAgICAgICAgICBp
-ZiAoY3NpemUgPiBzLT5jbHVzdGVyX3NpemUpIHsNCj4gKyAgICAgICAgICAgICAgICByZXQgPSBm
-aXhfbDJfZW50cnlfdG9femVybygNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIGJzLCByZXMs
-IGZpeCwgbDJfb2Zmc2V0LCBpLCBhY3RpdmUsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAi
-Y29tcHJlc3NlZCBjbHVzdGVyIGxhcmdlciB0aGFuIGNsdXN0ZXI6IHNpemUgMHglIg0KPiArICAg
-ICAgICAgICAgICAgICAgICAgICAgUFJJeDY0LCBjc2l6ZSk7DQo+ICsgICAgICAgICAgICAgICAg
-aWYgKHJldCA8IDApIHsNCj4gKyAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsOw0KPiArICAg
-ICAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgICAgICBjb250aW51ZTsNCj4gKyAgICAgICAg
-ICAgIH0NCj4gKw0KPiAgICAgICAgICAgICAgIGNvZmZzZXQgPSBsMl9lbnRyeSAmIHMtPmNsdXN0
-ZXJfb2Zmc2V0X21hc2sgJg0KPiAgICAgICAgICAgICAgICAgICAgICAgICB+KEJEUlZfU0VDVE9S
-X1NJWkUgLSAxKTsNCj4gKyAgICAgICAgICAgIGlmIChjb2Zmc2V0ID49IGJkcnZfZ2V0bGVuZ3Ro
-KGJzLT5maWxlLT5icykpIHsNCj4gKyAgICAgICAgICAgICAgICByZXQgPSBmaXhfbDJfZW50cnlf
-dG9femVybygNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgIGJzLCByZXMsIGZpeCwgbDJfb2Zm
-c2V0LCBpLCBhY3RpdmUsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAiY29tcHJlc3NlZCBj
-bHVzdGVyIG91dCBvZiBmaWxlOiBvZmZzZXQgMHglIiBQUkl4NjQsDQo+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICBjb2Zmc2V0KTsNCj4gKyAgICAgICAgICAgICAgICBpZiAocmV0IDwgMCkgew0K
-PiArICAgICAgICAgICAgICAgICAgICBnb3RvIGZhaWw7DQo+ICsgICAgICAgICAgICAgICAgfQ0K
-PiArICAgICAgICAgICAgICAgIGNvbnRpbnVlOw0KPiArICAgICAgICAgICAgfQ0KPiArDQo+ICAg
-ICAgICAgICAgICAgcmV0ID0gcWNvdzJfaW5jX3JlZmNvdW50c19pbXJ0KGJzLCByZXMsDQo+ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlZmNvdW50X3RhYmxl
-LCByZWZjb3VudF90YWJsZV9zaXplLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBjb2Zmc2V0LCBjc2l6ZSk7DQo+IEBAIC0xNzQ4LDYgKzE3NzAsMTYgQEAg
-c3RhdGljIGludCBjaGVja19yZWZjb3VudHNfbDIoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEJkcnZD
-aGVja1Jlc3VsdCAqcmVzLA0KPiAgICAgICAgICAgew0KPiAgICAgICAgICAgICAgIHVpbnQ2NF90
-IG9mZnNldCA9IGwyX2VudHJ5ICYgTDJFX09GRlNFVF9NQVNLOw0KPiAgIA0KPiArICAgICAgICAg
-ICAgaWYgKG9mZnNldCA+PSBiZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMpKSB7DQo+ICsgICAg
-ICAgICAgICAgICAgcmV0ID0gZml4X2wyX2VudHJ5X3RvX3plcm8oDQo+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICBicywgcmVzLCBmaXgsIGwyX29mZnNldCwgaSwgYWN0aXZlLA0KPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgImNsdXN0ZXIgb3V0IG9mIGZpbGU6IG9mZnNldCAweCUiIFBSSXg2
-NCwgb2Zmc2V0KTsNCj4gKyAgICAgICAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPiArICAgICAg
-ICAgICAgICAgICAgICBnb3RvIGZhaWw7DQo+ICsgICAgICAgICAgICAgICAgfQ0KPiArICAgICAg
-ICAgICAgICAgIGNvbnRpbnVlOw0KPiArICAgICAgICAgICAgfQ0KPiArDQo+ICAgICAgICAgICAg
-ICAgaWYgKGZsYWdzICYgQ0hFQ0tfRlJBR19JTkZPKSB7DQo+ICAgICAgICAgICAgICAgICAgIHJl
-cy0+YmZpLmFsbG9jYXRlZF9jbHVzdGVycysrOw0KPiAgICAgICAgICAgICAgICAgICBpZiAobmV4
-dF9jb250aWd1b3VzX29mZnNldCAmJg0KDQpobW0sIGludGVyZXN0aW5nIHF1ZXN0aW9uIGhlcmU6
-IGluIGNhc2Ugb2YgbWlzYWxpZ25lZCBsMiBlbnRyeSwgd2UgemVybyANCml0IG91dCBvbmx5IGZv
-ciBRQ09XMl9DTFVTVEVSX1pFUk9fQUxMT0MsIGJ1dCBub3QgZm9yIG5vcm1hbCBjbHVzdGVycz8g
-DQpXaHk/IEkgdGhpbmsgaXQgaXMgb2sgdG8gbWFyayBhcyB6ZXJvIG1pc2FsaWduZWQgbm9ybWFs
-IGNsdXN0ZXIgbDIgDQplbnRyeSwgb3RoZXJ3aXNlIHdlJ2xsIGhhdmUgZmF0YWwgY29ycnVwdGlv
-biBvbiBhbnkgb3BlcmF0aW9uIHRvIHRoaXMgDQpjbHVzdGVyLg0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQoNCg==
+
+
+On 10/10/2018 12:29 AM, Li Qiang wrote:
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> ---
+>  hw/ide/piix.c | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
+> index a3afe1f..5f29cce 100644
+> --- a/hw/ide/piix.c
+> +++ b/hw/ide/piix.c
+> @@ -35,6 +35,10 @@
+>  #include "hw/ide/pci.h"
+>  #include "trace.h"
+>  
+> +#define TYPE_PIIX3_IDE "piix3-ide"
+> +#define TYPE_PIIX3_IDE_XEN "piix3-ide-xen"
+> +#define TYPE_PIIX4_IDE "piix4-ide"
+> +
+>  static uint64_t bmdma_read(void *opaque, hwaddr addr, unsigned size)
+>  {
+>      BMDMAState *bm = opaque;
+> @@ -204,7 +208,7 @@ PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
+>  {
+>      PCIDevice *dev;
+>  
+> -    dev = pci_create_simple(bus, devfn, "piix3-ide-xen");
+> +    dev = pci_create_simple(bus, devfn, TYPE_PIIX3_IDE_XEN);
+>      pci_ide_create_devs(dev, hd_table);
+>      return dev;
+>  }
+> @@ -226,7 +230,7 @@ PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
+>  {
+>      PCIDevice *dev;
+>  
+> -    dev = pci_create_simple(bus, devfn, "piix3-ide");
+> +    dev = pci_create_simple(bus, devfn, TYPE_PIIX3_IDE);
+>      pci_ide_create_devs(dev, hd_table);
+>      return dev;
+>  }
+> @@ -237,7 +241,7 @@ PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
+>  {
+>      PCIDevice *dev;
+>  
+> -    dev = pci_create_simple(bus, devfn, "piix4-ide");
+> +    dev = pci_create_simple(bus, devfn, TYPE_PIIX4_IDE);
+>      pci_ide_create_devs(dev, hd_table);
+>      return dev;
+>  }
+> @@ -257,13 +261,13 @@ static void piix3_ide_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo piix3_ide_info = {
+> -    .name          = "piix3-ide",
+> +    .name          = TYPE_PIIX3_IDE,
+>      .parent        = TYPE_PCI_IDE,
+>      .class_init    = piix3_ide_class_init,
+>  };
+>  
+>  static const TypeInfo piix3_ide_xen_info = {
+> -    .name          = "piix3-ide-xen",
+> +    .name          = TYPE_PIIX3_IDE_XEN,
+>      .parent        = TYPE_PCI_IDE,
+>      .class_init    = piix3_ide_class_init,
+>  };
+> @@ -283,7 +287,7 @@ static void piix4_ide_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo piix4_ide_info = {
+> -    .name          = "piix4-ide",
+> +    .name          = TYPE_PIIX4_IDE,
+>      .parent        = TYPE_PCI_IDE,
+>      .class_init    = piix4_ide_class_init,
+>  };
+> 
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+Sure thing. This can actually go through the trivial queue:
+
+Acked-by: John Snow <jsnow@redhat.com>
+
+CC'd qemu-trivial.
+
+--js
