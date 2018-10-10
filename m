@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gA6FE-0008UH-37
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 00:37:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1gA6dI-0002vk-TN
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 01:02:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gA6FA-0006rB-24
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 00:37:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gA6F9-0006qF-Rc
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 00:37:07 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B7CC2369C9
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 04:37:06 +0000 (UTC)
-Date: Wed, 10 Oct 2018 12:37:00 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181010043700.GO18728@xz-x1>
-References: <20181009131251.721-1-marcandre.lureau@redhat.com>
-	<20181009131251.721-5-marcandre.lureau@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1gA6dH-0000gZ-Vy
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 01:02:04 -0400
+Date: Wed, 10 Oct 2018 15:32:31 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20181010043230.GK7004@umbus.fritz.box>
+References: <20181008032539.6437-1-sjitindarsingh@gmail.com>
+	<20181008032539.6437-3-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3NJww9yp20AXRsxZ"
 Content-Disposition: inline
-In-Reply-To: <20181009131251.721-5-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/6] monitor: check if chardev can switch
- gcontext for OOB
+In-Reply-To: <20181008032539.6437-3-sjitindarsingh@gmail.com>
+Subject: Re: [Qemu-devel] [QEMU-PPC] [PATCH V2 2/3] target/ppc: Add one reg
+ id for ptcr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, paulus@ozlabs.org
 
-On Tue, Oct 09, 2018 at 05:12:49PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Note: this patch will conflict with Peter "[PATCH v9 3/6] monitor:
-> remove "x-oob", turn oob on by default", but can be trivially updated.
+
+--3NJww9yp20AXRsxZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Oct 08, 2018 at 02:25:38PM +1100, Suraj Jitindar Singh wrote:
+> The ptcr (partition table control register) is used to store the address
+> and size of the partition table. For nested kvm-hv we have a level 1
+> guest register the location of it's partition table with the hypervisor.
+> Thus to support migration we need to be able to read this out of kvm
+> and restore it post migration.
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Add the one reg id for the ptcr.
+>=20
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  monitor.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  target/ppc/translate_init.inc.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >=20
-> diff --git a/monitor.c b/monitor.c
-> index a25514490a..c175cf6f0d 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4550,9 +4550,10 @@ void monitor_init(Chardev *chr, int flags)
->      bool use_oob =3D flags & MONITOR_USE_OOB;
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 263e63cb03..487196800b 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -8197,11 +8197,11 @@ static void gen_spr_power9_mmu(CPUPPCState *env)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+>      /* Partition Table Control */
+> -    spr_register_hv(env, SPR_PTCR, "PTCR",
+> -                    SPR_NOACCESS, SPR_NOACCESS,
+> -                    SPR_NOACCESS, SPR_NOACCESS,
+> -                    &spr_read_generic, &spr_write_ptcr,
+> -                    0x00000000);
+> +    spr_register_kvm_hv(env, SPR_PTCR, "PTCR",
+> +                        SPR_NOACCESS, SPR_NOACCESS,
+> +                        SPR_NOACCESS, SPR_NOACCESS,
+> +                        &spr_read_generic, &spr_write_ptcr,
+> +                        KVM_REG_PPC_PTCR, 0x00000000);
+>  #endif
+>  }
 > =20
->      if (use_oob) {
-> -        if (CHARDEV_IS_MUX(chr)) {
-> +        if (!qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT)) {
->              error_report("Monitor out-of-band is not supported with "
-> -                         "MUX typed chardev backend");
-> +                         "%s typed chardev backend",
-> +                         object_get_typename(OBJECT(chr)));
-
-This seems a bit confusing to me at the first glance since we forbid
-mux because not all frontends are ready to run outside main loop (and
-now we have mon_iothread so it'll be odd too to run anything
-non-monitor on that too...), rather than whether the backend can
-dynamically switch its context.
-
-I'm not sure, but do you mean you want to disable oob for backends
-like spice or braille?  I just noticed that it seems even legal if we
-pipe a qmp monitor with a windows mouse...
-
-I believe in all cases the commit message can be enhanced on
-explaining "why" of this patch. :)
-
-Regards,
 
 --=20
-Peter Xu
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--3NJww9yp20AXRsxZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlu9gN4ACgkQbDjKyiDZ
+s5IKUxAApo+PXazLukjK5igC/2RWxmnzQFbvD304IuRxwKsvkx9BQ2/n40gEG5ju
+dyCWbdUkb2uuRi+Zdd9AH+1b+eN/mrDEwOaFNFzeBB0kvj7TqDaFT/yqetQrR5HL
+d4iyb/5IVOVYfqIOVPYUiWsbxVhuUdrJfmFe3o2dqMJF2WoxEc7+Uv6Hb2U17RNA
+jYGbjxgQrMsbgw3zGAnS9NvI+yOSeivmrFVFwIZP5dFaZ+IfWLwIQMVufe+KR/El
+PG0zgW95KGTFuaEI8LcdlFJ+aDChIlwGxtVOE5ni2QpMTnmykvnIc9YDWoP+XpeN
+26E7Vu5vBKbK6wgmAkgRx9GQWhc24zcFjjqHaleOMqmnRjtsJTYcQqEX1Ntq9ake
+DfezqG9Tv8PrwWST5Sh50srKrO9B+m+OxWkhpL2hNB4dIHKR9PdUXCKrSlN9/DsR
+nrShQ03N7IbuDgbX8crkEOr7sl2+WIo11io7JQoRhSd54q2c5MDPLW8I6QYSTk6u
+YQg6Ya17k/LobZD09rLQQm8U7xJe0TQw9w63KqtSUkcs/8DTFNR+l24gsOj27Zgt
+j2F6pLVN2igwkE1BBpm+OyfwcgWbaU1OzlcY9GE5KnqEfkJ03PvJZ6QxZT0DNe+w
+hzlJRv5l25T+ITmRQMKTUQ6tSgDFP1BCidiJVFPWBUab6b4LOnE=
+=vTxB
+-----END PGP SIGNATURE-----
+
+--3NJww9yp20AXRsxZ--
