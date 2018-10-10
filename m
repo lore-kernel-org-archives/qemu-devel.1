@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gAFGu-0000kb-Lt
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:15:33 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAFIW-0001gN-FB
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:17:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gAFGr-0006AO-Vx
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:15:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gAFGr-00069z-N4
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:15:29 -0400
-From: Cleber Rosa <crosa@redhat.com>
-References: <20181009232607.15521-1-crosa@redhat.com>
-	<20181009232607.15521-5-crosa@redhat.com>
-	<835fcb24-5832-9e6c-9f57-0364f0bf849a@redhat.com>
-	<95a8561c-0511-6a8a-a3eb-25d556029e7a@redhat.com>
-	<20181010134656.GE5738@habkost.net>
-	<47f72e98-335f-b3c9-54c7-4c8a468d85d6@redhat.com>
-Message-ID: <26fe2055-77c2-45fa-4e88-62101d70b88b@redhat.com>
-Date: Wed, 10 Oct 2018 10:15:15 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAFIT-0006up-Pv
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:17:12 -0400
+Date: Wed, 10 Oct 2018 16:16:52 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181010161652.6eb8b00f.cohuck@redhat.com>
+In-Reply-To: <158900e0-4ac5-5d20-b47d-cb7f7a036e70@linux.ibm.com>
+References: <20181009175226.22138-1-akrowiak@linux.vnet.ibm.com>
+	<20181009175226.22138-5-akrowiak@linux.vnet.ibm.com>
+	<20181010101453.4d1e4add.cohuck@redhat.com>
+	<158900e0-4ac5-5d20-b47d-cb7f7a036e70@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <47f72e98-335f-b3c9-54c7-4c8a468d85d6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] scripts/qemu.py: set predefined
- machine type based on arch
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 4/6] s390x/ap: base Adjunct Processor
+ (AP) object model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, fiuczy@linux.ibm.com, mimu@linux.ibm.com
 
+On Wed, 10 Oct 2018 09:59:55 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
+> On 10/10/2018 04:14 AM, Cornelia Huck wrote:
+> > On Tue,  9 Oct 2018 13:52:24 -0400
+> > Tony Krowiak <akrowiak@linux.vnet.ibm.com> wrote:
+> >   
+> >> diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
+> >> new file mode 100644
+> >> index 000000000000..fb6e35024c82
+> >> --- /dev/null
+> >> +++ b/hw/s390x/ap-device.c
+> >> @@ -0,0 +1,39 @@
+> >> +/*
+> >> + * Adjunct Processor (AP) matrix device
+> >> + *
+> >> + * Copyright 2018 IBM Corp.
+> >> + * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>  
+> > 
+> > Do you also want this to use the vnet-less form instead?
+> >   
+> >> + *
+> >> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> >> + * your option) any later version. See the COPYING file in the top-level
+> >> + * directory.
+> >> + */  
+> >   
+> >> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+> >> new file mode 100644
+> >> index 000000000000..4fb3c9ab82f2
+> >> --- /dev/null
+> >> +++ b/include/hw/s390x/ap-device.h
+> >> @@ -0,0 +1,23 @@
+> >> +/*
+> >> + * Adjunct Processor (AP) matrix device interfaces
+> >> + *
+> >> + * Copyright 2018 IBM Corp.
+> >> + * Author(s): Tony Krowiak <akrowiak@linux.vnet.ibm.com>  
+> > 
+> > Same here.  
+> 
+> Yes. Shall I just submit a v11?
 
-On 10/10/18 9:59 AM, Cleber Rosa wrote:
->=20
->=20
-> On 10/10/18 9:46 AM, Eduardo Habkost wrote:
->> On Wed, Oct 10, 2018 at 08:35:38AM -0400, Cleber Rosa wrote:
->>>
->>>
->>> On 10/10/18 7:00 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> On 10/10/2018 01:26, Cleber Rosa wrote:
->>>>> Some targets require a machine type to be set, as there's no defaul=
-t
->>>>> (aarch64 is one example).  To give a consistent interface to users =
-of
->>>>> this API, this changes set_machine() so that a predefined default c=
-an
->>>>> be used, if one is not given.  The approach used is exactly the sam=
-e
->>>>> with the console device type.
->>>>>
->>>>> Also, even when there's a default machine type, for some purposes,
->>>>> testing included, it's better if outside code is explicit about the
->>>>> machine type, instead of relying on whatever is set internally.
->>>>>
->>>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>>>> ---
->>>>>  scripts/qemu.py | 22 +++++++++++++++++++++-
->>>>>  1 file changed, 21 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->>>>> index d9e24a0c1a..fca9b76990 100644
->>>>> --- a/scripts/qemu.py
->>>>> +++ b/scripts/qemu.py
->>>>> @@ -36,6 +36,15 @@ CONSOLE_DEV_TYPES =3D {
->>>>>      r'^s390-ccw-virtio.*': 'sclpconsole',
->>>>>      }
->>>>> =20
->>>>> +#: Maps archictures to the preferred machine type
->>>>> +MACHINE_TYPES =3D {
->>>>> +    r'^aarch64$': 'virt',
->>>>> +    r'^ppc$': 'g3beige',
->>>>> +    r'^ppc64$': 'pseries',
->>>>> +    r'^s390x$': 's390-ccw-virtio',
->>>>> +    r'^x86_64$': 'q35',
->>>>
->>>> Why choose Q35 rather than PC (the default)?
->>>>
->>>> I was wondering about how to generate variants/machines.json but thi=
-s is
->>>> definitively something we want to do via a QMP query.
->>>>
->>>> Eduardo what do you think?
->>>>
->>>
->>> It was motivated by Eduardo's initiative to make q35 the default "acr=
-oss
->>> the board".  He can confirm and give more details.
->>
->> Making Q35 the default on applications using QEMU and libvirt is
->> something I'd like to happen.  But I think the simplest way to do
->> that is to change the QEMU default.  This way you won't need this
->> table on qemu.py: you can just use the default provided by QEMU.
->>
->=20
-> The idea is to bring consistency on how we're calling
-> "qemu-system-$(ARCH)", and at the same time apply the "explicit is
-> better than implicit" rule.
->=20
-> The most important fact is that some targets do not (currently) have
-> "the default provided by QEMU", aarch64 is one of them.
->=20
-> - Cleber.
->=20
-
-So I ended up not relaying the question properly: should we default
-(even if explicitly adding "-machine") to "pc"?
-
-Thanks!
-- Cleber.
+Please submit a v11 with the various things mentioned during review
+(and the r-bs etc. collected).
