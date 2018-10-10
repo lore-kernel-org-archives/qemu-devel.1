@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gA54d-0006ET-7m
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:22:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1gA5Md-0000r9-PD
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:40:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gA54Z-0001Ng-Rt
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:22:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gA54Z-0001NM-K2
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:22:07 -0400
-Date: Wed, 10 Oct 2018 11:21:55 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181010032154.GL18728@xz-x1>
-References: <20181009062718.1914-1-peterx@redhat.com>
-	<20181009062718.1914-3-peterx@redhat.com>
-	<CAJ+F1CJwK4cC5xXviefrOFiQCcrP7fsrDwx2E9mZSg_UtFPXrA@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1gA5Mb-00065y-0r
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:40:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59490)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gA5Ma-00065J-RB
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:40:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gA5MZ-0007cl-ID
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 03:40:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 727112E80CC
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 03:40:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJwK4cC5xXviefrOFiQCcrP7fsrDwx2E9mZSg_UtFPXrA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 2/6] monitor: resume the monitor earlier
- if needed
+Date: Wed, 10 Oct 2018 03:33:13 -0000
+From: Rob Thomas <1779017@bugs.launchpad.net>
+Reply-To: Bug 1779017 <1779017@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153014968219.17704.367188786620032253.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153914239333.12644.7631127387977370530.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1779017] Re: qemu-system-arm: crashes raspian
+ kernels with divide-by-zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +37,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Oct 09, 2018 at 12:54:37PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
-> On Tue, Oct 9, 2018 at 10:28 AM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > Currently when QMP request queue full we won't resume the monitor unt=
-il
-> > we have completely handled the current command.  It's not necessary
-> > since even before it's handled the queue is already non-full.  Moving
-> > the resume logic earlier before the command execution.
-> >
-> > Note that now monitor_resume() is heavy weighted after 8af6bb14a3a8 a=
-nd
-> > it's even possible (as pointed out by Marc-Andr=C3=A9) that the funct=
-ion
-> > itself may try to take the monitor lock again, so let's do the resume
-> > after the monitor lock is released to avoid possible dead lock.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  monitor.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/monitor.c b/monitor.c
-> > index 1f83775fff..f5911399d8 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -4149,6 +4149,12 @@ static void monitor_qmp_bh_dispatcher(void *da=
-ta)
-> >      need_resume =3D !qmp_oob_enabled(mon) ||
-> >          mon->qmp.qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX -=
- 1;
-> >      qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
-> > +
-> > +    if (need_resume) {
-> > +        /* Pairs with the monitor_suspend() in handle_qmp_command() =
-*/
-> > +        monitor_resume(mon);
-> > +    }
->=20
-> "need_resume" is only set on non-oob enabled monitors.
+This does not appear to be DIRECTLY a bug in QEMU, but 'something' has
+changed in the RPi Kernel to cause this issue.
 
-... or on oob-enabled monitors when queue full?
+The actual cause of the panic is (in my situation) because the kernel is
+unable to mount root, and this is caused by it being unable to access
+the SD interface, as it can't get timing.
 
->=20
-> On monitor_resume(), monitor_qmp_read() may end up being called, which
-> may call handle_qmp_command().
->=20
-> With regular commands, a new command is queued. But if the command is
-> "exec-oob", it will dispatch immediately, thus not following the QMP
-> reply ordering constrain.
->=20
-> Shouldn't it be an error to call exec-oob on non-oob enabled monitors?
+This is a random working kernel (using QEMU 3.0) -
+https://pastebin.com/wvkneNNF
 
-Do you mean a "qmp_capabilities" command to enable oob, and a
-continuous "exec-oob" command?
+This is the latest 4.14 kernel (using the identical QEMU) -
+https://pastebin.com/QTwgCkV2
 
-I can't say I fully understand the scenario you mentioned, but I think
-it does violate the rule if we resume the monitor before we finish
-executing the "qmp_capabilities" command since that command should
-still be run with "non-oob" context.  So in that case we should do the
-resume after dispatching.  For the other queue-full case we shouldn't
-need to, as Markus suggested.
+The actual error is on line 160:
 
-Instead of bothering with all these, how about I drop this patch?  We
-might resume the monitor a little bit later when queue full, but I
-don't think that's a big deal for now.
+[    1.706622] sdhost-bcm2835 3f202000.mmc: could not get clk, deferring
+probe
 
-Regards,
+This never actually activates the mmc controller, and the root volume is
+not available.
 
---=20
-Peter Xu
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1779017
+
+Title:
+  qemu-system-arm: crashes raspian kernels with divide-by-zero
+
+Status in QEMU:
+  New
+
+Bug description:
+  While trying to boot a arm kernel for a raspi2 machine (kernel7-4.9.41-st=
+retch.img in my case, but applies to other versions, too) the kernel crash =
+with a division by zero. The output on the sreial console is:
+  [   10.022377] [<8011d344>] (__warn) from [<8011d42c>] (warn_slowpath_nul=
+l+0x30/0x38)
+  [   10.024726] [<8011d42c>] (warn_slowpath_null) from [<804da378>] (uart_=
+get_baud_rate+0xf8/0x160)
+
+  ...
+
+  [   10.094933] Hardware name: BCM2835
+  [   10.101507] [<8010fb3c>] (unwind_backtrace) from [<8010c058>] (show_st=
+ack+0x20/0x24)
+  [   10.105413] [<8010c058>] (show_stack) from [<80455f84>] (dump_stack+0x=
+d4/0x118)
+  [   10.140268] [<80455f84>] (dump_stack) from [<8010bed4>] (__div0+0x24/0=
+x28)
+  [   10.143065] [<8010bed4>] (__div0) from [<8045498c>] (Ldiv0+0x8/0x14)
+  [   10.145553] [<8045498c>] (Ldiv0) from [<804e5538>] (pl011_set_termios+=
+0x9c/0x37c)
+  [   10.148017] [<804e5538>] (pl011_set_termios) from [<804da954>] (uart_c=
+hange_speed+0x40/0xfc)
+  [   10.185887] [<804da954>] (uart_change_speed) from [<804ddedc>] (uart_s=
+tartup.part.3+0xa4/0x13c)
+  [   10.222187] [<804ddedc>] (uart_startup.part.3) from [<804ddfcc>] (uart=
+_port_activate+0x58/0x64)
+  [   10.226014] [<804ddfcc>] (uart_port_activate) from [<804c93b8>] (tty_p=
+ort_open+0xa0/0xe0)
+  [   10.228398] [<804c93b8>] (tty_port_open) from [<804dce64>] (uart_open+=
+0x40/0x48)
+  [   10.264254] [<804dce64>] (uart_open) from [<804c1d70>] (tty_open+0xc0/=
+0x678)
+  [   10.266697] [<804c1d70>] (tty_open) from [<802753f0>] (chrdev_open+0xe=
+0/0x1a0)
+  [   10.269049] [<802753f0>] (chrdev_open) from [<8026d964>] (do_dentry_op=
+en+0x1f4/0x314)
+  [   10.271620] [<8026d964>] (do_dentry_open) from [<8026ec00>] (vfs_open+=
+0x60/0x8c)
+  [   10.275245] [<8026ec00>] (vfs_open) from [<8027f39c>] (path_openat+0x2=
+bc/0x1040)
+  [   10.312827] [<8027f39c>] (path_openat) from [<80281040>] (do_filp_open=
++0x70/0xd4)
+  [   10.317860] [<80281040>] (do_filp_open) from [<8026efd8>] (do_sys_open=
++0x120/0x1d0)
+  [   10.320370] [<8026efd8>] (do_sys_open) from [<8026f0b4>] (SyS_open+0x2=
+c/0x30)
+  [   10.357033] [<8026f0b4>] (SyS_open) from [<801080c0>] (ret_fast_syscal=
+l+0x0/0x1c)
+
+  Tracking that down in the linux kernel source, it looks like somehow
+  uart_get_baud_rate() returns 0.
+
+  The same kernel could be booted without problem with qemu version 2.11.
+  Trying to bisecting the issue revealed commit @d9f8bbd8eb4e95db97cf02bd03=
+af86a3d606f4f1 as the culprit.
+
+  Commandline to run was:
+  qemu-system-arm -M raspi2 \
+  	-kernel "$KERNEL" \
+  	-m 1024 \
+  	-d guest_errors,unimp \
+  	-dtb bcm2709-rpi-2-b.dtb \
+  	-drive file=3D"$IMG,if=3Dsd,format=3Draw"
+
+  Distribution is SuSE tumbleweed (x86_64, kernel 4.17.2), but same
+  problem also happens with a freshly compiled qemu from git repository.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1779017/+subscriptions
