@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gAKZJ-000270-Fi
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:54:55 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gAKaO-0002ve-5G
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:56:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gAKZD-0002Va-6Y
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:54:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gAKZB-0001sq-13
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:54:46 -0400
-References: <20181009232607.15521-1-crosa@redhat.com>
-	<20181009232607.15521-5-crosa@redhat.com>
-	<835fcb24-5832-9e6c-9f57-0364f0bf849a@redhat.com>
-	<95a8561c-0511-6a8a-a3eb-25d556029e7a@redhat.com>
-	<20181010134656.GE5738@habkost.net>
-	<47f72e98-335f-b3c9-54c7-4c8a468d85d6@redhat.com>
-	<26fe2055-77c2-45fa-4e88-62101d70b88b@redhat.com>
-	<20181010142840.GH5738@habkost.net>
-	<118ed8f7-5947-12c6-f3f6-b10597f37aac@redhat.com>
-	<CAFEAcA9NBu+L4wHfkLTv93wy90wjnV05EZ12PT6PmLjdZ5h_YA@mail.gmail.com>
-	<00aa913d-a7e9-3c5d-34a8-fc9ff59091db@redhat.com>
-	<CAFEAcA_fTb5uYaB3vxr3iPXLskaOmQQr1Yrd89h91noxPF1O5Q@mail.gmail.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <fb29c57e-27ce-7f80-12c2-881daea53309@redhat.com>
-Date: Wed, 10 Oct 2018 15:54:24 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gAKaK-0003Sy-Ni
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:56:00 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44497)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gAKaK-0003S2-E8
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:55:56 -0400
+Received: by mail-pf1-x443.google.com with SMTP id r9-v6so3143683pff.11
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 12:55:56 -0700 (PDT)
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
+	<a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
+	<5A5F4A2B-2DAF-4D70-BF1D-7ABC8461FDC8@raithlin.com>
+	<63b741e2-b3e5-283a-4dfc-9c1db757c575@gmail.com>
+	<C8D03A20-3B1A-4021-969F-194B14918CF2@raithlin.com>
+From: Alistair <alistair23@gmail.com>
+Message-ID: <f568f334-e746-eb0c-7670-1bcccc14080f@gmail.com>
+Date: Wed, 10 Oct 2018 12:55:48 -0700
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_fTb5uYaB3vxr3iPXLskaOmQQr1Yrd89h91noxPF1O5Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <C8D03A20-3B1A-4021-969F-194B14918CF2@raithlin.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] scripts/qemu.py: set predefined
- machine type based on arch
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,132 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Stephen Bates <sbates@raithlin.com>, Andrea Bolognani <abologna@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: Keith Busch <keith.busch@intel.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>
 
-
-
-On 10/10/18 2:07 PM, Peter Maydell wrote:
-> On 10 October 2018 at 18:52, Cleber Rosa <crosa@redhat.com> wrote:
->>
->>
->> On 10/10/18 12:23 PM, Peter Maydell wrote:
->>> On 10 October 2018 at 16:47, Cleber Rosa <crosa@redhat.com> wrote:
->>>> To make sure we're on the same page, we're still going to have default
->>>> machine types, based on the arch, for those targets that don't provide
->>>> one (aarch64 is one example).  Right?
->>>
->>> Does it make sense to define a default? The reason arm
->>> doesn't specify a default machine type is because you
->>> can't just run any old guest on any old machine type.
->>> You need to know "this guest image will run on machine
->>> type X", and run it on machine type X. This is like
->>> knowing you need to run a test on x86 PC and not
->>> on PPC spapr.
->>>
->>
->> While requiring tests to specify every single aspect of the environment
->> that will be used may be OK for low level unit tests, it puts a lot of
->> burden on higher level tests (which is supposed to be the vast majority
->> under tests/acceptance).
->>
->> From a test writer perspective, working on these higher level tests, it
->> may want to make sure that feature "X", unrelated to the target arch,
->> machine type, etc, "just works".  You man want to look at the "vnc.py"
->> test for a real world example.
+On 10/10/2018 12:01 PM, Stephen  Bates wrote:
+>> I added e1000 and e1000e support to my kernel and changed the QEMU command to:
 > 
-> OK, if it doesn't have a dependency on machine at all, it
-> should state that somehow.
+> So using -device e1000e rather than -device e1000 seems to work. I am not sure why -device e1000 causes a kernel panic. The MSI-X message is interesting and may be related to why NVMe interrupts are not reaching the OS in the guest?
+
+Great! I'm glad that it works.
+
+So it looks like PCIe is working but with some limitations in the 
+interrupts (as seen here and with the NVMe).
+
+Unless anyone has any objections I still think it makes sense to merge 
+the current patches as that works for a variety of PCIe devices. We can 
+continue to look into the interrupt issues after that.
+
+Do you want to add a Tested-by tag Stephen?
+
+Alistair
+
 > 
->> Eduardo has suggested that "make check-acceptance" runs all (possible)
->> tests on all target archs by default.
+> [    0.216000] e1000: Intel(R) PRO/1000 Network Driver - version 7.3.21-k8-NAPI
+> [    0.216000] e1000: Copyright (c) 1999-2006 Intel Corporation.
+> [    0.216000] e1000e: Intel(R) PRO/1000 Network Driver - 3.2.6-k
+> [    0.216000] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+> [    0.220000] e1000e 0000:00:01.0: assign IRQ: got 1
+> [    0.220000] e1000e 0000:00:01.0: enabling device (0000 -> 0002)
+> [    0.220000] e1000e 0000:00:01.0: enabling bus mastering
+> [    0.220000] e1000e 0000:00:01.0: Interrupt Throttling Rate (ints/sec) set to dynamic conservative mode
+> [    0.220000] e1000e 0000:00:01.0 0000:00:01.0 (uninitialized): Failed to initialize MSI-X interrupts.  Falling back to MSI interrupts.
+> [    0.220000] e1000e 0000:00:01.0 0000:00:01.0 (uninitialized): Failed to initialize MSI interrupts.  Falling back to legacy interrupts.
+> [    0.348000] e1000e 0000:00:01.0 eth0: (PCI Express:2.5GT/s:Width x1) 52:54:00:12:34:56
+> [    0.356000] e1000e 0000:00:01.0 eth0: Intel(R) PRO/1000 Network Connection
+> [    0.356000] e1000e 0000:00:01.0 eth0: MAC: 3, PHY: 8, PBA No: 000000-000
 > 
-> Yeah; or we have some mechanism for trimming down the
-> matrix of what we run. But I think it's better coverage
-> if we have 3 tests ABC that don't depend on machine
-> and 3 machines XYZ to run AX BY CZ than AX BX CX by
-> specifying X as an arbitrary "default".
+> root@libertas:~# lspci -vvv
+> 00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
+> 	Subsystem: Red Hat, Inc QEMU PCIe Host bridge
+> 	Control: I/O- Mem- BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx-
+> 	Status: Cap- 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+> lspci: Unable to load libkmod resources: error -12
 > 
-> It looks like the 'vnc' test is just testing QEMU functionality,
-> not anything that involves interacting with the guest or
-> machine model? There's a good argument that that only really
-> needs to be run once, not once per architecture.
-> 
-> You might also want to consider the "none" machine, which exists
-> for bits of test infrastructure that aren't actually trying to
-> run guests.
-> 
->>> Would it make more sense for each test to specify
->>> which machine types it can work on?
->>>
->>
->> I think it does, but I believe in the black list approach, instead of
->> the white list.
->>
->> The reason for that is that I believe that majority of the tests under
->> "tests/acceptance" can be made to work on every target (which would be
->> the default).  So far, I've made sure tests behave correctly on the 5
->> arches included in the "archs.json" file in this series (x86_64, ppc64,
->> ppc, aarch64, s390x).
->>
->> To give a full disclosure, "boot_linux.py" (boots a linux kernel) is
->> x86_64 specific, and CANCELS when asked to be run on other archs.  But,
->> on the work I've done top of these series, it already works with ppc64
->> and aarch64.  Also, "boot_linux.py" sent in another series, (which boots
->> a full linux guest) is also being adapted to work on most of the target
->> archs.
-> 
-> Right, "boot Linux" is machine specific. The kernel/disk
-> /etc that boots on aarch64 virt is probably not going to boot
-> on the 64-bit xilinx board; and on 32-bit arm you definitely
-> are going to want a different kernel in some places. This
-> is likely to be true of most tests that actually try to run
-> code in the guest.
-> 
-
-Agreed.
-
-> We should aim to test the machines we care about (regardless
-> of what architectures they are), rather than thinking about it
-> in terms of "testing architectures X, Y, Z", I think.
-> 
-
-To me it's clear that:
-
- 1) I lack a complete understanding of what "we care about"
- 2) It's easier to start with something, and tweak it to taste
-
-And TBH, I fully agree with Philippe in the sense that difference
-developer/maintainer roles will require a different test "profile".
-
-> I think you're going to need at least some whitelist functionality;
-> otherwise half the tests are going to break every time we add
-> a new machine (and "add every new machine to the blacklist for
-> half the tests" doesn't scale very well).
-> 
-
-The whitelist approach is in effect, it's the reason I sent a
-"archs.json" file, not with machine types, but with the archs that I've
-tested with.
-
-So, I'm going to push forward this series (a v3) with the same
-simplified approach, that is, `make check-acceptance` will still run the
-tests on a single target.
-
-Then, once that is settled, we can decide on:
-
- 1) `make check-acceptance` becomes "run on all target args/machine
-types" and `make check-acceptance-$(ARCH)-$(MACHINE)` is introduced.
- 2) `make check-acceptance-all` is introduced.
-
-To me it's clear that there's a huge continuation to this discussion,
-and that we should bite one piece at a time.
-
-Thoughts?
-
-Regards!
-- Cleber.
-
-> thanks
-> -- PMM
+> 00:01.0 Ethernet controller: Intel Corporation 82574L Gigabit Network Connection
+> 	Subsystem: Intel Corporation 82574L Gigabit Network Connection
+> 	Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx-
+> 	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+> 	Latency: 0
+> 	Interrupt: pin A routed to IRQ 1
+> 	Region 0: Memory at 40040000 (32-bit, non-prefetchable) [size=128K]
+> 	Region 1: Memory at 40060000 (32-bit, non-prefetchable) [size=128K]
+> 	Region 2: I/O ports at <unassigned> [disabled]
+> 	Region 3: Memory at 40080000 (32-bit, non-prefetchable) [size=16K]
+> 	[virtual] Expansion ROM at 40000000 [disabled] [size=256K]
+> 	Capabilities: [c8] Power Management version 2
+> 		Flags: PMEClk- DSI+ D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)
+> 		Status: D0 NoSoftRst- PME-Enable- DSel=0 DScale=0 PME-
+> 	Capabilities: [e0] Express (v1) Root Complex Integrated Endpoint, MSI 00
+> 		DevCap:	MaxPayload 128 bytes, PhantFunc 0
+> 			ExtTag- RBE+
+> 		DevCtl:	Report errors: Correctable- Non-Fatal- Fatal- Unsupported-
+> 			RlxdOrd- ExtTag- PhantFunc- AuxPwr- NoSnoop-
+> 			MaxPayload 128 bytes, MaxReadReq 128 bytes
+> 		DevSta:	CorrErr- UncorrErr- FatalErr- UnsuppReq- AuxPwr- TransPend-
+> 	Capabilities: [100 v2] Advanced Error Reporting
+> 		UESta:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
+> 		UEMsk:	DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP- ECRC- UnsupReq- ACSViol-
+> 		UESvrt:	DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+ ECRC- UnsupReq- ACSViol-
+> 		CESta:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr-
+> 		CEMsk:	RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr+
+> 		AERCap:	First Error Pointer: 00, GenCap+ CGenEn- ChkCap+ ChkEn-
+> 	Capabilities: [140 v1] Device Serial Number 52-54-00-ff-ff-12-34-56
+> 	Kernel driver in use: e1000e
+>      
 > 
