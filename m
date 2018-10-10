@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEaO-00028g-7N
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:31:38 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEaV-0002FF-QD
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEaK-0002m3-HC
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:31:35 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:44114)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEaT-0002sW-4u
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:31:43 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:44216)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEaI-0002gv-Ic
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:31:31 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEaS-0002rp-OY
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:31:41 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 10 Oct 2018 16:34:31 +0300
-Message-ID: <20181010133431.24538.53838.stgit@pasha-VirtualBox>
+Date: Wed, 10 Oct 2018 16:34:54 +0300
+Message-ID: <20181010133454.24538.66846.stgit@pasha-VirtualBox>
 In-Reply-To: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
 References: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v7 10/19] replay: introduce breakpoint at the
- specified step
+Subject: [Qemu-devel] [PATCH v7 14/19] gdbstub: add reverse step support in
+ replay mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,280 +30,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, war2jordan@live.com, pavel.dovgaluk@ispras.ru, mst@redhat.com, jasowang@redhat.com, zuban32s@gmail.com, kraxel@redhat.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, armbru@redhat.comdovgaluk@ispras.ru, dgilbert@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org, rth@twiddle.net, kwolf@redhat.com, crosthwaite.peter@gmail.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
 
-This patch introduces replay_break, replay_delete_break
-qmp and hmp commands.
-These commands allow stopping at the specified instruction.
-It may be useful for debugging when there are some known
-events that should be investigated.
-replay_break command has one argument - number of instructions
-executed since the start of the replay.
-replay_delete_break removes previously set breakpoint.
+GDB remote protocol supports two reverse debugging commands:
+reverse step and reverse continue.
+This patch adds support of the first one to the gdbstub.
+Reverse step is intended to step one instruction in the backwards
+direction. This is not possible in regular execution.
+But replayed execution is deterministic, therefore we can load one of
+the prior snapshots and proceed to the desired step. It is equivalent
+to stepping one instruction back.
+There should be at least one snapshot preceding the debugged part of
+the replay log.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-
---
-
-v2:
- - renamed replay_break qmp command into replay-break
-   (suggested by Eric Blake)
-v7:
- - introduces replay_delete_break command
 ---
- hmp-commands.hx           |   29 ++++++++++++++++
- hmp.h                     |    2 +
- qapi/misc.json            |   31 +++++++++++++++++
- replay/replay-debugging.c |   84 +++++++++++++++++++++++++++++++++++++++++++++
- replay/replay-internal.h  |    4 ++
- replay/replay.c           |   17 +++++++++
- 6 files changed, 167 insertions(+)
+ accel/tcg/translator.c    |    1 +
+ cpus.c                    |   14 +++++++++++---
+ exec.c                    |    5 +++++
+ gdbstub.c                 |   42 +++++++++++++++++++++++++++++++++++++++---
+ include/sysemu/replay.h   |    7 +++++++
+ replay/replay-debugging.c |   33 +++++++++++++++++++++++++++++++++
+ stubs/replay.c            |    5 +++++
+ 7 files changed, 101 insertions(+), 6 deletions(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index db0c681..615d725 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1888,6 +1888,35 @@ Set QOM property @var{property} of object at location @var{path} to value @var{v
- ETEXI
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index afd0a49..33a543e 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -17,6 +17,7 @@
+ #include "exec/gen-icount.h"
+ #include "exec/log.h"
+ #include "exec/translator.h"
++#include "sysemu/replay.h"
  
-     {
-+        .name       = "replay_break",
-+        .args_type  = "step:i",
-+        .params     = "step",
-+        .help       = "sets breakpoint on the specified step of the replay",
-+        .cmd        = hmp_replay_break,
-+    },
-+
-+STEXI
-+@item replay_break @var{step}
-+@findex replay_break
-+Set breakpoint on the specified step of the replay.
-+Execution stops when the specified step is reached.
-+ETEXI
-+
-+    {
-+        .name       = "replay_delete_break",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "removes replay breakpoint",
-+        .cmd        = hmp_replay_delete_break,
-+    },
-+
-+STEXI
-+@item replay_delete_break
-+@findex replay_delete_break
-+Removes replay breakpoint which was previously set with replay_break.
-+ETEXI
-+
-+    {
-         .name       = "info",
-         .args_type  = "item:s?",
-         .params     = "[subcommand]",
-diff --git a/hmp.h b/hmp.h
-index d792149..c9b9b4f 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -149,5 +149,7 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
- void hmp_info_sev(Monitor *mon, const QDict *qdict);
- void hmp_info_replay(Monitor *mon, const QDict *qdict);
-+void hmp_replay_break(Monitor *mon, const QDict *qdict);
-+void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
+ /* Pairs with tcg_clear_temp_count.
+    To be called by #TranslatorOps.{translate_insn,tb_stop} if
+diff --git a/cpus.c b/cpus.c
+index d60ddf1..5189a7e 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1104,9 +1104,17 @@ static bool cpu_can_run(CPUState *cpu)
  
- #endif
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 79f6b21..e00a9b0 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -3140,6 +3140,37 @@
-   'returns': 'ReplayInfo' }
- 
- ##
-+# @replay-break:
-+#
-+# Set breakpoint on the specified step of the replay.
-+# Execution stops when the specified step is reached.
-+#
-+# @step: execution step to stop at
-+#
-+# Since: 3.1
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-break", "data": { "step": 220414 } }
-+#
-+##
-+{ 'command': 'replay-break', 'data': { 'step': 'int' } }
-+
-+##
-+# @replay-delete-break:
-+#
-+# Removes replay breakpoint.
-+#
-+# Since: 3.1
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-delete-break" }
-+#
-+##
-+{ 'command': 'replay-delete-break' }
-+
-+##
- # @xen-load-devices-state:
- #
- # Load the state of all devices from file. The RAM and the block devices
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index 1d7e75d..207d6e0 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -16,6 +16,8 @@
- #include "hmp.h"
- #include "monitor/monitor.h"
- #include "qapi/qapi-commands-misc.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qemu/timer.h"
- 
- void hmp_info_replay(Monitor *mon, const QDict *qdict)
+ static void cpu_handle_guest_debug(CPUState *cpu)
  {
-@@ -40,3 +42,85 @@ ReplayInfo *qmp_query_replay(Error **errp)
-     retval->step = replay_get_current_step();
-     return retval;
- }
-+
-+static void replay_break(uint64_t step, QEMUTimerCB callback, void *opaque)
-+{
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+    assert(replay_mutex_locked());
-+    assert(replay_break_step >= replay_get_current_step());
-+    assert(callback);
-+
-+    replay_break_step = step;
-+
-+    if (replay_break_timer) {
-+        timer_del(replay_break_timer);
+-    gdb_set_stop_cpu(cpu);
+-    qemu_system_debug_request();
+-    cpu->stopped = true;
++    if (!replay_running_debug()) {
++        gdb_set_stop_cpu(cpu);
++        qemu_system_debug_request();
++        cpu->stopped = true;
 +    } else {
-+        replay_break_timer = timer_new_ns(QEMU_CLOCK_REALTIME, callback, opaque);
-+    }
-+}
-+
-+static void replay_delete_break(void)
-+{
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+    assert(replay_mutex_locked());
-+
-+    if (replay_break_timer) {
-+        timer_del(replay_break_timer);
-+        timer_free(replay_break_timer);
-+        replay_break_timer = NULL;
-+    }
-+    replay_break_step = -1ULL;
-+}
-+
-+static void replay_stop_vm(void *opaque)
-+{
-+    vm_stop(RUN_STATE_PAUSED);
-+    replay_delete_break();
-+}
-+
-+void qmp_replay_break(int64_t step, Error **errp)
-+{
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        if (step >= replay_get_current_step()) {
-+            replay_break(step, replay_stop_vm, NULL);
++        if (!cpu->singlestep_enabled) {
++            cpu_single_step(cpu, SSTEP_ENABLE);
 +        } else {
-+            error_setg(errp, "cannot set breakpoint at the step in the past");
++            cpu_single_step(cpu, 0);
 +        }
-+    } else {
-+        error_setg(errp, "setting the breakpoint is allowed only in play mode");
 +    }
-+}
-+
-+void hmp_replay_break(Monitor *mon, const QDict *qdict)
-+{
-+    int64_t step = qdict_get_try_int(qdict, "step", -1LL);
-+    Error *err = NULL;
-+
-+    qmp_replay_break(step, &err);
-+    if (err) {
-+        error_report_err(err);
-+        error_free(err);
-+        return;
-+    }
-+}
-+
-+void qmp_replay_delete_break(Error **errp)
-+{
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        replay_delete_break();
-+    } else {
-+        error_setg(errp, "replay breakpoints are allowed only in play mode");
-+    }
-+}
-+
-+void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+
-+    qmp_replay_delete_break(&err);
-+    if (err) {
-+        error_report_err(err);
-+        error_free(err);
-+        return;
-+    }
-+}
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index af6f4d5..94b7e9b 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -91,6 +91,10 @@ extern ReplayState replay_state;
+ }
  
- /* File for replay writing */
- extern FILE *replay_file;
-+/* Step of the replay breakpoint */
-+extern uint64_t replay_break_step;
-+/* Timer for the replay breakpoint callback */
-+extern QEMUTimer *replay_break_timer;
- 
- void replay_put_byte(uint8_t byte);
- void replay_put_event(uint8_t event);
-diff --git a/replay/replay.c b/replay/replay.c
-index e6b1045..c6d5de9 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -34,6 +34,10 @@ static char *replay_filename;
- ReplayState replay_state;
- static GSList *replay_blockers;
- 
-+/* Replay breakpoints */
-+uint64_t replay_break_step = -1ULL;
-+QEMUTimer *replay_break_timer;
-+
- bool replay_next_event_is(int event)
- {
-     bool res = false;
-@@ -73,6 +77,13 @@ int replay_get_instructions(void)
-     replay_mutex_lock();
-     if (replay_next_event_is(EVENT_INSTRUCTION)) {
-         res = replay_state.instructions_count;
-+        if (replay_break_step != -1LL) {
-+            uint64_t current = replay_get_current_step();
-+            assert(replay_break_step >= current);
-+            if (current + res > replay_break_step) {
-+                res = replay_break_step - current;
+ #ifdef CONFIG_LINUX
+diff --git a/exec.c b/exec.c
+index d0821e6..7e794cb 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2738,6 +2738,11 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
+     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+         if (cpu_watchpoint_address_matches(wp, vaddr, len)
+             && (wp->flags & flags)) {
++            if (replay_running_debug()) {
++                /* Don't process the watchpoints when we are
++                   in a reverse debugging operation. */
++                return;
 +            }
-+        }
-     }
-     replay_mutex_unlock();
-     return res;
-@@ -99,6 +110,12 @@ void replay_account_executed_instructions(void)
-                    will be read from the log. */
-                 qemu_notify_event();
-             }
-+            /* Execution reached the break step */
-+            if (replay_break_step == replay_state.current_step) {
-+                /* Cannot make callback directly from the vCPU thread */
-+                timer_mod_ns(replay_break_timer,
-+                    qemu_clock_get_ns(QEMU_CLOCK_REALTIME));
-+            }
+             if (flags == BP_MEM_READ) {
+                 wp->flags |= BP_WATCHPOINT_HIT_READ;
+             } else {
+diff --git a/gdbstub.c b/gdbstub.c
+index c8478de..6af98998 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -39,6 +39,7 @@
+ #include "sysemu/kvm.h"
+ #include "exec/semihost.h"
+ #include "exec/exec-all.h"
++#include "sysemu/replay.h"
+ 
+ #ifdef CONFIG_USER_ONLY
+ #define GDB_ATTACHED "0"
+@@ -334,6 +335,19 @@ typedef struct GDBState {
+  */
+ static int sstep_flags = SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
+ 
++/* Retrieves flags for single step mode. */
++static int get_sstep_flags(void)
++{
++    /* In replay mode all events written into the log should be replayed.
++     * That is why NOIRQ flag is removed in this mode.
++     */
++    if (replay_mode != REPLAY_MODE_NONE) {
++        return SSTEP_ENABLE;
++    } else {
++        return sstep_flags;
++    }
++}
++
+ static GDBState *gdbserver_state;
+ 
+ bool gdb_has_xml;
+@@ -424,7 +438,7 @@ static int gdb_continue_partial(GDBState *s, char *newstates)
+     CPU_FOREACH(cpu) {
+         if (newstates[cpu->cpu_index] == 's') {
+             trace_gdbstub_op_stepping(cpu->cpu_index);
+-            cpu_single_step(cpu, sstep_flags);
++            cpu_single_step(cpu, get_sstep_flags());
          }
      }
+     s->running_state = 1;
+@@ -443,7 +457,7 @@ static int gdb_continue_partial(GDBState *s, char *newstates)
+                 break; /* nothing to do here */
+             case 's':
+                 trace_gdbstub_op_stepping(cpu->cpu_index);
+-                cpu_single_step(cpu, sstep_flags);
++                cpu_single_step(cpu, get_sstep_flags());
+                 cpu_resume(cpu);
+                 flag = 1;
+                 break;
+@@ -1082,9 +1096,28 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+             addr = strtoull(p, (char **)&p, 16);
+             gdb_set_cpu_pc(s, addr);
+         }
+-        cpu_single_step(s->c_cpu, sstep_flags);
++        cpu_single_step(s->c_cpu, get_sstep_flags());
+         gdb_continue(s);
+         return RS_IDLE;
++    case 'b':
++        /* Backward debugging commands */
++        if (replay_mode == REPLAY_MODE_PLAY) {
++            switch (*p) {
++            case 's':
++                if (replay_reverse_step()) {
++                    gdb_continue(s);
++                    return RS_IDLE;
++                } else {
++                    put_packet(s, "E14");
++                    break;
++                }
++            default:
++                goto unknown_command;
++            }
++        } else {
++            put_packet(s, "E22");
++        }
++        goto unknown_command;
+     case 'F':
+         {
+             target_ulong ret;
+@@ -1347,6 +1380,9 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+             if (cc->gdb_core_xml_file != NULL) {
+                 pstrcat(buf, sizeof(buf), ";qXfer:features:read+");
+             }
++            if (replay_mode == REPLAY_MODE_PLAY) {
++                pstrcat(buf, sizeof(buf), ";ReverseStep+");
++            }
+             put_packet(s, buf);
+             break;
+         }
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index cc5e9b0..73bf5fc 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -73,6 +73,13 @@ void replay_finish(void);
+ void replay_add_blocker(Error *reason);
+ /* Returns name of the replay log file */
+ const char *replay_get_filename(void);
++/* Start making one step in backward direction.
++   Used by gdbstub for backwards debugging.
++   Returns true on success. */
++bool replay_reverse_step(void);
++/* Returns true if replay module is processing
++   reverse_continue or reverse_step request */
++bool replay_running_debug(void);
+ 
+ /* Processing the instructions */
+ 
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index d744106..6334d82 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -21,6 +21,13 @@
+ #include "block/snapshot.h"
+ #include "migration/snapshot.h"
+ 
++static bool replay_is_debugging;
++
++bool replay_running_debug(void)
++{
++    return replay_is_debugging;
++}
++
+ void hmp_info_replay(Monitor *mon, const QDict *qdict)
+ {
+     if (replay_mode == REPLAY_MODE_NONE) {
+@@ -215,3 +222,29 @@ void hmp_replay_seek(Monitor *mon, const QDict *qdict)
+         return;
+     }
  }
++
++static void replay_stop_vm_debug(void *opaque)
++{
++    replay_is_debugging = false;
++    vm_stop(RUN_STATE_DEBUG);
++    replay_break(-1LL, NULL, NULL);
++}
++
++bool replay_reverse_step(void)
++{
++    Error *err = NULL;
++
++    assert(replay_mode == REPLAY_MODE_PLAY);
++
++    if (replay_get_current_step() != 0) {
++        replay_seek(replay_get_current_step() - 1, replay_stop_vm_debug, &err);
++        if (err) {
++            error_free(err);
++            return false;
++        }
++        replay_is_debugging = true;
++        return true;
++    }
++
++    return false;
++}
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 4ac6078..521552f 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -80,3 +80,8 @@ void replay_mutex_lock(void)
+ void replay_mutex_unlock(void)
+ {
+ }
++
++bool replay_reverse_step(void)
++{
++    return false;
++}
