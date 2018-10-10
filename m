@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAAFF-0002wz-OT
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 04:53:30 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAANL-0005EH-Sz
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 05:01:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAAFB-0004ie-Ix
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 04:53:29 -0400
-Date: Wed, 10 Oct 2018 10:52:56 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181010105256.1ee6e099.cohuck@redhat.com>
-In-Reply-To: <3df292ed-acbf-19da-484e-3aa4ad9536f0@redhat.com>
-References: <20181009175226.22138-1-akrowiak@linux.vnet.ibm.com>
-	<20181009175226.22138-6-akrowiak@linux.vnet.ibm.com>
-	<3df292ed-acbf-19da-484e-3aa4ad9536f0@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gAANC-0001SO-5y
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 05:01:51 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52134)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAANA-0001Qa-9w
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 05:01:42 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 143-v6so4553315wmf.1
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 02:01:38 -0700 (PDT)
+References: <20181009181612.10633-1-peter.maydell@linaro.org>
+	<a7f3a1b3-7c06-b82b-3201-4db1175ee8f0@redhat.com>
+	<CAFEAcA9kHphNZcXOVLWgDH=_VFDZ1jDLa3KNN_UWhxfK_dH5bw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5dd15e46-7a0d-6a39-7b05-97b5bd9c1b9c@redhat.com>
+Date: Wed, 10 Oct 2018 11:01:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA9kHphNZcXOVLWgDH=_VFDZ1jDLa3KNN_UWhxfK_dH5bw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v10 5/6] s390x/vfio: ap:
- Introduce VFIO AP device
+Subject: Re: [Qemu-devel] [PATCH] coccinelle: new inplace-byteswaps.cocci to
+ remove inplace-byteswapping calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,113 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Wed, 10 Oct 2018 10:25:22 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On 09/10/2018 20:35, Peter Maydell wrote:
+> On 9 October 2018 at 19:23, Eric Blake <eblake@redhat.com> wrote:
+>> On 10/9/18 1:16 PM, Peter Maydell wrote:
+>>>
+>>> Add a new Coccinelle script which replaces uses of the inplace
+>>> byteswapping functions *_to_cpus() and cpu_to_*s() with their
+>>> not-in-place equivalents. This is useful for where the swapping
+>>> is done on members of a packed struct -- taking the address
+>>> of the member to pass it to an inplace function is undefined
+>>> behaviour in C.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>> Richard asked for a coccinelle script in the scripts/coccinelle
+>>> directory, so here's a patch to add it.
+>>>
+>>>   scripts/coccinelle/inplace-byteswaps.cocci | 65 ++++++++++++++++++++++
+>>>   1 file changed, 65 insertions(+)
+>>>   create mode 100644 scripts/coccinelle/inplace-byteswaps.cocci
+>>>
+>>> diff --git a/scripts/coccinelle/inplace-byteswaps.cocci
+>>> b/scripts/coccinelle/inplace-byteswaps.cocci
+>>> new file mode 100644
+>>> index 00000000000..a869a90cbfd
+>>> --- /dev/null
+>>> +++ b/scripts/coccinelle/inplace-byteswaps.cocci
+>>> @@ -0,0 +1,65 @@
+>>> +// Replace uses of in-place byteswapping functions with calls to the
+>>> +// equivalent not-in-place functions.  This is necessary to avoid
+>>> +// undefined behaviour if the expression being swapped is a field in a
+>>> +// packed struct.
+>>> +
+>>> +@@
+>>> +expression E;
+>>> +@@
+>>> +-be16_to_cpus(&E);
+>>> ++E = be16_to_cpu(E);
+>>> +@@
+>>> +expression E;
+>>> +@@
+>>> +-be32_to_cpus(&E);
+>>> ++E = be32_to_cpu(E);
+>>
+>>
+>> It's probably possible to shorten this as:
+> 
+> This is kind of why I didn't post it as a patch to go in
+> scripts/ initially :-)  I suspected it was possible to
+> shorten it (maybe there's even coccinelle syntax to allow the
+> function names to be substituted to be specified with
+> a regex?), but the dumb-and-simple cut-and-paste for every
+> function being replaced worked and it didn't seem worth
+> spending even ten minutes messing around trying to improve
+> what is fundamentally a throwaway script...
 
-> On 2018-10-09 19:52, Tony Krowiak wrote:
+Julia Lawall once [*] said:
 
-> [...]
-> > +static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
-> > +{
-> > +    GError *gerror;
-> > +    char *symlink, *group_path;
-> > +    int groupid;
-> > +
-> > +    symlink = g_strdup_printf("%s/iommu_group", vapdev->vdev.sysfsdev);
-> > +    group_path = g_file_read_link(symlink, &gerror);
-> > +    g_free(symlink);
-> > +
-> > +    if (!group_path) {
-> > +        error_setg(errp, "%s: no iommu_group found for %s: %s",
-> > +                   VFIO_AP_DEVICE_TYPE, vapdev->vdev.sysfsdev, gerror->message);
-> > +        return NULL;
-> > +    }
-> > +
-> > +    if (sscanf(basename(group_path), "%d", &groupid) != 1) {
-> > +        error_setg(errp, "vfio: failed to read %s", group_path);
-> > +        return NULL;
-> > +    }
-> > +
-> > +    return vfio_get_group(groupid, &address_space_memory, errp);
-> > +}  
-> 
-> I think you've got to g_free(group_path) after you don't need it anymore.
-> 
-> > +static void vfio_ap_realize(DeviceState *dev, Error **errp)
-> > +{
-> > +    int ret;
-> > +    char *mdevid;
-> > +    Error *local_err = NULL;
-> > +    VFIOGroup *vfio_group;
-> > +    APDevice *apdev = AP_DEVICE(dev);
-> > +    VFIOAPDevice *vapdev = VFIO_AP_DEVICE(apdev);
-> > +
-> > +    vfio_group = vfio_ap_get_group(vapdev, &local_err);
-> > +    if (!vfio_group) {
-> > +        goto out_err;
-> > +    }
-> > +
-> > +    vapdev->vdev.ops = &vfio_ap_ops;
-> > +    vapdev->vdev.type = VFIO_DEVICE_TYPE_AP;
-> > +    mdevid = basename(vapdev->vdev.sysfsdev);
-> > +    vapdev->vdev.name = g_strdup_printf("%s", mdevid);
-> > +    vapdev->vdev.dev = dev;
-> > +
-> > +    ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
-> > +    if (ret) {
-> > +        goto out_get_dev_err;
-> > +    }
-> > +
-> > +    /* Enable hardware to intepret AP instructions executed on the guest */
-> > +    object_property_set_bool(OBJECT(qdev_get_machine()), true, "apie", NULL);
-> > +
-> > +    return;
-> > +
-> > +out_get_dev_err:
-> > +    vfio_ap_put_device(vapdev);
-> > +    vfio_put_group(vfio_group);
-> > +out_err:
-> > +    error_propagate(errp, local_err);
-> > +}
-> > +
-> > +static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
-> > +{
-> > +    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
-> > +    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);  
-> 
-> Didn't you want to remove the DO_UPCASTs ?
-> 
-> > +    VFIOGroup *group = vapdev->vdev.group;
-> > +
-> > +    vfio_ap_put_device(vapdev);
-> > +    vfio_put_group(group);
-> > +}
-> > +
-> > +static Property vfio_ap_properties[] = {
-> > +    DEFINE_PROP_STRING("sysfsdev", VFIOAPDevice, vdev.sysfsdev),
-> > +    DEFINE_PROP_END_OF_LIST(),
-> > +};
-> > +
-> > +static void vfio_ap_reset(DeviceState *dev)
-> > +{
-> > +    int ret;
-> > +    APDevice *apdev = DO_UPCAST(APDevice, parent_obj, dev);
-> > +    VFIOAPDevice *vapdev = DO_UPCAST(VFIOAPDevice, apdev, apdev);  
-> 
-> dito
-> 
-> > +    ret = ioctl(vapdev->vdev.fd, VFIO_DEVICE_RESET);
-> > +    if (ret) {
-> > +        error_report("%s: failed to reset %s device: %s", __func__,
-> > +                     vapdev->vdev.name, strerror(ret));
-> > +    }
-> > +}  
+Even for 6 functions, I would suggest to write out the function names in
+the pattern matching code rather than using regular expressions.  If the
+names are explicit, then Coccinelle can do some filtering, either based
+on an index made with idutils or glimpse (see the coccinelle scripts
+directory for tools for making these indices) or based on grep, to drop
+without parsing files that are not relevant.  It doesn't do this for
+regular expressions.  So you will get a faster result if the names are
+explicit in the pattern code.
 
-OK, this is now a bit too much stuff all in all to change while
-applying...
-
-Tony, can you please do a respin with these changes and the other
-things people have noticed? Thanks!
+[*] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03004.html
