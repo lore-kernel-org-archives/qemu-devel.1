@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gAEFR-0004x6-H3
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:09:58 -0400
+	(envelope-from <sbates@raithlin.com>) id 1gAEGf-0005bJ-Qs
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1gAEFO-0005CS-7U
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:09:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37896)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gAEFN-0005C7-Ua
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:09:54 -0400
-References: <20181009232607.15521-1-crosa@redhat.com>
-	<20181009232607.15521-8-crosa@redhat.com>
-	<a633eba5-3b96-2e36-db9d-25b8718c6bbb@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <8b21b355-5fc9-36c8-5c23-bee0b75b68ca@redhat.com>
-Date: Wed, 10 Oct 2018 09:09:44 -0400
-MIME-Version: 1.0
-In-Reply-To: <a633eba5-3b96-2e36-db9d-25b8718c6bbb@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <sbates@raithlin.com>) id 1gAEGZ-0005ib-9f
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:11:11 -0400
+Received: from mail-eopbgr660107.outbound.protection.outlook.com
+	([40.107.66.107]:29652
+	helo=CAN01-QB1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbates@raithlin.com>) id 1gAEGY-0005hZ-VO
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:11:07 -0400
+From: "Stephen  Bates" <sbates@raithlin.com>
+Date: Wed, 10 Oct 2018 13:11:04 +0000
+Message-ID: <3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+In-Reply-To: <5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] Acceptance Tests: change the
- handling of tests for specific archs
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E66EB9FDD52AB941AF75B129CC20CDFC@CANPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Caio Carrara <ccarrara@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>, Keith Busch <keith.busch@intel.com>
 
-
-
-On 10/10/18 6:50 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 10/10/2018 01:26, Cleber Rosa wrote:
->> With the introduction of a variants file that can run the same
->> tests on various architectures, it makes sense to make most tests
->> to be reusable on those environments.  The exception should be
->> when a test is really testing a specific architecture feature.
->>
->> With the change proposed here, on a command line such as:
->>
->>   $ avocado run \
->>      --json-variants-load=3Dtests/acceptance/variants/arch.json \
->>      -- tests/acceptance/
->>
->> The boot_linux_console.py tests will appear as "CANCELED: Currently
->> specific to the x86_64 arch", which is as a good thing when compared
->> to being ignored by tags because:
->>
->>  * The architecture specific parts can be addressed
->>  * It will be run on the matching architecture (as opposed to always
->>    being filtered out by the tags mechanism)
->>  * CANCELED tests do no influence negatively the overall job results,
->>    they're not considered an error or failure
->>
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>  tests/acceptance/boot_linux_console.py | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance=
-/boot_linux_console.py
->> index 58032f971c..ba3ac036da 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -19,12 +19,13 @@ class BootLinuxConsole(Test):
->>      and the kernel command line is properly passed from QEMU to the k=
-ernel
->> =20
->>      :avocado: enable
->> -    :avocado: tags=3Dx86_64
->>      """
->> =20
->>      timeout =3D 60
->> =20
->>      def test(self):
->> +        if self.arch !=3D 'x86_64':
->> +            self.cancel('Currently specific to the x86_64 target arch=
-')
->>          kernel_url =3D ('https://mirrors.kernel.org/fedora/releases/2=
-8/'
->>                        'Everything/x86_64/os/images/pxeboot/vmlinuz')
->>          kernel_hash =3D '238e083e114c48200f80d889f7e32eeb2793e02a'
->>
->=20
-> For some reason this test run quicker on a aarch64 host than my x86 lap=
-top:
->=20
-> ThunderX 88XX (aarch64 Little Endian):
->=20
->  (05/30)
-> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test;x86_64:
-> PASS (12.88 s)
->=20
-> Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz:
->=20
->  (05/30)
-> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test;x86_64:
-> PASS (31.13 s)
->=20
-
-The only reason I can think of is faster networking on the aarch64
-machine.  Are those numbers more or less the same on subsequent runs?
-
-Thanks for testing it!
-- Cleber.
-
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
+QW5kcmVhIGFuZCBBbGlzdGFpcg0KDQorS2VpdGggc2luY2UgaGUgZGV2ZWxvcGVkIGEgbG90IG9m
+IHRoZSBOVk1lIGRyaXZlIG1vZGVsDQoNCiAgICA+PiBBbGlzdGFpciBGcmFuY2lzICg1KToNCiAg
+ICA+PiAgIGh3L3Jpc2N2L3ZpcnQ6IEluY3JlYXNlIHRoZSBudW1iZXIgb2YgaW50ZXJydXB0cw0K
+ICAgID4+ICAgaHcvcmlzY3YvdmlydDogQ29ubmVjdCB0aGUgZ3BleCBQQ0llDQogICAgPj4gICBy
+aXNjdjogRW5hYmxlIFZHQSBhbmQgUENJRV9WR0ENCiAgICA+PiAgIGh3L3Jpc2N2L3NpZml2ZV91
+OiBDb25uZWN0IHRoZSBYaWxpbnggUENJZQ0KICAgID4+ICAgaHcvcmlzY3YvdmlydDogQ29ubmVj
+dCBhIFZpcnRJTyBuZXQgUENJZSBkZXZpY2UNCg0KSSBhbHNvIHRyaWVkIHRoZXNlIG91dCBidXQg
+SSB3YXMgaW50ZXJlc3RlZCBpbiBzZWVpbmcgaWYgSSBjb3VsZCBjcmVhdGUgTlZNZSBtb2RlbHMg
+aW5zaWRlIHRoZSBuZXcgUENJZSBzdWJzeXN0ZW0gKGZvciBib3RoIHRoZSB2aXJ0IGFuZCBzaWZp
+dmVfdSBtYWNoaW5lcykuIFRoZSBzaWZpdmVfdSBtYWNoaW5lIGRpZCBub3Qgd29yayBhdCBhbGwg
+KHNvIEknbGwgbGVhdmUgdGhhdCBvbmUgZm9yIG5vdykuIFRoZSB2aXJ0IG1hY2hpbmUgc3VjY2Vz
+c2Z1bGx5IG1hcHBlZCBpbiB0aGUgTlZNZSBkZXZpY2VzIGFuZCB0aGUgT1MgZHJpdmVyIHdhcyBh
+YmxlIHRvIHByb2JlIHRoZSBudm1lIGRyaXZlciBhZ2FpbnN0IHRoZW0uIEhvd2V2ZXIgc29tZXRo
+aW5nIHNlZW1zIHRvIGJlIGJyb2tlbiB3aXRoIGludGVycnVwdHMgYXMgSSBzZWUgbWVzc2FnZXMg
+bGlrZSB0aGVzZSBpbiB0aGUgT1MgZG1lc2c6DQoNClsgICA2Mi44NTIwMDBdIG52bWUgbnZtZTA6
+IEkvTyA4NTYgUUlEIDEgdGltZW91dCwgY29tcGxldGlvbiBwb2xsZWQNClsgICA2NC44MzIwMDBd
+IG52bWUgbnZtZTE6IEkvTyA4MTkgUUlEIDEgdGltZW91dCwgY29tcGxldGlvbiBwb2xsZWQNClsg
+ICA2NC44MzYwMDBdIG52bWUgbnZtZTE6IEkvTyA4MjAgUUlEIDEgdGltZW91dCwgY29tcGxldGlv
+biBwb2xsZWQNClsgICA2NC44NDAwMDBdIG52bWUgbnZtZTE6IEkvTyA4MjEgUUlEIDEgdGltZW91
+dCwgY29tcGxldGlvbiBwb2xsZWQNClsgICA2NC44NDQwMDBdIG52bWUgbnZtZTE6IEkvTyA4MjIg
+UUlEIDEgdGltZW91dCwgY29tcGxldGlvbiBwb2xsZWQNClsgICA2NC44NDgwMDBdIG52bWUgbnZt
+ZTA6IEkvTyA4NTYgUUlEIDEgdGltZW91dCwgY29tcGxldGlvbiBwb2xsZWQNClsgICA2NC44NTIw
+MDBdIG52bWUgbnZtZTA6IEkvTyA4NTcgUUlEIDEgdGltZW91dCwgY29tcGxldGlvbiBwb2xsZWQN
+Cg0KVGhlc2UgaW1wbHkgdGhlIGRyaXZlciBoaXQgYW4gYWRtaW4gcXVldWUgdGltZW91dCBidXQg
+d2hlbiBpdCByZWFwZWQgdGhlIE5WTWUgYWRtaW4gY29tcGxldGlvbiBxdWV1ZSBpdCBmb3VuZCBj
+b21tYW5kcyB3ZXJlIGRvbmUgYnV0IG5vIGludGVycnVwdCB3YXMgZGV0ZWN0ZWQgYnkgdGhlIE9T
+LiBBbHNvIG9uIHN0YXJ0aW5nIFFFTVUgSSBzZWUgdGhpczoNCg0KYmJsIGxvYWRlcg0KcWVtdS1z
+eXN0ZW0tcmlzY3Y2NDogcGxpYzogaW52YWxpZCByZWdpc3RlciB3cml0ZTogMDAwMDIwOTANCnFl
+bXUtc3lzdGVtLXJpc2N2NjQ6IHBsaWM6IGludmFsaWQgcmVnaXN0ZXIgd3JpdGU6IDAwMDAyMDk0
+DQpxZW11LXN5c3RlbS1yaXNjdjY0OiBwbGljOiBpbnZhbGlkIHJlZ2lzdGVyIHdyaXRlOiAwMDAw
+MjA5OA0KcWVtdS1zeXN0ZW0tcmlzY3Y2NDogcGxpYzogaW52YWxpZCByZWdpc3RlciB3cml0ZTog
+MDAwMDIwOWMNCnFlbXUtc3lzdGVtLXJpc2N2NjQ6IHBsaWM6IGludmFsaWQgcmVnaXN0ZXIgd3Jp
+dGU6IDAwMDAyMGEwDQpxZW11LXN5c3RlbS1yaXNjdjY0OiBwbGljOiBpbnZhbGlkIHJlZ2lzdGVy
+IHdyaXRlOiAwMDAwMjBhNA0KcWVtdS1zeXN0ZW0tcmlzY3Y2NDogcGxpYzogaW52YWxpZCByZWdp
+c3RlciB3cml0ZTogMDAwMDIwYTgNCnFlbXUtc3lzdGVtLXJpc2N2NjQ6IHBsaWM6IGludmFsaWQg
+cmVnaXN0ZXIgd3JpdGU6IDAwMDAyMGFjDQpxZW11LXN5c3RlbS1yaXNjdjY0OiBwbGljOiBpbnZh
+bGlkIHJlZ2lzdGVyIHdyaXRlOiAwMDAwMjBiMA0KcWVtdS1zeXN0ZW0tcmlzY3Y2NDogcGxpYzog
+aW52YWxpZCByZWdpc3RlciB3cml0ZTogMDAwMDIwYjQNCkluIHBjaV9vZmZzZXQgPSBbMjA4MF0g
+bXNlbSA9IFsyMTY0XSBwYXJlbnQgPSBbMl0NCg0KTXkgY29tbWFuZCB0byBzdGFydCBxZW11IHdh
+czoNCg0KJFFFTVUgLW5vZ3JhcGhpYyBcDQogICAgICAtbWFjaGluZSB2aXJ0IFwNCiAgICAgIC1z
+bXAgMSAtbSA4RyBcDQogICAgICAtYXBwZW5kICJjb25zb2xlPWh2YzAgcm8gcm9vdD0vZGV2L3Zk
+YSIgXA0KICAgICAgLWtlcm5lbCAkS0VSTkVMIFwNCiAgICAgIC1kcml2ZSBmaWxlPSR7Uk9PVEZT
+fSxmb3JtYXQ9cmF3LGlkPWhkMCBcDQogICAgICAtZGV2aWNlIHZpcnRpby1ibGstZGV2aWNlLGRy
+aXZlPWhkMCBcDQogICAgIC1kZXZpY2UgdmlydGlvLW5ldC1kZXZpY2UsbmV0ZGV2PW5ldDAgXA0K
+ICAgICAgLW5ldGRldiB1c2VyLGlkPW5ldDAgXA0KICAgICAgLWRldmljZSBudm1lLGRyaXZlPW52
+bWUwLHNlcmlhbD1udm1lMCxjbWJfc2l6ZV9tYj0xNiBcDQogICAgICAtZHJpdmUgZmlsZT1udm1l
+MC5xY293MixpZj1ub25lLGlkPW52bWUwLHNuYXBzaG90PW9uIFwNCiAgICAgIC1kcml2ZSBmaWxl
+PW52bWUxLnFjb3cyLGlmPW5vbmUsaWQ9bnZtZTEsc25hcHNob3Q9b24gXA0KICAgICAgLWRldmlj
+ZSBudm1lLGRyaXZlPW52bWUxLHNlcmlhbD1udm1lMSxjbWJfc2l6ZV9tYj02NA0KDQpJIHBsYW4g
+dG8gYWxzbyB0cnkgd2l0aCBhIGUxMDAwIG5ldHdvcmsgaW50ZXJmYWNlIG1vZGVsIHRvbW9ycm93
+IGFuZCBzZWUgaG93IHRoYXQgYmVoYXZlcy4uLi4NCg0KQ2hlZXJzDQogDQpTdGVwaGVuDQoNCg0K
