@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gAJlf-0008Ay-8t
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:03:36 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gAJo8-00012o-K7
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gAJlc-0001tl-1k
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:03:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51220)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gAJlW-0001qT-Pp
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:03:28 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 872995F732
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 19:03:23 +0000 (UTC)
-References: <1539093025-101599-1-git-send-email-imammedo@redhat.com>
-	<9ccf4afa-3528-a336-3eb2-9fc516852e91@redhat.com>
-	<40220217-aa30-9436-22a8-9d1fca611d8e@redhat.com>
-	<85084815-a668-c5f4-bd36-b4853596a658@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <36296a65-f937-4e8e-bb0a-f07d99c89e09@redhat.com>
-Date: Wed, 10 Oct 2018 21:03:21 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1gAJo5-0003CJ-EG
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:06:08 -0400
+Date: Wed, 10 Oct 2018 20:05:53 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181010190552.GD2411@work-vm>
+References: <20181008160536.6332-1-i.maximets@samsung.com>
+	<CGME20181008160328eucas1p14fff8e1e5e5f065019353fb86b845340@eucas1p1.samsung.com>
+	<20181008160536.6332-3-i.maximets@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <85084815-a668-c5f4-bd36-b4853596a658@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] memory: move MemoryRegion::size cleanup to
- memory_region_finalize()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181008160536.6332-3-i.maximets@samsung.com>
+Subject: Re: [Qemu-devel] [RFC 2/2] vhost-user: Fix userfaultfd leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: Ilya Maximets <i.maximets@samsung.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, qemu-stable@nongnu.org
 
-On 10/10/18 20:56, Paolo Bonzini wrote:
-> On 09/10/2018 19:09, Laszlo Ersek wrote:
->>>    memory_region_size() != 0
->>> and therefore it's ok to access it in
->>>    file_backend_unparent()
->>>       if (memory_region_size() != 0)
->>>           memory_region_get_ram_ptr()
->>>
->>> which happens when object_add fails and unparents failed backend making
->>> file_backend_unparent() access invalid memory region.
->>
->> I think it makes sense to zero out the size even if unparenting
->> would, in itself, prevent the above crash. Because, in
->> host_memory_backend_mr_inited(), we have:
->>
->>     /*
->>      * NOTE: We forbid zero-length memory backend, so here zero means
->>      * "we haven't inited the backend memory region yet".
->>      */
->>
->> I'm unsure how general that invariant is, but it can't hurt to honor
->> it everywhere. (Especially if we can do the zeroing in one common
->> place.)
+* Ilya Maximets (i.maximets@samsung.com) wrote:
+> 'fd' received from the vhost side is never freed.
+> Also, everything (including 'postcopy_listen' state) should be
+> cleaned up on vhost cleanup.
 > 
-> Yeah, that's the part that I'm not sure about.  If we do it in finalize,
-> no one should be able to observe that we are zeroing it; finalize runs
-> just before the object is g_free-d.  I agree with Igor that it's nicer
-> to leave the object in good state, but the right place to zero is
-> exactly where the first patch placed it, i.e. where the error is
-> detected and the initialization of memory_region_init is unwound.
+> Fixes: 46343570c06e ("vhost+postcopy: Wire up POSTCOPY_END notify")
+> Fixes: f82c11165ffa ("vhost+postcopy: Register shared ufd with postcopy")
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
 
-OK.
+Thanks,
 
-Thanks
-Laszlo
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  hw/virtio/vhost-user.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index c442daa562..e09bed0e4a 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -1280,6 +1280,7 @@ static int vhost_user_postcopy_end(struct vhost_dev *dev, Error **errp)
+>          return ret;
+>      }
+>      postcopy_unregister_shared_ufd(&u->postcopy_fd);
+> +    close(u->postcopy_fd.fd);
+>      u->postcopy_fd.handler = NULL;
+>  
+>      trace_vhost_user_postcopy_end_exit();
+> @@ -1419,6 +1420,12 @@ static int vhost_user_backend_cleanup(struct vhost_dev *dev)
+>          postcopy_remove_notifier(&u->postcopy_notifier);
+>          u->postcopy_notifier.notify = NULL;
+>      }
+> +    u->postcopy_listen = false;
+> +    if (u->postcopy_fd.handler) {
+> +        postcopy_unregister_shared_ufd(&u->postcopy_fd);
+> +        close(u->postcopy_fd.fd);
+> +        u->postcopy_fd.handler = NULL;
+> +    }
+>      if (u->slave_fd >= 0) {
+>          qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
+>          close(u->slave_fd);
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
