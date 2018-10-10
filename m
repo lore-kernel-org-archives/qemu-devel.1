@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gA7iY-00027p-Lq
+	(envelope-from <armbru@redhat.com>) id 1gA7iY-00027m-LN
 	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 02:11:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gA7iV-0008F4-Nl
+	(envelope-from <armbru@redhat.com>) id 1gA7iW-0008FN-0I
 	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 02:11:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60816)
+Received: from mx1.redhat.com ([209.132.183.28]:51682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gA7iV-00083l-G9
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gA7iV-0007dD-NI
 	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 02:11:31 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EEA3E30820E1
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 06:11:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D24F88319
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 06:11:15 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 10 Oct 2018 08:11:09 +0200
-Message-Id: <20181010061113.6057-2-armbru@redhat.com>
+Date: Wed, 10 Oct 2018 08:11:10 +0200
+Message-Id: <20181010061113.6057-3-armbru@redhat.com>
 In-Reply-To: <20181010061113.6057-1-armbru@redhat.com>
 References: <20181010061113.6057-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/5] tests/check-qjson: fix a leak
+Subject: [Qemu-devel] [PULL 2/5] qapi/misc.json: Remove superfluous words in
+ CpuModelExpansionType
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,70 +34,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Kashyap Chamarthy <kchamart@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Kashyap Chamarthy <kchamart@redhat.com>
 
-Spotted by ASAN:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=3D=3D11893=3D=3DERROR: LeakSanitizer: detected memory leaks
+Remove repetition of 'independent of'.  While at it, s/QMU/QEMU in
+@CpuDefinitionInfo.
 
-Direct leak of 1120 byte(s) in 28 object(s) allocated from:
-    #0 0x7fd0515b0c48 in malloc (/lib64/libasan.so.5+0xeec48)
-    #1 0x7fd050ffa3c5 in g_malloc (/lib64/libglib-2.0.so.0+0x523c5)
-    #2 0x559e708b56a4 in qstring_from_str /home/elmarco/src/qq/qobject/qs=
-tring.c:66
-    #3 0x559e708b4fe0 in qstring_new /home/elmarco/src/qq/qobject/qstring=
-.c:23
-    #4 0x559e708bda7d in parse_string /home/elmarco/src/qq/qobject/json-p=
-arser.c:143
-    #5 0x559e708c1009 in parse_literal /home/elmarco/src/qq/qobject/json-=
-parser.c:484
-    #6 0x559e708c1627 in parse_value /home/elmarco/src/qq/qobject/json-pa=
-rser.c:547
-    #7 0x559e708c1c67 in json_parser_parse /home/elmarco/src/qq/qobject/j=
-son-parser.c:573
-    #8 0x559e708bc0ff in json_message_process_token /home/elmarco/src/qq/=
-qobject/json-streamer.c:92
-    #9 0x559e708d1655 in json_lexer_feed_char /home/elmarco/src/qq/qobjec=
-t/json-lexer.c:292
-    #10 0x559e708d1fe1 in json_lexer_feed /home/elmarco/src/qq/qobject/js=
-on-lexer.c:339
-    #11 0x559e708bc856 in json_message_parser_feed /home/elmarco/src/qq/q=
-object/json-streamer.c:121
-    #12 0x559e708b8b4b in qobject_from_jsonv /home/elmarco/src/qq/qobject=
-/qjson.c:69
-    #13 0x559e708b8d02 in qobject_from_json /home/elmarco/src/qq/qobject/=
-qjson.c:83
-    #14 0x559e708a74ae in from_json_str /home/elmarco/src/qq/tests/check-=
-qjson.c:30
-    #15 0x559e708a9f83 in utf8_string /home/elmarco/src/qq/tests/check-qj=
-son.c:781
-    #16 0x7fd05101bc49 in test_case_run gtestutils.c:2255
-    #17 0x7fd05101bc49 in g_test_run_suite_internal gtestutils.c:2339
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20180901211917.10372-1-marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+Message-Id: <20181003104605.8477-1-kchamart@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+[Commit message updated as requested by Kashyap]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/check-qjson.c | 1 +
- 1 file changed, 1 insertion(+)
+ qapi/misc.json | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index cc13f3d41e..d876a7a96e 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -780,6 +780,7 @@ static void utf8_string(void)
-             if (!strstr(json_out, "\\uFFFD")) {
-                 str =3D from_json_str(json_out, j, &error_abort);
-                 g_assert_cmpstr(qstring_get_try_str(str), =3D=3D, utf8_i=
-n);
-+                qobject_unref(str);
-             }
-         }
-     }
+diff --git a/qapi/misc.json b/qapi/misc.json
+index ada9af5add..f98de3a58c 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -2017,7 +2017,7 @@
+ #
+ # @migration-safe: whether a CPU definition can be safely used for
+ #                  migration in combination with a QEMU compatibility ma=
+chine
+-#                  when migrating between different QMU versions and bet=
+ween
++#                  when migrating between different QEMU versions and be=
+tween
+ #                  hosts with different sets of (hardware or software)
+ #                  capabilities. If not provided, information is not ava=
+ilable
+ #                  and callers should not assume the CPU definition to b=
+e
+@@ -2126,11 +2126,11 @@
+ # @static: Expand to a static CPU model, a combination of a static base
+ #          model name and property delta changes. As the static base mod=
+el will
+ #          never change, the expanded CPU model will be the same, indepe=
+ndent of
+-#          independent of QEMU version, machine type, machine options, a=
+nd
+-#          accelerator options. Therefore, the resulting model can be us=
+ed by
+-#          tooling without having to specify a compatibility machine - e=
+.g. when
+-#          displaying the "host" model. static CPU models are migration-=
+safe.
+-#
++#          QEMU version, machine type, machine options, and accelerator =
+options.
++#          Therefore, the resulting model can be used by tooling without=
+ having
++#          to specify a compatibility machine - e.g. when displaying the=
+ "host"
++#          model. The @static CPU models are migration-safe.
++
+ # @full: Expand all properties. The produced model is not guaranteed to =
+be
+ #        migration-safe, but allows tooling to get an insight and work w=
+ith
+ #        model details.
 --=20
 2.17.1
