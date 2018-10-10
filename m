@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbates@raithlin.com>) id 1gAJk2-00079E-HY
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:01:56 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gAJkK-0007Hd-Bj
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:02:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbates@raithlin.com>) id 1gAJjy-0000xV-FY
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:01:54 -0400
-Received: from mail-eopbgr670116.outbound.protection.outlook.com
-	([40.107.67.116]:57925
-	helo=CAN01-TO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbates@raithlin.com>) id 1gAJju-0000rM-Gx
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:01:48 -0400
-From: "Stephen  Bates" <sbates@raithlin.com>
-Date: Wed, 10 Oct 2018 19:01:32 +0000
-Message-ID: <C8D03A20-3B1A-4021-969F-194B14918CF2@raithlin.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
-	<a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
-	<5A5F4A2B-2DAF-4D70-BF1D-7ABC8461FDC8@raithlin.com>
-	<63b741e2-b3e5-283a-4dfc-9c1db757c575@gmail.com>
-In-Reply-To: <63b741e2-b3e5-283a-4dfc-9c1db757c575@gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3F1A4FB586E4D84088CF349D02A6693B@CANPRD01.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	(envelope-from <dgilbert@redhat.com>) id 1gAJkG-000196-PY
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:02:12 -0400
+Date: Wed, 10 Oct 2018 20:01:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181010190153.GC2411@work-vm>
+References: <20181008160536.6332-1-i.maximets@samsung.com>
+	<CGME20181008160325eucas1p23bd6b6ce112175d274db884fb2a83f54@eucas1p2.samsung.com>
+	<20181008160536.6332-2-i.maximets@samsung.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181008160536.6332-2-i.maximets@samsung.com>
+Subject: Re: [Qemu-devel] [RFC 1/2] migration: Stop postcopy fault thread
+ before notifying
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair <alistair23@gmail.com>, Andrea Bolognani <abologna@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
-Cc: Keith Busch <keith.busch@intel.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>
+To: Ilya Maximets <i.maximets@samsung.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, qemu-stable@nongnu.org
 
-PiBJIGFkZGVkIGUxMDAwIGFuZCBlMTAwMGUgc3VwcG9ydCB0byBteSBrZXJuZWwgYW5kIGNoYW5n
-ZWQgdGhlIFFFTVUgY29tbWFuZCB0bzoNCg0KU28gdXNpbmcgLWRldmljZSBlMTAwMGUgcmF0aGVy
-IHRoYW4gLWRldmljZSBlMTAwMCBzZWVtcyB0byB3b3JrLiBJIGFtIG5vdCBzdXJlIHdoeSAtZGV2
-aWNlIGUxMDAwIGNhdXNlcyBhIGtlcm5lbCBwYW5pYy4gVGhlIE1TSS1YIG1lc3NhZ2UgaXMgaW50
-ZXJlc3RpbmcgYW5kIG1heSBiZSByZWxhdGVkIHRvIHdoeSBOVk1lIGludGVycnVwdHMgYXJlIG5v
-dCByZWFjaGluZyB0aGUgT1MgaW4gdGhlIGd1ZXN0Pw0KDQpbICAgIDAuMjE2MDAwXSBlMTAwMDog
-SW50ZWwoUikgUFJPLzEwMDAgTmV0d29yayBEcml2ZXIgLSB2ZXJzaW9uIDcuMy4yMS1rOC1OQVBJ
-DQpbICAgIDAuMjE2MDAwXSBlMTAwMDogQ29weXJpZ2h0IChjKSAxOTk5LTIwMDYgSW50ZWwgQ29y
-cG9yYXRpb24uDQpbICAgIDAuMjE2MDAwXSBlMTAwMGU6IEludGVsKFIpIFBSTy8xMDAwIE5ldHdv
-cmsgRHJpdmVyIC0gMy4yLjYtaw0KWyAgICAwLjIxNjAwMF0gZTEwMDBlOiBDb3B5cmlnaHQoYykg
-MTk5OSAtIDIwMTUgSW50ZWwgQ29ycG9yYXRpb24uDQpbICAgIDAuMjIwMDAwXSBlMTAwMGUgMDAw
-MDowMDowMS4wOiBhc3NpZ24gSVJROiBnb3QgMQ0KWyAgICAwLjIyMDAwMF0gZTEwMDBlIDAwMDA6
-MDA6MDEuMDogZW5hYmxpbmcgZGV2aWNlICgwMDAwIC0+IDAwMDIpDQpbICAgIDAuMjIwMDAwXSBl
-MTAwMGUgMDAwMDowMDowMS4wOiBlbmFibGluZyBidXMgbWFzdGVyaW5nDQpbICAgIDAuMjIwMDAw
-XSBlMTAwMGUgMDAwMDowMDowMS4wOiBJbnRlcnJ1cHQgVGhyb3R0bGluZyBSYXRlIChpbnRzL3Nl
-Yykgc2V0IHRvIGR5bmFtaWMgY29uc2VydmF0aXZlIG1vZGUNClsgICAgMC4yMjAwMDBdIGUxMDAw
-ZSAwMDAwOjAwOjAxLjAgMDAwMDowMDowMS4wICh1bmluaXRpYWxpemVkKTogRmFpbGVkIHRvIGlu
-aXRpYWxpemUgTVNJLVggaW50ZXJydXB0cy4gIEZhbGxpbmcgYmFjayB0byBNU0kgaW50ZXJydXB0
-cy4NClsgICAgMC4yMjAwMDBdIGUxMDAwZSAwMDAwOjAwOjAxLjAgMDAwMDowMDowMS4wICh1bmlu
-aXRpYWxpemVkKTogRmFpbGVkIHRvIGluaXRpYWxpemUgTVNJIGludGVycnVwdHMuICBGYWxsaW5n
-IGJhY2sgdG8gbGVnYWN5IGludGVycnVwdHMuDQpbICAgIDAuMzQ4MDAwXSBlMTAwMGUgMDAwMDow
-MDowMS4wIGV0aDA6IChQQ0kgRXhwcmVzczoyLjVHVC9zOldpZHRoIHgxKSA1Mjo1NDowMDoxMjoz
-NDo1Ng0KWyAgICAwLjM1NjAwMF0gZTEwMDBlIDAwMDA6MDA6MDEuMCBldGgwOiBJbnRlbChSKSBQ
-Uk8vMTAwMCBOZXR3b3JrIENvbm5lY3Rpb24NClsgICAgMC4zNTYwMDBdIGUxMDAwZSAwMDAwOjAw
-OjAxLjAgZXRoMDogTUFDOiAzLCBQSFk6IDgsIFBCQSBObzogMDAwMDAwLTAwMA0KDQpyb290QGxp
-YmVydGFzOn4jIGxzcGNpIC12dnYNCjAwOjAwLjAgSG9zdCBicmlkZ2U6IFJlZCBIYXQsIEluYy4g
-UUVNVSBQQ0llIEhvc3QgYnJpZGdlDQoJU3Vic3lzdGVtOiBSZWQgSGF0LCBJbmMgUUVNVSBQQ0ll
-IEhvc3QgYnJpZGdlDQoJQ29udHJvbDogSS9PLSBNZW0tIEJ1c01hc3Rlci0gU3BlY0N5Y2xlLSBN
-ZW1XSU5WLSBWR0FTbm9vcC0gUGFyRXJyLSBTdGVwcGluZy0gU0VSUi0gRmFzdEIyQi0gRGlzSU5U
-eC0NCglTdGF0dXM6IENhcC0gNjZNSHotIFVERi0gRmFzdEIyQi0gUGFyRXJyLSBERVZTRUw9ZmFz
-dCA+VEFib3J0LSA8VEFib3J0LSA8TUFib3J0LSA+U0VSUi0gPFBFUlItIElOVHgtDQpsc3BjaTog
-VW5hYmxlIHRvIGxvYWQgbGlia21vZCByZXNvdXJjZXM6IGVycm9yIC0xMg0KDQowMDowMS4wIEV0
-aGVybmV0IGNvbnRyb2xsZXI6IEludGVsIENvcnBvcmF0aW9uIDgyNTc0TCBHaWdhYml0IE5ldHdv
-cmsgQ29ubmVjdGlvbg0KCVN1YnN5c3RlbTogSW50ZWwgQ29ycG9yYXRpb24gODI1NzRMIEdpZ2Fi
-aXQgTmV0d29yayBDb25uZWN0aW9uDQoJQ29udHJvbDogSS9PLSBNZW0rIEJ1c01hc3RlcisgU3Bl
-Y0N5Y2xlLSBNZW1XSU5WLSBWR0FTbm9vcC0gUGFyRXJyLSBTdGVwcGluZy0gU0VSUi0gRmFzdEIy
-Qi0gRGlzSU5UeC0NCglTdGF0dXM6IENhcCsgNjZNSHotIFVERi0gRmFzdEIyQi0gUGFyRXJyLSBE
-RVZTRUw9ZmFzdCA+VEFib3J0LSA8VEFib3J0LSA8TUFib3J0LSA+U0VSUi0gPFBFUlItIElOVHgt
-DQoJTGF0ZW5jeTogMA0KCUludGVycnVwdDogcGluIEEgcm91dGVkIHRvIElSUSAxDQoJUmVnaW9u
-IDA6IE1lbW9yeSBhdCA0MDA0MDAwMCAoMzItYml0LCBub24tcHJlZmV0Y2hhYmxlKSBbc2l6ZT0x
-MjhLXQ0KCVJlZ2lvbiAxOiBNZW1vcnkgYXQgNDAwNjAwMDAgKDMyLWJpdCwgbm9uLXByZWZldGNo
-YWJsZSkgW3NpemU9MTI4S10NCglSZWdpb24gMjogSS9PIHBvcnRzIGF0IDx1bmFzc2lnbmVkPiBb
-ZGlzYWJsZWRdDQoJUmVnaW9uIDM6IE1lbW9yeSBhdCA0MDA4MDAwMCAoMzItYml0LCBub24tcHJl
-ZmV0Y2hhYmxlKSBbc2l6ZT0xNktdDQoJW3ZpcnR1YWxdIEV4cGFuc2lvbiBST00gYXQgNDAwMDAw
-MDAgW2Rpc2FibGVkXSBbc2l6ZT0yNTZLXQ0KCUNhcGFiaWxpdGllczogW2M4XSBQb3dlciBNYW5h
-Z2VtZW50IHZlcnNpb24gMg0KCQlGbGFnczogUE1FQ2xrLSBEU0krIEQxLSBEMi0gQXV4Q3VycmVu
-dD0wbUEgUE1FKEQwLSxEMS0sRDItLEQzaG90LSxEM2NvbGQtKQ0KCQlTdGF0dXM6IEQwIE5vU29m
-dFJzdC0gUE1FLUVuYWJsZS0gRFNlbD0wIERTY2FsZT0wIFBNRS0NCglDYXBhYmlsaXRpZXM6IFtl
-MF0gRXhwcmVzcyAodjEpIFJvb3QgQ29tcGxleCBJbnRlZ3JhdGVkIEVuZHBvaW50LCBNU0kgMDAN
-CgkJRGV2Q2FwOglNYXhQYXlsb2FkIDEyOCBieXRlcywgUGhhbnRGdW5jIDANCgkJCUV4dFRhZy0g
-UkJFKw0KCQlEZXZDdGw6CVJlcG9ydCBlcnJvcnM6IENvcnJlY3RhYmxlLSBOb24tRmF0YWwtIEZh
-dGFsLSBVbnN1cHBvcnRlZC0NCgkJCVJseGRPcmQtIEV4dFRhZy0gUGhhbnRGdW5jLSBBdXhQd3It
-IE5vU25vb3AtDQoJCQlNYXhQYXlsb2FkIDEyOCBieXRlcywgTWF4UmVhZFJlcSAxMjggYnl0ZXMN
-CgkJRGV2U3RhOglDb3JyRXJyLSBVbmNvcnJFcnItIEZhdGFsRXJyLSBVbnN1cHBSZXEtIEF1eFB3
-ci0gVHJhbnNQZW5kLQ0KCUNhcGFiaWxpdGllczogWzEwMCB2Ml0gQWR2YW5jZWQgRXJyb3IgUmVw
-b3J0aW5nDQoJCVVFU3RhOglETFAtIFNERVMtIFRMUC0gRkNQLSBDbXBsdFRPLSBDbXBsdEFicnQt
-IFVueENtcGx0LSBSeE9GLSBNYWxmVExQLSBFQ1JDLSBVbnN1cFJlcS0gQUNTVmlvbC0NCgkJVUVN
-c2s6CURMUC0gU0RFUy0gVExQLSBGQ1AtIENtcGx0VE8tIENtcGx0QWJydC0gVW54Q21wbHQtIFJ4
-T0YtIE1hbGZUTFAtIEVDUkMtIFVuc3VwUmVxLSBBQ1NWaW9sLQ0KCQlVRVN2cnQ6CURMUCsgU0RF
-UysgVExQLSBGQ1ArIENtcGx0VE8tIENtcGx0QWJydC0gVW54Q21wbHQtIFJ4T0YrIE1hbGZUTFAr
-IEVDUkMtIFVuc3VwUmVxLSBBQ1NWaW9sLQ0KCQlDRVN0YToJUnhFcnItIEJhZFRMUC0gQmFkRExM
-UC0gUm9sbG92ZXItIFRpbWVvdXQtIE5vbkZhdGFsRXJyLQ0KCQlDRU1zazoJUnhFcnItIEJhZFRM
-UC0gQmFkRExMUC0gUm9sbG92ZXItIFRpbWVvdXQtIE5vbkZhdGFsRXJyKw0KCQlBRVJDYXA6CUZp
-cnN0IEVycm9yIFBvaW50ZXI6IDAwLCBHZW5DYXArIENHZW5Fbi0gQ2hrQ2FwKyBDaGtFbi0NCglD
-YXBhYmlsaXRpZXM6IFsxNDAgdjFdIERldmljZSBTZXJpYWwgTnVtYmVyIDUyLTU0LTAwLWZmLWZm
-LTEyLTM0LTU2DQoJS2VybmVsIGRyaXZlciBpbiB1c2U6IGUxMDAwZQ0KICAgIA0KDQo=
+* Ilya Maximets (i.maximets@samsung.com) wrote:
+> POSTCOPY_NOTIFY_INBOUND_END handlers will remove userfault fds
+> from the postcopy_remote_fds array which could be still in
+> use by the fault thread. Let's stop the thread before
+> notification to avoid possible accessing wrong memory.
+
+OK I think; since this is already in the cleanup we shouldn't
+be getting faults anyway at that point.
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> Fixes: 46343570c06e ("vhost+postcopy: Wire up POSTCOPY_END notify")
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+> ---
+>  migration/postcopy-ram.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 853d8b32ca..e5c02a32c5 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -533,6 +533,12 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>      if (mis->have_fault_thread) {
+>          Error *local_err = NULL;
+>  
+> +        /* Let the fault thread quit */
+> +        atomic_set(&mis->fault_thread_quit, 1);
+> +        postcopy_fault_thread_notify(mis);
+> +        trace_postcopy_ram_incoming_cleanup_join();
+> +        qemu_thread_join(&mis->fault_thread);
+> +
+>          if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_END, &local_err)) {
+>              error_report_err(local_err);
+>              return -1;
+> @@ -541,11 +547,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>          if (qemu_ram_foreach_migratable_block(cleanup_range, mis)) {
+>              return -1;
+>          }
+> -        /* Let the fault thread quit */
+> -        atomic_set(&mis->fault_thread_quit, 1);
+> -        postcopy_fault_thread_notify(mis);
+> -        trace_postcopy_ram_incoming_cleanup_join();
+> -        qemu_thread_join(&mis->fault_thread);
+>  
+>          trace_postcopy_ram_incoming_cleanup_closeuf();
+>          close(mis->userfault_fd);
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
