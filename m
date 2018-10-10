@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aclindsa@gmail.com>) id 1gALFj-0002x5-9N
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:38:45 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aclindsa@gmail.com>) id 1gALFh-0002k0-HI
+	(envelope-from <aclindsa@gmail.com>) id 1gALFi-0002wF-CN
 	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:38:43 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <aclindsa@gmail.com>) id 1gALFh-0002k6-IG
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:38:42 -0400
 From: Aaron Lindsay <aclindsa@gmail.com>
-Date: Wed, 10 Oct 2018 16:37:31 -0400
-Message-Id: <20181010203735.27918-11-aclindsa@gmail.com>
+Date: Wed, 10 Oct 2018 16:37:34 -0400
+Message-Id: <20181010203735.27918-14-aclindsa@gmail.com>
 In-Reply-To: <20181010203735.27918-1-aclindsa@gmail.com>
 References: <20181010203735.27918-1-aclindsa@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 10/14] target/arm: Finish implementation of
- PM[X]EVCNTR and PM[X]EVTYPER
+Subject: [Qemu-devel] [PATCH v6 13/14] target/arm: Implement PMSWINC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,444 +24,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: qemu-devel@nongnu.org, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>, Aaron Lindsay <aclindsa@gmail.com>, Aaron Lindsay <alindsay@codeaurora.org>
 
-Add arrays to hold the registers, the definitions themselves, access
-functions, and logic to reset counters when PMCR.P is set. Update
-filtering code to support counters other than PMCCNTR. Support migration
-with raw read/write functions.
-
 Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-Signed-off-by: Aaron Lindsay <aclindsa@gmail.com>
 ---
- target/arm/cpu.h    |   3 +
- target/arm/helper.c | 296 +++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 282 insertions(+), 17 deletions(-)
+ target/arm/helper.c | 39 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index cc026f0b75..f4317f87c9 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -482,6 +482,9 @@ typedef struct CPUARMState {
-          * pmccntr_op_finish.
-          */
-         uint64_t c15_ccnt_delta;
-+        uint64_t c14_pmevcntr[31];
-+        uint64_t c14_pmevcntr_delta[31];
-+        uint64_t c14_pmevtyper[31];
-         uint64_t pmccfiltr_el0; /* Performance Monitor Filter Register */
-         uint64_t vpidr_el2; /* Virtualization Processor ID Register */
-         uint64_t vmpidr_el2; /* Virtualization Multiprocessor ID Register */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 375b6dcda5..f0798f7a8c 100644
+index 89ceb34cb9..6c2a899009 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -946,6 +946,7 @@ static const ARMCPRegInfo v6_cp_reginfo[] = {
- #define PMCRDP  0x10
- #define PMCRD   0x8
- #define PMCRC   0x4
-+#define PMCRP   0x2
- #define PMCRE   0x1
- 
- #define PMXEVTYPER_P          0x80000000
-@@ -1018,6 +1019,17 @@ uint64_t get_pmceid(CPUARMState *env)
-     return pmceid;
+@@ -994,6 +994,15 @@ static bool event_always_supported(CPUARMState *env)
+     return true;
  }
  
-+/*
-+ * Check at runtime whether a PMU event is supported for the current machine
-+ */
-+static bool event_supported(uint16_t number)
++static uint64_t swinc_get_count(CPUARMState *env)
 +{
-+    if (number > MAX_EVENT_ID) {
-+        return false;
-+    }
-+    return supported_event_map[number] != UNSUPPORTED_EVENT;
-+}
-+
- static CPAccessResult pmreg_access(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    bool isread)
- {
-@@ -1137,9 +1149,11 @@ static inline bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
-         prohibited = env->cp15.c9_pmcr & PMCRDP;
-     }
- 
--    /* TODO Remove assert, set filter to correct PMEVTYPER */
--    assert(counter == 31);
--    filter = env->cp15.pmccfiltr_el0;
-+    if (counter == 31) {
-+        filter = env->cp15.pmccfiltr_el0;
-+    } else {
-+        filter = env->cp15.c14_pmevtyper[counter];
-+    }
- 
-     p   = filter & PMXEVTYPER_P;
-     u   = filter & PMXEVTYPER_U;
-@@ -1159,6 +1173,17 @@ static inline bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
-         filtered = m != p;
-     }
- 
-+    if (counter != 31) {
-+        /*
-+         * If not checking PMCCNTR, ensure the counter is setup to an event we
-+         * support
-+         */
-+        uint16_t event = filter & PMXEVTYPER_EVTCOUNT;
-+        if (!event_supported(event)) {
-+            return false;
-+        }
-+    }
-+
-     return enabled && !prohibited && !filtered;
- }
- 
-@@ -1205,14 +1230,47 @@ void pmccntr_op_finish(CPUARMState *env)
-     }
- }
- 
-+static void pmevcntr_op_start(CPUARMState *env, uint8_t counter)
-+{
-+
-+    uint16_t event = env->cp15.c14_pmevtyper[counter] & PMXEVTYPER_EVTCOUNT;
-+    uint64_t count = 0;
-+    if (event_supported(event)) {
-+        uint16_t event_idx = supported_event_map[event];
-+        count = pm_events[event_idx].get_count(env);
-+    }
-+
-+    if (pmu_counter_enabled(env, counter)) {
-+        env->cp15.c14_pmevcntr[counter] =
-+            count - env->cp15.c14_pmevcntr_delta[counter];
-+    }
-+    env->cp15.c14_pmevcntr_delta[counter] = count;
-+}
-+
-+static void pmevcntr_op_finish(CPUARMState *env, uint8_t counter)
-+{
-+    if (pmu_counter_enabled(env, counter)) {
-+        env->cp15.c14_pmevcntr_delta[counter] -=
-+            env->cp15.c14_pmevcntr[counter];
-+    }
-+}
-+
- void pmu_op_start(CPUARMState *env)
- {
-+    unsigned int i;
-     pmccntr_op_start(env);
-+    for (i = 0; i < pmu_num_counters(env); i++) {
-+        pmevcntr_op_start(env, i);
-+    }
- }
- 
- void pmu_op_finish(CPUARMState *env)
- {
-+    unsigned int i;
-     pmccntr_op_finish(env);
-+    for (i = 0; i < pmu_num_counters(env); i++) {
-+        pmevcntr_op_finish(env, i);
-+    }
- }
- 
- void pmu_pre_el_change(ARMCPU *cpu, void *ignored)
-@@ -1235,6 +1293,13 @@ static void pmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-         env->cp15.c15_ccnt = 0;
-     }
- 
-+    if (value & PMCRP) {
-+        unsigned int i;
-+        for (i = 0; i < pmu_num_counters(env); i++) {
-+            env->cp15.c14_pmevcntr[i] = 0;
-+        }
-+    }
-+
-     /* only the DP, X, D and E bits are writable */
-     env->cp15.c9_pmcr &= ~0x39;
-     env->cp15.c9_pmcr |= (value & 0x39);
-@@ -1288,6 +1353,14 @@ void pmccntr_op_finish(CPUARMState *env)
- {
- }
- 
-+void pmevcntr_op_start(CPUARMState *env, uint8_t i)
-+{
-+}
-+
-+void pmevcntr_op_finish(CPUARMState *env, uint8_t i)
-+{
-+}
-+
- void pmu_op_start(CPUARMState *env)
- {
- }
-@@ -1358,30 +1431,174 @@ static void pmovsset_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     env->cp15.c9_pmovsr |= value;
- }
- 
--static void pmxevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
--                             uint64_t value)
-+static void pmevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value, const uint8_t counter)
- {
-+    if (counter == 31) {
-+        pmccfiltr_write(env, ri, value);
-+    } else if (counter < pmu_num_counters(env)) {
-+        pmevcntr_op_start(env, counter);
-+
-+        /*
-+         * If this counter's event type is changing, store the current
-+         * underlying count for the new type in c14_pmevcntr_delta[counter] so
-+         * pmevcntr_op_finish has the correct baseline when it converts back to
-+         * a delta.
-+         */
-+        uint16_t old_event = env->cp15.c14_pmevtyper[counter] &
-+            PMXEVTYPER_EVTCOUNT;
-+        uint16_t new_event = value & PMXEVTYPER_EVTCOUNT;
-+        if (old_event != new_event) {
-+            uint64_t count = 0;
-+            if (event_supported(new_event)) {
-+                uint16_t event_idx = supported_event_map[new_event];
-+                count = pm_events[event_idx].get_count(env);
-+            }
-+            env->cp15.c14_pmevcntr_delta[counter] = count;
-+        }
-+
-+        env->cp15.c14_pmevtyper[counter] = value & PMXEVTYPER_MASK;
-+        pmevcntr_op_finish(env, counter);
-+    }
-     /* Attempts to access PMXEVTYPER are CONSTRAINED UNPREDICTABLE when
-      * PMSELR value is equal to or greater than the number of implemented
-      * counters, but not equal to 0x1f. We opt to behave as a RAZ/WI.
-      */
--    if (env->cp15.c9_pmselr == 0x1f) {
--        pmccfiltr_write(env, ri, value);
-+}
-+
-+static uint64_t pmevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri,
-+                               const uint8_t counter)
-+{
-+    if (counter == 31) {
-+        return env->cp15.pmccfiltr_el0;
-+    } else if (counter < pmu_num_counters(env)) {
-+        return env->cp15.c14_pmevtyper[counter];
-+    } else {
-+      /*
-+       * We opt to behave as a RAZ/WI when attempts to access PMXEVTYPER
-+       * are CONSTRAINED UNPREDICTABLE. See comments in pmevtyper_write().
-+       */
-+        return 0;
-     }
- }
- 
-+static void pmevtyper_writefn(CPUARMState *env, const ARMCPRegInfo *ri,
-+                              uint64_t value)
-+{
-+    uint8_t counter = ((ri->crm & 3) << 3) | (ri->opc2 & 7);
-+    pmevtyper_write(env, ri, value, counter);
-+}
-+
-+static void pmevtyper_rawwrite(CPUARMState *env, const ARMCPRegInfo *ri,
-+                               uint64_t value)
-+{
-+    uint8_t counter = ((ri->crm & 3) << 3) | (ri->opc2 & 7);
-+    env->cp15.c14_pmevtyper[counter] = value;
-+
 +    /*
-+     * pmevtyper_rawwrite is called between a pair of pmu_op_start and
-+     * pmu_op_finish calls when loading saved state for a migration. Because
-+     * we're potentially updating the type of event here, the value written to
-+     * c14_pmevcntr_delta by the preceeding pmu_op_start call may be for a
-+     * different counter type. Therefore, we need to set this value to the
-+     * current count for the counter type we're writing so that pmu_op_finish
-+     * has the correct count for its calculation.
++     * SW_INCR events are written directly to the pmevcntr's by writes to
++     * PMSWINC, so there is no underlying count maintained by the PMU itself
 +     */
-+    uint16_t event = value & PMXEVTYPER_EVTCOUNT;
-+    if (event_supported(event)) {
-+        uint16_t event_idx = supported_event_map[event];
-+        env->cp15.c14_pmevcntr_delta[counter] =
-+            pm_events[event_idx].get_count(env);
-+    }
++    return 0;
 +}
 +
-+static uint64_t pmevtyper_readfn(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    uint8_t counter = ((ri->crm & 3) << 3) | (ri->opc2 & 7);
-+    return pmevtyper_read(env, ri, counter);
-+}
-+
-+static void pmxevtyper_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value)
-+{
-+    pmevtyper_write(env, ri, value, env->cp15.c9_pmselr & 31);
-+}
-+
- static uint64_t pmxevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
--    /* We opt to behave as a RAZ/WI when attempts to access PMXEVTYPER
--     * are CONSTRAINED UNPREDICTABLE. See comments in pmxevtyper_write().
-+    return pmevtyper_read(env, ri, env->cp15.c9_pmselr & 31);
-+}
-+
-+static void pmevcntr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value, uint8_t counter)
-+{
-+    if (counter < pmu_num_counters(env)) {
-+        pmevcntr_op_start(env, counter);
-+        env->cp15.c14_pmevcntr[counter] = value;
-+        pmevcntr_op_finish(env, counter);
-+    }
-+    /*
-+     * We opt to behave as a RAZ/WI when attempts to access PM[X]EVCNTR
-+     * are CONSTRAINED UNPREDICTABLE.
-      */
--    if (env->cp15.c9_pmselr == 0x1f) {
--        return env->cp15.pmccfiltr_el0;
-+}
-+
-+static uint64_t pmevcntr_read(CPUARMState *env, const ARMCPRegInfo *ri,
-+                              uint8_t counter)
-+{
-+    if (counter < pmu_num_counters(env)) {
-+        uint64_t ret;
-+        pmevcntr_op_start(env, counter);
-+        ret = env->cp15.c14_pmevcntr[counter];
-+        pmevcntr_op_finish(env, counter);
-+        return ret;
-     } else {
-+      /* We opt to behave as a RAZ/WI when attempts to access PM[X]EVCNTR
-+       * are CONSTRAINED UNPREDICTABLE. */
-         return 0;
-     }
+ /*
+  * Return the underlying cycle count for the PMU cycle counters. If we're in
+  * usermode, simply return 0.
+@@ -1021,6 +1030,10 @@ static uint64_t instructions_get_count(CPUARMState *env)
+ #endif
+ 
+ static const pm_event pm_events[] = {
++    { .number = 0x000, /* SW_INCR */
++      .supported = event_always_supported,
++      .get_count = swinc_get_count,
++    },
+ #ifndef CONFIG_USER_ONLY
+     { .number = 0x008, /* INST_RETIRED, Instruction architecturally executed */
+       .supported = instructions_supported,
+@@ -1345,6 +1358,24 @@ static void pmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     pmu_op_finish(env);
  }
  
-+static void pmevcntr_writefn(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value)
++static void pmswinc_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                          uint64_t value)
 +{
-+    uint8_t counter = ((ri->crm & 3) << 3) | (ri->opc2 & 7);
-+    pmevcntr_write(env, ri, value, counter);
-+}
-+
-+static uint64_t pmevcntr_readfn(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    uint8_t counter = ((ri->crm & 3) << 3) | (ri->opc2 & 7);
-+    return pmevcntr_read(env, ri, counter);
-+}
-+
-+static void pmevcntr_rawwrite(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value)
-+{
-+    uint8_t counter = ((ri->crm & 3) << 3) | (ri->opc2 & 7);
-+    assert(counter < pmu_num_counters(env));
-+    env->cp15.c14_pmevcntr[counter] = value;
-+    pmevcntr_write(env, ri, value, counter);
-+}
-+
-+static uint64_t pmevcntr_rawread(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    uint8_t counter = ((ri->crm & 3) << 3) | (ri->opc2 & 7);
-+    assert(counter < pmu_num_counters(env));
-+    return env->cp15.c14_pmevcntr[counter];
-+}
-+
-+static void pmxevcntr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value)
-+{
-+    pmevcntr_write(env, ri, value, env->cp15.c9_pmselr & 31);
-+}
-+
-+static uint64_t pmxevcntr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    return pmevcntr_read(env, ri, env->cp15.c9_pmselr & 31);
-+}
-+
- static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                             uint64_t value)
- {
-@@ -1571,16 +1788,23 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .fieldoffset = offsetof(CPUARMState, cp15.pmccfiltr_el0),
-       .resetvalue = 0, },
-     { .name = "PMXEVTYPER", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 1,
--      .access = PL0_RW, .type = ARM_CP_NO_RAW, .accessfn = pmreg_access,
-+      .access = PL0_RW, .type = ARM_CP_NO_RAW | ARM_CP_IO,
-+      .accessfn = pmreg_access,
-       .writefn = pmxevtyper_write, .readfn = pmxevtyper_read },
-     { .name = "PMXEVTYPER_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 1,
--      .access = PL0_RW, .type = ARM_CP_NO_RAW, .accessfn = pmreg_access,
-+      .access = PL0_RW, .type = ARM_CP_NO_RAW | ARM_CP_IO,
-+      .accessfn = pmreg_access,
-       .writefn = pmxevtyper_write, .readfn = pmxevtyper_read },
--    /* Unimplemented, RAZ/WI. */
-     { .name = "PMXEVCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 2,
--      .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
--      .accessfn = pmreg_access_xevcntr },
-+      .access = PL0_RW, .type = ARM_CP_NO_RAW | ARM_CP_IO,
-+      .accessfn = pmreg_access_xevcntr,
-+      .writefn = pmxevcntr_write, .readfn = pmxevcntr_read },
-+    { .name = "PMXEVCNTR_EL0", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 2,
-+      .access = PL0_RW, .type = ARM_CP_NO_RAW | ARM_CP_IO,
-+      .accessfn = pmreg_access_xevcntr,
-+      .writefn = pmxevcntr_write, .readfn = pmxevcntr_read },
-     { .name = "PMUSERENR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 0,
-       .access = PL0_R | PL1_RW, .accessfn = access_tpm,
-       .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmuserenr),
-@@ -4339,7 +4563,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
- #endif
-     /* The only field of MDCR_EL2 that has a defined architectural reset value
-      * is MDCR_EL2.HPMN which should reset to the value of PMCR_EL0.N; but we
--     * don't impelment any PMU event counters, so using zero as a reset
-+     * don't implement any PMU event counters, so using zero as a reset
-      * value for MDCR_EL2 is okay
-      */
-     { .name = "MDCR_EL2", .state = ARM_CP_STATE_BOTH,
-@@ -5191,6 +5415,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-          * field as main ID register, and we implement only the cycle
-          * count register.
-          */
-+        unsigned int i, pmcrn = 4;
- #ifndef CONFIG_USER_ONLY
-         ARMCPRegInfo pmcr = {
-             .name = "PMCR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 0,
-@@ -5211,6 +5436,43 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         };
-         define_one_arm_cp_reg(cpu, &pmcr);
-         define_one_arm_cp_reg(cpu, &pmcr64);
-+        for (i = 0; i < pmcrn; i++) {
-+            char *pmevcntr_name = g_strdup_printf("PMEVCNTR%d", i);
-+            char *pmevcntr_el0_name = g_strdup_printf("PMEVCNTR%d_EL0", i);
-+            char *pmevtyper_name = g_strdup_printf("PMEVTYPER%d", i);
-+            char *pmevtyper_el0_name = g_strdup_printf("PMEVTYPER%d_EL0", i);
-+            ARMCPRegInfo pmev_regs[] = {
-+                { .name = pmevcntr_name, .cp = 15, .crn = 15,
-+                  .crm = 8 | (3 & (i >> 3)), .opc1 = 0, .opc2 = i & 7,
-+                  .access = PL0_RW, .type = ARM_CP_IO | ARM_CP_ALIAS,
-+                  .readfn = pmevcntr_readfn, .writefn = pmevcntr_writefn,
-+                  .accessfn = pmreg_access },
-+                { .name = pmevcntr_el0_name, .state = ARM_CP_STATE_AA64,
-+                  .opc0 = 3, .opc1 = 3, .crn = 15, .crm = 8 | (3 & (i >> 3)),
-+                  .opc2 = i & 7, .access = PL0_RW, .accessfn = pmreg_access,
-+                  .type = ARM_CP_IO,
-+                  .readfn = pmevcntr_readfn, .writefn = pmevcntr_writefn,
-+                  .raw_readfn = pmevcntr_rawread,
-+                  .raw_writefn = pmevcntr_rawwrite },
-+                { .name = pmevtyper_name, .cp = 15, .crn = 15,
-+                  .crm = 12 | (3 & (i >> 3)), .opc1 = 0, .opc2 = i & 7,
-+                  .access = PL0_RW, .type = ARM_CP_IO | ARM_CP_ALIAS,
-+                  .readfn = pmevtyper_readfn, .writefn = pmevtyper_writefn,
-+                  .accessfn = pmreg_access },
-+                { .name = pmevtyper_el0_name, .state = ARM_CP_STATE_AA64,
-+                  .opc0 = 3, .opc1 = 3, .crn = 15, .crm = 12 | (3 & (i >> 3)),
-+                  .opc2 = i & 7, .access = PL0_RW, .accessfn = pmreg_access,
-+                  .type = ARM_CP_IO,
-+                  .readfn = pmevtyper_readfn, .writefn = pmevtyper_writefn,
-+                  .raw_writefn = pmevtyper_rawwrite },
-+                REGINFO_SENTINEL
-+            };
-+            define_arm_cp_regs(cpu, pmev_regs);
-+            g_free(pmevcntr_name);
-+            g_free(pmevcntr_el0_name);
-+            g_free(pmevtyper_name);
-+            g_free(pmevtyper_el0_name);
++    unsigned int i;
++    for (i = 0; i < pmu_num_counters(env); i++) {
++        /* Increment a counter's count iff: */
++        if ((value & (1 << i)) && /* counter's bit is set */
++                /* counter is enabled and not filtered */
++                pmu_counter_enabled(env, i) &&
++                /* counter is SW_INCR */
++                (env->cp15.c14_pmevtyper[i] & PMXEVTYPER_EVTCOUNT) == 0x0) {
++            pmevcntr_op_start(env, i);
++            env->cp15.c14_pmevcntr[i]++;
++            pmevcntr_op_finish(env, i);
 +        }
- #endif
-         ARMCPRegInfo clidr = {
-             .name = "CLIDR", .state = ARM_CP_STATE_BOTH,
++    }
++}
++
+ static uint64_t pmccntr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     uint64_t ret;
+@@ -1751,9 +1782,13 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
+       .writefn = pmovsr_write,
+       .raw_writefn = raw_write },
+-    /* Unimplemented so WI. */
+     { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
+-      .access = PL0_W, .accessfn = pmreg_access_swinc, .type = ARM_CP_NOP },
++      .access = PL0_W, .accessfn = pmreg_access_swinc, .type = ARM_CP_NO_RAW,
++      .writefn = pmswinc_write },
++    { .name = "PMSWINC_EL0", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 4,
++      .access = PL0_W, .accessfn = pmreg_access_swinc, .type = ARM_CP_NO_RAW,
++      .writefn = pmswinc_write },
+     { .name = "PMSELR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 5,
+       .access = PL0_RW, .type = ARM_CP_ALIAS,
+       .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmselr),
 -- 
 2.19.1
