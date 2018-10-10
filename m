@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gAIOM-0005hm-JP
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:35:27 -0400
+	(envelope-from <palmer@sifive.com>) id 1gAIcB-0007nt-JJ
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:49:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1gAIOH-0004pL-4r
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:35:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1gAIOG-0004np-RL
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:35:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1AE7030026A4
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 17:35:17 +0000 (UTC)
-References: <20181008185013.19371-1-mreitz@redhat.com>
-	<20181010101025.kck5epmrqurpbeg6@sirius.home.kraxel.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0d07e9f7-1924-0e0f-94da-25d25b10e748@redhat.com>
-Date: Wed, 10 Oct 2018 19:35:06 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181010101025.kck5epmrqurpbeg6@sirius.home.kraxel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Fhl09IfCjfIzBZMBasuPzBPmAMiegPCMJ"
-Subject: Re: [Qemu-devel] [PATCH] sdl2: Support all virtio-gpu formats
+	(envelope-from <palmer@sifive.com>) id 1gAIc8-0000ha-CG
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:49:43 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37264)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@sifive.com>) id 1gAIc7-0000gH-TF
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 13:49:40 -0400
+Received: by mail-pl1-x642.google.com with SMTP id u6-v6so141053plz.4
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 10:49:39 -0700 (PDT)
+Date: Wed, 10 Oct 2018 10:49:36 -0700 (PDT)
+In-Reply-To: <cover.1539023064.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+Message-ID: <mhng-99c18a25-be61-4fa6-93c6-313a0fa37372@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/5]  Misc RISC-V patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, alistair23@gmail.com, Alistair.Francis@wdc.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Fhl09IfCjfIzBZMBasuPzBPmAMiegPCMJ
-From: Max Reitz <mreitz@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <0d07e9f7-1924-0e0f-94da-25d25b10e748@redhat.com>
-Subject: Re: [PATCH] sdl2: Support all virtio-gpu formats
-References: <20181008185013.19371-1-mreitz@redhat.com>
- <20181010101025.kck5epmrqurpbeg6@sirius.home.kraxel.org>
-In-Reply-To: <20181010101025.kck5epmrqurpbeg6@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 08 Oct 2018 11:25:07 PDT (-0700), Alistair.Francis@wdc.com wrote:
+> These are some patches that I have cherry picked from Michael's RISC-V
+> tree that are ready to be applied.
+> Unless anyone has any comments against these I'll send a PR later this
+> week.
+>
+> Michael Clark (5):
+>   RISC-V: Allow setting and clearing multiple irqs
+>   RISC-V: Move non-ops from op_helper to cpu_helper
+>   RISC-V: Update CSR and interrupt definitions
+>   RISC-V: Add missing free for plic_hart_config
+>   RISC-V: Don't add NULL bootargs to device-tree
+>
+>  hw/riscv/sifive_clint.c                 |   8 +-
+>  hw/riscv/sifive_plic.c                  |   4 +-
+>  hw/riscv/sifive_u.c                     |   4 +-
+>  hw/riscv/spike.c                        |   6 +-
+>  hw/riscv/virt.c                         |   6 +-
+>  target/riscv/Makefile.objs              |   2 +-
+>  target/riscv/cpu.c                      |   6 +-
+>  target/riscv/cpu.h                      |  22 +-
+>  target/riscv/cpu_bits.h                 | 683 +++++++++++++-----------
+>  target/riscv/{helper.c => cpu_helper.c} |  35 +-
+>  target/riscv/op_helper.c                |  34 +-
+>  11 files changed, 438 insertions(+), 372 deletions(-)
+>  rename target/riscv/{helper.c => cpu_helper.c} (95%)
 
-On 10.10.18 12:10, Gerd Hoffmann wrote:
-> On Mon, Oct 08, 2018 at 08:50:13PM +0200, Max Reitz wrote:
->> There are some 2D resource formats that can be used through virtio-gpu=
-,
->=20
-> Ahem, not really.  XRGB is the only one which works in practice, and
-> virtio-gpu kms driver will stop advertising anything else soon (patches=
-
-> should land upstream with the next merge window).
-
-OK, if virtio-gpu didn't support anything else, that'd be a fix, too.
-But it sounds like you're talking about the Linux driver, I'm not.
-
-This is not about Linux applications being able to abuse the Linux
-driver to crash the VM, this is about malicious drivers (not necessarily
-Linux drivers).
-
->> Add these formats in the switch converting pixman to SDL format
->> constants so a guest cannot crash the VM by triggering the
->> g_assert_not_reached() with an unsupported format.
->=20
-> Do you have a reproducer for that?
-
-I have attached two RISC-V kernels, one (kernel-rgbx) setting
-VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM, the other (kernel-bgra) setting
-VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM.  Both crash qemu:
-
-$ $QEMU/build/riscv64-softmmu/qemu-system-riscv64 -kernel kernel-rgbx \
-    -serial stdio -M virt -device virtio-gpu-device
-[platform-virt] Virt platform detected
-[virtio-gpu] Found device @0x10008000
-[virtio-gpu] Scanout 0: 0x0:1024x768
-**
-ERROR:$QEMU/ui/sdl2-2d.c:114:sdl2_2d_switch: code should not be reached
-[1]    7151 abort (core dumped)
-
-So this is not about a misbehaving Linux driver but about an own driver.
- Of course, if you can insert kernel code, there's noone stopping you
-from hitting that assertion with Linux, too.
-
-> There is sdl2_2d_check_format() which reports the supported formats.
-> If we hit sdl2_2d_switch() with a format not whitelisted by
-> sdl2_2d_check_format() we have a bug somewhere in qemu ...
-
-I suppose the other solution would be for virtio_gpu_set_scanout() to
-check whether the resource's format can actually be used for that
-display.  Or in virtio_gpu_resource_create_2d(), I don't know whether
-it's possible to use resources in other formats at all.
-
-Max
-
-
---Fhl09IfCjfIzBZMBasuPzBPmAMiegPCMJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlu+OEoACgkQ9AfbAGHV
-z0D68gf/cNirc503alVM515RwSOkQUNTW4Brbh6aWwoo8tY6zceSqJF1vvOQqNhK
-uhMledvXG6aA9cSQyaB2HbDZr7IwW5kzbQ2RsjIxper/Gjx7Bvd4Xf/Mb1LB9Ibm
-/nMsR2LtYPg/8jdVz2QwWCD9QEWte7lBBWkWX2NbCR0hutDdJKoPFyEz8m7xu1Cy
-nMCrOVfbmyPJFniCKPbAPaBvaaiqvjc4NcS+WHlU+YwMfepm9dgNNc2Bkfq7ppzT
-8D5Fc6tjZ362jLk6CaBfzTL+bPyGFcRjxFs9vjrdC1q6Jpp6y7Bp+bmq+25mRAqt
-MciLNj3cc48+WInd0lZa9jjE5Q+QrA==
-=MjW3
------END PGP SIGNATURE-----
-
---Fhl09IfCjfIzBZMBasuPzBPmAMiegPCMJ--
+I tried pinging Michael but he hasn't responded.  As far as I'm concerned, as 
+long as you've tested these then they seem fine -- they look pretty safe.  If 
+you're not set up to make QEMU PRs then I can do so, as we should really get 
+the ball rolling on our big patch backlog.
