@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1gA3jU-0006JR-LX
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:56:17 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1gA50n-0005Qc-HN
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1gA3jP-0000np-V7
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:56:16 -0400
-Received: from mga06.intel.com ([134.134.136.31]:52872)
+	(envelope-from <alex.williamson@redhat.com>) id 1gA50i-0005kq-TD
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:18:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50232)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1gA3jP-0000lw-Ff
-	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 21:56:11 -0400
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Date: Wed, 10 Oct 2018 01:49:56 +0000
-Message-ID: <09D68D4CF52CAF489B702DEBDD12D3D3527FD330@SHSMSX103.ccr.corp.intel.com>
-References: <20180919031122.28487-1-tao3.xu@intel.com>
-	<20180919031122.28487-2-tao3.xu@intel.com>
-In-Reply-To: <20180919031122.28487-2-tao3.xu@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gA50i-0005jv-Ky
+	for qemu-devel@nongnu.org; Tue, 09 Oct 2018 23:18:08 -0400
+Date: Tue, 9 Oct 2018 21:18:02 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20181009211802.531df951@t450s.home>
+In-Reply-To: <9BD73EA91F8E404F851CF3F519B14AA80180A6E0@DGGEMI521-MBX.china.huawei.com>
+References: <9BD73EA91F8E404F851CF3F519B14AA80180A4A5@DGGEMI521-MBX.china.huawei.com>
+	<20181009090801.6f53286d@w520.home>
+	<9BD73EA91F8E404F851CF3F519B14AA80180A6E0@DGGEMI521-MBX.china.huawei.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/1] i386: Add new model of
- Cascadelake-Server
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] The results of lspci are inconsistent between vfio
+ reset pci devices and reset devices by sysfs interafce
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,119 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Xu, Tao3" <tao3.xu@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Wuzongyong (Euler Dept)" <cordius.wu@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Chenhaiwu (Euler)" <chenhaiwu1@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>
 
-Hi Eduardo/Paolo,
+On Wed, 10 Oct 2018 01:47:10 +0000
+"Wuzongyong (Euler Dept)" <cordius.wu@huawei.com> wrote:
+> 
+> You're right. The initial states are not identical.
+> I found the function vfio_pci_pre_reset in qemu.
+>     /*
+>      * Stop any ongoing DMA by disconecting I/O, MMIO, and bus master.
+>      * Also put INTx Disable in known state.
+>      */
+>     cmd = vfio_pci_read_config(pdev, PCI_COMMAND, 2);
+>     cmd &= ~(PCI_COMMAND_IO | PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER |
+>              PCI_COMMAND_INTX_DISABLE);
+>     vfio_pci_write_config(pdev, PCI_COMMAND, cmd, 2);
+> 
+> So the behaviors between the two reset are inconsistent.
+> 
+> Then I wonder whether the operation is necessary here?
+> Could I enable the Memory bit in the Command register in vfio_pci_post_reset,
+> because I want to write regions of PCI devices after reset.
 
-Do you have any comments about this patch ?
+One reset is done by the kernel to try to put the device into a known
+clean state before allowing the user access to it, the other is done by
+QEMU as part of the initial machine reset.  I suppose we could special
+case the initial machine reset, but it seems perhaps risky and
+unnecessary.
 
-Thanks
-Jingqi
+QEMU is the driver here, it can certainly enable MMIO on the device and
+there are some examples in the QEMU code where MMIO is enabled to
+interact with the device, see vfio_radeon_reset() for example.  The
+device driver in the guest or the VM firmware should be the one to
+enable the device for VM usage though, QEMU should provide the device
+to the VM in a power-on default state, or as close as we can reasonably
+get to that.  Thanks,
 
-> -----Original Message-----
-> From: Xu, Tao3
-> Sent: Wednesday, September 19, 2018 11:11 AM
-> To: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com
-> Cc: qemu-devel@nongnu.org; Liu, Jingqi <jingqi.liu@intel.com>; Xu, Tao3
-> <tao3.xu@intel.com>
-> Subject: [PATCH 1/1] i386: Add new model of Cascadelake-Server
->=20
-> New CPU models mostly inherit features from ancestor Skylake-Server, whil=
-e
-> addin new features: AVX512_VNNI, Intel PT.
-> SSBD support for speculative execution
-> side channel mitigations.
->=20
-> Note:
->=20
-> On Cascadelake, some capabilities (RDCL_NO, IBRS_ALL, RSBA,
-> SKIP_L1DFL_VMENTRY and SSB_NO) are enumerated by MSR.
-> These features rely on MSR based feature support patch.
-> Will be added later after that patch's in.
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg00074.html
->=20
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
->  target/i386/cpu.c | 54
-> +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 54 insertions(+)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c index
-> f24295e6e4..670898f32d 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -2386,6 +2386,60 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Xeon Processor (Skylake, IBRS)",
->      },
-> +    {
-> +        .name =3D "Cascadelake-Server",
-> +        .level =3D 0xd,
-> +        .vendor =3D CPUID_VENDOR_INTEL,
-> +        .family =3D 6,
-> +        .model =3D 85,
-> +        .stepping =3D 5,
-> +        .features[FEAT_1_EDX] =3D
-> +            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX =
-|
-> +            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV |
-> CPUID_MCA |
-> +            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 =
-|
-> +            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-> +            CPUID_DE | CPUID_FP87,
-> +        .features[FEAT_1_ECX] =3D
-> +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
-> +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
-> +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
-> +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
-> +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
-> CPUID_EXT_MOVBE |
-> +            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
-> +        .features[FEAT_8000_0001_EDX] =3D
-> +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
-> +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
-> +        .features[FEAT_8000_0001_ECX] =3D
-> +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM |
-> CPUID_EXT3_3DNOWPREFETCH,
-> +        .features[FEAT_7_0_EBX] =3D
-> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-> +            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP
-> |
-> +            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
-> CPUID_7_0_EBX_INVPCID |
-> +            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED |
-> CPUID_7_0_EBX_ADX |
-> +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX |
-> CPUID_7_0_EBX_CLWB |
-> +            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
-> +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
-> +            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
-> +            CPUID_7_0_EBX_INTEL_PT,
-> +        .features[FEAT_7_0_ECX] =3D
-> +            CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
-> +            CPUID_7_0_ECX_AVX512VNNI,
-> +        .features[FEAT_7_0_EDX] =3D
-> +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
-> +        /* Missing: XSAVES (not supported by some Linux versions,
-> +                * including v4.1 to v4.12).
-> +                * KVM doesn't yet expose any XSAVES state save component=
-,
-> +                * and the only one defined in Skylake (processor tracing=
-)
-> +                * probably will block migration anyway.
-> +                */
-> +        .features[FEAT_XSAVE] =3D
-> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-> +            CPUID_XSAVE_XGETBV1,
-> +        .features[FEAT_6_EAX] =3D
-> +            CPUID_6_EAX_ARAT,
-> +        .xlevel =3D 0x80000008,
-> +        .model_id =3D "Intel Xeon Processor (Cascadelake)",
-> +    },
->      {
->          .name =3D "Icelake-Client",
->          .level =3D 0xd,
-> --
-> 2.17.1
+Alex
