@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gAL5C-0008RD-6s
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:27:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1gALCb-00024E-4g
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gAL57-0005DO-7A
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:27:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35392)
+	(envelope-from <ehabkost@redhat.com>) id 1gALCW-0000eh-9a
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:35:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37724)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gAL53-00059b-MK
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:27:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CD8D13083395
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 20:27:40 +0000 (UTC)
-References: <20181009062718.1914-1-peterx@redhat.com>
-	<902c92e2-3454-771e-51ff-ab38b970e86e@redhat.com>
-	<049fc618-6e13-5030-4124-1c9f4315f7eb@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5ca812f7-c574-36fc-c7cd-f11e71a0efc1@redhat.com>
-Date: Wed, 10 Oct 2018 15:27:34 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1gALCP-0000dD-Gn
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 16:35:20 -0400
+Date: Wed, 10 Oct 2018 17:35:11 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20181010203511.GJ5738@habkost.net>
+References: <20180919031122.28487-1-tao3.xu@intel.com>
+	<20180919031122.28487-2-tao3.xu@intel.com>
+	<09D68D4CF52CAF489B702DEBDD12D3D3527FD330@SHSMSX103.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <049fc618-6e13-5030-4124-1c9f4315f7eb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 0/6] monitor: enable OOB by default
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09D68D4CF52CAF489B702DEBDD12D3D3527FD330@SHSMSX103.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] i386: Add new model of
+ Cascadelake-Server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +29,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Liu, Jingqi" <jingqi.liu@intel.com>
+Cc: "Xu, Tao3" <tao3.xu@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Robert Hoo <robert.hu@linux.intel.com>
 
-On 10/10/18 2:26 PM, Eric Blake wrote:
+On Wed, Oct 10, 2018 at 01:49:56AM +0000, Liu, Jingqi wrote:
+> Hi Eduardo/Paolo,
+> 
+> Do you have any comments about this patch ?
+
+Thanks for the reminder and sorry for the delay.  I was waiting
+for MSR features to be merged before including this CPU model.
+
+But considering that it's taking a while until we sort out the
+details, I'll review this so it can be merged first if necessary.
 
 > 
-> On the other hand, when I'm trying to use a qemu binary with these 
-> patches applied, libvirt is hanging when trying to probe the 
-> capabilities of the binary, waiting for a response to 
-> "qmp_capabilities". I'll try and bisect which patch is causing the 
-> problem, and figure out why it is happening for libvirt and not running 
-> by hand (perhaps is it a tty vs. Unix socket thing?)
-
-Bisect didn't help much; it landed on:
-
-     monitor: remove "x-oob", turn oob on by default
-
-as the cause of libvirt hanging. I didn't have time to investigate 
-further, other than the command line that is hanging:
-
-/home/eblake/qemu/x86_64-softmmu/qemu-system-x86_64 -S -no-user-config 
--nodefaults -nographic -machine none,accel=kvm:tcg -qmp 
-unix:/var/lib/libvirt/qemu/capabilities.monitor.sock,server,nowait 
--pidfile /var/lib/libvirt/qemu/capabilities.pidfile -daemonize
-
-And I suspect it is the -daemonize that is causing the hang I'm seeing 
-when run by libvirt.
-
-> Based-on: <20180828191048.29806-1-armbru@redhat.com>
-> Based-on: <20180901111716.1675-1-armbru@redhat.com>
+> Thanks
+> Jingqi
 > 
-> (this series is based on Markus's monitor-next tree)
-
-
-Am I missing any prerequisite patches? Markus' monitor-next tree is 
-currently a subset of git master (merge efd1d522).
+> > -----Original Message-----
+> > From: Xu, Tao3
+> > Sent: Wednesday, September 19, 2018 11:11 AM
+> > To: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com
+> > Cc: qemu-devel@nongnu.org; Liu, Jingqi <jingqi.liu@intel.com>; Xu, Tao3
+> > <tao3.xu@intel.com>
+> > Subject: [PATCH 1/1] i386: Add new model of Cascadelake-Server
+> > 
+> > New CPU models mostly inherit features from ancestor Skylake-Server, while
+> > addin new features: AVX512_VNNI, Intel PT.
+> > SSBD support for speculative execution
+> > side channel mitigations.
+> > 
+> > Note:
+> > 
+> > On Cascadelake, some capabilities (RDCL_NO, IBRS_ALL, RSBA,
+> > SKIP_L1DFL_VMENTRY and SSB_NO) are enumerated by MSR.
+> > These features rely on MSR based feature support patch.
+> > Will be added later after that patch's in.
+> > http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg00074.html
+> > 
+> > Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> > ---
+> >  target/i386/cpu.c | 54
+> > +++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 54 insertions(+)
+> > 
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c index
+> > f24295e6e4..670898f32d 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -2386,6 +2386,60 @@ static X86CPUDefinition builtin_x86_defs[] = {
+> >          .xlevel = 0x80000008,
+> >          .model_id = "Intel Xeon Processor (Skylake, IBRS)",
+> >      },
+> > +    {
+> > +        .name = "Cascadelake-Server",
+> > +        .level = 0xd,
+> > +        .vendor = CPUID_VENDOR_INTEL,
+> > +        .family = 6,
+> > +        .model = 85,
+> > +        .stepping = 5,
+> > +        .features[FEAT_1_EDX] =
+> > +            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+> > +            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV |
+> > CPUID_MCA |
+> > +            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
+> > +            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
+> > +            CPUID_DE | CPUID_FP87,
+> > +        .features[FEAT_1_ECX] =
+> > +            CPUID_EXT_AVX | CPUID_EXT_XSAVE | CPUID_EXT_AES |
+> > +            CPUID_EXT_POPCNT | CPUID_EXT_X2APIC | CPUID_EXT_SSE42 |
+> > +            CPUID_EXT_SSE41 | CPUID_EXT_CX16 | CPUID_EXT_SSSE3 |
+> > +            CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3 |
+> > +            CPUID_EXT_TSC_DEADLINE_TIMER | CPUID_EXT_FMA |
+> > CPUID_EXT_MOVBE |
+> > +            CPUID_EXT_PCID | CPUID_EXT_F16C | CPUID_EXT_RDRAND,
+> > +        .features[FEAT_8000_0001_EDX] =
+> > +            CPUID_EXT2_LM | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+> > +            CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
+> > +        .features[FEAT_8000_0001_ECX] =
+> > +            CPUID_EXT3_ABM | CPUID_EXT3_LAHF_LM |
+> > CPUID_EXT3_3DNOWPREFETCH,
+> > +        .features[FEAT_7_0_EBX] =
+> > +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+> > +            CPUID_7_0_EBX_HLE | CPUID_7_0_EBX_AVX2 | CPUID_7_0_EBX_SMEP
+> > |
+> > +            CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
+> > CPUID_7_0_EBX_INVPCID |
+> > +            CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED |
+> > CPUID_7_0_EBX_ADX |
+> > +            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_MPX |
+> > CPUID_7_0_EBX_CLWB |
+> > +            CPUID_7_0_EBX_AVX512F | CPUID_7_0_EBX_AVX512DQ |
+> > +            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
+> > +            CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT |
+> > +            CPUID_7_0_EBX_INTEL_PT,
+> > +        .features[FEAT_7_0_ECX] =
+> > +            CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE |
+> > +            CPUID_7_0_ECX_AVX512VNNI,
+> > +        .features[FEAT_7_0_EDX] =
+> > +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+> > +        /* Missing: XSAVES (not supported by some Linux versions,
+> > +                * including v4.1 to v4.12).
+> > +                * KVM doesn't yet expose any XSAVES state save component,
+> > +                * and the only one defined in Skylake (processor tracing)
+> > +                * probably will block migration anyway.
+> > +                */
+> > +        .features[FEAT_XSAVE] =
+> > +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+> > +            CPUID_XSAVE_XGETBV1,
+> > +        .features[FEAT_6_EAX] =
+> > +            CPUID_6_EAX_ARAT,
+> > +        .xlevel = 0x80000008,
+> > +        .model_id = "Intel Xeon Processor (Cascadelake)",
+> > +    },
+> >      {
+> >          .name = "Icelake-Client",
+> >          .level = 0xd,
+> > --
+> > 2.17.1
+> 
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
