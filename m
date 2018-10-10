@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gAK7m-0006DR-32
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:26:27 -0400
+	(envelope-from <alistair23@gmail.com>) id 1gAKXr-0001Ce-1e
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:53:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gAK7h-0002zo-FG
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:26:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38108)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gAK7d-0002yf-DY
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:26:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CBB6E307D85A
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 19:26:14 +0000 (UTC)
-References: <20181009062718.1914-1-peterx@redhat.com>
-	<902c92e2-3454-771e-51ff-ab38b970e86e@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <049fc618-6e13-5030-4124-1c9f4315f7eb@redhat.com>
-Date: Wed, 10 Oct 2018 14:26:09 -0500
+	(envelope-from <alistair23@gmail.com>) id 1gAKXn-00017h-QI
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:53:22 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37826)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1gAKXn-00017K-Iy
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:53:19 -0400
+Received: by mail-pg1-x541.google.com with SMTP id c10-v6so3005819pgq.4
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 12:53:19 -0700 (PDT)
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
+	<a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
+	<5A5F4A2B-2DAF-4D70-BF1D-7ABC8461FDC8@raithlin.com>
+	<63b741e2-b3e5-283a-4dfc-9c1db757c575@gmail.com>
+	<D55C15F1-937F-474B-82B1-3F891E03638F@raithlin.com>
+From: Alistair <alistair23@gmail.com>
+Message-ID: <99997a93-da91-6a03-bc0b-fb539f05d797@gmail.com>
+Date: Wed, 10 Oct 2018 12:53:10 -0700
 MIME-Version: 1.0
-In-Reply-To: <902c92e2-3454-771e-51ff-ab38b970e86e@redhat.com>
+In-Reply-To: <D55C15F1-937F-474B-82B1-3F891E03638F@raithlin.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 0/6] monitor: enable OOB by default
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +37,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stephen Bates <sbates@raithlin.com>, Andrea Bolognani <abologna@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: Keith Busch <keith.busch@intel.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>
 
-On 10/10/18 11:26 AM, Eric Blake wrote:
-> On 10/9/18 1:27 AM, Peter Xu wrote:
->> Based-on: <20180828191048.29806-1-armbru@redhat.com>
->> Based-on: <20180901111716.1675-1-armbru@redhat.com>
->>
->> (this series is based on Markus's monitor-next tree)
->>
->> v9:
->> - add r-bs
->> - release the qmp queue lock before resume [Marc-Andre]
-> 
-> I haven't reviewed closely, but did want to report that I tested that 
-> with your patches applied, there is no way to trigger OOB of the initial 
-> capability handshake (good). It's a bit odd that the initial error 
-> (input member unexpected) is different from the later error (does not 
-> support OOB), but not a show-stopper, so I don't think you need to worry 
-> about it:
-> 
-> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 0, "major": 3}, 
-> "package": "v3.0.0-1150-g7d932cd3d53"}, "capabilities": ["oob"]}}
-> {"exec-oob":"qmp_capabilities","arguments":{"enable":["oob"]}}
-> {"error": {"class": "GenericError", "desc": "QMP input member 'exec-oob' 
-> is unexpected"}}
-> {"execute":"qmp_capabilities","arguments":{"enable":["oob"]}}
-> {"return": {}}
-> {"exec-oob":"qmp_capabilities"}
-> {"error": {"class": "GenericError", "desc": "The command 
-> qmp_capabilities does not support OOB"}}
-> 
 
-On the other hand, when I'm trying to use a qemu binary with these 
-patches applied, libvirt is hanging when trying to probe the 
-capabilities of the binary, waiting for a response to 
-"qmp_capabilities". I'll try and bisect which patch is causing the 
-problem, and figure out why it is happening for libvirt and not running 
-by hand (perhaps is it a tty vs. Unix socket thing?)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+On 10/10/2018 11:47 AM, Stephen  Bates wrote:
+>>     Why do you need two networking options?
+> 
+> I don't need the e1000 for networking. The e1000 option is there to test the PCIe since it implements a PCIe model of the e1000 NIC. Basically it's another test path for your PCIe patches and was used for testing when PCIe support to the arm virt model [1].
+>      
+>>     Strange. Is there any reason you need to use the e1000? The VirtIO
+>>     networking device works for me.
+>      
+> As per above. The e1000 is there to test PCIe not networking.
+
+Awe. My mistake. I thought that the VirtIO networking device was a PCIe 
+device for some reason.
+
+Alistair
+
+> 
+> Stephen
+>      
+> [1] https://github.com/qemu/qemu/commit/4ab29b8214cc4b54e0c1a8270b610a340311470e
+> 
