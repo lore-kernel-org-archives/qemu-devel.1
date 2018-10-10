@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gAHlx-0001Gl-Ol
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:55:46 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAHnf-0002A0-R7
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:57:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gAHlu-0001u3-Is
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:55:45 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 10 Oct 2018 16:55:37 +0000
-Message-ID: <0a9f5768-1fb1-8ce3-4ace-e02589e261c0@virtuozzo.com>
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
-	<20180817122219.16206-8-vsementsov@virtuozzo.com>
-	<873684d4-5219-fa89-f393-2cea8b291dc6@virtuozzo.com>
-In-Reply-To: <873684d4-5219-fa89-f393-2cea8b291dc6@virtuozzo.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C27D83A02968A4468C4C115C29CB18CA@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <philmd@redhat.com>) id 1gAHnc-0003vL-Li
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:57:31 -0400
+Received: from mail-wr1-f43.google.com ([209.85.221.43]:40034)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAHnc-0003uq-EW
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:57:28 -0400
+Received: by mail-wr1-f43.google.com with SMTP id d2-v6so6551761wro.7
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 09:57:28 -0700 (PDT)
+References: <20181010061113.6057-1-armbru@redhat.com>
+	<20181010061113.6057-4-armbru@redhat.com>
+	<97edaf90-6e1b-92b0-9bcf-3e894328512e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <9a6358d7-1b38-d20a-56ff-dd8e2b0b3326@redhat.com>
+Date: Wed, 10 Oct 2018 18:57:25 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/qcow2-refcount: fix
- out-of-file L2 entries to be read-as-zero
+In-Reply-To: <97edaf90-6e1b-92b0-9bcf-3e894328512e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 3/5] tests: Restore check-qdict unit test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-MTAuMTAuMjAxOCAxOTozOSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MTcuMDguMjAxOCAxNToyMiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+
-IFJld3JpdGUgY29ycnVwdGVkIEwyIHRhYmxlIGVudHJ5LCB3aGljaCByZWZlcmVuY2Ugc3BhY2Ug
-b3V0IG9mDQo+PiB1bmRlcmx5aW5nIGZpbGUuDQo+Pg0KPj4gTWFrZSB0aGlzIEwyIHRhYmxlIGVu
-dHJ5IHJlYWQtYXMtYWxsLXplcm9zIHdpdGhvdXQgYW55IGFsbG9jYXRpb24uDQo+Pg0KPj4gU2ln
-bmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0
-dW96em8uY29tPg0KPj4gLS0tDQo+PiDCoCBibG9jay9xY293Mi1yZWZjb3VudC5jIHwgMzIgKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+IMKgIDEgZmlsZSBjaGFuZ2VkLCAzMiBp
-bnNlcnRpb25zKCspDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMg
-Yi9ibG9jay9xY293Mi1yZWZjb3VudC5jDQo+PiBpbmRleCAzYzAwNGU1YmZlLi4zZGUzNzY4YTNj
-IDEwMDY0NA0KPj4gLS0tIGEvYmxvY2svcWNvdzItcmVmY291bnQuYw0KPj4gKysrIGIvYmxvY2sv
-cWNvdzItcmVmY291bnQuYw0KPj4gQEAgLTE3MjAsOCArMTcyMCwzMCBAQCBzdGF0aWMgaW50IGNo
-ZWNrX3JlZmNvdW50c19sMihCbG9ja0RyaXZlclN0YXRlIA0KPj4gKmJzLCBCZHJ2Q2hlY2tSZXN1
-bHQgKnJlcywNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIE1hcmsgY2x1c3RlciBh
-cyB1c2VkICovDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjc2l6ZSA9ICgoKGwyX2Vu
-dHJ5ID4+IHMtPmNzaXplX3NoaWZ0KSAmIHMtPmNzaXplX21hc2spIA0KPj4gKyAxKSAqDQo+PiDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgQkRSVl9TRUNUT1JfU0la
-RTsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChjc2l6ZSA+IHMtPmNsdXN0ZXJfc2l6
-ZSkgew0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXQgPSBmaXhfbDJfZW50
-cnlfdG9femVybygNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIGJzLCByZXMsIGZpeCwgbDJfb2Zmc2V0LCBpLCBhY3RpdmUsDQo+PiArwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAiY29tcHJlc3NlZCBjbHVzdGVy
-IGxhcmdlciB0aGFuIGNsdXN0ZXI6IA0KPj4gc2l6ZSAweCUiDQo+PiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBQUkl4NjQsIGNzaXplKTsNCj4+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHJldCA8IDApIHsNCj4+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBnb3RvIGZhaWw7DQo+PiArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-Y29udGludWU7DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9DQo+PiArDQo+PiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBjb2Zmc2V0ID0gbDJfZW50cnkgJiBzLT5jbHVzdGVyX29mZnNl
-dF9tYXNrICYNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgfihCRFJWX1NFQ1RPUl9TSVpFIC0gMSk7DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBp
-ZiAoY29mZnNldCA+PSBiZHJ2X2dldGxlbmd0aChicy0+ZmlsZS0+YnMpKSB7DQo+PiArwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldCA9IGZpeF9sMl9lbnRyeV90b196ZXJvKA0KPj4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYnMsIHJlcywg
-Zml4LCBsMl9vZmZzZXQsIGksIGFjdGl2ZSwNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgICJjb21wcmVzc2VkIGNsdXN0ZXIgb3V0IG9mIGZpbGU6IG9m
-ZnNldCAweCUiIA0KPj4gUFJJeDY0LA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgY29mZnNldCk7DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIGlmIChyZXQgPCAwKSB7DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgZ290byBmYWlsOw0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9
-DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnRpbnVlOw0KPj4gK8KgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgfQ0KPj4gKw0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-cmV0ID0gcWNvdzJfaW5jX3JlZmNvdW50c19pbXJ0KGJzLCByZXMsDQo+PiDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIHJlZmNvdW50X3RhYmxlLCANCj4+IHJlZmNvdW50X3RhYmxlX3Np
-emUsDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvZmZzZXQsIGNzaXplKTsN
-Cj4+IEBAIC0xNzQ4LDYgKzE3NzAsMTYgQEAgc3RhdGljIGludCBjaGVja19yZWZjb3VudHNfbDIo
-QmxvY2tEcml2ZXJTdGF0ZSANCj4+ICpicywgQmRydkNoZWNrUmVzdWx0ICpyZXMsDQo+PiDCoMKg
-wqDCoMKgwqDCoMKgwqAgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdWludDY0X3Qg
-b2Zmc2V0ID0gbDJfZW50cnkgJiBMMkVfT0ZGU0VUX01BU0s7DQo+PiDCoCArwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBpZiAob2Zmc2V0ID49IGJkcnZfZ2V0bGVuZ3RoKGJzLT5maWxlLT5icykpIHsN
-Cj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0gZml4X2wyX2VudHJ5X3Rv
-X3plcm8oDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBicywgcmVzLCBmaXgsIGwyX29mZnNldCwgaSwgYWN0aXZlLA0KPj4gK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgImNsdXN0ZXIgb3V0IG9mIGZpbGU6IG9m
-ZnNldCAweCUiIFBSSXg2NCwgDQo+PiBvZmZzZXQpOw0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBpZiAocmV0IDwgMCkgew0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGdvdG8gZmFpbDsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgfQ0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjb250aW51ZTsNCj4+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0NCj4+ICsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIGlmIChmbGFncyAmIENIRUNLX0ZSQUdfSU5GTykgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCByZXMtPmJmaS5hbGxvY2F0ZWRfY2x1c3RlcnMrKzsNCj4+IMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKG5leHRfY29udGlndW91c19vZmZzZXQg
-JiYNCj4NCj4gaG1tLCBpbnRlcmVzdGluZyBxdWVzdGlvbiBoZXJlOiBpbiBjYXNlIG9mIG1pc2Fs
-aWduZWQgbDIgZW50cnksIHdlIA0KPiB6ZXJvIGl0IG91dCBvbmx5IGZvciBRQ09XMl9DTFVTVEVS
-X1pFUk9fQUxMT0MsIGJ1dCBub3QgZm9yIG5vcm1hbCANCj4gY2x1c3RlcnM/IFdoeT8gSSB0aGlu
-ayBpdCBpcyBvayB0byBtYXJrIGFzIHplcm8gbWlzYWxpZ25lZCBub3JtYWwgDQo+IGNsdXN0ZXIg
-bDIgZW50cnksIG90aGVyd2lzZSB3ZSdsbCBoYXZlIGZhdGFsIGNvcnJ1cHRpb24gb24gYW55IA0K
-PiBvcGVyYXRpb24gdG8gdGhpcyBjbHVzdGVyLg0KPg0KDQpvciB3ZSBjYW4ganVzdCBhbGlnbiB0
-aGVtIGRvd24uDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg0K
+On 10/10/2018 18:43, Eric Blake wrote:
+> On 10/10/18 1:11 AM, Markus Armbruster wrote:
+>> Commit 0bcc8e5bd8d accidentally dropped check-qdict from the list of
+>> unit tests (again, see commit 4429532b48a).  Put it back, and fix up
+>> the test.
+> 
+> Since this seems to be a recurring problem...
+> 
+>> +++ b/tests/Makefile.include
+>> @@ -40,7 +40,7 @@ SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
+>>     check-unit-y = tests/check-qdict$(EXESUF)
+> 
+> How about a followup patch that does:
+> 
+> -   check-unit-y = tests/check-qdict$(EXESUF)
+> +   check-unit-y =
+> +   check-unit-y += tests/check-qdict$(EXESUF)
+> 
+
+Yes, clever :)
