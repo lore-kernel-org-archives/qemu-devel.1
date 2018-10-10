@@ -1,41 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gADkE-0003Oo-7D
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:37:43 -0400
+	(envelope-from <otubo@redhat.com>) id 1gADmD-0004oN-EF
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gADk9-0007ln-1o
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:37:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50330)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gADk8-0007l8-LK
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:37:36 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9ACUZHR017258
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 08:37:35 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2n1gugt2dy-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 08:37:34 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Wed, 10 Oct 2018 13:37:32 +0100
-Reply-To: pmorel@linux.ibm.com
-References: <20181009175226.22138-1-akrowiak@linux.vnet.ibm.com>
-	<20181009175226.22138-6-akrowiak@linux.vnet.ibm.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Wed, 10 Oct 2018 14:37:25 +0200
+	(envelope-from <otubo@redhat.com>) id 1gADm8-0000Y8-Cb
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:39:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50018)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1gADm8-0000WD-3z
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:39:40 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EF7A630024DC
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 12:39:38 +0000 (UTC)
+Date: Wed, 10 Oct 2018 14:39:37 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20181010123937.GC3661@vader>
+References: <20181008173125.19678-1-armbru@redhat.com>
+	<20181008173125.19678-17-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181009175226.22138-6-akrowiak@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <b5b11801-256d-dc7b-2a16-ad4b25d9681b@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 5/6] s390x/vfio: ap: Introduce VFIO AP
- device
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2iBwrppp/7QCDedR"
+Content-Disposition: inline
+In-Reply-To: <20181008173125.19678-17-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 16/31] seccomp: Clean up error reporting in
+ parse_sandbox()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,191 +35,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, cohuck@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, borntraeger@de.ibm.com, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 09/10/2018 19:52, Tony Krowiak wrote:
-> Introduces a VFIO based AP device. The device is defined via
-> the QEMU command line by specifying:
+
+--2iBwrppp/7QCDedR
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 08/10/2018 - 19:31:10, Markus Armbruster wrote:
+> Calling error_report() in a function that takes an Error ** argument
+> is suspicious.  parse_sandbox() does that, and then fails without
+> setting an error.  Its caller main(), via qemu_opts_foreach(), is fine
+> with it, but clean it up anyway.
 >=20
->      -device vfio-ap,sysfsdev=3D<path-to-mediated-matrix-device>
->=20
-> There may be only one vfio-ap device configured for a guest.
->=20
-> The mediated matrix device is created by the VFIO AP device
-> driver by writing a UUID to a sysfs attribute file (see
-> docs/vfio-ap.txt). The mediated matrix device will be named
-> after the UUID. Symbolic links to the $uuid are created in
-> many places, so the path to the mediated matrix device $uuid
-> can be specified in any of the following ways:
->=20
-> /sys/devices/vfio_ap/matrix/$uuid
-> /sys/devices/vfio_ap/matrix/mdev_supported_types/vfio_ap-passthrough/de=
-vices/$uuid
-> /sys/bus/mdev/devices/$uuid
-> /sys/bus/mdev/drivers/vfio_mdev/$uuid
->=20
-> When the vfio-ap device is realized, it acquires and opens the
-> VFIO iommu group to which the mediated matrix device is
-> bound. This causes a VFIO group notification event to be
-> signaled. The vfio_ap device driver's group notification
-> handler will get called at which time the device driver
-> will configure the the AP devices to which the guest will
-> be granted access.
->=20
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+> Cc: Eduardo Otubo <otubo@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   MAINTAINERS                       |   1 +
->   default-configs/s390x-softmmu.mak |   1 +
->   hw/vfio/Makefile.objs             |   1 +
->   hw/vfio/ap.c                      | 180 +++++++++++++++++++++++++++++=
-+
->   include/hw/vfio/vfio-common.h     |   1 +
->   5 files changed, 184 insertions(+)
->   create mode 100644 hw/vfio/ap.c
+>  qemu-seccomp.c | 18 +++++++++---------
+>  vl.c           |  4 ++--
+>  2 files changed, 11 insertions(+), 11 deletions(-)
 >=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 97e8ed808bc0..29041da69237 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1209,6 +1209,7 @@ F: hw/s390x/ap-device.c
->   F: hw/s390x/ap-bridge.c
->   F: include/hw/s390x/ap-device.h
->   F: include/hw/s390x/ap-bridge.h
-> +F: hw/vfio/ap.c
->   L: qemu-s390x@nongnu.org
->=20
->   vhost
-> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-=
-softmmu.mak
-> index d6b67d50f0e4..5eef37592451 100644
-> --- a/default-configs/s390x-softmmu.mak
-> +++ b/default-configs/s390x-softmmu.mak
-> @@ -7,3 +7,4 @@ CONFIG_S390_FLIC=3Dy
->   CONFIG_S390_FLIC_KVM=3D$(CONFIG_KVM)
->   CONFIG_VFIO_CCW=3D$(CONFIG_LINUX)
->   CONFIG_WDT_DIAG288=3Dy
-> +CONFIG_VFIO_AP=3D$(CONFIG_LINUX)
-> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-> index a2e7a0a7cf02..8b3f664d85f7 100644
-> --- a/hw/vfio/Makefile.objs
-> +++ b/hw/vfio/Makefile.objs
-> @@ -6,4 +6,5 @@ obj-$(CONFIG_SOFTMMU) +=3D platform.o
->   obj-$(CONFIG_VFIO_XGMAC) +=3D calxeda-xgmac.o
->   obj-$(CONFIG_VFIO_AMD_XGBE) +=3D amd-xgbe.o
->   obj-$(CONFIG_SOFTMMU) +=3D spapr.o
-> +obj-$(CONFIG_VFIO_AP) +=3D ap.o
->   endif
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> new file mode 100644
-> index 000000000000..5543406afc58
-> --- /dev/null
-> +++ b/hw/vfio/ap.c
-> @@ -0,0 +1,180 @@
-> +/*
-> + * VFIO based AP matrix device assignment
-> + *
-> + * Copyright 2018 IBM Corp.
-> + * Author(s): Tony Krowiak <akrowiak@linux.ibm.com>
-> + *            Halil Pasic <pasic@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-(at
-> + * your option) any later version. See the COPYING file in the top-lev=
-el
-> + * directory.
-> + */
+> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+> index 1baa5c69ed..6d27699409 100644
+> --- a/qemu-seccomp.c
+> +++ b/qemu-seccomp.c
+> @@ -12,11 +12,12 @@
+>   * Contributions after 2012-01-13 are licensed under the terms of the
+>   * GNU GPL, version 2 or (at your option) any later version.
+>   */
 > +
-> +#include <linux/vfio.h>
-> +#include <sys/ioctl.h>
-> +#include "qemu/osdep.h"
+>  #include "qemu/osdep.h"
 > +#include "qapi/error.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/vfio/vfio.h"
-> +#include "hw/vfio/vfio-common.h"
-> +#include "hw/s390x/ap-device.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/queue.h"
-> +#include "qemu/option.h"
-> +#include "qemu/config-file.h"
-> +#include "cpu.h"
-> +#include "kvm_s390x.h"
-> +#include "sysemu/sysemu.h"
-> +#include "hw/s390x/ap-bridge.h"
-> +#include "exec/address-spaces.h"
-> +
-> +#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
-> +
-> +typedef struct VFIOAPDevice {
-> +    APDevice apdev;
-> +    VFIODevice vdev;
-> +} VFIOAPDevice;
-> +
-> +#define VFIO_AP_DEVICE(obj) \
-> +        OBJECT_CHECK(VFIOAPDevice, (obj), VFIO_AP_DEVICE_TYPE)
-> +
-> +static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
-> +{
-> +    vdev->needs_reset =3D false;
-> +}
-> +
-> +/*
-> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
-> + * vfio-ap device now.
-> + */
-> +struct VFIODeviceOps vfio_ap_ops =3D {
-> +    .vfio_compute_needs_reset =3D vfio_ap_compute_needs_reset,
-> +};
-> +
-> +static void vfio_ap_put_device(VFIOAPDevice *vapdev)
-> +{
-> +    g_free(vapdev->vdev.name);
-> +    vfio_put_base_device(&vapdev->vdev);
-> +}
-> +
-> +static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp=
-)
-> +{
-> +    GError *gerror;
-> +    char *symlink, *group_path;
-> +    int groupid;
-> +
-> +    symlink =3D g_strdup_printf("%s/iommu_group", vapdev->vdev.sysfsde=
-v);
-> +    group_path =3D g_file_read_link(symlink, &gerror);
+>  #include "qemu/config-file.h"
+>  #include "qemu/option.h"
+>  #include "qemu/module.h"
+> -#include "qemu/error-report.h"
+>  #include <sys/prctl.h>
+>  #include <seccomp.h>
+>  #include "sysemu/seccomp.h"
+> @@ -190,7 +191,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
+ **errp)
+>                   * to provide a little bit of consistency for
+>                   * the command line */
+>              } else {
+> -                error_report("invalid argument for obsolete");
+> +                error_setg(errp, "invalid argument for obsolete");
+>                  return -1;
+>              }
+>          }
+> @@ -205,14 +206,13 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
+or **errp)
+>                  /* calling prctl directly because we're
+>                   * not sure if host has CAP_SYS_ADMIN set*/
+>                  if (prctl(PR_SET_NO_NEW_PRIVS, 1)) {
+> -                    error_report("failed to set no_new_privs "
+> -                                 "aborting");
+> +                    error_setg(errp, "failed to set no_new_privs " "abor=
+ting");
+>                      return -1;
 
+Except for this " " all else is good.
 
-hum I oversaw this change, it leads to segfault.
+Acked-by: Eduardo Otubo <otubo@redhat.com>
 
-You must initialize gerror before use.
-The following patch avoid a segmentation fault:
-
-
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index 5543406afc..3b8e9ba6dc 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -59,7 +59,7 @@ static void vfio_ap_put_device(VFIOAPDevice *vapdev)
-
-  static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
-  {
--    GError *gerror;
-+    GError *gerror =3D NULL;
-      char *symlink, *group_path;
-      int groupid;
-
-
-
-Regards,
-Pierre
-
-
-
-
-With this:
-Tested-by: Pierre Morel<pmorel@linux.ibm.com>
+>                  }
+>              } else if (g_str_equal(value, "allow")) {
+>                  /* default value */
+>              } else {
+> -                error_report("invalid argument for elevateprivileges");
+> +                error_setg(errp, "invalid argument for elevateprivileges=
+");
+>                  return -1;
+>              }
+>          }
+> @@ -224,7 +224,7 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Error=
+ **errp)
+>              } else if (g_str_equal(value, "allow")) {
+>                  /* default value */
+>              } else {
+> -                error_report("invalid argument for spawn");
+> +                error_setg(errp, "invalid argument for spawn");
+>                  return -1;
+>              }
+>          }
+> @@ -236,14 +236,14 @@ int parse_sandbox(void *opaque, QemuOpts *opts, Err=
+or **errp)
+>              } else if (g_str_equal(value, "allow")) {
+>                  /* default value */
+>              } else {
+> -                error_report("invalid argument for resourcecontrol");
+> +                error_setg(errp, "invalid argument for resourcecontrol");
+>                  return -1;
+>              }
+>          }
+> =20
+>          if (seccomp_start(seccomp_opts) < 0) {
+> -            error_report("failed to install seccomp syscall filter "
+> -                         "in the kernel");
+> +            error_setg(errp, "failed to install seccomp syscall filter "
+> +                       "in the kernel");
+>              return -1;
+>          }
+>      }
+> diff --git a/vl.c b/vl.c
+> index 9d2b38a31f..485c3fc008 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3925,8 +3925,8 @@ int main(int argc, char **argv, char **envp)
+> =20
+>  #ifdef CONFIG_SECCOMP
+>      olist =3D qemu_find_opts_err("sandbox", NULL);
+> -    if (olist && qemu_opts_foreach(olist, parse_sandbox, NULL, NULL)) {
+> -        exit(1);
+> +    if (olist) {
+> +        qemu_opts_foreach(olist, parse_sandbox, NULL, &error_fatal);
+>      }
+>  #endif
+> =20
+> --=20
+> 2.17.1
+>=20
 
 --=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+Eduardo Otubo
+
+--2iBwrppp/7QCDedR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbvfMJAAoJEN8y58Dw//miXa8H/0YTnULomZfPRD+eaCbL0Gsk
+OEMG81cZqq3ZmdZ3KOX7P4AtBhCE8C003Cjl53BJZaOms3Pq2HKNi7Q0E/2I2m+c
+3kXZ2Ztb30zVt/vrYyMXlYWOj7efe19ddFeFmCt0WEV2vKsfsAoTPtRsYslK7gfH
+Kj5CcXGSKUr5U5BJrzoT/A/V24FZeMvpRjeLVb1x6wB4zGtQGd/0Fl8sQlN0aUzj
+AW4k1ZIbjF+SXKC24UspVqHLHxCkmVyZajK5tw7/BLvWrlYv9tsRBV+CVwMnkL3r
+uv9en6pC6/ZH2vuKGRgMJOGxW2gEX8nUdPkMSkPzUifb30Lgq6Hedn6zXY0c3zQ=
+=YMZf
+-----END PGP SIGNATURE-----
+
+--2iBwrppp/7QCDedR--
