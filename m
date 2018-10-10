@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57903)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gAM4V-0006Uk-Ox
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 17:31:12 -0400
+	id 1gAMQg-00018h-Kd
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 17:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1gAM4S-00085C-40
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 17:31:11 -0400
+	id 1gAMQf-000191-Is
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 17:54:06 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:40649)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gAMQf-00018W-B6
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 17:54:05 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id z204-v6so7292491wmc.5
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 14:54:05 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 10 Oct 2018 23:31:02 +0200
-Message-Id: <20181010213102.8373-1-f4bug@amsat.org>
+Date: Wed, 10 Oct 2018 23:53:54 +0200
+Message-Id: <20181010215355.16221-3-f4bug@amsat.org>
+In-Reply-To: <20181010215355.16221-1-f4bug@amsat.org>
+References: <20181010215355.16221-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] python: Use io.StringIO
+Subject: [Qemu-devel] [PATCH 2/3] hw/pci-bridge/ioh3420: Remove unuseful
+ header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +34,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-
-Both Python 2.7 and 3 support the same io.StringIO to
-handle unicode strings.
-
-Use the common form to use indistinctly Python 2.7 or 3.
-
-http://python-future.org/compatible_idioms.html#stringio
-
-This fixes running tests on the Fedora Docker image,
-which uses Python3 since 356dc290f:
-
-  $ make docker-test-block@fedora
-  [...]
-  045         [failed, exit status 1] - output mismatch (see 045.out.bad)
-  --- /tmp/qemu-test/src/tests/qemu-iotests/045.out       2018-07-17 16:56:18.000000000 +0000
-  +++ /tmp/qemu-test/build/tests/qemu-iotests/045.out.bad 2018-07-17 17:19:22.448409007 +0000
-  @@ -1,5 +1,6 @@
-  -...........
-  -----------------------------------------------------------------------
-  -Ran 11 tests
-  -
-  -OK
-  +Traceback (most recent call last):
-  +  File "045", line 178, in <module>
-  +    iotests.main(supported_fmts=['raw'])
-  +  File "/tmp/qemu-test/src/tests/qemu-iotests/iotests.py", line 682, in main
-  +    import StringIO
-  +ModuleNotFoundError: No module named 'StringIO'
-  132         [failed, exit status 1] - output mismatch (see 132.out.bad)
-  152         [failed, exit status 1] - output mismatch (see 152.out.bad)
-
-  Failures: 045 132 152
+To: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Isaku Yamahata <yamahata@valinux.co.jp>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/qemu-iotests/iotests.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/pci-bridge/ioh3420.h | 6 ------
+ hw/pci-bridge/ioh3420.c | 2 +-
+ 2 files changed, 1 insertion(+), 7 deletions(-)
+ delete mode 100644 hw/pci-bridge/ioh3420.h
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 4e67fbbe96..cd9be1bd9c 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -679,13 +679,13 @@ def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
+diff --git a/hw/pci-bridge/ioh3420.h b/hw/pci-bridge/ioh3420.h
+deleted file mode 100644
+index ea423cb991..0000000000
+--- a/hw/pci-bridge/ioh3420.h
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#ifndef QEMU_IOH3420_H
+-#define QEMU_IOH3420_H
+-
+-#include "hw/pci/pcie_port.h"
+-
+-#endif /* QEMU_IOH3420_H */
+diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
+index a451d74ee6..81f2de6f07 100644
+--- a/hw/pci-bridge/ioh3420.c
++++ b/hw/pci-bridge/ioh3420.c
+@@ -24,7 +24,7 @@
+ #include "hw/pci/pci_ids.h"
+ #include "hw/pci/msi.h"
+ #include "hw/pci/pcie.h"
+-#include "ioh3420.h"
++#include "hw/pci/pcie_port.h"
  
-     # We need to filter out the time taken from the output so that qemu-iotest
-     # can reliably diff the results against master output.
--    import StringIO
-+    from io import StringIO
-     if debug:
-         output = sys.stdout
-         verbosity = 2
-         sys.argv.remove('-d')
-     else:
--        output = StringIO.StringIO()
-+        output = StringIO()
- 
-     logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
- 
+ #define PCI_DEVICE_ID_IOH_EPORT         0x3420  /* D0:F0 express mode */
+ #define PCI_DEVICE_ID_IOH_REV           0x2
 -- 
 2.19.1
