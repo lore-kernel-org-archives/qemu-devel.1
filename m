@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gAJkK-0007Hd-Bj
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:02:13 -0400
+	(envelope-from <lersek@redhat.com>) id 1gAJlf-0008Ay-8t
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gAJkG-000196-PY
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:02:12 -0400
-Date: Wed, 10 Oct 2018 20:01:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181010190153.GC2411@work-vm>
-References: <20181008160536.6332-1-i.maximets@samsung.com>
-	<CGME20181008160325eucas1p23bd6b6ce112175d274db884fb2a83f54@eucas1p2.samsung.com>
-	<20181008160536.6332-2-i.maximets@samsung.com>
+	(envelope-from <lersek@redhat.com>) id 1gAJlc-0001tl-1k
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:03:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gAJlW-0001qT-Pp
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:03:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 872995F732
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 19:03:23 +0000 (UTC)
+References: <1539093025-101599-1-git-send-email-imammedo@redhat.com>
+	<9ccf4afa-3528-a336-3eb2-9fc516852e91@redhat.com>
+	<40220217-aa30-9436-22a8-9d1fca611d8e@redhat.com>
+	<85084815-a668-c5f4-bd36-b4853596a658@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <36296a65-f937-4e8e-bb0a-f07d99c89e09@redhat.com>
+Date: Wed, 10 Oct 2018 21:03:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181008160536.6332-2-i.maximets@samsung.com>
-Subject: Re: [Qemu-devel] [RFC 1/2] migration: Stop postcopy fault thread
- before notifying
+In-Reply-To: <85084815-a668-c5f4-bd36-b4853596a658@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory: move MemoryRegion::size cleanup to
+ memory_region_finalize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ilya Maximets <i.maximets@samsung.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, qemu-stable@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
-* Ilya Maximets (i.maximets@samsung.com) wrote:
-> POSTCOPY_NOTIFY_INBOUND_END handlers will remove userfault fds
-> from the postcopy_remote_fds array which could be still in
-> use by the fault thread. Let's stop the thread before
-> notification to avoid possible accessing wrong memory.
-
-OK I think; since this is already in the cleanup we shouldn't
-be getting faults anyway at that point.
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> Fixes: 46343570c06e ("vhost+postcopy: Wire up POSTCOPY_END notify")
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
-> ---
->  migration/postcopy-ram.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+On 10/10/18 20:56, Paolo Bonzini wrote:
+> On 09/10/2018 19:09, Laszlo Ersek wrote:
+>>>    memory_region_size() != 0
+>>> and therefore it's ok to access it in
+>>>    file_backend_unparent()
+>>>       if (memory_region_size() != 0)
+>>>           memory_region_get_ram_ptr()
+>>>
+>>> which happens when object_add fails and unparents failed backend making
+>>> file_backend_unparent() access invalid memory region.
+>>
+>> I think it makes sense to zero out the size even if unparenting
+>> would, in itself, prevent the above crash. Because, in
+>> host_memory_backend_mr_inited(), we have:
+>>
+>>     /*
+>>      * NOTE: We forbid zero-length memory backend, so here zero means
+>>      * "we haven't inited the backend memory region yet".
+>>      */
+>>
+>> I'm unsure how general that invariant is, but it can't hurt to honor
+>> it everywhere. (Especially if we can do the zeroing in one common
+>> place.)
 > 
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index 853d8b32ca..e5c02a32c5 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -533,6 +533,12 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->      if (mis->have_fault_thread) {
->          Error *local_err = NULL;
->  
-> +        /* Let the fault thread quit */
-> +        atomic_set(&mis->fault_thread_quit, 1);
-> +        postcopy_fault_thread_notify(mis);
-> +        trace_postcopy_ram_incoming_cleanup_join();
-> +        qemu_thread_join(&mis->fault_thread);
-> +
->          if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_END, &local_err)) {
->              error_report_err(local_err);
->              return -1;
-> @@ -541,11 +547,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
->          if (qemu_ram_foreach_migratable_block(cleanup_range, mis)) {
->              return -1;
->          }
-> -        /* Let the fault thread quit */
-> -        atomic_set(&mis->fault_thread_quit, 1);
-> -        postcopy_fault_thread_notify(mis);
-> -        trace_postcopy_ram_incoming_cleanup_join();
-> -        qemu_thread_join(&mis->fault_thread);
->  
->          trace_postcopy_ram_incoming_cleanup_closeuf();
->          close(mis->userfault_fd);
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Yeah, that's the part that I'm not sure about.  If we do it in finalize,
+> no one should be able to observe that we are zeroing it; finalize runs
+> just before the object is g_free-d.  I agree with Igor that it's nicer
+> to leave the object in good state, but the right place to zero is
+> exactly where the first patch placed it, i.e. where the error is
+> detected and the initialization of memory_region_init is unwound.
+
+OK.
+
+Thanks
+Laszlo
