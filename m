@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1gAGtN-0006bP-GA
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 11:59:22 -0400
+	(envelope-from <crosa@redhat.com>) id 1gAGwf-0000k2-BI
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:02:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1gAGtL-0006ha-BL
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 11:59:21 -0400
-Received: from mail-it1-x142.google.com ([2607:f8b0:4864:20::142]:54388)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1gAGtK-0006aa-BA
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 11:59:19 -0400
-Received: by mail-it1-x142.google.com with SMTP id l191-v6so8813907ita.4
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 08:59:05 -0700 (PDT)
+	(envelope-from <crosa@redhat.com>) id 1gAGwa-0000iN-AT
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:02:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1gAGwa-0000hc-1I
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 12:02:40 -0400
+References: <20181009232607.15521-1-crosa@redhat.com>
+	<20181009232607.15521-5-crosa@redhat.com>
+	<835fcb24-5832-9e6c-9f57-0364f0bf849a@redhat.com>
+	<95a8561c-0511-6a8a-a3eb-25d556029e7a@redhat.com>
+	<20181010134656.GE5738@habkost.net>
+	<47f72e98-335f-b3c9-54c7-4c8a468d85d6@redhat.com>
+	<26fe2055-77c2-45fa-4e88-62101d70b88b@redhat.com>
+	<20181010142840.GH5738@habkost.net> <20181010153141.GL10973@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <0c24391d-7d83-04dc-25c9-a9c269e03c48@redhat.com>
+Date: Wed, 10 Oct 2018 12:02:30 -0400
 MIME-Version: 1.0
-References: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
-In-Reply-To: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
-From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Wed, 10 Oct 2018 18:58:53 +0300
-Message-ID: <CAKSfGUAaheneT=BxAUPKUKxBzSFrHL+bDhh3mY8fbjdnace7yw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20181010153141.GL10973@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 00/19] Fixing record/replay and adding
- reverse debugging
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] scripts/qemu.py: set predefined
+ machine type based on arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,154 +35,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Cc: alex.bennee@linaro.org, armbru@redhat.com, artem.k.pisarenko@gmail.com, boost.lists@gmail.com, ciro.santilli@gmail.com, crosthwaite.peter@gmail.com, dgilbert@redhat.com, dovgaluk@ispras.ru, jasowang@redhat.com, kraxel@redhat.com, kwolf@redhat.com, maria.klimushenkova@ispras.ru, mreitz@redhat.com, mst@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, quintela@redhat.com, rth@twiddle.net, thomas.dullien@googlemail.com, war2jordan@live.com
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <pmathieu@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Caio Carrara <ccarrara@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-Hi Pavel,
 
-Please do not CC me in this series, this isn=E2=80=99t anyhow relevant for =
-me
-anymore.
 
-Regards, Alex
+On 10/10/18 11:31 AM, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Oct 10, 2018 at 11:28:40AM -0300, Eduardo Habkost wrote:
+>> On Wed, Oct 10, 2018 at 10:15:15AM -0400, Cleber Rosa wrote:
+>>>
+>>>
+>>> On 10/10/18 9:59 AM, Cleber Rosa wrote:
+>>>>
+>>>>
+>>>> On 10/10/18 9:46 AM, Eduardo Habkost wrote:
+>>>>> On Wed, Oct 10, 2018 at 08:35:38AM -0400, Cleber Rosa wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 10/10/18 7:00 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>>>> On 10/10/2018 01:26, Cleber Rosa wrote:
+>>>>>>>> Some targets require a machine type to be set, as there's no def=
+ault
+>>>>>>>> (aarch64 is one example).  To give a consistent interface to use=
+rs of
+>>>>>>>> this API, this changes set_machine() so that a predefined defaul=
+t can
+>>>>>>>> be used, if one is not given.  The approach used is exactly the =
+same
+>>>>>>>> with the console device type.
+>>>>>>>>
+>>>>>>>> Also, even when there's a default machine type, for some purpose=
+s,
+>>>>>>>> testing included, it's better if outside code is explicit about =
+the
+>>>>>>>> machine type, instead of relying on whatever is set internally.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>>>>>>> ---
+>>>>>>>>  scripts/qemu.py | 22 +++++++++++++++++++++-
+>>>>>>>>  1 file changed, 21 insertions(+), 1 deletion(-)
+>>>>>>>>
+>>>>>>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+>>>>>>>> index d9e24a0c1a..fca9b76990 100644
+>>>>>>>> --- a/scripts/qemu.py
+>>>>>>>> +++ b/scripts/qemu.py
+>>>>>>>> @@ -36,6 +36,15 @@ CONSOLE_DEV_TYPES =3D {
+>>>>>>>>      r'^s390-ccw-virtio.*': 'sclpconsole',
+>>>>>>>>      }
+>>>>>>>> =20
+>>>>>>>> +#: Maps archictures to the preferred machine type
+>>>>>>>> +MACHINE_TYPES =3D {
+>>>>>>>> +    r'^aarch64$': 'virt',
+>>>>>>>> +    r'^ppc$': 'g3beige',
+>>>>>>>> +    r'^ppc64$': 'pseries',
+>>>>>>>> +    r'^s390x$': 's390-ccw-virtio',
+>>>>>>>> +    r'^x86_64$': 'q35',
+>>>>>>>
+>>>>>>> Why choose Q35 rather than PC (the default)?
+>>>>>>>
+>>>>>>> I was wondering about how to generate variants/machines.json but =
+this is
+>>>>>>> definitively something we want to do via a QMP query.
+>>>>>>>
+>>>>>>> Eduardo what do you think?
+>>>>>>>
+>>>>>>
+>>>>>> It was motivated by Eduardo's initiative to make q35 the default "=
+across
+>>>>>> the board".  He can confirm and give more details.
+>>>>>
+>>>>> Making Q35 the default on applications using QEMU and libvirt is
+>>>>> something I'd like to happen.  But I think the simplest way to do
+>>>>> that is to change the QEMU default.  This way you won't need this
+>>>>> table on qemu.py: you can just use the default provided by QEMU.
+>>>>>
+>>>>
+>>>> The idea is to bring consistency on how we're calling
+>>>> "qemu-system-$(ARCH)", and at the same time apply the "explicit is
+>>>> better than implicit" rule.
+>>>>
+>>>> The most important fact is that some targets do not (currently) have
+>>>> "the default provided by QEMU", aarch64 is one of them.
+>>>>
+>>>> - Cleber.
+>>>>
+>>>
+>>> So I ended up not relaying the question properly: should we default
+>>> (even if explicitly adding "-machine") to "pc"?
+>>
+>> I think using the default machine-type (when QEMU has a default)
+>> would be less surprising for users of the qemu.py API.
+>>
+>> Implicitly adding -machine when there's no default is also
+>> surprising, but then it's a nice surprise: instead of crashing
+>> you get a running VM.
+>>
+>> Now, there are two other questions related to this:
+>>
+>> If using 'pc' as default, should we always add -machine, or just
+>> omit the machine-type name?  I think we should omit it unless the
+>> caller asked for a specific machine-type name (because it would
+>> be less surprising for users of the API).
+>>
+>> About our default testing configuration for acceptance tests:
+>> should acceptance tests run against PC by default?  Should it
+>> test Q35?  Should we test both PC and Q35?  I'm not sure what's
+>> the answer, but I think these decisions shouldn't affect the
+>> qemu.py API at all.
+>=20
+> As a general goal we should be aiming to test everything we provide
+> to users if, we expect them to actually use it and not have it
+> break later :-)
+>=20
+> Given that 'pc' has been the default for entire existance of QEMU,
+> 99% of guests are using 'pc' and thus we definitely want to be
+> testing it.
+>=20
+> Equally we'd like to encourage use of 'q35' so we should also be
+> testing that, even though it has very little usage right now.
+>=20
+> Thus, we really need to be running any tests against both machine
+> types.  If we do that, then the question of default doesn't really
+> matter as one of them is always not the default and needs testing
+> regardless.
+>=20
+> Regards,
+> Daniel
+>=20
 
-=D1=81=D1=80, 10 =D0=BE=D0=BA=D1=82. 2018 =D0=B3. =D0=B2 16:30, Pavel Dovga=
-lyuk <Pavel.Dovgaluk@ispras.ru>:
+Hi Daniel,
 
-> GDB remote protocol supports reverse debugging of the targets.
-> It includes 'reverse step' and 'reverse continue' operations.
-> The first one finds the previous step of the execution,
-> and the second one is intended to stop at the last breakpoint that
-> would happen when the program is executed normally.
->
-> Reverse debugging is possible in the replay mode, when at least
-> one snapshot was created at the record or replay phase.
-> QEMU can use these snapshots for travelling back in time with GDB.
->
-> Running the execution in replay mode allows using GDB reverse debugging
-> commands:
->  - reverse-stepi (or rsi): Steps one instruction to the past.
->    QEMU loads on of the prior snapshots and proceeds to the desired
->    instruction forward. When that step is reaches, execution stops.
->  - reverse-continue (or rc): Runs execution "backwards".
->    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
->    and replaying the execution. Then QEMU loads snapshots again and
->    replays to the latest breakpoint. When there are no breakpoints in
->    the examined section of the execution, QEMU finds one more snapshot
->    and tries again. After the first snapshot is processed, execution
->    stops at this snapshot.
->
-> The set of patches include the following modifications:
->  - gdbstub update for reverse debugging support
->  - functions that automatically perform reverse step and reverse
->    continue operations
->  - hmp/qmp commands for manipulating the replay process
->  - improvement of the snapshotting for saving the execution step
->    in the snapshot parameters
->  - other record/replay fixes
->
-> The patches are available in the repository:
-> https://github.com/ispras/qemu/tree/rr-181010
->
-> v7 changes:
->  - rebased to the new master with upstreamed patches from the series
->  - several improvements in hmp/qmp commands handling (suggested by Markus
-> Armbruster)
->  - fixed record/replay with '-rtc base' option enabled
->  - added document with virtual hardware requirements
->
-> v6 changes:
->  - rebased to the new version of master
->  - fixed build of linux-user configurations
->  - added new clock for slirp and vnc timers
->
-> v5 changes:
->  - multiple fixes of record/replay bugs appeared after QEMU core update
->  - changed reverse debugging to 'since 3.1'
->
-> v4 changes:
->  - changed 'since 2.13' to 'since 3.0' in json (as suggested by Eric Blak=
-e)
->
-> v3 changes:
->  - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
->  - Rebased to the new code base.
->  - Minor fixes.
->
-> v2 changes:
->  - documented reverse debugging
->  - fixed start vmstate loading in record mode
->  - documented qcow2 changes (as suggested by Eric Blake)
->  - made icount SnapshotInfo field optional (as suggested by Eric Blake)
->  - renamed qmp commands (as suggested by Eric Blake)
->  - minor changes
->
-> ---
->
-> Pavel Dovgalyuk (19):
->       block: implement bdrv_snapshot_goto for blkreplay
->       replay: disable default snapshot for record/replay
->       replay: update docs for record/replay with block devices
->       replay: don't drain/flush bdrv queue while RR is working
->       replay: finish record/replay before closing the disks
->       qcow2: introduce icount field for snapshots
->       migration: introduce icount field for snapshots
->       replay: provide and accessor for rr filename
->       replay: introduce info hmp/qmp command
->       replay: introduce breakpoint at the specified step
->       replay: implement replay-seek command to proceed to the desired ste=
-p
->       replay: refine replay-time module
->       replay: flush rr queue before loading the vmstate
->       gdbstub: add reverse step support in replay mode
->       gdbstub: add reverse continue support in replay mode
->       replay: describe reverse debugging in docs/replay.txt
->       replay: add BH oneshot event for block layer
->       replay: init rtc after enabling the replay
->       replay: document development rules
->
->
->  accel/tcg/translator.c    |    1
->  block/blkreplay.c         |    8 +
->  block/block-backend.c     |    3
->  block/io.c                |   22 +++
->  block/qapi.c              |   17 ++
->  block/qcow2-snapshot.c    |    9 +
->  block/qcow2.h             |    2
->  blockdev.c                |   10 +
->  cpus.c                    |   19 ++-
->  docs/devel/replay.txt     |   45 ++++++
->  docs/interop/qcow2.txt    |    4 +
->  docs/replay.txt           |   45 ++++++
->  exec.c                    |    6 +
->  gdbstub.c                 |   50 +++++++
->  hmp-commands-info.hx      |   14 ++
->  hmp-commands.hx           |   44 ++++++
->  hmp.h                     |    4 +
->  include/block/snapshot.h  |    1
->  include/sysemu/replay.h   |   20 +++
->  migration/savevm.c        |   15 +-
->  qapi/block-core.json      |    7 +
->  qapi/block.json           |    3
->  qapi/misc.json            |   77 +++++++++++
->  replay/Makefile.objs      |    3
->  replay/replay-debugging.c |  319
-> +++++++++++++++++++++++++++++++++++++++++++++
->  replay/replay-events.c    |   16 ++
->  replay/replay-internal.h  |    7 +
->  replay/replay-time.c      |   32 ++---
->  replay/replay.c           |   26 ++++
->  stubs/Makefile.objs       |    1
->  stubs/replay-user.c       |    9 +
->  stubs/replay.c            |   10 +
->  vl.c                      |   22 ++-
->  33 files changed, 818 insertions(+), 53 deletions(-)
->  create mode 100644 docs/devel/replay.txt
->  create mode 100644 replay/replay-debugging.c
->  create mode 100644 stubs/replay-user.c
->
-> --
-> Pavel Dovgalyuk
->
---=20
-Aleksandr Bezzubikov
+I think we're in sync.  Please look at my previous reply (and accept my
+apologies if this is not a better "netiquette" than replying the same
+thing again).
+
+Regards!
+- Cleber.
