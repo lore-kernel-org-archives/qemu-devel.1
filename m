@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gADY5-000766-KH
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:25:10 -0400
+	(envelope-from <abologna@redhat.com>) id 1gADZV-0007m5-F2
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gADY2-0005xV-Cs
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:25:09 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 10 Oct 2018 12:25:02 +0000
-Message-ID: <8a8c1a81-61c7-b436-340c-644cafb1f932@virtuozzo.com>
-References: <20180817122219.16206-1-vsementsov@virtuozzo.com>
-	<20180817122219.16206-6-vsementsov@virtuozzo.com>
-	<062515d2-1351-cbc1-50df-b196f631bf4e@redhat.com>
-In-Reply-To: <062515d2-1351-cbc1-50df-b196f631bf4e@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D964D8A811703B40B66D3ED1735B985D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] block/qcow2-refcount:
- check_refcounts_l2: split fix_l2_entry_to_zero
+	(envelope-from <abologna@redhat.com>) id 1gADZS-0006pb-3S
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:26:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39176)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gADZR-0006lC-Se
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 08:26:34 -0400
+Message-ID: <5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Wed, 10 Oct 2018 14:26:21 +0200
+In-Reply-To: <cover.1538683492.git.alistair.francis@wdc.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, Denis Lunev <den@virtuozzo.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: "alistair23@gmail.com" <alistair23@gmail.com>, "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>, "Richard W.M. Jones" <rjones@redhat.com>
 
-MDguMTAuMjAxOCAyMjo1NCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNy4wOC4xOCAxNDoyMiwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IFNwbGl0IGVudHJ5IHJlcGFp
-cmluZyB0byBzZXBhcmF0ZSBmdW5jdGlvbiwgdG8gYmUgcmV1c2VkIGxhdGVyLg0KPj4NCj4+IE5v
-dGU6IGVudHJ5IGluIGluLW1lbW9yeSBsMiB0YWJsZSAobG9jYWwgdmFyaWFibGUgaW4NCj4+IGNo
-ZWNrX3JlZmNvdW50c19sMikgaXMgbm90IHVwZGF0ZWQgYWZ0ZXIgdGhpcyBwYXRjaC4NCj4+DQo+
-PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
-QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2svcWNvdzItcmVmY291bnQuYyB8IDE0
-NyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tDQo+PiAg
-IDEgZmlsZSBjaGFuZ2VkLCAxMDkgaW5zZXJ0aW9ucygrKSwgMzggZGVsZXRpb25zKC0pDQo+Pg0K
-Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLXJlZmNvdW50LmMgYi9ibG9jay9xY293Mi1yZWZj
-b3VudC5jDQo+PiBpbmRleCAzYjA1N2I2MzVkLi5kOWM4Y2Q2NjZiIDEwMDY0NA0KPj4gLS0tIGEv
-YmxvY2svcWNvdzItcmVmY291bnQuYw0KPj4gKysrIGIvYmxvY2svcWNvdzItcmVmY291bnQuYw0K
-Pj4gQEAgLTE1NTQsNiArMTU1NCw5OSBAQCBlbnVtIHsNCj4+ICAgICAgIENIRUNLX0ZSQUdfSU5G
-TyA9IDB4MiwgICAgICAvKiB1cGRhdGUgQmxvY2tGcmFnSW5mbyBjb3VudGVycyAqLw0KPj4gICB9
-Ow0KPj4gICANCj4+ICsvKiBVcGRhdGUgZW50cnkgaW4gTDEgb3IgTDIgdGFibGUNCj4+ICsgKg0K
-Pj4gKyAqIFJldHVybnM6IC1lcnJubyBpZiBvdmVybGFwIGNoZWNrIGZhaWxlZA0KPj4gKyAqICAg
-ICAgICAgIDAgaWYgd3JpdGUgZmFpbGVkDQo+PiArICogICAgICAgICAgMSBvbiBzdWNjZXNzDQo+
-PiArICovDQo+PiArc3RhdGljIGludCB3cml0ZV90YWJsZV9lbnRyeShCbG9ja0RyaXZlclN0YXRl
-ICpicywgY29uc3QgY2hhciAqdGFibGVfbmFtZSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHVpbnQ2NF90IHRhYmxlX29mZnNldCwgaW50IGVudHJ5X2luZGV4LA0KPj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3QgbmV3X3ZhbCwgaW50IGlnbikNCj4+ICt7
-DQo+PiArICAgIGludCByZXQ7DQo+PiArICAgIHVpbnQ2NF90IGVudHJ5X29mZnNldCA9DQo+PiAr
-ICAgICAgICAgICAgdGFibGVfb2Zmc2V0ICsgKHVpbnQ2NF90KWVudHJ5X2luZGV4ICogc2l6ZW9m
-KG5ld192YWwpOw0KPj4gKw0KPj4gKyAgICBjcHVfdG9fYmU2NHMoJm5ld192YWwpOw0KPj4gKyAg
-ICByZXQgPSBxY293Ml9wcmVfd3JpdGVfb3ZlcmxhcF9jaGVjayhicywgaWduLCBlbnRyeV9vZmZz
-ZXQsIHNpemVvZihuZXdfdmFsKSk7DQo+PiArICAgIGlmIChyZXQgPCAwKSB7DQo+PiArICAgICAg
-ICBmcHJpbnRmKHN0ZGVyciwNCj4+ICsgICAgICAgICAgICAgICAgIkVSUk9SOiBDYW4ndCB3cml0
-ZSAlcyB0YWJsZSBlbnRyeTogb3ZlcmxhcCBjaGVjayBmYWlsZWQ6ICVzXG4iLA0KPiBJIHJlY2Vu
-dGx5IGNvbXBsYWluZWQgdG8gQmVydG8gdGhhdCBJIGRvbid0IGxpa2UgZWxpc2lvbnMgKCJjYW4n
-dCIpIGluDQo+IHVzZXIgaW50ZXJmYWNlcywgc28gSSBzdXBwb3NlIEknbGwgaGF2ZSB0byBjb21w
-bGFpbiBoZXJlLCB0b28sIHRoYXQgSSdkDQo+IHByZWZlciBhICJDYW5ub3QiLg0KPg0KPj4gKyAg
-ICAgICAgICAgICAgICB0YWJsZV9uYW1lLCBzdHJlcnJvcigtcmV0KSk7DQo+PiArICAgICAgICBy
-ZXR1cm4gcmV0Ow0KPj4gKyAgICB9DQo+PiArDQo+PiArICAgIHJldCA9IGJkcnZfcHdyaXRlX3N5
-bmMoYnMtPmZpbGUsIGVudHJ5X29mZnNldCwgJm5ld192YWwsIHNpemVvZihuZXdfdmFsKSk7DQo+
-PiArICAgIGlmIChyZXQgPCAwKSB7DQo+PiArICAgICAgICBmcHJpbnRmKHN0ZGVyciwgIkVSUk9S
-OiBGYWlsZWQgdG8gb3ZlcndyaXRlICVzIHRhYmxlIGVudHJ5OiAlc1xuIiwNCj4+ICsgICAgICAg
-ICAgICAgICAgdGFibGVfbmFtZSwgc3RyZXJyb3IoLXJldCkpOw0KPj4gKyAgICAgICAgcmV0dXJu
-IDA7DQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAgcmV0dXJuIDE7DQo+PiArfQ0KPj4gKw0KPj4g
-Ky8qIFRyeSB0byBmaXggKGlmIGFsbG93ZWQpIGVudHJ5IGluIEwxIG9yIEwyIHRhYmxlLiBVcGRh
-dGUgQHJlcyBjb3JyZXNwb25kaW5nbHkuDQo+PiArICoNCj4+ICsgKiBSZXR1cm5zOiAtZXJybm8g
-aWYgb3ZlcmxhcCBjaGVjayBmYWlsZWQNCj4+ICsgKiAgICAgICAgICAwIGlmIGVudHJ5IHdhcyBu
-b3QgdXBkYXRlZCBmb3Igb3RoZXIgcmVhc29uDQo+PiArICogICAgICAgICAgICAoZml4aW5nIGRp
-c2FibGVkIG9yIHdyaXRlIGZhaWxlZCkNCj4+ICsgKiAgICAgICAgICAxIG9uIHN1Y2Nlc3MNCj4+
-ICsgKi8NCj4+ICtzdGF0aWMgaW50IGZpeF90YWJsZV9lbnRyeShCbG9ja0RyaXZlclN0YXRlICpi
-cywgQmRydkNoZWNrUmVzdWx0ICpyZXMsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
-QmRydkNoZWNrTW9kZSBmaXgsIGNvbnN0IGNoYXIgKnRhYmxlX25hbWUsDQo+PiArICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgdWludDY0X3QgdGFibGVfb2Zmc2V0LCBpbnQgZW50cnlfaW5kZXgs
-DQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0X3QgbmV3X3ZhbCwgaW50IGln
-biwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICBjb25zdCBjaGFyICpmbXQsIHZhX2xp
-c3QgYXJncykNCj4+ICt7DQo+PiArICAgIGludCByZXQ7DQo+PiArDQo+PiArICAgIGZwcmludGYo
-c3RkZXJyLCBmaXggJiBCRFJWX0ZJWF9FUlJPUlMgPyAiUmVwYWlyaW5nOiAiIDogIkVSUk9SOiAi
-KTsNCj4+ICsgICAgdmZwcmludGYoc3RkZXJyLCBmbXQsIGFyZ3MpOw0KPj4gKyAgICBmcHJpbnRm
-KHN0ZGVyciwgIlxuIik7DQo+IElmIHlvdSdyZSBqdXN0IGdvaW5nIHRvIHByaW50IHRoaXMgaGVy
-ZSwgcmlnaHQgYXQgdGhlIHN0YXJ0LCBJIHRoaW5rIGl0DQo+IHdvdWxkIGJlIGJldHRlciB0byBq
-dXN0IGRvIGl0IGluIHRoZSBjYWxsZXIuDQo+DQo+IFN1cmUsIHdpdGggdGhpcyBzb2x1dGlvbiB0
-aGUgY2FsbGVyIHNhZmVzIGFuIGZwcmludGYoKSBjYWxsLCBidXQgSSBmaW5kDQo+IGl0IGEgYml0
-IG92ZXIgdGhlIHRvcCB0byBzdGFydCB3aXRoIHZhcmFyZyBoYW5kbGluZyBoZXJlIHdoZW4gdGhl
-IGNhbGxlcg0KPiBjYW4ganVzdCBkbyBhbiBhZGRpdGlvbmFsIGZwcmludGYoKS4NCj4NCj4gKEFs
-c28sIEkgYWN0dWFsbHkgZmluZCBpdCBjbGVhcmVyIGlmIHlvdSBoYXZlIHRvIGNhbGwgdHdvIHNl
-cGFyYXRlDQo+IGZ1bmN0aW9ucy4pDQo+DQo+PiArDQo+PiArICAgIGlmICghKGZpeCAmIEJEUlZf
-RklYX0VSUk9SUykpIHsNCj4+ICsgICAgICAgIHJlcy0+Y29ycnVwdGlvbnMrKzsNCj4+ICsgICAg
-ICAgIHJldHVybiAwOw0KPj4gKyAgICB9DQoNCmhtbSwgYWZ0ZXIgZHJvcHBpbmcgcHJpbnRmcywg
-dGhpcyBpZiBiZWNvbWVzIHN0cmFuZ2UgdG9vLiBpdCdzIHRoZSBvbmx5IA0KdXNlIG9mICJmaXgi
-LCBhbmQgbm90IGNvcnJlc3BvbmQgdG8gZnVuY3Rpb24gbmFtZSAoY29ycmVzcG9uZCB0byANCmNv
-bW1lbnRzLCBidXQgaXQncyBhIGJhZCByZWFzb24pLg0KDQo+PiArDQo+PiArICAgIHJldCA9IHdy
-aXRlX3RhYmxlX2VudHJ5KGJzLCB0YWJsZV9uYW1lLCB0YWJsZV9vZmZzZXQsIGVudHJ5X2luZGV4
-LCBuZXdfdmFsLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZ24pOw0KPj4gKw0K
-Pj4gKyAgICBpZiAocmV0ID09IDEpIHsNCj4+ICsgICAgICAgIHJlcy0+Y29ycnVwdGlvbnNfZml4
-ZWQrKzsNCj4+ICsgICAgfSBlbHNlIHsNCj4+ICsgICAgICAgIHJlcy0+Y2hlY2tfZXJyb3JzKys7
-DQo+PiArICAgIH0NCj4+ICsNCj4+ICsgICAgcmV0dXJuIHJldDsNCj4+ICt9DQo+PiArDQo+PiAr
-LyogTWFrZSBMMiBlbnRyeSB0byBiZSBRQ09XMl9DTFVTVEVSX1pFUk9fUExBSU4NCj4+ICsgKg0K
-Pj4gKyAqIFJldHVybnM6IC1lcnJubyBpZiBvdmVybGFwIGNoZWNrIGZhaWxlZA0KPj4gKyAqICAg
-ICAgICAgIDAgaWYgd3JpdGUgZmFpbGVkDQo+PiArICogICAgICAgICAgMSBvbiBzdWNjZXNzDQo+
-PiArICovDQo+PiArc3RhdGljIGludCBmaXhfbDJfZW50cnlfdG9femVybyhCbG9ja0RyaXZlclN0
-YXRlICpicywgQmRydkNoZWNrUmVzdWx0ICpyZXMsDQo+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBCZHJ2Q2hlY2tNb2RlIGZpeCwgaW50NjRfdCBsMl9vZmZzZXQsDQo+PiArICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQgbDJfaW5kZXgsIGJvb2wgYWN0aXZlLA0K
-Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgY2hhciAqZm10LCAuLi4p
-DQo+PiArew0KPj4gKyAgICBpbnQgcmV0Ow0KPj4gKyAgICBpbnQgaWduID0gYWN0aXZlID8gUUNP
-VzJfT0xfQUNUSVZFX0wyIDogUUNPVzJfT0xfSU5BQ1RJVkVfTDI7DQo+PiArICAgIHVpbnQ2NF90
-IGwyX2VudHJ5ID0gUUNPV19PRkxBR19aRVJPOw0KPj4gKyAgICB2YV9saXN0IGFyZ3M7DQo+PiAr
-DQo+PiArICAgIHZhX3N0YXJ0KGFyZ3MsIGZtdCk7DQo+PiArICAgIHJldCA9IGZpeF90YWJsZV9l
-bnRyeShicywgcmVzLCBmaXgsICJMMiIsIGwyX29mZnNldCwgbDJfaW5kZXgsIGwyX2VudHJ5LA0K
-Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgaWduLCBmbXQsIGFyZ3MpOw0KPj4gKyAgICB2
-YV9lbmQoYXJncyk7DQo+PiArDQo+PiArICAgIHJldHVybiByZXQ7DQo+PiArfQ0KPiBJZiB5b3Ug
-ZHJvcCB0aGUgZnByaW50ZigpIGZyb20gZml4X3RhYmxlX2VudHJ5KCksIHRoaXMgZnVuY3Rpb24g
-d2lsbA0KPiBtYWtlIGxlc3Mgc2Vuc2UgYXMgd2VsbC4gIEp1c3QgY2FsbGluZyBmaXhfdGFibGVf
-ZW50cnkoKSBkaXJlY3RseSB3aWxsDQo+IGJlIGp1c3QgYXMgZWFzeS4NCj4NCj4gKFllcywgSSBz
-ZWUgdGhhdCB5b3UgdXNlIHRoZSBmdW5jdGlvbiBpbiBwYXRjaCA3IGFnYWluLCBhbmQgeWVzLCB5
-b3UnZA0KPiBoYXZlIHRvIHVzZSBhIGZ1bGwgbGluZSBmb3IgdGhlICJhY3RpdmUgPzoiIHRlcm5h
-cnksIGJ1dCBzdGlsbC4pDQo+DQo+IE1heA0KPg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
-ZGltaXINCg0K
+On Thu, 2018-10-04 at 20:06 +0000, Alistair Francis wrote:
+> Alistair Francis (5):
+>   hw/riscv/virt: Increase the number of interrupts
+>   hw/riscv/virt: Connect the gpex PCIe
+>   riscv: Enable VGA and PCIE_VGA
+>   hw/riscv/sifive_u: Connect the Xilinx PCIe
+>   hw/riscv/virt: Connect a VirtIO net PCIe device
+> 
+>  default-configs/riscv32-softmmu.mak | 10 +++-
+>  default-configs/riscv64-softmmu.mak | 10 +++-
+>  hw/riscv/sifive_u.c                 | 64 +++++++++++++++++++++++++
+>  hw/riscv/virt.c                     | 72 +++++++++++++++++++++++++++++
+>  include/hw/riscv/sifive_u.h         |  4 +-
+>  include/hw/riscv/virt.h             |  6 ++-
+>  6 files changed, 161 insertions(+), 5 deletions(-)
+
+I gave v4 a try a few weeks ago because I wanted to see what would
+be needed to wire this up on the libvirt side. Turns out, not much
+really :)
+
+I still have a couple of questions that hopefully you'll be able
+to answer:
+
+* what should libvirt look for to figure out whether or not a RISC-V
+  guest will have PCI support? For aarch64 we look for the presence
+  of the 'gpex-pcihost' device, but of course that won't work for
+  RISC-V so we need something else;
+
+* I have succesfully started a RISC-V guest with virtio-pci devices
+  attached but, while they show up in 'info qtree' and friends, the
+  guest OS itself doesn't seem to recognize any of them - not even
+  pcie.0! I'm using the guest images listed at [1] and following the
+  corresponding instructions, but I think the BBL build (config at
+  [2]) is missing some feature... Any ideas what we would need to
+  add there?
+
+If you can help with these I'll give the patches another spin and
+gladly provide my Tested-by :)
+
+
+[1] https://fedoraproject.org/wiki/Architectures/RISC-V/Installing
+[2] https://github.com/rwmjones/fedora-riscv-kernel/blob/master/config
+-- 
+Andrea Bolognani / Red Hat / Virtualization
