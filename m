@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xypron.glpk@gmx.de>) id 1gAJdT-00059g-AR
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:55:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1gAJeu-0005s8-Ko
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xypron.glpk@gmx.de>) id 1gAJdP-00067D-Vw
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:55:07 -0400
-From: Heinrich Schuchardt <xypron.glpk@gmx.de>
-Date: Wed, 10 Oct 2018 20:54:45 +0200
-Message-Id: <20181010185445.10290-1-xypron.glpk@gmx.de>
+	(envelope-from <pbonzini@redhat.com>) id 1gAJer-0006lE-Fp
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:56:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56670)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gAJeq-0006ht-FX
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:56:33 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5909D83F44
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 18:56:24 +0000 (UTC)
+References: <1539093025-101599-1-git-send-email-imammedo@redhat.com>
+	<9ccf4afa-3528-a336-3eb2-9fc516852e91@redhat.com>
+	<40220217-aa30-9436-22a8-9d1fca611d8e@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <85084815-a668-c5f4-bd36-b4853596a658@redhat.com>
+Date: Wed, 10 Oct 2018 20:56:21 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/1] hw/arm/virt: provide a model property in
- the fdt
+In-Reply-To: <40220217-aa30-9436-22a8-9d1fca611d8e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory: move MemoryRegion::size cleanup to
+ memory_region_finalize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,31 +36,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Heinrich Schuchardt <xypron.glpk@gmx.de>
+To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
-Device trees in the Linux kernel generally provide a model property. Some
-software like the Debian flash-kernel package rely on this property to
-identify boards.
+On 09/10/2018 19:09, Laszlo Ersek wrote:
+>>    memory_region_size() != 0
+>> and therefore it's ok to access it in
+>>    file_backend_unparent()
+>>       if (memory_region_size() != 0)
+>>           memory_region_get_ram_ptr()
+>>
+>> which happens when object_add fails and unparents failed backend making
+>> file_backend_unparent() access invalid memory region.
+>
+> I think it makes sense to zero out the size even if unparenting
+> would, in itself, prevent the above crash. Because, in
+> host_memory_backend_mr_inited(), we have:
+> 
+>     /*
+>      * NOTE: We forbid zero-length memory backend, so here zero means
+>      * "we haven't inited the backend memory region yet".
+>      */
+> 
+> I'm unsure how general that invariant is, but it can't hurt to honor
+> it everywhere. (Especially if we can do the zeroing in one common
+> place.)
 
-The patch sets the model property for the virt boards to 'QEMU virt'.
+Yeah, that's the part that I'm not sure about.  If we do it in finalize,
+no one should be able to observe that we are zeroing it; finalize runs
+just before the object is g_free-d.  I agree with Igor that it's nicer
+to leave the object in good state, but the right place to zero is
+exactly where the first patch placed it, i.e. where the error is
+detected and the initialization of memory_region_init is unwound.
 
-Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
----
- hw/arm/virt.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 281ddcdf6e..abe366895a 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -200,6 +200,7 @@ static void create_fdt(VirtMachineState *vms)
-     vms->fdt = fdt;
- 
-     /* Header */
-+    qemu_fdt_setprop_string(fdt, "/", "model", "QEMU virt");
-     qemu_fdt_setprop_string(fdt, "/", "compatible", "linux,dummy-virt");
-     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
-     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
--- 
-2.19.1
+Paolo
