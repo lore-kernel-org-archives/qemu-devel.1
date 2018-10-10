@@ -1,42 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gA8w3-0006Ow-Qc
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 03:29:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1gA9Gu-0001oZ-5k
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 03:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gA8vv-0005Gx-Vm
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 03:29:33 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gA8vs-000555-LP
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 03:29:26 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9A7OK7Y017002
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 03:29:20 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2n1b134tk2-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 03:29:20 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Wed, 10 Oct 2018 08:29:17 +0100
-Reply-To: pmorel@linux.ibm.com
-References: <20181009175226.22138-1-akrowiak@linux.vnet.ibm.com>
-	<20181009175226.22138-6-akrowiak@linux.vnet.ibm.com>
-	<cd6e06e4-0549-3c1a-96e4-2b2354b9866d@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Wed, 10 Oct 2018 09:29:10 +0200
+	(envelope-from <bounces@canonical.com>) id 1gA9Gq-0002Xr-Vp
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 03:51:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39590)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gA9Gq-0002XI-P9
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 03:51:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gA9Gn-0008WS-2B
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 07:51:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 501F02E819F
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 07:50:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <cd6e06e4-0549-3c1a-96e4-2b2354b9866d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <703ea817-fea6-f443-0bed-b6e5465ec5b2@linux.ibm.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 5/6] s390x/vfio: ap: Introduce VFIO AP
- device
+Date: Wed, 10 Oct 2018 07:44:35 -0000
+From: Chris Ward <1796816@bugs.launchpad.net>
+Reply-To: Bug 1796816 <1796816@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <153907284198.23615.17821186357944149368.malonedeb@chaenomeles.canonical.com>
+Message-Id: <153915747529.3860.1705321803580035071.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1796816] Re: Wrong keyboard in QEMU Windows for
+ OpenSUSE PowerPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,54 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Tony Krowiak <akrowiak@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, fiuczy@linux.ibm.com, mimu@linux.ibm.com, Tony Krowiak <akrowiak@linux.ibm.com>
+To: qemu-devel@nongnu.org
 
-On 09/10/2018 21:51, David Hildenbrand wrote:
->=20
->> +static void vfio_ap_realize(DeviceState *dev, Error **errp)
->> +{
->> +    int ret;
->> +    char *mdevid;
->> +    Error *local_err =3D NULL;
->> +    VFIOGroup *vfio_group;
->> +    APDevice *apdev =3D AP_DEVICE(dev);
->> +    VFIOAPDevice *vapdev =3D VFIO_AP_DEVICE(apdev);
->> +
->> +    vfio_group =3D vfio_ap_get_group(vapdev, &local_err);
->> +    if (!vfio_group) {
->> +        goto out_err;
->> +    }
->> +
->> +    vapdev->vdev.ops =3D &vfio_ap_ops;
->> +    vapdev->vdev.type =3D VFIO_DEVICE_TYPE_AP;
->> +    mdevid =3D basename(vapdev->vdev.sysfsdev);
->> +    vapdev->vdev.name =3D g_strdup_printf("%s", mdevid);
->> +    vapdev->vdev.dev =3D dev;
->> +
->> +    ret =3D vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local=
-_err);
->> +    if (ret) {
->> +        goto out_get_dev_err;
->> +    }
->> +
->> +    /* Enable hardware to intepret AP instructions executed on the gu=
-est */
->> +    object_property_set_bool(OBJECT(qdev_get_machine()), true, "apie"=
-, NULL);
->> +
->=20
-> I commented on the old version that this is wrong (if I am not starting
-> to lose my memory). This has to go. (there is no such property, this
-> will simply report an error we ignore)
->=20
-> (can most probably be fixed when applying)
->=20
+I have configured a matching PowerPC virtual machine under an OpenSUSE
+Tumbleweed x86_64 host with qemu-ppc64 for that platform, and the
+keyboard mapping is correct for all keys. So the bug I have come across
+is presumably a bug with the WIndows port of QEMU.
 
-+1
-absolutely no problem to remove this line.
-I also tested without this line.
+-- =
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1796816
+
+Title:
+  Wrong keyboard in QEMU Windows for OpenSUSE PowerPC
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am trying to run an OpenSUSE PowerPC Little Endian system under Microso=
+ft Windows. I have an English UK keyboard. The keyboard is basically correc=
+t (I get a 'pound' sign when I press shift-3) but some of the keys are rend=
+ered incorrectly. The wrong keys are
+  \ renders as # (just right of left hand shift key)
+  | renders as ~ (shift-\)
+  ' renders as ` (2 keys right of l)
+  @ renders as =C2=AC (shift-')
+  # renders as ' (3 keys right of l)
+  ~ renders as @ (shift-#)
+
+  QEMU command line was
+  >"\Program Files\qemu\qemu-system-ppc64.exe" -hda opensuse.qcow2
+
+  OpenSUSE was installed from
+  download.opensuse.org/ports/ppc/tumbleweed/iso/openSUSE-Tumbleweed-
+  DVD-ppc64le-Current.iso .
+
+  I am running OpenSUSE in runlevel 3 (no X11).
+
+  I don't really know whether the problem is with QEMU, the Windows port
+  of QEMU, or with OpenSUSE Tumbleweed.
+
+  This is with QEMU for Windows 3.0.0 from https://qemu.weilnetz.de/w64/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1796816/+subscriptions
