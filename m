@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gAJeu-0005s8-Ko
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:56:37 -0400
+	(envelope-from <sbates@raithlin.com>) id 1gAJk2-00079E-HY
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gAJer-0006lE-Fp
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:56:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56670)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gAJeq-0006ht-FX
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 14:56:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5909D83F44
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 18:56:24 +0000 (UTC)
-References: <1539093025-101599-1-git-send-email-imammedo@redhat.com>
-	<9ccf4afa-3528-a336-3eb2-9fc516852e91@redhat.com>
-	<40220217-aa30-9436-22a8-9d1fca611d8e@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <85084815-a668-c5f4-bd36-b4853596a658@redhat.com>
-Date: Wed, 10 Oct 2018 20:56:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <40220217-aa30-9436-22a8-9d1fca611d8e@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <sbates@raithlin.com>) id 1gAJjy-0000xV-FY
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:01:54 -0400
+Received: from mail-eopbgr670116.outbound.protection.outlook.com
+	([40.107.67.116]:57925
+	helo=CAN01-TO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbates@raithlin.com>) id 1gAJju-0000rM-Gx
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 15:01:48 -0400
+From: "Stephen  Bates" <sbates@raithlin.com>
+Date: Wed, 10 Oct 2018 19:01:32 +0000
+Message-ID: <C8D03A20-3B1A-4021-969F-194B14918CF2@raithlin.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
+	<a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
+	<5A5F4A2B-2DAF-4D70-BF1D-7ABC8461FDC8@raithlin.com>
+	<63b741e2-b3e5-283a-4dfc-9c1db757c575@gmail.com>
+In-Reply-To: <63b741e2-b3e5-283a-4dfc-9c1db757c575@gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] memory: move MemoryRegion::size cleanup to
- memory_region_finalize()
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3F1A4FB586E4D84088CF349D02A6693B@CANPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +36,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+To: Alistair <alistair23@gmail.com>, Andrea Bolognani <abologna@redhat.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: Keith Busch <keith.busch@intel.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>
 
-On 09/10/2018 19:09, Laszlo Ersek wrote:
->>    memory_region_size() != 0
->> and therefore it's ok to access it in
->>    file_backend_unparent()
->>       if (memory_region_size() != 0)
->>           memory_region_get_ram_ptr()
->>
->> which happens when object_add fails and unparents failed backend making
->> file_backend_unparent() access invalid memory region.
->
-> I think it makes sense to zero out the size even if unparenting
-> would, in itself, prevent the above crash. Because, in
-> host_memory_backend_mr_inited(), we have:
-> 
->     /*
->      * NOTE: We forbid zero-length memory backend, so here zero means
->      * "we haven't inited the backend memory region yet".
->      */
-> 
-> I'm unsure how general that invariant is, but it can't hurt to honor
-> it everywhere. (Especially if we can do the zeroing in one common
-> place.)
-
-Yeah, that's the part that I'm not sure about.  If we do it in finalize,
-no one should be able to observe that we are zeroing it; finalize runs
-just before the object is g_free-d.  I agree with Igor that it's nicer
-to leave the object in good state, but the right place to zero is
-exactly where the first patch placed it, i.e. where the error is
-detected and the initialization of memory_region_init is unwound.
-
-Paolo
+PiBJIGFkZGVkIGUxMDAwIGFuZCBlMTAwMGUgc3VwcG9ydCB0byBteSBrZXJuZWwgYW5kIGNoYW5n
+ZWQgdGhlIFFFTVUgY29tbWFuZCB0bzoNCg0KU28gdXNpbmcgLWRldmljZSBlMTAwMGUgcmF0aGVy
+IHRoYW4gLWRldmljZSBlMTAwMCBzZWVtcyB0byB3b3JrLiBJIGFtIG5vdCBzdXJlIHdoeSAtZGV2
+aWNlIGUxMDAwIGNhdXNlcyBhIGtlcm5lbCBwYW5pYy4gVGhlIE1TSS1YIG1lc3NhZ2UgaXMgaW50
+ZXJlc3RpbmcgYW5kIG1heSBiZSByZWxhdGVkIHRvIHdoeSBOVk1lIGludGVycnVwdHMgYXJlIG5v
+dCByZWFjaGluZyB0aGUgT1MgaW4gdGhlIGd1ZXN0Pw0KDQpbICAgIDAuMjE2MDAwXSBlMTAwMDog
+SW50ZWwoUikgUFJPLzEwMDAgTmV0d29yayBEcml2ZXIgLSB2ZXJzaW9uIDcuMy4yMS1rOC1OQVBJ
+DQpbICAgIDAuMjE2MDAwXSBlMTAwMDogQ29weXJpZ2h0IChjKSAxOTk5LTIwMDYgSW50ZWwgQ29y
+cG9yYXRpb24uDQpbICAgIDAuMjE2MDAwXSBlMTAwMGU6IEludGVsKFIpIFBSTy8xMDAwIE5ldHdv
+cmsgRHJpdmVyIC0gMy4yLjYtaw0KWyAgICAwLjIxNjAwMF0gZTEwMDBlOiBDb3B5cmlnaHQoYykg
+MTk5OSAtIDIwMTUgSW50ZWwgQ29ycG9yYXRpb24uDQpbICAgIDAuMjIwMDAwXSBlMTAwMGUgMDAw
+MDowMDowMS4wOiBhc3NpZ24gSVJROiBnb3QgMQ0KWyAgICAwLjIyMDAwMF0gZTEwMDBlIDAwMDA6
+MDA6MDEuMDogZW5hYmxpbmcgZGV2aWNlICgwMDAwIC0+IDAwMDIpDQpbICAgIDAuMjIwMDAwXSBl
+MTAwMGUgMDAwMDowMDowMS4wOiBlbmFibGluZyBidXMgbWFzdGVyaW5nDQpbICAgIDAuMjIwMDAw
+XSBlMTAwMGUgMDAwMDowMDowMS4wOiBJbnRlcnJ1cHQgVGhyb3R0bGluZyBSYXRlIChpbnRzL3Nl
+Yykgc2V0IHRvIGR5bmFtaWMgY29uc2VydmF0aXZlIG1vZGUNClsgICAgMC4yMjAwMDBdIGUxMDAw
+ZSAwMDAwOjAwOjAxLjAgMDAwMDowMDowMS4wICh1bmluaXRpYWxpemVkKTogRmFpbGVkIHRvIGlu
+aXRpYWxpemUgTVNJLVggaW50ZXJydXB0cy4gIEZhbGxpbmcgYmFjayB0byBNU0kgaW50ZXJydXB0
+cy4NClsgICAgMC4yMjAwMDBdIGUxMDAwZSAwMDAwOjAwOjAxLjAgMDAwMDowMDowMS4wICh1bmlu
+aXRpYWxpemVkKTogRmFpbGVkIHRvIGluaXRpYWxpemUgTVNJIGludGVycnVwdHMuICBGYWxsaW5n
+IGJhY2sgdG8gbGVnYWN5IGludGVycnVwdHMuDQpbICAgIDAuMzQ4MDAwXSBlMTAwMGUgMDAwMDow
+MDowMS4wIGV0aDA6IChQQ0kgRXhwcmVzczoyLjVHVC9zOldpZHRoIHgxKSA1Mjo1NDowMDoxMjoz
+NDo1Ng0KWyAgICAwLjM1NjAwMF0gZTEwMDBlIDAwMDA6MDA6MDEuMCBldGgwOiBJbnRlbChSKSBQ
+Uk8vMTAwMCBOZXR3b3JrIENvbm5lY3Rpb24NClsgICAgMC4zNTYwMDBdIGUxMDAwZSAwMDAwOjAw
+OjAxLjAgZXRoMDogTUFDOiAzLCBQSFk6IDgsIFBCQSBObzogMDAwMDAwLTAwMA0KDQpyb290QGxp
+YmVydGFzOn4jIGxzcGNpIC12dnYNCjAwOjAwLjAgSG9zdCBicmlkZ2U6IFJlZCBIYXQsIEluYy4g
+UUVNVSBQQ0llIEhvc3QgYnJpZGdlDQoJU3Vic3lzdGVtOiBSZWQgSGF0LCBJbmMgUUVNVSBQQ0ll
+IEhvc3QgYnJpZGdlDQoJQ29udHJvbDogSS9PLSBNZW0tIEJ1c01hc3Rlci0gU3BlY0N5Y2xlLSBN
+ZW1XSU5WLSBWR0FTbm9vcC0gUGFyRXJyLSBTdGVwcGluZy0gU0VSUi0gRmFzdEIyQi0gRGlzSU5U
+eC0NCglTdGF0dXM6IENhcC0gNjZNSHotIFVERi0gRmFzdEIyQi0gUGFyRXJyLSBERVZTRUw9ZmFz
+dCA+VEFib3J0LSA8VEFib3J0LSA8TUFib3J0LSA+U0VSUi0gPFBFUlItIElOVHgtDQpsc3BjaTog
+VW5hYmxlIHRvIGxvYWQgbGlia21vZCByZXNvdXJjZXM6IGVycm9yIC0xMg0KDQowMDowMS4wIEV0
+aGVybmV0IGNvbnRyb2xsZXI6IEludGVsIENvcnBvcmF0aW9uIDgyNTc0TCBHaWdhYml0IE5ldHdv
+cmsgQ29ubmVjdGlvbg0KCVN1YnN5c3RlbTogSW50ZWwgQ29ycG9yYXRpb24gODI1NzRMIEdpZ2Fi
+aXQgTmV0d29yayBDb25uZWN0aW9uDQoJQ29udHJvbDogSS9PLSBNZW0rIEJ1c01hc3RlcisgU3Bl
+Y0N5Y2xlLSBNZW1XSU5WLSBWR0FTbm9vcC0gUGFyRXJyLSBTdGVwcGluZy0gU0VSUi0gRmFzdEIy
+Qi0gRGlzSU5UeC0NCglTdGF0dXM6IENhcCsgNjZNSHotIFVERi0gRmFzdEIyQi0gUGFyRXJyLSBE
+RVZTRUw9ZmFzdCA+VEFib3J0LSA8VEFib3J0LSA8TUFib3J0LSA+U0VSUi0gPFBFUlItIElOVHgt
+DQoJTGF0ZW5jeTogMA0KCUludGVycnVwdDogcGluIEEgcm91dGVkIHRvIElSUSAxDQoJUmVnaW9u
+IDA6IE1lbW9yeSBhdCA0MDA0MDAwMCAoMzItYml0LCBub24tcHJlZmV0Y2hhYmxlKSBbc2l6ZT0x
+MjhLXQ0KCVJlZ2lvbiAxOiBNZW1vcnkgYXQgNDAwNjAwMDAgKDMyLWJpdCwgbm9uLXByZWZldGNo
+YWJsZSkgW3NpemU9MTI4S10NCglSZWdpb24gMjogSS9PIHBvcnRzIGF0IDx1bmFzc2lnbmVkPiBb
+ZGlzYWJsZWRdDQoJUmVnaW9uIDM6IE1lbW9yeSBhdCA0MDA4MDAwMCAoMzItYml0LCBub24tcHJl
+ZmV0Y2hhYmxlKSBbc2l6ZT0xNktdDQoJW3ZpcnR1YWxdIEV4cGFuc2lvbiBST00gYXQgNDAwMDAw
+MDAgW2Rpc2FibGVkXSBbc2l6ZT0yNTZLXQ0KCUNhcGFiaWxpdGllczogW2M4XSBQb3dlciBNYW5h
+Z2VtZW50IHZlcnNpb24gMg0KCQlGbGFnczogUE1FQ2xrLSBEU0krIEQxLSBEMi0gQXV4Q3VycmVu
+dD0wbUEgUE1FKEQwLSxEMS0sRDItLEQzaG90LSxEM2NvbGQtKQ0KCQlTdGF0dXM6IEQwIE5vU29m
+dFJzdC0gUE1FLUVuYWJsZS0gRFNlbD0wIERTY2FsZT0wIFBNRS0NCglDYXBhYmlsaXRpZXM6IFtl
+MF0gRXhwcmVzcyAodjEpIFJvb3QgQ29tcGxleCBJbnRlZ3JhdGVkIEVuZHBvaW50LCBNU0kgMDAN
+CgkJRGV2Q2FwOglNYXhQYXlsb2FkIDEyOCBieXRlcywgUGhhbnRGdW5jIDANCgkJCUV4dFRhZy0g
+UkJFKw0KCQlEZXZDdGw6CVJlcG9ydCBlcnJvcnM6IENvcnJlY3RhYmxlLSBOb24tRmF0YWwtIEZh
+dGFsLSBVbnN1cHBvcnRlZC0NCgkJCVJseGRPcmQtIEV4dFRhZy0gUGhhbnRGdW5jLSBBdXhQd3It
+IE5vU25vb3AtDQoJCQlNYXhQYXlsb2FkIDEyOCBieXRlcywgTWF4UmVhZFJlcSAxMjggYnl0ZXMN
+CgkJRGV2U3RhOglDb3JyRXJyLSBVbmNvcnJFcnItIEZhdGFsRXJyLSBVbnN1cHBSZXEtIEF1eFB3
+ci0gVHJhbnNQZW5kLQ0KCUNhcGFiaWxpdGllczogWzEwMCB2Ml0gQWR2YW5jZWQgRXJyb3IgUmVw
+b3J0aW5nDQoJCVVFU3RhOglETFAtIFNERVMtIFRMUC0gRkNQLSBDbXBsdFRPLSBDbXBsdEFicnQt
+IFVueENtcGx0LSBSeE9GLSBNYWxmVExQLSBFQ1JDLSBVbnN1cFJlcS0gQUNTVmlvbC0NCgkJVUVN
+c2s6CURMUC0gU0RFUy0gVExQLSBGQ1AtIENtcGx0VE8tIENtcGx0QWJydC0gVW54Q21wbHQtIFJ4
+T0YtIE1hbGZUTFAtIEVDUkMtIFVuc3VwUmVxLSBBQ1NWaW9sLQ0KCQlVRVN2cnQ6CURMUCsgU0RF
+UysgVExQLSBGQ1ArIENtcGx0VE8tIENtcGx0QWJydC0gVW54Q21wbHQtIFJ4T0YrIE1hbGZUTFAr
+IEVDUkMtIFVuc3VwUmVxLSBBQ1NWaW9sLQ0KCQlDRVN0YToJUnhFcnItIEJhZFRMUC0gQmFkRExM
+UC0gUm9sbG92ZXItIFRpbWVvdXQtIE5vbkZhdGFsRXJyLQ0KCQlDRU1zazoJUnhFcnItIEJhZFRM
+UC0gQmFkRExMUC0gUm9sbG92ZXItIFRpbWVvdXQtIE5vbkZhdGFsRXJyKw0KCQlBRVJDYXA6CUZp
+cnN0IEVycm9yIFBvaW50ZXI6IDAwLCBHZW5DYXArIENHZW5Fbi0gQ2hrQ2FwKyBDaGtFbi0NCglD
+YXBhYmlsaXRpZXM6IFsxNDAgdjFdIERldmljZSBTZXJpYWwgTnVtYmVyIDUyLTU0LTAwLWZmLWZm
+LTEyLTM0LTU2DQoJS2VybmVsIGRyaXZlciBpbiB1c2U6IGUxMDAwZQ0KICAgIA0KDQo=
