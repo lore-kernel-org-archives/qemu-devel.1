@@ -1,32 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gAOUR-0000gd-UZ
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 20:06:08 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gAOW0-0001JT-54
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 20:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gAOUO-0007Rm-LI
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 20:06:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gAOUO-0007Qu-Cl
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 20:06:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D2CA530820DB
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 00:06:02 +0000 (UTC)
-Date: Thu, 11 Oct 2018 08:05:55 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181011000555.GA5014@xz-x1>
-References: <20181009062718.1914-1-peterx@redhat.com>
-	<902c92e2-3454-771e-51ff-ab38b970e86e@redhat.com>
-	<049fc618-6e13-5030-4124-1c9f4315f7eb@redhat.com>
-	<5ca812f7-c574-36fc-c7cd-f11e71a0efc1@redhat.com>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1gAOVw-0008Q0-7F
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 20:07:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60910
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1gAOVv-0008Pc-Rl
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 20:07:39 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w9B047n8108638
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 20:07:38 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2n1tym1bku-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 20:07:38 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 10 Oct 2018 20:07:38 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5ca812f7-c574-36fc-c7cd-f11e71a0efc1@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v9 0/6] monitor: enable OOB by default
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <0ad2a56e767a04f8fd2c8cb32ed6c1bc0f1c2497.1538652143.git.tgolembi@redhat.com>
+References: <cover.1538652143.git.tgolembi@redhat.com>
+	<0ad2a56e767a04f8fd2c8cb32ed6c1bc0f1c2497.1538652143.git.tgolembi@redhat.com>
+Date: Wed, 10 Oct 2018 18:35:50 -0500
+Message-Id: <153921455074.28130.1953306136051172522@sif>
+Subject: Re: [Qemu-devel] [PATCH v4 01/11] qga-win: fix crashes when PCI
+ info cannot be retrived
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +43,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Sameeh Jubran <sjubran@redhat.com>, =?utf-8?q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>, Olga Krishtal <okrishtal@virtuozzo.com>
 
-On Wed, Oct 10, 2018 at 03:27:34PM -0500, Eric Blake wrote:
-> On 10/10/18 2:26 PM, Eric Blake wrote:
-> 
-> > 
-> > On the other hand, when I'm trying to use a qemu binary with these
-> > patches applied, libvirt is hanging when trying to probe the
-> > capabilities of the binary, waiting for a response to
-> > "qmp_capabilities". I'll try and bisect which patch is causing the
-> > problem, and figure out why it is happening for libvirt and not running
-> > by hand (perhaps is it a tty vs. Unix socket thing?)
-> 
-> Bisect didn't help much; it landed on:
-> 
->     monitor: remove "x-oob", turn oob on by default
-> 
-> as the cause of libvirt hanging. I didn't have time to investigate further,
-> other than the command line that is hanging:
-> 
-> /home/eblake/qemu/x86_64-softmmu/qemu-system-x86_64 -S -no-user-config
-> -nodefaults -nographic -machine none,accel=kvm:tcg -qmp
-> unix:/var/lib/libvirt/qemu/capabilities.monitor.sock,server,nowait -pidfile
-> /var/lib/libvirt/qemu/capabilities.pidfile -daemonize
-> 
-> And I suspect it is the -daemonize that is causing the hang I'm seeing when
-> run by libvirt.
-> 
-> > Based-on: <20180828191048.29806-1-armbru@redhat.com>
-> > Based-on: <20180901111716.1675-1-armbru@redhat.com>
-> > 
-> > (this series is based on Markus's monitor-next tree)
-> 
-> 
-> Am I missing any prerequisite patches? Markus' monitor-next tree is
-> currently a subset of git master (merge efd1d522).
+Quoting Tom=C3=A1=C5=A1 Golembiovsk=C3=BD (2018-10-04 06:22:28)
+> The guest-get-fsinfo command collects also information about PCI
+> controller where the disk is attached. When this fails for some reasons
+> it tries to return just the partial information. However in certain
+> cases the pointer to the structure was not initialized and was set to
+> NULL. This breaks the serializer and leads to a crash of the guest agent.
+> =
 
-Sorry for the confusion. I should have removed these lines from the
-old cover letter.
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> ---
+>  qga/commands-win32.c | 27 ++++++++++++++++++++++-----
+>  1 file changed, 22 insertions(+), 5 deletions(-)
+> =
 
-It's very possible the daemonize thing, actually Wolfgang Bumiller has
-posted patches to fix this up (it's not the problem of this series,
-but it just exposed this to libvirt by the series since it only
-happens when oob and daemonize are both enabled).  The fixes are:
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 98d9735389..9c959122d9 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -633,15 +633,32 @@ static GuestDiskAddressList *build_guest_disk_info(=
+char *guid, Error **errp)
+>           * https://technet.microsoft.com/en-us/library/ee851589(v=3Dws.1=
+0).aspx */
+>          if (DeviceIoControl(vol_h, IOCTL_SCSI_GET_ADDRESS, NULL, 0, scsi=
+_ad,
+>                              sizeof(SCSI_ADDRESS), &len, NULL)) {
+> +            Error *local_err =3D NULL;
+>              disk->unit =3D addr.Lun;
+>              disk->target =3D addr.TargetId;
+>              disk->bus =3D addr.PathId;
+> -            disk->pci_controller =3D get_pci_info(name, errp);
+> +            g_debug("unit=3D%lld target=3D%lld bus=3D%lld",
+> +                disk->unit, disk->target, disk->bus);
+> +            disk->pci_controller =3D get_pci_info(name, &local_err);
+> +
+> +            if (local_err) {
+> +                g_debug("failed to get PCI controller info: %s",
+> +                    error_get_pretty(local_err));
+> +                error_free(local_err);
+> +            } else if (disk->pci_controller !=3D NULL) {
+> +                g_debug("pci: domain=3D%lld bus=3D%lld slot=3D%lld funct=
+ion=3D%lld",
+> +                    disk->pci_controller->domain,
+> +                    disk->pci_controller->bus,
+> +                    disk->pci_controller->slot,
+> +                    disk->pci_controller->function);
+> +            }
+>          }
+> -        /* We do not set error in this case, because we still have enough
+> -         * information about volume. */
+> -    } else {
+> -         disk->pci_controller =3D NULL;
+> +    }
+> +    /* We do not set error in case pci_controller is NULL, because we st=
+ill
+> +     * have enough information about volume. */
+> +    if (disk->pci_controller =3D=3D NULL) {
+> +        g_debug("no PCI controller info");
+> +        disk->pci_controller =3D g_malloc0(sizeof(GuestPCIAddress));
 
-  [PATCH v2 0/2] delay monitor iothread creation
+Initializing to 0 would be wrong. I pointed out a patch from Sameeh in
+v3 that initializes to -1. I'd recommend either picking up his patch,
+or perhaps the schema change. But if we do go to the extent of a
+non-backward-compatible schema change, I think we should also consider
+just deprecating the current GuestDiskAddress list completely:
 
-Since it cannot be applied cleanly onto this series, I resolved the
-conflicts and pushed a tree here in case you wanna try with these two
-extra patches applied:
+{ 'struct': 'GuestDiskAddress',
+  'data': {'pci-controller': 'GuestPCIAddress',
+           'bus-type': 'GuestDiskBusType',
+           'bus': 'int', 'target': 'int', 'unit': 'int'} }
 
-  https://github.com/xzpeter/qemu/tree/test-oob
+and defining something more modular. Some these there don't make a lot
+of sense, like how GuestDiskBusType varies between scsi, ide, usb, etc,
+but we still have the same bus/target/unit fields. I think each bus type =
 
-Please feel free to test with libvirt again with that.
+should have it's own addressing units associated with it. The original
+code made use of the fact that IDE/SATA/SCSI/SAS/etc could all be
+retrieved via IOCTL_SCSI_GET_ADDRESS with those units but making sense
+of them is sort of Windows magic that isn't good from an API perspective
+and then there's all the other bus types where those units may or may
+not be sensible. And on POSIX you basically have to look at the code
+to figure out where each unit is/isn't being plucked from...
 
-Thanks for playing with the tree and further investigation!  I will
-also mention this in the next version of cover letter (if there is one).
+So for now I'd recommend just hard-setting the PCI fields to -1 like
+in Sameeh's patch, and I'll do some testing and send a follow-up patch
+to do the same for bus-type if that seems needed. We can explore better
+options after 3.1.
 
-Regards,
+>      }
+> =
 
--- 
-Peter Xu
+>      list =3D g_malloc0(sizeof(*list));
+> -- =
+
+> 2.19.0
+>=20
