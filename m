@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAFbN-0000nQ-HL
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:36:42 -0400
+	(envelope-from <cota@braap.org>) id 1gAFnU-0002nu-GB
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAFbI-0006a8-QM
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:36:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45798)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gAFbI-0006ZI-HO
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:36:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gAFbD-0002PL-LP
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 14:36:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C7A012E818A
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 14:36:29 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Oct 2018 14:23:35 -0000
-From: "Emilio G. Cota" <1793119@bugs.launchpad.net>
-Reply-To: Bug 1793119 <1793119@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153726785322.19300.9182114718255539260.malonedeb@wampee.canonical.com>
-Message-Id: <153918141653.12644.10792008069077778917.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1793119] Re: Wrong floating-point emulation on
- AArch64 with FPCR set to zero
+	(envelope-from <cota@braap.org>) id 1gAFnP-0004ba-MU
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:49:12 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41295)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1gAFnP-0004aP-F0
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 10:49:07 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Date: Wed, 10 Oct 2018 10:48:50 -0400
+Message-Id: <20181010144853.13005-2-cota@braap.org>
+In-Reply-To: <20181010144853.13005-1-cota@braap.org>
+References: <20181010144853.13005-1-cota@braap.org>
+Subject: [Qemu-devel] [PATCH 1/4] tcg: access cpu->icount_decr.u16.high with
+ atomics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,69 +25,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
 
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Committed
+Consistently access u16.high with atomics to avoid
+undefined behaviour in MTTCG.
 
--- =
+Note that icount_decr.u16.low is only used in icount mode,
+so regular accesses to it are OK.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1793119
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+---
+ accel/tcg/tcg-all.c       | 2 +-
+ accel/tcg/translate-all.c | 2 +-
+ qom/cpu.c                 | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-Title:
-  Wrong floating-point emulation on AArch64 with FPCR set to zero
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  On AArch64, with FPCR set to Zero (i.e., FPU set to IEEE-754 compliant
-  mode), floating-point emulation does not produce the same results as
-  real hardware (e.g., Raspberry Pi 3 with AArch64 Linux).
-
-  I attached a sample that reproduces the issue. It divides `x` by `y`
-  and puts the result in `r`. The expected result of the operation is
-  `q`.
-
-  Output on real hardware:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-  fpcr =3D 0x07000000.
-  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x7ff0000000000=
-000. q =3D 0x43300fde9cbcf023.
-  fpcr =3D 0x00000000.
-  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x43300fde9cbcf=
-023. q =3D 0x43300fde9cbcf023.
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-
-  Notice that after setting FPCR to zero, `r` equals `q`.
-
-  Output on qemu 3.0.0 (Linux user-mode emulation):
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-  fpcr =3D 0x07000000.
-  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x7ff0000000000=
-000. q =3D 0x43300fde9cbcf023.
-  fpcr =3D 0x00000000.
-  x =3D 0x03250f416dcdc6d0. y =3D 0x00029f4e5837c977. r =3D 0x43300fde9cbcf=
-024. q =3D 0x43300fde9cbcf023.
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-
-  Notice that after setting FPCR to zero, `r` is not equal to `q`.
-
-  Also notice that, using another proprietary operating system, the same
-  issue arises between a real board and QEMU. This might be an issue in
-  emulation of the AArch64 instruction "fdiv".
-
-  Build command line: aarch64-linux-gnu-gcc -static -O0 -o sample1
-  sample1.c
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1793119/+subscriptions
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 56dbb56a16..3d25bdcc17 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -51,7 +51,7 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
+     if (!qemu_cpu_is_self(cpu)) {
+         qemu_cpu_kick(cpu);
+     } else {
+-        cpu->icount_decr.u16.high = -1;
++        atomic_set(&cpu->icount_decr.u16.high, -1);
+         if (use_icount &&
+             !cpu->can_do_io
+             && (mask & ~old_mask) != 0) {
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index ad5c758246..356dcd0948 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2341,7 +2341,7 @@ void cpu_interrupt(CPUState *cpu, int mask)
+ {
+     g_assert(qemu_mutex_iothread_locked());
+     cpu->interrupt_request |= mask;
+-    cpu->icount_decr.u16.high = -1;
++    atomic_set(&cpu->icount_decr.u16.high, -1);
+ }
+ 
+ /*
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 92599f3541..20ad54d43f 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -266,7 +266,7 @@ static void cpu_common_reset(CPUState *cpu)
+     cpu->mem_io_pc = 0;
+     cpu->mem_io_vaddr = 0;
+     cpu->icount_extra = 0;
+-    cpu->icount_decr.u32 = 0;
++    atomic_set(&cpu->icount_decr.u32, 0);
+     cpu->can_do_io = 1;
+     cpu->exception_index = -1;
+     cpu->crash_occurred = false;
+-- 
+2.17.1
