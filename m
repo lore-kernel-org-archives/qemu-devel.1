@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAEZO-0001YG-5s
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEZN-0001YF-Kr
 	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAEZL-0002H2-HQ
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:30:34 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39623)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAEZL-0002EI-7S
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:30:31 -0400
-Received: by mail-wr1-f67.google.com with SMTP id 61-v6so5754541wrb.6
-	for <qemu-devel@nongnu.org>; Wed, 10 Oct 2018 06:30:28 -0700 (PDT)
-References: <20181001063803.22330-1-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <20f2bf61-8c11-47cb-a05c-7248d51a53a8@redhat.com>
-Date: Wed, 10 Oct 2018 15:30:25 +0200
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEZI-0002EX-3Z
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:30:33 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:43828)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1gAEZE-0002BE-7h
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 09:30:25 -0400
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Wed, 10 Oct 2018 16:33:34 +0300
+Message-ID: <20181010133333.24538.53169.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
-In-Reply-To: <20181001063803.22330-1-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] net: convert SysBus init method
- to a realize method
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v7 00/19] Fixing record/replay and adding
+ reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +25,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, war2jordan@live.com, pavel.dovgaluk@ispras.ru, mst@redhat.com, jasowang@redhat.com, zuban32s@gmail.com, kraxel@redhat.com, thomas.dullien@googlemail.com, artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, armbru@redhat.comdovgaluk@ispras.ru, dgilbert@redhat.com, boost.lists@gmail.com, alex.bennee@linaro.org, rth@twiddle.net, kwolf@redhat.com, crosthwaite.peter@gmail.com, mreitz@redhat.com, maria.klimushenkova@ispras.ru, pbonzini@redhat.com
 
-Cc'ing Eduardo since it might make sens to have this series go via his
-machine-next tree, rather than Jason's net tree.
+GDB remote protocol supports reverse debugging of the targets.
+It includes 'reverse step' and 'reverse continue' operations.
+The first one finds the previous step of the execution,
+and the second one is intended to stop at the last breakpoint that
+would happen when the program is executed normally.
 
-On 01/10/2018 08:37, Cédric Le Goater wrote:
-> Hello,
-> 
-> Here is my take to the SysBus init to realize method conversion. I
-> picked the /net directory and did them all. Also added a couple of
-> reset methods in separate patches.
-> 
-> make check tested
-> 
-> Thanks,
-> 
-> C.
-> 
-> Changes since v1:
-> 
->  - dropped changes in lan9118_init() and smc91c111_init()
->  - fix alignment in milkymist_minimac2_realize()
->  - improved etraxfs reset method
->  
-> 
-> Cédric Le Goater (11):
->   net: etraxfs_eth: convert SysBus init method to a realize method
->   net: etraxfs_eth: add a reset method
->   net: lan9118: convert SysBus init method to a realize method
->   net: lance: convert SysBus init method to a realize method
->   net: milkymist_minimac2: convert SysBus init method to a realize
->     method
->   net: mipsnet: convert SysBus init method to a realize method
->   net: opencores_eth: convert SysBus init method to a realize method
->   net: smc91c111: convert SysBus init method to a realize method
->   net: stellaris_enet: convert SysBus init method to a realize method
->   net: stellaris_enet: add a reset method
->   net: xgmac: convert SysBus init method to a realize method
-> 
->  hw/net/etraxfs_eth.c        | 44 ++++++++++++++++++++++++++-----------
->  hw/net/lan9118.c            |  9 +++-----
->  hw/net/lance.c              |  8 +++----
->  hw/net/milkymist-minimac2.c |  9 +++-----
->  hw/net/mipsnet.c            |  9 +++-----
->  hw/net/opencores_eth.c      |  8 +++----
->  hw/net/smc91c111.c          |  8 +++----
->  hw/net/stellaris_enet.c     | 15 ++++++-------
->  hw/net/xgmac.c              |  9 +++-----
->  9 files changed, 59 insertions(+), 60 deletions(-)
-> 
+Reverse debugging is possible in the replay mode, when at least
+one snapshot was created at the record or replay phase.
+QEMU can use these snapshots for travelling back in time with GDB.
+
+Running the execution in replay mode allows using GDB reverse debugging
+commands:
+ - reverse-stepi (or rsi): Steps one instruction to the past.
+   QEMU loads on of the prior snapshots and proceeds to the desired
+   instruction forward. When that step is reaches, execution stops.
+ - reverse-continue (or rc): Runs execution "backwards".
+   QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+   and replaying the execution. Then QEMU loads snapshots again and
+   replays to the latest breakpoint. When there are no breakpoints in
+   the examined section of the execution, QEMU finds one more snapshot
+   and tries again. After the first snapshot is processed, execution
+   stops at this snapshot.
+
+The set of patches include the following modifications:
+ - gdbstub update for reverse debugging support
+ - functions that automatically perform reverse step and reverse
+   continue operations
+ - hmp/qmp commands for manipulating the replay process
+ - improvement of the snapshotting for saving the execution step
+   in the snapshot parameters
+ - other record/replay fixes
+
+The patches are available in the repository:
+https://github.com/ispras/qemu/tree/rr-181010
+
+v7 changes:
+ - rebased to the new master with upstreamed patches from the series
+ - several improvements in hmp/qmp commands handling (suggested by Markus Armbruster)
+ - fixed record/replay with '-rtc base' option enabled
+ - added document with virtual hardware requirements
+
+v6 changes:
+ - rebased to the new version of master
+ - fixed build of linux-user configurations
+ - added new clock for slirp and vnc timers
+
+v5 changes:
+ - multiple fixes of record/replay bugs appeared after QEMU core update
+ - changed reverse debugging to 'since 3.1'
+
+v4 changes:
+ - changed 'since 2.13' to 'since 3.0' in json (as suggested by Eric Blake)
+
+v3 changes:
+ - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
+ - Rebased to the new code base.
+ - Minor fixes.
+
+v2 changes:
+ - documented reverse debugging
+ - fixed start vmstate loading in record mode
+ - documented qcow2 changes (as suggested by Eric Blake)
+ - made icount SnapshotInfo field optional (as suggested by Eric Blake)
+ - renamed qmp commands (as suggested by Eric Blake)
+ - minor changes
+
+---
+
+Pavel Dovgalyuk (19):
+      block: implement bdrv_snapshot_goto for blkreplay
+      replay: disable default snapshot for record/replay
+      replay: update docs for record/replay with block devices
+      replay: don't drain/flush bdrv queue while RR is working
+      replay: finish record/replay before closing the disks
+      qcow2: introduce icount field for snapshots
+      migration: introduce icount field for snapshots
+      replay: provide and accessor for rr filename
+      replay: introduce info hmp/qmp command
+      replay: introduce breakpoint at the specified step
+      replay: implement replay-seek command to proceed to the desired step
+      replay: refine replay-time module
+      replay: flush rr queue before loading the vmstate
+      gdbstub: add reverse step support in replay mode
+      gdbstub: add reverse continue support in replay mode
+      replay: describe reverse debugging in docs/replay.txt
+      replay: add BH oneshot event for block layer
+      replay: init rtc after enabling the replay
+      replay: document development rules
+
+
+ accel/tcg/translator.c    |    1 
+ block/blkreplay.c         |    8 +
+ block/block-backend.c     |    3 
+ block/io.c                |   22 +++
+ block/qapi.c              |   17 ++
+ block/qcow2-snapshot.c    |    9 +
+ block/qcow2.h             |    2 
+ blockdev.c                |   10 +
+ cpus.c                    |   19 ++-
+ docs/devel/replay.txt     |   45 ++++++
+ docs/interop/qcow2.txt    |    4 +
+ docs/replay.txt           |   45 ++++++
+ exec.c                    |    6 +
+ gdbstub.c                 |   50 +++++++
+ hmp-commands-info.hx      |   14 ++
+ hmp-commands.hx           |   44 ++++++
+ hmp.h                     |    4 +
+ include/block/snapshot.h  |    1 
+ include/sysemu/replay.h   |   20 +++
+ migration/savevm.c        |   15 +-
+ qapi/block-core.json      |    7 +
+ qapi/block.json           |    3 
+ qapi/misc.json            |   77 +++++++++++
+ replay/Makefile.objs      |    3 
+ replay/replay-debugging.c |  319 +++++++++++++++++++++++++++++++++++++++++++++
+ replay/replay-events.c    |   16 ++
+ replay/replay-internal.h  |    7 +
+ replay/replay-time.c      |   32 ++---
+ replay/replay.c           |   26 ++++
+ stubs/Makefile.objs       |    1 
+ stubs/replay-user.c       |    9 +
+ stubs/replay.c            |   10 +
+ vl.c                      |   22 ++-
+ 33 files changed, 818 insertions(+), 53 deletions(-)
+ create mode 100644 docs/devel/replay.txt
+ create mode 100644 replay/replay-debugging.c
+ create mode 100644 stubs/replay-user.c
+
+-- 
+Pavel Dovgalyuk
