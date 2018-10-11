@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAcou-0003l5-78
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1gAcpF-00043e-Dm
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAcoq-0001nc-W8
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:12 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46833)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAcoq-0001my-NT
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:08 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n11-v6so10068423wru.13
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 08:24:08 -0700 (PDT)
-References: <20181011131413.22208-1-philmd@redhat.com>
-	<7762db82-6044-df69-a1b7-c05100a0e938@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4b664769-9830-e186-05c4-132a8cfc423b@redhat.com>
-Date: Thu, 11 Oct 2018 17:24:01 +0200
+	(envelope-from <thuth@redhat.com>) id 1gAcpB-00021D-F1
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36542)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gAcpB-00020Y-55
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:29 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C80E0C049AFC
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 15:24:27 +0000 (UTC)
+References: <20181011144751.2724218-1-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4c1d98a8-f21e-4358-f47a-6087ca63412a@redhat.com>
+Date: Thu, 11 Oct 2018 17:24:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <7762db82-6044-df69-a1b7-c05100a0e938@redhat.com>
+In-Reply-To: <20181011144751.2724218-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] chardev: Convert IOReadHandler to read an
- unsigned number of bytes
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: Prevent more accidental test
+ disabling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Prasad J Pandit <ppandit@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Antony Pavlov <antonynpavlov@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Alistair Francis <alistair@alistair23.me>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Zhang Chen <zhangckid@gmail.com>, "open list:PXA2XX" <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Samuel Thibault <samuel.thibault@ens-lyon.org>, "open list:X86" <xen-devel@lists.xenproject.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Cornelia Huck <cohuck@redhat.com>, "open list:S390 Virtio-ccw" <qemu-s390x@nongnu.org>, Thomas Huth <huth@tuxfamily.org>, Michael Walle <michael@walle.cc>, "open list:sPAPR" <qemu-ppc@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: philmd@redhat.com, armbru@redhat.com
 
-On 11/10/2018 17:14, Paolo Bonzini wrote:
-> On 11/10/2018 15:14, Philippe Mathieu-Daudé wrote:
->> The number of bytes can not be negative nor zero.
->>
->> Fixed 2 format string:
->> - hw/char/spapr_vty.c
->> - hw/usb/ccid-card-passthru.c
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->> See: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02212.html
+On 2018-10-11 16:47, Eric Blake wrote:
+> GNU make is perfectly happy to use 'check-FOO-y += bar' to
+> initialize check-FOO-y.  (GNU Automake strictly insists that
+> you cannot use += until after an initial = per variable, but
+> thankfully we aren't using automake).
 > 
-> Not that easy; you need to adjust qemu_chr_be_can_write,
-> qemu_chr_be_write_impl, qemu_chr_be_write (which is where the callbacks
-> are invoked).
+> As we have had more than one instance where copy-and-paste of
+> 'check-FOO-y = bar' from a first test under category FOO into
+> an additional test, which ends up disabling the first (see
+> commits 992159c7 and 4429532b), it's better to just always use
+> the form that survives copy-and-paste, even for categories that
+> don't currently add more than one test.
+> 
+> Done with s/^\(check-[a-z]*-y \)=/\1+=/g
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/Makefile.include | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
 
-OK.
+Good idea!
 
-> On the other hand, fd_chr_read_poll is not an IOCanReadHandler, and this
-> patch therefore probably doesn't compile?
-
-It does compile.
-
-fd_chr_update_read_handler() uses fd_chr_read_poll with io_add_watch_poll():
-
-GSource *io_add_watch_poll(Chardev *chr,
-                        QIOChannel *ioc,
-                        IOCanReadHandler *fd_can_read,
-                        QIOChannelFunc fd_read,
-                        gpointer user_data,
-                        GMainContext *context);
+Acked-by: Thomas Huth <thuth@redhat.com>
