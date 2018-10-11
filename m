@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAW3D-0003tQ-KM
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:10:32 -0400
+	(envelope-from <david@redhat.com>) id 1gAW58-0005JX-FA
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:12:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAW3C-000725-QD
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:10:31 -0400
-References: <20181003193931.18096-1-richard.henderson@linaro.org>
-	<20181009185154.GA21860@flamenco>
+	(envelope-from <david@redhat.com>) id 1gAW55-0000b8-Q3
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:12:29 -0400
+References: <20181010170309.12045-1-akrowiak@linux.ibm.com>
+	<ceeafd70-b1d3-9e80-d357-65740dd125cd@de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <98581f37-2daf-ff8b-8a46-f90fd61209a9@redhat.com>
-Date: Thu, 11 Oct 2018 10:10:22 +0200
+Message-ID: <98d6ffa8-97b2-ac01-fe23-22355a04ae56@redhat.com>
+Date: Thu, 11 Oct 2018 10:12:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181009185154.GA21860@flamenco>
+In-Reply-To: <ceeafd70-b1d3-9e80-d357-65740dd125cd@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 0/9] tcg: Reorg 128-bit
- atomic operations
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v11 0/6] s390x: vfio-ap: guest
+ dedicated crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, akrowiak@linux.vnet.ibm.com, cohuck@redhat.com, pmorel@linux.vnet.ibm.com, fiuczy@linux.ibm.com, eskultet@redhat.com, agraf@suse.de, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, heiko.carstens@de.ibm.com, eric.auger@redhat.com, alex.williamson@redhat.com, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, mjrosato@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, berrange@redhat.com, alifm@linux.vnet.ibm.com, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, pbonzini@redhat.com
 
-On 09/10/2018 20:51, Emilio G. Cota wrote:
-> On Wed, Oct 03, 2018 at 14:39:22 -0500, Richard Henderson wrote:
-> (snip)
->> Richard Henderson (9):
->>   tcg: Split CONFIG_ATOMIC128
->>   target/i386: Convert to HAVE_CMPXCHG128
->>   target/arm: Convert to HAVE_CMPXCHG128
->>   target/arm: Check HAVE_CMPXCHG128 at translate time
->>   target/ppc: Convert to HAVE_CMPXCHG128 and HAVE_ATOMIC128
->>   target/s390x: Convert to HAVE_CMPXCHG128 and HAVE_ATOMIC128
->>   target/s390x: Split do_cdsg, do_lpq, do_stpq
->>   target/s390x: Skip wout, cout helpers if op helper does not return
->>   target/s390x: Check HAVE_ATOMIC128 and HAVE_CMPXCHG128 at translate
+On 10/10/2018 20:15, Christian Borntraeger wrote:
 > 
-> Cc'ing ppc/s390x maintainers -- I'm not sure they've seen this series.
-> Link to this thread (v3):
->   https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg00598.html
+> On 10/10/2018 07:03 PM, Tony Krowiak wrote:
+>> This patch series is the QEMU counterpart to the KVM/kernel support for 
+>> guest dedicated crypto adapters. The KVM/kernel model is built on the 
+>> VFIO mediated device framework and provides the infrastructure for 
+>> granting exclusive guest access to crypto devices installed on the linux 
+>> host. This patch series introduces a new QEMU command line option, QEMU 
+>> object model and CPU model features to exploit the KVM/kernel model.
+>>
+>> See the detailed specifications for AP virtualization provided by this 
+>> patch set in docs/vfio-ap.txt for a more complete discussion of the 
+>> design introduced by this patch series.
+>>
+>> v10 => v11 Change log:
 > 
-> I'm eager to get this merged, particularly for i386 where it is
-> fixing unnecessary exits via exec_atomic for cmpxchg16 emulation.
 > 
-> Thanks,
 > 
-> 		Emilio
+> Series seems to work fine.
 > 
+> Christian
 
-Thanks for the CC, I indeed haven't seen it.
+Had a quick glimpse over all patches, looks good and clean to me.
+
 
 -- 
 
