@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1gAhwr-0006t5-20
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:49 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1gAiN6-0005Je-NZ
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 17:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1gAhwm-00063A-K5
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:44 -0400
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:45470)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1gAhwl-0003ld-Px
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:40 -0400
-Received: by mail-ot1-x332.google.com with SMTP id u22so10287364ota.12
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:18 -0700 (PDT)
+	(envelope-from <alex.williamson@redhat.com>) id 1gAiN1-0006qV-LZ
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 17:19:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1gAiN1-0006pm-Cm
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 17:19:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0D92D62EAA
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 21:19:46 +0000 (UTC)
+Date: Thu, 11 Oct 2018 15:19:41 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20181011151941.77cd8516@w520.home>
+In-Reply-To: <20180917061729.22407-3-kraxel@redhat.com>
+References: <20180917061729.22407-1-kraxel@redhat.com>
+	<20180917061729.22407-3-kraxel@redhat.com>
 MIME-Version: 1.0
-References: <CAFEAcA_fmoBRTk0VKEjuu82eb7piCkq588+v7RT7r6f=_4=OVw@mail.gmail.com>
-	<mhng-e2fff6d4-8420-48c5-92d9-cc03e16dfa48@palmer-si-x1c4>
-In-Reply-To: <mhng-e2fff6d4-8420-48c5-92d9-cc03e16dfa48@palmer-si-x1c4>
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 12 Oct 2018 09:52:07 +1300
-Message-ID: <CAHNT7NvSYFtnKyFjPZqbHL=QM82zgRq5oU+mJW9vm7=QO9yTEg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 0/5] Misc RISC-V patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/vfio/display: add ramfb support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +34,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Palmer Dabbelt <palmer@sifive.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair23@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Richard Henderson <richard.henderson@linaro.org>, Karsten Merker <merker@debian.org>, Stefan O'Rear <sorear2@gmail.com>, "Richard W.M. Jones" <rjones@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi All,
+On Mon, 17 Sep 2018 08:17:29 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-On Thu, Oct 11, 2018 at 7:22 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+> So we have a boot display when using a vgpu as primary display.
+> 
+> ramfb depends on a fw_cfg file.  fw_cfg files can not be added and
+> removed at runtime, therefore a ramfb-enabled vfio device can't be
+> hotplugged.
+> 
+> Add a nohotplug variant of the vfio-pci device (as child class).  Add
+> the ramfb property to the nohotplug variant only.  So to enable the vgpu
+> display with boot support use this:
+> 
+>   -device vfio-pci-nohotplug,display=on,ramfb=on,sysfsdev=...
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/vfio/pci.h                 |  1 +
+>  include/hw/vfio/vfio-common.h |  2 ++
+>  hw/vfio/display.c             | 12 ++++++++++++
+>  hw/vfio/pci.c                 | 25 +++++++++++++++++++++++++
+>  4 files changed, 40 insertions(+)
+> 
+> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> index 52b065421a..904e286586 100644
+> --- a/hw/vfio/pci.h
+> +++ b/hw/vfio/pci.h
+> @@ -149,6 +149,7 @@ typedef struct VFIOPCIDevice {
+>  #define VFIO_FEATURE_ENABLE_IGD_OPREGION \
+>                                  (1 << VFIO_FEATURE_ENABLE_IGD_OPREGION_BIT)
+>      OnOffAuto display;
+> +    bool enable_ramfb;
+>      int32_t bootindex;
+>      uint32_t igd_gms;
+>      OffAutoPCIBAR msix_relo;
 
-> On Wed, 10 Oct 2018 11:10:07 PDT (-0700), peter.maydell@linaro.org wrote:
-> > On 10 October 2018 at 18:49, Palmer Dabbelt <palmer@sifive.com> wrote:
-> >> we should really
-> >> get the ball rolling on our big patch backlog.
-> >
-> > Yes, please do. Softfreeze is not all that far away and I
-> > would strongly prefer not to get an enormous sized pull
-> > request at the last minute. The ideal pattern is that
-> > code changes come in at a steady rate across the whole
-> > of the 'open' part of the development cycle.
->
-> Ya, sorry, we've been a bit out of it.  If I understand correctly, the
-> soft
-> freeze is the 30th?  If so it's really time to get started, and it looks
-> like
-> Michael is busy so I'll have to go figure this out.
->
+Hi Gerd,
 
-Yes. I should think twice about the Signed-off-by: on my commits. I need to
-run a regression on this out-of-order subset. I currently only run tests on
-the top of the riscv-qemu tree in-order, and when I rebase against master.
-If the commits need any significant effort to rebase because they are taken
-in some random order then the testing will be invalidated. i.e. I haven't
-checked the dependencies for these commits.
+One tiny nit here, we can move this new bool down in the struct with
+the rest of the bools for better alignment.  I can change that on
+commit.  However, I'm not having luck getting ramfb to work; the
+display is only getting initialized once the guest driver loads.  This
+is a 440FX/SeaBIOS VM, it looks like you've already updated bios.bin in
+qemu.git with ramfb support, but I also see the same results with
+bios.bin from your seabios.git package.  I'm using libvirt to launch
+the guest with a wrapper around qemu-system-x86_64 to replace vfio-pci
+with vfio-pci-nohotplug, resulting in a command line including:
 
-I am happy to review whoever posts the contents of the tree. I can test
-apply the PRs against the riscv-qemu tree and if they give us lumps, we'll
-reject, including my own changes (if rebased).
+-bios /usr/share/seabios.git/bios.bin \
+-spice port=0,disable-ticketing,gl=on,rendernode=/dev/dri/by-path/pci-0000:00:02.0-render,seamless-migration=on \
+-device vfio-pci-nohotplug,id=hostdev0,sysfsdev=...,display=on,bus=pci.0,addr=0x9 \
+-set device.hostdev0.x-igd-opregion=on \
+-set device.hostdev0.ramfb=on \
 
-Alastair, I suggest you confer with Debian and Fedora folk. Don't break the
-Linux distros... I'm petrified that we might break Debian.
+Relevant XML blobs:
 
-Palmer, I disagree with idea, I would like to maintain the soft-fork until
-we have the CI running our regression test suite (currently manual)
+    <graphics type='spice'>
+      <listen type='none'/>
+      <gl enable='yes' rendernode='/dev/dri/by-path/pci-0000:00:02.0-render'/>
+    </graphics>
+    <video>
+      <model type='none'/>
+    </video>
+    <hostdev mode='subsystem' type='mdev' managed='no' model='vfio-pci' display='on'>
+      <source>
+        <address uuid='cd4fa69f-c24c-476f-a61d-abca705e2a13'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x09' function='0x0'/>
+    </hostdev>
+...
+  <qemu:commandline>
+    <qemu:arg value='-set'/>
+    <qemu:arg value='device.hostdev0.x-igd-opregion=on'/>
+    <qemu:arg value='-set'/>
+    <qemu:arg value='device.hostdev0.ramfb=on'/>
+  </qemu:commandline>
 
-Peter, I have to pull in your remote wholesale. I don't cherry-pick from
-your tree. I think this is truly dumb. This might serve the needs of some
-folk running Linux but we have emulation fidelity fixes for the RISC-V
-community as a whole. Alastair is the only person not submitting his
-patches via the (sub)maintainer tree. BTW Who is the RISC-V port
-maintainer? Puzzled.
+This is a Windows 10 VM, but as I understand this ramfb support, I
+think I'm still supposed to see SeaBIOS boot messages and perhaps even
+the Windows boot animation before the guest driver takes over, is that
+correct?  What am I missing?  Thanks,
 
-Here is the pull queue. But I'm not ready to make a PR until we have the CI
-running the regression. I certainly don't want rebases of random commits to
-the riscv-qemu tree coming in when we pull.
-
-- https://github.com/riscv/riscv-qemu/tree/qemu-for-upstream
-
-That said, they have sign-off. There are plenty of other "RISC-V"
-maintainers. Do what you think is wise.
-
-Most important thing here is the Debian builders and other RISC-V virtual
-machines in production. Having the Debian folk or some other helpful tester
-running the entire tree. Pulling it in one go means we don't have a
-bisection problem interspersed with a whole lot of other random patches.
-You may not have all of the interrupt related changes that require
-extensive parallel burn-in tests (GCC bootstrap). i.e. we do significantly
-more than "make check" when we pull changes into our tree.
-
-Thanks and Regards,
-Michael.
+Alex
