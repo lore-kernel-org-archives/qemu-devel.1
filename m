@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZl-0002Co-Eq
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZs-0002EG-3Q
 	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZk-0004OI-Dw
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:45 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZp-0004Qf-Bn
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:50 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu, 11 Oct 2018 04:19:25 +0200
-Message-Id: <20181011021931.4249-7-edgar.iglesias@gmail.com>
+Date: Thu, 11 Oct 2018 04:19:28 +0200
+Message-Id: <20181011021931.4249-10-edgar.iglesias@gmail.com>
 In-Reply-To: <20181011021931.4249-1-edgar.iglesias@gmail.com>
 References: <20181011021931.4249-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 06/12] net: cadence_gem: Add support for
- selecting the DMA MemoryRegion
+Subject: [Qemu-devel] [PATCH v2 09/12] target-arm: powerctl: Enable HVC when
+ starting CPUs to EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,162 +25,36 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Add support for selecting the Memory Region that the GEM
-will do DMA to.
+When QEMU provides the equivalent of the EL3 firmware, we
+need to enable HVCs in scr_el3 when turning on CPUs that
+target EL2.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/net/cadence_gem.c         | 59 ++++++++++++++++++++++--------------
- include/hw/net/cadence_gem.h |  2 ++
- 2 files changed, 39 insertions(+), 22 deletions(-)
+ target/arm/arm-powerctl.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 759c1d71e0..a40f136285 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -28,6 +28,7 @@
- #include "hw/net/cadence_gem.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
-+#include "sysemu/dma.h"
- #include "net/checksum.h"
- 
- #ifdef CADENCE_GEM_ERR_DEBUG
-@@ -835,9 +836,9 @@ static void gem_get_rx_desc(CadenceGEMState *s, int q)
- {
-     DB_PRINT("read descriptor 0x%x\n", (unsigned)s->rx_desc_addr[q]);
-     /* read current descriptor */
--    cpu_physical_memory_read(s->rx_desc_addr[q],
--                             (uint8_t *)s->rx_desc[q],
--                             sizeof(uint32_t) * gem_get_desc_len(s, true));
-+    address_space_read(&s->dma_as, s->rx_desc_addr[q], MEMTXATTRS_UNSPECIFIED,
-+                       (uint8_t *)s->rx_desc[q],
-+                       sizeof(uint32_t) * gem_get_desc_len(s, true));
- 
-     /* Descriptor owned by software ? */
-     if (rx_desc_get_ownership(s->rx_desc[q]) == 1) {
-@@ -956,10 +957,10 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-                 rx_desc_get_buffer(s->rx_desc[q]));
- 
-         /* Copy packet data to emulated DMA buffer */
--        cpu_physical_memory_write(rx_desc_get_buffer(s, s->rx_desc[q]) +
-+        address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
-                                                                   rxbuf_offset,
--                                  rxbuf_ptr,
--                                  MIN(bytes_to_copy, rxbufsize));
-+                            MEMTXATTRS_UNSPECIFIED, rxbuf_ptr,
-+                            MIN(bytes_to_copy, rxbufsize));
-         rxbuf_ptr += MIN(bytes_to_copy, rxbufsize);
-         bytes_to_copy -= MIN(bytes_to_copy, rxbufsize);
- 
-@@ -993,9 +994,10 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-         }
- 
-         /* Descriptor write-back.  */
--        cpu_physical_memory_write(s->rx_desc_addr[q],
--                                  (uint8_t *)s->rx_desc[q],
--                                  sizeof(uint32_t) * gem_get_desc_len(s, true));
-+        address_space_write(&s->dma_as, s->rx_desc_addr[q],
-+                            MEMTXATTRS_UNSPECIFIED,
-+                            (uint8_t *)s->rx_desc[q],
-+                            sizeof(uint32_t) * gem_get_desc_len(s, true));
- 
-         /* Next descriptor */
-         if (rx_desc_get_wrap(s->rx_desc[q])) {
-@@ -1099,9 +1101,9 @@ static void gem_transmit(CadenceGEMState *s)
-         packet_desc_addr = s->tx_desc_addr[q];
- 
-         DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
--        cpu_physical_memory_read(packet_desc_addr,
--                                 (uint8_t *)desc,
--                                 sizeof(uint32_t) * gem_get_desc_len(s, false));
-+        address_space_read(&s->dma_as, packet_desc_addr,
-+                           MEMTXATTRS_UNSPECIFIED, (uint8_t *)desc,
-+                           sizeof(uint32_t) * gem_get_desc_len(s, false));
-         /* Handle all descriptors owned by hardware */
-         while (tx_desc_get_used(desc) == 0) {
- 
-@@ -1133,8 +1135,9 @@ static void gem_transmit(CadenceGEMState *s)
-             /* Gather this fragment of the packet from "dma memory" to our
-              * contig buffer.
-              */
--            cpu_physical_memory_read(tx_desc_get_buffer(s, desc), p,
--                                     tx_desc_get_length(desc));
-+            address_space_read(&s->dma_as, tx_desc_get_buffer(s, desc),
-+                               MEMTXATTRS_UNSPECIFIED,
-+                               p, tx_desc_get_length(desc));
-             p += tx_desc_get_length(desc);
-             total_bytes += tx_desc_get_length(desc);
- 
-@@ -1145,13 +1148,15 @@ static void gem_transmit(CadenceGEMState *s)
-                 /* Modify the 1st descriptor of this packet to be owned by
-                  * the processor.
-                  */
--                cpu_physical_memory_read(s->tx_desc_addr[q],
--                                         (uint8_t *)desc_first,
--                                         sizeof(desc_first));
-+                address_space_read(&s->dma_as, s->tx_desc_addr[q],
-+                                   MEMTXATTRS_UNSPECIFIED,
-+                                   (uint8_t *)desc_first,
-+                                   sizeof(desc_first));
-                 tx_desc_set_used(desc_first);
--                cpu_physical_memory_write(s->tx_desc_addr[q],
--                                          (uint8_t *)desc_first,
--                                          sizeof(desc_first));
-+                address_space_write(&s->dma_as, s->tx_desc_addr[q],
-+                                  MEMTXATTRS_UNSPECIFIED,
-+                                  (uint8_t *)desc_first,
-+                                   sizeof(desc_first));
-                 /* Advance the hardware current descriptor past this packet */
-                 if (tx_desc_get_wrap(desc)) {
-                     s->tx_desc_addr[q] = s->regs[GEM_TXQBASE];
-@@ -1204,8 +1209,9 @@ static void gem_transmit(CadenceGEMState *s)
-                 packet_desc_addr += 4 * gem_get_desc_len(s, false);
-             }
-             DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
--            cpu_physical_memory_read(packet_desc_addr, (uint8_t *)desc,
--                                sizeof(uint32_t) * gem_get_desc_len(s, false));
-+            address_space_read(&s->dma_as, packet_desc_addr,
-+                              MEMTXATTRS_UNSPECIFIED, (uint8_t *)desc,
-+                              sizeof(uint32_t) * gem_get_desc_len(s, false));
-         }
- 
-         if (tx_desc_get_used(desc)) {
-@@ -1500,6 +1506,9 @@ static void gem_realize(DeviceState *dev, Error **errp)
-     CadenceGEMState *s = CADENCE_GEM(dev);
-     int i;
- 
-+    address_space_init(&s->dma_as,
-+                       s->dma_mr ? s->dma_mr : get_system_memory(), "dma");
+diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+index ce55eeb682..2b856930fb 100644
+--- a/target/arm/arm-powerctl.c
++++ b/target/arm/arm-powerctl.c
+@@ -103,6 +103,16 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
+     } else {
+         /* Processor is not in secure mode */
+         target_cpu->env.cp15.scr_el3 |= SCR_NS;
 +
-     if (s->num_priority_queues == 0 ||
-         s->num_priority_queues > MAX_PRIORITY_QUEUES) {
-         error_setg(errp, "Invalid num-priority-queues value: %" PRIx8,
-@@ -1537,6 +1546,12 @@ static void gem_init(Object *obj)
-                           "enet", sizeof(s->regs));
++        /*
++         * If QEMU is providing the equivalent of EL3 firmware, then we need
++         * to make sure a CPU targeting EL2 comes out of reset with a
++         * functional HVC insn.
++         */
++        if (arm_feature(&target_cpu->env, ARM_FEATURE_EL3)
++            && info->target_el == 2) {
++            target_cpu->env.cp15.scr_el3 |= SCR_HCE;
++        }
+     }
  
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
-+
-+    object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
-+                             (Object **)&s->dma_mr,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             OBJ_PROP_LINK_STRONG,
-+                             &error_abort);
- }
- 
- static const VMStateDescription vmstate_cadence_gem = {
-diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
-index 00dbf4f72e..5426961d91 100644
---- a/include/hw/net/cadence_gem.h
-+++ b/include/hw/net/cadence_gem.h
-@@ -45,6 +45,8 @@ typedef struct CadenceGEMState {
- 
-     /*< public >*/
-     MemoryRegion iomem;
-+    MemoryRegion *dma_mr;
-+    AddressSpace dma_as;
-     NICState *nic;
-     NICConf conf;
-     qemu_irq irq[MAX_PRIORITY_QUEUES];
+     /* We check if the started CPU is now at the correct level */
 -- 
 2.17.1
