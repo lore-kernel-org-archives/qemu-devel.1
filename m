@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gAXAD-0007mX-SU
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:21:50 -0400
+	(envelope-from <david@redhat.com>) id 1gAXFq-000199-Q5
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gAXA8-0006Bl-Rb
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:21:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50802)
+	(envelope-from <david@redhat.com>) id 1gAXFl-0001TE-4y
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:27:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37662)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gAXA8-0006BA-Ky
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:21:44 -0400
-Date: Thu, 11 Oct 2018 10:21:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181011092132.GD2483@work-vm>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gAXFk-0001O6-Sn
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:27:33 -0400
 References: <20181009205652.10605-1-david@redhat.com>
 	<20181009205652.10605-5-david@redhat.com>
 	<20181011090821.GC2483@work-vm>
 	<a2305986-84c9-671a-af1d-463814e5cfd6@redhat.com>
+	<20181011092132.GD2483@work-vm>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <733ce1f0-c50f-b856-500b-e995d999605e@redhat.com>
+Date: Thu, 11 Oct 2018 11:27:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a2305986-84c9-671a-af1d-463814e5cfd6@redhat.com>
+In-Reply-To: <20181011092132.GD2483@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v1 4/7] range: add some more functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,70 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
 
-* David Hildenbrand (david@redhat.com) wrote:
-> On 11/10/2018 11:08, Dr. David Alan Gilbert wrote:
-> > * David Hildenbrand (david@redhat.com) wrote:
-> >> Add some more functions that will be used in memory-device context.
-> >>
-> >> range_init(): Init using lower bound and size
-> >> range_valid(): Check if there would be an overflow when initializin
-> >> range_size(): Extract the size of a range
-> >> range_overlaps_range(): Check for overlaps of two ranges
-> >> range_contains_range(): Check if one range is contained in the other
-> >> range_starts_before_range(): Check if one range starts before another
-> >> range_ends_after_range(): Check if one range ends after another
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  include/qemu/range.h | 80 ++++++++++++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 80 insertions(+)
-> >>
-> >> diff --git a/include/qemu/range.h b/include/qemu/range.h
-> >> index 7e75f4e655..18e8acf22f 100644
-> >> --- a/include/qemu/range.h
-> >> +++ b/include/qemu/range.h
-> >> @@ -112,6 +112,86 @@ static inline uint64_t range_upb(Range *range)
-> >>      return range->upb;
-> >>  }
-> >>  
-> >> +/*
-> >> + * Initialize @range to span the interval [@lob,@lob + @size - 1].
-> >> + * @size may be 0.
-> >> + */
-> >> +static inline void range_init(Range *range, uint64_t lob, uint64_t size)
-> >> +{
-> >> +    range->lob = lob;
-> >> +    range->upb = lob + size - 1;
-> >> +    range_invariant(range);
-> >> +}
-> >> +
-> >> +/*
-> >> + * Check if the interval [@lob,@lob + @size - 1] would be valid or not
-> >> + * (result in an overflow).
-> >> + */
-> >> +static inline bool range_valid(uint64_t lob, uint64_t size)
-> >> +{
-> >> +    return lob + size >= lob;
-> >> +}
-> > 
-> > That name confused me, I'd expected that to have taken a range and check
-> > it for something (like a non-asserting version of the invariant).
+On 11/10/2018 11:21, Dr. David Alan Gilbert wrote:
+> * David Hildenbrand (david@redhat.com) wrote:
+>> On 11/10/2018 11:08, Dr. David Alan Gilbert wrote:
+>>> * David Hildenbrand (david@redhat.com) wrote:
+>>>> Add some more functions that will be used in memory-device context.
+>>>>
+>>>> range_init(): Init using lower bound and size
+>>>> range_valid(): Check if there would be an overflow when initializin
+>>>> range_size(): Extract the size of a range
+>>>> range_overlaps_range(): Check for overlaps of two ranges
+>>>> range_contains_range(): Check if one range is contained in the other
+>>>> range_starts_before_range(): Check if one range starts before another
+>>>> range_ends_after_range(): Check if one range ends after another
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  include/qemu/range.h | 80 ++++++++++++++++++++++++++++++++++++++++++++
+>>>>  1 file changed, 80 insertions(+)
+>>>>
+>>>> diff --git a/include/qemu/range.h b/include/qemu/range.h
+>>>> index 7e75f4e655..18e8acf22f 100644
+>>>> --- a/include/qemu/range.h
+>>>> +++ b/include/qemu/range.h
+>>>> @@ -112,6 +112,86 @@ static inline uint64_t range_upb(Range *range)
+>>>>      return range->upb;
+>>>>  }
+>>>>  
+>>>> +/*
+>>>> + * Initialize @range to span the interval [@lob,@lob + @size - 1].
+>>>> + * @size may be 0.
+>>>> + */
+>>>> +static inline void range_init(Range *range, uint64_t lob, uint64_t size)
+>>>> +{
+>>>> +    range->lob = lob;
+>>>> +    range->upb = lob + size - 1;
+>>>> +    range_invariant(range);
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Check if the interval [@lob,@lob + @size - 1] would be valid or not
+>>>> + * (result in an overflow).
+>>>> + */
+>>>> +static inline bool range_valid(uint64_t lob, uint64_t size)
+>>>> +{
+>>>> +    return lob + size >= lob;
+>>>> +}
+>>>
+>>> That name confused me, I'd expected that to have taken a range and check
+>>> it for something (like a non-asserting version of the invariant).
+>>
+>> Then we have to remove all the variant asserts from the initializer
+>> functions (well, because then it is no longer an invariant then). Other
+>> ideas?
 > 
-> Then we have to remove all the variant asserts from the initializer
-> functions (well, because then it is no longer an invariant then). Other
-> ideas?
-
-My worry here is just the name 'range_valid'.
-
-Dave
-
-> -- 
+> My worry here is just the name 'range_valid'.
 > 
-> Thanks,
-> 
-> David / dhildenb
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+hmm "range_would_overflow()" ?
+
+> Dave
+
+-- 
+
+Thanks,
+
+David / dhildenb
