@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gAR9T-0005u3-TR
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:56:40 -0400
+	(envelope-from <famz@redhat.com>) id 1gARB4-0006c6-4C
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gAR9T-0004tR-7Q
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:56:39 -0400
-Date: Thu, 11 Oct 2018 10:56:24 +0800
+	(envelope-from <famz@redhat.com>) id 1gARB3-0005fK-8B
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:58:18 -0400
+Date: Thu, 11 Oct 2018 10:58:04 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20181011025624.GE17357@magic>
+Message-ID: <20181011025804.GF17357@magic>
 References: <20180814062739.19640-1-pbonzini@redhat.com>
 	<46af1836-e70a-185e-7312-e26fa57d1e2a@redhat.com>
 	<da1cc131-0352-5fd8-8180-829d2f5d07ec@redhat.com>
@@ -63,7 +63,8 @@ On Wed, 10/10 13:19, Paolo Bonzini wrote:
 > > 
 > 
 > Yes, we do.
+> 
 
-Queued, thanks!
+I'll send a pull request today. Thanks!
 
 Fam
