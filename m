@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAZvH-0001m3-33
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:18:37 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAZwJ-0002Sw-K3
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAZvC-0007Yd-4Y
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:18:35 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35868)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAZvB-0007Y6-Tb
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:18:30 -0400
-Received: by mail-wm1-f67.google.com with SMTP id a8-v6so9149036wmf.1
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 05:18:29 -0700 (PDT)
-References: <1539260043-4264-1-git-send-email-liq3ea@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <309b17e0-0353-86b6-ed4f-e80b8a4ea384@redhat.com>
-Date: Thu, 11 Oct 2018 14:18:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <1539260043-4264-1-git-send-email-liq3ea@gmail.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAZwE-0008Ee-J0
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:19:39 -0400
+Received: from mail-bl2nam02on0130.outbound.protection.outlook.com
+	([104.47.38.130]:33926
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gAZwE-0008Dc-Cf
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:19:34 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 11 Oct 2018 12:19:31 +0000
+Message-ID: <BN6PR2201MB12510F030208D6D43766AD0DC6E10@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1539256947-22807-18-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<43cd472e-cc66-469c-e4d3-6d4db71e4494@redhat.com>
+In-Reply-To: <43cd472e-cc66-469c-e4d3-6d4db71e4494@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] i440fx: use ARRAY_SIZE for pam_regions
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 17/22] target/mips: Implement emulation
+ of nanoMIPS EVA instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +33,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, mst@redhat.com, marcel.apfelbaum@gmail.com
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Stefan Markovic <smarkovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, "laurent@vivier.eu" <laurent@vivier.eu>, Petar Jovanovic <pjovanovic@wavecomp.com>, "aurelien@aurel32.net" <aurelien@aurel32.net>
 
-On 11/10/2018 14:14, Li Qiang wrote:
-> Cc: qemu-trivial@nongnu.org 
-> 
-> Signed-off-by: Li Qiang <liq3ea@gmail.com>
 
-Good cleanup!
+> What about NMS core without caches? Shouldn't we use:
+>
+>                       check_nms(ctx);
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+I don't see any support in the nanoMIPS documentation for this.
 
-> ---
->  hw/pci-host/piix.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-> index 0e608347c1..230d5d2ea3 100644
-> --- a/hw/pci-host/piix.c
-> +++ b/hw/pci-host/piix.c
-> @@ -142,7 +142,7 @@ static void i440fx_update_memory_mappings(PCII440FXState *d)
->      PCIDevice *pd = PCI_DEVICE(d);
->  
->      memory_region_transaction_begin();
-> -    for (i = 0; i < 13; i++) {
-> +    for (i = 0; i < ARRAY_SIZE(d->pam_regions); i++) {
->          pam_update(&d->pam_regions[i], i,
->                     pd->config[I440FX_PAM + (DIV_ROUND_UP(i, 2))]);
->      }
-> @@ -401,7 +401,7 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
->  
->      init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_space,
->               &f->pam_regions[0], PAM_BIOS_BASE, PAM_BIOS_SIZE);
-> -    for (i = 0; i < 12; ++i) {
-> +    for (i = 0; i < ARRAY_SIZE(f->pam_regions) - 1; ++i) {
->          init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_space,
->                   &f->pam_regions[i+1], PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE,
->                   PAM_EXPAN_SIZE);
-> 
+Thanks,
+Aleksandar=
