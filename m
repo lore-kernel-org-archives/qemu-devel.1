@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gAcpF-00043e-Dm
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1gAcvY-0007cy-PX
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1gAcpB-00021D-F1
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36542)
+	(envelope-from <kwolf@redhat.com>) id 1gAcvU-0006u2-Gw
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:31:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32531)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1gAcpB-00020Y-55
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:24:29 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C80E0C049AFC
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 15:24:27 +0000 (UTC)
-References: <20181011144751.2724218-1-eblake@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4c1d98a8-f21e-4358-f47a-6087ca63412a@redhat.com>
-Date: Thu, 11 Oct 2018 17:24:22 +0200
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1gAcvU-0006tg-Ac
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:31:00 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 11 Oct 2018 17:30:39 +0200
+Message-Id: <20181011153039.2324-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181011144751.2724218-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests: Prevent more accidental test
- disabling
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] gtk: Don't vte_terminal_set_encoding() on new
+ VTE versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,29 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: philmd@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, kraxel@redhat.com, kbastian@mail.uni-paderborn.de
 
-On 2018-10-11 16:47, Eric Blake wrote:
-> GNU make is perfectly happy to use 'check-FOO-y += bar' to
-> initialize check-FOO-y.  (GNU Automake strictly insists that
-> you cannot use += until after an initial = per variable, but
-> thankfully we aren't using automake).
-> 
-> As we have had more than one instance where copy-and-paste of
-> 'check-FOO-y = bar' from a first test under category FOO into
-> an additional test, which ends up disabling the first (see
-> commits 992159c7 and 4429532b), it's better to just always use
-> the form that survives copy-and-paste, even for categories that
-> don't currently add more than one test.
-> 
-> Done with s/^\(check-[a-z]*-y \)=/\1+=/g
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/Makefile.include | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
+The function vte_terminal_set_encoding() is deprecated since VTE 0.54,
+so stop calling it from that version on. This fixes a build error
+because of our use of warning flags [-Werror=3Ddeprecated-declarations].
 
-Good idea!
+Fixes: https://bugs.launchpad.net/bugs/1794939
+Reported-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ ui/gtk.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 3ddb5fe162..1d68276253 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1951,12 +1951,14 @@ static GSList *gd_vc_vte_init(GtkDisplayState *s,=
+ VirtualConsole *vc,
+     g_signal_connect(vc->vte.terminal, "commit", G_CALLBACK(gd_vc_in), v=
+c);
+=20
+     /* The documentation says that the default is UTF-8, but actually it=
+ is
+-     * 7-bit ASCII at least in VTE 0.38.
+-     */
++     * 7-bit ASCII at least in VTE 0.38. The function is deprecated sinc=
+e
++     * VTE 0.54 (only UTF-8 is supported now). */
++#if !VTE_CHECK_VERSION(0, 54, 0)
+ #if VTE_CHECK_VERSION(0, 38, 0)
+     vte_terminal_set_encoding(VTE_TERMINAL(vc->vte.terminal), "UTF-8", N=
+ULL);
+ #else
+     vte_terminal_set_encoding(VTE_TERMINAL(vc->vte.terminal), "UTF-8");
++#endif
+ #endif
+=20
+     vte_terminal_set_scrollback_lines(VTE_TERMINAL(vc->vte.terminal), -1=
+);
+--=20
+2.19.1
