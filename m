@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gAVuY-0000pO-JI
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:01:40 -0400
+	(envelope-from <david@redhat.com>) id 1gAVvT-0001Ix-0e
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:02:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gAVuR-0007op-4x
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:01:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1gAVuJ-0007hN-8i
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:01:21 -0400
-Date: Thu, 11 Oct 2018 09:01:14 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181011080114.GS27120@redhat.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
-	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gAVvK-00006X-6q
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:02:30 -0400
+References: <20181003193931.18096-1-richard.henderson@linaro.org>
+	<20181003193931.18096-8-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <5a792d12-3a9a-6645-1c8d-2e92e2d3a647@redhat.com>
+Date: Thu, 11 Oct 2018 10:02:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+In-Reply-To: <20181003193931.18096-8-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 7/9] target/s390x: Split
+ do_cdsg, do_lpq, do_stpq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +25,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Alistair <alistair23@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>, "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org
 
-On Thu, Oct 11, 2018 at 07:59:59AM +0200, Andrea Bolognani wrote:
-> On Wed, 2018-10-10 at 10:57 -0700, Alistair wrote:
-> > I use this monolithic config: 
-> > https://github.com/alistair23/meta-riscv/blob/7a950aa705b439b5ec19bb6f094930888335ba7b/recipes-kernel/linux/files/freedom-u540/defconfig
-> > 
-> > It has way too much enabled, but I think if you copy the PCIe part that 
-> > should be enough.
+On 03/10/2018 21:39, Richard Henderson wrote:
+> Cc: qemu-s390x@nongnu.org
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/mem_helper.c | 128 ++++++++++++++++++--------------------
+>  1 file changed, 61 insertions(+), 67 deletions(-)
 > 
-> Looks like there's quite a few CONFIG*PCI* options we're missing!
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index e106f61b4e..b5858d2fa2 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
+> @@ -1380,57 +1380,58 @@ uint32_t HELPER(trXX)(CPUS390XState *env, uint32_t r1, uint32_t r2,
+>      return cc;
+>  }
+>  
+> -static void do_cdsg(CPUS390XState *env, uint64_t addr,
+> -                    uint32_t r1, uint32_t r3, bool parallel)
+> +void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
+> +                  uint32_t r1, uint32_t r3)
+>  {
+>      uintptr_t ra = GETPC();
+>      Int128 cmpv = int128_make128(env->regs[r1 + 1], env->regs[r1]);
+>      Int128 newv = int128_make128(env->regs[r3 + 1], env->regs[r3]);
+>      Int128 oldv;
+> +    uint64_t oldh, oldl;
+>      bool fail;
+>  
+> -    if (parallel) {
+> -#if !HAVE_CMPXCHG128
+> -        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+> -#else
+> -        int mem_idx = cpu_mmu_index(env, false);
+> -        TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+> -        oldv = helper_atomic_cmpxchgo_be_mmu(env, addr, cmpv, newv, oi, ra);
+> -        fail = !int128_eq(oldv, cmpv);
+> -#endif
+> -    } else {
+> -        uint64_t oldh, oldl;
+> +    check_alignment(env, addr, 16, ra);
+>  
+> -        check_alignment(env, addr, 16, ra);
+> +    oldh = cpu_ldq_data_ra(env, addr + 0, ra);
+> +    oldl = cpu_ldq_data_ra(env, addr + 8, ra);
+>  
+> -        oldh = cpu_ldq_data_ra(env, addr + 0, ra);
+> -        oldl = cpu_ldq_data_ra(env, addr + 8, ra);
+> -
+> -        oldv = int128_make128(oldl, oldh);
+> -        fail = !int128_eq(oldv, cmpv);
+> -        if (fail) {
+> -            newv = oldv;
+> -        }
+> -
+> -        cpu_stq_data_ra(env, addr + 0, int128_gethi(newv), ra);
+> -        cpu_stq_data_ra(env, addr + 8, int128_getlo(newv), ra);
+> +    oldv = int128_make128(oldl, oldh);
+> +    fail = !int128_eq(oldv, cmpv);
+> +    if (fail) {
+> +        newv = oldv;
+>      }
+>  
+> +    cpu_stq_data_ra(env, addr + 0, int128_gethi(newv), ra);
+> +    cpu_stq_data_ra(env, addr + 8, int128_getlo(newv), ra);
+> +
+>      env->cc_op = fail;
+>      env->regs[r1] = int128_gethi(oldv);
+>      env->regs[r1 + 1] = int128_getlo(oldv);
+>  }
+>  
+> -void HELPER(cdsg)(CPUS390XState *env, uint64_t addr,
+> -                  uint32_t r1, uint32_t r3)
+> -{
+> -    do_cdsg(env, addr, r1, r3, false);
+> -}
+> -
+>  void HELPER(cdsg_parallel)(CPUS390XState *env, uint64_t addr,
+>                             uint32_t r1, uint32_t r3)
+>  {
+> -    do_cdsg(env, addr, r1, r3, true);
+> +    uintptr_t ra = GETPC();
+> +    Int128 cmpv = int128_make128(env->regs[r1 + 1], env->regs[r1]);
+> +    Int128 newv = int128_make128(env->regs[r3 + 1], env->regs[r3]);
+> +    int mem_idx;
+> +    TCGMemOpIdx oi;
+> +    Int128 oldv;
+> +    bool fail;
+> +
+> +    if (!HAVE_CMPXCHG128) {
+> +        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+> +    }
+> +
+> +    mem_idx = cpu_mmu_index(env, false);
+> +    oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+> +    oldv = helper_atomic_cmpxchgo_be_mmu(env, addr, cmpv, newv, oi, ra);
+> +    fail = !int128_eq(oldv, cmpv);
+> +
+> +    env->cc_op = fail;
+> +    env->regs[r1] = int128_gethi(oldv);
+> +    env->regs[r1 + 1] = int128_getlo(oldv);
+>  }
+>  
+>  static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
+> @@ -2097,16 +2098,25 @@ uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
+>  #endif
+>  
+>  /* load pair from quadword */
+> -static uint64_t do_lpq(CPUS390XState *env, uint64_t addr, bool parallel)
+> +uint64_t HELPER(lpq)(CPUS390XState *env, uint64_t addr)
+>  {
+>      uintptr_t ra = GETPC();
+>      uint64_t hi, lo;
+>  
+> -    if (!parallel) {
+> -        check_alignment(env, addr, 16, ra);
+> -        hi = cpu_ldq_data_ra(env, addr + 0, ra);
+> -        lo = cpu_ldq_data_ra(env, addr + 8, ra);
+> -    } else if (HAVE_ATOMIC128) {
+> +    check_alignment(env, addr, 16, ra);
+> +    hi = cpu_ldq_data_ra(env, addr + 0, ra);
+> +    lo = cpu_ldq_data_ra(env, addr + 8, ra);
+> +
+> +    env->retxl = lo;
+> +    return hi;
+> +}
+> +
+> +uint64_t HELPER(lpq_parallel)(CPUS390XState *env, uint64_t addr)
+> +{
+> +    uintptr_t ra = GETPC();
+> +    uint64_t hi, lo;
+> +
+> +    if (HAVE_ATOMIC128) {
+>          int mem_idx = cpu_mmu_index(env, false);
+>          TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+>          Int128 v = helper_atomic_ldo_be_mmu(env, addr, oi, ra);
+> @@ -2120,27 +2130,23 @@ static uint64_t do_lpq(CPUS390XState *env, uint64_t addr, bool parallel)
+>      return hi;
+>  }
+>  
+> -uint64_t HELPER(lpq)(CPUS390XState *env, uint64_t addr)
+> -{
+> -    return do_lpq(env, addr, false);
+> -}
+> -
+> -uint64_t HELPER(lpq_parallel)(CPUS390XState *env, uint64_t addr)
+> -{
+> -    return do_lpq(env, addr, true);
+> -}
+> -
+>  /* store pair to quadword */
+> -static void do_stpq(CPUS390XState *env, uint64_t addr,
+> -                    uint64_t low, uint64_t high, bool parallel)
+> +void HELPER(stpq)(CPUS390XState *env, uint64_t addr,
+> +                  uint64_t low, uint64_t high)
+>  {
+>      uintptr_t ra = GETPC();
+>  
+> -    if (!parallel) {
+> -        check_alignment(env, addr, 16, ra);
+> -        cpu_stq_data_ra(env, addr + 0, high, ra);
+> -        cpu_stq_data_ra(env, addr + 8, low, ra);
+> -    } else if (HAVE_ATOMIC128) {
+> +    check_alignment(env, addr, 16, ra);
+> +    cpu_stq_data_ra(env, addr + 0, high, ra);
+> +    cpu_stq_data_ra(env, addr + 8, low, ra);
+> +}
+> +
+> +void HELPER(stpq_parallel)(CPUS390XState *env, uint64_t addr,
+> +                           uint64_t low, uint64_t high)
+> +{
+> +    uintptr_t ra = GETPC();
+> +
+> +    if (HAVE_ATOMIC128) {
+>          int mem_idx = cpu_mmu_index(env, false);
+>          TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+>          Int128 v = int128_make128(low, high);
+> @@ -2150,18 +2156,6 @@ static void do_stpq(CPUS390XState *env, uint64_t addr,
+>      }
+>  }
+>  
+> -void HELPER(stpq)(CPUS390XState *env, uint64_t addr,
+> -                  uint64_t low, uint64_t high)
+> -{
+> -    do_stpq(env, addr, low, high, false);
+> -}
+> -
+> -void HELPER(stpq_parallel)(CPUS390XState *env, uint64_t addr,
+> -                           uint64_t low, uint64_t high)
+> -{
+> -    do_stpq(env, addr, low, high, true);
+> -}
+> -
+>  /* Execute instruction.  This instruction executes an insn modified with
+>     the contents of r1.  It does not change the executed instruction in memory;
+>     it does not change the program counter.
+> 
 
-PCI settings in this file:
+Way easier to read.
 
-CONFIG_BLK_MQ_PCI=y
-CONFIG_GENERIC_PCI_IOMAP=y
-CONFIG_HOTPLUG_PCI_PCIE=y
-CONFIG_HOTPLUG_PCI=y
-CONFIG_MEDIA_PCI_SUPPORT=y
-CONFIG_PCI_ATS=y
-CONFIG_PCI_BUS_ADDR_T_64BIT=y
-CONFIG_PCI_DEBUG=y
-CONFIG_PCI_DMA_32=y
-CONFIG_PCI_DOMAINS_GENERIC=y
-CONFIG_PCI_DOMAINS=y
-CONFIG_PCIEAER=y
-CONFIG_PCIEASPM_DEFAULT=y
-CONFIG_PCIEASPM=y
-CONFIG_PCI_ECAM=y
-CONFIG_PCIE_MICROSEMI=y
-CONFIG_PCI_ENDPOINT=y
-CONFIG_PCIEPORTBUS=y
-CONFIG_PCIE_XILINX=y
-CONFIG_PCI_HOST_COMMON=y
-CONFIG_PCI_HOST_GENERIC=y
-CONFIG_PCI_IOV=y
-CONFIG_PCI_MSI=y
-CONFIG_PCI_PASID=y
-CONFIG_PCI_PRI=y
-CONFIG_PCI_QUIRKS=y
-CONFIG_PCI_SW_SWITCHTEC=y
-CONFIG_PCI=y
-CONFIG_USB_BDC_PCI=y
-CONFIG_USB_EHCI_PCI=y
-CONFIG_USB_OHCI_HCD_PCI=y
-CONFIG_USB_PCI=y
-CONFIG_USB_XHCI_PCI=y
-
-Here are the settings we currently do NOT have in my RV kernel:
-
-CONFIG_HOTPLUG_PCI_PCIE=y
-CONFIG_HOTPLUG_PCI=y
-CONFIG_MEDIA_PCI_SUPPORT=y
-CONFIG_PCI_ATS=y
-CONFIG_PCI_DEBUG=y
-CONFIG_PCIEAER=y
-CONFIG_PCIEASPM_DEFAULT=y
-CONFIG_PCIEASPM=y
-CONFIG_PCI_ECAM=y
-CONFIG_PCIE_MICROSEMI=y
-CONFIG_PCI_ENDPOINT=y
-CONFIG_PCIEPORTBUS=y
-CONFIG_PCI_HOST_COMMON=y
-CONFIG_PCI_HOST_GENERIC=y
-CONFIG_PCI_IOV=y
-CONFIG_PCI_PASID=y
-CONFIG_PCI_PRI=y
-CONFIG_PCI_SW_SWITCHTEC=y
-CONFIG_USB_BDC_PCI=y
-
-If you're happy with it, I can add all of those.  If there are any
-which shouldn't be added let me know.
-
-Rich.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-top is 'top' for virtual machines.  Tiny program with many
-powerful monitoring features, net stats, disk stats, logging, etc.
-http://people.redhat.com/~rjones/virt-top
+
+Thanks,
+
+David / dhildenb
