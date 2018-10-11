@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gAZsp-0000BD-E8
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:16:04 -0400
+	(envelope-from <abologna@redhat.com>) id 1gAZso-0000Ac-EA
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gAZsk-0005W6-CH
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:16:03 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51646)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gAZsj-0005SU-89
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:15:58 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 143-v6so8710526wmf.1
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 05:15:56 -0700 (PDT)
-References: <20181011112436.9305-1-ppandit@redhat.com>
-	<a5508166-efdc-d1d9-0fe1-9acb1f590633@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3c688482-fccc-ee8c-b871-ee3a7c42ecf4@redhat.com>
+	(envelope-from <abologna@redhat.com>) id 1gAZsj-0005U2-8G
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:16:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51965)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gAZsi-0005OH-4v
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:15:57 -0400
+Message-ID: <ae0853d9e209e830fccb188bb3d6b396b3144d63.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
 Date: Thu, 11 Oct 2018 14:15:48 +0200
-MIME-Version: 1.0
-In-Reply-To: <a5508166-efdc-d1d9-0fe1-9acb1f590633@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] ccid-card-passthru: check buffer size
- parameter
+In-Reply-To: <20181011114522.GB8125@redhat.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
+	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
+	<20181011080114.GS27120@redhat.com> <20181011114522.GB8125@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, P J P <ppandit@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: Arash TC <tohidi.arash@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Alistair <alistair23@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>, "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>
 
-On 11/10/2018 13:58, Philippe Mathieu-Daudé wrote:
-> Cc'ing Paolo & Marc-André.
+On Thu, 2018-10-11 at 12:45 +0100, Richard W.M. Jones wrote:
+> On Thu, Oct 11, 2018 at 09:01:14AM +0100, Richard W.M. Jones wrote:
+> > Here are the settings we currently do NOT have in my RV kernel:
+> > 
+> > CONFIG_HOTPLUG_PCI_PCIE=y
+> > CONFIG_HOTPLUG_PCI=y
+> > CONFIG_MEDIA_PCI_SUPPORT=y
+> > CONFIG_PCI_ATS=y
+> > CONFIG_PCI_DEBUG=y
+> > CONFIG_PCIEAER=y
+> > CONFIG_PCIEASPM_DEFAULT=y
+> > CONFIG_PCIEASPM=y
+> > CONFIG_PCI_ECAM=y
+> > CONFIG_PCIE_MICROSEMI=y
+> > CONFIG_PCI_ENDPOINT=y
+> > CONFIG_PCIEPORTBUS=y
+> > CONFIG_PCI_HOST_COMMON=y
+> > CONFIG_PCI_HOST_GENERIC=y
+> > CONFIG_PCI_IOV=y
+> > CONFIG_PCI_PASID=y
+> > CONFIG_PCI_PRI=y
+> > CONFIG_PCI_SW_SWITCHTEC=y
+> > CONFIG_USB_BDC_PCI=y
+> > 
+> > If you're happy with it, I can add all of those.  If there are any
+> > which shouldn't be added let me know.
 > 
-> On 11/10/2018 13:24, P J P wrote:
->> From: Prasad J Pandit <pjp@fedoraproject.org>
->>
->> While reading virtual smart card data, if buffer 'size' is negative
->> it would lead to memory corruption errors. Add check to avoid it.
+> I didn't see an answer but in any case I have tried to enable all of
+> these.  The only settings which could not be enabled were:
 > 
-> The IOReadHandler does not have documentation.
+> CONFIG_MEDIA_PCI_SUPPORT=y
+> CONFIG_PCI_ECAM=y
+> CONFIG_PCI_HOST_COMMON=y
+> CONFIG_PCI_HOST_GENERIC=y
+
+I believe these last two are the ones we really miss. I could be
+wrong though - as you know, I've made a few guesses that didn't
+quite pan out already :)
+
+> CONFIG_USB_BDC_PCI=y
 > 
->  typedef void IOReadHandler(void *opaque, const uint8_t *buf, int size);
+> Probably missing deps or missing arch support.  I didn't track them
+> down yet, but note I'm still using kernel 4.15.
 > 
-> Why is the 'size' argument signed? Does it makes sens to call it with a
-> negative value?
+>   https://github.com/rwmjones/fedora-riscv-kernel/commits/master
 
-Yeah, it probably should be changed to size_t (same for the return value
-of can_read callbacks); the size cannot be negative, in fact it can also
-never be zero.
+We talked about this on IRC a while ago: assuming my guess above
+is correct, you would need to backport
 
-Also, the "if" should never trigger because the size is bound to what
-can_read returns, which is VSCARD_IN_SIZE - card->vscard_in_pos.
+  https://github.com/torvalds/linux/commit/51bc085d6454214b02dba7a259ee1fdfe3ee8d9f
 
-So it is probably better to:
+because that's the one that makes PCI_HOST_GENERIC available to
+non-ARM architectures.
 
-1) move the
-
-    assert(card->vscard_in_pos < VSCARD_IN_SIZE);
-
-to can_read, which becomes
-
-    assert(card->vscard_in_pos <= VSCARD_IN_SIZE);
-    return VSCARD_IN_SIZE - card->vscard_in_pos;
-
-2) here, replace the if with an
-
-    assert(size <= VSCARD_IN_SIZE - card->vscard_in_pos);
-
-Note that the right side of the comparison is the return value of
-can_read.  Also, this assert will always fail if card->vscard_in_pos >=
-VSCARD_IN_SIZE), since size > 0.
-
-3) also here, replace the
-
-    assert(card->vscard_in_hdr < VSCARD_IN_SIZE);
-
-with the stricter and more correct
-
-    assert(card->vscard_in_hdr < card->vscard_in_pos);
-
-
-Related, I don't understand why the read function ends with
-
-    if (card->vscard_in_hdr == card->vscard_in_pos) {
-        card->vscard_in_pos = card->vscard_in_hdr = 0;
-    }
-
-I would have expected something more generic, like:
-
-    /* Drop any messages that were fully processed.  */
-    if (card->vscard_in_hdr > 0) {
-        memmove(card->vscard_in_data,
-                card->vscard_in_data + card->vscard_in_hdr,
-                card->vscard_in_pos - card->vscard_in_hdr);
-        card->vscard_in_pos -= card->vscard_in_hdr;
-        card->vscard_in_hdr = 0;
-    }
-
-Marc-André, do you know something about libcacard that justifies the
-latter?  If the error_report is changed to an assert it's probably a
-good idea anyway to make the code more liberal in what it accepts.
-Prasad, can you prepare a v2 that does these changes?
-
-Thanks,
-
-Paolo
-
+> In any case a new kernel/bbl has been built, available in the usual
+> place:
 > 
-> Thanks,
-> 
-> Phil.
-> 
->>
->> Reported-by: Arash TC <tohidi.arash@gmail.com>
->> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
->> ---
->>  hw/usb/ccid-card-passthru.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
->> index 0a6c657228..63ed78f4c6 100644
->> --- a/hw/usb/ccid-card-passthru.c
->> +++ b/hw/usb/ccid-card-passthru.c
->> @@ -275,6 +275,7 @@ static void ccid_card_vscard_read(void *opaque, const uint8_t *buf, int size)
->>      PassthruState *card = opaque;
->>      VSCMsgHeader *hdr;
->>  
->> +    assert(0 <= size && size < VSCARD_IN_SIZE);
->>      if (card->vscard_in_pos + size > VSCARD_IN_SIZE) {
->>          error_report("no room for data: pos %u +  size %d > %" PRId64 "."
->>                       " dropping connection.",
->>
-> 
+>   https://fedorapeople.org/groups/risc-v/disk-images/
+
+I gave it a spin: it doesn't work :(
+
+-- 
+Andrea Bolognani / Red Hat / Virtualization
