@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZu-0002JU-U0
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:56 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZy-0002O4-KS
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZs-0004Sz-Td
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:54 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZu-0004Ur-Sf
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:57 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu, 11 Oct 2018 04:19:30 +0200
-Message-Id: <20181011021931.4249-12-edgar.iglesias@gmail.com>
+Date: Thu, 11 Oct 2018 04:19:31 +0200
+Message-Id: <20181011021931.4249-13-edgar.iglesias@gmail.com>
 In-Reply-To: <20181011021931.4249-1-edgar.iglesias@gmail.com>
 References: <20181011021931.4249-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 11/12] hw/arm: versal: Add a model of Xilinx
- Versal SoC
+Subject: [Qemu-devel] [PATCH v2 12/12] hw/arm: versal: Add a virtual Xilinx
+ Versal board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +25,42 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Add a model of Xilinx Versal SoC.
+Add a virtual Xilinx Versal board.
+
+This board is based on the Xilinx Versal SoC. The exact
+details of what peripherals are attached to this board
+will remain in control of QEMU. QEMU will generate an
+FDT on the fly for Linux and other software to auto-discover
+peripherals.
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- default-configs/aarch64-softmmu.mak |   1 +
- hw/arm/Makefile.objs                |   1 +
- hw/arm/xlnx-versal.c                | 324 ++++++++++++++++++++++++++++
- include/hw/arm/xlnx-versal.h        | 122 +++++++++++
- 4 files changed, 448 insertions(+)
- create mode 100644 hw/arm/xlnx-versal.c
- create mode 100644 include/hw/arm/xlnx-versal.h
+ hw/arm/Makefile.objs      |   2 +-
+ hw/arm/xlnx-versal-virt.c | 494 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 495 insertions(+), 1 deletion(-)
+ create mode 100644 hw/arm/xlnx-versal-virt.c
 
-diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
-index 6f790f061a..4ea9add003 100644
---- a/default-configs/aarch64-softmmu.mak
-+++ b/default-configs/aarch64-softmmu.mak
-@@ -8,4 +8,5 @@ CONFIG_DDC=y
- CONFIG_DPCD=y
- CONFIG_XLNX_ZYNQMP=y
- CONFIG_XLNX_ZYNQMP_ARM=y
-+CONFIG_XLNX_VERSAL=y
- CONFIG_ARM_SMMUV3=y
 diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 5f88062c66..ec21d9bc1f 100644
+index ec21d9bc1f..50c7b4a927 100644
 --- a/hw/arm/Makefile.objs
 +++ b/hw/arm/Makefile.objs
-@@ -26,6 +26,7 @@ obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
+@@ -26,7 +26,7 @@ obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
  obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
  obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
  obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
-+obj-$(CONFIG_XLNX_VERSAL) += xlnx-versal.o
+-obj-$(CONFIG_XLNX_VERSAL) += xlnx-versal.o
++obj-$(CONFIG_XLNX_VERSAL) += xlnx-versal.o xlnx-versal-virt.o
  obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
  obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
-diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
 new file mode 100644
-index 0000000000..f2145fd6a1
+index 0000000000..1ae125b174
 --- /dev/null
-+++ b/hw/arm/xlnx-versal.c
-@@ -0,0 +1,324 @@
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -0,0 +1,494 @@
 +/*
-+ * Xilinx Versal SoC model.
++ * Xilinx Versal Virtual board.
 + *
 + * Copyright (c) 2018 Xilinx Inc.
 + * Written by Edgar E. Iglesias
@@ -77,196 +71,247 @@ index 0000000000..f2145fd6a1
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
 +#include "qemu/log.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "sysemu/device_tree.h"
++#include "exec/address-spaces.h"
++#include "hw/boards.h"
 +#include "hw/sysbus.h"
-+#include "net/net.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/kvm.h"
-+#include "hw/arm/arm.h"
-+#include "kvm_arm.h"
-+#include "hw/misc/unimp.h"
-+#include "hw/intc/arm_gicv3_common.h"
++#include "hw/arm/sysbus-fdt.h"
++#include "hw/arm/fdt.h"
++#include "cpu.h"
 +#include "hw/arm/xlnx-versal.h"
 +
-+#define XLNX_VERSAL_ACPU_TYPE ARM_CPU_TYPE_NAME("cortex-a72")
-+#define GEM_REVISION        0x40070106
++#define TYPE_XLNX_VERSAL_VIRT_MACHINE MACHINE_TYPE_NAME("xlnx-versal-virt")
++#define XLNX_VERSAL_VIRT_MACHINE(obj) \
++    OBJECT_CHECK(VersalVirt, (obj), TYPE_XLNX_VERSAL_VIRT_MACHINE)
 +
-+static void versal_create_apu_cpus(Versal *s, Error **errp)
++typedef struct VersalVirt {
++    MachineState parent_obj;
++
++    Versal soc;
++    MemoryRegion mr_ddr;
++
++    void *fdt;
++    int fdt_size;
++    struct {
++        uint32_t gic;
++        uint32_t ethernet_phy[2];
++        uint32_t clk_125Mhz;
++        uint32_t clk_25Mhz;
++    } phandle;
++    struct arm_boot_info binfo;
++
++    struct {
++        bool secure;
++    } cfg;
++} VersalVirt;
++
++static void fdt_create(VersalVirt *s)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(s);
++    int i;
++
++    s->fdt = create_device_tree(&s->fdt_size);
++    if (!s->fdt) {
++        error_report("create_device_tree() failed");
++        exit(1);
++    }
++
++    /* Allocate all phandles.  */
++    s->phandle.gic = qemu_fdt_alloc_phandle(s->fdt);
++    for (i = 0; i < ARRAY_SIZE(s->phandle.ethernet_phy); i++) {
++        s->phandle.ethernet_phy[i] = qemu_fdt_alloc_phandle(s->fdt);
++    }
++    s->phandle.clk_25Mhz = qemu_fdt_alloc_phandle(s->fdt);
++    s->phandle.clk_125Mhz = qemu_fdt_alloc_phandle(s->fdt);
++
++    /* Create /chosen node for load_dtb.  */
++    qemu_fdt_add_subnode(s->fdt, "/chosen");
++
++    /* Header */
++    qemu_fdt_setprop_cell(s->fdt, "/", "interrupt-parent", s->phandle.gic);
++    qemu_fdt_setprop_cell(s->fdt, "/", "#size-cells", 0x2);
++    qemu_fdt_setprop_cell(s->fdt, "/", "#address-cells", 0x2);
++    qemu_fdt_setprop_string(s->fdt, "/", "model", mc->desc);
++    qemu_fdt_setprop_string(s->fdt, "/", "compatible", "xlnx-versal-virt");
++}
++
++static void fdt_add_clk_node(VersalVirt *s, const char *name,
++                             unsigned int freq_hz, uint32_t phandle)
++{
++    qemu_fdt_add_subnode(s->fdt, name);
++    qemu_fdt_setprop_cell(s->fdt, name, "phandle", phandle);
++    qemu_fdt_setprop_cell(s->fdt, name, "clock-frequency", freq_hz);
++    qemu_fdt_setprop_cell(s->fdt, name, "#clock-cells", 0x0);
++    qemu_fdt_setprop_string(s->fdt, name, "compatible", "fixed-clock");
++    qemu_fdt_setprop(s->fdt, name, "u-boot,dm-pre-reloc", NULL, 0);
++}
++
++static void fdt_add_cpu_nodes(VersalVirt *s, uint32_t psci_conduit)
 +{
 +    int i;
 +
-+    for (i = 0; i < ARRAY_SIZE(s->fpd.apu.cpu); i++) {
-+        Object *obj;
-+        char *name;
++    qemu_fdt_add_subnode(s->fdt, "/cpus");
++    qemu_fdt_setprop_cell(s->fdt, "/cpus", "#size-cells", 0x0);
++    qemu_fdt_setprop_cell(s->fdt, "/cpus", "#address-cells", 1);
 +
-+        obj = object_new(XLNX_VERSAL_ACPU_TYPE);
-+        if (!obj) {
-+            /* Secondary CPUs start in PSCI powered-down state */
-+            error_setg(errp, "Unable to create apu.cpu[%d] of type %s",
-+                       i, XLNX_VERSAL_ACPU_TYPE);
-+            return;
++    for (i = XLNX_VERSAL_NR_ACPUS - 1; i >= 0; i--) {
++        char *name = g_strdup_printf("/cpus/cpu@%d", i);
++        ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
++
++        qemu_fdt_add_subnode(s->fdt, name);
++        qemu_fdt_setprop_cell(s->fdt, name, "reg", armcpu->mp_affinity);
++        if (psci_conduit != QEMU_PSCI_CONDUIT_DISABLED) {
++            qemu_fdt_setprop_string(s->fdt, name, "enable-method", "psci");
 +        }
-+
-+        name = g_strdup_printf("apu-cpu[%d]", i);
-+        object_property_add_child(OBJECT(s), name, obj, &error_fatal);
++        qemu_fdt_setprop_string(s->fdt, name, "device_type", "cpu");
++        qemu_fdt_setprop_string(s->fdt, name, "compatible",
++                                armcpu->dtb_compatible);
 +        g_free(name);
-+
-+        object_property_set_int(obj, s->cfg.psci_conduit,
-+                                "psci-conduit", &error_abort);
-+        if (i) {
-+            object_property_set_bool(obj, true,
-+                                     "start-powered-off", &error_abort);
-+        }
-+
-+        object_property_set_int(obj, ARRAY_SIZE(s->fpd.apu.cpu),
-+                                "core-count", &error_abort);
-+        object_property_set_link(obj, OBJECT(&s->fpd.apu.mr), "memory",
-+                                 &error_abort);
-+        object_property_set_bool(obj, true, "realized", &error_fatal);
-+        s->fpd.apu.cpu[i] = ARM_CPU(obj);
 +    }
 +}
 +
-+static void versal_create_apu_gic(Versal *s, qemu_irq *pic, Error **errp)
++static void fdt_add_gic_nodes(VersalVirt *s)
 +{
-+    static const uint64_t addrs[] = {
-+        MM_GIC_APU_DIST_MAIN,
-+        MM_GIC_APU_REDIST_0
-+    };
-+    SysBusDevice *gicbusdev;
-+    DeviceState *gicdev;
-+    int nr_apu_cpus = ARRAY_SIZE(s->fpd.apu.cpu);
++    char *nodename;
++
++    nodename = g_strdup_printf("/gic@%x", MM_GIC_APU_DIST_MAIN);
++    qemu_fdt_add_subnode(s->fdt, nodename);
++    qemu_fdt_setprop_cell(s->fdt, nodename, "phandle", s->phandle.gic);
++    qemu_fdt_setprop_cells(s->fdt, nodename, "interrupts",
++                           GIC_FDT_IRQ_TYPE_PPI, VERSAL_GIC_MAINT_IRQ,
++                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
++    qemu_fdt_setprop(s->fdt, nodename, "interrupt-controller", NULL, 0);
++    qemu_fdt_setprop_sized_cells(s->fdt, nodename, "reg",
++                                 2, MM_GIC_APU_DIST_MAIN,
++                                 2, MM_GIC_APU_DIST_MAIN_SIZE,
++                                 2, MM_GIC_APU_REDIST_0,
++                                 2, MM_GIC_APU_REDIST_0_SIZE);
++    qemu_fdt_setprop_cell(s->fdt, nodename, "#interrupt-cells", 3);
++    qemu_fdt_setprop_string(s->fdt, nodename, "compatible", "arm,gic-v3");
++}
++
++static void fdt_add_timer_nodes(VersalVirt *s)
++{
++    const char compat[] = "arm,armv8-timer";
++    uint32_t irqflags = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
++
++    qemu_fdt_add_subnode(s->fdt, "/timer");
++    qemu_fdt_setprop_cells(s->fdt, "/timer", "interrupts",
++            GIC_FDT_IRQ_TYPE_PPI, VERSAL_TIMER_S_EL1_IRQ, irqflags,
++            GIC_FDT_IRQ_TYPE_PPI, VERSAL_TIMER_NS_EL1_IRQ, irqflags,
++            GIC_FDT_IRQ_TYPE_PPI, VERSAL_TIMER_VIRT_IRQ, irqflags,
++            GIC_FDT_IRQ_TYPE_PPI, VERSAL_TIMER_NS_EL2_IRQ, irqflags);
++    qemu_fdt_setprop(s->fdt, "/timer", "compatible",
++                     compat, sizeof(compat));
++}
++
++static void fdt_add_uart_nodes(VersalVirt *s)
++{
++    uint64_t addrs[] = { MM_UART1, MM_UART0 };
++    unsigned int irqs[] = { VERSAL_UART1_IRQ_0, VERSAL_UART0_IRQ_0 };
++    const char compat[] = "arm,pl011\0arm,sbsa-uart";
++    const char clocknames[] = "uartclk\0apb_pclk";
 +    int i;
-+
-+    sysbus_init_child_obj(OBJECT(s), "apu-gic",
-+                          &s->fpd.apu.gic, sizeof(s->fpd.apu.gic),
-+                          gicv3_class_name());
-+    gicbusdev = SYS_BUS_DEVICE(&s->fpd.apu.gic);
-+    gicdev = DEVICE(&s->fpd.apu.gic);
-+    qdev_prop_set_uint32(gicdev, "revision", 3);
-+    qdev_prop_set_uint32(gicdev, "num-cpu", 2);
-+    qdev_prop_set_uint32(gicdev, "num-irq", XLNX_VERSAL_NR_IRQS + 32);
-+    qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
-+    qdev_prop_set_uint32(gicdev, "redist-region-count[0]", 2);
-+    if (!kvm_irqchip_in_kernel()) {
-+        qdev_prop_set_bit(gicdev, "has-security-extensions", true);
-+    }
-+
-+    object_property_set_bool(OBJECT(&s->fpd.apu.gic), true, "realized", errp);
 +
 +    for (i = 0; i < ARRAY_SIZE(addrs); i++) {
-+        MemoryRegion *mr;
++        char *name = g_strdup_printf("/uart@%" PRIx64, addrs[i]);
++        qemu_fdt_add_subnode(s->fdt, name);
++        qemu_fdt_setprop_cell(s->fdt, name, "current-speed", 115200);
++        qemu_fdt_setprop_cells(s->fdt, name, "clocks",
++                               s->phandle.clk_125Mhz, s->phandle.clk_125Mhz);
++        qemu_fdt_setprop(s->fdt, name, "clock-names",
++                         clocknames, sizeof(clocknames));
 +
-+        mr = sysbus_mmio_get_region(gicbusdev, i);
-+        memory_region_add_subregion(&s->fpd.apu.mr, addrs[i], mr);
-+    }
++        qemu_fdt_setprop_cells(s->fdt, name, "interrupts",
++                               GIC_FDT_IRQ_TYPE_SPI, irqs[i],
++                               GIC_FDT_IRQ_FLAGS_LEVEL_HI);
++        qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
++                                     2, addrs[i], 2, 0x1000);
++        qemu_fdt_setprop(s->fdt, name, "compatible",
++                         compat, sizeof(compat));
++        qemu_fdt_setprop(s->fdt, name, "u-boot,dm-pre-reloc", NULL, 0);
 +
-+    for (i = 0; i < nr_apu_cpus; i++) {
-+        DeviceState *cpudev = DEVICE(s->fpd.apu.cpu[i]);
-+        int ppibase = XLNX_VERSAL_NR_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
-+        qemu_irq maint_irq;
-+        int ti;
-+        /* Mapping from the output timer irq lines from the CPU to the
-+         * GIC PPI inputs.
-+         */
-+        const int timer_irq[] = {
-+            [GTIMER_PHYS] = VERSAL_TIMER_NS_EL1_IRQ,
-+            [GTIMER_VIRT] = VERSAL_TIMER_VIRT_IRQ,
-+            [GTIMER_HYP]  = VERSAL_TIMER_NS_EL2_IRQ,
-+            [GTIMER_SEC]  = VERSAL_TIMER_S_EL1_IRQ,
-+        };
-+
-+        for (ti = 0; ti < ARRAY_SIZE(timer_irq); ti++) {
-+            qdev_connect_gpio_out(cpudev, ti,
-+                                  qdev_get_gpio_in(gicdev,
-+                                                   ppibase + timer_irq[ti]));
++        if (addrs[i] == MM_UART0) {
++            /* Select UART0.  */
++            qemu_fdt_setprop_string(s->fdt, "/chosen", "stdout-path", name);
 +        }
-+        maint_irq = qdev_get_gpio_in(gicdev,
-+                                        ppibase + VERSAL_GIC_MAINT_IRQ);
-+        qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt",
-+                                    0, maint_irq);
-+        sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
-+        sysbus_connect_irq(gicbusdev, i + nr_apu_cpus,
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
-+        sysbus_connect_irq(gicbusdev, i + 2 * nr_apu_cpus,
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
-+        sysbus_connect_irq(gicbusdev, i + 3 * nr_apu_cpus,
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_VFIQ));
-+    }
-+
-+    for (i = 0; i < XLNX_VERSAL_NR_IRQS; i++) {
-+        pic[i] = qdev_get_gpio_in(gicdev, i);
-+    }
-+}
-+
-+static void versal_create_uarts(Versal *s, qemu_irq *pic)
-+{
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(s->lpd.iou.uart); i++) {
-+        static const int irqs[] = { VERSAL_UART0_IRQ_0, VERSAL_UART1_IRQ_0};
-+        static const uint64_t addrs[] = { MM_UART0, MM_UART1 };
-+        char *name = g_strdup_printf("uart%d", i);
-+        DeviceState *dev;
-+        MemoryRegion *mr;
-+
-+        dev = qdev_create(NULL, "pl011");
-+        s->lpd.iou.uart[i] = SYS_BUS_DEVICE(dev);
-+        qdev_prop_set_chr(dev, "chardev", serial_hd(i));
-+        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
-+        qdev_init_nofail(dev);
-+
-+        mr = sysbus_mmio_get_region(s->lpd.iou.uart[i], 0);
-+        memory_region_add_subregion(&s->mr_ps, addrs[i], mr);
-+
-+        sysbus_connect_irq(s->lpd.iou.uart[i], 0, pic[irqs[i]]);
 +        g_free(name);
 +    }
 +}
 +
-+static void versal_create_gems(Versal *s, qemu_irq *pic)
++static void fdt_add_fixed_link_nodes(VersalVirt *s, char *gemname,
++                                     uint32_t phandle)
 +{
++    char *name = g_strdup_printf("%s/fixed-link", gemname);
++
++    qemu_fdt_add_subnode(s->fdt, name);
++    qemu_fdt_setprop_cell(s->fdt, name, "phandle", phandle);
++    qemu_fdt_setprop_cells(s->fdt, name, "full-duplex");
++    qemu_fdt_setprop_cell(s->fdt, name, "speed", 1000);
++    g_free(name);
++}
++
++static void fdt_add_gem_nodes(VersalVirt *s)
++{
++    uint64_t addrs[] = { MM_GEM1, MM_GEM0 };
++    unsigned int irqs[] = { VERSAL_GEM1_IRQ_0, VERSAL_GEM0_IRQ_0 };
++    const char clocknames[] = "pclk\0hclk\0tx_clk\0rx_clk";
++    const char compat_gem[] = "cdns,zynqmp-gem\0cdns,gem";
 +    int i;
 +
-+    for (i = 0; i < ARRAY_SIZE(s->lpd.iou.gem); i++) {
-+        static const int irqs[] = { VERSAL_GEM0_IRQ_0, VERSAL_GEM1_IRQ_0};
-+        static const uint64_t addrs[] = { MM_GEM0, MM_GEM1 };
-+        char *name = g_strdup_printf("gem%d", i);
-+        NICInfo *nd = &nd_table[i];
-+        DeviceState *dev;
-+        MemoryRegion *mr;
++    for (i = 0; i < ARRAY_SIZE(addrs); i++) {
++        char *name = g_strdup_printf("/ethernet@%" PRIx64, addrs[i]);
++        qemu_fdt_add_subnode(s->fdt, name);
 +
-+        dev = qdev_create(NULL, "cadence_gem");
-+        s->lpd.iou.gem[i] = SYS_BUS_DEVICE(dev);
-+        object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
-+        if (nd->used) {
-+            qemu_check_nic_model(nd, "cadence_gem");
-+            qdev_set_nic_properties(dev, nd);
-+        }
-+        object_property_set_int(OBJECT(s->lpd.iou.gem[i]),
-+                                2, "num-priority-queues",
-+                                &error_abort);
-+        object_property_set_link(OBJECT(s->lpd.iou.gem[i]),
-+                                 OBJECT(&s->mr_ps), "dma",
-+                                 &error_abort);
-+        qdev_init_nofail(dev);
-+
-+        mr = sysbus_mmio_get_region(s->lpd.iou.gem[i], 0);
-+        memory_region_add_subregion(&s->mr_ps, addrs[i], mr);
-+
-+        sysbus_connect_irq(s->lpd.iou.gem[i], 0, pic[irqs[i]]);
++        fdt_add_fixed_link_nodes(s, name, s->phandle.ethernet_phy[i]);
++        qemu_fdt_setprop_string(s->fdt, name, "phy-mode", "rgmii-id");
++        qemu_fdt_setprop_cell(s->fdt, name, "phy-handle",
++                              s->phandle.ethernet_phy[i]);
++        qemu_fdt_setprop_cells(s->fdt, name, "clocks",
++                               s->phandle.clk_25Mhz, s->phandle.clk_25Mhz,
++                               s->phandle.clk_25Mhz, s->phandle.clk_25Mhz);
++        qemu_fdt_setprop(s->fdt, name, "clock-names",
++                         clocknames, sizeof(clocknames));
++        qemu_fdt_setprop_cells(s->fdt, name, "interrupts",
++                               GIC_FDT_IRQ_TYPE_SPI, irqs[i],
++                               GIC_FDT_IRQ_FLAGS_LEVEL_HI,
++                               GIC_FDT_IRQ_TYPE_SPI, irqs[i],
++                               GIC_FDT_IRQ_FLAGS_LEVEL_HI);
++        qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
++                                     2, addrs[i], 2, 0x1000);
++        qemu_fdt_setprop(s->fdt, name, "compatible",
++                         compat_gem, sizeof(compat_gem));
++        qemu_fdt_setprop_cell(s->fdt, name, "#address-cells", 1);
++        qemu_fdt_setprop_cell(s->fdt, name, "#size-cells", 0);
 +        g_free(name);
 +    }
 +}
 +
-+/* This takes the board allocated linear DDR memory and creates aliases
-+ * for each split DDR range/aperture on the Versal address map.
-+ */
-+static void versal_map_ddr(Versal *s)
++static void fdt_nop_memory_nodes(void *fdt, Error **errp)
 +{
-+    uint64_t size = memory_region_size(s->cfg.mr_ddr);
++    Error *err = NULL;
++    char **node_path;
++    int n = 0;
++
++    node_path = qemu_fdt_node_unit_path(fdt, "memory", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    while (node_path[n]) {
++        if (g_str_has_prefix(node_path[n], "/memory")) {
++            qemu_fdt_nop_node(fdt, node_path[n]);
++        }
++        n++;
++    }
++    g_strfreev(node_path);
++}
++
++static void fdt_add_memory_nodes(VersalVirt *s, void *fdt, uint64_t ram_size)
++{
 +    /* Describes the various split DDR access regions.  */
 +    static const struct {
 +        uint64_t base;
@@ -277,245 +322,236 @@ index 0000000000..f2145fd6a1
 +        { MM_TOP_DDR_3, MM_TOP_DDR_3_SIZE },
 +        { MM_TOP_DDR_4, MM_TOP_DDR_4_SIZE }
 +    };
-+    uint64_t offset = 0;
++    uint64_t mem_reg_prop[8] = {0};
++    uint64_t size = ram_size;
++    Error *err = NULL;
++    char *name;
 +    int i;
 +
-+    assert(ARRAY_SIZE(addr_ranges) == ARRAY_SIZE(s->noc.mr_ddr_ranges));
++    fdt_nop_memory_nodes(fdt, &err);
++    if (err) {
++        error_report_err(err);
++        return;
++    }
++
++    name = g_strdup_printf("/memory@%x", MM_TOP_DDR);
 +    for (i = 0; i < ARRAY_SIZE(addr_ranges) && size; i++) {
-+        char *name;
 +        uint64_t mapsize;
 +
 +        mapsize = size < addr_ranges[i].size ? size : addr_ranges[i].size;
-+        name = g_strdup_printf("noc-ddr-range%d", i);
-+        /* Create the MR alias.  */
-+        memory_region_init_alias(&s->noc.mr_ddr_ranges[i], OBJECT(s),
-+                                 name, s->cfg.mr_ddr,
-+                                 offset, mapsize);
 +
-+        /* Map it onto the NoC MR.  */
-+        memory_region_add_subregion(&s->mr_ps, addr_ranges[i].base,
-+                                    &s->noc.mr_ddr_ranges[i]);
-+        offset += mapsize;
++        mem_reg_prop[i * 2] = addr_ranges[i].base;
++        mem_reg_prop[i * 2 + 1] = mapsize;
 +        size -= mapsize;
++    }
++    qemu_fdt_add_subnode(fdt, name);
++    qemu_fdt_setprop_string(fdt, name, "device_type", "memory");
++
++    switch (i) {
++    case 1:
++        qemu_fdt_setprop_sized_cells(fdt, name, "reg",
++                                     2, mem_reg_prop[0],
++                                     2, mem_reg_prop[1]);
++        break;
++    case 2:
++        qemu_fdt_setprop_sized_cells(fdt, name, "reg",
++                                     2, mem_reg_prop[0],
++                                     2, mem_reg_prop[1],
++                                     2, mem_reg_prop[2],
++                                     2, mem_reg_prop[3]);
++        break;
++    case 3:
++        qemu_fdt_setprop_sized_cells(fdt, name, "reg",
++                                     2, mem_reg_prop[0],
++                                     2, mem_reg_prop[1],
++                                     2, mem_reg_prop[2],
++                                     2, mem_reg_prop[3],
++                                     2, mem_reg_prop[4],
++                                     2, mem_reg_prop[5]);
++        break;
++    case 4:
++        qemu_fdt_setprop_sized_cells(fdt, name, "reg",
++                                     2, mem_reg_prop[0],
++                                     2, mem_reg_prop[1],
++                                     2, mem_reg_prop[2],
++                                     2, mem_reg_prop[3],
++                                     2, mem_reg_prop[4],
++                                     2, mem_reg_prop[5],
++                                     2, mem_reg_prop[6],
++                                     2, mem_reg_prop[7]);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    g_free(name);
++}
++
++static void versal_virt_modify_dtb(const struct arm_boot_info *binfo,
++                                    void *fdt)
++{
++    VersalVirt *s = container_of(binfo, VersalVirt, binfo);
++
++    fdt_add_memory_nodes(s, fdt, binfo->ram_size);
++}
++
++static void *versal_virt_get_dtb(const struct arm_boot_info *binfo,
++                                  int *fdt_size)
++{
++    const VersalVirt *board = container_of(binfo, VersalVirt, binfo);
++
++    *fdt_size = board->fdt_size;
++    return board->fdt;
++}
++
++#define NUM_VIRTIO_TRANSPORT 32
++static void create_virtio_regions(VersalVirt *s)
++{
++    int virtio_mmio_size = 0x200;
++    int i;
++
++    for (i = 0; i < NUM_VIRTIO_TRANSPORT; i++) {
++        char *name = g_strdup_printf("virtio%d", i);;
++        hwaddr base = MM_TOP_RSVD + i * virtio_mmio_size;
++        int irq = VERSAL_RSVD_HIGH_IRQ_FIRST + i;
++        MemoryRegion *mr;
++        DeviceState *dev;
++        qemu_irq pic_irq;
++
++        pic_irq = qdev_get_gpio_in(DEVICE(&s->soc.fpd.apu.gic), irq);
++        dev = qdev_create(NULL, "virtio-mmio");
++        object_property_add_child(OBJECT(&s->soc), name, OBJECT(dev),
++                                  &error_fatal);
++        qdev_init_nofail(dev);
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic_irq);
++        mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
++        memory_region_add_subregion(&s->soc.mr_ps, base, mr);
++        sysbus_create_simple("virtio-mmio", base, pic_irq);
++    }
++
++    for (i = 0; i < NUM_VIRTIO_TRANSPORT; i++) {
++        hwaddr base = MM_TOP_RSVD + i * virtio_mmio_size;
++        int irq = VERSAL_RSVD_HIGH_IRQ_FIRST + i;
++        char *name = g_strdup_printf("/virtio_mmio@%" PRIx64, base);
++
++        qemu_fdt_add_subnode(s->fdt, name);
++        qemu_fdt_setprop(s->fdt, name, "dma-coherent", NULL, 0);
++        qemu_fdt_setprop_cells(s->fdt, name, "interrupts",
++                               GIC_FDT_IRQ_TYPE_SPI, irq,
++                               GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
++        qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
++                                     2, base, 2, virtio_mmio_size);
++        qemu_fdt_setprop_string(s->fdt, name, "compatible", "virtio,mmio");
 +        g_free(name);
 +    }
 +}
 +
-+static void versal_unimp_area(Versal *s, const char *name,
-+                                MemoryRegion *mr,
-+                                hwaddr base, hwaddr size)
++static void versal_virt_init(MachineState *machine)
 +{
-+    DeviceState *dev = qdev_create(NULL, TYPE_UNIMPLEMENTED_DEVICE);
-+    MemoryRegion *mr_dev;
++    VersalVirt *s = XLNX_VERSAL_VIRT_MACHINE(machine);
++    int psci_conduit = QEMU_PSCI_CONDUIT_DISABLED;
 +
-+    qdev_prop_set_string(dev, "name", name);
-+    qdev_prop_set_uint64(dev, "size", size);
-+    object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
-+    qdev_init_nofail(dev);
++    /*
++     * If the user provides an Operating System to be loaded, we expect them
++     * to use the -kernel command line option.
++     *
++     * Users can load firmware or boot-loaders with the -device loader options.
++     *
++     * When loading an OS, we generate a dtb and let arm_load_kernel() select
++     * where it gets loaded. This dtb will be passed to the kernel in x0.
++     *
++     * If there's no -kernel option, we generate a DTB and place it at 0x1000
++     * for the bootloaders or firmware to pick up.
++     *
++     * If users want to provide their own DTB, they can use the -dtb option.
++     * These dtb's will have their memory nodes modified to match QEMU's
++     * selected ram_size option before they get passed to the kernel or fw.
++     *
++     * When loading an OS, we turn on QEMU's PSCI implementation with SMC
++     * as the PSCI conduit. When there's no -kernel, we assume the user
++     * provides EL3 firmware to handle PSCI.
++     */
++    if (machine->kernel_filename) {
++        psci_conduit = QEMU_PSCI_CONDUIT_SMC;
++    }
 +
-+    mr_dev = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-+    memory_region_add_subregion(mr, base, mr_dev);
++    memory_region_allocate_system_memory(&s->mr_ddr, NULL, "ddr",
++                                         machine->ram_size);
++
++    sysbus_init_child_obj(OBJECT(machine), "xlnx-ve", &s->soc,
++                          sizeof(s->soc), TYPE_XLNX_VERSAL);
++    object_property_set_link(OBJECT(&s->soc), OBJECT(&s->mr_ddr),
++                             "ddr", &error_abort);
++    object_property_set_int(OBJECT(&s->soc), psci_conduit,
++                            "psci-conduit", &error_abort);
++    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
++
++    fdt_create(s);
++    create_virtio_regions(s);
++    fdt_add_gem_nodes(s);
++    fdt_add_uart_nodes(s);
++    fdt_add_gic_nodes(s);
++    fdt_add_timer_nodes(s);
++    fdt_add_cpu_nodes(s, psci_conduit);
++    fdt_add_clk_node(s, "/clk125", 125000000, s->phandle.clk_125Mhz);
++    fdt_add_clk_node(s, "/clk25", 25000000, s->phandle.clk_25Mhz);
++
++    /* Make the APU cpu address space visible to virtio and other
++     * modules unaware of muliple address-spaces.  */
++    memory_region_add_subregion_overlap(get_system_memory(),
++                                        0, &s->soc.fpd.apu.mr, 0);
++
++    s->binfo.ram_size = machine->ram_size;
++    s->binfo.kernel_filename = machine->kernel_filename;
++    s->binfo.kernel_cmdline = machine->kernel_cmdline;
++    s->binfo.initrd_filename = machine->initrd_filename;
++    s->binfo.loader_start = 0x0;
++    s->binfo.get_dtb = versal_virt_get_dtb;
++    s->binfo.modify_dtb = versal_virt_modify_dtb;
++    if (machine->kernel_filename) {
++        arm_load_kernel(s->soc.fpd.apu.cpu[0], &s->binfo);
++    } else {
++        AddressSpace *as = arm_boot_address_space(s->soc.fpd.apu.cpu[0],
++                                                  &s->binfo);
++        /* Some boot-loaders (e.g u-boot) don't like blobs at address 0 (NULL).
++         * Offset things by 4K.  */
++        s->binfo.loader_start = 0x1000;
++        s->binfo.dtb_limit = 0x1000000;
++        if (arm_load_dtb(s->binfo.loader_start,
++                         &s->binfo, s->binfo.dtb_limit, as) < 0) {
++            exit(EXIT_FAILURE);
++        }
++    }
 +}
 +
-+static void versal_unimp(Versal *s)
++static void versal_virt_machine_instance_init(Object *obj)
 +{
-+    versal_unimp_area(s, "psm", &s->mr_ps,
-+                        MM_PSM_START, MM_PSM_END - MM_PSM_START);
-+    versal_unimp_area(s, "crl", &s->mr_ps,
-+                        MM_CRL, MM_CRL_SIZE);
-+    versal_unimp_area(s, "crf", &s->mr_ps,
-+                        MM_FPD_CRF, MM_FPD_CRF_SIZE);
-+    versal_unimp_area(s, "iou-scntr", &s->mr_ps,
-+                        MM_IOU_SCNTR, MM_IOU_SCNTR_SIZE);
-+    versal_unimp_area(s, "iou-scntr-seucre", &s->mr_ps,
-+                        MM_IOU_SCNTRS, MM_IOU_SCNTRS_SIZE);
 +}
 +
-+static void versal_realize(DeviceState *dev, Error **errp)
++static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
 +{
-+    Versal *s = XLNX_VERSAL(dev);
-+    qemu_irq pic[XLNX_VERSAL_NR_IRQS];
++    MachineClass *mc = MACHINE_CLASS(oc);
 +
-+    versal_create_apu_cpus(s, errp);
-+    versal_create_apu_gic(s, pic, errp);
-+    versal_create_uarts(s, pic);
-+    versal_create_gems(s, pic);
-+    versal_map_ddr(s);
-+    versal_unimp(s);
-+
-+    /* Create the On Chip Memory (OCM).  */
-+    memory_region_init_ram(&s->lpd.mr_ocm, OBJECT(s), "ocm",
-+                           MM_OCM_SIZE, &error_fatal);
-+
-+    memory_region_add_subregion_overlap(&s->mr_ps, MM_OCM, &s->lpd.mr_ocm, 0);
-+    memory_region_add_subregion_overlap(&s->fpd.apu.mr, 0, &s->mr_ps, 0);
++    mc->desc = "Xilinx Versal Virtual development board";
++    mc->init = versal_virt_init;
++    mc->max_cpus = XLNX_VERSAL_NR_ACPUS;
++    mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
++    mc->no_cdrom = true;
 +}
 +
-+static void versal_init(Object *obj)
-+{
-+    Versal *s = XLNX_VERSAL(obj);
-+
-+    memory_region_init(&s->fpd.apu.mr, obj, "mr-apu", UINT64_MAX);
-+    memory_region_init(&s->mr_ps, obj, "mr-ps-switch", UINT64_MAX);
-+}
-+
-+static Property versal_properties[] = {
-+    DEFINE_PROP_LINK("ddr", Versal, cfg.mr_ddr, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-+    DEFINE_PROP_UINT32("psci-conduit", Versal, cfg.psci_conduit, 0),
-+    DEFINE_PROP_END_OF_LIST()
++static const TypeInfo versal_virt_machine_init_typeinfo = {
++    .name       = TYPE_XLNX_VERSAL_VIRT_MACHINE,
++    .parent     = TYPE_MACHINE,
++    .class_init = versal_virt_machine_class_init,
++    .instance_init = versal_virt_machine_instance_init,
++    .instance_size = sizeof(VersalVirt),
 +};
 +
-+static void versal_class_init(ObjectClass *klass, void *data)
++static void versal_virt_machine_init_register_types(void)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = versal_realize;
-+    dc->props = versal_properties;
-+    /* No VMSD since we haven't got any top-level SoC state to save.  */
++    type_register_static(&versal_virt_machine_init_typeinfo);
 +}
 +
-+static const TypeInfo versal_info = {
-+    .name = TYPE_XLNX_VERSAL,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(Versal),
-+    .instance_init = versal_init,
-+    .class_init = versal_class_init,
-+};
++type_init(versal_virt_machine_init_register_types)
 +
-+static void versal_register_types(void)
-+{
-+    type_register_static(&versal_info);
-+}
-+
-+type_init(versal_register_types);
-diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
-new file mode 100644
-index 0000000000..9da621e4b6
---- /dev/null
-+++ b/include/hw/arm/xlnx-versal.h
-@@ -0,0 +1,122 @@
-+/*
-+ * Model of the Xilinx Versal
-+ *
-+ * Copyright (c) 2018 Xilinx Inc.
-+ * Written by Edgar E. Iglesias
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+#ifndef XLNX_VERSAL_H
-+#define XLNX_VERSAL_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/arm/arm.h"
-+#include "hw/intc/arm_gicv3.h"
-+
-+#define TYPE_XLNX_VERSAL "xlnx-versal"
-+#define XLNX_VERSAL(obj) OBJECT_CHECK(Versal, (obj), TYPE_XLNX_VERSAL)
-+
-+#define XLNX_VERSAL_NR_ACPUS   2
-+#define XLNX_VERSAL_NR_UARTS   2
-+#define XLNX_VERSAL_NR_GEMS    2
-+#define XLNX_VERSAL_NR_IRQS    256
-+
-+typedef struct Versal {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+
-+    /*< public >*/
-+    struct {
-+        struct {
-+            MemoryRegion mr;
-+            ARMCPU *cpu[XLNX_VERSAL_NR_ACPUS];
-+            GICv3State gic;
-+        } apu;
-+    } fpd;
-+
-+    MemoryRegion mr_ps;
-+
-+    struct {
-+        /* 4 ranges to access DDR.  */
-+        MemoryRegion mr_ddr_ranges[4];
-+    } noc;
-+
-+    struct {
-+        MemoryRegion mr_ocm;
-+
-+        struct {
-+            SysBusDevice *uart[XLNX_VERSAL_NR_UARTS];
-+            SysBusDevice *gem[XLNX_VERSAL_NR_GEMS];
-+        } iou;
-+    } lpd;
-+
-+    struct {
-+        MemoryRegion *mr_ddr;
-+        uint32_t psci_conduit;
-+    } cfg;
-+} Versal;
-+
-+/* Memory-map and IRQ definitions. Copied a subset from
-+ * auto-generated files.  */
-+
-+#define VERSAL_GIC_MAINT_IRQ        9
-+#define VERSAL_TIMER_VIRT_IRQ       11
-+#define VERSAL_TIMER_S_EL1_IRQ      13
-+#define VERSAL_TIMER_NS_EL1_IRQ     14
-+#define VERSAL_TIMER_NS_EL2_IRQ     10
-+
-+#define VERSAL_UART0_IRQ_0         18
-+#define VERSAL_UART1_IRQ_0         19
-+#define VERSAL_GEM0_IRQ_0          56
-+#define VERSAL_GEM0_WAKE_IRQ_0     57
-+#define VERSAL_GEM1_IRQ_0          58
-+#define VERSAL_GEM1_WAKE_IRQ_0     59
-+
-+/* Architecturally eserved IRQs suitable for virtualization.  */
-+#define VERSAL_RSVD_HIGH_IRQ_FIRST 160
-+#define VERSAL_RSVD_HIGH_IRQ_LAST  255
-+
-+#define MM_TOP_RSVD                 0xa0000000U
-+#define MM_TOP_RSVD_SIZE            0x4000000
-+#define MM_GIC_APU_DIST_MAIN        0xf9000000U
-+#define MM_GIC_APU_DIST_MAIN_SIZE   0x10000
-+#define MM_GIC_APU_REDIST_0         0xf9080000U
-+#define MM_GIC_APU_REDIST_0_SIZE    0x80000
-+
-+#define MM_UART0                    0xff000000U
-+#define MM_UART0_SIZE               0x10000
-+#define MM_UART1                    0xff010000U
-+#define MM_UART1_SIZE               0x10000
-+
-+#define MM_GEM0                     0xff0c0000U
-+#define MM_GEM0_SIZE                0x10000
-+#define MM_GEM1                     0xff0d0000U
-+#define MM_GEM1_SIZE                0x10000
-+
-+#define MM_OCM                      0xfffc0000U
-+#define MM_OCM_SIZE                 0x40000
-+
-+#define MM_TOP_DDR                  0x0
-+#define MM_TOP_DDR_SIZE             0x80000000U
-+#define MM_TOP_DDR_2                0x800000000ULL
-+#define MM_TOP_DDR_2_SIZE           0x800000000ULL
-+#define MM_TOP_DDR_3                0xc000000000ULL
-+#define MM_TOP_DDR_3_SIZE           0x4000000000ULL
-+#define MM_TOP_DDR_4                0x10000000000ULL
-+#define MM_TOP_DDR_4_SIZE           0xb780000000ULL
-+
-+#define MM_PSM_START                0xffc80000U
-+#define MM_PSM_END                  0xffcf0000U
-+
-+#define MM_CRL                      0xff5e0000U
-+#define MM_CRL_SIZE                 0x300000
-+#define MM_IOU_SCNTR                0xff130000U
-+#define MM_IOU_SCNTR_SIZE           0x10000
-+#define MM_IOU_SCNTRS               0xff140000U
-+#define MM_IOU_SCNTRS_SIZE          0x10000
-+#define MM_FPD_CRF                  0xfd1a0000U
-+#define MM_FPD_CRF_SIZE             0x140000
-+#endif
 -- 
 2.17.1
