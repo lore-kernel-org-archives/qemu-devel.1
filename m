@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhdE-000707-Ek
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gAhwZ-0006de-GF
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhd7-0006tC-S7
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:26 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:29214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhd6-0006qy-GQ
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:20 -0400
-From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 11 Oct 2018 20:32:15 +0000
-Message-ID: <20181011203115.18666-11-alistair.francis@wdc.com>
-References: <20181011203115.18666-1-alistair.francis@wdc.com>
-In-Reply-To: <20181011203115.18666-1-alistair.francis@wdc.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F2656771BE5E1649806DDD120A8545B4@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: [Qemu-devel] [PULL 10/10] RISC-V: Don't add NULL bootargs to
- device-tree
+	(envelope-from <richard.henderson@linaro.org>) id 1gAhwK-0003BF-67
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:17 -0400
+Received: from mail-pl1-x62e.google.com ([2607:f8b0:4864:20::62e]:35123)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gAhwJ-00035Z-Q0
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:11 -0400
+Received: by mail-pl1-x62e.google.com with SMTP id f8-v6so4800267plb.2
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:11 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 11 Oct 2018 13:51:47 -0700
+Message-Id: <20181011205206.3552-2-richard.henderson@linaro.org>
+In-Reply-To: <20181011205206.3552-1-richard.henderson@linaro.org>
+References: <20181011205206.3552-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 01/20] target/arm: Hoist address increment for
+ vector memory ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +27,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>Alistair Francis <Alistair.Francis@wdc.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
 
-RnJvbTogTWljaGFlbCBDbGFyayA8bWpjQHNpZml2ZS5jb20+DQoNCkNjOiBQYWxtZXIgRGFiYmVs
-dCA8cGFsbWVyQHNpZml2ZS5jb20+DQpDYzogQWxpc3RhaXIgRnJhbmNpcyA8QWxpc3RhaXIuRnJh
-bmNpc0B3ZGMuY29tPg0KU2lnbmVkLW9mZi1ieTogTWljaGFlbCBDbGFyayA8bWpjQHNpZml2ZS5j
-b20+DQpSZXZpZXdlZC1ieTogQWxpc3RhaXIgRnJhbmNpcyA8YWxpc3RhaXIuZnJhbmNpc0B3ZGMu
-Y29tPg0KUmV2aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0
-LmNvbT4NClJldmlld2VkLWJ5OiBQYWxtZXIgRGFiYmVsdCA8cGFsbWVyQHNpZml2ZS5jb20+DQpT
-aWduZWQtb2ZmLWJ5OiBBbGlzdGFpciBGcmFuY2lzIDxhbGlzdGFpci5mcmFuY2lzQHdkYy5jb20+
-DQotLS0NCiBody9yaXNjdi9zaWZpdmVfdS5jIHwgNCArKystDQogaHcvcmlzY3Yvc3Bpa2UuYyAg
-ICB8IDYgKysrKy0tDQogaHcvcmlzY3YvdmlydC5jICAgICB8IDQgKysrLQ0KIDMgZmlsZXMgY2hh
-bmdlZCwgMTAgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2h3
-L3Jpc2N2L3NpZml2ZV91LmMgYi9ody9yaXNjdi9zaWZpdmVfdS5jDQppbmRleCA0ZTI3MzExOWMz
-Li4wYzUxYzYxMDgyIDEwMDY0NA0KLS0tIGEvaHcvcmlzY3Yvc2lmaXZlX3UuYw0KKysrIGIvaHcv
-cmlzY3Yvc2lmaXZlX3UuYw0KQEAgLTI1OSw3ICsyNTksOSBAQCBzdGF0aWMgdm9pZCBjcmVhdGVf
-ZmR0KFNpRml2ZVVTdGF0ZSAqcywgY29uc3Qgc3RydWN0IE1lbW1hcEVudHJ5ICptZW1tYXAsDQog
-DQogICAgIHFlbXVfZmR0X2FkZF9zdWJub2RlKGZkdCwgIi9jaG9zZW4iKTsNCiAgICAgcWVtdV9m
-ZHRfc2V0cHJvcF9zdHJpbmcoZmR0LCAiL2Nob3NlbiIsICJzdGRvdXQtcGF0aCIsIG5vZGVuYW1l
-KTsNCi0gICAgcWVtdV9mZHRfc2V0cHJvcF9zdHJpbmcoZmR0LCAiL2Nob3NlbiIsICJib290YXJn
-cyIsIGNtZGxpbmUpOw0KKyAgICBpZiAoY21kbGluZSkgew0KKyAgICAgICAgcWVtdV9mZHRfc2V0
-cHJvcF9zdHJpbmcoZmR0LCAiL2Nob3NlbiIsICJib290YXJncyIsIGNtZGxpbmUpOw0KKyAgICB9
-DQogICAgIGdfZnJlZShub2RlbmFtZSk7DQogfQ0KIA0KZGlmZiAtLWdpdCBhL2h3L3Jpc2N2L3Nw
-aWtlLmMgYi9ody9yaXNjdi9zcGlrZS5jDQppbmRleCBiZTVlZjg1ZTgxLi44YTcxMmVkNDkwIDEw
-MDY0NA0KLS0tIGEvaHcvcmlzY3Yvc3Bpa2UuYw0KKysrIGIvaHcvcmlzY3Yvc3Bpa2UuYw0KQEAg
-LTE1Niw4ICsxNTYsMTAgQEAgc3RhdGljIHZvaWQgY3JlYXRlX2ZkdChTcGlrZVN0YXRlICpzLCBj
-b25zdCBzdHJ1Y3QgTWVtbWFwRW50cnkgKm1lbW1hcCwNCiAgICAgZ19mcmVlKGNlbGxzKTsNCiAg
-ICAgZ19mcmVlKG5vZGVuYW1lKTsNCiANCi0gICAgcWVtdV9mZHRfYWRkX3N1Ym5vZGUoZmR0LCAi
-L2Nob3NlbiIpOw0KLSAgICBxZW11X2ZkdF9zZXRwcm9wX3N0cmluZyhmZHQsICIvY2hvc2VuIiwg
-ImJvb3RhcmdzIiwgY21kbGluZSk7DQorICAgIGlmIChjbWRsaW5lKSB7DQorICAgICAgICBxZW11
-X2ZkdF9hZGRfc3Vibm9kZShmZHQsICIvY2hvc2VuIik7DQorICAgICAgICBxZW11X2ZkdF9zZXRw
-cm9wX3N0cmluZyhmZHQsICIvY2hvc2VuIiwgImJvb3RhcmdzIiwgY21kbGluZSk7DQorICAgIH0N
-CiAgfQ0KIA0KIHN0YXRpYyB2b2lkIHNwaWtlX3YxXzEwXzBfYm9hcmRfaW5pdChNYWNoaW5lU3Rh
-dGUgKm1hY2hpbmUpDQpkaWZmIC0tZ2l0IGEvaHcvcmlzY3YvdmlydC5jIGIvaHcvcmlzY3Yvdmly
-dC5jDQppbmRleCAzZjMwZWI3NGQyLi42MmFkZDQ3NjY3IDEwMDY0NA0KLS0tIGEvaHcvcmlzY3Yv
-dmlydC5jDQorKysgYi9ody9yaXNjdi92aXJ0LmMNCkBAIC0yODQsNyArMjg0LDkgQEAgc3RhdGlj
-IHZvaWQgKmNyZWF0ZV9mZHQoUklTQ1ZWaXJ0U3RhdGUgKnMsIGNvbnN0IHN0cnVjdCBNZW1tYXBF
-bnRyeSAqbWVtbWFwLA0KIA0KICAgICBxZW11X2ZkdF9hZGRfc3Vibm9kZShmZHQsICIvY2hvc2Vu
-Iik7DQogICAgIHFlbXVfZmR0X3NldHByb3Bfc3RyaW5nKGZkdCwgIi9jaG9zZW4iLCAic3Rkb3V0
-LXBhdGgiLCBub2RlbmFtZSk7DQotICAgIHFlbXVfZmR0X3NldHByb3Bfc3RyaW5nKGZkdCwgIi9j
-aG9zZW4iLCAiYm9vdGFyZ3MiLCBjbWRsaW5lKTsNCisgICAgaWYgKGNtZGxpbmUpIHsNCisgICAg
-ICAgIHFlbXVfZmR0X3NldHByb3Bfc3RyaW5nKGZkdCwgIi9jaG9zZW4iLCAiYm9vdGFyZ3MiLCBj
-bWRsaW5lKTsNCisgICAgfQ0KICAgICBnX2ZyZWUobm9kZW5hbWUpOw0KIA0KICAgICByZXR1cm4g
-ZmR0Ow0KLS0gDQoyLjE3LjENCg0K
+From: Richard Henderson <rth@twiddle.net>
+
+This can reduce the number of opcodes required for certain
+complex forms of load-multiple (e.g. ld4.16b).
+
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ target/arm/translate-a64.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index c403b12eb9..76b5ca3606 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -3012,7 +3012,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     bool is_store = !extract32(insn, 22, 1);
+     bool is_postidx = extract32(insn, 23, 1);
+     bool is_q = extract32(insn, 30, 1);
+-    TCGv_i64 tcg_addr, tcg_rn;
++    TCGv_i64 tcg_addr, tcg_rn, tcg_ebytes;
+ 
+     int ebytes = 1 << size;
+     int elements = (is_q ? 128 : 64) / (8 << size);
+@@ -3077,6 +3077,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     tcg_rn = cpu_reg_sp(s, rn);
+     tcg_addr = tcg_temp_new_i64();
+     tcg_gen_mov_i64(tcg_addr, tcg_rn);
++    tcg_ebytes = tcg_const_i64(ebytes);
+ 
+     for (r = 0; r < rpt; r++) {
+         int e;
+@@ -3101,7 +3102,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+                         clear_vec_high(s, is_q, tt);
+                     }
+                 }
+-                tcg_gen_addi_i64(tcg_addr, tcg_addr, ebytes);
++                tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
+                 tt = (tt + 1) % 32;
+             }
+         }
+@@ -3115,6 +3116,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+             tcg_gen_add_i64(tcg_rn, tcg_rn, cpu_reg(s, rm));
+         }
+     }
++    tcg_temp_free_i64(tcg_ebytes);
+     tcg_temp_free_i64(tcg_addr);
+ }
+ 
+@@ -3157,7 +3159,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+     bool replicate = false;
+     int index = is_q << 3 | S << 2 | size;
+     int ebytes, xs;
+-    TCGv_i64 tcg_addr, tcg_rn;
++    TCGv_i64 tcg_addr, tcg_rn, tcg_ebytes;
+ 
+     switch (scale) {
+     case 3:
+@@ -3210,6 +3212,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+     tcg_rn = cpu_reg_sp(s, rn);
+     tcg_addr = tcg_temp_new_i64();
+     tcg_gen_mov_i64(tcg_addr, tcg_rn);
++    tcg_ebytes = tcg_const_i64(ebytes);
+ 
+     for (xs = 0; xs < selem; xs++) {
+         if (replicate) {
+@@ -3252,7 +3255,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+                 do_vec_st(s, rt, index, tcg_addr, scale);
+             }
+         }
+-        tcg_gen_addi_i64(tcg_addr, tcg_addr, ebytes);
++        tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
+         rt = (rt + 1) % 32;
+     }
+ 
+@@ -3264,6 +3267,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+             tcg_gen_add_i64(tcg_rn, tcg_rn, cpu_reg(s, rm));
+         }
+     }
++    tcg_temp_free_i64(tcg_ebytes);
+     tcg_temp_free_i64(tcg_addr);
+ }
+ 
+-- 
+2.17.1
