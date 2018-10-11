@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gAdPv-0001NR-MK
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 12:02:28 -0400
+	(envelope-from <liq3ea@163.com>) id 1gAdfe-000639-Rn
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 12:18:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1gAdPu-000597-TL
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 12:02:27 -0400
-Date: Thu, 11 Oct 2018 18:02:17 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20181011160217.GC23047@localhost.localdomain>
-References: <20181011105802.22665-1-berto@igalia.com>
+	(envelope-from <liq3ea@163.com>) id 1gAdfa-0004xl-TP
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 12:18:42 -0400
+Received: from m12-16.163.com ([220.181.12.16]:33142)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>) id 1gAdfX-0004uI-75
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 12:18:38 -0400
+From: Li Qiang <liq3ea@163.com>
+Date: Thu, 11 Oct 2018 09:18:20 -0700
+Message-Id: <20181011161820.38794-1-liq3ea@163.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181011105802.22665-1-berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Get the request alignment for
- encrypted images from QCryptoBlock
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] piix_pci: change the i440fx data sheet link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,17 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>
+To: mst@redhat.com, marcel.apfelbaum@gmail.com
+Cc: qemu-devel@nongnu.org, philmd@redhat.com, Li Qiang <liq3ea@163.com>
 
-Am 11.10.2018 um 12:58 hat Alberto Garcia geschrieben:
-> This doesn't have any practical effect at the moment because the
-> values of BDRV_SECTOR_SIZE, QCRYPTO_BLOCK_LUKS_SECTOR_SIZE and
-> QCRYPTO_BLOCK_QCOW_SECTOR_SIZE are all the same (512 bytes), but
-> future encryption methods could have different requirements.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+Seems the intel link is unavailable, change it to qemu site.
 
-Thanks, applied to the block branch.
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/pci-host/piix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Kevin
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index 0e608347c1..56a42055f1 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -40,7 +40,7 @@
+ 
+ /*
+  * I440FX chipset data sheet.
+- * http://download.intel.com/design/chipsets/datashts/29054901.pdf
++ * https://wiki.qemu.org/File:29054901.pdf
+  */
+ 
+ #define I440FX_PCI_HOST_BRIDGE(obj) \
+-- 
+2.17.1
