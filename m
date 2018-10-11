@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAkat-0001po-Fw
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:16 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gAkgx-0006Pg-Ht
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:48:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAkaq-0002K1-St
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:15 -0400
-Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:33528)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gAkgs-0006jq-U2
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:48:31 -0400
+Received: from mail-yb1-f172.google.com ([209.85.219.172]:34068)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gAkaq-0002Hj-IP
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:12 -0400
-Received: by mail-pl1-x62f.google.com with SMTP id s4-v6so4986189plp.0
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 16:42:11 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 11 Oct 2018 16:41:58 -0700
-Message-Id: <20181011234159.11496-7-richard.henderson@linaro.org>
-In-Reply-To: <20181011234159.11496-1-richard.henderson@linaro.org>
-References: <20181011234159.11496-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 6/7] target/ppc: Split out float_invalid_op_div
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1gAkgs-0006jO-Oh
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:48:26 -0400
+Received: by mail-yb1-f172.google.com with SMTP id 184-v6so4311196ybg.1
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 16:48:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20180930232312.16486-1-f4bug@amsat.org>
+	<20180930232312.16486-3-f4bug@amsat.org>
+	<20181011024611.GB17357@magic>
+In-Reply-To: <20181011024611.GB17357@magic>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 12 Oct 2018 01:48:14 +0200
+Message-ID: <CAAdtpL6CbwwW4m9OnDQof_8iPiyttnbffRy_03Typt3hbdZLtw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] tests/vm: Do not abuse parallelism
+ when KVM is not available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,97 +34,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/fpu_helper.c | 52 +++++++++++++++++++----------------------
- 1 file changed, 24 insertions(+), 28 deletions(-)
+On Thu, Oct 11, 2018 at 4:46 AM Fam Zheng <famz@redhat.com> wrote:
+> On Mon, 10/01 01:23, Philippe Mathieu-Daud=C3=A9 wrote:
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > ---
+> > v2: Add get_default_jobs (Fam suggestion)
+> > ---
+> >  tests/vm/basevm.py | 13 ++++++++++---
+> >  1 file changed, 10 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> > index 5a5fa09752..fc203e9f53 100755
+> > --- a/tests/vm/basevm.py
+> > +++ b/tests/vm/basevm.py
+> > @@ -202,6 +202,13 @@ class BaseVM(object):
+> >          return self._guest.qmp(*args, **kwargs)
+> >
+> >  def parse_args(vm_name):
+> > +
+> > +    def get_default_jobs():
+> > +        if kvm_available():
+> > +            return multiprocessing.cpu_count() / 2
+> > +        else:
+> > +            return 1
+> > +
+> >      parser =3D optparse.OptionParser(
+> >          description=3D"VM test utility.  Exit codes: "
+> >                      "0 =3D success, "
+> > @@ -214,7 +221,7 @@ def parse_args(vm_name):
+> >                        help=3D"image file name")
+> >      parser.add_option("--force", "-f", action=3D"store_true",
+> >                        help=3D"force build image even if image exists")
+> > -    parser.add_option("--jobs", type=3Dint, default=3Dmultiprocessing.=
+cpu_count() / 2,
+> > +    parser.add_option("--jobs", type=3Dint, default=3Dget_default_jobs=
+(),
+> >                        help=3D"number of virtual CPUs")
+> >      parser.add_option("--verbose", "-V", action=3D"store_true",
+> >                        help=3D"Pass V=3D1 to builds within the guest")
+> > @@ -237,7 +244,7 @@ def main(vmcls):
+> >              return 1
+> >          logging.basicConfig(level=3D(logging.DEBUG if args.debug
+> >                                     else logging.WARN))
+> > -        vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs)
+> > +        vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs if kvm_avai=
+lable() else 0)
+>
+> What's wrong with just using args.jobs? It defaults to 1 if kvm_available=
+()
+> returns false, so I don't think we need another condition here.
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index ef251d062f..127c08bcec 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -715,6 +715,21 @@ float64 helper_fmul(CPUPPCState *env, float64 arg1, float64 arg2)
-     return ret;
- }
- 
-+static void float_invalid_op_div(CPUPPCState *env, bool set_fprc,
-+                                 uintptr_t retaddr, int classes)
-+{
-+    classes &= ~is_neg;
-+    if (classes == is_inf) {
-+        /* Division of infinity by infinity */
-+        float_invalid_op_vxidi(env, set_fprc, retaddr);
-+    } else if (classes == is_zero) {
-+        /* Division of zero by zero */
-+        float_invalid_op_vxzdz(env, set_fprc, retaddr);
-+    } else if (classes & is_snan) {
-+        float_invalid_op_vxsnan(env, retaddr);
-+    }
-+}
-+
- /* fdiv - fdiv. */
- float64 helper_fdiv(CPUPPCState *env, float64 arg1, float64 arg2)
- {
-@@ -723,18 +738,9 @@ float64 helper_fdiv(CPUPPCState *env, float64 arg1, float64 arg2)
- 
-     if (unlikely(status)) {
-         if (status & float_flag_invalid) {
--            /* Determine what kind of invalid operation was seen.  */
--            if (float64_is_infinity(arg1) && float64_is_infinity(arg2)) {
--                /* Division of infinity by infinity */
--                float_invalid_op_vxidi(env, 1, GETPC());
--            } else if (float64_is_zero(arg1) && float64_is_zero(arg2)) {
--                /* Division of zero by zero */
--                float_invalid_op_vxzdz(env, 1, GETPC());
--            } else if (float64_is_signaling_nan(arg1, &env->fp_status) ||
--                       float64_is_signaling_nan(arg2, &env->fp_status)) {
--                /* sNaN division */
--                float_invalid_op_vxsnan(env, GETPC());
--            }
-+            float_invalid_op_div(env, 1, GETPC(),
-+                                 float64_classify(arg1) |
-+                                 float64_classify(arg2));
-         }
-         if (status & float_flag_divbyzero) {
-             float_zero_divide_excp(env, GETPC());
-@@ -1969,14 +1975,9 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                           \
-         env->fp_status.float_exception_flags |= tstat.float_exception_flags;  \
-                                                                               \
-         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {     \
--            if (tp##_is_infinity(xa.fld) && tp##_is_infinity(xb.fld)) {       \
--                float_invalid_op_vxidi(env, sfprf, GETPC());                  \
--            } else if (tp##_is_zero(xa.fld) && tp##_is_zero(xb.fld)) {        \
--                float_invalid_op_vxzdz(env, sfprf, GETPC());                  \
--            } else if (tp##_is_signaling_nan(xa.fld, &tstat) ||               \
--                       tp##_is_signaling_nan(xb.fld, &tstat)) {               \
--                float_invalid_op_vxsnan(env, GETPC());                        \
--            }                                                                 \
-+            float_invalid_op_div(env, sfprf, GETPC(),                         \
-+                                 tp##_classify(xa.fld) |                      \
-+                                 tp##_classify(xb.fld));                      \
-         }                                                                     \
-         if (unlikely(tstat.float_exception_flags & float_flag_divbyzero)) {   \
-             float_zero_divide_excp(env, GETPC());                             \
-@@ -2020,14 +2021,9 @@ void helper_xsdivqp(CPUPPCState *env, uint32_t opcode)
-     env->fp_status.float_exception_flags |= tstat.float_exception_flags;
- 
-     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
--        if (float128_is_infinity(xa.f128) && float128_is_infinity(xb.f128)) {
--            float_invalid_op_vxidi(env, 1, GETPC());
--        } else if (float128_is_zero(xa.f128) && float128_is_zero(xb.f128)) {
--            float_invalid_op_vxzdz(env, 1, GETPC());
--        } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
--                   float128_is_signaling_nan(xb.f128, &tstat)) {
--            float_invalid_op_vxsnan(env, GETPC());
--        }
-+        float_invalid_op_div(env, 1, GETPC(),
-+                             float128_classify(xa.f128) |
-+                             float128_classify(xb.f128));
-     }
-     if (unlikely(tstat.float_exception_flags & float_flag_divbyzero)) {
-         float_zero_divide_excp(env, GETPC());
--- 
-2.17.1
+You are right, I missed that.
+
+>
+> >          if args.build_image:
+> >              if os.path.exists(args.image) and not args.force:
+> >                  sys.stderr.writelines(["Image file exists: %s\n" % arg=
+s.image,
+> > @@ -248,7 +255,7 @@ def main(vmcls):
+> >              vm.add_source_dir(args.build_qemu)
+> >              cmd =3D [vm.BUILD_SCRIPT.format(
+> >                     configure_opts =3D " ".join(argv),
+> > -                   jobs=3Dargs.jobs,
+> > +                   jobs=3Dargs.jobs if kvm_available() else 1,
+>
+> Again, can't we just use args.jobs?
+>
+> >                     verbose =3D "V=3D1" if args.verbose else "")]
+> >          else:
+> >              cmd =3D argv
+> > --
+> > 2.19.0
+> >
+>
+> Fam
