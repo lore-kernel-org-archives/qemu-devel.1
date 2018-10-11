@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gAbeT-0004sx-ID
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:29 -0400
+	(envelope-from <wexu@redhat.com>) id 1gAbeb-0004wz-9P
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gAbeP-000620-WE
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35882)
+	(envelope-from <wexu@redhat.com>) id 1gAbeZ-00066b-9R
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42122)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gAbeP-00060H-G4
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:17 -0400
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gAbeV-00062t-Bb
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:25 -0400
 From: wexu@redhat.com
-Date: Thu, 11 Oct 2018 10:08:29 -0400
-Message-Id: <1539266915-15216-7-git-send-email-wexu@redhat.com>
+Date: Thu, 11 Oct 2018 10:08:31 -0400
+Message-Id: <1539266915-15216-9-git-send-email-wexu@redhat.com>
 In-Reply-To: <1539266915-15216-1-git-send-email-wexu@redhat.com>
 References: <1539266915-15216-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [[RFC v3 06/12] virtio: get avail bytes check for
+Subject: [Qemu-devel] [[RFC v3 08/12] virtio: event suppression support for
  packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,215 +29,175 @@ Cc: jasowang@redhat.com, tiwei.bie@intel.com, wexu@redhat.com, jfreimann@redhat.
 
 From: Wei Xu <wexu@redhat.com>
 
-Same thought as 1.0 except a bit confused when trying to reuse
-'shadow_avail_idx', so the interrelated new event_idx and the wrap
-counter for notifications has been introduced in previous patch.
-
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/virtio/virtio.c | 176 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 173 insertions(+), 3 deletions(-)
+ hw/virtio/virtio.c | 126 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 123 insertions(+), 3 deletions(-)
 
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 86f88da..13c6c98 100644
+index d12a7e3..1d25776 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -375,6 +375,17 @@ int virtio_queue_ready(VirtQueue *vq)
-     return vq->vring.avail != 0;
+@@ -241,6 +241,30 @@ static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
+     virtio_tswap16s(vdev, &desc->next);
  }
  
-+static void vring_packed_desc_read(VirtIODevice *vdev, VRingPackedDesc *desc,
-+                            MemoryRegionCache *cache, int i)
++static void vring_packed_event_read(VirtIODevice *vdev,
++                            MemoryRegionCache *cache, VRingPackedDescEvent *e)
 +{
-+    address_space_read_cached(cache, i * sizeof(VRingPackedDesc),
-+                              desc, sizeof(VRingPackedDesc));
-+    virtio_tswap16s(vdev, &desc->flags);
-+    virtio_tswap64s(vdev, &desc->addr);
-+    virtio_tswap32s(vdev, &desc->len);
-+    virtio_tswap16s(vdev, &desc->id);
++    address_space_read_cached(cache, 0, e, sizeof(*e));
++    virtio_tswap16s(vdev, &e->off_wrap);
++    virtio_tswap16s(vdev, &e->flags);
 +}
 +
- static void vring_packed_desc_read_flags(VirtIODevice *vdev,
-                     VRingPackedDesc *desc, MemoryRegionCache *cache, int i)
- {
-@@ -672,9 +683,9 @@ static int virtqueue_read_next_desc(VirtIODevice *vdev, VRingDesc *desc,
-     return VIRTQUEUE_READ_DESC_MORE;
- }
- 
--void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
--                               unsigned int *out_bytes,
--                               unsigned max_in_bytes, unsigned max_out_bytes)
-+static void virtqueue_split_get_avail_bytes(VirtQueue *vq,
-+                            unsigned int *in_bytes, unsigned int *out_bytes,
-+                            unsigned max_in_bytes, unsigned max_out_bytes)
- {
-     VirtIODevice *vdev = vq->vdev;
-     unsigned int max, idx;
-@@ -797,6 +808,165 @@ err:
-     goto done;
- }
- 
-+static void virtqueue_packed_get_avail_bytes(VirtQueue *vq,
-+                            unsigned int *in_bytes, unsigned int *out_bytes,
-+                            unsigned max_in_bytes, unsigned max_out_bytes)
++static void vring_packed_off_wrap_write(VirtIODevice *vdev,
++                            MemoryRegionCache *cache, uint16_t off_wrap)
 +{
-+    VirtIODevice *vdev = vq->vdev;
-+    unsigned int max, idx;
-+    unsigned int total_bufs, in_total, out_total;
-+    MemoryRegionCache *desc_cache;
-+    VRingMemoryRegionCaches *caches;
-+    MemoryRegionCache indirect_desc_cache = MEMORY_REGION_CACHE_INVALID;
-+    int64_t len = 0;
-+    VRingPackedDesc desc;
-+    bool wrap_counter;
++    virtio_tswap16s(vdev, &off_wrap);
++    address_space_write_cached(cache, 0, &off_wrap, sizeof(off_wrap));
++    address_space_cache_invalidate(cache, 0, sizeof(off_wrap));
++}
 +
-+    if (unlikely(!vq->vring.desc)) {
-+        if (in_bytes) {
-+            *in_bytes = 0;
-+        }
-+        if (out_bytes) {
-+            *out_bytes = 0;
-+        }
++static void vring_packed_flags_write(VirtIODevice *vdev,
++                            MemoryRegionCache *cache, uint16_t flags)
++{
++    virtio_tswap16s(vdev, &flags);
++    address_space_write_cached(cache, sizeof(uint16_t), &flags, sizeof(flags));
++    address_space_cache_invalidate(cache, sizeof(uint16_t), sizeof(flags));
++}
++
+ static VRingMemoryRegionCaches *vring_get_region_caches(struct VirtQueue *vq)
+ {
+     VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
+@@ -347,7 +371,7 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
+     address_space_cache_invalidate(&caches->used, pa, sizeof(val));
+ }
+ 
+-void virtio_queue_set_notification(VirtQueue *vq, int enable)
++static void virtio_queue_set_notification_split(VirtQueue *vq, int enable)
+ {
+     vq->notification = enable;
+ 
+@@ -370,6 +394,51 @@ void virtio_queue_set_notification(VirtQueue *vq, int enable)
+     rcu_read_unlock();
+ }
+ 
++static void virtio_queue_set_notification_packed(VirtQueue *vq, int enable)
++{
++    VRingPackedDescEvent e;
++    VRingMemoryRegionCaches *caches;
++
++    rcu_read_lock();
++    caches  = vring_get_region_caches(vq);
++    vring_packed_event_read(vq->vdev, &caches->device, &e);
++
++    if (!enable) {
++        e.flags = RING_EVENT_FLAGS_DISABLE;
++        goto out;
++    }
++
++    e.flags = RING_EVENT_FLAGS_ENABLE;
++    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
++        uint16_t off_wrap = vq->event_idx | vq->event_wrap_counter << 15;
++
++        vring_packed_off_wrap_write(vq->vdev, &caches->device, off_wrap);
++        /* Make sure off_wrap is wrote before flags */
++        smp_wmb();
++
++        e.flags = RING_EVENT_FLAGS_DESC;
++    }
++
++out:
++    vring_packed_flags_write(vq->vdev, &caches->device, e.flags);
++    rcu_read_unlock();
++}
++
++void virtio_queue_set_notification(VirtQueue *vq, int enable)
++{
++    vq->notification = enable;
++
++    if (!vq->vring.desc) {
 +        return;
 +    }
 +
-+    rcu_read_lock();
-+    idx = vq->last_avail_idx;
-+    wrap_counter = vq->avail_wrap_counter;
-+    total_bufs = in_total = out_total = 0;
-+
-+    max = vq->vring.num;
-+    caches = vring_get_region_caches(vq);
-+    if (caches->desc.len < max * sizeof(VRingPackedDesc)) {
-+        virtio_error(vdev, "Cannot map descriptor ring");
-+        goto err;
-+    }
-+
-+    desc_cache = &caches->desc;
-+    vring_packed_desc_read(vdev, &desc, desc_cache, idx);
-+    /* Make sure we see all the fields*/
-+    smp_rmb();
-+    while (is_desc_avail(&desc, wrap_counter)) {
-+        unsigned int num_bufs;
-+        unsigned int i = 0;
-+
-+        num_bufs = total_bufs;
-+
-+        if (desc.flags & VRING_DESC_F_INDIRECT) {
-+            if (desc.len % sizeof(VRingPackedDesc)) {
-+                virtio_error(vdev, "Invalid size for indirect buffer table");
-+                goto err;
-+            }
-+
-+            /* If we've got too many, that implies a descriptor loop. */
-+            if (num_bufs >= max) {
-+                virtio_error(vdev, "Looped descriptor");
-+                goto err;
-+            }
-+
-+            /* loop over the indirect descriptor table */
-+            len = address_space_cache_init(&indirect_desc_cache,
-+                                           vdev->dma_as,
-+                                           desc.addr, desc.len, false);
-+            desc_cache = &indirect_desc_cache;
-+            if (len < desc.len) {
-+                virtio_error(vdev, "Cannot map indirect buffer");
-+                goto err;
-+            }
-+
-+            max = desc.len / sizeof(VRingPackedDesc);
-+            num_bufs = i = 0;
-+            vring_packed_desc_read(vdev, &desc, desc_cache, i);
-+            /* Make sure we see all the fields*/
-+            smp_rmb();
-+        }
-+
-+        do {
-+            /* If we've got too many, that implies a descriptor loop. */
-+            if (++num_bufs > max) {
-+                virtio_error(vdev, "Looped descriptor");
-+                goto err;
-+            }
-+
-+            if (desc.flags & VRING_DESC_F_WRITE) {
-+                in_total += desc.len;
-+            } else {
-+                out_total += desc.len;
-+            }
-+            if (in_total >= max_in_bytes && out_total >= max_out_bytes) {
-+                goto done;
-+            }
-+
-+            if (desc_cache == &indirect_desc_cache) {
-+                if (++i > vq->vring.num) {
-+                    virtio_error(vdev, "Looped descriptor");
-+                    goto err;
-+                }
-+                vring_packed_desc_read(vdev, &desc, desc_cache, i);
-+            } else {
-+                if (++idx >= vq->vring.num) {
-+                    idx -= vq->vring.num;
-+                    wrap_counter = !wrap_counter;
-+                }
-+                vring_packed_desc_read(vdev, &desc, desc_cache, idx);
-+            }
-+            /* Make sure we see the flags */
-+            smp_rmb();
-+        } while (desc.flags & VRING_DESC_F_NEXT);
-+
-+        if (desc_cache == &indirect_desc_cache) {
-+            address_space_cache_destroy(&indirect_desc_cache);
-+            total_bufs++;
-+            /* We missed one step on for indirect desc */
-+            idx++;
-+            if (++idx >= vq->vring.num) {
-+                idx -= vq->vring.num;
-+                wrap_counter = !wrap_counter;
-+            }
-+        } else {
-+            total_bufs = num_bufs;
-+        }
-+
-+        desc_cache = &caches->desc;
-+        vring_packed_desc_read(vdev, &desc, desc_cache, idx);
-+        /* Make sure we see all the fields */
-+        smp_rmb();
-+    }
-+
-+    /* Set up index and wrap counter for an interrupt when no enough desc */
-+    vq->event_idx = idx;
-+    vq->event_wrap_counter = wrap_counter;
-+done:
-+    address_space_cache_destroy(&indirect_desc_cache);
-+    if (in_bytes) {
-+        *in_bytes = in_total;
-+    }
-+    if (out_bytes) {
-+        *out_bytes = out_total;
-+    }
-+    rcu_read_unlock();
-+    return;
-+
-+err:
-+    in_total = out_total = 0;
-+    goto done;
-+}
-+
-+void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
-+                               unsigned int *out_bytes,
-+                               unsigned max_in_bytes, unsigned max_out_bytes)
-+{
 +    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
-+        virtqueue_packed_get_avail_bytes(vq, in_bytes, out_bytes,
-+                                         max_in_bytes, max_out_bytes);
++        virtio_queue_set_notification_packed(vq, enable);
 +    } else {
-+        virtqueue_split_get_avail_bytes(vq, in_bytes, out_bytes,
-+                                        max_in_bytes, max_out_bytes);
++        virtio_queue_set_notification_split(vq, enable);
 +    }
 +}
 +
- int virtqueue_avail_bytes(VirtQueue *vq, unsigned int in_bytes,
-                           unsigned int out_bytes)
+ int virtio_queue_ready(VirtQueue *vq)
  {
+     return vq->vring.avail != 0;
+@@ -2103,8 +2172,7 @@ static void virtio_set_isr(VirtIODevice *vdev, int value)
+     }
+ }
+ 
+-/* Called within rcu_read_lock().  */
+-static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
++static bool virtio_split_should_notify(VirtIODevice *vdev, VirtQueue *vq)
+ {
+     uint16_t old, new;
+     bool v;
+@@ -2127,6 +2195,58 @@ static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
+     return !v || vring_need_event(vring_get_used_event(vq), new, old);
+ }
+ 
++static bool vring_packed_need_event(VirtQueue *vq, uint16_t off_wrap,
++                                    uint16_t new, uint16_t old)
++{
++    bool wrap = vq->event_wrap_counter;
++    int off = off_wrap & ~(1 << 15);
++
++    if (new < old) {
++        new += vq->vring.num;
++        wrap ^= 1;
++    }
++
++    if (wrap != off_wrap >> 15) {
++        off += vq->vring.num;
++    }
++
++    return vring_need_event(off, new, old);
++}
++
++static bool virtio_packed_should_notify(VirtIODevice *vdev, VirtQueue *vq)
++{
++    VRingPackedDescEvent e;
++    uint16_t old, new;
++    bool v;
++    VRingMemoryRegionCaches *caches;
++
++    caches  = vring_get_region_caches(vq);
++    vring_packed_event_read(vdev, &caches->driver, &e);
++
++    old = vq->signalled_used;
++    new = vq->signalled_used = vq->used_idx;
++    v = vq->signalled_used_valid;
++    vq->signalled_used_valid = true;
++
++    if (e.flags == RING_EVENT_FLAGS_DISABLE) {
++        return false;
++    } else if (e.flags == RING_EVENT_FLAGS_ENABLE) {
++        return true;
++    }
++
++    return !v || vring_packed_need_event(vq, e.off_wrap, new, old);
++}
++
++/* Called within rcu_read_lock().  */
++static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
++{
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        return virtio_packed_should_notify(vdev, vq);
++    } else {
++        return virtio_split_should_notify(vdev, vq);
++    }
++}
++
+ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
+ {
+     bool should_notify;
 -- 
 1.8.3.1
