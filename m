@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAkaq-0001oA-G4
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gAkar-0001oP-OB
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAkao-0002HA-A9
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:12 -0400
-Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:32931)
+	(envelope-from <richard.henderson@linaro.org>) id 1gAkaq-0002In-B9
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:13 -0400
+Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:34585)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gAkam-0002Co-9o
+	id 1gAkao-0002FV-76
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:10 -0400
-Received: by mail-pg1-x530.google.com with SMTP id y18-v6so4925290pge.0
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 16:42:07 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id f18-v6so4985258plr.1
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 16:42:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 11 Oct 2018 16:41:55 -0700
-Message-Id: <20181011234159.11496-4-richard.henderson@linaro.org>
+Date: Thu, 11 Oct 2018 16:41:56 -0700
+Message-Id: <20181011234159.11496-5-richard.henderson@linaro.org>
 In-Reply-To: <20181011234159.11496-1-richard.henderson@linaro.org>
 References: <20181011234159.11496-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/7] target/ppc: Introduce fp number
- classification
+Subject: [Qemu-devel] [PATCH 4/7] target/ppc: Split out
+ float_invalid_op_addsub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +30,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
 
-Having a separate, logical classifiation of numbers will
-unify more error paths for different formats.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/fpu_helper.c | 94 ++++++++++++++++++++++-------------------
- 1 file changed, 51 insertions(+), 43 deletions(-)
+ target/ppc/fpu_helper.c | 60 ++++++++++++++++++-----------------------
+ 1 file changed, 26 insertions(+), 34 deletions(-)
 
 diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index c9198f826d..9ae55b1e93 100644
+index 9ae55b1e93..111ce12a37 100644
 --- a/target/ppc/fpu_helper.c
 +++ b/target/ppc/fpu_helper.c
-@@ -114,54 +114,62 @@ static inline int ppc_float64_get_unbiased_exp(float64 f)
-     return ((f >> 52) & 0x7FF) - 1023;
+@@ -648,6 +648,17 @@ void helper_reset_fpstatus(CPUPPCState *env)
+     set_float_exception_flags(0, &env->fp_status);
  }
  
--#define COMPUTE_FPRF(tp)                                       \
--void helper_compute_fprf_##tp(CPUPPCState *env, tp arg)        \
-+/* Classify a floating-point number.  */
-+enum {
-+    is_normal   = 1,
-+    is_zero     = 2,
-+    is_denormal = 4,
-+    is_inf      = 8,
-+    is_qnan     = 16,
-+    is_snan     = 32,
-+    is_neg      = 64,
-+};
-+
-+#define COMPUTE_CLASS(tp)                                      \
-+static int tp##_classify(tp arg)                               \
- {                                                              \
--    int isneg;                                                 \
--    int fprf;                                                  \
--                                                               \
--    isneg = tp##_is_neg(arg);                                  \
-+    int ret = tp##_is_neg(arg) * is_neg;                       \
-     if (unlikely(tp##_is_any_nan(arg))) {                      \
--        if (tp##_is_signaling_nan(arg, &env->fp_status)) {     \
--            /* Signaling NaN: flags are undefined */           \
--            fprf = 0x00;                                       \
--        } else {                                               \
--            /* Quiet NaN */                                    \
--            fprf = 0x11;                                       \
--        }                                                      \
-+        float_status dummy = { };  /* snan_bit_is_one = 0 */   \
-+        ret |= (tp##_is_signaling_nan(arg, &dummy)             \
-+                ? is_snan : is_qnan);                          \
-     } else if (unlikely(tp##_is_infinity(arg))) {              \
--        /* +/- infinity */                                     \
--        if (isneg) {                                           \
--            fprf = 0x09;                                       \
--        } else {                                               \
--            fprf = 0x05;                                       \
--        }                                                      \
-+        ret |= is_inf;                                         \
-+    } else if (tp##_is_zero(arg)) {                            \
-+        ret |= is_zero;                                        \
-+    } else if (tp##_is_zero_or_denormal(arg)) {                \
-+        ret |= is_denormal;                                    \
-     } else {                                                   \
--        if (tp##_is_zero(arg)) {                               \
--            /* +/- zero */                                     \
--            if (isneg) {                                       \
--                fprf = 0x12;                                   \
--            } else {                                           \
--                fprf = 0x02;                                   \
--            }                                                  \
--        } else {                                               \
--            if (tp##_is_zero_or_denormal(arg)) {               \
--                /* Denormalized numbers */                     \
--                fprf = 0x10;                                   \
--            } else {                                           \
--                /* Normalized numbers */                       \
--                fprf = 0x00;                                   \
--            }                                                  \
--            if (isneg) {                                       \
--                fprf |= 0x08;                                  \
--            } else {                                           \
--                fprf |= 0x04;                                  \
--            }                                                  \
--        }                                                      \
-+        ret |= is_normal;                                      \
-     }                                                          \
--    /* We update FPSCR_FPRF */                                 \
--    env->fpscr &= ~(0x1F << FPSCR_FPRF);                       \
--    env->fpscr |= fprf << FPSCR_FPRF;                          \
-+    return ret;                                                \
-+}
-+
-+COMPUTE_CLASS(float16)
-+COMPUTE_CLASS(float32)
-+COMPUTE_CLASS(float64)
-+COMPUTE_CLASS(float128)
-+
-+static void set_fprf_from_class(CPUPPCState *env, int class)
++static void float_invalid_op_addsub(CPUPPCState *env, bool set_fpcc,
++                                    uintptr_t retaddr, int classes)
 +{
-+    static const uint8_t fprf[6][2] = {
-+        { 0x04, 0x08 },  /* normalized */
-+        { 0x02, 0x12 },  /* zero */
-+        { 0x14, 0x18 },  /* denormalized */
-+        { 0x05, 0x09 },  /* infinity */
-+        { 0x11, 0x11 },  /* qnan */
-+        { 0x00, 0x00 },  /* snan -- flags are undefined */
-+    };
-+    bool isneg = class & is_neg;
-+
-+    env->fpscr &= ~(0x1F << FPSCR_FPRF);
-+    env->fpscr |= fprf[ctz32(class)][isneg] << FPSCR_FPRF;
++    if ((classes & ~is_neg) == is_inf) {
++        /* Magnitude subtraction of infinities */
++        float_invalid_op_vxisi(env, set_fpcc, retaddr);
++    } else if (classes & is_snan) {
++        float_invalid_op_vxsnan(env, retaddr);
++    }
 +}
 +
-+#define COMPUTE_FPRF(tp)                                \
-+void helper_compute_fprf_##tp(CPUPPCState *env, tp arg) \
-+{                                                       \
-+    set_fprf_from_class(env, tp##_classify(arg));       \
- }
+ /* fadd - fadd. */
+ float64 helper_fadd(CPUPPCState *env, float64 arg1, float64 arg2)
+ {
+@@ -655,14 +666,9 @@ float64 helper_fadd(CPUPPCState *env, float64 arg1, float64 arg2)
+     int status = get_float_exception_flags(&env->fp_status);
  
- COMPUTE_FPRF(float16)
+     if (unlikely(status & float_flag_invalid)) {
+-        if (float64_is_infinity(arg1) && float64_is_infinity(arg2)) {
+-            /* Magnitude subtraction of infinities */
+-            float_invalid_op_vxisi(env, 1, GETPC());
+-        } else if (float64_is_signaling_nan(arg1, &env->fp_status) ||
+-                   float64_is_signaling_nan(arg2, &env->fp_status)) {
+-            /* sNaN addition */
+-            float_invalid_op_vxsnan(env, GETPC());
+-        }
++        float_invalid_op_addsub(env, 1, GETPC(),
++                                float64_classify(arg1) |
++                                float64_classify(arg2));
+     }
+ 
+     return ret;
+@@ -675,14 +681,9 @@ float64 helper_fsub(CPUPPCState *env, float64 arg1, float64 arg2)
+     int status = get_float_exception_flags(&env->fp_status);
+ 
+     if (unlikely(status & float_flag_invalid)) {
+-        if (float64_is_infinity(arg1) && float64_is_infinity(arg2)) {
+-            /* Magnitude subtraction of infinities */
+-            float_invalid_op_vxisi(env, 1, GETPC());
+-        } else if (float64_is_signaling_nan(arg1, &env->fp_status) ||
+-                   float64_is_signaling_nan(arg2, &env->fp_status)) {
+-            /* sNaN addition */
+-            float_invalid_op_vxsnan(env, GETPC());
+-        }
++        float_invalid_op_addsub(env, 1, GETPC(),
++                                float64_classify(arg1) |
++                                float64_classify(arg2));
+     }
+ 
+     return ret;
+@@ -1803,12 +1804,9 @@ void helper_##name(CPUPPCState *env, uint32_t opcode)                        \
+         env->fp_status.float_exception_flags |= tstat.float_exception_flags; \
+                                                                              \
+         if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {    \
+-            if (tp##_is_infinity(xa.fld) && tp##_is_infinity(xb.fld)) {      \
+-                float_invalid_op_vxisi(env, sfprf, GETPC());                 \
+-            } else if (tp##_is_signaling_nan(xa.fld, &tstat) ||              \
+-                       tp##_is_signaling_nan(xb.fld, &tstat)) {              \
+-                float_invalid_op_vxsnan(env, GETPC());                       \
+-            }                                                                \
++            float_invalid_op_addsub(env, sfprf, GETPC(),                     \
++                                    tp##_classify(xa.fld) |                  \
++                                    tp##_classify(xb.fld));                  \
+         }                                                                    \
+                                                                              \
+         if (r2sp) {                                                          \
+@@ -1852,12 +1850,9 @@ void helper_xsaddqp(CPUPPCState *env, uint32_t opcode)
+     env->fp_status.float_exception_flags |= tstat.float_exception_flags;
+ 
+     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
+-        if (float128_is_infinity(xa.f128) && float128_is_infinity(xb.f128)) {
+-            float_invalid_op_vxisi(env, 1, GETPC());
+-        } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
+-                   float128_is_signaling_nan(xb.f128, &tstat)) {
+-            float_invalid_op_vxsnan(env, GETPC());
+-        }
++        float_invalid_op_addsub(env, 1, GETPC(),
++                                float128_classify(xa.f128) |
++                                float128_classify(xb.f128));
+     }
+ 
+     helper_compute_fprf_float128(env, xt.f128);
+@@ -3518,12 +3513,9 @@ void helper_xssubqp(CPUPPCState *env, uint32_t opcode)
+     env->fp_status.float_exception_flags |= tstat.float_exception_flags;
+ 
+     if (unlikely(tstat.float_exception_flags & float_flag_invalid)) {
+-        if (float128_is_infinity(xa.f128) && float128_is_infinity(xb.f128)) {
+-            float_invalid_op_vxisi(env, 1, GETPC());
+-        } else if (float128_is_signaling_nan(xa.f128, &tstat) ||
+-                   float128_is_signaling_nan(xb.f128, &tstat)) {
+-            float_invalid_op_vxsnan(env, GETPC());
+-        }
++        float_invalid_op_addsub(env, 1, GETPC(),
++                                float128_classify(xa.f128) |
++                                float128_classify(xb.f128));
+     }
+ 
+     helper_compute_fprf_float128(env, xt.f128);
 -- 
 2.17.1
