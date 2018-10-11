@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAhwp-0006s3-V7
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gAhwq-0006sC-2O
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAhwl-0005xJ-Og
+	(envelope-from <richard.henderson@linaro.org>) id 1gAhwm-0005zz-72
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:43 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35778)
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40800)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gAhwl-0004jE-8Q
+	id 1gAhwl-0003SW-Mi
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:39 -0400
-Received: by mail-pl1-x641.google.com with SMTP id f8-v6so4800498plb.2
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:27 -0700 (PDT)
+Received: by mail-pf1-x443.google.com with SMTP id s5-v6so5005658pfj.7
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:15 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 11 Oct 2018 13:51:58 -0700
-Message-Id: <20181011205206.3552-13-richard.henderson@linaro.org>
+Date: Thu, 11 Oct 2018 13:51:50 -0700
+Message-Id: <20181011205206.3552-5-richard.henderson@linaro.org>
 In-Reply-To: <20181011205206.3552-1-richard.henderson@linaro.org>
 References: <20181011205206.3552-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 12/20] target/arm: Use gvec for VSHR, VSHL
+Subject: [Qemu-devel] [PATCH 04/20] target/arm: Promote consecutive memory
+ ops for aa64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,131 +30,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+For a sequence of loads or stores from a single register,
+little-endian operations can be promoted to an 8-byte op.
+This can reduce the number of operations by a factor of 8.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 70 +++++++++++++++++++++++++++++-------------
- 1 file changed, 48 insertions(+), 22 deletions(-)
+ target/arm/translate-a64.c | 66 +++++++++++++++++++++++---------------
+ 1 file changed, 40 insertions(+), 26 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e195efcc55..a16f323d52 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -6373,8 +6373,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     size--;
-             }
-             shift = (insn >> 16) & ((1 << (3 + size)) - 1);
--            /* To avoid excessive duplication of ops we implement shift
--               by immediate using the variable shift operations.  */
-             if (op < 8) {
-                 /* Shift by immediate:
-                    VSHR, VSRA, VRSHR, VRSRA, VSRI, VSHL, VQSHL, VQSHLU.  */
-@@ -6386,37 +6384,62 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                 }
-                 /* Right shifts are encoded as N - shift, where N is the
-                    element size in bits.  */
--                if (op <= 4)
-+                if (op <= 4) {
-                     shift = shift - (1 << (size + 3));
-+                }
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index fff99ca303..2f4041462e 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1200,25 +1200,23 @@ static void write_vec_element_i32(DisasContext *s, TCGv_i32 tcg_src,
+ 
+ /* Store from vector register to memory */
+ static void do_vec_st(DisasContext *s, int srcidx, int element,
+-                      TCGv_i64 tcg_addr, int size)
++                      TCGv_i64 tcg_addr, int size, TCGMemOp endian)
+ {
+-    TCGMemOp memop = s->be_data + size;
+     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
+ 
+     read_vec_element(s, tcg_tmp, srcidx, element, size);
+-    tcg_gen_qemu_st_i64(tcg_tmp, tcg_addr, get_mem_index(s), memop);
++    tcg_gen_qemu_st_i64(tcg_tmp, tcg_addr, get_mem_index(s), endian | size);
+ 
+     tcg_temp_free_i64(tcg_tmp);
+ }
+ 
+ /* Load from memory to vector register */
+ static void do_vec_ld(DisasContext *s, int destidx, int element,
+-                      TCGv_i64 tcg_addr, int size)
++                      TCGv_i64 tcg_addr, int size, TCGMemOp endian)
+ {
+-    TCGMemOp memop = s->be_data + size;
+     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
+ 
+-    tcg_gen_qemu_ld_i64(tcg_tmp, tcg_addr, get_mem_index(s), memop);
++    tcg_gen_qemu_ld_i64(tcg_tmp, tcg_addr, get_mem_index(s), endian | size);
+     write_vec_element(s, tcg_tmp, destidx, element, size);
+ 
+     tcg_temp_free_i64(tcg_tmp);
+@@ -3013,9 +3011,10 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     bool is_postidx = extract32(insn, 23, 1);
+     bool is_q = extract32(insn, 30, 1);
+     TCGv_i64 tcg_addr, tcg_rn, tcg_ebytes;
++    TCGMemOp endian = s->be_data;
+ 
+-    int ebytes = 1 << size;
+-    int elements = (is_q ? 128 : 64) / (8 << size);
++    int ebytes;   /* bytes per element */
++    int elements; /* elements per vector */
+     int rpt;    /* num iterations */
+     int selem;  /* structure elements */
+     int r;
+@@ -3074,6 +3073,20 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+         gen_check_sp_alignment(s);
+     }
+ 
++    /* For our purposes, bytes are always little-endian.  */
++    if (size == 0) {
++        endian = MO_LE;
++    }
 +
-+                switch (op) {
-+                case 0:  /* VSHR */
-+                    /* Right shift comes here negative.  */
-+                    shift = -shift;
-+                    /* Shifts larger than the element size are architecturally
-+                     * valid.  Unsigned results in all zeros; signed results
-+                     * in all sign bits.
-+                     */
-+                    if (!u) {
-+                        tcg_gen_gvec_sari(size, rd_ofs, rm_ofs,
-+                                          MIN(shift, (8 << size) - 1),
-+                                          vec_size, vec_size);
-+                    } else if (shift >= 8 << size) {
-+                        tcg_gen_gvec_dup8i(rd_ofs, vec_size, vec_size, 0);
-+                    } else {
-+                        tcg_gen_gvec_shri(size, rd_ofs, rm_ofs, shift,
-+                                          vec_size, vec_size);
-+                    }
-+                    return 0;
++    /* Consecutive little-endian elements from a single register
++     * can be promoted to a larger little-endian operation.
++     */
++    if (selem == 1 && endian == MO_LE) {
++        size = 3;
++    }
++    ebytes = 1 << size;
++    elements = (is_q ? 16 : 8) / ebytes;
 +
-+                case 5: /* VSHL, VSLI */
-+                    if (!u) { /* VSHL */
-+                        /* Shifts larger than the element size are
-+                         * architecturally valid and results in zero.
-+                         */
-+                        if (shift >= 8 << size) {
-+                            tcg_gen_gvec_dup8i(rd_ofs, vec_size, vec_size, 0);
-+                        } else {
-+                            tcg_gen_gvec_shli(size, rd_ofs, rm_ofs, shift,
-+                                              vec_size, vec_size);
-+                        }
-+                        return 0;
-+                    }
-+                    break;
-+                }
-+
-                 if (size == 3) {
-                     count = q + 1;
+     tcg_rn = cpu_reg_sp(s, rn);
+     tcg_addr = tcg_temp_new_i64();
+     tcg_gen_mov_i64(tcg_addr, tcg_rn);
+@@ -3082,32 +3095,33 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     for (r = 0; r < rpt; r++) {
+         int e;
+         for (e = 0; e < elements; e++) {
+-            int tt = (rt + r) % 32;
+             int xs;
+             for (xs = 0; xs < selem; xs++) {
++                int tt = (rt + r + xs) % 32;
+                 if (is_store) {
+-                    do_vec_st(s, tt, e, tcg_addr, size);
++                    do_vec_st(s, tt, e, tcg_addr, size, endian);
                  } else {
-                     count = q ? 4: 2;
+-                    do_vec_ld(s, tt, e, tcg_addr, size);
+-
+-                    /* For non-quad operations, setting a slice of the low
+-                     * 64 bits of the register clears the high 64 bits (in
+-                     * the ARM ARM pseudocode this is implicit in the fact
+-                     * that 'rval' is a 64 bit wide variable).
+-                     * For quad operations, we might still need to zero the
+-                     * high bits of SVE.  We optimize by noticing that we only
+-                     * need to do this the first time we touch a register.
+-                     */
+-                    if (e == 0 && (r == 0 || xs == selem - 1)) {
+-                        clear_vec_high(s, is_q, tt);
+-                    }
++                    do_vec_ld(s, tt, e, tcg_addr, size, endian);
                  }
--                switch (size) {
--                case 0:
--                    imm = (uint8_t) shift;
--                    imm |= imm << 8;
--                    imm |= imm << 16;
--                    break;
--                case 1:
--                    imm = (uint16_t) shift;
--                    imm |= imm << 16;
--                    break;
--                case 2:
--                case 3:
--                    imm = shift;
--                    break;
--                default:
--                    abort();
--                }
+                 tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
+-                tt = (tt + 1) % 32;
+             }
+         }
+     }
+ 
++    if (!is_store) {
++        /* For non-quad operations, setting a slice of the low
++         * 64 bits of the register clears the high 64 bits (in
++         * the ARM ARM pseudocode this is implicit in the fact
++         * that 'rval' is a 64 bit wide variable).
++         * For quad operations, we might still need to zero the
++         * high bits of SVE.
++         */
++        for (r = 0; r < rpt * selem; r++) {
++            int tt = (rt + r) % 32;
++            clear_vec_high(s, is_q, tt);
++        }
++    }
 +
-+                /* To avoid excessive duplication of ops we implement shift
-+                 * by immediate using the variable shift operations.
-+                  */
-+                imm = dup_const(size, shift);
- 
-                 for (pass = 0; pass < count; pass++) {
-                     if (size == 3) {
-                         neon_load_reg64(cpu_V0, rm + pass);
-                         tcg_gen_movi_i64(cpu_V1, imm);
-                         switch (op) {
--                        case 0:  /* VSHR */
-                         case 1:  /* VSRA */
-                             if (u)
-                                 gen_helper_neon_shl_u64(cpu_V0, cpu_V0, cpu_V1);
-@@ -6447,6 +6470,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                                                          cpu_V0, cpu_V1);
-                             }
-                             break;
-+                        default:
-+                            g_assert_not_reached();
-                         }
-                         if (op == 1 || op == 3) {
-                             /* Accumulate.  */
-@@ -6475,7 +6500,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                         tmp2 = tcg_temp_new_i32();
-                         tcg_gen_movi_i32(tmp2, imm);
-                         switch (op) {
--                        case 0:  /* VSHR */
-                         case 1:  /* VSRA */
-                             GEN_NEON_INTEGER_OP(shl);
-                             break;
-@@ -6513,6 +6537,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                         case 7: /* VQSHL */
-                             GEN_NEON_INTEGER_OP_ENV(qshl);
-                             break;
-+                        default:
-+                            g_assert_not_reached();
-                         }
-                         tcg_temp_free_i32(tmp2);
- 
+     if (is_postidx) {
+         int rm = extract32(insn, 16, 5);
+         if (rm == 31) {
+@@ -3228,9 +3242,9 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+         } else {
+             /* Load/store one element per register */
+             if (is_load) {
+-                do_vec_ld(s, rt, index, tcg_addr, scale);
++                do_vec_ld(s, rt, index, tcg_addr, scale, s->be_data);
+             } else {
+-                do_vec_st(s, rt, index, tcg_addr, scale);
++                do_vec_st(s, rt, index, tcg_addr, scale, s->be_data);
+             }
+         }
+         tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
 -- 
 2.17.1
