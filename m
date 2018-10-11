@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gAU15-0000s4-3b
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 02:00:12 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gAUGy-0002vc-P1
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 02:16:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gAU10-0006N5-4j
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 02:00:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41612)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gAU0z-0006Mn-RS
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 02:00:06 -0400
-Message-ID: <7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 11 Oct 2018 07:59:59 +0200
-In-Reply-To: <892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+	(envelope-from <sjitindarsingh@gmail.com>) id 1gAUGw-00066q-K4
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 02:16:36 -0400
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Thu, 11 Oct 2018 17:16:08 +1100
+Message-Id: <20181011061609.11423-3-sjitindarsingh@gmail.com>
+In-Reply-To: <20181011061609.11423-1-sjitindarsingh@gmail.com>
+References: <20181011061609.11423-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V3 2/3] target/ppc: Add one reg id
+ for ptcr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +20,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair <alistair23@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
-Cc: "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>, "Richard W.M. Jones" <rjones@redhat.com>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: paulus@ozlabs.org, david@gibson.dropbear.id.au, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-On Wed, 2018-10-10 at 10:57 -0700, Alistair wrote:
-> On 10/10/2018 05:26 AM, Andrea Bolognani wrote:
-> > * what should libvirt look for to figure out whether or not a RISC-V
-> >    guest will have PCI support? For aarch64 we look for the presence
-> >    of the 'gpex-pcihost' device, but of course that won't work for
-> >    RISC-V so we need something else;
-> 
-> I'm not sure what you mean here. Why can we not do the same thing with 
-> RISC-V?
+The ptcr (partition table control register) is used to store the address
+and size of the partition table. For nested kvm-hv we have a level 1
+guest register the location of it's partition table with the hypervisor.
+Thus to support migration we need to be able to read this out of kvm
+and restore it post migration.
 
-The gpex-pcihost device was introduced at the same time as
-aarch64/virt gained PCI support, so we can probe the binary[1] and,
-if the device is present, we know that aarch64/virt guests will be
-able to use PCI. We cannot do the same for RISC-V for obvious
-reasons: the device is already there :)
+Add the one reg id for the ptcr.
 
-Is there any RISC-V device / property that was introduced along
-with PCI support and we can use as a witness?
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/translate_init.inc.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-> > * I have succesfully started a RISC-V guest with virtio-pci devices
-> >    attached but, while they show up in 'info qtree' and friends, the
-> >    guest OS itself doesn't seem to recognize any of them - not even
-> >    pcie.0! I'm using the guest images listed at [1] and following the
-> >    corresponding instructions, but I think the BBL build (config at
-> >    [2]) is missing some feature... Any ideas what we would need to
-> >    add there?
-> 
-> I use this monolithic config: 
-> https://github.com/alistair23/meta-riscv/blob/7a950aa705b439b5ec19bb6f094930888335ba7b/recipes-kernel/linux/files/freedom-u540/defconfig
-> 
-> It has way too much enabled, but I think if you copy the PCIe part that 
-> should be enough.
-
-Looks like there's quite a few CONFIG*PCI* options we're missing!
-
-Rich, can you try incorporating those and kicking off a BBL build?
-If I remember correctly you might also have to backport a commit or
-two to make some of the options available on RISC-V, but it should
-be very feasible.
-
-[...]
-> Obviously on top of that you will need to enable the VirtIO support as 
-> that doesn't exist in the hardware.
-
-Yeah, we already have that enabled and non-PCI VirtIO devices work
-just fine.
-
-
-[1] Not the guest, mind you: libvirt will probe each QEMU binary only
-    once to reduce the overhead, so anyth
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 263e63cb03..487196800b 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8197,11 +8197,11 @@ static void gen_spr_power9_mmu(CPUPPCState *env)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     /* Partition Table Control */
+-    spr_register_hv(env, SPR_PTCR, "PTCR",
+-                    SPR_NOACCESS, SPR_NOACCESS,
+-                    SPR_NOACCESS, SPR_NOACCESS,
+-                    &spr_read_generic, &spr_write_ptcr,
+-                    0x00000000);
++    spr_register_kvm_hv(env, SPR_PTCR, "PTCR",
++                        SPR_NOACCESS, SPR_NOACCESS,
++                        SPR_NOACCESS, SPR_NOACCESS,
++                        &spr_read_generic, &spr_write_ptcr,
++                        KVM_REG_PPC_PTCR, 0x00000000);
+ #endif
+ }
+ 
 -- 
-Andrea Bolognani / Red Hat / Virtualization
+2.13.6
