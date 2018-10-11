@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gAd2A-00011m-Um
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:37:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gAd3C-0001Y1-As
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gAd25-0004Zk-Qs
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:37:54 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35268)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gAd25-0004Z5-JR
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:37:49 -0400
-Received: by mail-wr1-f68.google.com with SMTP id w5-v6so10229470wrt.2
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 08:37:49 -0700 (PDT)
-Message-ID: <1539272266.16655.154.camel@redhat.com>
-From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Thu, 11 Oct 2018 17:37:46 +0200
-In-Reply-To: <20181011150944.5qfaflgkcekdlz3o@sirius.home.kraxel.org>
-References: <20181009131052.18500-1-lhrazky@redhat.com>
-	<20181009131052.18500-2-lhrazky@redhat.com>
-	<1539113618.12871.122.camel@redhat.com>
-	<1539189387.16655.63.camel@redhat.com>
-	<20181011122757.gsynkctea7reqnik@sirius.home.kraxel.org>
-	<1539263541.16655.110.camel@redhat.com>
-	<20181011134336.w55g5ts6kln6cgtt@sirius.home.kraxel.org>
-	<1539268208.16655.144.camel@redhat.com>
-	<20181011150944.5qfaflgkcekdlz3o@sirius.home.kraxel.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Spice-devel] [RFC PATCH spice 1/2] QXL interface:
- add functions to identify monitors in the guest
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gAd34-0005NG-M9
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:38:56 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 11 Oct 2018 15:38:38 +0000
+Message-ID: <da9329e9-ff60-eb17-ffbc-446226d4eef8@virtuozzo.com>
+References: <20180917145732.48590-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20180917145732.48590-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8E07357760A3A74AB5ABA87EEF91DF61@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: [Qemu-devel] ping Re: [PATCH v4 0/8] dirty-bitmap: rewrite
+ bdrv_dirty_iter_next_area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Jonathon Jongsma <jjongsma@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>, "jcody@redhat.com" <jcody@redhat.com>, Denis Lunev <den@virtuozzo.com>
 
-On Thu, 2018-10-11 at 17:09 +0200, Gerd Hoffmann wrote:
-> > > Ok.  We probably should fix interface_client_monitors_config() to use
-> > > the channel_id instead of qemu_console_get_head() then.
-> > 
-> > It's not that simple. This would break the QXL with multiple monitors
-> > per channel case.
-> 
-> It is that simple.
-> 
-> qxl doesn't use that code path and has its own version of the callback
-> (in qxl.c).  Fixing it there is a bit more tricky.
-
-Ok.. and what's actually the problem using qemu_console_get_head()? It
-just doesn't feel right to me using channel_id as an index into this
-array. It is not the right index strictly speaking.
-
-> > I think we should fix spice server to actually do the filtering and
-> > only send monitors_config that belongs to the device to the QXL
-> > interface. As Frediano mentioned, it looks more like a bug.
-> 
-> Only problem is changing the callback semantics changes the library api.
-> We could add a second version of the callback which gets called with a
-> filtered list (if present).  Not sure this is worth the effort though.
-
-That's right. But if we don't actually break any currently supported
-use cases, it might be fine? The only thing we would be breaking is the
-virtio-gpu, I think? Is that already something we don't want to break?
-
-> > > > A bit differently, as I said, but the configs are merged on the client,
-> > > > which should be an equivalent outcome.
-> > > 
-> > > Indeed.  So the qemu_spice_gl_monitor_config() function is correct then.
-> > 
-> > I don't follow you reasoning for this conclusion... Is it correct
-> > because it sends a single monitor in the monitors_config?
-> 
-> Yes (again, qxl doesn't run this code path so it'll only see the
-> one-monitor-per-channel cases).
-> 
-> > Why is this
-> > function needed for the opengl case and not for regular virtio-gpu
-> > case?
-> 
-> Not fully sure why opengl needs this.  Maybe because the texture can be
-> larger than the actual scanout (for padding reasons) so we need to
-> communicate the scanout rectangle.
-> 
-> > > Another story is linking display channels to device heads, i.e.
-> > > virtio-gpu registers one display channel per head, each channel
-> > > registers the same device path of course, and now you need to
-> > > figure in the guest agent which xrandr output is which head.
-> > 
-> > This is actually the reason for the
-> > spice_qxl_device_monitor_add_display_id(qxl, device_display_id)
-> > function (using this opportunity to merge the other email thread
-> > discussion into one).
-> 
-> Ah, ok.  We should *not* call this thing display_id then, that'll be
-> confusing.  Or at very least rename the function to something like ...
-> 
-> spice_qxl_monitor_add_device_display_id()
->                       ^^^^^^^^^^^^^^^^^   don't split this
-> 
-> ... to make more clear this is something else than the display_id.
-
-Ok.
-
-> > > Simplest way would be to require display channels being registered in
-> > > order, so the channel with the smallest channel_id is head 0, ...
-> > 
-> > I don't like this, you once again rely on implicit information derived
-> > from the order of registration of the channels. We should make this
-> > explicit, so that it doesn't cause trouble in the future...
-> 
-> Fine with me too.
-> 
-> I'd suggest to split the patches, one for the path and one for the
-> device_display_id thing (or whatever else we call this to make it less
-> likely being confused with display_id, even though I don't have a good
-> suggestion offhand).
-
-Sure, no problem.
-
-> cheers,
->   Gerd
-> 
+cGluZw0KDQoxNy4wOS4yMDE4IDE3OjU3LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
+b3RlOg0KPiBIaSBhbGwuDQo+DQo+IDEuIGJkcnZfZGlydHlfaXRlcl9uZXh0X2FyZWEgZG9uJ3Qg
+dXNlIGhiaXRtYXBfbmV4dF96ZXJvIGFuZCB1c2VzDQo+IGluZWZmaWNpZW50IGxvb3AgaW5zdGVh
+ZC4gTGV0J3MgaW1wcm92ZSBpdC4NCj4NCj4gMi4gYmRydl9kaXJ0eV9pdGVyX25leHRfYXJlYSBk
+b24ndCBoYW5kbGUgdW5hbGlnbmVkIG9mZnNldCBhbmQNCj4gbWF4X29mZnNldCBjb3JyZWN0bHku
+IEknbSBub3Qgc3VyZSB0aGF0IGl0IGlzIGEgcmVhbCBidWcuIEJ1dCBpZiBpdCBpcywNCj4gd2Ug
+bmVlZCB0aGVzZSBzZXJpZXMgaW4gMy4wLg0KPg0KPiBEZXRhaWxzIGFyZSBpbiAwNSBjb21taXQg
+bWVzc2FnZS4NCj4NCj4gTm90ZTogIltQQVRDSF0gbmJkL3NlcnZlcjogZml4IGJpdG1hcCBleHBv
+cnQiIHNob3VsZCBiZSBhcHBsaWVkIGZpcnN0Og0KPiBCYXNlZC1vbjogPDIwMTgwOTE0MTY1MTE2
+LjIzMTgyLTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPg0KPiB2NDoNCj4NCj4gUmV3b3Jr
+OiBzd2l0Y2ggaW50ZXJmYWNlIHRvIHN0YXJ0LGNvdW50IC8gb2Zmc2V0LGJ5dGVzIHN0eWxlLg0K
+PiBGaXggd3JvbmcgaGFuZGxpbmcgb2YgdGhlIGNhc2Ugd2hlbiByZXF1ZXN0ZWQgcmVnaW9uIGVu
+ZCBleGNlZWRzDQo+IG92ZXJhbGwgYml0bWFwIGVuZC4NCj4gU29tZSBvdGhlciBjaGFuZ2VzLg0K
+Pg0KPiAwNi0wODogYWRkIEpvaG4ncyByLWIuDQo+DQo+IHYzOg0KPiAwMTogLSBjaGFuZ2UgaW50
+ZXJmYWNlIHRvIHN0YXJ0L2VuZCwgYW5kIC0xIGFzIHNwZWNpYWwgZW5kLW1hcmtlciBpbnN0ZWFk
+IG9mIDANCj4gICAgICAtICJub3QgZm91bmQiIGZvciBpbnZhbGlkIHJlZ2lvbnMgaW5zdGVhZCBv
+ZiBhc3NlcnQNCj4gMDI6IHJlYmFzZSBvbiAwMSBjaGFuZ2VzDQo+IDAzOiAtIGZpeCBtaXN0YWtl
+IGluIGhiaXRtYXBfaXRlcl9pbml0IGFyZ3VtZW50cyAobWlzdGFrZSBpbg0KPiAgICAgICAgaGJp
+dG1hcF9uZXh0X3plcm8gYXJndW1lbnRzIGlzIGZpeGVkIGF1dG9tYXRpY2FsbHkgZHVlIHRvIDAx
+IGNoYW5nZXMpDQo+IDA0OiBuZXcNCj4NCj4NCj4gdjI6DQo+DQo+IDAxOiAtIGltcHJvdmUgY29t
+bWVudA0KPiAgICAgIC0gcy9ieXRlcy9jb3VudC8NCj4gICAgICAtIGZpeCBmb3Jnb3R0ZW4gZnVu
+Y3Rpb24gY2FsbCBpbiB0ZXN0DQo+ICAgICAgLSBpbnRyb2R1Y2Ugb3JpZ19zaXplIGZpZWxkIGhl
+cmUgZm9yIEhCaXRtYXAsDQo+ICAgICAgICBtYWtlIGNoZWNraW5nIGluIGhiaXRtYXBfbmV4dF96
+ZXJvIG1vcmUgZWZmZWN0aXZlIGFuZCBzYWZlDQo+IDAyOiBuZXcNCj4gMDM6IC0gb3JpZ19zaXpl
+IGFscmVhZHkgaW50cm9kdWNlZCBpbiAwMQ0KPiAgICAgIC0gZml4IGhiaXRtYXBfbmV4dF9kaXJ0
+eV9hcmVhIHRvIG5vdCByZXR1cm4gdmFsdWUgbGVzcyB0aGFuDQo+ICAgICAgICBvZmZzZXQgb24g
+dW5hbGlnbmVkIHJlcXVlc3RzDQo+DQo+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgKDgp
+Og0KPiAgICBkaXJ0eS1iaXRtYXA6IGltcHJvdmUgYmRydl9kaXJ0eV9iaXRtYXBfbmV4dF96ZXJv
+DQo+ICAgIHRlc3RzOiBhZGQgdGVzdHMgZm9yIGhiaXRtYXBfbmV4dF96ZXJvIHdpdGggc3BlY2lm
+aWVkIGVuZCBwYXJhbWV0ZXINCj4gICAgZGlydHktYml0bWFwOiBhZGQgYmRydl9kaXJ0eV9iaXRt
+YXBfbmV4dF9kaXJ0eV9hcmVhDQo+ICAgIHRlc3RzOiBhZGQgdGVzdHMgZm9yIGhiaXRtYXBfbmV4
+dF9kaXJ0eV9hcmVhDQo+ICAgIGJsb2NrL21pcnJvcjogZml4IGFuZCBpbXByb3ZlIGRvX3N5bmNf
+dGFyZ2V0X3dyaXRlDQo+ICAgIFJldmVydCAiYmxvY2svZGlydHktYml0bWFwOiBBZGQgYmRydl9k
+aXJ0eV9pdGVyX25leHRfYXJlYSINCj4gICAgUmV2ZXJ0ICJ0ZXN0LWhiaXRtYXA6IEFkZCBub24t
+YWR2YW5jaW5nIGl0ZXJfbmV4dCB0ZXN0cyINCj4gICAgUmV2ZXJ0ICJoYml0bWFwOiBBZGQgQGFk
+dmFuY2UgcGFyYW0gdG8gaGJpdG1hcF9pdGVyX25leHQoKSINCj4NCj4gICBpbmNsdWRlL2Jsb2Nr
+L2RpcnR5LWJpdG1hcC5oIHwgICA3ICstDQo+ICAgaW5jbHVkZS9xZW11L2hiaXRtYXAuaCAgICAg
+ICB8ICAzMSArKysrLS0NCj4gICBibG9jay9iYWNrdXAuYyAgICAgICAgICAgICAgIHwgICA1ICst
+DQo+ICAgYmxvY2svZGlydHktYml0bWFwLmMgICAgICAgICB8ICA2OCArKy0tLS0tLS0tLS0tLQ0K
+PiAgIGJsb2NrL21pcnJvci5jICAgICAgICAgICAgICAgfCAgMTcgKystLQ0KPiAgIG5iZC9zZXJ2
+ZXIuYyAgICAgICAgICAgICAgICAgfCAgIDIgKy0NCj4gICB0ZXN0cy90ZXN0LWhiaXRtYXAuYyAg
+ICAgICAgIHwgMTc3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tDQo+ICAgdXRp
+bC9oYml0bWFwLmMgICAgICAgICAgICAgICB8ICA3NiArKysrKysrKysrKystLS0NCj4gICA4IGZp
+bGVzIGNoYW5nZWQsIDI2MiBpbnNlcnRpb25zKCspLCAxMjEgZGVsZXRpb25zKC0pDQo+DQoNCg0K
+LS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0KDQo=
