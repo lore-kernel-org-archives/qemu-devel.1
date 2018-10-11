@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAVfn-0005BS-Fz
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:46:20 -0400
+	(envelope-from <rjones@redhat.com>) id 1gAVp3-0006lz-A8
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAVfj-0007NS-N7
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:46:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40170)
+	(envelope-from <rjones@redhat.com>) id 1gAVp0-0004RQ-4i
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:55:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAVfb-0007Jy-RN
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:46:10 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180918185246.18109-1-danielhb413@gmail.com>
-	<20180918185246.18109-4-danielhb413@gmail.com>
-Date: Thu, 11 Oct 2018 09:45:59 +0200
-In-Reply-To: <20180918185246.18109-4-danielhb413@gmail.com> (Daniel Henrique
-	Barboza's message of "Tue, 18 Sep 2018 15:52:46 -0300")
-Message-ID: <871s8x7wp4.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1gAVoz-0004Qo-RR
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:55:50 -0400
+Date: Thu, 11 Oct 2018 08:55:44 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20181011075544.GR27120@redhat.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
+	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 3/3] qmp hmp: Make system_wakeup check
- wake-up support and run state
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,153 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, imammedo@redhat.com
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Alistair <alistair23@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>, "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>
 
-Daniel Henrique Barboza <danielhb413@gmail.com> writes:
+On Thu, Oct 11, 2018 at 07:59:59AM +0200, Andrea Bolognani wrote:
+> On Wed, 2018-10-10 at 10:57 -0700, Alistair wrote:
+> > On 10/10/2018 05:26 AM, Andrea Bolognani wrote:
+> > > * what should libvirt look for to figure out whether or not a RISC-V
+> > >    guest will have PCI support? For aarch64 we look for the presence
+> > >    of the 'gpex-pcihost' device, but of course that won't work for
+> > >    RISC-V so we need something else;
+> > 
+> > I'm not sure what you mean here. Why can we not do the same thing with 
+> > RISC-V?
+> 
+> The gpex-pcihost device was introduced at the same time as
+> aarch64/virt gained PCI support, so we can probe the binary[1] and,
+> if the device is present, we know that aarch64/virt guests will be
+> able to use PCI. We cannot do the same for RISC-V for obvious
+> reasons: the device is already there :)
+> 
+> Is there any RISC-V device / property that was introduced along
+> with PCI support and we can use as a witness?
 
-> The qmp/hmp command 'system_wakeup' is simply a direct call to
-> 'qemu_system_wakeup_request' from vl.c. This function verifies if
-> runstate is SUSPENDED and if the wake up reason is valid before
-> proceeding. However, no error or warning is thrown if any of those
-> pre-requirements isn't met. There is no way for the caller to
-> differentiate between a successful wakeup or an error state caused
-> when trying to wake up a guest that wasn't suspended.
->
-> This means that system_wakeup is silently failing, which can be
-> considered a bug. Adding error handling isn't an API break in this
-> case - applications that didn't check the result will remain broken,
-> the ones that check it will have a chance to deal with it.
->
-> Adding to that, the commit before previous created a new QMP API called
-> query-current-machine, with a new flag called wakeup-suspend-support,
-> that indicates if the guest has the capability of waking up from suspended
-> state. Although such guest will never reach SUSPENDED state and erroring
-> it out in this scenario would suffice, it is more informative for the user
-> to differentiate between a failure because the guest isn't suspended versus
-> a failure because the guest does not have support for wake up at all.
->
-> All this considered, this patch changes qmp_system_wakeup to:
->
-> - check if the guest has the capability to wake-up from suspend. If
-> not, error out informing about the lack of support;
->
-> - make the runstate verification before proceeding to call
-> qemu_system_wakeup_request, firing up an error message if the user tries
-> to wake up a machine that isn't in SUSPENDED state.
->
-> After this patch, this is the output of system_wakeup in a guest that
-> does not have wake-up from suspend support (ppc64):
->
-> (qemu) system_wakeup
-> wake-up from suspend is not supported by this guest
-> (qemu)
->
-> And this is the output of system_wakeup in a x86 guest that has the
-> support but isn't suspended:
->
-> (qemu) system_wakeup
-> Unable to wake up: guest is not in suspended state
-> (qemu)
->
-> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hmp.c                   |  5 ++++-
->  include/sysemu/sysemu.h |  1 +
->  qapi/misc.json          |  5 ++++-
->  qmp.c                   | 10 ++++++++++
->  vl.c                    |  2 +-
->  5 files changed, 20 insertions(+), 3 deletions(-)
->
-> diff --git a/hmp.c b/hmp.c
-> index 4975fa56b0..e98c24782f 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1203,7 +1203,10 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
->  
->  void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
->  {
-> -    qmp_system_wakeup(NULL);
-> +    Error *err = NULL;
-> +
-> +    qmp_system_wakeup(&err);
-> +    hmp_handle_error(mon, &err);
->  }
->  
->  void hmp_nmi(Monitor *mon, const QDict *qdict)
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 0446adacc6..8d91c5ad5b 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -74,6 +74,7 @@ void qemu_exit_preconfig_request(void);
->  void qemu_system_reset_request(ShutdownCause reason);
->  void qemu_system_suspend_request(void);
->  void qemu_register_suspend_notifier(Notifier *notifier);
-> +bool qemu_wakeup_suspend_enabled(void);
->  void qemu_system_wakeup_request(WakeupReason reason);
->  void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
->  void qemu_register_wakeup_notifier(Notifier *notifier);
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index b616d385a4..2f5995f45f 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -1230,7 +1230,10 @@
->  ##
->  # @system_wakeup:
->  #
-> -# Wakeup guest from suspend.  Does nothing in case the guest isn't suspended.
-> +# If the guest has wake-up from suspend support enabled
-> +# (wakeup-suspend-support flag from query-current-machine), wakeup guest
-> +# from suspend if the guest is in SUSPENDED state. Returns an error
-> +# otherwise.
+Can we ignore non-PCIe guests?  virtio-mmio should die.
 
-Perhaps a note that versions older than 3.1 neglected to report errors
-would be helpful.
+Also if we ever get to the stage where (real) RISC-V servers are
+shipping that don't have PCIe, then I'm afraid I will have lost a
+critical battle :-( Non-PCI might be OK for tiny embedded stuff, but
+for proper machines - real and virtual - we should require PCIe.
 
->  #
->  # Since:  1.1
->  #
-> diff --git a/qmp.c b/qmp.c
-> index e7c0a2fd60..44e619d1be 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -183,6 +183,16 @@ void qmp_cont(Error **errp)
->  
->  void qmp_system_wakeup(Error **errp)
->  {
-> +    if (!qemu_wakeup_suspend_enabled()) {
-> +        error_setg(errp,
-> +                   "wake-up from suspend is not supported by this guest");
-> +        return;
-> +    }
+> > > * I have succesfully started a RISC-V guest with virtio-pci devices
+> > >    attached but, while they show up in 'info qtree' and friends, the
+> > >    guest OS itself doesn't seem to recognize any of them - not even
+> > >    pcie.0! I'm using the guest images listed at [1] and following the
+> > >    corresponding instructions, but I think the BBL build (config at
+> > >    [2]) is missing some feature... Any ideas what we would need to
+> > >    add there?
+> > 
+> > I use this monolithic config: 
+> > https://github.com/alistair23/meta-riscv/blob/7a950aa705b439b5ec19bb6f094930888335ba7b/recipes-kernel/linux/files/freedom-u540/defconfig
+> > 
+> > It has way too much enabled, but I think if you copy the PCIe part that 
+> > should be enough.
+> 
+> Looks like there's quite a few CONFIG*PCI* options we're missing!
+> 
+> Rich, can you try incorporating those and kicking off a BBL build?
+> If I remember correctly you might also have to backport a commit or
+> two to make some of the options available on RISC-V, but it should
+> be very feasible.
 
-Is this a new check?
+I'll have a look.
 
-If not, where is the condition checked before this patch?
+Rich.
 
-> +    if (!runstate_check(RUN_STATE_SUSPENDED)) {
-> +        error_setg(errp,
-> +                   "Unable to wake up: guest is not in suspended state");
-> +        return;
-> +    }
-
-Duplicates the check in qemu_system_wakeup_request().  Should that
-function take an Error ** argument instead?
-
->      qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
->  }
->  
-> diff --git a/vl.c b/vl.c
-> index f78947f69c..35a33d61ba 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1759,7 +1759,7 @@ void qemu_register_wakeup_support(void)
->      wakeup_suspend_enabled = true;
->  }
->  
-> -static bool qemu_wakeup_suspend_enabled(void)
-> +bool qemu_wakeup_suspend_enabled(void)
->  {
->      return wakeup_suspend_enabled;
->  }
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-builder quickly builds VMs from scratch
+http://libguestfs.org/virt-builder.1.html
