@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gAZtx-0000or-H2
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:17:14 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAZvH-0001m3-33
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1gAZtr-0006Jy-6s
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:17:13 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:37131)
+	(envelope-from <philmd@redhat.com>) id 1gAZvC-0007Yd-4Y
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:18:35 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35868)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1gAZtq-0005nX-R3
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:17:07 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20181009153132.GL22838@redhat.com>
-References: <20181009125541.24455-1-berrange@redhat.com>
-	<20181009125541.24455-5-berrange@redhat.com>
-	<w51h8hv88og.fsf@maestria.local.igalia.com>
-	<20181009150629.GK22838@redhat.com>
-	<w51bm8387e6.fsf@maestria.local.igalia.com>
-	<20181009153132.GL22838@redhat.com>
-Date: Thu, 11 Oct 2018 14:16:24 +0200
-Message-ID: <w51efcwn0fb.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAZvB-0007Y6-Tb
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 08:18:30 -0400
+Received: by mail-wm1-f67.google.com with SMTP id a8-v6so9149036wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 05:18:29 -0700 (PDT)
+References: <1539260043-4264-1-git-send-email-liq3ea@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <309b17e0-0353-86b6-ed4f-e80b8a4ea384@redhat.com>
+Date: Thu, 11 Oct 2018 14:18:21 +0200
 MIME-Version: 1.0
+In-Reply-To: <1539260043-4264-1-git-send-email-liq3ea@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/6] crypto: convert xts_tweak_encdec to
- use xts_uint128 type
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] i440fx: use ARRAY_SIZE for pam_regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Li Qiang <liq3ea@gmail.com>, mst@redhat.com, marcel.apfelbaum@gmail.com
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-On Tue 09 Oct 2018 05:31:32 PM CEST, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Oct 09, 2018 at 05:30:25PM +0200, Alberto Garcia wrote:
->> >> >      for (i =3D 0; i < lim; i++) {
->> >> > -        xts_tweak_encdec(datactx, decfunc, src, dst, (uint8_t *)&T=
-);
->> >> > +        xts_uint128 S, D;
->> >> > +
->> >> > +        memcpy(&S, src, XTS_BLOCK_SIZE);
->> >> > +        xts_tweak_encdec(datactx, decfunc, &S, &D, &T);
->> >> > +        memcpy(dst, &D, XTS_BLOCK_SIZE);
->> >>=20
->> >> Why do you need S and D?
->> >
->> > I think src & dst pointers can't be guaranteed to be aligned
->> > sufficiently for int64 operations, if we just cast from uint8t*.
->>=20
->> I see. I did a quick test without the memcpy() calls and it doesn't
->> seem to have a visible effect on performance, but if it turns out
->> that it does then maybe this is worth investigating further. I
->> suspect all buffers received by this code are allocated with
->> qemu_try_blockalign() anyway, so it should be safe.
->
-> The extra memcpy() calls certainly had a perf impact when I added
-> them, so if we can determine that we can safely do without, that would
-> be desirable.
+On 11/10/2018 14:14, Li Qiang wrote:
+> Cc: qemu-trivial@nongnu.org 
+> 
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
 
-So I was having a look at this. From the block layer everything comes
-properly aligned. Then there's VirtioCrypto, which seems to allow XTS
-mode but I couldn't quite tell from virtio_crypto_sym_op_helper() if all
-buffers are guaranteed to be aligned.
+Good cleanup!
 
-What you could do is a runtime check (with QEMU_PTR_IS_ALIGNED()) and
-decide what implementation to use.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-A couple of additional thoughts:
-
-- x86_64 (and others) allow unaligned memory accesses, and that might be
-  faster than copying the buffer using memcpy(). I haven't measured it
-  however.
-
-- qcrypto_block_{encrypt,decrypt}_helper() (used for encrypted block
-  I/O) use the same buffer for input and output, so maybe it's worth
-  exploring if this fact allows for additional optimization if you still
-  need to use memcpy().
-
-Berto
+> ---
+>  hw/pci-host/piix.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index 0e608347c1..230d5d2ea3 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -142,7 +142,7 @@ static void i440fx_update_memory_mappings(PCII440FXState *d)
+>      PCIDevice *pd = PCI_DEVICE(d);
+>  
+>      memory_region_transaction_begin();
+> -    for (i = 0; i < 13; i++) {
+> +    for (i = 0; i < ARRAY_SIZE(d->pam_regions); i++) {
+>          pam_update(&d->pam_regions[i], i,
+>                     pd->config[I440FX_PAM + (DIV_ROUND_UP(i, 2))]);
+>      }
+> @@ -401,7 +401,7 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>  
+>      init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_space,
+>               &f->pam_regions[0], PAM_BIOS_BASE, PAM_BIOS_SIZE);
+> -    for (i = 0; i < 12; ++i) {
+> +    for (i = 0; i < ARRAY_SIZE(f->pam_regions) - 1; ++i) {
+>          init_pam(dev, f->ram_memory, f->system_memory, f->pci_address_space,
+>                   &f->pam_regions[i+1], PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE,
+>                   PAM_EXPAN_SIZE);
+> 
