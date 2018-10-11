@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gAQgp-0007vn-Uz
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:27:04 -0400
+	(envelope-from <famz@redhat.com>) id 1gAQzk-0004f1-1c
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:46:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1gAQgl-0001i3-VX
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:27:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39910)
+	(envelope-from <famz@redhat.com>) id 1gAQzg-0006qO-QX
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:46:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39430)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1gAQgl-0001ay-Ny
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:26:59 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F24F71E2CC
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 02:26:58 +0000 (UTC)
-Date: Thu, 11 Oct 2018 10:26:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20181011022650.GC5014@xz-x1>
-References: <20181009062718.1914-1-peterx@redhat.com>
-	<902c92e2-3454-771e-51ff-ab38b970e86e@redhat.com>
-	<049fc618-6e13-5030-4124-1c9f4315f7eb@redhat.com>
-	<5ca812f7-c574-36fc-c7cd-f11e71a0efc1@redhat.com>
-	<20181011000555.GA5014@xz-x1>
-	<6b5b28f9-2ab9-93c2-ce32-6f767d8df97c@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1gAQzb-0006XW-71
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:46:29 -0400
+Date: Thu, 11 Oct 2018 10:46:11 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20181011024611.GB17357@magic>
+References: <20180930232312.16486-1-f4bug@amsat.org>
+	<20180930232312.16486-3-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <6b5b28f9-2ab9-93c2-ce32-6f767d8df97c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v9 0/6] monitor: enable OOB by default
+In-Reply-To: <20180930232312.16486-3-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] tests/vm: Do not abuse parallelism
+ when KVM is not available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-On Wed, Oct 10, 2018 at 08:17:41PM -0500, Eric Blake wrote:
-> On 10/10/18 7:05 PM, Peter Xu wrote:
-> 
-> > > other than the command line that is hanging:
-> > > 
-> > > /home/eblake/qemu/x86_64-softmmu/qemu-system-x86_64 -S -no-user-config
-> > > -nodefaults -nographic -machine none,accel=kvm:tcg -qmp
-> > > unix:/var/lib/libvirt/qemu/capabilities.monitor.sock,server,nowait -pidfile
-> > > /var/lib/libvirt/qemu/capabilities.pidfile -daemonize
-> > > 
-> > > And I suspect it is the -daemonize that is causing the hang I'm seeing when
-> > > run by libvirt.
-> > > 
-> 
-> > 
-> > It's very possible the daemonize thing, actually Wolfgang Bumiller has
-> > posted patches to fix this up (it's not the problem of this series,
-> > but it just exposed this to libvirt by the series since it only
-> > happens when oob and daemonize are both enabled).  The fixes are:
-> > 
-> >    [PATCH v2 0/2] delay monitor iothread creation
-> > 
-> > Since it cannot be applied cleanly onto this series, I resolved the
-> > conflicts and pushed a tree here in case you wanna try with these two
-> > extra patches applied:
-> > 
-> >    https://github.com/xzpeter/qemu/tree/test-oob
-> 
-> Technically, we should apply the patches in the opposite order (Wolfgang's
-> first, then yours), so that bisection does not land on a known-bad hang
-> situation.
+On Mon, 10/01 01:23, Philippe Mathieu-Daud=E9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+> v2: Add get_default_jobs (Fam suggestion)
+> ---
+>  tests/vm/basevm.py | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 5a5fa09752..fc203e9f53 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -202,6 +202,13 @@ class BaseVM(object):
+>          return self._guest.qmp(*args, **kwargs)
+> =20
+>  def parse_args(vm_name):
+> +
+> +    def get_default_jobs():
+> +        if kvm_available():
+> +            return multiprocessing.cpu_count() / 2
+> +        else:
+> +            return 1
+> +
+>      parser =3D optparse.OptionParser(
+>          description=3D"VM test utility.  Exit codes: "
+>                      "0 =3D success, "
+> @@ -214,7 +221,7 @@ def parse_args(vm_name):
+>                        help=3D"image file name")
+>      parser.add_option("--force", "-f", action=3D"store_true",
+>                        help=3D"force build image even if image exists")
+> -    parser.add_option("--jobs", type=3Dint, default=3Dmultiprocessing.=
+cpu_count() / 2,
+> +    parser.add_option("--jobs", type=3Dint, default=3Dget_default_jobs=
+(),
+>                        help=3D"number of virtual CPUs")
+>      parser.add_option("--verbose", "-V", action=3D"store_true",
+>                        help=3D"Pass V=3D1 to builds within the guest")
+> @@ -237,7 +244,7 @@ def main(vmcls):
+>              return 1
+>          logging.basicConfig(level=3D(logging.DEBUG if args.debug
+>                                     else logging.WARN))
+> -        vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs)
+> +        vm =3D vmcls(debug=3Dargs.debug, vcpus=3Dargs.jobs if kvm_avai=
+lable() else 0)
 
-Agreed, that patch actually fixes bug of current master (current
-master could possibly hit the same issue when with x-oob=on and
--daemonize), so should be applied earlier when proper.
+What's wrong with just using args.jobs? It defaults to 1 if kvm_available=
+()
+returns false, so I don't think we need another condition here.
 
-> 
-> > 
-> > Please feel free to test with libvirt again with that.
-> > 
-> > Thanks for playing with the tree and further investigation!  I will
-> > also mention this in the next version of cover letter (if there is one).
-> 
-> Confirmed that libvirt no longer hung with Wolfgang's patches added in.
+>          if args.build_image:
+>              if os.path.exists(args.image) and not args.force:
+>                  sys.stderr.writelines(["Image file exists: %s\n" % arg=
+s.image,
+> @@ -248,7 +255,7 @@ def main(vmcls):
+>              vm.add_source_dir(args.build_qemu)
+>              cmd =3D [vm.BUILD_SCRIPT.format(
+>                     configure_opts =3D " ".join(argv),
+> -                   jobs=3Dargs.jobs,
+> +                   jobs=3Dargs.jobs if kvm_available() else 1,
 
-Thanks!
+Again, can't we just use args.jobs?
 
--- 
-Peter Xu
+>                     verbose =3D "V=3D1" if args.verbose else "")]
+>          else:
+>              cmd =3D argv
+> --=20
+> 2.19.0
+>=20
+
+Fam
