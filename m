@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gAbek-00055X-7u
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAbmY-00039b-0O
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gAbeh-0006E9-CC
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gAbeh-00068W-3u
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:35 -0400
-From: wexu@redhat.com
-Date: Thu, 11 Oct 2018 10:08:35 -0400
-Message-Id: <1539266915-15216-13-git-send-email-wexu@redhat.com>
-In-Reply-To: <1539266915-15216-1-git-send-email-wexu@redhat.com>
-References: <1539266915-15216-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [[RFC v3 12/12] virtio: feature vhost-net support for
- packed ring
+	(envelope-from <cohuck@redhat.com>) id 1gAbmR-0007MR-A0
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:17:41 -0400
+Date: Thu, 11 Oct 2018 16:17:07 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20181011161707.3be6ae43.cohuck@redhat.com>
+In-Reply-To: <1539264723-741-1-git-send-email-thuth@redhat.com>
+References: <1539264723-741-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x: Include the tod-qemu also for
+ builds with --disable-tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, tiwei.bie@intel.com, wexu@redhat.com, jfreimann@redhat.com, maxime.coquelin@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-From: Wei Xu <wexu@redhat.com>
+On Thu, 11 Oct 2018 15:32:03 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-(cherry picked from commit 305a2c4640c15c5717245067ab937fd10f478ee6)
-Signed-off-by: Wei Xu <wexu@redhat.com>
-(cherry picked from commit 46476dae6f44c6fef8802a4a0ac7d0d79fe399e3)
-Signed-off-by: Wei Xu <wexu@redhat.com>
----
- hw/virtio/vhost.c          | 3 +++
- hw/virtio/virtio.c         | 4 ++++
- include/hw/virtio/virtio.h | 1 +
- 3 files changed, 8 insertions(+)
+> The device is required for running qtests, see hw/s390x/tod.c:
+> 
+> void s390_init_tod(void)
+> {
+>     Object *obj;
+> 
+>     if (kvm_enabled()) {
+>         obj = object_new(TYPE_KVM_S390_TOD);
+>     } else {
+>         obj = object_new(TYPE_QEMU_S390_TOD);
+>     }
+>     [...]
+>   }
+> 
+> During qtests, we're running without kvm, so TYPE_QEMU_S390_TOD is
+> required to avoid that QEMU aborts here.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 9df2da3..de06d55 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -974,6 +974,9 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
-     }
- 
-     state.num = virtio_queue_get_last_avail_idx(vdev, idx);
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        state.num |= ((int)virtio_queue_packed_get_wc(vdev, idx)) << 31;
-+    }
-     r = dev->vhost_ops->vhost_set_vring_base(dev, &state);
-     if (r) {
-         VHOST_OPS_DEBUG("vhost_set_vring_base failed");
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 1d25776..2a90163 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2894,6 +2894,10 @@ void virtio_init(VirtIODevice *vdev, const char *name,
-     vdev->use_guest_notifier_mask = true;
- }
- 
-+bool virtio_queue_packed_get_wc(VirtIODevice *vdev, int n)
-+{
-+    return vdev->vq[n].avail_wrap_counter;
-+}
- hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
- {
-     return vdev->vq[n].vring.desc;
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 9af8839..0bb3be5 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -295,6 +295,7 @@ void virtio_queue_aio_set_host_notifier_handler(VirtQueue *vq, AioContext *ctx,
-                                                 VirtIOHandleAIOOutput handle_output);
- VirtQueue *virtio_vector_first_queue(VirtIODevice *vdev, uint16_t vector);
- VirtQueue *virtio_vector_next_queue(VirtQueue *vq);
-+bool virtio_queue_packed_get_wc(VirtIODevice *vdev, int n);
- 
- static inline void virtio_add_feature(uint64_t *features, unsigned int fbit)
- {
--- 
-1.8.3.1
+Fixes: 8046f374a6 ("s390x/tod: factor out TOD into separate device")
+
+> ---
+>  hw/s390x/Makefile.objs | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+> index 5dbc00c..0efc64c 100644
+> --- a/hw/s390x/Makefile.objs
+> +++ b/hw/s390x/Makefile.objs
+> @@ -26,8 +26,8 @@ obj-$(call lnot,$(CONFIG_PCI)) += s390-pci-stub.o
+>  obj-y += s390-skeys.o
+>  obj-y += s390-stattrib.o
+>  obj-y += tod.o
+> +obj-y += tod-qemu.o
+>  obj-$(CONFIG_KVM) += tod-kvm.o
+> -obj-$(CONFIG_TCG) += tod-qemu.o
+>  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+>  obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
+>  obj-y += s390-ccw.o
+
+Thanks, applied.
