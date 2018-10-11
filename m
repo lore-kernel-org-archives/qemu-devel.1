@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1gAaga-0005uh-N4
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:07:29 -0400
+	(envelope-from <lhrazky@redhat.com>) id 1gAalU-00071T-4A
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:12:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fziglio@redhat.com>) id 1gAagU-0004vS-RN
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:07:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1gAagP-0004pa-I5
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:07:19 -0400
-Date: Thu, 11 Oct 2018 09:07:12 -0400 (EDT)
-From: Frediano Ziglio <fziglio@redhat.com>
-Message-ID: <1030882657.33037782.1539263232740.JavaMail.zimbra@redhat.com>
+	(envelope-from <lhrazky@redhat.com>) id 1gAalO-0002N1-3Z
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:12:32 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50250)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gAalM-0002LP-BI
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:12:25 -0400
+Received: by mail-wm1-f68.google.com with SMTP id i8-v6so8896663wmg.0
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 06:12:24 -0700 (PDT)
+Message-ID: <1539263541.16655.110.camel@redhat.com>
+From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
+Date: Thu, 11 Oct 2018 15:12:21 +0200
 In-Reply-To: <20181011122757.gsynkctea7reqnik@sirius.home.kraxel.org>
 References: <20181009131052.18500-1-lhrazky@redhat.com>
 	<20181009131052.18500-2-lhrazky@redhat.com>
 	<1539113618.12871.122.camel@redhat.com>
 	<1539189387.16655.63.camel@redhat.com>
 	<20181011122757.gsynkctea7reqnik@sirius.home.kraxel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [Spice-devel] [RFC PATCH spice 1/2] QXL interface:
  add functions to identify monitors in the guest
@@ -32,9 +34,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>, spice-devel@lists.freedesktop.org, Jonathon Jongsma <jjongsma@redhat.com>, qemu-devel@nongnu.org
+Cc: Jonathon Jongsma <jjongsma@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
 
-> 
+On Thu, 2018-10-11 at 14:27 +0200, Gerd Hoffmann wrote:
 > > > So, if I remember correctly, Gerd recommended returning this value from
 > > > the function. But I think it needs more explanation here. What exactly
 > > > is a "monitor_id" supposed to represent? It is not used in your follow-
@@ -56,31 +58,50 @@ Cc: =?utf-8?B?THVrw6HFoSBIcsOhemvDvQ==?= <lhrazky@redhat.com>, spice-devel@lists
 > 
 > Both are linked to a display channel.  The server/client messages go
 > through the main channel though ...
-> 
+
+Not really, it actually is like this:
+
+       display channel
+server --------------> client
+
+
+        main channel
+client --------------> server
+
+So the monitors_configs go each on its own display channel to the
+client, the client puts it all together and sends back an aggregated
+list on the main channel.
+
 > So what happens if a message from the client arrives?  Is that
 > broadcasted as-is to all display channels?  The current qemu code
 > (interface_client_monitors_config in spice-display.c, which is used with
 > virtio-gpu) simply uses the head as index into the array, so it looks
 > like spice-server doesn't do any filtering here (like only filling in
 > the monitors which belong to the display channel).
-> 
 
-Yes, it is a broadcast but is a bug that is working only because the
-message is handled only by Linux driver and in Linux configuration is
-expected that there is only a QXL card supporting multiple monitor
-(in this case the broadcast is equivalent to send only the monitor
-for the given QXL card).
+Correct, the spice server doesn't do any filtering and sends the whole
+monitors_config to all the interfaces...
 
 > spice_qxl_monitors_config_async() is never called with virtio-gpu,
 > except when opengl is enabled.  In that case qemu simply sets
 > QXLMonitorsConfig->count to 1 and fills in QXLMonitorsConfig->head[0]
-> (see qemu_spice_gl_monitor_config in spice-display.c).  Which would be
+> (see qemu_spice_gl_monitor_config in spice-display.c).
+
+As a side note, I have no idea about opengl. I got a slight impression
+from some earlier conversation that this is actually not used, but I
+don't really know.
+
+My wild guess at this moment is, that if you don't call
+spice_qxl_monitors_config_async() with virtio-gpu, meaning you don't
+send any monitors config, a simple one containing a single monitor for
+the surface is created somewhere along the way.
+
+> Which would be
 > ok in case spice-server merges the configs from all channels before
 > sending it off to the client.  Not sure this actually happens ...
-> 
 
-Yes, server send all the monitors together (or at least it should).
-So client sends and receives all the monitor sizes at once.
+A bit differently, as I said, but the configs are merged on the client,
+which should be an equivalent outcome.
 
 > > Interstingly enough, that seems to be the ID we want to have in the
 > > device_display_id attribute.  I expect (still need to look that up, I'm
@@ -88,11 +109,8 @@ So client sends and receives all the monitor sizes at once.
 > 
 > Keep in mind that multiple display devices don't really work right now,
 > and possibly we need to fix not only spice but qemu too.
-> 
 
-What does not work at the moment? On Windows is normal to have multiple
-QXL cards and is working for instance. We use QXL card and vGPU and is
-not working that bad (beside the problem we are fixing here).
+What exactly do you mean by multiple devices not working?
 
 > > And yeah, I didn't use the id in the QEMU patches, as I didn't know
 > > how, I expect Gerd to have some grand plans for it :)
@@ -102,25 +120,21 @@ not working that bad (beside the problem we are fixing here).
 > one-qxl-device-multihead in combination with multiple display channels.
 > 
 > Is that correct?
-> 
 
-Well, I think depends form the definition of "things". As we are
-changing the code we are not "just keep things as is". But yes, for
-the future we plan to support only one monitor per channel so
-monitor_id == 0 (and so will be display_id == channel_id).
-I suppose by "things" in "just keep things as is" you mean the
-SPICE (client <-> server) protocol.
+Correct.
 
 > I don't think we need the monitors_id in qemu then, qemu can simply use
 > the channel_id (except for the legacy qxl case).
-> 
 
-Yes, and the channel_id is provided by Qemu to spice-server (as id of
-the QXL interface) so there's no reason to ask to spice-server to provide
-back channel_id.
+Ok. Given the fact that the monitor_ids actually come from the driver,
+QEMU should actually know them already, right? No need to pass them
+back anyway? (except for the virtio-gpu case, which doesn't send
+monitors_config and so a single monitor_id = 0 is deduced in spice
+server)
+
+Cheers,
+Lukas
 
 > cheers,
 >   Gerd
 > 
-
-Frediano
