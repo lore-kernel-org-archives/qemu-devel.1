@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gAcFs-0005Ud-8z
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:48:01 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAcGU-0005la-Ar
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:48:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1gAcFm-0001u0-PP
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:48:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1gAcFm-0001sy-HK
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:47:54 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AFE1430820C0
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 14:47:53 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Thu, 11 Oct 2018 09:47:51 -0500
-Message-Id: <20181011144751.2724218-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests: Prevent more accidental test disabling
+	(envelope-from <philmd@redhat.com>) id 1gAcGP-0002Ss-9E
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:48:38 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:36843)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAcGO-0002Kt-Am
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:48:32 -0400
+Received: by mail-wr1-f65.google.com with SMTP id y16so10026580wrw.3
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 07:48:21 -0700 (PDT)
+References: <1539261534-2795-1-git-send-email-liq3ea@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ce1a63fd-772e-d11f-bb6f-a59f76377239@redhat.com>
+Date: Thu, 11 Oct 2018 16:48:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <1539261534-2795-1-git-send-email-liq3ea@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] piix: use TYPE_FOO constants than string
+ constats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, philmd@redhat.com
+To: Li Qiang <liq3ea@gmail.com>, mst@redhat.com, marcel.apfelbaum@gmail.com
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-GNU make is perfectly happy to use 'check-FOO-y += bar' to
-initialize check-FOO-y.  (GNU Automake strictly insists that
-you cannot use += until after an initial = per variable, but
-thankfully we aren't using automake).
+On 11/10/2018 14:38, Li Qiang wrote:
+> Make them more QOMConventional.
+> Cc:qemu-trivial@nongnu.org 
+> 
+> Signed-off-by: Li Qiang <liq3ea@gmail.com>
 
-As we have had more than one instance where copy-and-paste of
-'check-FOO-y = bar' from a first test under category FOO into
-an additional test, which ends up disabling the first (see
-commits 992159c7 and 4429532b), it's better to just always use
-the form that survives copy-and-paste, even for categories that
-don't currently add more than one test.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Done with s/^\(check-[a-z]*-y \)=/\1+=/g
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/Makefile.include | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 8264af64a86..fa6d30e26f7 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -38,7 +38,7 @@ $(SRC_PATH)/scripts/qapi-gen.py
- SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
-    $(wildcard $(SRC_PATH)/default-configs/*-softmmu.mak)))
-
--check-unit-y = tests/check-qdict$(EXESUF)
-+check-unit-y += tests/check-qdict$(EXESUF)
- gcov-files-check-qdict-y = qobject/qdict.c
- check-unit-y += tests/check-block-qdict$(EXESUF)
- gcov-files-check-block-qdict-y = qobject/block-qdict.c
-@@ -181,7 +181,7 @@ check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
- # All QTests for now are POSIX-only, but the dependencies are
- # really in libqtest, not in the testcases themselves.
-
--check-qtest-generic-y = tests/qmp-test$(EXESUF)
-+check-qtest-generic-y += tests/qmp-test$(EXESUF)
- gcov-files-generic-y = monitor.c qapi/qmp-dispatch.c
- check-qtest-generic-y += tests/qmp-cmd-test$(EXESUF)
-
-@@ -324,13 +324,13 @@ check-qtest-x86_64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
- gcov-files-i386-y += i386-softmmu/hw/timer/mc146818rtc.c
- gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y))
-
--check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
-+check-qtest-alpha-y += tests/boot-serial-test$(EXESUF)
-
--check-qtest-hppa-y = tests/boot-serial-test$(EXESUF)
-+check-qtest-hppa-y += tests/boot-serial-test$(EXESUF)
-
- check-qtest-m68k-y = tests/boot-serial-test$(EXESUF)
-
--check-qtest-microblaze-y = tests/boot-serial-test$(EXESUF)
-+check-qtest-microblaze-y += tests/boot-serial-test$(EXESUF)
-
- check-qtest-mips-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
-
-@@ -338,7 +338,7 @@ check-qtest-mips64-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
-
- check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
-
--check-qtest-moxie-y = tests/boot-serial-test$(EXESUF)
-+check-qtest-moxie-y += tests/boot-serial-test$(EXESUF)
-
- check-qtest-ppc-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
- check-qtest-ppc-y += tests/boot-order-test$(EXESUF)
-@@ -348,7 +348,7 @@ check-qtest-ppc-y += tests/boot-serial-test$(EXESUF)
- check-qtest-ppc-y += tests/m48t59-test$(EXESUF)
- gcov-files-ppc-y += hw/timer/m48t59.c
-
--check-qtest-ppc64-y = $(check-qtest-ppc-y)
-+check-qtest-ppc64-y += $(check-qtest-ppc-y)
- gcov-files-ppc64-y = $(subst ppc-softmmu/,ppc64-softmmu/,$(gcov-files-ppc-y))
- check-qtest-ppc64-y += tests/spapr-phb-test$(EXESUF)
- gcov-files-ppc64-y += ppc64-softmmu/hw/ppc/spapr_pci.c
-@@ -377,7 +377,7 @@ check-qtest-sh4-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
-
- check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
-
--check-qtest-sparc-y = tests/prom-env-test$(EXESUF)
-+check-qtest-sparc-y += tests/prom-env-test$(EXESUF)
- check-qtest-sparc-y += tests/m48t59-test$(EXESUF)
- gcov-files-sparc-y = hw/timer/m48t59.c
- check-qtest-sparc-y += tests/boot-serial-test$(EXESUF)
-@@ -386,7 +386,7 @@ check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
- check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
- check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
-
--check-qtest-arm-y = tests/tmp105-test$(EXESUF)
-+check-qtest-arm-y += tests/tmp105-test$(EXESUF)
- check-qtest-arm-y += tests/pca9552-test$(EXESUF)
- check-qtest-arm-y += tests/ds1338-test$(EXESUF)
- check-qtest-arm-y += tests/m25p80-test$(EXESUF)
-@@ -403,9 +403,9 @@ check-qtest-aarch64-y = tests/numa-test$(EXESUF)
- check-qtest-aarch64-$(CONFIG_SDHCI) += tests/sdhci-test$(EXESUF)
- check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
-
--check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
-+check-qtest-microblazeel-y += $(check-qtest-microblaze-y)
-
--check-qtest-xtensaeb-y = $(check-qtest-xtensa-y)
-+check-qtest-xtensaeb-y += $(check-qtest-xtensa-y)
-
- check-qtest-s390x-y = tests/boot-serial-test$(EXESUF)
- check-qtest-s390x-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
--- 
-2.17.1
+> ---
+>  hw/pci-host/piix.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> index 230d5d2ea3..5881e63364 100644
+> --- a/hw/pci-host/piix.c
+> +++ b/hw/pci-host/piix.c
+> @@ -95,6 +95,9 @@ typedef struct PIIX3State {
+>  #define I440FX_PCI_DEVICE(obj) \
+>      OBJECT_CHECK(PCII440FXState, (obj), TYPE_I440FX_PCI_DEVICE)
+>  
+> +#define TYPE_PIIX3_DEVICE "PIIX3"
+> +#define TYPE_PIIX3_XEN_DEVICE "PIIX3-xen"
+> +
+>  struct PCII440FXState {
+>      /*< private >*/
+>      PCIDevice parent_obj;
+> @@ -413,13 +416,13 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>       * These additional routes can be discovered through ACPI. */
+>      if (xen_enabled()) {
+>          PCIDevice *pci_dev = pci_create_simple_multifunction(b,
+> -                             -1, true, "PIIX3-xen");
+> +                             -1, true, TYPE_PIIX3_XEN_DEVICE);
+>          piix3 = PIIX3_PCI_DEVICE(pci_dev);
+>          pci_bus_irqs(b, xen_piix3_set_irq, xen_pci_slot_get_pirq,
+>                  piix3, XEN_PIIX_NUM_PIRQS);
+>      } else {
+>          PCIDevice *pci_dev = pci_create_simple_multifunction(b,
+> -                             -1, true, "PIIX3");
+> +                             -1, true, TYPE_PIIX3_DEVICE);
+>          piix3 = PIIX3_PCI_DEVICE(pci_dev);
+>          pci_bus_irqs(b, piix3_set_irq, pci_slot_get_pirq, piix3,
+>                  PIIX_NUM_PIRQS);
+> @@ -737,7 +740,7 @@ static void piix3_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo piix3_info = {
+> -    .name          = "PIIX3",
+> +    .name          = TYPE_PIIX3_DEVICE,
+>      .parent        = TYPE_PIIX3_PCI_DEVICE,
+>      .class_init    = piix3_class_init,
+>  };
+> @@ -750,7 +753,7 @@ static void piix3_xen_class_init(ObjectClass *klass, void *data)
+>  };
+>  
+>  static const TypeInfo piix3_xen_info = {
+> -    .name          = "PIIX3-xen",
+> +    .name          = TYPE_PIIX3_XEN_DEVICE,
+>      .parent        = TYPE_PIIX3_PCI_DEVICE,
+>      .class_init    = piix3_xen_class_init,
+>  };
+> 
