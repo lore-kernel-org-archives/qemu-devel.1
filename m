@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAhwh-0006l2-2P
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:35 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gAhwj-0006lw-EN
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAhwZ-0004j5-G2
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:33 -0400
-Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:33669)
+	(envelope-from <richard.henderson@linaro.org>) id 1gAhwh-0005Xf-5j
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:37 -0400
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:43486)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gAhwM-0003D1-DK
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:17 -0400
-Received: by mail-pg1-x534.google.com with SMTP id y18-v6so4746641pge.0
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:13 -0700 (PDT)
+	id 1gAhwf-0004EA-5W
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:33 -0400
+Received: by mail-pg1-x532.google.com with SMTP id 80-v6so4721210pgh.10
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:23 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 11 Oct 2018 13:51:48 -0700
-Message-Id: <20181011205206.3552-3-richard.henderson@linaro.org>
+Date: Thu, 11 Oct 2018 13:51:55 -0700
+Message-Id: <20181011205206.3552-10-richard.henderson@linaro.org>
 In-Reply-To: <20181011205206.3552-1-richard.henderson@linaro.org>
 References: <20181011205206.3552-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 02/20] target/arm: Don't call
- tcg_clear_temp_count
+Subject: [Qemu-devel] [PATCH 09/20] target/arm: Use gvec for
+ NEON_3R_VADD_VSUB insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +30,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-This is done generically in translator_loop.
-
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 1 -
- target/arm/translate.c     | 1 -
- 2 files changed, 2 deletions(-)
+ target/arm/translate.c | 29 ++++++++++-------------------
+ 1 file changed, 10 insertions(+), 19 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 76b5ca3606..ac9723c1b9 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -13899,7 +13899,6 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
- 
- static void aarch64_tr_tb_start(DisasContextBase *db, CPUState *cpu)
- {
--    tcg_clear_temp_count();
- }
- 
- static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 426db7828a..736880ee71 100644
+index 4ab9f69b01..4dcd7123e9 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -12701,7 +12701,6 @@ static void arm_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
-         tcg_gen_movi_i32(tmp, 0);
-         store_cpu_field(tmp, condexec_bits);
-     }
--    tcg_clear_temp_count();
- }
- 
- static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
+@@ -5949,6 +5949,16 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                 break;
+             }
+             return 0;
++
++        case NEON_3R_VADD_VSUB:
++            if (u) {
++                tcg_gen_gvec_sub(size, rd_ofs, rn_ofs, rm_ofs,
++                                 vec_size, vec_size);
++            } else {
++                tcg_gen_gvec_add(size, rd_ofs, rn_ofs, rm_ofs,
++                                 vec_size, vec_size);
++            }
++            return 0;
+         }
+         if (size == 3) {
+             /* 64-bit element instructions. */
+@@ -6006,13 +6016,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                                                   cpu_V1, cpu_V0);
+                     }
+                     break;
+-                case NEON_3R_VADD_VSUB:
+-                    if (u) {
+-                        tcg_gen_sub_i64(CPU_V001);
+-                    } else {
+-                        tcg_gen_add_i64(CPU_V001);
+-                    }
+-                    break;
+                 default:
+                     abort();
+                 }
+@@ -6147,18 +6150,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+             tmp2 = neon_load_reg(rd, pass);
+             gen_neon_add(size, tmp, tmp2);
+             break;
+-        case NEON_3R_VADD_VSUB:
+-            if (!u) { /* VADD */
+-                gen_neon_add(size, tmp, tmp2);
+-            } else { /* VSUB */
+-                switch (size) {
+-                case 0: gen_helper_neon_sub_u8(tmp, tmp, tmp2); break;
+-                case 1: gen_helper_neon_sub_u16(tmp, tmp, tmp2); break;
+-                case 2: tcg_gen_sub_i32(tmp, tmp, tmp2); break;
+-                default: abort();
+-                }
+-            }
+-            break;
+         case NEON_3R_VTST_VCEQ:
+             if (!u) { /* VTST */
+                 switch (size) {
 -- 
 2.17.1
