@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAkUd-0000am-60
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:35:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1gAkaq-0001o6-DS
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAkUZ-0005TK-Hj
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:35:47 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45125)
+	(envelope-from <richard.henderson@linaro.org>) id 1gAkak-00029W-48
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:12 -0400
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:38558)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAkUZ-0005OR-B3
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:35:43 -0400
-Received: by mail-wr1-f68.google.com with SMTP id q5-v6so11461102wrw.12
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 16:35:42 -0700 (PDT)
-References: <20181011205206.3552-1-richard.henderson@linaro.org>
-	<20181011205206.3552-3-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e5f093cc-4cd2-63b0-81f2-b292ea8d318f@redhat.com>
-Date: Fri, 12 Oct 2018 01:35:40 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181011205206.3552-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/20] target/arm: Don't call
- tcg_clear_temp_count
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1gAkai-0001tD-2w
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 19:42:06 -0400
+Received: by mail-pg1-x52c.google.com with SMTP id f8-v6so4906643pgq.5
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 16:42:03 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 11 Oct 2018 16:41:52 -0700
+Message-Id: <20181011234159.11496-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/7] target/ppc: Some cleanups to fp exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org
 
-On 11/10/2018 22:51, Richard Henderson wrote:
-> This is done generically in translator_loop.
-> 
-> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+There are a few bugs here, primarily wrt usage of GETPC().
+But there is opportunity to share more code between paths
+that operate on different floating point types.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+This is not everything that could be done, but it's a good start.
+Better for this not to hang out on a branch for another release.
 
-> ---
->  target/arm/translate-a64.c | 1 -
->  target/arm/translate.c     | 1 -
->  2 files changed, 2 deletions(-)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 76b5ca3606..ac9723c1b9 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -13899,7 +13899,6 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
->  
->  static void aarch64_tr_tb_start(DisasContextBase *db, CPUState *cpu)
->  {
-> -    tcg_clear_temp_count();
->  }
->  
->  static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 426db7828a..736880ee71 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -12701,7 +12701,6 @@ static void arm_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
->          tcg_gen_movi_i32(tmp, 0);
->          store_cpu_field(tmp, condexec_bits);
->      }
-> -    tcg_clear_temp_count();
->  }
->  
->  static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
-> 
+
+r~
+
+
+Richard Henderson (7):
+  target/ppc: Split up float_invalid_op_excp
+  target/ppc: Remove float_check_status
+  target/ppc: Introduce fp number classification
+  target/ppc: Split out float_invalid_op_addsub
+  target/ppc: Split out float_invalid_op_mul
+  target/ppc: Split out float_invalid_op_div
+  target/ppc: Split out float_invalid_cvt
+
+ target/ppc/fpu_helper.c | 661 ++++++++++++++++++++--------------------
+ 1 file changed, 327 insertions(+), 334 deletions(-)
+
+-- 
+2.17.1
