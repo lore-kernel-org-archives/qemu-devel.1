@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gAVp3-0006lz-A8
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:55:54 -0400
+	(envelope-from <david@redhat.com>) id 1gAVri-0007hs-Hi
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1gAVp0-0004RQ-4i
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:55:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47806)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1gAVoz-0004Qo-RR
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:55:50 -0400
-Date: Thu, 11 Oct 2018 08:55:44 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20181011075544.GR27120@redhat.com>
-References: <cover.1538683492.git.alistair.francis@wdc.com>
-	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
-	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
+	(envelope-from <david@redhat.com>) id 1gAVrf-0005mW-9o
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:58:38 -0400
+References: <20181003193931.18096-1-richard.henderson@linaro.org>
+	<20181003193931.18096-7-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <3ed672a6-0d50-c24b-fb28-9f0b7c9e1e5a@redhat.com>
+Date: Thu, 11 Oct 2018 09:58:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
- support to RISC-V
+In-Reply-To: <20181003193931.18096-7-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v3 6/9] target/s390x: Convert
+ to HAVE_CMPXCHG128 and HAVE_ATOMIC128
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +25,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: Alistair <alistair23@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>, "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org
 
-On Thu, Oct 11, 2018 at 07:59:59AM +0200, Andrea Bolognani wrote:
-> On Wed, 2018-10-10 at 10:57 -0700, Alistair wrote:
-> > On 10/10/2018 05:26 AM, Andrea Bolognani wrote:
-> > > * what should libvirt look for to figure out whether or not a RISC-V
-> > >    guest will have PCI support? For aarch64 we look for the presence
-> > >    of the 'gpex-pcihost' device, but of course that won't work for
-> > >    RISC-V so we need something else;
-> > 
-> > I'm not sure what you mean here. Why can we not do the same thing with 
-> > RISC-V?
+On 03/10/2018 21:39, Richard Henderson wrote:
+> Cc: qemu-s390x@nongnu.org
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/mem_helper.c | 92 +++++++++++++++++----------------------
+>  1 file changed, 41 insertions(+), 51 deletions(-)
 > 
-> The gpex-pcihost device was introduced at the same time as
-> aarch64/virt gained PCI support, so we can probe the binary[1] and,
-> if the device is present, we know that aarch64/virt guests will be
-> able to use PCI. We cannot do the same for RISC-V for obvious
-> reasons: the device is already there :)
+> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+> index bacae4f503..e106f61b4e 100644
+> --- a/target/s390x/mem_helper.c
+> +++ b/target/s390x/mem_helper.c
+> @@ -25,6 +25,7 @@
+>  #include "exec/exec-all.h"
+>  #include "exec/cpu_ldst.h"
+>  #include "qemu/int128.h"
+> +#include "qemu/atomic128.h"
+>  
+>  #if !defined(CONFIG_USER_ONLY)
+>  #include "hw/s390x/storage-keys.h"
+> @@ -1389,7 +1390,7 @@ static void do_cdsg(CPUS390XState *env, uint64_t addr,
+>      bool fail;
+>  
+>      if (parallel) {
+> -#ifndef CONFIG_ATOMIC128
+> +#if !HAVE_CMPXCHG128
+>          cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+>  #else
+>          int mem_idx = cpu_mmu_index(env, false);
+> @@ -1435,9 +1436,7 @@ void HELPER(cdsg_parallel)(CPUS390XState *env, uint64_t addr,
+>  static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
+>                          uint64_t a2, bool parallel)
+>  {
+> -#if !defined(CONFIG_USER_ONLY) || defined(CONFIG_ATOMIC128)
+>      uint32_t mem_idx = cpu_mmu_index(env, false);
+> -#endif
+>      uintptr_t ra = GETPC();
+>      uint32_t fc = extract32(env->regs[0], 0, 8);
+>      uint32_t sc = extract32(env->regs[0], 8, 8);
+> @@ -1465,18 +1464,20 @@ static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
+>      probe_write(env, a2, 0, mem_idx, ra);
+>  #endif
+>  
+> -    /* Note that the compare-and-swap is atomic, and the store is atomic, but
+> -       the complete operation is not.  Therefore we do not need to assert serial
+> -       context in order to implement this.  That said, restart early if we can't
+> -       support either operation that is supposed to be atomic.  */
+> +    /*
+> +     * Note that the compare-and-swap is atomic, and the store is atomic,
+> +     * but the complete operation is not.  Therefore we do not need to
+> +     * assert serial context in order to implement this.  That said,
+> +     * restart early if we can't support either operation that is supposed
+> +     * to be atomic.
+> +     */
+>      if (parallel) {
+> -        int mask = 0;
+> -#if !defined(CONFIG_ATOMIC64)
+> -        mask = -8;
+> -#elif !defined(CONFIG_ATOMIC128)
+> -        mask = -16;
+> +        uint32_t max = 2;
+> +#ifdef CONFIG_ATOMIC64
+> +        max = 3;
+>  #endif
+> -        if (((4 << fc) | (1 << sc)) & mask) {
+> +        if ((HAVE_CMPXCHG128 ? 0 : fc + 2 > max) ||
+> +            (HAVE_ATOMIC128  ? 0 : sc > max)) {
+>              cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+>          }
+>      }
+> @@ -1546,16 +1547,7 @@ static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
+>              Int128 cv = int128_make128(env->regs[r3 + 1], env->regs[r3]);
+>              Int128 ov;
+>  
+> -            if (parallel) {
+> -#ifdef CONFIG_ATOMIC128
+> -                TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+> -                ov = helper_atomic_cmpxchgo_be_mmu(env, a1, cv, nv, oi, ra);
+> -                cc = !int128_eq(ov, cv);
+> -#else
+> -                /* Note that we asserted !parallel above.  */
+> -                g_assert_not_reached();
+> -#endif
+> -            } else {
+> +            if (!parallel) {
+>                  uint64_t oh = cpu_ldq_data_ra(env, a1 + 0, ra);
+>                  uint64_t ol = cpu_ldq_data_ra(env, a1 + 8, ra);
+>  
+> @@ -1567,6 +1559,13 @@ static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
+>  
+>                  cpu_stq_data_ra(env, a1 + 0, int128_gethi(nv), ra);
+>                  cpu_stq_data_ra(env, a1 + 8, int128_getlo(nv), ra);
+> +            } else if (HAVE_CMPXCHG128) {
+> +                TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+> +                ov = helper_atomic_cmpxchgo_be_mmu(env, a1, cv, nv, oi, ra);
+> +                cc = !int128_eq(ov, cv);
+> +            } else {
+> +                /* Note that we asserted !parallel above.  */
+> +                g_assert_not_reached();
+>              }
+>  
+>              env->regs[r3 + 0] = int128_gethi(ov);
+> @@ -1596,18 +1595,16 @@ static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
+>              cpu_stq_data_ra(env, a2, svh, ra);
+>              break;
+>          case 4:
+> -            if (parallel) {
+> -#ifdef CONFIG_ATOMIC128
+> +            if (!parallel) {
+> +                cpu_stq_data_ra(env, a2 + 0, svh, ra);
+> +                cpu_stq_data_ra(env, a2 + 8, svl, ra);
+> +            } else if (HAVE_ATOMIC128) {
+>                  TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+>                  Int128 sv = int128_make128(svl, svh);
+>                  helper_atomic_sto_be_mmu(env, a2, sv, oi, ra);
+> -#else
+> +            } else {
+>                  /* Note that we asserted !parallel above.  */
+>                  g_assert_not_reached();
+> -#endif
+> -            } else {
+> -                cpu_stq_data_ra(env, a2 + 0, svh, ra);
+> -                cpu_stq_data_ra(env, a2 + 8, svl, ra);
+>              }
+>              break;
+>          default:
+> @@ -2105,21 +2102,18 @@ static uint64_t do_lpq(CPUS390XState *env, uint64_t addr, bool parallel)
+>      uintptr_t ra = GETPC();
+>      uint64_t hi, lo;
+>  
+> -    if (parallel) {
+> -#ifndef CONFIG_ATOMIC128
+> -        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+> -#else
+> +    if (!parallel) {
+> +        check_alignment(env, addr, 16, ra);
+> +        hi = cpu_ldq_data_ra(env, addr + 0, ra);
+> +        lo = cpu_ldq_data_ra(env, addr + 8, ra);
+> +    } else if (HAVE_ATOMIC128) {
+>          int mem_idx = cpu_mmu_index(env, false);
+>          TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+>          Int128 v = helper_atomic_ldo_be_mmu(env, addr, oi, ra);
+>          hi = int128_gethi(v);
+>          lo = int128_getlo(v);
+> -#endif
+>      } else {
+> -        check_alignment(env, addr, 16, ra);
+> -
+> -        hi = cpu_ldq_data_ra(env, addr + 0, ra);
+> -        lo = cpu_ldq_data_ra(env, addr + 8, ra);
+> +        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+>      }
+>  
+>      env->retxl = lo;
+> @@ -2142,21 +2136,17 @@ static void do_stpq(CPUS390XState *env, uint64_t addr,
+>  {
+>      uintptr_t ra = GETPC();
+>  
+> -    if (parallel) {
+> -#ifndef CONFIG_ATOMIC128
+> -        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+> -#else
+> -        int mem_idx = cpu_mmu_index(env, false);
+> -        TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+> -
+> -        Int128 v = int128_make128(low, high);
+> -        helper_atomic_sto_be_mmu(env, addr, v, oi, ra);
+> -#endif
+> -    } else {
+> +    if (!parallel) {
+>          check_alignment(env, addr, 16, ra);
+> -
+>          cpu_stq_data_ra(env, addr + 0, high, ra);
+>          cpu_stq_data_ra(env, addr + 8, low, ra);
+> +    } else if (HAVE_ATOMIC128) {
+> +        int mem_idx = cpu_mmu_index(env, false);
+> +        TCGMemOpIdx oi = make_memop_idx(MO_TEQ | MO_ALIGN_16, mem_idx);
+> +        Int128 v = int128_make128(low, high);
+> +        helper_atomic_sto_be_mmu(env, addr, v, oi, ra);
+> +    } else {
+> +        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
+>      }
+>  }
+>  
 > 
-> Is there any RISC-V device / property that was introduced along
-> with PCI support and we can use as a witness?
 
-Can we ignore non-PCIe guests?  virtio-mmio should die.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Also if we ever get to the stage where (real) RISC-V servers are
-shipping that don't have PCIe, then I'm afraid I will have lost a
-critical battle :-( Non-PCI might be OK for tiny embedded stuff, but
-for proper machines - real and virtual - we should require PCIe.
-
-> > > * I have succesfully started a RISC-V guest with virtio-pci devices
-> > >    attached but, while they show up in 'info qtree' and friends, the
-> > >    guest OS itself doesn't seem to recognize any of them - not even
-> > >    pcie.0! I'm using the guest images listed at [1] and following the
-> > >    corresponding instructions, but I think the BBL build (config at
-> > >    [2]) is missing some feature... Any ideas what we would need to
-> > >    add there?
-> > 
-> > I use this monolithic config: 
-> > https://github.com/alistair23/meta-riscv/blob/7a950aa705b439b5ec19bb6f094930888335ba7b/recipes-kernel/linux/files/freedom-u540/defconfig
-> > 
-> > It has way too much enabled, but I think if you copy the PCIe part that 
-> > should be enough.
-> 
-> Looks like there's quite a few CONFIG*PCI* options we're missing!
-> 
-> Rich, can you try incorporating those and kicking off a BBL build?
-> If I remember correctly you might also have to backport a commit or
-> two to make some of the options available on RISC-V, but it should
-> be very feasible.
-
-I'll have a look.
-
-Rich.
+Only case 1 still looks fairly ugly with the ifdefs.
 
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-builder quickly builds VMs from scratch
-http://libguestfs.org/virt-builder.1.html
+
+Thanks,
+
+David / dhildenb
