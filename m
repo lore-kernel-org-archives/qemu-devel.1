@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAXnw-0002Zv-44
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:02:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1gAXqo-0003oh-Tr
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:05:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAXnt-0006XO-Eo
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:02:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAXnt-0006WY-6X
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:02:49 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181010120841.13214-1-fli@suse.com>
-	<20181010120841.13214-2-fli@suse.com>
-Date: Thu, 11 Oct 2018 12:02:42 +0200
-In-Reply-To: <20181010120841.13214-2-fli@suse.com> (Fei Li's message of "Wed,
-	10 Oct 2018 20:08:35 +0800")
-Message-ID: <87in286bst.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1gAXqe-000201-7Y
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:05:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52792)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1gAXqc-0001qO-G1
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:05:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1gAXqZ-0007Pu-PW
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 10:05:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BE6A02E80C7
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 10:05:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC v5 1/7] Fix segmentation fault when
- qemu_signal_init fails
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 11 Oct 2018 09:52:16 -0000
+From: Thomas Huth <1368204@bugs.launchpad.net>
+Reply-To: Bug 1368204 <1368204@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140911122344.25076.48914.malonedeb@soybean.canonical.com>
+Message-Id: <153925153696.16288.12054211044081009269.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1368204] Re: WinME isn't able to detect QEMU's
+ cdrom drive and other hard drives automatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,162 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fei Li <fli@suse.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, famz@redhat.com
+To: qemu-devel@nongnu.org
 
-Fei Li <fli@suse.com> writes:
+** Changed in: qemu
+     Assignee: John Snow (jnsnow) =3D> (unassigned)
 
-> Currently, when qemu_signal_init() fails it only returns a non-zero
-> value but without propagating any Error. But its callers need a
-> non-null err when runs error_report_err(err), or else 0->msg occurs.
+-- =
 
-The bug is in qemu_init_main_loop():
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1368204
 
-    ret = qemu_signal_init();
-    if (ret) {
-        return ret;
-    }
+Title:
+  WinME isn't able to detect QEMU's cdrom drive and other hard drives
+  automatically
 
-Fails without setting an error, unlike the other failures.  Its callers
-crash then.
+Status in QEMU:
+  Incomplete
 
-> To avoid such segmentation fault, add a new Error parameter to make
-> the call trace to propagate the err to the final caller.
->
-> Signed-off-by: Fei Li <fli@suse.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> ---
->  include/qemu/osdep.h | 2 +-
->  util/compatfd.c      | 9 ++++++---
->  util/main-loop.c     | 9 ++++-----
->  3 files changed, 11 insertions(+), 9 deletions(-)
->
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 4f8559e550..f1f56763a0 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
->                               additional fields in the future) */
->  };
->  
-> -int qemu_signalfd(const sigset_t *mask);
-> +int qemu_signalfd(const sigset_t *mask, Error **errp);
->  void sigaction_invoke(struct sigaction *action,
->                        struct qemu_signalfd_siginfo *info);
->  #endif
-> diff --git a/util/compatfd.c b/util/compatfd.c
-> index 980bd33e52..d3ed890405 100644
-> --- a/util/compatfd.c
-> +++ b/util/compatfd.c
-> @@ -16,6 +16,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu-common.h"
->  #include "qemu/thread.h"
-> +#include "qapi/error.h"
->  
->  #include <sys/syscall.h>
->  
-> @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
->      }
->  }
->  
-> -static int qemu_signalfd_compat(const sigset_t *mask)
-> +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
->  {
->      struct sigfd_compat_info *info;
->      QemuThread thread;
-> @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *mask)
->  
->      info = malloc(sizeof(*info));
->      if (info == NULL) {
-> +        error_setg(errp, "Failed to allocate signalfd memory");
->          errno = ENOMEM;
->          return -1;
->      }
->  
->      if (pipe(fds) == -1) {
-> +        error_setg(errp, "Failed to create signalfd pipe");
->          free(info);
->          return -1;
->      }
-> @@ -94,7 +97,7 @@ static int qemu_signalfd_compat(const sigset_t *mask)
->      return fds[0];
->  }
->  
-> -int qemu_signalfd(const sigset_t *mask)
-> +int qemu_signalfd(const sigset_t *mask, Error **errp)
->  {
->  #if defined(CONFIG_SIGNALFD)
->      int ret;
-> @@ -106,5 +109,5 @@ int qemu_signalfd(const sigset_t *mask)
->      }
->  #endif
->  
-> -    return qemu_signalfd_compat(mask);
-> +    return qemu_signalfd_compat(mask, errp);
->  }
+Bug description:
+  On a fresh installation of Windows Millennium (WinME) in qemu, Windows
+  Me isn't able to find the CD-ROM drive or additional hard drives other
+  than -hda at first place.
 
-I think this takes the Error conversion too far.
+  Only if i add manually an IDE controller driver in Windows ME's device ma=
+nager, the CD-ROM inserted in QEMU is found.
+  Thus an IDE controller isn't found automatically either.
 
-qemu_signalfd() is like the signalfd() system call, only portable, and
-setting FD_CLOEXEC.  In particular, it reports failure just like a
-system call: it sets errno and returns -1.  I'd prefer to keep it that
-way.  Instead...
+  This shouldn't be the case. On normal real hardware, Windows ME would
+  find at least one IDE or SCSI controller.
 
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index affe0403c5..9671b6d226 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
->      }
->  }
->  
-> -static int qemu_signal_init(void)
-> +static int qemu_signal_init(Error **errp)
->  {
->      int sigfd;
->      sigset_t set;
-> @@ -94,9 +94,8 @@ static int qemu_signal_init(void)
->      pthread_sigmask(SIG_BLOCK, &set, NULL);
->  
->      sigdelset(&set, SIG_IPI);
-> -    sigfd = qemu_signalfd(&set);
-> +    sigfd = qemu_signalfd(&set, errp);
->      if (sigfd == -1) {
-> -        fprintf(stderr, "failed to create signalfd\n");
->          return -errno;
->      }
->  
+  The command line that was used is the following:
+  sudo /usr/bin/qemu-system-i386 -hda WinME_QEMU.img -cdrom drivers.iso -bo=
+ot c -no-acpi -no-hpet -soundhw sb16 -net nic -cpu pentium3 -m 256 -vga cir=
+rus   =
 
-... change this function so:
 
-       pthread_sigmask(SIG_BLOCK, &set, NULL);
-   
-       sigdelset(&set, SIG_IPI);
-       sigfd = qemu_signalfd(&set);
-       if (sigfd == -1) {
-  -        fprintf(stderr, "failed to create signalfd\n");
-  +        error_setg_errno(errp, errno, "failed to create signalfd");
-           return -errno;
-       }
+  qemu's version is:
+  qemu-system-i386 --version                                               =
+                                                                           =
+                                                =
 
-Does this make sense?
+  QEMU emulator version 2.0.0 (Debian 2.0.0+dfsg-2ubuntu1.3), Copyright (c)=
+ 2003-2008 Fabrice Bellard
 
-> @@ -109,7 +108,7 @@ static int qemu_signal_init(void)
->  
->  #else /* _WIN32 */
->  
-> -static int qemu_signal_init(void)
-> +static int qemu_signal_init(Error **errp)
->  {
->      return 0;
->  }
-> @@ -148,7 +147,7 @@ int qemu_init_main_loop(Error **errp)
->  
->      init_clocks(qemu_timer_notify_cb);
->  
-> -    ret = qemu_signal_init();
-> +    ret = qemu_signal_init(errp);
->      if (ret) {
->          return ret;
->      }
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1368204/+subscriptions
