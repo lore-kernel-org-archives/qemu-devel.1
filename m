@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gAdD4-00058Y-Fm
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:49:11 -0400
+	(envelope-from <philmd@redhat.com>) id 1gAdHM-0006Ub-Ow
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:53:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1gAdCy-0006ob-Ts
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:49:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1gAdCx-0006kk-4K
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:49:03 -0400
-Date: Thu, 11 Oct 2018 16:48:34 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20181011154834.GA10122@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180914135230.15178-1-marcandre.lureau@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1gAdHI-0002vq-5K
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:53:36 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:34693)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAdHF-0002sW-1d
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:53:30 -0400
+Received: by mail-wm1-f68.google.com with SMTP id z25-v6so16083700wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 08:53:26 -0700 (PDT)
+References: <20181011131413.22208-1-philmd@redhat.com>
+	<7762db82-6044-df69-a1b7-c05100a0e938@redhat.com>
+	<4b664769-9830-e186-05c4-132a8cfc423b@redhat.com>
+	<8d285029-2b6f-a841-2489-c6761e62c02c@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f670390d-7409-1989-6ed3-7b31d64e583d@redhat.com>
+Date: Thu, 11 Oct 2018 17:53:20 +0200
 MIME-Version: 1.0
+In-Reply-To: <8d285029-2b6f-a841-2489-c6761e62c02c@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180914135230.15178-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-user: define conventions for
- vhost-user backends
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] chardev: Convert IOReadHandler to read an
+ unsigned number of bytes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,243 +33,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Felipe Franciosi <felipe@nutanix.com>, Gonglei <arei.gonglei@huawei.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Prasad J Pandit <ppandit@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Antony Pavlov <antonynpavlov@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Alistair Francis <alistair@alistair23.me>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Zhang Chen <zhangckid@gmail.com>, "open list:PXA2XX" <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Samuel Thibault <samuel.thibault@ens-lyon.org>, "open list:X86" <xen-devel@lists.xenproject.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Cornelia Huck <cohuck@redhat.com>, "open list:S390 Virtio-ccw" <qemu-s390x@nongnu.org>, Thomas Huth <huth@tuxfamily.org>, Michael Walle <michael@walle.cc>, "open list:sPAPR" <qemu-ppc@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Adding Markus since we're talking about new CLI argument and capability
-reporting standards.
+On 11/10/2018 17:34, Paolo Bonzini wrote:
+> On 11/10/2018 17:24, Philippe Mathieu-Daudé wrote:
+>>> On the other hand, fd_chr_read_poll is not an IOCanReadHandler, and this
+>>> patch therefore probably doesn't compile?
+>> It does compile.
+>>
+>> fd_chr_update_read_handler() uses fd_chr_read_poll with io_add_watch_poll():
+>>
+>> GSource *io_add_watch_poll(Chardev *chr,
+>>                         QIOChannel *ioc,
+>>                         IOCanReadHandler *fd_can_read,
+>>                         QIOChannelFunc fd_read,
+>>                         gpointer user_data,
+>>                         GMainContext *context);
+> 
+> Oh, that's somewhat weird.  It could just as well return a bool.
+> 
+> However, this made me notice that you need to change e.g. s->max_size's
+> declaration (in include/chardev/char-fd.h) from int to size_t, and
+> likewise for: 1) all users of s->max_size, such as len in fd_chr_read;
+> 2) all the similar variables in other char backends.
+> 
+> So it's probably best to structure the series as follows:
+> 
+> 1) change fd_can_read from IOCanReadHandler to a GSourceFunc (which
+> returns a boolean value), changing all "return s->foo" to "return s->foo
+>> 0;".  Then you can remove the > 0 from
+> 
+>     bool now_active = iwp->fd_can_read(iwp->opaque) > 0;
+> 
+> (Having the > 0 repeated in all backends is now a bit ugly, but there
+> are future cleanup opportunities here to move the qemu_chr_be_can_write
+> call to qemu_chr_be_can_write; this way most chardev backends can skip
+> defining a read_poll function.  But I digress).
+> 
+> 2) assert in qemu_chr_be_can_write that the returned value is >= 0
+> 
+> 3) for each backend, change the assigned variable from int to size_t
+> 
+> 4) now the rest of your patch, touching all front-ends.  The assertion
+> from (2) now does not make sense anymore, since ->can_read returns an
+> unsigned value, but perhaps you can keep a "fail-safe" assertion that
+> (ssize_t)returned_value >= 0 to catch undesired overflows.
 
-On Fri, Sep 14, 2018 at 05:52:30PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> As discussed during "[PATCH v4 00/29] vhost-user for input & GPU"
-> review, let's define a common set of backend conventions to help with
-> management layer implementation, and interoperability.
->=20
-> v2:
->  - drop --pidfile
->  - add some notes about daemonizing & stdin/out/err
->=20
-> Cc: libvir-list@redhat.com
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Cc: Changpeng Liu <changpeng.liu@intel.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Felipe Franciosi <felipe@nutanix.com>
-> Cc: Gonglei <arei.gonglei@huawei.com>
-> Cc: Maxime Coquelin <maxime.coquelin@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Victor Kaplansky <victork@redhat.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  docs/interop/vhost-user.txt | 109 +++++++++++++++++++++++++++++++++++-
->  1 file changed, 107 insertions(+), 2 deletions(-)
->=20
-> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> index ba5e37d714..339b335e9c 100644
-> --- a/docs/interop/vhost-user.txt
-> +++ b/docs/interop/vhost-user.txt
-> @@ -17,8 +17,13 @@ The protocol defines 2 sides of the communication, m=
-aster and slave. Master is
->  the application that shares its virtqueues, in our case QEMU. Slave is=
- the
->  consumer of the virtqueues.
-> =20
-> -In the current implementation QEMU is the Master, and the Slave is int=
-ended to
-> -be a software Ethernet switch running in user space, such as Snabbswit=
-ch.
-> +In the current implementation QEMU is the Master, and the Slave is the
-> +external process consuming the virtio queues, for example a software
-> +Ethernet switch running in user space, such as Snabbswitch, or a block
-> +device backend processing read & write to a virtual disk. In order to
-> +facilitate interoperability between various backend implementations,
-> +it is recommended to follow the "Backend program conventions"
-> +described in this document.
-> =20
->  Master and slave can be either a client (i.e. connecting) or server (l=
-istening)
->  in the socket communication.
-> @@ -859,3 +864,103 @@ resilient for selective requests.
->  For the message types that already solicit a reply from the client, th=
-e
->  presence of VHOST_USER_PROTOCOL_F_REPLY_ACK or need_reply bit being se=
-t brings
->  no behavioural change. (See the 'Communication' section for details.)
-> +
-> +Backend program conventions
-> +---------------------------
-> +
-> +vhost-user backends provide various services and they may need to be
-> +configured manually depending on the use case. However, it is a good
-> +idea to follow the conventions listed here when possible. Users, QEMU
-> +or libvirt, can then rely on some common behaviour to avoid
-> +heterogenous configuration and management of the backend program and
-> +facilitate interoperability.
-> +
-> +In order to be discoverable, default vhost-user backends should be
-> +located under "/usr/libexec", and be named "vhost-user-$device" where
-> +"$device" is the device name in lower-case following the name listed
-> +in the Linux virtio_ids.h header (ex: the VIRTIO_ID_RPROC_SERIAL
-> +backend would be named "vhost-user-rproc-serial").
-> +
-> +Mechanisms to list, and to select among alternatives implementations
-> +or modify the default backend are not described at this point (a
-> +distribution may use update-alternatives, for example, to list and to
-> +pick a different default backend).
-
-I don't think that update-alternatives is a good thing as it presumes
-that each host only needs a single preferred impl at a time.
-
-I think we need to be able to discover all impls for a given device
-type.
-
-This feels like the same problem we tackled recently with enumerating
-and choosing between multiple firmware impls.
-
-In $git/docs/interop/firmware.json we defined a way to drop config files
-into a standard directory, providing info about the firmware in a well
-defined QAPI based data format.
-
-Rather than requiring a special file naming convention I think we just
-need to register config files in a particular directory, letting the
-mgmt app enumerate them.
-
-eg
-
-  /etc/qemu/vhost-user/50-rproc-serial.json  (a default imp from QEMU)
-  /etc/qemu/vhost-user/10-my-rproc-serial.json (my replacenment impl)
-
-a file could be something pretty simple like
-
-   {
-       "name": "my-rproc-serial",
-       "description": "My rproc serial impl doing foo, bar, wizz",
-       "device": "rproc-serial",
-       "binary": "/usr/libexec/my-awesome-rproc-serial",
-   }
-
-Mgmt apps can simply load all files in that directory to learn about
-the possible impls. The file load order gives a prioritization if
-multiple matches exist, or a specific impl can be requested by
-name "my-rproc-serial".
-
-This shouldn't provide full capabilities reporting though, just
-enough to identify viable binaries. Capabilities should still be
-via the binary itself so it can be dynamically tailored based on
-other environmental factors
-
-> +
-> +The backend program must not daemonize itself, but it may be
-> +daemonized by the management layer. It may also have a restricted
-> +access to the system.
-> +
-> +File descriptors 0, 1 and 2 will exist, and have regular
-> +stdin/stdout/stderr usage (they may be redirected to /dev/null by the
-> +management layer, or to a log handler).
-> +
-> +The backend program must end (as quickly and cleanly as possible) when
-> +the SIGTERM signal is received. Eventually, it may be SIGKILL by the
-> +management layer after a few seconds.
-> +
-> +The following command line options have an expected behaviour. They
-> +are mandatory, unless explicitly said differently:
-> +
-> +* --socket-path=3DPATH
-> +
-> +This option specify the location of the vhost-user Unix domain socket.
-> +It is incompatible with --fd.
-> +
-> +* --fd=3DFDNUM
-> +
-> +When this argument is given, the backend program is started with the
-> +vhost-user socket as file descriptor FDNUM. It is incompatible with
-> +--socket-path.
-> +
-> +* --print-capabilities
-> +
-> +Output to stdout a line-seperated list of backend capabilities, and
-> +then exit successfully. Other options and arguments should be ignored,
-> +and the backend program should not perform its normal function.
-
-This is going to repeat the mistakes we've had with every other
-binary in QEMU. A "simple" flag list or args sounds appealing,
-but we've always been burnt by it in the medium-long term, which
-is why we created QAPI.
-
-If we're doing to have any capabilities reporting, we should
-model it in QAPI schema, so any '--print-capabilities' arg
-should print a JSON doc following the documented schema.
-
-While talking about QAPI, I think this is an opportunity to
-also avoid the problems of CLI arg values becoming more
-complex than just scalars. eg
-
-  --socket-path=3DPATH
-
-may inevitably grow more options  - eg to perhaps say whether
-to use it in listen or connect mode. Or to indicate a reconnect
-timeout. etc
-
-I know Markus wants to replace QemuOpts with something that
-is again driven by QAPI, so that "-arg $VALUE" can handle
-$VALUE being complex  non-scalar data following a QAPI
-schema with well defined semantics for parsing. Since we
-are defining a new standard, I think we should go todo
-something better than scalar values right from the start.
-
-> +
-> +At the time of writing, there are no common capabilities. Some
-> +device-specific capabilities are listed in the respective sections. By
-> +convention, device-specific capabilities are prefixed by their device
-> +name.
-> +
-> +vhost-user-input program conventions
-> +------------------------------------
-> +
-> +Capabilities:
-> +
-> +input-evdev-path
-> +
-> +    The --evdev-path command line option is supported.
-> +
-> +input-no-grab
-> +
-> +    The --no-grab command line option is supported.
-> +
-> +* --evdev-path=3DPATH (optional)
-> +
-> +Specify the linux input device.
-> +
-> +* --no-grab (optional)
-> +
-> +Do no request exclusive access to the input device.
-> +
-> +vhost-user-gpu program conventions
-> +----------------------------------
-> +
-> +Capabilities:
-> +
-> +gpu-render-node
-> +
-> +    The --render-node command line option is supported.
-> +
-> +gpu-virgl
-> +
-> +    The --virgl command line option is supported.
-> +
-> +* --render-node=3DPATH (optional)
-> +
-> +Specify the GPU DRM render node.
-> +
-> +* --virgl (optional)
-> +
-> +Enable virgl rendering support.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+OK! thanks for sorting this :)
