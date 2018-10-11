@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gAVsQ-00082e-Rk
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:59:23 -0400
+	(envelope-from <rjones@redhat.com>) id 1gAVuY-0000pO-JI
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:01:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1gAVsM-0006SC-OK
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:59:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18812)
+	(envelope-from <rjones@redhat.com>) id 1gAVuR-0007op-4x
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:01:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1gAVsM-0006JI-CV
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:59:18 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-References: <20180927212438.32024-1-lersek@redhat.com>
-Message-ID: <785e1781-398c-725f-4ded-b81b4aabe220@redhat.com>
-Date: Thu, 11 Oct 2018 09:59:05 +0200
+	(Exim 4.71) (envelope-from <rjones@redhat.com>) id 1gAVuJ-0007hN-8i
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 04:01:21 -0400
+Date: Thu, 11 Oct 2018 09:01:14 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20181011080114.GS27120@redhat.com>
+References: <cover.1538683492.git.alistair.francis@wdc.com>
+	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
+	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
+	<7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180927212438.32024-1-lersek@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] hw/pci-host/x86: extend the 64-bit
- PCI hole relative to the fw-assigned base
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/5] Connect a PCIe host and graphics
+ support to RISC-V
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Marcel Apfelbaum (GMail address)" <marcel.apfelbaum@gmail.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Alistair <alistair23@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>, "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>
 
-Michael,
-
-On 09/27/18 23:24, Laszlo Ersek wrote:
-> This is v2 of the series previously posted at
-> <http://mid.mail-archive.com/20180924221346.16733-1-lersek@redhat.com>.
+On Thu, Oct 11, 2018 at 07:59:59AM +0200, Andrea Bolognani wrote:
+> On Wed, 2018-10-10 at 10:57 -0700, Alistair wrote:
+> > I use this monolithic config: 
+> > https://github.com/alistair23/meta-riscv/blob/7a950aa705b439b5ec19bb6f094930888335ba7b/recipes-kernel/linux/files/freedom-u540/defconfig
+> > 
+> > It has way too much enabled, but I think if you copy the PCIe part that 
+> > should be enough.
 > 
-> Changes are noted on every patch.
+> Looks like there's quite a few CONFIG*PCI* options we're missing!
 
-can you please merge this series?
+PCI settings in this file:
 
-Please note that it depends on v2 of the following patch, from Gerd:
+CONFIG_BLK_MQ_PCI=y
+CONFIG_GENERIC_PCI_IOMAP=y
+CONFIG_HOTPLUG_PCI_PCIE=y
+CONFIG_HOTPLUG_PCI=y
+CONFIG_MEDIA_PCI_SUPPORT=y
+CONFIG_PCI_ATS=y
+CONFIG_PCI_BUS_ADDR_T_64BIT=y
+CONFIG_PCI_DEBUG=y
+CONFIG_PCI_DMA_32=y
+CONFIG_PCI_DOMAINS_GENERIC=y
+CONFIG_PCI_DOMAINS=y
+CONFIG_PCIEAER=y
+CONFIG_PCIEASPM_DEFAULT=y
+CONFIG_PCIEASPM=y
+CONFIG_PCI_ECAM=y
+CONFIG_PCIE_MICROSEMI=y
+CONFIG_PCI_ENDPOINT=y
+CONFIG_PCIEPORTBUS=y
+CONFIG_PCIE_XILINX=y
+CONFIG_PCI_HOST_COMMON=y
+CONFIG_PCI_HOST_GENERIC=y
+CONFIG_PCI_IOV=y
+CONFIG_PCI_MSI=y
+CONFIG_PCI_PASID=y
+CONFIG_PCI_PRI=y
+CONFIG_PCI_QUIRKS=y
+CONFIG_PCI_SW_SWITCHTEC=y
+CONFIG_PCI=y
+CONFIG_USB_BDC_PCI=y
+CONFIG_USB_EHCI_PCI=y
+CONFIG_USB_OHCI_HCD_PCI=y
+CONFIG_USB_PCI=y
+CONFIG_USB_XHCI_PCI=y
 
-> The bios-tables-test case depends on Gerd's "[PATCH] pci-testdev: add
-> optional memory bar" at
-> <https://patchew.org/QEMU/20180927121055.28361-1-kraxel@redhat.com/>.
+Here are the settings we currently do NOT have in my RV kernel:
 
-[Qemu-devel] [PATCH v2] pci-testdev: add optional memory bar
-message-id: <20180928064419.2106-1-kraxel@redhat.com>
+CONFIG_HOTPLUG_PCI_PCIE=y
+CONFIG_HOTPLUG_PCI=y
+CONFIG_MEDIA_PCI_SUPPORT=y
+CONFIG_PCI_ATS=y
+CONFIG_PCI_DEBUG=y
+CONFIG_PCIEAER=y
+CONFIG_PCIEASPM_DEFAULT=y
+CONFIG_PCIEASPM=y
+CONFIG_PCI_ECAM=y
+CONFIG_PCIE_MICROSEMI=y
+CONFIG_PCI_ENDPOINT=y
+CONFIG_PCIEPORTBUS=y
+CONFIG_PCI_HOST_COMMON=y
+CONFIG_PCI_HOST_GENERIC=y
+CONFIG_PCI_IOV=y
+CONFIG_PCI_PASID=y
+CONFIG_PCI_PRI=y
+CONFIG_PCI_SW_SWITCHTEC=y
+CONFIG_USB_BDC_PCI=y
 
-so please include that as well (first).
+If you're happy with it, I can add all of those.  If there are any
+which shouldn't be added let me know.
 
-Thanks!
-Laszlo
+Rich.
 
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> 
-> Thanks
-> Laszlo
-> 
-> Laszlo Ersek (4):
->   MAINTAINERS: list "tests/acpi-test-data" files in ACPI/SMBIOS section
->   tests/bios-tables-test: add 64-bit PCI MMIO aperture round-up test on
->     Q35
->   hw/pci-host/x86: extract get_pci_hole64_start_value() helpers
->   hw/pci-host/x86: extend the 64-bit PCI hole relative to the
->     fw-assigned base
-> 
->  hw/pci-host/piix.c                   |  17 ++++++++++++-----
->  hw/pci-host/q35.c                    |  17 ++++++++++++-----
->  tests/bios-tables-test.c             |  16 ++++++++++++++++
->  MAINTAINERS                          |   2 ++
->  tests/acpi-test-data/q35/DSDT.mmio64 | Bin 0 -> 8947 bytes
->  tests/acpi-test-data/q35/SRAT.mmio64 | Bin 0 -> 224 bytes
->  6 files changed, 42 insertions(+), 10 deletions(-)
->  create mode 100644 tests/acpi-test-data/q35/DSDT.mmio64
->  create mode 100644 tests/acpi-test-data/q35/SRAT.mmio64
-> 
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-top is 'top' for virtual machines.  Tiny program with many
+powerful monitoring features, net stats, disk stats, logging, etc.
+http://people.redhat.com/~rjones/virt-top
