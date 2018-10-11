@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAXab-0006pi-9m
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:49:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1gAXbK-00076Z-80
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:49:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAXaX-0004xD-Vm
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:49:05 -0400
-Date: Thu, 11 Oct 2018 11:48:45 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20181011114845.75275acd.cohuck@redhat.com>
-In-Reply-To: <ceeafd70-b1d3-9e80-d357-65740dd125cd@de.ibm.com>
-References: <20181010170309.12045-1-akrowiak@linux.ibm.com>
-	<ceeafd70-b1d3-9e80-d357-65740dd125cd@de.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1gAXbG-0005AW-SP
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:49:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49080)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAXbG-0005A6-M4
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:49:46 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180928075832.18586-1-w.bumiller@proxmox.com>
+	<20180928075832.18586-3-w.bumiller@proxmox.com>
+	<CAJ+F1CL4S8aLm6ayu7GfKMfySTBTuUS3j2cuni-+ErEp5Y8VLQ@mail.gmail.com>
+	<20180928095543.GN9560@xz-x1> <87r2gx8073.fsf@dusky.pond.sub.org>
+	<20181011082307.wvzu4urbsnemp5fn@olga.proxmox.com>
+Date: Thu, 11 Oct 2018 11:49:39 +0200
+In-Reply-To: <20181011082307.wvzu4urbsnemp5fn@olga.proxmox.com> (Wolfgang
+	Bumiller's message of "Thu, 11 Oct 2018 10:23:07 +0200")
+Message-ID: <87woqo6cek.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 0/6] s390x: vfio-ap: guest dedicated
- crypto adapters
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] monitor: delay monitor iothread
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net, akrowiak@linux.vnet.ibm.com, fiuczy@linux.ibm.com, mimu@linux.ibm.com
+To: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan
+	Gilbert" <dgilbert@redhat.com>
 
-On Wed, 10 Oct 2018 20:15:55 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Wolfgang Bumiller <w.bumiller@proxmox.com> writes:
 
-> On 10/10/2018 07:03 PM, Tony Krowiak wrote:
-> > This patch series is the QEMU counterpart to the KVM/kernel support for 
-> > guest dedicated crypto adapters. The KVM/kernel model is built on the 
-> > VFIO mediated device framework and provides the infrastructure for 
-> > granting exclusive guest access to crypto devices installed on the linux 
-> > host. This patch series introduces a new QEMU command line option, QEMU 
-> > object model and CPU model features to exploit the KVM/kernel model.
-> > 
-> > See the detailed specifications for AP virtualization provided by this 
-> > patch set in docs/vfio-ap.txt for a more complete discussion of the 
-> > design introduced by this patch series.
-> > 
-> > v10 => v11 Change log:  
-> 
-> 
-> 
-> Series seems to work fine.
-> 
-> Christian
+> On Thu, Oct 11, 2018 at 08:30:24AM +0200, Markus Armbruster wrote:
+[...]
+>> Since the bug is inconveniencing people, should I merge v1 for now?  We
+>> can then figure out how to improve on it.
+>
+> Tbh I'm unsure which way to proceed at this point.
 
-Is that a Tested-by:, or just 'looks sane'?
+Don't worry, ball's in my court for now.
