@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAf7u-0001uK-K4
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 13:51:59 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gAfJY-0004uo-EI
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:04:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAf7r-0001is-Bm
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 13:51:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51804)
+	(envelope-from <dgilbert@redhat.com>) id 1gAfJV-0001MB-MZ
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:04:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAf7r-0001iX-5C
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 13:51:55 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20181008173125.19678-1-armbru@redhat.com>
-	<20181008173125.19678-29-armbru@redhat.com>
-	<1ca2afa9-1eb3-6b01-bea9-486227dc1355@redhat.com>
-Date: Thu, 11 Oct 2018 19:51:52 +0200
-In-Reply-To: <1ca2afa9-1eb3-6b01-bea9-486227dc1355@redhat.com> (Eric Blake's
-	message of "Mon, 8 Oct 2018 15:46:16 -0500")
-Message-ID: <87lg74xtfr.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gAfJV-0001LT-Cu
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:03:57 -0400
+Date: Thu, 11 Oct 2018 19:03:53 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181011180352.GD29526@work-vm>
+References: <20181002135538.12113-1-den@openvz.org>
+	<875zybxorn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 28/31] fsdev: Clean up error reporting in
- qemu_fsdev_add()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875zybxorn.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 1/1] qmp,
+ hmp: make subsystem/system-vendor identities optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Denis V. Lunev" <den@openvz.org> writes:
+> 
+> > According to PCI specification subsystem id and subsystem vendor id are
+> > optinal and could be abscent in Type1 header and can be found on
+> > different offsets within Type0 and Type2 headers.
+> 
+> Well, they *are* absent in Type1 headers.  Perhaps:
+> 
+>   According to PCI specification, subsystem id and subsystem vendor id
+>   are present only in type 0 and type 2 headers (at different offsets),
+>   but not in type 1 headers.
 
-> On 10/8/18 12:31 PM, Markus Armbruster wrote:
->> Calling error_report() from within a a function that takes an Error **
->
-> s/a a/a/
+Queued with that text.
 
-Fixing, thanks!
-
->> argument is suspicious.  qemu_fsdev_add() does that, and its caller
->> fsdev_init_func() then fails without setting an error.  Its caller
->> main(), via qemu_opts_foreach(), is fine with it, but clean it up
->> anyway.
->>
+> > Thus we should make this data optional in struct PciDeviceId and skip
+> > reporting them via HMP if the information is not available.
+> >
+> > Additional (wrong information) about PCI bridges (Type1 devices) has been
+> > added in 5383a705 and fortunately not released. This patch fixes that
+> > problem. The problem was spotted by Markus.
+> 
+> A machine-readable way to phrase the last sentence is
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> 
+> > Signed-off-by: Denis V. Lunev <den@openvz.org>
+> > CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > CC: Eric Blake <eblake@redhat.com>
+> > CC: Markus Armbruster <armbru@redhat.com>
+> > ---
+> >  hmp.c          |  6 ++++--
+> >  hw/pci/pci.c   | 13 ++++++++++---
+> >  qapi/misc.json |  4 ++--
+> >  3 files changed, 16 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/hmp.c b/hmp.c
+> > index 3a9f797677..55633d29a3 100644
+> > --- a/hmp.c
+> > +++ b/hmp.c
+> > @@ -824,8 +824,10 @@ static void hmp_info_pci_device(Monitor *mon, const PciDeviceInfo *dev)
+> >  
+> >      monitor_printf(mon, ": PCI device %04" PRIx64 ":%04" PRIx64 "\n",
+> >                     dev->id->vendor, dev->id->device);
+> > -    monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
+> > -                   dev->id->subsystem_vendor, dev->id->subsystem);
+> > +    if (dev->id->has_subsystem_vendor && dev->id->has_subsystem) {
+> > +        monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
+> > +                       dev->id->subsystem_vendor, dev->id->subsystem);
+> > +    }
+> >  
+> >      if (dev->has_irq) {
+> >          monitor_printf(mon, "      IRQ %" PRId64 ".\n", dev->irq);
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index 51d0dec466..b937f0dc0a 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -1737,9 +1737,6 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
+> >      info->id = g_new0(PciDeviceId, 1);
+> >      info->id->vendor = pci_get_word(dev->config + PCI_VENDOR_ID);
+> >      info->id->device = pci_get_word(dev->config + PCI_DEVICE_ID);
+> > -    info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
+> > -    info->id->subsystem_vendor =
+> > -        pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
+> >      info->regions = qmp_query_pci_regions(dev);
+> >      info->qdev_id = g_strdup(dev->qdev.id ? dev->qdev.id : "");
+> >  
+> > @@ -1752,6 +1749,16 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
+> >      if (type == PCI_HEADER_TYPE_BRIDGE) {
+> >          info->has_pci_bridge = true;
+> >          info->pci_bridge = qmp_query_pci_bridge(dev, bus, bus_num);
+> > +    } else if (type == PCI_HEADER_TYPE_NORMAL) {
+> > +        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
+> > +        info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
+> > +        info->id->subsystem_vendor =
+> > +            pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
+> > +    } else if (type == PCI_HEADER_TYPE_CARDBUS) {
+> > +        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
+> > +        info->id->subsystem = pci_get_word(dev->config + PCI_CB_SUBSYSTEM_ID);
+> > +        info->id->subsystem_vendor =
+> > +            pci_get_word(dev->config + PCI_CB_SUBSYSTEM_VENDOR_ID);
+> >      }
+> >  
+> >      return info;
+> > diff --git a/qapi/misc.json b/qapi/misc.json
+> > index ada9af5add..95a6ed022d 100644
+> > --- a/qapi/misc.json
+> > +++ b/qapi/misc.json
+> > @@ -839,8 +839,8 @@
+> >  # Since: 2.4
+> >  ##
+> >  { 'struct': 'PciDeviceId',
+> > -  'data': {'device': 'int', 'vendor': 'int', 'subsystem': 'int',
+> > -            'subsystem-vendor': 'int'} }
+> > +  'data': {'device': 'int', 'vendor': 'int', '*subsystem': 'int',
+> > +            '*subsystem-vendor': 'int'} }
+> 
+> 'uint16' would match PCI, but I since we didn't for @device and @vendor,
+> we probably shouldn't for @subsystem and @subsystem-vendor.
+> 
+> >  
+> >  ##
+> >  # @PciDeviceInfo:
+> 
+> With Eric's spelling corrections or my rephrasing of the commit message:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
+> David, would you like to pick this up?
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
