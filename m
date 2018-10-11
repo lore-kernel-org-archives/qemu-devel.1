@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gAfMy-0006KT-G6
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:07:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gAgaZ-0004vf-PT
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 15:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gAfMv-000498-SQ
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:07:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59310)
+	(envelope-from <dgilbert@redhat.com>) id 1gAgaU-0001dS-Tz
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 15:25:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gAfMv-00047E-1Z
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:07:29 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 223263002387
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 18:07:27 +0000 (UTC)
-Date: Thu, 11 Oct 2018 19:07:23 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181011180723.GE29526@work-vm>
-References: <20180913132313.11370-1-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gAgaU-0001X0-Fm
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 15:25:34 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Thu, 11 Oct 2018 20:25:09 +0100
+Message-Id: <20181011192513.63634-4-dgilbert@redhat.com>
+In-Reply-To: <20181011192513.63634-1-dgilbert@redhat.com>
+References: <20181011192513.63634-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180913132313.11370-1-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration-test: Only generate a single
- target architecture
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 3/7] migration: Stop postcopy fault thread
+ before notifying
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: wei@redhat.com, thuth@redhat.com, i.maximets@samsung.com, den@openvz.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Several changes:
-> - We only allow generate header "inside" the tree.  Why?  Because we
->   need to connit the result, so it makes no sense to generate them on
->   the build dir.
-> - We only generate a single target each time.  Getting all the
->   cross-compilers correctly is an impossible task.  So know you do:
->      make -C tests/migration $target (native)
->      make CROSS_PREFIX=foo- -C tests/migratiion $target (cross)
->   And you are done.
-> 
-> - If we are building out of tree, we have no data about if we are
->   cross-compile or whatever.  So instead of guess what is happening,
->   just do what I pointed on previous point.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+From: Ilya Maximets <i.maximets@samsung.com>
 
+POSTCOPY_NOTIFY_INBOUND_END handlers will remove userfault fds
+from the postcopy_remote_fds array which could be still in
+use by the fault thread. Let's stop the thread before
+notification to avoid possible accessing wrong memory.
 
+Fixes: 46343570c06e ("vhost+postcopy: Wire up POSTCOPY_END notify")
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Ilya Maximets <i.maximets@samsung.com>
+Message-Id: <20181008160536.6332-2-i.maximets@samsung.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/postcopy-ram.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-and queued.
-
-
-> ---
->  tests/migration/Makefile | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
-> index ff726ed7dd..13e99b1692 100644
-> --- a/tests/migration/Makefile
-> +++ b/tests/migration/Makefile
-> @@ -9,6 +9,19 @@ TARGET_LIST = i386 aarch64 s390x
->  
->  SRC_PATH = ../..
->  
-> +.PHONY: help $(TARGET_LIST)
-> +help:
-> +	@echo "Create migration guest includes.  We generate a binary."
-> +	@echo "And then convert that binary to an include file that can be"
-> +	@echo "run in a guest."
-> +	@echo "Possible operations are:"
-> +	@echo
-> +	@echo " $(MAKE) clean                Remove all intermediate files"
-> +	@echo " $(MAKE) target               Generate for that target"
-> +	@echo " $(MAKE) CROSS_PREFIX=... target"
-> +	@echo "                              Cross-compile than target"
-> +	@echo " Possible targets are: $(TARGET_LIST)"
-> +
->  override define __note
->  /* This file is automatically generated from the assembly file in
->   * tests/migration/$@. Edit that file and then run "make all"
-> @@ -18,16 +31,8 @@ override define __note
->  endef
->  export __note
->  
-> -find-arch-cross-cc = $(lastword $(shell grep -h "CROSS_CC_GUEST=" $(wildcard $(SRC_PATH)/$(patsubst i386,*86*,$(1))-softmmu/config-target.mak) /dev/null))
-> -parse-cross-prefix = $(subst gcc,,$(patsubst cc,gcc,$(patsubst CROSS_CC_GUEST="%",%,$(call find-arch-cross-cc,$(1)))))
-> -gen-cross-prefix = $(patsubst %-,CROSS_PREFIX=%-,$(call parse-cross-prefix,$(1)))
-> -
-> -.PHONY: all $(TARGET_LIST)
-> -
-> -all: $(TARGET_LIST)
-> -
->  $(TARGET_LIST):
-> -	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
-> +	$(MAKE) CROSS_PREFIX=$(CROSS_PREFIX) -C $@
->  
->  clean:
->  	for target in $(TARGET_LIST); do \
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 853d8b32ca..e5c02a32c5 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -533,6 +533,12 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingS=
+tate *mis)
+     if (mis->have_fault_thread) {
+         Error *local_err =3D NULL;
+=20
++        /* Let the fault thread quit */
++        atomic_set(&mis->fault_thread_quit, 1);
++        postcopy_fault_thread_notify(mis);
++        trace_postcopy_ram_incoming_cleanup_join();
++        qemu_thread_join(&mis->fault_thread);
++
+         if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_END, &local_err)) {
+             error_report_err(local_err);
+             return -1;
+@@ -541,11 +547,6 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingS=
+tate *mis)
+         if (qemu_ram_foreach_migratable_block(cleanup_range, mis)) {
+             return -1;
+         }
+-        /* Let the fault thread quit */
+-        atomic_set(&mis->fault_thread_quit, 1);
+-        postcopy_fault_thread_notify(mis);
+-        trace_postcopy_ram_incoming_cleanup_join();
+-        qemu_thread_join(&mis->fault_thread);
+=20
+         trace_postcopy_ram_incoming_cleanup_closeuf();
+         close(mis->userfault_fd);
+--=20
+2.19.0
