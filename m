@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAXFq-000199-Q5
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:27:39 -0400
+	(envelope-from <thuth@redhat.com>) id 1gAXKY-0002GT-RH
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:32:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1gAXFl-0001TE-4y
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:27:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37662)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1gAXFk-0001O6-Sn
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:27:33 -0400
-References: <20181009205652.10605-1-david@redhat.com>
-	<20181009205652.10605-5-david@redhat.com>
-	<20181011090821.GC2483@work-vm>
-	<a2305986-84c9-671a-af1d-463814e5cfd6@redhat.com>
-	<20181011092132.GD2483@work-vm>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <733ce1f0-c50f-b856-500b-e995d999605e@redhat.com>
-Date: Thu, 11 Oct 2018 11:27:25 +0200
+	(envelope-from <thuth@redhat.com>) id 1gAXKU-0004bG-MR
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:32:30 -0400
+References: <20181010170309.12045-1-akrowiak@linux.ibm.com>
+	<ceeafd70-b1d3-9e80-d357-65740dd125cd@de.ibm.com>
+	<98d6ffa8-97b2-ac01-fe23-22355a04ae56@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <088a3aac-0385-7069-5bfc-8fce7c2624ee@redhat.com>
+Date: Thu, 11 Oct 2018 11:32:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <20181011092132.GD2483@work-vm>
+In-Reply-To: <98d6ffa8-97b2-ac01-fe23-22355a04ae56@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 4/7] range: add some more functions
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v11 0/6] s390x: vfio-ap: guest
+ dedicated crypto adapters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,72 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
+To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Tony Krowiak <akrowiak@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: mjrosato@linux.vnet.ibm.com, peter.maydell@linaro.org, akrowiak@linux.vnet.ibm.com, fiuczy@linux.ibm.com, berrange@redhat.com, eskultet@redhat.com, qemu-s390x@nongnu.org, heiko.carstens@de.ibm.com, cohuck@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, eric.auger@redhat.com, alex.williamson@redhat.com, pasic@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pbonzini@redhat.com, schwidefsky@de.ibm.com, mimu@linux.ibm.com, bjsdjshi@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, rth@twiddle.net
 
-On 11/10/2018 11:21, Dr. David Alan Gilbert wrote:
-> * David Hildenbrand (david@redhat.com) wrote:
->> On 11/10/2018 11:08, Dr. David Alan Gilbert wrote:
->>> * David Hildenbrand (david@redhat.com) wrote:
->>>> Add some more functions that will be used in memory-device context.
->>>>
->>>> range_init(): Init using lower bound and size
->>>> range_valid(): Check if there would be an overflow when initializin
->>>> range_size(): Extract the size of a range
->>>> range_overlaps_range(): Check for overlaps of two ranges
->>>> range_contains_range(): Check if one range is contained in the other
->>>> range_starts_before_range(): Check if one range starts before another
->>>> range_ends_after_range(): Check if one range ends after another
->>>>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  include/qemu/range.h | 80 ++++++++++++++++++++++++++++++++++++++++++++
->>>>  1 file changed, 80 insertions(+)
->>>>
->>>> diff --git a/include/qemu/range.h b/include/qemu/range.h
->>>> index 7e75f4e655..18e8acf22f 100644
->>>> --- a/include/qemu/range.h
->>>> +++ b/include/qemu/range.h
->>>> @@ -112,6 +112,86 @@ static inline uint64_t range_upb(Range *range)
->>>>      return range->upb;
->>>>  }
->>>>  
->>>> +/*
->>>> + * Initialize @range to span the interval [@lob,@lob + @size - 1].
->>>> + * @size may be 0.
->>>> + */
->>>> +static inline void range_init(Range *range, uint64_t lob, uint64_t size)
->>>> +{
->>>> +    range->lob = lob;
->>>> +    range->upb = lob + size - 1;
->>>> +    range_invariant(range);
->>>> +}
->>>> +
->>>> +/*
->>>> + * Check if the interval [@lob,@lob + @size - 1] would be valid or not
->>>> + * (result in an overflow).
->>>> + */
->>>> +static inline bool range_valid(uint64_t lob, uint64_t size)
->>>> +{
->>>> +    return lob + size >= lob;
->>>> +}
->>>
->>> That name confused me, I'd expected that to have taken a range and check
->>> it for something (like a non-asserting version of the invariant).
+On 2018-10-11 10:12, David Hildenbrand wrote:
+> On 10/10/2018 20:15, Christian Borntraeger wrote:
 >>
->> Then we have to remove all the variant asserts from the initializer
->> functions (well, because then it is no longer an invariant then). Other
->> ideas?
+>> On 10/10/2018 07:03 PM, Tony Krowiak wrote:
+>>> This patch series is the QEMU counterpart to the KVM/kernel support for 
+>>> guest dedicated crypto adapters. The KVM/kernel model is built on the 
+>>> VFIO mediated device framework and provides the infrastructure for 
+>>> granting exclusive guest access to crypto devices installed on the linux 
+>>> host. This patch series introduces a new QEMU command line option, QEMU 
+>>> object model and CPU model features to exploit the KVM/kernel model.
+>>>
+>>> See the detailed specifications for AP virtualization provided by this 
+>>> patch set in docs/vfio-ap.txt for a more complete discussion of the 
+>>> design introduced by this patch series.
+>>>
+>>> v10 => v11 Change log:
+>>
+>> Series seems to work fine.
+>>
+>> Christian
 > 
-> My worry here is just the name 'range_valid'.
-> 
+> Had a quick glimpse over all patches, looks good and clean to me.
 
-hmm "range_would_overflow()" ?
+FWIW, with one additional g_free() in patch 5, the series now also looks
+fine to me.
 
-> Dave
-
--- 
-
-Thanks,
-
-David / dhildenb
+ Thomas
