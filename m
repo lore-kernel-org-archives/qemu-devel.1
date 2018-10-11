@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gATnG-0007q2-H6
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 01:45:55 -0400
+	(envelope-from <abologna@redhat.com>) id 1gAU15-0000s4-3b
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 02:00:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1gATnD-0001uD-AJ
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 01:45:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37328)
+	(envelope-from <abologna@redhat.com>) id 1gAU10-0006N5-4j
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 02:00:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41612)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gATmz-0001mB-Vt
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 01:45:51 -0400
-Message-ID: <0879a2149c762b1ac714433eee00e45290bec0f3.camel@redhat.com>
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1gAU0z-0006Mn-RS
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 02:00:06 -0400
+Message-ID: <7d54ec114745b00b82601875416ccfe6a5f9fe6f.camel@redhat.com>
 From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 11 Oct 2018 07:45:32 +0200
-In-Reply-To: <99997a93-da91-6a03-bc0b-fb539f05d797@gmail.com>
+Date: Thu, 11 Oct 2018 07:59:59 +0200
+In-Reply-To: <892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
 References: <cover.1538683492.git.alistair.francis@wdc.com>
 	<5dd21056229d12a1af8d65e9208f4de43ba4a2ae.camel@redhat.com>
-	<3F86795E-6F41-4C86-91C6-21E8312F5E4B@eideticom.com>
-	<a9cf5e6c09eed752b123d5de842bdc3264e37117.camel@redhat.com>
-	<5A5F4A2B-2DAF-4D70-BF1D-7ABC8461FDC8@raithlin.com>
-	<63b741e2-b3e5-283a-4dfc-9c1db757c575@gmail.com>
-	<D55C15F1-937F-474B-82B1-3F891E03638F@raithlin.com>
-	<99997a93-da91-6a03-bc0b-fb539f05d797@gmail.com>
+	<892d54c5-2851-74ec-bdf2-286c1665c44f@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -34,34 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair <alistair23@gmail.com>, Stephen Bates <sbates@raithlin.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
-Cc: Keith Busch <keith.busch@intel.com>, "palmer@sifive.com" <palmer@sifive.com>, "Richard W.M. Jones" <rjones@redhat.com>
+To: Alistair <alistair23@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mjc@sifive.com" <mjc@sifive.com>
+Cc: "palmer@sifive.com" <palmer@sifive.com>, "stephen@eideticom.com" <stephen@eideticom.com>, "Richard W.M. Jones" <rjones@redhat.com>
 
-On Wed, 2018-10-10 at 12:53 -0700, Alistair wrote:
-> On 10/10/2018 11:47 AM, Stephen  Bates wrote:
-> > >     Strange. Is there any reason you need to use the e1000? The VirtIO
-> > >     networking device works for me.
-> > 
-> > As per above. The e1000 is there to test PCIe not networking.
+On Wed, 2018-10-10 at 10:57 -0700, Alistair wrote:
+> On 10/10/2018 05:26 AM, Andrea Bolognani wrote:
+> > * what should libvirt look for to figure out whether or not a RISC-V
+> >    guest will have PCI support? For aarch64 we look for the presence
+> >    of the 'gpex-pcihost' device, but of course that won't work for
+> >    RISC-V so we need something else;
+> 
+> I'm not sure what you mean here. Why can we not do the same thing with 
+> RISC-V?
 
-Unless I'm mistaken, e1000 is a conventional PCI device, with
-e1000e being the PCI Express equivalent.
+The gpex-pcihost device was introduced at the same time as
+aarch64/virt gained PCI support, so we can probe the binary[1] and,
+if the device is present, we know that aarch64/virt guests will be
+able to use PCI. We cannot do the same for RISC-V for obvious
+reasons: the device is already there :)
 
-> Awe. My mistake. I thought that the VirtIO networking device was a PCIe 
-> device for some reason.
+Is there any RISC-V device / property that was introduced along
+with PCI support and we can use as a witness?
 
-Most VirtIO devices, including virtio-net, show up as either
-conventional PCI or PCI Express based on the slot they're plugged
-into, so if you have
+> > * I have succesfully started a RISC-V guest with virtio-pci devices
+> >    attached but, while they show up in 'info qtree' and friends, the
+> >    guest OS itself doesn't seem to recognize any of them - not even
+> >    pcie.0! I'm using the guest images listed at [1] and following the
+> >    corresponding instructions, but I think the BBL build (config at
+> >    [2]) is missing some feature... Any ideas what we would need to
+> >    add there?
+> 
+> I use this monolithic config: 
+> https://github.com/alistair23/meta-riscv/blob/7a950aa705b439b5ec19bb6f094930888335ba7b/recipes-kernel/linux/files/freedom-u540/defconfig
+> 
+> It has way too much enabled, but I think if you copy the PCIe part that 
+> should be enough.
 
-  -device virtio-net-pci,bus=pci.0
+Looks like there's quite a few CONFIG*PCI* options we're missing!
 
-it will show up as a conventional PCI device but if you have
+Rich, can you try incorporating those and kicking off a BBL build?
+If I remember correctly you might also have to backport a commit or
+two to make some of the options available on RISC-V, but it should
+be very feasible.
 
-  -device pcie-root-port,id=pci.1,bus=pcie.0 \
-  -device virtio-net-pci,bus=pci.1
+[...]
+> Obviously on top of that you will need to enable the VirtIO support as 
+> that doesn't exist in the hardware.
 
-instead it will show up as a PCI Express device.
+Yeah, we already have that enabled and non-PCI VirtIO devices work
+just fine.
 
+
+[1] Not the guest, mind you: libvirt will probe each QEMU binary only
+    once to reduce the overhead, so anyth
 -- 
 Andrea Bolognani / Red Hat / Virtualization
