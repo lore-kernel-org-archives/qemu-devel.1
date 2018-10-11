@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAXqo-0003oh-Tr
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:05:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1gAXr9-0003xL-8Q
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAXqe-000201-7Y
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:05:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52792)
+	(envelope-from <bounces@canonical.com>) id 1gAXr6-0003Bt-JR
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:06:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52930)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gAXqc-0001qO-G1
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:05:38 -0400
+	id 1gAXr6-0001y3-6p
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:06:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gAXqZ-0007Pu-PW
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 10:05:35 +0000
+	id 1gAXqd-0007Wl-1U
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 10:05:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BE6A02E80C7
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 10:05:35 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 07B552E8054
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 10:05:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 11 Oct 2018 09:52:16 -0000
-From: Thomas Huth <1368204@bugs.launchpad.net>
-Reply-To: Bug 1368204 <1368204@bugs.launchpad.net>
+Date: Thu, 11 Oct 2018 09:47:53 -0000
+From: Thomas Huth <639651@bugs.launchpad.net>
+Reply-To: Bug 639651 <639651@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140911122344.25076.48914.malonedeb@soybean.canonical.com>
-Message-Id: <153925153696.16288.12054211044081009269.launchpad@gac.canonical.com>
+References: <20100915151259.29737.65112.malonedeb@potassium.ubuntu.com>
+Message-Id: <153925127522.3662.7734682426348336376.launchpad@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1368204] Re: WinME isn't able to detect QEMU's
- cdrom drive and other hard drives automatically
+Subject: [Qemu-devel] [Bug 639651] Re: DRIVER_IRQL_NOT_LESS_OR_EQUAL booting
+ WIndows XP with Synaptics driver installed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,47 +39,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: qemu
-     Assignee: John Snow (jnsnow) =3D> (unassigned)
+** Package changed: debian =3D> qemu (Debian)
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1368204
+https://bugs.launchpad.net/bugs/639651
 
 Title:
-  WinME isn't able to detect QEMU's cdrom drive and other hard drives
-  automatically
+  DRIVER_IRQL_NOT_LESS_OR_EQUAL booting WIndows XP with Synaptics driver
+  installed
 
 Status in QEMU:
   Incomplete
+Status in qemu package in Debian:
+  New
 
 Bug description:
-  On a fresh installation of Windows Millennium (WinME) in qemu, Windows
-  Me isn't able to find the CD-ROM drive or additional hard drives other
-  than -hda at first place.
+  Positng the issue here since I did not get any reply on the ML.
 
-  Only if i add manually an IDE controller driver in Windows ME's device ma=
-nager, the CD-ROM inserted in QEMU is found.
-  Thus an IDE controller isn't found automatically either.
+  I was trying to update some windows XP (SP3) images in kvm.
 
-  This shouldn't be the case. On normal real hardware, Windows ME would
-  find at least one IDE or SCSI controller.
-
-  The command line that was used is the following:
-  sudo /usr/bin/qemu-system-i386 -hda WinME_QEMU.img -cdrom drivers.iso -bo=
-ot c -no-acpi -no-hpet -soundhw sb16 -net nic -cpu pentium3 -m 256 -vga cir=
-rus   =
+  It worked fine several times but last time I added mass storage
+  drivers to sysprep and now on the second boot after reseal (the first
+  is mini-setup) I get a BSOD with message
+  DRIVER_IRQL_NOT_LESS_OR_EQUAL. =
 
 
-  qemu's version is:
-  qemu-system-i386 --version                                               =
-                                                                           =
-                                                =
+  It turns out that the error is unrelated to storage drivers. It is
+  triggered by Synaptics driver installing for the PS2 mouse in kvm
+  (which does not happen in VirtualBox or on real hardware).
 
-  QEMU emulator version 2.0.0 (Debian 2.0.0+dfsg-2ubuntu1.3), Copyright (c)=
- 2003-2008 Fabrice Bellard
+  The image is originally created on hardware with MP acpi (not
+  virtualization).
+
+  qemu-kvm                  0.12.5+dfsg-2
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1368204/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/639651/+subscriptions
