@@ -1,44 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gAZ2B-0004b3-62
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:21:39 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gAZ4I-0005Nb-5Y
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:23:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1gAZ27-0006kV-VO
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:21:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56836
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1gAZ25-0006iS-Vk
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:21:34 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w9BBKdWc011641
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 07:21:25 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2n25jd00y2-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 07:21:25 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Thu, 11 Oct 2018 12:21:23 +0100
-Reply-To: pmorel@linux.ibm.com
-References: <20181010170309.12045-1-akrowiak@linux.ibm.com>
-	<ceeafd70-b1d3-9e80-d357-65740dd125cd@de.ibm.com>
-	<20181011114845.75275acd.cohuck@redhat.com>
-	<85bc92db-56f9-fcca-e4c6-205f767d5c8e@de.ibm.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Thu, 11 Oct 2018 13:21:16 +0200
-MIME-Version: 1.0
-In-Reply-To: <85bc92db-56f9-fcca-e4c6-205f767d5c8e@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <9903d08b-f1c3-5f28-1a9b-90b89c1d8d37@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 0/6] s390x: vfio-ap: guest dedicated
- crypto adapters
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gAZ4E-0007JX-4M
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:23:49 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:50714 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1gAZ4D-000748-Ld
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:23:46 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Thu, 11 Oct 2018 13:22:05 +0200
+Message-Id: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH v4 00/22] Misc MIPS fixes and improvements for
+ October 2018
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,49 +23,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: peter.maydell@linaro.org, akrowiak@linux.vnet.ibm.com, fiuczy@linux.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, eskultet@redhat.com, agraf@suse.de, jjherne@linux.vnet.ibm.com, mimu@linux.ibm.com, mjrosato@linux.vnet.ibm.com, heiko.carstens@de.ibm.com, eric.auger@redhat.com, qemu-s390x@nongnu.org, bjsdjshi@linux.vnet.ibm.com, rth@twiddle.net, Tony Krowiak <akrowiak@linux.ibm.com>, pasic@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, alex.williamson@redhat.com, schwidefsky@de.ibm.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, laurent@vivier.eu, riku.voipio@iki.fi
 
-On 11/10/2018 12:00, Christian Borntraeger wrote:
->=20
->=20
-> On 10/11/2018 11:48 AM, Cornelia Huck wrote:
->> On Wed, 10 Oct 2018 20:15:55 +0200
->> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>
->>> On 10/10/2018 07:03 PM, Tony Krowiak wrote:
->>>> This patch series is the QEMU counterpart to the KVM/kernel support =
-for
->>>> guest dedicated crypto adapters. The KVM/kernel model is built on th=
-e
->>>> VFIO mediated device framework and provides the infrastructure for
->>>> granting exclusive guest access to crypto devices installed on the l=
-inux
->>>> host. This patch series introduces a new QEMU command line option, Q=
-EMU
->>>> object model and CPU model features to exploit the KVM/kernel model.
->>>>
->>>> See the detailed specifications for AP virtualization provided by th=
-is
->>>> patch set in docs/vfio-ap.txt for a more complete discussion of the
->>>> design introduced by this patch series.
->>>>
->>>> v10 =3D> v11 Change log:
->>>
->>>
->>>
->>> Series seems to work fine.
->>>
->>> Christian
->>
->> Is that a Tested-by:, or just 'looks sane'?
->=20
-> It was limited to some cases, but lets make it a tested-by.
->=20
->=20
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-I tested it yesterday, so you can keep my tested-by too.
+This series contains support for MIPS ABI flags in elf.h, hardware
+page table walker, DSP R3 availability control, and emulation of
+nanoMIPS EVA instructions. It also contains support for WatchHi,
+MemoryMapID, SAARI, and SAAR registers, ITU updates, implementation
+of DRAM, and I6500 core configuration.
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+MIPS ABI flags will be used in near future for linux user mode
+support for certain MIPS-specific parts of prctl() system call.
+
+All patches were developed a while ago, but were not submitted to
+this list for various reasons.
+
+v3->v4:
+
+  - added hardware page table walker (five patches)
+  - added separate patch on MemoryMapID
+  - added patch on updating mips32r6-generic
+  - added patch on updating MIPS64R2-generic
+  - added patch on improving DSP R2/R3-related naming
+  - added patch on SELEQZ.<D|S> SELNEZ.<D|S> fixing
+
+v2->v3:
+
+  - added patch on extending WatchHi registers
+  - added patch on MemoryMapID, SAARI, and SAAR registers
+  - added patch on ITU updates wrt SAAR
+  - added patch on Data Scratch Pad RAM
+  - added patch on I6500 core configuration
+  - corrected the patch on nanoMIPS EVA opcodes
+
+v1->v2:
+
+  - added three patches on MIPS-specifics in elf.h
+
+Dimitrije Nikolic (2):
+  target/mips: Add opcodes for nanoMIPS EVA instructions
+  target/mips: Implement emulation of nanoMIPS EVA instructions
+
+Matthew Fortune (1):
+  target/mips: Fix emulation of microMIPS R6 SELEQZ.<D|S> SELNEZ.<D|S>
+
+Stefan Markovic (6):
+  elf: Fix PT_MIPS_XXX constants
+  elf: Add MIPS_ABI_FP_XXX constants
+  elf: Add Mips_elf_abiflags_v0 structure
+  target/mips: Add bit definitions for DSP R3 ASE
+  target/mips: Add availability control for DSP R3 ASE
+  target/mips: Improve DSP R2/R3-related naming
+
+Yongbok Kim (13):
+  target/mips: Add CPO PWBase register
+  target/mips: Add CPO PWField register
+  target/mips: Add CPO PWSize register
+  target/mips: Add CPO PWCtl register
+  target/mips: Implement hardware page table walker
+  target/mips: Extend WatchHi registers
+  target/mips: Add CPO MemoryMapID register
+  target/mips: Add CP0 SAARI and SAAR registers
+  hw/mips: Update ITU to utilise SAARI/SAAR registers
+  hw/mips: Add Data Scratch Pad RAM
+  target/mips: Add DEC feature to mips32r6-generic CPU
+  target/mips: Add MSA ASE to MIPS64R2-generic CPU
+  target/mips: Add I6500 core configuration
+
+ default-configs/mips-softmmu-common.mak |   1 +
+ hw/mips/cps.c                           |   9 +
+ hw/mips/mips_malta.c                    |  31 ++
+ hw/misc/Makefile.objs                   |   1 +
+ hw/misc/mips_itu.c                      |  72 ++++-
+ include/elf.h                           |  30 +-
+ include/hw/mips/cps.h                   |   2 +
+ include/hw/misc/mips_itu.h              |   7 +
+ target/mips/cpu.h                       |  40 ++-
+ target/mips/helper.c                    | 369 +++++++++++++++++++++-
+ target/mips/helper.h                    |  12 +
+ target/mips/internal.h                  |  15 +-
+ target/mips/machine.c                   |  12 +-
+ target/mips/mips-defs.h                 |   3 +-
+ target/mips/op_helper.c                 | 158 +++++++++-
+ target/mips/translate.c                 | 524 +++++++++++++++++++++++++-------
+ target/mips/translate_init.inc.c        |  60 +++-
+ 17 files changed, 1218 insertions(+), 128 deletions(-)
+
+-- 
+2.7.4
