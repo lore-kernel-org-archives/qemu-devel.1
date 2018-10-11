@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAYkB-0001R1-EP
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:03:04 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gAYm9-0002G9-C4
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:05:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1gAYk7-00019W-BV
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:03:03 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37179)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1gAYk7-000198-3k
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:02:59 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 185-v6so8966012wmt.2
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 04:02:59 -0700 (PDT)
-References: <153924123502.3669683.1365591120394690822.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3b91d4bf-58b2-55b6-d41d-348865b7542a@redhat.com>
-Date: Thu, 11 Oct 2018 13:02:50 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1gAYm5-0001vD-BQ
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:05:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gAYm4-0001us-Vq
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:05:01 -0400
+Date: Thu, 11 Oct 2018 12:04:55 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20181011110454.GG2483@work-vm>
+References: <20181002135538.12113-1-den@openvz.org>
+	<875zybxorn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <153924123502.3669683.1365591120394690822.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] spapr_pci: rename some structured types
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875zybxorn.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 1/1] qmp,
+ hmp: make subsystem/system-vendor identities optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,153 +28,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
 
-Hi Greg,
-
-On 11/10/2018 09:00, Greg Kurz wrote:
-> According to CODING_STYLE, structured types names are expected to be
-> in CamelCase. PCI is dropped from the name for better readability.
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Denis V. Lunev" <den@openvz.org> writes:
 > 
-> While here, this also converts a call to g_malloc(n * sizeofi(foo)) to
-
-sizeof(foo)
-
-> g_new(n, foo), which is a recommended good practice.
-
-Clearly 2 different patches...
-
+> > According to PCI specification subsystem id and subsystem vendor id are
+> > optinal and could be abscent in Type1 header and can be found on
+> > different offsets within Type0 and Type2 headers.
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/ppc/spapr_pci.c          |   22 +++++++++++-----------
->  include/hw/pci-host/spapr.h |   12 ++++++------
->  2 files changed, 17 insertions(+), 17 deletions(-)
+> Well, they *are* absent in Type1 headers.  Perhaps:
 > 
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index c2271e6ed462..bfb959f2b065 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -277,7 +277,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->      unsigned int irq, max_irqs = 0;
->      sPAPRPHBState *phb = NULL;
->      PCIDevice *pdev = NULL;
-> -    spapr_pci_msi *msi;
-> +    sPAPRMSI *msi;
+>   According to PCI specification, subsystem id and subsystem vendor id
+>   are present only in type 0 and type 2 headers (at different offsets),
+>   but not in type 1 headers.
+> 
+> > Thus we should make this data optional in struct PciDeviceId and skip
+> > reporting them via HMP if the information is not available.
+> >
+> > Additional (wrong information) about PCI bridges (Type1 devices) has been
+> > added in 5383a705 and fortunately not released. This patch fixes that
+> > problem. The problem was spotted by Markus.
+> 
+> A machine-readable way to phrase the last sentence is
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> 
+> > Signed-off-by: Denis V. Lunev <den@openvz.org>
+> > CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > CC: Eric Blake <eblake@redhat.com>
+> > CC: Markus Armbruster <armbru@redhat.com>
+> > ---
+> >  hmp.c          |  6 ++++--
+> >  hw/pci/pci.c   | 13 ++++++++++---
+> >  qapi/misc.json |  4 ++--
+> >  3 files changed, 16 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/hmp.c b/hmp.c
+> > index 3a9f797677..55633d29a3 100644
+> > --- a/hmp.c
+> > +++ b/hmp.c
+> > @@ -824,8 +824,10 @@ static void hmp_info_pci_device(Monitor *mon, const PciDeviceInfo *dev)
+> >  
+> >      monitor_printf(mon, ": PCI device %04" PRIx64 ":%04" PRIx64 "\n",
+> >                     dev->id->vendor, dev->id->device);
+> > -    monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
+> > -                   dev->id->subsystem_vendor, dev->id->subsystem);
+> > +    if (dev->id->has_subsystem_vendor && dev->id->has_subsystem) {
+> > +        monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
+> > +                       dev->id->subsystem_vendor, dev->id->subsystem);
+> > +    }
+> >  
+> >      if (dev->has_irq) {
+> >          monitor_printf(mon, "      IRQ %" PRId64 ".\n", dev->irq);
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index 51d0dec466..b937f0dc0a 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -1737,9 +1737,6 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
+> >      info->id = g_new0(PciDeviceId, 1);
+> >      info->id->vendor = pci_get_word(dev->config + PCI_VENDOR_ID);
+> >      info->id->device = pci_get_word(dev->config + PCI_DEVICE_ID);
+> > -    info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
+> > -    info->id->subsystem_vendor =
+> > -        pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
+> >      info->regions = qmp_query_pci_regions(dev);
+> >      info->qdev_id = g_strdup(dev->qdev.id ? dev->qdev.id : "");
+> >  
+> > @@ -1752,6 +1749,16 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
+> >      if (type == PCI_HEADER_TYPE_BRIDGE) {
+> >          info->has_pci_bridge = true;
+> >          info->pci_bridge = qmp_query_pci_bridge(dev, bus, bus_num);
+> > +    } else if (type == PCI_HEADER_TYPE_NORMAL) {
+> > +        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
+> > +        info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
+> > +        info->id->subsystem_vendor =
+> > +            pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
+> > +    } else if (type == PCI_HEADER_TYPE_CARDBUS) {
+> > +        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
+> > +        info->id->subsystem = pci_get_word(dev->config + PCI_CB_SUBSYSTEM_ID);
+> > +        info->id->subsystem_vendor =
+> > +            pci_get_word(dev->config + PCI_CB_SUBSYSTEM_VENDOR_ID);
+> >      }
+> >  
+> >      return info;
+> > diff --git a/qapi/misc.json b/qapi/misc.json
+> > index ada9af5add..95a6ed022d 100644
+> > --- a/qapi/misc.json
+> > +++ b/qapi/misc.json
+> > @@ -839,8 +839,8 @@
+> >  # Since: 2.4
+> >  ##
+> >  { 'struct': 'PciDeviceId',
+> > -  'data': {'device': 'int', 'vendor': 'int', 'subsystem': 'int',
+> > -            'subsystem-vendor': 'int'} }
+> > +  'data': {'device': 'int', 'vendor': 'int', '*subsystem': 'int',
+> > +            '*subsystem-vendor': 'int'} }
+> 
+> 'uint16' would match PCI, but I since we didn't for @device and @vendor,
+> we probably shouldn't for @subsystem and @subsystem-vendor.
+> 
+> >  
+> >  ##
+> >  # @PciDeviceInfo:
+> 
+> With Eric's spelling corrections or my rephrasing of the commit message:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
+> David, would you like to pick this up?
 
-In CamelCase this should be "SpaprMsi"...
-I however agree sPAPRMSI is nicer, the code is also easier to review.
+Yes, I can do.
 
->      int *config_addr_key;
->      Error *err = NULL;
->      int i;
-> @@ -325,7 +325,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->          return;
->      }
->  
-> -    msi = (spapr_pci_msi *) g_hash_table_lookup(phb->msi, &config_addr);
-> +    msi = (sPAPRMSI *) g_hash_table_lookup(phb->msi, &config_addr);
->  
->      /* Releasing MSIs */
->      if (!req_num) {
-> @@ -414,7 +414,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->                       irq, req_num);
->  
->      /* Add MSI device to cache */
-> -    msi = g_new(spapr_pci_msi, 1);
-> +    msi = g_new(sPAPRMSI, 1);
->      msi->first_irq = irq;
->      msi->num = req_num;
->      config_addr_key = g_new(int, 1);
-> @@ -445,7 +445,7 @@ static void rtas_ibm_query_interrupt_source_number(PowerPCCPU *cpu,
->      unsigned int intr_src_num = -1, ioa_intr_num = rtas_ld(args, 3);
->      sPAPRPHBState *phb = NULL;
->      PCIDevice *pdev = NULL;
-> -    spapr_pci_msi *msi;
-> +    sPAPRMSI *msi;
->  
->      /* Find sPAPRPHBState */
->      phb = spapr_pci_find_phb(spapr, buid);
-> @@ -458,7 +458,7 @@ static void rtas_ibm_query_interrupt_source_number(PowerPCCPU *cpu,
->      }
->  
->      /* Find device descriptor and start IRQ */
-> -    msi = (spapr_pci_msi *) g_hash_table_lookup(phb->msi, &config_addr);
-> +    msi = (sPAPRMSI *) g_hash_table_lookup(phb->msi, &config_addr);
->      if (!msi || !msi->first_irq || !msi->num || (ioa_intr_num >= msi->num)) {
->          trace_spapr_pci_msi("Failed to return vector", config_addr);
->          rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-> @@ -1849,9 +1849,9 @@ static const VMStateDescription vmstate_spapr_pci_msi = {
->      .version_id = 1,
->      .minimum_version_id = 1,
->      .fields = (VMStateField []) {
-> -        VMSTATE_UINT32(key, spapr_pci_msi_mig),
-> -        VMSTATE_UINT32(value.first_irq, spapr_pci_msi_mig),
-> -        VMSTATE_UINT32(value.num, spapr_pci_msi_mig),
-> +        VMSTATE_UINT32(key, sPAPRMSIMig),
-> +        VMSTATE_UINT32(value.first_irq, sPAPRMSIMig),
-> +        VMSTATE_UINT32(value.num, sPAPRMSIMig),
->          VMSTATE_END_OF_LIST()
->      },
->  };
-> @@ -1883,12 +1883,12 @@ static int spapr_pci_pre_save(void *opaque)
->      if (!sphb->msi_devs_num) {
->          return 0;
->      }
-> -    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
-> +    sphb->msi_devs = g_new(sPAPRMSIMig, sphb->msi_devs_num);
->  
->      g_hash_table_iter_init(&iter, sphb->msi);
->      for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
->          sphb->msi_devs[i].key = *(uint32_t *) key;
-> -        sphb->msi_devs[i].value = *(spapr_pci_msi *) value;
-> +        sphb->msi_devs[i].value = *(sPAPRMSI *) value;
->      }
->  
->      return 0;
-> @@ -1938,7 +1938,7 @@ static const VMStateDescription vmstate_spapr_pci = {
->                               vmstate_spapr_pci_lsi, struct spapr_pci_lsi),
->          VMSTATE_INT32(msi_devs_num, sPAPRPHBState),
->          VMSTATE_STRUCT_VARRAY_ALLOC(msi_devs, sPAPRPHBState, msi_devs_num, 0,
-> -                                    vmstate_spapr_pci_msi, spapr_pci_msi_mig),
-> +                                    vmstate_spapr_pci_msi, sPAPRMSIMig),
->          VMSTATE_END_OF_LIST()
->      },
->  };
-> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> index 7c66c3872f96..041126da573d 100644
-> --- a/include/hw/pci-host/spapr.h
-> +++ b/include/hw/pci-host/spapr.h
-> @@ -34,15 +34,15 @@
->  
->  typedef struct sPAPRPHBState sPAPRPHBState;
->  
-> -typedef struct spapr_pci_msi {
-> +typedef struct sPAPRMSI {
->      uint32_t first_irq;
->      uint32_t num;
-> -} spapr_pci_msi;
-> +} sPAPRMSI;
->  
-> -typedef struct spapr_pci_msi_mig {
-> +typedef struct sPAPRMSIMig {
->      uint32_t key;
-> -    spapr_pci_msi value;
-> -} spapr_pci_msi_mig;
-> +    sPAPRMSI value;
-> +} sPAPRMSIMig;
->  
->  struct sPAPRPHBState {
->      PCIHostState parent_obj;
-> @@ -70,7 +70,7 @@ struct sPAPRPHBState {
->      GHashTable *msi;
->      /* Temporary cache for migration purposes */
->      int32_t msi_devs_num;
-> -    spapr_pci_msi_mig *msi_devs;
-> +    sPAPRMSIMig *msi_devs;
->  
->      QLIST_ENTRY(sPAPRPHBState) list;
->  
-> 
-> 
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
