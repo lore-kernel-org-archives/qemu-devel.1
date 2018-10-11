@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAhwo-0006qQ-8R
+	(envelope-from <mjc@sifive.com>) id 1gAhwr-0006t5-20
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAhwl-0005wG-Jk
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:42 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46740)
+	(envelope-from <mjc@sifive.com>) id 1gAhwm-00063A-K5
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:44 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:45470)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gAhwl-00055K-17
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:39 -0400
-Received: by mail-pg1-x542.google.com with SMTP id a5-v6so4715096pgv.13
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:30 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 11 Oct 2018 13:52:00 -0700
-Message-Id: <20181011205206.3552-15-richard.henderson@linaro.org>
-In-Reply-To: <20181011205206.3552-1-richard.henderson@linaro.org>
-References: <20181011205206.3552-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 14/20] target/arm: Use gvec for VSRI, VSLI
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1gAhwl-0003ld-Px
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:40 -0400
+Received: by mail-ot1-x332.google.com with SMTP id u22so10287364ota.12
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:18 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAFEAcA_fmoBRTk0VKEjuu82eb7piCkq588+v7RT7r6f=_4=OVw@mail.gmail.com>
+	<mhng-e2fff6d4-8420-48c5-92d9-cc03e16dfa48@palmer-si-x1c4>
+In-Reply-To: <mhng-e2fff6d4-8420-48c5-92d9-cc03e16dfa48@palmer-si-x1c4>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 12 Oct 2018 09:52:07 +1300
+Message-ID: <CAHNT7NvSYFtnKyFjPZqbHL=QM82zgRq5oU+mJW9vm7=QO9yTEg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 0/5] Misc RISC-V patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,521 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Palmer Dabbelt <palmer@sifive.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>, Alistair Francis <alistair23@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Richard Henderson <richard.henderson@linaro.org>, Karsten Merker <merker@debian.org>, Stefan O'Rear <sorear2@gmail.com>, "Richard W.M. Jones" <rjones@redhat.com>
 
-Move shi_op and sli_op expanders from translate-a64.c.
+Hi All,
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate.h     |   2 +
- target/arm/translate-a64.c | 152 +----------------------
- target/arm/translate.c     | 244 ++++++++++++++++++++++++++-----------
- 3 files changed, 179 insertions(+), 219 deletions(-)
+On Thu, Oct 11, 2018 at 7:22 AM Palmer Dabbelt <palmer@sifive.com> wrote:
 
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 8487b349ef..ef44f0a5e5 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -197,6 +197,8 @@ extern const GVecGen3 bit_op;
- extern const GVecGen3 bif_op;
- extern const GVecGen2i ssra_op[4];
- extern const GVecGen2i usra_op[4];
-+extern const GVecGen2i sri_op[4];
-+extern const GVecGen2i sli_op[4];
- 
- #define FORWARD_FEATURE(NAME) \
-     static inline bool aa32_dc_feature_##NAME(DisasContext *dc) \
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 1a9ae6d5f4..f47c132e6c 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -9392,85 +9392,10 @@ static void disas_simd_scalar_two_reg_misc(DisasContext *s, uint32_t insn)
-     }
- }
- 
--static void gen_shr8_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
--{
--    uint64_t mask = dup_const(MO_8, 0xff >> shift);
--    TCGv_i64 t = tcg_temp_new_i64();
--
--    tcg_gen_shri_i64(t, a, shift);
--    tcg_gen_andi_i64(t, t, mask);
--    tcg_gen_andi_i64(d, d, ~mask);
--    tcg_gen_or_i64(d, d, t);
--    tcg_temp_free_i64(t);
--}
--
--static void gen_shr16_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
--{
--    uint64_t mask = dup_const(MO_16, 0xffff >> shift);
--    TCGv_i64 t = tcg_temp_new_i64();
--
--    tcg_gen_shri_i64(t, a, shift);
--    tcg_gen_andi_i64(t, t, mask);
--    tcg_gen_andi_i64(d, d, ~mask);
--    tcg_gen_or_i64(d, d, t);
--    tcg_temp_free_i64(t);
--}
--
--static void gen_shr32_ins_i32(TCGv_i32 d, TCGv_i32 a, int32_t shift)
--{
--    tcg_gen_shri_i32(a, a, shift);
--    tcg_gen_deposit_i32(d, d, a, 0, 32 - shift);
--}
--
--static void gen_shr64_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
--{
--    tcg_gen_shri_i64(a, a, shift);
--    tcg_gen_deposit_i64(d, d, a, 0, 64 - shift);
--}
--
--static void gen_shr_ins_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64_t sh)
--{
--    uint64_t mask = (2ull << ((8 << vece) - 1)) - 1;
--    TCGv_vec t = tcg_temp_new_vec_matching(d);
--    TCGv_vec m = tcg_temp_new_vec_matching(d);
--
--    tcg_gen_dupi_vec(vece, m, mask ^ (mask >> sh));
--    tcg_gen_shri_vec(vece, t, a, sh);
--    tcg_gen_and_vec(vece, d, d, m);
--    tcg_gen_or_vec(vece, d, d, t);
--
--    tcg_temp_free_vec(t);
--    tcg_temp_free_vec(m);
--}
--
- /* SSHR[RA]/USHR[RA] - Vector shift right (optional rounding/accumulate) */
- static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
-                                  int immh, int immb, int opcode, int rn, int rd)
- {
--    static const GVecGen2i sri_op[4] = {
--        { .fni8 = gen_shr8_ins_i64,
--          .fniv = gen_shr_ins_vec,
--          .load_dest = true,
--          .opc = INDEX_op_shri_vec,
--          .vece = MO_8 },
--        { .fni8 = gen_shr16_ins_i64,
--          .fniv = gen_shr_ins_vec,
--          .load_dest = true,
--          .opc = INDEX_op_shri_vec,
--          .vece = MO_16 },
--        { .fni4 = gen_shr32_ins_i32,
--          .fniv = gen_shr_ins_vec,
--          .load_dest = true,
--          .opc = INDEX_op_shri_vec,
--          .vece = MO_32 },
--        { .fni8 = gen_shr64_ins_i64,
--          .fniv = gen_shr_ins_vec,
--          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--          .load_dest = true,
--          .opc = INDEX_op_shri_vec,
--          .vece = MO_64 },
--    };
--
-     int size = 32 - clz32(immh) - 1;
-     int immhb = immh << 3 | immb;
-     int shift = 2 * (8 << size) - immhb;
-@@ -9566,85 +9491,10 @@ static void handle_vec_simd_shri(DisasContext *s, bool is_q, bool is_u,
-     clear_vec_high(s, is_q, rd);
- }
- 
--static void gen_shl8_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
--{
--    uint64_t mask = dup_const(MO_8, 0xff << shift);
--    TCGv_i64 t = tcg_temp_new_i64();
--
--    tcg_gen_shli_i64(t, a, shift);
--    tcg_gen_andi_i64(t, t, mask);
--    tcg_gen_andi_i64(d, d, ~mask);
--    tcg_gen_or_i64(d, d, t);
--    tcg_temp_free_i64(t);
--}
--
--static void gen_shl16_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
--{
--    uint64_t mask = dup_const(MO_16, 0xffff << shift);
--    TCGv_i64 t = tcg_temp_new_i64();
--
--    tcg_gen_shli_i64(t, a, shift);
--    tcg_gen_andi_i64(t, t, mask);
--    tcg_gen_andi_i64(d, d, ~mask);
--    tcg_gen_or_i64(d, d, t);
--    tcg_temp_free_i64(t);
--}
--
--static void gen_shl32_ins_i32(TCGv_i32 d, TCGv_i32 a, int32_t shift)
--{
--    tcg_gen_deposit_i32(d, d, a, shift, 32 - shift);
--}
--
--static void gen_shl64_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
--{
--    tcg_gen_deposit_i64(d, d, a, shift, 64 - shift);
--}
--
--static void gen_shl_ins_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64_t sh)
--{
--    uint64_t mask = (1ull << sh) - 1;
--    TCGv_vec t = tcg_temp_new_vec_matching(d);
--    TCGv_vec m = tcg_temp_new_vec_matching(d);
--
--    tcg_gen_dupi_vec(vece, m, mask);
--    tcg_gen_shli_vec(vece, t, a, sh);
--    tcg_gen_and_vec(vece, d, d, m);
--    tcg_gen_or_vec(vece, d, d, t);
--
--    tcg_temp_free_vec(t);
--    tcg_temp_free_vec(m);
--}
--
- /* SHL/SLI - Vector shift left */
- static void handle_vec_simd_shli(DisasContext *s, bool is_q, bool insert,
-                                  int immh, int immb, int opcode, int rn, int rd)
- {
--    static const GVecGen2i shi_op[4] = {
--        { .fni8 = gen_shl8_ins_i64,
--          .fniv = gen_shl_ins_vec,
--          .opc = INDEX_op_shli_vec,
--          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--          .load_dest = true,
--          .vece = MO_8 },
--        { .fni8 = gen_shl16_ins_i64,
--          .fniv = gen_shl_ins_vec,
--          .opc = INDEX_op_shli_vec,
--          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--          .load_dest = true,
--          .vece = MO_16 },
--        { .fni4 = gen_shl32_ins_i32,
--          .fniv = gen_shl_ins_vec,
--          .opc = INDEX_op_shli_vec,
--          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--          .load_dest = true,
--          .vece = MO_32 },
--        { .fni8 = gen_shl64_ins_i64,
--          .fniv = gen_shl_ins_vec,
--          .opc = INDEX_op_shli_vec,
--          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
--          .load_dest = true,
--          .vece = MO_64 },
--    };
-     int size = 32 - clz32(immh) - 1;
-     int immhb = immh << 3 | immb;
-     int shift = immhb - (8 << size);
-@@ -9664,7 +9514,7 @@ static void handle_vec_simd_shli(DisasContext *s, bool is_q, bool insert,
-     }
- 
-     if (insert) {
--        gen_gvec_op2i(s, is_q, rd, rn, shift, &shi_op[size]);
-+        gen_gvec_op2i(s, is_q, rd, rn, shift, &sli_op[size]);
-     } else {
-         gen_gvec_fn2i(s, is_q, rd, rn, shift, tcg_gen_gvec_shli, size);
-     }
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index da95851370..104b49543d 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -5878,6 +5878,160 @@ const GVecGen2i usra_op[4] = {
-       .vece = MO_64, },
- };
- 
-+static void gen_shr8_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
-+{
-+    uint64_t mask = dup_const(MO_8, 0xff >> shift);
-+    TCGv_i64 t = tcg_temp_new_i64();
-+
-+    tcg_gen_shri_i64(t, a, shift);
-+    tcg_gen_andi_i64(t, t, mask);
-+    tcg_gen_andi_i64(d, d, ~mask);
-+    tcg_gen_or_i64(d, d, t);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_shr16_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
-+{
-+    uint64_t mask = dup_const(MO_16, 0xffff >> shift);
-+    TCGv_i64 t = tcg_temp_new_i64();
-+
-+    tcg_gen_shri_i64(t, a, shift);
-+    tcg_gen_andi_i64(t, t, mask);
-+    tcg_gen_andi_i64(d, d, ~mask);
-+    tcg_gen_or_i64(d, d, t);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_shr32_ins_i32(TCGv_i32 d, TCGv_i32 a, int32_t shift)
-+{
-+    tcg_gen_shri_i32(a, a, shift);
-+    tcg_gen_deposit_i32(d, d, a, 0, 32 - shift);
-+}
-+
-+static void gen_shr64_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
-+{
-+    tcg_gen_shri_i64(a, a, shift);
-+    tcg_gen_deposit_i64(d, d, a, 0, 64 - shift);
-+}
-+
-+static void gen_shr_ins_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64_t sh)
-+{
-+    if (sh == 0) {
-+        tcg_gen_mov_vec(d, a);
-+    } else {
-+        TCGv_vec t = tcg_temp_new_vec_matching(d);
-+        TCGv_vec m = tcg_temp_new_vec_matching(d);
-+
-+        tcg_gen_dupi_vec(vece, m, MAKE_64BIT_MASK((8 << vece) - sh, sh));
-+        tcg_gen_shri_vec(vece, t, a, sh);
-+        tcg_gen_and_vec(vece, d, d, m);
-+        tcg_gen_or_vec(vece, d, d, t);
-+
-+        tcg_temp_free_vec(t);
-+        tcg_temp_free_vec(m);
-+    }
-+}
-+
-+const GVecGen2i sri_op[4] = {
-+    { .fni8 = gen_shr8_ins_i64,
-+      .fniv = gen_shr_ins_vec,
-+      .load_dest = true,
-+      .opc = INDEX_op_shri_vec,
-+      .vece = MO_8 },
-+    { .fni8 = gen_shr16_ins_i64,
-+      .fniv = gen_shr_ins_vec,
-+      .load_dest = true,
-+      .opc = INDEX_op_shri_vec,
-+      .vece = MO_16 },
-+    { .fni4 = gen_shr32_ins_i32,
-+      .fniv = gen_shr_ins_vec,
-+      .load_dest = true,
-+      .opc = INDEX_op_shri_vec,
-+      .vece = MO_32 },
-+    { .fni8 = gen_shr64_ins_i64,
-+      .fniv = gen_shr_ins_vec,
-+      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+      .load_dest = true,
-+      .opc = INDEX_op_shri_vec,
-+      .vece = MO_64 },
-+};
-+
-+static void gen_shl8_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
-+{
-+    uint64_t mask = dup_const(MO_8, 0xff << shift);
-+    TCGv_i64 t = tcg_temp_new_i64();
-+
-+    tcg_gen_shli_i64(t, a, shift);
-+    tcg_gen_andi_i64(t, t, mask);
-+    tcg_gen_andi_i64(d, d, ~mask);
-+    tcg_gen_or_i64(d, d, t);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_shl16_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
-+{
-+    uint64_t mask = dup_const(MO_16, 0xffff << shift);
-+    TCGv_i64 t = tcg_temp_new_i64();
-+
-+    tcg_gen_shli_i64(t, a, shift);
-+    tcg_gen_andi_i64(t, t, mask);
-+    tcg_gen_andi_i64(d, d, ~mask);
-+    tcg_gen_or_i64(d, d, t);
-+    tcg_temp_free_i64(t);
-+}
-+
-+static void gen_shl32_ins_i32(TCGv_i32 d, TCGv_i32 a, int32_t shift)
-+{
-+    tcg_gen_deposit_i32(d, d, a, shift, 32 - shift);
-+}
-+
-+static void gen_shl64_ins_i64(TCGv_i64 d, TCGv_i64 a, int64_t shift)
-+{
-+    tcg_gen_deposit_i64(d, d, a, shift, 64 - shift);
-+}
-+
-+static void gen_shl_ins_vec(unsigned vece, TCGv_vec d, TCGv_vec a, int64_t sh)
-+{
-+    if (sh == 0) {
-+        tcg_gen_mov_vec(d, a);
-+    } else {
-+        TCGv_vec t = tcg_temp_new_vec_matching(d);
-+        TCGv_vec m = tcg_temp_new_vec_matching(d);
-+
-+        tcg_gen_dupi_vec(vece, m, MAKE_64BIT_MASK(0, sh));
-+        tcg_gen_shli_vec(vece, t, a, sh);
-+        tcg_gen_and_vec(vece, d, d, m);
-+        tcg_gen_or_vec(vece, d, d, t);
-+
-+        tcg_temp_free_vec(t);
-+        tcg_temp_free_vec(m);
-+    }
-+}
-+
-+const GVecGen2i sli_op[4] = {
-+    { .fni8 = gen_shl8_ins_i64,
-+      .fniv = gen_shl_ins_vec,
-+      .load_dest = true,
-+      .opc = INDEX_op_shli_vec,
-+      .vece = MO_8 },
-+    { .fni8 = gen_shl16_ins_i64,
-+      .fniv = gen_shl_ins_vec,
-+      .load_dest = true,
-+      .opc = INDEX_op_shli_vec,
-+      .vece = MO_16 },
-+    { .fni4 = gen_shl32_ins_i32,
-+      .fniv = gen_shl_ins_vec,
-+      .load_dest = true,
-+      .opc = INDEX_op_shli_vec,
-+      .vece = MO_32 },
-+    { .fni8 = gen_shl64_ins_i64,
-+      .fniv = gen_shl_ins_vec,
-+      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+      .load_dest = true,
-+      .opc = INDEX_op_shli_vec,
-+      .vece = MO_64 },
-+};
-+
- /* Translate a NEON data processing instruction.  Return nonzero if the
-    instruction is invalid.
-    We process data in a mixture of 32-bit and 64-bit chunks.
-@@ -5895,7 +6049,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-     int pairwise;
-     int u;
-     int vec_size;
--    uint32_t imm, mask;
-+    uint32_t imm;
-     TCGv_i32 tmp, tmp2, tmp3, tmp4, tmp5;
-     TCGv_ptr ptr1, ptr2, ptr3;
-     TCGv_i64 tmp64;
-@@ -6534,8 +6688,27 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                     }
-                     return 0;
- 
-+                case 4: /* VSRI */
-+                    if (!u) {
-+                        return 1;
-+                    }
-+                    /* Right shift comes here negative.  */
-+                    shift = -shift;
-+                    /* Shift out of range leaves destination unchanged.  */
-+                    if (shift < 8 << size) {
-+                        tcg_gen_gvec_2i(rd_ofs, rm_ofs, vec_size, vec_size,
-+                                        shift, &sri_op[size]);
-+                    }
-+                    return 0;
-+
-                 case 5: /* VSHL, VSLI */
--                    if (!u) { /* VSHL */
-+                    if (u) { /* VSLI */
-+                        /* Shift out of range leaves destination unchanged.  */
-+                        if (shift < 8 << size) {
-+                            tcg_gen_gvec_2i(rd_ofs, rm_ofs, vec_size,
-+                                            vec_size, shift, &sli_op[size]);
-+                        }
-+                    } else { /* VSHL */
-                         /* Shifts larger than the element size are
-                          * architecturally valid and results in zero.
-                          */
-@@ -6545,9 +6718,8 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                             tcg_gen_gvec_shli(size, rd_ofs, rm_ofs, shift,
-                                               vec_size, vec_size);
-                         }
--                        return 0;
-                     }
--                    break;
-+                    return 0;
-                 }
- 
-                 if (size == 3) {
-@@ -6573,10 +6745,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                             else
-                                 gen_helper_neon_rshl_s64(cpu_V0, cpu_V0, cpu_V1);
-                             break;
--                        case 4: /* VSRI */
--                        case 5: /* VSHL, VSLI */
--                            gen_helper_neon_shl_u64(cpu_V0, cpu_V0, cpu_V1);
--                            break;
-                         case 6: /* VQSHLU */
-                             gen_helper_neon_qshlu_s64(cpu_V0, cpu_env,
-                                                       cpu_V0, cpu_V1);
-@@ -6597,21 +6765,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                             /* Accumulate.  */
-                             neon_load_reg64(cpu_V1, rd + pass);
-                             tcg_gen_add_i64(cpu_V0, cpu_V0, cpu_V1);
--                        } else if (op == 4 || (op == 5 && u)) {
--                            /* Insert */
--                            neon_load_reg64(cpu_V1, rd + pass);
--                            uint64_t mask;
--                            if (shift < -63 || shift > 63) {
--                                mask = 0;
--                            } else {
--                                if (op == 4) {
--                                    mask = 0xffffffffffffffffull >> -shift;
--                                } else {
--                                    mask = 0xffffffffffffffffull << shift;
--                                }
--                            }
--                            tcg_gen_andi_i64(cpu_V1, cpu_V1, ~mask);
--                            tcg_gen_or_i64(cpu_V0, cpu_V0, cpu_V1);
-                         }
-                         neon_store_reg64(cpu_V0, rd + pass);
-                     } else { /* size < 3 */
-@@ -6624,15 +6777,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                         case 3: /* VRSRA */
-                             GEN_NEON_INTEGER_OP(rshl);
-                             break;
--                        case 4: /* VSRI */
--                        case 5: /* VSHL, VSLI */
--                            switch (size) {
--                            case 0: gen_helper_neon_shl_u8(tmp, tmp, tmp2); break;
--                            case 1: gen_helper_neon_shl_u16(tmp, tmp, tmp2); break;
--                            case 2: gen_helper_neon_shl_u32(tmp, tmp, tmp2); break;
--                            default: abort();
--                            }
--                            break;
-                         case 6: /* VQSHLU */
-                             switch (size) {
-                             case 0:
-@@ -6664,42 +6808,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                             tmp2 = neon_load_reg(rd, pass);
-                             gen_neon_add(size, tmp, tmp2);
-                             tcg_temp_free_i32(tmp2);
--                        } else if (op == 4 || (op == 5 && u)) {
--                            /* Insert */
--                            switch (size) {
--                            case 0:
--                                if (op == 4)
--                                    mask = 0xff >> -shift;
--                                else
--                                    mask = (uint8_t)(0xff << shift);
--                                mask |= mask << 8;
--                                mask |= mask << 16;
--                                break;
--                            case 1:
--                                if (op == 4)
--                                    mask = 0xffff >> -shift;
--                                else
--                                    mask = (uint16_t)(0xffff << shift);
--                                mask |= mask << 16;
--                                break;
--                            case 2:
--                                if (shift < -31 || shift > 31) {
--                                    mask = 0;
--                                } else {
--                                    if (op == 4)
--                                        mask = 0xffffffffu >> -shift;
--                                    else
--                                        mask = 0xffffffffu << shift;
--                                }
--                                break;
--                            default:
--                                abort();
--                            }
--                            tmp2 = neon_load_reg(rd, pass);
--                            tcg_gen_andi_i32(tmp, tmp, mask);
--                            tcg_gen_andi_i32(tmp2, tmp2, ~mask);
--                            tcg_gen_or_i32(tmp, tmp, tmp2);
--                            tcg_temp_free_i32(tmp2);
-                         }
-                         neon_store_reg(rd, pass, tmp);
-                     }
--- 
-2.17.1
+> On Wed, 10 Oct 2018 11:10:07 PDT (-0700), peter.maydell@linaro.org wrote:
+> > On 10 October 2018 at 18:49, Palmer Dabbelt <palmer@sifive.com> wrote:
+> >> we should really
+> >> get the ball rolling on our big patch backlog.
+> >
+> > Yes, please do. Softfreeze is not all that far away and I
+> > would strongly prefer not to get an enormous sized pull
+> > request at the last minute. The ideal pattern is that
+> > code changes come in at a steady rate across the whole
+> > of the 'open' part of the development cycle.
+>
+> Ya, sorry, we've been a bit out of it.  If I understand correctly, the
+> soft
+> freeze is the 30th?  If so it's really time to get started, and it looks
+> like
+> Michael is busy so I'll have to go figure this out.
+>
+
+Yes. I should think twice about the Signed-off-by: on my commits. I need to
+run a regression on this out-of-order subset. I currently only run tests on
+the top of the riscv-qemu tree in-order, and when I rebase against master.
+If the commits need any significant effort to rebase because they are taken
+in some random order then the testing will be invalidated. i.e. I haven't
+checked the dependencies for these commits.
+
+I am happy to review whoever posts the contents of the tree. I can test
+apply the PRs against the riscv-qemu tree and if they give us lumps, we'll
+reject, including my own changes (if rebased).
+
+Alastair, I suggest you confer with Debian and Fedora folk. Don't break the
+Linux distros... I'm petrified that we might break Debian.
+
+Palmer, I disagree with idea, I would like to maintain the soft-fork until
+we have the CI running our regression test suite (currently manual)
+
+Peter, I have to pull in your remote wholesale. I don't cherry-pick from
+your tree. I think this is truly dumb. This might serve the needs of some
+folk running Linux but we have emulation fidelity fixes for the RISC-V
+community as a whole. Alastair is the only person not submitting his
+patches via the (sub)maintainer tree. BTW Who is the RISC-V port
+maintainer? Puzzled.
+
+Here is the pull queue. But I'm not ready to make a PR until we have the CI
+running the regression. I certainly don't want rebases of random commits to
+the riscv-qemu tree coming in when we pull.
+
+- https://github.com/riscv/riscv-qemu/tree/qemu-for-upstream
+
+That said, they have sign-off. There are plenty of other "RISC-V"
+maintainers. Do what you think is wise.
+
+Most important thing here is the Debian builders and other RISC-V virtual
+machines in production. Having the Debian folk or some other helpful tester
+running the entire tree. Pulling it in one go means we don't have a
+bisection problem interspersed with a whole lot of other random patches.
+You may not have all of the interrupt related changes that require
+extensive parallel burn-in tests (GCC bootstrap). i.e. we do significantly
+more than "make check" when we pull changes into our tree.
+
+Thanks and Regards,
+Michael.
