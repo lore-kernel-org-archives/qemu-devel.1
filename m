@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gAfJY-0004uo-EI
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:04:04 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1gAfMy-0006KT-G6
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:07:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1gAfJV-0001MB-MZ
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:04:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48952)
+	(envelope-from <dgilbert@redhat.com>) id 1gAfMv-000498-SQ
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:07:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59310)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gAfJV-0001LT-Cu
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:03:57 -0400
-Date: Thu, 11 Oct 2018 19:03:53 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1gAfMv-00047E-1Z
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 14:07:29 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 223263002387
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 18:07:27 +0000 (UTC)
+Date: Thu, 11 Oct 2018 19:07:23 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20181011180352.GD29526@work-vm>
-References: <20181002135538.12113-1-den@openvz.org>
-	<875zybxorn.fsf@dusky.pond.sub.org>
+Message-ID: <20181011180723.GE29526@work-vm>
+References: <20180913132313.11370-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <875zybxorn.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH 1/1] qmp,
- hmp: make subsystem/system-vendor identities optional
+In-Reply-To: <20180913132313.11370-1-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration-test: Only generate a single
+ target architecture
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +33,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Denis V. Lunev" <den@openvz.org>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Denis V. Lunev" <den@openvz.org> writes:
+* Juan Quintela (quintela@redhat.com) wrote:
+> Several changes:
+> - We only allow generate header "inside" the tree.  Why?  Because we
+>   need to connit the result, so it makes no sense to generate them on
+>   the build dir.
+> - We only generate a single target each time.  Getting all the
+>   cross-compilers correctly is an impossible task.  So know you do:
+>      make -C tests/migration $target (native)
+>      make CROSS_PREFIX=foo- -C tests/migratiion $target (cross)
+>   And you are done.
 > 
-> > According to PCI specification subsystem id and subsystem vendor id are
-> > optinal and could be abscent in Type1 header and can be found on
-> > different offsets within Type0 and Type2 headers.
+> - If we are building out of tree, we have no data about if we are
+>   cross-compile or whatever.  So instead of guess what is happening,
+>   just do what I pointed on previous point.
 > 
-> Well, they *are* absent in Type1 headers.  Perhaps:
-> 
->   According to PCI specification, subsystem id and subsystem vendor id
->   are present only in type 0 and type 2 headers (at different offsets),
->   but not in type 1 headers.
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Queued with that text.
 
-> > Thus we should make this data optional in struct PciDeviceId and skip
-> > reporting them via HMP if the information is not available.
-> >
-> > Additional (wrong information) about PCI bridges (Type1 devices) has been
-> > added in 5383a705 and fortunately not released. This patch fixes that
-> > problem. The problem was spotted by Markus.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+and queued.
+
+
+> ---
+>  tests/migration/Makefile | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
 > 
-> A machine-readable way to phrase the last sentence is
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> 
-> > Signed-off-by: Denis V. Lunev <den@openvz.org>
-> > CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > CC: Eric Blake <eblake@redhat.com>
-> > CC: Markus Armbruster <armbru@redhat.com>
-> > ---
-> >  hmp.c          |  6 ++++--
-> >  hw/pci/pci.c   | 13 ++++++++++---
-> >  qapi/misc.json |  4 ++--
-> >  3 files changed, 16 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/hmp.c b/hmp.c
-> > index 3a9f797677..55633d29a3 100644
-> > --- a/hmp.c
-> > +++ b/hmp.c
-> > @@ -824,8 +824,10 @@ static void hmp_info_pci_device(Monitor *mon, const PciDeviceInfo *dev)
-> >  
-> >      monitor_printf(mon, ": PCI device %04" PRIx64 ":%04" PRIx64 "\n",
-> >                     dev->id->vendor, dev->id->device);
-> > -    monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
-> > -                   dev->id->subsystem_vendor, dev->id->subsystem);
-> > +    if (dev->id->has_subsystem_vendor && dev->id->has_subsystem) {
-> > +        monitor_printf(mon, "      PCI subsystem %04" PRIx64 ":%04" PRIx64 "\n",
-> > +                       dev->id->subsystem_vendor, dev->id->subsystem);
-> > +    }
-> >  
-> >      if (dev->has_irq) {
-> >          monitor_printf(mon, "      IRQ %" PRId64 ".\n", dev->irq);
-> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > index 51d0dec466..b937f0dc0a 100644
-> > --- a/hw/pci/pci.c
-> > +++ b/hw/pci/pci.c
-> > @@ -1737,9 +1737,6 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
-> >      info->id = g_new0(PciDeviceId, 1);
-> >      info->id->vendor = pci_get_word(dev->config + PCI_VENDOR_ID);
-> >      info->id->device = pci_get_word(dev->config + PCI_DEVICE_ID);
-> > -    info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
-> > -    info->id->subsystem_vendor =
-> > -        pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
-> >      info->regions = qmp_query_pci_regions(dev);
-> >      info->qdev_id = g_strdup(dev->qdev.id ? dev->qdev.id : "");
-> >  
-> > @@ -1752,6 +1749,16 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevice *dev, PCIBus *bus,
-> >      if (type == PCI_HEADER_TYPE_BRIDGE) {
-> >          info->has_pci_bridge = true;
-> >          info->pci_bridge = qmp_query_pci_bridge(dev, bus, bus_num);
-> > +    } else if (type == PCI_HEADER_TYPE_NORMAL) {
-> > +        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
-> > +        info->id->subsystem = pci_get_word(dev->config + PCI_SUBSYSTEM_ID);
-> > +        info->id->subsystem_vendor =
-> > +            pci_get_word(dev->config + PCI_SUBSYSTEM_VENDOR_ID);
-> > +    } else if (type == PCI_HEADER_TYPE_CARDBUS) {
-> > +        info->id->has_subsystem = info->id->has_subsystem_vendor = true;
-> > +        info->id->subsystem = pci_get_word(dev->config + PCI_CB_SUBSYSTEM_ID);
-> > +        info->id->subsystem_vendor =
-> > +            pci_get_word(dev->config + PCI_CB_SUBSYSTEM_VENDOR_ID);
-> >      }
-> >  
-> >      return info;
-> > diff --git a/qapi/misc.json b/qapi/misc.json
-> > index ada9af5add..95a6ed022d 100644
-> > --- a/qapi/misc.json
-> > +++ b/qapi/misc.json
-> > @@ -839,8 +839,8 @@
-> >  # Since: 2.4
-> >  ##
-> >  { 'struct': 'PciDeviceId',
-> > -  'data': {'device': 'int', 'vendor': 'int', 'subsystem': 'int',
-> > -            'subsystem-vendor': 'int'} }
-> > +  'data': {'device': 'int', 'vendor': 'int', '*subsystem': 'int',
-> > +            '*subsystem-vendor': 'int'} }
-> 
-> 'uint16' would match PCI, but I since we didn't for @device and @vendor,
-> we probably shouldn't for @subsystem and @subsystem-vendor.
-> 
-> >  
-> >  ##
-> >  # @PciDeviceInfo:
-> 
-> With Eric's spelling corrections or my rephrasing of the commit message:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> 
-> David, would you like to pick this up?
+> diff --git a/tests/migration/Makefile b/tests/migration/Makefile
+> index ff726ed7dd..13e99b1692 100644
+> --- a/tests/migration/Makefile
+> +++ b/tests/migration/Makefile
+> @@ -9,6 +9,19 @@ TARGET_LIST = i386 aarch64 s390x
+>  
+>  SRC_PATH = ../..
+>  
+> +.PHONY: help $(TARGET_LIST)
+> +help:
+> +	@echo "Create migration guest includes.  We generate a binary."
+> +	@echo "And then convert that binary to an include file that can be"
+> +	@echo "run in a guest."
+> +	@echo "Possible operations are:"
+> +	@echo
+> +	@echo " $(MAKE) clean                Remove all intermediate files"
+> +	@echo " $(MAKE) target               Generate for that target"
+> +	@echo " $(MAKE) CROSS_PREFIX=... target"
+> +	@echo "                              Cross-compile than target"
+> +	@echo " Possible targets are: $(TARGET_LIST)"
+> +
+>  override define __note
+>  /* This file is automatically generated from the assembly file in
+>   * tests/migration/$@. Edit that file and then run "make all"
+> @@ -18,16 +31,8 @@ override define __note
+>  endef
+>  export __note
+>  
+> -find-arch-cross-cc = $(lastword $(shell grep -h "CROSS_CC_GUEST=" $(wildcard $(SRC_PATH)/$(patsubst i386,*86*,$(1))-softmmu/config-target.mak) /dev/null))
+> -parse-cross-prefix = $(subst gcc,,$(patsubst cc,gcc,$(patsubst CROSS_CC_GUEST="%",%,$(call find-arch-cross-cc,$(1)))))
+> -gen-cross-prefix = $(patsubst %-,CROSS_PREFIX=%-,$(call parse-cross-prefix,$(1)))
+> -
+> -.PHONY: all $(TARGET_LIST)
+> -
+> -all: $(TARGET_LIST)
+> -
+>  $(TARGET_LIST):
+> -	$(MAKE) -C $@ $(call gen-cross-prefix,$@)
+> +	$(MAKE) CROSS_PREFIX=$(CROSS_PREFIX) -C $@
+>  
+>  clean:
+>  	for target in $(TARGET_LIST); do \
+> -- 
+> 2.17.1
 > 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
