@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gAalU-00071T-4A
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:12:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1gAamn-0007hL-C4
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lhrazky@redhat.com>) id 1gAalO-0002N1-3Z
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:12:32 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:50250)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lhrazky@redhat.com>) id 1gAalM-0002LP-BI
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:12:25 -0400
-Received: by mail-wm1-f68.google.com with SMTP id i8-v6so8896663wmg.0
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 06:12:24 -0700 (PDT)
-Message-ID: <1539263541.16655.110.camel@redhat.com>
-From: =?UTF-8?Q?Luk=C3=A1=C5=A1_Hr=C3=A1zk=C3=BD?= <lhrazky@redhat.com>
-Date: Thu, 11 Oct 2018 15:12:21 +0200
-In-Reply-To: <20181011122757.gsynkctea7reqnik@sirius.home.kraxel.org>
-References: <20181009131052.18500-1-lhrazky@redhat.com>
-	<20181009131052.18500-2-lhrazky@redhat.com>
-	<1539113618.12871.122.camel@redhat.com>
-	<1539189387.16655.63.camel@redhat.com>
-	<20181011122757.gsynkctea7reqnik@sirius.home.kraxel.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Spice-devel] [RFC PATCH spice 1/2] QXL interface:
- add functions to identify monitors in the guest
+	(envelope-from <armbru@redhat.com>) id 1gAami-00037U-Eq
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:13:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48202)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAami-00036y-6Q
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 09:13:48 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181010120841.13214-1-fli@suse.com>
+	<20181010120841.13214-3-fli@suse.com>
+Date: Thu, 11 Oct 2018 15:13:40 +0200
+In-Reply-To: <20181010120841.13214-3-fli@suse.com> (Fei Li's message of "Wed,
+	10 Oct 2018 20:08:36 +0800")
+Message-ID: <87h8hs4oe3.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v5 2/7] ui/vnc.c: polish vnc_init_func
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,108 +27,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Jonathon Jongsma <jjongsma@redhat.com>, spice-devel@lists.freedesktop.org, qemu-devel@nongnu.org
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, armbru@redhat.com, famz@redhat.com
 
-On Thu, 2018-10-11 at 14:27 +0200, Gerd Hoffmann wrote:
-> > > So, if I remember correctly, Gerd recommended returning this value from
-> > > the function. But I think it needs more explanation here. What exactly
-> > > is a "monitor_id" supposed to represent? It is not used in your follow-
-> > > up qemu patch so it's hard to tell.
-> > 
-> > It's supposed to be the actual monitor_id that we use in SPICE to
-> > identify the monitors. I've just spent quite some time looking up where
-> > the monitor_id actually comes from, and it's actually set all the way
-> > down in the driver (either xf86-video-qxl or the KMS driver in the
-> > kernel) and passed through the monitors_config functions to SPICE
-> > server.
-> 
-> How does all this monitors_config work currently in case multiple
-> display channels are present?
-> 
-> There is the QXLInterface->client_monitors_config() callback.
-> 
-> There is the spice_qxl_monitors_config_async() function.
-> 
-> Both are linked to a display channel.  The server/client messages go
-> through the main channel though ...
+Fei Li <fli@suse.com> writes:
 
-Not really, it actually is like this:
+> Add a new Error parameter for vnc_display_init() to handle errors
+> in its caller: vnc_init_func(), just like vnc_display_open() does.
+> And let the call trace propagate the Error.
+>
+> Besides, make vnc_start_worker_thread() return a bool to indicate
+> whether it succeeds instead of returning nothing.
+>
+> Signed-off-by: Fei Li <fli@suse.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> ---
+>  include/ui/console.h |  2 +-
+>  ui/vnc-jobs.c        |  9 ++++++---
+>  ui/vnc-jobs.h        |  2 +-
+>  ui/vnc.c             | 12 +++++++++---
+>  4 files changed, 17 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index fb969caf70..c17803c530 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -453,7 +453,7 @@ void qemu_display_early_init(DisplayOptions *opts);
+>  void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+>  
+>  /* vnc.c */
+> -void vnc_display_init(const char *id);
+> +void vnc_display_init(const char *id, Error **errp);
+>  void vnc_display_open(const char *id, Error **errp);
+>  void vnc_display_add_client(const char *id, int csock, bool skipauth);
+>  int vnc_display_password(const char *id, const char *password);
+> diff --git a/ui/vnc-jobs.c b/ui/vnc-jobs.c
+> index 929391f85d..8807d7217c 100644
+> --- a/ui/vnc-jobs.c
+> +++ b/ui/vnc-jobs.c
+> @@ -331,15 +331,18 @@ static bool vnc_worker_thread_running(void)
+>      return queue; /* Check global queue */
+>  }
+>  
+> -void vnc_start_worker_thread(void)
+> +bool vnc_start_worker_thread(Error **errp)
+>  {
+>      VncJobQueue *q;
+>  
+> -    if (vnc_worker_thread_running())
+> -        return ;
+> +    if (vnc_worker_thread_running()) {
+> +        goto out;
+> +    }
+>  
+>      q = vnc_queue_init();
+>      qemu_thread_create(&q->thread, "vnc_worker", vnc_worker_thread, q,
+>                         QEMU_THREAD_DETACHED);
+>      queue = q; /* Set global queue */
+> +out:
+> +    return true;
+>  }
 
-       display channel
-server --------------> client
+This function cannot fail.  Why convert it to Error, and complicate its
+caller?
 
+> diff --git a/ui/vnc-jobs.h b/ui/vnc-jobs.h
+> index 59f66bcc35..14640593db 100644
+> --- a/ui/vnc-jobs.h
+> +++ b/ui/vnc-jobs.h
+> @@ -37,7 +37,7 @@ void vnc_job_push(VncJob *job);
+>  void vnc_jobs_join(VncState *vs);
+>  
+>  void vnc_jobs_consume_buffer(VncState *vs);
+> -void vnc_start_worker_thread(void);
+> +bool vnc_start_worker_thread(Error **errp);
+>  
+>  /* Locks */
+>  static inline int vnc_trylock_display(VncDisplay *vd)
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index cf221c83cc..f3806e76db 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -3205,7 +3205,7 @@ static const DisplayChangeListenerOps dcl_ops = {
+>      .dpy_cursor_define    = vnc_dpy_cursor_define,
+>  };
+>  
+> -void vnc_display_init(const char *id)
+> +void vnc_display_init(const char *id, Error **errp)
+>  {
+>      VncDisplay *vd;
+>  
+       if (vnc_display_find(id) != NULL) {
+           return;
+       }
+       vd = g_malloc0(sizeof(*vd));
 
-        main channel
-client --------------> server
+       vd->id = strdup(id);
+       QTAILQ_INSERT_TAIL(&vnc_displays, vd, next);
 
-So the monitors_configs go each on its own display channel to the
-client, the client puts it all together and sends back an aggregated
-list on the main channel.
+       QTAILQ_INIT(&vd->clients);
+       vd->expires = TIME_MAX;
 
-> So what happens if a message from the client arrives?  Is that
-> broadcasted as-is to all display channels?  The current qemu code
-> (interface_client_monitors_config in spice-display.c, which is used with
-> virtio-gpu) simply uses the head as index into the array, so it looks
-> like spice-server doesn't do any filtering here (like only filling in
-> the monitors which belong to the display channel).
+       if (keyboard_layout) {
+           trace_vnc_key_map_init(keyboard_layout);
+           vd->kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
+       } else {
+           vd->kbd_layout = init_keyboard_layout(name2keysym, "en-us");
+       }
 
-Correct, the spice server doesn't do any filtering and sends the whole
-monitors_config to all the interfaces...
+       if (!vd->kbd_layout) {
+           exit(1);
 
-> spice_qxl_monitors_config_async() is never called with virtio-gpu,
-> except when opengl is enabled.  In that case qemu simply sets
-> QXLMonitorsConfig->count to 1 and fills in QXLMonitorsConfig->head[0]
-> (see qemu_spice_gl_monitor_config in spice-display.c).
+Uh, init_keyboard_layout() reports errors to stderr, and the exit(1)
+here makes them fatal.  Okay before this patch, but inappropriate
+afterwards.  I'm afraid you have to convert init_keyboard_layout() to
+Error first.
 
-As a side note, I have no idea about opengl. I got a slight impression
-from some earlier conversation that this is actually not used, but I
-don't really know.
+       }
 
-My wild guess at this moment is, that if you don't call
-spice_qxl_monitors_config_async() with virtio-gpu, meaning you don't
-send any monitors config, a simple one containing a single monitor for
-the surface is created somewhere along the way.
+       vd->share_policy = VNC_SHARE_POLICY_ALLOW_EXCLUSIVE;
+> @@ -3235,7 +3235,9 @@ void vnc_display_init(const char *id)
+>      vd->connections_limit = 32;
+>  
+>      qemu_mutex_init(&vd->mutex);
+> -    vnc_start_worker_thread();
+> +    if (!vnc_start_worker_thread(errp)) {
+> +        return;
+> +    }
+>  
+>      vd->dcl.ops = &dcl_ops;
+>      register_displaychangelistener(&vd->dcl);
+> @@ -4079,7 +4081,11 @@ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+>      char *id = (char *)qemu_opts_id(opts);
+>  
+>      assert(id);
+> -    vnc_display_init(id);
+> +    vnc_display_init(id, &local_err);
+> +    if (local_err) {
+> +        error_reportf_err(local_err, "Failed to init VNC server: ");
+> +        exit(1);
+> +    }
+>      vnc_display_open(id, &local_err);
+>      if (local_err != NULL) {
+>          error_reportf_err(local_err, "Failed to start VNC server: ");
 
-> Which would be
-> ok in case spice-server merges the configs from all channels before
-> sending it off to the client.  Not sure this actually happens ...
+Conflicts with my "[PATCH 24/31] vl: Clean up error reporting in
+vnc_init_func()".  Your patch shows that mine is incomplete.
 
-A bit differently, as I said, but the configs are merged on the client,
-which should be an equivalent outcome.
-
-> > Interstingly enough, that seems to be the ID we want to have in the
-> > device_display_id attribute.  I expect (still need to look that up, I'm
-> > out of time right now) that for virtio-gpu the ID is a bit different,
-> 
-> Keep in mind that multiple display devices don't really work right now,
-> and possibly we need to fix not only spice but qemu too.
-
-What exactly do you mean by multiple devices not working?
-
-> > And yeah, I didn't use the id in the QEMU patches, as I didn't know
-> > how, I expect Gerd to have some grand plans for it :)
-> 
-> IIRC the latest plan was to just keep things as is, plan with one
-> channel per monitor for all future things, and just not support
-> one-qxl-device-multihead in combination with multiple display channels.
-> 
-> Is that correct?
-
-Correct.
-
-> I don't think we need the monitors_id in qemu then, qemu can simply use
-> the channel_id (except for the legacy qxl case).
-
-Ok. Given the fact that the monitor_ids actually come from the driver,
-QEMU should actually know them already, right? No need to pass them
-back anyway? (except for the virtio-gpu case, which doesn't send
-monitors_config and so a single monitor_id = 0 is deduced in spice
-server)
-
-Cheers,
-Lukas
-
-> cheers,
->   Gerd
-> 
+Without my patch, there's no real reason for yours, however.  The two
+should be squashed together.
