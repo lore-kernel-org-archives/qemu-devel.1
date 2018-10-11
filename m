@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39621)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhcd-0006cg-55
+	id 1gAhcd-0006cf-4G
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:31:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhcY-0006UF-5H
+	id 1gAhcY-0006U9-4i
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:31:51 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:44543)
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:7100)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhcX-0006TF-NR
+	id 1gAhcX-0006TI-Lf
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:31:46 -0400
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 11 Oct 2018 20:31:38 +0000
-Message-ID: <20181011203115.18666-1-alistair.francis@wdc.com>
+Date: Thu, 11 Oct 2018 20:31:41 +0000
+Message-ID: <20181011203115.18666-2-alistair.francis@wdc.com>
+References: <20181011203115.18666-1-alistair.francis@wdc.com>
+In-Reply-To: <20181011203115.18666-1-alistair.francis@wdc.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BCF0CFA420BCAF4599C390BFFB486CF3@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PULL 00/10] riscv-pullreq queue
+Subject: [Qemu-devel] [PULL 01/10] hw/riscv/virt: Increase the number of
+ interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +34,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alistair Francis <Alistair.Francis@wdc.com>
 
-VGhlIGZvbGxvd2luZyBjaGFuZ2VzIHNpbmNlIGNvbW1pdCA3NWU1MGM4MGUwNTE0MjNhNmY1NWEz
-NGVlNGExZWVjODQyNDQ0YTViOg0KDQogIE1lcmdlIHJlbW90ZS10cmFja2luZyBicmFuY2ggJ3Jl
-bW90ZXMvYXJtYnJ1L3RhZ3MvcHVsbC1taXNjLTIwMTgtMTAtMTAnIGludG8gc3RhZ2luZyAoMjAx
-OC0xMC0xMSAxMDo0MzozNyArMDEwMCkNCg0KYXJlIGF2YWlsYWJsZSBpbiB0aGUgR2l0IHJlcG9z
-aXRvcnkgYXQ6DQoNCiAgZ2l0QGdpdGh1Yi5jb206YWxpc3RhaXIyMy9xZW11LmdpdCB0YWdzL3B1
-bGwtcmlzY3YtcHVsbHJlcS0yMDE4MTAxMQ0KDQpmb3IgeW91IHRvIGZldGNoIGNoYW5nZXMgdXAg
-dG8gZjM5ZTY0NWM1ZjVlOWYyYjNkNDFlOWMxYWQ4NGNhYWUxODI5Y2NlMjoNCg0KICBSSVNDLVY6
-IERvbid0IGFkZCBOVUxMIGJvb3RhcmdzIHRvIGRldmljZS10cmVlICgyMDE4LTEwLTExIDEwOjMw
-OjI2IC0wNzAwKQ0KDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpyaXNjdjogQ29ubmVjdCBQQ0llIGFuZCBhcHBseSBzb21l
-IG1pc2MgcGF0Y2hlcw0KDQpDb25uZWN0IFBDSWUgdG8gdGhlIFJJU0MtViB2aXJ0IG1hY2hpbmUg
-YW5kIFNpRml2ZSBVIG1hY2hpbmVzLg0KDQpUaGVyZSBhcmUgYWxzbyBzb21lIHBhdGNoZXMgdGhh
-dCBJIGhhdmUgY2hlcnJ5IHBpY2tlZCBmcm9tIE1pY2hhZWwncyBSSVNDLVYNCnRyZWUgdGhhdCBh
-cmUgcmVhZHkgdG8gYmUgYXBwbGllZC4NCg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KQWxpc3RhaXIgRnJhbmNpcyAoNSk6
-DQogICAgICBody9yaXNjdi92aXJ0OiBJbmNyZWFzZSB0aGUgbnVtYmVyIG9mIGludGVycnVwdHMN
-CiAgICAgIGh3L3Jpc2N2L3ZpcnQ6IENvbm5lY3QgdGhlIGdwZXggUENJZQ0KICAgICAgcmlzY3Y6
-IEVuYWJsZSBWR0EgYW5kIFBDSUVfVkdBDQogICAgICBody9yaXNjdi9zaWZpdmVfdTogQ29ubmVj
-dCB0aGUgWGlsaW54IFBDSWUNCiAgICAgIGh3L3Jpc2N2L3ZpcnQ6IENvbm5lY3QgYSBWaXJ0SU8g
-bmV0IFBDSWUgZGV2aWNlDQoNCk1pY2hhZWwgQ2xhcmsgKDUpOg0KICAgICAgUklTQy1WOiBBbGxv
-dyBzZXR0aW5nIGFuZCBjbGVhcmluZyBtdWx0aXBsZSBpcnFzDQogICAgICBSSVNDLVY6IE1vdmUg
-bm9uLW9wcyBmcm9tIG9wX2hlbHBlciB0byBjcHVfaGVscGVyDQogICAgICBSSVNDLVY6IFVwZGF0
-ZSBDU1IgYW5kIGludGVycnVwdCBkZWZpbml0aW9ucw0KICAgICAgUklTQy1WOiBBZGQgbWlzc2lu
-ZyBmcmVlIGZvciBwbGljX2hhcnRfY29uZmlnDQogICAgICBSSVNDLVY6IERvbid0IGFkZCBOVUxM
-IGJvb3RhcmdzIHRvIGRldmljZS10cmVlDQoNCiBkZWZhdWx0LWNvbmZpZ3MvcmlzY3YzMi1zb2Z0
-bW11Lm1hayAgICAgfCAgMTAgKy0NCiBkZWZhdWx0LWNvbmZpZ3MvcmlzY3Y2NC1zb2Z0bW11Lm1h
-ayAgICAgfCAgMTAgKy0NCiBody9yaXNjdi9zaWZpdmVfY2xpbnQuYyAgICAgICAgICAgICAgICAg
-fCAgIDggKy0NCiBody9yaXNjdi9zaWZpdmVfcGxpYy5jICAgICAgICAgICAgICAgICAgfCAgIDQg
-Ky0NCiBody9yaXNjdi9zaWZpdmVfdS5jICAgICAgICAgICAgICAgICAgICAgfCAgNjggKysrLQ0K
-IGh3L3Jpc2N2L3NwaWtlLmMgICAgICAgICAgICAgICAgICAgICAgICB8ICAgNiArLQ0KIGh3L3Jp
-c2N2L3ZpcnQuYyAgICAgICAgICAgICAgICAgICAgICAgICB8ICA3OCArKystDQogaW5jbHVkZS9o
-dy9yaXNjdi9zaWZpdmVfdS5oICAgICAgICAgICAgIHwgICA0ICstDQogaW5jbHVkZS9ody9yaXNj
-di92aXJ0LmggICAgICAgICAgICAgICAgIHwgICA2ICstDQogdGFyZ2V0L3Jpc2N2L01ha2VmaWxl
-Lm9ianMgICAgICAgICAgICAgIHwgICAyICstDQogdGFyZ2V0L3Jpc2N2L2NwdS5jICAgICAgICAg
-ICAgICAgICAgICAgIHwgICA2ICstDQogdGFyZ2V0L3Jpc2N2L2NwdS5oICAgICAgICAgICAgICAg
-ICAgICAgIHwgIDIyICstDQogdGFyZ2V0L3Jpc2N2L2NwdV9iaXRzLmggICAgICAgICAgICAgICAg
-IHwgNjgzICsrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tDQogdGFyZ2V0L3Jpc2N2L3to
-ZWxwZXIuYyA9PiBjcHVfaGVscGVyLmN9IHwgIDM1ICstDQogdGFyZ2V0L3Jpc2N2L29wX2hlbHBl
-ci5jICAgICAgICAgICAgICAgIHwgIDM0ICstDQogMTUgZmlsZXMgY2hhbmdlZCwgNTk5IGluc2Vy
-dGlvbnMoKyksIDM3NyBkZWxldGlvbnMoLSkNCiByZW5hbWUgdGFyZ2V0L3Jpc2N2L3toZWxwZXIu
-YyA9PiBjcHVfaGVscGVyLmN9ICg5NSUpDQo=
+Increase the number of interrupts to match the HiFive Unleashed board.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ include/hw/riscv/virt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 91163d6cbf..7cb2742070 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -45,7 +45,7 @@ enum {
+     UART0_IRQ =3D 10,
+     VIRTIO_IRQ =3D 1, /* 1 to 8 */
+     VIRTIO_COUNT =3D 8,
+-    VIRTIO_NDEV =3D 10
++    VIRTIO_NDEV =3D 0x35
+ };
+=20
+ enum {
+--=20
+2.17.1
