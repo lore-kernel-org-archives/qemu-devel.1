@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZs-0002EI-3T
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:52 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZs-0002EJ-3R
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZn-0004Pw-Sk
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:50 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZq-0004Rl-T2
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:51 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu, 11 Oct 2018 04:19:27 +0200
-Message-Id: <20181011021931.4249-9-edgar.iglesias@gmail.com>
+Date: Thu, 11 Oct 2018 04:19:29 +0200
+Message-Id: <20181011021931.4249-11-edgar.iglesias@gmail.com>
 In-Reply-To: <20181011021931.4249-1-edgar.iglesias@gmail.com>
 References: <20181011021931.4249-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 08/12] net: cadence_gem: Announce 64bit
- addressing support
+Subject: [Qemu-devel] [PATCH v2 10/12] target/arm: Add the Cortex-A72
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +24,110 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Announce 64bit addressing support.
+Add the ARM Cortex-A72.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/net/cadence_gem.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/arm/cpu64.c | 66 +++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 550225c15b..7f96de4aff 100644
---- a/hw/net/cadence_gem.c
-+++ b/hw/net/cadence_gem.c
-@@ -142,6 +142,7 @@
- #define GEM_DESCONF4      (0x0000028C/4)
- #define GEM_DESCONF5      (0x00000290/4)
- #define GEM_DESCONF6      (0x00000294/4)
-+#define GEM_DESCONF6_64B_MASK (1U << 23)
- #define GEM_DESCONF7      (0x00000298/4)
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index db71504cb5..44fdf0f6fa 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -51,7 +51,7 @@ static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ }
+ #endif
  
- #define GEM_INT_Q1_STATUS               (0x00000400 / 4)
-@@ -1300,7 +1301,7 @@ static void gem_reset(DeviceState *d)
-     s->regs[GEM_DESCONF] = 0x02500111;
-     s->regs[GEM_DESCONF2] = 0x2ab13fff;
-     s->regs[GEM_DESCONF5] = 0x002f2045;
--    s->regs[GEM_DESCONF6] = 0x0;
-+    s->regs[GEM_DESCONF6] = GEM_DESCONF6_64B_MASK;
+-static const ARMCPRegInfo cortex_a57_a53_cp_reginfo[] = {
++static const ARMCPRegInfo cortex_a72_a57_a53_cp_reginfo[] = {
+ #ifndef CONFIG_USER_ONLY
+     { .name = "L2CTLR_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 1, .crn = 11, .crm = 0, .opc2 = 2,
+@@ -156,7 +156,7 @@ static void aarch64_a57_initfn(Object *obj)
+     cpu->gic_num_lrs = 4;
+     cpu->gic_vpribits = 5;
+     cpu->gic_vprebits = 5;
+-    define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
++    define_arm_cp_regs(cpu, cortex_a72_a57_a53_cp_reginfo);
+ }
  
-     queues_mask = MAKE_64BIT_MASK(1, s->num_priority_queues - 1);
-     s->regs[GEM_DESCONF6] |= queues_mask;
+ static void aarch64_a53_initfn(Object *obj)
+@@ -215,7 +215,66 @@ static void aarch64_a53_initfn(Object *obj)
+     cpu->gic_num_lrs = 4;
+     cpu->gic_vpribits = 5;
+     cpu->gic_vprebits = 5;
+-    define_arm_cp_regs(cpu, cortex_a57_a53_cp_reginfo);
++    define_arm_cp_regs(cpu, cortex_a72_a57_a53_cp_reginfo);
++}
++
++static void aarch64_a72_initfn(Object *obj)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    cpu->dtb_compatible = "arm,cortex-a72";
++    set_feature(&cpu->env, ARM_FEATURE_V8);
++    set_feature(&cpu->env, ARM_FEATURE_VFP4);
++    set_feature(&cpu->env, ARM_FEATURE_NEON);
++    set_feature(&cpu->env, ARM_FEATURE_GENERIC_TIMER);
++    set_feature(&cpu->env, ARM_FEATURE_AARCH64);
++    set_feature(&cpu->env, ARM_FEATURE_CBAR_RO);
++    set_feature(&cpu->env, ARM_FEATURE_V8_AES);
++    set_feature(&cpu->env, ARM_FEATURE_V8_SHA1);
++    set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
++    set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
++    set_feature(&cpu->env, ARM_FEATURE_CRC);
++    set_feature(&cpu->env, ARM_FEATURE_EL2);
++    set_feature(&cpu->env, ARM_FEATURE_EL3);
++    set_feature(&cpu->env, ARM_FEATURE_PMU);
++    cpu->midr = 0x410fd083;
++    cpu->revidr = 0x00000000;
++    cpu->reset_fpsid = 0x41034080;
++    cpu->mvfr0 = 0x10110222;
++    cpu->mvfr1 = 0x12111111;
++    cpu->mvfr2 = 0x00000043;
++    cpu->ctr = 0x8444c004;
++    cpu->reset_sctlr = 0x00c50838;
++    cpu->id_pfr0 = 0x00000131;
++    cpu->id_pfr1 = 0x00011011;
++    cpu->id_dfr0 = 0x03010066;
++    cpu->id_afr0 = 0x00000000;
++    cpu->id_mmfr0 = 0x10201105;
++    cpu->id_mmfr1 = 0x40000000;
++    cpu->id_mmfr2 = 0x01260000;
++    cpu->id_mmfr3 = 0x02102211;
++    cpu->id_isar0 = 0x02101110;
++    cpu->id_isar1 = 0x13112111;
++    cpu->id_isar2 = 0x21232042;
++    cpu->id_isar3 = 0x01112131;
++    cpu->id_isar4 = 0x00011142;
++    cpu->id_isar5 = 0x00011121;
++    cpu->id_aa64pfr0 = 0x00002222;
++    cpu->id_aa64dfr0 = 0x10305106;
++    cpu->pmceid0 = 0x00000000;
++    cpu->pmceid1 = 0x00000000;
++    cpu->id_aa64isar0 = 0x00011120;
++    cpu->id_aa64mmfr0 = 0x00001124;
++    cpu->dbgdidr = 0x3516d000;
++    cpu->clidr = 0x0a200023;
++    cpu->ccsidr[0] = 0x701fe00a; /* 32KB L1 dcache */
++    cpu->ccsidr[1] = 0x201fe012; /* 48KB L1 icache */
++    cpu->ccsidr[2] = 0x707fe07a; /* 1MB L2 cache */
++    cpu->dcz_blocksize = 4; /* 64 bytes */
++    cpu->gic_num_lrs = 4;
++    cpu->gic_vpribits = 5;
++    cpu->gic_vprebits = 5;
++    define_arm_cp_regs(cpu, cortex_a72_a57_a53_cp_reginfo);
+ }
+ 
+ static void cpu_max_get_sve_vq(Object *obj, Visitor *v, const char *name,
+@@ -293,6 +352,7 @@ typedef struct ARMCPUInfo {
+ static const ARMCPUInfo aarch64_cpus[] = {
+     { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
+     { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
++    { .name = "cortex-a72",         .initfn = aarch64_a72_initfn },
+     { .name = "max",                .initfn = aarch64_max_initfn },
+     { .name = NULL }
+ };
 -- 
 2.17.1
