@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gAUyc-0003Ca-IE
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:01:43 -0400
+	(envelope-from <famz@redhat.com>) id 1gAVI2-0006iQ-PO
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1gAUxk-000748-Ad
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:01:42 -0400
-Received: from 16.mo5.mail-out.ovh.net ([87.98.174.144]:59447)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1gAUxk-00073V-2X
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:00:48 -0400
-Received: from player796.ha.ovh.net (unknown [10.109.160.239])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id E64741F91B8
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 09:00:45 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 11 Oct 2018 09:00:35 +0200
-Message-ID: <153924123502.3669683.1365591120394690822.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr_pci: rename some structured types
+	(envelope-from <famz@redhat.com>) id 1gAVI2-00036v-3u
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:21:46 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 11 Oct 2018 15:21:32 +0800
+Message-Id: <20181011072135.588-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/3] file-posix: Simplifications on image
+ locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +19,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-According to CODING_STYLE, structured types names are expected to be
-in CamelCase. PCI is dropped from the name for better readability.
+v5: Address Max's comments (Thanks for reviewing):
+    - Clean up after test done.
+    - Add rev-by to patch 1 and 2.
 
-While here, this also converts a call to g_malloc(n * sizeofi(foo)) to
-g_new(n, foo), which is a recommended good practice.
+v4: Fix test on systems without OFD. [Patchew]
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_pci.c          |   22 +++++++++++-----------
- include/hw/pci-host/spapr.h |   12 ++++++------
- 2 files changed, 17 insertions(+), 17 deletions(-)
+The first patch reduces chances of QEMU crash in unusual (but not unlikely)
+cases especially when used by Libvirt (see commit message).
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index c2271e6ed462..bfb959f2b065 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -277,7 +277,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-     unsigned int irq, max_irqs = 0;
-     sPAPRPHBState *phb = NULL;
-     PCIDevice *pdev = NULL;
--    spapr_pci_msi *msi;
-+    sPAPRMSI *msi;
-     int *config_addr_key;
-     Error *err = NULL;
-     int i;
-@@ -325,7 +325,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-         return;
-     }
- 
--    msi = (spapr_pci_msi *) g_hash_table_lookup(phb->msi, &config_addr);
-+    msi = (sPAPRMSI *) g_hash_table_lookup(phb->msi, &config_addr);
- 
-     /* Releasing MSIs */
-     if (!req_num) {
-@@ -414,7 +414,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                      irq, req_num);
- 
-     /* Add MSI device to cache */
--    msi = g_new(spapr_pci_msi, 1);
-+    msi = g_new(sPAPRMSI, 1);
-     msi->first_irq = irq;
-     msi->num = req_num;
-     config_addr_key = g_new(int, 1);
-@@ -445,7 +445,7 @@ static void rtas_ibm_query_interrupt_source_number(PowerPCCPU *cpu,
-     unsigned int intr_src_num = -1, ioa_intr_num = rtas_ld(args, 3);
-     sPAPRPHBState *phb = NULL;
-     PCIDevice *pdev = NULL;
--    spapr_pci_msi *msi;
-+    sPAPRMSI *msi;
- 
-     /* Find sPAPRPHBState */
-     phb = spapr_pci_find_phb(spapr, buid);
-@@ -458,7 +458,7 @@ static void rtas_ibm_query_interrupt_source_number(PowerPCCPU *cpu,
-     }
- 
-     /* Find device descriptor and start IRQ */
--    msi = (spapr_pci_msi *) g_hash_table_lookup(phb->msi, &config_addr);
-+    msi = (sPAPRMSI *) g_hash_table_lookup(phb->msi, &config_addr);
-     if (!msi || !msi->first_irq || !msi->num || (ioa_intr_num >= msi->num)) {
-         trace_spapr_pci_msi("Failed to return vector", config_addr);
-         rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-@@ -1849,9 +1849,9 @@ static const VMStateDescription vmstate_spapr_pci_msi = {
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField []) {
--        VMSTATE_UINT32(key, spapr_pci_msi_mig),
--        VMSTATE_UINT32(value.first_irq, spapr_pci_msi_mig),
--        VMSTATE_UINT32(value.num, spapr_pci_msi_mig),
-+        VMSTATE_UINT32(key, sPAPRMSIMig),
-+        VMSTATE_UINT32(value.first_irq, sPAPRMSIMig),
-+        VMSTATE_UINT32(value.num, sPAPRMSIMig),
-         VMSTATE_END_OF_LIST()
-     },
- };
-@@ -1883,12 +1883,12 @@ static int spapr_pci_pre_save(void *opaque)
-     if (!sphb->msi_devs_num) {
-         return 0;
-     }
--    sphb->msi_devs = g_malloc(sphb->msi_devs_num * sizeof(spapr_pci_msi_mig));
-+    sphb->msi_devs = g_new(sPAPRMSIMig, sphb->msi_devs_num);
- 
-     g_hash_table_iter_init(&iter, sphb->msi);
-     for (i = 0; g_hash_table_iter_next(&iter, &key, &value); ++i) {
-         sphb->msi_devs[i].key = *(uint32_t *) key;
--        sphb->msi_devs[i].value = *(spapr_pci_msi *) value;
-+        sphb->msi_devs[i].value = *(sPAPRMSI *) value;
-     }
- 
-     return 0;
-@@ -1938,7 +1938,7 @@ static const VMStateDescription vmstate_spapr_pci = {
-                              vmstate_spapr_pci_lsi, struct spapr_pci_lsi),
-         VMSTATE_INT32(msi_devs_num, sPAPRPHBState),
-         VMSTATE_STRUCT_VARRAY_ALLOC(msi_devs, sPAPRPHBState, msi_devs_num, 0,
--                                    vmstate_spapr_pci_msi, spapr_pci_msi_mig),
-+                                    vmstate_spapr_pci_msi, sPAPRMSIMig),
-         VMSTATE_END_OF_LIST()
-     },
- };
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index 7c66c3872f96..041126da573d 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -34,15 +34,15 @@
- 
- typedef struct sPAPRPHBState sPAPRPHBState;
- 
--typedef struct spapr_pci_msi {
-+typedef struct sPAPRMSI {
-     uint32_t first_irq;
-     uint32_t num;
--} spapr_pci_msi;
-+} sPAPRMSI;
- 
--typedef struct spapr_pci_msi_mig {
-+typedef struct sPAPRMSIMig {
-     uint32_t key;
--    spapr_pci_msi value;
--} spapr_pci_msi_mig;
-+    sPAPRMSI value;
-+} sPAPRMSIMig;
- 
- struct sPAPRPHBState {
-     PCIHostState parent_obj;
-@@ -70,7 +70,7 @@ struct sPAPRPHBState {
-     GHashTable *msi;
-     /* Temporary cache for migration purposes */
-     int32_t msi_devs_num;
--    spapr_pci_msi_mig *msi_devs;
-+    sPAPRMSIMig *msi_devs;
- 
-     QLIST_ENTRY(sPAPRPHBState) list;
- 
+The second patch halves fd for images.
+
+The third adds some more test for patch one (would have caught the regression
+caused by v2).
+
+Fam Zheng (3):
+  file-posix: Skip effectiveless OFD lock operations
+  file-posix: Drop s->lock_fd
+  tests: Add unit tests for image locking
+
+ block/file-posix.c         |  83 +++++++++++++-------
+ tests/Makefile.include     |   2 +
+ tests/test-image-locking.c | 157 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 212 insertions(+), 30 deletions(-)
+ create mode 100644 tests/test-image-locking.c
+
+-- 
+2.17.1
