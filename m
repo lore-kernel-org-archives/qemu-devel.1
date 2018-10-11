@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gAZ4N-0005Ry-N7
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:23:58 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gAZ4V-0005XD-ET
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gAZ4I-0007Ki-Cg
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:23:51 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50992 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1gAZ4R-0007MW-La
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:24:01 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:53489 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1gAZ4I-00076Q-3p
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:23:50 -0400
+	id 1gAZ4N-0007L6-UM
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 07:23:57 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Thu, 11 Oct 2018 13:22:06 +0200
-Message-Id: <1539256947-22807-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu, 11 Oct 2018 13:22:10 +0200
+Message-Id: <1539256947-22807-6-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PATCH v4 01/22] elf: Fix PT_MIPS_XXX constants
+Subject: [Qemu-devel] [PATCH v4 05/22] target/mips: Add CPO PWField register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +27,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, richard.henderson@linaro.org, amarkovic@wavecomp.com, smarkovic@wavecomp.com, pjovanovic@wavecomp.com, laurent@vivier.eu, riku.voipio@iki.fi
 
-From: Stefan Markovic <smarkovic@wavecomp.com>
+From: Yongbok Kim <yongbok.kim@mips.com>
 
-Fix existing and add missing PT_MIPS_XXX constants in elf.h.
-This is copied from kernel header arch/mips/include/asm/elf.h.
+Add PWField register (CP0 Register 5, Select 6).
 
-Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+The PWField register configures hardware page table walking for TLB
+refills.
+
+This register is required for the hardware page walker feature. It
+exists only if Config3 PW bit is set to 1. It contains following
+fields:
+
+GDI  (29..24) - Global Directory index
+UDI  (23..18) - Upper Directory index
+MDI  (17..12) - Middle Directory index
+PTI  (11..6 ) - Page Table index
+PTEI ( 5..0 ) - Page Table Entry shift
+
+Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- include/elf.h | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ target/mips/cpu.h       |  6 ++++++
+ target/mips/helper.h    |  1 +
+ target/mips/machine.c   |  1 +
+ target/mips/op_helper.c | 34 ++++++++++++++++++++++++++++++++++
+ target/mips/translate.c | 20 ++++++++++++++++++++
+ 5 files changed, 62 insertions(+)
 
-diff --git a/include/elf.h b/include/elf.h
-index 312f68a..decf210 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -28,8 +28,11 @@ typedef int64_t  Elf64_Sxword;
- #define PT_PHDR    6
- #define PT_LOPROC  0x70000000
- #define PT_HIPROC  0x7fffffff
--#define PT_MIPS_REGINFO		0x70000000
--#define PT_MIPS_OPTIONS		0x70000001
-+
-+#define PT_MIPS_REGINFO   0x70000000
-+#define PT_MIPS_RTPROC    0x70000001
-+#define PT_MIPS_OPTIONS   0x70000002
-+#define PT_MIPS_ABIFLAGS  0x70000003
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index c8999a8..01cd65c 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -290,6 +290,12 @@ struct CPUMIPSState {
+ #define CP0SC2_XR_MASK  (0xFFULL << CP0SC2_XR)
+ #define CP0SC2_MASK     (CP0SC_1GMASK | (CP0SC_1GMASK << 16) | CP0SC2_XR_MASK)
+     target_ulong CP0_PWBase;
++    target_ulong CP0_PWField;
++#define CP0PF_GDI  24    /* 29..24 */
++#define CP0PF_UDI  18    /* 23..18 */
++#define CP0PF_MDI  12    /* 17..12 */
++#define CP0PF_PTI  6     /* 11..6  */
++#define CP0PF_PTEI 0     /*  5..0  */
+     int32_t CP0_Wired;
+     int32_t CP0_SRSConf0_rw_bitmask;
+     int32_t CP0_SRSConf0;
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index b2a780a..6366f9b 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -120,6 +120,7 @@ DEF_HELPER_2(mtc0_pagegrain, void, env, tl)
+ DEF_HELPER_2(mtc0_segctl0, void, env, tl)
+ DEF_HELPER_2(mtc0_segctl1, void, env, tl)
+ DEF_HELPER_2(mtc0_segctl2, void, env, tl)
++DEF_HELPER_2(mtc0_pwfield, void, env, tl)
+ DEF_HELPER_2(mtc0_wired, void, env, tl)
+ DEF_HELPER_2(mtc0_srsconf0, void, env, tl)
+ DEF_HELPER_2(mtc0_srsconf1, void, env, tl)
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index 86702c6..aa6ef56 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -257,6 +257,7 @@ const VMStateDescription vmstate_mips_cpu = {
+         VMSTATE_UINTTL(env.CP0_SegCtl1, MIPSCPU),
+         VMSTATE_UINTTL(env.CP0_SegCtl2, MIPSCPU),
+         VMSTATE_UINTTL(env.CP0_PWBase, MIPSCPU),
++        VMSTATE_UINTTL(env.CP0_PWField, MIPSCPU),
+         VMSTATE_INT32(env.CP0_Wired, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf0, MIPSCPU),
+         VMSTATE_INT32(env.CP0_SRSConf1, MIPSCPU),
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index c148b31..bc506de 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -1445,6 +1445,40 @@ void helper_mtc0_segctl2(CPUMIPSState *env, target_ulong arg1)
+     tlb_flush(cs);
+ }
  
- /* Flags in the e_flags field of the header */
- /* MIPS architecture level. */
++void helper_mtc0_pwfield(CPUMIPSState *env, target_ulong arg1)
++{
++#ifdef TARGET_MIPS64
++    env->CP0_PWField = arg1 & 0x3F3FFFFFFFULL;
++#else
++    uint32_t mask = 0x3FFFFFFF;
++    uint32_t old_ptei = (env->CP0_PWField >> CP0PF_PTEI) & 0x3F;
++    uint32_t new_ptei = (arg1 >> CP0PF_PTEI) & 0x3F;
++
++    if ((env->insn_flags & ISA_MIPS32R6)) {
++        if (((arg1 >> CP0PF_GDI) & 0x3F) < 12) {
++            mask &= ~(0x3F << CP0PF_GDI);
++        }
++        if (((arg1 >> CP0PF_UDI) & 0x3F) < 12) {
++            mask &= ~(0x3F << CP0PF_UDI);
++        }
++        if (((arg1 >> CP0PF_MDI) & 0x3F) < 12) {
++            mask &= ~(0x3F << CP0PF_MDI);
++        }
++        if (((arg1 >> CP0PF_PTI) & 0x3F) < 12) {
++            mask &= ~(0x3F << CP0PF_PTI);
++        }
++    }
++    env->CP0_PWField = arg1 & mask;
++
++    if ((new_ptei >= 32) ||
++            ((env->insn_flags & ISA_MIPS32R6) &&
++                    (new_ptei == 0 || new_ptei == 1))) {
++        env->CP0_PWField = (env->CP0_PWField & ~0x3F) |
++                (old_ptei << CP0PF_PTEI);
++    }
++#endif
++}
++
+ void helper_mtc0_wired(CPUMIPSState *env, target_ulong arg1)
+ {
+     if (env->insn_flags & ISA_MIPS32R6) {
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 7af9a21..882a765 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -5553,6 +5553,11 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWBase));
+             rn = "PWBase";
+             break;
++        case 6:
++            check_pw(ctx);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWField));
++            rn = "PWField";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -6259,6 +6264,11 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_PWBase));
+             rn = "PWBase";
+             break;
++        case 6:
++            check_pw(ctx);
++            gen_helper_mtc0_pwfield(cpu_env, arg);
++            rn = "PWField";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -6974,6 +6984,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWBase));
+             rn = "PWBase";
+             break;
++        case 6:
++            check_pw(ctx);
++            tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWField));
++            rn = "PWField";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -7662,6 +7677,11 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             tcg_gen_st_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWBase));
+             rn = "PWBase";
+             break;
++        case 6:
++            check_pw(ctx);
++            gen_helper_mtc0_pwfield(cpu_env, arg);
++            rn = "PWField";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
 -- 
 2.7.4
