@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gAbek-00055V-6v
+	(envelope-from <wexu@redhat.com>) id 1gAbek-00055U-6o
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1gAbef-0006AB-8L
+	(envelope-from <wexu@redhat.com>) id 1gAbef-00069q-4I
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56060)
+Received: from mx1.redhat.com ([209.132.183.28]:45162)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gAbed-00065m-6i
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:33 -0400
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1gAbeb-00067F-8e
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 10:09:31 -0400
 From: wexu@redhat.com
-Date: Thu, 11 Oct 2018 10:08:33 -0400
-Message-Id: <1539266915-15216-11-git-send-email-wexu@redhat.com>
+Date: Thu, 11 Oct 2018 10:08:34 -0400
+Message-Id: <1539266915-15216-12-git-send-email-wexu@redhat.com>
 In-Reply-To: <1539266915-15216-1-git-send-email-wexu@redhat.com>
 References: <1539266915-15216-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [[RFC v3 10/12] virtio: packed ring feature bit for
- userspace backend
+Subject: [Qemu-devel] [[RFC v3 11/12] virtio: enable packed ring via a new
+ command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +29,31 @@ Cc: jasowang@redhat.com, tiwei.bie@intel.com, wexu@redhat.com, jfreimann@redhat.
 
 From: Wei Xu <wexu@redhat.com>
 
+only userspace virtio net backend has been supported by
+the CLI so far.
+
+(cherry picked from commit 0b3ec96f4a9402cca467c40353066e57608ac6b6)
+Signed-off-by: Wei Xu <wexu@redhat.com>
+(cherry picked from commit a1a3b85f00299ccc6f4bc819abe470da88059fb7)
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/net/vhost_net.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/hw/virtio/virtio.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index e037db6..fb4b18f 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -78,6 +78,7 @@ static const int user_feature_bits[] = {
-     VIRTIO_NET_F_MRG_RXBUF,
-     VIRTIO_NET_F_MTU,
-     VIRTIO_F_IOMMU_PLATFORM,
-+    VIRTIO_F_RING_PACKED,
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index e323e76..9af8839 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -264,7 +264,9 @@ typedef struct VirtIORNGConf VirtIORNGConf;
+     DEFINE_PROP_BIT64("any_layout", _state, _field, \
+                       VIRTIO_F_ANY_LAYOUT, true), \
+     DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
+-                      VIRTIO_F_IOMMU_PLATFORM, false)
++                      VIRTIO_F_IOMMU_PLATFORM, false), \
++    DEFINE_PROP_BIT64("ring_packed", _state, _field, \
++                      VIRTIO_F_RING_PACKED, false)
  
-     /* This bit implies RARP isn't sent by QEMU out of band */
-     VIRTIO_NET_F_GUEST_ANNOUNCE,
+ hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
+ hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
 -- 
 1.8.3.1
