@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZg-00028o-Ef
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:41 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZj-0002Ay-Vo
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZf-0004Ks-E5
-	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:40 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1gAQZi-0004NQ-R1
+	for qemu-devel@nongnu.org; Wed, 10 Oct 2018 22:19:43 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu, 11 Oct 2018 04:19:22 +0200
-Message-Id: <20181011021931.4249-4-edgar.iglesias@gmail.com>
+Date: Thu, 11 Oct 2018 04:19:24 +0200
+Message-Id: <20181011021931.4249-6-edgar.iglesias@gmail.com>
 In-Reply-To: <20181011021931.4249-1-edgar.iglesias@gmail.com>
 References: <20181011021931.4249-1-edgar.iglesias@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 03/12] net: cadence_gem: Use uint32_t for
- 32bit descriptor words
+Subject: [Qemu-devel] [PATCH v2 05/12] net: cadence_gem: Add support for
+ extended descriptors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,171 +25,197 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Use uint32_t instead of unsigned to describe 32bit descriptor words.
+Add support for extended descriptors with optional 64bit
+addressing and timestamping. QEMU will not yet provide
+timestamps (always leaving the valid timestamp bit as zero).
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/net/cadence_gem.c         | 42 ++++++++++++++++++------------------
+ hw/net/cadence_gem.c         | 69 ++++++++++++++++++++++++++----------
  include/hw/net/cadence_gem.h |  2 +-
- 2 files changed, 22 insertions(+), 22 deletions(-)
+ 2 files changed, 52 insertions(+), 19 deletions(-)
 
 diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-index 901c173970..31f3fe0e81 100644
+index 4d769b0244..759c1d71e0 100644
 --- a/hw/net/cadence_gem.c
 +++ b/hw/net/cadence_gem.c
-@@ -302,42 +302,42 @@
+@@ -207,6 +207,9 @@
+ #define GEM_NWCFG_BCAST_REJ    0x00000020 /* Reject broadcast packets */
+ #define GEM_NWCFG_PROMISC      0x00000010 /* Accept all packets */
+ 
++#define GEM_DMACFG_ADDR_64B    (1U << 30)
++#define GEM_DMACFG_TX_BD_EXT   (1U << 29)
++#define GEM_DMACFG_RX_BD_EXT   (1U << 28)
+ #define GEM_DMACFG_RBUFSZ_M    0x00FF0000 /* DMA RX Buffer Size mask */
+ #define GEM_DMACFG_RBUFSZ_S    16         /* DMA RX Buffer Size shift */
+ #define GEM_DMACFG_RBUFSZ_MUL  64         /* DMA RX Buffer Size multiplier */
+@@ -302,9 +305,14 @@
  
  #define GEM_MODID_VALUE 0x00020118
  
--static inline unsigned tx_desc_get_buffer(unsigned *desc)
-+static inline unsigned tx_desc_get_buffer(uint32_t *desc)
+-static inline unsigned tx_desc_get_buffer(uint32_t *desc)
++static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s, uint32_t *desc)
  {
-     return desc[0];
+-    return desc[0];
++    uint64_t ret = desc[0];
++
++    if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
++        ret |= (uint64_t)desc[2] << 32;
++    }
++    return ret;
  }
  
--static inline unsigned tx_desc_get_used(unsigned *desc)
-+static inline unsigned tx_desc_get_used(uint32_t *desc)
- {
-     return (desc[1] & DESC_1_USED) ? 1 : 0;
- }
- 
--static inline void tx_desc_set_used(unsigned *desc)
-+static inline void tx_desc_set_used(uint32_t *desc)
- {
-     desc[1] |= DESC_1_USED;
- }
- 
--static inline unsigned tx_desc_get_wrap(unsigned *desc)
-+static inline unsigned tx_desc_get_wrap(uint32_t *desc)
- {
-     return (desc[1] & DESC_1_TX_WRAP) ? 1 : 0;
- }
- 
--static inline unsigned tx_desc_get_last(unsigned *desc)
-+static inline unsigned tx_desc_get_last(uint32_t *desc)
- {
-     return (desc[1] & DESC_1_TX_LAST) ? 1 : 0;
- }
- 
--static inline void tx_desc_set_last(unsigned *desc)
-+static inline void tx_desc_set_last(uint32_t *desc)
- {
-     desc[1] |= DESC_1_TX_LAST;
- }
- 
--static inline unsigned tx_desc_get_length(unsigned *desc)
-+static inline unsigned tx_desc_get_length(uint32_t *desc)
- {
-     return desc[1] & DESC_1_LENGTH;
- }
- 
--static inline void print_gem_tx_desc(unsigned *desc, uint8_t queue)
-+static inline void print_gem_tx_desc(uint32_t *desc, uint8_t queue)
- {
-     DB_PRINT("TXDESC (queue %" PRId8 "):\n", queue);
-     DB_PRINT("bufaddr: 0x%08x\n", *desc);
-@@ -347,58 +347,58 @@ static inline void print_gem_tx_desc(unsigned *desc, uint8_t queue)
+ static inline unsigned tx_desc_get_used(uint32_t *desc)
+@@ -347,9 +355,30 @@ static inline void print_gem_tx_desc(uint32_t *desc, uint8_t queue)
      DB_PRINT("length:  %d\n", tx_desc_get_length(desc));
  }
  
--static inline unsigned rx_desc_get_buffer(unsigned *desc)
-+static inline unsigned rx_desc_get_buffer(uint32_t *desc)
+-static inline unsigned rx_desc_get_buffer(uint32_t *desc)
++static inline uint64_t rx_desc_get_buffer(CadenceGEMState *s, uint32_t *desc)
  {
-     return desc[0] & ~0x3UL;
+-    return desc[0] & ~0x3UL;
++    uint64_t ret = desc[0] & ~0x3UL;
++
++    if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
++        ret |= (uint64_t)desc[2] << 32;
++    }
++    return ret;
++}
++
++static inline int gem_get_desc_len(CadenceGEMState *s, bool rx_n_tx)
++{
++    int ret = 2;
++
++    if (s->regs[GEM_DMACFG] & GEM_DMACFG_ADDR_64B) {
++        ret += 2;
++    }
++    if (s->regs[GEM_DMACFG] & (rx_n_tx ? GEM_DMACFG_RX_BD_EXT
++                                       : GEM_DMACFG_TX_BD_EXT)) {
++        ret += 2;
++    }
++
++    assert(ret <= DESC_MAX_NUM_WORDS);
++    return ret;
  }
  
--static inline unsigned rx_desc_get_wrap(unsigned *desc)
-+static inline unsigned rx_desc_get_wrap(uint32_t *desc)
- {
-     return desc[0] & DESC_0_RX_WRAP ? 1 : 0;
- }
+ static inline unsigned rx_desc_get_wrap(uint32_t *desc)
+@@ -419,7 +448,7 @@ static void gem_init_register_masks(CadenceGEMState *s)
+     memset(&s->regs_ro[0], 0, sizeof(s->regs_ro));
+     s->regs_ro[GEM_NWCTRL]   = 0xFFF80000;
+     s->regs_ro[GEM_NWSTATUS] = 0xFFFFFFFF;
+-    s->regs_ro[GEM_DMACFG]   = 0xFE00F000;
++    s->regs_ro[GEM_DMACFG]   = 0x8E00F000;
+     s->regs_ro[GEM_TXSTATUS] = 0xFFFFFE08;
+     s->regs_ro[GEM_RXQBASE]  = 0x00000003;
+     s->regs_ro[GEM_TXQBASE]  = 0x00000003;
+@@ -807,7 +836,8 @@ static void gem_get_rx_desc(CadenceGEMState *s, int q)
+     DB_PRINT("read descriptor 0x%x\n", (unsigned)s->rx_desc_addr[q]);
+     /* read current descriptor */
+     cpu_physical_memory_read(s->rx_desc_addr[q],
+-                             (uint8_t *)s->rx_desc[q], sizeof(s->rx_desc[q]));
++                             (uint8_t *)s->rx_desc[q],
++                             sizeof(uint32_t) * gem_get_desc_len(s, true));
  
--static inline unsigned rx_desc_get_ownership(unsigned *desc)
-+static inline unsigned rx_desc_get_ownership(uint32_t *desc)
- {
-     return desc[0] & DESC_0_RX_OWNERSHIP ? 1 : 0;
- }
+     /* Descriptor owned by software ? */
+     if (rx_desc_get_ownership(s->rx_desc[q]) == 1) {
+@@ -926,9 +956,10 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+                 rx_desc_get_buffer(s->rx_desc[q]));
  
--static inline void rx_desc_set_ownership(unsigned *desc)
-+static inline void rx_desc_set_ownership(uint32_t *desc)
- {
-     desc[0] |= DESC_0_RX_OWNERSHIP;
- }
+         /* Copy packet data to emulated DMA buffer */
+-        cpu_physical_memory_write(rx_desc_get_buffer(s->rx_desc[q]) +
+-                                                                 rxbuf_offset,
+-                                  rxbuf_ptr, MIN(bytes_to_copy, rxbufsize));
++        cpu_physical_memory_write(rx_desc_get_buffer(s, s->rx_desc[q]) +
++                                                                  rxbuf_offset,
++                                  rxbuf_ptr,
++                                  MIN(bytes_to_copy, rxbufsize));
+         rxbuf_ptr += MIN(bytes_to_copy, rxbufsize);
+         bytes_to_copy -= MIN(bytes_to_copy, rxbufsize);
  
--static inline void rx_desc_set_sof(unsigned *desc)
-+static inline void rx_desc_set_sof(uint32_t *desc)
- {
-     desc[1] |= DESC_1_RX_SOF;
- }
+@@ -964,7 +995,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+         /* Descriptor write-back.  */
+         cpu_physical_memory_write(s->rx_desc_addr[q],
+                                   (uint8_t *)s->rx_desc[q],
+-                                  sizeof(s->rx_desc[q]));
++                                  sizeof(uint32_t) * gem_get_desc_len(s, true));
  
--static inline void rx_desc_set_eof(unsigned *desc)
-+static inline void rx_desc_set_eof(uint32_t *desc)
- {
-     desc[1] |= DESC_1_RX_EOF;
- }
+         /* Next descriptor */
+         if (rx_desc_get_wrap(s->rx_desc[q])) {
+@@ -972,7 +1003,7 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+             s->rx_desc_addr[q] = s->regs[GEM_RXQBASE];
+         } else {
+             DB_PRINT("incrementing RX descriptor list\n");
+-            s->rx_desc_addr[q] += 8;
++            s->rx_desc_addr[q] += 4 * gem_get_desc_len(s, true);
+         }
  
--static inline void rx_desc_set_length(unsigned *desc, unsigned len)
-+static inline void rx_desc_set_length(uint32_t *desc, unsigned len)
- {
-     desc[1] &= ~DESC_1_LENGTH;
-     desc[1] |= len;
- }
+         gem_get_rx_desc(s, q);
+@@ -1069,7 +1100,8 @@ static void gem_transmit(CadenceGEMState *s)
  
--static inline void rx_desc_set_broadcast(unsigned *desc)
-+static inline void rx_desc_set_broadcast(uint32_t *desc)
- {
-     desc[1] |= R_DESC_1_RX_BROADCAST;
- }
+         DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
+         cpu_physical_memory_read(packet_desc_addr,
+-                                 (uint8_t *)desc, sizeof(desc));
++                                 (uint8_t *)desc,
++                                 sizeof(uint32_t) * gem_get_desc_len(s, false));
+         /* Handle all descriptors owned by hardware */
+         while (tx_desc_get_used(desc) == 0) {
  
--static inline void rx_desc_set_unicast_hash(unsigned *desc)
-+static inline void rx_desc_set_unicast_hash(uint32_t *desc)
- {
-     desc[1] |= R_DESC_1_RX_UNICAST_HASH;
- }
+@@ -1082,7 +1114,7 @@ static void gem_transmit(CadenceGEMState *s)
+             /* The real hardware would eat this (and possibly crash).
+              * For QEMU let's lend a helping hand.
+              */
+-            if ((tx_desc_get_buffer(desc) == 0) ||
++            if ((tx_desc_get_buffer(s, desc) == 0) ||
+                 (tx_desc_get_length(desc) == 0)) {
+                 DB_PRINT("Invalid TX descriptor @ 0x%x\n",
+                          (unsigned)packet_desc_addr);
+@@ -1101,7 +1133,7 @@ static void gem_transmit(CadenceGEMState *s)
+             /* Gather this fragment of the packet from "dma memory" to our
+              * contig buffer.
+              */
+-            cpu_physical_memory_read(tx_desc_get_buffer(desc), p,
++            cpu_physical_memory_read(tx_desc_get_buffer(s, desc), p,
+                                      tx_desc_get_length(desc));
+             p += tx_desc_get_length(desc);
+             total_bytes += tx_desc_get_length(desc);
+@@ -1124,7 +1156,8 @@ static void gem_transmit(CadenceGEMState *s)
+                 if (tx_desc_get_wrap(desc)) {
+                     s->tx_desc_addr[q] = s->regs[GEM_TXQBASE];
+                 } else {
+-                    s->tx_desc_addr[q] = packet_desc_addr + 8;
++                    s->tx_desc_addr[q] = packet_desc_addr +
++                                         4 * gem_get_desc_len(s, false);
+                 }
+                 DB_PRINT("TX descriptor next: 0x%08x\n", s->tx_desc_addr[q]);
  
--static inline void rx_desc_set_multicast_hash(unsigned *desc)
-+static inline void rx_desc_set_multicast_hash(uint32_t *desc)
- {
-     desc[1] |= R_DESC_1_RX_MULTICAST_HASH;
- }
+@@ -1168,11 +1201,11 @@ static void gem_transmit(CadenceGEMState *s)
+                 tx_desc_set_last(desc);
+                 packet_desc_addr = s->regs[GEM_TXQBASE];
+             } else {
+-                packet_desc_addr += 8;
++                packet_desc_addr += 4 * gem_get_desc_len(s, false);
+             }
+             DB_PRINT("read descriptor 0x%" HWADDR_PRIx "\n", packet_desc_addr);
+-            cpu_physical_memory_read(packet_desc_addr,
+-                                     (uint8_t *)desc, sizeof(desc));
++            cpu_physical_memory_read(packet_desc_addr, (uint8_t *)desc,
++                                sizeof(uint32_t) * gem_get_desc_len(s, false));
+         }
  
--static inline void rx_desc_set_sar(unsigned *desc, int sar_idx)
-+static inline void rx_desc_set_sar(uint32_t *desc, int sar_idx)
- {
-     desc[1] = deposit32(desc[1], R_DESC_1_RX_SAR_SHIFT, R_DESC_1_RX_SAR_LENGTH,
-                         sar_idx);
-@@ -1042,7 +1042,7 @@ static void gem_transmit_updatestats(CadenceGEMState *s, const uint8_t *packet,
-  */
- static void gem_transmit(CadenceGEMState *s)
- {
--    unsigned    desc[2];
-+    uint32_t desc[2];
-     hwaddr packet_desc_addr;
-     uint8_t     tx_packet[2048];
-     uint8_t     *p;
-@@ -1108,7 +1108,7 @@ static void gem_transmit(CadenceGEMState *s)
- 
-             /* Last descriptor for this packet; hand the whole thing off */
-             if (tx_desc_get_last(desc)) {
--                unsigned    desc_first[2];
-+                uint32_t desc_first[2];
- 
-                 /* Modify the 1st descriptor of this packet to be owned by
-                  * the processor.
+         if (tx_desc_get_used(desc)) {
 diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
-index 35de622063..633d564dc3 100644
+index b33ef6513b..00dbf4f72e 100644
 --- a/include/hw/net/cadence_gem.h
 +++ b/include/hw/net/cadence_gem.h
-@@ -74,7 +74,7 @@ typedef struct CadenceGEMState {
+@@ -33,7 +33,7 @@
+ #define CADENCE_GEM_MAXREG        (0x00000800 / 4) /* Last valid GEM address */
  
-     uint8_t can_rx_state; /* Debug only */
+ /* Max number of words in a DMA descriptor.  */
+-#define DESC_MAX_NUM_WORDS              2
++#define DESC_MAX_NUM_WORDS              6
  
--    unsigned rx_desc[MAX_PRIORITY_QUEUES][2];
-+    uint32_t rx_desc[MAX_PRIORITY_QUEUES][2];
- 
-     bool sar_active[4];
- } CadenceGEMState;
+ #define MAX_PRIORITY_QUEUES             8
+ #define MAX_TYPE1_SCREENERS             16
 -- 
 2.17.1
