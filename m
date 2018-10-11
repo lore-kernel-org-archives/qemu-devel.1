@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAWpw-0007kh-7S
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:01:00 -0400
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAWq2-0007l9-21
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAWpg-0005bB-Md
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:00:52 -0400
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:15207)
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAWpk-0005c9-Cu
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:00:57 -0400
+Received: from cmccmta3.chinamobile.com ([221.176.66.81]:54544)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAWpd-0005Xn-3T
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:00:34 -0400
+	(envelope-from <maozhongyi@cmss.chinamobile.com>) id 1gAWpj-0005bZ-NA
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:00:40 -0400
 From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-Date: Thu, 11 Oct 2018 17:00:04 +0800
-Message-Id: <20181011090007.1103-2-maozhongyi@cmss.chinamobile.com>
+Date: Thu, 11 Oct 2018 17:00:07 +0800
+Message-Id: <20181011090007.1103-5-maozhongyi@cmss.chinamobile.com>
 In-Reply-To: <20181011090007.1103-1-maozhongyi@cmss.chinamobile.com>
 References: <20181011090007.1103-1-maozhongyi@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH 1/4] wm8750: remove duplicate macro
+Subject: [Qemu-devel] [PATCH 4/4] audio: use existing macros istead of
+ hardcoded strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,80 +25,128 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, Jan Kiszka <jan.kiszka@web.de>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-The header file wm8750.h contains '#define TYPE_WM8750 "wm8750"'
-macro, but '#define CODEC "wm8750"' macro is redefined in wm8750.c,
-just remove the local CODEC macro and replace it with TYPE_WM8750.
-
+Cc: Jan Kiszka <jan.kiszka@web.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-arm@nongnu.org
 
 Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 ---
- hw/audio/wm8750.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ hw/arm/musicpal.c          | 16 ++++++++--------
+ hw/audio/marvell_88w8618.c |  3 +--
+ include/hw/audio/wm8750.h  |  1 +
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
-index f4aa838f62..4be3602079 100644
---- a/hw/audio/wm8750.c
-+++ b/hw/audio/wm8750.c
-@@ -15,8 +15,6 @@
- #define IN_PORT_N	3
- #define OUT_PORT_N	3
- 
--#define CODEC		"wm8750"
--
- typedef struct {
-     int adc;
-     int adc_hz;
-@@ -204,11 +202,11 @@ static void wm8750_set_format(WM8750State *s)
-     in_fmt.fmt = AUD_FMT_S16;
- 
-     s->adc_voice[0] = AUD_open_in(&s->card, s->adc_voice[0],
--                    CODEC ".input1", s, wm8750_audio_in_cb, &in_fmt);
-+                    TYPE_WM8750 ".input1", s, wm8750_audio_in_cb, &in_fmt);
-     s->adc_voice[1] = AUD_open_in(&s->card, s->adc_voice[1],
--                    CODEC ".input2", s, wm8750_audio_in_cb, &in_fmt);
-+                    TYPE_WM8750 ".input2", s, wm8750_audio_in_cb, &in_fmt);
-     s->adc_voice[2] = AUD_open_in(&s->card, s->adc_voice[2],
--                    CODEC ".input3", s, wm8750_audio_in_cb, &in_fmt);
-+                    TYPE_WM8750 ".input3", s, wm8750_audio_in_cb, &in_fmt);
- 
-     /* Setup output */
-     out_fmt.endianness = 0;
-@@ -217,12 +215,12 @@ static void wm8750_set_format(WM8750State *s)
-     out_fmt.fmt = AUD_FMT_S16;
- 
-     s->dac_voice[0] = AUD_open_out(&s->card, s->dac_voice[0],
--                    CODEC ".speaker", s, wm8750_audio_out_cb, &out_fmt);
-+                    TYPE_WM8750 ".speaker", s, wm8750_audio_out_cb, &out_fmt);
-     s->dac_voice[1] = AUD_open_out(&s->card, s->dac_voice[1],
--                    CODEC ".headphone", s, wm8750_audio_out_cb, &out_fmt);
-+                    TYPE_WM8750 ".headphone", s, wm8750_audio_out_cb, &out_fmt);
-     /* MONOMIX is also in stereo for simplicity */
-     s->dac_voice[2] = AUD_open_out(&s->card, s->dac_voice[2],
--                    CODEC ".monomix", s, wm8750_audio_out_cb, &out_fmt);
-+                    TYPE_WM8750 ".monomix", s, wm8750_audio_out_cb, &out_fmt);
-     /* no sense emulating OUT3 which is a mix of other outputs */
- 
-     wm8750_vol_update(s);
-@@ -584,7 +582,7 @@ static int wm8750_post_load(void *opaque, int version_id)
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index ac266f9253..6425f1d50f 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -406,7 +406,7 @@ static void mv88w8618_eth_realize(DeviceState *dev, Error **errp)
  }
  
- static const VMStateDescription vmstate_wm8750 = {
--    .name = CODEC,
-+    .name = TYPE_WM8750,
-     .version_id = 0,
-     .minimum_version_id = 0,
-     .pre_save = wm8750_pre_save,
-@@ -621,7 +619,7 @@ static void wm8750_realize(DeviceState *dev, Error **errp)
- {
-     WM8750State *s = WM8750(dev);
- 
--    AUD_register_card(CODEC, &s->card);
-+    AUD_register_card(TYPE_WM8750, &s->card);
-     wm8750_reset(I2C_SLAVE(s));
+ static const VMStateDescription mv88w8618_eth_vmsd = {
+-    .name = "mv88w8618_eth",
++    .name = TYPE_MV88W8618_ETH,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+@@ -645,7 +645,7 @@ static void musicpal_lcd_init(Object *obj)
  }
+ 
+ static const VMStateDescription musicpal_lcd_vmsd = {
+-    .name = "musicpal_lcd",
++    .name = TYPE_MUSICPAL_LCD,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+@@ -771,7 +771,7 @@ static void mv88w8618_pic_init(Object *obj)
+ }
+ 
+ static const VMStateDescription mv88w8618_pic_vmsd = {
+-    .name = "mv88w8618_pic",
++    .name = TYPE_MV88W8618_PIC,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+@@ -951,7 +951,7 @@ static const VMStateDescription mv88w8618_timer_vmsd = {
+ };
+ 
+ static const VMStateDescription mv88w8618_pit_vmsd = {
+-    .name = "mv88w8618_pit",
++    .name = TYPE_MV88W8618_PIT,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+@@ -1038,7 +1038,7 @@ static void mv88w8618_flashcfg_init(Object *obj)
+ }
+ 
+ static const VMStateDescription mv88w8618_flashcfg_vmsd = {
+-    .name = "mv88w8618_flashcfg",
++    .name = TYPE_MV88W8618_FLASHCFG,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+@@ -1375,7 +1375,7 @@ static void musicpal_gpio_init(Object *obj)
+ }
+ 
+ static const VMStateDescription musicpal_gpio_vmsd = {
+-    .name = "musicpal_gpio",
++    .name = TYPE_MUSICPAL_GPIO,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+@@ -1539,7 +1539,7 @@ static void musicpal_key_init(Object *obj)
+ }
+ 
+ static const VMStateDescription musicpal_key_vmsd = {
+-    .name = "musicpal_key",
++    .name = TYPE_MUSICPAL_KEY,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+@@ -1693,7 +1693,7 @@ static void musicpal_init(MachineState *machine)
+     }
+ 
+     wm8750_dev = i2c_create_slave(i2c, TYPE_WM8750, MP_WM_ADDR);
+-    dev = qdev_create(NULL, "mv88w8618_audio");
++    dev = qdev_create(NULL, TYPE_MV88W8618_AUDIO);
+     s = SYS_BUS_DEVICE(dev);
+     object_property_set_link(OBJECT(dev), OBJECT(wm8750_dev),
+                              TYPE_WM8750, NULL);
+diff --git a/hw/audio/marvell_88w8618.c b/hw/audio/marvell_88w8618.c
+index baab4a3d53..dbdddf8ef4 100644
+--- a/hw/audio/marvell_88w8618.c
++++ b/hw/audio/marvell_88w8618.c
+@@ -39,7 +39,6 @@
+ #define MP_AUDIO_CLOCK_24MHZ    (1 << 9)
+ #define MP_AUDIO_MONO           (1 << 14)
+ 
+-#define TYPE_MV88W8618_AUDIO "mv88w8618_audio"
+ #define MV88W8618_AUDIO(obj) \
+     OBJECT_CHECK(mv88w8618_audio_state, (obj), TYPE_MV88W8618_AUDIO)
+ 
+@@ -268,7 +267,7 @@ static void mv88w8618_audio_realize(DeviceState *dev, Error **errp)
+ }
+ 
+ static const VMStateDescription mv88w8618_audio_vmsd = {
+-    .name = "mv88w8618_audio",
++    .name = TYPE_MV88W8618_AUDIO,
+     .version_id = 1,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+diff --git a/include/hw/audio/wm8750.h b/include/hw/audio/wm8750.h
+index 84e7a119bb..e12cb886d1 100644
+--- a/include/hw/audio/wm8750.h
++++ b/include/hw/audio/wm8750.h
+@@ -17,6 +17,7 @@
+ #include "hw/hw.h"
+ 
+ #define TYPE_WM8750 "wm8750"
++#define TYPE_MV88W8618_AUDIO "mv88w8618_audio"
+ 
+ typedef void data_req_cb(void *opaque, int free_out, int free_in);
  
 -- 
 2.17.1
