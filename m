@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39753)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhd3-0006tA-W3
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:22 -0400
+	id 1gAhd9-0006ub-RY
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhcw-0006jy-5t
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:15 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:29185)
+	id 1gAhd4-0006rM-0H
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:23 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:7470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=815999a97=Alistair.Francis@wdc.com>)
-	id 1gAhcs-0006dE-CE
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:08 -0400
+	id 1gAhcz-0006kR-6s
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:32:15 -0400
 From: Alistair Francis <Alistair.Francis@wdc.com>
-Date: Thu, 11 Oct 2018 20:32:01 +0000
-Message-ID: <20181011203115.18666-8-alistair.francis@wdc.com>
+Date: Thu, 11 Oct 2018 20:31:49 +0000
+Message-ID: <20181011203115.18666-5-alistair.francis@wdc.com>
 References: <20181011203115.18666-1-alistair.francis@wdc.com>
 In-Reply-To: <20181011203115.18666-1-alistair.francis@wdc.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <95DF030B253B324994C2EB395FCE8B05@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PULL 07/10] RISC-V: Move non-ops from op_helper to
- cpu_helper
+Subject: [Qemu-devel] [PULL 04/10] hw/riscv/sifive_u: Connect the Xilinx PCIe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +31,146 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>Alistair Francis <Alistair.Francis@wdc.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alistair Francis <Alistair.Francis@wdc.com>
 
-RnJvbTogTWljaGFlbCBDbGFyayA8bWpjQHNpZml2ZS5jb20+DQoNClRoaXMgcGF0Y2ggbWFrZXMg
-b3BfaGVscGVyLmMgY29udGFpbiBvbmx5IGluc3RydWN0aW9uDQpvcGVyYXRpb24gaGVscGVycyB1
-c2VkIGJ5IHRyYW5zbGF0ZS5jIGFuZCBtb3ZlcyBhbnkNCnVucmVsYXRlZCBjcHUgaGVscGVycyBp
-bnRvIGNwdV9oZWxwZXIuYy4gTm8gbG9naWMgaXMNCmNoYW5nZWQgYnkgdGhpcyBwYXRjaC4NCg0K
-Q2M6IFNhZ2FyIEthcmFuZGlrYXIgPHNhZ2Fya0BlZWNzLmJlcmtlbGV5LmVkdT4NCkNjOiBCYXN0
-aWFuIEtvcHBlbG1hbm4gPGtiYXN0aWFuQG1haWwudW5pLXBhZGVyYm9ybi5kZT4NCkNjOiBQYWxt
-ZXIgRGFiYmVsdCA8cGFsbWVyQHNpZml2ZS5jb20+DQpDYzogQWxpc3RhaXIgRnJhbmNpcyA8QWxp
-c3RhaXIuRnJhbmNpc0B3ZGMuY29tPg0KU2lnbmVkLW9mZi1ieTogTWljaGFlbCBDbGFyayA8bWpj
-QHNpZml2ZS5jb20+DQpSZXZpZXdlZC1ieTogQWxpc3RhaXIgRnJhbmNpcyA8YWxpc3RhaXIuZnJh
-bmNpc0B3ZGMuY29tPg0KUmV2aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGls
-bWRAcmVkaGF0LmNvbT4NClJldmlld2VkLWJ5OiBQYWxtZXIgRGFiYmVsdCA8cGFsbWVyQHNpZml2
-ZS5jb20+DQpTaWduZWQtb2ZmLWJ5OiBBbGlzdGFpciBGcmFuY2lzIDxhbGlzdGFpci5mcmFuY2lz
-QHdkYy5jb20+DQotLS0NCiB0YXJnZXQvcmlzY3YvTWFrZWZpbGUub2JqcyAgICAgICAgICAgICAg
-fCAgMiArLQ0KIHRhcmdldC9yaXNjdi97aGVscGVyLmMgPT4gY3B1X2hlbHBlci5jfSB8IDM1ICsr
-KysrKysrKysrKysrKysrKysrKysrKy0NCiB0YXJnZXQvcmlzY3Yvb3BfaGVscGVyLmMgICAgICAg
-ICAgICAgICAgfCAzNCAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiAzIGZpbGVzIGNoYW5nZWQs
-IDM1IGluc2VydGlvbnMoKyksIDM2IGRlbGV0aW9ucygtKQ0KIHJlbmFtZSB0YXJnZXQvcmlzY3Yv
-e2hlbHBlci5jID0+IGNwdV9oZWxwZXIuY30gKDk1JSkNCg0KZGlmZiAtLWdpdCBhL3RhcmdldC9y
-aXNjdi9NYWtlZmlsZS5vYmpzIGIvdGFyZ2V0L3Jpc2N2L01ha2VmaWxlLm9ianMNCmluZGV4IGFi
-ZDBhN2NkZTMuLmZjYzVkMzRjMWYgMTAwNjQ0DQotLS0gYS90YXJnZXQvcmlzY3YvTWFrZWZpbGUu
-b2Jqcw0KKysrIGIvdGFyZ2V0L3Jpc2N2L01ha2VmaWxlLm9ianMNCkBAIC0xICsxIEBADQotb2Jq
-LXkgKz0gdHJhbnNsYXRlLm8gb3BfaGVscGVyLm8gaGVscGVyLm8gY3B1Lm8gZnB1X2hlbHBlci5v
-IGdkYnN0dWIubyBwbXAubw0KK29iai15ICs9IHRyYW5zbGF0ZS5vIG9wX2hlbHBlci5vIGNwdV9o
-ZWxwZXIubyBjcHUubyBmcHVfaGVscGVyLm8gZ2Ric3R1Yi5vIHBtcC5vDQpkaWZmIC0tZ2l0IGEv
-dGFyZ2V0L3Jpc2N2L2hlbHBlci5jIGIvdGFyZ2V0L3Jpc2N2L2NwdV9oZWxwZXIuYw0Kc2ltaWxh
-cml0eSBpbmRleCA5NSUNCnJlbmFtZSBmcm9tIHRhcmdldC9yaXNjdi9oZWxwZXIuYw0KcmVuYW1l
-IHRvIHRhcmdldC9yaXNjdi9jcHVfaGVscGVyLmMNCmluZGV4IDYzYjMzODZiNzYuLjg2ZjlmNDcz
-MGMgMTAwNjQ0DQotLS0gYS90YXJnZXQvcmlzY3YvaGVscGVyLmMNCisrKyBiL3RhcmdldC9yaXNj
-di9jcHVfaGVscGVyLmMNCkBAIC0xLDUgKzEsNSBAQA0KIC8qDQotICogUklTQy1WIGVtdWxhdGlv
-biBoZWxwZXJzIGZvciBxZW11Lg0KKyAqIFJJU0MtViBDUFUgaGVscGVycyBmb3IgcWVtdS4NCiAg
-Kg0KICAqIENvcHlyaWdodCAoYykgMjAxNi0yMDE3IFNhZ2FyIEthcmFuZGlrYXIsIHNhZ2Fya0Bl
-ZWNzLmJlcmtlbGV5LmVkdQ0KICAqIENvcHlyaWdodCAoYykgMjAxNy0yMDE4IFNpRml2ZSwgSW5j
-Lg0KQEAgLTcyLDYgKzcyLDM5IEBAIGJvb2wgcmlzY3ZfY3B1X2V4ZWNfaW50ZXJydXB0KENQVVN0
-YXRlICpjcywgaW50IGludGVycnVwdF9yZXF1ZXN0KQ0KIA0KICNpZiAhZGVmaW5lZChDT05GSUdf
-VVNFUl9PTkxZKQ0KIA0KKy8qIGlvdGhyZWFkX211dGV4IG11c3QgYmUgaGVsZCAqLw0KK3VpbnQz
-Ml90IHJpc2N2X2NwdV91cGRhdGVfbWlwKFJJU0NWQ1BVICpjcHUsIHVpbnQzMl90IG1hc2ssIHVp
-bnQzMl90IHZhbHVlKQ0KK3sNCisgICAgQ1BVUklTQ1ZTdGF0ZSAqZW52ID0gJmNwdS0+ZW52Ow0K
-KyAgICB1aW50MzJfdCBvbGQsIG5ldywgY21wID0gYXRvbWljX3JlYWQoJmVudi0+bWlwKTsNCisN
-CisgICAgZG8gew0KKyAgICAgICAgb2xkID0gY21wOw0KKyAgICAgICAgbmV3ID0gKG9sZCAmIH5t
-YXNrKSB8ICh2YWx1ZSAmIG1hc2spOw0KKyAgICAgICAgY21wID0gYXRvbWljX2NtcHhjaGcoJmVu
-di0+bWlwLCBvbGQsIG5ldyk7DQorICAgIH0gd2hpbGUgKG9sZCAhPSBjbXApOw0KKw0KKyAgICBp
-ZiAobmV3ICYmICFvbGQpIHsNCisgICAgICAgIGNwdV9pbnRlcnJ1cHQoQ1BVKGNwdSksIENQVV9J
-TlRFUlJVUFRfSEFSRCk7DQorICAgIH0gZWxzZSBpZiAoIW5ldyAmJiBvbGQpIHsNCisgICAgICAg
-IGNwdV9yZXNldF9pbnRlcnJ1cHQoQ1BVKGNwdSksIENQVV9JTlRFUlJVUFRfSEFSRCk7DQorICAg
-IH0NCisNCisgICAgcmV0dXJuIG9sZDsNCit9DQorDQordm9pZCByaXNjdl9zZXRfbW9kZShDUFVS
-SVNDVlN0YXRlICplbnYsIHRhcmdldF91bG9uZyBuZXdwcml2KQ0KK3sNCisgICAgaWYgKG5ld3By
-aXYgPiBQUlZfTSkgew0KKyAgICAgICAgZ19hc3NlcnRfbm90X3JlYWNoZWQoKTsNCisgICAgfQ0K
-KyAgICBpZiAobmV3cHJpdiA9PSBQUlZfSCkgew0KKyAgICAgICAgbmV3cHJpdiA9IFBSVl9VOw0K
-KyAgICB9DQorICAgIC8qIHRsYl9mbHVzaCBpcyB1bm5lY2Vzc2FyeSBhcyBtb2RlIGlzIGNvbnRh
-aW5lZCBpbiBtbXVfaWR4ICovDQorICAgIGVudi0+cHJpdiA9IG5ld3ByaXY7DQorfQ0KKw0KIC8q
-IGdldF9waHlzaWNhbF9hZGRyZXNzIC0gZ2V0IHRoZSBwaHlzaWNhbCBhZGRyZXNzIGZvciB0aGlz
-IHZpcnR1YWwgYWRkcmVzcw0KICAqDQogICogRG8gYSBwYWdlIHRhYmxlIHdhbGsgdG8gb2J0YWlu
-IHRoZSBwaHlzaWNhbCBhZGRyZXNzIGNvcnJlc3BvbmRpbmcgdG8gYQ0KZGlmZiAtLWdpdCBhL3Rh
-cmdldC9yaXNjdi9vcF9oZWxwZXIuYyBiL3RhcmdldC9yaXNjdi9vcF9oZWxwZXIuYw0KaW5kZXgg
-ZDA4ODNkMzI5Yi4uNDk1MzkwYWIxYyAxMDA2NDQNCi0tLSBhL3RhcmdldC9yaXNjdi9vcF9oZWxw
-ZXIuYw0KKysrIGIvdGFyZ2V0L3Jpc2N2L29wX2hlbHBlci5jDQpAQCAtNjU0LDM5ICs2NTQsNiBA
-QCB0YXJnZXRfdWxvbmcgaGVscGVyX2NzcnJjKENQVVJJU0NWU3RhdGUgKmVudiwgdGFyZ2V0X3Vs
-b25nIHNyYywNCiANCiAjaWZuZGVmIENPTkZJR19VU0VSX09OTFkNCiANCi0vKiBpb3RocmVhZF9t
-dXRleCBtdXN0IGJlIGhlbGQgKi8NCi11aW50MzJfdCByaXNjdl9jcHVfdXBkYXRlX21pcChSSVND
-VkNQVSAqY3B1LCB1aW50MzJfdCBtYXNrLCB1aW50MzJfdCB2YWx1ZSkNCi17DQotICAgIENQVVJJ
-U0NWU3RhdGUgKmVudiA9ICZjcHUtPmVudjsNCi0gICAgdWludDMyX3Qgb2xkLCBuZXcsIGNtcCA9
-IGF0b21pY19yZWFkKCZlbnYtPm1pcCk7DQotDQotICAgIGRvIHsNCi0gICAgICAgIG9sZCA9IGNt
-cDsNCi0gICAgICAgIG5ldyA9IChvbGQgJiB+bWFzaykgfCAodmFsdWUgJiBtYXNrKTsNCi0gICAg
-ICAgIGNtcCA9IGF0b21pY19jbXB4Y2hnKCZlbnYtPm1pcCwgb2xkLCBuZXcpOw0KLSAgICB9IHdo
-aWxlIChvbGQgIT0gY21wKTsNCi0NCi0gICAgaWYgKG5ldyAmJiAhb2xkKSB7DQotICAgICAgICBj
-cHVfaW50ZXJydXB0KENQVShjcHUpLCBDUFVfSU5URVJSVVBUX0hBUkQpOw0KLSAgICB9IGVsc2Ug
-aWYgKCFuZXcgJiYgb2xkKSB7DQotICAgICAgICBjcHVfcmVzZXRfaW50ZXJydXB0KENQVShjcHUp
-LCBDUFVfSU5URVJSVVBUX0hBUkQpOw0KLSAgICB9DQotDQotICAgIHJldHVybiBvbGQ7DQotfQ0K
-LQ0KLXZvaWQgcmlzY3Zfc2V0X21vZGUoQ1BVUklTQ1ZTdGF0ZSAqZW52LCB0YXJnZXRfdWxvbmcg
-bmV3cHJpdikNCi17DQotICAgIGlmIChuZXdwcml2ID4gUFJWX00pIHsNCi0gICAgICAgIGdfYXNz
-ZXJ0X25vdF9yZWFjaGVkKCk7DQotICAgIH0NCi0gICAgaWYgKG5ld3ByaXYgPT0gUFJWX0gpIHsN
-Ci0gICAgICAgIG5ld3ByaXYgPSBQUlZfVTsNCi0gICAgfQ0KLSAgICAvKiB0bGJfZmx1c2ggaXMg
-dW5uZWNlc3NhcnkgYXMgbW9kZSBpcyBjb250YWluZWQgaW4gbW11X2lkeCAqLw0KLSAgICBlbnYt
-PnByaXYgPSBuZXdwcml2Ow0KLX0NCi0NCiB0YXJnZXRfdWxvbmcgaGVscGVyX3NyZXQoQ1BVUklT
-Q1ZTdGF0ZSAqZW52LCB0YXJnZXRfdWxvbmcgY3B1X3BjX2RlYikNCiB7DQogICAgIGlmICghKGVu
-di0+cHJpdiA+PSBQUlZfUykpIHsNCkBAIC03MzcsNyArNzA0LDYgQEAgdGFyZ2V0X3Vsb25nIGhl
-bHBlcl9tcmV0KENQVVJJU0NWU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nIGNwdV9wY19kZWIpDQog
-ICAgIHJldHVybiByZXRwYzsNCiB9DQogDQotDQogdm9pZCBoZWxwZXJfd2ZpKENQVVJJU0NWU3Rh
-dGUgKmVudikNCiB7DQogICAgIENQVVN0YXRlICpjcyA9IENQVShyaXNjdl9lbnZfZ2V0X2NwdShl
-bnYpKTsNCi0tIA0KMi4xNy4xDQoNCg==
+Connect the Xilinx PCIe device based on the information in the device
+tree stored in the ROM of the HiFish Unleashed board.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/sifive_u.c         | 64 +++++++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_u.h |  4 ++-
+ 2 files changed, 67 insertions(+), 1 deletion(-)
+
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 862f8ff5f7..4e273119c3 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -45,6 +45,8 @@
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
+ #include "exec/address-spaces.h"
++#include "hw/pci/pci.h"
++#include "hw/pci-host/xilinx-pcie.h"
+ #include "elf.h"
+=20
+ #include <libfdt.h>
+@@ -61,6 +63,7 @@ static const struct MemmapEntry {
+     [SIFIVE_U_UART1] =3D    { 0x10023000,     0x1000 },
+     [SIFIVE_U_DRAM] =3D     { 0x80000000,        0x0 },
+     [SIFIVE_U_GEM] =3D      { 0x100900FC,     0x2000 },
++    [SIFIVE_U_PCIE] =3D     { 0x2000000000, 0x4000000 },
+ };
+=20
+ #define GEM_REVISION        0x10070109
+@@ -218,6 +221,32 @@ static void create_fdt(SiFiveUState *s, const struct M=
+emmapEntry *memmap,
+     qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x0);
+     g_free(nodename);
+=20
++    nodename =3D g_strdup_printf("/pci@%lx",
++        (long) memmap[SIFIVE_U_PCIE].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 0x3);
++    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells", 0x1);
++    qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0x2);
++    qemu_fdt_setprop_string(fdt, nodename, "compatible",
++                            "xlnx,axi-pcie-host-1.00.a");
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
++    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x20, 0x0, 0x0,
++                           memmap[SIFIVE_U_PCIE].size);
++    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
++    qemu_fdt_setprop_cells(fdt, nodename, "ranges", 0x2000000, 0x0,
++                           0x40000000, 0x0, 0x40000000, 0x0, 0x20000000);
++    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle=
+);
++    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_PCIE_IRQ)=
+;
++    g_free(nodename);
++
++    nodename =3D g_strdup_printf("/pci@%lx/interrupt-controller",
++            (long) memmap[SIFIVE_U_PCIE].base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 0x00);
++    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells", 0x1);
++    qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
++    g_free(nodename);
++
+     nodename =3D g_strdup_printf("/soc/uart@%lx",
+         (long)memmap[SIFIVE_U_UART0].base);
+     qemu_fdt_add_subnode(fdt, nodename);
+@@ -234,6 +263,37 @@ static void create_fdt(SiFiveUState *s, const struct M=
+emmapEntry *memmap,
+     g_free(nodename);
+ }
+=20
++static inline DeviceState *
++xilinx_pcie_init(MemoryRegion *sys_mem, uint32_t bus_nr,
++                 hwaddr cfg_base, uint64_t cfg_size,
++                 hwaddr mmio_base, uint64_t mmio_size,
++                 qemu_irq irq, bool link_up)
++{
++    DeviceState *dev;
++    MemoryRegion *cfg, *mmio;
++
++    dev =3D qdev_create(NULL, TYPE_XILINX_PCIE_HOST);
++
++    qdev_prop_set_uint32(dev, "bus_nr", bus_nr);
++    qdev_prop_set_uint64(dev, "cfg_base", cfg_base);
++    qdev_prop_set_uint64(dev, "cfg_size", cfg_size);
++    qdev_prop_set_uint64(dev, "mmio_base", mmio_base);
++    qdev_prop_set_uint64(dev, "mmio_size", mmio_size);
++    qdev_prop_set_bit(dev, "link_up", link_up);
++
++    qdev_init_nofail(dev);
++
++    cfg =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
++    memory_region_add_subregion_overlap(sys_mem, cfg_base, cfg, 0);
++
++    mmio =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 1);
++    memory_region_add_subregion_overlap(sys_mem, 0, mmio, 0);
++
++    qdev_connect_gpio_out_named(dev, "interrupt_out", 0, irq);
++
++    return dev;
++}
++
+ static void riscv_sifive_u_init(MachineState *machine)
+ {
+     const struct MemmapEntry *memmap =3D sifive_u_memmap;
+@@ -373,6 +433,10 @@ static void riscv_sifive_u_soc_realize(DeviceState *de=
+v, Error **errp)
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_GEM].base)=
+;
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem), 0,
+                        plic_gpios[SIFIVE_U_GEM_IRQ]);
++
++    xilinx_pcie_init(system_memory, 0, memmap[SIFIVE_U_PCIE].base,
++                     memmap[SIFIVE_U_PCIE].size, 0x40000000, 0x20000000,
++                     qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_PCIE_IRQ),=
+ true);
+ }
+=20
+ static void riscv_sifive_u_machine_init(MachineClass *mc)
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index e8b4d9ffa3..e7292ea83b 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -53,12 +53,14 @@ enum {
+     SIFIVE_U_UART0,
+     SIFIVE_U_UART1,
+     SIFIVE_U_DRAM,
+-    SIFIVE_U_GEM
++    SIFIVE_U_GEM,
++    SIFIVE_U_PCIE
+ };
+=20
+ enum {
+     SIFIVE_U_UART0_IRQ =3D 3,
+     SIFIVE_U_UART1_IRQ =3D 4,
++    SIFIVE_U_PCIE_IRQ =3D 0x20,
+     SIFIVE_U_GEM_IRQ =3D 0x35
+ };
+=20
+--=20
+2.17.1
