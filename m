@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gAcfc-0005iT-GZ
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:14:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gAchX-0006aj-VY
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:16:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1gAcfY-0005Y0-5s
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:14:36 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52632)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1gAcfO-0005Ts-Sf
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:14:26 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 189-v6so9390076wmw.2
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 08:14:16 -0700 (PDT)
-References: <20181011131413.22208-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7762db82-6044-df69-a1b7-c05100a0e938@redhat.com>
-Date: Thu, 11 Oct 2018 17:14:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181011131413.22208-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] chardev: Convert IOReadHandler to read an
- unsigned number of bytes
+	(envelope-from <vsementsov@virtuozzo.com>) id 1gAchU-0006hA-M8
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 11:16:35 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 11 Oct 2018 18:16:17 +0300
+Message-Id: <20181011151623.25702-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20181011151623.25702-1-vsementsov@virtuozzo.com>
+References: <20181011151623.25702-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 2/8] block/qcow2-refcount: avoid eating RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +19,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Prasad J Pandit <ppandit@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Alberto Garcia <berto@igalia.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Antony Pavlov <antonynpavlov@gmail.com>, Anthony Perard <anthony.perard@citrix.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>, Alistair Francis <alistair@alistair23.me>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fabien Chouteau <chouteau@adacore.com>, Zhang Chen <zhangckid@gmail.com>, "open list:PXA2XX" <qemu-arm@nongnu.org>, Peter Chubb <peter.chubb@nicta.com.au>, Samuel Thibault <samuel.thibault@ens-lyon.org>, "open list:X86" <xen-devel@lists.xenproject.org>, David Gibson <david@gibson.dropbear.id.au>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Cornelia Huck <cohuck@redhat.com>, "open list:S390 Virtio-ccw" <qemu-s390x@nongnu.org>, Thomas Huth <huth@tuxfamily.org>, Michael Walle <michael@walle.cc>, "open list:sPAPR" <qemu-ppc@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-On 11/10/2018 15:14, Philippe Mathieu-Daudé wrote:
-> The number of bytes can not be negative nor zero.
-> 
-> Fixed 2 format string:
-> - hw/char/spapr_vty.c
-> - hw/usb/ccid-card-passthru.c
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> See: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02212.html
+qcow2_inc_refcounts_imrt() (through realloc_refcount_array()) can eat
+an unpredictable amount of memory on corrupted table entries, which are
+referencing regions far beyond the end of file.
 
-Not that easy; you need to adjust qemu_chr_be_can_write,
-qemu_chr_be_write_impl, qemu_chr_be_write (which is where the callbacks
-are invoked).
+Prevent this, by skipping such regions from further processing.
 
-On the other hand, fd_chr_read_poll is not an IOCanReadHandler, and this
-patch therefore probably doesn't compile?
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2-refcount.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-Paolo
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index b453d87a3f..afaa1a1409 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1499,12 +1499,30 @@ int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
+ {
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t start, last, cluster_offset, k, refcount;
++    int64_t file_len;
+     int ret;
+ 
+     if (size <= 0) {
+         return 0;
+     }
+ 
++    file_len = bdrv_getlength(bs->file->bs);
++    if (file_len < 0) {
++        return file_len;
++    }
++
++    /* Last cluster of qcow2 image may be semi-allocated, so it's may be OK to
++     * reference some space after file end but it should be less than one
++     * cluster.
++     */
++    if (offset + size - file_len >= s->cluster_size) {
++        fprintf(stderr, "ERROR: counting reference for region exceeding the "
++                "end of the file by one cluster or more: offset 0x%" PRIx64
++                " size 0x%" PRIx64 "\n", offset, size);
++        res->corruptions++;
++        return 0;
++    }
++
+     start = start_of_cluster(s, offset);
+     last = start_of_cluster(s, offset + size - 1);
+     for(cluster_offset = start; cluster_offset <= last;
+-- 
+2.18.0
