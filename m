@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAXbK-00076Z-80
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:49:50 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAXcV-0007w8-Tv
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:51:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1gAXbG-0005AW-SP
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:49:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49080)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAXbG-0005A6-M4
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:49:46 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180928075832.18586-1-w.bumiller@proxmox.com>
-	<20180928075832.18586-3-w.bumiller@proxmox.com>
-	<CAJ+F1CL4S8aLm6ayu7GfKMfySTBTuUS3j2cuni-+ErEp5Y8VLQ@mail.gmail.com>
-	<20180928095543.GN9560@xz-x1> <87r2gx8073.fsf@dusky.pond.sub.org>
-	<20181011082307.wvzu4urbsnemp5fn@olga.proxmox.com>
-Date: Thu, 11 Oct 2018 11:49:39 +0200
-In-Reply-To: <20181011082307.wvzu4urbsnemp5fn@olga.proxmox.com> (Wolfgang
-	Bumiller's message of "Thu, 11 Oct 2018 10:23:07 +0200")
-Message-ID: <87woqo6cek.fsf@dusky.pond.sub.org>
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAXcS-0005l3-K5
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:51:03 -0400
+Received: from mail-eopbgr680114.outbound.protection.outlook.com
+	([40.107.68.114]:26059
+	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gAXcS-0005kR-Dw
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 05:51:00 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Thu, 11 Oct 2018 09:50:57 +0000
+Message-ID: <BN6PR2201MB1251325E47DB57FF23DBFB9BC6E10@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20180930214744.27580-1-f4bug@amsat.org>,
+	<50011b67-99bc-59c2-1b42-831be7b42e81@amsat.org>
+In-Reply-To: <50011b67-99bc-59c2-1b42-831be7b42e81@amsat.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] monitor: delay monitor iothread
- creation
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] mips: Increase the insn_flags
+ holder size and clean mips-defs.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,17 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>, "Dr. David Alan
-	Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Wolfgang Bumiller <w.bumiller@proxmox.com> writes:
-
-> On Thu, Oct 11, 2018 at 08:30:24AM +0200, Markus Armbruster wrote:
-[...]
->> Since the bug is inconveniencing people, should I merge v1 for now?  We
->> can then figure out how to improve on it.
+> From: Philippe Mathieu-Daud=E9 <philippe.mathieu.daude@gmail.com> on beha=
+lf of Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>  Subject: Re: [PATCH v3 0/4] mips: Increase the insn_flags holder size an=
+d clean mips-defs.h
 >
-> Tbh I'm unsure which way to proceed at this point.
+> Ping?
 
-Don't worry, ball's in my court for now.
+I will get back to this series in next few days.
+
+Thanks,
+Aleksandar=
