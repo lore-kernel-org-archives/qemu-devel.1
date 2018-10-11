@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAXm4-0001eS-Td
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:00:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1gAXnw-0002Zv-44
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:02:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAXlz-0004K0-8A
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:00:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48414)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gAXly-0004Ik-OS
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:00:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gAXlw-00069g-HT
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 10:00:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 66F522E80CD
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 10:00:48 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1gAXnt-0006XO-Eo
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:02:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1gAXnt-0006WY-6X
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 06:02:49 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20181010120841.13214-1-fli@suse.com>
+	<20181010120841.13214-2-fli@suse.com>
+Date: Thu, 11 Oct 2018 12:02:42 +0200
+In-Reply-To: <20181010120841.13214-2-fli@suse.com> (Fei Li's message of "Wed,
+	10 Oct 2018 20:08:35 +0800")
+Message-ID: <87in286bst.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 11 Oct 2018 09:45:55 -0000
-From: Thomas Huth <1797332@bugs.launchpad.net>
-Reply-To: Bug 1797332 <1797332@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153924853499.3904.14862750971017456756.malonedeb@soybean.canonical.com>
-Message-Id: <153925115697.12301.14332589398302633648.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1797332] Re: qemu nested virtualization is not
- working with Ubuntu16.04
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC v5 1/7] Fix segmentation fault when
+ qemu_signal_init fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,338 +28,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-** Project changed: qemu =3D> qemu (Ubuntu)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1797332
-
-Title:
-  qemu nested virtualization is not working with Ubuntu16.04
-
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  # 1 What am I trying to do ? #
-
-  I want to use `libvirt` `qemu/KVM` with **nested virtualization** like de=
-scribed
-  in [1] and [2].
-  **But it does not work with Ubuntu16.04.** It worked some times ago, but =
-not
-  anymore.
-
-  =
-
-  I want 2 levels of virtualization like this:
-
-  * L0 =E2=80=93 the bare metal host, running KVM on `Ubuntu 16.04`
-  * L1 =E2=80=93 a `Ubuntu 16.04` VM running on L0; also called the "guest =
-hypervisor" =
-
-    =E2=80=94 as it itself is capable of running KVM
-  * L2 =E2=80=93 a `Ubuntu 16.04` VM running on L1, also called the "nested=
- guest"
-
-  =
-
-  [1] https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtuali=
-zation-in-kvm/
-  [2] https://www.linux-kvm.org/page/Nested_Guests
-
-  =
-
-  My goal is to deploy an `OpenStack` environnement on top of VMs rather th=
-an on
-  bare metal hosts for convenience for a lab experiment. As a result, the =
-
-  `OpenStack` nodes are L1 VMs. Compute nodes are L1 VMs as well and the VM=
-s =
-
-  created with `OpenStack` and wich are running on the compute nodes are L2=
- VMs.
-
-
-
-  =
-
-  # 2 What is my problem ? #
-
-  I can **not** run my 2nd levels of virtualization in 16.04:
-
-  * L0 is just fine: running `Ubuntu 16.04.5 LTS`, installed with the `.iso=
-` image
-  * L1: I install `libvirt` + `KVM` on L0. I can run VMs like the `Ubuntu16=
-.04` =
-
-    cloud image on L0.
-  * L2: I install `libvirt` + `KVM` on L1 as well. But I **can not** run VM=
-s on =
-
-    L1: I get `kernel panic` or `general protection fault`.
-
-  =
-
-  **But if I do the same with Ubuntu18.04** (on the same hardware) instead =
-of =
-
-  `Ubuntu16.04`, it works without faults.
-  I don't change the configuration or `virt-install scripts` (other than us=
-ing =
-
-  the 18.04 .iso and cloud image).
-
-
-
-  =
-
-  # 3 My libvirt installation for Ubuntu16.04 #
-
-  I install `libvir KVM` in both L0 and L1 using a custom repository [3] fr=
-om =
-
-  `OpenStack` team, because their version of libvirt in this repo is newer =
-than  =
-
-  the one on Ubuntu 16.04 official repo and it match the version of `libvir=
-t` =
-
-  in Ubuntu 18.04.
-
-  [3] https://wiki.ubuntu.com/OpenStack/CloudArchive
-
-
-
-  =
-
-  # 4 hardware and CPU #
-
-  CPU is:
-  > Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz
-  > Intel virt is enable in the bios/uefi.
-
-  The rest is standard HDD, standard I/O...
-
-
-
-  =
-
-  # 5 .iso and cloud image #
-
-  I download .iso for L0 bare metal server and cloud image =
-
-  for L1/L2 VMs from official repository:
-
-  Ubuntu 16.04
-   * http://releases.ubuntu.com/16.04/
-   * https://cloud-images.ubuntu.com/releases/16.04/release/
-
-  Ubuntu 18.04
-   * http://releases.ubuntu.com/bionic/
-   * https://cloud-images.ubuntu.com/releases/18.04/release/
-
-
-
-  =
-
-  # 6 Details #
-
-  ## Details about L0 Ubuntu 16.04 bare metal host ##
-  L0 is running `Ubuntu 16.04.5 LTS` installed with the .iso.
-
-  =
-
-  **kernel**
-  ```
-  user@L0:~$ uname -a
-  Linux L0 4.4.0-137-generic #163-Ubuntu SMP Mon Sep 24 13:14:43 UTC 2018 x=
-86_64 x86_64 x86_64 GNU/Linux
-  ```
-
-  **libvirt version** running on L0
-  ```
-  user@L0:~$ virsh version
-  Compiled against library: libvirt 4.0.0
-  Using library: libvirt 4.0.0
-  Using API: QEMU 4.0.0
-  Running hypervisor: QEMU 2.11.1
-  ```
-
-  **qemu version detail**
-  ```
-  ukvm2@kvm2:~$ qemu-system-x86_64 --version
-  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.5~cloud0)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  ```
-
-  **KVM acceleration**
-  ```
-  user@L0:~$ kvm-ok =
-
-  INFO: /dev/kvm exists
-  KVM acceleration can be used
-  ```
-
-  **nested parameter**
-  ```
-  user@L0:~$ cat /sys/module/kvm_intel/parameters/nested
-  Y
-  ```
-
-  **number of CPU**
-  ```
-  user@L0:~$ egrep -c '(vmx|svm)' /proc/cpuinfo
-  48
-  ```
-
-
-  ## Details about a L1 Ubuntu 16.04 VM ##
-  A VM in L1 (which is running on L0) which is running `Ubuntu 16.04.5 LTS` =
-
-  installed by a cloud image.
-
-  **kernel**
-  ```
-  user@L1-VM:~$ uname -a
-  Linux L1 4.4.0-137-generic #163-Ubuntu SMP Mon Sep 24 13:14:43 UTC 2018 x=
-86_64 x86_64 x86_64 GNU/Linux
-  ```
-
-  **libvirt version** running on the L1 VM
-  ```
-  user@L1-VM:~$ sudo virsh version
-  Compiled against library: libvirt 4.0.0
-  Using library: libvirt 4.0.0
-  Using API: QEMU 4.0.0
-  Running hypervisor: QEMU 2.11.1
-  ```
-
-  **qemu version detail**
-  ```
-  user@L1-VM:~$ qemu-system-x86_64 --version
-  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.5~cloud0)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  ```
-
-  **KVM acceleration**
-  ```
-  user@L1-VM:~$ kvm-ok =
-
-  INFO: /dev/kvm exists
-  KVM acceleration can be used
-  ```
-
-  **nested parameter**
-  ```
-  user@L1-VM:~$ cat /sys/module/kvm_intel/parameters/nested
-  Y
-  ```
-
-  **number of CPU**, which are vCPU given by L0 to the L1 VM
-  I give 20 vCPU.
-  ```
-  user@L1-VM:~$ egrep -c '(vmx|svm)' /proc/cpuinfo
-  20
-  ```
-
-
-  ## L1 VM virt-install script parameter ##
-  If you want to reproduce an L1 VM, I followed this [4]:
-
-  ```
-  virt-install \
-      --connect=3Dqemu:///system \
-      --name $VMName \
-      --memory $RAM \
-      --vcpus $VCPUS \
-      --cpu host \
-      --metadata description=3D$DESCRIPTION \
-      --os-type linux \
-      --os-variant ubuntu16.04 \
-      --disk $DISK_PATH/$VMName.$DISK_FORMAT,size=3D$DISK_SIZE,bus=3Dvirtio=
- \
-      --disk $CFGIMG_PATH/config_$VMName.$DISK_FORMAT,device=3Dcdrom \
-      --network bridge=3Dvirbr0 \
-      --graphics none \
-      --console pty,target_type=3Dserial \
-      --hvm
-  ```
-
-  [4] https://youth2009.org/post/kvm-with-ubuntu-cloud-image/
-
-
-  ## Details about a L2 VM ##
-
-  I want to create a L2 `Ubuntu 16.04.5 LTS` VM installed by a cloud image =
-VM =
-
-  within my L1 `KVM` VM. But whatever I do, my L2 VM crash before finishing=
- to be =
-
-  instantiated. I get `kernel panic` or `general protection fault`.
-
-  =
-
-  Here is the log of an L2 VM after the instanciation failed:
-  ```
-  user@L1-VM:~$ less /var/log/libvirt/qemu/VMNAME.log
-
-  2018-10-11T07:40:45.837151Z qemu-system-x86_64: -chardev pty,id=3Dcharser=
-ial0: char device redirected to /dev/pts/1 (label charserial0)
-  2018-10-11T07:40:45.844279Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: CPUID.07H:EBX.invpcid [bit 10]
-  2018-10-11T07:40:45.848532Z qemu-system-x86_64: warning: host doesn't sup=
-port requested feature: CPUID.07H:EBX.invpcid [bit 10]
-  ```
-
-  =
-
-  If you want to reproduce an L2 VM running on L1, follow [4].
-
-  =
-
-  **However** a Cirros OS image can run on a L1 VM !
-
-
-
-  =
-
-  # 7 Thoughts #
-  I think this is a bug in either `Ubuntu16.04` or `libvirt`.
-  All the information are here to reproduce the bug, I think.
-
-  =
-
-  If I do the same with `Ubuntu 18.04`, on the same hardware, following the=
- same =
-
-  steps but with Ubuntu 18.04 .iso and cloud image, it works.
-
-  It works if:
-
-  * L0 =3D Ubuntu18.04 (.iso) + qemu/KVM
-  * L1 =3D Ubuntu18.04 (cloud image) + qemu/KVM
-  * L2 =3D Ubuntu18.04 (cloud image)
-
-  =
-
-  It also works if:
-
-  * L0 =3D Ubuntu18.04 (.iso) + qemu/KVM
-  * L1 =3D Ubuntu18.04 (cloud image) + qemu/KVM
-  * L2 =3D Ubuntu16.04 (cloud image)
-
-
-  =
-
-  Thank you for your time reading !
-  --
-  nico
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1797332/+subscriptions
+To: Fei Li <fli@suse.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, peterx@redhat.com, famz@redhat.com
+
+Fei Li <fli@suse.com> writes:
+
+> Currently, when qemu_signal_init() fails it only returns a non-zero
+> value but without propagating any Error. But its callers need a
+> non-null err when runs error_report_err(err), or else 0->msg occurs.
+
+The bug is in qemu_init_main_loop():
+
+    ret = qemu_signal_init();
+    if (ret) {
+        return ret;
+    }
+
+Fails without setting an error, unlike the other failures.  Its callers
+crash then.
+
+> To avoid such segmentation fault, add a new Error parameter to make
+> the call trace to propagate the err to the final caller.
+>
+> Signed-off-by: Fei Li <fli@suse.com>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+> ---
+>  include/qemu/osdep.h | 2 +-
+>  util/compatfd.c      | 9 ++++++---
+>  util/main-loop.c     | 9 ++++-----
+>  3 files changed, 11 insertions(+), 9 deletions(-)
+>
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 4f8559e550..f1f56763a0 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -421,7 +421,7 @@ struct qemu_signalfd_siginfo {
+>                               additional fields in the future) */
+>  };
+>  
+> -int qemu_signalfd(const sigset_t *mask);
+> +int qemu_signalfd(const sigset_t *mask, Error **errp);
+>  void sigaction_invoke(struct sigaction *action,
+>                        struct qemu_signalfd_siginfo *info);
+>  #endif
+> diff --git a/util/compatfd.c b/util/compatfd.c
+> index 980bd33e52..d3ed890405 100644
+> --- a/util/compatfd.c
+> +++ b/util/compatfd.c
+> @@ -16,6 +16,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "qemu/thread.h"
+> +#include "qapi/error.h"
+>  
+>  #include <sys/syscall.h>
+>  
+> @@ -65,7 +66,7 @@ static void *sigwait_compat(void *opaque)
+>      }
+>  }
+>  
+> -static int qemu_signalfd_compat(const sigset_t *mask)
+> +static int qemu_signalfd_compat(const sigset_t *mask, Error **errp)
+>  {
+>      struct sigfd_compat_info *info;
+>      QemuThread thread;
+> @@ -73,11 +74,13 @@ static int qemu_signalfd_compat(const sigset_t *mask)
+>  
+>      info = malloc(sizeof(*info));
+>      if (info == NULL) {
+> +        error_setg(errp, "Failed to allocate signalfd memory");
+>          errno = ENOMEM;
+>          return -1;
+>      }
+>  
+>      if (pipe(fds) == -1) {
+> +        error_setg(errp, "Failed to create signalfd pipe");
+>          free(info);
+>          return -1;
+>      }
+> @@ -94,7 +97,7 @@ static int qemu_signalfd_compat(const sigset_t *mask)
+>      return fds[0];
+>  }
+>  
+> -int qemu_signalfd(const sigset_t *mask)
+> +int qemu_signalfd(const sigset_t *mask, Error **errp)
+>  {
+>  #if defined(CONFIG_SIGNALFD)
+>      int ret;
+> @@ -106,5 +109,5 @@ int qemu_signalfd(const sigset_t *mask)
+>      }
+>  #endif
+>  
+> -    return qemu_signalfd_compat(mask);
+> +    return qemu_signalfd_compat(mask, errp);
+>  }
+
+I think this takes the Error conversion too far.
+
+qemu_signalfd() is like the signalfd() system call, only portable, and
+setting FD_CLOEXEC.  In particular, it reports failure just like a
+system call: it sets errno and returns -1.  I'd prefer to keep it that
+way.  Instead...
+
+> diff --git a/util/main-loop.c b/util/main-loop.c
+> index affe0403c5..9671b6d226 100644
+> --- a/util/main-loop.c
+> +++ b/util/main-loop.c
+> @@ -71,7 +71,7 @@ static void sigfd_handler(void *opaque)
+>      }
+>  }
+>  
+> -static int qemu_signal_init(void)
+> +static int qemu_signal_init(Error **errp)
+>  {
+>      int sigfd;
+>      sigset_t set;
+> @@ -94,9 +94,8 @@ static int qemu_signal_init(void)
+>      pthread_sigmask(SIG_BLOCK, &set, NULL);
+>  
+>      sigdelset(&set, SIG_IPI);
+> -    sigfd = qemu_signalfd(&set);
+> +    sigfd = qemu_signalfd(&set, errp);
+>      if (sigfd == -1) {
+> -        fprintf(stderr, "failed to create signalfd\n");
+>          return -errno;
+>      }
+>  
+
+... change this function so:
+
+       pthread_sigmask(SIG_BLOCK, &set, NULL);
+   
+       sigdelset(&set, SIG_IPI);
+       sigfd = qemu_signalfd(&set);
+       if (sigfd == -1) {
+  -        fprintf(stderr, "failed to create signalfd\n");
+  +        error_setg_errno(errp, errno, "failed to create signalfd");
+           return -errno;
+       }
+
+Does this make sense?
+
+> @@ -109,7 +108,7 @@ static int qemu_signal_init(void)
+>  
+>  #else /* _WIN32 */
+>  
+> -static int qemu_signal_init(void)
+> +static int qemu_signal_init(Error **errp)
+>  {
+>      return 0;
+>  }
+> @@ -148,7 +147,7 @@ int qemu_init_main_loop(Error **errp)
+>  
+>      init_clocks(qemu_timer_notify_cb);
+>  
+> -    ret = qemu_signal_init();
+> +    ret = qemu_signal_init(errp);
+>      if (ret) {
+>          return ret;
+>      }
