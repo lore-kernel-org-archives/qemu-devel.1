@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gAVID-0006uw-HG
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:21:58 -0400
+	(envelope-from <armbru@pond.sub.org>) id 1gAVYd-00035k-2n
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:38:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1gAVIC-0003OK-D6
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:21:57 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Thu, 11 Oct 2018 15:21:35 +0800
-Message-Id: <20181011072135.588-4-famz@redhat.com>
-In-Reply-To: <20181011072135.588-1-famz@redhat.com>
-References: <20181011072135.588-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 3/3] tests: Add unit tests for image locking
+	(envelope-from <armbru@pond.sub.org>) id 1gAVYb-0007xk-ON
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:38:55 -0400
+Received: from oxygen.pond.sub.org ([2a01:4f8:201:233:1::3]:34146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@pond.sub.org>) id 1gAVYb-0007v9-Bk
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 03:38:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180918185246.18109-1-danielhb413@gmail.com>
+	<20180918185246.18109-2-danielhb413@gmail.com>
+Date: Thu, 11 Oct 2018 09:38:49 +0200
+Message-ID: <87a7nl7x12.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v9 1/3] qmp: query-current-machine with
+ wakeup-suspend-support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,198 +26,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, imammedo@redhat.com
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/Makefile.include     |   2 +
- tests/test-image-locking.c | 157 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 159 insertions(+)
- create mode 100644 tests/test-image-locking.c
+Daniel Henrique Barboza <danielhb413@gmail.com> writes:
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 7a3059bf6c..995c84f38a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -95,6 +95,7 @@ check-unit-y += tests/test-bdrv-drain$(EXESUF)
- check-unit-y += tests/test-blockjob$(EXESUF)
- check-unit-y += tests/test-blockjob-txn$(EXESUF)
- check-unit-y += tests/test-block-backend$(EXESUF)
-+check-unit-y += tests/test-image-locking$(EXESUF)
- check-unit-y += tests/test-x86-cpuid$(EXESUF)
- # all code tested by test-x86-cpuid is inside topology.h
- gcov-files-test-x86-cpuid-y =
-@@ -651,6 +652,7 @@ tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(te
- tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
-+tests/test-image-locking$(EXESUF): tests/test-image-locking.o $(test-block-obj-y) $(test-util-obj-y)
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
- tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
-diff --git a/tests/test-image-locking.c b/tests/test-image-locking.c
-new file mode 100644
-index 0000000000..7614cbf90c
---- /dev/null
-+++ b/tests/test-image-locking.c
-@@ -0,0 +1,157 @@
-+/*
-+ * Image locking tests
-+ *
-+ * Copyright (c) 2018 Red Hat Inc.
-+ *
-+ * Author: Fam Zheng <famz@redhat.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "block/block.h"
-+#include "sysemu/block-backend.h"
-+#include "qapi/error.h"
-+#include "qapi/qmp/qdict.h"
-+
-+static BlockBackend *open_image(const char *path,
-+                                uint64_t perm, uint64_t shared_perm,
-+                                Error **errp)
-+{
-+    Error *local_err = NULL;
-+    BlockBackend *blk;
-+    QDict *options = qdict_new();
-+
-+    qdict_put_str(options, "driver", "raw");
-+    blk = blk_new_open(path, NULL, options, BDRV_O_RDWR, &local_err);
-+    if (blk) {
-+        g_assert_null(local_err);
-+        if (blk_set_perm(blk, perm, shared_perm, errp)) {
-+            blk_unref(blk);
-+            blk = NULL;
-+        }
-+    } else {
-+        error_propagate(errp, local_err);
-+    }
-+    return blk;
-+}
-+
-+static void check_locked_bytes(int fd, uint64_t perm_locks,
-+                               uint64_t shared_perm_locks)
-+{
-+    int i;
-+
-+    if (!perm_locks && !shared_perm_locks) {
-+        g_assert(!qemu_lock_fd_test(fd, 0, 0, true));
-+        return;
-+    }
-+    for (i = 0; (1ULL << i) <= BLK_PERM_ALL; i++) {
-+        uint64_t bit = (1ULL << i);
-+        bool perm_expected = !!(bit & perm_locks);
-+        bool shared_perm_expected = !!(bit & shared_perm_locks);
-+        g_assert_cmpint(perm_expected, ==,
-+                        !!qemu_lock_fd_test(fd, 100 + i, 1, true));
-+        g_assert_cmpint(shared_perm_expected, ==,
-+                        !!qemu_lock_fd_test(fd, 200 + i, 1, true));
-+    }
-+}
-+
-+static void test_image_locking_basic(void)
-+{
-+    BlockBackend *blk1, *blk2, *blk3;
-+    char img_path[] = "/tmp/qtest.XXXXXX";
-+    uint64_t perm, shared_perm;
-+
-+    int fd = mkstemp(img_path);
-+    assert(fd >= 0);
-+
-+    perm = BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
-+    shared_perm = BLK_PERM_ALL;
-+    blk1 = open_image(img_path, perm, shared_perm, &error_abort);
-+    g_assert(blk1);
-+
-+    check_locked_bytes(fd, perm, ~shared_perm);
-+
-+    /* compatible perm between blk1 and blk2 */
-+    blk2 = open_image(img_path, perm | BLK_PERM_RESIZE, shared_perm, NULL);
-+    g_assert(blk2);
-+    check_locked_bytes(fd, perm | BLK_PERM_RESIZE, ~shared_perm);
-+
-+    /* incompatible perm with already open blk1 and blk2 */
-+    blk3 = open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, NULL);
-+    g_assert_null(blk3);
-+
-+    blk_unref(blk2);
-+
-+    /* Check that extra bytes in blk2 are correctly unlocked */
-+    check_locked_bytes(fd, perm, ~shared_perm);
-+
-+    blk_unref(blk1);
-+
-+    /* Image is unused, no lock there */
-+    check_locked_bytes(fd, 0, 0);
-+    blk3 = open_image(img_path, perm, BLK_PERM_WRITE_UNCHANGED, &error_abort);
-+    g_assert(blk3);
-+    blk_unref(blk3);
-+    close(fd);
-+    unlink(img_path);
-+}
-+
-+static void test_set_perm_abort(void)
-+{
-+    BlockBackend *blk1, *blk2;
-+    char img_path[] = "/tmp/qtest.XXXXXX";
-+    uint64_t perm, shared_perm;
-+    int r;
-+    int fd = mkstemp(img_path);
-+    assert(fd >= 0);
-+
-+    perm = BLK_PERM_WRITE | BLK_PERM_CONSISTENT_READ;
-+    shared_perm = BLK_PERM_ALL;
-+    blk1 = open_image(img_path, perm, shared_perm, &error_abort);
-+    g_assert(blk1);
-+
-+    blk2 = open_image(img_path, perm, shared_perm, &error_abort);
-+    g_assert(blk2);
-+
-+    check_locked_bytes(fd, perm, ~shared_perm);
-+
-+    /* A failed blk_set_perm mustn't change perm status (locked bytes) */
-+    r = blk_set_perm(blk2, perm | BLK_PERM_RESIZE, BLK_PERM_WRITE_UNCHANGED,
-+                     NULL);
-+    g_assert_cmpint(r, !=, 0);
-+    check_locked_bytes(fd, perm, ~shared_perm);
-+    blk_unref(blk1);
-+    blk_unref(blk2);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    bdrv_init();
-+    qemu_init_main_loop(&error_abort);
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    if (qemu_has_ofd_lock()) {
-+        g_test_add_func("/image-locking/basic", test_image_locking_basic);
-+        g_test_add_func("/image-locking/set-perm-abort", test_set_perm_abort);
-+    }
-+
-+    return g_test_run();
-+}
--- 
-2.17.1
+> When issuing the qmp/hmp 'system_wakeup' command, what happens in a
+> nutshell is:
+>
+> - qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
+> and notify the event
+> - in the main_loop, all vcpus are paused, a system reset is issued, all
+> subscribers of wakeup_notifiers receives a notification, vcpus are then
+> resumed and the wake up QAPI event is fired
+>
+> Note that this procedure alone doesn't ensure that the guest will awake
+> from SUSPENDED state - the subscribers of the wake up event must take
+> action to resume the guest, otherwise the guest will simply reboot. At
+> this moment, only the ACPI machines via acpi_pm1_cnt_init has wake-up
+> from suspend support.
+>
+> However, only the presence of 'system_wakeup' is required for QGA to
+> support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
+> This means that the user/management will expect to suspend the guest using
+> one of those suspend commands and then resume execution using system_wakeup,
+> regardless of the support offered in system_wakeup in the first place.
+>
+> This patch creates a new API called query-current-machine [1], that holds
+> a new flag called 'wakeup-suspend-support' that indicates if the guest
+> supports wake up from suspend via system_wakeup. The machine is considered
+> to implement wake-up support if a call to a new 'qemu_register_wakeup_support'
+> is made during its init, as it is now being done inside acpi_pm1_cnt_init.
+> This allows for any other machine type to declare wake-up support regardless
+> of ACPI state or wakeup_notifiers subscription, making easier for
+> newer implementations that might have its own mechanisms in the future.
+>
+> This is the expected output of query-current-machine when running a x86
+> guest:
+>
+> {"execute" : "query-current-machine"}
+> {"return": {"wakeup-suspend-support": true}}
+>
+> Running the same x86 guest, but with the --no-acpi option:
+>
+> {"execute" : "query-current-machine"}
+> {"return": {"wakeup-suspend-support": false}}
+>
+> This is the output when running a pseries guest:
+>
+> {"execute" : "query-current-machine"}
+> {"return": {"wakeup-suspend-support": false}}
+>
+> With this extra tool, management can avoid situations where a guest
+> that does not have proper suspend/wake capabilities ends up in
+> inconsistent state (e.g.
+> https://github.com/open-power-host-os/qemu/issues/31).
+>
+> [1] the decision of creating the query-current-machine API is based
+> on discussions in the QEMU mailing list where it was decided that
+> query-target wasn't a proper place to store the wake-up flag, neither
+> was query-machines because this isn't a static property of the
+> machine object. This new API can then be used to store other
+> dynamic machine properties that are scattered around the code
+> ATM. More info at:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04235.html
+>
+> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> ---
+>  hw/acpi/core.c          |  1 +
+>  include/sysemu/sysemu.h |  1 +
+>  qapi/misc.json          | 24 ++++++++++++++++++++++++
+>  vl.c                    | 19 +++++++++++++++++++
+>  4 files changed, 45 insertions(+)
+>
+> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> index b8d39012cd..2dea893245 100644
+> --- a/hw/acpi/core.c
+> +++ b/hw/acpi/core.c
+> @@ -617,6 +617,7 @@ void acpi_pm1_cnt_init(ACPIREGS *ar, MemoryRegion *parent,
+>      ar->pm1.cnt.s4_val = s4_val;
+>      ar->wakeup.notify = acpi_notify_wakeup;
+>      qemu_register_wakeup_notifier(&ar->wakeup);
+> +    qemu_register_wakeup_support();
+>      memory_region_init_io(&ar->pm1.cnt.io, memory_region_owner(parent),
+>                            &acpi_pm_cnt_ops, ar, "acpi-cnt", 2);
+>      memory_region_add_subregion(parent, 4, &ar->pm1.cnt.io);
+
+We might've discussed this before, not sure...  There's a second
+qemu_register_wakeup_notifier() in xen-hvm.c.  By not adding
+qemu_register_wakeup_support() there, you implicitly state that it
+doesn't provide wakeup support.  I have no idea whether that's true.  If
+it is, then I think the commit message should explain it.  We might even
+want a comment.  Please advise.
+
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 8d6095d98b..0446adacc6 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -77,6 +77,7 @@ void qemu_register_suspend_notifier(Notifier *notifier);
+>  void qemu_system_wakeup_request(WakeupReason reason);
+>  void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
+>  void qemu_register_wakeup_notifier(Notifier *notifier);
+> +void qemu_register_wakeup_support(void);
+>  void qemu_system_shutdown_request(ShutdownCause reason);
+>  void qemu_system_powerdown_request(void);
+>  void qemu_register_powerdown_notifier(Notifier *notifier);
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index d450cfef21..b616d385a4 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -2003,6 +2003,30 @@
+>  ##
+>  { 'command': 'query-machines', 'returns': ['MachineInfo'] }
+>  
+> +##
+> +# @CurrentMachineParams:
+> +#
+> +# Information describing the running machine parameters.
+> +#
+> +# @wakeup-suspend-support: true if the target supports wake up from
+
+s/target/machine/
+
+> +#                          suspend
+> +#
+> +# Since: 3.1.0
+> +##
+> +{ 'struct': 'CurrentMachineParams',
+> +  'data': { 'wakeup-suspend-support': 'bool'} }
+> +
+> +##
+> +# @query-current-machine:
+> +#
+> +# Return a list of parameters of the running machine.
+
+"a list of" suggests it returns a QAPI list.  Let's say "Return
+information on the current virtual machine".
+
+> +#
+> +# Returns: CurrentMachineParams
+> +#
+> +# Since: 3.1.0
+> +##
+> +{ 'command': 'query-current-machine', 'returns': 'CurrentMachineParams' }
+> +
+>  ##
+>  # @CpuDefinitionInfo:
+>  #
+> diff --git a/vl.c b/vl.c
+> index 5ba06adf78..f78947f69c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -184,6 +184,7 @@ bool boot_strict;
+>  uint8_t *boot_splash_filedata;
+>  size_t boot_splash_filedata_size;
+>  uint8_t qemu_extra_params_fw[2];
+> +bool wakeup_suspend_enabled;
+>  
+>  int icount_align_option;
+>  
+> @@ -1753,6 +1754,24 @@ void qemu_register_wakeup_notifier(Notifier *notifier)
+>      notifier_list_add(&wakeup_notifiers, notifier);
+>  }
+>  
+> +void qemu_register_wakeup_support(void)
+> +{
+> +    wakeup_suspend_enabled = true;
+> +}
+> +
+> +static bool qemu_wakeup_suspend_enabled(void)
+> +{
+> +    return wakeup_suspend_enabled;
+> +}
+> +
+> +CurrentMachineParams *qmp_query_current_machine(Error **errp)
+> +{
+> +    CurrentMachineParams *params = g_malloc0(sizeof(*params));
+> +    params->wakeup_suspend_support = qemu_wakeup_suspend_enabled();
+> +
+> +    return params;
+> +}
+> +
+>  void qemu_system_killed(int signal, pid_t pid)
+>  {
+>      shutdown_signal = signal;
