@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAhwq-0006sC-2O
+	(envelope-from <richard.henderson@linaro.org>) id 1gAhwq-0006sy-Sw
 	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1gAhwm-0005zz-72
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:43 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40800)
+	(envelope-from <richard.henderson@linaro.org>) id 1gAhwm-00061F-BM
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:44 -0400
+Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:38848)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1gAhwl-0003SW-Mi
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:39 -0400
-Received: by mail-pf1-x443.google.com with SMTP id s5-v6so5005658pfj.7
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:15 -0700 (PDT)
+	id 1gAhwl-0005MX-RX
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 16:52:40 -0400
+Received: by mail-pl1-x62a.google.com with SMTP id q19-v6so1704736pll.5
+	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 13:52:33 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 11 Oct 2018 13:51:50 -0700
-Message-Id: <20181011205206.3552-5-richard.henderson@linaro.org>
+Date: Thu, 11 Oct 2018 13:52:02 -0700
+Message-Id: <20181011205206.3552-17-richard.henderson@linaro.org>
 In-Reply-To: <20181011205206.3552-1-richard.henderson@linaro.org>
 References: <20181011205206.3552-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 04/20] target/arm: Promote consecutive memory
- ops for aa64
+Subject: [Qemu-devel] [PATCH 16/20] target/arm: Use gvec for
+ NEON_3R_VTST_VCEQ, NEON_3R_VCGT, NEON_3R_VCGE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +30,200 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-For a sequence of loads or stores from a single register,
-little-endian operations can be promoted to an 8-byte op.
-This can reduce the number of operations by a factor of 8.
+Move cmtst_op expanders from translate-a64.c.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 66 +++++++++++++++++++++++---------------
- 1 file changed, 40 insertions(+), 26 deletions(-)
+ target/arm/translate.h     |  2 +
+ target/arm/translate-a64.c | 38 ------------------
+ target/arm/translate.c     | 81 +++++++++++++++++++++++++++-----------
+ 3 files changed, 60 insertions(+), 61 deletions(-)
 
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index d11d504301..eb7ecbebe5 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -197,10 +197,12 @@ extern const GVecGen3 bit_op;
+ extern const GVecGen3 bif_op;
+ extern const GVecGen3 mla_op[4];
+ extern const GVecGen3 mls_op[4];
++extern const GVecGen3 cmtst_op[4];
+ extern const GVecGen2i ssra_op[4];
+ extern const GVecGen2i usra_op[4];
+ extern const GVecGen2i sri_op[4];
+ extern const GVecGen2i sli_op[4];
++void gen_cmtst_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b);
+ 
+ #define FORWARD_FEATURE(NAME) \
+     static inline bool aa32_dc_feature_##NAME(DisasContext *dc) \
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index fff99ca303..2f4041462e 100644
+index 94f7127c0e..b6f54e66fb 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -1200,25 +1200,23 @@ static void write_vec_element_i32(DisasContext *s, TCGv_i32 tcg_src,
- 
- /* Store from vector register to memory */
- static void do_vec_st(DisasContext *s, int srcidx, int element,
--                      TCGv_i64 tcg_addr, int size)
-+                      TCGv_i64 tcg_addr, int size, TCGMemOp endian)
- {
--    TCGMemOp memop = s->be_data + size;
-     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
- 
-     read_vec_element(s, tcg_tmp, srcidx, element, size);
--    tcg_gen_qemu_st_i64(tcg_tmp, tcg_addr, get_mem_index(s), memop);
-+    tcg_gen_qemu_st_i64(tcg_tmp, tcg_addr, get_mem_index(s), endian | size);
- 
-     tcg_temp_free_i64(tcg_tmp);
+@@ -8031,28 +8031,6 @@ static void disas_simd_scalar_three_reg_diff(DisasContext *s, uint32_t insn)
+     }
  }
  
- /* Load from memory to vector register */
- static void do_vec_ld(DisasContext *s, int destidx, int element,
--                      TCGv_i64 tcg_addr, int size)
-+                      TCGv_i64 tcg_addr, int size, TCGMemOp endian)
- {
--    TCGMemOp memop = s->be_data + size;
-     TCGv_i64 tcg_tmp = tcg_temp_new_i64();
- 
--    tcg_gen_qemu_ld_i64(tcg_tmp, tcg_addr, get_mem_index(s), memop);
-+    tcg_gen_qemu_ld_i64(tcg_tmp, tcg_addr, get_mem_index(s), endian | size);
-     write_vec_element(s, tcg_tmp, destidx, element, size);
- 
-     tcg_temp_free_i64(tcg_tmp);
-@@ -3013,9 +3011,10 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
-     bool is_postidx = extract32(insn, 23, 1);
-     bool is_q = extract32(insn, 30, 1);
-     TCGv_i64 tcg_addr, tcg_rn, tcg_ebytes;
-+    TCGMemOp endian = s->be_data;
- 
--    int ebytes = 1 << size;
--    int elements = (is_q ? 128 : 64) / (8 << size);
-+    int ebytes;   /* bytes per element */
-+    int elements; /* elements per vector */
-     int rpt;    /* num iterations */
-     int selem;  /* structure elements */
-     int r;
-@@ -3074,6 +3073,20 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
-         gen_check_sp_alignment(s);
-     }
- 
-+    /* For our purposes, bytes are always little-endian.  */
-+    if (size == 0) {
-+        endian = MO_LE;
-+    }
-+
-+    /* Consecutive little-endian elements from a single register
-+     * can be promoted to a larger little-endian operation.
-+     */
-+    if (selem == 1 && endian == MO_LE) {
-+        size = 3;
-+    }
-+    ebytes = 1 << size;
-+    elements = (is_q ? 16 : 8) / ebytes;
-+
-     tcg_rn = cpu_reg_sp(s, rn);
-     tcg_addr = tcg_temp_new_i64();
-     tcg_gen_mov_i64(tcg_addr, tcg_rn);
-@@ -3082,32 +3095,33 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
-     for (r = 0; r < rpt; r++) {
-         int e;
-         for (e = 0; e < elements; e++) {
--            int tt = (rt + r) % 32;
-             int xs;
-             for (xs = 0; xs < selem; xs++) {
-+                int tt = (rt + r + xs) % 32;
-                 if (is_store) {
--                    do_vec_st(s, tt, e, tcg_addr, size);
-+                    do_vec_st(s, tt, e, tcg_addr, size, endian);
-                 } else {
--                    do_vec_ld(s, tt, e, tcg_addr, size);
+-/* CMTST : test is "if (X & Y != 0)". */
+-static void gen_cmtst_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
+-{
+-    tcg_gen_and_i32(d, a, b);
+-    tcg_gen_setcondi_i32(TCG_COND_NE, d, d, 0);
+-    tcg_gen_neg_i32(d, d);
+-}
 -
--                    /* For non-quad operations, setting a slice of the low
--                     * 64 bits of the register clears the high 64 bits (in
--                     * the ARM ARM pseudocode this is implicit in the fact
--                     * that 'rval' is a 64 bit wide variable).
--                     * For quad operations, we might still need to zero the
--                     * high bits of SVE.  We optimize by noticing that we only
--                     * need to do this the first time we touch a register.
--                     */
--                    if (e == 0 && (r == 0 || xs == selem - 1)) {
--                        clear_vec_high(s, is_q, tt);
--                    }
-+                    do_vec_ld(s, tt, e, tcg_addr, size, endian);
-                 }
-                 tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
--                tt = (tt + 1) % 32;
-             }
-         }
-     }
+-static void gen_cmtst_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
+-{
+-    tcg_gen_and_i64(d, a, b);
+-    tcg_gen_setcondi_i64(TCG_COND_NE, d, d, 0);
+-    tcg_gen_neg_i64(d, d);
+-}
+-
+-static void gen_cmtst_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
+-{
+-    tcg_gen_and_vec(vece, d, a, b);
+-    tcg_gen_dupi_vec(vece, a, 0);
+-    tcg_gen_cmp_vec(TCG_COND_NE, vece, d, d, a);
+-}
+-
+ static void handle_3same_64(DisasContext *s, int opcode, bool u,
+                             TCGv_i64 tcg_rd, TCGv_i64 tcg_rn, TCGv_i64 tcg_rm)
+ {
+@@ -10413,22 +10391,6 @@ static void disas_simd_3same_float(DisasContext *s, uint32_t insn)
+ /* Integer op subgroup of C3.6.16. */
+ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+ {
+-    static const GVecGen3 cmtst_op[4] = {
+-        { .fni4 = gen_helper_neon_tst_u8,
+-          .fniv = gen_cmtst_vec,
+-          .vece = MO_8 },
+-        { .fni4 = gen_helper_neon_tst_u16,
+-          .fniv = gen_cmtst_vec,
+-          .vece = MO_16 },
+-        { .fni4 = gen_cmtst_i32,
+-          .fniv = gen_cmtst_vec,
+-          .vece = MO_32 },
+-        { .fni8 = gen_cmtst_i64,
+-          .fniv = gen_cmtst_vec,
+-          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
+-          .vece = MO_64 },
+-    };
+-
+     int is_q = extract32(insn, 30, 1);
+     int u = extract32(insn, 29, 1);
+     int size = extract32(insn, 22, 2);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 5008a24ffd..a9bd93bba1 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -6143,6 +6143,44 @@ const GVecGen3 mls_op[4] = {
+       .vece = MO_64 },
+ };
  
-+    if (!is_store) {
-+        /* For non-quad operations, setting a slice of the low
-+         * 64 bits of the register clears the high 64 bits (in
-+         * the ARM ARM pseudocode this is implicit in the fact
-+         * that 'rval' is a 64 bit wide variable).
-+         * For quad operations, we might still need to zero the
-+         * high bits of SVE.
-+         */
-+        for (r = 0; r < rpt * selem; r++) {
-+            int tt = (rt + r) % 32;
-+            clear_vec_high(s, is_q, tt);
-+        }
-+    }
++/* CMTST : test is "if (X & Y != 0)". */
++static void gen_cmtst_i32(TCGv_i32 d, TCGv_i32 a, TCGv_i32 b)
++{
++    tcg_gen_and_i32(d, a, b);
++    tcg_gen_setcondi_i32(TCG_COND_NE, d, d, 0);
++    tcg_gen_neg_i32(d, d);
++}
 +
-     if (is_postidx) {
-         int rm = extract32(insn, 16, 5);
-         if (rm == 31) {
-@@ -3228,9 +3242,9 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-         } else {
-             /* Load/store one element per register */
-             if (is_load) {
--                do_vec_ld(s, rt, index, tcg_addr, scale);
-+                do_vec_ld(s, rt, index, tcg_addr, scale, s->be_data);
-             } else {
--                do_vec_st(s, rt, index, tcg_addr, scale);
-+                do_vec_st(s, rt, index, tcg_addr, scale, s->be_data);
-             }
++void gen_cmtst_i64(TCGv_i64 d, TCGv_i64 a, TCGv_i64 b)
++{
++    tcg_gen_and_i64(d, a, b);
++    tcg_gen_setcondi_i64(TCG_COND_NE, d, d, 0);
++    tcg_gen_neg_i64(d, d);
++}
++
++static void gen_cmtst_vec(unsigned vece, TCGv_vec d, TCGv_vec a, TCGv_vec b)
++{
++    tcg_gen_and_vec(vece, d, a, b);
++    tcg_gen_dupi_vec(vece, a, 0);
++    tcg_gen_cmp_vec(TCG_COND_NE, vece, d, d, a);
++}
++
++const GVecGen3 cmtst_op[4] = {
++    { .fni4 = gen_helper_neon_tst_u8,
++      .fniv = gen_cmtst_vec,
++      .vece = MO_8 },
++    { .fni4 = gen_helper_neon_tst_u16,
++      .fniv = gen_cmtst_vec,
++      .vece = MO_16 },
++    { .fni4 = gen_cmtst_i32,
++      .fniv = gen_cmtst_vec,
++      .vece = MO_32 },
++    { .fni8 = gen_cmtst_i64,
++      .fniv = gen_cmtst_vec,
++      .prefer_i64 = TCG_TARGET_REG_BITS == 64,
++      .vece = MO_64 },
++};
++
+ /* Translate a NEON data processing instruction.  Return nonzero if the
+    instruction is invalid.
+    We process data in a mixture of 32-bit and 64-bit chunks.
+@@ -6349,6 +6387,26 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+             tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, vec_size, vec_size,
+                            u ? &mls_op[size] : &mla_op[size]);
+             return 0;
++
++        case NEON_3R_VTST_VCEQ:
++            if (u) { /* VCEQ */
++                tcg_gen_gvec_cmp(TCG_COND_EQ, size, rd_ofs, rn_ofs, rm_ofs,
++                                 vec_size, vec_size);
++            } else { /* VTST */
++                tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs,
++                               vec_size, vec_size, &cmtst_op[size]);
++            }
++            return 0;
++
++        case NEON_3R_VCGT:
++            tcg_gen_gvec_cmp(u ? TCG_COND_GTU : TCG_COND_GT, size,
++                             rd_ofs, rn_ofs, rm_ofs, vec_size, vec_size);
++            return 0;
++
++        case NEON_3R_VCGE:
++            tcg_gen_gvec_cmp(u ? TCG_COND_GEU : TCG_COND_GE, size,
++                             rd_ofs, rn_ofs, rm_ofs, vec_size, vec_size);
++            return 0;
          }
-         tcg_gen_add_i64(tcg_addr, tcg_addr, tcg_ebytes);
+ 
+         if (size == 3) {
+@@ -6502,12 +6560,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+         case NEON_3R_VQSUB:
+             GEN_NEON_INTEGER_OP_ENV(qsub);
+             break;
+-        case NEON_3R_VCGT:
+-            GEN_NEON_INTEGER_OP(cgt);
+-            break;
+-        case NEON_3R_VCGE:
+-            GEN_NEON_INTEGER_OP(cge);
+-            break;
+         case NEON_3R_VSHL:
+             GEN_NEON_INTEGER_OP(shl);
+             break;
+@@ -6535,23 +6587,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+             tmp2 = neon_load_reg(rd, pass);
+             gen_neon_add(size, tmp, tmp2);
+             break;
+-        case NEON_3R_VTST_VCEQ:
+-            if (!u) { /* VTST */
+-                switch (size) {
+-                case 0: gen_helper_neon_tst_u8(tmp, tmp, tmp2); break;
+-                case 1: gen_helper_neon_tst_u16(tmp, tmp, tmp2); break;
+-                case 2: gen_helper_neon_tst_u32(tmp, tmp, tmp2); break;
+-                default: abort();
+-                }
+-            } else { /* VCEQ */
+-                switch (size) {
+-                case 0: gen_helper_neon_ceq_u8(tmp, tmp, tmp2); break;
+-                case 1: gen_helper_neon_ceq_u16(tmp, tmp, tmp2); break;
+-                case 2: gen_helper_neon_ceq_u32(tmp, tmp, tmp2); break;
+-                default: abort();
+-                }
+-            }
+-            break;
+         case NEON_3R_VMUL:
+             /* VMUL.P8; other cases already eliminated.  */
+             gen_helper_neon_mul_p8(tmp, tmp, tmp2);
 -- 
 2.17.1
