@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAuGD-0000xU-2w
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:34 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAuG8-0000vm-Vo
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1gAuGB-0007ee-BQ
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:32 -0400
+	(envelope-from <cohuck@redhat.com>) id 1gAuFw-0007U8-1f
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 06:01:23 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Fri, 12 Oct 2018 12:00:56 +0200
-Message-Id: <20181012100101.29058-4-cohuck@redhat.com>
+Date: Fri, 12 Oct 2018 12:00:55 +0200
+Message-Id: <20181012100101.29058-3-cohuck@redhat.com>
 In-Reply-To: <20181012100101.29058-1-cohuck@redhat.com>
 References: <20181012100101.29058-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 3/8] s390x/cpumodel: Set up CPU model for AP
- device support
+Subject: [Qemu-devel] [PULL 2/8] linux-headers: update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,136 +20,175 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Tony Krowiak <akrowiak@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-From: Tony Krowiak <akrowiak@linux.ibm.com>
+Update to kvm/next commit dd5bd0a65ff6 ("Merge tag 'kvm-s390-next-4.20-1'
+of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD")
 
-A new CPU model feature and two new CPU model facilities are
-introduced to support AP devices for a KVM guest.
-
-CPU model features:
-
-1. The S390_FEAT_AP CPU model feature indicates whether AP
-   instructions are available to the guest. This feature will
-   be enabled only if the AP instructions are available on the
-   linux host as determined by the availability of the
-   KVM_S390_VM_CRYPTO_ENABLE_APIE VM attribute which is exposed
-   by KVM only if the AP instructions are available on the
-   host.
-
-   This feature must be turned on from userspace to execute AP
-   instructions on the KVM guest. The QEMU command line to turn
-   this feature on looks something like this:
-
-	qemu-system-s390x ... -cpu xxx,ap=on ...
-
-   This feature will be supported for zEC12 and newer CPU models.
-   The feature will not be supported for older models because
-   there are few older systems on which to test and the older
-   crypto cards will be going out of service in the relatively
-   near future.
-
-CPU model facilities:
-
-1. The S390_FEAT_AP_QUERY_CONFIG_INFO feature indicates whether the
-   AP Query Configuration Information (QCI) facility is available
-   to the guest as determined by whether the facility is available
-   on the host. This feature will be exposed by KVM only if the
-   QCI facility is installed on the host.
-
-2. The S390_FEAT_AP_FACILITY_TEST feature indicates whether the AP
-   Facility Test (APFT) facility is available to the guest as
-   determined by whether the facility is available on the host.
-   This feature will be exposed by KVM only if APFT is installed
-   on the host.
-
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Tested-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-Id: <20181010170309.12045-3-akrowiak@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu_features.c     | 3 +++
- target/s390x/cpu_features_def.h | 3 +++
- target/s390x/cpu_models.c       | 2 ++
- target/s390x/gen-features.c     | 3 +++
- 4 files changed, 11 insertions(+)
+ include/standard-headers/linux/input.h |  9 +++++----
+ linux-headers/asm-arm/kvm.h            | 13 +++++++++++++
+ linux-headers/asm-arm64/kvm.h          | 13 +++++++++++++
+ linux-headers/asm-s390/kvm.h           |  2 ++
+ linux-headers/asm-x86/kvm.h            |  1 +
+ linux-headers/linux/kvm.h              |  2 ++
+ linux-headers/linux/vfio.h             |  2 ++
+ linux-headers/linux/vhost.h            |  2 +-
+ 8 files changed, 39 insertions(+), 5 deletions(-)
 
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 172fb18df7..60cfeba48f 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -39,8 +39,10 @@ static const S390FeatDef s390_features[] = {
-     FEAT_INIT("srs", S390_FEAT_TYPE_STFL, 9, "Sense-running-status facility"),
-     FEAT_INIT("csske", S390_FEAT_TYPE_STFL, 10, "Conditional-SSKE facility"),
-     FEAT_INIT("ctop", S390_FEAT_TYPE_STFL, 11, "Configuration-topology facility"),
-+    FEAT_INIT("apqci", S390_FEAT_TYPE_STFL, 12, "Query AP Configuration Information facility"),
-     FEAT_INIT("ipter", S390_FEAT_TYPE_STFL, 13, "IPTE-range facility"),
-     FEAT_INIT("nonqks", S390_FEAT_TYPE_STFL, 14, "Nonquiescing key-setting facility"),
-+    FEAT_INIT("apft", S390_FEAT_TYPE_STFL, 15, "AP Facilities Test facility"),
-     FEAT_INIT("etf2", S390_FEAT_TYPE_STFL, 16, "Extended-translation facility 2"),
-     FEAT_INIT("msa-base", S390_FEAT_TYPE_STFL, 17, "Message-security-assist facility (excluding subfunctions)"),
-     FEAT_INIT("ldisp", S390_FEAT_TYPE_STFL, 18, "Long-displacement facility"),
-@@ -129,6 +131,7 @@ static const S390FeatDef s390_features[] = {
+diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
+index 6d6128c081..c0ad9fc2c3 100644
+--- a/include/standard-headers/linux/input.h
++++ b/include/standard-headers/linux/input.h
+@@ -267,10 +267,11 @@ struct input_mask {
+ /*
+  * MT_TOOL types
+  */
+-#define MT_TOOL_FINGER		0
+-#define MT_TOOL_PEN		1
+-#define MT_TOOL_PALM		2
+-#define MT_TOOL_MAX		2
++#define MT_TOOL_FINGER		0x00
++#define MT_TOOL_PEN		0x01
++#define MT_TOOL_PALM		0x02
++#define MT_TOOL_DIAL		0x0a
++#define MT_TOOL_MAX		0x0f
  
-     FEAT_INIT_MISC("dateh2", "DAT-enhancement facility 2"),
-     FEAT_INIT_MISC("cmm", "Collaborative-memory-management facility"),
-+    FEAT_INIT_MISC("ap", "AP instructions installed"),
+ /*
+  * Values describing the status of a force-feedback effect
+diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
+index 72aa226e6c..e1f8b74558 100644
+--- a/linux-headers/asm-arm/kvm.h
++++ b/linux-headers/asm-arm/kvm.h
+@@ -27,6 +27,7 @@
+ #define __KVM_HAVE_GUEST_DEBUG
+ #define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
++#define __KVM_HAVE_VCPU_EVENTS
  
-     FEAT_INIT("plo-cl", S390_FEAT_TYPE_PLO, 0, "PLO Compare and load (32 bit in general registers)"),
-     FEAT_INIT("plo-clg", S390_FEAT_TYPE_PLO, 1, "PLO Compare and load (64 bit in parameter list)"),
-diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index ac2c947f30..5fc7e7bf01 100644
---- a/target/s390x/cpu_features_def.h
-+++ b/target/s390x/cpu_features_def.h
-@@ -27,8 +27,10 @@ typedef enum {
-     S390_FEAT_SENSE_RUNNING_STATUS,
-     S390_FEAT_CONDITIONAL_SSKE,
-     S390_FEAT_CONFIGURATION_TOPOLOGY,
-+    S390_FEAT_AP_QUERY_CONFIG_INFO,
-     S390_FEAT_IPTE_RANGE,
-     S390_FEAT_NONQ_KEY_SETTING,
-+    S390_FEAT_AP_FACILITIES_TEST,
-     S390_FEAT_EXTENDED_TRANSLATION_2,
-     S390_FEAT_MSA,
-     S390_FEAT_LONG_DISPLACEMENT,
-@@ -119,6 +121,7 @@ typedef enum {
-     /* Misc */
-     S390_FEAT_DAT_ENH_2,
-     S390_FEAT_CMM,
-+    S390_FEAT_AP,
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
  
-     /* PLO */
-     S390_FEAT_PLO_CL,
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 265d25c937..7c253ff308 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -786,6 +786,8 @@ static void check_consistency(const S390CPUModel *model)
-         { S390_FEAT_PRNO_TRNG_QRTCR, S390_FEAT_MSA_EXT_5 },
-         { S390_FEAT_PRNO_TRNG, S390_FEAT_MSA_EXT_5 },
-         { S390_FEAT_SIE_KSS, S390_FEAT_SIE_F2 },
-+        { S390_FEAT_AP_QUERY_CONFIG_INFO, S390_FEAT_AP },
-+        { S390_FEAT_AP_FACILITIES_TEST, S390_FEAT_AP },
-     };
-     int i;
- 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 384b61cd67..70015eaaf5 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -447,6 +447,9 @@ static uint16_t full_GEN12_GA1[] = {
-     S390_FEAT_ADAPTER_INT_SUPPRESSION,
-     S390_FEAT_EDAT_2,
-     S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
-+    S390_FEAT_AP_QUERY_CONFIG_INFO,
-+    S390_FEAT_AP_FACILITIES_TEST,
-+    S390_FEAT_AP,
+@@ -125,6 +126,18 @@ struct kvm_sync_regs {
+ struct kvm_arch_memory_slot {
  };
  
- static uint16_t full_GEN12_GA2[] = {
++/* for KVM_GET/SET_VCPU_EVENTS */
++struct kvm_vcpu_events {
++	struct {
++		__u8 serror_pending;
++		__u8 serror_has_esr;
++		/* Align it to 8 bytes */
++		__u8 pad[6];
++		__u64 serror_esr;
++	} exception;
++	__u32 reserved[12];
++};
++
+ /* If you need to interpret the index values, here is the key: */
+ #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
+ #define KVM_REG_ARM_COPROC_SHIFT	16
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index 99cb9ad14a..e6a98c14c8 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -39,6 +39,7 @@
+ #define __KVM_HAVE_GUEST_DEBUG
+ #define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
++#define __KVM_HAVE_VCPU_EVENTS
+ 
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ 
+@@ -154,6 +155,18 @@ struct kvm_sync_regs {
+ struct kvm_arch_memory_slot {
+ };
+ 
++/* for KVM_GET/SET_VCPU_EVENTS */
++struct kvm_vcpu_events {
++	struct {
++		__u8 serror_pending;
++		__u8 serror_has_esr;
++		/* Align it to 8 bytes */
++		__u8 pad[6];
++		__u64 serror_esr;
++	} exception;
++	__u32 reserved[12];
++};
++
+ /* If you need to interpret the index values, here is the key: */
+ #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
+ #define KVM_REG_ARM_COPROC_SHIFT	16
+diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
+index 1ab9901911..0265482f8f 100644
+--- a/linux-headers/asm-s390/kvm.h
++++ b/linux-headers/asm-s390/kvm.h
+@@ -160,6 +160,8 @@ struct kvm_s390_vm_cpu_subfunc {
+ #define KVM_S390_VM_CRYPTO_ENABLE_DEA_KW	1
+ #define KVM_S390_VM_CRYPTO_DISABLE_AES_KW	2
+ #define KVM_S390_VM_CRYPTO_DISABLE_DEA_KW	3
++#define KVM_S390_VM_CRYPTO_ENABLE_APIE		4
++#define KVM_S390_VM_CRYPTO_DISABLE_APIE		5
+ 
+ /* kvm attributes for migration mode */
+ #define KVM_S390_VM_MIGRATION_STOP	0
+diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+index 86299efa80..fd23d5778e 100644
+--- a/linux-headers/asm-x86/kvm.h
++++ b/linux-headers/asm-x86/kvm.h
+@@ -377,6 +377,7 @@ struct kvm_sync_regs {
+ 
+ #define KVM_X86_QUIRK_LINT0_REENABLED	(1 << 0)
+ #define KVM_X86_QUIRK_CD_NW_CLEARED	(1 << 1)
++#define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	(1 << 2)
+ 
+ #define KVM_STATE_NESTED_GUEST_MODE	0x00000001
+ #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 66790724f1..83ba4eb571 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -951,6 +951,8 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_HYPERV_TLBFLUSH 155
+ #define KVM_CAP_S390_HPAGE_1M 156
+ #define KVM_CAP_NESTED_STATE 157
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 158
++#define KVM_CAP_MSR_PLATFORM_INFO 159
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 3615a269d3..ceb6453394 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -200,6 +200,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
+ #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+ #define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
++#define VFIO_DEVICE_FLAGS_AP	(1 << 5)	/* vfio-ap device */
+ 	__u32	num_regions;	/* Max region index + 1 */
+ 	__u32	num_irqs;	/* Max IRQ index + 1 */
+ };
+@@ -215,6 +216,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_API_PLATFORM_STRING		"vfio-platform"
+ #define VFIO_DEVICE_API_AMBA_STRING		"vfio-amba"
+ #define VFIO_DEVICE_API_CCW_STRING		"vfio-ccw"
++#define VFIO_DEVICE_API_AP_STRING		"vfio-ap"
+ 
+ /**
+  * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
+diff --git a/linux-headers/linux/vhost.h b/linux-headers/linux/vhost.h
+index 94726cb2c5..c8a8fbeb81 100644
+--- a/linux-headers/linux/vhost.h
++++ b/linux-headers/linux/vhost.h
+@@ -176,7 +176,7 @@ struct vhost_memory {
+ #define VHOST_BACKEND_F_IOTLB_MSG_V2 0x1
+ 
+ #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
+-#define VHOST_GET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x26, __u64)
++#define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
+ 
+ /* VHOST_NET specific defines */
+ 
 -- 
 2.14.4
