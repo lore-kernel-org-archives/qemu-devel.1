@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAt11-0001Lq-NP
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:41:48 -0400
+	(envelope-from <kraxel@redhat.com>) id 1gAt2X-0002Dq-Br
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1gAt0y-0008AB-BL
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:41:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49548)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1gAt0y-000833-2C
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:41:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1gAt0u-0006xY-SP
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 08:41:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 073832E807C
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 08:41:36 +0000 (UTC)
+	(envelope-from <kraxel@redhat.com>) id 1gAt2O-0007N0-GM
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:43:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37872)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gAt2K-0006n7-In
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 04:43:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B933BC0293AD
+	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 08:43:05 +0000 (UTC)
+Date: Fri, 12 Oct 2018 10:43:02 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20181012084302.so3aptiavcgvbbyh@sirius.home.kraxel.org>
+References: <20180917061729.22407-1-kraxel@redhat.com>
+	<20180917061729.22407-3-kraxel@redhat.com>
+	<20181011151941.77cd8516@w520.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 12 Oct 2018 08:34:18 -0000
-From: Artem Pisarenko <1790460@bugs.launchpad.net>
-Reply-To: Bug 1790460 <1790460@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <153596437135.32162.9985112313849579617.malonedeb@soybean.canonical.com>
-Message-Id: <153933325839.3703.10347175450143075612.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1790460] Re: -icount,
- sleep=off mode is broken (target slows down or hangs)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181011151941.77cd8516@w520.home>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/vfio/display: add ramfb support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +34,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Long-term testing showed that my trivial adaptation didn't fixed issue and =
-I sticked to modification from QBox. It didn't failed yet.
-And yes, issue still relevant to current master branch.
+  Hi,
 
--- =
+> >      OnOffAuto display;
+> > +    bool enable_ramfb;
+> >      int32_t bootindex;
+> >      uint32_t igd_gms;
+> >      OffAutoPCIBAR msix_relo;
+> 
+> Hi Gerd,
+> 
+> One tiny nit here, we can move this new bool down in the struct with
+> the rest of the bools for better alignment.  I can change that on
+> commit.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1790460
+I've grouped it with the display option because it is display related
+too, but if you prefer to group the bools instead this is fine with me.
 
-Title:
-  -icount,sleep=3Doff mode is broken (target slows down or hangs)
+> However, I'm not having luck getting ramfb to work; the
+> display is only getting initialized once the guest driver loads.  This
+> is a 440FX/SeaBIOS VM, it looks like you've already updated bios.bin in
+> qemu.git with ramfb support,
 
-Status in QEMU:
-  New
+Yes, seabios (and vgabios) bundled with 3.0 (and master branch) should work fine.
 
-Bug description:
-  QEMU running with options "-icount,sleep=3Doff -rtc clock=3Dvm" doesn't e=
-xecute emulation at maximum possible speed.
-  Target virtual clock may run faster or slower than realtime clock by N ti=
-mes, where N value depends on various unrelated conditions (i.e. random fro=
-m the user point of view). The worst case is when target hangs (hopefully, =
-early in booting stage).
-  Example scenarios I've described here: http://lists.nongnu.org/archive/ht=
-ml/qemu-discuss/2018-08/msg00102.html
+There is a standalone device you can use for testing (-vga none -device
+ramfb), to see whenever the firmware side of things works correctly.
 
-  QEMU process just sleeps most of the time (polling, waiting some
-  condition, etc.). I've tried to debug issue and came to 99% conclusion
-  that there are racing somewhere in qemu internals.
+OVMF has ramfb support too btw (merged a few months back).
 
-  The feature is broken since v2.6.0 release.
-  Bad commit is 281b2201e4e18d5b9a26e1e8d81b62b5581a13be by Pavel Dovgalyuk=
-, 03/10/2016 05:56 PM:
+> -device vfio-pci-nohotplug,id=hostdev0,sysfsdev=...,display=on,bus=pci.0,addr=0x9 \
 
-    icount: remove obsolete warp call
-    =
+>     <hostdev mode='subsystem' type='mdev' managed='no' model='vfio-pci' display='on'>
+>       <source>
+>         <address uuid='cd4fa69f-c24c-476f-a61d-abca705e2a13'/>
+>       </source>
+>       <address type='pci' domain='0x0000' bus='0x00' slot='0x09' function='0x0'/>
+>     </hostdev>
 
-    qemu_clock_warp call in qemu_tcg_wait_io_event function is not needed
-    anymore, because it is called in every iteration of main_loop_wait.
-    =
+Hmm, that actually uses vfio-pci-nohotplug?
+But when ramfb=on doesn't throw an error, then yes, appearently.
 
-    Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>   <qemu:commandline>
+>     <qemu:arg value='-set'/>
+>     <qemu:arg value='device.hostdev0.x-igd-opregion=on'/>
+>     <qemu:arg value='-set'/>
+>     <qemu:arg value='device.hostdev0.ramfb=on'/>
+>   </qemu:commandline>
 
-    Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-    Message-Id: <20160310115603.4812.67559.stgit@PASHA-ISP>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+I have this (additionally):
 
-  I've reverted commit to all major releases and latest git master
-  branch. Issue was fixed for all of them. My adaptation is trivial:
-  just restoring removed function call before "qemu_cond_wait(...)"
-  line.
+    <qemu:arg value='-set'/>
+    <qemu:arg value='device.hostdev0.driver=vfio-pci-nohotplug'/>
 
-  I'm sure following bugs are just particular cases of the issue:
-  #1774677, #1653063 .
+> This is a Windows 10 VM, but as I understand this ramfb support, I
+> think I'm still supposed to see SeaBIOS boot messages and perhaps even
+> the Windows boot animation before the guest driver takes over, is that
+> correct?
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1790460/+subscriptions
+Yes, you should see both.
+
+cheers,
+  Gerd
