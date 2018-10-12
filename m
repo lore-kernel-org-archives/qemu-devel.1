@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gAxHv-0003ID-Ej
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:15:37 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxLZ-0005Nz-AR
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:19:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1gAxHk-0002Ey-7M
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:15:29 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 12 Oct 2018 16:15:08 +0300
-Message-Id: <20181012131509.16370-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20181012131509.16370-1-vsementsov@virtuozzo.com>
-References: <20181012131509.16370-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] qapi: move to QOM path for
- x-block-latency-histogram-set
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxLT-0007T8-PG
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:19:17 -0400
+Received: from mail-eopbgr710135.outbound.protection.outlook.com
+	([40.107.71.135]:54816
+	helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gAxLT-0007Qd-Ep
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:19:11 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 12 Oct 2018 13:19:04 +0000
+Message-ID: <BN6PR2201MB1251DC37525E1B19F1E44AC3C6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>,
+	<1539256947-22807-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539256947-22807-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 01/22] elf: Fix PT_MIPS_XXX constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,76 +31,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, nshirokovskiy@virtuozzo.com
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "laurent@vivier.eu" <laurent@vivier.eu>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
 
-Move to way of device selecting, however fall back to device name if
-path is not found.
+> From: Stefan Markovic <smarkovic@wavecomp.com>
+>=20
+> Fix existing and add missing PT_MIPS_XXX constants in elf.h.
+> This is copied from kernel header arch/mips/include/asm/elf.h.
+>
+> Signed-off-by: Stefan Markovic <smarkovic@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- qapi/block-core.json |  4 ++--
- blockdev.c           | 16 ++++++++++++----
- 2 files changed, 14 insertions(+), 6 deletions(-)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index cfb37f8c1d..f4ae61e2e4 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -489,7 +489,7 @@
- # If only @device parameter is specified, remove all present latency histograms
- # for the device. Otherwise, add/reset some of (or all) latency histograms.
- #
--# @device: device name to set latency histogram for.
-+# @id: The QOM path or name of the guest device.
- #
- # @boundaries: list of interval boundary values (see description in
- #              BlockLatencyHistogramInfo definition). If specified, all
-@@ -547,7 +547,7 @@
- # <- { "return": {} }
- ##
- { 'command': 'x-block-latency-histogram-set',
--  'data': {'device': 'str',
-+  'data': {'id': 'str',
-            '*boundaries': ['uint64'],
-            '*boundaries-read': ['uint64'],
-            '*boundaries-write': ['uint64'],
-diff --git a/blockdev.c b/blockdev.c
-index a8755bd908..52e131f47b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -4368,20 +4368,28 @@ void qmp_x_blockdev_set_iothread(const char *node_name, StrOrNull *iothread,
- }
- 
- void qmp_x_block_latency_histogram_set(
--    const char *device,
-+    const char *id,
-     bool has_boundaries, uint64List *boundaries,
-     bool has_boundaries_read, uint64List *boundaries_read,
-     bool has_boundaries_write, uint64List *boundaries_write,
-     bool has_boundaries_flush, uint64List *boundaries_flush,
-     Error **errp)
- {
--    BlockBackend *blk = blk_by_name(device);
-     BlockAcctStats *stats;
-+    Error *local_err = NULL;
-+    BlockBackend *blk = blk_by_qdev_id(id, &local_err);
- 
-     if (!blk) {
--        error_setg(errp, "Device '%s' not found", device);
--        return;
-+        blk = blk_by_name(id);
-+        if (!blk) {
-+            error_propagate(errp, local_err);
-+            return;
-+        } else {
-+            error_free(local_err);
-+            local_err = NULL;
-+        }
-     }
-+
-     stats = blk_get_stats(blk);
- 
-     if (!has_boundaries && !has_boundaries_read && !has_boundaries_write &&
--- 
-2.18.0
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
