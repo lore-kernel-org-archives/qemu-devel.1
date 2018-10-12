@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gAxNw-0006qW-TF
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:21:45 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxQr-0000y8-Iw
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:24:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1gAxNs-0002Y3-7H
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:21:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45042)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1gAxNr-0002X5-Ug
-	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:21:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4AA5030001E2
-	for <qemu-devel@nongnu.org>; Fri, 12 Oct 2018 13:21:39 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 12 Oct 2018 15:21:34 +0200
-Message-Id: <20181012132135.12313-3-kraxel@redhat.com>
-In-Reply-To: <20181012132135.12313-1-kraxel@redhat.com>
-References: <20181012132135.12313-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] sdl2: Support all virtio-gpu formats
+	(envelope-from <amarkovic@wavecomp.com>) id 1gAxQl-0006b6-8Q
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:24:45 -0400
+Received: from mail-eopbgr720104.outbound.protection.outlook.com
+	([40.107.72.104]:18029
+	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1gAxQk-0006ZT-R0
+	for qemu-devel@nongnu.org; Fri, 12 Oct 2018 09:24:39 -0400
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Date: Fri, 12 Oct 2018 13:24:34 +0000
+Message-ID: <BN6PR2201MB1251E9870AB026DF238C0D5CC6E20@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1539256947-22807-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v4 00/22] Misc MIPS fixes and improvements
+ for October 2018
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "laurent@vivier.eu" <laurent@vivier.eu>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, "richard.henderson@linaro.org" <richard.henderson@linaro.org>, Stefan Markovic <smarkovic@wavecomp.com>, Petar Jovanovic <pjovanovic@wavecomp.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>
 
-From: Max Reitz <mreitz@redhat.com>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>=20
+> This series contains support for MIPS ABI flags in elf.h...
+>=20
+> Stefan Markovic (6):
+>  elf: Fix PT_MIPS_XXX constants
+>  elf: Add MIPS_ABI_FP_XXX constants
+>  elf: Add Mips_elf_abiflags_v0 structure
 
-There are some 2D resource formats that can be used through virtio-gpu,
-but which are not supported by SDL2 when used for a scanout; these are
-all alpha-channel formats and also XBGR (RGBX in non-BE pixman).
+Hi, Laurent
 
-Add these formats in the switch converting pixman to SDL format
-constants so a guest cannot crash the VM by triggering the
-g_assert_not_reached() with an unsupported format.
+The three patches above are fairly trivial MIPS-specific additions, and the=
+y
+have my "Reviewed-by"s. I think I can rightfully include them in my next
+MIPS pull request. Please let me know if you have any objections about
+that.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20181008185013.19371-1-mreitz@redhat.com
-
-[ kraxel: also update sdl2_2d_check_format() ]
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/sdl2-2d.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/ui/sdl2-2d.c b/ui/sdl2-2d.c
-index 85484407be..091ecfcc7f 100644
---- a/ui/sdl2-2d.c
-+++ b/ui/sdl2-2d.c
-@@ -101,15 +101,24 @@ void sdl2_2d_switch(DisplayChangeListener *dcl,
-     case PIXMAN_r5g6b5:
-         format = SDL_PIXELFORMAT_RGB565;
-         break;
-+    case PIXMAN_a8r8g8b8:
-     case PIXMAN_x8r8g8b8:
-         format = SDL_PIXELFORMAT_ARGB8888;
-         break;
-+    case PIXMAN_a8b8g8r8:
-+    case PIXMAN_x8b8g8r8:
-+        format = SDL_PIXELFORMAT_ABGR8888;
-+        break;
-+    case PIXMAN_r8g8b8a8:
-     case PIXMAN_r8g8b8x8:
-         format = SDL_PIXELFORMAT_RGBA8888;
-         break;
-     case PIXMAN_b8g8r8x8:
-         format = SDL_PIXELFORMAT_BGRX8888;
-         break;
-+    case PIXMAN_b8g8r8a8:
-+        format = SDL_PIXELFORMAT_BGRA8888;
-+        break;
-     default:
-         g_assert_not_reached();
-     }
-@@ -149,7 +158,13 @@ bool sdl2_2d_check_format(DisplayChangeListener *dcl,
-      * the native ones. Thes are the ones I have tested.
-      */
-     return (format == PIXMAN_x8r8g8b8 ||
-+            format == PIXMAN_a8r8g8b8 ||
-+            format == PIXMAN_a8b8g8r8 ||
-+            format == PIXMAN_x8b8g8r8 ||
-             format == PIXMAN_b8g8r8x8 ||
-+            format == PIXMAN_b8g8r8a8 ||
-+            format == PIXMAN_r8g8b8x8 ||
-+            format == PIXMAN_r8g8b8a8 ||
-             format == PIXMAN_x1r5g5b5 ||
-             format == PIXMAN_r5g6b5);
- }
--- 
-2.9.3
+Thanks,
+Aleksandar
