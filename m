@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gAoJt-0008L6-1C
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 23:40:57 -0400
+	(envelope-from <jialina01@baidu.com>) id 1gAoMs-0000bT-Hy
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 23:44:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1gAoJp-0001ly-Rn
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 23:40:56 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1gAoJp-0001kr-Ku
-	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 23:40:53 -0400
-Received: by mail-pl1-x642.google.com with SMTP id u6-v6so2482038plz.4
-	for <qemu-devel@nongnu.org>; Thu, 11 Oct 2018 20:40:53 -0700 (PDT)
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 11 Oct 2018 20:40:29 -0700
-Message-Id: <1539315629-5424-1-git-send-email-liq3ea@gmail.com>
-Subject: [Qemu-devel] [PATCH] vfio-pci: make vfio-pci device more QOM
- conventional
+	(envelope-from <jialina01@baidu.com>) id 1gAoMn-0004Jz-JR
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 23:44:02 -0400
+Received: from [220.181.50.185] (port=59356 helo=baidu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <jialina01@baidu.com>) id 1gAoMn-0004Fj-5O
+	for qemu-devel@nongnu.org; Thu, 11 Oct 2018 23:43:57 -0400
+From: jialina01 <jialina01@baidu.com>
+Date: Fri, 12 Oct 2018 10:56:23 +0800
+Message-ID: <20181012025623.38792-1-jialina01@baidu.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] migration: avoid segmentfault when take a
+ snapshot of a VM which being migrated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,139 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.williamson@redhat.com
-Cc: philmd@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, Li Qiang <liq3ea@gmail.com>
+To: jialina01@baidu.com, quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: chaiwen <chaiwen@baidu.com>, zhangyu <zhangyu31@baidu.com>
 
-Define a TYPE_VFIO_PCI and drop DO_UPCAST.
+During an active background migraion, snapshot will trigger a
+segmentfault. As snapshot clears the "current_migration" struct
+and updates "to_dst_file" before it finds out that there is a
+migration task, Migration accesses the null pointer in
+"current_migration" struct and qemu crashes eventually.
 
-Signed-off-by: Li Qiang <liq3ea@gmail.com>
+Signed-off-by: jialina01 <jialina01@baidu.com>
+Signed-off-by: chaiwen <chaiwen@baidu.com>
+Signed-off-by: zhangyu <zhangyu31@baidu.com>
 ---
- hw/vfio/pci.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+ migration/savevm.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 866f0deeb7..3f232aedff 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -37,6 +37,9 @@
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 2d10e45582..9cb97ca343 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1319,21 +1319,18 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+     MigrationState *ms = migrate_get_current();
+     MigrationStatus status;
  
- #define MSIX_CAP_LENGTH 12
+-    migrate_init(ms);
+-
+-    ms->to_dst_file = f;
+-
+     if (migration_is_blocked(errp)) {
+-        ret = -EINVAL;
+-        goto done;
++        return -EINVAL;
+     }
  
-+#define TYPE_VFIO_PCI "vfio-pci"
-+#define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+     if (migrate_use_block()) {
+         error_setg(errp, "Block migration and snapshots are incompatible");
+-        ret = -EINVAL;
+-        goto done;
++        return -EINVAL;
+     }
+ 
++    migrate_init(ms);
++    ms->to_dst_file = f;
 +
- static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
- static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+     qemu_mutex_unlock_iothread();
+     qemu_savevm_state_header(f);
+     qemu_savevm_state_setup(f);
+@@ -1355,7 +1352,6 @@ static int qemu_savevm_state(QEMUFile *f, Error **errp)
+         error_setg_errno(errp, -ret, "Error while writing VM state");
+     }
  
-@@ -222,7 +225,7 @@ static void vfio_intx_disable_kvm(VFIOPCIDevice *vdev)
- 
- static void vfio_intx_update(PCIDevice *pdev)
- {
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     PCIINTxRoute route;
-     Error *err = NULL;
- 
-@@ -477,7 +480,7 @@ static void vfio_update_kvm_msi_virq(VFIOMSIVector *vector, MSIMessage msg,
- static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
-                                    MSIMessage *msg, IOHandler *handler)
- {
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     VFIOMSIVector *vector;
-     int ret;
- 
-@@ -574,7 +577,7 @@ static int vfio_msix_vector_use(PCIDevice *pdev,
- 
- static void vfio_msix_vector_release(PCIDevice *pdev, unsigned int nr)
- {
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     VFIOMSIVector *vector = &vdev->msi_vectors[nr];
- 
-     trace_vfio_msix_vector_release(vdev->vbasedev.name, nr);
-@@ -1086,7 +1089,7 @@ static const MemoryRegionOps vfio_vga_ops = {
-  */
- static void vfio_sub_page_bar_update_mapping(PCIDevice *pdev, int bar)
- {
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     VFIORegion *region = &vdev->bars[bar].region;
-     MemoryRegion *mmap_mr, *region_mr, *base_mr;
-     PCIIORegion *r;
-@@ -1132,7 +1135,7 @@ static void vfio_sub_page_bar_update_mapping(PCIDevice *pdev, int bar)
-  */
- uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len)
- {
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     uint32_t emu_bits = 0, emu_val = 0, phys_val = 0, val;
- 
-     memcpy(&emu_bits, vdev->emulated_config_bits + addr, len);
-@@ -1165,7 +1168,7 @@ uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len)
- void vfio_pci_write_config(PCIDevice *pdev,
-                            uint32_t addr, uint32_t val, int len)
- {
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     uint32_t val_le = cpu_to_le32(val);
- 
-     trace_vfio_pci_write_config(vdev->vbasedev.name, addr, val, len);
-@@ -2801,7 +2804,7 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
- 
- static void vfio_realize(PCIDevice *pdev, Error **errp)
- {
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-     VFIODevice *vbasedev_iter;
-     VFIOGroup *group;
-     char *tmp, *subsys, group_path[PATH_MAX], *group_name;
-@@ -3084,8 +3087,7 @@ error:
- 
- static void vfio_instance_finalize(Object *obj)
- {
--    PCIDevice *pci_dev = PCI_DEVICE(obj);
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pci_dev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(obj);
-     VFIOGroup *group = vdev->vbasedev.group;
- 
-     vfio_display_finalize(vdev);
-@@ -3105,7 +3107,7 @@ static void vfio_instance_finalize(Object *obj)
- 
- static void vfio_exitfn(PCIDevice *pdev)
- {
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
- 
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-@@ -3120,8 +3122,7 @@ static void vfio_exitfn(PCIDevice *pdev)
- 
- static void vfio_pci_reset(DeviceState *dev)
- {
--    PCIDevice *pdev = DO_UPCAST(PCIDevice, qdev, dev);
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-+    VFIOPCIDevice *vdev = PCI_VFIO(dev);
- 
-     trace_vfio_pci_reset(vdev->vbasedev.name);
- 
-@@ -3161,7 +3162,7 @@ post_reset:
- static void vfio_instance_init(Object *obj)
- {
-     PCIDevice *pci_dev = PCI_DEVICE(obj);
--    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, PCI_DEVICE(obj));
-+    VFIOPCIDevice *vdev = PCI_VFIO(obj);
- 
-     device_add_bootindex_property(obj, &vdev->bootindex,
-                                   "bootindex", NULL,
-@@ -3245,7 +3246,7 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
- }
- 
- static const TypeInfo vfio_pci_dev_info = {
--    .name = "vfio-pci",
-+    .name = TYPE_VFIO_PCI,
-     .parent = TYPE_PCI_DEVICE,
-     .instance_size = sizeof(VFIOPCIDevice),
-     .class_init = vfio_pci_dev_class_init,
+-done:
+     if (ret != 0) {
+         status = MIGRATION_STATUS_FAILED;
+     } else {
 -- 
-2.11.0
+2.13.2.windows.1
